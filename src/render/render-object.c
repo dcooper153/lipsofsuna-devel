@@ -1,0 +1,1032 @@
+/* Lips of Suna
+ * Copyright© 2007-2009 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup lirnd Render
+ * @{
+ * \addtogroup lirndObject Object
+ * @{
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "render-draw.h"
+#include "render-object.h"
+
+static void
+private_clear_envmap (lirndObject* self);
+
+static void
+private_clear_lights (lirndObject* self);
+
+static void
+private_clear_materials (lirndObject* self);
+
+static void
+private_clear_model (lirndObject* self);
+
+static int
+private_init_envmap (lirndObject* self);
+
+static int
+private_init_lights (lirndObject* self);
+
+static int
+private_init_materials (lirndObject* self,
+                        lirndModel*  model);
+
+static int
+private_init_model (lirndObject* self,
+                    lirndModel*  model);
+
+static void
+private_render_debug (lirndObject* self,
+                      limdlNode*   node);
+
+static void
+private_transform_vertices (lirndObject* self);
+
+static int
+private_update_buffer (lirndObject* self);
+
+static void
+private_update_envmap (lirndObject* self,
+                       lirndScene*  scene);
+
+static void
+private_update_lights (lirndObject* self);
+
+/*****************************************************************************/
+
+/**
+ * \brief Creates a new render object and adds it to the renderer.
+ *
+ * \param render Renderer.
+ * \param id Unique identifier.
+ * \return New object or NULL.
+ */
+lirndObject*
+lirnd_object_new (lirndRender* render,
+                  int          id)
+{
+	lirndObject* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (lirndObject));
+	if (self == NULL)
+		return NULL;
+	self->id = id;
+	self->render = render;
+	self->transform = limat_transform_identity ();
+	self->orientation.matrix = limat_matrix_identity ();
+
+	/* Allocate pose buffer. */
+	self->pose.pose = limdl_pose_new ();
+	if (self->pose.pose == NULL)
+		goto error;
+
+	return self;
+
+error:
+	lirnd_object_free (self);
+	return NULL;
+}
+
+/**
+ * \brief Frees the render object.
+ *
+ * The object is removed from its renderer and its memory is freed.
+ *
+ * \param self Object.
+ */
+void
+lirnd_object_free (lirndObject* self)
+{
+	lirndConstraint* constraint;
+	lirndConstraint* constraint_next;
+
+	/* Free constraints. */
+	/* FIXME: Would be better to have objects remember their own constraints. */
+	for (constraint = self->render->world.constraints ; constraint != NULL ; constraint = constraint_next)
+	{
+		constraint_next = constraint->next;
+		if (constraint->objects[0] == self ||
+		    constraint->objects[1] == self)
+		{
+			if (constraint->prev != NULL)
+				constraint->prev->next = constraint->next;
+			else
+				self->render->world.constraints = constraint->next;
+			if (constraint->next != NULL)
+				constraint->next->prev = constraint->prev;
+			free (constraint);
+		}
+	}
+
+	/* Free model and pose. */
+	private_clear_envmap (self);
+	private_clear_lights (self);
+	private_clear_materials (self);
+	private_clear_model (self);
+	if (self->pose.pose != NULL)
+		limdl_pose_free (self->pose.pose);
+
+	free (self);
+}
+
+void
+lirnd_object_emit_particles (lirndObject* self)
+{
+	int i;
+	limatMatrix vtxmat;
+	limatMatrix nmlmat;
+	limatVector position;
+	limatVector velocity;
+	limdlVertex* vertex;
+	limdlVertex* vertices;
+	lirndParticle* particle;
+
+	if (self->model == NULL)
+		return;
+
+	vtxmat = self->orientation.matrix;
+	nmlmat = limat_matrix_get_rotation (vtxmat);
+	if (self->pose.vertices != NULL)
+		vertices = self->pose.vertices;
+	else
+		vertices = self->model->model->vertex.vertices;
+
+	for (i = 0 ; i < self->model->model->vertex.count ; i++)
+	{
+		vertex = vertices + i;
+		position = limat_matrix_transform (vtxmat, vertex->coord);
+		velocity = limat_matrix_transform (nmlmat, vertex->normal);
+		velocity = limat_vector_multiply (velocity, 3.0f/*0.2f*/);
+		/*
+			random()/(0.5*RAND_MAX)-1.0,
+			random()/(3.0*RAND_MAX)+3.0f,
+			random()/(0.5*RAND_MAX)-1.0
+		*/
+		particle = lirnd_render_insert_particle (self->render, &position, &velocity);
+		if (particle != NULL)
+		{
+			particle->time_life = 2.0f;
+			particle->time_fade = 1.0f;
+			particle->acceleration = limat_vector_init (0.0, -100.0, 5.0);
+		}
+	}
+}
+
+void
+lirnd_object_render (lirndObject*  self,
+                     lirndContext* context)
+{
+	int i;
+	limatMatrix matrix;
+	limdlMaterial* group;
+	lirndMaterial* material;
+	lirndShader* shader;
+	limdlModel* model;
+
+	if (self->model == NULL || self->model->model == NULL)
+		return;
+
+	/* Draw the mesh. */
+	model = self->model->model;
+	matrix = self->orientation.matrix;
+	if (self->buffer)
+	{
+		for (i = 0 ; i < model->materials.count ; i++)
+		{
+			group = model->materials.materials + i;
+			material = self->materials.array[i];
+			shader = material->shader;
+			assert (shader != NULL);
+			lirnd_context_set_material (context, material);
+			lirnd_context_set_matrix (context, &matrix);
+			lirnd_context_set_shader (context, shader);
+			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
+			lirnd_context_bind (context);
+			lirnd_context_render_buffer (context, 3 * group->start, 3 * group->end, self->buffer);
+		}
+	}
+	else
+	{
+		for (i = 0 ; i < model->materials.count ; i++)
+		{
+			group = model->materials.materials + i;
+			material = self->materials.array[i];
+			shader = material->shader;
+			assert (shader != NULL);
+			lirnd_context_set_material (context, material);
+			lirnd_context_set_matrix (context, &matrix);
+			lirnd_context_set_shader (context, shader);
+			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
+			lirnd_context_bind (context);
+			lirnd_context_render_indexed (context, 3 * group->start, 3 * group->end, self->pose.vertices);
+		}
+	}
+}
+
+/**
+ * \brief Renders debug information for the object.
+ *
+ * \param self Object.
+ * \param render Renderer.
+ */
+void
+lirnd_object_render_debug (lirndObject* self,
+                           lirndRender* render)
+{
+#ifdef LIRND_DEBUG_MESH
+	limatMatrix matrix;
+	lirndShader* shader;
+	limdlModel* model;
+
+	glColor3f (1.0f, 0.0f, 0.0f);
+	glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
+	if (self->model != NULL)
+	{
+		model = self->model->model;
+		matrix = self->orientation.matrix;
+		shader = self->render->shader.fixed;
+		if (self->buffer)
+		{
+			lirnd_shader_render_buffer (shader, &matrix,
+				0, model->vertex.count, self->buffer);
+		}
+		else
+		{
+			lirnd_shader_render_indexed (shader, &matrix,
+				0, model->vertex.count, self->pose.vertices);
+		}
+	}
+	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
+#endif
+//#define LIRND_DEBUG_ARMATURE
+#ifdef LIRND_DEBUG_ARMATURE
+	int i;
+	limdlNode* node;
+	limdlPose* pose = self->pose.pose;
+
+	if (pose == NULL)
+		return;
+
+//	lirnd_render_set_material (render, NULL);
+	glDisable (GL_TEXTURE_2D);
+	glDisable (GL_LIGHTING);
+	glDisable (GL_DEPTH_TEST);
+	glBindTexture (GL_TEXTURE_2D, 0);
+	glPushMatrix ();
+	glMultMatrixf (self->orientation.matrix.m);
+	glBegin (GL_LINES);
+	for (i = 0 ; i < pose->nodes.count ; i++)
+	{
+		node = pose->nodes.array[i];
+//		node = pose->model->nodes.array[i];
+		private_render_debug (self, node);
+	}
+	glEnd ();
+	glPopMatrix ();
+	glEnable (GL_LIGHTING);
+	glEnable (GL_TEXTURE_2D);
+#endif
+}
+
+void
+lirnd_object_render_group (lirndObject*  self,
+                           lirndContext* context,
+                           int           group)
+{
+	limdlModel* model;
+	limdlMaterial* material;
+
+	if (self->model == NULL)
+		return;
+
+	model = self->model->model;
+	material = model->materials.materials + group;
+	if (self->buffer)
+		lirnd_context_render_buffer (context, 3 * material->start, 3 * material->end, self->buffer);
+	else
+		lirnd_context_render_indexed (context, 3 * material->start, 3 * material->end, self->pose.vertices);
+}
+
+/**
+ * \brief Replaces all matching images with the provided image.
+ *
+ * \param self Object.
+ * \param replaced Image to replace.
+ * \param replacement Replacement image.
+ */
+void
+lirnd_object_replace_image (lirndObject* self,
+                            lirndImage*  replaced,
+                            lirndImage*  replacement)
+{
+	int i;
+	int j;
+	lirndMaterial* material;
+
+	if (self->model == NULL)
+		return;
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		material = self->materials.array[i];
+		for (j = 0 ; j < material->textures.count ; j++)
+		{
+			if (material->textures.array[j].image == replaced)
+			{
+				lirnd_material_set_texture (material, j,
+					self->model->model->materials.materials[i].textures.textures + j, replacement);
+			}
+		}
+	}
+}
+
+/**
+ * \brief Advances the timer of the object and deforms its mesh.
+ *
+ * \param self Object.
+ * \param scene Scene around the object.
+ * \param secs Number of seconds since the last update.
+ */
+void
+lirnd_object_update (lirndObject* self,
+                     lirndScene*  scene,
+                     float        secs)
+{
+	if (self->model == NULL)
+		return;
+
+	limdl_pose_update (self->pose.pose, secs);
+	private_transform_vertices (self);
+	private_update_buffer (self);
+	private_update_lights (self);
+	private_update_envmap (self, scene);
+}
+
+/**
+ * \brief Sets the current animation.
+ *
+ * \param self Object.
+ * \param channel Channel index.
+ * \param animation Animation name.
+ * \param repeats Number of time to repeats, -1 for infinite.
+ * \param priority Blending priority.
+ * \return Nonzero on success.
+ */
+void
+lirnd_object_set_animation (lirndObject* self,
+                            int          channel,
+                            const char*  animation,
+                            int          repeats,
+                            float        priority)
+{
+	limdl_pose_fade_channel (self->pose.pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+	limdl_pose_set_channel_animation (self->pose.pose, channel, animation);
+	limdl_pose_set_channel_repeats (self->pose.pose, channel, repeats);
+	limdl_pose_set_channel_priority (self->pose.pose, channel, priority);
+	limdl_pose_set_channel_state (self->pose.pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+}
+
+/**
+ * \brief Gets the bounding box of the object.
+ *
+ * \param self Object.
+ * \param result Return location for the bounding box.
+ */
+void
+lirnd_object_get_bounds (const lirndObject* self,
+                         limatAabb*         result)
+{
+	const limdlModel* model;
+
+	if (self->model == NULL)
+	{
+		limat_aabb_init (result);
+		return;
+	}
+
+	model = self->model->model;
+	*result = limat_aabb_transform (model->bounds, &self->orientation.matrix);
+}
+
+/**
+ * \brief Gets the center position of the object.
+ *
+ * The returned position depends on the current matrix.
+ *
+ * \param self Object.
+ * \param center Return location for the position.
+ */
+void
+lirnd_object_get_center (const lirndObject* self,
+                         limatVector*       center)
+{
+	*center = self->orientation.center;
+}
+
+/**
+ * \brief Sets the transformation of the object.
+ *
+ * \param self Object.
+ * \param transform Transformation.
+ */
+void
+lirnd_object_set_transform (lirndObject*          self,
+                            const limatTransform* transform)
+{
+	limatVector center;
+	limdlModel* model;
+
+	/* Set transformation. */
+	self->transform = *transform;
+	self->orientation.matrix = limat_convert_transform_to_matrix (*transform);
+
+	/* Set box center. */
+	if (self->model != NULL)
+	{
+		/* FIXME: Incorrect for rotated objects. */
+		model = self->model->model;
+		center = limat_vector_add (model->bounds.min, model->bounds.max);
+		center = limat_vector_multiply (center, 0.5f);
+		center = limat_vector_add (center, transform->position);
+		self->orientation.center = center;
+	}
+	else
+		self->orientation.center = transform->position;
+}
+
+/**
+ * \brief Sets the model of the object.
+ *
+ * Changes the model of the object and takes care of automatically registering
+ * and unregistering lights to match the new apperance.
+ *
+ * \param self Object.
+ * \param model Model.
+ * \return Nonzero on success.
+ */
+int
+lirnd_object_set_model (lirndObject* self,
+                        lirndModel*  model)
+{
+	lirndObject backup;
+
+	/* Clear old model. */
+	memcpy (&backup, self, sizeof (lirndObject));
+	memset (&self->cubemap, 0, sizeof (self->cubemap));
+	self->buffer = 0;
+	self->pose.vertices = NULL;
+	self->lights.count = 0;
+	self->lights.array = NULL;
+	self->materials.count = 0;
+	self->materials.array = NULL;
+
+	/* Create new model. */
+	if (model != NULL)
+	{
+		if (!private_init_model (self, model) ||
+		    !private_init_materials (self, model) ||
+		    !private_init_lights (self) || 
+		    !private_init_envmap (self))
+		{
+			self->pose.pose = NULL;
+			private_clear_lights (self);
+			private_clear_materials (self);
+			private_clear_model (self);
+			private_clear_envmap (self);
+			memcpy (self, &backup, sizeof (lirndObject));
+			return 0;
+		}
+	}
+
+	/* Replace old model. */
+	backup.pose.pose = NULL;
+	private_clear_lights (&backup);
+	private_clear_materials (&backup);
+	private_clear_model (&backup);
+	private_clear_envmap (&backup);
+	self->model = model;
+
+	return 1;
+}
+
+void*
+lirnd_object_get_userdata (const lirndObject* self)
+{
+	return self->userdata;
+}
+
+void
+lirnd_object_set_userdata (lirndObject* self,
+                           void*        value)
+{
+	self->userdata = value;
+}
+
+/*****************************************************************************/
+
+static void
+private_clear_envmap (lirndObject* self)
+{
+	int i;
+	int j;
+	lirndMaterial* material;
+	lirndTexture* texture;
+
+	glDeleteFramebuffersEXT (6, self->cubemap.fbo);
+	glDeleteTextures (1, &self->cubemap.depth);
+	glDeleteTextures (1, &self->cubemap.map);
+	memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
+	self->cubemap.depth = 0;
+	self->cubemap.map = 0;
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		material = self->materials.array[i];
+		for (j = 0 ; j < material->textures.count ; j++)
+		{
+			texture = material->textures.array + j;
+			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
+				texture->texture = 0;
+		}
+	}
+}
+
+static void
+private_clear_lights (lirndObject* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		if (self->lights.array[i] != NULL)
+		{
+			lirnd_lighting_remove_light (self->render->lighting, self->lights.array[i]);
+			lirnd_light_free (self->lights.array[i]);
+		}
+	}
+	free (self->lights.array);
+	self->lights.array = NULL;
+	self->lights.count = 0;
+}
+
+static void
+private_clear_materials (lirndObject* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		if (self->materials.array[i] != NULL)
+			lirnd_material_free (self->materials.array[i]);
+	}
+	free (self->materials.array);
+	self->materials.array = NULL;
+	self->materials.count = 0;
+}
+
+static void
+private_clear_model (lirndObject* self)
+{
+	if (self->pose.pose != NULL)
+		limdl_pose_set_model (self->pose.pose, NULL);
+	if (livid_features.ARB_vertex_buffer_object)
+		glDeleteBuffersARB (1, &self->buffer);
+	free (self->pose.vertices);
+}
+
+static int
+private_init_envmap (lirndObject* self)
+{
+	int i;
+	int j;
+	int width = 0;
+	int height = 0;
+	lirndMaterial* material;
+	lirndTexture* texture;
+
+	/* Check for requirements. */
+	if (!livid_features.ARB_depth_texture ||
+	    !livid_features.ARB_texture_cube_map ||
+	    !livid_features.EXT_framebuffer_object)
+		return 1;
+
+	/* Check if needed by textures. */
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		material = self->materials.array[i];
+		for (j = 0 ; j < material->textures.count ; j++)
+		{
+			texture = material->textures.array + j;
+			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
+			{
+				width = LI_MAX (width, texture->width);
+				height = LI_MAX (height, texture->height);
+			}
+		}
+	}
+	if (width < 2 || height < 2)
+		return 1;
+
+	/* Create depth texture. */
+	glGenTextures (1, &self->cubemap.depth);
+	glBindTexture (GL_TEXTURE_2D, self->cubemap.depth);
+	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+		width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+	/* Create cubemap texture. */
+	glGenTextures (1, &self->cubemap.map);
+	glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, self->cubemap.map);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	for (i = 0 ; i < 6 ; i++)
+	{
+		glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, 0, GL_RGB,
+			width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	}
+
+	/* Create framebuffer objects. */
+	glGenFramebuffersEXT (6, self->cubemap.fbo);
+	for (i = 0 ; i < 6 ; i++)
+	{
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
+		glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + i, self->cubemap.map, 0);
+		glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+			GL_TEXTURE_2D, self->cubemap.depth, 0);
+		glDrawBuffer (GL_COLOR_ATTACHMENT0_EXT);
+		switch (glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT))
+		{
+			case GL_FRAMEBUFFER_COMPLETE_EXT:
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+				lisys_error_set (EINVAL, "incomplete framebuffer attachment");
+				goto error;
+			case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+				lisys_error_set (EINVAL, "incomplete framebuffer dimensions");
+				goto error;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+				lisys_error_set (EINVAL, "missing framebuffer attachment");
+				goto error;
+			default:
+				lisys_error_set (ENOTSUP, "unsupported framebuffer format");
+				goto error;
+		}
+	}
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+
+	/* Setup virtual image to make binding easier. */
+	self->cubemap.width = width;
+	self->cubemap.height = height;
+
+	/* Bind it to environment map textures. */
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		material = self->materials.array[i];
+		for (j = 0 ; j < material->textures.count ; j++)
+		{
+			texture = material->textures.array + j;
+			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
+				texture->texture = self->cubemap.map;
+		}
+	}
+
+	return 1;
+
+error:
+	lisys_error_report ();
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+	glDeleteFramebuffersEXT (6, self->cubemap.fbo);
+	glDeleteTextures (1, &self->cubemap.depth);
+	glDeleteTextures (1, &self->cubemap.map);
+	memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
+	self->cubemap.depth = 0;
+	self->cubemap.map = 0;
+	return 1;
+}
+
+int
+private_init_lights (lirndObject* self)
+{
+	int i;
+	limdlNode* node;
+	limdlNodeIter iter;
+	lirndLight* light;
+
+	/* Create light sources. */
+	LIMDL_FOREACH_NODE (iter, &self->pose.pose->nodes)
+	{
+		node = iter.value;
+		if (node->type != LIMDL_NODE_LIGHT)
+			continue;
+		light = lirnd_light_new_from_model (self->render, node);
+		if (light == NULL)
+			return 0;
+		if (!lialg_array_append (&self->lights, &light))
+		{
+			lirnd_light_free (light);
+			return 0;
+		}
+	}
+
+	/* Register light sources. */
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		light = self->lights.array[i];
+		if (!lirnd_lighting_insert_light (self->render->lighting, light))
+		{
+			while (i--)
+			{
+				light = self->lights.array[i];
+				lirnd_lighting_remove_light (self->render->lighting, light);
+			}
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+static int
+private_init_materials (lirndObject* self,
+                        lirndModel*  model)
+{
+	uint32_t i;
+	uint32_t j;
+	limdlMaterial* src;
+	limdlTexture* texture;
+	lirndImage* image;
+	lirndMaterial* dst;
+
+	if (model == NULL)
+		return 1;
+
+	/* Allocate materials. */
+	self->materials.count = model->model->materials.count;
+	if (self->materials.count)
+	{
+		self->materials.array = calloc (self->materials.count, sizeof (lirndMaterial*));
+		if (self->materials.array == NULL)
+			return 0;
+	}
+
+	/* Resolve materials. */
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		src = model->model->materials.materials + i;
+		dst = lirnd_material_new ();
+		if (dst == NULL)
+			return 0;
+		if (src->flags & LIMDL_MATERIAL_FLAG_BILLBOARD)
+			dst->flags |= LIRND_MATERIAL_FLAG_BILLBOARD;
+		if (src->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
+			dst->flags |= LIRND_MATERIAL_FLAG_CULLFACE;
+		if (src->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
+			dst->flags |= LIRND_MATERIAL_FLAG_TRANSPARENCY;
+		dst->shininess = src->shininess;
+		dst->diffuse[0] = src->diffuse[0];
+		dst->diffuse[1] = src->diffuse[1];
+		dst->diffuse[2] = src->diffuse[2];
+		dst->diffuse[3] = src->diffuse[3];
+		dst->specular[0] = src->specular[0];
+		dst->specular[1] = src->specular[1];
+		dst->specular[2] = src->specular[2];
+		dst->specular[3] = src->specular[3];
+		lirnd_material_set_shader (dst, lirnd_render_find_shader (self->render, src->shader));
+		if (!lirnd_material_set_texture_count (dst, src->textures.count))
+		{
+			lirnd_material_free (dst);
+			return 0;
+		}
+		for (j = 0 ; j < src->textures.count ; j++)
+		{
+			texture = src->textures.textures + j;
+			if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
+				image = lirnd_render_find_image (self->render, texture->string);
+			else
+				image = lirnd_render_find_image (self->render, "empty");
+			lirnd_material_set_texture (dst, j, texture, image);
+		}
+		self->materials.array[i] = dst;
+	}
+
+	return 1;
+}
+
+static int
+private_init_model (lirndObject* self,
+                    lirndModel*  model)
+{
+	void* data;
+	size_t size;
+
+	/* Copy vertices. */
+	if (model->model->vertex.count)
+	{
+		self->pose.vertices = calloc (model->model->vertex.count, sizeof (limdlVertex));
+		if (self->pose.vertices == NULL)
+			return 0;
+		memcpy (self->pose.vertices, model->model->vertex.vertices, model->model->vertex.count * sizeof (limdlVertex));
+	}
+
+	/* Create vertex buffer. */
+	if (livid_features.ARB_vertex_buffer_object)
+	{
+		glGenBuffersARB (1, &self->buffer);
+		size = model->model->vertex.count * sizeof (limdlVertex);
+		data = model->model->vertex.vertices;
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
+		glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, data, GL_STREAM_DRAW_ARB);
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+	}
+
+	/* Change pose target. */
+	if (!limdl_pose_set_model (self->pose.pose, model->model))
+		return 0;
+
+	return 1;
+}
+
+static void
+private_render_debug (lirndObject* self,
+                      limdlNode*   node)
+{
+	int i;
+	limatTransform t;
+	limatVector x;
+	limatVector y;
+	limatVector z;
+	limatVector head;
+	limatVector tail;
+
+	/* Axis. */
+	if (node->type == LIMDL_NODE_EMPTY ||
+	    node->type == LIMDL_NODE_LIGHT)
+	{
+		limdl_node_get_pose_transform (node, &t);
+		limdl_node_get_pose_axes (node, &x, &y, &z);
+		x = limat_vector_multiply (x, 0.3f);
+		y = limat_vector_multiply (y, 0.3f);
+		z = limat_vector_multiply (z, 0.3f);
+		tail = t.position;
+		glColor3f (1.0f, 0.0f, 0.0f);
+		glVertex3f (tail.x, tail.y, tail.z);
+		glVertex3f (tail.x + x.x, tail.y + x.y, tail.z + x.z);
+		glColor3f (0.0f, 1.0f, 0.0f);
+		glVertex3f (tail.x, tail.y, tail.z);
+		glVertex3f (tail.x + y.x, tail.y + y.y, tail.z + y.z);
+		glColor3f (0.0f, 0.0f, 1.0f);
+		glVertex3f (tail.x, tail.y, tail.z);
+		glVertex3f (tail.x + z.x, tail.y + z.y, tail.z + z.z);
+	}
+
+	/* Bone. */
+	if (node->type == LIMDL_NODE_BONE)
+	{
+		limdl_bone_get_pose_head (node, &head);
+		limdl_bone_get_pose_tail (node, &tail);
+		glColor3f (1.0f, 1.0f, 0.0f);
+		glVertex3f (head.x, head.y, head.z);
+		glColor3f (1.0f, 1.0f, 1.0f);
+		glVertex3f (tail.x, tail.y, tail.z);
+	}
+
+	/* Children. */
+	for (i = 0 ; i < node->nodes.count ; i++)
+		private_render_debug (self, node->nodes.array[i]);
+}
+
+/**
+ * \brief Transforms the vertices of the model according to the current pose.
+ *
+ * \param self Object.
+ */
+static void
+private_transform_vertices (lirndObject* self)
+{
+	limdl_pose_transform_mesh (self->pose.pose, self->pose.vertices);
+}
+
+static int
+private_update_buffer (lirndObject* self)
+{
+	size_t size;
+	void* data;
+	const limdlModel* model = self->model->model;
+
+	if (!livid_features.ARB_vertex_buffer_object)
+		return 1;
+	glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
+	size = model->vertex.count * sizeof (limdlVertex);
+	data = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	if (data == NULL)
+		return 0;
+	memcpy (data, self->pose.vertices, size);
+	glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
+	glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+
+	return 1;
+}
+
+static void
+private_update_envmap (lirndObject* self,
+                       lirndScene*  scene)
+{
+	int i;
+	limatFrustum frustum;
+	limatVector ctr;
+	limatMatrix modelview;
+	limatMatrix projection;
+	const limatVector dir[6] =
+	{
+		{ 1.0f, 0.0f, 0.0f }, /* Back. */
+		{ -1.0f, 0.0f, 0.0f }, /* Front. */
+		{ 0.0f, 1.0f, 0.0f }, /* Up. */
+		{ 0.0f, -1.0f, 0.0f }, /* Down. */
+		{ 0.0f, 0.0f, 1.0f }, /* Left. */
+		{ 0.0f, 0.0f, -1.0f } /* Right. */
+	};
+	const limatVector up[6] =
+	{
+		{ 0.0f, -1.0f, 0.0f }, /* Back. */
+		{ 0.0f, -1.0f, 0.0f }, /* Front. */
+		{ 0.0f, 0.0f, 1.0f }, /* Up. */
+		{ 0.0f, 0.0f, -1.0f }, /* Down. */
+		{ 0.0f, -1.0f, 0.0f }, /* Left. */
+		{ 0.0f, -1.0f, 0.0f } /* Right. */
+	};
+
+	if (!self->cubemap.map || !self->render->shader.enabled)
+		return;
+	modelview = self->orientation.matrix;
+	projection = limat_matrix_perspective (0.5 * M_PI, 1.0f, 1.0f, 100.0f);
+	lirnd_object_get_center (self, &ctr);
+
+	/* Enable cube map rendering mode. */
+	glPushAttrib (GL_VIEWPORT_BIT);
+	glViewport (0, 0, self->cubemap.width, self->cubemap.height);
+
+	/* Render each cube face. */
+	for (i = 0 ; i < 6 ; i++)
+	{
+		modelview = limat_matrix_look (
+			ctr.x, ctr.y, ctr.z,
+			dir[i].x, dir[i].y, dir[i].z,
+			up[i].x, up[i].y, up[i].z);
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		limat_frustum_init (&frustum, &modelview, &projection);
+		lirnd_render_render2 (self->render,
+			scene, &modelview, &projection, &frustum, lirnd_draw_exclude, self);
+	}
+
+	/* Disable cube map rendering mode. */
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+	glPopAttrib ();
+}
+
+static void
+private_update_lights (lirndObject* self)
+{
+	int i;
+	limatTransform transform;
+	lirndLight* light;
+
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		light = self->lights.array[i];
+		if (light->node != NULL)
+		{
+			limdl_node_get_pose_transform (light->node, &transform);
+			transform = limat_transform_multiply (self->transform, transform);
+			lirnd_light_set_transform (light, &transform);
+		}
+	}
+}
+
+/** @} */
+/** @} */

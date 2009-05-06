@@ -1,0 +1,232 @@
+/* Lips of Suna
+ * Copyright© 2007-2009 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup liext Extension
+ * @{
+ * \addtogroup liextcli Client
+ * @{
+ * \addtogroup liextcliSkills Skills
+ * @{
+ */
+
+#include <client/lips-client.h>
+#include "ext-module.h"
+#include "ext-skills.h"
+
+static int
+private_visibility (liextModule* self,
+                    liengObject* object,
+                    int          value);
+
+static int
+private_packet (liextModule* module,
+                int          type,
+                liReader*    reader);
+
+static int
+private_packet_diff (liextModule* module,
+                     liReader*    reader);
+
+static int
+private_packet_reset (liextModule* module,
+                      liReader*    reader);
+
+/*****************************************************************************/
+
+licliExtensionInfo liextInfo =
+{
+	LICLI_EXTENSION_VERSION, "Skills",
+	liext_module_new,
+	liext_module_free
+};
+
+liextModule*
+liext_module_new (licliModule* module)
+{
+	liextModule* self;
+
+	self = calloc (1, sizeof (liextModule));
+	if (self == NULL)
+		return NULL;
+	self->module = module;
+	self->dictionary = lialg_u32dic_new ();
+	if (self->dictionary == NULL)
+	{
+		free (self);
+		return NULL;
+	}
+	self->calls[0] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_PACKET, 0, private_packet, self);
+	self->calls[1] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_VISIBILITY, 0, private_visibility, self);
+
+	liscr_script_insert_class (module->script, "SkillWidget", liextSkillWidgetScript, self);
+
+	return self;
+}
+
+void
+liext_module_free (liextModule* self)
+{
+	lialgU32dicIter iter;
+
+	LI_FOREACH_U32DIC (iter, self->dictionary)
+		liext_skills_free (iter.value);
+	lialg_u32dic_free (self->dictionary);
+	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_PACKET, self->calls[0]);
+	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_VISIBILITY, self->calls[1]);
+	free (self);
+}
+
+liextSkills*
+liext_module_find_skills (liextModule* self,
+                          uint32_t     id)
+{
+	return lialg_u32dic_find (self->dictionary, id);
+}
+
+/*****************************************************************************/
+
+static int
+private_packet (liextModule* self,
+                int          type,
+                liReader*    reader)
+{
+	switch (type)
+	{
+		case LIEXT_SKILLS_PACKET_RESET:
+			private_packet_reset (self, reader);
+			return 0;
+		case LIEXT_SKILLS_PACKET_DIFF:
+			private_packet_diff (self, reader);
+			return 0;
+	}
+
+	return 1;
+}
+
+static int
+private_packet_diff (liextModule* self,
+                     liReader*    reader)
+{
+	uint32_t id;
+	float value;
+	float maximum;
+	char* name;
+	liextSkills* skills;
+
+	/* Find or create skill block. */
+	if (!li_reader_get_uint32 (reader, &id))
+		return 0;
+	skills = lialg_u32dic_find (self->dictionary, id);
+	if (skills == NULL)
+	{
+		skills = liext_skills_new (self);
+		if (skills == NULL)
+			return 0;
+		if (!lialg_u32dic_insert (self->dictionary, id, skills))
+		{
+			liext_skills_free (skills);
+			return 0;
+		}
+	}
+
+	/* Insert skills. */
+	while (!li_reader_check_end (reader))
+	{
+		if (!li_reader_get_text (reader, "", &name) ||
+		    !li_reader_get_float (reader, &value) ||
+		    !li_reader_get_float (reader, &maximum) ||
+		    !liext_skills_set_skill (skills, name, value, maximum))
+		{
+			free (name);
+		    return 0;
+		}
+		free (name);
+	}
+
+	return 1;
+}
+
+static int
+private_packet_reset (liextModule* self,
+                      liReader*    reader)
+{
+	uint32_t id;
+	float value;
+	float maximum;
+	char* name;
+	liextSkills* skills;
+
+	/* Create or clear skill block. */
+	if (!li_reader_get_uint32 (reader, &id))
+		return 0;
+	skills = lialg_u32dic_find (self->dictionary, id);
+	if (skills == NULL)
+	{
+		skills = liext_skills_new (self);
+		if (skills == NULL)
+			return 0;
+		if (!lialg_u32dic_insert (self->dictionary, id, skills))
+		{
+			liext_skills_free (skills);
+			return 0;
+		}
+	}
+	else
+		liext_skills_clear (skills);
+
+	/* Insert skills. */
+	while (!li_reader_check_end (reader))
+	{
+		if (!li_reader_get_text (reader, "", &name) ||
+		    !li_reader_get_float (reader, &value) ||
+		    !li_reader_get_float (reader, &maximum) ||
+		    !liext_skills_set_skill (skills, name, value, maximum))
+		{
+			free (name);
+		    return 0;
+		}
+		free (name);
+	}
+
+	return 1;
+}
+
+static int
+private_visibility (liextModule* self,
+                    liengObject* object,
+                    int          value)
+{
+	liextSkills* skills;
+
+	/* Free skill block. */
+	if (!value)
+	{
+		skills = lialg_u32dic_find (self->dictionary, object->id);
+		if (skills != NULL)
+		{
+			lialg_u32dic_remove (self->dictionary, object->id);
+			liext_skills_free (skills);
+		}
+	}
+
+	return 1;
+}
+
+/** @} */
+/** @} */
+/** @} */

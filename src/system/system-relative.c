@@ -1,0 +1,215 @@
+/* Lips of Suna
+ * Copyright© 2007-2009 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup lisys System
+ * @{
+ * \addtogroup lisysRelative Relative
+ * @{
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef linux
+#include <linux/limits.h>
+#endif
+
+/**
+ * \brief Gets the file name of the calling executable.
+ *
+ * \return New string or NULL.
+ */
+char*
+lisys_relative_exename ()
+{
+#if defined linux
+	int i;
+	FILE* f;
+	char* tmp;
+	char* path;
+	size_t buf_size;
+	ssize_t size;
+	struct stat stat_buf;
+
+	/* Allocate memory. */
+	buf_size = PATH_MAX + 128;
+	path = (char *) malloc (buf_size);
+	if (path == NULL)
+		return NULL;
+	tmp = (char*) malloc (buf_size);
+	if (tmp == NULL)
+	{
+		free (path);
+		return NULL;
+	}
+
+	/* Try to resolve /proc/self/exe. */
+	strncpy (tmp, "/proc/self/exe", buf_size - 1);
+	while (1)
+	{
+		/* Read the link target. */
+		size = readlink (tmp, path, buf_size - 1);
+		if (size == -1)
+		{
+			free (tmp);
+			break;
+		}
+		path[size] = '\0';
+
+		/* Check if another link. */
+		i = stat (path, &stat_buf);
+		if (i == -1)
+		{
+			free (tmp);
+			break;
+		}
+		if (S_ISLNK (stat_buf.st_mode))
+		{
+			strncpy (path, tmp, buf_size - 1);
+			continue;
+		}
+
+		/* Return the final path. */
+		free (tmp);
+		return path;
+	}
+
+	/* Try to read from /proc/self/maps. */
+	if (1)
+	{
+		/* Open the file. */
+		f = fopen ("/proc/self/maps", "r");
+		if (f == NULL)
+		{
+			free (path);
+			return NULL;
+		}
+
+		/* Read in the first line. */
+		if (fgets (path, (int) buf_size, f) == NULL)
+		{
+			fclose (f);
+			free (path);
+			return NULL;
+		}
+
+		/* Remove trailing newline. */
+		buf_size = strlen (path);
+		if (buf_size <= 0)
+		{
+			fclose (f);
+			free (path);
+			return NULL;
+		}
+		if (path[buf_size - 1] == 10)
+			path[buf_size - 1] = 0;
+
+		/* Find the executable name. */
+		tmp = strchr (path, '/');
+		if (tmp == NULL)
+		{
+			fclose (f);
+			free (path);
+			return NULL;
+		}
+	}
+
+	/* Return the name. */
+	tmp = strdup (tmp);
+	free (path);
+	fclose (f);
+	return tmp;
+#elif defined WIN32
+	char* tmp;
+	char* path;
+	size_t ret;
+	size_t size = 256;
+
+	path = malloc (size);
+	if (path == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	while (1)
+	{
+		ret = GetModuleFileName (NULL, path, size);
+		if (!ret)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (path);
+			return NULL;
+		}
+		if (ret < size)
+			break;
+		tmp = realloc (path, size <<= 1);
+		if (tmp == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (path);
+			return NULL;
+		}
+		path = tmp;
+	}
+	for (tmp = path ; *tmp != '\0' ; tmp++)
+	{
+		if (*tmp == '\\')
+			*tmp = '/'
+	}
+
+	return tmp;
+#else
+#warning "Not supported."
+	return NULL;
+#endif
+}
+
+/**
+ * \brief Gets the directory in which the calling executable is.
+ *
+ * \return New string or NULL.
+ */
+char*
+lisys_relative_exedir ()
+{
+#if defined WIN32 || defined linux
+	char* tmp;
+	char* ptr;
+
+	tmp = lisys_relative_exename ();
+	if (tmp == NULL)
+		return NULL;
+	ptr = strrchr (tmp, '/');
+	if (ptr == NULL)
+	{
+		free (tmp);
+		return NULL;
+	}
+	*(ptr + 1) = '\0';
+	return tmp;
+#else
+#warning "Not supported."
+	return NULL;
+#endif
+}
+
+/** @} */
+/** @} */

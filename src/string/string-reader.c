@@ -1,0 +1,1081 @@
+/* Lips of Suna
+ * Copyright© 2007-2008 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup listr String
+ * @{
+ * \addtogroup listrReader Reader
+ * @{
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <zlib.h>
+#include "string-reader.h"
+
+/**
+ * \brief Creates a new stream reader.
+ *
+ * \param buffer Buffer to read.
+ * \param length Length of the buffer.
+ * \return New packet reader or NULL if ran out of memory.
+ */
+liReader*
+li_reader_new (const char* buffer,
+               int         length)
+{
+	liReader* self;
+
+	self = malloc (sizeof (liReader));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->pos = 0;
+	self->mmap = 0;
+	self->length = length;
+	self->buffer = buffer;
+
+	return self;
+}
+
+/**
+ * \brief Creates a new stream reader from a file.
+ *
+ * \param path Path to the file.
+ * \return New reader or NULL.
+ */
+liReader*
+li_reader_new_from_file (const char* path)
+{
+	int fd;
+	struct stat st;
+	liReader* self;
+
+	/* Allocate self. */
+	self = malloc (sizeof (liReader));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->pos = 0;
+	self->mmap = 1;
+
+	/* Open the file. */
+	fd = open (path, O_RDONLY);
+	if (fd == -1)
+	{
+		lisys_error_set (EIO, "cannot open `%s'", path);
+		free (self);
+		return NULL;
+	}
+	if (fstat (fd, &st) == -1)
+	{
+		lisys_error_set (EIO, "cannot stat `%s'", path);
+		close (fd);
+		free (self);
+		return NULL;
+	}
+
+	/* Memory map the file. */
+	/* Note: Mapping an empty file is an error. */
+	self->length = st.st_size;
+	if (st.st_size)
+	{
+		self->buffer = mmap (NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
+		if (self->buffer == MAP_FAILED)
+		{
+			lisys_error_set (EIO, "cannot mmap `%s'", path);
+			close (fd);
+			free (self);
+			return NULL;
+		}
+	}
+	else
+		self->mmap = 0;
+	close (fd);
+
+	return self;
+}
+
+/**
+ * \brief Creates a new stream reader from a NUL terminated string.
+ *
+ * \param buffer String to read.
+ * \return New packet reader or NULL.
+ */
+liReader* li_reader_new_from_string (const char* buffer)
+{
+	liReader* self;
+
+	self = malloc (sizeof (liReader));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->pos = 0;
+	self->mmap = 0;
+	self->length = strlen (buffer) + 1;
+	self->buffer = buffer;
+	return self;
+}
+
+/**
+ * \brief Frees the stream reader.
+ *
+ * \param self Stream reader.
+ */
+void li_reader_free (liReader* self)
+{
+	if (self->mmap)
+		munmap ((void*) self->buffer, self->length);
+	free (self);
+}
+
+/**
+ * \brief Checks if the reader is at its end position.
+ *
+ * \param self Stream reader.
+ * \return Nonzero if the end has been reached.
+ */
+int
+li_reader_check_end (liReader* self)
+{
+	return (self->pos == self->length);
+}
+
+/**
+ * \brief Checks for a single character.
+ *
+ * The reader position is only advanced if the read and the check succeed.
+ *
+ * \param self Packet reader.
+ * \param chr Character expected.
+ * \return Nonzero on success.
+ */
+int
+li_reader_check_char (liReader* self,
+                      char      chr)
+{
+	if (self->pos == self->length)
+		return 0;
+	if (self->buffer[self->pos] != chr)
+		return 0;
+	self->pos++;
+	return 1;
+}
+
+/**
+ * \brief Checks for a sequence of bytes.
+ *
+ * The reader position is only advanced if the read and the check succeed.
+ *
+ * \param self Stream reader.
+ * \param data Expected data.
+ * \param length Number of bytes expected.
+ * \return Nonzero on success.
+ */
+int
+li_reader_check_data (liReader*   self,
+                      const void* data,
+                      int         length)
+{
+	/* Check for read errors. */
+	if (self->pos + length > self->length)
+		return 0;
+
+	/* Compare the data. */
+	if (memcmp (self->buffer + self->pos, data, length) != 0)
+		return 0;
+
+	/* Advance the position. */
+	self->pos += length;
+	return 1;
+}
+
+/**
+ * \brief Checks for a string.
+ *
+ * The reader position is only advanced if the read and the check succeed.
+ *
+ * \param self Stream reader.
+ * \param data Expected string.
+ * \param list List of delimiters.
+ * \return Nonzero on success.
+ */
+int
+li_reader_check_text (liReader*   self,
+                      const char* data,
+                      const char* list)
+{
+	char* str;
+	int tmp = self->pos;
+
+	/* Avoid overwriting error. */
+	if (self->pos >= self->length)
+		return 0;
+
+	/* Read text. */
+	if (!li_reader_get_text (self, list, &str))
+		return 0;
+
+	/* Compare to the expected value. */
+	if (strcmp (str, data))
+	{
+		free (str);
+		self->pos = tmp;
+		return 0;
+	}
+	free (str);
+	return 1;
+}
+
+/**
+ * \brief Checks for a key value pair.
+ *
+ * The reader position is only advanced if the read and the check succeed.
+ *
+ * \param self Stream reader.
+ * \param key Expected key.
+ * \param value Expected value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_check_key_value_pair (liReader*   self,
+                                const char* key,
+                                const char* value)
+{
+	char* k;
+	char* v;
+	int tmp = self->pos;
+
+	/* Avoid overwriting error. */
+	li_reader_skip_chars (self, " \t");
+	if (self->pos >= self->length)
+		return 0;
+
+	/* Read the key. */
+	if (!li_reader_get_text (self, " \t", &k))
+		return 0;
+	if (strchr (k, '\n'))
+	{
+		self->pos = tmp;
+		free (k);
+		return 0;
+	}
+	if (strcmp (key, k))
+	{
+		self->pos = tmp;
+		free (k);
+		return 0;
+	}
+	free (k);
+
+	/* Avoid overwriting error. */
+	li_reader_skip_chars (self, " \t");
+	if (self->pos >= self->length)
+	{
+		self->pos = tmp;
+		return 0;
+	}
+
+	/* Read the value. */
+	if (!li_reader_get_text (self, "\n", &v))
+	{
+		self->pos = tmp;
+		return 0;
+	}
+	if (strcmp (value, v))
+	{
+		self->pos = tmp;
+		free (v);
+		return 0;
+	}
+	free (v);
+
+	return 1;
+}
+
+/**
+ * \brief Checks for a signed 32-bit binary value.
+ *
+ * The reader position is only advanced if the read and the check succeed.
+ *
+ * \param self Stream reader.
+ * \param value Expected value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_check_uint32 (liReader* self,
+                        uint32_t  value)
+{
+	int pos;
+	int ret;
+	uint32_t tmp;
+
+	pos = self->pos;
+	ret = li_reader_get_uint32 (self, &tmp);
+	if (!ret || tmp != value)
+	{
+		lisys_error_get (NULL);
+		return 0;
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Reads a single character.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_char (liReader* self,
+                    char*     value)
+{
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	*value = ((char*)(self->buffer + self->pos))[0];
+	self->pos++;
+	return 1;
+}
+
+/**
+ * \brief Reads compressed data.
+ *
+ * Reads a sequence of compressed data.
+ *
+ * The returned buffer must be freed manually with free.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the uncompressed data.
+ * \param length Return location for the length of the data.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_compressed (liReader* self,
+                          char**    value,
+                          int*      length)
+{
+	int tmp;
+	char* buf;
+	uLongf zlen;
+	uint32_t extrlen;
+	uint32_t complen;
+
+	/* Read lengths. */
+	if (!li_reader_get_uint32 (self, &extrlen) ||
+	    !li_reader_get_uint32 (self, &complen))
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+	if ((uint32_t) self->length < self->pos + complen)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Allocate buffer. */
+	buf = malloc (extrlen);
+	if (buf == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+
+	/* Uncompress data. */
+	zlen = extrlen;
+	tmp = uncompress ((Bytef*) buf, &zlen, (Bytef*)(self->buffer + self->pos), complen);
+	if (tmp != Z_OK)
+	{
+		if (tmp == Z_MEM_ERROR)
+			lisys_error_set (ENOMEM, NULL);
+		else
+			lisys_error_set (EINVAL, "cannot uncompress block");
+		free (buf);
+		return 0;
+	}
+	if (zlen != extrlen)
+	{
+		lisys_error_set (EINVAL, "cannot uncompress block");
+		free (buf);
+		return 0;
+	}
+	self->pos += complen;
+
+	/* Return buffer. */
+	*value = buf;
+	*length = zlen;
+	return 1;
+}
+
+/**
+ * \brief Reads a floating point number.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ */
+int
+li_reader_get_float (liReader* self,
+                     float*    value)
+{
+	uint8_t tmp[4];
+
+	/* Check for read errors. */
+	if (self->pos >= self->length - 3)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+#if LI_BYTE_ORDER == LI_LITTLE_ENDIAN
+	tmp[0] = ((uint8_t*)(self->buffer + self->pos))[3];
+	tmp[1] = ((uint8_t*)(self->buffer + self->pos))[2];
+	tmp[2] = ((uint8_t*)(self->buffer + self->pos))[1];
+	tmp[3] = ((uint8_t*)(self->buffer + self->pos))[0];
+#else
+	tmp[0] = ((uint8_t*)(self->buffer + self->pos))[0];
+	tmp[1] = ((uint8_t*)(self->buffer + self->pos))[1];
+	tmp[2] = ((uint8_t*)(self->buffer + self->pos))[2];
+	tmp[3] = ((uint8_t*)(self->buffer + self->pos))[3];
+#endif
+	*value = *((float*) &tmp);
+	self->pos += 4;
+	return 1;
+}
+
+/**
+ * \brief Reads a signed 8-bit binary integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_int8 (liReader* self,
+                    int8_t*   value)
+{
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	*value = ((int8_t*)(self->buffer + self->pos))[0];
+	self->pos++;
+	return 1;
+}
+
+/**
+ * \brief Reads a signed 16-bit binary integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_int16 (liReader* self,
+                     int16_t*  value)
+{
+	int8_t* tmp;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length - 1)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	tmp = (int8_t*)(self->buffer + self->pos);
+	*value = (((int16_t) tmp[0]) << 8) |
+	         (((int16_t) tmp[1]) << 0);
+	self->pos += 2;
+	return 1;
+}
+
+/**
+ * \brief Reads a signed 32-bit binary integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_int32 (liReader* self,
+                     int32_t*  value)
+{
+	int8_t* tmp;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length - 3)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	tmp = (int8_t*)(self->buffer + self->pos);
+	*value = (((int32_t) tmp[0]) << 24) |
+	         (((int32_t) tmp[1]) << 16) |
+	         (((int32_t) tmp[2]) << 8) |
+	         (((int32_t) tmp[3]) << 0);
+	self->pos += 4;
+	return 1;
+}
+
+/**
+ * \brief Gets the current read offset.
+ *
+ * \param self Stream reader.
+ * \return Stream offset.
+ */
+int
+li_reader_get_offset (liReader* self)
+{
+	return self->pos;
+}
+
+/**
+ * \brief Seeks to the requested offset.
+ *
+ * \param self Stream reader.
+ * \param offset Stream offset.
+ * \return Nonzero on success.
+ */
+int
+li_reader_set_offset (liReader* self,
+                      int       offset)
+{
+	if (offset < 0 || offset > self->length)
+		return 0;
+	self->pos = offset;
+
+	return 1;
+}
+
+/**
+ * \brief Reads an unsigned 8-bit binary integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_uint8 (liReader* self,
+                     uint8_t*  value)
+{
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	*value = ((uint8_t*)(self->buffer + self->pos))[0];
+	self->pos++;
+	return 1;
+}
+
+/**
+ * \brief Reads an unsigned 16-bit binary integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_uint16 (liReader* self,
+                      uint16_t* value)
+{
+	uint8_t* tmp;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length - 1)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	tmp = (uint8_t*)(self->buffer + self->pos);
+	*value = (((uint16_t) tmp[0]) << 8) |
+	         (((uint16_t) tmp[1]) << 0);
+	self->pos += 2;
+	return 1;
+}
+
+/**
+ * \brief Reads an unsigned 32-bit binary integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_uint32 (liReader* self,
+                      uint32_t* value)
+{
+	uint8_t* tmp;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length - 3)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Read the value. */
+	tmp = (uint8_t*)(self->buffer + self->pos);
+	*value = (((uint32_t) tmp[0]) << 24) |
+	         (((uint32_t) tmp[1]) << 16) |
+	         (((uint32_t) tmp[2]) << 8) |
+	         (((uint32_t) tmp[3]) << 0);
+	self->pos += 4;
+	return 1;
+}
+
+/**
+ * \brief Reads a string terminated with a delimiter character or NUL.
+ *
+ * The final position is one byte after the delimiter and the last
+ * character in the returned string is the delimiter if one was found.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param list List of delimiter character.
+ * \param value Return location for the newly allocated string.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_text (liReader*   self,
+                    const char* list,
+                    char**      value)
+{
+	int i;
+	int tmp = 0;
+	char* string;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Get the length of the string. */
+	while (self->buffer[self->pos + tmp] != '\0')
+	{
+		for (i = 0 ; list[i] != '\0' ; i++)
+		{
+			if (self->buffer[self->pos + tmp] == list[i])
+				break;
+		}
+		if (list[i] != '\0')
+			break;
+		tmp++;
+		if (self->pos + tmp == self->length)
+			break;
+	}
+
+	/* Allocate a string. */
+	string = malloc (tmp + 1);
+	if (string == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	strncpy (string, self->buffer + self->pos, tmp);
+	string[tmp] = '\0';
+	self->pos += tmp + 1;
+	if (self->pos > self->length)
+		self->pos = self->length;
+	*value = string;
+	return 1;
+}
+
+/**
+ * \brief Reads an ASCII integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_text_int (liReader* self,
+                        int*      value)
+{
+	int tmp = 0;
+	int sign = 1;
+	*value = 0;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Check for sign. */
+	if (self->buffer[self->pos] == '-')
+	{
+		tmp = 1;
+		sign = -1;
+		if (self->pos + 1 >= self->length)
+		{
+			lisys_error_set (EINVAL, "unexpected end of stream");
+			return 0;
+		}
+	}
+
+	/* Check for syntax. */
+	if (self->buffer[self->pos + tmp] < '0' ||
+	    self->buffer[self->pos + tmp] > '9')
+	{
+		lisys_error_set (EINVAL, "expected a number");
+		return 0;
+	}
+	if (self->pos + tmp + 1 < self->length &&
+	    self->buffer[self->pos + tmp] == '0' &&
+	    self->buffer[self->pos + tmp + 1] >= '0' &&
+	    self->buffer[self->pos + tmp + 1] <= '9')
+	{
+		lisys_error_set (EINVAL, "multiple leading zeros");
+		return 0;
+	}
+
+	/* Read in the digits. */
+	while (1)
+	{
+		*value *= 10;
+		*value += self->buffer[self->pos + tmp] - '0';
+		tmp++;
+		if (tmp == self->length - self->pos)
+			break;
+		if (self->buffer[self->pos + tmp] < '0' ||
+		    self->buffer[self->pos + tmp] > '9')
+			break;
+	}
+
+	/* Advance the position. */
+	self->pos += tmp;
+	*value *= sign;
+	return 1;
+}
+
+/**
+ * \brief Reads an unsigned ASCII integer.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_text_uint (liReader* self, int* value)
+{
+	int tmp = 0;
+	*value = 0;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Check for syntax. */
+	if (self->buffer[self->pos] == '-')
+	{
+		lisys_error_set (EINVAL, "expected an unsigned value but got a minus sign");
+		return 0;
+	}
+	if (self->buffer[self->pos] < '0' ||
+	    self->buffer[self->pos] > '9')
+	{
+		lisys_error_set (EINVAL, "expected a number");
+		return 0;
+	}
+	if (self->pos + 1 < self->length &&
+	    self->buffer[self->pos] == '0' &&
+	    self->buffer[self->pos + 1] >= '0' &&
+	    self->buffer[self->pos + 1] <= '9')
+	{
+		lisys_error_set (EINVAL, "multiple leading zeros");
+		return 0;
+	}
+
+	/* Read in the digits. */
+	while (1)
+	{
+		*value *= 10;
+		*value += self->buffer[self->pos + tmp] - '0';
+		tmp++;
+		if (tmp == self->length - self->pos)
+			break;
+		if (self->buffer[self->pos + tmp] < '0' ||
+		    self->buffer[self->pos + tmp] > '9')
+			break;
+	}
+
+	/* Advance the position. */
+	self->pos += tmp;
+	return 1;
+}
+
+/**
+ * \brief Reads an ASCII floating point number.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param value Return location for the value.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_text_float (liReader* self,
+                          float*    value)
+{
+	int tmp = 0;
+	int sign = 1;
+	float mul;
+	*value = 0;
+
+	/* Check for read errors. */
+	if (self->pos >= self->length)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Check for sign. */
+	if (self->buffer[self->pos] == '-')
+	{
+		tmp = 1;
+		sign = -1;
+		if (self->pos + 1 >= self->length)
+		{
+			lisys_error_set (EINVAL, "unexpected end of stream");
+			return 0;
+		}
+	}
+
+	/* Check for syntax. */
+	if (self->buffer[self->pos + tmp] < '0' ||
+	    self->buffer[self->pos + tmp] > '9')
+	{
+		lisys_error_set (EINVAL, "expected a number");
+		return 0;
+	}
+	if (self->pos + tmp + 1 < self->length &&
+	    self->buffer[self->pos + tmp] == '0' &&
+	    self->buffer[self->pos + tmp + 1] >= '0' &&
+	    self->buffer[self->pos + tmp + 1] <= '9')
+	{
+		lisys_error_set (EINVAL, "multiple leading zeros");
+		return 0;
+	}
+
+	/* Read in the digits. */
+	while (1)
+	{
+		*value *= 10;
+		*value += self->buffer[self->pos + tmp] - '0';
+		tmp++;
+		if (tmp == self->length - self->pos)
+			break;
+		if (self->buffer[self->pos + tmp] < '0' ||
+		    self->buffer[self->pos + tmp] > '9')
+			break;
+	}
+
+	/* Stop if there is no decimal part. */
+	if (self->pos + tmp + 1 >= self->length ||
+	    self->buffer[self->pos + tmp] != '.' ||
+		self->buffer[self->pos + tmp + 1] < '0' ||
+	    self->buffer[self->pos + tmp + 1] > '9')
+	{
+		self->pos += tmp;
+		*value *= sign;
+		return 1;
+	}
+	tmp++;
+
+	/* Read in the decimals. */
+	for (mul = 0.1f ; 1 ; mul *= 0.1f)
+	{
+		*value += mul * (self->buffer[self->pos + tmp] - '0');
+		tmp++;
+		if (tmp == self->length - self->pos)
+			break;
+		if (self->buffer[self->pos + tmp] < '0' ||
+		    self->buffer[self->pos + tmp] > '9')
+			break;
+	}
+	
+	/* Return the value. */
+	self->pos += tmp;
+	*value *= sign;
+	return 1;
+}
+
+/**
+ * \brief Parses a key value pair.
+ *
+ * The reader position is only advanced if the read succeeds.
+ *
+ * \param self Stream reader.
+ * \param key A return location for a newly allocated string.
+ * \param value A return location for a newly allocated string.
+ * \return Nonzero on success.
+ */
+int
+li_reader_get_key_value_pair (liReader* self,
+                              char**    key,
+                              char**    value)
+{
+	int tmp = self->pos;
+
+	/* Read the key. */
+	li_reader_skip_chars (self, " \t");
+	if (!li_reader_get_text (self, " \t", key))
+	{
+		*key = NULL;
+		*value = NULL;
+		self->pos = tmp;
+		return 0;
+	}
+	if (strchr (*key, '\n'))
+	{
+		free (*key);
+		*key = NULL;
+		*value = NULL;
+		self->pos = tmp;
+		lisys_error_set (EINVAL, "newline between a key and a value");
+		return 0;
+	}
+
+	/* Read the value. */
+	li_reader_skip_chars (self, " \t");
+	if (!li_reader_get_text (self, "\n", value))
+	{
+		free (*key);
+		*key = NULL;
+		*value = NULL;
+		self->pos = tmp;
+		return 0;
+	}
+	return 1;
+}
+
+/**
+ * \brief Skips a number of bytes.
+ *
+ * The reader position is only advanced if the skip succeeds.
+ *
+ * \param self Stream reader.
+ * \param num Number of bytes to skip.
+ * \return Nonzero on success.
+ */
+int
+li_reader_skip_bytes (liReader* self,
+                      int       num)
+{
+	/* Check for read errors. */
+	if (self->pos >= self->length - num - 1)
+	{
+		lisys_error_set (EINVAL, "unexpected end of stream");
+		return 0;
+	}
+
+	/* Skip bytes. */
+	self->pos += num;
+	return 1;
+}
+
+/**
+ * \brief Skips characters appearing in the list.
+ *
+ * \param self Stream reader.
+ * \param list List of characters to skip.
+ * \return Number of characters skipped.
+ */
+int
+li_reader_skip_chars (liReader*   self,
+                      const char* list)
+{
+	int c = 0;
+	const char* p;
+
+	/* Skip characters. */
+	while (self->pos < self->length)
+	{
+		for (p = list ; *p ; p++)
+		{
+			if (*p == self->buffer[self->pos])
+				break;
+		}
+		if (*p == '\0')
+			break;
+		self->pos++;
+		c++;
+	}
+
+	return c;
+}
+
+/** @} */
+/** @} */

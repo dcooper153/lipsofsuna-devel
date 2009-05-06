@@ -1,0 +1,633 @@
+/* Lips of Suna
+ * Copyright© 2007-2009 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup lisrv Server
+ * @{
+ * \addtogroup lisrvServer Server
+ * @{
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <assert.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <config/lips-config.h>
+#include <network/lips-network.h>
+#include <script/lips-script.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
+#include "server.h"
+#include "server-callbacks.h"
+#include "server-client.h"
+#include "server-extension.h"
+#include "server-script.h"
+
+#define LI_SERVER_SLEEP
+
+static int
+private_init_ai (lisrvServer* self);
+
+static int
+private_init_bans (lisrvServer* self);
+
+static int
+private_init_effects (lisrvServer* self);
+
+static int
+private_init_engine (lisrvServer* self);
+
+static int
+private_init_extensions (lisrvServer* self);
+
+static int
+private_init_host (lisrvServer* self);
+
+static int
+private_init_paths (lisrvServer* self,
+                    const char*  name);
+
+static int
+private_init_script (lisrvServer* self);
+
+static int
+private_init_time (lisrvServer* self);
+
+/****************************************************************************/
+
+/**
+ * \brief Creates a new server instance.
+ *
+ * \param name Server name.
+ * \return New server or NULL.
+ */
+lisrvServer*
+lisrv_server_new (const char* name)
+{
+	lisrvServer* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (lisrvServer));
+	if (self == NULL)
+		return NULL;
+
+	/* Initialize mutexes. */
+	pthread_mutex_init (&self->mutexes.bans, NULL);
+
+	/* Initialize subsystems. */
+	if (!private_init_paths (self, name) ||
+	    !private_init_ai (self) ||
+	    !private_init_host (self) ||
+	    !private_init_bans (self) ||
+	    !private_init_effects (self) ||
+	    !private_init_extensions (self) ||
+	    !private_init_engine (self) ||
+	    !private_init_time (self) ||
+	    !private_init_script (self))
+	{
+		lisrv_server_free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Frees the server.
+ *
+ * \param self Server.
+ */
+void
+lisrv_server_free (lisrvServer* self)
+{
+	lialgStrdicIter iter;
+	lisrvExtension* extension;
+
+	/* Free script. */
+	if (self->script != NULL)
+		liscr_script_free (self->script);
+
+	/* Free extensions. */
+	if (self->extensions != NULL)
+	{
+		LI_FOREACH_STRDIC (iter, self->extensions)
+		{
+			extension = iter.value;
+			((void (*)(void*)) extension->info->free) (extension->object);
+			lisys_module_free (extension->module);
+			free (extension);
+		}
+		lialg_strdic_free (self->extensions);
+	}
+
+	/* Free networking. */
+	if (self->network != NULL)
+		lisrv_network_free (self->network);
+
+	/* Free engine. */
+	if (self->engine != NULL)
+		lieng_engine_free (self->engine);
+
+	/* Free mutexes. */
+	pthread_mutex_destroy (&self->mutexes.bans);
+
+	/* Free configuration. */
+	if (self->config.bans != NULL)
+		licfg_bans_free (self->config.bans);
+	if (self->config.effects != NULL)
+		licfg_effects_free (self->config.effects);
+	if (self->config.host != NULL)
+		licfg_host_free (self->config.host);
+	if (self->paths != NULL)
+		lisrv_paths_free (self->paths);
+
+	/* Free helpers. */
+	if (self->helper.path_solver != NULL)
+		liai_path_solver_free (self->helper.path_solver);
+	if (self->helper.resources != NULL)
+		liarc_writer_free (self->helper.resources);
+
+	free (self);
+}
+
+/**
+ * \brief Emits an event.
+ *
+ * \param self Server.
+ * \param type Event type.
+ * \param ... Event arguments.
+ */
+void
+lisrv_server_event (lisrvServer* self,
+                    int          type,
+                                 ...)
+{
+	va_list args;
+
+	va_start (args, type);
+	licom_events_event (self->events.object, type, args);
+	va_end (args);
+}
+
+/**
+ * \brief Loads an extension.
+ *
+ * \param self Server.
+ * \param name Extensions name.
+ * \return Nonzero on success.
+ */
+int
+lisrv_server_load_extension (lisrvServer* self,
+                             const char*  name)
+{
+	char* path;
+	lisysModule* module;
+	lisrvExtension* extension;
+	lisrvExtensionInfo* info;
+
+	/* Check if already loaded. */
+	module = lialg_strdic_find (self->extensions, name);
+	if (module != NULL)
+		return 1;
+
+	/* Construct full path. */
+	path = lisys_path_format (
+		self->paths->global_exts, LISYS_PATH_SEPARATOR,
+		"lib", name, "-ser.", LISYS_EXTENSION_DLL, NULL);
+	if (path == NULL)
+		return 0;
+
+	/* Open module file. */
+	module = lisys_module_new (path, 0);
+	free (path);
+	if (module == NULL)
+		goto error;
+
+	/* Find module info. */
+	info = lisys_module_symbol (module, "liextInfo");
+	if (info == NULL)
+	{
+		lisys_error_set (EINVAL, "no module info");
+		lisys_module_free (module);
+		goto error;
+	}
+	if (info->version != LISRV_EXTENSION_VERSION)
+	{
+		lisys_error_set (EINVAL, "invalid module version");
+		lisys_module_free (module);
+		goto error;
+	}
+	if (info->name == NULL || info->init == NULL || info->free == NULL)
+	{
+		lisys_error_set (EINVAL, "invalid module format");
+		lisys_module_free (module);
+		goto error;
+	}
+
+	/* Insert to extension list. */
+	extension = calloc (1, sizeof (lisrvExtension));
+	extension->info = info;
+	extension->module = module;
+	if (extension == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		lisys_module_free (module);
+		goto error;
+	}
+	if (!lialg_strdic_insert (self->extensions, name, extension))
+	{
+		lisys_error_set (ENOMEM, NULL);
+		lisys_module_free (module);
+		free (extension);
+		goto error;
+	}
+
+	/* Call module initializer. */
+	extension->object = ((void* (*)(lisrvServer*)) info->init)(self);
+	if (extension->object == NULL)
+	{
+		lialg_strdic_remove (self->extensions, name);
+		lisys_module_free (module);
+		free (extension);
+		goto error;
+	}
+
+	return 1;
+
+error:
+	lisys_error_append ("cannot initialize module `%s'", name);
+	fprintf (stderr, "WARNING: %s.\n", lisys_error_get_string ());
+	return 0;
+}
+
+/**
+ * \brief Inserts a ban rule.
+ *
+ * \param self Server.
+ * \param ip Address to ban.
+ * \return Nonzero on success.
+ */
+int
+lisrv_server_insert_ban (lisrvServer* self,
+                         const char*  ip)
+{
+	int ret;
+
+	pthread_mutex_lock (&self->mutexes.bans);
+	ret = licfg_bans_insert_ban (self->config.bans, ip);
+	pthread_mutex_unlock (&self->mutexes.bans);
+	return ret;
+}
+
+/**
+ * \brief Runs the server in a loop until it exits.
+ *
+ * \param self Server.
+ * \return Nonzero on success.
+ */
+int
+lisrv_server_main (lisrvServer* self)
+{
+	float secs;
+	struct timeval curr_tick;
+	struct timeval prev_tick;
+
+	/* Main loop. */
+	gettimeofday (&prev_tick, NULL);
+	while (1)
+	{
+		gettimeofday (&curr_tick, NULL);
+		secs = curr_tick.tv_sec - prev_tick.tv_sec +
+			  (curr_tick.tv_usec - prev_tick.tv_usec) * 0.000001;
+		prev_tick = curr_tick;
+		if (!lisrv_server_update (self, secs))
+			break;
+#ifdef LI_SERVER_SLEEP
+		usleep (10);
+#endif
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Removes a ban rule.
+ *
+ * \param self Server.
+ * \param ip Address to unban.
+ * \return Nonzero on success.
+ */
+int
+lisrv_server_remove_ban (lisrvServer* self,
+                         const char*  ip)
+{
+	int ret;
+
+	pthread_mutex_lock (&self->mutexes.bans);
+	ret = licfg_bans_remove_ban (self->config.bans, ip);
+	pthread_mutex_unlock (&self->mutexes.bans);
+	return ret;
+}
+
+/**
+ * \brief Tells the server to shut down.
+ *
+ * \note Thread safe.
+ * \param self Server.
+ */
+void
+lisrv_server_shutdown (lisrvServer* self)
+{
+	self->quit = 1;
+}
+
+/**
+ * \brief Updates the server state.
+ *
+ * \param self Server.
+ * \param secs Duration of the tick in seconds.
+ * \return Nonzero if the server is still running.
+ */
+int
+lisrv_server_update (lisrvServer* self,
+                     float        secs)
+{
+	if (self->quit)
+		return 0;
+
+	liscr_script_update (self->script, secs);
+	lieng_engine_update (self->engine, secs);
+	lisrv_network_update (self->network, secs);
+	lieng_engine_call (self->engine, LISRV_CALLBACK_TICK, secs);
+
+	return !self->quit;
+}
+
+/**
+ * \brief Checks if the address is banned.
+ *
+ * \param self Server.
+ * \param address Address string.
+ * \return Nonzero if the socket is banned.
+ */
+int
+lisrv_server_get_banned (lisrvServer* self,
+                         const char*  address)
+{
+	return licfg_bans_get_banned (self->config.bans, address);
+}
+
+/**
+ * \brief Gets time since server startup.
+ *
+ * \param self Server.
+ * \return Time in seconds.
+ */
+double
+lisrv_server_get_time (const lisrvServer* self)
+{
+	struct timeval t;
+
+	gettimeofday (&t, NULL);
+	t.tv_sec -= self->time.start.tv_sec;
+	t.tv_usec -= self->time.start.tv_usec;
+	if (t.tv_usec < 0)
+	{
+		t.tv_sec -= 1;
+		t.tv_usec += 1000000;
+	}
+
+	return (double) t.tv_sec + (double) t.tv_usec * 0.000001;
+}
+
+/****************************************************************************/
+
+static int
+private_init_ai (lisrvServer* self)
+{
+	self->helper.path_solver = liai_path_solver_new ();
+	if (self->helper.path_solver == NULL)
+		return 0;
+	return 1;
+}
+
+static int
+private_init_bans (lisrvServer* self)
+{
+	self->config.bans = licfg_bans_new_from_file (self->paths->server_state);
+	if (self->config.bans == NULL)
+	{
+		if (lisys_error_peek () != EIO)
+			return 0;
+		self->config.bans = licfg_bans_new ();
+		if (self->config.bans == NULL)
+			return 0;
+		lisys_error_get (NULL);
+		return 1;
+	}
+	return 1;
+}
+
+static int
+private_init_effects (lisrvServer* self)
+{
+	self->config.effects = licfg_effects_new (self->paths->server_data);
+	if (self->config.effects == NULL)
+		return 0;
+	return 1;
+}
+
+static int
+private_init_engine (lisrvServer* self)
+{
+	int i;
+	liengCalls* calls;
+	liengAnimation* anim;
+	liengModel* model;
+
+	/* Create engine. */
+	self->engine = lieng_engine_new (self->paths->server_data, 0);
+	if (self->engine == NULL)
+		return 0;
+	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
+	lieng_engine_set_userdata (self->engine, LIENG_DATA_SERVER, self);
+
+	/* Initialize callbacks. */
+	calls = lieng_engine_get_calls (self->engine);
+	calls->lieng_object_new = lisrv_object_new;
+	calls->lieng_object_free = lisrv_object_free;
+	calls->lieng_object_moved = lisrv_object_moved;
+	calls->lieng_object_serialize = lisrv_object_serialize;
+	calls->lieng_object_set_model = lisrv_object_set_model;
+	calls->lieng_object_set_realized = lisrv_object_set_realized;
+	calls->lieng_object_set_transform = lisrv_object_set_transform;
+	calls->lieng_object_set_velocity = lisrv_object_set_velocity;
+	if (!lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGIN, lical_marshal_DATA_PTR_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGOUT, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_PACKET, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_ANIMATION, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_EFFECT, lical_marshal_DATA_PTR_PTR_INT) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SPEECH, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_VISIBILITY, lical_marshal_DATA_PTR_INT) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_HIDE, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_SHOW, lical_marshal_DATA_PTR_PTR))
+		return 0;
+
+	/* Load resources. */
+	if (!lieng_engine_load_resources (self->engine, NULL))
+		return 0;
+
+	/* Build resource packet. */
+	/* TODO: Should use compression. */
+	self->helper.resources = liarc_writer_new_packet (LINET_SERVER_PACKET_RESOURCES);
+	if (self->helper.resources == NULL)
+		return 0;
+	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->animations.count);
+	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->models.count);
+	for (i = 0 ; i < self->engine->resources->animations.count ; i++)
+	{
+		anim = lieng_resources_find_animation_by_code (self->engine->resources, i);
+		assert (anim != NULL);
+		liarc_writer_append_string (self->helper.resources, anim->name);
+		liarc_writer_append_nul (self->helper.resources);
+	}
+	for (i = 0 ; i < self->engine->resources->models.count ; i++)
+	{
+		model = lieng_resources_find_model_by_code (self->engine->resources, i);
+		assert (model != NULL);
+		liarc_writer_append_string (self->helper.resources, model->name);
+		liarc_writer_append_nul (self->helper.resources);
+	}
+
+	return 1;
+}
+
+static int
+private_init_extensions (lisrvServer* self)
+{
+	self->extensions = lialg_strdic_new ();
+	if (self->extensions == NULL)
+		return 0;
+	return 1;
+}
+
+static int
+private_init_host (lisrvServer* self)
+{
+	/* Read host configuration. */
+	self->config.host = licfg_host_new (self->paths->server_data);
+	if (self->config.host == NULL)
+		return 0;
+
+	/* Initialize networking. */
+	self->network = lisrv_network_new (self, self->config.host->udp, self->config.host->port);
+	if (self->network == NULL)
+		return 0;
+
+	return 1;
+}
+
+static int
+private_init_paths (lisrvServer* self,
+                    const char*  name)
+{
+	self->paths = lisrv_paths_new (name);
+	if (self->paths == NULL)
+		return 0;
+
+	return 1;
+}
+
+/**
+ * \brief Loads the scripts and objects.
+ *
+ * \param self Server.
+ * \return Nonzero on success.
+ */
+static int
+private_init_script (lisrvServer* self)
+{
+	int ret;
+	char* path;
+
+	/* Allocate the script. */
+	self->script = liscr_script_new ();
+	if (self->script == NULL)
+		return 0;
+	liscr_script_set_userdata (self->script, self);
+
+	/* Register classes. */
+	if (!liscr_script_insert_class (self->script, "Effect", lisrvEffectScript, self) ||
+	    !liscr_script_insert_class (self->script, "Event", lisrvEventScript, self) ||
+	    !liscr_script_insert_class (self->script, "Events", licomEventsScript, self) ||
+	    !liscr_script_insert_class (self->script, "Extension", lisrvExtensionScript, self) ||
+	    !liscr_script_insert_class (self->script, "Object", lisrvObjectScript, self) ||
+	    !liscr_script_insert_class (self->script, "Packet", licomPacketScript, self->script) ||
+	    !liscr_script_insert_class (self->script, "Path", licomPathScript, self->script) ||
+	    !liscr_script_insert_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
+	    !liscr_script_insert_class (self->script, "Server", lisrvServerScript, self) ||
+	    !liscr_script_insert_class (self->script, "Vector", licomVectorScript, self->script))
+		return 0;
+	if (!lisrv_server_init_callbacks_client (self) ||
+	    !lisrv_server_init_callbacks_event (self))
+		return 0;
+
+	/* Register events. */
+	self->events.object = licom_events_new (self->script);
+	if (self->events.object == NULL)
+		return 0;
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_ACTION);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_ANIMATION);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_CONTROL);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_EFFECT);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_HEAR);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_PACKET);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_LOGIN);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_LOGOUT);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_MESSAGE);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_SIMULATE);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_SPEECH);
+	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_VISIBILITY);
+
+	/* Load the script. */
+	path = lisys_path_concat (self->paths->server_data, "scripts", "server", "main.lua", NULL);
+	if (path == NULL)
+		return 0;
+	ret = liscr_script_load (self->script, path);
+	free (path);
+	if (!ret)
+		return 0;
+
+	return 1;
+}
+
+static int
+private_init_time (lisrvServer* self)
+{
+	gettimeofday (&self->time.start, NULL);
+	return 1;
+}
+
+/** @} */
+/** @} */

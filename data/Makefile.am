@@ -1,0 +1,2 @@
+SUBDIRS = $(MAYBE_EDITOR)
+DIST_SUBDIRS = editor

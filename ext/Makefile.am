@@ -1,0 +1,2 @@
+SUBDIRS = $(MAYBE_SERVER) $(MAYBE_CLIENT)
+DIST_SUBDIRS = server client

@@ -1,0 +1,3 @@
+SUBDIRS = src ext data doc
+EXTRA_DIST = dep COPYING.LESSER
+ACLOCAL_AMFLAGS = -I msc/m4

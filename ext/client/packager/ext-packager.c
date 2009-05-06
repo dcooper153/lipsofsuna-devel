@@ -1,0 +1,615 @@
+/* Lips of Suna
+ * Copyright© 2007-2009 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup liext Extension
+ * @{
+ * \addtogroup liextcli Client
+ * @{
+ * \addtogroup liextcliPackager Packager
+ * @{
+ */
+
+#include <archive/lips-archive.h>
+#include <client/lips-client.h>
+#include <model/lips-model.h>
+#include <render/lips-render.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
+#include <thread/lips-thread.h>
+#include <widget/lips-widget.h>
+#include "ext-packager.h"
+#include "ext-resources.h"
+
+#define ENABLE_PACKAGE_SERVER
+
+static void
+private_async_free (lithrAsyncCall* call);
+
+static void
+private_async_save (lithrAsyncCall* call);
+
+static inline int
+private_filter_lmdl (const char* dir,
+                     const char* name);
+
+static int
+private_insert_directory (liextPackager* self,
+                          const char*    path,
+                          const char*    name);
+
+static int
+private_insert_extra (lithrAsyncCall* call,
+                      liextPackager*  self);
+
+static int
+private_insert_file (liextPackager* self,
+                     const char*    dir,
+                     const char*    name,
+                     const char*     ext);
+
+static inline int
+private_insert_models (lithrAsyncCall* call,
+                       liextPackager*  self,
+                       const char*     path);
+
+static void
+private_progress_cancel (liextPackager* self);
+
+static void
+private_progress_update (liextPackager* self);
+
+static void
+private_verbose_model (liextPackager* self,
+                       limdlModel*    model,
+                       const char*    name);
+
+/*****************************************************************************/
+
+liextPackager*
+liext_packager_new (licliModule* module)
+{
+	liextPackager* self;
+
+	self = calloc (1, sizeof (liextPackager));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->module = module;
+
+	return self;
+}
+
+void
+liext_packager_free (liextPackager* self)
+{
+	liext_packager_cancel (self);
+	free (self);
+}
+
+/**
+ * \brief Cancels any active packaging process.
+ *
+ * \param self Packager.
+ */
+void
+liext_packager_cancel (liextPackager* self)
+{
+	if (self->worker == NULL)
+		return;
+	lithr_async_call_stop (self->worker);
+	lithr_async_call_wait (self->worker);
+	private_progress_update (self);
+}
+
+/**
+ * \brief Saves all client data files to a data tarball.
+ *
+ * The saved files include models, textures, shaders, sounds, fonts,
+ * config, and client scripts.
+ *
+ * \param self Packager.
+ * \param name Target file name.
+ * \return Nonzero on success.
+ */
+int
+liext_packager_save (liextPackager* self,
+                     const char*    name)
+{
+	liextPackager* data;
+
+	/* Make sure not already running. */
+	if (self->worker != NULL)
+	{
+		lisys_error_set (EBUSY, "busy saving");
+		return 0;
+	}
+
+	/* Allocate data. */
+	data = calloc (1, sizeof (liextPackager));
+	if (data == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	data->module = self->module;
+	data->target = strdup (name);
+	if (data->target == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (data);
+		return 0;
+	}
+
+	/* Create worker thread. */
+	/* FIXME: File name is ignored. */
+	self->worker = lithr_async_call_new (private_async_save, private_async_free, data);
+	if (self->worker == NULL)
+		return 0;
+
+	/* Create progress dialog. */
+	self->progress = liwdg_busy_new (self->module->widgets);
+	if (self->progress == NULL)
+	{
+		lithr_async_call_stop (self->worker);
+		lithr_async_call_wait (self->worker);
+		lithr_async_call_free (self->worker);
+		self->worker = NULL;
+		return 0;
+	}
+	liwdg_busy_set_cancel (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_cancel), self);
+	liwdg_busy_set_update (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_update), self);
+	liwdg_busy_set_text (LIWDG_BUSY (self->progress), "Packaging...");
+	liwdg_widget_set_visible (LIWDG_WIDGET (self->progress), 1);
+	liwdg_manager_insert_window (self->module->widgets, LIWDG_WIDGET (self->progress));
+
+	return 1;
+}
+
+/**
+ * \brief Checks if verbose debug messages are enabled.
+ *
+ * \param self Packager.
+ * \return Nonzero if verbose debug messages are enabled.
+ */
+int
+liext_packager_get_verbose (liextPackager* self)
+{
+	return self->verbose;
+}
+
+/**
+ * \brief Enables or disables verbose debug messages.
+ *
+ * \param self Packager.
+ * \param value Boolean.
+ */
+void
+liext_packager_set_verbose (liextPackager* self,
+                            int            value)
+{
+	self->verbose = value;
+}
+
+/*****************************************************************************/
+
+static void
+private_async_free (lithrAsyncCall* call)
+{
+	int i;
+	liextPackager* self = call->data;
+
+	if (self->resources != NULL)
+		liext_resources_free (self->resources);
+	if (self->effects != NULL)
+		licfg_effects_free (self->effects);
+	if (self->tar != NULL)
+		liarc_tar_free (self->tar);
+	if (self->writer != NULL)
+		liarc_writer_free (self->writer);
+	for (i = 0 ; i < self->files.count ; i++)
+	{
+		free (self->files.array[i].src);
+		free (self->files.array[i].dst);
+	}
+	free (self->files.array);
+}
+
+static void
+private_async_save (lithrAsyncCall* call)
+{
+	int i;
+	char* path;
+	const char* name;
+	lialgStrdicIter iter;
+	liextPackager* self = call->data;
+
+	/* Allocate writer. */
+	self->writer = liarc_writer_new_gzip (self->target);
+	if (self->writer == NULL)
+		goto error;
+	self->tar = liarc_tar_new (self->writer);
+	if (self->tar == NULL)
+		goto error;
+
+	/* Create resource list. */
+	self->resources = liext_resources_new ();
+	if (self->resources == NULL)
+		goto error;
+	path = lisys_path_concat (self->module->path, "graphics", NULL);
+	if (path == NULL)
+		goto error;
+	if (!private_insert_models (call, self, path) ||
+	    !private_insert_extra (call, self))
+	{
+		free (path);
+		goto error;
+	}
+	free (path);
+	if (call->stop)
+		goto stop;
+
+	/* Collect graphics. */
+	for (i = 0 ; i < self->resources->models.count ; i++)
+	{
+		name = self->resources->models.array[i].name;
+		if (!private_insert_file (self, "graphics", name, ".lmdl"))
+			goto error;
+		if (call->stop)
+			goto stop;
+	}
+	for (i = 0 ; i < self->resources->shaders.count ; i++)
+	{
+		name = self->resources->shaders.array[i];
+		if (!private_insert_file (self, "shaders", name, ""))
+			goto error;
+		if (call->stop)
+			goto stop;
+	}
+	for (i = 0 ; i < self->resources->textures.count ; i++)
+	{
+		name = self->resources->textures.array[i];
+		if (!private_insert_file (self, "graphics", name, ".dds"))
+			goto error;
+		if (call->stop)
+			goto stop;
+	}
+
+	/* Collect sound effects. */
+	self->effects = licfg_effects_new (self->module->path);
+	if (self->effects == NULL)
+		goto error;
+	if (call->stop)
+		goto stop;
+	LI_FOREACH_STRDIC (iter, self->effects->bystr)
+	{
+		/* FIXME: Make sure not already included. */
+		name = ((licfgEffect*) iter.value)->sound;
+		if (name == NULL)
+			continue;
+		if (!private_insert_file (self, "sounds", name, ""))
+			goto error;
+		if (call->stop)
+			goto stop;
+	}
+
+	/* Collect miscellaneous. */
+	if (!private_insert_directory (self, "", "about") ||
+	    !private_insert_directory (self, "", "config") ||
+	    !private_insert_directory (self, "", "fonts") ||
+	    !private_insert_directory (self, "scripts", "client") ||
+#ifdef ENABLE_PACKAGE_SERVER
+	    !private_insert_directory (self, "scripts", "server") ||
+	    !private_insert_directory (self, "", "world")
+#endif
+       )
+		goto error;
+	if (call->stop)
+		goto stop;
+
+	/* Create archive. */
+	if (!liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/about/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/config/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/graphics/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/scripts/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/scripts/client/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/scripts/server/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/shaders/") ||
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/sounds/") ||
+#ifdef ENABLE_PACKAGE_SERVER
+	    !liarc_tar_write_directory (self->tar, "lipsofsuna-0.0.1/data/world/")
+#endif
+	   )
+		goto error;
+	for (i = 0 ; i < self->files.count ; i++)
+	{
+		call->progress = (float) i / self->files.count;
+		if (call->stop)
+			goto stop;
+		if (!liarc_tar_write_file (self->tar, self->files.array[i].src, self->files.array[i].dst))
+			goto error;
+	}
+
+	/* Write to disk. */
+	call->progress = 1.0f;
+	if (call->stop)
+		goto stop;
+	if (!liarc_tar_write_end (self->tar))
+		goto error;
+	call->result = 1;
+
+stop:
+	return;
+
+error:
+	printf ("ERROR: %s.\n", lisys_error_get_string ());
+}
+
+static inline int
+private_filter_lmdl (const char* dir,
+                     const char* name)
+{
+	const char* ptr;
+
+	ptr = strstr (name, ".lmdl");
+	if (ptr == NULL)
+		return 0;
+	if (strcmp (ptr, ".lmdl"))
+		return 0;
+	return 1;
+}
+
+static int
+private_insert_directory (liextPackager* self,
+                          const char*    path,
+                          const char*    name)
+{
+	int i;
+	int ret;
+	char* src;
+	const char* file;
+	liextPackagerFile tmp;
+	lisysDir* dir;
+
+	src = lisys_path_concat (self->module->path, path, name, NULL);
+	if (src == NULL)
+		return 0;
+	dir = lisys_dir_open (src);
+	free (src);
+	if (dir == NULL)
+		return 0;
+	lisys_dir_set_filter (dir, LISYS_DIR_FILTER_VISIBLE);
+	if (!lisys_dir_scan (dir))
+		return 0;
+	for (i = 0 ; i < lisys_dir_get_count (dir) ; i++)
+	{
+		file = lisys_dir_get_name (dir, i);
+		tmp.src = lisys_dir_get_path (dir, i);
+		tmp.dst = lisys_path_concat ("lipsofsuna-0.0.1", "data", path, name, file, NULL);
+		if (tmp.src != NULL && tmp.dst != NULL)
+			ret = lialg_array_append (&self->files, &tmp);
+		else
+			ret = 0;
+		if (!ret)
+		{
+			free (tmp.src);
+			free (tmp.dst);
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+static int
+private_insert_extra (lithrAsyncCall* call,
+                      liextPackager*  self)
+{
+	char* tmp;
+	char* path;
+	liReader* reader;
+
+	/* Open extra texture list. */
+	path = lisys_path_concat (self->module->path, "graphics", "textures.cfg", NULL);
+	if (path == NULL)
+		return 0;
+	reader = li_reader_new_from_file (path);
+	free (path);
+	if (reader == NULL)
+	{
+		if (lisys_error_peek () != EIO)
+			return 0;
+		lisys_error_get (NULL);
+		return 1;
+	}
+
+	/* Read texture lines. */
+	while (!li_reader_check_end (reader))
+	{
+		if (!li_reader_get_text (reader, "\n", &tmp))
+		{
+			li_reader_free (reader);
+			return 0;
+		}
+		if (!liext_resources_insert_texture (self->resources, tmp))
+		{
+			free (tmp);
+			return 0;
+		}
+		free (tmp);
+	}
+	li_reader_free (reader);
+
+	return 1;
+}
+
+static int
+private_insert_file (liextPackager* self,
+                     const char*    dir,
+                     const char*    name,
+                     const char*    ext)
+{
+	int ret;
+	liextPackagerFile tmp;
+
+	tmp.src = lisys_path_format (self->module->path,
+		LISYS_PATH_SEPARATOR, dir,
+		LISYS_PATH_SEPARATOR, name, ext, NULL);
+	tmp.dst = lisys_path_format ("lipsofsuna-0.0.1",
+		LISYS_PATH_SEPARATOR, "data",
+		LISYS_PATH_SEPARATOR, dir,
+		LISYS_PATH_SEPARATOR, name, ext, NULL);
+	if (tmp.src != NULL && tmp.dst != NULL)
+		ret = lialg_array_append (&self->files, &tmp);
+	else
+		ret = 0;
+	if (!ret)
+	{
+		free (tmp.src);
+		free (tmp.dst);
+	}
+
+	return ret;
+}
+
+static inline int
+private_insert_models (lithrAsyncCall* call,
+                       liextPackager*  self,
+                       const char*     path)
+{
+	int i;
+	int ret;
+	int count;
+	char* file;
+	char* name;
+	limdlModel* model = NULL;
+	lisysDir* directory = NULL;
+
+	/* Find all converted models. */
+	directory = lisys_dir_open (path);
+	if (directory == NULL)
+		return 0;
+	lisys_dir_set_filter (directory, private_filter_lmdl);
+	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
+	if (!lisys_dir_scan (directory))
+		goto error;
+	count = lisys_dir_get_count (directory);
+
+	/* Load model and node information. */
+	/* FIXME: Use cache unless some models were rebuilt above. */
+	for (i = 0 ; i < count ; i++)
+	{
+		call->progress = (float) i / count;
+		if (call->stop)
+			break;
+
+		/* Open model file. */
+		file = lisys_dir_get_path (directory, i);
+		model = limdl_model_new_from_file (file);
+		free (file);
+		if (model == NULL)
+			goto error;
+
+		/* Verbose messages. */
+		if (self->verbose)
+			private_verbose_model (self, model, lisys_dir_get_name (directory, i));
+
+		/* Add to resource list. */
+		name = lisys_path_format (lisys_dir_get_name (directory, i), LISYS_PATH_STRIPEXT, NULL);
+		if (name == NULL)
+			goto error;
+		ret = liext_resources_insert_model (self->resources, name, model);
+		free (name);
+		if (!ret)
+			goto error;
+
+		/* Free the model. */
+		limdl_model_free (model);
+	}
+	lisys_dir_free (directory);
+
+	return 1;
+
+error:
+	if (model != NULL)
+		limdl_model_free (model);
+	lisys_dir_free (directory);
+	return 0;
+}
+
+/**
+ * \brief Called when the cancel button is pressed in the progress dialog.
+ *
+ * Sends a signal to the worker thread to stop working.
+ *
+ * \param self Module.
+ */
+static void
+private_progress_cancel (liextPackager* self)
+{
+	lithr_async_call_stop (self->worker);
+}
+
+/**
+ * \brief Called every tick to update packager status.
+ *
+ * If packaging is still in process, updates the progress dialog status.
+ * If packaging has ended, frees the progress dialog and the worker thread.
+ *
+ * \param self Module.
+ */
+static void
+private_progress_update (liextPackager* self)
+{
+	if (self->worker == NULL)
+		return;
+	if (lithr_async_call_get_done (self->worker))
+	{
+		liwdg_manager_remove_window (self->module->widgets, self->progress);
+		lithr_async_call_free (self->worker);
+		self->progress = NULL;
+		self->worker = NULL;
+	}
+	else
+		liwdg_busy_set_progress (LIWDG_BUSY (self->progress), lithr_async_call_get_progress (self->worker));
+}
+
+static void
+private_verbose_model (liextPackager* self,
+                       limdlModel*    model,
+                       const char*    name)
+{
+	int i;
+	int j;
+	limdlMaterial* material;
+
+	printf ("Model: %s\n", name);
+	for (i = 0 ; i < model->materials.count ; i++)
+	{
+		material = model->materials.materials + i;
+		for (j = 0 ; j < material->textures.count ; j++)
+			printf ("    %s\n", material->textures.textures[j].string);
+	}
+}
+
+/** @} */
+/** @} */
+/** @} */
