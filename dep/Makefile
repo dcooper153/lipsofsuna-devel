@@ -2,7 +2,7 @@ all:
 	$(MAKE) -C libsquish all install
 
 install:
-	cp build/lib/libsquish.so ../build
+	cp build/lib/libsquish.so ../build/lib
 
 clean:
 	$(MAKE) -C libsquish clean

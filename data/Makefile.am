@@ -1,2 +1,3 @@
-SUBDIRS = $(MAYBE_EDITOR)
-DIST_SUBDIRS = editor
+editordir = $(TOOLDIR)
+editor_DATA = blender-export.py
+EXTRA_DIST = blender-export.py

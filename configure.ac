@@ -116,6 +116,7 @@ if test "$want_relative" = yes; then
 	EXTSDIR="${prefix}/lib/extensions"
 	DATADIR="${prefix}/data"
 	MODSDIR="${prefix}/mods"
+	TOOLDIR="${prefix}/tool"
 	SAVEDIR="${prefix}/save"
 	bindir="${prefix}"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_RELATIVE_PATHS"
@@ -125,6 +126,7 @@ else
 	EXTSDIR="${libdir}/${PACKAGE}/extensions/$EXTSVER"
 	DATADIR="${datadir}/${PACKAGE}/data"
 	MODSDIR="${datadir}/${PACKAGE}/mods"
+	TOOLDIR="${datadir}/${PACKAGE}/tool"
 	SAVEDIR="${localstatedir}/${PACKAGE}"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DEXTSDIR=\\\"\"${libdir}/${PACKAGE}/extensions/$EXTSVER\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
@@ -141,11 +143,11 @@ AC_SUBST([EXTSDIR])
 AC_SUBST([DATADIR])
 AC_SUBST([MODSDIR])
 AC_SUBST([SAVEDIR])
+AC_SUBST([TOOLDIR])
 
 AC_OUTPUT([
 Makefile
 data/Makefile
-data/editor/Makefile
 doc/Makefile
 ext/Makefile
 ext/client/Makefile
