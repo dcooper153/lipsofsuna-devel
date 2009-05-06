@@ -1,0 +1,17 @@
+Makefile
+*.o
+*.la
+*.lo
+*.so
+.deps
+.libs
+build
+config.log
+config.status
+libtool
+lipsofsuna.geany
+autom4te.cache
+src/config.h
+src/stamp-h1
+src/main/lipsofsuna
+src/math/unittest
