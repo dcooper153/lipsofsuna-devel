@@ -724,6 +724,7 @@ private_init_engine (licliModule* self)
 	calls->lieng_object_update = licli_object_update;
 	calls->lieng_object_set_realized = licli_object_set_realized;
 	calls->lieng_object_set_transform = licli_object_set_transform;
+	calls->lieng_object_set_velocity = licli_object_set_velocity;
 
 	/* Initialize callbacks. */
 	if (!lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_CHAT, lical_marshal_DATA_PTR_PTR) ||

@@ -415,20 +415,28 @@ licli_object_set_transform (liengObject*          self,
 }
 
 /**
- * \brief Sets the target position of the object.
+ * \brief Sets the target velocity of the object.
  *
  * \param self Object.
- * \param velocity Velocity vector.
+ * \param value Velocity vector.
+ * \return Nonzero on success.
  */
-void
-licli_object_set_velocity (liengObject*    self,
-                           const limatVector* velocity)
+int
+licli_object_set_velocity (liengObject*       self,
+                           const limatVector* value)
 {
 	licliObject* data = LICLI_OBJECT (self);
 
-	data->curr.velocity = *velocity;
-	/* FIXME: No interpolation. */
-	data->prev.velocity = *velocity;
+	if (data != NULL)
+	{
+		data->curr.velocity = *value;
+		/* FIXME: No interpolation. */
+		data->prev.velocity = *value;
+	}
+	else
+		return lieng_default_calls.lieng_object_set_velocity (self, value);
+
+	return 1;
 }
 
 /** @} */

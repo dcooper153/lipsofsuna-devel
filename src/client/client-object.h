@@ -113,9 +113,9 @@ int
 licli_object_set_transform (liengObject*          self,
                             const limatTransform* value);
 
-void
+int
 licli_object_set_velocity (liengObject*       self,
-                           const limatVector* velocity);
+                           const limatVector* value);
 
 #endif
 
