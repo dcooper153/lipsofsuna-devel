@@ -283,7 +283,7 @@ int
 licli_network_get_dirty (const licliNetwork* self)
 {
 	if (SDL_GetTicks () - self->delta.tick < LICLI_NETWORK_INPUT_LATENCY)
-		return 1;
+		return 0;
 	if (self->delta.movement > 1.0f ||
 	    self->delta.rotation > 1.0f)
 		return 1;
