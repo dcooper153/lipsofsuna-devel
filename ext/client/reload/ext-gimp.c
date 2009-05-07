@@ -53,8 +53,6 @@ liext_reload_gimp (const char* src,
 		"(file-png-save 1 image drawable \"%s\" \"%s\" 1 0 0 0 0 0 0))"
 		"(gimp-quit 1)";
 
-	printf ("CONVERTGIMP %s %s\n", src, dst);
-
 	/* Check if source file is missing for sure. */
 	if (access (src, R_OK) == -1)
 		return 0;
