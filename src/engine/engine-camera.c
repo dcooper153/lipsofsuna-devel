@@ -156,6 +156,7 @@ lieng_camera_move (liengCamera* self,
 	/* Check for obstacles and set position. */
 	private_sweep (self, &src, &dst, &ret);
 	self->transform.target.position = ret;
+	private_update_modelview (self);
 }
 
 /**
@@ -222,7 +223,10 @@ lieng_camera_tilt (liengCamera* self,
 	axis = limat_vector_init (1.0f, 0.0f, 0.0f);
 	rot = limat_quaternion_rotation (value, axis);
 	transform = limat_convert_quaternion_to_transform (rot);
-	self->transform.local = limat_transform_multiply (self->transform.local, transform);
+	transform = limat_transform_multiply (self->transform.local, transform);
+	transform.rotation = limat_quaternion_normalize (transform.rotation);
+	self->transform.local = transform;
+	private_update_modelview (self);
 }
 
 /**
@@ -244,7 +248,10 @@ lieng_camera_turn (liengCamera* self,
 	axis = limat_quaternion_transform (rot, axis);
 	rot = limat_quaternion_rotation (value, axis);
 	transform = limat_convert_quaternion_to_transform (rot);
-	self->transform.local = limat_transform_multiply (self->transform.local, transform);
+	transform = limat_transform_multiply (self->transform.local, transform);
+	transform.rotation = limat_quaternion_normalize (transform.rotation);
+	self->transform.local = transform;
+	private_update_modelview (self);
 }
 
 /**
@@ -526,8 +533,7 @@ void
 lieng_camera_set_transform (liengCamera*          self,
                             const limatTransform* value)
 {
-	self->transform.target.position = value->position;
-	self->transform.target.rotation = value->rotation;
+	self->transform.target = *value;
 	private_update_modelview (self);
 }
 
@@ -582,6 +588,7 @@ private_update_1st_person (liengCamera* self,
 
 	/* Apply local rotation. */
 	self->transform.target = limat_transform_multiply (self->transform.target, self->transform.local);
+	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
 
 	/* Standard updates. */
 	private_update_orientation (self, secs);
@@ -603,6 +610,7 @@ private_update_3rd_person (liengCamera* self,
 
 	/* Apply local rotation. */
 	self->transform.target = limat_transform_multiply (self->transform.target, self->transform.local);
+	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
 
 	/* Check for walls. */
 	dist = self->config.distance;
@@ -621,6 +629,7 @@ private_update_3rd_person (liengCamera* self,
 		limat_vector_init (0.0f, 0.0f, dist),
 		limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
 	self->transform.target = limat_transform_multiply (self->transform.target, transform);
+	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
 
 	/* Standard updates. */
 	private_update_orientation (self, secs);
@@ -652,6 +661,8 @@ private_update_modelview (liengCamera* self)
 {
 	limatTransform t;
 
+	self->transform.current.rotation = limat_quaternion_normalize (self->transform.current.rotation);
+	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
 	t = limat_transform_invert (self->transform.current);
 	self->transform.inverse = t;
 	self->view.modelview = limat_convert_transform_to_matrix (t);
@@ -687,10 +698,12 @@ private_update_orientation (liengCamera* self,
 	self->transform.target.rotation = limat_quaternion_get_nearest (
 		self->transform.target.rotation,
 		self->transform.current.rotation);
+	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
 	self->transform.current.rotation = limat_quaternion_nlerp (
 		self->transform.target.rotation,
 		self->transform.current.rotation,
 		LI_MIN (1.0f, LIENG_CAMERA_DEFAULT_ROTATION * secs));
+	self->transform.current.rotation = limat_quaternion_normalize (self->transform.current.rotation);
 
 	/* Eliminate fluctuation. */
 	q = limat_quaternion_subtract (self->transform.current.rotation, self->transform.target.rotation);
