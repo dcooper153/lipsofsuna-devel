@@ -42,6 +42,9 @@ static int
 private_delete (liextDialog* self);
 
 static int
+private_duplicate (liextDialog* self);
+
+static int
 private_edit (liextDialog* self);
 
 static int
@@ -109,10 +112,11 @@ private_init (liextDialog*   self,
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
+		liwdg_button_new (manager),
 	};
 
 	/* Check memory. */
-	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 4))
+	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 5))
 		goto error;
 	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
 	{
@@ -127,6 +131,7 @@ private_init (liextDialog*   self,
 	self->button_insert = widgets[++i];
 	self->button_edit = widgets[++i];
 	self->button_delete = widgets[++i];
+	self->button_duplicate = widgets[++i];
 
 	/* Pack entry group. */
 	liwdg_label_set_text (LIWDG_LABEL (self->label_model), "Model:");
@@ -141,16 +146,19 @@ private_init (liextDialog*   self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_edit), "Edit");
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_insert), "Insert");
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_delete), "Delete");
+	liwdg_button_set_text (LIWDG_BUTTON (self->button_duplicate), "Duplicate");
 	liwdg_widget_insert_callback (self->button_edit, LIWDG_CALLBACK_PRESSED, 0, private_edit, self);
 	liwdg_widget_insert_callback (self->button_insert, LIWDG_CALLBACK_PRESSED, 0, private_insert, self);
 	liwdg_widget_insert_callback (self->button_delete, LIWDG_CALLBACK_PRESSED, 0, private_delete, self);
+	liwdg_widget_insert_callback (self->button_duplicate, LIWDG_CALLBACK_PRESSED, 0, private_duplicate, self);
 
 	/* Pack self. */
 	liwdg_window_set_title (LIWDG_WINDOW (self), "Model");
 	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 3, self->group);
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 2, self->button_insert);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 4, self->group);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 3, self->button_insert);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 2, self->button_duplicate);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 1, self->button_edit);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->button_delete);
 
@@ -174,6 +182,13 @@ static int
 private_delete (liextDialog* self)
 {
 	liext_editor_destroy (self->editor);
+	return 0;
+}
+
+static int
+private_duplicate (liextDialog* self)
+{
+	liext_editor_duplicate (self->editor);
 	return 0;
 }
 

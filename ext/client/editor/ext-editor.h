@@ -80,6 +80,9 @@ liext_editor_create (liextEditor*          self,
 int
 liext_editor_destroy (liextEditor* self);
 
+int
+liext_editor_duplicate (liextEditor* self);
+
 void
 liext_editor_rotate (liextEditor*           self,
                      const limatQuaternion* rotation);

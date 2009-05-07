@@ -48,6 +48,7 @@ struct _liextDialog
 	liwdgWidget* button_edit;
 	liwdgWidget* button_insert;
 	liwdgWidget* button_delete;
+	liwdgWidget* button_duplicate;
 };
 
 liwdgWidget*

@@ -163,6 +163,37 @@ liext_editor_destroy (liextEditor* self)
 	return 1;
 }
 
+/**
+ * \brief Requests the server to duplicate all selected objects.
+ *
+ * Due to technical issues, the old objects are left selected while the newly
+ * created objects are not made selected. This is not a concern typically since
+ * the new and old objects are usually identical in use, but it might cause
+ * confusion when objects controlled by scripts are duplicated.
+ *
+ * \param self Editor.
+ * \return Nonzero on success.
+ */
+int
+liext_editor_duplicate (liextEditor* self)
+{
+	int code;
+	lialgPtrdicIter iter;
+	liengSelection* selection;
+	limatTransform transform;
+
+	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	{
+		selection = iter.value;
+		code = lieng_object_get_model_code (selection->object);
+		lieng_object_get_transform (selection->object, &transform);
+		if (!liext_editor_create (self, code, &transform))
+			return 0;
+	}
+
+	return 1;
+}
+
 void
 liext_editor_rotate (liextEditor*           self,
                      const limatQuaternion* rotation)
