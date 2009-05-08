@@ -28,8 +28,8 @@
 #include "engine-camera.h"
 
 #define LIENG_CAMERA_DEFAULT_FOV (M_PI / 5.0f)
-#define LIENG_CAMERA_DEFAULT_NEAR 0.5f
-#define LIENG_CAMERA_DEFAULT_FAR 500.0f
+#define LIENG_CAMERA_DEFAULT_NEAR 2.0f
+#define LIENG_CAMERA_DEFAULT_FAR 100.0f
 #define LIENG_CAMERA_DEFAULT_ROTATION 8.0f
 #define LIENG_CAMERA_DEFAULT_ZOOM 14.0f
 #define LIENG_CAMERA_INTERPOLATION_C 1.0f
@@ -374,7 +374,7 @@ lieng_camera_get_bounds (const liengCamera* self,
 	top = tan (self->view.fov * M_PI / 360.0f) * near;
 	right = top * self->view.aspect;
 
-	max = 3.0f * LI_MAX (LI_MAX (top, right), near);
+	max = 1.5f * LI_MAX (LI_MAX (top, right), near);
 	size = limat_vector_init (max, max, max);
 	zero = limat_vector_init (0.0f, 0.0f, 0.0f);
 	limat_aabb_init_from_center (aabb, &zero, &size);

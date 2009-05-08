@@ -153,7 +153,7 @@ private_resize (licliWindow* self,
 	/* Recreate surface. */
 	for ( ; fsaa >= 0 ; fsaa--)
 	{
-		for (depth = 32 ; depth ; depth >>= 1)
+		for (depth = 32 ; depth ; depth -= 8)
 		{
 			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
 			SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
