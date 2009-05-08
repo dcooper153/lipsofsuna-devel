@@ -470,6 +470,32 @@ private_bind_uniform (lirndContext* self,
 				glLoadIdentity ();
 			}
 			break;
+		case LIRND_UNIFORM_LIGHTTYPE0:
+		case LIRND_UNIFORM_LIGHTTYPE1:
+		case LIRND_UNIFORM_LIGHTTYPE2:
+		case LIRND_UNIFORM_LIGHTTYPE3:
+		case LIRND_UNIFORM_LIGHTTYPE4:
+		case LIRND_UNIFORM_LIGHTTYPE5:
+		case LIRND_UNIFORM_LIGHTTYPE6:
+		case LIRND_UNIFORM_LIGHTTYPE7:
+		case LIRND_UNIFORM_LIGHTTYPE8:
+		case LIRND_UNIFORM_LIGHTTYPE9:
+			index = uniform->value - LIRND_UNIFORM_LIGHTTYPE0;
+			if (index < self->lights.count)
+			{
+				light = self->lights.array[index];
+				if (light->directional)
+					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_DIRECTIONAL);
+				else if (LI_ABS (light->cutoff - M_PI) < 0.001)
+					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_POINT);
+				else if (light->shadow.map && shadow[1])
+					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_SPOTSHADOW);
+				else
+					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_SPOT);
+			}
+			else
+				glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_DISABLED);
+			break;
 		case LIRND_UNIFORM_LIGHTMATRIX0:
 		case LIRND_UNIFORM_LIGHTMATRIX1:
 		case LIRND_UNIFORM_LIGHTMATRIX2:

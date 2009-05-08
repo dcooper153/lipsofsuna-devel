@@ -520,6 +520,13 @@ private_uniform_value (lirndShader* self,
 			return LIRND_UNIFORM_NONE;
 		return LIRND_UNIFORM_DIFFUSETEXTURE0 + index;
 	}
+	if (!strncmp (value, "LIGHTTYPE", 9))
+	{
+		index = atoi (value + 9);
+		if (index < 0 || index > 9)
+			return LIRND_UNIFORM_NONE;
+		return LIRND_UNIFORM_LIGHTTYPE0 + index;
+	}
 	if (!strncmp (value, "LIGHTMATRIX", 11))
 	{
 		index = atoi (value + 11);
