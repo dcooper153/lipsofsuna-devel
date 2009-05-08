@@ -73,6 +73,8 @@ lirnd_context_init (lirndContext* self,
 void
 lirnd_context_bind (lirndContext* self)
 {
+	int i;
+
 	if (!self->compiled)
 	{
 		self->modelviewinverse = limat_matrix_invert (self->modelview);
@@ -92,19 +94,11 @@ lirnd_context_bind (lirndContext* self)
 	}
 	else
 	{
-#ifdef OLDBIND
-		private_bind_lights_shader (self);
-		private_bind_material (self);
-		private_bind_shader (self);
-		private_bind_textures_shader (self);
-#else
-		int i;
 		private_bind_lights_shader (self);
 		private_bind_material (self);
 		private_bind_shader (self);
 		for (i = 0 ; i < self->shader->uniforms.count ; i++)
 			private_bind_uniform (self, self->shader->uniforms.array + i);
-#endif
 	}
 	glMatrixMode (GL_MODELVIEW);
 	glActiveTextureARB (GL_TEXTURE0);
@@ -238,7 +232,7 @@ lirnd_context_set_material (lirndContext*        self,
 	self->material.shininess = value->shininess;
 	memcpy (self->material.parameters, value->parameters, 4 * sizeof (float));
 	memcpy (self->material.diffuse, value->diffuse, 4 * sizeof (float));
-	memcpy (self->material.diffuse, value->diffuse, 4 * sizeof (float));
+	memcpy (self->material.specular, value->specular, 4 * sizeof (float));
 }
 
 void
