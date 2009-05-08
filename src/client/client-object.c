@@ -414,6 +414,15 @@ licli_object_set_transform (liengObject*          self,
 	return 1;
 }
 
+void
+licli_object_get_transform_target (liengObject*    self,
+                                   limatTransform* value)
+{
+	licliObject* data = LICLI_OBJECT (self);
+
+	*value = data->curr.transform;
+}
+
 /**
  * \brief Sets the target velocity of the object.
  *

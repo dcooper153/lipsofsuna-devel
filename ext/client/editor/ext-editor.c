@@ -186,7 +186,7 @@ liext_editor_duplicate (liextEditor* self)
 	{
 		selection = iter.value;
 		code = lieng_object_get_model_code (selection->object);
-		lieng_object_get_transform (selection->object, &transform);
+		lieng_object_get_transform_target (selection->object, &transform);
 		if (!liext_editor_create (self, code, &transform))
 			return 0;
 	}
@@ -304,7 +304,7 @@ liext_editor_translate (liextEditor*       self,
 	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
 	{
 		selection = iter.value;
-		lieng_object_get_transform (selection->object, &transform);
+		licli_object_get_transform_target (selection->object, &transform);
 		position = limat_vector_add (selection->transform.position, *translation);
 		transform = limat_transform_init (position, transform.rotation);
 		lieng_object_set_transform (selection->object, &transform);
@@ -329,7 +329,7 @@ liext_editor_transform_apply (liextEditor* self)
 	{
 		/* Get target. */
 		selection = iter.value;
-		lieng_object_get_transform (selection->object, &transform);
+		licli_object_get_transform_target (selection->object, &transform);
 		selection->transform = transform;
 
 		/* Send a transform packet. */
