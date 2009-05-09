@@ -186,7 +186,7 @@ liext_editor_duplicate (liextEditor* self)
 	{
 		selection = iter.value;
 		code = lieng_object_get_model_code (selection->object);
-		lieng_object_get_transform_target (selection->object, &transform);
+		licli_object_get_transform_target (selection->object, &transform);
 		if (!liext_editor_create (self, code, &transform))
 			return 0;
 	}
