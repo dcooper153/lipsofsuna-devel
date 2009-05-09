@@ -126,6 +126,7 @@ liwdg_widget_detach (liwdgWidget* self)
 			break;
 	}
 	self->state = LIWDG_WIDGET_STATE_DETACHED;
+	liwdg_manager_fix_focus (self->manager);
 
 	return changed;
 }
@@ -486,6 +487,8 @@ liwdg_widget_set_visible (liwdgWidget* self,
 		liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
 	if (self->state == LIWDG_WIDGET_STATE_POPUP)
 		liwdg_manager_remove_popup (self->manager, self);
+	if (!visible)
+		liwdg_manager_fix_focus (self->manager);
 }
 
 /*****************************************************************************/

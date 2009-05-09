@@ -248,6 +248,9 @@ liwdg_group_set_child (liwdgGroup*  self,
 	if (child != NULL)
 		child->parent = LIWDG_WIDGET (self);
 
+	/* Ensure valid focus. */
+	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
+
 	/* Update the size of the cell. */
 	private_cell_changed (self, x, y);
 }
@@ -561,6 +564,9 @@ liwdg_group_set_size (liwdgGroup* self,
 			self->row_expand++;
 	}
 
+	/* Ensure valid focus. */
+	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
+
 	/* Update the size request. */
 	private_rebuild_request (self);
 	return 1;
@@ -660,14 +666,19 @@ private_free (liwdgGroup* self)
 {
 	int i;
 
+	/* Remove child focus. */
+	i = LIWDG_WIDGET (self)->visible;
+	LIWDG_WIDGET (self)->visible = 0;
+	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
+	LIWDG_WIDGET (self)->visible = i;
+
+	/* Free childrem. */
 	for (i = 0 ; i < self->width * self->height ; i++)
 	{
 		if (self->cells[i].child != NULL)
-		{
-			liwdg_manager_remove_focus (LIWDG_WIDGET (self)->manager, self->cells[i].child);
 			liwdg_widget_free (self->cells[i].child);
-		}
 	}
+
 	free (self->cols);
 	free (self->rows);
 	free (self->cells);

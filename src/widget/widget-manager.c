@@ -206,6 +206,34 @@ liwdg_manager_find_window_by_point (liwdgManager* self,
 }
 
 /**
+ * \brief Makes sure that the focused widgets are visible.
+ *
+ * \param self Widget manager.
+ */
+void
+liwdg_manager_fix_focus (liwdgManager* self)
+{
+	liwdgWidget* widget;
+
+	for (widget = self->focus.keyboard ; widget != NULL ; widget = widget->parent)
+	{
+		if (!widget->visible)
+		{
+			liwdg_manager_set_focus_keyboard (self, NULL);
+			break;
+		}
+	}
+	for (widget = self->focus.mouse ; widget != NULL ; widget = widget->parent)
+	{
+		if (!widget->visible)
+		{
+			liwdg_manager_set_focus_mouse (self, NULL);
+			break;
+		}
+	}
+}
+
+/**
  * \brief Handles an event.
  *
  * \param self Widget manager.
@@ -401,21 +429,6 @@ liwdg_manager_insert_window (liwdgManager* self,
 	return 1;
 }
 
-void
-liwdg_manager_remove_focus (liwdgManager* self,
-                            liwdgWidget*  widget)
-{
-	liwdgWidget* w;
-
-	for (w = widget ; w != NULL ; w = w->parent)
-	{
-		if (w == self->focus.keyboard)
-			liwdg_manager_set_focus_keyboard (self, NULL);
-		if (w == self->focus.mouse)
-			liwdg_manager_set_focus_mouse (self, NULL);
-	}
-}
-
 int
 liwdg_manager_remove_popup (liwdgManager* self,
                             liwdgWidget*  widget)
@@ -424,7 +437,7 @@ liwdg_manager_remove_popup (liwdgManager* self,
 	assert (widget->state == LIWDG_WIDGET_STATE_POPUP);
 
 	/* Clear invalid focus. */
-	liwdg_manager_remove_focus (self, widget);
+	liwdg_manager_fix_focus (self);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
@@ -451,7 +464,7 @@ liwdg_manager_remove_window (liwdgManager* self,
 	assert (widget->state == LIWDG_WIDGET_STATE_WINDOW);
 
 	/* Clear invalid focus. */
-	liwdg_manager_remove_focus (self, widget);
+	liwdg_manager_fix_focus (self);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
@@ -613,7 +626,7 @@ liwdg_manager_set_root (liwdgManager* self,
 		return;
 
 	/* Clear invalid focus. */
-	liwdg_manager_remove_focus (self, widget);
+	liwdg_manager_fix_focus (self);
 
 	/* Replace old root. */
 	if (self->widgets.root != NULL)

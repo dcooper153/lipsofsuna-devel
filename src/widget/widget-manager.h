@@ -83,6 +83,9 @@ liwdg_manager_find_window_by_point (liwdgManager* self,
                                     int           y);
 
 void
+liwdg_manager_fix_focus (liwdgManager* self);
+
+void
 liwdg_manager_focus_next (liwdgManager* self);
 
 void
@@ -95,10 +98,6 @@ liwdg_manager_insert_popup (liwdgManager* self,
 int
 liwdg_manager_insert_window (liwdgManager* self,
                              liwdgWidget*  widget);
-
-void
-liwdg_manager_remove_focus (liwdgManager* self,
-                            liwdgWidget*  widget);
 
 int
 liwdg_manager_remove_popup (liwdgManager* self,
