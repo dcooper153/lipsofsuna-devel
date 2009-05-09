@@ -512,6 +512,9 @@ private_bind_uniform (lirndContext* self,
 			else
 				glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, bias.m);
 			break;
+		case LIRND_UNIFORM_MODELMATRIX:
+			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->matrix.m);
+			break;
 		case LIRND_UNIFORM_MODELVIEWINVERSE:
 			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->modelviewinverse.m);
 			break;

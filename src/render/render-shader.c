@@ -534,6 +534,8 @@ private_uniform_value (lirndShader* self,
 			return LIRND_UNIFORM_NONE;
 		return LIRND_UNIFORM_LIGHTMATRIX0 + index;
 	}
+	if (!strcmp (value, "MODELMATRIX"))
+		return LIRND_UNIFORM_MODELMATRIX;
 	if (!strcmp (value, "MODELVIEWINVERSE"))
 		return LIRND_UNIFORM_MODELVIEWINVERSE;
 	if (!strcmp (value, "NOISETEXTURE"))
