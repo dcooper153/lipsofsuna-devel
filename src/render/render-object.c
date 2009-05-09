@@ -989,6 +989,11 @@ private_update_envmap (lirndObject* self,
 	/* Enable cube map rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (0, 0, self->cubemap.width, self->cubemap.height);
+	glEnable (GL_DEPTH_TEST);
+	glEnable (GL_CULL_FACE);
+	glCullFace (GL_CCW);
+	glDepthFunc (GL_LEQUAL);
+	glBindTexture (GL_TEXTURE_2D, 0);
 
 	/* Render each cube face. */
 	for (i = 0 ; i < 6 ; i++)
@@ -1000,7 +1005,7 @@ private_update_envmap (lirndObject* self,
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		limat_frustum_init (&frustum, &modelview, &projection);
-		lirnd_render_render2 (self->render,
+		lirnd_render_render_custom (self->render,
 			scene, &modelview, &projection, &frustum, lirnd_draw_exclude, self);
 	}
 

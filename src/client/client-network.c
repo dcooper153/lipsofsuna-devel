@@ -189,6 +189,8 @@ licli_network_update (licliNetwork* self,
 		switch (message->type)
 		{
 			case GRAPPLE_MSG_NEW_USER_ME:
+			case GRAPPLE_MSG_USER_NAME:
+			case GRAPPLE_MSG_SESSION_NAME:
 				ret = 1;
 				break;
 			case GRAPPLE_MSG_USER_MSG:
@@ -199,14 +201,6 @@ licli_network_update (licliNetwork* self,
 				break;
 			case GRAPPLE_MSG_SERVER_DISCONNECTED:
 				ret = 0;
-				break;
-			case GRAPPLE_MSG_USER_NAME:
-				printf ("DEBUG: Server sent a user name but shouldn't do that.\n");
-				ret = 1;
-				break;
-			case GRAPPLE_MSG_SESSION_NAME:
-				printf ("DEBUG: Session name is `%s'.\n", message->SESSION_NAME.name);
-				ret = 1;
 				break;
 			default:
 				printf ("WARNING: Unkown message %d\n", message->type);

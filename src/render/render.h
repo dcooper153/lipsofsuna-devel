@@ -140,13 +140,14 @@ lirnd_render_render (lirndRender*  self,
                      limatFrustum* frustum);
 
 void
-lirnd_render_render2 (lirndRender*  self,
-                      lirndScene*   scene,
-                      limatMatrix*  modelview,
-                      limatMatrix*  projection,
-                      limatFrustum* frustum,
-                      lirndCallback call,
-                      void*         data);
+lirnd_render_render_custom (lirndRender*  self,
+                            lirndScene*   scene,
+                            limatMatrix*  modelview,
+                            limatMatrix*  projection,
+                            limatFrustum* frustum,
+                            lirndCallback call,
+                            void*         data);
+
 
 void
 lirnd_render_update (lirndRender* self,

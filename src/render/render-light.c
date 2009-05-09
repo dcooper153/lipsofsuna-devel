@@ -392,10 +392,15 @@ private_update_shadow (lirndLight* self,
 	glViewport (0, 0, SHADOWMAPSIZE, SHADOWMAPSIZE);
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->shadow.fbo);
 	glClear (GL_DEPTH_BUFFER_BIT);
+	glEnable (GL_DEPTH_TEST);
+	glEnable (GL_CULL_FACE);
+	glCullFace (GL_CCW);
+	glDepthFunc (GL_LEQUAL);
+	glBindTexture (GL_TEXTURE_2D, 0);
 
 	/* Render to depth texture. */
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	lirnd_render_render2 (self->render,
+	lirnd_render_render_custom (self->render,
 		scene,
 		&self->modelview,
 		&self->projection,

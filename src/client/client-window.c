@@ -118,8 +118,8 @@ static int
 private_init_video (licliWindow* self)
 {
 	/* Create the window. */
-	if (private_resize (self, 640, 480, livid_features_get_max_samples ()) +
-	    private_resize (self, 640, 480, 0) == 0)
+	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
+	    private_resize (self, 1024, 768, 0) == 0)
 		return 0;
 	livid_features_init ();
 	if (TTF_Init () == -1)

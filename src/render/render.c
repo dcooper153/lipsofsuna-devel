@@ -409,26 +409,25 @@ lirnd_render_render (lirndRender*  self,
                      limatFrustum* frustum)
 {
 	int i;
-	limatMatrix matrix;
 
 	assert (scene != NULL);
 	assert (modelview != NULL);
 	assert (projection != NULL);
 	assert (frustum != NULL);
 
+	/* Update lights. */
 	self->temporary.scene = scene;
 	lirnd_lighting_update (self->lighting, scene);
 
+	/* Set default rendering mode. */
 	self->temporary.scene = scene;
 	self->temporary.modelview = modelview;
 	self->temporary.projection = projection;
 	self->temporary.frustum = frustum;
-
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (projection->m);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadMatrixf (modelview->m);
-
 	glEnable (GL_LIGHTING);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_TEXTURE_2D);
@@ -441,39 +440,7 @@ lirnd_render_render (lirndRender*  self,
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindTexture (GL_TEXTURE_2D, 0);
 
-	/* Render the skybox. */
-	if (self->sky.model != NULL)
-	{
-#warning Skybox is disabled.
-#if 0
-		/* Enter distant mode. */
-		glMatrixMode (GL_PROJECTION);
-		glPushMatrix ();
-		matrix = limat_matrix_perspective (
-			camera->view.fov,
-			camera->view.aspect,
-			50.0f, 100000.0f);
-		glLoadMatrixf (matrix.m);
-		glMatrixMode (GL_MODELVIEW);
-		glPushMatrix ();
-		matrix = limat_matrix_get_rotation (camera->view.modelview);
-		glLoadMatrixf (matrix.m);
-		glEnable (GL_COLOR_MATERIAL);
-
-		/* Render the mesh. */
-		lirnd_draw_shadeless (NULL, self, self->sky.model);
-
-		/* Leave distant mode. */
-		glMatrixMode (GL_PROJECTION);
-		glPopMatrix ();
-		glMatrixMode (GL_MODELVIEW);
-		glPopMatrix ();
-		glClear (GL_DEPTH_BUFFER_BIT);
-		glDisable (GL_COLOR_MATERIAL);
-#endif
-	}
-
-	/* Render the scene. */
+	/* Render scene. */
 	glEnable (GL_COLOR_MATERIAL);
 	private_render (self, lirnd_draw_opaque, NULL);
 	private_render (self, lirnd_draw_transparent, NULL);
@@ -497,12 +464,10 @@ lirnd_render_render (lirndRender*  self,
 	for (i = 7 ; i >= 0 ; i--)
 	{
 		glActiveTextureARB (GL_TEXTURE0 + i);
-		glLoadIdentity ();
 		glBindTexture (GL_TEXTURE_2D, 0);
 		glDisable (GL_TEXTURE_2D);
 	}
 	glMatrixMode (GL_MODELVIEW);
-
 	self->temporary.scene = NULL;
 	self->temporary.modelview = NULL;
 	self->temporary.projection = NULL;
@@ -521,13 +486,13 @@ lirnd_render_render (lirndRender*  self,
  * \param data Data passed to rendering call.
  */
 void
-lirnd_render_render2 (lirndRender*  self,
-                      lirndScene*   scene,
-                      limatMatrix*  modelview,
-                      limatMatrix*  projection,
-                      limatFrustum* frustum,
-                      lirndCallback call,
-                      void*         data)
+lirnd_render_render_custom (lirndRender*  self,
+                            lirndScene*   scene,
+                            limatMatrix*  modelview,
+                            limatMatrix*  projection,
+                            limatFrustum* frustum,
+                            lirndCallback call,
+                            void*         data)
 {
 	assert (scene != NULL);
 	assert (modelview != NULL);
@@ -539,30 +504,11 @@ lirnd_render_render2 (lirndRender*  self,
 	self->temporary.modelview = modelview;
 	self->temporary.projection = projection;
 	self->temporary.frustum = frustum;
-
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (projection->m);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadMatrixf (modelview->m);
-
-	glEnable (GL_LIGHTING);
-	glEnable (GL_DEPTH_TEST);
-	glEnable (GL_TEXTURE_2D);
-	glEnable (GL_CULL_FACE);
-	glCullFace (GL_CCW);
-	glDepthFunc (GL_LEQUAL);
-	glShadeModel (GL_SMOOTH);
-	glEnable (GL_NORMALIZE);
-	glBindTexture (GL_TEXTURE_2D, 0);
-
-	/* Render the scene. */
-	glPolygonOffset (2.0, 2.0);
-	glEnable (GL_POLYGON_OFFSET_FILL);
-	glEnable (GL_COLOR_MATERIAL);
 	private_render (self, call, data);
-	glDisable (GL_COLOR_MATERIAL);
-	glDisable (GL_POLYGON_OFFSET_FILL);
-
 	self->temporary.scene = NULL;
 	self->temporary.modelview = NULL;
 	self->temporary.projection = NULL;

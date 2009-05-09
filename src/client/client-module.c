@@ -497,24 +497,39 @@ licli_module_render (licliModule* self)
 {
 	int w;
 	int h;
+	int active;
 	limatFrustum frustum;
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndScene* scene;
 
-	if (self->network != NULL)
+	/* Render scene. */
+	active = (self->network != NULL);
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (active)
 	{
-		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		lieng_camera_get_frustum (self->camera, &frustum);
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
 		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
 		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
 		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_SELECTION);
-		lirnd_render_render2 (self->engine->render, scene, &modelview, &projection, &frustum, lirnd_draw_bounds, NULL);
 	}
+	glDisable (GL_LIGHTING);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_TEXTURE_2D);
+	glDepthMask (GL_FALSE);
+	glColor3f (1.0f, 0.0f, 0.0f);
+	if (active)
+	{
+		lirnd_render_render_custom (self->engine->render, scene, &modelview,
+			&projection, &frustum, lirnd_draw_bounds, NULL);
+	}
+	glColor3f (1.0f, 1.0f, 1.0f);
 
+	/* Set 2D rendering mode. */
 	licli_window_get_size (self->window, &w, &h);
 	liwdg_manager_set_size (self->widgets, w, h);
 	lieng_camera_set_viewport (self->camera, 0, 0, w, h);
@@ -525,19 +540,17 @@ licli_module_render (licliModule* self)
 	glOrtho (0, w, 0, h, -100.0f, 100.0f);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
-	glDepthMask (GL_FALSE);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_LIGHTING);
-	glDisable (GL_CULL_FACE);
-	glEnable (GL_TEXTURE_2D);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClear (GL_DEPTH_BUFFER_BIT);
+	glEnable (GL_BLEND);
+	glEnable (GL_TEXTURE_2D);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	/* Render speech and UI. */
 	if (self->network != NULL)
 		private_render_speech (self);
 	liwdg_manager_render (self->widgets);
 
+	/* Disable 2D rendering mode. */
 	glEnable (GL_CULL_FACE);
 	glEnable (GL_LIGHTING);
 	glEnable (GL_DEPTH_TEST);
