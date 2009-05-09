@@ -515,6 +515,10 @@ private_bind_uniform (lirndContext* self,
 		case LIRND_UNIFORM_MODELVIEWINVERSE:
 			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->modelviewinverse.m);
 			break;
+		case LIRND_UNIFORM_NOISETEXTURE:
+			glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
+			glBindTexture (GL_TEXTURE_2D, self->render->helpers.noise);
+			break;
 		case LIRND_UNIFORM_SHADOWTEXTURE0:
 		case LIRND_UNIFORM_SHADOWTEXTURE1:
 		case LIRND_UNIFORM_SHADOWTEXTURE2:
@@ -535,6 +539,9 @@ private_bind_uniform (lirndContext* self,
 			}
 			glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 			glBindTexture (GL_TEXTURE_2D, map);
+			break;
+		case LIRND_UNIFORM_TIME:
+			glUniform1fARB (uniform->binding, self->render->helpers.time);
 			break;
 	}
 }

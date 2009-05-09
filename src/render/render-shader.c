@@ -211,7 +211,7 @@ private_check_compile (lirndShader* self,
 		{
 			while (li_reader_get_text (reader, "\n", &text))
 			{
-				printf ("WARNING: %s:%s%s", name, type, text);
+				printf ("WARNING: %s:%s%s\n", name, type, text);
 				free (text);
 			}
 			li_reader_free (reader);
@@ -536,6 +536,8 @@ private_uniform_value (lirndShader* self,
 	}
 	if (!strcmp (value, "MODELVIEWINVERSE"))
 		return LIRND_UNIFORM_MODELVIEWINVERSE;
+	if (!strcmp (value, "NOISETEXTURE"))
+		return LIRND_UNIFORM_NOISETEXTURE;
 	if (!strncmp (value, "SHADOWTEXTURE", 13))
 	{
 		index = atoi (value + 13);
@@ -543,6 +545,8 @@ private_uniform_value (lirndShader* self,
 			return LIRND_UNIFORM_NONE;
 		return LIRND_UNIFORM_SHADOWTEXTURE0 + index;
 	}
+	if (!strcmp (value, "TIME"))
+		return LIRND_UNIFORM_TIME;
 
 	return LIRND_UNIFORM_NONE;
 }

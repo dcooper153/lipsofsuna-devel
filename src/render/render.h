@@ -50,6 +50,11 @@ struct _lirndRender
 	} config;
 	struct
 	{
+		float time;
+		GLuint noise;
+	} helpers;
+	struct
+	{
 		int count;
 		int count_used;
 		int count_free;
