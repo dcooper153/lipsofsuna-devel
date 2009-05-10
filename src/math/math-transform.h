@@ -148,7 +148,7 @@ limat_transform_relative (limatTransform self,
 	inverse = limat_quaternion_conjugate (self.rotation);
 	position = limat_vector_subtract (transform.position, self.position);
 	position = limat_quaternion_transform (inverse, position);
-	rotation = limat_quaternion_multiply (transform.rotation, inverse);
+	rotation = limat_quaternion_multiply (inverse, transform.rotation);
 
 	return limat_transform_init (position, rotation);
 }
