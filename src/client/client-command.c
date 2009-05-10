@@ -266,7 +266,6 @@ private_object_create (licliModule* module,
 	transform = limat_transform_init (position, rotation);
 	lieng_object_set_transform (object, &transform);
 	lieng_object_set_velocity (object, &velocity);
-	licli_object_warp (object);
 	lieng_object_set_realized (object, 1);
 
 	/* Set animations. */

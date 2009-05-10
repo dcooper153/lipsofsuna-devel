@@ -1035,8 +1035,12 @@ private_warp (liengObject*       self,
 	liengSector* dst;
 	liengSector* src = self->sector;
 
-	/* Get destination sector. */
+	/* Check for changes. */
 	id = lisec_pointer_new (position);
+	if (src != NULL && src->id == id)
+		return 1;
+
+	/* Find or create new sector. */
 	dst = lieng_engine_find_sector (self->engine, id);
 	if (dst == NULL)
 	{
@@ -1049,14 +1053,12 @@ private_warp (liengObject*       self,
 	}
 
 	/* Update current sector. */
-	if (src != dst)
-	{
-		if (!lieng_sector_insert_object (dst, self))
-			return 0;
-		if (src != NULL)
-			lieng_sector_remove_object (src, self);
-		self->sector = dst;
-	}
+	assert (src != dst);
+	if (!lieng_sector_insert_object (dst, self))
+		return 0;
+	if (src != NULL)
+		lieng_sector_remove_object (src, self);
+	self->sector = dst;
 
 	return 1;
 }

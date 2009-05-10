@@ -238,6 +238,7 @@ licli_object_warp (liengObject* self)
 
 	data->prev.transform = data->curr.transform;
 	data->prev.velocity = data->curr.velocity;
+	lieng_default_calls.lieng_object_set_transform (self, &data->prev.transform);
 }
 
 void
@@ -353,6 +354,10 @@ licli_object_set_realized (liengObject* self,
 		return 1;
 	if (value)
 	{
+		/* Clear interpolation. */
+		if (LICLI_OBJECT (self) != NULL)
+			licli_object_warp (self);
+
 		/* Call base. */
 		if (!lieng_default_calls.lieng_object_set_realized (self, 1))
 			return 0;
