@@ -184,18 +184,24 @@ private_event (liextDialog* self,
 
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
 	{
-		liext_generator_get_statistics (self->generator, &stats);
-		if (stats.selected_rule != -1)
+#warning Might be too expensive to be run automatically at all.
+		self->timer -= event->update.secs;
+		if (self->timer <= 0.0f)
 		{
-			snprintf (text, 256, "Known: %d\nExpand: %d\nSelect: %d\n",
-				stats.rules_known, stats.rules_expand, stats.selected_rule);
+			self->timer = 10.0f;
+			liext_generator_get_statistics (self->generator, &stats);
+			if (stats.selected_rule != -1)
+			{
+				snprintf (text, 256, "Known: %d\nExpand: %d\nSelect: %d\n",
+					stats.rules_known, stats.rules_expand, stats.selected_rule);
+			}
+			else
+			{
+				snprintf (text, 256, "Known: %d\nExpand: %d\nSelect: None\n",
+					stats.rules_known, stats.rules_expand);
+			}
+			liwdg_label_set_text (LIWDG_LABEL (self->label_rule), text);
 		}
-		else
-		{
-			snprintf (text, 256, "Known: %d\nExpand: %d\nSelect: None\n",
-				stats.rules_known, stats.rules_expand);
-		}
-		liwdg_label_set_text (LIWDG_LABEL (self->label_rule), text);
 	}
 
 	return liwdgWindowType.event (LIWDG_WIDGET (self), event);

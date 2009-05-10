@@ -46,6 +46,7 @@ struct _liextDialog
 	liwdgWidget* button_insert;
 	liwdgWidget* button_remove;
 	liwdgWidget* button_generate;
+	float timer;
 };
 
 liwdgWidget*
