@@ -51,5 +51,8 @@ int
 liimg_image_save_s3tc (liimgImage* self,
                        const char* path);
 
+void
+liimg_image_shrink_half (liimgImage* self);
+
 /** @} */
 /** @} */
