@@ -9,8 +9,6 @@ liblipsconfig_la_SOURCES = \
 	config-account.h \
 	config-bans.c \
 	config-bans.h \
-	config-effects.c \
-	config-effects.h \
 	config-host.c \
 	config-host.h \
 	lips-config.h

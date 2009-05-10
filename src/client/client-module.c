@@ -43,9 +43,6 @@ static int
 private_init_camera (licliModule* self);
 
 static int
-private_init_effects (licliModule* self);
-
-static int
 private_init_engine (licliModule* self);
 
 static int
@@ -107,17 +104,16 @@ licli_module_new (licliClient* client,
 	    !private_init_bindings (self) ||
 	    !private_init_engine (self) ||
 	    !private_init_camera (self) ||
-        !private_init_effects (self) ||
-        !private_init_sound (self) ||
-        !private_init_widgets (self) ||
-        !private_init_extensions (self) ||
+	    !private_init_sound (self) ||
+	    !private_init_widgets (self) ||
+	    !private_init_extensions (self) ||
 		!private_init_script (self))
 		goto error;
 
 	return self;
 
 error:
-	printf ("ERROR: %s\n", lisys_error_get_string ());
+	lisys_error_report ();
 	licli_module_free (self);
 	return NULL;
 }
@@ -164,8 +160,6 @@ licli_module_free (licliModule* self)
 
 	if (self->bindings != NULL)
 		libnd_manager_free (self->bindings);
-	if (self->effects != NULL)
-		licfg_effects_free (self->effects);
 	if (self->widgets != NULL)
 		liwdg_manager_free (self->widgets);
 #ifndef LI_DISABLE_SOUND
@@ -251,12 +245,25 @@ lisndSample*
 licli_module_find_sample_by_id (licliModule* self,
                                 int          id)
 {
-	licfgEffect* effect;
+	liengSample* sample;
 
-	effect = licfg_effects_get_effect_by_code (self->effects, id);
-	if (effect == NULL)
+	/* Find sample. */
+	sample = lieng_resources_find_sample_by_code (self->engine->resources, id);
+	if (sample == NULL || sample->invalid)
 		return NULL;
-	return effect->data;
+	if (sample->data != NULL)
+		return sample->data;
+
+	/* Load sample. */
+	if (!lisnd_manager_set_sample (self->sound, sample->name, sample->path))
+	{
+		lisys_error_report ();
+		sample->invalid = 1;
+		return NULL;
+	}
+	sample->data = lisnd_manager_get_sample (self->sound, sample->name);
+
+	return sample->data;
 }
 
 /**
@@ -270,12 +277,25 @@ lisndSample*
 licli_module_find_sample_by_name (licliModule* self,
                                   const char*  name)
 {
-	licfgEffect* effect;
+	liengSample* sample;
 
-	effect = licfg_effects_get_effect_by_name (self->effects, name);
-	if (effect == NULL)
+	/* Find sample. */
+	sample = lieng_resources_find_sample_by_name (self->engine->resources, name);
+	if (sample == NULL || sample->invalid)
 		return NULL;
-	return effect->data;
+	if (sample->data != NULL)
+		return sample->data;
+
+	/* Load sample. */
+	if (!lisnd_manager_set_sample (self->sound, sample->name, sample->path))
+	{
+		lisys_error_report ();
+		sample->invalid = 1;
+		return NULL;
+	}
+	sample->data = lisnd_manager_get_sample (self->sound, sample->name);
+
+	return sample->data;
 }
 #endif
 
@@ -704,22 +724,6 @@ private_init_camera (licliModule* self)
 }
 
 static int
-private_init_effects (licliModule* self)
-{
-	self->effects = licfg_effects_new (self->path);
-	if (self->effects == NULL)
-	{
-		if (lisys_error_peek () != EIO)
-			return 0;
-		self->effects = licfg_effects_new (NULL);
-		if (self->effects == NULL)
-			return 0;
-	}
-
-	return 1;
-}
-
-static int
 private_init_engine (licliModule* self)
 {
 	int flags;
@@ -838,13 +842,6 @@ static int
 private_init_sound (licliModule* self)
 {
 #ifndef LI_DISABLE_SOUND
-	int num = 0;
-	int ret;
-	char* path;
-	licfgEffect* effect;
-	lialgU32dicIter iter;
-
-	/* Initialize sound system. */
 	if (self->client->sound == NULL)
 		return 1;
 	self->sound = lisnd_manager_new (self->client->sound);
@@ -852,23 +849,6 @@ private_init_sound (licliModule* self)
 	if (self->sound == NULL ||
 	    self->music == NULL)
 		return 0;
-
-	/* Load all samples. */
-	LI_FOREACH_U32DIC (iter, self->effects->byid)
-	{
-		effect = iter.value;
-		if (effect->sound == NULL)
-			continue;
-		path = lisys_path_concat (self->path, "sounds", effect->sound, NULL);
-		if (path == NULL)
-			return 0;
-		ret = lisnd_manager_set_sample (self->sound, effect->sound, path);
-		free (path);
-		if (!ret)
-			return 0;
-		effect->data = lisnd_manager_get_sample (self->sound, effect->sound);
-		num++;
-	}
 #endif
 
 	return 1;

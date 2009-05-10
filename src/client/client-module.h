@@ -52,7 +52,6 @@ struct _licliModule
 	char* password;
 	lialgStrdic* extensions;
 	libndManager* bindings;
-	licfgEffects* effects;
 	licliClient* client;
 	licliNetwork* network;
 	licliPaths* paths;

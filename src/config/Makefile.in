@@ -52,7 +52,7 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsconfig_la_LIBADD =
 am_liblipsconfig_la_OBJECTS = config-account.lo config-bans.lo \
-	config-effects.lo config-host.lo
+	config-host.lo
 liblipsconfig_la_OBJECTS = $(am_liblipsconfig_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -223,8 +223,6 @@ liblipsconfig_la_SOURCES = \
 	config-account.h \
 	config-bans.c \
 	config-bans.h \
-	config-effects.c \
-	config-effects.h \
 	config-host.c \
 	config-host.h \
 	lips-config.h
@@ -300,7 +298,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-account.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-bans.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-effects.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-host.Plo@am__quote@
 
 .c.o:

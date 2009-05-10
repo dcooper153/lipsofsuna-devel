@@ -48,12 +48,6 @@ private_object_animation (lisrvClient*   self,
                           lisrvAniminfo* info);
 
 static int
-private_object_effect (lisrvClient* self,
-                       liengObject* object,
-                       licfgEffect* effect,
-                       int          flags);
-
-static int
 private_object_model (lisrvClient* self,
                       liengObject* object,
                       liengModel*  model);
@@ -61,6 +55,12 @@ private_object_model (lisrvClient* self,
 static int
 private_object_motion (lisrvClient* self,
                        liengObject* object);
+
+static int
+private_object_sample (lisrvClient* self,
+                       liengObject* object,
+                       liengSample* sample,
+                       int          flags);
 
 static int
 private_object_speech (lisrvClient* self,
@@ -225,7 +225,7 @@ private_callbacks_setup (lisrvClient* self,
                          liengEngine* engine)
 {
 	self->calls[0] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_object_animation, self);
-	self->calls[1] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_EFFECT, 0, private_object_effect, self);
+	self->calls[1] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_object_sample, self);
 	self->calls[2] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_MODEL, 0, private_object_model, self);
 	self->calls[3] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self);
 	self->calls[4] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_SPEECH, 0, private_object_speech, self);
@@ -237,7 +237,7 @@ private_callbacks_clear (lisrvClient* self,
                          liengEngine* engine)
 {
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_ANIMATION, self->calls[0]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_EFFECT, self->calls[1]);
+	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_SAMPLE, self->calls[1]);
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_MODEL, self->calls[2]);
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_MOTION, self->calls[3]);
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_SPEECH, self->calls[4]);
@@ -267,29 +267,6 @@ private_object_animation (lisrvClient*   self,
 	liarc_writer_append_uint8 (writer, info->channel);
 	liarc_writer_append_uint8 (writer, info->permanent);
 	liarc_writer_append_float (writer, info->priority);
-	lisrv_client_send (self, writer, 0);
-	liarc_writer_free (writer);
-
-	return 1;
-}
-
-static int
-private_object_effect (lisrvClient* self,
-                       liengObject* object,
-                       licfgEffect* effect,
-                       int          flags)
-{
-	liarcWriter* writer;
-
-	/* Send to client if seen. */
-	if (!private_vision_contains (self, object))
-		return 1;
-	writer = liarc_writer_new_packet (LINET_SERVER_PACKET_OBJECT_EFFECT);
-	if (writer == NULL)
-		return 1;
-	liarc_writer_append_uint32 (writer, object->id);
-	liarc_writer_append_uint16 (writer, effect->id);
-	liarc_writer_append_uint16 (writer, flags);
 	lisrv_client_send (self, writer, 0);
 	liarc_writer_free (writer);
 
@@ -350,6 +327,29 @@ private_object_motion (lisrvClient* self,
 				private_vision_remove (self, object);
 		}
 	}
+
+	return 1;
+}
+
+static int
+private_object_sample (lisrvClient* self,
+                       liengObject* object,
+                       liengSample* sample,
+                       int          flags)
+{
+	liarcWriter* writer;
+
+	/* Send to client if seen. */
+	if (!private_vision_contains (self, object))
+		return 1;
+	writer = liarc_writer_new_packet (LINET_SERVER_PACKET_OBJECT_EFFECT);
+	if (writer == NULL)
+		return 1;
+	liarc_writer_append_uint32 (writer, object->id);
+	liarc_writer_append_uint16 (writer, sample->id);
+	liarc_writer_append_uint16 (writer, flags);
+	lisrv_client_send (self, writer, 0);
+	liarc_writer_free (writer);
 
 	return 1;
 }

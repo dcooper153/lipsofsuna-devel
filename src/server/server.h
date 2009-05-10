@@ -53,7 +53,6 @@ struct _lisrvServer
 	{
 		licfgBans* bans;
 		licfgHost* host;
-		licfgEffects* effects;
 	} config;
 	struct
 	{

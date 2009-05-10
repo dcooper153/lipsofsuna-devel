@@ -38,7 +38,9 @@ struct _liengAnimation
 struct _liengSample
 {
 	int id;
+	int invalid;
 	char* name;
+	char* path;
 	void* data;
 };
 

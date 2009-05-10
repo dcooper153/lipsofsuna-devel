@@ -312,14 +312,14 @@ private_event_object_animation (lisrvServer*   server,
 }
 
 static int
-private_event_object_effect (lisrvServer* server,
+private_event_object_sample (lisrvServer* server,
                              liengObject* object,
-                             licfgEffect* effect,
+                             liengSample* sample,
                              int          flags)
 {
 	lisrv_server_event (server, LISRV_EVENT_TYPE_EFFECT,
 		"*object", LICOM_SCRIPT_OBJECT, object,
-		"effect", LISCR_TYPE_STRING, effect->name,
+		"effect", LISCR_TYPE_STRING, sample->name,
 		"flags", LISCR_TYPE_INT, flags, NULL);
 	return 1;
 }
@@ -361,7 +361,7 @@ int lisrv_server_init_callbacks_event (lisrvServer* server)
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_LOGOUT, 0, private_event_client_logout, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_event_client_packet, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_event_object_animation, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_EFFECT, 0, private_event_object_effect, server);
+	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_event_object_sample, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_event_object_motion, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_SPEECH, 0, private_event_object_speech, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0, private_event_object_visibility, server);

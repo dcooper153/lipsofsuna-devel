@@ -252,18 +252,18 @@ lisrv_object_effect (liengObject* self,
                      const char*  value,
                      int          flags)
 {
-	licfgEffect* effect;
+	liengSample* sample;
 	lisrvObject* data = LISRV_OBJECT (self);
 
 	/* Find effect. */
 	if (!lieng_object_get_realized (self))
 		return;
-	effect = licfg_effects_get_effect_by_name (data->server->config.effects, value);
-	if (effect == NULL)
+	sample = lieng_resources_find_sample_by_name (data->server->engine->resources, value);
+	if (sample == NULL)
 		return;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_EFFECT, self, effect, flags);
+	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_SAMPLE, self, sample, flags);
 }
 
 /**

@@ -48,7 +48,6 @@ struct _liextPackager
 	liarcTar* tar;
 	liarcWriter* writer;
 	licliModule* module;
-	licfgEffects* effects;
 	liextResources* resources;
 	lithrAsyncCall* worker;
 	liwdgWidget* progress;

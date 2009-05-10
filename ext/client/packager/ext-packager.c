@@ -44,8 +44,12 @@ static void
 private_async_save (lithrAsyncCall* call);
 
 static inline int
-private_filter_lmdl (const char* dir,
-                     const char* name);
+private_filter_models (const char* dir,
+                       const char* name);
+
+static inline int
+private_filter_samples (const char* dir,
+                        const char* name);
 
 static int
 private_insert_directory (liextPackager* self,
@@ -60,12 +64,17 @@ static int
 private_insert_file (liextPackager* self,
                      const char*    dir,
                      const char*    name,
-                     const char*     ext);
+                     const char*    ext);
 
 static inline int
 private_insert_models (lithrAsyncCall* call,
                        liextPackager*  self,
                        const char*     path);
+
+static inline int
+private_insert_samples (lithrAsyncCall* call,
+                        liextPackager*  self,
+                        const char*     path);
 
 static void
 private_progress_cancel (liextPackager* self);
@@ -217,8 +226,6 @@ private_async_free (lithrAsyncCall* call)
 
 	if (self->resources != NULL)
 		liext_resources_free (self->resources);
-	if (self->effects != NULL)
-		licfg_effects_free (self->effects);
 	if (self->tar != NULL)
 		liarc_tar_free (self->tar);
 	if (self->writer != NULL)
@@ -237,7 +244,6 @@ private_async_save (lithrAsyncCall* call)
 	int i;
 	char* path;
 	const char* name;
-	lialgStrdicIter iter;
 	liextPackager* self = call->data;
 
 	/* Allocate writer. */
@@ -292,22 +298,17 @@ private_async_save (lithrAsyncCall* call)
 	}
 
 	/* Collect sound effects. */
-	self->effects = licfg_effects_new (self->module->path);
-	if (self->effects == NULL)
+	path = lisys_path_concat (self->module->path, "sounds", NULL);
+	if (path == NULL)
 		goto error;
+	if (!private_insert_samples (call, self, path))
+	{
+		free (path);
+		goto error;
+	}
+	free (path);
 	if (call->stop)
 		goto stop;
-	LI_FOREACH_STRDIC (iter, self->effects->bystr)
-	{
-		/* FIXME: Make sure not already included. */
-		name = ((licfgEffect*) iter.value)->sound;
-		if (name == NULL)
-			continue;
-		if (!private_insert_file (self, "sounds", name, ""))
-			goto error;
-		if (call->stop)
-			goto stop;
-	}
 
 	/* Collect miscellaneous. */
 	if (!private_insert_directory (self, "", "about") ||
@@ -360,12 +361,12 @@ stop:
 	return;
 
 error:
-	printf ("ERROR: %s.\n", lisys_error_get_string ());
+	lisys_error_report ();
 }
 
 static inline int
-private_filter_lmdl (const char* dir,
-                     const char* name)
+private_filter_models (const char* dir,
+                       const char* name)
 {
 	const char* ptr;
 
@@ -373,6 +374,20 @@ private_filter_lmdl (const char* dir,
 	if (ptr == NULL)
 		return 0;
 	if (strcmp (ptr, ".lmdl"))
+		return 0;
+	return 1;
+}
+
+static inline int
+private_filter_samples (const char* dir,
+                        const char* name)
+{
+	const char* ptr;
+
+	ptr = strstr (name, ".ogg");
+	if (ptr == NULL)
+		return 0;
+	if (strcmp (ptr, ".ogg"))
 		return 0;
 	return 1;
 }
@@ -507,7 +522,7 @@ private_insert_models (lithrAsyncCall* call,
 	directory = lisys_dir_open (path);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_lmdl);
+	lisys_dir_set_filter (directory, private_filter_models);
 	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 	if (!lisys_dir_scan (directory))
 		goto error;
@@ -523,6 +538,8 @@ private_insert_models (lithrAsyncCall* call,
 
 		/* Open model file. */
 		file = lisys_dir_get_path (directory, i);
+		if (file == NULL)
+			goto error;
 		model = limdl_model_new_from_file (file);
 		free (file);
 		if (model == NULL)
@@ -551,6 +568,45 @@ private_insert_models (lithrAsyncCall* call,
 error:
 	if (model != NULL)
 		limdl_model_free (model);
+	lisys_dir_free (directory);
+	return 0;
+}
+
+static int
+private_insert_samples (lithrAsyncCall* call,
+                        liextPackager*  self,
+                        const char*     path)
+{
+	int i;
+	int count;
+	const char* name;
+	lisysDir* directory = NULL;
+
+	/* Find all sound and music files. */
+	directory = lisys_dir_open (path);
+	if (directory == NULL)
+		return 0;
+	lisys_dir_set_filter (directory, private_filter_samples);
+	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
+	if (!lisys_dir_scan (directory))
+		goto error;
+	count = lisys_dir_get_count (directory);
+
+	/* Insert found files. */
+	for (i = 0 ; i < count ; i++)
+	{
+		call->progress = (float) i / count;
+		if (call->stop)
+			break;
+		name = lisys_dir_get_name (directory, i);
+		if (!private_insert_file (self, "sounds", name, ""))
+			goto error;
+	}
+	lisys_dir_free (directory);
+
+	return 1;
+
+error:
 	lisys_dir_free (directory);
 	return 0;
 }

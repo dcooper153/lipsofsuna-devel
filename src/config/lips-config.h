@@ -20,7 +20,6 @@
 
 #include "config-account.h"
 #include "config-bans.h"
-#include "config-effects.h"
 #include "config-host.h"
 
 #endif

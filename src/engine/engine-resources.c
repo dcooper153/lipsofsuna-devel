@@ -125,6 +125,7 @@ lieng_resources_free (liengResources* self)
 		{
 			sample = self->samples.array + i;
 			free (sample->name);
+			free (sample->path);
 		}
 		free (self->samples.array);
 	}
@@ -373,14 +374,18 @@ lieng_resources_load_from_stream (liengResources* self,
 {
 	int id;
 	char* name;
+	char* path;
 	uint32_t n_animations;
 	uint32_t n_models;
+	uint32_t n_samples;
 	liengAnimation* animation;
 	liengModel* model;
+	liengSample* sample;
 
 	/* Read the header. */
 	if (!li_reader_get_uint32 (reader, &n_animations) ||
-	    !li_reader_get_uint32 (reader, &n_models))
+	    !li_reader_get_uint32 (reader, &n_models) ||
+	    !li_reader_get_uint32 (reader, &n_samples))
 	{
 		lisys_error_set (EINVAL, "invalid resource list header");
 		goto error;
@@ -424,6 +429,32 @@ lieng_resources_load_from_stream (liengResources* self,
 			if (model == NULL)
 				goto error;
 			self->models.array[id] = model;
+		}
+	}
+
+	/* Read samples. */
+	if (n_samples)
+	{
+		self->samples.count = n_samples;
+		self->samples.array = calloc (n_samples, sizeof (liengSample));
+		if (self->samples.array == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			goto error;
+		}
+		for (id = 0 ; id < n_samples ; id++)
+		{
+			sample = self->samples.array + id;
+			sample->id = id;
+			sample->invalid = 0;
+			if (!li_reader_get_text (reader, "", &sample->name))
+				goto error;
+			path = lisys_path_format (self->engine->config.dir,
+				LISYS_PATH_SEPARATOR, "sounds",
+				LISYS_PATH_SEPARATOR, sample->name, ".ogg", NULL);
+			if (path == NULL)
+				goto error;
+			sample->path = path;
 		}
 	}
 
@@ -602,12 +633,22 @@ private_insert_sample (liengResources* self,
 		return 0;
 	sample = self->samples.array + self->samples.count - 1;
 	sample->id = 0;
+	sample->invalid = 0;
 	sample->data = NULL;
 	sample->name = strdup (name);
 	if (sample->name == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		self->samples.count--;
+		return 0;
+	}
+	sample->path = lisys_path_format (self->engine->config.dir,
+		LISYS_PATH_SEPARATOR, "sounds",
+		LISYS_PATH_SEPARATOR, sample->name, ".ogg", NULL);
+	if (sample->path == NULL)
+	{
+		self->samples.count--;
+		free (sample->name);
 		return 0;
 	}
 

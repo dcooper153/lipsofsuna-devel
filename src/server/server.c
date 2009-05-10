@@ -50,9 +50,6 @@ static int
 private_init_bans (lisrvServer* self);
 
 static int
-private_init_effects (lisrvServer* self);
-
-static int
 private_init_engine (lisrvServer* self);
 
 static int
@@ -97,7 +94,6 @@ lisrv_server_new (const char* name)
 	    !private_init_ai (self) ||
 	    !private_init_host (self) ||
 	    !private_init_bans (self) ||
-	    !private_init_effects (self) ||
 	    !private_init_extensions (self) ||
 	    !private_init_engine (self) ||
 	    !private_init_time (self) ||
@@ -152,8 +148,6 @@ lisrv_server_free (lisrvServer* self)
 	/* Free configuration. */
 	if (self->config.bans != NULL)
 		licfg_bans_free (self->config.bans);
-	if (self->config.effects != NULL)
-		licfg_effects_free (self->config.effects);
 	if (self->config.host != NULL)
 		licfg_host_free (self->config.host);
 	if (self->paths != NULL)
@@ -447,21 +441,13 @@ private_init_bans (lisrvServer* self)
 }
 
 static int
-private_init_effects (lisrvServer* self)
-{
-	self->config.effects = licfg_effects_new (self->paths->server_data);
-	if (self->config.effects == NULL)
-		return 0;
-	return 1;
-}
-
-static int
 private_init_engine (lisrvServer* self)
 {
 	int i;
-	liengCalls* calls;
 	liengAnimation* anim;
+	liengCalls* calls;
 	liengModel* model;
+	liengSample* sample;
 
 	/* Create engine. */
 	self->engine = lieng_engine_new (self->paths->server_data, 0);
@@ -485,7 +471,7 @@ private_init_engine (lisrvServer* self)
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_PACKET, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_ANIMATION, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_EFFECT, lical_marshal_DATA_PTR_PTR_INT) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SAMPLE, lical_marshal_DATA_PTR_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SPEECH, lical_marshal_DATA_PTR_PTR) ||
@@ -505,6 +491,7 @@ private_init_engine (lisrvServer* self)
 		return 0;
 	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->animations.count);
 	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->models.count);
+	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->samples.count);
 	for (i = 0 ; i < self->engine->resources->animations.count ; i++)
 	{
 		anim = lieng_resources_find_animation_by_code (self->engine->resources, i);
@@ -517,6 +504,13 @@ private_init_engine (lisrvServer* self)
 		model = lieng_resources_find_model_by_code (self->engine->resources, i);
 		assert (model != NULL);
 		liarc_writer_append_string (self->helper.resources, model->name);
+		liarc_writer_append_nul (self->helper.resources);
+	}
+	for (i = 0 ; i < self->engine->resources->samples.count ; i++)
+	{
+		sample = lieng_resources_find_sample_by_code (self->engine->resources, i);
+		assert (sample != NULL);
+		liarc_writer_append_string (self->helper.resources, sample->name);
 		liarc_writer_append_nul (self->helper.resources);
 	}
 
