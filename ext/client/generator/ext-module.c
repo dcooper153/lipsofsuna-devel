@@ -41,13 +41,18 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
+
+	/* Create generator. */
 	self->generator = liext_generator_new (module);
 	if (self->generator == NULL)
 		return NULL;
+
+	/* Create dialog. */
 	self->dialog = liext_dialog_new (module->widgets, self->generator);
 	if (self->dialog == NULL)
 	{
@@ -57,6 +62,7 @@ liext_module_new (licliModule* module)
 	liwdg_manager_insert_window (module->widgets, self->dialog);
 	liwdg_widget_set_visible (self->dialog, 0);
 
+	/* Register scripts. */
 	liscr_script_insert_class (module->script, "Generator", liextGeneratorScript, self);
 
 	return self;

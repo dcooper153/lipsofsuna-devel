@@ -30,6 +30,52 @@
 #include "ext-module.h"
 
 /* @luadoc
+ * module "Extension.Client.Generator"
+ * ---
+ * -- Generate random maps.
+ * -- @name Generator
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- Loads the generator rules from disk.
+ * --
+ * -- @param self Generator class.
+ * function Generator.load(self)
+ */
+static int
+Generator_load (lua_State* lua)
+{
+	liextModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
+	if (!liext_generator_load (module->generator, NULL))
+		lisys_error_report ();
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Saves the generator rules to disk.
+ * --
+ * -- @param self Generator class.
+ * function Generator.save(self)
+ */
+static int
+Generator_save (lua_State* lua)
+{
+	liextModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
+	if (!liext_generator_save (module->generator))
+		lisys_error_report ();
+
+	return 0;
+}
+
+/* @luadoc
  * ---
  * -- Visibility of the generator window.
  * -- @name Generator.visible
@@ -66,6 +112,8 @@ liextGeneratorScript (liscrClass* self,
 {
 	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
+	liscr_class_insert_func (self, "load", Generator_load);
+	liscr_class_insert_func (self, "save", Generator_save);
 	liscr_class_insert_getter (self, "visible", Generator_getter_visible);
 	liscr_class_insert_setter (self, "visible", Generator_setter_visible);
 }

@@ -73,6 +73,10 @@ liext_generator_find_rule (liextGenerator* self);
 int
 liext_generator_insert_rule (liextGenerator* self);
 
+int
+liext_generator_load (liextGenerator* self,
+                      const char*     path);
+
 void
 liext_generator_remove_rule (liextGenerator* self,
                              int             rule);
