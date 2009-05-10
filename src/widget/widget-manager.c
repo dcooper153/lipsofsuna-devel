@@ -222,6 +222,8 @@ liwdg_manager_fix_focus (liwdgManager* self)
 			liwdg_manager_set_focus_keyboard (self, NULL);
 			break;
 		}
+		if (widget->parent == NULL && widget->state == LIWDG_WIDGET_STATE_DETACHED)
+			liwdg_manager_set_focus_keyboard (self, NULL);
 	}
 	for (widget = self->focus.mouse ; widget != NULL ; widget = widget->parent)
 	{
@@ -230,6 +232,8 @@ liwdg_manager_fix_focus (liwdgManager* self)
 			liwdg_manager_set_focus_mouse (self, NULL);
 			break;
 		}
+		if (widget->parent == NULL && widget->state == LIWDG_WIDGET_STATE_DETACHED)
+			liwdg_manager_set_focus_mouse (self, NULL);
 	}
 }
 
