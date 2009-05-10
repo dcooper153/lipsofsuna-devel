@@ -40,7 +40,6 @@ liext_reload_image (const char* src,
 {
 	liimgImage* image;
 
-	printf ("CONVERTIMAGE %s %s\n", src, dst);
 	image = liimg_image_new_from_file (src);
 	if (image == NULL)
 		return 0;
