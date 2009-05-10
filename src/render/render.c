@@ -175,7 +175,7 @@ lirnd_render_find_image (lirndRender* self,
 	image = lirnd_resources_find_image (self->resources, name);
 	if (image == NULL)
 		image = lirnd_resources_insert_image (self->resources, name);
-	if (image == NULL)
+	if (image == NULL || image->invalid)
 		return NULL;
 	if (image->texture == NULL)
 	{
