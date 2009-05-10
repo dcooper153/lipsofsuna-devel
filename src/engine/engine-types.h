@@ -55,6 +55,7 @@ typedef struct _liengModel liengModel;
 typedef struct _liengObject liengObject;
 typedef struct _liengRender liengRender;
 typedef struct _liengResources liengResources;
+typedef struct _liengSample liengSample;
 typedef struct _liengSector liengSector;
 typedef struct _liengSelection liengSelection;
 

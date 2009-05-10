@@ -35,6 +35,13 @@ struct _liengAnimation
 	void* data;
 };
 
+struct _liengSample
+{
+	int id;
+	char* name;
+	void* data;
+};
+
 struct _liengResources
 {
 	liengEngine* engine;
@@ -48,6 +55,11 @@ struct _liengResources
 		int count;
 		liengModel** array;
 	} models;
+	struct
+	{
+		int count;
+		liengSample* array;
+	} samples;
 };
 
 liengResources*
@@ -71,6 +83,14 @@ lieng_resources_find_model_by_code (liengResources* self,
 liengModel*
 lieng_resources_find_model_by_name (liengResources* self,
                                     const char*     name);
+
+liengSample*
+lieng_resources_find_sample_by_code (liengResources* self,
+                                     int             id);
+
+liengSample*
+lieng_resources_find_sample_by_name (liengResources* self,
+                                     const char*     name);
 
 int
 lieng_resources_load_from_dir (liengResources* self,
