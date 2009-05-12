@@ -28,7 +28,7 @@
 #include "engine-block.h"
 
 static int
-private_build_shape (liengBlock*  self,
+private_build_tiles (liengBlock*  self,
                      limatVector* vertices);
 
 static void
@@ -184,7 +184,7 @@ lieng_block_set_tile (liengBlock* self,
 /*****************************************************************************/
 
 static int
-private_build_shape (liengBlock*  self,
+private_build_tiles (liengBlock*  self,
                      limatVector* vertices)
 {
 	int x;
@@ -309,7 +309,7 @@ private_update_physics (liengBlock*  self,
 	}
 	else if (self->type == LIENG_BLOCK_TYPE_TILES)
 	{
-		count = private_build_shape (self, vertices);
+		count = private_build_tiles (self, vertices);
 		self->shape = liphy_shape_new_convex (engine->physics, vertices, count);
 		if (self->shape == NULL)
 			return 0;
@@ -323,6 +323,8 @@ private_update_physics (liengBlock*  self,
 	}
 	if (self->physics == NULL)
 		return 0;
+	liphy_object_set_collision_group (self->physics, LIENG_PHYSICS_GROUP_TILES);
+	liphy_object_set_collision_mask (self->physics, ~LIENG_PHYSICS_GROUP_TILES);
 
 	return 1;
 }

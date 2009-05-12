@@ -98,6 +98,9 @@ lieng_sector_new (liengEngine* engine,
 		}
 	}
 
+	/* FIXME */
+	lieng_sector_fill (self, 1);
+
 	return self;
 }
 
