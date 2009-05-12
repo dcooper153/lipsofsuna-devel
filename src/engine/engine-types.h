@@ -18,6 +18,8 @@
 #ifndef __ENGINE_TYPES_H__
 #define __ENGINE_TYPES_H__
 
+#include <system/lips-system.h>
+
 /* FIXME */
 #define LIENG_ENABLE_GRAPHICS
 
@@ -48,6 +50,7 @@ enum
 	LIENG_OBJECT_FLAG_SAVE = 0x08
 };
 
+typedef uint16_t liengTile;
 typedef struct _liengAnimation liengAnimation;
 typedef struct _liengCamera liengCamera;
 typedef struct _liengEngine liengEngine;

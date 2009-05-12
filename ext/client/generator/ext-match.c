@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include "ext-match.h"
 
+#define INTERSECTION_MARGIN 0.05
+
 static int
 private_intersects_object (const liextMatch*     self,
                            const liengObject*    object,
@@ -139,9 +141,23 @@ private_intersects_object (const liextMatch*     self,
 
 	/* Get model bounds. */
 	lieng_model_get_bounds_transform (model, transform, &bounds0);
+	lieng_object_get_bounds_transform (object, &bounds1);
+
+	/* Intersection margin. */
+	bounds0.min.x = LI_MIN (bounds0.max.x, bounds0.min.x + INTERSECTION_MARGIN);
+	bounds0.min.y = LI_MIN (bounds0.max.y, bounds0.min.y + INTERSECTION_MARGIN);
+	bounds0.min.z = LI_MIN (bounds0.max.z, bounds0.min.z + INTERSECTION_MARGIN);
+	bounds0.max.x = LI_MAX (bounds0.min.x, bounds0.max.x - INTERSECTION_MARGIN);
+	bounds0.max.y = LI_MAX (bounds0.min.y, bounds0.max.y - INTERSECTION_MARGIN);
+	bounds0.max.z = LI_MAX (bounds0.min.z, bounds0.max.z - INTERSECTION_MARGIN);
+	bounds1.min.x = LI_MIN (bounds1.max.x, bounds1.min.x + INTERSECTION_MARGIN);
+	bounds1.min.y = LI_MIN (bounds1.max.y, bounds1.min.y + INTERSECTION_MARGIN);
+	bounds1.min.z = LI_MIN (bounds1.max.z, bounds1.min.z + INTERSECTION_MARGIN);
+	bounds1.max.x = LI_MAX (bounds1.min.x, bounds1.max.x - INTERSECTION_MARGIN);
+	bounds1.max.y = LI_MAX (bounds1.min.y, bounds1.max.y - INTERSECTION_MARGIN);
+	bounds1.max.z = LI_MAX (bounds1.min.z, bounds1.max.z - INTERSECTION_MARGIN);
 
 	/* Check if intersects with object bounds. */
-	lieng_object_get_bounds_transform (object, &bounds1);
 	if (!limat_aabb_intersects_aabb (&bounds0, &bounds1))
 		return 0;
 

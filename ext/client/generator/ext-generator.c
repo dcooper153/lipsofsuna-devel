@@ -672,7 +672,7 @@ private_pattern_intersects (liextGenerator* self,
 	lialgU32dicIter iter;
 
 	/* Test against each object. */
-	/* TODO: Could be optimized with space partititioning. */
+	/* TODO: Could be optimized with space partitioning. */
 	LI_FOREACH_U32DIC (iter, self->module->engine->objects)
 	{
 		if (liext_match_intersects_object (match, iter.value))

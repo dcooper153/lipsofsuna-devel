@@ -109,13 +109,54 @@ lieng_sector_new (liengEngine* engine,
 void
 lieng_sector_free (liengSector* self)
 {
+	int i;
+
 	/* Remove from engine. */
 	lialg_u32dic_remove (self->engine->sectors, self->id);
 
-	/* Free all memory. */
+	/* Free objects. */
 	if (self->objects != NULL)
 		lialg_u32dic_free (self->objects);
+
+	/* Free blocks. */
+	for (i = 0 ; i < LIENG_SECTOR_BLOCK_TOTAL ; i++)
+		lieng_block_free (self->blocks + i);
+
 	free (self);
+}
+
+/**
+ * \brief Fills the sector with the given terrain type.
+ *
+ * \param self Sector.
+ * \param terrain Terrain type.
+ */
+void
+lieng_sector_fill (liengSector* self,
+                   liengTile    terrain)
+{
+	int x;
+	int y;
+	int z;
+	int i = 0;
+	limatVector offset;
+
+	for (z = 0 ; z < LIENG_SECTOR_BLOCK_ROWS ; z++)
+	{
+		for (y = 0 ; y < LIENG_SECTOR_BLOCK_ROWS ; y++)
+		{
+			for (x = 0 ; x < LIENG_SECTOR_BLOCK_ROWS ; x++)
+			{
+				offset = limat_vector_init (
+					self->origin.x + 8 * x,
+					self->origin.y + 8 * y,
+					self->origin.z + 8 * z);
+				lieng_block_fill (self->blocks + i, terrain);
+				lieng_block_rebuild (self->blocks + i, self->engine, &offset);
+				i++;
+			}
+		}
+	}
 }
 
 /**
@@ -235,6 +276,52 @@ lieng_sector_get_bounds (const liengSector* self,
 	max = limat_vector_init (LISEC_SECTOR_SIZE, LISEC_SECTOR_SIZE, LISEC_SECTOR_SIZE);
 	max = limat_vector_add (min, max);
 	limat_aabb_init_from_points (result, &min, &max);
+}
+
+/**
+ * \brief Sets the terrain type of a tile.
+ *
+ * \param self Block.
+ * \param x Offset of the tile within the sector.
+ * \param y Offset of the tile within the sector.
+ * \param z Offset of the tile within the sector.
+ * \param terrain Terrain type.
+ * \return Nonzero if a tile was modified.
+ */
+int
+lieng_sector_set_tile (liengSector* self,
+                       int          x,
+                       int          y,
+                       int          z,
+                       liengTile    terrain)
+{
+	int i;
+	int ret;
+	int bx = x / 8;
+	int by = y / 8;
+	int bz = z / 8;
+	int tx = x % 8;
+	int ty = y % 8;
+	int tz = z % 8;
+	limatVector offset;
+
+	if (bx <= 0 || bx >= LIENG_SECTOR_BLOCK_ROWS || 
+	    by <= 0 || by >= LIENG_SECTOR_BLOCK_ROWS || 
+	    bz <= 0 || bz >= LIENG_SECTOR_BLOCK_ROWS)
+	{
+		assert (0);
+		return 0;
+	}
+	i = bx + (by + bz * LIENG_SECTOR_BLOCK_ROWS) * LIENG_SECTOR_BLOCK_ROWS;
+	offset = limat_vector_init (
+		self->origin.x + 8 * bx,
+		self->origin.y + 8 * by,
+		self->origin.z + 8 * bz);
+	ret = lieng_block_set_tile (self->blocks + i, tx, ty, tz, terrain);
+	if (ret)
+		lieng_block_rebuild (self->blocks + i, self->engine, &offset);
+
+	return ret;
 }
 
 /*****************************************************************************/

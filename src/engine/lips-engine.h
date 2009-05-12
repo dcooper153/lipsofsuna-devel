@@ -19,6 +19,7 @@
 #define __LIPS_ENGINE_H__
 
 #include "engine.h"
+#include "engine-block.h"
 #include "engine-camera.h"
 #include "engine-model.h"
 #include "engine-object.h"

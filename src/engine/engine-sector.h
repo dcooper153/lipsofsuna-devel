@@ -29,14 +29,19 @@
 #include <math/lips-math.h>
 #include <system/lips-system.h>
 #include "engine.h"
+#include "engine-block.h"
 #include "engine-types.h"
+
+#define LIENG_SECTOR_BLOCK_ROWS 4
+#define LIENG_SECTOR_BLOCK_TOTAL 64
 
 struct _liengSector
 {
 	uint32_t id;
+	lialgU32dic* objects;
+	liengBlock blocks[LIENG_SECTOR_BLOCK_TOTAL];
 	liengEngine* engine;
 	limatVector origin;
-	lialgU32dic* objects;
 };
 
 liengSector*
@@ -46,6 +51,10 @@ lieng_sector_new (liengEngine* engine,
 
 void
 lieng_sector_free (liengSector* self);
+
+void
+lieng_sector_fill (liengSector* self,
+                   liengTile    terrain);
 
 int
 lieng_sector_insert_object (liengSector* self,
@@ -61,6 +70,13 @@ lieng_sector_save (liengSector* self);
 void
 lieng_sector_get_bounds (const liengSector* self,
                          limatAabb*         result);
+
+int
+lieng_sector_set_tile (liengSector* self,
+                       int          x,
+                       int          y,
+                       int          z,
+                       liengTile    terrain);
 
 #endif
 

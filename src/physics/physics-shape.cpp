@@ -109,6 +109,13 @@ liphy_shape_new (liphyPhysics*     physics,
 	return self;
 }
 
+/**
+ * \brief Creates a collision shape from a bounding box.
+ *
+ * \param physics Physics engine.
+ * \param aabb Axis-aligned bounding box.
+ * \return New collision shape or NULL.
+ */
 liphyShape*
 liphy_shape_new_aabb (liphyPhysics*    physics,
                       const limatAabb* aabb)
@@ -140,6 +147,14 @@ liphy_shape_new_aabb (liphyPhysics*    physics,
 	return self;
 }
 
+/**
+ * \brief Creates a collision shape from a triangle list.
+ *
+ * \param physics Physics engine.
+ * \param vertices Vertex array.
+ * \param count Number of vertices.
+ * \return New collision shape or NULL.
+ */
 liphyShape*
 liphy_shape_new_convex (liphyPhysics*      physics,
                         const limatVector* vertices,

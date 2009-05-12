@@ -8,6 +8,8 @@ liblipsengine_la_SOURCES = \
 	lips-engine.h \
 	engine.c \
 	engine.h \
+	engine-block.c \
+	engine-block.h \
 	engine-camera.c \
 	engine-camera.h \
 	engine-model.c \
