@@ -461,7 +461,7 @@ limdl_model_insert_node (limdlModel* self,
  * \param self Model.
  * \param material Material index.
  * \param vertices Array of three vertices.
- * \param weights Array of three weights.
+ * \param weights Array of three weights or NULL.
  * \return Nonzero on success.
  */
 int
@@ -475,32 +475,24 @@ limdl_model_insert_triangle (limdlModel*         self,
 	int offset;
 	limdlVertex* vertex;
 	limdlWeights* weight;
-	limdlWeight* weightbuf[3] = { NULL, NULL, NULL };
+	limdlWeights weightbuf[3] = { { 0, NULL }, { 0, NULL }, { 0, NULL } };
 
 	assert (material >= 0);
 	assert (material < self->materials.count);
 
 	/* Duplicate weights. */
-	if (weights[0].count)
+	if (weights != NULL)
 	{
-		weightbuf[0] = malloc (weights[0].count * sizeof (limdlWeight));
-		if (weightbuf[0] == NULL)
-			goto error;
-		memcpy (weightbuf[0], weights[0].weights, weights[0].count * sizeof (limdlWeight));
-	}
-	if (weights[1].count)
-	{
-		weightbuf[1] = malloc (weights[1].count * sizeof (limdlWeight));
-		if (weightbuf[1] == NULL)
-			goto error;
-		memcpy (weightbuf[1], weights[1].weights, weights[1].count * sizeof (limdlWeight));
-	}
-	if (weights[2].count)
-	{
-		weightbuf[2] = malloc (weights[2].count * sizeof (limdlWeight));
-		if (weightbuf[2] == NULL)
-			goto error;
-		memcpy (weightbuf[2], weights[2].weights, weights[2].count * sizeof (limdlWeight));
+		for (i = 0 ; i < 3 ; i++)
+		{
+			if (!weights[0].count)
+				continue;
+			weightbuf[i].weights = malloc (weights[i].count * sizeof (limdlWeight));
+			if (weightbuf[i].weights == NULL)
+				goto error;
+			memcpy (weightbuf[i].weights, weights[i].weights, weights[i].count * sizeof (limdlWeight));
+			weightbuf[i].count = weights[i].count;
+		}
 	}
 
 	/* Resize vertex buffer. */
@@ -526,11 +518,7 @@ limdl_model_insert_triangle (limdlModel*         self,
 
 	/* Insert vertices. */
 	memcpy (vertex + offset, vertices, 3 * sizeof (limdlVertex));
-	for (i = 0 ; i < 3 ; i++)
-	{
-		weight[offset + i].count = weights[i].count;
-		weight[offset + i].weights = weightbuf[i];
-	}
+	memcpy (weight + offset, weightbuf, 3 * sizeof (limdlWeights));
 	self->vertex.count += 3;
 
 	/* Update material groups. */
@@ -544,9 +532,9 @@ limdl_model_insert_triangle (limdlModel*         self,
 	return 1;
 
 error:
-	free (weightbuf[0]);
-	free (weightbuf[1]);
-	free (weightbuf[2]);
+	free (weightbuf[0].weights);
+	free (weightbuf[1].weights);
+	free (weightbuf[2].weights);
 	return 0;
 }
 
