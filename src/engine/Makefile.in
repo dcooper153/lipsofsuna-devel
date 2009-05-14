@@ -52,9 +52,9 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsengine_la_LIBADD =
 am_liblipsengine_la_OBJECTS = engine.lo engine-block.lo \
-	engine-camera.lo engine-model.lo engine-object.lo \
-	engine-render.lo engine-resources.lo engine-sector.lo \
-	engine-selection.lo
+	engine-block-builder.lo engine-camera.lo engine-model.lo \
+	engine-object.lo engine-render.lo engine-resources.lo \
+	engine-sector.lo engine-selection.lo
 liblipsengine_la_OBJECTS = $(am_liblipsengine_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -226,6 +226,8 @@ liblipsengine_la_SOURCES = \
 	engine.h \
 	engine-block.c \
 	engine-block.h \
+	engine-block-builder.c \
+	engine-block-builder.h \
 	engine-camera.c \
 	engine-camera.h \
 	engine-model.c \
@@ -311,6 +313,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-block-builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-block.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-camera.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-model.Plo@am__quote@

@@ -10,6 +10,8 @@ liblipsengine_la_SOURCES = \
 	engine.h \
 	engine-block.c \
 	engine-block.h \
+	engine-block-builder.c \
+	engine-block-builder.h \
 	engine-camera.c \
 	engine-camera.h \
 	engine-model.c \

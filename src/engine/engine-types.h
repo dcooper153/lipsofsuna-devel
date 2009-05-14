@@ -23,6 +23,7 @@
 /* FIXME */
 #define LIENG_ENABLE_GRAPHICS
 
+#define LIENG_PHYSICS_GROUP_STATICS 0x4000
 #define LIENG_PHYSICS_GROUP_TILES 0x8000
 
 enum
@@ -52,7 +53,7 @@ enum
 	LIENG_OBJECT_FLAG_SAVE = 0x08
 };
 
-typedef uint16_t liengTile;
+typedef uint8_t liengTile;
 typedef struct _liengAnimation liengAnimation;
 typedef struct _liengCamera liengCamera;
 typedef struct _liengEngine liengEngine;

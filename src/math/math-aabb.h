@@ -36,7 +36,6 @@ struct _limatAabb
 {
 	limatVector min;
 	limatVector max;
-	limatVector size;
 };
 
 static inline void
@@ -62,7 +61,6 @@ limat_aabb_init_from_center (limatAabb*         self,
 	tmp = limat_vector_multiply (*size, 0.5f);
 	self->min = limat_vector_subtract (*center, tmp);
 	self->max = limat_vector_add (*center, tmp);
-	self->size = *size;
 }
 
 /**
@@ -79,34 +77,6 @@ limat_aabb_init_from_points (limatAabb*         self,
 {
 	self->min = *min;
 	self->max = *max;
-	self->size = limat_vector_subtract (*max, *min);
-}
-
-/**
- * \brief Makes the base of the box square.
- *
- * This function modifies the X and Z dimensions of the box so that the
- * base becomes square. The resulting bounding box rouhgly approximates
- * all the rotational states of the original box along the Y axis.
- *
- * \param self Axis-aligned bounding box.
- */
-static inline void
-limat_aabb_average (limatAabb* self)
-{
-	float size;
-	limatVector tmp;
-	limatVector center;
-
-	/* FIXME: No good. */
-	center = limat_vector_add (
-		limat_vector_multiply (self->min, 0.5f),
-		limat_vector_multiply (self->max, 0.5f));
-	size = 0.5f * (self->size.x + self->size.z);
-	self->size = limat_vector_init (size, self->size.y, size);
-	tmp = limat_vector_multiply (self->size, 0.5f);
-	self->min = limat_vector_subtract (center, tmp);
-	self->max = limat_vector_add (center, tmp);
 }
 
 /**

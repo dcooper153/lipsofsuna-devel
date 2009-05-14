@@ -39,6 +39,45 @@
 
 /* @luadoc
  * ---
+ * -- Fills a sphere with terrain.
+ * --
+ * -- @param self Editor class.
+ * -- @param center Sphere center.
+ * -- @param radius Sphere radius.
+ * -- @param terrain Terrain type.
+ * function Editor.fill_sphere(self, center, radius, terrain)
+ */
+static int
+Editor_fill_sphere (lua_State* lua)
+{
+	float radius;
+	lialgU32dicIter iter;
+	liengTile terrain;
+	liengSector* sector;
+	liextModule* module;
+	limatVector vector;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	radius = luaL_checknumber (lua, 3);
+	terrain = luaL_checkinteger (lua, 4);
+	luaL_argcheck (lua, radius >= 0.0f, 3, "negative radius");
+	luaL_argcheck (lua, terrain >= 0, 4, "invalid terrain type");
+
+	LI_FOREACH_U32DIC (iter, module->server->engine->sectors)
+	{
+		sector = iter.value;
+		vector = *((limatVector*) center->data);
+		vector = limat_vector_subtract (vector, sector->origin);
+		lieng_sector_fill_sphere (sector, &vector, radius, terrain);
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Saves the current world map.
  * --
  * -- @param self Editor class.
@@ -64,6 +103,7 @@ liextEditorScript (liscrClass* self,
 {
 	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
+	liscr_class_insert_func (self, "fill_sphere", Editor_fill_sphere);
 	liscr_class_insert_func (self, "save", Editor_save);
 }
 

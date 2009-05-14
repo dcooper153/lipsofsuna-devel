@@ -20,7 +20,6 @@
 
 #define LICLI_PHYSICS_GROUP_CAMERA 0x0001
 #define LICLI_PHYSICS_GROUP_OBJECTS 0x0002
-#define LICLI_PHYSICS_GROUP_STATICS 0x0004
 
 typedef struct _licliClient licliClient;
 typedef struct _licliExtension licliExtension;

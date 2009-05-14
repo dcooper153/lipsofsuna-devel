@@ -13,6 +13,8 @@ liblipsmath_la_SOURCES = \
 	math-geometry.h \
 	math-halton.h \
 	math-matrix.h \
+	math-marching-cubes.c \
+	math-marching-cubes.h \
 	math-plane.h \
 	math-polygon.h \
 	math-quadratic.h \

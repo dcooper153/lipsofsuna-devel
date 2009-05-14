@@ -27,9 +27,16 @@
 #include <sector/lips-sector.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
+#include "engine-block-builder.h"
 #include "engine-sector.h"
 
 #define LIENG_SECTOR_VERSION 0xFF
+
+static int
+private_build_block (liengSector* self,
+                     int          x,
+                     int          y,
+                     int          z);
 
 static int
 private_init_objects (liengSector* self,
@@ -99,7 +106,15 @@ lieng_sector_new (liengEngine* engine,
 	}
 
 	/* FIXME */
-	lieng_sector_fill (self, 1);
+	srand (0);
+	limatVector center = limat_vector_init (32.0f, 0.0f, 32.0f);
+	lieng_sector_fill_sphere (self, &center, 18.0f, 1);
+	int z;
+	for (z = 0 ; z < 10 ; z++)
+	{
+		center = limat_vector_init (rand() % 64, rand() % 32, rand() % 64);
+		lieng_sector_fill_sphere (self, &center, rand() % 5 + 5, 1);
+	}
 
 	return self;
 }
@@ -114,15 +129,12 @@ lieng_sector_free (liengSector* self)
 {
 	int i;
 
-	/* Remove from engine. */
-	lialg_u32dic_remove (self->engine->sectors, self->id);
-
 	/* Free objects. */
 	if (self->objects != NULL)
 		lialg_u32dic_free (self->objects);
 
 	/* Free blocks. */
-	for (i = 0 ; i < LIENG_SECTOR_BLOCK_TOTAL ; i++)
+	for (i = 0 ; i < LIENG_BLOCKS_PER_SECTOR ; i++)
 		lieng_block_free (self->blocks + i);
 
 	free (self);
@@ -142,21 +154,65 @@ lieng_sector_fill (liengSector* self,
 	int y;
 	int z;
 	int i = 0;
-	limatVector offset;
 
-	for (z = 0 ; z < LIENG_SECTOR_BLOCK_ROWS ; z++)
+	for (z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
 	{
-		for (y = 0 ; y < LIENG_SECTOR_BLOCK_ROWS ; y++)
+		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
 		{
-			for (x = 0 ; x < LIENG_SECTOR_BLOCK_ROWS ; x++)
+			for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++)
 			{
-				offset = limat_vector_init (
-					self->origin.x + 8 * x,
-					self->origin.y + 8 * y,
-					self->origin.z + 8 * z);
 				lieng_block_fill (self->blocks + i, terrain);
-				lieng_block_rebuild (self->blocks + i, self->engine, &offset);
+				private_build_block (self, x, y, z);
 				i++;
+			}
+		}
+	}
+}
+
+/**
+ * \brief Fills a sphere with the given terrain type.
+ *
+ * \param self Sector.
+ * \param center Center of the sphere relative to the origin of the sector.
+ * \param radius Radius of the sphere.
+ * \param terrain Terrain type.
+ */
+void
+lieng_sector_fill_sphere (liengSector*       self,
+                          const limatVector* center,
+                          float              radius,
+                          liengTile          terrain)
+{
+	int x;
+	int y;
+	int z;
+	int i;
+	float r;
+	limatVector block;
+	limatVector dist;
+
+	r = radius + LIENG_BLOCK_WIDTH;
+	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+	{
+		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+		{
+			for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+			{
+				block = limat_vector_init (
+					(x + 0.5f) * LIENG_BLOCK_WIDTH,
+					(y + 0.5f) * LIENG_BLOCK_WIDTH,
+					(z + 0.5f) * LIENG_BLOCK_WIDTH);
+				dist = limat_vector_subtract (*center, block);
+				if (limat_vector_dot (dist, dist) < r * r)
+				{
+					block = limat_vector_init (
+						x * LIENG_BLOCK_WIDTH,
+						y * LIENG_BLOCK_WIDTH,
+						z * LIENG_BLOCK_WIDTH);
+					block = limat_vector_subtract (*center, block);
+					if (lieng_block_fill_sphere (self->blocks + i, &block, radius, terrain))
+						private_build_block (self, x, y, z);
+				}
 			}
 		}
 	}
@@ -282,52 +338,176 @@ lieng_sector_get_bounds (const liengSector* self,
 }
 
 /**
- * \brief Sets the terrain type of a tile.
+ * \brief Sets the terrain type of a voxel.
  *
  * \param self Block.
- * \param x Offset of the tile within the sector.
- * \param y Offset of the tile within the sector.
- * \param z Offset of the tile within the sector.
+ * \param x Offset of the voxel within the sector.
+ * \param y Offset of the voxel within the sector.
+ * \param z Offset of the voxel within the sector.
+ * \return Terrain type or zero.
+ */
+liengTile
+lieng_sector_get_voxel (liengSector* sector,
+                        int          x,
+                        int          y,
+                        int          z)
+{
+	liengBlock* block;
+	int bx = x / LIENG_TILES_PER_LINE;
+	int by = y / LIENG_TILES_PER_LINE;
+	int bz = z / LIENG_TILES_PER_LINE;
+	int tx = x % LIENG_TILES_PER_LINE;
+	int ty = y % LIENG_TILES_PER_LINE;
+	int tz = z % LIENG_TILES_PER_LINE;
+
+	if (x < 0 || y < 0 || z < 0 ||
+	    bx < 0 || bx >= LIENG_BLOCKS_PER_LINE ||
+	    by < 0 || by >= LIENG_BLOCKS_PER_LINE ||
+	    bz < 0 || bz >= LIENG_BLOCKS_PER_LINE)
+		return 0;
+	block = sector->blocks + LIENG_BLOCK_INDEX (bx, by, bz);
+	switch (block->type)
+	{
+		case LIENG_BLOCK_TYPE_FULL:
+			return block->full.terrain;
+		case LIENG_BLOCK_TYPE_TILES:
+			return block->tiles->tiles[LIENG_TILE_INDEX (tx, ty, tz)];
+		default:
+			return 0;
+	}
+}
+
+/**
+ * \brief Sets the terrain type of a voxel.
+ *
+ * \param self Block.
+ * \param x Offset of the voxel within the sector.
+ * \param y Offset of the voxel within the sector.
+ * \param z Offset of the voxel within the sector.
  * \param terrain Terrain type.
- * \return Nonzero if a tile was modified.
+ * \return Nonzero if a voxel was modified.
  */
 int
-lieng_sector_set_tile (liengSector* self,
-                       int          x,
-                       int          y,
-                       int          z,
-                       liengTile    terrain)
+lieng_sector_set_voxel (liengSector* self,
+                        int          x,
+                        int          y,
+                        int          z,
+                        liengTile    terrain)
 {
-	int i;
 	int ret;
-	int bx = x / 8;
-	int by = y / 8;
-	int bz = z / 8;
-	int tx = x % 8;
-	int ty = y % 8;
-	int tz = z % 8;
+	int bx = x / LIENG_BLOCKS_PER_LINE;
+	int by = y / LIENG_BLOCKS_PER_LINE;
+	int bz = z / LIENG_BLOCKS_PER_LINE;
+	int tx = x % LIENG_BLOCKS_PER_LINE;
+	int ty = y % LIENG_BLOCKS_PER_LINE;
+	int tz = z % LIENG_BLOCKS_PER_LINE;
+	liengBlock* block;
 	limatVector offset;
 
-	if (bx <= 0 || bx >= LIENG_SECTOR_BLOCK_ROWS || 
-	    by <= 0 || by >= LIENG_SECTOR_BLOCK_ROWS || 
-	    bz <= 0 || bz >= LIENG_SECTOR_BLOCK_ROWS)
+	if (x < 0 || y < 0 || z < 0 ||
+	    bx < 0 || bx >= LIENG_BLOCKS_PER_LINE || 
+	    by < 0 || by >= LIENG_BLOCKS_PER_LINE || 
+	    bz < 0 || bz >= LIENG_BLOCKS_PER_LINE)
 	{
 		assert (0);
 		return 0;
 	}
-	i = bx + (by + bz * LIENG_SECTOR_BLOCK_ROWS) * LIENG_SECTOR_BLOCK_ROWS;
-	offset = limat_vector_init (
-		self->origin.x + 8 * bx,
-		self->origin.y + 8 * by,
-		self->origin.z + 8 * bz);
-	ret = lieng_block_set_tile (self->blocks + i, tx, ty, tz, terrain);
+	block = self->blocks + LIENG_BLOCK_INDEX (bx, by, bz);
+	ret = lieng_block_set_voxel (block, tx, ty, tz, terrain);
 	if (ret)
-		lieng_block_rebuild (self->blocks + i, self->engine, &offset);
+	{
+		offset = limat_vector_init (
+			self->origin.x + LIENG_BLOCK_WIDTH * bx,
+			self->origin.y + LIENG_BLOCK_WIDTH * by,
+			self->origin.z + LIENG_BLOCK_WIDTH * bz);
+		private_build_block (self, bx, by, bz);
+	}
 
 	return ret;
 }
 
 /*****************************************************************************/
+
+static int
+private_build_block (liengSector* self,
+                     int          x,
+                     int          y,
+                     int          z)
+{
+	liengBlock* block;
+	liengBlockBuilder* builder;
+	limdlModel* model;
+	lirndModel* rndmdl;
+
+	/* Generate mesh. */
+	block = self->blocks + LIENG_BLOCK_INDEX (x, y, z);
+	builder = lieng_block_builder_new (self);
+	if (builder == NULL)
+		return 0;
+	if (!lieng_block_builder_build (builder, x, y, z))
+	{
+		lieng_block_builder_free (builder);
+		return 0;
+	}
+
+	/* Replace physics data. */
+	if (block->physics != NULL)
+		liphy_object_free (block->physics);
+	if (block->shape != NULL)
+		liphy_shape_free (block->shape);
+	block->physics = NULL;
+	block->shape = lieng_block_builder_get_shape (builder);
+	if (block->shape != NULL)
+	{
+		block->physics = liphy_object_new (self->engine->physics, block->shape,
+			LIPHY_SHAPE_MODE_CONCAVE, LIPHY_CONTROL_MODE_STATIC);
+		if (block->physics != NULL)
+		{
+			liphy_object_set_collision_group (block->physics, LIENG_PHYSICS_GROUP_TILES);
+			liphy_object_set_collision_mask (block->physics,
+				~(LIENG_PHYSICS_GROUP_TILES | LIENG_PHYSICS_GROUP_STATICS));
+			liphy_object_set_realized (block->physics, 1);
+		}
+	}
+
+	/* Replace render data. */
+#ifndef LIENG_DISABLE_GRAPHICS
+	if (self->engine->render != NULL)
+	{
+		if (block->render != NULL)
+		{
+			model = block->render->model->model;
+			rndmdl = block->render->model;
+			self->engine->renderapi->lirnd_object_free (block->render);
+			self->engine->renderapi->lirnd_model_free (rndmdl);
+			limdl_model_free (model);
+		}
+		model = lieng_block_builder_get_model (builder);
+		rndmdl = self->engine->renderapi->lirnd_model_new (self->engine->render, model);
+		block->render = self->engine->renderapi->lirnd_object_new (self->engine->render, 0);
+		if (block->render == NULL)
+		{
+			self->engine->renderapi->lirnd_model_free (rndmdl);
+			limdl_model_free (model);
+			lieng_block_builder_free (builder);
+			return 0;
+		}
+		if (!self->engine->renderapi->lirnd_object_set_model (block->render, rndmdl))
+		{
+			self->engine->renderapi->lirnd_object_free (block->render);
+			self->engine->renderapi->lirnd_model_free (rndmdl);
+			limdl_model_free (model);
+			block->render = NULL;
+			lieng_block_builder_free (builder);
+			return 0;
+		}
+	}
+#endif
+
+	lieng_block_builder_free (builder);
+
+	return 1;
+}
 
 static int
 private_init_objects (liengSector* self,

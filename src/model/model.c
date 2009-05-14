@@ -292,6 +292,48 @@ limdl_model_free (limdlModel* self)
 }
 
 /**
+ * \brief Recalculates the bounding box of the model.
+ *
+ * Loops through all vertices of the model and calculates the minimum and
+ * maximum axis values used.
+ *
+ * \param self Model.
+ */
+void
+limdl_model_calculate_bounds (limdlModel* self)
+{
+	int i;
+	limatVector v;
+
+	if (self->vertex.count)
+	{
+		self->bounds.min = self->vertex.vertices[0].coord;
+		self->bounds.max = self->vertex.vertices[0].coord;
+		for (i = 1 ; i < self->vertex.count ; i++)
+		{
+			v = self->vertex.vertices[i].coord;
+			if (self->bounds.min.x > v.x)
+				self->bounds.min.x = v.x;
+			if (self->bounds.min.y > v.y)
+				self->bounds.min.y = v.y;
+			if (self->bounds.min.z > v.z)
+				self->bounds.min.z = v.z;
+			if (self->bounds.max.x < v.x)
+				self->bounds.max.x = v.x;
+			if (self->bounds.max.y < v.y)
+				self->bounds.max.y = v.y;
+			if (self->bounds.max.z < v.z)
+				self->bounds.max.z = v.z;
+		}
+	}
+	else
+	{
+		self->bounds.min = limat_vector_init (0.0f, 0.0f, 0.0f);
+		self->bounds.max = limat_vector_init (0.0f, 0.0f, 0.0f);
+	}
+}
+
+/**
  * \brief Finds the material index of the material.
  *
  * Finds the first material that matches the passed material.

@@ -81,12 +81,14 @@ licli_object_new (licliModule* module,
 	if (flags & LINET_OBJECT_FLAG_DYNAMIC)
 	{
 		lieng_object_set_collision_group (self, LICLI_PHYSICS_GROUP_OBJECTS);
-		lieng_object_set_collision_mask (self, LICLI_PHYSICS_GROUP_OBJECTS | LICLI_PHYSICS_GROUP_STATICS);
+		lieng_object_set_collision_mask (self,
+			LICLI_PHYSICS_GROUP_OBJECTS | LIENG_PHYSICS_GROUP_STATICS);
 	}
 	else
 	{
-		lieng_object_set_collision_group (self, LICLI_PHYSICS_GROUP_STATICS);
-		lieng_object_set_collision_mask (self, LICLI_PHYSICS_GROUP_CAMERA | LICLI_PHYSICS_GROUP_OBJECTS | LICLI_PHYSICS_GROUP_STATICS);
+		lieng_object_set_collision_group (self, LIENG_PHYSICS_GROUP_STATICS);
+		lieng_object_set_collision_mask (self,
+			LICLI_PHYSICS_GROUP_CAMERA | LICLI_PHYSICS_GROUP_OBJECTS);
 	}
 
 	/* Allocate script data. */
@@ -148,7 +150,6 @@ licli_object_update (liengObject* self,
 	lialgList* ptr;
 	lialgList* next;
 	licliObject* data;
-	limatAabb aabb;
 	liSpeech* speech;
 #ifndef LI_DISABLE_SOUND
 	lisndSource* source;
@@ -160,10 +161,6 @@ licli_object_update (liengObject* self,
 	data = LICLI_OBJECT (self);
 	if (data == NULL)
 		return;
-
-	/* Get bounds. */
-	lieng_object_get_bounds (self, &aabb);
-	limat_aabb_average (&aabb);
 
 	/* Interpolate position. */
 	data->prev.transform.position = limat_vector_lerp (
@@ -177,16 +174,6 @@ licli_object_update (liengObject* self,
 		data->curr.transform.rotation, data->prev.transform.rotation,
 		0.5f * LI_OBJECT_DIRECTION_CORRECTION);
 	lieng_default_calls.lieng_object_set_transform (self, &data->prev.transform);
-
-	/* Apply movement. */
-//	liwrl_object_update (LIWRL_OBJECT (self), client->map, &aabb, secs);
-/*	if (liwrl_object_get_dirty (LIWRL_OBJECT (self)))
-	{
-		LIWRL_OBJECT (self)->flags_prev = LIWRL_OBJECT (self)->flags;
-		LIWRL_OBJECT (self)->position_prev = LIWRL_OBJECT (self)->position;
-		LIWRL_OBJECT (self)->velocity_prev = LIWRL_OBJECT (self)->velocity;
-		LIWRL_OBJECT (self)->direction_prev = LIWRL_OBJECT (self)->direction;
-	}*/
 
 	/* Update speech. */
 	for (ptr = data->speech ; ptr != NULL ; ptr = next)

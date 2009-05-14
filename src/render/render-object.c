@@ -782,7 +782,7 @@ private_init_materials (lirndObject* self,
 	lirndImage* image;
 	lirndMaterial* dst;
 
-	if (model == NULL)
+	if (model == NULL || model->model == NULL)
 		return 1;
 
 	/* Allocate materials. */

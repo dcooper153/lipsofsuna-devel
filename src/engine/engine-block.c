@@ -27,16 +27,8 @@
 #include "engine.h"
 #include "engine-block.h"
 
-static int
-private_build_tiles (liengBlock*  self,
-                     limatVector* vertices);
-
 static void
 private_optimize_tiles (liengBlock* self);
-
-static int
-private_update_physics (liengBlock*  self,
-                        liengEngine* engine);
 
 /*****************************************************************************/
 
@@ -49,7 +41,21 @@ void
 lieng_block_free (liengBlock* self)
 {
 	int i;
+#ifndef LIENG_DISABLE_GRAPHICS
+	limdlModel* model;
+	lirndModel* rndmdl;
+#endif
 
+#ifndef LIENG_DISABLE_GRAPHICS
+	if (self->render != NULL)
+	{
+		model = self->render->model->model;
+		rndmdl = self->render->model;
+		lirnd_object_free (self->render);
+		lirnd_model_free (rndmdl);
+		limdl_model_free (model);
+	}
+#endif
 	if (self->physics != NULL)
 		liphy_object_free (self->physics);
 	if (self->shape != NULL)
@@ -93,34 +99,78 @@ lieng_block_fill (liengBlock* self,
 }
 
 /**
- * \brief Rebuilds the physics and graphics of the block.
+ * \brief Fills a sphere with the given terrain type.
  *
  * \param self Block.
- * \param engine Engine.
- * \param offset Position vector of the block.
- * \return Nonzero on success.
+ * \param center Center of the sphere relative to the origin of the block.
+ * \param radius Radius of the sphere.
+ * \param terrain Terrain type.
+ * \return Nonzero if at least one voxel was modified.
  */
 int
-lieng_block_rebuild (liengBlock*        self,
-                     liengEngine*       engine,
-                     const limatVector* offset)
+lieng_block_fill_sphere (liengBlock*        self,
+                         const limatVector* center,
+                         float              radius,
+                         liengTile          terrain)
 {
-	limatTransform transform;
+	int x;
+	int y;
+	int z;
+	int ret = 0;
+	limatVector dist;
 
-	if (!private_update_physics (self, engine))
-		return 0;
-	if (self->physics != NULL)
+	for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
 	{
-		transform = limat_convert_vector_to_transform (*offset);
-		liphy_object_set_transform (self->physics, &transform);
-		liphy_object_set_realized (self->physics, 1);
+		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
+		{
+			for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+			{
+				dist = limat_vector_subtract (*center, limat_vector_init (
+					(x + 0.5f) * LIENG_TILE_WIDTH,
+					(y + 0.5f) * LIENG_TILE_WIDTH,
+					(z + 0.5f) * LIENG_TILE_WIDTH));
+				if (limat_vector_dot (dist, dist) <= radius * radius)
+					ret |= lieng_block_set_voxel (self, x, y, z, terrain);
+			}
+		}
 	}
 
-	return 1;
+	return ret;
 }
 
 /**
- * \brief Sets the terrain type of a tile.
+ * \brief Gets the terrain type of a voxel.
+ *
+ * \param self Block.
+ * \param x Offset of the voxel within the block.
+ * \param y Offset of the voxel within the block.
+ * \param z Offset of the voxel within the block.
+ * \return Terrain type or zero.
+ */
+liengTile
+lieng_block_get_voxel (liengBlock* self,
+                       uint8_t     x,
+                       uint8_t     y,
+                       uint8_t     z)
+{
+	switch (self->type)
+	{
+		case LIENG_BLOCK_TYPE_FULL:
+			return self->full.terrain;
+		case LIENG_BLOCK_TYPE_HEIGHT:
+			break;
+		case LIENG_BLOCK_TYPE_MULTIPLE:
+			/* FIXME: Not implemented. */
+			break;
+		case LIENG_BLOCK_TYPE_TILES:
+			return self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)];
+	}
+
+	return 0;
+}
+
+/**
+ * \brief Sets the terrain type of a voxel.
  *
  * This can alter the type of the block if, for example, a tile is removed from
  * a full block, in which case the block would be converted to a tiles block.
@@ -128,21 +178,21 @@ lieng_block_rebuild (liengBlock*        self,
  * You need to call #lieng_block_rebuild manually if something was changed.
  *
  * \param self Block.
- * \param x Offset of the tile within the block.
- * \param y Offset of the tile within the block.
- * \param z Offset of the tile within the block.
+ * \param x Offset of the voxel within the block.
+ * \param y Offset of the voxel within the block.
+ * \param z Offset of the voxel within the block.
  * \param terrain Terrain type.
- * \return Nonzero if a tile was modified.
+ * \return Nonzero if a voxel was modified.
  */
 int
-lieng_block_set_tile (liengBlock* self,
-                      uint8_t     x,
-                      uint8_t     y,
-                      uint8_t     z,
-                      liengTile   terrain)
+lieng_block_set_voxel (liengBlock* self,
+                       uint8_t     x,
+                       uint8_t     y,
+                       uint8_t     z,
+                       liengTile   terrain)
 {
 	int i;
-	uint8_t tmp;
+	liengTile tmp;
 	liengBlockTiles* tiles;
 
 	switch (self->type)
@@ -154,8 +204,9 @@ lieng_block_set_tile (liengBlock* self,
 			tiles = calloc (1, sizeof (liengBlockTiles));
 			if (tiles == NULL)
 				return 0;
-			i = x + 8 * y + 64 * z;
-			memset (tiles->tiles, tmp, 512);
+			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
+				tiles->tiles[i] = tmp;
+			i = LIENG_TILE_INDEX (x, y, z);
 			tiles->tiles[i] = terrain;
 			self->tiles = tiles;
 			self->type = LIENG_BLOCK_TYPE_TILES;
@@ -165,12 +216,12 @@ lieng_block_set_tile (liengBlock* self,
 		case LIENG_BLOCK_TYPE_MULTIPLE:
 			for (i = 0 ; i < self->multiple->count ; i++)
 			{
-				if (lieng_block_set_tile (self->multiple->blocks + i, x, y, z, terrain))
+				if (lieng_block_set_voxel (self->multiple->blocks + i, x, y, z, terrain))
 					return 1;
 			}
 			break;
 		case LIENG_BLOCK_TYPE_TILES:
-			i = x + 8 * y + 64 * z;
+			i = LIENG_TILE_INDEX (x, y, z);
 			if (self->tiles->tiles[i] == terrain)
 				return 0;
 			self->tiles->tiles[i] = terrain;
@@ -183,86 +234,14 @@ lieng_block_set_tile (liengBlock* self,
 
 /*****************************************************************************/
 
-static int
-private_build_tiles (liengBlock*  self,
-                     limatVector* vertices)
-{
-	int x;
-	int y;
-	int z;
-	int i = 0;
-	int c = 0;
-	const liengTile* tiles = self->tiles->tiles;
-
-	for (z = 0 ; z < 8 ; z++)
-	{
-		for (y = 0 ; y < 8 ; y++)
-		{
-			for (x = 0 ; x < 8 ; x++)
-			{
-				if (!tiles[i])
-				{
-					i++;
-					continue;
-				}
-				if (!x || !self->tiles->tiles[i - 1])
-				{
-					vertices[c++] = limat_vector_init (x, y, z);
-					vertices[c++] = limat_vector_init (x, y, z + 1);
-					vertices[c++] = limat_vector_init (x, y + 1, z + 1);
-					vertices[c++] = limat_vector_init (x, y + 1, z);
-				}
-				if (x == 7 || !self->tiles->tiles[i + 1])
-				{
-					vertices[c++] = limat_vector_init (x + 1, y, z);
-					vertices[c++] = limat_vector_init (x + 1, y, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y + 1, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y + 1, z);
-				}
-				if (!y || !self->tiles->tiles[i - 8])
-				{
-					vertices[c++] = limat_vector_init (x, y, z);
-					vertices[c++] = limat_vector_init (x, y, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y, z);
-				}
-				if (y == 7 || !self->tiles->tiles[i + 8])
-				{
-					vertices[c++] = limat_vector_init (x, y + 1, z);
-					vertices[c++] = limat_vector_init (x, y + 1, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y + 1, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y + 1, z);
-				}
-				if (!z || !self->tiles->tiles[i - 64])
-				{
-					vertices[c++] = limat_vector_init (x, y, z);
-					vertices[c++] = limat_vector_init (x, y + 1, z);
-					vertices[c++] = limat_vector_init (x + 1, y + 1, z);
-					vertices[c++] = limat_vector_init (x + 1, y, z);
-				}
-				if (z == 7 || !self->tiles->tiles[i + 64])
-				{
-					vertices[c++] = limat_vector_init (x, y, z + 1);
-					vertices[c++] = limat_vector_init (x, y + 1, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y + 1, z + 1);
-					vertices[c++] = limat_vector_init (x + 1, y, z + 1);
-				}
-				i++;
-			}
-		}
-	}
-
-	return c;
-}
-
 static void
 private_optimize_tiles (liengBlock* self)
 {
 	int i;
-	uint8_t tile = self->tiles->tiles[0];
+	liengTile tile = self->tiles->tiles[0];
 
 	/* Check if homogeneous. */
-	for (i = 1 ; i < 512 ; i++)
+	for (i = 1 ; i < LIENG_TILES_PER_BLOCK ; i++)
 	{
 		if (self->tiles->tiles[i] != tile)
 			return;
@@ -272,61 +251,6 @@ private_optimize_tiles (liengBlock* self)
 	free (self->tiles);
 	self->full.terrain = tile;
 	self->type = LIENG_BLOCK_TYPE_FULL;
-}
-
-static int
-private_update_physics (liengBlock*  self,
-                        liengEngine* engine)
-{
-	int count;
-	limatAabb aabb;
-	limatVector vertices[4048];
-
-	/* Free old physics data. */
-	if (self->physics != NULL)
-	{
-		liphy_object_free (self->physics);
-		self->physics = NULL;
-	}
-	if (self->shape != NULL)
-	{
-		liphy_shape_free (self->shape);
-		self->shape = NULL;
-	}
-
-	/* Create collision shape. */
-	if (self->type == LIENG_BLOCK_TYPE_FULL)
-	{
-		if (!self->full.terrain)
-			return 1;
-		aabb.min = limat_vector_init (0.0f, 0.0f, 0.0f);
-		aabb.max = limat_vector_init (8.0f, 8.0f, 8.0f);
-		self->shape = liphy_shape_new_aabb (engine->physics, &aabb);
-		if (self->shape == NULL)
-			return 0;
-		self->physics = liphy_object_new (engine->physics, self->shape,
-			LIPHY_SHAPE_MODE_BOX, LIPHY_CONTROL_MODE_STATIC);
-	}
-	else if (self->type == LIENG_BLOCK_TYPE_TILES)
-	{
-		count = private_build_tiles (self, vertices);
-		self->shape = liphy_shape_new_convex (engine->physics, vertices, count);
-		if (self->shape == NULL)
-			return 0;
-		self->physics = liphy_object_new (engine->physics, self->shape,
-			LIPHY_SHAPE_MODE_CONCAVE, LIPHY_CONTROL_MODE_STATIC);
-	}
-	else
-	{
-		/* FIXME! */
-		return 0;
-	}
-	if (self->physics == NULL)
-		return 0;
-	liphy_object_set_collision_group (self->physics, LIENG_PHYSICS_GROUP_TILES);
-	liphy_object_set_collision_mask (self->physics, ~LIENG_PHYSICS_GROUP_TILES);
-
-	return 1;
 }
 
 /** @} */

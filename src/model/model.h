@@ -122,6 +122,9 @@ limdlModel*
 limdl_model_new_from_file (const char* path);
 
 void
+limdl_model_calculate_bounds (limdlModel* self);
+
+void
 limdl_model_free (limdlModel* self);
 
 int

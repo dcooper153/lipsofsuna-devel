@@ -53,7 +53,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsmath_la_LIBADD =
-am_liblipsmath_la_OBJECTS =
+am_liblipsmath_la_OBJECTS = math-marching-cubes.lo
 liblipsmath_la_OBJECTS = $(am_liblipsmath_la_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
 am_unittest_OBJECTS = unittest.$(OBJEXT)
@@ -232,6 +232,8 @@ liblipsmath_la_SOURCES = \
 	math-geometry.h \
 	math-halton.h \
 	math-matrix.h \
+	math-marching-cubes.c \
+	math-marching-cubes.h \
 	math-plane.h \
 	math-polygon.h \
 	math-quadratic.h \
@@ -328,6 +330,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/math-marching-cubes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unittest.Po@am__quote@
 
 .c.o:

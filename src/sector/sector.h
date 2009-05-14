@@ -28,7 +28,7 @@
 #include <math/lips-math.h>
 
 #define LISEC_SECTOR_INVALID 0xFFFFFFFF
-#define LISEC_SECTOR_SIZE 100
+#define LISEC_SECTOR_SIZE 64
 
 /**
  * \brief The size of a map sector as a vector presentation.

@@ -505,6 +505,136 @@ licli_module_pick (licliModule*    self,
 	return ret;
 }
 
+/* FIXME */
+static void
+private_render_tiles (licliModule*       self,
+                      liengSector*       sector,
+                      liengBlock*        block,
+                      const limatVector* offset,
+                      int bx, int by, int bz)
+{
+	if (block->render == NULL)
+		return;
+	limatFrustum frustum;
+	limatMatrix modelview;
+	limatMatrix projection;
+	lieng_camera_get_frustum (self->camera, &frustum);
+	lieng_camera_get_modelview (self->camera, &modelview);
+	lieng_camera_get_projection (self->camera, &projection);
+	self->engine->render->temporary.frustum = &frustum;
+	self->engine->render->temporary.modelview = &modelview;
+	self->engine->render->temporary.projection = &projection;
+	lirnd_draw_opaque (NULL, self->engine->render, block->render);
+	self->engine->render->temporary.frustum = NULL;
+	self->engine->render->temporary.modelview = NULL;
+	self->engine->render->temporary.projection = NULL;
+}
+static void
+private_render_block (licliModule*       self,
+                      liengSector*       sector,
+                      liengBlock*        block,
+                      const limatVector* offset,
+                      int bx, int by, int bz)
+{
+	switch (block->type)
+	{
+		case LIENG_BLOCK_TYPE_FULL:
+			if (!block->full.terrain)
+				break;
+			glPushMatrix ();
+			glTranslatef (offset->x, offset->y, offset->z);
+			glScalef (LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH);
+			glBegin (GL_QUADS);
+			glColor3f (8.0f, 0.0f, 0.0f);
+			glVertex3f (0.0f, 0.0f, 0.0f);
+			glVertex3f (0.0f, 1.0f, 0.0f);
+			glVertex3f (1.0f, 1.0f, 0.0f);
+			glVertex3f (1.0f, 0.0f, 0.0f);
+			glColor3f (8.0f, 0.0f, 0.0f);
+			glVertex3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (0.0f, 1.0f, 1.0f);
+			glVertex3f (1.0f, 1.0f, 1.0f);
+			glVertex3f (1.0f, 0.0f, 1.0f);
+			glColor3f (0.0f, 1.0f, 0.0f);
+			glVertex3f (0.0f, 0.0f, 0.0f);
+			glVertex3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (1.0f, 0.0f, 1.0f);
+			glVertex3f (1.0f, 0.0f, 0.0f);
+			glColor3f (0.0f, 1.0f, 0.0f);
+			glVertex3f (0.0f, 1.0f, 0.0f);
+			glVertex3f (0.0f, 1.0f, 1.0f);
+			glVertex3f (1.0f, 1.0f, 1.0f);
+			glVertex3f (1.0f, 1.0f, 0.0f);
+			glColor3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (0.0f, 0.0f, 0.0f);
+			glVertex3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (0.0f, 1.0f, 1.0f);
+			glVertex3f (0.0f, 1.0f, 0.0f);
+			glColor3f (0.0f, 0.0f, 1.0f);
+			glVertex3f (1.0f, 0.0f, 0.0f);
+			glVertex3f (1.0f, 0.0f, 1.0f);
+			glVertex3f (1.0f, 1.0f, 1.0f);
+			glVertex3f (1.0f, 1.0f, 0.0f);
+			glEnd ();
+			glPopMatrix ();
+			break;
+		case LIENG_BLOCK_TYPE_TILES:
+			private_render_tiles (self, sector, block, offset, bx, by, bz);
+			break;
+	}
+}
+static void
+private_render_terrain (licliModule* self)
+{
+	lialgU32dicIter iter;
+	liengSector* sector;
+	limatFrustum frustum;
+
+	lieng_camera_get_frustum (self->camera, &frustum);
+	LI_FOREACH_U32DIC (iter, self->engine->sectors)
+	{
+		sector = iter.value;
+
+		limatAabb sector_aabb;
+		lieng_sector_get_bounds (sector, &sector_aabb);
+		if (limat_frustum_cull_aabb (&frustum, &sector_aabb))
+			continue;
+
+		int xb, yb, zb;
+		limatVector pos;
+		lisec_pointer_get_origin (sector->id, &pos);
+		for (zb = 0 ; zb < LIENG_BLOCKS_PER_LINE ; zb++)
+		{
+			for (yb = 0 ; yb < LIENG_BLOCKS_PER_LINE ; yb++)
+			{
+				for (xb = 0 ; xb < LIENG_BLOCKS_PER_LINE ; xb++)
+				{
+					liengBlock* block = sector->blocks + LIENG_BLOCK_INDEX (xb, yb, zb);
+
+					limatAabb block_aabb = sector_aabb;
+					block_aabb.min.x = sector_aabb.min.x + LIENG_BLOCK_WIDTH * xb;
+					block_aabb.min.y = sector_aabb.min.y + LIENG_BLOCK_WIDTH * yb;
+					block_aabb.min.z = sector_aabb.min.z + LIENG_BLOCK_WIDTH * zb;
+					block_aabb.max.x = block_aabb.min.x + LIENG_BLOCK_WIDTH;
+					block_aabb.max.y = block_aabb.min.y + LIENG_BLOCK_WIDTH;
+					block_aabb.max.z = block_aabb.min.z + LIENG_BLOCK_WIDTH;
+					if (limat_frustum_cull_aabb (&frustum, &block_aabb))
+						continue;
+
+					limatVector offset = limat_vector_init (
+						pos.x + xb * LIENG_BLOCK_WIDTH,
+						pos.y + yb * LIENG_BLOCK_WIDTH,
+						pos.z + zb * LIENG_BLOCK_WIDTH);
+					private_render_block (self, sector, block, &offset, xb, yb, zb);
+				}
+			}
+		}
+	}
+
+	if (self->engine->render->shader.enabled)
+		glUseProgramObjectARB (0);
+}
+
 /**
  * \brief Renders everything.
  *
@@ -535,6 +665,9 @@ licli_module_render (licliModule* self)
 		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
 		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
 		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_SELECTION);
+
+		/* FIXME! */
+		private_render_terrain (self);
 	}
 	glDisable (GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
@@ -717,7 +850,7 @@ private_init_camera (licliModule* self)
 	lieng_camera_set_driver (self->camera, LIENG_CAMERA_DRIVER_THIRDPERSON);
 	lieng_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
 	lieng_object_set_collision_group (self->camera->object, LICLI_PHYSICS_GROUP_CAMERA);
-	lieng_object_set_collision_mask (self->camera->object, LICLI_PHYSICS_GROUP_STATICS);
+	lieng_object_set_collision_mask (self->camera->object, LIENG_PHYSICS_GROUP_STATICS | LIENG_PHYSICS_GROUP_TILES);
 	lieng_object_set_realized (self->camera->object, 1);
 
 	return 1;

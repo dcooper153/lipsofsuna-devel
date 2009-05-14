@@ -32,14 +32,16 @@
 #include "engine-block.h"
 #include "engine-types.h"
 
-#define LIENG_SECTOR_BLOCK_ROWS 4
-#define LIENG_SECTOR_BLOCK_TOTAL 64
+#define LIENG_BLOCK_INDEX(x,y,z) (x + LIENG_BLOCKS_PER_LINE * y + LIENG_BLOCKS_PER_PLANE * z)
+#define LIENG_BLOCKS_PER_LINE 4
+#define LIENG_BLOCKS_PER_PLANE (LIENG_BLOCKS_PER_LINE * LIENG_BLOCKS_PER_LINE)
+#define LIENG_BLOCKS_PER_SECTOR (LIENG_BLOCKS_PER_LINE * LIENG_BLOCKS_PER_LINE * LIENG_BLOCKS_PER_LINE)
 
 struct _liengSector
 {
 	uint32_t id;
 	lialgU32dic* objects;
-	liengBlock blocks[LIENG_SECTOR_BLOCK_TOTAL];
+	liengBlock blocks[LIENG_BLOCKS_PER_SECTOR];
 	liengEngine* engine;
 	limatVector origin;
 };
@@ -56,6 +58,12 @@ void
 lieng_sector_fill (liengSector* self,
                    liengTile    terrain);
 
+void
+lieng_sector_fill_sphere (liengSector*       self,
+                          const limatVector* center,
+                          float              radius,
+                          liengTile          terrain);
+
 int
 lieng_sector_insert_object (liengSector* self,
                             liengObject* object);
@@ -71,12 +79,18 @@ void
 lieng_sector_get_bounds (const liengSector* self,
                          limatAabb*         result);
 
+liengTile
+lieng_sector_get_voxel (liengSector* sector,
+                        int          x,
+                        int          y,
+                        int          z);
+
 int
-lieng_sector_set_tile (liengSector* self,
-                       int          x,
-                       int          y,
-                       int          z,
-                       liengTile    terrain);
+lieng_sector_set_voxel (liengSector* self,
+                        int          x,
+                        int          y,
+                        int          z,
+                        liengTile    terrain);
 
 #endif
 

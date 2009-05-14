@@ -25,6 +25,7 @@
 #include "math-geometry.h"
 #include "math-halton.h"
 #include "math-matrix.h"
+#include "math-marching-cubes.h"
 #include "math-plane.h"
 #include "math-polygon.h"
 #include "math-quadratic.h"

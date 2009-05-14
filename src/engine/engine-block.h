@@ -32,6 +32,15 @@
 #endif
 #include "engine-types.h"
 
+#define LIENG_TILE_INDEX(x,y,z) (x + LIENG_TILES_PER_LINE * y + LIENG_TILES_PER_PLANE * z)
+#define LIENG_TILE_WIDTH 2.0f
+#define LIENG_TILES_PER_LINE 8
+#define LIENG_TILES_PER_PLANE (LIENG_TILES_PER_LINE * LIENG_TILES_PER_LINE)
+#define LIENG_TILES_PER_BLOCK (LIENG_TILES_PER_LINE * LIENG_TILES_PER_LINE * LIENG_TILES_PER_LINE)
+#define LIENG_HEIGHTS_PER_LINE (LIENG_TILES_PER_LINE + 1)
+#define LIENG_HEIGHTS_PER_BLOCK (LIENG_TILES_PER_LINE + 1)
+#define LIENG_BLOCK_WIDTH (LIENG_TILE_WIDTH * LIENG_TILES_PER_LINE)
+
 enum
 {
 	LIENG_BLOCK_TYPE_FULL,
@@ -55,7 +64,7 @@ struct _liengBlockHeight
 {
 	uint8_t flags;
 	uint8_t terrain;
-	uint8_t heights[81];
+	uint8_t heights[LIENG_HEIGHTS_PER_BLOCK];
 };
 
 struct _liengBlockMultiple
@@ -68,7 +77,7 @@ struct _liengBlockMultiple
 struct _liengBlockTiles
 {
 	uint8_t flags;
-	liengTile tiles[512];
+	liengTile tiles[LIENG_TILES_PER_BLOCK];
 };
 
 struct _liengBlock
@@ -77,7 +86,7 @@ struct _liengBlock
 	liphyShape* shape;
 	liphyObject* physics;
 #ifndef LIENG_DISABLE_GRAPHICS
-	//lirndBlock* render;
+	lirndObject* render;
 #endif
 	union
 	{
@@ -96,16 +105,23 @@ lieng_block_fill (liengBlock* self,
                   liengTile   terrain);
 
 int
-lieng_block_rebuild (liengBlock*        self,
-                     liengEngine*       engine,
-                     const limatVector* offset);
+lieng_block_fill_sphere (liengBlock*        self,
+                         const limatVector* center,
+                         float              radius,
+                         liengTile          terrain);
+
+liengTile
+lieng_block_get_voxel (liengBlock* self,
+                       uint8_t     x,
+                       uint8_t     y,
+                       uint8_t     z);
 
 int
-lieng_block_set_tile (liengBlock* self,
-                      uint8_t     x,
-                      uint8_t     y,
-                      uint8_t     z,
-                      liengTile   terrain);
+lieng_block_set_voxel (liengBlock* self,
+                       uint8_t     x,
+                       uint8_t     y,
+                       uint8_t     z,
+                       liengTile   terrain);
 
 #endif
 
