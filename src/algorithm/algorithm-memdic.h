@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef __ALGORITHM_ASSOC_MEM_H__
-#define __ALGORITHM_ASSOC_MEM_H__
+#ifndef __ALGORITHM_MEMDIC_H__
+#define __ALGORITHM_MEMDIC_H__
 
 #include <assert.h>
 #include <stdlib.h>
@@ -72,7 +72,7 @@ lialg_memdic_node_free (lialgMemdicNode* self)
 
 static inline int
 lialg_memdic_node_compare (const lialgMemdicNode* self,
-                              const lialgMemdicNode* node)
+                           const lialgMemdicNode* node)
 {
 	int ret;
 	int min;
@@ -153,8 +153,8 @@ lialg_memdic_clear (lialgMemdic* self)
  */
 static inline void*
 lialg_memdic_find (lialgMemdic* self,
-                      const void*    key,
-                      int            keysize)
+                   const void*  key,
+                   int          keysize)
 {
 	lialgMemdicNode tmp;
 	lialgMemdicNode* anode;
@@ -180,8 +180,8 @@ lialg_memdic_find (lialgMemdic* self,
  */
 static inline lialgMemdicNode*
 lialg_memdic_find_node (lialgMemdic* self,
-                           const void*    key,
-                           int            keysize)
+                        const void*  key,
+                        int          keysize)
 {
 	lialgMemdicNode tmp;
 	lialgBstNode* tnode;
@@ -206,9 +206,9 @@ lialg_memdic_find_node (lialgMemdic* self,
  */
 static inline lialgMemdicNode*
 lialg_memdic_insert (lialgMemdic* self,
-                        const void*    key,
-                        int            keysize,
-                        void*          value)
+                     const void*  key,
+                     int          keysize,
+                     void*        value)
 {
 	lialgMemdicNode* node;
 
@@ -250,8 +250,8 @@ lialg_memdic_insert (lialgMemdic* self,
  */
 static inline int
 lialg_memdic_remove (lialgMemdic* self,
-                        const void*    key,
-                        int            keysize)
+                     const void*  key,
+                     int          keysize)
 {
 	lialgBstNode* tnode;
 	lialgMemdicNode* anode;
@@ -289,7 +289,7 @@ lialg_memdic_remove (lialgMemdic* self,
  */
 static inline void
 lialg_memdic_remove_node (lialgMemdic*     self,
-                             lialgMemdicNode* node)
+                          lialgMemdicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -311,7 +311,7 @@ lialg_memdic_remove_node (lialgMemdic*     self,
 
 static inline void
 lialg_memdic_iter_start (lialgMemdicIter* self,
-                            lialgMemdic*     assoc)
+                         lialgMemdic*     assoc)
 {
 	self->assoc = assoc;
 	if (assoc->list == NULL)
