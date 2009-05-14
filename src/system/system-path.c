@@ -258,7 +258,7 @@ lisys_path_format (lisysPathFormat format,
 		}
 
 		/* Resize buffer. */
-		if (pos + len > cap)
+		if (cap <= pos + len)
 		{
 			while (cap <= pos + len)
 				cap <<= 1;
