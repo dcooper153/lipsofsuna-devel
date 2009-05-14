@@ -57,6 +57,11 @@ private_init_box (liphyShape*      self,
                   const limatAabb* aabb);
 
 static inline int
+private_init_concave (liphyShape*       self,
+                     const limatVector* vertices,
+                     int                count);
+
+static inline int
 private_init_convex (liphyShape*        self,
                      const limatVector* vertices,
                      int                count);
@@ -148,7 +153,47 @@ liphy_shape_new_aabb (liphyPhysics*    physics,
 }
 
 /**
- * \brief Creates a collision shape from a triangle list.
+ * \brief Creates a concave collision shape from a triangle list.
+ *
+ * \param physics Physics engine.
+ * \param vertices Vertex array.
+ * \param count Number of vertices.
+ * \return New collision shape or NULL.
+ */
+liphyShape*
+liphy_shape_new_concave (liphyPhysics*      physics,
+                         const limatVector* vertices,
+                         int                count)
+{
+	liphyShape* self;
+
+	self = (liphyShape*) calloc (1, sizeof (liphyShape));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	try
+	{
+		self->physics = physics;
+		if (!private_init_concave (self, vertices, count))
+		{
+			liphy_shape_free (self);
+			return NULL;
+		}
+	}
+	catch (...)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		liphy_shape_free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Creates a convex collision shape from a triangle list.
  *
  * \param physics Physics engine.
  * \param vertices Vertex array.
@@ -379,6 +424,55 @@ private_init_box (liphyShape*      self,
 	self->shapes.box = private_create_convex_from_aabb (self, aabb);
 	self->shapes.capsule = private_create_capsule_from_aabb (self, aabb);
 	self->shapes.convex = private_create_convex_from_aabb (self, aabb);
+
+	return 1;
+}
+
+static inline int
+private_init_concave (liphyShape*       self,
+                     const limatVector* vertices,
+                     int                count)
+{
+	int i;
+
+	/* Allocate indices. */
+	/* FIXME: Pretty pointless to have something like this. */
+	self->indices.count = count;
+	self->indices.array = (int*) calloc (self->indices.count, sizeof (int));
+	if (self->indices.array == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	for (i = 0 ; i < self->indices.count ; i++)
+		self->indices.array[i] = i;
+
+	/* Allocate vertices. */
+	self->vertices.count = count;
+	self->vertices.array = (btScalar*) calloc (4 * self->vertices.count, sizeof (btScalar));
+	if (self->vertices.array == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		self->vertices.array[4 * i + 0] = vertices[i].x;
+		self->vertices.array[4 * i + 1] = vertices[i].y;
+		self->vertices.array[4 * i + 2] = vertices[i].z;
+		self->vertices.array[4 * i + 3] = 0.0;
+	}
+
+	/* Create shapes. */
+	self->shapes.box = private_create_convex_from_vertices (self,
+		self->vertices.array, self->vertices.count);
+	self->shapes.capsule = private_create_capsule_from_vertices (self,
+		self->vertices.array, self->vertices.count);
+	self->shapes.concave = private_create_concave_from_vertices (self,
+		self->indices.array, self->indices.count,
+		self->vertices.array, self->vertices.count);
+	self->shapes.convex = private_create_convex_from_vertices (self,
+		self->vertices.array, self->vertices.count);
 
 	return 1;
 }
