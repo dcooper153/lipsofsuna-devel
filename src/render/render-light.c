@@ -386,6 +386,8 @@ private_update_shadow (lirndLight* self,
                        lirndScene* scene)
 {
 	limatFrustum frustum;
+	lirndContext context;
+	lirndSceneIter iter;
 
 	/* Enable depth rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
@@ -400,12 +402,12 @@ private_update_shadow (lirndLight* self,
 
 	/* Render to depth texture. */
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	lirnd_render_render_custom (self->render,
-		scene,
-		&self->modelview,
-		&self->projection,
-		&frustum,
-		lirnd_draw_shadowmap, self);
+	lirnd_context_init (&context, self->render);
+	lirnd_context_set_modelview (&context, &self->modelview);
+	lirnd_context_set_projection (&context, &self->projection);
+	lirnd_context_set_frustum (&context, &frustum);
+	LIRND_FOREACH_SCENE (iter, scene)
+		lirnd_draw_shadowmap (&context, iter.value, self);
 
 	/* Disable depth rendering mode. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);

@@ -30,44 +30,44 @@
 #include "render-types.h"
 
 void
-lirnd_draw_bounds (void*        data,
-                   lirndRender* render,
-                   lirndObject* object);
+lirnd_draw_bounds (lirndContext* context,
+                   lirndObject*  object,
+                   void*         data);
 
 void
-lirnd_draw_debug (void*        data,
-                  lirndRender* render,
-                  lirndObject* object);
+lirnd_draw_debug (lirndContext* context,
+                  lirndObject*  object,
+                  void*         data);
 
 void
-lirnd_draw_exclude (void*        data,
-                    lirndRender* render,
-                    lirndObject* object);
+lirnd_draw_exclude (lirndContext* context,
+                    lirndObject*  object,
+                    void*         data);
 
 void
-lirnd_draw_opaque (void*        data,
-                   lirndRender* render,
-                   lirndObject* object);
+lirnd_draw_opaque (lirndContext* context,
+                   lirndObject*  object,
+                   void*         data);
 
 void
-lirnd_draw_picking (void*        data,
-                    lirndRender* render,
-                    lirndObject* object);
+lirnd_draw_picking (lirndContext* context,
+                    lirndObject*  object,
+                    void*         data);
 
 void
-lirnd_draw_shadeless (void*        data,
-                      lirndRender* render,
-                      lirndObject* object);
+lirnd_draw_shadeless (lirndContext* context,
+                      lirndObject*  object,
+                      void*         data);
 
 void
-lirnd_draw_shadowmap (void*        data,
-                      lirndRender* render,
-                      lirndObject* object);
+lirnd_draw_shadowmap (lirndContext* context,
+                      lirndObject*  object,
+                      void*         data);
 
 void
-lirnd_draw_transparent (void*        data,
-                        lirndRender* render,
-                        lirndObject* object);
+lirnd_draw_transparent (lirndContext* context,
+                        lirndObject*  object,
+                        void*         data);
 
 #endif
 

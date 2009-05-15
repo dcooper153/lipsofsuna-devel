@@ -115,6 +115,7 @@ liwdg_manager_new (const char* root)
 		return NULL;
 	self->width = 640;
 	self->height = 480;
+	self->projection = limat_matrix_identity ();
 
 	/* Load config and resources. */
 	self->fonts = lialg_strdic_new ();
@@ -605,6 +606,19 @@ liwdg_manager_set_focus_mouse (liwdgManager* self,
 }
 
 /**
+ * \brief Gets the projection matrix used for rendering widgets.
+ *
+ * \param self Widget manager.
+ * \param matrix Return location for the projection matrix.
+ */
+void
+liwdg_manager_get_projection (liwdgManager* self,
+                              limatMatrix*  matrix)
+{
+	*matrix = self->projection;
+}
+
+/**
  * \brief Gets the root widget.
  *
  * \param self Widget manager.
@@ -655,7 +669,7 @@ liwdg_manager_set_root (liwdgManager* self,
 /**
  * \brief Gets the screen size.
  *
- * \param self A widget manager.
+ * \param self Widget manager.
  * \param width Return location for the width or NULL.
  * \param height Return location for the height or NULL.
  */
@@ -664,14 +678,10 @@ liwdg_manager_get_size (liwdgManager* self,
                         int*          width,
                         int*          height)
 {
-	SDL_Surface* surface;
-
-	surface = SDL_GetVideoSurface ();
-	assert (surface != NULL);
 	if (width != NULL)
-		*width = surface->w;
+		*width = self->width;
 	if (height != NULL)
-		*height = surface->h;
+		*height = self->height;
 }
 
 /**
@@ -688,29 +698,9 @@ liwdg_manager_set_size (liwdgManager* self,
 {
 	self->width = width;
 	self->height = height;
+	self->projection = limat_matrix_ortho (0.0f, width, height, 0.0f, -100.0f, 100.0f);
 	if (self->widgets.root != NULL)
 		liwdg_widget_set_allocation (self->widgets.root, 0, 0, width, height);
-}
-
-void
-liwdg_manager_set_texture (liwdgManager* self,
-                           liimgTexture* texture)
-{
-	glColor3f (1.0f, 1.0f, 1.0f);
-	if (texture != NULL)
-	{
-		glActiveTextureARB (GL_TEXTURE1);
-		glBindTexture (GL_TEXTURE_2D, 0);
-		glActiveTextureARB (GL_TEXTURE0);
-		glBindTexture (GL_TEXTURE_2D, texture->texture);
-	}
-	else
-	{
-		glActiveTextureARB (GL_TEXTURE1);
-		glBindTexture (GL_TEXTURE_2D, 0);
-		glActiveTextureARB (GL_TEXTURE0);
-		glBindTexture (GL_TEXTURE_2D, 0);
-	}
 }
 
 /*****************************************************************************/

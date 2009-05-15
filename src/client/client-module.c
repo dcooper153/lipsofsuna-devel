@@ -513,21 +513,21 @@ private_render_tiles (licliModule*       self,
                       const limatVector* offset,
                       int bx, int by, int bz)
 {
-	if (block->render == NULL)
-		return;
 	limatFrustum frustum;
 	limatMatrix modelview;
 	limatMatrix projection;
+	lirndContext context;
+
+	if (block->render == NULL)
+		return;
 	lieng_camera_get_frustum (self->camera, &frustum);
 	lieng_camera_get_modelview (self->camera, &modelview);
 	lieng_camera_get_projection (self->camera, &projection);
-	self->engine->render->temporary.frustum = &frustum;
-	self->engine->render->temporary.modelview = &modelview;
-	self->engine->render->temporary.projection = &projection;
-	lirnd_draw_opaque (NULL, self->engine->render, block->render);
-	self->engine->render->temporary.frustum = NULL;
-	self->engine->render->temporary.modelview = NULL;
-	self->engine->render->temporary.projection = NULL;
+	lirnd_context_init (&context, self->engine->render);
+	lirnd_context_set_modelview (&context, &modelview);
+	lirnd_context_set_projection (&context, &projection);
+	lirnd_context_set_frustum (&context, &frustum);
+	lirnd_draw_opaque (&context, block->render, NULL);
 }
 static void
 private_render_block (licliModule*       self,
@@ -651,7 +651,9 @@ licli_module_render (licliModule* self)
 	limatFrustum frustum;
 	limatMatrix modelview;
 	limatMatrix projection;
+	lirndContext context;
 	lirndScene* scene;
+	lirndSceneIter iter;
 
 	/* Render scene. */
 	active = (self->network != NULL);
@@ -664,7 +666,6 @@ licli_module_render (licliModule* self)
 		lieng_camera_get_projection (self->camera, &projection);
 		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
 		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
-		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_SELECTION);
 
 		/* FIXME! */
 		private_render_terrain (self);
@@ -675,12 +676,17 @@ licli_module_render (licliModule* self)
 	glDisable (GL_TEXTURE_2D);
 	glDepthMask (GL_FALSE);
 	glColor3f (1.0f, 0.0f, 0.0f);
+	lirnd_context_init (&context, self->engine->render);
 	if (active)
 	{
-		lirnd_render_render_custom (self->engine->render, scene, &modelview,
-			&projection, &frustum, lirnd_draw_bounds, NULL);
+		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_SELECTION);
+		lirnd_context_set_modelview (&context, &modelview);
+		lirnd_context_set_projection (&context, &projection);
+		lirnd_context_set_frustum (&context, &frustum);
+		LIRND_FOREACH_SCENE (iter, scene)
+			lirnd_draw_bounds (&context, iter.value, NULL);
 	}
-	glColor3f (1.0f, 1.0f, 1.0f);
+	lirnd_context_unbind (&context);
 
 	/* Set 2D rendering mode. */
 	licli_window_get_size (self->window, &w, &h);
@@ -688,7 +694,6 @@ licli_module_render (licliModule* self)
 	lieng_camera_set_viewport (self->camera, 0, 0, w, h);
 	glViewport (0, 0, w, h);
 	glMatrixMode (GL_PROJECTION);
-	glPushMatrix ();
 	glLoadIdentity();
 	glOrtho (0, w, 0, h, -100.0f, 100.0f);
 	glMatrixMode (GL_MODELVIEW);
@@ -708,9 +713,6 @@ licli_module_render (licliModule* self)
 	glEnable (GL_LIGHTING);
 	glEnable (GL_DEPTH_TEST);
 	glDepthMask (GL_TRUE);
-	glMatrixMode (GL_PROJECTION);
-	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
 
 	SDL_GL_SwapBuffers ();
 }

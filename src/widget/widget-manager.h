@@ -38,6 +38,7 @@ struct _liwdgManager
 	lialgStrdic* fonts;
 	lialgStrdic* images;
 	lialgStrdic* subimgs;
+	limatMatrix projection;
 	struct
 	{
 		int active;
@@ -114,23 +115,40 @@ void
 liwdg_manager_update (liwdgManager* self,
                       float         secs);
 
-liwdgWidget*  liwdg_manager_get_focus_keyboard  (liwdgManager* self);
-void          liwdg_manager_set_focus_keyboard  (liwdgManager* self,
-                                                 liwdgWidget*  widget);
-liwdgWidget*  liwdg_manager_get_focus_mouse     (liwdgManager* self);
-void          liwdg_manager_set_focus_mouse     (liwdgManager* self,
-                                                 liwdgWidget*  widget);
-liwdgWidget*  liwdg_manager_get_root            (liwdgManager* self);
-void          liwdg_manager_set_root            (liwdgManager* self,
-                                                 liwdgWidget*  widget);
-void          liwdg_manager_get_size            (liwdgManager* self,
-                                                 int*          x,
-                                                 int*          y);
-void          liwdg_manager_set_size            (liwdgManager* self,
-                                                 int           width,
-                                                 int           height);
-void          liwdg_manager_set_texture         (liwdgManager* self,
-                                                 liimgTexture* texture);
+liwdgWidget*
+liwdg_manager_get_focus_keyboard (liwdgManager* self);
+
+void
+liwdg_manager_set_focus_keyboard (liwdgManager* self,
+                                  liwdgWidget*  widget);
+
+liwdgWidget*
+liwdg_manager_get_focus_mouse (liwdgManager* self);
+
+void
+liwdg_manager_set_focus_mouse (liwdgManager* self,
+                               liwdgWidget*  widget);
+
+void
+liwdg_manager_get_projection (liwdgManager* self,
+                              limatMatrix*  matrix);
+
+liwdgWidget*
+liwdg_manager_get_root (liwdgManager* self);
+
+void
+liwdg_manager_set_root (liwdgManager* self,
+                        liwdgWidget*  widget);
+
+void
+liwdg_manager_get_size (liwdgManager* self,
+                        int*          x,
+                        int*          y);
+
+void
+liwdg_manager_set_size (liwdgManager* self,
+                        int           width,
+                        int           height);
 
 #endif
 

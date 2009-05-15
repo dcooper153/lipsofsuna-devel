@@ -59,7 +59,7 @@ typedef enum _lirndSelect lirndSelect;
 typedef struct _lirndSelection lirndSelection;
 typedef struct _lirndShader lirndShader;
 typedef struct _lirndTexture lirndTexture;
-typedef void (*lirndCallback) (void*, lirndRender*, lirndObject*);
+typedef void (*lirndCallback) (lirndContext*, lirndObject*, void*);
 
 struct _lirndSelection
 {

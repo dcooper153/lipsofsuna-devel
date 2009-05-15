@@ -75,13 +75,6 @@ struct _lirndRender
 	} shader;
 	struct
 	{
-		limatFrustum* frustum;
-		limatMatrix* modelview;
-		limatMatrix* projection;
-		lirndScene* scene;
-	} temporary;
-	struct
-	{
 		lirndConstraint* constraints;
 	} world;
 };
@@ -138,16 +131,6 @@ lirnd_render_render (lirndRender*  self,
                      limatMatrix*  modelview,
                      limatMatrix*  projection,
                      limatFrustum* frustum);
-
-void
-lirnd_render_render_custom (lirndRender*  self,
-                            lirndScene*   scene,
-                            limatMatrix*  modelview,
-                            limatMatrix*  projection,
-                            limatFrustum* frustum,
-                            lirndCallback call,
-                            void*         data);
-
 
 void
 lirnd_render_update (lirndRender* self,

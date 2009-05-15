@@ -63,11 +63,14 @@ lirnd_context_init (lirndContext* self,
 	memset (self, 0, sizeof (lirndContext));
 	self->compiled = 1;
 	self->render = render;
+	self->material.diffuse[0] = 1.0f;
+	self->material.diffuse[1] = 1.0f;
+	self->material.diffuse[2] = 1.0f;
+	self->material.diffuse[3] = 1.0f;
 	self->matrix = limat_matrix_identity ();
 	self->modelview = limat_matrix_identity ();
 	self->modelviewinverse = limat_matrix_identity ();
 	self->projection = limat_matrix_identity ();
-//		limat_matrix_ortho (0.0f, 640.0f, 480.0f, 0.0f, -100.0f, 100.0f);
 }
 
 void
@@ -75,6 +78,7 @@ lirnd_context_bind (lirndContext* self)
 {
 	int i;
 
+	/* Validate state. */
 	if (!self->compiled)
 	{
 		self->modelviewinverse = limat_matrix_invert (self->modelview);
@@ -82,10 +86,10 @@ lirnd_context_bind (lirndContext* self)
 	}
 	if (!self->render->shader.enabled)
 		self->fixed = 1;
-	glMatrixMode (GL_TEXTURE);
+
+	/* Bind materials. */
 	if (self->fixed || self->shader == NULL)
 	{
-		private_bind_lights_fixed (self);
 		private_bind_material (self);
 		if (livid_features.shader_model >= 3)
 			glUseProgramObjectARB (0);
@@ -94,13 +98,28 @@ lirnd_context_bind (lirndContext* self)
 	}
 	else
 	{
-		private_bind_lights_shader (self);
 		private_bind_material (self);
 		private_bind_shader (self);
+	}
+
+	/* Bind matrices. */
+	glMatrixMode (GL_PROJECTION);
+	glLoadMatrixf (self->projection.m);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadMatrixf (self->modelview.m);
+
+	/* Bind lights. */
+	if (self->fixed || self->shader == NULL)
+	{
+		private_bind_lights_fixed (self);
+		glEnable (GL_LIGHTING);
+	}
+	else
+	{
+		private_bind_lights_shader (self);
 		for (i = 0 ; i < self->shader->uniforms.count ; i++)
 			private_bind_uniform (self, self->shader->uniforms.array + i);
 	}
-	glMatrixMode (GL_MODELVIEW);
 	glActiveTextureARB (GL_TEXTURE0);
 }
 
@@ -205,6 +224,24 @@ lirnd_context_render_indexed (lirndContext*      self,
 	glPopMatrix ();
 }
 
+/**
+ * \brief Resets the OpenGL state variables used by contexts.
+ *
+ * \param self Rendering context.
+ */
+void
+lirnd_context_unbind (lirndContext* self)
+{
+	if (livid_features.shader_model >= 3)
+		glUseProgramObjectARB (0);
+	glEnable (GL_TEXTURE_2D);
+	glEnable (GL_BLEND);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_LIGHTING);
+	glColor3f (1.0f, 1.0f, 1.0f);
+}
+
 void
 lirnd_context_set_flags (lirndContext* self,
                          int           value)
@@ -213,6 +250,13 @@ lirnd_context_set_flags (lirndContext* self,
 /*	self->lighting = ((value & LIRND_FLAG_LIGHTING) != 0);
 	self->texturing = ((value & LIRND_FLAG_TEXTURING) != 0);*/
 	self->shadows = ((value & LIRND_FLAG_SHADOW1) != 0);
+}
+
+void
+lirnd_context_set_frustum (lirndContext*       self,
+                           const limatFrustum* frustum)
+{
+	self->frustum = *frustum;
 }
 
 void

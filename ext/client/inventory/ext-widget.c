@@ -45,6 +45,13 @@ static int
 private_event (liextInventoryWidget* self,
                liwdgEvent*           event);
 
+static void
+private_calculate_modelview (liextInventoryWidget* self,
+                             liengObject*          object,
+                             liwdgRect*            frame,
+                             float                 scale,
+                             limatMatrix*          modelview);
+
 static const liwdgWidgetClass
 liextInventoryWidgetType =
 {
@@ -122,6 +129,8 @@ private_event (liextInventoryWidget* self,
 	float scale;
 	liengObject* object;
 	limatAabb bounds;
+	limatMatrix modelview;
+	limatMatrix projection;
 	limatVector center;
 	lirndContext context;
 	lirndRender* render;
@@ -148,6 +157,7 @@ private_event (liextInventoryWidget* self,
 		liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 		size = liext_inventory_get_size (self->inventory);
 		render = self->module->module->engine->render;
+
 		/* Draw frame. */
 		subimg = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, "inventory");
 		if (subimg != NULL)
@@ -164,14 +174,16 @@ private_event (liextInventoryWidget* self,
 		}
 		else
 			w = LIEXT_SLOT_SIZE;
+
 		/* Draw items. */
-		glEnable (GL_SCISSOR_TEST);
+		lirnd_context_init (&context, render);
 		for (i = 0 ; i < size ; i++)
 		{
 			/* Get slot item. */
 			object = liext_inventory_get_object (self->inventory, i);
 			if (object == NULL)
 				continue;
+
 			/* Calculate frame size. */
 			frame = rect;
 			frame.x += i * w;
@@ -183,34 +195,35 @@ private_event (liextInventoryWidget* self,
 				frame.width -= subimg->pad[1] + subimg->pad[2];
 				frame.height -= subimg->pad[0] + subimg->pad[3];
 			}
+
 			/* Calculate scale factor. */
 			lieng_object_get_bounds (object, &bounds);
 			center = limat_vector_add (bounds.min, bounds.max);
 			center = limat_vector_multiply (center, 0.5f);
-			scale = 2.0f * LI_MAX (bounds.max.x - center.x, bounds.max.y - center.y);
-			scale = LI_MIN (frame.width, frame.height) / LI_MAX (1, scale);
+#warning FIXME: Hardcoded inventory scale factor.
+//			scale = 2.0f * LI_MAX (bounds.max.x - center.x, bounds.max.y - center.y);
+//			scale = LI_MIN (frame.width, frame.height) / LI_MAX (1, scale);
+			scale = 50.0f;
+
 			/* Render the object. */
-			glScissor (frame.x, frame.y, frame.width, frame.height);
-			glClear (GL_DEPTH_BUFFER_BIT);
-			glEnable (GL_DEPTH_TEST);
+			glMatrixMode (GL_PROJECTION);
 			glPushMatrix ();
-			glTranslatef (frame.x + 0.5 * frame.width, frame.y + 0.5 * frame.height, 50.0f);
-			glScalef (scale, scale, scale);
-			glRotatef (45.0f, 1.0, 0.0, 0.0);
-			glRotatef (45.0f, 0.0, 1.0, 0.0);
-			glTranslatef (-center.x, -center.y, -center.z);
-			lirnd_context_init (&context, render);
+			glMatrixMode (GL_MODELVIEW);
+			glPushMatrix ();
+			glClear (GL_DEPTH_BUFFER_BIT);
+			private_calculate_modelview (self, object, &frame, scale, &modelview);
+			lirnd_context_set_modelview (&context, &modelview);
+			liwdg_manager_get_projection (LIWDG_WIDGET (self)->manager, &projection);
+			lirnd_context_set_projection (&context, &projection);
 			lirnd_context_set_lights (&context, &self->light, 1);
 			lirnd_object_render (object->render, &context);
-			lirnd_context_init (&context, render);
-			lirnd_context_bind (&context);
+			glMatrixMode (GL_PROJECTION);
+			glPopMatrix ();
+			glMatrixMode (GL_MODELVIEW);
 			glPopMatrix ();
 		}
-		glEnable (GL_BLEND);
-		glDisable (GL_DEPTH_TEST);
-		glDisable (GL_CULL_FACE);
-		glDisable (GL_LIGHTING);
-		glDisable (GL_SCISSOR_TEST);
+		lirnd_context_unbind (&context);
+
 		return 1;
 	}
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
@@ -234,6 +247,38 @@ private_event (liextInventoryWidget* self,
 	}
 
 	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+}
+
+static void
+private_calculate_modelview (liextInventoryWidget* self,
+                             liengObject*          object,
+                             liwdgRect*            frame,
+                             float                 scale,
+                             limatMatrix*          modelview)
+{
+	limatMatrix m0;
+	limatMatrix m1;
+	limatMatrix m2;
+	limatMatrix m3;
+	limatTransform transform;
+	limdlNode* node;
+
+	m0 = limat_matrix_translation (frame->x + 0.5 * frame->width, frame->y + 0.5 * frame->height, 0.0f);
+	m1 = limat_matrix_scale (scale, scale, scale);
+	m2 = limat_matrix_rotation (0.55f, 0.0f, 1.0f, 0.0f);
+	node = limdl_pose_find_node (object->render->pose.pose, "#root");
+	if (node != NULL)
+	{
+		limdl_node_get_pose_transform (node, &transform);
+		transform = limat_transform_invert (transform);
+		m3 = limat_convert_transform_to_matrix (transform);
+	}
+	else
+		m3 = limat_matrix_identity ();
+
+	*modelview = limat_matrix_multiply (m0, m1);
+	*modelview = limat_matrix_multiply (*modelview, m2);
+	*modelview = limat_matrix_multiply (*modelview, m3);
 }
 
 /** @} */

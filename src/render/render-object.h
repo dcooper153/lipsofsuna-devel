@@ -134,6 +134,9 @@ void
 lirnd_object_set_userdata (lirndObject* self,
                            void*        value);
 
+int
+lirnd_object_get_visible (lirndObject* self);
+
 #endif
 
 /** @} */

@@ -61,6 +61,8 @@ private_particle_update (lirndRender* self,
 
 static void
 private_render (lirndRender*  self,
+                lirndScene*   scene,
+                lirndContext* context,
                 lirndCallback call,
                 void*         data);
 
@@ -313,33 +315,23 @@ lirnd_render_pick (lirndRender*    self,
 	GLuint selection[256];
 	GLint viewport[4];
 	limatMatrix pick;
-
-	self->temporary.scene = scene;
-	self->temporary.modelview = modelview;
-	self->temporary.projection = projection;
-	self->temporary.frustum = frustum;
+	lirndContext context;
 
 	glGetIntegerv (GL_VIEWPORT, viewport);
 	pick = limat_matrix_pick (x, y, size, size, viewport);
-	glMatrixMode (GL_PROJECTION);
-	glLoadMatrixf (pick.m);
-	glMultMatrixf (projection->m);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadMatrixf (modelview->m);
+	pick = limat_matrix_multiply (pick, *projection);
+	lirnd_context_init (&context, self);
+	lirnd_context_set_modelview (&context, modelview);
+	lirnd_context_set_projection (&context, &pick);
+	lirnd_context_set_frustum (&context, frustum);
 
 	/* Pick scene. */
 	glSelectBuffer (256, selection);
 	glRenderMode (GL_SELECT);
 	glInitNames ();
 	glPushName (0);
-	private_render (self, lirnd_draw_picking, NULL);
+	private_render (self, scene, &context, lirnd_draw_picking, NULL);
 	count = glRenderMode (GL_RENDER);
-
-	/* Restore state. */
-	self->temporary.scene = NULL;
-	self->temporary.modelview = NULL;
-	self->temporary.projection = NULL;
-	self->temporary.frustum = NULL;
 	if (count <= 0)
 		return 0;
 
@@ -409,25 +401,22 @@ lirnd_render_render (lirndRender*  self,
                      limatFrustum* frustum)
 {
 	int i;
+	lirndContext context;
 
 	assert (scene != NULL);
 	assert (modelview != NULL);
 	assert (projection != NULL);
 	assert (frustum != NULL);
 
+	lirnd_context_init (&context, self);
+	lirnd_context_set_modelview (&context, modelview);
+	lirnd_context_set_projection (&context, projection);
+	lirnd_context_set_frustum (&context, frustum);
+
 	/* Update lights. */
-	self->temporary.scene = scene;
 	lirnd_lighting_update (self->lighting, scene);
 
 	/* Set default rendering mode. */
-	self->temporary.scene = scene;
-	self->temporary.modelview = modelview;
-	self->temporary.projection = projection;
-	self->temporary.frustum = frustum;
-	glMatrixMode (GL_PROJECTION);
-	glLoadMatrixf (projection->m);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadMatrixf (modelview->m);
 	glEnable (GL_LIGHTING);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_TEXTURE_2D);
@@ -442,8 +431,8 @@ lirnd_render_render (lirndRender*  self,
 
 	/* Render scene. */
 	glEnable (GL_COLOR_MATERIAL);
-	private_render (self, lirnd_draw_opaque, NULL);
-	private_render (self, lirnd_draw_transparent, NULL);
+	private_render (self, scene, &context, lirnd_draw_opaque, NULL);
+	private_render (self, scene, &context, lirnd_draw_transparent, NULL);
 	glDisable (GL_COLOR_MATERIAL);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_BLEND);
@@ -454,7 +443,7 @@ lirnd_render_render (lirndRender*  self,
 
 	/* Render debug. */
 #ifndef NDEBUG
-	private_render (self, lirnd_draw_debug, NULL);
+	private_render (self, scene, &context, lirnd_draw_debug, NULL);
 #endif
 
 	/* Restore state. */
@@ -468,51 +457,6 @@ lirnd_render_render (lirndRender*  self,
 		glDisable (GL_TEXTURE_2D);
 	}
 	glMatrixMode (GL_MODELVIEW);
-	self->temporary.scene = NULL;
-	self->temporary.modelview = NULL;
-	self->temporary.projection = NULL;
-	self->temporary.frustum = NULL;
-}
-
-/**
- * \brief Renders the scene.
- *
- * \param self Renderer.
- * \param scene Rendered scene.
- * \param modelview Modelview matrix.
- * \param projection Projection matrix.
- * \param frustum Frustum used for culling.
- * \param call Rendering call.
- * \param data Data passed to rendering call.
- */
-void
-lirnd_render_render_custom (lirndRender*  self,
-                            lirndScene*   scene,
-                            limatMatrix*  modelview,
-                            limatMatrix*  projection,
-                            limatFrustum* frustum,
-                            lirndCallback call,
-                            void*         data)
-{
-	assert (scene != NULL);
-	assert (modelview != NULL);
-	assert (projection != NULL);
-	assert (frustum != NULL);
-	assert (call != NULL);
-
-	self->temporary.scene = scene;
-	self->temporary.modelview = modelview;
-	self->temporary.projection = projection;
-	self->temporary.frustum = frustum;
-	glMatrixMode (GL_PROJECTION);
-	glLoadMatrixf (projection->m);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadMatrixf (modelview->m);
-	private_render (self, call, data);
-	self->temporary.scene = NULL;
-	self->temporary.modelview = NULL;
-	self->temporary.projection = NULL;
-	self->temporary.frustum = NULL;
 }
 
 /**
@@ -885,19 +829,15 @@ private_particle_update (lirndRender* self,
 
 static void
 private_render (lirndRender*  self,
+                lirndScene*   scene,
+                lirndContext* context,
                 lirndCallback call,
                 void*         data)
 {
-	lirndObject* object;
 	lirndSceneIter iter;
 
-	LIRND_FOREACH_SCENE (iter, self->temporary.scene)
-	{
-		object = iter.value;
-		if (object->model == NULL)
-			continue;
-		call (data, self, object);
-	}
+	LIRND_FOREACH_SCENE (iter, scene)
+		call (context, iter.value, data);
 }
 
 /** @} */

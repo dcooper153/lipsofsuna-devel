@@ -541,6 +541,14 @@ lirnd_object_set_userdata (lirndObject* self,
 	self->userdata = value;
 }
 
+int
+lirnd_object_get_visible (lirndObject* self)
+{
+	if (self->model == NULL)
+		return 0;
+	return 1;
+}
+
 /*****************************************************************************/
 
 static void
@@ -961,6 +969,8 @@ private_update_envmap (lirndObject* self,
 	limatVector ctr;
 	limatMatrix modelview;
 	limatMatrix projection;
+	lirndContext context;
+	lirndSceneIter iter;
 	const limatVector dir[6] =
 	{
 		{ 1.0f, 0.0f, 0.0f }, /* Back. */
@@ -1005,8 +1015,12 @@ private_update_envmap (lirndObject* self,
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		limat_frustum_init (&frustum, &modelview, &projection);
-		lirnd_render_render_custom (self->render,
-			scene, &modelview, &projection, &frustum, lirnd_draw_exclude, self);
+		lirnd_context_init (&context, self->render);
+		lirnd_context_set_modelview (&context, &modelview);
+		lirnd_context_set_projection (&context, &projection);
+		lirnd_context_set_frustum (&context, &frustum);
+		LIRND_FOREACH_SCENE (iter, scene)
+			lirnd_draw_exclude (&context, iter.value, self);
 	}
 
 	/* Disable cube map rendering mode. */

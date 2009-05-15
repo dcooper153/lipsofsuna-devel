@@ -62,11 +62,11 @@ limat_matrix_identity ()
 
 static inline limatMatrix
 limat_matrix_frustum (float left,
-                   float right,
-                   float bottom,
-                   float top,
-                   float near,
-                   float far)
+                      float right,
+                      float bottom,
+                      float top,
+                      float near,
+                      float far)
 {
 	limatMatrix self;
 
@@ -92,14 +92,14 @@ limat_matrix_frustum (float left,
 
 static inline limatMatrix
 limat_matrix_look (float eyex,
-                float eyey,
-                float eyez,
-                float dirx,
-                float diry,
-                float dirz,
-                float upx,
-                float upy,
-                float upz)
+                   float eyey,
+                   float eyez,
+                   float dirx,
+                   float diry,
+                   float dirz,
+                   float upx,
+                   float upy,
+                   float upz)
 {
 	float len;
 	float sidex;
@@ -154,14 +154,14 @@ limat_matrix_look (float eyex,
 
 static inline limatMatrix
 limat_matrix_lookat (float eyex,
-                  float eyey,
-                  float eyez,
-                  float centerx,
-                  float centery,
-                  float centerz,
-                  float upx,
-                  float upy,
-                  float upz)
+                     float eyey,
+                     float eyez,
+                     float centerx,
+                     float centery,
+                     float centerz,
+                     float upx,
+                     float upy,
+                     float upz)
 {
 	float dirx = centerx - eyex;
 	float diry = centery - eyey;
@@ -175,11 +175,11 @@ limat_matrix_lookat (float eyex,
 
 static inline limatMatrix
 limat_matrix_ortho (float left,
-                 float right,
-                 float top,
-                 float bottom,
-                 float near,
-                 float far)
+                    float right,
+                    float top,
+                    float bottom,
+                    float near,
+                    float far)
 {
 	limatMatrix self;
 
@@ -218,7 +218,6 @@ limat_matrix_perspective (float fov,
                           float near,
                           float far)
 {
-#if 1
 	float d;
 	float f;
 	limatMatrix self;
@@ -243,21 +242,13 @@ limat_matrix_perspective (float fov,
 	self.m[15] = 0.0f;
 
 	return self;
-#else
-	float top = tan (0.5f * fov) * near;
-	float bottom = -top;
-	float left = top * aspect;
-	float right = bottom * aspect;
-
-	return limat_matrix_frustum (left, right, bottom, top, near, far);
-#endif
 }
 
 static inline limatMatrix
 limat_matrix_rotation (float radians,
-                    float x,
-                    float y,
-                    float z)
+                       float x,
+                       float y,
+                       float z)
 {
 	limatMatrix self;
 	float s0 = sin (-radians);
@@ -286,8 +277,8 @@ limat_matrix_rotation (float radians,
 
 static inline limatMatrix
 limat_matrix_scale (float x,
-                 float y,
-                 float z)
+                    float y,
+                    float z)
 {
 	limatMatrix self;
 
@@ -320,7 +311,7 @@ limat_matrix_scale (float x,
  */
 static inline limatVector
 limat_matrix_transform (limatMatrix self,
-                     limatVector vector)
+                        limatVector vector)
 {
 	limatVector result;
 
@@ -332,8 +323,8 @@ limat_matrix_transform (limatMatrix self,
 
 static inline limatMatrix
 limat_matrix_translation (float x,
-                       float y,
-                       float z)
+                          float y,
+                          float z)
 {
 	limatMatrix self;
 
@@ -441,7 +432,7 @@ limat_matrix_invert (const limatMatrix self)
 
 static inline limatMatrix
 limat_matrix_multiply (const limatMatrix self,
-                    const limatMatrix matrix)
+                       const limatMatrix matrix)
 {
 	limatMatrix result;
 	const float* A = self.m;
@@ -470,10 +461,10 @@ limat_matrix_multiply (const limatMatrix self,
 /* Stolen from Mesa. */
 static inline limatMatrix
 limat_matrix_pick (float      x,
-                float      y,
-                float      w,
-                float      h,
-                const int* viewport)
+                   float      y,
+                   float      w,
+                   float      h,
+                   const int* viewport)
 {
 	limatMatrix m0;
 	limatMatrix m1;

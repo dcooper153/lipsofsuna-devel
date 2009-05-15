@@ -39,6 +39,7 @@ struct _lirndContext
 	int shadows;
 	lirndRender* render;
 	lirndShader* shader;
+	limatFrustum frustum;
 	limatMatrix matrix;
 	limatMatrix modelview;
 	limatMatrix modelviewinverse;
@@ -83,8 +84,15 @@ lirnd_context_render_indexed (lirndContext*      self,
                               const limdlVertex* vertices);
 
 void
+lirnd_context_unbind (lirndContext* self);
+
+void
 lirnd_context_set_flags (lirndContext* self,
                          int           value);
+
+void
+lirnd_context_set_frustum (lirndContext*       self,
+                           const limatFrustum* frustum);
 
 void
 lirnd_context_set_lights (lirndContext* self,
