@@ -35,7 +35,7 @@ class liphyCharacterController;
 
 struct _liphyPhysics
 {
-	btAxisSweep3* broadphase;
+	bt32BitAxisSweep3* broadphase;
 	btDefaultCollisionConfiguration* configuration;
 	btCollisionDispatcher* dispatcher;
 	btConstraintSolver* solver;

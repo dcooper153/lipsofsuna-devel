@@ -26,6 +26,7 @@
 #include <string.h>
 #include "engine.h"
 #include "engine-block.h"
+#include "engine-voxel.h"
 
 static void
 private_optimize_tiles (liengBlock* self);
@@ -95,7 +96,72 @@ lieng_block_fill (liengBlock* self,
 	lieng_block_free (self);
 	memset (self, 0, sizeof (liengBlock));
 	self->type = LIENG_BLOCK_TYPE_FULL;
-	self->full.terrain = terrain;
+	if (terrain & 0xFF)
+		self->full.terrain = terrain | 0xFF00;
+	else
+		self->full.terrain = 0;
+}
+
+/**
+ * \brief Fills a box with the given terrain type.
+ *
+ * \param self Block.
+ * \param aabb Bounding box relative to the origin of the block.
+ * \param terrain Terrain type.
+ * \return Nonzero if at least one voxel was modified.
+ */
+int
+lieng_block_fill_aabb (liengBlock*      self,
+                       const limatAabb* box,
+                       liengTile        terrain)
+{
+	int x;
+	int y;
+	int z;
+	int ret = 0;
+	limatAabb child;
+
+	terrain &= 0xFF;
+	if (!terrain)
+	{
+		/* Erase terrain. */
+		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		{
+			child.min = limat_vector_init (
+				x * LIENG_TILE_WIDTH,
+				y * LIENG_TILE_WIDTH,
+				z * LIENG_TILE_WIDTH);
+			child.max = limat_vector_init (
+				(x + 1) * LIENG_TILE_WIDTH,
+				(y + 1) * LIENG_TILE_WIDTH,
+				(z + 1) * LIENG_TILE_WIDTH);
+			if (limat_aabb_intersects_aabb (box, &child))
+				ret |= lieng_block_set_voxel (self, x, y, z, 0);
+		}
+	}
+	else
+	{
+		/* Paint terrain. */
+		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		{
+			child.min = limat_vector_init (
+				x * LIENG_TILE_WIDTH,
+				y * LIENG_TILE_WIDTH,
+				z * LIENG_TILE_WIDTH);
+			child.max = limat_vector_init (
+				(x + 1) * LIENG_TILE_WIDTH,
+				(y + 1) * LIENG_TILE_WIDTH,
+				(z + 1) * LIENG_TILE_WIDTH);
+			if (limat_aabb_intersects_aabb (box, &child))
+				ret |= lieng_block_set_voxel (self, x, y, z, 0xFF00 | terrain);
+		}
+	}
+
+	return ret;
 }
 
 /**
@@ -113,27 +179,70 @@ lieng_block_fill_sphere (liengBlock*        self,
                          float              radius,
                          liengTile          terrain)
 {
+	int i;
 	int x;
 	int y;
 	int z;
 	int ret = 0;
+	liengTile tile;
 	limatVector dist;
-
-	for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
+	static const limatVector corner_offsets[8] =
 	{
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 0.0f, 1.0f },
+		{ 0.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f }
+	};
+
+	terrain &= 0xFF;
+	if (!terrain)
+	{
+		/* Erase terrain. */
+		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
 		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
 		{
-			for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+			tile = lieng_block_get_voxel (self, x, y, z);
+			for (i = 0 ; i < 8 ; i++)
 			{
 				dist = limat_vector_subtract (*center, limat_vector_init (
-					(x + 0.5f) * LIENG_TILE_WIDTH,
-					(y + 0.5f) * LIENG_TILE_WIDTH,
-					(z + 0.5f) * LIENG_TILE_WIDTH));
+					(x + corner_offsets[i].x) * LIENG_TILE_WIDTH,
+					(y + corner_offsets[i].y) * LIENG_TILE_WIDTH,
+					(z + corner_offsets[i].z) * LIENG_TILE_WIDTH));
 				if (limat_vector_dot (dist, dist) <= radius * radius)
-					ret |= lieng_block_set_voxel (self, x, y, z, terrain);
+					tile &= ~(1 << (i + 8));
 			}
+			tile = lieng_voxel_validate (tile);
+			ret |= lieng_block_set_voxel (self, x, y, z, tile);
 		}
 	}
+	else
+	{
+		/* Paint terrain. */
+		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		{
+			tile = lieng_block_get_voxel (self, x, y, z) & 0xFF00;
+			tile |= terrain;
+			for (i = 0 ; i < 8 ; i++)
+			{
+				dist = limat_vector_subtract (*center, limat_vector_init (
+					(x + corner_offsets[i].x) * LIENG_TILE_WIDTH,
+					(y + corner_offsets[i].y) * LIENG_TILE_WIDTH,
+					(z + corner_offsets[i].z) * LIENG_TILE_WIDTH));
+				if (limat_vector_dot (dist, dist) <= radius * radius)
+					tile |= (1 << (i + 8));
+			}
+			tile = lieng_voxel_validate (tile);
+			ret |= lieng_block_set_voxel (self, x, y, z, tile);
+		}
+	}
+	self->rebuild |= ret;
 
 	return ret;
 }
@@ -156,6 +265,7 @@ lieng_block_get_voxel (liengBlock* self,
 	switch (self->type)
 	{
 		case LIENG_BLOCK_TYPE_FULL:
+			assert (self->full.terrain != 0xFF00);
 			return self->full.terrain;
 		case LIENG_BLOCK_TYPE_HEIGHT:
 			break;
@@ -163,6 +273,7 @@ lieng_block_get_voxel (liengBlock* self,
 			/* FIXME: Not implemented. */
 			break;
 		case LIENG_BLOCK_TYPE_TILES:
+			assert (self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)] != 0xFF00);
 			return self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)];
 	}
 
@@ -195,10 +306,11 @@ lieng_block_set_voxel (liengBlock* self,
 	liengTile tmp;
 	liengBlockTiles* tiles;
 
+	terrain = lieng_voxel_validate (terrain);
 	switch (self->type)
 	{
 		case LIENG_BLOCK_TYPE_FULL:
-			tmp = self->full.terrain;
+			tmp = lieng_voxel_init (0xFF, self->full.terrain);
 			if (tmp == terrain)
 				return 0;
 			tiles = calloc (1, sizeof (liengBlockTiles));
@@ -207,9 +319,10 @@ lieng_block_set_voxel (liengBlock* self,
 			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
 				tiles->tiles[i] = tmp;
 			i = LIENG_TILE_INDEX (x, y, z);
-			tiles->tiles[i] = terrain;
+			tiles->tiles[i] = lieng_voxel_validate (terrain);
 			self->tiles = tiles;
 			self->type = LIENG_BLOCK_TYPE_TILES;
+			self->rebuild = 1;
 			return 1;
 		case LIENG_BLOCK_TYPE_HEIGHT:
 			break;
@@ -217,7 +330,10 @@ lieng_block_set_voxel (liengBlock* self,
 			for (i = 0 ; i < self->multiple->count ; i++)
 			{
 				if (lieng_block_set_voxel (self->multiple->blocks + i, x, y, z, terrain))
+				{
+					self->rebuild = 1;
 					return 1;
+				}
 			}
 			break;
 		case LIENG_BLOCK_TYPE_TILES:
@@ -225,6 +341,7 @@ lieng_block_set_voxel (liengBlock* self,
 			if (self->tiles->tiles[i] == terrain)
 				return 0;
 			self->tiles->tiles[i] = terrain;
+			self->rebuild = 1;
 			private_optimize_tiles (self);
 			return 1;
 	}
@@ -248,6 +365,8 @@ private_optimize_tiles (liengBlock* self)
 	}
 
 	/* Reduce to full block. */
+	if (!(tile & 0xFF) || !(tile & 0xFF00))
+		tile = 0;
 	free (self->tiles);
 	self->full.terrain = tile;
 	self->type = LIENG_BLOCK_TYPE_FULL;

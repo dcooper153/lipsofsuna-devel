@@ -105,16 +105,48 @@ lieng_sector_new (liengEngine* engine,
 		}
 	}
 
+#warning DEBUG: Placeholder voxel terrain construction.
+#if 1
+	lieng_sector_fill (self, 1);
+	limatVector center = limat_vector_init (32.0f, 36.0f, 32.0f);
+	lieng_sector_fill_sphere (self, &center, 16.0f, 0);
+
+	/* Bugged. */
+	limatAabb aabb = { { 1.0, 30.0, 1.0 }, { 60.0, 40.0, 60.0 } };
+	lieng_sector_fill_aabb (self, &aabb, 0);
+
+	limatAabb aabb1 = { { 1.0, 0.0, 36.0 }, { 20.0, 60.0, 37.0 } };
+	lieng_sector_fill_aabb (self, &aabb1, 0);
+	limatAabb aabb2 = { { 44.0, 0.0, 35.0 }, { 64.0, 60.0, 36.0 } };
+	lieng_sector_fill_aabb (self, &aabb2, 1);
+
+	/* Bugged. */
+	limatAabb aabb3 = { { 1.0, 0.0, 33.0 }, { 20.0, 60.0, 34.0 } };
+	lieng_sector_fill_aabb (self, &aabb3, 0);
+#endif
+#if 0
 	/* FIXME */
-	srand (0);
-	limatVector center = limat_vector_init (32.0f, 0.0f, 32.0f);
-	lieng_sector_fill_sphere (self, &center, 18.0f, 1);
+	srand (94639576);
+	lieng_sector_fill (self, 1);
+	limatVector center = limat_vector_init (32.0f, 36.0f, 32.0f);
+	lieng_sector_fill_sphere (self, &center, 8.0f, 0);
 	int z;
-	for (z = 0 ; z < 10 ; z++)
+	for (z = 0 ; z < 20 ; z++)
 	{
 		center = limat_vector_init (rand() % 64, rand() % 32, rand() % 64);
-		lieng_sector_fill_sphere (self, &center, rand() % 5 + 5, 1);
+		lieng_sector_fill_sphere (self, &center, rand() % 5 + 5, 0);
 	}
+	for (z = 0 ; z < 10 ; z++)
+	{
+		limatAabb aabb;
+		limatVector size;
+		limatVector center;
+		center = limat_vector_init (rand() % 64, rand() % 32, rand() % 64);
+		size = limat_vector_init (rand() % 8 + 6, rand() % 8 + 6, rand() % 8 + 6);
+		limat_aabb_init_from_center (&aabb, &center, &size);
+		lieng_sector_fill_aabb (self, &aabb, 0);
+	}
+#endif
 
 	return self;
 }
@@ -173,6 +205,47 @@ lieng_sector_fill (liengSector* self,
  * \brief Fills a sphere with the given terrain type.
  *
  * \param self Sector.
+ * \param box Bounding box relative to the origin of the sector.
+ * \param terrain Terrain type.
+ */
+void
+lieng_sector_fill_aabb (liengSector*     self,
+                        const limatAabb* box,
+                        liengTile        terrain)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	limatAabb block;
+	limatAabb child;
+
+	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+	for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+	{
+		block.min = limat_vector_init (
+			x * LIENG_BLOCK_WIDTH,
+			y * LIENG_BLOCK_WIDTH,
+			z * LIENG_BLOCK_WIDTH);
+		block.max = limat_vector_init (
+			(x + 1) * LIENG_BLOCK_WIDTH,
+			(y + 1) * LIENG_BLOCK_WIDTH,
+			(z + 1) * LIENG_BLOCK_WIDTH);
+		if (limat_aabb_intersects_aabb (box, &block))
+		{
+			child.min = limat_vector_subtract (box->min, block.min);
+			child.max = limat_vector_subtract (box->max, block.min);
+			if (lieng_block_fill_aabb (self->blocks + i, &child, terrain))
+				self->rebuild = 1;
+		}
+	}
+}
+
+/**
+ * \brief Fills a sphere with the given terrain type.
+ *
+ * \param self Sector.
  * \param center Center of the sphere relative to the origin of the sector.
  * \param radius Radius of the sphere.
  * \param terrain Terrain type.
@@ -183,37 +256,33 @@ lieng_sector_fill_sphere (liengSector*       self,
                           float              radius,
                           liengTile          terrain)
 {
+	int i;
 	int x;
 	int y;
 	int z;
-	int i;
 	float r;
 	limatVector block;
 	limatVector dist;
 
 	r = radius + LIENG_BLOCK_WIDTH;
 	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+	for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
 	{
-		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+		block = limat_vector_init (
+			(x + 0.5f) * LIENG_BLOCK_WIDTH,
+			(y + 0.5f) * LIENG_BLOCK_WIDTH,
+			(z + 0.5f) * LIENG_BLOCK_WIDTH);
+		dist = limat_vector_subtract (*center, block);
+		if (limat_vector_dot (dist, dist) < r * r)
 		{
-			for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
-			{
-				block = limat_vector_init (
-					(x + 0.5f) * LIENG_BLOCK_WIDTH,
-					(y + 0.5f) * LIENG_BLOCK_WIDTH,
-					(z + 0.5f) * LIENG_BLOCK_WIDTH);
-				dist = limat_vector_subtract (*center, block);
-				if (limat_vector_dot (dist, dist) < r * r)
-				{
-					block = limat_vector_init (
-						x * LIENG_BLOCK_WIDTH,
-						y * LIENG_BLOCK_WIDTH,
-						z * LIENG_BLOCK_WIDTH);
-					block = limat_vector_subtract (*center, block);
-					if (lieng_block_fill_sphere (self->blocks + i, &block, radius, terrain))
-						private_build_block (self, x, y, z);
-				}
-			}
+			block = limat_vector_init (
+				x * LIENG_BLOCK_WIDTH,
+				y * LIENG_BLOCK_WIDTH,
+				z * LIENG_BLOCK_WIDTH);
+			block = limat_vector_subtract (*center, block);
+			if (lieng_block_fill_sphere (self->blocks + i, &block, radius, terrain))
+				self->rebuild = 1;
 		}
 	}
 }
@@ -319,6 +388,37 @@ lieng_sector_save (liengSector* self)
 }
 
 /**
+ * \brief Called once per tick to update the status of the sector.
+ *
+ * \param self Sector.
+ * \param secs Number of seconds since the last update.
+ */
+void
+lieng_sector_update (liengSector* self,
+                     float        secs)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+
+	if (!self->rebuild)
+		return;
+	self->rebuild = 0;
+
+	/* Rebuild changed blocks. */
+	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+	for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+	{
+		if (!self->blocks[i].rebuild)
+			continue;
+		self->blocks[i].rebuild = 0;
+		private_build_block (self, x, y, z);
+	}
+}
+
+/**
  * \brief Gets the bounding box of the sector.
  *
  * \param self Sector.
@@ -366,15 +466,8 @@ lieng_sector_get_voxel (liengSector* sector,
 	    bz < 0 || bz >= LIENG_BLOCKS_PER_LINE)
 		return 0;
 	block = sector->blocks + LIENG_BLOCK_INDEX (bx, by, bz);
-	switch (block->type)
-	{
-		case LIENG_BLOCK_TYPE_FULL:
-			return block->full.terrain;
-		case LIENG_BLOCK_TYPE_TILES:
-			return block->tiles->tiles[LIENG_TILE_INDEX (tx, ty, tz)];
-		default:
-			return 0;
-	}
+
+	return lieng_block_get_voxel (block, tx, ty, tz);
 }
 
 /**

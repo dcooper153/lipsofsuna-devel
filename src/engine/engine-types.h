@@ -53,7 +53,7 @@ enum
 	LIENG_OBJECT_FLAG_SAVE = 0x08
 };
 
-typedef uint8_t liengTile;
+typedef uint16_t liengTile;
 typedef struct _liengAnimation liengAnimation;
 typedef struct _liengCamera liengCamera;
 typedef struct _liengEngine liengEngine;

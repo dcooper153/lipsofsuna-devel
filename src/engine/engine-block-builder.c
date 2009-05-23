@@ -23,18 +23,61 @@
  */
 
 #include "engine-block-builder.h"
+#include "engine-voxel.h"
 
-static const int
-neighbor_offsets[24] =
+static const int voxel_face_normals[6][3] =
 {
-	-1, -1, -1,
-	 0, -1, -1,
-	-1,  0, -1,
-	 0,  0, -1,
-	-1, -1,  0,
-	 0, -1,  0,
-	-1,  0,  0,
-	 0,  0,  0
+	{ -1,  0,  0 },
+	{  1,  0,  0 },
+	{  0, -1,  0 },
+	{  0,  1,  0 },
+	{  0,  0, -1 },
+	{  0,  0,  1 }
+};
+
+static const int voxel_triangle_masks[6][2][4] =
+{
+	  /* Processed. */                    /* Neighbor. */
+	{ { 0x1500, 0x5400, 0x5100, 0x4500 }, { 0x2A00, 0xA800, 0xA200, 0x8A00 } },
+	{ { 0x2A00, 0xA800, 0xA200, 0x8A00 }, { 0x1500, 0x5400, 0x5100, 0x4500 } },
+	{ { 0x1300, 0x3200, 0x2300, 0x3100 }, { 0x4C00, 0xC800, 0x8C00, 0xC400 } },
+	{ { 0x4C00, 0xC800, 0x8C00, 0xC400 }, { 0x1300, 0x3200, 0x2300, 0x3100 } },
+	{ { 0x0700, 0x0E00, 0x0B00, 0x0D00 }, { 0x7000, 0xE000, 0xB000, 0xD000 } },
+	{ { 0x7000, 0xE000, 0xB000, 0xD000 }, { 0x0700, 0x0E00, 0x0B00, 0x0D00 } }
+};
+
+static const limatVector voxel_triangle_vertices[24][3] =
+{
+	/* Negative X */
+	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
+	/* Positive X */
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },
+	/* Negative Y */
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f } },
+	/* Positive Y */
+	{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 0.0f } },
+	{ { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
+	{ { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
+	/* Negative Z */
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	/* Positive Z */
+	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } }
 };
 
 static int
@@ -184,7 +227,7 @@ private_build_full (liengBlockBuilder* self,
 	aabb.min = limat_vector_init (0.0f, 0.0f, 0.0f);
 	aabb.max = limat_vector_init (LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH);
 	aabb.min = limat_vector_add (aabb.min, blockoff);
-	aabb.max = limat_vector_add (aabb.min, blockoff);
+	aabb.max = limat_vector_add (aabb.max, blockoff);
 	self->helpers.shape = liphy_shape_new_aabb (self->sector->engine->physics, &aabb);
 	if (self->helpers.shape == NULL)
 		return 0;
@@ -202,17 +245,20 @@ private_build_tiles (liengBlockBuilder* self,
 	int c;
 	int i;
 	int j;
+	int n;
 	int tx;
 	int ty;
 	int tz;
-	int neighbors[8];
+	int mask0;
+	int mask1;
 	liengBlockBuilderNormal* lookup;
+	liengTile tile;
 	limatVector* tmp;
 	limatVector coord;
 	limatVector normal;
 	limatVector blockoff;
 	limatVector tileoff;
-	limatVector vertices[15];
+	limatVector vertices[64];
 	limdlVertex mdlverts[3];
 
 	if (!private_insert_materials (self))
@@ -228,26 +274,40 @@ private_build_tiles (liengBlockBuilder* self,
 	for (ty = 0 ; ty < LIENG_TILES_PER_LINE ; ty++)
 	for (tx = 0 ; tx < LIENG_TILES_PER_LINE ; tx++)
 	{
-		/* Find neighbor tiles. */
-		for (i = 0 ; i < 8 ; i++)
+		tile = block->tiles->tiles[LIENG_TILE_INDEX (tx, ty, tz)];
+		if (!tile)
+			continue;
+
+		/* Triangulate smooth surface. */
+		c = lieng_voxel_triangulate (tile, vertices);
+
+		/* Triangulate visible sharp faces. */
+		mask0 = tile;
+		for (i = 0 ; i < 6 ; i++)
 		{
-			neighbors[i] = lieng_sector_get_voxel (self->sector,
-				LIENG_TILES_PER_LINE * bx + tx + neighbor_offsets[3 * i + 0],
-				LIENG_TILES_PER_LINE * by + ty + neighbor_offsets[3 * i + 1],
-				LIENG_TILES_PER_LINE * bz + tz + neighbor_offsets[3 * i + 2]);
+			mask1 = lieng_sector_get_voxel (self->sector,
+				LIENG_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
+				LIENG_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
+				LIENG_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
+			for (j = n = 0 ; j < 4 && n < 2 ; j++)
+			{
+				if ((mask0 & voxel_triangle_masks[i][0][j]) == voxel_triangle_masks[i][0][j] &&
+				    (mask1 & voxel_triangle_masks[i][1][j]) != voxel_triangle_masks[i][1][j])
+				{
+					vertices[c++] = voxel_triangle_vertices[4 * i + j][0];
+					vertices[c++] = voxel_triangle_vertices[4 * i + j][1];
+					vertices[c++] = voxel_triangle_vertices[4 * i + j][2];
+					n++;
+				}
+			}
 		}
 
-		/* Triangulate voxels. */
-		c = limat_marching_cube (
-			((neighbors[0] != 0) << 0) | ((neighbors[1] != 0) << 1) |
-			((neighbors[2] != 0) << 2) | ((neighbors[3] != 0) << 3) |
-			((neighbors[4] != 0) << 4) | ((neighbors[5] != 0) << 5) |
-			((neighbors[6] != 0) << 6) | ((neighbors[7] != 0) << 7), vertices);
+		/* Check for empty. */
 		if (!c)
 			continue;
 
-		/* Scale and translate. */
-		tileoff = limat_vector_init (tx - 0.5f, ty - 0.5f, tz - 0.5f);
+		/* Scale and translate vertices. */
+		tileoff = limat_vector_init (tx, ty, tz);
 		tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
 		for (i = 0 ; i < c ; i++)
 		{
@@ -311,6 +371,8 @@ private_build_tiles (liengBlockBuilder* self,
 		}
 #endif
 	}
+	if (!self->vertices.count)
+		return 1;
 
 	/* Create collision shape. */
 	self->helpers.shape = liphy_shape_new_concave (self->sector->engine->physics,

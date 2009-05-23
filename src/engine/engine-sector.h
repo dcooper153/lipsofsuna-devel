@@ -40,6 +40,7 @@
 struct _liengSector
 {
 	uint32_t id;
+	int rebuild;
 	lialgU32dic* objects;
 	liengBlock blocks[LIENG_BLOCKS_PER_SECTOR];
 	liengEngine* engine;
@@ -59,6 +60,11 @@ lieng_sector_fill (liengSector* self,
                    liengTile    terrain);
 
 void
+lieng_sector_fill_aabb (liengSector*     self,
+                        const limatAabb* box,
+                        liengTile        terrain);
+
+void
 lieng_sector_fill_sphere (liengSector*       self,
                           const limatVector* center,
                           float              radius,
@@ -74,6 +80,10 @@ lieng_sector_remove_object (liengSector* self,
 
 int
 lieng_sector_save (liengSector* self);
+
+void
+lieng_sector_update (liengSector* self,
+                     float        secs);
 
 void
 lieng_sector_get_bounds (const liengSector* self,

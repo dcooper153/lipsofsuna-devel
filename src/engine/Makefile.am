@@ -26,4 +26,6 @@ liblipsengine_la_SOURCES = \
 	engine-sector.h \
 	engine-selection.c \
 	engine-selection.h \
-	engine-types.h
+	engine-types.h \
+	engine-voxel.c \
+	engine-voxel.h

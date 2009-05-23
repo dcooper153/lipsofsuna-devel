@@ -35,6 +35,13 @@ static void
 private_clear_sectors (liengEngine* self);
 
 static void
+private_mark_block (liengEngine* self,
+                    liengSector* sector,
+                    int          x,
+                    int          y,
+                    int          z);
+
+static void
 private_physics_transform (liphyObject* object);
 
 #ifndef LIENG_DISABLE_GRAPHICS
@@ -521,39 +528,6 @@ lieng_engine_read_object_data (liengEngine*    self,
 }
 
 /**
- * \brief Updates the scene.
- *
- * \param self Engine.
- * \param secs Number of seconds since the last update.
- */
-void
-lieng_engine_update (liengEngine* self,
-                     float        secs)
-{
-	lialgU32dicIter iter;
-	liengObject* object;
-
-	/* Update objects. */
-	LI_FOREACH_U32DIC (iter, self->objects)
-	{
-		object = iter.value;
-		lieng_object_update (object, secs);
-	}
-
-	/* Update physics. */
-	liphy_physics_update (self->physics, secs);
-
-	/* Update renderer state. */
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->renderapi != NULL)
-		self->renderapi->lirnd_render_update (self->render, secs);
-#endif
-
-	/* Maintain callbacks. */
-	lical_callbacks_update (self->callbacks);
-}
-
-/**
  * \brief Saves all the currently loaded sectors.
  *
  * \param self Engine.
@@ -575,6 +549,93 @@ lieng_engine_save (liengEngine* self)
 	}
 
 	return ret;
+}
+
+/**
+ * \brief Updates the scene.
+ *
+ * \param self Engine.
+ * \param secs Number of seconds since the last update.
+ */
+void
+lieng_engine_update (liengEngine* self,
+                     float        secs)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	lialgU32dicIter iter;
+	liengObject* object;
+	liengSector* sector;
+
+	/* Update block boundaries. */
+	LI_FOREACH_U32DIC (iter, self->sectors)
+	{
+		sector = iter.value;
+		if (sector->rebuild != 1)
+			continue;
+		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+		{
+			if (sector->blocks[i].rebuild != 1)
+				continue;
+			private_mark_block (self, sector, x - 1, y - 1, z - 1);
+			private_mark_block (self, sector, x    , y - 1, z - 1);
+			private_mark_block (self, sector, x + 1, y - 1, z - 1);
+			private_mark_block (self, sector, x - 1, y    , z - 1);
+			private_mark_block (self, sector, x    , y    , z - 1);
+			private_mark_block (self, sector, x + 1, y    , z - 1);
+			private_mark_block (self, sector, x - 1, y + 1, z - 1);
+			private_mark_block (self, sector, x    , y + 1, z - 1);
+			private_mark_block (self, sector, x + 1, y + 1, z - 1);
+			private_mark_block (self, sector, x - 1, y - 1, z    );
+			private_mark_block (self, sector, x    , y - 1, z    );
+			private_mark_block (self, sector, x + 1, y - 1, z    );
+			private_mark_block (self, sector, x - 1, y    , z    );
+			//private_mark_block (self, sector, x    , y    , z    );
+			private_mark_block (self, sector, x + 1, y    , z    );
+			private_mark_block (self, sector, x - 1, y + 1, z    );
+			private_mark_block (self, sector, x    , y + 1, z    );
+			private_mark_block (self, sector, x + 1, y + 1, z    );
+			private_mark_block (self, sector, x - 1, y - 1, z + 1);
+			private_mark_block (self, sector, x    , y - 1, z + 1);
+			private_mark_block (self, sector, x + 1, y - 1, z + 1);
+			private_mark_block (self, sector, x - 1, y    , z + 1);
+			private_mark_block (self, sector, x    , y    , z + 1);
+			private_mark_block (self, sector, x + 1, y    , z + 1);
+			private_mark_block (self, sector, x - 1, y + 1, z + 1);
+			private_mark_block (self, sector, x    , y + 1, z + 1);
+			private_mark_block (self, sector, x + 1, y + 1, z + 1);
+		}
+	}
+
+	/* Update sectors. */
+	LI_FOREACH_U32DIC (iter, self->sectors)
+	{
+		sector = iter.value;
+		lieng_sector_update (sector, secs);
+	}
+
+	/* Update objects. */
+	LI_FOREACH_U32DIC (iter, self->objects)
+	{
+		object = iter.value;
+		lieng_object_update (object, secs);
+	}
+
+	/* Update physics. */
+	liphy_physics_update (self->physics, secs);
+
+	/* Update renderer state. */
+#ifndef LIENG_DISABLE_GRAPHICS
+	if (self->renderapi != NULL)
+		self->renderapi->lirnd_render_update (self->render, secs);
+#endif
+
+	/* Maintain callbacks. */
+	lical_callbacks_update (self->callbacks);
 }
 
 /**
@@ -819,6 +880,62 @@ private_init (liengEngine* self,
 		return 0;
 
 	return 1;
+}
+
+static void
+private_mark_block (liengEngine* self,
+                    liengSector* sector,
+                    int          x,
+                    int          y,
+                    int          z)
+{
+	int sx;
+	int sy;
+	int sz;
+	uint32_t id;
+	liengSector* sector1;
+
+	/* Find affected sector. */
+	lisec_pointer_get_offset (sector->id, &sx, &sy, &sz);
+	if (x < 0)
+	{
+		x = LIENG_BLOCKS_PER_LINE - 1;
+		sx--;
+	}
+	else if (x >= LIENG_BLOCKS_PER_LINE)
+	{
+		x = 0;
+		sx++;
+	}
+	if (y < 0)
+	{
+		y = LIENG_BLOCKS_PER_LINE - 1;
+		sy--;
+	}
+	else if (y >= LIENG_BLOCKS_PER_LINE)
+	{
+		y = 0;
+		sy++;
+	}
+	if (z < 0)
+	{
+		z = LIENG_BLOCKS_PER_LINE - 1;
+		sz--;
+	}
+	else if (z >= LIENG_BLOCKS_PER_LINE)
+	{
+		z = 0;
+		sz++;
+	}
+	id = lisec_pointer_new_from_offset (sx, sy, sz);
+	if (id == sector->id)
+		return;
+
+	/* Mark block as dirty. */
+	sector1 = lieng_engine_find_sector (self, id);
+	if (sector1 == NULL)
+		return;
+	sector1->blocks[LIENG_BLOCK_INDEX (x, y, z)].rebuild = 2;
 }
 
 static void

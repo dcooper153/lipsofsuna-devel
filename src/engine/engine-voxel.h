@@ -15,18 +15,37 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_ENGINE_H__
-#define __LIPS_ENGINE_H__
+/**
+ * \addtogroup lieng Engine
+ * @{
+ * \addtogroup liengVoxel Voxel
+ * @{
+ */
 
-#include "engine.h"
-#include "engine-block.h"
-#include "engine-camera.h"
-#include "engine-model.h"
-#include "engine-object.h"
-#include "engine-resources.h"
-#include "engine-sector.h"
-#include "engine-selection.h"
+#ifndef __ENGINE_VOXEL_H__
+#define __ENGINE_VOXEL_H__
+
+#include <math/lips-math.h>
 #include "engine-types.h"
-#include "engine-voxel.h"
+
+liengTile
+lieng_voxel_init (int shape,
+                  int type);
+
+int
+lieng_voxel_triangulate (liengTile    self,
+                         limatVector* result);
+
+liengTile
+lieng_voxel_validate (liengTile self);
+
+int
+lieng_voxel_get_shape (liengTile self);
+
+int
+lieng_voxel_get_type (liengTile self);
 
 #endif
+
+/** @} */
+/** @} */

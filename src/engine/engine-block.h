@@ -25,6 +25,7 @@
 #ifndef __ENGINE_BLOCK_H__
 #define __ENGINE_BLOCK_H__
 
+#include <math/lips-math.h>
 #include <physics/lips-physics.h>
 #include <system/lips-system.h>
 #ifndef LIENG_DISABLE_GRAPHICS
@@ -83,6 +84,7 @@ struct _liengBlockTiles
 struct _liengBlock
 {
 	uint8_t type;
+	uint8_t rebuild;
 	liphyShape* shape;
 	liphyObject* physics;
 #ifndef LIENG_DISABLE_GRAPHICS
@@ -103,6 +105,11 @@ lieng_block_free (liengBlock* self);
 void
 lieng_block_fill (liengBlock* self,
                   liengTile   terrain);
+
+int
+lieng_block_fill_aabb (liengBlock*      self,
+                       const limatAabb* box,
+                       liengTile        terrain);
 
 int
 lieng_block_fill_sphere (liengBlock*        self,

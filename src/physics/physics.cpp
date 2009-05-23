@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <sector/lips-sector.h>
 #include "physics.h"
 #include "physics-private.h"
 
@@ -43,14 +44,14 @@ liphy_physics_new ()
 {
 	liphyPhysics* self;
 	btVector3 min (0, 0, 0);
-	btVector3 max (25400, 25400, 25400);
+	btVector3 max (256 * LISEC_SECTOR_SIZE, 256 * LISEC_SECTOR_SIZE, 256 * LISEC_SECTOR_SIZE);
 
 	self = (liphyPhysics*) calloc (1, sizeof (liphyPhysics));
 	if (self == NULL)
 		return NULL;
 	try
 	{
-		self->broadphase = new btAxisSweep3 (min, max, MAXPROXIES);
+		self->broadphase = new bt32BitAxisSweep3 (min, max, MAXPROXIES);
 		self->broadphase->getOverlappingPairCache ()->setInternalGhostPairCallback (new btGhostPairCallback ());
 		self->configuration = new btDefaultCollisionConfiguration ();
 		self->dispatcher = new btCollisionDispatcher (self->configuration);

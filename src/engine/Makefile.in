@@ -54,7 +54,7 @@ liblipsengine_la_LIBADD =
 am_liblipsengine_la_OBJECTS = engine.lo engine-block.lo \
 	engine-block-builder.lo engine-camera.lo engine-model.lo \
 	engine-object.lo engine-render.lo engine-resources.lo \
-	engine-sector.lo engine-selection.lo
+	engine-sector.lo engine-selection.lo engine-voxel.lo
 liblipsengine_la_OBJECTS = $(am_liblipsengine_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -242,7 +242,9 @@ liblipsengine_la_SOURCES = \
 	engine-sector.h \
 	engine-selection.c \
 	engine-selection.h \
-	engine-types.h
+	engine-types.h \
+	engine-voxel.c \
+	engine-voxel.h
 
 all: all-am
 
@@ -322,6 +324,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-resources.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-sector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-selection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-voxel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine.Plo@am__quote@
 
 .c.o:
