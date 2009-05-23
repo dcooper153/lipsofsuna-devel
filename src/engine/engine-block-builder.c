@@ -35,51 +35,6 @@ static const int voxel_face_normals[6][3] =
 	{  0,  0,  1 }
 };
 
-static const int voxel_triangle_masks[6][2][4] =
-{
-	  /* Processed. */                    /* Neighbor. */
-	{ { 0x1500, 0x5400, 0x5100, 0x4500 }, { 0x2A00, 0xA800, 0xA200, 0x8A00 } },
-	{ { 0x2A00, 0xA800, 0xA200, 0x8A00 }, { 0x1500, 0x5400, 0x5100, 0x4500 } },
-	{ { 0x1300, 0x3200, 0x2300, 0x3100 }, { 0x4C00, 0xC800, 0x8C00, 0xC400 } },
-	{ { 0x4C00, 0xC800, 0x8C00, 0xC400 }, { 0x1300, 0x3200, 0x2300, 0x3100 } },
-	{ { 0x0700, 0x0E00, 0x0B00, 0x0D00 }, { 0x7000, 0xE000, 0xB000, 0xD000 } },
-	{ { 0x7000, 0xE000, 0xB000, 0xD000 }, { 0x0700, 0x0E00, 0x0B00, 0x0D00 } }
-};
-
-static const limatVector voxel_triangle_vertices[24][3] =
-{
-	/* Negative X */
-	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
-	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
-	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f } },
-	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
-	/* Positive X */
-	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } },
-	{ { 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },
-	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
-	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },
-	/* Negative Y */
-	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
-	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f } },
-	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } },
-	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f } },
-	/* Positive Y */
-	{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 0.0f } },
-	{ { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
-	{ { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 0.0f } },
-	{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
-	/* Negative Z */
-	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f } },
-	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-	/* Positive Z */
-	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
-	{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
-	{ { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
-	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } }
-};
-
 static int
 private_build_full (liengBlockBuilder* self,
                     liengBlock*        block,
@@ -245,14 +200,12 @@ private_build_tiles (liengBlockBuilder* self,
 	int c;
 	int i;
 	int j;
-	int n;
 	int tx;
 	int ty;
 	int tz;
-	int mask0;
-	int mask1;
 	liengBlockBuilderNormal* lookup;
 	liengTile tile;
+	liengTile mask[6];
 	limatVector* tmp;
 	limatVector coord;
 	limatVector normal;
@@ -278,31 +231,15 @@ private_build_tiles (liengBlockBuilder* self,
 		if (!tile)
 			continue;
 
-		/* Triangulate smooth surface. */
-		c = lieng_voxel_triangulate (tile, vertices);
-
-		/* Triangulate visible sharp faces. */
-		mask0 = tile;
+		/* Triangulate the voxel. */
 		for (i = 0 ; i < 6 ; i++)
 		{
-			mask1 = lieng_sector_get_voxel (self->sector,
+			mask[i] = lieng_sector_get_voxel (self->sector,
 				LIENG_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
 				LIENG_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
 				LIENG_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
-			for (j = n = 0 ; j < 4 && n < 2 ; j++)
-			{
-				if ((mask0 & voxel_triangle_masks[i][0][j]) == voxel_triangle_masks[i][0][j] &&
-				    (mask1 & voxel_triangle_masks[i][1][j]) != voxel_triangle_masks[i][1][j])
-				{
-					vertices[c++] = voxel_triangle_vertices[4 * i + j][0];
-					vertices[c++] = voxel_triangle_vertices[4 * i + j][1];
-					vertices[c++] = voxel_triangle_vertices[4 * i + j][2];
-					n++;
-				}
-			}
 		}
-
-		/* Check for empty. */
+		c = lieng_voxel_triangulate (tile, mask, vertices);
 		if (!c)
 			continue;
 

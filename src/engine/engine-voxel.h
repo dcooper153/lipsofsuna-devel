@@ -34,6 +34,7 @@ lieng_voxel_init (int shape,
 
 int
 lieng_voxel_triangulate (liengTile    self,
+                         liengTile*   neighbors,
                          limatVector* result);
 
 liengTile

@@ -25,6 +25,74 @@
 #include "engine-voxel.h"
 
 /**
+ * \brief Holds corner masks used for determining if unit cube faces of voxels are visible.
+ *
+ * The table holds two columns of corner masks. The first column defines all
+ * the possible triangle configurations for each face of the unit cube of the
+ * triangulated voxel, and the second one holds the same information for the
+ * corresponding adjanced faces of a neighbor voxel.
+ *
+ * The table is used so that the triangulated voxel is checked for existence
+ * of each unit cube triangle. If a triangle is found, the corresponding
+ * neighbor voxel is checked for a corner configuration that would cause the
+ * triangle to be hidden. If no such configuration is found, the triangle is
+ * generated. Otherwise, it is skipped.
+ */
+static const int
+voxel_unitcube_triangle_masks[6][2][4] =
+{
+	  /* Triangulated. */                 /* Neighbor. */
+	{ { 0x1500, 0x5400, 0x5100, 0x4500 }, { 0x2A00, 0xA800, 0xA200, 0x8A00 } },
+	{ { 0x2A00, 0xA800, 0xA200, 0x8A00 }, { 0x1500, 0x5400, 0x5100, 0x4500 } },
+	{ { 0x1300, 0x3200, 0x2300, 0x3100 }, { 0x4C00, 0xC800, 0x8C00, 0xC400 } },
+	{ { 0x4C00, 0xC800, 0x8C00, 0xC400 }, { 0x1300, 0x3200, 0x2300, 0x3100 } },
+	{ { 0x0700, 0x0E00, 0x0B00, 0x0D00 }, { 0x7000, 0xE000, 0xB000, 0xD000 } },
+	{ { 0x7000, 0xE000, 0xB000, 0xD000 }, { 0x0700, 0x0E00, 0x0B00, 0x0D00 } }
+};
+
+/**
+ * \brief Holds a list of triangles and vertices for the voxel unit cube.
+ *
+ * If a unit cube triangle of voxel was determined to be visible using the
+ * above table, the vertices of the triangle are copied from this table to
+ * the list of triangulared vertices.
+ */
+static const limatVector
+voxel_unitcube_triangle_vertices[24][3] =
+{
+	/* Negative X */
+	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 0.0f, 1.0f, 0.0f } },
+	/* Positive X */
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } },
+	/* Negative Y */
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f } },
+	/* Positive Y */
+	{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 0.0f } },
+	{ { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
+	{ { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
+	/* Negative Z */
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f } },
+	{ { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	/* Positive Z */
+	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { 1.0f, 0.0f, 1.0f } },
+	{ { 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f } }
+};
+
+/**
  * \brief Holds the triangle configuration for different corner configurations.
  *
  * An array holding pre-calculated triangulation information for all 256
@@ -836,22 +904,54 @@ lieng_voxel_init (int shape,
 /**
  * \brief Triangulates a voxel.
  *
+ * The neighbor tiles must be provided in the following format:
+ *
+ * \li Voxel adjancent to the negative X face.
+ * \li Voxel adjancent to the positive X face.
+ * \li Voxel adjancent to the negative Y face.
+ * \li Voxel adjancent to the positive Y face.
+ * \li Voxel adjancent to the negative Z face.
+ * \li Voxel adjancent to the positive Z face.
+ *
  * \param self Voxel.
- * \param result Return location with room for at least 9 vertices.
+ * \param neighbors Array of adjanced voxels.
+ * \param result Return location with room for at least 36(?) vertices.
  * \return Number of vertices written.
  */
 int
 lieng_voxel_triangulate (liengTile    self,
+                         liengTile*   neighbors,
                          limatVector* result)
 {
 	int c;
 	int i;
+	int j;
+	int n;
 
-	c = (self >> 8);
-	for (i = 0 ; i < 3 * voxel_triangle_lists[c].count ; i++)
-		result[i] = voxel_triangle_lists[c].array[i];
+	/* Triangulate cross section. */
+	i = (self >> 8);
+	for (c = 0 ; c < 3 * voxel_triangle_lists[i].count ; c++)
+		result[c] = voxel_triangle_lists[i].array[c];
 
-	return i;
+	/* Triangulate unit cube. */
+	for (i = 0 ; i < 6 ; i++)
+	{
+		for (j = n = 0 ; j < 4 && n < 2 ; j++)
+		{
+			if ((voxel_unitcube_triangle_masks[i][0][j] & self) ==
+			     voxel_unitcube_triangle_masks[i][0][j] &&
+			    (voxel_unitcube_triangle_masks[i][1][j] & neighbors[i]) !=
+			     voxel_unitcube_triangle_masks[i][1][j])
+			{
+				result[c++] = voxel_unitcube_triangle_vertices[4 * i + j][0];
+				result[c++] = voxel_unitcube_triangle_vertices[4 * i + j][1];
+				result[c++] = voxel_unitcube_triangle_vertices[4 * i + j][2];
+				n++;
+			}
+		}
+	}
+
+	return c;
 }
 
 /**
