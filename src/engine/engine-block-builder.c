@@ -347,23 +347,23 @@ private_insert_materials (liengBlockBuilder* self)
 	/* FIXME */
 	memset (&material, 0, sizeof (limdlMaterial));
 	material.flags = 0;
-	material.shininess = 64.0f;
+	material.shininess = 1.0f;
 	material.diffuse[0] = 1.0f;
 	material.diffuse[1] = 1.0f;
 	material.diffuse[2] = 1.0f;
 	material.diffuse[3] = 1.0f;
-	material.specular[0] = 1.0f;
-	material.specular[1] = 1.0f;
-	material.specular[2] = 1.0f;
-	material.specular[3] = 1.0f;
+	material.specular[0] = 0.0f;
+	material.specular[1] = 0.0f;
+	material.specular[2] = 0.0f;
+	material.specular[3] = 0.0f;
 	material.shader = "default";
 	material.textures.count = 1;
 	material.textures.textures = &texture;
 	material.textures.textures[0].type = LIMDL_TEXTURE_TYPE_IMAGE;
-	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_CLAMP;
+	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_CLAMP | LIMDL_TEXTURE_FLAG_MIPMAP;
 	material.textures.textures[0].width = 256;
 	material.textures.textures[0].height = 256;
-	material.textures.textures[0].string = "grass-000";
+	material.textures.textures[0].string = "terrain-000";
 	if (!limdl_model_insert_material (self->helpers.model, &material))
 		return 0;
 
