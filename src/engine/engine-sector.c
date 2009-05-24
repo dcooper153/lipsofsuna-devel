@@ -106,25 +106,12 @@ lieng_sector_new (liengEngine* engine,
 	}
 
 #warning DEBUG: Placeholder voxel terrain construction.
-#if 0
+#if 1
 	lieng_sector_fill (self, 1);
 	limatVector center = limat_vector_init (32.0f, 36.0f, 32.0f);
-	lieng_sector_fill_sphere (self, &center, 16.0f, 0);
-
-	/* Bugged. */
-	limatAabb aabb = { { 1.0, 30.0, 1.0 }, { 60.0, 40.0, 60.0 } };
-	lieng_sector_fill_aabb (self, &aabb, 0);
-
-	limatAabb aabb1 = { { 1.0, 0.0, 36.0 }, { 20.0, 60.0, 37.0 } };
-	lieng_sector_fill_aabb (self, &aabb1, 0);
-	limatAabb aabb2 = { { 44.0, 0.0, 35.0 }, { 64.0, 60.0, 36.0 } };
-	lieng_sector_fill_aabb (self, &aabb2, 1);
-
-	/* Bugged. */
-	limatAabb aabb3 = { { 1.0, 0.0, 33.0 }, { 20.0, 60.0, 34.0 } };
-	lieng_sector_fill_aabb (self, &aabb3, 0);
+	lieng_sector_fill_sphere (self, &center, 10.0f, 0);
 #endif
-#if 1
+#if 0
 	/* FIXME */
 	srand (94639576);
 	lieng_sector_fill (self, 1);

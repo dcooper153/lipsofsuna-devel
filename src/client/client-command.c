@@ -67,6 +67,14 @@ static int
 private_resources (licliModule* module,
                    liReader*    reader);
 
+static int
+private_voxel_box (licliModule* module,
+                   liReader*    reader);
+
+static int
+private_voxel_sphere (licliModule* module,
+                      liReader*    reader);
+
 /*****************************************************************************/
 
 /**
@@ -110,6 +118,12 @@ licli_module_handle_packet (licliModule* self,
 			return 0;
 		case LINET_SERVER_PACKET_RESOURCES:
 			private_resources (self, reader);
+			return 0;
+		case LIEXT_VOXEL_PACKET_BOX:
+			private_voxel_box (self, reader);
+			return 0;
+		case LIEXT_VOXEL_PACKET_SPHERE:
+			private_voxel_sphere (self, reader);
 			return 0;
 		case LINET_SERVER_PACKET_CUSTOM:
 			private_custom (self, reader);
@@ -415,6 +429,70 @@ private_resources (licliModule* module,
                    liReader*    reader)
 {
 	lieng_engine_load_resources (module->engine, reader);
+
+	return 1;
+}
+
+static int
+private_voxel_box (licliModule* module,
+                   liReader*    reader)
+{
+	uint32_t terrain;
+	lialgU32dicIter iter;
+	liengSector* sector;
+	limatAabb aabb;
+	limatAabb aabb1;
+
+	/* Parse the packet. */
+	if (!li_reader_get_float (reader, &aabb.min.x) ||
+	    !li_reader_get_float (reader, &aabb.min.y) ||
+	    !li_reader_get_float (reader, &aabb.min.z) ||
+	    !li_reader_get_float (reader, &aabb.max.x) ||
+	    !li_reader_get_float (reader, &aabb.max.y) ||
+	    !li_reader_get_float (reader, &aabb.max.z) ||
+	    !li_reader_get_uint32 (reader, &terrain) ||
+	    !li_reader_check_end (reader))
+		return 0;
+
+	/* Edit terrain. */
+	LI_FOREACH_U32DIC (iter, module->engine->sectors)
+	{
+		sector = iter.value;
+		aabb1.min = limat_vector_subtract (aabb.min, sector->origin);
+		aabb1.max = limat_vector_subtract (aabb.max, sector->origin);
+		lieng_sector_fill_aabb (sector, &aabb1, terrain);
+	}
+
+	return 1;
+}
+
+static int
+private_voxel_sphere (licliModule* module,
+                      liReader*    reader)
+{
+	float radius;
+	uint32_t terrain;
+	lialgU32dicIter iter;
+	liengSector* sector;
+	limatVector center;
+	limatVector center1;
+
+	/* Parse the packet. */
+	if (!li_reader_get_float (reader, &center.x) ||
+	    !li_reader_get_float (reader, &center.y) ||
+	    !li_reader_get_float (reader, &center.z) ||
+	    !li_reader_get_float (reader, &radius) ||
+	    !li_reader_get_uint32 (reader, &terrain) ||
+	    !li_reader_check_end (reader))
+		return 0;
+
+	/* Edit terrain. */
+	LI_FOREACH_U32DIC (iter, module->engine->sectors)
+	{
+		sector = iter.value;
+		center1 = limat_vector_subtract (center, sector->origin);
+		lieng_sector_fill_sphere (sector, &center1, radius, terrain);
+	}
 
 	return 1;
 }
