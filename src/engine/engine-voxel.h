@@ -26,6 +26,7 @@
 #define __ENGINE_VOXEL_H__
 
 #include <math/lips-math.h>
+#include <model/lips-model.h>
 #include "engine-types.h"
 
 liengTile
@@ -35,7 +36,7 @@ lieng_voxel_init (int shape,
 int
 lieng_voxel_triangulate (liengTile    self,
                          liengTile*   neighbors,
-                         limatVector* result);
+                         limdlVertex* result);
 
 liengTile
 lieng_voxel_validate (liengTile self);
