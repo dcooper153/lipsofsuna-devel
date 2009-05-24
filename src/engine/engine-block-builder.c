@@ -267,6 +267,28 @@ private_build_tiles (liengBlockBuilder* self,
 		{
 			for (i = 0 ; i < c ; i += 3)
 			{
+				/* Project texture coordinates. */
+#warning FIXME: Hardcoded terrain texture coordinate generation.
+#define TEXTURE_SCALE 0.05f
+				float dx = vertices[i].normal.x;
+				float dy = vertices[i].normal.y;
+				float dz = vertices[i].normal.z;
+				limatVector u;
+				if (LI_ABS (dx) < LI_ABS (dy) && LI_ABS (dx) < LI_ABS (dz))
+					u = limat_vector_init (1.0f, 0.0f, 0.0f);
+				else if (LI_ABS (dy) < LI_ABS (dz))
+					u = limat_vector_init (1.0f, 1.0f, 0.0f);
+				else
+					u = limat_vector_init (0.0f, 0.0f, 1.0f);
+				limatVector v = limat_vector_cross (u, vertices[i].normal);
+				for (j = 0 ; j < 3 ; j++)
+				{
+					float tu = limat_vector_dot (vertices[i + j].coord, u);
+					float tv = limat_vector_dot (vertices[i + j].coord, v);
+					vertices[i + j].texcoord[0] = tu * TEXTURE_SCALE;
+					vertices[i + j].texcoord[1] = tv * TEXTURE_SCALE;
+				}
+
 				/* Insert model triangle. */
 				/* FIXME: Bad material. */
 				limdl_model_insert_triangle (self->helpers.model, 0, vertices + i, NULL);
@@ -345,6 +367,7 @@ private_insert_materials (liengBlockBuilder* self)
 		return 1;
 
 	/* FIXME */
+#warning FIXME: Hardcoded terrain material.
 	memset (&material, 0, sizeof (limdlMaterial));
 	material.flags = 0;
 	material.shininess = 1.0f;
@@ -360,10 +383,10 @@ private_insert_materials (liengBlockBuilder* self)
 	material.textures.count = 1;
 	material.textures.textures = &texture;
 	material.textures.textures[0].type = LIMDL_TEXTURE_TYPE_IMAGE;
-	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_CLAMP | LIMDL_TEXTURE_FLAG_MIPMAP;
+	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
 	material.textures.textures[0].width = 256;
 	material.textures.textures[0].height = 256;
-	material.textures.textures[0].string = "terrain-000";
+	material.textures.textures[0].string = "stone-002";
 	if (!limdl_model_insert_material (self->helpers.model, &material))
 		return 0;
 
