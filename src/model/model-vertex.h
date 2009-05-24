@@ -36,11 +36,11 @@ struct _limdlVertex
 };
 
 static inline void
-limdl_vertex_init (limdlVertex*    self,
+limdl_vertex_init (limdlVertex*       self,
                    const limatVector* coord,
                    const limatVector* normal,
-                   float           u,
-                   float           v)
+                   float              u,
+                   float              v)
 {
 	self->texcoord[0] = u;
 	self->texcoord[1] = v;
