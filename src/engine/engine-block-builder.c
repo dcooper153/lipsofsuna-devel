@@ -369,7 +369,7 @@ private_insert_materials (liengBlockBuilder* self)
 	/* FIXME */
 #warning FIXME: Hardcoded terrain material.
 	memset (&material, 0, sizeof (limdlMaterial));
-	material.flags = 0;
+	material.flags = LIMDL_MATERIAL_FLAG_CULLFACE;
 	material.shininess = 1.0f;
 	material.diffuse[0] = 1.0f;
 	material.diffuse[1] = 1.0f;
@@ -386,7 +386,7 @@ private_insert_materials (liengBlockBuilder* self)
 	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
 	material.textures.textures[0].width = 256;
 	material.textures.textures[0].height = 256;
-	material.textures.textures[0].string = "stone-002";
+	material.textures.textures[0].string = "grass-000";
 	if (!limdl_model_insert_material (self->helpers.model, &material))
 		return 0;
 
