@@ -117,6 +117,9 @@ lieng_block_fill_sphere (liengBlock*        self,
                          float              radius,
                          liengTile          terrain);
 
+void
+lieng_block_optimize (liengBlock* self);
+
 liengTile
 lieng_block_get_voxel (liengBlock* self,
                        uint8_t     x,

@@ -507,19 +507,21 @@ licli_module_pick (licliModule*    self,
 
 /* FIXME */
 static void
-private_render_tiles (licliModule*       self,
-                      liengSector*       sector,
-                      liengBlock*        block,
-                      const limatVector* offset,
-                      int bx, int by, int bz)
+private_render_terrain (licliModule* self)
 {
+	int xb;
+	int yb;
+	int zb;
+	lialgU32dicIter iter;
+	liengBlock* block;
+	liengSector* sector;
+	limatAabb block_aabb;
+	limatAabb sector_aabb;
 	limatFrustum frustum;
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndContext context;
 
-	if (block->render == NULL)
-		return;
 	lieng_camera_get_frustum (self->camera, &frustum);
 	lieng_camera_get_modelview (self->camera, &modelview);
 	lieng_camera_get_projection (self->camera, &projection);
@@ -527,105 +529,31 @@ private_render_tiles (licliModule*       self,
 	lirnd_context_set_modelview (&context, &modelview);
 	lirnd_context_set_projection (&context, &projection);
 	lirnd_context_set_frustum (&context, &frustum);
-	lirnd_draw_opaque (&context, block->render, NULL);
-}
-static void
-private_render_block (licliModule*       self,
-                      liengSector*       sector,
-                      liengBlock*        block,
-                      const limatVector* offset,
-                      int bx, int by, int bz)
-{
-	switch (block->type)
-	{
-		case LIENG_BLOCK_TYPE_FULL:
-			if (!block->full.terrain)
-				break;
-			glPushMatrix ();
-			glTranslatef (offset->x, offset->y, offset->z);
-			glScalef (LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH);
-			glBegin (GL_QUADS);
-			glColor3f (8.0f, 0.0f, 0.0f);
-			glVertex3f (0.0f, 0.0f, 0.0f);
-			glVertex3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (1.0f, 1.0f, 0.0f);
-			glVertex3f (1.0f, 0.0f, 0.0f);
-			glColor3f (8.0f, 0.0f, 0.0f);
-			glVertex3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (0.0f, 1.0f, 1.0f);
-			glVertex3f (1.0f, 1.0f, 1.0f);
-			glVertex3f (1.0f, 0.0f, 1.0f);
-			glColor3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (0.0f, 0.0f, 0.0f);
-			glVertex3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (1.0f, 0.0f, 1.0f);
-			glVertex3f (1.0f, 0.0f, 0.0f);
-			glColor3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (0.0f, 1.0f, 0.0f);
-			glVertex3f (0.0f, 1.0f, 1.0f);
-			glVertex3f (1.0f, 1.0f, 1.0f);
-			glVertex3f (1.0f, 1.0f, 0.0f);
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (0.0f, 0.0f, 0.0f);
-			glVertex3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (0.0f, 1.0f, 1.0f);
-			glVertex3f (0.0f, 1.0f, 0.0f);
-			glColor3f (0.0f, 0.0f, 1.0f);
-			glVertex3f (1.0f, 0.0f, 0.0f);
-			glVertex3f (1.0f, 0.0f, 1.0f);
-			glVertex3f (1.0f, 1.0f, 1.0f);
-			glVertex3f (1.0f, 1.0f, 0.0f);
-			glEnd ();
-			glPopMatrix ();
-			break;
-		case LIENG_BLOCK_TYPE_TILES:
-			private_render_tiles (self, sector, block, offset, bx, by, bz);
-			break;
-	}
-}
-static void
-private_render_terrain (licliModule* self)
-{
-	lialgU32dicIter iter;
-	liengSector* sector;
-	limatFrustum frustum;
 
-	lieng_camera_get_frustum (self->camera, &frustum);
 	LI_FOREACH_U32DIC (iter, self->engine->sectors)
 	{
 		sector = iter.value;
-
-		limatAabb sector_aabb;
 		lieng_sector_get_bounds (sector, &sector_aabb);
 		if (limat_frustum_cull_aabb (&frustum, &sector_aabb))
 			continue;
-
-		int xb, yb, zb;
-		limatVector pos;
-		lisec_pointer_get_origin (sector->id, &pos);
 		for (zb = 0 ; zb < LIENG_BLOCKS_PER_LINE ; zb++)
 		{
 			for (yb = 0 ; yb < LIENG_BLOCKS_PER_LINE ; yb++)
 			{
 				for (xb = 0 ; xb < LIENG_BLOCKS_PER_LINE ; xb++)
 				{
-					liengBlock* block = sector->blocks + LIENG_BLOCK_INDEX (xb, yb, zb);
-
-					limatAabb block_aabb = sector_aabb;
+					block = sector->blocks + LIENG_BLOCK_INDEX (xb, yb, zb);
+					if (block->render == NULL)
+						continue;
+					block_aabb = sector_aabb;
 					block_aabb.min.x = sector_aabb.min.x + LIENG_BLOCK_WIDTH * xb;
 					block_aabb.min.y = sector_aabb.min.y + LIENG_BLOCK_WIDTH * yb;
 					block_aabb.min.z = sector_aabb.min.z + LIENG_BLOCK_WIDTH * zb;
 					block_aabb.max.x = block_aabb.min.x + LIENG_BLOCK_WIDTH;
 					block_aabb.max.y = block_aabb.min.y + LIENG_BLOCK_WIDTH;
 					block_aabb.max.z = block_aabb.min.z + LIENG_BLOCK_WIDTH;
-					if (limat_frustum_cull_aabb (&frustum, &block_aabb))
-						continue;
-
-					limatVector offset = limat_vector_init (
-						pos.x + xb * LIENG_BLOCK_WIDTH,
-						pos.y + yb * LIENG_BLOCK_WIDTH,
-						pos.z + zb * LIENG_BLOCK_WIDTH);
-					private_render_block (self, sector, block, &offset, xb, yb, zb);
+//					if (!limat_frustum_cull_aabb (&frustum, &block_aabb))
+						lirnd_draw_opaque (&context, block->render, NULL);
 				}
 			}
 		}

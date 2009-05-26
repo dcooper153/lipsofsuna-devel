@@ -28,11 +28,6 @@
 #include "engine-block.h"
 #include "engine-voxel.h"
 
-static void
-private_optimize_tiles (liengBlock* self);
-
-/*****************************************************************************/
-
 /**
  * \brief Frees the contents of the block but not the block itself.
  *
@@ -248,6 +243,32 @@ lieng_block_fill_sphere (liengBlock*        self,
 }
 
 /**
+ * \brief Optimizes the block.
+ *
+ * \param self Block.
+ */
+void
+lieng_block_optimize (liengBlock* self)
+{
+	int i;
+	liengTile tile;
+
+	if (self->type == LIENG_BLOCK_TYPE_TILES)
+	{
+		/* Convert homegeneous tile blocks to full blocks. */
+		tile = self->tiles->tiles[0];
+		for (i = 1 ; i < LIENG_TILES_PER_BLOCK ; i++)
+		{
+			if (self->tiles->tiles[i] != tile)
+				return;
+		}
+		free (self->tiles);
+		self->full.terrain = tile;
+		self->type = LIENG_BLOCK_TYPE_FULL;
+	}
+}
+
+/**
  * \brief Gets the terrain type of a voxel.
  *
  * \param self Block.
@@ -319,7 +340,7 @@ lieng_block_set_voxel (liengBlock* self,
 			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
 				tiles->tiles[i] = tmp;
 			i = LIENG_TILE_INDEX (x, y, z);
-			tiles->tiles[i] = lieng_voxel_validate (terrain);
+			tiles->tiles[i] = terrain;
 			self->tiles = tiles;
 			self->type = LIENG_BLOCK_TYPE_TILES;
 			self->rebuild = 1;
@@ -342,34 +363,10 @@ lieng_block_set_voxel (liengBlock* self,
 				return 0;
 			self->tiles->tiles[i] = terrain;
 			self->rebuild = 1;
-			private_optimize_tiles (self);
 			return 1;
 	}
 
 	return 0;
-}
-
-/*****************************************************************************/
-
-static void
-private_optimize_tiles (liengBlock* self)
-{
-	int i;
-	liengTile tile = self->tiles->tiles[0];
-
-	/* Check if homogeneous. */
-	for (i = 1 ; i < LIENG_TILES_PER_BLOCK ; i++)
-	{
-		if (self->tiles->tiles[i] != tile)
-			return;
-	}
-
-	/* Reduce to full block. */
-	if (!(tile & 0xFF) || !(tile & 0xFF00))
-		tile = 0;
-	free (self->tiles);
-	self->full.terrain = tile;
-	self->type = LIENG_BLOCK_TYPE_FULL;
 }
 
 /** @} */

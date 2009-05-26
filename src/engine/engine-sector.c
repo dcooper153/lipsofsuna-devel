@@ -43,6 +43,12 @@ private_init_objects (liengSector* self,
                       const char*  dir,
                       const char*  name);
 
+static void
+private_mark_block (liengSector* self,
+                    int          x,
+                    int          y,
+                    int          z);
+
 /*****************************************************************************/
 
 /**
@@ -108,8 +114,12 @@ lieng_sector_new (liengEngine* engine,
 #warning DEBUG: Placeholder voxel terrain construction.
 #if 1
 	lieng_sector_fill (self, 1);
-	limatVector center = limat_vector_init (32.0f, 36.0f, 32.0f);
-	lieng_sector_fill_sphere (self, &center, 10.0f, 0);
+//	limatVector center = limat_vector_init (32.0f, 32.0f, 32.0f);
+	limatAabb aabb;
+	aabb.min = limat_vector_init (32.0f, 32.0f, 32.0f);
+	aabb.max = limat_vector_init (64.0f, 64.0f, 64.0f);
+//	lieng_sector_fill_sphere (self, &center, 18.0f, 0);
+	lieng_sector_fill_aabb (self, &aabb, 0);
 #endif
 #if 0
 	/* FIXME */
@@ -393,6 +403,42 @@ lieng_sector_update (liengSector* self,
 		return;
 	self->rebuild = 0;
 
+	/* Mark affected neighbors. */
+	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+	for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+	{
+		if (!(self->blocks[i].rebuild & 1))
+			continue;
+		private_mark_block (self, x - 1, y - 1, z - 1);
+		private_mark_block (self, x    , y - 1, z - 1);
+		private_mark_block (self, x + 1, y - 1, z - 1);
+		private_mark_block (self, x - 1, y    , z - 1);
+		private_mark_block (self, x    , y    , z - 1);
+		private_mark_block (self, x + 1, y    , z - 1);
+		private_mark_block (self, x - 1, y + 1, z - 1);
+		private_mark_block (self, x    , y + 1, z - 1);
+		private_mark_block (self, x + 1, y + 1, z - 1);
+		private_mark_block (self, x - 1, y - 1, z    );
+		private_mark_block (self, x    , y - 1, z    );
+		private_mark_block (self, x + 1, y - 1, z    );
+		private_mark_block (self, x - 1, y    , z    );
+		//ivate_mark_block (self, x    , y    , z    );
+		private_mark_block (self, x + 1, y    , z    );
+		private_mark_block (self, x - 1, y + 1, z    );
+		private_mark_block (self, x    , y + 1, z    );
+		private_mark_block (self, x + 1, y + 1, z    );
+		private_mark_block (self, x - 1, y - 1, z + 1);
+		private_mark_block (self, x    , y - 1, z + 1);
+		private_mark_block (self, x + 1, y - 1, z + 1);
+		private_mark_block (self, x - 1, y    , z + 1);
+		private_mark_block (self, x    , y    , z + 1);
+		private_mark_block (self, x + 1, y    , z + 1);
+		private_mark_block (self, x - 1, y + 1, z + 1);
+		private_mark_block (self, x    , y + 1, z + 1);
+		private_mark_block (self, x + 1, y + 1, z + 1);
+	}
+
 	/* Rebuild changed blocks. */
 	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
 	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
@@ -500,7 +546,6 @@ lieng_sector_set_voxel (liengSector* self,
 			self->origin.x + LIENG_BLOCK_WIDTH * bx,
 			self->origin.y + LIENG_BLOCK_WIDTH * by,
 			self->origin.z + LIENG_BLOCK_WIDTH * bz);
-		private_build_block (self, bx, by, bz);
 	}
 
 	return ret;
@@ -519,8 +564,11 @@ private_build_block (liengSector* self,
 	limdlModel* model;
 	lirndModel* rndmdl;
 
-	/* Generate mesh. */
+	/* Optimize block. */
 	block = self->blocks + LIENG_BLOCK_INDEX (x, y, z);
+	lieng_block_optimize (block);
+
+	/* Generate mesh. */
 	builder = lieng_block_builder_new (self);
 	if (builder == NULL)
 		return 0;
@@ -651,6 +699,20 @@ private_init_objects (liengSector* self,
 error:
 	liarc_serialize_free (serialize);
 	return 0;
+}
+
+static void
+private_mark_block (liengSector* self,
+                    int          x,
+                    int          y,
+                    int          z)
+{
+	int i;
+
+	i = LIENG_BLOCK_INDEX (x, y, z);
+	if (i < 0 || i >= LIENG_BLOCKS_PER_SECTOR)
+		return;
+	self->blocks[i].rebuild |= 2;
 }
 
 /** @} */

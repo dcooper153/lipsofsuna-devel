@@ -49,8 +49,20 @@ private_build_tiles (liengBlockBuilder* self,
                      int                by,
                      int                bz);
 
+static void
+private_calculate_texcoords (liengBlockBuilder* self,
+                             int                material,
+                             limdlVertex*       vertices);
+
 static int
 private_insert_materials (liengBlockBuilder* self);
+
+static int
+private_insert_vertices (liengBlockBuilder* self,
+                         limatVector*       blockoff,
+                         limatVector*       tileoff,
+                         limdlVertex*       vertices,
+                         int                count);
 
 /*****************************************************************************/
 
@@ -114,18 +126,50 @@ lieng_block_builder_build (liengBlockBuilder* self,
                            int                by,
                            int                bz)
 {
+#ifndef LIENG_DISABLE_GRAPHICS
+	int i;
+	liengBlockBuilderNormal* lookup;
+	limatVector coord;
+	limatVector normal;
+#endif
 	liengBlock* block;
 
+	/* Triangulate the block. */
 	block = self->sector->blocks + LIENG_BLOCK_INDEX (bx, by, bz);
 	switch (block->type)
 	{
 		case LIENG_BLOCK_TYPE_FULL:
-			return private_build_full (self, block, bx, by, bz);
+			if (!private_build_full (self, block, bx, by, bz))
+				return 0;
+			break;
 		case LIENG_BLOCK_TYPE_TILES:
-			return private_build_tiles (self, block, bx, by, bz);
+			if (!private_build_tiles (self, block, bx, by, bz))
+				return 0;
+			break;
+		default:
+			return 0;
 	}
 
-	return 0;
+	/* Apply smooth normals and calculate bounding box. */
+#ifndef LIENG_DISABLE_GRAPHICS
+	if (self->helpers.model != NULL && self->vertices.count)
+	{
+		for (i = 0 ; i < self->helpers.model->vertex.count ; i++)
+		{
+			coord = self->helpers.model->vertex.vertices[i].coord;
+			lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
+			assert (lookup != NULL);
+			if (lookup != NULL)
+			{
+				normal = limat_vector_multiply (lookup->normals, 1.0f / lookup->count);
+				self->helpers.model->vertex.vertices[i].normal = normal;
+			}
+		}
+		limdl_model_calculate_bounds (self->helpers.model);
+	}
+#endif
+
+	return 1;
 }
 
 limdlModel*
@@ -160,23 +204,52 @@ private_build_full (liengBlockBuilder* self,
                     int                by,
                     int                bz)
 {
+	int c;
+	int i;
+	int tx;
+	int ty;
+	int tz;
+	liengTile tile;
+	liengTile mask[6];
 	limatAabb aabb;
 	limatVector blockoff;
+	limatVector tileoff;
+	limdlVertex vertices[64];
 
 	if (!block->full.terrain)
 		return 1;
-
 	if (!private_insert_materials (self))
 		return 0;
+	tile = block->full.terrain;
 
 	/* Get block offset. */
 	blockoff = limat_vector_init (bx, by, bz);
 	blockoff = limat_vector_multiply (blockoff, LIENG_BLOCK_WIDTH);
 	blockoff = limat_vector_add (blockoff, self->sector->origin);
 
-	/* TODO: Build model. */
-#ifndef LIENG_DISABLE_GRAPHICS
-#endif
+	/* Generate vertices. */
+	for (tz = 0 ; tz < LIENG_TILES_PER_LINE ; tz++)
+	for (ty = 0 ; ty < LIENG_TILES_PER_LINE ; ty++)
+	for (tx = 0 ; tx < LIENG_TILES_PER_LINE ; tx++)
+	{
+		for (i = 0 ; i < 6 ; i++)
+		{
+			mask[i] = lieng_sector_get_voxel (self->sector,
+				LIENG_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
+				LIENG_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
+				LIENG_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
+		}
+		c = lieng_voxel_triangulate (tile, mask, vertices);
+		if (c)
+		{
+			tileoff = limat_vector_init (tx, ty, tz);
+			tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
+			if (!private_insert_vertices (self, &blockoff, &tileoff, vertices, c))
+				return 0;
+		}
+	}
+	if (!self->vertices.count)
+		return 1;
 
 	/* Create collision shape. */
 	aabb.min = limat_vector_init (0.0f, 0.0f, 0.0f);
@@ -199,16 +272,11 @@ private_build_tiles (liengBlockBuilder* self,
 {
 	int c;
 	int i;
-	int j;
 	int tx;
 	int ty;
 	int tz;
-	liengBlockBuilderNormal* lookup;
 	liengTile tile;
 	liengTile mask[6];
-	limatVector* tmp;
-	limatVector coord;
-	limatVector normal;
 	limatVector blockoff;
 	limatVector tileoff;
 	limdlVertex vertices[64];
@@ -229,8 +297,6 @@ private_build_tiles (liengBlockBuilder* self,
 		tile = block->tiles->tiles[LIENG_TILE_INDEX (tx, ty, tz)];
 		if (!tile)
 			continue;
-
-		/* Triangulate the voxel. */
 		for (i = 0 ; i < 6 ; i++)
 		{
 			mask[i] = lieng_sector_get_voxel (self->sector,
@@ -239,86 +305,13 @@ private_build_tiles (liengBlockBuilder* self,
 				LIENG_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
 		}
 		c = lieng_voxel_triangulate (tile, mask, vertices);
-		if (!c)
-			continue;
-
-		/* Scale and translate vertices. */
-		tileoff = limat_vector_init (tx, ty, tz);
-		tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
-		for (i = 0 ; i < c ; i++)
+		if (c)
 		{
-			vertices[i].coord = limat_vector_multiply (vertices[i].coord, LIENG_TILE_WIDTH);
-			vertices[i].coord = limat_vector_add (vertices[i].coord, tileoff);
-			vertices[i].coord = limat_vector_add (vertices[i].coord, blockoff);
+			tileoff = limat_vector_init (tx, ty, tz);
+			tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
+			if (!private_insert_vertices (self, &blockoff, &tileoff, vertices, c))
+				return 0;
 		}
-
-		/* Insert collision vertices. */
-		tmp = realloc (self->vertices.array, (self->vertices.count + c) * sizeof (limatVector));
-		if (tmp == NULL)
-			return 0;
-		for (i = 0 ; i < c ; i++)
-			tmp[self->vertices.count + i] = vertices[i].coord;
-		self->vertices.array = tmp;
-		self->vertices.count += c;
-
-		/* Insert model vertices. */
-#ifndef LIENG_DISABLE_GRAPHICS
-		if (self->helpers.model != NULL)
-		{
-			for (i = 0 ; i < c ; i += 3)
-			{
-				/* Project texture coordinates. */
-#warning FIXME: Hardcoded terrain texture coordinate generation.
-#define TEXTURE_SCALE 0.05f
-				float dx = vertices[i].normal.x;
-				float dy = vertices[i].normal.y;
-				float dz = vertices[i].normal.z;
-				limatVector u;
-				if (LI_ABS (dx) < LI_ABS (dy) && LI_ABS (dx) < LI_ABS (dz))
-					u = limat_vector_init (1.0f, 0.0f, 0.0f);
-				else if (LI_ABS (dy) < LI_ABS (dz))
-					u = limat_vector_init (1.0f, 1.0f, 0.0f);
-				else
-					u = limat_vector_init (0.0f, 0.0f, 1.0f);
-				limatVector v = limat_vector_cross (u, vertices[i].normal);
-				for (j = 0 ; j < 3 ; j++)
-				{
-					float tu = limat_vector_dot (vertices[i + j].coord, u);
-					float tv = limat_vector_dot (vertices[i + j].coord, v);
-					vertices[i + j].texcoord[0] = tu * TEXTURE_SCALE;
-					vertices[i + j].texcoord[1] = tv * TEXTURE_SCALE;
-				}
-
-				/* Insert model triangle. */
-				/* FIXME: Bad material. */
-				limdl_model_insert_triangle (self->helpers.model, 0, vertices + i, NULL);
-
-				/* Create normal lookup. */
-				normal = vertices[i].normal;
-				for (j = 0 ; j < 3 ; j++)
-				{
-					coord = vertices[i + j].coord;
-					lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
-					if (lookup == NULL)
-					{
-						lookup = malloc (sizeof (liengBlockBuilderNormal));
-						if (lookup == NULL)
-							continue;
-						lookup->vertex = coord;
-						lookup->normals = normal;
-						lookup->count = 1;
-						if (!lialg_memdic_insert (self->helpers.normals, &coord, sizeof (limatVector), lookup))
-							free (lookup);
-					}
-					else
-					{
-						lookup->normals = limat_vector_add (lookup->normals, normal);
-						lookup->count++;
-					}
-				}
-			}
-		}
-#endif
 	}
 	if (!self->vertices.count)
 		return 1;
@@ -329,31 +322,38 @@ private_build_tiles (liengBlockBuilder* self,
 	if (self->helpers.shape == NULL)
 		return 0;
 
-	/* Apply smooth normals. */
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->helpers.model != NULL)
-	{
-		for (i = 0 ; i < self->helpers.model->vertex.count ; i++)
-		{
-			coord = self->helpers.model->vertex.vertices[i].coord;
-			lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
-			assert (lookup != NULL);
-			if (lookup != NULL)
-			{
-				normal = limat_vector_multiply (lookup->normals, 1.0f / lookup->count);
-				self->helpers.model->vertex.vertices[i].normal = normal;
-			}
-		}
-	}
-#endif
-
-	/* Calculate bounding box. */
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->helpers.model != NULL)
-		limdl_model_calculate_bounds (self->helpers.model);
-#endif
-
 	return 1;
+}
+
+static void
+private_calculate_texcoords (liengBlockBuilder* self,
+                             int                material,
+                             limdlVertex*       vertices)
+{
+#warning FIXME: Hardcoded terrain texture coordinate generation.
+#define TEXTURE_SCALE 0.05f
+	int j;
+	float dx = vertices->normal.x;
+	float dy = vertices->normal.y;
+	float dz = vertices->normal.z;
+	limatVector u;
+	limatVector v;
+
+	if (LI_ABS (dx) < LI_ABS (dy) && LI_ABS (dx) < LI_ABS (dz))
+		u = limat_vector_init (1.0f, 0.0f, 0.0f);
+	else if (LI_ABS (dy) < LI_ABS (dz))
+		u = limat_vector_init (1.0f, 1.0f, 0.0f);
+	else
+		u = limat_vector_init (0.0f, 0.0f, 1.0f);
+	v = limat_vector_cross (u, vertices->normal);
+
+	for (j = 0 ; j < 3 ; j++)
+	{
+		vertices[j].texcoord[0] = limat_vector_dot (vertices[j].coord, u);
+		vertices[j].texcoord[1] = limat_vector_dot (vertices[j].coord, v);
+		vertices[j].texcoord[0] *= TEXTURE_SCALE;
+		vertices[j].texcoord[1] *= TEXTURE_SCALE;
+	}
 }
 
 static int
@@ -394,6 +394,78 @@ private_insert_materials (liengBlockBuilder* self)
 #else
 	return 1;
 #endif
+}
+
+static int
+private_insert_vertices (liengBlockBuilder* self,
+                         limatVector*       blockoff,
+                         limatVector*       tileoff,
+                         limdlVertex*       vertices,
+                         int                count)
+{
+	int i;
+	int j;
+	liengBlockBuilderNormal* lookup;
+	limatVector coord;
+	limatVector normal;
+	limatVector* tmp;
+
+	/* Scale and translate vertices. */
+	for (i = 0 ; i < count ; i++)
+	{
+		vertices[i].coord = limat_vector_multiply (vertices[i].coord, LIENG_TILE_WIDTH);
+		vertices[i].coord = limat_vector_add (vertices[i].coord, *tileoff);
+		vertices[i].coord = limat_vector_add (vertices[i].coord, *blockoff);
+	}
+
+	/* Insert collision vertices. */
+	tmp = realloc (self->vertices.array, (self->vertices.count + count) * sizeof (limatVector));
+	if (tmp == NULL)
+		return 0;
+	for (i = 0 ; i < count ; i++)
+		tmp[self->vertices.count + i] = vertices[i].coord;
+	self->vertices.array = tmp;
+	self->vertices.count += count;
+
+	/* Insert model vertices. */
+#ifndef LIENG_DISABLE_GRAPHICS
+	if (self->helpers.model != NULL)
+	{
+		for (i = 0 ; i < count ; i += 3)
+		{
+			/* Insert model triangle. */
+			/* FIXME: Bad material. */
+			private_calculate_texcoords (self, 0, vertices + i);
+			limdl_model_insert_triangle (self->helpers.model, 0, vertices + i, NULL);
+
+			/* Create normal lookup. */
+			normal = vertices[i].normal;
+			for (j = 0 ; j < 3 ; j++)
+			{
+				coord = vertices[i + j].coord;
+				lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
+				if (lookup == NULL)
+				{
+					lookup = malloc (sizeof (liengBlockBuilderNormal));
+					if (lookup == NULL)
+						continue;
+					lookup->vertex = coord;
+					lookup->normals = normal;
+					lookup->count = 1;
+					if (!lialg_memdic_insert (self->helpers.normals, &coord, sizeof (limatVector), lookup))
+						free (lookup);
+				}
+				else
+				{
+					lookup->normals = limat_vector_add (lookup->normals, normal);
+					lookup->count++;
+				}
+			}
+		}
+	}
+#endif
+
+	return 1;
 }
 
 /** @} */
