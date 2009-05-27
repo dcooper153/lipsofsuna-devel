@@ -529,6 +529,7 @@ private_render_terrain (licliModule* self)
 	lirnd_context_set_modelview (&context, &modelview);
 	lirnd_context_set_projection (&context, &projection);
 	lirnd_context_set_frustum (&context, &frustum);
+	glEnable (GL_TEXTURE_2D);
 
 	LI_FOREACH_U32DIC (iter, self->engine->sectors)
 	{
@@ -552,7 +553,7 @@ private_render_terrain (licliModule* self)
 					block_aabb.max.x = block_aabb.min.x + LIENG_BLOCK_WIDTH;
 					block_aabb.max.y = block_aabb.min.y + LIENG_BLOCK_WIDTH;
 					block_aabb.max.z = block_aabb.min.z + LIENG_BLOCK_WIDTH;
-//					if (!limat_frustum_cull_aabb (&frustum, &block_aabb))
+					if (!limat_frustum_cull_aabb (&frustum, &block_aabb))
 						lirnd_draw_opaque (&context, block->render, NULL);
 				}
 			}
