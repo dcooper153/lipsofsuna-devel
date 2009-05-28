@@ -209,6 +209,31 @@ lieng_engine_clear_selection (liengEngine* self)
 	lialg_ptrdic_clear (self->selection);
 }
 
+/**
+ * \brief Finds or creates a sector.
+ *
+ * Finds an existing sector or creates an empty one on demand. This is used by
+ * various map editing facilities of the server to ensure that edited sectors
+ * aren't swapped out.
+ *
+ * \param self Engine.
+ * \param id Sector number.
+ * \return Sector or NULL.
+ */
+liengSector*
+lieng_engine_create_sector (liengEngine* self,
+                            uint32_t     id)
+{
+	liengSector* sector;
+
+	sector = lialg_u32dic_find (self->sectors, id);
+	if (sector != NULL)
+		return sector;
+	sector = lieng_sector_new (self, id, NULL);
+
+	return sector;
+}
+
 liengAnimation*
 lieng_engine_find_animation_by_code (liengEngine* self,
                                      int          id)
@@ -416,6 +441,31 @@ lieng_engine_load_resources (liengEngine* self,
 		return lieng_resources_load_from_stream (self->resources, reader);
 	else
 		return lieng_resources_load_from_dir (self->resources, self->config.dir);
+}
+
+/**
+ * \brief Finds or loads a sector.
+ *
+ * Finds an existing sector or loads one from the disk on demand. This is used
+ * by various map editing facilities of the server to ensure that edited sectors
+ * aren't swapped out.
+ *
+ * \param self Engine.
+ * \param id Sector number.
+ * \return Sector or NULL.
+ */
+liengSector*
+lieng_engine_load_sector (liengEngine* self,
+                          uint32_t     id)
+{
+	liengSector* sector;
+
+	sector = lialg_u32dic_find (self->sectors, id);
+	if (sector != NULL)
+		return sector;
+	sector = lieng_sector_new (self, id, self->config.dir);
+
+	return sector;
 }
 
 /**

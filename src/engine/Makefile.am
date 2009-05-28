@@ -18,6 +18,7 @@ liblipsengine_la_SOURCES = \
 	engine-model.h \
 	engine-object.c \
 	engine-object.h \
+	engine-range.h \
 	engine-render.c \
 	engine-render.h \
 	engine-resources.c \

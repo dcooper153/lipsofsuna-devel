@@ -20,51 +20,48 @@
  * @{
  * \addtogroup liextsrv Server
  * @{
- * \addtogroup liextsrvEditor Editor
+ * \addtogroup liextsrvSkeleton Skeleton
  * @{
  */
 
-#include <script/lips-script.h>
 #include <server/lips-server.h>
-#include "ext-editor.h"
+#include "ext-skeleton.h"
 #include "ext-module.h"
 
-/* @luadoc
- * module "Extension.Server.Editor"
- * ---
- * -- Allow dynamic editing of the game.
- * -- @name Editor
- * -- @class table
- */
-
-/* @luadoc
- * ---
- * -- Saves the current world map.
- * --
- * -- @param self Editor class.
- * function Editor.save(self)
- */
-static int
-Editor_save (lua_State* lua)
+lisrvExtensionInfo liextInfo =
 {
-	liextModule* module;
+	LISRV_EXTENSION_VERSION, "Skeleton",
+	liext_module_new,
+	liext_module_free
+};
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
+liextModule*
+liext_module_new (lisrvServer* server)
+{
+	liextModule* self;
 
-	lieng_engine_save (module->server->engine);
+	self = calloc (1, sizeof (liextModule));
+	if (self == NULL)
+		return NULL;
+	self->server = server;
+	self->skeleton = liext_skeleton_new (server);
+	if (self->skeleton == NULL)
+	{
+		free (self);
+		return NULL;
+	}
 
-	return 0;
+	liscr_script_insert_class (server->script, "Skeleton", liextSkeletonScript, self);
+
+	return self;
 }
 
-/*****************************************************************************/
-
 void
-liextEditorScript (liscrClass* self,
-                   void*       data)
+liext_module_free (liextModule* self)
 {
-	liscr_class_set_convert (self, (void*) abort);
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
-	liscr_class_insert_func (self, "save", Editor_save);
+	/* FIXME: Remove the class here. */
+	liext_skeleton_free (self->skeleton);
+	free (self);
 }
 
 /** @} */

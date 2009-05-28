@@ -19150,7 +19150,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile data/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/generator/Makefile ext/client/inventory/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile src/Makefile src/ai/Makefile src/algorithm/Makefile src/archive/Makefile src/binding/Makefile src/callback/Makefile src/class/Makefile src/client/Makefile src/client/script/Makefile src/config/Makefile src/engine/Makefile src/font/Makefile src/image/Makefile src/main/Makefile src/math/Makefile src/model/Makefile src/network/Makefile src/physics/Makefile src/render/Makefile src/script/Makefile src/script/common/Makefile src/sector/Makefile src/server/Makefile src/server/script/Makefile src/string/Makefile src/sound/Makefile src/system/Makefile src/thread/Makefile src/video/Makefile src/widget/Makefile"
+ac_config_files="$ac_config_files Makefile data/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/generator/Makefile ext/client/inventory/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skeleton/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile ext/server/voxel/Makefile src/Makefile src/ai/Makefile src/algorithm/Makefile src/archive/Makefile src/binding/Makefile src/callback/Makefile src/class/Makefile src/client/Makefile src/client/script/Makefile src/config/Makefile src/engine/Makefile src/font/Makefile src/image/Makefile src/main/Makefile src/math/Makefile src/model/Makefile src/network/Makefile src/physics/Makefile src/render/Makefile src/script/Makefile src/script/common/Makefile src/sector/Makefile src/server/Makefile src/server/script/Makefile src/string/Makefile src/sound/Makefile src/system/Makefile src/thread/Makefile src/video/Makefile src/widget/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20182,9 +20182,11 @@ do
     "ext/server/generator/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/generator/Makefile" ;;
     "ext/server/inventory/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/inventory/Makefile" ;;
     "ext/server/npc/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/npc/Makefile" ;;
+    "ext/server/skeleton/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/skeleton/Makefile" ;;
     "ext/server/skills/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/skills/Makefile" ;;
     "ext/server/slots/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/slots/Makefile" ;;
     "ext/server/spawner/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/spawner/Makefile" ;;
+    "ext/server/voxel/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/voxel/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/ai/Makefile") CONFIG_FILES="$CONFIG_FILES src/ai/Makefile" ;;
     "src/algorithm/Makefile") CONFIG_FILES="$CONFIG_FILES src/algorithm/Makefile" ;;

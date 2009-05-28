@@ -111,40 +111,6 @@ lieng_sector_new (liengEngine* engine,
 		}
 	}
 
-#warning DEBUG: Placeholder voxel terrain construction.
-#if 1
-	lieng_sector_fill (self, 1);
-//	limatVector center = limat_vector_init (32.0f, 32.0f, 32.0f);
-	limatAabb aabb;
-	aabb.min = limat_vector_init (32.0f, 32.0f, 32.0f);
-	aabb.max = limat_vector_init (64.0f, 64.0f, 64.0f);
-//	lieng_sector_fill_sphere (self, &center, 18.0f, 0);
-	lieng_sector_fill_aabb (self, &aabb, 0);
-#endif
-#if 0
-	/* FIXME */
-	srand (94639576);
-	lieng_sector_fill (self, 1);
-	limatVector center = limat_vector_init (32.0f, 36.0f, 32.0f);
-	lieng_sector_fill_sphere (self, &center, 8.0f, 0);
-	int z;
-	for (z = 0 ; z < 40 ; z++)
-	{
-		center = limat_vector_init (rand() % 64, rand() % 32, rand() % 64);
-		lieng_sector_fill_sphere (self, &center, rand() % 5 + 5, 0);
-	}
-	for (z = 0 ; z < 40 ; z++)
-	{
-		limatAabb aabb;
-		limatVector size;
-		limatVector center;
-		center = limat_vector_init (rand() % 64, rand() % 32, rand() % 64);
-		size = limat_vector_init (rand() % 8 + 6, rand() % 8 + 6, rand() % 8 + 6);
-		limat_aabb_init_from_center (&aabb, &center, &size);
-		lieng_sector_fill_aabb (self, &aabb, 0);
-	}
-#endif
-
 	return self;
 }
 
@@ -191,11 +157,11 @@ lieng_sector_fill (liengSector* self,
 			for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++)
 			{
 				lieng_block_fill (self->blocks + i, terrain);
-				private_build_block (self, x, y, z);
 				i++;
 			}
 		}
 	}
+	self->rebuild = 1;
 }
 
 /**
@@ -410,6 +376,7 @@ lieng_sector_update (liengSector* self,
 	{
 		if (!(self->blocks[i].rebuild & 1))
 			continue;
+#warning FIXME: Even the smallest change results to 27 blocks being rebuilt.
 		private_mark_block (self, x - 1, y - 1, z - 1);
 		private_mark_block (self, x    , y - 1, z - 1);
 		private_mark_block (self, x + 1, y - 1, z - 1);

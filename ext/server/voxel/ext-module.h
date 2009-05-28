@@ -20,52 +20,54 @@
  * @{
  * \addtogroup liextsrv Server
  * @{
- * \addtogroup liextsrvEditor Editor
+ * \addtogroup liextsrvVoxel Voxel
  * @{
  */
 
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
+
+#include <algorithm/lips-algorithm.h>
+#include <callback/lips-callback.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
-#include "ext-editor.h"
-#include "ext-module.h"
+#include "ext-voxel.h"
 
-/* @luadoc
- * module "Extension.Server.Editor"
- * ---
- * -- Allow dynamic editing of the game.
- * -- @name Editor
- * -- @class table
- */
+#define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
 
-/* @luadoc
- * ---
- * -- Saves the current world map.
- * --
- * -- @param self Editor class.
- * function Editor.save(self)
- */
-static int
-Editor_save (lua_State* lua)
+typedef struct _liextModule liextModule;
+struct _liextModule
 {
-	liextModule* module;
+	lialgPtrdic* listeners;
+	licalHandle calls[2];
+	lisrvServer* server;
+};
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
+liextModule*
+liext_module_new (lisrvServer* server);
 
-	lieng_engine_save (module->server->engine);
+void
+liext_module_free (liextModule* self);
 
-	return 0;
-}
+void
+liext_module_fill_box (liextModule*       self,
+                       const limatVector* min,
+                       const limatVector* max,
+                       liengTile          terrain);
+
+void
+liext_module_fill_sphere (liextModule*       self,
+                          const limatVector* center,
+                          float              radius,
+                          liengTile          terrain);
 
 /*****************************************************************************/
 
 void
-liextEditorScript (liscrClass* self,
-                   void*       data)
-{
-	liscr_class_set_convert (self, (void*) abort);
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
-	liscr_class_insert_func (self, "save", Editor_save);
-}
+liextVoxelScript (liscrClass* self,
+                  void*       data);
+
+#endif
 
 /** @} */
 /** @} */

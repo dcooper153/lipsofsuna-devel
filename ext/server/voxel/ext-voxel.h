@@ -15,19 +15,40 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_ENGINE_H__
-#define __LIPS_ENGINE_H__
+/**
+ * \addtogroup liext Extension
+ * @{
+ * \addtogroup liextsrv Server
+ * @{
+ * \addtogroup liextsrvVoxel Voxel
+ * @{
+ */
 
-#include "engine.h"
-#include "engine-block.h"
-#include "engine-camera.h"
-#include "engine-model.h"
-#include "engine-object.h"
-#include "engine-range.h"
-#include "engine-resources.h"
-#include "engine-sector.h"
-#include "engine-selection.h"
-#include "engine-types.h"
-#include "engine-voxel.h"
+#ifndef __EXT_VOXEL_H__
+#define __EXT_VOXEL_H__
+
+#include <server/lips-server.h>
+
+typedef struct _liextVoxel liextVoxel;
+struct _liextVoxel
+{
+	int x;
+	int y;
+	int z;
+	int radius;
+};
+
+liextVoxel*
+liext_voxel_new (int x,
+                 int y,
+                 int z,
+                 int radius);
+
+void
+liext_voxel_free (liextVoxel* self);
 
 #endif
+
+/** @} */
+/** @} */
+/** @} */

@@ -168,9 +168,11 @@ ext/server/editor/Makefile
 ext/server/generator/Makefile
 ext/server/inventory/Makefile
 ext/server/npc/Makefile
+ext/server/skeleton/Makefile
 ext/server/skills/Makefile
 ext/server/slots/Makefile
 ext/server/spawner/Makefile
+ext/server/voxel/Makefile
 src/Makefile
 src/ai/Makefile
 src/algorithm/Makefile

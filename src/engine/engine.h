@@ -117,6 +117,10 @@ lieng_engine_call_remove (liengEngine* self,
 void
 lieng_engine_clear_selection (liengEngine* self);
 
+liengSector*
+lieng_engine_create_sector (liengEngine* self,
+                            uint32_t     id);
+
 liengAnimation*
 lieng_engine_find_animation_by_code (liengEngine* self,
                                      int          id);
@@ -148,6 +152,10 @@ lieng_engine_load_model (liengEngine* self,
 int
 lieng_engine_load_texture (liengEngine* self,
                            const char*  name);
+
+liengSector*
+lieng_engine_load_sector (liengEngine* self,
+                          uint32_t     id);
 
 int
 lieng_engine_read_object (liengEngine*    self,

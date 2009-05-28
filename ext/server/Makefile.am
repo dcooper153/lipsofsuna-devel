@@ -4,6 +4,8 @@ SUBDIRS = \
 	generator \
 	inventory \
 	npc \
+	skeleton \
 	skills \
 	slots \
-	spawner
+	spawner \
+	voxel

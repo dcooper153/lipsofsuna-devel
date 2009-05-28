@@ -20,51 +20,37 @@
  * @{
  * \addtogroup liextsrv Server
  * @{
- * \addtogroup liextsrvEditor Editor
+ * \addtogroup liextsrvVoxel Voxel
  * @{
  */
 
-#include <script/lips-script.h>
+#include <network/lips-network.h>
 #include <server/lips-server.h>
-#include "ext-editor.h"
-#include "ext-module.h"
+#include "ext-voxel.h"
 
-/* @luadoc
- * module "Extension.Server.Editor"
- * ---
- * -- Allow dynamic editing of the game.
- * -- @name Editor
- * -- @class table
- */
-
-/* @luadoc
- * ---
- * -- Saves the current world map.
- * --
- * -- @param self Editor class.
- * function Editor.save(self)
- */
-static int
-Editor_save (lua_State* lua)
+liextVoxel*
+liext_voxel_new (int x,
+                 int y,
+                 int z,
+                 int radius)
 {
-	liextModule* module;
+	liextVoxel* self;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
+	self = calloc (1, sizeof (liextVoxel));
+	if (self == NULL)
+		return NULL;
+	self->x = x;
+	self->y = y;
+	self->z = z;
+	self->radius = radius;
 
-	lieng_engine_save (module->server->engine);
-
-	return 0;
+	return self;
 }
 
-/*****************************************************************************/
-
 void
-liextEditorScript (liscrClass* self,
-                   void*       data)
+liext_voxel_free (liextVoxel* self)
 {
-	liscr_class_set_convert (self, (void*) abort);
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
-	liscr_class_insert_func (self, "save", Editor_save);
+	free (self);
 }
 
 /** @} */

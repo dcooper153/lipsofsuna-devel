@@ -72,6 +72,10 @@ private_voxel_box (licliModule* module,
                    liReader*    reader);
 
 static int
+private_voxel_diff (licliModule* module,
+                    liReader*    reader);
+
+static int
 private_voxel_sphere (licliModule* module,
                       liReader*    reader);
 
@@ -121,6 +125,9 @@ licli_module_handle_packet (licliModule* self,
 			return 0;
 		case LIEXT_VOXEL_PACKET_BOX:
 			private_voxel_box (self, reader);
+			return 0;
+		case LIEXT_VOXEL_PACKET_DIFF:
+			private_voxel_diff (self, reader);
 			return 0;
 		case LIEXT_VOXEL_PACKET_SPHERE:
 			private_voxel_sphere (self, reader);
@@ -461,6 +468,41 @@ private_voxel_box (licliModule* module,
 		aabb1.min = limat_vector_subtract (aabb.min, sector->origin);
 		aabb1.max = limat_vector_subtract (aabb.max, sector->origin);
 		lieng_sector_fill_aabb (sector, &aabb1, terrain);
+	}
+
+	return 1;
+}
+
+static int
+private_voxel_diff (licliModule* module,
+                    liReader*    reader)
+{
+	uint16_t blockid;
+	uint32_t sectorid;
+	liengBlock* block;
+	liengSector* sector;
+
+	while (!li_reader_check_end (reader))
+	{
+		/* Read block offset. */
+		if (!li_reader_get_uint32 (reader, &sectorid) ||
+			!li_reader_get_uint16 (reader, &blockid))
+			return 0;
+#warning FIXME: Validate sector id.
+		if (blockid >= LIENG_BLOCKS_PER_SECTOR)
+			return 0;
+
+		/* Find block. */
+		sector = lieng_engine_create_sector (module->engine, sectorid);
+		if (sector == NULL)
+			return 0;
+		block = sector->blocks + blockid;
+
+		/* Read block data. */
+		if (!lieng_block_read (block, reader))
+			return 0;
+		if (block->rebuild)
+			sector->rebuild = 1;
 	}
 
 	return 1;

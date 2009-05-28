@@ -79,8 +79,6 @@ lieng_block_free (liengBlock* self)
 /**
  * \brief Fills the block with the given terrain type.
  *
- * You need to call #lieng_block_rebuild manually if something was changed.
- *
  * \param self Block.
  * \param terrain Terrain type.
  */
@@ -88,13 +86,27 @@ void
 lieng_block_fill (liengBlock* self,
                   liengTile   terrain)
 {
-	lieng_block_free (self);
-	memset (self, 0, sizeof (liengBlock));
-	self->type = LIENG_BLOCK_TYPE_FULL;
-	if (terrain & 0xFF)
-		self->full.terrain = terrain | 0xFF00;
+	terrain = lieng_voxel_init (0xFF, terrain);
+	if (self->type == LIENG_BLOCK_TYPE_FULL)
+	{
+		/* Set new terrain. */
+		if (self->full.terrain != terrain)
+		{
+			self->full.terrain = terrain;
+			self->rebuild = 1;
+		}
+	}
 	else
-		self->full.terrain = 0;
+	{
+		/* Free old data. */
+		lieng_block_free (self);
+		memset (self, 0, sizeof (liengBlock));
+
+		/* Set new terrain. */
+		self->type = LIENG_BLOCK_TYPE_FULL;
+		self->rebuild = 1;
+		self->full.terrain = terrain;
+	}
 }
 
 /**
@@ -237,7 +249,6 @@ lieng_block_fill_sphere (liengBlock*        self,
 			ret |= lieng_block_set_voxel (self, x, y, z, tile);
 		}
 	}
-	self->rebuild |= ret;
 
 	return ret;
 }
@@ -266,6 +277,92 @@ lieng_block_optimize (liengBlock* self)
 		self->full.terrain = tile;
 		self->type = LIENG_BLOCK_TYPE_FULL;
 	}
+}
+
+/**
+ * \brief Reads block data from a stream.
+ *
+ * \param self Block.
+ * \param reader Reader.
+ * \return Nonzero on success.
+ */
+int
+lieng_block_read (liengBlock* self,
+                  liReader*   reader)
+{
+	int x;
+	int y;
+	int z;
+	uint8_t type;
+	uint16_t terrain;
+
+	if (!li_reader_get_uint8 (reader, &type))
+		return 0;
+	switch (type)
+	{
+		case LIENG_BLOCK_TYPE_FULL:
+			if (!li_reader_get_uint16 (reader, &terrain))
+				return 0;
+			lieng_block_fill (self, terrain);
+			break;
+		case LIENG_BLOCK_TYPE_HEIGHT:
+			/* FIXME: Not implemented. */
+			break;
+		case LIENG_BLOCK_TYPE_MULTIPLE:
+			/* FIXME: Not implemented. */
+			break;
+		case LIENG_BLOCK_TYPE_TILES:
+			for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
+			for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
+			for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+			{
+				if (!li_reader_get_uint16 (reader, &terrain))
+					return 0;
+				lieng_block_set_voxel (self, x, y, z, terrain);
+			}
+			break;
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Writes block data to a stream.
+ *
+ * \param self Block.
+ * \param reader Reader.
+ * \return Nonzero on success.
+ */
+int
+lieng_block_write (liengBlock*  self,
+                   liarcWriter* writer)
+{
+	int i;
+
+	if (!liarc_writer_append_uint8 (writer, self->type))
+		return 0;
+	switch (self->type)
+	{
+		case LIENG_BLOCK_TYPE_FULL:
+			if (!liarc_writer_append_uint16 (writer, self->full.terrain))
+				return 0;
+			break;
+		case LIENG_BLOCK_TYPE_HEIGHT:
+			/* FIXME: Not implemented. */
+			break;
+		case LIENG_BLOCK_TYPE_MULTIPLE:
+			/* FIXME: Not implemented. */
+			break;
+		case LIENG_BLOCK_TYPE_TILES:
+			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
+			{
+				if (!liarc_writer_append_uint16 (writer, self->tiles->tiles[i]))
+					return 0;
+			}
+			break;
+	}
+
+	return 1;
 }
 
 /**

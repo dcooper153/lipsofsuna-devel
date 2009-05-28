@@ -15,19 +15,35 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_ENGINE_H__
-#define __LIPS_ENGINE_H__
+/**
+ * \addtogroup liext Extension
+ * @{
+ * \addtogroup liextsrv Server
+ * @{
+ * \addtogroup liextsrvSkeleton Skeleton
+ * @{
+ */
 
-#include "engine.h"
-#include "engine-block.h"
-#include "engine-camera.h"
-#include "engine-model.h"
-#include "engine-object.h"
-#include "engine-range.h"
-#include "engine-resources.h"
-#include "engine-sector.h"
-#include "engine-selection.h"
-#include "engine-types.h"
-#include "engine-voxel.h"
+#ifndef __EXT_SKELETON_H__
+#define __EXT_SKELETON_H__
+
+#include <server/lips-server.h>
+
+typedef struct _liextSkeleton liextSkeleton;
+struct _liextSkeleton
+{
+	lisrvServer* server;
+	licalHandle calls[1];
+};
+
+liextSkeleton*
+liext_skeleton_new (lisrvServer* server);
+
+void
+liext_skeleton_free (liextSkeleton* self);
 
 #endif
+
+/** @} */
+/** @} */
+/** @} */

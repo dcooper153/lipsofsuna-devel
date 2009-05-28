@@ -33,7 +33,7 @@
 #endif
 #include "engine-types.h"
 
-#define LIENG_TILE_INDEX(x,y,z) (x + LIENG_TILES_PER_LINE * y + LIENG_TILES_PER_PLANE * z)
+#define LIENG_TILE_INDEX(x, y, z) ((x) + LIENG_TILES_PER_LINE * (y) + LIENG_TILES_PER_PLANE * (z))
 #define LIENG_TILE_WIDTH 1.0f
 #define LIENG_TILES_PER_LINE 16
 #define LIENG_TILES_PER_PLANE (LIENG_TILES_PER_LINE * LIENG_TILES_PER_LINE)
@@ -119,6 +119,14 @@ lieng_block_fill_sphere (liengBlock*        self,
 
 void
 lieng_block_optimize (liengBlock* self);
+
+int
+lieng_block_read (liengBlock* self,
+                  liReader*   reader);
+
+int
+lieng_block_write (liengBlock*  self,
+                   liarcWriter* writer);
 
 liengTile
 lieng_block_get_voxel (liengBlock* self,
