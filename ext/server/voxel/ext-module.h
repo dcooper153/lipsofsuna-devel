@@ -38,6 +38,7 @@
 typedef struct _liextModule liextModule;
 struct _liextModule
 {
+	float radius;
 	lialgPtrdic* listeners;
 	licalHandle calls[2];
 	lisrvServer* server;

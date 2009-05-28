@@ -43,12 +43,6 @@ private_init_objects (liengSector* self,
                       const char*  dir,
                       const char*  name);
 
-static void
-private_mark_block (liengSector* self,
-                    int          x,
-                    int          y,
-                    int          z);
-
 /*****************************************************************************/
 
 /**
@@ -161,7 +155,7 @@ lieng_sector_fill (liengSector* self,
 			}
 		}
 	}
-	self->rebuild = 1;
+	self->dirty = 1;
 }
 
 /**
@@ -200,7 +194,7 @@ lieng_sector_fill_aabb (liengSector*     self,
 			child.min = limat_vector_subtract (box->min, block.min);
 			child.max = limat_vector_subtract (box->max, block.min);
 			if (lieng_block_fill_aabb (self->blocks + i, &child, terrain))
-				self->rebuild = 1;
+				self->dirty = 1;
 		}
 	}
 }
@@ -245,7 +239,7 @@ lieng_sector_fill_sphere (liengSector*       self,
 				z * LIENG_BLOCK_WIDTH);
 			block = limat_vector_subtract (*center, block);
 			if (lieng_block_fill_sphere (self->blocks + i, &block, radius, terrain))
-				self->rebuild = 1;
+				self->dirty = 1;
 		}
 	}
 }
@@ -365,56 +359,19 @@ lieng_sector_update (liengSector* self,
 	int y;
 	int z;
 
-	if (!self->rebuild)
-		return;
-	self->rebuild = 0;
-
-	/* Mark affected neighbors. */
-	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-	for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
-	{
-		if (!(self->blocks[i].rebuild & 1))
-			continue;
-#warning FIXME: Even the smallest change results to 27 blocks being rebuilt.
-		private_mark_block (self, x - 1, y - 1, z - 1);
-		private_mark_block (self, x    , y - 1, z - 1);
-		private_mark_block (self, x + 1, y - 1, z - 1);
-		private_mark_block (self, x - 1, y    , z - 1);
-		private_mark_block (self, x    , y    , z - 1);
-		private_mark_block (self, x + 1, y    , z - 1);
-		private_mark_block (self, x - 1, y + 1, z - 1);
-		private_mark_block (self, x    , y + 1, z - 1);
-		private_mark_block (self, x + 1, y + 1, z - 1);
-		private_mark_block (self, x - 1, y - 1, z    );
-		private_mark_block (self, x    , y - 1, z    );
-		private_mark_block (self, x + 1, y - 1, z    );
-		private_mark_block (self, x - 1, y    , z    );
-		//ivate_mark_block (self, x    , y    , z    );
-		private_mark_block (self, x + 1, y    , z    );
-		private_mark_block (self, x - 1, y + 1, z    );
-		private_mark_block (self, x    , y + 1, z    );
-		private_mark_block (self, x + 1, y + 1, z    );
-		private_mark_block (self, x - 1, y - 1, z + 1);
-		private_mark_block (self, x    , y - 1, z + 1);
-		private_mark_block (self, x + 1, y - 1, z + 1);
-		private_mark_block (self, x - 1, y    , z + 1);
-		private_mark_block (self, x    , y    , z + 1);
-		private_mark_block (self, x + 1, y    , z + 1);
-		private_mark_block (self, x - 1, y + 1, z + 1);
-		private_mark_block (self, x    , y + 1, z + 1);
-		private_mark_block (self, x + 1, y + 1, z + 1);
-	}
-
 	/* Rebuild changed blocks. */
-	for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-	for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-	for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+	if (self->dirty)
 	{
-		if (!self->blocks[i].rebuild)
-			continue;
-		self->blocks[i].rebuild = 0;
-		private_build_block (self, x, y, z);
+		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+		{
+			if (!self->blocks[i].dirty)
+				continue;
+			private_build_block (self, x, y, z);
+			self->blocks[i].dirty = 0;
+		}
+		self->dirty = 0;
 	}
 }
 
@@ -666,20 +623,6 @@ private_init_objects (liengSector* self,
 error:
 	liarc_serialize_free (serialize);
 	return 0;
-}
-
-static void
-private_mark_block (liengSector* self,
-                    int          x,
-                    int          y,
-                    int          z)
-{
-	int i;
-
-	i = LIENG_BLOCK_INDEX (x, y, z);
-	if (i < 0 || i >= LIENG_BLOCKS_PER_SECTOR)
-		return;
-	self->blocks[i].rebuild |= 2;
 }
 
 /** @} */

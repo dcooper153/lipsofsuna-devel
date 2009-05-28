@@ -40,7 +40,7 @@
 struct _liengSector
 {
 	uint32_t id;
-	int rebuild;
+	uint8_t dirty;
 	lialgU32dic* objects;
 	liengBlock blocks[LIENG_BLOCKS_PER_SECTOR];
 	liengEngine* engine;

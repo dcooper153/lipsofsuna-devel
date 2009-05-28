@@ -612,52 +612,69 @@ lieng_engine_update (liengEngine* self,
                      float        secs)
 {
 	int i;
+	int j;
 	int x;
 	int y;
 	int z;
 	lialgU32dicIter iter;
 	liengObject* object;
 	liengSector* sector;
+	struct
+	{
+		int x;
+		int y;
+		int z;
+		int mask;
+	}
+	neighbors[26] =
+	{
+		{ -1, -1, -1, 0x01|0x04|0x10 },
+		{  0, -1, -1, 0x00|0x04|0x10 },
+		{  1, -1, -1, 0x02|0x04|0x10 },
+		{ -1,  0, -1, 0x01|0x00|0x10 },
+		{  0,  0, -1, 0x00|0x00|0x10 },
+		{  1,  0, -1, 0x02|0x00|0x10 },
+		{ -1,  1, -1, 0x01|0x08|0x10 },
+		{  0,  1, -1, 0x00|0x08|0x10 },
+		{  1,  1, -1, 0x02|0x08|0x10 },
+		{ -1, -1,  0, 0x01|0x04|0x00 },
+		{  0, -1,  0, 0x00|0x04|0x00 },
+		{  1, -1,  0, 0x02|0x04|0x00 },
+		{ -1,  0,  0, 0x01|0x00|0x00 },
+		{  1,  0,  0, 0x02|0x00|0x00 },
+		{ -1,  1,  0, 0x01|0x08|0x00 },
+		{  0,  1,  0, 0x00|0x08|0x00 },
+		{  1,  1,  0, 0x02|0x08|0x00 },
+		{ -1, -1,  1, 0x01|0x04|0x20 },
+		{  0, -1,  1, 0x00|0x04|0x20 },
+		{  1, -1,  1, 0x02|0x04|0x20 },
+		{ -1,  0,  1, 0x01|0x00|0x20 },
+		{  0,  0,  1, 0x00|0x00|0x20 },
+		{  1,  0,  1, 0x02|0x00|0x20 },
+		{ -1,  1,  1, 0x01|0x08|0x20 },
+		{  0,  1,  1, 0x00|0x08|0x20 },
+		{  1,  1,  1, 0x02|0x08|0x20 },
+	};
 
 	/* Update block boundaries. */
 	LI_FOREACH_U32DIC (iter, self->sectors)
 	{
 		sector = iter.value;
-		if (sector->rebuild != 1)
+		if (!sector->dirty)
 			continue;
 		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
 		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
 		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
 		{
-			if (sector->blocks[i].rebuild != 1)
-				continue;
-			private_mark_block (self, sector, x - 1, y - 1, z - 1);
-			private_mark_block (self, sector, x    , y - 1, z - 1);
-			private_mark_block (self, sector, x + 1, y - 1, z - 1);
-			private_mark_block (self, sector, x - 1, y    , z - 1);
-			private_mark_block (self, sector, x    , y    , z - 1);
-			private_mark_block (self, sector, x + 1, y    , z - 1);
-			private_mark_block (self, sector, x - 1, y + 1, z - 1);
-			private_mark_block (self, sector, x    , y + 1, z - 1);
-			private_mark_block (self, sector, x + 1, y + 1, z - 1);
-			private_mark_block (self, sector, x - 1, y - 1, z    );
-			private_mark_block (self, sector, x    , y - 1, z    );
-			private_mark_block (self, sector, x + 1, y - 1, z    );
-			private_mark_block (self, sector, x - 1, y    , z    );
-			//private_mark_block (self, sector, x    , y    , z    );
-			private_mark_block (self, sector, x + 1, y    , z    );
-			private_mark_block (self, sector, x - 1, y + 1, z    );
-			private_mark_block (self, sector, x    , y + 1, z    );
-			private_mark_block (self, sector, x + 1, y + 1, z    );
-			private_mark_block (self, sector, x - 1, y - 1, z + 1);
-			private_mark_block (self, sector, x    , y - 1, z + 1);
-			private_mark_block (self, sector, x + 1, y - 1, z + 1);
-			private_mark_block (self, sector, x - 1, y    , z + 1);
-			private_mark_block (self, sector, x    , y    , z + 1);
-			private_mark_block (self, sector, x + 1, y    , z + 1);
-			private_mark_block (self, sector, x - 1, y + 1, z + 1);
-			private_mark_block (self, sector, x    , y + 1, z + 1);
-			private_mark_block (self, sector, x + 1, y + 1, z + 1);
+			for (j = 0 ; j < 26 ; j++)
+			{
+				if ((sector->blocks[i].dirty & neighbors[j].mask) != neighbors[j].mask)
+					continue;
+				private_mark_block (self, sector,
+					neighbors[j].x + x,
+					neighbors[j].y + y,
+					neighbors[j].z + z);
+			}
 		}
 	}
 
@@ -978,14 +995,13 @@ private_mark_block (liengEngine* self,
 		sz++;
 	}
 	id = lisec_pointer_new_from_offset (sx, sy, sz);
-	if (id == sector->id)
-		return;
 
 	/* Mark block as dirty. */
 	sector1 = lieng_engine_find_sector (self, id);
 	if (sector1 == NULL)
 		return;
-	sector1->blocks[LIENG_BLOCK_INDEX (x, y, z)].rebuild = 2;
+	sector1->blocks[LIENG_BLOCK_INDEX (x, y, z)].dirty |= 0x80;
+	sector1->dirty = 1;
 }
 
 static void

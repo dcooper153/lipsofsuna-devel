@@ -45,34 +45,16 @@
 enum
 {
 	LIENG_BLOCK_TYPE_FULL,
-	LIENG_BLOCK_TYPE_HEIGHT,
-	LIENG_BLOCK_TYPE_MULTIPLE,
 	LIENG_BLOCK_TYPE_TILES
 };
 
 typedef struct _liengBlock liengBlock;
 typedef struct _liengBlockFull liengBlockFull;
-typedef struct _liengBlockHeight liengBlockHeight;
-typedef struct _liengBlockMultiple liengBlockMultiple;
 typedef struct _liengBlockTiles liengBlockTiles;
 
 struct _liengBlockFull
 {
 	liengTile terrain;
-};
-
-struct _liengBlockHeight
-{
-	uint8_t flags;
-	uint8_t terrain;
-	uint8_t heights[LIENG_HEIGHTS_PER_BLOCK];
-};
-
-struct _liengBlockMultiple
-{
-	uint8_t count;
-	uint8_t* types;
-	liengBlock* blocks;
 };
 
 struct _liengBlockTiles
@@ -84,7 +66,7 @@ struct _liengBlockTiles
 struct _liengBlock
 {
 	uint8_t type;
-	uint8_t rebuild;
+	uint8_t dirty;
 	liphyShape* shape;
 	liphyObject* physics;
 #ifndef LIENG_DISABLE_GRAPHICS
@@ -93,8 +75,6 @@ struct _liengBlock
 	union
 	{
 		liengBlockFull full;
-		liengBlockHeight* height;
-		liengBlockMultiple* multiple;
 		liengBlockTiles* tiles;
 	};
 };

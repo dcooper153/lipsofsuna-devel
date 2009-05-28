@@ -30,7 +30,6 @@
 #include "ext-module.h"
 
 #define LISTENER_POSITION_EPSILON 3.0f
-#define LISTENER_SIGHT_RADIUS 16.0f
 
 static int
 private_object_motion (liextModule* self,
@@ -65,6 +64,7 @@ liext_module_new (lisrvServer* server)
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
+	self->radius = 20.0f;
 	self->server = server;
 	self->listeners = lialg_ptrdic_new ();
 	if (self->listeners == NULL)
@@ -220,7 +220,7 @@ private_object_motion (liextModule* self,
 
 	/* Calculate vision volume. */
 	lieng_object_get_transform (object, &transform);
-	radius = (int)(LISTENER_SIGHT_RADIUS / LIENG_BLOCK_WIDTH + 0.5f);
+	radius = (int)(self->radius / LIENG_BLOCK_WIDTH + 0.5f);
 	center.x = transform.position.x / LIENG_BLOCK_WIDTH;
 	center.y = transform.position.y / LIENG_BLOCK_WIDTH;
 	center.z = transform.position.z / LIENG_BLOCK_WIDTH;
@@ -284,7 +284,7 @@ private_object_visibility (liextModule* self,
 	{
 		/* Calculate vision volume. */
 		lieng_object_get_transform (object, &transform);
-		radius = (int)(LISTENER_SIGHT_RADIUS / LIENG_BLOCK_WIDTH + 0.5f);
+		radius = (int)(self->radius / LIENG_BLOCK_WIDTH + 0.5f);
 		center.x = transform.position.x / LIENG_BLOCK_WIDTH;
 		center.y = transform.position.y / LIENG_BLOCK_WIDTH;
 		center.z = transform.position.z / LIENG_BLOCK_WIDTH;
@@ -361,14 +361,6 @@ private_pack_block (liextModule* self,
 		y % LIENG_BLOCKS_PER_LINE,
 		z % LIENG_BLOCKS_PER_LINE);
 	block = sector->blocks + id;
-
-		printf ("PACKBLOCK sec=%d,%d,%d(%X), blk=%d,%d,%d(%X)\n",
-			x / LIENG_BLOCKS_PER_LINE,
-			y / LIENG_BLOCKS_PER_LINE,
-			z / LIENG_BLOCKS_PER_LINE, sector->id,
-			x % LIENG_BLOCKS_PER_LINE,
-			y % LIENG_BLOCKS_PER_LINE,
-			z % LIENG_BLOCKS_PER_LINE, id);
 
 	/* Send block data. */
 	if (!liarc_writer_append_uint32 (writer, sector->id) ||

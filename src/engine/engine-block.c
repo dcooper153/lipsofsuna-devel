@@ -36,7 +36,6 @@
 void
 lieng_block_free (liengBlock* self)
 {
-	int i;
 #ifndef LIENG_DISABLE_GRAPHICS
 	limdlModel* model;
 	lirndModel* rndmdl;
@@ -61,15 +60,6 @@ lieng_block_free (liengBlock* self)
 	{
 		case LIENG_BLOCK_TYPE_FULL:
 			break;
-		case LIENG_BLOCK_TYPE_HEIGHT:
-			free (self->height);
-			break;
-		case LIENG_BLOCK_TYPE_MULTIPLE:
-			for (i = 0 ; i < self->multiple->count ; i++)
-				lieng_block_free (self->multiple->blocks + i);
-			free (self->multiple->blocks);
-			free (self->multiple);
-			break;
 		case LIENG_BLOCK_TYPE_TILES:
 			free (self->tiles);
 			break;
@@ -93,7 +83,7 @@ lieng_block_fill (liengBlock* self,
 		if (self->full.terrain != terrain)
 		{
 			self->full.terrain = terrain;
-			self->rebuild = 1;
+			self->dirty = 0xFF;
 		}
 	}
 	else
@@ -104,7 +94,7 @@ lieng_block_fill (liengBlock* self,
 
 		/* Set new terrain. */
 		self->type = LIENG_BLOCK_TYPE_FULL;
-		self->rebuild = 1;
+		self->dirty = 0xFF;
 		self->full.terrain = terrain;
 	}
 }
@@ -305,12 +295,6 @@ lieng_block_read (liengBlock* self,
 				return 0;
 			lieng_block_fill (self, terrain);
 			break;
-		case LIENG_BLOCK_TYPE_HEIGHT:
-			/* FIXME: Not implemented. */
-			break;
-		case LIENG_BLOCK_TYPE_MULTIPLE:
-			/* FIXME: Not implemented. */
-			break;
 		case LIENG_BLOCK_TYPE_TILES:
 			for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
 			for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
@@ -347,12 +331,6 @@ lieng_block_write (liengBlock*  self,
 			if (!liarc_writer_append_uint16 (writer, self->full.terrain))
 				return 0;
 			break;
-		case LIENG_BLOCK_TYPE_HEIGHT:
-			/* FIXME: Not implemented. */
-			break;
-		case LIENG_BLOCK_TYPE_MULTIPLE:
-			/* FIXME: Not implemented. */
-			break;
 		case LIENG_BLOCK_TYPE_TILES:
 			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
 			{
@@ -385,11 +363,6 @@ lieng_block_get_voxel (liengBlock* self,
 		case LIENG_BLOCK_TYPE_FULL:
 			assert (self->full.terrain != 0xFF00);
 			return self->full.terrain;
-		case LIENG_BLOCK_TYPE_HEIGHT:
-			break;
-		case LIENG_BLOCK_TYPE_MULTIPLE:
-			/* FIXME: Not implemented. */
-			break;
 		case LIENG_BLOCK_TYPE_TILES:
 			assert (self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)] != 0xFF00);
 			return self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)];
@@ -424,6 +397,7 @@ lieng_block_set_voxel (liengBlock* self,
 	liengTile tmp;
 	liengBlockTiles* tiles;
 
+	/* Modify terrain. */
 	terrain = lieng_voxel_validate (terrain);
 	switch (self->type)
 	{
@@ -440,30 +414,33 @@ lieng_block_set_voxel (liengBlock* self,
 			tiles->tiles[i] = terrain;
 			self->tiles = tiles;
 			self->type = LIENG_BLOCK_TYPE_TILES;
-			self->rebuild = 1;
-			return 1;
-		case LIENG_BLOCK_TYPE_HEIGHT:
-			break;
-		case LIENG_BLOCK_TYPE_MULTIPLE:
-			for (i = 0 ; i < self->multiple->count ; i++)
-			{
-				if (lieng_block_set_voxel (self->multiple->blocks + i, x, y, z, terrain))
-				{
-					self->rebuild = 1;
-					return 1;
-				}
-			}
 			break;
 		case LIENG_BLOCK_TYPE_TILES:
 			i = LIENG_TILE_INDEX (x, y, z);
 			if (self->tiles->tiles[i] == terrain)
 				return 0;
 			self->tiles->tiles[i] = terrain;
-			self->rebuild = 1;
-			return 1;
+			break;
+		default:
+			return 0;
 	}
 
-	return 0;
+	/* Mark faces dirty. */
+	if (x == 0)
+		self->dirty |= 0x01;
+	if (x == LIENG_TILES_PER_LINE - 1)
+		self->dirty |= 0x02;
+	if (y == 0)
+		self->dirty |= 0x04;
+	if (y == LIENG_TILES_PER_LINE - 1)
+		self->dirty |= 0x08;
+	if (z == 0)
+		self->dirty |= 0x10;
+	if (z == LIENG_TILES_PER_LINE - 1)
+		self->dirty |= 0x20;
+	self->dirty |= 0x80;
+
+	return 1;
 }
 
 /** @} */
