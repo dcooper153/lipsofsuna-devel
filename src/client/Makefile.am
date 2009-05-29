@@ -49,7 +49,6 @@ liblipsclient_la_LIBADD = \
 	../image/liblipsimage.la \
 	../binding/liblipsbinding.la \
 	../sound/liblipssound.la \
-	../sector/liblipssector.la \
 	../video/liblipsvideo.la \
 	../archive/liblipsarchive.la \
 	../callback/liblipscallback.la \

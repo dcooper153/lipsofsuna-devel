@@ -21,6 +21,7 @@
 #include "engine.h"
 #include "engine-block.h"
 #include "engine-camera.h"
+#include "engine-iterator.h"
 #include "engine-model.h"
 #include "engine-object.h"
 #include "engine-range.h"

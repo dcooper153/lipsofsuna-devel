@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <sector/lips-sector.h>
 #include <system/lips-system.h>
 #include "render.h"
 #include "render-draw.h"

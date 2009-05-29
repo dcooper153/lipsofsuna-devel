@@ -25,12 +25,11 @@
 #ifndef __CLIENT_OBJECT_H__
 #define __CLIENT_OBJECT_H__
 
+#include <algorithm/lips-algorithm.h>
 #include <engine/lips-engine.h>
 #include <math/lips-math.h>
 #include <network/lips-network.h>
 #include <render/lips-render.h>
-#include <sector/lips-sector.h>
-#include <algorithm/lips-algorithm.h>
 #include <system/lips-system.h>
 #include "client-types.h"
 

@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sector/lips-sector.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "engine-block-builder.h"
@@ -70,12 +69,16 @@ lieng_sector_new (liengEngine* engine,
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
-	self->id = id;
+	self->x = id % LIENG_SECTORS_PER_LINE;
+	self->y = id / LIENG_SECTORS_PER_LINE % LIENG_SECTORS_PER_LINE;
+	self->z = id / LIENG_SECTORS_PER_LINE / LIENG_SECTORS_PER_LINE;
 	self->engine = engine;
-	lisec_pointer_get_origin (id, &self->origin);
+	self->origin.x = LIENG_SECTOR_WIDTH * self->x;
+	self->origin.y = LIENG_SECTOR_WIDTH * self->y;
+	self->origin.z = LIENG_SECTOR_WIDTH * self->z;
 
 	/* Insert to engine. */
-	if (!lialg_u32dic_insert (engine->sectors, self->id, self))
+	if (!lialg_u32dic_insert (engine->sectors, id, self))
 	{
 		free (self);
 		return NULL;
@@ -304,7 +307,7 @@ lieng_sector_save (liengSector* self)
 		return 1;
 
 	/* Create serializer. */
-	snprintf (name, 16, "%06X", self->id);
+	snprintf (name, 16, "%06X", LIENG_SECTOR_INDEX (self->x, self->y, self->z));
 	path = lisys_path_format (self->engine->config.dir,
 		LISYS_PATH_SEPARATOR, "world",
 		LISYS_PATH_SEPARATOR, name, ".lsec", NULL);
@@ -389,7 +392,7 @@ lieng_sector_get_bounds (const liengSector* self,
 	limatVector max;
 
 	min = self->origin;
-	max = limat_vector_init (LISEC_SECTOR_SIZE, LISEC_SECTOR_SIZE, LISEC_SECTOR_SIZE);
+	max = limat_vector_init (LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH);
 	max = limat_vector_add (min, max);
 	limat_aabb_init_from_points (result, &min, &max);
 }

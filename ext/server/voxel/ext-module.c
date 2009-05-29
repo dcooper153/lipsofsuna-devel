@@ -111,22 +111,18 @@ liext_module_fill_box (liextModule*       self,
                        const limatVector* max,
                        liengTile          terrain)
 {
-	uint32_t id;
 	lialgU32dicIter iter1;
 	liarcWriter* writer;
 	liengRange range;
-	liengRangeIter iter;
+	liengRangeIter rangeiter;
 	liengSector* sector;
 	limatAabb aabb;
 
 	/* Modify sectors. */
-	range = lieng_range_new_from_aabb (min, max, LISEC_SECTOR_SIZE);
-	LIENG_FOREACH_RANGE (iter, range)
+	range = lieng_range_new_from_aabb (min, max, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		id = lisec_pointer_new_from_offset (iter.x, iter.y, iter.z);
-		if (id == LISEC_SECTOR_INVALID)
-			continue;
-		sector = lieng_engine_load_sector (self->server->engine, id);
+		sector = lieng_engine_load_sector (self->server->engine, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		aabb.min = limat_vector_subtract (*min, sector->origin);
@@ -159,22 +155,18 @@ liext_module_fill_sphere (liextModule*       self,
                           float              radius,
                           liengTile          terrain)
 {
-	uint32_t id;
 	lialgU32dicIter iter1;
 	liarcWriter* writer;
 	liengRange range;
-	liengRangeIter iter;
+	liengRangeIter rangeiter;
 	liengSector* sector;
 	limatVector vector;
 
 	/* Modify sectors. */
-	range = lieng_range_new_from_sphere (center, radius, LISEC_SECTOR_SIZE);
-	LIENG_FOREACH_RANGE (iter, range)
+	range = lieng_range_new_from_sphere (center, radius, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		id = lisec_pointer_new_from_offset (iter.x, iter.y, iter.z);
-		if (id == LISEC_SECTOR_INVALID)
-			continue;
-		sector = lieng_engine_load_sector (self->server->engine, id);
+		sector = lieng_engine_load_sector (self->server->engine, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		vector = limat_vector_subtract (*center, sector->origin);
@@ -328,13 +320,6 @@ private_object_visibility (liextModule* self,
 	return 1;
 }
 
-static inline uint32_t
-LIENG_SECTOR_INDEX(int x, int y, int z) \
-{
-	limatVector tmp = { x * LISEC_SECTOR_SIZE, y * LISEC_SECTOR_SIZE, z * LISEC_SECTOR_SIZE };
-	return lisec_pointer_new (&tmp);
-}
-
 static int
 private_pack_block (liextModule* self,
                     liarcWriter* writer,
@@ -347,7 +332,7 @@ private_pack_block (liextModule* self,
 	liengSector* sector;
 
 	/* Find sector. */
-	id = LIENG_SECTOR_INDEX (//lisec_pointer_new_from_offset (
+	id = LIENG_SECTOR_INDEX (
 		x / LIENG_BLOCKS_PER_LINE,
 		y / LIENG_BLOCKS_PER_LINE,
 		z / LIENG_BLOCKS_PER_LINE);
@@ -363,7 +348,9 @@ private_pack_block (liextModule* self,
 	block = sector->blocks + id;
 
 	/* Send block data. */
-	if (!liarc_writer_append_uint32 (writer, sector->id) ||
+	if (!liarc_writer_append_uint8 (writer, sector->x) ||
+	    !liarc_writer_append_uint8 (writer, sector->y) ||
+	    !liarc_writer_append_uint8 (writer, sector->z) ||
 	    !liarc_writer_append_uint16 (writer, id) ||
 	    !lieng_block_write (block, writer))
 	{

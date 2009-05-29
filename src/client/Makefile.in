@@ -61,8 +61,8 @@ liblipsclient_la_DEPENDENCIES = ../server/liblipsserver.la \
 	../model/liblipsmodel.la ../widget/liblipswidget.la \
 	../font/liblipsfont.la ../image/liblipsimage.la \
 	../binding/liblipsbinding.la ../sound/liblipssound.la \
-	../sector/liblipssector.la ../video/liblipsvideo.la \
-	../archive/liblipsarchive.la ../callback/liblipscallback.la \
+	../video/liblipsvideo.la ../archive/liblipsarchive.la \
+	../callback/liblipscallback.la \
 	../algorithm/liblipsalgorithm.la ../string/liblipsstring.la \
 	../thread/liblipsthread.la ../system/liblipssystem.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -292,7 +292,6 @@ liblipsclient_la_LIBADD = \
 	../image/liblipsimage.la \
 	../binding/liblipsbinding.la \
 	../sound/liblipssound.la \
-	../sector/liblipssector.la \
 	../video/liblipsvideo.la \
 	../archive/liblipsarchive.la \
 	../callback/liblipscallback.la \

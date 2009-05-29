@@ -28,12 +28,11 @@
 #include <pthread.h>
 #include <grapple/grapple.h>
 #include <ai/lips-ai.h>
+#include <algorithm/lips-algorithm.h>
 #include <config/lips-config.h>
 #include <engine/lips-engine.h>
 #include <physics/lips-physics.h>
 #include <script/lips-script.h>
-#include <sector/lips-sector.h>
-#include <algorithm/lips-algorithm.h>
 #include "server-event.h"
 #include "server-network.h"
 #include "server-object.h"

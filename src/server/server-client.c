@@ -487,12 +487,15 @@ private_vision_update (lisrvClient* self)
 {
 	float dist;
 	lialgU32dicIter obj_iter;
-	lisecIter sec_iter;
+	liengRange range;
+	liengRangeIter rangeiter;
 	liengSector* sector;
 	liengObject* object = self->object;
 
 	if (object->sector == NULL)
 		return;
+	sector = object->sector;
+	range = lieng_range_new (sector->x, sector->y, sector->z, 1, 0, 256);
 
 	/* Remove from vision. */
 	LI_FOREACH_U32DIC (obj_iter, self->vision)
@@ -503,9 +506,9 @@ private_vision_update (lisrvClient* self)
 	}
 
 	/* Add to vision. */
-	LI_FOREACH_SECTOR (sec_iter, object->sector->id, 1)
+	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = lieng_engine_find_sector (object->engine, sec_iter.id);
+		sector = lieng_engine_find_sector (object->engine, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		LI_FOREACH_U32DIC (obj_iter, sector->objects)

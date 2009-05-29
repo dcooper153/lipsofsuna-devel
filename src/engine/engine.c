@@ -23,8 +23,9 @@
  */
 
 #include <stdarg.h>
-#include <sector/lips-sector.h>
 #include "engine.h"
+#include "engine-iterator.h"
+#include "engine-range.h"
 #include "engine-selection.h"
 
 static int
@@ -764,28 +765,33 @@ lieng_engine_set_center (liengEngine*       self,
 {
 	int error = 0;
 	uint32_t id;
-	lialgU32dicIter iter_ptr;
+	lialgU32dicIter iter;
 	liengSector* sector;
-	lisecIter iter_sec;
+	liengRange range0;
+	liengRange range1;
+	liengRangeIter rangeiter;
 
 	/* Get new center sector. */
-	id = lisec_pointer_new (center);
+	id = LIENG_SECTOR_INDEX_FROM_POINT (*center);
+	range0 = lieng_range_new_from_sphere (center, self->config.radius, LIENG_SECTOR_WIDTH, 0, 256);
+	range1 = lieng_range_new_from_index (id, self->config.radius, 0, 256);
 
 	/* Remove sectors. */
-	LI_FOREACH_U32DIC (iter_ptr, self->sectors)
+	LI_FOREACH_U32DIC (iter, self->sectors)
 	{
-		sector = iter_ptr.value;
-		if (!lisec_pointer_get_nearby (id, sector->id, self->config.radius))
+		sector = iter.value;
+		if (!lieng_range_contains (&range1, sector->x, sector->y, sector->z))
 			lieng_sector_free (sector);
 	}
 
 	/* Insert sectors. */
-	LI_FOREACH_SECTOR (iter_sec, id, self->config.radius)
+	LIENG_FOREACH_RANGE (rangeiter, range0)
 	{
-		sector = lialg_u32dic_find (self->sectors, iter_sec.id);
+		id = LIENG_SECTOR_INDEX (rangeiter.x, rangeiter.y, rangeiter.z);
+		sector = lialg_u32dic_find (self->sectors, id);
 		if (sector != NULL)
 			continue;
-		sector = lieng_sector_new (self, iter_sec.id, self->config.dir);
+		sector = lieng_sector_new (self, id, self->config.dir);
 		if (sector == NULL)
 		{
 			lisys_error_report ();
@@ -963,7 +969,9 @@ private_mark_block (liengEngine* self,
 	liengSector* sector1;
 
 	/* Find affected sector. */
-	lisec_pointer_get_offset (sector->id, &sx, &sy, &sz);
+	sx = sector->x;
+	sy = sector->y;
+	sz = sector->z;
 	if (x < 0)
 	{
 		x = LIENG_BLOCKS_PER_LINE - 1;
@@ -994,7 +1002,7 @@ private_mark_block (liengEngine* self,
 		z = 0;
 		sz++;
 	}
-	id = lisec_pointer_new_from_offset (sx, sy, sz);
+	id = LIENG_SECTOR_INDEX (sx, sy, sz);
 
 	/* Mark block as dirty. */
 	sector1 = lieng_engine_find_sector (self, id);

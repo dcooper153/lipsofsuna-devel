@@ -219,17 +219,20 @@ private_rescan (liextNpc* self)
 	liengObject* object;
 	liengObject* target;
 	liengSector* sector;
-	lisecIter iter0;
+	liengRange range;
+	liengRangeIter rangeiter;
 
 	dist = self->radius;
 	target = NULL;
 	object = self->object;
+	sector = object->sector;
 	assert (object->sector != NULL);
+	range = lieng_range_new (sector->x, sector->y, sector->z, 1, 0, 256);
 
 	/* Search for target. */
-	LI_FOREACH_SECTOR (iter0, object->sector->id, 1)
+	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = lieng_engine_find_sector (object->engine, iter0.id);
+		sector = lieng_engine_find_sector (object->engine, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		LI_FOREACH_U32DIC (iter1, sector->objects)

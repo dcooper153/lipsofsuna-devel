@@ -477,23 +477,27 @@ static int
 private_voxel_diff (licliModule* module,
                     liReader*    reader)
 {
+	uint8_t sectorx;
+	uint8_t sectory;
+	uint8_t sectorz;
 	uint16_t blockid;
-	uint32_t sectorid;
 	liengBlock* block;
 	liengSector* sector;
 
 	while (!li_reader_check_end (reader))
 	{
 		/* Read block offset. */
-		if (!li_reader_get_uint32 (reader, &sectorid) ||
-			!li_reader_get_uint16 (reader, &blockid))
+		if (!li_reader_get_uint8 (reader, &sectorx) ||
+		    !li_reader_get_uint8 (reader, &sectory) ||
+		    !li_reader_get_uint8 (reader, &sectorz) ||
+		    !li_reader_get_uint16 (reader, &blockid))
 			return 0;
-#warning FIXME: Validate sector id.
 		if (blockid >= LIENG_BLOCKS_PER_SECTOR)
 			return 0;
 
 		/* Find block. */
-		sector = lieng_engine_create_sector (module->engine, sectorid);
+		sector = lieng_engine_create_sector (module->engine,
+			LIENG_SECTOR_INDEX (sectorx, sectory, sectorz));
 		if (sector == NULL)
 			return 0;
 		block = sector->blocks + blockid;

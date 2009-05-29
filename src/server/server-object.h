@@ -30,7 +30,6 @@
 #include <engine/lips-engine.h>
 #include <script/lips-script.h>
 #include <string/lips-string.h>
-#include <sector/lips-sector.h>
 #include "server-types.h"
 
 #define LISRV_OBJECT(o) ((lisrvObject*) lieng_object_get_userdata ((liengObject*)(o), LIENG_DATA_SERVER))

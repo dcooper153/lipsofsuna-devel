@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <sector/lips-sector.h>
 #include "physics.h"
 #include "physics-private.h"
 
@@ -43,8 +42,8 @@ liphyPhysics*
 liphy_physics_new ()
 {
 	liphyPhysics* self;
-	btVector3 min (0, 0, 0);
-	btVector3 max (256 * LISEC_SECTOR_SIZE, 256 * LISEC_SECTOR_SIZE, 256 * LISEC_SECTOR_SIZE);
+	btVector3 min (-65535, -65535, -65535);
+	btVector3 max ( 65535,  65535,  65535);
 
 	self = (liphyPhysics*) calloc (1, sizeof (liphyPhysics));
 	if (self == NULL)

@@ -194,7 +194,6 @@ src/physics/Makefile
 src/render/Makefile
 src/script/Makefile
 src/script/common/Makefile
-src/sector/Makefile
 src/server/Makefile
 src/server/script/Makefile
 src/string/Makefile

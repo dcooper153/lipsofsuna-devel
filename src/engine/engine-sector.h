@@ -32,6 +32,12 @@
 #include "engine-block.h"
 #include "engine-types.h"
 
+#define LIENG_SECTOR_INDEX_FROM_POINT(p) LIENG_SECTOR_INDEX((int)((p).x / LIENG_SECTOR_WIDTH), (int)((p).y / LIENG_SECTOR_WIDTH), (int)((p).z / LIENG_SECTOR_WIDTH))
+#define LIENG_SECTOR_INDEX(x, y, z) ((x) + LIENG_SECTORS_PER_LINE * (y) + LIENG_SECTORS_PER_PLANE * (z))
+#define LIENG_SECTOR_WIDTH (LIENG_BLOCKS_PER_LINE * LIENG_BLOCK_WIDTH)
+#define LIENG_SECTORS_PER_LINE 256
+#define LIENG_SECTORS_PER_PLANE (LIENG_SECTORS_PER_LINE * LIENG_SECTORS_PER_LINE)
+#define LIENG_SECTORS_PER_WORLD (LIENG_SECTORS_PER_LINE * LIENG_SECTORS_PER_LINE * LIENG_SECTORS_PER_LINE)
 #define LIENG_BLOCK_INDEX(x, y, z) ((x) + LIENG_BLOCKS_PER_LINE * (y) + LIENG_BLOCKS_PER_PLANE * (z))
 #define LIENG_BLOCKS_PER_LINE 4
 #define LIENG_BLOCKS_PER_PLANE (LIENG_BLOCKS_PER_LINE * LIENG_BLOCKS_PER_LINE)
@@ -39,7 +45,9 @@
 
 struct _liengSector
 {
-	uint32_t id;
+	uint8_t x;
+	uint8_t y;
+	uint8_t z;
 	uint8_t dirty;
 	lialgU32dic* objects;
 	liengBlock blocks[LIENG_BLOCKS_PER_SECTOR];

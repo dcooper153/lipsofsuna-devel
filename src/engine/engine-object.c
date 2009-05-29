@@ -23,7 +23,6 @@
  */
 
 #include <network/lips-network.h>
-#include <sector/lips-sector.h>
 #include "engine-object.h"
 #include "engine-selection.h"
 
@@ -820,7 +819,7 @@ private_callback_moved (liengObject* self)
 
 	/* Get source sector. */
 	lieng_object_get_transform (self, &transform);
-	id = lisec_pointer_new (&transform.position);
+	id = LIENG_SECTOR_INDEX_FROM_POINT (transform.position);
 	src = self->sector;
 
 	/* Get destination sector. */
@@ -1032,13 +1031,18 @@ private_warp (liengObject*       self,
               const limatVector* position)
 {
 	uint32_t id;
+	uint32_t id1;
 	liengSector* dst;
 	liengSector* src = self->sector;
 
 	/* Check for changes. */
-	id = lisec_pointer_new (position);
-	if (src != NULL && src->id == id)
-		return 1;
+	id = LIENG_SECTOR_INDEX_FROM_POINT (*position);
+	if (src != NULL)
+	{
+		id1 = LIENG_SECTOR_INDEX (src->x, src->y, src->z);
+		if (id == id1)
+			return 1;
+	}
 
 	/* Find or create new sector. */
 	dst = lieng_engine_find_sector (self->engine, id);

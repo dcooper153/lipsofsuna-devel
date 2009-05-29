@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,16 +25,14 @@
 #ifndef __SERVER_OBSERVER_H__
 #define __SERVER_OBSERVER_H__
 
-#include <sector/lips-sector.h>
 #include <algorithm/lips-algorithm.h>
+#include <engine/lips-engine.h>
 #include "server.h"
 
 typedef struct _lisrvObserverIter lisrvObserverIter;
 struct _lisrvObserverIter
 {
-	lisecIter sectors;
-	lialgU32dicIter objects;
-	liengSector* sector;
+	liengObjectIter objects;
 	liengObject* subject;
 	liengObject* object;
 };
@@ -52,101 +50,58 @@ struct _lisrvObserverIter
 	for (lisrv_observer_iter_first (&iter, subject, radius) ; iter.object != NULL ; \
 	     lisrv_observer_iter_next (&iter))
 
-static inline void
+static inline int
 lisrv_observer_iter_first (lisrvObserverIter* self,
                            liengObject*       subject,
                            int                radius)
 {
-	liengObject* object;
+	int x;
+	int y;
+	int z;
 
+	/* Initialize self. */
 	memset (self, 0, sizeof (lisrvObserverIter));
-	if (subject->sector != NULL)
-	{
-		self->subject = subject;
-		self->object = NULL;
-		self->sector = NULL;
-		lisec_iter_first (&self->sectors, subject->sector->id, radius);
-		while (1)
-		{
-			/* Find non-empty sector. */
-			while (self->sectors.id != LISEC_SECTOR_INVALID)
-			{
-				self->sector = lieng_engine_find_sector (subject->engine, self->sectors.id);
-				lisec_iter_next (&self->sectors);
-				if (self->sector != NULL)
-					break;
-			}
-			if (self->sector == NULL)
-				return;
+	if (subject->sector == NULL)
+		return 0;
+	x = subject->sector->x;
+	y = subject->sector->y;
+	z = subject->sector->z;
+	self->subject = subject;
+	if (!lieng_object_iter_first (&self->objects, subject->engine, x, y, z, radius))
+		return 0;
 
-			/* Find observer in sector. */
-			LI_FOREACH_U32DIC (self->objects, self->sector->objects)
-			{
-				object = self->objects.value;
-				if (lisrv_object_sees (object, self->subject))
-				{
-					self->object = object;
-					lialg_u32dic_iter_next (&self->objects);
-					return;
-				}
-			}
-		}
-	}
-	else
+	/* Find first observer. */
+	while (self->objects.object != NULL)
 	{
-		self->subject = subject;
-		self->object = NULL;
-		self->sector = NULL;
+		if (lisrv_object_sees (self->objects.object, self->subject))
+		{
+			self->object = self->objects.object;
+			return 1;
+		}
+		if (!lieng_object_iter_next (&self->objects))
+			return 0;
 	}
+
+	return 0;
 }
 
-static inline void
+static inline int
 lisrv_observer_iter_next (lisrvObserverIter* self)
 {
-	liengObject* object;
-
-	/* Find next observer in current sector. */
-	while (self->objects.value != NULL)
+	/* Find next observer. */
+	while (self->objects.object != NULL)
 	{
-		object = self->objects.value;
-		if (lisrv_object_sees (object, self->subject))
+		if (!lieng_object_iter_next (&self->objects))
+			return 0;
+		if (lisrv_object_sees (self->objects.object, self->subject))
 		{
-			self->object = object;
-			lialg_u32dic_iter_next (&self->objects);
-			return;
-		}
-		lialg_u32dic_iter_next (&self->objects);
-	}
-
-	/* Find new sector and an observer in it. */
-	while (1)
-	{
-		/* Find non-empty sector. */
-		do
-		{
-			lisec_iter_next (&self->sectors);
-			if (self->sectors.id == LISEC_SECTOR_INVALID)
-			{
-				self->sector = NULL;
-				self->object = NULL;
-				return;
-			}
-			self->sector = lieng_engine_find_sector (self->subject->engine, self->sectors.id);
-		}
-		while (self->sector == NULL);
-
-		/* Find observer in sector. */
-		LI_FOREACH_U32DIC (self->objects, self->sector->objects)
-		{
-			object = self->objects.value;
-			if (lisrv_object_sees (object, self->subject))
-			{
-				self->object = object;
-				lialg_u32dic_iter_next (&self->objects);
-				return;
-			}
+			self->object = self->objects.object;
+			return 1;
 		}
 	}
+	self->object = NULL;
+
+	return 0;
 }
 
 #endif
