@@ -36,6 +36,7 @@ AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with de
 AC_ARG_ENABLE([client], AC_HELP_STRING([--disable-client], [Do not compile the client]), [want_client=no], [want_client=yes])
 AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with sound support]), [want_sound=no], [want_sound=yes])
 AC_ARG_ENABLE([server], AC_HELP_STRING([--disable-server], [Do not compile the server]), [want_server=no], [want_server=yes])
+AC_ARG_ENABLE([deps], AC_HELP_STRING([--disable-deps], [Do not compile built-in dependencies]), [want_deps=no], [want_deps=yes])
 AC_ARG_ENABLE([luatest], AC_HELP_STRING([--disable-luatest], [Do not try to detect whether Lua is available]), [want_luatest=no], [want_luatest=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
 
@@ -52,6 +53,13 @@ if test "$want_client" = yes; then
 	MAYBE_CLIENT="client"
 else
 	MAYBE_CLIENT=
+fi
+
+dnl Conditional dependency compilation.
+if test "$want_deps" = yes; then
+	MAYBE_DEP="dep"
+else
+	MAYBE_DEP=
 fi
 
 dnl Conditional graphics compilation if client or editor wanted.
@@ -136,6 +144,7 @@ fi
 dnl Export configuration.
 AC_SUBST([LIPS_CFLAGS])
 AC_SUBST([MAYBE_CLIENT])
+AC_SUBST([MAYBE_DEP])
 AC_SUBST([MAYBE_GRAPHICS])
 AC_SUBST([MAYBE_SOUND])
 AC_SUBST([MAYBE_SERVER])
@@ -148,6 +157,7 @@ AC_SUBST([TOOLDIR])
 AC_OUTPUT([
 Makefile
 data/Makefile
+dep/Makefile
 doc/Makefile
 ext/Makefile
 ext/client/Makefile
