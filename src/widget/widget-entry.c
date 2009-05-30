@@ -193,6 +193,7 @@ private_event (liwdgEntry* self,
 			{
 				case SDLK_TAB:
 				case SDLK_RETURN:
+				case SDLK_ESCAPE:
 					return 1;
 				case SDLK_BACKSPACE:
 					private_backspace (self);
