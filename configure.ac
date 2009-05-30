@@ -1,11 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT([Lips of Suna], [0.0.1], [http://lipsofsuna.org], [lipsofsuna])
+AC_INIT([Lips of Suna], [0.0.2], [http://lipsofsuna.org], [lipsofsuna])
 AC_CONFIG_AUX_DIR([msc])
 AC_CONFIG_MACRO_DIR([msc/m4])
-AM_INIT_AUTOMAKE(AC_PACKAGE_TARNAME, AC_PACKAGE_VERSION)
-AM_CONFIG_HEADER(src/config.h)
+AM_INIT_AUTOMAKE([tar-ustar])
+AM_CONFIG_HEADER([src/config.h])
 AM_MAINTAINER_MODE
 
 AC_ISC_POSIX
@@ -23,13 +23,6 @@ AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(z, deflate)
 AC_CHECK_LIB(pthread, pthread_create)
 AC_SEARCH_LIBS(socket, socket)
-PKG_CHECK_MODULES([BULLET], [bullet >= 2.71])
-
-dnl FIXME
-GRAPPLE_CFLAGS=""
-GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
-AC_SUBST([GRAPPLE_CFLAGS])
-AC_SUBST([GRAPPLE_LIBS])
 
 dnl Arguments.
 AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with debugging symbols]), [want_debug=no], [want_debug=yes])
@@ -40,7 +33,7 @@ AC_ARG_ENABLE([deps], AC_HELP_STRING([--disable-deps], [Do not compile built-in 
 AC_ARG_ENABLE([luatest], AC_HELP_STRING([--disable-luatest], [Do not try to detect whether Lua is available]), [want_luatest=no], [want_luatest=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
 
-dnl Compilation flags.
+dnl Compiler flags.
 if test "$want_debug" = yes; then
 	LIPS_CFLAGS="-g"
 else
@@ -48,75 +41,57 @@ else
 fi
 LIPS_CFLAGS="$LIPS_CFLAGS -Wall -export-dynamic -DLI_ENABLE_ERROR"
 
-dnl Conditional client compilation.
-if test "$want_client" = yes; then
-	MAYBE_CLIENT="client"
-else
-	MAYBE_CLIENT=
-fi
-
-dnl Conditional dependency compilation.
+dnl Built-in dependencies.
 if test "$want_deps" = yes; then
 	MAYBE_DEP="dep"
+	LIPS_CFLAGS="$LIPS_CFLAGS -I$PWD/dep/build/include"
+	BULLET_CFLAGS="-I$PWD/dep/build/include/bullet"
+	BULLET_LIBS="-lbulletdynamics -lbulletcollision -lbulletmath"
+	GRAPPLE_CFLAGS=""
+	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
+	LUA_CFLAGS="-I$PWD/dep/build/include/lua"
+	LUA_LIBS="-llua5.1"
 else
 	MAYBE_DEP=
-fi
-
-dnl Conditional graphics compilation if client or editor wanted.
-if test "$want_client" = yes -o "$want_editor" = yes; then
-	MAYBE_GRAPHICS="video image render font widget binding"
-
-	dnl Check for SDL.
-	AM_PATH_SDL
-	if test "x$enable_sdltest" = "xyes" ; then
-		AC_CHECK_LIB([SDL_image], [IMG_Load], [dummy=1], AC_MSG_ERROR([*** Unable to find SDL_image libary]))
-		AC_CHECK_LIB([SDL_ttf], [TTF_Init], [dummy=1], AC_MSG_ERROR([*** Unable to find SDL_ttf library]))
+	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
+	GRAPPLE_CFLAGS=""
+	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
+	if test "$want_luatest" = yes; then
+		PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [], [PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])])
 	fi
-
-	dnl Check for OpenGL.
-	OPENGL_CFLAGS="-I/usr/X11R6/include"
-	OPENGL_LIBS="-L/usr/X11R6/lib -lGL"
-	AC_SUBST([OPENGL_CFLAGS])
-	AC_SUBST([OPENGL_LIBS])
-else
-	MAYBE_GRAPHICS=
 fi
 
-dnl Conditional sound compilation.
-if test "$want_sound" = yes -a \( "$want_client" = yes -o "$want_editor" = yes \); then
-	MAYBE_SOUND="sound"
-
-	dnl Check for OpenAL.
-	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
-	AC_SUBST([OPENAL_LIBS])
-	AC_SUBST([OPENAL_CFLAGS])
-
-	dnl Check for Vorbis.
-	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
-	AC_SUBST([VORBIS_LIBS])
-	AC_SUBST([VORBIS_CFLAGS])
-else
-	MAYBE_SOUND=
-
-	OPENAL_CFLAGS="-DLI_DISABLE_SOUND"
-	AC_SUBST([OPENAL_CFLAGS])
-fi
-
-dnl Conditional server compilation.
+dnl Server support.
 if test "$want_server" = yes; then
 	MAYBE_SERVER="server"
 else
 	MAYBE_SERVER=
 fi
 
-dnl Conditional Lua check.
-if test "$want_server" = yes; then
-	if test "$want_luatest" = yes; then
-		PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [],
-		[PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])])
+dnl Client support.
+if test "$want_client" = yes; then
+	MAYBE_CLIENT="client"
+	MAYBE_GRAPHICS="video image render font widget binding"
+	AM_PATH_SDL
+	if test "x$enable_sdltest" = "xyes" ; then
+		AC_CHECK_LIB([SDL_image], [IMG_Load], [dummy=1], AC_MSG_ERROR([*** Unable to find SDL_image libary]))
+		AC_CHECK_LIB([SDL_ttf], [TTF_Init], [dummy=1], AC_MSG_ERROR([*** Unable to find SDL_ttf library]))
 	fi
-	AC_SUBST([LUA_CFLAGS])
-	AC_SUBST([LUA_LIBS])
+	OPENGL_CFLAGS="-I/usr/X11R6/include"
+	OPENGL_LIBS="-L/usr/X11R6/lib -lGL"
+else
+	MAYBE_CLIENT=
+	MAYBE_GRAPHICS=
+fi
+
+dnl Sound support.
+if test "$want_sound" = yes -a "$want_client" = yes; then
+	MAYBE_SOUND="sound"
+	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
+	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
+else
+	MAYBE_SOUND=
+	OPENAL_CFLAGS="-DLI_DISABLE_SOUND"
 fi
 
 dnl Relative paths.
@@ -143,6 +118,18 @@ fi
 
 dnl Export configuration.
 AC_SUBST([LIPS_CFLAGS])
+AC_SUBST([BULLET_CFLAGS])
+AC_SUBST([BULLET_LIBS])
+AC_SUBST([GRAPPLE_CFLAGS])
+AC_SUBST([GRAPPLE_LIBS])
+AC_SUBST([LUA_CFLAGS])
+AC_SUBST([LUA_LIBS])
+AC_SUBST([OPENAL_CFLAGS])
+AC_SUBST([OPENAL_LIBS])
+AC_SUBST([OPENGL_CFLAGS])
+AC_SUBST([OPENGL_LIBS])
+AC_SUBST([VORBIS_LIBS])
+AC_SUBST([VORBIS_CFLAGS])
 AC_SUBST([MAYBE_CLIENT])
 AC_SUBST([MAYBE_DEP])
 AC_SUBST([MAYBE_GRAPHICS])

@@ -3,6 +3,7 @@ Makefile
 *.la
 *.lo
 *.so
+*.so.*
 .deps
 .libs
 build
@@ -11,6 +12,12 @@ config.status
 libtool
 lipsofsuna.geany
 autom4te.cache
+dep/bullet/Jamconfig
+dep/bullet/Jamfile
+dep/bullet/bullet.pc
+dep/bullet/config.h
+dep/bullet/stamp-h1
+dep/libgrapple/test/unittest
 src/config.h
 src/stamp-h1
 src/main/lipsofsuna
