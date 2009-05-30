@@ -32,7 +32,7 @@
 #include "server-client.h"
 #include "server-script.h"
 
-#define LISCR_CLIENT_DEFAULT_RADIUS 100
+#define LISRV_CLIENT_DEFAULT_RADIUS 64
 
 static void
 private_callbacks_setup (lisrvClient* self,
@@ -115,7 +115,7 @@ lisrv_client_new (lisrvServer* server,
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	self->radius = LISCR_CLIENT_DEFAULT_RADIUS;
+	self->radius = LISRV_CLIENT_DEFAULT_RADIUS;
 	self->network.user = user;
 
 	/* Allocate vision. */

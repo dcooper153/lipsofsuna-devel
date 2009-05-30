@@ -276,10 +276,13 @@ private_object_create (licliModule* module,
 		return 0;
 
 	/* Create an object. */
-	object = licli_object_new (module, id, flags);
+	object = lieng_engine_find_object (module->engine, id);
 	if (object == NULL)
-		return 0;
-	lieng_object_ref (object, 1);
+	{
+		object = licli_object_new (module, id, flags);
+		if (object == NULL)
+			return 0;
+	}
 	lieng_object_set_model_code (object, graphic);
 
 	/* Set transformation. */
@@ -321,9 +324,8 @@ private_object_destroy (licliModule* module,
 	object = lieng_engine_find_object (module->engine, id);
 	if (object == NULL)
 		return 1;
-	lieng_object_set_realized (object, 0);
 	lieng_object_set_selected (object, 0);
-	lieng_object_ref (object, -1);
+	lieng_object_set_realized (object, 0);
 
 	return 1;
 }
