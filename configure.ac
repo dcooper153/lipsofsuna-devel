@@ -46,11 +46,11 @@ if test "$want_deps" = yes; then
 	MAYBE_DEP="dep"
 	LIPS_CFLAGS="$LIPS_CFLAGS -I$PWD/dep/build/include"
 	BULLET_CFLAGS="-I$PWD/dep/build/include/bullet"
-	BULLET_LIBS="-lbulletdynamics -lbulletcollision -lbulletmath"
+	BULLET_LIBS="-L$PWD/dep/build/lib -lbulletdynamics -lbulletcollision -lbulletmath"
 	GRAPPLE_CFLAGS=""
-	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
+	GRAPPLE_LIBS="-L$PWD/dep/build/lib -lgrapple -lcrypt -lpthread"
 	LUA_CFLAGS="-I$PWD/dep/build/include/lua"
-	LUA_LIBS="-llua5.1"
+	LUA_LIBS="-L$PWD/dep/build/lib -llua5.1"
 else
 	MAYBE_DEP=
 	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
