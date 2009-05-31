@@ -36,9 +36,11 @@ struct _lividFeatures
 	int ARB_pixel_buffer_object;
 	int ARB_point_sprite;
 	int ARB_shadow;
+	int ARB_texture_compression;
 	int ARB_texture_cube_map;
 	int ARB_vertex_buffer_object;
 	int EXT_framebuffer_object;
+	int EXT_texture_compression_s3tc_;
 	int EXT_texture_filter_anisotropic;
 };
 

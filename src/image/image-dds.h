@@ -452,6 +452,8 @@ liimg_dds_load_texture (FILE*     file,
                         liimgDDS* info)
 {
 	int i;
+	int type;
+	void* tmp;
 	GLuint texture;
 	liimgDDS dds;
 	liimgDDSFormat fmt;
@@ -469,27 +471,70 @@ liimg_dds_load_texture (FILE*     file,
 	glBindTexture (GL_TEXTURE_2D, texture);
 	if (!dds.header.mipmaps)
 		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-//	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, dds.header.mipmaps? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
+	if (!fmt.compressed)
 	{
-		if (!liimg_dds_read_level (&dds, file, i, &lvl))
+		/* Uncompressed format. */
+		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
 		{
-			glDeleteTextures (1, &texture);
-			return 0;
-		}
-		if (fmt.compressed)
-		{
-			glCompressedTexImage2DARB (GL_TEXTURE_2D, i, fmt.format,
-				lvl.width, lvl.height, 0, lvl.size, lvl.data);
-		}
-		else
-		{
+			if (!liimg_dds_read_level (&dds, file, i, &lvl))
+			{
+				glDeleteTextures (1, &texture);
+				return 0;
+			}
 			glTexImage2D (GL_TEXTURE_2D, i, fmt.internal, lvl.width,
 				lvl.height, 0, fmt.format, fmt.type, lvl.data);
+			free (lvl.data);
 		}
-		free (lvl.data);
+	}
+	else if (livid_features.EXT_texture_compression_s3tc_)
+	{
+		/* Hardware uncompression. */
+		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
+		{
+			if (!liimg_dds_read_level (&dds, file, i, &lvl))
+			{
+				glDeleteTextures (1, &texture);
+				return 0;
+			}
+			glCompressedTexImage2DARB (GL_TEXTURE_2D, i, fmt.format,
+				lvl.width, lvl.height, 0, lvl.size, lvl.data);
+			free (lvl.data);
+		}
+	}
+	else
+	{
+		/* Software uncompression. */
+		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
+		{
+			if (!liimg_dds_read_level (&dds, file, i, &lvl))
+			{
+				glDeleteTextures (1, &texture);
+				return 0;
+			}
+			switch (fmt.format)
+			{
+				case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: type = 1; break;
+				case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: type = 3; break;
+				case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: type = 5; break;
+				default:
+					type = 0;
+					break;
+			}
+			if (type)
+			{
+				tmp = malloc (4 * lvl.width * lvl.height);
+				if (tmp != NULL)
+				{
+					liimg_compress_uncompress (lvl.data, lvl.width, lvl.height, type, tmp);
+					glTexImage2D (GL_TEXTURE_2D, i, 4, lvl.width, lvl.height,
+						0, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
+					free (tmp);
+				}
+			}
+			free (lvl.data);
+		}
 	}
 
 	return texture;

@@ -56,12 +56,16 @@ livid_features_init ()
 		livid_features.ARB_pixel_buffer_object = 1;
 	if (livid_video_check_support ("GL_ARB_shadow"))
 		livid_features.ARB_shadow = 1;
+	if (livid_video_check_support ("GL_ARB_texture_compression"))
+		livid_features.ARB_texture_compression = 1;
 	if (livid_video_check_support ("GL_ARB_texture_cube_map"))
 		livid_features.ARB_texture_cube_map = 1;
 	if (livid_video_check_support ("GL_ARB_vertex_buffer_object"))
 		livid_features.ARB_vertex_buffer_object = 1;
 	if (livid_video_check_support ("GL_EXT_framebuffer_object"))
 		livid_features.EXT_framebuffer_object = 1;
+	if (livid_video_check_support ("GL_EXT_texture_compression_s3tc"))
+		livid_features.EXT_texture_compression_s3tc_ = 1;
 	if (livid_video_check_support ("GL_EXT_texture_filter_anisotropic"))
 	{
 		livid_features.EXT_texture_filter_anisotropic = 1;

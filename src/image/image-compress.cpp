@@ -48,7 +48,7 @@ liimg_compress_compress (const void* pixels,
 	switch (type)
 	{
 		case 1: flags = squish::kColourClusterFit | squish::kDxt1; break;
-		case 2: flags = squish::kColourClusterFit | squish::kDxt3; break;
+		case 3: flags = squish::kColourClusterFit | squish::kDxt3; break;
 		default: flags = squish::kColourClusterFit | squish::kDxt5; break;
 	}
 	squish::CompressImage ((squish::u8*) pixels, width, height, result, flags);
@@ -74,10 +74,10 @@ liimg_compress_uncompress (const void* pixels,
 	switch (type)
 	{
 		case 1: flags = squish::kColourClusterFit | squish::kDxt1; break;
-		case 2: flags = squish::kColourClusterFit | squish::kDxt3; break;
+		case 3: flags = squish::kColourClusterFit | squish::kDxt3; break;
 		default: flags = squish::kColourClusterFit | squish::kDxt5; break;
 	}
-	squish::DecompressImage ((squish::u8*) pixels, width, height, result, flags);
+	squish::DecompressImage ((squish::u8*) result, width, height, pixels, flags);
 }
 
 /**
@@ -98,7 +98,7 @@ liimg_compress_storage (int width,
 	switch (type)
 	{
 		case 1: flags = squish::kColourClusterFit | squish::kDxt1; break;
-		case 2: flags = squish::kColourClusterFit | squish::kDxt3; break;
+		case 3: flags = squish::kColourClusterFit | squish::kDxt3; break;
 		default: flags = squish::kColourClusterFit | squish::kDxt5; break;
 	}
 	return squish::GetStorageRequirements(width, height, flags);
