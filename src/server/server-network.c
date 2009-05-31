@@ -359,7 +359,8 @@ private_disconnect (lisrvNetwork*    self,
 	client = lisrv_network_find_client (self, message->USER_DISCONNECTED.id);
 	if (client == NULL)
 		return 0;
-	lisrv_client_free (client);
+	assert (client->object != NULL);
+	lisrv_object_disconnect (client->object);
 
 	return 1;
 }
