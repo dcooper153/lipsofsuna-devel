@@ -54,6 +54,9 @@ int
 lirel_reload_update (lirelReload* self);
 
 int
+lirel_reload_get_done (const lirelReload* self);
+
+int
 lirel_reload_get_enabled (const lirelReload* self);
 
 int

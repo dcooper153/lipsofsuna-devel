@@ -142,19 +142,20 @@ lirel_reload_update (lirelReload* self)
 {
 	char* name;
 
-	if (self->notify == NULL)
-		return 1;
-	if (!lisys_notify_poll (self->notify))
-		return 1;
-	if (!(self->notify->event.flags & LISYS_NOTIFY_CLOSEW))
-		return 1;
-
 	/* Terminate finished jobs. */
 	if (self->worker != NULL && lithr_async_call_get_done (self->worker))
 	{
 		lithr_async_call_free (self->worker);
 		self->worker = NULL;
 	}
+
+	/* Wait for monitor events. */
+	if (self->notify == NULL)
+		return 1;
+	if (!lisys_notify_poll (self->notify))
+		return 1;
+	if (!(self->notify->event.flags & LISYS_NOTIFY_CLOSEW))
+		return 1;
 
 	/* Reload changed models. */
 	if (lisys_path_check_ext (self->notify->event.name, "lmdl"))
@@ -206,6 +207,12 @@ lirel_reload_update (lirelReload* self)
 }
 
 int
+lirel_reload_get_done (const lirelReload* self)
+{
+	return self->worker == NULL;
+}
+
+int
 lirel_reload_get_enabled (const lirelReload* self)
 {
 	return (self->notify != NULL);
@@ -246,6 +253,14 @@ lirel_reload_set_enabled (lirelReload* self,
 	}
 
 	return 1;
+}
+
+float
+lirel_reload_get_progress (const lirelReload* self)
+{
+	if (self->worker == NULL)
+		return 1.0f;
+	return lithr_async_call_get_progress (self->worker);
 }
 
 /*****************************************************************************/

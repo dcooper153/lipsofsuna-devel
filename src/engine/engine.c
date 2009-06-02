@@ -66,12 +66,14 @@ private_scene_next_selected (lirndSceneIter* iter);
 /**
  * \brief Creates a new game engine.
  *
- * \param dir Data directory root.
+ * \param datadir Data directory root.
+ * \param moddir Module directory.
  * \param gfx Nonzero if should load graphics.
  * \return New engine or NULL.
  */
 liengEngine*
-lieng_engine_new (const char* dir,
+lieng_engine_new (const char* datadir,
+                  const char* moddir,
                   int         gfx)
 {
 	liengEngine* self;
@@ -83,8 +85,10 @@ lieng_engine_new (const char* dir,
 	self->range.size = 0xFFFFFFFF;
 	self->calls = lieng_default_calls;
 	self->config.radius = 1;
-	self->config.dir = strdup (dir);
-	if (self->config.dir == NULL)
+	self->config.datadir = strdup (datadir);
+	self->config.dir = strdup (moddir);
+	if (self->config.datadir == NULL ||
+	    self->config.dir == NULL)
 		goto error;
 
 	if (!private_init (self, gfx))
@@ -155,6 +159,8 @@ lieng_engine_free (liengEngine* self)
 		lieng_render_free (self->renderapi);
 #endif
 
+	free (self->config.datadir);
+	free (self->config.dir);
 	free (self);
 }
 

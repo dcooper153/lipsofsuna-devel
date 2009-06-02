@@ -28,6 +28,7 @@
 #define __EXT_RELOAD_H__
 
 #include <client/lips-client.h>
+#include <reload/lips-reload.h>
 #include <system/lips-system.h>
 #include <thread/lips-thread.h>
 #include <widget/lips-widget.h>
@@ -38,8 +39,7 @@ struct _liextReload
 	int queued;
 	licalHandle calls[1];
 	licliModule* module;
-	lisysNotify* notify;
-	lithrAsyncCall* worker;
+	lirelReload* reload;
 	liwdgWidget* progress;
 };
 
@@ -61,19 +61,6 @@ liext_reload_get_enabled (const liextReload* self);
 int
 liext_reload_set_enabled (liextReload* self,
                           int          value);
-
-int
-liext_reload_blender (liextReload* self,
-                      const char*  src,
-                      const char*  dst);
-
-int
-liext_reload_image (const char* src,
-                    const char* dst);
-
-int
-liext_reload_gimp (const char* src,
-                   const char* dst);
 
 #endif
 

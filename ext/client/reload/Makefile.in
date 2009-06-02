@@ -50,9 +50,9 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(extdir)"
 extLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(ext_LTLIBRARIES)
-libreload_cli_la_LIBADD =
-am_libreload_cli_la_OBJECTS = ext-blender.lo ext-gimp.lo ext-image.lo \
-	ext-module.lo ext-reload.lo ext-script.lo
+libreload_cli_la_DEPENDENCIES = ../../../src/reload/liblipsreload.la
+am_libreload_cli_la_OBJECTS = ext-module.lo ext-reload.lo \
+	ext-script.lo
 libreload_cli_la_OBJECTS = $(am_libreload_cli_la_OBJECTS)
 libreload_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -225,10 +225,8 @@ ext_LTLIBRARIES = \
 	libreload-cli.la
 
 libreload_cli_la_LDFLAGS = -module -avoid-version
+libreload_cli_la_LIBADD = ../../../src/reload/liblipsreload.la
 libreload_cli_la_SOURCES = \
-	ext-blender.c \
-	ext-gimp.c \
-	ext-image.c \
 	ext-module.c \
 	ext-module.h \
 	ext-reload.c \
@@ -304,9 +302,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-blender.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-gimp.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-reload.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-script.Plo@am__quote@

@@ -33,6 +33,7 @@
 typedef struct _livieViewer livieViewer;
 struct _livieViewer
 {
+	char* datadir;
 	char* path;
 	SDL_Surface* screen;
 	liengCamera* camera;

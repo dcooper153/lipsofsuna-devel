@@ -81,6 +81,7 @@ struct _liengEngine
 	{
 		int flags;
 		int radius;
+		char* datadir;
 		char* dir;
 	} config;
 	struct
@@ -91,7 +92,8 @@ struct _liengEngine
 };
 
 liengEngine*
-lieng_engine_new (const char* dir,
+lieng_engine_new (const char* datadir,
+                  const char* moddir,
                   int         gfx);
 
 void

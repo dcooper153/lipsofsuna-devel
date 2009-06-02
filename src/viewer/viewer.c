@@ -98,6 +98,9 @@ livie_viewer_free (livieViewer* self)
 	if (self->screen != NULL)
 		SDL_FreeSurface (self->screen);
 	SDL_Quit ();
+	free (self->path);
+	free (self->datadir);
+	free (self);
 }
 
 int
@@ -209,7 +212,7 @@ private_init_engine (livieViewer* self,
 {
 	int flags;
 
-	self->engine = lieng_engine_new (self->path, 1);
+	self->engine = lieng_engine_new (self->datadir, self->path, 1);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);
@@ -248,25 +251,20 @@ static int
 private_init_paths (livieViewer* self,
                     const char*  name)
 {
-	char* tmp;
-
 	/* Get data directory. */
 #ifdef LI_RELATIVE_PATHS
-	tmp = lisys_relative_exedir (NULL);
-	if (tmp == NULL)
-		return 0;
+	self->datadir = lisys_relative_exedir (NULL);
 #else
-	tmp = (char*) DATADIR;
+	self->datadir = strdup (DATADIR);
 #endif
+	if (self->datadir == NULL)
+		return 0;
 
 	/* Get module directory. */
 	if (!strcmp (name, "data"))
-		self->path = lisys_path_concat (tmp, name, NULL);
+		self->path = lisys_path_concat (self->datadir, name, NULL);
 	else
-		self->path = lisys_path_concat (tmp, "mods", name, NULL);
-#ifdef LI_RELATIVE_PATHS
-	free (tmp);
-#endif
+		self->path = lisys_path_concat (self->datadir, "mods", name, NULL);
 	if (self->path == NULL)
 		return 0;
 

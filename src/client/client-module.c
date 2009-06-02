@@ -793,7 +793,7 @@ private_init_engine (licliModule* self)
 	int flags;
 	liengCalls* calls;
 
-	self->engine = lieng_engine_new (self->path, 1);
+	self->engine = lieng_engine_new (self->paths->global_data, self->path, 1);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);
