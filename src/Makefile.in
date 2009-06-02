@@ -112,6 +112,7 @@ MAYBE_DEP = @MAYBE_DEP@
 MAYBE_GRAPHICS = @MAYBE_GRAPHICS@
 MAYBE_SERVER = @MAYBE_SERVER@
 MAYBE_SOUND = @MAYBE_SOUND@
+MAYBE_VIEWER = @MAYBE_VIEWER@
 MKDIR_P = @MKDIR_P@
 MODSDIR = @MODSDIR@
 NM = @NM@
@@ -204,6 +205,7 @@ SUBDIRS = \
 	$(MAYBE_GRAPHICS) \
 	$(MAYBE_SERVER) \
 	$(MAYBE_CLIENT) \
+	$(MAYBE_VIEWER) \
 	main
 
 DIST_SUBDIRS = \
@@ -212,6 +214,7 @@ DIST_SUBDIRS = \
 	video image render font widget binding \
 	server \
 	client \
+	viewer \
 	main
 
 all: config.h

@@ -184,3 +184,6 @@ private_resize (licliWindow* self,
 
 	return 1;
 }
+
+/** @} */
+/** @} */

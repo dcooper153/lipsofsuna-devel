@@ -32,10 +32,14 @@ static int
 print_help (const char* exe);
 
 static int
-client_main ();
+client_main (const char* name);
 
 static int
-server_main ();
+server_main (const char* name);
+
+static int
+viewer_main (const char* name,
+             const char* model);
 
 /*****************************************************************************/
 
@@ -44,7 +48,9 @@ main (int argc, char** argv)
 {
 	int i;
 	int dedicated = 0;
-	const char* name;
+	int viewer = 0;
+	const char* model = NULL;
+	const char* name = NULL;
 
 	/* Parse arguments. */
 	for (i = 1 ; i < argc ; i++)
@@ -55,6 +61,14 @@ main (int argc, char** argv)
 		else if (!strcmp (argv[i], "-d") ||
 		         !strcmp (argv[i], "--dedicated"))
 			dedicated = 1;
+		else if (!strcmp (argv[i], "-m") ||
+		         !strcmp (argv[i], "--model"))
+		{
+			if (i == argc - 1)
+				return print_help (argv[0]);
+			viewer = 1;
+			model = argv[++i];
+		}
 		else
 			break;
 	}
@@ -71,6 +85,8 @@ main (int argc, char** argv)
 	srand (time (NULL));
 	if (dedicated)
 		return server_main (name);
+	else if (viewer)
+		return viewer_main (name, model);
 	else
 		return client_main (name);
 }
@@ -81,8 +97,9 @@ static int
 print_help (const char* exe)
 {
 	printf ("Usage: %s [OPTION] [MODULE]\n\n", exe);
-	printf ("  -d, --dedicated  Run as a dedicated server.\n");
-	printf ("  -h, --help       Display this help and exit.\n\n");
+	printf ("  -d, --dedicated     Run as a dedicated server.\n");
+	printf ("  -h, --help          Display this help and exit.\n");
+	printf ("  -m, --model <name>  Run as a simple model viewer.\n\n");
 	return 0;
 }
 
@@ -187,6 +204,60 @@ server_main (const char* name)
 	lisrv_server_free (server);
 
 	return 0;
+}
+
+static int
+viewer_main (const char* name,
+             const char* model)
+{
+	void* viewer;
+	void (*livie_viewer_free)(void*);
+	int (*livie_viewer_main)(void*);
+	void* (*livie_viewer_new)(const char*, const char*);
+	lisysModule* module;
+
+	/* Open viewer library. */
+	module = lisys_module_new ("liblipsviewer." LISYS_EXTENSION_DLL,
+		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
+	if (module == NULL)
+	{
+		lisys_error_report ();
+		return 1;
+	}
+
+	/* Find used functions. */
+	livie_viewer_free = lisys_module_symbol (module, "livie_viewer_free");
+	livie_viewer_main = lisys_module_symbol (module, "livie_viewer_main");
+	livie_viewer_new = lisys_module_symbol (module, "livie_viewer_new");
+	if (livie_viewer_free == NULL ||
+	    livie_viewer_main == NULL ||
+	    livie_viewer_new == NULL)
+	{
+		lisys_error_set (EINVAL, "invalid viewer library");
+		lisys_error_report ();
+		lisys_module_free (module);
+		return 1;
+	}
+
+	/* Create and run the viewer. */
+	viewer = livie_viewer_new (name, model);
+	if (viewer == NULL)
+	{
+		lisys_error_report ();
+		lisys_module_free (module);
+		return 1;
+	}
+	if (!livie_viewer_main (viewer))
+	{
+		lisys_error_report ();
+		livie_viewer_free (viewer);
+		lisys_module_free (module);
+		return 0;
+	}
+	livie_viewer_free (viewer);
+	lisys_module_free (module);
+
+	return 1;
 }
 
 /** @} */

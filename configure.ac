@@ -29,6 +29,7 @@ AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with de
 AC_ARG_ENABLE([client], AC_HELP_STRING([--disable-client], [Do not compile the client]), [want_client=no], [want_client=yes])
 AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with sound support]), [want_sound=no], [want_sound=yes])
 AC_ARG_ENABLE([server], AC_HELP_STRING([--disable-server], [Do not compile the server]), [want_server=no], [want_server=yes])
+AC_ARG_ENABLE([viewer], AC_HELP_STRING([--disable-viewer], [Do not compile the model viewer]), [want_viewer=no], [want_viewer=yes])
 AC_ARG_ENABLE([deps], AC_HELP_STRING([--disable-deps], [Do not compile built-in dependencies]), [want_deps=no], [want_deps=yes])
 AC_ARG_ENABLE([luatest], AC_HELP_STRING([--disable-luatest], [Do not try to detect whether Lua is available]), [want_luatest=no], [want_luatest=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
@@ -71,6 +72,19 @@ fi
 dnl Client support.
 if test "$want_client" = yes; then
 	MAYBE_CLIENT="client"
+else
+	MAYBE_CLIENT=
+fi
+
+dnl Viewer support.
+if test "$want_viewer" = yes; then
+	MAYBE_VIEWER="viewer"
+else
+	MAYBE_VIEWER=
+fi
+
+dnl Graphics support.
+if test "$want_client" = yes -o "$want_viewer" = yes; then
 	MAYBE_GRAPHICS="video image render font widget binding"
 	AM_PATH_SDL
 	if test "x$enable_sdltest" = "xyes" ; then
@@ -80,7 +94,6 @@ if test "$want_client" = yes; then
 	OPENGL_CFLAGS="-I/usr/X11R6/include"
 	OPENGL_LIBS="-L/usr/X11R6/lib -lGL"
 else
-	MAYBE_CLIENT=
 	MAYBE_GRAPHICS=
 fi
 
@@ -135,6 +148,7 @@ AC_SUBST([MAYBE_DEP])
 AC_SUBST([MAYBE_GRAPHICS])
 AC_SUBST([MAYBE_SOUND])
 AC_SUBST([MAYBE_SERVER])
+AC_SUBST([MAYBE_VIEWER])
 AC_SUBST([EXTSDIR])
 AC_SUBST([DATADIR])
 AC_SUBST([MODSDIR])
@@ -198,5 +212,6 @@ src/sound/Makefile
 src/system/Makefile
 src/thread/Makefile
 src/video/Makefile
+src/viewer/Makefile
 src/widget/Makefile
 ])

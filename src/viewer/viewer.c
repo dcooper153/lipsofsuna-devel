@@ -1,0 +1,324 @@
+/* Lips of Suna
+ * Copyright© 2007-2009 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup livie Viewer
+ * @{
+ * \addtogroup livieViewer Viewer
+ * @{
+ */
+
+#include <sys/time.h>
+#include "viewer.h"
+
+#define ZOOM_SPEED 0.5f
+#define ROTATION_SPEED 0.01f
+
+static int
+private_init_camera (livieViewer* self);
+
+static int
+private_init_engine (livieViewer* self,
+                     const char*  name);
+
+static int
+private_init_model (livieViewer* self,
+                    const char*  model);
+
+static int
+private_init_paths (livieViewer* self,
+                    const char*  name);
+
+static int
+private_init_video (livieViewer* self);
+
+static int
+private_resize (livieViewer* self,
+                int          width,
+                int          height,
+                int          fsaa);
+
+/*****************************************************************************/
+
+livieViewer*
+livie_viewer_new (const char* name,
+                  const char* model)
+{
+	char buf[256];
+	livieViewer* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (livieViewer));
+	if (self == NULL)
+		return NULL;
+
+	/* Initialize subsystems. */
+	if (!private_init_video (self) ||
+	    !private_init_paths (self, name) ||
+	    !private_init_engine (self, name) ||
+	    !private_init_camera (self) ||
+	    !private_init_model (self, model))
+	{
+		livie_viewer_free (self);
+		return NULL;
+	}
+	snprintf (buf, 256, "%s - Lips of Suna Model Viewer", model);
+	SDL_WM_SetCaption (buf, buf);
+
+	return self;
+}
+
+void
+livie_viewer_free (livieViewer* self)
+{
+	if (self->camera != NULL)
+		lieng_camera_free (self->camera);
+	if (self->engine != NULL)
+		lieng_engine_free (self->engine);
+	if (self->screen != NULL)
+		SDL_FreeSurface (self->screen);
+	SDL_Quit ();
+}
+
+int
+livie_viewer_main (livieViewer* self)
+{
+	float secs;
+	struct timeval curr_tick;
+	struct timeval prev_tick;
+	SDL_Event event;
+	limatAabb aabb;
+	limatFrustum frustum;
+	limatMatrix modelview;
+	limatMatrix projection;
+	limatTransform transform;
+	lirndScene* scene;
+
+	/* Main loop. */
+	gettimeofday (&prev_tick, NULL);
+	while (1)
+	{
+		gettimeofday (&curr_tick, NULL);
+		secs = curr_tick.tv_sec - prev_tick.tv_sec +
+			  (curr_tick.tv_usec - prev_tick.tv_usec) * 0.000001;
+		prev_tick = curr_tick;
+
+		/* Handle events. */
+		while (SDL_PollEvent (&event))
+		{
+			switch (event.type)
+			{
+				case SDL_QUIT:
+					return 1;
+				case SDL_KEYDOWN:
+					if (event.key.keysym.sym == SDLK_s)
+					{
+						lirnd_render_set_shaders_enabled (self->engine->render,
+							!lirnd_render_get_shaders_enabled (self->engine->render));
+					}
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == 4)
+						lieng_camera_zoom (self->camera, -ZOOM_SPEED);
+					else if (event.button.button == 5)
+						lieng_camera_zoom (self->camera, ZOOM_SPEED);
+					break;
+				case SDL_MOUSEMOTION:
+					if (SDL_GetMouseState (NULL, NULL))
+					{
+						lieng_camera_turn (self->camera, ROTATION_SPEED * -event.motion.xrel);
+						lieng_camera_tilt (self->camera, ROTATION_SPEED * -event.motion.yrel);
+					}
+					break;
+				case SDL_VIDEORESIZE:
+					private_resize (self, event.resize.w, event.resize.h, self->mode.fsaa);
+					lieng_camera_set_viewport (self->camera, 0, 0, event.resize.w, event.resize.h);
+					glViewport (0, 0, event.resize.w, event.resize.h);
+					break;
+			}
+		}
+
+		/* Update camera. */
+		lieng_object_get_bounds (self->object, &aabb);
+		lieng_object_get_transform (self->object, &transform);
+		transform.position = limat_vector_add (transform.position,
+			limat_vector_multiply (limat_vector_add (aabb.min, aabb.max), 0.5f));
+		lieng_camera_set_center (self->camera, &transform);
+		lieng_camera_update (self->camera, secs);
+
+		/* Render scene. */
+		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		lieng_camera_get_frustum (self->camera, &frustum);
+		lieng_camera_get_modelview (self->camera, &modelview);
+		lieng_camera_get_projection (self->camera, &projection);
+		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
+		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
+		SDL_GL_SwapBuffers ();
+	}
+
+	return 1;
+}
+
+/*****************************************************************************/
+
+static int
+private_init_camera (livieViewer* self)
+{
+	GLint viewport[4];
+
+	self->camera = lieng_camera_new (self->engine);
+	if (self->camera == NULL)
+		return 0;
+	glGetIntegerv (GL_VIEWPORT, viewport);
+	lieng_camera_set_driver (self->camera, LIENG_CAMERA_DRIVER_THIRDPERSON);
+	lieng_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
+	lieng_camera_set_clip (self->camera, 0);
+	lieng_object_set_realized (self->camera->object, 1);
+
+	return 1;
+}
+
+static int
+private_init_engine (livieViewer* self,
+                     const char*  name)
+{
+	int flags;
+
+	self->engine = lieng_engine_new (self->path, 1);
+	if (self->engine == NULL)
+		return 0;
+	flags = lieng_engine_get_flags (self->engine);
+	lieng_engine_set_flags (self->engine, flags | LIENG_FLAG_REMOTE_SECTORS);
+	lieng_engine_set_userdata (self->engine, LIENG_DATA_CLIENT, self);
+	if (!lieng_engine_load_resources (self->engine, NULL))
+		return 0;
+
+	return 1;
+}
+
+static int
+private_init_model (livieViewer* self,
+                    const char*  model)
+{
+	liengModel* mdl;
+
+	self->object = lieng_object_new (self->engine, NULL,
+		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_STATIC, 0, NULL);
+	if (self->object == NULL)
+		return 0;
+	mdl = lieng_engine_find_model_by_name (self->engine, model);
+	if (mdl == NULL)
+	{
+		lisys_error_set (EINVAL, "Cannot find model `%s'", model);
+		return 0;
+	}
+	lieng_object_set_model (self->object, mdl);
+	lieng_object_set_realized (self->object, 1);
+
+	return 1;
+}
+
+static int
+private_init_paths (livieViewer* self,
+                    const char*  name)
+{
+	char* tmp;
+
+	/* Get data directory. */
+#ifdef LI_RELATIVE_PATHS
+	tmp = lisys_relative_exedir (NULL);
+	if (tmp == NULL)
+		return 0;
+#else
+	tmp = (char*) DATADIR;
+#endif
+
+	/* Get module directory. */
+	if (!strcmp (name, "data"))
+		self->path = lisys_path_concat (tmp, name, NULL);
+	else
+		self->path = lisys_path_concat (tmp, "mods", name, NULL);
+#ifdef LI_RELATIVE_PATHS
+	free (tmp);
+#endif
+	if (self->path == NULL)
+		return 0;
+
+	return 1;
+}
+
+static int
+private_init_video (livieViewer* self)
+{
+	SDL_Init (SDL_INIT_VIDEO);
+
+	/* Create the window. */
+	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
+	    private_resize (self, 1024, 768, 0) == 0)
+		return 0;
+	livid_features_init ();
+	livid_video_init (NULL);
+
+	return 1;
+}
+
+static int
+private_resize (livieViewer* self,
+                int          width,
+                int          height,
+                int          fsaa)
+{
+	int depth;
+
+	/* Recreate surface. */
+	for ( ; fsaa >= 0 ; fsaa--)
+	{
+		for (depth = 32 ; depth ; depth -= 8)
+		{
+			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
+			SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+			SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
+			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
+			self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
+			if (self->screen != NULL)
+				break;
+		}
+		if (self->screen != NULL)
+			break;
+	}
+	if (self->screen == NULL)
+	{
+		lisys_error_set (LI_ERROR_UNKNOWN, "cannot set video mode");
+		return 0;
+	}
+
+	/* Store mode. */
+	self->mode.width = width;
+	self->mode.height = height;
+	self->mode.fsaa = fsaa;
+	if (fsaa)
+		glEnable (GL_MULTISAMPLE_ARB);
+	else
+		glDisable (GL_MULTISAMPLE_ARB);
+
+	return 1;
+}
+
+/** @} */
+/** @} */

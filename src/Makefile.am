@@ -4,6 +4,7 @@ SUBDIRS = \
 	$(MAYBE_GRAPHICS) \
 	$(MAYBE_SERVER) \
 	$(MAYBE_CLIENT) \
+	$(MAYBE_VIEWER) \
 	main
 
 DIST_SUBDIRS = \
@@ -12,4 +13,5 @@ DIST_SUBDIRS = \
 	video image render font widget binding \
 	server \
 	client \
+	viewer \
 	main

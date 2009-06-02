@@ -792,6 +792,7 @@ SAVEDIR
 MODSDIR
 DATADIR
 EXTSDIR
+MAYBE_VIEWER
 MAYBE_SERVER
 MAYBE_SOUND
 MAYBE_GRAPHICS
@@ -943,6 +944,7 @@ enable_debug
 enable_client
 enable_sound
 enable_server
+enable_viewer
 enable_deps
 enable_luatest
 enable_relpath
@@ -1615,6 +1617,7 @@ Optional Features:
   --disable-client        Do not compile the client
   --disable-sound         Do not compile with sound support
   --disable-server        Do not compile the server
+  --disable-viewer        Do not compile the model viewer
   --disable-deps          Do not compile built-in dependencies
   --disable-luatest       Do not try to detect whether Lua is available
   --enable-relpath        Install everything under a single directory
@@ -5863,13 +5866,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5866: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5869: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5869: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5872: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5872: output\"" >&5)
+  (eval echo "\"\$as_me:5875: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7074,7 +7077,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7077 "configure"' > conftest.$ac_ext
+  echo '#line 7080 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9646,11 +9649,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9649: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9652: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9653: \$? = $ac_status" >&5
+   echo "$as_me:9656: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9985,11 +9988,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9988: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9991: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9992: \$? = $ac_status" >&5
+   echo "$as_me:9995: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10090,11 +10093,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10093: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10096: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10097: \$? = $ac_status" >&5
+   echo "$as_me:10100: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10145,11 +10148,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10148: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10151: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10152: \$? = $ac_status" >&5
+   echo "$as_me:10155: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12958,7 +12961,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12961 "configure"
+#line 12964 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13054,7 +13057,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13057 "configure"
+#line 13060 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15074,11 +15077,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15077: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15080: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15081: \$? = $ac_status" >&5
+   echo "$as_me:15084: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15173,11 +15176,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15176: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15179: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15180: \$? = $ac_status" >&5
+   echo "$as_me:15183: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15225,11 +15228,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15228: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15231: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15232: \$? = $ac_status" >&5
+   echo "$as_me:15235: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18034,6 +18037,13 @@ else
   want_server=yes
 fi
 
+# Check whether --enable-viewer was given.
+if test "${enable_viewer+set}" = set; then
+  enableval=$enable_viewer; want_viewer=no
+else
+  want_viewer=yes
+fi
+
 # Check whether --enable-deps was given.
 if test "${enable_deps+set}" = set; then
   enableval=$enable_deps; want_deps=no
@@ -18496,6 +18506,17 @@ fi
 
 if test "$want_client" = yes; then
 	MAYBE_CLIENT="client"
+else
+	MAYBE_CLIENT=
+fi
+
+if test "$want_viewer" = yes; then
+	MAYBE_VIEWER="viewer"
+else
+	MAYBE_VIEWER=
+fi
+
+if test "$want_client" = yes -o "$want_viewer" = yes; then
 	MAYBE_GRAPHICS="video image render font widget binding"
 
 # Check whether --with-sdl-prefix was given.
@@ -18961,7 +18982,6 @@ fi
 	OPENGL_CFLAGS="-I/usr/X11R6/include"
 	OPENGL_LIBS="-L/usr/X11R6/lib -lGL"
 else
-	MAYBE_CLIENT=
 	MAYBE_GRAPHICS=
 fi
 
@@ -19243,7 +19263,8 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/generator/Makefile ext/client/inventory/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skeleton/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile ext/server/voxel/Makefile src/Makefile src/ai/Makefile src/algorithm/Makefile src/archive/Makefile src/binding/Makefile src/callback/Makefile src/class/Makefile src/client/Makefile src/client/script/Makefile src/config/Makefile src/engine/Makefile src/font/Makefile src/image/Makefile src/main/Makefile src/math/Makefile src/model/Makefile src/network/Makefile src/physics/Makefile src/render/Makefile src/script/Makefile src/script/common/Makefile src/server/Makefile src/server/script/Makefile src/string/Makefile src/sound/Makefile src/system/Makefile src/thread/Makefile src/video/Makefile src/widget/Makefile"
+
+ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/generator/Makefile ext/client/inventory/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skeleton/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile ext/server/voxel/Makefile src/Makefile src/ai/Makefile src/algorithm/Makefile src/archive/Makefile src/binding/Makefile src/callback/Makefile src/class/Makefile src/client/Makefile src/client/script/Makefile src/config/Makefile src/engine/Makefile src/font/Makefile src/image/Makefile src/main/Makefile src/math/Makefile src/model/Makefile src/network/Makefile src/physics/Makefile src/render/Makefile src/script/Makefile src/script/common/Makefile src/server/Makefile src/server/script/Makefile src/string/Makefile src/sound/Makefile src/system/Makefile src/thread/Makefile src/video/Makefile src/viewer/Makefile src/widget/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20309,6 +20330,7 @@ do
     "src/system/Makefile") CONFIG_FILES="$CONFIG_FILES src/system/Makefile" ;;
     "src/thread/Makefile") CONFIG_FILES="$CONFIG_FILES src/thread/Makefile" ;;
     "src/video/Makefile") CONFIG_FILES="$CONFIG_FILES src/video/Makefile" ;;
+    "src/viewer/Makefile") CONFIG_FILES="$CONFIG_FILES src/viewer/Makefile" ;;
     "src/widget/Makefile") CONFIG_FILES="$CONFIG_FILES src/widget/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

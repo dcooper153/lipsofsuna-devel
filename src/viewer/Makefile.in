@@ -14,7 +14,6 @@
 
 @SET_MAKE@
 
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -33,8 +32,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = unittest$(EXEEXT)
-subdir = src/math
+subdir = src/viewer
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -52,13 +50,19 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-liblipsmath_la_LIBADD =
-am_liblipsmath_la_OBJECTS = math-marching-cubes.lo
-liblipsmath_la_OBJECTS = $(am_liblipsmath_la_OBJECTS)
-PROGRAMS = $(noinst_PROGRAMS)
-am_unittest_OBJECTS = unittest.$(OBJEXT)
-unittest_OBJECTS = $(am_unittest_OBJECTS)
-unittest_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+liblipsviewer_la_DEPENDENCIES = ../engine/liblipsengine.la \
+	../script/liblipsscript.la ../render/liblipsrender.la \
+	../physics/liblipsphysics.la ../callback/liblipscallback.la \
+	../config/liblipsconfig.la ../math/liblipsmath.la \
+	../model/liblipsmodel.la ../image/liblipsimage.la \
+	../video/liblipsvideo.la ../archive/liblipsarchive.la \
+	../algorithm/liblipsalgorithm.la ../string/liblipsstring.la \
+	../thread/liblipsthread.la ../system/liblipssystem.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_liblipsviewer_la_OBJECTS = viewer.lo
+liblipsviewer_la_OBJECTS = $(am_liblipsviewer_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
 am__depfiles_maybe = depfiles
@@ -71,8 +75,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(liblipsmath_la_SOURCES) $(unittest_SOURCES)
-DIST_SOURCES = $(liblipsmath_la_SOURCES) $(unittest_SOURCES)
+SOURCES = $(liblipsviewer_la_SOURCES)
+DIST_SOURCES = $(liblipsviewer_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -221,37 +225,31 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(srcdir)/..
-AM_CFLAGS = $(LIPS_CFLAGS)
+AM_CFLAGS = $(LIPS_CFLAGS) $(SDL_CFLAGS) $(OPENGL_CFLAGS) $(BULLET_CFLAGS) $(LUA_CFLAGS)
 lib_LTLIBRARIES = \
-	liblipsmath.la
+	liblipsviewer.la
 
-liblipsmath_la_SOURCES = \
-	lips-math.h \
-	math-aabb.h \
-	math-convert.h \
-	math-frustum.h  \
-	math-generic.h \
-	math-geometry.h \
-	math-halton.h \
-	math-matrix.h \
-	math-marching-cubes.c \
-	math-marching-cubes.h \
-	math-plane.h \
-	math-polygon.h \
-	math-quadratic.h \
-	math-quaternion.h \
-	math-rectangle.h \
-	math-transform.h \
-	math-triangle.h \
-	math-types.h \
-	math-vector.h \
-	math-vertex.h
+liblipsviewer_la_SOURCES = \
+	viewer.c \
+	viewer.h
 
-unittest_SOURCES = \
-	unittest.c
-
-unittest_LDADD = \
-	-L. -llipsmath
+liblipsviewer_la_LIBADD = \
+	../engine/liblipsengine.la \
+	../script/liblipsscript.la \
+	../render/liblipsrender.la \
+	../physics/liblipsphysics.la \
+	../callback/liblipscallback.la \
+	../config/liblipsconfig.la \
+	../math/liblipsmath.la \
+	../model/liblipsmodel.la \
+	../image/liblipsimage.la \
+	../video/liblipsvideo.la \
+	../archive/liblipsarchive.la \
+	../algorithm/liblipsalgorithm.la \
+	../string/liblipsstring.la \
+	../thread/liblipsthread.la \
+	../system/liblipssystem.la \
+	$(SDL_LIBS) -lSDL_image $(OPENGL_LIBS) $(BULLET_LIBS) $(LUA_LIBS)
 
 all: all-am
 
@@ -266,9 +264,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/math/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/viewer/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/math/Makefile
+	  $(AUTOMAKE) --gnu  src/viewer/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -313,18 +311,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-liblipsmath.la: $(liblipsmath_la_OBJECTS) $(liblipsmath_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(liblipsmath_la_OBJECTS) $(liblipsmath_la_LIBADD) $(LIBS)
-
-clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; for p in $$list; do \
-	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  echo " rm -f $$p $$f"; \
-	  rm -f $$p $$f ; \
-	done
-unittest$(EXEEXT): $(unittest_OBJECTS) $(unittest_DEPENDENCIES) 
-	@rm -f unittest$(EXEEXT)
-	$(LINK) $(unittest_OBJECTS) $(unittest_LDADD) $(LIBS)
+liblipsviewer.la: $(liblipsviewer_la_OBJECTS) $(liblipsviewer_la_DEPENDENCIES) 
+	$(LINK) -rpath $(libdir) $(liblipsviewer_la_OBJECTS) $(liblipsviewer_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -332,8 +320,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/math-marching-cubes.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unittest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viewer.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -437,7 +424,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
+all-am: Makefile $(LTLIBRARIES)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -469,7 +456,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
-	clean-noinstPROGRAMS mostlyclean-am
+	mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -528,15 +515,15 @@ uninstall-am: uninstall-libLTLIBRARIES
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libLTLIBRARIES clean-libtool clean-noinstPROGRAMS ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-libLTLIBRARIES install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	clean-libLTLIBRARIES clean-libtool ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-libLTLIBRARIES
