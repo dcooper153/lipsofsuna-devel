@@ -51,16 +51,17 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-liblipsviewer_la_DEPENDENCIES = ../engine/liblipsengine.la \
-	../script/liblipsscript.la ../render/liblipsrender.la \
-	../physics/liblipsphysics.la ../callback/liblipscallback.la \
-	../config/liblipsconfig.la ../math/liblipsmath.la \
-	../model/liblipsmodel.la ../image/liblipsimage.la \
-	../video/liblipsvideo.la ../archive/liblipsarchive.la \
-	../algorithm/liblipsalgorithm.la ../string/liblipsstring.la \
-	../thread/liblipsthread.la ../system/liblipssystem.la \
+liblipsviewer_la_DEPENDENCIES = ../reload/liblipsreload.la \
+	../engine/liblipsengine.la ../script/liblipsscript.la \
+	../render/liblipsrender.la ../physics/liblipsphysics.la \
+	../callback/liblipscallback.la ../config/liblipsconfig.la \
+	../math/liblipsmath.la ../model/liblipsmodel.la \
+	../image/liblipsimage.la ../video/liblipsvideo.la \
+	../archive/liblipsarchive.la ../algorithm/liblipsalgorithm.la \
+	../string/liblipsstring.la ../thread/liblipsthread.la \
+	../system/liblipssystem.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1)
 am_liblipsviewer_la_OBJECTS = viewer.lo
 liblipsviewer_la_OBJECTS = $(am_liblipsviewer_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
@@ -234,6 +235,7 @@ liblipsviewer_la_SOURCES = \
 	viewer.h
 
 liblipsviewer_la_LIBADD = \
+	../reload/liblipsreload.la \
 	../engine/liblipsengine.la \
 	../script/liblipsscript.la \
 	../render/liblipsrender.la \

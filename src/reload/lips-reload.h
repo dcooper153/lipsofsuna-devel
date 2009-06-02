@@ -15,49 +15,9 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livie Viewer
- * @{
- * \addtogroup livieViewer Viewer
- * @{
- */
+#ifndef __LIPS_RELOAD_H__
+#define __LIPS_RELOAD_H__
 
-#ifndef __VIEWER_H__
-#define __VIEWER_H__
-
-#include <SDL/SDL.h>
-#include <engine/lips-engine.h>
-#include <reload/lips-reload.h>
-#include <video/lips-video.h>
-
-typedef struct _livieViewer livieViewer;
-struct _livieViewer
-{
-	char* path;
-	SDL_Surface* screen;
-	liengCamera* camera;
-	liengEngine* engine;
-	liengObject* object;
-	lirelReload* reload;
-	struct
-	{
-		int width;
-		int height;
-		int fsaa;
-	} mode;
-};
-
-livieViewer*
-livie_viewer_new (const char* name,
-                  const char* model);
-
-void
-livie_viewer_free (livieViewer* self);
-
-int
-livie_viewer_main (livieViewer* self);
+#include "reload.h"
 
 #endif
-
-/** @} */
-/** @} */

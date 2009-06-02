@@ -9,6 +9,7 @@ liblipsviewer_la_SOURCES = \
 	viewer.h
 
 liblipsviewer_la_LIBADD = \
+	../reload/liblipsreload.la \
 	../engine/liblipsengine.la \
 	../script/liblipsscript.la \
 	../render/liblipsrender.la \

@@ -16,48 +16,40 @@
  */
 
 /**
- * \addtogroup livie Viewer
+ * \addtogroup lirel Reload
  * @{
- * \addtogroup livieViewer Viewer
+ * \addtogroup lirelImage Image
  * @{
  */
 
-#ifndef __VIEWER_H__
-#define __VIEWER_H__
+#include <stdio.h>
+#include <image/lips-image.h>
 
-#include <SDL/SDL.h>
-#include <engine/lips-engine.h>
-#include <reload/lips-reload.h>
-#include <video/lips-video.h>
-
-typedef struct _livieViewer livieViewer;
-struct _livieViewer
-{
-	char* path;
-	SDL_Surface* screen;
-	liengCamera* camera;
-	liengEngine* engine;
-	liengObject* object;
-	lirelReload* reload;
-	struct
-	{
-		int width;
-		int height;
-		int fsaa;
-	} mode;
-};
-
-livieViewer*
-livie_viewer_new (const char* name,
-                  const char* model);
-
-void
-livie_viewer_free (livieViewer* self);
-
+/**
+ * \brief Converts an image file to DDS.
+ *
+ * \param src Source file.
+ * \param dst Destination file of type DDS.
+ * \return Nonzero of success.
+ */
 int
-livie_viewer_main (livieViewer* self);
+lirel_reload_image (const char* src,
+                    const char* dst)
+{
+	liimgImage* image;
 
-#endif
+	image = liimg_image_new_from_file (src);
+	if (image == NULL)
+		return 0;
+	if (!liimg_image_save_s3tc (image, dst) &&
+	    !liimg_image_save_rgba (image, dst))
+	{
+		printf ("FAILED TO SAVE S3TC %s\n", dst);
+	}
+	liimg_image_free (image);
+
+	return 1;
+}
 
 /** @} */
 /** @} */

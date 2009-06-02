@@ -202,6 +202,7 @@ src/math/Makefile
 src/model/Makefile
 src/network/Makefile
 src/physics/Makefile
+src/reload/Makefile
 src/render/Makefile
 src/script/Makefile
 src/script/common/Makefile

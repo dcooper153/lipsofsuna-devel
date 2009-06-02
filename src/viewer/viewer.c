@@ -44,6 +44,9 @@ private_init_paths (livieViewer* self,
                     const char*  name);
 
 static int
+private_init_reload (livieViewer* self);
+
+static int
 private_init_video (livieViewer* self);
 
 static int
@@ -70,6 +73,7 @@ livie_viewer_new (const char* name,
 	if (!private_init_video (self) ||
 	    !private_init_paths (self, name) ||
 	    !private_init_engine (self, name) ||
+		!private_init_reload (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_model (self, model))
 	{
@@ -85,6 +89,8 @@ livie_viewer_new (const char* name,
 void
 livie_viewer_free (livieViewer* self)
 {
+	if (self->reload != NULL)
+		lirel_reload_free (self->reload);
 	if (self->camera != NULL)
 		lieng_camera_free (self->camera);
 	if (self->engine != NULL)
@@ -152,6 +158,9 @@ livie_viewer_main (livieViewer* self)
 			}
 		}
 
+		/* Update resources. */
+		lirel_reload_update (self->reload);
+
 		/* Update camera. */
 		lieng_object_get_bounds (self->object, &aabb);
 		lieng_object_get_transform (self->object, &transform);
@@ -159,6 +168,7 @@ livie_viewer_main (livieViewer* self)
 			limat_vector_multiply (limat_vector_add (aabb.min, aabb.max), 0.5f));
 		lieng_camera_set_center (self->camera, &transform);
 		lieng_camera_update (self->camera, secs);
+		lieng_camera_warp (self->camera);
 
 		/* Render scene. */
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
@@ -225,7 +235,8 @@ private_init_model (livieViewer* self,
 	if (mdl == NULL)
 	{
 		lisys_error_set (EINVAL, "Cannot find model `%s'", model);
-		return 0;
+		lisys_error_report ();
+		return 1;
 	}
 	lieng_object_set_model (self->object, mdl);
 	lieng_object_set_realized (self->object, 1);
@@ -258,6 +269,18 @@ private_init_paths (livieViewer* self,
 #endif
 	if (self->path == NULL)
 		return 0;
+
+	return 1;
+}
+
+static int
+private_init_reload (livieViewer* self)
+{
+	self->reload = lirel_reload_new (self->engine);
+	if (self->reload == NULL)
+		return 0;
+	lirel_reload_set_enabled (self->reload, 1);
+	lirel_reload_run (self->reload);
 
 	return 1;
 }
