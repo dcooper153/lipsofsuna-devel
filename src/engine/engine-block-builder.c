@@ -59,6 +59,7 @@ private_insert_materials (liengBlockBuilder* self);
 
 static int
 private_insert_vertices (liengBlockBuilder* self,
+                         int                material,
                          limatVector*       blockoff,
                          limatVector*       tileoff,
                          limdlVertex*       vertices,
@@ -209,6 +210,7 @@ private_build_full (liengBlockBuilder* self,
 	int tx;
 	int ty;
 	int tz;
+	int mat;
 	liengTile tile;
 	liengTile mask[6];
 	limatAabb aabb;
@@ -242,9 +244,10 @@ private_build_full (liengBlockBuilder* self,
 		c = lieng_voxel_triangulate (tile, mask, vertices);
 		if (c)
 		{
+			mat = lieng_voxel_get_type (tile) - 1;
 			tileoff = limat_vector_init (tx, ty, tz);
 			tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
-			if (!private_insert_vertices (self, &blockoff, &tileoff, vertices, c))
+			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, vertices, c))
 				return 0;
 		}
 	}
@@ -275,6 +278,7 @@ private_build_tiles (liengBlockBuilder* self,
 	int tx;
 	int ty;
 	int tz;
+	int mat;
 	liengTile tile;
 	liengTile mask[6];
 	limatVector blockoff;
@@ -307,9 +311,10 @@ private_build_tiles (liengBlockBuilder* self,
 		c = lieng_voxel_triangulate (tile, mask, vertices);
 		if (c)
 		{
+			mat = lieng_voxel_get_type (tile) - 1;
 			tileoff = limat_vector_init (tx, ty, tz);
 			tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
-			if (!private_insert_vertices (self, &blockoff, &tileoff, vertices, c))
+			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, vertices, c))
 				return 0;
 		}
 	}
@@ -386,7 +391,42 @@ private_insert_materials (liengBlockBuilder* self)
 	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
 	material.textures.textures[0].width = 256;
 	material.textures.textures[0].height = 256;
+	material.textures.textures[0].string = "stone-000";
+	if (!limdl_model_insert_material (self->helpers.model, &material))
+		return 0;
+	memset (&material, 0, sizeof (limdlMaterial));
+	material.flags = LIMDL_MATERIAL_FLAG_CULLFACE;
+	material.shininess = 1.0f;
+	material.diffuse[0] = 1.0f;
+	material.diffuse[1] = 1.0f;
+	material.diffuse[2] = 1.0f;
+	material.diffuse[3] = 1.0f;
+	material.specular[0] = 0.0f;
+	material.specular[1] = 0.0f;
+	material.specular[2] = 0.0f;
+	material.specular[3] = 0.0f;
+	material.shader = "default";
+	material.textures.count = 1;
+	material.textures.textures = &texture;
+	material.textures.textures[0].type = LIMDL_TEXTURE_TYPE_IMAGE;
+	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
+	material.textures.textures[0].width = 256;
+	material.textures.textures[0].height = 256;
 	material.textures.textures[0].string = "grass-000";
+	if (!limdl_model_insert_material (self->helpers.model, &material))
+		return 0;
+	memset (&material, 0, sizeof (limdlMaterial));
+	material.flags = LIMDL_MATERIAL_FLAG_CULLFACE;
+	material.shininess = 1.0f;
+	material.diffuse[0] = 1.0f;
+	material.diffuse[1] = 1.0f;
+	material.diffuse[2] = 1.0f;
+	material.diffuse[3] = 1.0f;
+	material.specular[0] = 0.0f;
+	material.specular[1] = 0.0f;
+	material.specular[2] = 0.0f;
+	material.specular[3] = 0.0f;
+	material.shader = "lava";
 	if (!limdl_model_insert_material (self->helpers.model, &material))
 		return 0;
 
@@ -398,6 +438,7 @@ private_insert_materials (liengBlockBuilder* self)
 
 static int
 private_insert_vertices (liengBlockBuilder* self,
+                         int                material,
                          limatVector*       blockoff,
                          limatVector*       tileoff,
                          limdlVertex*       vertices,
@@ -434,9 +475,8 @@ private_insert_vertices (liengBlockBuilder* self,
 		for (i = 0 ; i < count ; i += 3)
 		{
 			/* Insert model triangle. */
-			/* FIXME: Bad material. */
-			private_calculate_texcoords (self, 0, vertices + i);
-			limdl_model_insert_triangle (self->helpers.model, 0, vertices + i, NULL);
+			private_calculate_texcoords (self, material, vertices + i);
+			limdl_model_insert_triangle (self->helpers.model, material, vertices + i, NULL);
 
 			/* Create normal lookup. */
 			normal = vertices[i].normal;

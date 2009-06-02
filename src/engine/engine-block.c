@@ -180,6 +180,7 @@ lieng_block_fill_sphere (liengBlock*        self,
 	int x;
 	int y;
 	int z;
+	int found;
 	int ret = 0;
 	liengTile tile;
 	limatVector dist;
@@ -224,6 +225,7 @@ lieng_block_fill_sphere (liengBlock*        self,
 		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
 		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
 		{
+			found = 0;
 			tile = lieng_block_get_voxel (self, x, y, z) & 0xFF00;
 			tile |= terrain;
 			for (i = 0 ; i < 8 ; i++)
@@ -233,10 +235,16 @@ lieng_block_fill_sphere (liengBlock*        self,
 					(y + corner_offsets[i].y) * LIENG_TILE_WIDTH,
 					(z + corner_offsets[i].z) * LIENG_TILE_WIDTH));
 				if (limat_vector_dot (dist, dist) <= radius * radius)
+				{
 					tile |= (1 << (i + 8));
+					found = 1;
+				}
 			}
-			tile = lieng_voxel_validate (tile);
-			ret |= lieng_block_set_voxel (self, x, y, z, tile);
+			if (found)
+			{
+				tile = lieng_voxel_validate (tile);
+				ret |= lieng_block_set_voxel (self, x, y, z, tile);
+			}
 		}
 	}
 
