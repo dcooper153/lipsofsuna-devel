@@ -497,71 +497,12 @@ licli_module_pick (licliModule*    self,
 	lieng_camera_get_frustum (self->camera, &frustum);
 	lieng_camera_get_modelview (self->camera, &modelview);
 	lieng_camera_get_projection (self->camera, &projection);
-	scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
+	scene = lieng_engine_get_scene (self->engine);
 	ret = lirnd_render_pick (self->engine->render,
 		scene, &modelview, &projection, &frustum,
 		x, self->window->mode.height - y, 5, result);
 
 	return ret;
-}
-
-/* FIXME */
-static void
-private_render_terrain (licliModule* self)
-{
-	int xb;
-	int yb;
-	int zb;
-	lialgU32dicIter iter;
-	liengBlock* block;
-	liengSector* sector;
-	limatAabb block_aabb;
-	limatAabb sector_aabb;
-	limatFrustum frustum;
-	limatMatrix modelview;
-	limatMatrix projection;
-	lirndContext context;
-
-	lieng_camera_get_frustum (self->camera, &frustum);
-	lieng_camera_get_modelview (self->camera, &modelview);
-	lieng_camera_get_projection (self->camera, &projection);
-	lirnd_context_init (&context, self->engine->render);
-	lirnd_context_set_modelview (&context, &modelview);
-	lirnd_context_set_projection (&context, &projection);
-	lirnd_context_set_frustum (&context, &frustum);
-	glEnable (GL_TEXTURE_2D);
-
-	LI_FOREACH_U32DIC (iter, self->engine->sectors)
-	{
-		sector = iter.value;
-		lieng_sector_get_bounds (sector, &sector_aabb);
-		if (limat_frustum_cull_aabb (&frustum, &sector_aabb))
-			continue;
-		for (zb = 0 ; zb < LIENG_BLOCKS_PER_LINE ; zb++)
-		{
-			for (yb = 0 ; yb < LIENG_BLOCKS_PER_LINE ; yb++)
-			{
-				for (xb = 0 ; xb < LIENG_BLOCKS_PER_LINE ; xb++)
-				{
-					block = sector->blocks + LIENG_BLOCK_INDEX (xb, yb, zb);
-					if (block->render == NULL)
-						continue;
-					block_aabb = sector_aabb;
-					block_aabb.min.x = sector_aabb.min.x + LIENG_BLOCK_WIDTH * xb;
-					block_aabb.min.y = sector_aabb.min.y + LIENG_BLOCK_WIDTH * yb;
-					block_aabb.min.z = sector_aabb.min.z + LIENG_BLOCK_WIDTH * zb;
-					block_aabb.max.x = block_aabb.min.x + LIENG_BLOCK_WIDTH;
-					block_aabb.max.y = block_aabb.min.y + LIENG_BLOCK_WIDTH;
-					block_aabb.max.z = block_aabb.min.z + LIENG_BLOCK_WIDTH;
-					if (!limat_frustum_cull_aabb (&frustum, &block_aabb))
-						lirnd_draw_opaque (&context, block->render, NULL);
-				}
-			}
-		}
-	}
-
-	if (self->engine->render->shader.enabled)
-		glUseProgramObjectARB (0);
 }
 
 /**
@@ -577,12 +518,12 @@ licli_module_render (licliModule* self)
 	int w;
 	int h;
 	int active;
+	liengSelectionIter iter;
 	limatFrustum frustum;
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndContext context;
 	lirndScene* scene;
-	lirndSceneIter iter;
 
 	/* Render scene. */
 	active = (self->network != NULL);
@@ -593,11 +534,8 @@ licli_module_render (licliModule* self)
 		lieng_camera_get_frustum (self->camera, &frustum);
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
-		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
+		scene = lieng_engine_get_scene (self->engine);
 		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
-
-		/* FIXME! */
-		private_render_terrain (self);
 	}
 	glDisable (GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
@@ -608,12 +546,14 @@ licli_module_render (licliModule* self)
 	lirnd_context_init (&context, self->engine->render);
 	if (active)
 	{
-		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_SELECTION);
 		lirnd_context_set_modelview (&context, &modelview);
 		lirnd_context_set_projection (&context, &projection);
 		lirnd_context_set_frustum (&context, &frustum);
-		LIRND_FOREACH_SCENE (iter, scene)
-			lirnd_draw_bounds (&context, iter.value, NULL);
+		LIENG_FOREACH_SELECTION (iter, self->engine)
+		{
+			if (iter.object->render != NULL)
+				lirnd_draw_bounds (&context, iter.object->render, NULL);
+		}
 	}
 	lirnd_context_unbind (&context);
 

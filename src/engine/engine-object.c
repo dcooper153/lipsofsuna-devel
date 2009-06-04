@@ -914,7 +914,7 @@ private_callback_update (liengObject* self,
 {
 #ifndef LIENG_DISABLE_GRAPHICS
 	if (self->engine->renderapi != NULL)
-		self->engine->renderapi->lirnd_object_update (self->render, self->engine->scene_normal, secs);
+		self->engine->renderapi->lirnd_object_update (self->render, self->engine->scene, secs);
 #endif
 }
 

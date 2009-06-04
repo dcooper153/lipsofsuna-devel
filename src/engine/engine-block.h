@@ -108,6 +108,9 @@ int
 lieng_block_write (liengBlock*  self,
                    liarcWriter* writer);
 
+int
+lieng_block_get_empty (liengBlock* self);
+
 liengTile
 lieng_block_get_voxel (liengBlock* self,
                        uint8_t     x,

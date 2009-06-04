@@ -179,9 +179,10 @@ livie_viewer_main (livieViewer* self)
 		lieng_camera_get_frustum (self->camera, &frustum);
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
-		scene = lieng_engine_get_scene (self->engine, LIENG_SCENE_NORMAL);
+		scene = lieng_engine_get_scene (self->engine);
 		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
 		SDL_GL_SwapBuffers ();
+		SDL_Delay (100);
 	}
 
 	return 1;

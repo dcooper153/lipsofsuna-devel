@@ -352,6 +352,18 @@ lieng_block_write (liengBlock*  self,
 }
 
 /**
+ * \brief Checks if the block is empty.
+ *
+ * \param self Block.
+ * \return Boolean.
+ */
+int
+lieng_block_get_empty (liengBlock* self)
+{
+	return self->physics != NULL;
+}
+
+/**
  * \brief Gets the terrain type of a voxel.
  *
  * \param self Block.

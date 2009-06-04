@@ -33,13 +33,6 @@ enum
 	LIENG_DATA_MAX
 };
 
-typedef int liengSceneType;
-enum
-{
-	LIENG_SCENE_NORMAL,
-	LIENG_SCENE_SELECTION
-};
-
 enum
 {
 	LIENG_FLAG_REMOTE_SECTORS = 0x01

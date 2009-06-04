@@ -74,8 +74,7 @@ struct _liengEngine
 #ifndef LIENG_DISABLE_GRAPHICS
 	liengRender* renderapi;
 	lirndRender* render;
-	lirndScene* scene_normal;
-	lirndScene* scene_selection;
+	lirndScene* scene;
 #endif
 	struct
 	{
@@ -206,8 +205,7 @@ lieng_engine_set_local_range (liengEngine* self,
                               uint32_t     end);
 
 void*
-lieng_engine_get_scene (liengEngine*   self,
-                        liengSceneType type);
+lieng_engine_get_scene (liengEngine* self);
 
 void*
 lieng_engine_get_userdata (liengEngine* self,

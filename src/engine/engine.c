@@ -47,18 +47,8 @@ private_physics_transform (liphyObject* object);
 
 #ifndef LIENG_DISABLE_GRAPHICS
 static int
-private_scene_begin_realized (lirndSceneIter* iter,
-                              lirndScene*     scene);
-
-static int
-private_scene_begin_selected (lirndSceneIter* iter,
-                              lirndScene*     scene);
-
-static int
-private_scene_next_realized (lirndSceneIter* iter);
-
-static int
-private_scene_next_selected (lirndSceneIter* iter);
+private_scene_begin (liengSceneIter* iter,
+                     lirndScene*     scene);
 #endif
 
 /*****************************************************************************/
@@ -850,20 +840,10 @@ lieng_engine_set_local_range (liengEngine* self,
 }
 
 void*
-lieng_engine_get_scene (liengEngine*   self,
-                        liengSceneType type)
+lieng_engine_get_scene (liengEngine* self)
 {
 #ifndef LIENG_DISABLE_GRAPHICS
-	switch (type)
-	{
-		case LIENG_SCENE_NORMAL:
-			return self->scene_normal;
-		case LIENG_SCENE_SELECTION:
-			return self->scene_selection;
-		default:
-			assert (0);
-			return NULL;
-	}
+	return self->scene;
 #else
 	return NULL;
 #endif
@@ -933,18 +913,12 @@ private_init (liengEngine* self,
 		if (self->renderapi == NULL)
 			return 0;
 		self->render = self->renderapi->render;
-		self->scene_normal = calloc (1, sizeof (lirndScene));
-		if (self->scene_normal == NULL)
+		self->scene = calloc (1, sizeof (lirndScene));
+		if (self->scene == NULL)
 			return 0;
-		self->scene_normal->data = self;
-		self->scene_normal->begin = private_scene_begin_realized;
-		self->scene_normal->next = private_scene_next_realized;
-		self->scene_selection = calloc (1, sizeof (lirndScene));
-		if (self->scene_selection == NULL)
-			return 0;
-		self->scene_selection->data = self;
-		self->scene_selection->begin = private_scene_begin_selected;
-		self->scene_selection->next = private_scene_next_selected;
+		self->scene->data = self;
+		self->scene->begin = (void*) private_scene_begin;
+		self->scene->next = (void*) lieng_scene_iter_next;
 	}
 #endif
 
@@ -1031,89 +1005,11 @@ private_physics_transform (liphyObject* object)
 
 #ifndef LIENG_DISABLE_GRAPHICS
 static int
-private_scene_begin_realized (lirndSceneIter* iter,
-                              lirndScene*     scene)
+private_scene_begin (liengSceneIter* iter,
+                     lirndScene*     scene)
 {
-	lialgU32dicIter* u32i = (lialgU32dicIter*) iter->data;
-	liengEngine* self = scene->data;
-	liengObject* object;
-
-	iter->scene = scene;
-
-	/* Find first realized object. */
-	for (lialg_u32dic_iter_start (u32i, self->objects) ; u32i->value != NULL ;
-	     lialg_u32dic_iter_next (u32i))
-	{
-		if (lieng_object_get_realized (u32i->value))
-		{
-			object = u32i->value;
-			iter->value = object->render;
-			return 1;
-		}
-	}
-	iter->value = NULL;
-
-	return 0;
-}
-
-static int
-private_scene_begin_selected (lirndSceneIter* iter,
-                              lirndScene*     scene)
-{
-	lialgPtrdicIter* ptri = (lialgPtrdicIter*) iter->data;
-	liengEngine* self = scene->data;
-	liengSelection* selection;
-
-	iter->scene = scene;
-	lialg_ptrdic_iter_start (ptri, self->selection);
-
-	selection = ptri->value;
-	if (selection != NULL)
-		iter->value = selection->object->render;
-	else
-		iter->value = NULL;
-
-	return 1;
-}
-
-static int
-private_scene_next_realized (lirndSceneIter* iter)
-{
-	lialgU32dicIter* u32i = (lialgU32dicIter*) iter->data;
-	liengObject* object;
-
-	/* Find next realized object. */
-	for (lialg_u32dic_iter_next (u32i) ; u32i->value != NULL ;
-	     lialg_u32dic_iter_next (u32i))
-	{
-		if (lieng_object_get_realized (u32i->value))
-		{
-			object = u32i->value;
-			iter->value = object->render;
-			return 1;
-		}
-	}
-	iter->value = NULL;
-
-	return 0;
-}
-
-static int
-private_scene_next_selected (lirndSceneIter* iter)
-{
-	int ret;
-	lialgPtrdicIter* ptri = (lialgPtrdicIter*) iter->data;
-	liengSelection* selection;
-
-	ret = lialg_ptrdic_iter_next (ptri);
-
-	selection = ptri->value;
-	if (selection != NULL)
-		iter->value = selection->object->render;
-	else
-		iter->value = NULL;
-
-	return ret;
+	return lieng_scene_iter_first (iter, scene->data,
+		lieng_block_get_empty, lieng_object_get_realized);
 }
 #endif
 
