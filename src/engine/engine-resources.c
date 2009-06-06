@@ -342,8 +342,8 @@ lieng_resources_load_from_dir (liengResources* self,
 		sizeof (liengAnimation), private_compare_animations);
 	qsort (self->models.array, self->models.count,
 		sizeof (liengModel*), private_compare_models);
-	qsort (self->models.array, self->samples.count,
-		sizeof (liengSample*), private_compare_samples);
+	qsort (self->samples.array, self->samples.count,
+		sizeof (liengSample), private_compare_samples);
 	for (i = 0 ; i < self->animations.count ; i++)
 		self->animations.array[i].id = i;
 	for (i = 0 ; i < self->models.count ; i++)
