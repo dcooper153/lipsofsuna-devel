@@ -210,61 +210,19 @@ def VertexCoord(object, mesh, face, index):
 	coord = face.v[index].co.copy().resize4D() * matrix
 	return coord
 
-def VertexNormal(object, mesh, face, index):
+def VertexNormal(object, mesh, face, index, conn):
 	global lips_correction_matrix
 	matrix = object.matrix * lips_correction_matrix
 	matrix = matrix.rotationPart()
-
-	# Use face normal for solid faces.
 	if not face.smooth:
 		normal = face.no * matrix
 		normal.normalize()
 		return normal
-
-	# Use vertex normal if no edge split.
-	# TODO: Could be cached.
-	found = 0
-	for mod in object.modifiers:
-		if mod.type == Blender.Modifier.Types.EDGESPLIT:
-			found = 1
-			break
-	if not found:
+	if not conn.edgesplit:
 		normal = face.v[index].no * matrix
 		normal.normalize()
 		return normal
-
-	# Find smooth edges.
-	split = 0
-	edges = []
-	vertex = face.v[index].index
-	for key in face.edge_keys:
-		if vertex in key:
-			edge = mesh.edges[mesh.findEdges([key])]
-			if edge.flag & Blender.Mesh.EdgeFlags.SHARP:
-				split = 1
-			else:
-				edges.append(edge)
-
-	# Use vertex normal if all edges were smooth.
-	if not split:
-		normal = face.v[index].no * matrix
-		normal.normalize()
-		return normal
-
-	# Use face normal if all edges were sharp.
-	if len(edges) == 0:
-		normal = face.no * matrix
-		normal.normalize()
-		return normal
-
-	# Manually calculate smooth normal.
-	# FIXME: This doesn't seem to work correctly.
-	normal = Vector(0.0, 0.0, 0.0)
-	for f in mesh.faces:
-		for edge in edges:
-			if edge.key in f.edge_keys:
-				normal = normal + f.no * matrix
-				break
+	normal = conn.CalculateNormal(face.index, face.v[index].index) * matrix
 	normal.normalize()
 	return normal
 
@@ -470,6 +428,128 @@ class LipsCurve:
 #############################################################################
 # Mesh.
 
+class LipsConnectivity:
+
+	# \brief Creates face connectivity data for the mesh.
+	#
+	# \param self Connectivity.
+	# \param object Blender object.
+	# \param mesh Blender mesh data.
+	def __init__(self, object, mesh):
+		self.mesh = mesh
+		self.edgesplit = 0
+		for mod in object.modifiers:
+			if mod.type == Blender.Modifier.Types.EDGESPLIT:
+				self.edgesplit = 1
+				break
+		if self.edgesplit:
+			self.vertexfaces = []
+			for vert in mesh.verts:
+				self.vertexfaces.append([])
+			for face in mesh.faces:
+				for vert in face.verts:
+					if face.index not in self.vertexfaces[vert.index]:
+						self.vertexfaces[vert.index].append(face.index)
+
+	# \brief Recalculates the normal for a face vertex.
+	#
+	# Calculates a face vertex normal using sharp edge information
+	# in a manner similar to how the EdgeSplit modifier works.
+	#
+	# \param self Connectivity.
+	# \param faceidx Face index.
+	# \param vertidx Vertex index.
+	# \return Vector.
+	def CalculateNormal(self, faceidx, vertidx):
+
+		# Initialize face loop.
+		normal = self.mesh.faces[faceidx].no
+		edgeidx, sharp = self.FindFirstEdge(faceidx, vertidx)
+		visited = [edgeidx]
+
+		# Loop faces backward.
+		if not sharp:
+			tmpe, tmpf = edgeidx, faceidx
+			faceidx = self.FindOtherFace(faceidx, edgeidx, vertidx)
+			if faceidx != -1:
+				while faceidx != tmpf:
+					normal = normal + self.mesh.faces[faceidx].no
+					edgeidx, sharp = self.FindOtherEdge(faceidx, edgeidx, vertidx)
+					if sharp or edgeidx in visited:
+						break
+					visited.append(edgeidx)
+					faceidx = self.FindOtherFace(faceidx, edgeidx, vertidx)
+					if faceidx == -1:
+						break
+			edgeidx, faceidx = tmpe, tmpf
+
+		# Loop faces forward.
+		while 1:
+			edgeidx, sharp = self.FindOtherEdge(faceidx, edgeidx, vertidx)
+			if sharp or edgeidx in visited:
+				break
+			visited.append(edgeidx)
+			faceidx = self.FindOtherFace(faceidx, edgeidx, vertidx)
+			if faceidx == -1:
+				break
+			normal = normal + self.mesh.faces[faceidx].no
+
+		# Return average normal.
+		normal.normalize()
+		return normal
+
+	# \brief Favoring sharp edges, finds an edge in the face that contains the vertex.
+	#
+	# \param faceidx Face index.
+	# \param vertidx Vertex index.
+	# \return Edge index, sharp flag.
+	def FindFirstEdge(self, faceidx, vertidx):
+		for edgekey in self.mesh.faces[faceidx].edge_keys:
+			edge = self.mesh.edges[self.mesh.findEdges([edgekey])]
+			if vertidx in edge.key:
+				if edge.flag & Blender.Mesh.EdgeFlags.SHARP:
+					return edge.index, 1
+		for edgekey in self.mesh.faces[faceidx].edge_keys:
+			edge = self.mesh.edges[self.mesh.findEdges([edgekey])]
+			if vertidx in edge.key:
+				return edge.index, 0
+		return -1, 1
+
+	# \brief Finds the second edge in the face that contains the vertex.
+	#
+	# \param self Connectivity.
+	# \param faceidx Face index.
+	# \param edgeidx Edge index.
+	# \param vertidx Vertex index.
+	# \return Edge index, sharp flag.
+	def FindOtherEdge(self, faceidx, edgeidx, vertidx):
+		for edgekey in self.mesh.faces[faceidx].edge_keys:
+			edge = self.mesh.edges[self.mesh.findEdges([edgekey])]
+			if edge.index != edgeidx:
+				if vertidx in edgekey:
+					if edge.flag & Blender.Mesh.EdgeFlags.SHARP:
+						return edge.index, 1
+					else:
+						return edge.index, 0
+		return -1, 1
+
+	# Finds the second face in the mesh that contains the edge and the vertex.
+	#
+	# \param self Connectivity.
+	# \param faceidx Face index.
+	# \param edgeidx Edge index.
+	# \param vertidx Vertex index.
+	# \return Face index.
+	def FindOtherFace(self, faceidx, edgeidx, vertidx):
+		for face in self.vertexfaces[vertidx]:
+			if face != faceidx:
+				for edgekey in self.mesh.faces[face].edge_keys:
+					edge = self.mesh.edges[self.mesh.findEdges([edgekey])]
+					if edge.index == edgeidx:
+						return face
+		return -1
+
+
 class LipsFaceGroup:
 
 	def __init__(self, shader, textures):
@@ -552,7 +632,8 @@ class LipsMesh:
 	# \param object Blender mesh object.
 	# \param mesh Blender mesh data. 
 	# \param face Blender mesh face.
-	def AppendFace(self, object, mesh, face):
+	# \param conn Face connectivity data for the mesh.
+	def AppendFace(self, object, mesh, face, conn):
 
 		v = []
 		flags = lips_exporter_calls["FaceFlags"](object, mesh, face)
@@ -563,7 +644,7 @@ class LipsMesh:
 		specular = lips_exporter_calls["FaceSpecular"](object, mesh, face)
 		for i in range(len(face.v)):
 			co = lips_exporter_calls["VertexCoord"](object, mesh, face, i)
-			no = lips_exporter_calls["VertexNormal"](object, mesh, face, i)
+			no = lips_exporter_calls["VertexNormal"](object, mesh, face, i, conn)
 			te = lips_exporter_calls["VertexTexcoords"](object, mesh, face, i)
 			we = lips_exporter_calls["VertexWeights"](object, mesh, face, i, self.weightgroupnamelist)
 			v.append(LipsVertex(co, no, te, we))
@@ -594,6 +675,7 @@ class LipsMesh:
 	# \param mesh Blender mesh object. 
 	def AppendMesh(self, mesh):
 		mdata = mesh.getData(0, 1)
+		conn = LipsConnectivity(mesh, mdata)
 
 		# Append weight group names.
 		for name in mdata.getVertGroupNames():
@@ -602,7 +684,7 @@ class LipsMesh:
 
 		# Append face vertices.
 		for face in mdata.faces:
-			self.AppendFace(mesh, mdata, face)
+			self.AppendFace(mesh, mdata, face, conn)
 
 	def Compile(self, armature):
 
