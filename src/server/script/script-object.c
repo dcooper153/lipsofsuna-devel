@@ -46,7 +46,7 @@
  * -- @param channel Animation channel or nil for any channel.
  * -- @param priority Animation priority.
  * -- @param permanent Boolean indicating whether the animation is permanent or temporary.
- * function Object.animate(self, name, channel, permanent)
+ * function Object.animate(self, name, channel, priority, permanent)
  */
 static int
 Object_animate (lua_State* lua)
@@ -63,7 +63,7 @@ Object_animate (lua_State* lua)
 	if (!lua_isnoneornil (lua, 3))
 	{
 		channel = luaL_checkinteger (lua, 3);
-		luaL_argcheck (lua, channel >= 0 && channel < 254, 4, "invalid animation channel");
+		luaL_argcheck (lua, channel >= 0 && channel < 254, 3, "invalid animation channel");
 	}
 	if (!lua_isnoneornil (lua, 4))
 	{
