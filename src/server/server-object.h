@@ -76,10 +76,6 @@ lisrv_object_effect (liengObject* self,
 int
 lisrv_object_moved (liengObject* self);
 
-void
-lisrv_object_say (liengObject* self,
-                  const char*  value);
-
 int
 lisrv_object_sees (const liengObject* self,
                    const liengObject* target);

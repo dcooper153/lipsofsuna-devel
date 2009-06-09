@@ -11,7 +11,6 @@ liblipsclient_la_SOURCES = \
 	client-callbacks.c \
 	client-callbacks.h \
 	client-command.c \
-	client-event.h \
 	client-extension.h \
 	client-module.c \
 	client-module.h \

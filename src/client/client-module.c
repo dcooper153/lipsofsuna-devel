@@ -29,7 +29,6 @@
 #include <system/lips-system.h>
 #include "client.h"
 #include "client-callbacks.h"
-#include "client-event.h"
 #include "client-module.h"
 #include "client-paths.h"
 #include "client-script.h"
@@ -196,25 +195,6 @@ licli_module_connect (licliModule* self,
 	if (self->network == NULL)
 		return 0;
 	return 1;
-}
-
-/**
- * \brief Emits an event.
- *
- * \param self Module.
- * \param type Event type.
- * \param ... Event arguments.
- */
-void
-licli_module_event (licliModule* self,
-                    int          type,
-                                 ...)
-{
-	va_list args;
-
-	va_start (args, type);
-	licom_events_event (self->events.module, type, args);
-	va_end (args);
 }
 
 /**
@@ -748,8 +728,7 @@ private_init_engine (licliModule* self)
 	calls->lieng_object_set_velocity = licli_object_set_velocity;
 
 	/* Initialize callbacks. */
-	if (!lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_CHAT, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_EVENT, lical_marshal_DATA_PTR) ||
+	if (!lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_EVENT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_PACKET, lical_marshal_DATA_INT_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_SELECT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
@@ -804,8 +783,6 @@ private_init_script (licliModule* self)
 	/* Register classes. */
 	if (!liscr_script_insert_class (self->script, "Action", licliActionScript, self) ||
 	    !liscr_script_insert_class (self->script, "Binding", licliBindingScript, self) ||
-	    !liscr_script_insert_class (self->script, "Event", licliEventScript, self) ||
-	    !liscr_script_insert_class (self->script, "Events", licomEventsScript, self) ||
 	    !liscr_script_insert_class (self->script, "Extension", licliExtensionScript, self) ||
 	    !liscr_script_insert_class (self->script, "Group", licliGroupScript, self) ||
 	    !liscr_script_insert_class (self->script, "Module", licliModuleScript, self) ||
@@ -817,15 +794,6 @@ private_init_script (licliModule* self)
 	    !liscr_script_insert_class (self->script, "Vector", licomVectorScript, self->script) ||
 	    !liscr_script_insert_class (self->script, "Window", licliWindowScript, self))
 		return 0;
-
-	/* Register events. */
-	self->events.module = licom_events_new (self->script);
-	if (self->events.module == NULL)
-		return 0;
-	licom_events_insert_type (self->events.module, LICLI_EVENT_TYPE_CHAT);
-	licom_events_insert_type (self->events.module, LICLI_EVENT_TYPE_FRAME);
-	licom_events_insert_type (self->events.module, LICLI_EVENT_TYPE_PACKET);
-	licom_events_insert_type (self->events.module, LICLI_EVENT_TYPE_SELECT);
 
 	/* Load script. */
 	path = lisys_path_concat (self->path, "scripts", "client", "main.lua", NULL);

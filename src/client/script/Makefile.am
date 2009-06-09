@@ -15,7 +15,6 @@ liblipsclientscript_la_SOURCES = \
 	lips-client-script.h \
 	script-action.c \
 	script-binding.c \
-	script-event.c \
 	script-extension.c \
 	script-group.c \
 	script-module.c \

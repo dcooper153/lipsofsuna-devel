@@ -36,10 +36,6 @@ lisrvEffectScript (liscrClass* self,
                    void*       data);
 
 void
-lisrvEventScript (liscrClass* self,
-                  void*       data);
-
-void
 lisrvExtensionScript (liscrClass* self,
                       void*       data);
 

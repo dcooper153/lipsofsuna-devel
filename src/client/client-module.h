@@ -65,10 +65,6 @@ struct _licliModule
 	lisndSource* music;
 #endif
 	liwdgManager* widgets;
-	struct
-	{
-		liscrData* module;
-	} events;
 };
 
 licliModule*
@@ -84,11 +80,6 @@ int
 licli_module_connect (licliModule* self,
                       const char*  name,
                       const char*  pass);
-
-void
-licli_module_event (licliModule* self,
-                    int          type,
-                                 ...) __LI_ATTRIBUTE_SENTINEL;
 
 liengObject*
 licli_module_find_object (licliModule* self,

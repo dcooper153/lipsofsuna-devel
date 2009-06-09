@@ -63,11 +63,6 @@ private_object_sample (lisrvClient* self,
                        int          flags);
 
 static int
-private_object_speech (lisrvClient* self,
-                       liengObject* object,
-                       const char*  message);
-
-static int
 private_object_visibility (lisrvClient* self,
                            liengObject* object,
                            int          visible);
@@ -228,8 +223,7 @@ private_callbacks_setup (lisrvClient* self,
 	self->calls[1] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_object_sample, self);
 	self->calls[2] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_MODEL, 0, private_object_model, self);
 	self->calls[3] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self);
-	self->calls[4] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_SPEECH, 0, private_object_speech, self);
-	self->calls[5] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0, private_object_visibility, self);
+	self->calls[4] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0, private_object_visibility, self);
 }
 
 static void
@@ -240,8 +234,7 @@ private_callbacks_clear (lisrvClient* self,
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_SAMPLE, self->calls[1]);
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_MODEL, self->calls[2]);
 	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_MOTION, self->calls[3]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_SPEECH, self->calls[4]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, self->calls[5]);
+	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, self->calls[4]);
 }
 
 /*****************************************************************************/
@@ -350,21 +343,6 @@ private_object_sample (lisrvClient* self,
 	liarc_writer_append_uint16 (writer, flags);
 	lisrv_client_send (self, writer, 0);
 	liarc_writer_free (writer);
-
-	return 1;
-}
-
-static int
-private_object_speech (lisrvClient* self,
-                       liengObject* object,
-                       const char*  message)
-{
-	if (!private_vision_contains (self, object))
-		return 1;
-	lisrv_server_event (self->server, LISRV_EVENT_TYPE_HEAR,
-		"*object", LICOM_SCRIPT_OBJECT, self->object,
-		"sender", LICOM_SCRIPT_OBJECT, object,
-		"message", LISCR_TYPE_STRING, message, NULL);
 
 	return 1;
 }

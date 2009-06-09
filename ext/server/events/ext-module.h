@@ -18,48 +18,57 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
+ * \addtogroup liextsrv Server
  * @{
- * \addtogroup liextcliInventory Inventory
+ * \addtogroup liextsrvEvents Events
  * @{
  */
 
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <script/lips-script.h>
+#include <server/lips-server.h>
 
-#define LIEXT_SCRIPT_INVENTORY_WIDGET "Lips.InventoryWidget"
+#define LIEXT_SCRIPT_EVENTS "Lips.Events"
 
 enum
 {
-	LIEXT_CALLBACK_ACTIVATE = LIWDG_CALLBACK_ACTIVATED
+	LIEXT_EVENT_ANIMATION,
+	LIEXT_EVENT_CONTROL,
+	LIEXT_EVENT_EFFECT,
+	LIEXT_EVENT_LOGIN,
+	LIEXT_EVENT_LOGOUT,
+	LIEXT_EVENT_PACKET,
+	LIEXT_EVENT_SIMULATE,
+	LIEXT_EVENT_TICK,
+	LIEXT_EVENT_VISIBILITY,
+	LIEXT_EVENT_MAX
 };
 
 typedef struct _liextModule liextModule;
-typedef struct _liextInventory liextInventory;
-
 struct _liextModule
 {
-	licalHandle calls[2];
-	licliModule* module;
-	liextInventory* inventory;
+	licalHandle calls[10];
+	lisrvServer* server;
 };
 
 liextModule*
-liext_module_new (licliModule* module);
+liext_module_new (lisrvServer* server);
 
 void
 liext_module_free (liextModule* self);
 
-liextInventory*
-liext_module_find_inventory (liextModule* self);
+void
+liext_module_event (liextModule* self,
+                    int          type,
+                                 ...) __LI_ATTRIBUTE_SENTINEL;
 
 /*****************************************************************************/
 
 void
-liextInventoryWidgetScript (liscrClass* self,
-                            void*       data);
+liextEventsScript (liscrClass* self,
+                   void*       data);
 
 #endif
 

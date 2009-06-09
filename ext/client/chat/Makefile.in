@@ -51,8 +51,7 @@ am__installdirs = "$(DESTDIR)$(extdir)"
 extLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(ext_LTLIBRARIES)
 libchat_cli_la_LIBADD =
-am_libchat_cli_la_OBJECTS = ext-entry.lo ext-history.lo ext-module.lo \
-	ext-script.lo
+am_libchat_cli_la_OBJECTS = ext-history.lo ext-module.lo ext-script.lo
 libchat_cli_la_OBJECTS = $(am_libchat_cli_la_OBJECTS)
 libchat_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -226,8 +225,6 @@ ext_LTLIBRARIES = \
 
 libchat_cli_la_LDFLAGS = -module -avoid-version
 libchat_cli_la_SOURCES = \
-	ext-entry.c \
-	ext-entry.h \
 	ext-history.c \
 	ext-history.h \
 	ext-module.c \
@@ -303,7 +300,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-entry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-script.Plo@am__quote@

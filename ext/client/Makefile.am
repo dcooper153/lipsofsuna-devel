@@ -2,6 +2,7 @@ SUBDIRS = \
 	camera \
 	chat \
 	editor \
+	events \
 	generator \
 	inventory \
 	options \

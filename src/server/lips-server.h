@@ -20,7 +20,6 @@
 
 #include "server-callbacks.h"
 #include "server-client.h"
-#include "server-event.h"
 #include "server-extension.h"
 #include "server-network.h"
 #include "server-object.h"

@@ -29,6 +29,30 @@
 #include "ext-module.h"
 
 static int
+private_callback_activated (liscrData* data)
+{
+	liscrScript* script = liscr_data_get_script (data);
+
+	liscr_pushdata (script->lua, data);
+	lua_getfield (script->lua, -1, "activated");
+	if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+	{
+		lua_pushvalue (script->lua, -2);
+		lua_remove (script->lua, -3);
+		if (lua_pcall (script->lua, 1, 0, 0) != 0)
+		{
+			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+			lisys_error_report ();
+			lua_pop (script->lua, 1);
+		}
+		return 0;
+	}
+	else
+		lua_pop (script->lua, 2);
+	return 1;
+}
+
+static int
 private_callback_menu (liscrData* data,
                        int        id)
 {
@@ -163,6 +187,109 @@ Button_setter_text (lua_State* lua)
 	text = luaL_checkstring (lua, 3);
 
 	liwdg_button_set_text (LIWDG_BUTTON (self->data), text);
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Edit text.
+ * -- @name Entry
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- Creates a new text entry widget.
+ * --
+ * -- @param self Entry class.
+ * -- @param table Optional table of parameters.
+ * -- @return New entry widget.
+ * function Entry.new(self, table)
+ */
+static int
+Entry_new (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* self;
+	liscrScript* script;
+	liwdgWidget* widget;
+
+	script = liscr_script (lua);
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_ENTRY);
+
+	/* Allocate widget. */
+	widget = liwdg_entry_new (module->module->widgets);
+	if (widget == NULL)
+	{
+		lua_pushnil (lua);
+		return 1;
+	}
+
+	/* Allocate userdata. */
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_ENTRY);
+	if (self == NULL)
+	{
+		liwdg_widget_free (widget);
+		lua_pushnil (lua);
+		return 1;
+	}
+
+	/* Copy attributes. */
+	if (!lua_isnoneornil (lua, 2))
+		liscr_copyargs (lua, self, 2);
+
+	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_ACTIVATED, 0, private_callback_activated, self);
+	liwdg_widget_set_userdata (widget, self);
+	liscr_pushdata (lua, self);
+	liscr_data_unref (self, NULL);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Clears the entry.
+ * --
+ * -- @param self Entry.
+ * function Entry.clear(self)
+ */
+static int
+Entry_clear (lua_State* lua)
+{
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_ENTRY);
+
+	liwdg_entry_clear (LIWDG_ENTRY (self->data));
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Displayed text.
+ * -- @name Label.text
+ * -- @class table
+ */
+static int
+Entry_getter_text (lua_State* lua)
+{
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_ENTRY);
+
+	lua_pushstring (lua, liwdg_entry_get_text (LIWDG_ENTRY (self->data)));
+	return 1;
+}
+static int
+Entry_setter_text (lua_State* lua)
+{
+	const char* text;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_ENTRY);
+	text = luaL_checkstring (lua, 3);
+
+	liwdg_entry_set_text (LIWDG_ENTRY (self->data), text);
 	return 0;
 }
 
@@ -557,19 +684,37 @@ void
 liextButtonScript (liscrClass* self,
                    void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_BUTTON, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_func (self, "new", Button_new);
 	liscr_class_insert_getter (self, "text", Button_getter_text);
 	liscr_class_insert_setter (self, "text", Button_setter_text);
 }
 
 void
+liextEntryScript (liscrClass* self,
+                  void*       data)
+{
+	liextModule* module = data;
+
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_ENTRY, data);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_insert_func (self, "new", Entry_new);
+	liscr_class_insert_func (self, "clear", Entry_clear);
+	liscr_class_insert_getter (self, "text", Entry_getter_text);
+	liscr_class_insert_setter (self, "text", Entry_setter_text);
+}
+
+void
 liextImageScript (liscrClass* self,
                   void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_IMAGE, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_func (self, "new", Image_new);
 	liscr_class_insert_getter (self, "image", Image_getter_image);
 	liscr_class_insert_setter (self, "image", Image_setter_image);
@@ -579,8 +724,10 @@ void
 liextLabelScript (liscrClass* self,
                   void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_LABEL, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_func (self, "new", Label_new);
 	liscr_class_insert_getter (self, "text", Label_getter_text);
 	liscr_class_insert_setter (self, "text", Label_setter_text);
@@ -590,8 +737,10 @@ void
 liextMenuScript (liscrClass* self,
                  void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENU, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_enum (self, "HORIZONTAL", 0);
 	liscr_class_insert_enum (self, "VERTICAL", 1);
 	liscr_class_insert_func (self, "new", Menu_new);

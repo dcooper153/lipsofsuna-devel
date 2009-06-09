@@ -27,7 +27,6 @@
 #include <script/lips-script.h>
 
 #define LICOM_SCRIPT_EVENT "Lips.Event"
-#define LICOM_SCRIPT_EVENTS "Lips.Events"
 #define LICOM_SCRIPT_OBJECT "Lips.Object"
 #define LICOM_SCRIPT_PACKET "Lips.Packet"
 #define LICOM_SCRIPT_PATH "Lips.Path"
@@ -37,10 +36,6 @@
 void
 licomEventScript (liscrClass* clss,
                   void*       data);
-
-void
-licomEventsScript (liscrClass* clss,
-                   void*       data);
 
 void
 licomObjectScript (liscrClass* self,
@@ -61,20 +56,6 @@ licomQuaternionScript (liscrClass* self,
 void
 licomVectorScript (liscrClass* self,
                    void*       data);
-
-/*****************************************************************************/
-
-liscrData*
-licom_events_new (liscrScript* script);
-
-void
-licom_events_event (liscrData* self,
-                    int        type,
-                    va_list    args);
-
-void
-licom_events_insert_type (liscrData* self,
-                          int        type);
 
 /*****************************************************************************/
 

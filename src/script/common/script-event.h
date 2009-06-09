@@ -39,17 +39,9 @@ liscrData*
 licom_event_newva (liscrScript* script,
                                 ...);
 
-int
-licom_event_get (const liscrData* self,
-                                  ...);
-
 void
 licom_event_set (liscrData*   self,
                               ...);
-
-int
-licom_event_getv (const liscrData* self,
-                  va_list          args);
 
 void
 licom_event_setv (liscrData*   self,

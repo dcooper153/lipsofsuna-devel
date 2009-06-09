@@ -125,8 +125,10 @@ void
 liextInventoryWidgetScript (liscrClass* self,
                             void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY_WIDGET, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_func (self, "new", InventoryWidget_new);
 }
 

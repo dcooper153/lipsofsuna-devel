@@ -141,6 +141,8 @@ static int
 private_init (liwdgEntry*   self,
               liwdgManager* manager)
 {
+	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_ACTIVATED, lical_marshal_DATA))
+		return 0;
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->editable = 1;
 	self->string = calloc (1, sizeof (char));
@@ -192,12 +194,14 @@ private_event (liwdgEntry* self,
 			switch (event->key.keycode)
 			{
 				case SDLK_TAB:
-				case SDLK_RETURN:
 				case SDLK_ESCAPE:
 					return 1;
 				case SDLK_BACKSPACE:
 					private_backspace (self);
 					return 0;
+				case SDLK_RETURN:
+					lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_ACTIVATED);
+					return 1;
 				default:
 					break;
 			}

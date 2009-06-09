@@ -163,12 +163,14 @@ liscr_class_convert (liscrClass* self,
  *
  * \param self Class.
  * \param init Class initializer.
+ * \param data Class userdata.
  */
 void
 liscr_class_inherit (liscrClass*    self,
-                     liscrClassInit init)
+                     liscrClassInit init,
+                     void*          data)
 {
-	init (self, NULL);
+	init (self, data);
 }
 
 /**

@@ -37,7 +37,7 @@
 struct _lisrvClient
 {
 	lialgU32dic* vision;
-	licalHandle calls[7];
+	licalHandle calls[5];
 	liengObject* object;
 	lisrvServer* server;
 	lisrvClient* next;

@@ -24,7 +24,6 @@
 
 #include "client.h"
 #include "client-callbacks.h"
-#include "client-event.h"
 #include "client-window.h"
 
 /*****************************************************************************/
@@ -200,30 +199,6 @@ private_miscellaneous_tick (licliModule* module,
 #endif
 	}
 
-	/* Frame change event. */
-	licli_module_event (module, LICLI_EVENT_TYPE_FRAME,
-		"secs", LISCR_TYPE_FLOAT, secs, NULL);
-
-	return 1;
-}
-
-static int
-private_miscellaneous_select (licliModule*    module,
-                              lirndSelection* selection)
-{
-	liengObject* object;
-
-	if (selection != NULL)
-	{
-		object = lieng_engine_find_object (module->engine, selection->object);
-		if (object != NULL && object->script != NULL)
-		{
-			licli_module_event (module, LICLI_EVENT_TYPE_SELECT,
-				"*object", LICOM_SCRIPT_OBJECT, object, NULL);
-			return 1;
-		}
-	}
-
 	return 1;
 }
 
@@ -232,7 +207,6 @@ licli_module_init_callbacks_misc (licliModule* self)
 {
 	lieng_engine_call_insert (self->engine, LICLI_CALLBACK_EVENT, -5, private_miscellaneous_event, self);
 	lieng_engine_call_insert (self->engine, LICLI_CALLBACK_PACKET, 0, licli_module_handle_packet, self);
-	lieng_engine_call_insert (self->engine, LICLI_CALLBACK_SELECT, 0, private_miscellaneous_select, self);
 	lieng_engine_call_insert (self->engine, LICLI_CALLBACK_TICK, 0, private_miscellaneous_tick, self);
 	return 1;
 }

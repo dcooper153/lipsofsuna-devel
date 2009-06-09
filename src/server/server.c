@@ -163,25 +163,6 @@ lisrv_server_free (lisrvServer* self)
 }
 
 /**
- * \brief Emits an event.
- *
- * \param self Server.
- * \param type Event type.
- * \param ... Event arguments.
- */
-void
-lisrv_server_event (lisrvServer* self,
-                    int          type,
-                                 ...)
-{
-	va_list args;
-
-	va_start (args, type);
-	licom_events_event (self->events.object, type, args);
-	va_end (args);
-}
-
-/**
  * \brief Loads an extension.
  *
  * \param self Server.
@@ -466,7 +447,8 @@ private_init_engine (lisrvServer* self)
 	calls->lieng_object_set_realized = lisrv_object_set_realized;
 	calls->lieng_object_set_transform = lisrv_object_set_transform;
 	calls->lieng_object_set_velocity = lisrv_object_set_velocity;
-	if (!lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGIN, lical_marshal_DATA_PTR_PTR_PTR) ||
+	if (!lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_CONTROL, lical_marshal_DATA_PTR_PTR_INT) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGIN, lical_marshal_DATA_PTR_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGOUT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_PACKET, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
@@ -474,7 +456,6 @@ private_init_engine (lisrvServer* self)
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SAMPLE, lical_marshal_DATA_PTR_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SPEECH, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_VISIBILITY, lical_marshal_DATA_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_HIDE, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_SHOW, lical_marshal_DATA_PTR_PTR))
@@ -573,8 +554,6 @@ private_init_script (lisrvServer* self)
 
 	/* Register classes. */
 	if (!liscr_script_insert_class (self->script, "Effect", lisrvEffectScript, self) ||
-	    !liscr_script_insert_class (self->script, "Event", lisrvEventScript, self) ||
-	    !liscr_script_insert_class (self->script, "Events", licomEventsScript, self) ||
 	    !liscr_script_insert_class (self->script, "Extension", lisrvExtensionScript, self) ||
 	    !liscr_script_insert_class (self->script, "Object", lisrvObjectScript, self) ||
 	    !liscr_script_insert_class (self->script, "Packet", licomPacketScript, self->script) ||
@@ -583,26 +562,8 @@ private_init_script (lisrvServer* self)
 	    !liscr_script_insert_class (self->script, "Server", lisrvServerScript, self) ||
 	    !liscr_script_insert_class (self->script, "Vector", licomVectorScript, self->script))
 		return 0;
-	if (!lisrv_server_init_callbacks_client (self) ||
-	    !lisrv_server_init_callbacks_event (self))
+	if (!lisrv_server_init_callbacks_client (self))
 		return 0;
-
-	/* Register events. */
-	self->events.object = licom_events_new (self->script);
-	if (self->events.object == NULL)
-		return 0;
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_ACTION);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_ANIMATION);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_CONTROL);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_EFFECT);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_HEAR);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_PACKET);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_LOGIN);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_LOGOUT);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_MESSAGE);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_SIMULATE);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_SPEECH);
-	licom_events_insert_type (self->events.object, LISRV_EVENT_TYPE_VISIBILITY);
 
 	/* Load the script. */
 	path = lisys_path_concat (self->paths->server_data, "scripts", "server", "main.lua", NULL);

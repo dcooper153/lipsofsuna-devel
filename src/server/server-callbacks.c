@@ -28,89 +28,6 @@
 #include "server-script.h"
 
 static int
-private_client_packet_action (lisrvClient* self,
-                              liReader*    reader)
-{
-	uint8_t action;
-
-	if (!li_reader_get_uint8 (reader, &action))
-		return 0;
-	lisrv_server_event (self->server, LISRV_EVENT_TYPE_ACTION,
-		"*object", LICOM_SCRIPT_OBJECT, self->object,
-		"action", LISCR_TYPE_INT, (int) action, NULL);
-	return 1;
-}
-
-static int
-private_client_packet_chat (lisrvClient* self,
-                            liReader*    reader)
-{
-	uint8_t flags;
-	char* message = NULL;
-
-	/* Get message. */
-	if (!li_reader_get_uint8 (reader, &flags) ||
-	    !li_reader_get_text (reader, "", &message) ||
-	    !li_reader_check_end (reader) ||
-	    !li_string_utf8_get_valid (message))
-	{
-		free (message);
-		return 0;
-	}
-
-	/* Get sector. */
-	if (self->object == NULL || self->object->sector == NULL)
-	{
-		free (message);
-		return 1;
-	}
-
-	/* Emit an event to self. */
-	lisrv_server_event (self->server, LISRV_EVENT_TYPE_MESSAGE,
-		"*object", LICOM_SCRIPT_OBJECT, self->object,
-		"message", LISCR_TYPE_STRING, message, NULL);
-	free (message);
-	return 1;
-}
-
-static int
-private_client_packet_move (lisrvClient* self,
-                            liReader*    reader)
-{
-	int8_t x;
-	int8_t y;
-	int8_t z;
-	int8_t w;
-	uint8_t flags;
-	limatQuaternion tmp;
-	limatTransform transform;
-
-	/* Parse the packet. */
-	if (!li_reader_get_uint8 (reader, &flags) || (flags & ~LI_CONTROL_MASK) ||
-	    !li_reader_get_int8 (reader, &x) ||
-	    !li_reader_get_int8 (reader, &y) ||
-	    !li_reader_get_int8 (reader, &z) ||
-	    !li_reader_get_int8 (reader, &w) ||
-	    !li_reader_check_end (reader))
-		return 0;
-	if (self->object != NULL && lisrv_object_get_valid (self->object))
-	{
-		/* FIXME: Should be included to the event. */
-		lieng_object_get_transform (self->object, &transform);
-		tmp = limat_quaternion_init (x / 127.0f, y / 127.0f, z / 127.0f, w / 127.0f);
-		transform.rotation = limat_quaternion_normalize (tmp);
-		lieng_object_set_transform (self->object, &transform);
-	}
-	lisrv_server_event (self->server, LISRV_EVENT_TYPE_CONTROL,
-		"*object", LICOM_SCRIPT_OBJECT, self->object,
-		"controls", LISCR_TYPE_INT, flags, NULL);
-
-	return 1;
-}
-
-/****/
-
-static int
 private_client_client_login (lisrvServer* server,
                              liengObject* object,
                              const char*  name,
@@ -161,24 +78,29 @@ private_client_client_login (lisrvServer* server,
 static int
 private_client_client_packet (lisrvServer* server,
                               lisrvClient* client,
-                              liReader*    packet)
+                              liReader*    reader)
 {
-	int ret = 1;
+	int8_t x;
+	int8_t y;
+	int8_t z;
+	int8_t w;
+	uint8_t flags;
+	limatQuaternion tmp;
 
-	switch (((uint8_t*) packet->buffer)[0])
+	if (((uint8_t*) reader->buffer)[0] == LINET_CLIENT_PACKET_MOVE)
 	{
-		case LI_CLIENT_COMMAND_ACTION:
-			ret = private_client_packet_action (client, packet);
-			break;
-		case LI_CLIENT_COMMAND_CHAT:
-			ret = private_client_packet_chat (client, packet);
-			break;
-		case LI_CLIENT_COMMAND_MOVE:
-			ret = private_client_packet_move (client, packet);
-			break;
+		if (!li_reader_get_uint8 (reader, &flags) || (flags & ~LI_CONTROL_MASK) ||
+			!li_reader_get_int8 (reader, &x) ||
+			!li_reader_get_int8 (reader, &y) ||
+			!li_reader_get_int8 (reader, &z) ||
+			!li_reader_get_int8 (reader, &w) ||
+			!li_reader_check_end (reader))
+			return 1;
+		tmp = limat_quaternion_init (x / 127.0f, y / 127.0f, z / 127.0f, w / 127.0f);
+		lieng_engine_call (server->engine, LISRV_CALLBACK_CLIENT_CONTROL, client->object, &tmp, flags);
 	}
 
-	return ret;
+	return 1;
 }
 
 static int
@@ -260,111 +182,6 @@ int lisrv_server_init_callbacks_client (lisrvServer* server)
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_client_client_packet, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_VISION_HIDE, 0, private_client_vision_hide, server);
 	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_VISION_SHOW, 0, private_client_vision_show, server);
-	return 1;
-}
-
-/*****************************************************************************/
-
-static int
-private_event_client_login (lisrvServer* server,
-                            liengObject* object,
-                            const char*  name,
-                            const char*  pass)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_LOGIN,
-		"*object", LICOM_SCRIPT_OBJECT, object, NULL);
-	return 1;
-}
-
-static int
-private_event_client_logout (lisrvServer* server,
-                             lisrvObject* object)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_LOGOUT,
-		"*object", LICOM_SCRIPT_OBJECT, object, NULL);
-	return 1;
-}
-
-static int
-private_event_client_packet (lisrvServer* server,
-                             lisrvClient* client,
-                             liReader*    packet)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_PACKET,
-		"*object", LICOM_SCRIPT_OBJECT, client->object,
-		"message", LISCR_TYPE_INT, (int)(((uint8_t*) packet->buffer)[0]),
-		"packet", LICOM_SCRIPT_PACKET, packet, NULL);
-	return 1;
-}
-
-static int
-private_event_object_animation (lisrvServer*   server,
-                                liengObject*   object,
-                                lisrvAniminfo* info)
-{
-#warning animation events disabled.
-#if 0
-	lisrv_server_event (server, LISRV_EVENT_TYPE_OBJECT_ANIMATION,
-		"*object", LICOM_SCRIPT_OBJECT, object,
-		"animation", LISCR_TYPE_STRING, animation->name, NULL);
-#endif
-	return 1;
-}
-
-static int
-private_event_object_sample (lisrvServer* server,
-                             liengObject* object,
-                             liengSample* sample,
-                             int          flags)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_EFFECT,
-		"*object", LICOM_SCRIPT_OBJECT, object,
-		"effect", LISCR_TYPE_STRING, sample->name,
-		"flags", LISCR_TYPE_INT, flags, NULL);
-	return 1;
-}
-
-static int
-private_event_object_motion (lisrvServer* server,
-                             liengObject* object)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_SIMULATE,
-		"*object", LICOM_SCRIPT_OBJECT, object, NULL);
-	return 1;
-}
-
-static int
-private_event_object_speech (lisrvServer* server,
-                             liengObject* object,
-                             const char*  message)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_SPEECH,
-		"*object", LICOM_SCRIPT_OBJECT, object,
-		"message", LISCR_TYPE_STRING, message, NULL);
-	return 1;
-}
-
-static int
-private_event_object_visibility (lisrvServer* server,
-                                 liengObject* object,
-                                 int          visible)
-{
-	lisrv_server_event (server, LISRV_EVENT_TYPE_VISIBILITY,
-		"*object", LICOM_SCRIPT_OBJECT, object,
-		"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
-	return 1;
-}
-
-int lisrv_server_init_callbacks_event (lisrvServer* server)
-{
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 0, private_event_client_login, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_LOGOUT, 0, private_event_client_logout, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_event_client_packet, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_event_object_animation, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_event_object_sample, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_event_object_motion, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_SPEECH, 0, private_event_object_speech, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0, private_event_object_visibility, server);
 	return 1;
 }
 

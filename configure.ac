@@ -165,6 +165,7 @@ ext/client/Makefile
 ext/client/camera/Makefile
 ext/client/chat/Makefile
 ext/client/editor/Makefile
+ext/client/events/Makefile
 ext/client/generator/Makefile
 ext/client/inventory/Makefile
 ext/client/options/Makefile
@@ -176,6 +177,7 @@ ext/client/widgets/Makefile
 ext/server/Makefile
 ext/server/creature/Makefile
 ext/server/editor/Makefile
+ext/server/events/Makefile
 ext/server/generator/Makefile
 ext/server/inventory/Makefile
 ext/server/npc/Makefile

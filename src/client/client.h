@@ -33,6 +33,8 @@
 #include "client-types.h"
 #include "client-window.h"
 
+#define LICLI_EVENT_TYPE_ACTION 0
+
 struct _licliClient
 {
 	licliModule* module;

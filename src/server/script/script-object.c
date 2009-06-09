@@ -204,7 +204,6 @@ Object_send (lua_State* lua)
 	liscrData* packet;
 	liscrPacket* data;
 	lisrvClient* client;
-#warning Should be provided by packet extension.
 
 	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
 	packet = liscr_checkdata (lua, 2, LICOM_SCRIPT_PACKET);
@@ -214,63 +213,6 @@ Object_send (lua_State* lua)
 
 	if (client != NULL)
 		lisrv_client_send (client, data->writer, GRAPPLE_RELIABLE);
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Sends a speech packet to the client controlling the object.
- * --
- * -- @param self Object.
- * -- @param sender Speaking object.
- * -- @param string Message string.
- * function Object.send_speech(self, string)
- */
-static int
-Object_send_speech (lua_State* lua)
-{
-	const char* string;
-	liarcWriter* writer;
-	liscrData* object;
-	liscrData* sender;
-	lisrvClient* client;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	sender = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
-	string = luaL_checkstring (lua, 3);
-	client = LISRV_OBJECT (object->data)->client;
-
-	if (client != NULL)
-	{
-		writer = liarc_writer_new_packet (LINET_SERVER_PACKET_CHAT);
-		if (writer == NULL)
-			return 0;
-		liarc_writer_append_uint32 (writer, LIENG_OBJECT (sender->data)->id);
-		liarc_writer_append_string (writer, string);
-		lisrv_client_send (client, writer, GRAPPLE_RELIABLE);
-		liarc_writer_free (writer);
-	}
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- FIXME
- * --
- * -- @param self Object.
- * -- @param string Message string.
- * function Object.say(self, string)
- */
-static int
-Object_say (lua_State* lua)
-{
-	const char* text;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	text = luaL_checkstring (lua, 2);
-
-	lisrv_object_say (self->data, text);
 	return 0;
 }
 
@@ -421,26 +363,6 @@ Object_getter_client (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Object event handler list.
- * --
- * -- Class member.
- * --
- * -- @name Object.events
- * -- @class table
- */
-static int
-Object_getter_events (lua_State* lua)
-{
-	lisrvServer* server;
-
-	server = liscr_checkclassdata (lua, 1, LISRV_SCRIPT_OBJECT);
-
-	liscr_pushdata (lua, server->events.object);
-	return 1;
-}
-
-/* @luadoc
- * ---
  * -- Name.
  * -- @name Object.name
  * -- @class table
@@ -481,7 +403,7 @@ void
 lisrvObjectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licomObjectScript);
+	liscr_class_inherit (self, licomObjectScript, NULL);
 	liscr_class_set_serialize (self, private_serialize);
 	liscr_class_set_userdata (self, LISRV_SCRIPT_OBJECT, data);
 	liscr_class_insert_interface (self, LISRV_SCRIPT_OBJECT);
@@ -489,14 +411,11 @@ lisrvObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "disconnect", Object_disconnect);
 	liscr_class_insert_func (self, "effect", Object_effect);
 	liscr_class_insert_func (self, "new", Object_new);
-	liscr_class_insert_func (self, "say", Object_say);
 	liscr_class_insert_func (self, "send", Object_send);
-	liscr_class_insert_func (self, "send_speech", Object_send_speech);
 	liscr_class_insert_func (self, "solve_path", Object_solve_path);
 	liscr_class_insert_func (self, "swap_clients", Object_swap_clients);
 	liscr_class_insert_func (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_getter (self, "client", Object_getter_client);
-	liscr_class_insert_getter (self, "events", Object_getter_events);
 	liscr_class_insert_getter (self, "name", Object_getter_name);
 	liscr_class_insert_setter (self, "name", Object_setter_name);
 }

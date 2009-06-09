@@ -91,8 +91,10 @@ void
 liextOptionsScript (liscrClass* self,
                     void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_OPTIONS, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_func (self, "new", Options_new);
 }
 

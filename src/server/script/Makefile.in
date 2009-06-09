@@ -51,7 +51,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsserverscript_la_LIBADD =
-am_liblipsserverscript_la_OBJECTS = script-effect.lo script-event.lo \
+am_liblipsserverscript_la_OBJECTS = script-effect.lo \
 	script-extension.lo script-object.lo script-server.lo
 liblipsserverscript_la_OBJECTS = $(am_liblipsserverscript_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
@@ -227,7 +227,6 @@ lib_LTLIBRARIES = \
 liblipsserverscript_la_SOURCES = \
 	lips-server-script.h \
 	script-effect.c \
-	script-event.c \
 	script-extension.c \
 	script-object.c \
 	script-server.c
@@ -302,7 +301,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-effect.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-extension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-server.Plo@am__quote@

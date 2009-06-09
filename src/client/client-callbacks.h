@@ -31,7 +31,6 @@
 
 enum
 {
-	LICLI_CALLBACK_CHAT, /* (data, object, message) */
 	LICLI_CALLBACK_EVENT, /* (data, event) */
 	LICLI_CALLBACK_PACKET, /* (data, type, packet) */
 	LICLI_CALLBACK_SELECT, /* (data, selection) */

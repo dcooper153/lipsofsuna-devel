@@ -112,8 +112,10 @@ void
 liextSkillWidgetScript (liscrClass* self,
                         void*       data)
 {
+	liextModule* module = data;
+
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILL_WIDGET, data);
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_func (self, "new", SkillWidget_new);
 	liscr_class_insert_setter (self, "skill", SkillWidget_setter_skill);
 }

@@ -32,7 +32,6 @@ struct _licomEvent
 {
 	liscrData* data;
 	int type;
-	char* primary;
 };
 
 /*****************************************************************************/
@@ -54,7 +53,6 @@ Event___gc (lua_State* lua)
 	self = liscr_isdata (lua, 1, LICOM_SCRIPT_EVENT);
 	event = self->data;
 
-	free (event->primary);
 	free (event);
 	liscr_data_free (self);
 	return 0;
@@ -233,7 +231,7 @@ licom_event_set (liscrData* self,
 	va_list args;
 
 	va_start (args, self);
-	licom_event_getv (self, args);
+	licom_event_setv (self, args);
 	va_end (args);
 }
 
@@ -254,7 +252,6 @@ licom_event_setv (liscrData* self,
 	const char* type;
 	const char* name;
 	liscrClass* clss;
-	licomEvent* event = self->data;
 	liscrScript* script = self->script;
 
 	liscr_pushpriv (script->lua, self);
@@ -264,11 +261,6 @@ licom_event_setv (liscrData* self,
 		name = va_arg (args, char*);
 		if (name == NULL)
 			break;
-		if (*name == '*')
-		{
-			free (event->primary);
-			event->primary = strdup (++name);
-		}
 
 		/* Duplicated from liscrData due to the behavior of varargs
 		   being undefined when passed to a function and then reused. */

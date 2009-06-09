@@ -41,6 +41,33 @@
 
 /* @luadoc
  * ---
+ * -- Finds an object by ID.
+ * --
+ * -- @param self Module class.
+ * -- @param id Object ID.
+ * -- @return Object or nil.
+ * function Module.find_object(self, id)
+ */
+static int
+Module_find_object (lua_State* lua)
+{
+	uint32_t id;
+	liengObject* object;
+	licliModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
+	id = (uint32_t) luaL_checknumber (lua, 2);
+
+	object = lieng_engine_find_object (module->engine, id);
+	if (object != NULL)
+		liscr_pushdata (lua, object->script);
+	else
+		lua_pushnil (lua);
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Launches a server and joins it.
  * --
  * -- If a server has already been launched, it is terminated.
@@ -181,34 +208,6 @@ Module_send (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- FIXME
- * --
- * -- @param self Module class.
- * -- @param number Number.
- * function Module.send_action(self, number)
- */
-static int
-Module_send_action (lua_State* lua)
-{
-	int value;
-	liarcWriter* writer;
-	licliModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	value = (int) luaL_checknumber (lua, 2);
-	/* TODO: Send flags. */
-
-	writer = liarc_writer_new_packet (LI_CLIENT_COMMAND_ACTION);
-	if (writer == NULL)
-		return 0;
-	liarc_writer_append_uint8 (writer, value);
-	licli_module_send (module, writer, GRAPPLE_RELIABLE);
-	liarc_writer_free (writer);
-	return 0;
-}
-
-/* @luadoc
- * ---
  * -- Ambient light color.
  * -- @name Module.ambient
  * -- @class table
@@ -234,23 +233,6 @@ Module_setter_ambient (lua_State* lua)
 
 	lirnd_lighting_set_ambient (module->engine->render->lighting, value);
 	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Module event handler list.
- * -- @name Module.events
- * -- @class table
- */
-static int
-Module_getter_events (lua_State* lua)
-{
-	licliModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-
-	liscr_pushdata (lua, module->events.module);
-	return 1;
 }
 
 /* @luadoc
@@ -487,12 +469,11 @@ licliModuleScript (liscrClass* self,
 {
 	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_MODULE, data);
+	liscr_class_insert_func (self, "find_object", Module_find_object);
 	liscr_class_insert_func (self, "host", Module_host);
 	liscr_class_insert_func (self, "join", Module_join);
 	liscr_class_insert_func (self, "pick", Module_pick);
 	liscr_class_insert_func (self, "send", Module_send);
-	liscr_class_insert_func (self, "send_action", Module_send_action);
-	liscr_class_insert_getter (self, "events", Module_getter_events);
 	liscr_class_insert_getter (self, "moving", Module_getter_moving);
 	liscr_class_insert_getter (self, "sun_direction", Module_getter_sun_direction);
 	liscr_class_insert_setter (self, "ambient", Module_setter_ambient);

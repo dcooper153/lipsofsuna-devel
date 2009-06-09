@@ -65,6 +65,112 @@ Server_find_object (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Finds all clients inside a sphere.
+ * --
+ * -- @param self Server class.
+ * -- @param center Center of lookup sphere.
+ * -- @param radius Radius of lookup sphere.
+ * -- @return Array of matching objects.
+ * function Server.nearby_clients(self, center, radius)
+ */
+static int
+Server_nearby_clients (lua_State* lua)
+{
+	int i = 1;
+	int r;
+	int x;
+	int y;
+	int z;
+	float radius;
+	liengObjectIter iter;
+	limatTransform transform;
+	limatVector center;
+	limatVector diff;
+	liscrData* vector;
+	lisrvServer* server;
+
+	server = liscr_checkclassdata (lua, 1, LISRV_SCRIPT_SERVER);
+	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	radius = luaL_checknumber (lua, 3);
+	radius *= radius;
+	center = *((limatVector*) vector->data);
+
+	x = (int)(center.x / LIENG_SECTOR_WIDTH);
+	y = (int)(center.y / LIENG_SECTOR_WIDTH);
+	z = (int)(center.z / LIENG_SECTOR_WIDTH);
+	r = (int)(radius / LIENG_SECTOR_WIDTH + 2.25f);
+	lua_newtable (lua);
+	LIENG_FOREACH_OBJECT (iter, server->engine, x, y, z, r)
+	{
+		if (LISRV_OBJECT (iter.object)->client == NULL)
+			continue;
+		lieng_object_get_transform (iter.object, &transform);
+		diff = limat_vector_subtract (center, transform.position);
+		if (limat_vector_dot (diff, diff) <= radius)
+		{
+			lua_pushnumber (lua, i);
+			liscr_pushdata (lua, iter.object->script);
+			lua_settable (lua, -3);
+		}
+	}
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Finds all objects inside a sphere.
+ * --
+ * -- @param self Server class.
+ * -- @param center Center of lookup sphere.
+ * -- @param radius Radius of lookup sphere.
+ * -- @return Array of matching objects.
+ * function Server.nearby_object(self, center, radius)
+ */
+static int
+Server_nearby_objects (lua_State* lua)
+{
+	int i = 1;
+	int r;
+	int x;
+	int y;
+	int z;
+	float radius;
+	liengObjectIter iter;
+	limatTransform transform;
+	limatVector center;
+	limatVector diff;
+	liscrData* vector;
+	lisrvServer* server;
+
+	server = liscr_checkclassdata (lua, 1, LISRV_SCRIPT_SERVER);
+	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	radius = luaL_checknumber (lua, 3);
+	radius *= radius;
+	center = *((limatVector*) vector->data);
+
+	x = (int)(center.x / LIENG_SECTOR_WIDTH);
+	y = (int)(center.y / LIENG_SECTOR_WIDTH);
+	z = (int)(center.z / LIENG_SECTOR_WIDTH);
+	r = (int)(radius / LIENG_SECTOR_WIDTH + 2.25f);
+	lua_newtable (lua);
+	LIENG_FOREACH_OBJECT (iter, server->engine, x, y, z, r)
+	{
+		lieng_object_get_transform (iter.object, &transform);
+		diff = limat_vector_subtract (center, transform.position);
+		if (limat_vector_dot (diff, diff) <= radius)
+		{
+			lua_pushnumber (lua, i);
+			liscr_pushdata (lua, iter.object->script);
+			lua_settable (lua, -3);
+		}
+	}
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Request server save.
  * --
  * -- @param self Server class.
@@ -159,6 +265,8 @@ lisrvServerScript (liscrClass* self,
 	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LISRV_SCRIPT_SERVER, data);
 	liscr_class_insert_func (self, "find_object", Server_find_object);
+	liscr_class_insert_func (self, "nearby_clients", Server_nearby_clients);
+	liscr_class_insert_func (self, "nearby_objects", Server_nearby_objects);
 	liscr_class_insert_func (self, "save", Server_save);
 	liscr_class_insert_func (self, "shutdown", Server_shutdown);
 	liscr_class_insert_getter (self, "debug", Server_getter_debug);

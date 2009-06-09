@@ -213,7 +213,7 @@ struct _liengObjectIter
  * \param radius Search radius in sectors.
  */
 #define LIENG_FOREACH_OBJECT(iter, engine, x, y, z, radius) \
-	for (lieng_object_iter_first (&iter, engine, x, y, z, radius) ; iter.sector != NULL ; \
+	for (lieng_object_iter_first (&iter, engine, x, y, z, radius) ; iter.object != NULL ; \
 	     lieng_object_iter_next (&iter))
 
 static inline int

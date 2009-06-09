@@ -36,7 +36,6 @@ typedef struct _liextChatHistory liextChatHistory;
 struct _liextChatHistory
 {
 	liwdgLabel base;
-	licalHandle* calls[1];
 	licliModule* module;
 	struct
 	{
@@ -48,6 +47,10 @@ struct _liextChatHistory
 liwdgWidget*
 liext_chat_history_new (liwdgManager* manager,
                         licliModule*  module);
+
+int
+liext_chat_history_append (liextChatHistory* self,
+                           const char*       message);
 
 #endif
 

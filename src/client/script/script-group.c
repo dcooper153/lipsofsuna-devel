@@ -207,7 +207,7 @@ void
 licliGroupScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_inherit (self, licliWidgetScript);
+	liscr_class_inherit (self, licliWidgetScript, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_GROUP, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_GROUP);
 	liscr_class_insert_func (self, "new", Group_new);

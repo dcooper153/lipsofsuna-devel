@@ -45,6 +45,7 @@ liext_module_new (licliModule* module)
 	self->module = module;
 
 	liscr_script_insert_class (module->script, "Button", liextButtonScript, self);
+	liscr_script_insert_class (module->script, "Entry", liextEntryScript, self);
 	liscr_script_insert_class (module->script, "Image", liextImageScript, self);
 	liscr_script_insert_class (module->script, "Label", liextLabelScript, self);
 	liscr_script_insert_class (module->script, "Menu", liextMenuScript, self);

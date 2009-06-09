@@ -41,11 +41,6 @@ static void
 private_free (liextChatHistory* self);
 
 static int
-private_chat (liextChatHistory* self,
-              liengObject*      object,
-              const char*       message);
-
-static int
 private_event (liextChatHistory* self,
                liwdgEvent*       event);
 
@@ -62,6 +57,13 @@ const liwdgWidgetClass liextChatHistoryType =
 	(liwdgWidgetEventFunc) private_event
 };
 
+/**
+ * \brief Creates a new chat history widget.
+ *
+ * \param manager Widget manager.
+ * \param module Client module.
+ * \return New widget or NULL.
+ */
 liwdgWidget*
 liext_chat_history_new (liwdgManager* manager,
                         licliModule*  module)
@@ -74,11 +76,37 @@ liext_chat_history_new (liwdgManager* manager,
 		return NULL;
 	LIEXT_WIDGET_CHAT_HISTORY (self)->module = module;
 
-	/* Register callback. */
-	LIEXT_WIDGET_CHAT_HISTORY (self)->calls[0] = lieng_engine_call_insert (
-		module->engine, LICLI_CALLBACK_CHAT, 0, private_chat, self);
-
 	return self;
+}
+
+/**
+ * \brief Appends a message to the history widget.
+ *
+ * \param self Chat history.
+ * \param message Message.
+ * \return Nonzero on success.
+ */
+int
+liext_chat_history_append (liextChatHistory* self,
+                           const char*       message)
+{
+	int i;
+	char* msg;
+
+	msg = strdup (message);
+	if (msg == NULL)
+		return 0;
+
+	/* Scroll lines. */
+	free (self->lines.array[0]);
+	for (i = 0 ; i < self->lines.count - 1 ; i++)
+		self->lines.array[i] = self->lines.array[i + 1];
+
+	/* Insert new line to bottom. */
+	self->lines.array[self->lines.count - 1] = msg;
+	private_rebuild (self);
+
+	return 1;
 }
 
 /****************************************************************************/
@@ -116,37 +144,6 @@ private_free (liextChatHistory* self)
 			free (self->lines.array[i]);
 		free (self->lines.array);
 	}
-
-	/* Remove callback. */
-	if (self->calls[0] != NULL)
-		lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_CHAT, self->calls[0]);
-}
-
-static int
-private_chat (liextChatHistory* self,
-              liengObject*      object,
-              const char*       message)
-{
-	int i;
-	const char* name;
-
-	/* Get player name. */
-	/* FIXME: But objects don't have names! */
-	if (object != NULL)
-		name = "???";
-	else
-		name = "???";
-
-	/* Scroll lines. */
-	free (self->lines.array[0]);
-	for (i = 0 ; i < self->lines.count - 1 ; i++)
-		self->lines.array[i] = self->lines.array[i + 1];
-
-	/* Insert new line to bottom. */
-	self->lines.array[self->lines.count - 1] = listr_string_format ("<%s> %s", name, message);
-	private_rebuild (self);
-
-	return 0;
 }
 
 static int

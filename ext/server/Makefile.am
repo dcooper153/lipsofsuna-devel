@@ -1,6 +1,7 @@
 SUBDIRS = \
 	creature \
 	editor \
+	events \
 	generator \
 	inventory \
 	npc \

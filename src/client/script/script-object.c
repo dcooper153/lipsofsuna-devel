@@ -59,14 +59,39 @@ Object_emit_particles (lua_State* lua)
 	return 1;
 }
 
+/* @luadoc
+ * ---
+ * -- Displays a message above the object.
+ * --
+ * -- @param self Object.
+ * -- @param message Message.
+ * function Object.say(self, message)
+ */
+static int
+Object_say (lua_State* lua)
+{
+	const char* msg;
+	liscrData* object;
+	liengObject* data;
+
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+	msg = luaL_checkstring (lua, 2);
+	data = LIENG_OBJECT (object->data);
+
+	if (data->render != NULL)
+		licli_object_set_speech (data, msg);
+	return 1;
+}
+
 /*****************************************************************************/
 
 void
 licliObjectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licomObjectScript);
+	liscr_class_inherit (self, licomObjectScript, NULL);
 	liscr_class_insert_func (self, "emit_particles", Object_emit_particles);
+	liscr_class_insert_func (self, "say", Object_say);
 }
 
 /** @} */

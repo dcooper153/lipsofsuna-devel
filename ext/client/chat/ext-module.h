@@ -29,8 +29,6 @@
 
 #include <script/lips-script.h>
 
-#define LIEXT_SCRIPT_CHAT "Lips.Chat"
-#define LIEXT_SCRIPT_CHAT_ENTRY "Lips.ChatEntry"
 #define LIEXT_SCRIPT_CHAT_HISTORY "Lips.ChatHistory"
 
 typedef struct _liextModule liextModule;
@@ -45,19 +43,7 @@ liext_module_new (licliModule* module);
 void
 liext_module_free (liextModule* self);
 
-int
-liext_module_send (liextModule* self,
-                   const char*  message);
-
 /*****************************************************************************/
-
-void
-liextChatScript (liscrClass* self,
-                 void*       data);
-
-void
-liextChatEntryScript (liscrClass* self,
-                      void*       data);
 
 void
 liextChatHistoryScript (liscrClass* self,

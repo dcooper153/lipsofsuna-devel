@@ -33,7 +33,6 @@
 #include <engine/lips-engine.h>
 #include <physics/lips-physics.h>
 #include <script/lips-script.h>
-#include "server-event.h"
 #include "server-network.h"
 #include "server-object.h"
 #include "server-paths.h"
@@ -55,10 +54,6 @@ struct _lisrvServer
 	} config;
 	struct
 	{
-		liscrData* object;
-	} events;
-	struct
-	{
 		liaiPathSolver* path_solver;
 		liarcWriter* resources;
 	} helper;
@@ -77,11 +72,6 @@ lisrv_server_new (const char* name);
 
 void
 lisrv_server_free (lisrvServer* self);
-
-void
-lisrv_server_event (lisrvServer* self,
-                    int          type,
-                                 ...) __LI_ATTRIBUTE_SENTINEL;
 
 int
 lisrv_server_load_extension (lisrvServer* self,

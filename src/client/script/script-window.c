@@ -175,7 +175,7 @@ void
 licliWindowScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licliGroupScript);
+	liscr_class_inherit (self, licliGroupScript, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WINDOW, data);
 	liscr_class_insert_func (self, "new", Window_new);
 	liscr_class_insert_getter (self, "title", Window_getter_title);

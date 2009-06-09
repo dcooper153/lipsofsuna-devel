@@ -37,6 +37,12 @@
 
 /* @luadoc
  * ---
+ * -- Read or write a boolean value.
+ * -- @name Packet.BOOL
+ * -- @class table
+ */
+/* @luadoc
+ * ---
  * -- First packet number for custom packets.
  * -- @name Packet.CUSTOM
  * -- @class table
@@ -194,6 +200,10 @@ Packet_read (lua_State* lua)
 		type = luaL_checkinteger (lua, i);
 		switch (type)
 		{
+			case LISCR_PACKET_FORMAT_BOOL:
+				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
+				if (ok) lua_pushboolean (lua, tmp.i8);
+				break;
 			case LISCR_PACKET_FORMAT_INT8:
 				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
 				if (ok) lua_pushnumber (lua, tmp.i8);
@@ -207,8 +217,11 @@ Packet_read (lua_State* lua)
 				if (ok) lua_pushnumber (lua, tmp.i32);
 				break;
 			case LISCR_PACKET_FORMAT_STRING:
+				tmp.str = NULL;
 				if (ok) ok &= li_reader_get_text (data->reader, "", &tmp.str);
-				if (ok) { lua_pushstring (lua, tmp.str); free (tmp.str); }
+				if (ok) ok &= li_string_utf8_get_valid (tmp.str);
+				if (ok) lua_pushstring (lua, tmp.str);
+				free (tmp.str);
 				break;
 			case LISCR_PACKET_FORMAT_UINT8:
 				if (ok) ok &= li_reader_get_uint8 (data->reader, &tmp.u8);
@@ -272,6 +285,10 @@ Packet_write (lua_State* lua)
 		type = luaL_checkinteger (lua, i++);
 		switch (type)
 		{
+			case LISCR_PACKET_FORMAT_BOOL:
+				tmp.u8 = lua_toboolean (lua, i);
+				liarc_writer_append_uint8 (data->writer, tmp.u8);
+				break;
 			case LISCR_PACKET_FORMAT_INT8:
 				tmp.i8 = luaL_checknumber (lua, i);
 				liarc_writer_append_int8 (data->writer, tmp.i8);
@@ -287,6 +304,7 @@ Packet_write (lua_State* lua)
 			case LISCR_PACKET_FORMAT_STRING:
 				tmp.str = luaL_checkstring (lua, i);
 				liarc_writer_append_string (data->writer, tmp.str);
+				liarc_writer_append_nul (data->writer);
 				break;
 			case LISCR_PACKET_FORMAT_UINT8:
 				tmp.u8 = luaL_checknumber (lua, i);
@@ -382,6 +400,7 @@ licomPacketScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_convert (self, private_convert);
+	liscr_class_insert_enum (self, "BOOL", LISCR_PACKET_FORMAT_BOOL);
 	liscr_class_insert_enum (self, "CUSTOM", LINET_SERVER_PACKET_CUSTOM);
 	liscr_class_insert_enum (self, "INT8", LISCR_PACKET_FORMAT_INT8);
 	liscr_class_insert_enum (self, "INT16", LISCR_PACKET_FORMAT_INT16);

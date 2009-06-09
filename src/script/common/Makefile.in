@@ -51,9 +51,9 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipscommonscript_la_LIBADD =
-am_liblipscommonscript_la_OBJECTS = script-event.lo script-events.lo \
-	script-object.lo script-packet.lo script-path.lo \
-	script-quaternion.lo script-vector.lo
+am_liblipscommonscript_la_OBJECTS = script-event.lo script-object.lo \
+	script-packet.lo script-path.lo script-quaternion.lo \
+	script-vector.lo
 liblipscommonscript_la_OBJECTS = $(am_liblipscommonscript_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -225,7 +225,6 @@ liblipscommonscript_la_SOURCES = \
 	lips-common-script.h \
 	script-event.c \
 	script-event.h \
-	script-events.c \
 	script-object.c \
 	script-packet.c \
 	script-packet.h \
@@ -303,7 +302,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-event.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-events.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-path.Plo@am__quote@

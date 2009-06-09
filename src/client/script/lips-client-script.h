@@ -46,10 +46,6 @@ licliBindingScript (liscrClass* self,
                     void*       data);
 
 void
-licliEventScript (liscrClass* self,
-                  void*       data);
-
-void
 licliExtensionScript (liscrClass* self,
                       void*       data);
 

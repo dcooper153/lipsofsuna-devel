@@ -40,7 +40,8 @@ liscr_class_convert (liscrClass* self,
 
 void
 liscr_class_inherit (liscrClass*    self,
-                     liscrClassInit init);
+                     liscrClassInit init,
+                     void*          data);
 
 void
 liscr_class_insert_enum (liscrClass* self,

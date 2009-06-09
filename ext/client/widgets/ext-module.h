@@ -30,6 +30,7 @@
 #include <script/lips-script.h>
 
 #define LIEXT_SCRIPT_BUTTON "Lips.Button"
+#define LIEXT_SCRIPT_ENTRY "Lips.Entry"
 #define LIEXT_SCRIPT_IMAGE "Lips.Image"
 #define LIEXT_SCRIPT_LABEL "Lips.Label"
 #define LIEXT_SCRIPT_MENU "Lips.Menu"
@@ -52,6 +53,10 @@ liext_module_free (liextModule* self);
 void
 liextButtonScript (liscrClass* self,
                    void*       data);
+
+void
+liextEntryScript (liscrClass* self,
+                  void*       data);
 
 void
 liextImageScript (liscrClass* self,

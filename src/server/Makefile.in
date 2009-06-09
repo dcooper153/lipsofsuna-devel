@@ -250,7 +250,6 @@ liblipsserver_la_SOURCES = \
 	server-callbacks.h \
 	server-client.c \
 	server-client.h \
-	server-event.h \
 	server-extension.h \
 	server-network.c \
 	server-network.h \

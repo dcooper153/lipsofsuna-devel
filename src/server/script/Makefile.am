@@ -10,7 +10,6 @@ lib_LTLIBRARIES = \
 liblipsserverscript_la_SOURCES = \
 	lips-server-script.h \
 	script-effect.c \
-	script-event.c \
 	script-extension.c \
 	script-object.c \
 	script-server.c

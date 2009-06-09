@@ -33,6 +33,7 @@
 
 enum
 {
+	LISRV_CALLBACK_CLIENT_CONTROL, /* (data, object, quat, flags) */
 	LISRV_CALLBACK_CLIENT_LOGIN, /* (data, object, name, pass) */
 	LISRV_CALLBACK_CLIENT_LOGOUT, /* (data, object) */
 	LISRV_CALLBACK_CLIENT_PACKET, /* (data, client, packet) */
@@ -40,7 +41,6 @@ enum
 	LISRV_CALLBACK_OBJECT_SAMPLE, /* (data, object, sample, flags) */
 	LISRV_CALLBACK_OBJECT_MODEL, /* (data, object, model) */
 	LISRV_CALLBACK_OBJECT_MOTION, /* (data, object) */
-	LISRV_CALLBACK_OBJECT_SPEECH, /* (data, object, text) */
 	LISRV_CALLBACK_OBJECT_VISIBILITY, /* (data, object, visible) */
 	LISRV_CALLBACK_TICK, /* (data, secs) */
 	LISRV_CALLBACK_VISION_HIDE, /* (data, object, object) */
@@ -48,7 +48,6 @@ enum
 };
 
 int lisrv_server_init_callbacks_client (lisrvServer* server);
-int lisrv_server_init_callbacks_event (lisrvServer* server);
 
 #endif
 

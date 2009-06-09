@@ -8,7 +8,6 @@ liblipscommonscript_la_SOURCES = \
 	lips-common-script.h \
 	script-event.c \
 	script-event.h \
-	script-events.c \
 	script-object.c \
 	script-packet.c \
 	script-packet.h \

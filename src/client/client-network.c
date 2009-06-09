@@ -235,7 +235,7 @@ licli_network_update (licliNetwork* self,
 		self->delta.rotation = 0.0f;
 		self->prev.controls = self->curr.controls;
 		self->prev.direction = self->curr.direction;
-		writer = liarc_writer_new_packet (LI_CLIENT_COMMAND_MOVE);
+		writer = liarc_writer_new_packet (LINET_CLIENT_PACKET_MOVE);
 		if (writer != NULL)
 		{
 			/* FIXME: No analog support. */
@@ -304,12 +304,13 @@ private_message (licliNetwork*    self,
 	}
 
 	/* Create packet reader. */
-	reader = li_reader_new ((char*) data + 1, len - 1);
+	reader = li_reader_new ((char*) data, len);
 	if (reader == NULL)
 		return 0;
+	reader->pos = 1;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->module->engine, LICLI_CALLBACK_PACKET, (int) data[0], reader);
+	lieng_engine_call (self->module->engine, LICLI_CALLBACK_PACKET, data[0], reader);
 	li_reader_free (reader);
 
 	return 1;

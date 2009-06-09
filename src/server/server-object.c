@@ -415,23 +415,6 @@ lisrv_object_serialize (liengObject*    self,
 	}
 }
 
-/**
- * \brief Emits a speech event.
- *
- * \param self Object.
- * \param value Message string.
- */
-void
-lisrv_object_say (liengObject* self,
-                  const char*  value)
-{
-	if (!lieng_object_get_realized (self))
-		return;
-
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_SPEECH, self, value);
-}
-
 int
 lisrv_object_sees (const liengObject* self,
                    const liengObject* target)

@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "client.h"
-#include "client-event.h"
 
 static int
 private_assign (licliModule* module,
@@ -34,10 +33,6 @@ private_assign (licliModule* module,
 static int
 private_chat (licliModule* module,
               liReader*    reader);
-
-static int
-private_custom (licliModule* module,
-                liReader*    reader);
 
 static int
 private_object_animation (licliModule* module,
@@ -99,9 +94,6 @@ licli_module_handle_packet (licliModule* self,
 		case LINET_SERVER_PACKET_ASSIGN:
 			private_assign (self, reader);
 			return 0;
-		case LINET_SERVER_PACKET_CHAT:
-			private_chat (self, reader);
-			return 0;
 		case LINET_SERVER_PACKET_OBJECT_ANIMATION:
 			private_object_animation (self, reader);
 			return 0;
@@ -132,9 +124,6 @@ licli_module_handle_packet (licliModule* self,
 		case LIEXT_VOXEL_PACKET_SPHERE:
 			private_voxel_sphere (self, reader);
 			return 0;
-		case LINET_SERVER_PACKET_CUSTOM:
-			private_custom (self, reader);
-			return 0;
 	}
 
 	return 1;
@@ -162,48 +151,6 @@ private_assign (licliModule* module,
 			lieng_object_set_realized (iter.value, 0);
 	}
 
-	return 1;
-}
-
-static int
-private_chat (licliModule* module,
-              liReader*    reader)
-{
-	uint32_t id;
-	char* message = NULL;
-	liengObject* object;
-
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_text (reader, "", &message) ||
-	    !li_reader_check_end (reader))
-	{
-		free (message);
-		return 0;
-	}
-
-	/* FIXME */
-	object = licli_module_find_object (module, id);
-	if (object != NULL)
-		licli_object_set_speech (object, message);
-	else
-		printf ("FIXME: %s: \"%s\"\n", "<missing>", message);
-
-	lical_callbacks_call (module->engine->callbacks, LICLI_CALLBACK_CHAT, object, message);
-
-	licli_module_event (module, LICLI_EVENT_TYPE_CHAT,
-		"client", LISCR_TYPE_INT, id,
-		"message", LISCR_TYPE_STRING, message, NULL);
-	free (message);
-	return 1;
-}
-
-static int
-private_custom (licliModule* module,
-                liReader*    reader)
-{
-	licli_module_event (module, LICLI_EVENT_TYPE_PACKET,
-		"message", LISCR_TYPE_INT, (int)(((uint8_t*) reader->buffer)[0]),
-		"packet", LICOM_SCRIPT_PACKET, reader, NULL);
 	return 1;
 }
 

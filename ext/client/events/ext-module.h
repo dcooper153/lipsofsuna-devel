@@ -18,44 +18,54 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
+ * \addtogroup liextsrv Server
  * @{
- * \addtogroup liextcliChat Chat          
+ * \addtogroup liextsrvEvents Events
  * @{
  */
 
-#include <client/lips-client.h>
-#include "ext-history.h"
-#include "ext-module.h"
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
-licliExtensionInfo liextInfo =
+#include <client/lips-client.h>
+#include <script/lips-script.h>
+
+#define LIEXT_SCRIPT_EVENTS "Lips.Events"
+
+enum
 {
-	LICLI_EXTENSION_VERSION, "Chat",
-	liext_module_new,
-	liext_module_free
+	LIEXT_EVENT_ACTION = LICLI_EVENT_TYPE_ACTION,
+	LIEXT_EVENT_PACKET,
+	LIEXT_EVENT_SELECT,
+	LIEXT_EVENT_TICK,
+	LIEXT_EVENT_MAX
+};
+
+typedef struct _liextModule liextModule;
+struct _liextModule
+{
+	licalHandle calls[3];
+	licliModule* module;
 };
 
 liextModule*
-liext_module_new (licliModule* module)
-{
-	liextModule* self;
-
-	self = calloc (1, sizeof (liextModule));
-	if (self == NULL)
-		return NULL;
-	self->module = module;
-
-	liscr_script_insert_class (module->script, "ChatHistory", liextChatHistoryScript, self);
-
-	return self;
-}
+liext_module_new (licliModule* module);
 
 void
-liext_module_free (liextModule* self)
-{
-	/* FIXME: Remove the class here. */
-	free (self);
-}
+liext_module_free (liextModule* self);
+
+void
+liext_module_event (liextModule* self,
+                    int          type,
+                                 ...) __LI_ATTRIBUTE_SENTINEL;
+
+/*****************************************************************************/
+
+void
+liextEventsScript (liscrClass* self,
+                   void*       data);
+
+#endif
 
 /** @} */
 /** @} */
