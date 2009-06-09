@@ -462,14 +462,14 @@ liscr_class_default___index (lua_State* lua)
 	}
 
 	/* Getters. */
-	if (lua_isstring (script->lua, 2))
+	if (lua_isstring (lua, 2))
 	{
-		tmp.name = (char*) lua_tostring (script->lua, 2);
+		tmp.name = (char*) lua_tostring (lua, 2);
 		func = bsearch (&tmp, clss->getters.getters, clss->getters.count,
 			sizeof (liscrClassMemb), private_member_compare);
 		if (func != NULL)
 		{
-			func->call (script->lua);
+			func->call (lua);
 			return 1;
 		}
 	}
@@ -477,23 +477,23 @@ liscr_class_default___index (lua_State* lua)
 	/* Custom values. */
 	if (self != NULL)
 	{
-		liscr_pushpriv (script->lua, self);
-		lua_pushvalue (script->lua, 2);
-		lua_gettable (script->lua, -2);
-		if (!lua_isnil (script->lua, -1))
+		liscr_pushpriv (lua, self);
+		lua_pushvalue (lua, 2);
+		lua_gettable (lua, -2);
+		if (!lua_isnil (lua, -1))
 		{
-			lua_remove (script->lua, -2);
+			lua_remove (lua, -2);
 			return 1;
 		}
-		lua_pop (script->lua, 2);
+		lua_pop (lua, 2);
 	}
 
 	/* Class values. */
-	luaL_getmetatable (script->lua, clss->meta);
-	assert (!lua_isnil (script->lua, -1));
-	lua_pushvalue (script->lua, 2);
-	lua_rawget (script->lua, -2);
-	lua_remove (script->lua, -2);
+	luaL_getmetatable (lua, clss->meta);
+	assert (!lua_isnil (lua, -1));
+	lua_pushvalue (lua, 2);
+	lua_rawget (lua, -2);
+	lua_remove (lua, -2);
 
 	return 1;
 }
@@ -520,10 +520,7 @@ liscr_class_default___newindex (lua_State* lua)
 	{
 		self = liscr_isanydata (lua, 1);
 		if (self == NULL)
-		{
-			lua_pushnil (lua);
-			return 1;
-		}
+			return 0;
 		clss = liscr_data_get_class (self);
 	}
 	else
@@ -540,14 +537,14 @@ liscr_class_default___newindex (lua_State* lua)
 	}
 
 	/* Setters. */
-	if (lua_isstring (script->lua, 2))
+	if (lua_isstring (lua, 2))
 	{
-		tmp.name = (char*) lua_tostring (script->lua, 2);
+		tmp.name = (char*) lua_tostring (lua, 2);
 		func = bsearch (&tmp, clss->setters.setters, clss->setters.count,
 			sizeof (liscrClassMemb), private_member_compare);
 		if (func != NULL)
 		{
-			func->call (script->lua);
+			func->call (lua);
 			return 0;
 		}
 	}
@@ -555,19 +552,19 @@ liscr_class_default___newindex (lua_State* lua)
 	/* Custom values. */
 	if (self != NULL)
 	{
-		liscr_pushpriv (script->lua, self);
-		lua_pushvalue (script->lua, 2);
-		lua_pushvalue (script->lua, 3);
-		lua_settable (script->lua, -3);
-		lua_pop (script->lua, 1);
+		liscr_pushpriv (lua, self);
+		lua_pushvalue (lua, 2);
+		lua_pushvalue (lua, 3);
+		lua_settable (lua, -3);
+		lua_pop (lua, 1);
 		return 0;
 	}
 
 	/* Protect reserved names. */
 #warning FIXME: Is this enough protection?
-	if (lua_isstring (script->lua, 2))
+	if (lua_isstring (lua, 2))
 	{
-		tmp.name = (char*) lua_tostring (script->lua, 2);
+		tmp.name = (char*) lua_tostring (lua, 2);
 		if (!strncmp (tmp.name, "__", 2))
 			return 0;
 		func = bsearch (&tmp, clss->getters.getters, clss->getters.count,
@@ -577,12 +574,12 @@ liscr_class_default___newindex (lua_State* lua)
 	}
 
 	/* Custom class values. */
-	luaL_getmetatable (script->lua, clss->meta);
-	assert (!lua_isnil (script->lua, -1));
-	lua_pushvalue (script->lua, 2);
-	lua_pushvalue (script->lua, 3);
-	lua_rawset (script->lua, -3);
-	lua_pop (script->lua, 1);
+	luaL_getmetatable (lua, clss->meta);
+	assert (!lua_isnil (lua, -1));
+	lua_pushvalue (lua, 2);
+	lua_pushvalue (lua, 3);
+	lua_rawset (lua, -3);
+	lua_pop (lua, 1);
 
 	return 0;
 }

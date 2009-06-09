@@ -925,7 +925,7 @@ liscr_script (lua_State* lua)
 {
 	liscrScript* script;
 
-	lua_pushlightuserdata (lua, lua);
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_SELF);
 	lua_gettable (lua, LUA_REGISTRYINDEX);
 	script = lua_touserdata (lua, -1);
 	lua_pop (lua, 1);

@@ -25,6 +25,8 @@
 #include "script.h"
 #include "script-types.h"
 
+#define LISCR_SCRIPT_SELF (NULL + 1)
+
 typedef struct _liscrClassMemb liscrClassMemb;
 
 enum

@@ -32,8 +32,6 @@
 #include "script-data.h"
 #include "script-private.h"
 
-#define LISCR_SCRIPT_SELF (NULL + 1)
-
 /**
  * \brief Creates a new script.
  *
@@ -86,7 +84,7 @@ liscr_script_new ()
 	luaL_openlibs (self->lua);
 
 	/* Create shortcut to self. */
-	lua_pushlightuserdata (self->lua, self->lua);
+	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_SELF);
 	lua_pushlightuserdata (self->lua, self);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
 
