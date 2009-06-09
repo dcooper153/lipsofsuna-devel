@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include <client/lips-client.h>
 #include "lips-client-script.h"
 
@@ -47,10 +46,11 @@ Widget___gc (lua_State* lua)
 	liscrData* self;
 
 	self = liscr_isiface (lua, 1, LICLI_SCRIPT_WIDGET);
-
 	if (self->data != NULL)
+	{
 		private_detach (self);
-	liwdg_widget_free (self->data);
+		liwdg_widget_free (self->data);
+	}
 
 	return 0;
 }
@@ -183,13 +183,11 @@ private_detach (liscrData* self)
 	int y;
 	liwdgGroup* group;
 	liwdgWidget* child;
-	liwdgWidget* widget;
-
-	widget = self->data;
+	liwdgWidget* widget = self->data;
 
 	/* Unparent all children managed by scripts so that they aren't
 	   double removed when their garbage collection methods are called. */
-	if (li_instance_typeis (widget, &liwdgGroupType))
+	if (liwdg_widget_typeis (widget, &liwdgGroupType))
 	{
 		group = LIWDG_GROUP (widget);
 		for (x = 0 ; x < group->width ; x++)

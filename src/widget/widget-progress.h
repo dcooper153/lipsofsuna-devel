@@ -40,7 +40,7 @@ struct _liwdgProgress
 	float value;
 };
 
-extern const liwdgWidgetClass liwdgProgressType;
+extern const liwdgClass liwdgProgressType;
 
 liwdgWidget*
 liwdg_progress_new (liwdgManager* manager);

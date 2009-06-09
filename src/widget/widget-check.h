@@ -43,7 +43,7 @@ struct _liwdgCheck
 	char* string;
 };
 
-extern const liwdgWidgetClass liwdgCheckType;
+extern const liwdgClass liwdgCheckType;
 
 liwdgWidget*
 liwdg_check_new (liwdgManager* manager);

@@ -34,8 +34,6 @@
 
 #define LIEXT_DIALOG(o) ((liextDialog*)(o))
 
-extern const liwdgWidgetClass liextDialogType;
-
 typedef struct _liextDialog liextDialog;
 struct _liextDialog
 {
@@ -50,6 +48,8 @@ struct _liextDialog
 	liwdgWidget* button_delete;
 	liwdgWidget* button_duplicate;
 };
+
+extern const liwdgClass liextDialogType;
 
 liwdgWidget*
 liext_dialog_new (liwdgManager* manager,

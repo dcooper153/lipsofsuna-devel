@@ -37,7 +37,7 @@ struct _liwdgWindow
 	liwdgWidget* label_title;
 };
 
-extern const liwdgWidgetClass liwdgWindowType;
+extern const liwdgClass liwdgWindowType;
 
 liwdgWidget*
 liwdg_window_new (liwdgManager* manager,

@@ -22,6 +22,7 @@
 #include "widget-button.h"
 #include "widget-busy.h"
 #include "widget-check.h"
+#include "widget-class.h"
 #include "widget-entry.h"
 #include "widget-event.h"
 #include "widget-group.h"

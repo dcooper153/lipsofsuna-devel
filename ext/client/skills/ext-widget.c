@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include <client/lips-client.h>
 #include "ext-skills.h"
 #include "ext-widget.h"
@@ -43,23 +42,22 @@ static int
 private_event (liextSkillWidget* self,
                liwdgEvent*       event);
 
-static const liwdgWidgetClass
-liextSkillWidgetType =
+/****************************************************************************/
+
+const liwdgClass liextSkillWidgetType =
 {
-	LI_CLASS_BASE_DYNAMIC, private_base, "SkillWidget", sizeof (liextSkillWidget),
+	LIWDG_BASE_DYNAMIC, private_base, "SkillWidget", sizeof (liextSkillWidget),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
 };
-
-/****************************************************************************/
 
 liwdgWidget*
 liext_skill_widget_new (liextModule* module)
 {
 	liwdgWidget* self;
 
-	self = li_instance_new (&liextSkillWidgetType, module->module->widgets);
+	self = liwdg_widget_new (module->module->widgets, &liextSkillWidgetType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_SKILL_WIDGET (self)->module = module;

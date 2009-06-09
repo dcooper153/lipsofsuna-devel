@@ -32,7 +32,7 @@
 
 typedef struct _liwdgMenu liwdgMenu;
 
-extern const liwdgWidgetClass liwdgMenuType;
+extern const liwdgClass liwdgMenuType;
 
 liwdgWidget*
 liwdg_menu_new (liwdgManager* manager);

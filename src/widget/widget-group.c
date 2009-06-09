@@ -23,7 +23,6 @@
  */
 
 #include <assert.h>
-#include <class/lips-class.h>
 #include <math/lips-math.h>
 #include "widget-group.h"
 #include "widget-window.h"
@@ -66,9 +65,9 @@ private_rebuild_children (liwdgGroup* self);
 static void
 private_rebuild_request (liwdgGroup* self);
 
-const liwdgWidgetClass liwdgGroupType =
+const liwdgClass liwdgGroupType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgWidgetType, "Group", sizeof (liwdgGroup),
+	LIWDG_BASE_STATIC, &liwdgWidgetType, "Group", sizeof (liwdgGroup),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -85,7 +84,7 @@ const liwdgWidgetClass liwdgGroupType =
 liwdgWidget*
 liwdg_group_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgGroupType, manager);
+	return liwdg_widget_new (manager, &liwdgGroupType);
 }
 
 /**
@@ -103,7 +102,7 @@ liwdg_group_new_with_size (liwdgManager* manager,
 {
 	liwdgWidget* self;
 
-	self = li_instance_new (&liwdgGroupType, manager);
+	self = liwdg_widget_new (manager, &liwdgGroupType);
 	if (self == NULL)
 		return NULL;
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), cols, rows))
@@ -236,17 +235,19 @@ liwdg_group_set_child (liwdgGroup*  self,
 	cell = self->cells + x + y * self->width;
 	if (cell->child != NULL)
 	{
-		if (liwdg_manager_get_focus_mouse (LIWDG_WIDGET (self)->manager) == cell->child)
-			liwdg_manager_set_focus_mouse (LIWDG_WIDGET (self)->manager, NULL);
-		if (liwdg_manager_get_focus_keyboard (LIWDG_WIDGET (self)->manager) == cell->child)
-			liwdg_manager_set_focus_keyboard (LIWDG_WIDGET (self)->manager, NULL);
+		assert (cell->child->state == LIWDG_WIDGET_STATE_DETACHED);
+		assert (cell->child->parent == LIWDG_WIDGET (self));
 		cell->child->parent = NULL;
 	}
 
 	/* Attach the new child. */
 	cell->child = child;
 	if (child != NULL)
+	{
+		assert (child->parent == NULL);
+		assert (child->state == LIWDG_WIDGET_STATE_DETACHED);
 		child->parent = LIWDG_WIDGET (self);
+	}
 
 	/* Ensure valid focus. */
 	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);

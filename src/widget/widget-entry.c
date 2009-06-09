@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include "widget-entry.h"
 #include "widget-manager.h"
 
@@ -43,10 +42,9 @@ private_backspace (liwdgEntry* self);
 static void
 private_rebuild (liwdgEntry* self);
 
-const liwdgWidgetClass
-liwdgEntryType =
+const liwdgClass liwdgEntryType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgWidgetType, "Entry", sizeof (liwdgEntry),
+	LIWDG_BASE_STATIC, &liwdgWidgetType, "Entry", sizeof (liwdgEntry),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -57,7 +55,7 @@ liwdgEntryType =
 liwdgWidget*
 liwdg_entry_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgEntryType, manager);
+	return liwdg_widget_new (manager, &liwdgEntryType);
 }
 
 void

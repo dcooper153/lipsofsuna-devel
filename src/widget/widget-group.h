@@ -30,10 +30,6 @@
 
 #define LIWDG_GROUP(o) ((liwdgGroup*)(o))
 
-typedef struct _liwdgGroup liwdgGroup;
-
-/****************************************************************************/
-
 typedef struct _liwdgGroupRow liwdgGroupRow;
 struct _liwdgGroupRow
 {
@@ -60,8 +56,7 @@ struct _liwdgGroupCell
 	liwdgWidget* child;
 };
 
-/****************************************************************************/
-
+typedef struct _liwdgGroup liwdgGroup;
 struct _liwdgGroup
 {
 	liwdgWidget base;
@@ -79,6 +74,8 @@ struct _liwdgGroup
 	liwdgGroupCol* cols;
 	liwdgGroupCell* cells;
 };
+
+extern const liwdgClass liwdgGroupType;
 
 liwdgWidget*
 liwdg_group_new (liwdgManager* manager);
@@ -177,10 +174,6 @@ void
 liwdg_group_set_spacings (liwdgGroup* self,
                           int         column,
                           int         row);
-
-/****************************************************************************/
-
-extern const liwdgWidgetClass liwdgGroupType;
 
 #endif
 

@@ -24,6 +24,12 @@
 
 enum
 {
+	LIWDG_BASE_DYNAMIC,
+	LIWDG_BASE_STATIC
+};
+
+enum
+{
 	LIWDG_CALLBACK_ACTIVATED,
 	LIWDG_CALLBACK_PRESSED,
 	LIWDG_CALLBACK_LAST
@@ -39,9 +45,9 @@ enum
 
 typedef int (*liwdgHandler)();
 typedef int liwdgWidgetState;
+typedef struct _liwdgClass liwdgClass;
 typedef struct _liwdgManager liwdgManager;
 typedef struct _liwdgWidget liwdgWidget;
-typedef struct _liwdgWidgetClass liwdgWidgetClass;
 typedef struct _liwdgRect liwdgRect;
 typedef struct _liwdgSize liwdgSize;
 typedef struct _liwdgSubimage liwdgSubimage;

@@ -39,7 +39,7 @@ struct _liwdgImage
 	char* image;
 };
 
-extern const liwdgWidgetClass liwdgImageType;
+extern const liwdgClass liwdgImageType;
 
 liwdgWidget*
 liwdg_image_new (liwdgManager* manager);

@@ -42,7 +42,7 @@ struct _liwdgButton
 	char* string;
 };
 
-extern const liwdgWidgetClass liwdgButtonType;
+extern const liwdgClass liwdgButtonType;
 
 liwdgWidget*
 liwdg_button_new (liwdgManager* manager);

@@ -39,7 +39,7 @@ struct _liwdgBusy
 	void* update_data;
 };
 
-extern const liwdgWidgetClass liwdgBusyType;
+extern const liwdgClass liwdgBusyType;
 
 liwdgWidget*
 liwdg_busy_new (liwdgManager* manager);

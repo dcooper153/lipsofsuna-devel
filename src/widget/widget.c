@@ -26,10 +26,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <class/lips-class.h>
 #include "widget.h"
 #include "widget-group.h"
 #include "widget-window.h"
+
+static int
+private_new (liwdgWidget*      self,
+             const liwdgClass* clss,
+             liwdgManager*     manager);
 
 static int
 private_init (liwdgWidget*  self,
@@ -52,15 +56,35 @@ private_paint_row (liwdgWidget* self,
                    float        h,
                    int          repeat);
 
-const liwdgWidgetClass liwdgWidgetType =
+const liwdgClass liwdgWidgetType =
 {
-	LI_CLASS_BASE_STATIC, NULL, "Widget", sizeof (liwdgWidget),
+	LIWDG_BASE_STATIC, NULL, "Widget", sizeof (liwdgWidget),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event,
 };
 
 /*****************************************************************************/
+
+liwdgWidget*
+liwdg_widget_new (liwdgManager*     manager,
+                  const liwdgClass* clss)
+{
+	liwdgWidget* self;
+
+	self = calloc (1, clss->size);
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	self->manager = manager;
+	self->type = clss;
+	if (!private_new (self, clss, manager))
+		return 0;
+
+	return self;
+}
 
 /**
  * \brief Frees the widget.
@@ -72,10 +96,16 @@ const liwdgWidgetClass liwdgWidgetType =
 void
 liwdg_widget_free (liwdgWidget* self)
 {
+	const liwdgClass* ptr;
+
 	assert (self->manager->focus.keyboard != self);
 	assert (self->manager->focus.mouse != self);
 
-	li_instance_free (self, self->type);
+	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
+	{
+		if (ptr->free != NULL)
+			ptr->free (self);
+	}
 	free (self);
 }
 
@@ -100,7 +130,7 @@ liwdg_widget_detach (liwdgWidget* self)
 		case LIWDG_WIDGET_STATE_DETACHED:
 			if (self->parent != NULL)
 			{
-				assert (li_instance_typeis (self->parent, &liwdgGroupType));
+				assert (liwdg_widget_typeis (self->parent, &liwdgGroupType));
 				liwdg_group_detach_child (LIWDG_GROUP (self->parent), self);
 				changed = 1;
 			}
@@ -234,17 +264,6 @@ liwdg_widget_paint (liwdgWidget* self,
 	private_paint_row (self, px, py, tx, ty + 2, w, h[2], repeatx);
 }
 
-void
-liwdg_widget_update (liwdgWidget* self,
-                     float        secs)
-{
-	liwdgEvent event;
-
-	event.type = LIWDG_EVENT_TYPE_UPDATE;
-	event.update.secs = secs;
-	self->type->event (self, &event);
-}
-
 int
 liwdg_widget_register_callback (liwdgWidget* self,
                                 licalType    type,
@@ -271,6 +290,45 @@ liwdg_widget_render (liwdgWidget* self)
 		event.type = LIWDG_EVENT_TYPE_RENDER;
 		self->type->event (self, &event);
 	}
+}
+
+/**
+ * \brief Checks if the widget implements the given class.
+ *
+ * \param self Widget.
+ * \param clss Class.
+ * \return Nonzero if implements.
+ */
+int
+liwdg_widget_typeis (const liwdgWidget* self,
+                     const liwdgClass*  clss)
+{
+	const liwdgClass* ptr;
+
+	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
+	{
+		if (clss == ptr)
+			return 1;
+	}
+
+	return 0;
+}
+
+/**
+ * \brief Calls the type specific update handler of the widget.
+ *
+ * \param self Widget.
+ * \param secs Seconds since last update.
+ */
+void
+liwdg_widget_update (liwdgWidget* self,
+                     float        secs)
+{
+	liwdgEvent event;
+
+	event.type = LIWDG_EVENT_TYPE_UPDATE;
+	event.update.secs = secs;
+	self->type->event (self, &event);
 }
 
 void
@@ -494,6 +552,39 @@ liwdg_widget_set_visible (liwdgWidget* self,
 /*****************************************************************************/
 
 static int
+private_new (liwdgWidget*      self,
+             const liwdgClass* clss,
+             liwdgManager*     manager)
+{
+	const liwdgClass* base;
+
+	/* Initialization. */
+	base = liwdg_class_get_base (clss);
+	if (base != NULL)
+	{
+		if (!private_new (self, base, manager))
+			return 0;
+	}
+	else
+	{
+		assert (clss == &liwdgWidgetType);
+	}
+	if (clss->init == NULL)
+		return 1;
+	if (clss->init (self, manager))
+		return 1;
+
+	/* Error recovery. */
+	if (base != NULL)
+		self->type = base;
+	else
+		self->type = &liwdgWidgetType;
+	liwdg_widget_free (self);
+
+	return 0;
+}
+
+static int
 private_init (liwdgWidget*  self,
               liwdgManager* manager)
 {
@@ -508,7 +599,8 @@ private_init (liwdgWidget*  self,
 static void
 private_free (liwdgWidget* self)
 {
-	lical_callbacks_free (self->callbacks);
+	if (self->callbacks != NULL)
+		lical_callbacks_free (self->callbacks);
 }
 
 static int

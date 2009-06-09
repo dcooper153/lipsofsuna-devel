@@ -192,7 +192,6 @@ src/algorithm/Makefile
 src/archive/Makefile
 src/binding/Makefile
 src/callback/Makefile
-src/class/Makefile
 src/client/Makefile
 src/client/script/Makefile
 src/config/Makefile

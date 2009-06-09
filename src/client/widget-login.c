@@ -15,7 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <class/lips-class.h>
 #include <system/lips-system.h>
 #include "client-paths.h"
 #include "client-window.h"
@@ -44,9 +43,9 @@ static int
 private_filter_servers (const char* dir,
                         const char* name);
 
-const liwdgWidgetClass liwdgLoginType =
+const liwdgClass liwdgLoginType =
 {
-	LI_CLASS_BASE_DYNAMIC, private_base, "Login", sizeof (liwdgLogin),
+	LIWDG_BASE_DYNAMIC, private_base, "Login", sizeof (liwdgLogin),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -57,7 +56,7 @@ const liwdgWidgetClass liwdgLoginType =
 liwdgWidget*
 liwdg_login_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgLoginType, manager);
+	return liwdg_widget_new (manager, &liwdgLoginType);
 }
 
 int

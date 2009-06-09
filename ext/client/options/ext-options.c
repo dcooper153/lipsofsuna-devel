@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include <client/lips-client.h>
 #include "ext-options.h"
 
@@ -56,9 +55,9 @@ private_shaders (liextOptions* self);
 
 /****************************************************************************/
 
-const liwdgWidgetClass liextOptionsType =
+const liwdgClass liextOptionsType =
 {
-	LI_CLASS_BASE_DYNAMIC, private_base, "Options", sizeof (liextOptions),
+	LIWDG_BASE_DYNAMIC, private_base, "Options", sizeof (liextOptions),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -69,7 +68,7 @@ liext_options_new (licliModule* module)
 {
 	liwdgWidget* self;
 
-	self = li_instance_new (&liextOptionsType, module->widgets);
+	self = liwdg_widget_new (module->widgets, &liextOptionsType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_WIDGET_OPTIONS (self)->module = module;

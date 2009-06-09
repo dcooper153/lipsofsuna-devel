@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include <client/lips-client.h>
 #include "ext-inventory.h"
 #include "ext-widget.h"
@@ -52,16 +51,15 @@ private_calculate_modelview (liextInventoryWidget* self,
                              float                 scale,
                              limatMatrix*          modelview);
 
-static const liwdgWidgetClass
-liextInventoryWidgetType =
+/****************************************************************************/
+
+static const liwdgClass liextInventoryWidgetType =
 {
-	LI_CLASS_BASE_DYNAMIC, private_base, "InventoryWidget", sizeof (liextInventoryWidget),
+	LIWDG_BASE_DYNAMIC, private_base, "InventoryWidget", sizeof (liextInventoryWidget),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
 };
-
-/****************************************************************************/
 
 liwdgWidget*
 liext_inventory_widget_new (liextInventory* inventory)
@@ -73,7 +71,7 @@ liext_inventory_widget_new (liextInventory* inventory)
 	liwdgWidget* self;
 
 	/* Allocate self. */
-	self = li_instance_new (&liextInventoryWidgetType, inventory->module->module->widgets);
+	self = liwdg_widget_new (inventory->module->module->widgets, &liextInventoryWidgetType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_INVENTORY_WIDGET (self)->module = inventory->module;

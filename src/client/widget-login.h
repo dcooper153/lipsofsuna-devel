@@ -40,7 +40,7 @@ struct _liwdgLogin
 	liwdgWidget* button_import;
 };
 
-extern const liwdgWidgetClass liwdgLoginType;
+extern const liwdgClass liwdgLoginType;
 
 liwdgWidget*
 liwdg_login_new (liwdgManager* manager);

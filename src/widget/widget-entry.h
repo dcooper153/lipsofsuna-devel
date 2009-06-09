@@ -48,7 +48,7 @@ struct _liwdgEntry
 	unsigned int secret : 1;
 };
 
-extern const liwdgWidgetClass liwdgEntryType;
+extern const liwdgClass liwdgEntryType;
 
 liwdgWidget*
 liwdg_entry_new (liwdgManager* manager);

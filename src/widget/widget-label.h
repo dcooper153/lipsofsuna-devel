@@ -39,7 +39,7 @@ struct _liwdgLabel
 	char* string;
 };
 
-extern const liwdgWidgetClass liwdgLabelType;
+extern const liwdgClass liwdgLabelType;
 
 liwdgWidget*
 liwdg_label_new (liwdgManager* manager);

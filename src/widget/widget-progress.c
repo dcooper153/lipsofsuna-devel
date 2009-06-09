@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include "widget-manager.h"
 #include "widget-progress.h"
 
@@ -40,9 +39,9 @@ private_event (liwdgProgress* self,
 static void
 private_rebuild (liwdgProgress* self);
 
-const liwdgWidgetClass liwdgProgressType =
+const liwdgClass liwdgProgressType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgWidgetType, "Progress", sizeof (liwdgProgress),
+	LIWDG_BASE_STATIC, &liwdgWidgetType, "Progress", sizeof (liwdgProgress),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -53,7 +52,7 @@ const liwdgWidgetClass liwdgProgressType =
 liwdgWidget*
 liwdg_progress_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgProgressType, manager);
+	return liwdg_widget_new (manager, &liwdgProgressType);
 }
 
 lifntFont*

@@ -86,6 +86,7 @@ Group_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
+	liwdg_widget_set_userdata (widget, self);
 
 	liscr_pushdata (lua, self);
 	return 1;

@@ -14,6 +14,7 @@ liblipswidget_la_SOURCES = \
 	widget-button.h \
 	widget-check.c \
 	widget-check.h \
+	widget-class.h \
 	widget-entry.c \
 	widget-entry.h \
 	widget-event.h \

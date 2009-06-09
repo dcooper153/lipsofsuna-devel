@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include "widget-label.h"
 #include "widget-menu.h"
 #include "widget-private.h"
@@ -61,9 +60,9 @@ private_rebuild (liwdgMenu* self);
 static const char*
 private_style (liwdgMenu* self);
 
-const liwdgWidgetClass liwdgMenuType =
+const liwdgClass liwdgMenuType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgWidgetType, "Menu", sizeof (liwdgMenu),
+	LIWDG_BASE_STATIC, &liwdgWidgetType, "Menu", sizeof (liwdgMenu),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -74,7 +73,7 @@ const liwdgWidgetClass liwdgMenuType =
 liwdgWidget*
 liwdg_menu_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgMenuType, manager);
+	return liwdg_widget_new (manager, &liwdgMenuType);
 }
 
 int

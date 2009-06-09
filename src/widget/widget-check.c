@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include "widget-check.h"
 #include "widget-manager.h"
 
@@ -40,9 +39,9 @@ private_event (liwdgCheck* self,
 static void
 private_rebuild (liwdgCheck* self);
 
-const liwdgWidgetClass liwdgCheckType =
+const liwdgClass liwdgCheckType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgWidgetType, "Check", sizeof (liwdgCheck),
+	LIWDG_BASE_STATIC, &liwdgWidgetType, "Check", sizeof (liwdgCheck),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -53,7 +52,7 @@ const liwdgWidgetClass liwdgCheckType =
 liwdgWidget*
 liwdg_check_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgCheckType, manager);
+	return liwdg_widget_new (manager, &liwdgCheckType);
 }
 
 int

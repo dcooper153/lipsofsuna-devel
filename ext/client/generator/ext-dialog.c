@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include <system/lips-system.h>
 #include "ext-dialog.h"
 
@@ -53,9 +52,9 @@ private_remove (liextDialog* self);
 
 /****************************************************************************/
 
-const liwdgWidgetClass liextDialogType =
+const liwdgClass liextDialogType =
 {
-	LI_CLASS_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (liextDialog),
+	LIWDG_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (liextDialog),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -67,7 +66,7 @@ liext_dialog_new (liwdgManager*   manager,
 {
 	liwdgWidget* self;
 
-	self = li_instance_new (&liextDialogType, manager);
+	self = liwdg_widget_new (manager, &liextDialogType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_DIALOG (self)->generator = generator;

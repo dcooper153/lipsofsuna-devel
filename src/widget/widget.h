@@ -27,20 +27,16 @@
 
 #include <SDL/SDL.h>
 #include <callback/lips-callback.h>
+#include "widget-class.h"
 #include "widget-event.h"
 #include "widget-manager.h"
 #include "widget-types.h"
 
 #define LIWDG_WIDGET(o) ((liwdgWidget*)(o))
-#define LIWDG_WIDGET_CLASS(c) ((liwdgWidgetClass*)(c))
-
-typedef int  (*liwdgWidgetInitFunc)(liwdgWidget*, liwdgManager*);
-typedef void (*liwdgWidgetFreeFunc)(liwdgWidget*);
-typedef int  (*liwdgWidgetEventFunc)(liwdgWidget*, liwdgEvent*);
 
 struct _liwdgWidget
 {
-	const liwdgWidgetClass* type;
+	const liwdgClass* type;
 	licalCallbacks* callbacks;
 	liwdgManager* manager;
 	liwdgWidget* parent;
@@ -55,18 +51,11 @@ struct _liwdgWidget
 	unsigned int visible : 1;
 };
 
-struct _liwdgWidgetClass
-{
-	int basetype;
-	const void* base;
-	const char* type;
-	int size;
-	liwdgWidgetInitFunc init;
-	liwdgWidgetFreeFunc free;
-	liwdgWidgetEventFunc event;
-};
+extern const liwdgClass liwdgWidgetType;
 
-extern const liwdgWidgetClass liwdgWidgetType;
+liwdgWidget*
+liwdg_widget_new (liwdgManager*     manager,
+                  const liwdgClass* clss);
 
 void
 liwdg_widget_free (liwdgWidget* self);
@@ -107,6 +96,10 @@ liwdg_widget_remove_callback (liwdgWidget* self,
 
 void
 liwdg_widget_render (liwdgWidget* self);
+
+int
+liwdg_widget_typeis (const liwdgWidget* self,
+                     const liwdgClass*  clss);
 
 void
 liwdg_widget_update (liwdgWidget* self,

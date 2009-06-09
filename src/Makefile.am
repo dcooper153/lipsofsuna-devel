@@ -1,5 +1,5 @@
 SUBDIRS = \
-	system thread math string archive algorithm callback class config ai model script physics network engine reload \
+	system thread math string archive algorithm callback config ai model script physics network engine reload \
 	$(MAYBE_SOUND) \
 	$(MAYBE_GRAPHICS) \
 	$(MAYBE_SERVER) \
@@ -8,7 +8,7 @@ SUBDIRS = \
 	main
 
 DIST_SUBDIRS = \
-	system thread math string archive algorithm callback class config ai model script physics network engine reload \
+	system thread math string archive algorithm callback config ai model script physics network engine reload \
 	sound \
 	video image render font widget binding \
 	server \

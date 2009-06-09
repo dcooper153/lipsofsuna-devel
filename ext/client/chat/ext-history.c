@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include <client/lips-client.h>
 #include "ext-history.h"
 
@@ -49,9 +48,9 @@ private_rebuild (liextChatHistory* self);
 
 /****************************************************************************/
 
-const liwdgWidgetClass liextChatHistoryType =
+const liwdgClass liextChatHistoryType =
 {
-	LI_CLASS_BASE_DYNAMIC, private_base, "ChatHistory", sizeof (liextChatHistory),
+	LIWDG_BASE_DYNAMIC, private_base, "ChatHistory", sizeof (liextChatHistory),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -71,7 +70,7 @@ liext_chat_history_new (liwdgManager* manager,
 	liwdgWidget* self;
 
 	/* Allocate self. */
-	self = li_instance_new (&liextChatHistoryType, manager);
+	self = liwdg_widget_new (manager, &liextChatHistoryType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_WIDGET_CHAT_HISTORY (self)->module = module;

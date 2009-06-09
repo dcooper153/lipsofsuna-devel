@@ -24,7 +24,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <class/lips-class.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "widget-group.h"
@@ -1008,7 +1007,7 @@ private_focus_next (liwdgManager* self,
 		}
 
 		/* Focus the first focusable child. */
-		if (li_instance_typeis (start, &liwdgGroupType))
+		if (liwdg_widget_typeis (start, &liwdgGroupType))
 		{
 			tmp = private_get_next_focusable (self, LIWDG_GROUP (start), NULL);
 			if (tmp != NULL)
@@ -1047,7 +1046,7 @@ private_focus_next (liwdgManager* self,
 		}
 
 		/* Focus the first focusable child. */
-		if (li_instance_typeis (start, &liwdgGroupType))
+		if (liwdg_widget_typeis (start, &liwdgGroupType))
 		{
 			tmp = private_get_next_focusable (self, LIWDG_GROUP (start), NULL);
 			if (tmp != NULL)
@@ -1082,7 +1081,7 @@ private_focus_prev (liwdgManager* self,
 		}
 
 		/* Focus the last focusable child. */
-		if (li_instance_typeis (start, &liwdgGroupType))
+		if (liwdg_widget_typeis (start, &liwdgGroupType))
 		{
 			tmp = private_get_prev_focusable (self, LIWDG_GROUP (start), NULL);
 			if (tmp != NULL)
@@ -1121,7 +1120,7 @@ private_focus_prev (liwdgManager* self,
 		}
 
 		/* Focus the last focusable child. */
-		if (li_instance_typeis (start, &liwdgGroupType))
+		if (liwdg_widget_typeis (start, &liwdgGroupType))
 		{
 			tmp = private_get_prev_focusable (self, LIWDG_GROUP (start), NULL);
 			if (tmp != NULL)
@@ -1241,7 +1240,7 @@ private_get_next_focusable (liwdgManager* self,
 		child = group->cells[x + y * group->width].child;
 		if (child == NULL)
 			continue;
-		if (li_instance_typeis (child, &liwdgGroupType))
+		if (liwdg_widget_typeis (child, &liwdgGroupType))
 		{
 			/* Enter a child group. */
 			tmp = private_get_next_focusable (self, LIWDG_GROUP (child), NULL);
@@ -1303,7 +1302,7 @@ out:
 		child = group->cells[x + y * group->width].child;
 		if (child == NULL)
 			continue;
-		if (li_instance_typeis (child, &liwdgGroupType))
+		if (liwdg_widget_typeis (child, &liwdgGroupType))
 		{
 			tmp = private_get_prev_focusable (self, LIWDG_GROUP (child), NULL);
 			if (tmp != NULL)

@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include "widget-label.h"
 #include "widget-window.h"
 
@@ -40,9 +39,9 @@ static int
 private_event (liwdgWindow* self,
                liwdgEvent*  event);
 
-const liwdgWidgetClass liwdgWindowType =
+const liwdgClass liwdgWindowType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgGroupType, "Window", sizeof (liwdgWindow),
+	LIWDG_BASE_STATIC, &liwdgGroupType, "Window", sizeof (liwdgWindow),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -57,7 +56,7 @@ liwdg_window_new (liwdgManager* manager,
 {
 	liwdgWidget* self;
 
-	self = li_instance_new (&liwdgWindowType, manager);
+	self = liwdg_widget_new (manager, &liwdgWindowType);
 	if (self == NULL)
 		return NULL;
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), width, height))

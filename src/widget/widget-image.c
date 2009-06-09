@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <class/lips-class.h>
 #include "widget-image.h"
 #include "widget-manager.h"
 
@@ -40,9 +39,9 @@ private_event (liwdgImage* self,
 static void
 private_rebuild (liwdgImage* self);
 
-const liwdgWidgetClass liwdgImageType =
+const liwdgClass liwdgImageType =
 {
-	LI_CLASS_BASE_STATIC, &liwdgWidgetType, "Image", sizeof (liwdgImage),
+	LIWDG_BASE_STATIC, &liwdgWidgetType, "Image", sizeof (liwdgImage),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -53,7 +52,7 @@ const liwdgWidgetClass liwdgImageType =
 liwdgWidget*
 liwdg_image_new (liwdgManager* manager)
 {
-	return li_instance_new (&liwdgImageType, manager);
+	return liwdg_widget_new (manager, &liwdgImageType);
 }
 
 const char*
