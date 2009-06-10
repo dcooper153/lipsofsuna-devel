@@ -40,6 +40,8 @@
 #include "render-shader.h"
 #include "render-types.h"
 
+/* #define LIRND_ENABLE_PROFILING */
+
 struct _lirndRender
 {
 	lirndLighting* lighting;
@@ -77,6 +79,15 @@ struct _lirndRender
 	{
 		lirndConstraint* constraints;
 	} world;
+#ifdef LIRND_ENABLE_PROFILING
+	struct
+	{
+		int objects;
+		int materials;
+		int faces;
+		int vertices;
+	} profiling;
+#endif
 };
 
 lirndRender*

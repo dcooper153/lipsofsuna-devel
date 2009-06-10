@@ -64,6 +64,10 @@ lirnd_draw_bounds (lirndContext* context,
 	glVertex3f (aabb.min.x, aabb.min.y, aabb.max.z);
 	glVertex3f (aabb.min.x, aabb.max.y, aabb.max.z);
 	glEnd ();
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 void
@@ -84,6 +88,10 @@ lirnd_draw_debug (lirndContext* context,
 
 	/* Render debug. */
 	lirnd_object_render_debug (object, context->render);
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 void
@@ -138,6 +146,10 @@ lirnd_draw_exclude (lirndContext* context,
 		lirnd_context_bind (context);
 		lirnd_object_render_group (object, context, i);
 	}
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 void
@@ -191,6 +203,10 @@ lirnd_draw_opaque (lirndContext* context,
 			lirnd_object_render_group (object, context, i);
 		}
 	}
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 void
@@ -266,6 +282,10 @@ lirnd_draw_shadeless (lirndContext* context,
 		lirnd_context_bind (context);
 		lirnd_object_render_group (object, context, i);
 	}
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 void
@@ -296,6 +316,10 @@ lirnd_draw_shadowmap (lirndContext* context,
 		lirnd_context_bind (context);
 		lirnd_object_render_group (object, context, i);
 	}
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 void
@@ -349,6 +373,10 @@ lirnd_draw_transparent (lirndContext* context,
 			lirnd_object_render_group (object, context, i);
 		}
 	}
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
 }
 
 /** @} */

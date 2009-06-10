@@ -432,6 +432,12 @@ lirnd_render_render (lirndRender*  self,
 	glLightModelfv (GL_LIGHT_MODEL_AMBIENT, none);
 
 	/* Render scene. */
+#ifdef LIRND_ENABLE_PROFILING
+	self->profiling.objects = 0;
+	self->profiling.materials = 0;
+	self->profiling.faces = 0;
+	self->profiling.vertices = 0;
+#endif
 	glEnable (GL_COLOR_MATERIAL);
 	private_render (self, scene, &context, lirnd_draw_opaque, NULL);
 	private_render (self, scene, &context, lirnd_draw_transparent, NULL);
@@ -439,6 +445,11 @@ lirnd_render_render (lirndRender*  self,
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_BLEND);
 	glDepthMask (GL_TRUE);
+#ifdef LIRND_ENABLE_PROFILING
+	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",
+		self->profiling.objects, self->profiling.materials,
+		self->profiling.faces, self->profiling.vertices);
+#endif
 
 	/* Render particles. */
 	private_particle_render (self);
@@ -824,9 +835,13 @@ private_render (lirndRender*  self,
                 void*         data)
 {
 	lirndSceneIter iter;
+	lirndObject* object;
 
 	LIRND_FOREACH_SCENE (iter, scene)
-		call (context, iter.value, data);
+	{
+		object = iter.value;
+		call (context, object, data);
+	}
 }
 
 /** @} */

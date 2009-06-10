@@ -173,6 +173,12 @@ lirnd_context_render_buffer (lirndContext* self,
 	glDisableClientState (GL_VERTEX_ARRAY);
 
 	glPopMatrix ();
+
+#ifdef LIRND_ENABLE_PROFILING
+	self->render->profiling.materials++;
+	self->render->profiling.faces += count;
+	self->render->profiling.vertices += 3 * count;
+#endif
 }
 
 /**
@@ -222,6 +228,12 @@ lirnd_context_render_indexed (lirndContext*      self,
 	}
 	glEnd ();
 	glPopMatrix ();
+
+#ifdef LIRND_ENABLE_PROFILING
+	self->render->profiling.materials++;
+	self->render->profiling.faces += vertex1 - vertex0;
+	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
+#endif
 }
 
 /**
