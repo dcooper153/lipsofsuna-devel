@@ -89,6 +89,16 @@ livie_viewer_new (const char* name,
 void
 livie_viewer_free (livieViewer* self)
 {
+	if (self->lights.key != NULL)
+	{
+		lirnd_lighting_remove_light (self->engine->render->lighting, self->lights.key);
+		lirnd_light_free (self->lights.key);
+	}
+	if (self->lights.fill != NULL)
+	{
+		lirnd_lighting_remove_light (self->engine->render->lighting, self->lights.fill);
+		lirnd_light_free (self->lights.fill);
+	}
 	if (self->reload != NULL)
 		lirel_reload_free (self->reload);
 	if (self->camera != NULL)
@@ -173,6 +183,14 @@ livie_viewer_main (livieViewer* self)
 		lieng_camera_update (self->camera, secs);
 		lieng_camera_warp (self->camera);
 
+		/* Update lights. */
+		lieng_camera_get_transform (self->camera, &transform);
+		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
+		lirnd_light_set_transform (self->lights.key, &transform);
+		lieng_camera_get_transform (self->camera, &transform);
+		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
+		lirnd_light_set_transform (self->lights.fill, &transform);
+
 		/* Render scene. */
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -212,7 +230,11 @@ private_init_engine (livieViewer* self,
                      const char*  name)
 {
 	int flags;
+	const float equation[3] = { 1.0f, 0.0f, 0.001f };
+	const float diffuse0[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
+	const float diffuse1[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
+	/* Allocate engine. */
 	self->engine = lieng_engine_new (self->datadir, self->path, 1);
 	if (self->engine == NULL)
 		return 0;
@@ -221,6 +243,16 @@ private_init_engine (livieViewer* self,
 	lieng_engine_set_userdata (self->engine, LIENG_DATA_CLIENT, self);
 	if (!lieng_engine_load_resources (self->engine, NULL))
 		return 0;
+
+	/* Allocate lights. */
+	self->lights.key = lirnd_light_new (self->engine->render, diffuse0, equation, M_PI, 0.0f, 0);
+	if (self->lights.key == NULL)
+		return 0;
+	lirnd_lighting_insert_light (self->engine->render->lighting, self->lights.key);
+	self->lights.fill = lirnd_light_new (self->engine->render, diffuse1, equation, M_PI, 0.0f, 0);
+	if (self->lights.fill == NULL)
+		return 0;
+	lirnd_lighting_insert_light (self->engine->render->lighting, self->lights.fill);
 
 	return 1;
 }

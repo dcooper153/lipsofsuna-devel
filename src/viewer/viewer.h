@@ -42,6 +42,11 @@ struct _livieViewer
 	lirelReload* reload;
 	struct
 	{
+		lirndLight* key;
+		lirndLight* fill;
+	} lights;
+	struct
+	{
 		int width;
 		int height;
 		int fsaa;
