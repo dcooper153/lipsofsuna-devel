@@ -41,6 +41,7 @@ struct _liengRender
 	void (*lirnd_object_replace_image)(lirndObject*, lirndImage*, lirndImage*);
 	int (*lirnd_object_set_model)(lirndObject*, lirndModel*);
 	void (*lirnd_object_set_animation)(lirndObject*, int, const char*, int, float);
+	int (*lirnd_object_set_realized)(lirndObject*, int);
 	void (*lirnd_object_set_transform)(lirndObject*, const limatTransform*);
 	lirndRender* (*lirnd_render_new)(const char*);
 	void (*lirnd_render_free)(lirndRender*);

@@ -42,15 +42,14 @@ lieng_render_new (const char* dir)
 
 	/* Resolve symbols. */
 	void* prog = dlopen (NULL, RTLD_NOW);
-#define SYM1(a, b) \
-	self->a = dlsym (prog, #b); \
+#define SYM(a) \
+	self->a = dlsym (prog, #a); \
 	if (self->a == NULL) \
 	{ \
-		lisys_error_set (ENOENT, "cannot find symbol `%s'", #b); \
+		lisys_error_set (ENOENT, "cannot find symbol `%s'", #a); \
 		free (self); \
 		return NULL; \
 	}
-#define SYM(a) SYM1(a, a)
 	SYM (lirnd_model_new);
 	SYM (lirnd_model_free);
 	SYM (lirnd_object_new);
@@ -59,13 +58,13 @@ lieng_render_new (const char* dir)
 	SYM (lirnd_object_update);
 	SYM (lirnd_object_set_model);
 	SYM (lirnd_object_set_animation);
+	SYM (lirnd_object_set_realized);
 	SYM (lirnd_object_set_transform);
 	SYM (lirnd_render_new);
 	SYM (lirnd_render_free);
 	SYM (lirnd_render_update);
 	SYM (lirnd_render_find_image);
 	SYM (lirnd_render_load_image);
-#undef SYM1
 #undef SYM
 
 	/* Allocate renderer. */

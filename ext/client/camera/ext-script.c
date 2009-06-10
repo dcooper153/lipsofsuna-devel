@@ -199,6 +199,62 @@ Camera_setter_mode (lua_State* lua)
 	return 0;
 }
 
+/* @luadoc
+ * ---
+ * -- Camera position.
+ * -- @name Camera.position
+ * -- @class table
+ */
+static int
+Camera_getter_position (lua_State* lua)
+{
+	liextModule* module;
+	limatTransform transform;
+	liscrData* vector;
+	liscrScript* script = liscr_script (lua);
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
+
+	lieng_camera_get_transform (module->module->camera, &transform);
+	vector = liscr_vector_new (script, &transform.position);
+	if (vector != NULL)
+	{
+		liscr_pushdata (lua, vector);
+		liscr_data_unref (vector, NULL);
+	}
+	else
+		lua_pushnil (lua);
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Camera rotation.
+ * -- @name Camera.rotation
+ * -- @class table
+ */
+static int
+Camera_getter_rotation (lua_State* lua)
+{
+	liextModule* module;
+	limatTransform transform;
+	liscrData* quat;
+	liscrScript* script = liscr_script (lua);
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
+
+	lieng_camera_get_transform (module->module->camera, &transform);
+	quat = liscr_quaternion_new (script, &transform.rotation);
+	if (quat != NULL)
+	{
+		liscr_pushdata (lua, quat);
+		liscr_data_unref (quat, NULL);
+	}
+	else
+		lua_pushnil (lua);
+	return 1;
+}
+
 /*****************************************************************************/
 
 void
@@ -215,6 +271,8 @@ liextCameraScript (liscrClass* self,
 	liscr_class_insert_func (self, "turn", Camera_turn);
 	liscr_class_insert_func (self, "zoom", Camera_zoom);
 	liscr_class_insert_getter (self, "mode", Camera_getter_mode);
+	liscr_class_insert_getter (self, "position", Camera_getter_position);
+	liscr_class_insert_getter (self, "rotation", Camera_getter_rotation);
 	liscr_class_insert_setter (self, "mode", Camera_setter_mode);
 }
 

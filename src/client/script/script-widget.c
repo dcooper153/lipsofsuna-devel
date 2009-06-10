@@ -90,6 +90,7 @@ Widget_popup (lua_State* lua)
 
 	liwdg_manager_insert_popup (widget->manager, self->data);
 	liwdg_widget_set_allocation (widget, rect.x, rect.y, rect.width, rect.height);
+	liscr_data_ref (self, NULL);
 
 	return 0;
 }
@@ -118,11 +119,15 @@ Widget_setter_visible (lua_State* lua)
 {
 	int value;
 	liscrData* self;
+	liwdgWidget* widget;
 
 	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WIDGET);
 	value = lua_toboolean (lua, 3);
+	widget = self->data;
 
-	liwdg_widget_set_visible (self->data, value);
+	if (widget->state == LIWDG_WIDGET_STATE_POPUP)
+		liscr_data_unref (self, NULL);
+	liwdg_widget_set_visible (widget, value);
 
 	return 0;
 }

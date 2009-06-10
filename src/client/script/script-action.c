@@ -179,8 +179,9 @@ Action_new (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Enables or disables the binding.
- * -- @name Binding.enabled
+ * -- Enables or disables the action.
+ * --
+ * -- @name Action.enabled
  * -- @class table
  */
 static int

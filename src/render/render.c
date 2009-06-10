@@ -401,6 +401,7 @@ lirnd_render_render (lirndRender*  self,
 {
 	int i;
 	lirndContext context;
+	GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	assert (scene != NULL);
 	assert (modelview != NULL);
@@ -427,6 +428,8 @@ lirnd_render_render (lirndRender*  self,
 	glEnable (GL_NORMALIZE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindTexture (GL_TEXTURE_2D, 0);
+	glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, none);
+	glLightModelfv (GL_LIGHT_MODEL_AMBIENT, none);
 
 	/* Render scene. */
 	glEnable (GL_COLOR_MATERIAL);
@@ -495,14 +498,14 @@ lirnd_render_set_global_shadows (lirndRender* self,
 int
 lirnd_render_get_light_count (const lirndRender* self)
 {
-	return self->lighting->lights.capacity;
+	return self->lighting->active_lights.capacity;
 }
 
 void
 lirnd_render_set_light_count (lirndRender* self,
                               int          count)
 {
-	self->lighting->lights.capacity = LI_MIN (8, count);
+	self->lighting->active_lights.capacity = LI_MIN (8, count);
 }
 
 /**
@@ -572,19 +575,6 @@ lirnd_render_set_sky (lirndRender* self,
 	}
 #endif
 	return 1;
-}
-
-/**
- * \brief Sets the sun direction.
- *
- * \param self Renderer.
- * \param direction Light direction.
- */
-void
-lirnd_render_set_sun (lirndRender*       self,
-                      const limatVector* direction)
-{
-	lirnd_lighting_set_sun_direction (self->lighting, direction);
 }
 
 /*****************************************************************************/

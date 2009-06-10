@@ -30,8 +30,9 @@
 
 #define LICLI_SCRIPT_ACTION "Lips.Action"
 #define LICLI_SCRIPT_BINDING "Lips.Binding"
-#define LICLI_SCRIPT_GROUP "Lips.Group"
 #define LICLI_SCRIPT_EXTENSION "Lips.Extension"
+#define LICLI_SCRIPT_GROUP "Lips.Group"
+#define LICLI_SCRIPT_LIGHT "Lips.Light"
 #define LICLI_SCRIPT_MODULE "Lips.Module"
 #define LICLI_SCRIPT_PLAYER "Lips.Player"
 #define LICLI_SCRIPT_WIDGET "Lips.Widget"
@@ -51,6 +52,10 @@ licliExtensionScript (liscrClass* self,
 
 void
 licliGroupScript (liscrClass* self,
+                  void*       data);
+
+void
+licliLightScript (liscrClass* self,
                   void*       data);
 
 void

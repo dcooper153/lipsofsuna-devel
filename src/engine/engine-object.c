@@ -961,6 +961,12 @@ private_callback_set_realized (liengObject* self,
 		if (!liphy_object_set_realized (self->physics, 1))
 			return 0;
 
+		/* Activate graphics. */
+#ifndef LIENG_DISABLE_GRAPHICS
+		if (self->render != NULL)
+			self->engine->renderapi->lirnd_object_set_realized (self->render, 1);
+#endif
+
 		/* Link to map. */
 		lieng_object_get_transform (self, &transform);
 		if (!private_warp (self, &transform.position))
@@ -976,6 +982,12 @@ private_callback_set_realized (liengObject* self,
 	{
 		/* Deactivate physics. */
 		liphy_object_set_realized (self->physics, 0);
+
+		/* Deactivate graphics. */
+#ifndef LIENG_DISABLE_GRAPHICS
+		if (self->render != NULL)
+			self->engine->renderapi->lirnd_object_set_realized (self->render, 0);
+#endif
 
 		/* Remove from map. */
 		lieng_sector_remove_object (self->sector, self);

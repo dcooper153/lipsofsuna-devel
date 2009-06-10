@@ -528,6 +528,65 @@ lirnd_object_set_model (lirndObject* self,
 	return 1;
 }
 
+/**
+ * \brief Checks if the object is renderable.
+ *
+ * Returns nonzero if the realized flag of the object is set and the object
+ * has a model assigned to it. Otherwise returns zero.
+ *
+ * \param self Object.
+ * \return Nonzero if realized.
+ */
+int
+lirnd_object_get_realized (const lirndObject* self)
+{
+	return self->realized && self->model != NULL;
+}
+
+/**
+ * \brief Sets the realized flag of the object.
+ *
+ * If the flag is set and the object has a model set, the model will be rendered
+ * in subsequent frames. The light sources that are a part of the model are also
+ * added to the scene.
+ *
+ * If the flag is cleared, the model assigned to the object is not rendered from
+ * now on. The light sources associated with the model are also removed from the
+ * scene.
+ *
+ * \param self Object.
+ * \param value Flag value.
+ * \return Nonzero if succeeded.
+ */
+int
+lirnd_object_set_realized (lirndObject* self,
+                           int          value)
+{
+	int i;
+
+	if (self->realized == value)
+		return 1;
+	self->realized = value;
+	if (value && self->model != NULL)
+	{
+		for (i = 0 ; i < self->lights.count ; i++)
+		{
+			if (self->lights.array[i] != NULL)
+				lirnd_lighting_insert_light (self->render->lighting, self->lights.array[i]);
+		}
+	}
+	else
+	{
+		for (i = 0 ; i < self->lights.count ; i++)
+		{
+			if (self->lights.array[i] != NULL)
+				lirnd_lighting_remove_light (self->render->lighting, self->lights.array[i]);
+		}
+	}
+
+	return 1;
+}
+
 void*
 lirnd_object_get_userdata (const lirndObject* self)
 {
@@ -539,14 +598,6 @@ lirnd_object_set_userdata (lirndObject* self,
                            void*        value)
 {
 	self->userdata = value;
-}
-
-int
-lirnd_object_get_visible (lirndObject* self)
-{
-	if (self->model == NULL)
-		return 0;
-	return 1;
 }
 
 /*****************************************************************************/
@@ -762,17 +813,20 @@ private_init_lights (lirndObject* self)
 	}
 
 	/* Register light sources. */
-	for (i = 0 ; i < self->lights.count ; i++)
+	if (self->realized)
 	{
-		light = self->lights.array[i];
-		if (!lirnd_lighting_insert_light (self->render->lighting, light))
+		for (i = 0 ; i < self->lights.count ; i++)
 		{
-			while (i--)
+			light = self->lights.array[i];
+			if (!lirnd_lighting_insert_light (self->render->lighting, light))
 			{
-				light = self->lights.array[i];
-				lirnd_lighting_remove_light (self->render->lighting, light);
+				while (i--)
+				{
+					light = self->lights.array[i];
+					lirnd_lighting_remove_light (self->render->lighting, light);
+				}
+				return 0;
 			}
-			return 0;
 		}
 	}
 

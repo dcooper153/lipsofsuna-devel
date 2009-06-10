@@ -33,7 +33,7 @@ lirnd_draw_bounds (lirndContext* context,
 	limatAabb aabb;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -74,7 +74,7 @@ lirnd_draw_debug (lirndContext* context,
 	limatAabb aabb;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -99,7 +99,7 @@ lirnd_draw_exclude (lirndContext* context,
 	lirndMaterial* material;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Exlude object. */
@@ -128,7 +128,9 @@ lirnd_draw_exclude (lirndContext* context,
 	{
 		material = object->materials.array[i];
 		lirnd_context_set_flags (context, flags);
-		lirnd_context_set_lights (context, context->render->lighting->lights.active, context->render->lighting->lights.count);
+		lirnd_context_set_lights (context,
+			context->render->lighting->active_lights.array,
+			context->render->lighting->active_lights.count);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_shader (context, material->shader);
@@ -151,7 +153,7 @@ lirnd_draw_opaque (lirndContext* context,
 	lirndMaterial* material;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -178,7 +180,9 @@ lirnd_draw_opaque (lirndContext* context,
 		if (!(material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			lirnd_context_set_flags (context, flags);
-			lirnd_context_set_lights (context, context->render->lighting->lights.active, context->render->lighting->lights.count);
+			lirnd_context_set_lights (context,
+				context->render->lighting->active_lights.array,
+				context->render->lighting->active_lights.count);
 			lirnd_context_set_material (context, material);
 			lirnd_context_set_matrix (context, &matrix);
 			lirnd_context_set_shader (context, material->shader);
@@ -201,7 +205,7 @@ lirnd_draw_picking (lirndContext* context,
 	lirndMaterial* material;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -237,7 +241,7 @@ lirnd_draw_shadeless (lirndContext* context,
 	lirndMaterial* material;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -274,7 +278,7 @@ lirnd_draw_shadowmap (lirndContext* context,
 	limatMatrix matrix;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -307,7 +311,7 @@ lirnd_draw_transparent (lirndContext* context,
 	lirndMaterial* material;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_visible (object))
+	if (!lirnd_object_get_realized (object))
 		return;
 
 	/* Frustum culling. */
@@ -334,7 +338,9 @@ lirnd_draw_transparent (lirndContext* context,
 		if (material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY)
 		{
 			lirnd_context_set_flags (context, flags);
-			lirnd_context_set_lights (context, context->render->lighting->lights.active, context->render->lighting->lights.count);
+			lirnd_context_set_lights (context,
+				context->render->lighting->active_lights.array,
+				context->render->lighting->active_lights.count);
 			lirnd_context_set_matrix (context, &matrix);
 			lirnd_context_set_material (context, material);
 			lirnd_context_set_shader (context, material->shader);

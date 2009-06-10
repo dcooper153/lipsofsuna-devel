@@ -40,16 +40,19 @@ private_select_light (lirndLighting*     self,
 
 /*****************************************************************************/
 
+/**
+ * \brief Creates a new light manager.
+ *
+ * \param render Renderer.
+ * \return New light manager or NULL.
+ */
 lirndLighting*
 lirnd_lighting_new (lirndRender* render)
 {
-	const float ambient[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	const float diffuse[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	const float texture[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const limatVector direction = { 0.3f, 0.5f, 0.7f };
 	lirndLighting* self;
+	const float texture[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	/* Allocase self. */
+	/* Allocate self. */
 	self = calloc (1, sizeof (lirndLighting));
 	if (self == NULL)
 	{
@@ -58,34 +61,26 @@ lirnd_lighting_new (lirndRender* render)
 	}
 	self->render = render;
 
-	/* Allocate lights. */
-	self->lights.capacity = 8;
-	self->lights.active = calloc (self->lights.capacity, sizeof (lirndLight*));
-	if (self->lights.active == NULL)
+	/* Allocate light arrays. */
+	self->lights = lialg_ptrdic_new ();
+	if (self->lights == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		goto error;
 	}
-	self->lights.dict = lialg_ptrdic_new ();
-	if (self->lights.dict == NULL)
+	self->active_lights.capacity = 8;
+	self->active_lights.array = calloc (self->active_lights.capacity, sizeof (lirndLight*));
+	if (self->active_lights.array == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		goto error;
 	}
-
-	/* Create the sun.  */
-	self->sun.light = lirnd_light_new_directional (self->render, diffuse);
-	if (self->sun.light == NULL)
-		goto error;
-	lirnd_lighting_set_sun_direction (self, &direction);
-	memcpy (self->sun.ambient, ambient, 4 * sizeof (float));
-	lirnd_light_set_ambient (self->sun.light, self->sun.ambient);
 
 	/* Create default depth texture. */
 	if (livid_features.shader_model >= 3)
 	{
-		glGenTextures (1, &self->lights.depth_texture_max);
-		glBindTexture (GL_TEXTURE_2D, self->lights.depth_texture_max);
+		glGenTextures (1, &self->depth_texture_max);
+		glBindTexture (GL_TEXTURE_2D, self->depth_texture_max);
 		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2, 2,
 			0, GL_DEPTH_COMPONENT, GL_FLOAT, texture);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -101,65 +96,59 @@ error:
 	return NULL;
 }
 
+/**
+ * \brief Frees the light manager.
+ *
+ * \param self Light manager.
+ */
 void
 lirnd_lighting_free (lirndLighting* self)
 {
-	if (self->sun.light != NULL)
-		lirnd_light_free (self->sun.light);
-	if (self->lights.dict != NULL)
+	if (self->lights != NULL)
 	{
-		assert (self->lights.dict->size == 0);
-		lialg_ptrdic_free (self->lights.dict);
+		assert (self->lights->size == 0);
+		lialg_ptrdic_free (self->lights);
 	}
-	glDeleteTextures (1, &self->lights.depth_texture_max);
-	free (self->lights.active);
+	glDeleteTextures (1, &self->depth_texture_max);
+	free (self->active_lights.array);
 }
 
-int
-lirnd_lighting_create_light (lirndLighting*   self,
-                             const limdlNode* node)
-{
-	lirndLight* light;
-	limatTransform transform;
-
-	/* Create light. */
-	light = lirnd_light_new_from_model (self->render, node);
-	if (light == NULL)
-		return 0;
-	if (!lialg_ptrdic_insert (self->lights.dict, light, light))
-	{
-		lirnd_light_free (light);
-		return 0;
-	}
-
-	/* Update transformation. */
-	limdl_node_get_pose_transform (node, &transform);
-	lirnd_light_set_transform (light, &transform);
-
-	return 1;
-}
-
+/**
+ * \brief Registers a new light source.
+ *
+ * \param self Light manager.
+ * \param light Light source.
+ * \return Nonzero on success.
+ */
 int
 lirnd_lighting_insert_light (lirndLighting* self,
                              lirndLight*    light)
 {
-	if (!lialg_ptrdic_insert (self->lights.dict, light, light))
+	if (!lialg_ptrdic_insert (self->lights, light, light))
 		return 0;
+	light->enabled = 1;
 	return 1;
 }
 
+/**
+ * \brief Removes a registered light source.
+ *
+ * \param self Light manager.
+ * \param light Light source.
+ */
 void
 lirnd_lighting_remove_light (lirndLighting* self,
                              lirndLight*    light)
 {
-	lialg_ptrdic_remove (self->lights.dict, light);
+	lialg_ptrdic_remove (self->lights, light);
+	light->enabled = 0;
 }
 
 /**
  * \brief Updates the status of all registered light sources.
  *
  * \param self Light manager.
- * \param scene Scene surrounding the light source.
+ * \param scene Current scene.
  */
 void
 lirnd_lighting_update (lirndLighting* self,
@@ -168,22 +157,19 @@ lirnd_lighting_update (lirndLighting* self,
 	lialgPtrdicIter iter;
 	lirndLight* light;
 
-	lirnd_light_update (self->sun.light, scene);
-	LI_FOREACH_PTRDIC (iter, self->lights.dict)
+	LI_FOREACH_PTRDIC (iter, self->lights)
 	{
 		light = iter.value;
 		lirnd_light_update (light, scene);
 	}
 }
 
-void
-lirnd_lighting_set_ambient (lirndLighting* self,
-                            const float*   value)
-{
-	memcpy (self->sun.ambient, value, 4 * sizeof (float));
-	lirnd_light_set_ambient (self->sun.light, self->sun.ambient);
-}
-
+/**
+ * \brief Sets the center of the scene and selects lights affecting it.
+ *
+ * \param self Light manager.
+ * \param point Lighting focus point.
+ */
 void
 lirnd_lighting_set_center (lirndLighting*     self,
                            const limatVector* point)
@@ -191,35 +177,13 @@ lirnd_lighting_set_center (lirndLighting*     self,
 	lialgPtrdicIter iter;
 	lirndLight* light;
 
-	/* Select sun. */
-	self->lights.active[0] = self->sun.light;
-	self->lights.active[0]->rating = -1.0f;
-	self->lights.count = 1;
-
-	/* Select other lights. */
-	LI_FOREACH_PTRDIC (iter, self->lights.dict)
+	self->active_lights.count = 0;
+	LI_FOREACH_PTRDIC (iter, self->lights)
 	{
 		light = iter.value;
 		private_select_light (self, light, point);
 	}
-
-	/* Sort lights. */
-	qsort (self->lights.active, self->lights.count, sizeof (lirndLight*), private_compare_lights);
-}
-
-void
-lirnd_lighting_set_sun_color (lirndLighting* self,
-                              const float*   value)
-{
-	memcpy (self->sun.light->diffuse, value, 4 * sizeof (float));
-}
-
-void
-lirnd_lighting_set_sun_direction (lirndLighting*     self,
-                                  const limatVector* value)
-{
-	self->sun.direction = limat_vector_normalize (*value);
-	lirnd_light_set_direction (self->sun.light, &self->sun.direction);
+	qsort (self->active_lights.array, self->active_lights.count, sizeof (lirndLight*), private_compare_lights);
 }
 
 /*****************************************************************************/
@@ -252,22 +216,22 @@ private_select_light (lirndLighting*     self,
 //		return;
 
 	/* Try to add a new light. */
-	if (self->lights.count < self->lights.capacity)
+	if (self->active_lights.count < self->active_lights.capacity)
 	{
-		i = self->lights.count;
-		self->lights.active[i] = light;
-		self->lights.active[i]->rating = rating;
-		self->lights.count++;
+		i = self->active_lights.count;
+		self->active_lights.array[i] = light;
+		self->active_lights.array[i]->rating = rating;
+		self->active_lights.count++;
 		return;
 	}
 
 	/* Try to replace an existing light. */
-	for (i = 0 ; i < self->lights.capacity ; i++)
+	for (i = 0 ; i < self->active_lights.capacity ; i++)
 	{
-		if (rating < self->lights.active[i]->rating)
+		if (rating < self->active_lights.array[i]->rating)
 		{
-			self->lights.active[i] = light;
-			self->lights.active[i]->rating = rating;
+			self->active_lights.array[i] = light;
+			self->active_lights.array[i]->rating = rating;
 			return;
 		}
 	}

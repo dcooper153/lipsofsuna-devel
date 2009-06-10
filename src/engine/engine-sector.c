@@ -556,6 +556,7 @@ private_build_block (liengSector* self,
 			lieng_block_builder_free (builder);
 			return 0;
 		}
+		self->engine->renderapi->lirnd_object_set_realized (block->render, 1);
 	}
 #endif
 

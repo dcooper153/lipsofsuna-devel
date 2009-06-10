@@ -302,6 +302,18 @@ lirnd_light_set_directional (lirndLight* self,
 }
 
 /**
+ * \brief Checks if the light is registered.
+ *
+ * \param self Light source.
+ * \return Nonzero if registered.
+ */
+int
+lirnd_light_get_enabled (const lirndLight* self)
+{
+	return self->enabled;
+}
+
+/**
  * \brief Gets the modelview matrix of the light.
  *
  * \param self Light source.
@@ -353,6 +365,19 @@ lirnd_light_set_projection (lirndLight*     self,
                             const limatMatrix* value)
 {
 	self->projection = *value;
+}
+
+/**
+ * \brief Gets the transformation of the light.
+ *
+ * \param self Light source.
+ * \param value Return value for the transformation.
+ */
+void
+lirnd_light_get_transform (lirndLight*     self,
+                           limatTransform* value)
+{
+	*value = self->transform;
 }
 
 /**

@@ -37,6 +37,7 @@
 struct _lirndLight
 {
 	int directional;
+	int enabled;
 	float rating;
 	float cutoff;
 	float exponent;
@@ -107,9 +108,16 @@ void
 lirnd_light_set_directional (lirndLight* self,
                              int         value);
 
+int
+lirnd_light_get_enabled (const lirndLight* self);
+
 void
 lirnd_light_get_modelview (const lirndLight* self,
-                           limatMatrix*         value);
+                           limatMatrix*      value);
+
+void
+lirnd_light_get_transform (lirndLight*     self,
+                           limatTransform* value);
 
 void
 lirnd_light_set_transform (lirndLight*           self,
@@ -117,7 +125,7 @@ lirnd_light_set_transform (lirndLight*           self,
 
 void
 lirnd_light_get_projection (const lirndLight* self,
-                            limatMatrix*         value);
+                            limatMatrix*      value);
 
 void
 lirnd_light_set_projection (lirndLight*     self,

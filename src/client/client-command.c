@@ -31,10 +31,6 @@ private_assign (licliModule* module,
                 liReader*    reader);
 
 static int
-private_chat (licliModule* module,
-              liReader*    reader);
-
-static int
 private_object_animation (licliModule* module,
                           liReader*    reader);
 

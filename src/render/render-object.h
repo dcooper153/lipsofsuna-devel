@@ -36,6 +36,7 @@
 struct _lirndObject
 {
 	int id;
+	int realized;
 	GLuint buffer;
 	void* userdata;
 	lirndRender* render;
@@ -123,6 +124,13 @@ int
 lirnd_object_set_model (lirndObject* self,
                         lirndModel*  model);
 
+int
+lirnd_object_get_realized (const lirndObject* self);
+
+int
+lirnd_object_set_realized (lirndObject* self,
+                           int          value);
+
 void
 lirnd_object_set_transform (lirndObject*          self,
                             const limatTransform* transform);
@@ -133,9 +141,6 @@ lirnd_object_get_userdata (const lirndObject* self);
 void
 lirnd_object_set_userdata (lirndObject* self,
                            void*        value);
-
-int
-lirnd_object_get_visible (lirndObject* self);
 
 #endif
 

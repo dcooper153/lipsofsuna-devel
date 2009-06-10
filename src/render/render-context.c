@@ -577,7 +577,7 @@ private_bind_uniform (lirndContext* self,
 		case LIRND_UNIFORM_SHADOWTEXTURE8:
 		case LIRND_UNIFORM_SHADOWTEXTURE9:
 			index = uniform->value - LIRND_UNIFORM_SHADOWTEXTURE0;
-			map = self->render->lighting->lights.depth_texture_max;
+			map = self->render->lighting->depth_texture_max;
 			if (index < self->lights.count)
 			{
 				light = self->lights.array[index];

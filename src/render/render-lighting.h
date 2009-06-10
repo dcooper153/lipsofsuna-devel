@@ -34,6 +34,8 @@
 
 struct _lirndLighting
 {
+	GLuint depth_texture_max;
+	lialgPtrdic* lights;
 	lirndRender* render;
 	struct
 	{
@@ -44,16 +46,8 @@ struct _lirndLighting
 	{
 		int capacity;
 		int count;
-		lirndLight** active;
-		lialgPtrdic* dict;
-		GLuint depth_texture_max;
-	} lights;
-	struct
-	{
-		lirndLight* light;
-		limatVector direction;
-		float ambient[4];
-	} sun;
+		lirndLight** array;
+	} active_lights;
 };
 
 lirndLighting*
@@ -70,29 +64,13 @@ void
 lirnd_lighting_remove_light (lirndLighting* self,
                              lirndLight*    light);
 
-int
-lirnd_lighting_create_light (lirndLighting*   self,
-                             const limdlNode* node);
-
 void
 lirnd_lighting_update (lirndLighting* self,
                        lirndScene*    scene);
 
 void
-lirnd_lighting_set_ambient (lirndLighting* self,
-                            const float*   value);
-
-void
 lirnd_lighting_set_center (lirndLighting*     self,
                            const limatVector* point);
-
-void
-lirnd_lighting_set_sun_color (lirndLighting* self,
-                              const float*   value);
-
-void
-lirnd_lighting_set_sun_direction (lirndLighting*     self,
-                                  const limatVector* value);
 
 #endif
 

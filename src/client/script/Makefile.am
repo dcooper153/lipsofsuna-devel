@@ -17,6 +17,7 @@ liblipsclientscript_la_SOURCES = \
 	script-binding.c \
 	script-extension.c \
 	script-group.c \
+	script-light.c \
 	script-module.c \
 	script-object.c \
 	script-player.c \

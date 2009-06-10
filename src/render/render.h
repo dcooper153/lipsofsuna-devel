@@ -146,6 +146,7 @@ lirnd_render_get_light_count (const lirndRender* self);
 void
 lirnd_render_set_light_count (lirndRender* self,
                               int          count);
+
 void
 lirnd_render_set_light_focus (lirndRender*    self,
                               const limatVector* point);
@@ -164,10 +165,6 @@ lirnd_render_set_shaders_enabled (lirndRender* self,
 int
 lirnd_render_set_sky (lirndRender* self,
                       lirndModel*  model);
-
-void
-lirnd_render_set_sun (lirndRender*    self,
-                      const limatVector* direction);
 
 #endif
 

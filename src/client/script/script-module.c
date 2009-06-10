@@ -208,35 +208,6 @@ Module_send (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Ambient light color.
- * -- @name Module.ambient
- * -- @class table
- */
-static int
-Module_setter_ambient (lua_State* lua)
-{
-	int i;
-	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	licliModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	luaL_checktype (lua, 3, LUA_TTABLE);
-
-	for (i = 0 ; i < 4 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_gettable (lua, 3);
-		if (lua_isnumber (lua, -1))
-			value[i] = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-	}
-
-	lirnd_lighting_set_ambient (module->engine->render->lighting, value);
-	return 0;
-}
-
-/* @luadoc
- * ---
  * -- Movement mode flag.
  * -- @name Module.moving
  * -- @class table
@@ -374,77 +345,6 @@ Module_setter_sky (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Sun light diffuse color.
- * -- @name Module.sun_color
- * -- @class table
- */
-static int
-Module_setter_sun_color (lua_State* lua)
-{
-	int i;
-	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	licliModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	luaL_checktype (lua, 3, LUA_TTABLE);
-
-	for (i = 0 ; i < 4 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_gettable (lua, 3);
-		if (lua_isnumber (lua, -1))
-			value[i] = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-	}
-
-	lirnd_lighting_set_sun_color (module->engine->render->lighting, value);
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Sun light direction.
- * -- @name Module.sun_direction
- * -- @class table
- */
-static int
-Module_getter_sun_direction (lua_State* lua)
-{
-	licliModule* module;
-	liscrData* vector;
-	liscrScript* script = liscr_script (lua);
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	liscr_checkclass (lua, 1, LICLI_SCRIPT_MODULE);
-
-	assert (module != NULL);
-	assert (module->engine != NULL);
-
-	vector = liscr_vector_new (script, &module->engine->render->lighting->sun.direction);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
-}
-static int
-Module_setter_sun_direction (lua_State* lua)
-{
-	licliModule* module;
-	liscrData* vector;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	vector = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-
-	lirnd_render_set_sun (module->engine->render, vector->data);
-	return 0;
-}
-
-/* @luadoc
- * ---
  * -- Main window title.
  * -- @name Module.title
  * -- @class table
@@ -475,14 +375,10 @@ licliModuleScript (liscrClass* self,
 	liscr_class_insert_func (self, "pick", Module_pick);
 	liscr_class_insert_func (self, "send", Module_send);
 	liscr_class_insert_getter (self, "moving", Module_getter_moving);
-	liscr_class_insert_getter (self, "sun_direction", Module_getter_sun_direction);
-	liscr_class_insert_setter (self, "ambient", Module_setter_ambient);
 	liscr_class_insert_setter (self, "moving", Module_setter_moving);
 	liscr_class_insert_setter (self, "music", Module_setter_music);
 	liscr_class_insert_setter (self, "root", Module_setter_root);
 	liscr_class_insert_setter (self, "sky", Module_setter_sky);
-	liscr_class_insert_setter (self, "sun_color", Module_setter_sun_color);
-	liscr_class_insert_setter (self, "sun_direction", Module_setter_sun_direction);
 	liscr_class_insert_setter (self, "title", Module_setter_title);
 }
 

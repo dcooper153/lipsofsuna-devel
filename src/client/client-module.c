@@ -785,6 +785,7 @@ private_init_script (licliModule* self)
 	    !liscr_script_insert_class (self->script, "Binding", licliBindingScript, self) ||
 	    !liscr_script_insert_class (self->script, "Extension", licliExtensionScript, self) ||
 	    !liscr_script_insert_class (self->script, "Group", licliGroupScript, self) ||
+	    !liscr_script_insert_class (self->script, "Light", licliLightScript, self) ||
 	    !liscr_script_insert_class (self->script, "Module", licliModuleScript, self) ||
 	    !liscr_script_insert_class (self->script, "Object", licliObjectScript, self) ||
 	    !liscr_script_insert_class (self->script, "Packet", licomPacketScript, self->script) ||

@@ -52,9 +52,9 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsclientscript_la_LIBADD =
 am_liblipsclientscript_la_OBJECTS = script-action.lo script-binding.lo \
-	script-extension.lo script-group.lo script-module.lo \
-	script-object.lo script-player.lo script-widget.lo \
-	script-window.lo
+	script-extension.lo script-group.lo script-light.lo \
+	script-module.lo script-object.lo script-player.lo \
+	script-widget.lo script-window.lo
 liblipsclientscript_la_OBJECTS = $(am_liblipsclientscript_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -236,6 +236,7 @@ liblipsclientscript_la_SOURCES = \
 	script-binding.c \
 	script-extension.c \
 	script-group.c \
+	script-light.c \
 	script-module.c \
 	script-object.c \
 	script-player.c \
@@ -315,6 +316,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-binding.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-extension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-group.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-light.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-player.Plo@am__quote@
