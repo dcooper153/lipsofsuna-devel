@@ -204,6 +204,8 @@ private_select_light (lirndLighting*     self,
                       const limatVector* center)
 {
 	int i;
+	int best_index;
+	float best_rating;
 	float rating;
 	limatVector position;
 
@@ -226,14 +228,20 @@ private_select_light (lirndLighting*     self,
 	}
 
 	/* Try to replace an existing light. */
+	best_index = -1;
+	best_rating = rating;
 	for (i = 0 ; i < self->active_lights.capacity ; i++)
 	{
-		if (rating < self->active_lights.array[i]->rating)
+		if (self->active_lights.array[i]->rating < best_rating)
 		{
-			self->active_lights.array[i] = light;
-			self->active_lights.array[i]->rating = rating;
-			return;
+			best_rating = self->active_lights.array[i]->rating;
+			best_index = i;
 		}
+	}
+	if (best_index != -1)
+	{
+		self->active_lights.array[best_index] = light;
+		self->active_lights.array[best_index]->rating = rating;
 	}
 }
 
