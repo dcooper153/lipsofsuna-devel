@@ -103,10 +103,81 @@ Light_new (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Sets the diffuse color of the light source.
+ * -- The ambient color of the light source.
+ * -- @name Light.ambient
+ * -- @class table
+ */
+static int
+Light_getter_ambient (lua_State* lua)
+{
+	int i;
+	lirndLight* light;
+	liscrData* data;
+
+	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
+	light = data->data;
+
+	lua_newtable (lua);
+	for (i = 0 ; i < 4 ; i++)
+	{
+		lua_pushnumber (lua, i + 1);
+		lua_pushnumber (lua, light->ambient[i]);
+		lua_settable (lua, -3);
+	}
+
+	return 1;
+}
+static int
+Light_setter_ambient (lua_State* lua)
+{
+	int i;
+	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	lirndLight* light;
+	liscrData* data;
+
+	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
+	luaL_checktype (lua, 3, LUA_TTABLE);
+	light = data->data;
+
+	for (i = 0 ; i < 4 ; i++)
+	{
+		lua_pushnumber (lua, i + 1);
+		lua_gettable (lua, 3);
+		if (lua_isnumber (lua, -1))
+			value[i] = lua_tonumber (lua, -1);
+		lua_pop (lua, 1);
+	}
+
+	memcpy (light->ambient, value, 4 * sizeof (float));
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- The diffuse color of the light source.
  * -- @name Light.color
  * -- @class table
  */
+static int
+Light_getter_color (lua_State* lua)
+{
+	int i;
+	lirndLight* light;
+	liscrData* data;
+
+	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
+	light = data->data;
+
+	lua_newtable (lua);
+	for (i = 0 ; i < 4 ; i++)
+	{
+		lua_pushnumber (lua, i + 1);
+		lua_pushnumber (lua, light->diffuse[i]);
+		lua_settable (lua, -3);
+	}
+
+	return 1;
+}
 static int
 Light_setter_color (lua_State* lua)
 {
@@ -174,10 +245,30 @@ Light_setter_enabled (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Sets the attenuation equation of the light source.
+ * -- The attenuation equation of the light source.
  * -- @name Light.equation
  * -- @class table
  */
+static int
+Light_getter_equation (lua_State* lua)
+{
+	int i;
+	lirndLight* light;
+	liscrData* data;
+
+	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
+	light = data->data;
+
+	lua_newtable (lua);
+	for (i = 0 ; i < 3 ; i++)
+	{
+		lua_pushnumber (lua, i + 1);
+		lua_pushnumber (lua, light->equation[i]);
+		lua_settable (lua, -3);
+	}
+
+	return 1;
+}
 static int
 Light_setter_equation (lua_State* lua)
 {
@@ -261,8 +352,12 @@ licliLightScript (liscrClass* self,
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
 	liscr_class_insert_func (self, "__gc", Light___gc);
 	liscr_class_insert_func (self, "new", Light_new);
+	liscr_class_insert_getter (self, "ambient", Light_getter_ambient);
+	liscr_class_insert_getter (self, "color", Light_getter_color);
 	liscr_class_insert_getter (self, "enabled", Light_getter_enabled);
+	liscr_class_insert_getter (self, "equation", Light_getter_equation);
 	liscr_class_insert_getter (self, "position", Light_getter_position);
+	liscr_class_insert_setter (self, "ambient", Light_setter_ambient);
 	liscr_class_insert_setter (self, "color", Light_setter_color);
 	liscr_class_insert_setter (self, "enabled", Light_setter_enabled);
 	liscr_class_insert_setter (self, "equation", Light_setter_equation);
