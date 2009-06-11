@@ -108,7 +108,7 @@ Server_nearby_clients (lua_State* lua)
 		diff = limat_vector_subtract (center, transform.position);
 		if (limat_vector_dot (diff, diff) <= radius)
 		{
-			lua_pushnumber (lua, i);
+			lua_pushnumber (lua, iter.object->id);
 			liscr_pushdata (lua, iter.object->script);
 			lua_settable (lua, -3);
 		}
@@ -160,7 +160,7 @@ Server_nearby_objects (lua_State* lua)
 		diff = limat_vector_subtract (center, transform.position);
 		if (limat_vector_dot (diff, diff) <= radius)
 		{
-			lua_pushnumber (lua, i);
+			lua_pushnumber (lua, iter.object->id);
 			liscr_pushdata (lua, iter.object->script);
 			lua_settable (lua, -3);
 		}
