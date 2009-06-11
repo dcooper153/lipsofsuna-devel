@@ -68,12 +68,14 @@ static int
 Packager_save (lua_State* lua)
 {
 	const char* name;
+	const char* dir;
 	liextModule* self;
 
 	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_PACKAGER);
 	name = luaL_checkstring (lua, 2);
+	dir = luaL_checkstring (lua, 3);
 
-	if (!liext_packager_save (self->packager, name))
+	if (!liext_packager_save (self->packager, name, dir))
 		lua_pushboolean (lua, 0);
 	else
 		lua_pushboolean (lua, 1);

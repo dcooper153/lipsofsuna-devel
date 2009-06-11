@@ -44,13 +44,21 @@ typedef struct _liextPackager liextPackager;
 struct _liextPackager
 {
 	int verbose;
+	licliModule* module;
+	lithrAsyncCall* worker;
+	liwdgWidget* progress;
+};
+
+typedef struct _liextPackagerData liextPackagerData;
+struct _liextPackagerData
+{
 	char* target;
+	char* directory;
 	liarcTar* tar;
 	liarcWriter* writer;
 	licliModule* module;
+	liextPackager* packager;
 	liextResources* resources;
-	lithrAsyncCall* worker;
-	liwdgWidget* progress;
 	struct
 	{
 		int count;
@@ -69,7 +77,8 @@ liext_packager_cancel (liextPackager* self);
 
 int
 liext_packager_save (liextPackager* self,
-                     const char*    name);
+                     const char*    name,
+                     const char*    dir);
 
 int
 liext_packager_get_verbose (liextPackager* self);

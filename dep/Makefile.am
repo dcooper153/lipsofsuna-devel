@@ -41,7 +41,7 @@ build/lib/libbulletdynamics.so.0:
 		$(MAKE) $(AM_MAKEFLAGS) install)
 
 build/lib/libgrapple-0.9.so.2:
-	(cd libgrapple && ./configure --prefix=$(INSTALLDIR) && \
+	(cd libgrapple && ./configure LDFLAGS=-lcrypto --prefix=$(INSTALLDIR) && \
 		$(MAKE) $(AM_MAKEFLAGS) && \
 		$(MAKE) $(AM_MAKEFLAGS) install)
 

@@ -618,37 +618,39 @@ private_insert_sample (liengResources* self,
                        const char*     name)
 {
 	int j;
-	liengSample* sample;
+	liengSample sample;
 
 	/* Check for duplicates. */
 	for (j = 0 ; j < self->samples.count ; j++)
 	{
-		sample = self->samples.array + j;
-		if (!strcmp (sample->name, name))
+		if (!strcmp (self->samples.array[j].name, name))
 			return 1;
 	}
 
 	/* Create new sample. */
-	if (!lialg_array_resize (&self->samples, self->samples.count + 1))
-		return 0;
-	sample = self->samples.array + self->samples.count - 1;
-	sample->id = 0;
-	sample->invalid = 0;
-	sample->data = NULL;
-	sample->name = strdup (name);
-	if (sample->name == NULL)
+	sample.id = 0;
+	sample.invalid = 0;
+	sample.data = NULL;
+	sample.name = strdup (name);
+	if (sample.name == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
-		self->samples.count--;
 		return 0;
 	}
-	sample->path = lisys_path_format (self->engine->config.dir,
+	sample.path = lisys_path_format (self->engine->config.dir,
 		LISYS_PATH_SEPARATOR, "sounds",
-		LISYS_PATH_SEPARATOR, sample->name, ".ogg", NULL);
-	if (sample->path == NULL)
+		LISYS_PATH_SEPARATOR, name, ".ogg", NULL);
+	if (sample.path == NULL)
 	{
-		self->samples.count--;
-		free (sample->name);
+		free (sample.name);
+		return 0;
+	}
+
+	/* Append to sample array. */
+	if (!lialg_array_append (&self->samples, &sample))
+	{
+		free (sample.name);
+		free (sample.path);
 		return 0;
 	}
 
