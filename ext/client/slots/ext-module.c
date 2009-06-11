@@ -64,6 +64,7 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
@@ -74,9 +75,18 @@ liext_module_new (licliModule* module)
 		free (self);
 		return NULL;
 	}
-	self->calls[0] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_PACKET, 0, private_packet, self);
-	self->calls[1] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_TICK, 0, private_tick, self);
-	self->calls[2] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_VISIBILITY, 0, private_visibility, self);
+
+	/* Register callbacks. */
+	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 0,
+	     	private_packet, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 1) ||
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_VISIBILITY, 0,
+	     	private_visibility, self, self->calls + 2))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -89,11 +99,8 @@ liext_module_free (liextModule* self)
 	LI_FOREACH_U32DIC (iter, self->dictionary)
 		liext_slots_free (iter.value);
 	lialg_u32dic_free (self->dictionary);
-
-	/* FIXME: Remove the class here. */
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_PACKET, self->calls[0]);
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_TICK, self->calls[1]);
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_VISIBILITY, self->calls[2]);
+	lieng_engine_remove_calls (self->module->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

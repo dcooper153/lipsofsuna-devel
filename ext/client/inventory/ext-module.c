@@ -60,6 +60,7 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
@@ -70,9 +71,18 @@ liext_module_new (licliModule* module)
 		free (self);
 		return NULL;
 	}
-	self->calls[0] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_PACKET, 0, private_packet, self);
-	self->calls[1] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_VISIBILITY, 0, private_visibility, self);
 
+	/* Register callbacks. */
+	 if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 0,
+	      	private_packet, self, self->calls + 0) ||
+	     !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_VISIBILITY, 0,
+	      	private_visibility, self, self->calls + 1))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
 	liscr_script_insert_class (module->script, "InventoryWidget", liextInventoryWidgetScript, self);
 
 	return self;
@@ -82,9 +92,9 @@ void
 liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
+	lieng_engine_remove_calls (self->module->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	liext_inventory_free (self->inventory);
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_PACKET, self->calls[0]);
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_VISIBILITY, self->calls[1]);
 	free (self);
 }
 

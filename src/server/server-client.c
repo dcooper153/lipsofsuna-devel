@@ -219,22 +219,19 @@ static void
 private_callbacks_setup (lisrvClient* self,
                          liengEngine* engine)
 {
-	self->calls[0] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_object_animation, self);
-	self->calls[1] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_object_sample, self);
-	self->calls[2] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_MODEL, 0, private_object_model, self);
-	self->calls[3] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self);
-	self->calls[4] = lieng_engine_call_insert (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0, private_object_visibility, self);
+	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_object_animation, self, self->calls + 0);
+	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_object_sample, self, self->calls + 1);
+	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_MODEL, 0, private_object_model, self, self->calls + 2);
+	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self, self->calls + 3);
+	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0, private_object_visibility, self, self->calls + 4);
 }
 
 static void
 private_callbacks_clear (lisrvClient* self,
                          liengEngine* engine)
 {
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_ANIMATION, self->calls[0]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_SAMPLE, self->calls[1]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_MODEL, self->calls[2]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_MOTION, self->calls[3]);
-	lieng_engine_call_remove (engine, LISRV_CALLBACK_OBJECT_VISIBILITY, self->calls[4]);
+	lieng_engine_remove_calls (engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 }
 
 /*****************************************************************************/

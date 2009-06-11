@@ -48,6 +48,7 @@ liext_module_new (lisrvServer* server)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
@@ -58,8 +59,16 @@ liext_module_new (lisrvServer* server)
 		free (self);
 		return NULL;
 	}
-	self->calls[0] = lieng_engine_call_insert (server->engine, LISRV_CALLBACK_VISION_SHOW, 0, private_vision_show, self);
 
+	/* Register callbacks. */
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_SHOW, 0,
+	     	private_vision_show, self, self->calls + 0))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
 	liscr_script_insert_class (server->script, "Slots", liextSlotsScript, self);
 
 	return self;
@@ -70,7 +79,8 @@ liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
 	lialg_ptrdic_free (self->dictionary);
-	lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_VISION_SHOW, self->calls[0]);
+	lieng_engine_remove_calls (self->server->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

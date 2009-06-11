@@ -174,23 +174,31 @@ lical_callbacks_remove_type (licalCallbacks* self,
 	lialg_u32dic_remove (self->types, type);
 }
 
-licalHandle
+int
 lical_callbacks_insert_callback (licalCallbacks* self,
                                  licalType       type,
                                  int             priority,
                                  void*           call,
-                                 void*           data)
+                                 void*           data,
+                                 licalHandle*    result)
 {
 	licalCalltype* typ;
 	licalCallfunc* ptr;
 	licalCallfunc* func;
+
+	/* Clear handle. */
+	if (result != NULL)
+	{
+		result->type = 0;
+		result->func = NULL;
+	}
 
 	/* Find type. */
 	typ = lialg_u32dic_find (self->types, type);
 	if (typ == NULL)
 	{
 		lisys_error_set (EINVAL, "invalid call type %d", type);
-		return NULL;
+		return 0;
 	}
 
 	/* Allocate function. */
@@ -198,24 +206,31 @@ lical_callbacks_insert_callback (licalCallbacks* self,
 	if (func == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
-		return NULL;
+		return 0;
 	}
 	func->prio = priority;
 	func->call = call;
 	func->data = data;
 
+	/* Set handle. */
+	if (result != NULL)
+	{
+		result->type = type;
+		result->func = func;
+	}
+
 	/* Insertion sort by priority. */
 	if (typ->funcs == NULL)
 	{
 		typ->funcs = func;
-		return func;
+		return 1;
 	}
 	if (priority < typ->funcs->prio)
 	{
 		func->next = typ->funcs;
 		typ->funcs->prev = func;
 		typ->funcs = func;
-		return func;
+		return 1;
 	}
 	for (ptr = typ->funcs ; ptr->next != NULL ; ptr = ptr->next)
 	{
@@ -228,23 +243,24 @@ lical_callbacks_insert_callback (licalCallbacks* self,
 		ptr->next->prev = func;
 	ptr->next = func;
 
-	return func;
+	return 1;
 }
 
 void
 lical_callbacks_remove_callback (licalCallbacks* self,
-                                 licalType       type,
-                                 licalHandle     handle)
+                                 licalHandle*    handle)
 {
 	licalCalltype* typ;
 	licalCallfunc* func;
 
-	typ = lialg_u32dic_find (self->types, type);
+	if (handle->func == NULL)
+		return;
+	typ = lialg_u32dic_find (self->types, handle->type);
 	if (typ == NULL)
 		return;
 	for (func = typ->funcs ; func != NULL ; func = func->next)
 	{
-		if (func == handle)
+		if (func == handle->func)
 		{
 			/* Remove from type. */
 			if (func->prev == NULL)
@@ -261,6 +277,8 @@ lical_callbacks_remove_callback (licalCallbacks* self,
 			break;
 		}
 	}
+	handle->type = 0;
+	handle->func = NULL;
 }
 
 /*****************************************************************************/

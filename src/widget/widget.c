@@ -175,14 +175,26 @@ liwdg_widget_event (liwdgWidget* self,
 	return self->type->event (self, event);
 }
 
-licalHandle
+/**
+ * \brief Adds a callback handler.
+ *
+ * \param self Widget.
+ * \param type Callback type.
+ * \param priority Callback priority, smaller means called earlier.
+ * \param call Function to be called.
+ * \param data User data passed to the function.
+ * \param result Return location for the callback data.
+ * \return Nonzero on success.
+ */
+int
 liwdg_widget_insert_callback (liwdgWidget* self,
                               licalType    type,
                               int          priority,
                               void*        call,
-                              void*        data)
+                              void*        data,
+                              licalHandle* result)
 {
-	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data);
+	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data, result);
 }
 
 void
@@ -264,6 +276,17 @@ liwdg_widget_paint (liwdgWidget* self,
 	private_paint_row (self, px, py, tx, ty + 2, w, h[2], repeatx);
 }
 
+/**
+ * \brief Registers a callback type.
+ *
+ * This is usually called in the class constructor to add type specific
+ * callbacks to inherited widget classes.
+ *
+ * \param self Widget.
+ * \param type Callback type.
+ * \param marshal Callback parameter convention.
+ * \return Nonzero on success.
+ */
 int
 liwdg_widget_register_callback (liwdgWidget* self,
                                 licalType    type,
@@ -272,12 +295,17 @@ liwdg_widget_register_callback (liwdgWidget* self,
 	return lical_callbacks_insert_type (self->callbacks, type, marshal);
 }
 
+/**
+ * \brief Removes a callback handler.
+ *
+ * \param self Widget.
+ * \param handle Callback handle.
+ */
 void
 liwdg_widget_remove_callback (liwdgWidget* self,
-                              licalType    type,
-                              licalHandle  handle)
+                              licalHandle* handle)
 {
-	lical_callbacks_remove_callback (self->callbacks, type, handle);
+	lical_callbacks_remove_callback (self->callbacks, handle);
 }
 
 void

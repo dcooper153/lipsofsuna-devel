@@ -169,22 +169,26 @@ lieng_engine_call (liengEngine* self,
 	return ret;
 }
 
-licalHandle
-lieng_engine_call_insert (liengEngine* self,
+/**
+ * \brief Inserts an event handler callback.
+ *
+ * \param self Engine.
+ * \param type Callback type.
+ * \param priority Callback priority, smaller means called earlier.
+ * \param call Function to be called.
+ * \param data User data passed to the function.
+ * \param result Return location for the callback data.
+ * \return Nonzero on success.
+ */
+int
+lieng_engine_insert_call (liengEngine* self,
                           licalType    type,
                           int          priority,
                           void*        call,
-                          void*        data)
+                          void*        data,
+                          licalHandle* result)
 {
-	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data);
-}
-
-void
-lieng_engine_call_remove (liengEngine* self,
-                          licalType    type,
-                          licalHandle  handle)
-{
-	lical_callbacks_remove_callback (self->callbacks, type, handle);
+	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data, result);
 }
 
 /**
@@ -361,6 +365,54 @@ lieng_engine_load_model (liengEngine* self,
 }
 
 /**
+ * \brief Loads the resource list of the engine.
+ *
+ * If a stream reader is provided, the resource list is loaded from that.
+ * Otherwise, the list is constructed by iterating through files in the
+ * currently set data directory.
+ *
+ * \param self Engine.
+ * \param reader Reader or NULL.
+ * \return Nonzero on success.
+ */
+int
+lieng_engine_load_resources (liengEngine* self,
+                             liReader*    reader)
+{
+#warning Breaks due to old models being lost if called multiple times.
+#warning Should unload and reload models so that the list can change without restarting.
+	if (reader != NULL)
+		return lieng_resources_load_from_stream (self->resources, reader);
+	else
+		return lieng_resources_load_from_dir (self->resources, self->config.dir);
+}
+
+/**
+ * \brief Finds or loads a sector.
+ *
+ * Finds an existing sector or loads one from the disk on demand. This is used
+ * by various map editing facilities of the server to ensure that edited sectors
+ * aren't swapped out.
+ *
+ * \param self Engine.
+ * \param id Sector number.
+ * \return Sector or NULL.
+ */
+liengSector*
+lieng_engine_load_sector (liengEngine* self,
+                          uint32_t     id)
+{
+	liengSector* sector;
+
+	sector = lialg_u32dic_find (self->sectors, id);
+	if (sector != NULL)
+		return sector;
+	sector = lieng_sector_new (self, id, self->config.dir);
+
+	return sector;
+}
+
+/**
  * \brief Forces the engine to reload a texture.
  *
  * Reloads the requested texture and updates any objects that reference
@@ -415,54 +467,6 @@ lieng_engine_load_texture (liengEngine* self,
 #endif
 
 	return 1;
-}
-
-/**
- * \brief Loads the resource list of the engine.
- *
- * If a stream reader is provided, the resource list is loaded from that.
- * Otherwise, the list is constructed by iterating through files in the
- * currently set data directory.
- *
- * \param self Engine.
- * \param reader Reader or NULL.
- * \return Nonzero on success.
- */
-int
-lieng_engine_load_resources (liengEngine* self,
-                             liReader*    reader)
-{
-#warning Breaks due to old models being lost if called multiple times.
-#warning Should unload and reload models so that the list can change without restarting.
-	if (reader != NULL)
-		return lieng_resources_load_from_stream (self->resources, reader);
-	else
-		return lieng_resources_load_from_dir (self->resources, self->config.dir);
-}
-
-/**
- * \brief Finds or loads a sector.
- *
- * Finds an existing sector or loads one from the disk on demand. This is used
- * by various map editing facilities of the server to ensure that edited sectors
- * aren't swapped out.
- *
- * \param self Engine.
- * \param id Sector number.
- * \return Sector or NULL.
- */
-liengSector*
-lieng_engine_load_sector (liengEngine* self,
-                          uint32_t     id)
-{
-	liengSector* sector;
-
-	sector = lialg_u32dic_find (self->sectors, id);
-	if (sector != NULL)
-		return sector;
-	sector = lieng_sector_new (self, id, self->config.dir);
-
-	return sector;
 }
 
 /**
@@ -572,6 +576,37 @@ lieng_engine_read_object_data (liengEngine*    self,
 			lisys_error_set (EINVAL, "invalid object save data");
 			return 0;
 	}
+}
+
+/**
+ * \brief Removes an event handler callback.
+ *
+ * \param self Engine.
+ * \param handle Callback handle.
+ */
+void
+lieng_engine_remove_call (liengEngine* self,
+                          licalHandle* handle)
+{
+	lical_callbacks_remove_callback (self->callbacks, handle);
+}
+
+/**
+ * \brief Removes event handler callbacks.
+ *
+ * \param self Engine.
+ * \param handle Callback handles.
+ * \param count Number of handles.
+ */
+void
+lieng_engine_remove_calls (liengEngine* self,
+                           licalHandle* handles,
+                           int          count)
+{
+	int i;
+
+	for (i = 0 ; i < count ; i++)
+		lical_callbacks_remove_callback (self->callbacks, handles + i);
 }
 
 /**

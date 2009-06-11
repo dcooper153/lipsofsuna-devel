@@ -29,7 +29,6 @@
 #include "cal-marshal.h"
 
 typedef int licalType;
-typedef void* licalHandle;
 
 typedef struct _licalCallfunc licalCallfunc;
 struct _licalCallfunc
@@ -40,6 +39,13 @@ struct _licalCallfunc
 	void* data;
 	licalCallfunc* prev;
 	licalCallfunc* next;
+};
+
+typedef struct _licalHandle licalHandle;
+struct _licalHandle
+{
+	licalType type;
+	licalCallfunc* func;
 };
 
 typedef struct _licalCallbacks licalCallbacks;
@@ -77,17 +83,17 @@ void
 lical_callbacks_remove_type (licalCallbacks* self,
                              licalType       type);
 
-licalHandle
+int
 lical_callbacks_insert_callback (licalCallbacks* self,
                                  licalType       type,
                                  int             priority,
                                  void*           call,
-                                 void*           data);
+                                 void*           data,
+                                 licalHandle*    result);
 
 void
 lical_callbacks_remove_callback (licalCallbacks* self,
-                                 licalType       type,
-                                 licalHandle     handle);
+                                 licalHandle*    handle);
 
 #endif
 

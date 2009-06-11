@@ -250,9 +250,9 @@ private_init (liwdgLogin*   self,
 
 	/* Pack button group. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_import), "Import");
-	liwdg_widget_insert_callback (self->button_import, LIWDG_CALLBACK_PRESSED, 0, private_import, self);
+	liwdg_widget_insert_callback (self->button_import, LIWDG_CALLBACK_PRESSED, 0, private_import, self, NULL);
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_login), "Login");
-	liwdg_widget_insert_callback (self->button_login, LIWDG_CALLBACK_PRESSED, 0, private_login, self);
+	liwdg_widget_insert_callback (self->button_login, LIWDG_CALLBACK_PRESSED, 0, private_login, self, NULL);
 	liwdg_group_set_spacings (LIWDG_GROUP (self->group_buttons), 5, 0);
 	liwdg_group_set_child (LIWDG_GROUP (self->group_buttons), 0, 0, self->button_import);
 	liwdg_group_set_child (LIWDG_GROUP (self->group_buttons), 1, 0, self->button_login);

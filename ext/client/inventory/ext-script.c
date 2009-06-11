@@ -102,7 +102,7 @@ InventoryWidget_new (lua_State* lua)
 		return 1;
 	}
 	liwdg_widget_set_userdata (widget, self);
-	if (!liwdg_widget_insert_callback (widget, LIEXT_CALLBACK_ACTIVATE, 0, private_callback_activated, self))
+	if (!liwdg_widget_insert_callback (widget, LIEXT_CALLBACK_ACTIVATE, 0, private_callback_activated, self, NULL))
 	{
 		liwdg_widget_free (widget);
 		lua_pushnil (lua);

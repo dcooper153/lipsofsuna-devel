@@ -62,7 +62,10 @@ void
 liext_creature_free (liextCreature* self)
 {
 	if (self->active)
-		lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_TICK, self->calls[0]);
+	{
+		lieng_engine_remove_calls (self->server->engine, self->calls,
+			sizeof (self->calls) / sizeof (licalHandle));
+	}
 	free (self);
 }
 
@@ -80,11 +83,11 @@ liext_creature_set_active (liextCreature* self,
 		return 1;
 	if (value)
 	{
-		self->calls[0] = lieng_engine_call_insert (self->server->engine,
-			LISRV_CALLBACK_TICK, 0, private_tick, self);
+		lieng_engine_insert_call (self->server->engine,
+			LISRV_CALLBACK_TICK, 0, private_tick, self, self->calls + 0);
 	}
 	else
-		lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_TICK, self->calls[0]);
+		lieng_engine_call_remove (self->server->engine, self->calls, 1);
 	self->active = value;
 
 	return 1;

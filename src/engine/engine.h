@@ -103,18 +103,6 @@ lieng_engine_call (liengEngine* self,
                    licalType    type,
                                 ...);
 
-licalHandle
-lieng_engine_call_insert (liengEngine* self,
-                          licalType    type,
-                          int          priority,
-                          void*        call,
-                          void*        data);
-
-void
-lieng_engine_call_remove (liengEngine* self,
-                          licalType    type,
-                          licalHandle  handle);
-
 void
 lieng_engine_clear_selection (liengEngine* self);
 
@@ -147,16 +135,28 @@ lieng_engine_find_sector (liengEngine* self,
                           uint32_t     id);
 
 int
+lieng_engine_insert_call (liengEngine* self,
+                          licalType    type,
+                          int          priority,
+                          void*        call,
+                          void*        data,
+                          licalHandle* result);
+
+int
 lieng_engine_load_model (liengEngine* self,
                          const char*  name);
 
 int
-lieng_engine_load_texture (liengEngine* self,
-                           const char*  name);
+lieng_engine_load_resources (liengEngine* self,
+                             liReader*    reader);
 
 liengSector*
 lieng_engine_load_sector (liengEngine* self,
                           uint32_t     id);
+
+int
+lieng_engine_load_texture (liengEngine* self,
+                           const char*  name);
 
 int
 lieng_engine_read_object (liengEngine*    self,
@@ -164,13 +164,18 @@ lieng_engine_read_object (liengEngine*    self,
                           liengObject**   value);
 
 int
-lieng_engine_load_resources (liengEngine* self,
-                             liReader*    reader);
-
-int
 lieng_engine_read_object_data (liengEngine*    self,
                                liarcSerialize* serialize,
                                liengObject*    value);
+
+void
+lieng_engine_remove_call (liengEngine* self,
+                          licalHandle* handle);
+
+void
+lieng_engine_remove_calls (liengEngine* self,
+                           licalHandle* handles,
+                           int          count);
 
 void
 lieng_engine_update (liengEngine* self,

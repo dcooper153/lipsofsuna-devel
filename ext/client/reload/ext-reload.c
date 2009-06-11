@@ -61,9 +61,9 @@ liext_reload_new (licliModule* module)
 		return NULL;
 	}
 
-	/* Allocate callbacks. */
-	self->calls[0] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_TICK, 0, private_callback_tick, self);
-	if (self->calls[0] == NULL)
+	/* Register callbacks. */
+	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
+	     	private_callback_tick, self, self->calls + 0))
 	{
 		liext_reload_free (self);
 		return NULL;
@@ -80,6 +80,8 @@ liext_reload_free (liextReload* self)
 		liext_reload_cancel (self);
 		lirel_reload_free (self->reload);
 	}
+	lieng_engine_remove_calls (self->module->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

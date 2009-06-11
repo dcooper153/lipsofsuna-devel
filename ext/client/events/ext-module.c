@@ -60,13 +60,22 @@ liext_module_new (licliModule* module)
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	liscr_script_insert_class (script, "Event", licomEventScript, self);
-	liscr_script_insert_class (script, "Events", liextEventsScript, self);
 
 	/* Register callbacks. */
-	self->calls[0] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_PACKET, 1, private_packet, self);
-	self->calls[1] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_SELECT, 0, private_select, self);
-	self->calls[2] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_TICK, 0, private_tick, self);
+	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 1,
+	     	private_packet, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_SELECT, 0,
+	     	private_select, self, self->calls + 1) ||
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 2))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
+	liscr_script_insert_class (script, "Event", licomEventScript, self);
+	liscr_script_insert_class (script, "Events", liextEventsScript, self);
 
 	/* Register events. */
 	lua_newtable (script->lua);
@@ -88,9 +97,8 @@ void
 liext_module_free (liextModule* self)
 {
 	/* Remove callbacks. */
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_PACKET, self->calls[0]);
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_SELECT, self->calls[1]);
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_TICK, self->calls[2]);
+	lieng_engine_remove_calls (self->module->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 
 	/* FIXME: Remove the class here. */
 	free (self);

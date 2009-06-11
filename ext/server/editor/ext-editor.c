@@ -44,8 +44,8 @@ liext_editor_new (lisrvServer* server)
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	self->calls[0] = lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 1, private_client_packet, self);
-	if (self->calls[0] == NULL)
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 1,
+	     	private_client_packet, self, self->calls + 0))
 	{
 		free (self);
 		return NULL;
@@ -57,7 +57,8 @@ liext_editor_new (lisrvServer* server)
 void
 liext_editor_free (liextEditor* self)
 {
-	lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_CLIENT_PACKET, self->calls[0]);
+	lieng_engine_remove_calls (self->server->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

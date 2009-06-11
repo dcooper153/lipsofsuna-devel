@@ -49,7 +49,7 @@ enum
 typedef struct _liextModule liextModule;
 struct _liextModule
 {
-	licalHandle calls[10];
+	licalHandle calls[9];
 	lisrvServer* server;
 };
 

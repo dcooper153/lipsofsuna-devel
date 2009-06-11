@@ -45,12 +45,21 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->calls[0] = lieng_engine_call_insert (module->engine, LICLI_CALLBACK_TICK, 0, private_tick, self);
 
+	/* Register callbacks. */
+	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 0))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
 	liscr_script_insert_class (module->script, "Camera", liextCameraScript, self);
 
 	return self;
@@ -60,7 +69,8 @@ void
 liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
-	lieng_engine_call_remove (self->module->engine, LICLI_CALLBACK_TICK, self->calls[0]);
+	lieng_engine_remove_calls (self->module->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

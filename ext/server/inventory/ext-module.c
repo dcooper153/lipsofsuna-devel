@@ -57,7 +57,12 @@ liext_module_new (lisrvServer* server)
 		free (self);
 		return NULL;
 	}
-	self->calls[0] = lieng_engine_call_insert (server->engine, LISRV_CALLBACK_TICK, 0, private_tick, self);
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 0))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
 
 	liscr_script_insert_class (server->script, "Inventory", liextInventoryScript, self);
 
@@ -69,7 +74,8 @@ liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
 	lialg_ptrdic_free (self->dictionary);
-	lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_TICK, self->calls[0]);
+	lieng_engine_remove_calls (self->server->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

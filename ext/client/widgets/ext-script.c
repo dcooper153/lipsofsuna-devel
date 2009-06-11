@@ -153,7 +153,7 @@ Button_new (lua_State* lua)
 	if (!lua_isnoneornil (lua, 2))
 		liscr_copyargs (lua, self, 2);
 
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self);
+	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
 	liwdg_widget_set_userdata (widget, self);
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);
@@ -238,7 +238,7 @@ Entry_new (lua_State* lua)
 	if (!lua_isnoneornil (lua, 2))
 		liscr_copyargs (lua, self, 2);
 
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_ACTIVATED, 0, private_callback_activated, self);
+	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_ACTIVATED, 0, private_callback_activated, self, NULL);
 	liwdg_widget_set_userdata (widget, self);
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);
@@ -341,7 +341,7 @@ Image_new (lua_State* lua)
 	if (!lua_isnoneornil (lua, 2))
 		liscr_copyargs (lua, self, 2);
 
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self);
+	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
 	liwdg_widget_set_userdata (widget, self);
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);
@@ -426,7 +426,7 @@ Label_new (lua_State* lua)
 	if (!lua_isnoneornil (lua, 2))
 		liscr_copyargs (lua, self, 2);
 
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self);
+	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
 	liwdg_widget_set_userdata (widget, self);
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);

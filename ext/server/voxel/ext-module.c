@@ -61,6 +61,7 @@ liext_module_new (lisrvServer* server)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
@@ -72,15 +73,18 @@ liext_module_new (lisrvServer* server)
 		free (self);
 		return NULL;
 	}
-	self->calls[0] = lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1, private_object_motion, self);
-	self->calls[1] = lieng_engine_call_insert (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 1, private_object_visibility, self);
-	if (self->calls[0] == NULL ||
-	    self->calls[1] == NULL)
+
+	/* Register callbacks. */
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1,
+	     	private_object_motion, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 1,
+	     	private_object_visibility, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
 
+	/* Register classes. */
 	liscr_script_insert_class (server->script, "Voxel", liextVoxelScript, self);
 
 	return self;
@@ -100,8 +104,8 @@ liext_module_free (liextModule* self)
 		lialg_ptrdic_free (self->listeners);
 	}
 
-	lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_OBJECT_MOTION, self->calls[0]);
-	lieng_engine_call_remove (self->server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, self->calls[1]);
+	lieng_engine_remove_calls (self->server->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 

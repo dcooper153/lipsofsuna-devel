@@ -178,10 +178,10 @@ private_client_vision_show (lisrvServer* server,
 
 int lisrv_server_init_callbacks_client (lisrvServer* server)
 {
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 0, private_client_client_login, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_client_client_packet, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_VISION_HIDE, 0, private_client_vision_hide, server);
-	lieng_engine_call_insert (server->engine, LISRV_CALLBACK_VISION_SHOW, 0, private_client_vision_show, server);
+	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 0, private_client_client_login, server, NULL);
+	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_client_client_packet, server, NULL);
+	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_HIDE, 0, private_client_vision_hide, server, NULL);
+	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_SHOW, 0, private_client_vision_show, server, NULL);
 	return 1;
 }
 

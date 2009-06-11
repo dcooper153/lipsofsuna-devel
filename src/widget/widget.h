@@ -67,12 +67,13 @@ int
 liwdg_widget_event (liwdgWidget* self,
                     liwdgEvent*  event);
 
-licalHandle
+int
 liwdg_widget_insert_callback (liwdgWidget* self,
                               licalType    type,
                               int          priority,
                               void*        call,
-                              void*        data);
+                              void*        data,
+                              licalHandle* result);
 
 void
 liwdg_widget_move (liwdgWidget* self,
@@ -91,8 +92,7 @@ liwdg_widget_register_callback (liwdgWidget* self,
 
 void
 liwdg_widget_remove_callback (liwdgWidget* self,
-                              licalType    type,
-                              licalHandle  handle);
+                              licalHandle* handle);
 
 void
 liwdg_widget_render (liwdgWidget* self);

@@ -146,10 +146,10 @@ private_init (liextDialog*   self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_insert), "Insert");
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_delete), "Delete");
 	liwdg_button_set_text (LIWDG_BUTTON (self->button_duplicate), "Duplicate");
-	liwdg_widget_insert_callback (self->button_edit, LIWDG_CALLBACK_PRESSED, 0, private_edit, self);
-	liwdg_widget_insert_callback (self->button_insert, LIWDG_CALLBACK_PRESSED, 0, private_insert, self);
-	liwdg_widget_insert_callback (self->button_delete, LIWDG_CALLBACK_PRESSED, 0, private_delete, self);
-	liwdg_widget_insert_callback (self->button_duplicate, LIWDG_CALLBACK_PRESSED, 0, private_duplicate, self);
+	liwdg_widget_insert_callback (self->button_edit, LIWDG_CALLBACK_PRESSED, 0, private_edit, self, NULL);
+	liwdg_widget_insert_callback (self->button_insert, LIWDG_CALLBACK_PRESSED, 0, private_insert, self, NULL);
+	liwdg_widget_insert_callback (self->button_delete, LIWDG_CALLBACK_PRESSED, 0, private_delete, self, NULL);
+	liwdg_widget_insert_callback (self->button_duplicate, LIWDG_CALLBACK_PRESSED, 0, private_duplicate, self, NULL);
 
 	/* Pack self. */
 	liwdg_window_set_title (LIWDG_WINDOW (self), "Model");
