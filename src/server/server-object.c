@@ -493,12 +493,16 @@ lisrv_object_set_client (liengObject* self,
 	if (data->client == value)
 		return 1;
 	data->client = value;
-	if (value == NULL)
-		lieng_object_ref (self, -1);
-	else
+	if (value != NULL)
+	{
 		lieng_object_ref (self, 1);
-
-	return lisrv_client_set_object (value, self);
+		return lisrv_client_set_object (value, self);
+	}
+	else
+	{
+		lieng_object_ref (self, -1);
+		return 1;
+	}
 }
 
 /**
