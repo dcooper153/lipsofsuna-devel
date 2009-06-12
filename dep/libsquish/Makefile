@@ -9,6 +9,8 @@ CXXFLAGS+=-fPIC
 all : $(LIB)
 
 install : $(LIB)
+	mkdir -p $(INSTALL_DIR)/include
+	mkdir -p $(INSTALL_DIR)/lib
 	install squish.h $(INSTALL_DIR)/include 
 	install $(LIB) $(INSTALL_DIR)/lib
 
