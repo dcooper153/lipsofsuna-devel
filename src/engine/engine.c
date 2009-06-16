@@ -923,6 +923,9 @@ private_init (liengEngine* self,
 	self->callbacks = lical_callbacks_new ();
 	if (self->callbacks == NULL)
 		return 0;
+	if (!lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_LOAD, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_UNLOAD, lical_marshal_DATA_PTR_PTR))
+		return 0;
 
 	/* Objects. */
 	self->objects = lialg_u32dic_new ();

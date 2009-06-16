@@ -40,7 +40,6 @@ if test "$want_debug" = yes; then
 else
 	LIPS_CFLAGS="-DNDEBUG"
 fi
-LIPS_CFLAGS="$LIPS_CFLAGS -Wall -export-dynamic -DLI_ENABLE_ERROR"
 
 dnl Built-in dependencies.
 if test "$want_deps" = yes; then
@@ -52,9 +51,12 @@ if test "$want_deps" = yes; then
 	GRAPPLE_LIBS="-L$PWD/dep/build/lib -lgrapple -lcrypt -lpthread"
 	LUA_CFLAGS="-I$PWD/dep/build/include/lua"
 	LUA_LIBS="-L$PWD/dep/build/lib -llua5.1"
+	SQLITE_CFLAGS="-I$PWD/dep/build/include/sqlite"
+	SQLITE_LIBS="-L$PWD/dep/build/lib -lsqlite3"
 else
 	MAYBE_DEP=
 	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
+	PKG_CHECK_MODULES([SQLITE], [sqlite3 >= 3.6.0])
 	GRAPPLE_CFLAGS=""
 	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
 	if test "$want_luatest" = yes; then
@@ -130,6 +132,7 @@ else
 fi
 
 dnl Export configuration.
+LIPS_CFLAGS="$LIPS_CFLAGS $SQLITE_CFLAGS -Wall -export-dynamic -DLI_ENABLE_ERROR"
 AC_SUBST([LIPS_CFLAGS])
 AC_SUBST([BULLET_CFLAGS])
 AC_SUBST([BULLET_LIBS])
@@ -141,6 +144,8 @@ AC_SUBST([OPENAL_CFLAGS])
 AC_SUBST([OPENAL_LIBS])
 AC_SUBST([OPENGL_CFLAGS])
 AC_SUBST([OPENGL_LIBS])
+AC_SUBST([SQLITE_CFLAGS])
+AC_SUBST([SQLITE_LIBS])
 AC_SUBST([VORBIS_LIBS])
 AC_SUBST([VORBIS_CFLAGS])
 AC_SUBST([MAYBE_CLIENT])

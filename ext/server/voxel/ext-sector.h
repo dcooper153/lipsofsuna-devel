@@ -24,34 +24,27 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
-#include "ext-voxel.h"
+#ifndef __EXT_SECTOR_H__
+#define __EXT_SECTOR_H__
 
-liextVoxel*
-liext_voxel_new (int x,
-                 int y,
-                 int z,
-                 int radius)
-{
-	liextVoxel* self;
+#include "ext-module.h"
 
-	self = calloc (1, sizeof (liextVoxel));
-	if (self == NULL)
-		return NULL;
-	self->x = x;
-	self->y = y;
-	self->z = z;
-	self->radius = radius;
-
-	return self;
-}
+int
+liext_sector_read (liengSector* self,
+                   liarcSql*    sql);
 
 void
-liext_voxel_free (liextVoxel* self)
-{
-	free (self);
-}
+liext_sector_update (liengSector* self,
+                     float        secs);
+
+int
+liext_sector_write (liengSector* self,
+                    liarcSql*    sql);
+
+int
+liext_sector_get_empty (const liengSector* self);
+
+#endif
 
 /** @} */
 /** @} */

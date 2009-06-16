@@ -20,6 +20,7 @@
 
 #include "archive-tar.h"
 #include "archive-serialize.h"
+#include "archive-sql.h"
 #include "archive-writer.h"
 
 #endif

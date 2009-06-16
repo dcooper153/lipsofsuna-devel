@@ -16,39 +16,20 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup liarc Archive
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup liarcSql Sql
  * @{
  */
 
-#ifndef __EXT_VOXEL_H__
-#define __EXT_VOXEL_H__
+#ifndef __ARCHIVE_SQL_H__
+#define __ARCHIVE_SQL_H__
 
-#include <server/lips-server.h>
+#include <sqlite3.h>
 
-typedef struct _liextVoxel liextVoxel;
-struct _liextVoxel
-{
-	int x;
-	int y;
-	int z;
-	int radius;
-};
-
-liextVoxel*
-liext_voxel_new (int x,
-                 int y,
-                 int z,
-                 int radius);
-
-void
-liext_voxel_free (liextVoxel* self);
+typedef sqlite3 liarcSql;
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

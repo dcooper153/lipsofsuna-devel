@@ -1,6 +1,6 @@
 SUBDIRS = script .
 INCLUDES = -I$(srcdir)/..
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS) $(BULLET_CFLAGS)
+AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS) $(BULLET_CFLAGS) $(SQLITE_CFLAGS)
 
 lib_LTLIBRARIES = \
 	liblipsserver.la
@@ -40,4 +40,4 @@ liblipsserver_la_LIBADD = \
 	../model/liblipsmodel.la \
 	../math/liblipsmath.la \
 	../system/liblipssystem.la \
-	$(LUA_LIBS) $(GRAPPLE_LIBS)
+	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS)

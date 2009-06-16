@@ -84,6 +84,7 @@ lieng_block_fill (liengBlock* self,
 		{
 			self->full.terrain = terrain;
 			self->dirty = 0xFF;
+			self->stamp++;
 		}
 	}
 	else
@@ -96,6 +97,7 @@ lieng_block_fill (liengBlock* self,
 		self->type = LIENG_BLOCK_TYPE_FULL;
 		self->dirty = 0xFF;
 		self->full.terrain = terrain;
+		self->stamp++;
 	}
 }
 
@@ -157,6 +159,8 @@ lieng_block_fill_aabb (liengBlock*      self,
 				ret |= lieng_block_set_voxel (self, x, y, z, 0xFF00 | terrain);
 		}
 	}
+	if (ret)
+		self->stamp++;
 
 	return ret;
 }
@@ -247,6 +251,8 @@ lieng_block_fill_sphere (liengBlock*        self,
 			}
 		}
 	}
+	if (ret)
+		self->stamp++;
 
 	return ret;
 }

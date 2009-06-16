@@ -7,8 +7,10 @@ ext_LTLIBRARIES = \
 
 libvoxel_ser_la_LDFLAGS = -module -avoid-version
 libvoxel_ser_la_SOURCES = \
-	ext-voxel.c \
-	ext-voxel.h \
+	ext-listener.c \
+	ext-listener.h \
 	ext-module.c \
 	ext-module.h \
-	ext-script.c
+	ext-script.c \
+	ext-sector.c \
+	ext-sector.h

@@ -63,6 +63,12 @@ lieng_sector_new (liengEngine* engine,
 void
 lieng_sector_free (liengSector* self);
 
+int
+lieng_sector_build_block (liengSector* self,
+                          int          x,
+                          int          y,
+                          int          z);
+
 void
 lieng_sector_fill (liengSector* self,
                    liengTile    terrain);

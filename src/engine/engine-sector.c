@@ -108,6 +108,9 @@ lieng_sector_new (liengEngine* engine,
 		}
 	}
 
+	/* Invoke callbacks. */
+	lieng_engine_call (engine, LIENG_CALLBACK_SECTOR_LOAD, self);
+
 	return self;
 }
 
@@ -130,6 +133,15 @@ lieng_sector_free (liengSector* self)
 		lieng_block_free (self->blocks + i);
 
 	free (self);
+}
+
+int
+lieng_sector_build_block (liengSector* self,
+                          int          x,
+                          int          y,
+                          int          z)
+{
+	return private_build_block (self, x, y, z);
 }
 
 /**
@@ -357,25 +369,6 @@ void
 lieng_sector_update (liengSector* self,
                      float        secs)
 {
-	int i;
-	int x;
-	int y;
-	int z;
-
-	/* Rebuild changed blocks. */
-	if (self->dirty)
-	{
-		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
-		{
-			if (!self->blocks[i].dirty)
-				continue;
-			private_build_block (self, x, y, z);
-			self->blocks[i].dirty = 0;
-		}
-		self->dirty = 0;
-	}
 }
 
 /**

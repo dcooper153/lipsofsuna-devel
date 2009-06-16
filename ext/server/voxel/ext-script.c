@@ -27,7 +27,7 @@
 #include <network/lips-network.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
-#include "ext-voxel.h"
+#include "ext-listener.h"
 #include "ext-module.h"
 
 /* @luadoc
@@ -42,7 +42,7 @@
  * ---
  * -- Fills a box with voxel terrain.
  * --
- * -- @param self Editor class.
+ * -- @param self Voxel class.
  * -- @param min Box minimum point.
  * -- @param max Box maximum point.
  * -- @param terrain Terrain type.
@@ -71,7 +71,7 @@ Voxel_fill_box (lua_State* lua)
  * ---
  * -- Fills a sphere with voxel terrain.
  * --
- * -- @param self Editor class.
+ * -- @param self Voxel class.
  * -- @param center Sphere center.
  * -- @param radius Sphere radius.
  * -- @param terrain Terrain type.
@@ -97,6 +97,26 @@ Voxel_fill_sphere (lua_State* lua)
 	return 0;
 }
 
+/* @luadoc
+ * ---
+ * -- Saves the terrain of the currently loaded sectors.
+ * --
+ * -- @param self Voxel class.
+ * function Voxel.save(self)
+ */
+static int
+Voxel_save (lua_State* lua)
+{
+	liextModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+
+	if (!liext_module_write (module, module->server->sql))
+		lisys_error_report ();
+
+	return 0;
+}
+
 /*****************************************************************************/
 
 void
@@ -107,6 +127,7 @@ liextVoxelScript (liscrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
 	liscr_class_insert_func (self, "fill_box", Voxel_fill_box);
 	liscr_class_insert_func (self, "fill_sphere", Voxel_fill_sphere);
+	liscr_class_insert_func (self, "save", Voxel_save);
 }
 
 /** @} */

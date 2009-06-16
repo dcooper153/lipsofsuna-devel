@@ -43,6 +43,7 @@ struct _lisrvServer
 	uint32_t debug;
 	int quit;
 	lialgStrdic* extensions;
+	liarcSql* sql;
 	liengEngine* engine;
 	liscrScript* script;
 	lisrvNetwork* network;

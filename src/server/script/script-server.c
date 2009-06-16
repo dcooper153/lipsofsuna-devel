@@ -76,7 +76,6 @@ Server_find_object (lua_State* lua)
 static int
 Server_nearby_clients (lua_State* lua)
 {
-	int i = 1;
 	int r;
 	int x;
 	int y;
@@ -130,7 +129,6 @@ Server_nearby_clients (lua_State* lua)
 static int
 Server_nearby_objects (lua_State* lua)
 {
-	int i = 1;
 	int r;
 	int x;
 	int y;

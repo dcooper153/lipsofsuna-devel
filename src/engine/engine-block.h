@@ -65,6 +65,7 @@ struct _liengBlock
 {
 	uint8_t type;
 	uint8_t dirty;
+	uint32_t stamp;
 	liphyShape* shape;
 	liphyObject* physics;
 #ifndef LIENG_DISABLE_GRAPHICS

@@ -31,7 +31,8 @@
 #include <callback/lips-callback.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
-#include "ext-voxel.h"
+#include "ext-listener.h"
+#include "ext-sector.h"
 
 #define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
 
@@ -40,7 +41,7 @@ struct _liextModule
 {
 	float radius;
 	lialgPtrdic* listeners;
-	licalHandle calls[2];
+	licalHandle calls[4];
 	lisrvServer* server;
 };
 
@@ -61,6 +62,10 @@ liext_module_fill_sphere (liextModule*       self,
                           const limatVector* center,
                           float              radius,
                           liengTile          terrain);
+
+int
+liext_module_write (liextModule* self,
+                    liarcSql*    sql);
 
 /*****************************************************************************/
 

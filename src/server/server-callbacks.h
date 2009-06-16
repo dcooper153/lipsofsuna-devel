@@ -33,7 +33,7 @@
 
 enum
 {
-	LISRV_CALLBACK_CLIENT_CONTROL, /* (data, object, quat, flags) */
+	LISRV_CALLBACK_CLIENT_CONTROL = LIENG_CALLBACK_LAST, /* (data, object, quat, flags) */
 	LISRV_CALLBACK_CLIENT_LOGIN, /* (data, object, name, pass) */
 	LISRV_CALLBACK_CLIENT_LOGOUT, /* (data, object) */
 	LISRV_CALLBACK_CLIENT_PACKET, /* (data, client, packet) */

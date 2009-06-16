@@ -51,7 +51,8 @@ am__installdirs = "$(DESTDIR)$(extdir)"
 extLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(ext_LTLIBRARIES)
 libvoxel_ser_la_LIBADD =
-am_libvoxel_ser_la_OBJECTS = ext-voxel.lo ext-module.lo ext-script.lo
+am_libvoxel_ser_la_OBJECTS = ext-listener.lo ext-module.lo \
+	ext-script.lo ext-sector.lo
 libvoxel_ser_la_OBJECTS = $(am_libvoxel_ser_la_OBJECTS)
 libvoxel_ser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -159,6 +160,8 @@ SDL_LIBS = @SDL_LIBS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SQLITE_CFLAGS = @SQLITE_CFLAGS@
+SQLITE_LIBS = @SQLITE_LIBS@
 STRIP = @STRIP@
 TOOLDIR = @TOOLDIR@
 VERSION = @VERSION@
@@ -225,11 +228,13 @@ ext_LTLIBRARIES = \
 
 libvoxel_ser_la_LDFLAGS = -module -avoid-version
 libvoxel_ser_la_SOURCES = \
-	ext-voxel.c \
-	ext-voxel.h \
+	ext-listener.c \
+	ext-listener.h \
 	ext-module.c \
 	ext-module.h \
-	ext-script.c
+	ext-script.c \
+	ext-sector.c \
+	ext-sector.h
 
 all: all-am
 
@@ -300,9 +305,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-voxel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-sector.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

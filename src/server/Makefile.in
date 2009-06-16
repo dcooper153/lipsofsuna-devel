@@ -60,7 +60,8 @@ liblipsserver_la_DEPENDENCIES = ../engine/liblipsengine.la \
 	../archive/liblipsarchive.la ../callback/liblipscallback.la \
 	../algorithm/liblipsalgorithm.la ../model/liblipsmodel.la \
 	../math/liblipsmath.la ../system/liblipssystem.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 am_liblipsserver_la_OBJECTS = server.lo server-callbacks.lo \
 	server-client.lo server-network.lo server-object.lo \
 	server-paths.lo
@@ -178,6 +179,8 @@ SDL_LIBS = @SDL_LIBS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SQLITE_CFLAGS = @SQLITE_CFLAGS@
+SQLITE_LIBS = @SQLITE_LIBS@
 STRIP = @STRIP@
 TOOLDIR = @TOOLDIR@
 VERSION = @VERSION@
@@ -238,7 +241,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = script .
 INCLUDES = -I$(srcdir)/..
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS) $(BULLET_CFLAGS)
+AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS) $(BULLET_CFLAGS) $(SQLITE_CFLAGS)
 lib_LTLIBRARIES = \
 	liblipsserver.la
 
@@ -277,7 +280,7 @@ liblipsserver_la_LIBADD = \
 	../model/liblipsmodel.la \
 	../math/liblipsmath.la \
 	../system/liblipssystem.la \
-	$(LUA_LIBS) $(GRAPPLE_LIBS)
+	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS)
 
 all: all-recursive
 

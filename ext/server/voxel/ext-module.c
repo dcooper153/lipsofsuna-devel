@@ -26,7 +26,7 @@
 
 #include <network/lips-network.h>
 #include <server/lips-server.h>
-#include "ext-voxel.h"
+#include "ext-listener.h"
 #include "ext-module.h"
 
 #define LISTENER_POSITION_EPSILON 3.0f
@@ -41,11 +41,12 @@ private_object_visibility (liextModule* self,
                            int          visible);
 
 static int
-private_pack_block (liextModule* self,
-                    liarcWriter* writer,
-                    int          x,
-                    int          y,
-                    int          z);
+private_sector_load (liextModule* self,
+                     liengSector* sector);
+
+static int
+private_tick (liextModule* self,
+              float        secs);
 
 /*****************************************************************************/
 
@@ -78,7 +79,11 @@ liext_module_new (lisrvServer* server)
 	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1,
 	     	private_object_motion, self, self->calls + 0) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 1,
-	     	private_object_visibility, self, self->calls + 1))
+	     	private_object_visibility, self, self->calls + 1) ||
+	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, 0,
+	     	private_sector_load, self, self->calls + 2) ||
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 3))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -100,7 +105,7 @@ liext_module_free (liextModule* self)
 	if (self->listeners != NULL)
 	{
 		LI_FOREACH_PTRDIC (iter, self->listeners)
-			liext_voxel_free (iter.value);
+			liext_listener_free (iter.value);
 		lialg_ptrdic_free (self->listeners);
 	}
 
@@ -115,8 +120,6 @@ liext_module_fill_box (liextModule*       self,
                        const limatVector* max,
                        liengTile          terrain)
 {
-	lialgU32dicIter iter1;
-	liarcWriter* writer;
 	liengRange range;
 	liengRangeIter rangeiter;
 	liengSector* sector;
@@ -133,24 +136,6 @@ liext_module_fill_box (liextModule*       self,
 		aabb.max = limat_vector_subtract (*max, sector->origin);
 		lieng_sector_fill_aabb (sector, &aabb, terrain);
 	}
-
-	/* Notify clients. */
-	writer = liarc_writer_new_packet (LIEXT_VOXEL_PACKET_BOX);
-	if (writer != NULL)
-	{
-		liarc_writer_append_float (writer, min->x);
-		liarc_writer_append_float (writer, min->y);
-		liarc_writer_append_float (writer, min->z);
-		liarc_writer_append_float (writer, max->x);
-		liarc_writer_append_float (writer, max->y);
-		liarc_writer_append_float (writer, max->z);
-		liarc_writer_append_uint32 (writer, terrain);
-		LI_FOREACH_U32DIC (iter1, self->server->network->clients)
-		{
-#warning FIXME: Terrain edit events are sent to all clients.
-			lisrv_client_send (iter1.value, writer, GRAPPLE_RELIABLE);
-		}
-	}
 }
 
 void
@@ -159,8 +144,6 @@ liext_module_fill_sphere (liextModule*       self,
                           float              radius,
                           liengTile          terrain)
 {
-	lialgU32dicIter iter1;
-	liarcWriter* writer;
 	liengRange range;
 	liengRangeIter rangeiter;
 	liengSector* sector;
@@ -176,22 +159,65 @@ liext_module_fill_sphere (liextModule*       self,
 		vector = limat_vector_subtract (*center, sector->origin);
 		lieng_sector_fill_sphere (sector, &vector, radius, terrain);
 	}
+}
 
-	/* Notify clients. */
-	writer = liarc_writer_new_packet (LIEXT_VOXEL_PACKET_SPHERE);
-	if (writer != NULL)
+int
+liext_module_write (liextModule* self,
+                    liarcSql*    sql)
+{
+	const char* query;
+	sqlite3_stmt* statement;
+	lialgU32dicIter iter;
+
+	/* Create material table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
+		"(id INTEGER PRIMARY KEY,name TEXT,shi REAL,"
+		"dif0 REAL,dif1 REAL,dif2 REAL,dif3 REAL,"
+		"spe0 REAL,spe1 REAL,spe2 REAL,spe3 REAL);";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		liarc_writer_append_float (writer, center->x);
-		liarc_writer_append_float (writer, center->y);
-		liarc_writer_append_float (writer, center->z);
-		liarc_writer_append_float (writer, radius);
-		liarc_writer_append_uint32 (writer, terrain);
-		LI_FOREACH_U32DIC (iter1, self->server->network->clients)
-		{
-#warning FIXME: Terrain edit events are sent to all clients.
-			lisrv_client_send (iter1.value, writer, GRAPPLE_RELIABLE);
-		}
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		return 0;
 	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create sector table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
+		"(id INTEGER PRIMARY KEY,data BLOB);";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Save materials. */
+/*	LI_FOREACH_ASSOCID (iter, self->materials)
+	{
+		if (!liext_material_write (iter.value, sql))
+			return 0;
+	}*/
+
+	/* Save terrain. */
+	LI_FOREACH_U32DIC (iter, self->server->engine->sectors)
+	{
+		if (!liext_sector_write (iter.value, sql))
+			return 0;
+	}
+
+	return 1;
 }
 
 /*****************************************************************************/
@@ -200,64 +226,15 @@ static int
 private_object_motion (liextModule* self,
                        liengObject* object)
 {
-	int radius;
-	liarcWriter* writer;
-	liextVoxel* listener;
-	limatTransform transform;
-	struct { int x, y, z; } center, pos;
+	liextListener* listener;
 
 	if (LISRV_OBJECT (object)->client == NULL)
 		return 1;
 
-	/* Find terrain vision subscription. */
+	/* Mark listener as moved. */
 	listener = lialg_ptrdic_find (self->listeners, object);
-	if (listener == NULL)
-		return 1;
-
-	/* Calculate vision volume. */
-	lieng_object_get_transform (object, &transform);
-	radius = (int)(self->radius / LIENG_BLOCK_WIDTH + 0.5f);
-	center.x = transform.position.x / LIENG_BLOCK_WIDTH;
-	center.y = transform.position.y / LIENG_BLOCK_WIDTH;
-	center.z = transform.position.z / LIENG_BLOCK_WIDTH;
-
-	/* Check for position change. */
-	if (center.x == listener->x &&
-	    center.y == listener->y &&
-	    center.z == listener->z)
-		return 1;
-	writer = NULL;
-
-	/* Send newly seen terrain. */
-	for (pos.z = center.z - radius ; pos.z <= center.z + radius ; pos.z++)
-	for (pos.y = center.y - radius ; pos.y <= center.y + radius ; pos.y++)
-	for (pos.x = center.x - radius ; pos.x <= center.x + radius ; pos.x++)
-	{
-		if (listener->x - listener->radius <= pos.x && pos.x <= listener->x + listener->radius &&
-		    listener->y - listener->radius <= pos.y && pos.y <= listener->y + listener->radius &&
-		    listener->z - listener->radius <= pos.z && pos.z <= listener->z + listener->radius)
-			continue;
-		if (writer == NULL)
-			writer = liarc_writer_new_packet (LIEXT_VOXEL_PACKET_DIFF);
-		if (writer == NULL)
-			return 1;
-		if (!private_pack_block (self, writer, pos.x, pos.y, pos.z))
-		{
-			liarc_writer_free (writer);
-			return 1;
-		}
-	}
-	if (writer != NULL)
-	{
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
-		liarc_writer_free (writer);
-	}
-
-	/* Store new vision center. */
-	listener->x = center.x;
-	listener->y = center.y;
-	listener->z = center.z;
-	listener->radius = radius;
+	if (listener != NULL)
+		listener->moved = 1;
 
 	return 1;
 }
@@ -267,49 +244,29 @@ private_object_visibility (liextModule* self,
                            liengObject* object,
                            int          visible)
 {
-	int radius;
-	liarcWriter* writer;
-	liextVoxel* listener;
-	limatTransform transform;
-	struct { int x, y, z; } center, pos;
+	liextListener* listener;
 
 	if (LISRV_OBJECT (object)->client == NULL)
 		return 1;
-
 	if (visible)
 	{
-		/* Calculate vision volume. */
-		lieng_object_get_transform (object, &transform);
-		radius = (int)(self->radius / LIENG_BLOCK_WIDTH + 0.5f);
-		center.x = transform.position.x / LIENG_BLOCK_WIDTH;
-		center.y = transform.position.y / LIENG_BLOCK_WIDTH;
-		center.z = transform.position.z / LIENG_BLOCK_WIDTH;
-
 		/* Subscribe to terrain updates. */
-		lieng_object_get_transform (object, &transform);
-		listener = liext_voxel_new (center.x, center.y, center.z, radius);
+		listener = lialg_ptrdic_find (self->listeners, object);
+		if (listener != NULL)
+		{
+			listener->moved = 1;
+			return 1;
+		}
+		listener = liext_listener_new (self, object, self->radius);
 		if (listener == NULL)
 			return 1;
 		if (!lialg_ptrdic_insert (self->listeners, object, listener))
-			liext_voxel_free (listener);
-
-		/* Send newly seen terrain. */
-		/* FIXME: Not implemented yet! */
-		writer = liarc_writer_new_packet (LIEXT_VOXEL_PACKET_DIFF);
-		if (writer == NULL)
-			return 1;
-		for (pos.z = center.z - radius ; pos.z <= center.z + radius ; pos.z++)
-		for (pos.y = center.y - radius ; pos.y <= center.y + radius ; pos.y++)
-		for (pos.x = center.x - radius ; pos.x <= center.x + radius ; pos.x++)
 		{
-			if (!private_pack_block (self, writer, pos.x, pos.y, pos.z))
-			{
-				liarc_writer_free (writer);
-				return 1;
-			}
+			liext_listener_free (listener);
+			return 1;
 		}
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
-		liarc_writer_free (writer);
+		listener->moved = 1;
+		return 1;
 	}
 	else
 	{
@@ -318,48 +275,62 @@ private_object_visibility (liextModule* self,
 		if (listener == NULL)
 			return 1;
 		lialg_ptrdic_remove (self->listeners, object);
-		liext_voxel_free (listener);
+		liext_listener_free (listener);
 	}
 
 	return 1;
 }
 
 static int
-private_pack_block (liextModule* self,
-                    liarcWriter* writer,
-                    int          x,
-                    int          y,
-                    int          z)
+private_sector_load (liextModule* self,
+                     liengSector* sector)
 {
-	uint32_t id;
-	liengBlock* block;
+	liext_sector_read (sector, self->server->sql);
+
+	return 1;
+}
+
+static int
+private_tick (liextModule* self,
+              float        secs)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	lialgU32dicIter iter;
+	lialgPtrdicIter iter1;
 	liengSector* sector;
 
-	/* Find sector. */
-	id = LIENG_SECTOR_INDEX (
-		x / LIENG_BLOCKS_PER_LINE,
-		y / LIENG_BLOCKS_PER_LINE,
-		z / LIENG_BLOCKS_PER_LINE);
-	sector = lieng_engine_find_sector (self->server->engine, id);
-	if (sector == NULL)
-		return 0;
-
-	/* Find block. */
-	id = LIENG_BLOCK_INDEX (
-		x % LIENG_BLOCKS_PER_LINE,
-		y % LIENG_BLOCKS_PER_LINE,
-		z % LIENG_BLOCKS_PER_LINE);
-	block = sector->blocks + id;
-
-	/* Send block data. */
-	if (!liarc_writer_append_uint8 (writer, sector->x) ||
-	    !liarc_writer_append_uint8 (writer, sector->y) ||
-	    !liarc_writer_append_uint8 (writer, sector->z) ||
-	    !liarc_writer_append_uint16 (writer, id) ||
-	    !lieng_block_write (block, writer))
+	/* Rebuild modified terrain blocks. */
+	LI_FOREACH_U32DIC (iter, self->server->engine->sectors)
 	{
-		liarc_writer_free (writer);
-		return 0;
+		sector = iter.value;
+		if (!sector->dirty)
+			continue;
+		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+		{
+			if (!sector->blocks[i].dirty)
+				continue;
+			lieng_sector_build_block (sector, x, y, z);
+		}
+	}
+
+	/* Update listeners. */
+	LI_FOREACH_PTRDIC (iter1, self->listeners)
+		liext_listener_update (iter1.value, secs);
+
+	/* Mark all terrain as clean. */
+	LI_FOREACH_U32DIC (iter, self->server->engine->sectors)
+	{
+		sector = iter.value;
+		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+			sector->blocks[i].dirty = 0;
+		sector->dirty = 0;
 	}
 
 	return 1;

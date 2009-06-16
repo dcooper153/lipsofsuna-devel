@@ -66,6 +66,9 @@ static int
 private_init_script (lisrvServer* self);
 
 static int
+private_init_sql (lisrvServer* self);
+
+static int
 private_init_time (lisrvServer* self);
 
 /****************************************************************************/
@@ -91,6 +94,7 @@ lisrv_server_new (const char* name)
 
 	/* Initialize subsystems. */
 	if (!private_init_paths (self, name) ||
+	    !private_init_sql (self) ||
 	    !private_init_ai (self) ||
 	    !private_init_host (self) ||
 	    !private_init_bans (self) ||
@@ -141,6 +145,10 @@ lisrv_server_free (lisrvServer* self)
 	/* Free engine. */
 	if (self->engine != NULL)
 		lieng_engine_free (self->engine);
+
+	/* Free database. */
+	if (self->sql != NULL)
+		sqlite3_close (self->sql);
 
 	/* Free mutexes. */
 	pthread_mutex_destroy (&self->mutexes.bans);
@@ -573,6 +581,47 @@ private_init_script (lisrvServer* self)
 	free (path);
 	if (!ret)
 		return 0;
+
+	return 1;
+}
+
+static int
+private_init_sql (lisrvServer* self)
+{
+	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
+	char* path;
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Format path. */
+	path = lisys_path_concat (self->paths->server_data, "server.db", NULL);
+	if (path == NULL)
+		return 0;
+
+	/* Open database. */
+	if (sqlite3_open_v2 (path, &self->sql, flags, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		sqlite3_close (self->sql);
+		free (path);
+		return 0;
+	}
+	free (path);
+
+	/* Create info table. */
+	query = "CREATE TABLE IF NOT EXISTS info (version TEXT);";
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		sqlite3_finalize (statement);
+		return 0;
+	}
+
+	/* FIXME: Create object table. */
 
 	return 1;
 }
