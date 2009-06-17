@@ -225,19 +225,6 @@ Inventory_setter_size (lua_State* lua)
 
 /*****************************************************************************/
 
-static int
-private_init (liscrData* self)
-{
-	liscrClass* clss = liscr_data_get_class (self);
-	liextModule* module = liscr_class_get_userdata (clss, LIEXT_SCRIPT_INVENTORY);
-
-	self->data = liext_inventory_new (module);
-	if (self->data == NULL)
-		return 0;
-
-	return 1;
-}
-
 void
 liextInventoryScript (liscrClass* self,
                       void*       data)

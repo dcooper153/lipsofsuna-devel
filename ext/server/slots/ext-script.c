@@ -256,19 +256,6 @@ Slots_setter_owner (lua_State* lua)
 
 /*****************************************************************************/
 
-static int
-private_init (liscrData* self)
-{
-	liscrClass* clss = liscr_data_get_class (self);
-	liextModule* module = liscr_class_get_userdata (clss, LIEXT_SCRIPT_SLOTS);
-
-	self->data = liext_slots_new (module);
-	if (self->data == NULL)
-		return 0;
-
-	return 1;
-}
-
 void
 liextSlotsScript (liscrClass* self,
                   void*       data)
