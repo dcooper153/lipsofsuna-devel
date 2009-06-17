@@ -49,6 +49,12 @@
  */
 /* @luadoc
  * ---
+ * -- Read or write a floating point value.
+ * -- @name Packet.FLOAT
+ * -- @class table
+ */
+/* @luadoc
+ * ---
  * -- Read or write a signed 8-bit integer.
  * -- @name Packet.INT8
  * -- @class table
@@ -186,6 +192,7 @@ Packet_read (lua_State* lua)
 		uint8_t u8;
 		uint16_t u16;
 		uint32_t u32;
+		float flt;
 		char* str;
 	} tmp;
 
@@ -203,6 +210,10 @@ Packet_read (lua_State* lua)
 			case LISCR_PACKET_FORMAT_BOOL:
 				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
 				if (ok) lua_pushboolean (lua, tmp.i8);
+				break;
+			case LISCR_PACKET_FORMAT_FLOAT:
+				if (ok) ok &= li_reader_get_float (data->reader, &tmp.flt);
+				if (ok) lua_pushnumber (lua, tmp.flt);
 				break;
 			case LISCR_PACKET_FORMAT_INT8:
 				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
@@ -272,6 +283,7 @@ Packet_write (lua_State* lua)
 		uint8_t u8;
 		uint16_t u16;
 		uint32_t u32;
+		float flt;
 		const char* str;
 	} tmp;
 
@@ -288,6 +300,10 @@ Packet_write (lua_State* lua)
 			case LISCR_PACKET_FORMAT_BOOL:
 				tmp.u8 = lua_toboolean (lua, i);
 				liarc_writer_append_uint8 (data->writer, tmp.u8);
+				break;
+			case LISCR_PACKET_FORMAT_FLOAT:
+				tmp.flt = luaL_checknumber (lua, i);
+				liarc_writer_append_float (data->writer, tmp.flt);
 				break;
 			case LISCR_PACKET_FORMAT_INT8:
 				tmp.i8 = luaL_checknumber (lua, i);
@@ -402,6 +418,7 @@ licomPacketScript (liscrClass* self,
 	liscr_class_set_convert (self, private_convert);
 	liscr_class_insert_enum (self, "BOOL", LISCR_PACKET_FORMAT_BOOL);
 	liscr_class_insert_enum (self, "CUSTOM", LINET_SERVER_PACKET_CUSTOM);
+	liscr_class_insert_enum (self, "FLOAT", LISCR_PACKET_FORMAT_FLOAT);
 	liscr_class_insert_enum (self, "INT8", LISCR_PACKET_FORMAT_INT8);
 	liscr_class_insert_enum (self, "INT16", LISCR_PACKET_FORMAT_INT16);
 	liscr_class_insert_enum (self, "INT32", LISCR_PACKET_FORMAT_INT32);
