@@ -92,7 +92,7 @@ lisrv_observer_iter_next (lisrvObserverIter* self)
 	while (self->objects.object != NULL)
 	{
 		if (!lieng_object_iter_next (&self->objects))
-			return 0;
+			break;
 		if (lisrv_object_sees (self->objects.object, self->subject))
 		{
 			self->object = self->objects.object;

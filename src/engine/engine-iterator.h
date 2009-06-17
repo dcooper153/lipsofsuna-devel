@@ -230,7 +230,7 @@ lieng_object_iter_first (liengObjectIter* self,
 		return 0;
 
 	/* Find first object. */
-	while (lieng_sector_iter_next (&self->sectors))
+	while (self->sectors.sector != NULL)
 	{
 		lialg_u32dic_iter_start (&self->objects, self->sectors.sector->objects);
 		if (self->objects.value != NULL)
@@ -238,6 +238,8 @@ lieng_object_iter_first (liengObjectIter* self,
 			self->object = self->objects.value;
 			return 1;
 		}
+		if (!lieng_sector_iter_next (&self->sectors))
+			break;
 	}
 
 	return 0;
