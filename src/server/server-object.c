@@ -69,9 +69,56 @@ lisrv_object_new (liengEngine*     engine,
                   uint32_t         id,
                   void*            ptr)
 {
+	int ret;
+	double rnd;
+	const char* query;
 	liengObject* self;
 	lisrvObject* data;
 	lisrvServer* server = lieng_engine_get_userdata (engine, LIENG_DATA_SERVER);
+	sqlite3_stmt* statement;
+
+	/* Choose unique object number. */
+	while (!id)
+	{
+		/* Choose random number. */
+		rnd = rand () / (double) RAND_MAX;
+		id = engine->range.start + (uint32_t)(engine->range.size * rnd);
+		if (!id)
+			continue;
+
+		/* Reject numbers of loaded objects. */
+		if (lialg_u32dic_find (engine->objects, id))
+		{
+			id = 0;
+			continue;
+		}
+
+		/* Reject numbers of database objects. */
+		query = "SELECT id FROM objects WHERE id=?;";
+		if (sqlite3_prepare_v2 (server->sql, query, -1, &statement, NULL) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (server->sql));
+			return 0;
+		}
+		if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (server->sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		ret = sqlite3_step (statement);
+		if (ret != SQLITE_DONE)
+		{
+			if (ret != SQLITE_ROW)
+			{
+				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (server->sql));
+				sqlite3_finalize (statement);
+				return 0;
+			}
+			id = 0;
+		}
+		sqlite3_finalize (statement);
+	}
 
 	/* Allocate engine data. */
 	self = lieng_default_calls.lieng_object_new (engine, model, shape_mode, control_mode, id, ptr);
