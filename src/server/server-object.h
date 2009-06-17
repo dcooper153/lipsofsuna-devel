@@ -77,6 +77,9 @@ int
 lisrv_object_moved (liengObject* self);
 
 int
+lisrv_object_purge (liengObject* self);
+
+int
 lisrv_object_sees (const liengObject* self,
                    const liengObject* target);
 

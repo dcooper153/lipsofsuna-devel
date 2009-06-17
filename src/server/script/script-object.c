@@ -191,6 +191,24 @@ Object_new (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Purges the object from the database.
+ * --
+ * -- @param self Object.
+ * function Object.purge(self)
+ */
+static int
+Object_purge (lua_State* lua)
+{
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+
+	lisrv_object_purge (self->data);
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Sends a network packet to the client controlling the object.
  * --
  * -- @param self Object.
@@ -403,6 +421,7 @@ lisrvObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "disconnect", Object_disconnect);
 	liscr_class_insert_func (self, "effect", Object_effect);
 	liscr_class_insert_func (self, "new", Object_new);
+	liscr_class_insert_func (self, "purge", Object_purge);
 	liscr_class_insert_func (self, "send", Object_send);
 	liscr_class_insert_func (self, "solve_path", Object_solve_path);
 	liscr_class_insert_func (self, "swap_clients", Object_swap_clients);

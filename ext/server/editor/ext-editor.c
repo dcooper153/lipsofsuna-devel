@@ -114,6 +114,7 @@ private_client_packet (liextEditor* self,
 			if (object == NULL)
 				return 1;
 			lieng_object_set_realized (object, 0);
+			lisrv_object_purge (object);
 			break;
 		case LINET_EXT_EDITOR_PACKET_SAVE:
 			lisrv_server_save (self->server);

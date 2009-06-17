@@ -37,6 +37,12 @@
 #define LISRV_OBJECT_VERSION 0
 
 static int
+private_delete_animations (liengObject* self);
+
+static int
+private_delete_variables (liengObject* self);
+
+static int
 private_read_animations (liengObject* self);
 
 static int
@@ -340,6 +346,53 @@ lisrv_object_moved (liengObject* self)
 }
 
 /**
+ * \brief Purges the object from the object database.
+ *
+ * \param self Object.
+ * \return Nonzero on success.
+ */
+int
+lisrv_object_purge (liengObject* self)
+{
+	int ret;
+	const char* query;
+	liarcSql* sql;
+	sqlite3_stmt* statement;
+
+	ret = 1;
+	sql = LISRV_OBJECT (self)->server->sql;
+
+	/* Remove from helper tables. */
+	if (!private_delete_animations (self))
+		ret = 0;
+	if (!private_delete_variables (self))
+		ret = 0;
+
+	/* Remove from the main table. */
+	query = "DELETE FROM objects WHERE id=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return ret;
+}
+
+/**
  * \brief Serializes or deserializes the object.
  * 
  * \param self Object.
@@ -454,55 +507,9 @@ lisrv_object_serialize (liengObject* self,
 	}
 	else
 	{
-		/* Clear animation data. */
-		query = "DELETE from object_anims WHERE id=?;";
-		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-			lisys_error_report ();
+		if (!private_delete_animations (self) ||
+		    !private_delete_variables (self))
 			return 0;
-		}
-		if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-			lisys_error_report ();
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		if (sqlite3_step (statement) != SQLITE_DONE)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-			lisys_error_report ();
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		sqlite3_finalize (statement);
-
-		/* Clear script data. */
-		query = "DELETE from object_vars WHERE id=?;";
-		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-			lisys_error_report ();
-			return 0;
-		}
-		if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-			lisys_error_report ();
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		if (sqlite3_step (statement) != SQLITE_DONE)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-			lisys_error_report ();
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		sqlite3_finalize (statement);
-
-		/* Write new data. */
 		if (lieng_object_get_realized (self))
 		{
 			/* Collect values. */
@@ -564,7 +571,6 @@ lisrv_object_serialize (liengObject* self,
 			if (ret)
 			{
 				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-				lisys_error_report ();
 				sqlite3_finalize (statement);
 				return 0;
 			}
@@ -573,7 +579,6 @@ lisrv_object_serialize (liengObject* self,
 			if (sqlite3_step (statement) != SQLITE_DONE)
 			{
 				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-				lisys_error_report ();
 				sqlite3_finalize (statement);
 				return 0;
 			}
@@ -835,6 +840,72 @@ lisrv_object_set_velocity (liengObject*       self,
 }
 
 /*****************************************************************************/
+
+static int
+private_delete_animations (liengObject* self)
+{
+	const char* query;
+	liarcSql* sql;
+	sqlite3_stmt* statement;
+
+	sql = LISRV_OBJECT (self)->server->sql;
+
+	/* Clear animation data. */
+	query = "DELETE from object_anims WHERE id=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
+}
+
+static int
+private_delete_variables (liengObject* self)
+{
+	const char* query;
+	liarcSql* sql;
+	sqlite3_stmt* statement;
+
+	sql = LISRV_OBJECT (self)->server->sql;
+
+	/* Clear script data. */
+	query = "DELETE from object_vars WHERE id=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
+}
 
 static int
 private_read_animations (liengObject* self)
