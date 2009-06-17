@@ -89,6 +89,9 @@ int
 lisrv_server_remove_ban (lisrvServer* self,
                          const char*  ip);
 
+int
+lisrv_server_save (lisrvServer* self);
+
 void
 lisrv_server_shutdown (lisrvServer* self);
 

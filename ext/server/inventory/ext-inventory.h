@@ -51,10 +51,6 @@ liext_inventory_new (liextModule* module);
 void
 liext_inventory_free (liextInventory* self);
 
-int
-liext_inventory_serialize (liextInventory* self,
-                           liarcSerialize* serialize);
-
 liengObject*
 liext_inventory_get_object (liextInventory* self,
                             int             slot);

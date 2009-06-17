@@ -78,10 +78,6 @@ liscr_class_get_interface (const liscrClass* self,
 const char*
 liscr_class_get_name (const liscrClass* self);
 
-void
-liscr_class_set_serialize (liscrClass*         self,
-                           liscrClassSerialize value);
-
 void*
 liscr_class_get_userdata (liscrClass* self,
                           const char* key);

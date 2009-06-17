@@ -88,10 +88,6 @@ void
 lieng_object_jump (liengObject*       self,
                    const limatVector* impulse);
 
-int
-lieng_object_serialize (liengObject*    self,
-                        liarcSerialize* serializer);
-
 void
 lieng_object_update (liengObject* self,
                      float        secs);

@@ -74,67 +74,6 @@ liext_spawner_free (liextSpawner* self)
 	free (self);
 }
 
-/**
- * \brief Serializes or deserializes the spawner.
- *
- * \param self Spawner.
- * \param serialize Serializer.
- * \return Nonzero on success.
- */
-int
-liext_spawner_serialize (liextSpawner*   self,
-                         liarcSerialize* serialize)
-{
-	float delay;
-	float timer;
-	uint8_t active;
-	uint8_t version;
-	uint32_t limit;
-	liengObject* object;
-
-	if (liarc_serialize_get_write (serialize))
-	{
-		/* Write header. */
-		if (!liarc_writer_append_uint8 (serialize->writer, LIEXT_SPAWNER_VERSION) ||
-		    !liarc_writer_append_uint8 (serialize->writer, self->active) ||
-		    !liarc_writer_append_uint32 (serialize->writer, self->limit) ||
-		    !liarc_writer_append_float (serialize->writer, self->delay) ||
-		    !liarc_writer_append_float (serialize->writer, self->timer))
-			return 0;
-
-		/* Write owner. */
-		if (!lieng_engine_write_object (self->server->engine, serialize, self->object))
-			return 0;
-	}
-	else
-	{
-		/* Read header. */
-		if (!li_reader_get_uint8 (serialize->reader, &version) ||
-		    !li_reader_get_uint8 (serialize->reader, &active) ||
-		    !li_reader_get_uint32 (serialize->reader, &limit) ||
-		    !li_reader_get_float (serialize->reader, &delay) ||
-		    !li_reader_get_float (serialize->reader, &timer))
-			return 0;
-		if (version != LIEXT_SPAWNER_VERSION)
-		{
-			lisys_error_set (EINVAL, "unsupported spawner version");
-			return 0;
-		}
-		self->active = (active != 0);
-		self->delay = LI_MAX (0.0f, delay);
-		self->timer = LI_CLAMP (timer, 0.0f, self->delay);
-		if (!liext_spawner_set_limit (self, limit))
-			return 0;
-
-		/* Read owner. */
-		if (!lieng_engine_read_object (self->server->engine, serialize, &object) ||
-		    !liext_spawner_set_object (self, object))
-			return 0;
-	}
-
-	return 1;
-}
-
 int
 liext_spawner_get_active (liextSpawner* self)
 {

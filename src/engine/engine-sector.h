@@ -56,9 +56,12 @@ struct _liengSector
 };
 
 liengSector*
+lieng_sector_default_new (liengEngine* engine,
+                          uint32_t     id);
+
+liengSector*
 lieng_sector_new (liengEngine* engine,
-                  uint32_t     id,
-                  const char*  dir);
+                  uint32_t     id);
 
 void
 lieng_sector_free (liengSector* self);
@@ -91,9 +94,6 @@ lieng_sector_insert_object (liengSector* self,
 void
 lieng_sector_remove_object (liengSector* self,
                             liengObject* object);
-
-int
-lieng_sector_save (liengSector* self);
 
 void
 lieng_sector_update (liengSector* self,

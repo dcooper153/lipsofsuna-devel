@@ -33,16 +33,8 @@ liscr_data_new (liscrScript* script,
                 void*        data,
                 const char*  meta);
 
-liscrData*
-liscr_data_new_from_stream (liscrScript*    script,
-                            liarcSerialize* serialize);
-
 void
 liscr_data_free (liscrData* object);
-
-int
-liscr_data_read (liscrData*      self,
-                 liarcSerialize* serialize);
 
 void
 liscr_data_ref (liscrData* object,
@@ -51,10 +43,6 @@ liscr_data_ref (liscrData* object,
 void
 liscr_data_unref (liscrData* object,
                   liscrData* referencer);
-
-int
-liscr_data_write (liscrData*      self,
-                  liarcSerialize* serialize);
 
 liscrClass*
 liscr_data_get_class (liscrData* self);

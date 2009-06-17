@@ -235,24 +235,11 @@ private_init (liscrData* self)
 	return 1;
 }
 
-static int
-private_serialize (liscrData*      self,
-                   liarcSerialize* serialize)
-{
-	if (!liarc_serialize_get_write (serialize))
-	{
-		if (!private_init (self))
-			return 0;
-	}
-	return liext_spawner_serialize (self->data, serialize);
-}
-
 void
 liextSpawnerScript (liscrClass* self,
                     void*       data)
 {
 	liscr_class_set_convert (self, (void*) abort);
-	liscr_class_set_serialize (self, private_serialize);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPAWNER, data);
 	liscr_class_insert_func (self, "__gc", Spawner___gc);
 	liscr_class_insert_func (self, "new", Spawner_new);

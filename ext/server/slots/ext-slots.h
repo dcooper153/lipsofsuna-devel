@@ -78,10 +78,6 @@ liext_slots_insert_slot (liextSlots*   self,
                          const char*   node);
 
 int
-liext_slots_serialize (liextSlots*     self,
-                       liarcSerialize* serialize);
-
-int
 liext_slots_get_object (liextSlots*   self,
                         const char*   slot,
                         liengObject** object);

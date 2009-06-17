@@ -230,7 +230,7 @@ lieng_engine_create_sector (liengEngine* self,
 	sector = lialg_u32dic_find (self->sectors, id);
 	if (sector != NULL)
 		return sector;
-	sector = lieng_sector_new (self, id, NULL);
+	sector = lieng_sector_new (self, id);
 
 	return sector;
 }
@@ -407,7 +407,7 @@ lieng_engine_load_sector (liengEngine* self,
 	sector = lialg_u32dic_find (self->sectors, id);
 	if (sector != NULL)
 		return sector;
-	sector = lieng_sector_new (self, id, self->config.dir);
+	sector = lieng_sector_new (self, id);
 
 	return sector;
 }
@@ -470,115 +470,6 @@ lieng_engine_load_texture (liengEngine* self,
 }
 
 /**
- * \brief Deserializes a serialized object.
- *
- * \param self Engine.
- * \param serialize Deserializer.
- * \param value Return location for the deserialized object.
- * \return Nonzero on success.
- */
-int
-lieng_engine_read_object (liengEngine*    self,
-                          liarcSerialize* serialize,
-                          liengObject**   value)
-{
-	uint8_t mode;
-	uint32_t id;
-
-	if (!li_reader_get_uint8 (serialize->reader, &mode))
-		return 0;
-	switch (mode)
-	{
-		case 0:
-			*value = NULL;
-			return 1;
-		case 1:
-			if (!li_reader_get_uint32 (serialize->reader, &id))
-				return 0;
-			*value = liarc_serialize_find_object (serialize, id);
-			if (*value == NULL)
-			{
-				lisys_error_set (EINVAL, "invalid object reference %d", id);
-				return 0;
-			}
-			return 1;
-		case 2:
-			if (!li_reader_get_uint32 (serialize->reader, &id))
-				return 0;
-			*value = liarc_serialize_find_object (serialize, id);
-			if (*value != NULL)
-			{
-				lisys_error_set (EINVAL, "duplicate object id %d", id);
-				return 0;
-			}
-			*value = lieng_object_new (self, NULL, LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
-			if (*value == NULL)
-				return 0;
-			if (!liarc_serialize_insert_object (serialize, *value))
-			{
-				lieng_object_free (*value);
-				return 0;
-			}
-			if (!lieng_object_serialize (*value, serialize))
-			{
-				lieng_object_free (*value);
-				return 0;
-			}
-			return 1;
-		default:
-			lisys_error_set (EINVAL, "invalid object save data");
-			return 0;
-	}
-}
-
-/**
- * \brief Incrementally deserializes object fields.
- *
- * \param self Engine.
- * \param serialize Deserializer.
- * \param value Object to modify.
- * \return Nonzero on success.
- */
-int
-lieng_engine_read_object_data (liengEngine*    self,
-                               liarcSerialize* serialize,
-                               liengObject*    value)
-{
-	uint8_t mode;
-	uint32_t id;
-	liengObject* tmp;
-
-	if (!li_reader_get_uint8 (serialize->reader, &mode))
-		return 0;
-	switch (mode)
-	{
-		case 0:
-			lisys_error_set (EINVAL, "expected object data, got NULL");
-			return 0;
-		case 1:
-			lisys_error_set (EINVAL, "expected object data, got reference");
-			return 0;
-		case 2:
-			if (!li_reader_get_uint32 (serialize->reader, &id))
-				return 0;
-			tmp = liarc_serialize_find_object (serialize, id);
-			if (tmp != NULL)
-			{
-				lisys_error_set (EINVAL, "duplicate object id %d", id);
-				return 0;
-			}
-			if (!liarc_serialize_insert_object (serialize, value))
-				return 0;
-			if (!lieng_object_serialize (value, serialize))
-				return 0;
-			return 1;
-		default:
-			lisys_error_set (EINVAL, "invalid object save data");
-			return 0;
-	}
-}
-
-/**
  * \brief Removes an event handler callback.
  *
  * \param self Engine.
@@ -607,30 +498,6 @@ lieng_engine_remove_calls (liengEngine* self,
 
 	for (i = 0 ; i < count ; i++)
 		lical_callbacks_remove_callback (self->callbacks, handles + i);
-}
-
-/**
- * \brief Saves all the currently loaded sectors.
- *
- * \param self Engine.
- * \return Nonzero on success.
- */
-int
-lieng_engine_save (liengEngine* self)
-{
-	int ret;
-	lialgU32dicIter iter;
-	liengSector* sector;
-
-	ret = 1;
-	LI_FOREACH_U32DIC (iter, self->sectors)
-	{
-		sector = iter.value;
-		if (!lieng_sector_save (sector))
-			ret = 0;
-	}
-
-	return ret;
 }
 
 /**
@@ -737,100 +604,10 @@ lieng_engine_update (liengEngine* self,
 	lical_callbacks_update (self->callbacks);
 }
 
-/**
- * \brief Serializes an object.
- *
- * \param self Engine.
- * \param serialize Serializer.
- * \param value Object to be serialized.
- * \return Nonzero on success.
- */
-int
-lieng_engine_write_object (liengEngine*    self,
-                           liarcSerialize* serialize,
-                           liengObject*    value)
-{
-	int id;
-
-	if (value == NULL)
-	{
-		liarc_writer_append_uint8 (serialize->writer, 0);
-		return 1;
-	}
-	id = liarc_serialize_find_object_id (serialize, value);
-	if (id != -1)
-	{
-		liarc_writer_append_uint8 (serialize->writer, 1);
-		liarc_writer_append_uint32 (serialize->writer, id);
-	}
-	else
-	{
-		liarc_writer_append_uint8 (serialize->writer, 2);
-		if (!liarc_serialize_insert_object (serialize, value))
-			return 0;
-		id = liarc_serialize_find_object_id (serialize, value);
-		assert (id != -1);
-		liarc_writer_append_uint32 (serialize->writer, id);
-		if (!lieng_object_serialize (value, serialize))
-			return 0;
-	}
-
-	return 1;
-}
-
 liengCalls*
 lieng_engine_get_calls (liengEngine* self)
 {
 	return &self->calls;
-}
-
-/**
- * \brief Sets the center point of the scene.
- *
- * \param self Engine.
- * \param center Center position vector.
- */
-int
-lieng_engine_set_center (liengEngine*       self,
-                         const limatVector* center)
-{
-	int error = 0;
-	uint32_t id;
-	lialgU32dicIter iter;
-	liengSector* sector;
-	liengRange range0;
-	liengRange range1;
-	liengRangeIter rangeiter;
-
-	/* Get new center sector. */
-	id = LIENG_SECTOR_INDEX_FROM_POINT (*center);
-	range0 = lieng_range_new_from_sphere (center, self->config.radius, LIENG_SECTOR_WIDTH, 0, 256);
-	range1 = lieng_range_new_from_index (id, self->config.radius, 0, 256);
-
-	/* Remove sectors. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
-	{
-		sector = iter.value;
-		if (!lieng_range_contains (&range1, sector->x, sector->y, sector->z))
-			lieng_sector_free (sector);
-	}
-
-	/* Insert sectors. */
-	LIENG_FOREACH_RANGE (rangeiter, range0)
-	{
-		id = LIENG_SECTOR_INDEX (rangeiter.x, rangeiter.y, rangeiter.z);
-		sector = lialg_u32dic_find (self->sectors, id);
-		if (sector != NULL)
-			continue;
-		sector = lieng_sector_new (self, id, self->config.dir);
-		if (sector == NULL)
-		{
-			lisys_error_report ();
-			continue;
-		}
-	}
-
-	return error;
 }
 
 /**

@@ -37,8 +37,16 @@
 #define LISRV_OBJECT_VERSION 0
 
 static int
-private_read_block (liengObject*    self,
-                    liarcSerialize* serialize);
+private_read_animations (liengObject* self);
+
+static int
+private_read_variables (liengObject* self);
+
+static int
+private_write_animations (liengObject* self);
+
+static int
+private_write_variables (liengObject* self);
 
 /*****************************************************************************/
 
@@ -288,131 +296,256 @@ lisrv_object_moved (liengObject* self)
  * \brief Serializes or deserializes the object.
  * 
  * \param self Object.
- * \param serialize Deserializer.
+ * \param save Nonzero if saving, zero if reading.
  * \return Nonzero on success.
  */
 int
-lisrv_object_serialize (liengObject*    self,
-                        liarcSerialize* serialize)
+lisrv_object_serialize (liengObject* self,
+                        int          save)
 {
-	int i;
 	int ret;
-	char* type;
-	uint32_t end;
-	uint32_t blocks;
-	uint32_t size;
-	lialgU32dicIter iter;
-	liarcWriter* engine;
-	liarcWriter* server;
-	liarcWriter* script;
-	lisrvAniminfo* info;
+	int col;
+	int colgroup;
+	int colmask;
+	int control;
+	int flags;
+	int sector;
+	int shape;
+	float mass;
+	float movement;
+	float speed;
+	float step;
+	const char* model;
+	const char* query;
+	liarcSql* sql;
+	limatTransform transform;
+	limatVector angular;
+	sqlite3_stmt* statement;
 
-	if (liarc_serialize_get_write (serialize))
+	sql = LISRV_OBJECT (self)->server->sql;
+
+	if (!save)
 	{
-		/* Write engine. */
-		if (!liarc_serialize_push (serialize))
-			return 0;
-		if (!lieng_default_calls.lieng_object_serialize (self, serialize))
-			return 0;
-
-		/* Write server. */
-		if (!liarc_serialize_push (serialize))
-			return 0;
-		liarc_writer_append_uint8 (serialize->writer, LISRV_OBJECT_VERSION);
-		liarc_writer_append_uint32 (serialize->writer, LISRV_OBJECT (self)->animations->size);
-		LI_FOREACH_U32DIC (iter, LISRV_OBJECT (self)->animations)
+		/* Prepare statement. */
+		query = "SELECT "
+			"flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
+			"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model "
+			"FROM objects WHERE id=?;";
+		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 		{
-			info = iter.value;
-			liarc_writer_append_string (serialize->writer, info->animation->name);
-			liarc_writer_append_uint32 (serialize->writer, info->channel);
-			liarc_writer_append_uint32 (serialize->writer, 0);
-			liarc_writer_append_uint32 (serialize->writer, 0);
-			liarc_writer_append_float (serialize->writer, info->priority);
-			liarc_writer_append_float (serialize->writer, 0.0f);
-			liarc_writer_append_float (serialize->writer, 0.0f);
-			liarc_writer_append_float (serialize->writer, 0.0f);
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+			return 0;
 		}
-		if (serialize->writer->error)
+		if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
 			return 0;
+		}
 
-		/* Write script. */
-		if (!liarc_serialize_push (serialize))
+		/* Execute statement. */
+		ret = sqlite3_step (statement);
+		if (ret == SQLITE_DONE)
+		{
+			sqlite3_finalize (statement);
+			return 1;
+		}
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
 			return 0;
-		if (!liscr_data_write (self->script, serialize))
-			return 0;
+		}
 
-		/* Pack all to stream. */
-		script = liarc_serialize_pop (serialize);
-		server = liarc_serialize_pop (serialize);
-		engine = liarc_serialize_pop (serialize);
-		size = strlen ("engine") + 1 + 4 + 4 + engine->memory.length +
-			strlen ("server") + 1 + 4 + server->memory.length +
-			strlen ("script") + 1 + 4 + script->memory.length;
-		ret = liarc_writer_append_string (serialize->writer, "object") &&
-			  liarc_writer_append_nul (serialize->writer) &&
-			  liarc_writer_append_uint32 (serialize->writer, size) &&
-			  liarc_writer_append_uint32 (serialize->writer, 3) &&
-			  liarc_writer_append_string (serialize->writer, "engine") &&
-			  liarc_writer_append_nul (serialize->writer) &&
-			  liarc_writer_append_uint32 (serialize->writer, engine->memory.length) &&
-			  liarc_writer_append_raw (serialize->writer, engine->memory.buffer, engine->memory.length) &&
-			  liarc_writer_append_string (serialize->writer, "server") &&
-			  liarc_writer_append_nul (serialize->writer) &&
-			  liarc_writer_append_uint32 (serialize->writer, server->memory.length) &&
-			  liarc_writer_append_raw (serialize->writer, server->memory.buffer, server->memory.length) &&
-			  liarc_writer_append_string (serialize->writer, "script") &&
-			  liarc_writer_append_nul (serialize->writer) &&
-			  liarc_writer_append_uint32 (serialize->writer, script->memory.length) &&
-			  liarc_writer_append_raw (serialize->writer, script->memory.buffer, script->memory.length);
-		liarc_writer_free (script);
-		liarc_writer_free (server);
-		liarc_writer_free (engine);
+		/* Read columns. */
+		col = 0;
+		flags = sqlite3_column_int (statement, col++);
+		angular.x = sqlite3_column_double (statement, col++);
+		angular.y = sqlite3_column_double (statement, col++);
+		angular.z = sqlite3_column_double (statement, col++);
+		transform.position.x = sqlite3_column_double (statement, col++);
+		transform.position.y = sqlite3_column_double (statement, col++);
+		transform.position.z = sqlite3_column_double (statement, col++);
+		transform.rotation.x = sqlite3_column_double (statement, col++);
+		transform.rotation.y = sqlite3_column_double (statement, col++);
+		transform.rotation.z = sqlite3_column_double (statement, col++);
+		transform.rotation.w = sqlite3_column_double (statement, col++);
+		mass = sqlite3_column_double (statement, col++);
+		movement = sqlite3_column_double (statement, col++);
+		speed = sqlite3_column_double (statement, col++);
+		step = sqlite3_column_double (statement, col++);
+		colgroup = sqlite3_column_int (statement, col++);
+		colmask = sqlite3_column_int (statement, col++);
+		control = sqlite3_column_int (statement, col++);
+		shape = sqlite3_column_int (statement, col++);
+		if (sqlite3_column_type (statement, col) == SQLITE_TEXT)
+			model = (char*) sqlite3_column_text (statement, col++);
+		else
+			model = NULL;
 
-		return !serialize->writer->error;
+		/* Set state. */
+		lieng_object_set_angular_momentum (self, &angular);
+		lieng_object_set_transform (self, &transform);
+		lieng_object_set_mass (self, mass);
+		liphy_object_set_movement (self->physics, movement);
+		lieng_object_set_speed (self, speed);
+		lieng_object_set_collision_group (self, colgroup);
+		lieng_object_set_collision_mask (self, colmask);
+		liphy_object_set_control_mode (self->physics, control);
+		liphy_object_set_shape_mode (self->physics, shape);
+		if (model != NULL)
+			lieng_object_set_model_name (self, model);
+		sqlite3_finalize (statement);
+
+		/* Read animation data. */
+		if (self->script != NULL)
+			private_read_animations (self);
+
+		/* Read script data. */
+		if (self->script != NULL)
+			private_read_variables (self);
 	}
 	else
 	{
-		/* Read header. */
-		if (!li_reader_get_text (serialize->reader, "", &type))
-			return 0;
-		if (!li_reader_get_uint32 (serialize->reader, &size))
+		/* Clear animation data. */
+		query = "DELETE from object_anims WHERE id=?;";
+		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 		{
-			free (type);
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+			lisys_error_report ();
 			return 0;
 		}
-		end = li_reader_get_offset (serialize->reader) + size;
-
-		/* Read blocks. */
-		if (!strcmp (type, "object"))
+		if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
 		{
-			if (!li_reader_get_uint32 (serialize->reader, &blocks))
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			lisys_error_report ();
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		if (sqlite3_step (statement) != SQLITE_DONE)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			lisys_error_report ();
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		sqlite3_finalize (statement);
+
+		/* Clear script data. */
+		query = "DELETE from object_vars WHERE id=?;";
+		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+			lisys_error_report ();
+			return 0;
+		}
+		if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			lisys_error_report ();
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		if (sqlite3_step (statement) != SQLITE_DONE)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			lisys_error_report ();
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		sqlite3_finalize (statement);
+
+		/* Write new data. */
+		if (lieng_object_get_realized (self))
+		{
+			/* Collect values. */
+			flags = LISRV_OBJECT (self)->flags;
+			sector = LIENG_SECTOR_INDEX (self->sector->x, self->sector->y, self->sector->z);
+			model = (self->model != NULL)? self->model->name : NULL;
+			mass = lieng_object_get_mass (self);
+			movement = liphy_object_get_movement (self->physics);
+			speed = lieng_object_get_speed (self);
+			step = 0.0f;
+			colgroup = lieng_object_get_collision_group (self);
+			colmask = lieng_object_get_collision_mask (self);
+			control = liphy_object_get_control_mode (self->physics);
+			shape = liphy_object_get_shape_mode (self->physics);
+			lieng_object_get_transform (self, &transform);
+			lieng_object_get_angular_momentum (self, &angular);
+
+			/* Prepare statement. */
+			query = "INSERT OR REPLACE INTO objects "
+				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
+				"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model) VALUES "
+				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 			{
-				free (type);
+				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 				return 0;
 			}
-			for (i = 0 ; i < blocks ; i++)
-				private_read_block (self, serialize);
-		}
-		else
-		{
-			li_reader_set_offset (serialize->reader, end);
-			free (type);
-			return 1;
-		}
 
-		/* Check for read size. */
-		if (li_reader_get_offset (serialize->reader) != end)
-		{
-			lisys_error_set (EINVAL, "size mismatch in block `%s' (%d/%d)",
-				type, li_reader_get_offset (serialize->reader), end);
-			li_reader_set_offset (serialize->reader, end);
-			free (type);
-			return 0;
-		}
+			/* Bind values. */
+			col = 1;
+			ret = (sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, sector) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, flags) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, angular.x) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, angular.y) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, angular.x) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.position.x) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.position.y) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.position.z) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.x) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.y) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.z) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.w) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, mass) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, movement) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, speed) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, step) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, colgroup) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, colmask) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, control) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, shape) != SQLITE_OK);
+			if (!ret)
+			{
+				if (model != NULL)
+					ret = (sqlite3_bind_text (statement, col++, model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+				else
+					ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
+			}
+			if (ret)
+			{
+				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+				lisys_error_report ();
+				sqlite3_finalize (statement);
+				return 0;
+			}
 
-		free (type);
-		return 1;
+			/* Write values. */
+			if (sqlite3_step (statement) != SQLITE_DONE)
+			{
+				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+				lisys_error_report ();
+				sqlite3_finalize (statement);
+				return 0;
+			}
+			sqlite3_finalize (statement);
+
+			/* Write animation data. */
+			if (self->script != NULL)
+				private_write_animations (self);
+
+			/* Save script data. */
+			if (self->script != NULL)
+			{
+				if (!private_write_variables (self))
+					return 0;
+			}
+		}
 	}
+
+	return 1;
 }
 
 int
@@ -657,96 +790,297 @@ lisrv_object_set_velocity (liengObject*       self,
 /*****************************************************************************/
 
 static int
-private_read_block (liengObject*    self,
-                    liarcSerialize* serialize)
+private_read_animations (liengObject* self)
 {
-	char* type;
-	char* name;
-	float priority;
-	uint8_t version;
-	uint32_t i;
-	uint32_t anims;
-	uint32_t channel;
-	uint32_t end;
-	uint32_t pad;
-	uint32_t size;
-	liReader* reader = serialize->reader;
+	int ret;
+	int chan;
+	float prio;
+	const char* name;
+	const char* query;
+	liarcSql* sql;
+	sqlite3_stmt* statement;
 
-	/* Read block header. */
-	if (!li_reader_get_text (reader, "", &type))
-		return 0;
-	if (!li_reader_get_uint32 (reader, &size))
+	sql = LISRV_OBJECT (self)->server->sql;
+
+	/* Prepare statement. */
+	query = "SELECT name,chan,prio FROM object_anims WHERE id=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		free (type);
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 		return 0;
 	}
-	end = li_reader_get_offset (reader) + size;
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
 
-	/* Read block data. */
-	/* FIXME: Should prevent reading past block end. */
-	if (!strcmp (type, "engine"))
+	/* Execute statement. */
+	while (1)
 	{
-		/* Read engine. */
-		if (!lieng_default_calls.lieng_object_serialize (self, serialize))
-			goto error;
-	}
-	else if (!strcmp (type, "server"))
-	{
-		/* Read server. */
-		if (!li_reader_get_uint8 (reader, &version) ||
-			!li_reader_get_uint32 (reader, &anims))
-			goto error;
-		if (version != LISRV_OBJECT_VERSION)
+		ret = sqlite3_step (statement);
+		if (ret == SQLITE_DONE)
 		{
-			lisys_error_set (EINVAL, "incorrect server object version");
-			goto error;
+			sqlite3_finalize (statement);
+			break;
 		}
-		for (i = 0 ; i < anims ; i++)
+		if (ret != SQLITE_ROW)
 		{
-			name = NULL;
-			if (!li_reader_get_text (reader, "", &name) ||
-				!li_reader_get_uint32 (reader, &channel) ||
-				!li_reader_get_uint32 (reader, &pad) ||
-				!li_reader_get_uint32 (reader, &pad) ||
-				!li_reader_get_float (reader, &priority) ||
-				!li_reader_get_uint32 (reader, &pad) ||
-				!li_reader_get_uint32 (reader, &pad) ||
-				!li_reader_get_uint32 (reader, &pad))
-			{
-				free (name);
-				goto error;
-			}
-			lisrv_object_animate (self, name, channel, priority, 1);
-			free (name);
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
 		}
+		name = (char*) sqlite3_column_text (statement, 0);
+		chan = sqlite3_column_int (statement, 1);
+		prio = sqlite3_column_double (statement, 2);
+		if (name != NULL && *name != '\0' && chan >= 0 && prio > 0.0f)
+			lisrv_object_animate (self, name, chan, prio, 1);
 	}
-	else if (!strcmp (type, "script"))
+
+	return 1;
+}
+
+static int
+private_read_variables (liengObject* self)
+{
+	int ret;
+	const char* query;
+	liarcSql* sql;
+	liscrScript* script;
+	sqlite3_stmt* statement;
+
+	sql = LISRV_OBJECT (self)->server->sql;
+	script = LISRV_OBJECT (self)->server->script;
+
+	/* Get custom deserialization function. */
+	liscr_pushdata (script->lua, self->script);
+	lua_pushstring (script->lua, "loaded");
+	lua_gettable (script->lua, -2);
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
 	{
-		if (!liscr_data_read (self->script, serialize))
-			goto error;
-	}
-	else
-	{
-		li_reader_set_offset (reader, end);
-		free (type);
+		lua_pop (script->lua, 2);
 		return 1;
 	}
-	free (type);
 
-	/* Check for read size. */
-	if (li_reader_get_offset (serialize->reader) != end)
+	/* Prepare statement. */
+	query = "SELECT name,value FROM object_vars WHERE id=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "block size mismatch");
-		li_reader_set_offset (serialize->reader, end);
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		lua_pop (script->lua, 1);
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		lua_pop (script->lua, 1);
+		return 0;
+	}
+
+	/* Execute statement. */
+	liscr_pushdata (script->lua, self->script);
+	lua_newtable (script->lua);
+	while (1)
+	{
+		ret = sqlite3_step (statement);
+		if (ret == SQLITE_DONE)
+		{
+			sqlite3_finalize (statement);
+			break;
+		}
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			lua_pop (script->lua, 3);
+			return 0;
+		}
+		if (sqlite3_column_type (statement, 0) != SQLITE_TEXT)
+			continue;
+		switch (sqlite3_column_type (statement, 1))
+		{
+			case SQLITE_TEXT:
+				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 0));
+				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 1));
+				lua_settable (script->lua, -3);
+				break;
+			case SQLITE_INTEGER:
+				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 0));
+				lua_pushnumber (script->lua, sqlite3_column_int (statement, 1));
+				lua_settable (script->lua, -3);
+				break;
+			case SQLITE_FLOAT:
+				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 0));
+				lua_pushnumber (script->lua, sqlite3_column_double (statement, 1));
+				lua_settable (script->lua, -3);
+				break;
+		}
+	}
+
+	/* Deserialize fields. */
+	if (lua_pcall (script->lua, 2, 0, 0) != 0)
+	{
+		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+		lua_pop (script->lua, 1);
 		return 0;
 	}
 
 	return 1;
+}
 
-error:
-	li_reader_set_offset (serialize->reader, end);
-	free (type);
-	return 0;
+static int
+private_write_animations (liengObject* self)
+{
+	const char* query;
+	lialgU32dicIter iter;
+	liarcSql* sql;
+	lisrvAniminfo* info;
+	sqlite3_stmt* statement;
+
+	sql = LISRV_OBJECT (self)->server->sql;
+
+	/* Save all permanent animations. */
+	LI_FOREACH_U32DIC (iter, LISRV_OBJECT (self)->animations)
+	{
+		info = iter.value;
+		if (!info->permanent)
+			continue;
+		assert (info->animation != NULL);
+
+		/* Prepare statement. */
+		query = "INSERT INTO object_anims (id,name,chan,prio) VALUES (?,?,?,?);";
+		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+			return 0;
+		}
+
+		/* Bind values. */
+		if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK ||
+		    sqlite3_bind_text (statement, 2, info->animation->name, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+		    sqlite3_bind_int (statement, 3, info->channel) != SQLITE_OK ||
+		    sqlite3_bind_double (statement, 4, info->priority) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Execute statement. */
+		if (sqlite3_step (statement) != SQLITE_DONE)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		sqlite3_finalize (statement);
+	}
+
+	return 1;
+}
+
+static int
+private_write_variables (liengObject* self)
+{
+	int ret;
+	double value_num;
+	const char* value_str;
+	const char* key;
+	const char* query;
+	liarcSql* sql;
+	liscrScript* script;
+	sqlite3_stmt* statement;
+
+	sql = LISRV_OBJECT (self)->server->sql;
+	script = LISRV_OBJECT (self)->server->script;
+
+	/* Get custom serialization function. */
+	liscr_pushdata (script->lua, self->script);
+	lua_pushstring (script->lua, "saved");
+	lua_gettable (script->lua, -2);
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+	{
+		lua_pop (script->lua, 2);
+		return 1;
+	}
+
+	/* Get custom serialization fields. */
+	lua_pushvalue (script->lua, -2);
+	lua_remove (script->lua, -3);
+	if (lua_pcall (script->lua, 1, 1, 0) != 0)
+	{
+		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+		lua_pop (script->lua, 1);
+		return 0;
+	}
+	if (lua_type (script->lua, -1) != LUA_TTABLE)
+	{
+		lua_pop (script->lua, 1);
+		return 1;
+	}
+
+	/* Insert fields to the database. */
+	lua_pushnil (script->lua);
+	while (lua_next (script->lua, -2) != 0)
+	{
+		/* Check for valid types. */
+		if (lua_type (script->lua, -2) != LUA_TSTRING ||
+		   (lua_type (script->lua, -1) != LUA_TSTRING &&
+		    lua_type (script->lua, -1) != LUA_TNUMBER))
+		{
+			lua_pop (script->lua, 1);
+			continue;
+		}
+		key = lua_tostring (script->lua, -2);
+
+		/* Prepare statement. */
+		query = "INSERT INTO object_vars (id,name,value) VALUES (?,?,?);";
+		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+			lua_pop (script->lua, 3);
+			return 0;
+		}
+
+		/* Bind values. */
+		if (lua_type (script->lua, -1) == LUA_TSTRING)
+		{
+			value_str = lua_tostring (script->lua, -1);
+			ret = (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK ||
+			       sqlite3_bind_text (statement, 2, key, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+			       sqlite3_bind_text (statement, 3, value_str, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+		}
+		else
+		{
+			value_num = lua_tonumber (script->lua, -1);
+			ret = (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK ||
+			       sqlite3_bind_text (statement, 2, key, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+			       sqlite3_bind_double (statement, 3, value_num) != SQLITE_OK);
+		}
+		if (ret)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			lua_pop (script->lua, 3);
+			return 0;
+		}
+
+		/* Execute statement. */
+		if (sqlite3_step (statement) != SQLITE_DONE)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			lua_pop (script->lua, 3);
+			return 0;
+		}
+		sqlite3_finalize (statement);
+		lua_pop (script->lua, 1);
+	}
+	lua_pop (script->lua, 1);
+
+	return 1;
 }
 
 /** @} */

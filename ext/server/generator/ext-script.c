@@ -51,7 +51,7 @@ Generator_save (lua_State* lua)
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
 
-	lieng_engine_save (module->server->engine);
+	lisrv_server_save (module->server);
 
 	return 0;
 }

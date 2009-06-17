@@ -131,78 +131,6 @@ Object_jump (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- FIXME
- * --
- * -- Not implemented yet. Deserializes the object from a file.
- * --
- * -- @param self Object.
- * -- @param file Filename.
- * -- @return True on success.
- * function Object.read(self, file)
- */
-static int
-Object_read (lua_State* lua)
-{
-	int ret;
-	const char* file;
-	liarcSerialize* serialize;
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	file = luaL_checkstring (lua, 2);
-
-	serialize = liarc_serialize_new_read (file);
-	if (serialize != NULL)
-	{
-		ret = lieng_engine_read_object_data (LIENG_OBJECT (object->data)->engine, serialize, object->data);
-		if (!ret)
-			lisys_error_report ();
-		liarc_serialize_free (serialize);
-		lua_pushboolean (lua, ret);
-	}
-	else
-		lua_pushboolean (lua, 0);
-	return 1;
-}
-
-/* @luadoc
- * ---
- * -- FIXME
- * --
- * -- Incomplete. Serializes the object to a file.
- * --
- * -- @param self Object.
- * -- @param file Filename.
- * -- @return True on success.
- * function Object.write(self)
- */
-static int
-Object_write (lua_State* lua)
-{
-	int ret;
-	const char* file;
-	liarcSerialize* serialize;
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	file = luaL_checkstring (lua, 2);
-
-	serialize = liarc_serialize_new_write (file);
-	if (serialize == NULL)
-	{
-		lua_pushboolean (lua, 0);
-		return 1;
-	}
-	ret = lieng_engine_write_object (LIENG_OBJECT (object->data)->engine, serialize, object->data);
-	if (!ret)
-		lisys_error_report ();
-	liarc_serialize_free (serialize);
-	lua_pushboolean (lua, ret);
-	return 1;
-}
-
-/* @luadoc
- * ---
  * -- Angular velocity.
  * --
  * -- Angular velocity specifies how the object rotates. The direction of the
@@ -797,8 +725,6 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "approach", Object_approach);
 	liscr_class_insert_func (self, "impulse", Object_impulse);
 	liscr_class_insert_func (self, "jump", Object_jump);
-	liscr_class_insert_func (self, "read", Object_read);
-	liscr_class_insert_func (self, "write", Object_write);
 	liscr_class_insert_getter (self, "angular_momentum", Object_getter_angular_momentum);
 	liscr_class_insert_getter (self, "collision_group", Object_getter_collision_group);
 	liscr_class_insert_getter (self, "collision_mask", Object_getter_collision_mask);

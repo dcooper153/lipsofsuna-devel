@@ -51,12 +51,12 @@ struct _liengCalls
 	liengObject* (*lieng_object_new)(liengEngine*, liengModel*, liphyShapeMode, liphyControlMode, uint32_t, void*);
 	void (*lieng_object_free)(liengObject*);
 	int (*lieng_object_moved)(liengObject*);
-	int (*lieng_object_serialize)(liengObject*, liarcSerialize*);
 	void (*lieng_object_update)(liengObject*, float);
 	int (*lieng_object_set_model)(liengObject*, liengModel* model);;
 	int (*lieng_object_set_realized)(liengObject*, int);
 	int (*lieng_object_set_transform)(liengObject*, const limatTransform*);
 	int (*lieng_object_set_velocity)(liengObject*, const limatVector*);
+	liengSector* (*lieng_sector_new)(liengEngine*, uint32_t);
 };
 
 extern const liengCalls lieng_default_calls;
@@ -158,16 +158,6 @@ int
 lieng_engine_load_texture (liengEngine* self,
                            const char*  name);
 
-int
-lieng_engine_read_object (liengEngine*    self,
-                          liarcSerialize* serialize,
-                          liengObject**   value);
-
-int
-lieng_engine_read_object_data (liengEngine*    self,
-                               liarcSerialize* serialize,
-                               liengObject*    value);
-
 void
 lieng_engine_remove_call (liengEngine* self,
                           licalHandle* handle);
@@ -181,21 +171,8 @@ void
 lieng_engine_update (liengEngine* self,
                      float        secs);
 
-
-int
-lieng_engine_save (liengEngine* self);
-
-int
-lieng_engine_write_object (liengEngine*    self,
-                           liarcSerialize* serialize,
-                           liengObject*    value);
-
 liengCalls*
 lieng_engine_get_calls (liengEngine* self);
-
-int
-lieng_engine_set_center (liengEngine*       self,
-                         const limatVector* center);
 
 int
 lieng_engine_get_flags (const liengEngine* self);

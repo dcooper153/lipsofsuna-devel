@@ -81,12 +81,12 @@ lisrv_object_sees (const liengObject* self,
                    const liengObject* target);
 
 int
-lisrv_object_serialize (liengObject*    self,
-                        liarcSerialize* serializer);
+lisrv_object_serialize (liengObject* self,
+                        int          save);
 
 liaiPath*
 lisrv_object_solve_path (const liengObject* self,
-                         const limatVector*    target);
+                         const limatVector* target);
 
 void
 lisrv_object_swap (liengObject* self,

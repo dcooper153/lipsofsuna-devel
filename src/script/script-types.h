@@ -32,7 +32,6 @@ typedef struct _liscrData liscrData;
 typedef struct _liscrScript liscrScript;
 typedef void (*liscrClassInit)(liscrClass*, void* data);
 typedef int (*liscrClassFunc)(lua_State*);
-typedef int (*liscrClassSerialize)(liscrData*, liarcSerialize*);
 typedef liscrData* (*liscrClassConvert)(liscrScript*, void*);
 
 /* FIXME */

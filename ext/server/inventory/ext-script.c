@@ -238,24 +238,11 @@ private_init (liscrData* self)
 	return 1;
 }
 
-static int
-private_serialize (liscrData*      self,
-                   liarcSerialize* serialize)
-{
-	if (!liarc_serialize_get_write (serialize))
-	{
-		if (!private_init (self))
-			return 0;
-	}
-	return liext_inventory_serialize (self->data, serialize);
-}
-
 void
 liextInventoryScript (liscrClass* self,
                       void*       data)
 {
 	liscr_class_set_convert (self, (void*) abort);
-	liscr_class_set_serialize (self, private_serialize);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY, data);
 	liscr_class_insert_func (self, "__gc", Inventory___gc);
 	liscr_class_insert_func (self, "__index", Inventory___index);

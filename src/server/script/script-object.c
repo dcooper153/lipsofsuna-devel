@@ -392,19 +392,11 @@ Object_setter_name (lua_State* lua)
 
 /*****************************************************************************/
 
-static int
-private_serialize (liscrData*      self,
-                   liarcSerialize* serialize)
-{
-	return 1;
-}
-
 void
 lisrvObjectScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_inherit (self, licomObjectScript, NULL);
-	liscr_class_set_serialize (self, private_serialize);
 	liscr_class_set_userdata (self, LISRV_SCRIPT_OBJECT, data);
 	liscr_class_insert_interface (self, LISRV_SCRIPT_OBJECT);
 	liscr_class_insert_func (self, "animate", Object_animate);

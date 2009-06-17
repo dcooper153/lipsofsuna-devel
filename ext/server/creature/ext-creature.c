@@ -87,7 +87,7 @@ liext_creature_set_active (liextCreature* self,
 			LISRV_CALLBACK_TICK, 0, private_tick, self, self->calls + 0);
 	}
 	else
-		lieng_engine_call_remove (self->server->engine, self->calls, 1);
+		lieng_engine_remove_call (self->server->engine, self->calls + 0);
 	self->active = value;
 
 	return 1;

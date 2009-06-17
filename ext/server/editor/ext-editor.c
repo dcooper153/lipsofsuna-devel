@@ -116,7 +116,7 @@ private_client_packet (liextEditor* self,
 			lieng_object_set_realized (object, 0);
 			break;
 		case LINET_EXT_EDITOR_PACKET_SAVE:
-			lieng_engine_save (self->server->engine);
+			lisrv_server_save (self->server);
 			break;
 		case LINET_EXT_EDITOR_PACKET_TRANSFORM:
 			if (!li_reader_get_uint32 (packet, &id) ||

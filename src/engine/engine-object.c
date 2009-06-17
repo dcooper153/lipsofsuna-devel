@@ -167,20 +167,6 @@ lieng_object_jump (liengObject*       self,
 }
 
 /**
- * \brief Serializes or deserializes the object from a stream.
- * 
- * \param self Object.
- * \param serialize Serializer.
- * \return Nonzero on success.
- */
-int
-lieng_object_serialize (liengObject*    self,
-                        liarcSerialize* serialize)
-{
-	return self->engine->calls.lieng_object_serialize (self, serialize);
-}
-
-/**
  * \brief Updates the state of the object.
  * 
  * \param self Object.
@@ -826,7 +812,7 @@ private_callback_moved (liengObject* self)
 	dst = lieng_engine_find_sector (self->engine, id);
 	if (dst == NULL)
 	{
-		dst = lieng_sector_new (self->engine, id, self->engine->config.dir);
+		dst = lieng_sector_new (self->engine, id);
 		if (dst == NULL)
 			return 0;
 	}
@@ -842,70 +828,6 @@ private_callback_moved (liengObject* self)
 	}
 
 	return 1;
-}
-
-static int
-private_callback_serialize (liengObject*    self,
-                            liarcSerialize* serialize)
-{
-	int value;
-	char* model;
-	uint8_t version;
-	uint32_t flags;
-	liReader* reader = serialize->reader;
-	liarcWriter* writer = serialize->writer;
-	limatTransform transform;
-
-	if (liarc_serialize_get_write (serialize))
-	{
-		/* Write header. */
-		liarc_writer_append_uint8 (writer, LIENG_OBJECT_VERSION);
-		liarc_writer_append_uint32 (writer, self->flags);
-
-		/* Write model. */
-		if (self->model != NULL)
-			liarc_writer_append_string (writer, self->model->name);
-		liarc_writer_append_nul (writer);
-
-		/* Write physics. */
-		if (!liphy_object_write (self->physics, writer))
-			return 0;
-
-		return !writer->error;
-	}
-	else
-	{
-		/* Read version. */
-		if (!li_reader_get_uint8 (reader, &version))
-			return 0;
-		if (version != LIENG_OBJECT_VERSION)
-		{
-			lisys_error_set (EINVAL, "incorrect engine object version");
-			return 0;
-		}
-
-		/* Read flags. */
-		/* FIXME: Sanity checks? */
-		if (!li_reader_get_uint32 (reader, &flags))
-			return 0;
-		self->flags = flags;
-
-		/* Read model. */
-		if (!li_reader_get_text (reader, "", &model))
-			return 0;
-		lieng_object_set_model_name (self, model);
-		free (model);
-
-		/* Read physics. */
-		if (!liphy_object_read (self->physics, reader))
-			return 0;
-		liphy_object_get_transform (self->physics, &transform);
-		lieng_object_set_transform (self, &transform);
-		value = liphy_object_get_realized (self->physics);
-		lieng_object_set_realized (self, value);
-
-		return 1;
-	}
 }
 
 static void
@@ -1028,12 +950,12 @@ const liengCalls lieng_default_calls =
 	private_callback_new,
 	private_callback_free,
 	private_callback_moved,
-	private_callback_serialize,
 	private_callback_update,
 	private_callback_set_model,
 	private_callback_set_realized,
 	private_callback_set_transform,
 	private_callback_set_velocity,
+	lieng_sector_default_new
 };
 
 /*****************************************************************************/
@@ -1060,10 +982,7 @@ private_warp (liengObject*       self,
 	dst = lieng_engine_find_sector (self->engine, id);
 	if (dst == NULL)
 	{
-		if (self->engine->config.flags & LIENG_FLAG_REMOTE_SECTORS)
-			dst = lieng_sector_new (self->engine, id, NULL);
-		else
-			dst = lieng_sector_new (self->engine, id, self->engine->config.dir);
+		dst = lieng_sector_new (self->engine, id);
 		if (dst == NULL)
 			return 0;
 	}

@@ -378,19 +378,6 @@ liscr_class_get_name (const liscrClass* self)
 }
 
 /**
- * \brief Sets the serialization method of the class.
- *
- * \param self Class.
- * \param value Serialize function.
- */
-void
-liscr_class_set_serialize (liscrClass*         self,
-                           liscrClassSerialize value)
-{
-	self->serialize = value;
-}
-
-/**
  * \brief Gets an user pointer from the class.
  *
  * \param self Class.

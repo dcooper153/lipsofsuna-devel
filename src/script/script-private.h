@@ -51,7 +51,6 @@ struct _liscrClass
 	char* meta;
 	lialgStrdic* userdata;
 	liscrClassConvert convert;
-	liscrClassSerialize serialize;
 	liscrScript* script;
 	struct
 	{

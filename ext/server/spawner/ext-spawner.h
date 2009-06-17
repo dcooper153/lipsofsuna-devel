@@ -61,10 +61,6 @@ void
 liext_spawner_free (liextSpawner* self);
 
 int
-liext_spawner_serialize (liextSpawner*   self,
-                         liarcSerialize* serialize);
-
-int
 liext_spawner_get_active (liextSpawner* self);
 
 int

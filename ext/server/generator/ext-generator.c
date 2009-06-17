@@ -108,7 +108,7 @@ private_client_packet (liextGenerator* self,
 			lieng_object_set_realized (object, 1);
 			break;
 		case LINET_EXT_GENERATOR_PACKET_SAVE:
-			lieng_engine_save (self->server->engine);
+			lisrv_server_save (self->server);
 			break;
 	}
 

@@ -42,7 +42,7 @@ liext_sector_read (liengSector* self,
 	int i;
 	int id;
 	int size;
-	char query[512];
+	const char* query;
 	const void* bytes;
 	liReader* reader;
 	liengBlock* block;
@@ -50,17 +50,23 @@ liext_sector_read (liengSector* self,
 
 	/* Prepare statement. */
 	id = LIENG_SECTOR_INDEX (self->x, self->y, self->z);
-	snprintf (query, sizeof (query), "SELECT (data) FROM voxel_sectors WHERE id='%d';", id);
+	query = "SELECT (data) FROM voxel_sectors WHERE id=?;";
 	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
 		return 0;
 	}
 
 	/* Execute statement. */
 	if (sqlite3_step (statement) != SQLITE_ROW)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}
@@ -126,18 +132,18 @@ liext_sector_write (liengSector* self,
 		query = "DELETE FROM voxel_sectors WHERE id=?;";
 		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 		{
-			lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 			return 0;
 		}
 		if (sqlite3_bind_int (statement, col++, id) != SQLITE_OK)
 		{
-			lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
 			sqlite3_finalize (statement);
 			return 0;
 		}
 		if (sqlite3_step (statement) != SQLITE_DONE)
 		{
-			lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
 			sqlite3_finalize (statement);
 			return 0;
 		}
@@ -156,7 +162,7 @@ liext_sector_write (liengSector* self,
 	query = "INSERT OR REPLACE INTO voxel_sectors (id,data) VALUES (?,?);";
 	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 		liarc_writer_free (writer);
 		return 0;
 	}
@@ -165,7 +171,7 @@ liext_sector_write (liengSector* self,
 	if (sqlite3_bind_int (statement, col++, id) != SQLITE_OK ||
 	    sqlite3_bind_blob (statement, col++, writer->memory.buffer, writer->memory.length, SQLITE_TRANSIENT) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
 		liarc_writer_free (writer);
 		return 0;
@@ -175,7 +181,7 @@ liext_sector_write (liengSector* self,
 	/* Write values. */
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}
