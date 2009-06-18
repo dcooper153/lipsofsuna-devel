@@ -179,6 +179,37 @@ Object_setter_angular_momentum (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Class type.
+ * --
+ * -- @name Object.class
+ * -- @class table
+ */
+static int
+Object_getter_class (lua_State* lua)
+{
+	liscrData* object;
+
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+
+	liscr_pushclass (lua, object->clss);
+	return 1;
+}
+static int
+Object_setter_class (lua_State* lua)
+{
+	liscrData* object;
+	liscrClass* clss;
+
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+	clss = liscr_checkanyclass (lua, 3);
+
+	if (!liscr_data_set_class (object, clss))
+		luaL_argerror (lua, 3, "incompatible class");
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Collision group bitmask.
  * --
  * -- @name Object.collision_group
@@ -718,6 +749,7 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "impulse", Object_impulse);
 	liscr_class_insert_func (self, "jump", Object_jump);
 	liscr_class_insert_getter (self, "angular_momentum", Object_getter_angular_momentum);
+	liscr_class_insert_getter (self, "class", Object_getter_class);
 	liscr_class_insert_getter (self, "collision_group", Object_getter_collision_group);
 	liscr_class_insert_getter (self, "collision_mask", Object_getter_collision_mask);
 	liscr_class_insert_getter (self, "gravity", Object_getter_gravity);
@@ -735,6 +767,7 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_getter (self, "valid", Object_getter_valid);
 	liscr_class_insert_getter (self, "velocity", Object_getter_velocity);
 	liscr_class_insert_setter (self, "angular_momentum", Object_setter_angular_momentum);
+	liscr_class_insert_setter (self, "class", Object_setter_class);
 	liscr_class_insert_setter (self, "collision_group", Object_setter_collision_group);
 	liscr_class_insert_setter (self, "collision_mask", Object_setter_collision_mask);
 	liscr_class_insert_setter (self, "gravity", Object_setter_gravity);

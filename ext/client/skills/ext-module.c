@@ -83,7 +83,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register classes. */
-	liscr_script_insert_class (module->script, "SkillWidget", liextSkillWidgetScript, self);
+	liscr_script_create_class (module->script, "SkillWidget", liextSkillWidgetScript, self);
 
 	return self;
 }

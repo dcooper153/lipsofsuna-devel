@@ -51,7 +51,7 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	}
 
-	liscr_script_insert_class (server->script, "Editor", liextEditorScript, self);
+	liscr_script_create_class (server->script, "Editor", liextEditorScript, self);
 
 	return self;
 }

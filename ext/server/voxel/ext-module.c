@@ -90,7 +90,7 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_insert_class (server->script, "Voxel", liextVoxelScript, self);
+	liscr_script_create_class (server->script, "Voxel", liextVoxelScript, self);
 
 	return self;
 }

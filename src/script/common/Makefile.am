@@ -6,6 +6,7 @@ lib_LTLIBRARIES = \
 
 liblipscommonscript_la_SOURCES = \
 	lips-common-script.h \
+	script-class.c \
 	script-event.c \
 	script-event.h \
 	script-object.c \

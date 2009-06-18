@@ -46,7 +46,7 @@ liext_module_new (licliModule* module)
 		return NULL;
 	self->module = module;
 
-	clss = liscr_script_insert_class (module->script, "Options", liextOptionsScript, self);
+	clss = liscr_script_create_class (module->script, "Options", liextOptionsScript, self);
 
 	return self;
 }

@@ -51,7 +51,7 @@ liext_module_new (licliModule* module)
 		return NULL;
 	}
 
-	liscr_script_insert_class (module->script, "Packager", liextPackagerScript, self);
+	liscr_script_create_class (module->script, "Packager", liextPackagerScript, self);
 
 	return self;
 }

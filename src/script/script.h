@@ -42,6 +42,12 @@ void
 liscr_script_free (liscrScript* self);
 
 liscrClass*
+liscr_script_create_class (liscrScript*   self,
+                           const char*    name,
+                           liscrClassInit init,
+                           void*          data);
+
+liscrClass*
 liscr_script_find_class (liscrScript* self,
                          const char*  name);
 
@@ -49,11 +55,9 @@ void*
 liscr_script_find_data (liscrScript* self,
                         const void*  data);
 
-liscrClass*
-liscr_script_insert_class (liscrScript*   self,
-                           const char*    name,
-                           liscrClassInit init,
-                           void*          data);
+int
+liscr_script_insert_class (liscrScript* self,
+                           liscrClass*  clss);
 
 void
 liscr_script_insert_data (liscrScript* self,

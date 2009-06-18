@@ -47,74 +47,12 @@ liscr_data_unref (liscrData* object,
 liscrClass*
 liscr_data_get_class (liscrData* self);
 
+int
+liscr_data_set_class (liscrData*  self,
+                      liscrClass* clss);
+
 liscrScript*
 liscr_data_get_script (liscrData* self);
-
-/*****************************************************************************/
-/* Lua specific. */
-
-liscrClass*
-liscr_isanyclass (lua_State*  lua,
-                  int         arg);
-
-liscrData*
-liscr_isanydata (lua_State* lua,
-                 int        arg);
-
-liscrClass*
-liscr_isclass (lua_State*  lua,
-               int         arg,
-               const char* meta);
-
-liscrData*
-liscr_isdata (lua_State*  lua,
-              int         arg,
-              const char* meta);
-
-liscrData*
-liscr_checkanydata (lua_State* lua,
-                    int        arg);
-
-liscrClass*
-liscr_checkclass (lua_State*  lua,
-                  int         arg,
-                  const char* meta);
-
-void*
-liscr_checkclassdata (lua_State*  lua,
-                      int         arg,
-                      const char* meta);
-
-liscrData*
-liscr_checkdata (lua_State*  lua,
-                 int         arg,
-                 const char* meta);
-
-int
-liscr_copyargs (lua_State* lua,
-                liscrData* data,
-                int        arg);
-
-int
-liscr_getref (lua_State* lua,
-              liscrData* owner,
-              int        slot);
-
-void
-liscr_setref (lua_State* lua,
-              liscrData* owner,
-              int        slot);
-
-void
-liscr_pushdata (lua_State* lua,
-                liscrData* object);
-
-void
-liscr_pushpriv (lua_State* lua,
-                liscrData* object);
-
-liscrScript*
-liscr_script (lua_State* lua);
 
 #endif
 

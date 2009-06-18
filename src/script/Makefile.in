@@ -51,7 +51,8 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsscript_la_LIBADD =
-am_liblipsscript_la_OBJECTS = script.lo script-class.lo script-data.lo
+am_liblipsscript_la_OBJECTS = script.lo script-class.lo script-data.lo \
+	script-util.lo
 liblipsscript_la_OBJECTS = $(am_liblipsscript_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -241,7 +242,9 @@ liblipsscript_la_SOURCES = \
 	script-data.c \
 	script-data.h \
 	script-private.h \
-	script-types.h
+	script-types.h \
+	script-util.c \
+	script-util.h
 
 all: all-recursive
 
@@ -314,6 +317,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-class.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script.Plo@am__quote@
 
 .c.o:

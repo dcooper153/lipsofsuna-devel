@@ -51,7 +51,7 @@ liext_module_new (licliModule* module)
 		return NULL;
 	}
 
-	liscr_script_insert_class (module->script, "Reload", liextReloadScript, self);
+	liscr_script_create_class (module->script, "Reload", liextReloadScript, self);
 
 	return self;
 }

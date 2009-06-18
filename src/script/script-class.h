@@ -31,6 +31,12 @@ liscrClass*
 liscr_class_new (liscrScript* script,
                  const char*  name);
 
+liscrClass*
+liscr_class_new_full (liscrScript* script,
+                      liscrClass*  base,
+                      const char*  name,
+                      int          global);
+
 void
 liscr_class_free (liscrClass* self);
 

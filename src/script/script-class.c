@@ -27,6 +27,7 @@
 #include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
+#include "script-util.h"
 
 static int
 private_member_compare (const void* a,
@@ -49,6 +50,24 @@ liscrClass*
 liscr_class_new (liscrScript* script,
                  const char*  name)
 {
+	return liscr_class_new_full (script, NULL, name, 1);
+}
+
+/**
+ * \brief Creates a new class.
+ *
+ * \param script Script.
+ * \param base Base class or NULL for none.
+ * \param name Class name.
+ * \param global Nonzero if a global variables should be allocated as well.
+ * \return New class or NULL.
+ */
+liscrClass*
+liscr_class_new_full (liscrScript* script,
+                      liscrClass*  base,
+                      const char*  name,
+                      int          global)
+{
 	liscrClass* self;
 
 	/* Allocate self. */
@@ -56,6 +75,9 @@ liscr_class_new (liscrScript* script,
 	if (self == NULL)
 		return NULL;
 	self->script = script;
+	self->base = base;
+
+	/* Allocate class name. */
 	self->name = strdup (name);
 	if (self->name == NULL)
 	{
@@ -63,7 +85,7 @@ liscr_class_new (liscrScript* script,
 		return NULL;
 	}
 
-	/* Allocate class name. */
+	/* Allocate metatable name. */
 	self->meta = malloc (strlen (name) + 6);
 	if (self->meta == NULL)
 	{
@@ -86,10 +108,13 @@ liscr_class_new (liscrScript* script,
 
 	/* Create metatable. */
 	luaL_newmetatable (self->script->lua, self->meta);
-	lua_pushvalue (self->script->lua, -1);
-	lua_setglobal (self->script->lua, self->name);
+	if (global)
+	{
+		lua_pushvalue (self->script->lua, -1);
+		lua_setglobal (self->script->lua, self->name);
+	}
 
-	/* Set metatable. */
+	/* Set own metatable. */
 	lua_pushvalue (self->script->lua, -1);
 	lua_setmetatable (self->script->lua, -2);
 	lua_pop (self->script->lua, -1);
@@ -393,6 +418,7 @@ liscr_class_set_userdata (liscrClass* self,
 int
 liscr_class_default___index (lua_State* lua)
 {
+	liscrClass* ptr;
 	liscrClass* clss;
 	liscrClassMemb tmp;
 	liscrClassMemb* func;
@@ -416,28 +442,29 @@ liscr_class_default___index (lua_State* lua)
 		self = NULL;
 	luaL_checkany (lua, 2);
 
-	/* Sort on demand. */
-	if (clss->flags & LISCR_CLASS_FLAG_SORT_GETTERS)
-	{
-		clss->flags &= ~LISCR_CLASS_FLAG_SORT_GETTERS;
-		qsort (clss->getters.getters, clss->getters.count,
-			sizeof (liscrClassMemb), private_member_compare);
-	}
-
 	/* Getters. */
 	if (lua_isstring (lua, 2))
 	{
-		tmp.name = (char*) lua_tostring (lua, 2);
-		func = bsearch (&tmp, clss->getters.getters, clss->getters.count,
-			sizeof (liscrClassMemb), private_member_compare);
-		if (func != NULL)
+		for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 		{
-			func->call (lua);
-			return 1;
+			if (ptr->flags & LISCR_CLASS_FLAG_SORT_GETTERS)
+			{
+				ptr->flags &= ~LISCR_CLASS_FLAG_SORT_GETTERS;
+				qsort (ptr->getters.getters, ptr->getters.count,
+					sizeof (liscrClassMemb), private_member_compare);
+			}
+			tmp.name = (char*) lua_tostring (lua, 2);
+			func = bsearch (&tmp, ptr->getters.getters, ptr->getters.count,
+				sizeof (liscrClassMemb), private_member_compare);
+			if (func != NULL)
+			{
+				func->call (lua);
+				return 1;
+			}
 		}
 	}
 
-	/* Custom values. */
+	/* Custom instance variables. */
 	if (self != NULL)
 	{
 		liscr_pushpriv (lua, self);
@@ -451,12 +478,21 @@ liscr_class_default___index (lua_State* lua)
 		lua_pop (lua, 2);
 	}
 
-	/* Class values. */
-	luaL_getmetatable (lua, clss->meta);
-	assert (!lua_isnil (lua, -1));
-	lua_pushvalue (lua, 2);
-	lua_rawget (lua, -2);
-	lua_remove (lua, -2);
+	/* Custom class variables. */
+	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
+	{
+		luaL_getmetatable (lua, ptr->meta);
+		assert (!lua_isnil (lua, -1));
+		lua_pushvalue (lua, 2);
+		lua_rawget (lua, -2);
+		lua_remove (lua, -2);
+		if (!lua_isnil (lua, -1))
+			return 1;
+		lua_pop (lua, 1);
+	}
+
+	/* None found. */
+	lua_pushnil (lua);
 
 	return 1;
 }
@@ -470,6 +506,7 @@ liscr_class_default___index (lua_State* lua)
 int
 liscr_class_default___newindex (lua_State* lua)
 {
+	liscrClass* ptr;
 	liscrClass* clss;
 	liscrClassMemb tmp;
 	liscrClassMemb* func;
@@ -491,28 +528,44 @@ liscr_class_default___newindex (lua_State* lua)
 	luaL_checkany (lua, 2);
 	luaL_checkany (lua, 3);
 
-	/* Sort on demand. */
-	if (clss->flags & LISCR_CLASS_FLAG_SORT_SETTERS)
-	{
-		clss->flags &= ~LISCR_CLASS_FLAG_SORT_SETTERS;
-		qsort (clss->setters.setters, clss->setters.count,
-			sizeof (liscrClassMemb), private_member_compare);
-	}
-
 	/* Setters. */
 	if (lua_isstring (lua, 2))
 	{
-		tmp.name = (char*) lua_tostring (lua, 2);
-		func = bsearch (&tmp, clss->setters.setters, clss->setters.count,
-			sizeof (liscrClassMemb), private_member_compare);
-		if (func != NULL)
+		for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 		{
-			func->call (lua);
-			return 0;
+			if (ptr->flags & LISCR_CLASS_FLAG_SORT_SETTERS)
+			{
+				ptr->flags &= ~LISCR_CLASS_FLAG_SORT_SETTERS;
+				qsort (ptr->setters.setters, ptr->setters.count,
+					sizeof (liscrClassMemb), private_member_compare);
+			}
+			tmp.name = (char*) lua_tostring (lua, 2);
+			func = bsearch (&tmp, ptr->setters.setters, ptr->setters.count,
+				sizeof (liscrClassMemb), private_member_compare);
+			if (func != NULL)
+			{
+				func->call (lua);
+				return 0;
+			}
 		}
 	}
 
-	/* Custom values. */
+	/* Protect reserved names. */
+	if (lua_isstring (lua, 2))
+	{
+		tmp.name = (char*) lua_tostring (lua, 2);
+		if (!strncmp (tmp.name, "__", 2))
+			return 0;
+		for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
+		{
+			func = bsearch (&tmp, ptr->getters.getters, ptr->getters.count,
+				sizeof (liscrClassMemb), private_member_compare);
+			if (func != NULL)
+				return 0;
+		}
+	}
+
+	/* Custom instance variables. */
 	if (self != NULL)
 	{
 		liscr_pushpriv (lua, self);
@@ -523,20 +576,7 @@ liscr_class_default___newindex (lua_State* lua)
 		return 0;
 	}
 
-	/* Protect reserved names. */
-#warning FIXME: Is this enough protection?
-	if (lua_isstring (lua, 2))
-	{
-		tmp.name = (char*) lua_tostring (lua, 2);
-		if (!strncmp (tmp.name, "__", 2))
-			return 0;
-		func = bsearch (&tmp, clss->getters.getters, clss->getters.count,
-			sizeof (liscrClassMemb), private_member_compare);
-		if (func != NULL)
-			return 0;
-	}
-
-	/* Custom class values. */
+	/* Custom class variables. */
 	luaL_getmetatable (lua, clss->meta);
 	assert (!lua_isnil (lua, -1));
 	lua_pushvalue (lua, 2);

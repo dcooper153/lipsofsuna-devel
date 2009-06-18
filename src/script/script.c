@@ -126,6 +126,41 @@ liscr_script_free (liscrScript* self)
 }
 
 /**
+ * \brief Creates a new class.
+ *
+ * \param self Script.
+ * \param name Name for the class.
+ * \param init Initialization function.
+ * \param data Data passed to the function.
+ * \return Class owned by the script or NULL.
+ */
+liscrClass*
+liscr_script_create_class (liscrScript*   self,
+                           const char*    name,
+                           liscrClassInit init,
+                           void*          data)
+{
+	liscrClass* clss;
+
+	/* Create class. */
+	clss = liscr_class_new (self, name);
+	if (clss == NULL)
+		return NULL;
+
+	/* Store to list. */
+	if (!lialg_strdic_insert (self->classes, clss->meta, clss))
+	{
+		liscr_class_free (clss);
+		return NULL;
+	}
+
+	/* Call initializer. */
+	init (clss, data);
+
+	return clss;
+}
+
+/**
  * \brief Finds a class by name.
  *
  * \param self Script.
@@ -202,38 +237,20 @@ liscr_script_load (liscrScript* self,
 }
 
 /**
- * \brief Creates a new class.
+ * \brief Inserts a new class to the script.
  *
  * \param self Script.
- * \param name Name for the class.
- * \param init Initialization function.
- * \param data Data passed to the function.
- * \return Class owned by the script or NULL.
+ * \param clss Class.
+ * \return Nonzero on success.
  */
-liscrClass*
-liscr_script_insert_class (liscrScript*   self,
-                           const char*    name,
-                           liscrClassInit init,
-                           void*          data)
+int
+liscr_script_insert_class (liscrScript* self,
+                           liscrClass*  clss)
 {
-	liscrClass* clss;
-
-	/* Create class. */
-	clss = liscr_class_new (self, name);
-	if (clss == NULL)
-		return NULL;
-
-	/* Store to list. */
 	if (!lialg_strdic_insert (self->classes, clss->meta, clss))
-	{
-		liscr_class_free (clss);
-		return NULL;
-	}
+		return 0;
 
-	/* Call initializer. */
-	init (clss, data);
-
-	return clss;
+	return 1;
 }
 
 /**

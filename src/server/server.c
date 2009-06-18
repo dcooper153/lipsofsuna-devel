@@ -592,14 +592,15 @@ private_init_script (lisrvServer* self)
 	liscr_script_set_userdata (self->script, self);
 
 	/* Register classes. */
-	if (!liscr_script_insert_class (self->script, "Effect", lisrvEffectScript, self) ||
-	    !liscr_script_insert_class (self->script, "Extension", lisrvExtensionScript, self) ||
-	    !liscr_script_insert_class (self->script, "Object", lisrvObjectScript, self) ||
-	    !liscr_script_insert_class (self->script, "Packet", licomPacketScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Path", licomPathScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Server", lisrvServerScript, self) ||
-	    !liscr_script_insert_class (self->script, "Vector", licomVectorScript, self->script))
+	if (!liscr_script_create_class (self->script, "Class", licomClassScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Effect", lisrvEffectScript, self) ||
+	    !liscr_script_create_class (self->script, "Extension", lisrvExtensionScript, self) ||
+	    !liscr_script_create_class (self->script, "Object", lisrvObjectScript, self) ||
+	    !liscr_script_create_class (self->script, "Packet", licomPacketScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Path", licomPathScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Server", lisrvServerScript, self) ||
+	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script))
 		return 0;
 	if (!lisrv_server_init_callbacks_client (self))
 		return 0;

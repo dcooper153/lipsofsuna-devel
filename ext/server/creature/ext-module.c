@@ -45,7 +45,7 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	self->server = server;
 
-	liscr_script_insert_class (server->script, "Creature", liextCreatureScript, self);
+	liscr_script_create_class (server->script, "Creature", liextCreatureScript, self);
 
 	return self;
 }

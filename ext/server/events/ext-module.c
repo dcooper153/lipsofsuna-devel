@@ -92,8 +92,8 @@ liext_module_new (lisrvServer* server)
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	liscr_script_insert_class (script, "Event", licomEventScript, self);
-	liscr_script_insert_class (script, "Events", liextEventsScript, self);
+	liscr_script_create_class (script, "Event", licomEventScript, self);
+	liscr_script_create_class (script, "Events", liextEventsScript, self);
 
 	/* Register callbacks. */
 	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0,

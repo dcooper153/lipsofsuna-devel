@@ -60,7 +60,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register classes. */
-	liscr_script_insert_class (module->script, "Camera", liextCameraScript, self);
+	liscr_script_create_class (module->script, "Camera", liextCameraScript, self);
 
 	return self;
 }

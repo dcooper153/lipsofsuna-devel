@@ -41,6 +41,7 @@ struct _liscrClass
 	char* name;
 	char* meta;
 	lialgStrdic* userdata;
+	liscrClass* base;
 	liscrScript* script;
 	struct
 	{

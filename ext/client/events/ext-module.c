@@ -74,8 +74,8 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register classes. */
-	liscr_script_insert_class (script, "Event", licomEventScript, self);
-	liscr_script_insert_class (script, "Events", liextEventsScript, self);
+	liscr_script_create_class (script, "Event", licomEventScript, self);
+	liscr_script_create_class (script, "Events", liextEventsScript, self);
 
 	/* Register events. */
 	lua_newtable (script->lua);

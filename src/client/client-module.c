@@ -781,19 +781,19 @@ private_init_script (licliModule* self)
 	liscr_script_set_userdata (self->script, self);
 
 	/* Register classes. */
-	if (!liscr_script_insert_class (self->script, "Action", licliActionScript, self) ||
-	    !liscr_script_insert_class (self->script, "Binding", licliBindingScript, self) ||
-	    !liscr_script_insert_class (self->script, "Extension", licliExtensionScript, self) ||
-	    !liscr_script_insert_class (self->script, "Group", licliGroupScript, self) ||
-	    !liscr_script_insert_class (self->script, "Light", licliLightScript, self) ||
-	    !liscr_script_insert_class (self->script, "Module", licliModuleScript, self) ||
-	    !liscr_script_insert_class (self->script, "Object", licliObjectScript, self) ||
-	    !liscr_script_insert_class (self->script, "Packet", licomPacketScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Path", licomPathScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Player", licliPlayerScript, self) ||
-	    !liscr_script_insert_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Vector", licomVectorScript, self->script) ||
-	    !liscr_script_insert_class (self->script, "Window", licliWindowScript, self))
+	if (!liscr_script_create_class (self->script, "Action", licliActionScript, self) ||
+	    !liscr_script_create_class (self->script, "Binding", licliBindingScript, self) ||
+	    !liscr_script_create_class (self->script, "Extension", licliExtensionScript, self) ||
+	    !liscr_script_create_class (self->script, "Group", licliGroupScript, self) ||
+	    !liscr_script_create_class (self->script, "Light", licliLightScript, self) ||
+	    !liscr_script_create_class (self->script, "Module", licliModuleScript, self) ||
+	    !liscr_script_create_class (self->script, "Object", licliObjectScript, self) ||
+	    !liscr_script_create_class (self->script, "Packet", licomPacketScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Path", licomPathScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Player", licliPlayerScript, self) ||
+	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Window", licliWindowScript, self))
 		return 0;
 
 	/* Load script. */

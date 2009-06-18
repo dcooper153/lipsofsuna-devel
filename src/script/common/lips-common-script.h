@@ -26,12 +26,17 @@
 #include <math/lips-math.h>
 #include <script/lips-script.h>
 
+#define LICOM_SCRIPT_CLASS "Lips.Class"
 #define LICOM_SCRIPT_EVENT "Lips.Event"
 #define LICOM_SCRIPT_OBJECT "Lips.Object"
 #define LICOM_SCRIPT_PACKET "Lips.Packet"
 #define LICOM_SCRIPT_PATH "Lips.Path"
 #define LICOM_SCRIPT_QUATERNION "Lips.Quaternion"
 #define LICOM_SCRIPT_VECTOR "Lips.Vector"
+
+void
+licomClassScript (liscrClass* clss,
+                  void*       data);
 
 void
 licomEventScript (liscrClass* clss,

@@ -64,7 +64,7 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	}
 
-	liscr_script_insert_class (server->script, "Inventory", liextInventoryScript, self);
+	liscr_script_create_class (server->script, "Inventory", liextInventoryScript, self);
 
 	return self;
 }

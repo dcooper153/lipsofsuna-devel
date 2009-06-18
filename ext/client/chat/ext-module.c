@@ -45,7 +45,7 @@ liext_module_new (licliModule* module)
 		return NULL;
 	self->module = module;
 
-	liscr_script_insert_class (module->script, "ChatHistory", liextChatHistoryScript, self);
+	liscr_script_create_class (module->script, "ChatHistory", liextChatHistoryScript, self);
 
 	return self;
 }

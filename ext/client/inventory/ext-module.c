@@ -83,7 +83,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register classes. */
-	liscr_script_insert_class (module->script, "InventoryWidget", liextInventoryWidgetScript, self);
+	liscr_script_create_class (module->script, "InventoryWidget", liextInventoryWidgetScript, self);
 
 	return self;
 }

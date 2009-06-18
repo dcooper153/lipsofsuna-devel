@@ -69,7 +69,7 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_insert_class (server->script, "Slots", liextSlotsScript, self);
+	liscr_script_create_class (server->script, "Slots", liextSlotsScript, self);
 
 	return self;
 }

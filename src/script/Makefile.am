@@ -14,4 +14,6 @@ liblipsscript_la_SOURCES = \
 	script-data.c \
 	script-data.h \
 	script-private.h \
-	script-types.h
+	script-types.h \
+	script-util.c \
+	script-util.h

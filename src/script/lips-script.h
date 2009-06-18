@@ -21,5 +21,6 @@
 #include "script.h"
 #include "script-class.h"
 #include "script-data.h"
+#include "script-util.h"
 
 #endif

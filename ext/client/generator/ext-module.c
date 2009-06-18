@@ -63,7 +63,7 @@ liext_module_new (licliModule* module)
 	liwdg_widget_set_visible (self->dialog, 0);
 
 	/* Register scripts. */
-	liscr_script_insert_class (module->script, "Generator", liextGeneratorScript, self);
+	liscr_script_create_class (module->script, "Generator", liextGeneratorScript, self);
 
 	return self;
 }
