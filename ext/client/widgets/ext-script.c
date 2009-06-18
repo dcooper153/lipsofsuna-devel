@@ -611,7 +611,7 @@ MenuGroup___gc (lua_State* lua)
 {
 	liscrData* self;
 
-	self = liscr_isiface (lua, 1, LIEXT_SCRIPT_MENUGROUP);
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENUGROUP);
 
 	if (self->data != NULL)
 		liwdg_menu_group_free (self->data);
@@ -755,7 +755,6 @@ void
 liextMenuGroupScript (liscrClass* self,
                       void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENUGROUP, data);
 	liscr_class_insert_func (self, "__gc", MenuGroup___gc);
 	liscr_class_insert_func (self, "new", MenuGroup_new);

@@ -348,7 +348,6 @@ void
 licliLightScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
 	liscr_class_insert_func (self, "__gc", Light___gc);
 	liscr_class_insert_func (self, "new", Light_new);

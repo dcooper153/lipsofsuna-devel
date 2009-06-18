@@ -433,26 +433,10 @@ Quaternion_setter_z (lua_State* lua)
 
 /*****************************************************************************/
 
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        quaternion)
-{
-	liscrData* data;
-
-	data = liscr_quaternion_new (script, quaternion);
-	if (data == NULL)
-		return NULL;
-
-#warning Is it safe to unrefence here?
-	liscr_data_unref (data, NULL);
-	return data;
-}
-
 void
 licomQuaternionScript (liscrClass* self,
                        void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_insert_func (self, "__add", Quaternion___add);
 	liscr_class_insert_func (self, "__gc", Quaternion___gc);
 	liscr_class_insert_func (self, "__mul", Quaternion___mul);

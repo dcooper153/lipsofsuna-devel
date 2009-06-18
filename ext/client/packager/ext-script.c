@@ -120,7 +120,6 @@ void
 liextPackagerScript (liscrClass* self,
                      void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PACKAGER, data);
 	liscr_class_insert_func (self, "cancel", Packager_cancel);
 	liscr_class_insert_func (self, "save", Packager_save);

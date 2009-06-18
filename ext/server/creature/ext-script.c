@@ -173,7 +173,6 @@ void
 liextCreatureScript (liscrClass* self,
                      void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CREATURE, data);
 	liscr_class_insert_func (self, "__gc", Creature___gc);
 	liscr_class_insert_func (self, "new", Creature_new);

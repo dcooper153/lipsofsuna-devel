@@ -198,7 +198,6 @@ void
 liextEditorScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
 	liscr_class_insert_func (self, "create", Editor_create);
 	liscr_class_insert_func (self, "rotate", Editor_rotate);

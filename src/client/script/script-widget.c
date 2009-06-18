@@ -45,7 +45,7 @@ Widget___gc (lua_State* lua)
 {
 	liscrData* self;
 
-	self = liscr_isiface (lua, 1, LICLI_SCRIPT_WIDGET);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 	if (self->data != NULL)
 	{
 		private_detach (self);
@@ -73,7 +73,7 @@ Widget_popup (lua_State* lua)
 	liwdgSize size;
 	liwdgWidget* widget;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WIDGET);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 	widget = self->data;
 	luaL_argcheck (lua, widget->state == LIWDG_WIDGET_STATE_DETACHED, 1, "widget already in use");
 	luaL_argcheck (lua, widget->parent == NULL, 1, "widget already in use");
@@ -107,7 +107,7 @@ Widget_getter_visible (lua_State* lua)
 	int value;
 	liscrData* self;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WIDGET);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 
 	value = liwdg_widget_get_visible (self->data);
 	lua_pushboolean (lua, value);
@@ -121,7 +121,7 @@ Widget_setter_visible (lua_State* lua)
 	liscrData* self;
 	liwdgWidget* widget;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WIDGET);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 	value = lua_toboolean (lua, 3);
 	widget = self->data;
 
@@ -144,7 +144,7 @@ Widget_getter_x (lua_State* lua)
 	liscrData* self;
 	liwdgRect rect;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WIDGET);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 
 	liwdg_widget_get_allocation (self->data, &rect);
 	lua_pushnumber (lua, rect.x);
@@ -164,7 +164,7 @@ Widget_getter_y (lua_State* lua)
 	liscrData* self;
 	liwdgRect rect;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WIDGET);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 
 	liwdg_widget_get_allocation (self->data, &rect);
 	lua_pushnumber (lua, rect.y);
@@ -173,13 +173,6 @@ Widget_getter_y (lua_State* lua)
 }
 
 /*****************************************************************************/
-
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        data)
-{
-	return liwdg_widget_get_userdata (data);
-}
 
 static void
 private_detach (liscrData* self)
@@ -220,7 +213,6 @@ void
 licliWidgetScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
 	liscr_class_insert_func (self, "__gc", Widget___gc);

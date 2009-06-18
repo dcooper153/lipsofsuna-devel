@@ -173,18 +173,10 @@ Binding_new (lua_State* lua)
 
 /*****************************************************************************/
 
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        data)
-{
-	return libnd_binding_get_userdata (data);
-}
-
 void
 licliBindingScript (liscrClass* self,
                     void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_insert_func (self, "__gc", Binding___gc);
 	liscr_class_insert_func (self, "new", Binding_new);
 	liscr_class_insert_func (self, "free", Binding_free);

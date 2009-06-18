@@ -237,7 +237,6 @@ void
 licliPlayerScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_PLAYER, data);
 	liscr_class_insert_func (self, "tilt", Player_tilt);
 	liscr_class_insert_func (self, "turn", Player_turn);

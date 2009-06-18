@@ -183,9 +183,14 @@ private_packet (liextModule* self,
                 int          type,
                 liReader*    reader)
 {
+	liscrData* data0;
+
+	data0 = liscr_packet_new_readable (self->module->script, reader);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
 		"message", LISCR_TYPE_INT, type,
-		"packet", LICOM_SCRIPT_PACKET, reader, NULL);
+		"packet", LICOM_SCRIPT_PACKET, data0, NULL);
+	if (data0 != NULL)
+		liscr_data_unref (data0, NULL);
 
 	return 1;
 }
@@ -202,7 +207,7 @@ private_select (liextModule*    self,
 		if (object != NULL && object->script != NULL)
 		{
 			liext_module_event (self, LIEXT_EVENT_SELECT,
-				"object", LICOM_SCRIPT_OBJECT, object, NULL);
+				"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
 			return 1;
 		}
 	}

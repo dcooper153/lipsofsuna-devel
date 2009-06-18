@@ -72,11 +72,6 @@ liscr_isdata (lua_State*  lua,
               const char* meta);
 
 liscrData*
-liscr_isiface (lua_State*  lua,
-               int         arg,
-               const char* meta);
-
-liscrData*
 liscr_checkanydata (lua_State* lua,
                     int        arg);
 
@@ -89,11 +84,6 @@ void*
 liscr_checkclassdata (lua_State*  lua,
                       int         arg,
                       const char* meta);
-
-liscrData*
-liscr_checkiface (lua_State*  lua,
-                  int         arg,
-                  const char* meta);
 
 liscrData*
 liscr_checkdata (lua_State*  lua,

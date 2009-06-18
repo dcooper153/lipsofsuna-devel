@@ -260,7 +260,6 @@ void
 liextSlotsScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SLOTS, data);
 	liscr_class_insert_enum (self, "PRIVATE", LIEXT_SLOT_TYPE_PRIVATE);
 	liscr_class_insert_enum (self, "PUBLIC", LIEXT_SLOT_TYPE_PUBLIC);

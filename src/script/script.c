@@ -232,7 +232,6 @@ liscr_script_insert_class (liscrScript*   self,
 
 	/* Call initializer. */
 	init (clss, data);
-	assert (clss->convert != NULL);
 
 	return clss;
 }

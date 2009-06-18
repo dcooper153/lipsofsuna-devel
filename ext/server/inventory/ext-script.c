@@ -229,7 +229,6 @@ void
 liextInventoryScript (liscrClass* self,
                       void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY, data);
 	liscr_class_insert_func (self, "__gc", Inventory___gc);
 	liscr_class_insert_func (self, "__index", Inventory___index);

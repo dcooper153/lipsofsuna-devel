@@ -35,22 +35,12 @@ enum
 	LISCR_CLASS_FLAG_SORT_SETTERS = 0x2
 };
 
-enum
-{
-	LISCR_SERIALIZE_BOOLEAN,
-	LISCR_SERIALIZE_DATA,
-	LISCR_SERIALIZE_NUMBER,
-	LISCR_SERIALIZE_STRING,
-	LISCR_SERIALIZE_TABLE
-};
-
 struct _liscrClass
 {
 	int flags;
 	char* name;
 	char* meta;
 	lialgStrdic* userdata;
-	liscrClassConvert convert;
 	liscrScript* script;
 	struct
 	{

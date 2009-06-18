@@ -261,7 +261,6 @@ void
 liextCameraScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CAMERA, data);
 	liscr_class_insert_enum (self, "FIRSTPERSON", LIENG_CAMERA_DRIVER_FIRSTPERSON);
 	liscr_class_insert_enum (self, "THIRDPERSON", LIENG_CAMERA_DRIVER_THIRDPERSON);

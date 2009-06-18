@@ -115,13 +115,13 @@ Group_set_child (lua_State* lua)
 	liscrData* newwidget;
 	liscrScript* script = liscr_script (lua);
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_GROUP);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	x = luaL_checkint (lua, 2);
 	y = luaL_checkint (lua, 3);
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
 	luaL_argcheck (lua, x >= 0 && x < w, 2, "invalid column");
 	luaL_argcheck (lua, y >= 0 && y < h, 2, "invalid row");
-	newwidget = liscr_checkiface (lua, 4, LICLI_SCRIPT_WIDGET);
+	newwidget = liscr_checkdata (lua, 4, LICLI_SCRIPT_WIDGET);
 	widget = newwidget->data;
 	luaL_argcheck (lua, widget->state == LIWDG_WIDGET_STATE_DETACHED, 4, "widget already in use");
 	luaL_argcheck (lua, widget->parent == NULL, 4, "widget already in use");
@@ -160,7 +160,7 @@ Group_set_col_expand (lua_State* lua)
 	int expand;
 	liscrData* self;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_GROUP);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	x = luaL_checkint (lua, 2);
 	expand = lua_toboolean (lua, 3);
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
@@ -190,7 +190,7 @@ Group_set_row_expand (lua_State* lua)
 	int expand;
 	liscrData* self;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_GROUP);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	y = luaL_checkint (lua, 2);
 	expand = lua_toboolean (lua, 3);
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);

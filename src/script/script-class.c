@@ -151,13 +151,6 @@ liscr_class_free (liscrClass* self)
 	free (self);
 }
 
-void*
-liscr_class_convert (liscrClass* self,
-                     void*       data)
-{
-	return self->convert (self->script, data);
-}
-
 /**
  * \brief Inherits members from another class.
  *
@@ -323,23 +316,6 @@ liscr_class_insert_setter (liscrClass*    self,
 	self->flags |= LISCR_CLASS_FLAG_SORT_SETTERS;
 
 	return 1;
-}
-
-/**
- * \brief Sets the converter function for the class.
- *
- * The converter function is used for converting native objects to
- * script objects. This is primarily used for achieving convenenient
- * and extensible interfacing with scripts.
- *
- * \param self Class.
- * \param value Converter function.
- */
-void
-liscr_class_set_convert (liscrClass* self,
-                         liscrData* (*value)(liscrScript*, void*))
-{
-	self->convert = value;
 }
 
 /**

@@ -136,7 +136,6 @@ void
 liextEventsScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EVENTS, data);
 	liscr_class_insert_enum (self, "ACTION", LIEXT_EVENT_ACTION);
 	liscr_class_insert_enum (self, "PACKET", LIEXT_EVENT_PACKET);

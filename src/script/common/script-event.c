@@ -120,13 +120,6 @@ Event_setter_type (lua_State* lua)
 
 /*****************************************************************************/
 
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        data)
-{
-	return ((licomEvent*) data)->data;
-}
-
 /**
  * \brief Adds the event type members to the class.
  *
@@ -137,7 +130,6 @@ void
 licomEventScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_insert_func (self, "__gc", Event___gc);
 	liscr_class_insert_func (self, "new", Event_new);
 	liscr_class_insert_getter (self, "type", Event_getter_type);
@@ -251,7 +243,6 @@ licom_event_setv (liscrData* self,
 	float pfloat;
 	const char* type;
 	const char* name;
-	liscrClass* clss;
 	liscrScript* script = self->script;
 
 	liscr_pushpriv (script->lua, self);
@@ -287,9 +278,7 @@ licom_event_setv (liscrData* self,
 		}
 		else
 		{
-			clss = liscr_script_find_class (script, type);
 			pptr = va_arg (args, void*);
-			pptr = liscr_class_convert (clss, pptr);
 			if (pptr == NULL)
 				break;
 			liscr_pushdata (script->lua, pptr);

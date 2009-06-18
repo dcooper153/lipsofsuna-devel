@@ -45,7 +45,7 @@ private_login (liextModule* self,
 
 static int
 private_logout (liextModule* self,
-                lisrvObject* object);
+                liengObject* object);
 
 static int
 private_motion (liextModule* self,
@@ -228,7 +228,7 @@ private_animation (liextModule*   self,
 #warning animation events disabled.
 #if 0
 	liext_module_event (self, LIEXT_EVENT_OBJECT_ANIMATION,
-		"object", LICOM_SCRIPT_OBJECT, object,
+		"object", LICOM_SCRIPT_OBJECT, object->script,
 		"animation", LISCR_TYPE_STRING, animation->name, NULL);
 #endif
 	return 1;
@@ -240,10 +240,16 @@ private_control (liextModule*     self,
                  limatQuaternion* rotation,
                  int              flags)
 {
+	liscrData* data0;
+
+	data0 = liscr_quaternion_new (self->server->script, rotation);
 	liext_module_event (self, LIEXT_EVENT_CONTROL,
-		"object", LICOM_SCRIPT_OBJECT, object,
-		"rotation", LICOM_SCRIPT_QUATERNION, rotation,
+		"object", LICOM_SCRIPT_OBJECT, object->script,
+		"rotation", LICOM_SCRIPT_QUATERNION, data0,
 		"controls", LISCR_TYPE_INT, flags, NULL);
+	if (data0 != NULL)
+		liscr_data_unref (data0, NULL);
+
 	return 1;
 }
 
@@ -254,16 +260,16 @@ private_login (liextModule* self,
                const char*  pass)
 {
 	liext_module_event (self, LIEXT_EVENT_LOGIN,
-		"object", LICOM_SCRIPT_OBJECT, object, NULL);
+		"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
 
 static int
 private_logout (liextModule* self,
-                lisrvObject* object)
+                liengObject* object)
 {
 	liext_module_event (self, LIEXT_EVENT_LOGOUT,
-		"object", LICOM_SCRIPT_OBJECT, object, NULL);
+		"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
 
@@ -281,10 +287,18 @@ private_packet (liextModule* self,
                 lisrvClient* client,
                 liReader*    packet)
 {
+	int type;
+	liscrData* data0;
+
+	type = ((uint8_t*) packet->buffer)[0];
+	data0 = liscr_packet_new_readable (self->server->script, packet);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
-		"object", LICOM_SCRIPT_OBJECT, client->object,
-		"message", LISCR_TYPE_INT, (int)(((uint8_t*) packet->buffer)[0]),
-		"packet", LICOM_SCRIPT_PACKET, packet, NULL);
+		"object", LICOM_SCRIPT_OBJECT, client->object->script,
+		"message", LISCR_TYPE_INT, type,
+		"packet", LICOM_SCRIPT_PACKET, data0, NULL);
+	if (data0 != NULL)
+		liscr_data_unref (data0, NULL);
+
 	return 1;
 }
 
@@ -295,7 +309,7 @@ private_sample (liextModule* self,
                 int          flags)
 {
 	liext_module_event (self, LIEXT_EVENT_EFFECT,
-		"object", LICOM_SCRIPT_OBJECT, object,
+		"object", LICOM_SCRIPT_OBJECT, object->script,
 		"effect", LISCR_TYPE_STRING, sample->name,
 		"flags", LISCR_TYPE_INT, flags, NULL);
 	return 1;
@@ -316,7 +330,7 @@ private_visibility (liextModule* self,
                     int          visible)
 {
 	liext_module_event (self, LIEXT_EVENT_VISIBILITY,
-		"object", LICOM_SCRIPT_OBJECT, object,
+		"object", LICOM_SCRIPT_OBJECT, object->script,
 		"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
 	return 1;
 }

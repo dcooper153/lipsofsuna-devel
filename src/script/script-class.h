@@ -34,10 +34,6 @@ liscr_class_new (liscrScript* script,
 void
 liscr_class_free (liscrClass* self);
 
-void*
-liscr_class_convert (liscrClass* self,
-                     void*       data);
-
 void
 liscr_class_inherit (liscrClass*    self,
                      liscrClassInit init,
@@ -66,10 +62,6 @@ int
 liscr_class_insert_setter (liscrClass*    self,
                            const char*    name,
                            liscrClassFunc value);
-
-void
-liscr_class_set_convert (liscrClass*       self,
-                         liscrClassConvert value);
 
 int
 liscr_class_get_interface (const liscrClass* self,

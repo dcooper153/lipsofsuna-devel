@@ -360,7 +360,6 @@ void
 liextSkillScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILL, data);
 	liscr_class_insert_func (self, "__gc", Skill___gc);
 	liscr_class_insert_getter (self, "maximum", Skill_getter_maximum);
@@ -375,7 +374,6 @@ void
 liextSkillsScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILLS, data);
 	liscr_class_insert_enum (self, "INTERNAL", LIEXT_SKILL_TYPE_INTERNAL);
 	liscr_class_insert_enum (self, "PRIVATE", LIEXT_SKILL_TYPE_PRIVATE);

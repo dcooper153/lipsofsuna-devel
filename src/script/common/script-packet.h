@@ -51,11 +51,13 @@ struct _liscrPacket
 	liarcWriter* writer;
 };
 
-liscrPacket*
-liscr_packet_new_readable (const liReader* reader);
+liscrData*
+liscr_packet_new_readable (liscrScript*    script,
+                           const liReader* reader);
 
-liscrPacket*
-liscr_packet_new_writable (int type);
+liscrData*
+liscr_packet_new_writable (liscrScript* script,
+                           int          type);
 
 void
 liscr_packet_free (liscrPacket* self);

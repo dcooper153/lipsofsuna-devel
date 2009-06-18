@@ -48,8 +48,8 @@ private_action_callback (libndAction*  action,
 
 	/* Create event. */
 	event = licom_event_newva (script,
-		"binding", LICLI_SCRIPT_BINDING, binding,
-		"action", LICLI_SCRIPT_ACTION, action,
+		"binding", LICLI_SCRIPT_BINDING, libnd_binding_get_userdata (binding),
+		"action", LICLI_SCRIPT_ACTION, libnd_action_get_userdata (action),
 		"active", LISCR_TYPE_BOOLEAN, value > 0.0f,
 		"value", LISCR_TYPE_FLOAT, value,
 		"params", LISCR_TYPE_STRING, binding->params, NULL);
@@ -209,18 +209,10 @@ Action_setter_enabled (lua_State* lua)
 
 /*****************************************************************************/
 
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        data)
-{
-	return libnd_action_get_userdata (data);
-}
-
 void
 licliActionScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_ACTION, data);
 	liscr_class_insert_func (self, "__gc", Action___gc);
 	liscr_class_insert_func (self, "new", Action_new);

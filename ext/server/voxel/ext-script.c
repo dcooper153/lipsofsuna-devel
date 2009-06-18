@@ -123,7 +123,6 @@ void
 liextVoxelScript (liscrClass* self,
                      void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
 	liscr_class_insert_func (self, "fill_box", Voxel_fill_box);
 	liscr_class_insert_func (self, "fill_sphere", Voxel_fill_sphere);

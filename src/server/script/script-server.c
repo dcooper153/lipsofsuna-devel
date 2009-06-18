@@ -260,7 +260,6 @@ lisrvServerScript (liscrClass* self,
                    void*       data)
 {
 #warning LISRV_SCRIPT_SERVER is a duplicate of LICOM_SCRIPT_SERVER
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LISRV_SCRIPT_SERVER, data);
 	liscr_class_insert_func (self, "find_object", Server_find_object);
 	liscr_class_insert_func (self, "nearby_clients", Server_nearby_clients);

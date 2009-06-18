@@ -66,7 +66,6 @@ void
 lisrvExtensionScript (liscrClass* self,
                       void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LISRV_SCRIPT_EXTENSION, data);
 	liscr_class_insert_func (self, "new", Extension_new);
 }

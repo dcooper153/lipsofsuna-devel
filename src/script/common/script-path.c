@@ -107,7 +107,6 @@ void
 licomPathScript (liscrClass* self,
                  void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_insert_func (self, "__gc", Path___gc);
 	liscr_class_insert_func (self, "pop", Path_pop);
 	liscr_class_insert_getter (self, "length", Path_getter_length);

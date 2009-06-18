@@ -126,23 +126,15 @@ Packet_new (lua_State* lua)
 	int err;
 	int type;
 	liscrData* self;
-	liscrPacket* data;
 	liscrScript* script = liscr_script (lua);
 
 	liscr_checkclass (lua, 1, LICOM_SCRIPT_PACKET);
 	type = luaL_checkinteger (lua, 2);
 
 	/* Allocate packet. */
-	data = liscr_packet_new_writable (type);
-	if (data == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	self = liscr_data_new (script, data, LICOM_SCRIPT_PACKET);
+	self = liscr_packet_new_writable (script, type);
 	if (self == NULL)
 	{
-		liscr_packet_free (data);
 		lua_pushnil (lua);
 		return 1;
 	}
@@ -389,33 +381,10 @@ Packet_getter_type (lua_State* lua)
 
 /*****************************************************************************/
 
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        reader)
-{
-	liscrData* self;
-	liscrPacket* data;
-
-	data = liscr_packet_new_readable (reader);
-	if (data == NULL)
-		return NULL;
-	self = liscr_data_new (script, data, LICOM_SCRIPT_PACKET);
-	if (self == NULL)
-	{
-		liscr_packet_free (data);
-		return NULL;
-	}
-
-#warning Is it safe to unrefence here?
-	liscr_data_unref (self, NULL);
-	return self;
-}
-
 void
 licomPacketScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_insert_enum (self, "BOOL", LISCR_PACKET_FORMAT_BOOL);
 	liscr_class_insert_enum (self, "CUSTOM", LINET_SERVER_PACKET_CUSTOM);
 	liscr_class_insert_enum (self, "FLOAT", LISCR_PACKET_FORMAT_FLOAT);
@@ -434,11 +403,14 @@ licomPacketScript (liscrClass* self,
 	liscr_class_insert_getter (self, "type", Packet_getter_type);
 }
 
-liscrPacket*
-liscr_packet_new_readable (const liReader* reader)
+liscrData*
+liscr_packet_new_readable (liscrScript*    script,
+                           const liReader* reader)
 {
+	liscrData* data;
 	liscrPacket* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liscrPacket));
 	if (self == NULL)
 		return NULL;
@@ -448,6 +420,8 @@ liscr_packet_new_readable (const liReader* reader)
 		free (self);
 		return NULL;
 	}
+
+	/* Allocate reader. */
 	self->reader = li_reader_new (self->buffer, reader->length);
 	if (self->reader == NULL)
 	{
@@ -457,17 +431,31 @@ liscr_packet_new_readable (const liReader* reader)
 	}
 	memcpy (self->buffer, reader->buffer, reader->length);
 
-	return self;
+	/* Allocate script data. */
+	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET);
+	if (data == NULL)
+	{
+		li_reader_free (self->reader);
+		free (self->buffer);
+		free (self);
+	}
+
+	return data;
 }
 
-liscrPacket*
-liscr_packet_new_writable (int type)
+liscrData*
+liscr_packet_new_writable (liscrScript* script,
+                           int          type)
 {
+	liscrData* data;
 	liscrPacket* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liscrPacket));
 	if (self == NULL)
 		return NULL;
+
+	/* Allocate writer. */
 	self->writer = liarc_writer_new_packet (type);
 	if (self->writer == NULL)
 	{
@@ -475,7 +463,16 @@ liscr_packet_new_writable (int type)
 		return NULL;
 	}
 
-	return self;
+	/* Allocate script data. */
+	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET);
+	if (data == NULL)
+	{
+		liarc_writer_free (self->writer);
+		free (self);
+		return NULL;
+	}
+
+	return data;
 }
 
 void

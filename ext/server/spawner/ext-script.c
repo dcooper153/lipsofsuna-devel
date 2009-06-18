@@ -219,27 +219,10 @@ Spawner_setter_object (lua_State* lua)
 
 /*****************************************************************************/
 
-static int
-private_init (liscrData* self)
-{
-	liscrClass* clss = liscr_data_get_class (self);
-	liextModule* module = liscr_class_get_userdata (clss, LIEXT_SCRIPT_SPAWNER);
-	liextSpawner* spawner;
-
-	spawner = liext_spawner_new (module);
-	if (spawner == NULL)
-		return 0;
-	self->data = spawner;
-	spawner->script = self;
-
-	return 1;
-}
-
 void
 liextSpawnerScript (liscrClass* self,
                     void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPAWNER, data);
 	liscr_class_insert_func (self, "__gc", Spawner___gc);
 	liscr_class_insert_func (self, "new", Spawner_new);

@@ -130,7 +130,7 @@ Window_getter_visible (lua_State* lua)
 	int value;
 	liscrData* self;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WINDOW);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WINDOW);
 
 	value = liwdg_widget_get_visible (self->data);
 	lua_pushboolean (lua, value);
@@ -144,7 +144,7 @@ Window_setter_visible (lua_State* lua)
 	licliModule* module;
 	liscrData* self;
 
-	self = liscr_checkiface (lua, 1, LICLI_SCRIPT_WINDOW);
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WINDOW);
 	value = lua_toboolean (lua, 3);
 	module = liscr_class_get_userdata (self->clss, LICLI_SCRIPT_WINDOW);
 

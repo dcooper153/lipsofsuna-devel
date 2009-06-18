@@ -280,7 +280,6 @@ void
 liextNpcScript (liscrClass* self,
                 void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);
 	liscr_class_insert_func (self, "__gc", Npc___gc);
 	liscr_class_insert_func (self, "new", Npc_new);

@@ -62,7 +62,6 @@ void
 liextSkeletonScript (liscrClass* self,
                      void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);
 	liscr_class_insert_func (self, "test", Skeleton_test);
 }

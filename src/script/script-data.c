@@ -278,6 +278,7 @@ liscrData*
 liscr_isanydata (lua_State* lua,
                  int        arg)
 {
+	int ret;
 	lialgStrdicIter iter;
 	liscrClass* clss;
 	liscrData* object;
@@ -286,13 +287,21 @@ liscr_isanydata (lua_State* lua,
 	object = lua_touserdata (lua, arg);
 	if (object == NULL)
 		return NULL;
+	if (!lua_getmetatable (lua, arg))
+		return NULL;
 	LI_FOREACH_STRDIC (iter, script->classes)
 	{
 		clss = iter.value;
-		object = liscr_isdata (lua, arg, clss->meta);
-		if (object != NULL)
+		lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
+		ret = lua_rawequal (lua, -1, -2);
+		lua_pop (lua, 1);
+		if (!ret)
+		{
+			lua_pop (lua, 1);
 			return object;
+		}
 	}
+	lua_pop (lua, 1);
 
 	return NULL;
 }
@@ -341,39 +350,6 @@ liscr_isdata (lua_State*  lua,
               int         arg,
               const char* meta)
 {
-	int ret;
-	void* object;
-
-	object = lua_touserdata (lua, arg);
-	if (object == NULL)
-		return NULL;
-	if (!lua_getmetatable (lua, arg))
-		return NULL;
-	lua_getfield (lua, LUA_REGISTRYINDEX, meta);
-	ret = lua_rawequal (lua, -1, -2);
-	lua_pop (lua, 2);
-	if (!ret)
-		return NULL;
-
-	return object;
-}
-
-/**
- * \brief Gets userdata that implements an interface from stack.
- *
- * Consumes: 0.
- * Returns: 0.
- *
- * \param lua Lua state.
- * \param arg Stack index.
- * \param meta Class type.
- * \return Userdata owned by Lua or NULL.
- */
-liscrData*
-liscr_isiface (lua_State*  lua,
-               int         arg,
-               const char* meta)
-{
 	liscrData* data;
 
 	data = liscr_isanydata (lua, arg);
@@ -381,7 +357,6 @@ liscr_isiface (lua_State*  lua,
 		return NULL;
 	if (liscr_class_get_interface (data->clss, meta))
 		return data;
-	data = liscr_isdata (lua, arg, meta);
 
 	return data;
 }
@@ -463,42 +438,6 @@ liscr_checkdata (lua_State*  lua,
 	liscrData* object;
 
 	object = liscr_isdata (lua, arg, meta);
-	if (object == NULL)
-	{
-		snprintf (msg, 255, "expected %s", meta);
-		luaL_argcheck (lua, 0, arg, msg);
-	}
-	if (object->invalid)
-	{
-		snprintf (msg, 255, "invalid %s", meta);
-		luaL_argcheck (lua, 0, arg, msg);
-	}
-
-	return object;
-}
-
-/**
- * \brief Gets a userdata that implements an interface from stack.
- *
- * If the type check fails, a Lua error is raised.
- *
- * Consumes: 0.
- * Returns: 0.
- *
- * \param lua Lua state.
- * \param arg Stack index.
- * \param meta Class type.
- * \return Userdata owned by Lua.
- */
-liscrData*
-liscr_checkiface (lua_State*  lua,
-                  int         arg,
-                  const char* meta)
-{
-	char msg[256];
-	liscrData* object;
-
-	object = liscr_isiface (lua, arg, meta);
 	if (object == NULL)
 	{
 		snprintf (msg, 255, "expected interface %s", meta);

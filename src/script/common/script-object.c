@@ -705,18 +705,10 @@ Object_setter_velocity (lua_State* lua)
 
 /*****************************************************************************/
 
-static liscrData*
-private_convert (liscrScript* script,
-                 void*        data)
-{
-	return LIENG_OBJECT (data)->script;
-}
-
 void
 licomObjectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, private_convert);
 	liscr_class_insert_enum (self, "SHAPE_MODE_BOX", LIPHY_SHAPE_MODE_BOX);
 	liscr_class_insert_enum (self, "SHAPE_MODE_CAPSULE", LIPHY_SHAPE_MODE_CAPSULE);
 	liscr_class_insert_enum (self, "SHAPE_MODE_CONCAVE", LIPHY_SHAPE_MODE_CONCAVE);

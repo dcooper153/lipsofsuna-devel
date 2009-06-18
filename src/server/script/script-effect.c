@@ -32,7 +32,6 @@ void
 lisrvEffectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_insert_enum (self, "REPEAT", LI_EFFECT_REPEAT);
 }
 

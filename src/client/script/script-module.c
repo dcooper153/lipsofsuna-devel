@@ -332,7 +332,7 @@ Module_setter_root (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
 	if (!lua_isnil (lua, 3))
 	{
-		window = liscr_checkiface (lua, 3, LICLI_SCRIPT_WIDGET);
+		window = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
 		data = window->data;
 		luaL_argcheck (lua, data->parent == NULL, 3, "widget already in use");
 		luaL_argcheck (lua, data->state == LIWDG_WIDGET_STATE_DETACHED, 3, "widget already in use");
@@ -411,7 +411,6 @@ void
 licliModuleScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_set_convert (self, (void*) abort);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_MODULE, data);
 	liscr_class_insert_func (self, "find_object", Module_find_object);
 	liscr_class_insert_func (self, "host", Module_host);
