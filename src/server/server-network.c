@@ -155,6 +155,8 @@ private_init (lisrvNetwork* self,
               int           udp,
               int           port)
 {
+	grapple_error error;
+
 	/* Allocate client list. */
 	self->clients = lialg_u32dic_new ();
 	if (self->clients == NULL)
@@ -178,9 +180,10 @@ private_init (lisrvNetwork* self,
 	grapple_server_namepolicy_set (self->socket, GRAPPLE_NAMEPOLICY_REQUIRED);
 	grapple_server_connectionhandler_set (self->socket, (grapple_connection_callback) private_accept, self);
 	grapple_server_passwordhandler_set (self->socket, (grapple_password_callback) private_login, self);
-	if (!grapple_server_start (self->socket))
+	if (grapple_server_start (self->socket) != GRAPPLE_OK)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot start grapple server");
+		error = grapple_server_error_get (self->socket);
+		lisys_error_set (EINVAL, "host: %s", grapple_error_text (error));
 		return 0;
 	}
 
