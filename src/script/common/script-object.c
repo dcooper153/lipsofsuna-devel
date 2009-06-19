@@ -86,6 +86,55 @@ Object_approach (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Finds a bone or an anchor by name.
+ * --
+ * -- @param self Object.
+ * -- @param name Node name.
+ * function Object.find_node(self, name)
+ */
+static int
+Object_find_node (lua_State* lua)
+{
+	const char* name;
+	limatTransform transform;
+	limdlNode* node;
+	liscrData* tmp;
+	liscrData* object;
+	liscrScript* script;
+
+	script = liscr_script (lua);
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+	name = luaL_checkstring (lua, 2);
+
+	/* Find node. */
+	node = limdl_pose_find_node (LIENG_OBJECT (object->data)->pose, name);
+	if (node == NULL)
+		return 0;
+
+	/* Return transform. */
+	limdl_node_get_pose_transform (node, &transform);
+	tmp = liscr_vector_new (script, &transform.position);
+	if (tmp != NULL)
+	{
+		liscr_pushdata (lua, tmp);
+		liscr_data_unref (tmp, NULL);
+	}
+	else
+		lua_pushnil (lua);
+	tmp = liscr_quaternion_new (script, &transform.rotation);
+	if (tmp != NULL)
+	{
+		liscr_pushdata (lua, tmp);
+		liscr_data_unref (tmp, NULL);
+	}
+	else
+		lua_pushnil (lua);
+
+	return 2;
+}
+
+/* @luadoc
+ * ---
  * -- Lets an impulse force affect the object.
  * --
  * -- @param self Object.
@@ -746,6 +795,7 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_enum (self, "SHAPE_MODE_CONVEX", LIPHY_SHAPE_MODE_CONVEX);
 	liscr_class_insert_func (self, "__gc", Object___gc);
 	liscr_class_insert_func (self, "approach", Object_approach);
+	liscr_class_insert_func (self, "find_node", Object_find_node);
 	liscr_class_insert_func (self, "impulse", Object_impulse);
 	liscr_class_insert_func (self, "jump", Object_jump);
 	liscr_class_insert_getter (self, "angular_momentum", Object_getter_angular_momentum);
