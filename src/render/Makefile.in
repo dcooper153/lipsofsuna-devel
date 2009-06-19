@@ -51,11 +51,11 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipsrender_la_LIBADD =
-am_liblipsrender_la_OBJECTS = render.lo render-constraint.lo \
-	render-context.lo render-draw.lo render-light.lo \
-	render-lighting.lo render-material.lo render-model.lo \
-	render-object.lo render-particle.lo render-resources.lo \
-	render-shader.lo render-texture.lo
+am_liblipsrender_la_OBJECTS = render.lo render-context.lo \
+	render-draw.lo render-light.lo render-lighting.lo \
+	render-material.lo render-model.lo render-object.lo \
+	render-particle.lo render-resources.lo render-shader.lo \
+	render-texture.lo
 liblipsrender_la_OBJECTS = $(am_liblipsrender_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -229,8 +229,6 @@ liblipsrender_la_SOURCES = \
 	lips-render.h \
 	render.c \
 	render.h \
-	render-constraint.c \
-	render-constraint.h \
 	render-context.c \
 	render-context.h \
 	render-draw.c \
@@ -327,7 +325,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-context.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-draw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-light.Plo@am__quote@

@@ -69,6 +69,7 @@ struct _liengEngine
 	lialgPtrdic* selection;
 	licalCallbacks* callbacks;
 	liengCalls calls;
+	liengConstraint* constraints;
 	liengResources* resources;
 	liphyPhysics* physics;
 #ifndef LIENG_DISABLE_GRAPHICS
@@ -142,6 +143,10 @@ lieng_engine_insert_call (liengEngine* self,
                           void*        data,
                           licalHandle* result);
 
+void
+lieng_engine_insert_constraint (liengEngine*     self,
+                                liengConstraint* constraint);
+
 int
 lieng_engine_load_model (liengEngine* self,
                          const char*  name);
@@ -166,6 +171,10 @@ void
 lieng_engine_remove_calls (liengEngine* self,
                            licalHandle* handles,
                            int          count);
+
+void
+lieng_engine_remove_constraint (liengEngine*     self,
+                                liengConstraint* constraint);
 
 void
 lieng_engine_update (liengEngine* self,

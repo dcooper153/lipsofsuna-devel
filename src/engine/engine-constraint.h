@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup lieng Render
  * @{
- * \addtogroup lirndConstraint Constraint
+ * \addtogroup liengConstraint Constraint
  * @{
  */
 
@@ -26,33 +26,33 @@
 #define __RENDER_CONSTRAINT_H__
 
 #include <model/lips-model.h>
-#include "render-types.h"
+#include "engine-types.h"
 
-struct _lirndConstraint
+struct _liengConstraint
 {
-	lirndConstraint* prev;
-	lirndConstraint* next;
-	lirndObject* objects[2];
+	liengConstraint* prev;
+	liengConstraint* next;
+	liengObject* objects[2];
 	limdlNode* nodes[2];
 };
 
-lirndConstraint*
-lirnd_constraint_new (lirndObject* first_object,
-                      const char*     first_anchor,
-                      lirndObject* second_object,
-                      const char*     second_anchor);
+liengConstraint*
+lieng_constraint_new (liengObject* first_object,
+                      const char*  first_anchor,
+                      liengObject* second_object,
+                      const char*  second_anchor);
 
 void
-lirnd_constraint_free (lirndConstraint* self);
+lieng_constraint_free (liengConstraint* self);
 
 void
-lirnd_constraint_update (lirndConstraint* self,
+lieng_constraint_update (liengConstraint* self,
                          float            secs);
 
 void
-lirnd_constraint_get_transform (lirndConstraint* self,
+lieng_constraint_get_transform (liengConstraint* self,
                                 int              index,
-                                lirndMatrix      type,
+                                liengMatrix      type,
                                 limatTransform*  value);
 
 /** @} */

@@ -269,6 +269,9 @@ lisrv_object_animate (liengObject* self,
 		}
 	}
 
+	/* Animate pose. */
+	lieng_object_set_animation (self, channel, name, permanent? -1 : 1, priority);
+
 	/* Invoke callbacks. */
 	if (lieng_object_get_realized (self))
 	{

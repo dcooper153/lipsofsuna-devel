@@ -240,7 +240,7 @@ licli_object_set_animation (liengObject* self,
 	liengAnimation* animation;
 	limdlPose* pose;
 
-	pose = self->render->pose.pose;
+	pose = self->pose;
 	chan = channel + 65536;
 
 	if (value == LINET_INVALID_ANIMATION)

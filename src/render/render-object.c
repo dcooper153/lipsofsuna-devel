@@ -44,7 +44,8 @@ static int
 private_init_envmap (lirndObject* self);
 
 static int
-private_init_lights (lirndObject* self);
+private_init_lights (lirndObject* self,
+                     limdlPose*   pose);
 
 static int
 private_init_materials (lirndObject* self,
@@ -57,9 +58,6 @@ private_init_model (lirndObject* self,
 static void
 private_render_debug (lirndObject* self,
                       limdlNode*   node);
-
-static void
-private_transform_vertices (lirndObject* self);
 
 static int
 private_update_buffer (lirndObject* self);
@@ -95,16 +93,7 @@ lirnd_object_new (lirndRender* render,
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 
-	/* Allocate pose buffer. */
-	self->pose.pose = limdl_pose_new ();
-	if (self->pose.pose == NULL)
-		goto error;
-
 	return self;
-
-error:
-	lirnd_object_free (self);
-	return NULL;
 }
 
 /**
@@ -117,36 +106,28 @@ error:
 void
 lirnd_object_free (lirndObject* self)
 {
-	lirndConstraint* constraint;
-	lirndConstraint* constraint_next;
-
-	/* Free constraints. */
-	/* FIXME: Would be better to have objects remember their own constraints. */
-	for (constraint = self->render->world.constraints ; constraint != NULL ; constraint = constraint_next)
-	{
-		constraint_next = constraint->next;
-		if (constraint->objects[0] == self ||
-		    constraint->objects[1] == self)
-		{
-			if (constraint->prev != NULL)
-				constraint->prev->next = constraint->next;
-			else
-				self->render->world.constraints = constraint->next;
-			if (constraint->next != NULL)
-				constraint->next->prev = constraint->prev;
-			free (constraint);
-		}
-	}
-
-	/* Free model and pose. */
 	private_clear_envmap (self);
 	private_clear_lights (self);
 	private_clear_materials (self);
 	private_clear_model (self);
-	if (self->pose.pose != NULL)
-		limdl_pose_free (self->pose.pose);
-
 	free (self);
+}
+
+/**
+ * \brief Transforms the object.
+ *
+ * \param self Object.
+ * \param pose Pose transformation.
+ */
+void
+lirnd_object_deform (lirndObject* self,
+                     limdlPose*   pose)
+{
+	if (self->model == NULL)
+		return;
+	limdl_pose_transform_mesh (pose, self->vertices);
+	private_update_buffer (self);
+	private_update_lights (self);
 }
 
 void
@@ -166,8 +147,8 @@ lirnd_object_emit_particles (lirndObject* self)
 
 	vtxmat = self->orientation.matrix;
 	nmlmat = limat_matrix_get_rotation (vtxmat);
-	if (self->pose.vertices != NULL)
-		vertices = self->pose.vertices;
+	if (self->vertices != NULL)
+		vertices = self->vertices;
 	else
 		vertices = self->model->model->vertex.vertices;
 
@@ -238,7 +219,7 @@ lirnd_object_render (lirndObject*  self,
 			lirnd_context_set_shader (context, shader);
 			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 			lirnd_context_bind (context);
-			lirnd_context_render_indexed (context, 3 * group->start, 3 * group->end, self->pose.vertices);
+			lirnd_context_render_indexed (context, 3 * group->start, 3 * group->end, self->vertices);
 		}
 	}
 }
@@ -273,7 +254,7 @@ lirnd_object_render_debug (lirndObject* self,
 		else
 		{
 			lirnd_shader_render_indexed (shader, &matrix,
-				0, model->vertex.count, self->pose.vertices);
+				0, model->vertex.count, self->vertices);
 		}
 	}
 	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
@@ -324,7 +305,7 @@ lirnd_object_render_group (lirndObject*  self,
 	if (self->buffer)
 		lirnd_context_render_buffer (context, 3 * material->start, 3 * material->end, self->buffer);
 	else
-		lirnd_context_render_indexed (context, 3 * material->start, 3 * material->end, self->pose.vertices);
+		lirnd_context_render_indexed (context, 3 * material->start, 3 * material->end, self->vertices);
 }
 
 /**
@@ -373,36 +354,7 @@ lirnd_object_update (lirndObject* self,
 {
 	if (self->model == NULL)
 		return;
-
-	limdl_pose_update (self->pose.pose, secs);
-	private_transform_vertices (self);
-	private_update_buffer (self);
-	private_update_lights (self);
 	private_update_envmap (self, scene);
-}
-
-/**
- * \brief Sets the current animation.
- *
- * \param self Object.
- * \param channel Channel index.
- * \param animation Animation name.
- * \param repeats Number of time to repeats, -1 for infinite.
- * \param priority Blending priority.
- * \return Nonzero on success.
- */
-void
-lirnd_object_set_animation (lirndObject* self,
-                            int          channel,
-                            const char*  animation,
-                            int          repeats,
-                            float        priority)
-{
-	limdl_pose_fade_channel (self->pose.pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
-	limdl_pose_set_channel_animation (self->pose.pose, channel, animation);
-	limdl_pose_set_channel_repeats (self->pose.pose, channel, repeats);
-	limdl_pose_set_channel_priority (self->pose.pose, channel, priority);
-	limdl_pose_set_channel_state (self->pose.pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
 }
 
 /**
@@ -481,11 +433,13 @@ lirnd_object_set_transform (lirndObject*          self,
  *
  * \param self Object.
  * \param model Model.
+ * \param pose Pose.
  * \return Nonzero on success.
  */
 int
 lirnd_object_set_model (lirndObject* self,
-                        lirndModel*  model)
+                        lirndModel*  model,
+                        limdlPose*   pose)
 {
 	lirndObject backup;
 
@@ -493,7 +447,7 @@ lirnd_object_set_model (lirndObject* self,
 	memcpy (&backup, self, sizeof (lirndObject));
 	memset (&self->cubemap, 0, sizeof (self->cubemap));
 	self->buffer = 0;
-	self->pose.vertices = NULL;
+	self->vertices = NULL;
 	self->lights.count = 0;
 	self->lights.array = NULL;
 	self->materials.count = 0;
@@ -504,10 +458,9 @@ lirnd_object_set_model (lirndObject* self,
 	{
 		if (!private_init_model (self, model) ||
 		    !private_init_materials (self, model) ||
-		    !private_init_lights (self) || 
+		    !private_init_lights (self, pose) || 
 		    !private_init_envmap (self))
 		{
-			self->pose.pose = NULL;
 			private_clear_lights (self);
 			private_clear_materials (self);
 			private_clear_model (self);
@@ -518,7 +471,6 @@ lirnd_object_set_model (lirndObject* self,
 	}
 
 	/* Replace old model. */
-	backup.pose.pose = NULL;
 	private_clear_lights (&backup);
 	private_clear_materials (&backup);
 	private_clear_model (&backup);
@@ -664,11 +616,9 @@ private_clear_materials (lirndObject* self)
 static void
 private_clear_model (lirndObject* self)
 {
-	if (self->pose.pose != NULL)
-		limdl_pose_set_model (self->pose.pose, NULL);
 	if (livid_features.ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
-	free (self->pose.vertices);
+	free (self->vertices);
 }
 
 static int
@@ -789,7 +739,8 @@ error:
 }
 
 int
-private_init_lights (lirndObject* self)
+private_init_lights (lirndObject* self,
+                     limdlPose*   pose)
 {
 	int i;
 	limdlNode* node;
@@ -797,18 +748,21 @@ private_init_lights (lirndObject* self)
 	lirndLight* light;
 
 	/* Create light sources. */
-	LIMDL_FOREACH_NODE (iter, &self->pose.pose->nodes)
+	if (pose != NULL)
 	{
-		node = iter.value;
-		if (node->type != LIMDL_NODE_LIGHT)
-			continue;
-		light = lirnd_light_new_from_model (self->render, node);
-		if (light == NULL)
-			return 0;
-		if (!lialg_array_append (&self->lights, &light))
+		LIMDL_FOREACH_NODE (iter, &pose->nodes)
 		{
-			lirnd_light_free (light);
-			return 0;
+			node = iter.value;
+			if (node->type != LIMDL_NODE_LIGHT)
+				continue;
+			light = lirnd_light_new_from_model (self->render, node);
+			if (light == NULL)
+				return 0;
+			if (!lialg_array_append (&self->lights, &light))
+			{
+				lirnd_light_free (light);
+				return 0;
+			}
 		}
 	}
 
@@ -909,10 +863,10 @@ private_init_model (lirndObject* self,
 	/* Copy vertices. */
 	if (model->model->vertex.count)
 	{
-		self->pose.vertices = calloc (model->model->vertex.count, sizeof (limdlVertex));
-		if (self->pose.vertices == NULL)
+		self->vertices = calloc (model->model->vertex.count, sizeof (limdlVertex));
+		if (self->vertices == NULL)
 			return 0;
-		memcpy (self->pose.vertices, model->model->vertex.vertices, model->model->vertex.count * sizeof (limdlVertex));
+		memcpy (self->vertices, model->model->vertex.vertices, model->model->vertex.count * sizeof (limdlVertex));
 	}
 
 	/* Create vertex buffer. */
@@ -925,10 +879,6 @@ private_init_model (lirndObject* self,
 		glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, data, GL_STREAM_DRAW_ARB);
 		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 	}
-
-	/* Change pose target. */
-	if (!limdl_pose_set_model (self->pose.pose, model->model))
-		return 0;
 
 	return 1;
 }
@@ -982,17 +932,6 @@ private_render_debug (lirndObject* self,
 		private_render_debug (self, node->nodes.array[i]);
 }
 
-/**
- * \brief Transforms the vertices of the model according to the current pose.
- *
- * \param self Object.
- */
-static void
-private_transform_vertices (lirndObject* self)
-{
-	limdl_pose_transform_mesh (self->pose.pose, self->pose.vertices);
-}
-
 static int
 private_update_buffer (lirndObject* self)
 {
@@ -1007,7 +946,7 @@ private_update_buffer (lirndObject* self)
 	data = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	if (data == NULL)
 		return 0;
-	memcpy (data, self->pose.vertices, size);
+	memcpy (data, self->vertices, size);
 	glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
 	glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 

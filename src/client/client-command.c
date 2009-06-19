@@ -231,7 +231,7 @@ private_object_create (licliModule* module,
 	/* Set transformation. */
 	rotation = limat_quaternion_init (x / 127.0f, y / 127.0f, z / 127.0f, w / 127.0f);
 	transform = limat_transform_init (position, rotation);
-	lieng_object_set_transform (object, &transform);
+	licli_object_set_transform (object, &transform);
 	lieng_object_set_velocity (object, &velocity);
 	lieng_object_set_realized (object, 1);
 
@@ -370,7 +370,7 @@ private_object_simulate (licliModule* module,
 	else
 		rotation = LICLI_OBJECT (object)->curr.transform.rotation;
 	transform = limat_transform_init (position, rotation);
-	lieng_object_set_transform (object, &transform);
+	licli_object_set_transform (object, &transform);
 	lieng_object_set_velocity (object, &velocity);
 
 	return 1;

@@ -71,13 +71,13 @@ liext_slot_new (liengObject* object,
 	lieng_object_set_realized (self->object, 1);
 
 	/* Allocate constraint. */
-	self->constraint = lirnd_constraint_new (object->render, node0, self->object->render, node1);
+	self->constraint = lieng_constraint_new (object, node0, self->object, node1);
 	if (self->constraint == NULL)
 	{
 		lisys_error_append ("cannot create object");
 		goto error;
 	}
-	lirnd_render_insert_constraint (self->object->engine->render, self->constraint);
+	lieng_engine_insert_constraint (self->object->engine, self->constraint);
 
 	return self;
 
@@ -104,8 +104,8 @@ liext_slot_free (liextSlot* self)
 	/* Free constraint. */
 	if (self->constraint != NULL)
 	{
-		lirnd_render_remove_constraint (self->module->engine->render, self->constraint);
-		lirnd_constraint_free (self->constraint);
+		lieng_engine_remove_constraint (self->module->engine, self->constraint);
+		lieng_constraint_free (self->constraint);
 	}
 
 	/* Free object. */

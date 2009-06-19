@@ -54,10 +54,10 @@ lieng_render_new (const char* dir)
 	SYM (lirnd_model_free);
 	SYM (lirnd_object_new);
 	SYM (lirnd_object_free);
+	SYM (lirnd_object_deform);
 	SYM (lirnd_object_replace_image);
 	SYM (lirnd_object_update);
 	SYM (lirnd_object_set_model);
-	SYM (lirnd_object_set_animation);
 	SYM (lirnd_object_set_realized);
 	SYM (lirnd_object_set_transform);
 	SYM (lirnd_render_new);

@@ -14,6 +14,8 @@ liblipsengine_la_SOURCES = \
 	engine-block-builder.h \
 	engine-camera.c \
 	engine-camera.h \
+	engine-constraint.c \
+	engine-constraint.h \
 	engine-iterator.h \
 	engine-model.c \
 	engine-model.h \

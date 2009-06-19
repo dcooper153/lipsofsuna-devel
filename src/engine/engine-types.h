@@ -45,6 +45,12 @@ enum
 	LIENG_CALLBACK_LAST
 };
 
+enum _liengMatrix
+{
+	LIENG_MATRIX_LOCAL,
+	LIENG_MATRIX_WORLD,
+};
+
 enum
 {
 	LIENG_OBJECT_FLAG_DIRTY = 0x01,
@@ -56,7 +62,9 @@ enum
 typedef uint16_t liengTile;
 typedef struct _liengAnimation liengAnimation;
 typedef struct _liengCamera liengCamera;
+typedef struct _liengConstraint liengConstraint;
 typedef struct _liengEngine liengEngine;
+typedef enum _liengMatrix liengMatrix;
 typedef struct _liengModel liengModel;
 typedef struct _liengObject liengObject;
 typedef struct _liengRender liengRender;

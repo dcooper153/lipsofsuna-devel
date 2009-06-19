@@ -35,20 +35,12 @@ enum _lirndSelect
 	LIRND_SELECT_SECTOR,
 };
 
-enum _lirndMatrix
-{
-	LIRND_MATRIX_LOCAL,
-	LIRND_MATRIX_WORLD,
-};
-
 typedef struct _lirndCamera lirndCamera;
-typedef struct _lirndConstraint lirndConstraint;
 typedef struct _lirndContext lirndContext;
 typedef enum _lirndFlags lirndFlags;
 typedef struct _lirndLight lirndLight;
 typedef struct _lirndLighting lirndLighting;
 typedef struct _lirndMaterial lirndMaterial;
-typedef enum _lirndMatrix lirndMatrix;
 typedef struct _lirndModel lirndModel;
 typedef struct _lirndObject lirndObject;
 typedef struct _lirndRender lirndRender;

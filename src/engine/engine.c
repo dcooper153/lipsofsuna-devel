@@ -24,6 +24,7 @@
 
 #include <stdarg.h>
 #include "engine.h"
+#include "engine-constraint.h"
 #include "engine-iterator.h"
 #include "engine-range.h"
 #include "engine-selection.h"
@@ -96,7 +97,16 @@ void
 lieng_engine_free (liengEngine* self)
 {
 	lialgU32dicIter iter;
+	liengConstraint* constraint;
+	liengConstraint* constraint_next;
 	liengObject* object;
+
+	/* Free constraints. */
+	for (constraint = self->constraints ; constraint != NULL ; constraint = constraint_next)
+	{
+		constraint_next = constraint->next;
+		lieng_constraint_free (constraint);
+	}
 
 	/* Unrealize objects. */
 	if (self->objects != NULL)
@@ -167,28 +177,6 @@ lieng_engine_call (liengEngine* self,
 	va_end (args);
 
 	return ret;
-}
-
-/**
- * \brief Inserts an event handler callback.
- *
- * \param self Engine.
- * \param type Callback type.
- * \param priority Callback priority, smaller means called earlier.
- * \param call Function to be called.
- * \param data User data passed to the function.
- * \param result Return location for the callback data.
- * \return Nonzero on success.
- */
-int
-lieng_engine_insert_call (liengEngine* self,
-                          licalType    type,
-                          int          priority,
-                          void*        call,
-                          void*        data,
-                          licalHandle* result)
-{
-	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data, result);
 }
 
 /**
@@ -305,6 +293,44 @@ lieng_engine_find_sector (liengEngine* self,
                           uint32_t     id)
 {
 	return lialg_u32dic_find (self->sectors, id);
+}
+
+/**
+ * \brief Inserts an event handler callback.
+ *
+ * \param self Engine.
+ * \param type Callback type.
+ * \param priority Callback priority, smaller means called earlier.
+ * \param call Function to be called.
+ * \param data User data passed to the function.
+ * \param result Return location for the callback data.
+ * \return Nonzero on success.
+ */
+int
+lieng_engine_insert_call (liengEngine* self,
+                          licalType    type,
+                          int          priority,
+                          void*        call,
+                          void*        data,
+                          licalHandle* result)
+{
+	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data, result);
+}
+
+/**
+ * \brief Register a constraint.
+ *
+ * \param self Engine.
+ * \param constraint Constraint.
+ */
+void
+lieng_engine_insert_constraint (liengEngine*     self,
+                                liengConstraint* constraint)
+{
+	if (self->constraints != NULL)
+		self->constraints->prev = constraint;
+	constraint->next = self->constraints;
+	self->constraints = constraint;
 }
 
 /**
@@ -501,6 +527,26 @@ lieng_engine_remove_calls (liengEngine* self,
 }
 
 /**
+ * \brief Unregister a constraint.
+ *
+ * \param self Engine.
+ * \param constraint Constraint.
+ */
+void
+lieng_engine_remove_constraint (liengEngine*     self,
+                                liengConstraint* constraint)
+{
+	if (constraint->next != NULL)
+		constraint->next->prev = constraint->prev;
+	if (constraint->prev != NULL)
+		constraint->prev->next = constraint->next;
+	else
+		self->constraints = constraint->next;
+	constraint->next = NULL;
+	constraint->prev = NULL;
+}
+
+/**
  * \brief Updates the scene.
  *
  * \param self Engine.
@@ -516,6 +562,7 @@ lieng_engine_update (liengEngine* self,
 	int y;
 	int z;
 	lialgU32dicIter iter;
+	liengConstraint* constraint;
 	liengObject* object;
 	liengSector* sector;
 	struct
@@ -594,14 +641,30 @@ lieng_engine_update (liengEngine* self,
 	/* Update physics. */
 	liphy_physics_update (self->physics, secs);
 
+	/* Maintain callbacks. */
+	lical_callbacks_update (self->callbacks);
+
+	/* Update constraints. */
+	for (constraint = self->constraints ;
+	     constraint != NULL ;
+	     constraint = constraint->next)
+	{
+		lieng_constraint_update (constraint, secs);
+	}
+
 	/* Update renderer state. */
 #ifndef LIENG_DISABLE_GRAPHICS
 	if (self->renderapi != NULL)
+	{
+		LI_FOREACH_U32DIC (iter, self->objects)
+		{
+			object = iter.value;
+			self->renderapi->lirnd_object_deform (object->render, object->pose);
+			self->renderapi->lirnd_object_update (object->render, self->scene, secs);
+		}
 		self->renderapi->lirnd_render_update (self->render, secs);
+	}
 #endif
-
-	/* Maintain callbacks. */
-	lical_callbacks_update (self->callbacks);
 }
 
 liengCalls*

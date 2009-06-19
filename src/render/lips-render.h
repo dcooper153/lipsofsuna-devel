@@ -19,7 +19,6 @@
 #define __LIPS_RENDER_H__
 
 #include "render.h"
-#include "render-constraint.h"
 #include "render-context.h"
 #include "render-draw.h"
 #include "render-image.h"

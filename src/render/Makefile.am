@@ -8,8 +8,6 @@ liblipsrender_la_SOURCES = \
 	lips-render.h \
 	render.c \
 	render.h \
-	render-constraint.c \
-	render-constraint.h \
 	render-context.c \
 	render-context.h \
 	render-draw.c \

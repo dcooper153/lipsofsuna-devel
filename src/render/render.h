@@ -29,7 +29,6 @@
 #include <config/lips-config.h>
 #include <image/lips-image.h>
 #include <system/lips-system.h>
-#include "render-constraint.h"
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-material.h"
@@ -75,10 +74,6 @@ struct _lirndRender
 		lirndShader* shadowmap;
 		lirndShader* fixed;
 	} shader;
-	struct
-	{
-		lirndConstraint* constraints;
-	} world;
 #ifdef LIRND_ENABLE_PROFILING
 	struct
 	{
@@ -112,10 +107,6 @@ int
 lirnd_render_load_image (lirndRender* self,
                          const char*  name);
 
-void
-lirnd_render_insert_constraint (lirndRender*     self,
-                                lirndConstraint* constraint);
-
 lirndParticle*
 lirnd_render_insert_particle (lirndRender*    self,
                               const limatVector* position,
@@ -131,10 +122,6 @@ lirnd_render_pick (lirndRender*    self,
                    int             y,
                    int             size,
                    lirndSelection* result);
-
-void
-lirnd_render_remove_constraint (lirndRender*     self,
-                                lirndConstraint* constraint);
 
 void
 lirnd_render_render (lirndRender*  self,

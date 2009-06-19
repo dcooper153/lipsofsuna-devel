@@ -39,9 +39,10 @@ struct _lirndObject
 	int realized;
 	GLuint buffer;
 	void* userdata;
+	limatTransform transform;
+	limdlVertex* vertices;
 	lirndRender* render;
 	lirndModel* model;
-	limatTransform transform;
 	struct
 	{
 		int width;
@@ -65,11 +66,6 @@ struct _lirndObject
 		limatVector center;
 		limatMatrix matrix;
 	} orientation;
-	struct
-	{
-		limdlPose* pose;
-		limdlVertex* vertices;
-	} pose;
 };
 
 lirndObject*
@@ -78,6 +74,10 @@ lirnd_object_new (lirndRender* render,
 
 void
 lirnd_object_free (lirndObject* self);
+
+void
+lirnd_object_deform (lirndObject* self,
+                     limdlPose*   pose);
 
 void
 lirnd_object_emit_particles (lirndObject* self);
@@ -106,13 +106,6 @@ lirnd_object_update (lirndObject* self,
                      float        secs);
 
 void
-lirnd_object_set_animation (lirndObject* self,
-                            int          channel,
-                            const char*  animation,
-                            int          repeats,
-                            float        priority);
-
-void
 lirnd_object_get_bounds (const lirndObject* self,
                          limatAabb*         result);
 
@@ -122,7 +115,8 @@ lirnd_object_get_center (const lirndObject* self,
 
 int
 lirnd_object_set_model (lirndObject* self,
-                        lirndModel*  model);
+                        lirndModel*  model,
+                        limdlPose*   pose);
 
 int
 lirnd_object_get_realized (const lirndObject* self);

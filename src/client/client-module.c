@@ -724,7 +724,6 @@ private_init_engine (licliModule* self)
 	calls->lieng_object_free = licli_object_free;
 	calls->lieng_object_update = licli_object_update;
 	calls->lieng_object_set_realized = licli_object_set_realized;
-	calls->lieng_object_set_transform = licli_object_set_transform;
 	calls->lieng_object_set_velocity = licli_object_set_velocity;
 
 	/* Initialize callbacks. */

@@ -453,7 +453,7 @@ private_build_block (liengSector* self,
 			lieng_block_builder_free (builder);
 			return 0;
 		}
-		if (!self->engine->renderapi->lirnd_object_set_model (block->render, rndmdl))
+		if (!self->engine->renderapi->lirnd_object_set_model (block->render, rndmdl, NULL))
 		{
 			self->engine->renderapi->lirnd_object_free (block->render);
 			self->engine->renderapi->lirnd_model_free (rndmdl);

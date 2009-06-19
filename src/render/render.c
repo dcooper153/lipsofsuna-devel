@@ -98,16 +98,6 @@ error:
 void
 lirnd_render_free (lirndRender* self)
 {
-	lirndConstraint* constraint;
-	lirndConstraint* constraint_next;
-
-	/* Free constraints. */
-	for (constraint = self->world.constraints ; constraint != NULL ; constraint = constraint_next)
-	{
-		constraint_next = constraint->next;
-		free (constraint);
-	}
-
 	/* Free resources. */
 	if (self->resources != NULL)
 		lirnd_resources_free (self->resources);
@@ -232,22 +222,6 @@ lirnd_render_load_image (lirndRender* self,
 }
 
 /**
- * \brief Register a constraint.
- *
- * \param self Renderer.
- * \param constraint Constraint.
- */
-void
-lirnd_render_insert_constraint (lirndRender*     self,
-                                lirndConstraint* constraint)
-{
-	if (self->world.constraints != NULL)
-		self->world.constraints->prev = constraint;
-	constraint->next = self->world.constraints;
-	self->world.constraints = constraint;
-}
-
-/**
  * \brief Creates a new particle.
  *
  * \param self Renderer.
@@ -364,26 +338,6 @@ lirnd_render_pick (lirndRender*    self,
 }
 
 /**
- * \brief Unregister a constraint.
- *
- * \param self Renderer.
- * \param constraint Constraint.
- */
-void
-lirnd_render_remove_constraint (lirndRender*     self,
-                                lirndConstraint* constraint)
-{
-	if (constraint->next != NULL)
-		constraint->next->prev = constraint->prev;
-	if (constraint->prev != NULL)
-		constraint->prev->next = constraint->next;
-	else
-		self->world.constraints = constraint->next;
-	constraint->next = NULL;
-	constraint->prev = NULL;
-}
-
-/**
  * \brief Renders the scene.
  *
  * \param self Renderer.
@@ -482,18 +436,8 @@ void
 lirnd_render_update (lirndRender* self,
                      float        secs)
 {
-	lirndConstraint* constraint;
-
 	/* Update particles. */
 	private_particle_update (self, secs);
-
-	/* Update constraints. */
-	for (constraint = self->world.constraints ;
-	     constraint != NULL ;
-	     constraint = constraint->next)
-	{
-		lirnd_constraint_update (constraint, secs);
-	}
 
 	/* Update time. */
 	self->helpers.time += secs;

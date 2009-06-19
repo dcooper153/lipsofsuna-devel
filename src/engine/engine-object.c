@@ -23,6 +23,7 @@
  */
 
 #include <network/lips-network.h>
+#include "engine-constraint.h"
 #include "engine-object.h"
 #include "engine-selection.h"
 
@@ -190,6 +191,33 @@ lieng_object_get_angular_momentum (const liengObject* self,
                                    limatVector*       value)
 {
 	liphy_object_get_angular_momentum (self->physics, value);
+}
+
+/**
+ * \brief Sets the current animation of a specified channel.
+ *
+ * \param self Object.
+ * \param channel Channel index.
+ * \param animation Animation name or NULL.
+ * \param repeats Number of time to repeats, -1 for infinite.
+ * \param priority Blending priority.
+ * \return Nonzero on success.
+ */
+void
+lieng_object_set_animation (liengObject* self,
+                            int          channel,
+                            const char*  animation,
+                            int          repeats,
+                            float        priority)
+{
+	limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+	if (animation != NULL)
+	{
+		limdl_pose_set_channel_animation (self->pose, channel, animation);
+		limdl_pose_set_channel_repeats (self->pose, channel, repeats);
+		limdl_pose_set_channel_priority (self->pose, channel, priority);
+		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+	}
 }
 
 /**
@@ -743,11 +771,7 @@ private_callback_new (liengEngine*     engine,
 	else
 		self->physics = liphy_object_new (engine->physics, NULL, shape_mode, control_mode);
 	if (self->physics == NULL)
-	{
-		lialg_u32dic_remove (engine->objects, self->id);
-		free (self);
-		return NULL;
-	}
+		goto error;
 
 	/* Initialize graphics. */
 #ifndef LIENG_DISABLE_GRAPHICS
@@ -755,36 +779,73 @@ private_callback_new (liengEngine*     engine,
 	{
 		self->render = self->engine->renderapi->lirnd_object_new (engine->render, self->id);
 		if (self->render == NULL)
-		{
-			lialg_u32dic_remove (engine->objects, self->id);
-			liphy_object_free (self->physics);
-			free (self);
-			return NULL;
-		}
+			goto error;
 	}
 #endif
+
+	/* Allocate pose buffer. */
+	self->pose = limdl_pose_new ();
+	if (self->pose == NULL)
+		goto error;
 
 	/* Set model. */
 	if (model != NULL)
 	{
 		lieng_object_set_model (self, model);
-#ifndef LIENG_DISABLE_GRAPHICS
-		if (self->engine->renderapi != NULL)
-			self->engine->renderapi->lirnd_object_set_animation (self->render, 0, "idle", -1, 0.0f);
-#endif
+		lieng_object_set_animation (self, 0, "idle", -1, 0.0f);
 	}
 
 	return self;
+
+error:
+	if (self->pose != NULL)
+		limdl_pose_free (self->pose);
+	if (self->physics != NULL)
+		liphy_object_free (self->physics);
+#ifndef LIENG_DISABLE_GRAPHICS
+	if (self->render != NULL)
+		self->engine->renderapi->lirnd_object_free (self->render);
+#endif
+	lialg_u32dic_remove (engine->objects, self->id);
+	free (self);
+	return NULL;
 }
 
 static void
 private_callback_free (liengObject* self)
 {
-	/* Remove from engine. */
+	liengConstraint* constraint;
+	liengConstraint* constraint_next;
+
+	/* Unrealize. */
 	if (self->sector != NULL)
 		lieng_object_set_realized (self, 0);
 	lieng_object_set_selected (self, 0);
+
+	/* Free constraints. */
+	/* FIXME: Would be better to have objects remember their own constraints. */
+	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint_next)
+	{
+		constraint_next = constraint->next;
+		if (constraint->objects[0] == self ||
+		    constraint->objects[1] == self)
+		{
+			if (constraint->prev != NULL)
+				constraint->prev->next = constraint->next;
+			else
+				self->engine->constraints = constraint->next;
+			if (constraint->next != NULL)
+				constraint->next->prev = constraint->prev;
+			free (constraint);
+		}
+	}
+
+	/* Remove from engine. */
 	lialg_u32dic_remove (self->engine->objects, self->id);
+
+	/* Free pose. */
+	if (self->pose != NULL)
+		limdl_pose_free (self->pose);
 
 	/* Free all memory. */
 	liphy_object_free (self->physics);
@@ -834,10 +895,8 @@ static void
 private_callback_update (liengObject* self,
                          float        secs)
 {
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->engine->renderapi != NULL)
-		self->engine->renderapi->lirnd_object_update (self->render, self->engine->scene, secs);
-#endif
+	if (self->pose != NULL)
+		limdl_pose_update (self->pose, secs);
 }
 
 static int
@@ -847,18 +906,20 @@ private_callback_set_model (liengObject* self,
 //	lirnd_render_remove_object (self->engine->render, self->render);
 	if (model != NULL)
 	{
+		limdl_pose_set_model (self->pose, model->model);
 #ifndef LIENG_DISABLE_GRAPHICS
 		if (self->engine->renderapi != NULL)
-			self->engine->renderapi->lirnd_object_set_model (self->render, model->render);
+			self->engine->renderapi->lirnd_object_set_model (self->render, model->render, self->pose);
 #endif
 		liphy_object_set_shape (self->physics, model->physics,
 			liphy_object_get_shape_mode (self->physics));
 	}
 	else
 	{
+		limdl_pose_set_model (self->pose, NULL);
 #ifndef LIENG_DISABLE_GRAPHICS
 		if (self->engine->renderapi != NULL)
-			self->engine->renderapi->lirnd_object_set_model (self->render, NULL);
+			self->engine->renderapi->lirnd_object_set_model (self->render, NULL, NULL);
 #endif
 		liphy_object_set_shape (self->physics, NULL,
 			liphy_object_get_shape_mode (self->physics));

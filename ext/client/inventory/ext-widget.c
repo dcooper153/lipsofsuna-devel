@@ -264,7 +264,7 @@ private_calculate_modelview (liextInventoryWidget* self,
 	m0 = limat_matrix_translation (frame->x + 0.5 * frame->width, frame->y + 0.5 * frame->height, 0.0f);
 	m1 = limat_matrix_scale (scale, scale, scale);
 	m2 = limat_matrix_rotation (0.55f, 0.0f, 1.0f, 0.0f);
-	node = limdl_pose_find_node (object->render->pose.pose, "#root");
+	node = limdl_pose_find_node (object->pose, "#root");
 	if (node != NULL)
 	{
 		limdl_node_get_pose_transform (node, &transform);

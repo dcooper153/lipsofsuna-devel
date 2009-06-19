@@ -50,6 +50,7 @@ struct _liengObject
 	liengEngine* engine;
 	liengModel* model;
 	liengSector* sector;
+	limdlPose* pose;
 	liphyObject* physics;
 #ifndef LIENG_DISABLE_SCRIPTS
 	liscrData* script;
@@ -99,6 +100,13 @@ lieng_object_get_angular_momentum (const liengObject* self,
 void
 lieng_object_set_angular_momentum (liengObject*       self,
                                    const limatVector* value);
+
+void
+lieng_object_set_animation (liengObject* self,
+                            int          channel,
+                            const char*  animation,
+                            int          repeats,
+                            float        priority);
 
 void
 lieng_object_get_bounds (const liengObject* self,

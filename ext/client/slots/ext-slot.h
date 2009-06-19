@@ -35,7 +35,7 @@ struct _liextSlot
 {
 	licliModule* module;
 	liengObject* object;
-	lirndConstraint* constraint;
+	liengConstraint* constraint;
 };
 
 liextSlot*
