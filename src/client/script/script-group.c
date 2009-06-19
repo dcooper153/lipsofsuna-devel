@@ -121,10 +121,15 @@ Group_set_child (lua_State* lua)
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
 	luaL_argcheck (lua, x >= 0 && x < w, 2, "invalid column");
 	luaL_argcheck (lua, y >= 0 && y < h, 2, "invalid row");
-	newwidget = liscr_checkdata (lua, 4, LICLI_SCRIPT_WIDGET);
-	widget = newwidget->data;
-	luaL_argcheck (lua, widget->state == LIWDG_WIDGET_STATE_DETACHED, 4, "widget already in use");
-	luaL_argcheck (lua, widget->parent == NULL, 4, "widget already in use");
+	if (!lua_isnoneornil (lua, 4))
+	{
+		newwidget = liscr_checkdata (lua, 4, LICLI_SCRIPT_WIDGET);
+		widget = newwidget->data;
+		luaL_argcheck (lua, widget->state == LIWDG_WIDGET_STATE_DETACHED, 4, "widget already in use");
+		luaL_argcheck (lua, widget->parent == NULL, 4, "widget already in use");
+	}
+	else
+		newwidget = NULL;
 
 	/* Detach and unreference old child. */
 	widget = liwdg_group_get_child (LIWDG_GROUP (self->data), x, y);
@@ -136,8 +141,13 @@ Group_set_child (lua_State* lua)
 	}
 
 	/* Insert and reference new widget. */
-	liscr_data_ref (newwidget, self);
-	liwdg_group_set_child (LIWDG_GROUP (self->data), x, y, newwidget->data);
+	if (newwidget != NULL)
+	{
+		liscr_data_ref (newwidget, self);
+		liwdg_group_set_child (LIWDG_GROUP (self->data), x, y, newwidget->data);
+	}
+	else
+		liwdg_group_set_child (LIWDG_GROUP (self->data), x, y, NULL);
 
 	return 0;
 }
