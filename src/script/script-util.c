@@ -150,7 +150,6 @@ liscr_checkanyclass (lua_State* lua,
 	if (clss == NULL)
 	{
 		snprintf (msg, 255, "expected wrapped class");
-		abort();
 		luaL_argcheck (lua, 0, arg, msg);
 	}
 
