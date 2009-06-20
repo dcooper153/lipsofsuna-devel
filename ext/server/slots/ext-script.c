@@ -133,6 +133,47 @@ Slots___newindex (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Gets information on a slot.
+ * --
+ * -- @param self Slots.
+ * -- @param name Slot name.
+ * -- @return Table of slot information.
+ * function Slots.get_slot(self, name)
+ */
+static int
+Slots_get_slot (lua_State* lua)
+{
+	const char* name;
+	liscrData* self;
+	liextSlot* slot;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SLOTS);
+	name = luaL_checkstring (lua, 2);
+
+	/* Find slot. */
+	slot = liext_slots_find_slot (self->data, name);
+	if (slot == NULL)
+		return 0;
+
+	/* Collect information. */
+	lua_newtable (lua);
+	lua_pushstring (lua, slot->name);
+	lua_setfield (lua, -2, "name");
+	lua_pushstring (lua, slot->node);
+	lua_setfield (lua, -2, "node");
+	lua_pushnumber (lua, slot->type);
+	lua_setfield (lua, -2, "type");
+	if (slot->object != NULL)
+	{
+		liscr_pushdata (lua, slot->object->script);
+		lua_setfield (lua, -2, "object");
+	}
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new slots object.
  * --
  * -- @param self Slots class.
@@ -266,6 +307,7 @@ liextSlotsScript (liscrClass* self,
 	liscr_class_insert_func (self, "__gc", Slots___gc);
 	liscr_class_insert_func (self, "__index", Slots___index);
 	liscr_class_insert_func (self, "__newindex", Slots___newindex);
+	liscr_class_insert_func (self, "get_slot", Slots_get_slot);
 	liscr_class_insert_func (self, "new", Slots_new);
 	liscr_class_insert_func (self, "register", Slots_register);
 	liscr_class_insert_getter (self, "owner", Slots_getter_owner);
