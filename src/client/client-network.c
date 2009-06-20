@@ -125,10 +125,12 @@ licli_network_tilt (licliNetwork* self,
                     int           keep)
 {
 	limatQuaternion quat;
+	limatVector axis;
 
 	if (!keep)
 	{
-		quat = limat_quaternion_rotation (-value, limat_vector_init (0.0f, 1.0f, 0.0f));
+		axis = limat_vector_init (1.0f, 0.0f, 0.0f);
+		quat = limat_quaternion_rotation (-value, axis);
 		quat = limat_quaternion_multiply (self->curr.direction, quat);
 		quat = limat_quaternion_normalize (quat);
 		self->curr.direction = quat;
@@ -150,10 +152,14 @@ licli_network_turn (licliNetwork* self,
                     int           keep)
 {
 	limatQuaternion quat;
+	limatVector axis;
 
 	if (!keep)
 	{
-		quat = limat_quaternion_rotation (-value, limat_vector_init (0.0f, 1.0f, 0.0f));
+		quat = limat_quaternion_conjugate (self->curr.direction);
+		axis = limat_vector_init (0.0f, 1.0f, 0.0f);
+		axis = limat_quaternion_transform (quat, axis);
+		quat = limat_quaternion_rotation (-value, axis);
 		quat = limat_quaternion_multiply (self->curr.direction, quat);
 		quat = limat_quaternion_normalize (quat);
 		self->curr.direction = quat;
@@ -282,6 +288,32 @@ licli_network_get_dirty (const licliNetwork* self)
 	    self->delta.rotation > 1.0f)
 		return 1;
 	return 0;
+}
+
+/**
+ * \brief Gets the current rotation of the player.
+ *
+ * \param self Network interface.
+ * \param value Return location for the quaternion.
+ */
+void
+licli_network_get_rotation (const licliNetwork* self,
+                            limatQuaternion*    value)
+{
+	*value = self->curr.direction;
+}
+
+/**
+ * \brief Sets the current rotation of the player.
+ *
+ * \param self Network interface.
+ * \param value Rotation value.
+ */
+void
+licli_network_set_rotation (licliNetwork*          self,
+                            const limatQuaternion* value)
+{
+	self->curr.direction = *value;
 }
 
 /*****************************************************************************/

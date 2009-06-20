@@ -81,6 +81,14 @@ licli_network_get_connected (const licliNetwork* self);
 int
 licli_network_get_dirty (const licliNetwork* self);
 
+void
+licli_network_get_rotation (const licliNetwork* self,
+                            limatQuaternion*    value);
+
+void
+licli_network_set_rotation (licliNetwork*          self,
+                            const limatQuaternion* value);
+
 #endif
 
 /** @} */

@@ -204,32 +204,75 @@ Quaternion___sub (lua_State* lua)
 static int
 Quaternion_new (lua_State* lua)
 {
-	limatQuaternion vec;
+	limatQuaternion quat;
 	liscrData* self;
 	liscrScript* script = liscr_script (lua);
 
+	liscr_checkclass (lua, 1, LICOM_SCRIPT_QUATERNION);
 	if (!lua_isnoneornil (lua, 2))
-		vec.x = luaL_checknumber (lua, 2);
+		quat.x = luaL_checknumber (lua, 2);
 	else
-		vec.x = 0.0f;
+		quat.x = 0.0f;
 	if (!lua_isnoneornil (lua, 3))
-		vec.y = luaL_checknumber (lua, 3);
+		quat.y = luaL_checknumber (lua, 3);
 	else
-		vec.y = 0.0f;
+		quat.y = 0.0f;
 	if (!lua_isnoneornil (lua, 4))
-		vec.z = luaL_checknumber (lua, 4);
+		quat.z = luaL_checknumber (lua, 4);
 	else
-		vec.z = 0.0f;
+		quat.z = 0.0f;
 	if (!lua_isnoneornil (lua, 5))
-		vec.z = luaL_checknumber (lua, 5);
+		quat.z = luaL_checknumber (lua, 5);
 	else
-		vec.z = 1.0f;
-	self = liscr_quaternion_new (script, &vec);
+		quat.z = 1.0f;
+	self = liscr_quaternion_new (script, &quat);
 	if (self == NULL)
 		return 0;
 
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Creates a new quaternion.
+ * --
+ * -- @param self Quaternion class.
+ * -- @param euler Table of euler angles.
+ * -- @return New quaternion.
+ * function Quaternion.new(self, euler)
+ */
+static int
+Quaternion_new_euler (lua_State* lua)
+{
+	int i;
+	float euler[3];
+	limatQuaternion quat;
+	liscrData* self;
+	liscrScript* script = liscr_script (lua);
+
+	liscr_checkclass (lua, 1, LICOM_SCRIPT_QUATERNION);
+	luaL_checktype (lua, 2, LUA_TTABLE);
+
+	for (i = 0 ; i < 3 ; i++)
+	{
+		lua_pushnumber (lua, i + 1);
+		lua_gettable (lua, -2);
+		if (lua_isnumber (lua, -1))
+			euler[i] = lua_tonumber (lua, -1);
+		else
+			euler[i] = 0.0f;
+		lua_pop (lua, 1);
+	}
+
+	quat = limat_quaternion_euler (euler[0], euler[1], euler[2]);
+	self = liscr_quaternion_new (script, &quat);
+	if (self == NULL)
+		return 0;
+	liscr_pushdata (lua, self);
+	liscr_data_unref (self, NULL);
+
 	return 1;
 }
 
@@ -346,6 +389,37 @@ Quaternion_setter_w (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Euler angle presentation of the quaternion.
+ * -- @name Quaternion.euler
+ * -- @class table
+ */
+static int
+Quaternion_getter_euler (lua_State* lua)
+{
+	float e[3];
+	liscrData* self;
+	limatQuaternion* data;
+
+	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_QUATERNION);
+	data = self->data;
+
+	limat_quaternion_get_euler (*data, e + 0, e + 1, e + 2);
+	lua_newtable (lua);
+	lua_pushnumber (lua, 1);
+	lua_pushnumber (lua, e[0]);
+	lua_settable (lua, -3);
+	lua_pushnumber (lua, 2);
+	lua_pushnumber (lua, e[1]);
+	lua_settable (lua, -3);
+	lua_pushnumber (lua, 3);
+	lua_pushnumber (lua, e[2]);
+	lua_settable (lua, -3);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- X value.
  * -- @name Quaternion.x
  * -- @class table
@@ -442,8 +516,10 @@ licomQuaternionScript (liscrClass* self,
 	liscr_class_insert_func (self, "__mul", Quaternion___mul);
 	liscr_class_insert_func (self, "__sub", Quaternion___sub);
 	liscr_class_insert_func (self, "new", Quaternion_new);
+	liscr_class_insert_func (self, "new_euler", Quaternion_new_euler);
 	liscr_class_insert_func (self, "nlerp", Quaternion_nlerp);
 	liscr_class_insert_func (self, "normalize", Quaternion_normalize);
+	liscr_class_insert_getter (self, "euler", Quaternion_getter_euler);
 	liscr_class_insert_getter (self, "length", Quaternion_getter_length);
 	liscr_class_insert_getter (self, "x", Quaternion_getter_x);
 	liscr_class_insert_getter (self, "y", Quaternion_getter_y);

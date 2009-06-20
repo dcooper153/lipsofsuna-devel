@@ -161,6 +161,49 @@ Player_setter_move (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Current rotation quaternion of the player.
+ * -- @name Player.rotation
+ * -- @class table
+ */
+static int
+Player_getter_rotation (lua_State* lua)
+{
+	licliModule* module;
+	limatQuaternion tmp;
+	liscrData* quat;
+	liscrScript* script = liscr_script (lua);
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
+
+	if (module->network == NULL)
+		return 0;
+	licli_network_get_rotation (module->network, &tmp);
+	quat = liscr_quaternion_new (script, &tmp);
+	if (quat == NULL)
+		return 0;
+	liscr_pushdata (lua, quat);
+	liscr_data_unref (quat, NULL);
+
+	return 1;
+}
+static int
+Player_setter_rotation (lua_State* lua)
+{
+	licliModule* module;
+	liscrData* quat;
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
+	quat = liscr_checkdata (lua, 3, LICOM_SCRIPT_QUATERNION);
+
+	if (module->network == NULL)
+		return 0;
+	licli_network_set_rotation (module->network, quat->data);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Gets or sets the tilting rate of the player.
  * -- @name Player.tilt_rate
  * -- @class table
@@ -242,10 +285,12 @@ licliPlayerScript (liscrClass* self,
 	liscr_class_insert_func (self, "turn", Player_turn);
 	liscr_class_insert_getter (self, "analog", Player_getter_analog);
 	liscr_class_insert_getter (self, "move", Player_getter_move);
+	liscr_class_insert_getter (self, "rotation", Player_getter_rotation);
 	liscr_class_insert_getter (self, "tilt_rate", Player_getter_tilt_rate);
 	liscr_class_insert_getter (self, "turn_rate", Player_getter_turn_rate);
 	liscr_class_insert_setter (self, "analog", Player_setter_analog);
 	liscr_class_insert_setter (self, "move", Player_setter_move);
+	liscr_class_insert_setter (self, "rotation", Player_setter_rotation);
 	liscr_class_insert_setter (self, "tilt_rate", Player_setter_tilt_rate);
 	liscr_class_insert_setter (self, "turn_rate", Player_setter_turn_rate);
 }
