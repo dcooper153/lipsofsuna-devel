@@ -681,6 +681,7 @@ lisrv_object_set_client (liengObject* self,
 	if (data->client == value)
 		return 1;
 	data->client = value;
+	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_CLIENT, self);
 	if (value != NULL)
 	{
 		lieng_object_ref (self, 1);

@@ -32,6 +32,10 @@
 #define LISTENER_POSITION_EPSILON 3.0f
 
 static int
+private_object_client (liextModule* self,
+                       liengObject* object);
+
+static int
 private_object_motion (liextModule* self,
                        liengObject* object);
 
@@ -76,14 +80,16 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1,
-	     	private_object_motion, self, self->calls + 0) ||
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 1,
+	     	private_object_client, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1,
+	     	private_object_motion, self, self->calls + 1) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 1,
-	     	private_object_visibility, self, self->calls + 1) ||
+	     	private_object_visibility, self, self->calls + 2) ||
 	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, 0,
-	     	private_sector_load, self, self->calls + 2) ||
+	     	private_sector_load, self, self->calls + 3) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 3))
+	     	private_tick, self, self->calls + 4))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -221,6 +227,23 @@ liext_module_write (liextModule* self,
 }
 
 /*****************************************************************************/
+
+static int
+private_object_client (liextModule* self,
+                       liengObject* object)
+{
+	liextListener* listener;
+
+	/* Unsubscribe from terrain updates. */
+	listener = lialg_ptrdic_find (self->listeners, object);
+	if (listener != NULL)
+	{
+		lialg_ptrdic_remove (self->listeners, object);
+		liext_listener_free (listener);
+	}
+
+	return 1;
+}
 
 static int
 private_object_motion (liextModule* self,

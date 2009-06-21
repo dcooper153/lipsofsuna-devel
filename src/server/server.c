@@ -491,6 +491,7 @@ private_init_engine (lisrvServer* self)
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGOUT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_PACKET, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_CLIENT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_ANIMATION, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SAMPLE, lical_marshal_DATA_PTR_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||

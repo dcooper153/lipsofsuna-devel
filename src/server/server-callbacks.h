@@ -38,6 +38,7 @@ enum
 	LISRV_CALLBACK_CLIENT_LOGOUT, /* (data, object) */
 	LISRV_CALLBACK_CLIENT_PACKET, /* (data, client, packet) */
 	LISRV_CALLBACK_OBJECT_ANIMATION, /* (data, object, animation) */
+	LISRV_CALLBACK_OBJECT_CLIENT, /* (data, object) */
 	LISRV_CALLBACK_OBJECT_SAMPLE, /* (data, object, sample, flags) */
 	LISRV_CALLBACK_OBJECT_MODEL, /* (data, object, model) */
 	LISRV_CALLBACK_OBJECT_MOTION, /* (data, object) */
