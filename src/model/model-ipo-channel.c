@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,29 +27,39 @@
 #include <assert.h>
 #include "model-ipo.h"
 
-static inline void li_bezier_subdivide_4 (limatVector* self,
-                                          limatVector* p0,
-                                          limatVector* p1,
-                                          limatVector* p2,
-                                          limatVector* p3,
-                                          float     u);
+#define LIMDL_BEZIER_SOLVE_ITERATIONS 10
 
-static float limdl_ipo_channel_solve_const  (const limdlIpoChannel* self,
-                                             float                  time);
-static float limdl_ipo_channel_solve_linear (const limdlIpoChannel* self,
-                                             float                  time);
-static float limdl_ipo_channel_solve_bezier (const limdlIpoChannel* self,
-                                             float                  time);
-static float limdl_ipo_curve_solve_const    (const float*           curve,
-                                             float                  time);
-static float limdl_ipo_curve_solve_linear   (const float*           curve,
-                                             float                  time);
-static float limdl_ipo_curve_solve_bezier   (const float*           curve,
-                                             float                  time);
+static inline void
+li_bezier_subdivide_4 (limatVector* self,
+                       limatVector* p0,
+                       limatVector* p1,
+                       limatVector* p2,
+                       limatVector* p3,
+                       float        u);
+
+static float
+private_solve_const_chan (const limdlIpoChannel* self,
+                          float                  time);
+static float
+private_solve_linear_chan (const limdlIpoChannel* self,
+                           float                  time);
+static float
+private_solve_bezier_chan (const limdlIpoChannel* self,
+                           float                  time);
+static float
+private_solve_const (const float* curve,
+                     float        time);
+static float
+private_solve_linear (const float* curve,
+                      float        time);
+static float
+private_solve_bezier (const float* curve,
+                      float        time);
 
 /*****************************************************************************/
 
-float limdl_ipo_channel_get_duration (const limdlIpoChannel* self)
+float
+limdl_ipo_channel_get_duration (const limdlIpoChannel* self)
 {
 	if (self->length == 0)
 		return 0.0f;
@@ -67,8 +77,9 @@ float limdl_ipo_channel_get_duration (const limdlIpoChannel* self)
 	}
 }
 
-float limdl_ipo_channel_get_value (const limdlIpoChannel* self,
-                                   float                  time)
+float
+limdl_ipo_channel_get_value (const limdlIpoChannel* self,
+                             float                  time)
 {
 	if (self->length == 0)
 	{
@@ -82,11 +93,11 @@ float limdl_ipo_channel_get_value (const limdlIpoChannel* self,
 	switch (self->type)
 	{
 		case LIMDL_IPO_TYPE_CONSTANT:
-			return limdl_ipo_channel_solve_const (self, time);
+			return private_solve_const_chan (self, time);
 		case LIMDL_IPO_TYPE_LINEAR:
-			return limdl_ipo_channel_solve_linear (self, time);
+			return private_solve_linear_chan (self, time);
 		case LIMDL_IPO_TYPE_BEZIER:
-			return limdl_ipo_channel_solve_bezier (self, time);
+			return private_solve_bezier_chan (self, time);
 		default:
 			assert (0);
 			return 0.0f;
@@ -113,8 +124,9 @@ static inline void li_bezier_subdivide_4 (limatVector* self,
 	self->z = s0 * p0->z + s1 * p1->z + s2 * p2->z + s3 * p3->z;
 }
 
-static float limdl_ipo_channel_solve_const (const limdlIpoChannel* self,
-                                            float                  time)
+static float
+private_solve_const_chan (const limdlIpoChannel* self,
+                          float                  time)
 {
 	int i;
 	float prev;
@@ -137,11 +149,12 @@ static float limdl_ipo_channel_solve_const (const limdlIpoChannel* self,
 	assert (i < self->length);
 
 	/* Solve the point from the constant curve. */
-	return limdl_ipo_curve_solve_const (self->nodes + i, time);
+	return private_solve_const (self->nodes + i, time);
 }
 
-static float limdl_ipo_channel_solve_linear (const limdlIpoChannel* self,
-                                             float                  time)
+static float
+private_solve_linear_chan (const limdlIpoChannel* self,
+                           float                  time)
 {
 	int i;
 	float prev;
@@ -164,11 +177,12 @@ static float limdl_ipo_channel_solve_linear (const limdlIpoChannel* self,
 	assert (i < self->length);
 
 	/* Solve the point from the linear curve. */
-	return limdl_ipo_curve_solve_linear (self->nodes + i, time);
+	return private_solve_linear (self->nodes + i, time);
 }
 
-static float limdl_ipo_channel_solve_bezier (const limdlIpoChannel* self,
-                                             float                  time)
+static float
+private_solve_bezier_chan (const limdlIpoChannel* self,
+                           float                  time)
 {
 	int i;
 	float prev;
@@ -191,18 +205,20 @@ static float limdl_ipo_channel_solve_bezier (const limdlIpoChannel* self,
 	assert (i < self->length);
 
 	/* Solve the point from the bezier curve. */
-	return limdl_ipo_curve_solve_bezier (self->nodes + i, time);
+	return private_solve_bezier (self->nodes + i, time);
 }
 
-static float limdl_ipo_curve_solve_const (const float* curve,
-                                          float        time)
+static float
+private_solve_const (const float* curve,
+                     float        time)
 {
 	(void) time;
 	return curve[1];
 }
 
-static float limdl_ipo_curve_solve_linear (const float* curve,
-                                           float        time)
+static float
+private_solve_linear (const float* curve,
+                      float        time)
 {
 	float t;
 	float min;
@@ -215,14 +231,36 @@ static float limdl_ipo_curve_solve_linear (const float* curve,
 	       curve[3] * t;
 }
 
-static float limdl_ipo_curve_solve_bezier (const float* curve,
-                                           float        time)
+static float
+private_solve_bezier (const float* curve,
+                      float        time)
 {
+	int i;
 	float t;
-	float min;
-	float max;
+	float l;
+/*	float min;
+	float max;*/
 	limatVector p[5];
 
+	l = 0.25;
+	t = 0.5f;
+	p[0] = limat_vector_init (curve[0], curve[1], 0.0f);
+	p[1] = limat_vector_init (curve[2], curve[3], 0.0f);
+	p[2] = limat_vector_init (curve[4], curve[5], 0.0f);
+	p[3] = limat_vector_init (curve[6], curve[7], 0.0f);
+	for (i = 0 ; i < LIMDL_BEZIER_SOLVE_ITERATIONS ; i++)
+	{
+		li_bezier_subdivide_4 (p + 4, p + 0, p + 1, p + 2, p + 3, t);
+		if (p[4].x < time)
+			t -= l;
+		else
+			t += l;
+		l *= 0.5;
+	}
+
+	return p[4].y;
+
+#if 0
 	/* FIXME: This approximation is coarse. */
 	min = curve[0];
 	max = curve[6];
@@ -235,6 +273,7 @@ static float limdl_ipo_curve_solve_bezier (const float* curve,
 	p[3] = limat_vector_init (curve[6], curve[7], 0.0f);
 	li_bezier_subdivide_4 (p + 4, p + 0, p + 1, p + 2, p + 3, t);
 	return p[4].y;
+#endif
 }
 
 /** @} */
