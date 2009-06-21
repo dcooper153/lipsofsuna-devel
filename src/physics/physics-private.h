@@ -31,6 +31,7 @@
 
 class liphyMotionState;
 class liphyCustomController;
+class liphyContactController;
 class liphyCharacterController;
 
 struct _liphyPhysics
@@ -41,10 +42,8 @@ struct _liphyPhysics
 	btConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamics;
 	lialgList* controllers;
-	struct
-	{
-		liphyTransformFunc transform;
-	} callbacks;
+	liphyTransformCall transform_callback;
+	void* userdata;
 };
 
 struct _liphyShape
@@ -78,39 +77,31 @@ struct _liphyObject
 	liphyShapeMode shape_mode;
 	liphyControlMode control_mode;
 	liphyMotionState* motion;
-	liphyCustomController* controller;
-	int realized;
-	float mass;
-	float movement;
-	float speed;
-	void* userdata;
+	liphyCustomController* custom_controller;
+	liphyContactController* contact_controller;
+	btKinematicCharacterController* character_controller;
+	btPairCachingGhostObject* ghost;
+	btRigidBody* body;
+	btRaycastVehicle* vehicle;
+	btVehicleRaycaster* vehicle_caster;
+	btRaycastVehicle::btVehicleTuning* vehicle_tuning;
+	int flags;
 	struct
 	{
-		int group;
-		int mask;
-	} collision;
-	union
-	{
-		struct
-		{
-			float step;
-			limatVector force;
-			limatVector velocity;
-			btPairCachingGhostObject* ghost;
-			btKinematicCharacterController* controller;
-		} character;
-		struct
-		{
-			btRigidBody* body;
-		} rigid;
-		struct
-		{
-			btRigidBody* body;
-			btRaycastVehicle* vehicle;
-			btVehicleRaycaster* caster;
-			btRaycastVehicle::btVehicleTuning* tuning;
-		} vehicle;
-	};
+		int collision_group;
+		int collision_mask;
+		float mass;
+		float movement;
+		float speed;
+		float character_step;
+		void* userdata;
+		limatTransform transform;
+		limatVector angular;
+		limatVector velocity;
+		limatVector character_force; /* FIXME */
+		liphyCallback custom_call;
+		liphyContactCall contact_call;
+	} config;
 };
 
 class liphyMotionState : public btMotionState
@@ -133,6 +124,16 @@ public:
 	virtual void debugDraw (btIDebugDraw* debugDrawer);
 public:
 	liphyCallback call;
+	liphyObject* data;
+};
+
+class liphyContactController : public btActionInterface
+{
+public:
+	liphyContactController (liphyObject* data);
+	virtual void updateAction (btCollisionWorld* world, btScalar delta);
+	virtual void debugDraw (btIDebugDraw* debugDrawer);
+public:
 	liphyObject* data;
 };
 

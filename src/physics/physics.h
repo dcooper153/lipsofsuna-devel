@@ -50,7 +50,14 @@ liphy_physics_update (liphyPhysics* self,
 
 void
 liphy_physics_set_transform_callback (liphyPhysics*      self,
-                                      liphyTransformFunc func);
+                                      liphyTransformCall value);
+
+void*
+liphy_physics_get_userdata (liphyPhysics* self);
+
+void
+liphy_physics_set_userdata (liphyPhysics* self,
+                            void*         data);
 
 LI_END_DECLS
 

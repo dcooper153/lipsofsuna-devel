@@ -51,8 +51,8 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 	if (len0 > LIPHY_MOTION_TOLERANCE || len1 > LIPHY_ROTATION_TOLERANCE)
 	{
 		this->previous = this->current;
-		if (this->object->physics->callbacks.transform != NULL)
-			this->object->physics->callbacks.transform (this->object);
+		if (this->object->physics->transform_callback != NULL)
+			this->object->physics->transform_callback (this->object);
 	}
 }
 
@@ -77,8 +77,114 @@ liphyCustomController::debugDraw (btIDebugDraw* debugDrawer)
 
 /*****************************************************************************/
 
+liphyContactController::liphyContactController (liphyObject* data)
+{
+	this->data = data;
+}
+
+void liphyContactController::updateAction (btCollisionWorld* world, btScalar delta)
+{
+	int i;
+	int j;
+	int p;
+	int contacts;
+	limatVector momentum0;
+	limatVector momentum1;
+	liphyObject* tmp;
+	liphyContact contact;
+	btManifoldArray manifolds;
+	btBroadphasePair* pair;
+	btCollisionObject* object;
+	btPersistentManifold* manifold;
+	btHashedOverlappingPairCache* cache = this->data->ghost->getOverlappingPairCache ();
+	btBroadphasePairArray& pairarray = cache->getOverlappingPairArray ();
+	btOverlappingPairCache* paircache = this->data->physics->dynamics->getPairCache ();
+
+	/* Update ghost position. */
+	tmp = this->data;
+	if (tmp->body != NULL)
+	{
+		btTransform transform;
+		tmp->motion->getWorldTransform (transform);
+		tmp->ghost->setWorldTransform (transform);
+	}
+
+	/* Get own momentum. */
+	liphy_object_get_velocity (tmp, &momentum0);
+	momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (tmp));
+
+	/* Loop through collision pairs. */
+	for (i = 0 ; i < pairarray.size () ; i++)
+	{
+		/* Get contact manifolds. */
+		pair = paircache->findPair (pairarray[i].m_pProxy0, pairarray[i].m_pProxy1);
+		if (pair == NULL || pair->m_algorithm == NULL)
+			continue;
+		manifolds.clear ();
+		pair->m_algorithm->getAllContactManifolds (manifolds);
+
+		/* Loop through all manifolds. */
+		for (j = 0 ; j < manifolds.size () ; j++)
+		{
+			manifold = manifolds[j];
+			contacts = manifold->getNumContacts ();
+			if (!contacts)
+				continue;
+
+			/* Get pair object. */
+			object = (btCollisionObject*) manifold->getBody0 ();
+			if (object == tmp->ghost || object == tmp->body)
+				object = (btCollisionObject*) manifold->getBody1 ();
+			if (object == tmp->ghost || object == tmp->body)
+				continue;
+			contact.object = (liphyObject*) object->getUserPointer ();
+			assert (contact.object == NULL || contact.object->physics == tmp->physics);
+
+			/* Get pair momentum. */
+			if (contact.object != NULL)
+			{
+				liphy_object_get_velocity (contact.object, &momentum1);
+				momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (contact.object));
+			}
+			else
+				momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
+
+			/* Calculate average impulse per point. */
+			contact.impulse = limat_vector_get_length (
+				limat_vector_subtract (momentum0, momentum1));
+			contact.impulse /= contacts;
+
+			/* Loop through all collision points. */
+			for (p = 0 ; p < contacts ; p++)
+			{
+				const btManifoldPoint& point = manifold->getContactPoint (p);
+				if (point.getDistance () < 0.0f)
+				{
+					/* Invoke callback. */
+					const btVector3& pt = point.getPositionWorldOnB ();
+					const btVector3& nm = point.m_normalWorldOnB;
+					contact.point = limat_vector_init (pt[0], pt[1], pt[2]);
+					contact.normal = limat_vector_init (nm[0], nm[1], nm[2]);
+					tmp->config.contact_call (tmp, &contact);
+
+					/* Dangerous delete this condition here. */
+					if (tmp->config.contact_call == NULL ||
+					    tmp->contact_controller != this)
+						return;
+				}
+			}
+		}
+	}
+}
+
+void liphyContactController::debugDraw (btIDebugDraw* debugDrawer)
+{
+}
+
+/*****************************************************************************/
+
 liphyCharacterController::liphyCharacterController (liphyObject* object, btConvexShape* shape) :
-	btKinematicCharacterController (object->character.ghost, shape, object->character.step)
+	btKinematicCharacterController (object->ghost, shape, object->config.character_step)
 {
 	this->object = object;
 }
@@ -107,14 +213,14 @@ liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
 		transform * btVector3 (0.0f, 0.0f, 0.0f) -
 		transform * btVector3 (0.0f, 0.0f, 1.0f);
 
-	dir = forward * this->object->movement * this->object->speed * delta;
+	dir = forward * this->object->config.movement * this->object->config.speed * delta;
 	if (this->object->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
 	{
 		/* v = v0+at = v0+tF/m */
-		f = &this->object->character.force;
-		v = &this->object->character.velocity;
-		*v = limat_vector_add (this->object->character.velocity,
-			limat_vector_multiply (*f, delta / this->object->mass));
+		f = &this->object->config.character_force;
+		v = &this->object->config.velocity;
+		*v = limat_vector_add (this->object->config.velocity,
+			limat_vector_multiply (*f, delta / this->object->config.mass));
 		/* x = vt */
 		dir += delta * btVector3 (v->x, v->y, v->z);
 		/* FIXME: Hardcoded decay. */

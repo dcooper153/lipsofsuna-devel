@@ -46,10 +46,12 @@ enum _liphyShapeMode
 	LIPHY_SHAPE_MODE_MAX
 };
 
+typedef struct _liphyContact liphyContact;
 typedef enum _liphyControlMode liphyControlMode;
 typedef enum _liphyShapeMode liphyShapeMode;
 typedef struct _liphyObject liphyObject;
 typedef void (*liphyCallback)(liphyObject* self, float secs);
+typedef void (*liphyContactCall)(liphyObject* self, liphyContact* contact);
 
 /** @} */
 /** @} */
@@ -84,6 +86,24 @@ struct _liphyCollision
 /**
  * \addtogroup liphy Physics
  * @{
+ * \addtogroup liphyContact Contact
+ * @{
+ */
+
+struct _liphyContact
+{
+	float impulse;
+	limatVector point;
+	limatVector normal;
+	liphyObject* object;
+};
+
+/** @} */
+/** @} */
+
+/**
+ * \addtogroup liphy Physics
+ * @{
  * \addtogroup liphyPhysics Physics
  * @{
  */
@@ -103,7 +123,7 @@ struct _liphyCollision
  */
 #define LIPHY_DEFAULT_COLLISION_MASK 0xFFFF
 
-typedef void (*liphyTransformFunc)(liphyObject* object);
+typedef void (*liphyTransformCall)(liphyObject* object);
 typedef struct _liphyPhysics liphyPhysics;
 
 /** @} */

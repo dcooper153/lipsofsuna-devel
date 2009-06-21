@@ -190,7 +190,20 @@ void
 lieng_object_get_angular_momentum (const liengObject* self,
                                    limatVector*       value)
 {
-	liphy_object_get_angular_momentum (self->physics, value);
+	liphy_object_get_angular (self->physics, value);
+}
+
+/**
+ * \brief Sets the angular momentum of the object.
+ *
+ * \param self Object.
+ * \param value Angular momentum vector.
+ */
+void
+lieng_object_set_angular_momentum (liengObject*       self,
+                                   const limatVector* value)
+{
+	liphy_object_set_angular (self->physics, value);
 }
 
 /**
@@ -218,19 +231,6 @@ lieng_object_set_animation (liengObject* self,
 		limdl_pose_set_channel_priority (self->pose, channel, priority);
 		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
 	}
-}
-
-/**
- * \brief Sets the angular momentum of the object.
- *
- * \param self Object.
- * \param value Angular momentum vector.
- */
-void
-lieng_object_set_angular_momentum (liengObject*       self,
-                                   const limatVector* value)
-{
-	liphy_object_set_angular_momentum (self->physics, value);
 }
 
 /**

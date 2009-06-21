@@ -25,18 +25,27 @@
 #include "physics-object.h"
 #include "physics-private.h"
 
-#define LIPHY_OBJECT_VERSION 0
+#define PRIVATE_ADDED_BODY 0x0001
+#define PRIVATE_ADDED_GHOST 0x0002
+#define PRIVATE_ADDED_VEHICLE 0x0004
+#define PRIVATE_ADDED_CHARACTER_CONTROLLER 0x0008
+#define PRIVATE_ADDED_CONTACT_CONTROLLER 0x0010
+#define PRIVATE_ADDED_CUSTOM_CONTROLLER 0x0020
+#define PRIVATE_CHANGED_CONTROL_MODE 0x0040
+#define PRIVATE_CHANGED_SHAPE 0x0080
+#define PRIVATE_CHANGED_USERCALL 0x0100
+#define PRIVATE_REALIZED 0x0200
+#define PRIVATE_CCD_MOTION_THRESHOLD 1.0f
+#ifdef ENABLE_PHYSICS_DEBUG
+#define PRIVATE_DEBUG_STATE(s, m) printf ("DEBUG: %p " m "\n", s)
+#else
+#define PRIVATE_DEBUG_STATE(s, m)
+#endif
 
 static btCollisionShape*
 private_choose_shape (const liphyObject* self,
                       liphyShape*        shape,
                       liphyShapeMode     mode);
-
-static void
-private_mode_clear (liphyObject* self);
-
-static void
-private_mode_enable (liphyObject* self);
 
 static float
 private_sweep_shape (const liphyObject* self,
@@ -52,7 +61,7 @@ private_sweep_sphere (const liphyObject* self,
                       liphyCollision*    result);
 
 static void
-private_update_userdata (liphyObject* self);
+private_update_state (liphyObject* self);
 
 /*****************************************************************************/
 
@@ -72,22 +81,21 @@ liphy_object_new (liphyPhysics*    physics,
                   liphyControlMode control_mode)
 {
 	liphyObject* self;
-	btScalar mass = 10.0f;
-	btVector3 inertia (0.0f, 0.0f, 0.0f);
 	btVector3 position (0.0f, 0.0f, 0.0f);
 	btQuaternion orientation (0.0f, 0.0f, 0.0f, 1.0f);
 
 	self = (liphyObject*) calloc (1, sizeof (liphyObject));
 	if (self == NULL)
 		return NULL;
+	self->physics = physics;
 	self->control_mode = control_mode;
-	self->speed = LIPHY_DEFAULT_SPEED;
+	self->config.mass = 10.0f;
+	self->config.speed = LIPHY_DEFAULT_SPEED;
+	self->config.character_step = 0.35;
+	self->config.collision_group = LIPHY_DEFAULT_COLLISION_GROUP;
+	self->config.collision_mask = LIPHY_DEFAULT_COLLISION_MASK;
 	try
 	{
-		self->collision.group = LIPHY_DEFAULT_COLLISION_GROUP;
-		self->collision.mask = LIPHY_DEFAULT_COLLISION_MASK;
-		self->mass = mass;
-		self->physics = physics;
 		self->motion = new liphyMotionState (self, btTransform (orientation, position));
 	}
 	catch (...)
@@ -95,7 +103,7 @@ liphy_object_new (liphyPhysics*    physics,
 		liphy_object_free (self);
 		return NULL;
 	}
-	private_mode_enable (self);
+	self->flags = PRIVATE_CHANGED_CONTROL_MODE | PRIVATE_CHANGED_SHAPE | PRIVATE_CHANGED_USERCALL;
 	liphy_object_set_shape (self, shape, shape_mode);
 
 	return self;
@@ -109,8 +117,8 @@ liphy_object_new (liphyPhysics*    physics,
 void
 liphy_object_free (liphyObject* self)
 {
-	private_mode_clear (self);
-	delete self->controller;
+	self->flags &= ~PRIVATE_REALIZED;
+	private_update_state (self);
 	delete self->motion;
 	free (self);
 }
@@ -130,26 +138,10 @@ liphy_object_impulse (liphyObject*       self,
 	btVector3 v0 (impulse->x, impulse->y, impulse->z);
 	btVector3 v1 (point->x, point->y, point->z);
 
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			self->character.force = limat_vector_add (self->character.force, *impulse);
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			self->rigid.body->applyImpulse (v0, v1);
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			self->rigid.body->applyImpulse (v0, v1);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->applyImpulse (v0, v1);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
+	if (self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
+		self->config.character_force = limat_vector_add (self->config.character_force, *impulse);
+	if (self->body != NULL)
+		self->body->applyImpulse (v0, v1);
 }
 
 /**
@@ -170,19 +162,20 @@ liphy_object_insert_wheel (liphyObject*       self,
                            float              susplen,
                            int                turning)
 {
-	if (self->control_mode != LIPHY_CONTROL_MODE_VEHICLE)
-		return;
-	btVector3 bpoint (point->x, point->y, point->z);
-	btVector3 bdir (0.0f, -1.0f, 0.0f);
-	btVector3 baxle (axle->x, axle->y, axle->z);
-	btWheelInfo& wheel = self->vehicle.vehicle->addWheel (
-		bpoint, bdir, baxle, susplen, radius, *self->vehicle.tuning, turning);
-	/* FIXME: Should be configurable. */
-	wheel.m_suspensionStiffness = 20.0f;
-	wheel.m_wheelsDampingRelaxation = 2.3f;
-	wheel.m_wheelsDampingCompression = 4.4f;
-	wheel.m_frictionSlip = 1000.0f;
-	wheel.m_rollInfluence = 0.1f;
+	/* FIXME */
+	if (self->flags & PRIVATE_ADDED_VEHICLE)
+	{
+		btVector3 bpoint (point->x, point->y, point->z);
+		btVector3 bdir (0.0f, -1.0f, 0.0f);
+		btVector3 baxle (axle->x, axle->y, axle->z);
+		btWheelInfo& wheel = self->vehicle->addWheel (bpoint, bdir, baxle, susplen, radius, *self->vehicle_tuning, turning);
+		/* FIXME: Should be configurable. */
+		wheel.m_suspensionStiffness = 20.0f;
+		wheel.m_wheelsDampingRelaxation = 2.3f;
+		wheel.m_wheelsDampingCompression = 4.4f;
+		wheel.m_frictionSlip = 1000.0f;
+		wheel.m_rollInfluence = 0.1f;
+	}
 }
 
 /**
@@ -207,108 +200,10 @@ liphy_object_jump (liphyObject*       self,
 
 	if (self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
 	{
-		v = self->character.velocity;
-		v = limat_vector_add (v, limat_vector_multiply (*impulse, 1.0f / self->mass));
-		self->character.velocity = v;
+		v = self->config.velocity;
+		v = limat_vector_add (v, limat_vector_multiply (*impulse, 1.0f / self->config.mass));
+		self->config.velocity = v;
 	}
-}
-
-/**
- * \brief Deserializes the object from a stream.
- * 
- * \param self Object.
- * \param reader Reader.
- * \return Nonzero on success.
- */
-int
-liphy_object_read (liphyObject* self,
-                   liReader*    reader)
-{
-	float mass;
-	float movement;
-	float speed;
-	float step;
-	uint8_t version;
-	uint8_t realized;
-	uint32_t collision_group;
-	uint32_t collision_mask; 
-	uint32_t control_mode;
-	uint32_t shape_mode;
-	limatTransform transform;
-	limatVector angular;
-	limatVector velocity;
-
-	if (!li_reader_get_uint8 (reader, &version))
-		return 0;
-	if (version != LIPHY_OBJECT_VERSION)
-	{
-		lisys_error_set (EINVAL, "incorrect physics object version");
-		return 0;
-	}
-	if (!li_reader_get_uint8 (reader, &realized) ||
-	    !li_reader_get_uint32 (reader, &collision_group) ||
-	    !li_reader_get_uint32 (reader, &collision_mask) ||
-	    !li_reader_get_uint32 (reader, &control_mode) ||
-	    !li_reader_get_uint32 (reader, &shape_mode) ||
-	    !li_reader_get_float (reader, &mass) ||
-	    !li_reader_get_float (reader, &movement) ||
-	    !li_reader_get_float (reader, &speed) ||
-	    !li_reader_get_float (reader, &transform.position.x) ||
-	    !li_reader_get_float (reader, &transform.position.y) ||
-	    !li_reader_get_float (reader, &transform.position.z) ||
-	    !li_reader_get_float (reader, &transform.rotation.x) ||
-	    !li_reader_get_float (reader, &transform.rotation.y) ||
-	    !li_reader_get_float (reader, &transform.rotation.z) ||
-	    !li_reader_get_float (reader, &transform.rotation.w) ||
-	    !li_reader_get_float (reader, &velocity.x) ||
-	    !li_reader_get_float (reader, &velocity.y) ||
-	    !li_reader_get_float (reader, &velocity.z) ||
-	    !li_reader_get_float (reader, &angular.x) ||
-	    !li_reader_get_float (reader, &angular.y) ||
-	    !li_reader_get_float (reader, &angular.z) ||
-	    !li_reader_get_float (reader, &step))
-		return 0;
-	if (control_mode > LIPHY_CONTROL_MODE_MAX)
-	{
-		lisys_error_set (EINVAL, "invalid control mode");
-		return 0;
-	}
-	if (shape_mode > LIPHY_SHAPE_MODE_MAX)
-	{
-		lisys_error_set (EINVAL, "invalid shape mode");
-		return 0;
-	}
-	if (mass < 0.0f)
-	{
-		lisys_error_set (EINVAL, "invalid mass");
-		return 0;
-	}
-	if (speed < 0.0f)
-	{
-		lisys_error_set (EINVAL, "invalid speed");
-		return 0;
-	}
-	if (step < 0.0f)
-	{
-		lisys_error_set (EINVAL, "invalid character step");
-		return 0;
-	}
-	liphy_object_set_mass (self, mass);
-	liphy_object_set_collision_mask (self, collision_mask);
-	liphy_object_set_collision_group (self, collision_group);
-	liphy_object_set_control_mode (self, (liphyControlMode) control_mode);
-	liphy_object_set_shape_mode (self, (liphyShapeMode) shape_mode);
-	liphy_object_set_movement (self, movement);
-	liphy_object_set_speed (self, speed);
-	liphy_object_set_transform (self, &transform);
-	liphy_object_set_velocity (self, &velocity);
-	liphy_object_set_angular_momentum (self, &angular);
-	if (control_mode == LIPHY_CONTROL_MODE_CHARACTER)
-		self->character.step = step;
-	/* FIXME: Can we do this safely? */
-	liphy_object_set_realized (self, realized);
-
-	return 1;
 }
 
 /**
@@ -381,120 +276,49 @@ liphy_object_sweep_sphere (liphyObject*       self,
 }
 
 /**
- * \brief Serializes the object to a stream.
- * 
- * \param self Object.
- * \param writer Writer.
- * \return Nonzero on success.
- */
-int
-liphy_object_write (liphyObject* self,
-                    liarcWriter* writer)
-{
-	limatTransform transform;
-	limatVector vector;
-
-	liarc_writer_append_uint8 (writer, LIPHY_OBJECT_VERSION);
-	liarc_writer_append_uint8 (writer, self->realized);
-	liarc_writer_append_uint32 (writer, self->collision.group);
-	liarc_writer_append_uint32 (writer, self->collision.mask);
-	liarc_writer_append_uint32 (writer, self->control_mode);
-	liarc_writer_append_uint32 (writer, self->shape_mode);
-	liarc_writer_append_float (writer, self->mass);
-	liarc_writer_append_float (writer, self->movement);
-	liarc_writer_append_float (writer, self->speed);
-	liphy_object_get_transform (self, &transform);
-	liarc_writer_append_float (writer, transform.position.x);
-	liarc_writer_append_float (writer, transform.position.y);
-	liarc_writer_append_float (writer, transform.position.z);
-	liarc_writer_append_float (writer, transform.rotation.x);
-	liarc_writer_append_float (writer, transform.rotation.y);
-	liarc_writer_append_float (writer, transform.rotation.z);
-	liarc_writer_append_float (writer, transform.rotation.w);
-	liphy_object_get_velocity (self, &vector);
-	liarc_writer_append_float (writer, vector.x);
-	liarc_writer_append_float (writer, vector.y);
-	liarc_writer_append_float (writer, vector.z);
-	liphy_object_get_angular_momentum (self, &vector);
-	liarc_writer_append_float (writer, vector.x);
-	liarc_writer_append_float (writer, vector.y);
-	liarc_writer_append_float (writer, vector.z);
-	if (self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
-		liarc_writer_append_float (writer, self->character.step);
-	else
-		liarc_writer_append_float (writer, 0.0f);
-
-	return !writer->error;
-}
-
-/**
- * \brief Gets the angular momentum of the object.
+ * \brief Gets the angular velocity of the object.
  *
  * \param self Object.
- * \param value Return location for the angular momentum vector.
+ * \param value Return location for the angular velocity vector.
  */
 void
-liphy_object_get_angular_momentum (const liphyObject* self,
-                                   limatVector*       value)
+liphy_object_get_angular (const liphyObject* self,
+                          limatVector*       value)
 {
 	btVector3 velocity;
-	
-	switch (self->control_mode)
+
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			velocity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			velocity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			velocity = self->rigid.body->getAngularVelocity ();
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			velocity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			velocity = self->vehicle.body->getAngularVelocity ();
-			break;
-		default:
-			velocity = btVector3 (0.0, 0.0, 0.0);
-			assert (0);
-			break;
+		velocity = self->body->getAngularVelocity ();
+		value->x = velocity[0];
+		value->y = velocity[1];
+		value->z = velocity[2];
 	}
-	value->x = velocity[0];
-	value->y = velocity[1];
-	value->z = velocity[2];
+	else
+	{
+		value->x = 0.0f;
+		value->y = 0.0f;
+		value->z = 0.0f;
+	}
 }
 
 /**
- * \brief Sets the angular momentum of the object.
+ * \brief Sets the angular velocity of the object.
  *
  * \param self Object.
- * \param value Angular momentum vector.
+ * \param value Angular velocity vector.
  */
 void
-liphy_object_set_angular_momentum (liphyObject*       self,
-                                   const limatVector* value)
+liphy_object_set_angular (liphyObject*       self,
+                          const limatVector* value)
 {
 	btVector3 velocity (value->x, value->y, value->z);
-	
-	switch (self->control_mode)
+
+	self->config.angular = *value;
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			self->rigid.body->setAngularVelocity (velocity);
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->setAngularVelocity (velocity);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
+		if (self->control_mode != LIPHY_CONTROL_MODE_STATIC)
+			self->body->setAngularVelocity (velocity);
 	}
 }
 
@@ -507,7 +331,7 @@ liphy_object_set_angular_momentum (liphyObject*       self,
 int
 liphy_object_get_collision_group (const liphyObject* self)
 {
-	return self->collision.group;
+	return self->config.collision_group;
 }
 
 /**
@@ -526,29 +350,19 @@ liphy_object_set_collision_group (liphyObject* self,
 {
 	btBroadphaseProxy* proxy;
 
-	self->collision.group = mask;
-	switch (self->control_mode)
+	self->config.collision_group = mask;
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			proxy = NULL;
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			proxy = self->character.ghost->getBroadphaseHandle ();
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			proxy = self->rigid.body->getBroadphaseHandle ();
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			proxy = self->vehicle.body->getBroadphaseHandle ();
-			break;
-		default:
-			proxy = NULL;
-			assert (0);
-			break;
+		proxy = self->body->getBroadphaseHandle ();
+		if (proxy != NULL)
+			proxy->m_collisionFilterGroup = mask;
 	}
-	if (proxy != NULL)
-		proxy->m_collisionFilterGroup = mask;
+	if (self->ghost != NULL)
+	{
+		proxy = self->ghost->getBroadphaseHandle ();
+		if (proxy != NULL)
+			proxy->m_collisionFilterGroup = mask;
+	}
 }
 
 /**
@@ -560,7 +374,7 @@ liphy_object_set_collision_group (liphyObject* self,
 int
 liphy_object_get_collision_mask (const liphyObject* self)
 {
-	return self->collision.mask;
+	return self->config.collision_mask;
 }
 
 /**
@@ -579,29 +393,36 @@ liphy_object_set_collision_mask (liphyObject* self,
 {
 	btBroadphaseProxy* proxy;
 
-	self->collision.mask = mask;
-	switch (self->control_mode)
+	self->config.collision_mask = mask;
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			proxy = NULL;
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			proxy = self->character.ghost->getBroadphaseHandle ();
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			proxy = self->rigid.body->getBroadphaseHandle ();
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			proxy = self->vehicle.body->getBroadphaseHandle ();
-			break;
-		default:
-			proxy = NULL;
-			assert (0);
-			break;
+		proxy = self->body->getBroadphaseHandle ();
+		if (proxy != NULL)
+			proxy->m_collisionFilterMask = mask;
 	}
-	if (proxy != NULL)
-		proxy->m_collisionFilterMask = mask;
+	if (self->ghost != NULL)
+	{
+		proxy = self->ghost->getBroadphaseHandle ();
+		if (proxy != NULL)
+			proxy->m_collisionFilterMask = mask;
+	}
+}
+
+/**
+ * \brief Sets the contact handler callback of the object.
+ *
+ * The contact callback, when not NULL, is called every time the object
+ * collides with something.
+ *
+ * \param self Object.
+ * \return Simulation mode.
+ */
+void
+liphy_object_set_contact_call (liphyObject*     self,
+                               liphyContactCall value)
+{
+	self->config.contact_call = value;
+	private_update_state (self);
 }
 
 /**
@@ -628,9 +449,9 @@ liphy_object_set_control_mode (liphyObject*     self,
 {
 	if (self->control_mode == value)
 		return;
-	private_mode_clear (self);
 	self->control_mode = value;
-	private_mode_enable (self);
+	self->flags |= PRIVATE_CHANGED_CONTROL_MODE;
+	private_update_state (self);
 }
 
 /**
@@ -657,29 +478,13 @@ liphy_object_get_gravity (const liphyObject* self,
 {
 	btVector3 gravity;
 
-	switch (self->control_mode)
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			gravity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			gravity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			gravity = self->rigid.body->getGravity ();
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			gravity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			gravity = self->vehicle.body->getGravity ();
-			break;
-		default:
-			gravity = btVector3 (0.0, 0.0, 0.0);
-			assert (0);
-			break;
+		gravity = self->body->getGravity ();
+		*value = limat_vector_init (gravity[0], gravity[1], gravity[2]);
 	}
-	*value = limat_vector_init (gravity[0], gravity[1], gravity[2]);
+	else
+		*value = limat_vector_init (0.0f, 0.0f, 0.0f);
 }
 
 /**
@@ -692,24 +497,8 @@ void
 liphy_object_set_gravity (const liphyObject* self,
                           const limatVector* value)
 {
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			self->rigid.body->setGravity (btVector3 (value->x, value->y, value->z));
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->setGravity (btVector3 (value->x, value->y, value->z));
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
+	if (self->body != NULL)
+		self->body->setGravity (btVector3 (value->x, value->y, value->z));
 }
 
 /**
@@ -725,9 +514,9 @@ liphy_object_get_ground (const liphyObject* self)
 {
 	if (self->control_mode != LIPHY_CONTROL_MODE_CHARACTER)
 		return 0;
-	if (self->character.controller == NULL)
+	if (self->character_controller == NULL)
 		return 0;
-	return self->character.controller->onGround ();
+	return self->character_controller->onGround ();
 }
 
 /**
@@ -741,7 +530,7 @@ liphy_object_get_inertia (liphyObject* self,
                           limatVector* result)
 {
 	if (self->shape != NULL)
-		liphy_shape_get_inertia (self->shape, self->mass, result);
+		liphy_shape_get_inertia (self->shape, self->config.mass, result);
 	else
 		*result = limat_vector_init (0.0f, 0.0f, 0.0f);
 }
@@ -755,7 +544,7 @@ liphy_object_get_inertia (liphyObject* self,
 float
 liphy_object_get_mass (const liphyObject* self)
 {
-	return self->mass;
+	return self->config.mass;
 }
 
 /**
@@ -778,25 +567,12 @@ liphy_object_set_mass (liphyObject* self,
 		inertia[1] = v.y;
 		inertia[2] = v.z;
 	}
-	switch (self->control_mode)
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			self->rigid.body->setMassProps (value, inertia);
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->setMassProps (value, inertia);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
+		if (self->control_mode != LIPHY_CONTROL_MODE_STATIC)
+			self->body->setMassProps (value, inertia);
 	}
-	self->mass = value;
+	self->config.mass = value;
 }
 
 /**
@@ -808,7 +584,7 @@ liphy_object_set_mass (liphyObject* self,
 float
 liphy_object_get_movement (const liphyObject* self)
 {
-	return self->movement;
+	return self->config.movement;
 }
 
 /**
@@ -823,12 +599,12 @@ liphy_object_set_movement (liphyObject* self,
 {
 	int i;
 
-	self->movement = value;
+	self->config.movement = value;
 	if (self->control_mode == LIPHY_CONTROL_MODE_VEHICLE)
 	{
-		for (i = 0 ; i < self->vehicle.vehicle->getNumWheels () ; i++)
+		for (i = 0 ; i < self->vehicle->getNumWheels () ; i++)
 		{
-			btWheelInfo& wheel = self->vehicle.vehicle->getWheelInfo (i);
+			btWheelInfo& wheel = self->vehicle->getWheelInfo (i);
 			wheel.m_engineForce = value;
 		}
 	}
@@ -843,7 +619,9 @@ liphy_object_set_movement (liphyObject* self,
 int
 liphy_object_get_realized (const liphyObject* self)
 {
-	return self->realized;
+	return (self->flags & PRIVATE_ADDED_BODY) ||
+	       (self->flags & PRIVATE_ADDED_GHOST) ||
+	       (self->flags & PRIVATE_ADDED_VEHICLE);
 }
 
 /**
@@ -857,66 +635,13 @@ int
 liphy_object_set_realized (liphyObject* self,
                            int          value)
 {
-	if (self->realized == value)
+	if ((value != 0) == ((self->flags & PRIVATE_REALIZED) != 0))
 		return 1;
 	if (value)
-	{
-		switch (self->control_mode)
-		{
-			case LIPHY_CONTROL_MODE_NONE:
-				break;
-			case LIPHY_CONTROL_MODE_CHARACTER:
-				if (self->character.ghost->getCollisionShape () != NULL)
-				{
-					self->physics->dynamics->addCollisionObject (self->character.ghost, self->collision.group, self->collision.mask);
-					self->character.controller = new liphyCharacterController (self,
-						(btConvexShape*) private_choose_shape (self, self->shape, self->shape_mode));
-					self->physics->dynamics->addAction (self->character.controller);
-				}
-				break;
-			case LIPHY_CONTROL_MODE_RIGID:
-				self->physics->dynamics->addRigidBody (self->rigid.body, self->collision.group, self->collision.mask);
-				break;
-			case LIPHY_CONTROL_MODE_STATIC:
-				self->physics->dynamics->addRigidBody (self->rigid.body, self->collision.group, self->collision.mask);
-				break;
-			case LIPHY_CONTROL_MODE_VEHICLE:
-				self->physics->dynamics->addVehicle (self->vehicle.vehicle);
-				break;
-			case LIPHY_CONTROL_MODE_MAX:
-				assert (0);
-				return 0;
-		}
-	}
+		self->flags |= PRIVATE_REALIZED;
 	else
-	{
-		switch (self->control_mode)
-		{
-			case LIPHY_CONTROL_MODE_NONE:
-				break;
-			case LIPHY_CONTROL_MODE_CHARACTER:
-				if (self->character.ghost != NULL)
-					self->physics->dynamics->removeCollisionObject (self->character.ghost);
-				if (self->character.controller != NULL)
-				{
-					self->physics->dynamics->removeAction (self->character.controller);
-					delete self->character.controller;
-					self->character.controller = NULL;
-				}
-				break;
-			case LIPHY_CONTROL_MODE_RIGID:
-			case LIPHY_CONTROL_MODE_STATIC:
-				self->physics->dynamics->removeRigidBody (self->rigid.body);
-				break;
-			case LIPHY_CONTROL_MODE_VEHICLE:
-				self->physics->dynamics->removeVehicle (self->vehicle.vehicle);
-				break;
-			case LIPHY_CONTROL_MODE_MAX:
-				assert (0);
-				return 0;
-		}
-	}
-	self->realized = value;
+		self->flags &= ~PRIVATE_REALIZED;
+	private_update_state (self);
 
 	return 1;
 }
@@ -931,23 +656,10 @@ void
 liphy_object_set_rotating (liphyObject* self,
                            float        value)
 {
-	switch (self->control_mode)
+	if (self->body)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			self->rigid.body->setAngularFactor (value);
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->setAngularFactor (value);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
+		if (self->control_mode != LIPHY_CONTROL_MODE_STATIC)
+			self->body->setAngularFactor (value);
 	}
 }
 
@@ -960,7 +672,7 @@ liphy_object_set_rotating (liphyObject* self,
 float
 liphy_object_get_speed (const liphyObject* self)
 {
-	return self->speed;
+	return self->config.speed;
 }
 
 /**
@@ -973,7 +685,7 @@ void
 liphy_object_set_speed (liphyObject* self,
                         float        value)
 {
-	self->speed = value;
+	self->config.speed = value;
 }
 
 /**
@@ -1000,101 +712,12 @@ liphy_object_set_shape (liphyObject*   self,
                         liphyShape*    shape,
                         liphyShapeMode mode)
 {
-	int added;
-	limatVector inertia;
-	btCollisionShape* btshape;
-
-	/* Choose collision shape. */
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_CHARACTER:
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			if (mode == LIPHY_SHAPE_MODE_CONCAVE)
-				mode = LIPHY_SHAPE_MODE_CONVEX;
-			break;
-		case LIPHY_CONTROL_MODE_NONE:
-		case LIPHY_CONTROL_MODE_STATIC:
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
-	btshape = private_choose_shape (self, shape, mode);
-
-	/* Apply the shape to the object. */
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			if (self->character.controller != NULL)
-			{
-				self->physics->dynamics->removeAction (self->character.controller);
-				delete self->character.controller;
-				self->character.controller = NULL;
-			}
-			if (btshape != NULL)
-			{
-				added = (self->character.ghost->getCollisionShape () != NULL);
-				self->character.ghost->setCollisionShape (btshape);
-				if (self->realized)
-				{
-					if (!added)
-					{
-						self->physics->dynamics->addCollisionObject (
-							self->character.ghost, self->collision.group, self->collision.mask);
-					}
-					self->character.controller = new liphyCharacterController (self,
-						(btConvexShape*) private_choose_shape (self, shape, mode));
-					self->physics->dynamics->addAction (self->character.controller);
-				}
-			}
-			else
-				self->character.ghost->setCollisionShape (NULL);
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			if (btshape != NULL)
-			{
-				liphy_shape_get_inertia (shape, self->mass, &inertia);
-				self->rigid.body->setCollisionShape (btshape);
-				self->rigid.body->setMassProps (self->mass, btVector3 (inertia.x, inertia.y, inertia.z));
-			}
-			else
-			{
-				self->rigid.body->setCollisionShape (NULL);
-				self->rigid.body->setMassProps (self->mass, btVector3 (0.0f, 0.0f, 0.0f));
-			}
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			if (self->realized)
-				self->physics->dynamics->removeRigidBody (self->rigid.body);
-			if (btshape != NULL)
-				self->rigid.body->setCollisionShape (btshape);
-			else
-				self->rigid.body->setCollisionShape (NULL);
-			if (self->realized)
-				self->physics->dynamics->addRigidBody (self->rigid.body, self->collision.group, self->collision.mask);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			if (btshape != NULL)
-			{
-				liphy_shape_get_inertia (shape, self->mass, &inertia);
-				self->vehicle.body->setCollisionShape (btshape);
-				self->vehicle.body->setMassProps (self->mass, btVector3 (inertia.x, inertia.y, inertia.z));
-			}
-			else
-			{
-				self->vehicle.body->setCollisionShape (NULL);
-				self->vehicle.body->setMassProps (self->mass, btVector3 (0.0f, 0.0f, 0.0f));
-			}
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
+	if (self->shape == shape && self->shape_mode == mode)
+		return;
 	self->shape = shape;
 	self->shape_mode = mode;
+	self->flags |= PRIVATE_CHANGED_SHAPE;
+	private_update_state (self);
 }
 
 /**
@@ -1164,32 +787,30 @@ liphy_object_set_transform (liphyObject*          self,
 	btTransform transform (rotation, origin);
 
 	self->motion->setWorldTransform (transform);
-	switch (self->control_mode)
+	if (self->flags & PRIVATE_ADDED_GHOST)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			self->character.ghost->setWorldTransform (transform);
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			self->rigid.body->setCenterOfMassTransform (transform);
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			if (self->realized)
-				self->physics->dynamics->removeRigidBody (self->rigid.body);
-			self->rigid.body->setCenterOfMassTransform (transform);
-			if (self->realized)
-				self->physics->dynamics->addRigidBody (self->rigid.body, self->collision.group, self->collision.mask);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->setCenterOfMassTransform (transform);
-			self->vehicle.vehicle->resetSuspension ();
-			for (i = 0 ; i < self->vehicle.vehicle->getNumWheels () ; i++)
-				self->vehicle.vehicle->updateWheelTransform (i, true);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
+		assert (self->ghost != NULL);
+		self->ghost->setWorldTransform (transform);
+	}
+	if (self->flags & PRIVATE_ADDED_BODY)
+	{
+		assert (self->body != NULL);
+		if (self->control_mode == LIPHY_CONTROL_MODE_STATIC)
+		{
+			self->physics->dynamics->removeRigidBody (self->body);
+			self->body->setCenterOfMassTransform (transform);
+			self->physics->dynamics->addRigidBody (self->body, self->config.collision_group, self->config.collision_mask);
+		}
+		else
+			self->body->setCenterOfMassTransform (transform);
+	}
+	if (self->flags & PRIVATE_ADDED_VEHICLE)
+	{
+		assert (self->vehicle != NULL);
+		self->body->setCenterOfMassTransform (transform);
+		self->vehicle->resetSuspension ();
+		for (i = 0 ; i < self->vehicle->getNumWheels () ; i++)
+			self->vehicle->updateWheelTransform (i, true);
 	}
 }
 
@@ -1202,8 +823,8 @@ liphy_object_set_transform (liphyObject*          self,
 liphyCallback
 liphy_object_get_usercall (liphyObject* self)
 {
-	if (self->controller != NULL)
-		return self->controller->call;
+	if (self->custom_controller != NULL)
+		return self->custom_controller->call;
 	return NULL;
 }
 
@@ -1220,17 +841,9 @@ void
 liphy_object_set_usercall (liphyObject*  self,
                            liphyCallback value)
 {
-	if (self->controller != NULL)
-	{
-		self->physics->dynamics->removeAction (self->controller);
-		delete self->controller;
-		self->controller = NULL;
-	}
-	if (value != NULL)
-	{
-		self->controller = new liphyCustomController (value, self);
-		self->physics->dynamics->addAction (self->controller);
-	}
+	self->config.custom_call = value;
+	self->flags |= PRIVATE_CHANGED_USERCALL;
+	private_update_state (self);
 }
 
 /**
@@ -1242,7 +855,7 @@ liphy_object_set_usercall (liphyObject*  self,
 void*
 liphy_object_get_userdata (liphyObject* self)
 {
-	return self->userdata;
+	return self->config.userdata;
 }
 
 /**
@@ -1255,8 +868,7 @@ void
 liphy_object_set_userdata (liphyObject* self,
                            void*        value)
 {
-	self->userdata = value;
-	private_update_userdata (self);
+	self->config.userdata = value;
 }
 
 /**
@@ -1269,31 +881,7 @@ void
 liphy_object_get_velocity (liphyObject* self,
                            limatVector* value)
 {
-	btVector3 velocity;
-
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			velocity = btVector3 (0.0, 0.0, 0.0);
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			*value = self->character.velocity;
-			return;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			velocity = self->rigid.body->getLinearVelocity ();
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			velocity = self->vehicle.body->getLinearVelocity ();
-			break;
-		default:
-			velocity = btVector3 (0.0, 0.0, 0.0);
-			assert (0);
-			break;
-	}
-	value->x = velocity[0];
-	value->y = velocity[1];
-	value->z = velocity[2];
+	*value = self->config.velocity;
 }
 
 /**
@@ -1308,24 +896,9 @@ liphy_object_set_velocity (liphyObject*       self,
 {
 	btVector3 velocity (value->x, value->y, value->z);
 
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			self->character.velocity = *value;
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			self->rigid.body->setLinearVelocity (velocity);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			self->vehicle.body->setLinearVelocity (velocity);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
+	self->config.velocity = *value;
+	if (self->body != NULL)
+		self->body->setLinearVelocity (velocity);
 }
 
 /*****************************************************************************/
@@ -1384,121 +957,6 @@ private_choose_shape (const liphyObject* self,
 	return btshape;
 }
 
-static void
-private_mode_clear (liphyObject* self)
-{
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			if (self->realized)
-			{
-				self->physics->dynamics->removeCollisionObject (self->character.ghost);
-				if (self->character.controller != NULL)
-					self->physics->dynamics->removeAction (self->character.controller);
-			}
-			delete self->character.ghost;
-			delete self->character.controller;
-			self->character.ghost = NULL;
-			self->character.controller = NULL;
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			if (self->realized)
-				self->physics->dynamics->removeRigidBody (self->rigid.body);
-			delete self->rigid.body;
-			self->rigid.body = NULL;
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			/* FIXME */
-			if (self->realized)
-				self->physics->dynamics->removeVehicle (self->vehicle.vehicle);
-			delete self->vehicle.body;
-			delete self->vehicle.vehicle;
-			delete self->vehicle.caster;
-			delete self->vehicle.tuning;
-			self->vehicle.vehicle = NULL;
-			self->vehicle.caster = NULL;
-			self->vehicle.tuning = NULL;
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
-}
-
-static void
-private_mode_enable (liphyObject* self)
-{
-	limatVector v;
-	btCollisionShape* shape;
-
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			break;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			shape = private_choose_shape (self, self->shape, self->shape_mode);
-			self->character.step = 0.35;
-			self->character.ghost = new btPairCachingGhostObject ();
-			self->character.ghost->setWorldTransform (self->motion->current);
-			self->character.ghost->setCollisionFlags (btCollisionObject::CF_CHARACTER_OBJECT);
-			self->character.ghost->setCollisionShape (shape);
-			self->character.controller = NULL;
-			if (self->realized)
-			{
-				self->physics->dynamics->addCollisionObject (self->character.ghost, self->collision.group, self->collision.mask);
-				if (shape != NULL)
-				{
-					self->character.controller = new liphyCharacterController (self,
-						(btConvexShape*) private_choose_shape (self, self->shape, self->shape_mode));
-					self->physics->dynamics->addAction (self->character.controller);
-				}
-			}
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			liphy_object_get_inertia (self, &v);
-			self->rigid.body = new btRigidBody (self->mass, self->motion, NULL, btVector3 (v.x, v.y, v.z));
-			if (self->realized)
-				self->physics->dynamics->addRigidBody (self->rigid.body, self->collision.group, self->collision.mask);
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			self->rigid.body = new btRigidBody (0.0, self->motion, NULL, btVector3 (0.0, 0.0, 0.0));
-			if (self->realized)
-				self->physics->dynamics->addRigidBody (self->rigid.body, self->collision.group, self->collision.mask);
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			liphy_object_get_inertia (self, &v);
-			self->vehicle.body = new btRigidBody (self->mass, self->motion, NULL, btVector3 (v.x, v.y, v.z));
-			self->vehicle.body->setActivationState (DISABLE_DEACTIVATION);
-			self->vehicle.tuning = new btRaycastVehicle::btVehicleTuning ();
-			self->vehicle.caster = new btDefaultVehicleRaycaster (self->physics->dynamics);
-			self->vehicle.vehicle = new btRaycastVehicle (*self->vehicle.tuning, self->vehicle.body, self->vehicle.caster);
-			self->vehicle.vehicle->setCoordinateSystem (0, 1, 2);
-#if 0
-			/* FIXME! */
-			limatVector a0 = { -1.0f, 0.0f, 0.0f };
-			limatVector a1 = { 1.0f, 0.0f, 0.0f };
-			limatVector p0 = { -2.0f, 0.0f, -2.0f };
-			limatVector p1 = { 2.0f, 0.0f, -2.0f };
-			limatVector p2 = { -2.0f, 0.0f, 2.0f };
-			limatVector p3 = { 2.0f, 0.0f, 2.0f };
-			liphy_object_insert_wheel (self, &p0, &a0, 0.5f, 0.6f, 0);
-			liphy_object_insert_wheel (self, &p1, &a1, 0.5f, 0.6f, 0);
-			liphy_object_insert_wheel (self, &p2, &a0, 0.5f, 0.6f, 1);
-			liphy_object_insert_wheel (self, &p3, &a1, 0.5f, 0.6f, 1);
-#endif
-			if (self->realized)
-				self->physics->dynamics->addVehicle (self->vehicle.vehicle);
-			break;
-		case LIPHY_CONTROL_MODE_MAX:
-			assert (0);
-			return;
-	}
-	private_update_userdata (self);
-}
-
 static int
 private_sweep_sphere (const liphyObject* self,
                       btConvexShape*     shape,
@@ -1512,25 +970,12 @@ private_sweep_sphere (const liphyObject* self,
 	btCollisionWorld* collision;
 
 	/* Get own object. */
-	switch (self->control_mode)
-	{
-		case LIPHY_CONTROL_MODE_NONE:
-			return 1.0f;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			object = self->character.ghost;
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			object = self->rigid.body;
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			object = self->vehicle.body;
-			break;
-		default:
-			assert (0);
-			object = NULL;
-			break;
-	}
+	if (self->body != NULL)
+		object = self->body;
+	else if (self->ghost != NULL)
+		object = self->ghost;
+	else
+		return 0;
 	if (self->shape == NULL)
 		return 0;
 
@@ -1572,30 +1017,18 @@ private_sweep_shape (const liphyObject* self,
 	btConvexShape* shape;
 
 	/* Get own object. */
-	switch (self->control_mode)
+	if (self->body != NULL)
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			return 1.0f;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			object = self->character.ghost;
-			proxy = self->character.ghost->getBroadphaseHandle ();
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-			object = self->rigid.body;
-			proxy = self->rigid.body->getBroadphaseHandle ();
-			break;
-		case LIPHY_CONTROL_MODE_STATIC:
-			return 0.0f;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			object = self->vehicle.body;
-			proxy = self->vehicle.body->getBroadphaseHandle ();
-			break;
-		default:
-			assert (0);
-			object = NULL;
-			proxy = NULL;
-			break;
+		object = self->body;
+		proxy = self->body->getBroadphaseHandle ();
 	}
+	else if (self->ghost != NULL)
+	{
+		object = self->ghost;
+		proxy = self->ghost->getBroadphaseHandle ();
+	}
+	else
+		return 1.0f;
 	if (proxy == NULL)
 		return 1.0f;
 	if (self->shape == NULL)
@@ -1624,30 +1057,196 @@ private_sweep_shape (const liphyObject* self,
 }
 
 static void
-private_update_userdata (liphyObject* self)
+private_update_state (liphyObject* self)
 {
-	btCollisionObject* object;
+	limatVector v;
+	btCollisionShape* shape;
 
-	switch (self->control_mode)
+	if (self->control_mode != LIPHY_CONTROL_MODE_STATIC && self->shape_mode == LIPHY_SHAPE_MODE_CONCAVE)
+		shape = private_choose_shape (self, self->shape, LIPHY_SHAPE_MODE_CONVEX);
+	else
+		shape = private_choose_shape (self, self->shape, self->shape_mode);
+
+	/* Remove invalid components. */
+	if ((self->flags & PRIVATE_CHANGED_CONTROL_MODE) ||
+	    (self->flags & PRIVATE_CHANGED_SHAPE) ||
+	    (self->flags & PRIVATE_CHANGED_USERCALL) ||
+	   !(self->flags & PRIVATE_REALIZED) || !(self->shape != NULL))
 	{
-		case LIPHY_CONTROL_MODE_NONE:
-			return;
-		case LIPHY_CONTROL_MODE_CHARACTER:
-			object = self->character.ghost;
-			break;
-		case LIPHY_CONTROL_MODE_RIGID:
-		case LIPHY_CONTROL_MODE_STATIC:
-			object = self->rigid.body;
-			break;
-		case LIPHY_CONTROL_MODE_VEHICLE:
-			object = self->vehicle.body;
-			break;
-		default:
-			assert (0);
-			return;
+		self->flags &= ~(PRIVATE_CHANGED_CONTROL_MODE | PRIVATE_CHANGED_SHAPE | PRIVATE_CHANGED_USERCALL);
+		if (self->flags & PRIVATE_ADDED_GHOST)
+		{
+			assert (self->ghost != NULL);
+			self->physics->dynamics->removeCollisionObject (self->ghost);
+			delete self->ghost;
+			self->ghost = NULL;
+			self->flags &= ~PRIVATE_ADDED_GHOST;
+			PRIVATE_DEBUG_STATE (self, "ghost removed");
+		}
+		if (self->flags & PRIVATE_ADDED_CHARACTER_CONTROLLER)
+		{
+			assert (self->character_controller != NULL);
+			self->physics->dynamics->removeAction (self->character_controller);
+			delete self->character_controller;
+			self->character_controller = NULL;
+			self->flags &= ~PRIVATE_ADDED_CHARACTER_CONTROLLER;
+			PRIVATE_DEBUG_STATE (self, "character controller removed");
+		}
+		if (self->flags & PRIVATE_ADDED_CONTACT_CONTROLLER)
+		{
+			assert (self->contact_controller != NULL);
+			self->physics->dynamics->removeAction (self->contact_controller);
+			delete self->contact_controller;
+			self->contact_controller = NULL;
+			self->flags &= ~PRIVATE_ADDED_CONTACT_CONTROLLER;
+			PRIVATE_DEBUG_STATE (self, "contact controller removed");
+		}
+		if (self->flags & PRIVATE_ADDED_CUSTOM_CONTROLLER)
+		{
+			assert (self->custom_controller != NULL);
+			self->physics->dynamics->removeAction (self->custom_controller);
+			delete self->custom_controller;
+			self->custom_controller = NULL;
+			self->flags &= ~PRIVATE_ADDED_CUSTOM_CONTROLLER;
+			PRIVATE_DEBUG_STATE (self, "custom controller removed");
+		}
+		if (self->flags & PRIVATE_ADDED_BODY)
+		{
+			assert (self->body != NULL);
+			self->physics->dynamics->removeRigidBody (self->body);
+			delete self->body;
+			self->body = NULL;
+			self->flags &= ~PRIVATE_ADDED_BODY;
+			PRIVATE_DEBUG_STATE (self, "body removed");
+		}
+		if (self->flags & PRIVATE_ADDED_VEHICLE)
+		{
+			assert (self->vehicle != NULL);
+			self->physics->dynamics->removeVehicle (self->vehicle);
+			delete self->body;
+			delete self->vehicle;
+			delete self->vehicle_tuning;
+			delete self->vehicle_caster;
+			self->body = NULL;
+			self->vehicle = NULL;
+			self->vehicle_tuning = NULL;
+			self->vehicle_caster = NULL;
+			self->flags &= ~PRIVATE_ADDED_VEHICLE;
+			PRIVATE_DEBUG_STATE (self, "vehicle removed");
+		}
 	}
-	if (object != NULL)
-		object->setUserPointer (self->userdata);
+
+	/* Create required components. */
+	if ((self->flags & PRIVATE_REALIZED) && (self->shape != NULL))
+	{
+		if (!(self->flags & PRIVATE_ADDED_GHOST))
+		{
+			assert (self->ghost == NULL);
+			if (self->config.contact_call != NULL || self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
+			{
+				self->ghost = new btPairCachingGhostObject ();
+				self->ghost->setUserPointer (self);
+				self->ghost->setWorldTransform (self->motion->current);
+				self->ghost->setCollisionShape (shape);
+				self->physics->dynamics->addCollisionObject (self->ghost, self->config.collision_group, self->config.collision_mask);
+				self->flags |= PRIVATE_ADDED_GHOST;
+				PRIVATE_DEBUG_STATE (self, "ghost added");
+			}
+		}
+		if (!(self->flags & PRIVATE_ADDED_CUSTOM_CONTROLLER))
+		{
+			assert (self->custom_controller == NULL);
+			if (self->config.custom_call != NULL)
+			{
+				self->custom_controller = new liphyCustomController (self->config.custom_call, self);
+				self->physics->dynamics->addAction (self->custom_controller);
+				self->flags |= PRIVATE_ADDED_CUSTOM_CONTROLLER;
+				PRIVATE_DEBUG_STATE (self, "custom controller added");
+			}
+		}
+		if (!(self->flags & PRIVATE_ADDED_CONTACT_CONTROLLER))
+		{
+			assert (self->contact_controller == NULL);
+			if (self->config.contact_call != NULL)
+			{
+				assert (self->ghost != NULL);
+				self->contact_controller = new liphyContactController (self);
+				self->physics->dynamics->addAction (self->contact_controller);
+				self->flags |= PRIVATE_ADDED_CONTACT_CONTROLLER;
+				PRIVATE_DEBUG_STATE (self, "contact controller added");
+			}
+		}
+		if (!(self->flags & PRIVATE_ADDED_CHARACTER_CONTROLLER))
+		{
+			assert (self->character_controller == NULL);
+			if (self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
+			{
+				self->character_controller = new liphyCharacterController (self, (btConvexShape*) shape);
+				self->physics->dynamics->addAction (self->character_controller);
+				self->flags |= PRIVATE_ADDED_CHARACTER_CONTROLLER;
+				PRIVATE_DEBUG_STATE (self, "character controller added");
+			}
+		}
+		if (!(self->flags & PRIVATE_ADDED_BODY))
+		{
+			if (self->control_mode == LIPHY_CONTROL_MODE_STATIC)
+			{
+				assert (self->body == NULL);
+				self->body = new btRigidBody (0.0, self->motion, shape, btVector3 (0.0, 0.0, 0.0));
+				self->body->setUserPointer (self);
+				self->physics->dynamics->addRigidBody (self->body, self->config.collision_group, self->config.collision_mask);
+				self->flags |= PRIVATE_ADDED_BODY;
+				PRIVATE_DEBUG_STATE (self, "static body added");
+			}
+			else if (self->control_mode == LIPHY_CONTROL_MODE_RIGID)
+			{
+				btVector3 angular (self->config.angular.x, self->config.angular.y, self->config.angular.z);
+				btVector3 velocity (self->config.velocity.x, self->config.velocity.y, self->config.velocity.z);
+				assert (self->body == NULL);
+				liphy_object_get_inertia (self, &v);
+				self->body = new btRigidBody (self->config.mass, self->motion, shape, btVector3 (v.x, v.y, v.z));
+				self->body->setUserPointer (self);
+				self->body->setLinearVelocity (velocity);
+				self->body->setAngularVelocity (angular);
+				self->body->setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);
+				self->physics->dynamics->addRigidBody (self->body, self->config.collision_group, self->config.collision_mask);
+				self->flags |= PRIVATE_ADDED_BODY;
+				PRIVATE_DEBUG_STATE (self, "rigid body added");
+			}
+		}
+		if (!(self->flags & PRIVATE_ADDED_VEHICLE))
+		{
+			if (self->control_mode == LIPHY_CONTROL_MODE_VEHICLE)
+			{
+				btVector3 angular (self->config.angular.x, self->config.angular.y, self->config.angular.z);
+				btVector3 velocity (self->config.velocity.x, self->config.velocity.y, self->config.velocity.z);
+				assert (self->body == NULL);
+				liphy_object_get_inertia (self, &v);
+				self->body = new btRigidBody (self->config.mass, self->motion, shape, btVector3 (v.x, v.y, v.z));
+				self->body->setUserPointer (self);
+				self->body->setLinearVelocity (velocity);
+				self->body->setAngularVelocity (angular);
+				self->body->setActivationState (DISABLE_DEACTIVATION);
+				self->body->setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);
+				self->vehicle_tuning = new btRaycastVehicle::btVehicleTuning ();
+				self->vehicle_caster = new btDefaultVehicleRaycaster (self->physics->dynamics);
+				self->vehicle = new btRaycastVehicle (*self->vehicle_tuning, self->body, self->vehicle_caster);
+				self->vehicle->setCoordinateSystem (0, 1, 2);
+				self->physics->dynamics->addVehicle (self->vehicle);
+				self->flags |= PRIVATE_ADDED_VEHICLE;
+				PRIVATE_DEBUG_STATE (self, "vehicle added");
+			}
+		}
+	}
+
+	/* Set ghost collision mode. */
+	if (self->flags & PRIVATE_ADDED_GHOST)
+	{
+		if (self->flags & PRIVATE_ADDED_CHARACTER_CONTROLLER)
+			self->ghost->setCollisionFlags (btCollisionObject::CF_CHARACTER_OBJECT);
+		else
+			self->ghost->setCollisionFlags (btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
 }
 
 /** @} */

@@ -154,13 +154,38 @@ liphy_physics_update (liphyPhysics* self,
  * The callback will be called every time an object is moved.
  *
  * \param self Physics simulation.
- * \param func Transformation callback function.
+ * \param value Transformation callback function.
  */
 void
 liphy_physics_set_transform_callback (liphyPhysics*      self,
-                                      liphyTransformFunc func)
+                                      liphyTransformCall value)
 {
-	self->callbacks.transform = func;
+	self->transform_callback = value;
+}
+
+/**
+ * \brief Gets the userdata of the physics engine.
+ *
+ * \param self Physics simulation.
+ * \return Userdata.
+ */
+void*
+liphy_physics_get_userdata (liphyPhysics* self)
+{
+	return self->userdata;
+}
+
+/**
+ * \brief Sets the userdata of the physics engine.
+ *
+ * \param self Physics simulation.
+ * \param data Userdata.
+ */
+void
+liphy_physics_set_userdata (liphyPhysics* self,
+                            void*         data)
+{
+	self->userdata = data;
 }
 
 /*****************************************************************************/
@@ -169,21 +194,6 @@ static void
 private_internal_tick (btDynamicsWorld* dynamics,
                        btScalar         step)
 {
-#if 0
-	lialgList* ptr;
-	liphyObject* object;
-	liphyPhysics* self = (liphyPhysics*) dynamics->getWorldUserInfo ();
-
-	for (ptr = self->controllers ; ptr != NULL ; ptr = ptr->next)
-	{
-		object = (liphyObject*) ptr->data;
-		assert (object->control.call0 != NULL || object->control.call1 != NULL);
-		if (object->control.call0 != NULL)
-			object->control.call0 (object, step);
-		if (object->control.call1 != NULL)
-			object->control.call1 (object, step);
-	}
-#endif
 }
 
 /** @} */

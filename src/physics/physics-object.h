@@ -51,10 +51,6 @@ void
 liphy_object_jump (liphyObject*       self,
                    const limatVector* impulse);
 
-int
-liphy_object_read (liphyObject* self,
-                   liReader*    reader);
-
 liphyObject*
 liphy_object_scan_sphere (liphyObject*       self,
                           const limatVector* relctr,
@@ -71,17 +67,13 @@ liphy_object_sweep_sphere (liphyObject*       self,
                            float              radius,
                            liphyCollision*    result);
 
-int
-liphy_object_write (liphyObject* self,
-                    liarcWriter* writer);
+void
+liphy_object_get_angular (const liphyObject* self,
+                          limatVector*       value);
 
 void
-liphy_object_get_angular_momentum (const liphyObject* self,
-                                   limatVector*       value);
-
-void
-liphy_object_set_angular_momentum (liphyObject*       self,
-                                   const limatVector* value);
+liphy_object_set_angular (liphyObject*       self,
+                          const limatVector* value);
 
 int
 liphy_object_get_collision_group (const liphyObject* self);
@@ -96,6 +88,10 @@ liphy_object_get_collision_mask (const liphyObject* self);
 void
 liphy_object_set_collision_mask (liphyObject* self,
                                  int          mask);
+
+void
+liphy_object_set_contact_call (liphyObject*     self,
+                               liphyContactCall value);
 
 liphyControlMode
 liphy_object_get_control_mode (const liphyObject* self);
