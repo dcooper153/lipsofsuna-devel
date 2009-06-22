@@ -159,6 +159,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SQLITE_CFLAGS = @SQLITE_CFLAGS@
 SQLITE_LIBS = @SQLITE_LIBS@
+SQUISH_CFLAGS = @SQUISH_CFLAGS@
+SQUISH_LIBS = @SQUISH_LIBS@
 STRIP = @STRIP@
 TOOLDIR = @TOOLDIR@
 VERSION = @VERSION@
@@ -212,6 +214,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
@@ -246,9 +249,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/server/script/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/server/script/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/server/script/Makefile
+	  $(AUTOMAKE) --foreign  src/server/script/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

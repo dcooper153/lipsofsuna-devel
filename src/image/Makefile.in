@@ -50,7 +50,8 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-liblipsimage_la_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+liblipsimage_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_liblipsimage_la_OBJECTS = image.lo image-compress.lo \
 	image-texture.lo
 liblipsimage_la_OBJECTS = $(am_liblipsimage_la_OBJECTS)
@@ -168,6 +169,8 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SQLITE_CFLAGS = @SQLITE_CFLAGS@
 SQLITE_LIBS = @SQLITE_LIBS@
+SQUISH_CFLAGS = @SQUISH_CFLAGS@
+SQUISH_LIBS = @SQUISH_LIBS@
 STRIP = @STRIP@
 TOOLDIR = @TOOLDIR@
 VERSION = @VERSION@
@@ -221,13 +224,15 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -I$(srcdir)/.. -I$(srcdir)/../../dep/build/include
-AM_CFLAGS = $(LIPS_CFLAGS) $(SDL_CFLAGS) $(OPENGL_CFLAGS)
+INCLUDES = -I$(srcdir)/..
+AM_CFLAGS = $(LIPS_CFLAGS) $(SDL_CFLAGS) $(OPENGL_CFLAGS) $(SQUISH_CFLAGS)
+AM_CXXFLAGS = $(LIPS_CFLAGS) $(SDL_CFLAGS) $(OPENGL_CFLAGS) $(SQUISH_CFLAGS)
 lib_LTLIBRARIES = \
 	liblipsimage.la
 
@@ -241,9 +246,7 @@ liblipsimage_la_SOURCES = \
 	image-texture.h \
 	lips-image.h
 
-liblipsimage_la_LIBADD = \
-	-L$(srcdir)/../../dep/build/lib -lsquish
-
+liblipsimage_la_LIBADD = $(SQUISH_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -257,9 +260,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/image/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  src/image/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/image/Makefile
+	  $(AUTOMAKE) --foreign  src/image/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

@@ -113,22 +113,6 @@ CS_CHECK_HOST
 # Nothing yet.
 
 #----------------------------------------------------------------------------
-# Check for GLUT.
-#----------------------------------------------------------------------------
-AS_IF([test $cs_host_family = windows],
-    [# Tack the GLUT that comes with bullet onto compiler & linker flags.
-    _AC_SRCDIRS(["."])
-    glut_cflags="-I$ac_top_srcdir/Glut"
-    glut_lflags="-L$ac_top_srcdir/Glut"
-    CFLAGS="$CFLAGS $glut_cflags"
-    LDFLAGS="$LDFLAGS $glut_lflags"
-    CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$glut_cflags], [+])
-    CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$glut_lflags], [+])
-    ])
-CS_CHECK_GLUT
-
-
-#----------------------------------------------------------------------------
 # Package configuration switches.
 #----------------------------------------------------------------------------
 AC_ARG_ENABLE([multithreaded],

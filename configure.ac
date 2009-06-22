@@ -44,19 +44,27 @@ fi
 dnl Built-in dependencies.
 if test "$want_deps" = yes; then
 	MAYBE_DEP="dep"
-	LIPS_CFLAGS="$LIPS_CFLAGS -I$PWD/dep/build/include"
-	BULLET_CFLAGS="-I$PWD/dep/build/include/bullet"
-	BULLET_LIBS="-L$PWD/dep/build/lib -lbulletdynamics -lbulletcollision -lbulletmath"
-	GRAPPLE_CFLAGS=""
-	GRAPPLE_LIBS="-L$PWD/dep/build/lib -lgrapple -lcrypt -lpthread"
-	LUA_CFLAGS="-I$PWD/dep/build/include/lua"
-	LUA_LIBS="-L$PWD/dep/build/lib -llua5.1"
-	SQLITE_CFLAGS="-I$PWD/dep/build/include/sqlite"
-	SQLITE_LIBS="-L$PWD/dep/build/lib -lsqlite3"
+	BULLET_CFLAGS="-I\$(top_srcdir)/dep/bullet/src"
+	BULLET_LIBS="\$(top_builddir)/dep/bullet/src/libbulletdynamics.la \$(top_builddir)/dep/bullet/src/libbulletcollision.la \$(top_builddir)/dep/bullet/src/libbulletmath.la"
+	GRAPPLE_CFLAGS="-I\$(top_srcdir)/dep/libgrapple/src"
+	GRAPPLE_LIBS="\$(top_builddir)/dep/libgrapple/src/libgrapple.la"
+	LUA_CFLAGS="-I\$(top_srcdir)/dep/lua/src"
+	LUA_LIBS="\$(top_builddir)/dep/lua/liblua5.1.la"
+	SQUISH_CFLAGS="-I\$(top_srcdir)/dep/libsquish"
+	SQUISH_LIBS="\$(top_builddir)/dep/libsquish/libsquish.la"
+	SQLITE_CFLAGS="-I\$(top_srcdir)/dep/sqlite"
+	SQLITE_LIBS="\$(top_builddir)/dep/sqlite/libsqlite3.la"
+	AC_CONFIG_SUBDIRS(dep/bullet)
+	AC_CONFIG_SUBDIRS(dep/libgrapple)
+	AC_CONFIG_SUBDIRS(dep/libsquish)
+	AC_CONFIG_SUBDIRS(dep/lua)
+	AC_CONFIG_SUBDIRS(dep/sqlite)
 else
 	MAYBE_DEP=
 	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
 	PKG_CHECK_MODULES([SQLITE], [sqlite3 >= 3.6.0])
+	SQUISH_CFLAGS=""
+	SQUISH_LIBS="-lsquish"
 	GRAPPLE_CFLAGS=""
 	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
 	if test "$want_luatest" = yes; then
@@ -146,6 +154,8 @@ AC_SUBST([OPENGL_CFLAGS])
 AC_SUBST([OPENGL_LIBS])
 AC_SUBST([SQLITE_CFLAGS])
 AC_SUBST([SQLITE_LIBS])
+AC_SUBST([SQUISH_CFLAGS])
+AC_SUBST([SQUISH_LIBS])
 AC_SUBST([VORBIS_LIBS])
 AC_SUBST([VORBIS_CFLAGS])
 AC_SUBST([MAYBE_CLIENT])
