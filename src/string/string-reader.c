@@ -22,14 +22,21 @@
  * @{
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
-#include <zlib.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
 #include "string-reader.h"
 
 /**
@@ -52,7 +59,7 @@ li_reader_new (const char* buffer,
 		return NULL;
 	}
 	self->pos = 0;
-	self->mmap = 0;
+	self->mmap = NULL;
 	self->length = length;
 	self->buffer = buffer;
 
@@ -68,8 +75,6 @@ li_reader_new (const char* buffer,
 liReader*
 li_reader_new_from_file (const char* path)
 {
-	int fd;
-	struct stat st;
 	liReader* self;
 
 	/* Allocate self. */
@@ -80,41 +85,16 @@ li_reader_new_from_file (const char* path)
 		return NULL;
 	}
 	self->pos = 0;
-	self->mmap = 1;
-
-	/* Open the file. */
-	fd = open (path, O_RDONLY);
-	if (fd == -1)
-	{
-		lisys_error_set (EIO, "cannot open `%s'", path);
-		free (self);
-		return NULL;
-	}
-	if (fstat (fd, &st) == -1)
-	{
-		lisys_error_set (EIO, "cannot stat `%s'", path);
-		close (fd);
-		free (self);
-		return NULL;
-	}
 
 	/* Memory map the file. */
-	/* Note: Mapping an empty file is an error. */
-	self->length = st.st_size;
-	if (st.st_size)
+	self->mmap = lisys_mmap_open (path);
+	if (self->mmap == NULL)
 	{
-		self->buffer = mmap (NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-		if (self->buffer == MAP_FAILED)
-		{
-			lisys_error_set (EIO, "cannot mmap `%s'", path);
-			close (fd);
-			free (self);
-			return NULL;
-		}
+		free (self);
+		return NULL;
 	}
-	else
-		self->mmap = 0;
-	close (fd);
+	self->length = lisys_mmap_get_size (self->mmap);
+	self->buffer = lisys_mmap_get_buffer (self->mmap);
 
 	return self;
 }
@@ -136,7 +116,7 @@ liReader* li_reader_new_from_string (const char* buffer)
 		return NULL;
 	}
 	self->pos = 0;
-	self->mmap = 0;
+	self->mmap = NULL;
 	self->length = strlen (buffer) + 1;
 	self->buffer = buffer;
 	return self;
@@ -149,8 +129,8 @@ liReader* li_reader_new_from_string (const char* buffer)
  */
 void li_reader_free (liReader* self)
 {
-	if (self->mmap)
-		munmap ((void*) self->buffer, self->length);
+	if (self->mmap != NULL)
+		lisys_mmap_free (self->mmap);
 	free (self);
 }
 
@@ -369,76 +349,6 @@ li_reader_get_char (liReader* self,
 	/* Read the value. */
 	*value = ((char*)(self->buffer + self->pos))[0];
 	self->pos++;
-	return 1;
-}
-
-/**
- * \brief Reads compressed data.
- *
- * Reads a sequence of compressed data.
- *
- * The returned buffer must be freed manually with free.
- *
- * \param self Stream reader.
- * \param value Return location for the uncompressed data.
- * \param length Return location for the length of the data.
- * \return Nonzero on success.
- */
-int
-li_reader_get_compressed (liReader* self,
-                          char**    value,
-                          int*      length)
-{
-	int tmp;
-	char* buf;
-	uLongf zlen;
-	uint32_t extrlen;
-	uint32_t complen;
-
-	/* Read lengths. */
-	if (!li_reader_get_uint32 (self, &extrlen) ||
-	    !li_reader_get_uint32 (self, &complen))
-	{
-		lisys_error_set (EINVAL, "unexpected end of stream");
-		return 0;
-	}
-	if ((uint32_t) self->length < self->pos + complen)
-	{
-		lisys_error_set (EINVAL, "unexpected end of stream");
-		return 0;
-	}
-
-	/* Allocate buffer. */
-	buf = malloc (extrlen);
-	if (buf == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		return 0;
-	}
-
-	/* Uncompress data. */
-	zlen = extrlen;
-	tmp = uncompress ((Bytef*) buf, &zlen, (Bytef*)(self->buffer + self->pos), complen);
-	if (tmp != Z_OK)
-	{
-		if (tmp == Z_MEM_ERROR)
-			lisys_error_set (ENOMEM, NULL);
-		else
-			lisys_error_set (EINVAL, "cannot uncompress block");
-		free (buf);
-		return 0;
-	}
-	if (zlen != extrlen)
-	{
-		lisys_error_set (EINVAL, "cannot uncompress block");
-		free (buf);
-		return 0;
-	}
-	self->pos += complen;
-
-	/* Return buffer. */
-	*value = buf;
-	*length = zlen;
 	return 1;
 }
 

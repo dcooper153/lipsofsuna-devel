@@ -35,6 +35,12 @@
 #include <inttypes.h>
 #endif
 
+uint16_t
+lisys_htons (uint16_t value);
+
+uint32_t
+lisys_htonl (uint32_t value);
+
 #endif
 
 /** @} */

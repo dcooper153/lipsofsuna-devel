@@ -11,6 +11,5 @@ liblipsstring_la_SOURCES = \
 	string-parser.h \
 	string-parser.c \
 	string-reader.c \
-	string-reader.h \
-	string-regex.h
+	string-reader.h
 

@@ -1,5 +1,5 @@
 INCLUDES = -I$(srcdir)/..
-AM_CFLAGS = $(LIPS_CFLAGS)
+AM_CFLAGS = $(LIPS_CFLAGS) $(ZLIB_CFLAGS)
 
 lib_LTLIBRARIES = \
 	liblipsarchive.la

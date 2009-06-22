@@ -24,7 +24,7 @@
 
 #ifndef LIENG_DISABLE_GRAPHICS
 
-#include <dlfcn.h>
+#include <system/lips-system.h>
 #include "engine-render.h"
 
 liengRender*
@@ -41,9 +41,8 @@ lieng_render_new (const char* dir)
 	}
 
 	/* Resolve symbols. */
-	void* prog = dlopen (NULL, RTLD_NOW);
 #define SYM(a) \
-	self->a = dlsym (prog, #a); \
+	self->a = lisys_module_global_symbol ("lipsrender", #a); \
 	if (self->a == NULL) \
 	{ \
 		lisys_error_set (ENOENT, "cannot find symbol `%s'", #a); \

@@ -34,8 +34,8 @@ limdl_light_read (limdlNode* self,
 
 	if (!li_reader_get_uint32 (reader, &tmp) ||
 	    !li_reader_get_float (reader, &light->projection.fov) ||
-	    !li_reader_get_float (reader, &light->projection.near) ||
-	    !li_reader_get_float (reader, &light->projection.far) ||
+	    !li_reader_get_float (reader, &light->projection.nearz) ||
+	    !li_reader_get_float (reader, &light->projection.farz) ||
 	    !li_reader_get_float (reader, light->color + 0) ||
 	    !li_reader_get_float (reader, light->color + 1) ||
 	    !li_reader_get_float (reader, light->color + 2) ||
@@ -58,8 +58,8 @@ limdl_light_write (const limdlNode* self,
 
 	liarc_writer_append_uint32 (writer, light->flags);
 	liarc_writer_append_float (writer, light->projection.fov);
-	liarc_writer_append_float (writer, light->projection.near);
-	liarc_writer_append_float (writer, light->projection.far);
+	liarc_writer_append_float (writer, light->projection.nearz);
+	liarc_writer_append_float (writer, light->projection.farz);
 	liarc_writer_append_float (writer, light->color[0]);
 	liarc_writer_append_float (writer, light->color[1]);
 	liarc_writer_append_float (writer, light->color[2]);
@@ -85,8 +85,8 @@ limdl_light_get_projection (const limdlNode* self,
 {
 	*value = limat_matrix_perspective (
 		self->light.projection.fov, 1.0f,
-		self->light.projection.near,
-		self->light.projection.far);
+		self->light.projection.nearz,
+		self->light.projection.farz);
 }
 
 /** @} */

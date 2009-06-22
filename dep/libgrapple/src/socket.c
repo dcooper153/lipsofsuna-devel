@@ -142,6 +142,15 @@ static int inet_pton(int af, const char *src, void *dst)
 }
 #endif
 
+#if defined WIN32 && defined HAVE_WINSOCK2_H
+static long enumEvent(SOCKET s,WSAEVENT hEventObject)
+{
+  WSANETWORKEVENTS NetworkEvents;
+  WSAEnumNetworkEvents(s,hEventObject,&NetworkEvents);
+  return NetworkEvents.lNetworkEvents;
+}
+#endif
+
 static int udp_replyport=20000;
 
 extern FILE *popen(const char *,const char *);
@@ -286,6 +295,8 @@ static BIO *memory_buf_BIO(const char* buf, int len)
   return bio;
 }
 
+#endif //SOCK_SSL
+
 socket_certificate *socket_certificate_get(socketbuf *sock)
 {
 #ifndef SOCK_SSL
@@ -402,6 +413,8 @@ socket_certificate *socket_certificate_get(socketbuf *sock)
   return returnval;
 #endif
 }
+
+#ifdef SOCK_SSL
 
 //Function to initialise the socket to be encrypted
 static int socket_set_encrypted_keys(socketbuf *sock)
@@ -4361,15 +4374,6 @@ static int process_resends(socketbuf *sock)
 
   return 0;
 }
-
-#if defined WIN32 && defined HAVE_WINSOCK2_H
-static long enumEvent(SOCKET s,WSAEVENT hEventObject)
-{
-  WSANETWORKEVENTS NetworkEvents;
-  WSAEnumNetworkEvents(s,hEventObject,&NetworkEvents);
-  return NetworkEvents.lNetworkEvents;
-}
-#endif
 
 //This is the main function called to process user sockets. It handles
 //calls to both input and output as well as processing incoming sockets

@@ -52,8 +52,9 @@ libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 liblipssystem_la_LIBADD =
 am_liblipssystem_la_OBJECTS = system.lo system-directory.lo \
-	system-error.lo system-execute.lo system-module.lo \
-	system-notify.lo system-path.lo system-relative.lo
+	system-error.lo system-file.lo system-execute.lo \
+	system-module.lo system-notify.lo system-path.lo \
+	system-relative.lo system-types.lo system-user.lo
 liblipssystem_la_OBJECTS = $(am_liblipssystem_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
@@ -167,6 +168,8 @@ TOOLDIR = @TOOLDIR@
 VERSION = @VERSION@
 VORBIS_CFLAGS = @VORBIS_CFLAGS@
 VORBIS_LIBS = @VORBIS_LIBS@
+ZLIB_CFLAGS = @ZLIB_CFLAGS@
+ZLIB_LIBS = @ZLIB_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -236,6 +239,8 @@ liblipssystem_la_SOURCES = \
 	system-endian.h \
 	system-error.c \
 	system-error.h \
+	system-file.c \
+	system-file.h \
 	system-execute.c \
 	system-execute.h \
 	system-module.c \
@@ -246,7 +251,10 @@ liblipssystem_la_SOURCES = \
 	system-path.h \
 	system-relative.c \
 	system-relative.h \
-	system-types.h
+	system-types.c \
+	system-types.h \
+	system-user.c \
+	system-user.h
 
 all: all-am
 
@@ -320,10 +328,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-directory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-execute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-notify.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-relative.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-types.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system.Plo@am__quote@
 
 .c.o:

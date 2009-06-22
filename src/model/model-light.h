@@ -38,8 +38,8 @@ struct _limdlLight
 	struct
 	{
 		float fov;
-		float near;
-		float far;
+		float nearz;
+		float farz;
 	} projection;
 	struct
 	{

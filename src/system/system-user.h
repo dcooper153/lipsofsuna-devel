@@ -16,53 +16,28 @@
  */
 
 /**
- * \addtogroup listr String
+ * \addtogroup lisys System
  * @{
- * \addtogroup listrRegex Regex
+ * \addtogroup lisysUser User
  * @{
  */
 
-#ifndef __STRING_REGEX_H__
-#define __STRING_REGEX_H__
+#ifndef __SYSTEM_USER_H__
+#define __SYSTEM_USER_H__
 
-#include <regex.h>
-#include <stdlib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef struct _liRegex liRegex;
-struct _liRegex
-{
-	regex_t regex;
-};
+char*
+lisys_user_get_name (int uid);
 
-static inline liRegex*
-li_regex_new (const char* regex)
-{
-	liRegex* self;
+char*
+lisys_group_get_name (int gid);
 
-	self = (liRegex*) calloc (1, sizeof (liRegex));
-	if (self == NULL)
-		return NULL;
-	if (regcomp (&self->regex, regex, REG_NOSUB | REG_EXTENDED) != 0)
-	{
-		free (self);
-		return NULL;
-	}
-	return self;
+#ifdef __cplusplus
 }
-
-static inline void
-li_regex_free (liRegex* self)
-{
-	regfree (&self->regex);
-	free (self);
-}
-
-static inline int
-li_regex_match (liRegex*    self,
-                const char* string)
-{
-	return regexec (&self->regex, string, 0, 0, 0) == 0;
-}
+#endif
 
 #endif
 

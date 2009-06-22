@@ -27,7 +27,6 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <zlib.h>
 #include <system/lips-system.h>
 
 typedef struct _liarcWriter liarcWriter;
@@ -42,7 +41,7 @@ struct _liarcWriter
 	} file;
 	struct
 	{
-		gzFile pointer;
+		void* pointer;
 	} gzip;
 	struct
 	{

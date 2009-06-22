@@ -262,7 +262,7 @@ li_polygon_clip (const liPolygon* self,
 	}
 
 #ifndef linux
-	free (tmp_coord);
+	free (tmp_vtx);
 #endif
 	return ret;
 }

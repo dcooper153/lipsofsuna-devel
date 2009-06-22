@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -34,6 +34,10 @@ enum
 	LI_ERROR_UNKNOWN = -1,
 	LI_ERROR_VERSION = -2,
 };
+
+#ifndef ENOTSUP
+#define ENOTSUP 1024
+#endif
 
 LI_BEGIN_DECLS
 

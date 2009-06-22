@@ -288,7 +288,7 @@ private_init_paths (livieViewer* self,
 #ifdef LI_RELATIVE_PATHS
 	self->datadir = lisys_relative_exedir (NULL);
 #else
-	self->datadir = strdup (DATADIR);
+	self->datadir = strdup (LIDATADIR);
 #endif
 	if (self->datadir == NULL)
 		return 0;

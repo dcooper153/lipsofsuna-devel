@@ -24,10 +24,12 @@
 #include "system-endian.h"
 #include "system-error.h"
 #include "system-execute.h"
+#include "system-file.h"
 #include "system-module.h"
 #include "system-notify.h"
 #include "system-path.h"
 #include "system-relative.h"
 #include "system-types.h"
+#include "system-user.h"
 
 #endif

@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
+#include <zlib.h>
+#include <system/lips-system.h>
 #include "archive-writer.h"
 
 #define FORMAT_BUFFER_SIZE 128
@@ -414,7 +414,7 @@ int
 liarc_writer_append_int16 (liarcWriter* self,
                            int16_t      value)
 {
-	value = htons (value);
+	value = lisys_htons (value);
 	if (!self->write (self, &value, 2))
 	{
 		self->error = 1;
@@ -437,7 +437,7 @@ int
 liarc_writer_append_int32 (liarcWriter* self,
                            int32_t      value)
 {
-	value = htonl (value);
+	value = lisys_htonl (value);
 	if (!self->write (self, &value, 4))
 	{
 		self->error = 1;
@@ -504,7 +504,7 @@ int
 liarc_writer_append_uint16 (liarcWriter* self,
                             uint16_t     value)
 {
-	value = htons (value);
+	value = lisys_htons (value);
 	if (!self->write (self, &value, 2))
 	{
 		self->error = 1;
@@ -526,7 +526,7 @@ int
 liarc_writer_append_uint32 (liarcWriter* self,
                             uint32_t     value)
 {
-	value = htonl (value);
+	value = lisys_htonl (value);
 	if (!self->write (self, &value, 4))
 	{
 		self->error = 1;

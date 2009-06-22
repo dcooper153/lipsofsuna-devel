@@ -31,8 +31,8 @@ typedef struct _liReader liReader;
 struct _liReader
 {
 	int pos;
-	int mmap;
 	int length;
+	lisysMmap* mmap;
 	const char* buffer;
 };
 
@@ -49,7 +49,6 @@ int       li_reader_check_text (liReader* self, const char* data, const char* li
 int       li_reader_check_key_value_pair (liReader* self, const char* key, const char* value);
 int       li_reader_check_uint32 (liReader* self, uint32_t value);
 int       li_reader_get_char (liReader* self, char* value);
-int       li_reader_get_compressed (liReader* self, char** value, int* length);
 int       li_reader_get_float (liReader* self, float* value);
 int       li_reader_get_int8 (liReader* self, int8_t* value);
 int       li_reader_get_int16 (liReader* self, int16_t* value);

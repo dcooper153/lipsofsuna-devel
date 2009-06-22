@@ -2379,7 +2379,7 @@ static void *grapple_server_thread_main(void *voiddata)
   int loopa;
   int all_done;
 
-#ifndef HAVE_SIGACTION
+#ifdef HAVE_SIGACTION
   struct sigaction sa;
   memset(&sa,0,sizeof(struct sigaction));
   sa.sa_handler = SIG_IGN;

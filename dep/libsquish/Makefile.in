@@ -34,9 +34,9 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure COPYING \
-	ChangeLog INSTALL msc/config.guess msc/config.sub msc/depcomp \
-	msc/install-sh msc/ltmain.sh msc/missing
+	$(srcdir)/Makefile.in $(top_srcdir)/configure ChangeLog \
+	msc/config.guess msc/config.sub msc/depcomp msc/install-sh \
+	msc/ltmain.sh msc/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \

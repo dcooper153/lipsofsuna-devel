@@ -27,9 +27,11 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-#include <poll.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#endif
 #ifdef HAVE_SYS_INOTIFY_H
 #include <sys/inotify.h>
 #define HAVE_INOTIFY

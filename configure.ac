@@ -16,12 +16,11 @@ AM_PROG_CC_STDC
 PKG_PROG_PKG_CONFIG
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(arpa/inet.h fcntl.h endian.h inttypes.h netdb.h netinet/in.h stdint.h sys/byteorder.h sys/socket.h)
-AC_CHECK_HEADERS(sys/inotify.h inotifytools/inotify.h)
+AC_CHECK_HEADERS(dlfcn.h fcntl.h endian.h inttypes.h netdb.h poll.h stdint.h unistd.h windows.h arpa/inet.h netinet/in.h sys/byteorder.h sys/mman.h sys/socket.h sys/stat.h sys/wait.h sys/inotify.h inotifytools/inotify.h)
 AC_CHECK_LIB(dl, dlsym)
 AC_CHECK_LIB(m, main)
-AC_CHECK_LIB(z, deflate)
 AC_CHECK_LIB(pthread, pthread_create)
+AC_CHECK_FUNCS(fork lstat readlink stat)
 AC_SEARCH_LIBS(socket, socket)
 
 dnl Arguments.
@@ -54,6 +53,9 @@ if test "$want_deps" = yes; then
 	SQUISH_LIBS="\$(top_builddir)/dep/libsquish/libsquish.la"
 	SQLITE_CFLAGS="-I\$(top_srcdir)/dep/sqlite"
 	SQLITE_LIBS="\$(top_builddir)/dep/sqlite/libsqlite3.la"
+	ZLIB_CFLAGS="-I\$(top_srcdir)/dep/zlib"
+	ZLIB_LIBS="\$(top_builddir)/dep/zlib/libz.la"
+	AC_CONFIG_SUBDIRS(dep/zlib)
 	AC_CONFIG_SUBDIRS(dep/bullet)
 	AC_CONFIG_SUBDIRS(dep/libgrapple)
 	AC_CONFIG_SUBDIRS(dep/libsquish)
@@ -67,6 +69,8 @@ else
 	SQUISH_LIBS="-lsquish"
 	GRAPPLE_CFLAGS=""
 	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
+	ZLIB_CFLAGS=""
+	ZLIB_LIBS="-lz"
 	if test "$want_luatest" = yes; then
 		PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [], [PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])])
 	fi
@@ -134,9 +138,9 @@ else
 	MODSDIR="${datadir}/${PACKAGE}/mods"
 	TOOLDIR="${datadir}/${PACKAGE}/tool"
 	SAVEDIR="${localstatedir}/${PACKAGE}"
-	LIPS_CFLAGS="$LIPS_CFLAGS -DEXTSDIR=\\\"\"${libdir}/${PACKAGE}/extensions/$EXTSVER\"\\\""
-	LIPS_CFLAGS="$LIPS_CFLAGS -DDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
-	LIPS_CFLAGS="$LIPS_CFLAGS -DSAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLIEXTSDIR=\\\"\"${libdir}/${PACKAGE}/extensions/$EXTSVER\"\\\""
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLIDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLISAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
 fi
 
 dnl Export configuration.
@@ -156,8 +160,10 @@ AC_SUBST([SQLITE_CFLAGS])
 AC_SUBST([SQLITE_LIBS])
 AC_SUBST([SQUISH_CFLAGS])
 AC_SUBST([SQUISH_LIBS])
-AC_SUBST([VORBIS_LIBS])
 AC_SUBST([VORBIS_CFLAGS])
+AC_SUBST([VORBIS_LIBS])
+AC_SUBST([ZLIB_CFLAGS])
+AC_SUBST([ZLIB_LIBS])
 AC_SUBST([MAYBE_CLIENT])
 AC_SUBST([MAYBE_DEP])
 AC_SUBST([MAYBE_GRAPHICS])

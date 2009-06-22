@@ -22,6 +22,9 @@
  * @{
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +33,9 @@
 #include <sys/stat.h>
 #ifdef linux
 #include <linux/limits.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
 #endif
 
 /**
@@ -145,16 +151,12 @@ lisys_relative_exename ()
 
 	path = malloc (size);
 	if (path == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	while (1)
 	{
-		ret = GetModuleFileName (NULL, path, size);
+		ret = GetModuleFileNameA (NULL, path, size);
 		if (!ret)
 		{
-			lisys_error_set (ENOMEM, NULL);
 			free (path);
 			return NULL;
 		}
@@ -163,7 +165,6 @@ lisys_relative_exename ()
 		tmp = realloc (path, size <<= 1);
 		if (tmp == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
 			free (path);
 			return NULL;
 		}
@@ -172,7 +173,7 @@ lisys_relative_exename ()
 	for (tmp = path ; *tmp != '\0' ; tmp++)
 	{
 		if (*tmp == '\\')
-			*tmp = '/'
+			*tmp = '/';
 	}
 
 	return tmp;

@@ -4,6 +4,7 @@ Makefile
 *.lo
 *.so
 *.so.*
+*.exe
 .deps
 .libs
 build

@@ -14,6 +14,8 @@ liblipssystem_la_SOURCES = \
 	system-endian.h \
 	system-error.c \
 	system-error.h \
+	system-file.c \
+	system-file.h \
 	system-execute.c \
 	system-execute.h \
 	system-module.c \
@@ -24,4 +26,7 @@ liblipssystem_la_SOURCES = \
 	system-path.h \
 	system-relative.c \
 	system-relative.h \
-	system-types.h
+	system-types.c \
+	system-types.h \
+	system-user.c \
+	system-user.h

@@ -1,1 +1,1 @@
-SUBDIRS = bullet libgrapple libsquish lua sqlite
+SUBDIRS = zlib bullet libgrapple libsquish lua sqlite

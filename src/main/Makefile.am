@@ -8,7 +8,8 @@ lipsofsuna_SOURCES = \
 	main.c
 
 lipsofsuna_LDADD = \
-	-L../system -llipssystem
+	-L../system -llipssystem \
+	$(ZLIB_LIBS)
 
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)

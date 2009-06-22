@@ -26,8 +26,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <grp.h>
-#include <pwd.h>
 #include <time.h>
 #include <unistd.h>
 #include <system/lips-system.h>
@@ -59,8 +57,8 @@ private_header_set_name (liarcTar*       self,
 static void
 private_header_set_owner (liarcTar*      self,
                           liarcTarHeader* header,
-                          uid_t           uid,
-                          gid_t           gid);
+                          int             uid,
+                          int             gid);
 
 static void
 private_header_set_perm (liarcTar*       self,
@@ -171,9 +169,9 @@ liarc_tar_write_file (liarcTar*   self,
 	size_t len;
 	size_t pos;
 	char type;
-	char tmp[100];
 	char block[512];
-	struct stat st;
+	char* link;
+	lisysStat st;
 	liarcTarHeader header;
 
 	/* FIXME */
@@ -193,39 +191,48 @@ liarc_tar_write_file (liarcTar*   self,
 	}
 
 	/* Open file. */
-	if (lstat (src, &st) != 0)
+	if (!lisys_lstat (src, &st))
 	{
 		lisys_error_set (EIO, "cannot stat `%s'", src);
 		return 0;
 	}
 
 	/* Get file type. */
-	if (S_ISREG (st.st_mode)) type = LIARC_TAR_FILE;
-	else if (S_ISDIR (st.st_mode)) type = LIARC_TAR_DIRECTORY;
-	else if (S_ISLNK (st.st_mode)) type = LIARC_TAR_LINK;
-#ifdef SUPPORT_DEVICES
-	else if (S_ISCHR (st.st_mode)) type = LIARC_TAR_CHAR;
-	else if (S_ISBLK (st.st_mode)) type = LIARC_TAR_BLOCK;
-#endif
-	else
-		return 1;
-	if (S_ISLNK (st.st_mode) && readlink (src, tmp, 100) <= 0)
+	switch (st.type)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot read link `%s'", src);
-		return 0;
+		case LISYS_STAT_FILE: type = LIARC_TAR_FILE; break;
+		case LISYS_STAT_DIRECTORY: type = LIARC_TAR_DIRECTORY; break;
+		case LISYS_STAT_LINK: type = LIARC_TAR_LINK; break;
+#ifdef SUPPORT_DEVICES
+		case LISYS_STAT_CHAR: type = LIARC_TAR_CHAR; break;
+		case LISYS_STAT_BLOCK: type = LIARC_TAR_BLOCK; break;
+#endif
+		default:
+			return 1;
+	}
+	if (st.type == LISYS_STAT_LINK)
+	{
+		link = lisys_readlink (src);
+		if (link == NULL)
+			return 0;
 	}
 
 	/* Write header. */
 	private_header_init (self, &header);
-	private_header_set_type (self, &header, type, st.st_size);
+	private_header_set_type (self, &header, type, st.size);
 	private_header_set_name (self, &header, dst);
-	private_header_set_perm (self, &header, st.st_mode & 0777);
-	private_header_set_time (self, &header, st.st_mtime);
-	if (user) private_header_set_owner (self, &header, st.st_uid, st.st_gid);
-	if (S_ISLNK (st.st_mode)) private_header_set_link (self, &header, tmp);
-	if (S_ISCHR (st.st_mode)) private_header_set_device (self, &header, st.st_rdev);
-	if (S_ISBLK (st.st_mode)) private_header_set_device (self, &header, st.st_rdev);
+	private_header_set_perm (self, &header, st.mode);
+	private_header_set_time (self, &header, st.mtime);
+	if (user) private_header_set_owner (self, &header, st.uid, st.gid);
+	if (st.type == LISYS_STAT_LINK)
+	{
+		private_header_set_link (self, &header, link);
+		free (link);
+	}
+	if (st.type == LISYS_STAT_CHAR) private_header_set_device (self, &header, st.rdev);
+	if (st.type == LISYS_STAT_BLOCK) private_header_set_device (self, &header, st.rdev);
 	private_header_set_sum (self, &header);
+	
 	if (!liarc_writer_append_raw (self->writer, &header, 512))
 		return 0;
 
@@ -238,12 +245,12 @@ liarc_tar_write_file (liarcTar*   self,
 		lisys_error_set (EIO, "cannot open `%s'", src);
 		return 0;
 	}
-	for (pos = 0 ; pos < st.st_size ; pos += len)
+	for (pos = 0 ; pos < st.size ; pos += len)
 	{
 		len = fread (block, 1, 512, file);
 		if (len < 512)
 		{
-			if (pos + len != st.st_size)
+			if (pos + len != st.size)
 			{
 				lisys_error_set (EIO, "error while reading `%s'", src);
 				fclose (file);
@@ -333,20 +340,26 @@ private_header_set_name (liarcTar*       self,
 static void
 private_header_set_owner (liarcTar*       self,
                           liarcTarHeader* header,
-                          uid_t           uid,
-                          gid_t           gid)
+                          int             uid,
+                          int             gid)
 {
-	struct passwd* pwd;
-	struct group* grp;
+	char* user;
+	char* group;
 
-	pwd = getpwuid (uid);
-	grp = getgrgid (gid);
 	snprintf (header->uid, 8, "%07o", uid);
 	snprintf (header->gid, 8, "%07o", gid);
-	if (pwd != NULL)
-		snprintf (header->uname, 32, "%s", pwd->pw_name);
-	if (grp != NULL)
-		snprintf (header->gname, 32, "%s", grp->gr_name);
+	user = lisys_user_get_name (uid);
+	if (user != NULL)
+	{
+		snprintf (header->uname, 32, "%s", user);
+		free (user);
+	}
+	group = lisys_group_get_name (gid);
+	if (group != NULL)
+	{
+		snprintf (header->gname, 32, "%s", group);
+		free (group);
+	}
 }
 
 static void

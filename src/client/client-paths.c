@@ -24,6 +24,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <string/lips-string.h>
@@ -54,7 +55,7 @@ licli_paths_new ()
 	self->local_data = lisys_path_concat (lisys_system_get_path_config_home (), PACKAGE, NULL);
 	if (self->local_data == NULL)
 		goto error;
-	self->global_data = DATADIR;
+	self->global_data = LIDATADIR;
 #endif
 
 	/* Get extension directory. */
@@ -63,7 +64,7 @@ licli_paths_new ()
 	if (self->global_exts == NULL)
 		goto error;
 #else
-	self->global_exts = EXTSDIR;
+	self->global_exts = LIEXTSDIR;
 #endif
 
 	/* Create the local directory. */

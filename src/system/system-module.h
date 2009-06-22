@@ -29,10 +29,6 @@ enum
 };
 
 typedef struct _lisysModule lisysModule;
-struct _lisysModule
-{
-	void* handle;
-};
 
 lisysModule*
 lisys_module_new (const char* path,
@@ -44,6 +40,10 @@ lisys_module_free (lisysModule* self);
 void*
 lisys_module_symbol (lisysModule* self,
                      const char*  name);
+
+void*
+lisys_module_global_symbol (const char* module,
+                            const char* name);
 
 /** @} */
 /** @} */

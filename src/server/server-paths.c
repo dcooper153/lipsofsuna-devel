@@ -51,7 +51,7 @@ lisrv_paths_new (const char* name)
 	if (self->server_data == NULL)
 		goto error;
 #else
-	self->global_data = DATADIR;
+	self->global_data = LIDATADIR;
 	if (!strcmp (name, "data"))
 		self->server_data = lisys_path_concat (self->global_data, "data", NULL);
 	else
@@ -69,7 +69,7 @@ lisrv_paths_new (const char* name)
 	if (self->server_state == NULL)
 		goto error;
 #else
-	self->global_state = SAVEDIR;
+	self->global_state = LISAVEDIR;
 	self->server_state = lisys_path_concat (self->global_state, name, NULL);
 	if (self->server_state == NULL)
 		goto error;
@@ -81,7 +81,7 @@ lisrv_paths_new (const char* name)
 	if (self->global_exts == NULL)
 		goto error;
 #else
-	self->global_exts = EXTSDIR;
+	self->global_exts = LIEXTSDIR;
 #endif
 
 	/* Create the save directory. */
