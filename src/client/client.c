@@ -42,6 +42,7 @@ licli_client_new (const char* name)
 	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
+		lisys_error_report ();
 		return NULL;
 	}
 
@@ -50,6 +51,7 @@ licli_client_new (const char* name)
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
+		lisys_error_report ();
 		return NULL;
 	}
 
@@ -66,6 +68,7 @@ licli_client_new (const char* name)
 	if (self->window == NULL)
 	{
 		licli_client_free (self);
+		lisys_error_report ();
 		return NULL;
 	}
 
@@ -74,6 +77,7 @@ licli_client_new (const char* name)
 	if (self->module == NULL)
 	{
 		licli_client_free (self);
+		lisys_error_report ();
 		return NULL;
 	}
 

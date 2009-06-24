@@ -91,7 +91,11 @@ lisrv_server_new (const char* name)
 	/* Allocate self. */
 	self = calloc (1, sizeof (lisrvServer));
 	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		lisys_error_report ();
 		return NULL;
+	}
 
 	/* Initialize mutexes. */
 	pthread_mutex_init (&self->mutexes.bans, NULL);
@@ -108,6 +112,7 @@ lisrv_server_new (const char* name)
 	    !private_init_script (self))
 	{
 		lisrv_server_free (self);
+		lisys_error_report ();
 		return NULL;
 	}
 
@@ -634,7 +639,7 @@ private_init_sql (lisrvServer* self)
 	/* Open database. */
 	if (sqlite3_open_v2 (path, &self->sql, flags, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		sqlite3_close (self->sql);
 		free (path);
 		return 0;
@@ -645,7 +650,7 @@ private_init_sql (lisrvServer* self)
 	query = "CREATE TABLE IF NOT EXISTS info (version TEXT);";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
@@ -663,7 +668,7 @@ private_init_sql (lisrvServer* self)
 		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,shape UNSIGNED INTEGER);";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
@@ -677,11 +682,12 @@ private_init_sql (lisrvServer* self)
 		"(id INTEGER REFERENCES objects(id),name TEXT,type INTEGER,value TEXT);";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}
@@ -691,11 +697,12 @@ private_init_sql (lisrvServer* self)
 		"(id UNSIGNED INTEGER REFERENCES objects(id),name TEXT,chan REAL,prio REAL);";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, sqlite3_errmsg (self->sql));
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}

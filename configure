@@ -17866,8 +17866,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-LIPS_CFLAGS="$CFLAGS"
-LIPS_LIBS="$LIBS"
 
 # Check whether --enable-easy was given.
 if test "${enable_easy+set}" = set; then
@@ -18481,6 +18479,8 @@ if test "$ac_res" != no; then
 
 fi
 
+LIPS_CFLAGS="$CFLAGS"
+LIPS_LIBS="$LIBS"
 
 
 # Check whether --with-sdl-prefix was given.

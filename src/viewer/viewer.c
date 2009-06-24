@@ -68,13 +68,18 @@ livie_viewer_new (const char* name,
 	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
+		lisys_error_report ();
 		return NULL;
 	}
 
 	/* Allocate self. */
 	self = calloc (1, sizeof (livieViewer));
 	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		lisys_error_report ();
 		return NULL;
+	}
 
 	/* Initialize subsystems. */
 	if (!private_init_video (self) ||
@@ -85,6 +90,7 @@ livie_viewer_new (const char* name,
 	    !private_init_model (self, model))
 	{
 		livie_viewer_free (self);
+		lisys_error_report ();
 		return NULL;
 	}
 	snprintf (buf, 256, "%s - Lips of Suna Model Viewer", model);

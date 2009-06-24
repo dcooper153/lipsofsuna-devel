@@ -19,8 +19,6 @@ AC_HEADER_STDC
 
 dnl Pthread dependency.
 ACX_PTHREAD
-LIPS_CFLAGS="$CFLAGS"
-LIPS_LIBS="$LIBS"
 
 dnl Arguments.
 AC_ARG_ENABLE([easy], AC_HELP_STRING([--enable-easy], [Compile a relative binary using built-in dependencies]), [want_easy=yes], [want_easy=no])
@@ -55,6 +53,8 @@ AC_CHECK_LIB(dl, dlsym)
 AC_CHECK_LIB(m, main)
 AC_CHECK_FUNCS(fork lstat readlink stat usleep)
 AC_SEARCH_LIBS(socket, socket)
+LIPS_CFLAGS="$CFLAGS"
+LIPS_LIBS="$LIBS"
 
 dnl Check for SDL.
 AM_PATH_SDL([1.2.0], [have_sdl=yes], [have_sdl=no])

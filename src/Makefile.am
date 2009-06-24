@@ -394,7 +394,7 @@ liblipsofsunaviewer_la_SOURCES = \
 liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
 
 lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS)
-lipsofsuna_CFLAGS = 
+lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
 lipsofsuna_SOURCES = $(syssrc) $(maisrc)
 
 install-data-local:

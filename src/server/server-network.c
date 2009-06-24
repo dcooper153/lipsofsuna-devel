@@ -66,7 +66,10 @@ lisrv_network_new (lisrvServer* server,
 
 	self = calloc (1, sizeof (lisrvNetwork));
 	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
 		return NULL;
+	}
 	self->server = server;
 
 	pthread_mutex_init (&self->mutex, NULL);

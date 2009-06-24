@@ -139,13 +139,11 @@ client_main (const char* name)
 	client = licli_client_new (name);
 	if (client == NULL)
 	{
-		lisys_error_report ();
 		lisys_module_free (module);
 		return 1;
 	}
 	if (!licli_client_main (client))
 	{
-		lisys_error_report ();
 		licli_client_free (client);
 		lisys_module_free (module);
 		return 0;
@@ -182,7 +180,7 @@ server_main (const char* name)
 	    lisrv_server_main == NULL ||
 	    lisrv_server_new == NULL)
 	{
-		lisys_error_set (EINVAL, "invalid client library");
+		lisys_error_set (EINVAL, "invalid server library");
 		lisys_error_report ();
 		lisys_module_free (module);
 		return 1;
@@ -192,16 +190,17 @@ server_main (const char* name)
 	server = lisrv_server_new (name);
 	if (server == NULL)
 	{
-		lisys_error_report ();
+		lisys_module_free (module);
 		return 1;
 	}
 	if (!lisrv_server_main (server))
 	{
-		lisys_error_report ();
 		lisrv_server_free (server);
+		lisys_module_free (module);
 		return 1;
 	}
 	lisrv_server_free (server);
+	lisys_module_free (module);
 
 	return 0;
 }
@@ -243,13 +242,11 @@ viewer_main (const char* name,
 	viewer = livie_viewer_new (name, model);
 	if (viewer == NULL)
 	{
-		lisys_error_report ();
 		lisys_module_free (module);
 		return 1;
 	}
 	if (!livie_viewer_main (viewer))
 	{
-		lisys_error_report ();
 		livie_viewer_free (viewer);
 		lisys_module_free (module);
 		return 0;
