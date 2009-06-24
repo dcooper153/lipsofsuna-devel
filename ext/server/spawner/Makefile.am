@@ -1,11 +1,11 @@
-INCLUDES = -I$(srcdir)/../../../src
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LISRV_CFLAGS)
 
 extdir = $(EXTSDIR)
-ext_LTLIBRARIES = \
-	libspawner-ser.la
+ext_LTLIBRARIES = libspawner-ser.la
 
-libspawner_ser_la_LDFLAGS = -module -avoid-version
+libspawner_ser_la_LDFLAGS = -module -avoid-version -no-undefined
+libspawner_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
 libspawner_ser_la_SOURCES = \
 	ext-module.c \
 	ext-module.h \

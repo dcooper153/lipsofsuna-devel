@@ -616,7 +616,7 @@ private_clear_materials (lirndObject* self)
 static void
 private_clear_model (lirndObject* self)
 {
-	if (livid_features.ARB_vertex_buffer_object)
+	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
 	free (self->vertices);
 }
@@ -632,9 +632,9 @@ private_init_envmap (lirndObject* self)
 	lirndTexture* texture;
 
 	/* Check for requirements. */
-	if (!livid_features.ARB_depth_texture ||
-	    !livid_features.ARB_texture_cube_map ||
-	    !livid_features.EXT_framebuffer_object)
+	if (!GLEW_ARB_depth_texture ||
+	    !GLEW_ARB_texture_cube_map ||
+	    !GLEW_EXT_framebuffer_object)
 		return 1;
 
 	/* Check if needed by textures. */
@@ -870,7 +870,7 @@ private_init_model (lirndObject* self,
 	}
 
 	/* Create vertex buffer. */
-	if (livid_features.ARB_vertex_buffer_object)
+	if (GLEW_ARB_vertex_buffer_object)
 	{
 		glGenBuffersARB (1, &self->buffer);
 		size = model->model->vertex.count * sizeof (limdlVertex);
@@ -939,7 +939,7 @@ private_update_buffer (lirndObject* self)
 	void* data;
 	const limdlModel* model = self->model->model;
 
-	if (!livid_features.ARB_vertex_buffer_object)
+	if (!GLEW_ARB_vertex_buffer_object)
 		return 1;
 	glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
 	size = model->vertex.count * sizeof (limdlVertex);

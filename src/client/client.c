@@ -38,10 +38,10 @@ licli_client_new (const char* name)
 	const char* login = "none";
 	const char* password = "none";
 
-	/* Initialize video. */
-	if (!livid_video_init (NULL))
+	/* Initialize SDL. */
+	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
-		lisys_error_set (ENOTSUP, "cannot initialize video");
+		lisys_error_set (ENOTSUP, "initializing SDL failed");
 		return NULL;
 	}
 

@@ -5,6 +5,7 @@ AM_CFLAGS = -g -Wall
 lib_LTLIBRARIES = \
 	libsquish.la
 
+libsquish_la_LDFLAGS = -no-undefined
 libsquish_la_SOURCES = \
 	alpha.cpp \
 	alpha.h \

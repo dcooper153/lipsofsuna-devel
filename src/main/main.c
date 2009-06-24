@@ -113,7 +113,7 @@ client_main (const char* name)
 	lisysModule* module;
 
 	/* Open client library. */
-	module = lisys_module_new ("liblipsclient." LISYS_EXTENSION_DLL,
+	module = lisys_module_new ("liblipsofsunaclient." LISYS_EXTENSION_DLL,
 		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
 	if (module == NULL)
 	{
@@ -166,7 +166,7 @@ server_main (const char* name)
 	lisysModule* module;
 
 	/* Open client library. */
-	module = lisys_module_new ("liblipsserver." LISYS_EXTENSION_DLL,
+	module = lisys_module_new ("liblipsofsunaserver." LISYS_EXTENSION_DLL,
 		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
 	if (module == NULL)
 	{
@@ -217,7 +217,7 @@ viewer_main (const char* name,
 	lisysModule* module;
 
 	/* Open viewer library. */
-	module = lisys_module_new ("liblipsviewer." LISYS_EXTENSION_DLL,
+	module = lisys_module_new ("liblipsofsunaviewer." LISYS_EXTENSION_DLL,
 		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
 	if (module == NULL)
 	{

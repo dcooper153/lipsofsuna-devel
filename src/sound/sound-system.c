@@ -22,6 +22,8 @@
  * @{
  */
 
+#ifndef LI_DISABLE_SOUND
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string/lips-string.h>
@@ -105,6 +107,8 @@ lisnd_system_set_listener (lisndSystem*       self,
 	alListenerfv (AL_VELOCITY, alvel);
 	alListenerfv (AL_ORIENTATION, alori);
 }
+
+#endif
 
 /** @} */
 /** @} */

@@ -1,11 +1,11 @@
-INCLUDES = -I$(srcdir)/../../../src
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LISRV_CFLAGS)
 
 extdir = $(EXTSDIR)
-ext_LTLIBRARIES = \
-	libeditor-ser.la
+ext_LTLIBRARIES = libeditor-ser.la
 
-libeditor_ser_la_LDFLAGS = -module -avoid-version
+libeditor_ser_la_LDFLAGS = -module -avoid-version -no-undefined
+libeditor_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
 libeditor_ser_la_SOURCES = \
 	ext-editor.c \
 	ext-editor.h \

@@ -26,6 +26,7 @@
 #define __SERVER_H__
 
 #include <pthread.h>
+#include <sys/time.h>
 #include <grapple/grapple.h>
 #include <ai/lips-ai.h>
 #include <algorithm/lips-algorithm.h>

@@ -5,6 +5,7 @@ AM_CFLAGS = -g -Wall
 lib_LTLIBRARIES = \
         liblua5.1.la
 
+liblua5_1_la_LDFLAGS = -no-undefined
 liblua5_1_la_SOURCES = \
 	src/lapi.c \
 	src/lapi.h \

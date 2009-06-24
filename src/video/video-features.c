@@ -25,9 +25,10 @@
 #include <string.h>
 #include "video-features.h"
 #include "video-opengl.h"
-#define __gl_h_
+#ifdef HAVE_GL_GLX_H
 #include <GL/glx.h>
 #include <GL/glxext.h>
+#endif
 
 /**
  * \brief Global video card feature cache.
@@ -46,38 +47,16 @@ livid_features_init ()
 	memset (&livid_features, 0, sizeof (lividFeatures));
 
 	/* Get capabilities. */
-	if (livid_video_check_support ("GL_ARB_depth_buffer_float"))
-		livid_features.ARB_depth_buffer_float = 1;
-	if (livid_video_check_support ("GL_ARB_depth_texture"))
-		livid_features.ARB_depth_texture = 1;
-	if (livid_video_check_support ("GL_ARB_point_sprite"))
-		livid_features.ARB_point_sprite = 1;
-	if (livid_video_check_support ("GL_ARB_pixel_buffer_object"))
-		livid_features.ARB_pixel_buffer_object = 1;
-	if (livid_video_check_support ("GL_ARB_shadow"))
-		livid_features.ARB_shadow = 1;
-	if (livid_video_check_support ("GL_ARB_texture_compression"))
-		livid_features.ARB_texture_compression = 1;
-	if (livid_video_check_support ("GL_ARB_texture_cube_map"))
-		livid_features.ARB_texture_cube_map = 1;
-	if (livid_video_check_support ("GL_ARB_vertex_buffer_object"))
-		livid_features.ARB_vertex_buffer_object = 1;
-	if (livid_video_check_support ("GL_EXT_framebuffer_object"))
-		livid_features.EXT_framebuffer_object = 1;
-	if (livid_video_check_support ("GL_EXT_texture_compression_s3tc"))
-		livid_features.EXT_texture_compression_s3tc_ = 1;
-	if (livid_video_check_support ("GL_EXT_texture_filter_anisotropic"))
+	if (GLEW_EXT_texture_filter_anisotropic)
 	{
-		livid_features.EXT_texture_filter_anisotropic = 1;
 		glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &tmp);
 		livid_features.anisotropic_level = tmp;
 	}
-	if (livid_video_check_support ("GL_ARB_shading_language_100"))
+	if (GLEW_ARB_shading_language_100)
 	{
-		if (livid_video_check_support ("GL_NV_vertex_program3") ||
-		    livid_video_check_support ("GL_ATI_shader_texture_lod"))
+		if (GLEW_NV_vertex_program3 || GLEW_ATI_shader_texture_lod)
 			livid_features.shader_model = 3;
-		else if (livid_video_check_support ("GL_ARB_fragment_shader"))
+		else if (GLEW_ARB_fragment_shader)
 			livid_features.shader_model = 2;
 		else
 			livid_features.shader_model = 1;
@@ -99,6 +78,8 @@ livid_features_init ()
 int
 livid_features_get_max_samples ()
 {
+#ifdef HAVE_GL_GLX_H
+
 	int i;
 	int count;
 	int screen;
@@ -132,6 +113,12 @@ livid_features_get_max_samples ()
 
 	XCloseDisplay (display);
 	return best_samples;
+#else
+
+	/* FIXME */
+	return 8;
+
+#endif
 }
 
 /** @} */

@@ -1,11 +1,11 @@
-INCLUDES = -I$(srcdir)/../../../src
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LISRV_CFLAGS)
 
 extdir = $(EXTSDIR)
-ext_LTLIBRARIES = \
-	libinventory-ser.la
+ext_LTLIBRARIES = libinventory-ser.la
 
-libinventory_ser_la_LDFLAGS = -module -avoid-version
+libinventory_ser_la_LDFLAGS = -module -avoid-version -no-undefined
+libinventory_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
 libinventory_ser_la_SOURCES = \
 	ext-inventory.c \
 	ext-inventory.h \

@@ -1,11 +1,11 @@
-INCLUDES = -I$(srcdir)/../../../src
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LICLI_CFLAGS)
 
 extdir = $(EXTSDIR)
-ext_LTLIBRARIES = \
-	libeditor-cli.la
+ext_LTLIBRARIES = libeditor-cli.la
 
-libeditor_cli_la_LDFLAGS = -module -avoid-version
+libeditor_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libeditor_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
 libeditor_cli_la_SOURCES = \
 	ext-dialog.c \
 	ext-dialog.h \

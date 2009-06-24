@@ -72,7 +72,7 @@ lirnd_model_new (lirndRender* render,
 void
 lirnd_model_free (lirndModel* self)
 {
-	if (livid_features.ARB_vertex_buffer_object)
+	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
 	free (self);
 }
@@ -97,7 +97,7 @@ private_init_buffer (lirndModel* self)
 	size_t size;
 	void* data;
 
-	if (!livid_features.ARB_vertex_buffer_object)
+	if (!GLEW_ARB_vertex_buffer_object)
 		return 1;
 	glGenBuffersARB (1, &self->buffer);
 	size = self->model->vertex.count * sizeof (limdlVertex);

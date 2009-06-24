@@ -32,9 +32,11 @@
  * \brief Frees the contents of the block but not the block itself.
  *
  * \param self Block.
+ * \param engine Engine.
  */
 void
-lieng_block_free (liengBlock* self)
+lieng_block_free (liengBlock*  self,
+                  liengEngine* engine)
 {
 #ifndef LIENG_DISABLE_GRAPHICS
 	limdlModel* model;
@@ -46,8 +48,8 @@ lieng_block_free (liengBlock* self)
 	{
 		model = self->render->model->model;
 		rndmdl = self->render->model;
-		lirnd_object_free (self->render);
-		lirnd_model_free (rndmdl);
+		engine->renderapi->lirnd_object_free (self->render);
+		engine->renderapi->lirnd_model_free (rndmdl);
 		limdl_model_free (model);
 	}
 #endif
@@ -73,8 +75,9 @@ lieng_block_free (liengBlock* self)
  * \param terrain Terrain type.
  */
 void
-lieng_block_fill (liengBlock* self,
-                  liengTile   terrain)
+lieng_block_fill (liengBlock*  self,
+                  liengEngine* engine,
+                  liengTile    terrain)
 {
 	terrain = lieng_voxel_init (0xFF, terrain);
 	if (self->type == LIENG_BLOCK_TYPE_FULL)
@@ -90,7 +93,7 @@ lieng_block_fill (liengBlock* self,
 	else
 	{
 		/* Free old data. */
-		lieng_block_free (self);
+		lieng_block_free (self, engine);
 		memset (self, 0, sizeof (liengBlock));
 
 		/* Set new terrain. */
@@ -287,12 +290,14 @@ lieng_block_optimize (liengBlock* self)
  * \brief Reads block data from a stream.
  *
  * \param self Block.
+ * \param engine Engine.
  * \param reader Reader.
  * \return Nonzero on success.
  */
 int
-lieng_block_read (liengBlock* self,
-                  liReader*   reader)
+lieng_block_read (liengBlock*  self,
+                  liengEngine* engine,
+                  liReader*    reader)
 {
 	int x;
 	int y;
@@ -307,7 +312,7 @@ lieng_block_read (liengBlock* self,
 		case LIENG_BLOCK_TYPE_FULL:
 			if (!li_reader_get_uint16 (reader, &terrain))
 				return 0;
-			lieng_block_fill (self, terrain);
+			lieng_block_fill (self, engine, terrain);
 			break;
 		case LIENG_BLOCK_TYPE_TILES:
 			for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)

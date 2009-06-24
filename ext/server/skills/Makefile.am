@@ -1,11 +1,11 @@
-INCLUDES = -I$(srcdir)/../../../src
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LISRV_CFLAGS)
 
 extdir = $(EXTSDIR)
-ext_LTLIBRARIES = \
-	libskills-ser.la
+ext_LTLIBRARIES = libskills-ser.la
 
-libskills_ser_la_LDFLAGS = -module -avoid-version
+libskills_ser_la_LDFLAGS = -module -avoid-version -no-undefined
+libskills_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
 libskills_ser_la_SOURCES = \
 	ext-module.c \
 	ext-module.h \

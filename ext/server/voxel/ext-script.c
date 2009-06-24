@@ -60,7 +60,6 @@ Voxel_fill_box (lua_State* lua)
 	min = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
 	max = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
 	terrain = luaL_checkinteger (lua, 4);
-	luaL_argcheck (lua, terrain >= 0, 4, "invalid terrain type");
 
 	liext_module_fill_box (module, min->data, max->data, terrain);
 
@@ -90,7 +89,6 @@ Voxel_fill_sphere (lua_State* lua)
 	radius = luaL_checknumber (lua, 3);
 	terrain = luaL_checkinteger (lua, 4);
 	luaL_argcheck (lua, radius >= 0.0f, 3, "negative radius");
-	luaL_argcheck (lua, terrain >= 0, 4, "invalid terrain type");
 
 	liext_module_fill_sphere (module, center->data, radius, terrain);
 

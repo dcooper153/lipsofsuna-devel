@@ -31,6 +31,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+target_triplet = @target@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
@@ -38,7 +39,14 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	msc/config.sub msc/depcomp msc/install-sh msc/ltmain.sh \
 	msc/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/msc/m4/acx_pthread.m4 \
+	$(top_srcdir)/msc/m4/ax_check_gl.m4 \
+	$(top_srcdir)/msc/m4/ax_lang_compiler_ms.m4 \
+	$(top_srcdir)/msc/m4/libtool.m4 \
+	$(top_srcdir)/msc/m4/ltoptions.m4 \
+	$(top_srcdir)/msc/m4/ltsugar.m4 \
+	$(top_srcdir)/msc/m4/ltversion.m4 \
+	$(top_srcdir)/msc/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -59,6 +67,7 @@ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 ETAGS = etags
 CTAGS = ctags
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -101,6 +110,10 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 EXTSDIR = @EXTSDIR@
 FGREP = @FGREP@
+GLEW_CFLAGS = @GLEW_CFLAGS@
+GLEW_LIBS = @GLEW_LIBS@
+GL_CFLAGS = @GL_CFLAGS@
+GL_LIBS = @GL_LIBS@
 GRAPPLE_CFLAGS = @GRAPPLE_CFLAGS@
 GRAPPLE_LIBS = @GRAPPLE_LIBS@
 GREP = @GREP@
@@ -114,8 +127,13 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LICLI_CFLAGS = @LICLI_CFLAGS@
+LICLI_LIBS = @LICLI_LIBS@
 LIPO = @LIPO@
 LIPS_CFLAGS = @LIPS_CFLAGS@
+LIPS_LIBS = @LIPS_LIBS@
+LISRV_CFLAGS = @LISRV_CFLAGS@
+LISRV_LIBS = @LISRV_LIBS@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 LUA_CFLAGS = @LUA_CFLAGS@
@@ -124,9 +142,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MAYBE_CLIENT = @MAYBE_CLIENT@
 MAYBE_DEP = @MAYBE_DEP@
-MAYBE_GRAPHICS = @MAYBE_GRAPHICS@
 MAYBE_SERVER = @MAYBE_SERVER@
-MAYBE_SOUND = @MAYBE_SOUND@
 MAYBE_VIEWER = @MAYBE_VIEWER@
 MKDIR_P = @MKDIR_P@
 MODSDIR = @MODSDIR@
@@ -148,6 +164,9 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PTHREAD_CC = @PTHREAD_CC@
+PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
+PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
 SAVEDIR = @SAVEDIR@
 SDL_CFLAGS = @SDL_CFLAGS@
@@ -165,6 +184,7 @@ TOOLDIR = @TOOLDIR@
 VERSION = @VERSION@
 VORBIS_CFLAGS = @VORBIS_CFLAGS@
 VORBIS_LIBS = @VORBIS_LIBS@
+XMKMF = @XMKMF@
 ZLIB_CFLAGS = @ZLIB_CFLAGS@
 ZLIB_LIBS = @ZLIB_LIBS@
 abs_builddir = @abs_builddir@
@@ -174,6 +194,7 @@ abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+acx_pthread_config = @acx_pthread_config@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -217,12 +238,15 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
+target = @target@
 target_alias = @target_alias@
+target_cpu = @target_cpu@
+target_os = @target_os@
+target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = $(MAYBE_DEP) src ext data doc
-DIST_SUBDIRS = dep src ext data doc
+SUBDIRS = dep src ext data doc
 EXTRA_DIST = COPYING.LESSER
 ACLOCAL_AMFLAGS = -I msc/m4
 all: all-recursive

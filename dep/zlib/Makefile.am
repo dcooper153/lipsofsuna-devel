@@ -5,6 +5,7 @@ AM_CFLAGS = -g -Wall
 lib_LTLIBRARIES = \
 	libz.la
 
+libz_la_LDFLAGS = -no-undefined
 libz_la_SOURCES = \
 	adler32.c \
 	compress.c \

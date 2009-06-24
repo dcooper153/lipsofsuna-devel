@@ -96,7 +96,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(bullet_includedir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libbulletcollision_la_LIBADD =
+libbulletcollision_la_DEPENDENCIES = libbulletmath.la
 am_libbulletcollision_la_OBJECTS = btRaycastCallback.lo \
 	btMinkowskiPenetrationDepthSolver.lo btSubSimplexConvexCast.lo \
 	btGjkEpaPenetrationDepthSolver.lo btGjkConvexCast.lo \
@@ -138,11 +138,15 @@ am_libbulletcollision_la_OBJECTS = btRaycastCallback.lo \
 	btGImpactShape.lo gim_box_set.lo gim_contact.lo gim_memory.lo \
 	gim_tri_collision.lo
 libbulletcollision_la_OBJECTS = $(am_libbulletcollision_la_OBJECTS)
+libbulletcollision_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libbulletcollision_la_LDFLAGS) $(LDFLAGS) -o $@
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@am_libbulletcollision_la_rpath =  \
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@	-rpath $(libdir)
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@am_libbulletcollision_la_rpath =  \
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@	-rpath $(libdir)
-libbulletdynamics_la_LIBADD =
+libbulletdynamics_la_DEPENDENCIES = libbulletmath.la \
+	libbulletcollision.la
 am_libbulletdynamics_la_OBJECTS = btContinuousDynamicsWorld.lo \
 	btRigidBody.lo btSimpleDynamicsWorld.lo Bullet-C-API.lo \
 	btDiscreteDynamicsWorld.lo btGeneric6DofConstraint.lo \
@@ -153,6 +157,9 @@ am_libbulletdynamics_la_OBJECTS = btContinuousDynamicsWorld.lo \
 	btWheelInfo.lo btRaycastVehicle.lo \
 	btKinematicCharacterController.lo
 libbulletdynamics_la_OBJECTS = $(am_libbulletdynamics_la_OBJECTS)
+libbulletdynamics_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libbulletdynamics_la_LDFLAGS) $(LDFLAGS) -o $@
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@am_libbulletdynamics_la_rpath =  \
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@	-rpath $(libdir)
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@am_libbulletdynamics_la_rpath =  \
@@ -161,6 +168,9 @@ libbulletmath_la_LIBADD =
 am_libbulletmath_la_OBJECTS = btQuickprof.lo btGeometryUtil.lo \
 	btAlignedAllocator.lo btConvexHull.lo
 libbulletmath_la_OBJECTS = $(am_libbulletmath_la_OBJECTS)
+libbulletmath_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libbulletmath_la_LDFLAGS) $(LDFLAGS) -o $@
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@am_libbulletmath_la_rpath =  \
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@	-rpath $(libdir)
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@am_libbulletmath_la_rpath =  \
@@ -260,10 +270,11 @@ libbulletmultithreaded_la_OBJECTS =  \
 libbulletmultithreaded_la_LINK = $(LIBTOOL) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(libbulletmultithreaded_la_CXXFLAGS) $(CXXFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(libbulletmultithreaded_la_LDFLAGS) $(LDFLAGS) -o $@
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@am_libbulletmultithreaded_la_rpath =  \
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@	-rpath $(libdir)
-libbulletsoftbody_la_LIBADD =
+libbulletsoftbody_la_DEPENDENCIES = libbulletmath.la \
+	libbulletcollision.la libbulletdynamics.la
 am_libbulletsoftbody_la_OBJECTS =  \
 	btSoftBodyRigidBodyCollisionConfiguration.lo btSoftBody.lo \
 	btSoftRigidCollisionAlgorithm.lo \
@@ -271,6 +282,9 @@ am_libbulletsoftbody_la_OBJECTS =  \
 	btSoftRigidDynamicsWorld.lo btSoftBodyHelpers.lo \
 	btSoftSoftCollisionAlgorithm.lo
 libbulletsoftbody_la_OBJECTS = $(am_libbulletsoftbody_la_OBJECTS)
+libbulletsoftbody_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libbulletsoftbody_la_LDFLAGS) $(LDFLAGS) -o $@
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@am_libbulletsoftbody_la_rpath =  \
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@	-rpath $(libdir)
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@am_libbulletsoftbody_la_rpath =  \
@@ -809,6 +823,7 @@ nobase_bullet_include_HEADERS = btBulletDynamicsCommon.h \
 	LinearMath/btHashMap.h LinearMath/btQuickprof.h
 @CONDITIONAL_BUILD_MULTITHREADED_FALSE@lib_LTLIBRARIES = libbulletmath.la libbulletcollision.la libbulletdynamics.la libbulletsoftbody.la
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@lib_LTLIBRARIES = libbulletmath.la libbulletcollision.la libbulletdynamics.la libbulletsoftbody.la libbulletmultithreaded.la
+@CONDITIONAL_BUILD_MULTITHREADED_TRUE@libbulletmultithreaded_la_LDFLAGS = -no-undefined
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@libbulletmultithreaded_la_CXXFLAGS = ${CXXFLAGS} -I./BulletMultiThreaded/vectormath/scalar/cpp
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@libbulletmultithreaded_la_SOURCES = \
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@		BulletMultiThreaded/SpuCollisionObjectWrapper.cpp \
@@ -874,6 +889,7 @@ nobase_bullet_include_HEADERS = btBulletDynamicsCommon.h \
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@		BulletMultiThreaded/SpuNarrowPhaseCollisionTask/boxBoxDistance.h \
 @CONDITIONAL_BUILD_MULTITHREADED_TRUE@		BulletMultiThreaded/SpuNarrowPhaseCollisionTask/Box.h
 
+libbulletmath_la_LDFLAGS = -no-undefined
 libbulletmath_la_SOURCES = \
 		LinearMath/btQuickprof.cpp \
 		LinearMath/btGeometryUtil.cpp \
@@ -902,6 +918,8 @@ libbulletmath_la_SOURCES = \
 		LinearMath/btIDebugDraw.h \
 		LinearMath/btRandom.h
 
+libbulletcollision_la_LDFLAGS = -no-undefined
+libbulletcollision_la_LIBADD = libbulletmath.la
 libbulletcollision_la_SOURCES = \
 		BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp \
 		BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.cpp \
@@ -1072,6 +1090,8 @@ libbulletcollision_la_SOURCES = \
                 BulletCollision/Gimpact/gim_memory.cpp\
                 BulletCollision/Gimpact/gim_tri_collision.cpp
 
+libbulletdynamics_la_LDFLAGS = -no-undefined
+libbulletdynamics_la_LIBADD = libbulletmath.la libbulletcollision.la
 libbulletdynamics_la_SOURCES = \
 		BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp \
 		BulletDynamics/Dynamics/btRigidBody.cpp \
@@ -1115,6 +1135,8 @@ libbulletdynamics_la_SOURCES = \
 		BulletDynamics/Vehicle/btRaycastVehicle.h \
 		BulletDynamics/Vehicle/btWheelInfo.h
 
+libbulletsoftbody_la_LDFLAGS = -no-undefined
+libbulletsoftbody_la_LIBADD = libbulletmath.la libbulletcollision.la libbulletdynamics.la
 libbulletsoftbody_la_SOURCES = \
 		BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.cpp \
 		BulletSoftBody/btSoftBody.cpp \
@@ -1194,15 +1216,15 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libbulletcollision.la: $(libbulletcollision_la_OBJECTS) $(libbulletcollision_la_DEPENDENCIES) 
-	$(CXXLINK) $(am_libbulletcollision_la_rpath) $(libbulletcollision_la_OBJECTS) $(libbulletcollision_la_LIBADD) $(LIBS)
+	$(libbulletcollision_la_LINK) $(am_libbulletcollision_la_rpath) $(libbulletcollision_la_OBJECTS) $(libbulletcollision_la_LIBADD) $(LIBS)
 libbulletdynamics.la: $(libbulletdynamics_la_OBJECTS) $(libbulletdynamics_la_DEPENDENCIES) 
-	$(CXXLINK) $(am_libbulletdynamics_la_rpath) $(libbulletdynamics_la_OBJECTS) $(libbulletdynamics_la_LIBADD) $(LIBS)
+	$(libbulletdynamics_la_LINK) $(am_libbulletdynamics_la_rpath) $(libbulletdynamics_la_OBJECTS) $(libbulletdynamics_la_LIBADD) $(LIBS)
 libbulletmath.la: $(libbulletmath_la_OBJECTS) $(libbulletmath_la_DEPENDENCIES) 
-	$(CXXLINK) $(am_libbulletmath_la_rpath) $(libbulletmath_la_OBJECTS) $(libbulletmath_la_LIBADD) $(LIBS)
+	$(libbulletmath_la_LINK) $(am_libbulletmath_la_rpath) $(libbulletmath_la_OBJECTS) $(libbulletmath_la_LIBADD) $(LIBS)
 libbulletmultithreaded.la: $(libbulletmultithreaded_la_OBJECTS) $(libbulletmultithreaded_la_DEPENDENCIES) 
 	$(libbulletmultithreaded_la_LINK) $(am_libbulletmultithreaded_la_rpath) $(libbulletmultithreaded_la_OBJECTS) $(libbulletmultithreaded_la_LIBADD) $(LIBS)
 libbulletsoftbody.la: $(libbulletsoftbody_la_OBJECTS) $(libbulletsoftbody_la_DEPENDENCIES) 
-	$(CXXLINK) $(am_libbulletsoftbody_la_rpath) $(libbulletsoftbody_la_OBJECTS) $(libbulletsoftbody_la_LIBADD) $(LIBS)
+	$(libbulletsoftbody_la_LINK) $(am_libbulletsoftbody_la_rpath) $(libbulletsoftbody_la_OBJECTS) $(libbulletsoftbody_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

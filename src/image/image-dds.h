@@ -188,7 +188,7 @@ liimg_dds_init_s3tc (liimgDDS* self,
 static inline void
 liimg_dds_byteswap (liimgDDS* self)
 {
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if LI_BYTE_ORDER == LI_BIG_ENDIAN
 	#define BYTESWAP(i) ((((i)&&0xFF)<<24) | (((i)&&0xFF00)<<8) | (((i)&&0xFF0000)>>8) | (((i)&&0xFF000000)>>24))
 	self->header.magic = BYTESWAP (self->header.magic);
 	self->header.flags = BYTESWAP (self->header.flags);
@@ -199,7 +199,7 @@ liimg_dds_byteswap (liimgDDS* self)
 	self->header.mipmaps = BYTESWAP (self->header.mipmaps);
 	self->format.size = BYTESWAP (self->format.size);
 	self->format.flags = BYTESWAP (self->format.flags);
-	self->format.fourcc = BYTESWAP (self->format.fourcc);
+	self->format.compress = BYTESWAP (self->format.compress);
 	self->format.rgbbits = BYTESWAP (self->format.rgbbits);
 	self->format.rmask = BYTESWAP (self->format.rmask);
 	self->format.gmask = BYTESWAP (self->format.gmask);
@@ -488,7 +488,7 @@ liimg_dds_load_texture (FILE*     file,
 			free (lvl.data);
 		}
 	}
-	else if (livid_features.EXT_texture_compression_s3tc_)
+	else if (GLEW_EXT_texture_compression_s3tc)
 	{
 		/* Hardware uncompression. */
 		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)

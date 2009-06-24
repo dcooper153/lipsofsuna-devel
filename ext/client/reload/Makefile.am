@@ -1,12 +1,11 @@
-INCLUDES = -I$(srcdir)/../../../src
-AM_CFLAGS = $(LIPS_CFLAGS) $(LUA_CFLAGS) $(GRAPPLE_CFLAGS)
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LICLI_CFLAGS)
 
 extdir = $(EXTSDIR)
-ext_LTLIBRARIES = \
-	libreload-cli.la
+ext_LTLIBRARIES = libreload-cli.la
 
-libreload_cli_la_LDFLAGS = -module -avoid-version
-libreload_cli_la_LIBADD = ../../../src/reload/liblipsreload.la
+libreload_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libreload_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
 libreload_cli_la_SOURCES = \
 	ext-module.c \
 	ext-module.h \

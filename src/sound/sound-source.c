@@ -22,6 +22,8 @@
  * @{
  */
 
+#ifndef LI_DISABLE_SOUND
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "sound-source.h"
@@ -207,6 +209,8 @@ lisnd_source_set_velocity (lisndSource*       self,
 {
 	alSource3f (self->source, AL_VELOCITY, value->x, value->y, value->z);
 }
+
+#endif
 
 /** @} */
 /** @} */

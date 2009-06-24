@@ -448,7 +448,7 @@ private_voxel_diff (licliModule* module,
 		block = sector->blocks + blockid;
 
 		/* Read block data. */
-		if (!lieng_block_read (block, reader))
+		if (!lieng_block_read (block, module->engine, reader))
 			return 0;
 		if (block->dirty)
 			sector->dirty = 1;

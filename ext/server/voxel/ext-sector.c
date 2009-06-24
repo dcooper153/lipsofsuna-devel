@@ -85,7 +85,7 @@ liext_sector_read (liengSector* self,
 	for (i = 0 ; i < LIENG_BLOCKS_PER_SECTOR ; i++)
 	{
 		block = self->blocks + i;
-		if (!lieng_block_read (block, reader))
+		if (!lieng_block_read (block, self->engine, reader))
 		{
 			sqlite3_finalize (statement);
 			return 0;

@@ -31,7 +31,9 @@
 #include <render/lips-render.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
+#ifndef LI_DISABLE_SOUND
 #include <sound/lips-sound.h>
+#endif
 #include <widget/lips-widget.h>
 #include "client.h"
 #include "client-callbacks.h"

@@ -111,7 +111,7 @@ lieng_sector_free (liengSector* self)
 
 	/* Free blocks. */
 	for (i = 0 ; i < LIENG_BLOCKS_PER_SECTOR ; i++)
-		lieng_block_free (self->blocks + i);
+		lieng_block_free (self->blocks + i, self->engine);
 
 	free (self);
 }
@@ -146,7 +146,7 @@ lieng_sector_fill (liengSector* self,
 		{
 			for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++)
 			{
-				lieng_block_fill (self->blocks + i, terrain);
+				lieng_block_fill (self->blocks + i, self->engine, terrain);
 				i++;
 			}
 		}

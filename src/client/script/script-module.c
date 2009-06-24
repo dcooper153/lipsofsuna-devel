@@ -169,9 +169,9 @@ Module_particle_effect (lua_State* lua)
 	{
 		position = *((limatVector*) vector->data);;
 		velocity = limat_vector_init (
-			0.1*(random()/(0.5*RAND_MAX)-1.0),
-			0.1*(random()/(3.0*RAND_MAX)+3.0),
-			0.1*(random()/(0.5*RAND_MAX)-1.0));
+			0.1*(rand()/(0.5*RAND_MAX)-1.0),
+			0.1*(rand()/(3.0*RAND_MAX)+3.0),
+			0.1*(rand()/(0.5*RAND_MAX)-1.0));
 		particle = lirnd_render_insert_particle (module->engine->render, &position, &velocity);
 		if (particle != NULL)
 		{

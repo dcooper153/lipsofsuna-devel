@@ -22,6 +22,8 @@
  * @{
  */
 
+#ifndef LI_DISABLE_SOUND
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <vorbis/codec.h>
@@ -129,6 +131,8 @@ lisnd_sample_free (lisndSample* self)
 	alDeleteBuffers (1, &self->buffer);
 	free (self);
 }
+
+#endif
 
 /** @} */
 /** @} */

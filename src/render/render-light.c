@@ -85,8 +85,7 @@ lirnd_light_new (lirndRender* render,
 	self->transform = limat_transform_identity ();
 	if (!shadows)
 		return self;
-	if (!livid_features.EXT_framebuffer_object ||
-	    !livid_features.ARB_depth_buffer_float)
+	if (!GLEW_EXT_framebuffer_object || !GLEW_ARB_depth_buffer_float)
 		return self;
 
 	/* Create shadow texture. */
@@ -185,7 +184,7 @@ lirnd_light_new_from_model (lirndRender*     render,
  */
 void lirnd_light_free (lirndLight* self)
 {
-	if (livid_features.EXT_framebuffer_object)
+	if (GLEW_EXT_framebuffer_object)
 		glDeleteFramebuffersEXT (1, &self->shadow.fbo);
 	glDeleteTextures (1, &self->shadow.map);
 	free (self);

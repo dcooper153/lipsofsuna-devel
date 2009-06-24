@@ -22,6 +22,8 @@
  * @{
  */
 
+#ifndef LI_DISABLE_SOUND
+
 #include "sound-manager.h"
 
 /**
@@ -132,6 +134,8 @@ lisnd_manager_set_sample (lisndManager* self,
 
 	return 1;
 }
+
+#endif
 
 /** @} */
 /** @} */

@@ -32,13 +32,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+target_triplet = @target@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure INSTALL \
 	msc/config.guess msc/config.sub msc/depcomp msc/install-sh \
 	msc/ltmain.sh msc/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/msc/m4/libtool.m4 \
+	$(top_srcdir)/msc/m4/ltoptions.m4 \
+	$(top_srcdir)/msc/m4/ltsugar.m4 \
+	$(top_srcdir)/msc/m4/ltversion.m4 \
+	$(top_srcdir)/msc/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -62,6 +67,9 @@ am_liblua5_1_la_OBJECTS = lapi.lo lauxlib.lo lbaselib.lo lcode.lo \
 	lstrlib.lo ltable.lo ltablib.lo ltm.lo lundump.lo lvm.lo \
 	lzio.lo print.lo
 liblua5_1_la_OBJECTS = $(am_liblua5_1_la_OBJECTS)
+liblua5_1_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(liblua5_1_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
 am__depfiles_maybe = depfiles
@@ -201,7 +209,11 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
+target = @target@
 target_alias = @target_alias@
+target_cpu = @target_cpu@
+target_os = @target_os@
+target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
@@ -211,6 +223,7 @@ AM_CFLAGS = -g -Wall
 lib_LTLIBRARIES = \
         liblua5.1.la
 
+liblua5_1_la_LDFLAGS = -no-undefined
 liblua5_1_la_SOURCES = \
 	src/lapi.c \
 	src/lapi.h \
@@ -331,7 +344,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 liblua5.1.la: $(liblua5_1_la_OBJECTS) $(liblua5_1_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(liblua5_1_la_OBJECTS) $(liblua5_1_la_LIBADD) $(LIBS)
+	$(liblua5_1_la_LINK) -rpath $(libdir) $(liblua5_1_la_OBJECTS) $(liblua5_1_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

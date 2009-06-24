@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,6 +25,7 @@
 #include "system-error.h"
 #include "system-execute.h"
 #include "system-file.h"
+#include "system-misc.h"
 #include "system-module.h"
 #include "system-notify.h"
 #include "system-path.h"

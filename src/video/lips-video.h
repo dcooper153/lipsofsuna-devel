@@ -18,7 +18,6 @@
 #ifndef __LIPS_VIDEO_H__
 #define __LIPS_VIDEO_H__
 
-#include "video-debug.h"
 #include "video-features.h"
 #include "video-opengl.h"
 

@@ -716,7 +716,7 @@ private_particle_render (lirndRender* self)
 	/* Set particle rendering mode. */
 	glBlendFunc (GL_ONE, GL_ONE);
 	glDisable (GL_LIGHTING);
-	if (livid_features.ARB_point_sprite)
+	if (GLEW_ARB_point_sprite)
 	{
 		glEnable (GL_POINT_SPRITE_ARB);
 		glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
@@ -740,7 +740,7 @@ private_particle_render (lirndRender* self)
 	glEnd ();
 
 	/* Set normal rendering mode. */
-	if (livid_features.ARB_point_sprite)
+	if (GLEW_ARB_point_sprite)
 	{
 		glDisable (GL_POINT_SPRITE_ARB);
 	}

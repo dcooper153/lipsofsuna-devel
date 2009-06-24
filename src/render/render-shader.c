@@ -218,7 +218,7 @@ private_check_compile (lirndShader* self,
 		}
 		if (strstr (log, "software"))
 		{
-			lisys_error_set (EOPNOTSUPP, "unsupported %s shader `%s'", type, name);
+			lisys_error_set (ENOTSUP, "unsupported %s shader `%s'", type, name);
 			return 0;
 		}
 	}
@@ -258,7 +258,7 @@ private_check_link (lirndShader* self,
 		}
 		if (strstr (log, "software"))
 		{
-			lisys_error_set (EOPNOTSUPP, "unsupported program `%s'", name);
+			lisys_error_set (ENOTSUP, "unsupported program `%s'", name);
 			return 0;
 		}
 	}

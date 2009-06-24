@@ -49,6 +49,7 @@ nobase_bullet_include_HEADERS += \
 
 lib_LTLIBRARIES	= libbulletmath.la libbulletcollision.la libbulletdynamics.la libbulletsoftbody.la libbulletmultithreaded.la
 
+libbulletmultithreaded_la_LDFLAGS = -no-undefined
 libbulletmultithreaded_la_CXXFLAGS = ${CXXFLAGS} -I./BulletMultiThreaded/vectormath/scalar/cpp
 libbulletmultithreaded_la_SOURCES =\
 		BulletMultiThreaded/SpuCollisionObjectWrapper.cpp \
@@ -119,6 +120,7 @@ lib_LTLIBRARIES	= libbulletmath.la libbulletcollision.la libbulletdynamics.la li
 endif
 
 
+libbulletmath_la_LDFLAGS = -no-undefined
 libbulletmath_la_SOURCES	= \
 		LinearMath/btQuickprof.cpp \
 		LinearMath/btGeometryUtil.cpp \
@@ -148,6 +150,8 @@ libbulletmath_la_SOURCES	= \
 		LinearMath/btRandom.h
 
 
+libbulletcollision_la_LDFLAGS = -no-undefined
+libbulletcollision_la_LIBADD = libbulletmath.la
 libbulletcollision_la_SOURCES = \
 		BulletCollision/NarrowPhaseCollision/btRaycastCallback.cpp \
 		BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.cpp \
@@ -318,6 +322,8 @@ libbulletcollision_la_SOURCES = \
                 BulletCollision/Gimpact/gim_memory.cpp\
                 BulletCollision/Gimpact/gim_tri_collision.cpp
 
+libbulletdynamics_la_LDFLAGS = -no-undefined
+libbulletdynamics_la_LIBADD = libbulletmath.la libbulletcollision.la
 libbulletdynamics_la_SOURCES = \
 		BulletDynamics/Dynamics/btContinuousDynamicsWorld.cpp \
 		BulletDynamics/Dynamics/btRigidBody.cpp \
@@ -361,6 +367,8 @@ libbulletdynamics_la_SOURCES = \
 		BulletDynamics/Vehicle/btRaycastVehicle.h \
 		BulletDynamics/Vehicle/btWheelInfo.h
 
+libbulletsoftbody_la_LDFLAGS = -no-undefined
+libbulletsoftbody_la_LIBADD = libbulletmath.la libbulletcollision.la libbulletdynamics.la
 libbulletsoftbody_la_SOURCES = \
 		BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.cpp \
 		BulletSoftBody/btSoftBody.cpp \

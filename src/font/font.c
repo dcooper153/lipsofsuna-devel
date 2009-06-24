@@ -233,7 +233,7 @@ static lifntFontGlyph* self_cache_glyph (lifntFont* self,
 	else
 	{
 		/* Replace random tile. */
-		index = random () % self->table_length;
+		index = rand () % self->table_length;
 		cached = self->table[index];
 		lialg_u32dic_remove (self->index, cached->glyph);
 		if (!lialg_u32dic_insert (self->index, glyph, cached))

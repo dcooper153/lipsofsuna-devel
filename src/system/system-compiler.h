@@ -18,12 +18,12 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysAttribute Attribute
+ * \addtogroup lisysCompiler Compiler
  * @{
  */
 
-#ifndef __SYSTEM_ATTRIBUTE_H__
-#define __SYSTEM_ATTRIBUTE_H__
+#ifndef __SYSTEM_COMPILER_H__
+#define __SYSTEM_COMPILER_H__
 
 #ifdef __cplusplus
 #define LI_BEGIN_DECLS extern "C" {
@@ -31,6 +31,12 @@
 #else
 #define LI_BEGIN_DECLS
 #define LI_END_DECLS
+#endif
+
+#if defined WIN32 && defined DLL_EXPORT
+#define LIAPICALL __declspec(dllexport)
+#else
+#define LIAPICALL
 #endif
 
 #if __GNUC__ >= 4

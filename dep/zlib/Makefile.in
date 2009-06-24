@@ -32,13 +32,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+target_triplet = @target@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure ChangeLog \
 	msc/config.guess msc/config.sub msc/depcomp msc/install-sh \
 	msc/ltmain.sh msc/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/msc/m4/libtool.m4 \
+	$(top_srcdir)/msc/m4/ltoptions.m4 \
+	$(top_srcdir)/msc/m4/ltsugar.m4 \
+	$(top_srcdir)/msc/m4/ltversion.m4 \
+	$(top_srcdir)/msc/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -59,6 +64,9 @@ am_libz_la_OBJECTS = adler32.lo compress.lo crc32.lo deflate.lo \
 	gzio.lo infback.lo inffast.lo inflate.lo inftrees.lo trees.lo \
 	uncompr.lo zutil.lo
 libz_la_OBJECTS = $(am_libz_la_OBJECTS)
+libz_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(libz_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
 am__depfiles_maybe = depfiles
@@ -198,7 +206,11 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
+target = @target@
 target_alias = @target_alias@
+target_cpu = @target_cpu@
+target_os = @target_os@
+target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
@@ -208,6 +220,7 @@ AM_CFLAGS = -g -Wall
 lib_LTLIBRARIES = \
 	libz.la
 
+libz_la_LDFLAGS = -no-undefined
 libz_la_SOURCES = \
 	adler32.c \
 	compress.c \
@@ -297,7 +310,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libz.la: $(libz_la_OBJECTS) $(libz_la_DEPENDENCIES) 
-	$(LINK) -rpath $(libdir) $(libz_la_OBJECTS) $(libz_la_LIBADD) $(LIBS)
+	$(libz_la_LINK) -rpath $(libdir) $(libz_la_OBJECTS) $(libz_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

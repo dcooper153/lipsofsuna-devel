@@ -308,7 +308,7 @@ lisrv_server_main (lisrvServer* self)
 		if (!lisrv_server_update (self, secs))
 			break;
 #ifdef LI_SERVER_SLEEP
-		usleep (10);
+		lisys_usleep (10);
 #endif
 	}
 

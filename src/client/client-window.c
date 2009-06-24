@@ -108,7 +108,6 @@ licli_window_set_size (licliWindow* self,
 static int
 private_init_input (licliWindow* self)
 {
-	SDL_InitSubSystem (SDL_INIT_JOYSTICK);
 	self->joystick = SDL_JoystickOpen (0);
 	SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	return 1;
@@ -149,6 +148,7 @@ private_resize (licliWindow* self,
                 int          fsaa)
 {
 	int depth;
+	GLenum error;
 
 	/* Recreate surface. */
 	for ( ; fsaa >= 0 ; fsaa--)
@@ -170,6 +170,14 @@ private_resize (licliWindow* self,
 	if (self->screen == NULL)
 	{
 		lisys_error_set (LI_ERROR_UNKNOWN, "cannot set video mode");
+		return 0;
+	}
+
+	/* Initialize GLEW. */
+	error = glewInit ();
+	if (error != GLEW_OK)
+	{
+		lisys_error_set (LI_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
 		return 0;
 	}
 

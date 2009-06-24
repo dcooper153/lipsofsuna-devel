@@ -68,11 +68,14 @@ licli_paths_new ()
 #endif
 
 	/* Create the local directory. */
+#warning FIXME: Creating local data directory disabled.
+#if 0
 	if (mkdir (self->local_data, S_IRWXU))
 	{
 		if (errno != EEXIST)
 			printf ("WARNING: Cannot create directory `%s'.", self->local_data);
 	}
+#endif
 
 	return self;
 

@@ -79,11 +79,13 @@ struct _liengBlock
 };
 
 void
-lieng_block_free (liengBlock* self);
+lieng_block_free (liengBlock*  self,
+                  liengEngine* engine);
 
 void
-lieng_block_fill (liengBlock* self,
-                  liengTile   terrain);
+lieng_block_fill (liengBlock*  self,
+                  liengEngine* engine,
+                  liengTile    terrain);
 
 int
 lieng_block_fill_aabb (liengBlock*      self,
@@ -100,8 +102,9 @@ void
 lieng_block_optimize (liengBlock* self);
 
 int
-lieng_block_read (liengBlock* self,
-                  liReader*   reader);
+lieng_block_read (liengBlock*  self,
+                  liengEngine* engine,
+                  liReader*    reader);
 
 int
 lieng_block_write (liengBlock*  self,

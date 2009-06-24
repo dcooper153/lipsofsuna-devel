@@ -64,6 +64,13 @@ livie_viewer_new (const char* name,
 	char buf[256];
 	livieViewer* self;
 
+	/* Initialize SDL. */
+	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
+	{
+		lisys_error_set (ENOTSUP, "initializing SDL failed");
+		return NULL;
+	}
+
 	/* Allocate self. */
 	self = calloc (1, sizeof (livieViewer));
 	if (self == NULL)
@@ -319,14 +326,11 @@ private_init_reload (livieViewer* self)
 static int
 private_init_video (livieViewer* self)
 {
-	SDL_Init (SDL_INIT_VIDEO);
-
 	/* Create the window. */
 	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
 	    private_resize (self, 1024, 768, 0) == 0)
 		return 0;
 	livid_features_init ();
-	livid_video_init (NULL);
 
 	return 1;
 }
@@ -338,6 +342,7 @@ private_resize (livieViewer* self,
                 int          fsaa)
 {
 	int depth;
+	GLenum error;
 
 	/* Recreate surface. */
 	for ( ; fsaa >= 0 ; fsaa--)
@@ -359,6 +364,14 @@ private_resize (livieViewer* self,
 	if (self->screen == NULL)
 	{
 		lisys_error_set (LI_ERROR_UNKNOWN, "cannot set video mode");
+		return 0;
+	}
+
+	/* Initialize GLEW. */
+	error = glewInit ();
+	if (error != GLEW_OK)
+	{
+		lisys_error_set (LI_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
 		return 0;
 	}
 
