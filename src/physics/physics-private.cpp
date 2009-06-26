@@ -179,8 +179,6 @@ void liphyContactController::updateAction (btCollisionWorld* world, btScalar del
 					contact.point = limat_vector_init (pt[0], pt[1], pt[2]);
 					contact.normal = limat_vector_init (nm[0], nm[1], nm[2]);
 					tmp->config.contact_call (tmp, &contact);
-					printf ("%p from manifold pair=%d/%d mani=%d/%d\n", contact.object,
-						i, pairarray.size (), j, manifolds.size ());
 
 					/* Dangerous delete this condition here. */
 					if (tmp->config.contact_call == NULL ||

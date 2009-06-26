@@ -73,16 +73,6 @@ liscr_copyargs (lua_State* lua,
                 liscrData* data,
                 int        arg);
 
-int
-liscr_getref (lua_State* lua,
-              liscrData* owner,
-              int        slot);
-
-void
-liscr_setref (lua_State* lua,
-              liscrData* owner,
-              int        slot);
-
 void
 liscr_pushclass (lua_State*  lua,
                  liscrClass* clss);
