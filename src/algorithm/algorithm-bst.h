@@ -59,6 +59,10 @@ struct _lialgBst
 	lialgBstMalloc malloc;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 lialgBst*
 lialg_bst_new (lialgBstCompare cmp,
                lialgBstMalloc  malloc,
@@ -102,6 +106,10 @@ lialg_bst_remove (lialgBst*     self,
 void
 lialg_bst_unlink (lialgBst*     self,
                   lialgBstNode* node);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
