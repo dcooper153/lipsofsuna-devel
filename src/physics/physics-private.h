@@ -131,9 +131,11 @@ class liphyContactController : public btActionInterface
 {
 public:
 	liphyContactController (liphyObject* data);
+	virtual ~liphyContactController ();
 	virtual void updateAction (btCollisionWorld* world, btScalar delta);
 	virtual void debugDraw (btIDebugDraw* debugDrawer);
 public:
+	lialgPtrdic* visited;
 	liphyObject* data;
 };
 

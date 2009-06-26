@@ -881,6 +881,11 @@ void
 liphy_object_get_velocity (liphyObject* self,
                            limatVector* value)
 {
+	if (self->body != NULL)
+	{
+		const btVector3& velocity = self->body->getLinearVelocity ();
+		self->config.velocity = limat_vector_init (velocity[0], velocity[1], velocity[2]);
+	}
 	*value = self->config.velocity;
 }
 
@@ -996,7 +1001,7 @@ private_sweep_sphere (const liphyObject* self,
 	result->point.y = test.m_hitPointWorld[1];
 	result->point.z = test.m_hitPointWorld[2];
 	if (test.m_hitCollisionObject != NULL)
-		result->object = test.m_hitCollisionObject->getUserPointer ();
+		result->object = (liphyObject*) test.m_hitCollisionObject->getUserPointer ();
 	else
 		result->object = NULL;
 

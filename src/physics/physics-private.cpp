@@ -80,6 +80,12 @@ liphyCustomController::debugDraw (btIDebugDraw* debugDrawer)
 liphyContactController::liphyContactController (liphyObject* data)
 {
 	this->data = data;
+	this->visited = lialg_ptrdic_new ();
+}
+
+liphyContactController::~liphyContactController ()
+{
+	lialg_ptrdic_free (this->visited);
 }
 
 void liphyContactController::updateAction (btCollisionWorld* world, btScalar delta)
@@ -99,6 +105,8 @@ void liphyContactController::updateAction (btCollisionWorld* world, btScalar del
 	btHashedOverlappingPairCache* cache = this->data->ghost->getOverlappingPairCache ();
 	btBroadphasePairArray& pairarray = cache->getOverlappingPairArray ();
 	btOverlappingPairCache* paircache = this->data->physics->dynamics->getPairCache ();
+
+	lialg_ptrdic_clear (this->visited);
 
 	/* Update ghost position. */
 	tmp = this->data;
@@ -140,6 +148,11 @@ void liphyContactController::updateAction (btCollisionWorld* world, btScalar del
 			contact.object = (liphyObject*) object->getUserPointer ();
 			assert (contact.object == NULL || contact.object->physics == tmp->physics);
 
+			/* Reject duplicates. */
+			if (contact.object != NULL && lialg_ptrdic_find (this->visited, contact.object) != NULL)
+				continue;
+			lialg_ptrdic_insert (this->visited, contact.object, (void*) -1);
+
 			/* Get pair momentum. */
 			if (contact.object != NULL)
 			{
@@ -149,12 +162,12 @@ void liphyContactController::updateAction (btCollisionWorld* world, btScalar del
 			else
 				momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
 
-			/* Calculate average impulse per point. */
+			/* Calculate total impulse. */
+			/* FIXME: This is pretty sloppy. */
 			contact.impulse = limat_vector_get_length (
 				limat_vector_subtract (momentum0, momentum1));
-			contact.impulse /= contacts;
 
-			/* Loop through all collision points. */
+			/* Just returning the first point should be good enough. */
 			for (p = 0 ; p < contacts ; p++)
 			{
 				const btManifoldPoint& point = manifold->getContactPoint (p);
@@ -166,11 +179,14 @@ void liphyContactController::updateAction (btCollisionWorld* world, btScalar del
 					contact.point = limat_vector_init (pt[0], pt[1], pt[2]);
 					contact.normal = limat_vector_init (nm[0], nm[1], nm[2]);
 					tmp->config.contact_call (tmp, &contact);
+					printf ("%p from manifold pair=%d/%d mani=%d/%d\n", contact.object,
+						i, pairarray.size (), j, manifolds.size ());
 
 					/* Dangerous delete this condition here. */
 					if (tmp->config.contact_call == NULL ||
 					    tmp->contact_controller != this)
 						return;
+					break;
 				}
 			}
 		}

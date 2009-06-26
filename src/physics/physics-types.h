@@ -69,15 +69,7 @@ struct _liphyCollision
 	float fraction;
 	limatVector normal;
 	limatVector point;
-
-	/**
-	 * \brief Userdata of the colliding object.
-	 *
-	 * On server side, the userdata is a pointer to the server object, or
-	 * NULL if there is no server object assigned, such as in a case of
-	 * a collision with static sector data.
-	 */
-	void* object;
+	liphyObject* object;
 };
 
 /** @} */

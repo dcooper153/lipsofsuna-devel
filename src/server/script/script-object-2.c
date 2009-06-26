@@ -379,6 +379,7 @@ static int
 Object_sweep_sphere (lua_State* lua)
 {
 	float radius;
+	liengObject* eobj;
 	liscrData* object;
 	liscrData* start;
 	liscrData* end;
@@ -412,10 +413,12 @@ Object_sweep_sphere (lua_State* lua)
 		}
 		if (result.object != NULL)
 		{
-			/* The object field holds the userdata of the colliding engine
-			   object or NULL if no collision occurred. */
-			liscr_pushdata (lua, LIENG_OBJECT (result.object)->script);
-			lua_setfield (lua, -2, "object");
+			eobj = liphy_object_get_userdata (result.object);
+			if (eobj != NULL && eobj->script != NULL)
+			{
+				liscr_pushdata (lua, eobj->script);
+				lua_setfield (lua, -2, "object");
+			}
 		}
 	}
 	else
