@@ -45,6 +45,11 @@ struct _liextInventoryWidget
 liwdgWidget*
 liext_inventory_widget_new (liextInventory* inventory);
 
+void
+liext_inventory_widget_get_slot_rect (const liextInventoryWidget* self,
+                                      int                         slot,
+                                      liwdgRect*                  value);
+
 #endif
 
 /** @} */

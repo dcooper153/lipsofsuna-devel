@@ -61,6 +61,12 @@ static const liwdgClass liextInventoryWidgetType =
 	(liwdgWidgetEventFunc) private_event
 };
 
+/**
+ * \brief Creates a new inventory widget.
+ *
+ * \param inventory Inventory.
+ * \return New widget or NULL.
+ */
 liwdgWidget*
 liext_inventory_widget_new (liextInventory* inventory)
 {
@@ -88,6 +94,44 @@ liext_inventory_widget_new (liextInventory* inventory)
 	lirnd_light_set_direction (LIEXT_INVENTORY_WIDGET (self)->light, &dir);
 
 	return self;
+}
+
+/**
+ * \brief Gets the allocation of a menu item.
+ *
+ * \param self Inventory widget.
+ * \param slot Slot index.
+ * \param value Return location for the rectangle.
+ */
+void
+liext_inventory_widget_get_slot_rect (const liextInventoryWidget* self,
+                                      int                         slot,
+                                      liwdgRect*                  value)
+{
+	int w;
+	int size;
+	liwdgRect rect;
+	liwdgSubimage* subimg;
+
+	/* Get widget size. */
+	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+	size = liext_inventory_get_size (self->inventory);
+
+	/* Calculate slot width. */
+	subimg = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, "inventory");
+	if (subimg != NULL)
+	{
+		w = (int) ceil ((float) LIEXT_SLOT_SIZE / LI_MAX (0, subimg->w[1]));
+		w = subimg->w[0] + w * subimg->w[1] + subimg->w[2];
+	}
+	else
+		w = LIEXT_SLOT_SIZE;
+
+	/* Calculate slot offset. */
+	value->x = rect.x + slot * w;
+	value->y = rect.y;
+	value->width = w;
+	value->height = rect.height;
 }
 
 /****************************************************************************/

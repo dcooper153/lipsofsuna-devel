@@ -792,6 +792,7 @@ private_init_script (licliModule* self)
 	    !liscr_script_create_class (self->script, "Player", licliPlayerScript, self) ||
 	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
 	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Widget", licliWidgetScript, self) ||
 	    !liscr_script_create_class (self->script, "Window", licliWindowScript, self))
 		return 0;
 

@@ -67,6 +67,40 @@ private_callback_activated (liscrData* data,
 
 /* @luadoc
  * ---
+ * -- Gets the allocation rectangle of a slot.
+ * --
+ * -- @param self Inventory widget.
+ * -- @param slot Slot index.
+ * -- @return Rectangle.
+ * function InventoryWidget.get_slot_rect(self, slot)
+ */
+static int
+InventoryWidget_get_slot_rect (lua_State* lua)
+{
+	int slot;
+	liscrData* self;
+	liwdgRect rect;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY_WIDGET);
+	slot = luaL_checkinteger (lua, 2);
+	luaL_argcheck (lua, slot >= 1, 2, "invalid slot index");
+
+	liext_inventory_widget_get_slot_rect (self->data, slot - 1, &rect);
+	lua_newtable (lua);
+	lua_pushnumber (lua, rect.x);
+	lua_setfield (lua, -2, "x");
+	lua_pushnumber (lua, rect.y);
+	lua_setfield (lua, -2, "y");
+	lua_pushnumber (lua, rect.width);
+	lua_setfield (lua, -2, "width");
+	lua_pushnumber (lua, rect.height);
+	lua_setfield (lua, -2, "height");
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new inventory widget.
  * --
  * -- @param self Inventory widget class.
@@ -129,6 +163,7 @@ liextInventoryWidgetScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY_WIDGET, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_insert_func (self, "get_slot_rect", InventoryWidget_get_slot_rect);
 	liscr_class_insert_func (self, "new", InventoryWidget_new);
 }
 

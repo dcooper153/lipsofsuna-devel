@@ -524,6 +524,7 @@ Menu_new (lua_State* lua)
  * --
  * -- @param self Menu.
  * -- @param name Item text.
+ * -- @return Rectangle or nil.
  * function Menu.get_item_rect(self, name)
  */
 static int
