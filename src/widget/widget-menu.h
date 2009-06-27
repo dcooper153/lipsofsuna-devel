@@ -46,6 +46,11 @@ liwdg_menu_remove_group (liwdgMenu*      self,
                          liwdgMenuGroup* group);
 
 int
+liwdg_menu_get_item_rect (const liwdgMenu* self,
+                          const char*      name,
+                          liwdgRect*       value);
+
+int
 liwdg_menu_get_vertical (const liwdgMenu* self);
 
 void

@@ -27,6 +27,15 @@
 #include <client/lips-client.h>
 #include "lips-client-script.h"
 
+enum
+{
+	POPUP_LEFT,
+	POPUP_RIGHT,
+	POPUP_UP,
+	POPUP_DOWN,
+	POPUP_MAX
+};
+
 static void
 private_detach (liscrData* self);
 
@@ -57,16 +66,42 @@ Widget___gc (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Popup below the parent rectangle.
+ * -- @name Widget.POPUP_DOWN
+ * -- @class table
+ */
+/* @luadoc
+ * ---
+ * -- Popup to the left from the parent rectangle.
+ * -- @name Widget.POPUP_LEFT
+ * -- @class table
+ */
+/* @luadoc
+ * ---
+ * -- Popup to the right from the parent rectangle.
+ * -- @name Widget.POPUP_RIGHT
+ * -- @class table
+ */
+/* @luadoc
+ * ---
+ * -- Popup above the parent rectangle.
+ * -- @name Widget.POPUP_UP
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
  * -- Pops up the widget.
  * --
  * -- @param self Widget.
- * -- @param x Optional X coordinate.
- * -- @param y Optional Y coordinate.
- * function Widget.popup(self, x, y)
+ * -- @param rect Optional rectangle.
+ * -- @param dir Optional popup direction from the rectangle.
+ * function Widget.popup(self, rect, dir)
  */
 static int
 Widget_popup (lua_State* lua)
 {
+	int dir;
 	liscrData* self;
 	liwdgRect rect;
 	liwdgSize screen;
@@ -77,17 +112,71 @@ Widget_popup (lua_State* lua)
 	widget = self->data;
 	luaL_argcheck (lua, widget->state == LIWDG_WIDGET_STATE_DETACHED, 1, "widget already in use");
 	luaL_argcheck (lua, widget->parent == NULL, 1, "widget already in use");
-	liwdg_widget_get_request (widget, &size);
-	liwdg_manager_get_size (widget->manager, &screen.width, &screen.height);
-	rect.x = (screen.width - size.width) / 2;
-	rect.y = (screen.height - size.height) / 2;
-	rect.width = size.width;
-	rect.height = size.height;
-	if (!lua_isnoneornil (lua, 2))
-		rect.x = (int) luaL_checknumber (lua, 2);
-	if (!lua_isnoneornil (lua, 3))
-		rect.y = (int) luaL_checknumber (lua, 3);
 
+	/* Calculate position. */
+	liwdg_widget_get_request (widget, &size);
+	if (!lua_isnoneornil (lua, 2))
+	{
+		/* Get arguments. */
+		luaL_checktype (lua, 2, LUA_TTABLE);
+		if (!lua_isnoneornil (lua, 3))
+		{
+			dir = luaL_checkinteger (lua, 3);
+			luaL_argcheck (lua, 0 <= dir && dir < POPUP_MAX, 3, "invalid popup direction");
+		}
+		else
+			dir = POPUP_DOWN;
+		lua_getfield (lua, 2, "x");
+		if (lua_type (lua, -1) == LUA_TNUMBER)
+			rect.x = lua_tonumber (lua, -1);
+		else
+			rect.x = 0;
+		lua_pop (lua, 1);
+		lua_getfield (lua, 2, "y");
+		if (lua_type (lua, -1) == LUA_TNUMBER)
+			rect.y = lua_tonumber (lua, -1);
+		else
+			rect.y = 0;
+		lua_pop (lua, 1);
+		lua_getfield (lua, 2, "width");
+		if (lua_type (lua, -1) == LUA_TNUMBER)
+			rect.width = lua_tonumber (lua, -1);
+		else
+			rect.width = 0;
+		lua_pop (lua, 1);
+		lua_getfield (lua, 2, "height");
+		if (lua_type (lua, -1) == LUA_TNUMBER)
+			rect.height = lua_tonumber (lua, -1);
+		else
+			rect.height = 0;
+		lua_pop (lua, 1);
+
+		/* Calculate relative offset. */
+		switch (dir)
+		{
+			case POPUP_LEFT: rect.x -= size.width; break;
+			case POPUP_RIGHT: rect.x += rect.width; break;
+			case POPUP_UP: rect.y += rect.height; break;
+			case POPUP_DOWN: rect.y -= size.height; break;
+			default:
+				assert (0);
+				break;
+		}
+		rect.width = size.width;
+		rect.height = size.height;
+	}
+	else
+	{
+		/* Place at center. */
+		liwdg_manager_get_size (widget->manager, &screen.width, &screen.height);
+		rect.x = (screen.width - size.width) / 2;
+		rect.y = (screen.height - size.height) / 2;
+		rect.width = size.width;
+		rect.height = size.height;
+	}
+
+	/* Popup the widget. */
+	liwdg_widget_set_visible (widget, 1);
 	liwdg_manager_insert_popup (widget->manager, self->data);
 	liwdg_widget_set_allocation (widget, rect.x, rect.y, rect.width, rect.height);
 	liscr_data_ref (self, NULL);
@@ -215,6 +304,10 @@ licliWidgetScript (liscrClass* self,
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
+	liscr_class_insert_enum (self, "POPUP_DOWN", POPUP_DOWN);
+	liscr_class_insert_enum (self, "POPUP_LEFT", POPUP_LEFT);
+	liscr_class_insert_enum (self, "POPUP_RIGHT", POPUP_RIGHT);
+	liscr_class_insert_enum (self, "POPUP_UP", POPUP_UP);
 	liscr_class_insert_func (self, "__gc", Widget___gc);
 	liscr_class_insert_func (self, "popup", Widget_popup);
 	liscr_class_insert_getter (self, "visible", Widget_getter_visible);

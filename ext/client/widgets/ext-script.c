@@ -520,6 +520,39 @@ Menu_new (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Gets the allocation rectangle of a menu item.
+ * --
+ * -- @param self Menu.
+ * -- @param name Item text.
+ * function Menu.get_item_rect(self, name)
+ */
+static int
+Menu_get_item_rect (lua_State* lua)
+{
+	const char* name;
+	liscrData* self;
+	liwdgRect rect;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
+	name = luaL_checkstring (lua, 2);
+
+	if (!liwdg_menu_get_item_rect (self->data, name, &rect))
+		return 0;
+	lua_newtable (lua);
+	lua_pushnumber (lua, rect.x);
+	lua_setfield (lua, -2, "x");
+	lua_pushnumber (lua, rect.y);
+	lua_setfield (lua, -2, "y");
+	lua_pushnumber (lua, rect.width);
+	lua_setfield (lua, -2, "width");
+	lua_pushnumber (lua, rect.height);
+	lua_setfield (lua, -2, "height");
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Inserts a menu group to the menu.
  * --
  * -- @param self Menu.
@@ -743,8 +776,9 @@ liextMenuScript (liscrClass* self,
 	liscr_class_inherit (self, licliWidgetScript, module->module);
 	liscr_class_insert_enum (self, "HORIZONTAL", 0);
 	liscr_class_insert_enum (self, "VERTICAL", 1);
-	liscr_class_insert_func (self, "new", Menu_new);
+	liscr_class_insert_func (self, "get_item_rect", Menu_get_item_rect);
 	liscr_class_insert_func (self, "insert", Menu_insert);
+	liscr_class_insert_func (self, "new", Menu_new);
 	liscr_class_insert_getter (self, "font", Menu_getter_font);
 	liscr_class_insert_getter (self, "orientation", Menu_getter_orientation);
 	liscr_class_insert_setter (self, "font", Menu_setter_font);

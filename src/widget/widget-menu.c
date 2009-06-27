@@ -58,7 +58,7 @@ static void
 private_rebuild (liwdgMenu* self);
 
 static const char*
-private_style (liwdgMenu* self);
+private_style (const liwdgMenu* self);
 
 const liwdgClass liwdgMenuType =
 {
@@ -70,12 +70,25 @@ const liwdgClass liwdgMenuType =
 
 /****************************************************************************/
 
+/**
+ * \brief Creates a new menu widget.
+ *
+ * \param manager Widget manager.
+ * \return New widget or NULL.
+ */
 liwdgWidget*
 liwdg_menu_new (liwdgManager* manager)
 {
 	return liwdg_widget_new (manager, &liwdgMenuType);
 }
 
+/**
+ * \brief Inserts a group to the menu.
+ *
+ * \param self Menu.
+ * \param group Menu group.
+ * \return Nonzero on success.
+ */
 int
 liwdg_menu_insert_group (liwdgMenu*      self,
                          liwdgMenuGroup* group)
@@ -99,11 +112,71 @@ liwdg_menu_insert_group (liwdgMenu*      self,
 	return 1;
 }
 
+/**
+ * \brief Removes a group from the menu.
+ *
+ * \param self Menu.
+ * \param group Menu group.
+ */
 void
 liwdg_menu_remove_group (liwdgMenu*      self,
                          liwdgMenuGroup* group)
 {
 	private_rebuild (self);
+}
+
+/**
+ * \brief Gets the allocation of a menu item.
+ *
+ * \param self Menu.
+ * \param name Item name.
+ * \param value Return location for the rectangle.
+ * \return Nonzero on success.
+ */
+int
+liwdg_menu_get_item_rect (const liwdgMenu* self,
+                          const char*      name,
+                          liwdgRect*       value)
+{
+	lialgList* ptr;
+	liwdgMenuItem* item;
+	liwdgMenuProxy* proxy;
+	liwdgRect rect;
+
+	if (self->font == NULL)
+		return 0;
+	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+	if (self->vertical)
+	{
+		for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+		{
+			proxy = ptr->data;
+			item = proxy->items->data;
+			if (!strcmp (name, item->text))
+			{
+				*value = rect;
+				return 1;
+			}
+			rect.y += lifnt_font_get_height (self->font) + SPACINGY;
+		}
+	}
+	else
+	{
+		for (ptr = self->proxies ; ptr->next != NULL ; ptr = ptr->next) {}
+		for ( ; ptr != NULL ; ptr = ptr->prev)
+		{
+			proxy = ptr->data;
+			item = proxy->items->data;
+			if (!strcmp (name, item->text))
+			{
+				*value = rect;
+				return 1;
+			}
+			rect.x += lifnt_layout_get_width (proxy->label) + SPACINGX;
+		}
+	}
+
+	return 0;
 }
 
 int
@@ -324,7 +397,7 @@ private_rebuild (liwdgMenu* self)
 }
 
 static const char*
-private_style (liwdgMenu* self)
+private_style (const liwdgMenu* self)
 {
 	if (self->vertical)
 		return "menu";
