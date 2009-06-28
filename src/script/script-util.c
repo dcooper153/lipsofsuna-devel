@@ -133,8 +133,8 @@ liscr_isdata (lua_State*  lua,
 	data = liscr_isanydata (lua, arg);
 	if (data == NULL)
 		return NULL;
-	if (liscr_class_get_interface (data->clss, meta))
-		return data;
+	if (!liscr_class_get_interface (data->clss, meta))
+		return NULL;
 
 	return data;
 }

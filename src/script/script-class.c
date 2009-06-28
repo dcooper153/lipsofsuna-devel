@@ -356,11 +356,18 @@ liscr_class_get_interface (const liscrClass* self,
 {
 	char* ret;
 
+	/* Check self. */
 	if (!strcmp (self->meta, name))
 		return 1;
+
+	/* Check interfaces. */
 	ret = bsearch (&name, self->interfaces.array, self->interfaces.count,
 		sizeof (char*), private_string_compare);
 	if (ret != NULL)
+		return 1;
+
+	/* Check base. */
+	if (self->base != NULL && liscr_class_get_interface (self->base, name))
 		return 1;
 
 	return 0;
