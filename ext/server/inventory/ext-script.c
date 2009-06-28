@@ -150,6 +150,37 @@ Inventory_new (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Index of the first free inventory slot or nil if full.
+ * --
+ * -- @name Inventory.first_free_slot
+ * -- @class table
+ */
+static int
+Inventory_getter_first_free_slot (lua_State* lua)
+{
+	int i;
+	int size;
+	liscrData* self;
+	liengObject* object;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
+	size = liext_inventory_get_size (self->data);
+
+	for (i = 0 ; i < size ; i++)
+	{
+		object = liext_inventory_get_object (self->data, i);
+		if (object == NULL)
+		{
+			lua_pushnumber (lua, i + 1);
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Owner of the inventory.
  * -- @name Inventory.owner
  * -- @class table
@@ -196,7 +227,7 @@ Inventory_setter_owner (lua_State* lua)
  * -- If the number of slots is reduced and there are objects in
  * -- the removed slots, the objects in question are destroyed.
  * --
- * -- @name Player.move
+ * -- @name Inventory.size
  * -- @class table
  */
 static int
@@ -234,6 +265,7 @@ liextInventoryScript (liscrClass* self,
 	liscr_class_insert_func (self, "__index", Inventory___index);
 	liscr_class_insert_func (self, "__newindex", Inventory___newindex);
 	liscr_class_insert_func (self, "new", Inventory_new);
+	liscr_class_insert_getter (self, "first_free_slot", Inventory_getter_first_free_slot);
 	liscr_class_insert_getter (self, "owner", Inventory_getter_owner);
 	liscr_class_insert_getter (self, "size", Inventory_getter_size);
 	liscr_class_insert_setter (self, "owner", Inventory_setter_owner);
