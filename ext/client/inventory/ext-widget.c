@@ -51,6 +51,9 @@ private_calculate_modelview (liextInventoryWidget* self,
                              float                 scale,
                              limatMatrix*          modelview);
 
+static int
+private_slot_width (const liextInventoryWidget* self);
+
 /****************************************************************************/
 
 static const liwdgClass liextInventoryWidgetType =
@@ -97,6 +100,43 @@ liext_inventory_widget_new (liextInventory* inventory)
 }
 
 /**
+ * \brief Gets the inventory slot at the given window position.
+ *
+ * \param self Inventory widget.
+ * \param x Point in window space.
+ * \param y Point in window space.
+ * \return Slot number or -1.
+ */
+int
+liext_inventory_widget_get_slot_at (const liextInventoryWidget* self,
+                                    int                         x,
+                                    int                         y)
+{
+	int size;
+	int slot;
+	int width;
+	liwdgRect rect;
+
+	/* Get widget size. */
+	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+	size = liext_inventory_get_size (self->inventory);
+	width = private_slot_width (self);
+
+	/* Border check. */
+	x -= rect.x;
+	y -= rect.y;
+	if (x < 0 || y < 0 || y >= LIEXT_SLOT_SIZE)
+		return -1;
+
+	/* Slot check. */
+	slot = x / width;
+	if (slot >= size)
+		return -1;
+
+	return slot;
+}
+
+/**
  * \brief Gets the allocation of a menu item.
  *
  * \param self Inventory widget.
@@ -108,29 +148,17 @@ liext_inventory_widget_get_slot_rect (const liextInventoryWidget* self,
                                       int                         slot,
                                       liwdgRect*                  value)
 {
-	int w;
-	int size;
+	int width;
 	liwdgRect rect;
-	liwdgSubimage* subimg;
 
 	/* Get widget size. */
 	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-	size = liext_inventory_get_size (self->inventory);
-
-	/* Calculate slot width. */
-	subimg = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, "inventory");
-	if (subimg != NULL)
-	{
-		w = (int) ceil ((float) LIEXT_SLOT_SIZE / LI_MAX (0, subimg->w[1]));
-		w = subimg->w[0] + w * subimg->w[1] + subimg->w[2];
-	}
-	else
-		w = LIEXT_SLOT_SIZE;
+	width = private_slot_width (self);
 
 	/* Calculate slot offset. */
-	value->x = rect.x + slot * w;
+	value->x = rect.x + slot * width;
 	value->y = rect.y;
-	value->width = w;
+	value->width = width;
 	value->height = rect.height;
 }
 
@@ -321,6 +349,25 @@ private_calculate_modelview (liextInventoryWidget* self,
 	*modelview = limat_matrix_multiply (m0, m1);
 	*modelview = limat_matrix_multiply (*modelview, m2);
 	*modelview = limat_matrix_multiply (*modelview, m3);
+}
+
+static int
+private_slot_width (const liextInventoryWidget* self)
+{
+	int w;
+	liwdgSubimage* subimg;
+
+	/* Calculate slot width. */
+	subimg = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, "inventory");
+	if (subimg != NULL)
+	{
+		w = (int) ceil ((float) LIEXT_SLOT_SIZE / LI_MAX (0, subimg->w[1]));
+		w = subimg->w[0] + w * subimg->w[1] + subimg->w[2];
+	}
+	else
+		w = LIEXT_SLOT_SIZE;
+
+	return w;
 }
 
 /** @} */

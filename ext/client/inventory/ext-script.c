@@ -67,6 +67,35 @@ private_callback_activated (liscrData* data,
 
 /* @luadoc
  * ---
+ * -- Gets the slot at the given screen position.
+ * --
+ * -- @param self Inventory widget.
+ * -- @param pos Position vector.
+ * -- @return Slot number or nil.
+ * function InventoryWidget.get_slot_at(self, pos)
+ */
+static int
+InventoryWidget_get_slot_at (lua_State* lua)
+{
+	int slot;
+	limatVector* tmp;
+	liscrData* self;
+	liscrData* vector;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY_WIDGET);
+	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	tmp = vector->data;
+
+	slot = liext_inventory_widget_get_slot_at (self->data, (int) tmp->x, (int) tmp->y);
+	if (slot == -1)
+		return 0;
+	lua_pushnumber (lua, slot + 1);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Gets the allocation rectangle of a slot.
  * --
  * -- @param self Inventory widget.
@@ -163,6 +192,7 @@ liextInventoryWidgetScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY_WIDGET, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_insert_func (self, "get_slot_at", InventoryWidget_get_slot_at);
 	liscr_class_insert_func (self, "get_slot_rect", InventoryWidget_get_slot_rect);
 	liscr_class_insert_func (self, "new", InventoryWidget_new);
 }

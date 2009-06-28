@@ -252,6 +252,34 @@ Module_send (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Gets the current cursor position.
+ * -- @name Module.cursor_pos
+ * -- @class table
+ */
+static int
+Module_getter_cursor_pos (lua_State* lua)
+{
+	int x;
+	int y;
+	licliModule* module;
+	limatVector tmp;
+	liscrData* data;
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
+
+	SDL_GetMouseState (&x, &y);
+	tmp = limat_vector_init (x, module->widgets->height - y - 1, 0.0f);
+	data = liscr_vector_new (module->script, &tmp);
+	if (data == NULL)
+		return 0;
+	liscr_pushdata (lua, data);
+	liscr_data_unref (data, NULL);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Movement mode flag.
  * -- @name Module.moving
  * -- @class table
@@ -418,6 +446,7 @@ licliModuleScript (liscrClass* self,
 	liscr_class_insert_func (self, "particle_effect", Module_particle_effect);
 	liscr_class_insert_func (self, "pick", Module_pick);
 	liscr_class_insert_func (self, "send", Module_send);
+	liscr_class_insert_getter (self, "cursor_pos", Module_getter_cursor_pos);
 	liscr_class_insert_getter (self, "moving", Module_getter_moving);
 	liscr_class_insert_setter (self, "moving", Module_setter_moving);
 	liscr_class_insert_setter (self, "music", Module_setter_music);
