@@ -28,7 +28,6 @@
 #include <math/lips-math.h>
 #include <model/lips-model.h>
 #include "render.h"
-#include "render-scene.h"
 #include "render-types.h"
 
 /* FIXME: Should be configurable. */
@@ -89,8 +88,7 @@ lirnd_light_compare (const lirndLight* self,
                      const lirndLight* light);
 
 void
-lirnd_light_update (lirndLight* self,
-                    lirndScene* scene);
+lirnd_light_update (lirndLight* self);
 
 void
 lirnd_light_set_ambient (lirndLight*  self,

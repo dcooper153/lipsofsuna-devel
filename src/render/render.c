@@ -25,7 +25,6 @@
 #include <system/lips-system.h>
 #include "render.h"
 #include "render-draw.h"
-#include "render-scene.h"
 
 #define LIRND_LIGHT_MAXIMUM_RATING 100.0f
 #define LIRND_PARTICLE_MAXIMUM_COUNT 500000
@@ -60,7 +59,6 @@ private_particle_update (lirndRender* self,
 
 static void
 private_render (lirndRender*  self,
-                lirndScene*   scene,
                 lirndContext* context,
                 lirndCallback call,
                 void*         data);
@@ -77,6 +75,11 @@ lirnd_render_new (const char* dir)
 	if (self == NULL)
 		return NULL;
 	self->shader.enabled = 0;//(livid_features.shader_model >= 3);
+
+	/* Allocate object list. */
+	self->objects = lialg_ptrdic_new ();
+	if (self->objects == NULL)
+		goto error;
 
 	/* Load data. */
 	self->config.dir = strdup (dir);
@@ -120,6 +123,11 @@ lirnd_render_free (lirndRender* self)
 	if (self->shader.shadowmap != NULL)
 		lirnd_shader_free (self->shader.shadowmap);
 
+	if (self->objects != NULL)
+	{
+		assert (self->objects->size == 0);
+		lialg_ptrdic_free (self->objects);
+	}
 	free (self->config.dir);
 	free (self);
 }
@@ -260,7 +268,6 @@ lirnd_render_insert_particle (lirndRender*       self,
  * \brief Picks an object from the scene.
  *
  * \param self Renderer.
- * \param scene Scene to pick.
  * \param modelview Modelview matrix.
  * \param projection Projection matrix.
  * \param frustum Frustum.
@@ -272,7 +279,6 @@ lirnd_render_insert_particle (lirndRender*       self,
  */
 int
 lirnd_render_pick (lirndRender*    self,
-                   lirndScene*     scene,
                    limatMatrix*    modelview,
                    limatMatrix*    projection,
                    limatFrustum*   frustum,
@@ -303,7 +309,7 @@ lirnd_render_pick (lirndRender*    self,
 	glRenderMode (GL_SELECT);
 	glInitNames ();
 	glPushName (0);
-	private_render (self, scene, &context, lirnd_draw_picking, NULL);
+	private_render (self, &context, lirnd_draw_picking, NULL);
 	count = glRenderMode (GL_RENDER);
 	if (count <= 0)
 		return 0;
@@ -341,14 +347,12 @@ lirnd_render_pick (lirndRender*    self,
  * \brief Renders the scene.
  *
  * \param self Renderer.
- * \param scene Rendered scene.
  * \param modelview Modelview matrix.
  * \param projection Projection matrix.
  * \param frustum Frustum used for culling.
  */
 void
 lirnd_render_render (lirndRender*  self,
-                     lirndScene*   scene,
                      limatMatrix*  modelview,
                      limatMatrix*  projection,
                      limatFrustum* frustum)
@@ -357,7 +361,6 @@ lirnd_render_render (lirndRender*  self,
 	lirndContext context;
 	GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	assert (scene != NULL);
 	assert (modelview != NULL);
 	assert (projection != NULL);
 	assert (frustum != NULL);
@@ -368,7 +371,7 @@ lirnd_render_render (lirndRender*  self,
 	lirnd_context_set_frustum (&context, frustum);
 
 	/* Update lights. */
-	lirnd_lighting_update (self->lighting, scene);
+	lirnd_lighting_update (self->lighting);
 
 	/* Set default rendering mode. */
 	glEnable (GL_LIGHTING);
@@ -393,8 +396,8 @@ lirnd_render_render (lirndRender*  self,
 	self->profiling.vertices = 0;
 #endif
 	glEnable (GL_COLOR_MATERIAL);
-	private_render (self, scene, &context, lirnd_draw_opaque, NULL);
-	private_render (self, scene, &context, lirnd_draw_transparent, NULL);
+	private_render (self, &context, lirnd_draw_opaque, NULL);
+	private_render (self, &context, lirnd_draw_transparent, NULL);
 	glDisable (GL_COLOR_MATERIAL);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_BLEND);
@@ -410,7 +413,7 @@ lirnd_render_render (lirndRender*  self,
 
 	/* Render debug. */
 #ifndef NDEBUG
-	private_render (self, scene, &context, lirnd_draw_debug, NULL);
+	private_render (self, &context, lirnd_draw_debug, NULL);
 #endif
 
 	/* Restore state. */
@@ -773,15 +776,14 @@ private_particle_update (lirndRender* self,
 
 static void
 private_render (lirndRender*  self,
-                lirndScene*   scene,
                 lirndContext* context,
                 lirndCallback call,
                 void*         data)
 {
-	lirndSceneIter iter;
+	lialgPtrdicIter iter;
 	lirndObject* object;
 
-	LIRND_FOREACH_SCENE (iter, scene)
+	LI_FOREACH_PTRDIC (iter, self->objects)
 	{
 		object = iter.value;
 		call (context, object, data);

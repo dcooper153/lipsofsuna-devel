@@ -16,31 +16,31 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup livox Voxel
  * @{
- * \addtogroup liengBlockBuilder BlockBuilder
+ * \addtogroup livoxBuilder Builder
  * @{
  */
 
-#ifndef __ENGINE_BLOCK_BUILDER_H__
-#define __ENGINE_BLOCK_BUILDER_H__
+#ifndef __VOXEL_BUILDER_H__
+#define __VOXEL_BUILDER_H__
 
 #include <algorithm/lips-algorithm.h>
 #include <math/lips-math.h>
-#include "engine-sector.h"
+#include "voxel-sector.h"
 
-typedef struct _liengBlockBuilderNormal liengBlockBuilderNormal;
-struct _liengBlockBuilderNormal
+typedef struct _livoxBuilderNormal livoxBuilderNormal;
+struct _livoxBuilderNormal
 {
 	int count;
 	limatVector vertex;
 	limatVector normals;
 };
 
-typedef struct _liengBlockBuilder liengBlockBuilder;
-struct _liengBlockBuilder
+typedef struct _livoxBuilder livoxBuilder;
+struct _livoxBuilder
 {
-	liengSector* sector;
+	livoxSector* sector;
 	struct
 	{
 		lialgMemdic* normals;
@@ -54,23 +54,23 @@ struct _liengBlockBuilder
 	} vertices;
 };
 
-liengBlockBuilder*
-lieng_block_builder_new (liengSector* sector);
+livoxBuilder*
+livox_builder_new (livoxSector* sector);
 
 void
-lieng_block_builder_free (liengBlockBuilder* self);
+livox_builder_free (livoxBuilder* self);
 
 int
-lieng_block_builder_build (liengBlockBuilder* self,
-                           int                bx,
-                           int                by,
-                           int                bz);
+livox_builder_build (livoxBuilder* self,
+                     int           bx,
+                     int           by,
+                     int           bz);
 
 limdlModel*
-lieng_block_builder_get_model (liengBlockBuilder* self);
+livox_builder_get_model (livoxBuilder* self);
 
 liphyShape*
-lieng_block_builder_get_shape (liengBlockBuilder* self);
+livox_builder_get_shape (livoxBuilder* self);
 
 #endif
 

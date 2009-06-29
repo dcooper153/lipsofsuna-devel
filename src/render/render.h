@@ -35,7 +35,6 @@
 #include "render-object.h"
 #include "render-particle.h"
 #include "render-resources.h"
-#include "render-scene.h"
 #include "render-shader.h"
 #include "render-types.h"
 
@@ -43,6 +42,7 @@
 
 struct _lirndRender
 {
+	lialgPtrdic* objects;
 	lirndLighting* lighting;
 	lirndResources* resources;
 	struct
@@ -114,7 +114,6 @@ lirnd_render_insert_particle (lirndRender*    self,
 
 int
 lirnd_render_pick (lirndRender*    self,
-                   lirndScene*     scene,
                    limatMatrix*    modelview,
                    limatMatrix*    projection,
                    limatFrustum*   frustum,
@@ -125,7 +124,6 @@ lirnd_render_pick (lirndRender*    self,
 
 void
 lirnd_render_render (lirndRender*  self,
-                     lirndScene*   scene,
                      limatMatrix*  modelview,
                      limatMatrix*  projection,
                      limatFrustum* frustum);

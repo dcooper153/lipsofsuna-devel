@@ -11,6 +11,4 @@ libvoxel_ser_la_SOURCES = \
 	ext-listener.h \
 	ext-module.c \
 	ext-module.h \
-	ext-script.c \
-	ext-sector.c \
-	ext-sector.h
+	ext-script.c

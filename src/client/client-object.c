@@ -82,11 +82,11 @@ licli_object_new (licliModule* module,
 	{
 		lieng_object_set_collision_group (self, LICLI_PHYSICS_GROUP_OBJECTS);
 		lieng_object_set_collision_mask (self,
-			LICLI_PHYSICS_GROUP_OBJECTS | LIENG_PHYSICS_GROUP_STATICS);
+			LICLI_PHYSICS_GROUP_OBJECTS | LIPHY_GROUP_STATICS);
 	}
 	else
 	{
-		lieng_object_set_collision_group (self, LIENG_PHYSICS_GROUP_STATICS);
+		lieng_object_set_collision_group (self, LIPHY_GROUP_STATICS);
 		lieng_object_set_collision_mask (self,
 			LICLI_PHYSICS_GROUP_CAMERA | LICLI_PHYSICS_GROUP_OBJECTS);
 	}

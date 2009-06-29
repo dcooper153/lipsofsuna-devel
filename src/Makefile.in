@@ -78,10 +78,9 @@ am__objects_6 = client.lo client-callbacks.lo client-command.lo \
 	script-module.lo script-object-1.lo script-player.lo \
 	script-widget.lo script-window.lo
 am__objects_7 = config-account.lo config-bans.lo config-host.lo
-am__objects_8 = engine.lo engine-block.lo engine-block-builder.lo \
-	engine-camera.lo engine-constraint.lo engine-model.lo \
-	engine-object.lo engine-render.lo engine-resources.lo \
-	engine-sector.lo engine-selection.lo engine-voxel.lo
+am__objects_8 = engine.lo engine-camera.lo engine-constraint.lo \
+	engine-model.lo engine-object.lo engine-resources.lo \
+	engine-sector.lo engine-selection.lo
 am__objects_9 = font.lo font-layout.lo
 am__objects_10 = image.lo image-compress.lo image-texture.lo
 am__objects_11 = math-marching-cubes.lo
@@ -93,10 +92,11 @@ am__objects_14 = physics.lo physics-object.lo physics-private.lo \
 	physics-shape.lo
 am__objects_15 = reload.lo reload-blender.lo reload-gimp.lo \
 	reload-image.lo
-am__objects_16 = render.lo render-context.lo render-draw.lo \
-	render-light.lo render-lighting.lo render-material.lo \
-	render-model.lo render-object.lo render-particle.lo \
-	render-resources.lo render-shader.lo render-texture.lo
+am__objects_16 = render.lo render-api.lo render-context.lo \
+	render-draw.lo render-light.lo render-lighting.lo \
+	render-material.lo render-model.lo render-object.lo \
+	render-particle.lo render-resources.lo render-shader.lo \
+	render-texture.lo
 am__objects_17 = server.lo server-callbacks.lo server-client.lo \
 	server-network.lo server-object.lo server-paths.lo \
 	script-effect.lo script-extension-2.lo script-object-2.lo \
@@ -114,7 +114,9 @@ am__objects_21 = system.lo system-directory.lo system-error.lo \
 	system-relative.lo system-types.lo system-user.lo
 am__objects_22 = thread-async-call.lo
 am__objects_23 = video-features.lo
-am__objects_24 = widget.lo widget-busy.lo widget-button.lo \
+am__objects_24 = voxel.lo voxel-block.lo voxel-builder.lo \
+	voxel-manager.lo voxel-sector.lo
+am__objects_25 = widget.lo widget-busy.lo widget-button.lo \
 	widget-check.lo widget-entry.lo widget-group.lo \
 	widget-image.lo widget-label.lo widget-manager.lo \
 	widget-menu.lo widget-menugroup.lo widget-progress.lo \
@@ -127,7 +129,7 @@ am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
 	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
 	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
-	$(am__objects_24)
+	$(am__objects_24) $(am__objects_25)
 liblipsofsunaclient_la_OBJECTS = $(am_liblipsofsunaclient_la_OBJECTS)
 liblipsofsunaclient_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -138,13 +140,13 @@ am_liblipsofsunaserver_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_8) $(am__objects_11) $(am__objects_12) \
 	$(am__objects_13) $(am__objects_14) $(am__objects_17) \
 	$(am__objects_18) $(am__objects_20) $(am__objects_21) \
-	$(am__objects_22)
+	$(am__objects_22) $(am__objects_24)
 liblipsofsunaserver_la_OBJECTS = $(am_liblipsofsunaserver_la_OBJECTS)
 liblipsofsunaserver_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(liblipsofsunaserver_la_LDFLAGS) $(LDFLAGS) -o $@
 liblipsofsunaviewer_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__objects_25 = viewer.lo
+am__objects_26 = viewer.lo
 am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
@@ -153,14 +155,14 @@ am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
 	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
 	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
-	$(am__objects_25) $(am__objects_24)
+	$(am__objects_26) $(am__objects_25)
 liblipsofsunaviewer_la_OBJECTS = $(am_liblipsofsunaviewer_la_OBJECTS)
 liblipsofsunaviewer_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(liblipsofsunaviewer_la_LDFLAGS) $(LDFLAGS) -o $@
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_26 = lipsofsuna-system.$(OBJEXT) \
+am__objects_27 = lipsofsuna-system.$(OBJEXT) \
 	lipsofsuna-system-directory.$(OBJEXT) \
 	lipsofsuna-system-error.$(OBJEXT) \
 	lipsofsuna-system-file.$(OBJEXT) \
@@ -172,8 +174,8 @@ am__objects_26 = lipsofsuna-system.$(OBJEXT) \
 	lipsofsuna-system-relative.$(OBJEXT) \
 	lipsofsuna-system-types.$(OBJEXT) \
 	lipsofsuna-system-user.$(OBJEXT)
-am__objects_27 = lipsofsuna-main.$(OBJEXT)
-am_lipsofsuna_OBJECTS = $(am__objects_26) $(am__objects_27)
+am__objects_28 = lipsofsuna-main.$(OBJEXT)
+am_lipsofsuna_OBJECTS = $(am__objects_27) $(am__objects_28)
 lipsofsuna_OBJECTS = $(am_lipsofsuna_OBJECTS)
 lipsofsuna_LDADD = $(LDADD)
 lipsofsuna_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -481,10 +483,6 @@ engsrc = \
 	engine/lips-engine.h \
 	engine/engine.c \
 	engine/engine.h \
-	engine/engine-block.c \
-	engine/engine-block.h \
-	engine/engine-block-builder.c \
-	engine/engine-block-builder.h \
 	engine/engine-camera.c \
 	engine/engine-camera.h \
 	engine/engine-constraint.c \
@@ -495,17 +493,13 @@ engsrc = \
 	engine/engine-object.c \
 	engine/engine-object.h \
 	engine/engine-range.h \
-	engine/engine-render.c \
-	engine/engine-render.h \
 	engine/engine-resources.c \
 	engine/engine-resources.h \
 	engine/engine-sector.c \
 	engine/engine-sector.h \
 	engine/engine-selection.c \
 	engine/engine-selection.h \
-	engine/engine-types.h \
-	engine/engine-voxel.c \
-	engine/engine-voxel.h
+	engine/engine-types.h
 
 fntsrc = \
 	font/lips-font.h \
@@ -599,6 +593,8 @@ rndsrc = \
 	render/lips-render.h \
 	render/render.c \
 	render/render.h \
+	render/render-api.c \
+	render/render-api.h \
 	render/render-context.c \
 	render/render-context.h \
 	render/render-draw.c \
@@ -737,6 +733,21 @@ viesrc = \
 	viewer/viewer.c \
 	viewer/viewer.h
 
+voxsrc = \
+	voxel/lips-voxel.h \
+	voxel/voxel.c \
+	voxel/voxel.h \
+	voxel/voxel-block.c \
+	voxel/voxel-block.h \
+	voxel/voxel-builder.c \
+	voxel/voxel-builder.h \
+	voxel/voxel-iterator.h \
+	voxel/voxel-manager.c \
+	voxel/voxel-manager.h \
+	voxel/voxel-sector.c \
+	voxel/voxel-sector.h \
+	voxel/voxel-types.h
+
 wdgsrc = \
 	widget/lips-widget.h \
 	widget/widget.c \
@@ -776,13 +787,14 @@ liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
 	$(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(vidsrc) $(wdgsrc)
+	$(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaserver_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(srvsrc) $(scrsrc) $(strsrc) $(syssrc) $(thrsrc)
+	$(mdlsrc) $(netsrc) $(physrc) $(srvsrc) $(scrsrc) $(strsrc) $(syssrc) \
+	$(thrsrc) $(voxsrc)
 
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunaviewer_la_LDFLAGS = -no-undefined -export-dynamic
@@ -945,17 +957,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-account.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-bans.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config-host.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-block-builder.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-block.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-camera.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-resources.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-sector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-selection.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine-voxel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font-layout.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font.Plo@am__quote@
@@ -993,6 +1001,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reload-gimp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reload-image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reload.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-api.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-context.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-draw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-light.Plo@am__quote@
@@ -1058,6 +1067,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread-async-call.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/video-features.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/viewer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-block.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-builder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-sector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-busy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-button.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-check.Plo@am__quote@
@@ -1367,20 +1381,6 @@ engine.lo: engine/engine.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine.lo `test -f 'engine/engine.c' || echo '$(srcdir)/'`engine/engine.c
 
-engine-block.lo: engine/engine-block.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT engine-block.lo -MD -MP -MF $(DEPDIR)/engine-block.Tpo -c -o engine-block.lo `test -f 'engine/engine-block.c' || echo '$(srcdir)/'`engine/engine-block.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/engine-block.Tpo $(DEPDIR)/engine-block.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='engine/engine-block.c' object='engine-block.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine-block.lo `test -f 'engine/engine-block.c' || echo '$(srcdir)/'`engine/engine-block.c
-
-engine-block-builder.lo: engine/engine-block-builder.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT engine-block-builder.lo -MD -MP -MF $(DEPDIR)/engine-block-builder.Tpo -c -o engine-block-builder.lo `test -f 'engine/engine-block-builder.c' || echo '$(srcdir)/'`engine/engine-block-builder.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/engine-block-builder.Tpo $(DEPDIR)/engine-block-builder.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='engine/engine-block-builder.c' object='engine-block-builder.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine-block-builder.lo `test -f 'engine/engine-block-builder.c' || echo '$(srcdir)/'`engine/engine-block-builder.c
-
 engine-camera.lo: engine/engine-camera.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT engine-camera.lo -MD -MP -MF $(DEPDIR)/engine-camera.Tpo -c -o engine-camera.lo `test -f 'engine/engine-camera.c' || echo '$(srcdir)/'`engine/engine-camera.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/engine-camera.Tpo $(DEPDIR)/engine-camera.Plo
@@ -1409,13 +1409,6 @@ engine-object.lo: engine/engine-object.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine-object.lo `test -f 'engine/engine-object.c' || echo '$(srcdir)/'`engine/engine-object.c
 
-engine-render.lo: engine/engine-render.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT engine-render.lo -MD -MP -MF $(DEPDIR)/engine-render.Tpo -c -o engine-render.lo `test -f 'engine/engine-render.c' || echo '$(srcdir)/'`engine/engine-render.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/engine-render.Tpo $(DEPDIR)/engine-render.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='engine/engine-render.c' object='engine-render.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine-render.lo `test -f 'engine/engine-render.c' || echo '$(srcdir)/'`engine/engine-render.c
-
 engine-resources.lo: engine/engine-resources.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT engine-resources.lo -MD -MP -MF $(DEPDIR)/engine-resources.Tpo -c -o engine-resources.lo `test -f 'engine/engine-resources.c' || echo '$(srcdir)/'`engine/engine-resources.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/engine-resources.Tpo $(DEPDIR)/engine-resources.Plo
@@ -1436,13 +1429,6 @@ engine-selection.lo: engine/engine-selection.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='engine/engine-selection.c' object='engine-selection.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine-selection.lo `test -f 'engine/engine-selection.c' || echo '$(srcdir)/'`engine/engine-selection.c
-
-engine-voxel.lo: engine/engine-voxel.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT engine-voxel.lo -MD -MP -MF $(DEPDIR)/engine-voxel.Tpo -c -o engine-voxel.lo `test -f 'engine/engine-voxel.c' || echo '$(srcdir)/'`engine/engine-voxel.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/engine-voxel.Tpo $(DEPDIR)/engine-voxel.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='engine/engine-voxel.c' object='engine-voxel.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o engine-voxel.lo `test -f 'engine/engine-voxel.c' || echo '$(srcdir)/'`engine/engine-voxel.c
 
 font.lo: font/font.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT font.lo -MD -MP -MF $(DEPDIR)/font.Tpo -c -o font.lo `test -f 'font/font.c' || echo '$(srcdir)/'`font/font.c
@@ -1576,6 +1562,13 @@ render.lo: render/render.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render.c' object='render.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o render.lo `test -f 'render/render.c' || echo '$(srcdir)/'`render/render.c
+
+render-api.lo: render/render-api.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT render-api.lo -MD -MP -MF $(DEPDIR)/render-api.Tpo -c -o render-api.lo `test -f 'render/render-api.c' || echo '$(srcdir)/'`render/render-api.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/render-api.Tpo $(DEPDIR)/render-api.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-api.c' object='render-api.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o render-api.lo `test -f 'render/render-api.c' || echo '$(srcdir)/'`render/render-api.c
 
 render-context.lo: render/render-context.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT render-context.lo -MD -MP -MF $(DEPDIR)/render-context.Tpo -c -o render-context.lo `test -f 'render/render-context.c' || echo '$(srcdir)/'`render/render-context.c
@@ -1947,6 +1940,41 @@ video-features.lo: video/video-features.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='video/video-features.c' object='video-features.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o video-features.lo `test -f 'video/video-features.c' || echo '$(srcdir)/'`video/video-features.c
+
+voxel.lo: voxel/voxel.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel.lo -MD -MP -MF $(DEPDIR)/voxel.Tpo -c -o voxel.lo `test -f 'voxel/voxel.c' || echo '$(srcdir)/'`voxel/voxel.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/voxel.Tpo $(DEPDIR)/voxel.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel.c' object='voxel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel.lo `test -f 'voxel/voxel.c' || echo '$(srcdir)/'`voxel/voxel.c
+
+voxel-block.lo: voxel/voxel-block.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel-block.lo -MD -MP -MF $(DEPDIR)/voxel-block.Tpo -c -o voxel-block.lo `test -f 'voxel/voxel-block.c' || echo '$(srcdir)/'`voxel/voxel-block.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/voxel-block.Tpo $(DEPDIR)/voxel-block.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel-block.c' object='voxel-block.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel-block.lo `test -f 'voxel/voxel-block.c' || echo '$(srcdir)/'`voxel/voxel-block.c
+
+voxel-builder.lo: voxel/voxel-builder.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel-builder.lo -MD -MP -MF $(DEPDIR)/voxel-builder.Tpo -c -o voxel-builder.lo `test -f 'voxel/voxel-builder.c' || echo '$(srcdir)/'`voxel/voxel-builder.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/voxel-builder.Tpo $(DEPDIR)/voxel-builder.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel-builder.c' object='voxel-builder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel-builder.lo `test -f 'voxel/voxel-builder.c' || echo '$(srcdir)/'`voxel/voxel-builder.c
+
+voxel-manager.lo: voxel/voxel-manager.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel-manager.lo -MD -MP -MF $(DEPDIR)/voxel-manager.Tpo -c -o voxel-manager.lo `test -f 'voxel/voxel-manager.c' || echo '$(srcdir)/'`voxel/voxel-manager.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/voxel-manager.Tpo $(DEPDIR)/voxel-manager.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel-manager.c' object='voxel-manager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel-manager.lo `test -f 'voxel/voxel-manager.c' || echo '$(srcdir)/'`voxel/voxel-manager.c
+
+voxel-sector.lo: voxel/voxel-sector.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel-sector.lo -MD -MP -MF $(DEPDIR)/voxel-sector.Tpo -c -o voxel-sector.lo `test -f 'voxel/voxel-sector.c' || echo '$(srcdir)/'`voxel/voxel-sector.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/voxel-sector.Tpo $(DEPDIR)/voxel-sector.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel-sector.c' object='voxel-sector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel-sector.lo `test -f 'voxel/voxel-sector.c' || echo '$(srcdir)/'`voxel/voxel-sector.c
 
 widget.lo: widget/widget.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT widget.lo -MD -MP -MF $(DEPDIR)/widget.Tpo -c -o widget.lo `test -f 'widget/widget.c' || echo '$(srcdir)/'`widget/widget.c

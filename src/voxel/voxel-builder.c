@@ -16,14 +16,17 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup livox Voxel
  * @{
- * \addtogroup liengBlockBuilder BlockBuilder
+ * \addtogroup livoxBuilder Builder
  * @{
  */
 
-#include "engine-block-builder.h"
-#include "engine-voxel.h"
+#include "voxel.h"
+#include "voxel-builder.h"
+#include "voxel-manager.h"
+#include "voxel-private.h"
+#include "voxel-sector.h"
 
 static const int voxel_face_normals[6][3] =
 {
@@ -36,44 +39,44 @@ static const int voxel_face_normals[6][3] =
 };
 
 static int
-private_build_full (liengBlockBuilder* self,
-                    liengBlock*        block,
-                    int                bx,
-                    int                by,
-                    int                bz);
+private_build_full (livoxBuilder* self,
+                    livoxBlock*   block,
+                    int           bx,
+                    int           by,
+                    int           bz);
 
 static int
-private_build_tiles (liengBlockBuilder* self,
-                     liengBlock*        block,
-                     int                bx,
-                     int                by,
-                     int                bz);
+private_build_tiles (livoxBuilder* self,
+                     livoxBlock*   block,
+                     int           bx,
+                     int           by,
+                     int           bz);
 
 static void
-private_calculate_texcoords (liengBlockBuilder* self,
-                             int                material,
-                             limdlVertex*       vertices);
+private_calculate_texcoords (livoxBuilder* self,
+                             int           material,
+                             limdlVertex*  vertices);
 
 static int
-private_insert_materials (liengBlockBuilder* self);
+private_insert_materials (livoxBuilder* self);
 
 static int
-private_insert_vertices (liengBlockBuilder* self,
-                         int                material,
-                         limatVector*       blockoff,
-                         limatVector*       tileoff,
-                         limdlVertex*       vertices,
-                         int                count);
+private_insert_vertices (livoxBuilder* self,
+                         int           material,
+                         limatVector*  blockoff,
+                         limatVector*  tileoff,
+                         limdlVertex*  vertices,
+                         int           count);
 
 /*****************************************************************************/
 
-liengBlockBuilder*
-lieng_block_builder_new (liengSector* sector)
+livoxBuilder*
+livox_builder_new (livoxSector* sector)
 {
-	liengBlockBuilder* self;
+	livoxBuilder* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liengBlockBuilder));
+	self = calloc (1, sizeof (livoxBuilder));
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -82,7 +85,8 @@ lieng_block_builder_new (liengSector* sector)
 	self->sector = sector;
 
 	/* Allocate rendering specific. */
-	if (sector->engine->render != NULL)
+#ifndef LIVOX_DISABLE_GRAPHICS
+	if (sector->manager->render != NULL)
 	{
 		self->helpers.model = limdl_model_new ();
 		if (self->helpers.model == NULL)
@@ -98,12 +102,13 @@ lieng_block_builder_new (liengSector* sector)
 			return NULL;
 		}
 	}
+#endif
 
 	return self;
 }
 
 void
-lieng_block_builder_free (liengBlockBuilder* self)
+livox_builder_free (livoxBuilder* self)
 {
 	lialgMemdicIter iter;
 
@@ -122,28 +127,28 @@ lieng_block_builder_free (liengBlockBuilder* self)
 }
 
 int
-lieng_block_builder_build (liengBlockBuilder* self,
-                           int                bx,
-                           int                by,
-                           int                bz)
+livox_builder_build (livoxBuilder* self,
+                     int           bx,
+                     int           by,
+                     int           bz)
 {
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef LIVOX_DISABLE_GRAPHICS
 	int i;
-	liengBlockBuilderNormal* lookup;
+	livoxBuilderNormal* lookup;
 	limatVector coord;
 	limatVector normal;
 #endif
-	liengBlock* block;
+	livoxBlock* block;
 
 	/* Triangulate the block. */
-	block = self->sector->blocks + LIENG_BLOCK_INDEX (bx, by, bz);
+	block = self->sector->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 	switch (block->type)
 	{
-		case LIENG_BLOCK_TYPE_FULL:
+		case LIVOX_BLOCK_TYPE_FULL:
 			if (!private_build_full (self, block, bx, by, bz))
 				return 0;
 			break;
-		case LIENG_BLOCK_TYPE_TILES:
+		case LIVOX_BLOCK_TYPE_TILES:
 			if (!private_build_tiles (self, block, bx, by, bz))
 				return 0;
 			break;
@@ -152,7 +157,7 @@ lieng_block_builder_build (liengBlockBuilder* self,
 	}
 
 	/* Apply smooth normals and calculate bounding box. */
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef LIVOX_DISABLE_GRAPHICS
 	if (self->helpers.model != NULL && self->vertices.count)
 	{
 		for (i = 0 ; i < self->helpers.model->vertex.count ; i++)
@@ -174,7 +179,7 @@ lieng_block_builder_build (liengBlockBuilder* self,
 }
 
 limdlModel*
-lieng_block_builder_get_model (liengBlockBuilder* self)
+livox_builder_get_model (livoxBuilder* self)
 {
 	limdlModel* model;
 
@@ -186,7 +191,7 @@ lieng_block_builder_get_model (liengBlockBuilder* self)
 }
 
 liphyShape*
-lieng_block_builder_get_shape (liengBlockBuilder* self)
+livox_builder_get_shape (livoxBuilder* self)
 {
 	liphyShape* shape;
 
@@ -199,11 +204,11 @@ lieng_block_builder_get_shape (liengBlockBuilder* self)
 /*****************************************************************************/
 
 static int
-private_build_full (liengBlockBuilder* self,
-                    liengBlock*        block,
-                    int                bx,
-                    int                by,
-                    int                bz)
+private_build_full (livoxBuilder* self,
+                    livoxBlock*   block,
+                    int           bx,
+                    int           by,
+                    int           bz)
 {
 	int c;
 	int i;
@@ -211,8 +216,8 @@ private_build_full (liengBlockBuilder* self,
 	int ty;
 	int tz;
 	int mat;
-	liengTile tile;
-	liengTile mask[6];
+	livoxVoxel tile;
+	livoxVoxel mask[6];
 	limatAabb aabb;
 	limatVector blockoff;
 	limatVector tileoff;
@@ -226,27 +231,27 @@ private_build_full (liengBlockBuilder* self,
 
 	/* Get block offset. */
 	blockoff = limat_vector_init (bx, by, bz);
-	blockoff = limat_vector_multiply (blockoff, LIENG_BLOCK_WIDTH);
+	blockoff = limat_vector_multiply (blockoff, LIVOX_BLOCK_WIDTH);
 	blockoff = limat_vector_add (blockoff, self->sector->origin);
 
 	/* Generate vertices. */
-	for (tz = 0 ; tz < LIENG_TILES_PER_LINE ; tz++)
-	for (ty = 0 ; ty < LIENG_TILES_PER_LINE ; ty++)
-	for (tx = 0 ; tx < LIENG_TILES_PER_LINE ; tx++)
+	for (tz = 0 ; tz < LIVOX_TILES_PER_LINE ; tz++)
+	for (ty = 0 ; ty < LIVOX_TILES_PER_LINE ; ty++)
+	for (tx = 0 ; tx < LIVOX_TILES_PER_LINE ; tx++)
 	{
 		for (i = 0 ; i < 6 ; i++)
 		{
-			mask[i] = lieng_sector_get_voxel (self->sector,
-				LIENG_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
-				LIENG_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
-				LIENG_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
+			mask[i] = livox_sector_get_voxel (self->sector,
+				LIVOX_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
+				LIVOX_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
+				LIVOX_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
 		}
-		c = lieng_voxel_triangulate (tile, mask, vertices);
+		c = livox_voxel_triangulate (tile, mask, vertices);
 		if (c)
 		{
-			mat = lieng_voxel_get_type (tile) - 1;
+			mat = livox_voxel_get_type (tile) - 1;
 			tileoff = limat_vector_init (tx, ty, tz);
-			tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
+			tileoff = limat_vector_multiply (tileoff, LIVOX_TILE_WIDTH);
 			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, vertices, c))
 				return 0;
 		}
@@ -256,10 +261,10 @@ private_build_full (liengBlockBuilder* self,
 
 	/* Create collision shape. */
 	aabb.min = limat_vector_init (0.0f, 0.0f, 0.0f);
-	aabb.max = limat_vector_init (LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH, LIENG_BLOCK_WIDTH);
+	aabb.max = limat_vector_init (LIVOX_BLOCK_WIDTH, LIVOX_BLOCK_WIDTH, LIVOX_BLOCK_WIDTH);
 	aabb.min = limat_vector_add (aabb.min, blockoff);
 	aabb.max = limat_vector_add (aabb.max, blockoff);
-	self->helpers.shape = liphy_shape_new_aabb (self->sector->engine->physics, &aabb);
+	self->helpers.shape = liphy_shape_new_aabb (self->sector->manager->physics, &aabb);
 	if (self->helpers.shape == NULL)
 		return 0;
 
@@ -267,11 +272,11 @@ private_build_full (liengBlockBuilder* self,
 }
 
 static int
-private_build_tiles (liengBlockBuilder* self,
-                     liengBlock*        block,
-                     int                bx,
-                     int                by,
-                     int                bz)
+private_build_tiles (livoxBuilder* self,
+                     livoxBlock*   block,
+                     int           bx,
+                     int           by,
+                     int           bz)
 {
 	int c;
 	int i;
@@ -279,8 +284,8 @@ private_build_tiles (liengBlockBuilder* self,
 	int ty;
 	int tz;
 	int mat;
-	liengTile tile;
-	liengTile mask[6];
+	livoxVoxel tile;
+	livoxVoxel mask[6];
 	limatVector blockoff;
 	limatVector tileoff;
 	limdlVertex vertices[64];
@@ -290,30 +295,30 @@ private_build_tiles (liengBlockBuilder* self,
 
 	/* Get block offset. */
 	blockoff = limat_vector_init (bx, by, bz);
-	blockoff = limat_vector_multiply (blockoff, LIENG_BLOCK_WIDTH);
+	blockoff = limat_vector_multiply (blockoff, LIVOX_BLOCK_WIDTH);
 	blockoff = limat_vector_add (blockoff, self->sector->origin);
 
 	/* Generate vertices. */
-	for (tz = 0 ; tz < LIENG_TILES_PER_LINE ; tz++)
-	for (ty = 0 ; ty < LIENG_TILES_PER_LINE ; ty++)
-	for (tx = 0 ; tx < LIENG_TILES_PER_LINE ; tx++)
+	for (tz = 0 ; tz < LIVOX_TILES_PER_LINE ; tz++)
+	for (ty = 0 ; ty < LIVOX_TILES_PER_LINE ; ty++)
+	for (tx = 0 ; tx < LIVOX_TILES_PER_LINE ; tx++)
 	{
-		tile = block->tiles->tiles[LIENG_TILE_INDEX (tx, ty, tz)];
+		tile = block->tiles->tiles[LIVOX_TILE_INDEX (tx, ty, tz)];
 		if (!tile)
 			continue;
 		for (i = 0 ; i < 6 ; i++)
 		{
-			mask[i] = lieng_sector_get_voxel (self->sector,
-				LIENG_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
-				LIENG_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
-				LIENG_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
+			mask[i] = livox_sector_get_voxel (self->sector,
+				LIVOX_TILES_PER_LINE * bx + tx + voxel_face_normals[i][0],
+				LIVOX_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
+				LIVOX_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
 		}
-		c = lieng_voxel_triangulate (tile, mask, vertices);
+		c = livox_voxel_triangulate (tile, mask, vertices);
 		if (c)
 		{
-			mat = lieng_voxel_get_type (tile) - 1;
+			mat = livox_voxel_get_type (tile) - 1;
 			tileoff = limat_vector_init (tx, ty, tz);
-			tileoff = limat_vector_multiply (tileoff, LIENG_TILE_WIDTH);
+			tileoff = limat_vector_multiply (tileoff, LIVOX_TILE_WIDTH);
 			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, vertices, c))
 				return 0;
 		}
@@ -322,7 +327,7 @@ private_build_tiles (liengBlockBuilder* self,
 		return 1;
 
 	/* Create collision shape. */
-	self->helpers.shape = liphy_shape_new_concave (self->sector->engine->physics,
+	self->helpers.shape = liphy_shape_new_concave (self->sector->manager->physics,
 		self->vertices.array, self->vertices.count);
 	if (self->helpers.shape == NULL)
 		return 0;
@@ -331,9 +336,9 @@ private_build_tiles (liengBlockBuilder* self,
 }
 
 static void
-private_calculate_texcoords (liengBlockBuilder* self,
-                             int                material,
-                             limdlVertex*       vertices)
+private_calculate_texcoords (livoxBuilder* self,
+                             int           material,
+                             limdlVertex*  vertices)
 {
 #warning FIXME: Hardcoded terrain texture coordinate generation.
 #define TEXTURE_SCALE 0.05f
@@ -362,9 +367,9 @@ private_calculate_texcoords (liengBlockBuilder* self,
 }
 
 static int
-private_insert_materials (liengBlockBuilder* self)
+private_insert_materials (livoxBuilder* self)
 {
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef LIVOX_DISABLE_GRAPHICS
 	limdlMaterial material;
 	limdlTexture texture;
 
@@ -437,16 +442,16 @@ private_insert_materials (liengBlockBuilder* self)
 }
 
 static int
-private_insert_vertices (liengBlockBuilder* self,
-                         int                material,
-                         limatVector*       blockoff,
-                         limatVector*       tileoff,
-                         limdlVertex*       vertices,
-                         int                count)
+private_insert_vertices (livoxBuilder* self,
+                         int           material,
+                         limatVector*  blockoff,
+                         limatVector*  tileoff,
+                         limdlVertex*  vertices,
+                         int           count)
 {
 	int i;
 	int j;
-	liengBlockBuilderNormal* lookup;
+	livoxBuilderNormal* lookup;
 	limatVector coord;
 	limatVector normal;
 	limatVector* tmp;
@@ -454,7 +459,7 @@ private_insert_vertices (liengBlockBuilder* self,
 	/* Scale and translate vertices. */
 	for (i = 0 ; i < count ; i++)
 	{
-		vertices[i].coord = limat_vector_multiply (vertices[i].coord, LIENG_TILE_WIDTH);
+		vertices[i].coord = limat_vector_multiply (vertices[i].coord, LIVOX_TILE_WIDTH);
 		vertices[i].coord = limat_vector_add (vertices[i].coord, *tileoff);
 		vertices[i].coord = limat_vector_add (vertices[i].coord, *blockoff);
 	}
@@ -469,7 +474,7 @@ private_insert_vertices (liengBlockBuilder* self,
 	self->vertices.count += count;
 
 	/* Insert model vertices. */
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef LIVOX_DISABLE_GRAPHICS
 	if (self->helpers.model != NULL)
 	{
 		for (i = 0 ; i < count ; i += 3)
@@ -486,7 +491,7 @@ private_insert_vertices (liengBlockBuilder* self,
 				lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
 				if (lookup == NULL)
 				{
-					lookup = malloc (sizeof (liengBlockBuilderNormal));
+					lookup = malloc (sizeof (livoxBuilderNormal));
 					if (lookup == NULL)
 						continue;
 					lookup->vertex = coord;

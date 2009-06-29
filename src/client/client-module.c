@@ -154,6 +154,8 @@ licli_module_free (licliModule* self)
 		licli_network_free (self->network);
 
 	/* Free engine. */
+	if (self->voxels != NULL)
+		livox_manager_free (self->voxels);
 	if (self->engine != NULL)
 		lieng_engine_free (self->engine);
 
@@ -472,14 +474,12 @@ licli_module_pick (licliModule*    self,
 	limatFrustum frustum;
 	limatMatrix modelview;
 	limatMatrix projection;
-	lirndScene* scene;
 
 	lieng_camera_get_frustum (self->camera, &frustum);
 	lieng_camera_get_modelview (self->camera, &modelview);
 	lieng_camera_get_projection (self->camera, &projection);
-	scene = lieng_engine_get_scene (self->engine);
 	ret = lirnd_render_pick (self->engine->render,
-		scene, &modelview, &projection, &frustum,
+		&modelview, &projection, &frustum,
 		x, self->window->mode.height - y, 5, result);
 
 	return ret;
@@ -503,7 +503,6 @@ licli_module_render (licliModule* self)
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndContext context;
-	lirndScene* scene;
 
 	/* Render scene. */
 	active = (self->network != NULL);
@@ -514,8 +513,7 @@ licli_module_render (licliModule* self)
 		lieng_camera_get_frustum (self->camera, &frustum);
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
-		scene = lieng_engine_get_scene (self->engine);
-		lirnd_render_render (self->engine->render, scene, &modelview, &projection, &frustum);
+		lirnd_render_render (self->engine->render, &modelview, &projection, &frustum);
 	}
 	glDisable (GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
@@ -701,7 +699,7 @@ private_init_camera (licliModule* self)
 	lieng_camera_set_driver (self->camera, LIENG_CAMERA_DRIVER_THIRDPERSON);
 	lieng_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
 	lieng_object_set_collision_group (self->camera->object, LICLI_PHYSICS_GROUP_CAMERA);
-	lieng_object_set_collision_mask (self->camera->object, LIENG_PHYSICS_GROUP_STATICS | LIENG_PHYSICS_GROUP_TILES);
+	lieng_object_set_collision_mask (self->camera->object, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES);
 	lieng_object_set_realized (self->camera->object, 1);
 
 	return 1;
@@ -713,6 +711,7 @@ private_init_engine (licliModule* self)
 	int flags;
 	liengCalls* calls;
 
+	/* Initialize engine. */
 	self->engine = lieng_engine_new (self->paths->global_data, self->path, 1);
 	if (self->engine == NULL)
 		return 0;
@@ -736,6 +735,11 @@ private_init_engine (licliModule* self)
 	if (!licli_module_init_callbacks_binding (self) ||
 	    !licli_module_init_callbacks_misc (self) ||
 	    !licli_module_init_callbacks_widget (self))
+		return 0;
+
+	/* Initialize voxels. */
+	self->voxels = livox_manager_new (self->engine->physics, self->engine->render, self->engine->renderapi);
+	if (self->voxels == NULL)
 		return 0;
 
 	return 1;

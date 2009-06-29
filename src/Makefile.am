@@ -97,10 +97,6 @@ engsrc = \
 	engine/lips-engine.h \
 	engine/engine.c \
 	engine/engine.h \
-	engine/engine-block.c \
-	engine/engine-block.h \
-	engine/engine-block-builder.c \
-	engine/engine-block-builder.h \
 	engine/engine-camera.c \
 	engine/engine-camera.h \
 	engine/engine-constraint.c \
@@ -111,17 +107,13 @@ engsrc = \
 	engine/engine-object.c \
 	engine/engine-object.h \
 	engine/engine-range.h \
-	engine/engine-render.c \
-	engine/engine-render.h \
 	engine/engine-resources.c \
 	engine/engine-resources.h \
 	engine/engine-sector.c \
 	engine/engine-sector.h \
 	engine/engine-selection.c \
 	engine/engine-selection.h \
-	engine/engine-types.h \
-	engine/engine-voxel.c \
-	engine/engine-voxel.h
+	engine/engine-types.h
 fntsrc = \
 	font/lips-font.h \
 	font/font.c \
@@ -206,6 +198,8 @@ rndsrc = \
 	render/lips-render.h \
 	render/render.c \
 	render/render.h \
+	render/render-api.c \
+	render/render-api.h \
 	render/render-context.c \
 	render/render-context.h \
 	render/render-draw.c \
@@ -335,6 +329,20 @@ vidsrc = \
 viesrc = \
 	viewer/viewer.c \
 	viewer/viewer.h
+voxsrc = \
+	voxel/lips-voxel.h \
+	voxel/voxel.c \
+	voxel/voxel.h \
+	voxel/voxel-block.c \
+	voxel/voxel-block.h \
+	voxel/voxel-builder.c \
+	voxel/voxel-builder.h \
+	voxel/voxel-iterator.h \
+	voxel/voxel-manager.c \
+	voxel/voxel-manager.h \
+	voxel/voxel-sector.c \
+	voxel/voxel-sector.h \
+	voxel/voxel-types.h
 wdgsrc = \
 	widget/lips-widget.h \
 	widget/widget.c \
@@ -376,13 +384,14 @@ liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
 	$(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(vidsrc) $(wdgsrc)
+	$(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 
 liblipsofsunaserver_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(srvsrc) $(scrsrc) $(strsrc) $(syssrc) $(thrsrc)
+	$(mdlsrc) $(netsrc) $(physrc) $(srvsrc) $(scrsrc) $(strsrc) $(syssrc) \
+	$(thrsrc) $(voxsrc)
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 
 liblipsofsunaviewer_la_LDFLAGS = -no-undefined -export-dynamic

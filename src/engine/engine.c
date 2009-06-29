@@ -37,20 +37,7 @@ static void
 private_clear_sectors (liengEngine* self);
 
 static void
-private_mark_block (liengEngine* self,
-                    liengSector* sector,
-                    int          x,
-                    int          y,
-                    int          z);
-
-static void
 private_physics_transform (liphyObject* object);
-
-#ifndef LIENG_DISABLE_GRAPHICS
-static int
-private_scene_begin (liengSceneIter* iter,
-                     lirndScene*     scene);
-#endif
 
 /*****************************************************************************/
 
@@ -156,7 +143,7 @@ lieng_engine_free (liengEngine* self)
 		liphy_physics_free (self->physics);
 #ifndef LIENG_DISABLE_GRAPHICS
 	if (self->renderapi != NULL)
-		lieng_render_free (self->renderapi);
+		self->renderapi->lirnd_render_free (self->render);
 #endif
 
 	free (self->config.datadir);
@@ -556,73 +543,10 @@ void
 lieng_engine_update (liengEngine* self,
                      float        secs)
 {
-	int i;
-	int j;
-	int x;
-	int y;
-	int z;
 	lialgU32dicIter iter;
 	liengConstraint* constraint;
 	liengObject* object;
 	liengSector* sector;
-	struct
-	{
-		int x;
-		int y;
-		int z;
-		int mask;
-	}
-	neighbors[26] =
-	{
-		{ -1, -1, -1, 0x01|0x04|0x10 },
-		{  0, -1, -1, 0x00|0x04|0x10 },
-		{  1, -1, -1, 0x02|0x04|0x10 },
-		{ -1,  0, -1, 0x01|0x00|0x10 },
-		{  0,  0, -1, 0x00|0x00|0x10 },
-		{  1,  0, -1, 0x02|0x00|0x10 },
-		{ -1,  1, -1, 0x01|0x08|0x10 },
-		{  0,  1, -1, 0x00|0x08|0x10 },
-		{  1,  1, -1, 0x02|0x08|0x10 },
-		{ -1, -1,  0, 0x01|0x04|0x00 },
-		{  0, -1,  0, 0x00|0x04|0x00 },
-		{  1, -1,  0, 0x02|0x04|0x00 },
-		{ -1,  0,  0, 0x01|0x00|0x00 },
-		{  1,  0,  0, 0x02|0x00|0x00 },
-		{ -1,  1,  0, 0x01|0x08|0x00 },
-		{  0,  1,  0, 0x00|0x08|0x00 },
-		{  1,  1,  0, 0x02|0x08|0x00 },
-		{ -1, -1,  1, 0x01|0x04|0x20 },
-		{  0, -1,  1, 0x00|0x04|0x20 },
-		{  1, -1,  1, 0x02|0x04|0x20 },
-		{ -1,  0,  1, 0x01|0x00|0x20 },
-		{  0,  0,  1, 0x00|0x00|0x20 },
-		{  1,  0,  1, 0x02|0x00|0x20 },
-		{ -1,  1,  1, 0x01|0x08|0x20 },
-		{  0,  1,  1, 0x00|0x08|0x20 },
-		{  1,  1,  1, 0x02|0x08|0x20 },
-	};
-
-	/* Update block boundaries. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
-	{
-		sector = iter.value;
-		if (!sector->dirty)
-			continue;
-		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
-		{
-			for (j = 0 ; j < 26 ; j++)
-			{
-				if ((sector->blocks[i].dirty & neighbors[j].mask) != neighbors[j].mask)
-					continue;
-				private_mark_block (self, sector,
-					neighbors[j].x + x,
-					neighbors[j].y + y,
-					neighbors[j].z + z);
-			}
-		}
-	}
 
 	/* Update sectors. */
 	LI_FOREACH_U32DIC (iter, self->sectors)
@@ -660,7 +584,7 @@ lieng_engine_update (liengEngine* self,
 		{
 			object = iter.value;
 			self->renderapi->lirnd_object_deform (object->render, object->pose);
-			self->renderapi->lirnd_object_update (object->render, self->scene, secs);
+			self->renderapi->lirnd_object_update (object->render, secs);
 		}
 		self->renderapi->lirnd_render_update (self->render, secs);
 	}
@@ -712,16 +636,6 @@ lieng_engine_set_local_range (liengEngine* self,
 {
 	self->range.start = start;
 	self->range.size = end - start;
-}
-
-void*
-lieng_engine_get_scene (liengEngine* self)
-{
-#ifndef LIENG_DISABLE_GRAPHICS
-	return self->scene;
-#else
-	return NULL;
-#endif
 }
 
 void*
@@ -787,16 +701,10 @@ private_init (liengEngine* self,
 #ifndef LIENG_DISABLE_GRAPHICS
 	if (gfx)
 	{
-		self->renderapi = lieng_render_new (self->config.dir);
+		self->renderapi = lisys_module_global_symbol ("lipsrender", "lirnd_render_api");
 		if (self->renderapi == NULL)
 			return 0;
-		self->render = self->renderapi->render;
-		self->scene = calloc (1, sizeof (lirndScene));
-		if (self->scene == NULL)
-			return 0;
-		self->scene->data = self;
-		self->scene->begin = (void*) private_scene_begin;
-		self->scene->next = (void*) lieng_scene_iter_next;
+		self->render = self->renderapi->lirnd_render_new (self->config.dir);
 	}
 #endif
 
@@ -814,63 +722,6 @@ private_init (liengEngine* self,
 }
 
 static void
-private_mark_block (liengEngine* self,
-                    liengSector* sector,
-                    int          x,
-                    int          y,
-                    int          z)
-{
-	int sx;
-	int sy;
-	int sz;
-	uint32_t id;
-	liengSector* sector1;
-
-	/* Find affected sector. */
-	sx = sector->x;
-	sy = sector->y;
-	sz = sector->z;
-	if (x < 0)
-	{
-		x = LIENG_BLOCKS_PER_LINE - 1;
-		sx--;
-	}
-	else if (x >= LIENG_BLOCKS_PER_LINE)
-	{
-		x = 0;
-		sx++;
-	}
-	if (y < 0)
-	{
-		y = LIENG_BLOCKS_PER_LINE - 1;
-		sy--;
-	}
-	else if (y >= LIENG_BLOCKS_PER_LINE)
-	{
-		y = 0;
-		sy++;
-	}
-	if (z < 0)
-	{
-		z = LIENG_BLOCKS_PER_LINE - 1;
-		sz--;
-	}
-	else if (z >= LIENG_BLOCKS_PER_LINE)
-	{
-		z = 0;
-		sz++;
-	}
-	id = LIENG_SECTOR_INDEX (sx, sy, sz);
-
-	/* Mark block as dirty. */
-	sector1 = lieng_engine_find_sector (self, id);
-	if (sector1 == NULL)
-		return;
-	sector1->blocks[LIENG_BLOCK_INDEX (x, y, z)].dirty |= 0x80;
-	sector1->dirty = 1;
-}
-
-static void
 private_physics_transform (liphyObject* object)
 {
 	liengObject* obj;
@@ -880,16 +731,6 @@ private_physics_transform (liphyObject* object)
 		return;
 	obj->engine->calls.lieng_object_moved (obj);
 }
-
-#ifndef LIENG_DISABLE_GRAPHICS
-static int
-private_scene_begin (liengSceneIter* iter,
-                     lirndScene*     scene)
-{
-	return lieng_scene_iter_first (iter, scene->data,
-		lieng_block_get_empty, lieng_object_get_realized);
-}
-#endif
 
 /** @} */
 /** @} */

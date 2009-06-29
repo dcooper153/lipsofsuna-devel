@@ -131,6 +131,10 @@ int
 liext_listener_update (liextListener* self,
                        float          secs)
 {
+	int x;
+	int y;
+	int z;
+	int stamp;
 	liarcWriter* writer = NULL;
 	liengObject* object;
 	liengRange sectors;
@@ -138,12 +142,13 @@ liext_listener_update (liextListener* self,
 	liengRange range;
 	liengRangeIter iter0;
 	liengRangeIter iter1;
-	liengSector* sector;
 	limatTransform transform;
 	limatVector min;
 	limatVector max;
 	limatVector size;
 	lisrvClient* client;
+	livoxBlock* block;
+	livoxSector* sector;
 
 	/* TODO: Early exit if listener has not moved and sectors have not changed. */
 
@@ -158,38 +163,42 @@ liext_listener_update (liextListener* self,
 	size = limat_vector_init (self->radius, self->radius, self->radius);
 	min = limat_vector_subtract (transform.position, size);
 	max = limat_vector_add (transform.position, size);
-	sectors = lieng_range_new_from_aabb (&min, &max, LIENG_SECTOR_WIDTH,
-		0, LIENG_SECTORS_PER_LINE);
-	blocks = lieng_range_new_from_aabb (&min, &max, LIENG_BLOCK_WIDTH,
-		0, LIENG_SECTORS_PER_LINE * LIENG_BLOCKS_PER_LINE);
+	sectors = lieng_range_new_from_aabb (&min, &max, LIVOX_SECTOR_WIDTH,
+		0, LIVOX_SECTORS_PER_LINE);
+	blocks = lieng_range_new_from_aabb (&min, &max, LIVOX_BLOCK_WIDTH,
+		0, LIVOX_SECTORS_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 
 	/* Loop through visible sector. */
 	LIENG_FOREACH_RANGE (iter0, sectors)
 	{
 		/* Get dirty sector. */
-		sector = lieng_engine_find_sector (self->module->server->engine, iter0.index);
+		sector = livox_manager_find_sector (self->module->voxels, iter0.index);
 		if (sector == NULL)
 			continue;
-		if (!self->moved && !sector->dirty)
+		if (!self->moved && !livox_sector_get_dirty (sector))
 			continue;
 
 		/* Calculate visible block range. */
+		livox_sector_get_offset (sector, &x, &y, &z);
 		range.min = 0;
-		range.max = LIENG_BLOCKS_PER_LINE;
-		range.minx = LI_MAX (blocks.minx - sector->x * LIENG_BLOCKS_PER_LINE, 0);
-		range.miny = LI_MAX (blocks.miny - sector->y * LIENG_BLOCKS_PER_LINE, 0);
-		range.minz = LI_MAX (blocks.minz - sector->z * LIENG_BLOCKS_PER_LINE, 0);
-		range.maxx = LI_MIN (blocks.maxx - sector->x * LIENG_BLOCKS_PER_LINE, LIENG_BLOCKS_PER_LINE) - 1;
-		range.maxy = LI_MIN (blocks.maxy - sector->y * LIENG_BLOCKS_PER_LINE, LIENG_BLOCKS_PER_LINE) - 1;
-		range.maxz = LI_MIN (blocks.maxz - sector->z * LIENG_BLOCKS_PER_LINE, LIENG_BLOCKS_PER_LINE) - 1;
+		range.max = LIVOX_BLOCKS_PER_LINE;
+		range.minx = LI_MAX (blocks.minx - x * LIVOX_BLOCKS_PER_LINE, 0);
+		range.miny = LI_MAX (blocks.miny - y * LIVOX_BLOCKS_PER_LINE, 0);
+		range.minz = LI_MAX (blocks.minz - z * LIVOX_BLOCKS_PER_LINE, 0);
+		range.maxx = LI_MIN (blocks.maxx - x * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE) - 1;
+		range.maxy = LI_MIN (blocks.maxy - y * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE) - 1;
+		range.maxz = LI_MIN (blocks.maxz - z * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE) - 1;
 
 		/* Loop through visible blocks. */
 		LIENG_FOREACH_RANGE (iter1, range)
 		{
-			/* Get uncached block. */
-			if (!self->moved && !sector->blocks[iter1.index].dirty)
+			block = livox_sector_get_block (sector, iter1.index);
+			stamp = livox_block_get_stamp (block);
+
+			/* Check if alreach cached. */
+			if (!self->moved && !livox_block_get_dirty (block))
 				continue;
-			if (liext_listener_get_cached (self, iter0.index, iter1.index, sector->blocks[iter1.index].stamp))
+			if (liext_listener_get_cached (self, iter0.index, iter1.index, stamp))
 				continue;
 
 			/* Write block. */
@@ -197,18 +206,18 @@ liext_listener_update (liextListener* self,
 				writer = liarc_writer_new_packet (LIEXT_VOXEL_PACKET_DIFF);
 			if (writer == NULL)
 				return 0;
-			if (!liarc_writer_append_uint8 (writer, sector->x) ||
-				!liarc_writer_append_uint8 (writer, sector->y) ||
-				!liarc_writer_append_uint8 (writer, sector->z) ||
+			if (!liarc_writer_append_uint8 (writer, x) ||
+				!liarc_writer_append_uint8 (writer, y) ||
+				!liarc_writer_append_uint8 (writer, z) ||
 				!liarc_writer_append_uint16 (writer, iter1.index) ||
-				!lieng_block_write (sector->blocks + iter1.index, writer))
+				!livox_block_write (block, writer))
 			{
 				liarc_writer_free (writer);
 				return 0;
 			}
 
 			/* Cache block. */
-			liext_listener_cache (self, iter0.index, iter1.index, sector->blocks[iter1.index].stamp);
+			liext_listener_cache (self, iter0.index, iter1.index, stamp);
 		}
 	}
 

@@ -29,7 +29,6 @@
 #include <video/lips-video.h>
 #include "render.h"
 #include "render-light.h"
-#include "render-scene.h"
 #include "render-types.h"
 
 struct _lirndLighting
@@ -65,8 +64,7 @@ lirnd_lighting_remove_light (lirndLighting* self,
                              lirndLight*    light);
 
 void
-lirnd_lighting_update (lirndLighting* self,
-                       lirndScene*    scene);
+lirnd_lighting_update (lirndLighting* self);
 
 void
 lirnd_lighting_set_center (lirndLighting*     self,

@@ -153,13 +153,7 @@ static int
 private_miscellaneous_tick (licliModule* module,
                             float        secs)
 {
-	int i;
-	int x;
-	int y;
-	int z;
-	lialgU32dicIter iter;
 	liengObject* player;
-	liengSector* sector;
 	limatAabb bounds;
 	limatTransform transform;
 #ifndef LI_DISABLE_SOUND
@@ -180,24 +174,7 @@ private_miscellaneous_tick (licliModule* module,
 
 	/* Update engine state. */
 	lieng_engine_update (module->engine, secs);
-
-	/* Rebuild modified terrain. */
-	LI_FOREACH_U32DIC (iter, module->engine->sectors)
-	{
-		sector = iter.value;
-		if (!sector->dirty)
-			continue;
-		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
-		{
-			if (!sector->blocks[i].dirty)
-				continue;
-			lieng_sector_build_block (sector, x, y, z);
-			sector->blocks[i].dirty = 0;
-		}
-		sector->dirty = 0;
-	}
+	livox_manager_update (module->voxels, secs);
 
 	/* Check for player. */
 	player = licli_module_get_player (module);

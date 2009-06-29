@@ -16,13 +16,13 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup livox Voxel
  * @{
- * \addtogroup liengVoxel Voxel
+ * \addtogroup livoxVoxel Voxel
  * @{
  */
 
-#include "engine-voxel.h"
+#include "voxel.h"
 
 /**
  * \brief Holds corner masks used for determining if unit cube faces of voxels are visible.
@@ -1725,8 +1725,8 @@ static const float voxel_crosssection_texcoords[256][9][2] =
  * \param type Terrain type.
  * \return Voxel.
  */
-liengTile
-lieng_voxel_init (int shape,
+livoxVoxel
+livox_voxel_init (int shape,
                   int type)
 {
 	type &= 0xFF;
@@ -1754,8 +1754,8 @@ lieng_voxel_init (int shape,
  * \return Number of vertices written.
  */
 int
-lieng_voxel_triangulate (liengTile    self,
-                         liengTile*   neighbors,
+livox_voxel_triangulate (livoxVoxel   self,
+                         livoxVoxel*  neighbors,
                          limdlVertex* result)
 {
 	int c;
@@ -1840,13 +1840,13 @@ lieng_voxel_triangulate (liengTile    self,
  * \param self Voxel.
  * \return Voxel.
  */
-liengTile
-lieng_voxel_validate (liengTile self)
+livoxVoxel
+livox_voxel_validate (livoxVoxel self)
 {
-	int shape = lieng_voxel_get_shape (self);
-	int type = lieng_voxel_get_type (self);
+	int shape = livox_voxel_get_shape (self);
+	int type = livox_voxel_get_type (self);
 
-	return lieng_voxel_init (shape, type);
+	return livox_voxel_init (shape, type);
 }
 
 /**
@@ -1856,7 +1856,7 @@ lieng_voxel_validate (liengTile self)
  * \return Shape mask.
  */
 int
-lieng_voxel_get_shape (liengTile self)
+livox_voxel_get_shape (livoxVoxel self)
 {
 	return self >> 8;
 }
@@ -1868,7 +1868,7 @@ lieng_voxel_get_shape (liengTile self)
  * \return Terrain type.
  */
 int
-lieng_voxel_get_type (liengTile self)
+livox_voxel_get_type (livoxVoxel self)
 {
 	return self & 0xFF;
 }

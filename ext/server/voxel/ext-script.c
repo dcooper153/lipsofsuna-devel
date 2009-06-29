@@ -51,10 +51,10 @@
 static int
 Voxel_fill_box (lua_State* lua)
 {
-	liengTile terrain;
 	liextModule* module;
 	liscrData* min;
 	liscrData* max;
+	livoxVoxel terrain;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	min = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
@@ -80,9 +80,9 @@ static int
 Voxel_fill_sphere (lua_State* lua)
 {
 	float radius;
-	liengTile terrain;
 	liextModule* module;
 	liscrData* center;
+	livoxVoxel terrain;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);

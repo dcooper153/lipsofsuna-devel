@@ -100,9 +100,8 @@ private_client_packet (liextEditor* self,
 				LIPHY_SHAPE_MODE_CONCAVE, LIPHY_CONTROL_MODE_STATIC, 0, NULL);
 			if (object == NULL)
 				return 1;
-			lieng_object_set_collision_group (object, LIENG_PHYSICS_GROUP_STATICS);
-			lieng_object_set_collision_mask (object,
-				~(LIENG_PHYSICS_GROUP_STATICS | LIENG_PHYSICS_GROUP_TILES));
+			lieng_object_set_collision_group (object, LIPHY_GROUP_STATICS);
+			lieng_object_set_collision_mask (object, ~(LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES));
 			transform = limat_transform_init (position, rotation);
 			lieng_object_set_transform (object, &transform);
 			lieng_object_set_realized (object, 1);

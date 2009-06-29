@@ -16,36 +16,37 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup lirnd Render
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup lirndApi Api
  * @{
  */
 
-#ifndef __EXT_SECTOR_H__
-#define __EXT_SECTOR_H__
+#include "render-api.h"
 
-#include "ext-module.h"
+/**
+ * \brief Rendering function list.
+ *
+ * This variable exists to make it easier to load the renderer at run-time.
+ */
+lirndApi lirnd_render_api =
+{
+	lirnd_model_new,
+	lirnd_model_free,
+	lirnd_object_new,
+	lirnd_object_free,
+	lirnd_object_deform,
+	lirnd_object_replace_image,
+	lirnd_object_update,
+	lirnd_object_set_model,
+	lirnd_object_set_realized,
+	lirnd_object_set_transform,
+	lirnd_render_new,
+	lirnd_render_free,
+	lirnd_render_update,
+	lirnd_render_find_image,
+	lirnd_render_load_image
+};
 
-int
-liext_sector_read (liengSector* self,
-                   liarcSql*    sql);
-
-void
-liext_sector_update (liengSector* self,
-                     float        secs);
-
-int
-liext_sector_write (liengSector* self,
-                    liarcSql*    sql);
-
-int
-liext_sector_get_empty (const liengSector* self);
-
-#endif
-
-/** @} */
 /** @} */
 /** @} */

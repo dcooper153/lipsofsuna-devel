@@ -79,6 +79,14 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	}
 
+	/* Create voxel manager. */
+	self->voxels = livox_manager_new (server->engine->physics, NULL, NULL);
+	if (self->voxels == NULL)
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
 	/* Register callbacks. */
 	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 1,
 	     	private_object_client, self, self->calls + 0) ||
@@ -114,6 +122,8 @@ liext_module_free (liextModule* self)
 			liext_listener_free (iter.value);
 		lialg_ptrdic_free (self->listeners);
 	}
+	if (self->voxels != NULL)
+		livox_manager_free (self->voxels);
 
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
@@ -124,23 +134,25 @@ void
 liext_module_fill_box (liextModule*       self,
                        const limatVector* min,
                        const limatVector* max,
-                       liengTile          terrain)
+                       livoxVoxel         terrain)
 {
 	liengRange range;
 	liengRangeIter rangeiter;
-	liengSector* sector;
 	limatAabb aabb;
+	limatVector origin;
+	livoxSector* sector;
 
 	/* Modify sectors. */
 	range = lieng_range_new_from_aabb (min, max, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = lieng_engine_load_sector (self->server->engine, rangeiter.index);
+		sector = livox_manager_load_sector (self->voxels, rangeiter.index, self->server->sql);
 		if (sector == NULL)
 			continue;
-		aabb.min = limat_vector_subtract (*min, sector->origin);
-		aabb.max = limat_vector_subtract (*max, sector->origin);
-		lieng_sector_fill_aabb (sector, &aabb, terrain);
+		livox_sector_get_origin (sector, &origin);
+		aabb.min = limat_vector_subtract (*min, origin);
+		aabb.max = limat_vector_subtract (*max, origin);
+		livox_sector_fill_aabb (sector, &aabb, terrain);
 	}
 }
 
@@ -148,22 +160,24 @@ void
 liext_module_fill_sphere (liextModule*       self,
                           const limatVector* center,
                           float              radius,
-                          liengTile          terrain)
+                          livoxVoxel         terrain)
 {
 	liengRange range;
 	liengRangeIter rangeiter;
-	liengSector* sector;
+	limatVector origin;
 	limatVector vector;
+	livoxSector* sector;
 
 	/* Modify sectors. */
 	range = lieng_range_new_from_sphere (center, radius, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = lieng_engine_load_sector (self->server->engine, rangeiter.index);
+		sector = livox_manager_load_sector (self->voxels, rangeiter.index, self->server->sql);
 		if (sector == NULL)
 			continue;
-		vector = limat_vector_subtract (*center, sector->origin);
-		lieng_sector_fill_sphere (sector, &vector, radius, terrain);
+		livox_sector_get_origin (sector, &origin);
+		vector = limat_vector_subtract (*center, origin);
+		livox_sector_fill_sphere (sector, &vector, radius, terrain);
 	}
 }
 
@@ -217,9 +231,9 @@ liext_module_write (liextModule* self,
 	}*/
 
 	/* Save terrain. */
-	LI_FOREACH_U32DIC (iter, self->server->engine->sectors)
+	LI_FOREACH_U32DIC (iter, self->voxels->sectors)
 	{
-		if (!liext_sector_write (iter.value, sql))
+		if (!livox_sector_write (iter.value, sql))
 			return 0;
 	}
 
@@ -308,7 +322,10 @@ static int
 private_sector_load (liextModule* self,
                      liengSector* sector)
 {
-	liext_sector_read (sector, self->server->sql);
+	uint32_t index;
+
+	index = LIVOX_SECTOR_INDEX (sector->x, sector->y, sector->z);
+	livox_manager_load_sector (self->voxels, index, self->server->sql);
 
 	return 1;
 }
@@ -323,21 +340,23 @@ private_tick (liextModule* self,
 	int z;
 	lialgU32dicIter iter;
 	lialgPtrdicIter iter1;
-	liengSector* sector;
+	livoxBlock* block;
+	livoxSector* sector;
 
 	/* Rebuild modified terrain blocks. */
-	LI_FOREACH_U32DIC (iter, self->server->engine->sectors)
+	LI_FOREACH_U32DIC (iter, self->voxels->sectors)
 	{
 		sector = iter.value;
-		if (!sector->dirty)
+		if (!livox_sector_get_dirty (sector))
 			continue;
-		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
+		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
 		{
-			if (!sector->blocks[i].dirty)
+			block = livox_sector_get_block (sector, i);
+			if (!livox_block_get_dirty (block))
 				continue;
-			lieng_sector_build_block (sector, x, y, z);
+			livox_sector_build_block (sector, x, y, z);
 		}
 	}
 
@@ -346,14 +365,17 @@ private_tick (liextModule* self,
 		liext_listener_update (iter1.value, secs);
 
 	/* Mark all terrain as clean. */
-	LI_FOREACH_U32DIC (iter, self->server->engine->sectors)
+	LI_FOREACH_U32DIC (iter, self->voxels->sectors)
 	{
 		sector = iter.value;
-		for (i = z = 0 ; z < LIENG_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_BLOCKS_PER_LINE ; x++, i++)
-			sector->blocks[i].dirty = 0;
-		sector->dirty = 0;
+		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
+		{
+			block = livox_sector_get_block (sector, i);
+			livox_block_set_dirty (block, 0);
+		}
+		livox_sector_set_dirty (sector, 0);
 	}
 
 	return 1;

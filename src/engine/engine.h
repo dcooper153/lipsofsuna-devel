@@ -34,7 +34,6 @@
 #include <system/lips-system.h>
 #include "engine-model.h"
 #include "engine-object.h"
-#include "engine-render.h"
 #include "engine-resources.h"
 #include "engine-sector.h"
 #include "engine-types.h"
@@ -73,9 +72,8 @@ struct _liengEngine
 	liengResources* resources;
 	liphyPhysics* physics;
 #ifndef LIENG_DISABLE_GRAPHICS
-	liengRender* renderapi;
+	lirndApi* renderapi;
 	lirndRender* render;
-	lirndScene* scene;
 #endif
 	struct
 	{
@@ -194,9 +192,6 @@ void
 lieng_engine_set_local_range (liengEngine* self,
                               uint32_t     start,
                               uint32_t     end);
-
-void*
-lieng_engine_get_scene (liengEngine* self);
 
 void*
 lieng_engine_get_userdata (liengEngine* self,

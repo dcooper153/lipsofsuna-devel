@@ -34,6 +34,7 @@
 #ifndef LI_DISABLE_SOUND
 #include <sound/lips-sound.h>
 #endif
+#include <voxel/lips-voxel.h>
 #include <widget/lips-widget.h>
 #include "client.h"
 #include "client-callbacks.h"
@@ -66,6 +67,7 @@ struct _licliModule
 	lisndManager* sound;
 	lisndSource* music;
 #endif
+	livoxManager* voxels;
 	liwdgManager* widgets;
 };
 

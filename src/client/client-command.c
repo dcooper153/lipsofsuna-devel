@@ -391,9 +391,10 @@ private_voxel_box (licliModule* module,
 {
 	uint32_t terrain;
 	lialgU32dicIter iter;
-	liengSector* sector;
 	limatAabb aabb;
 	limatAabb aabb1;
+	limatVector origin;
+	livoxSector* sector;
 
 	/* Parse the packet. */
 	if (!li_reader_get_float (reader, &aabb.min.x) ||
@@ -407,12 +408,13 @@ private_voxel_box (licliModule* module,
 		return 0;
 
 	/* Edit terrain. */
-	LI_FOREACH_U32DIC (iter, module->engine->sectors)
+	LI_FOREACH_U32DIC (iter, module->voxels->sectors)
 	{
 		sector = iter.value;
-		aabb1.min = limat_vector_subtract (aabb.min, sector->origin);
-		aabb1.max = limat_vector_subtract (aabb.max, sector->origin);
-		lieng_sector_fill_aabb (sector, &aabb1, terrain);
+		livox_sector_get_origin (sector, &origin);
+		aabb1.min = limat_vector_subtract (aabb.min, origin);
+		aabb1.max = limat_vector_subtract (aabb.max, origin);
+		livox_sector_fill_aabb (sector, &aabb1, terrain);
 	}
 
 	return 1;
@@ -426,8 +428,8 @@ private_voxel_diff (licliModule* module,
 	uint8_t sectory;
 	uint8_t sectorz;
 	uint16_t blockid;
-	liengBlock* block;
-	liengSector* sector;
+	livoxBlock* block;
+	livoxSector* sector;
 
 	while (!li_reader_check_end (reader))
 	{
@@ -437,21 +439,21 @@ private_voxel_diff (licliModule* module,
 		    !li_reader_get_uint8 (reader, &sectorz) ||
 		    !li_reader_get_uint16 (reader, &blockid))
 			return 0;
-		if (blockid >= LIENG_BLOCKS_PER_SECTOR)
+		if (blockid >= LIVOX_BLOCKS_PER_SECTOR)
 			return 0;
 
 		/* Find block. */
-		sector = lieng_engine_create_sector (module->engine,
+		sector = livox_manager_create_sector (module->voxels,
 			LIENG_SECTOR_INDEX (sectorx, sectory, sectorz));
 		if (sector == NULL)
 			return 0;
-		block = sector->blocks + blockid;
+		block = livox_sector_get_block (sector, blockid);
 
 		/* Read block data. */
-		if (!lieng_block_read (block, module->engine, reader))
+		if (!livox_block_read (block, module->voxels, reader))
 			return 0;
-		if (block->dirty)
-			sector->dirty = 1;
+		if (livox_block_get_dirty (block))
+			livox_sector_set_dirty (sector, 1);
 	}
 
 	return 1;
@@ -464,9 +466,10 @@ private_voxel_sphere (licliModule* module,
 	float radius;
 	uint32_t terrain;
 	lialgU32dicIter iter;
-	liengSector* sector;
 	limatVector center;
 	limatVector center1;
+	limatVector origin;
+	livoxSector* sector;
 
 	/* Parse the packet. */
 	if (!li_reader_get_float (reader, &center.x) ||
@@ -478,11 +481,12 @@ private_voxel_sphere (licliModule* module,
 		return 0;
 
 	/* Edit terrain. */
-	LI_FOREACH_U32DIC (iter, module->engine->sectors)
+	LI_FOREACH_U32DIC (iter, module->voxels->sectors)
 	{
 		sector = iter.value;
-		center1 = limat_vector_subtract (center, sector->origin);
-		lieng_sector_fill_sphere (sector, &center1, radius, terrain);
+		livox_sector_get_origin (sector, &origin);
+		center1 = limat_vector_subtract (center, origin);
+		livox_sector_fill_sphere (sector, &center1, radius, terrain);
 	}
 
 	return 1;

@@ -27,7 +27,6 @@
 #include "render-context.h"
 #include "render-draw.h"
 #include "render-lighting.h"
-#include "render-scene.h"
 
 static int
 private_compare_lights (const void* a,
@@ -151,8 +150,7 @@ lirnd_lighting_remove_light (lirndLighting* self,
  * \param scene Current scene.
  */
 void
-lirnd_lighting_update (lirndLighting* self,
-                       lirndScene*    scene)
+lirnd_lighting_update (lirndLighting* self)
 {
 	lialgPtrdicIter iter;
 	lirndLight* light;
@@ -160,7 +158,7 @@ lirnd_lighting_update (lirndLighting* self,
 	LI_FOREACH_PTRDIC (iter, self->lights)
 	{
 		light = iter.value;
-		lirnd_light_update (light, scene);
+		lirnd_light_update (light);
 	}
 }
 

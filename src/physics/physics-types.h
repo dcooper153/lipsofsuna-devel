@@ -27,6 +27,9 @@
  * @{
  */
 
+#define LIPHY_GROUP_STATICS 0x4000
+#define LIPHY_GROUP_TILES 0x8000
+
 enum _liphyControlMode
 {
 	LIPHY_CONTROL_MODE_NONE,

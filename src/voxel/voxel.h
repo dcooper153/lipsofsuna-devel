@@ -15,19 +15,39 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_ENGINE_H__
-#define __LIPS_ENGINE_H__
+/**
+ * \addtogroup livox Voxel
+ * @{
+ * \addtogroup livoxVoxel Voxel
+ * @{
+ */
 
-#include "engine.h"
-#include "engine-camera.h"
-#include "engine-constraint.h"
-#include "engine-iterator.h"
-#include "engine-model.h"
-#include "engine-object.h"
-#include "engine-range.h"
-#include "engine-resources.h"
-#include "engine-sector.h"
-#include "engine-selection.h"
-#include "engine-types.h"
+#ifndef __VOXEL_H__
+#define __VOXEL_H__
+
+#include <math/lips-math.h>
+#include <model/lips-model.h>
+#include "voxel-types.h"
+
+livoxVoxel
+livox_voxel_init (int shape,
+                  int type);
+
+int
+livox_voxel_triangulate (livoxVoxel   self,
+                         livoxVoxel*  neighbors,
+                         limdlVertex* result);
+
+livoxVoxel
+livox_voxel_validate (livoxVoxel self);
+
+int
+livox_voxel_get_shape (livoxVoxel self);
+
+int
+livox_voxel_get_type (livoxVoxel self);
 
 #endif
+
+/** @} */
+/** @} */

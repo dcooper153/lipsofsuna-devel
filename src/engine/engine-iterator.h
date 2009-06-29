@@ -26,9 +26,6 @@
 #define __ENGINE_ITERATOR_H__
 
 #include <algorithm/lips-algorithm.h>
-#ifndef LIENG_DISABLE_GRAPHICS
-#include <render/lips-render.h>
-#endif
 #include "engine-range.h"
 #include "engine-sector.h"
 #include "engine-selection.h"
@@ -131,7 +128,7 @@ struct _liengSectorIter
 };
 
 /**
- * \brief Iterates through a range of loaded sectors sectors.
+ * \brief Iterates through a range of loaded sectors.
  *
  * This is a macro that works in the same way with a for loop.
  *
@@ -332,125 +329,6 @@ lieng_selection_iter_next (liengSelectionIter* self)
 		self->object = NULL;
 		return 0;
 	}
-}
-
-/*****************************************************************************/
-
-typedef struct _liengSceneIter liengSceneIter;
-struct _liengSceneIter
-{
-#ifndef LIENG_DISABLE_GRAPHICS
-	lirndScene* scene;
-	lirndObject* render;
-#endif
-	int blocks;
-	lialgU32dicIter sectors;
-	lialgU32dicIter objects;
-	liengObject* object;
-	liengBlock* block;
-	int (*block_filter)(liengBlock*);
-	int (*object_filter)(liengObject*);
-};
-
-/**
- * \brief Iterates through all objects and terrain blocks in all loaded sectors.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Scene iterator.
- * \param engine Engine.
- */
-#define LIENG_FOREACH_SCENE(iter, engine) \
-	for (lieng_scene_iter_first (&iter, engine, NULL, NULL) ; \
-	     iter.object != NULL && iter.block != NULL ; \
-	     lieng_scene_iter_next (&iter))
-
-static inline int
-lieng_scene_iter_next (liengSceneIter* self)
-{
-	liengBlock* block;
-	liengObject* object;
-	liengSector* sector;
-
-	for (sector = self->sectors.value ; sector != NULL ; sector = self->sectors.value)
-	{
-		/* Find next terrain block. */
-		if (self->blocks < LIENG_BLOCKS_PER_SECTOR)
-		{
-			while (++self->blocks < LIENG_BLOCKS_PER_SECTOR)
-			{
-				block = sector->blocks + self->blocks;
-				if (self->block_filter == NULL || self->block_filter (block))
-				{
-					self->block = block;
-					self->object = NULL;
-#ifndef LIENG_DISABLE_GRAPHICS
-					self->render = self->block->render;
-#endif
-					return 1;
-				}
-			}
-			lialg_u32dic_iter_start (&self->objects, sector->objects);
-		}
-
-		/* Find next object. */
-		while (self->objects.value != NULL)
-		{
-			object = self->objects.value;
-			lialg_u32dic_iter_next (&self->objects);
-			if (self->object_filter == NULL || self->object_filter (object))
-			{
-				self->block = NULL;
-				self->object = object;
-#ifndef LIENG_DISABLE_GRAPHICS
-				self->render = object->render;
-#endif
-				return 1;
-			}
-		}
-
-		/* Find next sector. */
-		lialg_u32dic_iter_next (&self->sectors);
-		self->blocks = 0;
-	}
-
-	/* No more sectors. */
-	self->block = NULL;
-	self->object = NULL;
-#ifndef LIENG_DISABLE_GRAPHICS
-	self->render = NULL;
-#endif
-
-	return 0;
-}
-
-static inline int
-lieng_scene_iter_first (liengSceneIter* self,
-                        liengEngine*    engine,
-                        void*           block_filter,
-                        void*           object_filter)
-{
-	self->block_filter = block_filter;
-	self->object_filter = object_filter;
-	self->blocks = -1;
-#ifndef LIENG_DISABLE_GRAPHICS
-	self->scene = engine->scene;
-#endif
-
-	/* Find first sector. */
-	lialg_u32dic_iter_start (&self->sectors, engine->sectors);
-	if (self->sectors.value == NULL)
-	{
-		self->block = NULL;
-		self->object = NULL;
-#ifndef LIENG_DISABLE_GRAPHICS
-		self->render = NULL;
-#endif
-		return 0;
-	}
-
-	/* Find first block or object. */
-	return lieng_scene_iter_next (self);
 }
 
 #endif

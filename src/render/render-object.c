@@ -63,8 +63,7 @@ static int
 private_update_buffer (lirndObject* self);
 
 static void
-private_update_envmap (lirndObject* self,
-                       lirndScene*  scene);
+private_update_envmap (lirndObject* self);
 
 static void
 private_update_lights (lirndObject* self);
@@ -93,6 +92,13 @@ lirnd_object_new (lirndRender* render,
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 
+	/* Add to renderer. */
+	if (!lialg_ptrdic_insert (render->objects, self, self))
+	{
+		free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -106,6 +112,7 @@ lirnd_object_new (lirndRender* render,
 void
 lirnd_object_free (lirndObject* self)
 {
+	lialg_ptrdic_remove (self->render->objects, self);
 	private_clear_envmap (self);
 	private_clear_lights (self);
 	private_clear_materials (self);
@@ -349,12 +356,11 @@ lirnd_object_replace_image (lirndObject* self,
  */
 void
 lirnd_object_update (lirndObject* self,
-                     lirndScene*  scene,
                      float        secs)
 {
 	if (self->model == NULL)
 		return;
-	private_update_envmap (self, scene);
+	private_update_envmap (self);
 }
 
 /**
@@ -954,16 +960,15 @@ private_update_buffer (lirndObject* self)
 }
 
 static void
-private_update_envmap (lirndObject* self,
-                       lirndScene*  scene)
+private_update_envmap (lirndObject* self)
 {
 	int i;
+	lialgPtrdicIter iter;
 	limatFrustum frustum;
 	limatVector ctr;
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndContext context;
-	lirndSceneIter iter;
 	const limatVector dir[6] =
 	{
 		{ 1.0f, 0.0f, 0.0f }, /* Back. */
@@ -1012,7 +1017,7 @@ private_update_envmap (lirndObject* self,
 		lirnd_context_set_modelview (&context, &modelview);
 		lirnd_context_set_projection (&context, &projection);
 		lirnd_context_set_frustum (&context, &frustum);
-		LIRND_FOREACH_SCENE (iter, scene)
+		LI_FOREACH_PTRDIC (iter, self->render->objects)
 			lirnd_draw_exclude (&context, iter.value, self);
 	}
 

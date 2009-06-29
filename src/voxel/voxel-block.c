@@ -16,40 +16,41 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup livox Voxel
  * @{
- * \addtogroup liengBlock Block
+ * \addtogroup livoxBlock Block
  * @{
  */
 
 #include <stdlib.h>
 #include <string.h>
-#include "engine.h"
-#include "engine-block.h"
-#include "engine-voxel.h"
+#include "voxel.h"
+#include "voxel-block.h"
+#include "voxel-manager.h"
+#include "voxel-private.h"
 
 /**
  * \brief Frees the contents of the block but not the block itself.
  *
  * \param self Block.
- * \param engine Engine.
+ * \param manager Voxel manager.
  */
 void
-lieng_block_free (liengBlock*  self,
-                  liengEngine* engine)
+livox_block_free (livoxBlock*   self,
+                  livoxManager* manager)
 {
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef LIVOX_DISABLE_GRAPHICS
 	limdlModel* model;
 	lirndModel* rndmdl;
 #endif
 
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef LIVOX_DISABLE_GRAPHICS
 	if (self->render != NULL)
 	{
 		model = self->render->model->model;
 		rndmdl = self->render->model;
-		engine->renderapi->lirnd_object_free (self->render);
-		engine->renderapi->lirnd_model_free (rndmdl);
+		manager->renderapi->lirnd_object_free (self->render);
+		manager->renderapi->lirnd_model_free (rndmdl);
 		limdl_model_free (model);
 	}
 #endif
@@ -60,9 +61,9 @@ lieng_block_free (liengBlock*  self,
 
 	switch (self->type)
 	{
-		case LIENG_BLOCK_TYPE_FULL:
+		case LIVOX_BLOCK_TYPE_FULL:
 			break;
-		case LIENG_BLOCK_TYPE_TILES:
+		case LIVOX_BLOCK_TYPE_TILES:
 			free (self->tiles);
 			break;
 	}
@@ -72,15 +73,16 @@ lieng_block_free (liengBlock*  self,
  * \brief Fills the block with the given terrain type.
  *
  * \param self Block.
+ * \param manager Voxel manager.
  * \param terrain Terrain type.
  */
 void
-lieng_block_fill (liengBlock*  self,
-                  liengEngine* engine,
-                  liengTile    terrain)
+livox_block_fill (livoxBlock*   self,
+                  livoxManager* manager,
+                  livoxVoxel    terrain)
 {
-	terrain = lieng_voxel_init (0xFF, terrain);
-	if (self->type == LIENG_BLOCK_TYPE_FULL)
+	terrain = livox_voxel_init (0xFF, terrain);
+	if (self->type == LIVOX_BLOCK_TYPE_FULL)
 	{
 		/* Set new terrain. */
 		if (self->full.terrain != terrain)
@@ -93,11 +95,11 @@ lieng_block_fill (liengBlock*  self,
 	else
 	{
 		/* Free old data. */
-		lieng_block_free (self, engine);
-		memset (self, 0, sizeof (liengBlock));
+		livox_block_free (self, manager);
+		memset (self, 0, sizeof (livoxBlock));
 
 		/* Set new terrain. */
-		self->type = LIENG_BLOCK_TYPE_FULL;
+		self->type = LIVOX_BLOCK_TYPE_FULL;
 		self->dirty = 0xFF;
 		self->full.terrain = terrain;
 		self->stamp++;
@@ -113,9 +115,9 @@ lieng_block_fill (liengBlock*  self,
  * \return Nonzero if at least one voxel was modified.
  */
 int
-lieng_block_fill_aabb (liengBlock*      self,
+livox_block_fill_aabb (livoxBlock*      self,
                        const limatAabb* box,
-                       liengTile        terrain)
+                       livoxVoxel       terrain)
 {
 	int x;
 	int y;
@@ -127,39 +129,39 @@ lieng_block_fill_aabb (liengBlock*      self,
 	if (!terrain)
 	{
 		/* Erase terrain. */
-		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 		{
 			child.min = limat_vector_init (
-				x * LIENG_TILE_WIDTH,
-				y * LIENG_TILE_WIDTH,
-				z * LIENG_TILE_WIDTH);
+				x * LIVOX_TILE_WIDTH,
+				y * LIVOX_TILE_WIDTH,
+				z * LIVOX_TILE_WIDTH);
 			child.max = limat_vector_init (
-				(x + 1) * LIENG_TILE_WIDTH,
-				(y + 1) * LIENG_TILE_WIDTH,
-				(z + 1) * LIENG_TILE_WIDTH);
+				(x + 1) * LIVOX_TILE_WIDTH,
+				(y + 1) * LIVOX_TILE_WIDTH,
+				(z + 1) * LIVOX_TILE_WIDTH);
 			if (limat_aabb_intersects_aabb (box, &child))
-				ret |= lieng_block_set_voxel (self, x, y, z, 0);
+				ret |= livox_block_set_voxel (self, x, y, z, 0);
 		}
 	}
 	else
 	{
 		/* Paint terrain. */
-		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 		{
 			child.min = limat_vector_init (
-				x * LIENG_TILE_WIDTH,
-				y * LIENG_TILE_WIDTH,
-				z * LIENG_TILE_WIDTH);
+				x * LIVOX_TILE_WIDTH,
+				y * LIVOX_TILE_WIDTH,
+				z * LIVOX_TILE_WIDTH);
 			child.max = limat_vector_init (
-				(x + 1) * LIENG_TILE_WIDTH,
-				(y + 1) * LIENG_TILE_WIDTH,
-				(z + 1) * LIENG_TILE_WIDTH);
+				(x + 1) * LIVOX_TILE_WIDTH,
+				(y + 1) * LIVOX_TILE_WIDTH,
+				(z + 1) * LIVOX_TILE_WIDTH);
 			if (limat_aabb_intersects_aabb (box, &child))
-				ret |= lieng_block_set_voxel (self, x, y, z, 0xFF00 | terrain);
+				ret |= livox_block_set_voxel (self, x, y, z, 0xFF00 | terrain);
 		}
 	}
 	if (ret)
@@ -178,10 +180,10 @@ lieng_block_fill_aabb (liengBlock*      self,
  * \return Nonzero if at least one voxel was modified.
  */
 int
-lieng_block_fill_sphere (liengBlock*        self,
+livox_block_fill_sphere (livoxBlock*        self,
                          const limatVector* center,
                          float              radius,
-                         liengTile          terrain)
+                         livoxVoxel         terrain)
 {
 	int i;
 	int x;
@@ -189,7 +191,7 @@ lieng_block_fill_sphere (liengBlock*        self,
 	int z;
 	int found;
 	int ret = 0;
-	liengTile tile;
+	livoxVoxel tile;
 	limatVector dist;
 	static const limatVector corner_offsets[8] =
 	{
@@ -207,40 +209,40 @@ lieng_block_fill_sphere (liengBlock*        self,
 	if (!terrain)
 	{
 		/* Erase terrain. */
-		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 		{
-			tile = lieng_block_get_voxel (self, x, y, z);
+			tile = livox_block_get_voxel (self, x, y, z);
 			for (i = 0 ; i < 8 ; i++)
 			{
 				dist = limat_vector_subtract (*center, limat_vector_init (
-					(x + corner_offsets[i].x) * LIENG_TILE_WIDTH,
-					(y + corner_offsets[i].y) * LIENG_TILE_WIDTH,
-					(z + corner_offsets[i].z) * LIENG_TILE_WIDTH));
+					(x + corner_offsets[i].x) * LIVOX_TILE_WIDTH,
+					(y + corner_offsets[i].y) * LIVOX_TILE_WIDTH,
+					(z + corner_offsets[i].z) * LIVOX_TILE_WIDTH));
 				if (limat_vector_dot (dist, dist) <= radius * radius)
 					tile &= ~(1 << (i + 8));
 			}
-			tile = lieng_voxel_validate (tile);
-			ret |= lieng_block_set_voxel (self, x, y, z, tile);
+			tile = livox_voxel_validate (tile);
+			ret |= livox_block_set_voxel (self, x, y, z, tile);
 		}
 	}
 	else
 	{
 		/* Paint terrain. */
-		for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 		{
 			found = 0;
-			tile = lieng_block_get_voxel (self, x, y, z) & 0xFF00;
+			tile = livox_block_get_voxel (self, x, y, z) & 0xFF00;
 			tile |= terrain;
 			for (i = 0 ; i < 8 ; i++)
 			{
 				dist = limat_vector_subtract (*center, limat_vector_init (
-					(x + corner_offsets[i].x) * LIENG_TILE_WIDTH,
-					(y + corner_offsets[i].y) * LIENG_TILE_WIDTH,
-					(z + corner_offsets[i].z) * LIENG_TILE_WIDTH));
+					(x + corner_offsets[i].x) * LIVOX_TILE_WIDTH,
+					(y + corner_offsets[i].y) * LIVOX_TILE_WIDTH,
+					(z + corner_offsets[i].z) * LIVOX_TILE_WIDTH));
 				if (limat_vector_dot (dist, dist) <= radius * radius)
 				{
 					tile |= (1 << (i + 8));
@@ -249,8 +251,8 @@ lieng_block_fill_sphere (liengBlock*        self,
 			}
 			if (found)
 			{
-				tile = lieng_voxel_validate (tile);
-				ret |= lieng_block_set_voxel (self, x, y, z, tile);
+				tile = livox_voxel_validate (tile);
+				ret |= livox_block_set_voxel (self, x, y, z, tile);
 			}
 		}
 	}
@@ -266,23 +268,23 @@ lieng_block_fill_sphere (liengBlock*        self,
  * \param self Block.
  */
 void
-lieng_block_optimize (liengBlock* self)
+livox_block_optimize (livoxBlock* self)
 {
 	int i;
-	liengTile tile;
+	livoxVoxel tile;
 
-	if (self->type == LIENG_BLOCK_TYPE_TILES)
+	if (self->type == LIVOX_BLOCK_TYPE_TILES)
 	{
 		/* Convert homegeneous tile blocks to full blocks. */
 		tile = self->tiles->tiles[0];
-		for (i = 1 ; i < LIENG_TILES_PER_BLOCK ; i++)
+		for (i = 1 ; i < LIVOX_TILES_PER_BLOCK ; i++)
 		{
 			if (self->tiles->tiles[i] != tile)
 				return;
 		}
 		free (self->tiles);
 		self->full.terrain = tile;
-		self->type = LIENG_BLOCK_TYPE_FULL;
+		self->type = LIVOX_BLOCK_TYPE_FULL;
 	}
 }
 
@@ -290,14 +292,14 @@ lieng_block_optimize (liengBlock* self)
  * \brief Reads block data from a stream.
  *
  * \param self Block.
- * \param engine Engine.
+ * \param manager Voxel manager.
  * \param reader Reader.
  * \return Nonzero on success.
  */
 int
-lieng_block_read (liengBlock*  self,
-                  liengEngine* engine,
-                  liReader*    reader)
+livox_block_read (livoxBlock*   self,
+                  livoxManager* manager,
+                  liReader*     reader)
 {
 	int x;
 	int y;
@@ -309,19 +311,19 @@ lieng_block_read (liengBlock*  self,
 		return 0;
 	switch (type)
 	{
-		case LIENG_BLOCK_TYPE_FULL:
+		case LIVOX_BLOCK_TYPE_FULL:
 			if (!li_reader_get_uint16 (reader, &terrain))
 				return 0;
-			lieng_block_fill (self, engine, terrain);
+			livox_block_fill (self, manager, terrain);
 			break;
-		case LIENG_BLOCK_TYPE_TILES:
-			for (z = 0 ; z < LIENG_TILES_PER_LINE ; z++)
-			for (y = 0 ; y < LIENG_TILES_PER_LINE ; y++)
-			for (x = 0 ; x < LIENG_TILES_PER_LINE ; x++)
+		case LIVOX_BLOCK_TYPE_TILES:
+			for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+			for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+			for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 			{
 				if (!li_reader_get_uint16 (reader, &terrain))
 					return 0;
-				lieng_block_set_voxel (self, x, y, z, terrain);
+				livox_block_set_voxel (self, x, y, z, terrain);
 			}
 			break;
 	}
@@ -337,7 +339,7 @@ lieng_block_read (liengBlock*  self,
  * \return Nonzero on success.
  */
 int
-lieng_block_write (liengBlock*  self,
+livox_block_write (livoxBlock*  self,
                    liarcWriter* writer)
 {
 	int i;
@@ -346,12 +348,12 @@ lieng_block_write (liengBlock*  self,
 		return 0;
 	switch (self->type)
 	{
-		case LIENG_BLOCK_TYPE_FULL:
+		case LIVOX_BLOCK_TYPE_FULL:
 			if (!liarc_writer_append_uint16 (writer, self->full.terrain))
 				return 0;
 			break;
-		case LIENG_BLOCK_TYPE_TILES:
-			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
+		case LIVOX_BLOCK_TYPE_TILES:
+			for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
 			{
 				if (!liarc_writer_append_uint16 (writer, self->tiles->tiles[i]))
 					return 0;
@@ -363,15 +365,66 @@ lieng_block_write (liengBlock*  self,
 }
 
 /**
+ * \brief Returns nonzero if the block is dirty.
+ *
+ * \param self Block.
+ * \return Nonzero if dirty.
+ */
+int
+livox_block_get_dirty (const livoxBlock* self)
+{
+	return self->dirty;
+}
+
+/**
+ * \brief Returns nonzero if the block is dirty.
+ *
+ * \param self Block.
+ * \return Nonzero if dirty.
+ */
+void
+livox_block_set_dirty (livoxBlock* self,
+                       int         value)
+{
+	self->dirty = value;
+}
+
+/**
  * \brief Checks if the block is empty.
  *
  * \param self Block.
  * \return Boolean.
  */
 int
-lieng_block_get_empty (liengBlock* self)
+livox_block_get_empty (livoxBlock* self)
 {
 	return self->physics != NULL;
+}
+
+#ifndef LIVOX_DISABLE_GRAPHICS
+/**
+ * \brief Gets the render object of the block.
+ *
+ * \param self Block.
+ * \return Render object or NULL.
+ */
+lirndObject*
+livox_block_get_render (livoxBlock* self)
+{
+	return self->render;
+}
+#endif
+
+/**
+ * \brief Gets the modification stamp of the block.
+ *
+ * \param self Block.
+ * \return Modification stamp.
+ */
+int
+livox_block_get_stamp (const livoxBlock* self)
+{
+	return self->stamp;
 }
 
 /**
@@ -383,20 +436,20 @@ lieng_block_get_empty (liengBlock* self)
  * \param z Offset of the voxel within the block.
  * \return Terrain type or zero.
  */
-liengTile
-lieng_block_get_voxel (liengBlock* self,
+livoxVoxel
+livox_block_get_voxel (livoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z)
 {
 	switch (self->type)
 	{
-		case LIENG_BLOCK_TYPE_FULL:
+		case LIVOX_BLOCK_TYPE_FULL:
 			assert (self->full.terrain != 0xFF00);
 			return self->full.terrain;
-		case LIENG_BLOCK_TYPE_TILES:
-			assert (self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)] != 0xFF00);
-			return self->tiles->tiles[LIENG_TILE_INDEX (x, y, z)];
+		case LIVOX_BLOCK_TYPE_TILES:
+			assert (self->tiles->tiles[LIVOX_TILE_INDEX (x, y, z)] != 0xFF00);
+			return self->tiles->tiles[LIVOX_TILE_INDEX (x, y, z)];
 	}
 
 	return 0;
@@ -408,7 +461,7 @@ lieng_block_get_voxel (liengBlock* self,
  * This can alter the type of the block if, for example, a tile is removed from
  * a full block, in which case the block would be converted to a tiles block.
  *
- * You need to call #lieng_block_rebuild manually if something was changed.
+ * You need to call #livox_block_rebuild manually if something was changed.
  *
  * \param self Block.
  * \param x Offset of the voxel within the block.
@@ -418,36 +471,36 @@ lieng_block_get_voxel (liengBlock* self,
  * \return Nonzero if a voxel was modified.
  */
 int
-lieng_block_set_voxel (liengBlock* self,
+livox_block_set_voxel (livoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z,
-                       liengTile   terrain)
+                       livoxVoxel  terrain)
 {
 	int i;
-	liengTile tmp;
-	liengBlockTiles* tiles;
+	livoxVoxel tmp;
+	livoxBlockTiles* tiles;
 
 	/* Modify terrain. */
-	terrain = lieng_voxel_validate (terrain);
+	terrain = livox_voxel_validate (terrain);
 	switch (self->type)
 	{
-		case LIENG_BLOCK_TYPE_FULL:
-			tmp = lieng_voxel_init (0xFF, self->full.terrain);
+		case LIVOX_BLOCK_TYPE_FULL:
+			tmp = livox_voxel_init (0xFF, self->full.terrain);
 			if (tmp == terrain)
 				return 0;
-			tiles = calloc (1, sizeof (liengBlockTiles));
+			tiles = calloc (1, sizeof (livoxBlockTiles));
 			if (tiles == NULL)
 				return 0;
-			for (i = 0 ; i < LIENG_TILES_PER_BLOCK ; i++)
+			for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
 				tiles->tiles[i] = tmp;
-			i = LIENG_TILE_INDEX (x, y, z);
+			i = LIVOX_TILE_INDEX (x, y, z);
 			tiles->tiles[i] = terrain;
 			self->tiles = tiles;
-			self->type = LIENG_BLOCK_TYPE_TILES;
+			self->type = LIVOX_BLOCK_TYPE_TILES;
 			break;
-		case LIENG_BLOCK_TYPE_TILES:
-			i = LIENG_TILE_INDEX (x, y, z);
+		case LIVOX_BLOCK_TYPE_TILES:
+			i = LIVOX_TILE_INDEX (x, y, z);
 			if (self->tiles->tiles[i] == terrain)
 				return 0;
 			self->tiles->tiles[i] = terrain;
@@ -459,15 +512,15 @@ lieng_block_set_voxel (liengBlock* self,
 	/* Mark faces dirty. */
 	if (x == 0)
 		self->dirty |= 0x01;
-	if (x == LIENG_TILES_PER_LINE - 1)
+	if (x == LIVOX_TILES_PER_LINE - 1)
 		self->dirty |= 0x02;
 	if (y == 0)
 		self->dirty |= 0x04;
-	if (y == LIENG_TILES_PER_LINE - 1)
+	if (y == LIVOX_TILES_PER_LINE - 1)
 		self->dirty |= 0x08;
 	if (z == 0)
 		self->dirty |= 0x10;
-	if (z == LIENG_TILES_PER_LINE - 1)
+	if (z == LIVOX_TILES_PER_LINE - 1)
 		self->dirty |= 0x20;
 	self->dirty |= 0x80;
 

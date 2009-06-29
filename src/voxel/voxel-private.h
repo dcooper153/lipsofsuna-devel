@@ -16,35 +16,55 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup livox Voxel
  * @{
- * \addtogroup lirndScene Scene
+ * \addtogroup livoxBlock Block
  * @{
  */
 
-#ifndef __RENDER_SCENE_H__
-#define __RENDER_SCENE_H__
+#ifndef __VOXEL_PRIVATE_H__
+#define __VOXEL_PRIVATE_H__
 
-#include "render-types.h"
+typedef struct _livoxBlockFull livoxBlockFull;
+typedef struct _livoxBlockTiles livoxBlockTiles;
 
-struct _lirndScene
+struct _livoxBlockFull
 {
-	int (*begin)(lirndSceneIter*, lirndScene*);
-	int (*next)(lirndSceneIter*);
-	void* data;
+	livoxVoxel terrain;
 };
 
-struct _lirndSceneIter
+struct _livoxBlockTiles
 {
-	lirndScene* scene;
-	lirndObject* value;
-	char data[256];
+	uint8_t flags;
+	livoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
 };
 
-#define LIRND_FOREACH_SCENE(i, s) \
-	for ((s)->begin (&(i), s) ; (i).value != NULL ; (s)->next (&(i)))
+struct _livoxBlock
+{
+	uint8_t type;
+	uint8_t dirty;
+	uint16_t stamp;
+	liphyShape* shape;
+	liphyObject* physics;
+#ifndef LIVOX_DISABLE_GRAPHICS
+	lirndObject* render;
+#endif
+	union
+	{
+		livoxBlockFull full;
+		livoxBlockTiles* tiles;
+	};
+};
+
+struct _livoxSector
+{
+	uint8_t x;
+	uint8_t y;
+	uint8_t z;
+	uint8_t dirty;
+	livoxBlock blocks[LIVOX_BLOCKS_PER_SECTOR];
+	livoxManager* manager;
+	limatVector origin;
+};
 
 #endif
-
-/** @} */
-/** @} */

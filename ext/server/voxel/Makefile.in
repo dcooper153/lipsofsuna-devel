@@ -61,7 +61,7 @@ LTLIBRARIES = $(ext_LTLIBRARIES)
 libvoxel_ser_la_DEPENDENCIES =  \
 	$(top_builddir)/src/liblipsofsunaserver.la
 am_libvoxel_ser_la_OBJECTS = ext-listener.lo ext-module.lo \
-	ext-script.lo ext-sector.lo
+	ext-script.lo
 libvoxel_ser_la_OBJECTS = $(am_libvoxel_ser_la_OBJECTS)
 libvoxel_ser_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -261,9 +261,7 @@ libvoxel_ser_la_SOURCES = \
 	ext-listener.h \
 	ext-module.c \
 	ext-module.h \
-	ext-script.c \
-	ext-sector.c \
-	ext-sector.h
+	ext-script.c
 
 all: all-am
 
@@ -337,7 +335,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ext-sector.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

@@ -102,7 +102,6 @@ lirnd_object_replace_image (lirndObject* self,
 
 void
 lirnd_object_update (lirndObject* self,
-                     lirndScene*  scene,
                      float        secs);
 
 void

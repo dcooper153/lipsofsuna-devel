@@ -28,8 +28,7 @@
 #include "render-light.h"
 
 static void
-private_update_shadow (lirndLight* self,
-                       lirndScene* scene);
+private_update_shadow (lirndLight* self);
 
 /*****************************************************************************/
 
@@ -214,14 +213,13 @@ lirnd_light_compare (const lirndLight* self,
 }
 
 void
-lirnd_light_update (lirndLight* self,
-                    lirndScene* scene)
+lirnd_light_update (lirndLight* self)
 {
 	if (self->shadow.map)
 	{
 		if ((self->directional && self->render->lighting->config.global_shadows) ||
 		    (!self->directional && self->render->lighting->config.local_shadows))
-			private_update_shadow (self, scene);
+			private_update_shadow (self);
 	}
 }
 
@@ -406,12 +404,11 @@ lirnd_light_set_transform (lirndLight*           self,
 /*****************************************************************************/
 
 static void
-private_update_shadow (lirndLight* self,
-                       lirndScene* scene)
+private_update_shadow (lirndLight* self)
 {
+	lialgPtrdicIter iter;
 	limatFrustum frustum;
 	lirndContext context;
-	lirndSceneIter iter;
 
 	/* Enable depth rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
@@ -430,7 +427,7 @@ private_update_shadow (lirndLight* self,
 	lirnd_context_set_modelview (&context, &self->modelview);
 	lirnd_context_set_projection (&context, &self->projection);
 	lirnd_context_set_frustum (&context, &frustum);
-	LIRND_FOREACH_SCENE (iter, scene)
+	LI_FOREACH_PTRDIC (iter, self->render->objects)
 		lirnd_draw_shadowmap (&context, iter.value, self);
 
 	/* Disable depth rendering mode. */

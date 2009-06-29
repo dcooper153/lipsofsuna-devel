@@ -16,30 +16,29 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup lirnd Render
  * @{
- * \addtogroup liengRender Render
+ * \addtogroup lirndApi Api
  * @{
  */
 
-#ifndef __ENGINE_RENDER_H__
-#define __ENGINE_RENDER_H__
-#ifndef LIENG_DISABLE_GRAPHICS
+#ifndef __RENDER_API_H__
+#define __RENDER_API_H__
 
-#include <image/lips-image.h>
-#include <render/lips-render.h>
-#include "engine-types.h"
+#include "render.h"
+#include "render-model.h"
+#include "render-object.h"
 
-struct _liengRender
+typedef struct _lirndApi lirndApi;
+struct _lirndApi
 {
-	lirndRender* render;
 	lirndModel* (*lirnd_model_new)(lirndRender*, limdlModel*);
 	void (*lirnd_model_free)(lirndModel*);
 	lirndObject* (*lirnd_object_new)(lirndRender*, int);
 	void (*lirnd_object_free)(lirndObject*);
 	void (*lirnd_object_deform)(lirndObject*, limdlPose*);
 	void (*lirnd_object_replace_image)(lirndObject*, lirndImage*, lirndImage*);
-	void (*lirnd_object_update)(lirndObject*, lirndScene*, float);
+	void (*lirnd_object_update)(lirndObject*, float);
 	int (*lirnd_object_set_model)(lirndObject*, lirndModel*, limdlPose*);
 	int (*lirnd_object_set_realized)(lirndObject*, int);
 	void (*lirnd_object_set_transform)(lirndObject*, const limatTransform*);
@@ -50,13 +49,8 @@ struct _liengRender
 	int (*lirnd_render_load_image)(lirndRender*, const char*);
 };
 
-liengRender*
-lieng_render_new (const char* dir);
+extern lirndApi lirnd_render_api;
 
-void
-lieng_render_free (liengRender* self);
-
-#endif
 #endif
 
 /** @} */

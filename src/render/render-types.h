@@ -45,8 +45,6 @@ typedef struct _lirndModel lirndModel;
 typedef struct _lirndObject lirndObject;
 typedef struct _lirndRender lirndRender;
 typedef struct _lirndResources lirndResources;
-typedef struct _lirndScene lirndScene;
-typedef struct _lirndSceneIter lirndSceneIter;
 typedef enum _lirndSelect lirndSelect;
 typedef struct _lirndSelection lirndSelection;
 typedef struct _lirndShader lirndShader;
