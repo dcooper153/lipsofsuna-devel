@@ -32,11 +32,11 @@
 #include <algorithm/lips-algorithm.h>
 #include <config/lips-config.h>
 #include <engine/lips-engine.h>
+#include <paths/lips-paths.h>
 #include <physics/lips-physics.h>
 #include <script/lips-script.h>
 #include "server-network.h"
 #include "server-object.h"
-#include "server-paths.h"
 #include "server-types.h"
 
 struct _lisrvServer
@@ -46,9 +46,9 @@ struct _lisrvServer
 	lialgStrdic* extensions;
 	liarcSql* sql;
 	liengEngine* engine;
+	lipthPaths* paths;
 	liscrScript* script;
 	lisrvNetwork* network;
-	lisrvPaths* paths;
 	struct
 	{
 		licfgBans* bans;

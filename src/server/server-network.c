@@ -251,7 +251,7 @@ private_login (const char*   login,
 		return 0;
 
 	/* Contruct the account path. */
-	path = lisys_path_concat (self->server->paths->server_state, "accounts", login, NULL);
+	path = lisys_path_concat (self->server->paths->module_state, "accounts", login, NULL);
 	if (path == NULL)
 		return 0;
 

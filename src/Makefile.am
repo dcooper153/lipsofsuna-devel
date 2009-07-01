@@ -120,6 +120,13 @@ fntsrc = \
 	font/font.h \
 	font/font-layout.c \
 	font/font-layout.h
+gensrc = \
+	generator/generator.c \
+	generator/generator.h \
+	generator/generator-brush.c \
+	generator/generator-brush.h \
+	generator/generator-rule.c \
+	generator/generator-rule.h
 imgsrc = \
 	image/lips-image.h \
 	image/image.c \
@@ -187,6 +194,10 @@ physrc = \
 	physics/physics-shape.cpp \
 	physics/physics-shape.h \
 	physics/physics-types.h
+pthsrc = \
+	paths/lips-paths.h \
+	paths/paths.c \
+	paths/paths.j
 relsrc = \
 	reload/lips-reload.h \
 	reload/reload.c \
@@ -240,8 +251,6 @@ srvsrc = \
 	server/server-object.c \
 	server/server-object.h \
 	server/server-observer.h \
-	server/server-paths.c \
-	server/server-paths.h \
 	server/server-script.h \
 	server/server-types.h \
 	server/script/lips-server-script.h \
@@ -377,29 +386,35 @@ wdgsrc = \
 	widget/widget-window.h
 
 bin_PROGRAMS = lipsofsuna
-lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunaserver.la liblipsofsunaviewer.la
+lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunagenerator.la liblipsofsunaserver.la liblipsofsunaviewer.la
 
 liblipsofsunaclient_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
-	$(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
+
+liblipsofsunagenerator_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunagenerator_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(physrc) $(pthsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
+liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 
 liblipsofsunaserver_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(srvsrc) $(scrsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(voxsrc)
+	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(srvsrc) $(scrsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 
 liblipsofsunaviewer_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaviewer_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
-	$(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
+	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
 liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
 
 lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS)

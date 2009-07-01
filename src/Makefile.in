@@ -90,33 +90,33 @@ am__objects_12 = model.lo model-animation.lo model-bone.lo \
 am__objects_13 = network.lo
 am__objects_14 = physics.lo physics-object.lo physics-private.lo \
 	physics-shape.lo
-am__objects_15 = reload.lo reload-blender.lo reload-gimp.lo \
+am__objects_15 = paths.lo
+am__objects_16 = reload.lo reload-blender.lo reload-gimp.lo \
 	reload-image.lo
-am__objects_16 = render.lo render-api.lo render-context.lo \
+am__objects_17 = render.lo render-api.lo render-context.lo \
 	render-draw.lo render-light.lo render-lighting.lo \
 	render-material.lo render-model.lo render-object.lo \
 	render-particle.lo render-resources.lo render-shader.lo \
 	render-texture.lo
-am__objects_17 = server.lo server-callbacks.lo server-client.lo \
-	server-network.lo server-object.lo server-paths.lo \
-	script-effect.lo script-extension-2.lo script-object-2.lo \
-	script-server.lo
-am__objects_18 = script.lo script-class.lo script-data.lo \
+am__objects_18 = server.lo server-callbacks.lo server-client.lo \
+	server-network.lo server-object.lo script-effect.lo \
+	script-extension-2.lo script-object-2.lo script-server.lo
+am__objects_19 = script.lo script-class.lo script-data.lo \
 	script-util.lo script-class-1.lo script-event.lo \
 	script-object-3.lo script-packet.lo script-path.lo \
 	script-quaternion.lo script-vector.lo
-am__objects_19 = sound-manager.lo sound-sample.lo sound-source.lo \
+am__objects_20 = sound-manager.lo sound-sample.lo sound-source.lo \
 	sound-system.lo
-am__objects_20 = string-generic.lo string-parser.lo string-reader.lo
-am__objects_21 = system.lo system-directory.lo system-error.lo \
+am__objects_21 = string-generic.lo string-parser.lo string-reader.lo
+am__objects_22 = system.lo system-directory.lo system-error.lo \
 	system-file.lo system-execute.lo system-misc.lo \
 	system-module.lo system-notify.lo system-path.lo \
 	system-relative.lo system-types.lo system-user.lo
-am__objects_22 = thread-async-call.lo
-am__objects_23 = video-features.lo
-am__objects_24 = voxel.lo voxel-block.lo voxel-builder.lo \
+am__objects_23 = thread-async-call.lo
+am__objects_24 = video-features.lo
+am__objects_25 = voxel.lo voxel-block.lo voxel-builder.lo \
 	voxel-manager.lo voxel-sector.lo
-am__objects_25 = widget.lo widget-busy.lo widget-button.lo \
+am__objects_26 = widget.lo widget-busy.lo widget-button.lo \
 	widget-check.lo widget-entry.lo widget-group.lo \
 	widget-image.lo widget-label.lo widget-manager.lo \
 	widget-menu.lo widget-menugroup.lo widget-progress.lo \
@@ -129,24 +129,36 @@ am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
 	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
 	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
-	$(am__objects_24) $(am__objects_25)
+	$(am__objects_24) $(am__objects_25) $(am__objects_26)
 liblipsofsunaclient_la_OBJECTS = $(am_liblipsofsunaclient_la_OBJECTS)
 liblipsofsunaclient_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(liblipsofsunaclient_la_LDFLAGS) $(LDFLAGS) -o $@
+liblipsofsunagenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__objects_27 = generator.lo generator-brush.lo generator-rule.lo
+am_liblipsofsunagenerator_la_OBJECTS = $(am__objects_2) \
+	$(am__objects_3) $(am__objects_27) $(am__objects_11) \
+	$(am__objects_14) $(am__objects_15) $(am__objects_21) \
+	$(am__objects_22) $(am__objects_23) $(am__objects_25)
+liblipsofsunagenerator_la_OBJECTS =  \
+	$(am_liblipsofsunagenerator_la_OBJECTS)
+liblipsofsunagenerator_la_LINK = $(LIBTOOL) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) \
+	$(liblipsofsunagenerator_la_LDFLAGS) $(LDFLAGS) -o $@
 liblipsofsunaserver_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_liblipsofsunaserver_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_5) $(am__objects_7) \
 	$(am__objects_8) $(am__objects_11) $(am__objects_12) \
-	$(am__objects_13) $(am__objects_14) $(am__objects_17) \
-	$(am__objects_18) $(am__objects_20) $(am__objects_21) \
-	$(am__objects_22) $(am__objects_24)
+	$(am__objects_13) $(am__objects_14) $(am__objects_15) \
+	$(am__objects_18) $(am__objects_19) $(am__objects_21) \
+	$(am__objects_22) $(am__objects_23) $(am__objects_25)
 liblipsofsunaserver_la_OBJECTS = $(am_liblipsofsunaserver_la_OBJECTS)
 liblipsofsunaserver_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(liblipsofsunaserver_la_LDFLAGS) $(LDFLAGS) -o $@
 liblipsofsunaviewer_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__objects_26 = viewer.lo
+am__objects_28 = viewer.lo
 am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
@@ -155,14 +167,14 @@ am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
 	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
 	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
-	$(am__objects_26) $(am__objects_25)
+	$(am__objects_24) $(am__objects_28) $(am__objects_26)
 liblipsofsunaviewer_la_OBJECTS = $(am_liblipsofsunaviewer_la_OBJECTS)
 liblipsofsunaviewer_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(liblipsofsunaviewer_la_LDFLAGS) $(LDFLAGS) -o $@
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__objects_27 = lipsofsuna-system.$(OBJEXT) \
+am__objects_29 = lipsofsuna-system.$(OBJEXT) \
 	lipsofsuna-system-directory.$(OBJEXT) \
 	lipsofsuna-system-error.$(OBJEXT) \
 	lipsofsuna-system-file.$(OBJEXT) \
@@ -174,8 +186,8 @@ am__objects_27 = lipsofsuna-system.$(OBJEXT) \
 	lipsofsuna-system-relative.$(OBJEXT) \
 	lipsofsuna-system-types.$(OBJEXT) \
 	lipsofsuna-system-user.$(OBJEXT)
-am__objects_28 = lipsofsuna-main.$(OBJEXT)
-am_lipsofsuna_OBJECTS = $(am__objects_27) $(am__objects_28)
+am__objects_30 = lipsofsuna-main.$(OBJEXT)
+am_lipsofsuna_OBJECTS = $(am__objects_29) $(am__objects_30)
 lipsofsuna_OBJECTS = $(am_lipsofsuna_OBJECTS)
 lipsofsuna_LDADD = $(LDADD)
 lipsofsuna_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -203,9 +215,11 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(liblipsofsunaclient_la_SOURCES) \
+	$(liblipsofsunagenerator_la_SOURCES) \
 	$(liblipsofsunaserver_la_SOURCES) \
 	$(liblipsofsunaviewer_la_SOURCES) $(lipsofsuna_SOURCES)
 DIST_SOURCES = $(liblipsofsunaclient_la_SOURCES) \
+	$(liblipsofsunagenerator_la_SOURCES) \
 	$(liblipsofsunaserver_la_SOURCES) \
 	$(liblipsofsunaviewer_la_SOURCES) $(lipsofsuna_SOURCES)
 ETAGS = etags
@@ -508,6 +522,14 @@ fntsrc = \
 	font/font-layout.c \
 	font/font-layout.h
 
+gensrc = \
+	generator/generator.c \
+	generator/generator.h \
+	generator/generator-brush.c \
+	generator/generator-brush.h \
+	generator/generator-rule.c \
+	generator/generator-rule.h
+
 imgsrc = \
 	image/lips-image.h \
 	image/image.c \
@@ -581,6 +603,11 @@ physrc = \
 	physics/physics-shape.h \
 	physics/physics-types.h
 
+pthsrc = \
+	paths/lips-paths.h \
+	paths/paths.c \
+	paths/paths.j
+
 relsrc = \
 	reload/lips-reload.h \
 	reload/reload.c \
@@ -636,8 +663,6 @@ srvsrc = \
 	server/server-object.c \
 	server/server-object.h \
 	server/server-observer.h \
-	server/server-paths.c \
-	server/server-paths.h \
 	server/server-script.h \
 	server/server-types.h \
 	server/script/lips-server-script.h \
@@ -781,28 +806,34 @@ wdgsrc = \
 	widget/widget-window.c \
 	widget/widget-window.h
 
-lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunaserver.la liblipsofsunaviewer.la
+lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunagenerator.la liblipsofsunaserver.la liblipsofsunaviewer.la
 liblipsofsunaclient_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
-	$(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
+liblipsofsunagenerator_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunagenerator_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(physrc) $(pthsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
+
+liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunaserver_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(srvsrc) $(scrsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(voxsrc)
+	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(srvsrc) $(scrsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
 
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunaviewer_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaviewer_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
-	$(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
+	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
 
 liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
 lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS)
@@ -888,6 +919,8 @@ clean-libLTLIBRARIES:
 	done
 liblipsofsunaclient.la: $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_DEPENDENCIES) 
 	$(liblipsofsunaclient_la_LINK) -rpath $(libdir) $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_LIBADD) $(LIBS)
+liblipsofsunagenerator.la: $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_DEPENDENCIES) 
+	$(liblipsofsunagenerator_la_LINK) -rpath $(libdir) $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_LIBADD) $(LIBS)
 liblipsofsunaserver.la: $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_DEPENDENCIES) 
 	$(liblipsofsunaserver_la_LINK) -rpath $(libdir) $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_LIBADD) $(LIBS)
 liblipsofsunaviewer.la: $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_DEPENDENCIES) 
@@ -967,6 +1000,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/engine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font-layout.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generator-brush.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generator-rule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/image-compress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/image-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/image.Plo@am__quote@
@@ -993,6 +1029,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-pose.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paths.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/physics-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/physics-private.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/physics-shape.Plo@am__quote@
@@ -1043,7 +1080,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server-client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server-network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server-object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server-paths.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sound-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sound-sample.Plo@am__quote@
@@ -1528,6 +1564,13 @@ network.lo: network/network.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o network.lo `test -f 'network/network.c' || echo '$(srcdir)/'`network/network.c
 
+paths.lo: paths/paths.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT paths.lo -MD -MP -MF $(DEPDIR)/paths.Tpo -c -o paths.lo `test -f 'paths/paths.c' || echo '$(srcdir)/'`paths/paths.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/paths.Tpo $(DEPDIR)/paths.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='paths/paths.c' object='paths.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o paths.lo `test -f 'paths/paths.c' || echo '$(srcdir)/'`paths/paths.c
+
 reload.lo: reload/reload.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT reload.lo -MD -MP -MF $(DEPDIR)/reload.Tpo -c -o reload.lo `test -f 'reload/reload.c' || echo '$(srcdir)/'`reload/reload.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/reload.Tpo $(DEPDIR)/reload.Plo
@@ -1681,13 +1724,6 @@ server-object.lo: server/server-object.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='server/server-object.c' object='server-object.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o server-object.lo `test -f 'server/server-object.c' || echo '$(srcdir)/'`server/server-object.c
-
-server-paths.lo: server/server-paths.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT server-paths.lo -MD -MP -MF $(DEPDIR)/server-paths.Tpo -c -o server-paths.lo `test -f 'server/server-paths.c' || echo '$(srcdir)/'`server/server-paths.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/server-paths.Tpo $(DEPDIR)/server-paths.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='server/server-paths.c' object='server-paths.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o server-paths.lo `test -f 'server/server-paths.c' || echo '$(srcdir)/'`server/server-paths.c
 
 script-effect.lo: server/script/script-effect.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT script-effect.lo -MD -MP -MF $(DEPDIR)/script-effect.Tpo -c -o script-effect.lo `test -f 'server/script/script-effect.c' || echo '$(srcdir)/'`server/script/script-effect.c
@@ -2066,6 +2102,27 @@ widget-window.lo: widget/widget-window.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-window.c' object='widget-window.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o widget-window.lo `test -f 'widget/widget-window.c' || echo '$(srcdir)/'`widget/widget-window.c
+
+generator.lo: generator/generator.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT generator.lo -MD -MP -MF $(DEPDIR)/generator.Tpo -c -o generator.lo `test -f 'generator/generator.c' || echo '$(srcdir)/'`generator/generator.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/generator.Tpo $(DEPDIR)/generator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/generator.c' object='generator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o generator.lo `test -f 'generator/generator.c' || echo '$(srcdir)/'`generator/generator.c
+
+generator-brush.lo: generator/generator-brush.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT generator-brush.lo -MD -MP -MF $(DEPDIR)/generator-brush.Tpo -c -o generator-brush.lo `test -f 'generator/generator-brush.c' || echo '$(srcdir)/'`generator/generator-brush.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/generator-brush.Tpo $(DEPDIR)/generator-brush.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/generator-brush.c' object='generator-brush.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o generator-brush.lo `test -f 'generator/generator-brush.c' || echo '$(srcdir)/'`generator/generator-brush.c
+
+generator-rule.lo: generator/generator-rule.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT generator-rule.lo -MD -MP -MF $(DEPDIR)/generator-rule.Tpo -c -o generator-rule.lo `test -f 'generator/generator-rule.c' || echo '$(srcdir)/'`generator/generator-rule.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/generator-rule.Tpo $(DEPDIR)/generator-rule.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/generator-rule.c' object='generator-rule.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o generator-rule.lo `test -f 'generator/generator-rule.c' || echo '$(srcdir)/'`generator/generator-rule.c
 
 viewer.lo: viewer/viewer.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT viewer.lo -MD -MP -MF $(DEPDIR)/viewer.Tpo -c -o viewer.lo `test -f 'viewer/viewer.c' || echo '$(srcdir)/'`viewer/viewer.c

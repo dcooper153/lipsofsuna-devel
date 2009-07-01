@@ -560,7 +560,6 @@ livox_sector_set_voxel (livoxSector* self,
 	int ty = y % LIVOX_BLOCKS_PER_LINE;
 	int tz = z % LIVOX_BLOCKS_PER_LINE;
 	livoxBlock* block;
-	limatVector offset;
 
 	if (x < 0 || y < 0 || z < 0 ||
 	    bx < 0 || bx >= LIVOX_BLOCKS_PER_LINE || 
@@ -572,13 +571,6 @@ livox_sector_set_voxel (livoxSector* self,
 	}
 	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 	ret = livox_block_set_voxel (block, tx, ty, tz, terrain);
-	if (ret)
-	{
-		offset = limat_vector_init (
-			self->origin.x + LIVOX_BLOCK_WIDTH * bx,
-			self->origin.y + LIVOX_BLOCK_WIDTH * by,
-			self->origin.z + LIVOX_BLOCK_WIDTH * bz);
-	}
 
 	return ret;
 }

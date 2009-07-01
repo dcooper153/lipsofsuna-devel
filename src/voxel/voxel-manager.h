@@ -72,6 +72,10 @@ void
 livox_manager_update (livoxManager* self,
                       float         secs);
 
+int
+livox_manager_write (livoxManager* self,
+                     liarcSql*     sql);
+
 #endif
 
 /** @} */

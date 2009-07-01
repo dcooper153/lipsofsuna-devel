@@ -25,7 +25,7 @@
 #include "physics.h"
 #include "physics-private.h"
 
-#define MAXPROXIES 1024
+#define MAXPROXIES 1000000
 
 static void
 private_internal_tick (btDynamicsWorld* dynamics,

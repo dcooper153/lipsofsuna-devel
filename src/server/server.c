@@ -168,7 +168,7 @@ lisrv_server_free (lisrvServer* self)
 	if (self->config.host != NULL)
 		licfg_host_free (self->config.host);
 	if (self->paths != NULL)
-		lisrv_paths_free (self->paths);
+		lipth_paths_free (self->paths);
 
 	/* Free helpers. */
 	if (self->helper.path_solver != NULL)
@@ -451,7 +451,7 @@ private_init_ai (lisrvServer* self)
 static int
 private_init_bans (lisrvServer* self)
 {
-	self->config.bans = licfg_bans_new_from_file (self->paths->server_state);
+	self->config.bans = licfg_bans_new_from_file (self->paths->module_state);
 	if (self->config.bans == NULL)
 	{
 		if (lisys_error_peek () != EIO)
@@ -475,7 +475,7 @@ private_init_engine (lisrvServer* self)
 	liengSample* sample;
 
 	/* Create engine. */
-	self->engine = lieng_engine_new (self->paths->global_data, self->paths->server_data, 0);
+	self->engine = lieng_engine_new (self->paths->global_data, self->paths->module_data, 0);
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
@@ -556,7 +556,7 @@ static int
 private_init_host (lisrvServer* self)
 {
 	/* Read host configuration. */
-	self->config.host = licfg_host_new (self->paths->server_data);
+	self->config.host = licfg_host_new (self->paths->module_data);
 	if (self->config.host == NULL)
 		return 0;
 
@@ -572,7 +572,7 @@ static int
 private_init_paths (lisrvServer* self,
                     const char*  name)
 {
-	self->paths = lisrv_paths_new (name);
+	self->paths = lipth_paths_new (name);
 	if (self->paths == NULL)
 		return 0;
 
@@ -612,7 +612,7 @@ private_init_script (lisrvServer* self)
 		return 0;
 
 	/* Load the script. */
-	path = lisys_path_concat (self->paths->server_data, "scripts", "server", "main.lua", NULL);
+	path = lipth_paths_get_script (self->paths, "server/main.lua");
 	if (path == NULL)
 		return 0;
 	ret = liscr_script_load (self->script, path);
@@ -632,7 +632,7 @@ private_init_sql (lisrvServer* self)
 	sqlite3_stmt* statement;
 
 	/* Format path. */
-	path = lisys_path_concat (self->paths->server_data, "server.db", NULL);
+	path = lipth_paths_get_data (self->paths, "server.db");
 	if (path == NULL)
 		return 0;
 

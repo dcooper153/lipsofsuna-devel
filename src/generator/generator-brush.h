@@ -16,30 +16,59 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup ligen Generator
  * @{
- * \addtogroup lisrvPaths Paths
+ * \addtogroup ligenBrush Brush
  * @{
  */
 
-#ifndef __SERVER_PATHS_H__
-#define __SERVER_PATHS_H__
+#ifndef __GENERATOR_BRUSH_H__
+#define __GENERATOR_BRUSH_H__
 
-typedef struct _lisrvPaths lisrvPaths;
-struct _lisrvPaths
+#include <math/lips-math.h>
+#include <voxel/lips-voxel.h>
+#include "generator-rule.h"
+
+typedef struct _ligenBrushobject ligenBrushobject;
+struct _ligenBrushobject
 {
-	char* global_exts;
-	char* global_data;
-	char* global_state;
-	char* server_data;
-	char* server_state;
+	limatVector pos;
+	/* TODO */
 };
 
-lisrvPaths*
-lisrv_paths_new (const char* name);
+typedef struct _ligenBrush ligenBrush;
+struct _ligenBrush
+{
+	int id;
+	int size[3];
+	struct
+	{
+		int count;
+		livoxVoxel* array;
+	} voxels;
+	struct
+	{
+		int count;
+		ligenRule** array;
+	} rules;
+	struct
+	{
+		int count;
+		ligenBrushobject* array;
+	} objects;
+};
+
+ligenBrush*
+ligen_brush_new (int width,
+                 int height,
+                 int depth);
 
 void
-lisrv_paths_free (lisrvPaths* self);
+ligen_brush_free (ligenBrush* self);
+
+int
+ligen_brush_insert_rule (ligenBrush* self,
+                         ligenRule*  rule);
 
 #endif
 

@@ -114,7 +114,7 @@ livox_manager_find_sector (livoxManager* self,
  *
  * \brief Voxel manager.
  * \param id Sector index.
- * \param sql Databaes.
+ * \param sql Database.
  * \return Sector owned by the manager or NULL.
  */
 livoxSector*
@@ -222,6 +222,72 @@ livox_manager_update (livoxManager* self,
 		}
 		sector->dirty = 0;
 	}
+}
+
+/**
+ * \brief Writes all the sectors to the database.
+ *
+ * \param self Voxel manager.
+ * \param sql Database.
+ * \return Nonzero on success.
+ */
+int
+livox_manager_write (livoxManager* self,
+                     liarcSql*     sql)
+{
+	const char* query;
+	sqlite3_stmt* statement;
+	lialgU32dicIter iter;
+
+	/* Create material table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
+		"(id INTEGER PRIMARY KEY,name TEXT,shi REAL,"
+		"dif0 REAL,dif1 REAL,dif2 REAL,dif3 REAL,"
+		"spe0 REAL,spe1 REAL,spe2 REAL,spe3 REAL);";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create sector table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
+		"(id INTEGER PRIMARY KEY,data BLOB);";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Save materials. */
+/*	LI_FOREACH_ASSOCID (iter, self->materials)
+	{
+		if (!liext_material_write (iter.value, sql))
+			return 0;
+	}*/
+
+	/* Save terrain. */
+	LI_FOREACH_U32DIC (iter, self->sectors)
+	{
+		if (!livox_sector_write (iter.value, sql))
+			return 0;
+	}
+
+	return 1;
 }
 
 /*****************************************************************************/
