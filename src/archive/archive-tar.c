@@ -170,7 +170,7 @@ liarc_tar_write_file (liarcTar*   self,
 	size_t pos;
 	char type;
 	char block[512];
-	char* link;
+	char* link = NULL;
 	lisysStat st;
 	liarcTarHeader header;
 
