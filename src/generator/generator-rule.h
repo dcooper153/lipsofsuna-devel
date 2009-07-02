@@ -31,8 +31,8 @@ enum
 	LIGEN_RULE_REQUIRE = 0x01
 };
 
-typedef struct _ligenRulebrush ligenRulebrush;
-struct _ligenRulebrush
+typedef struct _ligenRulestroke ligenRulestroke;
+struct _ligenRulestroke
 {
 	int pos[3];
 	int brush;
@@ -42,11 +42,14 @@ struct _ligenRulebrush
 typedef struct _ligenRule ligenRule;
 struct _ligenRule
 {
+	int id;
+	int flags;
+	char* name;
 	struct
 	{
 		int count;
-		ligenRulebrush* array;
-	} brushes;
+		ligenRulestroke* array;
+	} strokes;
 };
 
 ligenRule*
@@ -56,12 +59,12 @@ void
 ligen_rule_free (ligenRule* self);
 
 int
-ligen_rule_insert_brush (ligenRule* self,
-                         int        x,
-                         int        y,
-                         int        z,
-                         int        flags,
-                         int        brush);
+ligen_rule_insert_stroke (ligenRule* self,
+                          int        x,
+                          int        y,
+                          int        z,
+                          int        flags,
+                          int        brush);
 
 #endif
 

@@ -72,6 +72,9 @@ ligen_generator_main (ligenGenerator* self);
 int
 ligen_generator_step (ligenGenerator* self);
 
+int
+ligen_generator_write_brushes (ligenGenerator* self);
+
 #endif
 
 /** @} */

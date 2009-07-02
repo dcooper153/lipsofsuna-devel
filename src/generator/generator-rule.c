@@ -45,6 +45,14 @@ ligen_rule_new ()
 		return NULL;
 	}
 
+	/* Allocate name. */
+	self->name = calloc (1, sizeof (char));
+	if (self->name == NULL)
+	{
+		free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -56,7 +64,7 @@ ligen_rule_new ()
 void
 ligen_rule_free (ligenRule* self)
 {
-	free (self->brushes.array);
+	free (self->strokes.array);
 	free (self);
 }
 
@@ -72,21 +80,21 @@ ligen_rule_free (ligenRule* self)
  * \return Nonzero on success.
  */
 int
-ligen_rule_insert_brush (ligenRule* self,
-                         int        x,
-                         int        y,
-                         int        z,
-                         int        flags,
-                         int        brush)
+ligen_rule_insert_stroke (ligenRule* self,
+                          int        x,
+                          int        y,
+                          int        z,
+                          int        flags,
+                          int        brush)
 {
-	ligenRulebrush tmp;
+	ligenRulestroke tmp;
 
 	tmp.pos[0] = x;
 	tmp.pos[1] = y;
 	tmp.pos[2] = z;
 	tmp.flags = flags;
 	tmp.brush = brush;
-	if (!lialg_array_append (&self->brushes, &tmp))
+	if (!lialg_array_append (&self->strokes, &tmp))
 	{
 		lisys_error_set (ENOMEM, NULL);
 		return 0;

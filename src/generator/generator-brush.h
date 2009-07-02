@@ -41,6 +41,7 @@ struct _ligenBrush
 {
 	int id;
 	int size[3];
+	char* name;
 	struct
 	{
 		int count;
@@ -69,6 +70,15 @@ ligen_brush_free (ligenBrush* self);
 int
 ligen_brush_insert_rule (ligenBrush* self,
                          ligenRule*  rule);
+
+int
+ligen_brush_read_rules (ligenBrush* self,
+                        liarcSql*   sql,
+                        int         id);
+
+int
+ligen_brush_write (ligenBrush* self,
+                   liarcSql*   sql);
 
 #endif
 

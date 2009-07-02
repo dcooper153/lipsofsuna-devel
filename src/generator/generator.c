@@ -33,14 +33,14 @@ static int
 private_init_sql (ligenGenerator* self);
 
 static int
-private_brush_exists (ligenGenerator* self,
-                      ligenStroke*    stroke,
-                      ligenRulebrush* rbrush);
+private_brush_exists (ligenGenerator*  self,
+                      ligenStroke*     stroke,
+                      ligenRulestroke* rstroke);
 
 static int
-private_brush_intersects (ligenGenerator* self,
-                          ligenStroke*    stroke,
-                          ligenRulebrush* rbrush);
+private_brush_intersects (ligenGenerator*  self,
+                          ligenStroke*     stroke,
+                          ligenRulestroke* rstroke);
 
 static int
 private_rule_apply (ligenGenerator* self,
@@ -131,6 +131,26 @@ ligen_generator_free (ligenGenerator* self)
 }
 
 /**
+ * \brief Inserts a brush to the generator.
+ *
+ * The ownership of the brush is transferred to the generator if successful.
+ *
+ * \param self Generator.
+ * \param brush Brush.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_insert_brush (ligenGenerator* self,
+                              ligenBrush*     brush)
+{
+	if (!lialg_array_append (&self->brushes, &brush))
+		return 0;
+	brush->id = self->brushes.count - 1;
+
+	return 1;
+}
+
+/**
  * \brief Enters the main loop of the generator.
  *
  * \param self Generator.
@@ -197,63 +217,172 @@ ligen_generator_step (ligenGenerator* self)
 	return 0;
 }
 
+/**
+ * \brief Saves brushes to the generator database.
+ *
+ * \param self Generator.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_write_brushes (ligenGenerator* self)
+{
+	int i;
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Create brush table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_brushes "
+		"(id INTEGER PRIMARY KEY,name TEXT,sizx UNSIGNED INTEGER,"
+		"sizy UNSIGNED INTEGER,sizz UNSIGNED INTEGER,voxels BLOB);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create rule table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_rules "
+		"(id INTEGER,"
+		"brush INTEGER REFERENCES generator_brushes(id),"
+		"name TEXT,flags UNSIGNED INTEGER);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create stroke table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_strokes "
+		"(id INTEGER,"
+		"brush INTEGER REFERENCES generator_brushes(id),"
+		"rule INTEGER,"
+		"paint INTEGER REFERENCES generator_brushes(id),"
+		"x UNSIGNED INTEGER,y UNSIGNED INTEGER,z UNSIGNED INTEGER,"
+		"flags UNSIGNED INTEGER);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Save brushes. */
+	for (i = 0 ; i < self->brushes.count ; i++)
+		ligen_brush_write (self->brushes.array[i], self->gensql);
+
+	return 1;
+}
+
 /*****************************************************************************/
 
 static int
 private_init_brushes (ligenGenerator* self)
 {
-	/*************************************************************************/
-	/* FIXME: DEBUG */
+	int id;
+	int col;
+	int ret;
+	int size0;
+	int size1;
+	int size[3];
+	char* name;
+	const char* query;
+	const void* bytes;
+	liarcSql* sql;
+	ligenBrush* brush;
+	sqlite3_stmt* statement;
 
-	self->brushes.count = 3;
-	self->brushes.array = calloc (3, sizeof (ligenBrush*));
-	self->brushes.array[0] = ligen_brush_new (10, 10, 10);
-	self->brushes.array[0]->id = 0;
-	self->brushes.array[1] = ligen_brush_new (10, 3, 3);
-	self->brushes.array[1]->id = 1;
-	self->brushes.array[2] = ligen_brush_new (3, 3, 10);
-	self->brushes.array[2]->id = 2;
+	sql = self->gensql;
 
-	ligenRule* rule;
+	/* Prepare statement. */
+	query = "SELECT id,sizx,sizy,sizz,name,voxels FROM generator_brushes;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
 
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, 10, 0, 5, LIGEN_RULE_GENERATE, 1);
-	ligen_brush_insert_rule (self->brushes.array[0], rule);
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, 5, 0, -10, LIGEN_RULE_GENERATE, 2);
-	ligen_brush_insert_rule (self->brushes.array[0], rule);
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, -10, 0, 5, LIGEN_RULE_GENERATE, 1);
-	ligen_brush_insert_rule (self->brushes.array[0], rule);
+	/* Read brushes. */
+	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
+	{
+		/* Check for errors. */
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
 
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, 10, 0, -1, LIGEN_RULE_GENERATE, 0);
-	ligen_brush_insert_rule (self->brushes.array[1], rule);
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, 10, 0, 0, LIGEN_RULE_GENERATE, 1);
-	ligen_brush_insert_rule (self->brushes.array[1], rule);
+		/* Read id and size. */
+		col = 0;
+		id = sqlite3_column_int (statement, col++);
+		size[0] = LI_MAX (1, sqlite3_column_int (statement, col++));
+		size[1] = LI_MAX (1, sqlite3_column_int (statement, col++));
+		size[2] = LI_MAX (1, sqlite3_column_int (statement, col++));
 
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, -3, 0, -10, LIGEN_RULE_GENERATE, 0);
-	ligen_brush_insert_rule (self->brushes.array[2], rule);
-	rule = ligen_rule_new ();
-	ligen_rule_insert_brush (rule, -3, 0, 10, LIGEN_RULE_GENERATE, 0);
-	ligen_brush_insert_rule (self->brushes.array[2], rule);
+		/* Create new brush. */
+		brush = ligen_brush_new (size[0], size[1], size[2]);
+		if (brush == NULL)
+		{
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		if (!ligen_generator_insert_brush (self, brush))
+		{
+			ligen_brush_free (brush);
+			sqlite3_finalize (statement);
+			return 0;
+		}
 
-	ligenStroke stroke;
-	stroke.brush = 0;
-	stroke.pos[0] = (int)(127.5 * LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE) - 5;
-	stroke.pos[1] = (int)(127.5 * LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE) - 5;
-	stroke.pos[2] = (int)(127.5 * LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE) - 5;
-	stroke.size[0] = self->brushes.array[0]->size[0];
-	stroke.size[1] = self->brushes.array[0]->size[1];
-	stroke.size[2] = self->brushes.array[0]->size[2];
-	self->world.count = 1;
-	self->world.array = calloc (1, sizeof (ligenStroke));
-	self->world.array[0] = stroke;
+		/* Read name column. */
+		name = (char*) sqlite3_column_text (statement, col);
+		size0 = sqlite3_column_bytes (statement, col++);
+		if (size0 > 0 && name != NULL)
+		{
+			free (brush->name);
+			brush->name = strdup (name);
+			if (brush->name == NULL)
+			{
+				lisys_error_set (ENOMEM, NULL);
+				sqlite3_finalize (statement);
+				return 0;
+			}
+		}
 
-	/* FIXME: DEBUG */
-	/*************************************************************************/
+		/* Read voxels column. */
+		bytes = sqlite3_column_blob (statement, col);
+		size0 = sqlite3_column_bytes (statement, col);
+		size1 = size[0] * size[1] * size[2] * sizeof (livoxVoxel);
+		if (size0 == size1)
+			memcpy (brush->voxels.array, bytes, size1);
+
+		/* Read rules. */
+		if (!ligen_brush_read_rules (brush, sql, id))
+		{
+			sqlite3_finalize (statement);
+			return 0;
+		}
+	}
+	sqlite3_finalize (statement);
 
 	return 1;
 }
@@ -298,9 +427,9 @@ private_init_sql (ligenGenerator* self)
 }
 
 static int
-private_brush_exists (ligenGenerator* self,
-                      ligenStroke*    stroke,
-                      ligenRulebrush* rbrush)
+private_brush_exists (ligenGenerator*  self,
+                      ligenStroke*     stroke,
+                      ligenRulestroke* rstroke)
 {
 	int i;
 	int pos[3];
@@ -308,10 +437,10 @@ private_brush_exists (ligenGenerator* self,
 	ligenStroke* stroke1;
 
 	/* Calculate world position. */
-	brush = self->brushes.array[rbrush->brush];
-	pos[0] = stroke->pos[0] + rbrush->pos[0];
-	pos[1] = stroke->pos[1] + rbrush->pos[1];
-	pos[2] = stroke->pos[2] + rbrush->pos[2];
+	brush = self->brushes.array[rstroke->brush];
+	pos[0] = stroke->pos[0] + rstroke->pos[0];
+	pos[1] = stroke->pos[1] + rstroke->pos[1];
+	pos[2] = stroke->pos[2] + rstroke->pos[2];
 
 	/* Test against all strokes. */
 	/* FIXME: Use space partitioning. */
@@ -329,9 +458,9 @@ private_brush_exists (ligenGenerator* self,
 }
 
 static int
-private_brush_intersects (ligenGenerator* self,
-                          ligenStroke*    stroke,
-                          ligenRulebrush* rbrush)
+private_brush_intersects (ligenGenerator*  self,
+                          ligenStroke*     stroke,
+                          ligenRulestroke* rstroke)
 {
 	int i;
 	int min0[3];
@@ -342,10 +471,10 @@ private_brush_intersects (ligenGenerator* self,
 	ligenStroke* stroke1;
 
 	/* Calculate world position. */
-	brush = self->brushes.array[rbrush->brush];
-	min0[0] = stroke->pos[0] + rbrush->pos[0];
-	min0[1] = stroke->pos[1] + rbrush->pos[1];
-	min0[2] = stroke->pos[2] + rbrush->pos[2];
+	brush = self->brushes.array[rstroke->brush];
+	min0[0] = stroke->pos[0] + rstroke->pos[0];
+	min0[1] = stroke->pos[1] + rstroke->pos[1];
+	min0[2] = stroke->pos[2] + rstroke->pos[2];
 	max0[0] = min0[0] + brush->size[0];
 	max0[1] = min0[1] + brush->size[1];
 	max0[2] = min0[2] + brush->size[2];
@@ -380,16 +509,16 @@ private_rule_apply (ligenGenerator* self,
 	int orig;
 	ligenBrush* brush;
 	ligenStroke stroke1;
-	ligenRulebrush* rbrush;
+	ligenRulestroke* rstroke;
 
 	orig = self->world.count;
-	for (i = 0 ; i < rule->brushes.count ; i++)
+	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
-		rbrush = rule->brushes.array + i;
-		brush = self->brushes.array[rbrush->brush];
-		stroke1.pos[0] = stroke->pos[0] + rbrush->pos[0];
-		stroke1.pos[1] = stroke->pos[1] + rbrush->pos[1];
-		stroke1.pos[2] = stroke->pos[2] + rbrush->pos[2];
+		rstroke = rule->strokes.array + i;
+		brush = self->brushes.array[rstroke->brush];
+		stroke1.pos[0] = stroke->pos[0] + rstroke->pos[0];
+		stroke1.pos[1] = stroke->pos[1] + rstroke->pos[1];
+		stroke1.pos[2] = stroke->pos[2] + rstroke->pos[2];
 		stroke1.size[0] = brush->size[0];
 		stroke1.size[1] = brush->size[1];
 		stroke1.size[2] = brush->size[2];
@@ -410,19 +539,19 @@ private_rule_test (ligenGenerator* self,
                    ligenRule*      rule)
 {
 	int i;
-	ligenRulebrush* rbrush;
+	ligenRulestroke* rstroke;
 
-	for (i = 0 ; i < rule->brushes.count ; i++)
+	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
-		rbrush = rule->brushes.array + i;
-		if (rbrush->flags & LIGEN_RULE_REQUIRE)
+		rstroke = rule->strokes.array + i;
+		if (rstroke->flags & LIGEN_RULE_REQUIRE)
 		{
-			if (!private_brush_exists (self, stroke, rbrush))
+			if (!private_brush_exists (self, stroke, rstroke))
 				return 0;
 		}
 		else
 		{
-			if (private_brush_intersects (self, stroke, rbrush))
+			if (private_brush_intersects (self, stroke, rstroke))
 				return 0;
 		}
 	}
