@@ -290,6 +290,90 @@ Group_new (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Removes a column from the widget.
+ * --
+ * -- @param self Group.
+ * -- @param col Column index.
+ * function Group.remove_col(self, col)
+ */
+static int
+Group_remove_col (lua_State* lua)
+{
+	int y;
+	int w;
+	int h;
+	int col;
+	liscrData* self;
+	liscrData* data;
+	liwdgWidget* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	col = luaL_checkint (lua, 2);
+	liwdg_group_get_size (self->data, &w, &h);
+	luaL_argcheck (lua, col >= 0 && col < h, 2, "invalid column");
+
+	/* Detach scripted widgets. */
+	for (y = 0 ; y < h ; y++)
+	{
+		widget = liwdg_group_get_child (self->data, col, y);
+		if (widget != NULL)
+		{
+			data = liwdg_widget_get_userdata (widget);
+			if (data != NULL)
+				licli_script_widget_detach (data);
+		}
+	}
+
+	/* Remove column. */
+	liwdg_group_remove_col (self->data, col);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Removes a row from the widget.
+ * --
+ * -- @param self Group.
+ * -- @param row Row index.
+ * function Group.remove_row(self, row)
+ */
+static int
+Group_remove_row (lua_State* lua)
+{
+	int x;
+	int w;
+	int h;
+	int row;
+	liscrData* self;
+	liscrData* data;
+	liwdgWidget* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	row = luaL_checkint (lua, 2);
+	liwdg_group_get_size (self->data, &w, &h);
+	luaL_argcheck (lua, row >= 0 && row < h, 2, "invalid row");
+
+	/* Detach scripted widgets. */
+	for (x = 0 ; x < w ; x++)
+	{
+		widget = liwdg_group_get_child (self->data, x, row);
+		if (widget != NULL)
+		{
+			data = liwdg_widget_get_userdata (widget);
+			if (data != NULL)
+				licli_script_widget_detach (data);
+		}
+	}
+
+	/* Remove row. */
+	liwdg_group_remove_row (self->data, row);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Places a widget inside the group.
  * --
  * -- @param self Group.
@@ -422,6 +506,8 @@ licliGroupScript (liscrClass* self,
 	liscr_class_insert_func (self, "insert_col", Group_insert_col);
 	liscr_class_insert_func (self, "insert_row", Group_insert_row);
 	liscr_class_insert_func (self, "new", Group_new);
+	liscr_class_insert_func (self, "remove_col", Group_remove_col);
+	liscr_class_insert_func (self, "remove_row", Group_remove_row);
 	liscr_class_insert_func (self, "set_child", Group_set_child);
 	liscr_class_insert_func (self, "set_col_expand", Group_set_col_expand);
 	liscr_class_insert_func (self, "set_row_expand", Group_set_row_expand);

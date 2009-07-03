@@ -220,16 +220,16 @@ liwdg_group_insert_col (liwdgGroup* self,
 		return 0;
 
 	/* Shift columns. */
-	for (x = self->width - 1 ; x > index ; x++)
+	for (x = self->width - 1 ; x > index ; x--)
 	{
-		self->cols[index] = self->cols[index - 1];
+		self->cols[x] = self->cols[x - 1];
 		for (y = 0 ; y < self->height ; y++)
 			self->cells[x + y * self->width] = self->cells[(x - 1) + y * self->width];
 	}
 
 	/* Clear new column. */
 	memset (self->cols + index, 0, sizeof (liwdgGroupCol));
-	for (x = 0 ; y < self->height ; x++)
+	for (y = 0 ; y < self->height ; y++)
 		self->cells[index + x * self->width].child = NULL;
 
 	/* Rebuild columns. */
@@ -261,9 +261,9 @@ liwdg_group_insert_row (liwdgGroup* self,
 		return 0;
 
 	/* Shift rows. */
-	for (y = self->height - 1 ; y > index ; y++)
+	for (y = self->height - 1 ; y > index ; y--)
 	{
-		self->rows[index] = self->rows[index - 1];
+		self->rows[y] = self->rows[y - 1];
 		for (x = 0 ; x < self->width ; x++)
 			self->cells[x + y * self->width] = self->cells[x + (y - 1) * self->width];
 	}
@@ -278,6 +278,94 @@ liwdg_group_insert_row (liwdgGroup* self,
 	private_rebuild_children (self);
 
 	return 1;
+}
+
+/**
+ * \brief Removes a column from the group.
+ *
+ * \param self Group.
+ * \param index Column index.
+ */
+void
+liwdg_group_remove_col (liwdgGroup* self,
+                        int         index)
+{
+	int x;
+	int y;
+
+	assert (index >= 0);
+	assert (index < self->width);
+
+	/* Delete widgets. */
+	for (y = 0 ; y < self->height ; y++)
+	{
+		if (self->cells[index + y * self->width].child != NULL)
+			liwdg_widget_free (self->cells[index + y * self->width].child);
+	}
+
+	/* Shift columns. */
+	for (x = index ; x < self->width - 1 ; x++)
+	{
+		self->cols[x] = self->cols[x + 1];
+		for (y = 0 ; y < self->height ; y++)
+			self->cells[x + y * self->width] = self->cells[(x + 1) + y * self->width];
+	}
+
+	/* Clear last column. */
+	for (y = 0 ; y < self->height ; y++)
+		self->cells[(self->width - 1) + y * self->width].child = NULL;
+
+	/* Resize. */
+	liwdg_group_set_size (self, self->width - 1, self->height);
+
+	/* Rebuild all. */
+	private_rebuild_horz (self);
+	private_rebuild_vert (self);
+	private_rebuild_children (self);
+}
+
+/**
+ * \brief Removes a row from the group.
+ *
+ * \param self Group.
+ * \param index Row index.
+ */
+void
+liwdg_group_remove_row (liwdgGroup* self,
+                        int         index)
+{
+	int x;
+	int y;
+
+	assert (index >= 0);
+	assert (index < self->height);
+
+	/* Delete widgets. */
+	for (x = 0 ; x < self->width ; x++)
+	{
+		if (self->cells[x + index * self->width].child != NULL)
+			liwdg_widget_free (self->cells[x + index * self->width].child);
+	}
+
+	/* Shift rows. */
+	for (y = index ; y < self->height - 1 ; y++)
+	{
+		self->rows[y] = self->rows[y + 1];
+		for (x = 0 ; x < self->width ; x++)
+			self->cells[x + y * self->width] = self->cells[x + (y + 1) * self->width];
+	}
+
+	/* Clear last row. */
+	for (x = 0 ; x < self->width ; x++)
+		self->cells[x + (self->height - 1) * self->width].child = NULL;
+
+	/* Resize. */
+	liwdg_group_set_size (self, self->width, self->height - 1);
+
+	/* Rebuild all. */
+	private_rebuild_horz (self);
+	private_rebuild_vert (self);
+	private_rebuild_children (self);
 }
 
 /**

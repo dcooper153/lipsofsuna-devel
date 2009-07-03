@@ -36,9 +36,6 @@ enum
 	POPUP_MAX
 };
 
-static void
-private_detach (liscrData* self);
-
 /*****************************************************************************/
 
 /* @luadoc
@@ -57,7 +54,8 @@ Widget___gc (lua_State* lua)
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
 	if (self->data != NULL)
 	{
-		private_detach (self);
+		licli_script_widget_detach_children (self);
+		licli_script_widget_detach (self);
 		liwdg_widget_free (self->data);
 	}
 
@@ -263,8 +261,38 @@ Widget_getter_y (lua_State* lua)
 
 /*****************************************************************************/
 
-static void
-private_detach (liscrData* self)
+/**
+ * \brief Detaches the widget from the user interface.
+ *
+ * Used for unparenting the widget before certain widget operations, most
+ * notably the deletion, so that it isn't double removed by the widget manager.
+ *
+ * \param self Script widget.
+ */
+void
+licli_script_widget_detach (liscrData* self)
+{
+	liwdgWidget* widget = self->data;
+
+	if (widget->parent != NULL)
+	{
+		assert (widget->parent->userdata != NULL);
+		liscr_data_unref (self, widget->parent->userdata);
+	}
+	liwdg_widget_detach (widget);
+}
+
+/**
+ * \brief Detaches all scripted child widgets from the widget.
+ *
+ * Used for unparenting all children managed by scripts before certain widget
+ * operations so that they aren't double removed when their garbage collection
+ * methods are called.
+ *
+ * \param self Script widget.
+ */
+void
+licli_script_widget_detach_children (liscrData* self)
 {
 	int x;
 	int y;
@@ -272,8 +300,6 @@ private_detach (liscrData* self)
 	liwdgWidget* child;
 	liwdgWidget* widget = self->data;
 
-	/* Unparent all children managed by scripts so that they aren't
-	   double removed when their garbage collection methods are called. */
 	if (liwdg_widget_typeis (widget, &liwdgGroupType))
 	{
 		group = LIWDG_GROUP (widget);
@@ -290,12 +316,6 @@ private_detach (liscrData* self)
 			}
 		}
 	}
-
-	/* Unparent the widget itself so that the widget manager or any
-	   potential parent widget doesn't access freed memory. */
-	if (widget->parent != NULL && widget->parent->userdata != NULL)
-		liscr_data_unref (self, widget->parent->userdata);
-	liwdg_widget_detach (widget);
 }
 
 void

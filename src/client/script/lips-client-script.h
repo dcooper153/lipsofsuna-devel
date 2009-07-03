@@ -78,6 +78,14 @@ void
 licliWindowScript (liscrClass* self,
                    void*       data);
 
+/*****************************************************************************/
+
+void
+licli_script_widget_detach (liscrData* self);
+
+void
+licli_script_widget_detach_children (liscrData* self);
+
 #endif
 
 /** @} */

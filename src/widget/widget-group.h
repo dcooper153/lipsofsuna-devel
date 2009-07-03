@@ -108,6 +108,14 @@ liwdg_group_insert_row (liwdgGroup* self,
                         int         index);
 
 void
+liwdg_group_remove_col (liwdgGroup* self,
+                        int         index);
+
+void
+liwdg_group_remove_row (liwdgGroup* self,
+                        int         index);
+
+void
 liwdg_group_get_cell_rect (liwdgGroup* self,
                            int         x,
                            int         y,
