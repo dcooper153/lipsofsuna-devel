@@ -832,26 +832,11 @@ private_init (liwdgGroup*   self,
               liwdgManager* manager)
 {
 	/* Allocate memory. */
-	self->cols = calloc (1, sizeof (liwdgGroupCol));
-	if (self->cols == NULL)
-	{
-		return 0;
-	}
-	self->rows = calloc (1, sizeof (liwdgGroupRow));
-	if (self->rows == NULL)
-	{
-		free (self->cols);
-		return 0;
-	}
-	self->cells = calloc (1, sizeof (liwdgGroupCell));
-	if (self->cells == NULL)
-	{
-		free (self->cols);
-		free (self->rows);
-		return 0;
-	}
-	self->width = 1;
-	self->height = 1;
+	self->cols = NULL;
+	self->rows = NULL;
+	self->cells = NULL;
+	self->width = 0;
+	self->height = 0;
 	self->col_expand = 0;
 	self->row_expand = 0;
 	self->col_spacing = LIWDG_GROUP_DEFAULT_SPACING;
@@ -1079,7 +1064,9 @@ private_rebuild_horz (liwdgGroup* self)
 		self->cols[x].allocation = self->cols[x].request;
 		if (self->cols[x].expand)
 			self->cols[x].allocation += expand;
-		start += self->cols[x].allocation + self->col_spacing;
+		start += self->cols[x].allocation;
+		if (self->cols[x].request)
+			start += self->col_spacing;
 	}
 }
 
@@ -1111,7 +1098,9 @@ private_rebuild_vert (liwdgGroup* self)
 		self->rows[y].allocation = self->rows[y].request;
 		if (self->rows[y].expand)
 			self->rows[y].allocation += expand;
-		start += self->rows[y].allocation + self->row_spacing;
+		start += self->rows[y].allocation;
+		if (self->rows[y].request)
+			start += self->row_spacing;
 	}
 }
 

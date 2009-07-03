@@ -96,7 +96,7 @@ static int
 private_init (liwdgLabel*   self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA))
+	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
 		return 0;
 	self->string = calloc (1, 1);
 	if (self->string == NULL)
@@ -126,7 +126,7 @@ private_event (liwdgLabel* self,
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self);
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
