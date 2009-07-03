@@ -990,9 +990,13 @@ private_cell_changed (liwdgGroup* self,
 		private_rebuild_vert (self);
 		private_rebuild_children (self);
 	}
-	else if (child != NULL/* && LIWDG_WIDGET (self)->allocated && !child->allocated*/)
+	else if (child != NULL && child->visible)
 	{
 		/* Only set allocation of the widget. */
+		assert (child->request.width <= size.width);
+		assert (child->request.height <= size.height);
+		assert (self->cols[x].allocation >= size.width);
+		assert (self->rows[y].allocation >= size.height);
 		liwdg_widget_set_allocation (child,
 			LIWDG_WIDGET (self)->allocation.x + self->cols[x].start,
 			LIWDG_WIDGET (self)->allocation.y + self->rows[y].start,
