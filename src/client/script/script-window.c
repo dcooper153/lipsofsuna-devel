@@ -40,8 +40,8 @@
  * -- Creates a new window.
  * --
  * -- @param self Window class.
- * -- @param width Number of columns to create.
- * -- @param height Number of rows to create.
+ * -- @param width Optional number of columns to create.
+ * -- @param height Optional number of rows to create.
  * -- @return New window.
  * function Window.new(self, width, height)
  */
@@ -56,8 +56,14 @@ Window_new (lua_State* lua)
 	licliModule* module = liscr_script_get_userdata (script);
 
 	/* Check arguments. */
-	width = (int) luaL_checkint (lua, 2);
-	height = (int) luaL_checkint (lua, 3);
+	if (!lua_isnoneornil (lua, 2))
+		width = luaL_checkint (lua, 2);
+	else
+		width = 0;
+	if (!lua_isnoneornil (lua, 3))
+		height = luaL_checkint (lua, 3);
+	else
+		height = 0;
 	luaL_argcheck (lua, width >= 0, 2, "invalid size");
 	luaL_argcheck (lua, height >= 0, 3, "invalid size");
 

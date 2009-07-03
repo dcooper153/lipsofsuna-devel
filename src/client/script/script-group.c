@@ -69,8 +69,8 @@ Group_append_col (lua_State* lua)
 	{
 		lua_getfield (lua, 1, "set_child");
 		lua_pushvalue (lua, 1);
-		lua_pushnumber (lua, w - 1);
-		lua_pushnumber (lua, 0);
+		lua_pushnumber (lua, w);
+		lua_pushnumber (lua, 1);
 		lua_pushvalue (lua, 2);
 		if (lua_pcall (lua, 4, 0, 0) != 0)
 		{
@@ -116,8 +116,8 @@ Group_append_row (lua_State* lua)
 	{
 		lua_getfield (lua, 1, "set_child");
 		lua_pushvalue (lua, 1);
-		lua_pushnumber (lua, 0);
-		lua_pushnumber (lua, h - 1);
+		lua_pushnumber (lua, 1);
+		lua_pushnumber (lua, h);
 		lua_pushvalue (lua, 2);
 		if (lua_pcall (lua, 4, 0, 0) != 0)
 		{
@@ -150,7 +150,7 @@ Group_insert_col (lua_State* lua)
 	liscrData* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	col = luaL_checkint (lua, 2);
+	col = luaL_checkint (lua, 2) - 1;
 	if (!lua_isnoneornil (lua, 3))
 		widget = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
 	else
@@ -167,8 +167,8 @@ Group_insert_col (lua_State* lua)
 	{
 		lua_getfield (lua, 1, "set_child");
 		lua_pushvalue (lua, 1);
-		lua_pushnumber (lua, col);
-		lua_pushnumber (lua, 0);
+		lua_pushnumber (lua, col + 1);
+		lua_pushnumber (lua, 1);
 		lua_pushvalue (lua, 3);
 		if (lua_pcall (lua, 4, 0, 0) != 0)
 		{
@@ -201,7 +201,7 @@ Group_insert_row (lua_State* lua)
 	liscrData* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	row = luaL_checkint (lua, 2);
+	row = luaL_checkint (lua, 2) - 1;
 	if (!lua_isnoneornil (lua, 3))
 		widget = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
 	else
@@ -218,8 +218,8 @@ Group_insert_row (lua_State* lua)
 	{
 		lua_getfield (lua, 1, "set_child");
 		lua_pushvalue (lua, 1);
-		lua_pushnumber (lua, 0);
-		lua_pushnumber (lua, row);
+		lua_pushnumber (lua, 1);
+		lua_pushnumber (lua, row + 1);
 		lua_pushvalue (lua, 3);
 		if (lua_pcall (lua, 4, 0, 0) != 0)
 		{
@@ -238,8 +238,8 @@ Group_insert_row (lua_State* lua)
  * -- Creates a new group.
  * --
  * -- @param self Group class.
- * -- @param width Number of columns to create.
- * -- @param height Number of rows to create.
+ * -- @param width Optional number of columns to create.
+ * -- @param height Optional number of rows to create.
  * -- @return New group.
  * function Group.new(self, width, height)
  */
@@ -257,8 +257,14 @@ Group_new (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_GROUP);
 
 	/* Check arguments. */
-	width = (int) luaL_checkint (lua, 2);
-	height = (int) luaL_checkint (lua, 3);
+	if (!lua_isnoneornil (lua, 2))
+		width = luaL_checkint (lua, 2);
+	else
+		width = 0;
+	if (!lua_isnoneornil (lua, 3))
+		height = luaL_checkint (lua, 3);
+	else
+		height = 0;
 	luaL_argcheck (lua, width >= 0, 2, "invalid size");
 	luaL_argcheck (lua, height >= 0, 3, "invalid size");
 
@@ -269,11 +275,14 @@ Group_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	if (!liwdg_group_set_size (LIWDG_GROUP (widget), width, height))
+	if (width || height)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		if (!liwdg_group_set_size (LIWDG_GROUP (widget), width, height))
+		{
+			liwdg_widget_free (widget);
+			lua_pushnil (lua);
+			return 1;
+		}
 	}
 	self = liscr_data_new (script, widget, LICLI_SCRIPT_GROUP);
 	if (self == NULL)
@@ -308,7 +317,7 @@ Group_remove_col (lua_State* lua)
 	liwdgWidget* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	col = luaL_checkint (lua, 2);
+	col = luaL_checkint (lua, 2) - 1;
 	liwdg_group_get_size (self->data, &w, &h);
 	luaL_argcheck (lua, col >= 0 && col < h, 2, "invalid column");
 
@@ -350,7 +359,7 @@ Group_remove_row (lua_State* lua)
 	liwdgWidget* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	row = luaL_checkint (lua, 2);
+	row = luaL_checkint (lua, 2) - 1;
 	liwdg_group_get_size (self->data, &w, &h);
 	luaL_argcheck (lua, row >= 0 && row < h, 2, "invalid row");
 
@@ -396,8 +405,8 @@ Group_set_child (lua_State* lua)
 	liscrScript* script = liscr_script (lua);
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	x = luaL_checkint (lua, 2);
-	y = luaL_checkint (lua, 3);
+	x = luaL_checkint (lua, 2) - 1;
+	y = luaL_checkint (lua, 3) - 1;
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
 	luaL_argcheck (lua, x >= 0 && x < w, 2, "invalid column");
 	luaL_argcheck (lua, y >= 0 && y < h, 2, "invalid row");
@@ -451,7 +460,7 @@ Group_set_col_expand (lua_State* lua)
 	liscrData* self;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	x = luaL_checkint (lua, 2);
+	x = luaL_checkint (lua, 2) - 1;
 	expand = lua_toboolean (lua, 3);
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
 	luaL_argcheck (lua, x >= 0 && x < w, 2, "invalid column");
@@ -481,7 +490,7 @@ Group_set_row_expand (lua_State* lua)
 	liscrData* self;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	y = luaL_checkint (lua, 2);
+	y = luaL_checkint (lua, 2) - 1;
 	expand = lua_toboolean (lua, 3);
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
 	luaL_argcheck (lua, y >= 0 && y < h, 2, "invalid row");
@@ -490,6 +499,48 @@ Group_set_row_expand (lua_State* lua)
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->data), y, expand);
 
 	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Number of rows in the group.
+ * -- @name Group.cols
+ * -- @class table
+ */
+static int
+Group_getter_cols (lua_State* lua)
+{
+	int w;
+	int h;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+
+	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
+	lua_pushnumber (lua, w);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Number of rows in the group.
+ * -- @name Group.rows
+ * -- @class table
+ */
+static int
+Group_getter_rows (lua_State* lua)
+{
+	int w;
+	int h;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+
+	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
+	lua_pushnumber (lua, h);
+
+	return 1;
 }
 
 /*****************************************************************************/
@@ -511,6 +562,8 @@ licliGroupScript (liscrClass* self,
 	liscr_class_insert_func (self, "set_child", Group_set_child);
 	liscr_class_insert_func (self, "set_col_expand", Group_set_col_expand);
 	liscr_class_insert_func (self, "set_row_expand", Group_set_row_expand);
+	liscr_class_insert_getter (self, "cols", Group_getter_cols);
+	liscr_class_insert_getter (self, "rows", Group_getter_rows);
 }
 
 /** @} */
