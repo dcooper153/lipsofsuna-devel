@@ -383,6 +383,46 @@ Group_remove_row (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Gets a child widget.
+ * --
+ * -- @param self Group.
+ * -- @param x Column number.
+ * -- @param y Row number.
+ * -- @return Widget or nil.
+ * function Group.get_child(self, x, y)
+ */
+static int
+Group_get_child (lua_State* lua)
+{
+	int x;
+	int y;
+	int w;
+	int h;
+	liscrData* self;
+	liscrData* data;
+	liwdgWidget* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	x = luaL_checkint (lua, 2) - 1;
+	y = luaL_checkint (lua, 3) - 1;
+	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
+	luaL_argcheck (lua, x >= 0 && x < w, 2, "invalid column");
+	luaL_argcheck (lua, y >= 0 && y < h, 2, "invalid row");
+
+	/* Get child widget. */
+	widget = liwdg_group_get_child (LIWDG_GROUP (self->data), x, y);
+	if (widget == NULL)
+		return 0;
+	data = liwdg_widget_get_userdata (widget);
+	if (data == NULL)
+		return 0;
+	liscr_pushdata (lua, data);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Places a widget inside the group.
  * --
  * -- @param self Group.
@@ -559,6 +599,7 @@ licliGroupScript (liscrClass* self,
 	liscr_class_insert_func (self, "new", Group_new);
 	liscr_class_insert_func (self, "remove_col", Group_remove_col);
 	liscr_class_insert_func (self, "remove_row", Group_remove_row);
+	liscr_class_insert_func (self, "get_child", Group_get_child);
 	liscr_class_insert_func (self, "set_child", Group_set_child);
 	liscr_class_insert_func (self, "set_col_expand", Group_set_col_expand);
 	liscr_class_insert_func (self, "set_row_expand", Group_set_row_expand);
