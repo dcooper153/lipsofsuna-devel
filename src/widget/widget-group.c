@@ -114,9 +114,33 @@ liwdg_group_new_with_size (liwdgManager* manager,
 }
 
 /**
+ * \brief Appends an empty column to the group.
+ *
+ * \param self Group.
+ * \return Nonzero on success.
+ */
+int
+liwdg_group_append_col (liwdgGroup* self)
+{
+	return liwdg_group_set_size (self, self->width + 1, self->height);
+}
+
+/**
+ * \brief Appends an empty row to the group.
+ *
+ * \param self Group.
+ * \return Nonzero on success.
+ */
+int
+liwdg_group_append_row (liwdgGroup* self)
+{
+	return liwdg_group_set_size (self, self->width, self->height + 1);
+}
+
+/**
  * \brief Updates the layout after the size of a child changing.
  *
- * \param self A group widget.
+ * \param self Group.
  * \param child A widget.
  */
 void
@@ -172,6 +196,88 @@ liwdg_group_detach_child (liwdgGroup*  self,
 			}
 		}
 	}
+}
+
+/**
+ * \brief Inserts an empty column to the group.
+ *
+ * \param self Group.
+ * \param index Column index.
+ * \return Nonzero on success.
+ */
+int
+liwdg_group_insert_col (liwdgGroup* self,
+                        int         index)
+{
+	int x;
+	int y;
+
+	assert (index >= 0);
+	assert (index <= self->width);
+
+	/* Resize. */
+	if (!liwdg_group_set_size (self, self->width + 1, self->height))
+		return 0;
+
+	/* Shift columns. */
+	for (x = self->width - 1 ; x > index ; x++)
+	{
+		self->cols[index] = self->cols[index - 1];
+		for (y = 0 ; y < self->height ; y++)
+			self->cells[x + y * self->width] = self->cells[(x - 1) + y * self->width];
+	}
+
+	/* Clear new column. */
+	memset (self->cols + index, 0, sizeof (liwdgGroupCol));
+	for (x = 0 ; y < self->height ; x++)
+		self->cells[index + x * self->width].child = NULL;
+
+	/* Rebuild columns. */
+	private_rebuild_horz (self);
+	private_rebuild_children (self);
+
+	return 1;
+}
+
+/**
+ * \brief Inserts an empty row to the group.
+ *
+ * \param self Group.
+ * \param index Row index.
+ * \return Nonzero on success.
+ */
+int
+liwdg_group_insert_row (liwdgGroup* self,
+                        int         index)
+{
+	int x;
+	int y;
+
+	assert (index >= 0);
+	assert (index <= self->height);
+
+	/* Resize. */
+	if (!liwdg_group_set_size (self, self->width, self->height + 1))
+		return 0;
+
+	/* Shift rows. */
+	for (y = self->height - 1 ; y > index ; y++)
+	{
+		self->rows[index] = self->rows[index - 1];
+		for (x = 0 ; x < self->width ; x++)
+			self->cells[x + y * self->width] = self->cells[x + (y - 1) * self->width];
+	}
+
+	/* Clear new row. */
+	memset (self->rows + index, 0, sizeof (liwdgGroupRow));
+	for (x = 0 ; x < self->width ; x++)
+		self->cells[x + index * self->width].child = NULL;
+
+	/* Rebuild rows. */
+	private_rebuild_vert (self);
+	private_rebuild_children (self);
+
+	return 1;
 }
 
 /**
@@ -498,28 +604,35 @@ liwdg_group_set_size (liwdgGroup* self,
 {
 	int x;
 	int y;
-	liwdgGroupCol* mem0;
-	liwdgGroupRow* mem1;
-	liwdgGroupCell* mem2;
+	liwdgGroupCol* mem0 = NULL;
+	liwdgGroupRow* mem1 = NULL;
+	liwdgGroupCell* mem2 = NULL;
 
 	/* Allocate memory. */
-	mem0 = (liwdgGroupCol*) calloc (width, sizeof (liwdgGroupCol));
-	if (mem0 == NULL)
+	if (width > 0)
 	{
-		return 0;
+		mem0 = (liwdgGroupCol*) calloc (width, sizeof (liwdgGroupCol));
+		if (mem0 == NULL)
+			return 0;
 	}
-	mem1 = (liwdgGroupRow*) calloc (height, sizeof (liwdgGroupRow));
-	if (mem1 == NULL)
+	if (height > 0)
 	{
-		free (mem0);
-		return 0;
+		mem1 = (liwdgGroupRow*) calloc (height, sizeof (liwdgGroupRow));
+		if (mem1 == NULL)
+		{
+			free (mem0);
+			return 0;
+		}
 	}
-	mem2 = (liwdgGroupCell*) calloc (width * height, sizeof (liwdgGroupCell));
-	if (mem2 == NULL)
+	if (width > 0 && height > 0)
 	{
-		free (mem0);
-		free (mem1);
-		return 0;
+		mem2 = (liwdgGroupCell*) calloc (width * height, sizeof (liwdgGroupCell));
+		if (mem2 == NULL)
+		{
+			free (mem0);
+			free (mem1);
+			return 0;
+		}
 	}
 
 	/* Copy over the column data. */

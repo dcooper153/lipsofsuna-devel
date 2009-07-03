@@ -39,6 +39,202 @@
 
 /* @luadoc
  * ---
+ * -- Appends a column to the widget.
+ * --
+ * -- @param self Group.
+ * -- @param widget Optional widget.
+ * function Group.append_row(self, widget)
+ */
+static int
+Group_append_col (lua_State* lua)
+{
+	int w;
+	int h;
+	liscrData* self;
+	liscrData* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	if (!lua_isnoneornil (lua, 2))
+		widget = liscr_checkdata (lua, 2, LICLI_SCRIPT_WIDGET);
+	else
+		widget = NULL;
+
+	/* Append row. */
+	if (!liwdg_group_append_col (self->data))
+		return 0;
+	liwdg_group_get_size (self->data, &w, &h);
+
+	/* Set widget. */
+	if (widget != NULL)
+	{
+		lua_getfield (lua, 1, "set_child");
+		lua_pushvalue (lua, 1);
+		lua_pushnumber (lua, w - 1);
+		lua_pushnumber (lua, 0);
+		lua_pushvalue (lua, 2);
+		if (lua_pcall (lua, 4, 0, 0) != 0)
+		{
+			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
+			lisys_error_report ();
+			lua_pop (lua, 1);
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Appends a row to the widget.
+ * --
+ * -- @param self Group.
+ * -- @param widget Optional widget.
+ * function Group.append_row(self, widget)
+ */
+static int
+Group_append_row (lua_State* lua)
+{
+	int w;
+	int h;
+	liscrData* self;
+	liscrData* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	if (!lua_isnoneornil (lua, 2))
+		widget = liscr_checkdata (lua, 2, LICLI_SCRIPT_WIDGET);
+	else
+		widget = NULL;
+
+	/* Append row. */
+	if (!liwdg_group_append_row (self->data))
+		return 0;
+	liwdg_group_get_size (self->data, &w, &h);
+
+	/* Set widget. */
+	if (widget != NULL)
+	{
+		lua_getfield (lua, 1, "set_child");
+		lua_pushvalue (lua, 1);
+		lua_pushnumber (lua, 0);
+		lua_pushnumber (lua, h - 1);
+		lua_pushvalue (lua, 2);
+		if (lua_pcall (lua, 4, 0, 0) != 0)
+		{
+			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
+			lisys_error_report ();
+			lua_pop (lua, 1);
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Inserts a column to the widget.
+ * --
+ * -- @param self Group.
+ * -- @param col Column index.
+ * -- @param widget Optional widget.
+ * function Group.insert_col(self, col, widget)
+ */
+static int
+Group_insert_col (lua_State* lua)
+{
+	int w;
+	int h;
+	int col;
+	liscrData* self;
+	liscrData* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	col = luaL_checkint (lua, 2);
+	if (!lua_isnoneornil (lua, 3))
+		widget = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
+	else
+		widget = NULL;
+	liwdg_group_get_size (self->data, &w, &h);
+	luaL_argcheck (lua, col >= 0 && col <= w, 2, "invalid column");
+
+	/* Insert row. */
+	if (!liwdg_group_insert_col (self->data, col))
+		return 0;
+
+	/* Set widget. */
+	if (widget != NULL)
+	{
+		lua_getfield (lua, 1, "set_child");
+		lua_pushvalue (lua, 1);
+		lua_pushnumber (lua, col);
+		lua_pushnumber (lua, 0);
+		lua_pushvalue (lua, 3);
+		if (lua_pcall (lua, 4, 0, 0) != 0)
+		{
+			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
+			lisys_error_report ();
+			lua_pop (lua, 1);
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Inserts a row to the widget.
+ * --
+ * -- @param self Group.
+ * -- @param row Row index.
+ * -- @param widget Optional widget.
+ * function Group.insert_row(self, row, widget)
+ */
+static int
+Group_insert_row (lua_State* lua)
+{
+	int w;
+	int h;
+	int row;
+	liscrData* self;
+	liscrData* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	row = luaL_checkint (lua, 2);
+	if (!lua_isnoneornil (lua, 3))
+		widget = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
+	else
+		widget = NULL;
+	liwdg_group_get_size (self->data, &w, &h);
+	luaL_argcheck (lua, row >= 0 && row <= h, 2, "invalid row");
+
+	/* Insert row. */
+	if (!liwdg_group_insert_row (self->data, row))
+		return 0;
+
+	/* Set widget. */
+	if (widget != NULL)
+	{
+		lua_getfield (lua, 1, "set_child");
+		lua_pushvalue (lua, 1);
+		lua_pushnumber (lua, 0);
+		lua_pushnumber (lua, row);
+		lua_pushvalue (lua, 3);
+		if (lua_pcall (lua, 4, 0, 0) != 0)
+		{
+			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
+			lisys_error_report ();
+			lua_pop (lua, 1);
+			return 0;
+		}
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new group.
  * --
  * -- @param self Group class.
@@ -221,6 +417,10 @@ licliGroupScript (liscrClass* self,
 	liscr_class_inherit (self, licliWidgetScript, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_GROUP, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_GROUP);
+	liscr_class_insert_func (self, "append_col", Group_append_col);
+	liscr_class_insert_func (self, "append_row", Group_append_row);
+	liscr_class_insert_func (self, "insert_col", Group_insert_col);
+	liscr_class_insert_func (self, "insert_row", Group_insert_row);
 	liscr_class_insert_func (self, "new", Group_new);
 	liscr_class_insert_func (self, "set_child", Group_set_child);
 	liscr_class_insert_func (self, "set_col_expand", Group_set_col_expand);

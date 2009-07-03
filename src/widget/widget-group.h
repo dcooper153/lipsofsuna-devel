@@ -85,6 +85,12 @@ liwdg_group_new_with_size (liwdgManager* manager,
                            int           cols,
                            int           rows);
 
+int
+liwdg_group_append_col (liwdgGroup* self);
+
+int
+liwdg_group_append_row (liwdgGroup* self);
+
 void
 liwdg_group_child_request (liwdgGroup*  self,
                            liwdgWidget* child);
@@ -92,6 +98,14 @@ liwdg_group_child_request (liwdgGroup*  self,
 void
 liwdg_group_detach_child (liwdgGroup*  self,
                           liwdgWidget* child);
+
+int
+liwdg_group_insert_col (liwdgGroup* self,
+                        int         index);
+
+int
+liwdg_group_insert_row (liwdgGroup* self,
+                        int         index);
 
 void
 liwdg_group_get_cell_rect (liwdgGroup* self,
