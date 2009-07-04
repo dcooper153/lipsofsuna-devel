@@ -382,6 +382,8 @@ wdgsrc = \
 	widget/widget-private.h \
 	widget/widget-progress.c \
 	widget/widget-progress.h \
+	widget/widget-render.c \
+	widget/widget-render.h \
 	widget/widget-types.h \
 	widget/widget-window.c \
 	widget/widget-window.h

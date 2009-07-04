@@ -121,7 +121,7 @@ am__objects_27 = widget.lo widget-busy.lo widget-button.lo \
 	widget-check.lo widget-entry.lo widget-group.lo \
 	widget-image.lo widget-label.lo widget-manager.lo \
 	widget-menu.lo widget-menugroup.lo widget-progress.lo \
-	widget-window.lo
+	widget-render.lo widget-window.lo
 am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
@@ -804,6 +804,8 @@ wdgsrc = \
 	widget/widget-private.h \
 	widget/widget-progress.c \
 	widget/widget-progress.h \
+	widget/widget-render.c \
+	widget/widget-render.h \
 	widget/widget-types.h \
 	widget/widget-window.c \
 	widget/widget-window.h
@@ -1122,6 +1124,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-menu.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-menugroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-progress.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget.Plo@am__quote@
 
@@ -2118,6 +2121,13 @@ widget-progress.lo: widget/widget-progress.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-progress.c' object='widget-progress.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o widget-progress.lo `test -f 'widget/widget-progress.c' || echo '$(srcdir)/'`widget/widget-progress.c
+
+widget-render.lo: widget/widget-render.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT widget-render.lo -MD -MP -MF $(DEPDIR)/widget-render.Tpo -c -o widget-render.lo `test -f 'widget/widget-render.c' || echo '$(srcdir)/'`widget/widget-render.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/widget-render.Tpo $(DEPDIR)/widget-render.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-render.c' object='widget-render.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o widget-render.lo `test -f 'widget/widget-render.c' || echo '$(srcdir)/'`widget/widget-render.c
 
 widget-window.lo: widget/widget-window.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT widget-window.lo -MD -MP -MF $(DEPDIR)/widget-window.Tpo -c -o widget-window.lo `test -f 'widget/widget-window.c' || echo '$(srcdir)/'`widget/widget-window.c

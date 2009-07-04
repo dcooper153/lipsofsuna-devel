@@ -15,25 +15,45 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_WIDGET_H__
-#define __LIPS_WIDGET_H__
+/**
+ * \addtogroup liwdg Widget
+ * @{
+ * \addtogroup liwdgRender Render
+ * @{
+ */
 
+#ifndef __WIDGET_RENDER_H__
+#define __WIDGET_RENDER_H__
+
+#include <render/lips-render.h>
 #include "widget.h"
-#include "widget-button.h"
-#include "widget-busy.h"
-#include "widget-check.h"
-#include "widget-class.h"
-#include "widget-entry.h"
-#include "widget-event.h"
-#include "widget-group.h"
-#include "widget-image.h"
-#include "widget-label.h"
-#include "widget-manager.h"
-#include "widget-menu.h"
-#include "widget-menugroup.h"
-#include "widget-progress.h"
-#include "widget-render.h"
-#include "widget-types.h"
-#include "widget-window.h"
+
+#define LIWDG_RENDER(o) ((liwdgRender*)(o))
+
+typedef struct _liwdgRender liwdgRender;
+struct _liwdgRender
+{
+	liwdgWidget base;
+	limatMatrix modelview;
+	limatMatrix projection;
+	lirndRender* render;
+};
+
+extern const liwdgClass liwdgRenderType;
+
+liwdgWidget*
+liwdg_render_new (liwdgManager* manager,
+                  lirndRender*  render);
+
+void
+liwdg_render_set_modelview (liwdgRender*       self,
+                            const limatMatrix* value);
+
+void
+liwdg_render_set_projection (liwdgRender*       self,
+                             const limatMatrix* value);
 
 #endif
+
+/** @} */
+/** @} */
