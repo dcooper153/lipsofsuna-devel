@@ -62,6 +62,7 @@ struct _liwdgGroup
 	liwdgWidget base;
 	int width;
 	int height;
+	int homogeneous;
 	int col_expand;
 	int row_expand;
 	int col_spacing;
@@ -149,6 +150,14 @@ liwdg_group_set_col_expand (liwdgGroup* self,
 int
 liwdg_group_get_col_size (liwdgGroup* self,
                           int         x);
+
+int
+liwdg_group_get_homogeneous (const liwdgGroup* self,
+                             int               value);
+
+void
+liwdg_group_set_homogeneous (liwdgGroup* self,
+                             int         value);
 
 void
 liwdg_group_get_margins (liwdgGroup* self,

@@ -121,6 +121,7 @@ fntsrc = \
 	font/font-layout.c \
 	font/font-layout.h
 gensrc = \
+	generator/lips-generator.h \
 	generator/generator.c \
 	generator/generator.h \
 	generator/generator-brush.c \
@@ -391,9 +392,9 @@ lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunagenerator.la liblipsofsuna
 liblipsofsunaclient_la_LDFLAGS = -no-undefined -export-dynamic
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
-	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
-	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+	$(engsrc) $(fntsrc) $(gensrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
+	$(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 
 liblipsofsunagenerator_la_LDFLAGS = -no-undefined -export-dynamic
