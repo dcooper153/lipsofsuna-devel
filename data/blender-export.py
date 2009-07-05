@@ -85,9 +85,9 @@ def FaceShader(object, mesh, face):
 
 def FaceShininess(object, mesh, face):
 	if mesh.materials and mesh.materials[face.mat]:
-		return mesh.materials[face.mat].hard
+		return mesh.materials[face.mat].hard / 511.0 * 128.0
 	else:
-		return 1.0
+		return 0.0
 
 def FaceSpecular(object, mesh, face):
 	if mesh.materials and mesh.materials[face.mat]:
