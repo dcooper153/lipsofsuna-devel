@@ -63,11 +63,33 @@ struct _ligenGenerator
 ligenGenerator*
 ligen_generator_new (const char* name);
 
+ligenGenerator*
+ligen_generator_new_full (const char* name,
+                          lirndScene* scene,
+                          lirndApi*   rndapi);
+
 void
 ligen_generator_free (ligenGenerator* self);
 
+void
+ligen_generator_clear_scene (ligenGenerator* self);
+
+int
+ligen_generator_insert_brush (ligenGenerator* self,
+                              ligenBrush*     brush);
+
+int
+ligen_generator_insert_stroke (ligenGenerator* self,
+                               int             brush,
+                               int             x,
+                               int             y,
+                               int             z);
+
 int
 ligen_generator_main (ligenGenerator* self);
+
+int
+ligen_generator_rebuild_scene (ligenGenerator* self);
 
 int
 ligen_generator_step (ligenGenerator* self);

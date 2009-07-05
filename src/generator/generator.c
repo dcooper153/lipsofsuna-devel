@@ -67,6 +67,22 @@ private_stroke_paint (ligenGenerator* self,
 ligenGenerator*
 ligen_generator_new (const char* name)
 {
+	return ligen_generator_new_full (name, NULL, NULL);
+}
+
+/**
+ * \brief Creates a new generator module.
+ *
+ * \param name Module name.
+ * \param scene Render scene or NULL.
+ * \param rndapi Render API or NULL.
+ * \return New generator or NULL.
+ */
+ligenGenerator*
+ligen_generator_new_full (const char* name,
+                          lirndScene* scene,
+                          lirndApi*   rndapi)
+{
 	ligenGenerator* self;
 
 	/* Allocate self. */
@@ -87,7 +103,7 @@ ligen_generator_new (const char* name)
 	self->physics = liphy_physics_new ();
 	if (self->physics == NULL)
 		goto error;
-	self->voxels = livox_manager_new (self->physics, NULL, NULL);
+	self->voxels = livox_manager_new (self->physics, scene, rndapi);
 	if (self->voxels == NULL)
 		goto error;
 
@@ -131,6 +147,24 @@ ligen_generator_free (ligenGenerator* self)
 }
 
 /**
+ * \brief Removes all the created map paint operations.
+ *
+ * \param self Generator.
+ */
+void
+ligen_generator_clear_scene (ligenGenerator* self)
+{
+	/* Free strokes. */
+	free (self->world.array);
+	self->world.array = NULL;
+	self->world.count = 0;
+
+	/* Clear scene. */
+	livox_manager_clear (self->voxels);
+	livox_manager_update (self->voxels, 1.0f);
+}
+
+/**
  * \brief Inserts a brush to the generator.
  *
  * The ownership of the brush is transferred to the generator if successful.
@@ -151,6 +185,43 @@ ligen_generator_insert_brush (ligenGenerator* self,
 }
 
 /**
+ * \brief Inserts a stroke to the generator.
+ *
+ * \param self Generator.
+ * \param brush Brush number.
+ * \param x Insertion position.
+ * \param y Insertion position.
+ * \param z Insertion position.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_insert_stroke (ligenGenerator* self,
+                               int             brush,
+                               int             x,
+                               int             y,
+                               int             z)
+{
+	ligenBrush* brush_;
+	ligenStroke stroke;
+
+	assert (brush >= 0);
+	assert (brush < self->brushes.count);
+
+	brush_ = self->brushes.array[brush];
+	stroke.pos[0] = x;
+	stroke.pos[1] = y;
+	stroke.pos[2] = z;
+	stroke.size[0] = brush_->size[0];
+	stroke.size[1] = brush_->size[1];
+	stroke.size[2] = brush_->size[2];
+	stroke.brush = brush;
+	if (!lialg_array_append (&self->world, &stroke))
+		return 0;
+
+	return 1;
+}
+
+/**
  * \brief Enters the main loop of the generator.
  *
  * \param self Generator.
@@ -160,15 +231,38 @@ int
 ligen_generator_main (ligenGenerator* self)
 {
 	int i;
-	ligenStroke* stroke;
 
-	/* Generate terrain. */
+	/* Generate areas. */
 	/* FIXME */
 	for (i = 0 ; i < 20 ; i++)
 	{
 		if (!ligen_generator_step (self))
 			break;
 	}
+
+	/* Generate geometry. */
+	ligen_generator_rebuild_scene (self);
+
+	/* Save geometry. */
+	livox_manager_write (self->voxels, self->srvsql);
+
+	return 1;
+}
+
+/**
+ * \brief Rebuilds all the terrain.
+ *
+ * \param self Generator.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_rebuild_scene (ligenGenerator* self)
+{
+	int i;
+	ligenStroke* stroke;
+
+	/* Clear sectors. */
+	livox_manager_clear (self->voxels);
 
 	/* Paint strokes. */
 	for (i = 0 ; i < self->world.count ; i++)
@@ -177,8 +271,9 @@ ligen_generator_main (ligenGenerator* self)
 		private_stroke_paint (self, stroke);
 	}
 
-	/* Save terrain. */
-	livox_manager_write (self->voxels, self->srvsql);
+	/* Rebuild geometry. */
+	if (self->voxels->scene != NULL)
+		livox_manager_update (self->voxels, 1.0f);
 
 	return 1;
 }
@@ -335,9 +430,12 @@ private_init_brushes (ligenGenerator* self)
 		/* Read id and size. */
 		col = 0;
 		id = sqlite3_column_int (statement, col++);
-		size[0] = LI_MAX (1, sqlite3_column_int (statement, col++));
-		size[1] = LI_MAX (1, sqlite3_column_int (statement, col++));
-		size[2] = LI_MAX (1, sqlite3_column_int (statement, col++));
+		size[0] = sqlite3_column_int (statement, col++);
+		size[1] = sqlite3_column_int (statement, col++);
+		size[2] = sqlite3_column_int (statement, col++);
+		size[0] = LI_MAX (1, size[0]);
+		size[1] = LI_MAX (1, size[1]);
+		size[2] = LI_MAX (1, size[2]);
 
 		/* Create new brush. */
 		brush = ligen_brush_new (size[0], size[1], size[2]);

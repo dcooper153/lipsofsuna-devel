@@ -50,19 +50,19 @@ const liwdgClass liwdgRenderType =
  * \brief Creates a new scene renderer widget.
  *
  * \param manager Widget manager.
- * \param render Renderer.
+ * \param scene Scene.
  * \return New widget or NULL.
  */
 liwdgWidget*
 liwdg_render_new (liwdgManager* manager,
-                  lirndRender*  render)
+                  lirndScene*   scene)
 {
 	liwdgWidget* self;
 
 	self = liwdg_widget_new (manager, &liwdgRenderType);
 	if (self == NULL)
 		return NULL;
-	LIWDG_RENDER (self)->render = render;
+	LIWDG_RENDER (self)->scene = scene;
 
 	return self;
 }
@@ -132,17 +132,25 @@ private_event (liwdgRender* self,
 			glMatrixMode (GL_MODELVIEW);
 			glPushMatrix ();
 			glPushAttrib (GL_VIEWPORT_BIT | GL_ENABLE_BIT);
-
 			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 			glViewport (rect.x, rect.y, rect.width, rect.height);
 			glScissor (rect.x, rect.y, rect.width, rect.height);
 			glEnable (GL_SCISSOR_TEST);
-			glClearColor (1.0, 0.0, 0.0, 1.0);
-			glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			limat_frustum_init (&frustum, &self->modelview, &self->projection);
-			lirnd_render_render (self->render, &self->modelview, &self->projection, &frustum);
+			glClear (GL_DEPTH_BUFFER_BIT);
+			if (self->scene != NULL)
+			{
+				limat_frustum_init (&frustum, &self->modelview, &self->projection);
+				lirnd_scene_render (self->scene, &self->modelview, &self->projection, &frustum);
+			}
+			if (self->custom_render_func != NULL)
+			{
+				glMatrixMode (GL_PROJECTION);
+				glLoadMatrixf (self->projection.m);
+				glMatrixMode (GL_MODELVIEW);
+				glLoadMatrixf (self->modelview.m);
+				self->custom_render_func (self, self->custom_render_data);
+			}
 			glDisable (GL_SCISSOR_TEST);
-
 			glPopAttrib ();
 			glMatrixMode (GL_PROJECTION);
 			glPopMatrix ();

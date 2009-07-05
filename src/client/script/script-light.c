@@ -47,7 +47,7 @@ Light___gc (lua_State* lua)
 	self = liscr_isdata (lua, 1, LICLI_SCRIPT_LIGHT);
 	light = self->data;
 
-	lirnd_lighting_remove_light (light->render->lighting, light);
+	lirnd_lighting_remove_light (light->scene->lighting, light);
 	lirnd_light_free (light);
 	liscr_data_free (self);
 
@@ -77,7 +77,7 @@ Light_new (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_LIGHT);
 
 	/* Allocate light. */
-	light = lirnd_light_new (module->engine->render, color, equation, M_PI, 0.0f, 0);
+	light = lirnd_light_new (module->engine->scene, color, equation, M_PI, 0.0f, 0);
 	if (light == NULL)
 	{
 		lua_pushnil (lua);
@@ -236,9 +236,9 @@ Light_setter_enabled (lua_State* lua)
 	if (value != lirnd_light_get_enabled (light))
 	{
 		if (value)
-			lirnd_lighting_insert_light (light->render->lighting, light);
+			lirnd_lighting_insert_light (light->scene->lighting, light);
 		else
-			lirnd_lighting_remove_light (light->render->lighting, light);
+			lirnd_lighting_remove_light (light->scene->lighting, light);
 	}
 	return 0;
 }

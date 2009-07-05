@@ -55,6 +55,23 @@ liext_generator_new (licliModule* module)
 		return self;
 	self->module = module;
 
+	/* Allocate preview scene. */
+	self->scene = lirnd_scene_new (module->engine->render);
+	if (self->scene == NULL)
+	{
+		free (self);
+		return NULL;
+	}
+
+	/* Allocate generator. */
+	self->generator = ligen_generator_new_full (module->name, self->scene, module->engine->renderapi);
+	if (self->generator == NULL)
+	{
+		lirnd_scene_free (self->scene);
+		free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -62,6 +79,9 @@ void
 liext_generator_free (liextGenerator* self)
 {
 	int i;
+
+	if (self->generator != NULL)
+		ligen_generator_free (self->generator);
 
 	/* Free rules. */
 	for (i = 0 ; i < self->rules.count ; i++)

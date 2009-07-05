@@ -42,31 +42,21 @@
 
 struct _lirndRender
 {
-	lialgPtrdic* objects;
-	lirndLighting* lighting;
+	lialgPtrdic* scenes;
 	lirndResources* resources;
 	struct
 	{
 		char* dir;
+		int global_shadows;
+		int local_shadows;
+		int light_count;
 	} config;
 	struct
 	{
 		float time;
 		GLuint noise;
+		GLuint depth_texture_max;
 	} helpers;
-	struct
-	{
-		int count;
-		int count_used;
-		int count_free;
-		lirndParticle* particles;
-		lirndParticle* particles_used;
-		lirndParticle* particles_free;
-	} particle;
-	struct
-	{
-		lirndObject* model;
-	} sky;
 	struct
 	{
 		int enabled;
@@ -107,27 +97,6 @@ int
 lirnd_render_load_image (lirndRender* self,
                          const char*  name);
 
-lirndParticle*
-lirnd_render_insert_particle (lirndRender*    self,
-                              const limatVector* position,
-                              const limatVector* velocity);
-
-int
-lirnd_render_pick (lirndRender*    self,
-                   limatMatrix*    modelview,
-                   limatMatrix*    projection,
-                   limatFrustum*   frustum,
-                   int             x,
-                   int             y,
-                   int             size,
-                   lirndSelection* result);
-
-void
-lirnd_render_render (lirndRender*  self,
-                     limatMatrix*  modelview,
-                     limatMatrix*  projection,
-                     limatFrustum* frustum);
-
 void
 lirnd_render_update (lirndRender* self,
                      float        secs);
@@ -144,10 +113,6 @@ lirnd_render_set_light_count (lirndRender* self,
                               int          count);
 
 void
-lirnd_render_set_light_focus (lirndRender*    self,
-                              const limatVector* point);
-
-void
 lirnd_render_set_local_shadows (lirndRender* self,
                                 int          value);
 
@@ -157,10 +122,6 @@ lirnd_render_get_shaders_enabled (const lirndRender* self);
 void
 lirnd_render_set_shaders_enabled (lirndRender* self,
                                   int          value);
-
-int
-lirnd_render_set_sky (lirndRender* self,
-                      lirndModel*  model);
 
 #endif
 

@@ -35,7 +35,7 @@ private_update_shadow (lirndLight* self);
 /**
  * \brief Creates a new light source.
  *
- * \param render Renderer.
+ * \param scene Scene.
  * \param color Array of 4 floats.
  * \param equation Array of 3 floats.
  * \param cutoff Spot cutoff in radians.
@@ -44,7 +44,7 @@ private_update_shadow (lirndLight* self);
  * \return New light source or NULL.
  */
 lirndLight*
-lirnd_light_new (lirndRender* render,
+lirnd_light_new (lirndScene*  scene,
                  const float* color,
                  const float* equation,
                  float        cutoff,
@@ -60,7 +60,7 @@ lirnd_light_new (lirndRender* render,
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
-	self->render = render;
+	self->scene = scene;
 	self->ambient[0] = 0.0f;
 	self->ambient[1] = 0.0f;
 	self->ambient[2] = 0.0f;
@@ -122,12 +122,12 @@ lirnd_light_new (lirndRender* render,
 /**
  * \brief Creates a new directional light source.
  *
- * \param render Renderer.
+ * \param scene Scene.
  * \param color Array of 4 floats.
  * \return New light source or NULL.
  */
 lirndLight*
-lirnd_light_new_directional (lirndRender* render,
+lirnd_light_new_directional (lirndScene*  scene,
                              const float* color)
 {
 	const float equation[3] = { 1.0f, 0.0f, 0.0f };
@@ -135,7 +135,7 @@ lirnd_light_new_directional (lirndRender* render,
 	lirndLight* self;
 
 	/* Create the sun.  */
-	self = lirnd_light_new (render, color, equation, M_PI, 0.0f, 0);
+	self = lirnd_light_new (scene, color, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return NULL;
 	lirnd_light_set_direction (self, &direction);
@@ -146,12 +146,12 @@ lirnd_light_new_directional (lirndRender* render,
 /**
  * \brief Creates a new light from a model light.
  *
- * \param render Renderer.
+ * \param scene Scene.
  * \param light Model light.
  * \return New light or NULL.
  */
 lirndLight*
-lirnd_light_new_from_model (lirndRender*     render,
+lirnd_light_new_from_model (lirndScene*      scene,
                             const limdlNode* light)
 {
 	limatMatrix projection;
@@ -159,7 +159,7 @@ lirnd_light_new_from_model (lirndRender*     render,
 	lirndLight* self;
 
 	/* Allocate self. */
-	self = lirnd_light_new (render,
+	self = lirnd_light_new (scene,
 		light->light.color, light->light.equation,
 		light->light.spot.cutoff, light->light.spot.exponent,
 		light->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
@@ -217,8 +217,8 @@ lirnd_light_update (lirndLight* self)
 {
 	if (self->shadow.map)
 	{
-		if ((self->directional && self->render->lighting->config.global_shadows) ||
-		    (!self->directional && self->render->lighting->config.local_shadows))
+		if ((self->directional && self->scene->render->config.global_shadows) ||
+		    (!self->directional && self->scene->render->config.local_shadows))
 			private_update_shadow (self);
 	}
 }
@@ -417,17 +417,17 @@ private_update_shadow (lirndLight* self)
 	glClear (GL_DEPTH_BUFFER_BIT);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_CULL_FACE);
-	glCullFace (GL_CCW);
+	glFrontFace (GL_CCW);
 	glDepthFunc (GL_LEQUAL);
 	glBindTexture (GL_TEXTURE_2D, 0);
 
 	/* Render to depth texture. */
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	lirnd_context_init (&context, self->render);
+	lirnd_context_init (&context, self->scene);
 	lirnd_context_set_modelview (&context, &self->modelview);
 	lirnd_context_set_projection (&context, &self->projection);
 	lirnd_context_set_frustum (&context, &frustum);
-	LI_FOREACH_PTRDIC (iter, self->render->objects)
+	LI_FOREACH_PTRDIC (iter, self->scene->objects)
 		lirnd_draw_shadowmap (&context, iter.value, self);
 
 	/* Disable depth rendering mode. */

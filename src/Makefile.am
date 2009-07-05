@@ -231,6 +231,7 @@ rndsrc = \
 	render/render-particle.h \
 	render/render-resources.c \
 	render/render-resources.h \
+	render/render-scene.c \
 	render/render-scene.h \
 	render/render-shader.c \
 	render/render-shader.h \

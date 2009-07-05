@@ -185,7 +185,7 @@ int
 liext_module_write (liextModule* self,
                     liarcSql*    sql)
 {
-	return livox_database_write (self->voxels, sql);
+	return livox_manager_write (self->voxels, sql);
 }
 
 /*****************************************************************************/

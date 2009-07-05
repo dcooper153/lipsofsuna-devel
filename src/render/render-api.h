@@ -28,13 +28,14 @@
 #include "render.h"
 #include "render-model.h"
 #include "render-object.h"
+#include "render-scene.h"
 
 typedef struct _lirndApi lirndApi;
 struct _lirndApi
 {
 	lirndModel* (*lirnd_model_new)(lirndRender*, limdlModel*);
 	void (*lirnd_model_free)(lirndModel*);
-	lirndObject* (*lirnd_object_new)(lirndRender*, int);
+	lirndObject* (*lirnd_object_new)(lirndScene*, int);
 	void (*lirnd_object_free)(lirndObject*);
 	void (*lirnd_object_deform)(lirndObject*, limdlPose*);
 	void (*lirnd_object_replace_image)(lirndObject*, lirndImage*, lirndImage*);
@@ -47,6 +48,9 @@ struct _lirndApi
 	void (*lirnd_render_update)(lirndRender*, float);
 	lirndImage* (*lirnd_render_find_image)(lirndRender*, const char*);
 	int (*lirnd_render_load_image)(lirndRender*, const char*);
+	lirndScene* (*lirnd_scene_new)(lirndRender*);
+	void (*lirnd_scene_free)(lirndScene*);
+	void (*lirnd_scene_update)(lirndScene*, float);
 };
 
 extern lirndApi lirnd_render_api;

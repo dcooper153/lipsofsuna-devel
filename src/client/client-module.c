@@ -478,7 +478,7 @@ licli_module_pick (licliModule*    self,
 	lieng_camera_get_frustum (self->camera, &frustum);
 	lieng_camera_get_modelview (self->camera, &modelview);
 	lieng_camera_get_projection (self->camera, &projection);
-	ret = lirnd_render_pick (self->engine->render,
+	ret = lirnd_scene_pick (self->engine->scene,
 		&modelview, &projection, &frustum,
 		x, self->window->mode.height - y, 5, result);
 
@@ -513,7 +513,7 @@ licli_module_render (licliModule* self)
 		lieng_camera_get_frustum (self->camera, &frustum);
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
-		lirnd_render_render (self->engine->render, &modelview, &projection, &frustum);
+		lirnd_scene_render (self->engine->scene, &modelview, &projection, &frustum);
 	}
 	glDisable (GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
@@ -521,7 +521,7 @@ licli_module_render (licliModule* self)
 	glDisable (GL_TEXTURE_2D);
 	glDepthMask (GL_FALSE);
 	glColor3f (1.0f, 0.0f, 0.0f);
-	lirnd_context_init (&context, self->engine->render);
+	lirnd_context_init (&context, self->engine->scene);
 	if (active)
 	{
 		lirnd_context_set_modelview (&context, &modelview);
@@ -738,7 +738,7 @@ private_init_engine (licliModule* self)
 		return 0;
 
 	/* Initialize voxels. */
-	self->voxels = livox_manager_new (self->engine->physics, self->engine->render, self->engine->renderapi);
+	self->voxels = livox_manager_new (self->engine->physics, self->engine->scene, self->engine->renderapi);
 	if (self->voxels == NULL)
 		return 0;
 

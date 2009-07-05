@@ -41,7 +41,7 @@ struct _lirndObject
 	void* userdata;
 	limatTransform transform;
 	limdlVertex* vertices;
-	lirndRender* render;
+	lirndScene* scene;
 	lirndModel* model;
 	struct
 	{
@@ -69,8 +69,8 @@ struct _lirndObject
 };
 
 lirndObject*
-lirnd_object_new (lirndRender* render,
-                  int          id);
+lirnd_object_new (lirndScene* scene,
+                  int         id);
 
 void
 lirnd_object_free (lirndObject* self);

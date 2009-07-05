@@ -33,17 +33,10 @@
 
 struct _lirndLighting
 {
-	GLuint depth_texture_max;
 	lialgPtrdic* lights;
 	lirndRender* render;
 	struct
 	{
-		int global_shadows;
-		int local_shadows;
-	} config;
-	struct
-	{
-		int capacity;
 		int count;
 		lirndLight** array;
 	} active_lights;

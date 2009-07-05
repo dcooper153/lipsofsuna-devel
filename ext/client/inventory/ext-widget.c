@@ -87,7 +87,7 @@ liext_inventory_widget_new (liextInventory* inventory)
 	LIEXT_INVENTORY_WIDGET (self)->inventory = inventory;
 
 	/* Allocate light. */
-	LIEXT_INVENTORY_WIDGET (self)->light = lirnd_light_new_directional (inventory->module->module->engine->render, color);
+	LIEXT_INVENTORY_WIDGET (self)->light = lirnd_light_new_directional (inventory->module->module->engine->scene, color);
 	if (LIEXT_INVENTORY_WIDGET (self)->light == NULL)
 	{
 		liwdg_widget_free (self);
@@ -246,7 +246,7 @@ private_event (liextInventoryWidget* self,
 			w = LIEXT_SLOT_SIZE;
 
 		/* Draw items. */
-		lirnd_context_init (&context, render);
+		lirnd_context_init (&context, self->module->module->engine->scene);
 		for (i = 0 ; i < size ; i++)
 		{
 			/* Get slot item. */

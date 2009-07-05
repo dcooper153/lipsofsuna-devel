@@ -40,12 +40,8 @@ private_mark_block (livoxManager* self,
 #ifndef LIVOX_DISABLE_GRAPHICS
 livoxManager*
 livox_manager_new (liphyPhysics* physics,
-                   lirndRender*  render,
+                   lirndScene*   scene,
                    lirndApi*     rndapi)
-#else
-livoxManager*
-livox_manager_new (liphyPhysics* physics)
-#endif
 {
 	livoxManager* self;
 
@@ -53,7 +49,9 @@ livox_manager_new (liphyPhysics* physics)
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
-	self->render = render;
+	self->scene = scene;
+	if (scene != NULL)
+		self->render = scene->render;
 	self->renderapi = rndapi;
 	self->sectors = lialg_u32dic_new ();
 	if (self->sectors == NULL)
@@ -64,6 +62,26 @@ livox_manager_new (liphyPhysics* physics)
 
 	return self;
 }
+#else
+livoxManager*
+livox_manager_new (liphyPhysics* physics)
+{
+	livoxManager* self;
+
+	self = calloc (1, sizeof (livoxManager));
+	if (self == NULL)
+		return NULL;
+	self->physics = physics;
+	self->sectors = lialg_u32dic_new ();
+	if (self->sectors == NULL)
+	{
+		free (self);
+		return NULL;
+	}
+
+	return self;
+}
+#endif
 
 void
 livox_manager_free (livoxManager* self)
@@ -74,6 +92,17 @@ livox_manager_free (livoxManager* self)
 		lialg_u32dic_free (self->sectors);
 	}
 	free (self);
+}
+
+/**
+ * \brief Removes all the sectors.
+ *
+ * \param self Voxel manager.
+ */
+void
+livox_manager_clear (livoxManager* self)
+{
+	private_clear_sectors (self);
 }
 
 /**

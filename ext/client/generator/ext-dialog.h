@@ -40,10 +40,22 @@ struct _liextDialog
 	liwdgWindow base;
 	licliModule* module;
 	liextGenerator* generator;
+	liwdgWidget* group_brushes;
+	liwdgWidget* group_strokes;
+	liwdgWidget* label_brush;
+	liwdgWidget* render_strokes;
+	liwdgWidget* button_move_left;
+	liwdgWidget* button_move_right;
+	liwdgWidget* button_move_up;
+	liwdgWidget* button_move_down;
+
 	liwdgWidget* label_rule;
 	liwdgWidget* button_insert;
 	liwdgWidget* button_remove;
 	liwdgWidget* button_generate;
+	int active_brush;
+	int active_rule;
+	int active_stroke;
 	float timer;
 };
 

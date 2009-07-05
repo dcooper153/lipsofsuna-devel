@@ -104,12 +104,12 @@ livie_viewer_free (livieViewer* self)
 {
 	if (self->lights.key != NULL)
 	{
-		lirnd_lighting_remove_light (self->engine->render->lighting, self->lights.key);
+		lirnd_lighting_remove_light (self->engine->scene->lighting, self->lights.key);
 		lirnd_light_free (self->lights.key);
 	}
 	if (self->lights.fill != NULL)
 	{
-		lirnd_lighting_remove_light (self->engine->render->lighting, self->lights.fill);
+		lirnd_lighting_remove_light (self->engine->scene->lighting, self->lights.fill);
 		lirnd_light_free (self->lights.fill);
 	}
 	if (self->reload != NULL)
@@ -209,7 +209,7 @@ livie_viewer_main (livieViewer* self)
 		lieng_camera_get_frustum (self->camera, &frustum);
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
-		lirnd_render_render (self->engine->render, &modelview, &projection, &frustum);
+		lirnd_scene_render (self->engine->scene, &modelview, &projection, &frustum);
 		SDL_GL_SwapBuffers ();
 		SDL_Delay (100);
 	}
@@ -256,14 +256,14 @@ private_init_engine (livieViewer* self,
 		return 0;
 
 	/* Allocate lights. */
-	self->lights.key = lirnd_light_new (self->engine->render, diffuse0, equation, M_PI, 0.0f, 0);
+	self->lights.key = lirnd_light_new (self->engine->scene, diffuse0, equation, M_PI, 0.0f, 0);
 	if (self->lights.key == NULL)
 		return 0;
-	lirnd_lighting_insert_light (self->engine->render->lighting, self->lights.key);
-	self->lights.fill = lirnd_light_new (self->engine->render, diffuse1, equation, M_PI, 0.0f, 0);
+	lirnd_lighting_insert_light (self->engine->scene->lighting, self->lights.key);
+	self->lights.fill = lirnd_light_new (self->engine->scene, diffuse1, equation, M_PI, 0.0f, 0);
 	if (self->lights.fill == NULL)
 		return 0;
-	lirnd_lighting_insert_light (self->engine->render->lighting, self->lights.fill);
+	lirnd_lighting_insert_light (self->engine->scene->lighting, self->lights.fill);
 
 	return 1;
 }

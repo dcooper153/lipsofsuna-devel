@@ -39,13 +39,14 @@ struct _livoxManager
 #ifndef LIVOX_DISABLE_GRAPHICS
 	lirndApi* renderapi;
 	lirndRender* render;
+	lirndScene* scene;
 #endif
 };
 
 #ifndef LIVOX_DISABLE_GRAPHICS
 livoxManager*
 livox_manager_new (liphyPhysics* physics,
-                   lirndRender*  render,
+                   lirndScene*   scene,
                    lirndApi*     rndapi);
 #else
 livoxManager*
@@ -54,6 +55,9 @@ livox_manager_new (liphyPhysics* physics);
 
 void
 livox_manager_free (livoxManager* self);
+
+void
+livox_manager_clear (livoxManager* self);
 
 livoxSector*
 livox_manager_create_sector (livoxManager* self,

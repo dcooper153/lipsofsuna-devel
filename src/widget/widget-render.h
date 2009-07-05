@@ -36,14 +36,16 @@ struct _liwdgRender
 	liwdgWidget base;
 	limatMatrix modelview;
 	limatMatrix projection;
-	lirndRender* render;
+	lirndScene* scene;
+	void (*custom_render_func)(liwdgRender*, void*);
+	void* custom_render_data;
 };
 
 extern const liwdgClass liwdgRenderType;
 
 liwdgWidget*
 liwdg_render_new (liwdgManager* manager,
-                  lirndRender*  render);
+                  lirndScene*   scene);
 
 void
 liwdg_render_set_modelview (liwdgRender*       self,

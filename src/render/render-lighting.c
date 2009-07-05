@@ -49,7 +49,6 @@ lirndLighting*
 lirnd_lighting_new (lirndRender* render)
 {
 	lirndLighting* self;
-	const float texture[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	/* Allocate self. */
 	self = calloc (1, sizeof (lirndLighting));
@@ -67,25 +66,11 @@ lirnd_lighting_new (lirndRender* render)
 		lisys_error_set (ENOMEM, NULL);
 		goto error;
 	}
-	self->active_lights.capacity = 8;
-	self->active_lights.array = calloc (self->active_lights.capacity, sizeof (lirndLight*));
+	self->active_lights.array = calloc (8, sizeof (lirndLight*));
 	if (self->active_lights.array == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
-
-	/* Create default depth texture. */
-	if (livid_features.shader_model >= 3)
-	{
-		glGenTextures (1, &self->depth_texture_max);
-		glBindTexture (GL_TEXTURE_2D, self->depth_texture_max);
-		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2, 2,
-			0, GL_DEPTH_COMPONENT, GL_FLOAT, texture);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	}
 
 	return self;
@@ -108,8 +93,8 @@ lirnd_lighting_free (lirndLighting* self)
 		assert (self->lights->size == 0);
 		lialg_ptrdic_free (self->lights);
 	}
-	glDeleteTextures (1, &self->depth_texture_max);
 	free (self->active_lights.array);
+	free (self);
 }
 
 /**
@@ -216,7 +201,7 @@ private_select_light (lirndLighting*     self,
 //		return;
 
 	/* Try to add a new light. */
-	if (self->active_lights.count < self->active_lights.capacity)
+	if (self->active_lights.count < 8)
 	{
 		i = self->active_lights.count;
 		self->active_lights.array[i] = light;
@@ -228,7 +213,7 @@ private_select_light (lirndLighting*     self,
 	/* Try to replace an existing light. */
 	best_index = -1;
 	best_rating = rating;
-	for (i = 0 ; i < self->active_lights.capacity ; i++)
+	for (i = 0 ; i < 8 ; i++)
 	{
 		if (self->active_lights.array[i]->rating < best_rating)
 		{

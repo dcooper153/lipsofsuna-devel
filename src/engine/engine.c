@@ -143,7 +143,12 @@ lieng_engine_free (liengEngine* self)
 		liphy_physics_free (self->physics);
 #ifndef LIENG_DISABLE_GRAPHICS
 	if (self->renderapi != NULL)
-		self->renderapi->lirnd_render_free (self->render);
+	{
+		if (self->scene != NULL)
+			self->renderapi->lirnd_scene_free (self->scene);
+		if (self->render != NULL)
+			self->renderapi->lirnd_render_free (self->render);
+	}
 #endif
 
 	free (self->config.datadir);
@@ -584,9 +589,9 @@ lieng_engine_update (liengEngine* self,
 		{
 			object = iter.value;
 			self->renderapi->lirnd_object_deform (object->render, object->pose);
-			self->renderapi->lirnd_object_update (object->render, secs);
 		}
 		self->renderapi->lirnd_render_update (self->render, secs);
+		self->renderapi->lirnd_scene_update (self->scene, secs);
 	}
 #endif
 }
@@ -705,6 +710,11 @@ private_init (liengEngine* self,
 		if (self->renderapi == NULL)
 			return 0;
 		self->render = self->renderapi->lirnd_render_new (self->config.dir);
+		if (self->render == NULL)
+			return 0;
+		self->scene = self->renderapi->lirnd_scene_new (self->render);
+		if (self->scene == NULL)
+			return 0;
 	}
 #endif
 

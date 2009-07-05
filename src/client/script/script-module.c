@@ -172,7 +172,7 @@ Module_particle_effect (lua_State* lua)
 			0.1*(rand()/(0.5*RAND_MAX)-1.0),
 			0.1*(rand()/(3.0*RAND_MAX)+3.0),
 			0.1*(rand()/(0.5*RAND_MAX)-1.0));
-		particle = lirnd_render_insert_particle (module->engine->render, &position, &velocity);
+		particle = lirnd_scene_insert_particle (module->engine->scene, &position, &velocity);
 		if (particle != NULL)
 		{
 			particle->time_life = 2.0f;

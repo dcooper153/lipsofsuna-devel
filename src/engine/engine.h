@@ -74,6 +74,7 @@ struct _liengEngine
 #ifndef LIENG_DISABLE_GRAPHICS
 	lirndApi* renderapi;
 	lirndRender* render;
+	lirndScene* scene;
 #endif
 	struct
 	{

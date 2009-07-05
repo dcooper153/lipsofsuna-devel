@@ -28,6 +28,7 @@
 #include "render-material.h"
 #include "render-model.h"
 #include "render-object.h"
+#include "render-scene.h"
 #include "render-shader.h"
 #include "render-texture.h"
 #include "render-types.h"

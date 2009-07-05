@@ -28,6 +28,7 @@
 #define __EXT_GENERATOR_H__
 
 #include <client/lips-client.h>
+#include <generator/lips-generator.h>
 #include "ext-match.h"
 #include "ext-rule.h"
 
@@ -43,6 +44,8 @@ typedef struct _liextGenerator liextGenerator;
 struct _liextGenerator
 {
 	licliModule* module;
+	ligenGenerator* generator;
+	lirndScene* scene;
 	struct
 	{
 		int count;

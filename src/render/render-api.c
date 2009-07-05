@@ -45,7 +45,10 @@ lirndApi lirnd_render_api =
 	lirnd_render_free,
 	lirnd_render_update,
 	lirnd_render_find_image,
-	lirnd_render_load_image
+	lirnd_render_load_image,
+	lirnd_scene_new,
+	lirnd_scene_free,
+	lirnd_scene_update
 };
 
 /** @} */

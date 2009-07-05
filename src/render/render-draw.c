@@ -121,14 +121,14 @@ lirnd_draw_exclude (lirndContext* context,
 
 	/* Lighting. */
 	lirnd_object_get_center (object, &center);
-	lirnd_render_set_light_focus (context->render, &center);
+	lirnd_scene_set_light_focus (context->scene, &center);
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
 	flags |= LIRND_FLAG_LIGHTING;
 	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->lighting->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->lighting->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -137,8 +137,8 @@ lirnd_draw_exclude (lirndContext* context,
 		material = object->materials.array[i];
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_lights (context,
-			context->render->lighting->active_lights.array,
-			context->render->lighting->active_lights.count);
+			context->scene->lighting->active_lights.array,
+			context->scene->lighting->active_lights.count);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_shader (context, material->shader);
@@ -175,14 +175,14 @@ lirnd_draw_opaque (lirndContext* context,
 
 	/* Lighting. */
 	lirnd_object_get_center (object, &center);
-	lirnd_render_set_light_focus (context->render, &center);
+	lirnd_scene_set_light_focus (context->scene, &center);
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
 	flags |= LIRND_FLAG_LIGHTING;
 	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->lighting->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->lighting->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -193,8 +193,8 @@ lirnd_draw_opaque (lirndContext* context,
 		{
 			lirnd_context_set_flags (context, flags);
 			lirnd_context_set_lights (context,
-				context->render->lighting->active_lights.array,
-				context->render->lighting->active_lights.count);
+				context->scene->lighting->active_lights.array,
+				context->scene->lighting->active_lights.count);
 			lirnd_context_set_material (context, material);
 			lirnd_context_set_matrix (context, &matrix);
 			lirnd_context_set_shader (context, material->shader);
@@ -345,14 +345,14 @@ lirnd_draw_transparent (lirndContext* context,
 
 	/* Lighting. */
 	lirnd_object_get_center (object, &center);
-	lirnd_render_set_light_focus (context->render, &center);
+	lirnd_scene_set_light_focus (context->scene, &center);
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
 	flags |= LIRND_FLAG_LIGHTING;
 	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->lighting->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->lighting->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -363,8 +363,8 @@ lirnd_draw_transparent (lirndContext* context,
 		{
 			lirnd_context_set_flags (context, flags);
 			lirnd_context_set_lights (context,
-				context->render->lighting->active_lights.array,
-				context->render->lighting->active_lights.count);
+				context->scene->lighting->active_lights.array,
+				context->scene->lighting->active_lights.count);
 			lirnd_context_set_matrix (context, &matrix);
 			lirnd_context_set_material (context, material);
 			lirnd_context_set_shader (context, material->shader);

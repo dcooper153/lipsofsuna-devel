@@ -97,8 +97,8 @@ am__objects_17 = reload.lo reload-blender.lo reload-gimp.lo \
 am__objects_18 = render.lo render-api.lo render-context.lo \
 	render-draw.lo render-light.lo render-lighting.lo \
 	render-material.lo render-model.lo render-object.lo \
-	render-particle.lo render-resources.lo render-shader.lo \
-	render-texture.lo
+	render-particle.lo render-resources.lo render-scene.lo \
+	render-shader.lo render-texture.lo
 am__objects_19 = server.lo server-callbacks.lo server-client.lo \
 	server-network.lo server-object.lo script-effect.lo \
 	script-extension-2.lo script-object-2.lo script-server.lo
@@ -643,6 +643,7 @@ rndsrc = \
 	render/render-particle.h \
 	render/render-resources.c \
 	render/render-resources.h \
+	render/render-scene.c \
 	render/render-scene.h \
 	render/render-shader.c \
 	render/render-shader.h \
@@ -1052,6 +1053,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-particle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-resources.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-scene.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-shader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/render.Plo@am__quote@
@@ -1701,6 +1703,13 @@ render-resources.lo: render/render-resources.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-resources.c' object='render-resources.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o render-resources.lo `test -f 'render/render-resources.c' || echo '$(srcdir)/'`render/render-resources.c
+
+render-scene.lo: render/render-scene.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT render-scene.lo -MD -MP -MF $(DEPDIR)/render-scene.Tpo -c -o render-scene.lo `test -f 'render/render-scene.c' || echo '$(srcdir)/'`render/render-scene.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/render-scene.Tpo $(DEPDIR)/render-scene.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-scene.c' object='render-scene.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o render-scene.lo `test -f 'render/render-scene.c' || echo '$(srcdir)/'`render/render-scene.c
 
 render-shader.lo: render/render-shader.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT render-shader.lo -MD -MP -MF $(DEPDIR)/render-shader.Tpo -c -o render-shader.lo `test -f 'render/render-shader.c' || echo '$(srcdir)/'`render/render-shader.c

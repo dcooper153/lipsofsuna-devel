@@ -49,7 +49,7 @@ struct _lirndLight
 	limatMatrix modelview_inverse;
 	limatTransform transform;
 	const limdlNode* node;
-	lirndRender* render;
+	lirndScene* scene;
 	struct
 	{
 		GLuint fbo;
@@ -58,7 +58,7 @@ struct _lirndLight
 };
 
 lirndLight*
-lirnd_light_new (lirndRender* render,
+lirnd_light_new (lirndScene*  scene,
                  const float* color,
                  const float* equation,
                  float        cutoff,
@@ -66,11 +66,11 @@ lirnd_light_new (lirndRender* render,
                  int          shadow);
 
 lirndLight*
-lirnd_light_new_directional (lirndRender* self,
+lirnd_light_new_directional (lirndScene*  scene,
                              const float* color);
 
 lirndLight*
-lirnd_light_new_from_model (lirndRender*     render,
+lirnd_light_new_from_model (lirndScene*      scene,
                             const limdlNode* light);
 
 void

@@ -29,6 +29,7 @@
 #include <model/lips-model.h>
 #include "render-light.h"
 #include "render-material.h"
+#include "render-scene.h"
 #include "render-texture.h"
 #include "render-types.h"
 
@@ -38,6 +39,7 @@ struct _lirndContext
 	int fixed;
 	int shadows;
 	lirndRender* render;
+	lirndScene* scene;
 	lirndShader* shader;
 	limatFrustum frustum;
 	limatMatrix matrix;
@@ -66,7 +68,7 @@ struct _lirndContext
 
 void
 lirnd_context_init (lirndContext* self,
-                    lirndRender*  render);
+                    lirndScene*   scene);
 
 void
 lirnd_context_bind (lirndContext* self);

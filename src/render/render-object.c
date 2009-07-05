@@ -71,15 +71,15 @@ private_update_lights (lirndObject* self);
 /*****************************************************************************/
 
 /**
- * \brief Creates a new render object and adds it to the renderer.
+ * \brief Creates a new render object and adds it to the scene.
  *
- * \param render Renderer.
+ * \param scene Scene.
  * \param id Unique identifier.
  * \return New object or NULL.
  */
 lirndObject*
-lirnd_object_new (lirndRender* render,
-                  int          id)
+lirnd_object_new (lirndScene* scene,
+                  int         id)
 {
 	lirndObject* self;
 
@@ -88,12 +88,12 @@ lirnd_object_new (lirndRender* render,
 	if (self == NULL)
 		return NULL;
 	self->id = id;
-	self->render = render;
+	self->scene = scene;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 
 	/* Add to renderer. */
-	if (!lialg_ptrdic_insert (render->objects, self, self))
+	if (!lialg_ptrdic_insert (scene->objects, self, self))
 	{
 		free (self);
 		return NULL;
@@ -112,7 +112,7 @@ lirnd_object_new (lirndRender* render,
 void
 lirnd_object_free (lirndObject* self)
 {
-	lialg_ptrdic_remove (self->render->objects, self);
+	lialg_ptrdic_remove (self->scene->objects, self);
 	private_clear_envmap (self);
 	private_clear_lights (self);
 	private_clear_materials (self);
@@ -170,7 +170,7 @@ lirnd_object_emit_particles (lirndObject* self)
 			random()/(3.0*RAND_MAX)+3.0f,
 			random()/(0.5*RAND_MAX)-1.0
 		*/
-		particle = lirnd_render_insert_particle (self->render, &position, &velocity);
+		particle = lirnd_scene_insert_particle (self->scene, &position, &velocity);
 		if (particle != NULL)
 		{
 			particle->time_life = 2.0f;
@@ -530,7 +530,7 @@ lirnd_object_set_realized (lirndObject* self,
 		for (i = 0 ; i < self->lights.count ; i++)
 		{
 			if (self->lights.array[i] != NULL)
-				lirnd_lighting_insert_light (self->render->lighting, self->lights.array[i]);
+				lirnd_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
 		}
 	}
 	else
@@ -538,7 +538,7 @@ lirnd_object_set_realized (lirndObject* self,
 		for (i = 0 ; i < self->lights.count ; i++)
 		{
 			if (self->lights.array[i] != NULL)
-				lirnd_lighting_remove_light (self->render->lighting, self->lights.array[i]);
+				lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
 		}
 	}
 
@@ -595,7 +595,7 @@ private_clear_lights (lirndObject* self)
 	{
 		if (self->lights.array[i] != NULL)
 		{
-			lirnd_lighting_remove_light (self->render->lighting, self->lights.array[i]);
+			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
 			lirnd_light_free (self->lights.array[i]);
 		}
 	}
@@ -761,7 +761,7 @@ private_init_lights (lirndObject* self,
 			node = iter.value;
 			if (node->type != LIMDL_NODE_LIGHT)
 				continue;
-			light = lirnd_light_new_from_model (self->render, node);
+			light = lirnd_light_new_from_model (self->scene, node);
 			if (light == NULL)
 				return 0;
 			if (!lialg_array_append (&self->lights, &light))
@@ -778,12 +778,12 @@ private_init_lights (lirndObject* self,
 		for (i = 0 ; i < self->lights.count ; i++)
 		{
 			light = self->lights.array[i];
-			if (!lirnd_lighting_insert_light (self->render->lighting, light))
+			if (!lirnd_lighting_insert_light (self->scene->lighting, light))
 			{
 				while (i--)
 				{
 					light = self->lights.array[i];
-					lirnd_lighting_remove_light (self->render->lighting, light);
+					lirnd_lighting_remove_light (self->scene->lighting, light);
 				}
 				return 0;
 			}
@@ -838,7 +838,7 @@ private_init_materials (lirndObject* self,
 		dst->specular[1] = src->specular[1];
 		dst->specular[2] = src->specular[2];
 		dst->specular[3] = src->specular[3];
-		lirnd_material_set_shader (dst, lirnd_render_find_shader (self->render, src->shader));
+		lirnd_material_set_shader (dst, lirnd_render_find_shader (self->scene->render, src->shader));
 		if (!lirnd_material_set_texture_count (dst, src->textures.count))
 		{
 			lirnd_material_free (dst);
@@ -848,9 +848,9 @@ private_init_materials (lirndObject* self,
 		{
 			texture = src->textures.textures + j;
 			if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
-				image = lirnd_render_find_image (self->render, texture->string);
+				image = lirnd_render_find_image (self->scene->render, texture->string);
 			else
-				image = lirnd_render_find_image (self->render, "empty");
+				image = lirnd_render_find_image (self->scene->render, "empty");
 			lirnd_material_set_texture (dst, j, texture, image);
 		}
 		self->materials.array[i] = dst;
@@ -988,7 +988,7 @@ private_update_envmap (lirndObject* self)
 		{ 0.0f, -1.0f, 0.0f } /* Right. */
 	};
 
-	if (!self->cubemap.map || !self->render->shader.enabled)
+	if (!self->cubemap.map || !self->scene->render->shader.enabled)
 		return;
 	modelview = self->orientation.matrix;
 	projection = limat_matrix_perspective (0.5 * M_PI, 1.0f, 1.0f, 100.0f);
@@ -999,7 +999,7 @@ private_update_envmap (lirndObject* self)
 	glViewport (0, 0, self->cubemap.width, self->cubemap.height);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_CULL_FACE);
-	glCullFace (GL_CCW);
+	glFrontFace (GL_CCW);
 	glDepthFunc (GL_LEQUAL);
 	glBindTexture (GL_TEXTURE_2D, 0);
 
@@ -1013,11 +1013,11 @@ private_update_envmap (lirndObject* self)
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		limat_frustum_init (&frustum, &modelview, &projection);
-		lirnd_context_init (&context, self->render);
+		lirnd_context_init (&context, self->scene);
 		lirnd_context_set_modelview (&context, &modelview);
 		lirnd_context_set_projection (&context, &projection);
 		lirnd_context_set_frustum (&context, &frustum);
-		LI_FOREACH_PTRDIC (iter, self->render->objects)
+		LI_FOREACH_PTRDIC (iter, self->scene->objects)
 			lirnd_draw_exclude (&context, iter.value, self);
 	}
 

@@ -58,11 +58,12 @@ private_enable_light (lirndContext* self,
 
 void
 lirnd_context_init (lirndContext* self,
-                    lirndRender*  render)
+                    lirndScene*   scene)
 {
 	memset (self, 0, sizeof (lirndContext));
 	self->compiled = 1;
-	self->render = render;
+	self->scene = scene;
+	self->render = scene->render;
 	self->material.diffuse[0] = 1.0f;
 	self->material.diffuse[1] = 1.0f;
 	self->material.diffuse[2] = 1.0f;
@@ -94,7 +95,6 @@ lirnd_context_bind (lirndContext* self)
 		if (livid_features.shader_model >= 3)
 			glUseProgramObjectARB (0);
 		private_bind_textures_fixed (self);
-		glEnable (GL_LIGHTING);
 	}
 	else
 	{
@@ -411,12 +411,10 @@ private_bind_texture (lirndContext* self,
 {
 	glActiveTextureARB (GL_TEXTURE0 + i);
 	glBindTexture (GL_TEXTURE_2D, texture->texture);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->params.minfilter);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->params.magfilter);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->params.minfilter);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->params.wraps);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->params.wrapt);
-	glMatrixMode (GL_TEXTURE);
-	glLoadIdentity ();
 }
 
 static void
@@ -426,12 +424,10 @@ private_bind_textures_fixed (lirndContext* self)
 
 	for (i = 0 ; i < self->textures.count ; i++)
 		private_bind_texture (self, i, self->textures.array + i);
-	for ( ; i < 8 ; i++)
+	for ( ; i < livid_features.max_texture_units ; i++)
 	{
 		glActiveTextureARB (GL_TEXTURE0 + i);
 		glBindTexture (GL_TEXTURE_2D, 0);
-		glMatrixMode (GL_TEXTURE);
-		glLoadIdentity ();
 	}
 }
 
@@ -487,8 +483,6 @@ private_bind_uniform (lirndContext* self,
 			{
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 				glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, 0);
-				glMatrixMode (GL_TEXTURE);
-				glLoadIdentity ();
 			}
 			break;
 		case LIRND_UNIFORM_DIFFUSETEXTURE0:
@@ -516,8 +510,6 @@ private_bind_uniform (lirndContext* self,
 			{
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 				glBindTexture (GL_TEXTURE_2D, 0);
-				glMatrixMode (GL_TEXTURE);
-				glLoadIdentity ();
 			}
 			break;
 		case LIRND_UNIFORM_LIGHTTYPE0:
@@ -589,7 +581,7 @@ private_bind_uniform (lirndContext* self,
 		case LIRND_UNIFORM_SHADOWTEXTURE8:
 		case LIRND_UNIFORM_SHADOWTEXTURE9:
 			index = uniform->value - LIRND_UNIFORM_SHADOWTEXTURE0;
-			map = self->render->lighting->depth_texture_max;
+			map = self->render->helpers.depth_texture_max;
 			if (index < self->lights.count)
 			{
 				light = self->lights.array[index];

@@ -635,7 +635,7 @@ private_build_block (livoxSector* self,
 		}
 		model = livox_builder_get_model (builder);
 		rndmdl = self->manager->renderapi->lirnd_model_new (self->manager->render, model);
-		block->render = self->manager->renderapi->lirnd_object_new (self->manager->render, 0);
+		block->render = self->manager->renderapi->lirnd_object_new (self->manager->scene, 0);
 		if (block->render == NULL)
 		{
 			self->manager->renderapi->lirnd_model_free (rndmdl);

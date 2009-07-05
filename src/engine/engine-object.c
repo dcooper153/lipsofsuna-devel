@@ -777,7 +777,7 @@ private_callback_new (liengEngine*     engine,
 #ifndef LIENG_DISABLE_GRAPHICS
 	if (self->engine->renderapi != NULL)
 	{
-		self->render = self->engine->renderapi->lirnd_object_new (engine->render, self->id);
+		self->render = self->engine->renderapi->lirnd_object_new (engine->scene, self->id);
 		if (self->render == NULL)
 			goto error;
 	}
