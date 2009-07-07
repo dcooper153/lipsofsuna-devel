@@ -58,6 +58,7 @@ Widget___gc (lua_State* lua)
 		licli_script_widget_detach (self);
 		liwdg_widget_free (self->data);
 	}
+	liscr_data_free (self);
 
 	return 0;
 }
@@ -277,7 +278,8 @@ licli_script_widget_detach (liscrData* self)
 	if (widget->parent != NULL)
 	{
 		assert (widget->parent->userdata != NULL);
-		liscr_data_unref (self, widget->parent->userdata);
+		if (liscr_data_get_valid (widget->parent->userdata))
+			liscr_data_unref (self, widget->parent->userdata);
 	}
 	liwdg_widget_detach (widget);
 }

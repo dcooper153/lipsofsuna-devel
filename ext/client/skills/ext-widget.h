@@ -39,7 +39,6 @@ struct _liextSkillWidget
 	char* skill;
 	uint32_t object;
 	liextModule* module;
-	liwdgWidget* label;
 	liwdgWidget* value;
 };
 
@@ -50,10 +49,6 @@ int
 liext_skill_widget_set_skill (liextSkillWidget* self,
                               uint32_t          object,
                               const char*       name);
-
-int
-liext_skill_widget_set_text (liextSkillWidget* self,
-                             const char*       value);
 
 #endif
 

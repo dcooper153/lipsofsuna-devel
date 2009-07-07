@@ -43,7 +43,8 @@ struct _liwdgWidget
 	liwdgWidget* prev;
 	liwdgWidget* next;
 	liwdgRect allocation;
-	liwdgSize request;
+	liwdgSize hardrequest;
+	liwdgSize userrequest;
 	liwdgWidgetState state;
 	void* userdata;
 	unsigned int focusable : 1;
@@ -155,7 +156,7 @@ liwdg_widget_get_style_allocation (liwdgWidget* self,
 void
 liwdg_widget_get_style_request (liwdgWidget* self,
                                 const char*  style,
-                                liwdgSize*   rect);
+                                liwdgSize*   size);
 
 void
 liwdg_widget_set_style_request (liwdgWidget* self,

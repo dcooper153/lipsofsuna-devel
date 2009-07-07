@@ -49,12 +49,9 @@ struct _liscrScript
 	void* userpointer;
 	lua_State* lua;
 	lialgStrdic* classes;
+#ifndef NDEBUG
 	lialgPtrdic* objects;
-	struct
-	{
-		int count;
-		int lookup;
-	} userdata;
+#endif
 };
 
 /* FIXME */

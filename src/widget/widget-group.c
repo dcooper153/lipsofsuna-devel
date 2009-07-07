@@ -983,8 +983,6 @@ private_cell_changed (liwdgGroup* self,
 	else if (child != NULL && child->visible)
 	{
 		/* Only set allocation of the widget. */
-		assert (child->request.width <= size.width);
-		assert (child->request.height <= size.height);
 		assert (self->cols[x].allocation >= size.width);
 		assert (self->rows[y].allocation >= size.height);
 		liwdg_widget_set_allocation (child,
@@ -1096,7 +1094,7 @@ private_rebuild (liwdgGroup* self,
 			/* Set the size request. */
 			LIWDG_WIDGET (self)->allocation.width = LI_MAX (wreq, LIWDG_WIDGET (self)->allocation.width);
 			LIWDG_WIDGET (self)->allocation.height = LI_MAX (hreq, LIWDG_WIDGET (self)->allocation.height);
-			liwdg_widget_set_request (LIWDG_WIDGET (self), wreq, hreq);
+			liwdg_widget_set_style_request (LIWDG_WIDGET (self), wreq, hreq, "group");
 		}
 
 		if (flags & PRIVATE_REBUILD_HORZ)
@@ -1178,7 +1176,7 @@ private_rebuild (liwdgGroup* self,
 			/* Set the size request. */
 			LIWDG_WIDGET (self)->allocation.width = LI_MAX (wreq, LIWDG_WIDGET (self)->allocation.width);
 			LIWDG_WIDGET (self)->allocation.height = LI_MAX (hreq, LIWDG_WIDGET (self)->allocation.height);
-			liwdg_widget_set_request (LIWDG_WIDGET (self), wreq, hreq);
+			liwdg_widget_set_style_request (LIWDG_WIDGET (self), wreq, hreq, "group");
 		}
 
 		if (flags & PRIVATE_REBUILD_HORZ)

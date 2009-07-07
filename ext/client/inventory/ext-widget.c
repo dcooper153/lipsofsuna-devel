@@ -313,7 +313,7 @@ private_event (liextInventoryWidget* self,
 		}
 		/* Calculate total size. */
 		size = liext_inventory_get_size (self->inventory);
-		liwdg_widget_set_request (LIWDG_WIDGET (self), size * self->slotsize.width, self->slotsize.height);
+		liwdg_widget_set_style_request (LIWDG_WIDGET (self), size * self->slotsize.width, self->slotsize.height, "inventory");
 	}
 
 	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);

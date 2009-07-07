@@ -442,7 +442,6 @@ Group_set_child (lua_State* lua)
 	liscrData* self;
 	liscrData* oldwidget;
 	liscrData* newwidget;
-	liscrScript* script = liscr_script (lua);
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	x = luaL_checkint (lua, 2) - 1;
@@ -464,8 +463,8 @@ Group_set_child (lua_State* lua)
 	widget = liwdg_group_get_child (LIWDG_GROUP (self->data), x, y);
 	if (widget != NULL)
 	{
-		oldwidget = liscr_script_find_data (script, widget);
-		luaL_argcheck (lua, oldwidget == NULL, 4, "cell reserved by native widget");
+		oldwidget = liwdg_widget_get_userdata (widget);
+		luaL_argcheck (lua, oldwidget != NULL, 4, "cell reserved by native widget");
 		liscr_data_unref (oldwidget, self);
 	}
 

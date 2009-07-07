@@ -54,6 +54,9 @@ liscr_data_set_class (liscrData*  self,
 liscrScript*
 liscr_data_get_script (liscrData* self);
 
+int
+liscr_data_get_valid (liscrData* self);
+
 #endif
 
 /** @} */

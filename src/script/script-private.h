@@ -26,6 +26,7 @@
 #include "script-types.h"
 
 #define LISCR_SCRIPT_SELF (NULL + 1)
+#define LISCR_SCRIPT_LOOKUP (NULL + 2)
 
 typedef struct _liscrClassMemb liscrClassMemb;
 

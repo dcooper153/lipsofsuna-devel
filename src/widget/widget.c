@@ -442,20 +442,43 @@ liwdg_widget_set_focusable (liwdgWidget* self,
 	self->focusable = focusable;
 }
 
+/**
+ * \brief Gets the size request of the widget.
+ *
+ * If the size request is overridden by the user, returns the user request.
+ * Otherwise, returns the real minimum acceptable size for the widget.
+ *
+ * \param self Widget.
+ * \param request Return location for the size.
+ */
 void
 liwdg_widget_get_request (liwdgWidget* self,
                           liwdgSize*   request)
 {
-	*request = self->request;
+	if (self->userrequest.width != -1)
+		request->width = self->userrequest.width;
+	else
+		request->width = self->hardrequest.width;
+	if (self->userrequest.height != -1)
+		request->height = self->userrequest.height;
+	else
+		request->height = self->hardrequest.height;
 }
 
+/**
+ * \brief Sets or unsets the user overridden size request of the widget.
+ *
+ * \param self Widget.
+ * \param w Width or -1 to unset.
+ * \param h Height or -1 to unset.
+ */
 void
 liwdg_widget_set_request (liwdgWidget* self,
                           int          w,
                           int          h)
 {
-	self->request.width = w;
-	self->request.height = h;
+	self->userrequest.width = w;
+	self->userrequest.height = h;
 	if (self->parent != NULL)
 		liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
 }
@@ -494,22 +517,23 @@ liwdg_widget_get_style_allocation (liwdgWidget* self,
 void
 liwdg_widget_get_style_request (liwdgWidget* self,
                                 const char*  style,
-                                liwdgSize*   rect)
+                                liwdgSize*   size)
 {
-	int w = self->request.width;
-	int h = self->request.height;
 	int pw[3];
 	int ph[3];
 	int repeatx;
 	int repeaty;
+	liwdgSize tmp;
 	liwdgSubimage* sub;
+
+	/* Get ordinary request. */
+	liwdg_widget_get_request (self, &tmp);
 
 	/* Get widget subimage. */
 	sub = lialg_strdic_find (self->manager->subimgs, style);
 	if (sub == NULL)
 	{
-		rect->width = w;
-		rect->height = h;
+		*size = tmp;
 		return;
 	}
 
@@ -520,14 +544,14 @@ liwdg_widget_get_style_request (liwdgWidget* self,
 	ph[0] = sub->h[0];
 	ph[1] = LI_MAX (1, sub->h[1]);
 	ph[2] = sub->h[2];
-	repeatx = LI_MAX (0, w - pw[0] - pw[2] + sub->pad[1] + sub->pad[2]);
-	repeaty = LI_MAX (0, h - ph[0] - ph[2] + sub->pad[0] + sub->pad[3]);
+	repeatx = LI_MAX (0, tmp.width - pw[0] - pw[2] + sub->pad[1] + sub->pad[2]);
+	repeaty = LI_MAX (0, tmp.height - ph[0] - ph[2] + sub->pad[0] + sub->pad[3]);
 	repeatx = (int) ceil ((float) repeatx / pw[1]);
 	repeaty = (int) ceil ((float) repeaty / ph[1]);
 
 	/* Calculate suitable request. */
-	rect->width = pw[0] + repeatx * pw[1] + pw[2];
-	rect->height = ph[0] + repeaty * ph[1] + ph[2];
+	size->width = pw[0] + repeatx * pw[1] + pw[2];
+	size->height = ph[0] + repeaty * ph[1] + ph[2];
 }
 
 void
@@ -538,11 +562,14 @@ liwdg_widget_set_style_request (liwdgWidget* self,
 {
 	liwdgSize size;
 
-	/* Set request suitable for the style. */
-	self->request.width = w;
-	self->request.height = h;
+	/* Set suitable hard request. */
+	self->hardrequest.width = w;
+	self->hardrequest.height = h;
 	liwdg_widget_get_style_request (self, style, &size);
-	liwdg_widget_set_request (self, size.width, size.height);
+	self->hardrequest.width = size.width;
+	self->hardrequest.height = size.height;
+	if (self->parent != NULL)
+		liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
 }
 
 void*
@@ -616,6 +643,8 @@ static int
 private_init (liwdgWidget*  self,
               liwdgManager* manager)
 {
+	self->userrequest.width = -1;
+	self->userrequest.height = -1;
 	self->manager = manager;
 	self->visible = 1;
 	self->callbacks = lical_callbacks_new ();

@@ -101,7 +101,7 @@ private_init (liwdgRender*  self,
 {
 	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
 		return 0;
-	liwdg_widget_set_request (LIWDG_WIDGET (self), 128, 128);
+	liwdg_widget_set_style_request (LIWDG_WIDGET (self), 128, 128, "render");
 	self->modelview = limat_matrix_identity ();
 	self->projection = limat_matrix_perspective (45.0f, 1.0f, 1.0f, 100.0f);
 

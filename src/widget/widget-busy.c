@@ -113,7 +113,7 @@ private_init (liwdgBusy*   self,
 
 	/* Pack self. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->button), "Cancel");
-	liwdg_widget_set_request (self->progress, 100, self->progress->request.height);
+	liwdg_widget_set_request (self->progress, 100, -1);
 	liwdg_progress_set_text (LIWDG_PROGRESS (self->progress), "Derp");
 	liwdg_widget_set_visible (self->button, 0);
 	liwdg_window_set_title (LIWDG_WINDOW (self), "Busy...");

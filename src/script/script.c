@@ -60,6 +60,7 @@ liscr_script_new ()
 	}
 
 	/* Allocate object lookup. */
+#ifndef NDEBUG
 	self->objects = lialg_ptrdic_new ();
 	if (self->objects == NULL)
 	{
@@ -68,13 +69,16 @@ liscr_script_new ()
 		free (self);
 		return NULL;
 	}
+#endif
 
 	/* Allocate script. */
 	self->lua = lua_open ();
 	if (self->lua == NULL)
 	{
 		lisys_error_set (ENOMEM, "cannot allocate script");
+#ifndef NDEBUG
 		lialg_ptrdic_free (self->objects);
+#endif
 		lialg_strdic_free (self->classes);
 		free (self);
 		return NULL;
@@ -89,12 +93,13 @@ liscr_script_new ()
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
 
 	/* Create pointer->userdata lookup table. */
+	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP);
 	lua_newtable (self->lua);
 	lua_newtable (self->lua);
 	lua_pushstring (self->lua, "v");
 	lua_setfield (self->lua, -2, "__mode");
 	lua_setmetatable (self->lua, -2);
-	self->userdata.lookup = luaL_ref (self->lua, LUA_REGISTRYINDEX);
+	lua_settable (self->lua, LUA_REGISTRYINDEX);
 
 	/* Crash at errors. */
 	lua_atpanic (self->lua, (lua_CFunction) abort);
@@ -115,7 +120,9 @@ liscr_script_free (liscrScript* self)
 	/* Free all objects. */
 	lua_close (self->lua);
 	self->lua = NULL;
+#ifndef NDEBUG
 	lialg_ptrdic_free (self->objects);
+#endif
 
 	/* Free classes. */
 	LI_FOREACH_STRDIC (iter, self->classes)
@@ -172,20 +179,6 @@ liscr_script_find_class (liscrScript* self,
                          const char*  name)
 {
 	return lialg_strdic_find (self->classes, name);
-}
-
-/**
- * \brief Finds a user data by object it wraps.
- *
- * \param self Script.
- * \param data Pointer to wrapped data.
- * \return User data or NULL.
- */
-void*
-liscr_script_find_data (liscrScript* self,
-                        const void*  data)
-{
-	return lialg_ptrdic_find (self->objects, (void*) data);
 }
 
 /**
@@ -251,34 +244,6 @@ liscr_script_insert_class (liscrScript* self,
 		return 0;
 
 	return 1;
-}
-
-/**
- * \brief Inserts a new userdata to the script.
- *
- * \param self Script.
- * \param data Data.
- */
-void
-liscr_script_insert_data (liscrScript* self,
-                          liscrData*   data)
-{
-	lialg_ptrdic_insert (self->objects, data->data, data);
-	self->userdata.count++;
-}
-
-/**
- * \brief Removes a userdata.
- *
- * \param self Script.
- * \param data Data.
- */
-void
-liscr_script_remove_data (liscrScript* self,
-                          liscrData*   data)
-{
-	lialg_ptrdic_remove (self->objects, data->data);
-	self->userdata.count--;
 }
 
 /**

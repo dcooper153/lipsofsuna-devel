@@ -74,7 +74,9 @@ liscr_data_new (liscrScript* script,
 	lua_setmetatable (script->lua, -2);
 
 	/* Add to lookup table. */
-	lua_rawgeti (script->lua, LUA_REGISTRYINDEX, script->userdata.lookup);
+	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);
+	lua_gettable (script->lua, LUA_REGISTRYINDEX);
+	assert (lua_type (script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (script->lua, object);
 	lua_pushvalue (script->lua, -3);
 	lua_settable (script->lua, -3);
@@ -88,8 +90,10 @@ liscr_data_new (liscrScript* script,
 	liscr_data_ref (object, NULL);
 	lua_pop (script->lua, 1);
 
-	/* Statistics. */
-	script->userdata.count++;
+#ifndef NDEBUG
+	assert (lialg_ptrdic_find (object->script->objects, object) == NULL);
+	lialg_ptrdic_insert (object->script->objects, object, object);
+#endif
 
 	return object;
 }
@@ -111,14 +115,18 @@ liscr_data_free (liscrData* object)
 	liscrScript* script = object->script;
 
 	/* Remove from lookup table. */
-	lua_rawgeti (script->lua, LUA_REGISTRYINDEX, script->userdata.lookup);
+	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);
+	lua_gettable (script->lua, LUA_REGISTRYINDEX);
+	assert (lua_type (script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (script->lua, object);
 	lua_pushnil (script->lua);
 	lua_settable (script->lua, -3);
 	lua_pop (script->lua, 1);
 
-	/* Statistics. */
-	script->userdata.count--;
+#ifndef NDEBUG
+	assert (lialg_ptrdic_find (object->script->objects, object) != NULL);
+	lialg_ptrdic_remove (object->script->objects, object);
+#endif
 }
 
 /**
@@ -287,6 +295,33 @@ liscrScript*
 liscr_data_get_script (liscrData* self)
 {
 	return self->script;
+}
+
+/**
+ * \brief Checks if the data is being garbage collected.
+ *
+ * This function is used be some garbage collection callbacks to work around
+ * ugly cleanup conditions where the destruction of the native data of the
+ * userdata depends on references of other userdata, but the refering userdata
+ * might be garbage collected already.
+ *
+ * \param self Script userdata.
+ * \return Nonzero if not garbage collected.
+ */
+int
+liscr_data_get_valid (liscrData* self)
+{
+	int ret;
+
+	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP);
+	lua_gettable (self->script->lua, LUA_REGISTRYINDEX);
+	assert (lua_type (self->script->lua, -1) == LUA_TTABLE);
+	lua_pushlightuserdata (self->script->lua, self);
+	lua_gettable (self->script->lua, -2);
+	ret = lua_isuserdata (self->script->lua, -1);
+	lua_pop (self->script->lua, 2);
+
+	return ret;
 }
 
 /** @} */

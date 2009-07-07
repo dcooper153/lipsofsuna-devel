@@ -295,58 +295,6 @@ liscr_copyargs (lua_State* lua,
 }
 
 /**
- * \brief Pushes a reference to the stack.
- *
- * Consumes: 0.
- * Returns: 1.
- *
- * \param lua Lua state.
- * \param owner Userdata whose reference to fetch.
- * \param slot Integer slot holding the reference.
- * \return Nonzero if the value in the reference slot was not nil.
- */
-int
-liscr_getref (lua_State* lua,
-              liscrData* owner,
-              int        slot)
-{
-	liscr_pushpriv (lua, owner);
-	lua_pushlightuserdata (lua, NULL + 1 + slot);
-	lua_gettable (lua, -2);
-	lua_remove (lua, -2);
-
-	return !lua_isnil (lua, -1);
-}
-
-/**
- * \brief Pops a value from stack and stores it as a reference.
- *
- * Setting a reference with this function effectively ensures that the
- * referenced value doesn't get garbage collected as long it is needed by
- * the userdata. A referenced value can only become subject to garbage
- * collection if all userdata referencing it become subject to garbage
- * collection or unreference it.
- *
- * Consumes: 1.
- * Returns: 0.
- *
- * \param lua Lua state.
- * \param owner Userdata whose reference the value will be.
- * \param slot Integer slot to hold the reference.
- */
-void
-liscr_setref (lua_State* lua,
-              liscrData* owner,
-              int        slot)
-{
-	liscr_pushpriv (lua, owner);
-	lua_pushlightuserdata (lua, NULL + 1 + slot);
-	lua_pushvalue (lua, -3);
-	lua_settable (lua, -3);
-	lua_pop (lua, 2);
-}
-
-/**
  * \brief Pushes the class to stack.
  *
  * Consumes: 0.
@@ -376,7 +324,9 @@ void
 liscr_pushdata (lua_State* lua,
                 liscrData* object)
 {
-	lua_rawgeti (lua, LUA_REGISTRYINDEX, object->script->userdata.lookup);
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP);
+	lua_gettable (lua, LUA_REGISTRYINDEX);
+	assert (lua_type (lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (lua, object);
 	lua_gettable (lua, -2);
 	lua_remove (lua, -2);

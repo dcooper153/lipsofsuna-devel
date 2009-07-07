@@ -313,8 +313,8 @@ private_rebuild (liwdgEntry* self)
 	}
 
 	/* Request size. */
-	liwdg_widget_set_request (LIWDG_WIDGET (self),
-		LI_MAX (32, lifnt_layout_get_width (self->text)), h);
+	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
+		LI_MAX (32, lifnt_layout_get_width (self->text)), h, "entry");
 }
 
 /** @} */

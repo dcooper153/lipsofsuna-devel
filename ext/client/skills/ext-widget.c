@@ -78,16 +78,6 @@ liext_skill_widget_set_skill (liextSkillWidget* self,
 	free (self->skill);
 	self->skill = tmp;
 	self->object = object;
-	liwdg_label_set_text (LIWDG_LABEL (self->label), name);
-
-	return 1;
-}
-
-int
-liext_skill_widget_set_text (liextSkillWidget* self,
-                             const char*       value)
-{
-	liwdg_label_set_text (LIWDG_LABEL (self->label), value);
 
 	return 1;
 }
@@ -107,12 +97,11 @@ private_init (liextSkillWidget* self,
 	int i;
 	liwdgWidget* widgets[] =
 	{
-		liwdg_label_new (manager),
 		liwdg_progress_new (manager)
 	};
 
 	/* Check memory. */
-	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
+	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 1))
 		goto error;
 	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
 	{
@@ -121,13 +110,11 @@ private_init (liextSkillWidget* self,
 	}
 
 	/* Assign widgets. */
-	self->label = widgets[(i = 0)];
-	self->value = widgets[++i];
+	self->value = widgets[(i = 0)];
 
 	/* Pack widgets. */
 	liwdg_widget_set_request (self->value, 100, -1);
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->label);
-	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, self->value);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->value);
 
 	return 1;
 
@@ -150,6 +137,7 @@ static int
 private_event (liextSkillWidget* self,
                liwdgEvent*       event)
 {
+	char buffer[256];
 	liengObject* object;
 	liextSkill* skill;
 	liextSkills* skills;
@@ -182,7 +170,9 @@ private_event (liextSkillWidget* self,
 		skill = liext_skills_find_skill (skills, self->skill);
 		if (skill == NULL)
 			goto disable;
+		snprintf (buffer, 256, "%d/%d", (int) skill->value, (int) skill->maximum);
 		liwdg_progress_set_value (LIWDG_PROGRESS (self->value), skill->value / skill->maximum);
+		liwdg_progress_set_text (LIWDG_PROGRESS (self->value), buffer);
 		return 1;
 	}
 

@@ -196,9 +196,9 @@ private_rebuild (liwdgLabel* self)
 		h = lifnt_font_get_height (self->font);
 		lifnt_layout_append_string (self->text, self->font, self->string);
 	}
-	liwdg_widget_set_request (LIWDG_WIDGET (self),
+	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LI_MAX (
-		lifnt_layout_get_height (self->text), h));
+		lifnt_layout_get_height (self->text), h), "label");
 }
 
 /** @} */
