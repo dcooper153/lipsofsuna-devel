@@ -32,7 +32,8 @@
 #include "server-client.h"
 #include "server-script.h"
 
-#define LISRV_CLIENT_DEFAULT_RADIUS 64
+#define LISRV_CLIENT_DEFAULT_RADIUS 32
+#define LISRV_CLIENT_LOAD_RADIUS 32
 
 static void
 private_callbacks_setup (lisrvClient* self,
@@ -289,6 +290,21 @@ private_object_motion (lisrvClient* self,
                        liengObject* object)
 {
 	float dist;
+	liengRange range;
+	liengRangeIter iter;
+	limatTransform transform;
+
+	/* Make sure nearby sectors are loaded when self moved. */
+	if (object == self->object)
+	{
+		lieng_object_get_transform (self->object, &transform);
+		range = lieng_range_new_from_sphere (&transform.position, 
+			LISRV_CLIENT_LOAD_RADIUS, LIENG_SECTOR_WIDTH, 0, 256);
+		LIENG_FOREACH_RANGE (iter, range)
+		{
+			lieng_engine_load_sector (self->server->engine, iter.index);
+		}
+	}
 
 	/* Maintain vision data. */
 	dist = lieng_object_get_distance (self->object, object);
