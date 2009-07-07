@@ -36,6 +36,7 @@ struct _liwdgLabel
 	liwdgWidget base;
 	lifntFont* font;
 	lifntLayout* text;
+	int highlight;
 	char* string;
 };
 
@@ -44,12 +45,23 @@ extern const liwdgClass liwdgLabelType;
 liwdgWidget*
 liwdg_label_new (liwdgManager* manager);
 
+liwdgWidget*
+liwdg_label_new_with_text (liwdgManager* manager,
+                           const char*   text);
+
 lifntFont*
 liwdg_label_get_font (liwdgLabel* self);
 
 void
 liwdg_label_set_font (liwdgLabel* self,
                       lifntFont*  font);
+
+int
+liwdg_label_get_highlight (const liwdgLabel* self);
+
+void
+liwdg_label_set_highlight (liwdgLabel* self,
+                           int         value);
 
 int
 liwdg_label_set_text (liwdgLabel* self,

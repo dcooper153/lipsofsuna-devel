@@ -55,6 +55,24 @@ liwdg_label_new (liwdgManager* manager)
 	return liwdg_widget_new (manager, &liwdgLabelType);
 }
 
+liwdgWidget*
+liwdg_label_new_with_text (liwdgManager* manager,
+                           const char*   text)
+{
+	liwdgWidget* self;
+
+	self = liwdg_label_new (manager);
+	if (self == NULL)
+		return NULL;
+	if (!liwdg_label_set_text (LIWDG_LABEL (self), text))
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
 lifntFont*
 liwdg_label_get_font (liwdgLabel* self)
 {
@@ -67,6 +85,19 @@ liwdg_label_set_font (liwdgLabel* self,
 {
 	self->font = font;
 	private_rebuild (self);
+}
+
+int
+liwdg_label_get_highlight (const liwdgLabel* self)
+{
+	return self->highlight;
+}
+
+void
+liwdg_label_set_highlight (liwdgLabel* self,
+                           int         value)
+{
+	self->highlight = value;
 }
 
 const char*
@@ -123,6 +154,8 @@ static int
 private_event (liwdgLabel* self,
                liwdgEvent* event)
 {
+	liwdgRect rect;
+
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
@@ -130,6 +163,18 @@ private_event (liwdgLabel* self,
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
+			if (self->highlight)
+			{
+				liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+				glColor3f (0.0f, 1.0f, 0.0f);
+				glBindTexture (GL_TEXTURE_2D, 0);
+				glBegin (GL_TRIANGLE_STRIP);
+				glVertex2i (rect.x, rect.y);
+				glVertex2i (rect.x + rect.width, rect.y);
+				glVertex2i (rect.x, rect.y + rect.height);
+				glVertex2i (rect.x + rect.width, rect.y + rect.height);
+				glEnd ();
+			}
 			glColor3f (0.8f, 0.8f, 0.8f);
 			lifnt_layout_render (self->text,
 				LIWDG_WIDGET (self)->allocation.x,
