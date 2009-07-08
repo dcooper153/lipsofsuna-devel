@@ -296,7 +296,7 @@ private_read_textures (liextResources*   self,
 		material = model->materials.materials + i;
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
-			texture = material->textures.textures + j;
+			texture = material->textures.array + j;
 			count = self->textures.count;
 
 			/* Only interested in images. */

@@ -89,7 +89,7 @@ struct _limdlMaterial
 	struct
 	{
 		int count;
-		limdlTexture* textures;
+		limdlTexture* array;
 	} textures;
 };
 
@@ -97,13 +97,27 @@ struct _limdlMaterial
 extern "C" {
 #endif
 
+void
+limdl_material_clear_textures (limdlMaterial* self);
+
 int
 limdl_material_read (limdlMaterial* self,
                      liReader*      reader);
 
 int
+limdl_material_realloc_textures (limdlMaterial* self,
+                                 int            count);
+
+int
 limdl_material_write (limdlMaterial* self,
                       liarcWriter*   writer);
+
+int
+limdl_material_set_texture (limdlMaterial* self,
+                            int            unit,
+                            int            type,
+                            int            flags,
+                            const char*    name);
 
 #ifdef __cplusplus
 }

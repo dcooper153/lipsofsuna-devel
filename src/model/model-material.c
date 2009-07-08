@@ -25,6 +25,23 @@
 #include "model-material.h"
 
 /**
+ * \brief Removes all textures from the material.
+ *
+ * \param self Material.
+ */
+void
+limdl_material_clear_textures (limdlMaterial* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->textures.count ; i++)
+		free (self->textures.array[i].string);
+	free (self->textures.array);
+	self->textures.array = NULL;
+	self->textures.count = 0;
+}
+
+/**
  * \brief Deserializes the material from a stream.
  *
  * \param self Material.
@@ -66,8 +83,8 @@ limdl_material_read (limdlMaterial* self,
 	/* Read textures. */
 	if (self->textures.count > 0)
 	{
-		self->textures.textures = calloc (self->textures.count, sizeof (limdlTexture));
-		if (self->textures.textures == NULL)
+		self->textures.array = calloc (self->textures.count, sizeof (limdlTexture));
+		if (self->textures.array == NULL)
 		{
 			lisys_error_set (ENOMEM, NULL);
 			return 0;
@@ -78,13 +95,66 @@ limdl_material_read (limdlMaterial* self,
 			    !li_reader_get_uint32 (reader, tmp + 1) ||
 			    !li_reader_get_uint32 (reader, tmp + 2) ||
 			    !li_reader_get_uint32 (reader, tmp + 3) ||
-			    !li_reader_get_text (reader, "", &self->textures.textures[i].string))
+			    !li_reader_get_text (reader, "", &self->textures.array[i].string))
 				return 0;
-			self->textures.textures[i].type = tmp[0];
-			self->textures.textures[i].flags = tmp[1];
-			self->textures.textures[i].width = tmp[2];
-			self->textures.textures[i].height = tmp[3];
+			self->textures.array[i].type = tmp[0];
+			self->textures.array[i].flags = tmp[1];
+			self->textures.array[i].width = tmp[2];
+			self->textures.array[i].height = tmp[3];
 		}
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Allocates or reallocates the textures of the material.
+ *
+ * \param self Material.
+ * \param count Texture count.
+ * \return Nonzero on success.
+ */
+int
+limdl_material_realloc_textures (limdlMaterial* self,
+                                 int            count)
+{
+	int i;
+	limdlTexture* tmp;
+
+	if (count == self->textures.count)
+		return 1;
+	if (!count)
+	{
+		limdl_material_clear_textures (self);
+		return 1;
+	}
+	else if (count < self->textures.count)
+	{
+		for (i = count ; i < self->textures.count ; i++)
+			free (self->textures.array[i].string);
+		tmp = realloc (self->textures.array, count * sizeof (limdlTexture));
+		if (tmp != NULL)
+			self->textures.array = tmp;
+		self->textures.count = count;
+	}
+	else
+	{
+		tmp = realloc (self->textures.array, count * sizeof (limdlTexture));
+		if (tmp == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			return 0;
+		}
+		self->textures.array = tmp;
+		for (i = self->textures.count ; i < count ; i++)
+		{
+			self->textures.array[i].type = LIMDL_TEXTURE_TYPE_EMPTY;
+			self->textures.array[i].flags = LIMDL_TEXTURE_FLAG_REPEAT;
+			self->textures.array[i].width = 0;
+			self->textures.array[i].height = 0;
+			self->textures.array[i].string = NULL;
+		}
+		self->textures.count = count;
 	}
 
 	return 1;
@@ -123,7 +193,7 @@ limdl_material_write (limdlMaterial* self,
 		return 0;
 	for (i = 0 ; i < self->textures.count ; i++)
 	{
-		texture = self->textures.textures + i;
+		texture = self->textures.array + i;
 		if (!liarc_writer_append_uint32 (writer, texture->type) ||
 		    !liarc_writer_append_uint32 (writer, texture->flags) ||
 		    !liarc_writer_append_uint32 (writer, texture->width) ||
@@ -132,6 +202,42 @@ limdl_material_write (limdlMaterial* self,
 		    !liarc_writer_append_nul (writer))
 			return 0;
 	}
+
+	return 1;
+}
+
+/**
+ * \brief Sets texture unit information.
+ *
+ * \param self Material.
+ * \param unit Texture unit.
+ * \param type Texture type.
+ * \param flags Texture parameters.
+ * \param name Image name.
+ * \return Nonzero on success.
+ */
+int
+limdl_material_set_texture (limdlMaterial* self,
+                            int            unit,
+                            int            type,
+                            int            flags,
+                            const char*    name)
+{
+	char* dup;
+
+	assert (unit >= 0);
+	assert (unit < self->textures.count);
+
+	dup = strdup (name);
+	if (dup == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	free (self->textures.array[unit].string);
+	self->textures.array[unit].type = type;
+	self->textures.array[unit].flags = flags;
+	self->textures.array[unit].string = dup;
 
 	return 1;
 }

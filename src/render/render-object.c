@@ -341,7 +341,7 @@ lirnd_object_replace_image (lirndObject* self,
 			if (material->textures.array[j].image == replaced)
 			{
 				lirnd_material_set_texture (material, j,
-					self->model->model->materials.materials[i].textures.textures + j, replacement);
+					self->model->model->materials.materials[i].textures.array + j, replacement);
 			}
 		}
 	}
@@ -846,7 +846,7 @@ private_init_materials (lirndObject* self,
 		}
 		for (j = 0 ; j < src->textures.count ; j++)
 		{
-			texture = src->textures.textures + j;
+			texture = src->textures.array + j;
 			if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
 				image = lirnd_render_find_image (self->scene->render, texture->string);
 			else

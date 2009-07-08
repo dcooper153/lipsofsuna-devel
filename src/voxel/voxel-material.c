@@ -24,6 +24,12 @@
 
 #include "voxel-material.h"
 
+static int
+private_read_textures (livoxMaterial* self,
+                       liarcSql*      sql);
+
+/*****************************************************************************/
+
 /**
  * \brief Deserializes a material from an SQL statement.
  *
@@ -92,14 +98,12 @@ livox_material_new (liarcSql*     sql,
 		return NULL;
 	}
 
-	/* TODO: Read textures. */
-	self->model.textures.count = 1;
-	self->model.textures.textures = calloc (1, sizeof (limdlTexture));
-	self->model.textures.textures[0].type = LIMDL_TEXTURE_TYPE_IMAGE;
-	self->model.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
-	self->model.textures.textures[0].width = 256;
-	self->model.textures.textures[0].height = 256;
-	self->model.textures.textures[0].string = "grass-000";
+	/* Read textures. */
+	if (!private_read_textures (self, sql))
+	{
+		livox_material_free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -148,7 +152,7 @@ livox_material_new_from_stream (liReader* reader)
 void
 livox_material_free (livoxMaterial* self)
 {
-	printf ("FIXME: livox_material_free: free textures\n");
+	limdl_material_clear_textures (&self->model);
 	free (self->model.shader);
 	free (self->name);
 	free (self);
@@ -171,6 +175,79 @@ livox_material_write_to_stream (livoxMaterial* self,
 	       liarc_writer_append_float (writer, self->friction) &&
 	       liarc_writer_append_float (writer, self->scale) &&
 	       limdl_material_write (&self->model, writer);
+}
+
+/*****************************************************************************/
+
+static int
+private_read_textures (livoxMaterial* self,
+                       liarcSql*      sql)
+{
+	int col;
+	int ret;
+	int unit;
+	int flags;
+	int size;
+	const char* name;
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Prepare statement. */
+	query = "SELECT unit,flags,name FROM voxel_textures WHERE mat=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+
+	/* Read textures. */
+	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
+	{
+		/* Check for errors. */
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Read values. */
+		col = 0;
+		unit = sqlite3_column_int (statement, col++);
+		if (unit < 0)
+			continue;
+		flags = sqlite3_column_int (statement, col++);
+		name = (char*) sqlite3_column_text (statement, col);
+		size = sqlite3_column_bytes (statement, col++);
+		if (!size || name == NULL)
+			name = "";
+
+		/* Allocate materials. */
+		if (self->model.textures.count <= unit)
+		{
+			if (!limdl_material_realloc_textures (&self->model, unit + 1))
+			{
+				sqlite3_finalize (statement);
+				return 0;
+			}
+		}
+
+		/* Set values. */
+		if (!limdl_material_set_texture (&self->model, unit, LIMDL_TEXTURE_TYPE_IMAGE, flags, name))
+		{
+			sqlite3_finalize (statement);
+			return 0;
+		}
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
 }
 
 /** @} */

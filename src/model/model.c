@@ -226,7 +226,6 @@ void
 limdl_model_free (limdlModel* self)
 {
 	int i;
-	int j;
 	limdlMaterial* material;
 
 	/* Free material groups. */
@@ -235,13 +234,8 @@ limdl_model_free (limdlModel* self)
 		for (i = 0 ; i < self->materials.count ; i++)
 		{
 			material = self->materials.materials + i;
+			limdl_material_clear_textures (material);
 			free (material->shader);
-			if (material->textures.textures != NULL)
-			{
-				for (j = 0 ; j < material->textures.count ; j++)
-					free (material->textures.textures[j].string);
-				free (material->textures.textures);
-			}
 		}
 		free (self->materials.materials);
 	}
@@ -366,7 +360,7 @@ limdl_model_find_material (const limdlModel*    self,
 			{
 				for (j = 0 ; j < m->textures.count ; j++)
 				{
-					if (limdl_texture_compare (m->textures.textures + j, material->textures.textures + j))
+					if (limdl_texture_compare (m->textures.array + j, material->textures.array + j))
 						break;
 				}
 				if (j == m->textures.count)
@@ -450,18 +444,18 @@ limdl_model_insert_material (limdlModel*          self,
 	/* Copy textures. */
 	tmp->textures.count = material->textures.count;
 	if (tmp->textures.count)
-		tmp->textures.textures = calloc (tmp->textures.count, sizeof (limdlTexture));
+		tmp->textures.array = calloc (tmp->textures.count, sizeof (limdlTexture));
 	else
-		tmp->textures.textures = NULL;
+		tmp->textures.array = NULL;
 	for (i = 0 ; i < tmp->textures.count ; i++)
 	{
-		tmp->textures.textures[i] = material->textures.textures[i];
-		tmp->textures.textures[i].string = strdup (material->textures.textures[i].string);
-		if (tmp->textures.textures[i].string == NULL)
+		tmp->textures.array[i] = material->textures.array[i];
+		tmp->textures.array[i].string = strdup (material->textures.array[i].string);
+		if (tmp->textures.array[i].string == NULL)
 		{
 			while (i)
-				free (tmp->textures.textures[i--].string);
-			free (tmp->textures.textures);
+				free (tmp->textures.array[i--].string);
+			free (tmp->textures.array);
 			free (tmp->shader);
 			return 0;
 		}
