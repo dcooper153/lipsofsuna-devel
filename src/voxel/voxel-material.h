@@ -15,17 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_MODEL_H__
-#define __LIPS_MODEL_H__
+/**
+ * \addtogroup livox Voxel
+ * @{
+ * \addtogroup livoxMaterial Material
+ * @{
+ */
 
-#include "model.h"
-#include "model-animation.h"
-#include "model-bone.h"
-#include "model-ipo.h"
-#include "model-material.h"
-#include "model-node.h"
-#include "model-light.h"
-#include "model-pose.h"
-#include "model-vertex.h"
+#ifndef __VOXEL_MATERIAL_H__
+#define __VOXEL_MATERIAL_H__
+
+#include <archive/lips-archive.h>
+#include <model/lips-model.h>
+#include "voxel-types.h"
+
+struct _livoxMaterial
+{
+	int id;
+	char* name;
+	float friction;
+	float scale;
+	limdlMaterial model;
+};
+
+livoxMaterial*
+livox_material_new (liarcSql*     sql,
+                    sqlite3_stmt* stmt);
+
+livoxMaterial*
+livox_material_new_from_stream (liReader* reader);
+
+void
+livox_material_free (livoxMaterial* self);
+
+int
+livox_material_write_to_stream (livoxMaterial* self,
+                                liarcWriter*   writer);
 
 #endif
+
+/** @} */
+/** @} */

@@ -31,6 +31,7 @@
 #include "model-animation.h"
 #include "model-bone.h"
 #include "model-light.h"
+#include "model-material.h"
 #include "model-node.h"
 #include "model-types.h"
 #include "model-vertex.h"
@@ -38,10 +39,6 @@
 #define LIMDL_FORMAT_VERSION 0xFFFFFFFA
 
 typedef int limdlModelFlags;
-typedef int limdlTextureFlags;
-typedef int limdlTextureType;
-typedef struct _limdlMaterial limdlMaterial;
-typedef struct _limdlTexture limdlTexture;
 typedef struct _limdlWeightGroup limdlWeightGroup;
 typedef struct _limdlWeights limdlWeights;
 typedef struct _limdlWeight limdlWeight;
@@ -52,21 +49,6 @@ enum
 	LIMDL_MATERIAL_FLAG_COLLISION    = 0x02,
 	LIMDL_MATERIAL_FLAG_CULLFACE     = 0x04,
 	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
-};
-
-enum
-{
-	LIMDL_TEXTURE_FLAG_BILINEAR = 0x01,
-	LIMDL_TEXTURE_FLAG_CLAMP    = 0x02,
-	LIMDL_TEXTURE_FLAG_MIPMAP   = 0x04,
-	LIMDL_TEXTURE_FLAG_REPEAT   = 0x08
-};
-
-enum
-{
-	LIMDL_TEXTURE_TYPE_EMPTY,
-	LIMDL_TEXTURE_TYPE_ENVMAP,
-	LIMDL_TEXTURE_TYPE_IMAGE
 };
 
 /*****************************************************************************/
@@ -168,51 +150,6 @@ limdl_model_get_index (const limdlModel*  self,
 #ifdef __cplusplus
 }
 #endif
-
-/*****************************************************************************/
-
-struct _limdlMaterial
-{
-	int start;
-	int end;
-	int flags;
-	char* shader;
-	float emission;
-	float shininess;
-	float diffuse[4];
-	float specular[4];
-	struct
-	{
-		int count;
-		limdlTexture* textures;
-	} textures;
-};
-
-/*****************************************************************************/
-
-struct _limdlTexture
-{
-	limdlTextureType type;
-	limdlTextureFlags flags;
-	int width;
-	int height;
-	char* string;
-};
-
-static inline int
-limdl_texture_compare (const limdlTexture* self,
-                       const limdlTexture* texture)
-{
-	if (self->type != texture->type ||
-	    self->flags != texture->flags ||
-	    self->width != texture->width ||
-	    self->height != texture->height)
-		return 0;
-	if (strcmp (self->string, texture->string))
-		return 0;
-
-	return 1;
-}
 
 /*****************************************************************************/
 

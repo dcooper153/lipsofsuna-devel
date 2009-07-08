@@ -173,6 +173,8 @@ mdlsrc = \
 	model/model-ipo-channel.c \
 	model/model-light.c \
 	model/model-light.h \
+	model/model-material.c \
+	model/model-material.h \
 	model/model-node.c \
 	model/model-node.h \
 	model/model-pose.c \
@@ -351,6 +353,8 @@ voxsrc = \
 	voxel/voxel-iterator.h \
 	voxel/voxel-manager.c \
 	voxel/voxel-manager.h \
+	voxel/voxel-material.c \
+	voxel/voxel-material.h \
 	voxel/voxel-sector.c \
 	voxel/voxel-sector.h \
 	voxel/voxel-types.h

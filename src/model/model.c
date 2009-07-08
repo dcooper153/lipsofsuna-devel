@@ -112,11 +112,6 @@ private_write_ipo (const limdlModel* self,
                    liarcWriter*      writer);
 
 static void
-private_write_material (const limdlModel* self,
-                        limdlMaterial*    material,
-                        liarcWriter*      writer);
-
-static void
 private_write_weight (const limdlModel* self,
                       limdlWeight*      weight,
                       liarcWriter*      writer);
@@ -1028,29 +1023,9 @@ private_read_material (limdlModel*    self,
                        limdlMaterial* material,
                        liReader*      reader)
 {
-	int i;
-	uint32_t tmp[4];
-
-	/* Read header. */
-	if (!li_reader_get_uint32 (reader, tmp + 0) ||
-		!li_reader_get_uint32 (reader, tmp + 1) ||
-		!li_reader_get_uint32 (reader, tmp + 2) ||
-		!li_reader_get_float (reader, &material->emission) ||
-		!li_reader_get_float (reader, &material->shininess) ||
-		!li_reader_get_float (reader, material->diffuse + 0) ||
-		!li_reader_get_float (reader, material->diffuse + 1) ||
-		!li_reader_get_float (reader, material->diffuse + 2) ||
-		!li_reader_get_float (reader, material->diffuse + 3) ||
-		!li_reader_get_float (reader, material->specular + 0) ||
-		!li_reader_get_float (reader, material->specular + 1) ||
-		!li_reader_get_float (reader, material->specular + 2) ||
-		!li_reader_get_float (reader, material->specular + 3) ||
-		!li_reader_get_uint32 (reader, tmp + 3))
+	/* Read material. */
+	if (!limdl_material_read (material, reader))
 		return 0;
-	material->start = tmp[0];
-	material->end = tmp[1];
-	material->flags = tmp[2];
-	material->textures.count = tmp[3];
 
 	/* Sanity checks. */
 	if (material->start == material->end)
@@ -1068,34 +1043,6 @@ private_read_material (limdlModel*    self,
 	{
 		lisys_error_set (EINVAL, "material range out of bounds");
 		return 0;
-	}
-
-	/* Read shader. */
-	if (!li_reader_get_text (reader, "", &material->shader))
-		return 0;
-
-	/* Read textures. */
-	if (material->textures.count > 0)
-	{
-		material->textures.textures = calloc (material->textures.count, sizeof (limdlTexture));
-		if (material->textures.textures == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
-			return 0;
-		}
-		for (i = 0 ; i < material->textures.count ; i++)
-		{
-			if (!li_reader_get_uint32 (reader, tmp + 0) ||
-			    !li_reader_get_uint32 (reader, tmp + 1) ||
-			    !li_reader_get_uint32 (reader, tmp + 2) ||
-			    !li_reader_get_uint32 (reader, tmp + 3) ||
-			    !li_reader_get_text (reader, "", &material->textures.textures[i].string))
-				return 0;
-			material->textures.textures[i].type = tmp[0];
-			material->textures.textures[i].flags = tmp[1];
-			material->textures.textures[i].width = tmp[2];
-			material->textures.textures[i].height = tmp[3];
-		}
 	}
 
 	return 1;
@@ -1255,7 +1202,7 @@ private_write_mesh (const limdlModel* self,
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
 		material = self->materials.materials + i;
-		private_write_material (self, material, writer);
+		limdl_material_write (material, writer);
 	}
 
 	/* Write weight groups. */
@@ -1313,42 +1260,6 @@ private_write_ipo (const limdlModel* self,
 		{
 			liarc_writer_append_float (writer, ipo->channels[i].nodes[j]);
 		}
-	}
-}
-
-static void
-private_write_material (const limdlModel* self,
-                        limdlMaterial*    material,
-                        liarcWriter*      writer)
-{
-	int i;
-	limdlTexture* texture;
-
-	liarc_writer_append_uint32 (writer, material->start);
-	liarc_writer_append_uint32 (writer, material->end);
-	liarc_writer_append_uint32 (writer, material->flags);
-	liarc_writer_append_float (writer, material->emission);
-	liarc_writer_append_float (writer, material->shininess);
-	liarc_writer_append_float (writer, material->diffuse[0]);
-	liarc_writer_append_float (writer, material->diffuse[1]);
-	liarc_writer_append_float (writer, material->diffuse[2]);
-	liarc_writer_append_float (writer, material->diffuse[3]);
-	liarc_writer_append_float (writer, material->specular[0]);
-	liarc_writer_append_float (writer, material->specular[1]);
-	liarc_writer_append_float (writer, material->specular[2]);
-	liarc_writer_append_float (writer, material->specular[3]);
-	liarc_writer_append_uint32 (writer, material->textures.count);
-	liarc_writer_append_string (writer, material->shader);
-	liarc_writer_append_nul (writer);
-	for (i = 0 ; i < material->textures.count ; i++)
-	{
-		texture = material->textures.textures + i;
-		liarc_writer_append_uint32 (writer, texture->type);
-		liarc_writer_append_uint32 (writer, texture->flags);
-		liarc_writer_append_uint32 (writer, texture->width);
-		liarc_writer_append_uint32 (writer, texture->height);
-		liarc_writer_append_string (writer, texture->string);
-		liarc_writer_append_nul (writer);
 	}
 }
 

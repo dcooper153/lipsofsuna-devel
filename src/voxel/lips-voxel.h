@@ -23,6 +23,7 @@
 #include "voxel-builder.h"
 #include "voxel-iterator.h"
 #include "voxel-manager.h"
+#include "voxel-material.h"
 #include "voxel-sector.h"
 
 #endif

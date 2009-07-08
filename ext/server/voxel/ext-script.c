@@ -119,7 +119,7 @@ Voxel_save (lua_State* lua)
 
 void
 liextVoxelScript (liscrClass* self,
-                     void*       data)
+                  void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
 	liscr_class_insert_func (self, "fill_box", Voxel_fill_box);

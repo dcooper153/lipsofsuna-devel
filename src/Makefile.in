@@ -86,8 +86,8 @@ am__objects_10 = generator.lo generator-brush.lo generator-rule.lo
 am__objects_11 = image.lo image-compress.lo image-texture.lo
 am__objects_12 = math-marching-cubes.lo
 am__objects_13 = model.lo model-animation.lo model-bone.lo \
-	model-ipo.lo model-ipo-channel.lo model-light.lo model-node.lo \
-	model-pose.lo
+	model-ipo.lo model-ipo-channel.lo model-light.lo \
+	model-material.lo model-node.lo model-pose.lo
 am__objects_14 = network.lo
 am__objects_15 = physics.lo physics-object.lo physics-private.lo \
 	physics-shape.lo
@@ -116,7 +116,7 @@ am__objects_23 = system.lo system-directory.lo system-error.lo \
 am__objects_24 = thread-async-call.lo
 am__objects_25 = video-features.lo
 am__objects_26 = voxel.lo voxel-block.lo voxel-builder.lo \
-	voxel-manager.lo voxel-sector.lo
+	voxel-manager.lo voxel-material.lo voxel-sector.lo
 am__objects_27 = widget.lo widget-busy.lo widget-button.lo \
 	widget-check.lo widget-entry.lo widget-group.lo \
 	widget-image.lo widget-label.lo widget-manager.lo \
@@ -580,6 +580,8 @@ mdlsrc = \
 	model/model-ipo-channel.c \
 	model/model-light.c \
 	model/model-light.h \
+	model/model-material.c \
+	model/model-material.h \
 	model/model-node.c \
 	model/model-node.h \
 	model/model-pose.c \
@@ -772,6 +774,8 @@ voxsrc = \
 	voxel/voxel-iterator.h \
 	voxel/voxel-manager.c \
 	voxel/voxel-manager.h \
+	voxel/voxel-material.c \
+	voxel/voxel-material.h \
 	voxel/voxel-sector.c \
 	voxel/voxel-sector.h \
 	voxel/voxel-types.h
@@ -1030,6 +1034,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-ipo-channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-ipo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-light.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model-pose.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
@@ -1112,6 +1117,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-block.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel-sector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/voxel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/widget-busy.Plo@am__quote@
@@ -1570,6 +1576,13 @@ model-light.lo: model/model-light.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-light.c' object='model-light.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o model-light.lo `test -f 'model/model-light.c' || echo '$(srcdir)/'`model/model-light.c
+
+model-material.lo: model/model-material.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT model-material.lo -MD -MP -MF $(DEPDIR)/model-material.Tpo -c -o model-material.lo `test -f 'model/model-material.c' || echo '$(srcdir)/'`model/model-material.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/model-material.Tpo $(DEPDIR)/model-material.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-material.c' object='model-material.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o model-material.lo `test -f 'model/model-material.c' || echo '$(srcdir)/'`model/model-material.c
 
 model-node.lo: model/model-node.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT model-node.lo -MD -MP -MF $(DEPDIR)/model-node.Tpo -c -o model-node.lo `test -f 'model/model-node.c' || echo '$(srcdir)/'`model/model-node.c
@@ -2039,6 +2052,13 @@ voxel-manager.lo: voxel/voxel-manager.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel-manager.c' object='voxel-manager.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel-manager.lo `test -f 'voxel/voxel-manager.c' || echo '$(srcdir)/'`voxel/voxel-manager.c
+
+voxel-material.lo: voxel/voxel-material.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel-material.lo -MD -MP -MF $(DEPDIR)/voxel-material.Tpo -c -o voxel-material.lo `test -f 'voxel/voxel-material.c' || echo '$(srcdir)/'`voxel/voxel-material.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/voxel-material.Tpo $(DEPDIR)/voxel-material.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='voxel/voxel-material.c' object='voxel-material.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o voxel-material.lo `test -f 'voxel/voxel-material.c' || echo '$(srcdir)/'`voxel/voxel-material.c
 
 voxel-sector.lo: voxel/voxel-sector.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT voxel-sector.lo -MD -MP -MF $(DEPDIR)/voxel-sector.Tpo -c -o voxel-sector.lo `test -f 'voxel/voxel-sector.c' || echo '$(srcdir)/'`voxel/voxel-sector.c

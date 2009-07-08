@@ -48,6 +48,7 @@ enum
 
 typedef uint16_t livoxVoxel;
 typedef struct _livoxManager livoxManager;
+typedef struct _livoxMaterial livoxMaterial;
 typedef struct _livoxSector livoxSector;
 
 #endif

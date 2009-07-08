@@ -242,7 +242,7 @@ livox_sector_read (livoxSector* self,
 
 	/* Prepare statement. */
 	id = LIVOX_SECTOR_INDEX (self->x, self->y, self->z);
-	query = "SELECT (data) FROM voxel_sectors WHERE id=?;";
+	query = "SELECT data FROM voxel_sectors WHERE id=?;";
 	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));

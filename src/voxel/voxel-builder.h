@@ -43,6 +43,7 @@ struct _livoxBuilder
 	livoxSector* sector;
 	struct
 	{
+		lialgU32dic* materials;
 		lialgMemdic* normals;
 		limdlModel* model;
 		liphyShape* shape;

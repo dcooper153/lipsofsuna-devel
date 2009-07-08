@@ -23,7 +23,11 @@
  */
 
 #include "voxel-manager.h"
+#include "voxel-material.h"
 #include "voxel-private.h"
+
+static void
+private_clear_materials (livoxManager* self);
 
 static void
 private_clear_sectors (livoxManager* self);
@@ -53,9 +57,16 @@ livox_manager_new (liphyPhysics* physics,
 	if (scene != NULL)
 		self->render = scene->render;
 	self->renderapi = rndapi;
+	self->materials = lialg_u32dic_new ();
+	if (self->materials == NULL)
+	{
+		free (self);
+		return NULL;
+	}
 	self->sectors = lialg_u32dic_new ();
 	if (self->sectors == NULL)
 	{
+		lialg_u32dic_free (self->materials);
 		free (self);
 		return NULL;
 	}
@@ -72,9 +83,16 @@ livox_manager_new (liphyPhysics* physics)
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
+	self->materials = lialg_u32dic_new ();
+	if (self->materials == NULL)
+	{
+		free (self);
+		return NULL;
+	}
 	self->sectors = lialg_u32dic_new ();
 	if (self->sectors == NULL)
 	{
+		lialg_u32dic_free (self->materials);
 		free (self);
 		return NULL;
 	}
@@ -86,6 +104,11 @@ livox_manager_new (liphyPhysics* physics)
 void
 livox_manager_free (livoxManager* self)
 {
+	if (self->materials != NULL)
+	{
+		private_clear_materials (self);
+		lialg_u32dic_free (self->materials);
+	}
 	if (self->sectors != NULL)
 	{
 		private_clear_sectors (self);
@@ -127,11 +150,107 @@ livox_manager_create_sector (livoxManager* self,
 	return livox_sector_new (self, id);
 }
 
+livoxMaterial*
+livox_manager_find_material (livoxManager* self,
+                             uint32_t      id)
+{
+	return lialg_u32dic_find (self->materials, id);
+}
+
 livoxSector*
 livox_manager_find_sector (livoxManager* self,
                            uint32_t      id)
 {
 	return lialg_u32dic_find (self->sectors, id);
+}
+
+/**
+ * \brief Inserts a material to the material database.
+ *
+ * Any existing material with a conflicting ID is removed and freed
+ * before attemtpting to insert the new material.
+ *
+ * The ownership of the material is transfered to the material manager
+ * upon success.
+ *
+ * \param self Voxel manager.
+ * \param material Material.
+ * \return Nonzeron on success.
+ */
+int
+livox_manager_insert_material (livoxManager*  self,
+                               livoxMaterial* material)
+{
+	livoxMaterial* tmp;
+
+	tmp = lialg_u32dic_find (self->materials, material->id);
+	if (tmp != NULL)
+	{
+		lialg_u32dic_remove (self->materials, material->id);
+		livox_material_free (tmp);
+	}
+	if (!lialg_u32dic_insert (self->materials, material->id, material))
+		return 0;
+
+	return 1;
+}
+
+/**
+ * \brief Loads materials from an SQL database.
+ *
+ * \brief Voxel manager.
+ * \param sql Database.
+ * \return Nonzero on success.
+ */
+int
+livox_manager_load_materials (livoxManager* self,
+                              liarcSql*     sql)
+{
+	int ret;
+	const char* query;
+	livoxMaterial* material;
+	sqlite3_stmt* statement;
+
+	/* Prepare statement. */
+	query = "SELECT id,flags,fric,scal,shi,dif0,dif1,dif2,dif3,spe0,spe1,"
+		"spe2,spe3,name,shdr FROM voxel_materials;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+
+	/* Read materials. */
+	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
+	{
+		/* Check for errors. */
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Read material. */
+		material = livox_material_new (sql, statement);
+		if (material == NULL)
+		{
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		assert (lialg_u32dic_find (self->materials, material->id) == NULL);
+
+		/* Add to material list. */
+		if (!lialg_u32dic_insert (self->materials, material->id, material))
+		{
+			livox_material_free (material);
+			sqlite3_finalize (statement);
+			return 0;
+		}
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
 }
 
 /**
@@ -270,9 +389,27 @@ livox_manager_write (livoxManager* self,
 
 	/* Create material table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
-		"(id INTEGER PRIMARY KEY,name TEXT,shi REAL,"
+		"(id INTEGER PRIMARY KEY,flags UNSIGNED INTEGER,"
+		"fric REAL,scal REAL,shi REAL,"
 		"dif0 REAL,dif1 REAL,dif2 REAL,dif3 REAL,"
-		"spe0 REAL,spe1 REAL,spe2 REAL,spe3 REAL);";
+		"spe0 REAL,spe1 REAL,spe2 REAL,spe3 REAL,name TEXT,shdr TEXT);";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create texture table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_textures "
+		"(mat INTEGER REFERENCES voxel_materials(id),"
+		"unit UNSIGNED INTEGER,flags UNSIGNED INTEGER,name TEXT);";
 	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
@@ -320,6 +457,20 @@ livox_manager_write (livoxManager* self,
 }
 
 /*****************************************************************************/
+
+static void
+private_clear_materials (livoxManager* self)
+{
+	lialgU32dicIter iter;
+	livoxMaterial* material;
+
+	LI_FOREACH_U32DIC (iter, self->materials)
+	{
+		material = iter.value;
+		livox_material_free (material);
+	}
+	lialg_u32dic_clear (self->materials);
+}
 
 static void
 private_clear_sectors (livoxManager* self)

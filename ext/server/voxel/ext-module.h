@@ -41,7 +41,8 @@ struct _liextModule
 {
 	float radius;
 	lialgPtrdic* listeners;
-	licalHandle calls[5];
+	liarcWriter* assign_packet;
+	licalHandle calls[6];
 	lisrvServer* server;
 	livoxManager* voxels;
 };

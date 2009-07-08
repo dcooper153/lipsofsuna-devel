@@ -36,6 +36,10 @@ private_object_client (liextModule* self,
                        liengObject* object);
 
 static int
+private_object_client_login (liextModule* self,
+                             liengObject* object);
+
+static int
 private_object_motion (liextModule* self,
                        liengObject* object);
 
@@ -64,7 +68,9 @@ lisrvExtensionInfo liextInfo =
 liextModule*
 liext_module_new (lisrvServer* server)
 {
+	lialgU32dicIter iter;
 	liextModule* self;
+	livoxMaterial* material;
 
 	/* Allocate self. */
 	self = calloc (1, sizeof (liextModule));
@@ -86,18 +92,42 @@ liext_module_new (lisrvServer* server)
 		liext_module_free (self);
 		return NULL;
 	}
+	if (!livox_manager_load_materials (self->voxels, server->sql))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Create assign packet. */
+	self->assign_packet = liarc_writer_new_packet (LIEXT_VOXEL_PACKET_ASSIGN);
+	if (self->assign_packet == NULL)
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+	LI_FOREACH_U32DIC (iter, self->voxels->materials)
+	{
+		material = iter.value;
+		if (!livox_material_write_to_stream (material, self->assign_packet))
+		{
+			liext_module_free (self);
+			return NULL;
+		}
+	}
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 1,
-	     	private_object_client, self, self->calls + 0) ||
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 1,
+	     	private_object_client_login, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 1,
+	     	private_object_client, self, self->calls + 1) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1,
-	     	private_object_motion, self, self->calls + 1) ||
+	     	private_object_motion, self, self->calls + 2) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 1,
-	     	private_object_visibility, self, self->calls + 2) ||
+	     	private_object_visibility, self, self->calls + 3) ||
 	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, 0,
-	     	private_sector_load, self, self->calls + 3) ||
+	     	private_sector_load, self, self->calls + 4) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 4))
+	     	private_tick, self, self->calls + 5))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -124,6 +154,8 @@ liext_module_free (liextModule* self)
 	}
 	if (self->voxels != NULL)
 		livox_manager_free (self->voxels);
+	if (self->assign_packet != NULL)
+		liarc_writer_free (self->assign_packet);
 
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
@@ -203,6 +235,16 @@ private_object_client (liextModule* self,
 		lialg_ptrdic_remove (self->listeners, object);
 		liext_listener_free (listener);
 	}
+
+	return 1;
+}
+
+static int
+private_object_client_login (liextModule* self,
+                             liengObject* object)
+{
+	/* Send the material database to the client. */
+	lisrv_client_send (LISRV_OBJECT (object)->client, self->assign_packet, GRAPPLE_RELIABLE);
 
 	return 1;
 }

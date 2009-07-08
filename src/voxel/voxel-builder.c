@@ -25,8 +25,11 @@
 #include "voxel.h"
 #include "voxel-builder.h"
 #include "voxel-manager.h"
+#include "voxel-material.h"
 #include "voxel-private.h"
 #include "voxel-sector.h"
+
+#define PRIVATE_MISSING_MATERIAL 0xFFFFFFFF
 
 static const int voxel_face_normals[6][3] =
 {
@@ -57,8 +60,11 @@ private_calculate_texcoords (livoxBuilder* self,
                              int           material,
                              limdlVertex*  vertices);
 
+#ifndef LIVOX_DISABLE_GRAPHICS
 static int
-private_insert_materials (livoxBuilder* self);
+private_insert_material (livoxBuilder* self,
+                         int           id);
+#endif
 
 static int
 private_insert_vertices (livoxBuilder* self,
@@ -88,17 +94,23 @@ livox_builder_new (livoxSector* sector)
 #ifndef LIVOX_DISABLE_GRAPHICS
 	if (sector->manager->render != NULL)
 	{
+		self->helpers.materials = lialg_u32dic_new ();
+		if (self->helpers.materials == NULL)
+		{
+			livox_builder_free (self);
+			return NULL;
+		}
 		self->helpers.model = limdl_model_new ();
 		if (self->helpers.model == NULL)
 		{
-			free (self);
+			livox_builder_free (self);
 			return NULL;
 		}
 		self->helpers.normals = lialg_memdic_new ();
 		if (self->helpers.normals == NULL)
 		{
 			limdl_model_free (self->helpers.model);
-			free (self);
+			livox_builder_free (self);
 			return NULL;
 		}
 	}
@@ -118,6 +130,8 @@ livox_builder_free (livoxBuilder* self)
 			free (iter.value);
 		lialg_memdic_free (self->helpers.normals);
 	}
+	if (self->helpers.materials != NULL)
+		lialg_u32dic_free (self->helpers.materials);
 	if (self->helpers.model != NULL)
 		limdl_model_free (self->helpers.model);
 	if (self->helpers.shape != NULL)
@@ -225,8 +239,6 @@ private_build_full (livoxBuilder* self,
 
 	if (!block->full.terrain)
 		return 1;
-	if (!private_insert_materials (self))
-		return 0;
 	tile = block->full.terrain;
 
 	/* Get block offset. */
@@ -290,9 +302,6 @@ private_build_tiles (livoxBuilder* self,
 	limatVector tileoff;
 	limdlVertex vertices[64];
 
-	if (!private_insert_materials (self))
-		return 0;
-
 	/* Get block offset. */
 	blockoff = limat_vector_init (bx, by, bz);
 	blockoff = limat_vector_multiply (blockoff, LIVOX_BLOCK_WIDTH);
@@ -340,15 +349,16 @@ private_calculate_texcoords (livoxBuilder* self,
                              int           material,
                              limdlVertex*  vertices)
 {
-#warning FIXME: Hardcoded terrain texture coordinate generation.
-#define TEXTURE_SCALE 0.05f
 	int j;
 	float dx = vertices->normal.x;
 	float dy = vertices->normal.y;
 	float dz = vertices->normal.z;
+	float scale;
 	limatVector u;
 	limatVector v;
+	livoxMaterial* voxmat;
 
+	/* Calculate plane vectors. */
 	if (LI_ABS (dx) < LI_ABS (dy) && LI_ABS (dx) < LI_ABS (dz))
 		u = limat_vector_init (1.0f, 0.0f, 0.0f);
 	else if (LI_ABS (dy) < LI_ABS (dz))
@@ -357,89 +367,66 @@ private_calculate_texcoords (livoxBuilder* self,
 		u = limat_vector_init (0.0f, 0.0f, 1.0f);
 	v = limat_vector_cross (u, vertices->normal);
 
+	/* Get scale factor. */
+	voxmat = lialg_u32dic_find (self->sector->manager->materials, material);
+	if (voxmat != NULL)
+		scale = voxmat->scale;
+	else
+		scale = 0.05f;
+
+	/* Calculate texture coordinates. */
 	for (j = 0 ; j < 3 ; j++)
 	{
-		vertices[j].texcoord[0] = limat_vector_dot (vertices[j].coord, u);
-		vertices[j].texcoord[1] = limat_vector_dot (vertices[j].coord, v);
-		vertices[j].texcoord[0] *= TEXTURE_SCALE;
-		vertices[j].texcoord[1] *= TEXTURE_SCALE;
+		vertices[j].texcoord[0] = scale * limat_vector_dot (vertices[j].coord, u);
+		vertices[j].texcoord[1] = scale * limat_vector_dot (vertices[j].coord, v);
 	}
 }
 
-static int
-private_insert_materials (livoxBuilder* self)
-{
 #ifndef LIVOX_DISABLE_GRAPHICS
-	limdlMaterial material;
-	limdlTexture texture;
+static int
+private_insert_material (livoxBuilder* self,
+                         int           id)
+{
+	void* ret;
+	limdlMaterial tmp;
+	limdlMaterial* mdlmat;
+	livoxMaterial* voxmat;
 
-	if (self->helpers.model == NULL)
-		return 1;
+	assert (self->helpers.model != NULL);
 
-	/* FIXME */
-#warning FIXME: Hardcoded terrain material.
-	memset (&material, 0, sizeof (limdlMaterial));
-	material.flags = LIMDL_MATERIAL_FLAG_CULLFACE;
-	material.shininess = 1.0f;
-	material.diffuse[0] = 1.0f;
-	material.diffuse[1] = 1.0f;
-	material.diffuse[2] = 1.0f;
-	material.diffuse[3] = 1.0f;
-	material.specular[0] = 0.0f;
-	material.specular[1] = 0.0f;
-	material.specular[2] = 0.0f;
-	material.specular[3] = 0.0f;
-	material.shader = "default";
-	material.textures.count = 1;
-	material.textures.textures = &texture;
-	material.textures.textures[0].type = LIMDL_TEXTURE_TYPE_IMAGE;
-	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
-	material.textures.textures[0].width = 256;
-	material.textures.textures[0].height = 256;
-	material.textures.textures[0].string = "stone-000";
-	if (!limdl_model_insert_material (self->helpers.model, &material))
-		return 0;
-	memset (&material, 0, sizeof (limdlMaterial));
-	material.flags = LIMDL_MATERIAL_FLAG_CULLFACE;
-	material.shininess = 1.0f;
-	material.diffuse[0] = 1.0f;
-	material.diffuse[1] = 1.0f;
-	material.diffuse[2] = 1.0f;
-	material.diffuse[3] = 1.0f;
-	material.specular[0] = 0.0f;
-	material.specular[1] = 0.0f;
-	material.specular[2] = 0.0f;
-	material.specular[3] = 0.0f;
-	material.shader = "default";
-	material.textures.count = 1;
-	material.textures.textures = &texture;
-	material.textures.textures[0].type = LIMDL_TEXTURE_TYPE_IMAGE;
-	material.textures.textures[0].flags = LIMDL_TEXTURE_FLAG_REPEAT | LIMDL_TEXTURE_FLAG_MIPMAP;
-	material.textures.textures[0].width = 256;
-	material.textures.textures[0].height = 256;
-	material.textures.textures[0].string = "grass-000";
-	if (!limdl_model_insert_material (self->helpers.model, &material))
-		return 0;
-	memset (&material, 0, sizeof (limdlMaterial));
-	material.flags = LIMDL_MATERIAL_FLAG_CULLFACE;
-	material.shininess = 1.0f;
-	material.diffuse[0] = 1.0f;
-	material.diffuse[1] = 1.0f;
-	material.diffuse[2] = 1.0f;
-	material.diffuse[3] = 1.0f;
-	material.specular[0] = 0.0f;
-	material.specular[1] = 0.0f;
-	material.specular[2] = 0.0f;
-	material.specular[3] = 0.0f;
-	material.shader = "lava";
-	if (!limdl_model_insert_material (self->helpers.model, &material))
-		return 0;
+	/* Check for existing. */
+	ret = lialg_u32dic_find (self->helpers.materials, id);
+	if (ret != NULL)
+		return (int)(intptr_t)(ret - 1);
 
-	return 1;
-#else
-	return 1;
-#endif
+	/* Find material info. */
+	voxmat = livox_manager_find_material (self->sector->manager, id);
+	if (voxmat == NULL)
+	{
+		id = PRIVATE_MISSING_MATERIAL;
+		ret = lialg_u32dic_find (self->helpers.materials, id);
+		if (ret != NULL)
+			return (int)(intptr_t)(ret - 1);
+		memset (&tmp, 0, sizeof (limdlMaterial));
+		tmp.diffuse[0] = 1.0f;
+		tmp.diffuse[1] = 1.0f;
+		tmp.diffuse[2] = 1.0f;
+		tmp.diffuse[3] = 1.0f;
+		tmp.shader = "default";
+		mdlmat = &tmp;
+	}
+	else
+		mdlmat = &voxmat->model;
+
+	/* Create new material. */
+	if (!limdl_model_insert_material (self->helpers.model, mdlmat))
+		return -1;
+	if (!lialg_u32dic_insert (self->helpers.materials, id, NULL + self->helpers.model->materials.count))
+		return -1;
+
+	return self->helpers.model->materials.count - 1;
 }
+#endif
 
 static int
 private_insert_vertices (livoxBuilder* self,
@@ -451,6 +438,7 @@ private_insert_vertices (livoxBuilder* self,
 {
 	int i;
 	int j;
+	int mat;
 	livoxBuilderNormal* lookup;
 	limatVector coord;
 	limatVector normal;
@@ -480,8 +468,11 @@ private_insert_vertices (livoxBuilder* self,
 		for (i = 0 ; i < count ; i += 3)
 		{
 			/* Insert model triangle. */
+			mat = private_insert_material (self, material);
+			if (mat == -1)
+				return 0;
 			private_calculate_texcoords (self, material, vertices + i);
-			limdl_model_insert_triangle (self->helpers.model, material, vertices + i, NULL);
+			limdl_model_insert_triangle (self->helpers.model, mat, vertices + i, NULL);
 
 			/* Create normal lookup. */
 			normal = vertices[i].normal;

@@ -34,6 +34,7 @@
 
 struct _livoxManager
 {
+	lialgU32dic* materials;
 	lialgU32dic* sectors;
 	liphyPhysics* physics;
 #ifndef LIVOX_DISABLE_GRAPHICS
@@ -63,9 +64,21 @@ livoxSector*
 livox_manager_create_sector (livoxManager* self,
                              uint32_t      id);
 
+livoxMaterial*
+livox_manager_find_material (livoxManager* self,
+                             uint32_t      id);
+
 livoxSector*
 livox_manager_find_sector (livoxManager* self,
                            uint32_t      id);
+
+int
+livox_manager_insert_material (livoxManager*  self,
+                               livoxMaterial* material);
+
+int
+livox_manager_load_materials (livoxManager* self,
+                              liarcSql*     sql);
 
 livoxSector*
 livox_manager_load_sector (livoxManager* self,
