@@ -87,10 +87,6 @@ lirnd_object_render (lirndObject*  self,
                      lirndContext* context);
 
 void
-lirnd_object_render_debug (lirndObject* self,
-                           lirndRender* render);
-
-void
 lirnd_object_render_group (lirndObject*  self,
                            lirndContext* context,
                            int           group);

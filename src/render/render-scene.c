@@ -287,11 +287,6 @@ lirnd_scene_render (lirndScene*   self,
 	private_particle_render (self);
 	glDepthMask (GL_TRUE);
 
-	/* Render debug. */
-#ifndef NDEBUG
-	private_render (self, &context, lirnd_draw_debug, NULL);
-#endif
-
 	/* Restore state. */
 	if (self->render->shader.enabled)
 		glUseProgramObjectARB (0);

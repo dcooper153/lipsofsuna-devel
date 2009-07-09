@@ -231,71 +231,6 @@ lirnd_object_render (lirndObject*  self,
 	}
 }
 
-/**
- * \brief Renders debug information for the object.
- *
- * \param self Object.
- * \param render Renderer.
- */
-void
-lirnd_object_render_debug (lirndObject* self,
-                           lirndRender* render)
-{
-#ifdef LIRND_DEBUG_MESH
-	limatMatrix matrix;
-	lirndShader* shader;
-	limdlModel* model;
-
-	glColor3f (1.0f, 0.0f, 0.0f);
-	glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
-	if (self->model != NULL)
-	{
-		model = self->model->model;
-		matrix = self->orientation.matrix;
-		shader = self->render->shader.fixed;
-		if (self->buffer)
-		{
-			lirnd_shader_render_buffer (shader, &matrix,
-				0, model->vertex.count, self->buffer);
-		}
-		else
-		{
-			lirnd_shader_render_indexed (shader, &matrix,
-				0, model->vertex.count, self->vertices);
-		}
-	}
-	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
-#endif
-//#define LIRND_DEBUG_ARMATURE
-#ifdef LIRND_DEBUG_ARMATURE
-	int i;
-	limdlNode* node;
-	limdlPose* pose = self->pose.pose;
-
-	if (pose == NULL)
-		return;
-
-//	lirnd_render_set_material (render, NULL);
-	glDisable (GL_TEXTURE_2D);
-	glDisable (GL_LIGHTING);
-	glDisable (GL_DEPTH_TEST);
-	glBindTexture (GL_TEXTURE_2D, 0);
-	glPushMatrix ();
-	glMultMatrixf (self->orientation.matrix.m);
-	glBegin (GL_LINES);
-	for (i = 0 ; i < pose->nodes.count ; i++)
-	{
-		node = pose->nodes.array[i];
-//		node = pose->model->nodes.array[i];
-		private_render_debug (self, node);
-	}
-	glEnd ();
-	glPopMatrix ();
-	glEnable (GL_LIGHTING);
-	glEnable (GL_TEXTURE_2D);
-#endif
-}
-
 void
 lirnd_object_render_group (lirndObject*  self,
                            lirndContext* context,
@@ -887,55 +822,6 @@ private_init_model (lirndObject* self,
 	}
 
 	return 1;
-}
-
-static void
-private_render_debug (lirndObject* self,
-                      limdlNode*   node)
-{
-	int i;
-	limatTransform t;
-	limatVector x;
-	limatVector y;
-	limatVector z;
-	limatVector head;
-	limatVector tail;
-
-	/* Axis. */
-	if (node->type == LIMDL_NODE_EMPTY ||
-	    node->type == LIMDL_NODE_LIGHT)
-	{
-		limdl_node_get_pose_transform (node, &t);
-		limdl_node_get_pose_axes (node, &x, &y, &z);
-		x = limat_vector_multiply (x, 0.3f);
-		y = limat_vector_multiply (y, 0.3f);
-		z = limat_vector_multiply (z, 0.3f);
-		tail = t.position;
-		glColor3f (1.0f, 0.0f, 0.0f);
-		glVertex3f (tail.x, tail.y, tail.z);
-		glVertex3f (tail.x + x.x, tail.y + x.y, tail.z + x.z);
-		glColor3f (0.0f, 1.0f, 0.0f);
-		glVertex3f (tail.x, tail.y, tail.z);
-		glVertex3f (tail.x + y.x, tail.y + y.y, tail.z + y.z);
-		glColor3f (0.0f, 0.0f, 1.0f);
-		glVertex3f (tail.x, tail.y, tail.z);
-		glVertex3f (tail.x + z.x, tail.y + z.y, tail.z + z.z);
-	}
-
-	/* Bone. */
-	if (node->type == LIMDL_NODE_BONE)
-	{
-		limdl_bone_get_pose_head (node, &head);
-		limdl_bone_get_pose_tail (node, &tail);
-		glColor3f (1.0f, 1.0f, 0.0f);
-		glVertex3f (head.x, head.y, head.z);
-		glColor3f (1.0f, 1.0f, 1.0f);
-		glVertex3f (tail.x, tail.y, tail.z);
-	}
-
-	/* Children. */
-	for (i = 0 ; i < node->nodes.count ; i++)
-		private_render_debug (self, node->nodes.array[i]);
 }
 
 static int
