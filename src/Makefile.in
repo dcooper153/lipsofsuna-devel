@@ -58,9 +58,9 @@ am__vpath_adj = case $$p in \
     *) f=$$p;; \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
-libLTLIBRARIES_INSTALL = $(INSTALL)
-LTLIBRARIES = $(lib_LTLIBRARIES)
+am__installdirs = "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(bindir)"
+prgLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(prg_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 liblipsofsunaclient_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_1 = ai-path.lo ai-path-solver.lo ai-sector.lo \
@@ -311,6 +311,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
+PROGDIR = @PROGDIR@
 PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
@@ -396,6 +397,7 @@ top_srcdir = @top_srcdir@
 INCLUDES = -I$(srcdir)
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+EXTRA_DIST = src/math/unittest.c
 aisrc = \
 	ai/lips-ai.h \
 	ai/ai-path.c \
@@ -815,36 +817,42 @@ wdgsrc = \
 	widget/widget-window.c \
 	widget/widget-window.h
 
-lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunagenerator.la liblipsofsunaserver.la liblipsofsunaviewer.la
-liblipsofsunaclient_la_LDFLAGS = -no-undefined -export-dynamic
+prgdir = $(PROGDIR)
+prg_LTLIBRARIES = \
+	liblipsofsunaclient.la \
+	liblipsofsunagenerator.la \
+	liblipsofsunaserver.la \
+	liblipsofsunaviewer.la
+
+liblipsofsunaclient_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(gensrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) \
 	$(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
-liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
-liblipsofsunagenerator_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunagenerator_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunagenerator_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(physrc) $(pthsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
-liblipsofsunaserver_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunaserver_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(srvsrc) $(scrsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
-liblipsofsunaviewer_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunaviewer_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaviewer_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
 	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
 
-liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
 lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS)
 lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
 lipsofsuna_SOURCES = $(syssrc) $(maisrc)
@@ -899,41 +907,41 @@ $(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+install-prgLTLIBRARIES: $(prg_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	test -z "$(prgdir)" || $(MKDIR_P) "$(DESTDIR)$(prgdir)"
+	@list='$(prg_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    f=$(am__strip_dir) \
-	    echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(libdir)/$$f'"; \
-	    $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(libLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(libdir)/$$f"; \
+	    echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(prgLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(prgdir)/$$f'"; \
+	    $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(prgLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(prgdir)/$$f"; \
 	  else :; fi; \
 	done
 
-uninstall-libLTLIBRARIES:
+uninstall-prgLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	@list='$(prg_LTLIBRARIES)'; for p in $$list; do \
 	  p=$(am__strip_dir) \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$p'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$p"; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(prgdir)/$$p'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(prgdir)/$$p"; \
 	done
 
-clean-libLTLIBRARIES:
-	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
-	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+clean-prgLTLIBRARIES:
+	-test -z "$(prg_LTLIBRARIES)" || rm -f $(prg_LTLIBRARIES)
+	@list='$(prg_LTLIBRARIES)'; for p in $$list; do \
 	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
 	  test "$$dir" != "$$p" || dir=.; \
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
 liblipsofsunaclient.la: $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_DEPENDENCIES) 
-	$(liblipsofsunaclient_la_LINK) -rpath $(libdir) $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_LIBADD) $(LIBS)
+	$(liblipsofsunaclient_la_LINK) -rpath $(prgdir) $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_LIBADD) $(LIBS)
 liblipsofsunagenerator.la: $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_DEPENDENCIES) 
-	$(liblipsofsunagenerator_la_LINK) -rpath $(libdir) $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_LIBADD) $(LIBS)
+	$(liblipsofsunagenerator_la_LINK) -rpath $(prgdir) $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_LIBADD) $(LIBS)
 liblipsofsunaserver.la: $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_DEPENDENCIES) 
-	$(liblipsofsunaserver_la_LINK) -rpath $(libdir) $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_LIBADD) $(LIBS)
+	$(liblipsofsunaserver_la_LINK) -rpath $(prgdir) $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_LIBADD) $(LIBS)
 liblipsofsunaviewer.la: $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_DEPENDENCIES) 
-	$(liblipsofsunaviewer_la_LINK) -rpath $(libdir) $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_LIBADD) $(LIBS)
+	$(liblipsofsunaviewer_la_LINK) -rpath $(prgdir) $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
@@ -2492,10 +2500,8 @@ distdir: $(DISTFILES)
 check-am: all-am
 check: check-am
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) config.h
-install-binPROGRAMS: install-libLTLIBRARIES
-
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -2524,8 +2530,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-prgLTLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -2543,11 +2549,11 @@ info: info-am
 
 info-am:
 
-install-data-am: install-data-local
+install-data-am: install-data-local install-prgLTLIBRARIES
 
 install-dvi: install-dvi-am
 
-install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
+install-exec-am: install-binPROGRAMS
 
 install-html: install-html-am
 
@@ -2579,32 +2585,29 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
+uninstall-am: uninstall-binPROGRAMS uninstall-prgLTLIBRARIES
 
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
+	clean-generic clean-libtool clean-prgLTLIBRARIES ctags \
 	distclean distclean-compile distclean-generic distclean-hdr \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
 	install-data install-data-am install-data-local install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-libLTLIBRARIES
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-prgLTLIBRARIES install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-prgLTLIBRARIES
 
 
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)
 	$(mkinstalldirs) $(SAVEDIR)
-
-#	unittest.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

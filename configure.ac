@@ -198,6 +198,7 @@ if test "$want_relative" = yes; then
 	EXTSDIR="${prefix}/lib/extensions"
 	DATADIR="${prefix}/data"
 	MODSDIR="${prefix}/mods"
+	PROGDIR="${prefix}/lib/programs"
 	TOOLDIR="${prefix}/tool"
 	SAVEDIR="${prefix}/save"
 	bindir="${prefix}"
@@ -208,9 +209,11 @@ else
 	EXTSDIR="${libdir}/${PACKAGE}/extensions/$EXTSVER"
 	DATADIR="${datadir}/${PACKAGE}/data"
 	MODSDIR="${datadir}/${PACKAGE}/mods"
+	PROGDIR="${libdir}/${PACKAGE}/programs/$EXTSVER"
 	TOOLDIR="${datadir}/${PACKAGE}/tool"
 	SAVEDIR="${localstatedir}/${PACKAGE}"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIEXTSDIR=\\\"\"${libdir}/${PACKAGE}/extensions/$EXTSVER\"\\\""
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLIPROGDIR=\\\"\"${libdir}/${PACKAGE}/programs/$EXTSVER\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLISAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
 fi
@@ -267,6 +270,7 @@ AC_SUBST([MAYBE_VIEWER])
 AC_SUBST([EXTSDIR])
 AC_SUBST([DATADIR])
 AC_SUBST([MODSDIR])
+AC_SUBST([PROGDIR])
 AC_SUBST([SAVEDIR])
 AC_SUBST([TOOLDIR])
 

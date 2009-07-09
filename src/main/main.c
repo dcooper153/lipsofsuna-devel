@@ -36,6 +36,9 @@ enum
 	PRIVATE_MODE_VIEWER
 };
 
+static lisysModule*
+private_open_program (const char* name);
+
 static int
 print_help (const char* exe);
 
@@ -111,6 +114,42 @@ main (int argc, char** argv)
 
 /*****************************************************************************/
 
+static lisysModule*
+private_open_program (const char* name)
+{
+	char* tmp;
+	char* path;
+	lisysModule* module;
+
+	/* Format path. */
+#ifdef LI_RELATIVE_PATHS
+	tmp = lisys_relative_exedir ();
+	if (tmp == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	path = lisys_path_format (tmp,
+		LISYS_PATH_SEPARATOR, "lib",
+		LISYS_PATH_SEPARATOR, "programs",
+		LISYS_PATH_SEPARATOR, "lib", name, ".", LISYS_EXTENSION_DLL, NULL);
+	free (tmp);
+	if (path == NULL)
+		return NULL;
+#else
+	tmp = LIPROGDIR;
+	path = lisys_path_format (tmp, LISYS_PATH_SEPARATOR, "lib", name, ".", LISYS_EXTENSION_DLL, NULL);
+	if (path == NULL)
+		return NULL;
+#endif
+
+	/* Open library. */
+	module = lisys_module_new (path, LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
+	free (path);
+
+	return module;
+}
+
 static int
 print_help (const char* exe)
 {
@@ -132,8 +171,7 @@ client_main (const char* name)
 	lisysModule* module;
 
 	/* Open client library. */
-	module = lisys_module_new ("liblipsofsunaclient." LISYS_EXTENSION_DLL,
-		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
+	module = private_open_program ("lipsofsunaclient");
 	if (module == NULL)
 	{
 		lisys_error_report ();
@@ -183,8 +221,7 @@ generator_main (const char* name)
 	lisysModule* module;
 
 	/* Open client library. */
-	module = lisys_module_new ("liblipsofsunagenerator." LISYS_EXTENSION_DLL,
-		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
+	module = private_open_program ("lipsofsunagenerator");
 	if (module == NULL)
 	{
 		lisys_error_report ();
@@ -234,8 +271,7 @@ server_main (const char* name)
 	lisysModule* module;
 
 	/* Open client library. */
-	module = lisys_module_new ("liblipsofsunaserver." LISYS_EXTENSION_DLL,
-		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
+	module = private_open_program ("lipsofsunaserver");
 	if (module == NULL)
 	{
 		lisys_error_report ();
@@ -286,8 +322,7 @@ viewer_main (const char* name,
 	lisysModule* module;
 
 	/* Open viewer library. */
-	module = lisys_module_new ("liblipsofsunaviewer." LISYS_EXTENSION_DLL,
-		LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
+	module = private_open_program ("lipsofsunaviewer");
 	if (module == NULL)
 	{
 		lisys_error_report ();

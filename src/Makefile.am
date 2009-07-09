@@ -1,6 +1,7 @@
 INCLUDES = -I$(srcdir)
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+EXTRA_DIST = src/math/unittest.c
 
 aisrc = \
 	ai/lips-ai.h \
@@ -393,37 +394,43 @@ wdgsrc = \
 	widget/widget-window.c \
 	widget/widget-window.h
 
-bin_PROGRAMS = lipsofsuna
-lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunagenerator.la liblipsofsunaserver.la liblipsofsunaviewer.la
+prgdir = $(PROGDIR)
+prg_LTLIBRARIES = \
+	liblipsofsunaclient.la \
+	liblipsofsunagenerator.la \
+	liblipsofsunaserver.la \
+	liblipsofsunaviewer.la
 
-liblipsofsunaclient_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunaclient_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(gensrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) \
 	$(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
-liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 
-liblipsofsunagenerator_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunagenerator_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunagenerator_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(physrc) $(pthsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
-liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 
-liblipsofsunaserver_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunaserver_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(srvsrc) $(scrsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
-liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 
-liblipsofsunaviewer_la_LDFLAGS = -no-undefined -export-dynamic
+liblipsofsunaviewer_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaviewer_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
 	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
 	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
-liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
+
+bin_PROGRAMS = lipsofsuna
 
 lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS)
 lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
@@ -432,5 +439,3 @@ lipsofsuna_SOURCES = $(syssrc) $(maisrc)
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)
 	$(mkinstalldirs) $(SAVEDIR)
-
-#	unittest.c
