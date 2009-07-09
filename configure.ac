@@ -282,7 +282,6 @@ ext/client/chat/Makefile
 ext/client/editor/Makefile
 ext/client/events/Makefile
 ext/client/generator/Makefile
-ext/client/inventory/Makefile
 ext/client/options/Makefile
 ext/client/packager/Makefile
 ext/client/reload/Makefile

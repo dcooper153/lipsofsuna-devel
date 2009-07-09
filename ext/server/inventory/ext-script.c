@@ -106,6 +106,33 @@ Inventory___newindex (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Finds an inventory by ID.
+ * --
+ * -- @param self Inventory class.
+ * -- @param id Inventory number.
+ * -- @return Inventory or nil.
+ * function Inventory.find(self, id)
+ */
+static int
+Inventory_find (lua_State* lua)
+{
+	int slot;
+	liextInventory* inventory;
+	liextModule* self;
+
+	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
+	slot = luaL_checkinteger (lua, 2);
+
+	inventory = liext_module_find_inventory (self, slot);
+	if (inventory == NULL)
+		return 0;
+	liscr_pushdata (lua, inventory->script);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new inventory.
  * --
  * -- @param self Inventory class.
@@ -150,6 +177,74 @@ Inventory_new (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Subscribes an object to the inventory.
+ * --
+ * -- @param self Inventory.
+ * -- @param object Object to subscribe.
+ * function Inventory.subscribe(self, object)
+ */
+static int
+Inventory_subscribe (lua_State* lua)
+{
+	liscrData* object;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+
+	liext_inventory_insert_listener (self->data, object->data);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Checks if an object is subscribed to the inventory.
+ * --
+ * -- @param self Inventory.
+ * -- @param object Object.
+ * -- @return True if subscribed.
+ * function Inventory.subscribed(self, object)
+ */
+static int
+Inventory_subscribed (lua_State* lua)
+{
+	liscrData* object;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+
+	lua_pushboolean (lua, liext_inventory_find_listener (self->data,
+		LIENG_OBJECT (object->data)->id) != NULL);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Unsubscribes an object from the inventory.
+ * --
+ * -- @param self Inventory.
+ * -- @param object Object to unsubscribe.
+ * function Inventory.unsubscribe(self, object)
+ */
+static int
+Inventory_unsubscribe (lua_State* lua)
+{
+	liscrData* object;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+
+	liext_inventory_remove_listener (self->data, object->data);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Index of the first free inventory slot or nil if full.
  * --
  * -- @name Inventory.first_free_slot
@@ -181,44 +276,41 @@ Inventory_getter_first_free_slot (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Owner of the inventory.
- * -- @name Inventory.owner
+ * -- Unique ID of the inventory.
+ * --
+ * -- @name Inventory.id
  * -- @class table
  */
 static int
-Inventory_getter_owner (lua_State* lua)
+Inventory_getter_id (lua_State* lua)
 {
-	liengObject* object;
 	liscrData* self;
 
 	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
 
-	object = liext_inventory_get_owner (self->data);
-	if (object != NULL && object->script != NULL)
-		liscr_pushdata (lua, object->script);
-	else
-		lua_pushnil (lua);
+	lua_pushnumber (lua, liext_inventory_get_id (self->data));
 	return 1;
 }
-static int
-Inventory_setter_owner (lua_State* lua)
-{
-	liscrData* object;
-	liscrData* self;
-	liengObject* value;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
-	if (!lua_isnil (lua, 3))
-	{
-		object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-		value = object->data;
-	}
-	else
-		value = NULL;
+/* @luadoc
+ * ---
+ * -- Custom callback called when an item is added or changed.
+ * --
+ * -- Arguments passed to the callback: inventory, listener, slot, object.
+ * --
+ * -- @name Inventory.item_added_cb
+ * -- @class table
+ */
 
-	liext_inventory_set_owner (self->data, value);
-	return 0;
-}
+/* @luadoc
+ * ---
+ * -- Custom callback called when an item is removed.
+ * --
+ * -- Arguments passed to the callback: inventory, listener, slot.
+ * --
+ * -- @name Inventory.item_removed_cb
+ * -- @class table
+ */
 
 /* @luadoc
  * ---
@@ -254,6 +346,26 @@ Inventory_setter_size (lua_State* lua)
 	return 0;
 }
 
+/* @luadoc
+ * ---
+ * -- Custom callback called when a user is added.
+ * --
+ * -- Arguments passed to the callback: inventory, object.
+ * --
+ * -- @name Inventory.user_added_cb
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- Custom callback called when a user is removed.
+ * --
+ * -- Arguments passed to the callback: inventory, object.
+ * --
+ * -- @name Inventory.user_removed_cb
+ * -- @class table
+ */
+
 /*****************************************************************************/
 
 void
@@ -264,11 +376,14 @@ liextInventoryScript (liscrClass* self,
 	liscr_class_insert_func (self, "__gc", Inventory___gc);
 	liscr_class_insert_func (self, "__index", Inventory___index);
 	liscr_class_insert_func (self, "__newindex", Inventory___newindex);
+	liscr_class_insert_func (self, "find", Inventory_find);
 	liscr_class_insert_func (self, "new", Inventory_new);
+	liscr_class_insert_func (self, "subscribe", Inventory_subscribe);
+	liscr_class_insert_func (self, "subscribed", Inventory_subscribed);
+	liscr_class_insert_func (self, "unsubscribe", Inventory_unsubscribe);
 	liscr_class_insert_getter (self, "first_free_slot", Inventory_getter_first_free_slot);
-	liscr_class_insert_getter (self, "owner", Inventory_getter_owner);
+	liscr_class_insert_getter (self, "id", Inventory_getter_id);
 	liscr_class_insert_getter (self, "size", Inventory_getter_size);
-	liscr_class_insert_setter (self, "owner", Inventory_setter_owner);
 	liscr_class_insert_setter (self, "size", Inventory_setter_size);
 }
 

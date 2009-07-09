@@ -20663,7 +20663,7 @@ LICLI_LIBS="\
 
 
 
-ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/events/Makefile ext/client/generator/Makefile ext/client/inventory/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/events/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skeleton/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile ext/server/voxel/Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/events/Makefile ext/client/generator/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/events/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skeleton/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile ext/server/voxel/Makefile src/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -21684,7 +21684,6 @@ do
     "ext/client/editor/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/editor/Makefile" ;;
     "ext/client/events/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/events/Makefile" ;;
     "ext/client/generator/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/generator/Makefile" ;;
-    "ext/client/inventory/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/inventory/Makefile" ;;
     "ext/client/options/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/options/Makefile" ;;
     "ext/client/packager/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/packager/Makefile" ;;
     "ext/client/reload/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/reload/Makefile" ;;

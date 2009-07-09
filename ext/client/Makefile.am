@@ -4,7 +4,6 @@ SUBDIRS = \
 	editor \
 	events \
 	generator \
-	inventory \
 	options \
 	packager \
 	reload \

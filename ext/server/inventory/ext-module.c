@@ -51,7 +51,7 @@ liext_module_new (lisrvServer* server)
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	self->dictionary = lialg_ptrdic_new ();
+	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
 		free (self);
@@ -73,28 +73,17 @@ void
 liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
-	lialg_ptrdic_free (self->dictionary);
+	lialg_u32dic_free (self->dictionary);
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
 	free (self);
 }
 
-int
-liext_module_insert_inventory (liextModule*    self,
-                               liengObject*    key,
-                               liextInventory* value)
+liextInventory*
+liext_module_find_inventory (liextModule* self,
+                             uint32_t     id)
 {
-	if (lialg_ptrdic_insert (self->dictionary, key, value))
-		return 1;
-	return 0;
-}
-
-void
-liext_module_remove_inventory (liextModule*    self,
-                               liengObject*    key,
-                               liextInventory* value)
-{
-	lialg_ptrdic_remove (self->dictionary, key);
+	return lialg_u32dic_find (self->dictionary, id);
 }
 
 /*****************************************************************************/

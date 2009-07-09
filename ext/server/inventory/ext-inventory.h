@@ -34,7 +34,8 @@
 
 struct _liextInventory
 {
-	liengObject* owner;
+	int id;
+	lialgU32dic* listeners;
 	liextModule* module;
 	liscrData* script;
 	lisrvServer* server;
@@ -52,6 +53,21 @@ void
 liext_inventory_free (liextInventory* self);
 
 liengObject*
+liext_inventory_find_listener (liextInventory* self,
+                               int             id);
+
+int
+liext_inventory_insert_listener (liextInventory* self,
+                                 liengObject*    value);
+
+void
+liext_inventory_remove_listener (liextInventory* self,
+                                 liengObject*    value);
+
+int
+liext_inventory_get_id (const liextInventory* self);
+
+liengObject*
 liext_inventory_get_object (liextInventory* self,
                             int             slot);
 
@@ -59,13 +75,6 @@ int
 liext_inventory_set_object (liextInventory* self,
                             int             slot,
                             liengObject*    object);
-
-liengObject*
-liext_inventory_get_owner (liextInventory* self);
-
-int
-liext_inventory_set_owner (liextInventory* self,
-                           liengObject*    value);
 
 int
 liext_inventory_get_size (liextInventory* self);

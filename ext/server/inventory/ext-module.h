@@ -38,7 +38,7 @@ typedef struct _liextModule liextModule;
 
 struct _liextModule
 {
-	lialgPtrdic* dictionary;
+	lialgU32dic* dictionary;
 	licalHandle calls[1];
 	lisrvServer* server;
 };
@@ -49,15 +49,9 @@ liext_module_new (lisrvServer* server);
 void
 liext_module_free (liextModule* self);
 
-int
-liext_module_insert_inventory (liextModule*    self,
-                               liengObject*    key,
-                               liextInventory* value);
-
-void
-liext_module_remove_inventory (liextModule*    self,
-                               liengObject*    key,
-                               liextInventory* value);
+liextInventory*
+liext_module_find_inventory (liextModule* self,
+                             uint32_t     id);
 
 /*****************************************************************************/
 

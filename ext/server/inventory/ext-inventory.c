@@ -31,15 +31,21 @@
 #define LIEXT_INVENTORY_VERSION 0xFF
 
 static int
-private_send_clear (liextInventory* self);
+private_send_close (liextInventory* self,
+                    liengObject*    listener);
 
 static int
-private_send_reset (liextInventory* self);
+private_send_open (liextInventory* self,
+                   liengObject*    listener);
 
 static int
 private_send_object (liextInventory* self,
                      int             slot,
                      liengObject*    object);
+
+static int
+private_send_remove (liextInventory* self,
+                     int             slot);
 
 /*****************************************************************************/
 
@@ -54,14 +60,40 @@ liext_inventory_new (liextModule* module)
 {
 	liextInventory* self;
 
+	/* Allocate self. */
 	self = calloc (1, sizeof (liextInventory));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
 	self->server = module->server;
-	if (!liext_inventory_set_size (self, 10))
+
+	/* Find unique ID. */
+	while (!self->id)
+	{
+		self->id = rand ();
+		if (lialg_u32dic_find (module->dictionary, self->id))
+			self->id = 0;
+	}
+
+	/* Register self. */
+	if (!lialg_u32dic_insert (module->dictionary, self->id, self))
 	{
 		free (self);
+		return NULL;
+	}
+
+	/* Allocate listener dictionary. */
+	self->listeners = lialg_u32dic_new ();
+	if (self->listeners == NULL)
+	{
+		liext_inventory_free (self);
+		return NULL;
+	}
+
+	/* Set default size. */
+	if (!liext_inventory_set_size (self, 10))
+	{
+		liext_inventory_free (self);
 		return NULL;
 	}
 
@@ -79,8 +111,64 @@ liext_inventory_new (liextModule* module)
 void
 liext_inventory_free (liextInventory* self)
 {
+	lialg_u32dic_remove (self->module->dictionary, self->id);
+	if (self->listeners != NULL)
+		lialg_u32dic_free (self->listeners);
 	free (self->slots.array);
 	free (self);
+}
+
+/**
+ * \brief Finds a listener by id.
+ *
+ * \param self Inventory.
+ * \param id Listener id.
+ * \return Object or NULL.
+ */
+liengObject*
+liext_inventory_find_listener (liextInventory* self,
+                               int             id)
+{
+	return lialg_u32dic_find (self->listeners, id);
+}
+
+/**
+ * \brief Adds a new inventory listener.
+ *
+ * \param self Inventory.
+ * \param value Listener object.
+ * \return Nonzero on success.
+ */
+int
+liext_inventory_insert_listener (liextInventory* self,
+                                 liengObject*    value)
+{
+	if (lialg_u32dic_find (self->listeners, value->id))
+		return 1;
+	if (!lialg_u32dic_insert (self->listeners, value->id, value))
+		return 0;
+	liscr_data_ref (value->script, self->script);
+	private_send_open (self, value);
+
+	return 1;
+}
+
+/**
+ * \brief Removes an inventory listener.
+ *
+ * \param self Inventory.
+ * \param value Listener object.
+ */
+void
+liext_inventory_remove_listener (liextInventory* self,
+                                 liengObject*    value)
+{
+	if (lialg_u32dic_find (self->listeners, value->id))
+	{
+		private_send_close (self, value);
+		lialg_u32dic_remove (self->listeners, value->id);
+		liscr_data_ref (value->script, self->script);
+	}
 }
 
 /**
@@ -119,64 +207,12 @@ liext_inventory_set_object (liextInventory* self,
 		liscr_data_unref (self->slots.array[slot]->script, self->script);
 	self->slots.array[slot] = object;
 	if (object != NULL)
+	{
 		liscr_data_ref (object->script, self->script);
-	private_send_object (self, slot, object);
-
-	return 1;
-}
-
-/**
- * \brief Gets the owner of the inventory.
- *
- * \param self Inventory.
- * \return Object or NULL.
- */
-liengObject*
-liext_inventory_get_owner (liextInventory* self)
-{
-	return self->owner;
-}
-
-/**
- * \brief Sets the owner of the inventory.
- *
- * \param self Inventory.
- * \param value Object.
- * \return Nonzero on success.
- */
-int
-liext_inventory_set_owner (liextInventory* self,
-                           liengObject*    value)
-{
-	if (self->owner == value)
-		return 1;
-
-	/* Inform old owner. */
-	if (self->owner != NULL)
-	{
-		if (!private_send_clear (self))
-			return 0;
+		private_send_object (self, slot, object);
 	}
-
-	/* Set new owner. */
-	if (self->owner != NULL)
-	{
-		liext_module_remove_inventory (self->module, self->owner, self);
-		liscr_data_unref (self->owner->script, self->script);
-	}
-	self->owner = value;
-	if (self->owner != NULL)
-	{
-		liscr_data_ref (self->owner->script, self->script);
-		liext_module_insert_inventory (self->module, self->owner, self);
-	}
-
-	/* Inform new owner. */
-	if (self->owner != NULL)
-	{
-		if (!private_send_reset (self))
-			return 0;
-	}
+	else
+		private_send_remove (self, slot);
 
 	return 1;
 }
@@ -205,10 +241,14 @@ liext_inventory_set_size (liextInventory* self,
                           int             value)
 {
 	int i;
+	lialgU32dicIter iter;
 	liengObject** tmp;
 
+	/* Check for changes. */
 	if (value == self->slots.count)
 		return 1;
+
+	/* Set new size. */
 	if (value > self->slots.count)
 	{
 		tmp = realloc (self->slots.array, value * sizeof (liengObject*));
@@ -234,65 +274,84 @@ liext_inventory_set_size (liextInventory* self,
 			self->slots.array = tmp;
 		self->slots.count = value;
 	}
-	private_send_reset (self);
+
+	/* Update all listeners. */
+	LI_FOREACH_U32DIC (iter, self->listeners)
+	{
+		private_send_close (self, iter.value);
+		private_send_open (self, iter.value);
+	}
 
 	return 1;
+}
+
+int
+liext_inventory_get_id (const liextInventory* self)
+{
+	return self->id;
 }
 
 /*****************************************************************************/
 
 static int
-private_send_clear (liextInventory* self)
+private_send_close (liextInventory* self,
+                    liengObject*    listener)
 {
-	liarcWriter* writer;
+	liscrScript* script = self->module->server->script;
 
-	if (self->owner != NULL && LISRV_OBJECT (self->owner)->client != NULL)
+	if (LISRV_OBJECT (listener)->client == NULL)
+		return 1;
+
+	/* Check for callback. */
+	liscr_pushdata (script->lua, self->script);
+	lua_getfield (script->lua, -1, "user_removed_cb");
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
 	{
-		/* Create packet. */
-		writer = liarc_writer_new_packet (LIEXT_INVENTORY_PACKET_RESET);
-		if (writer == NULL)
-			return 0;
-		liarc_writer_append_uint32 (writer, self->owner->id);
-		liarc_writer_append_uint8 (writer, 0);
+		lua_pop (script->lua, 2);
+		return 1;
+	}
 
-		/* Send to owner. */
-		lisrv_client_send (LISRV_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
-
-		liarc_writer_free (writer);
+	/* Invoke callback. */
+	lua_pushvalue (script->lua, -2);
+	lua_remove (script->lua, -3);
+	liscr_pushdata (script->lua, listener->script);
+	if (lua_pcall (script->lua, 2, 0, 0) != 0)
+	{
+		lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+		lisys_error_report ();
+		lua_pop (script->lua, 1);
 	}
 
 	return 1;
 }
 
 static int
-private_send_reset (liextInventory* self)
+private_send_open (liextInventory* self,
+                   liengObject*    listener)
 {
-	int i;
-	liarcWriter* writer;
-	liengObject* object;
+	liscrScript* script = self->module->server->script;
 
-	if (self->owner != NULL && LISRV_OBJECT (self->owner)->client != NULL)
+	if (LISRV_OBJECT (listener)->client == NULL)
+		return 1;
+
+	/* Check for callback. */
+	liscr_pushdata (script->lua, self->script);
+	lua_getfield (script->lua, -1, "user_added_cb");
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
 	{
-		/* Create packet. */
-		writer = liarc_writer_new_packet (LIEXT_INVENTORY_PACKET_RESET);
-		if (writer == NULL)
-			return 0;
-		liarc_writer_append_uint32 (writer, self->owner->id);
-		liarc_writer_append_uint8 (writer, self->slots.count);
-		for (i = 0 ; i < self->slots.count ; i++)
-		{
-			object = self->slots.array[i];
-			if (object != NULL)
-			{
-				liarc_writer_append_uint8 (writer, i);
-				liarc_writer_append_uint16 (writer, lieng_object_get_model_code (object));
-			}
-		}
+		lua_pop (script->lua, 2);
+		return 1;
+	}
 
-		/* Send to owner. */
-		lisrv_client_send (LISRV_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
-
-		liarc_writer_free (writer);
+	/* Invoke callback. */
+	lua_pushvalue (script->lua, -2);
+	lua_remove (script->lua, -3);
+	liscr_pushdata (script->lua, listener->script);
+	if (lua_pcall (script->lua, 2, 0, 0) != 0)
+	{
+		lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+		lisys_error_report ();
+		lua_pop (script->lua, 1);
 	}
 
 	return 1;
@@ -303,25 +362,72 @@ private_send_object (liextInventory* self,
                      int             slot,
                      liengObject*    object)
 {
-	liarcWriter* writer;
+	lialgU32dicIter iter;
+	liscrScript* script = self->module->server->script;
 
-	if (self->owner != NULL && LISRV_OBJECT (self->owner)->client != NULL)
+	LI_FOREACH_U32DIC (iter, self->listeners)
 	{
-		/* Create packet. */
-		writer = liarc_writer_new_packet (LIEXT_INVENTORY_PACKET_DIFF);
-		if (writer == NULL)
-			return 0;
-		liarc_writer_append_uint32 (writer, self->owner->id);
-		liarc_writer_append_uint8 (writer, slot);
-		if (object != NULL)
-			liarc_writer_append_uint16 (writer, lieng_object_get_model_code (object));
-		else
-			liarc_writer_append_uint16 (writer, LINET_INVALID_MODEL);
+		if (LISRV_OBJECT (iter.value)->client == NULL)
+			continue;
 
-		/* Send to owner. */
-		lisrv_client_send (LISRV_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
+		/* Check for callback. */
+		liscr_pushdata (script->lua, self->script);
+		lua_getfield (script->lua, -1, "item_added_cb");
+		if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+		{
+			lua_pop (script->lua, 2);
+			continue;
+		}
 
-		liarc_writer_free (writer);
+		/* Invoke callback. */
+		lua_pushvalue (script->lua, -2);
+		lua_remove (script->lua, -3);
+		liscr_pushdata (script->lua, LIENG_OBJECT (iter.value)->script);
+		lua_pushnumber (script->lua, slot + 1);
+		liscr_pushdata (script->lua, object->script);
+		if (lua_pcall (script->lua, 4, 0, 0) != 0)
+		{
+			lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+			lisys_error_report ();
+			lua_pop (script->lua, 1);
+		}
+	}
+
+	return 1;
+}
+
+static int
+private_send_remove (liextInventory* self,
+                     int             slot)
+{
+	lialgU32dicIter iter;
+	liscrScript* script = self->module->server->script;
+
+	LI_FOREACH_U32DIC (iter, self->listeners)
+	{
+		if (LISRV_OBJECT (iter.value)->client == NULL)
+			continue;
+
+		/* Check for callback. */
+		liscr_pushdata (script->lua, self->script);
+		lua_getfield (script->lua, -1, "item_removed_cb");
+		if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+		{
+			lua_pop (script->lua, 2);
+			continue;
+		}
+
+		/* Invoke callback. */
+		lua_pushvalue (script->lua, -2);
+		lua_remove (script->lua, -3);
+		liscr_pushdata (script->lua, LIENG_OBJECT (iter.value)->script);
+		lua_pushnumber (script->lua, slot + 1);
+		if (lua_pcall (script->lua, 3, 0, 0) != 0)
+		{
+			lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+			lisys_error_report ();
+			lua_pop (script->lua, 1);
+		}
 	}
 
 	return 1;
