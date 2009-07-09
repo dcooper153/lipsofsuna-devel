@@ -13,6 +13,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -48,20 +49,142 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
-SOURCES =
-DIST_SOURCES =
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-dvi-recursive install-exec-recursive \
-	install-html-recursive install-info-recursive \
-	install-pdf-recursive install-ps-recursive install-recursive \
-	installcheck-recursive installdirs-recursive pdf-recursive \
-	ps-recursive uninstall-recursive
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(extdir)"
+extLTLIBRARIES_INSTALL = $(INSTALL)
+LTLIBRARIES = $(ext_LTLIBRARIES)
+libcamera_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libcamera_cli_la_OBJECTS = libcamera_cli_la-ext-module.lo \
+	libcamera_cli_la-ext-script.lo
+libcamera_cli_la_OBJECTS = $(am_libcamera_cli_la_OBJECTS)
+libcamera_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libcamera_cli_la_CFLAGS) \
+	$(CFLAGS) $(libcamera_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libchat_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libchat_cli_la_OBJECTS = libchat_cli_la-ext-history.lo \
+	libchat_cli_la-ext-module.lo libchat_cli_la-ext-script.lo
+libchat_cli_la_OBJECTS = $(am_libchat_cli_la_OBJECTS)
+libchat_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libchat_cli_la_CFLAGS) \
+	$(CFLAGS) $(libchat_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libeditor_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libeditor_cli_la_OBJECTS = libeditor_cli_la-ext-dialog.lo \
+	libeditor_cli_la-ext-editor.lo libeditor_cli_la-ext-module.lo \
+	libeditor_cli_la-ext-script.lo
+libeditor_cli_la_OBJECTS = $(am_libeditor_cli_la_OBJECTS)
+libeditor_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libeditor_cli_la_CFLAGS) \
+	$(CFLAGS) $(libeditor_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libevents_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libevents_cli_la_OBJECTS = libevents_cli_la-ext-module.lo \
+	libevents_cli_la-ext-script.lo
+libevents_cli_la_OBJECTS = $(am_libevents_cli_la_OBJECTS)
+libevents_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libevents_cli_la_CFLAGS) \
+	$(CFLAGS) $(libevents_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libgenerator_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libgenerator_cli_la_OBJECTS = libgenerator_cli_la-ext-dialog.lo \
+	libgenerator_cli_la-ext-generator.lo \
+	libgenerator_cli_la-ext-match.lo \
+	libgenerator_cli_la-ext-module.lo \
+	libgenerator_cli_la-ext-rule.lo \
+	libgenerator_cli_la-ext-script.lo
+libgenerator_cli_la_OBJECTS = $(am_libgenerator_cli_la_OBJECTS)
+libgenerator_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(libgenerator_cli_la_CFLAGS) $(CFLAGS) \
+	$(libgenerator_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+liboptions_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_liboptions_cli_la_OBJECTS = liboptions_cli_la-ext-module.lo \
+	liboptions_cli_la-ext-options.lo \
+	liboptions_cli_la-ext-script.lo
+liboptions_cli_la_OBJECTS = $(am_liboptions_cli_la_OBJECTS)
+liboptions_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(liboptions_cli_la_CFLAGS) $(CFLAGS) \
+	$(liboptions_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libpackager_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libpackager_cli_la_OBJECTS = libpackager_cli_la-ext-module.lo \
+	libpackager_cli_la-ext-packager.lo \
+	libpackager_cli_la-ext-resources.lo \
+	libpackager_cli_la-ext-script.lo
+libpackager_cli_la_OBJECTS = $(am_libpackager_cli_la_OBJECTS)
+libpackager_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(libpackager_cli_la_CFLAGS) $(CFLAGS) \
+	$(libpackager_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libreload_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libreload_cli_la_OBJECTS = libreload_cli_la-ext-module.lo \
+	libreload_cli_la-ext-reload.lo libreload_cli_la-ext-script.lo
+libreload_cli_la_OBJECTS = $(am_libreload_cli_la_OBJECTS)
+libreload_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libreload_cli_la_CFLAGS) \
+	$(CFLAGS) $(libreload_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libskills_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libskills_cli_la_OBJECTS = libskills_cli_la-ext-module.lo \
+	libskills_cli_la-ext-script.lo libskills_cli_la-ext-skills.lo \
+	libskills_cli_la-ext-widget.lo
+libskills_cli_la_OBJECTS = $(am_libskills_cli_la_OBJECTS)
+libskills_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libskills_cli_la_CFLAGS) \
+	$(CFLAGS) $(libskills_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libslots_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libslots_cli_la_OBJECTS = libslots_cli_la-ext-module.lo \
+	libslots_cli_la-ext-slot.lo libslots_cli_la-ext-slots.lo
+libslots_cli_la_OBJECTS = $(am_libslots_cli_la_OBJECTS)
+libslots_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libslots_cli_la_CFLAGS) \
+	$(CFLAGS) $(libslots_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libwidgets_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libwidgets_cli_la_OBJECTS = libwidgets_cli_la-ext-module.lo \
+	libwidgets_cli_la-ext-script.lo
+libwidgets_cli_la_OBJECTS = $(am_libwidgets_cli_la_OBJECTS)
+libwidgets_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(libwidgets_cli_la_CFLAGS) $(CFLAGS) \
+	$(libwidgets_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/src
+depcomp = $(SHELL) $(top_srcdir)/msc/depcomp
+am__depfiles_maybe = depfiles
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
+	$(libeditor_cli_la_SOURCES) $(libevents_cli_la_SOURCES) \
+	$(libgenerator_cli_la_SOURCES) $(liboptions_cli_la_SOURCES) \
+	$(libpackager_cli_la_SOURCES) $(libreload_cli_la_SOURCES) \
+	$(libskills_cli_la_SOURCES) $(libslots_cli_la_SOURCES) \
+	$(libwidgets_cli_la_SOURCES)
+DIST_SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
+	$(libeditor_cli_la_SOURCES) $(libevents_cli_la_SOURCES) \
+	$(libgenerator_cli_la_SOURCES) $(liboptions_cli_la_SOURCES) \
+	$(libpackager_cli_la_SOURCES) $(libreload_cli_la_SOURCES) \
+	$(libskills_cli_la_SOURCES) $(libslots_cli_la_SOURCES) \
+	$(libwidgets_cli_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -230,22 +353,143 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = \
-	camera \
-	chat \
-	editor \
-	events \
-	generator \
-	options \
-	packager \
-	reload \
-	skills \
-	slots \
-	widgets
+INCLUDES = -I$(top_srcdir)/src
+AM_CFLAGS = $(LICLI_CFLAGS)
+extdir = $(EXTSDIR)
+ext_LTLIBRARIES = \
+	libcamera-cli.la \
+	libchat-cli.la \
+	libeditor-cli.la \
+	libevents-cli.la \
+	libgenerator-cli.la \
+	liboptions-cli.la \
+	libpackager-cli.la \
+	libreload-cli.la \
+	libskills-cli.la \
+	libslots-cli.la \
+	libwidgets-cli.la
 
-all: all-recursive
+libcamera_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libcamera_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libcamera_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libcamera_cli_la_SOURCES = \
+	camera/ext-module.c \
+	camera/ext-module.h \
+	camera/ext-script.c
+
+libchat_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libchat_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libchat_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libchat_cli_la_SOURCES = \
+	chat/ext-history.c \
+	chat/ext-history.h \
+	chat/ext-module.c \
+	chat/ext-module.h \
+	chat/ext-script.c
+
+libeditor_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libeditor_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libeditor_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libeditor_cli_la_SOURCES = \
+	editor/ext-dialog.c \
+	editor/ext-dialog.h \
+	editor/ext-editor.c \
+	editor/ext-editor.h \
+	editor/ext-module.c \
+	editor/ext-module.h \
+	editor/ext-script.c
+
+libevents_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libevents_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libevents_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libevents_cli_la_SOURCES = \
+	events/ext-module.c \
+	events/ext-module.h \
+	events/ext-script.c
+
+libgenerator_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libgenerator_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libgenerator_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libgenerator_cli_la_SOURCES = \
+	generator/ext-dialog.c \
+	generator/ext-dialog.h \
+	generator/ext-generator.c \
+	generator/ext-generator.h \
+	generator/ext-match.c \
+	generator/ext-match.h \
+	generator/ext-module.c \
+	generator/ext-module.h \
+	generator/ext-rule.c \
+	generator/ext-rule.h \
+	generator/ext-script.c
+
+liboptions_cli_la_CFLAGS = $(LICLI_CFLAGS)
+liboptions_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+liboptions_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+liboptions_cli_la_SOURCES = \
+	options/ext-module.c \
+	options/ext-module.h \
+	options/ext-options.c \
+	options/ext-options.h \
+	options/ext-script.c
+
+libpackager_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libpackager_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libpackager_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libpackager_cli_la_SOURCES = \
+	packager/ext-module.c \
+	packager/ext-module.h \
+	packager/ext-packager.c \
+	packager/ext-packager.h \
+	packager/ext-resources.c \
+	packager/ext-resources.h \
+	packager/ext-script.c
+
+libreload_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libreload_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libreload_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libreload_cli_la_SOURCES = \
+	reload/ext-module.c \
+	reload/ext-module.h \
+	reload/ext-reload.c \
+	reload/ext-reload.h \
+	reload/ext-script.c
+
+libskills_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libskills_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libskills_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libskills_cli_la_SOURCES = \
+	skills/ext-module.c \
+	skills/ext-module.h \
+	skills/ext-script.c \
+	skills/ext-skills.c \
+	skills/ext-skills.h \
+	skills/ext-widget.c \
+	skills/ext-widget.h
+
+libslots_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libslots_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libslots_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libslots_cli_la_SOURCES = \
+	slots/ext-module.c \
+	slots/ext-module.h \
+	slots/ext-slot.c \
+	slots/ext-slot.h \
+	slots/ext-slots.c \
+	slots/ext-slots.h
+
+libwidgets_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libwidgets_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libwidgets_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libwidgets_cli_la_SOURCES = \
+	widgets/ext-module.c \
+	widgets/ext-module.h \
+	widgets/ext-script.c
+
+all: all-am
 
 .SUFFIXES:
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -275,82 +519,377 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+install-extLTLIBRARIES: $(ext_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(extdir)" || $(MKDIR_P) "$(DESTDIR)$(extdir)"
+	@list='$(ext_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(extLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) '$$p' '$(DESTDIR)$(extdir)/$$f'"; \
+	    $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(extLTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) "$$p" "$(DESTDIR)$(extdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-extLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(ext_LTLIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(extdir)/$$p'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(extdir)/$$p"; \
+	done
+
+clean-extLTLIBRARIES:
+	-test -z "$(ext_LTLIBRARIES)" || rm -f $(ext_LTLIBRARIES)
+	@list='$(ext_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libcamera-cli.la: $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_DEPENDENCIES) 
+	$(libcamera_cli_la_LINK) -rpath $(extdir) $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_LIBADD) $(LIBS)
+libchat-cli.la: $(libchat_cli_la_OBJECTS) $(libchat_cli_la_DEPENDENCIES) 
+	$(libchat_cli_la_LINK) -rpath $(extdir) $(libchat_cli_la_OBJECTS) $(libchat_cli_la_LIBADD) $(LIBS)
+libeditor-cli.la: $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_DEPENDENCIES) 
+	$(libeditor_cli_la_LINK) -rpath $(extdir) $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_LIBADD) $(LIBS)
+libevents-cli.la: $(libevents_cli_la_OBJECTS) $(libevents_cli_la_DEPENDENCIES) 
+	$(libevents_cli_la_LINK) -rpath $(extdir) $(libevents_cli_la_OBJECTS) $(libevents_cli_la_LIBADD) $(LIBS)
+libgenerator-cli.la: $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_DEPENDENCIES) 
+	$(libgenerator_cli_la_LINK) -rpath $(extdir) $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_LIBADD) $(LIBS)
+liboptions-cli.la: $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_DEPENDENCIES) 
+	$(liboptions_cli_la_LINK) -rpath $(extdir) $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_LIBADD) $(LIBS)
+libpackager-cli.la: $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_DEPENDENCIES) 
+	$(libpackager_cli_la_LINK) -rpath $(extdir) $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_LIBADD) $(LIBS)
+libreload-cli.la: $(libreload_cli_la_OBJECTS) $(libreload_cli_la_DEPENDENCIES) 
+	$(libreload_cli_la_LINK) -rpath $(extdir) $(libreload_cli_la_OBJECTS) $(libreload_cli_la_LIBADD) $(LIBS)
+libskills-cli.la: $(libskills_cli_la_OBJECTS) $(libskills_cli_la_DEPENDENCIES) 
+	$(libskills_cli_la_LINK) -rpath $(extdir) $(libskills_cli_la_OBJECTS) $(libskills_cli_la_LIBADD) $(LIBS)
+libslots-cli.la: $(libslots_cli_la_OBJECTS) $(libslots_cli_la_DEPENDENCIES) 
+	$(libslots_cli_la_LINK) -rpath $(extdir) $(libslots_cli_la_OBJECTS) $(libslots_cli_la_LIBADD) $(LIBS)
+libwidgets-cli.la: $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_DEPENDENCIES) 
+	$(libwidgets_cli_la_LINK) -rpath $(extdir) $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_LIBADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcamera_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcamera_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchat_cli_la-ext-history.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchat_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libchat_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-dialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-editor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libevents_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libevents_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-dialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-generator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-match.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-rule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboptions_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboptions_cli_la-ext-options.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboptions_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpackager_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpackager_cli_la-ext-packager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpackager_cli_la-ext-resources.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpackager_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libreload_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libreload_cli_la-ext-reload.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libreload_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libskills_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libskills_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libskills_cli_la-ext-skills.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libskills_cli_la-ext-widget.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libslots_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libslots_cli_la-ext-slot.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libslots_cli_la-ext-slots.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwidgets_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libwidgets_cli_la-ext-script.Plo@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+libcamera_cli_la-ext-module.lo: camera/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcamera_cli_la_CFLAGS) $(CFLAGS) -MT libcamera_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libcamera_cli_la-ext-module.Tpo -c -o libcamera_cli_la-ext-module.lo `test -f 'camera/ext-module.c' || echo '$(srcdir)/'`camera/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libcamera_cli_la-ext-module.Tpo $(DEPDIR)/libcamera_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='camera/ext-module.c' object='libcamera_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcamera_cli_la_CFLAGS) $(CFLAGS) -c -o libcamera_cli_la-ext-module.lo `test -f 'camera/ext-module.c' || echo '$(srcdir)/'`camera/ext-module.c
+
+libcamera_cli_la-ext-script.lo: camera/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcamera_cli_la_CFLAGS) $(CFLAGS) -MT libcamera_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libcamera_cli_la-ext-script.Tpo -c -o libcamera_cli_la-ext-script.lo `test -f 'camera/ext-script.c' || echo '$(srcdir)/'`camera/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libcamera_cli_la-ext-script.Tpo $(DEPDIR)/libcamera_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='camera/ext-script.c' object='libcamera_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcamera_cli_la_CFLAGS) $(CFLAGS) -c -o libcamera_cli_la-ext-script.lo `test -f 'camera/ext-script.c' || echo '$(srcdir)/'`camera/ext-script.c
+
+libchat_cli_la-ext-history.lo: chat/ext-history.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchat_cli_la_CFLAGS) $(CFLAGS) -MT libchat_cli_la-ext-history.lo -MD -MP -MF $(DEPDIR)/libchat_cli_la-ext-history.Tpo -c -o libchat_cli_la-ext-history.lo `test -f 'chat/ext-history.c' || echo '$(srcdir)/'`chat/ext-history.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libchat_cli_la-ext-history.Tpo $(DEPDIR)/libchat_cli_la-ext-history.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='chat/ext-history.c' object='libchat_cli_la-ext-history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchat_cli_la_CFLAGS) $(CFLAGS) -c -o libchat_cli_la-ext-history.lo `test -f 'chat/ext-history.c' || echo '$(srcdir)/'`chat/ext-history.c
+
+libchat_cli_la-ext-module.lo: chat/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchat_cli_la_CFLAGS) $(CFLAGS) -MT libchat_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libchat_cli_la-ext-module.Tpo -c -o libchat_cli_la-ext-module.lo `test -f 'chat/ext-module.c' || echo '$(srcdir)/'`chat/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libchat_cli_la-ext-module.Tpo $(DEPDIR)/libchat_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='chat/ext-module.c' object='libchat_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchat_cli_la_CFLAGS) $(CFLAGS) -c -o libchat_cli_la-ext-module.lo `test -f 'chat/ext-module.c' || echo '$(srcdir)/'`chat/ext-module.c
+
+libchat_cli_la-ext-script.lo: chat/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchat_cli_la_CFLAGS) $(CFLAGS) -MT libchat_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libchat_cli_la-ext-script.Tpo -c -o libchat_cli_la-ext-script.lo `test -f 'chat/ext-script.c' || echo '$(srcdir)/'`chat/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libchat_cli_la-ext-script.Tpo $(DEPDIR)/libchat_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='chat/ext-script.c' object='libchat_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libchat_cli_la_CFLAGS) $(CFLAGS) -c -o libchat_cli_la-ext-script.lo `test -f 'chat/ext-script.c' || echo '$(srcdir)/'`chat/ext-script.c
+
+libeditor_cli_la-ext-dialog.lo: editor/ext-dialog.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -MT libeditor_cli_la-ext-dialog.lo -MD -MP -MF $(DEPDIR)/libeditor_cli_la-ext-dialog.Tpo -c -o libeditor_cli_la-ext-dialog.lo `test -f 'editor/ext-dialog.c' || echo '$(srcdir)/'`editor/ext-dialog.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libeditor_cli_la-ext-dialog.Tpo $(DEPDIR)/libeditor_cli_la-ext-dialog.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor/ext-dialog.c' object='libeditor_cli_la-ext-dialog.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -c -o libeditor_cli_la-ext-dialog.lo `test -f 'editor/ext-dialog.c' || echo '$(srcdir)/'`editor/ext-dialog.c
+
+libeditor_cli_la-ext-editor.lo: editor/ext-editor.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -MT libeditor_cli_la-ext-editor.lo -MD -MP -MF $(DEPDIR)/libeditor_cli_la-ext-editor.Tpo -c -o libeditor_cli_la-ext-editor.lo `test -f 'editor/ext-editor.c' || echo '$(srcdir)/'`editor/ext-editor.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libeditor_cli_la-ext-editor.Tpo $(DEPDIR)/libeditor_cli_la-ext-editor.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor/ext-editor.c' object='libeditor_cli_la-ext-editor.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -c -o libeditor_cli_la-ext-editor.lo `test -f 'editor/ext-editor.c' || echo '$(srcdir)/'`editor/ext-editor.c
+
+libeditor_cli_la-ext-module.lo: editor/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -MT libeditor_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libeditor_cli_la-ext-module.Tpo -c -o libeditor_cli_la-ext-module.lo `test -f 'editor/ext-module.c' || echo '$(srcdir)/'`editor/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libeditor_cli_la-ext-module.Tpo $(DEPDIR)/libeditor_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor/ext-module.c' object='libeditor_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -c -o libeditor_cli_la-ext-module.lo `test -f 'editor/ext-module.c' || echo '$(srcdir)/'`editor/ext-module.c
+
+libeditor_cli_la-ext-script.lo: editor/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -MT libeditor_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libeditor_cli_la-ext-script.Tpo -c -o libeditor_cli_la-ext-script.lo `test -f 'editor/ext-script.c' || echo '$(srcdir)/'`editor/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libeditor_cli_la-ext-script.Tpo $(DEPDIR)/libeditor_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor/ext-script.c' object='libeditor_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -c -o libeditor_cli_la-ext-script.lo `test -f 'editor/ext-script.c' || echo '$(srcdir)/'`editor/ext-script.c
+
+libevents_cli_la-ext-module.lo: events/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libevents_cli_la_CFLAGS) $(CFLAGS) -MT libevents_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libevents_cli_la-ext-module.Tpo -c -o libevents_cli_la-ext-module.lo `test -f 'events/ext-module.c' || echo '$(srcdir)/'`events/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libevents_cli_la-ext-module.Tpo $(DEPDIR)/libevents_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='events/ext-module.c' object='libevents_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libevents_cli_la_CFLAGS) $(CFLAGS) -c -o libevents_cli_la-ext-module.lo `test -f 'events/ext-module.c' || echo '$(srcdir)/'`events/ext-module.c
+
+libevents_cli_la-ext-script.lo: events/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libevents_cli_la_CFLAGS) $(CFLAGS) -MT libevents_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libevents_cli_la-ext-script.Tpo -c -o libevents_cli_la-ext-script.lo `test -f 'events/ext-script.c' || echo '$(srcdir)/'`events/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libevents_cli_la-ext-script.Tpo $(DEPDIR)/libevents_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='events/ext-script.c' object='libevents_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libevents_cli_la_CFLAGS) $(CFLAGS) -c -o libevents_cli_la-ext-script.lo `test -f 'events/ext-script.c' || echo '$(srcdir)/'`events/ext-script.c
+
+libgenerator_cli_la-ext-dialog.lo: generator/ext-dialog.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-dialog.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-dialog.Tpo -c -o libgenerator_cli_la-ext-dialog.lo `test -f 'generator/ext-dialog.c' || echo '$(srcdir)/'`generator/ext-dialog.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-dialog.Tpo $(DEPDIR)/libgenerator_cli_la-ext-dialog.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-dialog.c' object='libgenerator_cli_la-ext-dialog.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-dialog.lo `test -f 'generator/ext-dialog.c' || echo '$(srcdir)/'`generator/ext-dialog.c
+
+libgenerator_cli_la-ext-generator.lo: generator/ext-generator.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-generator.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-generator.Tpo -c -o libgenerator_cli_la-ext-generator.lo `test -f 'generator/ext-generator.c' || echo '$(srcdir)/'`generator/ext-generator.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-generator.Tpo $(DEPDIR)/libgenerator_cli_la-ext-generator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-generator.c' object='libgenerator_cli_la-ext-generator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-generator.lo `test -f 'generator/ext-generator.c' || echo '$(srcdir)/'`generator/ext-generator.c
+
+libgenerator_cli_la-ext-match.lo: generator/ext-match.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-match.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-match.Tpo -c -o libgenerator_cli_la-ext-match.lo `test -f 'generator/ext-match.c' || echo '$(srcdir)/'`generator/ext-match.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-match.Tpo $(DEPDIR)/libgenerator_cli_la-ext-match.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-match.c' object='libgenerator_cli_la-ext-match.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-match.lo `test -f 'generator/ext-match.c' || echo '$(srcdir)/'`generator/ext-match.c
+
+libgenerator_cli_la-ext-module.lo: generator/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-module.Tpo -c -o libgenerator_cli_la-ext-module.lo `test -f 'generator/ext-module.c' || echo '$(srcdir)/'`generator/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-module.Tpo $(DEPDIR)/libgenerator_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-module.c' object='libgenerator_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-module.lo `test -f 'generator/ext-module.c' || echo '$(srcdir)/'`generator/ext-module.c
+
+libgenerator_cli_la-ext-rule.lo: generator/ext-rule.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-rule.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-rule.Tpo -c -o libgenerator_cli_la-ext-rule.lo `test -f 'generator/ext-rule.c' || echo '$(srcdir)/'`generator/ext-rule.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-rule.Tpo $(DEPDIR)/libgenerator_cli_la-ext-rule.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-rule.c' object='libgenerator_cli_la-ext-rule.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-rule.lo `test -f 'generator/ext-rule.c' || echo '$(srcdir)/'`generator/ext-rule.c
+
+libgenerator_cli_la-ext-script.lo: generator/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-script.Tpo -c -o libgenerator_cli_la-ext-script.lo `test -f 'generator/ext-script.c' || echo '$(srcdir)/'`generator/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-script.Tpo $(DEPDIR)/libgenerator_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-script.c' object='libgenerator_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-script.lo `test -f 'generator/ext-script.c' || echo '$(srcdir)/'`generator/ext-script.c
+
+liboptions_cli_la-ext-module.lo: options/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboptions_cli_la_CFLAGS) $(CFLAGS) -MT liboptions_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/liboptions_cli_la-ext-module.Tpo -c -o liboptions_cli_la-ext-module.lo `test -f 'options/ext-module.c' || echo '$(srcdir)/'`options/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liboptions_cli_la-ext-module.Tpo $(DEPDIR)/liboptions_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='options/ext-module.c' object='liboptions_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboptions_cli_la_CFLAGS) $(CFLAGS) -c -o liboptions_cli_la-ext-module.lo `test -f 'options/ext-module.c' || echo '$(srcdir)/'`options/ext-module.c
+
+liboptions_cli_la-ext-options.lo: options/ext-options.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboptions_cli_la_CFLAGS) $(CFLAGS) -MT liboptions_cli_la-ext-options.lo -MD -MP -MF $(DEPDIR)/liboptions_cli_la-ext-options.Tpo -c -o liboptions_cli_la-ext-options.lo `test -f 'options/ext-options.c' || echo '$(srcdir)/'`options/ext-options.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liboptions_cli_la-ext-options.Tpo $(DEPDIR)/liboptions_cli_la-ext-options.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='options/ext-options.c' object='liboptions_cli_la-ext-options.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboptions_cli_la_CFLAGS) $(CFLAGS) -c -o liboptions_cli_la-ext-options.lo `test -f 'options/ext-options.c' || echo '$(srcdir)/'`options/ext-options.c
+
+liboptions_cli_la-ext-script.lo: options/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboptions_cli_la_CFLAGS) $(CFLAGS) -MT liboptions_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/liboptions_cli_la-ext-script.Tpo -c -o liboptions_cli_la-ext-script.lo `test -f 'options/ext-script.c' || echo '$(srcdir)/'`options/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liboptions_cli_la-ext-script.Tpo $(DEPDIR)/liboptions_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='options/ext-script.c' object='liboptions_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liboptions_cli_la_CFLAGS) $(CFLAGS) -c -o liboptions_cli_la-ext-script.lo `test -f 'options/ext-script.c' || echo '$(srcdir)/'`options/ext-script.c
+
+libpackager_cli_la-ext-module.lo: packager/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -MT libpackager_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libpackager_cli_la-ext-module.Tpo -c -o libpackager_cli_la-ext-module.lo `test -f 'packager/ext-module.c' || echo '$(srcdir)/'`packager/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpackager_cli_la-ext-module.Tpo $(DEPDIR)/libpackager_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='packager/ext-module.c' object='libpackager_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -c -o libpackager_cli_la-ext-module.lo `test -f 'packager/ext-module.c' || echo '$(srcdir)/'`packager/ext-module.c
+
+libpackager_cli_la-ext-packager.lo: packager/ext-packager.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -MT libpackager_cli_la-ext-packager.lo -MD -MP -MF $(DEPDIR)/libpackager_cli_la-ext-packager.Tpo -c -o libpackager_cli_la-ext-packager.lo `test -f 'packager/ext-packager.c' || echo '$(srcdir)/'`packager/ext-packager.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpackager_cli_la-ext-packager.Tpo $(DEPDIR)/libpackager_cli_la-ext-packager.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='packager/ext-packager.c' object='libpackager_cli_la-ext-packager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -c -o libpackager_cli_la-ext-packager.lo `test -f 'packager/ext-packager.c' || echo '$(srcdir)/'`packager/ext-packager.c
+
+libpackager_cli_la-ext-resources.lo: packager/ext-resources.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -MT libpackager_cli_la-ext-resources.lo -MD -MP -MF $(DEPDIR)/libpackager_cli_la-ext-resources.Tpo -c -o libpackager_cli_la-ext-resources.lo `test -f 'packager/ext-resources.c' || echo '$(srcdir)/'`packager/ext-resources.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpackager_cli_la-ext-resources.Tpo $(DEPDIR)/libpackager_cli_la-ext-resources.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='packager/ext-resources.c' object='libpackager_cli_la-ext-resources.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -c -o libpackager_cli_la-ext-resources.lo `test -f 'packager/ext-resources.c' || echo '$(srcdir)/'`packager/ext-resources.c
+
+libpackager_cli_la-ext-script.lo: packager/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -MT libpackager_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libpackager_cli_la-ext-script.Tpo -c -o libpackager_cli_la-ext-script.lo `test -f 'packager/ext-script.c' || echo '$(srcdir)/'`packager/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libpackager_cli_la-ext-script.Tpo $(DEPDIR)/libpackager_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='packager/ext-script.c' object='libpackager_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libpackager_cli_la_CFLAGS) $(CFLAGS) -c -o libpackager_cli_la-ext-script.lo `test -f 'packager/ext-script.c' || echo '$(srcdir)/'`packager/ext-script.c
+
+libreload_cli_la-ext-module.lo: reload/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libreload_cli_la_CFLAGS) $(CFLAGS) -MT libreload_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libreload_cli_la-ext-module.Tpo -c -o libreload_cli_la-ext-module.lo `test -f 'reload/ext-module.c' || echo '$(srcdir)/'`reload/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libreload_cli_la-ext-module.Tpo $(DEPDIR)/libreload_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/ext-module.c' object='libreload_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libreload_cli_la_CFLAGS) $(CFLAGS) -c -o libreload_cli_la-ext-module.lo `test -f 'reload/ext-module.c' || echo '$(srcdir)/'`reload/ext-module.c
+
+libreload_cli_la-ext-reload.lo: reload/ext-reload.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libreload_cli_la_CFLAGS) $(CFLAGS) -MT libreload_cli_la-ext-reload.lo -MD -MP -MF $(DEPDIR)/libreload_cli_la-ext-reload.Tpo -c -o libreload_cli_la-ext-reload.lo `test -f 'reload/ext-reload.c' || echo '$(srcdir)/'`reload/ext-reload.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libreload_cli_la-ext-reload.Tpo $(DEPDIR)/libreload_cli_la-ext-reload.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/ext-reload.c' object='libreload_cli_la-ext-reload.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libreload_cli_la_CFLAGS) $(CFLAGS) -c -o libreload_cli_la-ext-reload.lo `test -f 'reload/ext-reload.c' || echo '$(srcdir)/'`reload/ext-reload.c
+
+libreload_cli_la-ext-script.lo: reload/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libreload_cli_la_CFLAGS) $(CFLAGS) -MT libreload_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libreload_cli_la-ext-script.Tpo -c -o libreload_cli_la-ext-script.lo `test -f 'reload/ext-script.c' || echo '$(srcdir)/'`reload/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libreload_cli_la-ext-script.Tpo $(DEPDIR)/libreload_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/ext-script.c' object='libreload_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libreload_cli_la_CFLAGS) $(CFLAGS) -c -o libreload_cli_la-ext-script.lo `test -f 'reload/ext-script.c' || echo '$(srcdir)/'`reload/ext-script.c
+
+libskills_cli_la-ext-module.lo: skills/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -MT libskills_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libskills_cli_la-ext-module.Tpo -c -o libskills_cli_la-ext-module.lo `test -f 'skills/ext-module.c' || echo '$(srcdir)/'`skills/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libskills_cli_la-ext-module.Tpo $(DEPDIR)/libskills_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='skills/ext-module.c' object='libskills_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -c -o libskills_cli_la-ext-module.lo `test -f 'skills/ext-module.c' || echo '$(srcdir)/'`skills/ext-module.c
+
+libskills_cli_la-ext-script.lo: skills/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -MT libskills_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libskills_cli_la-ext-script.Tpo -c -o libskills_cli_la-ext-script.lo `test -f 'skills/ext-script.c' || echo '$(srcdir)/'`skills/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libskills_cli_la-ext-script.Tpo $(DEPDIR)/libskills_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='skills/ext-script.c' object='libskills_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -c -o libskills_cli_la-ext-script.lo `test -f 'skills/ext-script.c' || echo '$(srcdir)/'`skills/ext-script.c
+
+libskills_cli_la-ext-skills.lo: skills/ext-skills.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -MT libskills_cli_la-ext-skills.lo -MD -MP -MF $(DEPDIR)/libskills_cli_la-ext-skills.Tpo -c -o libskills_cli_la-ext-skills.lo `test -f 'skills/ext-skills.c' || echo '$(srcdir)/'`skills/ext-skills.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libskills_cli_la-ext-skills.Tpo $(DEPDIR)/libskills_cli_la-ext-skills.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='skills/ext-skills.c' object='libskills_cli_la-ext-skills.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -c -o libskills_cli_la-ext-skills.lo `test -f 'skills/ext-skills.c' || echo '$(srcdir)/'`skills/ext-skills.c
+
+libskills_cli_la-ext-widget.lo: skills/ext-widget.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -MT libskills_cli_la-ext-widget.lo -MD -MP -MF $(DEPDIR)/libskills_cli_la-ext-widget.Tpo -c -o libskills_cli_la-ext-widget.lo `test -f 'skills/ext-widget.c' || echo '$(srcdir)/'`skills/ext-widget.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libskills_cli_la-ext-widget.Tpo $(DEPDIR)/libskills_cli_la-ext-widget.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='skills/ext-widget.c' object='libskills_cli_la-ext-widget.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libskills_cli_la_CFLAGS) $(CFLAGS) -c -o libskills_cli_la-ext-widget.lo `test -f 'skills/ext-widget.c' || echo '$(srcdir)/'`skills/ext-widget.c
+
+libslots_cli_la-ext-module.lo: slots/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslots_cli_la_CFLAGS) $(CFLAGS) -MT libslots_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libslots_cli_la-ext-module.Tpo -c -o libslots_cli_la-ext-module.lo `test -f 'slots/ext-module.c' || echo '$(srcdir)/'`slots/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libslots_cli_la-ext-module.Tpo $(DEPDIR)/libslots_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='slots/ext-module.c' object='libslots_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslots_cli_la_CFLAGS) $(CFLAGS) -c -o libslots_cli_la-ext-module.lo `test -f 'slots/ext-module.c' || echo '$(srcdir)/'`slots/ext-module.c
+
+libslots_cli_la-ext-slot.lo: slots/ext-slot.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslots_cli_la_CFLAGS) $(CFLAGS) -MT libslots_cli_la-ext-slot.lo -MD -MP -MF $(DEPDIR)/libslots_cli_la-ext-slot.Tpo -c -o libslots_cli_la-ext-slot.lo `test -f 'slots/ext-slot.c' || echo '$(srcdir)/'`slots/ext-slot.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libslots_cli_la-ext-slot.Tpo $(DEPDIR)/libslots_cli_la-ext-slot.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='slots/ext-slot.c' object='libslots_cli_la-ext-slot.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslots_cli_la_CFLAGS) $(CFLAGS) -c -o libslots_cli_la-ext-slot.lo `test -f 'slots/ext-slot.c' || echo '$(srcdir)/'`slots/ext-slot.c
+
+libslots_cli_la-ext-slots.lo: slots/ext-slots.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslots_cli_la_CFLAGS) $(CFLAGS) -MT libslots_cli_la-ext-slots.lo -MD -MP -MF $(DEPDIR)/libslots_cli_la-ext-slots.Tpo -c -o libslots_cli_la-ext-slots.lo `test -f 'slots/ext-slots.c' || echo '$(srcdir)/'`slots/ext-slots.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libslots_cli_la-ext-slots.Tpo $(DEPDIR)/libslots_cli_la-ext-slots.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='slots/ext-slots.c' object='libslots_cli_la-ext-slots.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslots_cli_la_CFLAGS) $(CFLAGS) -c -o libslots_cli_la-ext-slots.lo `test -f 'slots/ext-slots.c' || echo '$(srcdir)/'`slots/ext-slots.c
+
+libwidgets_cli_la-ext-module.lo: widgets/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libwidgets_cli_la_CFLAGS) $(CFLAGS) -MT libwidgets_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libwidgets_cli_la-ext-module.Tpo -c -o libwidgets_cli_la-ext-module.lo `test -f 'widgets/ext-module.c' || echo '$(srcdir)/'`widgets/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libwidgets_cli_la-ext-module.Tpo $(DEPDIR)/libwidgets_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widgets/ext-module.c' object='libwidgets_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libwidgets_cli_la_CFLAGS) $(CFLAGS) -c -o libwidgets_cli_la-ext-module.lo `test -f 'widgets/ext-module.c' || echo '$(srcdir)/'`widgets/ext-module.c
+
+libwidgets_cli_la-ext-script.lo: widgets/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libwidgets_cli_la_CFLAGS) $(CFLAGS) -MT libwidgets_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libwidgets_cli_la-ext-script.Tpo -c -o libwidgets_cli_la-ext-script.lo `test -f 'widgets/ext-script.c' || echo '$(srcdir)/'`widgets/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libwidgets_cli_la-ext-script.Tpo $(DEPDIR)/libwidgets_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widgets/ext-script.c' object='libwidgets_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libwidgets_cli_la_CFLAGS) $(CFLAGS) -c -o libwidgets_cli_la-ext-script.lo `test -f 'widgets/ext-script.c' || echo '$(srcdir)/'`widgets/ext-script.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run `make' without going through this Makefile.
-# To change the values of `make' variables: instead of editing Makefiles,
-# (1) if the variable is set in `config.status', edit `config.status'
-#     (which will cause the Makefiles to be regenerated when you run `make');
-# (2) otherwise, pass the desired values on the `make' command line.
-$(RECURSIVE_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
-$(RECURSIVE_CLEAN_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	rev=''; for subdir in $$list; do \
-	  if test "$$subdir" = "."; then :; else \
-	    rev="$$subdir $$rev"; \
-	  fi; \
-	done; \
-	rev="$$rev ."; \
-	target=`echo $@ | sed s/-recursive//`; \
-	for subdir in $$rev; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done && test -z "$$fail"
-tags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
-	done
-ctags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
-	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -362,23 +901,10 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -391,7 +917,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
@@ -438,37 +964,22 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d "$(distdir)/$$subdir" \
-	    || $(MKDIR_P) "$(distdir)/$$subdir" \
-	    || exit 1; \
-	    distdir=`$(am__cd) $(distdir) && pwd`; \
-	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
-	    (cd $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$top_distdir" \
-	        distdir="$$distdir/$$subdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-check: check-recursive
-all-am: Makefile
-installdirs: installdirs-recursive
-installdirs-am:
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+check: check-am
+all-am: Makefile $(LTLIBRARIES)
+installdirs:
+	for dir in "$(DESTDIR)$(extdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -484,76 +995,81 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+clean: clean-am
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-extLTLIBRARIES clean-generic clean-libtool \
+	mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
-info: info-recursive
+info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-extLTLIBRARIES
 
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-exec-am:
 
-install-html: install-html-recursive
+install-html: install-html-am
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-extLTLIBRARIES
 
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) install-am \
-	install-strip
+.MAKE: install-am install-strip
 
-.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am check check-am clean clean-generic clean-libtool \
-	ctags ctags-recursive distclean distclean-generic \
+.PHONY: CTAGS GTAGS all all-am check check-am clean \
+	clean-extLTLIBRARIES clean-generic clean-libtool ctags \
+	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am
+	install-exec-am install-extLTLIBRARIES install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-extLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

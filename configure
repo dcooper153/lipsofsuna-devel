@@ -20663,7 +20663,7 @@ LICLI_LIBS="\
 
 
 
-ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/client/camera/Makefile ext/client/chat/Makefile ext/client/editor/Makefile ext/client/events/Makefile ext/client/generator/Makefile ext/client/options/Makefile ext/client/packager/Makefile ext/client/reload/Makefile ext/client/skills/Makefile ext/client/slots/Makefile ext/client/widgets/Makefile ext/server/Makefile ext/server/creature/Makefile ext/server/editor/Makefile ext/server/events/Makefile ext/server/generator/Makefile ext/server/inventory/Makefile ext/server/npc/Makefile ext/server/skeleton/Makefile ext/server/skills/Makefile ext/server/slots/Makefile ext/server/spawner/Makefile ext/server/voxel/Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/server/Makefile src/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -21679,29 +21679,7 @@ do
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "ext/Makefile") CONFIG_FILES="$CONFIG_FILES ext/Makefile" ;;
     "ext/client/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/Makefile" ;;
-    "ext/client/camera/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/camera/Makefile" ;;
-    "ext/client/chat/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/chat/Makefile" ;;
-    "ext/client/editor/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/editor/Makefile" ;;
-    "ext/client/events/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/events/Makefile" ;;
-    "ext/client/generator/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/generator/Makefile" ;;
-    "ext/client/options/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/options/Makefile" ;;
-    "ext/client/packager/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/packager/Makefile" ;;
-    "ext/client/reload/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/reload/Makefile" ;;
-    "ext/client/skills/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/skills/Makefile" ;;
-    "ext/client/slots/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/slots/Makefile" ;;
-    "ext/client/widgets/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/widgets/Makefile" ;;
     "ext/server/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/Makefile" ;;
-    "ext/server/creature/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/creature/Makefile" ;;
-    "ext/server/editor/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/editor/Makefile" ;;
-    "ext/server/events/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/events/Makefile" ;;
-    "ext/server/generator/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/generator/Makefile" ;;
-    "ext/server/inventory/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/inventory/Makefile" ;;
-    "ext/server/npc/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/npc/Makefile" ;;
-    "ext/server/skeleton/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/skeleton/Makefile" ;;
-    "ext/server/skills/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/skills/Makefile" ;;
-    "ext/server/slots/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/slots/Makefile" ;;
-    "ext/server/spawner/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/spawner/Makefile" ;;
-    "ext/server/voxel/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/voxel/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
