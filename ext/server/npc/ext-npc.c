@@ -31,6 +31,9 @@ static int
 private_tick (liextNpc* self,
               float     secs);
 
+static void
+private_attack (liextNpc* self);
+
 static liengObject*
 private_rescan (liextNpc* self);
 
@@ -212,7 +215,43 @@ private_tick (liextNpc* self,
 	lieng_object_get_transform (self->target, &transform);
 	lieng_object_approach (object, &transform.position, 1.0f);
 
+	/* Attack if near enough. */
+	if (lieng_object_get_distance (object, self->target) <= 3.0)
+		private_attack (self);
+
 	return 1;
+}
+
+static void
+private_attack (liextNpc* self)
+{
+	liscrScript* script = self->server->script;
+
+	/* Check for spawn function. */
+	lua_getfield (script->lua, LUA_GLOBALSINDEX, "Npc");
+	if (lua_type (script->lua, -1) != LUA_TTABLE)
+	{
+		lua_pop (script->lua, 1);
+		return;
+	}
+	lua_getfield (script->lua, -1, "attack_cb");
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+	{
+		lua_pop (script->lua, 2);
+		return;
+	}
+	lua_remove (script->lua, -2);
+
+	/* Call the spawn function. */
+	liscr_pushdata (script->lua, self->data);
+	liscr_pushdata (script->lua, self->object->script);
+	liscr_pushdata (script->lua, self->target->script);
+	if (lua_pcall (script->lua, 3, 0, 0) != 0)
+	{
+		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+		lisys_error_report ();
+		lua_pop (script->lua, 1);
+	}
 }
 
 static liengObject*

@@ -128,6 +128,16 @@ Npc_setter_alert (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Called when the controlled object is near the target.
+ * --
+ * -- Arguments passed to the callback: npc, object, target.
+ * --
+ * -- @name Npc.attack_cb
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
  * -- Controlled object.
  * -- @name Npc.object
  * -- @class table
