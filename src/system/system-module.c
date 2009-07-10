@@ -108,7 +108,7 @@ lisys_module_new (const char* path,
 	self->handle = LoadLibraryA (path);
 	if (self->handle == 0)
 	{
-		lisys_error_set (EIO, NULL);
+		lisys_error_set (EIO, "error code %d", GetLastError ());
 		free (self);
 		return NULL;
 	}

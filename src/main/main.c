@@ -174,6 +174,7 @@ client_main (const char* name)
 	module = private_open_program ("lipsofsunaclient");
 	if (module == NULL)
 	{
+		lisys_error_append ("cannot load client program");
 		lisys_error_report ();
 		return 1;
 	}
@@ -224,6 +225,7 @@ generator_main (const char* name)
 	module = private_open_program ("lipsofsunagenerator");
 	if (module == NULL)
 	{
+		lisys_error_append ("cannot load generator program");
 		lisys_error_report ();
 		return 1;
 	}
@@ -274,6 +276,7 @@ server_main (const char* name)
 	module = private_open_program ("lipsofsunaserver");
 	if (module == NULL)
 	{
+		lisys_error_append ("cannot load server program");
 		lisys_error_report ();
 		return 1;
 	}
@@ -325,6 +328,7 @@ viewer_main (const char* name,
 	module = private_open_program ("lipsofsunaviewer");
 	if (module == NULL)
 	{
+		lisys_error_append ("cannot load viewer program");
 		lisys_error_report ();
 		return 1;
 	}

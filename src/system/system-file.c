@@ -54,7 +54,8 @@ struct _lisysMmap
 #elif defined HAVE_WINDOWS_H
 	int size;
 	void* buffer;
-	HANDLE* handle;
+	HANDLE file;
+	HANDLE handle;
 #else
 #error "Mmap not supported"
 #endif
@@ -130,10 +131,21 @@ lisys_mmap_open (const char* path)
 	}
 
 	/* Open the file. */
-	self->handle = OpenFileMappingA (FILE_MAP_READ, FALSE, path);
-	if (self->handle == NULL)
+	self->file = CreateFile (path, GENERIC_READ, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	if (self->file == NULL)
 	{
 		lisys_error_set (EIO, "cannot open `%s'", path);
+		free (self);
+		return NULL;
+	}
+
+	/* Create file mapping. */
+	self->handle = CreateFileMapping (self->file, NULL, PAGE_READONLY, 0, 0, NULL);
+	if (self->handle == NULL)
+	{
+		lisys_error_set (EIO, "cannot create mapping for `%s'", path);
+		CloseHandle (self->file);
 		free (self);
 		return NULL;
 	}
@@ -142,19 +154,26 @@ lisys_mmap_open (const char* path)
 	{
 		lisys_error_set (EIO, "cannot get size of `%s'", path);
 		CloseHandle (self->handle);
+		CloseHandle (self->file);
 		free (self);
 		return NULL;
 	}
 
 	/* Memory map the file. */
-	self->buffer = MapViewOfFile (self->handle, FILE_MAP_ALL_ACCESS, 0, 0, self->size);
-	if (self->buffer == NULL)
+	if (self->size)
 	{
-		lisys_error_set (EIO, "cannot map `%s'", path);
-		CloseHandle (self->handle);
-		free (self);
-		return NULL;
+		self->buffer = MapViewOfFile (self->handle, FILE_MAP_READ, 0, 0, self->size);
+		if (self->buffer == NULL)
+		{
+			lisys_error_set (EIO, "cannot map `%s'", path);
+			CloseHandle (self->handle);
+			CloseHandle (self->file);
+			free (self);
+			return NULL;
+		}
 	}
+	else
+		self->buffer = NULL;
 
 	return self;
 
@@ -177,8 +196,10 @@ lisys_mmap_free (lisysMmap* self)
 		munmap ((void*) self->buffer, self->size);
 	free (self);
 #elif defined HAVE_WINDOWS_H
-	UnmapViewOfFile ((void*) self->buffer);
+	if (self->buffer != NULL)
+		UnmapViewOfFile ((void*) self->buffer);
 	CloseHandle (self->handle);
+	CloseHandle (self->file);
 #else
 #error "Mmap not supported"
 	return NULL;

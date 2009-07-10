@@ -176,7 +176,7 @@ lisys_relative_exename ()
 			*tmp = '/';
 	}
 
-	return tmp;
+	return path;
 #else
 #warning "Not supported."
 	return NULL;

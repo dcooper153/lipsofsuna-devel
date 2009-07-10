@@ -412,8 +412,8 @@ liblipsofsunaclient_la_SOURCES = \
 liblipsofsunagenerator_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
 liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunagenerator_la_SOURCES = \
-	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(physrc) $(pthsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(voxsrc)
+	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(mdlsrc) $(physrc) $(pthsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
 liblipsofsunaserver_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)

@@ -139,8 +139,9 @@ liblipsofsunaclient_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 liblipsofsunagenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_liblipsofsunagenerator_la_OBJECTS = $(am__objects_2) \
 	$(am__objects_3) $(am__objects_10) $(am__objects_12) \
-	$(am__objects_15) $(am__objects_16) $(am__objects_22) \
-	$(am__objects_23) $(am__objects_24) $(am__objects_26)
+	$(am__objects_13) $(am__objects_15) $(am__objects_16) \
+	$(am__objects_22) $(am__objects_23) $(am__objects_24) \
+	$(am__objects_26)
 liblipsofsunagenerator_la_OBJECTS =  \
 	$(am_liblipsofsunagenerator_la_OBJECTS)
 liblipsofsunagenerator_la_LINK = $(LIBTOOL) --tag=CXX \
@@ -835,8 +836,8 @@ liblipsofsunaclient_la_SOURCES = \
 liblipsofsunagenerator_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
 liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunagenerator_la_SOURCES = \
-	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(physrc) $(pthsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(voxsrc)
+	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(mdlsrc) $(physrc) $(pthsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
 liblipsofsunaserver_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
