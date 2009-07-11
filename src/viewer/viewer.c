@@ -41,6 +41,7 @@ private_init_model (livieViewer* self,
 
 static int
 private_init_paths (livieViewer* self,
+                    const char*  path,
                     const char*  name);
 
 static int
@@ -58,19 +59,13 @@ private_resize (livieViewer* self,
 /*****************************************************************************/
 
 livieViewer*
-livie_viewer_new (const char* name,
+livie_viewer_new (lividCalls* video,
+                  const char* path,
+                  const char* name,
                   const char* model)
 {
 	char buf[256];
 	livieViewer* self;
-
-	/* Initialize SDL. */
-	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
-	{
-		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		lisys_error_report ();
-		return NULL;
-	}
 
 	/* Allocate self. */
 	self = calloc (1, sizeof (livieViewer));
@@ -80,10 +75,20 @@ livie_viewer_new (const char* name,
 		lisys_error_report ();
 		return NULL;
 	}
+	self->video = *video;
+
+	/* Initialize SDL. */
+	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
+	{
+		lisys_error_set (ENOTSUP, "initializing SDL failed");
+		lisys_error_report ();
+		free (self);
+		return NULL;
+	}
 
 	/* Initialize subsystems. */
 	if (!private_init_video (self) ||
-	    !private_init_paths (self, name) ||
+	    !private_init_paths (self, path, name) ||
 	    !private_init_engine (self, name) ||
 		!private_init_reload (self) ||
 	    !private_init_camera (self) ||
@@ -94,7 +99,7 @@ livie_viewer_new (const char* name,
 		return NULL;
 	}
 	snprintf (buf, 256, "%s - Lips of Suna Model Viewer", model);
-	SDL_WM_SetCaption (buf, buf);
+	self->video.SDL_WM_SetCaption (buf, buf);
 
 	return self;
 }
@@ -118,11 +123,11 @@ livie_viewer_free (livieViewer* self)
 		lieng_camera_free (self->camera);
 	if (self->engine != NULL)
 		lieng_engine_free (self->engine);
+	if (self->paths != NULL)
+		lipth_paths_free (self->paths);
 	if (self->screen != NULL)
-		SDL_FreeSurface (self->screen);
-	SDL_Quit ();
-	free (self->path);
-	free (self->datadir);
+		self->video.SDL_FreeSurface (self->screen);
+	self->video.SDL_Quit ();
 	free (self);
 }
 
@@ -149,7 +154,7 @@ livie_viewer_main (livieViewer* self)
 		prev_tick = curr_tick;
 
 		/* Handle events. */
-		while (SDL_PollEvent (&event))
+		while (self->video.SDL_PollEvent (&event))
 		{
 			switch (event.type)
 			{
@@ -210,8 +215,8 @@ livie_viewer_main (livieViewer* self)
 		lieng_camera_get_modelview (self->camera, &modelview);
 		lieng_camera_get_projection (self->camera, &projection);
 		lirnd_scene_render (self->engine->scene, &modelview, &projection, &frustum);
-		SDL_GL_SwapBuffers ();
-		SDL_Delay (100);
+		self->video.SDL_GL_SwapBuffers ();
+		self->video.SDL_Delay (100);
 	}
 
 	return 1;
@@ -246,7 +251,7 @@ private_init_engine (livieViewer* self,
 	const float diffuse1[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	/* Allocate engine. */
-	self->engine = lieng_engine_new (self->datadir, self->path, 1);
+	self->engine = lieng_engine_new (self->paths->module_data, &lirnd_render_api);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);
@@ -293,23 +298,11 @@ private_init_model (livieViewer* self,
 
 static int
 private_init_paths (livieViewer* self,
+                    const char*  path,
                     const char*  name)
 {
-	/* Get data directory. */
-#ifdef LI_RELATIVE_PATHS
-	self->datadir = lisys_relative_exedir (NULL);
-#else
-	self->datadir = strdup (LIDATADIR);
-#endif
-	if (self->datadir == NULL)
-		return 0;
-
-	/* Get module directory. */
-	if (!strcmp (name, "data"))
-		self->path = lisys_path_concat (self->datadir, name, NULL);
-	else
-		self->path = lisys_path_concat (self->datadir, "mods", name, NULL);
-	if (self->path == NULL)
+	self->paths = lipth_paths_new (path, name);
+	if (self->paths == NULL)
 		return 0;
 
 	return 1;
@@ -318,7 +311,7 @@ private_init_paths (livieViewer* self,
 static int
 private_init_reload (livieViewer* self)
 {
-	self->reload = lirel_reload_new (self->engine);
+	self->reload = lirel_reload_new (self->engine, &self->video, self->paths->root);
 	if (self->reload == NULL)
 		return 0;
 	lirel_reload_set_enabled (self->reload, 1);
@@ -353,11 +346,11 @@ private_resize (livieViewer* self,
 	{
 		for (depth = 32 ; depth ; depth -= 8)
 		{
-			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
-			SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
-			SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
+			self->video.SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
+			self->video.SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+			self->video.SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+			self->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
+			self->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
 			self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
 			if (self->screen != NULL)
 				break;

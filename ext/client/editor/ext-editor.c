@@ -421,7 +421,7 @@ private_key_press (liextEditor*       self,
 	switch (event->keysym.sym)
 	{
 		case 'x':
-			SDL_GetMouseState (&x, &y);
+			self->module->client->video.SDL_GetMouseState (&x, &y);
 			if (self->drag.mode >= LIEXT_DRAG_ROTATE && self->drag.mode <= LIEXT_DRAG_ROTATEZ)
 				self->drag.mode = LIEXT_DRAG_ROTATEX;
 			else
@@ -429,7 +429,7 @@ private_key_press (liextEditor*       self,
 			self->drag.start = limat_vector_init (x, y, 0.0f);
 			break;
 		case 'y':
-			SDL_GetMouseState (&x, &y);
+			self->module->client->video.SDL_GetMouseState (&x, &y);
 			if (self->drag.mode >= LIEXT_DRAG_ROTATE && self->drag.mode <= LIEXT_DRAG_ROTATEZ)
 				self->drag.mode = LIEXT_DRAG_ROTATEY;
 			else
@@ -437,7 +437,7 @@ private_key_press (liextEditor*       self,
 			self->drag.start = limat_vector_init (x, y, 0.0f);
 			break;
 		case 'z':
-			SDL_GetMouseState (&x, &y);
+			self->module->client->video.SDL_GetMouseState (&x, &y);
 			if (self->drag.mode >= LIEXT_DRAG_ROTATE && self->drag.mode <= LIEXT_DRAG_ROTATEZ)
 				self->drag.mode = LIEXT_DRAG_ROTATEZ;
 			else

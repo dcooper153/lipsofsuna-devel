@@ -34,6 +34,9 @@
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
 #include "system-error.h"
 #include "system-execute.h"
 
@@ -164,39 +167,44 @@ private_execvp_redir (lisysExecFilter    filter,
 
 	return 1;
 
-#elif defined HAVE_CREATEPROCESS
+#elif defined _WIN32
 
 	int l;
 	int len = 0;
 	char* tmp;
 	char* cmd = NULL;
-	const char** arg;
+	const char* const* arg;
 	STARTUPINFO startup_info;
 	PROCESS_INFORMATION process_info;
 
 	/* Format command. */
 	/* FIXME: Spaces in arguments will break. */
-	for (arg = args ; arg != NULL ; arg++)
+	for (arg = args ; *arg != NULL ; arg++)
 	{
-		l = strlen (arg);
-		tmp = realloc (cmd, len + l + 1);
+		if (arg == args)
+			continue;
+		l = strlen (*arg);
+		tmp = realloc (cmd, len + l + 2);
 		if (tmp == NULL)
 		{
+			lisys_error_set (ENOMEM, NULL);
 			free (cmd);
 			return 0;
 		}
-		cmd = arg;
-		strncpy (tmp + l, arg, l);
-		len += l;
+		cmd = tmp;
+		cmd[len] = ' ';
+		strncpy (cmd + len + 1, *arg, l);
+		len += l + 1;
+		cmd[len] = '\0';
 	}
 
 	/* Prepare process info. */
-	memset (&startup_info, sizeof (startup_info);
-	memset (&process_info, sizeof (process_info);
+	memset (&startup_info, 0, sizeof (startup_info));
+	memset (&process_info, 0, sizeof (process_info));
 	startup_info.cb = sizeof (startup_info);
-	if (redir != NULL)
+	if (filter != NULL)
 	{
-		startup_info.dwflags = STARTF_USESTDHANDLES;
+	//	startup_info.dwFlags = STARTF_USESTDHANDLES;
 		//startup_info.hStdOutput = CreatePipe (PHANDLE,PHANDLE,LPSECURITY_ATTRIBUTES,DWORD);
 	}
 

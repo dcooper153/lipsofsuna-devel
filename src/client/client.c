@@ -27,24 +27,17 @@
 #include <time.h>
 #include <assert.h>
 #include "client.h"
-#include "client-paths.h"
 #include "client-window.h"
 
 licliClient*
-licli_client_new (const char* name)
+licli_client_new (lividCalls* video,
+                  const char* path,
+                  const char* name)
 {
 	licliClient* self;
 	/* FIXME: Login name and password not supported. */
 	const char* login = "none";
 	const char* password = "none";
-
-	/* Initialize SDL. */
-	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
-	{
-		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		lisys_error_report ();
-		return NULL;
-	}
 
 	/* Allocate self. */
 	self = calloc (1, sizeof (licliClient));
@@ -52,6 +45,16 @@ licli_client_new (const char* name)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		lisys_error_report ();
+		return NULL;
+	}
+	self->video = *video;
+
+	/* Initialize SDL. */
+	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
+	{
+		lisys_error_set (ENOTSUP, "initializing SDL failed");
+		lisys_error_report ();
+		free (self);
 		return NULL;
 	}
 
@@ -63,8 +66,8 @@ licli_client_new (const char* name)
 #endif
 
 	/* Create window. */
-	SDL_EnableUNICODE (1);
-	self->window = licli_window_new ();
+	self->video.SDL_EnableUNICODE (1);
+	self->window = licli_window_new (self);
 	if (self->window == NULL)
 	{
 		licli_client_free (self);
@@ -73,7 +76,7 @@ licli_client_new (const char* name)
 	}
 
 	/* Load module. */
-	self->module = licli_module_new (self, name, login, password);
+	self->module = licli_module_new (self, path, name, login, password);
 	if (self->module == NULL)
 	{
 		licli_client_free (self);
@@ -95,7 +98,7 @@ licli_client_free (licliClient* self)
 	if (self->sound != NULL)
 		lisnd_system_free (self->sound);
 #endif
-	SDL_Quit ();
+	self->video.SDL_Quit ();
 	free (self);
 }
 

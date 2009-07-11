@@ -43,7 +43,7 @@ private_resize (licliWindow* self,
 /****************************************************************************/
 
 licliWindow*
-licli_window_new (licliModule* module)
+licli_window_new (licliClient* client)
 {
 	licliWindow* self;
 
@@ -51,6 +51,7 @@ licli_window_new (licliModule* module)
 	self = calloc (1, sizeof (licliWindow));
 	if (self == NULL)
 		return NULL;
+	self->client = client;
 
 	/* Initialize subsystems. */
 	if (!private_init_input (self) ||
@@ -67,11 +68,11 @@ void
 licli_window_free (licliWindow* self)
 {
 	if (self->joystick != NULL)
-		SDL_JoystickClose (self->joystick);
+		self->client->video.SDL_JoystickClose (self->joystick);
 	if (self->screen != NULL)
-		SDL_FreeSurface (self->screen);
-	if (TTF_WasInit ())
-		TTF_Quit ();
+		self->client->video.SDL_FreeSurface (self->screen);
+	if (self->client->video.TTF_WasInit ())
+		self->client->video.TTF_Quit ();
 	free (self);
 }
 
@@ -108,8 +109,8 @@ licli_window_set_size (licliWindow* self,
 static int
 private_init_input (licliWindow* self)
 {
-	self->joystick = SDL_JoystickOpen (0);
-	SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	self->joystick = self->client->video.SDL_JoystickOpen (0);
+	self->client->video.SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	return 1;
 }
 
@@ -121,7 +122,7 @@ private_init_video (licliWindow* self)
 	    private_resize (self, 1024, 768, 0) == 0)
 		return 0;
 	livid_features_init ();
-	if (TTF_Init () == -1)
+	if (self->client->video.TTF_Init () == -1)
 	{
 		lisys_error_set (LI_ERROR_UNKNOWN, "cannot initialize SDL TTF");
 		return 0;
@@ -155,12 +156,12 @@ private_resize (licliWindow* self,
 	{
 		for (depth = 32 ; depth ; depth -= 8)
 		{
-			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
-			SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
-			SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
-			self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
+			self->client->video.SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
+			self->client->video.SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+			self->client->video.SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+			self->client->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
+			self->client->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
+			self->screen = self->client->video.SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
 			if (self->screen != NULL)
 				break;
 		}

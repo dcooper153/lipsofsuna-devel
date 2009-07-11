@@ -16,7 +16,6 @@
  */
 
 #include <system/lips-system.h>
-#include "client-paths.h"
 #include "client-window.h"
 #include "widget-login.h"
 

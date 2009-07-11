@@ -9,9 +9,9 @@ libGLEW_la_LDFLAGS = -no-undefined
 libGLEW_la_LIBADD = $(GL_LIBS)
 libGLEW_la_SOURCES = \
 	src/glew.c \
-	src/glewinfo.c \
 	include/GL/glew.h \
 	include/GL/glxew.h \
 	include/GL/wglew.h
 
+#	src/glewinfo.c
 #	src/visualinfo.c

@@ -40,7 +40,7 @@ private_binding_event (licliModule* module,
 				module->bindings,
 				LIBND_TYPE_JOYSTICK_AXIS,
 				event->jaxis.axis,
-				SDL_GetModState (),
+				module->client->video.SDL_GetModState (),
 				event->jaxis.value / 32768.0f);
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
@@ -48,7 +48,7 @@ private_binding_event (licliModule* module,
 				module->bindings,
 				LIBND_TYPE_JOYSTICK,
 				event->jbutton.button,
-				SDL_GetModState (),
+				module->client->video.SDL_GetModState (),
 				event->jbutton.state == SDL_PRESSED);
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
@@ -64,18 +64,18 @@ private_binding_event (licliModule* module,
 				module->bindings,
 				LIBND_TYPE_MOUSE,
 				event->button.button,
-				SDL_GetModState (),
+				module->client->video.SDL_GetModState (),
 				event->button.state == SDL_PRESSED);
 		case SDL_MOUSEMOTION:
 			libnd_manager_event (
 				module->bindings,
 				LIBND_TYPE_MOUSE_AXIS, 0,
-				SDL_GetModState (),
+				module->client->video.SDL_GetModState (),
 				-1.0 + 2.0f * event->motion.x / (float) module->window->mode.width);
 			libnd_manager_event (
 				module->bindings,
 				LIBND_TYPE_MOUSE_AXIS, 1,
-				SDL_GetModState (),
+				module->client->video.SDL_GetModState (),
 				-1.0 + 2.0f * event->motion.y / (float) module->window->mode.height);
 			break;
 	}
@@ -98,19 +98,19 @@ private_binding_tick (licliModule* module,
 	/* Pointer state. */
 	cx = module->window->mode.width / 2;
 	cy = module->window->mode.height / 2;
-	SDL_GetMouseState (&x, &y);
-	SDL_WarpMouse (cx, cy);
+	module->client->video.SDL_GetMouseState (&x, &y);
+	module->client->video.SDL_WarpMouse (cx, cy);
 
 	/* Cursor delta events. */
 	if (x != cx)
 	{
 		libnd_manager_event (module->bindings, LIBND_TYPE_MOUSE_DELTA,
-			0, SDL_GetModState (), x - cx);
+			0, module->client->video.SDL_GetModState (), x - cx);
 	}
 	if (y != cy)
 	{
 		libnd_manager_event (module->bindings, LIBND_TYPE_MOUSE_DELTA,
-			1, SDL_GetModState (), y - cy);
+			1, module->client->video.SDL_GetModState (), y - cy);
 	}
 
 	return 1;
@@ -219,13 +219,9 @@ static int
 private_widget_event (licliModule* module,
                       SDL_Event*   event)
 {
-	liwdgEvent ev;
-
 	if (module->moving)
 		return 1;
-	if (!liwdg_event_from_sdl (&ev, event))
-		return 1;
-	if (!liwdg_manager_event (module->widgets, &ev))
+	if (!liwdg_manager_event_sdl (module->widgets, event))
 		return 1;
 	return 0;
 }

@@ -102,49 +102,6 @@ union _liwdgEvent
 	liwdgEventUpdate update;
 };
 
-static inline int
-liwdg_event_from_sdl (liwdgEvent* self,
-                      SDL_Event*  event)
-{
-	int h = SDL_GetVideoSurface()->h - 1;
-
-	switch (event->type)
-	{
-		case SDL_KEYDOWN:
-			self->type = LIWDG_EVENT_TYPE_KEY_PRESS;
-			self->key.keycode = event->key.keysym.sym;
-			self->key.unicode = event->key.keysym.unicode;
-			self->key.modifiers = event->key.keysym.mod;
-			break;
-		case SDL_KEYUP:
-			self->type = LIWDG_EVENT_TYPE_KEY_RELEASE;
-			self->key.keycode = event->key.keysym.sym;
-			self->key.unicode = event->key.keysym.unicode;
-			self->key.modifiers = event->key.keysym.mod;
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			self->type = LIWDG_EVENT_TYPE_BUTTON_PRESS;
-			self->button.x = event->button.x;
-			self->button.y = h - event->button.y;
-			self->button.button = event->button.button;
-			break;
-		case SDL_MOUSEBUTTONUP:
-			self->type = LIWDG_EVENT_TYPE_BUTTON_RELEASE;
-			self->button.x = event->button.x;
-			self->button.y = h - event->button.y;
-			self->button.button = event->button.button;
-			break;
-		case SDL_MOUSEMOTION:
-			self->type = LIWDG_EVENT_TYPE_MOTION;
-			self->motion.x = event->motion.x;
-			self->motion.y = h - event->motion.y;
-			break;
-		default:
-			return 0;
-	}
-	return 1;
-}
-
 #endif
 
 /** @} */

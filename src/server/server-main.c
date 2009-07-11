@@ -16,30 +16,34 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup lisrv Server
  * @{
- * \addtogroup licliPaths Paths
+ * \addtogroup lisrvMain Main
  * @{
  */
 
-#ifndef __CLIENT_PATHS_H__
-#define __CLIENT_PATHS_H__
+#include "server.h"
+#undef main
 
-typedef struct _licliPaths licliPaths;
-struct _licliPaths
+int
+main (int argc, char** argv)
 {
-	char* local_data;
-	char* global_data;
-	char* global_exts;
-};
+	lisrvServer* self;
 
-licliPaths*
-licli_paths_new ();
+	if (argc != 3)
+		return 1;
+	self = lisrv_server_new (argv[1], argv[2]);
+	if (self == NULL)
+	{
+		lisys_error_report ();
+		return 1;
+	}
+	if (!lisrv_server_main (self))
+		lisys_error_report ();
+	lisrv_server_free (self);
 
-void
-licli_paths_free (licliPaths* self);
-
-#endif
+	return 0;
+}
 
 /** @} */
 /** @} */

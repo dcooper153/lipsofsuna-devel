@@ -32,11 +32,13 @@
 /**
  * \brief Creates a new paths object.
  *
+ * \param path Package root directory.
  * \param name Module name.
  * \return Paths or NULL.
  */
 lipthPaths*
-lipth_paths_new (const char* name)
+lipth_paths_new (const char* path,
+                 const char* name)
 {
 	char* tmp;
 	lipthPaths* self;
@@ -45,9 +47,14 @@ lipth_paths_new (const char* name)
 	if (self == NULL)
 		return NULL;
 
+	/* Set root directory. */
+	self->root = strdup (path);
+	if (self->root == NULL)
+		goto error;
+
 	/* Get data directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_data = lisys_relative_exedir (NULL);
+	self->global_data = strdup (path);
 	if (self->global_data == NULL)
 		goto error;
 	if (!strcmp (name, "data"))
@@ -121,6 +128,7 @@ lipth_paths_free (lipthPaths* self)
 #endif
 	free (self->module_data);
 	free (self->module_state);
+	free (self->root);
 	free (self);
 }
 

@@ -28,6 +28,7 @@
 typedef struct _lipthPaths lipthPaths;
 struct _lipthPaths
 {
+	char* root;
 	char* global_exts;
 	char* global_data;
 	char* global_state;
@@ -36,7 +37,8 @@ struct _lipthPaths
 };
 
 lipthPaths*
-lipth_paths_new (const char* name);
+lipth_paths_new (const char* path,
+                 const char* name);
 
 void
 lipth_paths_free (lipthPaths* self);

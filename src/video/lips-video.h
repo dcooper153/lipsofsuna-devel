@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,6 +18,7 @@
 #ifndef __LIPS_VIDEO_H__
 #define __LIPS_VIDEO_H__
 
+#include "video-calls.h"
 #include "video-features.h"
 #include "video-opengl.h"
 

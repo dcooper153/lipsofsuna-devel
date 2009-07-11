@@ -54,7 +54,7 @@ liext_reload_new (licliModule* module)
 	self->module = module;
 
 	/* Allocate reloader. */
-	self->reload = lirel_reload_new (module->engine);
+	self->reload = lirel_reload_new (module->engine, &module->client->video, module->paths->root);
 	if (self->reload == NULL)
 	{
 		liext_reload_free (self);

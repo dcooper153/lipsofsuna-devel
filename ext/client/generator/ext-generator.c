@@ -64,7 +64,8 @@ liext_generator_new (licliModule* module)
 	}
 
 	/* Allocate generator. */
-	self->generator = ligen_generator_new_full (module->name, self->scene, module->engine->renderapi);
+	self->generator = ligen_generator_new_full (module->paths->root,
+		module->name, self->scene, module->engine->renderapi);
 	if (self->generator == NULL)
 	{
 		lirnd_scene_free (self->scene);

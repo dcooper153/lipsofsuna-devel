@@ -55,10 +55,6 @@ static int
 private_init_model (lirndObject* self,
                     lirndModel*  model);
 
-static void
-private_render_debug (lirndObject* self,
-                      limdlNode*   node);
-
 static int
 private_update_buffer (lirndObject* self);
 

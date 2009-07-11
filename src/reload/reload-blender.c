@@ -91,7 +91,7 @@ private_convert (lirelReload* self,
 	char* script;
 
 	/* Find export script. */
-	script = lisys_path_concat (self->engine->config.datadir, "tool", "blender-export.py", NULL);
+	script = lisys_path_concat (self->path, "tool", "blender-export.py", NULL);
 	if (script == NULL)
 		return 0;
 

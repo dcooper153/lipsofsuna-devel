@@ -33,13 +33,17 @@ typedef struct _lirelReload lirelReload;
 struct _lirelReload
 {
 	int queued;
+	char* path;
 	liengEngine* engine;
 	lisysNotify* notify;
 	lithrAsyncCall* worker;
+	lividCalls video;
 };
 
 lirelReload*
-lirel_reload_new (liengEngine* engine);
+lirel_reload_new (liengEngine* engine,
+                  lividCalls*  video,
+                  const char*  path);
 
 void
 lirel_reload_free (lirelReload* self);
@@ -84,8 +88,9 @@ lirel_reload_blender (lirelReload* self,
  */
 
 int
-lirel_reload_image (const char* src,
-                    const char* dst);
+lirel_reload_image (lirelReload* self,
+                    const char*  src,
+                    const char*  dst);
 
 /**
  * @}
@@ -94,8 +99,9 @@ lirel_reload_image (const char* src,
  */
 
 int
-lirel_reload_gimp (const char* src,
-                   const char* dst);
+lirel_reload_gimp (lirelReload* self,
+                   const char*  src,
+                   const char*  dst);
 
 #endif
 

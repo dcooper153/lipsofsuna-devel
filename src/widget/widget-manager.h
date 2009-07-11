@@ -39,6 +39,7 @@ struct _liwdgManager
 	lialgStrdic* images;
 	lialgStrdic* subimgs;
 	limatMatrix projection;
+	lividCalls video;
 	struct
 	{
 		int active;
@@ -61,7 +62,8 @@ struct _liwdgManager
 };
 
 liwdgManager*
-liwdg_manager_new (const char* path);
+liwdg_manager_new (lividCalls* video,
+                   const char* path);
 
 void
 liwdg_manager_free (liwdgManager* self);
@@ -69,6 +71,10 @@ liwdg_manager_free (liwdgManager* self);
 int
 liwdg_manager_event (liwdgManager* self,
                      liwdgEvent*   event);
+
+int
+liwdg_manager_event_sdl (liwdgManager* manager,
+                         SDL_Event*    event);
 
 lifntFont*
 liwdg_manager_find_font (liwdgManager* self,

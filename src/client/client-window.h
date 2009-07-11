@@ -25,11 +25,12 @@
 #ifndef __CLIENT_WINDOW_H__
 #define __CLIENT_WINDOW_H__
 
-#include <SDL/SDL.h>
+#include <video/lips-video.h>
+#include "client-types.h"
 
-typedef struct _licliWindow licliWindow;
 struct _licliWindow
 {
+	licliClient* client;
 	SDL_Joystick* joystick;
 	SDL_Surface* screen;
 	struct
@@ -41,7 +42,7 @@ struct _licliWindow
 };
 
 licliWindow*
-licli_window_new ();
+licli_window_new (licliClient* client);
 
 void
 licli_window_free (licliWindow* self);

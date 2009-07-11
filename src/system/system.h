@@ -27,8 +27,10 @@
 
 #ifdef _WIN32
 #define LISYS_EXTENSION_DLL "dll"
+#define LISYS_EXTENSION_EXE ".exe"
 #else
 #define LISYS_EXTENSION_DLL "so"
+#define LISYS_EXTENSION_EXE ""
 #endif
 
 char* lisys_system_get_path_home ();

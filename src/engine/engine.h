@@ -40,6 +40,8 @@
 
 #ifndef LIENG_DISABLE_GRAPHICS
 #include <render/lips-render.h>
+#else
+#define lirndApi void
 #endif
 
 /*****************************************************************************/
@@ -80,7 +82,6 @@ struct _liengEngine
 	{
 		int flags;
 		int radius;
-		char* datadir;
 		char* dir;
 	} config;
 	struct
@@ -91,9 +92,8 @@ struct _liengEngine
 };
 
 liengEngine*
-lieng_engine_new (const char* datadir,
-                  const char* moddir,
-                  int         gfx);
+lieng_engine_new (const char* path,
+                  lirndApi*   api);
 
 void
 lieng_engine_free (liengEngine* self);

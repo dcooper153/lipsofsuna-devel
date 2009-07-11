@@ -29,16 +29,29 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_ENDIAN_H
+#if defined HAVE_ENDIAN_H
+
 #include <endian.h>
 #define LI_BYTE_ORDER __BYTE_ORDER
 #define LI_LITTLE_ENDIAN __LITTLE_ENDIAN
 #define LI_BIG_ENDIAN __BIG_ENDIAN
-#endif
 
-#ifdef HAVE_SYS_BYTEORDER_H
+#elif defined HAVE_RPCNDR_H
+
+#define LI_BIG_ENDIAN 4321
+#define LI_LITTLE_ENDIAN 1234
+#define LI_BYTE_ORDER LI_LITTLE_ENDIAN
+/*
+#include <windows.h>
+#include <rpcndr.h>
+#define LI_LITTLE_ENDIAN NDR_LITTLE_ENDIAN
+#define LI_BIG_ENDIAN NDR_BIG_ENDIAN
+#define LI_BYTE_ORDER NDR_LOCAL_ENDIAN
+*/
+
+#elif defined HAVE_SYS_BYTEORDER_H
+
 #include <sys/byteorder.h>
-
 #define LI_BIG_ENDIAN 4321
 #define LI_LITTLE_ENDIAN 1234
 #ifdef _BIG_ENDIAN
@@ -47,19 +60,9 @@
 #define LI_BYTE_ORDER LI_LITTLE_ENDIAN
 #endif
 
-#ifndef __BIG_ENDIAN
-#define __BIG_ENDIAN 4321
-#endif
-#ifndef __LITTLE_ENDIAN
-#define __LITTLE_ENDIAN 1234
-#endif
-#ifndef __BYTE_ORDER
-#ifdef _BIG_ENDIAN
-#define __BYTE_ORDER __BIG_ENDIAN
 #else
-#define __BYTE_ORDER __LITTLE_ENDIAN
-#endif
-#endif
+
+#error "Cannot determine byte order"
 
 #endif
 

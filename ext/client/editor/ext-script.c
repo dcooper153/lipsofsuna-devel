@@ -86,7 +86,7 @@ Editor_rotate (lua_State* lua)
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
 
-	SDL_GetMouseState (&x, &y);
+	module->module->client->video.SDL_GetMouseState (&x, &y);
 	liext_editor_begin_rotate (module->editor, x, y);
 
 	return 0;
@@ -157,7 +157,7 @@ Editor_translate (lua_State* lua)
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
 
-	SDL_GetMouseState (&x, &y);
+	module->module->client->video.SDL_GetMouseState (&x, &y);
 	liext_editor_begin_translate (module->editor, x, y);
 
 	return 0;

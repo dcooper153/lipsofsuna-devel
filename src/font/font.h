@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,10 +26,11 @@
 #define __FONT_H__
 
 #include <wchar.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
 #include <algorithm/lips-algorithm.h>
 #include <video/lips-video.h>
+
+#define LIFNT_CACHE_WIDTH 512
+#define LIFNT_CACHE_HEIGHT 512
 
 typedef struct _lifntFontGlyph lifntFontGlyph;
 struct _lifntFontGlyph
@@ -45,11 +46,6 @@ struct _lifntFontGlyph
 	int advance;
 };
 
-/*****************************************************************************/
-
-#define LI_FONT_CACHE_WIDTH 512
-#define LI_FONT_CACHE_HEIGHT 512
-
 typedef struct _lifntFont lifntFont;
 struct _lifntFont
 {
@@ -57,31 +53,39 @@ struct _lifntFont
 	int font_height;
 	int font_ascent;
 	int font_descent;
-	TTF_Font* font;
-
-	GLuint texture;
-
-	lialgU32dic* index;
-
 	int table_length;
 	int table_filled;
 	int table_width;
 	int table_height;
 	int table_glyph_width;
 	int table_glyph_height;
+	GLuint texture;
+	lialgU32dic* index;
 	lifntFontGlyph** table;
+	lividCalls video;
+	TTF_Font* font;
 };
 
-lifntFont* lifnt_font_new         (const char*      path,
-                                int              size);
-void    lifnt_font_free        (lifntFont*       self);
-void    lifnt_font_render      (lifntFont*       self,
-                                int              x,
-                                int              y,
-                                wchar_t          glyph);
-int     lifnt_font_get_advance (lifntFont*       self,
-                                wchar_t          glyph);
-int     lifnt_font_get_height  (const lifntFont* self);
+lifntFont*
+lifnt_font_new (lividCalls* video,
+                const char* path,
+                int         size);
+
+void
+lifnt_font_free (lifntFont* self);
+
+void
+lifnt_font_render (lifntFont* self,
+                   int        x,
+                   int        y,
+                   wchar_t    glyph);
+
+int
+lifnt_font_get_advance (lifntFont* self,
+                        wchar_t    glyph);
+
+int
+lifnt_font_get_height (const lifntFont* self);
 
 #endif
 

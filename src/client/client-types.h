@@ -27,5 +27,6 @@ typedef struct _licliExtensionInfo licliExtensionInfo;
 typedef struct _licliModule licliModule;
 typedef struct _licliNetwork licliNetwork;
 typedef struct _licliObject licliObject;
+typedef struct _licliWindow licliWindow;
 
 #endif

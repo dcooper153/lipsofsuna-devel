@@ -100,11 +100,13 @@ private_get_prev_focusable (liwdgManager* self,
 /**
  * \brief Creates a new widget manager.
  *
+ * \param video Video callbacks.
  * \param root Client data directory root.
  * \return New widget manager or NULL.
  */
 liwdgManager*
-liwdg_manager_new (const char* root)
+liwdg_manager_new (lividCalls* video,
+                   const char* root)
 {
 	liwdgManager* self;
 
@@ -114,6 +116,7 @@ liwdg_manager_new (const char* root)
 		return NULL;
 	self->width = 640;
 	self->height = 480;
+	self->video = *video;
 	self->projection = limat_matrix_identity ();
 
 	/* Load config and resources. */
@@ -372,6 +375,60 @@ liwdg_manager_event (liwdgManager* self,
 	}
 
 	return 0;
+}
+
+/**
+ * \brief Handles an SDL event.
+ *
+ * \param self Widget manager.
+ * \param event Event.
+ * \return Nonzero if handled, zero if passed through.
+ */
+int
+liwdg_manager_event_sdl (liwdgManager* self,
+                         SDL_Event*    event)
+{
+	int h;
+	liwdgEvent evt;
+
+	h = self->video.SDL_GetVideoSurface()->h - 1;
+
+	switch (event->type)
+	{
+		case SDL_KEYDOWN:
+			evt.type = LIWDG_EVENT_TYPE_KEY_PRESS;
+			evt.key.keycode = event->key.keysym.sym;
+			evt.key.unicode = event->key.keysym.unicode;
+			evt.key.modifiers = event->key.keysym.mod;
+			break;
+		case SDL_KEYUP:
+			evt.type = LIWDG_EVENT_TYPE_KEY_RELEASE;
+			evt.key.keycode = event->key.keysym.sym;
+			evt.key.unicode = event->key.keysym.unicode;
+			evt.key.modifiers = event->key.keysym.mod;
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			evt.type = LIWDG_EVENT_TYPE_BUTTON_PRESS;
+			evt.button.x = event->button.x;
+			evt.button.y = h - event->button.y;
+			evt.button.button = event->button.button;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			evt.type = LIWDG_EVENT_TYPE_BUTTON_RELEASE;
+			evt.button.x = event->button.x;
+			evt.button.y = h - event->button.y;
+			evt.button.button = event->button.button;
+			break;
+		case SDL_MOUSEMOTION:
+			evt.type = LIWDG_EVENT_TYPE_MOTION;
+			evt.motion.x = event->motion.x;
+			evt.motion.y = h - event->motion.y;
+			break;
+		default:
+			return 0;
+	}
+
+	return liwdg_manager_event (self, &evt);
 }
 
 void
@@ -960,7 +1017,7 @@ private_load_font (liwdgManager* self,
 	path = lisys_path_concat (root, "fonts", name, NULL);
 	if (path == NULL)
 		return NULL;
-	font = lifnt_font_new (path, size);
+	font = lifnt_font_new (&self->video, path, size);
 	free (path);
 
 	return font;

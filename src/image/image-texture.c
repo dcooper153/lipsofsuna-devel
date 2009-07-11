@@ -24,8 +24,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include <system/lips-system.h>
 #include "image-compress.h"
 #include "image-dds.h"

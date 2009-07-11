@@ -25,10 +25,10 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
-#include <SDL/SDL.h>
 #ifndef LI_DISABLE_SOUND
 #include <sound/lips-sound.h>
 #endif
+#include <video/lips-video.h>
 #include "client-module.h"
 #include "client-types.h"
 #include "client-window.h"
@@ -42,10 +42,13 @@ struct _licliClient
 #ifndef LI_DISABLE_SOUND
 	lisndSystem* sound;
 #endif
+	lividCalls video;
 };
 
 licliClient*
-licli_client_new (const char* name);
+licli_client_new (lividCalls* video,
+                  const char* path,
+                  const char* name);
 
 void
 licli_client_free (licliClient* self);

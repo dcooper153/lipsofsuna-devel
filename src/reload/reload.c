@@ -65,10 +65,14 @@ private_filter_xcf_modified (const char* dir,
  * file, the engine is instructed to reload the data file in question.
  *
  * \param engine Engine.
+ * \param video Video calls.
+ * \param path Path to global data directory.
  * \return New reloader or NULL.
  */
 lirelReload*
-lirel_reload_new (liengEngine* engine)
+lirel_reload_new (liengEngine* engine,
+                  lividCalls*  video,
+                  const char*  path)
 {
 	lirelReload* self;
 
@@ -80,6 +84,14 @@ lirel_reload_new (liengEngine* engine)
 		return NULL;
 	}
 	self->engine = engine;
+	self->video = *video;
+	self->path = strdup (path);
+	if (self->path == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -88,6 +100,7 @@ void
 lirel_reload_free (lirelReload* self)
 {
 	lirel_reload_cancel (self);
+	free (self->path);
 	free (self);
 }
 
@@ -359,7 +372,7 @@ private_convert_textures (lithrAsyncCall* call,
 	const struct
 	{
 		int (*filter)(const char*, const char*);
-		int (*convert)(const char*, const char*);
+		int (*convert)(lirelReload*, const char*, const char*);
 	}
 	converters[] =
 	{
@@ -389,7 +402,7 @@ private_convert_textures (lithrAsyncCall* call,
 			dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
 			if (src == NULL || dst == NULL)
 				goto error;
-			if (!converters[j].convert (src, dst))
+			if (!converters[j].convert (self, src, dst))
 				lisys_error_report ();
 			free (src);
 			free (dst);

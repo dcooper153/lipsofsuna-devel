@@ -16,47 +16,41 @@
  */
 
 /**
- * \addtogroup liimg Image
+ * \addtogroup livie Viewer
  * @{
- * \addtogroup liimgImage Image
+ * \addtogroup livieMain Main
  * @{
  */
 
-#include <video/lips-video.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_main.h>
+#include "viewer.h"
 
-typedef struct _liimgImage liimgImage;
-struct _liimgImage
+int
+main (int argc, char** argv)
 {
-	int width;
-	int height;
-	void* pixels;
 	lividCalls video;
-};
+	livieViewer* self;
 
-liimgImage*
-liimg_image_new (lividCalls* video);
+	if (argc != 4)
+		return 1;
+	if (!livid_calls_init (&video))
+	{
+		lisys_error_report ();
+		return 1;
+	}
+	self = livie_viewer_new (&video, argv[1], argv[2], argv[3]);
+	if (self == NULL)
+	{
+		lisys_error_report ();
+		return 1;
+	}
+	if (!livie_viewer_main (self))
+		lisys_error_report ();
+	livie_viewer_free (self);
 
-liimgImage*
-liimg_image_new_from_file (lividCalls* video,
-                           const char* path);
-
-void
-liimg_image_free (liimgImage* self);
-
-int
-liimg_image_load (liimgImage* self,
-                  const char* path);
-
-int
-liimg_image_save_rgba (liimgImage* self,
-                       const char* path);
-
-int
-liimg_image_save_s3tc (liimgImage* self,
-                       const char* path);
-
-void
-liimg_image_shrink_half (liimgImage* self);
+	return 0;
+}
 
 /** @} */
 /** @} */

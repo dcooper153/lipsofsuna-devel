@@ -52,6 +52,7 @@ licli_network_new (licliModule* module,
                    const char*  name,
                    const char*  pass)
 {
+	grapple_error error;
 	licliNetwork* self;
 
 	/* Allocate self. */
@@ -85,7 +86,8 @@ licli_network_new (licliModule* module,
 	grapple_client_password_set (self->client, pass);
 	if (grapple_client_start (self->client, 0) != GRAPPLE_OK)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot start grapple client");
+		error = grapple_client_error_get (self->client);
+		lisys_error_set (EINVAL, "connect: %s", grapple_error_text (error));
 		goto error;
 	}
 
@@ -236,7 +238,7 @@ licli_network_update (licliNetwork* self,
 	/* Synchronize controls. */
 	if (licli_network_get_dirty (self))
 	{
-		self->delta.tick = SDL_GetTicks ();
+		self->delta.tick = self->module->client->video.SDL_GetTicks ();
 		self->delta.movement = 0.0f;
 		self->delta.rotation = 0.0f;
 		self->prev.controls = self->curr.controls;
@@ -282,7 +284,9 @@ licli_network_get_connected (const licliNetwork* self)
 int
 licli_network_get_dirty (const licliNetwork* self)
 {
-	if (SDL_GetTicks () - self->delta.tick < LICLI_NETWORK_INPUT_LATENCY)
+	Uint32 ticks = self->module->client->video.SDL_GetTicks ();
+
+	if (ticks - self->delta.tick < LICLI_NETWORK_INPUT_LATENCY)
 		return 0;
 	if (self->delta.movement > 1.0f ||
 	    self->delta.rotation > 1.0f)

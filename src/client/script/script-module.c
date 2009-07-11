@@ -204,7 +204,7 @@ Module_pick (lua_State* lua)
 	lirndSelection result;
 
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	SDL_GetMouseState (&x, &y);
+	module->client->video.SDL_GetMouseState (&x, &y);
 	if (lua_gettop (lua) >= 2)
 		x = luaL_checknumber (lua, 2);
 	if (lua_gettop (lua) >= 3)
@@ -267,7 +267,7 @@ Module_getter_cursor_pos (lua_State* lua)
 
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
 
-	SDL_GetMouseState (&x, &y);
+	module->client->video.SDL_GetMouseState (&x, &y);
 	tmp = limat_vector_init (x, module->widgets->height - y - 1, 0.0f);
 	data = liscr_vector_new (module->script, &tmp);
 	if (data == NULL)
@@ -425,11 +425,12 @@ static int
 Module_setter_title (lua_State* lua)
 {
 	const char* value;
+	licliModule* module;
 
-	liscr_checkclass (lua, 1, LICLI_SCRIPT_MODULE);
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
 	value = luaL_checkstring (lua, 3);
 
-	SDL_WM_SetCaption (value, value);
+	module->client->video.SDL_WM_SetCaption (value, value);
 	return 0;
 }
 

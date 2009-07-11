@@ -28,6 +28,7 @@
 #include <algorithm/lips-algorithm.h>
 #include <binding/lips-binding.h>
 #include <engine/lips-engine.h>
+#include <paths/lips-paths.h>
 #include <render/lips-render.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
@@ -41,7 +42,6 @@
 #include "client-extension.h"
 #include "client-network.h"
 #include "client-object.h"
-#include "client-paths.h"
 #include "client-types.h"
 #include "client-window.h"
 
@@ -57,10 +57,10 @@ struct _licliModule
 	libndManager* bindings;
 	licliClient* client;
 	licliNetwork* network;
-	licliPaths* paths;
 	licliWindow* window;
 	liengCamera* camera;
 	liengEngine* engine;
+	lipthPaths* paths;
 	liscrScript* script;
 	lisrvServer* server;
 #ifndef LI_DISABLE_SOUND
@@ -73,6 +73,7 @@ struct _licliModule
 
 licliModule*
 licli_module_new (licliClient* client,
+                  const char*  path,
                   const char*  name,
                   const char*  login,
                   const char*  password);

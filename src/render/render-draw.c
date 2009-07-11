@@ -71,30 +71,6 @@ lirnd_draw_bounds (lirndContext* context,
 }
 
 void
-lirnd_draw_debug (lirndContext* context,
-                  lirndObject*  object,
-                  void*         data)
-{
-	limatAabb aabb;
-
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
-
-	/* Render debug. */
-	lirnd_object_render_debug (object, context->render);
-
-#ifdef LIRND_ENABLE_PROFILING
-	context->render->profiling.objects++;
-#endif
-}
-
-void
 lirnd_draw_exclude (lirndContext* context,
                     lirndObject*  object,
                     void*         data)

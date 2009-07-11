@@ -61,25 +61,29 @@ private_stroke_paint (ligenGenerator* self,
 /**
  * \brief Creates a new generator module.
  *
+ * \param path Package root directory.
  * \param name Module name.
  * \return New generator or NULL.
  */
 ligenGenerator*
-ligen_generator_new (const char* name)
+ligen_generator_new (const char* path,
+                     const char* name)
 {
-	return ligen_generator_new_full (name, NULL, NULL);
+	return ligen_generator_new_full (path, name, NULL, NULL);
 }
 
 /**
  * \brief Creates a new generator module.
  *
+ * \param path Package root directory.
  * \param name Module name.
  * \param scene Render scene or NULL.
  * \param rndapi Render API or NULL.
  * \return New generator or NULL.
  */
 ligenGenerator*
-ligen_generator_new_full (const char* name,
+ligen_generator_new_full (const char* path,
+                          const char* name,
                           lirndScene* scene,
                           lirndApi*   rndapi)
 {
@@ -95,7 +99,7 @@ ligen_generator_new_full (const char* name,
 	}
 
 	/* Allocate paths. */
-	self->paths = lipth_paths_new (name);
+	self->paths = lipth_paths_new (path, name);
 	if (self->paths == NULL)
 		goto error;
 

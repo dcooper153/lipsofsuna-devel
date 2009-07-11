@@ -24,8 +24,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include <system/lips-system.h>
 #include "image-compress.h"
 #include "image-dds.h"
@@ -34,10 +32,11 @@
 /**
  * \brief Creates a new empty image.
  *
+ * \param video Video calls.
  * \return New image or NULL.
  */
 liimgImage*
-liimg_image_new ()
+liimg_image_new (lividCalls* video)
 {
 	liimgImage* self;
 
@@ -47,6 +46,7 @@ liimg_image_new ()
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
+	self->video = *video;
 
 	return self;
 }
@@ -58,11 +58,12 @@ liimg_image_new ()
  * \return New image or NULL.
  */
 liimgImage*
-liimg_image_new_from_file (const char* path)
+liimg_image_new_from_file (lividCalls* video,
+                           const char* path)
 {
 	liimgImage* self;
 
-	self = liimg_image_new ();
+	self = liimg_image_new (video);
 	if (self == NULL)
 		return NULL;
 	if (!liimg_image_load (self, path))
@@ -102,7 +103,7 @@ liimg_image_load (liimgImage* self,
 	SDL_PixelFormat fmt =
 	{
 		NULL, 32, 4, 0, 0, 0, 0,
-#if __BYTE_ORDER == __BIT_ENDIAN
+#if LI_BYTE_ORDER == LI_BIG_ENDIAN
 		24, 16, 8, 0, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
 #else
 		0, 8, 16, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000,
@@ -111,14 +112,14 @@ liimg_image_load (liimgImage* self,
 	};
 
 	/* Load the image. */
-	image = IMG_Load (path);
+	image = self->video.IMG_Load (path);
 	if (image == NULL)
 	{
 		lisys_error_set (EIO, "cannot load `%s'", path);
 		return 0;
 	}
-	tmp = SDL_ConvertSurface (image, &fmt, SDL_SWSURFACE);
-	SDL_FreeSurface (image);
+	tmp = self->video.SDL_ConvertSurface (image, &fmt, SDL_SWSURFACE);
+	self->video.SDL_FreeSurface (image);
 	if (tmp == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -133,11 +134,11 @@ liimg_image_load (liimgImage* self,
 	if (self->pixels == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
-		SDL_FreeSurface (image);
+		self->video.SDL_FreeSurface (image);
 		return 0;
 	}
 	memcpy (self->pixels, image->pixels, 4 * image->w * image->h);
-	SDL_FreeSurface (image);
+	self->video.SDL_FreeSurface (image);
 
 	return 1;
 }

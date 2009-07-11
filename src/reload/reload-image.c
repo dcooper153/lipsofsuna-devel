@@ -24,21 +24,24 @@
 
 #include <stdio.h>
 #include <image/lips-image.h>
+#include "reload.h"
 
 /**
  * \brief Converts an image file to DDS.
  *
+ * \param self Reload.
  * \param src Source file.
  * \param dst Destination file of type DDS.
  * \return Nonzero of success.
  */
 int
-lirel_reload_image (const char* src,
-                    const char* dst)
+lirel_reload_image (lirelReload* self,
+                    const char*  src,
+                    const char*  dst)
 {
 	liimgImage* image;
 
-	image = liimg_image_new_from_file (src);
+	image = liimg_image_new_from_file (&self->video, src);
 	if (image == NULL)
 		return 0;
 	if (!liimg_image_save_s3tc (image, dst) &&

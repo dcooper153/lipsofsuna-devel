@@ -180,7 +180,7 @@ lisys_module_global_symbol (const char* module,
 	return dlsym (handle, name);
 #elif defined HAVE_WINDOWS_H
 	HANDLE handle;
-	handle = GetModuleHandle (name);
+	handle = GetModuleHandle (module);
 	if (handle == NULL)
 		return NULL;
 	return GetProcAddress (handle, name);

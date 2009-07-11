@@ -107,7 +107,7 @@ libslots_ser_la_SOURCES = \
 
 libspawner_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libspawner_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libspawner_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libspawner_ser_la_LIBADD =$(top_builddir)/src/liblipsofsunaserver.la
 libspawner_ser_la_SOURCES = \
 	spawner/ext-module.c \
 	spawner/ext-module.h \

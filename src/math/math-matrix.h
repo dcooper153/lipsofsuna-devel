@@ -65,26 +65,26 @@ limat_matrix_frustum (float left,
                       float right,
                       float bottom,
                       float top,
-                      float near,
-                      float far)
+                      float nearz,
+                      float farz)
 {
 	limatMatrix self;
 
-	self.m[0] = (2.0f * near) / (right - left);
+	self.m[0] = (2.0f * nearz) / (right - left);
 	self.m[1] = 0.0f;
 	self.m[2] = 0.0f;
 	self.m[3] = 0.0f;
 	self.m[4] = 0.0f;
-	self.m[5] = (2.0f * near) / (top - bottom);
+	self.m[5] = (2.0f * nearz) / (top - bottom);
 	self.m[6] = 0.0f;
 	self.m[7] = 0.0f;
 	self.m[8] = (right + left) / (right - left);
 	self.m[9] = (top + bottom) / (top - bottom);
-	self.m[10] = -(far + near) / (far - near);
+	self.m[10] = -(farz + nearz) / (farz - nearz);
 	self.m[11] = -1.0f;
 	self.m[12] = 0.0f;
 	self.m[13] = 0.0f;
-	self.m[14] = -2.0f * far * near / (far - near);
+	self.m[14] = -2.0f * farz * nearz / (farz - nearz);
 	self.m[15] = 0.0f;
 
 	return self;
@@ -178,8 +178,8 @@ limat_matrix_ortho (float left,
                     float right,
                     float top,
                     float bottom,
-                    float near,
-                    float far)
+                    float nearz,
+                    float farz)
 {
 	limatMatrix self;
 
@@ -193,11 +193,11 @@ limat_matrix_ortho (float left,
 	self.m[7] = 0.0f;
 	self.m[8] = 0.0f;
 	self.m[9] = 0.0f;
-	self.m[10] = -2.0f / (far - near);
+	self.m[10] = -2.0f / (farz - nearz);
 	self.m[11] = 0.0f;
 	self.m[12] = -(right + left) / (right - left);
 	self.m[13] = -(top + bottom) / (top - bottom);
-	self.m[14] = -(far + near) / (far - near);
+	self.m[14] = -(farz + nearz) / (farz - nearz);
 	self.m[15] = 1.0f;
 
 	return self;
@@ -208,21 +208,21 @@ limat_matrix_ortho (float left,
  *
  * \param fov Field of view in radians.
  * \param aspect Aspect ratio.
- * \param near Near plane distance.
- * \param far Far plane distance.
+ * \param nearz Near plane distance.
+ * \param farz Far plane distance.
  * \return Perspective matrix.
  */
 static inline limatMatrix
 limat_matrix_perspective (float fov,
                           float aspect,
-                          float near,
-                          float far)
+                          float nearz,
+                          float farz)
 {
 	float d;
 	float f;
 	limatMatrix self;
 
-	d = near - far;
+	d = nearz - farz;
 	f = 1.0f / tan (0.5f * fov);
 	self.m[0] = f / aspect;
 	self.m[1] = 0.0f;
@@ -234,11 +234,11 @@ limat_matrix_perspective (float fov,
 	self.m[7] = 0.0f;
 	self.m[8] = 0.0f;
 	self.m[9] = 0.0f;
-	self.m[10] = (far + near) / d;
+	self.m[10] = (farz + nearz) / d;
 	self.m[11] = -1.0f;
 	self.m[12] = 0.0f;
 	self.m[13] = 0.0f;
-	self.m[14] = 2.0f * far * near / d;
+	self.m[14] = 2.0f * farz * nearz / d;
 	self.m[15] = 0.0f;
 
 	return self;

@@ -61,10 +61,12 @@ struct _ligenGenerator
 };
 
 ligenGenerator*
-ligen_generator_new (const char* name);
+ligen_generator_new (const char* path,
+                     const char* name);
 
 ligenGenerator*
-ligen_generator_new_full (const char* name,
+ligen_generator_new_full (const char* path,
+                          const char* name,
                           lirndScene* scene,
                           lirndApi*   rndapi);
 

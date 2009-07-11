@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,13 +25,16 @@
 #include <system/lips-system.h>
 #include "font.h"
 
-static lifntFontGlyph* self_cache_glyph (lifntFont* self,
-                                         wchar_t    glyph);
+static lifntFontGlyph*
+private_cache_glyph (lifntFont* self,
+                     wchar_t    glyph);
 
 /*****************************************************************************/
 
-lifntFont* lifnt_font_new (const char* path,
-                           int         size)
+lifntFont*
+lifnt_font_new (lividCalls* video,
+                const char* path,
+                int         size)
 {
 	lifntFont* self;
 
@@ -42,9 +45,10 @@ lifntFont* lifnt_font_new (const char* path,
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
+	self->video = *video;
 
 	/* Open the font. */
-	self->font = TTF_OpenFont (path, size);
+	self->font = self->video.TTF_OpenFont (path, size);
 	if (self->font == NULL)
 	{
 		lisys_error_set (EIO, "cannot load font `%s'", path);
@@ -52,9 +56,9 @@ lifntFont* lifnt_font_new (const char* path,
 		return NULL;
 	}
 	self->font_size = size;
-	self->font_height = TTF_FontLineSkip (self->font);
-	self->font_ascent = TTF_FontAscent (self->font);
-	self->font_descent = TTF_FontDescent (self->font);
+	self->font_height = self->video.TTF_FontLineSkip (self->font);
+	self->font_ascent = self->video.TTF_FontAscent (self->font);
+	self->font_descent = self->video.TTF_FontDescent (self->font);
 
 	/* Allocate glyph index. */
 	self->index = lialg_u32dic_new ();
@@ -66,10 +70,10 @@ lifntFont* lifnt_font_new (const char* path,
 	}
 
 	/* Allocate glyph table. */
-	self->table_glyph_width = TTF_FontHeight (self->font); /* FIXME! */
-	self->table_glyph_height = TTF_FontHeight (self->font);
-	self->table_width = LI_FONT_CACHE_WIDTH / self->table_glyph_width;
-	self->table_height = LI_FONT_CACHE_HEIGHT / self->table_glyph_height;
+	self->table_glyph_width = self->video.TTF_FontHeight (self->font); /* FIXME! */
+	self->table_glyph_height = self->video.TTF_FontHeight (self->font);
+	self->table_width = LIFNT_CACHE_WIDTH / self->table_glyph_width;
+	self->table_height = LIFNT_CACHE_HEIGHT / self->table_glyph_height;
 	self->table_length = self->table_width * self->table_height;
 	self->table_filled = 0;
 	self->table = calloc (self->table_length, sizeof (lifntFontGlyph*));
@@ -85,12 +89,13 @@ lifntFont* lifnt_font_new (const char* path,
 	glBindTexture (GL_TEXTURE_2D, self->texture);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D (GL_TEXTURE_2D, 0, 4, LI_FONT_CACHE_WIDTH, LI_FONT_CACHE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D (GL_TEXTURE_2D, 0, 4, LIFNT_CACHE_WIDTH, LIFNT_CACHE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 	return self;
 }
 
-void lifnt_font_free (lifntFont* self)
+void
+lifnt_font_free (lifntFont* self)
 {
 	lialgU32dicIter iter;
 
@@ -105,7 +110,7 @@ void lifnt_font_free (lifntFont* self)
 	if (self->table != NULL)
 		free (self->table);
 	if (self->font != NULL)
-		TTF_CloseFont (self->font);
+		self->video.TTF_CloseFont (self->font);
 	free (self);
 }
 
@@ -117,10 +122,11 @@ void lifnt_font_free (lifntFont* self)
  * \param y Y coordinate of the glyph.
  * \param glyph A glyph.
  */
-void lifnt_font_render (lifntFont* self,
-                        int        x,
-                        int        y,
-                        wchar_t    glyph)
+void
+lifnt_font_render (lifntFont* self,
+                   int        x,
+                   int        y,
+                   wchar_t    glyph)
 {
 	float tex_x;
 	float tex_y;
@@ -132,16 +138,16 @@ void lifnt_font_render (lifntFont* self,
 	cached = lialg_u32dic_find (self->index, glyph);
 	if (cached == NULL)
 	{
-		cached = self_cache_glyph (self, glyph);
+		cached = private_cache_glyph (self, glyph);
 		if (cached == NULL)
 			return;
 	}
 
 	/* Get texture rectangle. */
-	tex_x = cached->table_x * self->table_glyph_width / (float) LI_FONT_CACHE_WIDTH;
-	tex_y = cached->table_y * self->table_glyph_height / (float) LI_FONT_CACHE_HEIGHT;
-	tex_w = cached->width / (float) LI_FONT_CACHE_WIDTH;
-	tex_h = cached->height / (float) LI_FONT_CACHE_HEIGHT;
+	tex_x = cached->table_x * self->table_glyph_width / (float) LIFNT_CACHE_WIDTH;
+	tex_y = cached->table_y * self->table_glyph_height / (float) LIFNT_CACHE_HEIGHT;
+	tex_w = cached->width / (float) LIFNT_CACHE_WIDTH;
+	tex_h = cached->height / (float) LIFNT_CACHE_HEIGHT;
 
 	/* Render tile. */
 	glBindTexture (GL_TEXTURE_2D, self->texture);
@@ -168,30 +174,34 @@ void lifnt_font_render (lifntFont* self,
  * \param glyph A wide character.
  * \return The advance in pixels.
  */
-int lifnt_font_get_advance (lifntFont* self,
-                            wchar_t    glyph)
+int
+lifnt_font_get_advance (lifntFont* self,
+                        wchar_t    glyph)
 {
 	lifntFontGlyph* cached;
 
 	cached = lialg_u32dic_find (self->index, glyph);
 	if (cached == NULL)
 	{
-		cached = self_cache_glyph (self, glyph);
+		cached = private_cache_glyph (self, glyph);
 		if (cached == NULL)
 			return 0;
 	}
+
 	return cached->advance;
 }
 
-int lifnt_font_get_height (const lifntFont* self)
+int
+lifnt_font_get_height (const lifntFont* self)
 {
 	return self->font_height;
 }
 
 /*****************************************************************************/
 
-static lifntFontGlyph* self_cache_glyph (lifntFont* self,
-                                         wchar_t    glyph)
+static lifntFontGlyph*
+private_cache_glyph (lifntFont* self,
+                     wchar_t    glyph)
 {
 	int index;
 	int advance;
@@ -202,7 +212,7 @@ static lifntFontGlyph* self_cache_glyph (lifntFont* self,
 	SDL_Surface* image;
 
 	/* Render the glyph. */
-	image = TTF_RenderGlyph_Blended (self->font, glyph, color);
+	image = self->video.TTF_RenderGlyph_Blended (self->font, glyph, color);
 	if (image == NULL)
 		return NULL;
 
@@ -216,7 +226,7 @@ static lifntFontGlyph* self_cache_glyph (lifntFont* self,
 		if (!lialg_u32dic_insert (self->index, glyph, cached))
 		{
 			self->table_filled--;
-			SDL_FreeSurface (image);
+			self->video.SDL_FreeSurface (image);
 			free (cached);
 			return NULL;
 		}
@@ -240,14 +250,14 @@ static lifntFontGlyph* self_cache_glyph (lifntFont* self,
 		{
 			self->table[index] = NULL;
 			self->table_filled--;
-			SDL_FreeSurface (image);
+			self->video.SDL_FreeSurface (image);
 			free (cached);
 			return NULL;
 		}
 	}
 
 	/* Store metrics. */
-	TTF_GlyphMetrics (self->font, glyph, &bearing_x, NULL, NULL, &bearing_y, &advance);
+	self->video.TTF_GlyphMetrics (self->font, glyph, &bearing_x, NULL, NULL, &bearing_y, &advance);
 	cached->glyph = glyph;
 	cached->table_index = index;
 	cached->table_x = index % self->table_width;
@@ -265,7 +275,7 @@ static lifntFontGlyph* self_cache_glyph (lifntFont* self,
 		self->table_glyph_height * cached->table_y,
 		image->w, image->h,
 		GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
-	SDL_FreeSurface (image);
+	self->video.SDL_FreeSurface (image);
 
 	return cached;
 }

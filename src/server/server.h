@@ -70,7 +70,8 @@ struct _lisrvServer
 };
 
 lisrvServer*
-lisrv_server_new (const char* name);
+lisrv_server_new (const char* path,
+                  const char* name);
 
 void
 lisrv_server_free (lisrvServer* self);

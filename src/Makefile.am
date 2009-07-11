@@ -1,6 +1,4 @@
 INCLUDES = -I$(srcdir)
-AM_CFLAGS = $(LICLI_CFLAGS)
-AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
 EXTRA_DIST = src/math/unittest.c
 
 aisrc = \
@@ -65,8 +63,6 @@ clisrc = \
 	client/client-network.h \
 	client/client-object.c \
 	client/client-object.h \
-	client/client-paths.c \
-	client/client-paths.h \
 	client/client-script.h \
 	client/client-speech.c \
 	client/client-speech.h \
@@ -337,6 +333,8 @@ thrsrc = \
 	thread/thread-async-call.h
 vidsrc = \
 	video/lips-video.h \
+	video/video-calls.c \
+	video/video-calls.h \
 	video/video-features.c \
 	video/video-features.h \
 	video/video-opengl.h
@@ -395,46 +393,56 @@ wdgsrc = \
 	widget/widget-window.h
 
 prgdir = $(PROGDIR)
-prg_LTLIBRARIES = \
-	liblipsofsunaclient.la \
-	liblipsofsunagenerator.la \
-	liblipsofsunaserver.la \
-	liblipsofsunaviewer.la
+prg_PROGRAMS = lipsofsuna
+bin_PROGRAMS = lipsofsuna-client lipsofsuna-generator lipsofsuna-server lipsofsuna-viewer
+lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunaserver.la
 
-liblipsofsunaclient_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaclient_la_CFLAGS = $(LICLI_CFLAGS)
+liblipsofsunaclient_la_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+liblipsofsunaclient_la_LDFLAGS = -no-undefined
 liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaclient_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
 	$(engsrc) $(fntsrc) $(gensrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) \
 	$(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
-liblipsofsunagenerator_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
-liblipsofsunagenerator_la_LIBADD = $(LISRV_LIBS)
-liblipsofsunagenerator_la_SOURCES = \
-	$(algsrc) $(arcsrc) $(gensrc) $(matsrc) $(mdlsrc) $(physrc) $(pthsrc) \
-	$(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
-
-liblipsofsunaserver_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
+liblipsofsunaserver_la_CFLAGS = $(LISRV_CFLAGS)
+liblipsofsunaserver_la_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
+liblipsofsunaserver_la_LDFLAGS = -no-undefined
 liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(srvsrc) $(scrsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunaviewer_la_LDFLAGS = -module -avoid-version --export-dynamic -no-undefined
-liblipsofsunaviewer_la_LIBADD = $(LICLI_LIBS)
-liblipsofsunaviewer_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(cfgsrc) \
-	$(engsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) $(physrc) \
-	$(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(vidsrc) $(viesrc) $(wdgsrc)
-
-bin_PROGRAMS = lipsofsuna
-
-lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS)
+lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
 lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
-lipsofsuna_SOURCES = $(syssrc) $(maisrc)
+lipsofsuna_SOURCES = $(maisrc) \
+	system/system-error.c \
+	system/system-execute.c \
+	system/system-path.c \
+	system/system-relative.c
+
+lipsofsuna_client_CFLAGS = $(LICLI_CFLAGS)
+lipsofsuna_client_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lSDL_image
+lipsofsuna_client_SOURCES = client/client-main.c
+
+lipsofsuna_generator_CFLAGS = $(LICLI_CFLAGS)
+lipsofsuna_generator_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
+lipsofsuna_generator_LDADD = liblipsofsunaserver.la
+lipsofsuna_generator_SOURCES = $(gensrc) generator/generator-main.c
+
+lipsofsuna_server_CFLAGS = $(LICLI_CFLAGS)
+lipsofsuna_server_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
+lipsofsuna_server_LDADD = liblipsofsunaserver.la
+lipsofsuna_server_SOURCES = server/server-main.c
+
+lipsofsuna_viewer_CFLAGS = $(LICLI_CFLAGS)
+lipsofsuna_viewer_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+lipsofsuna_viewer_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lSDL_image
+lipsofsuna_viewer_SOURCES = $(viesrc) viewer/viewer-main.c
 
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)

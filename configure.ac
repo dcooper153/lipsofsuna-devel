@@ -16,6 +16,7 @@ AM_PROG_LIBTOOL
 AM_PROG_CC_STDC
 PKG_PROG_PKG_CONFIG
 AC_HEADER_STDC
+AC_PATH_X
 
 dnl Pthread dependency.
 ACX_PTHREAD
@@ -48,7 +49,19 @@ if test "$want_client" = yes -o "$want_viewer" = yes; then
 else
 	want_graphics=no
 fi
-AC_CHECK_HEADERS(dlfcn.h fcntl.h endian.h inttypes.h netdb.h poll.h stdint.h unistd.h windows.h arpa/inet.h netinet/in.h sys/byteorder.h sys/mman.h sys/socket.h sys/stat.h sys/wait.h sys/inotify.h inotifytools/inotify.h GL/glx.h)
+AC_CHECK_HEADERS([dlfcn.h fcntl.h inttypes.h netdb.h poll.h stdint.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h])
+AC_CHECK_HEADERS([endian.h sys/byteorder.h])
+AC_CHECK_HEADERS([sys/mman.h sys/stat.h sys/wait.h])
+AC_CHECK_HEADERS([sys/inotify.h inotifytools/inotify.h])
+AC_CHECK_HEADERS([GL/glx.h])
+AC_CHECK_HEADERS([windows.h])
+AC_CHECK_HEADERS([rpcndr.h], [], [],
+[#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+])
+
 AC_CHECK_LIB(dl, dlsym)
 AC_CHECK_LIB(m, main)
 AC_CHECK_FUNCS(fork lstat readlink stat usleep)
@@ -58,7 +71,7 @@ LIPS_LIBS="$LIBS"
 
 dnl Check for SDL.
 AM_PATH_SDL([1.2.0], [have_sdl=yes], [have_sdl=no])
-if test "$want_graphics" = yes -a "$have_sdl" = no; then
+if test "$want_graphics" -a "$have_sdl" = no; then
 	AC_MSG_ERROR([cannot find SDL]);
 fi
 
@@ -198,22 +211,21 @@ if test "$want_relative" = yes; then
 	EXTSDIR="${prefix}/lib/extensions"
 	DATADIR="${prefix}/data"
 	MODSDIR="${prefix}/mods"
-	PROGDIR="${prefix}/lib/programs"
+	PROGDIR="${prefix}"
 	TOOLDIR="${prefix}/tool"
 	SAVEDIR="${prefix}/save"
-	bindir="${prefix}"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_RELATIVE_PATHS"
-	LDFLAGS="-Wl,-rpath -Wl,\\\$\$ORIGIN/lib $LDFLAGS"
+	LDFLAGS="-Wl,-rpath -Wl,\\\$\$ORIGIN/../lib $LDFLAGS"
 else
 	EXTSVER="0.1"
 	EXTSDIR="${libdir}/${PACKAGE}/extensions/$EXTSVER"
 	DATADIR="${datadir}/${PACKAGE}/data"
 	MODSDIR="${datadir}/${PACKAGE}/mods"
-	PROGDIR="${libdir}/${PACKAGE}/programs/$EXTSVER"
+	PROGDIR="${bindir}"
 	TOOLDIR="${datadir}/${PACKAGE}/tool"
 	SAVEDIR="${localstatedir}/${PACKAGE}"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIEXTSDIR=\\\"\"${libdir}/${PACKAGE}/extensions/$EXTSVER\"\\\""
-	LIPS_CFLAGS="$LIPS_CFLAGS -DLIPROGDIR=\\\"\"${libdir}/${PACKAGE}/programs/$EXTSVER\"\\\""
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLIPROGDIR=\\\"\"${bindir}\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLISAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
 fi
@@ -232,7 +244,6 @@ LICLI_CFLAGS="\
 	$SQUISH_CFLAGS $BULLET_CFLAGS"
 LICLI_LIBS="\
 	$LUA_LIBS $GRAPPLE_LIBS $SQLITE_LIBS $BULLET_LIBS $ZLIB_LIBS \
-	$SDL_LIBS -lSDL_ttf -lSDL_image \
 	$GLEW_LIBS $GL_LIBS $OPENAL_LIBS $VORBIS_LIBS $SQUISH_LIBS \
 	$PTHREAD_LIBS $PTHREAD_CFLAGS $LIPS_LIBS"
 AC_SUBST([LISRV_CFLAGS])

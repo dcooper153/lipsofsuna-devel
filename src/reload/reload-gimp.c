@@ -28,17 +28,20 @@
 #include <image/lips-image.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
+#include "reload.h"
 
 /**
  * \brief Converts an XCF image to DDS.
  *
+ * \param self Reload.
  * \param src Source file of type XCF.
  * \param dst Destination file of type DDS.
  * \return Nonzero of success.
  */
 int
-lirel_reload_gimp (const char* src,
-                   const char* dst)
+lirel_reload_gimp (lirelReload* self,
+                   const char*  src,
+                   const char*  dst)
 {
 	int ret;
 	int len0;
@@ -79,7 +82,7 @@ lirel_reload_gimp (const char* src,
 	free (script);
 
 	/* Convert to DDS. */
-	image = liimg_image_new_from_file (tmp);
+	image = liimg_image_new_from_file (&self->video, tmp);
 	if (image == NULL)
 	{
 		remove (tmp);

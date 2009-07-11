@@ -60,6 +60,7 @@ private_init_host (lisrvServer* self);
 
 static int
 private_init_paths (lisrvServer* self,
+                    const char*  path,
                     const char*  name);
 
 static int
@@ -80,11 +81,13 @@ private_sector_new (liengEngine* engine,
 /**
  * \brief Creates a new server instance.
  *
+ * \param path Package root directory.
  * \param name Server name.
  * \return New server or NULL.
  */
 lisrvServer*
-lisrv_server_new (const char* name)
+lisrv_server_new (const char* path,
+                  const char* name)
 {
 	lisrvServer* self;
 
@@ -93,7 +96,6 @@ lisrv_server_new (const char* name)
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
-		lisys_error_report ();
 		return NULL;
 	}
 
@@ -101,7 +103,7 @@ lisrv_server_new (const char* name)
 	pthread_mutex_init (&self->mutexes.bans, NULL);
 
 	/* Initialize subsystems. */
-	if (!private_init_paths (self, name) ||
+	if (!private_init_paths (self, path, name) ||
 	    !private_init_sql (self) ||
 	    !private_init_ai (self) ||
 	    !private_init_host (self) ||
@@ -112,7 +114,6 @@ lisrv_server_new (const char* name)
 	    !private_init_script (self))
 	{
 		lisrv_server_free (self);
-		lisys_error_report ();
 		return NULL;
 	}
 
@@ -266,7 +267,6 @@ lisrv_server_load_extension (lisrvServer* self,
 
 error:
 	lisys_error_append ("cannot initialize module `%s'", name);
-	fprintf (stderr, "WARNING: %s.\n", lisys_error_get_string ());
 	return 0;
 }
 
@@ -475,7 +475,7 @@ private_init_engine (lisrvServer* self)
 	liengSample* sample;
 
 	/* Create engine. */
-	self->engine = lieng_engine_new (self->paths->global_data, self->paths->module_data, 0);
+	self->engine = lieng_engine_new (self->paths->module_data, NULL);
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
@@ -570,9 +570,10 @@ private_init_host (lisrvServer* self)
 
 static int
 private_init_paths (lisrvServer* self,
+                    const char*  path,
                     const char*  name)
 {
-	self->paths = lipth_paths_new (name);
+	self->paths = lipth_paths_new (path, name);
 	if (self->paths == NULL)
 		return 0;
 

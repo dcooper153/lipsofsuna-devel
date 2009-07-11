@@ -56,6 +56,8 @@ Extension_new (lua_State* lua)
 	name = luaL_checkstring (lua, 2);
 
 	ret = lisrv_server_load_extension (server, name);
+	if (!ret)
+		lisys_error_report ();
 	lua_pushboolean (lua, ret);
 	return 1;
 }

@@ -30,8 +30,7 @@
 #include "engine-selection.h"
 
 static int
-private_init (liengEngine* self,
-              int          gfx);
+private_init (liengEngine* self);
 
 static void
 private_clear_sectors (liengEngine* self);
@@ -44,15 +43,13 @@ private_physics_transform (liphyObject* object);
 /**
  * \brief Creates a new game engine.
  *
- * \param datadir Data directory root.
- * \param moddir Module directory.
- * \param gfx Nonzero if should load graphics.
+ * \param path Module directory.
+ * \param api Pointer to render calls or NULL for no graphics.
  * \return New engine or NULL.
  */
 liengEngine*
-lieng_engine_new (const char* datadir,
-                  const char* moddir,
-                  int         gfx)
+lieng_engine_new (const char* path,
+                  lirndApi*   api)
 {
 	liengEngine* self;
 
@@ -63,13 +60,14 @@ lieng_engine_new (const char* datadir,
 	self->range.size = 0xFFFFFFFF;
 	self->calls = lieng_default_calls;
 	self->config.radius = 1;
-	self->config.datadir = strdup (datadir);
-	self->config.dir = strdup (moddir);
-	if (self->config.datadir == NULL ||
-	    self->config.dir == NULL)
+	self->config.dir = strdup (path);
+	if (self->config.dir == NULL)
 		goto error;
 
-	if (!private_init (self, gfx))
+#ifndef LIENG_DISABLE_GRAPHICS
+	self->renderapi = api;
+#endif
+	if (!private_init (self))
 		goto error;
 
 	return self;
@@ -151,7 +149,6 @@ lieng_engine_free (liengEngine* self)
 	}
 #endif
 
-	free (self->config.datadir);
 	free (self->config.dir);
 	free (self);
 }
@@ -675,8 +672,7 @@ private_clear_sectors (liengEngine* self)
 }
 
 static int
-private_init (liengEngine* self,
-              int          gfx)
+private_init (liengEngine* self)
 {
 	/* Callbacks. */
 	self->callbacks = lical_callbacks_new ();
@@ -704,11 +700,8 @@ private_init (liengEngine* self,
 
 	/* Render. */
 #ifndef LIENG_DISABLE_GRAPHICS
-	if (gfx)
+	if (self->renderapi != NULL)
 	{
-		self->renderapi = lisys_module_global_symbol ("lipsrender", "lirnd_render_api");
-		if (self->renderapi == NULL)
-			return 0;
 		self->render = self->renderapi->lirnd_render_new (self->config.dir);
 		if (self->render == NULL)
 			return 0;

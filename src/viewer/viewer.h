@@ -27,19 +27,21 @@
 
 #include <SDL/SDL.h>
 #include <engine/lips-engine.h>
+#include <paths/lips-paths.h>
 #include <reload/lips-reload.h>
+#include <system/lips-system.h>
 #include <video/lips-video.h>
 
 typedef struct _livieViewer livieViewer;
 struct _livieViewer
 {
-	char* datadir;
-	char* path;
 	SDL_Surface* screen;
 	liengCamera* camera;
 	liengEngine* engine;
 	liengObject* object;
+	lipthPaths* paths;
 	lirelReload* reload;
+	lividCalls video;
 	struct
 	{
 		lirndLight* key;
@@ -54,7 +56,9 @@ struct _livieViewer
 };
 
 livieViewer*
-livie_viewer_new (const char* name,
+livie_viewer_new (lividCalls* video,
+                  const char* path,
+                  const char* name,
                   const char* model);
 
 void

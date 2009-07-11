@@ -30,7 +30,6 @@
 #include "client.h"
 #include "client-callbacks.h"
 #include "client-module.h"
-#include "client-paths.h"
 #include "client-script.h"
 #include "client-speech.h"
 #include "client-window.h"
@@ -49,6 +48,7 @@ private_init_extensions (licliModule* self);
 
 static int
 private_init_paths (licliModule* self,
+                    const char*  path,
                     const char*  name);
 
 static int
@@ -71,13 +71,15 @@ private_render_speech (licliModule* self);
  * If the module isn't networked, the login name and password are ignored.
  *
  * \param client Client program.
- * \param name Name of the module.
+ * \param path Package root directory.
+ * \param name Module name.
  * \param login Login name.
  * \param password Login password.
  * \return New module or NULL.
  */
 licliModule*
 licli_module_new (licliClient* client,
+                  const char*  path,
                   const char*  name,
                   const char*  login,
                   const char*  password)
@@ -99,12 +101,12 @@ licli_module_new (licliClient* client,
 		goto error;
 
 	/* Initialize subsystems. */
-	if (!private_init_paths (self, name) ||
+	if (!private_init_paths (self, path, name) ||
 	    !private_init_bindings (self) ||
 	    !private_init_engine (self) ||
+	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_sound (self) ||
-	    !private_init_widgets (self) ||
 	    !private_init_extensions (self) ||
 		!private_init_script (self))
 		goto error;
@@ -171,6 +173,8 @@ licli_module_free (licliModule* self)
 #endif
 	if (self->server != NULL)
 		lisrv_server_free (self->server);
+	if (self->paths != NULL)
+		lipth_paths_free (self->paths);
 	free (self->login);
 	free (self->password);
 	free (self->path);
@@ -292,7 +296,7 @@ licli_module_host (licliModule* self)
 {
 	if (self->server != NULL)
 		lisrv_server_free (self->server);
-	self->server = lisrv_server_new (self->name);
+	self->server = lisrv_server_new (self->paths->root, self->name);
 	if (self->server == NULL)
 		return 0;
 
@@ -447,7 +451,7 @@ licli_module_main (licliModule* self)
 			}
 		}
 		else if (!active)
-			SDL_Delay (100);
+			self->client->video.SDL_Delay (100);
 
 		/* TODO: Do we want to keep running even when not connected? */
 		if (self->network == NULL || !licli_network_get_connected (self->network))
@@ -561,7 +565,7 @@ licli_module_render (licliModule* self)
 	glEnable (GL_DEPTH_TEST);
 	glDepthMask (GL_TRUE);
 
-	SDL_GL_SwapBuffers ();
+	self->client->video.SDL_GL_SwapBuffers ();
 }
 
 /**
@@ -600,7 +604,7 @@ licli_module_update (licliModule* self,
 	SDL_Event event;
 
 	/* Invoke input callbacks. */
-	while (SDL_PollEvent (&event))
+	while (self->client->video.SDL_PollEvent (&event))
 		lieng_engine_call (self->engine, LICLI_CALLBACK_EVENT, &event);
 
 	/* Invoke tick callbacks. */
@@ -642,14 +646,14 @@ licli_module_set_moving (licliModule* self,
 	{
 		cx = self->window->mode.width / 2;
 		cy = self->window->mode.height / 2;
-		SDL_ShowCursor (SDL_DISABLE);
-		SDL_WarpMouse (cx, cy);
-		SDL_WM_GrabInput (SDL_GRAB_OFF);
+		self->client->video.SDL_ShowCursor (SDL_DISABLE);
+		self->client->video.SDL_WarpMouse (cx, cy);
+		self->client->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
 	}
 	else
 	{
-		SDL_ShowCursor (SDL_ENABLE);
-		SDL_WM_GrabInput (SDL_GRAB_OFF);
+		self->client->video.SDL_ShowCursor (SDL_ENABLE);
+		self->client->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
 	}
 }
 
@@ -712,7 +716,7 @@ private_init_engine (licliModule* self)
 	liengCalls* calls;
 
 	/* Initialize engine. */
-	self->engine = lieng_engine_new (self->paths->global_data, self->path, 1);
+	self->engine = lieng_engine_new (self->paths->module_data, &lirnd_render_api);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);
@@ -756,15 +760,13 @@ private_init_extensions (licliModule* self)
 
 static int
 private_init_paths (licliModule* self,
+                    const char*  path,
                     const char*  name)
 {
-	self->paths = licli_paths_new ();
+	self->paths = lipth_paths_new (path, name);
 	if (self->paths == NULL)
 		return 0;
-	if (!strcmp (name, "data"))
-		self->path = lisys_path_concat (self->paths->global_data, name, NULL);
-	else
-		self->path = lisys_path_concat (self->paths->global_data, "mods", name, NULL);
+	self->path = strdup (self->paths->module_data);
 	if (self->path == NULL)
 		return 0;
 
@@ -834,7 +836,7 @@ private_init_sound (licliModule* self)
 static int
 private_init_widgets (licliModule* self)
 {
-	self->widgets = liwdg_manager_new (self->path);
+	self->widgets = liwdg_manager_new (&self->client->video, self->path);
 	if (self->widgets == NULL)
 		return 0;
 	liwdg_manager_set_size (self->widgets, self->window->mode.width, self->window->mode.height);
