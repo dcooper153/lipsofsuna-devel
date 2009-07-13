@@ -181,8 +181,6 @@ private_execvp_redir (lisysExecFilter    filter,
 	/* FIXME: Spaces in arguments will break. */
 	for (arg = args ; *arg != NULL ; arg++)
 	{
-		if (arg == args)
-			continue;
 		l = strlen (*arg);
 		tmp = realloc (cmd, len + l + 2);
 		if (tmp == NULL)
@@ -192,9 +190,10 @@ private_execvp_redir (lisysExecFilter    filter,
 			return 0;
 		}
 		cmd = tmp;
-		cmd[len] = ' ';
-		strncpy (cmd + len + 1, *arg, l);
-		len += l + 1;
+		strncpy (cmd + len, *arg, l);
+		len += l;
+		if (arg[1] != NULL)
+			cmd[len++] = ' ';
 		cmd[len] = '\0';
 	}
 
