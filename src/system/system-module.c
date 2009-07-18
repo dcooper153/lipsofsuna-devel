@@ -27,6 +27,7 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -64,6 +65,7 @@ lisys_module_new (const char* path,
 #ifdef HAVE_DLFCN_H
 
 	int dlflags;
+	char* tmp;
 	lisysModule* self;
 
 	/* Allocate self. */
@@ -81,8 +83,25 @@ lisys_module_new (const char* path,
 	else
 		dlflags |= RTLD_LOCAL;
 
+	/* Create full path on demand. */
+	if (strchr (path, '/') == NULL && strstr (path, ".so") == NULL)
+	{
+		tmp = calloc (strlen (path) + 7, sizeof (char));
+		if (tmp == NULL)
+			return NULL;
+		strcpy (tmp, "lib");
+		strcat (tmp, path);
+		strcat (tmp, ".so");
+	}
+	else
+		tmp = NULL;
+
 	/* Open library. */
-	self->handle = dlopen (path, dlflags);
+	if (tmp != NULL)
+		self->handle = dlopen (tmp, dlflags);
+	else
+		self->handle = dlopen (path, dlflags);
+	free (tmp);
 	if (self->handle == NULL)
 	{
 		lisys_error_set (EIO, "%s", dlerror ());
