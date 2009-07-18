@@ -171,6 +171,15 @@ def FaceTextures(object, mesh, face):
 
 	return textures
 
+def MeshVisible(object, mesh):
+	bsystems = object.getParticleSystems()
+	if len(bsystems) == 0:
+		return 1
+	for bparticles in bsystems:
+		if bparticles.renderEmitter:
+			return 1
+	return 0
+
 def NodeChild(scene, object, bone, child):
 	if object != child.parent:
 		return 0
@@ -203,6 +212,35 @@ def NodeChildren(scene, object, bone, parent):
 			if o.type == "Lamp":
 				nodes.append(LipsNode(LipsNodeType.LIGHT, scene, o, None, parent))
 	return nodes
+
+def ObjectHairs(object):
+
+	hairs = []
+
+	# Find hair particles.
+	for bparticles in object.getParticleSystems():
+		if bparticles.type is not Blender.Particle.TYPE['HAIR']:
+			continue
+	
+		# Get hair data.
+		bmat = bparticles.getMat()
+		locss = bparticles.getLoc(1)
+		sizes = bparticles.getSize(1)
+	
+		# Create hair strips.
+		# FIXME: Where is the size information for hair?
+		for locs in locss:
+			if locs is not None:
+				hair = LipsHair(bmat)
+				i = 0
+				for loc in locs:
+					tmp = Vector(loc[0], loc[1], loc[2])
+					hair.AppendNode(tmp[0], tmp[1], tmp[2], 1.0)#sizes[i])
+				i = i + 1
+				if len(hair.nodes):
+					hairs.append(hair)
+	
+	return hairs
 
 def VertexCoord(object, mesh, face, index):
 	global lips_correction_matrix
@@ -259,7 +297,7 @@ def VertexWeights(object, mesh, face, index, bones):
 #############################################################################
 # Function customization.
 
-lips_format_version = 0xFFFFFFFA
+lips_format_version = 0xFFFFFFF9
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
 lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
@@ -273,6 +311,8 @@ lips_exporter_calls = \
 	"FaceShininess": FaceShininess, \
 	"FaceSpecular": FaceSpecular, \
 	"FaceTextures": FaceTextures, \
+	"ObjectHairs": ObjectHairs, \
+	"MeshVisible": MeshVisible, \
 	"NodeChild": NodeChild, \
 	"NodeChildren": NodeChildren, \
 	"VertexCoord": VertexCoord, \
@@ -1059,6 +1099,34 @@ class LipsNode:
 			return quat
 
 #############################################################################
+# Particles.
+
+class LipsHair:
+
+	# Initializes a new hair strip.
+	def __init__(self, bmat):
+		# TODO: Material support.
+		self.nodes = []
+
+	# Appends a new node to the hair strip.
+	#
+	# \param self Hair.
+	def AppendNode(self, x, y, z, s):
+		self.nodes.append([x, y, z, s])
+
+	# Saves the hair strip.
+	#
+	# \param self Hair.
+	# \param writer Writer.
+	def Write(self, writer):
+		writer.WriteInt(len(self.nodes))
+		for node in self.nodes:
+			writer.WriteFloat(node[0])
+			writer.WriteFloat(node[1])
+			writer.WriteFloat(node[2])
+			writer.WriteFloat(node[3])
+
+#############################################################################
 # Scene.
 
 class LipsScene:
@@ -1079,7 +1147,21 @@ class LipsScene:
 				armatures.append(obj)
 		return armatures
 
-	# \brief Gets the list of meshes in the scene.
+	# \brief Gets the list of hairs in the scene.
+	#
+	# \param self Scene.
+	# \return Array of Lips hair objects.
+	def GetHairs(self):
+		hairs = []
+		objects = self.scene.objects
+		for obj in objects:
+			if obj.type == "Mesh":
+				hairs1 = lips_exporter_calls["ObjectHairs"](obj)
+				for hair in hairs1:
+					hairs.append(hair)
+		return hairs
+
+	# \brief Gets the list of visible meshes in the scene.
 	#
 	# \param self Scene.
 	# \return Array of Blender objects.
@@ -1088,7 +1170,8 @@ class LipsScene:
 		objects = self.scene.objects
 		for obj in objects:
 			if obj.type == "Mesh" and obj.parent == None:
-				meshes.append(obj)
+				if lips_exporter_calls["MeshVisible"](obj, obj.getData(0, 1)):
+					meshes.append(obj)
 		return meshes
 
 	# \brief Gets the list of objects in the scene.
@@ -1139,36 +1222,38 @@ class LipsExport:
 
 	def Write(self):
 
-		# Append armatures.
+		# Write header.
+		self.writer = LipsWriter(self.export_dir + self.export_name + self.export_ext)
+		self.writer.WriteString(self.export_magic)
+		self.writer.WriteInt(lips_format_version)
+
+		# Write mesh.
+		meshes = self.scene.GetMeshes()
+		for mesh in meshes:
+			self.mesh.AppendMesh(mesh)
+		self.mesh.Compile(self.armature)
+		self.mesh.Write(self.writer)
+
+		# Write nodes.
+		self.writer.WriteInt(1)
+		node = LipsNode(LipsNodeType.EMPTY, self.scene, None, None, None)
+		node.Write(self.writer)
+
+		# Write armatures.
 		armatures = self.scene.GetArmatures()
 		if len(armatures) > 1:
 			armatures = [armatures[0]]
 			print("W: File contains multiple armature.")
 		for armature in armatures:
 			self.armature.AppendArmature(armature, armature.getData())
-
-		# Append meshes.
-		meshes = self.scene.GetMeshes()
-		if len(meshes) == 0:
-			print("W: File contains no meshes.")
-			return None
-		for mesh in meshes:
-			self.mesh.AppendMesh(mesh)
-		self.mesh.Compile(self.armature)
-
-		# Write data.
-		self.writer = LipsWriter(self.export_dir + self.export_name + self.export_ext)
-		self.writer.WriteString(self.export_magic)
-		self.writer.WriteInt(lips_format_version)
-		self.mesh.Write(self.writer)
-		self.writer.WriteInt(1)
-		node = LipsNode(LipsNodeType.EMPTY, self.scene, None, None, None)
-		node.Write(self.writer)
 		self.armature.Write(self.writer)
-		self.writer.Close()
 
-		# FIXME: Debug.
-		node.Debug()
+		# Write hairs.
+		hairs = self.scene.GetHairs()
+		self.writer.WriteInt(len(hairs))
+		for hair in hairs:
+			hair.Write(self.writer)
+		self.writer.Close()
 
 #############################################################################
 # Specialized exporter.

@@ -40,6 +40,11 @@ lirnd_draw_exclude (lirndContext* context,
                     void*         data);
 
 void
+lirnd_draw_hair (lirndContext* context,
+                 lirndObject*  object,
+                 void*         data);
+
+void
 lirnd_draw_opaque (lirndContext* context,
                    lirndObject*  object,
                    void*         data);

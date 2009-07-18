@@ -15,18 +15,53 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_MODEL_H__
-#define __LIPS_MODEL_H__
+/**
+ * \addtogroup limdl Model
+ * @{
+ * \addtogroup limdlHair Hair
+ * @{
+ */
 
-#include "model.h"
-#include "model-animation.h"
-#include "model-bone.h"
-#include "model-hair.h"
-#include "model-ipo.h"
-#include "model-material.h"
-#include "model-node.h"
-#include "model-light.h"
-#include "model-pose.h"
-#include "model-vertex.h"
+#ifndef __MODEL_HAIR_H__
+#define __MODEL_HAIR_H__
+
+#include <archive/lips-archive.h>
+#include <math/lips-math.h>
+#include <string/lips-string.h>
+#include "model-types.h"
+
+struct _limdlHairNode
+{
+	limatVector position;
+	float size;
+};
+
+struct _limdlHair
+{
+	struct
+	{
+		int count;
+		limdlHairNode* array;
+	} nodes;
+};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int
+limdl_hair_read (limdlHair* self,
+                 liReader*  reader);
+
+int
+limdl_hair_write (limdlHair*   self,
+                  liarcWriter* writer);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
+
+/** @} */
+/** @} */

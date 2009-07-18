@@ -506,6 +506,9 @@ private_init_model (liphyShape*       self,
 {
 	int i;
 
+	if (!model->vertex.count)
+		return 1;
+
 	/* Allocate indices. */
 	/* FIXME: Pretty pointless to have something like this. */
 	self->indices.count = model->vertex.count;

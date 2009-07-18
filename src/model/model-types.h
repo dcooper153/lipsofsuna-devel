@@ -64,6 +64,15 @@ enum _limdlNodeType
 typedef enum _limdlNodeType limdlNodeType;
 typedef struct _limdlNode limdlNode;
 
+/**
+ * @}
+ * \addtogroup limdlHair Hair
+ * @{
+ */
+
+typedef struct _limdlHair limdlHair;
+typedef struct _limdlHairNode limdlHairNode;
+
 #endif
 
 /** @} */

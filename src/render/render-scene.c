@@ -272,6 +272,7 @@ lirnd_scene_render (lirndScene*   self,
 	self->render->profiling.vertices = 0;
 #endif
 	private_render (self, &context, lirnd_draw_opaque, NULL);
+	private_render (self, &context, lirnd_draw_hair, NULL);
 	private_render (self, &context, lirnd_draw_transparent, NULL);
 #ifdef LIRND_ENABLE_PROFILING
 	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",

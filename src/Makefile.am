@@ -165,6 +165,8 @@ mdlsrc = \
 	model/model-animation.h \
 	model/model-bone.c \
 	model/model-bone.h \
+	model/model-hair.c \
+	model/model-hair.h \
 	model/model-ipo.c \
 	model/model-ipo.h \
 	model/model-ipo-channel.c \

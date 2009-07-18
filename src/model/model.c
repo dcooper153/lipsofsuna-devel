@@ -48,6 +48,10 @@ private_read_armature (limdlModel* self,
                        liReader*   reader);
 
 static int
+private_read_hairs (limdlModel* self,
+                    liReader*   reader);
+
+static int
 private_read_hierarchy (limdlModel* self,
                         liReader*   reader);
 
@@ -92,6 +96,10 @@ private_write (const limdlModel* self,
 static int
 private_write_armature (const limdlModel* self,
                         liarcWriter*      writer);
+
+static int
+private_write_hairs (const limdlModel* self,
+                     liarcWriter*      writer);
 
 static int
 private_write_hierarchy (const limdlModel* self,
@@ -726,7 +734,8 @@ private_read (limdlModel* self,
 	/* Read chunks. */
 	if (!private_read_mesh (self, reader) ||
 	    !private_read_hierarchy (self, reader) ||
-	    !private_read_armature (self, reader))
+	    !private_read_armature (self, reader) ||
+	    !private_read_hairs (self, reader))
 		goto error;
 
 	return 1;
@@ -760,6 +769,40 @@ private_read_armature (limdlModel* self,
 		{
 			animation = self->animation.animations + i;
 			if (!private_read_animation (self, animation, reader))
+				goto error;
+		}
+	}
+
+	return 1;
+
+error:
+	return 0;
+}
+
+static int
+private_read_hairs (limdlModel* self,
+                    liReader*   reader)
+{
+	int i;
+	uint32_t count;
+
+	/* Read hair count. */
+	if (!li_reader_get_uint32 (reader, &count))
+		goto error;
+	self->hairs.count = count;
+
+	/* Read hairs. */
+	if (self->hairs.count)
+	{
+		self->hairs.array = calloc (self->hairs.count, sizeof (limdlHair));
+		if (self->hairs.array == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			goto error;
+		}
+		for (i = 0 ; i < self->hairs.count ; i++)
+		{
+			if (!limdl_hair_read (self->hairs.array + i, reader))
 				goto error;
 		}
 	}
@@ -1114,7 +1157,8 @@ private_write (const limdlModel* self,
 		return 0;
 	if (!private_write_mesh (self, writer) ||
 	    !private_write_hierarchy (self, writer) ||
-	    !private_write_armature (self, writer))
+	    !private_write_armature (self, writer) ||
+	    !private_write_hairs (self, writer))
 		return 0;
 	return 1;
 }
@@ -1132,6 +1176,25 @@ private_write_armature (const limdlModel* self,
 	{
 		animation = self->animation.animations + i;
 		private_write_animation (self, animation, writer);
+	}
+
+	return !writer->error;
+}
+
+static int
+private_write_hairs (const limdlModel* self,
+                     liarcWriter*      writer)
+{
+	int i;
+	limdlHair* hair;
+
+	/* Write animations. */
+	liarc_writer_append_uint32 (writer, self->hairs.count);
+	for (i = 0 ; i < self->hairs.count ; i++)
+	{
+		hair = self->hairs.array + i;
+		if (!limdl_hair_write (hair, writer))
+			return 0;
 	}
 
 	return !writer->error;

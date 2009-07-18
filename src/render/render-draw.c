@@ -129,6 +129,84 @@ lirnd_draw_exclude (lirndContext* context,
 }
 
 void
+lirnd_draw_hair (lirndContext* context,
+                 lirndObject*  object,
+                 void*         data)
+{
+	int i;
+	int j;
+	int flags;
+	float w;
+	limatAabb aabb;
+	limatMatrix matrix;
+	limatVector bbx;
+	limatVector bbz;
+	limatVector center;
+	limatVector coord[2];
+	limdlHair* hair;
+
+	/* Check if renderable. */
+	if (!lirnd_object_get_realized (object))
+		return;
+
+	/* Frustum culling. */
+	lirnd_object_get_bounds (object, &aabb);
+	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
+		return;
+
+	/* Lighting. */
+	lirnd_object_get_center (object, &center);
+	lirnd_scene_set_light_focus (context->scene, &center);
+
+	/* Rendering mode. */
+	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
+	flags |= LIRND_FLAG_LIGHTING;
+	flags |= LIRND_FLAG_TEXTURING;
+	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+
+	/* Initialize context. */
+	matrix = object->orientation.matrix;
+	lirnd_context_set_flags (context, flags);
+	lirnd_context_set_lights (context,
+		context->scene->lighting->active_lights.array,
+		context->scene->lighting->active_lights.count);
+//	lirnd_context_set_material (context, NULL);//material);
+	lirnd_context_set_matrix (context, &matrix);
+	lirnd_context_set_shader (context, NULL);//material->shader);
+	lirnd_context_set_textures (context, NULL, 0);
+	lirnd_context_bind (context);
+
+	/* Calculate billboard axis. */
+	bbx = limat_vector_init (context->modelview.m[0], context->modelview.m[4], context->modelview.m[8]);
+	bbz = limat_vector_init (context->modelview.m[2], context->modelview.m[6], context->modelview.m[10]);
+
+	/* Render billboards. */
+	glDisable (GL_CULL_FACE);
+	for (i = 0 ; i < object->model->model->hairs.count ; i++)
+	{
+		hair = object->model->model->hairs.array + i;
+		glBegin (GL_TRIANGLE_STRIP);
+		for (j = 0 ; j < hair->nodes.count && j < 10 ; j++)
+		{
+			w = 0.08f * (1.0f - (float)(j + 1) / hair->nodes.count);
+			coord[0] = hair->nodes.array[j].position;
+			coord[0] = limat_matrix_transform (matrix, coord[0]);
+			coord[1] = limat_vector_multiply (bbx, w);
+			coord[1] = limat_vector_add (coord[0], coord[1]);
+			glNormal3f (bbz.x, bbz.y, bbz.z);
+			glVertex3f (coord[0].x, coord[0].y, coord[0].z);
+			glVertex3f (coord[1].x, coord[1].y, coord[1].z);
+		}
+		glEnd ();
+	}
+
+#ifdef LIRND_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
+}
+
+void
 lirnd_draw_opaque (lirndContext* context,
                    lirndObject*  object,
                    void*         data)

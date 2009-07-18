@@ -30,13 +30,14 @@
 #include <string/lips-string.h>
 #include "model-animation.h"
 #include "model-bone.h"
+#include "model-hair.h"
 #include "model-light.h"
 #include "model-material.h"
 #include "model-node.h"
 #include "model-types.h"
 #include "model-vertex.h"
 
-#define LIMDL_FORMAT_VERSION 0xFFFFFFFA
+#define LIMDL_FORMAT_VERSION 0xFFFFFFF9
 
 typedef int limdlModelFlags;
 typedef struct _limdlWeightGroup limdlWeightGroup;
@@ -88,6 +89,13 @@ struct _limdlModel
 		int count;
 		limdlNode** array;
 	} nodes;
+
+	/* Particle. */
+	struct
+	{
+		int count;
+		limdlHair* array;
+	} hairs;
 };
 
 #ifdef __cplusplus
