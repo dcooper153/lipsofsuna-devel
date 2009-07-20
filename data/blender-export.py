@@ -139,7 +139,7 @@ def MaterialTextures(bmat, bmesh, bface):
 					flags = textures[0].flags
 				textures[0] = LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)
 			else:
-				textures.append(LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name))
+				textures[0] = LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)
 				count = 1
 	return textures[:count]
 
