@@ -30,6 +30,7 @@
 #include <string/lips-string.h>
 #include "model-animation.h"
 #include "model-bone.h"
+#include "model-faces.h"
 #include "model-hair.h"
 #include "model-light.h"
 #include "model-material.h"
@@ -41,8 +42,6 @@
 
 typedef int limdlModelFlags;
 typedef struct _limdlWeightGroup limdlWeightGroup;
-typedef struct _limdlWeights limdlWeights;
-typedef struct _limdlWeight limdlWeight;
 
 enum
 {
@@ -63,20 +62,21 @@ struct _limdlModel
 		limdlAnimation* animations;
 	} animation;
 
+	/* Materials. */
+	struct
+	{
+		int count;
+		limdlMaterial* array;
+	} materials;
+
 	/* Mesh. */
 	int flags;
 	limatAabb bounds;
 	struct
 	{
 		int count;
-		limdlMaterial* materials;
-	} materials;
-	struct
-	{
-		int count;
-		limdlVertex* vertices;
-		limdlWeights* weights;
-	} vertex;
+		limdlFaces* array;
+	} facegroups;
 	struct
 	{
 		int count;
@@ -94,7 +94,7 @@ struct _limdlModel
 	struct
 	{
 		int count;
-		limdlHair* array;
+		limdlHairs* array;
 	} hairs;
 };
 
@@ -126,6 +126,10 @@ limdl_model_find_node (const limdlModel* self,
                        const char*       name);
 
 int
+limdl_model_insert_group (limdlModel* self,
+                          int         material);
+
+int
 limdl_model_insert_material (limdlModel*          self,
                              const limdlMaterial* material);
 
@@ -135,7 +139,7 @@ limdl_model_insert_node (limdlModel* self,
 
 int
 limdl_model_insert_triangle (limdlModel*         self,
-                             int                 material,
+                             int                 group,
                              const limdlVertex*  vertices,
                              const limdlWeights* weights);
 
@@ -153,7 +157,11 @@ limdl_model_get_animation (limdlModel* self,
 
 int
 limdl_model_get_index (const limdlModel*  self,
-                       const limdlVertex* vertex);
+                       const limdlVertex* vertex,
+                       int                group);
+
+int
+limdl_model_get_index_count (const limdlModel* self);
 
 #ifdef __cplusplus
 }
@@ -166,18 +174,6 @@ struct _limdlWeightGroup
 	char* name;
 	char* bone;
 	limdlNode* node;
-};
-
-struct _limdlWeights
-{
-	int count;
-	limdlWeight* weights;
-};
-
-struct _limdlWeight
-{
-	int group;
-	float weight;
 };
 
 #endif

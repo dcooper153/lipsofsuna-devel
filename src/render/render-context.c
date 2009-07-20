@@ -127,15 +127,31 @@ lirnd_context_bind (lirndContext* self)
  * \brief Renders triangles.
  *
  * \param self Rendering context.
+ * \param buffer Render buffer.
+ */
+void
+lirnd_context_render (lirndContext* self,
+                      lirndBuffer*  buffer)
+{
+	if (buffer->buffer)
+		lirnd_context_render_vbo (self, 0, buffer->vertices.count, buffer->buffer);
+	else
+		lirnd_context_render_vtx (self, 0, buffer->vertices.count, buffer->vertices.array);
+}
+
+/**
+ * \brief Renders triangles.
+ *
+ * \param self Rendering context.
  * \param vertex0 Vertex from which to begin rendering.
  * \param vertex1 Vertex to which to end rendering.
  * \param vertices Vertex array.
  */
 void
-lirnd_context_render_buffer (lirndContext* self,
-                             int           vertex0,
-                             int           vertex1,
-                             GLuint        vertices)
+lirnd_context_render_vbo (lirndContext* self,
+                          int           vertex0,
+                          int           vertex1,
+                          GLuint        vertices)
 {
 	int count;
 	glColor3f (1.0f, 1.0f, 1.0f);
@@ -190,10 +206,10 @@ lirnd_context_render_buffer (lirndContext* self,
  * \param vertices Vertex array.
  */
 void
-lirnd_context_render_indexed (lirndContext*      self,
-                              int                vertex0,
-                              int                vertex1,
-                              const limdlVertex* vertices)
+lirnd_context_render_vtx (lirndContext*      self,
+                          int                vertex0,
+                          int                vertex1,
+                          const limdlVertex* vertices)
 {
 	int i;
 	limatVector n[3];

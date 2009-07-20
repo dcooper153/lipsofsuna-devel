@@ -36,10 +36,6 @@ static void
 private_filter (void* data,
                 FILE* file);
 
-static int
-private_move (const char* src,
-              const char* dst);
-
 /*****************************************************************************/
 
 /**
@@ -55,8 +51,6 @@ lirel_reload_blender (lirelReload* self,
                       const char*  src,
                       const char*  dst)
 {
-	char* name;
-
 	/* Check if file is missing for sure. */
 	if (access (src, R_OK) == -1)
 		return 0;
@@ -65,19 +59,6 @@ lirel_reload_blender (lirelReload* self,
 	if (!private_convert (self, src))
 		return 0;
 
-	/* Get name of temporary file. */
-	name = lisys_path_format (LISYS_PATH_BASENAME, src, LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
-	if (name == NULL)
-		return 0;
-
-	/* Move to the right place. */
-	if (!private_move (name, dst))
-	{
-		free (name);
-		return 0;
-	}
-
-	free (name);
 	return 1;
 }
 
@@ -118,28 +99,6 @@ private_filter (void* data,
 				printf ("%s", buffer);
 		}
 	}
-}
-
-static int
-private_move (const char* src,
-              const char* dst)
-{
-	int ret;
-	limdlModel* model;
-
-	/* Open source file. */
-	model = limdl_model_new_from_file (src);
-	if (model == NULL)
-		return 0;
-
-	/* Remove source file. */
-	unlink (src);
-
-	/* Write destination file. */
-	ret = limdl_model_write_file (model, dst);
-	limdl_model_free (model);
-
-	return ret;
 }
 
 /** @} */

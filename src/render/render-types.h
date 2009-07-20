@@ -35,7 +35,7 @@ enum _lirndSelect
 	LIRND_SELECT_SECTOR,
 };
 
-typedef struct _lirndCamera lirndCamera;
+typedef struct _lirndBuffer lirndBuffer;
 typedef struct _lirndContext lirndContext;
 typedef enum _lirndFlags lirndFlags;
 typedef struct _lirndLight lirndLight;

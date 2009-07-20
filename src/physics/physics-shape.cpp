@@ -505,13 +505,18 @@ private_init_model (liphyShape*       self,
                     const limdlModel* model)
 {
 	int i;
+	int j;
+	int k;
+	int count;
+	limdlFaces* group;
 
-	if (!model->vertex.count)
+	count = limdl_model_get_index_count (model);
+	if (!count)
 		return 1;
 
 	/* Allocate indices. */
 	/* FIXME: Pretty pointless to have something like this. */
-	self->indices.count = model->vertex.count;
+	self->indices.count = count;
 	self->indices.array = (int*) calloc (self->indices.count, sizeof (int));
 	if (self->indices.array == NULL)
 	{
@@ -522,19 +527,23 @@ private_init_model (liphyShape*       self,
 		self->indices.array[i] = i;
 
 	/* Allocate vertices. */
-	self->vertices.count = model->vertex.count;
+	self->vertices.count = count;
 	self->vertices.array = (btScalar*) calloc (4 * self->vertices.count, sizeof (btScalar));
 	if (self->vertices.array == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		return 0;
 	}
-	for (i = 0 ; i < self->vertices.count ; i++)
+	for (i = j = 0 ; j < model->facegroups.count ; j++)
 	{
-		self->vertices.array[4 * i + 0] = model->vertex.vertices[i].coord.x;
-		self->vertices.array[4 * i + 1] = model->vertex.vertices[i].coord.y;
-		self->vertices.array[4 * i + 2] = model->vertex.vertices[i].coord.z;
-		self->vertices.array[4 * i + 3] = 0.0;
+		group = model->facegroups.array + j;
+		for (k = 0 ; k < group->vertices.count ; k++)
+		{
+			self->vertices.array[i++] = group->vertices.array[k].coord.x;
+			self->vertices.array[i++] = group->vertices.array[k].coord.y;
+			self->vertices.array[i++] = group->vertices.array[k].coord.z;
+			self->vertices.array[i++] = 0.0;
+		}
 	}
 
 	/* Create shapes. */

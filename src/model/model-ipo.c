@@ -26,6 +26,84 @@
 #include <assert.h>
 #include "model-ipo.h"
 
+int
+limdl_ipo_read (limdlIpo* self,
+                liReader* reader)
+{
+	int i;
+	int j;
+	int channels;
+	uint32_t tmp[2];
+
+	/* Read the number of channels. */
+	if (!li_reader_get_text (reader, "", &self->name) ||
+	    !li_reader_get_uint32 (reader, tmp))
+		return 0;
+	channels = tmp[0];
+	if (channels != LIMDL_IPO_CHANNEL_NUM)
+	{
+		lisys_error_set (EINVAL, "invalid ipo channel");
+		return 0;
+	}
+
+	/* Read each channel. */
+	for (i = 0 ; i < channels ; i++)
+	{
+		/* Read the header. */
+		if (!li_reader_get_uint32 (reader, tmp + 0) ||
+		    !li_reader_get_uint32 (reader, tmp + 1))
+			return 0;
+		self->channels[i].type = tmp[0];
+		self->channels[i].length = tmp[1];
+
+		if (self->channels[i].length)
+		{
+			/* Allocate memory. */
+			self->channels[i].nodes = calloc (self->channels[i].length, sizeof (float));
+			if (self->channels[i].nodes == NULL)
+			{
+				lisys_error_set (ENOMEM, NULL);
+				return 0;
+			}
+
+			/* Read the data. */
+			for (j = 0 ; j < self->channels[i].length ; j++)
+			{
+				if (!li_reader_get_float (reader, self->channels[i].nodes + j))
+					return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+int
+limdl_ipo_write (const limdlIpo* self,
+                 liarcWriter*    writer)
+{
+	uint32_t i;
+	uint32_t j;
+
+	if (!liarc_writer_append_string (writer, self->name) ||
+	    !liarc_writer_append_nul (writer) ||
+	    !liarc_writer_append_uint32 (writer, LIMDL_IPO_CHANNEL_NUM))
+		return 0;
+	for (i = 0 ; i < LIMDL_IPO_CHANNEL_NUM ; i++)
+	{
+		if (!liarc_writer_append_uint32 (writer, self->channels[i].type) ||
+		    !liarc_writer_append_uint32 (writer, self->channels[i].length))
+			return 0;
+		for (j = 0 ; j < self->channels[i].length ; j++)
+		{
+			if (!liarc_writer_append_float (writer, self->channels[i].nodes[j]))
+				return 0;
+		}
+	}
+
+	return 1;
+}
+
 float
 limdl_ipo_get_duration (const limdlIpo* self)
 {

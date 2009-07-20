@@ -34,7 +34,6 @@
 struct _lirndModel
 {
 	int id;
-	GLuint buffer;
 	limdlModel* model;
 	lirndRender* render;
 };

@@ -44,6 +44,9 @@ struct _lirndMaterial
 	float shininess;
 	float diffuse[4];
 	float specular[4];
+	float strand_start;
+	float strand_end;
+	float strand_shape;
 	lirndShader* shader;
 	struct
 	{

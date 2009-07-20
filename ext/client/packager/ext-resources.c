@@ -257,7 +257,7 @@ private_read_shaders (liextResources*   self,
 
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
-		material = model->materials.materials + i;
+		material = model->materials.array + i;
 		count = self->shaders.count;
 
 		/* Check for duplicate. */
@@ -293,7 +293,7 @@ private_read_textures (liextResources*   self,
 
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
-		material = model->materials.materials + i;
+		material = model->materials.array + i;
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;

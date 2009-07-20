@@ -165,6 +165,8 @@ mdlsrc = \
 	model/model-animation.h \
 	model/model-bone.c \
 	model/model-bone.h \
+	model/model-faces.c \
+	model/model-faces.h \
 	model/model-hair.c \
 	model/model-hair.h \
 	model/model-ipo.c \
@@ -213,6 +215,8 @@ rndsrc = \
 	render/render.h \
 	render/render-api.c \
 	render/render-api.h \
+	render/render-buffer.c \
+	render/render-buffer.h \
 	render/render-context.c \
 	render/render-context.h \
 	render/render-draw.c \

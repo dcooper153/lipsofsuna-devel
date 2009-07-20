@@ -76,13 +76,6 @@ lirnd_light_new_from_model (lirndScene*      scene,
 void
 lirnd_light_free (lirndLight* self);
 
-void
-lirnd_light_bind (lirndLight*  self,
-                  lirndCamera* camera,
-                  int          number,
-                  int          texture,
-                  int          shadow);
-
 int
 lirnd_light_compare (const lirndLight* self,
                      const lirndLight* light);
@@ -126,7 +119,7 @@ lirnd_light_get_projection (const lirndLight* self,
                             limatMatrix*      value);
 
 void
-lirnd_light_set_projection (lirndLight*     self,
+lirnd_light_set_projection (lirndLight*        self,
                             const limatMatrix* value);
 
 #endif

@@ -684,7 +684,7 @@ private_verbose_model (liextPackagerData* self,
 	printf ("Model: %s\n", name);
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
-		material = model->materials.materials + i;
+		material = model->materials.array + i;
 		for (j = 0 ; j < material->textures.count ; j++)
 			printf ("    %s\n", material->textures.array[j].string);
 	}

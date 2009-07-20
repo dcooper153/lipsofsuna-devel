@@ -15,23 +15,42 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_RENDER_H__
-#define __LIPS_RENDER_H__
+/**
+ * \addtogroup lirnd Render
+ * @{
+ * \addtogroup lirndBuffer Buffer
+ * @{
+ */
 
-#include "render.h"
-#include "render-api.h"
-#include "render-buffer.h"
-#include "render-context.h"
-#include "render-draw.h"
-#include "render-image.h"
-#include "render-light.h"
-#include "render-lighting.h"
+#ifndef __RENDER_BUFFER_H__
+#define __RENDER_BUFFER_H__
+
+#include <model/lips-model.h>
+#include <video/lips-video.h>
 #include "render-material.h"
-#include "render-model.h"
-#include "render-object.h"
-#include "render-scene.h"
-#include "render-shader.h"
-#include "render-texture.h"
 #include "render-types.h"
 
+struct _lirndBuffer
+{
+	GLuint buffer;
+	lirndMaterial* material;
+	struct
+	{
+		int count;
+		limdlVertex* array;
+	} vertices;
+};
+
+int
+lirnd_buffer_init (lirndBuffer*   self,
+                   lirndMaterial* material,
+                   limdlVertex*   data,
+                   int            count);
+
+void
+lirnd_buffer_free (lirndBuffer* self);
+
 #endif
+
+/** @} */
+/** @} */

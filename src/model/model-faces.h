@@ -18,71 +18,58 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlHair Hair
+ * \addtogroup limdlFaces Faces
  * @{
  */
 
-#ifndef __MODEL_HAIR_H__
-#define __MODEL_HAIR_H__
+#ifndef __MODEL_FACES_H__
+#define __MODEL_FACES_H__
 
 #include <archive/lips-archive.h>
-#include <math/lips-math.h>
 #include <string/lips-string.h>
 #include "model-types.h"
+#include "model-vertex.h"
 
-struct _limdlHairNode
+typedef struct _limdlWeight limdlWeight;
+struct _limdlWeight
 {
-	limatVector position;
-	float size;
+	int group;
+	float weight;
 };
 
-struct _limdlHair
+typedef struct _limdlWeights limdlWeights;
+struct _limdlWeights
 {
 	int count;
-	limdlHairNode* nodes;
+	limdlWeight* weights;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int
-limdl_hair_read (limdlHair* self,
-                 liReader*  reader);
-
-int
-limdl_hair_write (limdlHair*   self,
-                  liarcWriter* writer);
-
-#ifdef __cplusplus
-}
-#endif
-
-struct _limdlHairs
+typedef struct _limdlFaces limdlFaces;
+struct _limdlFaces
 {
 	int material;
-	int count;
-	limdlHair* hairs;
+	struct
+	{
+		int count;
+		limdlVertex* array;
+	} vertices;
+	struct
+	{
+		int count;
+		limdlWeights* array;
+	} weights;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void
-limdl_hairs_free (limdlHairs* self);
+limdl_faces_free (limdlFaces* self);
 
 int
-limdl_hairs_read (limdlHairs* self,
+limdl_faces_read (limdlFaces* self,
                   liReader*   reader);
 
 int
-limdl_hairs_write (limdlHairs*  self,
+limdl_faces_write (limdlFaces*  self,
                    liarcWriter* writer);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
 

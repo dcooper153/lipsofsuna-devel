@@ -78,14 +78,15 @@ limdl_texture_compare (const limdlTexture* self,
 typedef struct _limdlMaterial limdlMaterial;
 struct _limdlMaterial
 {
-	int start;
-	int end;
 	int flags;
 	char* shader;
 	float emission;
 	float shininess;
 	float diffuse[4];
 	float specular[4];
+	float strand_start;
+	float strand_end;
+	float strand_shape;
 	struct
 	{
 		int count;

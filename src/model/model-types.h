@@ -72,6 +72,7 @@ typedef struct _limdlNode limdlNode;
 
 typedef struct _limdlHair limdlHair;
 typedef struct _limdlHairNode limdlHairNode;
+typedef struct _limdlHairs limdlHairs;
 
 #endif
 

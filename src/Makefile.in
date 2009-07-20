@@ -124,6 +124,7 @@ am__objects_12 = liblipsofsunaclient_la-math-marching-cubes.lo
 am__objects_13 = liblipsofsunaclient_la-model.lo \
 	liblipsofsunaclient_la-model-animation.lo \
 	liblipsofsunaclient_la-model-bone.lo \
+	liblipsofsunaclient_la-model-faces.lo \
 	liblipsofsunaclient_la-model-hair.lo \
 	liblipsofsunaclient_la-model-ipo.lo \
 	liblipsofsunaclient_la-model-ipo-channel.lo \
@@ -143,6 +144,7 @@ am__objects_17 = liblipsofsunaclient_la-reload.lo \
 	liblipsofsunaclient_la-reload-image.lo
 am__objects_18 = liblipsofsunaclient_la-render.lo \
 	liblipsofsunaclient_la-render-api.lo \
+	liblipsofsunaclient_la-render-buffer.lo \
 	liblipsofsunaclient_la-render-context.lo \
 	liblipsofsunaclient_la-render-draw.lo \
 	liblipsofsunaclient_la-render-light.lo \
@@ -260,6 +262,7 @@ am__objects_34 = liblipsofsunaserver_la-math-marching-cubes.lo
 am__objects_35 = liblipsofsunaserver_la-model.lo \
 	liblipsofsunaserver_la-model-animation.lo \
 	liblipsofsunaserver_la-model-bone.lo \
+	liblipsofsunaserver_la-model-faces.lo \
 	liblipsofsunaserver_la-model-hair.lo \
 	liblipsofsunaserver_la-model-ipo.lo \
 	liblipsofsunaserver_la-model-ipo-channel.lo \
@@ -758,6 +761,8 @@ mdlsrc = \
 	model/model-animation.h \
 	model/model-bone.c \
 	model/model-bone.h \
+	model/model-faces.c \
+	model/model-faces.h \
 	model/model-hair.c \
 	model/model-hair.h \
 	model/model-ipo.c \
@@ -811,6 +816,8 @@ rndsrc = \
 	render/render.h \
 	render/render-api.c \
 	render/render-api.h \
+	render/render-buffer.c \
+	render/render-buffer.h \
 	render/render-context.c \
 	render/render-context.h \
 	render/render-draw.c \
@@ -1252,6 +1259,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-math-marching-cubes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-animation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-bone.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-faces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-hair.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-ipo-channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-ipo.Plo@am__quote@
@@ -1271,6 +1279,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-reload-image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-reload.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-buffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-context.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-draw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-light.Plo@am__quote@
@@ -1383,6 +1392,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-math-marching-cubes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-animation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-bone.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-faces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-hair.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-ipo-channel.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-ipo.Plo@am__quote@
@@ -1866,6 +1876,13 @@ liblipsofsunaclient_la-model-bone.lo: model/model-bone.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-model-bone.lo `test -f 'model/model-bone.c' || echo '$(srcdir)/'`model/model-bone.c
 
+liblipsofsunaclient_la-model-faces.lo: model/model-faces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-model-faces.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-model-faces.Tpo -c -o liblipsofsunaclient_la-model-faces.lo `test -f 'model/model-faces.c' || echo '$(srcdir)/'`model/model-faces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-model-faces.Tpo $(DEPDIR)/liblipsofsunaclient_la-model-faces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-faces.c' object='liblipsofsunaclient_la-model-faces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-model-faces.lo `test -f 'model/model-faces.c' || echo '$(srcdir)/'`model/model-faces.c
+
 liblipsofsunaclient_la-model-hair.lo: model/model-hair.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-model-hair.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-model-hair.Tpo -c -o liblipsofsunaclient_la-model-hair.lo `test -f 'model/model-hair.c' || echo '$(srcdir)/'`model/model-hair.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-model-hair.Tpo $(DEPDIR)/liblipsofsunaclient_la-model-hair.Plo
@@ -1970,6 +1987,13 @@ liblipsofsunaclient_la-render-api.lo: render/render-api.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-api.c' object='liblipsofsunaclient_la-render-api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-render-api.lo `test -f 'render/render-api.c' || echo '$(srcdir)/'`render/render-api.c
+
+liblipsofsunaclient_la-render-buffer.lo: render/render-buffer.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-render-buffer.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-render-buffer.Tpo -c -o liblipsofsunaclient_la-render-buffer.lo `test -f 'render/render-buffer.c' || echo '$(srcdir)/'`render/render-buffer.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-render-buffer.Tpo $(DEPDIR)/liblipsofsunaclient_la-render-buffer.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-buffer.c' object='liblipsofsunaclient_la-render-buffer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-render-buffer.lo `test -f 'render/render-buffer.c' || echo '$(srcdir)/'`render/render-buffer.c
 
 liblipsofsunaclient_la-render-context.lo: render/render-context.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-render-context.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-render-context.Tpo -c -o liblipsofsunaclient_la-render-context.lo `test -f 'render/render-context.c' || echo '$(srcdir)/'`render/render-context.c
@@ -2677,6 +2701,13 @@ liblipsofsunaserver_la-model-bone.lo: model/model-bone.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-bone.c' object='liblipsofsunaserver_la-model-bone.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaserver_la-model-bone.lo `test -f 'model/model-bone.c' || echo '$(srcdir)/'`model/model-bone.c
+
+liblipsofsunaserver_la-model-faces.lo: model/model-faces.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaserver_la-model-faces.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaserver_la-model-faces.Tpo -c -o liblipsofsunaserver_la-model-faces.lo `test -f 'model/model-faces.c' || echo '$(srcdir)/'`model/model-faces.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaserver_la-model-faces.Tpo $(DEPDIR)/liblipsofsunaserver_la-model-faces.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-faces.c' object='liblipsofsunaserver_la-model-faces.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaserver_la-model-faces.lo `test -f 'model/model-faces.c' || echo '$(srcdir)/'`model/model-faces.c
 
 liblipsofsunaserver_la-model-hair.lo: model/model-hair.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaserver_la-model-hair.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaserver_la-model-hair.Tpo -c -o liblipsofsunaserver_la-model-hair.lo `test -f 'model/model-hair.c' || echo '$(srcdir)/'`model/model-hair.c

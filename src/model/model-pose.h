@@ -108,8 +108,9 @@ limdl_pose_update (limdlPose* self,
                    float      secs);
 
 void
-limdl_pose_transform_mesh (limdlPose*   self,
-                           limdlVertex* vertices);
+limdl_pose_transform_group (limdlPose*   self,
+                            int          group,
+                            limdlVertex* vertices);
 
 limdlAnimation*
 limdl_pose_get_channel_animation (const limdlPose* self,

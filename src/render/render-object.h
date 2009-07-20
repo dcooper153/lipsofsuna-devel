@@ -28,6 +28,7 @@
 #include <math/lips-math.h>
 #include <model/lips-model.h>
 #include "render.h"
+#include "render-buffer.h"
 #include "render-context.h"
 #include "render-material.h"
 #include "render-model.h"
@@ -37,12 +38,15 @@ struct _lirndObject
 {
 	int id;
 	int realized;
-	GLuint buffer;
 	void* userdata;
 	limatTransform transform;
-	limdlVertex* vertices;
 	lirndScene* scene;
 	lirndModel* model;
+	struct
+	{
+		int count;
+		lirndBuffer* array;
+	} buffers;
 	struct
 	{
 		int width;
@@ -81,15 +85,6 @@ lirnd_object_deform (lirndObject* self,
 
 void
 lirnd_object_emit_particles (lirndObject* self);
-
-void
-lirnd_object_render (lirndObject*  self,
-                     lirndContext* context);
-
-void
-lirnd_object_render_group (lirndObject*  self,
-                           lirndContext* context,
-                           int           group);
 
 void
 lirnd_object_replace_image (lirndObject* self,

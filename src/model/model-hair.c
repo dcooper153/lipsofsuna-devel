@@ -38,18 +38,18 @@ limdl_hair_read (limdlHair* self,
 		return 0;
 
 	/* Allocate nodes. */
-	self->nodes.array = calloc (count, sizeof (limdlHairNode));
-	if (self->nodes.array == NULL)
+	self->nodes = calloc (count, sizeof (limdlHairNode));
+	if (self->nodes == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		return 0;
 	}
-	self->nodes.count = count;
+	self->count = count;
 
 	/* Read nodes. */
 	for (i = 0 ; i < count ; i++)
 	{
-		node = self->nodes.array + i;
+		node = self->nodes + i;
 		if (!li_reader_get_float (reader, &node->position.x) ||
 		    !li_reader_get_float (reader, &node->position.y) ||
 		    !li_reader_get_float (reader, &node->position.z) ||
@@ -68,17 +68,87 @@ limdl_hair_write (limdlHair*   self,
 	limdlHairNode* node;
 
 	/* Write node count. */
-	if (!liarc_writer_append_uint32 (writer, self->nodes.count))
+	if (!liarc_writer_append_uint32 (writer, self->count))
 		return 0;
 
 	/* Write nodes. */
-	for (i = 0 ; i < self->nodes.count ; i++)
+	for (i = 0 ; i < self->count ; i++)
 	{
-		node = self->nodes.array + i;
+		node = self->nodes + i;
 		if (!liarc_writer_append_float (writer, node->position.x) ||
 		    !liarc_writer_append_float (writer, node->position.y) ||
 		    !liarc_writer_append_float (writer, node->position.z) ||
 		    !liarc_writer_append_float (writer, node->size))
+			return 0;
+	}
+
+	return 1;
+}
+
+/*****************************************************************************/
+
+void
+limdl_hairs_free (limdlHairs* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->count ; i++)
+		free (self->hairs[i].nodes);
+	free (self->hairs);
+}
+
+int
+limdl_hairs_read (limdlHairs* self,
+                  liReader*   reader)
+{
+	uint32_t i;
+	uint32_t mat;
+	uint32_t count;
+	limdlHair* hair;
+
+	/* Read header. */
+	if (!li_reader_get_uint32 (reader, &mat) ||
+	    !li_reader_get_uint32 (reader, &count))
+		return 0;
+	self->material = mat;
+
+	/* Allocate hairs. */
+	self->hairs = calloc (count, sizeof (limdlHair));
+	if (self->hairs == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	self->count = count;
+
+	/* Read hairs. */
+	for (i = 0 ; i < count ; i++)
+	{
+		hair = self->hairs + i;
+		if (!limdl_hair_read (hair, reader))
+			return 0;
+	}
+
+	return 1;
+}
+
+int
+limdl_hairs_write (limdlHairs*  self,
+                   liarcWriter* writer)
+{
+	int i;
+	limdlHair* hair;
+
+	/* Write header. */
+	if (!liarc_writer_append_uint32 (writer, self->material) ||
+	    !liarc_writer_append_uint32 (writer, self->count))
+		return 0;
+
+	/* Write hairs. */
+	for (i = 0 ; i < self->count ; i++)
+	{
+		hair = self->hairs + i;
+		if (!limdl_hair_write (hair, writer))
 			return 0;
 	}
 

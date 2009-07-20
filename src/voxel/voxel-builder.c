@@ -148,9 +148,11 @@ livox_builder_build (livoxBuilder* self,
 {
 #ifndef LIVOX_DISABLE_GRAPHICS
 	int i;
+	int j;
 	livoxBuilderNormal* lookup;
 	limatVector coord;
 	limatVector normal;
+	limdlFaces* group;
 #endif
 	livoxBlock* block;
 
@@ -174,15 +176,19 @@ livox_builder_build (livoxBuilder* self,
 #ifndef LIVOX_DISABLE_GRAPHICS
 	if (self->helpers.model != NULL && self->vertices.count)
 	{
-		for (i = 0 ; i < self->helpers.model->vertex.count ; i++)
+		for (i = 0 ; i < self->helpers.model->facegroups.count ; i++)
 		{
-			coord = self->helpers.model->vertex.vertices[i].coord;
-			lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
-			assert (lookup != NULL);
-			if (lookup != NULL)
+			group = self->helpers.model->facegroups.array + i;
+			for (j = 0 ; j < group->vertices.count ; j++)
 			{
-				normal = limat_vector_multiply (lookup->normals, 1.0f / lookup->count);
-				self->helpers.model->vertex.vertices[i].normal = normal;
+				coord = group->vertices.array[j].coord;
+				lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
+				assert (lookup != NULL);
+				if (lookup != NULL)
+				{
+					normal = limat_vector_multiply (lookup->normals, 1.0f / lookup->count);
+					group->vertices.array[j].normal = normal;
+				}
 			}
 		}
 		limdl_model_calculate_bounds (self->helpers.model);
@@ -393,6 +399,7 @@ private_insert_material (livoxBuilder* self,
 	livoxMaterial* voxmat;
 
 	assert (self->helpers.model != NULL);
+	assert (self->helpers.model->facegroups.count == self->helpers.model->materials.count);
 
 	/* Check for existing. */
 	ret = lialg_u32dic_find (self->helpers.materials, id);
@@ -420,6 +427,8 @@ private_insert_material (livoxBuilder* self,
 
 	/* Create new material. */
 	if (!limdl_model_insert_material (self->helpers.model, mdlmat))
+		return -1;
+	if (!limdl_model_insert_group (self->helpers.model, self->helpers.model->materials.count - 1))
 		return -1;
 	if (!lialg_u32dic_insert (self->helpers.materials, id, NULL + self->helpers.model->materials.count))
 		return -1;

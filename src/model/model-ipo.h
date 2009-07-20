@@ -25,6 +25,7 @@
 #ifndef __MODEL_IPO_H__
 #define __MODEL_IPO_H__
 
+#include <archive/lips-archive.h>
 #include <math/lips-math.h>
 
 enum
@@ -67,6 +68,14 @@ struct _limdlIpo
 	char* name;
 	limdlIpoChannel channels[LIMDL_IPO_CHANNEL_NUM];
 };
+
+int
+limdl_ipo_read (limdlIpo* self,
+                liReader* reader);
+
+int
+limdl_ipo_write (const limdlIpo* self,
+                 liarcWriter*    writer);
 
 float
 limdl_ipo_get_duration (const limdlIpo* self);

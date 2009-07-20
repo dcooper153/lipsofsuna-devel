@@ -56,7 +56,7 @@ private_init_model (lirndObject* self,
                     lirndModel*  model);
 
 static int
-private_update_buffer (lirndObject* self);
+private_update_buffers (lirndObject* self);
 
 static void
 private_update_envmap (lirndObject* self);
@@ -126,16 +126,25 @@ void
 lirnd_object_deform (lirndObject* self,
                      limdlPose*   pose)
 {
+	int i;
+	lirndBuffer* buffer;
+
 	if (self->model == NULL)
 		return;
-	limdl_pose_transform_mesh (pose, self->vertices);
-	private_update_buffer (self);
+	for (i = 0 ; i < self->buffers.count ; i++)
+	{
+		buffer = self->buffers.array + i;
+		limdl_pose_transform_group (pose, i, buffer->vertices.array);
+	}
+	private_update_buffers (self);
 	private_update_lights (self);
 }
 
 void
 lirnd_object_emit_particles (lirndObject* self)
 {
+#warning FIXME: Emitting particles is disabled
+#if 0
 	int i;
 	limatMatrix vtxmat;
 	limatMatrix nmlmat;
@@ -174,76 +183,7 @@ lirnd_object_emit_particles (lirndObject* self)
 			particle->acceleration = limat_vector_init (0.0, -100.0, 5.0);
 		}
 	}
-}
-
-void
-lirnd_object_render (lirndObject*  self,
-                     lirndContext* context)
-{
-	int i;
-	limatMatrix matrix;
-	limdlMaterial* group;
-	lirndMaterial* material;
-	lirndShader* shader;
-	limdlModel* model;
-
-	if (self->model == NULL || self->model->model == NULL)
-		return;
-
-	/* Draw the mesh. */
-	model = self->model->model;
-	matrix = self->orientation.matrix;
-	if (self->buffer)
-	{
-		for (i = 0 ; i < model->materials.count ; i++)
-		{
-			group = model->materials.materials + i;
-			material = self->materials.array[i];
-			shader = material->shader;
-			assert (shader != NULL);
-			lirnd_context_set_material (context, material);
-			lirnd_context_set_matrix (context, &matrix);
-			lirnd_context_set_shader (context, shader);
-			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-			lirnd_context_bind (context);
-			lirnd_context_render_buffer (context, 3 * group->start, 3 * group->end, self->buffer);
-		}
-	}
-	else
-	{
-		for (i = 0 ; i < model->materials.count ; i++)
-		{
-			group = model->materials.materials + i;
-			material = self->materials.array[i];
-			shader = material->shader;
-			assert (shader != NULL);
-			lirnd_context_set_material (context, material);
-			lirnd_context_set_matrix (context, &matrix);
-			lirnd_context_set_shader (context, shader);
-			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-			lirnd_context_bind (context);
-			lirnd_context_render_indexed (context, 3 * group->start, 3 * group->end, self->vertices);
-		}
-	}
-}
-
-void
-lirnd_object_render_group (lirndObject*  self,
-                           lirndContext* context,
-                           int           group)
-{
-	limdlModel* model;
-	limdlMaterial* material;
-
-	if (self->model == NULL)
-		return;
-
-	model = self->model->model;
-	material = model->materials.materials + group;
-	if (self->buffer)
-		lirnd_context_render_buffer (context, 3 * material->start, 3 * material->end, self->buffer);
-	else
-		lirnd_context_render_indexed (context, 3 * material->start, 3 * material->end, self->vertices);
+#endif
 }
 
 /**
@@ -272,7 +212,7 @@ lirnd_object_replace_image (lirndObject* self,
 			if (material->textures.array[j].image == replaced)
 			{
 				lirnd_material_set_texture (material, j,
-					self->model->model->materials.materials[i].textures.array + j, replacement);
+					self->model->model->materials.array[i].textures.array + j, replacement);
 			}
 		}
 	}
@@ -383,8 +323,8 @@ lirnd_object_set_model (lirndObject* self,
 	/* Clear old model. */
 	memcpy (&backup, self, sizeof (lirndObject));
 	memset (&self->cubemap, 0, sizeof (self->cubemap));
-	self->buffer = 0;
-	self->vertices = NULL;
+	self->buffers.count = 0;
+	self->buffers.array = NULL;
 	self->lights.count = 0;
 	self->lights.array = NULL;
 	self->materials.count = 0;
@@ -393,8 +333,8 @@ lirnd_object_set_model (lirndObject* self,
 	/* Create new model. */
 	if (model != NULL)
 	{
-		if (!private_init_model (self, model) ||
-		    !private_init_materials (self, model) ||
+		if (!private_init_materials (self, model) ||
+		    !private_init_model (self, model) ||
 		    !private_init_lights (self, pose) || 
 		    !private_init_envmap (self))
 		{
@@ -553,9 +493,13 @@ private_clear_materials (lirndObject* self)
 static void
 private_clear_model (lirndObject* self)
 {
-	if (GLEW_ARB_vertex_buffer_object)
-		glDeleteBuffersARB (1, &self->buffer);
-	free (self->vertices);
+	int i;
+
+	for (i = 0 ; i < self->buffers.count ; i++)
+		lirnd_buffer_free (self->buffers.array + i);
+	free (self->buffers.array);
+	self->buffers.array = NULL;
+	self->buffers.count = 0;
 }
 
 static int
@@ -750,7 +694,7 @@ private_init_materials (lirndObject* self,
 	/* Resolve materials. */
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
-		src = model->model->materials.materials + i;
+		src = model->model->materials.array + i;
 		dst = lirnd_material_new ();
 		if (dst == NULL)
 			return 0;
@@ -769,6 +713,9 @@ private_init_materials (lirndObject* self,
 		dst->specular[1] = src->specular[1];
 		dst->specular[2] = src->specular[2];
 		dst->specular[3] = src->specular[3];
+		dst->strand_start = src->strand_start;
+		dst->strand_end = src->strand_end;
+		dst->strand_shape = src->strand_shape;
 		lirnd_material_set_shader (dst, lirnd_render_find_shader (self->scene->render, src->shader));
 		if (!lirnd_material_set_texture_count (dst, src->textures.count))
 		{
@@ -794,49 +741,55 @@ static int
 private_init_model (lirndObject* self,
                     lirndModel*  model)
 {
-	void* data;
-	size_t size;
+	int i;
+	limdlFaces* group;
 
-	/* Copy vertices. */
-	if (model->model->vertex.count)
+	/* Allocate buffer list. */
+	self->buffers.array = calloc (model->model->facegroups.count, sizeof (lirndBuffer));
+	if (self->buffers.array == NULL)
+		return 0;
+	self->buffers.count = model->model->facegroups.count;
+
+	/* Allocate buffer data. */
+	for (i = 0 ; i < self->buffers.count ; i++)
 	{
-		self->vertices = calloc (model->model->vertex.count, sizeof (limdlVertex));
-		if (self->vertices == NULL)
+		group = model->model->facegroups.array + i;
+		assert (group->material >= 0);
+		assert (group->material < self->materials.count);
+		if (!lirnd_buffer_init (self->buffers.array + i,
+		                        self->materials.array[group->material],
+		                        group->vertices.array, group->vertices.count))
 			return 0;
-		memcpy (self->vertices, model->model->vertex.vertices, model->model->vertex.count * sizeof (limdlVertex));
-	}
-
-	/* Create vertex buffer. */
-	if (GLEW_ARB_vertex_buffer_object)
-	{
-		glGenBuffersARB (1, &self->buffer);
-		size = model->model->vertex.count * sizeof (limdlVertex);
-		data = model->model->vertex.vertices;
-		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
-		glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, data, GL_STREAM_DRAW_ARB);
-		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 	}
 
 	return 1;
 }
 
 static int
-private_update_buffer (lirndObject* self)
+private_update_buffers (lirndObject* self)
 {
-	size_t size;
-	void* data;
-	const limdlModel* model = self->model->model;
+	int i;
+	int size;
+	limdlVertex* data;
+	lirndBuffer* buffer;
 
 	if (!GLEW_ARB_vertex_buffer_object)
 		return 1;
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
-	size = model->vertex.count * sizeof (limdlVertex);
-	data = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
-	if (data == NULL)
-		return 0;
-	memcpy (data, self->vertices, size);
-	glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+	for (i = 0 ; i < self->buffers.count ; i++)
+	{
+		buffer = self->buffers.array + i;
+		if (buffer->buffer)
+		{
+			glBindBufferARB (GL_ARRAY_BUFFER_ARB, buffer->buffer);
+			size = buffer->vertices.count * sizeof (limdlVertex);
+			data = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+			if (data == NULL)
+				continue;
+			memcpy (data, buffer->vertices.array, size);
+			glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
+			glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+		}
+	}
 
 	return 1;
 }

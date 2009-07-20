@@ -26,11 +26,6 @@
 #include <stdlib.h>
 #include "render-model.h"
 
-static int
-private_init_buffer (lirndModel* self);
-
-/*****************************************************************************/
-
 /**
  * \brief Creates a new model from a loaded model buffer.
  *
@@ -54,13 +49,6 @@ lirnd_model_new (lirndRender* render,
 	self->render = render;
 	self->model = model;
 
-	/* Create renderable data. */
-	if (!private_init_buffer (self))
-	{
-		lirnd_model_free (self);
-		return NULL;
-	}
-
 	return self;
 }
 
@@ -72,8 +60,6 @@ lirnd_model_new (lirndRender* render,
 void
 lirnd_model_free (lirndModel* self)
 {
-	if (GLEW_ARB_vertex_buffer_object)
-		glDeleteBuffersARB (1, &self->buffer);
 	free (self);
 }
 
@@ -87,26 +73,6 @@ int
 lirnd_model_get_static (lirndModel* self)
 {
 	return !self->model->animation.count;
-}
-
-/*****************************************************************************/
-
-static int
-private_init_buffer (lirndModel* self)
-{
-	size_t size;
-	void* data;
-
-	if (!GLEW_ARB_vertex_buffer_object)
-		return 1;
-	glGenBuffersARB (1, &self->buffer);
-	size = self->model->vertex.count * sizeof (limdlVertex);
-	data = self->model->vertex.vertices;
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
-	glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, data, GL_STATIC_DRAW_ARB);
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-
-	return 1;
 }
 
 /** @} */

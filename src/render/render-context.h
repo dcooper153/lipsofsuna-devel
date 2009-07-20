@@ -27,6 +27,7 @@
 
 #include <image/lips-image.h>
 #include <model/lips-model.h>
+#include "render-buffer.h"
 #include "render-light.h"
 #include "render-material.h"
 #include "render-scene.h"
@@ -74,16 +75,20 @@ void
 lirnd_context_bind (lirndContext* self);
 
 void
-lirnd_context_render_buffer (lirndContext* self,
-                             int           vertex0,
-                             int           vertex1,
-                             GLuint        vertices);
+lirnd_context_render (lirndContext* self,
+                      lirndBuffer*  buffer);
 
 void
-lirnd_context_render_indexed (lirndContext*      self,
-                              int                vertex0,
-                              int                vertex1,
-                              const limdlVertex* vertices);
+lirnd_context_render_vbo (lirndContext* self,
+                          int           vertex0,
+                          int           vertex1,
+                          GLuint        vertices);
+
+void
+lirnd_context_render_vtx (lirndContext*      self,
+                          int                vertex0,
+                          int                vertex1,
+                          const limdlVertex* vertices);
 
 void
 lirnd_context_unbind (lirndContext* self);

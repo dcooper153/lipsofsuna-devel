@@ -31,145 +31,117 @@ Lips = LipsEnum()
 #############################################################################
 # Default functions.
 
-def FaceDiffuse(object, mesh, face):
-	if mesh.materials and mesh.materials[face.mat]:
-		m = mesh.materials[face.mat]
-		flags = m.getMode()
-		if flags & Blender.Material.Modes['ZTRANSP']:
-			return [m.R, m.G, m.B, m.alpha]
-		else:
-			return [m.R, m.G, m.B, 1.0]
-	else:
-		return [1.0, 1.0, 1.0, 1.0]
+def MaterialDiffuse(bmat):
+	if bmat:
+		if bmat.getMode() & Blender.Material.Modes['ZTRANSP']:
+			return [bmat.R, bmat.G, bmat.B, bmat.alpha]
+		return [bmat.R, bmat.G, bmat.B, 1.0]
+	return [1.0, 1.0, 1.0, 1.0]
 
-def FaceEmission(object, mesh, face):
-	if mesh.materials and mesh.materials[face.mat]:
-		m = mesh.materials[face.mat]
-		return m.emit
-	else:
-		return 0.0
+def MaterialEmission(bmat):
+	if bmat:
+		return bmat.emit
+	return 0.0
 
-def FaceFlags(object, mesh, face):
+def MaterialFlags(bmat, bmesh, bface):
 	flags = 0
-	if mesh.materials and mesh.materials[face.mat]:
-		mode = mesh.materials[face.mat].getMode()
-		if mode & Blender.Material.Modes['ZTRANSP']:
+	if bmat:
+		if bmat.getMode() & Blender.Material.Modes['ZTRANSP']:
 			# Texture and static transparency.
 			flags |= 8
-	if mesh.faceUV:
-		if face.mode & Blender.Mesh.FaceModes['DYNAMIC']:
+	if bmesh:
+		if bface and bmesh.faceUV:
+			if bface.mode & Blender.Mesh.FaceModes['DYNAMIC']:
+				# Collisions enabled.
+				flags |= 2
+			if not (bface.mode & Blender.Mesh.FaceModes['TWOSIDE']):
+				# Back face culling.
+				flags |= 4
+			if bface.mode & Blender.Mesh.FaceModes['BILLBOARD']:
+				# Render as billboard.
+				flags |= 1
+		else:
+			if not (bmesh.mode & Blender.Mesh.Modes['TWOSIDED']):
+				# Back face culling.
+				flags |= 4
 			# Collisions enabled.
 			flags |= 2
-		if not (face.mode & Blender.Mesh.FaceModes['TWOSIDE']):
-			# Back face culling.
-			flags |= 4
-		if face.mode & Blender.Mesh.FaceModes['BILLBOARD']:
-			# Render as billboard.
-			flags |= 1
-	else:
-		if not (mesh.mode & Blender.Mesh.Modes['TWOSIDED']):
-			# Back face culling.
-			flags |= 4
-		# Collisions enabled.
-		flags |= 2
 	return flags
 
-def FaceShader(object, mesh, face):
-	if mesh.materials and mesh.materials[face.mat]:
-		tmp = mesh.materials[face.mat].name.split("::")
+def MaterialShader(bmat):
+	if bmat:
+		tmp = bmat.name.split("::")
 		if len(tmp) >= 2:
 			return tmp[1]
-		return "default"
-	else:
-		return "default"
+	return "default"
 
-def FaceShininess(object, mesh, face):
-	if mesh.materials and mesh.materials[face.mat]:
-		return mesh.materials[face.mat].hard / 511.0 * 128.0
-	else:
-		return 0.0
+def MaterialShininess(bmat):
+	if bmat:
+		return bmat.hard / 511.0 * 128.0
+	return 0.0
 
-def FaceSpecular(object, mesh, face):
-	if mesh.materials and mesh.materials[face.mat]:
-		m = mesh.materials[face.mat]
-		return [m.specR, m.specG, m.specB, m.spec]
-	else:
-		return [1.0, 1.0, 1.0, 1.0]
+def MaterialSpecular(bmat):
+	if bmat:
+		return [bmat.specR, bmat.specG, bmat.specB, bmat.spec]
+	return [1.0, 1.0, 1.0, 1.0]
 
-def FaceTextures(object, mesh, face):
+def MaterialStrands(bmat):
+	# FIXME: No python API for strands apparently so abusing Z offset.
+	if bmat:
+		return [bmat.getZOffset(), 0.0, 0.0]
+	return [0.2, 0.0, 0.0]
+
+def MaterialTextures(bmat, bmesh, bface):
 	count = 0
 	index = 0
 	textures = []
-
-	# Use default if no material found.
-	if not mesh.materials or not mesh.materials[face.mat]:
-		if mesh.faceUV and face.image:
-			image = face.image
-			name = os.path.basename(image.filename)
+	if bmat:
+		for texture in bmat.getTextures():
+			index = index + 1
+			if not texture or not texture.tex:
+				# Nil texture.
+				textures.append(LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, ""))
+				continue
+			texture = texture.tex
+			if texture.type is Blender.Texture.Types.NONE:
+				# None texture.
+				textures.append(LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, ""))
+			elif texture.type is Blender.Texture.Types.IMAGE and texture.image:
+				# Image texture.
+				name = os.path.basename(texture.image.filename)
+				name = os.path.splitext(name)[0]
+				flags = 0
+				if texture.interpol: flags |= Lips.TexFlags.BILINEAR
+				if texture.mipmap: flags |= Lips.TexFlags.MIPMAP
+				if texture.extend is Blender.Texture.ExtendModes.EXTEND: flags |= Lips.TexFlags.CLAMP
+				if texture.extend is Blender.Texture.ExtendModes.REPEAT: flags |= Lips.TexFlags.REPEAT
+				if texture.extend is Blender.Texture.ExtendModes.CHECKER: flags |= Lips.TexFlags.REPEAT
+				textures.append(LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name))
+				count = index
+			elif texture.type is Blender.Texture.Types.ENVMAP:
+				# Envmap texture.
+				# FIXME: Blender doesn't support querying the Cuberes variable?
+				width = PowerOfTwo(128)#texture.cubeRes
+				height = width
+				flags = Lips.TexFlags.BILINEAR | Lips.TexFlags.REPEAT
+				textures.append(LipsTexture(Lips.TexTypes.ENVMAP, flags, width, height, ""))
+				count = index
+			else:
+				# Other texture.
+				textures.append(LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, ""))
+	if bmesh and bface and bmesh.faceUV and bface.image:
+		if not bmat or (bmat.getMode() & Blender.Material.Modes['TEXFACE']):
+			name = os.path.basename(bface.image.filename)
 			name = os.path.splitext(name)[0]
 			flags = Lips.TexFlags.BILINEAR | Lips.TexFlags.MIPMAP | Lips.TexFlags.REPEAT
-			textures = [LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)]
-		else:
-			textures = [LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, "")]
-		return textures
-
-	# Get textures from material.
-	bmaterial = mesh.materials[face.mat]
-	btextures = bmaterial.getTextures()
-	for texture in btextures:
-		index = index + 1
-		if not texture or not texture.tex:
-			# Nil texture.
-			textures.append(LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, ""))
-			continue
-		texture = texture.tex
-		if texture.type is Blender.Texture.Types.NONE:
-			# None texture
-			textures.append(LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, ""))
-		elif texture.type is Blender.Texture.Types.IMAGE and texture.image:
-			# Image texture
-			image = texture.image
-			name = os.path.basename(image.filename)
-			name = os.path.splitext(name)[0]
-			flags = 0
-			if texture.interpol: flags |= Lips.TexFlags.BILINEAR
-			if texture.mipmap: flags |= Lips.TexFlags.MIPMAP
-			if texture.extend is Blender.Texture.ExtendModes.EXTEND: flags |= Lips.TexFlags.CLAMP
-			if texture.extend is Blender.Texture.ExtendModes.REPEAT: flags |= Lips.TexFlags.REPEAT
-			if texture.extend is Blender.Texture.ExtendModes.CHECKER: flags |= Lips.TexFlags.REPEAT
-			textures.append(LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name))
-			count = index
-		elif texture.type is Blender.Texture.Types.ENVMAP:
-			# Envmap texture
-			# FIXME: Blender doesn't support querying the Cuberes variable?
-			width = PowerOfTwo(128)#texture.cubeRes
-			height = width
-			flags = Lips.TexFlags.BILINEAR | Lips.TexFlags.REPEAT
-			textures.append(LipsTexture(Lips.TexTypes.ENVMAP, flags, width, height, ""))
-			count = index
-		else:
-			# Other texture
-			#print("W: Unsupported texture type")
-			textures.append(LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, ""))
-
-	# Strip trailing unused textures.
-	textures = textures[:count]
-	if len(textures) == 0:
-		textures = [LipsTexture(Lips.TexTypes.NONE, 0, 0, 0, "")]
-
-	# Override first texture if TEXFACE is set.
-	mode = bmaterial.getMode()
-	if mode & Blender.Material.Modes['TEXFACE']:
-		if mesh.faceUV and face.image:
-			image = face.image
-			name = os.path.basename(image.filename)
-			name = os.path.splitext(name)[0]
-			flags = Lips.TexFlags.BILINEAR | Lips.TexFlags.MIPMAP | Lips.TexFlags.REPEAT
-			if textures[0].type is Lips.TexTypes.IMAGE:
-				flags = textures[0].flags
-			textures[0] = LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)
-
-	return textures
+			if count > 0:
+				if textures[0].type is Lips.TexTypes.IMAGE:
+					flags = textures[0].flags
+				textures[0] = LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)
+			else:
+				textures.append(LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name))
+				count = 1
+	return textures[:count]
 
 def MeshVisible(object, mesh):
 	bsystems = object.getParticleSystems()
@@ -203,7 +175,7 @@ def NodeChildren(scene, object, bone, parent):
 		for b in object.getData().bones.values():
 			if b.parent == bone:
 				nodes.append(LipsNode(LipsNodeType.BONE, scene, object, b, parent))
-	for o in scene.GetObjects():
+	for o in scene.objects:
 		if lips_exporter_calls["NodeChild"](scene, object, bone, o):
 			if o.type == "Armature":
 				nodes.append(LipsNode(LipsNodeType.EMPTY, scene, o, None, parent))
@@ -213,34 +185,21 @@ def NodeChildren(scene, object, bone, parent):
 				nodes.append(LipsNode(LipsNodeType.LIGHT, scene, o, None, parent))
 	return nodes
 
-def ObjectHairs(object):
-
-	hairs = []
-
-	# Find hair particles.
+def ObjectHairs(lips, object):
 	for bparticles in object.getParticleSystems():
 		if bparticles.type is not Blender.Particle.TYPE['HAIR']:
 			continue
-	
-		# Get hair data.
 		bmat = bparticles.getMat()
 		locss = bparticles.getLoc(1)
 		sizes = bparticles.getSize(1)
-	
-		# Create hair strips.
-		# FIXME: Where is the size information for hair?
 		for locs in locss:
 			if locs is not None:
-				hair = LipsHair(bmat)
-				i = 0
+				hair = LipsHair()
 				for loc in locs:
 					tmp = Vector(loc[0], loc[1], loc[2])
-					hair.AppendNode(tmp[0], tmp[1], tmp[2], 1.0)#sizes[i])
-				i = i + 1
+					hair.AppendNode(tmp[0], tmp[1], tmp[2], 1.0) # FIXME: Size.
 				if len(hair.nodes):
-					hairs.append(hair)
-	
-	return hairs
+					lips.AddHair(bmat, hair)
 
 def VertexCoord(object, mesh, face, index):
 	global lips_correction_matrix
@@ -304,13 +263,14 @@ lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
 lips_correction_quat = Euler(-90, 0, 0).toQuat()
 lips_exporter_calls = \
 { \
-	"FaceDiffuse": FaceDiffuse, \
-	"FaceEmission": FaceEmission, \
-	"FaceFlags": FaceFlags, \
-	"FaceShader": FaceShader, \
-	"FaceShininess": FaceShininess, \
-	"FaceSpecular": FaceSpecular, \
-	"FaceTextures": FaceTextures, \
+	"MaterialDiffuse": MaterialDiffuse, \
+	"MaterialEmission": MaterialEmission, \
+	"MaterialFlags": MaterialFlags, \
+	"MaterialShader": MaterialShader, \
+	"MaterialShininess": MaterialShininess, \
+	"MaterialSpecular": MaterialSpecular, \
+	"MaterialStrands": MaterialStrands, \
+	"MaterialTextures": MaterialTextures, \
 	"ObjectHairs": ObjectHairs, \
 	"MeshVisible": MeshVisible, \
 	"NodeChild": NodeChild, \
@@ -359,55 +319,42 @@ class LipsAnimation:
 				curves.append(LipsCurve(self.strip, None))
 		return curves
 
-	def GetBlendIn(self):
-		return lips_animation_timescale * self.strip.blendIn;
-
-	def GetBlendOut(self):
-		return lips_animation_timescale * self.strip.blendOut;
-
-	def GetDuration(self):
-		return lips_animation_timescale * (self.strip.actionEnd - self.strip.actionStart)
-
-	# \brief Gets the name of the animation.
-	def GetName(self):
-		return self.action.name
-
 	def Write(self, writer):
 		channels = self.action.getChannelNames()
-		writer.WriteString(self.GetName())
+		writer.WriteString(self.action.name)
 		writer.WriteInt(len(channels))
-		writer.WriteFloat(self.GetDuration())
-		writer.WriteFloat(self.GetBlendIn())
-		writer.WriteFloat(self.GetBlendOut())
+		writer.WriteFloat(lips_animation_timescale * (self.strip.actionEnd - self.strip.actionStart))
+		writer.WriteFloat(lips_animation_timescale * self.strip.blendIn)
+		writer.WriteFloat(lips_animation_timescale * self.strip.blendOut)
 		for channel in channels:
 			curves = self.GetCurves(channel)
 			writer.WriteString(channel)
 			writer.WriteInt(len(curves))
 			for curve in curves:
-				writer.WriteInt(curve.GetType())
-				writer.WriteInt(curve.GetLength())
-				for value in curve.GetValues():
+				writer.WriteInt(curve.type)
+				writer.WriteInt(curve.length)
+				for value in curve.values:
 					writer.WriteFloat(value)
 
 
-class LipsArmature:
+class LipsAnimations:
 
-	# Initializes a new armature.
+	# \brief Initializes a new armature.
 	def __init__(self):
 		self.animations = []
 
-	# \brief Appends animations from a Blender armature object.
+	# \brief Add animations from a Blender armature object.
 	#
-	# \param self Armature.
+	# \param self Animation manager.
 	# \param object Blender armature object.
 	# \param armature Blender armature data.
-	def AppendArmature(self, object, armature):
+	def AddArmature(self, object, armature):
 		for action in object.actionStrips:
 			self.animations.append(LipsAnimation(action))
 
-	# Writes animations.
+	# \brief Writes animations.
 	#
-	# \param self Armature.
+	# \param self Animation manager.
 	# \param writer Writer.
 	def Write(self, writer):
 		writer.WriteInt(len(self.animations))
@@ -417,7 +364,7 @@ class LipsArmature:
 
 class LipsCurve:
 
-	# Initializes a new IPO curve from Blender data.
+	# \brief Initializes a new IPO curve from Blender data.
 	def __init__(self, bstrip, bcurve):
 		self.strip = bstrip
 		self.curve = bcurve
@@ -452,18 +399,6 @@ class LipsCurve:
 				self.values.append(bezier.vec[2][1])
 		else:
 			print("W: Unknown curve type.")
-
-	# Returns the number of values in the curve.
-	def GetLength(self):
-		return self.length
-
-	# Gets the interpolation type of the curve.
-	def GetType(self):
-		return self.type
-
-	# Gets the nodes of the curve.
-	def GetValues(self):
-		return self.values
 
 #############################################################################
 # Mesh.
@@ -590,157 +525,26 @@ class LipsConnectivity:
 		return -1
 
 
-class LipsFaceGroup:
+class LipsFaces:
 
-	def __init__(self, shader, textures):
-		self.flags = 0
-		self.start = 0
-		self.shader = shader
-		self.textures = textures
-		self.vertices = []
-		self.emission = 0.0
-		self.shininess = 0.0
-		self.diffuse = [1.0, 1.0, 1.0, 1.0]
-		self.specular = [1.0, 1.0, 1.0, 1.0]
-
-	def AppendFace(self, v0, v1, v2):
-		self.vertices.append(v0)
-		self.vertices.append(v1)
-		self.vertices.append(v2)
-
-	def GetEnd(self):
-		return self.start + len(self.vertices) / 3
-
-	def GetKey(self):
-		key = ""
-		for tex in self.textures:
-			key = "%s %s" % (key, tex.GetKey())
-		return "%d %s %s %s %s %s [%s]" % (self.flags, self.shader, self.emission, self.shininess, self.diffuse, self.specular, key)
-
-	def GetStart(self):
-		return self.start
-
-	def SetStart(self, start):
-		self.start = start
-
-	def WriteHeader(self, writer):
-		writer.WriteInt(self.GetStart())
-		writer.WriteInt(self.GetEnd())
-		writer.WriteInt(self.flags)
-		writer.WriteFloat(self.emission)
-		writer.WriteFloat(self.shininess)
-		writer.WriteFloat(self.diffuse[0])
-		writer.WriteFloat(self.diffuse[1])
-		writer.WriteFloat(self.diffuse[2])
-		writer.WriteFloat(self.diffuse[3])
-		writer.WriteFloat(self.specular[0])
-		writer.WriteFloat(self.specular[1])
-		writer.WriteFloat(self.specular[2])
-		writer.WriteFloat(self.specular[3])
-		writer.WriteInt(len(self.textures))
-		writer.WriteString(self.shader)
-		for texture in self.textures:
-			texture.Write(writer)
-
-	def WriteFaces(self, writer):
-		for vertex in self.vertices:
-			vertex.WriteCoords(writer)
-
-	def WriteWeights(self, writer):
-		for vertex in self.vertices:
-			vertex.WriteWeights(writer)
-
-
-class LipsMesh:
-
-	# \brief Creates an empty mesh exporter.
+	# Initializes a new face manager.
+	#
+	# \param self Face manager.
 	def __init__(self):
-		self.facegroupindex = {}
-		self.facegrouplist = []
-		self.weightgroupnamelist = []
-		self.weightgrouplist = []
-		self.weightgroupdict = {}
+		self.groups = {}
 
-	# \brief Appends a face to the mesh.
+	# Adds a new face.
 	#
-	# The model format requires normals and texture coordinates to be stored
-	# per vertex so we need to create extra vertices for seams and sharp edges.
-	# Faces also need to be grouped so that the material and UV texture is
-	# constant within each group.
-	#
-	# \param self Lips mesh.
-	# \param object Blender mesh object.
-	# \param mesh Blender mesh data. 
-	# \param face Blender mesh face.
-	# \param conn Face connectivity data for the mesh.
-	def AppendFace(self, object, mesh, face, conn):
-
-		v = []
-		flags = lips_exporter_calls["FaceFlags"](object, mesh, face)
-		shader = lips_exporter_calls["FaceShader"](object, mesh, face)
-		textures = lips_exporter_calls["FaceTextures"](object, mesh, face)
-		shininess = lips_exporter_calls["FaceShininess"](object, mesh, face)
-		diffuse = lips_exporter_calls["FaceDiffuse"](object, mesh, face)
-		specular = lips_exporter_calls["FaceSpecular"](object, mesh, face)
-		for i in range(len(face.v)):
-			co = lips_exporter_calls["VertexCoord"](object, mesh, face, i)
-			no = lips_exporter_calls["VertexNormal"](object, mesh, face, i, conn)
-			te = lips_exporter_calls["VertexTexcoords"](object, mesh, face, i)
-			we = lips_exporter_calls["VertexWeights"](object, mesh, face, i, self.weightgroupnamelist)
-			v.append(LipsVertex(co, no, te, we))
-
-		# Create or reuse material group.
-		group = LipsFaceGroup(shader, textures)
-		group.flags = flags
-		group.shininess = shininess
-		group.diffuse = diffuse
-		group.specular = specular
-		key = group.GetKey()
-		if key in self.facegroupindex:
-			group = self.facegroupindex[key]
+	# \param self Face manager.
+	# \param mat Material index.
+	# \param verts Array of vertices.
+	def AddFace(self, mat, verts):
+		if mat in self.groups:
+			self.groups[mat].append(verts[0])
+			self.groups[mat].append(verts[1])
+			self.groups[mat].append(verts[2])
 		else:
-			self.facegrouplist.append(group)
-			self.facegroupindex[key] = group
-
-		# Append faces to the group.
-		if len(face.v) == 3:
-			group.AppendFace(v[0], v[1], v[2])
-		elif len(face.v) == 4:
-			group.AppendFace(v[0], v[1], v[2])
-			group.AppendFace(v[0], v[2], v[3])
-
-	# \brief Appends a mesh.
-	#
-	# \param self Lips mesh.
-	# \param mesh Blender mesh object. 
-	def AppendMesh(self, mesh):
-		mdata = mesh.getData(0, 1)
-		conn = LipsConnectivity(mesh, mdata)
-
-		# Append weight group names.
-		for name in mdata.getVertGroupNames():
-			if name not in self.weightgroupnamelist:
-				self.weightgroupnamelist.append(name)
-
-		# Append face vertices.
-		for face in mdata.faces:
-			self.AppendFace(mesh, mdata, face, conn)
-
-	def Compile(self, armature):
-
-		# Set face group offsets.
-		start = 0
-		for facegroup in self.facegrouplist:
-			facegroup.SetStart(start)
-			start = facegroup.GetEnd()
-
-		# Setup weight groups.
-		index = 0
-		for name in self.weightgroupnamelist:
-			weightgroup = LipsWeightGroup(index, name)
-			self.weightgrouplist.append(weightgroup)
-			self.weightgroupdict[name] = weightgroup
-			index = index + 1
+			self.groups[mat] = [verts[0], verts[1], verts[2]]
 
 	# \brief Gets the bounding box of the mesh.
 	#
@@ -749,8 +553,8 @@ class LipsMesh:
 		first = 1
 		bounds = [0, 0, 0, 0, 0, 0]
 		# Calculate box size.
-		for group in self.facegrouplist:
-			for vertex in group.vertices:
+		for group in self.groups.values():
+			for vertex in group:
 				if first:
 					first = 0
 					bounds[0] = vertex.values[9]
@@ -780,71 +584,56 @@ class LipsMesh:
 				bounds[i+3] = tmp + 0.5 * lips_minimum_box_size
 		return bounds
 
-	# \brief Gets the mesh flags.
+	# Saves all face groups.
 	#
-	# \return Flags.
-	def GetFlags(self):
-		flags = 0
-		#if not (self.mesh.mode & Blender.Mesh.Modes.TWOSIDE):
-		#	flags |= 1
-		return flags
-
-	# \brief Gets the faces of the mesh sorted by texture.
-	#
-	# \return List of face groups.
-	def GetFaceGroups(self):
-		return self.facegrouplist
-
-	# Gets the list of textures the mesh uses.
-	#
-	# The first element of the list is None if there are faces with no textures.
-	def GetTextures(self):
-		return self.textures
-
-	# Gets the vertices of the mesh.
-	def GetVertexCount(self):
-		if len(self.facegrouplist) > 0:
-			return 3 * self.facegrouplist[len(self.facegrouplist)-1].GetEnd()
-		else:
-			return 0
-
-	# Gets the names of weight groups of the mesh.
-	def GetWeightGroups(self):
-		return self.weightgrouplist
-
-	# Writes the mesh.
+	# \param self Face manager.
+	# \param writer Writer.
 	def Write(self, writer):
-		bounds = self.GetBounds();
-		facegroups = self.GetFaceGroups()
-		weightgroups = self.GetWeightGroups()
+		keys = self.groups.keys()
+		writer.WriteInt(len(keys))
+		for mat in keys:
+			verts = self.groups[mat]
+			writer.WriteInt(mat)
+			writer.WriteInt(len(verts))
+			for vertex in verts:
+				vertex.WriteCoords(writer)
+			for vertex in verts:
+				vertex.WriteWeights(writer)
 
-		# Write header.
-		writer.WriteInt(self.GetFlags())
-		writer.WriteInt(self.GetVertexCount())
-		writer.WriteInt(len(facegroups))
-		writer.WriteInt(len(weightgroups))
-		writer.WriteFloat(bounds[0])
-		writer.WriteFloat(bounds[1])
-		writer.WriteFloat(bounds[2])
-		writer.WriteFloat(bounds[3])
-		writer.WriteFloat(bounds[4])
-		writer.WriteFloat(bounds[5])
 
-		# Write vertices.
-		for facegroup in facegroups:
-			facegroup.WriteFaces(writer)
+class LipsMaterial:
 
-		# Write materials.
-		for facegroup in facegroups:
-			facegroup.WriteHeader(writer)
+	def __init__(self, index, flags, shininess, diffuse, specular, strands, shader, textures):
+		self.index = index
+		self.flags = flags
+		self.shader = shader
+		self.textures = textures
+		self.emission = 0.0
+		self.shininess = shininess
+		self.diffuse = diffuse
+		self.strands = strands
+		self.specular = specular
 
-		# Write weight groups.
-		for weightgroup in weightgroups:
-			weightgroup.Write(writer)
+	def Write(self, writer):
+		writer.WriteInt(self.flags)
+		writer.WriteFloat(self.emission)
+		writer.WriteFloat(self.shininess)
+		writer.WriteFloat(self.diffuse[0])
+		writer.WriteFloat(self.diffuse[1])
+		writer.WriteFloat(self.diffuse[2])
+		writer.WriteFloat(self.diffuse[3])
+		writer.WriteFloat(self.specular[0])
+		writer.WriteFloat(self.specular[1])
+		writer.WriteFloat(self.specular[2])
+		writer.WriteFloat(self.specular[3])
+		writer.WriteFloat(self.strands[0])
+		writer.WriteFloat(self.strands[1])
+		writer.WriteFloat(self.strands[2])
+		writer.WriteInt(len(self.textures))
+		writer.WriteString(self.shader)
+		for texture in self.textures:
+			texture.Write(writer)
 
-		# Write vertex weights.
-		for facegroup in facegroups:
-			facegroup.WriteWeights(writer)
 
 class LipsTexture:
 
@@ -864,6 +653,7 @@ class LipsTexture:
 
 	def GetKey(self):
 		return "%d %d %d %d %s" % (self.type, self.flags, self.width, self.height, self.string)
+
 
 class LipsVertex:
 
@@ -898,6 +688,7 @@ class LipsVertex:
 			writer.WriteInt(weight[0])
 			writer.WriteFloat(weight[1])
 
+
 class LipsWeightGroup:
 
 	# \brief Creates a new weight group.
@@ -915,6 +706,7 @@ class LipsWeightGroup:
 	def Write(self, writer):
 		writer.WriteString(self.name)
 		writer.WriteString(self.name)
+
 
 #############################################################################
 # Hierarchy.
@@ -1101,11 +893,44 @@ class LipsNode:
 #############################################################################
 # Particles.
 
+class LipsHairs:
+
+	# Initializes a new hair manager.
+	#
+	# \param self Hair manager.
+	def __init__(self):
+		self.groups = {}
+
+	# Appends a new hair to the hair group.
+	#
+	# \param self Hair manager.
+	# \param mat Material index.
+	# \param hair Hair.
+	def AddHair(self, mat, hair):
+		if mat in self.groups:
+			self.groups[mat].append(hair)
+		else:
+			self.groups[mat] = [hair]
+
+	# Saves all hair groups.
+	#
+	# \param self Hair manager.
+	# \param writer Writer.
+	def Write(self, writer):
+		keys = self.groups.keys()
+		writer.WriteInt(len(keys))
+		for mat in keys:
+			hairs = self.groups[mat]
+			writer.WriteInt(mat)
+			writer.WriteInt(len(hairs))
+			for hair in hairs:
+				hair.Write(writer)
+
+
 class LipsHair:
 
 	# Initializes a new hair strip.
-	def __init__(self, bmat):
-		# TODO: Material support.
+	def __init__(self):
 		self.nodes = []
 
 	# Appends a new node to the hair strip.
@@ -1126,61 +951,139 @@ class LipsHair:
 			writer.WriteFloat(node[2])
 			writer.WriteFloat(node[3])
 
+
 #############################################################################
-# Scene.
+# Storage.
 
-class LipsScene:
+class LipsStorage:
 
-	# Initializes a new scene from Blender data.
-	def __init__(self, bscene):
-		self.scene = bscene
+	def __init__(self, scene):
+		self.animations = LipsAnimations()
+		self.hairs = LipsHairs()
+		self.faces = LipsFaces()
+		self.materials = {}
+		self.node = None
+		self.weightnames = []
+		self.AddNode(LipsNode(LipsNodeType.EMPTY, scene, None, None, None))
+		for obj in scene.objects:
+			if obj.parent == None:
+				if obj.type == "Armature":
+					self.AddArmature(obj)
+				if obj.type == "Mesh":
+					self.AddMesh(obj)
+					lips_exporter_calls["ObjectHairs"](self, obj)
 
-	# \brief Gets the list of armatures in the scene.
+	def AddArmature(self, bobj):
+		self.animations.AddArmature(bobj, bobj.getData())
+
+	def AddHair(self, bmat, hair):
+		mat = self.AddMaterial(bmat, None, None)
+		self.hairs.AddHair(mat.index, hair)
+
+	def AddMaterial(self, bmat, bmesh, bface):
+		flag = lips_exporter_calls["MaterialFlags"](bmat, bmesh, bface)
+		shin = lips_exporter_calls["MaterialShininess"](bmat)
+		diff = lips_exporter_calls["MaterialDiffuse"](bmat)
+		spec = lips_exporter_calls["MaterialSpecular"](bmat)
+		stra = lips_exporter_calls["MaterialStrands"](bmat)
+		shad = lips_exporter_calls["MaterialShader"](bmat)
+		text = lips_exporter_calls["MaterialTextures"](bmat, bmesh, bface)
+		key = ""
+		for tex in text:
+			key = "%s %s" % (key, tex.GetKey())
+		key = "%d %s %s %s %s %s [%s]" % (flag, shad, shin, diff, stra, spec, key)
+		if key in self.materials:
+			mat = self.materials[key]
+		else:
+			idx = len(self.materials.keys())
+			mat = LipsMaterial(idx, flag, shin, diff, spec, stra, shad, text)
+			self.materials[key] = mat
+		return mat
+
+	# \brief Adds a mesh.
 	#
-	# \param self Scene.
-	# \return Array of Blender objects.
-	def GetArmatures(self):
-		armatures = []
-		objects = self.scene.objects
-		for obj in objects:
-			if obj.type == "Armature" and obj.parent == None:
-				armatures.append(obj)
-		return armatures
-
-	# \brief Gets the list of hairs in the scene.
+	# The model format requires normals and texture coordinates to be stored
+	# per vertex so we need to create extra vertices for seams and sharp edges.
+	# Faces also need to be grouped so that the material and UV texture is
+	# constant within each group.
 	#
-	# \param self Scene.
-	# \return Array of Lips hair objects.
-	def GetHairs(self):
-		hairs = []
-		objects = self.scene.objects
-		for obj in objects:
-			if obj.type == "Mesh":
-				hairs1 = lips_exporter_calls["ObjectHairs"](obj)
-				for hair in hairs1:
-					hairs.append(hair)
-		return hairs
+	# \param self Storage.
+	# \param bobj Blender object.
+	def AddMesh(self, bobj):
+		bmesh = bobj.getData(0, 1)
+		if lips_exporter_calls["MeshVisible"](bobj, bmesh):
+			conn = LipsConnectivity(bobj, bmesh)
+			for name in bmesh.getVertGroupNames():
+				if name not in self.weightnames:
+					self.weightnames.append(name)
+			for bface in bmesh.faces:
+				# Choose material.
+				bmat = None
+				if bmesh.materials:
+					bmat = bmesh.materials[bface.mat]
+				mat = self.AddMaterial(bmat, bmesh, bface)
+				# Create vertices.
+				v = []
+				for i in range(len(bface.v)):
+					co = lips_exporter_calls["VertexCoord"](bobj, bmesh, bface, i)
+					no = lips_exporter_calls["VertexNormal"](bobj, bmesh, bface, i, conn)
+					te = lips_exporter_calls["VertexTexcoords"](bobj, bmesh, bface, i)
+					we = lips_exporter_calls["VertexWeights"](bobj, bmesh, bface, i, self.weightnames)
+					v.append(LipsVertex(co, no, te, we))
+				# Insert faces.
+				if len(v) == 3:
+					self.faces.AddFace(mat.index, v)
+				elif len(v) == 4:
+					self.faces.AddFace(mat.index, [v[0], v[1], v[2]])
+					self.faces.AddFace(mat.index, [v[0], v[2], v[3]])
 
-	# \brief Gets the list of visible meshes in the scene.
+	def AddNode(self, node):
+		self.node = node
+
+	# \brief Writes the model file.
 	#
-	# \param self Scene.
-	# \return Array of Blender objects.
-	def GetMeshes(self):
-		meshes = []
-		objects = self.scene.objects
-		for obj in objects:
-			if obj.type == "Mesh" and obj.parent == None:
-				if lips_exporter_calls["MeshVisible"](obj, obj.getData(0, 1)):
-					meshes.append(obj)
-		return meshes
+	# \param self Storage.
+	# \param writer Writer.
+	def Write(self, writer):
+		bounds = self.faces.GetBounds();
+		writer.WriteString("lips/mdl")
+		writer.WriteInt(lips_format_version)
+		writer.WriteInt(0)
+		writer.WriteFloat(bounds[0])
+		writer.WriteFloat(bounds[1])
+		writer.WriteFloat(bounds[2])
+		writer.WriteFloat(bounds[3])
+		writer.WriteFloat(bounds[4])
+		writer.WriteFloat(bounds[5])
+		# Materials.
+		materials = self.materials.values()
+		materials.sort(lambda x,y: x.index - y.index)
+		writer.WriteString("mat")
+		writer.WriteInt(len(materials))
+		for material in materials:
+			material.Write(writer)
+		# Faces.
+		writer.WriteString("fac")
+		self.faces.Write(writer)
+		# Weights.
+		writer.WriteString("wei")
+		writer.WriteInt(len(self.weightnames))
+		for name in self.weightnames:
+			writer.WriteString(name)
+			writer.WriteString(name)
+		# Nodes.
+		writer.WriteString("nod")
+		writer.WriteInt(1)
+		self.node.Write(writer)
+		# Animations.
+		writer.WriteString("ani")
+		self.animations.Write(writer)
+		# Hairs.
+		writer.WriteString("hai")
+		self.hairs.Write(writer)
 
-	# \brief Gets the list of objects in the scene.
-	#
-	# \param self Scene.
-	# \return Array of Blender objects.
-	def GetObjects(self):
-		return self.scene.objects
-
+#############################################################################
+# Writer.
 
 class LipsWriter:
 
@@ -1204,59 +1107,11 @@ class LipsWriter:
 		self.file.write(value)
 		self.file.write(struct.pack('c', '\0'))
 
-
-class LipsExport:
-
-	# Initializes a new exporter.
-	def __init__(self, magic, dest, ext):
-		self.scene = LipsScene(Blender.Scene.GetCurrent())
-		self.mesh = LipsMesh()
-		self.armature = LipsArmature()
-		self.export_dir = dest
-		self.export_ext = ext
-		self.export_magic = magic
-		self.export_name = os.path.basename(Blender.Get("filename"))
-		self.export_name = os.path.splitext(self.export_name)[0]
-		self.export_name = os.path.splitext(self.export_name)[0]
-		self.export_name = os.path.splitext(self.export_name)[0]
-
-	def Write(self):
-
-		# Write header.
-		self.writer = LipsWriter(self.export_dir + self.export_name + self.export_ext)
-		self.writer.WriteString(self.export_magic)
-		self.writer.WriteInt(lips_format_version)
-
-		# Write mesh.
-		meshes = self.scene.GetMeshes()
-		for mesh in meshes:
-			self.mesh.AppendMesh(mesh)
-		self.mesh.Compile(self.armature)
-		self.mesh.Write(self.writer)
-
-		# Write nodes.
-		self.writer.WriteInt(1)
-		node = LipsNode(LipsNodeType.EMPTY, self.scene, None, None, None)
-		node.Write(self.writer)
-
-		# Write armatures.
-		armatures = self.scene.GetArmatures()
-		if len(armatures) > 1:
-			armatures = [armatures[0]]
-			print("W: File contains multiple armature.")
-		for armature in armatures:
-			self.armature.AppendArmature(armature, armature.getData())
-		self.armature.Write(self.writer)
-
-		# Write hairs.
-		hairs = self.scene.GetHairs()
-		self.writer.WriteInt(len(hairs))
-		for hair in hairs:
-			hair.Write(self.writer)
-		self.writer.Close()
-
 #############################################################################
-# Specialized exporter.
+# Main.
 
-exporter = LipsExport("lips/mdl", "", ".lmdl")
-exporter.Write()
+name = os.path.splitext(Blender.Get("filename"))[0]
+lips = LipsStorage(Blender.Scene.GetCurrent())
+writer = LipsWriter(name + ".lmdl")
+lips.Write(writer)
+writer.Close()
