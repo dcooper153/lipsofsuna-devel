@@ -53,6 +53,10 @@ liext_module_new (lisrvServer* server);
 void
 liext_module_free (liextModule* self);
 
+int
+liext_module_erase_point (liextModule*       self,
+                          const limatVector* point);
+
 void
 liext_module_fill_box (liextModule*       self,
                        const limatVector* min,

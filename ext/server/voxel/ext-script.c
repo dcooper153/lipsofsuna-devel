@@ -38,6 +38,30 @@
  * -- @class table
  */
 
+
+/* @luadoc
+ * ---
+ * -- Erases terrain from the vicinity of the given point.
+ * --
+ * -- @param self Voxel class.
+ * -- @param point Point.
+ * -- @return True if terrain was erased.
+ * function Voxel.erase_point(self, point)
+ */
+static int
+Voxel_erase_point (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+
+	lua_pushboolean (lua, liext_module_erase_point (module, center->data));
+
+	return 1;
+}
+
 /* @luadoc
  * ---
  * -- Fills a box with voxel terrain.
@@ -122,6 +146,7 @@ liextVoxelScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_insert_func (self, "erase_point", Voxel_erase_point);
 	liscr_class_insert_func (self, "fill_box", Voxel_fill_box);
 	liscr_class_insert_func (self, "fill_sphere", Voxel_fill_sphere);
 	liscr_class_insert_func (self, "save", Voxel_save);

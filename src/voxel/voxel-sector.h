@@ -45,6 +45,10 @@ livox_sector_build_block (livoxSector* self,
                           int          y,
                           int          z);
 
+int
+livox_sector_erase_point (livoxSector*       self,
+                          const limatVector* point);
+
 void
 livox_sector_fill (livoxSector* self,
                    livoxVoxel   terrain);

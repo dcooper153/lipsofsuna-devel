@@ -44,6 +44,15 @@ liphy_physics_cast_ray (const liphyPhysics* self,
                         limatVector*        result,
                         limatVector*        normal);
 
+int
+liphy_physics_cast_sphere (const liphyPhysics* self,
+                           const limatVector*  start,
+                           const limatVector*  end,
+                           float               radius,
+                           liphyObject**       ignore_array,
+                           int                 ignore_count,
+                           liphyCollision*     result);
+
 void
 liphy_physics_update (liphyPhysics* self,
                       float         secs);

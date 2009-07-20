@@ -27,6 +27,31 @@
 
 #define MAXPROXIES 1000000
 
+class ConvexTestIgnore : public btCollisionWorld::ClosestConvexResultCallback
+{
+public:
+	ConvexTestIgnore (liphyObject** ignore_array, int ignore_count) :
+		btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
+	{
+		this->ignore_count = ignore_count;
+		this->ignore_array = ignore_array;
+	}
+	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
+	{
+		int i;
+		liphyObject* hit = (liphyObject*) result.m_hitCollisionObject->getUserPointer ();
+		for (i = 0 ; i < this->ignore_count ; i++)
+		{
+			if (hit == this->ignore_array[i])
+				return 1.0;
+		}
+		return ClosestConvexResultCallback::addSingleResult (result, world);
+	}
+protected:
+	int ignore_count;
+	liphyObject** ignore_array;
+};
+
 static void
 private_internal_tick (btDynamicsWorld* dynamics,
                        btScalar         step);
@@ -101,10 +126,10 @@ liphy_physics_free (liphyPhysics* self)
  */
 int
 liphy_physics_cast_ray (const liphyPhysics* self,
-                        const limatVector*     start,
-                        const limatVector*     end,
-                        limatVector*           result,
-                        limatVector*           normal)
+                        const limatVector*  start,
+                        const limatVector*  end,
+                        limatVector*        result,
+                        limatVector*        normal)
 {
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
@@ -133,6 +158,62 @@ liphy_physics_cast_ray (const liphyPhysics* self,
 		*normal = limat_vector_normalize (limat_vector_subtract (*end, *start));
 		return 1;
 	}
+}
+
+/**
+ * \brief Casts a sphere to the scene.
+ *
+ * If the sphere hits no obstacle, result is set to the cast end point, normal is
+ * set to cast direction, and zero is returned. Otherwise, nonzero is returned
+ * and result and normal hold information on the collision point.
+ *
+ * \param self Physics simulation.
+ * \param start Cast start point.
+ * \param end Cast end point.
+ * \param radius Sphere radius.
+ * \param ignore_array Array of ignored objects.
+ * \param ignore_count Number of ignore objects.
+ * \param result Return location for collision data.
+ * \return Nonzero if a collision occurred.
+ */
+int
+liphy_physics_cast_sphere (const liphyPhysics* self,
+                           const limatVector*  start,
+                           const limatVector*  end,
+                           float               radius,
+                           liphyObject**       ignore_array,
+                           int                 ignore_count,
+                           liphyCollision*     result)
+{
+	btTransform src;
+	btTransform dst;
+	btCollisionWorld* collision;
+	btTransform btstart (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (start->x, start->y, start->z));
+	btTransform btend (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (end->x, end->y, end->z));
+	btSphereShape shape (radius);
+
+	/* Initialize sweep. */
+	ConvexTestIgnore test (ignore_array, ignore_count);
+	test.m_closestHitFraction = 1.0f;
+	test.m_collisionFilterGroup = btBroadphaseProxy::DefaultFilter;
+	test.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
+
+	/* Sweep the shape. */
+	collision = self->dynamics->getCollisionWorld ();
+	collision->convexSweepTest (&shape, btstart, btend, test);
+	result->fraction = test.m_closestHitFraction;
+	result->normal.x = test.m_hitNormalWorld[0];
+	result->normal.y = test.m_hitNormalWorld[1];
+	result->normal.z = test.m_hitNormalWorld[2];
+	result->point.x = test.m_hitPointWorld[0];
+	result->point.y = test.m_hitPointWorld[1];
+	result->point.z = test.m_hitPointWorld[2];
+	if (test.m_hitCollisionObject != NULL)
+		result->object = (liphyObject*) test.m_hitCollisionObject->getUserPointer ();
+	else
+		result->object = NULL;
+
+	return result->fraction < 1.0f;
 }
 
 /**

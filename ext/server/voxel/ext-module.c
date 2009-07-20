@@ -162,6 +162,30 @@ liext_module_free (liextModule* self)
 	free (self);
 }
 
+int
+liext_module_erase_point (liextModule*       self,
+                          const limatVector* point)
+{
+	int x, y, z;
+	int index;
+	limatVector p;
+	livoxSector* sector;
+
+	x = (int)(point->x / LIVOX_SECTOR_WIDTH);
+	y = (int)(point->y / LIVOX_SECTOR_WIDTH);
+	z = (int)(point->z / LIVOX_SECTOR_WIDTH);
+	p.x = point->x - x * LIVOX_SECTOR_WIDTH;
+	p.y = point->y - y * LIVOX_SECTOR_WIDTH;
+	p.z = point->z - z * LIVOX_SECTOR_WIDTH;
+
+	index = LIVOX_SECTOR_INDEX (x, y, z);
+	sector = livox_manager_load_sector (self->voxels, index, self->server->sql);
+	if (sector == NULL)
+		return 0;
+
+	return livox_sector_erase_point (sector, &p);
+}
+
 void
 liext_module_fill_box (liextModule*       self,
                        const limatVector* min,
