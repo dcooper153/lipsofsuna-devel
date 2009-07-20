@@ -186,6 +186,7 @@ def NodeChildren(scene, object, bone, parent):
 	return nodes
 
 def ObjectHairs(lips, object):
+	global lips_correction_matrix
 	for bparticles in object.getParticleSystems():
 		if bparticles.type is not Blender.Particle.TYPE['HAIR']:
 			continue
@@ -196,7 +197,7 @@ def ObjectHairs(lips, object):
 			if locs is not None:
 				hair = LipsHair()
 				for loc in locs:
-					tmp = Vector(loc[0], loc[1], loc[2])
+					tmp = Vector(loc[0], loc[1], loc[2]) * lips_correction_matrix
 					hair.AppendNode(tmp[0], tmp[1], tmp[2], 1.0) # FIXME: Size.
 				if len(hair.nodes):
 					lips.AddHair(bmat, hair)
