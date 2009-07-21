@@ -41,6 +41,7 @@ struct _liphyPhysics
 	btCollisionDispatcher* dispatcher;
 	btConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamics;
+	btGhostPairCallback* ghostcallback;
 	lialgList* controllers;
 	liphyTransformCall transform_callback;
 	void* userdata;

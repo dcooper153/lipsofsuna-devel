@@ -64,6 +64,10 @@ void
 liext_inventory_remove_listener (liextInventory* self,
                                  liengObject*    value);
 
+void
+liext_inventory_reset_listener (liextInventory* self,
+                                liengObject*    value);
+
 int
 liext_inventory_get_id (const liextInventory* self);
 

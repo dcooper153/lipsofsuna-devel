@@ -42,7 +42,7 @@ typedef struct _liextModule liextModule;
 struct _liextModule
 {
 	lialgPtrdic* dictionary;
-	licalHandle calls[2];
+	licalHandle calls[3];
 	lisrvServer* server;
 };
 

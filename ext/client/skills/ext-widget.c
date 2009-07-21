@@ -137,6 +137,7 @@ static int
 private_event (liextSkillWidget* self,
                liwdgEvent*       event)
 {
+	uint32_t id;
 	char buffer[256];
 	liengObject* object;
 	liextSkill* skill;
@@ -150,21 +151,14 @@ private_event (liextSkillWidget* self,
 		{
 			if (self->module->module->network == NULL)
 				goto disable;
-
-			static int FIXME = 0;
-			if (!FIXME)
-			{
-				printf ("FIXME: Hardcoded to track player.\n");
-				FIXME = 1;
-			}
-
-			self->object = self->module->module->network->id;
-			goto disable;
+			id = self->module->module->network->id;
 		}
-		object = lieng_engine_find_object (self->module->module->engine, self->object);
+		else
+			id = self->object;
+		object = lieng_engine_find_object (self->module->module->engine, id);
 		if (object == NULL)
 			goto disable;
-		skills = liext_module_find_skills (self->module, self->object);
+		skills = liext_module_find_skills (self->module, id);
 		if (skills == NULL)
 			goto disable;
 		skill = liext_skills_find_skill (skills, self->skill);

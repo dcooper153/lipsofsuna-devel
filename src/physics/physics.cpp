@@ -75,8 +75,9 @@ liphy_physics_new ()
 		return NULL;
 	try
 	{
+		self->ghostcallback = new btGhostPairCallback ();
 		self->broadphase = new bt32BitAxisSweep3 (min, max, MAXPROXIES);
-		self->broadphase->getOverlappingPairCache ()->setInternalGhostPairCallback (new btGhostPairCallback ());
+		self->broadphase->getOverlappingPairCache ()->setInternalGhostPairCallback (self->ghostcallback);
 		self->configuration = new btDefaultCollisionConfiguration ();
 		self->dispatcher = new btCollisionDispatcher (self->configuration);
 		self->solver = new btSequentialImpulseConstraintSolver ();
@@ -106,6 +107,7 @@ liphy_physics_free (liphyPhysics* self)
 	delete self->configuration;
 	delete self->dispatcher;
 	delete self->broadphase;
+	delete self->ghostcallback;
 	lialg_list_free (self->controllers);
 	free (self);
 }

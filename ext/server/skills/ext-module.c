@@ -30,6 +30,10 @@
 #include "ext-skills.h"
 
 static int
+private_object_client (liextModule* self,
+                       liengObject* object);
+
+static int
 private_tick (liextModule* self,
               float        secs);
 
@@ -65,10 +69,12 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 0) ||
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 0,
+	     	private_object_client, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 1) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_SHOW, 0,
-	     	private_vision_show, self, self->calls + 1))
+	     	private_vision_show, self, self->calls + 2))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -110,6 +116,26 @@ liext_module_remove_skills (liextModule* self,
 }
 
 /*****************************************************************************/
+
+static int
+private_object_client (liextModule* self,
+                       liengObject* object)
+{
+	lialgPtrdicIter iter;
+	liextSkills* skills;
+
+	LI_FOREACH_PTRDIC (iter, self->dictionary)
+	{
+		skills = iter.value;
+		if (skills->owner == object)
+		{
+			liext_skills_set_owner (skills, NULL);
+			liext_skills_set_owner (skills, object);
+		}
+	}
+
+	return 1;
+}
 
 static int
 private_tick (liextModule* self,

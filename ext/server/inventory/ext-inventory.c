@@ -172,6 +172,27 @@ liext_inventory_remove_listener (liextInventory* self,
 }
 
 /**
+ * \brief Resets an inventory listener.
+ *
+ * This is called when the client associated to the listener has changed.
+ * Causes the listener to be removed and readded so that the new inventory
+ * ownership states get sent to the clients.
+ *
+ * \param self Inventory.
+ * \param value Listener object.
+ */
+void
+liext_inventory_reset_listener (liextInventory* self,
+                                liengObject*    value)
+{
+	if (lialg_u32dic_find (self->listeners, value->id))
+	{
+		liext_inventory_remove_listener (self, value);
+		liext_inventory_insert_listener (self, value);
+	}
+}
+
+/**
  * \brief Gets an object in the specified slot.
  *
  * \param self Inventory.

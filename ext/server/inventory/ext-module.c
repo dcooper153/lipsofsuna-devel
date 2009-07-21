@@ -30,6 +30,10 @@
 #include "ext-inventory.h"
 
 static int
+private_object_client (liextModule* self,
+                       liengObject* object);
+
+static int
 private_tick (liextModule* self,
               float        secs);
 
@@ -57,8 +61,10 @@ liext_module_new (lisrvServer* server)
 		free (self);
 		return NULL;
 	}
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 0))
+	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 0,
+	     	private_object_client, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
+	     	private_tick, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -87,6 +93,18 @@ liext_module_find_inventory (liextModule* self,
 }
 
 /*****************************************************************************/
+
+static int
+private_object_client (liextModule* self,
+                       liengObject* object)
+{
+	lialgU32dicIter iter;
+
+	LI_FOREACH_U32DIC (iter, self->dictionary)
+		liext_inventory_reset_listener (iter.value, object);
+
+	return 1;
+}
 
 static int
 private_tick (liextModule* self,
