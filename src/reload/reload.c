@@ -191,7 +191,7 @@ lirel_reload_update (lirelReload* self)
 		printf ("Reloading texture `%s'\n", name);
 		if (name != NULL)
 		{
-			lieng_engine_load_texture (self->engine, name);
+			lirnd_render_load_image (self->engine->render, name);
 			free (name);
 		}
 	}

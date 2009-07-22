@@ -38,7 +38,6 @@ struct _lirndApi
 	lirndObject* (*lirnd_object_new)(lirndScene*, int);
 	void (*lirnd_object_free)(lirndObject*);
 	void (*lirnd_object_deform)(lirndObject*, limdlPose*);
-	void (*lirnd_object_replace_image)(lirndObject*, lirndImage*, lirndImage*);
 	void (*lirnd_object_update)(lirndObject*, float);
 	int (*lirnd_object_set_model)(lirndObject*, lirndModel*, limdlPose*);
 	int (*lirnd_object_set_realized)(lirndObject*, int);

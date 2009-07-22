@@ -36,7 +36,6 @@ lirndApi lirnd_render_api =
 	lirnd_object_new,
 	lirnd_object_free,
 	lirnd_object_deform,
-	lirnd_object_replace_image,
 	lirnd_object_update,
 	lirnd_object_set_model,
 	lirnd_object_set_realized,

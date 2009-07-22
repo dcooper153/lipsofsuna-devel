@@ -87,11 +87,6 @@ void
 lirnd_object_emit_particles (lirndObject* self);
 
 void
-lirnd_object_replace_image (lirndObject* self,
-                            lirndImage*  replace,
-                            lirndImage*  replacement);
-
-void
 lirnd_object_update (lirndObject* self,
                      float        secs);
 

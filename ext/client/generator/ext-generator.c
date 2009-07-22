@@ -83,6 +83,8 @@ liext_generator_free (liextGenerator* self)
 
 	if (self->generator != NULL)
 		ligen_generator_free (self->generator);
+	if (self->scene != NULL)
+		lirnd_scene_free (self->scene);
 
 	/* Free rules. */
 	for (i = 0 ; i < self->rules.count ; i++)

@@ -170,25 +170,57 @@ int
 lirnd_render_load_image (lirndRender* self,
                          const char*  name)
 {
-	liimgTexture* texture;
-	lirndImage* image;
+	int i;
+	int j;
+	lialgPtrdicIter iter0;
+	lialgPtrdicIter iter1;
+	liimgTexture* imgtexture;
+	lirndImage* rndimage;
+	lirndObject* object;
+	lirndScene* scene;
+	lirndTexture* texture;
+	lirndMaterial* material;
 
 	/* Find image info. */
-	image = lirnd_resources_find_image (self->resources, name);
-	if (image == NULL)
-		image = lirnd_resources_insert_image (self->resources, name);
-	if (image == NULL)
+	rndimage = lirnd_resources_find_image (self->resources, name);
+	if (rndimage == NULL)
+		rndimage = lirnd_resources_insert_image (self->resources, name);
+	if (rndimage == NULL)
 		return 0;
-	if (image->texture == NULL)
+	if (rndimage->texture == NULL)
 		return 1;
 
 	/* Reload image. */
-	texture = private_load_image (self, image);
-	if (texture == NULL)
+	imgtexture = private_load_image (self, rndimage);
+	if (imgtexture == NULL)
 		return 0;
-	if (image->texture != NULL)
-		liimg_texture_free (image->texture);
-	image->texture = texture;
+	if (rndimage->texture != NULL)
+		liimg_texture_free (rndimage->texture);
+	rndimage->texture = imgtexture;
+
+	/* Replace all instances. */
+	LI_FOREACH_PTRDIC (iter0, self->scenes)
+	{
+		scene = iter0.value;
+		LI_FOREACH_PTRDIC (iter1, scene->objects)
+		{
+			object = iter1.value;
+			if (object->model == NULL)
+				continue;
+			for (i = 0 ; i < object->materials.count ; i++)
+			{
+				material = object->materials.array[i];
+				for (j = 0 ; j < material->textures.count ; j++)
+				{
+					texture = material->textures.array + j;
+					if (texture->image == rndimage)
+					{
+						lirnd_texture_set_image (texture, rndimage);
+					}
+				}
+			}
+		}
+	}
 
 	return 1;
 }

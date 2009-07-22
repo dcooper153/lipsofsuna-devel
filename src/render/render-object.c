@@ -187,38 +187,6 @@ lirnd_object_emit_particles (lirndObject* self)
 }
 
 /**
- * \brief Replaces all matching images with the provided image.
- *
- * \param self Object.
- * \param replaced Image to replace.
- * \param replacement Replacement image.
- */
-void
-lirnd_object_replace_image (lirndObject* self,
-                            lirndImage*  replaced,
-                            lirndImage*  replacement)
-{
-	int i;
-	int j;
-	lirndMaterial* material;
-
-	if (self->model == NULL)
-		return;
-	for (i = 0 ; i < self->materials.count ; i++)
-	{
-		material = self->materials.array[i];
-		for (j = 0 ; j < material->textures.count ; j++)
-		{
-			if (material->textures.array[j].image == replaced)
-			{
-				lirnd_material_set_texture (material, j,
-					self->model->model->materials.array[i].textures.array + j, replacement);
-			}
-		}
-	}
-}
-
-/**
  * \brief Advances the timer of the object and deforms its mesh.
  *
  * \param self Object.

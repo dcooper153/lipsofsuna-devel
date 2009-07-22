@@ -428,63 +428,6 @@ lieng_engine_load_sector (liengEngine* self,
 }
 
 /**
- * \brief Forces the engine to reload a texture.
- *
- * Reloads the requested texture and updates any objects that reference
- * it to reflect the new texture. Any other references to the texture become
- * invalid and need to be manually replaced.
- *
- * \param self Engine.
- * \param name Texture name.
- * \return Nonzero on success.
- */
-int
-lieng_engine_load_texture (liengEngine* self,
-                           const char*  name)
-{
-#ifndef LIENG_DISABLE_GRAPHICS
-	lialgU32dicIter iter;
-	liengObject* object;
-	lirndImage dummy;
-	lirndImage* image;
-
-	/* Find old texture. */
-	image = self->renderapi->lirnd_render_find_image (self->render, name);
-	if (image == NULL)
-		return 1;
-
-	/* Remove old instances. */
-	memset (&dummy, 0, sizeof (dummy));
-	LI_FOREACH_U32DIC (iter, self->objects)
-	{
-		object = iter.value;
-		self->renderapi->lirnd_object_replace_image (object->render, image, &dummy);
-	}
-
-	/* Reload the texture. */
-	if (!self->renderapi->lirnd_render_load_image (self->render, name))
-	{
-		LI_FOREACH_U32DIC (iter, self->objects)
-		{
-			object = iter.value;
-			self->renderapi->lirnd_object_replace_image (object->render, &dummy, image);
-		}
-		return 0;
-	}
-	image = self->renderapi->lirnd_render_find_image (self->render, name);
-
-	/* Create new instances. */
-	LI_FOREACH_U32DIC (iter, self->objects)
-	{
-		object = iter.value;
-		self->renderapi->lirnd_object_replace_image (object->render, &dummy, image);
-	}
-#endif
-
-	return 1;
-}
-
-/**
  * \brief Removes an event handler callback.
  *
  * \param self Engine.

@@ -65,6 +65,10 @@ lirnd_scene_new (lirndRender* render)
 		return NULL;
 	self->render = render;
 
+	/* Register self. */
+	if (!lialg_ptrdic_insert (render->scenes, self, self))
+		goto error;
+
 	/* Allocate object list. */
 	self->objects = lialg_ptrdic_new ();
 	if (self->objects == NULL)
@@ -102,6 +106,9 @@ lirnd_scene_free (lirndScene* self)
 		assert (self->objects->size == 0);
 		lialg_ptrdic_free (self->objects);
 	}
+
+	/* Unregister self. */
+	lialg_ptrdic_remove (self->render->scenes, self);
 
 	free (self);
 }

@@ -158,10 +158,6 @@ liengSector*
 lieng_engine_load_sector (liengEngine* self,
                           uint32_t     id);
 
-int
-lieng_engine_load_texture (liengEngine* self,
-                           const char*  name);
-
 void
 lieng_engine_remove_call (liengEngine* self,
                           licalHandle* handle);
