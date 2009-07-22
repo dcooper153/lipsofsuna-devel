@@ -44,7 +44,7 @@
  * -- Objects stored to private slots are only transmitted to the client
  * -- who is the owner of the slots.
  * --
- * -- @name Skills.INTERNAL
+ * -- @name Skills.PRIVATE
  * -- @class table
  */
 /* @luadoc
@@ -54,7 +54,7 @@
  * -- Objects stored to public slots are transmitted to all clients who
  * -- can see the owner of the slots.
  * --
- * -- @name Skills.INTERNAL
+ * -- @name Skills.PUBLIC
  * -- @class table
  */
 
