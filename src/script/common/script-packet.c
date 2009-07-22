@@ -27,6 +27,12 @@
 #include <script/lips-script.h>
 #include "lips-common-script.h"
 
+static int
+private_read (liscrPacket* data,
+              lua_State*   lua);
+
+/*****************************************************************************/
+
 /* @luadoc
  * module "Core.Common.Packet"
  * ---
@@ -161,7 +167,7 @@ Packet_new (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Reads data from the packet.
+ * -- Reads data starting from the beginning of the packet.
  * --
  * -- @param self Packet.
  * -- @param ... Types to read.
@@ -171,85 +177,37 @@ Packet_new (lua_State* lua)
 static int
 Packet_read (lua_State* lua)
 {
-	int i;
-	int ok = 1;
-	int type;
 	liscrData* self;
 	liscrPacket* data;
-	union
-	{
-		int8_t i8;
-		int16_t i16;
-		int32_t i32;
-		uint8_t u8;
-		uint16_t u16;
-		uint32_t u32;
-		float flt;
-		char* str;
-	} tmp;
 
 	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
 	data = self->data;
 	luaL_argcheck (lua, data->reader != NULL, 1, "packet is not readable");
 	data->reader->pos = 1;
 
-	/* Read content. */
-	for (i = 2 ; i <= lua_gettop (lua) ; i++)
-	{
-		type = luaL_checkinteger (lua, i);
-		switch (type)
-		{
-			case LISCR_PACKET_FORMAT_BOOL:
-				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
-				if (ok) lua_pushboolean (lua, tmp.i8);
-				break;
-			case LISCR_PACKET_FORMAT_FLOAT:
-				if (ok) ok &= li_reader_get_float (data->reader, &tmp.flt);
-				if (ok) lua_pushnumber (lua, tmp.flt);
-				break;
-			case LISCR_PACKET_FORMAT_INT8:
-				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
-				if (ok) lua_pushnumber (lua, tmp.i8);
-				break;
-			case LISCR_PACKET_FORMAT_INT16:
-				if (ok) ok &= li_reader_get_int16 (data->reader, &tmp.i16);
-				if (ok) lua_pushnumber (lua, tmp.i16);
-				break;
-			case LISCR_PACKET_FORMAT_INT32:
-				if (ok) ok &= li_reader_get_int32 (data->reader, &tmp.i32);
-				if (ok) lua_pushnumber (lua, tmp.i32);
-				break;
-			case LISCR_PACKET_FORMAT_STRING:
-				tmp.str = NULL;
-				if (ok) ok &= li_reader_get_text (data->reader, "", &tmp.str);
-				if (ok) ok &= li_string_utf8_get_valid (tmp.str);
-				if (ok) lua_pushstring (lua, tmp.str);
-				free (tmp.str);
-				break;
-			case LISCR_PACKET_FORMAT_UINT8:
-				if (ok) ok &= li_reader_get_uint8 (data->reader, &tmp.u8);
-				if (ok) lua_pushnumber (lua, tmp.u8);
-				break;
-			case LISCR_PACKET_FORMAT_UINT16:
-				if (ok) ok &= li_reader_get_uint16 (data->reader, &tmp.u16);
-				if (ok) lua_pushnumber (lua, tmp.u16);
-				break;
-			case LISCR_PACKET_FORMAT_UINT32:
-				if (ok) ok &= li_reader_get_uint32 (data->reader, &tmp.u32);
-				if (ok) lua_pushnumber (lua, tmp.u32);
-				break;
-			default:
-				luaL_argerror (lua, i, "invalid format");
-				break;
-		}
-		if (!ok)
-			lua_pushnil (lua);
-		lua_replace (lua, i);
-	}
+	return private_read (data, lua);
+}
 
-	lua_pushboolean (lua, ok);
-	lua_replace (lua, 1);
-	return lua_gettop (lua);
+/* @luadoc
+ * ---
+ * -- Reads data starting from the last read positiong of the packet.
+ * --
+ * -- @param self Packet.
+ * -- @param ... Types to read.
+ * -- @return Boolean and a list of read values.
+ * function Packet.resume(self, ...)
+ */
+static int
+Packet_resume (lua_State* lua)
+{
+	liscrData* self;
+	liscrPacket* data;
+
+	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
+	data = self->data;
+	luaL_argcheck (lua, data->reader != NULL, 1, "packet is not readable");
+
+	return private_read (data, lua);
 }
 
 /* @luadoc
@@ -398,6 +356,7 @@ licomPacketScript (liscrClass* self,
 	liscr_class_insert_func (self, "__gc", Packet___gc);
 	liscr_class_insert_func (self, "new", Packet_new);
 	liscr_class_insert_func (self, "read", Packet_read);
+	liscr_class_insert_func (self, "resume", Packet_resume);
 	liscr_class_insert_func (self, "write", Packet_write);
 	liscr_class_insert_getter (self, "size", Packet_getter_size);
 	liscr_class_insert_getter (self, "type", Packet_getter_type);
@@ -484,6 +443,86 @@ liscr_packet_free (liscrPacket* self)
 		li_reader_free (self->reader);
 	free (self->buffer);
 	free (self);
+}
+
+/*****************************************************************************/
+
+static int
+private_read (liscrPacket* data,
+              lua_State*   lua)
+{
+	int i;
+	int ok = 1;
+	int type;
+	union
+	{
+		int8_t i8;
+		int16_t i16;
+		int32_t i32;
+		uint8_t u8;
+		uint16_t u16;
+		uint32_t u32;
+		float flt;
+		char* str;
+	} tmp;
+
+	/* Read content. */
+	for (i = 2 ; i <= lua_gettop (lua) ; i++)
+	{
+		type = luaL_checkinteger (lua, i);
+		switch (type)
+		{
+			case LISCR_PACKET_FORMAT_BOOL:
+				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
+				if (ok) lua_pushboolean (lua, tmp.i8);
+				break;
+			case LISCR_PACKET_FORMAT_FLOAT:
+				if (ok) ok &= li_reader_get_float (data->reader, &tmp.flt);
+				if (ok) lua_pushnumber (lua, tmp.flt);
+				break;
+			case LISCR_PACKET_FORMAT_INT8:
+				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
+				if (ok) lua_pushnumber (lua, tmp.i8);
+				break;
+			case LISCR_PACKET_FORMAT_INT16:
+				if (ok) ok &= li_reader_get_int16 (data->reader, &tmp.i16);
+				if (ok) lua_pushnumber (lua, tmp.i16);
+				break;
+			case LISCR_PACKET_FORMAT_INT32:
+				if (ok) ok &= li_reader_get_int32 (data->reader, &tmp.i32);
+				if (ok) lua_pushnumber (lua, tmp.i32);
+				break;
+			case LISCR_PACKET_FORMAT_STRING:
+				tmp.str = NULL;
+				if (ok) ok &= li_reader_get_text (data->reader, "", &tmp.str);
+				if (ok) ok &= li_string_utf8_get_valid (tmp.str);
+				if (ok) lua_pushstring (lua, tmp.str);
+				free (tmp.str);
+				break;
+			case LISCR_PACKET_FORMAT_UINT8:
+				if (ok) ok &= li_reader_get_uint8 (data->reader, &tmp.u8);
+				if (ok) lua_pushnumber (lua, tmp.u8);
+				break;
+			case LISCR_PACKET_FORMAT_UINT16:
+				if (ok) ok &= li_reader_get_uint16 (data->reader, &tmp.u16);
+				if (ok) lua_pushnumber (lua, tmp.u16);
+				break;
+			case LISCR_PACKET_FORMAT_UINT32:
+				if (ok) ok &= li_reader_get_uint32 (data->reader, &tmp.u32);
+				if (ok) lua_pushnumber (lua, tmp.u32);
+				break;
+			default:
+				luaL_argerror (lua, i, "invalid format");
+				break;
+		}
+		if (!ok)
+			lua_pushnil (lua);
+		lua_replace (lua, i);
+	}
+
+	lua_pushboolean (lua, ok);
+	lua_replace (lua, 1);
+	return lua_gettop (lua);
 }
 
 /** @} */
