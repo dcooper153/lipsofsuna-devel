@@ -155,6 +155,7 @@ lirnd_scene_insert_particle (lirndScene*        self,
  * \param modelview Modelview matrix.
  * \param projection Projection matrix.
  * \param frustum Frustum.
+ * \param viewport Viewport.
  * \param x Pick rectangle center.
  * \param y Pick rectangle center.
  * \param size Pick rectangle size.
@@ -166,6 +167,7 @@ lirnd_scene_pick (lirndScene*     self,
                   limatMatrix*    modelview,
                   limatMatrix*    projection,
                   limatFrustum*   frustum,
+                  const int*      viewport,
                   int             x,
                   int             y,
                   int             size,
@@ -176,11 +178,9 @@ lirnd_scene_pick (lirndScene*     self,
 	GLuint id;
 	GLuint dist;
 	GLuint selection[256];
-	GLint viewport[4];
 	limatMatrix pick;
 	lirndContext context;
 
-	glGetIntegerv (GL_VIEWPORT, viewport);
 	pick = limat_matrix_pick (x, y, size, size, viewport);
 	pick = limat_matrix_multiply (pick, *projection);
 	lirnd_context_init (&context, self);

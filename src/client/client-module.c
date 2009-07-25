@@ -460,36 +460,6 @@ licli_module_main (licliModule* self)
 }
 
 /**
- * \brief Picks an object from the scene.
- *
- * \param self Module.
- * \param x X position of the cursor.
- * \param y Y position of the cursor.
- * \param result Return location for the result.
- * \return Nonzero if picked an object.
- */
-int
-licli_module_pick (licliModule*    self,
-                   int             x,
-                   int             y,
-                   lirndSelection* result)
-{
-	int ret;
-	limatFrustum frustum;
-	limatMatrix modelview;
-	limatMatrix projection;
-
-	lieng_camera_get_frustum (self->camera, &frustum);
-	lieng_camera_get_modelview (self->camera, &modelview);
-	lieng_camera_get_projection (self->camera, &projection);
-	ret = lirnd_scene_pick (self->engine->scene,
-		&modelview, &projection, &frustum,
-		x, self->window->mode.height - y, 5, result);
-
-	return ret;
-}
-
-/**
  * \brief Renders everything.
  *
  * Called once per frame to render everything.

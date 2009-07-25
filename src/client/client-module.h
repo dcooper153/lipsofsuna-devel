@@ -115,12 +115,6 @@ licli_module_load_extension (licliModule* self,
 void
 licli_module_main (licliModule* self);
 
-int
-licli_module_pick (licliModule*    self,
-                   int             x,
-                   int             y,
-                   lirndSelection* result);
-
 void
 licli_module_render (licliModule* self);
 
