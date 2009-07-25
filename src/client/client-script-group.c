@@ -20,12 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrGroup Group
- * @{
  */
 
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /*****************************************************************************/
 
@@ -560,6 +557,42 @@ Group_getter_cols (lua_State* lua)
 
 	return 1;
 }
+static int
+Group_setter_cols (lua_State* lua)
+{
+	int w;
+	int h;
+	int y;
+	int cols;
+	liscrData* data;
+	liscrData* self;
+	liwdgWidget* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	cols = luaL_checkinteger (lua, 3);
+	luaL_argcheck (lua, cols >= 0, 3, "invalid column count");
+
+	/* Detach scripted widgets. */
+	liwdg_group_get_size (self->data, &w, &h);
+	for (w-- ; w >= cols ; w--)
+	{
+		for (y = 0 ; y < h ; y++)
+		{
+			widget = liwdg_group_get_child (self->data, w, y);
+			if (widget != NULL)
+			{
+				data = liwdg_widget_get_userdata (widget);
+				if (data != NULL)
+					licli_script_widget_detach (data);
+			}
+		}
+	}
+
+	/* Set new size. */
+	liwdg_group_set_size (LIWDG_GROUP (self->data), cols, h);
+
+	return 1;
+}
 
 /* @luadoc
  * ---
@@ -578,6 +611,42 @@ Group_getter_rows (lua_State* lua)
 
 	liwdg_group_get_size (LIWDG_GROUP (self->data), &w, &h);
 	lua_pushnumber (lua, h);
+
+	return 1;
+}
+static int
+Group_setter_rows (lua_State* lua)
+{
+	int w;
+	int h;
+	int x;
+	int rows;
+	liscrData* data;
+	liscrData* self;
+	liwdgWidget* widget;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	rows = luaL_checkinteger (lua, 3);
+	luaL_argcheck (lua, rows >= 0, 3, "invalid row count");
+
+	/* Detach scripted widgets. */
+	liwdg_group_get_size (self->data, &w, &h);
+	for (h-- ; h >= rows ; h--)
+	{
+		for (x = 0 ; x < w ; x++)
+		{
+			widget = liwdg_group_get_child (self->data, x, h);
+			if (widget != NULL)
+			{
+				data = liwdg_widget_get_userdata (widget);
+				if (data != NULL)
+					licli_script_widget_detach (data);
+			}
+		}
+	}
+
+	/* Set new size. */
+	liwdg_group_set_size (LIWDG_GROUP (self->data), w, rows);
 
 	return 1;
 }
@@ -604,8 +673,9 @@ licliGroupScript (liscrClass* self,
 	liscr_class_insert_func (self, "set_row_expand", Group_set_row_expand);
 	liscr_class_insert_getter (self, "cols", Group_getter_cols);
 	liscr_class_insert_getter (self, "rows", Group_getter_rows);
+	liscr_class_insert_setter (self, "cols", Group_setter_cols);
+	liscr_class_insert_setter (self, "rows", Group_setter_rows);
 }
 
-/** @} */
 /** @} */
 /** @} */

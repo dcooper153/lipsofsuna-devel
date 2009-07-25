@@ -20,12 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrBinding Binding
- * @{
  */
 
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /*****************************************************************************/
 
@@ -188,6 +185,5 @@ licliBindingScript (liscrClass* self,
 	liscr_class_insert_enum (self, "JOYSTICK_AXIS", LIBND_TYPE_JOYSTICK_AXIS);
 }
 
-/** @} */
 /** @} */
 /** @} */

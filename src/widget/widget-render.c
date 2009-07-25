@@ -38,7 +38,7 @@ private_event (liwdgRender* self,
 
 const liwdgClass liwdgRenderType =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Render", sizeof (liwdgRender),
+	LIWDG_BASE_STATIC, &liwdgGroupType, "Render", sizeof (liwdgRender),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -123,9 +123,11 @@ private_event (liwdgRender* self,
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self);
+			if (!lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self))
+				return 0;
+			break;
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
-			return 0;
+			break;
 		case LIWDG_EVENT_TYPE_RENDER:
 			glMatrixMode (GL_PROJECTION);
 			glPushMatrix ();
@@ -156,10 +158,22 @@ private_event (liwdgRender* self,
 			glPopMatrix ();
 			glMatrixMode (GL_MODELVIEW);
 			glPopMatrix ();
-			return 1;
+			glEnable (GL_BLEND);
+			glEnable (GL_TEXTURE_2D);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDisable (GL_CULL_FACE);
+			glDisable (GL_LIGHTING);
+			glDisable (GL_DEPTH_TEST);
+			glDepthMask (GL_FALSE);
+			liwdgGroupType.event (LIWDG_WIDGET (self), event);
+			break;
+		case LIWDG_EVENT_TYPE_UPDATE:
+			if (self->custom_update_func != NULL)
+				self->custom_update_func (self, self->custom_update_data);
+			break;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

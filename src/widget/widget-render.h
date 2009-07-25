@@ -27,18 +27,21 @@
 
 #include <render/lips-render.h>
 #include "widget.h"
+#include "widget-group.h"
 
 #define LIWDG_RENDER(o) ((liwdgRender*)(o))
 
 typedef struct _liwdgRender liwdgRender;
 struct _liwdgRender
 {
-	liwdgWidget base;
+	liwdgGroup base;
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndScene* scene;
 	void (*custom_render_func)(liwdgRender*, void*);
 	void* custom_render_data;
+	void (*custom_update_func)(liwdgRender*, void*);
+	void* custom_update_data;
 };
 
 extern const liwdgClass liwdgRenderType;

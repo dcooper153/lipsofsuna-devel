@@ -20,13 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrObject Object
- * @{
  */
 
-#include <client/lips-client.h>
-#include <script/common/lips-common-script.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /*****************************************************************************/
 
@@ -94,6 +90,5 @@ licliObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "say", Object_say);
 }
 
-/** @} */
 /** @} */
 /** @} */

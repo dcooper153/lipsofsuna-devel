@@ -20,16 +20,12 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrModule Module
- * @{
  */
 
 #include <stdlib.h>
-#include <client/lips-client.h>
 #include <network/lips-network.h>
-#include <script/common/lips-common-script.h>
 #include <system/lips-system.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /* @luadoc
  * module "Core.Client.Module"
@@ -456,6 +452,5 @@ licliModuleScript (liscrClass* self,
 	liscr_class_insert_setter (self, "title", Module_setter_title);
 }
 
-/** @} */
 /** @} */
 /** @} */

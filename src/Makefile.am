@@ -64,24 +64,24 @@ clisrc = \
 	client/client-object.c \
 	client/client-object.h \
 	client/client-script.h \
+	client/client-script-action.c \
+	client/client-script-binding.c \
+	client/client-script-group.c \
+	client/client-script-extension.c \
+	client/client-script-light.c \
+	client/client-script-module.c \
+	client/client-script-object.c \
+	client/client-script-player.c \
+	client/client-script-scene.c \
+	client/client-script-widget.c \
+	client/client-script-window.c \
 	client/client-speech.c \
 	client/client-speech.h \
 	client/client-types.h \
 	client/client-window.c \
 	client/client-window.h \
 	client/widget-login.c \
-	client/widget-login.h \
-	client/script/lips-client-script.h \
-	client/script/script-action.c \
-	client/script/script-binding.c \
-	client/script/script-group.c \
-	client/script/script-extension-1.c \
-	client/script/script-light.c \
-	client/script/script-module.c \
-	client/script/script-object-1.c \
-	client/script/script-player.c \
-	client/script/script-widget.c \
-	client/script/script-window.c
+	client/widget-login.h
 cfgsrc = \
 	config/lips-config.h \
 	config/config-account.c \

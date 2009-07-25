@@ -501,43 +501,9 @@ licli_module_render (licliModule* self)
 {
 	int w;
 	int h;
-	int active;
-	liengSelectionIter iter;
-	limatFrustum frustum;
-	limatMatrix modelview;
-	limatMatrix projection;
-	lirndContext context;
 
-	/* Render scene. */
-	active = (self->network != NULL);
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if (active)
-	{
-		lieng_camera_get_frustum (self->camera, &frustum);
-		lieng_camera_get_modelview (self->camera, &modelview);
-		lieng_camera_get_projection (self->camera, &projection);
-		lirnd_scene_render (self->engine->scene, &modelview, &projection, &frustum);
-	}
-	glDisable (GL_LIGHTING);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_TEXTURE_2D);
-	glDepthMask (GL_FALSE);
-	glColor3f (1.0f, 0.0f, 0.0f);
-	lirnd_context_init (&context, self->engine->scene);
-	if (active)
-	{
-		lirnd_context_set_modelview (&context, &modelview);
-		lirnd_context_set_projection (&context, &projection);
-		lirnd_context_set_frustum (&context, &frustum);
-		LIENG_FOREACH_SELECTION (iter, self->engine)
-		{
-			if (iter.object->render != NULL)
-				lirnd_draw_bounds (&context, iter.object->render, NULL);
-		}
-	}
-	lirnd_context_unbind (&context);
 
 	/* Set 2D rendering mode. */
 	licli_window_get_size (self->window, &w, &h);
@@ -797,6 +763,7 @@ private_init_script (licliModule* self)
 	    !liscr_script_create_class (self->script, "Path", licomPathScript, self->script) ||
 	    !liscr_script_create_class (self->script, "Player", licliPlayerScript, self) ||
 	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
+	    !liscr_script_create_class (self->script, "Scene", licliSceneScript, self) ||
 	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script) ||
 	    !liscr_script_create_class (self->script, "Widget", licliWidgetScript, self) ||
 	    !liscr_script_create_class (self->script, "Window", licliWindowScript, self))

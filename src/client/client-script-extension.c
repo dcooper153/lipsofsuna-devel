@@ -20,13 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrExtension Extension
- * @{
  */
 
-#include <script/lips-script.h>
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /*****************************************************************************/
 
@@ -72,6 +68,5 @@ licliExtensionScript (liscrClass* self,
 	liscr_class_insert_func (self, "new", Extension_new);
 }
 
-/** @} */
 /** @} */
 /** @} */

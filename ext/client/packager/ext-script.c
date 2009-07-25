@@ -85,7 +85,7 @@ Packager_save (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Verbpse debug flag.
+ * -- Boolean switch for verbose debug messages.
  * -- @name Packager.verbose
  * -- @class table
  */

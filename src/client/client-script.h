@@ -25,8 +25,72 @@
 #ifndef __CLIENT_SCRIPT_H__
 #define __CLIENT_SCRIPT_H__
 
+#include <script/lips-script.h>
 #include <script/common/lips-common-script.h>
-#include "script/lips-client-script.h"
+#include <widget/lips-widget.h>
+
+#define LICLI_SCRIPT_ACTION "Lips.Action"
+#define LICLI_SCRIPT_BINDING "Lips.Binding"
+#define LICLI_SCRIPT_EXTENSION "Lips.Extension"
+#define LICLI_SCRIPT_GROUP "Lips.Group"
+#define LICLI_SCRIPT_LIGHT "Lips.Light"
+#define LICLI_SCRIPT_MODULE "Lips.Module"
+#define LICLI_SCRIPT_PLAYER "Lips.Player"
+#define LICLI_SCRIPT_SCENE "Lips.Scene"
+#define LICLI_SCRIPT_WIDGET "Lips.Widget"
+#define LICLI_SCRIPT_WINDOW "Lips.Window"
+
+void
+licliActionScript (liscrClass* self,
+                   void*       data);
+
+void
+licliBindingScript (liscrClass* self,
+                    void*       data);
+
+void
+licliExtensionScript (liscrClass* self,
+                      void*       data);
+
+void
+licliGroupScript (liscrClass* self,
+                  void*       data);
+
+void
+licliLightScript (liscrClass* self,
+                  void*       data);
+
+void
+licliModuleScript (liscrClass* self,
+                   void*       data);
+
+void
+licliObjectScript (liscrClass* self,
+                   void*       data);
+
+void
+licliPlayerScript (liscrClass* self,
+                   void*       data);
+
+void
+licliSceneScript (liscrClass* self,
+                  void*       data);
+
+void
+licliWidgetScript (liscrClass* self,
+                   void*       data);
+
+void
+licliWindowScript (liscrClass* self,
+                   void*       data);
+
+/*****************************************************************************/
+
+void
+licli_script_widget_detach (liscrData* self);
+
+void
+licli_script_widget_detach_children (liscrData* self);
 
 #endif
 

@@ -20,12 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrWindow Window
- * @{
  */
 
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /* @luadoc
  * module "Core.Client.Window"
@@ -191,6 +188,5 @@ licliWindowScript (liscrClass* self,
 	liscr_class_insert_setter (self, "visible", Window_setter_visible);
 }
 
-/** @} */
 /** @} */
 /** @} */

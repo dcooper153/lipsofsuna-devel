@@ -91,19 +91,20 @@ am__objects_7 = liblipsofsunaclient_la-client.lo \
 	liblipsofsunaclient_la-client-module.lo \
 	liblipsofsunaclient_la-client-network.lo \
 	liblipsofsunaclient_la-client-object.lo \
+	liblipsofsunaclient_la-client-script-action.lo \
+	liblipsofsunaclient_la-client-script-binding.lo \
+	liblipsofsunaclient_la-client-script-group.lo \
+	liblipsofsunaclient_la-client-script-extension.lo \
+	liblipsofsunaclient_la-client-script-light.lo \
+	liblipsofsunaclient_la-client-script-module.lo \
+	liblipsofsunaclient_la-client-script-object.lo \
+	liblipsofsunaclient_la-client-script-player.lo \
+	liblipsofsunaclient_la-client-script-scene.lo \
+	liblipsofsunaclient_la-client-script-widget.lo \
+	liblipsofsunaclient_la-client-script-window.lo \
 	liblipsofsunaclient_la-client-speech.lo \
 	liblipsofsunaclient_la-client-window.lo \
-	liblipsofsunaclient_la-widget-login.lo \
-	liblipsofsunaclient_la-script-action.lo \
-	liblipsofsunaclient_la-script-binding.lo \
-	liblipsofsunaclient_la-script-group.lo \
-	liblipsofsunaclient_la-script-extension-1.lo \
-	liblipsofsunaclient_la-script-light.lo \
-	liblipsofsunaclient_la-script-module.lo \
-	liblipsofsunaclient_la-script-object-1.lo \
-	liblipsofsunaclient_la-script-player.lo \
-	liblipsofsunaclient_la-script-widget.lo \
-	liblipsofsunaclient_la-script-window.lo
+	liblipsofsunaclient_la-widget-login.lo
 am__objects_8 = liblipsofsunaclient_la-engine.lo \
 	liblipsofsunaclient_la-engine-camera.lo \
 	liblipsofsunaclient_la-engine-constraint.lo \
@@ -652,24 +653,24 @@ clisrc = \
 	client/client-object.c \
 	client/client-object.h \
 	client/client-script.h \
+	client/client-script-action.c \
+	client/client-script-binding.c \
+	client/client-script-group.c \
+	client/client-script-extension.c \
+	client/client-script-light.c \
+	client/client-script-module.c \
+	client/client-script-object.c \
+	client/client-script-player.c \
+	client/client-script-scene.c \
+	client/client-script-widget.c \
+	client/client-script-window.c \
 	client/client-speech.c \
 	client/client-speech.h \
 	client/client-types.h \
 	client/client-window.c \
 	client/client-window.h \
 	client/widget-login.c \
-	client/widget-login.h \
-	client/script/lips-client-script.h \
-	client/script/script-action.c \
-	client/script/script-binding.c \
-	client/script/script-group.c \
-	client/script/script-extension-1.c \
-	client/script/script-light.c \
-	client/script/script-module.c \
-	client/script/script-object-1.c \
-	client/script/script-player.c \
-	client/script/script-widget.c \
-	client/script/script-window.c
+	client/widget-login.h
 
 cfgsrc = \
 	config/lips-config.h \
@@ -1234,6 +1235,17 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-action.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-binding.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-extension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-group.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-light.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-player.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-scene.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-widget.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-script-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-speech.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-client.Plo@am__quote@
@@ -1293,30 +1305,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-shader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-action.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-binding.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-class-1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-class.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-effect.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-event.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-extension-1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-extension-2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-group.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-light.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-object-1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-object-2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-object-3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-packet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-path.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-player.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-quaternion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-vector.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-widget.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-server-callbacks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-server-client.Plo@am__quote@
@@ -1652,6 +1654,83 @@ liblipsofsunaclient_la-client-object.lo: client/client-object.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-object.lo `test -f 'client/client-object.c' || echo '$(srcdir)/'`client/client-object.c
 
+liblipsofsunaclient_la-client-script-action.lo: client/client-script-action.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-action.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-action.Tpo -c -o liblipsofsunaclient_la-client-script-action.lo `test -f 'client/client-script-action.c' || echo '$(srcdir)/'`client/client-script-action.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-action.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-action.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-action.c' object='liblipsofsunaclient_la-client-script-action.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-action.lo `test -f 'client/client-script-action.c' || echo '$(srcdir)/'`client/client-script-action.c
+
+liblipsofsunaclient_la-client-script-binding.lo: client/client-script-binding.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-binding.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-binding.Tpo -c -o liblipsofsunaclient_la-client-script-binding.lo `test -f 'client/client-script-binding.c' || echo '$(srcdir)/'`client/client-script-binding.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-binding.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-binding.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-binding.c' object='liblipsofsunaclient_la-client-script-binding.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-binding.lo `test -f 'client/client-script-binding.c' || echo '$(srcdir)/'`client/client-script-binding.c
+
+liblipsofsunaclient_la-client-script-group.lo: client/client-script-group.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-group.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-group.Tpo -c -o liblipsofsunaclient_la-client-script-group.lo `test -f 'client/client-script-group.c' || echo '$(srcdir)/'`client/client-script-group.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-group.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-group.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-group.c' object='liblipsofsunaclient_la-client-script-group.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-group.lo `test -f 'client/client-script-group.c' || echo '$(srcdir)/'`client/client-script-group.c
+
+liblipsofsunaclient_la-client-script-extension.lo: client/client-script-extension.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-extension.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-extension.Tpo -c -o liblipsofsunaclient_la-client-script-extension.lo `test -f 'client/client-script-extension.c' || echo '$(srcdir)/'`client/client-script-extension.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-extension.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-extension.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-extension.c' object='liblipsofsunaclient_la-client-script-extension.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-extension.lo `test -f 'client/client-script-extension.c' || echo '$(srcdir)/'`client/client-script-extension.c
+
+liblipsofsunaclient_la-client-script-light.lo: client/client-script-light.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-light.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-light.Tpo -c -o liblipsofsunaclient_la-client-script-light.lo `test -f 'client/client-script-light.c' || echo '$(srcdir)/'`client/client-script-light.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-light.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-light.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-light.c' object='liblipsofsunaclient_la-client-script-light.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-light.lo `test -f 'client/client-script-light.c' || echo '$(srcdir)/'`client/client-script-light.c
+
+liblipsofsunaclient_la-client-script-module.lo: client/client-script-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-module.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-module.Tpo -c -o liblipsofsunaclient_la-client-script-module.lo `test -f 'client/client-script-module.c' || echo '$(srcdir)/'`client/client-script-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-module.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-module.c' object='liblipsofsunaclient_la-client-script-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-module.lo `test -f 'client/client-script-module.c' || echo '$(srcdir)/'`client/client-script-module.c
+
+liblipsofsunaclient_la-client-script-object.lo: client/client-script-object.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-object.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-object.Tpo -c -o liblipsofsunaclient_la-client-script-object.lo `test -f 'client/client-script-object.c' || echo '$(srcdir)/'`client/client-script-object.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-object.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-object.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-object.c' object='liblipsofsunaclient_la-client-script-object.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-object.lo `test -f 'client/client-script-object.c' || echo '$(srcdir)/'`client/client-script-object.c
+
+liblipsofsunaclient_la-client-script-player.lo: client/client-script-player.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-player.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-player.Tpo -c -o liblipsofsunaclient_la-client-script-player.lo `test -f 'client/client-script-player.c' || echo '$(srcdir)/'`client/client-script-player.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-player.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-player.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-player.c' object='liblipsofsunaclient_la-client-script-player.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-player.lo `test -f 'client/client-script-player.c' || echo '$(srcdir)/'`client/client-script-player.c
+
+liblipsofsunaclient_la-client-script-scene.lo: client/client-script-scene.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-scene.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-scene.Tpo -c -o liblipsofsunaclient_la-client-script-scene.lo `test -f 'client/client-script-scene.c' || echo '$(srcdir)/'`client/client-script-scene.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-scene.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-scene.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-scene.c' object='liblipsofsunaclient_la-client-script-scene.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-scene.lo `test -f 'client/client-script-scene.c' || echo '$(srcdir)/'`client/client-script-scene.c
+
+liblipsofsunaclient_la-client-script-widget.lo: client/client-script-widget.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-widget.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-widget.Tpo -c -o liblipsofsunaclient_la-client-script-widget.lo `test -f 'client/client-script-widget.c' || echo '$(srcdir)/'`client/client-script-widget.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-widget.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-widget.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-widget.c' object='liblipsofsunaclient_la-client-script-widget.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-widget.lo `test -f 'client/client-script-widget.c' || echo '$(srcdir)/'`client/client-script-widget.c
+
+liblipsofsunaclient_la-client-script-window.lo: client/client-script-window.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-script-window.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-script-window.Tpo -c -o liblipsofsunaclient_la-client-script-window.lo `test -f 'client/client-script-window.c' || echo '$(srcdir)/'`client/client-script-window.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-script-window.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-script-window.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-window.c' object='liblipsofsunaclient_la-client-script-window.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-client-script-window.lo `test -f 'client/client-script-window.c' || echo '$(srcdir)/'`client/client-script-window.c
+
 liblipsofsunaclient_la-client-speech.lo: client/client-speech.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-client-speech.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-client-speech.Tpo -c -o liblipsofsunaclient_la-client-speech.lo `test -f 'client/client-speech.c' || echo '$(srcdir)/'`client/client-speech.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-client-speech.Tpo $(DEPDIR)/liblipsofsunaclient_la-client-speech.Plo
@@ -1672,76 +1751,6 @@ liblipsofsunaclient_la-widget-login.lo: client/widget-login.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/widget-login.c' object='liblipsofsunaclient_la-widget-login.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-login.lo `test -f 'client/widget-login.c' || echo '$(srcdir)/'`client/widget-login.c
-
-liblipsofsunaclient_la-script-action.lo: client/script/script-action.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-action.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-action.Tpo -c -o liblipsofsunaclient_la-script-action.lo `test -f 'client/script/script-action.c' || echo '$(srcdir)/'`client/script/script-action.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-action.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-action.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-action.c' object='liblipsofsunaclient_la-script-action.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-action.lo `test -f 'client/script/script-action.c' || echo '$(srcdir)/'`client/script/script-action.c
-
-liblipsofsunaclient_la-script-binding.lo: client/script/script-binding.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-binding.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-binding.Tpo -c -o liblipsofsunaclient_la-script-binding.lo `test -f 'client/script/script-binding.c' || echo '$(srcdir)/'`client/script/script-binding.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-binding.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-binding.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-binding.c' object='liblipsofsunaclient_la-script-binding.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-binding.lo `test -f 'client/script/script-binding.c' || echo '$(srcdir)/'`client/script/script-binding.c
-
-liblipsofsunaclient_la-script-group.lo: client/script/script-group.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-group.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-group.Tpo -c -o liblipsofsunaclient_la-script-group.lo `test -f 'client/script/script-group.c' || echo '$(srcdir)/'`client/script/script-group.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-group.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-group.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-group.c' object='liblipsofsunaclient_la-script-group.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-group.lo `test -f 'client/script/script-group.c' || echo '$(srcdir)/'`client/script/script-group.c
-
-liblipsofsunaclient_la-script-extension-1.lo: client/script/script-extension-1.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-extension-1.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-extension-1.Tpo -c -o liblipsofsunaclient_la-script-extension-1.lo `test -f 'client/script/script-extension-1.c' || echo '$(srcdir)/'`client/script/script-extension-1.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-extension-1.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-extension-1.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-extension-1.c' object='liblipsofsunaclient_la-script-extension-1.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-extension-1.lo `test -f 'client/script/script-extension-1.c' || echo '$(srcdir)/'`client/script/script-extension-1.c
-
-liblipsofsunaclient_la-script-light.lo: client/script/script-light.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-light.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-light.Tpo -c -o liblipsofsunaclient_la-script-light.lo `test -f 'client/script/script-light.c' || echo '$(srcdir)/'`client/script/script-light.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-light.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-light.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-light.c' object='liblipsofsunaclient_la-script-light.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-light.lo `test -f 'client/script/script-light.c' || echo '$(srcdir)/'`client/script/script-light.c
-
-liblipsofsunaclient_la-script-module.lo: client/script/script-module.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-module.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-module.Tpo -c -o liblipsofsunaclient_la-script-module.lo `test -f 'client/script/script-module.c' || echo '$(srcdir)/'`client/script/script-module.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-module.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-module.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-module.c' object='liblipsofsunaclient_la-script-module.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-module.lo `test -f 'client/script/script-module.c' || echo '$(srcdir)/'`client/script/script-module.c
-
-liblipsofsunaclient_la-script-object-1.lo: client/script/script-object-1.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-object-1.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-object-1.Tpo -c -o liblipsofsunaclient_la-script-object-1.lo `test -f 'client/script/script-object-1.c' || echo '$(srcdir)/'`client/script/script-object-1.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-object-1.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-object-1.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-object-1.c' object='liblipsofsunaclient_la-script-object-1.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-object-1.lo `test -f 'client/script/script-object-1.c' || echo '$(srcdir)/'`client/script/script-object-1.c
-
-liblipsofsunaclient_la-script-player.lo: client/script/script-player.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-player.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-player.Tpo -c -o liblipsofsunaclient_la-script-player.lo `test -f 'client/script/script-player.c' || echo '$(srcdir)/'`client/script/script-player.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-player.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-player.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-player.c' object='liblipsofsunaclient_la-script-player.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-player.lo `test -f 'client/script/script-player.c' || echo '$(srcdir)/'`client/script/script-player.c
-
-liblipsofsunaclient_la-script-widget.lo: client/script/script-widget.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-widget.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-widget.Tpo -c -o liblipsofsunaclient_la-script-widget.lo `test -f 'client/script/script-widget.c' || echo '$(srcdir)/'`client/script/script-widget.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-widget.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-widget.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-widget.c' object='liblipsofsunaclient_la-script-widget.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-widget.lo `test -f 'client/script/script-widget.c' || echo '$(srcdir)/'`client/script/script-widget.c
-
-liblipsofsunaclient_la-script-window.lo: client/script/script-window.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-script-window.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-script-window.Tpo -c -o liblipsofsunaclient_la-script-window.lo `test -f 'client/script/script-window.c' || echo '$(srcdir)/'`client/script/script-window.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-script-window.Tpo $(DEPDIR)/liblipsofsunaclient_la-script-window.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/script/script-window.c' object='liblipsofsunaclient_la-script-window.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-script-window.lo `test -f 'client/script/script-window.c' || echo '$(srcdir)/'`client/script/script-window.c
 
 liblipsofsunaclient_la-engine.lo: engine/engine.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-engine.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-engine.Tpo -c -o liblipsofsunaclient_la-engine.lo `test -f 'engine/engine.c' || echo '$(srcdir)/'`engine/engine.c

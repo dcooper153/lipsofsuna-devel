@@ -20,12 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrAction
- * @{
  */
 
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 static int
 private_action_callback (libndAction*  action,
@@ -221,6 +218,5 @@ licliActionScript (liscrClass* self,
 	liscr_class_insert_setter (self, "enabled", Action_setter_enabled);
 }
 
-/** @} */
 /** @} */
 /** @} */

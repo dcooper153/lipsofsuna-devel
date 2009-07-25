@@ -20,12 +20,9 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrWidget Widget
- * @{
  */
 
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 enum
 {
@@ -338,6 +335,5 @@ licliWidgetScript (liscrClass* self,
 	liscr_class_insert_setter (self, "visible", Widget_setter_visible);
 }
 
-/** @} */
 /** @} */
 /** @} */

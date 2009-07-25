@@ -20,13 +20,10 @@
  * @{
  * \addtogroup licliscr Script
  * @{
- * \addtogroup licliscrPlayer Player
- * @{
  */
 
 #include <stdlib.h>
-#include <client/lips-client.h>
-#include "lips-client-script.h"
+#include "lips-client.h"
 
 /* @luadoc
  * module "Core.Client.Player"
@@ -295,6 +292,5 @@ licliPlayerScript (liscrClass* self,
 	liscr_class_insert_setter (self, "turn_rate", Player_setter_turn_rate);
 }
 
-/** @} */
 /** @} */
 /** @} */
