@@ -64,9 +64,9 @@ lieng_range_iter_first (liengRangeIter* self,
 	self->x = range->minx;
 	self->y = range->miny;
 	self->z = range->minz;
-	if (range->minx == range->maxx ||
-	    range->miny == range->maxy ||
-	    range->minz == range->maxz)
+	if (range->minx > range->maxx ||
+	    range->miny > range->maxy ||
+	    range->minz > range->maxz)
 	{
 		self->more = 0;
 		return 0;
@@ -88,25 +88,19 @@ lieng_range_iter_next (liengRangeIter* self)
 	int r = self->range.max - self->range.min;
 
 	/* Find next bin. */
-	if (self->x >= self->range.maxx)
+	if (++self->x > self->range.maxx)
 	{
 		self->x = self->range.minx;
-		if (self->y >= self->range.maxy)
+		if (++self->y > self->range.maxy)
 		{
 			self->y = self->range.miny;
-			if (self->z >= self->range.maxz)
+			if (++self->z > self->range.maxz)
 			{
 				self->more = 0;
 				return 0;
 			}
-			else
-				self->z++;
 		}
-		else
-			self->y++;
 	}
-	else
-		self->x++;
 
 	/* Calculate bin index. */
 	self->index =

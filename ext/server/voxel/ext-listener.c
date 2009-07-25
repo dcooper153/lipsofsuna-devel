@@ -185,9 +185,9 @@ liext_listener_update (liextListener* self,
 		range.minx = LI_MAX (blocks.minx - x * LIVOX_BLOCKS_PER_LINE, 0);
 		range.miny = LI_MAX (blocks.miny - y * LIVOX_BLOCKS_PER_LINE, 0);
 		range.minz = LI_MAX (blocks.minz - z * LIVOX_BLOCKS_PER_LINE, 0);
-		range.maxx = LI_MIN (blocks.maxx - x * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE) - 1;
-		range.maxy = LI_MIN (blocks.maxy - y * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE) - 1;
-		range.maxz = LI_MIN (blocks.maxz - z * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE) - 1;
+		range.maxx = LI_MIN (blocks.maxx - x * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
+		range.maxy = LI_MIN (blocks.maxy - y * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
+		range.maxz = LI_MIN (blocks.maxz - z * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through visible blocks. */
 		LIENG_FOREACH_RANGE (iter1, range)

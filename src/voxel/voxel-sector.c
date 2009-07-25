@@ -545,6 +545,9 @@ livoxBlock*
 livox_sector_get_block (livoxSector* self,
                         int          index)
 {
+	assert (index >= 0);
+	assert (index < LIVOX_BLOCKS_PER_SECTOR);
+
 	return self->blocks + index;
 }
 
