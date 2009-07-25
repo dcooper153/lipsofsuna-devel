@@ -375,12 +375,18 @@ liwdg_widget_set_allocation (liwdgWidget* self,
 {
 	liwdgEvent event;
 
-	self->allocation.x = x;
-	self->allocation.y = y;
-	self->allocation.width = w;
-	self->allocation.height = h;
-	event.type = LIWDG_EVENT_TYPE_ALLOCATION;
-	liwdg_widget_event (self, &event);
+	if (self->allocation.x != x ||
+	    self->allocation.y != y ||
+	    self->allocation.width != w ||
+	    self->allocation.height != h)
+	{
+		self->allocation.x = x;
+		self->allocation.y = y;
+		self->allocation.width = w;
+		self->allocation.height = h;
+		event.type = LIWDG_EVENT_TYPE_ALLOCATION;
+		liwdg_widget_event (self, &event);
+	}
 }
 
 /**
@@ -477,10 +483,14 @@ liwdg_widget_set_request (liwdgWidget* self,
                           int          w,
                           int          h)
 {
-	self->userrequest.width = w;
-	self->userrequest.height = h;
-	if (self->parent != NULL)
-		liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
+	if (self->userrequest.width != w ||
+	    self->userrequest.height != h)
+	{
+		self->userrequest.width = w;
+		self->userrequest.height = h;
+		if (self->parent != NULL)
+			liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
+	}
 }
 
 liwdgWidget*

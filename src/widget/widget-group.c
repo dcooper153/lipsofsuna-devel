@@ -167,9 +167,10 @@ liwdg_group_child_request (liwdgGroup*  self,
 			cell = self->cells + x + y * self->width;
 			if (cell->child == child)
 			{
-				liwdg_widget_get_request (cell->child, &size);
-				if (self->cols[x].request < size.width ||
-				    self->rows[y].request < size.height)
+				size.width = private_get_col_size (self, x);
+				size.height = private_get_row_size (self, y);
+				if (self->cols[x].request != size.width ||
+				    self->rows[y].request != size.height)
 					private_cell_changed (self, x, y);
 				return;
 			}

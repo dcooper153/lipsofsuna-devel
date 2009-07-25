@@ -182,47 +182,6 @@ Module_particle_effect (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Pick an object from the screen.
- * --
- * -- @param self Module class.
- * -- @param x Optional X coordinate, default is cursor position.
- * -- @param y Optional Y coordinate, default is cursor position.
- * -- @return Object or nil.
- * function Module.pick(self, x, y)
- */
-static int
-Module_pick (lua_State* lua)
-{
-	int x;
-	int y;
-	licliModule* module;
-	liengObject* object;
-	lirndSelection result;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	module->client->video.SDL_GetMouseState (&x, &y);
-	if (lua_gettop (lua) >= 2)
-		x = luaL_checknumber (lua, 2);
-	if (lua_gettop (lua) >= 3)
-		y = luaL_checknumber (lua, 3);
-
-	if (!licli_module_pick (module, x, y, &result))
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	object = lieng_engine_find_object (module->engine, result.object);
-	if (object == NULL || object->script == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	liscr_pushdata (lua, object->script);
-	return 1;
-}
-
-/* @luadoc
- * ---
  * -- Sends a network packet to the server.
  * --
  * -- @param self Module class.
@@ -441,7 +400,6 @@ licliModuleScript (liscrClass* self,
 	liscr_class_insert_func (self, "host", Module_host);
 	liscr_class_insert_func (self, "join", Module_join);
 	liscr_class_insert_func (self, "particle_effect", Module_particle_effect);
-	liscr_class_insert_func (self, "pick", Module_pick);
 	liscr_class_insert_func (self, "send", Module_send);
 	liscr_class_insert_getter (self, "cursor_pos", Module_getter_cursor_pos);
 	liscr_class_insert_getter (self, "moving", Module_getter_moving);

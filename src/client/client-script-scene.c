@@ -35,6 +35,7 @@ private_render (liwdgRender* self,
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndContext context;
+	liwdgRect rect;
 
 	module = data;
 	if (module->network != NULL)
@@ -49,6 +50,8 @@ private_render (liwdgRender* self,
 		glLoadIdentity ();
 		glMatrixMode (GL_MODELVIEW);
 		glLoadIdentity ();
+		liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+		lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
 		lieng_camera_get_frustum (module->camera, &frustum);
 		lieng_camera_get_modelview (module->camera, &modelview);
 		lieng_camera_get_projection (module->camera, &projection);
@@ -145,6 +148,64 @@ Scene_new (lua_State* lua)
 	return 1;
 }
 
+/* @luadoc
+ * ---
+ * -- Pick an object from the scene.
+ * --
+ * -- @param self Scene.
+ * -- @param x Optional X coordinate, default is cursor position.
+ * -- @param y Optional Y coordinate, default is cursor position.
+ * -- @return Object or nil.
+ * function Scene.pick(self, x, y)
+ */
+static int
+Scene_pick (lua_State* lua)
+{
+	int x;
+	int y;
+	licliModule* module;
+	liengObject* object;
+	limatFrustum frustum;
+	limatMatrix modelview;
+	limatMatrix projection;
+	lirndSelection result;
+	liscrData* self;
+	liwdgRect rect;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_SCENE);
+	module = LIWDG_RENDER (self->data)->custom_render_data;
+	module->client->video.SDL_GetMouseState (&x, &y);
+	if (lua_gettop (lua) >= 2)
+		x = luaL_checknumber (lua, 2);
+	if (lua_gettop (lua) >= 3)
+		y = luaL_checknumber (lua, 3);
+
+	/* Check if inside the allocation. */
+	liwdg_widget_get_allocation (self->data, &rect);
+	x -= rect.x;
+	y -= rect.y;
+	if (x < 0 || x >= rect.width ||
+	    y < 0 || y >= rect.height)
+		return 0;
+
+	/* Pick objects from the scene. */
+	lieng_camera_get_frustum (module->camera, &frustum);
+	lieng_camera_get_modelview (module->camera, &modelview);
+	lieng_camera_get_projection (module->camera, &projection);
+	lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
+	if (!lirnd_scene_pick (module->engine->scene, &modelview, &projection, &frustum,
+	                       x, module->window->mode.height - y, 5, &result))
+		return 0;
+
+	/* Find the picked object. */
+	object = lieng_engine_find_object (module->engine, result.object);
+	if (object == NULL || object->script == NULL)
+		return 0;
+	liscr_pushdata (lua, object->script);
+
+	return 1;
+}
+
 /*****************************************************************************/
 
 void
@@ -154,6 +215,7 @@ licliSceneScript (liscrClass* self,
 	liscr_class_inherit (self, licliGroupScript, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_SCENE, data);
 	liscr_class_insert_func (self, "new", Scene_new);
+	liscr_class_insert_func (self, "pick", Scene_pick);
 }
 
 /** @} */
