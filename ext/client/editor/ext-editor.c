@@ -218,7 +218,7 @@ liext_editor_rotate (liextEditor*           self,
 		position = limat_vector_add (position, center);
 		newrotat = limat_quaternion_multiply (*rotation, selection->transform.rotation);
 		transform = limat_transform_init (position, newrotat);
-		lieng_object_set_transform (selection->object, &transform);
+		licli_object_set_transform (selection->object, &transform);
 	}
 }
 
@@ -277,7 +277,7 @@ liext_editor_snap (liextEditor* self,
 		selection->transform.rotation = limat_quaternion_euler (a, b, c);
 
 		transform = limat_transform_init (position, selection->transform.rotation);
-		lieng_object_set_transform (selection->object, &transform);
+		licli_object_set_transform (selection->object, &transform);
 	}
 
 	/* Send commands to server. */
@@ -308,7 +308,7 @@ liext_editor_translate (liextEditor*       self,
 		licli_object_get_transform_target (selection->object, &transform);
 		position = limat_vector_add (selection->transform.position, *translation);
 		transform = limat_transform_init (position, transform.rotation);
-		lieng_object_set_transform (selection->object, &transform);
+		licli_object_set_transform (selection->object, &transform);
 	}
 }
 
@@ -367,7 +367,7 @@ liext_editor_transform_cancel (liextEditor* self)
 	{
 		selection = iter.value;
 		transform = selection->transform;
-		lieng_object_set_transform (selection->object, &transform);
+		licli_object_set_transform (selection->object, &transform);
 	}
 }
 
