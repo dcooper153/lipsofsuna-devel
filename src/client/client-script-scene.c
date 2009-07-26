@@ -46,10 +46,6 @@ private_render (liwdgRender* self,
 		glDisable (GL_TEXTURE_2D);
 		glDepthMask (GL_FALSE);
 		glColor3f (1.0f, 0.0f, 0.0f);
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity ();
-		glMatrixMode (GL_MODELVIEW);
-		glLoadIdentity ();
 		liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 		lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
 		lieng_camera_get_frustum (module->camera, &frustum);
