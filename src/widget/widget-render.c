@@ -138,6 +138,7 @@ private_event (liwdgRender* self,
 			glViewport (rect.x, rect.y, rect.width, rect.height);
 			glScissor (rect.x, rect.y, rect.width, rect.height);
 			glEnable (GL_SCISSOR_TEST);
+			glDepthMask (GL_TRUE);
 			glClear (GL_DEPTH_BUFFER_BIT);
 			if (self->scene != NULL)
 			{

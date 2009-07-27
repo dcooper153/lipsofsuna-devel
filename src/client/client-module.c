@@ -473,7 +473,7 @@ licli_module_render (licliModule* self)
 	int h;
 
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear (GL_COLOR_BUFFER_BIT);
 
 	/* Set 2D rendering mode. */
 	licli_window_get_size (self->window, &w, &h);
@@ -485,7 +485,6 @@ licli_module_render (licliModule* self)
 	glOrtho (0, w, 0, h, -100.0f, 100.0f);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
-	glClear (GL_DEPTH_BUFFER_BIT);
 	glEnable (GL_BLEND);
 	glEnable (GL_TEXTURE_2D);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
