@@ -97,6 +97,7 @@ ligen_generator_new_full (const char* path,
 		lisys_error_report ();
 		return NULL;
 	}
+	ligen_generator_set_fill (self, 1);
 
 	/* Allocate paths. */
 	self->paths = lipth_paths_new (path, name);
@@ -390,6 +391,13 @@ ligen_generator_write_brushes (ligenGenerator* self)
 		ligen_brush_write (self->brushes.array[i], self->gensql);
 
 	return 1;
+}
+
+void
+ligen_generator_set_fill (ligenGenerator* self,
+                          int             fill)
+{
+	self->fill = livox_voxel_init (0xFF, fill);
 }
 
 /*****************************************************************************/
@@ -696,7 +704,7 @@ private_stroke_paint (ligenGenerator* self,
 		if (sector == NULL)
 		{
 			sector = livox_manager_create_sector (self->voxels, index);
-			livox_sector_fill (sector, livox_voxel_init (0xFF, 1));
+			livox_sector_fill (sector, self->fill);
 		}
 
 		/* Calculate paint offset. */

@@ -648,12 +648,12 @@ private_render_preview (liwdgWidget* widget,
 			glColor3f (1.0f, 0.0f, 0.0f);
 		else
 			glColor3f (0.0f, 1.0f, 0.0f);
-		x[0] = stroke->pos[0];
-		x[1] = stroke->pos[0] + stroke->size[0];
-		y[0] = stroke->pos[1];
-		y[1] = stroke->pos[1] + stroke->size[1];
-		z[0] = stroke->pos[2];
-		z[1] = stroke->pos[2] + stroke->size[2];
+		x[0] = LIVOX_TILE_WIDTH * (stroke->pos[0]);
+		x[1] = LIVOX_TILE_WIDTH * (stroke->pos[0] + stroke->size[0]);
+		y[0] = LIVOX_TILE_WIDTH * (stroke->pos[1]);
+		y[1] = LIVOX_TILE_WIDTH * (stroke->pos[1] + stroke->size[1]);
+		z[0] = LIVOX_TILE_WIDTH * (stroke->pos[2]);
+		z[1] = LIVOX_TILE_WIDTH * (stroke->pos[2] + stroke->size[2]);
 		glVertex3f (x[0], y[0], z[0]);
 		glVertex3f (x[1], y[0], z[0]);
 		glVertex3f (x[1], y[0], z[0]);
@@ -794,7 +794,7 @@ private_populate_strokes (liextDialog* self)
 	if (self->active_stroke > rule->strokes.count)
 		self->active_stroke = LI_MAX (0, rule->strokes.count);
 
-	/* Populate stroke list and preview scene. */
+	/* Populate stroke list. */
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
 		stroke = rule->strokes.array + i;
@@ -836,12 +836,12 @@ private_populate_strokes (liextDialog* self)
 	/* Setup preview transformation. */
 	liwdg_widget_get_allocation (self->render_strokes, &rect);
 	modelview = limat_matrix_lookat (
-		LIEXT_PREVIEW_CENTER + 0.5f * brush->size[0]/* - 15*/,
-		LIEXT_PREVIEW_CENTER + 0.5f * brush->size[1] + 45,
-		LIEXT_PREVIEW_CENTER + 0.5f * brush->size[2]/* - 30.0f*/,
-		LIEXT_PREVIEW_CENTER + 0.5f * brush->size[0],
-		LIEXT_PREVIEW_CENTER + 0.5f * brush->size[1],
-		LIEXT_PREVIEW_CENTER + 0.5f * brush->size[2],
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[0])/* - 15*/,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[1]) + 45,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[2])/* - 30.0f*/,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[0]),
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[1]),
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[2]),
 		0.0f, 0.0f, 1.0f);
 	projection = limat_matrix_perspective (45.0f, rect.width / rect.height, 1.0f, 100.0f);
 	liwdg_render_set_modelview (LIWDG_RENDER (self->render_strokes), &modelview);

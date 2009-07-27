@@ -72,6 +72,7 @@ liext_generator_new (licliModule* module)
 		free (self);
 		return NULL;
 	}
+	ligen_generator_set_fill (self->generator, 0);
 
 	return self;
 }

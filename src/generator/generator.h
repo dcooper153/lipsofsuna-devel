@@ -47,6 +47,7 @@ struct _ligenGenerator
 	lipthPaths* paths;
 	liphyPhysics* physics;
 	livoxManager* voxels;
+	livoxVoxel fill;
 	struct
 	{
 		int count;
@@ -98,6 +99,10 @@ ligen_generator_step (ligenGenerator* self);
 
 int
 ligen_generator_write_brushes (ligenGenerator* self);
+
+void
+ligen_generator_set_fill (ligenGenerator* self,
+                          int             fill);
 
 #endif
 
