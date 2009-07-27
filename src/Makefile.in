@@ -134,16 +134,19 @@ am__objects_13 = liblipsofsunaclient_la-model.lo \
 	liblipsofsunaclient_la-model-node.lo \
 	liblipsofsunaclient_la-model-pose.lo
 am__objects_14 = liblipsofsunaclient_la-network.lo
-am__objects_15 = liblipsofsunaclient_la-physics.lo \
+am__objects_15 = liblipsofsunaclient_la-particle-line.lo \
+	liblipsofsunaclient_la-particle-manager.lo \
+	liblipsofsunaclient_la-particle-point.lo
+am__objects_16 = liblipsofsunaclient_la-physics.lo \
 	liblipsofsunaclient_la-physics-object.lo \
 	liblipsofsunaclient_la-physics-private.lo \
 	liblipsofsunaclient_la-physics-shape.lo
-am__objects_16 = liblipsofsunaclient_la-paths.lo
-am__objects_17 = liblipsofsunaclient_la-reload.lo \
+am__objects_17 = liblipsofsunaclient_la-paths.lo
+am__objects_18 = liblipsofsunaclient_la-reload.lo \
 	liblipsofsunaclient_la-reload-blender.lo \
 	liblipsofsunaclient_la-reload-gimp.lo \
 	liblipsofsunaclient_la-reload-image.lo
-am__objects_18 = liblipsofsunaclient_la-render.lo \
+am__objects_19 = liblipsofsunaclient_la-render.lo \
 	liblipsofsunaclient_la-render-api.lo \
 	liblipsofsunaclient_la-render-buffer.lo \
 	liblipsofsunaclient_la-render-context.lo \
@@ -153,12 +156,11 @@ am__objects_18 = liblipsofsunaclient_la-render.lo \
 	liblipsofsunaclient_la-render-material.lo \
 	liblipsofsunaclient_la-render-model.lo \
 	liblipsofsunaclient_la-render-object.lo \
-	liblipsofsunaclient_la-render-particle.lo \
 	liblipsofsunaclient_la-render-resources.lo \
 	liblipsofsunaclient_la-render-scene.lo \
 	liblipsofsunaclient_la-render-shader.lo \
 	liblipsofsunaclient_la-render-texture.lo
-am__objects_19 = liblipsofsunaclient_la-server.lo \
+am__objects_20 = liblipsofsunaclient_la-server.lo \
 	liblipsofsunaclient_la-server-callbacks.lo \
 	liblipsofsunaclient_la-server-client.lo \
 	liblipsofsunaclient_la-server-network.lo \
@@ -167,7 +169,7 @@ am__objects_19 = liblipsofsunaclient_la-server.lo \
 	liblipsofsunaclient_la-script-extension-2.lo \
 	liblipsofsunaclient_la-script-object-2.lo \
 	liblipsofsunaclient_la-script-server.lo
-am__objects_20 = liblipsofsunaclient_la-script.lo \
+am__objects_21 = liblipsofsunaclient_la-script.lo \
 	liblipsofsunaclient_la-script-class.lo \
 	liblipsofsunaclient_la-script-data.lo \
 	liblipsofsunaclient_la-script-util.lo \
@@ -178,14 +180,14 @@ am__objects_20 = liblipsofsunaclient_la-script.lo \
 	liblipsofsunaclient_la-script-path.lo \
 	liblipsofsunaclient_la-script-quaternion.lo \
 	liblipsofsunaclient_la-script-vector.lo
-am__objects_21 = liblipsofsunaclient_la-sound-manager.lo \
+am__objects_22 = liblipsofsunaclient_la-sound-manager.lo \
 	liblipsofsunaclient_la-sound-sample.lo \
 	liblipsofsunaclient_la-sound-source.lo \
 	liblipsofsunaclient_la-sound-system.lo
-am__objects_22 = liblipsofsunaclient_la-string-generic.lo \
+am__objects_23 = liblipsofsunaclient_la-string-generic.lo \
 	liblipsofsunaclient_la-string-parser.lo \
 	liblipsofsunaclient_la-string-reader.lo
-am__objects_23 = liblipsofsunaclient_la-system.lo \
+am__objects_24 = liblipsofsunaclient_la-system.lo \
 	liblipsofsunaclient_la-system-directory.lo \
 	liblipsofsunaclient_la-system-error.lo \
 	liblipsofsunaclient_la-system-file.lo \
@@ -197,16 +199,16 @@ am__objects_23 = liblipsofsunaclient_la-system.lo \
 	liblipsofsunaclient_la-system-relative.lo \
 	liblipsofsunaclient_la-system-types.lo \
 	liblipsofsunaclient_la-system-user.lo
-am__objects_24 = liblipsofsunaclient_la-thread-async-call.lo
-am__objects_25 = liblipsofsunaclient_la-video-calls.lo \
+am__objects_25 = liblipsofsunaclient_la-thread-async-call.lo
+am__objects_26 = liblipsofsunaclient_la-video-calls.lo \
 	liblipsofsunaclient_la-video-features.lo
-am__objects_26 = liblipsofsunaclient_la-voxel.lo \
+am__objects_27 = liblipsofsunaclient_la-voxel.lo \
 	liblipsofsunaclient_la-voxel-block.lo \
 	liblipsofsunaclient_la-voxel-builder.lo \
 	liblipsofsunaclient_la-voxel-manager.lo \
 	liblipsofsunaclient_la-voxel-material.lo \
 	liblipsofsunaclient_la-voxel-sector.lo
-am__objects_27 = liblipsofsunaclient_la-widget.lo \
+am__objects_28 = liblipsofsunaclient_la-widget.lo \
 	liblipsofsunaclient_la-widget-busy.lo \
 	liblipsofsunaclient_la-widget-button.lo \
 	liblipsofsunaclient_la-widget-check.lo \
@@ -229,29 +231,29 @@ am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
 	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
 	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
-	$(am__objects_27)
+	$(am__objects_27) $(am__objects_28)
 liblipsofsunaclient_la_OBJECTS = $(am_liblipsofsunaclient_la_OBJECTS)
 liblipsofsunaclient_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(liblipsofsunaclient_la_CXXFLAGS) $(CXXFLAGS) \
 	$(liblipsofsunaclient_la_LDFLAGS) $(LDFLAGS) -o $@
 liblipsofsunaserver_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am__objects_28 = liblipsofsunaserver_la-ai-path.lo \
+am__objects_29 = liblipsofsunaserver_la-ai-path.lo \
 	liblipsofsunaserver_la-ai-path-solver.lo \
 	liblipsofsunaserver_la-ai-sector.lo \
 	liblipsofsunaserver_la-ai-waypoint.lo
-am__objects_29 = liblipsofsunaserver_la-algorithm-astar.lo \
+am__objects_30 = liblipsofsunaserver_la-algorithm-astar.lo \
 	liblipsofsunaserver_la-algorithm-bst.lo \
 	liblipsofsunaserver_la-algorithm-octree.lo
-am__objects_30 = liblipsofsunaserver_la-archive-tar.lo \
+am__objects_31 = liblipsofsunaserver_la-archive-tar.lo \
 	liblipsofsunaserver_la-archive-serialize.lo \
 	liblipsofsunaserver_la-archive-writer.lo
-am__objects_31 = liblipsofsunaserver_la-cal-callbacks.lo \
+am__objects_32 = liblipsofsunaserver_la-cal-callbacks.lo \
 	liblipsofsunaserver_la-cal-marshal.lo
-am__objects_32 = liblipsofsunaserver_la-config-account.lo \
+am__objects_33 = liblipsofsunaserver_la-config-account.lo \
 	liblipsofsunaserver_la-config-bans.lo \
 	liblipsofsunaserver_la-config-host.lo
-am__objects_33 = liblipsofsunaserver_la-engine.lo \
+am__objects_34 = liblipsofsunaserver_la-engine.lo \
 	liblipsofsunaserver_la-engine-camera.lo \
 	liblipsofsunaserver_la-engine-constraint.lo \
 	liblipsofsunaserver_la-engine-model.lo \
@@ -259,8 +261,8 @@ am__objects_33 = liblipsofsunaserver_la-engine.lo \
 	liblipsofsunaserver_la-engine-resources.lo \
 	liblipsofsunaserver_la-engine-sector.lo \
 	liblipsofsunaserver_la-engine-selection.lo
-am__objects_34 = liblipsofsunaserver_la-math-marching-cubes.lo
-am__objects_35 = liblipsofsunaserver_la-model.lo \
+am__objects_35 = liblipsofsunaserver_la-math-marching-cubes.lo
+am__objects_36 = liblipsofsunaserver_la-model.lo \
 	liblipsofsunaserver_la-model-animation.lo \
 	liblipsofsunaserver_la-model-bone.lo \
 	liblipsofsunaserver_la-model-faces.lo \
@@ -271,13 +273,13 @@ am__objects_35 = liblipsofsunaserver_la-model.lo \
 	liblipsofsunaserver_la-model-material.lo \
 	liblipsofsunaserver_la-model-node.lo \
 	liblipsofsunaserver_la-model-pose.lo
-am__objects_36 = liblipsofsunaserver_la-network.lo
-am__objects_37 = liblipsofsunaserver_la-physics.lo \
+am__objects_37 = liblipsofsunaserver_la-network.lo
+am__objects_38 = liblipsofsunaserver_la-physics.lo \
 	liblipsofsunaserver_la-physics-object.lo \
 	liblipsofsunaserver_la-physics-private.lo \
 	liblipsofsunaserver_la-physics-shape.lo
-am__objects_38 = liblipsofsunaserver_la-paths.lo
-am__objects_39 = liblipsofsunaserver_la-server.lo \
+am__objects_39 = liblipsofsunaserver_la-paths.lo
+am__objects_40 = liblipsofsunaserver_la-server.lo \
 	liblipsofsunaserver_la-server-callbacks.lo \
 	liblipsofsunaserver_la-server-client.lo \
 	liblipsofsunaserver_la-server-network.lo \
@@ -286,7 +288,7 @@ am__objects_39 = liblipsofsunaserver_la-server.lo \
 	liblipsofsunaserver_la-script-extension-2.lo \
 	liblipsofsunaserver_la-script-object-2.lo \
 	liblipsofsunaserver_la-script-server.lo
-am__objects_40 = liblipsofsunaserver_la-script.lo \
+am__objects_41 = liblipsofsunaserver_la-script.lo \
 	liblipsofsunaserver_la-script-class.lo \
 	liblipsofsunaserver_la-script-data.lo \
 	liblipsofsunaserver_la-script-util.lo \
@@ -297,10 +299,10 @@ am__objects_40 = liblipsofsunaserver_la-script.lo \
 	liblipsofsunaserver_la-script-path.lo \
 	liblipsofsunaserver_la-script-quaternion.lo \
 	liblipsofsunaserver_la-script-vector.lo
-am__objects_41 = liblipsofsunaserver_la-string-generic.lo \
+am__objects_42 = liblipsofsunaserver_la-string-generic.lo \
 	liblipsofsunaserver_la-string-parser.lo \
 	liblipsofsunaserver_la-string-reader.lo
-am__objects_42 = liblipsofsunaserver_la-system.lo \
+am__objects_43 = liblipsofsunaserver_la-system.lo \
 	liblipsofsunaserver_la-system-directory.lo \
 	liblipsofsunaserver_la-system-error.lo \
 	liblipsofsunaserver_la-system-file.lo \
@@ -312,20 +314,20 @@ am__objects_42 = liblipsofsunaserver_la-system.lo \
 	liblipsofsunaserver_la-system-relative.lo \
 	liblipsofsunaserver_la-system-types.lo \
 	liblipsofsunaserver_la-system-user.lo
-am__objects_43 = liblipsofsunaserver_la-thread-async-call.lo
-am__objects_44 = liblipsofsunaserver_la-voxel.lo \
+am__objects_44 = liblipsofsunaserver_la-thread-async-call.lo
+am__objects_45 = liblipsofsunaserver_la-voxel.lo \
 	liblipsofsunaserver_la-voxel-block.lo \
 	liblipsofsunaserver_la-voxel-builder.lo \
 	liblipsofsunaserver_la-voxel-manager.lo \
 	liblipsofsunaserver_la-voxel-material.lo \
 	liblipsofsunaserver_la-voxel-sector.lo
-am_liblipsofsunaserver_la_OBJECTS = $(am__objects_28) \
-	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
-	$(am__objects_32) $(am__objects_33) $(am__objects_34) \
-	$(am__objects_35) $(am__objects_36) $(am__objects_37) \
-	$(am__objects_38) $(am__objects_39) $(am__objects_40) \
-	$(am__objects_41) $(am__objects_42) $(am__objects_43) \
-	$(am__objects_44)
+am_liblipsofsunaserver_la_OBJECTS = $(am__objects_29) \
+	$(am__objects_30) $(am__objects_31) $(am__objects_32) \
+	$(am__objects_33) $(am__objects_34) $(am__objects_35) \
+	$(am__objects_36) $(am__objects_37) $(am__objects_38) \
+	$(am__objects_39) $(am__objects_40) $(am__objects_41) \
+	$(am__objects_42) $(am__objects_43) $(am__objects_44) \
+	$(am__objects_45)
 liblipsofsunaserver_la_OBJECTS = $(am_liblipsofsunaserver_la_OBJECTS)
 liblipsofsunaserver_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -334,8 +336,8 @@ liblipsofsunaserver_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 prgPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(prg_PROGRAMS)
-am__objects_45 = lipsofsuna-main.$(OBJEXT)
-am_lipsofsuna_OBJECTS = $(am__objects_45) \
+am__objects_46 = lipsofsuna-main.$(OBJEXT)
+am_lipsofsuna_OBJECTS = $(am__objects_46) \
 	lipsofsuna-system-error.$(OBJEXT) \
 	lipsofsuna-system-execute.$(OBJEXT) \
 	lipsofsuna-system-path.$(OBJEXT) \
@@ -354,10 +356,10 @@ lipsofsuna_client_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lipsofsuna_client_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__objects_46 = lipsofsuna_generator-generator.$(OBJEXT) \
+am__objects_47 = lipsofsuna_generator-generator.$(OBJEXT) \
 	lipsofsuna_generator-generator-brush.$(OBJEXT) \
 	lipsofsuna_generator-generator-rule.$(OBJEXT)
-am_lipsofsuna_generator_OBJECTS = $(am__objects_46) \
+am_lipsofsuna_generator_OBJECTS = $(am__objects_47) \
 	lipsofsuna_generator-generator-main.$(OBJEXT)
 lipsofsuna_generator_OBJECTS = $(am_lipsofsuna_generator_OBJECTS)
 lipsofsuna_generator_DEPENDENCIES = liblipsofsunaserver.la
@@ -373,8 +375,8 @@ lipsofsuna_server_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lipsofsuna_server_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__objects_47 = lipsofsuna_viewer-viewer.$(OBJEXT)
-am_lipsofsuna_viewer_OBJECTS = $(am__objects_47) \
+am__objects_48 = lipsofsuna_viewer-viewer.$(OBJEXT)
+am_lipsofsuna_viewer_OBJECTS = $(am__objects_48) \
 	lipsofsuna_viewer-viewer-main.$(OBJEXT)
 lipsofsuna_viewer_OBJECTS = $(am_lipsofsuna_viewer_OBJECTS)
 lipsofsuna_viewer_DEPENDENCIES = liblipsofsunaclient.la \
@@ -786,6 +788,14 @@ netsrc = \
 	network/network-extension.h \
 	network/network-protocol.h
 
+parsrc = \
+	particle/particle-line.c \
+	particle/particle-line.h \
+	particle/particle-manager.c \
+	particle/particle-manager.h \
+	particle/particle-point.c \
+	particle/particle-point.h
+
 physrc = \
 	physics/lips-physics.h \
 	physics/physics.cpp \
@@ -834,8 +844,6 @@ rndsrc = \
 	render/render-model.h \
 	render/render-object.c \
 	render/render-object.h \
-	render/render-particle.c \
-	render/render-particle.h \
 	render/render-resources.c \
 	render/render-resources.h \
 	render/render-scene.c \
@@ -1019,8 +1027,8 @@ liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
 	$(engsrc) $(fntsrc) $(gensrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
-	$(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) \
-	$(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+	$(parsrc) $(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) \
+	$(sndsrc) $(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 liblipsofsunaserver_la_CFLAGS = $(LISRV_CFLAGS)
 liblipsofsunaserver_la_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
@@ -1281,6 +1289,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-pose.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-network.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-particle-line.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-particle-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-particle-point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-paths.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-physics-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-physics-private.Plo@am__quote@
@@ -1299,7 +1310,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-particle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-resources.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-scene.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-render-shader.Plo@am__quote@
@@ -1948,6 +1958,27 @@ liblipsofsunaclient_la-network.lo: network/network.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-network.lo `test -f 'network/network.c' || echo '$(srcdir)/'`network/network.c
 
+liblipsofsunaclient_la-particle-line.lo: particle/particle-line.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-particle-line.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-particle-line.Tpo -c -o liblipsofsunaclient_la-particle-line.lo `test -f 'particle/particle-line.c' || echo '$(srcdir)/'`particle/particle-line.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-particle-line.Tpo $(DEPDIR)/liblipsofsunaclient_la-particle-line.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='particle/particle-line.c' object='liblipsofsunaclient_la-particle-line.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-particle-line.lo `test -f 'particle/particle-line.c' || echo '$(srcdir)/'`particle/particle-line.c
+
+liblipsofsunaclient_la-particle-manager.lo: particle/particle-manager.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-particle-manager.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-particle-manager.Tpo -c -o liblipsofsunaclient_la-particle-manager.lo `test -f 'particle/particle-manager.c' || echo '$(srcdir)/'`particle/particle-manager.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-particle-manager.Tpo $(DEPDIR)/liblipsofsunaclient_la-particle-manager.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='particle/particle-manager.c' object='liblipsofsunaclient_la-particle-manager.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-particle-manager.lo `test -f 'particle/particle-manager.c' || echo '$(srcdir)/'`particle/particle-manager.c
+
+liblipsofsunaclient_la-particle-point.lo: particle/particle-point.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-particle-point.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-particle-point.Tpo -c -o liblipsofsunaclient_la-particle-point.lo `test -f 'particle/particle-point.c' || echo '$(srcdir)/'`particle/particle-point.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-particle-point.Tpo $(DEPDIR)/liblipsofsunaclient_la-particle-point.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='particle/particle-point.c' object='liblipsofsunaclient_la-particle-point.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-particle-point.lo `test -f 'particle/particle-point.c' || echo '$(srcdir)/'`particle/particle-point.c
+
 liblipsofsunaclient_la-paths.lo: paths/paths.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-paths.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-paths.Tpo -c -o liblipsofsunaclient_la-paths.lo `test -f 'paths/paths.c' || echo '$(srcdir)/'`paths/paths.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-paths.Tpo $(DEPDIR)/liblipsofsunaclient_la-paths.Plo
@@ -2052,13 +2083,6 @@ liblipsofsunaclient_la-render-object.lo: render/render-object.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-object.c' object='liblipsofsunaclient_la-render-object.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-render-object.lo `test -f 'render/render-object.c' || echo '$(srcdir)/'`render/render-object.c
-
-liblipsofsunaclient_la-render-particle.lo: render/render-particle.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-render-particle.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-render-particle.Tpo -c -o liblipsofsunaclient_la-render-particle.lo `test -f 'render/render-particle.c' || echo '$(srcdir)/'`render/render-particle.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-render-particle.Tpo $(DEPDIR)/liblipsofsunaclient_la-render-particle.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-particle.c' object='liblipsofsunaclient_la-render-particle.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-render-particle.lo `test -f 'render/render-particle.c' || echo '$(srcdir)/'`render/render-particle.c
 
 liblipsofsunaclient_la-render-resources.lo: render/render-resources.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-render-resources.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-render-resources.Tpo -c -o liblipsofsunaclient_la-render-resources.lo `test -f 'render/render-resources.c' || echo '$(srcdir)/'`render/render-resources.c

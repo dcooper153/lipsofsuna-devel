@@ -36,15 +36,7 @@ static int
 private_init_particles (lirndScene* self);
 
 static void
-private_particle_remove (lirndScene*    self,
-                         lirndParticle* particle);
-
-static void
 private_particle_render (lirndScene* self);
-
-static void
-private_particle_update (lirndScene* self,
-                         float       secs);
 
 static void
 private_render (lirndScene*   self,
@@ -98,7 +90,8 @@ lirnd_scene_free (lirndScene* self)
 		lirnd_lighting_free (self->lighting);
 
 	/* Free particles. */
-	free (self->particle.particles);
+	if (self->particles != NULL)
+		lipar_manager_free (self->particles);
 
 	/* Free objects. */
 	if (self->objects != NULL)
@@ -121,31 +114,12 @@ lirnd_scene_free (lirndScene* self)
  * \param velocity Velocity of the particle.
  * \return Particle owned by the scene or NULL.
  */
-lirndParticle*
+liparPoint*
 lirnd_scene_insert_particle (lirndScene*        self,
                              const limatVector* position,
                              const limatVector* velocity)
 {
-	lirndParticle* particle;
-
-	/* Get free particle. */
-	particle = self->particle.particles_free;
-	if (particle == NULL)
-		return NULL;
-	lirnd_particle_init (particle, position, velocity);
-
-	/* Remove from free list. */
-	self->particle.particles_free = particle->next;
-	if (particle->next != NULL)
-		particle->next->prev = NULL;
-
-	/* Add to used list. */
-	if (self->particle.particles_used != NULL)
-		self->particle.particles_used->prev = particle;
-	particle->next = self->particle.particles_used;
-	self->particle.particles_used = particle;
-
-	return particle;
+	return lipar_manager_insert_point (self->particles, position, velocity);
 }
 
 /**
@@ -332,7 +306,7 @@ lirnd_scene_update (lirndScene* self,
 	lirnd_lighting_update (self->lighting);
 
 	/* Update particles. */
-	private_particle_update (self, secs);
+	lipar_manager_update (self->particles, secs);
 }
 
 /**
@@ -395,54 +369,21 @@ private_init_lights (lirndScene* self)
 static int
 private_init_particles (lirndScene* self)
 {
-	int i;
-	const int count = LIRND_PARTICLE_MAXIMUM_COUNT;
-
-	/* Allocate particles. */
-	self->particle.particles = calloc (count, sizeof (lirndParticle));
-	if (self->particle.particles == NULL)
+	self->particles = lipar_manager_new (LIRND_PARTICLE_MAXIMUM_COUNT, LIRND_PARTICLE_MAXIMUM_COUNT);
+	if (self->particles == NULL)
 		return 0;
-
-	/* Add to free list. */
-	self->particle.count_free = count;
-	self->particle.particles_free = self->particle.particles;
-	for (i = 0 ; i < count ; i++)
-	{
-		self->particle.particles[i].prev = self->particle.particles + i - 1;
-		self->particle.particles[i].next = self->particle.particles + i + 1;
-	}
-	self->particle.particles[0].prev = NULL;
-	self->particle.particles[count - 1].next = NULL;
-
 	return 1;
-}
-
-static void
-private_particle_remove (lirndScene*    self,
-                         lirndParticle* particle)
-{
-	/* Remove from used list. */
-	if (particle->prev != NULL)
-		particle->prev->next = particle->next;
-	else
-		self->particle.particles_used = particle->next;
-	if (particle->next != NULL)
-		particle->next->prev = particle->prev;
-
-	/* Add to free list. */
-	if (self->particle.particles_free != NULL)
-		self->particle.particles_free->prev = particle;
-	particle->next = self->particle.particles_free;
-	self->particle.particles_free = particle;
 }
 
 static void
 private_particle_render (lirndScene* self)
 {
-	float color[4];
-    float attenuation[] = { 1.0f, 0.0f, 0.02f };
+	float color0[4];
+	float color1[4];
+	float attenuation[] = { 1.0f, 0.0f, 0.02f };
 	lirndImage* image;
-	lirndParticle* particle;
+	liparLine* line;
+	liparPoint* particle;
 
 	/* Set particle graphics. */
 	image = lirnd_render_find_image (self->render, "particle-000");
@@ -453,7 +394,7 @@ private_particle_render (lirndScene* self)
 	glColor3f (1.0f, 1.0f, 1.0f);
 	glEnable (GL_BLEND);
 
-	/* Set particle rendering mode. */
+	/* Set point particle rendering mode. */
 	glBlendFunc (GL_ONE, GL_ONE);
 	glDisable (GL_LIGHTING);
 	if (GLEW_ARB_point_sprite)
@@ -466,16 +407,13 @@ private_particle_render (lirndScene* self)
 	else
 		glPointSize (4.0f);
 
-	/* Render particles. */
+	/* Render point particles. */
 	glBegin (GL_POINTS);
-	for (particle = self->particle.particles_used ; particle != NULL ; particle = particle->next)
+	for (particle = self->particles->points.used ; particle != NULL ; particle = particle->next)
 	{
-		lirnd_particle_get_color (particle, color);
-		glColor4fv (color);
-		glVertex3f (
-			particle->position.x,
-			particle->position.y,
-			particle->position.z);
+		lipar_point_get_color (particle, color0);
+		glColor4fv (color0);
+		glVertex3f (particle->position.x, particle->position.y, particle->position.z);
 	}
 	glEnd ();
 
@@ -486,29 +424,19 @@ private_particle_render (lirndScene* self)
 	}
 	glEnable (GL_LIGHTING);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
 
-static void
-private_particle_update (lirndScene* self,
-                         float       secs)
-{
-	lirndParticle* next;
-	lirndParticle* particle;
-
-	for (particle = self->particle.particles_used ; particle != NULL ; particle = next)
+	/* Render line particles. */
+	glBegin (GL_LINES);
+	for (line = self->particles->lines.used ; line != NULL ; line = line->next)
 	{
-		next = particle->next;
-
-		/* FIXME: Inaccurate. */
-		particle->velocity = limat_vector_add (particle->velocity,
-			limat_vector_multiply (particle->acceleration, secs * secs));
-		particle->position = limat_vector_add (particle->position,
-			limat_vector_multiply (particle->velocity, secs));
-		particle->time += secs;
-
-		if (particle->time > particle->time_life)
-			private_particle_remove (self, particle);
+		lipar_line_get_colors (line, color0, color1);
+		glColor4fv (color0);
+		glVertex3f (line->position[0].x, line->position[0].y, line->position[0].z);
+		glColor4fv (color1);
+		glVertex3f (line->position[1].x, line->position[1].y, line->position[1].z);
 	}
+	glEnd ();
+
 }
 
 static void

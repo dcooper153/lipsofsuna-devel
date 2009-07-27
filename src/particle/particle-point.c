@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,17 +16,18 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup lipar Particle
  * @{
- * \addtogroup lirndParticle Particle
+ * \addtogroup liparPoint Point
  * @{
  */
 
-#include "render-particle.h"
+#include "particle-point.h"
 
-void lirnd_particle_init (lirndParticle*  self,
-                          const limatVector* position,
-                          const limatVector* velocity)
+void
+lipar_point_init (liparPoint*        self,
+                  const limatVector* position,
+                  const limatVector* velocity)
 {
 	self->position = *position;
 	self->velocity = *velocity;
@@ -34,20 +35,22 @@ void lirnd_particle_init (lirndParticle*  self,
 	self->time = 0.0f;
 	self->time_fade = 0.0f;
 	self->time_life = 5.0f;
+	self->color[0] = 0.2f;
+	self->color[1] = 0.15f;
+	self->color[2] = 0.1f;
 }
 
-void lirnd_particle_get_color (const lirndParticle* self,
-                               float*               color)
+void
+lipar_point_get_color (const liparPoint* self,
+                       float*            color)
 {
 	float fade;
 
 	fade = LI_MAX (self->time_life - self->time_fade, 0.0f);
 	fade = LI_MAX (self->time - fade, 0.0f);
-
-	/* FIXME */
-	color[0] = 0.2f;
-	color[1] = 0.15f;
-	color[2] = 0.1f;
+	color[0] = self->color[0];
+	color[1] = self->color[1];
+	color[2] = self->color[2];
 	color[3] = 1.0f - fade / self->time_fade;
 }
 

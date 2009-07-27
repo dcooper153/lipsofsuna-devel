@@ -138,50 +138,6 @@ Module_join (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Creates a particle effect.
- * --
- * -- @param self Module class.
- * -- @param vector Position vector.
- * -- @param effect Effect name.
- * function Module.particle_effect(self, vector, effect)
- */
-static int
-Module_particle_effect (lua_State* lua)
-{
-	int i;
-	const char* effect;
-	licliModule* module;
-	limatVector position;
-	limatVector velocity;
-	lirndParticle* particle;
-	liscrData* vector;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	effect = luaL_checkstring (lua, 3);
-
-#warning Module_particle_effect is not implemented properly yet.
-	for (i = 0 ; i < 100 ; i++)
-	{
-		position = *((limatVector*) vector->data);;
-		velocity = limat_vector_init (
-			0.1*(rand()/(0.5*RAND_MAX)-1.0),
-			0.1*(rand()/(3.0*RAND_MAX)+3.0),
-			0.1*(rand()/(0.5*RAND_MAX)-1.0));
-		particle = lirnd_scene_insert_particle (module->engine->scene, &position, &velocity);
-		if (particle != NULL)
-		{
-			particle->time_life = 2.0f;
-			particle->time_fade = 1.0f;
-			particle->acceleration = limat_vector_init (0.0, -10.0, 0.5);
-		}
-	}
-
-	return 0;
-}
-
-/* @luadoc
- * ---
  * -- Sends a network packet to the server.
  * --
  * -- @param self Module class.
@@ -399,7 +355,6 @@ licliModuleScript (liscrClass* self,
 	liscr_class_insert_func (self, "find_object", Module_find_object);
 	liscr_class_insert_func (self, "host", Module_host);
 	liscr_class_insert_func (self, "join", Module_join);
-	liscr_class_insert_func (self, "particle_effect", Module_particle_effect);
 	liscr_class_insert_func (self, "send", Module_send);
 	liscr_class_insert_getter (self, "cursor_pos", Module_getter_cursor_pos);
 	liscr_class_insert_getter (self, "moving", Module_getter_moving);

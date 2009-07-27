@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,35 +16,39 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup lipar Particle
  * @{
- * \addtogroup lirndParticle Particle
+ * \addtogroup liparPoint Point
  * @{
  */
 
-#ifndef __RENDER_PARTICLE_H__
-#define __RENDER_PARTICLE_H__
+#ifndef __PARTICLE_POINT_H__
+#define __PARTICLE_POINT_H__
 
 #include <math/lips-math.h>
 
-typedef struct _lirndParticle lirndParticle;
-struct _lirndParticle
+typedef struct _liparPoint liparPoint;
+struct _liparPoint
 {
-	lirndParticle* prev;
-	lirndParticle* next;
-	limatVector position;
-	limatVector velocity;
-	limatVector acceleration;
 	float time;
 	float time_fade;
 	float time_life;
+	float color[3];
+	limatVector position;
+	limatVector velocity;
+	limatVector acceleration;
+	liparPoint* prev;
+	liparPoint* next;
 };
 
-void lirnd_particle_init      (lirndParticle*       self,
-                               const limatVector*      position,
-                               const limatVector*      velocity);
-void lirnd_particle_get_color (const lirndParticle* self,
-                               float*               color);
+void
+lipar_point_init (liparPoint*        self,
+                  const limatVector* position,
+                  const limatVector* velocity);
+
+void
+lipar_point_get_color (const liparPoint* self,
+                       float*            color);
 
 #endif
 

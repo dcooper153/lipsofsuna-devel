@@ -6,6 +6,7 @@ ext_LTLIBRARIES = \
 	libcamera-cli.la \
 	libchat-cli.la \
 	libeditor-cli.la \
+	libeffect-cli.la \
 	libevents-cli.la \
 	libgenerator-cli.la \
 	liboptions-cli.la \
@@ -44,6 +45,14 @@ libeditor_cli_la_SOURCES = \
 	editor/ext-module.c \
 	editor/ext-module.h \
 	editor/ext-script.c
+
+libeffect_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libeffect_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libeffect_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libeffect_cli_la_SOURCES = \
+	effect/ext-module.c \
+	effect/ext-module.h \
+	effect/ext-script.c
 
 libevents_cli_la_CFLAGS = $(LICLI_CFLAGS)
 libevents_cli_la_LDFLAGS = -module -avoid-version -no-undefined

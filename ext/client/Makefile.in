@@ -83,6 +83,14 @@ libeditor_cli_la_OBJECTS = $(am_libeditor_cli_la_OBJECTS)
 libeditor_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libeditor_cli_la_CFLAGS) \
 	$(CFLAGS) $(libeditor_cli_la_LDFLAGS) $(LDFLAGS) -o $@
+libeffect_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/src/liblipsofsunaclient.la
+am_libeffect_cli_la_OBJECTS = libeffect_cli_la-ext-module.lo \
+	libeffect_cli_la-ext-script.lo
+libeffect_cli_la_OBJECTS = $(am_libeffect_cli_la_OBJECTS)
+libeffect_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libeffect_cli_la_CFLAGS) \
+	$(CFLAGS) $(libeffect_cli_la_LDFLAGS) $(LDFLAGS) -o $@
 libevents_cli_la_DEPENDENCIES =  \
 	$(top_builddir)/src/liblipsofsunaclient.la
 am_libevents_cli_la_OBJECTS = libevents_cli_la-ext-module.lo \
@@ -172,17 +180,17 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
-	$(libeditor_cli_la_SOURCES) $(libevents_cli_la_SOURCES) \
-	$(libgenerator_cli_la_SOURCES) $(liboptions_cli_la_SOURCES) \
-	$(libpackager_cli_la_SOURCES) $(libreload_cli_la_SOURCES) \
-	$(libskills_cli_la_SOURCES) $(libslots_cli_la_SOURCES) \
-	$(libwidgets_cli_la_SOURCES)
+	$(libeditor_cli_la_SOURCES) $(libeffect_cli_la_SOURCES) \
+	$(libevents_cli_la_SOURCES) $(libgenerator_cli_la_SOURCES) \
+	$(liboptions_cli_la_SOURCES) $(libpackager_cli_la_SOURCES) \
+	$(libreload_cli_la_SOURCES) $(libskills_cli_la_SOURCES) \
+	$(libslots_cli_la_SOURCES) $(libwidgets_cli_la_SOURCES)
 DIST_SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
-	$(libeditor_cli_la_SOURCES) $(libevents_cli_la_SOURCES) \
-	$(libgenerator_cli_la_SOURCES) $(liboptions_cli_la_SOURCES) \
-	$(libpackager_cli_la_SOURCES) $(libreload_cli_la_SOURCES) \
-	$(libskills_cli_la_SOURCES) $(libslots_cli_la_SOURCES) \
-	$(libwidgets_cli_la_SOURCES)
+	$(libeditor_cli_la_SOURCES) $(libeffect_cli_la_SOURCES) \
+	$(libevents_cli_la_SOURCES) $(libgenerator_cli_la_SOURCES) \
+	$(liboptions_cli_la_SOURCES) $(libpackager_cli_la_SOURCES) \
+	$(libreload_cli_la_SOURCES) $(libskills_cli_la_SOURCES) \
+	$(libslots_cli_la_SOURCES) $(libwidgets_cli_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -361,6 +369,7 @@ ext_LTLIBRARIES = \
 	libcamera-cli.la \
 	libchat-cli.la \
 	libeditor-cli.la \
+	libeffect-cli.la \
 	libevents-cli.la \
 	libgenerator-cli.la \
 	liboptions-cli.la \
@@ -399,6 +408,14 @@ libeditor_cli_la_SOURCES = \
 	editor/ext-module.c \
 	editor/ext-module.h \
 	editor/ext-script.c
+
+libeffect_cli_la_CFLAGS = $(LICLI_CFLAGS)
+libeffect_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libeffect_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
+libeffect_cli_la_SOURCES = \
+	effect/ext-module.c \
+	effect/ext-module.h \
+	effect/ext-script.c
 
 libevents_cli_la_CFLAGS = $(LICLI_CFLAGS)
 libevents_cli_la_LDFLAGS = -module -avoid-version -no-undefined
@@ -553,6 +570,8 @@ libchat-cli.la: $(libchat_cli_la_OBJECTS) $(libchat_cli_la_DEPENDENCIES)
 	$(libchat_cli_la_LINK) -rpath $(extdir) $(libchat_cli_la_OBJECTS) $(libchat_cli_la_LIBADD) $(LIBS)
 libeditor-cli.la: $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_DEPENDENCIES) 
 	$(libeditor_cli_la_LINK) -rpath $(extdir) $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_LIBADD) $(LIBS)
+libeffect-cli.la: $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_DEPENDENCIES) 
+	$(libeffect_cli_la_LINK) -rpath $(extdir) $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_LIBADD) $(LIBS)
 libevents-cli.la: $(libevents_cli_la_OBJECTS) $(libevents_cli_la_DEPENDENCIES) 
 	$(libevents_cli_la_LINK) -rpath $(extdir) $(libevents_cli_la_OBJECTS) $(libevents_cli_la_LIBADD) $(LIBS)
 libgenerator-cli.la: $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_DEPENDENCIES) 
@@ -585,6 +604,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-editor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeditor_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeffect_cli_la-ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeffect_cli_la-ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libevents_cli_la-ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libevents_cli_la-ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-dialog.Plo@am__quote@
@@ -696,6 +717,20 @@ libeditor_cli_la-ext-script.lo: editor/ext-script.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='editor/ext-script.c' object='libeditor_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeditor_cli_la_CFLAGS) $(CFLAGS) -c -o libeditor_cli_la-ext-script.lo `test -f 'editor/ext-script.c' || echo '$(srcdir)/'`editor/ext-script.c
+
+libeffect_cli_la-ext-module.lo: effect/ext-module.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeffect_cli_la_CFLAGS) $(CFLAGS) -MT libeffect_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libeffect_cli_la-ext-module.Tpo -c -o libeffect_cli_la-ext-module.lo `test -f 'effect/ext-module.c' || echo '$(srcdir)/'`effect/ext-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libeffect_cli_la-ext-module.Tpo $(DEPDIR)/libeffect_cli_la-ext-module.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='effect/ext-module.c' object='libeffect_cli_la-ext-module.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeffect_cli_la_CFLAGS) $(CFLAGS) -c -o libeffect_cli_la-ext-module.lo `test -f 'effect/ext-module.c' || echo '$(srcdir)/'`effect/ext-module.c
+
+libeffect_cli_la-ext-script.lo: effect/ext-script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeffect_cli_la_CFLAGS) $(CFLAGS) -MT libeffect_cli_la-ext-script.lo -MD -MP -MF $(DEPDIR)/libeffect_cli_la-ext-script.Tpo -c -o libeffect_cli_la-ext-script.lo `test -f 'effect/ext-script.c' || echo '$(srcdir)/'`effect/ext-script.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libeffect_cli_la-ext-script.Tpo $(DEPDIR)/libeffect_cli_la-ext-script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='effect/ext-script.c' object='libeffect_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libeffect_cli_la_CFLAGS) $(CFLAGS) -c -o libeffect_cli_la-ext-script.lo `test -f 'effect/ext-script.c' || echo '$(srcdir)/'`effect/ext-script.c
 
 libevents_cli_la-ext-module.lo: events/ext-module.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libevents_cli_la_CFLAGS) $(CFLAGS) -MT libevents_cli_la-ext-module.lo -MD -MP -MF $(DEPDIR)/libevents_cli_la-ext-module.Tpo -c -o libevents_cli_la-ext-module.lo `test -f 'events/ext-module.c' || echo '$(srcdir)/'`events/ext-module.c

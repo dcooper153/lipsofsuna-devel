@@ -33,7 +33,6 @@
 #include "render-lighting.h"
 #include "render-material.h"
 #include "render-object.h"
-#include "render-particle.h"
 #include "render-resources.h"
 #include "render-shader.h"
 #include "render-types.h"

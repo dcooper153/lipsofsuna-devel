@@ -26,27 +26,19 @@
 #define __RENDER_SCENE_H__
 
 #include <algorithm/lips-algorithm.h>
+#include <particle/lips-particle.h>
 #include <system/lips-system.h>
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-object.h"
-#include "render-particle.h"
 #include "render-types.h"
 
 struct _lirndScene
 {
 	lialgPtrdic* objects;
+	liparManager* particles;
 	lirndRender* render;
 	lirndLighting* lighting;
-	struct
-	{
-		int count;
-		int count_used;
-		int count_free;
-		lirndParticle* particles;
-		lirndParticle* particles_used;
-		lirndParticle* particles_free;
-	} particle;
 	struct
 	{
 		lirndObject* model;
@@ -59,7 +51,7 @@ lirnd_scene_new (lirndRender* render);
 void
 lirnd_scene_free (lirndScene* self);
 
-lirndParticle*
+liparPoint*
 lirnd_scene_insert_particle (lirndScene*        self,
                              const limatVector* position,
                              const limatVector* velocity);

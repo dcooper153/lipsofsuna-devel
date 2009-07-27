@@ -187,6 +187,13 @@ netsrc = \
 	network/network.c \
 	network/network-extension.h \
 	network/network-protocol.h
+parsrc = \
+	particle/particle-line.c \
+	particle/particle-line.h \
+	particle/particle-manager.c \
+	particle/particle-manager.h \
+	particle/particle-point.c \
+	particle/particle-point.h
 physrc = \
 	physics/lips-physics.h \
 	physics/physics.cpp \
@@ -232,8 +239,6 @@ rndsrc = \
 	render/render-model.h \
 	render/render-object.c \
 	render/render-object.h \
-	render/render-particle.c \
-	render/render-particle.h \
 	render/render-resources.c \
 	render/render-resources.h \
 	render/render-scene.c \
@@ -410,8 +415,8 @@ liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS)
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
 	$(engsrc) $(fntsrc) $(gensrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
-	$(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) $(sndsrc) \
-	$(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+	$(parsrc) $(physrc) $(pthsrc) $(relsrc) $(rndsrc) $(srvsrc) $(scrsrc) \
+	$(sndsrc) $(strsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 liblipsofsunaserver_la_CFLAGS = $(LISRV_CFLAGS)
 liblipsofsunaserver_la_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
