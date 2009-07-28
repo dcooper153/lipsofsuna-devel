@@ -60,9 +60,6 @@ private_init_sound (licliModule* self);
 static int
 private_init_widgets (licliModule* self);
 
-static void
-private_render_speech (licliModule* self);
-
 /*****************************************************************************/
 
 /**
@@ -472,10 +469,9 @@ licli_module_render (licliModule* self)
 	int w;
 	int h;
 
+	/* Render UI. */
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT);
-
-	/* Set 2D rendering mode. */
 	licli_window_get_size (self->window, &w, &h);
 	liwdg_manager_set_size (self->widgets, w, h);
 	lieng_camera_set_viewport (self->camera, 0, 0, w, h);
@@ -488,19 +484,55 @@ licli_module_render (licliModule* self)
 	glEnable (GL_BLEND);
 	glEnable (GL_TEXTURE_2D);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	/* Render speech and UI. */
-	if (self->network != NULL)
-		private_render_speech (self);
 	liwdg_manager_render (self->widgets);
-
-	/* Disable 2D rendering mode. */
 	glEnable (GL_CULL_FACE);
 	glEnable (GL_LIGHTING);
 	glEnable (GL_DEPTH_TEST);
 	glDepthMask (GL_TRUE);
-
 	self->client->video.SDL_GL_SwapBuffers ();
+}
+
+void
+licli_module_render_speech (licliModule* self)
+{
+	int width;
+	lialgU32dicIter iter;
+	lialgList* ptr;
+	liengObject* object;
+	liSpeech* speech;
+	limatAabb bounds;
+	limatTransform transform;
+	limatVector win;
+
+	LI_FOREACH_U32DIC (iter, self->engine->objects)
+	{
+		/* Get object. */
+		object = iter.value;
+		if (LICLI_OBJECT (object) == NULL)
+			continue;
+		if (LICLI_OBJECT (object)->speech == NULL)
+			continue;
+
+		/* Get text offset. */
+		lieng_object_get_transform (object, &transform);
+		lieng_object_get_bounds (object, &bounds);
+		transform.position.y += bounds.max.y;
+		if (!lieng_camera_project (self->camera, &transform.position, &win))
+			continue;
+		win.y -= 5;
+
+		/* Render all messages. */
+		for (ptr = LICLI_OBJECT (object)->speech ; ptr != NULL ; ptr = ptr->next)
+		{
+			speech = ptr->data;
+			win.y += lifnt_layout_get_height (speech->text);
+			width = lifnt_layout_get_width (speech->text) / 2;
+			glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
+			lifnt_layout_render (speech->text, win.x - width + 1, win.y + 1);
+			glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
+			lifnt_layout_render (speech->text, win.x - width, win.y);
+		}
+	}
 }
 
 /**
@@ -778,49 +810,6 @@ private_init_widgets (licliModule* self)
 	liwdg_manager_set_size (self->widgets, self->window->mode.width, self->window->mode.height);
 
 	return 1;
-}
-
-static void
-private_render_speech (licliModule* self)
-{
-	int width;
-	lialgU32dicIter iter;
-	lialgList* ptr;
-	liengObject* object;
-	liSpeech* speech;
-	limatAabb bounds;
-	limatTransform transform;
-	limatVector win;
-
-	LI_FOREACH_U32DIC (iter, self->engine->objects)
-	{
-		/* Get object. */
-		object = iter.value;
-		if (LICLI_OBJECT (object) == NULL)
-			continue;
-		if (LICLI_OBJECT (object)->speech == NULL)
-			continue;
-
-		/* Get text offset. */
-		lieng_object_get_transform (object, &transform);
-		lieng_object_get_bounds (object, &bounds);
-		transform.position.y += bounds.max.y;
-		if (!lieng_camera_project (self->camera, &transform.position, &win))
-			continue;
-		win.y -= 5;
-
-		/* Render all messages. */
-		for (ptr = LICLI_OBJECT (object)->speech ; ptr != NULL ; ptr = ptr->next)
-		{
-			speech = ptr->data;
-			win.y += lifnt_layout_get_height (speech->text);
-			width = lifnt_layout_get_width (speech->text) / 2;
-			glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
-			lifnt_layout_render (speech->text, win.x - width + 1, win.y + 1);
-			glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
-			lifnt_layout_render (speech->text, win.x - width, win.y);
-		}
-	}
 }
 
 /** @} */

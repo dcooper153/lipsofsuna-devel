@@ -40,6 +40,7 @@ private_render (liwdgRender* self,
 	module = data;
 	if (module->network != NULL)
 	{
+		/* Draw selection. */
 		glDisable (GL_LIGHTING);
 		glDisable (GL_DEPTH_TEST);
 		glDisable (GL_CULL_FACE);
@@ -61,6 +62,14 @@ private_render (liwdgRender* self,
 				lirnd_draw_bounds (&context, iter.object->render, NULL);
 		}
 		lirnd_context_unbind (&context);
+
+		/* Draw speech. */
+		glMatrixMode (GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho (0, rect.width, 0, rect.height, -100.0f, 100.0f);
+		glMatrixMode (GL_MODELVIEW);
+		glLoadIdentity ();
+		licli_module_render_speech (module);
 	}
 }
 
