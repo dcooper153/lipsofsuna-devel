@@ -55,6 +55,15 @@ private_build_tiles (livoxBuilder* self,
                      int           by,
                      int           bz);
 
+#ifndef LIVOX_DISABLE_GRAPHICS
+static void
+private_calculate_normal (livoxBuilder* self,
+                          limdlFaces*   group,
+                          int           vertex,
+                          limatVector*  fnormal,
+                          limatVector*  vnormal);
+#endif
+
 static void
 private_calculate_texcoords (livoxBuilder* self,
                              int           material,
@@ -123,11 +132,19 @@ void
 livox_builder_free (livoxBuilder* self)
 {
 	lialgMemdicIter iter;
+	livoxBuilderNormal* normal;
+	livoxBuilderNormal* normal_next;
 
 	if (self->helpers.normals != NULL)
 	{
 		LI_FOREACH_MEMDIC (iter, self->helpers.normals)
-			free (iter.value);
+		{
+			for (normal = iter.value ; normal != NULL ; normal = normal->next)
+			{
+				normal_next = normal->next;
+				free (normal);
+			}
+		}
 		lialg_memdic_free (self->helpers.normals);
 	}
 	if (self->helpers.materials != NULL)
@@ -149,10 +166,10 @@ livox_builder_build (livoxBuilder* self,
 #ifndef LIVOX_DISABLE_GRAPHICS
 	int i;
 	int j;
-	livoxBuilderNormal* lookup;
-	limatVector coord;
+	int k;
 	limatVector normal;
 	limdlFaces* group;
+	limdlVertex* v;
 #endif
 	livoxBlock* block;
 
@@ -179,16 +196,14 @@ livox_builder_build (livoxBuilder* self,
 		for (i = 0 ; i < self->helpers.model->facegroups.count ; i++)
 		{
 			group = self->helpers.model->facegroups.array + i;
-			for (j = 0 ; j < group->vertices.count ; j++)
+			v = group->vertices.array;
+			for (j = 0 ; j < group->vertices.count ; j += 3)
 			{
-				coord = group->vertices.array[j].coord;
-				lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
-				assert (lookup != NULL);
-				if (lookup != NULL)
-				{
-					normal = limat_vector_multiply (lookup->normals, 1.0f / lookup->count);
-					group->vertices.array[j].normal = normal;
-				}
+				normal = limat_vector_normalize (limat_vector_cross (
+					limat_vector_subtract (v[j + 0].coord, v[j + 1].coord),
+					limat_vector_subtract (v[j + 1].coord, v[j + 2].coord)));
+				for (k = j ; k < j + 3 ; k++)
+					private_calculate_normal (self, group, k, &normal, &group->vertices.array[k].normal);
 			}
 		}
 		limdl_model_calculate_bounds (self->helpers.model);
@@ -350,6 +365,48 @@ private_build_tiles (livoxBuilder* self,
 	return 1;
 }
 
+#ifndef LIVOX_DISABLE_GRAPHICS
+static void
+private_calculate_normal (livoxBuilder*self,
+                          limdlFaces*  group,
+                          int          vertex,
+                          limatVector* fnormal,
+                          limatVector* vnormal)
+{
+	int count;
+	limatVector coord;
+	limatVector normal;
+	livoxBuilderNormal* lookup;
+
+	count = 1;
+	normal = *fnormal;
+
+	/* Find normal list. */
+	coord = group->vertices.array[vertex].coord;
+	lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
+	assert (lookup != NULL);
+	if (lookup == NULL)
+	{
+		*vnormal = *fnormal;
+		return;
+	}
+
+	/* Calculate sum of suitable normals. */
+	for ( ; lookup != NULL ; lookup = lookup->next)
+	{
+		if (limat_vector_dot (*fnormal, lookup->normal) > 0.1f)
+		{
+			normal = limat_vector_add (normal, lookup->normal);
+			count++;
+		}
+	}
+
+	/* Calculate average value. */
+	normal = limat_vector_multiply (normal, 1.0f / count);
+	*vnormal = normal;
+}
+#endif
+
 static void
 private_calculate_texcoords (livoxBuilder* self,
                              int           material,
@@ -448,10 +505,11 @@ private_insert_vertices (livoxBuilder* self,
 	int i;
 	int j;
 	int mat;
-	livoxBuilderNormal* lookup;
 	limatVector coord;
 	limatVector normal;
 	limatVector* tmp;
+	livoxBuilderNormal* lookup0;
+	livoxBuilderNormal* lookup1;
 
 	/* Scale and translate vertices. */
 	for (i = 0 ; i < count ; i++)
@@ -488,22 +546,25 @@ private_insert_vertices (livoxBuilder* self,
 			for (j = 0 ; j < 3 ; j++)
 			{
 				coord = vertices[i + j].coord;
-				lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
-				if (lookup == NULL)
+				lookup0 = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
+				if (lookup0 != NULL)
 				{
-					lookup = malloc (sizeof (livoxBuilderNormal));
-					if (lookup == NULL)
+					lookup1 = malloc (sizeof (livoxBuilderNormal));
+					if (lookup1 == NULL)
 						continue;
-					lookup->vertex = coord;
-					lookup->normals = normal;
-					lookup->count = 1;
-					if (!lialg_memdic_insert (self->helpers.normals, &coord, sizeof (limatVector), lookup))
-						free (lookup);
+					lookup1->next = lookup0->next;
+					lookup1->normal = normal;
+					lookup0->next = lookup1;
 				}
 				else
 				{
-					lookup->normals = limat_vector_add (lookup->normals, normal);
-					lookup->count++;
+					lookup1 = malloc (sizeof (livoxBuilderNormal));
+					if (lookup1 == NULL)
+						continue;
+					lookup1->next = NULL;
+					lookup1->normal = normal;
+					if (!lialg_memdic_insert (self->helpers.normals, &coord, sizeof (limatVector), lookup1))
+						free (lookup1);
 				}
 			}
 		}

@@ -32,9 +32,8 @@
 typedef struct _livoxBuilderNormal livoxBuilderNormal;
 struct _livoxBuilderNormal
 {
-	int count;
-	limatVector vertex;
-	limatVector normals;
+	limatVector normal;
+	livoxBuilderNormal* next;
 };
 
 typedef struct _livoxBuilder livoxBuilder;
