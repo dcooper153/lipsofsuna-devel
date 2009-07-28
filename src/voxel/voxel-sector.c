@@ -107,30 +107,32 @@ livox_sector_build_block (livoxSector* self,
 }
 
 /**
- * \brief Erases the voxel fragment nearest to the point.
- *
- * FIXME: This is pretty sketchy.
- *
- * FIXME: The player can fall through the terrain after calling this.
+ * \brief Erases the voxel fragment closest to the passed point.
  *
  * \param self Sector.
- * \param terrain Terrain type.
+ * \param point Point in sector space.
  * \return Nonzero on success, zero if the nearby voxels were all empty.
  */
 int
 livox_sector_erase_point (livoxSector*       self,
                           const limatVector* point)
 {
-	int i, j, k;
 	int x, y, z;
+	int xb, yb, zb;
+	int xc, yc, zc;
+	int xt, yt, zt;
 	int best;
+	int bestx;
+	int besty;
+	int bestz;
 	int mask;
 	int type;
 	int shape;
-	float d;
-	float dist;
-	limatVector off0;
-	limatVector off1;
+	float d0;
+	float d1;
+	float dist0;
+	float dist1;
+	limatVector off;
 	livoxVoxel voxel;
 
 	/* Find hit voxel. */
@@ -142,107 +144,72 @@ livox_sector_erase_point (livoxSector*       self,
 	    z < 0 || z >= LIVOX_TILES_PER_SECLINE)
 		return 0;
 
-	/* Calculate offset within voxel. */
-	off0.x = point->x - x * LIVOX_TILE_WIDTH - 0.5f * LIVOX_TILE_WIDTH;
-	off0.y = point->y - y * LIVOX_TILE_WIDTH - 0.5f * LIVOX_TILE_WIDTH;
-	off0.z = point->z - z * LIVOX_TILE_WIDTH - 0.5f * LIVOX_TILE_WIDTH;
-
-	/* Get voxel information. */
-	voxel = livox_sector_get_voxel (self, x, y, z);
-	type = livox_voxel_get_type (voxel);
-	shape = livox_voxel_get_shape (voxel);
-
-	/* Try neighbors if empty and near border. */
-	if (!type)
-	{
-		if (off0.x < -LIVOX_ERASE_SHIFT && x > 0)
-		{
-			off0.x += LIVOX_TILE_WIDTH;
-			voxel = livox_sector_get_voxel (self, --x, y, z);
-			type = livox_voxel_get_type (voxel);
-			shape = livox_voxel_get_shape (voxel);
-		}
-		else if (off0.x > LIVOX_ERASE_SHIFT && x < LIVOX_TILES_PER_SECLINE - 1)
-		{
-			off0.x -= LIVOX_TILE_WIDTH;
-			voxel = livox_sector_get_voxel (self, ++x, y, z);
-			type = livox_voxel_get_type (voxel);
-			shape = livox_voxel_get_shape (voxel);
-		}
-	}
-	if (!type)
-	{
-		if (off0.y < -LIVOX_ERASE_SHIFT && y > 0)
-		{
-			off0.y += LIVOX_TILE_WIDTH;
-			voxel = livox_sector_get_voxel (self, x, --y, z);
-			type = livox_voxel_get_type (voxel);
-			shape = livox_voxel_get_shape (voxel);
-		}
-		else if (off0.y > LIVOX_ERASE_SHIFT && y < LIVOX_TILES_PER_SECLINE - 1)
-		{
-			off0.y -= LIVOX_TILE_WIDTH;
-			voxel = livox_sector_get_voxel (self, x, ++y, z);
-			type = livox_voxel_get_type (voxel);
-			shape = livox_voxel_get_shape (voxel);
-		}
-	}
-	if (!type)
-	{
-		if (off0.z < -LIVOX_ERASE_SHIFT && z > 0)
-		{
-			off0.z += LIVOX_TILE_WIDTH;
-			voxel = livox_sector_get_voxel (self, x, y, --z);
-			type = livox_voxel_get_type (voxel);
-			shape = livox_voxel_get_shape (voxel);
-		}
-		else if (off0.z > LIVOX_ERASE_SHIFT && z < LIVOX_TILES_PER_SECLINE - 1)
-		{
-			off0.z -= LIVOX_TILE_WIDTH;
-			voxel = livox_sector_get_voxel (self, x, y, ++z);
-			type = livox_voxel_get_type (voxel);
-			shape = livox_voxel_get_shape (voxel);
-		}
-	}
-	if (!type)
-		return 0;
-
-	/* Calculate offset within voxel. */
-	off0.x = point->x - x * LIVOX_TILE_WIDTH + 0.5f * LIVOX_TILE_WIDTH;
-	off0.y = point->y - y * LIVOX_TILE_WIDTH + 0.5f * LIVOX_TILE_WIDTH;
-	off0.z = point->z - z * LIVOX_TILE_WIDTH + 0.5f * LIVOX_TILE_WIDTH;
-
-	/* Find closest filled corner. */
-	dist = 10.0E10f;
+	/* Find closest deletable corner. */
+	/* We try to favor the voxel that was hit by using two distance checks,
+	   one for the closest corner and another for the closest voxel. */
 	best = 0;
-	mask = 1;
-	for (k = 0 ; k < 2 ; k++)
-	for (j = 0 ; j < 2 ; j++)
-	for (i = 0 ; i < 2 ; i++, mask <<= 1)
+	bestx = x;
+	besty = y;
+	bestz = z;
+	dist0 = 10.0E10f;
+	dist1 = 10.0E10f;
+	for (zt = LI_MAX (0, z - 1) ; zt <= z + 1 && zt < LIVOX_TILES_PER_SECLINE ; zt++)
+	for (yt = LI_MAX (0, y - 1) ; yt <= y + 1 && yt < LIVOX_TILES_PER_SECLINE ; yt++)
+	for (xt = LI_MAX (0, x - 1) ; xt <= x + 1 && xt < LIVOX_TILES_PER_SECLINE ; xt++)
 	{
-		if (shape & mask)
+		/* Get voxel information. */
+		voxel = livox_sector_get_voxel (self, xt, yt, zt);
+		shape = livox_voxel_get_shape (voxel);
+
+		/* Get distance to voxel center. */
+		off.x = (xt + 0.5f) * LIVOX_TILE_WIDTH;
+		off.y = (yt + 0.5f) * LIVOX_TILE_WIDTH;
+		off.z = (zt + 0.5f) * LIVOX_TILE_WIDTH;
+		d1 = limat_vector_get_length (limat_vector_subtract (*point, off));
+
+		/* Check if empty. */
+		if (!shape)
+			continue;
+
+		/* Find closest corner. */
+		mask = 1;
+		for (zc = 0 ; zc < 2 ; zc++)
+		for (yc = 0 ; yc < 2 ; yc++)
+		for (xc = 0 ; xc < 2 ; xc++, mask <<= 1)
 		{
-			off1.x = (i + 0.5f) * LIVOX_TILE_WIDTH;
-			off1.y = (j + 0.5f) * LIVOX_TILE_WIDTH;
-			off1.z = (k + 0.5f) * LIVOX_TILE_WIDTH;
-			d = limat_vector_get_length (limat_vector_subtract (off0, off1));
-			if (!best || d < dist)
+			if (shape & mask)
 			{
-				best = mask;
-				dist = d;
+				off.x = (xt + xc) * LIVOX_TILE_WIDTH;
+				off.y = (yt + yc) * LIVOX_TILE_WIDTH;
+				off.z = (zt + zc) * LIVOX_TILE_WIDTH;
+				d0 = limat_vector_get_length (limat_vector_subtract (*point, off));
+				if (!best || d0 < dist0 || (d0 == dist0 && d1 < dist1))
+				{
+					best = mask;
+					bestx = xt;
+					besty = yt;
+					bestz = zt;
+					dist0 = d0;
+					dist1 = d1;
+				}
 			}
 		}
 	}
 	if (!best)
 		return 0;
 
-	/* Clear the corner. */
-	i = x / LIVOX_TILES_PER_LINE;
-	j = y / LIVOX_TILES_PER_LINE;
-	k = z / LIVOX_TILES_PER_LINE;
+	/* Get voxel information. */
+	voxel = livox_sector_get_voxel (self, bestx, besty, bestz);
+	type = livox_voxel_get_type (voxel);
+	shape = livox_voxel_get_shape (voxel);
+
+	/* Clear the found corner. */
+	xb = x / LIVOX_TILES_PER_LINE;
+	yb = y / LIVOX_TILES_PER_LINE;
+	zb = z / LIVOX_TILES_PER_LINE;
 	voxel = livox_voxel_init (shape & (~best), type);
-	livox_sector_set_voxel (self, x, y, z, voxel);
-	self->blocks[LIVOX_BLOCK_INDEX (i, j, k)].stamp++;
+	livox_sector_set_voxel (self, bestx, besty, bestz, voxel);
+	self->blocks[LIVOX_BLOCK_INDEX (xb, yb, zb)].stamp++;
 	self->dirty = 1;
 
 	return 1;

@@ -236,6 +236,23 @@ int
 ligen_generator_main (ligenGenerator* self)
 {
 	int i;
+	ligenBrush* brush;
+	ligenStroke stroke;
+
+	/* FIXME: This should be configurable. */
+	if (self->brushes.count > 0)
+	{
+		brush = self->brushes.array[0];
+		stroke.pos[0] = 8160 - brush->size[0] / 2;
+		stroke.pos[1] = 8160 - brush->size[1] / 2;
+		stroke.pos[2] = 8160 - brush->size[2] / 2;
+		stroke.size[0] = brush->size[0];
+		stroke.size[1] = brush->size[1];
+		stroke.size[2] = brush->size[2];
+		stroke.brush = brush->id;
+		if (!lialg_array_append (&self->world, &stroke))
+			return 0;
+	}
 
 	/* Generate areas. */
 	/* FIXME */
@@ -244,6 +261,7 @@ ligen_generator_main (ligenGenerator* self)
 		if (!ligen_generator_step (self))
 			break;
 	}
+	printf ("Strokes: %d\n", i);
 
 	/* Generate geometry. */
 	ligen_generator_rebuild_scene (self);
