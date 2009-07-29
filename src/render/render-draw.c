@@ -223,8 +223,8 @@ lirnd_draw_hair (lirndContext* context,
 					len0 += limat_vector_get_length (limat_vector_subtract (
 						hair->nodes[k - 1].position, hair->nodes[k].position));
 				}
-				w = material->strand_start * (len0 / len1) +
-				    material->strand_end * (1.0 - len0 / len1);
+				w = material->strand_start * (1.0 - len0 / len1) +
+				    material->strand_end * (len0 / len1);
 				sx = 4.5f; /* FIXME */
 				sy = 1.5f; /* FIXME */
 				ctr = limat_matrix_transform (matrix, hair->nodes[k].position);
