@@ -32,8 +32,13 @@
 typedef struct _ligenBrushobject ligenBrushobject;
 struct _ligenBrushobject
 {
-	limatVector pos;
-	/* TODO */
+	int id;
+	int flags;
+	float probability;
+	char* type;
+	char* model;
+	char* extra;
+	limatTransform transform;
 };
 
 typedef struct _ligenBrush ligenBrush;
@@ -55,7 +60,7 @@ struct _ligenBrush
 	struct
 	{
 		int count;
-		ligenBrushobject* array;
+		ligenBrushobject** array;
 	} objects;
 };
 

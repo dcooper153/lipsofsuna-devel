@@ -25,6 +25,11 @@
 #include "generator-brush.h"
 
 static int
+private_read_objects (ligenBrush* self,
+                      liarcSql*   sql,
+                      int         id);
+
+static int
 private_read_rules (ligenBrush* self,
                     liarcSql*   sql,
                     int         id);
@@ -33,6 +38,11 @@ static int
 private_write_rule (ligenBrush* self,
                     ligenRule*  rule,
                     liarcSql*   sql);
+
+static int
+private_write_object (ligenBrush*       self,
+                      ligenBrushobject* object,
+                      liarcSql*         sql);
 
 static int
 private_write_stroke (ligenBrush*      self,
@@ -142,7 +152,8 @@ ligen_brush_read_rules (ligenBrush* self,
                         liarcSql*   sql,
                         int         id)
 {
-	return private_read_rules (self, sql, id);
+	return private_read_rules (self, sql, id) &&
+	       private_read_objects (self, sql, id);
 }
 
 /**
@@ -196,6 +207,13 @@ ligen_brush_write (ligenBrush* self,
 	}
 	sqlite3_finalize (statement);
 
+	/* Write objects. */
+	for (i = 0 ; i < self->objects.count ; i++)
+	{
+		if (!private_write_object (self, self->objects.array[i], sql))
+			return 0;
+	}
+
 	/* Write rules. */
 	for (i = 0 ; i < self->rules.count ; i++)
 	{
@@ -207,6 +225,167 @@ ligen_brush_write (ligenBrush* self,
 }
 
 /*****************************************************************************/
+
+static int
+private_read_objects (ligenBrush* self,
+                      liarcSql*   sql,
+                      int         id)
+{
+	int i;
+	int col;
+	int ret;
+	int size;
+	const char* query;
+	ligenBrushobject object;
+	ligenBrushobject** tmp;
+	sqlite3_stmt* statement;
+	struct
+	{
+		int count;
+		ligenBrushobject** array;
+	} objects = { 0, NULL };
+
+	/* Prepare statement. */
+	query = "SELECT id,flags,prob,posx,posy,posz,rotx,roty,rotz,rotw,type,model,extra "
+		"FROM generator_objects WHERE brush=?;";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+
+	/* Read objects. */
+	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
+	{
+		/* Check for errors. */
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Read numeric fields. */
+		col = 0;
+		object.id = sqlite3_column_int (statement, col++);
+		object.flags = sqlite3_column_int (statement, col++);
+		object.probability = sqlite3_column_double (statement, col++);
+		object.transform.position.x = sqlite3_column_double (statement, col++);
+		object.transform.position.y = sqlite3_column_double (statement, col++);
+		object.transform.position.z = sqlite3_column_double (statement, col++);
+		object.transform.rotation.x = sqlite3_column_double (statement, col++);
+		object.transform.rotation.y = sqlite3_column_double (statement, col++);
+		object.transform.rotation.z = sqlite3_column_double (statement, col++);
+		object.transform.rotation.w = sqlite3_column_double (statement, col++);
+		if (object.probability <= 0.0f || object.probability > 1.0f)
+			object.probability = 1.0f;
+		object.transform.rotation = limat_quaternion_normalize (object.transform.rotation);
+
+		/* Read type column. */
+		object.type = (char*) sqlite3_column_text (statement, col);
+		size = sqlite3_column_bytes (statement, col++);
+		if (size > 0 && object.type != NULL)
+			object.type = strdup (object.type);
+		else
+			object.type = strdup ("");
+		if (object.type == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			goto error;
+		}
+
+		/* Read model column. */
+		object.model = (char*) sqlite3_column_text (statement, col);
+		size = sqlite3_column_bytes (statement, col++);
+		if (size > 0 && object.model != NULL)
+			object.model = strdup (object.model);
+		else
+			object.model = strdup ("");
+		if (object.model == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (object.type);
+			goto error;
+		}
+
+		/* Read extra column. */
+		object.extra = (char*) sqlite3_column_text (statement, col);
+		size = sqlite3_column_bytes (statement, col);
+		if (size > 0 && object.extra != NULL)
+			object.extra = strdup (object.extra);
+		else
+			object.extra = strdup ("");
+		if (object.extra == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (object.type);
+			free (object.model);
+			goto error;
+		}
+
+		/* Add to list. */
+		if (object.id >= objects.count)
+		{
+			tmp = realloc (objects.array, (object.id + 1) * sizeof (ligenBrushobject*));
+			if (tmp == NULL)
+			{
+				free (object.type);
+				free (object.model);
+				free (object.extra);
+				goto error;
+			}
+			for (i = objects.count ; i < object.id ; i++)
+				tmp[i] = NULL;
+			objects.array = tmp;
+			objects.count = object.id + 1;
+		}
+		objects.array[object.id] = malloc (sizeof (ligenBrushobject));
+		if (objects.array[object.id] == NULL)
+		{
+			free (object.type);
+			free (object.model);
+			free (object.extra);
+			goto error;
+		}
+		*(objects.array[object.id]) = object;
+	}
+
+	/* TODO: Remove any NULL objects. */
+
+	/* Use new objects. */
+	for (i = 0 ; i < self->objects.count ; i++)
+	{
+		free (self->objects.array[i]->type);
+		free (self->objects.array[i]->model);
+		free (self->objects.array[i]->extra);
+		free (self->objects.array[i]);
+	}
+	free (self->objects.array);
+	self->objects.count = objects.count;
+	self->objects.array = objects.array;
+
+	return 1;
+
+error:
+	for (i = 0 ; i < objects.count ; i++)
+	{
+		if (objects.array[i] != NULL)
+		{
+			free (objects.array[i]->type);
+			free (objects.array[i]->extra);
+			free (objects.array[i]);
+		}
+	}
+	free (objects.array);
+	sqlite3_finalize (statement);
+	return 0;
+}
 
 static int
 private_read_rules (ligenBrush* self,
@@ -369,6 +548,61 @@ error:
 	free (rules.array);
 	sqlite3_finalize (statement);
 	return 0;
+}
+
+static int
+private_write_object (ligenBrush*       self,
+                      ligenBrushobject* object,
+                      liarcSql*         sql)
+{
+	int col;
+	int ret;
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Prepare statement. */
+	query = "INSERT OR REPLACE INTO generator_objects "
+		"(id,brush,flags,prob,posx,posy,posz,rotx,roty,rotz,rotw,type,model,extra) VALUES "
+		"(?,?,?,?,?,?,?,?,?,?,?,?,?);";
+	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		return 0;
+	}
+
+	/* Bind values. */
+	col = 1;
+	ret = (sqlite3_bind_int (statement, col++, object->id) != SQLITE_OK ||
+		sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
+		sqlite3_bind_int (statement, col++, object->flags) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->probability) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.position.x) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.position.y) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.position.z) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.rotation.x) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.rotation.y) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.rotation.z) != SQLITE_OK ||
+		sqlite3_bind_double (statement, col++, object->transform.rotation.w) != SQLITE_OK ||
+		sqlite3_bind_text (statement, col++, object->type, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+		sqlite3_bind_text (statement, col++, object->model, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+		sqlite3_bind_text (statement, col++, object->extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+	if (ret)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+
+	/* Write values. */
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
 }
 
 static int

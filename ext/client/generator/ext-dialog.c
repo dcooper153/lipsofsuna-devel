@@ -638,9 +638,9 @@ private_render_preview (liwdgWidget* widget,
 	glDisable (GL_LIGHTING);
 	glDisable (GL_TEXTURE_2D);
 	glBegin (GL_LINES);
-	for (i = 0 ; i < self->generator->generator->world.count ; i++)
+	for (i = 0 ; i < self->generator->generator->strokes.count ; i++)
 	{
-		stroke = self->generator->generator->world.array + i;
+		stroke = self->generator->generator->strokes.array + i;
 		if (stroke->brush == self->active_brush &&
 		    stroke->pos[0] == LIEXT_PREVIEW_CENTER &&
 		    stroke->pos[1] == LIEXT_PREVIEW_CENTER &&

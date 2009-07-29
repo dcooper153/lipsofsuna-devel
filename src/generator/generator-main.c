@@ -32,6 +32,7 @@ main (int argc, char** argv)
 
 	if (argc != 3)
 		return 1;
+	srand (time (NULL));
 	self = ligen_generator_new (argv[1], argv[2]);
 	if (self == NULL)
 	{

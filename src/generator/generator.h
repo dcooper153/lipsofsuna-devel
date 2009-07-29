@@ -57,8 +57,7 @@ struct _ligenGenerator
 	{
 		int count;
 		ligenStroke* array;
-	} world;
-	/* TODO */
+	} strokes;
 };
 
 ligenGenerator*
@@ -96,6 +95,9 @@ ligen_generator_rebuild_scene (ligenGenerator* self);
 
 int
 ligen_generator_step (ligenGenerator* self);
+
+int
+ligen_generator_write (ligenGenerator* self);
 
 int
 ligen_generator_write_brushes (ligenGenerator* self);

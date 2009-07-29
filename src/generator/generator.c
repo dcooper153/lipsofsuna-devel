@@ -24,6 +24,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <engine/lips-engine.h>
+#include <network/lips-network.h>
 #include "generator.h"
 
 static int
@@ -31,6 +33,9 @@ private_init_brushes (ligenGenerator* self);
 
 static int
 private_init_sql (ligenGenerator* self);
+
+static int
+private_init_tables (ligenGenerator* self);
 
 static int
 private_brush_exists (ligenGenerator*  self,
@@ -114,6 +119,7 @@ ligen_generator_new_full (const char* path,
 
 	/* Load databases. */
 	if (!private_init_sql (self) ||
+	    !private_init_tables (self) ||
 	    !private_init_brushes (self))
 		goto error;
 
@@ -147,7 +153,7 @@ ligen_generator_free (ligenGenerator* self)
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
 	free (self->brushes.array);
-	free (self->world.array);
+	free (self->strokes.array);
 	free (self);
 }
 
@@ -160,9 +166,9 @@ void
 ligen_generator_clear_scene (ligenGenerator* self)
 {
 	/* Free strokes. */
-	free (self->world.array);
-	self->world.array = NULL;
-	self->world.count = 0;
+	free (self->strokes.array);
+	self->strokes.array = NULL;
+	self->strokes.count = 0;
 
 	/* Clear scene. */
 	livox_manager_clear (self->voxels);
@@ -220,7 +226,7 @@ ligen_generator_insert_stroke (ligenGenerator* self,
 	stroke.size[1] = brush_->size[1];
 	stroke.size[2] = brush_->size[2];
 	stroke.brush = brush;
-	if (!lialg_array_append (&self->world, &stroke))
+	if (!lialg_array_append (&self->strokes, &stroke))
 		return 0;
 
 	return 1;
@@ -250,7 +256,7 @@ ligen_generator_main (ligenGenerator* self)
 		stroke.size[1] = brush->size[1];
 		stroke.size[2] = brush->size[2];
 		stroke.brush = brush->id;
-		if (!lialg_array_append (&self->world, &stroke))
+		if (!lialg_array_append (&self->strokes, &stroke))
 			return 0;
 	}
 
@@ -265,9 +271,7 @@ ligen_generator_main (ligenGenerator* self)
 
 	/* Generate geometry. */
 	ligen_generator_rebuild_scene (self);
-
-	/* Save geometry. */
-	livox_manager_write (self->voxels, self->srvsql);
+	ligen_generator_write (self);
 
 	return 1;
 }
@@ -288,9 +292,9 @@ ligen_generator_rebuild_scene (ligenGenerator* self)
 	livox_manager_clear (self->voxels);
 
 	/* Paint strokes. */
-	for (i = 0 ; i < self->world.count ; i++)
+	for (i = 0 ; i < self->strokes.count ; i++)
 	{
-		stroke = self->world.array + i;
+		stroke = self->strokes.array + i;
 		private_stroke_paint (self, stroke);
 	}
 
@@ -313,19 +317,21 @@ ligen_generator_step (ligenGenerator* self)
 	int i;
 	int j;
 	ligenBrush* brush;
-	ligenStroke* stroke;
 	ligenRule* rule;
+	ligenStroke stroke;
 
-	for (i = 0 ; i < self->world.count ; i++)
+	for (i = 0 ; i < self->strokes.count ; i++)
 	{
-		stroke = self->world.array + i;
-		brush = self->brushes.array[stroke->brush];
+		/* The stroke array may be reallocated in private_rule_apply
+		 * so we need to create a copy of the stroke here. */
+		stroke = self->strokes.array[i];
+		brush = self->brushes.array[stroke.brush];
 		for (j = 0 ; j < brush->rules.count ; j++)
 		{
 			rule = brush->rules.array[j];
-			if (private_rule_test (self, stroke, rule))
+			if (private_rule_test (self, &stroke, rule))
 			{
-				if (!private_rule_apply (self, stroke, rule))
+				if (!private_rule_apply (self, &stroke, rule))
 					return 0;
 				return 1;
 			}
@@ -333,6 +339,165 @@ ligen_generator_step (ligenGenerator* self)
 	}
 
 	return 0;
+}
+
+/**
+ * \brief Saves the generated map to the server database.
+ *
+ * \param self Generator.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_write (ligenGenerator* self)
+{
+	int i;
+	int j;
+	int col;
+	int ret;
+	int flags;
+	double rnd;
+	uint32_t id;
+	uint32_t sector;
+	const char* query;
+	ligenBrush* brush;
+	ligenBrushobject* object;
+	ligenStroke* stroke;
+	limatTransform transform;
+	sqlite3_stmt* statement;
+
+	/* Save geometry. */
+	livox_manager_write (self->voxels, self->srvsql);
+
+	/* Remove old objects. */
+	query = "DELETE FROM objects;";
+	if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->srvsql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Save new objects. */
+	for (i = 0 ; i < self->strokes.count ; i++)
+	{
+		stroke = self->strokes.array + i;
+		brush = self->brushes.array[stroke->brush];
+		for (j = 0 ; j < brush->objects.count ; j++)
+		{
+			object = brush->objects.array[j];
+
+			/* Creation probability. */
+			rnd = rand () / (double) RAND_MAX;
+			if (rnd <= 1.0 - object->probability)
+				continue;
+
+			/* Choose unique object number. */
+			for (id = 0 ; !id ; )
+			{
+				/* Choose random number. */
+				rnd = rand () / (double) RAND_MAX;
+				id = LINET_RANGE_SERVER_START + (uint32_t)((LINET_RANGE_SERVER_END - LINET_RANGE_SERVER_START) * rnd);
+				if (!id)
+					continue;
+
+				/* Reject numbers of database objects. */
+				query = "SELECT id FROM objects WHERE id=?;";
+				if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
+				{
+					lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
+					return 0;
+				}
+				if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+				{
+					lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->srvsql));
+					sqlite3_finalize (statement);
+					return 0;
+				}
+				ret = sqlite3_step (statement);
+				if (ret != SQLITE_DONE)
+				{
+					if (ret != SQLITE_ROW)
+					{
+						lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->srvsql));
+						sqlite3_finalize (statement);
+						return 0;
+					}
+					id = 0;
+				}
+				sqlite3_finalize (statement);
+			}
+
+			/* Collect values. */
+			flags = object->flags;
+			transform = object->transform;
+			transform.position.x += LIVOX_TILE_WIDTH * stroke->pos[0];
+			transform.position.y += LIVOX_TILE_WIDTH * stroke->pos[1];
+			transform.position.z += LIVOX_TILE_WIDTH * stroke->pos[2];
+			sector = LIENG_SECTOR_INDEX (
+				(int)(transform.position.x / LIENG_SECTOR_WIDTH),
+				(int)(transform.position.y / LIENG_SECTOR_WIDTH),
+				(int)(transform.position.z / LIENG_SECTOR_WIDTH));
+
+			/* Prepare statement. */
+			query = "INSERT OR REPLACE INTO objects "
+				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
+				"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model) VALUES "
+				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+			if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
+			{
+				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
+				return 0;
+			}
+
+			/* Bind values. */
+			col = 1;
+			ret = (sqlite3_bind_int (statement, col++, id) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, sector) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, flags) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.position.x) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.position.y) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.position.z) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.x) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.y) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.z) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, transform.rotation.w) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 5.0f) != SQLITE_OK ||
+				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, LIPHY_DEFAULT_COLLISION_GROUP) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, LIPHY_DEFAULT_COLLISION_MASK) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, LIPHY_CONTROL_MODE_NONE) != SQLITE_OK ||
+				sqlite3_bind_int (statement, col++, LIPHY_SHAPE_MODE_CONCAVE) != SQLITE_OK ||
+				sqlite3_bind_text (statement, col++, object->model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+			if (ret)
+			{
+				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->srvsql));
+				sqlite3_finalize (statement);
+				return 0;
+			}
+
+			/* Write values. */
+			if (sqlite3_step (statement) != SQLITE_DONE)
+			{
+				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->srvsql));
+				sqlite3_finalize (statement);
+				return 0;
+			}
+			sqlite3_finalize (statement);
+		}
+	}
+
+	return 1;
 }
 
 /**
@@ -345,64 +510,6 @@ int
 ligen_generator_write_brushes (ligenGenerator* self)
 {
 	int i;
-	const char* query;
-	sqlite3_stmt* statement;
-
-	/* Create brush table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_brushes "
-		"(id INTEGER PRIMARY KEY,name TEXT,sizx UNSIGNED INTEGER,"
-		"sizy UNSIGNED INTEGER,sizz UNSIGNED INTEGER,voxels BLOB);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Create rule table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_rules "
-		"(id INTEGER,"
-		"brush INTEGER REFERENCES generator_brushes(id),"
-		"name TEXT,flags UNSIGNED INTEGER);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Create stroke table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_strokes "
-		"(id INTEGER,"
-		"brush INTEGER REFERENCES generator_brushes(id),"
-		"rule INTEGER,"
-		"paint INTEGER REFERENCES generator_brushes(id),"
-		"x UNSIGNED INTEGER,y UNSIGNED INTEGER,z UNSIGNED INTEGER,"
-		"flags UNSIGNED INTEGER);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Save brushes. */
 	for (i = 0 ; i < self->brushes.count ; i++)
@@ -555,6 +662,90 @@ private_init_sql (ligenGenerator* self)
 }
 
 static int
+private_init_tables (ligenGenerator* self)
+{
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Create brush table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_brushes "
+		"(id INTEGER PRIMARY KEY,name TEXT,sizx UNSIGNED INTEGER,"
+		"sizy UNSIGNED INTEGER,sizz UNSIGNED INTEGER,voxels BLOB);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create object table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_objects "
+		"(id INTEGER,"
+		"brush INTEGER REFERENCES generator_brushes(id),"
+		"flags UNSIGNED INTEGER,prob REAL,posx REAL,posy REAL,posz REAL,"
+		"rotx REAL,roty REAL,rotz REAL,rotw REAL,type TEXT,model TEXT,extra TEXT);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create rule table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_rules "
+		"(id INTEGER,"
+		"brush INTEGER REFERENCES generator_brushes(id),"
+		"name TEXT,flags UNSIGNED INTEGER);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Create stroke table. */
+	query = "CREATE TABLE IF NOT EXISTS generator_strokes "
+		"(id INTEGER,"
+		"brush INTEGER REFERENCES generator_brushes(id),"
+		"rule INTEGER,"
+		"paint INTEGER REFERENCES generator_brushes(id),"
+		"x UNSIGNED INTEGER,y UNSIGNED INTEGER,z UNSIGNED INTEGER,"
+		"flags UNSIGNED INTEGER);";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
+}
+
+static int
 private_brush_exists (ligenGenerator*  self,
                       ligenStroke*     stroke,
                       ligenRulestroke* rstroke)
@@ -572,9 +763,9 @@ private_brush_exists (ligenGenerator*  self,
 
 	/* Test against all strokes. */
 	/* FIXME: Use space partitioning. */
-	for (i = 0 ; i < self->world.count ; i++)
+	for (i = 0 ; i < self->strokes.count ; i++)
 	{
-		stroke1 = self->world.array + i;
+		stroke1 = self->strokes.array + i;
 		if (stroke1->brush == brush->id &&
 		    stroke1->pos[0] == pos[0] &&
 		    stroke1->pos[1] == pos[1] &&
@@ -609,9 +800,9 @@ private_brush_intersects (ligenGenerator*  self,
 
 	/* Test against all strokes. */
 	/* FIXME: Use space partitioning. */
-	for (i = 0 ; i < self->world.count ; i++)
+	for (i = 0 ; i < self->strokes.count ; i++)
 	{
-		stroke1 = self->world.array + i;
+		stroke1 = self->strokes.array + i;
 		min1[0] = stroke1->pos[0];
 		min1[1] = stroke1->pos[1];
 		min1[2] = stroke1->pos[2];
@@ -639,7 +830,7 @@ private_rule_apply (ligenGenerator* self,
 	ligenStroke stroke1;
 	ligenRulestroke* rstroke;
 
-	orig = self->world.count;
+	orig = self->strokes.count;
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
 		rstroke = rule->strokes.array + i;
@@ -651,9 +842,9 @@ private_rule_apply (ligenGenerator* self,
 		stroke1.size[1] = brush->size[1];
 		stroke1.size[2] = brush->size[2];
 		stroke1.brush = brush->id;
-		if (!lialg_array_append (&self->world, &stroke1))
+		if (!lialg_array_append (&self->strokes, &stroke1))
 		{
-			self->world.count = orig;
+			self->strokes.count = orig;
 			return 0;
 		}
 	}
