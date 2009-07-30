@@ -519,6 +519,30 @@ Object_setter_name (lua_State* lua)
 	return 0;
 }
 
+/* @luadoc
+ * ---
+ * -- Custom deserialization function.
+ * --
+ * -- If the function exists, the server calls it when any object is loaded.
+ * -- The function is given three arguments: the object, a type string, and a
+ * -- data string. The user is free to interpret the strings the way he wants.
+ * --
+ * -- @name Object.read_cb
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- Custom serialization function.
+ * --
+ * -- If the function exists, the server calls it when any object is saved.
+ * -- The function is given one argument: the object. The function must return
+ * -- two strings: a free form type string and a free form data string.
+ * --
+ * -- @name Object.write_cb
+ * -- @class table
+ */
+
 /*****************************************************************************/
 
 void

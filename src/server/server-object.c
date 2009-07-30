@@ -40,19 +40,10 @@ static int
 private_delete_animations (liengObject* self);
 
 static int
-private_delete_variables (liengObject* self);
-
-static int
 private_read_animations (liengObject* self);
 
 static int
-private_read_variables (liengObject* self);
-
-static int
 private_write_animations (liengObject* self);
-
-static int
-private_write_variables (liengObject* self);
 
 /*****************************************************************************/
 
@@ -368,8 +359,6 @@ lisrv_object_purge (liengObject* self)
 	/* Remove from helper tables. */
 	if (!private_delete_animations (self))
 		ret = 0;
-	if (!private_delete_variables (self))
-		ret = 0;
 
 	/* Remove from the main table. */
 	query = "DELETE FROM objects WHERE id=?;";
@@ -419,10 +408,13 @@ lisrv_object_serialize (liengObject* self,
 	float speed;
 	float step;
 	const char* model;
+	const char* type;
+	const char* extras;
 	const char* query;
 	liarcSql* sql;
 	limatTransform transform;
 	limatVector angular;
+	liscrScript* script;
 	sqlite3_stmt* statement;
 
 	sql = LISRV_OBJECT (self)->server->sql;
@@ -431,8 +423,8 @@ lisrv_object_serialize (liengObject* self,
 	{
 		/* Prepare statement. */
 		query = "SELECT "
-			"flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
-			"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model "
+			"flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
+			"mass,move,speed,step,colgrp,colmsk,control,shape,model,type,extra "
 			"FROM objects WHERE id=?;";
 		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 		{
@@ -485,6 +477,14 @@ lisrv_object_serialize (liengObject* self,
 			model = (char*) sqlite3_column_text (statement, col++);
 		else
 			model = NULL;
+		if (sqlite3_column_type (statement, col) == SQLITE_TEXT)
+			type = (char*) sqlite3_column_text (statement, col++);
+		else
+			type = NULL;
+		if (sqlite3_column_type (statement, col) == SQLITE_TEXT)
+			extras = (char*) sqlite3_column_text (statement, col++);
+		else
+			extras = NULL;
 
 		/* Set state. */
 		lieng_object_set_angular_momentum (self, &angular);
@@ -498,20 +498,38 @@ lisrv_object_serialize (liengObject* self,
 		liphy_object_set_shape_mode (self->physics, shape);
 		if (model != NULL)
 			lieng_object_set_model_name (self, model);
-		sqlite3_finalize (statement);
 
 		/* Read animation data. */
 		if (self->script != NULL)
 			private_read_animations (self);
 
-		/* Read script data. */
+		/* Process script values. */
 		if (self->script != NULL)
-			private_read_variables (self);
+		{
+			script = LISRV_OBJECT (self)->server->script;
+			liscr_pushdata (script->lua, self->script);
+			lua_pushstring (script->lua, "read_cb");
+			lua_gettable (script->lua, -2);
+			if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+			{
+				lua_pushvalue (script->lua, -2);
+				lua_remove (script->lua, -3);
+				lua_pushstring (script->lua, (type != NULL)? type : "");
+				lua_pushstring (script->lua, (extras != NULL)? extras : "");
+				if (lua_pcall (script->lua, 3, 0, 0) != 0)
+				{
+					lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+					lua_pop (script->lua, 1);
+				}
+			}
+			else
+				lua_pop (script->lua, 2);
+		}
+		sqlite3_finalize (statement);
 	}
 	else
 	{
-		if (!private_delete_animations (self) ||
-		    !private_delete_variables (self))
+		if (!private_delete_animations (self))
 			return 0;
 		if (lieng_object_get_realized (self))
 		{
@@ -529,12 +547,14 @@ lisrv_object_serialize (liengObject* self,
 			shape = liphy_object_get_shape_mode (self->physics);
 			lieng_object_get_transform (self, &transform);
 			lieng_object_get_angular_momentum (self, &angular);
+			type = NULL;
+			extras = NULL;
 
 			/* Prepare statement. */
 			query = "INSERT OR REPLACE INTO objects "
-				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
-				"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model) VALUES "
-				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
+				"mass,move,speed,step,colgrp,colmsk,control,shape,model,type,extra) VALUES "
+				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 			{
 				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
@@ -578,6 +598,59 @@ lisrv_object_serialize (liengObject* self,
 				return 0;
 			}
 
+			/* Bind script values. */
+			script = NULL;
+			if (self->script != NULL)
+			{
+				script = LISRV_OBJECT (self)->server->script;
+				liscr_pushdata (script->lua, self->script);
+				lua_pushstring (script->lua, "write_cb");
+				lua_gettable (script->lua, -2);
+				if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+				{
+					lua_pushvalue (script->lua, -2);
+					lua_remove (script->lua, -3);
+					if (lua_pcall (script->lua, 1, 2, 0) != 0)
+					{
+						lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+						lua_pop (script->lua, 1);
+						return 0;
+					}
+					if (lua_type (script->lua, -2) == LUA_TSTRING)
+						type = lua_tostring (script->lua, -2);
+					else
+						lua_remove (script->lua, -2);
+					if (lua_type (script->lua, -1) == LUA_TSTRING)
+						model = lua_tostring (script->lua, -1);
+					else
+						lua_remove (script->lua, -1);
+				}
+				else
+					lua_pop (script->lua, 2);
+			}
+			if (type != NULL)
+			{
+				assert (script != NULL);
+				ret = (sqlite3_bind_text (statement, col++, type, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+				lua_pop (script->lua, 1);
+			}
+			else
+				ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
+			if (model != NULL)
+			{
+				assert (script != NULL);
+				ret = (ret || sqlite3_bind_text (statement, col++, model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+				lua_pop (script->lua, 1);
+			}
+			else
+				ret = (ret || sqlite3_bind_null (statement, col++) != SQLITE_OK);
+			if (ret)
+			{
+				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+				sqlite3_finalize (statement);
+				return 0;
+			}
+
 			/* Write values. */
 			if (sqlite3_step (statement) != SQLITE_DONE)
 			{
@@ -590,13 +663,6 @@ lisrv_object_serialize (liengObject* self,
 			/* Write animation data. */
 			if (self->script != NULL)
 				private_write_animations (self);
-
-			/* Save script data. */
-			if (self->script != NULL)
-			{
-				if (!private_write_variables (self))
-					return 0;
-			}
 		}
 	}
 
@@ -879,39 +945,6 @@ private_delete_animations (liengObject* self)
 }
 
 static int
-private_delete_variables (liengObject* self)
-{
-	const char* query;
-	liarcSql* sql;
-	sqlite3_stmt* statement;
-
-	sql = LISRV_OBJECT (self)->server->sql;
-
-	/* Clear script data. */
-	query = "DELETE from object_vars WHERE id=?;";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-		return 0;
-	}
-	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	return 1;
-}
-
-static int
 private_read_animations (liengObject* self)
 {
 	int ret;
@@ -964,95 +997,6 @@ private_read_animations (liengObject* self)
 }
 
 static int
-private_read_variables (liengObject* self)
-{
-	int ret;
-	const char* query;
-	liarcSql* sql;
-	liscrScript* script;
-	sqlite3_stmt* statement;
-
-	sql = LISRV_OBJECT (self)->server->sql;
-	script = LISRV_OBJECT (self)->server->script;
-
-	/* Get custom deserialization function. */
-	liscr_pushdata (script->lua, self->script);
-	lua_pushstring (script->lua, "loaded");
-	lua_gettable (script->lua, -2);
-	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
-	{
-		lua_pop (script->lua, 2);
-		return 1;
-	}
-
-	/* Prepare statement. */
-	query = "SELECT name,value FROM object_vars WHERE id=?;";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-		lua_pop (script->lua, 1);
-		return 0;
-	}
-	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		lua_pop (script->lua, 1);
-		return 0;
-	}
-
-	/* Execute statement. */
-	liscr_pushdata (script->lua, self->script);
-	lua_newtable (script->lua);
-	while (1)
-	{
-		ret = sqlite3_step (statement);
-		if (ret == SQLITE_DONE)
-		{
-			sqlite3_finalize (statement);
-			break;
-		}
-		if (ret != SQLITE_ROW)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-			sqlite3_finalize (statement);
-			lua_pop (script->lua, 3);
-			return 0;
-		}
-		if (sqlite3_column_type (statement, 0) != SQLITE_TEXT)
-			continue;
-		switch (sqlite3_column_type (statement, 1))
-		{
-			case SQLITE_TEXT:
-				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 0));
-				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 1));
-				lua_settable (script->lua, -3);
-				break;
-			case SQLITE_INTEGER:
-				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 0));
-				lua_pushnumber (script->lua, sqlite3_column_int (statement, 1));
-				lua_settable (script->lua, -3);
-				break;
-			case SQLITE_FLOAT:
-				lua_pushstring (script->lua, (char*) sqlite3_column_text (statement, 0));
-				lua_pushnumber (script->lua, sqlite3_column_double (statement, 1));
-				lua_settable (script->lua, -3);
-				break;
-		}
-	}
-
-	/* Deserialize fields. */
-	if (lua_pcall (script->lua, 2, 0, 0) != 0)
-	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
-		lua_pop (script->lua, 1);
-		return 0;
-	}
-
-	return 1;
-}
-
-static int
 private_write_animations (liengObject* self)
 {
 	const char* query;
@@ -1099,108 +1043,6 @@ private_write_animations (liengObject* self)
 		}
 		sqlite3_finalize (statement);
 	}
-
-	return 1;
-}
-
-static int
-private_write_variables (liengObject* self)
-{
-	int ret;
-	double value_num;
-	const char* value_str;
-	const char* key;
-	const char* query;
-	liarcSql* sql;
-	liscrScript* script;
-	sqlite3_stmt* statement;
-
-	sql = LISRV_OBJECT (self)->server->sql;
-	script = LISRV_OBJECT (self)->server->script;
-
-	/* Get custom serialization function. */
-	liscr_pushdata (script->lua, self->script);
-	lua_pushstring (script->lua, "saved");
-	lua_gettable (script->lua, -2);
-	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
-	{
-		lua_pop (script->lua, 2);
-		return 1;
-	}
-
-	/* Get custom serialization fields. */
-	lua_pushvalue (script->lua, -2);
-	lua_remove (script->lua, -3);
-	if (lua_pcall (script->lua, 1, 1, 0) != 0)
-	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
-		lua_pop (script->lua, 1);
-		return 0;
-	}
-	if (lua_type (script->lua, -1) != LUA_TTABLE)
-	{
-		lua_pop (script->lua, 1);
-		return 1;
-	}
-
-	/* Insert fields to the database. */
-	lua_pushnil (script->lua);
-	while (lua_next (script->lua, -2) != 0)
-	{
-		/* Check for valid types. */
-		if (lua_type (script->lua, -2) != LUA_TSTRING ||
-		   (lua_type (script->lua, -1) != LUA_TSTRING &&
-		    lua_type (script->lua, -1) != LUA_TNUMBER))
-		{
-			lua_pop (script->lua, 1);
-			continue;
-		}
-		key = lua_tostring (script->lua, -2);
-
-		/* Prepare statement. */
-		query = "INSERT INTO object_vars (id,name,value) VALUES (?,?,?);";
-		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-			lua_pop (script->lua, 3);
-			return 0;
-		}
-
-		/* Bind values. */
-		if (lua_type (script->lua, -1) == LUA_TSTRING)
-		{
-			value_str = lua_tostring (script->lua, -1);
-			ret = (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK ||
-			       sqlite3_bind_text (statement, 2, key, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-			       sqlite3_bind_text (statement, 3, value_str, -1, SQLITE_TRANSIENT) != SQLITE_OK);
-		}
-		else
-		{
-			value_num = lua_tonumber (script->lua, -1);
-			ret = (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK ||
-			       sqlite3_bind_text (statement, 2, key, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-			       sqlite3_bind_double (statement, 3, value_num) != SQLITE_OK);
-		}
-		if (ret)
-		{
-			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-			sqlite3_finalize (statement);
-			lua_pop (script->lua, 3);
-			return 0;
-		}
-
-		/* Execute statement. */
-		if (sqlite3_step (statement) != SQLITE_DONE)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-			sqlite3_finalize (statement);
-			lua_pop (script->lua, 3);
-			return 0;
-		}
-		sqlite3_finalize (statement);
-		lua_pop (script->lua, 1);
-	}
-	lua_pop (script->lua, 1);
 
 	return 1;
 }

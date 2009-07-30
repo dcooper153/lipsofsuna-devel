@@ -666,7 +666,8 @@ private_init_sql (lisrvServer* self)
 		"flags UNSIGNED INTEGER,angx REAL,angy REAL,angz REAL,posx REAL,"
 		"posy REAL,posz REAL,rotx REAL,roty REAL,rotz REAL,rotw REAL,"
 		"mass REAL,move REAL,speed REAL,step REAL,colgrp UNSIGNED INTEGER,"
-		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,shape UNSIGNED INTEGER);";
+		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,shape UNSIGNED INTEGER,"
+		"type TEXT,extra TEXT);";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
@@ -674,21 +675,6 @@ private_init_sql (lisrvServer* self)
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Create object variable table. */
-	query = "CREATE TABLE IF NOT EXISTS object_vars "
-		"(id INTEGER REFERENCES objects(id),name TEXT,type INTEGER,value TEXT);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}

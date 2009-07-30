@@ -270,8 +270,9 @@ ligen_generator_main (ligenGenerator* self)
 	printf ("Strokes: %d\n", i);
 
 	/* Generate geometry. */
-	ligen_generator_rebuild_scene (self);
-	ligen_generator_write (self);
+	if (!ligen_generator_rebuild_scene (self) ||
+	    !ligen_generator_write (self))
+		return 0;
 
 	return 1;
 }
@@ -447,8 +448,8 @@ ligen_generator_write (ligenGenerator* self)
 			/* Prepare statement. */
 			query = "INSERT OR REPLACE INTO objects "
 				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
-				"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model) VALUES "
-				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+				"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model,type,extra) VALUES "
+				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
 			{
 				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
@@ -478,7 +479,9 @@ ligen_generator_write (ligenGenerator* self)
 				sqlite3_bind_int (statement, col++, LIPHY_DEFAULT_COLLISION_MASK) != SQLITE_OK ||
 				sqlite3_bind_int (statement, col++, LIPHY_CONTROL_MODE_NONE) != SQLITE_OK ||
 				sqlite3_bind_int (statement, col++, LIPHY_SHAPE_MODE_CONCAVE) != SQLITE_OK ||
-				sqlite3_bind_text (statement, col++, object->model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+				sqlite3_bind_text (statement, col++, object->model, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+				sqlite3_bind_text (statement, col++, object->type, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+				sqlite3_bind_text (statement, col++, object->extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
 			if (ret)
 			{
 				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->srvsql));
