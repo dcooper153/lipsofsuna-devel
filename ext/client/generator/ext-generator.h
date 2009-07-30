@@ -29,16 +29,6 @@
 
 #include <client/lips-client.h>
 #include <generator/lips-generator.h>
-#include "ext-match.h"
-#include "ext-rule.h"
-
-typedef struct _liextStatistics liextStatistics;
-struct _liextStatistics
-{
-	int rules_known;
-	int rules_expand;
-	int selected_rule;
-};
 
 typedef struct _liextGenerator liextGenerator;
 struct _liextGenerator
@@ -46,11 +36,6 @@ struct _liextGenerator
 	licliModule* module;
 	ligenGenerator* generator;
 	lirndScene* scene;
-	struct
-	{
-		int count;
-		liextRule** array;
-	} rules;
 };
 
 liextGenerator*
@@ -60,39 +45,11 @@ void
 liext_generator_free (liextGenerator* self);
 
 int
-liext_generator_create_object (liextGenerator*       self,
-                               liengModel*           model,
-                               const limatTransform* transform);
-
-liextMatch*
-liext_generator_find_match (liextGenerator* self,
-                            int             rule,
-                            int             line,
-                            liengObject*    root);
-
-int
-liext_generator_find_rule (liextGenerator* self);
-
-int
-liext_generator_insert_rule (liextGenerator* self);
-
-int
 liext_generator_load (liextGenerator* self,
                       const char*     path);
 
-void
-liext_generator_remove_rule (liextGenerator* self,
-                             int             rule);
-
-int
-liext_generator_run (liextGenerator* self);
-
 int
 liext_generator_save (liextGenerator* self);
-
-void
-liext_generator_get_statistics (liextGenerator*  self,
-                                liextStatistics* value);
 
 #endif
 

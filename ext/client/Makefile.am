@@ -70,12 +70,8 @@ libgenerator_cli_la_SOURCES = \
 	generator/ext-dialog.h \
 	generator/ext-generator.c \
 	generator/ext-generator.h \
-	generator/ext-match.c \
-	generator/ext-match.h \
 	generator/ext-module.c \
 	generator/ext-module.h \
-	generator/ext-rule.c \
-	generator/ext-rule.h \
 	generator/ext-script.c
 
 liboptions_cli_la_CFLAGS = $(LICLI_CFLAGS)
