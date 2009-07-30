@@ -28,6 +28,7 @@
 #include <math/lips-math.h>
 #include <voxel/lips-voxel.h>
 #include "generator-rule.h"
+#include "generator-types.h"
 
 typedef struct _ligenBrushobject ligenBrushobject;
 struct _ligenBrushobject
@@ -41,12 +42,12 @@ struct _ligenBrushobject
 	limatTransform transform;
 };
 
-typedef struct _ligenBrush ligenBrush;
 struct _ligenBrush
 {
 	int id;
 	int size[3];
 	char* name;
+	ligenGenerator* generator;
 	struct
 	{
 		int count;
@@ -65,9 +66,10 @@ struct _ligenBrush
 };
 
 ligenBrush*
-ligen_brush_new (int width,
-                 int height,
-                 int depth);
+ligen_brush_new (ligenGenerator* generator,
+                 int             width,
+                 int             height,
+                 int             depth);
 
 void
 ligen_brush_free (ligenBrush* self);
@@ -78,8 +80,15 @@ ligen_brush_insert_rule (ligenBrush* self,
 
 int
 ligen_brush_read_rules (ligenBrush* self,
-                        liarcSql*   sql,
-                        int         id);
+                        liarcSql*   sql);
+
+void
+ligen_brush_remove_rule (ligenBrush* self,
+                         int         index);
+
+void
+ligen_brush_remove_strokes (ligenBrush* self,
+                            int         brush);
 
 int
 ligen_brush_write (ligenBrush* self,

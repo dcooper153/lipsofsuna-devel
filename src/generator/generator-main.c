@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <time.h>
 #include "generator.h"
 #undef main
 

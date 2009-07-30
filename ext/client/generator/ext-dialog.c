@@ -118,6 +118,12 @@ private_populate_rules (liextDialog* self);
 static void
 private_populate_strokes (liextDialog* self);
 
+static int
+private_get_active (liextDialog*      self,
+                    ligenBrush**      brush,
+                    ligenRule**       rule,
+                    ligenRulestroke** stroke);
+
 /****************************************************************************/
 
 const liwdgClass liextDialogType =
@@ -311,6 +317,7 @@ error:
 static void
 private_free (liextDialog* self)
 {
+	free (self->brushes.array);
 }
 
 static int
@@ -337,7 +344,7 @@ private_add_brush (liextDialog* self,
 	ligenBrush* brush;
 
 	/* Create new brush. */
-	brush = ligen_brush_new (10, 10, 10);
+	brush = ligen_brush_new (self->generator->generator, 10, 10, 10);
 	if (brush == NULL)
 		return 0;
 	if (!ligen_generator_insert_brush (self->generator->generator, brush))
@@ -360,9 +367,8 @@ private_add_rule (liextDialog* self,
 	ligenRule* rule;
 
 	/* Get active brush. */
-	if (self->generator->generator->brushes.count <= self->active_brush)
+	if (private_get_active (self, &brush, NULL, NULL) < 1)
 		return 0;
-	brush = self->generator->generator->brushes.array[self->active_brush];
 
 	/* Create new rule. */
 	rule = ligen_rule_new ();
@@ -387,12 +393,8 @@ private_add_stroke (liextDialog* self,
 	ligenRule* rule;
 
 	/* Get active rule. */
-	if (self->generator->generator->brushes.count <= self->active_brush)
+	if (private_get_active (self, &brush, &rule, NULL) < 2)
 		return 0;
-	brush = self->generator->generator->brushes.array[self->active_brush];
-	if (brush->rules.count <= self->active_rule)
-		return 0;
-	rule = brush->rules.array[self->active_rule];
 
 	/* Create new stroke. */
 	ligen_rule_insert_stroke (rule, 0, 0, 0, 0, 0);
@@ -405,24 +407,25 @@ static int
 private_edit_stroke (liextDialog* self,
                      liwdgWidget* widget)
 {
+	int i;
 	ligenBrush* brush;
 	ligenRule* rule;
 	ligenRulestroke* stroke;
 
 	/* Get active stroke. */
-	if (self->generator->generator->brushes.count <= self->active_brush)
+	if (private_get_active (self, &brush, &rule, &stroke) < 3)
 		return 0;
-	brush = self->generator->generator->brushes.array[self->active_brush];
-	if (brush->rules.count <= self->active_rule)
-		return 0;
-	rule = brush->rules.array[self->active_rule];
-	if (rule->strokes.count <= self->active_stroke)
-		return 0;
-	stroke = rule->strokes.array + self->active_stroke;
 
 	/* FIXME: Popup a proper dialog. */
-	stroke->brush += 1;
-	stroke->brush %= self->generator->generator->brushes.count;
+	for (i = 0 ; i < self->brushes.count ; i++)
+	{
+		if (self->brushes.array[i] == stroke->brush)
+			break;
+	}
+	if (i < self->brushes.count - 1)
+		stroke->brush = self->brushes.array[i + 1];
+	else
+		stroke->brush = self->brushes.array[0];
 	private_populate_strokes (self);
 
 	return 0;
@@ -432,6 +435,14 @@ static int
 private_remove_brush (liextDialog* self,
                       liwdgWidget* widget)
 {
+	ligenBrush* brush;
+
+	/* Get active brush. */
+	if (private_get_active (self, &brush, NULL, NULL) < 1)
+		return 0;
+
+	/* Remove the brush. */
+	ligen_generator_remove_brush (self->generator->generator, brush->id);
 	private_populate_brushes (self);
 	private_populate_rules (self);
 	private_populate_strokes (self);
@@ -443,6 +454,15 @@ static int
 private_remove_rule (liextDialog* self,
                      liwdgWidget* widget)
 {
+	ligenBrush* brush;
+	ligenRule* rule;
+
+	/* Get active rule. */
+	if (private_get_active (self, &brush, &rule, NULL) < 2)
+		return 0;
+
+	/* Remove the rule. */
+	ligen_brush_remove_rule (brush, rule->id);
 	private_populate_rules (self);
 	private_populate_strokes (self);
 
@@ -453,6 +473,16 @@ static int
 private_remove_stroke (liextDialog* self,
                        liwdgWidget* widget)
 {
+	ligenBrush* brush;
+	ligenRule* rule;
+	ligenRulestroke* stroke;
+
+	/* Get active stroke. */
+	if (private_get_active (self, &brush, &rule, &stroke) < 3)
+		return 0;
+
+	/* Remove the rule. */
+	ligen_rule_remove_stroke (rule, self->active_stroke);
 	private_populate_strokes (self);
 
 	return 0;
@@ -570,18 +600,11 @@ private_move (liextDialog* self,
 	ligenRule* rule;
 	ligenRulestroke* stroke;
 
-	/* Get active rule. */
-	if (self->generator->generator->brushes.count <= self->active_brush)
+	/* Get active stroke. */
+	if (private_get_active (self, &brush, &rule, &stroke) < 3)
 		return;
-	brush = self->generator->generator->brushes.array[self->active_brush];
-	if (brush->rules.count <= self->active_rule)
-		return;
-	rule = brush->rules.array[self->active_rule];
-	if (rule->strokes.count <= self->active_stroke)
-		return;
-	stroke = rule->strokes.array + self->active_stroke;
 
-	/* Move rule. */
+	/* Move stroke. */
 	stroke->pos[0] += dx;
 	stroke->pos[1] += dy;
 	stroke->pos[2] += dz;
@@ -628,10 +651,17 @@ private_render_preview (liwdgWidget* widget,
                         liextDialog* self)
 {
 	int i;
+	int id;
 	int x[2];
 	int y[2];
 	int z[2];
 	ligenStroke* stroke;
+	ligenBrush* brush;
+
+	if (private_get_active (self, &brush, NULL, NULL) < 1)
+		id = -1;
+	else
+		id = brush->id;
 
 	/* Render stroke bounds. */
 	glDisable (GL_DEPTH_TEST);
@@ -641,7 +671,7 @@ private_render_preview (liwdgWidget* widget,
 	for (i = 0 ; i < self->generator->generator->strokes.count ; i++)
 	{
 		stroke = self->generator->generator->strokes.array + i;
-		if (stroke->brush == self->active_brush &&
+		if (stroke->brush == id &&
 		    stroke->pos[0] == LIEXT_PREVIEW_CENTER &&
 		    stroke->pos[1] == LIEXT_PREVIEW_CENTER &&
 		    stroke->pos[2] == LIEXT_PREVIEW_CENTER)
@@ -688,7 +718,9 @@ static void
 private_populate_brushes (liextDialog* self)
 {
 	int i;
+	int* tmp;
 	char buffer[256];
+	lialgU32dicIter iter;
 	ligenBrush* brush;
 	liwdgWidget* widget;
 	liwdgWidget* group;
@@ -697,17 +729,39 @@ private_populate_brushes (liextDialog* self)
 	group = self->group_brushes;
 	liwdg_group_set_size (LIWDG_GROUP (group), 1, 0);
 
-	for (i = 0 ; i < self->generator->generator->brushes.count ; i++)
+	/* Rebuild brush list. */
+	i = self->generator->generator->brushes->size;
+	tmp = realloc (self->brushes.array, i * sizeof (int));
+	if (tmp == NULL)
 	{
-		brush = self->generator->generator->brushes.array[i];
+		self->brushes.count = 0;
+		return;
+	}
+	self->brushes.count = i;
+	self->brushes.array = tmp;
+	i = 0;
+	LI_FOREACH_U32DIC (iter, self->generator->generator->brushes)
+	{
+		brush = iter.value;
+		self->brushes.array[i] = brush->id;
+		i++;
+	}
+
+	/* Rebuild brush group. */
+	i = 0;
+	LI_FOREACH_U32DIC (iter, self->generator->generator->brushes)
+	{
+		brush = iter.value;
+		assert (brush != NULL);
 		snprintf (buffer, 256, "%d. %s\n", i + 1, brush->name);
+		i++;
 
 		/* Create brush widget. */
 		widget = liwdg_label_new (LIWDG_WIDGET (self)->manager);
 		if (widget == NULL)
 			continue;
 		liwdg_label_set_text (LIWDG_LABEL (widget), buffer);
-		if (i == self->active_brush)
+		if (i - 1 == self->active_brush)
 			liwdg_label_set_highlight (LIWDG_LABEL (widget), 1);
 		liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0,
 			private_brush_selected, self, NULL);
@@ -735,9 +789,8 @@ private_populate_rules (liextDialog* self)
 	liwdg_group_set_size (LIWDG_GROUP (self->group_rules), 1, 0);
 
 	/* Get active brush. */
-	if (self->generator->generator->brushes.count <= self->active_brush)
+	if (private_get_active (self, &brush, NULL, NULL) < 1)
 		return;
-	brush = self->generator->generator->brushes.array[self->active_brush];
 
 	/* Populate rule list. */
 	for (i = 0 ; i < brush->rules.count ; i++)
@@ -785,12 +838,8 @@ private_populate_strokes (liextDialog* self)
 	ligen_generator_clear_scene (self->generator->generator);
 
 	/* Get active rule. */
-	if (self->generator->generator->brushes.count <= self->active_brush)
+	if (private_get_active (self, &brush, &rule, NULL) < 2)
 		return;
-	brush = self->generator->generator->brushes.array[self->active_brush];
-	if (brush->rules.count <= self->active_rule)
-		return;
-	rule = brush->rules.array[self->active_rule];
 	if (self->active_stroke > rule->strokes.count)
 		self->active_stroke = LI_MAX (0, rule->strokes.count);
 
@@ -846,6 +895,59 @@ private_populate_strokes (liextDialog* self)
 	projection = limat_matrix_perspective (45.0f, rect.width / rect.height, 1.0f, 100.0f);
 	liwdg_render_set_modelview (LIWDG_RENDER (self->render_strokes), &modelview);
 	liwdg_render_set_projection (LIWDG_RENDER (self->render_strokes), &projection);
+}
+
+static int
+private_get_active (liextDialog*      self,
+                    ligenBrush**      brush,
+                    ligenRule**       rule,
+                    ligenRulestroke** stroke)
+{
+	ligenBrush* brush_;
+	ligenRule* rule_;
+	ligenRulestroke* stroke_;
+
+	/* Get active brush. */
+	if (self->active_brush >= self->brushes.count)
+	{
+		if (brush != NULL) *brush = NULL;
+		if (rule != NULL) *rule = NULL;
+		if (stroke != NULL) *stroke = NULL;
+		return 0;
+	}
+	brush_ = ligen_generator_find_brush (self->generator->generator, self->brushes.array[self->active_brush]);
+	if (brush_ == NULL)
+	{
+		if (brush != NULL) *brush = NULL;
+		if (rule != NULL) *rule = NULL;
+		if (stroke != NULL) *stroke = NULL;
+		return 0;
+	}
+
+	/* Get active rule. */
+	if (brush_->rules.count <= self->active_rule)
+	{
+		if (brush != NULL) *brush = brush_;
+		if (rule != NULL) *rule = NULL;
+		if (stroke != NULL) *stroke = NULL;
+		return 1;
+	}
+	rule_ = brush_->rules.array[self->active_rule];
+
+	/* Get active stroke. */
+	if (rule_->strokes.count <= self->active_stroke)
+	{
+		if (brush != NULL) *brush = brush_;
+		if (rule != NULL) *rule = rule_;
+		if (stroke != NULL) *stroke = NULL;
+		return 2;
+	}
+	stroke_ = rule_->strokes.array + self->active_stroke;
+	if (brush != NULL) *brush = brush_;
+	if (rule != NULL) *rule = rule_;
+	if (stroke != NULL) *stroke = stroke_;
+
+	return 3;
 }
 
 /** @} */

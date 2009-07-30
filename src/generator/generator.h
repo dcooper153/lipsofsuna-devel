@@ -25,11 +25,13 @@
 #ifndef __GENERATOR_H__
 #define __GENERATOR_H__
 
+#include <algorithm/lips-algorithm.h>
 #include <archive/lips-archive.h>
 #include <paths/lips-paths.h>
 #include <system/lips-system.h>
 #include <voxel/lips-voxel.h>
 #include "generator-brush.h"
+#include "generator-types.h"
 
 typedef struct _ligenStroke ligenStroke;
 struct _ligenStroke
@@ -39,20 +41,15 @@ struct _ligenStroke
 	int brush;
 };
 
-typedef struct _ligenGenerator ligenGenerator;
 struct _ligenGenerator
 {
+	lialgU32dic* brushes;
 	liarcSql* gensql;
 	liarcSql* srvsql;
 	lipthPaths* paths;
 	liphyPhysics* physics;
 	livoxManager* voxels;
 	livoxVoxel fill;
-	struct
-	{
-		int count;
-		ligenBrush** array;
-	} brushes;
 	struct
 	{
 		int count;
@@ -76,6 +73,10 @@ ligen_generator_free (ligenGenerator* self);
 void
 ligen_generator_clear_scene (ligenGenerator* self);
 
+ligenBrush*
+ligen_generator_find_brush (ligenGenerator* self,
+                            int             id);
+
 int
 ligen_generator_insert_brush (ligenGenerator* self,
                               ligenBrush*     brush);
@@ -92,6 +93,10 @@ ligen_generator_main (ligenGenerator* self);
 
 int
 ligen_generator_rebuild_scene (ligenGenerator* self);
+
+void
+ligen_generator_remove_brush (ligenGenerator* self,
+                              int             id);
 
 int
 ligen_generator_step (ligenGenerator* self);

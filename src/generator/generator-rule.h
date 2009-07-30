@@ -66,6 +66,10 @@ ligen_rule_insert_stroke (ligenRule* self,
                           int        flags,
                           int        brush);
 
+void
+ligen_rule_remove_stroke (ligenRule* self,
+                          int        index);
+
 #endif
 
 /** @} */

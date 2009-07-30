@@ -60,6 +60,11 @@ struct _liextDialog
 	int active_rule;
 	int active_stroke;
 	float timer;
+	struct
+	{
+		int count;
+		int* array;
+	} brushes;
 };
 
 extern const liwdgClass liextDialogType;

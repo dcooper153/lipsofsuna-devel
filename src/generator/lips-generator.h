@@ -26,6 +26,7 @@
 #include "generator.h"
 #include "generator-brush.h"
 #include "generator-rule.h"
+#include "generator-types.h"
 
 #endif
 

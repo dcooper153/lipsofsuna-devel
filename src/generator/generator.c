@@ -138,10 +138,14 @@ error:
 void
 ligen_generator_free (ligenGenerator* self)
 {
-	int i;
+	lialgU32dicIter iter;
 
-	for (i = 0 ; i < self->brushes.count ; i++)
-		ligen_brush_free (self->brushes.array[i]);
+	if (self->brushes != NULL)
+	{
+		LI_FOREACH_U32DIC (iter, self->brushes)
+			ligen_brush_free (iter.value);
+		lialg_u32dic_free (self->brushes);
+	}
 	if (self->voxels != NULL)
 		livox_manager_free (self->voxels);
 	if (self->physics != NULL)
@@ -152,7 +156,6 @@ ligen_generator_free (ligenGenerator* self)
 		sqlite3_close (self->srvsql);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
-	free (self->brushes.array);
 	free (self->strokes.array);
 	free (self);
 }
@@ -176,6 +179,19 @@ ligen_generator_clear_scene (ligenGenerator* self)
 }
 
 /**
+ * \brief Finds a brush by id.
+ *
+ * \param self Generator.
+ * \return Brush or NULL.
+ */
+ligenBrush*
+ligen_generator_find_brush (ligenGenerator* self,
+                            int             id)
+{
+	return lialg_u32dic_find (self->brushes, id);
+}
+
+/**
  * \brief Inserts a brush to the generator.
  *
  * The ownership of the brush is transferred to the generator if successful.
@@ -188,9 +204,26 @@ int
 ligen_generator_insert_brush (ligenGenerator* self,
                               ligenBrush*     brush)
 {
-	if (!lialg_array_append (&self->brushes, &brush))
+	int i;
+
+	if (brush->id >= 0)
+	{
+		i = brush->id;
+		if (lialg_u32dic_find (self->brushes, i) != NULL)
+		{
+			assert (0);
+			return 0;
+		}
+	}
+	else
+	{
+		for (i = 0 ; lialg_u32dic_find (self->brushes, i) != NULL ; i++)
+		{
+		}
+	}
+	if (!lialg_u32dic_insert (self->brushes, i, brush))
 		return 0;
-	brush->id = self->brushes.count - 1;
+	brush->id = i;
 
 	return 1;
 }
@@ -215,10 +248,8 @@ ligen_generator_insert_stroke (ligenGenerator* self,
 	ligenBrush* brush_;
 	ligenStroke stroke;
 
-	assert (brush >= 0);
-	assert (brush < self->brushes.count);
-
-	brush_ = self->brushes.array[brush];
+	brush_ = lialg_u32dic_find (self->brushes, brush);
+	assert (brush_ != NULL);
 	stroke.pos[0] = x;
 	stroke.pos[1] = y;
 	stroke.pos[2] = z;
@@ -246,9 +277,9 @@ ligen_generator_main (ligenGenerator* self)
 	ligenStroke stroke;
 
 	/* FIXME: This should be configurable. */
-	if (self->brushes.count > 0)
+	brush = lialg_u32dic_find (self->brushes, 0);
+	if (brush != NULL);
 	{
-		brush = self->brushes.array[0];
 		stroke.pos[0] = 8160 - brush->size[0] / 2;
 		stroke.pos[1] = 8160 - brush->size[1] / 2;
 		stroke.pos[2] = 8160 - brush->size[2] / 2;
@@ -307,6 +338,35 @@ ligen_generator_rebuild_scene (ligenGenerator* self)
 }
 
 /**
+ * \brief Removes a brush from the generator.
+ *
+ * The brush and all the strokes referencing it are removed.
+ *
+ * \param self Generator.
+ * \param id Brush number.
+ */
+void
+ligen_generator_remove_brush (ligenGenerator* self,
+                              int             id)
+{
+	lialgU32dicIter iter;
+	ligenBrush* brush;
+
+	/* Find brush. */
+	brush = lialg_u32dic_find (self->brushes, id);
+	if (brush == NULL)
+		return;
+
+	/* Clear references. */
+	LI_FOREACH_U32DIC (iter, self->brushes)
+		ligen_brush_remove_strokes (iter.value, id);
+
+	/* Free brush. */
+	lialg_u32dic_remove (self->brushes, id);
+	ligen_brush_free (brush);
+}
+
+/**
  * \brief Extends the map by one rule.
  *
  * \param self Generator.
@@ -326,7 +386,8 @@ ligen_generator_step (ligenGenerator* self)
 		/* The stroke array may be reallocated in private_rule_apply
 		 * so we need to create a copy of the stroke here. */
 		stroke = self->strokes.array[i];
-		brush = self->brushes.array[stroke.brush];
+		brush = lialg_u32dic_find (self->brushes, stroke.brush);
+		assert (brush != NULL);
 		for (j = 0 ; j < brush->rules.count ; j++)
 		{
 			rule = brush->rules.array[j];
@@ -388,7 +449,8 @@ ligen_generator_write (ligenGenerator* self)
 	for (i = 0 ; i < self->strokes.count ; i++)
 	{
 		stroke = self->strokes.array + i;
-		brush = self->brushes.array[stroke->brush];
+		brush = lialg_u32dic_find (self->brushes, stroke->brush);
+		assert (brush != NULL);
 		for (j = 0 ; j < brush->objects.count ; j++)
 		{
 			object = brush->objects.array[j];
@@ -512,11 +574,73 @@ ligen_generator_write (ligenGenerator* self)
 int
 ligen_generator_write_brushes (ligenGenerator* self)
 {
-	int i;
+	const char* query;
+	lialgU32dicIter iter;
+	sqlite3_stmt* statement;
+
+	/* Remove old brushes. */
+	query = "DELETE FROM generator_brushes;";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Remove old rules. */
+	query = "DELETE FROM generator_rules;";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Remove old strokes. */
+	query = "DELETE FROM generator_strokes;";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Remove old objects. */
+	query = "DELETE FROM generator_objects;";
+	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
 
 	/* Save brushes. */
-	for (i = 0 ; i < self->brushes.count ; i++)
-		ligen_brush_write (self->brushes.array[i], self->gensql);
+	LI_FOREACH_U32DIC (iter, self->brushes)
+		ligen_brush_write (iter.value, self->gensql);
 
 	return 1;
 }
@@ -542,11 +666,17 @@ private_init_brushes (ligenGenerator* self)
 	char* name;
 	const char* query;
 	const void* bytes;
+	lialgU32dicIter iter;
 	liarcSql* sql;
 	ligenBrush* brush;
 	sqlite3_stmt* statement;
 
 	sql = self->gensql;
+
+	/* Allocate dictionary. */
+	self->brushes = lialg_u32dic_new ();
+	if (self->brushes == NULL)
+		return 0;
 
 	/* Prepare statement. */
 	query = "SELECT id,sizx,sizy,sizz,name,voxels FROM generator_brushes;";
@@ -578,12 +708,13 @@ private_init_brushes (ligenGenerator* self)
 		size[2] = LI_MAX (1, size[2]);
 
 		/* Create new brush. */
-		brush = ligen_brush_new (size[0], size[1], size[2]);
+		brush = ligen_brush_new (self, size[0], size[1], size[2]);
 		if (brush == NULL)
 		{
 			sqlite3_finalize (statement);
 			return 0;
 		}
+		brush->id = id;
 		if (!ligen_generator_insert_brush (self, brush))
 		{
 			ligen_brush_free (brush);
@@ -612,15 +743,18 @@ private_init_brushes (ligenGenerator* self)
 		size1 = size[0] * size[1] * size[2] * sizeof (livoxVoxel);
 		if (size0 == size1)
 			memcpy (brush->voxels.array, bytes, size1);
+	}
+	sqlite3_finalize (statement);
 
-		/* Read rules. */
-		if (!ligen_brush_read_rules (brush, sql, id))
+	/* Read rules. */
+	LI_FOREACH_U32DIC (iter, self->brushes)
+	{
+		if (!ligen_brush_read_rules (iter.value, sql))
 		{
 			sqlite3_finalize (statement);
 			return 0;
 		}
 	}
-	sqlite3_finalize (statement);
 
 	return 1;
 }
@@ -755,11 +889,9 @@ private_brush_exists (ligenGenerator*  self,
 {
 	int i;
 	int pos[3];
-	ligenBrush* brush;
 	ligenStroke* stroke1;
 
 	/* Calculate world position. */
-	brush = self->brushes.array[rstroke->brush];
 	pos[0] = stroke->pos[0] + rstroke->pos[0];
 	pos[1] = stroke->pos[1] + rstroke->pos[1];
 	pos[2] = stroke->pos[2] + rstroke->pos[2];
@@ -769,7 +901,7 @@ private_brush_exists (ligenGenerator*  self,
 	for (i = 0 ; i < self->strokes.count ; i++)
 	{
 		stroke1 = self->strokes.array + i;
-		if (stroke1->brush == brush->id &&
+		if (stroke1->brush == rstroke->brush &&
 		    stroke1->pos[0] == pos[0] &&
 		    stroke1->pos[1] == pos[1] &&
 		    stroke1->pos[2] == pos[2])
@@ -793,7 +925,8 @@ private_brush_intersects (ligenGenerator*  self,
 	ligenStroke* stroke1;
 
 	/* Calculate world position. */
-	brush = self->brushes.array[rstroke->brush];
+	brush = lialg_u32dic_find (self->brushes, rstroke->brush);
+	assert (brush != NULL);
 	min0[0] = stroke->pos[0] + rstroke->pos[0];
 	min0[1] = stroke->pos[1] + rstroke->pos[1];
 	min0[2] = stroke->pos[2] + rstroke->pos[2];
@@ -837,7 +970,8 @@ private_rule_apply (ligenGenerator* self,
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
 		rstroke = rule->strokes.array + i;
-		brush = self->brushes.array[rstroke->brush];
+		brush = lialg_u32dic_find (self->brushes, rstroke->brush);
+		assert (brush != NULL);
 		stroke1.pos[0] = stroke->pos[0] + rstroke->pos[0];
 		stroke1.pos[1] = stroke->pos[1] + rstroke->pos[1];
 		stroke1.pos[2] = stroke->pos[2] + rstroke->pos[2];
@@ -897,7 +1031,8 @@ private_stroke_paint (ligenGenerator* self,
 	livoxSector* sector;
 
 	/* Determine affected sectors. */
-	brush = self->brushes.array[stroke->brush];
+	brush = lialg_u32dic_find (self->brushes, stroke->brush);
+	assert (brush != NULL);
 	min[0] = (stroke->pos[0]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	min[1] = (stroke->pos[1]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	min[2] = (stroke->pos[2]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);

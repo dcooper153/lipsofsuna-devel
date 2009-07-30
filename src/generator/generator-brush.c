@@ -22,17 +22,16 @@
  * @{
  */
 
+#include "generator.h"
 #include "generator-brush.h"
 
 static int
 private_read_objects (ligenBrush* self,
-                      liarcSql*   sql,
-                      int         id);
+                      liarcSql*   sql);
 
 static int
 private_read_rules (ligenBrush* self,
-                    liarcSql*   sql,
-                    int         id);
+                    liarcSql*   sql);
 
 static int
 private_write_rule (ligenBrush* self,
@@ -56,15 +55,17 @@ private_write_stroke (ligenBrush*      self,
 /**
  * \brief Creates a new brush.
  *
+ * \param generator Generator.
  * \param width Width in voxels.
  * \param height Height in voxels.
  * \param depth Depth in voxels.
  * \return New brush or NULL.
  */
 ligenBrush*
-ligen_brush_new (int width,
-                 int height,
-                 int depth)
+ligen_brush_new (ligenGenerator* generator,
+                 int             width,
+                 int             height,
+                 int             depth)
 {
 	ligenBrush* self;
 
@@ -75,6 +76,8 @@ ligen_brush_new (int width,
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
+	self->generator = generator;
+	self->id = -1;
 	self->size[0] = width;
 	self->size[1] = height;
 	self->size[2] = depth;
@@ -144,16 +147,80 @@ ligen_brush_insert_rule (ligenBrush* self,
  *
  * \param self Brush.
  * \param sql Database.
- * \param id Brush number.
  * \return Nonzero on success.
  */
 int
 ligen_brush_read_rules (ligenBrush* self,
-                        liarcSql*   sql,
-                        int         id)
+                        liarcSql*   sql)
 {
-	return private_read_rules (self, sql, id) &&
-	       private_read_objects (self, sql, id);
+	return private_read_rules (self, sql) &&
+	       private_read_objects (self, sql);
+}
+
+/**
+ * \brief Removes a rule from the brush.
+ *
+ * The numbers of the other rules may be altered.
+ *
+ * \param self Brush.
+ * \param index Rule number.
+ */
+void
+ligen_brush_remove_rule (ligenBrush* self,
+                         int         index)
+{
+	int i;
+	ligenRule* rule;
+
+	assert (index >= 0);
+	assert (index < self->rules.count);
+
+	ligen_rule_free (self->rules.array[index]);
+	lialg_array_remove (&self->rules, index);
+
+	for (i = 0 ; i < self->rules.count ; i++)
+	{
+		rule = self->rules.array[index];
+		rule->id = i;
+	}
+}
+
+/**
+ * \brief Removes all strokes that use the brush with the given id.
+ *
+ * Loops through all rules their strokes. If a stroke is found that references
+ * the given brush id, the stroke is removed. Any rules that become empty are
+ * also removed.
+ *
+ * \param self Brush.
+ * \param brush Brush number.
+ */
+void
+ligen_brush_remove_strokes (ligenBrush* self,
+                            int         brush)
+{
+	int i;
+	int j;
+	ligenRule* rule;
+
+	for (i = 0 ; i < self->rules.count ; i++)
+	{
+		rule = self->rules.array[i];
+		for (j = 0 ; j < rule->strokes.count ; j++)
+		{
+			if (rule->strokes.array[j].brush == brush)
+			{
+				lialg_array_remove (&rule->strokes, j);
+				j--;
+			}
+		}
+		if (!rule->strokes.count)
+		{
+			ligen_rule_free (rule);
+			lialg_array_remove (&self->rules, i);
+			i--;
+		}
+	}
 }
 
 /**
@@ -228,8 +295,7 @@ ligen_brush_write (ligenBrush* self,
 
 static int
 private_read_objects (ligenBrush* self,
-                      liarcSql*   sql,
-                      int         id)
+                      liarcSql*   sql)
 {
 	int i;
 	int col;
@@ -253,7 +319,7 @@ private_read_objects (ligenBrush* self,
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 		return 0;
 	}
-	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
@@ -389,8 +455,7 @@ error:
 
 static int
 private_read_rules (ligenBrush* self,
-                    liarcSql*   sql,
-                    int         id)
+                    liarcSql*   sql)
 {
 	int i;
 	int col;
@@ -419,7 +484,7 @@ private_read_rules (ligenBrush* self,
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 		return 0;
 	}
-	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
@@ -463,7 +528,7 @@ private_read_rules (ligenBrush* self,
 		rule = ligen_rule_new ();
 		if (rule == NULL)
 			goto error;
-		rule->id = id;
+		rule->id = ruleid;
 		if (name != NULL)
 		{
 			free (rule->name);
@@ -492,7 +557,7 @@ private_read_rules (ligenBrush* self,
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
 		return 0;
 	}
-	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
@@ -522,6 +587,8 @@ private_read_rules (ligenBrush* self,
 		if (ruleid < 0 || strokeid < 0 || paintid < 0)
 			continue;
 		if (ruleid >= rules.count)
+			continue;
+		if (ligen_generator_find_brush (self->generator, paintid) == NULL)
 			continue;
 
 		/* Insert stroke. */

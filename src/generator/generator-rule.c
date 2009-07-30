@@ -103,5 +103,21 @@ ligen_rule_insert_stroke (ligenRule* self,
 	return 1;
 }
 
+/**
+ * \brief Removes a stroke from the rule.
+ *
+ * \param self Rule.
+ * \param index Stroke index.
+ */
+void
+ligen_rule_remove_stroke (ligenRule* self,
+                          int        index)
+{
+	assert (index >= 0);
+	assert (index < self->strokes.count);
+
+	lialg_array_remove (&self->strokes, index);
+}
+
 /** @} */
 /** @} */
