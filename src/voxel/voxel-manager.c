@@ -129,6 +129,60 @@ livox_manager_clear (livoxManager* self)
 }
 
 /**
+ * \brief Copies a box of voxels from the currently loaded scene.
+ *
+ * \param self Voxel manager.
+ * \param xstart Start voxel in voxels in world space.
+ * \param ystart Start voxel in voxels in world space.
+ * \param zstart Start voxel in voxels in world space.
+ * \param xsize Number of voxels to copy.
+ * \param ysize Number of voxels to copy.
+ * \param zsize Number of voxels to copy.
+ * \param result Buffer with room for xsize*ysize*zsize voxels.
+ */
+void
+livox_manager_copy_voxels (livoxManager* self,
+                           int           xstart,
+                           int           ystart,
+                           int           zstart,
+                           int           xsize,
+                           int           ysize,
+                           int           zsize,
+                           livoxVoxel*   result)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	int sx;
+	int sy;
+	int sz;
+	int idx;
+	livoxSector* sec;
+
+	/* FIXME: Avoid excessive sector lookups. */
+	for (i = 0, z = zstart ; z < zstart + zsize ; z++)
+	for (y = ystart ; y < ystart + ysize ; y++)
+	for (x = xstart ; x < xstart + xsize ; x++, i++)
+	{
+		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		idx = LIVOX_SECTOR_INDEX (sx, sy, sz);
+		sec = livox_manager_find_sector (self, idx);
+		if (sec != NULL)
+		{
+			result[i] = livox_sector_get_voxel (sec,
+				x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
+				y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
+				z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
+		}
+		else
+			result[i] = livox_voxel_init (0, 0);
+	}
+}
+
+/**
  * \brief Creates an empty sector.
  *
  * If a sector with the same number already exists, it is returned instead of

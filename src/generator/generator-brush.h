@@ -94,6 +94,13 @@ int
 ligen_brush_write (ligenBrush* self,
                    liarcSql*   sql);
 
+void
+ligen_brush_set_voxel (ligenBrush* self,
+                       int         x,
+                       int         y,
+                       int         z,
+                       livoxVoxel  voxel);
+
 #endif
 
 /** @} */

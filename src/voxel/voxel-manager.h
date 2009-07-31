@@ -64,6 +64,16 @@ livoxSector*
 livox_manager_create_sector (livoxManager* self,
                              uint32_t      id);
 
+void
+livox_manager_copy_voxels (livoxManager* self,
+                           int           xstart,
+                           int           ystart,
+                           int           zstart,
+                           int           xsize,
+                           int           ysize,
+                           int           zsize,
+                           livoxVoxel*   result);
+
 livoxMaterial*
 livox_manager_find_material (livoxManager* self,
                              uint32_t      id);

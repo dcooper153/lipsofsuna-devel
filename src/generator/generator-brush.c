@@ -291,6 +291,26 @@ ligen_brush_write (ligenBrush* self,
 	return 1;
 }
 
+void
+ligen_brush_set_voxel (ligenBrush* self,
+                       int         x,
+                       int         y,
+                       int         z,
+                       livoxVoxel  voxel)
+{
+	int i;
+
+	assert (x >= 0);
+	assert (y >= 0);
+	assert (z >= 0);
+	assert (x < self->size[0]);
+	assert (y < self->size[1]);
+	assert (z < self->size[2]);
+
+	i = x + y * self->size[0] + z * self->size[1] * self->size[2];
+	self->voxels.array[i] = voxel;
+}
+
 /*****************************************************************************/
 
 static int

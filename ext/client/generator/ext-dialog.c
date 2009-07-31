@@ -352,6 +352,23 @@ private_add_brush (liextDialog* self,
 		ligen_brush_free (brush);
 		return 0;
 	}
+
+	/* FIXME: Copies voxels from around the player. */
+	if (self->module->network != NULL)
+	{
+		liengObject* player = licli_module_get_player (self->module);
+		if (player != NULL)
+		{
+			limatTransform t;
+			lieng_object_get_transform (player, &t);
+			int xmin = (int)(t.position.x / LIVOX_TILE_WIDTH) - brush->size[0] / 2;
+			int ymin = (int)(t.position.y / LIVOX_TILE_WIDTH) - brush->size[1] / 2;
+			int zmin = (int)(t.position.z / LIVOX_TILE_WIDTH) - brush->size[2] / 2;
+			livox_manager_copy_voxels (self->module->voxels, xmin, ymin, zmin,
+				brush->size[0], brush->size[1], brush->size[2], brush->voxels.array);
+		}
+	}
+
 	private_populate_brushes (self);
 	private_populate_rules (self);
 	private_populate_strokes (self);
