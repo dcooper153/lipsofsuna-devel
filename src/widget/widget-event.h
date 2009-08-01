@@ -53,47 +53,50 @@ typedef struct _liwdgEventUpdate liwdgEventUpdate;
 
 struct _liwdgEventAllocation
 {
-	uint32_t type;
+	int type;
 };
 
 struct _liwdgEventButton
 {
-	uint32_t type;
-	uint32_t x;
-	uint32_t y;
-	uint8_t  button;
+	int type;
+	int x;
+	int y;
+	int button;
 };
 
 struct _liwdgEventFocus
 {
-	uint32_t type;
-	uint8_t mouse;
+	int type;
+	int mouse;
 };
 
 struct _liwdgEventKey
 {
-	uint32_t type;
-	uint32_t keycode;
+	int type;
+	int keycode;
 	uint32_t unicode;
 	uint32_t modifiers;
 };
 
 struct _liwdgEventMotion
 {
-	uint32_t type;
-	uint32_t x;
-	uint32_t y;
+	int type;
+	int x;
+	int y;
+	int dx;
+	int dy;
+	int buttons;
 };
 
 struct _liwdgEventUpdate
 {
-	uint32_t type;
+	int type;
 	float secs;
 };
 
 union _liwdgEvent
 {
-	uint32_t type;
+	int type;
 	liwdgEventAllocation allocation;
 	liwdgEventButton button;
 	liwdgEventFocus focus;

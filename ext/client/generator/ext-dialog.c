@@ -138,7 +138,10 @@ liwdgWidget*
 liext_dialog_new (liwdgManager*   manager,
                   liextGenerator* generator)
 {
+	const float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const float equation[3] = { 1.0f, 0.0f, 0.001f };
 	liextDialog* data;
+	limatTransform transform;
 	liwdgWidget* self;
 
 	self = liwdg_widget_new (manager, &liextDialogType);
@@ -164,6 +167,37 @@ liext_dialog_new (liwdgManager*   manager,
 	liwdg_group_set_col_expand (LIWDG_GROUP (data->group_column), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (data->group_column), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (data->group_column), 0, 1, data->render_strokes);
+
+	/* Create camera. */
+	LIEXT_DIALOG (self)->camera = lieng_camera_new (generator->module->engine);
+	if (LIEXT_DIALOG (self)->camera == NULL)
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+	transform.position = limat_vector_init (
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f)/* - 15*/,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f) + 55,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f)/* - 30.0f*/);
+	transform.rotation = limat_quaternion_look (
+		limat_vector_init (0.0f, -1.0f, 0.0f),
+		limat_vector_init (0.0f, 0.0f, 1.0f));
+	lieng_camera_set_clip (LIEXT_DIALOG (self)->camera, 0);
+	lieng_camera_set_driver (LIEXT_DIALOG (self)->camera, LIENG_CAMERA_DRIVER_MANUAL);
+	lieng_camera_set_transform (LIEXT_DIALOG (self)->camera, &transform);
+	lieng_camera_warp (LIEXT_DIALOG (self)->camera);
+
+	/* Create lights. */
+	LIEXT_DIALOG (self)->light0 = lirnd_light_new (generator->scene, diffuse, equation, M_PI, 0.0f, 0);
+	LIEXT_DIALOG (self)->light1 = lirnd_light_new (generator->scene, diffuse, equation, M_PI, 0.0f, 0);
+	if (LIEXT_DIALOG (self)->light0 == NULL ||
+	    LIEXT_DIALOG (self)->light1 == NULL)
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+	lirnd_lighting_insert_light (generator->scene->lighting, LIEXT_DIALOG (self)->light0);
+	lirnd_lighting_insert_light (generator->scene->lighting, LIEXT_DIALOG (self)->light1);
 
 	return self;
 }
@@ -317,6 +351,12 @@ error:
 static void
 private_free (liextDialog* self)
 {
+	if (self->camera != NULL)
+		lieng_camera_free (self->camera);
+	if (self->light0 != NULL)
+		lirnd_lighting_remove_light (self->generator->scene->lighting, self->light0);
+	if (self->light1 != NULL)
+		lirnd_lighting_remove_light (self->generator->scene->lighting, self->light1);
 	free (self->brushes.array);
 }
 
@@ -324,6 +364,46 @@ static int
 private_event (liextDialog* self,
                liwdgEvent*  event)
 {
+	int x;
+	int y;
+	limatMatrix modelview;
+	limatMatrix projection;
+	limatTransform transform;
+	liwdgRect rect;
+
+	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
+	{
+		x = event->button.x;
+		y = event->button.y;
+		liwdg_widget_get_allocation (self->render_strokes, &rect);
+		if (x >= rect.x && x < rect.x + rect.width &&
+		    y >= rect.y && y < rect.y + rect.height)
+		{
+			lieng_camera_get_transform (self->camera, &transform);
+			switch (event->button.button)
+			{
+				case 4:
+					lieng_camera_move (self->camera, 5.0f);
+					break;
+				case 5:
+					lieng_camera_move (self->camera, -5.0f);
+					break;
+			}
+			return 0;
+		}
+	}
+	if (event->type == LIWDG_EVENT_TYPE_MOTION)
+	{
+		x = event->motion.x;
+		y = event->motion.y;
+		liwdg_widget_get_allocation (self->render_strokes, &rect);
+		if (x >= rect.x && x < rect.x + rect.width &&
+		    y >= rect.y && y < rect.y + rect.height && (event->motion.buttons & 0x1))
+		{
+			lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
+			lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
+		}
+	}
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
 	{
 		self->timer -= event->update.secs;
@@ -332,6 +412,26 @@ private_event (liextDialog* self,
 			self->timer = 10.0f;
 			/* FIXME: Do we need to do anything here anymore? */
 		}
+
+		/* Update camera. */
+		liwdg_widget_get_allocation (self->render_strokes, &rect);
+		lieng_camera_set_viewport (self->camera, rect.x, rect.y, rect.width, rect.height);
+		lieng_camera_update (self->camera, event->update.secs);
+		lieng_camera_get_modelview (self->camera, &modelview);
+		lieng_camera_get_projection (self->camera, &projection);
+
+		/* Update scene. */
+		liwdg_render_set_modelview (LIWDG_RENDER (self->render_strokes), &modelview);
+		liwdg_render_set_projection (LIWDG_RENDER (self->render_strokes), &projection);
+		lirnd_scene_update (self->generator->scene, event->update.secs);
+
+		/* Setup lights. */
+		lieng_camera_get_transform (self->camera, &transform);
+		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
+		lirnd_light_set_transform (LIEXT_DIALOG (self)->light0, &transform);
+		lieng_camera_get_transform (self->camera, &transform);
+		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
+		lirnd_light_set_transform (LIEXT_DIALOG (self)->light1, &transform);
 	}
 
 	return liwdgWindowType.event (LIWDG_WIDGET (self), event);
@@ -662,7 +762,6 @@ private_move_right (liextDialog* self,
 	return 0;
 }
 
-
 static void
 private_render_preview (liwdgWidget* widget,
                         liextDialog* self)
@@ -843,10 +942,7 @@ private_populate_strokes (liextDialog* self)
 	ligenBrush* brush;
 	ligenRule* rule;
 	ligenRulestroke* stroke;
-	limatMatrix modelview;
-	limatMatrix projection;
 	liwdgWidget* widget;
-	liwdgRect rect;
 
 	/* Clear stroke group. */
 	liwdg_group_set_size (LIWDG_GROUP (self->group_strokes), 1, 0);
@@ -898,20 +994,6 @@ private_populate_strokes (liextDialog* self)
 	ligen_generator_insert_stroke (self->generator->generator, brush->id,
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
 	ligen_generator_rebuild_scene (self->generator->generator);
-
-	/* Setup preview transformation. */
-	liwdg_widget_get_allocation (self->render_strokes, &rect);
-	modelview = limat_matrix_lookat (
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[0])/* - 15*/,
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[1]) + 45,
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[2])/* - 30.0f*/,
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[0]),
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[1]),
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f * brush->size[2]),
-		0.0f, 0.0f, 1.0f);
-	projection = limat_matrix_perspective (45.0f, rect.width / rect.height, 1.0f, 100.0f);
-	liwdg_render_set_modelview (LIWDG_RENDER (self->render_strokes), &modelview);
-	liwdg_render_set_projection (LIWDG_RENDER (self->render_strokes), &projection);
 }
 
 static int

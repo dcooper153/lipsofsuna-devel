@@ -423,6 +423,9 @@ liwdg_manager_event_sdl (liwdgManager* self,
 			evt.type = LIWDG_EVENT_TYPE_MOTION;
 			evt.motion.x = event->motion.x;
 			evt.motion.y = h - event->motion.y;
+			evt.motion.dx = event->motion.xrel;
+			evt.motion.dy = -event->motion.yrel;
+			evt.motion.buttons = event->motion.state;
 			break;
 		default:
 			return 0;

@@ -39,7 +39,10 @@ struct _liextDialog
 {
 	liwdgWindow base;
 	licliModule* module;
+	liengCamera* camera;
 	liextGenerator* generator;
+	lirndLight* light0;
+	lirndLight* light1;
 	liwdgWidget* group_column;
 	liwdgWidget* group_brushes;
 	liwdgWidget* group_rules;

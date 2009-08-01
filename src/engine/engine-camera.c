@@ -222,10 +222,20 @@ lieng_camera_tilt (liengCamera* self,
 
 	axis = limat_vector_init (1.0f, 0.0f, 0.0f);
 	rot = limat_quaternion_rotation (value, axis);
-	transform = limat_convert_quaternion_to_transform (rot);
-	transform = limat_transform_multiply (self->transform.local, transform);
-	transform.rotation = limat_quaternion_normalize (transform.rotation);
-	self->transform.local = transform;
+	if (self->config.driver == LIENG_CAMERA_DRIVER_MANUAL)
+	{
+		transform = limat_convert_quaternion_to_transform (rot);
+		transform = limat_transform_multiply (self->transform.target, transform);
+		transform.rotation = limat_quaternion_normalize (transform.rotation);
+		self->transform.target = transform;
+	}
+	else
+	{
+		transform = limat_convert_quaternion_to_transform (rot);
+		transform = limat_transform_multiply (self->transform.local, transform);
+		transform.rotation = limat_quaternion_normalize (transform.rotation);
+		self->transform.local = transform;
+	}
 	private_update_modelview (self);
 }
 
@@ -243,14 +253,28 @@ lieng_camera_turn (liengCamera* self,
 	limatTransform transform;
 	limatVector axis;
 
-	rot = limat_quaternion_conjugate (self->transform.local.rotation);
-	axis = limat_vector_init (0.0f, 1.0f, 0.0f);
-	axis = limat_quaternion_transform (rot, axis);
-	rot = limat_quaternion_rotation (value, axis);
-	transform = limat_convert_quaternion_to_transform (rot);
-	transform = limat_transform_multiply (self->transform.local, transform);
-	transform.rotation = limat_quaternion_normalize (transform.rotation);
-	self->transform.local = transform;
+	if (self->config.driver == LIENG_CAMERA_DRIVER_MANUAL)
+	{
+		rot = limat_quaternion_conjugate (self->transform.target.rotation);
+		axis = limat_vector_init (0.0f, 1.0f, 0.0f);
+		axis = limat_quaternion_transform (rot, axis);
+		rot = limat_quaternion_rotation (value, axis);
+		transform = limat_convert_quaternion_to_transform (rot);
+		transform = limat_transform_multiply (self->transform.target, transform);
+		transform.rotation = limat_quaternion_normalize (transform.rotation);
+		self->transform.target = transform;
+	}
+	else
+	{
+		rot = limat_quaternion_conjugate (self->transform.local.rotation);
+		axis = limat_vector_init (0.0f, 1.0f, 0.0f);
+		axis = limat_quaternion_transform (rot, axis);
+		rot = limat_quaternion_rotation (value, axis);
+		transform = limat_convert_quaternion_to_transform (rot);
+		transform = limat_transform_multiply (self->transform.local, transform);
+		transform.rotation = limat_quaternion_normalize (transform.rotation);
+		self->transform.local = transform;
+	}
 	private_update_modelview (self);
 }
 
