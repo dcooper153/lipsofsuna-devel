@@ -26,8 +26,7 @@
 
 #include <system/lips-system.h>
 #include "ext-dialog.h"
-
-#define LIEXT_PREVIEW_CENTER 8160
+#include "ext-preview.h"
 
 static const void*
 private_base ();
@@ -106,10 +105,6 @@ private_move_right (liextDialog* self,
                     liwdgWidget* widget);
 
 static void
-private_render_preview (liwdgWidget* widget,
-                        liextDialog* self);
-
-static void
 private_populate_brushes (liextDialog* self);
 
 static void
@@ -135,71 +130,41 @@ const liwdgClass liextDialogType =
 };
 
 liwdgWidget*
-liext_dialog_new (liwdgManager*   manager,
-                  liextGenerator* generator)
+liext_dialog_new (liwdgManager* manager,
+                  liextModule*  module)
 {
-	const float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	const float equation[3] = { 1.0f, 0.0f, 0.001f };
 	liextDialog* data;
-	limatTransform transform;
 	liwdgWidget* self;
 
 	self = liwdg_widget_new (manager, &liextDialogType);
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_DIALOG (self);
-	data->generator = generator;
-	data->module = generator->module;
-
-	/* Populate brush list. */
-	private_populate_brushes (LIEXT_DIALOG (self));
+	data->module = module;
 
 	/* Initialize preview widget. */
-	data->render_strokes = liwdg_render_new (manager, generator->scene);
+	data->render_strokes = liext_preview_new (manager, module->module);
 	if (data->render_strokes == NULL)
 	{
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	LIWDG_RENDER (data->render_strokes)->custom_render_func = (void*) private_render_preview;
-	LIWDG_RENDER (data->render_strokes)->custom_render_data = self;
 	liwdg_widget_set_request (data->render_strokes, 320, 240);
 	liwdg_group_set_col_expand (LIWDG_GROUP (data->group_column), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (data->group_column), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (data->group_column), 0, 1, data->render_strokes);
+	data->generator = LIEXT_PREVIEW (data->render_strokes)->generator;
 
-	/* Create camera. */
-	LIEXT_DIALOG (self)->camera = lieng_camera_new (generator->module->engine);
-	if (LIEXT_DIALOG (self)->camera == NULL)
-	{
-		liwdg_widget_free (self);
-		return NULL;
-	}
-	transform.position = limat_vector_init (
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f)/* - 15*/,
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f) + 55,
-		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f)/* - 30.0f*/);
-	transform.rotation = limat_quaternion_look (
-		limat_vector_init (0.0f, -1.0f, 0.0f),
-		limat_vector_init (0.0f, 0.0f, 1.0f));
-	lieng_camera_set_clip (LIEXT_DIALOG (self)->camera, 0);
-	lieng_camera_set_driver (LIEXT_DIALOG (self)->camera, LIENG_CAMERA_DRIVER_MANUAL);
-	lieng_camera_set_transform (LIEXT_DIALOG (self)->camera, &transform);
-	lieng_camera_warp (LIEXT_DIALOG (self)->camera);
-
-	/* Create lights. */
-	LIEXT_DIALOG (self)->light0 = lirnd_light_new (generator->scene, diffuse, equation, M_PI, 0.0f, 0);
-	LIEXT_DIALOG (self)->light1 = lirnd_light_new (generator->scene, diffuse, equation, M_PI, 0.0f, 0);
-	if (LIEXT_DIALOG (self)->light0 == NULL ||
-	    LIEXT_DIALOG (self)->light1 == NULL)
-	{
-		liwdg_widget_free (self);
-		return NULL;
-	}
-	lirnd_lighting_insert_light (generator->scene->lighting, LIEXT_DIALOG (self)->light0);
-	lirnd_lighting_insert_light (generator->scene->lighting, LIEXT_DIALOG (self)->light1);
+	/* Populate brush list. */
+	private_populate_brushes (LIEXT_DIALOG (self));
 
 	return self;
+}
+
+int
+liext_dialog_save (liextDialog* self)
+{
+	return ligen_generator_write_brushes (self->generator);
 }
 
 /****************************************************************************/
@@ -351,12 +316,6 @@ error:
 static void
 private_free (liextDialog* self)
 {
-	if (self->camera != NULL)
-		lieng_camera_free (self->camera);
-	if (self->light0 != NULL)
-		lirnd_lighting_remove_light (self->generator->scene->lighting, self->light0);
-	if (self->light1 != NULL)
-		lirnd_lighting_remove_light (self->generator->scene->lighting, self->light1);
 	free (self->brushes.array);
 }
 
@@ -364,46 +323,6 @@ static int
 private_event (liextDialog* self,
                liwdgEvent*  event)
 {
-	int x;
-	int y;
-	limatMatrix modelview;
-	limatMatrix projection;
-	limatTransform transform;
-	liwdgRect rect;
-
-	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
-	{
-		x = event->button.x;
-		y = event->button.y;
-		liwdg_widget_get_allocation (self->render_strokes, &rect);
-		if (x >= rect.x && x < rect.x + rect.width &&
-		    y >= rect.y && y < rect.y + rect.height)
-		{
-			lieng_camera_get_transform (self->camera, &transform);
-			switch (event->button.button)
-			{
-				case 4:
-					lieng_camera_move (self->camera, 5.0f);
-					break;
-				case 5:
-					lieng_camera_move (self->camera, -5.0f);
-					break;
-			}
-			return 0;
-		}
-	}
-	if (event->type == LIWDG_EVENT_TYPE_MOTION)
-	{
-		x = event->motion.x;
-		y = event->motion.y;
-		liwdg_widget_get_allocation (self->render_strokes, &rect);
-		if (x >= rect.x && x < rect.x + rect.width &&
-		    y >= rect.y && y < rect.y + rect.height && (event->motion.buttons & 0x1))
-		{
-			lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
-			lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
-		}
-	}
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
 	{
 		self->timer -= event->update.secs;
@@ -412,26 +331,6 @@ private_event (liextDialog* self,
 			self->timer = 10.0f;
 			/* FIXME: Do we need to do anything here anymore? */
 		}
-
-		/* Update camera. */
-		liwdg_widget_get_allocation (self->render_strokes, &rect);
-		lieng_camera_set_viewport (self->camera, rect.x, rect.y, rect.width, rect.height);
-		lieng_camera_update (self->camera, event->update.secs);
-		lieng_camera_get_modelview (self->camera, &modelview);
-		lieng_camera_get_projection (self->camera, &projection);
-
-		/* Update scene. */
-		liwdg_render_set_modelview (LIWDG_RENDER (self->render_strokes), &modelview);
-		liwdg_render_set_projection (LIWDG_RENDER (self->render_strokes), &projection);
-		lirnd_scene_update (self->generator->scene, event->update.secs);
-
-		/* Setup lights. */
-		lieng_camera_get_transform (self->camera, &transform);
-		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
-		lirnd_light_set_transform (LIEXT_DIALOG (self)->light0, &transform);
-		lieng_camera_get_transform (self->camera, &transform);
-		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
-		lirnd_light_set_transform (LIEXT_DIALOG (self)->light1, &transform);
 	}
 
 	return liwdgWindowType.event (LIWDG_WIDGET (self), event);
@@ -444,19 +343,19 @@ private_add_brush (liextDialog* self,
 	ligenBrush* brush;
 
 	/* Create new brush. */
-	brush = ligen_brush_new (self->generator->generator, 10, 10, 10);
+	brush = ligen_brush_new (self->generator, 10, 10, 10);
 	if (brush == NULL)
 		return 0;
-	if (!ligen_generator_insert_brush (self->generator->generator, brush))
+	if (!ligen_generator_insert_brush (self->generator, brush))
 	{
 		ligen_brush_free (brush);
 		return 0;
 	}
 
 	/* FIXME: Copies voxels from around the player. */
-	if (self->module->network != NULL)
+	if (self->module->module->network != NULL)
 	{
-		liengObject* player = licli_module_get_player (self->module);
+		liengObject* player = licli_module_get_player (self->module->module);
 		if (player != NULL)
 		{
 			limatTransform t;
@@ -464,7 +363,7 @@ private_add_brush (liextDialog* self,
 			int xmin = (int)(t.position.x / LIVOX_TILE_WIDTH) - brush->size[0] / 2;
 			int ymin = (int)(t.position.y / LIVOX_TILE_WIDTH) - brush->size[1] / 2;
 			int zmin = (int)(t.position.z / LIVOX_TILE_WIDTH) - brush->size[2] / 2;
-			livox_manager_copy_voxels (self->module->voxels, xmin, ymin, zmin,
+			livox_manager_copy_voxels (self->module->module->voxels, xmin, ymin, zmin,
 				brush->size[0], brush->size[1], brush->size[2], brush->voxels.array);
 		}
 	}
@@ -559,7 +458,7 @@ private_remove_brush (liextDialog* self,
 		return 0;
 
 	/* Remove the brush. */
-	ligen_generator_remove_brush (self->generator->generator, brush->id);
+	ligen_generator_remove_brush (self->generator, brush->id);
 	private_populate_brushes (self);
 	private_populate_rules (self);
 	private_populate_strokes (self);
@@ -763,74 +662,6 @@ private_move_right (liextDialog* self,
 }
 
 static void
-private_render_preview (liwdgWidget* widget,
-                        liextDialog* self)
-{
-	int i;
-	int id;
-	int x[2];
-	int y[2];
-	int z[2];
-	ligenStroke* stroke;
-	ligenBrush* brush;
-
-	if (private_get_active (self, &brush, NULL, NULL) < 1)
-		id = -1;
-	else
-		id = brush->id;
-
-	/* Render stroke bounds. */
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_LIGHTING);
-	glDisable (GL_TEXTURE_2D);
-	glBegin (GL_LINES);
-	for (i = 0 ; i < self->generator->generator->strokes.count ; i++)
-	{
-		stroke = self->generator->generator->strokes.array + i;
-		if (stroke->brush == id &&
-		    stroke->pos[0] == LIEXT_PREVIEW_CENTER &&
-		    stroke->pos[1] == LIEXT_PREVIEW_CENTER &&
-		    stroke->pos[2] == LIEXT_PREVIEW_CENTER)
-			glColor3f (1.0f, 0.0f, 0.0f);
-		else
-			glColor3f (0.0f, 1.0f, 0.0f);
-		x[0] = LIVOX_TILE_WIDTH * (stroke->pos[0]);
-		x[1] = LIVOX_TILE_WIDTH * (stroke->pos[0] + stroke->size[0]);
-		y[0] = LIVOX_TILE_WIDTH * (stroke->pos[1]);
-		y[1] = LIVOX_TILE_WIDTH * (stroke->pos[1] + stroke->size[1]);
-		z[0] = LIVOX_TILE_WIDTH * (stroke->pos[2]);
-		z[1] = LIVOX_TILE_WIDTH * (stroke->pos[2] + stroke->size[2]);
-		glVertex3f (x[0], y[0], z[0]);
-		glVertex3f (x[1], y[0], z[0]);
-		glVertex3f (x[1], y[0], z[0]);
-		glVertex3f (x[1], y[0], z[1]);
-		glVertex3f (x[1], y[0], z[1]);
-		glVertex3f (x[0], y[0], z[1]);
-		glVertex3f (x[0], y[0], z[1]);
-		glVertex3f (x[0], y[0], z[0]);
-
-		glVertex3f (x[0], y[1], z[0]);
-		glVertex3f (x[1], y[1], z[0]);
-		glVertex3f (x[1], y[1], z[0]);
-		glVertex3f (x[1], y[1], z[1]);
-		glVertex3f (x[1], y[1], z[1]);
-		glVertex3f (x[0], y[1], z[1]);
-		glVertex3f (x[0], y[1], z[1]);
-		glVertex3f (x[0], y[1], z[0]);
-
-		glVertex3f (x[0], y[0], z[0]);
-		glVertex3f (x[0], y[1], z[0]);
-		glVertex3f (x[1], y[0], z[0]);
-		glVertex3f (x[1], y[1], z[0]);
-		glVertex3f (x[0], y[0], z[1]);
-		glVertex3f (x[0], y[1], z[1]);
-		glVertex3f (x[1], y[0], z[1]);
-		glVertex3f (x[1], y[1], z[1]);
-	}
-	glEnd ();
-}
-
-static void
 private_populate_brushes (liextDialog* self)
 {
 	int i;
@@ -846,7 +677,7 @@ private_populate_brushes (liextDialog* self)
 	liwdg_group_set_size (LIWDG_GROUP (group), 1, 0);
 
 	/* Rebuild brush list. */
-	i = self->generator->generator->brushes->size;
+	i = self->generator->brushes->size;
 	tmp = realloc (self->brushes.array, i * sizeof (int));
 	if (tmp == NULL)
 	{
@@ -856,7 +687,7 @@ private_populate_brushes (liextDialog* self)
 	self->brushes.count = i;
 	self->brushes.array = tmp;
 	i = 0;
-	LI_FOREACH_U32DIC (iter, self->generator->generator->brushes)
+	LI_FOREACH_U32DIC (iter, self->generator->brushes)
 	{
 		brush = iter.value;
 		self->brushes.array[i] = brush->id;
@@ -865,7 +696,7 @@ private_populate_brushes (liextDialog* self)
 
 	/* Rebuild brush group. */
 	i = 0;
-	LI_FOREACH_U32DIC (iter, self->generator->generator->brushes)
+	LI_FOREACH_U32DIC (iter, self->generator->brushes)
 	{
 		brush = iter.value;
 		assert (brush != NULL);
@@ -948,11 +779,14 @@ private_populate_strokes (liextDialog* self)
 	liwdg_group_set_size (LIWDG_GROUP (self->group_strokes), 1, 0);
 
 	/* Clear preview scene. */
-	ligen_generator_clear_scene (self->generator->generator);
+	liext_preview_clear (LIEXT_PREVIEW (self->render_strokes));
 
 	/* Get active rule. */
 	if (private_get_active (self, &brush, &rule, NULL) < 2)
+	{
+		liext_preview_build (LIEXT_PREVIEW (self->render_strokes));
 		return;
+	}
 	if (self->active_stroke > rule->strokes.count)
 		self->active_stroke = LI_MAX (0, rule->strokes.count);
 
@@ -986,14 +820,11 @@ private_populate_strokes (liextDialog* self)
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
 		stroke = rule->strokes.array + i;
-		ligen_generator_insert_stroke (self->generator->generator, stroke->brush,
-			LIEXT_PREVIEW_CENTER + stroke->pos[0],
-			LIEXT_PREVIEW_CENTER + stroke->pos[1],
-			LIEXT_PREVIEW_CENTER + stroke->pos[2]);
+		liext_preview_insert_stroke (LIEXT_PREVIEW (self->render_strokes),
+			stroke->pos[0], stroke->pos[1], stroke->pos[2], stroke->brush);
 	}
-	ligen_generator_insert_stroke (self->generator->generator, brush->id,
-		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
-	ligen_generator_rebuild_scene (self->generator->generator);
+	liext_preview_insert_stroke (LIEXT_PREVIEW (self->render_strokes), 0, 0, 0, brush->id);
+	liext_preview_build (LIEXT_PREVIEW (self->render_strokes));
 }
 
 static int
@@ -1014,7 +845,7 @@ private_get_active (liextDialog*      self,
 		if (stroke != NULL) *stroke = NULL;
 		return 0;
 	}
-	brush_ = ligen_generator_find_brush (self->generator->generator, self->brushes.array[self->active_brush]);
+	brush_ = ligen_generator_find_brush (self->generator, self->brushes.array[self->active_brush]);
 	if (brush_ == NULL)
 	{
 		if (brush != NULL) *brush = NULL;

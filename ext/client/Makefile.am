@@ -68,10 +68,10 @@ libgenerator_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
 libgenerator_cli_la_SOURCES = \
 	generator/ext-dialog.c \
 	generator/ext-dialog.h \
-	generator/ext-generator.c \
-	generator/ext-generator.h \
 	generator/ext-module.c \
 	generator/ext-module.h \
+	generator/ext-preview.c \
+	generator/ext-preview.h \
 	generator/ext-script.c
 
 liboptions_cli_la_CFLAGS = $(LICLI_CFLAGS)

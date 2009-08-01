@@ -24,32 +24,46 @@
  * @{
  */
 
-#ifndef __EXT_GENERATOR_H__
-#define __EXT_GENERATOR_H__
+#ifndef __EXT_PREVIEW_H__
+#define __EXT_PREVIEW_H__
 
 #include <client/lips-client.h>
 #include <generator/lips-generator.h>
+#include <engine/lips-engine.h>
+#include <widget/lips-widget.h>
 
-typedef struct _liextGenerator liextGenerator;
-struct _liextGenerator
+#define LIEXT_PREVIEW(o) ((liextPreview*)(o))
+
+typedef struct _liextPreview liextPreview;
+struct _liextPreview
 {
-	licliModule* module;
+	liwdgRender base;
 	ligenGenerator* generator;
+	liengCamera* camera;
+	lirndLight* light0;
+	lirndLight* light1;
+	lirndRender* render;
 	lirndScene* scene;
 };
 
-liextGenerator*
-liext_generator_new (licliModule* module);
+extern const liwdgClass liextPreviewType;
+
+liwdgWidget*
+liext_preview_new (liwdgManager* manager,
+                   licliModule*  module);
 
 void
-liext_generator_free (liextGenerator* self);
+liext_preview_build (liextPreview* self);
+
+void
+liext_preview_clear (liextPreview* self);
 
 int
-liext_generator_load (liextGenerator* self,
-                      const char*     path);
-
-int
-liext_generator_save (liextGenerator* self);
+liext_preview_insert_stroke (liextPreview* self,
+                             int           x,
+                             int           y,
+                             int           z,
+                             int           brush);
 
 #endif
 

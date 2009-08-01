@@ -15,48 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliGenerator Generator
- * @{
- */
+#ifndef __GENERATOR_TYPES_H__
+#define __GENERATOR_TYPES_H__
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
-
-#include "ext-module.h"
-
-#define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
-
-typedef struct _liextDialog liextDialog;
-typedef struct _liextModule liextModule;
-
-struct _liextModule
-{
-	licliModule* module;
-	liwdgWidget* dialog;
-};
-
-liextModule*
-liext_module_new (licliModule* module);
-
-void
-liext_module_free (liextModule* self);
-
-int
-liext_module_save (liextModule* self);
-
-/*****************************************************************************/
-
-void
-liextGeneratorScript (liscrClass* self,
-                      void*       data);
+typedef struct _ligenBrush ligenBrush;
+typedef struct _ligenGenerator ligenGenerator;
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

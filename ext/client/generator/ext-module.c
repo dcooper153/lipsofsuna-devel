@@ -26,7 +26,6 @@
 
 #include <client/lips-client.h>
 #include "ext-dialog.h"
-#include "ext-generator.h"
 #include "ext-module.h"
 
 licliExtensionInfo liextInfo =
@@ -47,16 +46,11 @@ liext_module_new (licliModule* module)
 		return NULL;
 	self->module = module;
 
-	/* Create generator. */
-	self->generator = liext_generator_new (module);
-	if (self->generator == NULL)
-		return NULL;
-
 	/* Create dialog. */
-	self->dialog = liext_dialog_new (module->widgets, self->generator);
+	self->dialog = liext_dialog_new (module->widgets, self);
 	if (self->dialog == NULL)
 	{
-		liext_generator_free (self->generator);
+		free (self);
 		return NULL;
 	}
 	liwdg_manager_insert_window (module->widgets, self->dialog);
@@ -74,8 +68,13 @@ liext_module_free (liextModule* self)
 	/* FIXME: Remove the class here. */
 	liwdg_manager_remove_window (self->module->widgets, self->dialog);
 	liwdg_widget_free (self->dialog);
-	liext_generator_free (self->generator);
 	free (self);
+}
+
+int
+liext_module_save (liextModule* self)
+{
+	return liext_dialog_save (LIEXT_DIALOG (self->dialog));
 }
 
 /** @} */

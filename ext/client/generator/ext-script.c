@@ -26,7 +26,6 @@
 
 #include <client/lips-client.h>
 #include <script/lips-script.h>
-#include "ext-generator.h"
 #include "ext-module.h"
 
 /* @luadoc
@@ -50,8 +49,7 @@ Generator_load (lua_State* lua)
 	liextModule* module;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
-	if (!liext_generator_load (module->generator, NULL))
-		lisys_error_report ();
+#warning FIXME: Generator_load not implemented
 
 	return 0;
 }
@@ -69,7 +67,7 @@ Generator_save (lua_State* lua)
 	liextModule* module;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
-	if (!liext_generator_save (module->generator))
+	if (!liext_module_save (module))
 		lisys_error_report ();
 
 	return 0;

@@ -28,21 +28,18 @@
 #define __EXT_DIALOG_H__
 
 #include <client/lips-client.h>
+#include <generator/lips-generator.h>
 #include <engine/lips-engine.h>
 #include <widget/lips-widget.h>
-#include "ext-generator.h"
+#include "ext-module.h"
 
 #define LIEXT_DIALOG(o) ((liextDialog*)(o))
 
-typedef struct _liextDialog liextDialog;
 struct _liextDialog
 {
 	liwdgWindow base;
-	licliModule* module;
-	liengCamera* camera;
-	liextGenerator* generator;
-	lirndLight* light0;
-	lirndLight* light1;
+	liextModule* module;
+	ligenGenerator* generator;
 	liwdgWidget* group_column;
 	liwdgWidget* group_brushes;
 	liwdgWidget* group_rules;
@@ -73,8 +70,11 @@ struct _liextDialog
 extern const liwdgClass liextDialogType;
 
 liwdgWidget*
-liext_dialog_new (liwdgManager*   manager,
-                  liextGenerator* generator);
+liext_dialog_new (liwdgManager* manager,
+                  liextModule*  module);
+
+int
+liext_dialog_save (liextDialog* self);
 
 #endif
 
