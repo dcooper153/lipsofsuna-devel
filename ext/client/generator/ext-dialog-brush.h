@@ -24,37 +24,39 @@
  * @{
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_DIALOG_BRUSH_H__
+#define __EXT_DIALOG_BRUSH_H__
 
+#include <client/lips-client.h>
+#include <generator/lips-generator.h>
+#include <engine/lips-engine.h>
+#include <widget/lips-widget.h>
 #include "ext-module.h"
 
-#define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
+#define LIEXT_DIALOG_BRUSH(o) ((liextDialogBrush*)(o))
 
-typedef struct _liextDialog liextDialog;
-typedef struct _liextDialogBrush liextDialogBrush;
-typedef struct _liextModule liextModule;
-
-struct _liextModule
+struct _liextDialogBrush
 {
-	licliModule* module;
-	liwdgWidget* dialog;
+	liwdgWindow base;
+	liextModule* module;
+	ligenGenerator* generator;
+	liwdgWidget* button_cancel;
+	liwdgWidget* button_create;
+	liwdgWidget* group_spins;
+	liwdgWidget* preview;
+	liwdgWidget* spin_xmin;
+	liwdgWidget* spin_ymin;
+	liwdgWidget* spin_zmin;
+	liwdgWidget* spin_xmax;
+	liwdgWidget* spin_ymax;
+	liwdgWidget* spin_zmax;
 };
 
-liextModule*
-liext_module_new (licliModule* module);
+extern const liwdgClass liextDialogBrushType;
 
-void
-liext_module_free (liextModule* self);
-
-int
-liext_module_save (liextModule* self);
-
-/*****************************************************************************/
-
-void
-liextGeneratorScript (liscrClass* self,
-                      void*       data);
+liwdgWidget*
+liext_dialog_brush_new (liwdgManager* manager,
+                        liextModule*  module);
 
 #endif
 

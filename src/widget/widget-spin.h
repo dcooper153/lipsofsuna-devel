@@ -16,48 +16,49 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup liwdg Widget
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliGenerator Generator
+ * \addtogroup liwdgSpin Spin
  * @{
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __WIDGET_SPIN_H__
+#define __WIDGET_SPIN_H__
 
-#include "ext-module.h"
+#include <font/lips-font.h>
+#include "widget.h"
 
-#define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
+#define LIWDG_SPIN(o) ((liwdgSpin*)(o))
 
-typedef struct _liextDialog liextDialog;
-typedef struct _liextDialogBrush liextDialogBrush;
-typedef struct _liextModule liextModule;
-
-struct _liextModule
+typedef struct _liwdgSpin liwdgSpin;
+struct _liwdgSpin
 {
-	licliModule* module;
-	liwdgWidget* dialog;
+	liwdgWidget base;
+	lifntFont* font;
+	lifntLayout* text;
+	float value;
 };
 
-liextModule*
-liext_module_new (licliModule* module);
+extern const liwdgClass liwdgSpinType;
+
+liwdgWidget*
+liwdg_spin_new (liwdgManager* manager);
+
+lifntFont*
+liwdg_spin_get_font (liwdgSpin* self);
 
 void
-liext_module_free (liextModule* self);
+liwdg_spin_set_font (liwdgSpin* self,
+                     lifntFont* font);
 
-int
-liext_module_save (liextModule* self);
-
-/*****************************************************************************/
+float
+liwdg_spin_get_value (liwdgSpin* self);
 
 void
-liextGeneratorScript (liscrClass* self,
-                      void*       data);
+liwdg_spin_set_value (liwdgSpin* self,
+                      float      value);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

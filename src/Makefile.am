@@ -399,6 +399,8 @@ wdgsrc = \
 	widget/widget-progress.h \
 	widget/widget-render.c \
 	widget/widget-render.h \
+	widget/widget-spin.c \
+	widget/widget-spin.h \
 	widget/widget-types.h \
 	widget/widget-window.c \
 	widget/widget-window.h

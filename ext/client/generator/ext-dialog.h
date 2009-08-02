@@ -40,22 +40,6 @@ struct _liextDialog
 	liwdgWindow base;
 	liextModule* module;
 	ligenGenerator* generator;
-	liwdgWidget* group_column;
-	liwdgWidget* group_brushes;
-	liwdgWidget* group_rules;
-	liwdgWidget* group_strokes;
-	liwdgWidget* render_strokes;
-	liwdgWidget* button_move_left;
-	liwdgWidget* button_move_right;
-	liwdgWidget* button_move_up;
-	liwdgWidget* button_move_down;
-	liwdgWidget* button_add_brush;
-	liwdgWidget* button_remove_brush;
-	liwdgWidget* button_add_rule;
-	liwdgWidget* button_remove_rule;
-	liwdgWidget* button_add_stroke;
-	liwdgWidget* button_edit_stroke;
-	liwdgWidget* button_remove_stroke;
 	int active_brush;
 	int active_rule;
 	int active_stroke;
@@ -65,6 +49,26 @@ struct _liextDialog
 		int count;
 		int* array;
 	} brushes;
+	struct
+	{
+		liwdgWidget* dialog;
+		liwdgWidget* group_column;
+		liwdgWidget* group_brushes;
+		liwdgWidget* group_rules;
+		liwdgWidget* group_strokes;
+		liwdgWidget* button_move_left;
+		liwdgWidget* button_move_right;
+		liwdgWidget* button_move_up;
+		liwdgWidget* button_move_down;
+		liwdgWidget* button_add_brush;
+		liwdgWidget* button_remove_brush;
+		liwdgWidget* button_add_rule;
+		liwdgWidget* button_remove_rule;
+		liwdgWidget* button_add_stroke;
+		liwdgWidget* button_edit_stroke;
+		liwdgWidget* button_remove_stroke;
+		liwdgWidget* preview;
+	} widgets;
 };
 
 extern const liwdgClass liextDialogType;
@@ -75,6 +79,9 @@ liext_dialog_new (liwdgManager* manager,
 
 int
 liext_dialog_save (liextDialog* self);
+
+void
+liext_dialog_update (liextDialog* self);
 
 #endif
 

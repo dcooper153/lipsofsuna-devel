@@ -33,6 +33,7 @@
 #include "widget-menugroup.h"
 #include "widget-progress.h"
 #include "widget-render.h"
+#include "widget-spin.h"
 #include "widget-types.h"
 #include "widget-window.h"
 

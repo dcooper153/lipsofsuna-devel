@@ -221,6 +221,7 @@ am__objects_28 = liblipsofsunaclient_la-widget.lo \
 	liblipsofsunaclient_la-widget-menugroup.lo \
 	liblipsofsunaclient_la-widget-progress.lo \
 	liblipsofsunaclient_la-widget-render.lo \
+	liblipsofsunaclient_la-widget-spin.lo \
 	liblipsofsunaclient_la-widget-window.lo
 am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
@@ -1014,6 +1015,8 @@ wdgsrc = \
 	widget/widget-progress.h \
 	widget/widget-render.c \
 	widget/widget-render.h \
+	widget/widget-spin.c \
+	widget/widget-spin.h \
 	widget/widget-types.h \
 	widget/widget-window.c \
 	widget/widget-window.h
@@ -1376,6 +1379,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-menugroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-progress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-render.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-spin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-ai-path-solver.Plo@am__quote@
@@ -2538,6 +2542,13 @@ liblipsofsunaclient_la-widget-render.lo: widget/widget-render.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-render.c' object='liblipsofsunaclient_la-widget-render.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-render.lo `test -f 'widget/widget-render.c' || echo '$(srcdir)/'`widget/widget-render.c
+
+liblipsofsunaclient_la-widget-spin.lo: widget/widget-spin.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-widget-spin.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-widget-spin.Tpo -c -o liblipsofsunaclient_la-widget-spin.lo `test -f 'widget/widget-spin.c' || echo '$(srcdir)/'`widget/widget-spin.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-widget-spin.Tpo $(DEPDIR)/liblipsofsunaclient_la-widget-spin.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-spin.c' object='liblipsofsunaclient_la-widget-spin.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-spin.lo `test -f 'widget/widget-spin.c' || echo '$(srcdir)/'`widget/widget-spin.c
 
 liblipsofsunaclient_la-widget-window.lo: widget/widget-window.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-widget-window.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-widget-window.Tpo -c -o liblipsofsunaclient_la-widget-window.lo `test -f 'widget/widget-window.c' || echo '$(srcdir)/'`widget/widget-window.c
