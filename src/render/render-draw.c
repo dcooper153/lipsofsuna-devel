@@ -158,7 +158,7 @@ lirnd_draw_hair (lirndContext* context,
 	lirndMaterial* material;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
+	if (!lirnd_object_get_realized (object) || object->model == NULL)
 		return;
 
 	/* Frustum culling. */

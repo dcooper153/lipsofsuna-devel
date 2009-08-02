@@ -40,19 +40,8 @@ livox_block_free (livoxBlock*   self,
                   livoxManager* manager)
 {
 #ifndef LIVOX_DISABLE_GRAPHICS
-	limdlModel* model;
-	lirndModel* rndmdl;
-#endif
-
-#ifndef LIVOX_DISABLE_GRAPHICS
 	if (self->render != NULL)
-	{
-		model = self->render->model->model;
-		rndmdl = self->render->model;
 		manager->renderapi->lirnd_object_free (self->render);
-		manager->renderapi->lirnd_model_free (rndmdl);
-		limdl_model_free (model);
-	}
 #endif
 	if (self->physics != NULL)
 		liphy_object_free (self->physics);

@@ -33,9 +33,27 @@
 typedef struct _lirndApi lirndApi;
 struct _lirndApi
 {
+	int (*lirnd_buffer_init)(lirndBuffer*   self,
+	                         lirndMaterial* material,
+	                         lirndFormat*   format,
+	                         void*          data,
+	                         int            count);
+	void (*lirnd_buffer_free)(lirndBuffer* self);
+	lirndMaterial* (*lirnd_material_new)();
+	lirndMaterial* (*lirnd_material_new_from_model)(lirndRender*, const limdlMaterial*);
+	void (*lirnd_material_free)(lirndMaterial* self);
 	lirndModel* (*lirnd_model_new)(lirndRender*, limdlModel*);
 	void (*lirnd_model_free)(lirndModel*);
 	lirndObject* (*lirnd_object_new)(lirndScene*, int);
+	lirndObject* (*lirnd_object_new_from_data)(lirndScene*      scene,
+	                                           int              id,
+	                                           const limatAabb* aabb,
+	                                           lirndBuffer*     buffers,
+	                                           int              buffercount,
+	                                           lirndMaterial**  materials,
+	                                           int              materialcount,
+	                                           lirndLight**     lights,
+	                                           int              lightcount);
 	void (*lirnd_object_free)(lirndObject*);
 	void (*lirnd_object_deform)(lirndObject*, limdlPose*);
 	void (*lirnd_object_update)(lirndObject*, float);

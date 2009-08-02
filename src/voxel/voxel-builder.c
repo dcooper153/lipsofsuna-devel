@@ -58,21 +58,15 @@ private_build_tiles (livoxBuilder* self,
 #ifndef LIVOX_DISABLE_GRAPHICS
 static void
 private_calculate_normal (livoxBuilder* self,
-                          limdlFaces*   group,
-                          int           vertex,
+                          limatVector*  coord,
                           limatVector*  fnormal,
                           limatVector*  vnormal);
-#endif
 
-static void
-private_calculate_texcoords (livoxBuilder* self,
-                             int           material,
-                             limdlVertex*  vertices);
-
-#ifndef LIVOX_DISABLE_GRAPHICS
 static int
-private_insert_material (livoxBuilder* self,
-                         int           id);
+private_insert_triangle (livoxBuilder* self,
+                         int           id,
+                         limatVector*  coords,
+                         limatVector*  normals);
 #endif
 
 static int
@@ -80,7 +74,8 @@ private_insert_vertices (livoxBuilder* self,
                          int           material,
                          limatVector*  blockoff,
                          limatVector*  tileoff,
-                         limdlVertex*  vertices,
+                         limatVector*  coords,
+                         limatVector*  normals,
                          int           count);
 
 /*****************************************************************************/
@@ -109,16 +104,9 @@ livox_builder_new (livoxSector* sector)
 			livox_builder_free (self);
 			return NULL;
 		}
-		self->helpers.model = limdl_model_new ();
-		if (self->helpers.model == NULL)
-		{
-			livox_builder_free (self);
-			return NULL;
-		}
 		self->helpers.normals = lialg_memdic_new ();
 		if (self->helpers.normals == NULL)
 		{
-			limdl_model_free (self->helpers.model);
 			livox_builder_free (self);
 			return NULL;
 		}
@@ -132,14 +120,16 @@ void
 livox_builder_free (livoxBuilder* self)
 {
 	lialgMemdicIter iter;
+	lialgU32dicIter iter1;
 	livoxBuilderNormal* normal;
 	livoxBuilderNormal* normal_next;
+	livoxFaces* faces;
 
 	if (self->helpers.normals != NULL)
 	{
 		LI_FOREACH_MEMDIC (iter, self->helpers.normals)
 		{
-			for (normal = iter.value ; normal != NULL ; normal = normal->next)
+			for (normal = iter.value ; normal != NULL ; normal = normal_next)
 			{
 				normal_next = normal->next;
 				free (normal);
@@ -148,9 +138,15 @@ livox_builder_free (livoxBuilder* self)
 		lialg_memdic_free (self->helpers.normals);
 	}
 	if (self->helpers.materials != NULL)
+	{
+		LI_FOREACH_U32DIC (iter1, self->helpers.materials)
+		{
+			faces = iter1.value;
+			free (faces->vertices.array);
+			free (faces);
+		}
 		lialg_u32dic_free (self->helpers.materials);
-	if (self->helpers.model != NULL)
-		limdl_model_free (self->helpers.model);
+	}
 	if (self->helpers.shape != NULL)
 		liphy_shape_free (self->helpers.shape);
 	free (self->vertices.array);
@@ -165,11 +161,12 @@ livox_builder_build (livoxBuilder* self,
 {
 #ifndef LIVOX_DISABLE_GRAPHICS
 	int i;
-	int j;
-	int k;
-	limatVector normal;
-	limdlFaces* group;
-	limdlVertex* v;
+	lialgU32dicIter iter;
+	limatVector coord;
+	limatVector normal0;
+	limatVector normal1;
+	livoxFaces* faces;
+	livoxVertex* vertex;
 #endif
 	livoxBlock* block;
 
@@ -191,39 +188,111 @@ livox_builder_build (livoxBuilder* self,
 
 	/* Apply smooth normals and calculate bounding box. */
 #ifndef LIVOX_DISABLE_GRAPHICS
-	if (self->helpers.model != NULL && self->vertices.count)
+	if (self->sector->manager->render != NULL && self->vertices.count)
 	{
-		for (i = 0 ; i < self->helpers.model->facegroups.count ; i++)
+		LI_FOREACH_U32DIC (iter, self->helpers.materials)
 		{
-			group = self->helpers.model->facegroups.array + i;
-			v = group->vertices.array;
-			for (j = 0 ; j < group->vertices.count ; j += 3)
+			faces = iter.value;
+			vertex = faces->vertices.array;
+			for (i = 0 ; i < faces->vertices.count ; i++)
 			{
-				normal = limat_vector_normalize (limat_vector_cross (
-					limat_vector_subtract (v[j + 0].coord, v[j + 1].coord),
-					limat_vector_subtract (v[j + 1].coord, v[j + 2].coord)));
-				for (k = j ; k < j + 3 ; k++)
-					private_calculate_normal (self, group, k, &normal, &group->vertices.array[k].normal);
+				coord = limat_vector_init (vertex->coord[0], vertex->coord[1], vertex->coord[2]);
+				normal0 = limat_vector_init (vertex->normal[0], vertex->normal[1], vertex->normal[2]);
+				private_calculate_normal (self, &coord, &normal0, &normal1);
+				vertex->normal[0] = normal1.x;
+				vertex->normal[1] = normal1.y;
+				vertex->normal[2] = normal1.z;
+				vertex++;
 			}
 		}
-		limdl_model_calculate_bounds (self->helpers.model);
+		self->aabb.min = limat_vector_init (
+			self->sector->x * LIVOX_SECTOR_WIDTH + bx * LIVOX_BLOCK_WIDTH,
+			self->sector->y * LIVOX_SECTOR_WIDTH + by * LIVOX_BLOCK_WIDTH,
+			self->sector->z * LIVOX_SECTOR_WIDTH + bz * LIVOX_BLOCK_WIDTH);
+		self->aabb.max = limat_vector_init (
+			self->aabb.min.x + LIVOX_BLOCK_WIDTH,
+			self->aabb.min.y + LIVOX_BLOCK_WIDTH,
+			self->aabb.min.z + LIVOX_BLOCK_WIDTH);
 	}
 #endif
 
 	return 1;
 }
 
-limdlModel*
-livox_builder_get_model (livoxBuilder* self)
+#ifndef LIVOX_DISABLE_GRAPHICS
+lirndObject*
+livox_builder_get_render (livoxBuilder* self)
 {
-	limdlModel* model;
+	int i = 0;
+	int count;
+	lialgU32dicIter iter;
+	lirndBuffer* buffers;
+	lirndMaterial** materials;
+	lirndObject* object;
+	livoxFaces* faces;
+	livoxMaterial* material;
+	lirndApi* render;
+	lirndFormat format =
+	{
+		sizeof (livoxVertex), 1,
+		{ GL_FLOAT, GL_FLOAT, GL_FLOAT }, { 0, 0, 0 },
+		GL_FLOAT, 2 * sizeof (float),
+		GL_SHORT, 5 * sizeof (float)
+	};
 
-	assert (self->helpers.model != NULL);
-	model = self->helpers.model;
-	self->helpers.model = NULL;
+	/* Allocate arrays. */
+	render = self->sector->manager->renderapi;
+	count = self->helpers.materials->size;
+	buffers = calloc (count, sizeof (lirndBuffer));
+	if (buffers == NULL)
+		return NULL;
+	materials = calloc (count, sizeof (lirndMaterial*));
+	if (materials == NULL)
+	{
+		free (buffers);
+		return NULL;
+	}
 
-	return model;
+	/* Allocate render data. */
+	LI_FOREACH_U32DIC (iter, self->helpers.materials)
+	{
+		faces = iter.value;
+		material = livox_manager_find_material (self->sector->manager, faces->material);
+		if (material != NULL)
+			materials[i] = render->lirnd_material_new_from_model (self->sector->manager->render, &material->model);
+		else
+			materials[i] = render->lirnd_material_new ();
+		if (materials[i] == NULL)
+			goto error;
+		if (!render->lirnd_buffer_init (buffers + i, materials[i], &format,
+		                                faces->vertices.array, faces->vertices.count))
+		{
+			render->lirnd_material_free (materials[i]);
+			goto error;
+		}
+		i++;
+	}
+
+	/* Allocate render object. */
+	object = render->lirnd_object_new_from_data (self->sector->manager->scene,
+		0, &self->aabb, buffers, count, materials, count, NULL, 0);
+	if (object == NULL)
+		goto error;
+
+	return object;
+
+error:
+	for (i-- ; i >= 0 ; i--)
+	{
+		render->lirnd_material_free (materials[i]);
+		render->lirnd_buffer_free (buffers + i);
+	}
+	free (materials);
+	free (buffers);
+
+	return NULL;
 }
+#endif
 
 liphyShape*
 livox_builder_get_shape (livoxBuilder* self)
@@ -256,7 +325,8 @@ private_build_full (livoxBuilder* self,
 	limatAabb aabb;
 	limatVector blockoff;
 	limatVector tileoff;
-	limdlVertex vertices[64];
+	limatVector coords[64];
+	limatVector normals[64];
 
 	if (!block->full.terrain)
 		return 1;
@@ -279,13 +349,13 @@ private_build_full (livoxBuilder* self,
 				LIVOX_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
 				LIVOX_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
 		}
-		c = livox_voxel_triangulate (tile, mask, vertices);
+		c = livox_voxel_triangulate (tile, mask, coords, normals);
 		if (c)
 		{
 			mat = livox_voxel_get_type (tile) - 1;
 			tileoff = limat_vector_init (tx, ty, tz);
 			tileoff = limat_vector_multiply (tileoff, LIVOX_TILE_WIDTH);
-			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, vertices, c))
+			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, coords, normals, c))
 				return 0;
 		}
 	}
@@ -321,7 +391,8 @@ private_build_tiles (livoxBuilder* self,
 	livoxVoxel mask[6];
 	limatVector blockoff;
 	limatVector tileoff;
-	limdlVertex vertices[64];
+	limatVector coords[64];
+	limatVector normals[64];
 
 	/* Get block offset. */
 	blockoff = limat_vector_init (bx, by, bz);
@@ -343,13 +414,13 @@ private_build_tiles (livoxBuilder* self,
 				LIVOX_TILES_PER_LINE * by + ty + voxel_face_normals[i][1],
 				LIVOX_TILES_PER_LINE * bz + tz + voxel_face_normals[i][2]);
 		}
-		c = livox_voxel_triangulate (tile, mask, vertices);
+		c = livox_voxel_triangulate (tile, mask, coords, normals);
 		if (c)
 		{
 			mat = livox_voxel_get_type (tile) - 1;
 			tileoff = limat_vector_init (tx, ty, tz);
 			tileoff = limat_vector_multiply (tileoff, LIVOX_TILE_WIDTH);
-			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, vertices, c))
+			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, coords, normals, c))
 				return 0;
 		}
 	}
@@ -367,14 +438,12 @@ private_build_tiles (livoxBuilder* self,
 
 #ifndef LIVOX_DISABLE_GRAPHICS
 static void
-private_calculate_normal (livoxBuilder*self,
-                          limdlFaces*  group,
-                          int          vertex,
-                          limatVector* fnormal,
-                          limatVector* vnormal)
+private_calculate_normal (livoxBuilder* self,
+                          limatVector*  coord,
+                          limatVector*  fnormal,
+                          limatVector*  vnormal)
 {
 	int count;
-	limatVector coord;
 	limatVector normal;
 	livoxBuilderNormal* lookup;
 
@@ -382,8 +451,7 @@ private_calculate_normal (livoxBuilder*self,
 	normal = *fnormal;
 
 	/* Find normal list. */
-	coord = group->vertices.array[vertex].coord;
-	lookup = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
+	lookup = lialg_memdic_find (self->helpers.normals, coord, sizeof (limatVector));
 	assert (lookup != NULL);
 	if (lookup == NULL)
 	{
@@ -407,90 +475,77 @@ private_calculate_normal (livoxBuilder*self,
 }
 #endif
 
-static void
-private_calculate_texcoords (livoxBuilder* self,
-                             int           material,
-                             limdlVertex*  vertices)
+#ifndef LIVOX_DISABLE_GRAPHICS
+static int
+private_insert_triangle (livoxBuilder* self,
+                         int           id,
+                         limatVector*  coords,
+                         limatVector*  normals)
 {
-	int j;
-	float dx = vertices->normal.x;
-	float dy = vertices->normal.y;
-	float dz = vertices->normal.z;
+	int i;
 	float scale;
 	limatVector u;
 	limatVector v;
-	livoxMaterial* voxmat;
+	livoxFaces* faces;
+	livoxMaterial* mat;
+	livoxVertex* tmp;
 
-	/* Calculate plane vectors. */
-	if (LI_ABS (dx) < LI_ABS (dy) && LI_ABS (dx) < LI_ABS (dz))
+	/* Check for existing. */
+	mat = livox_manager_find_material (self->sector->manager, id);
+	if (mat == NULL)
+	{
+		scale = 0.05f;
+		id = -1;
+	}
+	else
+		scale = mat->scale;
+	faces = lialg_u32dic_find (self->helpers.materials, id);
+
+	/* Create new material. */
+	if (faces == NULL)
+	{
+		faces = calloc (1, sizeof (livoxFaces));
+		if (faces == NULL)
+			return 0;
+		faces->material = id;
+		if (!lialg_u32dic_insert (self->helpers.materials, id, faces))
+		{
+			free (faces);
+			return 0;
+		}
+	}
+
+	/* Calculate tangent and bitangent. */
+	if (LI_ABS (normals->x) < LI_ABS (normals->y) && LI_ABS (normals->x) < LI_ABS (normals->z))
 		u = limat_vector_init (1.0f, 0.0f, 0.0f);
-	else if (LI_ABS (dy) < LI_ABS (dz))
+	else if (LI_ABS (normals->y) < LI_ABS (normals->z))
 		u = limat_vector_init (1.0f, 1.0f, 0.0f);
 	else
 		u = limat_vector_init (0.0f, 0.0f, 1.0f);
-	v = limat_vector_cross (u, vertices->normal);
+	v = limat_vector_cross (u, *normals);
 
-	/* Get scale factor. */
-	voxmat = lialg_u32dic_find (self->sector->manager->materials, material);
-	if (voxmat != NULL)
-		scale = voxmat->scale;
-	else
-		scale = 0.05f;
+	/* Reallocate vertices. */
+	id = faces->vertices.count;
+	tmp = realloc (faces->vertices.array, (id + 3) * sizeof (livoxVertex));
+	if (tmp == NULL)
+		return 0;
+	faces->vertices.array = tmp;
+	faces->vertices.count += 3;
 
-	/* Calculate texture coordinates. */
-	for (j = 0 ; j < 3 ; j++)
+	/* Insert vertices. */
+	for (i = 0 ; i < 3 ; i++, id++)
 	{
-		vertices[j].texcoord[0] = scale * limat_vector_dot (vertices[j].coord, u);
-		vertices[j].texcoord[1] = scale * limat_vector_dot (vertices[j].coord, v);
+		faces->vertices.array[id].texcoord[0] = scale * limat_vector_dot (coords[i], u);
+		faces->vertices.array[id].texcoord[1] = scale * limat_vector_dot (coords[i], v);
+		faces->vertices.array[id].normal[0] = normals[i].x;
+		faces->vertices.array[id].normal[1] = normals[i].y;
+		faces->vertices.array[id].normal[2] = normals[i].z;
+		faces->vertices.array[id].coord[0] = (uint16_t) coords[i].x;
+		faces->vertices.array[id].coord[1] = (uint16_t) coords[i].y;
+		faces->vertices.array[id].coord[2] = (uint16_t) coords[i].z;
 	}
-}
 
-#ifndef LIVOX_DISABLE_GRAPHICS
-static int
-private_insert_material (livoxBuilder* self,
-                         int           id)
-{
-	void* ret;
-	limdlMaterial tmp;
-	limdlMaterial* mdlmat;
-	livoxMaterial* voxmat;
-
-	assert (self->helpers.model != NULL);
-	assert (self->helpers.model->facegroups.count == self->helpers.model->materials.count);
-
-	/* Check for existing. */
-	ret = lialg_u32dic_find (self->helpers.materials, id);
-	if (ret != NULL)
-		return (int)(intptr_t)(ret - 1);
-
-	/* Find material info. */
-	voxmat = livox_manager_find_material (self->sector->manager, id);
-	if (voxmat == NULL)
-	{
-		id = PRIVATE_MISSING_MATERIAL;
-		ret = lialg_u32dic_find (self->helpers.materials, id);
-		if (ret != NULL)
-			return (int)(intptr_t)(ret - 1);
-		memset (&tmp, 0, sizeof (limdlMaterial));
-		tmp.diffuse[0] = 1.0f;
-		tmp.diffuse[1] = 1.0f;
-		tmp.diffuse[2] = 1.0f;
-		tmp.diffuse[3] = 1.0f;
-		tmp.shader = "default";
-		mdlmat = &tmp;
-	}
-	else
-		mdlmat = &voxmat->model;
-
-	/* Create new material. */
-	if (!limdl_model_insert_material (self->helpers.model, mdlmat))
-		return -1;
-	if (!limdl_model_insert_group (self->helpers.model, self->helpers.model->materials.count - 1))
-		return -1;
-	if (!lialg_u32dic_insert (self->helpers.materials, id, NULL + self->helpers.model->materials.count))
-		return -1;
-
-	return self->helpers.model->materials.count - 1;
+	return 1;
 }
 #endif
 
@@ -499,53 +554,49 @@ private_insert_vertices (livoxBuilder* self,
                          int           material,
                          limatVector*  blockoff,
                          limatVector*  tileoff,
-                         limdlVertex*  vertices,
+                         limatVector*  coords,
+                         limatVector*  normals,
                          int           count)
 {
 	int i;
 	int j;
-	int mat;
 	limatVector coord;
 	limatVector normal;
 	limatVector* tmp;
 	livoxBuilderNormal* lookup0;
 	livoxBuilderNormal* lookup1;
 
-	/* Scale and translate vertices. */
+	/* Scale and translate coordinates. */
 	for (i = 0 ; i < count ; i++)
 	{
-		vertices[i].coord = limat_vector_multiply (vertices[i].coord, LIVOX_TILE_WIDTH);
-		vertices[i].coord = limat_vector_add (vertices[i].coord, *tileoff);
-		vertices[i].coord = limat_vector_add (vertices[i].coord, *blockoff);
+		coords[i] = limat_vector_multiply (coords[i], LIVOX_TILE_WIDTH);
+		coords[i] = limat_vector_add (coords[i], *tileoff);
+		coords[i] = limat_vector_add (coords[i], *blockoff);
 	}
 
 	/* Insert collision vertices. */
 	tmp = realloc (self->vertices.array, (self->vertices.count + count) * sizeof (limatVector));
 	if (tmp == NULL)
 		return 0;
-	for (i = 0 ; i < count ; i++)
-		tmp[self->vertices.count + i] = vertices[i].coord;
+	memcpy (tmp + self->vertices.count, coords, count * sizeof (limatVector));
 	self->vertices.array = tmp;
 	self->vertices.count += count;
 
 	/* Insert model vertices. */
 #ifndef LIVOX_DISABLE_GRAPHICS
-	if (self->helpers.model != NULL)
+	if (self->sector->manager->render != NULL)
 	{
 		for (i = 0 ; i < count ; i += 3)
 		{
 			/* Insert model triangle. */
-			mat = private_insert_material (self, material);
-			if (mat == -1)
+			if (!private_insert_triangle (self, material, coords + i, normals + i))
 				return 0;
-			private_calculate_texcoords (self, material, vertices + i);
-			limdl_model_insert_triangle (self->helpers.model, mat, vertices + i, NULL);
 
 			/* Create normal lookup. */
-			normal = vertices[i].normal;
+			normal = normals[i];
 			for (j = 0 ; j < 3 ; j++)
 			{
-				coord = vertices[i + j].coord;
+				coord = coords[i + j];
 				lookup0 = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
 				if (lookup0 != NULL)
 				{

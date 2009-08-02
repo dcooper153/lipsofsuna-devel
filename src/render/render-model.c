@@ -48,6 +48,7 @@ lirnd_model_new (lirndRender* render,
 		return NULL;
 	self->render = render;
 	self->model = model;
+	self->aabb = model->bounds;
 
 	return self;
 }
@@ -61,6 +62,13 @@ void
 lirnd_model_free (lirndModel* self)
 {
 	free (self);
+}
+
+void
+lirnd_model_get_bounds (lirndModel* self,
+                        limatAabb*  aabb)
+{
+	*aabb = self->aabb;
 }
 
 /**

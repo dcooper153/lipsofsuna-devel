@@ -58,6 +58,10 @@ struct _lirndMaterial
 lirndMaterial*
 lirnd_material_new ();
 
+lirndMaterial*
+lirnd_material_new_from_model (lirndRender*         render,
+                               const limdlMaterial* material);
+
 void
 lirnd_material_free (lirndMaterial* self);
 

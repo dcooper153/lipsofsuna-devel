@@ -698,8 +698,6 @@ private_build_block (livoxSector* self,
 {
 	livoxBlock* block;
 	livoxBuilder* builder;
-	limdlModel* model;
-	lirndModel* rndmdl;
 
 	/* Optimize block. */
 	block = self->blocks + LIVOX_BLOCK_INDEX (x, y, z);
@@ -739,29 +737,10 @@ private_build_block (livoxSector* self,
 	if (self->manager->render != NULL)
 	{
 		if (block->render != NULL)
-		{
-			model = block->render->model->model;
-			rndmdl = block->render->model;
 			self->manager->renderapi->lirnd_object_free (block->render);
-			self->manager->renderapi->lirnd_model_free (rndmdl);
-			limdl_model_free (model);
-		}
-		model = livox_builder_get_model (builder);
-		rndmdl = self->manager->renderapi->lirnd_model_new (self->manager->render, model);
-		block->render = self->manager->renderapi->lirnd_object_new (self->manager->scene, 0);
+		block->render = livox_builder_get_render (builder);
 		if (block->render == NULL)
 		{
-			self->manager->renderapi->lirnd_model_free (rndmdl);
-			limdl_model_free (model);
-			livox_builder_free (builder);
-			return 0;
-		}
-		if (!self->manager->renderapi->lirnd_object_set_model (block->render, rndmdl, NULL))
-		{
-			self->manager->renderapi->lirnd_object_free (block->render);
-			self->manager->renderapi->lirnd_model_free (rndmdl);
-			limdl_model_free (model);
-			block->render = NULL;
 			livox_builder_free (builder);
 			return 0;
 		}

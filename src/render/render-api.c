@@ -31,9 +31,15 @@
  */
 lirndApi lirnd_render_api =
 {
+	lirnd_buffer_init,
+	lirnd_buffer_free,
+	lirnd_material_new,
+	lirnd_material_new_from_model,
+	lirnd_material_free,
 	lirnd_model_new,
 	lirnd_model_free,
 	lirnd_object_new,
+	lirnd_object_new_from_data,
 	lirnd_object_free,
 	lirnd_object_deform,
 	lirnd_object_update,

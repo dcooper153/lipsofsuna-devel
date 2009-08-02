@@ -34,6 +34,7 @@
 struct _lirndModel
 {
 	int id;
+	limatAabb aabb;
 	limdlModel* model;
 	lirndRender* render;
 };
@@ -45,8 +46,12 @@ lirnd_model_new (lirndRender* render,
 void
 lirnd_model_free (lirndModel*  self);
 
+void
+lirnd_model_get_bounds (lirndModel* self,
+                        limatAabb*  aabb);
+
 int
-lirnd_model_get_static (lirndModel*  self);
+lirnd_model_get_static (lirndModel* self);
 
 #endif
 

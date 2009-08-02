@@ -26,7 +26,6 @@
 #define __VOXEL_H__
 
 #include <math/lips-math.h>
-#include <model/lips-model.h>
 #include "voxel-types.h"
 
 livoxVoxel
@@ -36,7 +35,8 @@ livox_voxel_init (int shape,
 int
 livox_voxel_triangulate (livoxVoxel   self,
                          livoxVoxel*  neighbors,
-                         limdlVertex* result);
+                         limatVector* coords,
+                         limatVector* normals);
 
 livoxVoxel
 livox_voxel_validate (livoxVoxel self);

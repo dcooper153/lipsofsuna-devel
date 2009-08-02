@@ -41,6 +41,59 @@ lirnd_material_new ()
 	if (self == NULL)
 		return NULL;
 	self->shininess = 64;
+
+	return self;
+}
+
+lirndMaterial*
+lirnd_material_new_from_model (lirndRender*         render,
+                               const limdlMaterial* material)
+{
+	int j;
+	limdlTexture* texture;
+	lirndImage* image;
+	lirndMaterial* self;
+	lirndShader* shader;
+
+	self = calloc (1, sizeof (lirndMaterial));
+	if (self == NULL)
+		return NULL;
+	if (material->flags & LIMDL_MATERIAL_FLAG_BILLBOARD)
+		self->flags |= LIRND_MATERIAL_FLAG_BILLBOARD;
+	if (material->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
+		self->flags |= LIRND_MATERIAL_FLAG_CULLFACE;
+	if (material->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
+		self->flags |= LIRND_MATERIAL_FLAG_TRANSPARENCY;
+	self->shininess = material->shininess;
+	self->diffuse[0] = material->diffuse[0];
+	self->diffuse[1] = material->diffuse[1];
+	self->diffuse[2] = material->diffuse[2];
+	self->diffuse[3] = material->diffuse[3];
+	self->specular[0] = material->specular[0];
+	self->specular[1] = material->specular[1];
+	self->specular[2] = material->specular[2];
+	self->specular[3] = material->specular[3];
+	self->strand_start = material->strand_start;
+	self->strand_end = material->strand_end;
+	self->strand_shape = material->strand_shape;
+	shader = lirnd_render_find_shader (render, material->shader);
+	if (shader != NULL)
+		lirnd_material_set_shader (self, shader);
+	if (!lirnd_material_set_texture_count (self, material->textures.count))
+	{
+		lirnd_material_free (self);
+		return 0;
+	}
+	for (j = 0 ; j < material->textures.count ; j++)
+	{
+		texture = material->textures.array + j;
+		if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
+			image = lirnd_render_find_image (render, texture->string);
+		else
+			image = lirnd_render_find_image (render, "empty");
+		lirnd_material_set_texture (self, j, texture, image);
+	}
+
 	return self;
 }
 

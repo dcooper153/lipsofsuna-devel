@@ -84,10 +84,77 @@ lirnd_object_new (lirndScene* scene,
 	self->scene = scene;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
+	limat_aabb_init (&self->aabb);
 
 	/* Add to renderer. */
 	if (!lialg_ptrdic_insert (scene->objects, self, self))
 	{
+		free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Creates a new render object from raw data.
+ *
+ * If the creation of the object succeeds, the ownership of the passed
+ * mesh data is given to the object.
+ *
+ * \param scene Scene.
+ * \param id Object number.
+ * \param aabb Bounding box.
+ * \param buffer Render buffer array.
+ * \param buffercount Number of buffers.
+ * \param materials Material array.
+ * \param materialcount Number of materials.
+ * \param lights Light buffer.
+ * \param lightcount Number of lights.
+ * \return New render object or NULL.
+ */
+lirndObject*
+lirnd_object_new_from_data (lirndScene*      scene,
+                            int              id,
+                            const limatAabb* aabb,
+                            lirndBuffer*     buffers,
+                            int              buffercount,
+                            lirndMaterial**  materials,
+                            int              materialcount,
+                            lirndLight**     lights,
+                            int              lightcount)
+{
+	lirndObject* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (lirndObject));
+	if (self == NULL)
+		return NULL;
+	self->id = id;
+	self->aabb = *aabb;
+	self->scene = scene;
+	self->transform = limat_transform_identity ();
+	self->orientation.matrix = limat_matrix_identity ();
+
+	/* Add to renderer. */
+	if (!lialg_ptrdic_insert (scene->objects, self, self))
+	{
+		free (self);
+		return NULL;
+	}
+
+	/* Hijack data. */
+	self->buffers.count = buffercount;
+	self->buffers.array = buffers;
+	self->materials.count = materialcount;
+	self->materials.array = materials;
+	self->lights.count = lightcount;
+	self->lights.array = lights;
+
+	/* Initialize extras. */
+	if (!private_init_envmap (self))
+	{
+		lialg_ptrdic_remove (scene->objects, self);
 		free (self);
 		return NULL;
 	}
@@ -199,9 +266,8 @@ void
 lirnd_object_update (lirndObject* self,
                      float        secs)
 {
-	if (self->model == NULL)
-		return;
-	private_update_envmap (self);
+	if (self->buffers.count)
+		private_update_envmap (self);
 }
 
 /**
@@ -214,16 +280,7 @@ void
 lirnd_object_get_bounds (const lirndObject* self,
                          limatAabb*         result)
 {
-	const limdlModel* model;
-
-	if (self->model == NULL)
-	{
-		limat_aabb_init (result);
-		return;
-	}
-
-	model = self->model->model;
-	*result = limat_aabb_transform (model->bounds, &self->orientation.matrix);
+	*result = limat_aabb_transform (self->aabb, &self->orientation.matrix);
 }
 
 /**
@@ -315,7 +372,10 @@ lirnd_object_set_model (lirndObject* self,
 			memcpy (self, &backup, sizeof (lirndObject));
 			return 0;
 		}
+		self->aabb = model->aabb;
 	}
+	else
+		limat_aabb_init (&self->aabb);
 
 	/* Replace old model. */
 	private_clear_lights (&backup);
@@ -339,7 +399,7 @@ lirnd_object_set_model (lirndObject* self,
 int
 lirnd_object_get_realized (const lirndObject* self)
 {
-	return self->realized && self->model != NULL;
+	return self->realized && self->buffers.count;
 }
 
 /**
@@ -643,10 +703,7 @@ private_init_materials (lirndObject* self,
                         lirndModel*  model)
 {
 	uint32_t i;
-	uint32_t j;
 	limdlMaterial* src;
-	limdlTexture* texture;
-	lirndImage* image;
 	lirndMaterial* dst;
 
 	if (model == NULL || model->model == NULL)
@@ -665,42 +722,9 @@ private_init_materials (lirndObject* self,
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
 		src = model->model->materials.array + i;
-		dst = lirnd_material_new ();
+		dst = lirnd_material_new_from_model (self->scene->render, src);
 		if (dst == NULL)
 			return 0;
-		if (src->flags & LIMDL_MATERIAL_FLAG_BILLBOARD)
-			dst->flags |= LIRND_MATERIAL_FLAG_BILLBOARD;
-		if (src->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
-			dst->flags |= LIRND_MATERIAL_FLAG_CULLFACE;
-		if (src->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
-			dst->flags |= LIRND_MATERIAL_FLAG_TRANSPARENCY;
-		dst->shininess = src->shininess;
-		dst->diffuse[0] = src->diffuse[0];
-		dst->diffuse[1] = src->diffuse[1];
-		dst->diffuse[2] = src->diffuse[2];
-		dst->diffuse[3] = src->diffuse[3];
-		dst->specular[0] = src->specular[0];
-		dst->specular[1] = src->specular[1];
-		dst->specular[2] = src->specular[2];
-		dst->specular[3] = src->specular[3];
-		dst->strand_start = src->strand_start;
-		dst->strand_end = src->strand_end;
-		dst->strand_shape = src->strand_shape;
-		lirnd_material_set_shader (dst, lirnd_render_find_shader (self->scene->render, src->shader));
-		if (!lirnd_material_set_texture_count (dst, src->textures.count))
-		{
-			lirnd_material_free (dst);
-			return 0;
-		}
-		for (j = 0 ; j < src->textures.count ; j++)
-		{
-			texture = src->textures.array + j;
-			if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
-				image = lirnd_render_find_image (self->scene->render, texture->string);
-			else
-				image = lirnd_render_find_image (self->scene->render, "empty");
-			lirnd_material_set_texture (dst, j, texture, image);
-		}
 		self->materials.array[i] = dst;
 	}
 

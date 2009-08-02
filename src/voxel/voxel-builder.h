@@ -36,15 +36,34 @@ struct _livoxBuilderNormal
 	livoxBuilderNormal* next;
 };
 
+typedef struct _livoxVertex livoxVertex;
+struct _livoxVertex
+{
+	float texcoord[2];
+	float normal[3];
+	uint16_t coord[3];
+};
+
+typedef struct _livoxFaces livoxFaces;
+struct _livoxFaces
+{
+	int material;
+	struct
+	{
+		int count;
+		livoxVertex* array;
+	} vertices;
+};
+
 typedef struct _livoxBuilder livoxBuilder;
 struct _livoxBuilder
 {
+	limatAabb aabb;
 	livoxSector* sector;
 	struct
 	{
 		lialgU32dic* materials;
 		lialgMemdic* normals;
-		limdlModel* model;
 		liphyShape* shape;
 	} helpers;
 	struct
@@ -66,8 +85,8 @@ livox_builder_build (livoxBuilder* self,
                      int           by,
                      int           bz);
 
-limdlModel*
-livox_builder_get_model (livoxBuilder* self);
+lirndObject*
+livox_builder_get_render (livoxBuilder* self);
 
 liphyShape*
 livox_builder_get_shape (livoxBuilder* self);

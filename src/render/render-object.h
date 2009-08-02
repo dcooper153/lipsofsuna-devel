@@ -39,6 +39,7 @@ struct _lirndObject
 	int id;
 	int realized;
 	void* userdata;
+	limatAabb aabb;
 	limatTransform transform;
 	lirndScene* scene;
 	lirndModel* model;
@@ -75,6 +76,17 @@ struct _lirndObject
 lirndObject*
 lirnd_object_new (lirndScene* scene,
                   int         id);
+
+lirndObject*
+lirnd_object_new_from_data (lirndScene*      scene,
+                            int              id,
+                            const limatAabb* aabb,
+                            lirndBuffer*     buffers,
+                            int              buffercount,
+                            lirndMaterial**  materials,
+                            int              materialcount,
+                            lirndLight**     lights,
+                            int              lightcount);
 
 void
 lirnd_object_free (lirndObject* self);
