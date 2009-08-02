@@ -55,9 +55,6 @@ static int
 private_init_model (lirndObject* self,
                     lirndModel*  model);
 
-static int
-private_update_buffers (lirndObject* self);
-
 static void
 private_update_envmap (lirndObject* self);
 
@@ -127,6 +124,7 @@ lirnd_object_deform (lirndObject* self,
                      limdlPose*   pose)
 {
 	int i;
+	void* vertices;
 	lirndBuffer* buffer;
 
 	if (self->model == NULL)
@@ -134,9 +132,13 @@ lirnd_object_deform (lirndObject* self,
 	for (i = 0 ; i < self->buffers.count ; i++)
 	{
 		buffer = self->buffers.array + i;
-		limdl_pose_transform_group (pose, i, buffer->vertices.array);
+		vertices = lirnd_buffer_lock (buffer);
+		if (vertices != NULL)
+		{
+			limdl_pose_transform_group (pose, i, vertices);
+			lirnd_buffer_unlock (buffer, vertices);
+		}
 	}
-	private_update_buffers (self);
 	private_update_lights (self);
 }
 
@@ -728,35 +730,6 @@ private_init_model (lirndObject* self,
 		                        self->materials.array[group->material],
 		                        group->vertices.array, group->vertices.count))
 			return 0;
-	}
-
-	return 1;
-}
-
-static int
-private_update_buffers (lirndObject* self)
-{
-	int i;
-	int size;
-	limdlVertex* data;
-	lirndBuffer* buffer;
-
-	if (!GLEW_ARB_vertex_buffer_object)
-		return 1;
-	for (i = 0 ; i < self->buffers.count ; i++)
-	{
-		buffer = self->buffers.array + i;
-		if (buffer->buffer)
-		{
-			glBindBufferARB (GL_ARRAY_BUFFER_ARB, buffer->buffer);
-			size = buffer->vertices.count * sizeof (limdlVertex);
-			data = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
-			if (data == NULL)
-				continue;
-			memcpy (data, buffer->vertices.array, size);
-			glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
-			glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-		}
 	}
 
 	return 1;

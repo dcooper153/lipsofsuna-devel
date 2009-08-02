@@ -36,11 +36,6 @@ lirnd_buffer_init (lirndBuffer*   self,
 	if (count)
 	{
 		size = count * sizeof (limdlVertex);
-		self->vertices.array = malloc (count * sizeof (limdlVertex));
-		if (self->vertices.array == NULL)
-			return 0;
-		self->vertices.count = count;
-		memcpy (self->vertices.array, data, size);
 		if (GLEW_ARB_vertex_buffer_object)
 		{
 			glGenBuffersARB (1, &self->buffer);
@@ -48,6 +43,14 @@ lirnd_buffer_init (lirndBuffer*   self,
 			glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, data, GL_STREAM_DRAW_ARB);
 			glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 		}
+		else
+		{
+			self->vertices.array = malloc (count * sizeof (limdlVertex));
+			if (self->vertices.array == NULL)
+				return 0;
+			memcpy (self->vertices.array, data, size);
+		}
+		self->vertices.count = count;
 	}
 
 	return 1;
@@ -59,6 +62,39 @@ lirnd_buffer_free (lirndBuffer* self)
 	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
 	free (self->vertices.array);
+}
+
+void*
+lirnd_buffer_lock (lirndBuffer* self)
+{
+	int size;
+	void* ret;
+
+	size = self->vertices.count * sizeof (limdlVertex);
+	if (self->buffer != 0)
+	{
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
+		ret = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB);
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+		return ret;
+	}
+	else
+		return self->vertices.array;
+}
+
+void
+lirnd_buffer_unlock (lirndBuffer* self,
+                     void*        data)
+{
+	int size;
+
+	size = self->vertices.count * sizeof (limdlVertex);
+	if (self->buffer != 0)
+	{
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
+		glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+	}
 }
 
 /** @} */

@@ -50,6 +50,13 @@ lirnd_buffer_init (lirndBuffer*   self,
 void
 lirnd_buffer_free (lirndBuffer* self);
 
+void*
+lirnd_buffer_lock (lirndBuffer* self);
+
+void
+lirnd_buffer_unlock (lirndBuffer* self,
+                     void*        data);
+
 #endif
 
 /** @} */
