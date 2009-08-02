@@ -79,16 +79,18 @@ lirnd_context_render (lirndContext* self,
                       lirndBuffer*  buffer);
 
 void
-lirnd_context_render_vbo (lirndContext* self,
-                          int           vertex0,
-                          int           vertex1,
-                          GLuint        vertices);
+lirnd_context_render_vbo (lirndContext*      self,
+                          int                vertex0,
+                          int                vertex1,
+                          const lirndFormat* format,
+                          GLuint             vertices);
 
 void
 lirnd_context_render_vtx (lirndContext*      self,
                           int                vertex0,
                           int                vertex1,
-                          const limdlVertex* vertices);
+                          const lirndFormat* format,
+                          const void*        vertices);
 
 void
 lirnd_context_unbind (lirndContext* self);

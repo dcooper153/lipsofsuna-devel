@@ -134,9 +134,9 @@ lirnd_context_render (lirndContext* self,
                       lirndBuffer*  buffer)
 {
 	if (buffer->buffer)
-		lirnd_context_render_vbo (self, 0, buffer->vertices.count, buffer->buffer);
+		lirnd_context_render_vbo (self, 0, buffer->vertices.count, &buffer->format, buffer->buffer);
 	else
-		lirnd_context_render_vtx (self, 0, buffer->vertices.count, buffer->vertices.array);
+		lirnd_context_render_vtx (self, 0, buffer->vertices.count, &buffer->format, buffer->vertices.array);
 }
 
 /**
@@ -148,43 +148,48 @@ lirnd_context_render (lirndContext* self,
  * \param vertices Vertex array.
  */
 void
-lirnd_context_render_vbo (lirndContext* self,
-                          int           vertex0,
-                          int           vertex1,
-                          GLuint        vertices)
+lirnd_context_render_vbo (lirndContext*      self,
+                          int                vertex0,
+                          int                vertex1,
+                          const lirndFormat* format,
+                          GLuint             vertices)
 {
+	int i;
 	int count;
-	glColor3f (1.0f, 1.0f, 1.0f);
 
+	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 	glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertices);
 
 	/* Bind buffer. */
 	count = vertex1 - vertex0;
-	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointerEXT (2, GL_FLOAT, 12 * sizeof (float), count, NULL);
-	glClientActiveTextureARB (GL_TEXTURE1);
-	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointerEXT (2, GL_FLOAT, 12 * sizeof (float), count, NULL + 2 * sizeof (float));
-	glClientActiveTextureARB (GL_TEXTURE2);
-	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-	glTexCoordPointerEXT (2, GL_FLOAT, 12 * sizeof (float), count, NULL + 4 * sizeof (float));
+	for (i = 0 ; i < format->tex_count ; i++)
+	{
+		glClientActiveTextureARB (GL_TEXTURE0 + i);
+		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointerEXT (2, format->tex_formats[i], format->size, count,
+			NULL + format->tex_offsets[i]);
+	}
+	if (format->tex_count)
+		glClientActiveTextureARB (GL_TEXTURE0);
 	glEnableClientState (GL_NORMAL_ARRAY);
-	glNormalPointerEXT (GL_FLOAT, 12 * sizeof (float), 0, NULL + 6 * sizeof (float));
+	glNormalPointerEXT (format->nml_format, format->size, 0, NULL + format->nml_offset);
 	glEnableClientState (GL_VERTEX_ARRAY);
-	glVertexPointerEXT (3, GL_FLOAT, 12 * sizeof (float), 0, NULL + 9 * sizeof (float));
+	glVertexPointerEXT (3, format->vtx_format, format->size, 0, NULL + format->vtx_offset);
 
 	/* Render buffer. */
 	glDrawArraysEXT (GL_TRIANGLES, vertex0, count);
 
 	/* Unbind buffer. */
 	glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-	glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-	glClientActiveTextureARB (GL_TEXTURE1);
-	glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-	glClientActiveTextureARB (GL_TEXTURE0);
-	glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	for (i = 0 ; i < format->tex_count ; i++)
+	{
+		glClientActiveTextureARB (GL_TEXTURE0 + i);
+		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	}
+	if (format->tex_count)
+		glClientActiveTextureARB (GL_TEXTURE0);
 	glDisableClientState (GL_NORMAL_ARRAY);
 	glDisableClientState (GL_VERTEX_ARRAY);
 
@@ -209,40 +214,45 @@ void
 lirnd_context_render_vtx (lirndContext*      self,
                           int                vertex0,
                           int                vertex1,
-                          const limdlVertex* vertices)
+                          const lirndFormat* format,
+                          const void*        vertices)
 {
 	int i;
-	limatVector n[3];
-	limatVector v[3];
-	const float* t[3];
-	glColor3f (1.0f, 1.0f, 1.0f);
+	int count;
 
+	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
-	glBegin (GL_TRIANGLES);
-	for (i = vertex0 ; i < vertex1 ; i += 3)
+
+	/* Bind array. */
+	count = vertex1 - vertex0;
+	for (i = 0 ; i < format->tex_count ; i++)
 	{
-		/* FIXME: No multitexturing. */
-		v[0] = vertices[i + 0].coord;
-		v[1] = vertices[i + 1].coord;
-		v[2] = vertices[i + 2].coord;
-		n[0] = vertices[i + 0].normal;
-		n[1] = vertices[i + 1].normal;
-		n[2] = vertices[i + 2].normal;
-		t[0] = vertices[i + 0].texcoord;
-		t[1] = vertices[i + 1].texcoord;
-		t[2] = vertices[i + 2].texcoord;
-		glTexCoord2fv (t[0]);
-		glNormal3f (n[0].x, n[0].y, n[0].z);
-		glVertex3f (v[0].x, v[0].y, v[0].z);
-		glTexCoord2fv (t[1]);
-		glNormal3f (n[1].x, n[1].y, n[1].z);
-		glVertex3f (v[1].x, v[1].y, v[1].z);
-		glTexCoord2fv (t[2]);
-		glNormal3f (n[2].x, n[2].y, n[2].z);
-		glVertex3f (v[2].x, v[2].y, v[2].z);
+		glClientActiveTextureARB (GL_TEXTURE0 + i);
+		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointerEXT (2, format->tex_formats[i], format->size, count, vertices + format->tex_offsets[i]);
 	}
-	glEnd ();
+	if (format->tex_count)
+		glClientActiveTextureARB (GL_TEXTURE0);
+	glEnableClientState (GL_NORMAL_ARRAY);
+	glNormalPointerEXT (format->nml_format, format->size, 0, vertices + format->nml_offset);
+	glEnableClientState (GL_VERTEX_ARRAY);
+	glVertexPointerEXT (3, format->vtx_format, format->size, 0, vertices + format->vtx_offset);
+
+	/* Render array. */
+	glDrawArraysEXT (GL_TRIANGLES, vertex0, count);
+
+	/* Unbind array. */
+	for (i = 0 ; i < format->tex_count ; i++)
+	{
+		glClientActiveTextureARB (GL_TEXTURE0 + i);
+		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	}
+	if (format->tex_count)
+		glClientActiveTextureARB (GL_TEXTURE0);
+	glDisableClientState (GL_NORMAL_ARRAY);
+	glDisableClientState (GL_VERTEX_ARRAY);
+
 	glPopMatrix ();
 
 #ifdef LIRND_ENABLE_PROFILING

@@ -33,18 +33,20 @@
 struct _lirndBuffer
 {
 	GLuint buffer;
+	lirndFormat format;
 	lirndMaterial* material;
 	struct
 	{
 		int count;
-		limdlVertex* array;
+		void* array;
 	} vertices;
 };
 
 int
 lirnd_buffer_init (lirndBuffer*   self,
                    lirndMaterial* material,
-                   limdlVertex*   data,
+                   lirndFormat*   format,
+                   void*          data,
                    int            count);
 
 void

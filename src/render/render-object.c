@@ -713,6 +713,14 @@ private_init_model (lirndObject* self,
 {
 	int i;
 	limdlFaces* group;
+	lirndFormat format =
+	{
+		12 * sizeof (float), 3,
+		{ GL_FLOAT, GL_FLOAT, GL_FLOAT },
+		{ 0 * sizeof (float), 2 * sizeof (float), 4 * sizeof (float) },
+		GL_FLOAT, 6 * sizeof (float),
+		GL_FLOAT, 9 * sizeof (float)
+	};
 
 	/* Allocate buffer list. */
 	self->buffers.array = calloc (model->model->facegroups.count, sizeof (lirndBuffer));
@@ -727,7 +735,7 @@ private_init_model (lirndObject* self,
 		assert (group->material >= 0);
 		assert (group->material < self->materials.count);
 		if (!lirnd_buffer_init (self->buffers.array + i,
-		                        self->materials.array[group->material],
+		                        self->materials.array[group->material], &format,
 		                        group->vertices.array, group->vertices.count))
 			return 0;
 	}

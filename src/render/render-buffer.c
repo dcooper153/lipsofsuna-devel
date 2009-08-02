@@ -27,15 +27,17 @@
 int
 lirnd_buffer_init (lirndBuffer*   self,
                    lirndMaterial* material,
-                   limdlVertex*   data,
+                   lirndFormat*   format,
+                   void*          data,
                    int            count)
 {
 	int size;
 
 	self->material = material;
+	self->format = *format;
 	if (count)
 	{
-		size = count * sizeof (limdlVertex);
+		size = count * format->size;
 		if (GLEW_ARB_vertex_buffer_object)
 		{
 			glGenBuffersARB (1, &self->buffer);
@@ -45,7 +47,7 @@ lirnd_buffer_init (lirndBuffer*   self,
 		}
 		else
 		{
-			self->vertices.array = malloc (count * sizeof (limdlVertex));
+			self->vertices.array = malloc (count * format->size);
 			if (self->vertices.array == NULL)
 				return 0;
 			memcpy (self->vertices.array, data, size);
@@ -70,7 +72,7 @@ lirnd_buffer_lock (lirndBuffer* self)
 	int size;
 	void* ret;
 
-	size = self->vertices.count * sizeof (limdlVertex);
+	size = self->vertices.count * self->format.size;
 	if (self->buffer != 0)
 	{
 		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
@@ -86,9 +88,6 @@ void
 lirnd_buffer_unlock (lirndBuffer* self,
                      void*        data)
 {
-	int size;
-
-	size = self->vertices.count * sizeof (limdlVertex);
 	if (self->buffer != 0)
 	{
 		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);

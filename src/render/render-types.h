@@ -38,6 +38,7 @@ enum _lirndSelect
 typedef struct _lirndBuffer lirndBuffer;
 typedef struct _lirndContext lirndContext;
 typedef enum _lirndFlags lirndFlags;
+typedef struct _lirndFormat lirndFormat;
 typedef struct _lirndLight lirndLight;
 typedef struct _lirndLighting lirndLighting;
 typedef struct _lirndMaterial lirndMaterial;
@@ -51,6 +52,18 @@ typedef struct _lirndSelection lirndSelection;
 typedef struct _lirndShader lirndShader;
 typedef struct _lirndTexture lirndTexture;
 typedef void (*lirndCallback) (lirndContext*, lirndObject*, void*);
+
+struct _lirndFormat
+{
+	int size;
+	int tex_count;
+	int tex_formats[3];
+	int tex_offsets[3];
+	int nml_format;
+	int nml_offset;
+	int vtx_format;
+	int vtx_offset;
+};
 
 struct _lirndSelection
 {
