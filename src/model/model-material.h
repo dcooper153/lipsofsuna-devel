@@ -98,6 +98,10 @@ struct _limdlMaterial
 extern "C" {
 #endif
 
+int
+limdl_material_init_copy (limdlMaterial*       self,
+                          const limdlMaterial* src);
+
 void
 limdl_material_clear_textures (limdlMaterial* self);
 

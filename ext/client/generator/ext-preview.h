@@ -38,6 +38,7 @@ typedef struct _liextPreview liextPreview;
 struct _liextPreview
 {
 	liwdgRender base;
+	licliModule* module;
 	ligenGenerator* generator;
 	liengCamera* camera;
 	lirndLight* light0;
@@ -55,7 +56,7 @@ liext_preview_new (liwdgManager* manager,
 void
 liext_preview_build (liextPreview* self);
 
-void
+int
 liext_preview_clear (liextPreview* self);
 
 int

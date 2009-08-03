@@ -71,6 +71,7 @@ liext_preview_new (liwdgManager* manager,
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_PREVIEW (self);
+	data->module = module;
 	data->render = module->engine->render;
 
 	/* Allocate scene. */
@@ -131,10 +132,30 @@ liext_preview_build (liextPreview* self)
 	ligen_generator_rebuild_scene (self->generator);
 }
 
-void
+int
 liext_preview_clear (liextPreview* self)
 {
+	lialgU32dicIter iter;
+	livoxMaterial* material;
+
+	/* Clear scene and materials. */
 	ligen_generator_clear_scene (self->generator);
+	livox_manager_clear_materials (self->generator->voxels);
+
+	/* Copy materials. */
+	LI_FOREACH_U32DIC (iter, self->module->voxels->materials)
+	{
+		material = livox_material_new_copy (iter.value);
+		if (material == NULL)
+			return 0;
+		if (!livox_manager_insert_material (self->generator->voxels, material))
+		{
+			livox_material_free (material);
+			return 0;
+		}
+	}
+
+	return 1;
 }
 
 int

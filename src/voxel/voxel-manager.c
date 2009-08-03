@@ -129,6 +129,17 @@ livox_manager_clear (livoxManager* self)
 }
 
 /**
+ * \brief Removes all the materials.
+ *
+ * \param self Voxel manager.
+ */
+void
+livox_manager_clear_materials (livoxManager* self)
+{
+	private_clear_materials (self);
+}
+
+/**
  * \brief Copies a box of voxels from the currently loaded scene.
  *
  * \param self Voxel manager.

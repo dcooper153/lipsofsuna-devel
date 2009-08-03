@@ -25,6 +25,57 @@
 #include "model-material.h"
 
 /**
+ * \brief Initializes a copy of a material.
+ *
+ * \param self Copy destination.
+ * \param src Copy source.
+ * \return Nonzero on success.
+ */
+int
+limdl_material_init_copy (limdlMaterial*       self,
+                          const limdlMaterial* src)
+{
+	int i;
+
+	*self = *src;
+	if (src->shader != NULL)
+	{
+		self->shader = strdup (src->shader);
+		if (self->shader == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			return 0;
+		}
+	}
+	if (src->textures.count)
+	{
+		self->textures.array = calloc (src->textures.count, sizeof (limdlTexture));
+		if (self->textures.array == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (self->shader);
+			return 0;
+		}
+		memcpy (self->textures.array, src->textures.array, src->textures.count * sizeof (limdlTexture));
+		for (i = 0 ; i < src->textures.count ; i++)
+		{
+			self->textures.array[i].string = strdup (src->textures.array[i].string);
+			if (self->textures.array[i].string == NULL)
+			{
+				for (i-- ; i >= 0 ; i--)
+					free (self->textures.array[i].string);
+				free (self->textures.array);
+				free (self->shader);
+				lisys_error_set (ENOMEM, NULL);
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+/**
  * \brief Removes all textures from the material.
  *
  * \param self Material.

@@ -60,6 +60,9 @@ livox_manager_free (livoxManager* self);
 void
 livox_manager_clear (livoxManager* self);
 
+void
+livox_manager_clear_materials (livoxManager* self);
+
 livoxSector*
 livox_manager_create_sector (livoxManager* self,
                              uint32_t      id);

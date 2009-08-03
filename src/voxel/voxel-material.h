@@ -43,6 +43,9 @@ livox_material_new (liarcSql*     sql,
                     sqlite3_stmt* stmt);
 
 livoxMaterial*
+livox_material_new_copy (const livoxMaterial* src);
+
+livoxMaterial*
 livox_material_new_from_stream (liReader* reader);
 
 void

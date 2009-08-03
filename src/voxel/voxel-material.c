@@ -109,6 +109,45 @@ livox_material_new (liarcSql*     sql,
 }
 
 /**
+ * \brief Creates a copy of a material.
+ *
+ * \param src Material to copy.
+ * \return Soft copy of the material or NULL.
+ */
+livoxMaterial*
+livox_material_new_copy (const livoxMaterial* src)
+{
+	livoxMaterial* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (livoxMaterial));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->id = src->id;
+	self->friction = src->friction;
+	self->scale = src->scale;
+	self->model = src->model;
+	self->name = strdup (src->name);
+	if (self->name == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (self);
+		return NULL;
+	}
+	if (!limdl_material_init_copy (&self->model, &src->model))
+	{
+		free (self->name);
+		free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
  * \brief Deserializes a material from a stream.
  *
  * \param reader Stream reader.
