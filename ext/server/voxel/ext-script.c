@@ -38,6 +38,30 @@
  * -- @class table
  */
 
+/* @luadoc
+ * ---
+ * -- Erases a box of voxel terrain.
+ * --
+ * -- @param self Voxel class.
+ * -- @param min Box minimum point.
+ * -- @param max Box maximum point.
+ * function Voxel.fill_box(self, min, max)
+ */
+static int
+Voxel_erase_box (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* min;
+	liscrData* max;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	min = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	max = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
+
+	livox_manager_erase_box (module->voxels, min->data, max->data);
+
+	return 0;
+}
 
 /* @luadoc
  * ---
@@ -57,9 +81,35 @@ Voxel_erase_point (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
 
-	lua_pushboolean (lua, liext_module_erase_point (module, center->data));
+	lua_pushboolean (lua, livox_manager_erase_point (module->voxels, center->data));
 
 	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Erase a sphere of voxel terrain.
+ * --
+ * -- @param self Voxel class.
+ * -- @param center Sphere center.
+ * -- @param radius Sphere radius.
+ * function Voxel.erase_sphere(self, center, radius)
+ */
+static int
+Voxel_erase_sphere (lua_State* lua)
+{
+	float radius;
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	radius = luaL_checknumber (lua, 3);
+	luaL_argcheck (lua, radius >= 0.0f, 3, "negative radius");
+
+	livox_manager_erase_sphere (module->voxels, center->data, radius);
+
+	return 0;
 }
 
 /* @luadoc
@@ -85,9 +135,35 @@ Voxel_fill_box (lua_State* lua)
 	max = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
 	terrain = luaL_checkinteger (lua, 4);
 
-	liext_module_fill_box (module, min->data, max->data, terrain);
+	livox_manager_fill_box (module->voxels, min->data, max->data, terrain);
 
 	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Fills terrain from the vicinity of the given point.
+ * --
+ * -- @param self Voxel class.
+ * -- @param point Point.
+ * -- @param type Terrain type.
+ * -- @return True if terrain was filled.
+ * function Voxel.fill_point(self, point, type)
+ */
+static int
+Voxel_fill_point (lua_State* lua)
+{
+	int type;
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	type = luaL_checkinteger (lua, 3);
+
+	lua_pushboolean (lua, livox_manager_fill_point (module->voxels, center->data, type));
+
+	return 1;
 }
 
 /* @luadoc
@@ -114,7 +190,7 @@ Voxel_fill_sphere (lua_State* lua)
 	terrain = luaL_checkinteger (lua, 4);
 	luaL_argcheck (lua, radius >= 0.0f, 3, "negative radius");
 
-	liext_module_fill_sphere (module, center->data, radius, terrain);
+	livox_manager_fill_sphere (module->voxels, center->data, radius, terrain);
 
 	return 0;
 }
@@ -146,8 +222,11 @@ liextVoxelScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_insert_func (self, "erase_box", Voxel_erase_box);
 	liscr_class_insert_func (self, "erase_point", Voxel_erase_point);
+	liscr_class_insert_func (self, "erase_sphere", Voxel_erase_sphere);
 	liscr_class_insert_func (self, "fill_box", Voxel_fill_box);
+	liscr_class_insert_func (self, "fill_point", Voxel_fill_point);
 	liscr_class_insert_func (self, "fill_sphere", Voxel_fill_sphere);
 	liscr_class_insert_func (self, "save", Voxel_save);
 }

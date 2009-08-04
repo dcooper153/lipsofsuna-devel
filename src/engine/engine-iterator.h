@@ -68,6 +68,7 @@ lieng_range_iter_first (liengRangeIter* self,
 	    range->miny > range->maxy ||
 	    range->minz > range->maxz)
 	{
+		self->index = 0;
 		self->more = 0;
 		return 0;
 	}

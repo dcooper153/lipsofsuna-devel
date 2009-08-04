@@ -107,6 +107,45 @@ livox_sector_build_block (livoxSector* self,
 }
 
 /**
+ * \brief Erases terrain inside the box.
+ *
+ * \param self Sector.
+ * \param box Bounding box relative to the origin of the sector.
+ */
+void
+livox_sector_erase_aabb (livoxSector*     self,
+                         const limatAabb* box)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	limatAabb block;
+	limatAabb child;
+
+	for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
+	{
+		block.min = limat_vector_init (
+			x * LIVOX_BLOCK_WIDTH,
+			y * LIVOX_BLOCK_WIDTH,
+			z * LIVOX_BLOCK_WIDTH);
+		block.max = limat_vector_init (
+			(x + 1) * LIVOX_BLOCK_WIDTH,
+			(y + 1) * LIVOX_BLOCK_WIDTH,
+			(z + 1) * LIVOX_BLOCK_WIDTH);
+		if (limat_aabb_intersects_aabb (box, &block))
+		{
+			child.min = limat_vector_subtract (box->min, block.min);
+			child.max = limat_vector_subtract (box->max, block.min);
+			if (livox_block_erase_aabb (self->blocks + i, &child))
+				self->dirty = 1;
+		}
+	}
+}
+
+/**
  * \brief Erases the voxel fragment closest to the passed point.
  *
  * \param self Sector.
@@ -216,6 +255,49 @@ livox_sector_erase_point (livoxSector*       self,
 }
 
 /**
+ * \brief Erases terrain inside the sphere.
+ *
+ * \param self Sector.
+ * \param center Center of the sphere relative to the origin of the sector.
+ * \param radius Radius of the sphere.
+ */
+void
+livox_sector_erase_sphere (livoxSector*       self,
+                           const limatVector* center,
+                           float              radius)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	float r;
+	limatVector block;
+	limatVector dist;
+
+	r = radius + LIVOX_BLOCK_WIDTH;
+	for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
+	{
+		block = limat_vector_init (
+			(x + 0.5f) * LIVOX_BLOCK_WIDTH,
+			(y + 0.5f) * LIVOX_BLOCK_WIDTH,
+			(z + 0.5f) * LIVOX_BLOCK_WIDTH);
+		dist = limat_vector_subtract (*center, block);
+		if (limat_vector_dot (dist, dist) < r * r)
+		{
+			block = limat_vector_init (
+				x * LIVOX_BLOCK_WIDTH,
+				y * LIVOX_BLOCK_WIDTH,
+				z * LIVOX_BLOCK_WIDTH);
+			block = limat_vector_subtract (*center, block);
+			if (livox_block_erase_sphere (self->blocks + i, &block, radius))
+				self->dirty = 1;
+		}
+	}
+}
+
+/**
  * \brief Fills the sector with the given terrain type.
  *
  * \param self Sector.
@@ -254,7 +336,7 @@ livox_sector_fill (livoxSector* self,
 void
 livox_sector_fill_aabb (livoxSector*     self,
                         const limatAabb* box,
-                        livoxVoxel        terrain)
+                        livoxVoxel       terrain)
 {
 	int i;
 	int x;
@@ -286,6 +368,115 @@ livox_sector_fill_aabb (livoxSector*     self,
 }
 
 /**
+ * \brief Fills the voxel fragment closest to the passed point.
+ *
+ * \param self Sector.
+ * \param point Point in sector space.
+ * \param terrain Terrain type.
+ * \return Nonzero on success, zero if the nearby voxels were all empty.
+ */
+int
+livox_sector_fill_point (livoxSector*       self,
+                         const limatVector* point,
+                         int                terrain)
+{
+	int x, y, z;
+	int xb, yb, zb;
+	int xc, yc, zc;
+	int xt, yt, zt;
+	int best;
+	int bestx;
+	int besty;
+	int bestz;
+	int mask;
+	int shape;
+	float d0;
+	float d1;
+	float dist0;
+	float dist1;
+	limatVector off;
+	livoxVoxel voxel;
+
+	/* Find hit voxel. */
+	x = (int)(point->x / LIVOX_TILE_WIDTH);
+	y = (int)(point->y / LIVOX_TILE_WIDTH);
+	z = (int)(point->z / LIVOX_TILE_WIDTH);
+	if (x < 0 || x >= LIVOX_TILES_PER_SECLINE ||
+	    y < 0 || y >= LIVOX_TILES_PER_SECLINE ||
+	    z < 0 || z >= LIVOX_TILES_PER_SECLINE)
+		return 0;
+
+	/* Find closest deletable corner. */
+	/* We try to favor the voxel that was hit by using two distance checks,
+	   one for the closest corner and another for the closest voxel. */
+	best = 0;
+	bestx = x;
+	besty = y;
+	bestz = z;
+	dist0 = 10.0E10f;
+	dist1 = 10.0E10f;
+	for (zt = LI_MAX (0, z - 1) ; zt <= z + 1 && zt < LIVOX_TILES_PER_SECLINE ; zt++)
+	for (yt = LI_MAX (0, y - 1) ; yt <= y + 1 && yt < LIVOX_TILES_PER_SECLINE ; yt++)
+	for (xt = LI_MAX (0, x - 1) ; xt <= x + 1 && xt < LIVOX_TILES_PER_SECLINE ; xt++)
+	{
+		/* Get voxel information. */
+		voxel = livox_sector_get_voxel (self, xt, yt, zt);
+		shape = livox_voxel_get_shape (voxel);
+
+		/* Get distance to voxel center. */
+		off.x = (xt + 0.5f) * LIVOX_TILE_WIDTH;
+		off.y = (yt + 0.5f) * LIVOX_TILE_WIDTH;
+		off.z = (zt + 0.5f) * LIVOX_TILE_WIDTH;
+		d1 = limat_vector_get_length (limat_vector_subtract (*point, off));
+
+		/* Check if not empty. */
+		if (shape)
+			continue;
+
+		/* Find closest empty corner. */
+		mask = 1;
+		for (zc = 0 ; zc < 2 ; zc++)
+		for (yc = 0 ; yc < 2 ; yc++)
+		for (xc = 0 ; xc < 2 ; xc++, mask <<= 1)
+		{
+			if (!(shape & mask))
+			{
+				off.x = (xt + xc) * LIVOX_TILE_WIDTH;
+				off.y = (yt + yc) * LIVOX_TILE_WIDTH;
+				off.z = (zt + zc) * LIVOX_TILE_WIDTH;
+				d0 = limat_vector_get_length (limat_vector_subtract (*point, off));
+				if (!best || d0 < dist0 || (d0 == dist0 && d1 < dist1))
+				{
+					best = mask;
+					bestx = xt;
+					besty = yt;
+					bestz = zt;
+					dist0 = d0;
+					dist1 = d1;
+				}
+			}
+		}
+	}
+	if (!best)
+		return 0;
+
+	/* Get voxel information. */
+	voxel = livox_sector_get_voxel (self, bestx, besty, bestz);
+	shape = livox_voxel_get_shape (voxel);
+
+	/* Clear the found corner. */
+	xb = x / LIVOX_TILES_PER_LINE;
+	yb = y / LIVOX_TILES_PER_LINE;
+	zb = z / LIVOX_TILES_PER_LINE;
+	voxel = livox_voxel_init (shape | best, terrain);
+	livox_sector_set_voxel (self, bestx, besty, bestz, voxel);
+	self->blocks[LIVOX_BLOCK_INDEX (xb, yb, zb)].stamp++;
+	self->dirty = 1;
+
+	return 1;
+}
+
+/**
  * \brief Fills a sphere with the given terrain type.
  *
  * \param self Sector.
@@ -297,7 +488,7 @@ void
 livox_sector_fill_sphere (livoxSector*       self,
                           const limatVector* center,
                           float              radius,
-                          livoxVoxel          terrain)
+                          livoxVoxel         terrain)
 {
 	int i;
 	int x;

@@ -39,6 +39,15 @@ void
 livox_block_free (livoxBlock*   self,
                   livoxManager* manager);
 
+int
+livox_block_erase_aabb (livoxBlock*      self,
+                        const limatAabb* box);
+
+int
+livox_block_erase_sphere (livoxBlock*        self,
+                          const limatVector* center,
+                          float              radius);
+
 void
 livox_block_fill (livoxBlock*   self,
                   livoxManager* manager,

@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <engine/lips-engine.h>
 #include "voxel-manager.h"
 #include "voxel-material.h"
 #include "voxel-private.h"
@@ -213,6 +214,174 @@ livox_manager_create_sector (livoxManager* self,
 	if (sector != NULL)
 		return sector;
 	return livox_sector_new (self, id);
+}
+
+void
+livox_manager_erase_box (livoxManager*      self,
+                         const limatVector* min,
+                         const limatVector* max)
+{
+	liengRange range;
+	liengRangeIter rangeiter;
+	limatAabb aabb;
+	limatVector origin;
+	livoxSector* sector;
+
+	/* Modify sectors. */
+	range = lieng_range_new_from_aabb (min, max, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangeiter, range)
+	{
+		sector = livox_manager_find_sector (self, rangeiter.index);
+		if (sector == NULL)
+			continue;
+		livox_sector_get_origin (sector, &origin);
+		aabb.min = limat_vector_subtract (*min, origin);
+		aabb.max = limat_vector_subtract (*max, origin);
+		livox_sector_erase_aabb (sector, &aabb);
+	}
+}
+
+/**
+ * \brief Erases the voxel fragment closest to the passed point.
+ *
+ * \param self Voxel manager.
+ * \param point Point in world space.
+ * \return Nonzero on success, zero if the nearby voxels were all empty.
+ */
+int
+livox_manager_erase_point (livoxManager*      self,
+                           const limatVector* point)
+{
+	int x;
+	int y;
+	int z;
+	int index;
+	limatVector p;
+	livoxSector* sector;
+
+	x = (int)(point->x / LIVOX_SECTOR_WIDTH);
+	y = (int)(point->y / LIVOX_SECTOR_WIDTH);
+	z = (int)(point->z / LIVOX_SECTOR_WIDTH);
+	p.x = point->x - x * LIVOX_SECTOR_WIDTH;
+	p.y = point->y - y * LIVOX_SECTOR_WIDTH;
+	p.z = point->z - z * LIVOX_SECTOR_WIDTH;
+
+	index = LIVOX_SECTOR_INDEX (x, y, z);
+	sector = livox_manager_find_sector (self, index);
+	if (sector == NULL)
+		return 0;
+
+	return livox_sector_erase_point (sector, &p);
+}
+
+void
+livox_manager_erase_sphere (livoxManager*      self,
+                            const limatVector* center,
+                            float              radius)
+{
+	liengRange range;
+	liengRangeIter rangeiter;
+	limatVector origin;
+	limatVector vector;
+	livoxSector* sector;
+
+	/* Modify sectors. */
+	range = lieng_range_new_from_sphere (center, radius, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangeiter, range)
+	{
+		sector = livox_manager_find_sector (self, rangeiter.index);
+		if (sector == NULL)
+			continue;
+		livox_sector_get_origin (sector, &origin);
+		vector = limat_vector_subtract (*center, origin);
+		livox_sector_erase_sphere (sector, &vector, radius);
+	}
+}
+
+void
+livox_manager_fill_box (livoxManager*      self,
+                        const limatVector* min,
+                        const limatVector* max,
+                        livoxVoxel         terrain)
+{
+	liengRange range;
+	liengRangeIter rangeiter;
+	limatAabb aabb;
+	limatVector origin;
+	livoxSector* sector;
+
+	/* Modify sectors. */
+	range = lieng_range_new_from_aabb (min, max, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangeiter, range)
+	{
+		sector = livox_manager_find_sector (self, rangeiter.index);
+		if (sector == NULL)
+			continue;
+		livox_sector_get_origin (sector, &origin);
+		aabb.min = limat_vector_subtract (*min, origin);
+		aabb.max = limat_vector_subtract (*max, origin);
+		livox_sector_fill_aabb (sector, &aabb, terrain);
+	}
+}
+
+/**
+ * \brief Creates the voxel fragment closest to the passed point.
+ *
+ * \param self Voxel manager.
+ * \param point Point in world space.
+ * \param terrain Terrain type.
+ * \return Nonzero on success, zero if the nearby voxels were all empty.
+ */
+int
+livox_manager_fill_point (livoxManager*      self,
+                          const limatVector* point,
+                          int                terrain)
+{
+	int x;
+	int y;
+	int z;
+	int index;
+	limatVector p;
+	livoxSector* sector;
+
+	x = (int)(point->x / LIVOX_SECTOR_WIDTH);
+	y = (int)(point->y / LIVOX_SECTOR_WIDTH);
+	z = (int)(point->z / LIVOX_SECTOR_WIDTH);
+	p.x = point->x - x * LIVOX_SECTOR_WIDTH;
+	p.y = point->y - y * LIVOX_SECTOR_WIDTH;
+	p.z = point->z - z * LIVOX_SECTOR_WIDTH;
+
+	index = LIVOX_SECTOR_INDEX (x, y, z);
+	sector = livox_manager_find_sector (self, index);
+	if (sector == NULL)
+		return 0;
+
+	return livox_sector_fill_point (sector, &p, terrain);
+}
+
+void
+livox_manager_fill_sphere (livoxManager*      self,
+                           const limatVector* center,
+                           float              radius,
+                           livoxVoxel         terrain)
+{
+	liengRange range;
+	liengRangeIter rangeiter;
+	limatVector origin;
+	limatVector vector;
+	livoxSector* sector;
+
+	/* Modify sectors. */
+	range = lieng_range_new_from_sphere (center, radius, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangeiter, range)
+	{
+		sector = livox_manager_find_sector (self, rangeiter.index);
+		if (sector == NULL)
+			continue;
+		livox_sector_get_origin (sector, &origin);
+		vector = limat_vector_subtract (*center, origin);
+		livox_sector_fill_sphere (sector, &vector, radius, terrain);
+	}
 }
 
 livoxMaterial*

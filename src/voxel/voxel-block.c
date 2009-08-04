@@ -59,6 +59,101 @@ livox_block_free (livoxBlock*   self,
 }
 
 /**
+ * \brief Erases terrain inside the box.
+ *
+ * \param self Block.
+ * \param aabb Bounding box relative to the origin of the block.
+ * \return Nonzero if at least one voxel was modified.
+ */
+int
+livox_block_erase_aabb (livoxBlock*      self,
+                        const limatAabb* box)
+{
+	int x;
+	int y;
+	int z;
+	int ret = 0;
+	limatAabb child;
+
+	/* Erase terrain. */
+	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
+	{
+		child.min = limat_vector_init (
+			x * LIVOX_TILE_WIDTH,
+			y * LIVOX_TILE_WIDTH,
+			z * LIVOX_TILE_WIDTH);
+		child.max = limat_vector_init (
+			(x + 1) * LIVOX_TILE_WIDTH,
+			(y + 1) * LIVOX_TILE_WIDTH,
+			(z + 1) * LIVOX_TILE_WIDTH);
+		if (limat_aabb_intersects_aabb (box, &child))
+			ret |= livox_block_set_voxel (self, x, y, z, 0);
+	}
+	if (ret)
+		self->stamp++;
+
+	return ret;
+}
+
+/**
+ * \brief Erases terrain inside the sphere.
+ *
+ * \param self Block.
+ * \param center Center of the sphere relative to the origin of the block.
+ * \param radius Radius of the sphere.
+ * \return Nonzero if at least one voxel was modified.
+ */
+int
+livox_block_erase_sphere (livoxBlock*        self,
+                          const limatVector* center,
+                          float              radius)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	int ret = 0;
+	livoxVoxel tile;
+	limatVector dist;
+	static const limatVector corner_offsets[8] =
+	{
+		{ 0.0f, 0.0f, 0.0f },
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f },
+		{ 1.0f, 0.0f, 1.0f },
+		{ 0.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f }
+	};
+
+	/* Erase terrain. */
+	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
+	{
+		tile = livox_block_get_voxel (self, x, y, z);
+		for (i = 0 ; i < 8 ; i++)
+		{
+			dist = limat_vector_subtract (*center, limat_vector_init (
+				(x + corner_offsets[i].x) * LIVOX_TILE_WIDTH,
+				(y + corner_offsets[i].y) * LIVOX_TILE_WIDTH,
+				(z + corner_offsets[i].z) * LIVOX_TILE_WIDTH));
+			if (limat_vector_dot (dist, dist) <= radius * radius)
+				tile &= ~(1 << (i + 8));
+		}
+		tile = livox_voxel_validate (tile);
+		ret |= livox_block_set_voxel (self, x, y, z, tile);
+	}
+	if (ret)
+		self->stamp++;
+
+	return ret;
+}
+
+/**
  * \brief Fills the block with the given terrain type.
  *
  * \param self Block.
@@ -114,44 +209,22 @@ livox_block_fill_aabb (livoxBlock*      self,
 	int ret = 0;
 	limatAabb child;
 
+	/* Paint terrain. */
 	terrain &= 0xFF;
-	if (!terrain)
+	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
-		/* Erase terrain. */
-		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-		{
-			child.min = limat_vector_init (
-				x * LIVOX_TILE_WIDTH,
-				y * LIVOX_TILE_WIDTH,
-				z * LIVOX_TILE_WIDTH);
-			child.max = limat_vector_init (
-				(x + 1) * LIVOX_TILE_WIDTH,
-				(y + 1) * LIVOX_TILE_WIDTH,
-				(z + 1) * LIVOX_TILE_WIDTH);
-			if (limat_aabb_intersects_aabb (box, &child))
-				ret |= livox_block_set_voxel (self, x, y, z, 0);
-		}
-	}
-	else
-	{
-		/* Paint terrain. */
-		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-		{
-			child.min = limat_vector_init (
-				x * LIVOX_TILE_WIDTH,
-				y * LIVOX_TILE_WIDTH,
-				z * LIVOX_TILE_WIDTH);
-			child.max = limat_vector_init (
-				(x + 1) * LIVOX_TILE_WIDTH,
-				(y + 1) * LIVOX_TILE_WIDTH,
-				(z + 1) * LIVOX_TILE_WIDTH);
-			if (limat_aabb_intersects_aabb (box, &child))
-				ret |= livox_block_set_voxel (self, x, y, z, 0xFF00 | terrain);
-		}
+		child.min = limat_vector_init (
+			x * LIVOX_TILE_WIDTH,
+			y * LIVOX_TILE_WIDTH,
+			z * LIVOX_TILE_WIDTH);
+		child.max = limat_vector_init (
+			(x + 1) * LIVOX_TILE_WIDTH,
+			(y + 1) * LIVOX_TILE_WIDTH,
+			(z + 1) * LIVOX_TILE_WIDTH);
+		if (limat_aabb_intersects_aabb (box, &child))
+			ret |= livox_block_set_voxel (self, x, y, z, 0xFF00 | terrain);
 	}
 	if (ret)
 		self->stamp++;
@@ -194,55 +267,31 @@ livox_block_fill_sphere (livoxBlock*        self,
 		{ 1.0f, 1.0f, 1.0f }
 	};
 
+	/* Paint terrain. */
 	terrain &= 0xFF;
-	if (!terrain)
+	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
-		/* Erase terrain. */
-		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
+		found = 0;
+		tile = livox_block_get_voxel (self, x, y, z) & 0xFF00;
+		tile |= terrain;
+		for (i = 0 ; i < 8 ; i++)
 		{
-			tile = livox_block_get_voxel (self, x, y, z);
-			for (i = 0 ; i < 8 ; i++)
+			dist = limat_vector_subtract (*center, limat_vector_init (
+				(x + corner_offsets[i].x) * LIVOX_TILE_WIDTH,
+				(y + corner_offsets[i].y) * LIVOX_TILE_WIDTH,
+				(z + corner_offsets[i].z) * LIVOX_TILE_WIDTH));
+			if (limat_vector_dot (dist, dist) <= radius * radius)
 			{
-				dist = limat_vector_subtract (*center, limat_vector_init (
-					(x + corner_offsets[i].x) * LIVOX_TILE_WIDTH,
-					(y + corner_offsets[i].y) * LIVOX_TILE_WIDTH,
-					(z + corner_offsets[i].z) * LIVOX_TILE_WIDTH));
-				if (limat_vector_dot (dist, dist) <= radius * radius)
-					tile &= ~(1 << (i + 8));
+				tile |= (1 << (i + 8));
+				found = 1;
 			}
+		}
+		if (found)
+		{
 			tile = livox_voxel_validate (tile);
 			ret |= livox_block_set_voxel (self, x, y, z, tile);
-		}
-	}
-	else
-	{
-		/* Paint terrain. */
-		for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-		{
-			found = 0;
-			tile = livox_block_get_voxel (self, x, y, z) & 0xFF00;
-			tile |= terrain;
-			for (i = 0 ; i < 8 ; i++)
-			{
-				dist = limat_vector_subtract (*center, limat_vector_init (
-					(x + corner_offsets[i].x) * LIVOX_TILE_WIDTH,
-					(y + corner_offsets[i].y) * LIVOX_TILE_WIDTH,
-					(z + corner_offsets[i].z) * LIVOX_TILE_WIDTH));
-				if (limat_vector_dot (dist, dist) <= radius * radius)
-				{
-					tile |= (1 << (i + 8));
-					found = 1;
-				}
-			}
-			if (found)
-			{
-				tile = livox_voxel_validate (tile);
-				ret |= livox_block_set_voxel (self, x, y, z, tile);
-			}
 		}
 	}
 	if (ret)

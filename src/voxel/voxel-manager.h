@@ -77,6 +77,37 @@ livox_manager_copy_voxels (livoxManager* self,
                            int           zsize,
                            livoxVoxel*   result);
 
+void
+livox_manager_erase_box (livoxManager*      self,
+                         const limatVector* min,
+                         const limatVector* max);
+
+int
+livox_manager_erase_point (livoxManager*      self,
+                           const limatVector* point);
+
+void
+livox_manager_erase_sphere (livoxManager*      self,
+                            const limatVector* center,
+                            float              radius);
+
+void
+livox_manager_fill_box (livoxManager*      self,
+                        const limatVector* min,
+                        const limatVector* max,
+                        livoxVoxel         terrain);
+
+int
+livox_manager_fill_point (livoxManager*      self,
+                          const limatVector* point,
+                          int                terrain);
+
+void
+livox_manager_fill_sphere (livoxManager*      self,
+                           const limatVector* center,
+                           float              radius,
+                           livoxVoxel         terrain);
+
 livoxMaterial*
 livox_manager_find_material (livoxManager* self,
                              uint32_t      id);

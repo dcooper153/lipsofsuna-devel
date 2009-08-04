@@ -153,6 +153,7 @@ lirnd_scene_pick (lirndScene*     self,
 	GLuint dist;
 	GLuint selection[256];
 	limatMatrix pick;
+	limatVector window;
 	lirndContext context;
 
 	pick = limat_matrix_pick (x, y, size, size, viewport);
@@ -188,14 +189,20 @@ lirnd_scene_pick (lirndScene*     self,
 	if (id != 0)
 	{
 		result->type = LIRND_SELECT_OBJECT;
-		result->depth = (float) dist / 0xFFFFFFFF;
+		result->depth = dist / 4294967295.0f;
 		result->object = id;
+		window = limat_vector_init (x, y, result->depth);
+		result->point = limat_vector_init (0.0f, 0.0f, 0.0f);
+		limat_matrix_unproject (*projection, *modelview, viewport, &window, &result->point);
 	}
 	else
 	{
 		result->type = LIRND_SELECT_SECTOR;
-		result->depth = (float) dist / 0xFFFFFFFF;
+		result->depth = dist / 4294967295.0f;
 		result->object = 0;
+		window = limat_vector_init (x, y, result->depth);
+		result->point = limat_vector_init (0.0f, 0.0f, 0.0f);
+		limat_matrix_unproject (*projection, *modelview, viewport, &window, &result->point);
 	}
  
 	return 1;

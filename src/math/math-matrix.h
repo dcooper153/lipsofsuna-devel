@@ -403,31 +403,50 @@ limat_matrix_get_singular (const limatMatrix self)
 static inline limatMatrix
 limat_matrix_invert (const limatMatrix self)
 {
+	int i;
 	float det;
-	limatMatrix result;
+	float inv[16];
+	const float* m = self.m;
+	limatMatrix ret;
 
-	det = self.m[0] * (self.m[5] * self.m[10] - self.m[9] * self.m[6])
-	    - self.m[4] * (self.m[1] * self.m[10] - self.m[9] * self.m[2])
-	    + self.m[8] * (self.m[1] * self.m[ 6] - self.m[5] * self.m[2]);
-	assert (det != 0.0f);
-	result.m[ 0] =  det * (self.m[5] * self.m[10] - self.m[9] * self.m[6]);
-	result.m[ 1] = -det * (self.m[1] * self.m[10] - self.m[9] * self.m[2]);
-	result.m[ 2] =  det * (self.m[1] * self.m[ 6] - self.m[5] * self.m[2]);
-	result.m[ 3] = 0.0f;
-	result.m[ 4] = -det * (self.m[4] * self.m[10] - self.m[8] * self.m[6]);
-	result.m[ 5] =  det * (self.m[0] * self.m[10] - self.m[8] * self.m[2]);
-	result.m[ 6] = -det * (self.m[0] * self.m[ 6] - self.m[4] * self.m[2]);
-	result.m[ 7] = 0.0f;
-	result.m[ 8] =  det * (self.m[4] * self.m[ 9] - self.m[8] * self.m[5]);
-	result.m[ 9] = -det * (self.m[0] * self.m[ 9] - self.m[8] * self.m[1]);
-	result.m[10] =  det * (self.m[0] * self.m[ 5] - self.m[4] * self.m[1]);
-	result.m[11] = 0.0f;
-	result.m[12] = -(self.m[12] * result.m[0] + self.m[13] * result.m[4] + self.m[14] * result.m[ 8]);
-	result.m[13] = -(self.m[12] * result.m[1] + self.m[13] * result.m[5] + self.m[14] * result.m[ 9]);
-	result.m[14] = -(self.m[12] * result.m[2] + self.m[13] * result.m[6] + self.m[14] * result.m[10]);
-	result.m[15] = 1.0f;
+	inv[0] =   m[5]*m[10]*m[15] - m[5]*m[11]*m[14] - m[9]*m[6]*m[15]
+	         + m[9]*m[7]*m[14] + m[13]*m[6]*m[11] - m[13]*m[7]*m[10];
+	inv[4] =  -m[4]*m[10]*m[15] + m[4]*m[11]*m[14] + m[8]*m[6]*m[15]
+	         - m[8]*m[7]*m[14] - m[12]*m[6]*m[11] + m[12]*m[7]*m[10];
+	inv[8] =   m[4]*m[9]*m[15] - m[4]*m[11]*m[13] - m[8]*m[5]*m[15]
+	         + m[8]*m[7]*m[13] + m[12]*m[5]*m[11] - m[12]*m[7]*m[9];
+	inv[12] = -m[4]*m[9]*m[14] + m[4]*m[10]*m[13] + m[8]*m[5]*m[14]
+	         - m[8]*m[6]*m[13] - m[12]*m[5]*m[10] + m[12]*m[6]*m[9];
+	inv[1] =  -m[1]*m[10]*m[15] + m[1]*m[11]*m[14] + m[9]*m[2]*m[15]
+	         - m[9]*m[3]*m[14] - m[13]*m[2]*m[11] + m[13]*m[3]*m[10];
+	inv[5] =   m[0]*m[10]*m[15] - m[0]*m[11]*m[14] - m[8]*m[2]*m[15]
+	         + m[8]*m[3]*m[14] + m[12]*m[2]*m[11] - m[12]*m[3]*m[10];
+	inv[9] =  -m[0]*m[9]*m[15] + m[0]*m[11]*m[13] + m[8]*m[1]*m[15]
+	         - m[8]*m[3]*m[13] - m[12]*m[1]*m[11] + m[12]*m[3]*m[9];
+	inv[13] =  m[0]*m[9]*m[14] - m[0]*m[10]*m[13] - m[8]*m[1]*m[14]
+	         + m[8]*m[2]*m[13] + m[12]*m[1]*m[10] - m[12]*m[2]*m[9];
+	inv[2] =   m[1]*m[6]*m[15] - m[1]*m[7]*m[14] - m[5]*m[2]*m[15]
+	         + m[5]*m[3]*m[14] + m[13]*m[2]*m[7] - m[13]*m[3]*m[6];
+	inv[6] =  -m[0]*m[6]*m[15] + m[0]*m[7]*m[14] + m[4]*m[2]*m[15]
+	         - m[4]*m[3]*m[14] - m[12]*m[2]*m[7] + m[12]*m[3]*m[6];
+	inv[10] =  m[0]*m[5]*m[15] - m[0]*m[7]*m[13] - m[4]*m[1]*m[15]
+	         + m[4]*m[3]*m[13] + m[12]*m[1]*m[7] - m[12]*m[3]*m[5];
+	inv[14] = -m[0]*m[5]*m[14] + m[0]*m[6]*m[13] + m[4]*m[1]*m[14]
+	         - m[4]*m[2]*m[13] - m[12]*m[1]*m[6] + m[12]*m[2]*m[5];
+	inv[3] =  -m[1]*m[6]*m[11] + m[1]*m[7]*m[10] + m[5]*m[2]*m[11]
+	         - m[5]*m[3]*m[10] - m[9]*m[2]*m[7] + m[9]*m[3]*m[6];
+	inv[7] =   m[0]*m[6]*m[11] - m[0]*m[7]*m[10] - m[4]*m[2]*m[11]
+	         + m[4]*m[3]*m[10] + m[8]*m[2]*m[7] - m[8]*m[3]*m[6];
+	inv[11] = -m[0]*m[5]*m[11] + m[0]*m[7]*m[9] + m[4]*m[1]*m[11]
+	         - m[4]*m[3]*m[9] - m[8]*m[1]*m[7] + m[8]*m[3]*m[5];
+	inv[15] =  m[0]*m[5]*m[10] - m[0]*m[6]*m[9] - m[4]*m[1]*m[10]
+	         + m[4]*m[2]*m[9] + m[8]*m[1]*m[6] - m[8]*m[2]*m[5];
+	det = m[0]*inv[0] + m[1]*inv[4] + m[2]*inv[8] + m[3]*inv[12];
+	det = 1.0 / det;
+	for (i = 0; i < 16; i++)
+		ret.m[i] = inv[i] * det;
 
-	return result;
+	return ret;
 }
 
 static inline limatMatrix
@@ -476,6 +495,48 @@ limat_matrix_pick (float      x,
 		viewport[2] / w, viewport[3] / h, 1.0f);
 
 	return limat_matrix_multiply (m0, m1);
+}
+
+/**
+ * \brief Unprojects a point from window space to object space.
+ *
+ * \param projection Projection matrix.
+ * \param modelview Modelview matrix.
+ * \param viewport Viewport.
+ * \param window Vector in window space.
+ * \param object Return location for a vector in object space.
+ * \return Nonzero on success.
+ */
+static inline int
+limat_matrix_unproject (const limatMatrix  projection,
+                        const limatMatrix  modelview,
+                        const int*         viewport,
+                        const limatVector* window,
+                        limatVector*       object)
+{
+	float w;
+	limatMatrix m;
+	limatVector tmp;
+
+	/* Get inverse matrix. */
+	m = limat_matrix_multiply (projection, modelview);
+	if (limat_matrix_get_singular (m))
+		return 0;
+	m = limat_matrix_invert (m);
+
+	/* Vector to [-1,1] range. */
+	tmp.x = 2.0f * (window->x - viewport[0]) / viewport[2] - 1.0f;
+	tmp.y = 2.0f * (window->y - viewport[1]) / viewport[3] - 1.0f;
+	tmp.z = 2.0f * window->z - 1.0f;
+
+	/* Multiply by the inverse matrix. */
+	w = m.m[3] * tmp.x + m.m[7] * tmp.y + m.m[11] * tmp.z + m.m[15];
+	tmp = limat_matrix_transform (m, tmp);
+	object->x = tmp.x / w;
+	object->y = tmp.y / w;
+	object->z = tmp.z / w;
+
+	return 1;
 }
 
 #endif

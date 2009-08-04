@@ -70,6 +70,7 @@ struct _lirndSelection
 	lirndSelect type;
 	float depth;
 	uint32_t object;
+	limatVector point;
 };
 
 #endif

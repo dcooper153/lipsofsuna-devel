@@ -160,7 +160,7 @@ Scene_new (lua_State* lua)
  * -- @param self Scene.
  * -- @param x Optional X coordinate, default is cursor position.
  * -- @param y Optional Y coordinate, default is cursor position.
- * -- @return Object or nil.
+ * -- @return Object or nil, vector or nil.
  * function Scene.pick(self, x, y)
  */
 static int
@@ -176,6 +176,7 @@ Scene_pick (lua_State* lua)
 	limatMatrix projection;
 	lirndSelection result;
 	liscrData* self;
+	liscrData* vector;
 	liwdgRect rect;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_SCENE);
@@ -208,10 +209,14 @@ Scene_pick (lua_State* lua)
 	/* Find the picked object. */
 	object = lieng_engine_find_object (module->engine, result.object);
 	if (object == NULL || object->script == NULL)
-		return 0;
-	liscr_pushdata (lua, object->script);
+		lua_pushnil (lua);
+	else
+		liscr_pushdata (lua, object->script);
+	vector = liscr_vector_new (module->script, &result.point);
+	if (vector != NULL)
+		liscr_pushdata (lua, vector);
 
-	return 1;
+	return 2;
 }
 
 /*****************************************************************************/

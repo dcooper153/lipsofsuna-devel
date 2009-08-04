@@ -45,9 +45,18 @@ livox_sector_build_block (livoxSector* self,
                           int          y,
                           int          z);
 
+void
+livox_sector_erase_aabb (livoxSector*     self,
+                         const limatAabb* box);
+
 int
 livox_sector_erase_point (livoxSector*       self,
                           const limatVector* point);
+
+void
+livox_sector_erase_sphere (livoxSector*       self,
+                           const limatVector* center,
+                           float              radius);
 
 void
 livox_sector_fill (livoxSector* self,
@@ -57,6 +66,11 @@ void
 livox_sector_fill_aabb (livoxSector*     self,
                         const limatAabb* box,
                         livoxVoxel       terrain);
+
+int
+livox_sector_fill_point (livoxSector*       self,
+                         const limatVector* point,
+                         int                terrain);
 
 void
 livox_sector_fill_sphere (livoxSector*       self,
