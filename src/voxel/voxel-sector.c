@@ -248,8 +248,6 @@ livox_sector_erase_point (livoxSector*       self,
 	zb = z / LIVOX_TILES_PER_LINE;
 	voxel = livox_voxel_init (shape & (~best), type);
 	livox_sector_set_voxel (self, bestx, besty, bestz, voxel);
-	self->blocks[LIVOX_BLOCK_INDEX (xb, yb, zb)].stamp++;
-	self->dirty = 1;
 
 	return 1;
 }
@@ -470,8 +468,6 @@ livox_sector_fill_point (livoxSector*       self,
 	zb = z / LIVOX_TILES_PER_LINE;
 	voxel = livox_voxel_init (shape | best, terrain);
 	livox_sector_set_voxel (self, bestx, besty, bestz, voxel);
-	self->blocks[LIVOX_BLOCK_INDEX (xb, yb, zb)].stamp++;
-	self->dirty = 1;
 
 	return 1;
 }
@@ -854,7 +850,7 @@ livox_sector_set_voxel (livoxSector* self,
                         int          x,
                         int          y,
                         int          z,
-                        livoxVoxel    terrain)
+                        livoxVoxel   terrain)
 {
 	int ret;
 	int bx = x / LIVOX_BLOCKS_PER_LINE;
@@ -875,6 +871,11 @@ livox_sector_set_voxel (livoxSector* self,
 	}
 	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 	ret = livox_block_set_voxel (block, tx, ty, tz, terrain);
+	if (ret)
+	{
+		block->stamp++;
+		self->dirty = 1;
+	}
 
 	return ret;
 }

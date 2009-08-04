@@ -104,9 +104,6 @@ lieng_range_new_from_aabb (const limatVector* min,
 	self.maxx = (int)(max->x / unit);
 	self.maxy = (int)(max->y / unit);
 	self.maxz = (int)(max->z / unit);
-	if (self.maxx * unit < max->x) self.maxx++;
-	if (self.maxy * unit < max->y) self.maxy++;
-	if (self.maxz * unit < max->z) self.maxz++;
 	self.minx = LI_MAX (self.minx, mini);
 	self.miny = LI_MAX (self.miny, mini);
 	self.minz = LI_MAX (self.minz, mini);

@@ -273,49 +273,12 @@ static int
 private_tick (liextModule* self,
               float        secs)
 {
-	int i;
-	int x;
-	int y;
-	int z;
-	lialgU32dicIter iter;
 	lialgPtrdicIter iter1;
-	livoxBlock* block;
-	livoxSector* sector;
 
-	/* Rebuild modified terrain blocks. */
-	LI_FOREACH_U32DIC (iter, self->voxels->sectors)
-	{
-		sector = iter.value;
-		if (!livox_sector_get_dirty (sector))
-			continue;
-		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
-		{
-			block = livox_sector_get_block (sector, i);
-			if (!livox_block_get_dirty (block))
-				continue;
-			livox_sector_build_block (sector, x, y, z);
-		}
-	}
-
-	/* Update listeners. */
+	livox_manager_mark_updates (self->voxels);
 	LI_FOREACH_PTRDIC (iter1, self->listeners)
 		liext_listener_update (iter1.value, secs);
-
-	/* Mark all terrain as clean. */
-	LI_FOREACH_U32DIC (iter, self->voxels->sectors)
-	{
-		sector = iter.value;
-		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
-		{
-			block = livox_sector_get_block (sector, i);
-			livox_block_set_dirty (block, 0);
-		}
-		livox_sector_set_dirty (sector, 0);
-	}
+	livox_manager_update_marked (self->voxels);
 
 	return 1;
 }

@@ -114,6 +114,29 @@ Voxel_erase_sphere (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Erases a full voxel from the vicinity of the given point.
+ * --
+ * -- @param self Voxel class.
+ * -- @param point Point.
+ * -- @return True if terrain was erased.
+ * function Voxel.erase_voxel(self, point)
+ */
+static int
+Voxel_erase_voxel (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+
+	lua_pushboolean (lua, livox_manager_erase_voxel (module->voxels, center->data));
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Fills a box with voxel terrain.
  * --
  * -- @param self Voxel class.
@@ -197,6 +220,32 @@ Voxel_fill_sphere (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Fills a full voxel from the vicinity of the given point.
+ * --
+ * -- @param self Voxel class.
+ * -- @param point Point.
+ * -- @param type Terrain type.
+ * -- @return True if terrain was filled.
+ * function Voxel.fill_voxel(self, point, type)
+ */
+static int
+Voxel_fill_voxel (lua_State* lua)
+{
+	int type;
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	type = luaL_checkinteger (lua, 3);
+
+	lua_pushboolean (lua, livox_manager_fill_voxel (module->voxels, center->data, type));
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Saves the terrain of the currently loaded sectors.
  * --
  * -- @param self Voxel class.
@@ -225,9 +274,11 @@ liextVoxelScript (liscrClass* self,
 	liscr_class_insert_func (self, "erase_box", Voxel_erase_box);
 	liscr_class_insert_func (self, "erase_point", Voxel_erase_point);
 	liscr_class_insert_func (self, "erase_sphere", Voxel_erase_sphere);
+	liscr_class_insert_func (self, "erase_voxel", Voxel_erase_voxel);
 	liscr_class_insert_func (self, "fill_box", Voxel_fill_box);
 	liscr_class_insert_func (self, "fill_point", Voxel_fill_point);
 	liscr_class_insert_func (self, "fill_sphere", Voxel_fill_sphere);
+	liscr_class_insert_func (self, "fill_voxel", Voxel_fill_voxel);
 	liscr_class_insert_func (self, "save", Voxel_save);
 }
 
