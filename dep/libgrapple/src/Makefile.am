@@ -20,6 +20,7 @@ libgrapple_la_SOURCES = \
     grapple_lobbyclient.c \
     grapple_lobbyclient_thread.c \
     grapple_lobbyconnection.c \
+    grapple_lobbyerror.c \
     grapple_lobbygame.c \
     grapple_lobbymessage.c \
     grapple_message.c \
@@ -72,6 +73,7 @@ noinst_HEADERS = \
     grapple_lobbyclient_thread.h \
     grapple_lobbyconnection.h \
     grapple_lobbycallback.h \
+    grapple_lobbyerror.h \
     grapple_lobbymessage.h \
     grapple_lobbygame.h \
     grapple_message_internal.h \

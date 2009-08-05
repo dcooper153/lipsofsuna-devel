@@ -67,52 +67,56 @@ typedef struct _grapple_lobbymessage
 {
   grapple_lobbymessagetype type;
 
+#if !defined __GNUC__ || (__GNUC__ > 2)
   union
   {
-    struct
+#endif
+    struct _GLM_USER
     {
       grapple_user id;
       char *name;
     } USER;
-    struct 
+    struct _GLM_CHAT
     {
       grapple_user id;
-      int length;
+      size_t length;
       char *message;
     } CHAT;
-    struct 
+    struct _GLM_ROOM
     {
       grapple_lobbyroomid roomid;
       grapple_user userid;
       char *name;
     } ROOM;
-    struct
+    struct _GLM_GAME
     {
       grapple_lobbygameid id;
       char *name;
       void *description;
-      int descriptionlen;
+      size_t descriptionlen;
       int maxusers;
       int currentusers;
       int needpassword;
       int closed;
     } GAME;
-    struct 
+    struct _GLM_USERMSG
     {
       grapple_user id;
       void *data;
-      int length;
+      size_t length;
     } USERMSG;
-    struct
+    struct _GLM_CONNECTION_REFUSED
     {
       grapple_connection_refused reason;
     } CONNECTION_REFUSED;
-    struct 
+    struct _GLM_USERGAME
     {
       grapple_user userid;
       grapple_lobbygameid gameid;
     } USERGAME;
+#if !defined __GNUC__ || (__GNUC__ > 2)
   };
+#endif
 
   struct _grapple_lobbymessage *next;
   struct _grapple_lobbymessage *prev;
@@ -129,7 +133,7 @@ typedef struct
   grapple_lobbyroomid room;
   int closed;
   void *description;
-  int descriptionlen;
+  size_t descriptionlen;
 } grapple_lobbygame;
 
 //The callback typedef

@@ -28,7 +28,9 @@
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "grapple_comms.h"
 #include "grapple_queue.h"
@@ -50,12 +52,12 @@ static void *data_assemble(grapple_messagetype_internal message,
   returnval=(void *)malloc(datalen+8);
 
   num.i=htonl((int)message);
-  memcpy(returnval,(void *)num.c,4);
+  memcpy(returnval,num.c,4);
 
-  num.i=htonl(datalen);
-  memcpy(returnval+4,(void *)num.c,4);
+  num.i=htonl((long)datalen);
+  memcpy((char *)returnval+4,num.c,4);
 
-  memcpy(returnval+8,data,datalen);
+  memcpy((char *)returnval+8,data,datalen);
 
   return returnval;
 }
@@ -190,7 +192,7 @@ int s2c_send(internal_server_data *server,
   grapple_queue *newitem;
 
   //Refuse to send to anyone on the way out
-  if (target->delete)
+  if (target->deleted)
     {
       return 0;
     }

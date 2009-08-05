@@ -34,7 +34,6 @@
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
-#include <pthread.h>
 
 #include "grapple_lobby.h"
 #include "grapple_lobbyclient.h"
@@ -46,6 +45,7 @@
 #include "grapple_server.h"
 #include "tools.h"
 #include "grapple_lobbyconnection.h"
+#include "grapple_lobbyerror.h"
 #include "grapple_lobbymessage.h"
 #include "grapple_lobbygame.h"
 #include "grapple_lobbycallback.h"
@@ -301,7 +301,10 @@ int grapple_lobbyclient_port_set(grapple_lobbyclient lobbyclient,int port)
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -329,10 +332,14 @@ int grapple_lobbyclient_address_set(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
+      grapple_lobbyclient_error_set(lobbyclientdata,GRAPPLE_ERROR_NOT_INITIALISED);
       internal_lobbyclient_release(lobbyclientdata);
       return GRAPPLE_FAILED;
     }
@@ -356,7 +363,10 @@ int grapple_lobbyclient_name_set(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -398,11 +408,15 @@ int grapple_lobbyclient_encryption_enable(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
       internal_lobbyclient_release(lobbyclientdata);
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -429,7 +443,10 @@ int grapple_lobbyclient_protectionkey_set(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -463,7 +480,10 @@ int grapple_lobbyclient_password_set(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -502,7 +522,10 @@ char *grapple_lobbyclient_name_get(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return NULL;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return NULL;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -527,16 +550,14 @@ grapple_lobbymessage *grapple_lobbyclient_message_pull(grapple_lobbyclient lobby
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return NULL;
-
-  if (!lobbyclientdata->client)
     {
-      internal_lobbyclient_release(lobbyclientdata);
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
   if (!lobbyclientdata->messages)
     {
+      grapple_lobbyclient_error_set(lobbyclientdata,GRAPPLE_ERROR_NO_MESSAGES);
       internal_lobbyclient_release(lobbyclientdata);
       return NULL;
     }
@@ -583,11 +604,11 @@ static int grapple_lobbyclient_process_lobbymsg_chat(internal_lobbyclient_data *
 						     grapple_message *message)
 {
   void *data;
-  int length;
+  size_t length;
   grapple_lobbymessage *outmessage;
 
   length=message->USER_MSG.length-4;
-  data=message->USER_MSG.data+4;
+  data=(char *)message->USER_MSG.data+4;
 
   if (length ==0)
     return 0;
@@ -614,11 +635,11 @@ static int grapple_lobbyclient_process_lobbymsg_usermsg(internal_lobbyclient_dat
 							grapple_message *message)
 {
   void *data;
-  int length;
+  size_t length;
   grapple_lobbymessage *outmessage;
 
   length=message->USER_MSG.length-4;
-  data=message->USER_MSG.data+4;
+  data=(char *)message->USER_MSG.data+4;
 
   if (length < 4)
     return 0;
@@ -645,14 +666,15 @@ static int grapple_lobbyclient_process_lobbymsg_registergame(internal_lobbyclien
 							      grapple_message *message)
 {
   void *data;
-  int length,varlength;
+  size_t length;
+  int varlength;
   grapple_lobbymessage *outmessage=NULL;
-  int offset;
+  size_t offset;
   intchar val;
   grapple_lobbygame_internal *game,*gamescan;
 
   length=message->USER_MSG.length-4;
-  data=message->USER_MSG.data+4;
+  data=(char *)message->USER_MSG.data+4;
 
   if (length < 4)
     return 0;
@@ -675,61 +697,66 @@ static int grapple_lobbyclient_process_lobbymsg_registergame(internal_lobbyclien
   //4 bytes : Room number
   //4 bytes : Description length
   //        : Description
+  //4 bytes : Closed state
 
   memcpy(val.c,data,4);
   game->id=ntohl(val.i);
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   varlength=ntohl(val.i);
 
   game->session=(char *)malloc(varlength+1);
-  memcpy(game->session,data+8,varlength);
+  memcpy(game->session,(char *)data+8,varlength);
   game->session[varlength]=0;
   offset=varlength+8;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   varlength=ntohl(val.i);
   offset+=4;
 
   game->address=(char *)malloc(varlength+1);
-  memcpy(game->address,data+offset,varlength);
+  memcpy(game->address,(char *)data+offset,varlength);
   game->address[varlength]=0;
   offset+=varlength;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   game->port=ntohl(val.i);
   offset+=4;
 
-  memcpy(val.c,data+offset,4);
-  game->protocol=ntohl(val.i);
+  memcpy(val.c,(char *)data+offset,4);
+  game->protocol=(grapple_protocol)ntohl(val.i);
   offset+=4;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   game->currentusers=ntohl(val.i);
   offset+=4;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   game->maxusers=ntohl(val.i);
   offset+=4;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   game->needpassword=ntohl(val.i);
   offset+=4;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   game->room=ntohl(val.i);
   offset+=4;
 
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   game->descriptionlen=ntohl(val.i);
   offset+=4;
 
   if (game->descriptionlen)
     {
       game->description=(char *)malloc(game->descriptionlen);
-      memcpy(game->description,data+offset,game->descriptionlen);
+      memcpy(game->description,(char *)data+offset,game->descriptionlen);
       offset+=game->descriptionlen;
     }
+
+  memcpy(val.c,(char *)data+offset,4);
+  game->closed=ntohl(val.i);
+  offset+=4;
 
   //Check if the game is already there
   gamescan=grapple_lobbyclient_game_internal_get(lobbyclientdata,
@@ -754,6 +781,7 @@ static int grapple_lobbyclient_process_lobbymsg_registergame(internal_lobbyclien
       strcpy(outmessage->GAME.name,game->session);
       outmessage->GAME.currentusers=game->currentusers;
       outmessage->GAME.maxusers=game->maxusers;
+      outmessage->GAME.closed=game->closed;
       outmessage->GAME.needpassword=game->needpassword;
       outmessage->GAME.descriptionlen=game->descriptionlen;
       if (game->descriptionlen)
@@ -787,7 +815,7 @@ static int grapple_lobbyclient_process_lobbymsg_deletegame(internal_lobbyclient_
   grapple_lobbygame_internal *game;
   grapple_lobbymessage *outmessage=NULL;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
 
   gameid=ntohl(val.i);
 
@@ -827,11 +855,11 @@ static int grapple_lobbyclient_process_lobbymsg_yourgameid(internal_lobbyclient_
 							   grapple_message *message)
 {
   void *data;
-  int length;
+  size_t length;
   intchar val;
 
   length=message->USER_MSG.length-4;
-  data=message->USER_MSG.data+4;
+  data=(char *)message->USER_MSG.data+4;
 
   if (length < 4)
     return 0;
@@ -853,10 +881,10 @@ static int grapple_lobbyclient_process_lobbymsg_game_usercount(internal_lobbycli
   int count;
   grapple_lobbymessage *outmessage;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
   gameid=ntohl(val.i);
 
-  memcpy(val.c,message->USER_MSG.data+8,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+8,4);
   count=ntohl(val.i);
 
   //Find the game
@@ -891,10 +919,10 @@ static int grapple_lobbyclient_process_lobbymsg_game_maxusercount(internal_lobby
   int count;
   grapple_lobbymessage *outmessage;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
   gameid=ntohl(val.i);
 
-  memcpy(val.c,message->USER_MSG.data+8,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+8,4);
   count=ntohl(val.i);
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
@@ -928,10 +956,10 @@ static int grapple_lobbyclient_process_lobbymsg_game_closed(internal_lobbyclient
   int state;
   grapple_lobbymessage *outmessage;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
   gameid=ntohl(val.i);
 
-  memcpy(val.c,message->USER_MSG.data+8,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+8,4);
   state=ntohl(val.i);
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
@@ -965,10 +993,10 @@ static int grapple_lobbyclient_process_lobbymsg_user_joinedgame(internal_lobbycl
   outmessage=grapple_lobbymessage_aquire();
   outmessage->type=GRAPPLE_LOBBYMSG_USER_JOINEDGAME;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
   outmessage->USERGAME.gameid=ntohl(val.i);
 
-  memcpy(val.c,message->USER_MSG.data+8,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+8,4);
   outmessage->USERGAME.userid=ntohl(val.i);
 
   grapple_lobbyclient_process_message(lobbyclientdata,outmessage);
@@ -986,10 +1014,10 @@ static int grapple_lobbyclient_process_lobbymsg_user_leftgame(internal_lobbyclie
   outmessage=grapple_lobbymessage_aquire();
   outmessage->type=GRAPPLE_LOBBYMSG_USER_LEFTGAME;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
   outmessage->USERGAME.gameid=ntohl(val.i);
 
-  memcpy(val.c,message->USER_MSG.data+8,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+8,4);
   outmessage->USERGAME.userid=ntohl(val.i);
 
   grapple_lobbyclient_process_message(lobbyclientdata,outmessage);
@@ -1005,7 +1033,7 @@ static int grapple_lobbyclient_process_lobbymsg_game_description(internal_lobbyc
   grapple_lobbygameid gameid;
   grapple_lobbygame_internal *game;
 
-  memcpy(val.c,message->USER_MSG.data+4,4);
+  memcpy(val.c,(char *)message->USER_MSG.data+4,4);
   gameid=ntohl(val.i);
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
@@ -1021,7 +1049,7 @@ static int grapple_lobbyclient_process_lobbymsg_game_description(internal_lobbyc
       if (game->descriptionlen)
 	{
 	  game->description=(char *)malloc(game->descriptionlen);
-	  memcpy(game->description,message->USER_MSG.data+8,
+	  memcpy(game->description,(char *)message->USER_MSG.data+8,
 		 game->descriptionlen);
 	}
       else
@@ -1036,7 +1064,7 @@ static int grapple_lobbyclient_process_lobbymsg_game_description(internal_lobbyc
       outmessage->GAME.id=gameid;
       
       outmessage->GAME.description=(void *)malloc(message->USER_MSG.length-8);
-      memcpy(outmessage->GAME.description,message->USER_MSG.data+8,
+      memcpy(outmessage->GAME.description,(char *)message->USER_MSG.data+8,
 	     message->USER_MSG.length-8);
       
       grapple_lobbyclient_process_message(lobbyclientdata,outmessage);
@@ -1062,7 +1090,7 @@ static int grapple_lobbyclient_process_user_msg(internal_lobbyclient_data *lobby
 
   //Find the type of message
   memcpy(val.c,message->USER_MSG.data,4);
-  type=ntohl(val.i);
+  type=(grapple_lobbymessagetype_internal)ntohl(val.i);
 
   //Hand off the message to a sub-handler
   switch (type)
@@ -1416,6 +1444,9 @@ static int grapple_lobbyclient_generic_callback(grapple_message *message,
     case GRAPPLE_MSG_GAME_DESCRIPTION: //Not used by lobby
       //Dont care about these
       break;
+    case GRAPPLE_MSG_NONE:
+      //Never received, default NULL value
+      break;
     }
 
   grapple_message_dispose(message);
@@ -1434,7 +1465,10 @@ int grapple_lobbyclient_start(grapple_lobbyclient lobbyclient)
 
   //Check the lobbyclients minimum defaults are set
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -1493,7 +1527,10 @@ int grapple_lobbyclient_start(grapple_lobbyclient lobbyclient)
 
       //Check the lobbyclients minimum defaults are set
       if (!lobbyclientdata)
-	return GRAPPLE_FAILED;
+	{
+	  grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+	  return GRAPPLE_FAILED;
+	}
 
       if (!lobbyclientdata->client)
 	{
@@ -1539,7 +1576,10 @@ int grapple_lobbyclient_start(grapple_lobbyclient lobbyclient)
 
       //Check the lobbyclients minimum defaults are set
       if (!lobbyclientdata)
-	return GRAPPLE_FAILED;
+	{
+	  grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+	  return GRAPPLE_FAILED;
+	}
 
       if (!lobbyclientdata->client)
 	{
@@ -1585,7 +1625,10 @@ int grapple_lobbyclient_start(grapple_lobbyclient lobbyclient)
   
   //Check the lobbyclients minimum defaults are set
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -1626,7 +1669,8 @@ int grapple_lobbyclient_destroy(grapple_lobbyclient lobbyclient)
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    { 
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1646,6 +1690,7 @@ int grapple_lobbyclient_destroy(grapple_lobbyclient lobbyclient)
   //It could have been otherwise destroyed
   if (!lobbyclientdata)
     { 
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1739,6 +1784,7 @@ int grapple_lobbyclient_room_create(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1810,6 +1856,7 @@ int grapple_lobbyclient_room_enter(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1862,10 +1909,14 @@ int grapple_lobbyclient_room_leave(grapple_lobbyclient lobbyclient)
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
+      grapple_lobbyclient_error_set(lobbyclientdata,GRAPPLE_ERROR_CLIENT_NOT_CONNECTED);
       internal_lobbyclient_release(lobbyclientdata);
       return GRAPPLE_FAILED;
     }
@@ -1897,7 +1948,7 @@ int grapple_lobbyclient_room_leave(grapple_lobbyclient lobbyclient)
 
   internal_lobbyclient_release(lobbyclientdata);
 
-  return 0;
+  return GRAPPLE_OK;
 }
 
 //Leave a room (return to the main lobby)
@@ -1910,7 +1961,10 @@ int grapple_lobbyclient_room_passwordneeded(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -1932,12 +1986,13 @@ int grapple_lobbyclient_chat(grapple_lobbyclient lobbyclient,
   internal_lobbyclient_data *lobbyclientdata;
   char *outdata;
   intchar val;
-  int length;
+  size_t length;
   
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1963,7 +2018,7 @@ int grapple_lobbyclient_chat(grapple_lobbyclient lobbyclient,
 
   internal_lobbyclient_release(lobbyclientdata);
 
-  return 0;
+  return GRAPPLE_OK;
 }
 
 //Starting a new game via the lobby.
@@ -1982,16 +2037,19 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
   grapple_protocol protocol;
   intchar val;
   char *outdata,outdata2[8];
-  int length,offset,sessionlength,addresslength,finished,count;
+  int finished,count;
+  size_t offset,length,sessionlength,addresslength;
   grapple_lobbygameid returnval;
   grapple_lobbymessage *outmessage;
   void *description=NULL;
-  int descriptionlen=0,rv;
+  size_t descriptionlen=0;
+  int rv;
 
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -2046,7 +2104,7 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
   //outgoing packet
 
   //set the length to be:
-  length=20; //Ints for lobbyprotocol, port, protocol, maxusers, needpassword
+  length=24; //Ints for lobbyprotocol, port, protocol, maxusers, needpassword
     
   sessionlength=strlen(session);
   length+=(sessionlength+4); //The length of the session plus a length int
@@ -2064,7 +2122,7 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
   
   //Now add the length of the description plus a length int
   rv=grapple_server_description_get(server,description,&descriptionlen);
-  
+
   while (rv==0)
     {
       if (description)
@@ -2092,17 +2150,16 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
   //4 bytes : Description length
   //        : description
 
-
   val.i=htonl(GRAPPLE_LOBBYMESSAGE_REGISTERGAME);
   memcpy(outdata,val.c,4);
 
-  val.i=htonl(sessionlength);
+  val.i=htonl((long)sessionlength);
   memcpy(outdata+4,val.c,4);
 
   memcpy(outdata+8,session,sessionlength);
   offset=sessionlength+8;
 
-  val.i=htonl(addresslength);
+  val.i=htonl((long)addresslength);
   memcpy(outdata+offset,val.c,4);
   offset+=4;
 
@@ -2128,7 +2185,7 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
   memcpy(outdata+offset,val.c,4);
   offset+=4;
 
-  val.i=htonl(descriptionlen);
+  val.i=htonl((long)descriptionlen);
   memcpy(outdata+offset,val.c,4);
   offset+=4;
 
@@ -2164,6 +2221,7 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
 
       if (!lobbyclientdata)
 	{
+	  grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
 	  return 0;
 	}
 
@@ -2190,6 +2248,7 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -2224,6 +2283,7 @@ grapple_lobbygameid grapple_lobbyclient_game_register(grapple_lobbyclient lobbyc
     }
 
 
+  fflush(stdout);
   lobbyclientdata->thread=grapple_thread_create(grapple_lobbyclient_serverthread_main,
 						(void *)lobbyclientdata);
   if (!lobbyclientdata->thread)
@@ -2263,7 +2323,10 @@ int grapple_lobbyclient_game_unregister(grapple_lobbyclient lobbyclient)
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   //If the client isnt running a game, just nod and return
   if (!lobbyclientdata->gameid)
@@ -2350,7 +2413,7 @@ int grapple_lobbyclient_game_join(grapple_lobbyclient lobbyclient,
   internal_lobbyclient_data *lobbyclientdata;
   grapple_lobbygame_internal *game;
   int returnval;
-  char outdata[8];
+  char outdata[8],*tmpname;
   intchar val;
   grapple_lobbymessage *outmessage;
 
@@ -2358,6 +2421,7 @@ int grapple_lobbyclient_game_join(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -2376,6 +2440,8 @@ int grapple_lobbyclient_game_join(grapple_lobbyclient lobbyclient,
 
   if (!game)
     {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
       internal_lobbyclient_release(lobbyclientdata);
       return GRAPPLE_FAILED;
     }
@@ -2396,13 +2462,19 @@ int grapple_lobbyclient_game_join(grapple_lobbyclient lobbyclient,
 
   grapple_lobbygame_internal_release(game);
 
-  grapple_client_name_set(newclient,lobbyclientdata->name);
+  tmpname=grapple_client_name_get(newclient,grapple_client_serverid_get(newclient));
+  if (tmpname)
+    free(tmpname);
+  else
+    grapple_client_name_set(newclient,lobbyclientdata->name);
 
   //Actually connect the client and return the return value
   returnval=grapple_client_start(newclient,GRAPPLE_WAIT);
 
   if (returnval!=GRAPPLE_OK)
     {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_CANNOT_CONNECT); 
       internal_lobbyclient_release(lobbyclientdata);
       return returnval;
     }
@@ -2436,7 +2508,13 @@ int grapple_lobbyclient_game_join(grapple_lobbyclient lobbyclient,
 						(void *)lobbyclientdata);
 
   if (!lobbyclientdata->thread)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_INSUFFICIENT_SPACE); 
+      
+      internal_lobbyclient_release(lobbyclientdata);
+      return GRAPPLE_FAILED;
+    }
 
   //Let the server know that we have joined the game
 
@@ -2472,7 +2550,10 @@ int grapple_lobbyclient_game_leave(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
   //They werent in one anyway!
   if (!lobbyclientdata->ingame)
@@ -2556,7 +2637,10 @@ int grapple_lobbyclient_message_send(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return GRAPPLE_FAILED;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
+    }
 
 
   //Make up the packet
@@ -2579,7 +2663,7 @@ int grapple_lobbyclient_message_send(grapple_lobbyclient lobbyclient,
 
   free(outdata);
 
-  return 0;
+  return GRAPPLE_OK;
 }
 
 //Get the list of all rooms
@@ -2594,6 +2678,7 @@ grapple_lobbyroomid *grapple_lobbyclient_roomlist_get(grapple_lobbyclient
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -2649,7 +2734,10 @@ char *grapple_lobbyclient_roomname_get(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return NULL;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return NULL;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -2677,6 +2765,7 @@ grapple_lobbyroomid grapple_lobbyclient_roomid_get(grapple_lobbyclient lobbyclie
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -2704,6 +2793,7 @@ grapple_user *grapple_lobbyclient_roomusers_get(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -2735,7 +2825,10 @@ grapple_lobbygameid *grapple_lobbyclient_gamelist_get(grapple_lobbyclient lobbyc
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return NULL;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return NULL;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -2812,37 +2905,43 @@ grapple_lobbygame *grapple_lobbyclient_game_get(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
                                       gameid,GRAPPLE_LOCKTYPE_SHARED);
 
-  if (game)
+  if (!game)
     {
-      //Set up the retrun structure
-      returnval=(grapple_lobbygame *)calloc(1,sizeof(grapple_lobbygame));
-      
-      returnval->gameid=game->id;
-      returnval->currentusers=game->currentusers;
-      returnval->maxusers=game->maxusers;
-      returnval->needpassword=game->needpassword;
-      returnval->room=game->room;
-      returnval->closed=game->closed;
-      
-      returnval->name=malloc(strlen(game->session)+1);
-      strcpy(returnval->name,game->session);
-
-      returnval->descriptionlen=game->descriptionlen;
-      if (game->descriptionlen)
-	{
-	  returnval->description=malloc(game->descriptionlen);
-	  memcpy(returnval->description,game->description,game->descriptionlen);
-	}
-
-      grapple_lobbygame_internal_release(game);
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
+      internal_lobbyclient_release(lobbyclientdata);
+      return NULL;
     }
-	  
+
+  //Set up the retrun structure
+  returnval=(grapple_lobbygame *)calloc(1,sizeof(grapple_lobbygame));
+  
+  returnval->gameid=game->id;
+  returnval->currentusers=game->currentusers;
+  returnval->maxusers=game->maxusers;
+  returnval->needpassword=game->needpassword;
+  returnval->room=game->room;
+  returnval->closed=game->closed;
+  
+  returnval->name=(char *)malloc(strlen(game->session)+1);
+  strcpy(returnval->name,game->session);
+  
+  returnval->descriptionlen=game->descriptionlen;
+  if (game->descriptionlen)
+    {
+      returnval->description=malloc(game->descriptionlen);
+      memcpy(returnval->description,game->description,game->descriptionlen);
+    }
+  
+  grapple_lobbygame_internal_release(game);
+
   internal_lobbyclient_release(lobbyclientdata);
 
   return returnval;
@@ -2874,6 +2973,7 @@ int grapple_lobbyclient_callback_set(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -2949,6 +3049,7 @@ int grapple_lobbyclient_callback_unset(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -2976,7 +3077,8 @@ grapple_lobbyroomid grapple_lobbyclient_currentroomid_get(grapple_lobbyclient lo
 
   if (!lobbyclientdata)
     {
-      return GRAPPLE_FAILED;
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return 0;
     }
 
   returnval=lobbyclientdata->currentroom;
@@ -2995,6 +3097,7 @@ grapple_error grapple_lobbyclient_error_get(grapple_lobbyclient lobbyclient)
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_NO_ERROR);
       return GRAPPLE_ERROR_NOT_INITIALISED;
     }
 
@@ -3020,6 +3123,7 @@ int grapple_lobbyclient_connected(grapple_lobbyclient lobbyclient)
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -3041,7 +3145,10 @@ char *grapple_lobbyclient_gamesession_get(grapple_lobbyclient lobbyclient,
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
-    return NULL;
+    {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return NULL;
+    }
 
   if (!lobbyclientdata->client)
     {
@@ -3055,6 +3162,15 @@ char *grapple_lobbyclient_gamesession_get(grapple_lobbyclient lobbyclient,
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
                                       gameid,GRAPPLE_LOCKTYPE_SHARED);
+
+  if (!game)
+    {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
+      internal_lobbyclient_release(lobbyclientdata);
+      return NULL;
+    }
+
   returnval=(char *)malloc(strlen(game->session)+1);
   strcpy(returnval,game->session);
 
@@ -3070,11 +3186,13 @@ grapple_lobbygameid grapple_lobbyclient_gameid_get(grapple_lobbyclient lobbyclie
 {
   internal_lobbyclient_data *lobbyclientdata;
   grapple_lobbygameid returnval;
+  grapple_lobbygame_internal *game;
 
   lobbyclientdata=internal_lobbyclient_get(lobbyclient);
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -3086,9 +3204,20 @@ grapple_lobbygameid grapple_lobbyclient_gameid_get(grapple_lobbyclient lobbyclie
       return 0;
     }
 
+  game=grapple_lobbyclient_game_internal_get_byname(lobbyclientdata,
+						    name,
+						    GRAPPLE_LOCKTYPE_SHARED);
+  if (!game)
+    {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
+      internal_lobbyclient_release(lobbyclientdata);
+      return 0;
+    }
 
-  //Use the lowlevel grapple function for the name of a group
-  returnval=grapple_client_group_from_name(lobbyclientdata->client,name);
+
+  returnval=game->id;
+  grapple_lobbygame_internal_release(game);
 
   internal_lobbyclient_release(lobbyclientdata);
 
@@ -3106,6 +3235,7 @@ int grapple_lobbyclient_game_maxusers_get(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -3139,6 +3269,7 @@ int grapple_lobbyclient_game_currentusers_get(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -3152,6 +3283,14 @@ int grapple_lobbyclient_game_currentusers_get(grapple_lobbyclient lobbyclient,
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
                                       gameid,GRAPPLE_LOCKTYPE_SHARED);
+  if (!game)
+    {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
+      internal_lobbyclient_release(lobbyclientdata);
+      return 0;
+    }
+
   returnval=game->currentusers;
 
   grapple_lobbygame_internal_release(game);
@@ -3172,6 +3311,7 @@ int grapple_lobbyclient_game_closed_get(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -3185,6 +3325,14 @@ int grapple_lobbyclient_game_closed_get(grapple_lobbyclient lobbyclient,
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
                                       gameid,GRAPPLE_LOCKTYPE_SHARED);
+
+  if (!game)
+    {
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
+      internal_lobbyclient_release(lobbyclientdata);
+      return 0;
+    }
 
   returnval=game->closed;
 
@@ -3197,7 +3345,7 @@ int grapple_lobbyclient_game_closed_get(grapple_lobbyclient lobbyclient,
 
 int grapple_lobbyclient_game_description_get(grapple_lobbyclient lobbyclient,
 					     grapple_lobbygameid gameid,
-					     void *buf,int *len)
+					     void *buf,size_t *len)
 {
   internal_lobbyclient_data *lobbyclientdata;
   grapple_lobbygame_internal *game;
@@ -3206,7 +3354,8 @@ int grapple_lobbyclient_game_description_get(grapple_lobbyclient lobbyclient,
 
   if (!lobbyclientdata)
     {
-      return -1;
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_FAILED;
     }
 
   if (!lobbyclientdata->client)
@@ -3214,44 +3363,42 @@ int grapple_lobbyclient_game_description_get(grapple_lobbyclient lobbyclient,
       grapple_lobbyclient_error_set(lobbyclientdata,
 				    GRAPPLE_ERROR_CLIENT_NOT_CONNECTED);
       internal_lobbyclient_release(lobbyclientdata);
-      return -1;
+      return GRAPPLE_FAILED;
     }
 
   game=grapple_lobbyclient_game_internal_get(lobbyclientdata,
                                       gameid,GRAPPLE_LOCKTYPE_SHARED);
 
-  if (buf==NULL)
+  if (!game)
     {
-      *len=game->descriptionlen;
-      if (game->description)
-	{
-	  grapple_lobbygame_internal_release(game);
-	  internal_lobbyclient_release(lobbyclientdata);
-	  return 0;
-	}
-      else
-	{
-	  grapple_lobbygame_internal_release(game);
-	  internal_lobbyclient_release(lobbyclientdata);
-	  return 1;
-	}
+      grapple_lobbyclient_error_set(lobbyclientdata,
+				    GRAPPLE_ERROR_NO_SUCH_GAME);
+      internal_lobbyclient_release(lobbyclientdata);
+      return GRAPPLE_FAILED;
     }
-    
+
   if (*len < game->descriptionlen)
     {
+      if (*len>0)
+	grapple_lobbyclient_error_set(lobbyclientdata,
+				      GRAPPLE_ERROR_INSUFFICIENT_SPACE);
       *len=game->descriptionlen;
       grapple_lobbygame_internal_release(game);
       internal_lobbyclient_release(lobbyclientdata);
-      return 0;
+      if (*len==0)
+	return GRAPPLE_OK;
+      return GRAPPLE_FAILED;
     }
 
-  memcpy(buf,game->description,game->descriptionlen);
   *len=game->descriptionlen;
+
+  if (game->descriptionlen > 0)
+    memcpy(buf,game->description,game->descriptionlen);
 
   grapple_lobbygame_internal_release(game);
   internal_lobbyclient_release(lobbyclientdata);
 
-  return 1;
+  return GRAPPLE_OK;
 }
 
 int grapple_lobbyclient_id_get(grapple_lobbyclient lobbyclient)
@@ -3264,6 +3411,7 @@ int grapple_lobbyclient_id_get(grapple_lobbyclient lobbyclient)
 
   if (!lobbyclientdata)
     {
+      grapple_lobbyerror_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return -1;
     }
 

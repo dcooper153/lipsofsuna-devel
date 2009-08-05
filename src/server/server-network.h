@@ -26,7 +26,11 @@
 #define __SERVER_NETWORK_H__
 
 #include <pthread.h>
+#ifdef BUILTIN_GRAPPLE
+#include <grapple.h>
+#else
 #include <grapple/grapple.h>
+#endif
 #include <algorithm/lips-algorithm.h>
 #include "server.h"
 #include "server-client.h"

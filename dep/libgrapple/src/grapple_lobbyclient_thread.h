@@ -23,7 +23,12 @@
 #ifndef GRAPPLE_LOBBYCLIENT_THREAD_H
 #define GRAPPLE_LOBBYCLIENT_THREAD_H
 
+#ifdef HAVE_PTHREAD_H
 extern void *grapple_lobbyclient_serverthread_main(void *);
 extern void *grapple_lobbyclient_clientthread_main(void *);
+#else
+extern DWORD WINAPI grapple_lobbyclient_serverthread_main(LPVOID);
+extern DWORD WINAPI grapple_lobbyclient_clientthread_main(LPVOID);
+#endif
 
 #endif

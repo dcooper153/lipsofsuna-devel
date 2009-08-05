@@ -61,7 +61,7 @@ extern "C" {
   extern int grapple_server_description_set(grapple_server,const void *,
 					    size_t);
   extern int grapple_server_description_get(grapple_server,
-						    void *,int *);
+						    void *,size_t *);
   extern int grapple_server_encryption_enable(grapple_server,const char *,
 					      const char *,const char *,
 					      const char *);
@@ -116,7 +116,7 @@ extern "C" {
   extern grapple_message *grapple_server_message_pull(grapple_server);
 
   extern grapple_confirmid grapple_server_send(grapple_server,grapple_user,
-					       int,const void *,int);
+					       int,const void *,size_t);
 
   extern grapple_user *grapple_server_userlist_get(grapple_server);
 

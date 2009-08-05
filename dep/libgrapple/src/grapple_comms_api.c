@@ -128,7 +128,7 @@ static int c2s_handshake_send_password(internal_client_data *client)
   int reliable;
   int returnval;
   const char *password;
-  int len;
+  size_t len;
   
   reliable=client->reliablemode;
   client->reliablemode=1;
@@ -235,7 +235,8 @@ int c2s_pingreply(internal_client_data *client,int number)
 int c2s_variable_send(internal_client_data *client,grapple_variable *var)
 {
   int reliable;
-  int returnval,length,namelen,offset;
+  int returnval;
+  size_t namelen,length,offset;
   char *outdata;
   intchar val;
 
@@ -254,7 +255,7 @@ int c2s_variable_send(internal_client_data *client,grapple_variable *var)
       val.i=htonl(GRAPPLE_VARIABLE_TYPE_DATA);
       memcpy(outdata,val.c,4);
 
-      val.i=htonl(namelen);
+      val.i=htonl((long)namelen);
       memcpy(outdata+4,val.c,4);
       
       memcpy(outdata+8,var->name,namelen);
@@ -272,7 +273,7 @@ int c2s_variable_send(internal_client_data *client,grapple_variable *var)
       val.i=htonl(GRAPPLE_VARIABLE_TYPE_INT);
       memcpy(outdata,val.c,4);
 
-      val.i=htonl(namelen);
+      val.i=htonl((long)namelen);
       memcpy(outdata+4,val.c,4);
       
       memcpy(outdata+8,var->name,namelen);
@@ -290,7 +291,7 @@ int c2s_variable_send(internal_client_data *client,grapple_variable *var)
       val.i=htonl(GRAPPLE_VARIABLE_TYPE_DOUBLE);
       memcpy(outdata,val.c,4);
 
-      val.i=htonl(namelen);
+      val.i=htonl((long)namelen);
       memcpy(outdata+4,val.c,4);
       
       memcpy(outdata+8,var->name,namelen);
@@ -445,7 +446,7 @@ int s2c_user_connected(internal_server_data *server,
   int returnval;
   char *outdata;
   intchar val;
-  int length;
+  size_t length;
 
   if (!target->handshook || !newuser->handshook)
     return 0;
@@ -524,7 +525,7 @@ int s2c_user_setname(internal_server_data *server,
   serverid.i=htonl(user->serverid);
   memcpy(data,serverid.c,4);
 
-  memcpy(data+4,user->name,strlen(user->name));
+  memcpy((char *)data+4,user->name,strlen(user->name));
 
   reliable=target->reliablemode;
 
@@ -579,7 +580,7 @@ int s2SUQ_user_connected(internal_server_data *server,grapple_connection *user)
   int returnval;
   char *outdata;
   intchar val;
-  int length;
+  size_t length;
 
   val.i=user->serverid;
 
@@ -674,7 +675,7 @@ int s2SUQ_confirm_timeout(internal_server_data *server,grapple_confirm *conf)
 //Server sending a user message to a client
 int s2c_message(internal_server_data *server,
 		grapple_connection *user,int flags,int messageid,
-		const void *data,int datalen)
+		const void *data,size_t datalen)
 {
   int reliable,returnval;
   char *outdata;
@@ -714,7 +715,7 @@ int s2c_message(internal_server_data *server,
 
 //Client sending a user message to the server
 int c2s_message(internal_client_data *client,int flags,grapple_confirmid id,
-		const void *data,int datalen)
+		const void *data,size_t datalen)
 {
   char *outdata;
   intchar val;
@@ -746,7 +747,7 @@ int c2s_message(internal_client_data *client,int flags,grapple_confirmid id,
 //Client asking the server to relay a message to another client
 int c2s_relaymessage(internal_client_data *client,int target,
 		     int flags,grapple_confirmid id,
-		     const void *data,int datalen)
+		     const void *data,size_t datalen)
 {
   char *outdata;
   intchar val;
@@ -781,7 +782,7 @@ int c2s_relaymessage(internal_client_data *client,int target,
 //Client asking the server to relay a message to everyone
 int c2s_relayallmessage(internal_client_data *client,
 			int flags,grapple_confirmid id,
-			const void *data,int datalen)
+			const void *data,size_t datalen)
 {
   char *outdata;
   intchar val;
@@ -813,7 +814,7 @@ int c2s_relayallmessage(internal_client_data *client,
 //Client asking the server to relay a message to everyone but themselves
 int c2s_relayallbutselfmessage(internal_client_data *client,
 			       int flags,grapple_confirmid id,
-			       const void *data,int datalen)
+			       const void *data,size_t datalen)
 {
   char *outdata;
   intchar val;
@@ -879,8 +880,10 @@ int c2s_request_group(internal_client_data *client)
 int c2s_group_create(internal_client_data *client,int id,const char *name,
 		     const char *password)
 {
-  int returnval,offset;
-  int reliable,length,passlength;
+  int returnval;
+  size_t offset;
+  int reliable;
+  size_t length,passlength;
   intchar val;
   char *outdata;
 
@@ -894,14 +897,14 @@ int c2s_group_create(internal_client_data *client,int id,const char *name,
   val.i=htonl(id);
   memcpy(outdata,val.c,4);
 
-  val.i=htonl(length);
+  val.i=htonl((long)length);
   memcpy(outdata+4,val.c,4);
 
   memcpy(outdata+8,name,length);
 
   offset=8+length;
 
-  val.i=htonl(passlength);
+  val.i=htonl((long)passlength);
   memcpy(outdata+offset,val.c,4);
 
   offset+=4;
@@ -931,7 +934,8 @@ int c2s_group_add(internal_client_data *client,int group,int add,
 {
   char *outdata;
   intchar val;
-  int reliable,returnval,passlength;
+  int reliable,returnval;
+  size_t passlength;
 
   if (password && *password)
     passlength=strlen(password);
@@ -950,7 +954,7 @@ int c2s_group_add(internal_client_data *client,int group,int add,
   val.i=htonl(add);
   memcpy(outdata+4,val.c,4);
 
-  val.i=htonl(passlength);
+  val.i=htonl((long)passlength);
   memcpy(outdata+8,val.c,4);
 
   if (passlength)
@@ -1044,7 +1048,7 @@ int c2s_send_reconnection(internal_client_data *client)
   int reliable,returnval;
   char *outdata;
   intchar val;
-  int length;
+  size_t length;
 
   length=strlen(client->name);
 
@@ -1053,7 +1057,7 @@ int c2s_send_reconnection(internal_client_data *client)
   val.i=htonl(client->serverid);
   memcpy(outdata,val.c,4);
 
-  val.i=htonl(length);
+  val.i=htonl((long)length);
   memcpy(outdata+4,val.c,4);
 
   memcpy(outdata+8,client->name,length);
@@ -1099,7 +1103,7 @@ int c2s_confirm_received(internal_client_data *client,int from,int messageid)
 int s2c_relaymessage(internal_server_data *server,
 		     grapple_connection *user,grapple_connection *origin,
 		     int flags,int messageid,
-		     void *data,int datalen)
+		     void *data,size_t datalen)
 {
   char *outdata;
   intchar val;
@@ -1302,7 +1306,8 @@ int s2c_failover_can(internal_server_data *server,
 		     grapple_connection *user,int id,const char *host)
 {
   int returnval;
-  int reliable,length;
+  int reliable;
+  size_t length;
   intchar val;
   char *outdata;
 
@@ -1316,7 +1321,7 @@ int s2c_failover_can(internal_server_data *server,
   val.i=htonl(id);
   memcpy(outdata,val.c,4);
 
-  val.i=htonl(length);
+  val.i=htonl((long)length);
   memcpy(outdata+4,val.c,4);
 
   memcpy(outdata+8,host,length);
@@ -1358,7 +1363,8 @@ int s2c_group_create(internal_server_data *server,
 		     const char *password)
 {
   int returnval;
-  int reliable,namelength,passlength,offset;
+  int reliable;
+  size_t namelength,passlength,offset;
   intchar val;
   char *outdata;
 
@@ -1375,14 +1381,14 @@ int s2c_group_create(internal_server_data *server,
   val.i=htonl(groupid);
   memcpy(outdata,val.c,4);
 
-  val.i=htonl(namelength);
+  val.i=htonl((long)namelength);
   memcpy(outdata+4,val.c,4);
 
   memcpy(outdata+8,name,namelength);
   
   offset=namelength+8;
 
-  val.i=htonl(passlength);
+  val.i=htonl((long)passlength);
   memcpy(outdata+offset,val.c,4);
 
   offset+=4;
@@ -1562,7 +1568,8 @@ int s2c_variable_send(internal_server_data *server,
 		      grapple_connection *user,grapple_variable *var)
 {
   int reliable;
-  int returnval,length,namelen,offset;
+  int returnval;
+  size_t length,namelen,offset;
   char *outdata;
   intchar val;
 
@@ -1589,7 +1596,7 @@ int s2c_variable_send(internal_server_data *server,
 	val.i=htonl(var->usec);
 	memcpy(outdata+8,val.c,4);
 	
-	val.i=htonl(namelen);
+	val.i=htonl((long)namelen);
 	memcpy(outdata+12,val.c,4);
 	
 	memcpy(outdata+16,var->name,namelen);
@@ -1614,7 +1621,7 @@ int s2c_variable_send(internal_server_data *server,
 	val.i=htonl(var->usec);
 	memcpy(outdata+8,val.c,4);
 	
-	val.i=htonl(namelen);
+	val.i=htonl((long)namelen);
 	memcpy(outdata+12,val.c,4);
 	
 	memcpy(outdata+16,var->name,namelen);
@@ -1639,7 +1646,7 @@ int s2c_variable_send(internal_server_data *server,
 	val.i=htonl(var->usec);
 	memcpy(outdata+8,val.c,4);
 	
-	val.i=htonl(namelen);
+	val.i=htonl((long)namelen);
 	memcpy(outdata+12,val.c,4);
 	
 	memcpy(outdata+16,var->name,namelen);
@@ -1666,7 +1673,7 @@ int s2c_variable_send(internal_server_data *server,
 }
 
 int s2c_description_change(internal_server_data *server,
-			   grapple_connection *user,const void *data,int len)
+			   grapple_connection *user,const void *data,size_t len)
       
 {
   int reliable;

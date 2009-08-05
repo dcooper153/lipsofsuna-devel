@@ -102,6 +102,7 @@ extern grapple_certificate *grapple_lobby_user_certificate_get(grapple_lobby,
 							       grapple_user);
 
 extern int grapple_lobby_disconnect_client(grapple_lobby,grapple_user);
+extern grapple_lobbymessage *grapple_lobby_message_pull(grapple_lobby);
 
 /////////////////////////OTHER//////////////////////
 extern int grapple_lobbymessage_dispose(grapple_lobbymessage *);

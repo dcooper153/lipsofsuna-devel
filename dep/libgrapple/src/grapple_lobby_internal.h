@@ -23,7 +23,9 @@
 #ifndef GRAPPLE_LOBBY_INTERNAL_H
 #define GRAPPLE_LOBBY_INTERNAL_H
 
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
 
 #include "grapple_types.h"
 #include "grapple_lobby.h"
@@ -62,7 +64,7 @@ typedef struct _grapple_lobbygame_internal
   int needpassword;
   int room;
   int closed;
-  int descriptionlen;
+  size_t descriptionlen;
   void *description;
 
   grapple_user owner;
@@ -104,7 +106,6 @@ typedef struct _internal_lobby_data
   grapple_user mainroom;
   int roomcount;
   int roommax;
-  grapple_error last_error;
   grapple_thread_mutex *userlist_mutex;
   grapple_lobbyconnection *userlist;
   grapple_thread_mutex *message_mutex;
@@ -150,9 +151,17 @@ typedef struct _internal_lobbyclient_data
   struct _internal_lobbyclient_data *prev;
 } internal_lobbyclient_data;
 
+#ifndef GRAPPLE_INT_TYPE
+#if (defined WIN32 && !defined HAVE_STDINT_H )
+#define GRAPPLE_INT_TYPE __int32
+#else
+#define GRAPPLE_INT_TYPE int32_t
+#endif
+#endif
+
 typedef union
 {
-  int32_t i;
+  GRAPPLE_INT_TYPE i;
   char c[4];
 } intchar;
 

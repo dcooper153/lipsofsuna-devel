@@ -25,7 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "grapple_defines.h"
 #include "grapple_server.h"
@@ -431,32 +433,39 @@ grapple_nat_type grapple_server_nattrav_type_get(grapple_server server)
 
   if (!serverdata)
     {
-      return 0;
+      return GRAPPLE_NAT_UNKNOWN;
     }
 
   switch (socket_inet_udp2way_listener_stun_type_get(serverdata->sock))
     {
     case SOCKET_NAT_TYPE_UNKNOWN:
+      internal_server_release(serverdata);
       return GRAPPLE_NAT_UNKNOWN;
       break;
     case SOCKET_NAT_TYPE_NONE:
+      internal_server_release(serverdata);
       return GRAPPLE_NAT_OPEN;
       break;
     case SOCKET_NAT_TYPE_FULL_CONE:
+      internal_server_release(serverdata);
       return GRAPPLE_NAT_FULL_CONE;
       break;
     case SOCKET_NAT_TYPE_RESTRICTED_CONE:
+      internal_server_release(serverdata);
       return GRAPPLE_NAT_HOST_RESTRICTED;
       break;
     case SOCKET_NAT_TYPE_PORT_RESTRICTED_CONE:
+      internal_server_release(serverdata);
       return GRAPPLE_NAT_PORT_RESTRICTED;
       break;
     case SOCKET_NAT_TYPE_SYMMETRIC:
     case SOCKET_NAT_TYPE_FW_SYMMETRIC:
+      internal_server_release(serverdata);
       return GRAPPLE_NAT_SYMMETRIC;
       break;
     }
     
+  internal_server_release(serverdata);
   return GRAPPLE_NAT_UNKNOWN;
 }
 
@@ -605,7 +614,7 @@ grapple_namepolicy grapple_server_namepolicy_get(grapple_server server)
 
   if (!serverdata)
     {
-      return 0;
+      return GRAPPLE_NAMEPOLICY_NONE;
     }
 
   //Return the protocol
@@ -685,7 +694,7 @@ grapple_protocol grapple_server_protocol_get(grapple_server server)
 
   if (!serverdata)
     {
-      return 0;
+      return GRAPPLE_PROTOCOL_UNKNOWN;
     }
 
   //Return the protocol
@@ -1031,6 +1040,8 @@ int grapple_server_start(grapple_server server)
 
   switch (serverdata->protocol)
     {
+    case GRAPPLE_PROTOCOL_UNKNOWN:
+      break;
     case GRAPPLE_PROTOCOL_TCP:
       //Create a TCP listener socket
       serverdata->sock=socket_create_inet_tcp_listener_on_ip(serverdata->ip,
@@ -1235,7 +1246,8 @@ grapple_message *grapple_server_message_pull(grapple_server server)
 //the one or more clients, or a group
 grapple_confirmid grapple_server_send(grapple_server server,
 				      grapple_user serverid,
-				      int flags,const void *data,int datalen)
+				      int flags,const void *data,
+				      size_t datalen)
 {
   internal_server_data *serverdata;
   grapple_connection *target,*scan;
@@ -1717,7 +1729,7 @@ int grapple_server_description_set(grapple_server server,const void *data,
   //Set the new
   if (length>0)
     {
-      serverdata->description=(void *)malloc(length);
+      serverdata->description=(char *)malloc(length);
       memcpy(serverdata->description,data,length);
     }
   else
@@ -1746,7 +1758,7 @@ int grapple_server_description_set(grapple_server server,const void *data,
 }
 
 //Get the game description
-int grapple_server_description_get(grapple_server server,void *buf,int *len)
+int grapple_server_description_get(grapple_server server,void *buf,size_t *len)
 {
   internal_server_data *serverdata;
 
@@ -2682,6 +2694,7 @@ int grapple_server_enumgroup(grapple_server server,
   int loopa;
   grapple_connection *user;
   char *tmpname;
+  int carry_on=1;
 
   //Find the server
   serverdata=internal_server_get(server,GRAPPLE_LOCKTYPE_SHARED);
@@ -2697,7 +2710,7 @@ int grapple_server_enumgroup(grapple_server server,
   loopa=0;
 
   //Loop for each user
-  while (userarray[loopa])
+  while (carry_on && userarray[loopa])
     {
       grapple_thread_mutex_lock(serverdata->connection_mutex,
 				GRAPPLE_LOCKTYPE_SHARED);
@@ -2723,7 +2736,7 @@ int grapple_server_enumgroup(grapple_server server,
 	  if (serverid != GRAPPLE_USER_UNKNOWN)
 	    {
 	      //Run the callback
-	      (*callback)(serverid,tmpname,0,context);
+	      carry_on=(*callback)(serverid,tmpname,0,context);
 	    }
 	  if (tmpname)
 	    free(tmpname);
@@ -2756,6 +2769,7 @@ int grapple_server_enumgrouplist(grapple_server server,
   int count;
   char *tmpname;
   internal_grapple_group *scan;
+  int carry_on=1;
 
   //Find the server
   serverdata=internal_server_get(server,GRAPPLE_LOCKTYPE_SHARED);
@@ -2812,7 +2826,7 @@ int grapple_server_enumgrouplist(grapple_server server,
   grapple_thread_mutex_unlock(serverdata->group_mutex);
 
   //We now have the list of groups
-  while (count>0)
+  while (carry_on && count>0)
     {
       //Loop backwards through the groups. We make no guarentee of enumeration
       //order
@@ -2833,7 +2847,7 @@ int grapple_server_enumgrouplist(grapple_server server,
       if (groupid)
 	{
 	  //Run the callback
-	  (*callback)(groupid,tmpname,0,context);
+	  carry_on=(*callback)(groupid,tmpname,0,context);
 	}
 
       if (tmpname)
@@ -2924,6 +2938,7 @@ int grapple_server_enumusers(grapple_server server,
   int loopa;
   grapple_connection *user;
   char *tmpname;
+  int carry_on=1;
 
   //Find the server
   serverdata=internal_server_get(server,GRAPPLE_LOCKTYPE_SHARED);
@@ -2940,7 +2955,7 @@ int grapple_server_enumusers(grapple_server server,
   loopa=0;
 
   //Loop for each user
-  while (userarray[loopa])
+  while (carry_on && userarray[loopa])
     {
       grapple_thread_mutex_lock(serverdata->connection_mutex,
 				GRAPPLE_LOCKTYPE_SHARED);
@@ -2966,7 +2981,7 @@ int grapple_server_enumusers(grapple_server server,
 	  if (tmpname)
 	    {
 	      //Run the callback
-	      (*callback)(serverid,tmpname,0,context);
+	      carry_on=(*callback)(serverid,tmpname,0,context);
 	      
 	      free(tmpname);
 	    }
@@ -3031,6 +3046,7 @@ grapple_error grapple_server_error_get(grapple_server server)
 
   if (!serverdata)
     {
+      grapple_error_get(); //Just to wipe it
       return GRAPPLE_ERROR_NOT_INITIALISED;
     }
 
@@ -3040,6 +3056,11 @@ grapple_error grapple_server_error_get(grapple_server server)
   serverdata->last_error=GRAPPLE_NO_ERROR;
 
   internal_server_release(serverdata);
+
+  if (returnval==GRAPPLE_NO_ERROR)
+    returnval=grapple_error_get();
+  else
+    grapple_error_get(); //Just to wipe it
 
   return returnval;
 }
@@ -3094,18 +3115,21 @@ int grapple_server_intvar_get(grapple_server server,const char *name)
 {
   internal_server_data *serverdata;
   int returnval;
+  grapple_error err;
 
   //Find the server
   serverdata=internal_server_get(server,GRAPPLE_LOCKTYPE_SHARED);
 
   if (!serverdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       //No server
       return 0;
     }
 
   //Get the value
-  returnval=grapple_variable_get_int(serverdata->variables,name);
+  err=grapple_variable_get_int(serverdata->variables,name,&returnval);
+  grapple_server_error_set(serverdata,err);
 
   internal_server_release(serverdata);
 
@@ -3141,6 +3165,7 @@ double grapple_server_doublevar_get(grapple_server server,const char *name)
 {
   internal_server_data *serverdata;
   double returnval;
+  grapple_error err;
 
   //Find the server
   serverdata=internal_server_get(server,GRAPPLE_LOCKTYPE_SHARED);
@@ -3148,11 +3173,13 @@ double grapple_server_doublevar_get(grapple_server server,const char *name)
   if (!serverdata)
     {
       //No server
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
   //Get the value
-  returnval=grapple_variable_get_double(serverdata->variables,name);
+  err=grapple_variable_get_double(serverdata->variables,name,&returnval);
+  grapple_server_error_set(serverdata,err);
 
   //Done with this
   internal_server_release(serverdata);
@@ -3189,7 +3216,7 @@ int grapple_server_datavar_get(grapple_server server,const char *name,
 			       void *data,size_t *len)
 {
   internal_server_data *serverdata;
-  int returnval;
+  grapple_error err;
 
   //Find the server
   serverdata=internal_server_get(server,GRAPPLE_LOCKTYPE_SHARED);
@@ -3197,16 +3224,19 @@ int grapple_server_datavar_get(grapple_server server,const char *name,
   if (!serverdata)
     {
       //No server
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
   //Get the value
-  returnval=grapple_variable_get_data(serverdata->variables,name,data,len);
+  err=grapple_variable_get_data(serverdata->variables,name,data,len);
+
+  grapple_server_error_set(serverdata,err);
 
   //Done with this
   internal_server_release(serverdata);
 
-  if (returnval==0)
+  if (err!=GRAPPLE_NO_ERROR)
     return GRAPPLE_FAILED;
 
   return GRAPPLE_OK;
@@ -3215,6 +3245,10 @@ int grapple_server_datavar_get(grapple_server server,const char *name,
 grapple_certificate *grapple_server_user_certificate_get(grapple_server server,
 							 grapple_user target)
 {
+#ifndef SOCK_SSL
+  return NULL;
+#else
+
   internal_server_data *serverdata;
   socket_certificate *cert=NULL;
   grapple_certificate *returnval;
@@ -3259,6 +3293,7 @@ grapple_certificate *grapple_server_user_certificate_get(grapple_server server,
   free(cert);
 
   return returnval;
+#endif
 }
 
 char *grapple_server_user_name_get(grapple_server server,

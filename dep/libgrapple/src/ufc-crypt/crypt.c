@@ -38,9 +38,7 @@
 
 #define H G(r1, r2, l1, l2) ; G(l1, l2, r1, r2)
 
-char *ufc_crypt(key, salt)
-     const char *key;
-     const char *salt;
+char *ufc_crypt(const char *key, const char *salt)
   { unsigned long l1, l2, r1, r2, i, j, s, *k;
 
     setup_salt(salt);

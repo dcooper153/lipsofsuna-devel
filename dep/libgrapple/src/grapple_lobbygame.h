@@ -44,4 +44,9 @@ extern void grapple_lobbygame_internal_release(grapple_lobbygame_internal *);
 
 extern int grapple_lobbygame_internal_dispose(grapple_lobbygame_internal *);
 
+grapple_lobbygame_internal *grapple_lobbyclient_game_internal_get_byname(internal_lobbyclient_data *,
+									 const char *,
+									 grapple_mutex_locktype);
+
+
 #endif

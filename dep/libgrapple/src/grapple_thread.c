@@ -25,7 +25,9 @@
 #define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef HAVE_PTHREAD_H
 #include <pthread.h>
+#endif
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -39,23 +41,47 @@
 
 
 //This function creates a new thread
-grapple_thread *grapple_thread_create(void *(*function)(void*),
+grapple_thread *grapple_thread_create(
+#ifdef HAVE_PTHREAD_H
+				      void *(*function)(void*),
+#else
+				      LPTHREAD_START_ROUTINE function,
+#endif
 				      void *context)
 {
   grapple_thread *thread;
+#ifdef HAVE_PTHREAD_H
   int createval=-1;
+#else
+  DWORD createval=-1;
+#endif
 
   thread=(grapple_thread *)calloc(1,sizeof(grapple_thread));
 
   //Create the thread
-  while(createval!=0)
+  while(
+#ifdef HAVE_PTHREAD_H
+	createval!=0
+#else
+	!thread->thread
+#endif
+	)
     {
+#ifdef HAVE_PTHREAD_H
       createval=pthread_create(&thread->thread,NULL,
 			       function,context);
-
-      if (createval!=0)
+#else
+      thread->thread=CreateThread(NULL,0,function,context,0,&createval);
+#endif
+      if (
+#ifdef HAVE_PTHREAD_H
+	  createval!=0
+#else
+	  !thread->thread
+#endif
+	  )
 	{
-	  if (grapple_errno()!=EAGAIN)
+	  if (!GRAPPLE_THREAD_ERRNO_IS_EAGAIN)
 	    {
 	      free(thread);
 	      //Problem creating the thread that isnt a case of 'it will work
@@ -65,8 +91,12 @@ grapple_thread *grapple_thread_create(void *(*function)(void*),
 	}
     }
 
+#ifdef HAVE_PTHREAD_H
   pthread_detach(thread->thread);
-
+#else
+  CloseHandle(thread->thread);
+#endif
+  
   return thread;
 }
 
@@ -82,17 +112,23 @@ int grapple_thread_destroy(grapple_thread *thread)
 grapple_thread_mutex *grapple_thread_mutex_init()
 {
   grapple_thread_mutex *mutex;
+#ifdef HAVE_PTHREAD_H
   pthread_mutexattr_t attr;
-
+#endif
   //Initialise the memory
   mutex=(grapple_thread_mutex *)calloc(1,sizeof(grapple_thread_mutex));
   
   //Create the lock. This is not recursive, as the locks actually dont last
+#ifdef HAVE_PTHREAD_H
   pthread_mutexattr_init(&attr);
   pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 
   pthread_mutex_init(&mutex->mutex,&attr);
   pthread_mutex_init(&mutex->countmutex,&attr);
+#else
+  mutex->mutex=CreateMutex(NULL,FALSE,NULL);
+  mutex->countmutex=CreateMutex(NULL,FALSE,NULL);
+#endif
 
   //The counter for the locks
   mutex->lockcount=0;
@@ -108,8 +144,14 @@ int grapple_thread_mutex_destroy(grapple_thread_mutex *mutex)
     return 0;
 
   //Delete the mutex
+
+#ifdef HAVE_PTHREAD_H
   pthread_mutex_destroy(&mutex->mutex);
   pthread_mutex_destroy(&mutex->countmutex);
+#else
+  CloseHandle(mutex->mutex);
+  CloseHandle(mutex->countmutex);
+#endif
 
   //Free the memory
   free(mutex);
@@ -137,7 +179,12 @@ int grapple_thread_mutex_lock(grapple_thread_mutex *mutex,
       count=0;
 
       //Lock the thread
+#ifdef HAVE_PTHREAD_H
       pthread_mutex_lock(&mutex->mutex);
+#else
+      WaitForSingleObject(mutex->mutex,INFINITE);
+#endif
+
       //If any locks are already using this, shared
       while (mutex->lockcount > 0)
 	{
@@ -147,9 +194,15 @@ int grapple_thread_mutex_lock(grapple_thread_mutex *mutex,
 	    {
 	      //Unlock and lock in case there is a deadlock waiting to be
 	      //handled
+#ifdef HAVE_PTHREAD_H
 	      pthread_mutex_unlock(&mutex->mutex);
 	      microsleep(1);
 	      pthread_mutex_lock(&mutex->mutex);
+#else
+	      ReleaseMutex(mutex->mutex);
+	      microsleep(1);
+	      WaitForSingleObject(mutex->mutex,INFINITE);
+#endif
 	      count=0;
 	    }
 	  else
@@ -158,13 +211,20 @@ int grapple_thread_mutex_lock(grapple_thread_mutex *mutex,
 	}
 
       //Note we are using this exclusively
+#ifdef HAVE_PTHREAD_H
       pthread_mutex_lock(&mutex->countmutex);
       mutex->exlockcount++;
       pthread_mutex_unlock(&mutex->countmutex);
+#else
+      WaitForSingleObject(mutex->countmutex,INFINITE);
+      mutex->exlockcount++;
+      ReleaseMutex(mutex->countmutex);
+#endif
       break;
 
     case GRAPPLE_LOCKTYPE_SHARED:
 
+#ifdef HAVE_PTHREAD_H
       //Lock this, if there is an exclusive lock this will wait here
       pthread_mutex_lock(&mutex->mutex);
       //Incriment the counter
@@ -173,6 +233,17 @@ int grapple_thread_mutex_lock(grapple_thread_mutex *mutex,
       pthread_mutex_unlock(&mutex->countmutex);
       //Unlock the mutex, we are good to do this, it isnt exclusive
       pthread_mutex_unlock(&mutex->mutex);
+#else
+      //Lock this, if there is an exclusive lock this will wait here
+      WaitForSingleObject(mutex->mutex,INFINITE);
+      //Incriment the counter
+      WaitForSingleObject(mutex->countmutex,INFINITE);
+      mutex->lockcount++;
+      ReleaseMutex(mutex->countmutex);
+      //Unlock the mutex, we are good to do this, it isnt exclusive
+      ReleaseMutex(mutex->mutex);
+#endif
+
       break;
     }
 
@@ -185,17 +256,38 @@ int grapple_thread_mutex_lock(grapple_thread_mutex *mutex,
 int grapple_thread_mutex_trylock(grapple_thread_mutex *mutex,
 				 grapple_mutex_locktype locktype)
 {
+#ifdef GRAPPLE_THREAD_H
   int returnval=0;
+#else
+  DWORD returnval=0;
+#endif
   int count;
 
   switch (locktype)
     {
     case GRAPPLE_LOCKTYPE_EXCLUSIVE:
+#ifdef HAVE_PTHREAD_H
       returnval=pthread_mutex_trylock(&mutex->mutex);
-      if (returnval==0)
+#else
+      WaitForSingleObject(mutex->mutex,0);
+#endif
+      if (
+#ifdef HAVE_PTHREAD_H
+	  returnval==0
+#else
+	  returnval&WAIT_OBJECT_0
+#endif
+	  )
 	{
+	  //successful
 	  count=0;
-	  while (returnval==0 && mutex->lockcount > 0)
+	  while (
+#ifdef HAVE_PTHREAD_H
+		 returnval==0
+#else
+		 returnval&WAIT_OBJECT_0
+#endif
+		 && mutex->lockcount > 0)
 	    {
 	      //Wait for them to finish
 	      count++;
@@ -203,28 +295,57 @@ int grapple_thread_mutex_trylock(grapple_thread_mutex *mutex,
 		{
 		  //Unlock and lock in case there is a deadlock waiting to be
 		  //handled
+#ifdef HAVE_PTHREAD_H
 		  pthread_mutex_unlock(&mutex->mutex);
 		  microsleep(1);
-		  returnval=pthread_mutex_trylock(&mutex->mutex);
+		  pthread_mutex_trylock(&mutex->mutex);
+#else
+		  ReleaseMutex(mutex->mutex);
+		  microsleep(1);
+		  WaitForSingleObject(mutex->mutex,0);
+#endif
 		  count=0;
 		}
 	      else
 		microsleep(100);
 
 	    }
+#ifdef HAVE_PTHREAD_H
 	  pthread_mutex_lock(&mutex->countmutex);
 	  mutex->exlockcount++;
 	  pthread_mutex_unlock(&mutex->countmutex);
+#else
+	  WaitForSingleObject(mutex->countmutex,INFINITE);
+	  mutex->exlockcount++;
+	  ReleaseMutex(mutex->countmutex);
+#endif
 	}
       break;
     case GRAPPLE_LOCKTYPE_SHARED:
+#ifdef HAVE_PTHREAD_H
       returnval=pthread_mutex_trylock(&mutex->mutex);
-      if (returnval==0)
+#else
+      WaitForSingleObject(mutex->mutex,0);
+#endif
+      if (
+#ifdef HAVE_PTHREAD_H
+	  returnval==0
+#else
+	  returnval&WAIT_OBJECT_0
+#endif
+	  )
 	{
+#ifdef HAVE_PTHREAD_H
 	  pthread_mutex_lock(&mutex->countmutex);
 	  mutex->lockcount++;
 	  pthread_mutex_unlock(&mutex->countmutex);
 	  pthread_mutex_unlock(&mutex->mutex);
+#else
+	  WaitForSingleObject(mutex->countmutex,INFINITE);
+	  mutex->lockcount++;
+	  ReleaseMutex(mutex->countmutex);
+	  ReleaseMutex(mutex->mutex);
+#endif
 	}
       break;
     }
@@ -239,17 +360,30 @@ int grapple_thread_mutex_unlock(grapple_thread_mutex *mutex)
   if (mutex->exlockcount>0)
     {
       //Its exclusive, unlock it, allow others in
+#ifdef HAVE_PTHREAD_H
       pthread_mutex_lock(&mutex->countmutex);
       mutex->exlockcount--;
       pthread_mutex_unlock(&mutex->countmutex);
       pthread_mutex_unlock(&mutex->mutex);
+#else
+      WaitForSingleObject(mutex->countmutex,INFINITE);
+      mutex->exlockcount--;
+      ReleaseMutex(mutex->countmutex);
+      ReleaseMutex(mutex->mutex);
+#endif
     }
   else if (mutex->lockcount>0)
     {
       //It is shared, just decriment the lock type
+#ifdef HAVE_PTHREAD_H
       pthread_mutex_lock(&mutex->countmutex);
       mutex->lockcount--;
       pthread_mutex_unlock(&mutex->countmutex);
+#else
+      WaitForSingleObject(mutex->countmutex,INFINITE);
+      mutex->lockcount--;
+      ReleaseMutex(mutex->countmutex);
+#endif
     }
   //Otherwise, this is an error
   else

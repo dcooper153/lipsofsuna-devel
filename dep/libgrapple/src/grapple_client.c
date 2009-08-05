@@ -25,7 +25,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #include "grapple_defines.h"
 #include "grapple_callback.h"
@@ -307,6 +309,7 @@ int grapple_client_address_set(grapple_client client,const char *address)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -349,6 +352,7 @@ int grapple_client_port_set(grapple_client client,int port)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -377,6 +381,7 @@ int grapple_client_sourceport_set(grapple_client client,int port)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -406,6 +411,7 @@ int grapple_client_protocol_set(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -425,7 +431,7 @@ int grapple_client_protocol_set(grapple_client client,
 }
 
 //Returns the protocol used by this client
-int grapple_client_protocol_get(grapple_client client)
+grapple_protocol grapple_client_protocol_get(grapple_client client)
 {
   internal_client_data *clientdata;
   grapple_protocol protocol;
@@ -435,7 +441,8 @@ int grapple_client_protocol_get(grapple_client client)
 
   if (!clientdata)
     {
-      return GRAPPLE_FAILED;
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return GRAPPLE_PROTOCOL_UNKNOWN;
     }
 
   //Set the protocol
@@ -463,6 +470,7 @@ int grapple_client_encryption_enable(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -546,6 +554,7 @@ int grapple_client_notified_set(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -574,6 +583,7 @@ int grapple_client_password_set(grapple_client client,const char *password)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -603,6 +613,7 @@ int grapple_client_protectionkey_set(grapple_client client,const char *key)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -638,6 +649,7 @@ int grapple_client_start(grapple_client client,int flags)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -674,6 +686,11 @@ int grapple_client_start(grapple_client client,int flags)
   //Start a network connection - either 2 way UDP or TCP
   switch (clientdata->protocol)
     {
+    case GRAPPLE_PROTOCOL_UNKNOWN:
+      grapple_client_error_set(clientdata,GRAPPLE_ERROR_PROTOCOL_NOT_SET);
+      internal_client_release(clientdata);
+      return GRAPPLE_FAILED;
+      break;
     case GRAPPLE_PROTOCOL_TCP:
       clientdata->sock=socket_create_inet_tcp_wait(clientdata->address,
 						   clientdata->port,1);
@@ -794,6 +811,7 @@ int grapple_client_nattrav_address(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -830,6 +848,7 @@ int grapple_client_connected(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -865,6 +884,7 @@ int grapple_client_name_set(grapple_client client,const char *name)
 
   if (!clientdata)
     { 
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -904,13 +924,13 @@ char *grapple_client_name_get(grapple_client client,grapple_user serverid)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
   //We are getting ourown pre-auth name
   if (serverid==GRAPPLE_USER_UNKNOWN)
     {
-
       grapple_thread_mutex_lock(clientdata->internal_mutex,
 				GRAPPLE_LOCKTYPE_SHARED);
 
@@ -974,7 +994,8 @@ int grapple_client_messagecount_get(grapple_client client)
 
   if (!clientdata)
     {
-      return GRAPPLE_FAILED;
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return 0;
     }
 
   grapple_thread_mutex_lock(clientdata->message_in_mutex,
@@ -1000,7 +1021,8 @@ int grapple_client_messages_waiting(grapple_client client)
 
   if (!clientdata)
     {
-      return GRAPPLE_FAILED;
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return 0;
     }
 
   if (clientdata->message_in_queue)
@@ -1027,6 +1049,7 @@ grapple_message *grapple_client_message_pull(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
   
@@ -1066,18 +1089,20 @@ grapple_message *grapple_client_message_pull(grapple_client client)
 //the server or to other clients
 grapple_confirmid grapple_client_send(grapple_client client,
 				      grapple_user target,
-				      int flags,const void *data,int datalen)
+				      int flags,
+				      const void *data,size_t datalen)
 {
   internal_client_data *clientdata;
   grapple_confirmid thismessageid=0;
-  static int staticmessageid=1; /*This gets incrimented for each message
-				  that is requiring confirmation*/
+  static int staticmessageid=10; /*This gets incrimented for each message
+				   that is requiring confirmation*/
 
   //Find the data
   clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_EXCLUSIVE);
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1126,7 +1151,9 @@ grapple_confirmid grapple_client_send(grapple_client client,
   internal_client_release(clientdata);
 
   //Return the message ID - will be 0 if no confirmation was requested
-  return thismessageid;
+  if (thismessageid)
+    return thismessageid;
+  return GRAPPLE_OK;
 }
 
 //Destroy the client
@@ -1141,6 +1168,7 @@ int grapple_client_destroy(grapple_client client)
   if (!clientdata)
     {
       //There is no client to kill
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1242,6 +1270,7 @@ grapple_user *grapple_client_userlist_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -1266,6 +1295,7 @@ int grapple_client_callback_set(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1277,7 +1307,10 @@ int grapple_client_callback_set(grapple_client client,
       clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_EXCLUSIVE);
       //Check its still here
       if (!clientdata)
-	return GRAPPLE_FAILED;
+	{
+	  grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
+	  return GRAPPLE_FAILED;
+	}
     }
 
   grapple_thread_mutex_lock(clientdata->callback_mutex,
@@ -1349,6 +1382,7 @@ int grapple_client_callback_unset(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1406,12 +1440,14 @@ int grapple_client_enumusers(grapple_client client,
   int loopa;
   grapple_connection *user;
   char *tmpname;
+  int carry_on=1;
 
   //Find the client
   clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_SHARED);
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1421,7 +1457,7 @@ int grapple_client_enumusers(grapple_client client,
   loopa=0;
 
   //Loop for each user
-  while (userarray[loopa])
+  while (carry_on && userarray[loopa])
     {
       grapple_thread_mutex_lock(clientdata->connection_mutex,
 				GRAPPLE_LOCKTYPE_SHARED);
@@ -1447,7 +1483,7 @@ int grapple_client_enumusers(grapple_client client,
 	  if (tmpname)
 	    {
 	      //Run the callback
-	      (*callback)(serverid,tmpname,0,context);
+	      carry_on=(*callback)(serverid,tmpname,0,context);
 	      
 	      free(tmpname);
 	    }
@@ -1478,7 +1514,15 @@ char *grapple_client_session_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
+    }
+
+  if (!clientdata->sock)
+    {
+      grapple_client_error_set(clientdata,GRAPPLE_ERROR_CLIENT_NOT_CONNECTED);
+      internal_client_release(clientdata);
+      return 0;
     }
 
   //If no session name has been set, return null
@@ -1507,6 +1551,7 @@ int grapple_client_stop(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1544,6 +1589,7 @@ int grapple_client_ping(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1570,6 +1616,7 @@ double grapple_client_ping_get(grapple_client client,grapple_user serverid)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -1604,6 +1651,7 @@ grapple_user grapple_client_serverid_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -1637,6 +1685,7 @@ int grapple_client_sequential_set(grapple_client client,int value)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1674,6 +1723,7 @@ int grapple_client_sequential_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1686,7 +1736,7 @@ int grapple_client_sequential_get(grapple_client client)
 
 //Messages can be sent to groups, not just to users. This function
 //returns the ID of a group from the name
-int grapple_client_group_from_name(grapple_client client,const char *name)
+grapple_user grapple_client_group_from_name(grapple_client client,const char *name)
 {
   internal_client_data *clientdata;
   int returnval;
@@ -1696,7 +1746,8 @@ int grapple_client_group_from_name(grapple_client client,const char *name)
 
   if (!clientdata)
     {
-      return GRAPPLE_FAILED;
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return 0;
     }
 
   grapple_thread_mutex_lock(clientdata->group_mutex,
@@ -1724,6 +1775,8 @@ int grapple_client_group_from_name(grapple_client client,const char *name)
 
   grapple_thread_mutex_unlock(clientdata->group_mutex);
 
+  grapple_client_error_set(clientdata,GRAPPLE_ERROR_NO_SUCH_GROUP);
+
   internal_client_release(clientdata);
 
   //No ID to find
@@ -1744,6 +1797,7 @@ grapple_user grapple_client_group_create(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return 0;
     }
 
@@ -1798,6 +1852,7 @@ int grapple_client_group_add(grapple_client client,grapple_user group,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1842,7 +1897,8 @@ int grapple_client_group_passwordneeded(grapple_client client,
 
   if (!clientdata)
     {
-      return GRAPPLE_FAILED;
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
+      return 0;
     }
 
   grapple_thread_mutex_lock(clientdata->group_mutex,
@@ -1873,6 +1929,8 @@ int grapple_client_group_passwordneeded(grapple_client client,
 
   grapple_thread_mutex_unlock(clientdata->group_mutex);
 
+  grapple_client_error_set(clientdata,GRAPPLE_ERROR_NO_SUCH_GROUP);
+
   internal_client_release(clientdata);
 
   return 0;
@@ -1888,6 +1946,7 @@ int grapple_client_group_remove(grapple_client client,grapple_user group,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1921,6 +1980,7 @@ int grapple_client_group_delete(grapple_client client,grapple_user group)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1958,12 +2018,14 @@ int grapple_client_enumgroup(grapple_client client,
   int loopa;
   grapple_connection *user;
   char *tmpname;
+  int carry_on=1;
 
   //Find the client
   clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_SHARED);
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -1973,7 +2035,7 @@ int grapple_client_enumgroup(grapple_client client,
   loopa=0;
 
   //Loop for each user
-  while (userarray[loopa])
+  while (carry_on && userarray[loopa])
     {
       grapple_thread_mutex_lock(clientdata->connection_mutex,
 				GRAPPLE_LOCKTYPE_SHARED);
@@ -1999,7 +2061,7 @@ int grapple_client_enumgroup(grapple_client client,
 	  if (serverid != GRAPPLE_USER_UNKNOWN)
 	    {
 	      //Run the callback
-	      (*callback)(serverid,tmpname,0,context);
+	      carry_on=(*callback)(serverid,tmpname,0,context);
 	    }
 	  if (tmpname)
 	    free(tmpname);
@@ -2031,6 +2093,7 @@ grapple_user *grapple_client_groupusers_get(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -2053,6 +2116,7 @@ int grapple_client_enumgrouplist(grapple_client client,
   int count;
   char *tmpname;
   internal_grapple_group *scan;
+  int carry_on=1;
 
 
   //Find the client
@@ -2060,6 +2124,7 @@ int grapple_client_enumgrouplist(grapple_client client,
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 
@@ -2111,7 +2176,7 @@ int grapple_client_enumgrouplist(grapple_client client,
   grapple_thread_mutex_unlock(clientdata->group_mutex);
 
   //We now have the list of groups
-  while (count>0)
+  while (carry_on && count>0)
     {
       //Loop backwards through the groups. We make no guarentee of enumeration
       //order
@@ -2135,7 +2200,7 @@ int grapple_client_enumgrouplist(grapple_client client,
       if (groupid)
 	{
 	  //Run the callback
-	  (*callback)(groupid,tmpname,0,context);
+	  carry_on=(*callback)(groupid,tmpname,0,context);
 	}
 
       if (tmpname)
@@ -2162,6 +2227,7 @@ grapple_user *grapple_client_grouplist_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -2224,6 +2290,7 @@ char *grapple_client_groupname_get(grapple_client client,grapple_user groupid)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -2234,6 +2301,7 @@ char *grapple_client_groupname_get(grapple_client client,grapple_user groupid)
   if (!group)
     {
       grapple_thread_mutex_unlock(clientdata->group_mutex);
+      grapple_client_error_set(clientdata,GRAPPLE_ERROR_NO_SUCH_GROUP);
       internal_client_release(clientdata);
       return NULL;
     }
@@ -2279,18 +2347,21 @@ int grapple_client_intvar_get(grapple_client client,const char *name)
 {
   internal_client_data *clientdata;
   int returnval;
-
+  grapple_error err;
+  
   //Find the client
   clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_SHARED);
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       //No client
       return 0;
     }
 
   //Get the value
-  returnval=grapple_variable_get_int(clientdata->variables,name);
+  err=grapple_variable_get_int(clientdata->variables,name,&returnval);
+  grapple_client_error_set(clientdata,err);
 
   internal_client_release(clientdata);
 
@@ -2327,18 +2398,21 @@ double grapple_client_doublevar_get(grapple_client client,const char *name)
 {
   internal_client_data *clientdata;
   double returnval;
+  grapple_error err;
 
   //Find the client
   clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_SHARED);
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       //No client
       return 0;
     }
 
   //Get the value
-  returnval=grapple_variable_get_double(clientdata->variables,name);
+  err=grapple_variable_get_double(clientdata->variables,name,&returnval);
+  grapple_client_error_set(clientdata,err);
 
   //Done with this
   internal_client_release(clientdata);
@@ -2375,24 +2449,27 @@ int grapple_client_datavar_get(grapple_client client,const char *name,
 			       void *data,size_t *len)
 {
   internal_client_data *clientdata;
-  int returnval;
+  grapple_error err;
 
   //Find the client
   clientdata=internal_client_get(client,GRAPPLE_LOCKTYPE_SHARED);
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       //No client
       return GRAPPLE_FAILED;
     }
 
   //Get the value
-  returnval=grapple_variable_get_data(clientdata->variables,name,data,len);
+  err=grapple_variable_get_data(clientdata->variables,name,data,len);
+
+  grapple_client_error_set(clientdata,err);
 
   //Done with this
   internal_client_release(clientdata);
 
-  if (returnval==0)
+  if (err!=GRAPPLE_NO_ERROR)
     return GRAPPLE_FAILED;
 
   return GRAPPLE_OK;
@@ -2408,6 +2485,7 @@ grapple_error grapple_client_error_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_get(); //Just to wipe it
       return GRAPPLE_ERROR_NOT_INITIALISED;
     }
 
@@ -2418,11 +2496,20 @@ grapple_error grapple_client_error_get(grapple_client client)
 
   internal_client_release(clientdata);
 
+  if (returnval==GRAPPLE_NO_ERROR)
+    returnval=grapple_error_get();
+  else
+    grapple_error_get(); //Just to wipe it
+
   return returnval;
 }
 
 grapple_certificate *grapple_client_certificate_get(grapple_client client)
 {
+#ifndef SOCK_SSL
+  return NULL;
+#else
+
   internal_client_data *clientdata;
   socket_certificate *cert=NULL;
   grapple_certificate *returnval;
@@ -2431,6 +2518,7 @@ grapple_certificate *grapple_client_certificate_get(grapple_client client)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return NULL;
     }
 
@@ -2454,6 +2542,7 @@ grapple_certificate *grapple_client_certificate_get(grapple_client client)
   free(cert);
 
   return returnval;
+#endif
 }
 
 int grapple_client_dispatchers_set(grapple_client client,int num)
@@ -2466,6 +2555,7 @@ int grapple_client_dispatchers_set(grapple_client client,int num)
 
   if (!clientdata)
     {
+      grapple_error_set(GRAPPLE_ERROR_NOT_INITIALISED);
       return GRAPPLE_FAILED;
     }
 

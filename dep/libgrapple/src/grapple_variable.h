@@ -47,11 +47,11 @@ extern int grapple_variable_timeset_double(grapple_variable_hash *,
 extern int grapple_variable_timeset_data(grapple_variable_hash *,
 					 const char *,void *,size_t,int,int);
 
-extern int grapple_variable_get_int(grapple_variable_hash *,
-				    const char *);
-extern double grapple_variable_get_double(grapple_variable_hash *,
-				       const char *);
-extern int grapple_variable_get_data(grapple_variable_hash *,
+extern grapple_error grapple_variable_get_int(grapple_variable_hash *,
+				    const char *,int *);
+extern grapple_error grapple_variable_get_double(grapple_variable_hash *,
+				       const char *,double *);
+extern grapple_error grapple_variable_get_data(grapple_variable_hash *,
 				     const char *,void *,size_t *);
 
 extern int grapple_variable_client_sync(internal_client_data *,const char *);

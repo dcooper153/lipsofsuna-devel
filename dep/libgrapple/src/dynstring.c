@@ -45,7 +45,7 @@ dynstring *dynstringInit(int datasize)
 }
 
 //Check a length of string will fit, if it wont, grow the buffer
-void dynstringCheckAvailableLength(dynstring *data,int length)
+void dynstringCheckAvailableLength(dynstring *data,size_t length)
 {
   length+=2;
   if (length+data->len > data->maxlen)
@@ -58,7 +58,7 @@ void dynstringCheckAvailableLength(dynstring *data,int length)
 //Append some text to a dynstring
 void dynstringAppend(dynstring *data,const char *buf)
 {
-  int length;
+  size_t length;
 
   if (!buf || !*buf)
     return;
@@ -117,7 +117,7 @@ udynstring *dynstringUInit(int datasize)
 }
 
 //Check a length of string will fit, if it wont, grow the buffer
-void dynstringUCheckAvailableLength(udynstring *data,int length)
+void dynstringUCheckAvailableLength(udynstring *data,size_t length)
 {
   length+=2;
 
@@ -131,7 +131,7 @@ void dynstringUCheckAvailableLength(udynstring *data,int length)
 //Append some text to an unsigned dynstring
 void dynstringUAppend(udynstring *data,const unsigned char *buf)
 {
-  int length;
+  size_t length;
 
   if (!buf || !*buf)
     return;
@@ -190,7 +190,7 @@ sdynstring *dynstringSInit(int datasize)
 }
 
 //Check a length of string will fit, if it wont, grow the buffer
-void dynstringSCheckAvailableLength(sdynstring *data,int length)
+void dynstringSCheckAvailableLength(sdynstring *data,size_t length)
 {
   length+=2;
 
@@ -204,7 +204,7 @@ void dynstringSCheckAvailableLength(sdynstring *data,int length)
 //Append some text to a signed dynstring
 void dynstringSAppend(sdynstring *data,const signed char *buf)
 {
-  int length;
+  size_t length;
 
   if (!buf || !*buf)
     return;

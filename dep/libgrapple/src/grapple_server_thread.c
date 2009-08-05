@@ -23,7 +23,9 @@
 #include "grapple_configure_substitute.h"
 
 #include <stdio.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #ifdef HAVE_ERRNO_H
@@ -35,7 +37,6 @@
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
 #endif
-#include <pthread.h>
 
 #include "grapple_server_thread.h"
 #include "grapple_server_internal.h"
@@ -62,10 +63,10 @@ int user_set_delete(internal_server_data *server,
   grapple_connection *scan;
   int groupid;
 
-  if (target->delete)
+  if (target->deleted)
     return 1;
 
-  target->delete=1;
+  target->deleted=1;
 
   //delete from all groups now
   while (target->groups)
@@ -139,7 +140,7 @@ static void postprocess_handshake_good(internal_server_data *server,
     }
 
   //Now check we have matched the name policy
-  if (!user->handshakeflags & HANDSHAKE_FLAG_USERNAME)
+  if (!(user->handshakeflags & HANDSHAKE_FLAG_USERNAME))
     {
       switch(server->namepolicy)
 	{
@@ -376,7 +377,7 @@ static void postprocess_handshake_good(internal_server_data *server,
 static void process_message_grapple_version(internal_server_data *server,  
 					    grapple_connection *user,
 					    grapple_messagetype_internal messagetype,
-					    void *data,int datalen)
+					    void *data,size_t datalen)
 {
   //Compare the version passed by the client to the hardcoded version we have
   if (strlen(GRAPPLE_VERSION)!=datalen ||
@@ -401,7 +402,7 @@ static void process_message_grapple_version(internal_server_data *server,
 static void process_message_product_name(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
   //Check the server and client are playing the same game
   if (strlen(server->productname)!=datalen ||
@@ -428,7 +429,7 @@ static void process_message_product_name(internal_server_data *server,
 static void process_message_product_version(internal_server_data *server,  
 					    grapple_connection *user,
 					    grapple_messagetype_internal messagetype,
-					    void *data,int datalen)
+					    void *data,size_t datalen)
 {
   //Check the version on the server and client are the same
   if (strlen(server->productversion)!=datalen ||
@@ -452,7 +453,7 @@ static void process_message_product_version(internal_server_data *server,
 static void process_message_password(internal_server_data *server,  
 				     grapple_connection *user,
 				     grapple_messagetype_internal messagetype,
-				     void *data,int datalen)
+				     void *data,size_t datalen)
 {
   if (server->passwordhandler)
     {
@@ -510,7 +511,7 @@ static void process_message_password(internal_server_data *server,
 static void process_message_protectionkey(internal_server_data *server,  
 					  grapple_connection *user,
 					  grapple_messagetype_internal messagetype,
-					  void *data,int datalen)
+					  void *data,size_t datalen)
 {
   grapple_connection *scan;
   int unique;
@@ -538,7 +539,12 @@ static void process_message_protectionkey(internal_server_data *server,
       while (scan && unique)
 	{
 	  if (scan!=user && scan->protectionkey && 
-	      !strcasecmp(scan->protectionkey,user->protectionkey))
+#ifdef WIN32
+	      !_stricmp(scan->protectionkey,user->protectionkey)
+#else
+	      !strcasecmp(scan->protectionkey,user->protectionkey)
+#endif
+	      )
 	    {
 	      //It is the same, this is non-unique
 	      unique=0;
@@ -566,7 +572,7 @@ static void process_message_protectionkey(internal_server_data *server,
 static void process_message_user_name(internal_server_data *server,  
 				      grapple_connection *user,
 				      grapple_messagetype_internal messagetype,
-				      void *data,int datalen)
+				      void *data,size_t datalen)
 {
   grapple_connection *scan;
   int unique;
@@ -591,7 +597,13 @@ static void process_message_user_name(internal_server_data *server,
       scan=server->userlist;
       while (scan && unique)
 	{
-	  if (scan!=user && !strcasecmp(scan->name,user->name))
+	  if (scan!=user && 
+#ifdef WIN32
+	      !_stricmp(scan->name,user->name)
+#else
+	      !strcasecmp(scan->name,user->name)
+#endif
+	      )
 	    {
 	      //It is the same, this is non-unique
 	      unique=0;
@@ -640,7 +652,7 @@ static void process_message_user_name(internal_server_data *server,
 static void process_message_user_message(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
   intchar val;
   int flags,messageid;
@@ -661,11 +673,11 @@ static void process_message_user_message(internal_server_data *server,
   memcpy(val.c,data,4);
   flags=val.i;
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   messageid=ntohl(val.i);
 
   //Add a  message to the clients inbound message queue
-  s2SUQ_send(server,user->serverid,messagetype,data+8,datalen-8);
+  s2SUQ_send(server,user->serverid,messagetype,(char *)data+8,datalen-8);
 
   //Now, if required, send an acknowledgement back to the user
   if (flags & GRAPPLE_CONFIRM)
@@ -678,7 +690,7 @@ static void process_message_user_message(internal_server_data *server,
 static void process_message_user_disconnected(internal_server_data *server,  
 					      grapple_connection *user,
 					      grapple_messagetype_internal messagetype,
-					      void *data,int datalen)
+					      void *data,size_t datalen)
 {
   //Simply set the delete flag, dont delete them when we are in the middle of
   //processing them, that would break things
@@ -692,7 +704,7 @@ static void process_message_user_disconnected(internal_server_data *server,
 static void process_message_relay_to(internal_server_data *server,  
 				     grapple_connection *user,
 				     grapple_messagetype_internal messagetype,
-				     void *data,int datalen)
+				     void *data,size_t datalen)
 {
   intchar val;
   int target,flags,id;
@@ -716,10 +728,10 @@ static void process_message_relay_to(internal_server_data *server,
   memcpy(val.c,data,4);
   target=ntohl(val.i);
       
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   flags=val.i;
 
-  memcpy(val.c,data+8,4);
+  memcpy(val.c,(char *)data+8,4);
   id=ntohl(val.i);
 
   grapple_thread_mutex_lock(server->group_mutex,GRAPPLE_LOCKTYPE_SHARED);
@@ -748,7 +760,7 @@ static void process_message_relay_to(internal_server_data *server,
 		{
 		  //If this is the user, send them the message
 		  s2c_relaymessage(server,scan,user,flags,id,
-				   data+12,datalen-12);
+				   (char *)data+12,datalen-12);
 
 		  //Count the send
 		  count++;
@@ -780,7 +792,7 @@ static void process_message_relay_to(internal_server_data *server,
 	  if (scan->serverid==target)
 	    {
 	      //Send the message
-	      s2c_relaymessage(server,scan,user,flags,id,data+12,datalen-12);
+	      s2c_relaymessage(server,scan,user,flags,id,(char *)data+12,datalen-12);
 
 	      //Count the send
 	      count++;
@@ -808,7 +820,7 @@ static void process_message_relay_to(internal_server_data *server,
 static void process_message_relay_all(internal_server_data *server,  
 				      grapple_connection *user,
 				      grapple_messagetype_internal messagetype,
-				      void *data,int datalen)
+				      void *data,size_t datalen)
 {
   grapple_connection *scan;
   int flags,id,count=0;
@@ -830,7 +842,7 @@ static void process_message_relay_all(internal_server_data *server,
   memcpy(val.c,data,4);
   flags=val.i;
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   id=ntohl(val.i);
 
   grapple_thread_mutex_lock(server->connection_mutex,GRAPPLE_LOCKTYPE_SHARED);
@@ -840,7 +852,7 @@ static void process_message_relay_all(internal_server_data *server,
   while (scan)
     {
       //Send this user the message
-      s2c_relaymessage(server,scan,user,flags,id,data+8,datalen-8);
+      s2c_relaymessage(server,scan,user,flags,id,(char *)data+8,datalen-8);
 
       //Count the send
       count++;
@@ -864,7 +876,7 @@ static void process_message_relay_all(internal_server_data *server,
 static void process_message_relay_all_but_self(internal_server_data *server,  
 					       grapple_connection *user,
 					       grapple_messagetype_internal messagetype,
-					       void *data,int datalen)
+					       void *data,size_t datalen)
 {
   grapple_connection *scan;
   int flags,id,count=0;
@@ -886,7 +898,7 @@ static void process_message_relay_all_but_self(internal_server_data *server,
   memcpy(val.c,data,4);
   flags=val.i;
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   id=ntohl(val.i);
 
   grapple_thread_mutex_lock(server->connection_mutex,GRAPPLE_LOCKTYPE_SHARED);
@@ -899,7 +911,7 @@ static void process_message_relay_all_but_self(internal_server_data *server,
       if (scan->serverid!=user->serverid)
 	{
 	  //Send the message
-	  s2c_relaymessage(server,scan,user,flags,id,data+8,datalen-8);
+	  s2c_relaymessage(server,scan,user,flags,id,(char *)data+8,datalen-8);
 
 	  //Count the send
 	  count++;
@@ -928,7 +940,7 @@ static void process_message_relay_all_but_self(internal_server_data *server,
 static void process_message_ping(internal_server_data *server,  
 				 grapple_connection *user,
 				 grapple_messagetype_internal messagetype,
-				 void *data,int datalen)
+				 void *data,size_t datalen)
 {
   intchar val;
 
@@ -949,7 +961,7 @@ static void process_message_ping(internal_server_data *server,
 static void process_message_ping_reply(internal_server_data *server,  
 				       grapple_connection *user,
 				       grapple_messagetype_internal messagetype,
-				       void *data,int datalen)
+				       void *data,size_t datalen)
 {
   intchar val;
   grapple_connection *scan;
@@ -1001,7 +1013,7 @@ static void process_message_ping_reply(internal_server_data *server,
 static void process_message_request_next_groupid(internal_server_data *server,  
 						 grapple_connection *user,
 						 grapple_messagetype_internal messagetype,
-						 void *data,int datalen)
+						 void *data,size_t datalen)
 {
   //This function just sends a new next group ID to the client
   s2c_send_nextgroupid(server,user,server->user_serverid++);
@@ -1012,9 +1024,10 @@ static void process_message_request_next_groupid(internal_server_data *server,
 static void process_message_group_create(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
-  int groupid,namelen,passlen,offset;
+  int groupid;
+  size_t namelen,passlen,offset;
   intchar val;
   char *outdata;
   char *name,*password,*cpassword;
@@ -1053,7 +1066,7 @@ static void process_message_group_create(internal_server_data *server,
       return;
     }
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   namelen=ntohl(val.i);
   
   //Check we have enough data
@@ -1061,7 +1074,7 @@ static void process_message_group_create(internal_server_data *server,
     return;
 
   name=(char *)malloc(namelen+1);
-  memcpy(name,data+8,namelen);
+  memcpy(name,(char *)data+8,namelen);
   name[namelen]=0;
   
   offset=namelen+8;
@@ -1070,7 +1083,7 @@ static void process_message_group_create(internal_server_data *server,
   if (datalen-offset<4)
     return;
   
-  memcpy(val.c,data+offset,4);
+  memcpy(val.c,(char *)data+offset,4);
   passlen=ntohl(val.i);
   offset+=4;
   
@@ -1083,7 +1096,7 @@ static void process_message_group_create(internal_server_data *server,
 	  return;
 	}
       password=(char *)malloc(passlen+1);
-      memcpy(password,data+offset,passlen);
+      memcpy(password,(char *)data+offset,passlen);
       password[passlen]=0;
       offset+=passlen;
     }
@@ -1109,12 +1122,12 @@ static void process_message_group_create(internal_server_data *server,
   memcpy(outdata,val.c,4);
   
   //Add the name to the message queue
-  val.i=namelen;
+  val.i=(GRAPPLE_INT_TYPE)namelen;
   memcpy(outdata+4,val.c,4);
   
   memcpy(outdata+8,name,namelen);
   
-  val.i=passlen;
+  val.i=(GRAPPLE_INT_TYPE)passlen;
   memcpy(outdata+8+namelen,val.c,4);
   
   if (passlen)
@@ -1159,12 +1172,12 @@ static void process_message_group_create(internal_server_data *server,
 static void process_message_group_add(internal_server_data *server,  
 				      grapple_connection *user,
 				      grapple_messagetype_internal messagetype,
-				      void *data,int datalen)
+				      void *data,size_t datalen)
 {
   int groupid;
   int contentid;
   char *password=NULL,*cpassword;
-  int passwordlength;
+  size_t passwordlength;
   intchar val;
   grapple_connection *scan;
   char *outdata;
@@ -1186,9 +1199,9 @@ static void process_message_group_add(internal_server_data *server,
 
   memcpy(val.c,data,4);
   groupid=ntohl(val.i);
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   contentid=ntohl(val.i);
-  memcpy(val.c,data+8,4);
+  memcpy(val.c,(char *)data+8,4);
   passwordlength=ntohl(val.i);
 
   if (passwordlength)
@@ -1197,7 +1210,7 @@ static void process_message_group_add(internal_server_data *server,
       if (datalen-12<passwordlength)
 	return;
       password=(char *)malloc(passwordlength+1);
-      memcpy(password,data+12,passwordlength);
+      memcpy(password,(char *)data+12,passwordlength);
       password[passwordlength]=0;
     }
 
@@ -1250,7 +1263,7 @@ static void process_message_group_add(internal_server_data *server,
   val.i=contentid;
   memcpy(outdata+4,val.c,4);
 
-  val.i=passwordlength;
+  val.i=(GRAPPLE_INT_TYPE)passwordlength;
   memcpy(outdata+8,val.c,4);
 
   if (passwordlength)
@@ -1272,7 +1285,7 @@ static void process_message_group_add(internal_server_data *server,
 static void process_message_group_remove(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
   int groupid;
   int contentid;
@@ -1292,7 +1305,7 @@ static void process_message_group_remove(internal_server_data *server,
 
   memcpy(val.c,data,4);
   groupid=ntohl(val.i);
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   contentid=ntohl(val.i);
 
   //create a new item in the servers group
@@ -1328,14 +1341,14 @@ static void process_message_group_remove(internal_server_data *server,
 static void process_message_group_delete(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
   int groupid;
   intchar val;
   grapple_connection *scan;
   char *outdata;
   internal_grapple_group *group;
-  int length;
+  size_t length;
 
   //If the user has not completed handshake, dont let them send.
   if (!user->handshook)
@@ -1402,7 +1415,7 @@ static void process_message_group_delete(internal_server_data *server,
 static void process_message_failover_cant(internal_server_data *server,  
 					  grapple_connection *user,
 					  grapple_messagetype_internal messagetype,
-					  void *data,int datalen)
+					  void *data,size_t datalen)
 {
   //This is just a curtesy function, if the client cant failover to it,
   //then we dont actually do anything, we only do something if it CAN
@@ -1414,7 +1427,7 @@ static void process_message_failover_cant(internal_server_data *server,
 static void process_message_failover_tryme(internal_server_data *server,  
 					   grapple_connection *user,
 					   grapple_messagetype_internal messagetype,
-					   void *data,int datalen)
+					   void *data,size_t datalen)
 {
   char *address;
   //The client says they can failover - so try and connect to them, see
@@ -1434,6 +1447,8 @@ static void process_message_failover_tryme(internal_server_data *server,
   //Connect to them either with TCP or UDP - as appropriate
   switch (server->protocol)
     {
+    case GRAPPLE_PROTOCOL_UNKNOWN:
+      break;
     case GRAPPLE_PROTOCOL_TCP:
       user->failoversock=socket_create_inet_tcp_wait(address,server->port,0);
       break;
@@ -1465,10 +1480,10 @@ static void process_message_failover_tryme(internal_server_data *server,
 static void process_message_reconnection(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
   intchar val;
-  int length;
+  size_t length;
 
   //4 bytes : server ID
   //4 bytes : length of the name
@@ -1482,7 +1497,7 @@ static void process_message_reconnection(internal_server_data *server,
   //Set the new users server ID
   user->reconnectserverid=ntohl(val.i);
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
 
   length=ntohl(val.i);
 
@@ -1492,7 +1507,7 @@ static void process_message_reconnection(internal_server_data *server,
 
   //Create the users name
   user->name=(char *)malloc(length+1);
-  memcpy(user->name,data+8,length);
+  memcpy(user->name,(char *)data+8,length);
   user->name[length]=0;
 
   //Mark the user as reconnecting for when they finish their handshake
@@ -1504,7 +1519,7 @@ static void process_message_reconnection(internal_server_data *server,
 static void process_message_notify_state(internal_server_data *server,  
 					 grapple_connection *user,
 					 grapple_messagetype_internal messagetype,
-					 void *data,int datalen)
+					 void *data,size_t datalen)
 {
   intchar val;
 
@@ -1525,7 +1540,7 @@ static void process_message_notify_state(internal_server_data *server,
 static void process_message_confirm_received(internal_server_data *server,  
 					     grapple_connection *user,
 					     grapple_messagetype_internal messagetype,
-					     void *data,int datalen)
+					     void *data,size_t datalen)
 {
   intchar val;
   int userid,messageid;
@@ -1543,7 +1558,7 @@ static void process_message_confirm_received(internal_server_data *server,
   memcpy(val.c,data,4);
   userid=ntohl(val.i);
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   messageid=ntohl(val.i);
 
   if (!userid)
@@ -1591,15 +1606,16 @@ static void process_message_confirm_received(internal_server_data *server,
 static void process_message_variable(internal_server_data *server,  
 				     grapple_connection *user,
 				     grapple_messagetype_internal messagetype,
-				     void *data,int datalen)
+				     void *data,size_t datalen)
 {
   intchar val;
-  int type,offset,len;
+  int type;
+  size_t offset,len;
   char *name;
   int intval;
   double doubleval;
   void *vardata;
-  int vardatalen;
+  size_t vardatalen;
 
   //The data here is variable depending on the type of syncronised variable
   //we have
@@ -1618,7 +1634,7 @@ static void process_message_variable(internal_server_data *server,
   memcpy(val.c,data,4);
   type=ntohl(val.i);
 
-  memcpy(val.c,data+4,4);
+  memcpy(val.c,(char *)data+4,4);
   len=ntohl(val.i);
 
   offset=8;
@@ -1626,7 +1642,7 @@ static void process_message_variable(internal_server_data *server,
   if (datalen-offset<len)
     return;
   name=(char *)malloc(len+1);
-  memcpy(name,data+8,len);
+  memcpy(name,(char *)data+8,len);
   name[len]=0;
 
   offset+=len;
@@ -1636,14 +1652,14 @@ static void process_message_variable(internal_server_data *server,
     case GRAPPLE_VARIABLE_TYPE_DATA:
       vardatalen=datalen-offset;
       vardata=(void *)malloc(vardatalen);
-      memcpy(vardata,data+offset,vardatalen);
+      memcpy(vardata,(char *)data+offset,vardatalen);
       grapple_variable_set_data(server->variables,name,vardata,vardatalen);
       free(vardata);
       break;
     case GRAPPLE_VARIABLE_TYPE_DOUBLE:
       vardatalen=datalen-offset;
       vardata=(void *)malloc(vardatalen+1);
-      memcpy(vardata,data+offset,vardatalen);
+      memcpy(vardata,(char *)data+offset,vardatalen);
       *((char *)vardata+vardatalen)=0;
       doubleval=atof((char *)vardata);
       grapple_variable_set_double(server->variables,name,doubleval);
@@ -1655,7 +1671,7 @@ static void process_message_variable(internal_server_data *server,
 	  free(name);
 	  return;
 	}
-      memcpy(val.c,data+offset,4);
+      memcpy(val.c,(char *)data+offset,4);
       intval=ntohl(val.i);
       grapple_variable_set_int(server->variables,name,intval);
       break;
@@ -1675,7 +1691,7 @@ static void process_message_variable(internal_server_data *server,
 static void process_message(internal_server_data *server,  
 			    grapple_connection *user,
 			    grapple_messagetype_internal messagetype,
-			    void *data,int datalen)
+			    void *data,size_t datalen)
 {
   switch (messagetype)
     {
@@ -1786,11 +1802,11 @@ static int process_user_udp(internal_server_data *server,
   char *ptr;
 
   //If the user is dead, ignore it
-  if (user->delete)
+  if (user->deleted)
     return 0;
 
   //if this is a reconnection dummy socket
-  if (!user->sock)
+  if (!(user->sock))
     return 0;
 
   //Pull the next UDP packet from the socket
@@ -1807,7 +1823,7 @@ static int process_user_udp(internal_server_data *server,
       ptr=pulldata->data;
 
       memcpy(indata.c,ptr,4);
-      messagetype=ntohl(indata.i);
+      messagetype=(grapple_messagetype_internal)ntohl(indata.i);
       ptr+=4;
       
       memcpy(indata.c,ptr,4);
@@ -1836,17 +1852,17 @@ static int process_user_tcp(internal_server_data *server,
 {
   const void *data,*ptr;
   void *pulldata,*pullptr;
-  int length,messagelength;
+  size_t length,messagelength;
   intchar indata;
   grapple_messagetype_internal messagetype;
   int count=0;
 
   //If the user is dead, dont read
-  if (user->delete)
+  if (user->deleted)
     return 0;
 
   //if this is a reconnection dummy socket
-  if (!user->sock)
+  if (!(user->sock))
     return 0;
 
   //We will return as soon as there is no more data, so we can loop forever
@@ -1870,11 +1886,11 @@ static int process_user_tcp(internal_server_data *server,
       //         DATA
       
       memcpy(indata.c,ptr,4);
-      ptr+=4;
-      messagetype=ntohl(indata.i);
+      ptr=(const char *)ptr+4;
+      messagetype=(grapple_messagetype_internal)ntohl(indata.i);
       
       memcpy(indata.c,ptr,4);
-      ptr+=4;
+      ptr=(const char *)ptr+4;
       messagelength=ntohl(indata.i);
       
       //Check there is enough in the buffer for the whole message
@@ -1885,7 +1901,7 @@ static int process_user_tcp(internal_server_data *server,
       pulldata=socket_indata_pull(user->sock,messagelength+8);
 
       //Move to the start of the data
-      pullptr=pulldata+8;
+      pullptr=(char *)pulldata+8;
       
       //Process the message
       process_message(server,user,
@@ -1978,6 +1994,8 @@ static int process_userlist(internal_server_data *server)
       //Process the users sockets based on what protocol they are using
       switch (server->protocol)
 	{
+	case GRAPPLE_PROTOCOL_UNKNOWN:
+	  break;
 	case GRAPPLE_PROTOCOL_TCP:
 	  count+=process_user_tcp(server,scan);
 	  break;
@@ -2016,11 +2034,11 @@ static int process_userlist(internal_server_data *server)
       if (target->sock) //First test normal socketed users
 	{
 	  //If their socket is dead, tag for deletion
-	  if (!target->delete && socket_dead(target->sock))
+	  if (!target->deleted && socket_dead(target->sock))
 	    user_set_delete(server,target);
 
 	  //If they are deleted, and have nothing left to send to the server
-	  if (target->delete && !target->message_out_queue)
+	  if (target->deleted && !target->message_out_queue)
 	    {
 	      count++;
 	      
@@ -2111,7 +2129,7 @@ static int process_message_out_queue_tcp(grapple_connection *user)
 
       //We now have the message data to send
       socket_write(user->sock,
-		   data->data,data->length);
+		   (char *)data->data,data->length);
 
       free(data->data);
       free(data);
@@ -2150,11 +2168,11 @@ static int process_message_out_queue_udp(grapple_connection *user)
       //We now have the message data to send. It may be reliable or unreliable
       if (data->reliablemode)
 	socket_write_reliable(user->sock,
-			      data->data,data->length);
+			      (char *)data->data,data->length);
       else
 	socket_write(user->sock,
-		     data->data,data->length);
-
+		     (char *)data->data,data->length);
+      
       free(data->data);
       free(data);
 
@@ -2221,7 +2239,7 @@ static void run_autoping(internal_server_data *server)
   //Find when the last time the user may have pinged, that it has been long
   //enough that it needs to ping again
   gettimeofday(&time_now,NULL);
-  time_now.tv_usec-=(server->autoping*1000000);
+  time_now.tv_usec-=(long)(server->autoping*1000000);
   
   while (time_now.tv_usec<0)
     {
@@ -2367,7 +2385,11 @@ static void grapple_server_thread_udp(internal_server_data *server)
 
 //This is the function that is called when the server thread starts. It loops
 //while the thread is alive, and cleans up some when it dies
+#ifdef HAVE_PTHREAD_H
 static void *grapple_server_thread_main(void *voiddata)
+#else
+  static DWORD WINAPI grapple_server_thread_main(LPVOID voiddata)
+#endif
 {
   internal_server_data *data;
   int finished=0;
@@ -2424,6 +2446,8 @@ static void *grapple_server_thread_main(void *voiddata)
       //Process the thread data (users etc) via either the TCP or UDP handler
       switch (data->protocol)
 	{
+	case GRAPPLE_PROTOCOL_UNKNOWN:
+	  break;
 	case GRAPPLE_PROTOCOL_TCP:
 	  grapple_server_thread_tcp(data);
 	  break;
@@ -2477,6 +2501,8 @@ static void *grapple_server_thread_main(void *voiddata)
 		  //Process outgoing messages
 		  switch (user->protocol)
 		    {
+		    case GRAPPLE_PROTOCOL_UNKNOWN:
+		      break;
 		    case GRAPPLE_PROTOCOL_TCP:
 		      process_message_out_queue_tcp(user);
 		      break;
@@ -2606,7 +2632,11 @@ static void *grapple_server_thread_main(void *voiddata)
   data->thread=0;
   data->threaddestroy=0;
 
+#ifdef HAVE_PTHREAD_H
   return NULL;
+#else
+  return 0;
+#endif
 }
 
 //Function called by the grapple_server_start function to actually start the

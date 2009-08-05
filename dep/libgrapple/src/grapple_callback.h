@@ -23,12 +23,11 @@
 #ifndef GRAPPLE_CALLBACK_H
 #define GRAPPLE_CALLBACK_H
 
-#include <stdbool.h>
 
 #include "grapple_message.h"
 
 typedef int(*grapple_callback)(grapple_message *,void *);
-typedef bool(*grapple_user_enum_callback)(grapple_user,const char *,
-					  unsigned long,void *);
+typedef int(*grapple_user_enum_callback)(grapple_user,const char *,
+					 unsigned long,void *);
 
 #endif

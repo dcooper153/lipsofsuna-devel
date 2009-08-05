@@ -72,7 +72,7 @@ extern "C" {
 
   extern grapple_confirmid grapple_client_send(grapple_client,
 					       grapple_user,
-					       int,const void *,int);
+					       int,const void *,size_t);
 
   extern grapple_user *grapple_client_userlist_get(grapple_client);
 
@@ -132,7 +132,7 @@ extern "C" {
 
   extern grapple_certificate *grapple_client_certificate_get(grapple_client);
 
-  extern int grapple_client_protocol_get(grapple_client);
+  extern grapple_protocol grapple_client_protocol_get(grapple_client);
   extern int grapple_client_dispatchers_set(grapple_client,int);
 
 #ifdef __cplusplus

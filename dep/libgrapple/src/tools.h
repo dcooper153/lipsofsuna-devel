@@ -32,26 +32,27 @@
 
 extern void microsleep(int);
 extern void timemark(const char *);
-extern inline int grapple_errno(void);
 
 #ifdef WIN32
-
-#ifdef EMSGSIZE
-# undef EMSGSIZE
+extern int grapple_thread_errno(void);
+extern int grapple_socket_errno(void);
+#define GRAPPLE_THREAD_ERRNO_IS_EAGAIN (grapple_thread_errno()==EAGAIN)
+#define GRAPPLE_SOCKET_ERRNO_IS_EINVAL (grapple_socket_errno()==WSAEINVAL)
+#define GRAPPLE_SOCKET_ERRNO_IS_EAGAIN (grapple_socket_errno()==WSAEWOULDBLOCK)
+#define GRAPPLE_SOCKET_ERRNO_IS_EMSGSIZE (grapple_socket_errno()==WSAEMSGSIZE)
+#define GRAPPLE_SOCKET_ERRNO_IS_EINPROGRESS (grapple_socket_errno()==WSAEINPROGRESS||grapple_socket_errno()==WSAEWOULDBLOCK)
+#else
+extern inline int grapple_thread_errno(void);
+extern inline int grapple_socket_errno(void);
+#define GRAPPLE_THREAD_ERRNO_IS_EAGAIN (grapple_thread_errno()==EAGAIN)
+#define GRAPPLE_SOCKET_ERRNO_IS_EINVAL (grapple_socket_errno()==EINVAL)
+#define GRAPPLE_SOCKET_ERRNO_IS_EAGAIN (grapple_socket_errno()==EAGAIN)
+#define GRAPPLE_SOCKET_ERRNO_IS_EMSGSIZE (grapple_socket_errno()==EMSGSIZE)
+#define GRAPPLE_SOCKET_ERRNO_IS_EINPROGRESS (grapple_socket_errno()==EINPROGRESS)
 #endif
-#define EMSGSIZE WSAEMSGSIZE
 
-#ifdef EINPROGRESS
-# undef EINPROGRESS
-#endif
-#define EINPROGRESS WSAEWOULDBLOCK
-
-#ifdef EAGAIN
-# undef EAGAIN
-#endif
-#define EAGAIN WSAEWOULDBLOCK
-
-//End of win32 stuff
+#ifndef HAVE_GETTIMEOFDAY
+extern int gettimeofday(struct timeval *tp,void * tz);
 #endif
 
 #endif

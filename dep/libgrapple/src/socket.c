@@ -54,7 +54,9 @@
 #ifdef HAVE_STROPTS_H
 #include <stropts.h>
 #endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -76,15 +78,20 @@
 #include <sys/ioctl.h>
 #endif
 #include <time.h>
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
 #ifdef HAVE_WS2TCPIP_H
 #include <ws2tcpip.h>
 #endif
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
+#include "socket.h"
 
 #ifdef WIN32
 #define ioctl(x,y,z) ioctlsocket(x,y,z)
+#define close(x) closesocket(x)
 #endif
 
 #ifdef HAVE_LINUX_LIMITS_H
@@ -116,6 +123,11 @@
 #include "socket.h"
 #include "tools.h"
 
+//#define SSL_DEBUG
+//#define UDP_PROTOCOL_DEBUG
+//#define STUN_DEBUG
+//#define TURN_DEBUG
+
 #ifndef HAVE_INET_NTOP
 static const char *inet_ntop(int af, const void *src, char *dst, 
 			     socklen_t cnt)      
@@ -139,15 +151,6 @@ static int inet_pton(int af, const char *src, void *dst)
       return 1;
     }
   return -1;
-}
-#endif
-
-#if defined WIN32 && defined HAVE_WINSOCK2_H
-static long enumEvent(SOCKET s,WSAEVENT hEventObject)
-{
-  WSANETWORKEVENTS NetworkEvents;
-  WSAEnumNetworkEvents(s,hEventObject,&NetworkEvents);
-  return NetworkEvents.lNetworkEvents;
 }
 #endif
 
@@ -179,26 +182,32 @@ static int socket_client_request_connect_via_turn(socketbuf *);
 //some ifdefs and the code looks pretty ugly if itsleft inline. However leave
 //the compiler a request to put it back where it belongs by inline'ing it
 
-static inline ssize_t write_fn(int fd, const void *buf, size_t count)
-{
 #ifdef WIN32
-  return send(fd,buf,count,0);
+static int write_fn(SOCKET_FD_TYPE fd, const void *buf, size_t count)
+{
+  return send(fd,(const char *)buf,(int)count,0);
+}
 #else
+static inline ssize_t write_fn(SOCKET_FD_TYPE fd, const void *buf, size_t count)
+{
   return write(fd,buf,count);
-#endif  
 }
-static inline ssize_t read_fn(int fd, void *buf, size_t count)
-{
+#endif  
+
 #ifdef WIN32
-  return recv(fd,buf,count,0);
-#else
-  return read(fd,buf,count);
-#endif  
+static int read_fn(SOCKET_FD_TYPE fd, void *buf, int count)
+{
+  return recv(fd,(char *)buf,count,0);
 }
+#else
+static inline ssize_t read_fn(SOCKET_FD_TYPE fd, void *buf, size_t count)
+{
+  return read(fd,buf,count);
+}
+#endif  
 
 #ifdef SOCK_SSL
 
-//#define SSL_DEBUG
 //Handle the SSL errors
 
 static int ssl_process_error(SSL *ssl,int rv)
@@ -295,14 +304,8 @@ static BIO *memory_buf_BIO(const char* buf, int len)
   return bio;
 }
 
-#endif //SOCK_SSL
-
 socket_certificate *socket_certificate_get(socketbuf *sock)
 {
-#ifndef SOCK_SSL
-  return NULL;
-#else
-
   X509 *cert;
   X509_NAME *subject;
   X509_NAME *issuer;
@@ -411,10 +414,7 @@ socket_certificate *socket_certificate_get(socketbuf *sock)
     }
   
   return returnval;
-#endif
 }
-
-#ifdef SOCK_SSL
 
 //Function to initialise the socket to be encrypted
 static int socket_set_encrypted_keys(socketbuf *sock)
@@ -1008,7 +1008,7 @@ void socket_write(socketbuf *sock,
 		  const char *data,size_t len)
 {
   socket_intchar udplen,udpdata;
-  int newlen;
+  size_t newlen;
 
   //Sanity check
   if (len==0)
@@ -1029,7 +1029,7 @@ void socket_write(socketbuf *sock,
       //So, the first data goes in, this is the length of the following data
       //This happens for all UDP packets, so the buffer knows how long to send
       //as the data packet
-      udplen.i=newlen;
+      udplen.i=(SOCKET_INT_TYPE)newlen;
       dynstringRawappend(sock->outdata,udplen.c,4);
 
       if (sock->udp2w)
@@ -1111,7 +1111,7 @@ static socket_udp_rdata *socket_rdata_locate_packetnum(socket_udp_rdata *list,
 //Allocate an rdata packet and put it into a list
 static socket_udp_rdata *rdata_allocate(socket_udp_rdata *list,
 					int packetnum,
-					const char *data,int len,int sent)
+					const char *data,size_t len,int sent)
 {
   socket_udp_rdata *newpacket;
 
@@ -1234,7 +1234,11 @@ const char **socket_get_interface_list()
       char line[1024+1],*ptr,*endptr;
       
       //Run the command
+#ifdef WIN32
+      fp=_popen("ipconfig","r");
+#else
       fp=popen("ipconfig","r");
+#endif
       
       if (fp)
 	{
@@ -1564,7 +1568,8 @@ void socket_write_reliable(socketbuf *sock,
 			   const char *data,size_t len)
 {
   socket_intchar udplen,udpdata;
-  int newlen,packetnum;
+  size_t newlen;
+  SOCKET_INT_TYPE packetnum;
 
   //Sanity check
   if (len==0)
@@ -1588,7 +1593,7 @@ void socket_write_reliable(socketbuf *sock,
 
   //Send the length first //This does NOT get htonl'd as it gets stripped
   //before actually sending it
-  udplen.i=newlen;
+  udplen.i=(int)newlen;
   dynstringRawappend(sock->outdata,udplen.c,4);
 
   //Then the protocol
@@ -1689,7 +1694,7 @@ socket_processlist *socket_unlink(socket_processlist *list,socketbuf *sock)
 
 //This is the basic function for creating a socketbuf object around a
 //file descriptor
-static socketbuf *socket_create(int fd)
+static socketbuf *socket_create(SOCKET_FD_TYPE fd)
 {
   socketbuf *returnval;
 
@@ -1866,8 +1871,13 @@ void socket_destroy(socketbuf *sock)
   //Free the pathname (applies to unix sockets only)
   if (sock->path)
     {
+#ifdef _MSC_VER
+      if (sock->flags & SOCKET_LISTENER)
+	_unlink(sock->path);
+#else
       if (sock->flags & SOCKET_LISTENER)
 	unlink(sock->path);
+#endif
       free(sock->path);
     }
 
@@ -1898,7 +1908,7 @@ socketbuf *socket_create_unix_wait(const char *path,int wait)
   int fd;
   socketbuf *returnval;
   struct sockaddr_un sa;
-  unsigned long int dummy;
+  unsigned long int dummy,errorval,errorlen;
   int selectnum;
   fd_set writer;
 
@@ -1984,7 +1994,7 @@ socketbuf *socket_create_unix_wait(const char *path,int wait)
     }
   
   //The connection is 'in progress'
-  if (grapple_errno()==EINPROGRESS)
+  if (GRAPPLE_SOCKET_ERRNO_IS_EINPROGRESS)
     {
       //Connect was possibly OK, but we havent finished, come back
       //and check later with select
@@ -2024,11 +2034,27 @@ socketbuf *socket_create_unix_wait(const char *path,int wait)
 		  //At least one socket (it has to be us) returned data
 		  if (FD_ISSET(returnval->fd,&writer))
 		    {
-		      //We have connected
-		      returnval->flags &=~ SOCKET_CONNECTING;
-		      returnval->flags |= SOCKET_CONNECTED;
-		      returnval->connect_time=time(NULL);
-		      return returnval;
+		      //Check for an error in the connection
+		      errorlen=sizeof(errorval);
+		      if (getsockopt(returnval->fd,SOL_SOCKET,SO_ERROR,&errorval,(socklen_t *)&errorlen)==0)
+			{
+			  if (errorval==0)
+			    {
+			      //We have connected
+			      returnval->flags &=~ SOCKET_CONNECTING;
+			      returnval->flags |= SOCKET_CONNECTED;
+			      returnval->connect_time=time(NULL);
+			      return returnval;
+			    }
+			}
+		      //if we get here, then teh getsockopt returned a value
+		      //we dont like, and we failed to connect unless the error
+		      //is einprogress
+		      if (errorval!=EINPROGRESS)
+			{
+			  socket_destroy(returnval);
+			  return 0;
+			}
 		    }
 		}
 	    }
@@ -2166,10 +2192,19 @@ int socket_interrupt(socketbuf *sock)
   return 0;
 }
 
+#if defined WIN32 && defined HAVE_WINSOCK2_H
+static long enumEvent(SOCKET s,WSAEVENT hEventObject)
+{
+  WSANETWORKEVENTS NetworkEvents;
+  WSAEnumNetworkEvents(s,hEventObject,&NetworkEvents);
+  return NetworkEvents.lNetworkEvents;
+}
+#endif
+
 //Create a TCPIP connection to a remote socket
 socketbuf *socket_create_inet_tcp_wait(const char *host,int port,int wait)
 {
-  int fd;
+  SOCKET_FD_TYPE fd;
   socketbuf *returnval;
   struct sockaddr_in sa;
   unsigned long int dummy;
@@ -2286,7 +2321,7 @@ socketbuf *socket_create_inet_tcp_wait(const char *host,int port,int wait)
     }
 
   //We have an in-progress connection
-  if (grapple_errno()==EINPROGRESS)
+  if (GRAPPLE_SOCKET_ERRNO_IS_EINPROGRESS)
     {
       //Connect was possibly OK, but we havent finished, come back
       //and check later with select
@@ -2381,7 +2416,7 @@ socketbuf *socket_create_inet_tcp_wait(const char *host,int port,int wait)
 //to. With UDP you dont know if it has reached its target or not.
 socketbuf *socket_create_inet_udp_wait(const char *host,int port,int wait)
 {
-  int fd;
+  SOCKET_FD_TYPE fd;
   unsigned long int dummy;
   socketbuf *returnval;
   struct in_addr inet_address;
@@ -2511,7 +2546,7 @@ int socket_dead(socketbuf *sock)
 //This function drops a set length of data from the socket This is handy
 //For it we have already peeked it, so we HAVE the data, we dont want to
 //reallocate. Or if we have a set of data we KNOW is useless
-void socket_indata_drop(socketbuf *sock,int len)
+void socket_indata_drop(socketbuf *sock,size_t len)
 {
   //memmove freaks out at a zero length memory move
   if (len==0)
@@ -2561,7 +2596,7 @@ static socket_udp_data *socket_udp2way_indata_action(socketbuf *sock,int pull)
 {
   socket_udp_data *returnval;
   socket_intchar len;
-  int datalen;
+  size_t datalen;
 
   //All data must be at least 4 bytes - this is the length of the data in the
   //packet
@@ -2618,7 +2653,7 @@ static socket_udp_data *socket_udp_indata_action(socketbuf *sock,int pull)
 
 
   //Check we have enough space
-  if (sa_len+8  > sock->indata->len)
+  if (sa_len+8  > (socklen_t)sock->indata->len)
     return NULL;
 
   //Find the length of the data now.
@@ -2626,7 +2661,7 @@ static socket_udp_data *socket_udp_indata_action(socketbuf *sock,int pull)
   datalen=len.i;
 
   //Check we have the whole data packet
-  if (sa_len+datalen+8 > sock->indata->len)
+  if (sa_len+datalen+8 > (socklen_t)sock->indata->len)
     //We dont, its corrupt
     return NULL;
 
@@ -2665,7 +2700,7 @@ socket_udp_data *socket_udp_indata_view(socketbuf *sock)
 }
 
 //This is a user function to pull data from any non-UDP socket
-char *socket_indata_pull(socketbuf *sock,int len)
+char *socket_indata_pull(socketbuf *sock,size_t len)
 {
   char *returnval;
 
@@ -2831,11 +2866,19 @@ static int socket_recursive_read_listener_inet_udp(socketbuf *sock,
 						   int failkill,int level)
 {
 #ifdef FIONREAD
+#ifdef WIN32
+  unsigned long int chars_left;
+#else
   unsigned int chars_left;
+#endif
 #else
   unsigned long int chars_left;
 #endif
+#ifdef _MSC_VER
+  int chars_read,total_read;
+#else
   ssize_t chars_read,total_read;
+#endif
   void *buf;
   char quickbuf[1024];
   struct sockaddr_in sa;
@@ -2896,7 +2939,7 @@ static int socket_recursive_read_listener_inet_udp(socketbuf *sock,
 
       //Actually perfrorm the read from the UDP socket
       chars_read=recvfrom(sock->fd,
-			  buf,
+			  (char *)buf,
 			  chars_left,
 			  0,
 			  (struct sockaddr *)&sa,
@@ -2904,8 +2947,8 @@ static int socket_recursive_read_listener_inet_udp(socketbuf *sock,
 
       if (chars_read==-1)
 	{
-	  if (grapple_errno()!=EAGAIN) /*An EAGAIN simply means that it wasnt quite ready
-			       so try again later.*/
+	  if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN) /*An EAGAIN simply means that it wasnt quite ready
+					       so try again later.*/
 	    {
 	      //There was an error on the read, dead socket
 	      sock->flags|=SOCKET_DEAD;
@@ -2986,7 +3029,7 @@ static int socket_read_listener_inet_tcp(socketbuf *sock)
   socketbuf *newsock;
   socklen_t socklen;
   struct sockaddr_in sa;
-  int fd;
+  SOCKET_FD_TYPE fd;
   unsigned long int dummy=0;
   struct linger lingerval;
 #ifndef FIONBIO
@@ -3117,11 +3160,19 @@ static int socket_read_listener(socketbuf *sock)
 static int socket_udp2way_read(socketbuf *sock,int failkill)
 {
 #ifdef FIONREAD
+#ifdef WIN32
+  unsigned long int chars_left;
+#else
   unsigned int chars_left;
+#endif
 #else
   unsigned long int chars_left;
 #endif
+#ifdef _MSC_VER
+  int chars_read,total_read;
+#else
   ssize_t chars_read,total_read;
+#endif
   void *buf=0;
   char quickbuf[1024];
   struct sockaddr_in sa;
@@ -3175,7 +3226,7 @@ static int socket_udp2way_read(socketbuf *sock,int failkill)
 
       //Actually perfrorm the read from the UDP socket
       chars_read=recvfrom(sock->fd,
-			  buf,
+			  (char *)buf,
 			  chars_left,
 			  0,
 			  (struct sockaddr *)&sa,
@@ -3183,8 +3234,8 @@ static int socket_udp2way_read(socketbuf *sock,int failkill)
 
       if (chars_read==-1)
 	{
-	  if (grapple_errno()!=EAGAIN) /*An EAGAIN simply means that it wasnt quite ready
-			       so try again later.*/
+	  if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN) /*An EAGAIN simply means that it wasnt quite ready
+					       so try again later.*/
 
 	    {
               //There was an error on the read, dead socket
@@ -3247,7 +3298,11 @@ static int socket_read_ssl(socketbuf *sock)
 #else
   unsigned long int chars_left;
 #endif
+#ifdef _MSC_VER
+  int chars_read,total_read;
+#else
   ssize_t chars_read,total_read;
+#endif
   void *buf;
   int finished;
   char quickbuf[1024];
@@ -3370,11 +3425,19 @@ static int socket_read_ssl(socketbuf *sock)
 static int socket_read(socketbuf *sock)
 {
 #ifdef FIONREAD
+#ifdef WIN32
+  unsigned long int chars_left;
+#else
   unsigned int chars_left;
+#endif
 #else
   unsigned long int chars_left;
 #endif
+#ifdef _MSC_VER
+  int chars_read,total_read;
+#else
   ssize_t chars_read,total_read;
+#endif
   void *buf;
   char quickbuf[1024];
 
@@ -3439,7 +3502,7 @@ static int socket_read(socketbuf *sock)
       if (chars_read==-1)
 	{
 	  //there was an error
-	  if (grapple_errno()!=EAGAIN) //EAGAIN isnt bad, it just means try later
+	  if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN) //EAGAIN isnt bad, it just means try later
 	    {
 	      //Anything else is bad, the socket is dead
 	      sock->flags|=SOCKET_DEAD;
@@ -3495,7 +3558,7 @@ static int socket_process_write_stream(socketbuf *sock)
   if (written==-1)
     {
       //The write had an error
-      if (grapple_errno()!=EAGAIN) /*EAGAIN simply means that the write buffer is full,
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN) /*EAGAIN simply means that the write buffer is full,
 			   try again later, no problem*/
 	{
 	  //Any other error is fatal
@@ -3562,13 +3625,23 @@ static int socket_process_write_ssl(socketbuf *sock)
 }
 #endif
 
-static ssize_t socket_sendto(socketbuf *sock,
-			     int s,const void *buf,size_t len,int flags,
-			     const struct sockaddr *to, socklen_t tolen)
+static 
+#ifdef _MSC_VER
+int
+#else
+ssize_t
+#endif
+socket_sendto(socketbuf *sock,
+	      SOCKET_FD_TYPE s,const void *buf,size_t len,int flags,
+	      const struct sockaddr *to, socklen_t tolen)
 {
   static char quickbuf[HOST_NAME_MAX+120+1+8+1024+8];
   char *newbuf;
+#ifdef _MSC_VER
+  int rv;
+#else
   ssize_t rv;
+#endif
   int offset;
   socket_intchar val;
   union 
@@ -3580,7 +3653,11 @@ static ssize_t socket_sendto(socketbuf *sock,
 
   if (sock->udp2w_relay_by_listener && sock->parent)
     {
+#ifdef _MSC_VER
+      return sendto(sock->parent->fd,(const char *)buf,(int)len,flags,to,tolen);      
+#else
       return sendto(sock->parent->fd,buf,len,flags,to,tolen);      
+#endif
     }
   if (sock->udp2w_relaying_via_connector)
     {
@@ -3590,7 +3667,11 @@ static ssize_t socket_sendto(socketbuf *sock,
 	  memcpy(val.c,buf,4);
 	  if (ntohl(val.i)==SOCKET_UDP2W_PROTOCOL_CONNECTION)
 	    {
-	      return sendto(s,buf,len,flags,to,tolen);
+#ifdef _MSC_VER
+	      return sendto(s,(const char *)buf,(int)len,flags,to,(int)tolen);
+#else
+	      return sendto(s,buf,len,flags,to,(int)tolen);
+#endif
 	    }
 	}
          
@@ -3609,7 +3690,13 @@ static ssize_t socket_sendto(socketbuf *sock,
 
       memcpy(newbuf+8,buf,len);
 
-      rv=sendto(s,newbuf,len+8,flags,
+      rv=sendto(s,newbuf,
+#ifdef _MSC_VER
+		(int)len+8,
+#else
+		len+8,
+#endif
+		flags,
 		(struct sockaddr *)&sock->connect_sa,
 		sizeof(struct sockaddr_in));
 
@@ -3654,7 +3741,13 @@ static ssize_t socket_sendto(socketbuf *sock,
 
       memcpy(newbuf+offset,buf,len);
       
-      rv=sendto(s,newbuf,len+offset,flags,
+      rv=sendto(s,newbuf,
+#ifdef _MSC_VER
+		(int)len+offset,
+#else
+		len+offset,
+#endif
+		flags,
 		(struct sockaddr *)&sock->stun_sa,
 		sizeof(struct sockaddr_in));
 
@@ -3665,7 +3758,13 @@ static ssize_t socket_sendto(socketbuf *sock,
     }
   else
     {
-      return sendto(s,buf,len,flags,to,tolen);
+      return sendto(s,(const char *)buf,
+#ifdef _MSC_VER
+		    (int)len,
+#else
+		    len,
+#endif
+		    flags,to,tolen);
     }
 }
 
@@ -3679,10 +3778,10 @@ static ssize_t socket_sendto(socketbuf *sock,
 //the split placed in it
 static int socket_process_reprocess_large_dgram(socketbuf *sock,
 						socket_udp_rdata *packet,
-						int length)
+						size_t length)
 {
   int loopa;
-  int *newranges;  
+  size_t *newranges;  
 
   if (length < sock->udp2w_maxsend)
     {
@@ -3697,7 +3796,7 @@ static int socket_process_reprocess_large_dgram(socketbuf *sock,
       packet->resend_count=0;
       //Split each packet in half
       
-      newranges=(int *)malloc(packet->ranges_size*2*sizeof(int));
+      newranges=(size_t *)malloc(packet->ranges_size*2*sizeof(size_t));
 
       if (packet->range_received)
 	free(packet->range_received);
@@ -3722,7 +3821,7 @@ static int socket_process_reprocess_large_dgram(socketbuf *sock,
     {
       //This is a single packet, we can just split it now and send it
       
-      packet->range_starts=(int *)malloc(2*sizeof(int));
+      packet->range_starts=(size_t *)malloc(2*sizeof(size_t));
       packet->range_starts[0]=0;
       packet->range_starts[1]=packet->length/2;
 
@@ -3742,17 +3841,17 @@ static int socket_process_reprocess_large_dgram(socketbuf *sock,
 static int socket_process_write_large_dgram(socketbuf *sock)
 {
   socket_intchar val;
-  int length,sendlength;
+  size_t length,sendlength;
   socket_udp_rdata *packet;
   int packet_number;
   int subpacket_number=0;
   char *ptr;
   char *currentbuf=NULL;
-  int currentbuflen=0;
-  int smallranges[100];
-  int *largeranges=NULL;
+  size_t currentbuflen=0;
+  size_t smallranges[100];
+  size_t *largeranges=NULL;
   int maxranges=100;
-  int *ranges;
+  size_t *ranges;
   int success,written,written_total=0;
  
   memcpy(val.c,sock->outdata->buf,4);
@@ -3830,7 +3929,7 @@ static int socket_process_write_large_dgram(socketbuf *sock)
       
       if (written==-1) //There was an error
 	{
-	  if (grapple_errno()==EMSGSIZE)
+	  if (GRAPPLE_SOCKET_ERRNO_IS_EMSGSIZE)
 	    {
 	      //Data too big, record the new maximum size
 	      sock->udp2w_maxsend=sendlength+16-1;
@@ -3839,7 +3938,7 @@ static int socket_process_write_large_dgram(socketbuf *sock)
 		  sock->udp2w_minsend=sock->udp2w_maxsend;
 		}
 	    }
-	  else if (grapple_errno()!=EAGAIN) //If the error was EAGAIN just try again later when it hits a resend point
+	  else if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN) //If the error was EAGAIN just try again later when it hits a resend point
 	    {
 	      //The error was something fatal
 	      sock->flags |= SOCKET_DEAD;
@@ -3869,18 +3968,18 @@ static int socket_process_write_large_dgram(socketbuf *sock)
 	      maxranges*=2;
 	      if (ranges==smallranges)
 		{
-		  largeranges=(int *)malloc(maxranges*sizeof(int));
-		  memcpy(largeranges,smallranges,100*sizeof(int));
+		  largeranges=(size_t *)malloc(maxranges*sizeof(size_t));
+		  memcpy(largeranges,smallranges,100*sizeof(size_t));
 		  ranges=largeranges;
 		}
 	      else
 		{
-		  largeranges=(int *)realloc(largeranges,maxranges*sizeof(int));
+		  largeranges=(size_t *)realloc(largeranges,maxranges*sizeof(size_t));
 		}	
 	    }
 	  
 	  //Record the start of this range
-	  ranges[subpacket_number++]=ptr-(sock->outdata->buf+12);
+	  ranges[subpacket_number++]=(size_t)(ptr-(sock->outdata->buf+12));
 
 	  //Move the pointers
 	  ptr+=(sendlength);
@@ -3893,8 +3992,8 @@ static int socket_process_write_large_dgram(socketbuf *sock)
     free(currentbuf);
 
   //Now we've sent all the data, save this into the rdata packet
-  packet->range_starts=(int *)malloc(subpacket_number*sizeof(int *));
-  memcpy(packet->range_starts,ranges,subpacket_number*sizeof(int *));
+  packet->range_starts=(size_t *)malloc(subpacket_number*sizeof(size_t *));
+  memcpy(packet->range_starts,ranges,subpacket_number*sizeof(size_t *));
 
   packet->range_received=(char **)calloc(1,subpacket_number*sizeof(char *));
   
@@ -3928,11 +4027,11 @@ static int socket_process_write_dgram(socketbuf *sock)
   memcpy(towrite.c,sock->outdata->buf,4);
 
   //check we have enough data in the buffer to send it all
-  if (sock->outdata->len<4+towrite.i)
+  if (sock->outdata->len<4+(size_t)towrite.i)
     return 0;
 
   //If we know we cannot send a packet this large, split it
-  if (towrite.i > sock->udp2w_maxsend)
+  if ((size_t)towrite.i > sock->udp2w_maxsend)
     {
       //Data too big, split the packet and send in parts
       written=socket_process_write_large_dgram(sock);
@@ -3959,7 +4058,7 @@ static int socket_process_write_dgram(socketbuf *sock)
 
   if (written==-1) //There was an error
     {
-      if (grapple_errno()==EMSGSIZE)
+      if (GRAPPLE_SOCKET_ERRNO_IS_EMSGSIZE)
 	{
 	  //Data too big, split the packet and send in parts
 	  written=socket_process_write_large_dgram(sock);
@@ -3973,7 +4072,7 @@ static int socket_process_write_dgram(socketbuf *sock)
 	    }
   
 	}
-      else if (grapple_errno()!=EAGAIN) //If the error was EAGAIN just try later
+      else if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN) //If the error was EAGAIN just try later
 	{
 	  //The error was something fatal
 	  sock->flags |= SOCKET_DEAD;
@@ -4033,7 +4132,6 @@ static int socket_process_write(socketbuf *sock)
 //every 10 seconds. If the sockets go 60 seconds with no ping, then the 
 //socket is considered dead.
 
-//#define STUN_DEBUG
 static int process_pings(socketbuf *sock)
 {
   socket_intchar val;
@@ -4085,7 +4183,7 @@ static int process_pings(socketbuf *sock)
 	default:
 	  sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
 #ifdef STUN_DEBUG
-	  printf("STUN: Client type set to unknown\n");
+	  printf("STUN: Client type set to unknown (2)\n");
 #endif
 	  break;
 	}
@@ -4116,7 +4214,12 @@ static int process_pings(socketbuf *sock)
 	    {
 	      //With STUN, over 6 seconds we start requesting a connection via
 	      //the stun server
-	      if (this_second>sock->udp2w_lastmsg+12)
+              //The udp2w_directport test is a HACK. Some IP MASQ cause local
+              //networks to fuck up, and while one side can send to the other,
+	      //the other cannot reply due to IP MASQ breaking the stateful
+	      //firewall. This detects this problem and bails out to
+	      //using TURN. Its a PITA
+	      if (this_second>sock->udp2w_lastmsg+12 || sock->udp2w_directport>2)
 		{
 		  //Over 12 seconds, we try TURN
 		  if (this_second>sock->udp2w_lastmsg+18 || sock->turn_refused)
@@ -4172,7 +4275,7 @@ static int process_pings(socketbuf *sock)
 	  
 	  if (written==-1)
 	    {
-	      if (grapple_errno()!=EAGAIN)
+	      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 		{
 		  //Note the socket as dead if we cant send it
 		  sock->flags |= SOCKET_DEAD;
@@ -4201,7 +4304,8 @@ static int process_resends(socketbuf *sock)
   struct timeval time_now,target_time;
   long long us;
   socket_udp_rdata *scan;
-  int newlen,send_this_loop;
+  size_t newlen;
+  int send_this_loop;
   socket_intchar udplen,udpdata;
   int loopa;
 
@@ -4222,8 +4326,8 @@ static int process_resends(socketbuf *sock)
   //Find how old a packet needs to be
   us=sock->udp2w_averound/5; //Twice as long as average for a resend,/10*2 = /5
 
-  target_time.tv_sec=time_now.tv_sec-(us/1000000);
-  target_time.tv_usec=time_now.tv_usec-(us%1000000);
+  target_time.tv_sec=time_now.tv_sec-(long)(us/1000000);
+  target_time.tv_usec=time_now.tv_usec-(long)(us%1000000);
 
   if (target_time.tv_usec<0)
     {
@@ -4272,7 +4376,7 @@ static int process_resends(socketbuf *sock)
 			      continue;
 			    }
 
-			  udpdata.i=newlen+16;
+			  udpdata.i=(SOCKET_INT_TYPE)newlen+16;
 
 			  dynstringRawappend(sock->outdata,udpdata.c,4);
 			  
@@ -4294,7 +4398,7 @@ static int process_resends(socketbuf *sock)
 			      continue;
 			    }
 
-			  udpdata.i=newlen+16;
+			  udpdata.i=(SOCKET_INT_TYPE)newlen+16;
 			  
 			  dynstringRawappend(sock->outdata,udpdata.c,4);
 			  
@@ -4342,7 +4446,7 @@ static int process_resends(socketbuf *sock)
 		  newlen+=8;
 		  
 		  //Set this length into the buffer
-		  udplen.i=newlen;
+		  udplen.i=(SOCKET_INT_TYPE)newlen;
 		  dynstringRawappend(sock->outdata,udplen.c,4);
 		  
 		  //Send the protocol
@@ -4390,8 +4494,8 @@ int socket_process_sockets(socket_processlist *list,long int timeout)
   WSAEVENT events[FD_SETSIZE];
 #else
   fd_set readers,writers;
-#endif
   struct timeval select_timeout;
+#endif
   int count,selectnum;
   time_t this_second;
 
@@ -4700,7 +4804,7 @@ socketbuf *socket_create_inet_tcp_listener_on_ip(const char *localip,int port)
   unsigned long int dummy=0;
   char hostname[HOST_NAME_MAX+1];
   struct hostent *hp;
-  int fd;
+  SOCKET_FD_TYPE fd;
   socketbuf *sock;
   struct in_addr inet_address;
   struct linger lingerval;
@@ -4710,32 +4814,36 @@ socketbuf *socket_create_inet_tcp_listener_on_ip(const char *localip,int port)
 #endif
 #endif
 
-  //set the hostname. If this is passed in, use that, otherwise use gethostname
+  //set the hostname. If this is passed in, use that, otherwise use any
   memset(&sa,0,sizeof(struct sockaddr_in));
   if (localip)
+  {
     strcpy(hostname,localip);
+
+    //Simply gethostbyname which handles all kinds of addresses
+    hp=gethostbyname(hostname);
+
+    if (!hp)
+      //We couldnt resolve the host fail
+      return 0;
+
+    //We specifically requested an IP address, so we use it, thus restricting
+    //to just one interface. If we didnt specify the address then we skip
+    //this section which in effect means that the socket will bind to all
+    //IP addresses on the system
+    memcpy((char *)&inet_address,hp->h_addr_list[0],sizeof(struct in_addr));
+    if (inet_address.s_addr!=-1)
+      sa.sin_addr.s_addr=inet_address.s_addr;
+    sa.sin_family=hp->h_addrtype;
+    sa.sin_port = htons(port);
+  }
   else
-    gethostname(hostname,HOST_NAME_MAX);
+  {
+    sa.sin_addr.s_addr=INADDR_ANY;
+    sa.sin_family=AF_INET;
+    sa.sin_port = htons(port);
+  }
 
-  //Simply gethostbyname which handles all kinds of addresses
-  hp=gethostbyname(hostname);
-
-  if (!hp)
-    //We couldnt resolve the host fail
-    return 0;
-
-  if (localip)
-    {
-      //We specifically requested an IP address, so we use it, thus restricting
-      //to just one interface. If we didnt specify the address then we skip
-      //this section which in effect means that the socket will bind to all
-      //IP addresses on the system
-      memcpy((char *)&inet_address,hp->h_addr_list[0],sizeof(struct in_addr));
-      if (inet_address.s_addr!=-1)
-	sa.sin_addr.s_addr=inet_address.s_addr;
-    }
-  sa.sin_family=hp->h_addrtype;
-  sa.sin_port = htons(port);
 
   //Create the socket
   fd = socket(AF_INET,SOCK_STREAM,0);
@@ -4830,7 +4938,7 @@ socketbuf *socket_create_inet_udp_listener_on_ip(const char *localip,int port)
   unsigned long int dummy=0;
   char hostname[HOST_NAME_MAX+1];
   struct hostent *hp;
-  int fd;
+  SOCKET_FD_TYPE fd;
   socketbuf *sock;
   struct in_addr inet_address;
   struct linger lingerval;
@@ -4840,33 +4948,35 @@ socketbuf *socket_create_inet_udp_listener_on_ip(const char *localip,int port)
 #endif
 #endif
 
+  //set the hostname. If this is passed in, use that, otherwise use any
   memset(&sa,0,sizeof(struct sockaddr_in));
-
-  //set the hostname. If this is passed in, use that, otherwise use gethostname
   if (localip)
+  {
     strcpy(hostname,localip);
+
+    //Simply gethostbyname which handles all kinds of addresses
+    hp=gethostbyname(hostname);
+
+    if (!hp)
+      //We couldnt resolve the host fail
+      return 0;
+
+    //We specifically requested an IP address, so we use it, thus restricting
+    //to just one interface. If we didnt specify the address then we skip
+    //this section which in effect means that the socket will bind to all
+    //IP addresses on the system
+    memcpy((char *)&inet_address,hp->h_addr_list[0],sizeof(struct in_addr));
+    if (inet_address.s_addr!=-1)
+      sa.sin_addr.s_addr=inet_address.s_addr;
+    sa.sin_family=hp->h_addrtype;
+    sa.sin_port = htons(port);
+  }
   else
-    gethostname(hostname,HOST_NAME_MAX);
-
-  //Simply gethostbyname which handles all kinds of addresses
-  hp=gethostbyname(hostname);
-
-  if (!hp)
-    //We couldnt resolve the host fail
-    return 0;
-
-  if (localip)
-    {
-      //We specifically requested an IP address, so we use it, thus restricting
-      //to just one interface. If we didnt specify the address then we skip
-      //this section which in effect means that the socket will bind to all
-      //IP addresses on the system
-      memcpy((char *)&inet_address,hp->h_addr_list[0],sizeof(struct in_addr));
-      if (inet_address.s_addr!=-1)
-        sa.sin_addr=inet_address;
-    }
-  sa.sin_family=hp->h_addrtype;
-  sa.sin_port = htons(port);
+  {
+    sa.sin_addr.s_addr=INADDR_ANY;
+    sa.sin_family=AF_INET;
+    sa.sin_port = htons(port);
+  }
 
   //Create the socket
   fd = socket(PF_INET,SOCK_DGRAM,IPPROTO_IP);
@@ -5279,6 +5389,7 @@ void socket_relocate_data(socketbuf *from,socketbuf *to)
  ** at both ends                                                           **
  ****************************************************************************/
 
+
 //Send the connection message to a remote listener. This initialises the
 //session
 int socket_udp2way_connectmessage(socketbuf *sock)
@@ -5297,6 +5408,9 @@ int socket_udp2way_connectmessage(socketbuf *sock)
   //       : The unique identifier string
   //
 
+#ifdef UDP_PROTOCOL_DEBUG
+  printf("Sending SOCKET_UDP2W_PROTOCOL_CONNECTION\n");
+#endif
   intval.i=htonl(SOCKET_UDP2W_PROTOCOL_CONNECTION);
   memcpy(buf,intval.c,4);
 
@@ -5321,7 +5435,7 @@ int socket_udp2way_connectmessage(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, its dead
 	  sock->flags |= SOCKET_DEAD;
@@ -5352,6 +5466,9 @@ static int socket_udp2way_connectmessage_reply(socketbuf *sock)
   //Now we construct new data to send
   //4 bytes : protocol
 
+#ifdef UDP_PROTOCOL_DEBUG
+  printf("Sending SOCKET_UDP2W_PROTOCOL_CONNECTION_REPLY\n");
+#endif
   val.i=htonl(SOCKET_UDP2W_PROTOCOL_CONNECTION_REPLY);
   memcpy(buf,val.c,4);
 
@@ -5364,7 +5481,7 @@ static int socket_udp2way_connectmessage_reply(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //This is a fatal error, kill the socket
 	  sock->flags |= SOCKET_DEAD;
@@ -5387,6 +5504,9 @@ static int socket_udp2way_connectmessage_listener_reply(socketbuf *sock,
   //Now we construct new data to send
   //4 bytes : protocol
 
+#ifdef UDP_PROTOCOL_DEBUG
+  printf("Sending SOCKET_UDP2W_PROTOCOL_CONNECTION_FROMLISTENER_REPLY\n");
+#endif
   val.i=htonl(SOCKET_UDP2W_PROTOCOL_CONNECTION_FROMLISTENER_REPLY);
   memcpy(buf,val.c,4);
 
@@ -5402,7 +5522,7 @@ static int socket_udp2way_connectmessage_listener_reply(socketbuf *sock,
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //This is a fatal error, kill the socket
 	  sock->flags |= SOCKET_DEAD;
@@ -5428,8 +5548,7 @@ socketbuf *socket_create_inet_udp2way_wait_onport_stun(const char *host,
   char hostname[HOST_NAME_MAX+1];
   struct sockaddr_in sa;
   struct linger lingerval;
-
-  int fd;
+  SOCKET_FD_TYPE fd;
   unsigned long int dummy=0;
   struct in_addr inet_address;
   struct hostent *hp;
@@ -5602,7 +5721,7 @@ socketbuf *socket_create_inet_udp2way_wait_onport_stun(const char *host,
   //the same port. Pretty fullproof I reckon
   sprintf(sock->udp2w_unique,"%s-%d-%ld.%ld",hostname,inport,
 	  time_now.tv_sec,time_now.tv_usec);
-  sock->udp2w_uniquelen=strlen(sock->udp2w_unique);
+  sock->udp2w_uniquelen=(int)strlen(sock->udp2w_unique);
 
   //Send the connect protocol message to the remote server
   socket_udp2way_connectmessage(sock);
@@ -5761,7 +5880,7 @@ static socketbuf *socket_udp2way_listener_create_connection(socketbuf *sock,
 							    char *unique,
 							    int using_turn)
 {
-  int fd;
+  SOCKET_FD_TYPE fd;
   unsigned long int dummy;
   socketbuf *returnval,*oldreturnval;
   char host[20];
@@ -5804,6 +5923,7 @@ static socketbuf *socket_udp2way_listener_create_connection(socketbuf *sock,
 	  //one must be dead
 	  returnval->flags |= SOCKET_DEAD;
 	}
+      returnval->udp2w_lastmsg=time(NULL);
       returnval=socket_get_child_socketbuf(sock,host,port);
     }
 
@@ -5834,7 +5954,7 @@ static socketbuf *socket_udp2way_listener_create_connection(socketbuf *sock,
       returnval->udp2w_averound=2500000;
       returnval->udp2w_lastmsg=time(NULL);
       strcpy(returnval->udp2w_unique,unique);
-      returnval->udp2w_uniquelen=strlen(returnval->udp2w_unique);
+      returnval->udp2w_uniquelen=(int)strlen(returnval->udp2w_unique);
 
       returnval->mode=sock->mode;
 
@@ -5995,6 +6115,9 @@ int socket_udp2way_listener_data_process(socketbuf *sock,
 
   if (type==SOCKET_UDP2W_PROTOCOL_CONNECTION)
     {
+#ifdef UDP_PROTOCOL_DEBUG
+      printf("Listener received SOCKET_UDP2W_PROTOCOL_CONNECTION\n");
+#endif
       //New connection messages need 8 bytes minimum
       //4 Bytes : Protocol
       //4 Bytes : Length of the unique identifier
@@ -6022,15 +6145,21 @@ int socket_udp2way_listener_data_process(socketbuf *sock,
       if (datalen<9)
 	return 0;
       
-      
       memcpy(len.c,buf+4,4);
       target=socket_get_child_socketbuf_by_sendport(sock,ntohl(len.i));
+      
+      if (target)
+	{
+	  target->udp2w_relay_by_listener=1;
 
-      target->udp2w_relay_by_listener=1;
+          target->udp2w_lastmsg=time(NULL);
 
-      return socket_udp2way_reader_data_process(target,
-						sa,sa_len,
-						buf+8,datalen-8);
+	  return socket_udp2way_reader_data_process(target,
+						    sa,sa_len,
+						    buf+8,datalen-8);
+	}
+      
+      return 0;
     }
 
   if (type > SOCKET_UDP2W_STUN_PROTOCOL_MIN && 
@@ -6092,7 +6221,7 @@ static int socket_acknowledge_reader_udp_rpacket(socketbuf *sock,int packetnumbe
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
           //If the send fails, the socket dies
 	  sock->flags |= SOCKET_DEAD;
@@ -6120,7 +6249,7 @@ static void process_rpacket_backlog(socketbuf *sock)
 #endif
 
 	  //We are sequential, so this hasnt been sent yet
-	  len.i=oldpacket->length;
+	  len.i=(SOCKET_INT_TYPE)oldpacket->length;
 	  dynstringRawappend(sock->indata,len.c,4);
 	  dynstringRawappend(sock->indata,oldpacket->data,
 			     oldpacket->length);
@@ -6172,6 +6301,10 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
     {
     case SOCKET_UDP2W_PROTOCOL_CONNECTION_REPLY:
       {
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Socket received SOCKET_UDP2W_PROTOCOL_CONNECTION_REPLY\n");
+#endif
+      
 	//The server has acknowledged our connection, we now need to connect back
 	//to the server. If we can, and if we get a response, THEN we are
 	//connected
@@ -6183,7 +6316,8 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	//as it doesnt know about NAT. Full cone NAT will mean that this is
 	//correct and the server is wrong
 	sock->udp_sa.sin_port=sa->sin_port;
-	sock->udp2w_directport=1;
+	sock->udp_sa.sin_addr.s_addr=sa->sin_addr.s_addr;
+	sock->udp2w_directport++;
 	sock->udp2w_connectcounter+=2;
 	
 	//Directly write to the socket, a response including out unique ID
@@ -6194,6 +6328,9 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	//4 bytes: The length of the unique identifier string  
 	//       : The unique identifier string                
 	
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Sending SOCKET_UDP2W_PROTOCOL_CONNECTION_ACKNOWLEDGE\n");
+#endif
 	val.i=htonl(SOCKET_UDP2W_PROTOCOL_CONNECTION_ACKNOWLEDGE);
 	memcpy(outbuf,val.c,4);
 	
@@ -6214,7 +6351,7 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	//the connection over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -6228,6 +6365,9 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 
     case SOCKET_UDP2W_PROTOCOL_CONNECTION_FROMLISTENER_REPLY:
       {
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Socket received SOCKET_UDP2W_PROTOCOL_CONNECTION_FROMLISTENER_REPLY\n");
+#endif
 	//The server has acknowledged our connection, we now need to connect back
 	//to the server. If we can, and if we get a response, THEN we are
 	//connected
@@ -6236,7 +6376,7 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 
 	//This connection is direct from the listener at the other end. It
 	//contains the portnumber to connect to. Decode this.
-	if (sock->udp2w_directport==1)
+	if (sock->udp2w_directport>0)
 	  {
 	    //We have already had a connection directly from the socket itself,
 	    //so we can ignore this.
@@ -6270,6 +6410,9 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	//4 bytes: The length of the unique identifier string  
 	//       : The unique identifier string                
 	
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Sending SOCKET_UDP2W_PROTOCOL_CONNECTION_ACKNOWLEDGE\n");
+#endif
 	val.i=htonl(SOCKET_UDP2W_PROTOCOL_CONNECTION_ACKNOWLEDGE);
 	memcpy(outbuf,val.c,4);
 	
@@ -6290,7 +6433,7 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	//the connection over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -6304,6 +6447,9 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 
     case SOCKET_UDP2W_PROTOCOL_CONNECTION_ACKNOWLEDGE:
       {
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Socket received SOCKET_UDP2W_PROTOCOL_CONNECTION_ACKNOWLEDGE\n");
+#endif
 	//This is only ever received by the server end. It is part of the
 	//connection negotiation. When the server received this, it knows it
 	//can communicate with the client. This may also change the port as
@@ -6345,6 +6491,9 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	
 	
 	//Now send the last response back and the handshake is complete
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Sending SOCKET_UDP2W_PROTOCOL_OK_CONNECTION_ACKNOWLEDGE\n");
+#endif
 	val.i=htonl(SOCKET_UDP2W_PROTOCOL_OK_CONNECTION_ACKNOWLEDGE);
 	memcpy(outbuf,val.c,4);
 	
@@ -6359,7 +6508,7 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 	//the connection over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -6373,6 +6522,10 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
 
     case SOCKET_UDP2W_PROTOCOL_OK_CONNECTION_ACKNOWLEDGE:
       {
+#ifdef UDP_PROTOCOL_DEBUG
+	printf("Socket received SOCKET_UDP2W_PROTOCOL_OK_CONNECTION_ACKNOWLEDGE\n");
+	printf("CONNECTED\n");
+#endif
 	//The server and client can talk directly, we are connected
 	sock->flags&=~SOCKET_CONNECTING;
 	sock->flags|=SOCKET_CONNECTED;
@@ -6869,11 +7022,10 @@ int socket_udp2way_reader_data_process(socketbuf *sock,
  ** STUN server for this to work                                           **
  ****************************************************************************/
 
-//#define STUN_DEBUG
 int socket_udp2way_stun_start(socketbuf *sock)
 {
   int written;
-  int datalen;
+  size_t datalen;
   socket_intchar intval;
   char buf[HOST_NAME_MAX+5+120+1+8];
 
@@ -6889,7 +7041,7 @@ int socket_udp2way_stun_start(socketbuf *sock)
   memcpy(buf,intval.c,4);
 
   datalen=strlen(sock->stun_unique);
-  intval.i=htonl(datalen);
+  intval.i=htonl((long)datalen);
   memcpy(buf+4,intval.c,4);
 
   memcpy(buf+8,sock->stun_unique,datalen);
@@ -6905,11 +7057,11 @@ int socket_udp2way_stun_start(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, no STUN for us
 #ifdef STUN_DEBUG
-	  printf("STUN: Client type set to unknown\n");
+	  printf("STUN: Client type set to unknown (1) on error %d\n",grapple_errno());
 #endif
 	  sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
           return -1;
@@ -6936,7 +7088,7 @@ int socket_udp2way_stun_start(socketbuf *sock)
 int socket_udp2way_stun_start_stage1(socketbuf *sock)
 {
   int written;
-  int datalen;
+  size_t datalen;
   socket_intchar intval;
   char buf[HOST_NAME_MAX+5+120+1+8];
 
@@ -6960,7 +7112,7 @@ int socket_udp2way_stun_start_stage1(socketbuf *sock)
 	}
 
       datalen=strlen(sock->stun_unique);
-      intval.i=htonl(datalen);
+      intval.i=htonl((long)datalen);
       memcpy(buf+4,intval.c,4);
 
       memcpy(buf+8,sock->stun_unique,datalen);
@@ -6990,7 +7142,7 @@ int socket_udp2way_stun_start_stage1(socketbuf *sock)
 	}
 
       datalen=strlen(sock->stun_unique);
-      intval.i=htonl(datalen);
+      intval.i=htonl((long)datalen);
       memcpy(buf+4,intval.c,4);
 
       memcpy(buf+8,sock->stun_unique,datalen);
@@ -7009,11 +7161,11 @@ int socket_udp2way_stun_start_stage1(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, no STUN for us
 #ifdef STUN_DEBUG
-	  printf("STUN: Client type set to unknown\n");
+	  printf("STUN: Client type set to unknown (3)\n");
 #endif
 	  sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
           return -1;
@@ -7034,7 +7186,7 @@ int socket_udp2way_stun_start_stage1(socketbuf *sock)
 static int socket_udp2way_stun_secondserver_test(socketbuf *sock)
 {
   int written;
-  int datalen;
+  size_t datalen;
   socket_intchar intval;
   char buf[HOST_NAME_MAX+5+120+1+8];
 
@@ -7050,7 +7202,7 @@ static int socket_udp2way_stun_secondserver_test(socketbuf *sock)
   memcpy(buf,intval.c,4);
 
   datalen=strlen(sock->stun_unique);
-  intval.i=htonl(datalen);
+  intval.i=htonl((long)datalen);
   memcpy(buf+4,intval.c,4);
 
   memcpy(buf+8,sock->stun_unique,datalen);
@@ -7068,11 +7220,11 @@ static int socket_udp2way_stun_secondserver_test(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, no STUN for us
 #ifdef STUN_DEBUG
-	  printf("STUN: Client type set to unknown\n");
+	  printf("STUN: Client type set to unknown (4)\n");
 #endif
 	  sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
           return -1;
@@ -7099,7 +7251,7 @@ static int socket_udp2way_stun_secondserver_test(socketbuf *sock)
 static int socket_udp2way_stun_firewall_test(socketbuf *sock)
 {
   int written;
-  int datalen;
+  size_t datalen;
   socket_intchar intval;
   char buf[HOST_NAME_MAX+5+120+1+8];
 
@@ -7115,7 +7267,7 @@ static int socket_udp2way_stun_firewall_test(socketbuf *sock)
   memcpy(buf,intval.c,4);
 
   datalen=strlen(sock->stun_unique);
-  intval.i=htonl(datalen);
+  intval.i=htonl((long)datalen);
   memcpy(buf+4,intval.c,4);
 
   memcpy(buf+8,sock->stun_unique,datalen);
@@ -7131,11 +7283,11 @@ static int socket_udp2way_stun_firewall_test(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, no STUN for us
 #ifdef STUN_DEBUG
-	  printf("STUN: Client type set to unknown\n");
+	  printf("STUN: Client type set to unknown (5)\n");
 #endif
 	  sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
           return -1;
@@ -7179,6 +7331,9 @@ int socket_inet_udp2way_listener_stun(socketbuf *sock,
   struct hostent *hp;
   struct timeval time_now;
 
+#ifdef STUN_DEBUG
+  printf("Stun startup\n");
+#endif
   //Generate a sockaddr from this data
   //Lookup the hostname we are sending to
   hp=gethostbyname(host);
@@ -7189,6 +7344,10 @@ int socket_inet_udp2way_listener_stun(socketbuf *sock,
 
   if (inet_address.s_addr==-1)
     {
+#ifdef STUN_DEBUG
+      printf("Stun server address resolution failed\n");
+#endif
+
       //We couldnt resolve the address, no STUN for us
       return -1;
     }
@@ -7209,7 +7368,6 @@ int socket_inet_udp2way_listener_stun(socketbuf *sock,
   sock->stun_port=port;
 
   //We now know where the STUN server is and our next step is to send to it
-  sock->stun_nat_type=SOCKET_NAT_TYPE_IN_PROCESS;
 
   gettimeofday(&time_now,NULL);
 
@@ -7217,8 +7375,10 @@ int socket_inet_udp2way_listener_stun(socketbuf *sock,
   sprintf(sock->stun_unique,"STUN-%s-%d-%ld.%ld",sock->host,sock->port,
 	  time_now.tv_sec,time_now.tv_usec);
 
-  sock->stun_starttime=time(NULL);
+  sock->stun_starttime=time_now.tv_sec;
   
+  sock->stun_nat_type=SOCKET_NAT_TYPE_IN_PROCESS;
+
   //Now we send the STUN request
   return socket_udp2way_stun_start(sock);
 
@@ -7457,7 +7617,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//Find their IP address
 	inet_ntop(AF_INET,(void *)(&sa->sin_addr),hostname,HOST_NAME_MAX);
 	hostname[HOST_NAME_MAX]=0;
-	hostnamelen=strlen(hostname);
+	hostnamelen=(int)strlen(hostname);
 	
 	len.i=htonl(hostnamelen);
 	memcpy(outbuf+offset,len.c,4);
@@ -7486,7 +7646,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//the STUN over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -7590,7 +7750,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	if (!(sock->flags & SOCKET_LISTENER))
 	  {
 #ifdef STUN_DEBUG
-	    printf("STUN: Client type set to direct internet\n");
+	    printf("STUN: Client type outward socket address discovered. Done.\n");
 #endif
 	    sock->stun_nat_type=SOCKET_NAT_TYPE_NONE;
 	    
@@ -7672,6 +7832,9 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 		ifcount=0;
 		while (interfaces[ifcount])
 		  {
+#ifdef STUN_DEBUG
+		    printf("Testing locally discovered address %s\n",interfaces[ifcount]);
+#endif
 		    if (!strcmp(interfaces[ifcount],sock->published_address))
 		      {
 			//Its a local interface
@@ -7754,7 +7917,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//Find their IP address
 	inet_ntop(AF_INET,(void *)(&sa->sin_addr),hostname,HOST_NAME_MAX);
 	hostname[HOST_NAME_MAX]=0;
-	hostnamelen=strlen(hostname);
+	hostnamelen=(int)strlen(hostname);
 	
 	len.i=htonl(hostnamelen);
 	memcpy(outbuf+4,len.c,4);
@@ -7822,7 +7985,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//the STUN over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -7859,7 +8022,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	  return 0;
 	
 	memcpy(len.c,buf+4,4);
-	hostnamelen=ntohl(len.i);
+	hostnamelen=(int)ntohl(len.i);
 	
 	if (datalen < hostnamelen+8)
 	  return 0;
@@ -7909,7 +8072,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//the STUN over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -8097,7 +8260,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	offset=uniquelen+8;
 	
 	//Find their IP address
-	hostnamelen=strlen(sock->stun2_host);
+	hostnamelen=(int)strlen(sock->stun2_host);
 	
 	len.i=htonl(hostnamelen);
 	memcpy(outbuf+offset,len.c,4);
@@ -8121,7 +8284,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//the STUN over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -8231,7 +8394,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	      {
 		//We couldnt resolve the address, no STUN for us
 #ifdef STUN_DEBUG
-		printf("STUN: Client type set to unknown\n");
+		printf("STUN: Client type set to unknown (6)\n");
 #endif
 		sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
 		return -1;
@@ -8370,7 +8533,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	val.i=htonl(SOCKET_UDP2W_STUN_REQUEST_ADDRESS_FROM_ALT_PORT);
 	memcpy(outbuf,val.c,4);
 	
-	uniquelen=strlen(sock->stun_unique);
+	uniquelen=(int)strlen(sock->stun_unique);
 	len.i=htonl(uniquelen);
 	memcpy(outbuf+4,len.c,4);
 	
@@ -8387,11 +8550,11 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, no STUN for us
 #ifdef STUN_DEBUG
-		printf("STUN: Client type set to unknown, send error\n");
+		printf("STUN: Client type set to unknown (7), send error\n");
 #endif
 		sock->stun_nat_type=SOCKET_NAT_TYPE_UNKNOWN;
 		return -1;
@@ -8480,7 +8643,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	//the STUN over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -8665,7 +8828,7 @@ int socket_udp2way_reader_stun_process(socketbuf *sock,
 	inet_ntop(AF_INET,(void *)(&sa->sin_addr),sourcehostname,HOST_NAME_MAX);
 	sourcehostname[HOST_NAME_MAX]=0;
 	
-	hostnamelen=strlen(sourcehostname);
+	hostnamelen=(int)strlen(sourcehostname);
 	
 	val.i=htonl(hostnamelen);
 	memcpy(buf+offset,val.c,4);
@@ -8807,6 +8970,9 @@ int socket_client_request_connect_via_stun(socketbuf *sock)
   //4 bytes: The servers portnumber
 
 
+#ifdef UDP_PROTOCOL_DEBUG
+  printf("Sending SOCKET_UDP2W_STUN_CONNECTBACK\n");
+#endif
   intval.i=htonl(SOCKET_UDP2W_STUN_CONNECTBACK);
   memcpy(buf,intval.c,4);
 
@@ -8818,7 +8984,7 @@ int socket_client_request_connect_via_stun(socketbuf *sock)
 
   offset=8+datalen;
 
-  datalen=strlen(sock->host);
+  datalen=(int)strlen(sock->host);
   intval.i=htonl(datalen);
   memcpy(buf+offset,intval.c,4);
   offset+=4;
@@ -8846,7 +9012,7 @@ int socket_client_request_connect_via_stun(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, its dead
 	  sock->flags |= SOCKET_DEAD;
@@ -8887,6 +9053,9 @@ int socket_client_request_connect_via_turn(socketbuf *sock)
   //4 bytes: The servers portnumber
 
 
+#ifdef UDP_PROTOCOL_DEBUG
+  printf("Sending SOCKET_UDP2W_TURN_DO\n");
+#endif
   intval.i=htonl(SOCKET_UDP2W_TURN_DO);
   memcpy(buf,intval.c,4);
 
@@ -8898,7 +9067,7 @@ int socket_client_request_connect_via_turn(socketbuf *sock)
 
   offset=8+datalen;
 
-  datalen=strlen(sock->host);
+  datalen=(int)strlen(sock->host);
   intval.i=htonl(datalen);
   memcpy(buf+offset,intval.c,4);
   offset+=4;
@@ -8926,7 +9095,7 @@ int socket_client_request_connect_via_turn(socketbuf *sock)
 
   if (written==-1)
     {
-      if (grapple_errno()!=EAGAIN)
+      if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
         {
 	  //If the error is not EAGAIN, its dead
 	  sock->flags |= SOCKET_DEAD;
@@ -8946,7 +9115,6 @@ int socket_client_request_connect_via_turn(socketbuf *sock)
   return written;
 }
 
-//#define TURN_DEBUG
 int socket_udp2way_reader_turn_process(socketbuf *sock,
 				       struct sockaddr_in *sa,
 				       socklen_t sa_len,
@@ -9007,7 +9175,7 @@ int socket_udp2way_reader_turn_process(socketbuf *sock,
 	//the TURN over and over again until it gets its response
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;
@@ -9058,6 +9226,11 @@ int socket_udp2way_reader_turn_process(socketbuf *sock,
 	//Here we have been told that the server is not TURN enabled
 	sock->use_turn=1;
 	
+        //Reset the socket to use the same address it started with, as this
+        //is needed for the TURN client
+        sock->udp_sa.sin_port=sock->connect_sa.sin_port;
+        sock->udp_sa.sin_addr.s_addr=sock->connect_sa.sin_addr.s_addr;
+
 	return 1;
       }
       break;
@@ -9139,7 +9312,7 @@ int socket_udp2way_reader_turn_process(socketbuf *sock,
 	//reliable or not as the need arises
 	if (written==-1)
 	  {
-	    if (grapple_errno()!=EAGAIN)
+	    if (!GRAPPLE_SOCKET_ERRNO_IS_EAGAIN)
 	      {
 		//If the error is not EAGAIN, its dead       
 		sock->flags |= SOCKET_DEAD;

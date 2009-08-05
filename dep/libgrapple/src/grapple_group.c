@@ -49,7 +49,7 @@ char *group_crypt(grapple_user group,const char *password)
   if (!password || !*password)
     return NULL;
 
-  buf=malloc(20+1);
+  buf=(char *)malloc(20+1);
 
   salt[0]='a'+(group%26);
   salt[1]='a'+((group>>1)%26);
@@ -71,7 +71,7 @@ char *group_crypt_twice(grapple_user group,const char *password)
   if (!password || !*password)
     return NULL;
 
-  buf=malloc(20+1);
+  buf=(char *)malloc(20+1);
 
   salt[0]='a'+(group%26);
   salt[1]='a'+((group>>1)%26);
@@ -526,6 +526,11 @@ int client_group_remove(internal_client_data *client,int groupid,int removeid)
 	}
       grapple_thread_mutex_unlock(group->container_mutex);
     }
+  else
+    {
+      returnval=0;
+      grapple_client_error_set(client,GRAPPLE_ERROR_NO_SUCH_GROUP);
+    }
 
   grapple_thread_mutex_unlock(client->group_mutex);
 
@@ -644,6 +649,7 @@ int delete_client_group(internal_client_data *client,int id)
   if (!group)
     {
       grapple_thread_mutex_unlock(client->group_mutex);
+      grapple_client_error_set(client,GRAPPLE_ERROR_NO_SUCH_GROUP);
       return 0;
     }
 
@@ -969,6 +975,7 @@ int *client_group_unroll(internal_client_data *client,int groupid)
   if (!group)
     {
       grapple_thread_mutex_unlock(client->group_mutex);
+      grapple_client_error_set(client,GRAPPLE_ERROR_NO_SUCH_GROUP);
       return NULL;
     }
   

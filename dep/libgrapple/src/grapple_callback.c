@@ -164,7 +164,7 @@ int grapple_server_callback_generate(internal_server_data *server,
   //Find out what type of user message this is
   type=grapple_message_convert_to_usermessage_enum(item->messagetype);
 
-  if (!type)
+  if (type==GRAPPLE_MSG_NONE)
     {
       //This kind of message cant have a callback, abort
       return 0;
@@ -232,7 +232,7 @@ int grapple_client_callback_generate(internal_client_data *client,
   //Find out what type of user message this is
   type=grapple_message_convert_to_usermessage_enum(item->messagetype);
 
-  if (!type)
+  if (type==GRAPPLE_MSG_NONE)
     {
       //This kind of message cant have a callback, abort
       return 0;

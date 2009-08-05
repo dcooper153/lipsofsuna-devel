@@ -25,7 +25,6 @@
 #ifndef __SERVER_CLIENT_H__
 #define __SERVER_CLIENT_H__
 
-#include <grapple/grapple.h>
 #include <algorithm/lips-algorithm.h>
 #include <archive/lips-archive.h>
 #include <config/lips-config.h>

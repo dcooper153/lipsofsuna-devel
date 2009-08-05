@@ -32,20 +32,24 @@
 #define HAVE_WINDOWS_H
 #define HAVE_WINSOCK2_H
 #define HAVE_WS2TCPIP_H
-//#define HAVE_SYS_TYPES_H
-//#define HAVE_ERRNO_H
-//#define HAVE_NETINET_IN_H
-//#define HAVE_SYS_SOCKET_H
-//#define HAVE_SYS_SELECT_H
-//#define HAVE_INET_NTOP
-//#define HAVE_SYS_UN_H
-//#define HAVE_ARPA_INET_H 
-//#define HAVE_NETDB_H
-//#define HAVE_UNISTD_H
-//#define HAVE_SYS_IOCTL_H
-//#define HAVE_SIGNAL_H
-//#define HAVE_SIGACTION
-//#define HAVE_INET_NTOP
+
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_ERRNO_H 1
+#ifndef _MSC_VER
+#define HAVE_UNISTD_H 1
+#endif
+#define HAVE_SIGNAL_H 1
+
+#ifndef _MSC_VER
+#define HAVE_GETTIMEOFDAY 1
+#endif
+#ifndef _MSC_VER
+#define HAVE_PTHREAD_H 1
+#endif
+#ifndef _MSC_VER
+#define HAVE_SYS_TIME_H 1
+#endif
+
 
 #endif
 

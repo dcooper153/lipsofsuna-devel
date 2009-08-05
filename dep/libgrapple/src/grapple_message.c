@@ -85,6 +85,9 @@ void grapple_message_dispose(grapple_message *message)
     case GRAPPLE_MSG_CONFIRM_RECEIVED:
       //No allocations here
       break;
+    case GRAPPLE_MSG_NONE:
+      //Never received, default NULL value
+      break;
     }
 
   //Delete the message itself
@@ -118,7 +121,7 @@ static grapple_message *server_convert_user_connected_message(grapple_queue *que
   if (queue->length>4)
     {
       message->NEW_USER.name=(char *)malloc(queue->length-3);
-      memcpy(message->NEW_USER.name,queue->data+4,queue->length-4);
+      memcpy(message->NEW_USER.name,(char *)queue->data+4,queue->length-4);
       message->NEW_USER.name[queue->length-4]=0;
     }
 
@@ -204,16 +207,16 @@ static grapple_message *generic_convert_group_create_message(grapple_queue *queu
   memcpy(val.c,queue->data,4);
   message->GROUP.groupid=val.i;
 
-  memcpy(val.c,queue->data+4,4);
+  memcpy(val.c,(char *)queue->data+4,4);
   length=val.i;
 
   message->GROUP.name=(char *)malloc(length+1);
-  memcpy(message->GROUP.name,queue->data+8,length);
+  memcpy(message->GROUP.name,(char *)queue->data+8,length);
   message->GROUP.name[length]=0;
 
   offset=length+8;
 
-  memcpy(val.c,queue->data+offset,4);
+  memcpy(val.c,(char *)queue->data+offset,4);
   length=val.i;
 
   offset+=4;
@@ -221,7 +224,7 @@ static grapple_message *generic_convert_group_create_message(grapple_queue *queu
   if (length>0)
     {
       message->GROUP.password=(char *)malloc(length+1);
-      memcpy(message->GROUP.password,queue->data+offset,length);
+      memcpy(message->GROUP.password,(char *)queue->data+offset,length);
       message->GROUP.password[length]=0;
     }
 
@@ -241,7 +244,7 @@ static grapple_message *generic_convert_group_add_message(grapple_queue *queue)
 
   message->GROUP.groupid=val.i;
 
-  memcpy(val.c,queue->data+4,4);
+  memcpy(val.c,(char *)queue->data+4,4);
 
   message->GROUP.memberid=val.i;
 
@@ -261,7 +264,7 @@ static grapple_message *generic_convert_group_remove_message(grapple_queue *queu
 
   message->GROUP.groupid=val.i;
 
-  memcpy(val.c,queue->data+4,4);
+  memcpy(val.c,(char *)queue->data+4,4);
 
   message->GROUP.memberid=val.i;
 
@@ -282,7 +285,7 @@ static grapple_message *generic_convert_group_delete_message(grapple_queue *queu
   message->GROUP.groupid=val.i;
 
   message->GROUP.name=(char *)malloc(queue->length);
-  memcpy(message->GROUP.name,queue->data+4,queue->length-4);
+  memcpy(message->GROUP.name,(char *)queue->data+4,queue->length-4);
   message->GROUP.name[queue->length-4]=0;
 
   return message;
@@ -317,7 +320,7 @@ static grapple_message *generic_convert_confirm_timeout_message(grapple_queue *q
   memcpy(val.c,queue->data,4);
   message->CONFIRM.messageid=val.i;
 
-  memcpy(val.c,queue->data+4,4);
+  memcpy(val.c,(char *)queue->data+4,4);
   message->CONFIRM.usercount=val.i;
 
   message->CONFIRM.timeouts=
@@ -325,7 +328,7 @@ static grapple_message *generic_convert_confirm_timeout_message(grapple_queue *q
 
   for (loopa=0;loopa<message->CONFIRM.usercount;loopa++)
     {
-      memcpy(val.c,queue->data+8+(loopa*4),4);
+      memcpy(val.c,(char *)queue->data+8+(loopa*4),4);
       message->CONFIRM.timeouts[loopa]=val.i;
     }
 
@@ -453,7 +456,7 @@ static grapple_message *client_convert_user_connected_message(grapple_queue *que
   if (queue->length>4)
     {
       message->NEW_USER.name=(char *)malloc(queue->length-3);
-      memcpy(message->NEW_USER.name,queue->data+4,queue->length-4);
+      memcpy(message->NEW_USER.name,(char *)queue->data+4,queue->length-4);
       message->NEW_USER.name[queue->length-4]=0;
     }
   
@@ -473,7 +476,7 @@ static grapple_message *client_convert_user_name_message(grapple_queue *queue)
   message->USER_NAME.id=val.i;
 
   message->USER_NAME.name=(char *)malloc(queue->length-3);
-  memcpy(message->USER_NAME.name,queue->data+4,queue->length-4);
+  memcpy(message->USER_NAME.name,(char *)queue->data+4,queue->length-4);
   message->USER_NAME.name[queue->length-4]=0;
 
   return message;
@@ -523,7 +526,7 @@ static grapple_message *client_convert_relay_to_message(grapple_queue *queue)
   message->USER_MSG.id=val.i;
 
   message->USER_MSG.data=(char *)malloc(queue->length-4);
-  memcpy(message->USER_MSG.data,queue->data+4,queue->length-4);
+  memcpy(message->USER_MSG.data,(char *)queue->data+4,queue->length-4);
   message->USER_MSG.length=queue->length-4;
 
   return message;
@@ -623,7 +626,7 @@ static grapple_message *client_convert_ping_data_message(grapple_queue *queue)
   message->type=GRAPPLE_MSG_PING;
 
   memcpy(val.c,queue->data,4);
-  memcpy(dval.c,queue->data+4,8);
+  memcpy(dval.c,(char *)queue->data+4,8);
 
   message->PING.pingtime=dval.d;
   message->PING.id=val.i;
@@ -824,9 +827,9 @@ grapple_messagetype grapple_message_convert_to_usermessage_enum(grapple_messaget
     case GRAPPLE_MESSAGE_NOTIFY_STATE:
     case GRAPPLE_MESSAGE_VARIABLE:
     case GRAPPLE_MESSAGE_PROTECTIONKEY:
-      return 0;
+      return GRAPPLE_MSG_NONE;
       break;
     }
 
-  return 0;
+  return GRAPPLE_MSG_NONE;
 }

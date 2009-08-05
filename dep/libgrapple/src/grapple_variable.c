@@ -27,6 +27,7 @@
 #include "grapple_structs.h"
 #include "grapple_variable.h"
 #include "grapple_comms_api.h"
+#include "tools.h"
 
 //Link a variable object into a list of variable objects
 
@@ -386,59 +387,57 @@ int grapple_variable_set_data(grapple_variable_hash *hash,
   return 1;
 }
 		     
-int grapple_variable_get_int(grapple_variable_hash *hash,
-			     const char *name)
+grapple_error grapple_variable_get_int(grapple_variable_hash *hash,
+				       const char *name,int *val)
 {
   grapple_variable *var;
-  int returnval;
 
   var=grapple_variable_get(hash,name);
 
   if (!var)
     {
-      return 0;
+      return GRAPPLE_ERROR_NO_SUCH_VARIABLE;
     }
 
   if (var->vartype!=GRAPPLE_VARIABLE_TYPE_INT)
     {
       grapple_thread_mutex_unlock(var->mutex); 
-      return 0;
+      return GRAPPLE_ERROR_INCORRECT_VARIABLE_TYPE;
     }
 
-  returnval=var->intdata;
+  *val=var->intdata;
 
   grapple_thread_mutex_unlock(var->mutex); 
 
-  return returnval;
+  return GRAPPLE_NO_ERROR;
 }
 		     
-double grapple_variable_get_double(grapple_variable_hash *hash,
-				   const char *name)
+grapple_error grapple_variable_get_double(grapple_variable_hash *hash,
+				const char *name,double *val)
 {
   grapple_variable *var;
-  double returnval;
 
   var=grapple_variable_get(hash,name);
 
   if (!var)
     {
-      return 0;
+      return GRAPPLE_ERROR_NO_SUCH_VARIABLE;
     }
 
   if (var->vartype!=GRAPPLE_VARIABLE_TYPE_DOUBLE)
     {
       grapple_thread_mutex_unlock(var->mutex); 
-      return 0;
+      return GRAPPLE_ERROR_INCORRECT_VARIABLE_TYPE;
     }
 
-  returnval=var->intdata;
+  *val=var->intdata;
 
   grapple_thread_mutex_unlock(var->mutex); 
 
-  return returnval;
+  return GRAPPLE_NO_ERROR;
 }
 		     
-int grapple_variable_get_data(grapple_variable_hash *hash,
+grapple_error grapple_variable_get_data(grapple_variable_hash *hash,
 			      const char *name,void *data,size_t *len)
 {
   grapple_variable *var;
@@ -447,27 +446,27 @@ int grapple_variable_get_data(grapple_variable_hash *hash,
 
   if (!var)
     {
-      return 0;
+      return GRAPPLE_ERROR_NO_SUCH_VARIABLE;
     }
 
   if (var->vartype!=GRAPPLE_VARIABLE_TYPE_DATA)
     {
       grapple_thread_mutex_unlock(var->mutex); 
-      return 0;
+      return GRAPPLE_ERROR_INCORRECT_VARIABLE_TYPE;
     }
 
   if (data==NULL)
     {
       *len=var->length;
       grapple_thread_mutex_unlock(var->mutex); 
-      return 1;
+      return GRAPPLE_NO_ERROR;
     }
 
   if (*len < var->length)
     {
       *len=var->length;
       grapple_thread_mutex_unlock(var->mutex); 
-      return 0;
+      return GRAPPLE_ERROR_INSUFFICIENT_SPACE;
     }
 
   memcpy(data,var->data,var->length);
@@ -475,7 +474,7 @@ int grapple_variable_get_data(grapple_variable_hash *hash,
 
   grapple_thread_mutex_unlock(var->mutex); 
 
-  return 1;
+  return GRAPPLE_NO_ERROR;
 }
 		     
 int grapple_variable_client_sync(internal_client_data *clientdata,

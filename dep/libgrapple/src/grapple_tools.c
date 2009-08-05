@@ -20,6 +20,7 @@
     michael@linuxgamepublishing.com
 */
 
+#include "grapple_configure_substitute.h"
 #include "grapple_tools.h"
 #include "socket.h"
 

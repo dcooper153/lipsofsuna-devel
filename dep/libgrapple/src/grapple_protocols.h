@@ -25,6 +25,7 @@
 
 typedef enum
   {
+    GRAPPLE_PROTOCOL_UNKNOWN = 0,
     GRAPPLE_PROTOCOL_TCP = 1,
     GRAPPLE_PROTOCOL_UDP = 2
   } grapple_protocol;

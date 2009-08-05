@@ -44,7 +44,7 @@
 
 //Sequential ON or OFF
 #define GRAPPLE_SEQUENTIAL (1)
-#define GRAPPLE_NONSEQUENTIAL (1)
+#define GRAPPLE_NONSEQUENTIAL (2)
 
 //The unknown player ID
 #define GRAPPLE_USER_UNKNOWN (0)

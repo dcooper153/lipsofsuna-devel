@@ -2,6 +2,21 @@ If you find any bugs or have any updates, please submit them to
 
 grapple@linuxgamepublishing.com
 
+Updates since version 0.9.7
+
+Fixed an error when SSL is not available
+Corrected the error setting of many functions
+Corrected the behaviour of enumerating functions
+Fixed issues getting lobby game by name
+Finished porting work to win32 (mingw32 and visual studio), and MacOSX
+Fixed error querying NAT type
+Fixed a STUN race condition
+Fixed a timeout on slow but active UDP sockets
+Fixed local resolution bug
+Worked around a bug in IP MASQUERADE which prevents firewall bypass
+Allowed overriding of player name in the lobby
+Fixed a crash when connecting via vertain types of half cone NAT
+
 -------------------------------------------------------------------------------
 
 Updates since version 0.9.6

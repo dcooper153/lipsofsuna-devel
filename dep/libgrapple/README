@@ -232,7 +232,7 @@ This function starts the client, and connects it to the server. From this
 point you can ask the client if it has any messages from the server.
 NOTE: Running grapple_client_start does not always guarantee that you
 will be connected. You will know you are connected with you receive a message
-containing GRAPPLE_MSG_USER_ME which gives you your server assigned ID.
+containing GRAPPLE_MSG_NEW_USER_ME which gives you your server assigned ID.
 You can still at this stage receive a GRAPPLE_MSG_CONNECTION_REFUSED
 if the internal handshaking determines you are running a different game, or
 the target game is full or closed.
@@ -564,7 +564,6 @@ This has the following values
 
     With this message, two values are included in the message structure
       GROUP
-      NAME
 
     grapple_user groupid
     char *name

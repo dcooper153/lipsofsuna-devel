@@ -20,17 +20,27 @@
     michael@linuxgamepublishing.com
 */
 
-#ifndef GRAPPLE_TOOLS_H
-#define GRAPPLE_TOOLS_H
+#include "grapple_configure_substitute.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "grapple_lobbyerror.h"
+#include "grapple_lobby_internal.h"
 
-extern const char **grapple_local_addresses_get(void);
+//A local global variable that stores the last grapple error
+static grapple_error global_lobby_error;
 
-#ifdef __cplusplus
+void grapple_lobbyerror_set(grapple_error error)
+{
+  global_lobby_error=error;
 }
-#endif
 
-#endif
+grapple_error grapple_lobbyerror_get()
+{
+  grapple_error returnval;
+
+  returnval=global_lobby_error;
+
+  //Now wipe the last error
+  global_lobby_error=GRAPPLE_NO_ERROR;
+
+  return returnval;
+}

@@ -26,37 +26,37 @@
 typedef struct
 {
   char *buf;
-  int len;
-  int maxlen;
+  size_t len;
+  size_t maxlen;
 } dynstring;
 
 typedef struct
 {
   unsigned char *buf;
-  int len;
-  int maxlen;
+  size_t len;
+  size_t maxlen;
 } udynstring;
 
 typedef struct
 {
   signed char *buf;
-  int len;
-  int maxlen;
+  size_t len;
+  size_t maxlen;
 } sdynstring;
 
-extern void dynstringCheckAvailableLength(dynstring *,int);
+extern void dynstringCheckAvailableLength(dynstring *,size_t);
 extern dynstring *dynstringInit(int);
 extern void dynstringAppend(dynstring *,const char *);
 extern void dynstringUninit(dynstring *);
 extern void dynstringRawappend(dynstring *,const char *,size_t);
 
-extern void dynstringUCheckAvailableLength(udynstring *,int);
+extern void dynstringUCheckAvailableLength(udynstring *,size_t);
 extern udynstring *dynstringUInit(int);
 extern void dynstringUAppend(udynstring *,const unsigned char *);
 extern void dynstringUUninit(udynstring *);
 extern void dynstringURawappend(udynstring *,const unsigned char *,size_t);
 
-extern void dynstringSCheckAvailableLength(sdynstring *,int);
+extern void dynstringSCheckAvailableLength(sdynstring *,size_t);
 extern sdynstring *dynstringSInit(int);
 extern void dynstringSAppend(sdynstring *,const signed char *);
 extern void dynstringSUninit(sdynstring *);

@@ -27,6 +27,7 @@
 #include "grapple_structs.h"
 
 //A local global variable that stores the last grapple error
+static grapple_error global_error;
 
 //Set the error
 void grapple_client_error_set(internal_client_data *client,grapple_error error)
@@ -39,6 +40,22 @@ void grapple_server_error_set(internal_server_data *server,grapple_error error)
   server->last_error=error;
 }
 
+void grapple_error_set(grapple_error error)
+{
+  global_error=error;
+}
+
+grapple_error grapple_error_get()
+{
+  grapple_error returnval;
+
+  returnval=global_error;
+
+  //Now wipe the last error
+  global_error=GRAPPLE_NO_ERROR;
+
+  return returnval;
+}
 
 //Set a text representation of the error
 const char *grapple_error_text(grapple_error error)
@@ -96,8 +113,23 @@ const char *grapple_error_text(grapple_error error)
     case GRAPPLE_ERROR_NO_SUCH_GROUP:
       return "No such group";
       break;
+    case GRAPPLE_ERROR_NO_SUCH_VARIABLE:
+      return "No such variable";
+      break;
+    case GRAPPLE_ERROR_INCORRECT_VARIABLE_TYPE:
+      return "Incorrect variable type";
+      break;      
     case GRAPPLE_ERROR_BAD_PASSWORD:
-      return "Invalid Password";
+      return "Invalid password";
+      break;
+    case GRAPPLE_ERROR_INSUFFICIENT_SPACE:
+      return "Insufficient space";
+      break;      
+    case GRAPPLE_ERROR_NO_MESSAGES:
+      return "No messages available";
+      break;
+    case GRAPPLE_ERROR_NO_SUCH_GAME:
+      return "No such game";
       break;
     }
 

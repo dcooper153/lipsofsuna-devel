@@ -23,11 +23,12 @@
 #ifndef GRAPPLE_STRUCTS_H
 #define GRAPPLE_STRUCTS_H
 
-#include <pthread.h>
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
 
 #include "grapple_callback.h"
 #include "grapple_client.h"
@@ -37,9 +38,17 @@
 #include "socket.h"
 #include "grapple_thread.h"
 
+#ifndef GRAPPLE_INT_TYPE
+#if (defined WIN32 && !defined HAVE_STDINT_H )
+#define GRAPPLE_INT_TYPE __int32
+#else
+#define GRAPPLE_INT_TYPE int32_t
+#endif
+#endif
+
 typedef union
 {
-  int32_t i;
+  GRAPPLE_INT_TYPE i;
   char c[4];
 } intchar;
 
@@ -133,7 +142,7 @@ typedef struct _grapple_connection
   int serverid;
   int reconnectserverid;
   int me;
-  int delete;
+  int deleted;
   int handshook;
   int handshakeflags;
   int reconnecting;
@@ -192,7 +201,7 @@ typedef struct _internal_server_data
   char *productversion;
   char *session;
   char *description;
-  int descriptionlen;
+  size_t descriptionlen;
   char *password;
   grapple_password_callback passwordhandler;
   void *passwordhandlercontext;

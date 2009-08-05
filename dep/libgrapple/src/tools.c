@@ -26,7 +26,9 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
 #include <time.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -34,7 +36,9 @@
 #include <unistd.h>
 #endif
 #include <fcntl.h>
+#ifdef HAVE_SYS_FILE_H
 #include <sys/file.h>
+#endif
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
@@ -76,16 +80,53 @@ void timemark(const char *str)
   printf("%ld.%06ld %s",tv.tv_sec,tv.tv_usec,str);
 }
 
-inline int grapple_errno()
+#ifndef _MSC_VER
+inline 
+#endif
+int grapple_thread_errno()
 {
 #ifdef HAVE_ERRNO_H
   return errno;
 #else
-# ifdef WIN32
+#  warning No valid ERRNO system detected
+  return 0;
+#endif
+}
+
+#ifndef _MSC_VER
+inline 
+#endif
+int grapple_socket_errno()
+{
+#ifdef WIN32
   return WSAGetLastError();
 # else
+# ifdef HAVE_ERRNO_H
+  return errno;
+#else
 #  warning No valid ERRNO system detected
   return 0;
 # endif
 #endif
 }
+
+
+#ifndef HAVE_GETTIMEOFDAY
+#define FACTOR 0x19db1ded53e8000
+
+int gettimeofday(struct timeval *tp,void * tz)
+{
+  FILETIME f;
+  ULARGE_INTEGER ifreq;
+  LONGLONG res;
+  GetSystemTimeAsFileTime(&f);
+  ifreq.HighPart = f.dwHighDateTime;
+  ifreq.LowPart = f.dwLowDateTime;
+
+  res = ifreq.QuadPart - FACTOR;
+  tp->tv_sec = (long)((LONGLONG)res/10000000);
+  tp->tv_usec = (long)((LONGLONG)res% 10000000000); // Micro Seonds
+
+  return 0;
+}
+#endif

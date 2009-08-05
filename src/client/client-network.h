@@ -25,7 +25,11 @@
 #ifndef __CLIENT_NETWORK_H__
 #define __CLIENT_NETWORK_H__
 
+#ifdef BUILTIN_GRAPPLE
+#include <grapple.h>
+#else
 #include <grapple/grapple.h>
+#endif
 #include <config/lips-config.h>
 #include <algorithm/lips-algorithm.h>
 #include "client-module.h"

@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <pthread.h>
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -106,7 +105,11 @@ static void grapple_event_dispatch(grapple_callbackevent *event)
 }
 
 //The main function for the dispatcher thread.
+#ifdef HAVE_PTHREAD_H
 static void *grapple_callback_dispatcher_main(void *data)
+#else
+static DWORD WINAPI grapple_callback_dispatcher_main(LPVOID data)
+#endif
 {
   grapple_callback_dispatcher *thread;
   grapple_callbackevent *target;
@@ -282,7 +285,11 @@ static void *grapple_callback_dispatcher_main(void *data)
   
   //we're done
 
+#ifdef HAVE_PTHREAD_H
   return NULL;
+#else
+  return 0;
+#endif
 }
 
 //This function creates the dispatcher thread

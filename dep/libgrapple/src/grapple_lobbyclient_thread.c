@@ -25,7 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -44,7 +46,11 @@
 //This file contains the thread that a lobby client starts up when it starts
 //a new game. This thread feeds data about the game to the lobby server
 
+#ifdef HAVE_PTHREAD_H
 void *grapple_lobbyclient_serverthread_main(void *data)
+#else
+DWORD WINAPI grapple_lobbyclient_serverthread_main(LPVOID data)
+#endif
 {
   internal_lobbyclient_data *client;
   int finished=0;
@@ -53,9 +59,9 @@ void *grapple_lobbyclient_serverthread_main(void *data)
   int closed,oldclosed=GRAPPLE_SERVER_OPEN;
   char outdata[12],*varoutdata;
   void *description=NULL;
-  int descriptionlen=0;
+  size_t descriptionlen=0;
   void *olddescription=NULL;
-  int olddescriptionlen=0;
+  size_t olddescriptionlen=0;
   int rv;
   intchar val;
 
@@ -226,7 +232,11 @@ void *grapple_lobbyclient_serverthread_main(void *data)
 }
 
 
+#ifdef HAVE_PTHREAD_H
 void *grapple_lobbyclient_clientthread_main(void *data)
+#else
+DWORD WINAPI grapple_lobbyclient_clientthread_main(LPVOID data)
+#endif
 {
   internal_lobbyclient_data *client;
   int finished=0;

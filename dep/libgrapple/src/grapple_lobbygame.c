@@ -151,6 +151,68 @@ static grapple_lobbygame_internal *grapple_lobbygame_internal_get(grapple_thread
   return NULL;
 }
 
+static grapple_lobbygame_internal *grapple_lobbygame_internal_get_byname(grapple_thread_mutex *games_mutex,
+									 grapple_lobbygame_internal *list,
+									 const char *name,
+									 grapple_mutex_locktype type)
+{
+  grapple_lobbygame_internal *scan;
+  int finished=0,found;
+  grapple_lobbygameid gameid;
+
+  while (!finished)
+    {
+      grapple_thread_mutex_lock(games_mutex,
+				GRAPPLE_LOCKTYPE_SHARED);
+
+      //Loop through the clients
+      scan=list;
+
+      found=0;
+      
+      while (scan && !found)
+	{
+	  grapple_thread_mutex_lock(scan->inuse,GRAPPLE_LOCKTYPE_SHARED);
+
+	  //We have to be locked here to do a strcmp
+	  if (scan->session && !strcmp(scan->session,name))
+	    {
+	      //If we only want shared, we have it
+	      if (type==GRAPPLE_LOCKTYPE_SHARED)
+		{
+		  //Match and return it
+		  grapple_thread_mutex_unlock(games_mutex);
+		  return scan;
+		}
+	      gameid=scan->id;
+
+	      grapple_thread_mutex_unlock(scan->inuse);
+	      if (grapple_thread_mutex_lock(scan->inuse,type))
+		{
+		  //We have the right locktype now
+		  grapple_thread_mutex_unlock(games_mutex);
+		  return scan;
+		}
+	      //We couldnt get the right locktype but we now know the ID, hand
+	      //off to the main finder
+	      grapple_thread_mutex_unlock(games_mutex);
+	      return grapple_lobbygame_internal_get(games_mutex,list,
+						    gameid,type);
+	    }
+
+	  grapple_thread_mutex_unlock(scan->inuse);
+	  
+	  scan=scan->next;
+	  if (scan==list)
+	    scan=NULL;
+	}
+
+      grapple_thread_mutex_unlock(games_mutex);
+    }
+
+  return NULL;
+}
+
 grapple_lobbygame_internal *grapple_lobbyclient_game_internal_get(internal_lobbyclient_data *lobbyclientdata,
 								  grapple_lobbygameid gameid,
 								  grapple_mutex_locktype type)
@@ -174,3 +236,13 @@ void grapple_lobbygame_internal_release(grapple_lobbygame_internal *target)
 {
   grapple_thread_mutex_unlock(target->inuse);
 }
+
+grapple_lobbygame_internal *grapple_lobbyclient_game_internal_get_byname(internal_lobbyclient_data *lobbyclientdata,
+									 const char *name,
+									 grapple_mutex_locktype type)
+{
+  return grapple_lobbygame_internal_get_byname(lobbyclientdata->games_mutex,
+					       lobbyclientdata->games,
+					       name,type);
+}
+

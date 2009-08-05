@@ -29,15 +29,15 @@
 extern int c2s_handshake(internal_client_data *);
 extern int c2s_set_name(internal_client_data *,const char *);
 extern int c2s_message(internal_client_data *,int,int,
-		       const void *,int);
+		       const void *,size_t);
 extern int c2s_relaymessage(internal_client_data *,int,
 			    int,grapple_confirmid,
-			    const void *,int);
+			    const void *,size_t);
 extern int c2s_relayallmessage(internal_client_data *,int,grapple_confirmid,
-			       const void *,int);
+			       const void *,size_t);
 extern int c2s_relayallbutselfmessage(internal_client_data *,
 				      int,grapple_confirmid,
-				      const void *,int);
+				      const void *,size_t);
 extern int c2s_ping(internal_client_data *,int);
 extern int c2s_pingreply(internal_client_data *,int);
 extern int c2s_disconnect(internal_client_data *);
@@ -67,12 +67,12 @@ extern int s2c_user_connected(internal_server_data *,
 extern int s2c_user_setname(internal_server_data *,
 			    grapple_connection *,grapple_connection *);
 extern int s2c_message(internal_server_data *,
-		       grapple_connection *,int,int,const void *,int);
+		       grapple_connection *,int,int,const void *,size_t);
 extern int s2c_inform_disconnect(internal_server_data *,
 				 grapple_connection *,grapple_connection *);
 extern int s2c_relaymessage(internal_server_data *,
 			    grapple_connection *,grapple_connection *,
-			    int,int,void *,int);
+			    int,int,void *,size_t);
 extern int s2c_ping(internal_server_data *,grapple_connection *,int);
 extern int s2c_pingreply(internal_server_data *,grapple_connection *,int);
 extern int s2c_disconnect(internal_server_data *,grapple_connection *);
@@ -100,7 +100,7 @@ extern int s2c_variable_send(internal_server_data *,
 			     grapple_connection *,grapple_variable *);
 
 extern int s2c_description_change(internal_server_data *,
-				  grapple_connection *,const void *,int);
+				  grapple_connection *,const void *,size_t);
 
 extern int s2SUQ_user_connected(internal_server_data *,grapple_connection *);
 extern int s2SUQ_user_setname(internal_server_data *,grapple_connection *);

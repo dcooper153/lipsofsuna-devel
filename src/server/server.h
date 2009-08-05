@@ -27,7 +27,6 @@
 
 #include <pthread.h>
 #include <sys/time.h>
-#include <grapple/grapple.h>
 #include <ai/lips-ai.h>
 #include <algorithm/lips-algorithm.h>
 #include <config/lips-config.h>

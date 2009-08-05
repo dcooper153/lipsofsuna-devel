@@ -23,10 +23,14 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
+#include "grapple_configure_substitute.h"
+
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
@@ -42,7 +46,9 @@
 #include <winsock2.h>
 #endif
 
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
 
 #ifndef HOST_NAME_MAX
 # define HOST_NAME_MAX 255
@@ -53,6 +59,20 @@
 #endif
 
 #include "dynstring.h"
+
+#ifndef SOCKET_INT_TYPE
+#if (defined WIN32 && !defined HAVE_STDINT_H )
+#define SOCKET_INT_TYPE __int32
+#else
+#define SOCKET_INT_TYPE int32_t
+#endif
+#endif
+
+#ifdef _MSC_VER
+#define SOCKET_FD_TYPE SOCKET
+#else
+#define SOCKET_FD_TYPE int
+#endif
 
 #define SOCKET_LISTENER (1<<0)
 #define SOCKET_CONNECTING (1<<1)
@@ -135,20 +155,20 @@ typedef struct _socket_udp_data
 {
   struct sockaddr_in sa;
   char *data;
-  int length;
+  size_t length;
 } socket_udp_data;
 
 typedef struct _socket_udp_rdata
 {
   char *data;
-  int length;
+  size_t length;
   int packetnum;
   int sent;
   int resend_count;
   int received_this_send;
   int split_index;
   struct timeval sendtime;
-  int *range_starts;
+  size_t *range_starts;
   char **range_received;
   int ranges_left;
   int ranges_size;
@@ -159,7 +179,7 @@ typedef struct _socket_udp_rdata
 
 typedef struct _socketbuf
 {
-  int fd;
+  SOCKET_FD_TYPE fd;
 
 #if defined WIN32 && defined HAVE_WINSOCK2_H
   WSAEVENT event;
@@ -203,9 +223,9 @@ typedef struct _socketbuf
   int udp2w_directport;
   struct sockaddr_in connect_sa;
   int udp2w_connectcounter;
-  int udp2w_maxsend;
-  int udp2w_minsend;
-  int udp2w_fromserver_counter;
+  size_t udp2w_maxsend;
+  size_t udp2w_minsend;
+  size_t udp2w_fromserver_counter;
   int udp2w_relaying_via_connector;
   int udp2w_relay_by_listener;
 
@@ -221,7 +241,7 @@ typedef struct _socketbuf
   int stun2_port; //Sender on second machine
   struct sockaddr_in stun_sa;
   struct sockaddr_in stun2_sa; //Sender on second machine
-  int stun_fd2;
+  SOCKET_FD_TYPE stun_fd2;
   char stun_unique[5+HOST_NAME_MAX+60+1]; //'STUN-' host port_and_time NULL
 
   char *published_address;
@@ -271,7 +291,7 @@ typedef struct _socket_processlist
 
 typedef union 
 {
-  int32_t i;
+  SOCKET_INT_TYPE i;
   char c[4];
 } socket_intchar;
 
@@ -310,11 +330,11 @@ extern int           socket_dead(socketbuf *);
 extern void          socket_destroy(socketbuf *);
 extern int           socket_get_port(socketbuf *);
 extern int           socket_get_sending_port(socketbuf *);
-extern void          socket_indata_drop(socketbuf *,int);
+extern void          socket_indata_drop(socketbuf *,size_t);
 extern size_t        socket_indata_length(socketbuf *);
 extern size_t        socket_outdata_length(socketbuf *);
 extern time_t        socket_connecttime(socketbuf *);
-extern char         *socket_indata_pull(socketbuf *,int);
+extern char         *socket_indata_pull(socketbuf *,size_t);
 extern const char   *socket_indata_view(socketbuf *);
 extern socket_udp_data *socket_udp_indata_pull(socketbuf *);
 extern socket_udp_data *socket_udp_indata_view(socketbuf *);

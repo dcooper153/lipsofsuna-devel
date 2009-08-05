@@ -128,6 +128,7 @@ if test "x$want_builtin_grapple" = xyes; then
 	GRAPPLE_CFLAGS="-I\$(top_srcdir)/dep/libgrapple/src"
 	GRAPPLE_LIBS="\$(top_builddir)/dep/libgrapple/src/libgrapple.la"
 	AC_CONFIG_SUBDIRS(dep/libgrapple)
+	LIPS_CFLAGS="$LIPS_CFLAGS -DBUILTIN_GRAPPLE"
 else
 	GRAPPLE_CFLAGS=""
 	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"

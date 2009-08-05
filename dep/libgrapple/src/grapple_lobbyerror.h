@@ -20,18 +20,7 @@
     michael@linuxgamepublishing.com
 */
 
-#ifndef GRAPPLE_H
-#define GRAPPLE_H
-
-#include "grapple_defines.h"
-#include "grapple_types.h"
-#include "grapple_callback.h"
-#include "grapple_client.h"
-#include "grapple_server.h"
-#include "grapple_protocols.h"
 #include "grapple_error.h"
-#include "grapple_message.h"
-#include "grapple_tools.h"
-#include "grapple_certificate.h"
 
-#endif
+extern void grapple_lobbyerror_set(grapple_error);
+extern grapple_error grapple_lobbyerror_get(void);

@@ -372,8 +372,7 @@ static void init_des()
    bits swapped in the expansion by the current salt.
 */
 
-static void shuffle_sb(k, saltbits)
-  unsigned long *k, saltbits;
+static void shuffle_sb(unsigned long *k, unsigned long saltbits)
   { int j, x;
     for(j=4096; j--;) {
       x = (k[0] ^ k[1]) & saltbits;
@@ -389,8 +388,7 @@ static void shuffle_sb(k, saltbits)
 static unsigned char current_salt[3]="&&"; /* invalid value */
 static unsigned long oldsaltbits = 0;
 
-void setup_salt(s)
-  const char *s;
+void setup_salt(const char *s)
   { unsigned long i,j,saltbits;
 
     if(!initialized)
@@ -478,8 +476,7 @@ void setup_salt(s)
 
 /* Generate the key table before running the 25 DES rounds */
 
-void mk_keytab(key)
-  const char *key;
+void mk_keytab(const char *key)
   { unsigned long i,j;
     unsigned long *k,*mkt;
     int t;
@@ -501,9 +498,7 @@ void mk_keytab(key)
 
 /* Do final permutations and convert to ASCII */
 
-char *output_conversion(l1,l2,r1,r2,salt)
-  unsigned long l1,l2,r1,r2;
-  const char *salt;
+char *output_conversion(unsigned long l1,unsigned long l2,unsigned long r1,unsigned long r2,const char *salt)
   { static char outbuf[14];
     unsigned long i;
     unsigned long s,v1,v2;
@@ -538,15 +533,15 @@ char *output_conversion(l1,l2,r1,r2,salt)
     outbuf[1] = salt[1] ? salt[1] : salt[0];
 
     for(i=0; i<5; i++)
-      outbuf[i+2] = bin_to_ascii((v1>>(26-6*i)) & 0x3f);
+      outbuf[i+2] =(char)(bin_to_ascii((v1>>(26-6*i)) & 0x3f));
 
     s  = (v2 & 0xf) << 2;             /* Save the rightmost 4 bit a moment */
     v2 = (v2>>2) | ((v1 & 0x3)<<30);  /* Shift two bits of v1 onto v2      */
 
     for(i=5; i<10; i++)
-      outbuf[i+2] = bin_to_ascii((v2>>(56-6*i)) & 0x3f);
+      outbuf[i+2] = (char)(bin_to_ascii((v2>>(56-6*i)) & 0x3f));
 
-    outbuf[12] = bin_to_ascii(s);
+    outbuf[12] = (char)(bin_to_ascii(s));
     outbuf[13] = 0;
 
     return outbuf;

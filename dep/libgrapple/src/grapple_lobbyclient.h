@@ -107,7 +107,7 @@ extern int grapple_lobbyclient_game_closed_get(grapple_lobbyclient,
 					       grapple_lobbygameid);
 extern int grapple_lobbyclient_game_description_get(grapple_lobbyclient,
 						    grapple_lobbygameid,
-						    void *,int *);
+						    void *,size_t *);
 extern int grapple_lobbyclient_id_get(grapple_lobbyclient);
 
 extern int grapple_lobbyclient_encryption_enable(grapple_lobbyclient,

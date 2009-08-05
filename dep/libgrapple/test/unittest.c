@@ -6,14 +6,41 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+#ifdef HAVE_STDBOOL_H
+#include <stdbool.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+#include <windows.h>
+#endif
+
 #include "unittest.h"
 
-#include "../src/tools.h" //Just for microsleep
 #include "../src/grapple.h"
 #include "../src/grapple_lobby.h"
 
 static int staticpass=0,staticfail=0,quiet=0;
 const char *error=NULL;
+
+static void microsleep(int usec)
+{
+#ifdef WIN32
+  Sleep(usec / 1000);
+#else
+  fd_set fds;
+  struct timeval tv;
+  
+  tv.tv_sec=0;
+  tv.tv_usec=usec;
+  
+  FD_ZERO(&fds);
+
+  //Select on no file descriptors, which means it will just wait, until that
+  //time is up. Thus sleeping for a microsecond exact time.
+  select(FD_SETSIZE,&fds,0,0,&tv);
+#endif
+  return;
+}
+
 
 static grapple_server create_encrypted_server(grapple_protocol protocol,
 					      const char *private,
@@ -404,7 +431,7 @@ static int tcp_client_connected(void)
 }
 
 
-static bool userenumeration(grapple_user id,const char *name,
+static int userenumeration(grapple_user id,const char *name,
 			    unsigned long flags,void *context)
 {
   int *number;
@@ -413,7 +440,7 @@ static bool userenumeration(grapple_user id,const char *name,
 
   (*number)++;
 
-  return true;
+  return 1;
 }
 
 static int server_userenumeraion(grapple_protocol protocol)
@@ -1602,8 +1629,8 @@ static int tcp_server_groupmemberlistclient(void)
   return server_groupmemberlistclient(GRAPPLE_PROTOCOL_TCP);
 }
 
-static bool groupenumeration(grapple_user id,const char *name,
-			     unsigned long flags,void *context)
+static int groupenumeration(grapple_user id,const char *name,
+			    unsigned long flags,void *context)
 {
   int *number;
   
@@ -1611,7 +1638,7 @@ static bool groupenumeration(grapple_user id,const char *name,
 
   (*number)++;
 
-  return true;
+  return 1;
 }
 
 static int server_groupenum(grapple_protocol protocol)
@@ -5121,7 +5148,7 @@ static int client_sync_variable(grapple_protocol protocol)
   int returnval=0;
   time_t start;
   char data[6];
-  int datalen;
+  size_t datalen;
 
   server=create_server(protocol);
   client1=create_client(protocol,1);

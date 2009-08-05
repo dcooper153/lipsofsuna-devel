@@ -27,6 +27,7 @@
 
 typedef enum
   {
+    GRAPPLE_MSG_NONE                 =  0,
     GRAPPLE_MSG_NEW_USER             =  1,
     GRAPPLE_MSG_NEW_USER_ME,
     GRAPPLE_MSG_USER_NAME,
@@ -56,46 +57,75 @@ typedef enum
     GRAPPLE_NOCONN_PROTECTIONKEY_NOT_UNIQUE
   } grapple_connection_refused;
 
+
+
 typedef struct
 {
   grapple_messagetype type;
+
+#if !defined __GNUC__ || (__GNUC__ > 2)
   union
   {
+#endif
     struct 
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_USER_NAME
+#endif
     {
       grapple_user id;
       char *name;
     } USER_NAME;
-    struct 
+    struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_SESSION_NAME
+#endif
     {
       char *name;
     } SESSION_NAME;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_NEW_USER
+#endif
     {
       grapple_user id;
       char *name;
       int me;
     } NEW_USER;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_USER_MSG
+#endif
     {
       grapple_user id;
       void *data;
-      int length;
+      size_t length;
     } USER_MSG;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_USER_DISCONNECTED
+#endif
     {
       grapple_user id;
     } USER_DISCONNECTED;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_CONNECTION_REFUSED
+#endif
     {
       grapple_connection_refused reason;
     } CONNECTION_REFUSED;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_PING
+#endif
     {
       grapple_user id;
       double pingtime;
     } PING;
-    struct
+    struct 
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_GROUP
+#endif
     {
       grapple_user groupid;
       char *name;
@@ -103,17 +133,25 @@ typedef struct
       char *password;
     } GROUP;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_CONFIRM
+#endif
     {
       grapple_confirmid messageid;
       int usercount;
       grapple_user *timeouts;
     } CONFIRM;
     struct
+#if defined __GNUC__ && (__GNUC__ < 3)
+    _GM_GAME_DESCRIPTION
+#endif
     {
       void *description;
-      int length;
+      size_t length;
     } GAME_DESCRIPTION;
+#if !defined __GNUC__ || (__GNUC__ > 2)
   };
+#endif
 } grapple_message;
 
 #ifdef __cplusplus

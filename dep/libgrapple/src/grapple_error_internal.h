@@ -28,5 +28,7 @@
 
 extern void grapple_client_error_set(internal_client_data *,grapple_error);
 extern void grapple_server_error_set(internal_server_data *,grapple_error);
+extern void grapple_error_set(grapple_error);
+extern grapple_error grapple_error_get(void);
 
 #endif
