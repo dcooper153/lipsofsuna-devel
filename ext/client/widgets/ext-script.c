@@ -712,6 +712,91 @@ MenuGroup_new (lua_State* lua)
  * -- @class table
  */
 
+/* @luadoc
+ * ---
+ * -- Display and edit numeric values.
+ * -- @name Spin
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- Creates a new spin widget.
+ * --
+ * -- @param self Spin class.
+ * -- @param table Optional table of parameters.
+ * -- @return New spin widget.
+ * function Spin.new(self, table)
+ */
+static int
+Spin_new (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* self;
+	liscrScript* script;
+	liwdgWidget* widget;
+
+	script = liscr_script (lua);
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SPIN);
+
+	/* Allocate widget. */
+	widget = liwdg_spin_new (module->module->widgets);
+	if (widget == NULL)
+	{
+		lua_pushnil (lua);
+		return 1;
+	}
+
+	/* Allocate userdata. */
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SPIN);
+	if (self == NULL)
+	{
+		liwdg_widget_free (widget);
+		lua_pushnil (lua);
+		return 1;
+	}
+
+	/* Copy attributes. */
+	if (!lua_isnoneornil (lua, 2))
+		liscr_copyargs (lua, self, 2);
+
+	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
+	liwdg_widget_set_userdata (widget, self);
+	liscr_pushdata (lua, self);
+	liscr_data_unref (self, NULL);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Displayed text.
+ * -- @name Label.text
+ * -- @class table
+ */
+static int
+Spin_getter_value (lua_State* lua)
+{
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPIN);
+
+	lua_pushnumber (lua, liwdg_spin_get_value (LIWDG_SPIN (self->data)));
+	return 1;
+}
+static int
+Spin_setter_value (lua_State* lua)
+{
+	float value;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPIN);
+	value = luaL_checknumber (lua, 3);
+
+	liwdg_spin_set_value (LIWDG_SPIN (self->data), value);
+	return 0;
+}
+
 /*****************************************************************************/
 
 void
@@ -793,6 +878,19 @@ liextMenuGroupScript (liscrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENUGROUP, data);
 	liscr_class_insert_func (self, "__gc", MenuGroup___gc);
 	liscr_class_insert_func (self, "new", MenuGroup_new);
+}
+
+void
+liextSpinScript (liscrClass* self,
+                 void*       data)
+{
+	liextModule* module = data;
+
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPIN, data);
+	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_insert_func (self, "new", Spin_new);
+	liscr_class_insert_getter (self, "value", Spin_getter_value);
+	liscr_class_insert_setter (self, "value", Spin_setter_value);
 }
 
 /** @} */

@@ -50,6 +50,7 @@ liext_module_new (licliModule* module)
 	liscr_script_create_class (module->script, "Label", liextLabelScript, self);
 	liscr_script_create_class (module->script, "Menu", liextMenuScript, self);
 	liscr_script_create_class (module->script, "MenuGroup", liextMenuGroupScript, self);
+	liscr_script_create_class (module->script, "Spin", liextSpinScript, self);
 
 	return self;
 }
