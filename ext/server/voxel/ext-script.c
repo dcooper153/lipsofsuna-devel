@@ -40,6 +40,32 @@
 
 /* @luadoc
  * ---
+ * -- Replaces the material of the voxel near the given point.
+ * --
+ * -- @param self Voxel class.
+ * -- @param point Point.
+ * -- @param type Terrain type.
+ * -- @return True if terrain was replaced.
+ * function Voxel.color_voxel(self, point, type)
+ */
+static int
+Voxel_color_voxel (lua_State* lua)
+{
+	int type;
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	type = luaL_checkinteger (lua, 3);
+
+	lua_pushboolean (lua, livox_manager_color_voxel (module->voxels, center->data, type));
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Erases a box of voxel terrain.
  * --
  * -- @param self Voxel class.
@@ -65,7 +91,7 @@ Voxel_erase_box (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Erases terrain from the vicinity of the given point.
+ * -- Erases a terrain point near the given point.
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
@@ -114,7 +140,7 @@ Voxel_erase_sphere (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Erases a full voxel from the vicinity of the given point.
+ * -- Erases a full voxel near the given point.
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
@@ -165,7 +191,7 @@ Voxel_fill_box (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Fills terrain from the vicinity of the given point.
+ * -- Fills terrain near the given point.
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
@@ -220,7 +246,7 @@ Voxel_fill_sphere (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Fills a full voxel from the vicinity of the given point.
+ * -- Fills a full voxel near the given point.
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
@@ -271,6 +297,7 @@ liextVoxelScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_insert_func (self, "color_voxel", Voxel_color_voxel);
 	liscr_class_insert_func (self, "erase_box", Voxel_erase_box);
 	liscr_class_insert_func (self, "erase_point", Voxel_erase_point);
 	liscr_class_insert_func (self, "erase_sphere", Voxel_erase_sphere);

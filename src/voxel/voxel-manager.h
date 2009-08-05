@@ -63,9 +63,10 @@ livox_manager_clear (livoxManager* self);
 void
 livox_manager_clear_materials (livoxManager* self);
 
-livoxSector*
-livox_manager_create_sector (livoxManager* self,
-                             uint32_t      id);
+int
+livox_manager_color_voxel (livoxManager*      self,
+                           const limatVector* point,
+                           int                terrain);
 
 void
 livox_manager_copy_voxels (livoxManager* self,
@@ -76,6 +77,10 @@ livox_manager_copy_voxels (livoxManager* self,
                            int           ysize,
                            int           zsize,
                            livoxVoxel*   result);
+
+livoxSector*
+livox_manager_create_sector (livoxManager* self,
+                             uint32_t      id);
 
 void
 livox_manager_erase_box (livoxManager*      self,
