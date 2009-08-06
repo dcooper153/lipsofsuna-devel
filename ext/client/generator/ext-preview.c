@@ -91,7 +91,7 @@ liext_preview_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	ligen_generator_set_fill (data->generator, 0);
+	ligen_generator_set_fill (data->generator, -1);
 
 	/* Create camera. */
 	data->camera = lieng_camera_new (module->engine);

@@ -649,7 +649,10 @@ void
 ligen_generator_set_fill (ligenGenerator* self,
                           int             fill)
 {
-	self->fill = livox_voxel_init (0xFF, fill);
+	if (fill < 0)
+		self->fill = livox_voxel_init (0x00, 0);
+	else
+		self->fill = livox_voxel_init (0xFF, fill);
 }
 
 /*****************************************************************************/
@@ -1051,7 +1054,8 @@ private_stroke_paint (ligenGenerator* self,
 		if (sector == NULL)
 		{
 			sector = livox_manager_create_sector (self->voxels, index);
-			livox_sector_fill (sector, self->fill);
+			if (self->fill != 0)
+				livox_sector_fill (sector, self->fill);
 		}
 
 		/* Calculate paint offset. */

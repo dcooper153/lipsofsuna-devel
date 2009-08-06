@@ -163,7 +163,7 @@ livox_block_erase_sphere (livoxBlock*        self,
 void
 livox_block_fill (livoxBlock*   self,
                   livoxManager* manager,
-                  livoxVoxel    terrain)
+                  int           terrain)
 {
 	terrain = livox_voxel_init (0xFF, terrain);
 	if (self->type == LIVOX_BLOCK_TYPE_FULL)
@@ -201,7 +201,7 @@ livox_block_fill (livoxBlock*   self,
 int
 livox_block_fill_aabb (livoxBlock*      self,
                        const limatAabb* box,
-                       livoxVoxel       terrain)
+                       int              terrain)
 {
 	int x;
 	int y;
@@ -245,7 +245,7 @@ int
 livox_block_fill_sphere (livoxBlock*        self,
                          const limatVector* center,
                          float              radius,
-                         livoxVoxel         terrain)
+                         int                terrain)
 {
 	int i;
 	int x;
@@ -483,10 +483,8 @@ livox_block_get_voxel (livoxBlock* self,
 	switch (self->type)
 	{
 		case LIVOX_BLOCK_TYPE_FULL:
-			assert (self->full.terrain != 0xFF00);
 			return self->full.terrain;
 		case LIVOX_BLOCK_TYPE_TILES:
-			assert (self->tiles->tiles[LIVOX_TILE_INDEX (x, y, z)] != 0xFF00);
 			return self->tiles->tiles[LIVOX_TILE_INDEX (x, y, z)];
 	}
 
@@ -524,7 +522,7 @@ livox_block_set_voxel (livoxBlock* self,
 	switch (self->type)
 	{
 		case LIVOX_BLOCK_TYPE_FULL:
-			tmp = livox_voxel_init (0xFF, self->full.terrain);
+			tmp = self->full.terrain;
 			if (tmp == terrain)
 				return 0;
 			tiles = calloc (1, sizeof (livoxBlockTiles));

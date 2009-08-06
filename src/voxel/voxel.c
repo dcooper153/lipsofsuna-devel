@@ -896,8 +896,8 @@ livox_voxel_init (int shape,
 {
 	type &= 0xFF;
 	shape &= 0xFF;
-	if (!type || !shape || (shape != 0xFF && !voxel_crosssection_triangles[shape].count))
-		return 0;
+	if (shape != 0xFF && !voxel_crosssection_triangles[shape].count)
+		shape = 0;
 	return type | (shape << 8);
 }
 

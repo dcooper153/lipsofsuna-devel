@@ -51,18 +51,18 @@ livox_block_erase_sphere (livoxBlock*        self,
 void
 livox_block_fill (livoxBlock*   self,
                   livoxManager* manager,
-                  livoxVoxel    terrain);
+                  int           terrain);
 
 int
 livox_block_fill_aabb (livoxBlock*      self,
                        const limatAabb* box,
-                       livoxVoxel       terrain);
+                       int              terrain);
 
 int
 livox_block_fill_sphere (livoxBlock*        self,
                          const limatVector* center,
                          float              radius,
-                         livoxVoxel         terrain);
+                         int                terrain);
 
 void
 livox_block_optimize (livoxBlock* self);

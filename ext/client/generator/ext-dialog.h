@@ -35,38 +35,39 @@
 
 #define LIEXT_DIALOG(o) ((liextDialog*)(o))
 
+typedef struct _liextDialogTreerow liextDialogTreerow;
+struct _liextDialogTreerow
+{
+	int brush;
+	int rule;
+	int stroke;
+	liwdgWidget* widget;
+};
+
 struct _liextDialog
 {
 	liwdgWindow base;
 	liextModule* module;
 	ligenGenerator* generator;
-	int active_brush;
-	int active_rule;
-	int active_stroke;
+	int active_row;
 	float timer;
 	struct
 	{
 		int count;
-		int* array;
-	} brushes;
+		liextDialogTreerow* array;
+	} rows;
 	struct
 	{
 		liwdgWidget* dialog;
-		liwdgWidget* group_column;
-		liwdgWidget* group_brushes;
-		liwdgWidget* group_rules;
-		liwdgWidget* group_strokes;
+		liwdgWidget* group_view;
+		liwdgWidget* group_tree;
 		liwdgWidget* button_move_left;
 		liwdgWidget* button_move_right;
 		liwdgWidget* button_move_up;
 		liwdgWidget* button_move_down;
-		liwdgWidget* button_add_brush;
-		liwdgWidget* button_remove_brush;
-		liwdgWidget* button_add_rule;
-		liwdgWidget* button_remove_rule;
-		liwdgWidget* button_add_stroke;
-		liwdgWidget* button_edit_stroke;
-		liwdgWidget* button_remove_stroke;
+		liwdgWidget* button_add;
+		liwdgWidget* button_edit;
+		liwdgWidget* button_remove;
 		liwdgWidget* preview;
 	} widgets;
 };
