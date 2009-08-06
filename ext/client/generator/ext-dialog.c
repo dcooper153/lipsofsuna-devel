@@ -366,7 +366,7 @@ private_edit (liextDialog* self,
 		    self->rows.array[i].rule == -1)
 		{
 			stroke->brush = self->rows.array[i].brush;
-			private_rebuild_preview (self);
+			private_populate (self);
 			break;
 		}
 	}
@@ -505,7 +505,7 @@ private_populate (liextDialog* self)
 	widget = liwdg_label_new (LIWDG_WIDGET (self)->manager);
 	if (widget != NULL)
 	{
-		liwdg_label_set_text (LIWDG_LABEL (widget), "None");
+		liwdg_label_set_text (LIWDG_LABEL (widget), "Root");
 		liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
 		if (liwdg_group_insert_row (LIWDG_GROUP (group), 0))
 			liwdg_group_set_child (LIWDG_GROUP (group), 0, 0, widget);
@@ -530,7 +530,7 @@ private_populate (liextDialog* self)
 		widget = liwdg_label_new (LIWDG_WIDGET (self)->manager);
 		if (widget != NULL)
 		{
-			snprintf (buffer, 256, "%d. %s\n", i + 1, brush->name);
+			snprintf (buffer, 256, "| %s\n", brush->name);
 			liwdg_label_set_text (LIWDG_LABEL (widget), buffer);
 			liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
 			if (liwdg_group_insert_row (LIWDG_GROUP (group), 0))
@@ -555,7 +555,7 @@ private_populate (liextDialog* self)
 			widget = liwdg_label_new (LIWDG_WIDGET (self)->manager);
 			if (widget != NULL)
 			{
-				snprintf (buffer, 256, "  # %s\n", rule->name);
+				snprintf (buffer, 256, "| | %s\n", rule->name);
 				liwdg_label_set_text (LIWDG_LABEL (widget), buffer);
 				liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
 				if (liwdg_group_insert_row (LIWDG_GROUP (group), 0))
@@ -566,7 +566,7 @@ private_populate (liextDialog* self)
 
 			/* Add rule info. */
 			tmp.brush = brush->id;
-			tmp.rule = j;
+			tmp.rule = rule->id;
 			tmp.stroke = -1;
 			tmp.widget = widget;
 			lialg_array_append (&self->rows, &tmp);
@@ -581,7 +581,7 @@ private_populate (liextDialog* self)
 				widget = liwdg_label_new (LIWDG_WIDGET (self)->manager);
 				if (widget != NULL)
 				{
-					snprintf (buffer, 256, "    %s (%d)\n", brush1->name, stroke->brush);
+					snprintf (buffer, 256, "| | | %s\n", brush1->name);
 					liwdg_label_set_text (LIWDG_LABEL (widget), buffer);
 					liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
 					if (liwdg_group_insert_row (LIWDG_GROUP (group), 0))
