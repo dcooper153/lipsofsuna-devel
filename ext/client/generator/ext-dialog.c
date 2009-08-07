@@ -48,11 +48,11 @@ private_add (liextDialog* self,
              liwdgWidget* widget);
 
 static int
-private_edit (liextDialog* self,
-              liwdgWidget* widget);
+private_remove (liextDialog* self,
+                liwdgWidget* widget);
 
 static int
-private_remove (liextDialog* self,
+private_rename (liextDialog* self,
                 liwdgWidget* widget);
 
 static int
@@ -124,7 +124,7 @@ liext_dialog_new (liwdgManager* manager,
 		return NULL;
 	}
 	liwdg_widget_set_request (data->widgets.preview, 320, 240);
-	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 1, data->widgets.preview);
+	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 2, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
 
 	/* Populate brush list. */
@@ -160,11 +160,13 @@ private_init (liextDialog*  self,
 	int i;
 	liwdgWidget* group_buttons;
 	liwdgWidget* group_tree;
+	liwdgWidget* group_name;
 	liwdgWidget* widgets[] =
 	{
 		liwdg_group_new_with_size (manager, 4, 1),
-		liwdg_group_new_with_size (manager, 1, 6),
-		liwdg_group_new_with_size (manager, 1, 2),
+		liwdg_group_new_with_size (manager, 1, 5),
+		liwdg_group_new_with_size (manager, 2, 1),
+		liwdg_group_new_with_size (manager, 1, 3),
 		liwdg_group_new_with_size (manager, 1, 0),
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
@@ -172,7 +174,8 @@ private_init (liextDialog*  self,
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
-		liwdg_button_new (manager),
+		liwdg_entry_new (manager),
+		liwdg_label_new (manager)
 	};
 
 	/* Check memory. */
@@ -187,6 +190,7 @@ private_init (liextDialog*  self,
 	/* Assign widgets. */
 	group_buttons = widgets[(i = 0)];
 	group_tree = widgets[++i];
+	group_name = widgets[++i];
 	self->widgets.group_view = widgets[++i];
 	self->widgets.group_tree = widgets[++i];
 	self->widgets.button_move_up = widgets[++i];
@@ -194,8 +198,9 @@ private_init (liextDialog*  self,
 	self->widgets.button_move_left = widgets[++i];
 	self->widgets.button_move_right = widgets[++i];
 	self->widgets.button_add = widgets[++i];
-	self->widgets.button_edit = widgets[++i];
 	self->widgets.button_remove = widgets[++i];
+	self->widgets.entry_name = widgets[++i];
+	self->widgets.label_type = widgets[++i];
 
 	/* Configure widgets. */
 	liwdg_group_set_spacings (LIWDG_GROUP (self->widgets.group_tree), 0, 0);
@@ -205,26 +210,27 @@ private_init (liextDialog*  self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_move_left), "←");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_move_right), "→");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_edit), "Edit");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
 	liwdg_widget_insert_callback (self->widgets.button_move_up, LIWDG_CALLBACK_PRESSED, 0, private_move_up, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_move_down, LIWDG_CALLBACK_PRESSED, 0, private_move_down, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_move_left, LIWDG_CALLBACK_PRESSED, 0, private_move_left, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_move_right, LIWDG_CALLBACK_PRESSED, 0, private_move_right, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_edit, LIWDG_CALLBACK_PRESSED, 0, private_edit, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_rename, self, NULL);
 
 	/* Tree. */
-	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 3, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 2, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 5, liwdg_label_new_with_text (manager, "Brushes"));
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 4, self->widgets.group_tree);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_edit);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 4, liwdg_label_new_with_text (manager, "Brushes"));
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 3, self->widgets.group_tree);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_add);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_remove);
 
 	/* Strokes. */
+	liwdg_group_set_col_expand (LIWDG_GROUP (group_name), 1, 1);
+	liwdg_group_set_child (LIWDG_GROUP (group_name), 0, 0, self->widgets.label_type);
+	liwdg_group_set_child (LIWDG_GROUP (group_name), 1, 0, self->widgets.entry_name);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_buttons), 0, 1);
 	liwdg_group_set_homogeneous (LIWDG_GROUP (group_buttons), 1);
 	liwdg_group_set_child (LIWDG_GROUP (group_buttons), 0, 0, self->widgets.button_move_left);
@@ -232,7 +238,8 @@ private_init (liextDialog*  self,
 	liwdg_group_set_child (LIWDG_GROUP (group_buttons), 2, 0, self->widgets.button_move_up);
 	liwdg_group_set_child (LIWDG_GROUP (group_buttons), 3, 0, self->widgets.button_move_right);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 0, 2);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 1, group_name);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, group_buttons);
 
 	/* Pack self. */
@@ -340,41 +347,6 @@ private_add (liextDialog* self,
 }
 
 static int
-private_edit (liextDialog* self,
-              liwdgWidget* widget)
-{
-	int i;
-	ligenBrush* brush;
-	ligenRule* rule;
-	ligenRulestroke* stroke;
-
-	/* Get active stroke. */
-	if (private_get_active (self, &brush, &rule, &stroke) < 3)
-		return 0;
-
-	/* FIXME: Popup a proper dialog. */
-	for (i = 0 ; i < self->rows.count ; i++)
-	{
-		if (self->rows.array[i].brush == stroke->brush)
-			break;
-	}
-	for (i++ ; 1 ; i++)
-	{
-		if (i >= self->rows.count)
-			i = 0;
-		if (self->rows.array[i].brush != -1 &&
-		    self->rows.array[i].rule == -1)
-		{
-			stroke->brush = self->rows.array[i].brush;
-			private_populate (self);
-			break;
-		}
-	}
-
-	return 0;
-}
-
-static int
 private_remove (liextDialog* self,
                 liwdgWidget* widget)
 {
@@ -399,10 +371,51 @@ private_remove (liextDialog* self,
 }
 
 static int
+private_rename (liextDialog* self,
+                liwdgWidget* widget)
+{
+	const char* name;
+	lialgU32dicIter iter;
+	ligenBrush* brush;
+	ligenRule* rule;
+	ligenRulestroke* stroke;
+
+	switch (private_get_active (self, &brush, &rule, &stroke))
+	{
+		case 1:
+			ligen_brush_set_name (brush, liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name)));
+			private_populate (self);
+			break;
+		case 2:
+			ligen_rule_set_name (rule, liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name)));
+			private_populate (self);
+			break;
+		case 3:
+			name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
+			LI_FOREACH_U32DIC (iter, self->generator->brushes)
+			{
+				brush = iter.value;
+				if (!strcmp (name, brush->name))
+				{
+					stroke->brush = brush->id;
+					private_populate (self);
+					break;
+				}
+			}
+			break;
+	}
+
+	return 0;
+}
+
+static int
 private_selected (liextDialog* self,
                   liwdgWidget* widget)
 {
 	int i;
+	ligenBrush* brush;
+	ligenRule* rule;
+	ligenRulestroke* stroke;
 
 	/* Set active row. */
 	for (i = 0 ; i < self->rows.count ; i++)
@@ -415,6 +428,29 @@ private_selected (liextDialog* self,
 			self->active_row = i;
 			break;
 		}
+	}
+
+	/* Set info. */
+	switch (private_get_active (self, &brush, &rule, &stroke))
+	{
+		case 1:
+			liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Brush:");
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), brush->name);
+			break;
+		case 2:
+			liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Rule:");
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), rule->name);
+			break;
+		case 3:
+			brush = ligen_generator_find_brush (self->generator, stroke->brush);
+			assert (brush != NULL);
+			liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Stroke:");
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), brush->name);
+			break;
+		default:
+			liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
+			break;
 	}
 
 	/* Rebuild preview. */

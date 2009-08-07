@@ -291,6 +291,21 @@ ligen_brush_write (ligenBrush* self,
 	return 1;
 }
 
+int
+ligen_brush_set_name (ligenBrush* self,
+                      const char* value)
+{
+	char* tmp;
+
+	tmp = strdup (value);
+	if (tmp == NULL)
+		return 0;
+	free (self->name);
+	self->name = tmp;
+
+	return 1;
+}
+
 void
 ligen_brush_set_voxel (ligenBrush* self,
                        int         x,

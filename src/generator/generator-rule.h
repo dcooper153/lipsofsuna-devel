@@ -70,6 +70,10 @@ void
 ligen_rule_remove_stroke (ligenRule* self,
                           int        index);
 
+int
+ligen_rule_set_name (ligenRule*  self,
+                     const char* value);
+
 #endif
 
 /** @} */

@@ -119,5 +119,20 @@ ligen_rule_remove_stroke (ligenRule* self,
 	lialg_array_remove (&self->strokes, index);
 }
 
+int
+ligen_rule_set_name (ligenRule*  self,
+                     const char* value)
+{
+	char* tmp;
+
+	tmp = strdup (value);
+	if (tmp == NULL)
+		return 0;
+	free (self->name);
+	self->name = tmp;
+
+	return 1;
+}
+
 /** @} */
 /** @} */

@@ -94,6 +94,10 @@ int
 ligen_brush_write (ligenBrush* self,
                    liarcSql*   sql);
 
+int
+ligen_brush_set_name (ligenBrush* self,
+                      const char* value);
+
 void
 ligen_brush_set_voxel (ligenBrush* self,
                        int         x,

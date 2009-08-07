@@ -139,7 +139,8 @@ static int
 private_init (liwdgEntry*   self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_ACTIVATED, lical_marshal_DATA))
+	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_ACTIVATED, lical_marshal_DATA) ||
+	    !liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_EDITED, lical_marshal_DATA))
 		return 0;
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->editable = 1;
@@ -217,6 +218,7 @@ private_event (liwdgEntry* self,
 					}
 					free (str);
 					private_rebuild (self);
+					lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_EDITED);
 				}
 			}
 			return 0;
@@ -284,6 +286,7 @@ private_backspace (liwdgEntry* self)
 	/* Discard the last character. */
 	self->string[len0 - len1] = '\0';
 	private_rebuild (self);
+	lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_EDITED);
 }
 
 static void

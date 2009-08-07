@@ -66,8 +66,9 @@ struct _liextDialog
 		liwdgWidget* button_move_up;
 		liwdgWidget* button_move_down;
 		liwdgWidget* button_add;
-		liwdgWidget* button_edit;
 		liwdgWidget* button_remove;
+		liwdgWidget* entry_name;
+		liwdgWidget* label_type;
 		liwdgWidget* preview;
 	} widgets;
 };
