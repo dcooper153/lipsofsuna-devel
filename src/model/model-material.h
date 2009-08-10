@@ -27,53 +27,7 @@
 
 #include <string.h>
 #include <archive/lips-archive.h>
-
-typedef int limdlTextureFlags;
-typedef int limdlTextureType;
-
-enum
-{
-	LIMDL_TEXTURE_FLAG_BILINEAR = 0x01,
-	LIMDL_TEXTURE_FLAG_CLAMP    = 0x02,
-	LIMDL_TEXTURE_FLAG_MIPMAP   = 0x04,
-	LIMDL_TEXTURE_FLAG_REPEAT   = 0x08
-};
-
-enum
-{
-	LIMDL_TEXTURE_TYPE_EMPTY,
-	LIMDL_TEXTURE_TYPE_ENVMAP,
-	LIMDL_TEXTURE_TYPE_IMAGE
-};
-
-/*****************************************************************************/
-
-typedef struct _limdlTexture limdlTexture;
-struct _limdlTexture
-{
-	limdlTextureType type;
-	limdlTextureFlags flags;
-	int width;
-	int height;
-	char* string;
-};
-
-static inline int
-limdl_texture_compare (const limdlTexture* self,
-                       const limdlTexture* texture)
-{
-	if (self->type != texture->type ||
-	    self->flags != texture->flags ||
-	    self->width != texture->width ||
-	    self->height != texture->height)
-		return 0;
-	if (strcmp (self->string, texture->string))
-		return 0;
-
-	return 1;
-}
-
-/*****************************************************************************/
+#include "model-texture.h"
 
 typedef struct _limdlMaterial limdlMaterial;
 struct _limdlMaterial
@@ -97,6 +51,9 @@ struct _limdlMaterial
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int
+limdl_material_init (limdlMaterial* self);
 
 int
 limdl_material_init_copy (limdlMaterial*       self,

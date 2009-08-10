@@ -180,7 +180,7 @@ ligen_brush_remove_rule (ligenBrush* self,
 
 	for (i = 0 ; i < self->rules.count ; i++)
 	{
-		rule = self->rules.array[index];
+		rule = self->rules.array[i];
 		rule->id = i;
 	}
 }
@@ -216,8 +216,7 @@ ligen_brush_remove_strokes (ligenBrush* self,
 		}
 		if (!rule->strokes.count)
 		{
-			ligen_rule_free (rule);
-			lialg_array_remove (&self->rules, i);
+			ligen_brush_remove_rule (self, i);
 			i--;
 		}
 	}

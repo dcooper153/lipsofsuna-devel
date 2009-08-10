@@ -115,14 +115,15 @@ private_packet (liextModule* self,
                 int          type,
                 liReader*    reader)
 {
+	reader->pos = 1;
 	switch (type)
 	{
 		case LIEXT_SKILLS_PACKET_RESET:
 			private_packet_reset (self, reader);
-			return 0;
+			break;
 		case LIEXT_SKILLS_PACKET_DIFF:
 			private_packet_diff (self, reader);
-			return 0;
+			break;
 	}
 
 	return 1;

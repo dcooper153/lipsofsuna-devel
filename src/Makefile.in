@@ -132,7 +132,8 @@ am__objects_13 = liblipsofsunaclient_la-model.lo \
 	liblipsofsunaclient_la-model-light.lo \
 	liblipsofsunaclient_la-model-material.lo \
 	liblipsofsunaclient_la-model-node.lo \
-	liblipsofsunaclient_la-model-pose.lo
+	liblipsofsunaclient_la-model-pose.lo \
+	liblipsofsunaclient_la-model-texture.lo
 am__objects_14 = liblipsofsunaclient_la-network.lo
 am__objects_15 = liblipsofsunaclient_la-particle-line.lo \
 	liblipsofsunaclient_la-particle-manager.lo \
@@ -221,7 +222,9 @@ am__objects_28 = liblipsofsunaclient_la-widget.lo \
 	liblipsofsunaclient_la-widget-menugroup.lo \
 	liblipsofsunaclient_la-widget-progress.lo \
 	liblipsofsunaclient_la-widget-render.lo \
+	liblipsofsunaclient_la-widget-scroll.lo \
 	liblipsofsunaclient_la-widget-spin.lo \
+	liblipsofsunaclient_la-widget-tree.lo \
 	liblipsofsunaclient_la-widget-window.lo
 am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
@@ -273,7 +276,8 @@ am__objects_36 = liblipsofsunaserver_la-model.lo \
 	liblipsofsunaserver_la-model-light.lo \
 	liblipsofsunaserver_la-model-material.lo \
 	liblipsofsunaserver_la-model-node.lo \
-	liblipsofsunaserver_la-model-pose.lo
+	liblipsofsunaserver_la-model-pose.lo \
+	liblipsofsunaserver_la-model-texture.lo
 am__objects_37 = liblipsofsunaserver_la-network.lo
 am__objects_38 = liblipsofsunaserver_la-physics.lo \
 	liblipsofsunaserver_la-physics-object.lo \
@@ -780,6 +784,8 @@ mdlsrc = \
 	model/model-node.h \
 	model/model-pose.c \
 	model/model-pose.h \
+	model/model-texture.c \
+	model/model-texture.h \
 	model/model-types.h \
 	model/model-vertex.h
 
@@ -1015,8 +1021,12 @@ wdgsrc = \
 	widget/widget-progress.h \
 	widget/widget-render.c \
 	widget/widget-render.h \
+	widget/widget-scroll.c \
+	widget/widget-scroll.h \
 	widget/widget-spin.c \
 	widget/widget-spin.h \
+	widget/widget-tree.c \
+	widget/widget-tree.h \
 	widget/widget-types.h \
 	widget/widget-window.c \
 	widget/widget-window.h
@@ -1290,6 +1300,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-pose.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-particle-line.Plo@am__quote@
@@ -1379,7 +1390,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-menugroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-progress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-render.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-scroll.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-spin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-widget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-ai-path-solver.Plo@am__quote@
@@ -1416,6 +1429,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-pose.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-paths.Plo@am__quote@
@@ -1954,6 +1968,13 @@ liblipsofsunaclient_la-model-pose.lo: model/model-pose.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-pose.c' object='liblipsofsunaclient_la-model-pose.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-model-pose.lo `test -f 'model/model-pose.c' || echo '$(srcdir)/'`model/model-pose.c
+
+liblipsofsunaclient_la-model-texture.lo: model/model-texture.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-model-texture.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-model-texture.Tpo -c -o liblipsofsunaclient_la-model-texture.lo `test -f 'model/model-texture.c' || echo '$(srcdir)/'`model/model-texture.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-model-texture.Tpo $(DEPDIR)/liblipsofsunaclient_la-model-texture.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-texture.c' object='liblipsofsunaclient_la-model-texture.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-model-texture.lo `test -f 'model/model-texture.c' || echo '$(srcdir)/'`model/model-texture.c
 
 liblipsofsunaclient_la-network.lo: network/network.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-network.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-network.Tpo -c -o liblipsofsunaclient_la-network.lo `test -f 'network/network.c' || echo '$(srcdir)/'`network/network.c
@@ -2543,12 +2564,26 @@ liblipsofsunaclient_la-widget-render.lo: widget/widget-render.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-render.lo `test -f 'widget/widget-render.c' || echo '$(srcdir)/'`widget/widget-render.c
 
+liblipsofsunaclient_la-widget-scroll.lo: widget/widget-scroll.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-widget-scroll.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-widget-scroll.Tpo -c -o liblipsofsunaclient_la-widget-scroll.lo `test -f 'widget/widget-scroll.c' || echo '$(srcdir)/'`widget/widget-scroll.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-widget-scroll.Tpo $(DEPDIR)/liblipsofsunaclient_la-widget-scroll.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-scroll.c' object='liblipsofsunaclient_la-widget-scroll.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-scroll.lo `test -f 'widget/widget-scroll.c' || echo '$(srcdir)/'`widget/widget-scroll.c
+
 liblipsofsunaclient_la-widget-spin.lo: widget/widget-spin.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-widget-spin.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-widget-spin.Tpo -c -o liblipsofsunaclient_la-widget-spin.lo `test -f 'widget/widget-spin.c' || echo '$(srcdir)/'`widget/widget-spin.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-widget-spin.Tpo $(DEPDIR)/liblipsofsunaclient_la-widget-spin.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-spin.c' object='liblipsofsunaclient_la-widget-spin.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-spin.lo `test -f 'widget/widget-spin.c' || echo '$(srcdir)/'`widget/widget-spin.c
+
+liblipsofsunaclient_la-widget-tree.lo: widget/widget-tree.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-widget-tree.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-widget-tree.Tpo -c -o liblipsofsunaclient_la-widget-tree.lo `test -f 'widget/widget-tree.c' || echo '$(srcdir)/'`widget/widget-tree.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-widget-tree.Tpo $(DEPDIR)/liblipsofsunaclient_la-widget-tree.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='widget/widget-tree.c' object='liblipsofsunaclient_la-widget-tree.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-widget-tree.lo `test -f 'widget/widget-tree.c' || echo '$(srcdir)/'`widget/widget-tree.c
 
 liblipsofsunaclient_la-widget-window.lo: widget/widget-window.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-widget-window.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-widget-window.Tpo -c -o liblipsofsunaclient_la-widget-window.lo `test -f 'widget/widget-window.c' || echo '$(srcdir)/'`widget/widget-window.c
@@ -2801,6 +2836,13 @@ liblipsofsunaserver_la-model-pose.lo: model/model-pose.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-pose.c' object='liblipsofsunaserver_la-model-pose.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaserver_la-model-pose.lo `test -f 'model/model-pose.c' || echo '$(srcdir)/'`model/model-pose.c
+
+liblipsofsunaserver_la-model-texture.lo: model/model-texture.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaserver_la-model-texture.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaserver_la-model-texture.Tpo -c -o liblipsofsunaserver_la-model-texture.lo `test -f 'model/model-texture.c' || echo '$(srcdir)/'`model/model-texture.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaserver_la-model-texture.Tpo $(DEPDIR)/liblipsofsunaserver_la-model-texture.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='model/model-texture.c' object='liblipsofsunaserver_la-model-texture.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaserver_la-model-texture.lo `test -f 'model/model-texture.c' || echo '$(srcdir)/'`model/model-texture.c
 
 liblipsofsunaserver_la-network.lo: network/network.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaserver_la-network.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaserver_la-network.Tpo -c -o liblipsofsunaserver_la-network.lo `test -f 'network/network.c' || echo '$(srcdir)/'`network/network.c

@@ -428,7 +428,7 @@ ligen_generator_write (ligenGenerator* self)
 	sqlite3_stmt* statement;
 
 	/* Save geometry. */
-	livox_manager_write (self->voxels, self->srvsql);
+	livox_manager_write (self->voxels);
 
 	/* Remove old objects. */
 	query = "DELETE FROM objects;";
@@ -782,6 +782,9 @@ private_init_sql (ligenGenerator* self)
 		return 0;
 	}
 	free (path);
+
+	/* Use for loading and saving voxel data. */
+	livox_manager_set_sql (self->voxels, self->srvsql);
 
 	/* Format path. */
 	path = lipth_paths_get_data (self->paths, "generator.db");

@@ -15,28 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_WIDGET_H__
-#define __LIPS_WIDGET_H__
+/**
+ * \addtogroup limdl Model
+ * @{
+ * \addtogroup limdlTexture Texture
+ * @{
+ */
 
-#include "widget.h"
-#include "widget-button.h"
-#include "widget-busy.h"
-#include "widget-check.h"
-#include "widget-class.h"
-#include "widget-entry.h"
-#include "widget-event.h"
-#include "widget-group.h"
-#include "widget-image.h"
-#include "widget-label.h"
-#include "widget-manager.h"
-#include "widget-menu.h"
-#include "widget-menugroup.h"
-#include "widget-progress.h"
-#include "widget-render.h"
-#include "widget-scroll.h"
-#include "widget-spin.h"
-#include "widget-tree.h"
-#include "widget-types.h"
-#include "widget-window.h"
+#include "model-texture.h"
 
-#endif
+int
+limdl_texture_compare (const limdlTexture* self,
+                       const limdlTexture* texture)
+{
+	if (self->type != texture->type ||
+	    self->flags != texture->flags ||
+	    self->width != texture->width ||
+	    self->height != texture->height)
+		return 0;
+	if (strcmp (self->string, texture->string))
+		return 0;
+
+	return 1;
+}
+
+int
+limdl_texture_set_string (limdlTexture* self,
+                          const char*   value)
+{
+	char* tmp;
+
+	tmp = strdup (value);
+	if (tmp == NULL)
+		return 0;
+	free (self->string);
+	self->string = tmp;
+
+	return 1;
+}
+
+/** @} */
+/** @} */

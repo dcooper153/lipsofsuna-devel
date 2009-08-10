@@ -39,11 +39,14 @@ struct _livoxMaterial
 };
 
 livoxMaterial*
-livox_material_new (liarcSql*     sql,
-                    sqlite3_stmt* stmt);
+livox_material_new ();
 
 livoxMaterial*
 livox_material_new_copy (const livoxMaterial* src);
+
+livoxMaterial*
+livox_material_new_from_sql (liarcSql*     sql,
+                             sqlite3_stmt* stmt);
 
 livoxMaterial*
 livox_material_new_from_stream (liReader* reader);
@@ -52,8 +55,20 @@ void
 livox_material_free (livoxMaterial* self);
 
 int
+livox_material_append_texture (livoxMaterial* self,
+                               const char*    string);
+
+void
+livox_material_remove_texture (livoxMaterial* self,
+                               int            index);
+
+int
 livox_material_write_to_stream (livoxMaterial* self,
                                 liarcWriter*   writer);
+
+int
+livox_material_set_name (livoxMaterial* self,
+                         const char*    value);
 
 #endif
 

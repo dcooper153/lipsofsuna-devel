@@ -173,7 +173,7 @@ livox_manager_color_voxel (livoxManager*      self,
 	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
-		sector = livox_manager_find_sector (self, rangei0.index);
+		sector = livox_manager_load_sector (self, rangei0.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -257,7 +257,7 @@ livox_manager_copy_voxels (livoxManager* self,
 		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		idx = LIVOX_SECTOR_INDEX (sx, sy, sz);
-		sec = livox_manager_find_sector (self, idx);
+		sec = livox_manager_load_sector (self, idx);
 		if (sec != NULL)
 		{
 			result[i] = livox_sector_get_voxel (sec,
@@ -307,7 +307,7 @@ livox_manager_erase_box (livoxManager*      self,
 	range = lieng_range_new_from_aabb (min, max, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = livox_manager_find_sector (self, rangeiter.index);
+		sector = livox_manager_load_sector (self, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -361,7 +361,7 @@ livox_manager_erase_point (livoxManager*      self,
 	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
-		sector = livox_manager_find_sector (self, rangei0.index);
+		sector = livox_manager_load_sector (self, rangei0.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -448,7 +448,7 @@ livox_manager_erase_sphere (livoxManager*      self,
 	range = lieng_range_new_from_sphere (center, radius, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = livox_manager_find_sector (self, rangeiter.index);
+		sector = livox_manager_load_sector (self, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -485,7 +485,7 @@ livox_manager_erase_voxel (livoxManager*      self,
 	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
-		sector = livox_manager_find_sector (self, rangei0.index);
+		sector = livox_manager_load_sector (self, rangei0.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -542,7 +542,7 @@ livox_manager_fill_box (livoxManager*      self,
 	range = lieng_range_new_from_aabb (min, max, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = livox_manager_find_sector (self, rangeiter.index);
+		sector = livox_manager_load_sector (self, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -597,7 +597,7 @@ livox_manager_fill_point (livoxManager*      self,
 	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
-		sector = livox_manager_find_sector (self, rangei0.index);
+		sector = livox_manager_load_sector (self, rangei0.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -701,7 +701,7 @@ livox_manager_fill_sphere (livoxManager*      self,
 	range = lieng_range_new_from_sphere (center, radius, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangeiter, range)
 	{
-		sector = livox_manager_find_sector (self, rangeiter.index);
+		sector = livox_manager_load_sector (self, rangeiter.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -739,7 +739,7 @@ livox_manager_fill_voxel (livoxManager*      self,
 	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
-		sector = livox_manager_find_sector (self, rangei0.index);
+		sector = livox_manager_load_sector (self, rangei0.index);
 		if (sector == NULL)
 			continue;
 		livox_sector_get_origin (sector, &origin);
@@ -829,24 +829,28 @@ livox_manager_insert_material (livoxManager*  self,
  * \brief Loads materials from an SQL database.
  *
  * \brief Voxel manager.
- * \param sql Database.
  * \return Nonzero on success.
  */
 int
-livox_manager_load_materials (livoxManager* self,
-                              liarcSql*     sql)
+livox_manager_load_materials (livoxManager* self)
 {
 	int ret;
 	const char* query;
 	livoxMaterial* material;
 	sqlite3_stmt* statement;
 
+	if (self->sql == NULL)
+	{
+		lisys_error_set (EINVAL, "no database");
+		return 0;
+	}
+
 	/* Prepare statement. */
 	query = "SELECT id,flags,fric,scal,shi,dif0,dif1,dif2,dif3,spe0,spe1,"
 		"spe2,spe3,name,shdr FROM voxel_materials;";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 
@@ -856,13 +860,13 @@ livox_manager_load_materials (livoxManager* self,
 		/* Check for errors. */
 		if (ret != SQLITE_ROW)
 		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->sql));
 			sqlite3_finalize (statement);
 			return 0;
 		}
 
 		/* Read material. */
-		material = livox_material_new (sql, statement);
+		material = livox_material_new_from_sql (self->sql, statement);
 		if (material == NULL)
 		{
 			sqlite3_finalize (statement);
@@ -884,7 +888,7 @@ livox_manager_load_materials (livoxManager* self,
 }
 
 /**
- * \brief Loads a sector from an SQL database.
+ * \brief Loads a sector from the SQL database.
  *
  * If a sector with the same number already exists, no loading takes place.
  * If a sector with the requested ID cannot be found from the database,
@@ -892,13 +896,11 @@ livox_manager_load_materials (livoxManager* self,
  *
  * \brief Voxel manager.
  * \param id Sector index.
- * \param sql Database.
  * \return Sector owned by the manager or NULL.
  */
 livoxSector*
 livox_manager_load_sector (livoxManager* self,
-                           uint32_t      id,
-                           liarcSql*     sql)
+                           uint32_t      id)
 {
 	livoxSector* sector;
 
@@ -908,7 +910,8 @@ livox_manager_load_sector (livoxManager* self,
 	sector = livox_sector_new (self, id);
 	if (sector == NULL)
 		return NULL;
-	livox_sector_read (sector, sql);
+	if (self->sql != NULL)
+		livox_sector_read (sector, self->sql);
 
 	return sector;
 }
@@ -984,6 +987,20 @@ livox_manager_mark_updates (livoxManager* self)
 }
 
 void
+livox_manager_remove_material (livoxManager* self,
+                               int           id)
+{
+	livoxMaterial* material;
+
+	material = lialg_u32dic_find (self->materials, id);
+	if (material != NULL)
+	{
+		lialg_u32dic_remove (self->materials, id);
+		livox_material_free (material);
+	}
+}
+
+void
 livox_manager_update (livoxManager* self,
                       float         secs)
 {
@@ -1024,16 +1041,20 @@ livox_manager_update_marked (livoxManager* self)
  * \brief Writes all the sectors to the database.
  *
  * \param self Voxel manager.
- * \param sql Database.
  * \return Nonzero on success.
  */
 int
-livox_manager_write (livoxManager* self,
-                     liarcSql*     sql)
+livox_manager_write (livoxManager* self)
 {
 	const char* query;
 	sqlite3_stmt* statement;
 	lialgU32dicIter iter;
+
+	if (self->sql == NULL)
+	{
+		lisys_error_set (EINVAL, "no database");
+		return 0;
+	}
 
 	/* Create material table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
@@ -1041,14 +1062,14 @@ livox_manager_write (livoxManager* self,
 		"fric REAL,scal REAL,shi REAL,"
 		"dif0 REAL,dif1 REAL,dif2 REAL,dif3 REAL,"
 		"spe0 REAL,spe1 REAL,spe2 REAL,spe3 REAL,name TEXT,shdr TEXT);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}
@@ -1058,14 +1079,14 @@ livox_manager_write (livoxManager* self,
 	query = "CREATE TABLE IF NOT EXISTS voxel_textures "
 		"(mat INTEGER REFERENCES voxel_materials(id),"
 		"unit UNSIGNED INTEGER,flags UNSIGNED INTEGER,name TEXT);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}
@@ -1074,14 +1095,14 @@ livox_manager_write (livoxManager* self,
 	/* Create sector table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
 		"(id INTEGER PRIMARY KEY,data BLOB);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
 		return 0;
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (sql));
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}
@@ -1090,18 +1111,25 @@ livox_manager_write (livoxManager* self,
 	/* Save materials. */
 /*	LI_FOREACH_ASSOCID (iter, self->materials)
 	{
-		if (!liext_material_write (iter.value, sql))
+		if (!liext_material_write (iter.value, self->sql))
 			return 0;
 	}*/
 
 	/* Save terrain. */
 	LI_FOREACH_U32DIC (iter, self->sectors)
 	{
-		if (!livox_sector_write (iter.value, sql))
+		if (!livox_sector_write (iter.value, self->sql))
 			return 0;
 	}
 
 	return 1;
+}
+
+void
+livox_manager_set_sql (livoxManager* self,
+                       liarcSql*     sql)
+{
+	self->sql = sql;
 }
 
 /*****************************************************************************/

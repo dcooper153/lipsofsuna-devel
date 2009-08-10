@@ -31,6 +31,83 @@ private_read_textures (livoxMaterial* self,
 /*****************************************************************************/
 
 /**
+ * \brief Creates a new material.
+ *
+ * \return New material or NULL.
+ */
+livoxMaterial*
+livox_material_new ()
+{
+	livoxMaterial* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (livoxMaterial));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+
+	/* Allocate name. */
+	self->name = strdup ("");
+	if (self->name == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (self);
+		return NULL;
+	}
+
+	/* Initialize material. */
+	if (!limdl_material_init (&self->model))
+	{
+		free (self->name);
+		free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Creates a copy of a material.
+ *
+ * \param src Material to copy.
+ * \return Soft copy of the material or NULL.
+ */
+livoxMaterial*
+livox_material_new_copy (const livoxMaterial* src)
+{
+	livoxMaterial* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (livoxMaterial));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->id = src->id;
+	self->friction = src->friction;
+	self->scale = src->scale;
+	self->model = src->model;
+	self->name = strdup (src->name);
+	if (self->name == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (self);
+		return NULL;
+	}
+	if (!limdl_material_init_copy (&self->model, &src->model))
+	{
+		free (self->name);
+		free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
  * \brief Deserializes a material from an SQL statement.
  *
  * \param sql SQL database.
@@ -38,8 +115,8 @@ private_read_textures (livoxMaterial* self,
  * \return New material or NULL.
  */
 livoxMaterial*
-livox_material_new (liarcSql*     sql,
-                    sqlite3_stmt* stmt)
+livox_material_new_from_sql (liarcSql*     sql,
+                             sqlite3_stmt* stmt)
 {
 	int col;
 	int size;
@@ -109,45 +186,6 @@ livox_material_new (liarcSql*     sql,
 }
 
 /**
- * \brief Creates a copy of a material.
- *
- * \param src Material to copy.
- * \return Soft copy of the material or NULL.
- */
-livoxMaterial*
-livox_material_new_copy (const livoxMaterial* src)
-{
-	livoxMaterial* self;
-
-	/* Allocate self. */
-	self = calloc (1, sizeof (livoxMaterial));
-	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		return NULL;
-	}
-	self->id = src->id;
-	self->friction = src->friction;
-	self->scale = src->scale;
-	self->model = src->model;
-	self->name = strdup (src->name);
-	if (self->name == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
-		return NULL;
-	}
-	if (!limdl_material_init_copy (&self->model, &src->model))
-	{
-		free (self->name);
-		free (self);
-		return NULL;
-	}
-
-	return self;
-}
-
-/**
  * \brief Deserializes a material from a stream.
  *
  * \param reader Stream reader.
@@ -198,6 +236,50 @@ livox_material_free (livoxMaterial* self)
 }
 
 /**
+ * \brief Appends a new texture to the material.
+ *
+ * \param self Material.
+ * \param string Texture string.
+ * \return Nonzero on success.
+ */
+int
+livox_material_append_texture (livoxMaterial* self,
+                               const char*    string)
+{
+	int i;
+	int flags;
+
+	i = self->model.textures.count;
+	if (!limdl_material_realloc_textures (&self->model, i + 1))
+		return 0;
+	flags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
+	if (!limdl_material_set_texture (&self->model, i, LIMDL_TEXTURE_TYPE_IMAGE, flags, string))
+	{
+		limdl_material_realloc_textures (&self->model, i);
+		return 0;
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Removes a texture from the material.
+ *
+ * \param self Material.
+ * \param index Texture index.
+ */
+void
+livox_material_remove_texture (livoxMaterial* self,
+                               int            index)
+{
+	assert (index >= 0);
+	assert (index < self->model.textures.count);
+
+	free (self->model.textures.array[index].string);
+	lialg_array_remove (&self->model.textures, index);
+}
+
+/**
  * \brief Serializes the material to a stream.
  *
  * \param self Material.
@@ -214,6 +296,21 @@ livox_material_write_to_stream (livoxMaterial* self,
 	       liarc_writer_append_float (writer, self->friction) &&
 	       liarc_writer_append_float (writer, self->scale) &&
 	       limdl_material_write (&self->model, writer);
+}
+
+int
+livox_material_set_name (livoxMaterial* self,
+                         const char*    value)
+{
+	char* tmp;
+
+	tmp = strdup (value);
+	if (tmp == NULL)
+		return 0;
+	free (self->name);
+	self->name = tmp;
+
+	return 1;
 }
 
 /*****************************************************************************/

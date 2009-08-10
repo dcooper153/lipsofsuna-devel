@@ -92,6 +92,7 @@ liext_preview_new (liwdgManager* manager,
 		return NULL;
 	}
 	ligen_generator_set_fill (data->generator, -1);
+	livox_manager_set_sql (data->generator->voxels, NULL);
 
 	/* Create camera. */
 	data->camera = lieng_camera_new (module->engine);
@@ -133,27 +134,28 @@ liext_preview_build (liextPreview* self)
 }
 
 int
+liext_preview_build_box (liextPreview* self,
+                         int           xs,
+                         int           ys,
+                         int           zs,
+                         int           material)
+{
+	limatVector min;
+	limatVector max;
+
+	min = limat_vector_init (0.0f, 0.0f, 0.0f);
+	max = limat_vector_init (xs * LIVOX_TILE_WIDTH, ys * LIVOX_TILE_WIDTH, zs * LIVOX_TILE_WIDTH);
+	livox_manager_clear (self->generator->voxels);
+	livox_manager_fill_box (self->generator->voxels, &min, &max, material);
+	livox_manager_update (self->generator->voxels, 1.0f);
+
+	return 1;
+}
+
+int
 liext_preview_clear (liextPreview* self)
 {
-	lialgU32dicIter iter;
-	livoxMaterial* material;
-
-	/* Clear scene and materials. */
 	ligen_generator_clear_scene (self->generator);
-	livox_manager_clear_materials (self->generator->voxels);
-
-	/* Copy materials. */
-	LI_FOREACH_U32DIC (iter, self->module->voxels->materials)
-	{
-		material = livox_material_new_copy (iter.value);
-		if (material == NULL)
-			return 0;
-		if (!livox_manager_insert_material (self->generator->voxels, material))
-		{
-			livox_material_free (material);
-			return 0;
-		}
-	}
 
 	return 1;
 }
@@ -169,6 +171,28 @@ liext_preview_insert_stroke (liextPreview* self,
 		LIEXT_PREVIEW_CENTER + x,
 		LIEXT_PREVIEW_CENTER + y,
 		LIEXT_PREVIEW_CENTER + z);
+}
+
+int
+liext_preview_replace_materials (liextPreview* self)
+{
+	lialgU32dicIter iter;
+	livoxMaterial* material;
+
+	livox_manager_clear_materials (self->generator->voxels);
+	LI_FOREACH_U32DIC (iter, self->module->voxels->materials)
+	{
+		material = livox_material_new_copy (iter.value);
+		if (material == NULL)
+			return 0;
+		if (!livox_manager_insert_material (self->generator->voxels, material))
+		{
+			livox_material_free (material);
+			return 0;
+		}
+	}
+
+	return 1;
 }
 
 /****************************************************************************/

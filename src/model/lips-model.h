@@ -27,6 +27,7 @@
 #include "model-node.h"
 #include "model-light.h"
 #include "model-pose.h"
+#include "model-texture.h"
 #include "model-vertex.h"
 
 #endif

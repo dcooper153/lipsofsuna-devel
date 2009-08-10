@@ -33,10 +33,12 @@
 
 typedef struct _liextDialog liextDialog;
 typedef struct _liextDialogBrush liextDialogBrush;
+typedef struct _liextMaterials liextMaterials;
 typedef struct _liextModule liextModule;
 
 struct _liextModule
 {
+	licalHandle calls[1];
 	licliModule* module;
 	liwdgWidget* dialog;
 };

@@ -180,6 +180,8 @@ mdlsrc = \
 	model/model-node.h \
 	model/model-pose.c \
 	model/model-pose.h \
+	model/model-texture.c \
+	model/model-texture.h \
 	model/model-types.h \
 	model/model-vertex.h
 netsrc = \
@@ -399,8 +401,12 @@ wdgsrc = \
 	widget/widget-progress.h \
 	widget/widget-render.c \
 	widget/widget-render.h \
+	widget/widget-scroll.c \
+	widget/widget-scroll.h \
 	widget/widget-spin.c \
 	widget/widget-spin.h \
+	widget/widget-tree.c \
+	widget/widget-tree.h \
 	widget/widget-types.h \
 	widget/widget-window.c \
 	widget/widget-window.h

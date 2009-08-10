@@ -185,6 +185,7 @@ private_packet (liextModule* self,
 {
 	liscrData* data0;
 
+	reader->pos = 1;
 	data0 = liscr_packet_new_readable (self->module->script, reader);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
 		"message", LISCR_TYPE_INT, type,

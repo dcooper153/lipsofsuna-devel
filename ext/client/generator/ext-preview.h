@@ -57,6 +57,13 @@ void
 liext_preview_build (liextPreview* self);
 
 int
+liext_preview_build_box (liextPreview* self,
+                         int           xs,
+                         int           ys,
+                         int           zs,
+                         int           material);
+
+int
 liext_preview_clear (liextPreview* self);
 
 int
@@ -65,6 +72,9 @@ liext_preview_insert_stroke (liextPreview* self,
                              int           y,
                              int           z,
                              int           brush);
+
+int
+liext_preview_replace_materials (liextPreview* self);
 
 #endif
 

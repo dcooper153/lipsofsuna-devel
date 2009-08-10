@@ -25,6 +25,39 @@
 #include "model-material.h"
 
 /**
+ * \brief Initializes a default material.
+ *
+ * \param self Material.
+ * \return Nonzero on success.
+ */
+int
+limdl_material_init (limdlMaterial* self)
+{
+	self->shader = strdup ("default");
+	if (self->shader == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	self->flags = 0;
+	self->emission = 0.0f;
+	self->shininess = 1.0f;
+	self->diffuse[0] = 1.0f;
+	self->diffuse[1] = 1.0f;
+	self->diffuse[2] = 1.0f;
+	self->diffuse[3] = 1.0f;
+	self->specular[0] = 1.0f;
+	self->specular[1] = 1.0f;
+	self->specular[2] = 1.0f;
+	self->specular[3] = 1.0f;
+	self->strand_start = 0.1f;
+	self->strand_end = 0.0f;
+	self->strand_shape = 0.5f;
+
+	return 1;
+}
+
+/**
  * \brief Initializes a copy of a material.
  *
  * \param self Copy destination.

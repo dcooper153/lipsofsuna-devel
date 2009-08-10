@@ -36,6 +36,7 @@ struct _livoxManager
 {
 	lialgU32dic* materials;
 	lialgU32dic* sectors;
+	liarcSql* sql;
 	liphyPhysics* physics;
 #ifndef LIVOX_DISABLE_GRAPHICS
 	lirndApi* renderapi;
@@ -135,16 +136,18 @@ livox_manager_insert_material (livoxManager*  self,
                                livoxMaterial* material);
 
 int
-livox_manager_load_materials (livoxManager* self,
-                              liarcSql*     sql);
+livox_manager_load_materials (livoxManager* self);
 
 livoxSector*
 livox_manager_load_sector (livoxManager* self,
-                           uint32_t      id,
-                           liarcSql*     sql);
+                           uint32_t      id);
 
 void
 livox_manager_mark_updates (livoxManager* self);
+
+void
+livox_manager_remove_material (livoxManager* self,
+                               int           id);
 
 void
 livox_manager_update (livoxManager* self,
@@ -154,8 +157,11 @@ void
 livox_manager_update_marked (livoxManager* self);
 
 int
-livox_manager_write (livoxManager* self,
-                     liarcSql*     sql);
+livox_manager_write (livoxManager* self);
+
+void
+livox_manager_set_sql (livoxManager* self,
+                       liarcSql*     sql);
 
 #endif
 

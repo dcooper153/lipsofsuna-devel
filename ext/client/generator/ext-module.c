@@ -28,6 +28,13 @@
 #include "ext-dialog.h"
 #include "ext-module.h"
 
+static int
+private_packet (liextModule* self,
+                int          type,
+                liReader*    reader);
+
+/*****************************************************************************/
+
 licliExtensionInfo liextInfo =
 {
 	LICLI_EXTENSION_VERSION, "Generator",
@@ -56,6 +63,16 @@ liext_module_new (licliModule* module)
 	liwdg_manager_insert_window (module->widgets, self->dialog);
 	liwdg_widget_set_visible (self->dialog, 0);
 
+	/* Register callbacks. */
+	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 100,
+	     	private_packet, self, self->calls + 0))
+	{
+		liwdg_manager_remove_window (self->module->widgets, self->dialog);
+		liwdg_widget_free (self->dialog);
+		free (self);
+		return NULL;
+	}
+
 	/* Register scripts. */
 	liscr_script_create_class (module->script, "Generator", liextGeneratorScript, self);
 
@@ -65,6 +82,10 @@ liext_module_new (licliModule* module)
 void
 liext_module_free (liextModule* self)
 {
+	/* Remove callbacks. */
+	lieng_engine_remove_calls (self->module->engine, self->calls,
+		sizeof (self->calls) / sizeof (licalHandle));
+
 	/* FIXME: Remove the class here. */
 	liwdg_manager_remove_window (self->module->widgets, self->dialog);
 	liwdg_widget_free (self->dialog);
@@ -75,6 +96,20 @@ int
 liext_module_save (liextModule* self)
 {
 	return liext_dialog_save (LIEXT_DIALOG (self->dialog));
+}
+
+/*****************************************************************************/
+
+static int
+private_packet (liextModule* self,
+                int          type,
+                liReader*    reader)
+{
+	reader->pos = 1;
+	if (type == LIEXT_VOXEL_PACKET_ASSIGN)
+		liext_dialog_reset (LIEXT_DIALOG (self->dialog));
+
+	return 1;
 }
 
 /** @} */

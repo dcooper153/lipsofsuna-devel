@@ -81,6 +81,7 @@ licli_module_handle_packet (licliModule* self,
                             int          type,
                             liReader*    reader)
 {
+	reader->pos = 1;
 	switch (type)
 	{
 		case LINET_SERVER_PACKET_ASSIGN:
@@ -109,12 +110,13 @@ licli_module_handle_packet (licliModule* self,
 			return 0;
 		case LIEXT_VOXEL_PACKET_ASSIGN:
 			private_voxel_assign (self, reader);
-			return 0;
+			break;
 		case LIEXT_VOXEL_PACKET_DIFF:
 			private_voxel_diff (self, reader);
 			return 0;
 	}
 
+	reader->pos = 1;
 	return 1;
 }
 

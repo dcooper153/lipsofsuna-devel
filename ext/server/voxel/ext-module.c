@@ -92,7 +92,8 @@ liext_module_new (lisrvServer* server)
 		liext_module_free (self);
 		return NULL;
 	}
-	if (!livox_manager_load_materials (self->voxels, server->sql))
+	livox_manager_set_sql (self->voxels, server->sql);
+	if (!livox_manager_load_materials (self->voxels))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -166,7 +167,7 @@ int
 liext_module_write (liextModule* self,
                     liarcSql*    sql)
 {
-	return livox_manager_write (self->voxels, sql);
+	return livox_manager_write (self->voxels);
 }
 
 /*****************************************************************************/
@@ -264,7 +265,7 @@ private_sector_load (liextModule* self,
 	uint32_t index;
 
 	index = LIVOX_SECTOR_INDEX (sector->x, sector->y, sector->z);
-	livox_manager_load_sector (self->voxels, index, self->server->sql);
+	livox_manager_load_sector (self->voxels, index);
 
 	return 1;
 }

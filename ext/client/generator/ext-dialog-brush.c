@@ -85,6 +85,7 @@ liext_dialog_brush_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
+	liext_preview_replace_materials (LIEXT_PREVIEW (data->preview));
 	liwdg_widget_set_request (data->preview, 320, 240);
 	liwdg_group_set_child (LIWDG_GROUP (data), 0, 2, data->preview);
 	data->generator = LIEXT_PREVIEW (data->preview)->generator;
