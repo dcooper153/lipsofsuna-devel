@@ -115,9 +115,13 @@ liext_materials_new (liwdgManager* manager,
 int
 liext_materials_save (liextMaterials* self)
 {
-	printf ("FIXME: Not implemented\n");
-	//return ligen_generator_write_materials (self->generator);
-	return 1;
+	int ret;
+
+	livox_manager_set_sql (self->generator->voxels, self->generator->srvsql);
+	ret = livox_manager_write_materials (self->generator->voxels);
+	livox_manager_set_sql (self->generator->voxels, NULL);
+
+	return ret;
 }
 
 void
@@ -253,6 +257,7 @@ static int
 private_add (liextMaterials* self,
              liwdgWidget*    widget)
 {
+	int i;
 	liextMaterialsTreerow* row;
 	liextMaterialsTreerow* row1;
 	livoxMaterial* material;
@@ -266,6 +271,16 @@ private_add (liextMaterials* self,
 	if (row == NULL || row->material == NULL)
 	{
 		material = livox_material_new ();
+		if (material == NULL)
+			return 0;
+		for (i = 0 ; i < 256 ; i++)
+		{
+			if (livox_manager_find_material (self->generator->voxels, i) == NULL)
+				break;
+		}
+		if (i == 256)
+			return 0;
+		material->id = i;
 		if (!livox_manager_insert_material (self->generator->voxels, material))
 		{
 			livox_material_free (material);
@@ -304,7 +319,11 @@ private_remove (liextMaterials* self,
 	/* Get active item. */
 	row = private_get_active (self);
 	if (row == NULL || row->material == NULL)
+	{
+#warning FIXME: Abusing this for material saving!
+		liext_materials_save (self);
 		return 0;
+	}
 
 	/* Remove the selected item. */
 	if (row->texture < 0)
@@ -404,6 +423,7 @@ private_selected (liextMaterials* self,
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Material:");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->material->name);
 		liwdg_widget_set_visible (self->widgets.group_scale, 1);
+		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_scale), data->material->scale);
 	}
 	else
 	{
@@ -411,6 +431,7 @@ private_selected (liextMaterials* self,
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Texture:");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), texture->string);
 		liwdg_widget_set_visible (self->widgets.group_scale, 1);
+		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_scale), data->material->scale);
 	}
 
 	/* Rebuild preview. */

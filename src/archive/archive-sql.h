@@ -27,7 +27,29 @@
 
 #include <sqlite3.h>
 
+enum
+{
+	LIARC_SQL_BLOB,
+	LIARC_SQL_FLOAT,
+	LIARC_SQL_INT,
+	LIARC_SQL_TEXT
+};
+
 typedef sqlite3 liarcSql;
+
+int
+liarc_sql_delete (liarcSql*   self,
+                  const char* table);
+
+int
+liarc_sql_insert (liarcSql*   self,
+                  const char* table,
+                              ...);
+
+int
+liarc_sql_replace (liarcSql*   self,
+                   const char* table,
+                               ...);
 
 #endif
 

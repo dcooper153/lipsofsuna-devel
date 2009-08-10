@@ -63,6 +63,10 @@ livox_material_remove_texture (livoxMaterial* self,
                                int            index);
 
 int
+livox_material_write_to_sql (livoxMaterial* self,
+                             liarcSql*      sql);
+
+int
 livox_material_write_to_stream (livoxMaterial* self,
                                 liarcWriter*   writer);
 

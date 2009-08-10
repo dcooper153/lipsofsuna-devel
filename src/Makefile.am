@@ -32,6 +32,8 @@ arcsrc = \
 	archive/archive-tar.h \
 	archive/archive-serialize.c \
 	archive/archive-serialize.h \
+	archive/archive-sql.c \
+	archive/archive-sql.h \
 	archive/archive-writer.c \
 	archive/archive-writer.h
 bndsrc = \

@@ -134,7 +134,7 @@ lialg_u32dic_clear (lialgU32dic* self)
  */
 static inline void*
 lialg_u32dic_find (lialgU32dic* self,
-                     uint32_t      key)
+                   uint32_t     key)
 {
 	lialgU32dicNode tmp;
 	lialgU32dicNode* anode;
@@ -158,7 +158,7 @@ lialg_u32dic_find (lialgU32dic* self,
  */
 static inline lialgU32dicNode*
 lialg_u32dic_find_node (lialgU32dic* self,
-                          uint32_t      key)
+                        uint32_t     key)
 {
 	lialgU32dicNode tmp;
 	lialgBstNode* tnode;
@@ -181,8 +181,8 @@ lialg_u32dic_find_node (lialgU32dic* self,
  */
 static inline lialgU32dicNode*
 lialg_u32dic_insert (lialgU32dic* self,
-                       uint32_t      key,
-                       void*         value)
+                     uint32_t     key,
+                     void*        value)
 {
 	lialgU32dicNode* node;
 
@@ -216,7 +216,7 @@ lialg_u32dic_insert (lialgU32dic* self,
  */
 static inline int
 lialg_u32dic_remove (lialgU32dic* self,
-                       uint32_t      key)
+                     uint32_t     key)
 {
 	lialgBstNode* tnode;
 	lialgU32dicNode* anode;
@@ -253,7 +253,7 @@ lialg_u32dic_remove (lialgU32dic* self,
  */
 static inline void
 lialg_u32dic_remove_node (lialgU32dic*     self,
-                            lialgU32dicNode* node)
+                          lialgU32dicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -266,6 +266,27 @@ lialg_u32dic_remove_node (lialgU32dic*     self,
 	self->size--;
 }
 
+/**
+ * \brief Returns a random unused key.
+ *
+ * \param self Associative array.
+ * \return Unique key.
+ */
+static inline uint32_t
+lialg_u32dic_unique_key (const lialgU32dic* self)
+{
+	uint32_t key;
+
+	for (key = 0 ; !key ; )
+	{
+		key = rand ();
+		if (lialg_u32dic_find ((lialgU32dic*) self, key) != NULL)
+			key = 0;
+	}
+
+	return key;
+}
+
 /*****************************************************************************/
 
 #define LI_FOREACH_U32DIC(iter, assoc) \
@@ -275,7 +296,7 @@ lialg_u32dic_remove_node (lialgU32dic*     self,
 
 static inline void
 lialg_u32dic_iter_start (lialgU32dicIter* self,
-                           lialgU32dic*     assoc)
+                         lialgU32dic*     assoc)
 {
 	self->assoc = assoc;
 	if (assoc->list == NULL)

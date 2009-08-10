@@ -280,6 +280,52 @@ livox_material_remove_texture (livoxMaterial* self,
 }
 
 /**
+ * \brief Serializes the material to a database.
+ *
+ * \param self Material.
+ * \param writer Stream writer.
+ * \return Nonzero on success.
+ */
+int
+livox_material_write_to_sql (livoxMaterial* self,
+                             liarcSql*      sql)
+{
+	int i;
+	limdlTexture* texture;
+
+	if (!liarc_sql_insert (sql, "voxel_materials",
+		"id", LIARC_SQL_INT, self->id,
+		"flags", LIARC_SQL_INT, self->model.flags,
+		"fric", LIARC_SQL_FLOAT, self->friction,
+		"scal", LIARC_SQL_FLOAT, self->scale,
+		"shi", LIARC_SQL_FLOAT, self->model.shininess,
+		"dif0", LIARC_SQL_FLOAT, self->model.diffuse[0],
+		"dif1", LIARC_SQL_FLOAT, self->model.diffuse[1],
+		"dif2", LIARC_SQL_FLOAT, self->model.diffuse[2],
+		"dif3", LIARC_SQL_FLOAT, self->model.diffuse[3],
+		"spe0", LIARC_SQL_FLOAT, self->model.specular[0],
+		"spe1", LIARC_SQL_FLOAT, self->model.specular[1],
+		"spe2", LIARC_SQL_FLOAT, self->model.specular[2],
+		"spe3", LIARC_SQL_FLOAT, self->model.specular[3],
+		"name", LIARC_SQL_TEXT, self->name,
+		"shdr", LIARC_SQL_TEXT, self->model.shader, NULL))
+		return 0;
+
+	for (i = 0 ; i < self->model.textures.count ; i++)
+	{
+		texture = self->model.textures.array + i;
+		if (!liarc_sql_insert (sql, "voxel_textures",
+			"mat", LIARC_SQL_INT, self->id,
+			"unit", LIARC_SQL_INT, i,
+			"flags", LIARC_SQL_INT, texture->flags,
+			"name", LIARC_SQL_TEXT, texture->string, NULL))
+			return 0;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Serializes the material to a stream.
  *
  * \param self Material.

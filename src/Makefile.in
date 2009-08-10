@@ -76,6 +76,7 @@ am__objects_2 = liblipsofsunaclient_la-algorithm-astar.lo \
 	liblipsofsunaclient_la-algorithm-octree.lo
 am__objects_3 = liblipsofsunaclient_la-archive-tar.lo \
 	liblipsofsunaclient_la-archive-serialize.lo \
+	liblipsofsunaclient_la-archive-sql.lo \
 	liblipsofsunaclient_la-archive-writer.lo
 am__objects_4 = liblipsofsunaclient_la-binding.lo \
 	liblipsofsunaclient_la-binding-action.lo \
@@ -251,6 +252,7 @@ am__objects_30 = liblipsofsunaserver_la-algorithm-astar.lo \
 	liblipsofsunaserver_la-algorithm-octree.lo
 am__objects_31 = liblipsofsunaserver_la-archive-tar.lo \
 	liblipsofsunaserver_la-archive-serialize.lo \
+	liblipsofsunaserver_la-archive-sql.lo \
 	liblipsofsunaserver_la-archive-writer.lo
 am__objects_32 = liblipsofsunaserver_la-cal-callbacks.lo \
 	liblipsofsunaserver_la-cal-marshal.lo
@@ -625,6 +627,8 @@ arcsrc = \
 	archive/archive-tar.h \
 	archive/archive-serialize.c \
 	archive/archive-serialize.h \
+	archive/archive-sql.c \
+	archive/archive-sql.h \
 	archive/archive-writer.c \
 	archive/archive-writer.h
 
@@ -1244,6 +1248,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-algorithm-bst.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-algorithm-octree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-archive-serialize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-archive-sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-archive-tar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-archive-writer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaclient_la-binding-action.Plo@am__quote@
@@ -1403,6 +1408,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-algorithm-bst.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-algorithm-octree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-archive-serialize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-archive-sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-archive-tar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-archive-writer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liblipsofsunaserver_la-cal-callbacks.Plo@am__quote@
@@ -1576,6 +1582,13 @@ liblipsofsunaclient_la-archive-serialize.lo: archive/archive-serialize.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='archive/archive-serialize.c' object='liblipsofsunaclient_la-archive-serialize.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-archive-serialize.lo `test -f 'archive/archive-serialize.c' || echo '$(srcdir)/'`archive/archive-serialize.c
+
+liblipsofsunaclient_la-archive-sql.lo: archive/archive-sql.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-archive-sql.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-archive-sql.Tpo -c -o liblipsofsunaclient_la-archive-sql.lo `test -f 'archive/archive-sql.c' || echo '$(srcdir)/'`archive/archive-sql.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaclient_la-archive-sql.Tpo $(DEPDIR)/liblipsofsunaclient_la-archive-sql.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='archive/archive-sql.c' object='liblipsofsunaclient_la-archive-sql.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaclient_la-archive-sql.lo `test -f 'archive/archive-sql.c' || echo '$(srcdir)/'`archive/archive-sql.c
 
 liblipsofsunaclient_la-archive-writer.lo: archive/archive-writer.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaclient_la-archive-writer.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaclient_la-archive-writer.Tpo -c -o liblipsofsunaclient_la-archive-writer.lo `test -f 'archive/archive-writer.c' || echo '$(srcdir)/'`archive/archive-writer.c
@@ -2654,6 +2667,13 @@ liblipsofsunaserver_la-archive-serialize.lo: archive/archive-serialize.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='archive/archive-serialize.c' object='liblipsofsunaserver_la-archive-serialize.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaserver_la-archive-serialize.lo `test -f 'archive/archive-serialize.c' || echo '$(srcdir)/'`archive/archive-serialize.c
+
+liblipsofsunaserver_la-archive-sql.lo: archive/archive-sql.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaserver_la-archive-sql.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaserver_la-archive-sql.Tpo -c -o liblipsofsunaserver_la-archive-sql.lo `test -f 'archive/archive-sql.c' || echo '$(srcdir)/'`archive/archive-sql.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/liblipsofsunaserver_la-archive-sql.Tpo $(DEPDIR)/liblipsofsunaserver_la-archive-sql.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='archive/archive-sql.c' object='liblipsofsunaserver_la-archive-sql.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -c -o liblipsofsunaserver_la-archive-sql.lo `test -f 'archive/archive-sql.c' || echo '$(srcdir)/'`archive/archive-sql.c
 
 liblipsofsunaserver_la-archive-writer.lo: archive/archive-writer.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CFLAGS) $(CFLAGS) -MT liblipsofsunaserver_la-archive-writer.lo -MD -MP -MF $(DEPDIR)/liblipsofsunaserver_la-archive-writer.Tpo -c -o liblipsofsunaserver_la-archive-writer.lo `test -f 'archive/archive-writer.c' || echo '$(srcdir)/'`archive/archive-writer.c

@@ -1056,6 +1056,51 @@ livox_manager_write (livoxManager* self)
 		return 0;
 	}
 
+	/* Create sector table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
+		"(id INTEGER PRIMARY KEY,data BLOB);";
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	/* Save terrain. */
+	LI_FOREACH_U32DIC (iter, self->sectors)
+	{
+		if (!livox_sector_write (iter.value, self->sql))
+			return 0;
+	}
+
+	return livox_manager_write_materials (self);
+}
+
+/**
+ * \brief Writes the materials to the database.
+ *
+ * \param self Voxel manager.
+ * \return Nonzero on success.
+ */
+int
+livox_manager_write_materials (livoxManager* self)
+{
+	const char* query;
+	sqlite3_stmt* statement;
+	lialgU32dicIter iter;
+
+	if (self->sql == NULL)
+	{
+		lisys_error_set (EINVAL, "no database");
+		return 0;
+	}
+
 	/* Create material table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
 		"(id INTEGER PRIMARY KEY,flags UNSIGNED INTEGER,"
@@ -1092,33 +1137,15 @@ livox_manager_write (livoxManager* self)
 	}
 	sqlite3_finalize (statement);
 
-	/* Create sector table. */
-	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
-		"(id INTEGER PRIMARY KEY,data BLOB);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+	/* Remove old materials. */
+	if (!liarc_sql_delete (self->sql, "voxel_materials") ||
+	    !liarc_sql_delete (self->sql, "voxel_textures"))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Save materials. */
-/*	LI_FOREACH_ASSOCID (iter, self->materials)
+	LI_FOREACH_U32DIC (iter, self->materials)
 	{
-		if (!liext_material_write (iter.value, self->sql))
-			return 0;
-	}*/
-
-	/* Save terrain. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
-	{
-		if (!livox_sector_write (iter.value, self->sql))
+		if (!livox_material_write_to_sql (iter.value, self->sql))
 			return 0;
 	}
 

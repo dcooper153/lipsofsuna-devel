@@ -159,6 +159,9 @@ livox_manager_update_marked (livoxManager* self);
 int
 livox_manager_write (livoxManager* self);
 
+int
+livox_manager_write_materials (livoxManager* self);
+
 void
 livox_manager_set_sql (livoxManager* self,
                        liarcSql*     sql);

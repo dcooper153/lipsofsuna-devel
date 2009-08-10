@@ -414,7 +414,6 @@ ligen_generator_write (ligenGenerator* self)
 {
 	int i;
 	int j;
-	int col;
 	int ret;
 	int flags;
 	double rnd;
@@ -431,19 +430,8 @@ ligen_generator_write (ligenGenerator* self)
 	livox_manager_write (self->voxels);
 
 	/* Remove old objects. */
-	query = "DELETE FROM objects;";
-	if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
+	if (!liarc_sql_delete (self->srvsql, "objects"))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->srvsql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Save new objects. */
 	for (i = 0 ; i < self->strokes.count ; i++)
@@ -507,58 +495,33 @@ ligen_generator_write (ligenGenerator* self)
 				(int)(transform.position.y / LIENG_SECTOR_WIDTH),
 				(int)(transform.position.z / LIENG_SECTOR_WIDTH));
 
-			/* Prepare statement. */
-			query = "INSERT OR REPLACE INTO objects "
-				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,"
-				"rotw,mass,move,speed,step,colgrp,colmsk,control,shape,model,type,extra) VALUES "
-				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-			if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
-			{
-				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
-				return 0;
-			}
-
-			/* Bind values. */
-			col = 1;
-			ret = (sqlite3_bind_int (statement, col++, id) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, sector) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, flags) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.position.x) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.position.y) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.position.z) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.x) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.y) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.z) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.w) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 5.0f) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, 0.0f) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, LIPHY_DEFAULT_COLLISION_GROUP) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, LIPHY_DEFAULT_COLLISION_MASK) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, LIPHY_CONTROL_MODE_NONE) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, LIPHY_SHAPE_MODE_CONCAVE) != SQLITE_OK ||
-				sqlite3_bind_text (statement, col++, object->model, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-				sqlite3_bind_text (statement, col++, object->type, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-				sqlite3_bind_text (statement, col++, object->extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
-			if (ret)
-			{
-				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->srvsql));
-				sqlite3_finalize (statement);
-				return 0;
-			}
-
 			/* Write values. */
-			if (sqlite3_step (statement) != SQLITE_DONE)
-			{
-				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->srvsql));
-				sqlite3_finalize (statement);
+			if (!liarc_sql_replace (self->srvsql, "objects",
+				"id", LIARC_SQL_INT, id,
+				"sector", LIARC_SQL_INT, sector,
+				"flags", LIARC_SQL_INT, flags,
+				"angx", LIARC_SQL_FLOAT, 0.0f,
+				"angy", LIARC_SQL_FLOAT, 0.0f,
+				"angz", LIARC_SQL_FLOAT, 0.0f,
+				"posx", LIARC_SQL_FLOAT, transform.position.x,
+				"posy", LIARC_SQL_FLOAT, transform.position.y,
+				"posz", LIARC_SQL_FLOAT, transform.position.z,
+				"rotx", LIARC_SQL_FLOAT, transform.rotation.x,
+				"roty", LIARC_SQL_FLOAT, transform.rotation.y,
+				"rotz", LIARC_SQL_FLOAT, transform.rotation.z,
+				"rotw", LIARC_SQL_FLOAT, transform.rotation.w,
+				"mass", LIARC_SQL_FLOAT, 0.0f,
+				"move", LIARC_SQL_FLOAT, 0.0f,
+				"speed", LIARC_SQL_FLOAT, 5.0f,
+				"step", LIARC_SQL_FLOAT, 0.0f,
+				"colgrp", LIARC_SQL_INT, LIPHY_DEFAULT_COLLISION_GROUP,
+				"colmsk", LIARC_SQL_INT, LIPHY_DEFAULT_COLLISION_MASK,
+				"control", LIARC_SQL_INT, LIPHY_CONTROL_MODE_NONE,
+				"shape", LIARC_SQL_INT, LIPHY_SHAPE_MODE_CONCAVE,
+				"model", LIARC_SQL_TEXT, object->model,
+				"type", LIARC_SQL_TEXT, object->type,
+				"extra", LIARC_SQL_TEXT, object->extra))
 				return 0;
-			}
-			sqlite3_finalize (statement);
 		}
 	}
 
@@ -574,73 +537,21 @@ ligen_generator_write (ligenGenerator* self)
 int
 ligen_generator_write_brushes (ligenGenerator* self)
 {
-	const char* query;
 	lialgU32dicIter iter;
-	sqlite3_stmt* statement;
 
 	/* Remove old brushes. */
-	query = "DELETE FROM generator_brushes;";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
+	if (!liarc_sql_delete (self->gensql, "generator_brushes") ||
+	    !liarc_sql_delete (self->gensql, "generator_rules") ||
+	    !liarc_sql_delete (self->gensql, "generator_strokes") ||
+	    !liarc_sql_delete (self->gensql, "generator_objects"))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Remove old rules. */
-	query = "DELETE FROM generator_rules;";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Remove old strokes. */
-	query = "DELETE FROM generator_strokes;";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Remove old objects. */
-	query = "DELETE FROM generator_objects;";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->gensql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Save brushes. */
 	LI_FOREACH_U32DIC (iter, self->brushes)
-		ligen_brush_write (iter.value, self->gensql);
+	{
+		if (!ligen_brush_write (iter.value, self->gensql))
+			return 0;
+	}
 
 	return 1;
 }

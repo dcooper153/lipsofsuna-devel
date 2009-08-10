@@ -234,44 +234,33 @@ ligen_brush_write (ligenBrush* self,
                    liarcSql*   sql)
 {
 	int i;
-	int col;
 	int ret;
-	const char* query;
-	sqlite3_stmt* statement;
+	liarcWriter* writer;
+
+	/* Serialize voxels. */
+	writer = liarc_writer_new ();
+	if (writer == NULL)
+		return 0;
+	for (i = 0 ; i < self->voxels.count ; i++)
+	{
+		if (!liarc_writer_append_uint16 (writer, self->voxels.array[i]))
+		{
+			liarc_writer_free (writer);
+			return 0;
+		}
+	}
 
 	/* Prepare statement. */
-	query = "INSERT OR REPLACE INTO generator_brushes "
-		"(id,name,sizx,sizy,sizz,voxels) VALUES "
-		"(?,?,?,?,?,?);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+	ret = liarc_sql_replace (sql, "generator_brushes",
+		"id", LIARC_SQL_INT, self->id,
+		"name", LIARC_SQL_TEXT, self->name,
+		"sizx", LIARC_SQL_INT, self->size[0],
+		"sizy", LIARC_SQL_INT, self->size[1],
+		"sizz", LIARC_SQL_INT, self->size[2],
+		"voxels", LIARC_SQL_BLOB, writer->memory.buffer, writer->memory.length, NULL);
+	liarc_writer_free (writer);
+	if (!ret)
 		return 0;
-	}
-
-	/* Bind values. */
-	col = 1;
-	ret = (sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
-		sqlite3_bind_text (statement, col++, self->name, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, self->size[0]) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, self->size[1]) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, self->size[2]) != SQLITE_OK ||
-		sqlite3_bind_blob (statement, col++, self->voxels.array, self->voxels.count, SQLITE_TRANSIENT) != SQLITE_OK);
-	if (ret)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Write values. */
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Write objects. */
 	for (i = 0 ; i < self->objects.count ; i++)
@@ -656,54 +645,21 @@ private_write_object (ligenBrush*       self,
                       ligenBrushobject* object,
                       liarcSql*         sql)
 {
-	int col;
-	int ret;
-	const char* query;
-	sqlite3_stmt* statement;
-
-	/* Prepare statement. */
-	query = "INSERT OR REPLACE INTO generator_objects "
-		"(id,brush,flags,prob,posx,posy,posz,rotx,roty,rotz,rotw,type,model,extra) VALUES "
-		"(?,?,?,?,?,?,?,?,?,?,?,?,?);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-		return 0;
-	}
-
-	/* Bind values. */
-	col = 1;
-	ret = (sqlite3_bind_int (statement, col++, object->id) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, object->flags) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->probability) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.position.x) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.position.y) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.position.z) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.rotation.x) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.rotation.y) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.rotation.z) != SQLITE_OK ||
-		sqlite3_bind_double (statement, col++, object->transform.rotation.w) != SQLITE_OK ||
-		sqlite3_bind_text (statement, col++, object->type, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-		sqlite3_bind_text (statement, col++, object->model, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-		sqlite3_bind_text (statement, col++, object->extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
-	if (ret)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Write values. */
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	return 1;
+	return liarc_sql_replace (sql, "generator_objects",
+		"id", LIARC_SQL_INT, object->id,
+		"brush", LIARC_SQL_INT, self->id,
+		"flags", LIARC_SQL_INT, object->flags,
+		"prob", LIARC_SQL_FLOAT, object->probability,
+		"posx", LIARC_SQL_FLOAT, object->transform.position.x,
+		"posy", LIARC_SQL_FLOAT, object->transform.position.y,
+		"posz", LIARC_SQL_FLOAT, object->transform.position.z,
+		"rotx", LIARC_SQL_FLOAT, object->transform.rotation.x,
+		"roty", LIARC_SQL_FLOAT, object->transform.rotation.y,
+		"rotz", LIARC_SQL_FLOAT, object->transform.rotation.z,
+		"rotw", LIARC_SQL_FLOAT, object->transform.rotation.w,
+		"type", LIARC_SQL_TEXT, object->type,
+		"model", LIARC_SQL_TEXT, object->model,
+		"extra", LIARC_SQL_TEXT, object->extra, NULL);
 }
 
 static int
@@ -712,42 +668,14 @@ private_write_rule (ligenBrush* self,
                     liarcSql*   sql)
 {
 	int i;
-	int col;
-	int ret;
-	const char* query;
-	sqlite3_stmt* statement;
 
-	/* Prepare statement. */
-	query = "INSERT OR REPLACE INTO generator_rules "
-		"(id,brush,name,flags) VALUES "
-		"(?,?,?,?);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+	/* Write rule. */
+	if (!liarc_sql_replace (sql, "generator_rules",
+		"id", LIARC_SQL_INT, rule->id,
+		"brush", LIARC_SQL_INT, self->id,
+		"name", LIARC_SQL_TEXT, rule->name,
+		"flags", LIARC_SQL_INT, rule->flags, NULL))
 		return 0;
-	}
-
-	/* Bind values. */
-	col = 1;
-	ret = (sqlite3_bind_int (statement, col++, rule->id) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
-		sqlite3_bind_text (statement, col++, rule->name, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, rule->flags) != SQLITE_OK);
-	if (ret)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Write values. */
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Write strokes. */
 	for (i = 0 ; i < rule->strokes.count ; i++)
@@ -766,48 +694,15 @@ private_write_stroke (ligenBrush*      self,
                       int              id,
                       liarcSql*        sql)
 {
-	int col;
-	int ret;
-	const char* query;
-	sqlite3_stmt* statement;
-
-	/* Prepare statement. */
-	query = "INSERT OR REPLACE INTO generator_strokes "
-		"(id,brush,rule,paint,x,y,z,flags) VALUES "
-		"(?,?,?,?,?,?,?,?);";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-		return 0;
-	}
-
-	/* Bind values. */
-	col = 1;
-	ret = (sqlite3_bind_int (statement, col++, id) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, rule->id) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, stroke->brush) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, stroke->pos[0]) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, stroke->pos[1]) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, stroke->pos[2]) != SQLITE_OK ||
-		sqlite3_bind_int (statement, col++, stroke->flags) != SQLITE_OK);
-	if (ret)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Write values. */
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	return 1;
+	return liarc_sql_replace (sql, "generator_strokes",
+		"id", LIARC_SQL_INT, id,
+		"brush", LIARC_SQL_INT, self->id,
+		"rule", LIARC_SQL_INT, rule->id,
+		"paint", LIARC_SQL_INT, stroke->brush,
+		"x", LIARC_SQL_INT, stroke->pos[0],
+		"y", LIARC_SQL_INT, stroke->pos[1],
+		"z", LIARC_SQL_INT, stroke->pos[2],
+		"flags", LIARC_SQL_INT, stroke->flags, NULL);
 }
 
 /** @} */
