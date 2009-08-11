@@ -189,8 +189,7 @@ ligen_brush_remove_rule (ligenBrush* self,
  * \brief Removes all strokes that use the brush with the given id.
  *
  * Loops through all rules their strokes. If a stroke is found that references
- * the given brush id, the stroke is removed. Any rules that become empty are
- * also removed.
+ * the given brush id, the stroke is removed.
  *
  * \param self Brush.
  * \param brush Brush number.
@@ -213,11 +212,6 @@ ligen_brush_remove_strokes (ligenBrush* self,
 				lialg_array_remove (&rule->strokes, j);
 				j--;
 			}
-		}
-		if (!rule->strokes.count)
-		{
-			ligen_brush_remove_rule (self, i);
-			i--;
 		}
 	}
 }

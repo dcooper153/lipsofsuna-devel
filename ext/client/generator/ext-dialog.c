@@ -104,13 +104,6 @@ liext_dialog_reset (liextDialog* self)
 	liext_materials_reset (LIEXT_MATERIALS (self->materials));
 }
 
-void
-liext_dialog_update (liextDialog* self)
-{
-	liext_brushes_update (LIEXT_BRUSHES (self->brushes));
-	liext_materials_update (LIEXT_MATERIALS (self->materials));
-}
-
 /****************************************************************************/
 
 static const void*

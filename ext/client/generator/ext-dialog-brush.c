@@ -25,6 +25,7 @@
  */
 
 #include <system/lips-system.h>
+#include "ext-brushes.h"
 #include "ext-dialog.h"
 #include "ext-dialog-brush.h"
 #include "ext-preview.h"
@@ -217,14 +218,13 @@ private_create (liextDialogBrush* self,
 		return 0;
 	memcpy (dst->voxels.array, src->voxels.array, src->voxels.count * sizeof (livoxVoxel));
 
-	/* Add to the real generator. */
-	if (!ligen_generator_insert_brush (dialog->generator, dst))
+	/* Add to the brush list. */
+	if (!liext_brushes_insert_brush (LIEXT_BRUSHES (dialog->brushes), dst))
 	{
 		ligen_brush_free (dst);
 		return 0;
 	}
 	liwdg_widget_set_visible (LIWDG_WIDGET (self), 0);
-	liext_dialog_update (dialog);
 
 	return 0;
 }

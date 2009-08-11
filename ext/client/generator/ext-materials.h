@@ -75,9 +75,6 @@ liext_materials_save (liextMaterials* self);
 void
 liext_materials_reset (liextMaterials* self);
 
-void
-liext_materials_update (liextMaterials* self);
-
 #endif
 
 /** @} */

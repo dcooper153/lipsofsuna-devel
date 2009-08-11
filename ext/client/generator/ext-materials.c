@@ -131,12 +131,6 @@ liext_materials_reset (liextMaterials* self)
 	private_populate (self);
 }
 
-void
-liext_materials_update (liextMaterials* self)
-{
-	private_populate (self);
-}
-
 /****************************************************************************/
 
 static const void*
@@ -214,7 +208,7 @@ private_init (liextMaterials* self,
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_scale), 0, 0, self->widgets.label_scale);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_scale), 1, 0, self->widgets.scroll_scale);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 0, 3);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 3, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 1, self->widgets.group_name);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, self->widgets.group_scale);
 	liwdg_widget_set_visible (self->widgets.group_scale, 0);

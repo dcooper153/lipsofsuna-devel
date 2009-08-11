@@ -65,9 +65,6 @@ liext_dialog_save (liextDialog* self);
 void
 liext_dialog_reset (liextDialog* self);
 
-void
-liext_dialog_update (liextDialog* self);
-
 #endif
 
 /** @} */

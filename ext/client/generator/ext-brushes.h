@@ -73,13 +73,14 @@ liext_brushes_new (liwdgManager* manager,
                    liextModule*  module);
 
 int
+liext_brushes_insert_brush (liextBrushes* self,
+                            ligenBrush*   brush);
+
+int
 liext_brushes_save (liextBrushes* self);
 
 void
 liext_brushes_reset (liextBrushes* self);
-
-void
-liext_brushes_update (liextBrushes* self);
 
 #endif
 
