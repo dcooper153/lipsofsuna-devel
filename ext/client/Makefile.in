@@ -101,7 +101,8 @@ libevents_cli_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(CFLAGS) $(libevents_cli_la_LDFLAGS) $(LDFLAGS) -o $@
 libgenerator_cli_la_DEPENDENCIES =  \
 	$(top_builddir)/src/liblipsofsunaclient.la
-am_libgenerator_cli_la_OBJECTS = libgenerator_cli_la-ext-dialog.lo \
+am_libgenerator_cli_la_OBJECTS = libgenerator_cli_la-ext-brushes.lo \
+	libgenerator_cli_la-ext-dialog.lo \
 	libgenerator_cli_la-ext-dialog-brush.lo \
 	libgenerator_cli_la-ext-materials.lo \
 	libgenerator_cli_la-ext-module.lo \
@@ -429,6 +430,8 @@ libgenerator_cli_la_CFLAGS = $(LICLI_CFLAGS)
 libgenerator_cli_la_LDFLAGS = -module -avoid-version -no-undefined
 libgenerator_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
 libgenerator_cli_la_SOURCES = \
+	generator/ext-brushes.c \
+	generator/ext-brushes.h \
 	generator/ext-dialog.c \
 	generator/ext-dialog.h \
 	generator/ext-dialog-brush.c \
@@ -608,6 +611,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libeffect_cli_la-ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libevents_cli_la-ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libevents_cli_la-ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-brushes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-dialog-brush.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-dialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgenerator_cli_la-ext-materials.Plo@am__quote@
@@ -745,6 +749,13 @@ libevents_cli_la-ext-script.lo: events/ext-script.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='events/ext-script.c' object='libevents_cli_la-ext-script.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libevents_cli_la_CFLAGS) $(CFLAGS) -c -o libevents_cli_la-ext-script.lo `test -f 'events/ext-script.c' || echo '$(srcdir)/'`events/ext-script.c
+
+libgenerator_cli_la-ext-brushes.lo: generator/ext-brushes.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-brushes.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-brushes.Tpo -c -o libgenerator_cli_la-ext-brushes.lo `test -f 'generator/ext-brushes.c' || echo '$(srcdir)/'`generator/ext-brushes.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgenerator_cli_la-ext-brushes.Tpo $(DEPDIR)/libgenerator_cli_la-ext-brushes.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='generator/ext-brushes.c' object='libgenerator_cli_la-ext-brushes.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -c -o libgenerator_cli_la-ext-brushes.lo `test -f 'generator/ext-brushes.c' || echo '$(srcdir)/'`generator/ext-brushes.c
 
 libgenerator_cli_la-ext-dialog.lo: generator/ext-dialog.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgenerator_cli_la_CFLAGS) $(CFLAGS) -MT libgenerator_cli_la-ext-dialog.lo -MD -MP -MF $(DEPDIR)/libgenerator_cli_la-ext-dialog.Tpo -c -o libgenerator_cli_la-ext-dialog.lo `test -f 'generator/ext-dialog.c' || echo '$(srcdir)/'`generator/ext-dialog.c

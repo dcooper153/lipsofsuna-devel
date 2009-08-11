@@ -24,8 +24,8 @@
  * @{
  */
 
-#ifndef __EXT_DIALOG_H__
-#define __EXT_DIALOG_H__
+#ifndef __EXT_BRUSHES_H__
+#define __EXT_BRUSHES_H__
 
 #include <client/lips-client.h>
 #include <generator/lips-generator.h>
@@ -34,39 +34,52 @@
 #include "ext-materials.h"
 #include "ext-module.h"
 
-#define LIEXT_DIALOG(o) ((liextDialog*)(o))
+#define LIEXT_BRUSHES(o) ((liextBrushes*)(o))
 
-typedef struct _liextDialogTreerow liextDialogTreerow;
-struct _liextDialogTreerow
+typedef struct _liextBrushesTreerow liextBrushesTreerow;
+struct _liextBrushesTreerow
 {
 	ligenBrush* brush;
 	ligenRule* rule;
 	int stroke;
 };
 
-struct _liextDialog
+struct _liextBrushes
 {
-	liwdgWindow base;
+	liwdgGroup base;
 	liextModule* module;
 	ligenGenerator* generator;
-	liwdgWidget* brushes;
-	liwdgWidget* materials;
+	struct
+	{
+		liwdgWidget* dialog;
+		liwdgWidget* group_view;
+		liwdgWidget* button_move_left;
+		liwdgWidget* button_move_right;
+		liwdgWidget* button_move_up;
+		liwdgWidget* button_move_down;
+		liwdgWidget* button_add;
+		liwdgWidget* button_remove;
+		liwdgWidget* entry_name;
+		liwdgWidget* label_type;
+		liwdgWidget* preview;
+		liwdgWidget* tree;
+	} widgets;
 };
 
-extern const liwdgClass liextDialogType;
+extern const liwdgClass liextBrushesType;
 
 liwdgWidget*
-liext_dialog_new (liwdgManager* manager,
-                  liextModule*  module);
+liext_brushes_new (liwdgManager* manager,
+                   liextModule*  module);
 
 int
-liext_dialog_save (liextDialog* self);
+liext_brushes_save (liextBrushes* self);
 
 void
-liext_dialog_reset (liextDialog* self);
+liext_brushes_reset (liextBrushes* self);
 
 void
-liext_dialog_update (liextDialog* self);
+liext_brushes_update (liextBrushes* self);
 
 #endif
 

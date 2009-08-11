@@ -31,6 +31,7 @@
 
 #define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
 
+typedef struct _liextBrushes liextBrushes;
 typedef struct _liextDialog liextDialog;
 typedef struct _liextDialogBrush liextDialogBrush;
 typedef struct _liextMaterials liextMaterials;

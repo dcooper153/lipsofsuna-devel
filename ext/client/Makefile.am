@@ -66,6 +66,8 @@ libgenerator_cli_la_CFLAGS = $(LICLI_CFLAGS)
 libgenerator_cli_la_LDFLAGS = -module -avoid-version -no-undefined
 libgenerator_cli_la_LIBADD = $(top_builddir)/src/liblipsofsunaclient.la
 libgenerator_cli_la_SOURCES = \
+	generator/ext-brushes.c \
+	generator/ext-brushes.h \
 	generator/ext-dialog.c \
 	generator/ext-dialog.h \
 	generator/ext-dialog-brush.c \
