@@ -226,7 +226,7 @@ private_init (liextBrushes* self,
 	liwdgWidget* widgets[] =
 	{
 		liwdg_group_new_with_size (manager, 4, 1),
-		liwdg_group_new_with_size (manager, 1, 5),
+		liwdg_group_new_with_size (manager, 1, 4),
 		liwdg_group_new_with_size (manager, 2, 1),
 		liwdg_group_new_with_size (manager, 1, 3),
 		liwdg_button_new (manager),
@@ -283,7 +283,6 @@ private_init (liextBrushes* self,
 	/* Tree. */
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 2, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 4, liwdg_label_new_with_text (manager, "Brushes"));
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 3, self->widgets.tree);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_add);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_remove);
