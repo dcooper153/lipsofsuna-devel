@@ -36,14 +36,6 @@
 
 #define LIEXT_BRUSHES(o) ((liextBrushes*)(o))
 
-typedef struct _liextBrushesTreerow liextBrushesTreerow;
-struct _liextBrushesTreerow
-{
-	ligenBrush* brush;
-	ligenRule* rule;
-	int stroke;
-};
-
 struct _liextBrushes
 {
 	liwdgGroup base;
