@@ -174,7 +174,8 @@ liext_brushes_save (liextBrushes* self)
 void
 liext_brushes_reset (liextBrushes* self)
 {
-	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview));
+	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview),
+		self->module->module->voxels);
 	private_populate (self);
 }
 

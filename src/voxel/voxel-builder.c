@@ -352,7 +352,7 @@ private_build_full (livoxBuilder* self,
 		c = livox_voxel_triangulate (tile, mask, coords, normals);
 		if (c)
 		{
-			mat = livox_voxel_get_type (tile) - 1;
+			mat = livox_voxel_get_type (tile);
 			tileoff = limat_vector_init (tx, ty, tz);
 			tileoff = limat_vector_multiply (tileoff, LIVOX_TILE_WIDTH);
 			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, coords, normals, c))
@@ -417,7 +417,7 @@ private_build_tiles (livoxBuilder* self,
 		c = livox_voxel_triangulate (tile, mask, coords, normals);
 		if (c)
 		{
-			mat = livox_voxel_get_type (tile) - 1;
+			mat = livox_voxel_get_type (tile);
 			tileoff = limat_vector_init (tx, ty, tz);
 			tileoff = limat_vector_multiply (tileoff, LIVOX_TILE_WIDTH);
 			if (!private_insert_vertices (self, mat, &blockoff, &tileoff, coords, normals, c))

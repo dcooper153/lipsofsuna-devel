@@ -127,7 +127,8 @@ liext_materials_save (liextMaterials* self)
 void
 liext_materials_reset (liextMaterials* self)
 {
-	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview));
+	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview),
+		self->module->module->voxels);
 	private_populate (self);
 }
 

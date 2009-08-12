@@ -74,7 +74,8 @@ liext_preview_insert_stroke (liextPreview* self,
                              int           brush);
 
 int
-liext_preview_replace_materials (liextPreview* self);
+liext_preview_replace_materials (liextPreview* self,
+                                 livoxManager* voxels);
 
 #endif
 

@@ -143,8 +143,10 @@ liext_preview_build_box (liextPreview* self,
 	limatVector min;
 	limatVector max;
 
-	min = limat_vector_init (0.0f, 0.0f, 0.0f);
-	max = limat_vector_init (xs * LIVOX_TILE_WIDTH, ys * LIVOX_TILE_WIDTH, zs * LIVOX_TILE_WIDTH);
+	min = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
+	max = limat_vector_add (min, limat_vector_init (xs, ys, zs));
+	min = limat_vector_multiply (min, LIVOX_TILE_WIDTH);
+	max = limat_vector_multiply (max, LIVOX_TILE_WIDTH);
 	livox_manager_clear (self->generator->voxels);
 	livox_manager_fill_box (self->generator->voxels, &min, &max, material);
 	livox_manager_update (self->generator->voxels, 1.0f);
@@ -173,14 +175,22 @@ liext_preview_insert_stroke (liextPreview* self,
 		LIEXT_PREVIEW_CENTER + z);
 }
 
+/**
+ * \brief Replaces the materials of the preview with those of the passed voxel manager.
+ *
+ * \param self Preview.
+ * \param voxel Voxel manager.
+ * \return Nonzero on success.
+ */
 int
-liext_preview_replace_materials (liextPreview* self)
+liext_preview_replace_materials (liextPreview* self,
+                                 livoxManager* voxels)
 {
 	lialgU32dicIter iter;
 	livoxMaterial* material;
 
 	livox_manager_clear_materials (self->generator->voxels);
-	LI_FOREACH_U32DIC (iter, self->module->voxels->materials)
+	LI_FOREACH_U32DIC (iter, voxels->materials)
 	{
 		material = livox_material_new_copy (iter.value);
 		if (material == NULL)
