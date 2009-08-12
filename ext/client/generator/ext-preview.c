@@ -318,21 +318,32 @@ private_event (liextPreview* self,
 
 	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
 	{
-		lieng_camera_get_transform (self->camera, &transform);
-		switch (event->button.button)
+		if (liwdg_widget_get_grab (LIWDG_WIDGET (self)))
 		{
-			case 4:
-				lieng_camera_move (self->camera, 5.0f);
-				break;
-			case 5:
-				lieng_camera_move (self->camera, -5.0f);
-				break;
+			switch (event->button.button)
+			{
+				case 4:
+					lieng_camera_move (self->camera, 5.0f);
+					break;
+				case 5:
+					lieng_camera_move (self->camera, -5.0f);
+					break;
+			}
+		}
+		else
+		{
+			switch (event->button.button)
+			{
+				case 1:
+					liwdg_widget_set_grab (LIWDG_WIDGET (self), 1);
+					break;
+			}
 		}
 		return 0;
 	}
 	if (event->type == LIWDG_EVENT_TYPE_MOTION)
 	{
-		if (event->motion.buttons & 0x1)
+		if (liwdg_widget_get_grab (LIWDG_WIDGET (self)))
 		{
 			lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
 			lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);

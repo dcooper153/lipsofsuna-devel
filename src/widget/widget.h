@@ -118,6 +118,13 @@ liwdg_widget_set_allocation (liwdgWidget* self,
                              int          h);
 
 int
+liwdg_widget_get_grab (const liwdgWidget* self);
+
+void
+liwdg_widget_set_grab (liwdgWidget* self,
+                       int          value);
+
+int
 liwdg_widget_get_focus_mouse (liwdgWidget* self);
 
 void

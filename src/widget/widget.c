@@ -448,6 +448,36 @@ liwdg_widget_set_focusable (liwdgWidget* self,
 	self->focusable = focusable;
 }
 
+int
+liwdg_widget_get_grab (const liwdgWidget* self)
+{
+	return self->manager->widgets.grab == self;
+}
+
+void
+liwdg_widget_set_grab (liwdgWidget* self,
+                       int          value)
+{
+	int cx;
+	int cy;
+
+	if (value)
+	{
+		cx = self->manager->width / 2;
+		cy = self->manager->height / 2;
+		self->manager->video.SDL_ShowCursor (SDL_DISABLE);
+		self->manager->video.SDL_WarpMouse (cx, cy);
+		self->manager->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
+		self->manager->widgets.grab = self;
+	}
+	else
+	{
+		self->manager->video.SDL_ShowCursor (SDL_ENABLE);
+		self->manager->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
+		self->manager->widgets.grab = NULL;
+	}
+}
+
 /**
  * \brief Gets the size request of the widget.
  *

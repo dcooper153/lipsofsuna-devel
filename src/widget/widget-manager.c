@@ -218,6 +218,15 @@ liwdg_manager_fix_focus (liwdgManager* self)
 {
 	liwdgWidget* widget;
 
+	for (widget = self->widgets.grab ; widget != NULL ; widget = widget->parent)
+	{
+		if (!widget->visible)
+		{
+			if (liwdg_widget_get_grab (self->widgets.grab))
+				liwdg_widget_set_grab (self->widgets.grab, 0);
+			break;
+		}
+	}
 	for (widget = self->focus.keyboard ; widget != NULL ; widget = widget->parent)
 	{
 		if (!widget->visible)
@@ -257,6 +266,21 @@ liwdg_manager_event (liwdgManager* self,
 	liwdgEvent popup;
 	liwdgRect rect;
 	liwdgWidget* widget;
+
+	/* Handle grabs. */
+	if (self->widgets.grab != NULL)
+	{
+		widget = self->widgets.grab;
+		if (event->type == LIWDG_EVENT_TYPE_KEY_PRESS && event->key.keycode == SDLK_ESCAPE)
+		{
+			liwdg_widget_set_grab (self->widgets.grab, 0);
+			return 1;
+		}
+		if (event->type == LIWDG_EVENT_TYPE_MOTION)
+			return 1;
+		liwdg_widget_event (widget, event);
+		return 1;
+	}
 
 	/* Handle popups. */
 	if (self->widgets.popups != NULL)
@@ -576,10 +600,35 @@ void
 liwdg_manager_update (liwdgManager* self,
                       float         secs)
 {
+	int x;
+	int y;
+	int cx;
+	int cy;
+	int buttons;
+	liwdgEvent event;
 	liwdgRect rect;
 	liwdgSize size;
 	liwdgWidget* widget;
 
+	if (self->widgets.grab != NULL)
+	{
+		cx = self->width / 2;
+		cy = self->height / 2;
+		buttons = self->video.SDL_GetMouseState (&x, &y);
+		self->video.SDL_WarpMouse (cx, cy);
+
+		/* Cursor delta events. */
+		if (x != cx || y != cy)
+		{
+			event.type = LIWDG_EVENT_TYPE_MOTION;
+			event.motion.x = cx;
+			event.motion.y = cy;
+			event.motion.dx = x - cx;
+			event.motion.dy = (self->height - y - 1) - cy;
+			event.motion.buttons = buttons;
+			liwdg_widget_event (self->widgets.grab, &event);
+		}
+	}
 	if (self->widgets.root != NULL)
 		liwdg_widget_update (self->widgets.root, secs);
 	for (widget = self->widgets.dialogs ; widget != NULL ; widget = self->widgets.iter)

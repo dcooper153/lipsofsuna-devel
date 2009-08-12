@@ -55,6 +55,7 @@ struct _liwdgManager
 	{
 		liwdgWidget* iter;
 		liwdgWidget* root;
+		liwdgWidget* grab;
 		liwdgWidget* active;
 		liwdgWidget* dialogs;
 		liwdgWidget* popups;
