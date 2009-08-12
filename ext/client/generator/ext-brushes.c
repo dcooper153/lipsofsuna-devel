@@ -47,6 +47,7 @@ struct _liextBrushesTreerow
 	ligenBrush* brush;
 	ligenRule* rule;
 	int stroke;
+	int object;
 	int type;
 };
 
@@ -106,6 +107,11 @@ private_move_right (liextBrushes* self,
 static liwdgTreerow*
 private_append_brush (liextBrushes* self,
                       ligenBrush*   brush);
+
+static liwdgTreerow*
+private_append_object (liextBrushes* self,
+                       liwdgTreerow* row,
+                       int           index);
 
 static liwdgTreerow*
 private_append_rule (liextBrushes* self,
@@ -353,6 +359,7 @@ private_add (liextBrushes* self,
 {
 	ligenRule* rule;
 	liextBrushesTreerow* data;
+	limatTransform transform;
 	liwdgTreerow* row;
 
 	/* Get active row. */
@@ -377,11 +384,23 @@ private_add (liextBrushes* self,
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_BRUSH:
 			break;
-		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
-			/* FIXME: Add an object. */
-			break;
 		case LIEXT_BRUSHES_ROWTYPE_OBJECT:
-			/* FIXME: Add an object. */
+			row = liwdg_treerow_get_parent (row);
+			data = liwdg_treerow_get_data (row);
+			assert (data != NULL);
+			assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
+			/* Fall through. */
+		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
+			transform = limat_transform_init (
+				limat_vector_init (0.0f, 0.0f, 0.0f),
+				limat_quaternion_identity ());
+			if (!ligen_brush_insert_object (data->brush, 0, 1.0f, "", "", "", &transform))
+				return 0;
+			if (!private_append_object (self, row, data->brush->objects.count - 1))
+			{
+				ligen_brush_remove_object (data->brush, data->brush->objects.count - 1);
+				return 0;
+			}
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_RULES:
 			rule = ligen_rule_new ();
@@ -394,16 +413,13 @@ private_add (liextBrushes* self,
 			}
 			private_append_rule (self, row, rule);
 			break;
-		case LIEXT_BRUSHES_ROWTYPE_RULE:
-			if (!ligen_rule_insert_stroke (data->rule, 0, 0, 0, 0, 0))
-				return 0;
-			private_append_stroke (self, row, data->rule->strokes.count - 1);
-			break;
 		case LIEXT_BRUSHES_ROWTYPE_STROKE:
 			row = liwdg_treerow_get_parent (row);
 			data = liwdg_treerow_get_data (row);
 			assert (data != NULL);
 			assert (data->type == LIEXT_BRUSHES_ROWTYPE_RULE);
+			/* Fall through. */
+		case LIEXT_BRUSHES_ROWTYPE_RULE:
 			if (!ligen_rule_insert_stroke (data->rule, 0, 0, 0, 0, 0))
 				return 0;
 			private_append_stroke (self, row, data->rule->strokes.count - 1);
@@ -417,11 +433,11 @@ static int
 private_remove (liextBrushes* self,
                 liwdgWidget*  widget)
 {
-	int c[3];
-	int i[3];
+	int c;
+	int i;
 	liwdgTreerow* row;
-	liwdgTreerow* rows[4];
-	liextBrushesTreerow* data[4];
+	liwdgTreerow* rows[2];
+	liextBrushesTreerow* data[3];
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -438,40 +454,49 @@ private_remove (liextBrushes* self,
 		case LIEXT_BRUSHES_ROWTYPE_BRUSH:
 			rows[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
 			private_remove_strokes (self, rows[0], data[0]->brush->id);
+			liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (row));
 			ligen_generator_remove_brush (self->generator, data[0]->brush->id);
-			liwdg_treerow_remove_row (
-				liwdg_treerow_get_parent (row),
-				liwdg_treerow_get_index (row));
 			free (data[0]);
+			private_rebuild_preview (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_OBJECT:
+			rows[0] = liwdg_treerow_get_parent (row);
+			liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (row));
+			ligen_brush_remove_object (data[0]->brush, data[0]->object);
+			free (data[0]);
+			c = liwdg_treerow_get_row_count (rows[0]);
+			for (i = 0 ; i < c ; i++)
+			{
+				rows[1] = liwdg_treerow_get_row (rows[0], i);
+				data[1] = liwdg_treerow_get_data (rows[1]);
+				data[1]->object = i;
+			}
+			private_rebuild_preview (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_RULES:
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_RULE:
+			rows[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
 			ligen_brush_remove_rule (data[0]->brush, data[0]->rule->id);
-			liwdg_treerow_remove_row (
-				liwdg_treerow_get_parent (row),
-				liwdg_treerow_get_index (row));
+			liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (row));
 			free (data[0]);
+			private_rebuild_preview (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_STROKE:
-			ligen_rule_remove_stroke (data[0]->rule, data[0]->stroke);
 			rows[0] = liwdg_treerow_get_parent (row);
-			data[1] = liwdg_treerow_get_data (rows[0]);
-			c[0] = liwdg_treerow_get_row_count (rows[0]);
-			for (i[0] = 0 ; i[0] < c[0] ; i[0]++)
-			{
-				rows[1] = liwdg_treerow_get_row (rows[0], i[0]);
-				data[2] = liwdg_treerow_get_data (rows[1]);
-				data[2]->stroke = i[0];
-			}
-			liwdg_treerow_remove_row (
-				liwdg_treerow_get_parent (row),
-				liwdg_treerow_get_index (row));
+			liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (row));
+			ligen_rule_remove_stroke (data[0]->rule, data[0]->stroke);
 			free (data[0]);
+			c = liwdg_treerow_get_row_count (rows[0]);
+			for (i = 0 ; i < c ; i++)
+			{
+				rows[1] = liwdg_treerow_get_row (rows[0], i);
+				data[1] = liwdg_treerow_get_data (rows[1]);
+				data[1]->stroke = i;
+			}
+			private_rebuild_preview (self);
 			break;
 	}
 
@@ -482,51 +507,63 @@ static int
 private_rename (liextBrushes* self,
                 liwdgWidget*  widget)
 {
+	char* tmp;
 	const char* name;
 	lialgU32dicIter iter;
-	liextBrushesTreerow* row;
 	ligenBrush* brush;
-	liwdgTreerow* trow;
+	ligenBrushobject* object;
+	liextBrushesTreerow* data;
+	liwdgTreerow* row;
 
-	row = private_get_active (self);
-	if (row == NULL || row->brush == NULL)
+	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (row == NULL)
 		return 0;
+	data = liwdg_treerow_get_data (row);
+	assert (data != NULL);
 
-	/* Brush? */
-	if (row->rule == NULL)
+	switch (data->type)
 	{
-		name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
-		trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-		ligen_brush_set_name (row->brush, name);
-		liwdg_treerow_set_text (trow, name);
-		trow = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
-		private_rename_strokes (self, trow, row->brush->id, name);
-	}
-
-	/* Rule? */
-	else if (row->stroke < 0)
-	{
-		name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
-		trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-		ligen_rule_set_name (row->rule, name);
-		liwdg_treerow_set_text (trow, name);
-	}
-
-	/* Stroke? */
-	else
-	{
-		name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
-		LI_FOREACH_U32DIC (iter, self->generator->brushes)
-		{
-			brush = iter.value;
-			if (!strcmp (name, row->brush->name))
+		case LIEXT_BRUSHES_ROWTYPE_ROOT:
+			break;
+		case LIEXT_BRUSHES_ROWTYPE_BRUSH:
+		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
+		case LIEXT_BRUSHES_ROWTYPE_RULES:
+			name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
+			ligen_brush_set_name (data->brush, name);
+			liwdg_treerow_set_text (row, name);
+			row = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
+			private_rename_strokes (self, row, data->brush->id, name);
+			break;
+		case LIEXT_BRUSHES_ROWTYPE_OBJECT:
+			name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
+			tmp = strdup (name);
+			if (tmp == NULL)
+				return 0;
+			object = data->brush->objects.array[data->object];
+			free (object->model);
+			object->model = tmp;
+			liwdg_treerow_set_text (row, name);
+			private_rebuild_preview (self);
+			break;
+		case LIEXT_BRUSHES_ROWTYPE_RULE:
+			name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
+			ligen_rule_set_name (data->rule, name);
+			liwdg_treerow_set_text (row, name);
+			break;
+		case LIEXT_BRUSHES_ROWTYPE_STROKE:
+			name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
+			LI_FOREACH_U32DIC (iter, self->generator->brushes)
 			{
-				trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-				row->rule->strokes.array[row->stroke].brush = brush->id;
-				liwdg_treerow_set_text (trow, name);
-				break;
+				brush = iter.value;
+				if (!strcmp (name, data->brush->name))
+				{
+					data->rule->strokes.array[data->stroke].brush = brush->id;
+					liwdg_treerow_set_text (row, name);
+					private_rebuild_preview (self);
+					break;
+				}
 			}
-		}
+			break;
 	}
 
 	return 0;
@@ -539,6 +576,7 @@ private_selected (liextBrushes* self,
 {
 	liextBrushesTreerow* data;
 	ligenBrush* brush;
+	ligenBrushobject* object;
 	ligenRulestroke* stroke;
 	liwdgTreerow* row0;
 
@@ -557,6 +595,12 @@ private_selected (liextBrushes* self,
 	{
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
+	}
+	else if (data->object >= 0)
+	{
+		object = data->brush->objects.array[data->object];
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Object:");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), object->model);
 	}
 	else if (data->rule == NULL)
 	{
@@ -643,6 +687,7 @@ private_append_brush (liextBrushes* self,
                       ligenBrush*   brush)
 {
 	int i;
+	ligenBrushobject* object;
 	ligenRule* rule;
 	liwdgTreerow* rows[5] = { NULL, NULL, NULL, NULL, NULL };
 	liextBrushesTreerow* data[5] = { NULL, NULL, NULL, NULL, NULL };
@@ -655,6 +700,7 @@ private_append_brush (liextBrushes* self,
 	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_ROOT);
 	assert (data[0]->brush == NULL);
 	assert (data[0]->rule == NULL);
+	assert (data[0]->object < 0);
 	assert (data[0]->stroke < 0);
 
 	/* Add brush row. */
@@ -664,6 +710,7 @@ private_append_brush (liextBrushes* self,
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_BRUSH;
 	data[1]->brush = brush;
 	data[1]->rule = NULL;
+	data[1]->object = -1;
 	data[1]->stroke = -1;
 	rows[1] = liwdg_treerow_append_row (rows[0], brush->name, data[1]);
 	if (rows[1] == NULL)
@@ -676,6 +723,7 @@ private_append_brush (liextBrushes* self,
 	data[2]->type = LIEXT_BRUSHES_ROWTYPE_OBJECTS;
 	data[2]->brush = brush;
 	data[2]->rule = NULL;
+	data[2]->object = -1;
 	data[2]->stroke = -1;
 	rows[2] = liwdg_treerow_append_row (rows[1], "Objects", data[2]);
 	if (rows[2] == NULL)
@@ -688,6 +736,7 @@ private_append_brush (liextBrushes* self,
 	data[3]->type = LIEXT_BRUSHES_ROWTYPE_RULES;
 	data[3]->brush = brush;
 	data[3]->rule = NULL;
+	data[3]->object = -1;
 	data[3]->stroke = -1;
 	rows[3] = liwdg_treerow_append_row (rows[1], "Rules", data[3]);
 	if (rows[3] == NULL)
@@ -711,6 +760,31 @@ private_append_brush (liextBrushes* self,
 		}
 	}
 
+	/* Append objects. */
+	for (i = 0 ; i < brush->objects.count ; i++)
+	{
+		object = brush->objects.array[i];
+		rows[4] = private_append_object (self, rows[2], i);
+		if (rows[4] == NULL)
+		{
+			while (liwdg_treerow_get_row_count (rows[2]))
+			{
+				rows[4] = liwdg_treerow_get_row (rows[2], 0);
+				data[4] = liwdg_treerow_get_data (rows[4]);
+				free (data[4]);
+				liwdg_treerow_remove_row (rows[2], 0);
+			}
+			while (liwdg_treerow_get_row_count (rows[3]))
+			{
+				rows[4] = liwdg_treerow_get_row (rows[3], 0);
+				data[4] = liwdg_treerow_get_data (rows[4]);
+				free (data[4]);
+				liwdg_treerow_remove_row (rows[3], 0);
+			}
+			goto error;
+		}
+	}
+
 	return rows[1];
 
 error:
@@ -720,6 +794,47 @@ error:
 	if (rows[1] != NULL)
 		liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (rows[1]));
 	return NULL;
+}
+
+static liwdgTreerow*
+private_append_object (liextBrushes* self,
+                       liwdgTreerow* row,
+                       int           index)
+{
+	ligenBrushobject* object;
+	liextBrushesTreerow* data[2];
+	liwdgTreerow* rows[2];
+
+	/* Get row info. */
+	data[0] = liwdg_treerow_get_data (row);
+	assert (data[0] != NULL);
+	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
+	assert (data[0]->brush != NULL);
+	assert (data[0]->rule == NULL);
+	assert (data[0]->object < 0);
+	assert (data[0]->stroke < 0);
+	rows[0] = row;
+
+	/* Get object info. */
+	assert (index >= 0);
+	assert (index < data[0]->brush->objects.count);
+	object = data[0]->brush->objects.array[index];
+
+	/* Add object row. */
+	data[1] = calloc (1, sizeof (liextBrushesTreerow));
+	data[1]->type = LIEXT_BRUSHES_ROWTYPE_OBJECT;
+	data[1]->brush = data[0]->brush;
+	data[1]->rule = NULL;
+	data[1]->object = index;
+	data[1]->stroke = -1;
+	rows[1] = liwdg_treerow_append_row (rows[0], object->model, data[1]);
+	if (rows[1] == NULL)
+	{
+		free (data[1]);
+		return NULL;
+	}
+
+	return rows[1];
 }
 
 static liwdgTreerow*
@@ -737,14 +852,16 @@ private_append_rule (liextBrushes* self,
 	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_RULES);
 	assert (data[0]->brush != NULL);
 	assert (data[0]->rule == NULL);
+	assert (data[0]->object < 0);
 	assert (data[0]->stroke < 0);
 	rows[0] = row;
 
-	/* Add rule info. */
+	/* Add rule row. */
 	data[1] = calloc (1, sizeof (liextBrushesTreerow));
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_RULE;
 	data[1]->brush = data[0]->brush;
 	data[1]->rule = rule;
+	data[1]->object = -1;
 	data[1]->stroke = -1;
 	rows[1] = liwdg_treerow_append_row (rows[0], rule->name, data[1]);
 	if (rows[1] == NULL)
@@ -791,6 +908,7 @@ private_append_stroke (liextBrushes* self,
 	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_RULE);
 	assert (data[0]->brush != NULL);
 	assert (data[0]->rule != NULL);
+	assert (data[0]->object < 0);
 	assert (data[0]->stroke < 0);
 	rows[0] = row;
 
@@ -806,6 +924,7 @@ private_append_stroke (liextBrushes* self,
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_STROKE;
 	data[1]->brush = data[0]->brush;
 	data[1]->rule = data[0]->rule;
+	data[1]->object = -1;
 	data[1]->stroke = index;
 	rows[1] = liwdg_treerow_append_row (rows[0], brush->name, data[1]);
 	if (rows[1] == NULL)
@@ -887,6 +1006,7 @@ private_populate (liextBrushes* self)
 	data->type = LIEXT_BRUSHES_ROWTYPE_ROOT;
 	data->brush = NULL;
 	data->rule = NULL;
+	data->object = -1;
 	data->stroke = -1;
 	if (!liwdg_treerow_append_row (row, "Brushes", data))
 	{
@@ -906,8 +1026,12 @@ static void
 private_rebuild_preview (liextBrushes* self)
 {
 	int i;
+	int j;
 	liextBrushesTreerow* row;
+	ligenBrush* brush;
+	ligenBrushobject* object;
 	ligenRulestroke* stroke;
+	limatTransform transform;
 
 	row = private_get_active (self);
 	if (row == NULL || row->brush == NULL)
@@ -922,6 +1046,12 @@ private_rebuild_preview (liextBrushes* self)
 	{
 		liext_preview_clear (LIEXT_PREVIEW (self->widgets.preview));
 		liext_preview_insert_stroke (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0, row->brush->id);
+		for (j = 0 ; j < row->brush->objects.count ; j++)
+		{
+			object = row->brush->objects.array[j];
+			transform = object->transform;
+			liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
+		}
 		liext_preview_build (LIEXT_PREVIEW (self->widgets.preview));
 	}
 
@@ -936,6 +1066,25 @@ private_rebuild_preview (liextBrushes* self)
 				stroke->pos[0], stroke->pos[1], stroke->pos[2], stroke->brush);
 		}
 		liext_preview_insert_stroke (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0, row->brush->id);
+		for (i = 0 ; i < row->rule->strokes.count ; i++)
+		{
+			stroke = row->rule->strokes.array + i;
+			brush = ligen_generator_find_brush (self->generator, stroke->brush);
+			if (brush == NULL)
+				continue;
+			for (j = 0 ; j < brush->objects.count ; j++)
+			{
+				object = brush->objects.array[j];
+				transform = object->transform;
+				liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
+			}
+		}
+		for (j = 0 ; j < row->brush->objects.count ; j++)
+		{
+			object = row->brush->objects.array[j];
+			transform = object->transform;
+			liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
+		}
 		liext_preview_build (LIEXT_PREVIEW (self->widgets.preview));
 	}
 }

@@ -38,6 +38,7 @@ typedef struct _liextPreview liextPreview;
 struct _liextPreview
 {
 	liwdgRender base;
+	lialgPtrdic* objects;
 	licliModule* module;
 	ligenGenerator* generator;
 	liengCamera* camera;
@@ -65,6 +66,11 @@ liext_preview_build_box (liextPreview* self,
 
 int
 liext_preview_clear (liextPreview* self);
+
+int
+liext_preview_insert_object (liextPreview*         self,
+                             const limatTransform* transform,
+                             const char*           model);
 
 int
 liext_preview_insert_stroke (liextPreview* self,

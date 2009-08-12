@@ -124,6 +124,63 @@ ligen_brush_free (ligenBrush* self)
 }
 
 /**
+ * \brief Adds a new brush object.
+ *
+ * \param self Brush.
+ * \param flags Object flags.
+ * \param prob Generation probability.
+ * \param type Type string.
+ * \param model Model string.
+ * \param extra Extra string.
+ * \param transform Transformation relative to the brush.
+ * \return Nonzero on success.
+ */
+int
+ligen_brush_insert_object (ligenBrush*           self,
+                           int                   flags,
+                           float                 prob,
+                           const char*           type,
+                           const char*           model,
+                           const char*           extra,
+                           const limatTransform* transform)
+{
+	ligenBrushobject* object;
+
+	/* Allocate object. */
+	object = calloc (1, sizeof (ligenBrushobject));
+	if (object == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+	object->id = self->objects.count;
+	object->flags = flags;
+	object->probability = prob;
+	object->type = strdup (type);
+	object->model = strdup (model);
+	object->extra = strdup (extra);
+	object->transform = *transform;
+	if (object->type == NULL || object->model == NULL || object->extra == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		goto error;
+	}
+
+	/* Add to list. */
+	if (!lialg_array_append (&self->objects, &object))
+		goto error;
+
+	return 1;
+
+error:
+	free (object->type);
+	free (object->model);
+	free (object->extra);
+	free (object);
+	return 0;
+}
+
+/**
  * \brief Inserts a rule to the brush.
  *
  * The ownership of the rule is transferred to the brush if succeeded.
@@ -155,6 +212,38 @@ ligen_brush_read_rules (ligenBrush* self,
 {
 	return private_read_rules (self, sql) &&
 	       private_read_objects (self, sql);
+}
+
+/**
+ * \brief Removes an object from the brush.
+ *
+ * The id numbers of the other object may be altered.
+ *
+ * \param self Brush.
+ * \param index Object number.
+ */
+void
+ligen_brush_remove_object (ligenBrush* self,
+                           int         index)
+{
+	int i;
+	ligenBrushobject* object;
+
+	assert (index >= 0);
+	assert (index < self->objects.count);
+
+	object = self->objects.array[index];
+	free (object->model);
+	free (object->type);
+	free (object->extra);
+	free (object);
+	lialg_array_remove (&self->objects, index);
+
+	for (i = 0 ; i < self->objects.count ; i++)
+	{
+		object = self->objects.array[i];
+		object->id = i;
+	}
 }
 
 /**

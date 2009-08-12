@@ -83,6 +83,14 @@ liext_preview_new (liwdgManager* manager,
 	}
 	LIWDG_RENDER (self)->scene = data->scene;
 
+	/* Allocate objects. */
+	data->objects = lialg_ptrdic_new ();
+	if (data->objects == NULL)
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+
 	/* Allocate generator. */
 	data->generator = ligen_generator_new_full (module->paths->root,
 		module->name, data->scene, module->engine->renderapi);
@@ -157,7 +165,55 @@ liext_preview_build_box (liextPreview* self,
 int
 liext_preview_clear (liextPreview* self)
 {
+	lialgPtrdicIter iter;
+
 	ligen_generator_clear_scene (self->generator);
+	LI_FOREACH_PTRDIC (iter, self->objects)
+		lirnd_object_free (iter.value);
+	lialg_ptrdic_clear (self->objects);
+
+	return 1;
+}
+
+/**
+ * \brief Inserts an object to the preview widget.
+ *
+ * \param self Preview.
+ * \param transform Transformation.
+ * \param model Model name.
+ * \return Nonzero on success.
+ */
+int
+liext_preview_insert_object (liextPreview*         self,
+                             const limatTransform* transform,
+                             const char*           model)
+{
+	liengModel* model_;
+	limatTransform t;
+	lirndObject* object;
+
+	/* Find model. */
+	model_ = lieng_engine_find_model_by_name (self->module->engine, model);
+	if (model_ == NULL)
+		return 0;
+
+	/* Create object. */
+	object = lirnd_object_new (self->scene, self->objects->size);
+	if (object == NULL)
+		return 0;
+	t = limat_convert_vector_to_transform (limat_vector_init (
+		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER));
+	t = limat_transform_multiply (*transform, t);
+	lirnd_object_set_transform (object, &t);
+	lirnd_object_set_model (object, model_->render, NULL);
+	lirnd_object_set_realized (object, 1);
+
+	/* Add to dictionary. */
+	if (!lialg_ptrdic_insert (self->objects, object, object))
+	{
+		lirnd_object_free (object);
+		return 0;
+	}
 
 	return 1;
 }
@@ -225,6 +281,8 @@ private_init (liextPreview* self,
 static void
 private_free (liextPreview* self)
 {
+	lialgPtrdicIter iter;
+
 	if (self->light0 != NULL)
 	{
 		lirnd_lighting_remove_light (self->scene->lighting, self->light0);
@@ -234,6 +292,12 @@ private_free (liextPreview* self)
 	{
 		lirnd_lighting_remove_light (self->scene->lighting, self->light1);
 		lirnd_light_free (self->light1);
+	}
+	if (self->objects != NULL)
+	{
+		LI_FOREACH_PTRDIC (iter, self->objects)
+			lirnd_object_free (iter.value);
+		lialg_ptrdic_free (self->objects);
 	}
 	if (self->camera != NULL)
 		lieng_camera_free (self->camera);

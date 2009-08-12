@@ -75,12 +75,25 @@ void
 ligen_brush_free (ligenBrush* self);
 
 int
+ligen_brush_insert_object (ligenBrush*           self,
+                           int                   flags,
+                           float                 prob,
+                           const char*           type,
+                           const char*           model,
+                           const char*           extra,
+                           const limatTransform* transform);
+
+int
 ligen_brush_insert_rule (ligenBrush* self,
                          ligenRule*  rule);
 
 int
 ligen_brush_read_rules (ligenBrush* self,
                         liarcSql*   sql);
+
+void
+ligen_brush_remove_object (ligenBrush* self,
+                           int         index);
 
 void
 ligen_brush_remove_rule (ligenBrush* self,
