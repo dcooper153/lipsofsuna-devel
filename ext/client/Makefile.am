@@ -70,8 +70,6 @@ libgenerator_cli_la_SOURCES = \
 	generator/ext-brushes.h \
 	generator/ext-dialog.c \
 	generator/ext-dialog.h \
-	generator/ext-dialog-brush.c \
-	generator/ext-dialog-brush.h \
 	generator/ext-materials.c \
 	generator/ext-materials.h \
 	generator/ext-module.c \

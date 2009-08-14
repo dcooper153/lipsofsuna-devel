@@ -27,7 +27,6 @@
 #include <system/lips-system.h>
 #include "ext-brushes.h"
 #include "ext-dialog.h"
-#include "ext-dialog-brush.h"
 #include "ext-materials.h"
 #include "ext-preview.h"
 

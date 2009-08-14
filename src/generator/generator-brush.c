@@ -377,6 +377,41 @@ ligen_brush_set_name (ligenBrush* self,
 	return 1;
 }
 
+int
+ligen_brush_set_size (ligenBrush* self,
+                      int         x,
+                      int         y,
+                      int         z)
+{
+	int i;
+	int j;
+	int k;
+	livoxVoxel* tmp;
+
+	assert (x > 0);
+	assert (y > 0);
+	assert (z > 0);
+
+	tmp = calloc (x * y * z, sizeof (livoxVoxel));
+	if (tmp == NULL)
+		return 0;
+	for (k = 0 ; k < self->size[2] && k < z ; k++)
+	for (j = 0 ; j < self->size[1] && j < y ; j++)
+	for (i = 0 ; i < self->size[0] && i < x ; i++)
+	{
+		tmp[i + j * x + k * x * y] = self->voxels.array[
+			i + j * self->size[0] + k * self->size[0] * self->size[1]];
+	}
+	free (self->voxels.array);
+	self->voxels.array = tmp;
+	self->voxels.count = x * y * z;
+	self->size[0] = x;
+	self->size[1] = y;
+	self->size[2] = z;
+
+	return 1;
+}
+
 void
 ligen_brush_set_voxel (ligenBrush* self,
                        int         x,

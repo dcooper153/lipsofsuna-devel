@@ -26,7 +26,6 @@
 
 #include <system/lips-system.h>
 #include "ext-brushes.h"
-#include "ext-dialog-brush.h"
 #include "ext-module.h"
 #include "ext-preview.h"
 
@@ -121,6 +120,12 @@ private_transform (liextBrushes*   self,
                    int             finish);
 
 static void
+private_resize_brush (liextBrushes* self);
+
+static void
+private_rebuild_brush (liextBrushes* self);
+
+static void
 private_rebuild_preview (liextBrushes* self);
 
 static void
@@ -161,7 +166,7 @@ liext_brushes_new (liwdgManager* manager,
 	}
 	liext_preview_set_transform_call (LIEXT_PREVIEW (data->widgets.preview), private_transform, self);
 	liwdg_widget_set_request (data->widgets.preview, 320, 240);
-	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 2, data->widgets.preview);
+	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 1, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
 
 	/* Populate brush list. */
@@ -213,17 +218,22 @@ private_init (liextBrushes* self,
               liwdgManager* manager)
 {
 	int i;
+	liwdgWidget* group_attr;
 	liwdgWidget* group_tree;
-	liwdgWidget* group_name;
 	liwdgWidget* widgets[] =
 	{
+		liwdg_group_new_with_size (manager, 2, 2),
 		liwdg_group_new_with_size (manager, 1, 4),
-		liwdg_group_new_with_size (manager, 2, 1),
-		liwdg_group_new_with_size (manager, 1, 3),
+		liwdg_group_new_with_size (manager, 3, 1),
+		liwdg_group_new_with_size (manager, 2, 4),
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
 		liwdg_entry_new (manager),
 		liwdg_label_new (manager),
+		liwdg_label_new (manager),
+		liwdg_spin_new (manager),
+		liwdg_spin_new (manager),
+		liwdg_spin_new (manager),
 		liwdg_tree_new (manager)
 	};
 
@@ -237,22 +247,31 @@ private_init (liextBrushes* self,
 	}
 
 	/* Assign widgets. */
-	group_tree = widgets[(i = 0)];
-	group_name = widgets[++i];
+	group_attr = widgets[(i = 0)];
+	group_tree = widgets[++i];
+	self->widgets.group_size = widgets[++i];
 	self->widgets.group_view = widgets[++i];
 	self->widgets.button_add = widgets[++i];
 	self->widgets.button_remove = widgets[++i];
 	self->widgets.entry_name = widgets[++i];
+	self->widgets.label_size = widgets[++i];
 	self->widgets.label_type = widgets[++i];
+	self->widgets.spin_sizex = widgets[++i];
+	self->widgets.spin_sizey = widgets[++i];
+	self->widgets.spin_sizez = widgets[++i];
 	self->widgets.tree = widgets[++i];
 
 	/* Configure widgets. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_size), "Size");
 	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_rename, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.tree, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.spin_sizex, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.spin_sizey, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 
 	/* Tree. */
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 2, 1);
@@ -261,19 +280,31 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_add);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_remove);
 
-	/* Strokes. */
-	liwdg_group_set_col_expand (LIWDG_GROUP (group_name), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_name), 0, 0, self->widgets.label_type);
-	liwdg_group_set_child (LIWDG_GROUP (group_name), 1, 0, self->widgets.entry_name);
+	/* View. */
+	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_size), 0, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_size), 0, 1);
+	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_size), 1);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 0, 0, self->widgets.spin_sizex);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 1, 0, self->widgets.spin_sizey);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 2, 0, self->widgets.spin_sizez);
+	liwdg_group_set_col_expand (LIWDG_GROUP (group_attr), 1, 1);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 1, self->widgets.label_type);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 1, self->widgets.entry_name);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 0, self->widgets.label_size);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 0, self->widgets.group_size);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 2, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, group_name);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 1, 1);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, group_attr);
+	liwdg_widget_set_visible (self->widgets.label_size, 0);
+	liwdg_widget_set_visible (self->widgets.group_size, 0);
 
 	/* Pack self. */
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, group_tree);
 	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, self->widgets.group_view);
+
+	self->transform = limat_transform_identity ();
 
 	return 1;
 
@@ -318,8 +349,9 @@ static int
 private_add (liextBrushes* self,
              liwdgWidget*  widget)
 {
-	ligenRule* rule;
 	liextBrushesTreerow* data;
+	ligenBrush* brush;
+	ligenRule* rule;
 	limatTransform transform;
 	liwdgTreerow* row;
 
@@ -334,14 +366,19 @@ private_add (liextBrushes* self,
 	switch (data->type)
 	{
 		case LIEXT_BRUSHES_ROWTYPE_ROOT:
-			self->widgets.dialog = liext_dialog_brush_new (widget->manager, self->module);
-			if (!liwdg_manager_insert_window (widget->manager, self->widgets.dialog))
+			brush = ligen_brush_new (self->generator, 10, 10, 10);
+			if (brush == NULL)
+				return 0;
+			if (!ligen_generator_insert_brush (self->generator, brush))
 			{
-				liwdg_widget_free (self->widgets.dialog);
-				self->widgets.dialog = NULL;
+				ligen_brush_free (brush);
 				return 0;
 			}
-			liwdg_widget_set_visible (self->widgets.dialog, 1);
+			if (!private_append_brush (self, brush))
+			{
+				ligen_generator_remove_brush (self->generator, brush->id);
+				return 0;
+			}
 			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_BRUSH:
@@ -908,9 +945,9 @@ private_transform (liextBrushes*   self,
 	limatQuaternion quat;
 	limatVector pos;
 
+	row = private_get_active (self);
 	if (finish)
 	{
-		row = private_get_active (self);
 		if (row != NULL && row->stroke >= 0)
 		{
 			stroke = row->rule->strokes.array + row->stroke;
@@ -925,6 +962,15 @@ private_transform (liextBrushes*   self,
 			quat = limat_quaternion_multiply (transform->rotation, object->transform.rotation);
 			object->transform = limat_transform_init (pos, quat);
 		}
+		else if (row->type == LIEXT_BRUSHES_ROWTYPE_BRUSH)
+		{
+			self->transform = limat_transform_multiply (*transform, self->transform);
+		}
+	}
+	else if (row->type == LIEXT_BRUSHES_ROWTYPE_BRUSH)
+	{
+		private_rebuild_brush (self);
+		return;
 	}
 	private_rebuild_preview (self);
 }
@@ -961,6 +1007,77 @@ private_populate (liextBrushes* self)
 		brush = iter.value;
 		private_append_brush (self, brush);
 	}
+}
+
+static void
+private_resize_brush (liextBrushes* self)
+{
+	int x;
+	int y;
+	int z;
+	liextBrushesTreerow* data;
+	liwdgTreerow* row;
+
+	/* Find the brush. */
+	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	assert (row != NULL);
+	data = liwdg_treerow_get_data (row);
+	assert (data != NULL);
+	assert (data->brush != NULL); 
+
+	/* Resize the brush. */
+	x = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizex));
+	y = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizey));
+	z = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizez));
+	ligen_brush_set_size (data->brush, x, y, z);
+
+	/* Rebuild preview. */
+	private_rebuild_preview (self);
+}
+
+static void
+private_rebuild_brush (liextBrushes* self)
+{
+	int x;
+	int y;
+	int z;
+	liengObject* player;
+	liextBrushesTreerow* data;
+	ligenBrush* brush;
+	limatTransform transform;
+	limatTransform transform0;
+	limatTransform transform1;
+	liwdgTreerow* row;
+
+	/* Find the brush. */
+	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (row == NULL)
+		return;
+	data = liwdg_treerow_get_data (row);
+	assert (data != NULL);
+	assert (data->brush != NULL); 
+	brush = data->brush;
+
+	/* Find the player. */
+	if (self->module->module->network == NULL)
+		return;
+	player = licli_module_get_player (self->module->module);
+	if (player == NULL)
+		return;
+
+	/* Copy voxels from the scene. */
+	lieng_object_get_transform (player, &transform0);
+	liext_preview_get_transform (LIEXT_PREVIEW (self->widgets.preview), &transform1);
+	transform = limat_transform_multiply (transform1, transform0);
+	transform = limat_transform_multiply (transform, self->transform);
+	x = (int)(round (transform.position.x / LIVOX_TILE_WIDTH));
+	y = (int)(round (transform.position.y / LIVOX_TILE_WIDTH));
+	z = (int)(round (transform.position.z / LIVOX_TILE_WIDTH));
+	livox_manager_copy_voxels (self->module->module->voxels, x, y, z,
+		brush->size[0], brush->size[1], brush->size[2], brush->voxels.array);
+
+	/* Rebuild preview. */
+	private_rebuild_preview (self);
 }
 
 static void
@@ -1077,22 +1194,33 @@ private_rebuild_selection (liextBrushes* self)
 	{
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
+		liwdg_widget_set_visible (self->widgets.label_size, 0);
+		liwdg_widget_set_visible (self->widgets.group_size, 0);
 	}
 	else if (data->object >= 0)
 	{
 		object = data->brush->objects.array[data->object];
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Object:");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), object->model);
+		liwdg_widget_set_visible (self->widgets.label_size, 0);
+		liwdg_widget_set_visible (self->widgets.group_size, 0);
 	}
 	else if (data->rule == NULL)
 	{
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Brush:");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->brush->name);
+		liwdg_widget_set_visible (self->widgets.label_size, 1);
+		liwdg_widget_set_visible (self->widgets.group_size, 1);
+		liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_sizex), data->brush->size[0]);
+		liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_sizey), data->brush->size[1]);
+		liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_sizez), data->brush->size[2]);
 	}
 	else if (data->stroke < 0)
 	{
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Rule:");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->rule->name);
+		liwdg_widget_set_visible (self->widgets.label_size, 0);
+		liwdg_widget_set_visible (self->widgets.group_size, 0);
 	}
 	else
 	{
@@ -1100,6 +1228,8 @@ private_rebuild_selection (liextBrushes* self)
 		brush = ligen_generator_find_brush (self->generator, stroke->brush);
 		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Stroke:");
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), brush != NULL? brush->name : "");
+		liwdg_widget_set_visible (self->widgets.label_size, 0);
+		liwdg_widget_set_visible (self->widgets.group_size, 0);
 	}
 
 	/* Rebuild preview. */

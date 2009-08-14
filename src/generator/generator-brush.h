@@ -111,6 +111,12 @@ int
 ligen_brush_set_name (ligenBrush* self,
                       const char* value);
 
+int
+ligen_brush_set_size (ligenBrush* self,
+                      int         x,
+                      int         y,
+                      int         z);
+
 void
 ligen_brush_set_voxel (ligenBrush* self,
                        int         x,

@@ -41,15 +41,21 @@ struct _liextBrushes
 	liwdgGroup base;
 	liextModule* module;
 	ligenGenerator* generator;
+	limatTransform transform;
 	struct
 	{
 		liwdgWidget* dialog;
 		liwdgWidget* group_view;
+		liwdgWidget* group_size;
 		liwdgWidget* button_add;
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
+		liwdgWidget* label_size;
 		liwdgWidget* label_type;
 		liwdgWidget* preview;
+		liwdgWidget* spin_sizex;
+		liwdgWidget* spin_sizey;
+		liwdgWidget* spin_sizez;
 		liwdgWidget* tree;
 	} widgets;
 };
