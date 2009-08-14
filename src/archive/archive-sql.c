@@ -116,8 +116,8 @@ liarc_sql_insert (liarcSql*   self,
 		switch (type)
 		{
 			case LIARC_SQL_BLOB:
-				intv = va_arg (args, int);
 				voidv = va_arg (args, void*);
+				intv = va_arg (args, int);
 				break;
 			case LIARC_SQL_FLOAT:
 				floatv = va_arg (args, double);
@@ -188,8 +188,8 @@ liarc_sql_insert (liarcSql*   self,
 		switch (type)
 		{
 			case LIARC_SQL_BLOB:
-				intv = va_arg (args, int);
 				voidv = va_arg (args, void*);
+				intv = va_arg (args, int);
 				if (sqlite3_bind_blob (statement, i, voidv, intv, SQLITE_TRANSIENT) != SQLITE_OK)
 				{
 					lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self));
@@ -270,7 +270,7 @@ liarc_sql_replace (liarcSql*   self,
 		return 0;
 	}
 	strcpy (query, "INSERT OR REPLACE INTO ");
-	pos = 12;
+	pos = 23;
 	strcpy (query + pos, table);
 	pos += len;
 	strcpy (query + pos, " (");
@@ -286,8 +286,8 @@ liarc_sql_replace (liarcSql*   self,
 		switch (type)
 		{
 			case LIARC_SQL_BLOB:
-				intv = va_arg (args, int);
 				voidv = va_arg (args, void*);
+				intv = va_arg (args, int);
 				break;
 			case LIARC_SQL_FLOAT:
 				floatv = va_arg (args, double);
@@ -358,8 +358,8 @@ liarc_sql_replace (liarcSql*   self,
 		switch (type)
 		{
 			case LIARC_SQL_BLOB:
-				intv = va_arg (args, int);
 				voidv = va_arg (args, void*);
+				intv = va_arg (args, int);
 				if (sqlite3_bind_blob (statement, i, voidv, intv, SQLITE_TRANSIENT) != SQLITE_OK)
 				{
 					lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self));
