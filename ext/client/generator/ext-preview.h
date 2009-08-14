@@ -42,10 +42,15 @@ struct _liextPreview
 	licliModule* module;
 	ligenGenerator* generator;
 	liengCamera* camera;
+	limatVector drag;
+	limatTransform transform;
 	lirndLight* light0;
 	lirndLight* light1;
 	lirndRender* render;
 	lirndScene* scene;
+	int mode;
+	void (*transform_call)(void*, const limatTransform*, int);
+	void* transform_data;
 };
 
 extern const liwdgClass liextPreviewType;
@@ -82,6 +87,15 @@ liext_preview_insert_stroke (liextPreview* self,
 int
 liext_preview_replace_materials (liextPreview* self,
                                  livoxManager* voxels);
+
+void
+liext_preview_get_transform (liextPreview*   self,
+                             limatTransform* value);
+
+void
+liext_preview_set_transform_call (liextPreview* self,
+                                  void        (*call)(),
+                                  void*         data);
 
 #endif
 

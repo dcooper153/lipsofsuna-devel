@@ -28,6 +28,19 @@
 
 #define LIEXT_PREVIEW_CENTER 8160
 
+enum
+{
+	LIEXT_PREVIEW_MODE_CAMERA,
+	LIEXT_PREVIEW_MODE_ROTATE,
+	LIEXT_PREVIEW_MODE_ROTATEX,
+	LIEXT_PREVIEW_MODE_ROTATEY,
+	LIEXT_PREVIEW_MODE_ROTATEZ,
+	LIEXT_PREVIEW_MODE_TRANSLATE,
+	LIEXT_PREVIEW_MODE_TRANSLATEX,
+	LIEXT_PREVIEW_MODE_TRANSLATEY,
+	LIEXT_PREVIEW_MODE_TRANSLATEZ
+};
+
 static const void*
 private_base ();
 
@@ -41,6 +54,10 @@ private_free (liextPreview* self);
 static int
 private_event (liextPreview* self,
                liwdgEvent*   event);
+
+static void
+private_motion (liextPreview* self,
+                liwdgEvent*   event);
 
 static void
 private_render_preview (liwdgWidget*  widget,
@@ -203,7 +220,7 @@ liext_preview_insert_object (liextPreview*         self,
 		return 0;
 	t = limat_convert_vector_to_transform (limat_vector_init (
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER));
-	t = limat_transform_multiply (*transform, t);
+	t = limat_transform_multiply (t, *transform);
 	lirnd_object_set_transform (object, &t);
 	lirnd_object_set_model (object, model_->render, NULL);
 	lirnd_object_set_realized (object, 1);
@@ -259,6 +276,25 @@ liext_preview_replace_materials (liextPreview* self,
 	}
 
 	return 1;
+}
+
+void
+liext_preview_get_transform (liextPreview*   self,
+                             limatTransform* value)
+{
+	if (self->mode != LIEXT_PREVIEW_MODE_CAMERA)
+		*value = self->transform;
+	else
+		*value = limat_transform_identity ();
+}
+
+void
+liext_preview_set_transform_call (liextPreview* self,
+                                  void        (*call)(),
+                                  void*         data)
+{
+	self->transform_call = call;
+	self->transform_data = data;
 }
 
 /****************************************************************************/
@@ -322,6 +358,23 @@ private_event (liextPreview* self,
 		{
 			switch (event->button.button)
 			{
+				case 1:
+					if (self->mode != LIEXT_PREVIEW_MODE_CAMERA)
+					{
+						self->mode = LIEXT_PREVIEW_MODE_CAMERA;
+						if (self->transform_call != NULL)
+							self->transform_call (self->transform_data, &self->transform, 1);
+					}
+					break;
+				case 3:
+					if (self->mode != LIEXT_PREVIEW_MODE_CAMERA)
+					{
+						self->transform = limat_transform_identity ();
+						if (self->transform_call != NULL)
+							self->transform_call (self->transform_data, &self->transform, 0);
+						self->mode = LIEXT_PREVIEW_MODE_CAMERA;
+					}
+					break;
 				case 4:
 					lieng_camera_move (self->camera, 5.0f);
 					break;
@@ -344,9 +397,48 @@ private_event (liextPreview* self,
 	if (event->type == LIWDG_EVENT_TYPE_MOTION)
 	{
 		if (liwdg_widget_get_grab (LIWDG_WIDGET (self)))
+			private_motion (self, event);
+	}
+	if (event->type == LIWDG_EVENT_TYPE_KEY_PRESS)
+	{
+		switch (event->key.keycode)
 		{
-			lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
-			lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
+			case SDLK_g:
+				self->drag = limat_vector_init (0.0f, 0.0f, 0.0f);
+				self->mode = LIEXT_PREVIEW_MODE_TRANSLATE;
+				self->transform = limat_transform_identity ();
+				self->transform_call (self->transform_data, &self->transform, 0);
+				break;
+			case SDLK_r:
+				self->drag = limat_vector_init (0.0f, 0.0f, 0.0f);
+				self->mode = LIEXT_PREVIEW_MODE_ROTATE;
+				self->transform = limat_transform_identity ();
+				self->transform_call (self->transform_data, &self->transform, 0);
+				break;
+			case SDLK_x:
+				if (self->mode >= LIEXT_PREVIEW_MODE_TRANSLATE &&
+				    self->mode <= LIEXT_PREVIEW_MODE_TRANSLATEZ)
+					self->mode = LIEXT_PREVIEW_MODE_TRANSLATEX;
+				if (self->mode >= LIEXT_PREVIEW_MODE_ROTATE &&
+				    self->mode <= LIEXT_PREVIEW_MODE_ROTATEZ)
+					self->mode = LIEXT_PREVIEW_MODE_ROTATEX;
+				break;
+			case SDLK_y:
+				if (self->mode >= LIEXT_PREVIEW_MODE_TRANSLATE &&
+				    self->mode <= LIEXT_PREVIEW_MODE_TRANSLATEZ)
+					self->mode = LIEXT_PREVIEW_MODE_TRANSLATEY;
+				if (self->mode >= LIEXT_PREVIEW_MODE_ROTATE &&
+				    self->mode <= LIEXT_PREVIEW_MODE_ROTATEZ)
+					self->mode = LIEXT_PREVIEW_MODE_ROTATEY;
+				break;
+			case SDLK_z:
+				if (self->mode >= LIEXT_PREVIEW_MODE_TRANSLATE &&
+				    self->mode <= LIEXT_PREVIEW_MODE_TRANSLATEZ)
+					self->mode = LIEXT_PREVIEW_MODE_TRANSLATEZ;
+				if (self->mode >= LIEXT_PREVIEW_MODE_ROTATE &&
+				    self->mode <= LIEXT_PREVIEW_MODE_ROTATEZ)
+					self->mode = LIEXT_PREVIEW_MODE_ROTATEZ;
+				break;
 		}
 	}
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
@@ -373,6 +465,85 @@ private_event (liextPreview* self,
 	}
 
 	return liwdgRenderType.event (LIWDG_WIDGET (self), event);
+}
+
+static void
+private_motion (liextPreview* self,
+                liwdgEvent*   event)
+{
+	float amount;
+	limatVector vx;
+	limatVector vy;
+	limatVector axis;
+	limatVector delta;
+	limatQuaternion quat;
+	limatTransform transform;
+
+	self->drag.x += event->motion.dx;
+	self->drag.y += event->motion.dy;
+	if (self->transform_call != NULL)
+	{
+		switch (self->mode)
+		{
+			case LIEXT_PREVIEW_MODE_TRANSLATE:
+				lieng_camera_get_transform (self->camera, &transform);
+				vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
+				vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
+				vx = limat_vector_multiply (vx, 0.05f * self->drag.x);
+				vy = limat_vector_multiply (vy, 0.05f * self->drag.y);
+				delta = limat_vector_add (vx, vy);
+				self->transform = limat_transform_init (delta, limat_quaternion_identity ());
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_TRANSLATEX:
+				amount = 0.05f * self->drag.x;
+				delta = limat_vector_init (amount, 0.0f, 0.0f);
+				self->transform = limat_convert_vector_to_transform (delta);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_TRANSLATEY:
+				amount = 0.05f * self->drag.x;
+				delta = limat_vector_init (0.0f, amount, 0.0f);
+				self->transform = limat_convert_vector_to_transform (delta);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_TRANSLATEZ:
+				amount = 0.05f * self->drag.x;
+				delta = limat_vector_init (0.0f, 0.0f, amount);
+				self->transform = limat_convert_vector_to_transform (delta);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_ROTATE:
+				lieng_camera_get_transform (self->camera, &transform);
+				axis = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 0.0f, 1.0f));
+				amount = atan2 (self->drag.y, self->drag.x);
+				quat = limat_quaternion_rotation (amount, axis);
+				self->transform = limat_convert_quaternion_to_transform (quat);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_ROTATEX:
+				amount = 0.02f * self->drag.x;
+				quat = limat_quaternion_rotation (amount, limat_vector_init (1.0f, 0.0f, 0.0f));
+				self->transform = limat_convert_quaternion_to_transform (quat);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_ROTATEY:
+				amount = 0.02f * self->drag.x;
+				quat = limat_quaternion_rotation (amount, limat_vector_init (0.0f, 1.0f, 0.0f));
+				self->transform = limat_convert_quaternion_to_transform (quat);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+			case LIEXT_PREVIEW_MODE_ROTATEZ:
+				amount = 0.02f * self->drag.x;
+				quat = limat_quaternion_rotation (amount, limat_vector_init (0.0f, 0.0f, 1.0f));
+				self->transform = limat_convert_quaternion_to_transform (quat);
+				self->transform_call (self->transform_data, &self->transform, 0);
+				return;
+		}
+	}
+
+	lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
+	lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
 }
 
 static void

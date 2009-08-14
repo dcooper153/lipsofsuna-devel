@@ -45,10 +45,6 @@ struct _liextBrushes
 	{
 		liwdgWidget* dialog;
 		liwdgWidget* group_view;
-		liwdgWidget* button_move_left;
-		liwdgWidget* button_move_right;
-		liwdgWidget* button_move_up;
-		liwdgWidget* button_move_down;
 		liwdgWidget* button_add;
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
