@@ -656,7 +656,17 @@ private_init_brushes (ligenGenerator* self)
 		size0 = sqlite3_column_bytes (statement, col);
 		size1 = size[0] * size[1] * size[2] * sizeof (livoxVoxel);
 		if (size0 == size1)
+		{
 			memcpy (brush->voxels.array, bytes, size1);
+#if LI_BYTE_ORDER != LI_BIG_ENDIAN
+			for (size0 = 0 ; size0 < brush->voxels.count ; size0++)
+			{
+				brush->voxels.array[size0] =
+					(((brush->voxels.array[size0] & 0x00FF) << 8) |
+					 ((brush->voxels.array[size0] & 0xFF00) >> 8));
+			}
+#endif
+		}
 	}
 	sqlite3_finalize (statement);
 

@@ -123,6 +123,9 @@ private_transform (liextBrushes*   self,
 static void
 private_rebuild_preview (liextBrushes* self);
 
+static void
+private_rebuild_selection (liextBrushes* self);
+
 static liextBrushesTreerow*
 private_get_active (liextBrushes* self);
 
@@ -339,6 +342,7 @@ private_add (liextBrushes* self,
 				return 0;
 			}
 			liwdg_widget_set_visible (self->widgets.dialog, 1);
+			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_BRUSH:
 			break;
@@ -359,6 +363,7 @@ private_add (liextBrushes* self,
 				ligen_brush_remove_object (data->brush, data->brush->objects.count - 1);
 				return 0;
 			}
+			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_RULES:
 			rule = ligen_rule_new ();
@@ -370,6 +375,7 @@ private_add (liextBrushes* self,
 				return 0;
 			}
 			private_append_rule (self, row, rule);
+			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_STROKE:
 			row = liwdg_treerow_get_parent (row);
@@ -381,6 +387,7 @@ private_add (liextBrushes* self,
 			if (!ligen_rule_insert_stroke (data->rule, 0, 0, 0, 0, 0))
 				return 0;
 			private_append_stroke (self, row, data->rule->strokes.count - 1);
+			private_rebuild_selection (self);
 			break;
 	}
 
@@ -412,10 +419,11 @@ private_remove (liextBrushes* self,
 		case LIEXT_BRUSHES_ROWTYPE_BRUSH:
 			rows[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
 			private_remove_strokes (self, rows[0], data[0]->brush->id);
+			rows[0] = liwdg_treerow_get_parent (row);
 			liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (row));
 			ligen_generator_remove_brush (self->generator, data[0]->brush->id);
 			free (data[0]);
-			private_rebuild_preview (self);
+			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
 			break;
@@ -431,16 +439,16 @@ private_remove (liextBrushes* self,
 				data[1] = liwdg_treerow_get_data (rows[1]);
 				data[1]->object = i;
 			}
-			private_rebuild_preview (self);
+			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_RULES:
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_RULE:
-			rows[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
+			rows[0] = liwdg_treerow_get_parent (row);
 			ligen_brush_remove_rule (data[0]->brush, data[0]->rule->id);
 			liwdg_treerow_remove_row (rows[0], liwdg_treerow_get_index (row));
 			free (data[0]);
-			private_rebuild_preview (self);
+			private_rebuild_selection (self);
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_STROKE:
 			rows[0] = liwdg_treerow_get_parent (row);
@@ -454,7 +462,7 @@ private_remove (liextBrushes* self,
 				data[1] = liwdg_treerow_get_data (rows[1]);
 				data[1]->stroke = i;
 			}
-			private_rebuild_preview (self);
+			private_rebuild_selection (self);
 			break;
 	}
 
@@ -533,9 +541,6 @@ private_selected (liextBrushes* self,
                   liwdgTreerow* row)
 {
 	liextBrushesTreerow* data;
-	ligenBrush* brush;
-	ligenBrushobject* object;
-	ligenRulestroke* stroke;
 	liwdgTreerow* row0;
 
 	/* Deselect old. */
@@ -548,38 +553,8 @@ private_selected (liextBrushes* self,
 	data = liwdg_treerow_get_data (row);
 	assert (data != NULL);
 
-	/* Set info. */
-	if (data == NULL || data->brush == NULL)
-	{
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
-	}
-	else if (data->object >= 0)
-	{
-		object = data->brush->objects.array[data->object];
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Object:");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), object->model);
-	}
-	else if (data->rule == NULL)
-	{
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Brush:");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->brush->name);
-	}
-	else if (data->stroke < 0)
-	{
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Rule:");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->rule->name);
-	}
-	else
-	{
-		stroke = data->rule->strokes.array + data->stroke;
-		brush = ligen_generator_find_brush (self->generator, stroke->brush);
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Stroke:");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), brush != NULL? brush->name : "");
-	}
-
-	/* Rebuild preview. */
-	private_rebuild_preview (self);
+	/* Update info. */
+	private_rebuild_selection (self);
 
 	return 0;
 }
@@ -687,6 +662,14 @@ private_append_brush (liextBrushes* self,
 		}
 	}
 
+	/* Set active. */
+	rows[0] = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (rows[0] != NULL)
+		liwdg_treerow_set_highlighted (rows[0], 0);
+	liwdg_treerow_set_highlighted (rows[1], 1);
+	rows[0] = liwdg_treerow_get_parent (rows[1]);
+	liwdg_treerow_set_expanded (rows[0], 1);
+
 	return rows[1];
 
 error:
@@ -735,6 +718,14 @@ private_append_object (liextBrushes* self,
 		free (data[1]);
 		return NULL;
 	}
+
+	/* Set active. */
+	rows[0] = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (rows[0] != NULL)
+		liwdg_treerow_set_highlighted (rows[0], 0);
+	liwdg_treerow_set_highlighted (rows[1], 1);
+	rows[0] = liwdg_treerow_get_parent (rows[1]);
+	liwdg_treerow_set_expanded (rows[0], 1);
 
 	return rows[1];
 }
@@ -791,6 +782,14 @@ private_append_rule (liextBrushes* self,
 		}
 	}
 
+	/* Set active. */
+	rows[0] = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (rows[0] != NULL)
+		liwdg_treerow_set_highlighted (rows[0], 0);
+	liwdg_treerow_set_highlighted (rows[1], 1);
+	rows[0] = liwdg_treerow_get_parent (rows[1]);
+	liwdg_treerow_set_expanded (rows[0], 1);
+
 	return rows[1];
 }
 
@@ -834,6 +833,14 @@ private_append_stroke (liextBrushes* self,
 		free (data[1]);
 		return NULL;
 	}
+
+	/* Set active. */
+	rows[0] = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (rows[0] != NULL)
+		liwdg_treerow_set_highlighted (rows[0], 0);
+	liwdg_treerow_set_highlighted (rows[1], 1);
+	rows[0] = liwdg_treerow_get_parent (rows[1]);
+	liwdg_treerow_set_expanded (rows[0], 1);
 
 	return rows[1];
 }
@@ -1042,6 +1049,61 @@ private_rebuild_preview (liextBrushes* self)
 		}
 		liext_preview_build (LIEXT_PREVIEW (self->widgets.preview));
 	}
+}
+
+static void
+private_rebuild_selection (liextBrushes* self)
+{
+	liextBrushesTreerow* data;
+	ligenBrush* brush;
+	ligenBrushobject* object;
+	ligenRulestroke* stroke;
+	liwdgTreerow* row;
+
+	/* Get active row. */
+	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (row == NULL)
+	{
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
+		private_rebuild_preview (self);
+		return;
+	}
+	data = liwdg_treerow_get_data (row);
+	assert (data != NULL);
+
+	/* Set info. */
+	if (data->brush == NULL)
+	{
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
+	}
+	else if (data->object >= 0)
+	{
+		object = data->brush->objects.array[data->object];
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Object:");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), object->model);
+	}
+	else if (data->rule == NULL)
+	{
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Brush:");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->brush->name);
+	}
+	else if (data->stroke < 0)
+	{
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Rule:");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->rule->name);
+	}
+	else
+	{
+		stroke = data->rule->strokes.array + data->stroke;
+		brush = ligen_generator_find_brush (self->generator, stroke->brush);
+		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Stroke:");
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), brush != NULL? brush->name : "");
+	}
+
+	/* Rebuild preview. */
+	private_rebuild_preview (self);
 }
 
 static liextBrushesTreerow*
