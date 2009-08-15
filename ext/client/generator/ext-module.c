@@ -54,21 +54,18 @@ liext_module_new (licliModule* module)
 	self->module = module;
 
 	/* Create dialog. */
-	self->dialog = liext_dialog_new (module->widgets, self);
-	if (self->dialog == NULL)
+	self->editor = liext_editor_new (module->widgets, self);
+	if (self->editor == NULL)
 	{
 		free (self);
 		return NULL;
 	}
-	liwdg_manager_insert_window (module->widgets, self->dialog);
-	liwdg_widget_set_visible (self->dialog, 0);
 
 	/* Register callbacks. */
 	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 100,
 	     	private_packet, self, self->calls + 0))
 	{
-		liwdg_manager_remove_window (self->module->widgets, self->dialog);
-		liwdg_widget_free (self->dialog);
+		liwdg_widget_free (self->editor);
 		free (self);
 		return NULL;
 	}
@@ -87,15 +84,15 @@ liext_module_free (liextModule* self)
 		sizeof (self->calls) / sizeof (licalHandle));
 
 	/* FIXME: Remove the class here. */
-	liwdg_manager_remove_window (self->module->widgets, self->dialog);
-	liwdg_widget_free (self->dialog);
+	if (self->script == NULL)
+		liwdg_widget_free (self->editor);
 	free (self);
 }
 
 int
 liext_module_save (liextModule* self)
 {
-	return liext_dialog_save (LIEXT_DIALOG (self->dialog));
+	return liext_editor_save (LIEXT_EDITOR (self->editor));
 }
 
 /*****************************************************************************/
@@ -107,7 +104,7 @@ private_packet (liextModule* self,
 {
 	reader->pos = 1;
 	if (type == LIEXT_VOXEL_PACKET_ASSIGN)
-		liext_dialog_reset (LIEXT_DIALOG (self->dialog));
+		liext_editor_reset (LIEXT_EDITOR (self->editor));
 
 	return 1;
 }

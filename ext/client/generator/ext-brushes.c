@@ -1154,7 +1154,9 @@ private_rebuild_preview (liextBrushes* self)
 			for (j = 0 ; j < brush->objects.count ; j++)
 			{
 				object = brush->objects.array[j];
-				transform = object->transform;
+				transform = limat_convert_vector_to_transform (limat_vector_init (
+					stroke->pos[0], stroke->pos[1], stroke->pos[2]));
+				transform = limat_transform_multiply (object->transform, transform);
 				liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
 			}
 		}

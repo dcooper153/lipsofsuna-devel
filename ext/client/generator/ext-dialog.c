@@ -34,38 +34,38 @@ static const void*
 private_base ();
 
 static int
-private_init (liextDialog*    self,
+private_init (liextEditor*    self,
               liwdgManager* manager);
 
 static void
-private_free (liextDialog* self);
+private_free (liextEditor* self);
 
 static int
-private_event (liextDialog* self,
+private_event (liextEditor* self,
                liwdgEvent*  event);
 
 /****************************************************************************/
 
-const liwdgClass liextDialogType =
+const liwdgClass liextEditorType =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (liextDialog),
+	LIWDG_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (liextEditor),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
 };
 
 liwdgWidget*
-liext_dialog_new (liwdgManager* manager,
+liext_editor_new (liwdgManager* manager,
                   liextModule*  module)
 {
-	liextDialog* data;
+	liextEditor* data;
 	liwdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &liextDialogType);
+	self = liwdg_widget_new (manager, &liextEditorType);
 	if (self == NULL)
 		return NULL;
-	data = LIEXT_DIALOG (self);
+	data = LIEXT_EDITOR (self);
 	data->module = module;
 
 	/* Initialize brush editor. */
@@ -90,14 +90,14 @@ liext_dialog_new (liwdgManager* manager,
 }
 
 int
-liext_dialog_save (liextDialog* self)
+liext_editor_save (liextEditor* self)
 {
 	return liext_brushes_save (LIEXT_BRUSHES (self->brushes)) &&
 	       liext_materials_save (LIEXT_MATERIALS (self->materials));
 }
 
 void
-liext_dialog_reset (liextDialog* self)
+liext_editor_reset (liextEditor* self)
 {
 	liext_brushes_reset (LIEXT_BRUSHES (self->brushes));
 	liext_materials_reset (LIEXT_MATERIALS (self->materials));
@@ -108,34 +108,34 @@ liext_dialog_reset (liextDialog* self)
 static const void*
 private_base ()
 {
-	return &liwdgWindowType;
+	return &liwdgGroupType;
 }
 
 static int
-private_init (liextDialog*  self,
+private_init (liextEditor*  self,
               liwdgManager* manager)
 {
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
 		return 0;
 
-	liwdg_window_set_title (LIWDG_WINDOW (self), "Generator");
-	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 0, 1);
+	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 
 	return 1;
 }
 
 static void
-private_free (liextDialog* self)
+private_free (liextEditor* self)
 {
 }
 
 static int
-private_event (liextDialog* self,
+private_event (liextEditor* self,
                liwdgEvent*  event)
 {
-	return liwdgWindowType.event (LIWDG_WIDGET (self), event);
+	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

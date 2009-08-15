@@ -32,8 +32,7 @@
 #define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
 
 typedef struct _liextBrushes liextBrushes;
-typedef struct _liextDialog liextDialog;
-typedef struct _liextDialogBrush liextDialogBrush;
+typedef struct _liextEditor liextEditor;
 typedef struct _liextMaterials liextMaterials;
 typedef struct _liextModule liextModule;
 
@@ -41,7 +40,8 @@ struct _liextModule
 {
 	licalHandle calls[1];
 	licliModule* module;
-	liwdgWidget* dialog;
+	liscrData* script;
+	liwdgWidget* editor;
 };
 
 liextModule*

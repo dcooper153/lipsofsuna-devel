@@ -24,8 +24,8 @@
  * @{
  */
 
-#ifndef __EXT_DIALOG_H__
-#define __EXT_DIALOG_H__
+#ifndef __EXT_EDITOR_H__
+#define __EXT_EDITOR_H__
 
 #include <client/lips-client.h>
 #include <generator/lips-generator.h>
@@ -34,36 +34,36 @@
 #include "ext-materials.h"
 #include "ext-module.h"
 
-#define LIEXT_DIALOG(o) ((liextDialog*)(o))
+#define LIEXT_EDITOR(o) ((liextEditor*)(o))
 
-typedef struct _liextDialogTreerow liextDialogTreerow;
-struct _liextDialogTreerow
+typedef struct _liextEditorTreerow liextEditorTreerow;
+struct _liextEditorTreerow
 {
 	ligenBrush* brush;
 	ligenRule* rule;
 	int stroke;
 };
 
-struct _liextDialog
+struct _liextEditor
 {
-	liwdgWindow base;
+	liwdgGroup base;
 	liextModule* module;
 	ligenGenerator* generator;
 	liwdgWidget* brushes;
 	liwdgWidget* materials;
 };
 
-extern const liwdgClass liextDialogType;
+extern const liwdgClass liextEditorType;
 
 liwdgWidget*
-liext_dialog_new (liwdgManager* manager,
+liext_editor_new (liwdgManager* manager,
                   liextModule*  module);
 
 int
-liext_dialog_save (liextDialog* self);
+liext_editor_save (liextEditor* self);
 
 void
-liext_dialog_reset (liextDialog* self);
+liext_editor_reset (liextEditor* self);
 
 #endif
 
