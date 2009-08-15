@@ -57,18 +57,6 @@ static int
 private_load_config (liwdgManager* self,
                      const char*   root);
 
-static lifntFont*
-private_load_font (liwdgManager* self,
-                   const char*   root,
-                   const char*   name,
-                   int           size);
-
-static int
-private_load_texture (liwdgManager*  self,
-                      liimgTexture** texture,
-                      const char*    root,
-                      const char*    name);
-
 static int
 private_focus_next (liwdgManager* self,
                     liwdgWidget*  start);
@@ -120,16 +108,6 @@ liwdg_manager_new (lividCalls* video,
 	self->projection = limat_matrix_identity ();
 
 	/* Load config and resources. */
-	self->fonts = lialg_strdic_new ();
-	self->images = lialg_strdic_new ();
-	self->subimgs = lialg_strdic_new ();
-	if (self->fonts == NULL ||
-	    self->images == NULL ||
-	    self->subimgs == NULL)
-	{
-		liwdg_manager_free (self);
-		return NULL;
-	}
 	if (!private_load_config (self, root))
 		printf ("WARNING: %s\n", lisys_error_get_string ());
 
@@ -144,32 +122,12 @@ liwdg_manager_new (lividCalls* video,
 void
 liwdg_manager_free (liwdgManager* self)
 {
-	lialgStrdicIter iter;
-
 	assert (self->widgets.dialogs == NULL);
 	assert (self->widgets.root == NULL);
 	assert (self->widgets.active == NULL);
 
-	/* Free resources. */
-	if (self->fonts != NULL)
-	{
-		LI_FOREACH_STRDIC (iter, self->fonts)
-			lifnt_font_free (iter.value);
-		lialg_strdic_free (self->fonts);
-	}
-	if (self->images != NULL)
-	{
-		LI_FOREACH_STRDIC (iter, self->images)
-			liimg_texture_free (iter.value);
-		lialg_strdic_free (self->images);
-	}
-	if (self->subimgs != NULL)
-	{
-		LI_FOREACH_STRDIC (iter, self->subimgs)
-			free (iter.value);
-		lialg_strdic_free (self->subimgs);
-	}
-
+	if (self->styles != NULL)
+		liwdg_styles_free (self->styles);
 	free (self);
 }
 
@@ -177,14 +135,14 @@ lifntFont*
 liwdg_manager_find_font (liwdgManager* self,
                          const char*   name)
 {
-	return lialg_strdic_find (self->fonts, name);
+	return lialg_strdic_find (self->styles->fonts, name);
 }
 
-liwdgSubimage*
+liwdgStyle*
 liwdg_manager_find_style (liwdgManager* self,
                           const char*   name)
 {
-	return lialg_strdic_find (self->subimgs, name);
+	return lialg_strdic_find (self->styles->subimgs, name);
 }
 
 /**
@@ -915,181 +873,10 @@ static int
 private_load_config (liwdgManager* self,
                      const char*   root)
 {
-	int size;
-	char* file;
-	char* path;
-	char* field;
-	liReader* reader;
-	lifntFont* font;
-	liimgTexture* image;
-	liwdgSubimage* subimg;
-
-	path = lisys_path_concat (root, "config", "widgets.cfg", NULL);
-	if (path == NULL)
+	self->styles = liwdg_styles_new (self, root);
+	if (self->styles == NULL)
 		return 0;
-	reader = li_reader_new_from_file (path);
-	free (path);
-	if (reader == NULL)
-	{
-		if (lisys_error_get (NULL) != EIO)
-			return 0;
-		return 1;
-	}
 
-	li_reader_skip_chars (reader, " \t\n");
-	while (!li_reader_check_end (reader))
-	{
-		if (!li_reader_get_text (reader, " ", &field))
-			goto error;
-		if (!strcmp (field, "widget"))
-		{
-			free (field);
-			file = NULL;
-			field = NULL;
-			subimg = calloc (1, sizeof (liwdgSubimage));
-			if (subimg == NULL)
-				goto error;
-			if (!li_reader_get_text (reader, " ", &field) ||
-			    !li_reader_get_text (reader, " ", &file) ||
-			    !li_reader_get_text_int (reader, &subimg->x) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, &subimg->y) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->w + 0) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->w + 1) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->w + 2) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->h + 2) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->h + 1) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->h + 0) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->pad + 0) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->pad + 1) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->pad + 2) ||
-			    !li_reader_skip_chars (reader, " \t") ||
-			    !li_reader_get_text_int (reader, subimg->pad + 3))
-			{
-				lisys_error_set (EINVAL, "invalid widget definition");
-				free (subimg);
-				free (file);
-				free (field);
-				goto error;
-			}
-			image = lialg_strdic_find (self->images, file);
-			if (image == NULL)
-			{
-				if (!private_load_texture (self, &image, root, file))
-				{
-					free (subimg);
-					free (file);
-					free (field);
-					goto error;
-				}
-				if (!lialg_strdic_insert (self->images, file, image))
-				{
-					liimg_texture_free (image);
-					free (subimg);
-					free (file);
-					free (field);
-					goto error;
-				}
-			}
-			free (file);
-			subimg->texture = image;
-			if (!lialg_strdic_insert (self->subimgs, field, subimg))
-			{
-				free (subimg);
-				free (field);
-				goto error;
-			}
-			free (field);
-		}
-		else if (!strcmp (field, "font"))
-		{
-			free (field);
-			file = NULL;
-			field = NULL;
-			if (!li_reader_get_text (reader, " ", &field) ||
-			    !li_reader_get_text (reader, " ", &file) ||
-			    !li_reader_get_text_int (reader, &size))
-			{
-				lisys_error_set (EINVAL, "invalid font definition");
-				free (field);
-				free (file);
-				goto error;
-			}
-			font = private_load_font (self, root, file, size);
-			if (font == NULL)
-			{
-				free (file);
-				free (field);
-				goto error;
-			}
-			if (!lialg_strdic_insert (self->fonts, field, font))
-			{
-				lifnt_font_free (font);
-				free (file);
-				free (field);
-				goto error;
-			}
-			free (field);
-			free (file);
-		}
-		else
-		{
-			free (field);
-			goto error;
-		}
-		li_reader_skip_chars (reader, " \t\n");
-	}
-	li_reader_free (reader);
-
-	return 1;
-
-error:
-	li_reader_free (reader);
-	return 0;
-}
-
-static lifntFont*
-private_load_font (liwdgManager* self,
-                   const char*   root,
-                   const char*   name,
-                   int           size)
-{
-	char* path;
-	lifntFont* font;
-
-	path = lisys_path_concat (root, "fonts", name, NULL);
-	if (path == NULL)
-		return NULL;
-	font = lifnt_font_new (&self->video, path, size);
-	free (path);
-
-	return font;
-}
-
-static int
-private_load_texture (liwdgManager*  self,
-                      liimgTexture** texture,
-                      const char*    root,
-                      const char*    name)
-{
-	char* path;
-
-	path = lisys_path_concat (root, "graphics", name, NULL);
-	if (path == NULL)
-		return 0;
-	*texture = liimg_texture_new_from_file (path);
-	free (path);
-	if (*texture == NULL)
-		return 0;
 	return 1;
 }
 

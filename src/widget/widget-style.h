@@ -15,29 +15,47 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_WIDGET_H__
-#define __LIPS_WIDGET_H__
+/**
+ * \addtogroup liwdg Widget
+ * @{
+ * \addtogroup liwdgStyle Style
+ * @{
+ */
 
-#include "widget.h"
-#include "widget-button.h"
-#include "widget-busy.h"
-#include "widget-check.h"
-#include "widget-class.h"
-#include "widget-entry.h"
-#include "widget-event.h"
-#include "widget-group.h"
-#include "widget-image.h"
-#include "widget-label.h"
-#include "widget-manager.h"
-#include "widget-menu.h"
-#include "widget-menugroup.h"
-#include "widget-progress.h"
-#include "widget-render.h"
-#include "widget-scroll.h"
-#include "widget-spin.h"
-#include "widget-style.h"
-#include "widget-tree.h"
+#ifndef __WIDGET_STYLE_H__
+#define __WIDGET_STYLE_H__
+
+#include <image/lips-image.h>
 #include "widget-types.h"
-#include "widget-window.h"
+
+struct _liwdgStyle
+{
+	liimgTexture* texture;
+	int x, y;
+	int w[3];
+	int h[3];
+	int pad[4];
+	float color[4];
+	float selection[4];
+};
+
+struct _liwdgStyles
+{
+	liwdgManager* manager;
+	liwdgStyle fallback;
+	lialgStrdic* fonts;
+	lialgStrdic* images;
+	lialgStrdic* subimgs;
+};
+
+liwdgStyles*
+liwdg_styles_new (liwdgManager* manager,
+                  const char*   root);
+
+void
+liwdg_styles_free (liwdgStyles* self);
 
 #endif
+
+/** @} */
+/** @} */

@@ -112,6 +112,7 @@ private_event (liwdgSpin*  self,
 	int w;
 	int h;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -127,11 +128,12 @@ private_event (liwdgSpin*  self,
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "spin");
 			/* Draw base. */
 			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "spin", &rect);
 			liwdg_widget_paint (LIWDG_WIDGET (self), "spin", NULL);
 			/* Draw label. */
-			glColor3f (0.8f, 0.8f, 0.8f);
+			glColor4fv (style->color);
 			lifnt_layout_render (self->text,
 				rect.x + (rect.width - w) / 2,
 				rect.y + (rect.height - h) / 2);

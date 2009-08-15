@@ -407,6 +407,8 @@ wdgsrc = \
 	widget/widget-scroll.h \
 	widget/widget-spin.c \
 	widget/widget-spin.h \
+	widget/widget-style.c \
+	widget/widget-style.h \
 	widget/widget-tree.c \
 	widget/widget-tree.h \
 	widget/widget-types.h \

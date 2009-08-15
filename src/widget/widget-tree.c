@@ -85,6 +85,7 @@ private_treerow_foreach (liwdgTreerow* self,
 int
 private_treerow_render (liwdgTreerow* self,
                         liwdgRect*    rect,
+                        liwdgStyle*   style,
                         int           y);
 
 static int
@@ -348,8 +349,9 @@ private_event (liwdgTree*  self,
                liwdgEvent* event)
 {
 	int y;
-	liwdgTreerow* row;
 	liwdgRect rect;
+	liwdgTreerow* row;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -368,7 +370,12 @@ private_event (liwdgTree*  self,
 			else
 				return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self, row);
 		case LIWDG_EVENT_TYPE_RENDER:
-			private_treerow_render (&self->root, &LIWDG_WIDGET (self)->allocation, 0);
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "tree");
+			/* Draw base. */
+			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "tree", &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), "tree", NULL);
+			/* Draw rows. */
+			private_treerow_render (&self->root, &rect, style, 0);
 			return 1;
 	}
 
@@ -463,6 +470,7 @@ private_treerow_foreach (liwdgTreerow* self,
 int
 private_treerow_render (liwdgTreerow* self,
                         liwdgRect*    rect,
+                        liwdgStyle*   style,
                         int           y)
 {
 	int i;
@@ -479,7 +487,7 @@ private_treerow_render (liwdgTreerow* self,
 	/* Render selection. */
 	if (self->highlight)
 	{
-		glColor3f (0.0f, 1.0f, 0.0f);
+		glColor4fv (style->selection);
 		glBindTexture (GL_TEXTURE_2D, 0);
 		glBegin (GL_TRIANGLE_STRIP);
 		glVertex2i (rect->x, rect->y + rect->height - y - 1);
@@ -492,7 +500,7 @@ private_treerow_render (liwdgTreerow* self,
 	/* Render layout. */
 	if (self->layout != NULL)
 	{
-		glColor3f (0.8f, 0.8f, 0.8f);
+		glColor4fv (style->color);
 		lifnt_layout_render (self->layout, x, rect->y + rect->height - y - 1);
 	}
 
@@ -500,7 +508,7 @@ private_treerow_render (liwdgTreerow* self,
 	if (self->expand)
 	{
 		for (i = 0 ; i < self->rows.count ; i++)
-			y = private_treerow_render (self->rows.array[i], rect, y);
+			y = private_treerow_render (self->rows.array[i], rect, style, y);
 	}
 
 	/* Render hierarchy. */

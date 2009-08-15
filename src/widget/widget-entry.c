@@ -173,6 +173,7 @@ private_event (liwdgEntry* self,
 	int len;
 	char* str;
 	char* tmp;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -235,13 +236,14 @@ private_event (liwdgEntry* self,
 			}
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
-			glColor3f (1.0f, 1.0f, 1.0f);
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "entry");
 			glScissor (
 				LIWDG_WIDGET (self)->allocation.x,
 				LIWDG_WIDGET (self)->allocation.y,
 				LIWDG_WIDGET (self)->allocation.width,
 				LIWDG_WIDGET (self)->allocation.height);
 			glEnable (GL_SCISSOR_TEST);
+			glColor4fv (style->color);
 			lifnt_layout_render (self->text,
 				LIWDG_WIDGET (self)->allocation.x,
 				LIWDG_WIDGET (self)->allocation.y);

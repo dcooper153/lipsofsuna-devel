@@ -128,6 +128,7 @@ private_event (liwdgButton* self,
 	int w;
 	int h;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -147,20 +148,22 @@ private_event (liwdgButton* self,
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
 			if (liwdg_widget_get_focus_mouse (LIWDG_WIDGET (self)) ||
-				liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
+			    liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
 			{
+				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "button-focus");
 				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "button-focus", &rect);
 				liwdg_widget_paint (LIWDG_WIDGET (self), "button-focus", NULL);
-				glColor3f (1.0f, 1.0f, 1.0f);
+				glColor4fv (style->color);
 				lifnt_layout_render (self->text,
 					rect.x + (rect.width - w) / 2 + 2,
 					rect.y + (rect.height - h) / 2 - 2);
 			}
 			else
 			{
+				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "button");
 				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "button", &rect);
 				liwdg_widget_paint (LIWDG_WIDGET (self), "button", NULL);
-				glColor3f (1.0f, 1.0f, 1.0f);
+				glColor4fv (style->color);
 				lifnt_layout_render (self->text,
 					rect.x + (rect.width - w) / 2,
 					rect.y + (rect.height - h) / 2);

@@ -137,18 +137,20 @@ private_event (liwdgProgress* self,
 	int w;
 	int h;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "progress");
 			/* Draw base. */
 			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "progress", &rect);
 			liwdg_widget_paint (LIWDG_WIDGET (self), "progress", NULL);
 			/* Draw progress. */
 			glBindTexture (GL_TEXTURE_2D, 0);
-			glColor3f (1.0f, 0.0f, 0.0f);
+			glColor4fv (style->selection);
 			glBegin (GL_QUADS);
 			glVertex2f (rect.x, rect.y);
 			glVertex2f (rect.x + self->value * rect.width, rect.y);
@@ -156,7 +158,7 @@ private_event (liwdgProgress* self,
 			glVertex2f (rect.x, rect.y + rect.height);
 			glEnd ();
 			/* Draw label. */
-			glColor3f (0.0f, 0.0f, 0.0f);
+			glColor4fv (style->color);
 			lifnt_layout_render (self->text,
 				rect.x + (rect.width - w) / 2,
 				rect.y + (rect.height - h) / 2);

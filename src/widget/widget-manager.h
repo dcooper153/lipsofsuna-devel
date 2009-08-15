@@ -29,15 +29,14 @@
 #include <font/lips-font.h>
 #include <image/lips-image.h>
 #include "widget.h"
+#include "widget-style.h"
 #include "widget-types.h"
 
 struct _liwdgManager
 {
 	int width;
 	int height;
-	lialgStrdic* fonts;
-	lialgStrdic* images;
-	lialgStrdic* subimgs;
+	liwdgStyles* styles;
 	limatMatrix projection;
 	lividCalls video;
 	struct
@@ -81,7 +80,7 @@ lifntFont*
 liwdg_manager_find_font (liwdgManager* self,
                          const char*   name);
 
-liwdgSubimage*
+liwdgStyle*
 liwdg_manager_find_style (liwdgManager* self,
                           const char*   name);
 

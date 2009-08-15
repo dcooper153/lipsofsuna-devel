@@ -18,8 +18,6 @@
 #ifndef __WIDGET_TYPES_H__
 #define __WIDGET_TYPES_H__
 
-#include <image/lips-image.h>
-
 #define LIWDG_HANDLER(c) ((liwdgHandler)(c))
 
 enum
@@ -51,7 +49,8 @@ typedef struct _liwdgManager liwdgManager;
 typedef struct _liwdgWidget liwdgWidget;
 typedef struct _liwdgRect liwdgRect;
 typedef struct _liwdgSize liwdgSize;
-typedef struct _liwdgSubimage liwdgSubimage;
+typedef struct _liwdgStyle liwdgStyle;
+typedef struct _liwdgStyles liwdgStyles;
 
 struct _liwdgRect
 {
@@ -65,15 +64,6 @@ struct _liwdgSize
 {
 	int width;
 	int height;
-};
-
-struct _liwdgSubimage
-{
-	liimgTexture* texture;
-	int x, y;
-	int w[3];
-	int h[3];
-	int pad[4];
 };
 
 #endif

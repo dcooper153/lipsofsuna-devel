@@ -155,6 +155,10 @@ liwdg_widget_set_request (liwdgWidget* self,
 liwdgWidget*
 liwdg_widget_get_root (liwdgWidget* self);
 
+liwdgStyle*
+liwdg_widget_get_style (liwdgWidget* self,
+                        const char*  style);
+
 void
 liwdg_widget_get_style_allocation (liwdgWidget* self,
                                    const char*  style,

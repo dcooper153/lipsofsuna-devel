@@ -54,6 +54,7 @@ private_paint_row (liwdgWidget* self,
                    float*       ty,
                    float*       w,
                    float        h,
+                   float        wreq,
                    int          repeat);
 
 const liwdgClass liwdgWidgetType =
@@ -219,61 +220,137 @@ liwdg_widget_paint (liwdgWidget* self,
                     const char*  style,
                     liwdgRect*   rect)
 {
-	int y;
 	int px;
 	int py;
-	int repeatx;
-	int repeaty;
+	float fw;
+	float fh;
+	float fu;
+	float fv;
 	float w[3];
 	float h[3];
 	float tx[4];
 	float ty[4];
-	liwdgSubimage* sub;
+	liwdgStyle* style_;
 
-	/* Get widget subimage. */
+	/* Get style. */
 	if (rect == NULL)
 		rect = &self->allocation;
-	sub = lialg_strdic_find (self->manager->subimgs, style);
-	if (sub == NULL)
+	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
+	if (style_ == NULL)
 		return;
 
 	/* Calculate repeat counts. */
-	w[0] = sub->w[0];
-	w[1] = LI_MAX (1, sub->w[1]);
-	w[2] = sub->w[2];
-	h[0] = sub->h[0];
-	h[1] = LI_MAX (1, sub->h[1]);
-	h[2] = sub->h[2];
-	repeatx = LI_MAX (0, rect->width - w[0] - w[2]);
-	repeaty = LI_MAX (0, rect->height - h[0] - h[2]);
-	repeatx = (int) floor ((float) repeatx / w[1]);
-	repeaty = (int) floor ((float) repeaty / h[1]);
+	w[0] = style_->w[0];
+	w[1] = LI_MAX (1, style_->w[1]);
+	w[2] = style_->w[2];
+	h[0] = style_->h[0];
+	h[1] = LI_MAX (1, style_->h[1]);
+	h[2] = style_->h[2];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(sub->x) / sub->texture->width;
-	tx[1] = (float)(sub->x + sub->w[0]) / sub->texture->width;
-	tx[2] = (float)(sub->x + sub->w[0] + sub->w[1]) / sub->texture->width;
-	tx[3] = (float)(sub->x + sub->w[0] + sub->w[1] + sub->w[2]) / sub->texture->width;
-	ty[3] = (float)(sub->y) / sub->texture->height;
-	ty[2] = (float)(sub->y + sub->h[2]) / sub->texture->height;
-	ty[1] = (float)(sub->y + sub->h[2] + sub->h[1]) / sub->texture->height;
-	ty[0] = (float)(sub->y + sub->h[2] + sub->h[1] + sub->h[0]) / sub->texture->height;
+	tx[0] = (float)(style_->x) / style_->texture->width;
+	tx[1] = (float)(style_->x + style_->w[0]) / style_->texture->width;
+	tx[2] = (float)(style_->x + style_->w[0] + style_->w[1]) / style_->texture->width;
+	tx[3] = (float)(style_->x + style_->w[0] + style_->w[1] + style_->w[2]) / style_->texture->width;
+	ty[3] = (float)(style_->y) / style_->texture->height;
+	ty[2] = (float)(style_->y + style_->h[2]) / style_->texture->height;
+	ty[1] = (float)(style_->y + style_->h[2] + style_->h[1]) / style_->texture->height;
+	ty[0] = (float)(style_->y + style_->h[2] + style_->h[1] + style_->h[0]) / style_->texture->height;
 
-	/* Draw the grid. */
-	glBindTexture (GL_TEXTURE_2D, sub->texture->texture);
+	/* Bind texture. */
+	glBindTexture (GL_TEXTURE_2D, style_->texture->texture);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glColor3f (1.0f, 1.0f, 1.0f);
+
+	/* Paint corners. */
 	px = rect->x;
 	py = rect->y;
-	private_paint_row (self, px, py, tx, ty + 0, w, h[0], repeatx);
-	py += h[0];
-	for (y = 0 ; y < repeaty ; y++)
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[0], ty[0]); glVertex2f (px       , py);
+	glTexCoord2f (tx[1], ty[0]); glVertex2f (px + w[0], py);
+	glTexCoord2f (tx[0], ty[1]); glVertex2f (px       , py + h[0]);
+	glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py + h[0]);
+	glEnd ();
+	px = rect->x + rect->width - w[2] - 1;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[2], ty[0]); glVertex2f (px       , py);
+	glTexCoord2f (tx[3], ty[0]); glVertex2f (px + w[2], py);
+	glTexCoord2f (tx[2], ty[1]); glVertex2f (px       , py + h[0]);
+	glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py + h[0]);
+	glEnd ();
+	py = rect->y + rect->height - h[2] - 1;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[2], ty[2]); glVertex2f (px       , py);
+	glTexCoord2f (tx[3], ty[2]); glVertex2f (px + w[2], py);
+	glTexCoord2f (tx[2], ty[3]); glVertex2f (px       , py + h[2]);
+	glTexCoord2f (tx[3], ty[3]); glVertex2f (px + w[2], py + h[2]);
+	glEnd ();
+	px = rect->x;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[0], ty[2]); glVertex2f (px       , py);
+	glTexCoord2f (tx[1], ty[2]); glVertex2f (px + w[0], py);
+	glTexCoord2f (tx[0], ty[3]); glVertex2f (px       , py + h[2]);
+	glTexCoord2f (tx[1], ty[3]); glVertex2f (px + w[0], py + h[2]);
+	glEnd ();
+
+	/* Paint horizontal borders. */
+	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
 	{
-		private_paint_row (self, px, py, tx, ty + 1, w, h[1], repeatx);
-		py += h[1];
+		fw = LI_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
+		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
+		py = rect->y;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[1], ty[0]); glVertex2f (px     , py);
+		glTexCoord2f (fu   , ty[0]); glVertex2f (px + fw, py);
+		glTexCoord2f (tx[1], ty[1]); glVertex2f (px     , py + h[0]);
+		glTexCoord2f (fu   , ty[1]); glVertex2f (px + fw, py + h[0]);
+		glEnd ();
+		py = rect->y + rect->height - h[2] - 1;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[1], ty[2]); glVertex2f (px     , py);
+		glTexCoord2f (fu   , ty[2]); glVertex2f (px + fw, py);
+		glTexCoord2f (tx[1], ty[3]); glVertex2f (px     , py + h[2]);
+		glTexCoord2f (fu   , ty[3]); glVertex2f (px + fw, py + h[2]);
+		glEnd ();
 	}
-	private_paint_row (self, px, py, tx, ty + 2, w, h[2], repeatx);
+
+	/* Paint vertical borders. */
+	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
+	{
+		fh = LI_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
+		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
+		px = rect->x;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[0], ty[1]); glVertex2f (px       , py);
+		glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py);
+		glTexCoord2f (tx[0], fv   ); glVertex2f (px       , py + fh);
+		glTexCoord2f (tx[1], fv   ); glVertex2f (px + w[0], py + fh);
+		glEnd ();
+		px = rect->x + rect->width - w[2] - 1;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[2], ty[1]); glVertex2f (px       , py);
+		glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py);
+		glTexCoord2f (tx[2], fv   ); glVertex2f (px       , py + fh);
+		glTexCoord2f (tx[3], fv   ); glVertex2f (px + w[2], py + fh);
+		glEnd ();
+	}
+
+	/* Paint fill. */
+	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
+	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
+	{
+		fw = LI_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
+		fh = LI_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
+		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
+		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[1], ty[1]); glVertex2f (px     , py);
+		glTexCoord2f (fu   , ty[1]); glVertex2f (px + fw, py);
+		glTexCoord2f (tx[1], fv   ); glVertex2f (px     , py + fh);
+		glTexCoord2f (fu   , fv   ); glVertex2f (px + fw, py + fh);
+		glEnd ();
+	}
 }
 
 /**
@@ -532,26 +609,39 @@ liwdg_widget_get_root (liwdgWidget* self)
 	return widget;
 }
 
+liwdgStyle*
+liwdg_widget_get_style (liwdgWidget* self,
+                        const char*  style)
+{
+	liwdgStyle* style_;
+
+	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
+	if (style_ == NULL)
+		return &self->manager->styles->fallback;
+
+	return style_;
+}
+
 void
 liwdg_widget_get_style_allocation (liwdgWidget* self,
                                    const char*  style,
                                    liwdgRect*   allocation)
 {
-	liwdgSubimage* sub;
+	liwdgStyle* style_;
 
-	/* Get widget subimage. */
-	sub = lialg_strdic_find (self->manager->subimgs, style);
-	if (sub == NULL)
+	/* Get widget style_image. */
+	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
+	if (style_ == NULL)
 	{
 		*allocation = self->allocation;
 		return;
 	}
 
 	/* Subtract paddings from the allocation. */
-	allocation->x = self->allocation.x + sub->pad[1];
-	allocation->y = self->allocation.y + sub->pad[3];
-	allocation->width = self->allocation.width - sub->pad[1] - sub->pad[2];
-	allocation->height = self->allocation.height - sub->pad[3] - sub->pad[0];
+	allocation->x = self->allocation.x + style_->pad[1];
+	allocation->y = self->allocation.y + style_->pad[3];
+	allocation->width = self->allocation.width - style_->pad[1] - style_->pad[2];
+	allocation->height = self->allocation.height - style_->pad[3] - style_->pad[0];
 }
 
 void
@@ -559,39 +649,18 @@ liwdg_widget_get_style_request (liwdgWidget* self,
                                 const char*  style,
                                 liwdgSize*   size)
 {
-	int pw[3];
-	int ph[3];
-	int repeatx;
-	int repeaty;
-	liwdgSize tmp;
-	liwdgSubimage* sub;
+	liwdgStyle* style_;
 
 	/* Get ordinary request. */
-	liwdg_widget_get_request (self, &tmp);
+	liwdg_widget_get_request (self, size);
 
-	/* Get widget subimage. */
-	sub = lialg_strdic_find (self->manager->subimgs, style);
-	if (sub == NULL)
+	/* Add paddings. */
+	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
+	if (style_ != NULL)
 	{
-		*size = tmp;
-		return;
+		size->width += style_->pad[1] + style_->pad[2];
+		size->height += style_->pad[0] + style_->pad[3];
 	}
-
-	/* Calculate repeat counts. */
-	pw[0] = sub->w[0];
-	pw[1] = LI_MAX (1, sub->w[1]);
-	pw[2] = sub->w[2];
-	ph[0] = sub->h[0];
-	ph[1] = LI_MAX (1, sub->h[1]);
-	ph[2] = sub->h[2];
-	repeatx = LI_MAX (0, tmp.width - pw[0] - pw[2] + sub->pad[1] + sub->pad[2]);
-	repeaty = LI_MAX (0, tmp.height - ph[0] - ph[2] + sub->pad[0] + sub->pad[3]);
-	repeatx = (int) ceil ((float) repeatx / pw[1]);
-	repeaty = (int) ceil ((float) repeaty / ph[1]);
-
-	/* Calculate suitable request. */
-	size->width = pw[0] + repeatx * pw[1] + pw[2];
-	size->height = ph[0] + repeaty * ph[1] + ph[2];
 }
 
 void
@@ -722,6 +791,7 @@ private_paint_row (liwdgWidget* self,
                    float*       ty,
                    float*       w,
                    float        h,
+                   float        wreq,
                    int          repeat)
 {
 	int x;
@@ -736,7 +806,7 @@ private_paint_row (liwdgWidget* self,
 	px += w[0];
 
 	/* Draw fill. */
-	for (x = 0 ; x < repeat ; x++)
+	for (x = 0 ; x <= repeat ; x++)
 	{
 		glBegin (GL_TRIANGLE_STRIP);
 		glTexCoord2f (tx[1], ty[0]); glVertex2f (px, py);

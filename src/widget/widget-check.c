@@ -140,6 +140,7 @@ private_event (liwdgCheck* self,
 {
 	int h;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -156,15 +157,17 @@ private_event (liwdgCheck* self,
 		case LIWDG_EVENT_TYPE_RENDER:
 			if (self->active)
 			{
+				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "check-active");
 				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "check-active", &rect);
 				liwdg_widget_paint (LIWDG_WIDGET (self), "check-active", NULL);
 			}
 			else
 			{
+				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "check");
 				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "check", &rect);
 				liwdg_widget_paint (LIWDG_WIDGET (self), "check", NULL);
 			}
-			glColor3f (1.0f, 1.0f, 1.0f);
+			glColor4fv (style->color);
 			h = lifnt_layout_get_height (self->text);
 			lifnt_layout_render (self->text, rect.x, rect.y + (rect.height - h) / 2 - 2);
 			return 1;

@@ -139,8 +139,8 @@ private_event (liwdgScroll*  self,
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
 			/* Draw base. */
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "scroll", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "scroll", NULL);
+			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "scroll-horz", &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), "scroll-horz", NULL);
 			/* Draw label. */
 			glColor3f (0.8f, 0.8f, 0.8f);
 			lifnt_layout_render (self->text,

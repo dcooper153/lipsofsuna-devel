@@ -108,7 +108,7 @@ private_event (liwdgWindow* self,
 	liwdgRect rect;
 	liwdgRect frame;
 	liwdgSize size;
-	liwdgSubimage* subimg;
+	liwdgStyle* style;
 
 	if (event->type == LIWDG_EVENT_TYPE_RENDER)
 	{
@@ -120,17 +120,17 @@ private_event (liwdgWindow* self,
 			frame = rect;
 			frame.width = size.width;
 			frame.height = size.height;
-			subimg = lialg_strdic_find (LIWDG_WIDGET (self)->manager->subimgs, "window");
-			if (subimg != NULL)
+			style = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, "window");
+			if (style != NULL)
 			{
-				frame.x -= subimg->pad[1];
-				frame.y -= subimg->pad[3];
+				frame.x -= style->pad[1];
+				frame.y -= style->pad[3];
 				liwdg_widget_paint (LIWDG_WIDGET (self), "window", &frame);
 				glColor3f (1.0f, 1.0f, 1.0f);
 				liwdg_widget_get_request (LIWDG_WIDGET (self->label_title), &size);
 				liwdg_widget_set_allocation (self->label_title,
 					frame.x + 2,
-					frame.y + frame.height - subimg->pad[0] - 2,
+					frame.y + frame.height - style->pad[0] - 2,
 					size.width,
 					size.height);
 				liwdg_widget_render (self->label_title);

@@ -227,6 +227,7 @@ private_event (liwdgMenu*  self,
 	liwdgMenuItem* item;
 	liwdgMenuProxy* proxy;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -247,13 +248,14 @@ private_event (liwdgMenu*  self,
 				liwdg_widget_paint (LIWDG_WIDGET (self), private_style (self), NULL);
 			if (self->font != NULL)
 			{
+				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "menu");
 				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
 				if (self->vertical)
 				{
 					for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
 					{
 						proxy = ptr->data;
-						glColor3f (1.0f, 1.0f, 1.0f);
+						glColor4fv (style->color);
 						lifnt_layout_render (proxy->label, rect.x, rect.y);
 						rect.y += lifnt_font_get_height (self->font) + SPACINGY;
 					}
@@ -264,7 +266,7 @@ private_event (liwdgMenu*  self,
 					for ( ; ptr != NULL ; ptr = ptr->prev)
 					{
 						proxy = ptr->data;
-						glColor3f (1.0f, 1.0f, 1.0f);
+						glColor4fv (style->color);
 						lifnt_layout_render (proxy->label, rect.x, rect.y);
 						rect.x += lifnt_layout_get_width (proxy->label) + SPACINGX;
 					}
