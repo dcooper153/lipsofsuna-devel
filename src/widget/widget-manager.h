@@ -68,6 +68,15 @@ liwdg_manager_new (lividCalls* video,
 void
 liwdg_manager_free (liwdgManager* self);
 
+
+void
+liwdg_manager_cycle_focus (liwdgManager* self,
+                           int           next);
+
+void
+liwdg_manager_cycle_window_focus (liwdgManager* self,
+                                  int           next);
+
 int
 liwdg_manager_event (liwdgManager* self,
                      liwdgEvent*   event);
@@ -91,12 +100,6 @@ liwdg_manager_find_window_by_point (liwdgManager* self,
 
 void
 liwdg_manager_fix_focus (liwdgManager* self);
-
-void
-liwdg_manager_focus_next (liwdgManager* self);
-
-void
-liwdg_manager_focus_prev (liwdgManager* self);
 
 int
 liwdg_manager_insert_popup (liwdgManager* self,

@@ -33,6 +33,10 @@ enum
 	POPUP_MAX
 };
 
+static void
+private_detach_child (liwdgWidget* parent,
+                      liwdgWidget* child);
+
 /*****************************************************************************/
 
 /* @luadoc
@@ -293,28 +297,10 @@ licli_script_widget_detach (liscrData* self)
 void
 licli_script_widget_detach_children (liscrData* self)
 {
-	int x;
-	int y;
-	liwdgGroup* group;
-	liwdgWidget* child;
 	liwdgWidget* widget = self->data;
 
-	if (liwdg_widget_typeis (widget, &liwdgGroupType))
-	{
-		group = LIWDG_GROUP (widget);
-		for (x = 0 ; x < group->width ; x++)
-		{
-			for (y = 0 ; y < group->height ; y++)
-			{
-				child = liwdg_group_get_child (group, x, y);
-				if (child != NULL && child->userdata != NULL)
-				{
-					liscr_data_unref (child->userdata, self);
-					liwdg_group_set_child (group, x, y, NULL);
-				}
-			}
-		}
-	}
+	if (liwdg_widget_typeis (widget, &liwdgContainerType))
+		liwdg_container_foreach_child (LIWDG_CONTAINER (widget), private_detach_child, widget);
 }
 
 void
@@ -333,6 +319,19 @@ licliWidgetScript (liscrClass* self,
 	liscr_class_insert_getter (self, "x", Widget_getter_x);
 	liscr_class_insert_getter (self, "y", Widget_getter_y);
 	liscr_class_insert_setter (self, "visible", Widget_setter_visible);
+}
+
+/*****************************************************************************/
+
+static void
+private_detach_child (liwdgWidget* parent,
+                      liwdgWidget* child)
+{
+	if (child != NULL && child->userdata != NULL)
+	{
+		liwdg_container_detach_child (LIWDG_CONTAINER (parent), child);
+		liscr_data_unref (child->userdata, parent->userdata);
+	}
 }
 
 /** @} */

@@ -139,6 +139,7 @@ private_event (liwdgCheck* self,
                liwdgEvent* event)
 {
 	int h;
+	const char* mode;
 	liwdgRect rect;
 	liwdgStyle* style;
 
@@ -155,18 +156,17 @@ private_event (liwdgCheck* self,
 			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
-			if (self->active)
-			{
-				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "check-active");
-				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "check-active", &rect);
-				liwdg_widget_paint (LIWDG_WIDGET (self), "check-active", NULL);
-			}
+			if (liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)) && self->active)
+				mode = "check-active-focus";
+			else if (liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
+				mode = "check-focus";
+			else if (self->active)
+				mode = "check-active";
 			else
-			{
-				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "check");
-				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "check", &rect);
-				liwdg_widget_paint (LIWDG_WIDGET (self), "check", NULL);
-			}
+				mode = "check";
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), mode);
+			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), mode, &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), mode, NULL);
 			glColor4fv (style->color);
 			h = lifnt_layout_get_height (self->text);
 			lifnt_layout_render (self->text, rect.x, rect.y + (rect.height - h) / 2 - 2);

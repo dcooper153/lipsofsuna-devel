@@ -48,6 +48,29 @@ static int
 private_event (liwdgGroup* self,
                liwdgEvent* event);
 
+static liwdgWidget*
+private_child_at (liwdgGroup* self,
+                  int         pixx,
+                  int         pixy);
+
+static void
+private_child_request (liwdgGroup*  self,
+                       liwdgWidget* child);
+
+static liwdgWidget*
+private_cycle_focus (liwdgGroup*  self,
+                     liwdgWidget* curr,
+                     int          next);
+
+static void
+private_detach_child (liwdgGroup*  self,
+                      liwdgWidget* child);
+
+void
+private_foreach_child (liwdgGroup* self,
+                       void      (*call)(),
+                       void*       data);
+
 static void
 private_cell_changed (liwdgGroup* self,
                       int         x,
@@ -67,7 +90,7 @@ private_rebuild (liwdgGroup* self,
 
 const liwdgClass liwdgGroupType =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Group", sizeof (liwdgGroup),
+	LIWDG_BASE_STATIC, &liwdgContainerType, "Group", sizeof (liwdgGroup),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
 	(liwdgWidgetEventFunc) private_event
@@ -143,68 +166,6 @@ int
 liwdg_group_append_row (liwdgGroup* self)
 {
 	return liwdg_group_set_size (self, self->width, self->height + 1);
-}
-
-/**
- * \brief Updates the layout after the size of a child changing.
- *
- * \param self Group.
- * \param child A widget.
- */
-void
-liwdg_group_child_request (liwdgGroup*  self,
-                           liwdgWidget* child)
-{
-	int x;
-	int y;
-	liwdgSize size;
-	liwdgGroupCell* cell;
-
-	for (y = 0 ; y < self->height ; y++)
-	{
-		for (x = 0 ; x < self->width ; x++)
-		{
-			cell = self->cells + x + y * self->width;
-			if (cell->child == child)
-			{
-				size.width = private_get_col_size (self, x);
-				size.height = private_get_row_size (self, y);
-				if (self->cols[x].request != size.width ||
-				    self->rows[y].request != size.height)
-					private_cell_changed (self, x, y);
-				return;
-			}
-		}
-	}
-	assert (0 && "Invalid child request");
-}
-
-/**
- * \brief Finds and unparents a child widget.
- *
- * \param self Group.
- * \param child Child widget.
- */
-void
-liwdg_group_detach_child (liwdgGroup*  self,
-                          liwdgWidget* child)
-{
-	int x;
-	int y;
-	liwdgGroupCell* cell;
-
-	for (y = 0 ; y < self->height ; y++)
-	{
-		for (x = 0 ; x < self->width ; x++)
-		{
-			cell = self->cells + x + y * self->width;
-			if (cell->child == child)
-			{
-				liwdg_group_set_child (self, x, y, NULL);
-				return;
-			}
-		}
-	}
 }
 
 /**
@@ -451,53 +412,6 @@ liwdg_group_set_child (liwdgGroup*  self,
 
 	/* Update the size of the cell. */
 	private_cell_changed (self, x, y);
-}
-
-/**
- * \brief Gets a child widget by cursor position.
- *
- * \param self Group.
- * \param pixx Cursor position.
- * \param pixy Cursor position.
- * \return Widget owned by the group or NULL.
- */
-liwdgWidget*
-liwdg_group_get_child_at (liwdgGroup* self,
-                          int         pixx,
-                          int         pixy)
-{
-	int x;
-	int y;
-
-	pixx -= LIWDG_WIDGET (self)->allocation.x;
-	pixy -= LIWDG_WIDGET (self)->allocation.y;
-
-	/* Get column. */
-	for (x = 0 ; x < self->width ; x++)
-	{
-		if (pixx >= self->cols[x].start + self->cols[x].allocation)
-			continue;
-		if (pixx >= self->cols[x].start)
-			break;
-		return NULL;
-	}
-	if (x == self->width)
-		return NULL;
-
-	/* Get row. */
-	for (y = 0 ; y < self->height ; y++)
-	{
-		if (pixy >= self->rows[y].start + self->rows[y].allocation)
-			continue;
-		if (pixy >= self->rows[y].start)
-			break;
-		return NULL;
-	}
-	if (y == self->height)
-		return NULL;
-
-	/* Return the child. */
-	return self->cells[x + y * self->width].child;
 }
 
 /**
@@ -892,6 +806,22 @@ private_event (liwdgGroup* self,
 	int y;
 	liwdgWidget* child;
 
+	/* Container interface. */
+	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
+	    event->probe.clss == &liwdgContainerType)
+	{
+		static liwdgContainerIface iface =
+		{
+			(liwdgContainerChildAtFunc) private_child_at,
+			(liwdgContainerChildRequestFunc) private_child_request,
+			(liwdgContainerCycleFocusFunc) private_cycle_focus,
+			(liwdgContainerDetachChildFunc) private_detach_child,
+			(liwdgContainerForeachChildFunc) private_foreach_child
+		};
+		event->probe.result = &iface;
+		return 0;
+	}
+
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_ALLOCATION:
@@ -931,11 +861,11 @@ private_event (liwdgGroup* self,
 			y = event->motion.y;
 			break;
 		default:
-			return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+			return liwdgContainerType.event (LIWDG_WIDGET (self), event);
 	}
 
 	/* Get the affected widget. */
-	child = liwdg_group_get_child_at (self, x, y);
+	child = private_child_at (self, x, y);
 	if (child == NULL)
 		return 1;
 
@@ -945,6 +875,229 @@ private_event (liwdgGroup* self,
 		return 0;
 
 	return 1;
+}
+
+static liwdgWidget*
+private_child_at (liwdgGroup* self,
+                  int         pixx,
+                  int         pixy)
+{
+	int x;
+	int y;
+
+	pixx -= LIWDG_WIDGET (self)->allocation.x;
+	pixy -= LIWDG_WIDGET (self)->allocation.y;
+
+	/* Get column. */
+	for (x = 0 ; x < self->width ; x++)
+	{
+		if (pixx >= self->cols[x].start + self->cols[x].allocation)
+			continue;
+		if (pixx >= self->cols[x].start)
+			break;
+		return NULL;
+	}
+	if (x == self->width)
+		return NULL;
+
+	/* Get row. */
+	for (y = 0 ; y < self->height ; y++)
+	{
+		if (pixy >= self->rows[y].start + self->rows[y].allocation)
+			continue;
+		if (pixy >= self->rows[y].start)
+			break;
+		return NULL;
+	}
+	if (y == self->height)
+		return NULL;
+
+	/* Return the child. */
+	return self->cells[x + y * self->width].child;
+}
+
+static void
+private_child_request (liwdgGroup*  self,
+                       liwdgWidget* child)
+{
+	int x;
+	int y;
+	liwdgSize size;
+	liwdgGroupCell* cell;
+
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child == child)
+			{
+				size.width = private_get_col_size (self, x);
+				size.height = private_get_row_size (self, y);
+				if (self->cols[x].request != size.width ||
+				    self->rows[y].request != size.height)
+					private_cell_changed (self, x, y);
+				return;
+			}
+		}
+	}
+	assert (0 && "Invalid child request");
+}
+
+/**
+ * \brief Finds the next or previous focusable widget under the group.
+ *
+ * Searches nested containers recursively.
+ *
+ * \param group Group.
+ * \param next Nonzero for next, zero for previous.
+ * \return Widget or NULL.
+ */
+static liwdgWidget*
+private_cycle_focus (liwdgGroup*  self,
+                     liwdgWidget* curr,
+                     int          next)
+{
+	int x = 0;
+	int y = 0;
+	int found;
+	liwdgWidget* tmp;
+	liwdgWidget* child;
+
+	/* Find old focused widget. */
+	found = 0;
+	if (curr != NULL)
+	{
+		for (y = self->height - 1 ; y >= 0 ; y--)
+		{
+			for (x = self->width - 1 ; x >= 0 ; x--)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child == curr)
+				{
+					found = 1;
+					break;
+				}
+			}
+			if (found)
+				break;
+		}
+		assert (found);
+	}
+
+	/* Find new focused widget. */
+	if (next)
+	{
+		/* Set start position. */
+		if (!found)
+		{
+			x = 0;
+			y = self->height - 1;
+		}
+
+		/* Iterate forward. */
+		for ( ; y >= 0 ; y--, x = 0)
+		for ( ; x < self->width ; x++)
+		{
+			if (!found)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child == NULL)
+					continue;
+				if (liwdg_widget_typeis (child, &liwdgContainerType))
+				{
+					tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, 1);
+					if (tmp != NULL)
+						return tmp;
+				}
+				else
+				{
+					if (liwdg_widget_get_focusable (child))
+						return child;
+				}
+			}
+			else
+				found = 0;
+		}
+	}
+	else
+	{
+		/* Set start position. */
+		if (!found)
+		{
+			x = self->width - 1;
+			y = 0;
+		}
+
+		/* Iterate backward. */
+		for ( ; y < self->height ; y++, x = self->width - 1)
+		for ( ; x >= 0 ; x--)
+		{
+			if (!found)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child == NULL)
+					continue;
+				if (liwdg_widget_typeis (child, &liwdgContainerType))
+				{
+					tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, 0);
+					if (tmp != NULL)
+						return tmp;
+				}
+				else
+				{
+					if (liwdg_widget_get_focusable (child))
+						return child;
+				}
+			}
+			else
+				found = 0;
+		}
+	}
+
+	return NULL;
+}
+
+static void
+private_detach_child (liwdgGroup*  self,
+                      liwdgWidget* child)
+{
+	int x;
+	int y;
+	liwdgGroupCell* cell;
+
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child == child)
+			{
+				liwdg_group_set_child (self, x, y, NULL);
+				return;
+			}
+		}
+	}
+}
+
+void
+private_foreach_child (liwdgGroup* self,
+                       void      (*call)(),
+                       void*       data)
+{
+	int x;
+	int y;
+	liwdgGroupCell* cell;
+
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child != NULL)
+				call (data, cell->child);
+		}
+	}
 }
 
 static void

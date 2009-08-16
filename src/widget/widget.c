@@ -62,7 +62,7 @@ const liwdgClass liwdgWidgetType =
 	LIWDG_BASE_STATIC, NULL, "Widget", sizeof (liwdgWidget),
 	(liwdgWidgetInitFunc) private_init,
 	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event,
+	(liwdgWidgetEventFunc) private_event
 };
 
 /*****************************************************************************/
@@ -131,8 +131,8 @@ liwdg_widget_detach (liwdgWidget* self)
 		case LIWDG_WIDGET_STATE_DETACHED:
 			if (self->parent != NULL)
 			{
-				assert (liwdg_widget_typeis (self->parent, &liwdgGroupType));
-				liwdg_group_detach_child (LIWDG_GROUP (self->parent), self);
+				assert (liwdg_widget_typeis (self->parent, &liwdgContainerType));
+				liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
 				changed = 1;
 			}
 			break;
@@ -596,7 +596,7 @@ liwdg_widget_set_request (liwdgWidget* self,
 		self->userrequest.width = w;
 		self->userrequest.height = h;
 		if (self->parent != NULL)
-			liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
+			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
 	}
 }
 
@@ -678,7 +678,7 @@ liwdg_widget_set_style_request (liwdgWidget* self,
 	self->hardrequest.width = size.width;
 	self->hardrequest.height = size.height;
 	if (self->parent != NULL)
-		liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
+		liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
 }
 
 void*
@@ -706,7 +706,7 @@ liwdg_widget_set_visible (liwdgWidget* self,
 {
 	self->visible = (visible != 0);
 	if (self->parent != NULL)
-		liwdg_group_child_request (LIWDG_GROUP (self->parent), self);
+		liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
 	if (self->state == LIWDG_WIDGET_STATE_POPUP)
 		liwdg_manager_remove_popup (self->manager, self);
 	if (!visible)

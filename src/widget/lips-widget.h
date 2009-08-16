@@ -23,6 +23,7 @@
 #include "widget-busy.h"
 #include "widget-check.h"
 #include "widget-class.h"
+#include "widget-container.h"
 #include "widget-entry.h"
 #include "widget-event.h"
 #include "widget-group.h"

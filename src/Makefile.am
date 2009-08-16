@@ -383,6 +383,8 @@ wdgsrc = \
 	widget/widget-check.c \
 	widget/widget-check.h \
 	widget/widget-class.h \
+	widget/widget-container.c \
+	widget/widget-container.h \
 	widget/widget-entry.c \
 	widget/widget-entry.h \
 	widget/widget-event.h \

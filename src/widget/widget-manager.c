@@ -54,34 +54,15 @@ private_find_window (liwdgManager* self,
                      int*          match);
 
 static int
+private_focus_root (liwdgManager* self);
+
+static int
+private_focus_window (liwdgManager* self,
+                      int           next);
+
+static int
 private_load_config (liwdgManager* self,
                      const char*   root);
-
-static int
-private_focus_next (liwdgManager* self,
-                    liwdgWidget*  start);
-
-static int
-private_focus_prev (liwdgManager* self,
-                    liwdgWidget*  start);
-
-static liwdgWidget*
-private_get_next_dialog (liwdgManager* self,
-                         liwdgWidget*  curr);
-
-static liwdgWidget*
-private_get_prev_dialog (liwdgManager* self,
-                         liwdgWidget*  curr);
-
-static liwdgWidget*
-private_get_next_focusable (liwdgManager* self,
-                            liwdgGroup*   group,
-                            liwdgWidget*  curr);
-
-static liwdgWidget*
-private_get_prev_focusable (liwdgManager* self,
-                            liwdgGroup*   group,
-                            liwdgWidget*  curr);
 
 /*****************************************************************************/
 
@@ -129,6 +110,48 @@ liwdg_manager_free (liwdgManager* self)
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
 	free (self);
+}
+
+void
+liwdg_manager_cycle_focus (liwdgManager* self,
+                           int           next)
+{
+	liwdgWidget* tmp;
+	liwdgWidget* widget;
+
+	/* Ensure toplevel focus. */
+	if (self->focus.keyboard == NULL)
+	{
+		liwdg_manager_cycle_window_focus (self, next);
+		return;
+	}
+
+	/* Focus next or previous widget. */
+	for (widget = self->focus.keyboard ; widget->parent != NULL ; widget = widget->parent)
+	{
+		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget->parent), widget, next);
+		if (tmp != NULL)
+		{
+			liwdg_manager_set_focus_keyboard (self, tmp);
+			return;
+		}
+	}
+
+	/* Focus first or last widget. */
+	tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
+	if (tmp != NULL)
+		liwdg_manager_set_focus_keyboard (self, tmp);
+}
+
+void
+liwdg_manager_cycle_window_focus (liwdgManager* self,
+                                  int           next)
+{
+	if (!private_focus_window (self, next))
+	{
+		self->focus.keyboard = NULL;
+		private_focus_window (self, next);
+	}
 }
 
 lifntFont*
@@ -290,10 +313,20 @@ liwdg_manager_event (liwdgManager* self,
 	if (event->type == LIWDG_EVENT_TYPE_KEY_PRESS &&
 	    event->key.keycode == SDLK_TAB)
 	{
-		if (event->key.modifiers & KMOD_SHIFT)
-			liwdg_manager_focus_prev (self);
+		if (event->key.modifiers & KMOD_CTRL)
+		{
+			if (event->key.modifiers & KMOD_SHIFT)
+				liwdg_manager_cycle_window_focus (self, 0);
+			else
+				liwdg_manager_cycle_window_focus (self, 1);
+		}
 		else
-			liwdg_manager_focus_next (self);
+		{
+			if (event->key.modifiers & KMOD_SHIFT)
+				liwdg_manager_cycle_focus (self, 0);
+			else
+				liwdg_manager_cycle_focus (self, 1);
+		}
 		return 1;
 	}
 
@@ -414,20 +447,6 @@ liwdg_manager_event_sdl (liwdgManager* self,
 	}
 
 	return liwdg_manager_event (self, &evt);
-}
-
-void
-liwdg_manager_focus_next (liwdgManager* self)
-{
-	if (!private_focus_next (self, self->focus.keyboard))
-		private_focus_next (self, NULL);
-}
-
-void
-liwdg_manager_focus_prev (liwdgManager* self)
-{
-	if (!private_focus_prev (self, self->focus.keyboard))
-		private_focus_prev (self, NULL);
 }
 
 int
@@ -870,6 +889,106 @@ private_find_window (liwdgManager* self,
 }
 
 static int
+private_focus_root (liwdgManager* self)
+{
+	liwdgWidget* tmp;
+	liwdgWidget* widget;
+
+	widget = self->widgets.root;
+	if (widget == NULL)
+		return 0;
+	if (!liwdg_widget_get_visible (widget))
+		return 0;
+	if (liwdg_widget_typeis (widget, &liwdgContainerType))
+	{
+		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, 1);
+		if (tmp != NULL)
+		{
+			liwdg_manager_set_focus_keyboard (self, tmp);
+			return 1;
+		}
+	}
+	else if (liwdg_widget_get_focusable (widget))
+	{
+		liwdg_manager_set_focus_keyboard (self, widget);
+		return 1;
+	}
+
+	return 0;
+}
+
+static int
+private_focus_window (liwdgManager* self,
+                      int           next)
+{
+	liwdgWidget* tmp;
+	liwdgWidget* widget;
+
+	/* Find current toplevel. */
+	if (self->focus.keyboard != NULL)
+	{
+		widget = self->focus.keyboard;
+		while (widget->parent != NULL)
+			widget = widget->parent;
+	}
+	else
+	{
+		if (private_focus_root (self))
+			return 1;
+		if (self->widgets.dialogs == NULL)
+			return 0;
+		widget = NULL;
+	}
+
+	/* Find next toplevel. */
+	if (widget == NULL || widget == self->widgets.root)
+	{
+		widget = self->widgets.dialogs;
+		if (!next)
+		{
+			while (widget->next != NULL)
+				widget = widget->next;
+		}
+	}
+	else
+	{
+		if (next)
+			widget = widget->next;
+		else
+			widget = widget->prev;
+	}
+
+	/* Find next or previous window. */
+	while (widget != NULL)
+	{
+		if (liwdg_widget_get_visible (widget))
+		{
+			if (liwdg_widget_typeis (widget, &liwdgContainerType))
+			{
+				tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
+				if (tmp != NULL)
+				{
+					liwdg_manager_set_focus_keyboard (self, tmp);
+					return 1;
+				}
+			}
+			else if (liwdg_widget_get_focusable (widget))
+			{
+				liwdg_manager_set_focus_keyboard (self, widget);
+				return 1;
+			}
+		}
+		if (next)
+			widget = widget->next;
+		else
+			widget = widget->prev;
+	}
+
+	/* Default to root window. */
+	return private_focus_root (self);
+}
+
+static int
 private_load_config (liwdgManager* self,
                      const char*   root)
 {
@@ -878,340 +997,6 @@ private_load_config (liwdgManager* self,
 		return 0;
 
 	return 1;
-}
-
-static int
-private_focus_next (liwdgManager* self,
-                    liwdgWidget*  start)
-{
-	liwdgWidget* tmp;
-	liwdgWidget* widget;
-
-	/* Choose the starting position. */
-	if (start == NULL)
-	{
-		/* Get the first dialog. */
-		start = private_get_next_dialog (self, NULL);
-		if (start == NULL)
-			return 0;
-
-		/* Focus it if focusable. */
-		if (liwdg_widget_get_focusable (start))
-		{
-			liwdg_manager_set_focus_keyboard (self, start);
-			return 1;
-		}
-
-		/* Focus the first focusable child. */
-		if (liwdg_widget_typeis (start, &liwdgGroupType))
-		{
-			tmp = private_get_next_focusable (self, LIWDG_GROUP (start), NULL);
-			if (tmp != NULL)
-			{
-				liwdg_manager_set_focus_keyboard (self, tmp);
-				return 1;
-			}
-		}
-	}
-
-	/* Find the next focusable widget. */
-	while (1)
-	{
-		/* Loop through children. */
-		/* Does nothing if we started from an unfocusable dialog. */
-		for (widget = start ; widget->parent != NULL ; widget = widget->parent)
-		{
-			tmp = private_get_next_focusable (self, LIWDG_GROUP (widget->parent), widget);
-			if (tmp != NULL)
-			{
-				liwdg_manager_set_focus_keyboard (self, tmp);
-				return 1;
-			}
-		}
-
-		/* Get the next dialog. */
-		start = private_get_next_dialog (self, widget);
-		if (start == NULL)
-			return 0;
-
-		/* Focus it if focusable. */
-		if (liwdg_widget_get_focusable (start))
-		{
-			liwdg_manager_set_focus_keyboard (self, start);
-			return 1;
-		}
-
-		/* Focus the first focusable child. */
-		if (liwdg_widget_typeis (start, &liwdgGroupType))
-		{
-			tmp = private_get_next_focusable (self, LIWDG_GROUP (start), NULL);
-			if (tmp != NULL)
-			{
-				liwdg_manager_set_focus_keyboard (self, tmp);
-				return 1;
-			}
-		}
-	}
-}
-
-static int
-private_focus_prev (liwdgManager* self,
-                    liwdgWidget*  start)
-{
-	liwdgWidget* tmp;
-	liwdgWidget* widget;
-
-	/* Choose the starting position. */
-	if (start == NULL)
-	{
-		/* Get the last dialog. */
-		start = private_get_prev_dialog (self, NULL);
-		if (start == NULL)
-			return 0;
-
-		/* Focus it if focusable. */
-		if (liwdg_widget_get_focusable (start))
-		{
-			liwdg_manager_set_focus_keyboard (self, start);
-			return 1;
-		}
-
-		/* Focus the last focusable child. */
-		if (liwdg_widget_typeis (start, &liwdgGroupType))
-		{
-			tmp = private_get_prev_focusable (self, LIWDG_GROUP (start), NULL);
-			if (tmp != NULL)
-			{
-				liwdg_manager_set_focus_keyboard (self, tmp);
-				return 1;
-			}
-		}
-	}
-
-	/* Find the next focusable widget. */
-	while (1)
-	{
-		/* Loop through children. */
-		/* Does nothing if we started from an unfocusable dialog. */
-		for (widget = start ; widget->parent != NULL; widget = widget->parent)
-		{
-			tmp = private_get_prev_focusable (self, LIWDG_GROUP (widget->parent), widget);
-			if (tmp != NULL)
-			{
-				liwdg_manager_set_focus_keyboard (self, tmp);
-				return 1;
-			}
-		}
-
-		/* Get the previous dialog. */
-		start = private_get_prev_dialog (self, widget);
-		if (start == NULL)
-			return 0;
-
-		/* Focus it if focusable. */
-		if (liwdg_widget_get_focusable (start))
-		{
-			liwdg_manager_set_focus_keyboard (self, start);
-			return 1;
-		}
-
-		/* Focus the last focusable child. */
-		if (liwdg_widget_typeis (start, &liwdgGroupType))
-		{
-			tmp = private_get_prev_focusable (self, LIWDG_GROUP (start), NULL);
-			if (tmp != NULL)
-			{
-				liwdg_manager_set_focus_keyboard (self, tmp);
-				return 1;
-			}
-		}
-	}
-}
-
-static liwdgWidget*
-private_get_next_dialog (liwdgManager* self,
-                         liwdgWidget*  curr)
-{
-	liwdgWidget* widget;
-
-	/* Find old position. */
-	if (curr == self->widgets.root)
-		widget = self->widgets.dialogs;
-	else if (curr != NULL)
-		widget = curr->next;
-	else
-		widget = NULL;
-
-	/* Find next visible dialog. */
-	for ( ; widget != NULL ; widget = widget->next)
-	{
-		if (liwdg_widget_get_visible (widget))
-			return widget;
-	}
-
-	/* Return root if no more visiable dialogs. */
-	if (self->widgets.root != NULL)
-	{
-		if (liwdg_widget_get_visible (self->widgets.root))
-			return self->widgets.root;
-	}
-
-	return NULL;
-}
-
-static liwdgWidget*
-private_get_prev_dialog (liwdgManager* self,
-                         liwdgWidget*  curr)
-{
-	liwdgWidget* widget;
-
-	/* Find old position. */
-	if (curr == self->widgets.root)
-		widget = self->widgets.active;
-	else if (curr != NULL)
-		widget = curr->prev;
-	else
-		widget = NULL;
-
-	/* Find previous visible dialog. */
-	for ( ; widget != NULL ; widget = widget->prev)
-	{
-		if (liwdg_widget_get_visible (widget))
-			return widget;
-	}
-
-	/* Return root if no more visiable dialogs. */
-	if (self->widgets.root != NULL)
-	{
-		if (liwdg_widget_get_visible (self->widgets.root))
-			return self->widgets.root;
-	}
-
-	return NULL;
-}
-
-/**
- * \brief Gets the next focusable widget under the group.
- *
- * Searches nested groups recursively.
- *
- * \param self A widget manager.
- * \param group A widget group.
- * \param curr The current focused widget in the group or NULL.
- * \return A widget or NULL.
- */
-static liwdgWidget*
-private_get_next_focusable (liwdgManager* self,
-                            liwdgGroup*   group,
-                            liwdgWidget*  curr)
-{
-	int x = 0;
-	int y = group->height - 1;
-	liwdgWidget* tmp;
-	liwdgWidget* child;
-
-	/* Find old position. */
-	if (curr != NULL)
-	{
-		for (y = group->height - 1 ; y >= 0 ; y--)
-		{
-			for (x = group->width - 1 ; x >= 0 ; x--)
-			{
-				child = group->cells[x + y * group->width].child;
-				if (child == curr)
-					goto out;
-			}
-		}
-	out:
-		if (x < group->width)
-			x++;
-		else
-			y--;
-	}
-
-	/* Iterate forwards. */
-	for ( ; y >= 0 ; y--, x = 0)
-	for ( ; x < group->width ; x++)
-	{
-		child = group->cells[x + y * group->width].child;
-		if (child == NULL)
-			continue;
-		if (liwdg_widget_typeis (child, &liwdgGroupType))
-		{
-			/* Enter a child group. */
-			tmp = private_get_next_focusable (self, LIWDG_GROUP (child), NULL);
-			if (tmp != NULL)
-				return tmp;
-		}
-		else
-		{
-			/* Try a child widget. */
-			if (liwdg_widget_get_focusable (child))
-				return child;
-		}
-	}
-
-	return NULL;
-}
-
-/**
- * \brief Gets the previous focusable widget under the group.
- *
- * Searches nested groups recursively.
- *
- * \param self A widget manager.
- * \param group A widget group.
- * \param curr The current focused widget in the group or NULL.
- * \return A widget or NULL.
- */
-static liwdgWidget*
-private_get_prev_focusable (liwdgManager* self,
-                            liwdgGroup*   group,
-                            liwdgWidget*  curr)
-{
-	int x = group->width - 1;
-	int y = 0;
-	liwdgWidget* tmp;
-	liwdgWidget* child;
-
-	/* Find old position. */
-	if (curr != NULL)
-	{
-		for (y = group->height - 1 ; y >= 0 ; y--)
-		for (x = group->width - 1 ; x >= 0 ; x--)
-		{
-			child = group->cells[x + y * group->width].child;
-			if (child == curr)
-				goto out;
-		}
-out:
-		if (x)
-			x--;
-		else
-			y++;
-	}
-
-	/* Iterate backwards. */
-	for ( ; y < group->height ; y++, x = group->width - 1)
-	for ( ; x >= 0 ; x--)
-	{
-		child = group->cells[x + y * group->width].child;
-		if (child == NULL)
-			continue;
-		if (liwdg_widget_typeis (child, &liwdgGroupType))
-		{
-			tmp = private_get_prev_focusable (self, LIWDG_GROUP (child), NULL);
-			if (tmp != NULL)
-				return tmp;
-		}
-		else
-		{
-			if (liwdg_widget_get_focusable (child))
-				return child;
-		}
-	}
-
-	return NULL;
 }
 
 /** @} */

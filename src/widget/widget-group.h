@@ -25,8 +25,9 @@
 #ifndef __WIDGET_GROUP_H__
 #define __WIDGET_GROUP_H__
 
-#include "widget.h"
 #include <algorithm/lips-algorithm.h>
+#include "widget.h"
+#include "widget-container.h"
 
 #define LIWDG_GROUP(o) ((liwdgGroup*)(o))
 
@@ -59,7 +60,7 @@ struct _liwdgGroupCell
 typedef struct _liwdgGroup liwdgGroup;
 struct _liwdgGroup
 {
-	liwdgWidget base;
+	liwdgContainer base;
 	int width;
 	int height;
 	int homogeneous;
@@ -91,14 +92,6 @@ liwdg_group_append_col (liwdgGroup* self);
 
 int
 liwdg_group_append_row (liwdgGroup* self);
-
-void
-liwdg_group_child_request (liwdgGroup*  self,
-                           liwdgWidget* child);
-
-void
-liwdg_group_detach_child (liwdgGroup*  self,
-                          liwdgWidget* child);
 
 int
 liwdg_group_insert_col (liwdgGroup* self,
@@ -132,11 +125,6 @@ liwdg_group_set_child (liwdgGroup*  self,
                        int          x,
                        int          y,
                        liwdgWidget* child);
-
-liwdgWidget*
-liwdg_group_get_child_at (liwdgGroup* self,
-                          int         pixx,
-                          int         pixy);
 
 int
 liwdg_group_get_col_expand (liwdgGroup* self,

@@ -26,6 +26,7 @@
 #define __WIDGET_EVENT_H__
 
 #include <system/lips-system.h>
+#include "widget-types.h"
 
 enum
 {
@@ -38,6 +39,7 @@ enum
 	LIWDG_EVENT_TYPE_KEY_PRESS,
 	LIWDG_EVENT_TYPE_KEY_RELEASE,
 	LIWDG_EVENT_TYPE_MOTION,
+	LIWDG_EVENT_TYPE_PROBE,
 	LIWDG_EVENT_TYPE_RENDER,
 	LIWDG_EVENT_TYPE_UPDATE,
 	LIWDG_EVENT_TYPE_MAX,
@@ -49,6 +51,7 @@ typedef struct _liwdgEventButton liwdgEventButton;
 typedef struct _liwdgEventFocus liwdgEventFocus;
 typedef struct _liwdgEventKey liwdgEventKey;
 typedef struct _liwdgEventMotion liwdgEventMotion;
+typedef struct _liwdgEventProbe liwdgEventProbe;
 typedef struct _liwdgEventUpdate liwdgEventUpdate;
 
 struct _liwdgEventAllocation
@@ -88,6 +91,13 @@ struct _liwdgEventMotion
 	int buttons;
 };
 
+struct _liwdgEventProbe
+{
+	int type;
+	const liwdgClass* clss;
+	void* result;
+};
+
 struct _liwdgEventUpdate
 {
 	int type;
@@ -102,6 +112,7 @@ union _liwdgEvent
 	liwdgEventFocus focus;
 	liwdgEventKey key;
 	liwdgEventMotion motion;
+	liwdgEventProbe probe;
 	liwdgEventUpdate update;
 };
 
