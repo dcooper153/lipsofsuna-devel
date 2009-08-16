@@ -780,7 +780,7 @@ private_event (liwdgWidget* self,
 		return 1;
 	}
 
-	return 0;
+	return 1;
 }
 
 void
