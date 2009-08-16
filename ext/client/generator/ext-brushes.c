@@ -165,7 +165,7 @@ liext_brushes_new (liwdgManager* manager,
 		return NULL;
 	}
 	liext_preview_set_transform_call (LIEXT_PREVIEW (data->widgets.preview), private_transform, self);
-	liwdg_widget_set_request (data->widgets.preview, 320, 240);
+	liwdg_widget_set_request (data->widgets.preview, 640, 240);
 	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 1, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
 
@@ -225,7 +225,7 @@ private_init (liextBrushes* self,
 		liwdg_group_new_with_size (manager, 2, 2),
 		liwdg_group_new_with_size (manager, 1, 3),
 		liwdg_group_new_with_size (manager, 3, 1),
-		liwdg_group_new_with_size (manager, 2, 4),
+		liwdg_group_new_with_size (manager, 2, 2),
 		liwdg_button_new (manager),
 		liwdg_button_new (manager),
 		liwdg_entry_new (manager),
@@ -299,6 +299,8 @@ private_init (liextBrushes* self,
 	liwdg_widget_set_visible (self->widgets.group_size, 0);
 
 	/* Pack self. */
+	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
+	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, group_tree);

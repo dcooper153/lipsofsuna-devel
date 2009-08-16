@@ -15,31 +15,55 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_WIDGET_H__
-#define __LIPS_WIDGET_H__
+/**
+ * \addtogroup liwdg Widget
+ * @{
+ * \addtogroup liwdgTabs Tabs
+ * @{
+ */
+
+#ifndef __WIDGET_TABS_H__
+#define __WIDGET_TABS_H__
 
 #include "widget.h"
-#include "widget-button.h"
-#include "widget-busy.h"
-#include "widget-check.h"
-#include "widget-class.h"
 #include "widget-container.h"
-#include "widget-entry.h"
-#include "widget-event.h"
-#include "widget-group.h"
-#include "widget-image.h"
-#include "widget-label.h"
-#include "widget-manager.h"
-#include "widget-menu.h"
-#include "widget-menugroup.h"
-#include "widget-progress.h"
-#include "widget-render.h"
-#include "widget-scroll.h"
-#include "widget-spin.h"
-#include "widget-style.h"
-#include "widget-tabs.h"
-#include "widget-tree.h"
 #include "widget-types.h"
-#include "widget-window.h"
+
+#define LIWDG_TABS(o) ((liwdgTabs*)(o))
+
+typedef struct _liwdgTab liwdgTab;
+struct _liwdgTab
+{
+	char* text;
+	lifntFont* font;
+	lifntLayout* layout;
+	liwdgRect rect;
+	liwdgWidget* widget;
+};
+
+typedef struct _liwdgTabs liwdgTabs;
+struct _liwdgTabs
+{
+	liwdgContainer base;
+	int active;
+	struct
+	{
+		int count;
+		liwdgTab* array;
+	} tabs;
+};
+
+extern const liwdgClass liwdgTabsType;
+
+liwdgWidget*
+liwdg_tabs_new (liwdgManager* manager);
+
+int
+liwdg_tabs_append_tab (liwdgTabs*   self,
+                       const char*  title,
+                       liwdgWidget* widget);
 
 #endif
+
+/** @} */
+/** @} */

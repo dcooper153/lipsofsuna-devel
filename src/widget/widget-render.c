@@ -119,6 +119,7 @@ private_event (liwdgRender* self,
 {
 	limatFrustum frustum;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -129,12 +130,16 @@ private_event (liwdgRender* self,
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			break;
 		case LIWDG_EVENT_TYPE_RENDER:
+			/* Draw base. */
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "render");
+			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "render", &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), "render", NULL);
+			/* Draw scene. */
 			glMatrixMode (GL_PROJECTION);
 			glPushMatrix ();
 			glMatrixMode (GL_MODELVIEW);
 			glPushMatrix ();
 			glPushAttrib (GL_VIEWPORT_BIT | GL_ENABLE_BIT);
-			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 			glViewport (rect.x, rect.y, rect.width, rect.height);
 			glScissor (rect.x, rect.y, rect.width, rect.height);
 			glEnable (GL_SCISSOR_TEST);
@@ -166,7 +171,6 @@ private_event (liwdgRender* self,
 			glDisable (GL_LIGHTING);
 			glDisable (GL_DEPTH_TEST);
 			glDepthMask (GL_FALSE);
-			liwdgGroupType.event (LIWDG_WIDGET (self), event);
 			break;
 		case LIWDG_EVENT_TYPE_UPDATE:
 			if (self->custom_update_func != NULL)

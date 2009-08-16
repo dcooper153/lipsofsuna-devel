@@ -66,7 +66,7 @@ static void
 private_detach_child (liwdgGroup*  self,
                       liwdgWidget* child);
 
-void
+static void
 private_foreach_child (liwdgGroup* self,
                        void      (*call)(),
                        void*       data);
@@ -802,8 +802,6 @@ private_event (liwdgGroup* self,
                liwdgEvent* event)
 {
 	int i;
-	int x;
-	int y;
 	liwdgWidget* child;
 
 	/* Container interface. */
@@ -845,36 +843,7 @@ private_event (liwdgGroup* self,
 			return 1;
 	}
 
-	if (!liwdg_widget_get_visible (LIWDG_WIDGET (self)))
-		return 1;
-
-	/* Get cursor position. */
-	switch (event->type)
-	{
-		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
-			x = event->button.x;
-			y = event->button.y;
-			break;
-		case LIWDG_EVENT_TYPE_MOTION:
-			x = event->motion.x;
-			y = event->motion.y;
-			break;
-		default:
-			return liwdgContainerType.event (LIWDG_WIDGET (self), event);
-	}
-
-	/* Get the affected widget. */
-	child = private_child_at (self, x, y);
-	if (child == NULL)
-		return 1;
-
-	/* Propagate event. */
-	liwdg_widget_set_focus_mouse (child);
-	if (!liwdg_widget_event (child, event))
-		return 0;
-
-	return 1;
+	return liwdgContainerType.event (LIWDG_WIDGET (self), event);
 }
 
 static liwdgWidget*
@@ -1080,7 +1049,7 @@ private_detach_child (liwdgGroup*  self,
 	}
 }
 
-void
+static void
 private_foreach_child (liwdgGroup* self,
                        void      (*call)(),
                        void*       data)

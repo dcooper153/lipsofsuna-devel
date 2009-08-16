@@ -411,6 +411,8 @@ wdgsrc = \
 	widget/widget-spin.h \
 	widget/widget-style.c \
 	widget/widget-style.h \
+	widget/widget-tabs.c \
+	widget/widget-tabs.h \
 	widget/widget-tree.c \
 	widget/widget-tree.h \
 	widget/widget-types.h \

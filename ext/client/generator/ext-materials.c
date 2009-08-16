@@ -215,6 +215,7 @@ private_init (liextMaterials* self,
 	liwdg_widget_set_visible (self->widgets.group_scale, 0);
 
 	/* Pack self. */
+	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);

@@ -51,6 +51,7 @@ struct _liextEditor
 	ligenGenerator* generator;
 	liwdgWidget* brushes;
 	liwdgWidget* materials;
+	liwdgWidget* tabs;
 };
 
 extern const liwdgClass liextEditorType;

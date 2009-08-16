@@ -469,26 +469,10 @@ licli_module_render (licliModule* self)
 	int w;
 	int h;
 
-	/* Render UI. */
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT);
 	licli_window_get_size (self->window, &w, &h);
 	liwdg_manager_set_size (self->widgets, w, h);
 	lieng_camera_set_viewport (self->camera, 0, 0, w, h);
-	glViewport (0, 0, w, h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho (0, w, 0, h, -100.0f, 100.0f);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-	glEnable (GL_BLEND);
-	glEnable (GL_TEXTURE_2D);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liwdg_manager_render (self->widgets);
-	glEnable (GL_CULL_FACE);
-	glEnable (GL_LIGHTING);
-	glEnable (GL_DEPTH_TEST);
-	glDepthMask (GL_TRUE);
 	self->client->video.SDL_GL_SwapBuffers ();
 }
 

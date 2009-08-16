@@ -90,7 +90,7 @@ liwdg_manager_new (lividCalls* video,
 
 	/* Load config and resources. */
 	if (!private_load_config (self, root))
-		printf ("WARNING: %s\n", lisys_error_get_string ());
+		lisys_error_report ();
 
 	return self;
 }
@@ -554,8 +554,26 @@ liwdg_manager_render (liwdgManager* self)
 {
 	liwdgWidget* widget;
 
+	/* Setup viewport. */
+	glViewport (0, 0, self->width, self->height);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho (0, self->width, 0, self->height, -100.0f, 100.0f);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+
+	/* Setup render mode. */
 	glEnable (GL_BLEND);
+	glEnable (GL_TEXTURE_2D);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_LIGHTING);
+	glDepthMask (GL_FALSE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/* Render widgets. */
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glClear (GL_COLOR_BUFFER_BIT);
 	if (self->widgets.root != NULL)
 	{
 		if (liwdg_widget_get_visible (self->widgets.root))

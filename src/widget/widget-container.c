@@ -72,7 +72,7 @@ liwdg_container_child_at (liwdgContainer* self,
 		return NULL;
 
 	/* Call interface. */
-	if (iface->child_at == NULL)
+	if (iface->child_at != NULL)
 		return iface->child_at (self, x, y);
 
 	return NULL;
@@ -207,6 +207,10 @@ static int
 private_event (liwdgContainer* self,
                liwdgEvent*     event)
 {
+	int x;
+	int y;
+	liwdgWidget* child;
+
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
 	    event->probe.clss == &liwdgContainerType)
@@ -221,6 +225,34 @@ private_event (liwdgContainer* self,
 		};
 		event->probe.result = &iface;
 		return 0;
+	}
+
+	/* Get cursor position for mouse events. */
+	switch (event->type)
+	{
+		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
+		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
+			x = event->button.x;
+			y = event->button.y;
+			break;
+		case LIWDG_EVENT_TYPE_MOTION:
+			x = event->motion.x;
+			y = event->motion.y;
+			break;
+		default:
+			return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	}
+
+	/* Propagate event to child. */
+	if (liwdg_widget_get_visible (LIWDG_WIDGET (self)))
+	{
+		child = liwdg_container_child_at (self, x, y);
+		if (child != NULL)
+		{
+			liwdg_widget_set_focus_mouse (child);
+			if (!liwdg_widget_event (child, event))
+				return 0;
+		}
 	}
 
 	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
