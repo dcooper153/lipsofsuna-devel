@@ -628,7 +628,7 @@ private_rename (liextBrushes* self,
 			LI_FOREACH_U32DIC (iter, self->generator->brushes)
 			{
 				brush = iter.value;
-				if (!strcmp (name, data->brush->name))
+				if (!strcmp (name, brush->name))
 				{
 					data->rule->strokes.array[data->stroke].brush = brush->id;
 					liwdg_treerow_set_text (row, name);

@@ -289,7 +289,7 @@ liext_preview_paint_terrain (liextPreview* self,
 			livox_manager_fill_voxel (self->generator->voxels, point, material);
 			break;
 		case LIEXT_PREVIEW_PAINT_SPHERE:
-			livox_manager_fill_sphere (self->generator->voxels, point, material, radius);
+			livox_manager_fill_sphere (self->generator->voxels, point, radius, material);
 			break;
 	}
 	livox_manager_update (self->generator->voxels, 1.0f);
