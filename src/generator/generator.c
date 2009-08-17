@@ -383,10 +383,16 @@ ligen_generator_step (ligenGenerator* self)
 {
 	int i;
 	int j;
+	int k;
+	int tmp;
+	int* rnd;
+	int* rnd1;
 	ligenBrush* brush;
 	ligenRule* rule;
 	ligenStroke stroke;
 
+	/* TODO: Randomize the order of strokes. */
+	rnd = NULL;
 	for (i = 0 ; i < self->strokes.count ; i++)
 	{
 		/* The stroke array may be reallocated in private_rule_apply
@@ -394,17 +400,42 @@ ligen_generator_step (ligenGenerator* self)
 		stroke = self->strokes.array[i];
 		brush = lialg_u32dic_find (self->brushes, stroke.brush);
 		assert (brush != NULL);
+		if (!brush->rules.count)
+			continue;
+
+		/* Randomize rule order. */
+		rnd1 = realloc (rnd, brush->rules.count * sizeof (int));
+		if (rnd1 == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (rnd);
+			return 0;
+		}
+		rnd = rnd1;
+		for (j = 0 ; j < brush->rules.count ; j++)
+			rnd[j] = j;
 		for (j = 0 ; j < brush->rules.count ; j++)
 		{
-			rule = brush->rules.array[j];
+			k = rand () % brush->rules.count;
+			tmp = rnd[j];
+			rnd[j] = rnd[k];
+			rnd[k] = tmp;
+		}
+
+		/* Try each rule. */
+		for (j = 0 ; j < brush->rules.count ; j++)
+		{
+			rule = brush->rules.array[rnd[j]];
 			if (private_rule_test (self, &stroke, rule))
 			{
+				free (rnd);
 				if (!private_rule_apply (self, &stroke, rule))
 					return 0;
 				return 1;
 			}
 		}
 	}
+	free (rnd);
 
 	return 0;
 }
