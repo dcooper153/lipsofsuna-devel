@@ -27,6 +27,7 @@
 #include "ext-preview.h"
 
 #define LIEXT_PREVIEW_CENTER 8160
+#define LIEXT_PREVIEW_PAN 0.3f
 
 enum
 {
@@ -478,6 +479,7 @@ private_motion (liextPreview* self,
 	limatVector delta;
 	limatQuaternion quat;
 	limatTransform transform;
+	limatTransform transform1;
 
 	self->drag.x += event->motion.dx;
 	self->drag.y += event->motion.dy;
@@ -542,8 +544,22 @@ private_motion (liextPreview* self,
 		}
 	}
 
-	lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
-	lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
+	if (event->motion.buttons & 0x02)
+	{
+		lieng_camera_get_transform (self->camera, &transform);
+		vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
+		vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
+		vx = limat_vector_multiply (vx, LIEXT_PREVIEW_PAN * event->motion.dx);
+		vy = limat_vector_multiply (vy, LIEXT_PREVIEW_PAN * event->motion.dy);
+		transform1 = limat_convert_vector_to_transform (limat_vector_add (vx, vy));
+		transform1 = limat_transform_multiply (transform1, transform);
+		lieng_camera_set_transform (self->camera, &transform1);
+	}
+	else
+	{
+		lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
+		lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
+	}
 }
 
 static void
