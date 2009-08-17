@@ -263,6 +263,12 @@ ligen_generator_insert_stroke (ligenGenerator* self,
 	return 1;
 }
 
+int
+ligen_generator_load_materials (ligenGenerator* self)
+{
+	return livox_manager_load_materials (self->voxels);
+}
+
 /**
  * \brief Enters the main loop of the generator.
  *

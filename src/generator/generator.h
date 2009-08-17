@@ -89,6 +89,9 @@ ligen_generator_insert_stroke (ligenGenerator* self,
                                int             z);
 
 int
+ligen_generator_load_materials (ligenGenerator* self);
+
+int
 ligen_generator_main (ligenGenerator* self);
 
 int

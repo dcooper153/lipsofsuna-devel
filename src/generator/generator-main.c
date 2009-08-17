@@ -40,6 +40,7 @@ main (int argc, char** argv)
 		lisys_error_report ();
 		return 1;
 	}
+	ligen_generator_load_materials (self);
 	if (!ligen_generator_main (self))
 		lisys_error_report ();
 	ligen_generator_free (self);
