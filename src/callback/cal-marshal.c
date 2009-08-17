@@ -44,6 +44,14 @@ int lical_marshal_DATA_INT (void* call, void* data, va_list args)
 	return func(data, arg0);
 }
 
+int lical_marshal_DATA_INT_INT (void* call, void* data, va_list args)
+{
+	int (*func)(void*, int, int) = call;
+	int arg0 = va_arg (args, int);
+	int arg1 = va_arg (args, int);
+	return func(data, arg0, arg1);
+}
+
 int lical_marshal_DATA_INT_PTR (void* call, void* data, va_list args)
 {
 	int (*func)(void*, int, void*) = call;

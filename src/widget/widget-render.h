@@ -50,6 +50,12 @@ liwdgWidget*
 liwdg_render_new (liwdgManager* manager,
                   lirndScene*   scene);
 
+int
+liwdg_render_pick (liwdgRender*    self,
+                   lirndSelection* result,
+                   int             x,
+                   int             y);
+
 void
 liwdg_render_set_modelview (liwdgRender*       self,
                             const limatMatrix* value);

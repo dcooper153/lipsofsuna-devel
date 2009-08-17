@@ -68,6 +68,45 @@ liwdg_render_new (liwdgManager* manager,
 }
 
 /**
+ * \brief Picks the scene of the widget.
+ *
+ * \param self Renderer widget.
+ * \param result Return location for the picking result.
+ * \param x Point in screen space.
+ * \param y Point in screen space.
+ * \return Nonzero if found something.
+ */
+int
+liwdg_render_pick (liwdgRender*    self,
+                   lirndSelection* result,
+                   int             x,
+                   int             y)
+{
+	int viewport[4];
+	limatFrustum frustum;
+	liwdgRect rect;
+
+	/* Check if inside the allocation. */
+	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+	if (x < rect.x || x >= rect.x + rect.width ||
+	    y < rect.y || y >= rect.y + rect.height)
+		return 0;
+
+	/* Pick objects from the scene. */
+	if (self->scene == NULL)
+		return 0;
+	limat_frustum_init (&frustum, &self->modelview, &self->projection);
+	viewport[0] = rect.x;
+	viewport[1] = rect.y;
+	viewport[2] = rect.width;
+	viewport[3] = rect.height;
+	if (!lirnd_scene_pick (self->scene, &self->modelview, &self->projection, &frustum, viewport, x, y, 5, result))
+		return 0;
+
+	return 1;
+}
+
+/**
  * \brief Sets the modelview matrix of the rendered scene.
  *
  * \param self Renderer widget.

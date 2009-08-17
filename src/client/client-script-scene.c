@@ -168,16 +168,11 @@ Scene_pick (lua_State* lua)
 {
 	int x;
 	int y;
-	int viewport[4];
 	licliModule* module;
 	liengObject* object;
-	limatFrustum frustum;
-	limatMatrix modelview;
-	limatMatrix projection;
 	lirndSelection result;
 	liscrData* self;
 	liscrData* vector;
-	liwdgRect rect;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_SCENE);
 	module = LIWDG_RENDER (self->data)->custom_render_data;
@@ -187,23 +182,8 @@ Scene_pick (lua_State* lua)
 	if (lua_gettop (lua) >= 3)
 		y = luaL_checknumber (lua, 3);
 
-	/* Check if inside the allocation. */
-	liwdg_widget_get_allocation (self->data, &rect);
-	if (x < rect.x || x >= rect.x + rect.width ||
-	    y < rect.y || y >= rect.y + rect.height)
-		return 0;
-
 	/* Pick objects from the scene. */
-	viewport[0] = rect.x;
-	viewport[1] = rect.y;
-	viewport[2] = rect.width;
-	viewport[3] = rect.height;
-	lieng_camera_get_frustum (module->camera, &frustum);
-	lieng_camera_get_modelview (module->camera, &modelview);
-	lieng_camera_get_projection (module->camera, &projection);
-	lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
-	if (!lirnd_scene_pick (module->engine->scene, &modelview, &projection, &frustum,
-	                       viewport, x, module->window->mode.height - y, 5, &result))
+	if (!liwdg_render_pick (self->data, &result, x, module->window->mode.height - y - 1))
 		return 0;
 
 	/* Find the picked object. */

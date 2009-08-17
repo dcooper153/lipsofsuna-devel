@@ -34,6 +34,20 @@
 
 #define LIEXT_PREVIEW(o) ((liextPreview*)(o))
 
+#define LIEXT_CALLBACK_PRESSED 100
+#define LIEXT_CALLBACK_TRANSFORM 101
+
+enum
+{
+	LIEXT_PREVIEW_COLOR_VOXEL,
+	LIEXT_PREVIEW_ERASE_POINT,
+	LIEXT_PREVIEW_ERASE_VOXEL,
+	LIEXT_PREVIEW_ERASE_SPHERE,
+	LIEXT_PREVIEW_PAINT_POINT,
+	LIEXT_PREVIEW_PAINT_VOXEL,
+	LIEXT_PREVIEW_PAINT_SPHERE
+};
+
 typedef struct _liextPreview liextPreview;
 struct _liextPreview
 {
@@ -49,8 +63,6 @@ struct _liextPreview
 	lirndRender* render;
 	lirndScene* scene;
 	int mode;
-	void (*transform_call)(void*, const limatTransform*, int);
-	void* transform_data;
 };
 
 extern const liwdgClass liextPreviewType;
@@ -72,6 +84,13 @@ liext_preview_build_box (liextPreview* self,
 int
 liext_preview_clear (liextPreview* self);
 
+void
+liext_preview_copy_voxels (liextPreview* self,
+                           int           sx,
+                           int           sy,
+                           int           sz,
+                           livoxVoxel*   result);
+
 int
 liext_preview_insert_object (liextPreview*         self,
                              const limatTransform* transform,
@@ -84,6 +103,13 @@ liext_preview_insert_stroke (liextPreview* self,
                              int           z,
                              int           brush);
 
+void
+liext_preview_paint_terrain (liextPreview* self,
+                             limatVector*  point,
+                             int           mode,
+                             int           material,
+                             float         radius);
+
 int
 liext_preview_replace_materials (liextPreview* self,
                                  livoxManager* voxels);
@@ -91,11 +117,6 @@ liext_preview_replace_materials (liextPreview* self,
 void
 liext_preview_get_transform (liextPreview*   self,
                              limatTransform* value);
-
-void
-liext_preview_set_transform_call (liextPreview* self,
-                                  void        (*call)(),
-                                  void*         data);
 
 #endif
 

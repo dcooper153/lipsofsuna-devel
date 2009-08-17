@@ -42,17 +42,21 @@ struct _liextBrushes
 	liextModule* module;
 	ligenGenerator* generator;
 	limatTransform transform;
+	int paint;
 	struct
 	{
 		liwdgWidget* dialog;
+		liwdgWidget* group_paint;
 		liwdgWidget* group_view;
 		liwdgWidget* group_size;
 		liwdgWidget* button_add;
+		liwdgWidget* button_paint[7];
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
 		liwdgWidget* label_size;
 		liwdgWidget* label_type;
 		liwdgWidget* preview;
+		liwdgWidget* spin_paint;
 		liwdgWidget* spin_sizex;
 		liwdgWidget* spin_sizey;
 		liwdgWidget* spin_sizez;

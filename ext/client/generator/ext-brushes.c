@@ -69,6 +69,15 @@ private_add (liextBrushes* self,
              liwdgWidget*  widget);
 
 static int
+private_paint_select (liextBrushes* self,
+                      liwdgWidget*  widget);
+
+static int
+private_paint_terrain (liextBrushes* self,
+                       int           x,
+                       int           y);
+
+static int
 private_remove (liextBrushes* self,
                 liwdgWidget*  widget);
 
@@ -164,7 +173,8 @@ liext_brushes_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	liext_preview_set_transform_call (LIEXT_PREVIEW (data->widgets.preview), private_transform, self);
+	liwdg_widget_insert_callback (data->widgets.preview, LIEXT_CALLBACK_PRESSED, 0, private_paint_terrain, self, NULL);
+	liwdg_widget_insert_callback (data->widgets.preview, LIEXT_CALLBACK_TRANSFORM, 0, private_transform, self, NULL);
 	liwdg_widget_set_request (data->widgets.preview, 640, 240);
 	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 1, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
@@ -217,63 +227,75 @@ static int
 private_init (liextBrushes* self,
               liwdgManager* manager)
 {
-	int i;
 	liwdgWidget* group_attr;
 	liwdgWidget* group_tree;
-	liwdgWidget* widgets[] =
-	{
-		liwdg_group_new_with_size (manager, 2, 2),
-		liwdg_group_new_with_size (manager, 1, 3),
-		liwdg_group_new_with_size (manager, 3, 1),
-		liwdg_group_new_with_size (manager, 2, 2),
-		liwdg_button_new (manager),
-		liwdg_button_new (manager),
-		liwdg_entry_new (manager),
-		liwdg_label_new (manager),
-		liwdg_label_new (manager),
-		liwdg_spin_new (manager),
-		liwdg_spin_new (manager),
-		liwdg_spin_new (manager),
-		liwdg_tree_new (manager)
-	};
 
-	/* Check memory. */
-	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
-		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
-	{
-		if (widgets[i] == NULL)
-			goto error;
-	}
-
-	/* Assign widgets. */
-	group_attr = widgets[(i = 0)];
-	group_tree = widgets[++i];
-	self->widgets.group_size = widgets[++i];
-	self->widgets.group_view = widgets[++i];
-	self->widgets.button_add = widgets[++i];
-	self->widgets.button_remove = widgets[++i];
-	self->widgets.entry_name = widgets[++i];
-	self->widgets.label_size = widgets[++i];
-	self->widgets.label_type = widgets[++i];
-	self->widgets.spin_sizex = widgets[++i];
-	self->widgets.spin_sizey = widgets[++i];
-	self->widgets.spin_sizez = widgets[++i];
-	self->widgets.tree = widgets[++i];
+	/* Allocate widgets. */
+	if (!liwdg_group_set_size (LIWDG_GROUP (self), 3, 1))
+		return 0;
+	if (!liwdg_manager_alloc_widgets (manager,
+		&group_attr, liwdg_group_new_with_size (manager, 2, 2),
+		&group_tree, liwdg_group_new_with_size (manager, 1, 3),
+		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 1, 9),
+		&self->widgets.group_size, liwdg_group_new_with_size (manager, 3, 1),
+		&self->widgets.group_view, liwdg_group_new_with_size (manager, 2, 2),
+		&self->widgets.button_add, liwdg_button_new (manager),
+		&self->widgets.button_paint[0], liwdg_button_new (manager),
+		&self->widgets.button_paint[1], liwdg_button_new (manager),
+		&self->widgets.button_paint[2], liwdg_button_new (manager),
+		&self->widgets.button_paint[3], liwdg_button_new (manager),
+		&self->widgets.button_paint[4], liwdg_button_new (manager),
+		&self->widgets.button_paint[5], liwdg_button_new (manager),
+		&self->widgets.button_paint[6], liwdg_button_new (manager),
+		&self->widgets.button_remove, liwdg_button_new (manager),
+		&self->widgets.entry_name, liwdg_entry_new (manager),
+		&self->widgets.label_size, liwdg_label_new (manager),
+		&self->widgets.label_type, liwdg_label_new (manager),
+		&self->widgets.spin_paint, liwdg_spin_new (manager),
+		&self->widgets.spin_sizex, liwdg_spin_new (manager),
+		&self->widgets.spin_sizey, liwdg_spin_new (manager),
+		&self->widgets.spin_sizez, liwdg_spin_new (manager),
+		&self->widgets.tree, liwdg_tree_new (manager), NULL))
+		return 0;
 
 	/* Configure widgets. */
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_size), "Size");
-	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_rename, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.tree, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.spin_sizex, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.spin_sizey, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 
+	/* Paint. */
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Color voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Erase point");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Erase voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Erase sphere");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[4]), "Paint point");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[5]), "Paint voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[6]), "Paint sphere");
+	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[3], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[4], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[5], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[6], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 1, self->widgets.button_paint[0]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 2, self->widgets.button_paint[1]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 3, self->widgets.button_paint[2]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 4, self->widgets.button_paint[3]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 5, self->widgets.button_paint[4]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 6, self->widgets.button_paint[5]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 7, self->widgets.button_paint[6]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 8, self->widgets.spin_paint);
+
 	/* Tree. */
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
+	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 2, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.tree);
@@ -305,18 +327,11 @@ private_init (liextBrushes* self,
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, group_tree);
 	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, self->widgets.group_view);
+	liwdg_group_set_child (LIWDG_GROUP (self), 2, 0, self->widgets.group_paint);
 
 	self->transform = limat_transform_identity ();
 
 	return 1;
-
-error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
-	{
-		if (widgets[i] == NULL)
-			liwdg_widget_free (widgets[i]);
-	}
-	return 0;
 }
 
 static void
@@ -429,6 +444,59 @@ private_add (liextBrushes* self,
 			private_rebuild_selection (self);
 			break;
 	}
+
+	return 0;
+}
+
+static int
+private_paint_select (liextBrushes* self,
+                      liwdgWidget*  widget)
+{
+	int i;
+
+	for (i = 0 ; i < 7 ; i++)
+	{
+		if (widget == self->widgets.button_paint[i])
+		{
+			self->paint = i;
+			break;
+		}
+	}
+
+	return 0;
+}
+
+static int
+private_paint_terrain (liextBrushes* self,
+                       int           x,
+                       int           y)
+{
+	liextBrushesTreerow* data;
+	liwdgTreerow* row;
+	lirndSelection result;
+
+	/* Get active row. */
+	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (row == NULL)
+		return 0;
+	data = liwdg_treerow_get_data (row);
+	assert (data != NULL);
+	if (data->type != LIEXT_BRUSHES_ROWTYPE_BRUSH)
+		return 0;
+
+	/* Pick from the scene. */
+	/* TODO: Select the far intersection point with the box if no hit. */
+	if (!liwdg_render_pick (LIWDG_RENDER (self->widgets.preview), &result, x, y))
+		return 0;
+
+	/* Paint terrain. */
+	liext_preview_paint_terrain (LIEXT_PREVIEW (self->widgets.preview), &result.point, self->paint,
+		liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_paint)),
+		3.0f/*liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_radius))*/);
+	liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview),
+		data->brush->size[0], data->brush->size[1], data->brush->size[2],
+		data->brush->voxels.array);
+	private_rebuild_preview (self);
 
 	return 0;
 }

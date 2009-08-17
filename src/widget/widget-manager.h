@@ -68,6 +68,9 @@ liwdg_manager_new (lividCalls* video,
 void
 liwdg_manager_free (liwdgManager* self);
 
+int
+liwdg_manager_alloc_widgets (liwdgManager* self,
+                                           ...);
 
 void
 liwdg_manager_cycle_focus (liwdgManager* self,

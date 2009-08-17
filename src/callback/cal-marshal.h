@@ -32,6 +32,7 @@ typedef int (*licalMarshal)(void*, void*, va_list);
 int lical_marshal_DATA (void* call, void* data, va_list args);
 int lical_marshal_DATA_FLT (void* call, void* data, va_list args);
 int lical_marshal_DATA_INT (void* call, void* data, va_list args);
+int lical_marshal_DATA_INT_INT (void* call, void* data, va_list args);
 int lical_marshal_DATA_INT_PTR (void* call, void* data, va_list args);
 int lical_marshal_DATA_PTR (void* call, void* data, va_list args);
 int lical_marshal_DATA_PTR_INT (void* call, void* data, va_list args);

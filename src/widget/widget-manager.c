@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "widget-group.h"
@@ -110,6 +111,70 @@ liwdg_manager_free (liwdgManager* self)
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
 	free (self);
+}
+
+/**
+ * \brief Stores allocated widgets to pointers.
+ *
+ * \param self Widget manager.
+ * \param ... List of pointer-to-pointer and pointer pairs terminated by NULL.
+ */
+int
+liwdg_manager_alloc_widgets (liwdgManager* self,
+                                           ...)
+{
+	int fail;
+	va_list args;
+	liwdgWidget* ptr;
+	liwdgWidget** pptr;
+
+	/* Check for errors. */
+	fail = 0;
+	va_start (args, self);
+	while (1)
+	{
+		pptr = va_arg (args, liwdgWidget**);
+		if (pptr == NULL)
+			break;
+		ptr = va_arg (args, liwdgWidget*);
+		if (ptr == NULL)
+		{
+			fail = 1;
+			break;
+		}
+	}
+	va_end (args);
+	if (fail)
+	{
+		va_start (args, self);
+		while (1)
+		{
+			pptr = va_arg (args, liwdgWidget**);
+			if (pptr == NULL)
+				break;
+			ptr = va_arg (args, liwdgWidget*);
+			if (ptr != NULL)
+				liwdg_widget_free (ptr);
+		}
+		va_end (args);
+		lisys_error_set (ENOMEM, NULL);
+		return 0;
+	}
+
+	/* Copy widgets to target variables. */
+	va_start (args, self);
+	while (1)
+	{
+		pptr = va_arg (args, liwdgWidget**);
+		if (pptr == NULL)
+			break;
+		ptr = va_arg (args, liwdgWidget*);
+		assert (ptr != NULL);
+		*pptr = ptr;
+	}
+	va_end (args);
+
+	return 1;
 }
 
 void

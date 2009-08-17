@@ -144,44 +144,24 @@ static int
 private_init (liextMaterials* self,
               liwdgManager*   manager)
 {
-	int i;
 	liwdgWidget* group_tree;
-	liwdgWidget* widgets[] =
-	{
-		liwdg_group_new_with_size (manager, 1, 3),
-		liwdg_group_new_with_size (manager, 2, 1),
-		liwdg_group_new_with_size (manager, 2, 1),
-		liwdg_group_new_with_size (manager, 1, 4),
-		liwdg_button_new (manager),
-		liwdg_button_new (manager),
-		liwdg_entry_new (manager),
-		liwdg_label_new (manager),
-		liwdg_label_new (manager),
-		liwdg_scroll_new (manager),
-		liwdg_tree_new (manager)
-	};
 
-	/* Check memory. */
+	/* Allocate widgets. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
-		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
-	{
-		if (widgets[i] == NULL)
-			goto error;
-	}
-
-	/* Assign widgets. */
-	group_tree = widgets[(i = 0)];
-	self->widgets.group_name = widgets[++i];
-	self->widgets.group_scale = widgets[++i];
-	self->widgets.group_view = widgets[++i];
-	self->widgets.button_add = widgets[++i];
-	self->widgets.button_remove = widgets[++i];
-	self->widgets.entry_name = widgets[++i];
-	self->widgets.label_type = widgets[++i];
-	self->widgets.label_scale = widgets[++i];
-	self->widgets.scroll_scale = widgets[++i];
-	self->widgets.tree = widgets[++i];
+		return 0;
+	if (!liwdg_manager_alloc_widgets (manager,
+		&group_tree, liwdg_group_new_with_size (manager, 1, 3),
+		&self->widgets.group_name, liwdg_group_new_with_size (manager, 2, 1),
+		&self->widgets.group_scale, liwdg_group_new_with_size (manager, 2, 1),
+		&self->widgets.group_view, liwdg_group_new_with_size (manager, 1, 4),
+		&self->widgets.button_add, liwdg_button_new (manager),
+		&self->widgets.button_remove, liwdg_button_new (manager),
+		&self->widgets.entry_name, liwdg_entry_new (manager),
+		&self->widgets.label_type, liwdg_label_new (manager),
+		&self->widgets.label_scale, liwdg_label_new (manager),
+		&self->widgets.scroll_scale, liwdg_scroll_new (manager),
+		&self->widgets.tree, liwdg_tree_new (manager), NULL))
+		return 0;
 
 	/* Configure widgets. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
@@ -222,14 +202,6 @@ private_init (liextMaterials* self,
 	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, self->widgets.group_view);
 
 	return 1;
-
-error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
-	{
-		if (widgets[i] == NULL)
-			liwdg_widget_free (widgets[i]);
-	}
-	return 0;
 }
 
 static void
