@@ -183,7 +183,7 @@ Camera_getter_mode (lua_State* lua)
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
 
-	lua_pushboolean (lua, lieng_camera_get_driver (module->module->camera));
+	lua_pushnumber (lua, lieng_camera_get_driver (module->module->camera));
 	return 1;
 }
 static int
