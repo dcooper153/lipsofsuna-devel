@@ -669,16 +669,21 @@ liwdg_widget_set_style_request (liwdgWidget* self,
                                 int          h,
                                 const char*  style)
 {
+	liwdgSize old;
 	liwdgSize size;
 
 	/* Set suitable hard request. */
+	old = self->hardrequest;
 	self->hardrequest.width = w;
 	self->hardrequest.height = h;
 	liwdg_widget_get_style_request (self, style, &size);
 	self->hardrequest.width = size.width;
 	self->hardrequest.height = size.height;
-	if (self->parent != NULL)
-		liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+	if (old.width != size.width || old.height != size.height)
+	{
+		if (self->parent != NULL)
+			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+	}
 }
 
 void*

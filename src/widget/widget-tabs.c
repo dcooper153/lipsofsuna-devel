@@ -120,6 +120,7 @@ liwdg_tabs_append_tab (liwdgTabs*  self,
 		free (tmp.text);
 		return 0;
 	}
+	widget->parent = LIWDG_WIDGET (self);
 
 	/* Rebuild request. */
 	private_rebuild (self);
