@@ -55,6 +55,9 @@ struct _ligenRule
 ligenRule*
 ligen_rule_new ();
 
+ligenRule*
+ligen_rule_new_copy (ligenRule* rule);
+
 void
 ligen_rule_free (ligenRule* self);
 

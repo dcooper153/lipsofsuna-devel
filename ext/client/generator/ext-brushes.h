@@ -45,17 +45,19 @@ struct _liextBrushes
 	int paint;
 	struct
 	{
-		liwdgWidget* dialog;
+		liwdgWidget* check_required;
 		liwdgWidget* group_paint;
 		liwdgWidget* group_view;
 		liwdgWidget* group_size;
 		liwdgWidget* button_add;
+		liwdgWidget* button_copy;
 		liwdgWidget* button_paint[7];
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
 		liwdgWidget* label_size;
 		liwdgWidget* label_type;
 		liwdgWidget* preview;
+		liwdgWidget* scroll_radius;
 		liwdgWidget* spin_paint;
 		liwdgWidget* spin_sizex;
 		liwdgWidget* spin_sizey;

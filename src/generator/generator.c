@@ -50,7 +50,8 @@ private_brush_intersects (ligenGenerator*  self,
 static int
 private_rule_apply (ligenGenerator* self,
                     ligenStroke*    stroke,
-                    ligenRule*      rule);
+                    ligenRule*      rule,
+                    ligenBrush*     brush);
 
 static int
 private_rule_test (ligenGenerator* self,
@@ -299,7 +300,7 @@ ligen_generator_main (ligenGenerator* self)
 
 	/* Generate areas. */
 	/* FIXME */
-	for (i = 0 ; i < 20 ; i++)
+	for (i = 0 ; i < 100 ; i++)
 	{
 		if (!ligen_generator_step (self))
 			break;
@@ -391,8 +392,17 @@ ligen_generator_step (ligenGenerator* self)
 	ligenRule* rule;
 	ligenStroke stroke;
 
-	/* TODO: Randomize the order of strokes. */
+	/* Randomize stroke order. */
+	for (i = 0 ; i < self->strokes.count ; i++)
+	{
+		k = rand () % self->strokes.count;
+		stroke = self->strokes.array[i];
+		self->strokes.array[i] = self->strokes.array[k];
+		self->strokes.array[k] = stroke;
+	}
 	rnd = NULL;
+
+	/* Try to expand each stroke. */
 	for (i = 0 ; i < self->strokes.count ; i++)
 	{
 		/* The stroke array may be reallocated in private_rule_apply
@@ -429,7 +439,7 @@ ligen_generator_step (ligenGenerator* self)
 			if (private_rule_test (self, &stroke, rule))
 			{
 				free (rnd);
-				if (!private_rule_apply (self, &stroke, rule))
+				if (!private_rule_apply (self, &stroke, rule, brush))
 					return 0;
 				return 1;
 			}
@@ -463,7 +473,11 @@ ligen_generator_write (ligenGenerator* self)
 	limatTransform transform;
 	sqlite3_stmt* statement;
 
-	/* Save geometry. */
+	/* Remove old terrain. */
+	if (!liarc_sql_delete (self->srvsql, "voxel_sectors"))
+		return 0;
+
+	/* Save terrain. */
 	livox_manager_write (self->voxels);
 
 	/* Remove old objects. */
@@ -922,27 +936,31 @@ private_brush_intersects (ligenGenerator*  self,
 static int
 private_rule_apply (ligenGenerator* self,
                     ligenStroke*    stroke,
-                    ligenRule*      rule)
+                    ligenRule*      rule,
+                    ligenBrush*     brush)
 {
 	int i;
 	int orig;
-	ligenBrush* brush;
+	ligenBrush* brush1;
 	ligenStroke stroke1;
 	ligenRulestroke* rstroke;
+
+	printf ("BRUSH %s RULE %s\n", brush->name, rule->name);
 
 	orig = self->strokes.count;
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
 		rstroke = rule->strokes.array + i;
-		brush = lialg_u32dic_find (self->brushes, rstroke->brush);
-		assert (brush != NULL);
+		brush1 = lialg_u32dic_find (self->brushes, rstroke->brush);
+		assert (brush1 != NULL);
+		printf (" * CREATE %s\n", brush1->name);
 		stroke1.pos[0] = stroke->pos[0] + rstroke->pos[0];
 		stroke1.pos[1] = stroke->pos[1] + rstroke->pos[1];
 		stroke1.pos[2] = stroke->pos[2] + rstroke->pos[2];
-		stroke1.size[0] = brush->size[0];
-		stroke1.size[1] = brush->size[1];
-		stroke1.size[2] = brush->size[2];
-		stroke1.brush = brush->id;
+		stroke1.size[0] = brush1->size[0];
+		stroke1.size[1] = brush1->size[1];
+		stroke1.size[2] = brush1->size[2];
+		stroke1.brush = brush1->id;
 		if (!lialg_array_append (&self->strokes, &stroke1))
 		{
 			self->strokes.count = orig;

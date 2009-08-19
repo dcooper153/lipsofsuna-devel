@@ -49,8 +49,56 @@ ligen_rule_new ()
 	self->name = calloc (1, sizeof (char));
 	if (self->name == NULL)
 	{
+		lisys_error_set (ENOMEM, NULL);
 		free (self);
 		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Creates a soft copy of the rule.
+ *
+ * \param rule Rule to clone.
+ * \return New rule or NULL.
+ */
+ligenRule*
+ligen_rule_new_copy (ligenRule* rule)
+{
+	ligenRule* self;
+
+	/* Allocate self. */
+	self = calloc (1, sizeof (ligenRule));
+	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+	self->flags = rule->flags;
+
+	/* Copy name. */
+	self->name = strdup (rule->name);
+	if (self->name == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (self);
+		return NULL;
+	}
+
+	/* Copy strokes. */
+	if (rule->strokes.count)
+	{
+		self->strokes.array = calloc (1, rule->strokes.count * sizeof (ligenRulestroke));
+		if (self->strokes.array == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			free (self->name);
+			free (self);
+			return NULL;
+		}
+		memcpy (self->strokes.array, rule->strokes.array, rule->strokes.count * sizeof (ligenRulestroke));
+		self->strokes.count = rule->strokes.count;
 	}
 
 	return self;
