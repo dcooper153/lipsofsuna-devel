@@ -374,27 +374,6 @@ liwdg_manager_event (liwdgManager* self,
 		return 1;
 	}
 
-	/* Cycle focus. */
-	if (event->type == LIWDG_EVENT_TYPE_KEY_PRESS &&
-	    event->key.keycode == SDLK_TAB)
-	{
-		if (event->key.modifiers & KMOD_CTRL)
-		{
-			if (event->key.modifiers & KMOD_SHIFT)
-				liwdg_manager_cycle_window_focus (self, 0);
-			else
-				liwdg_manager_cycle_window_focus (self, 1);
-		}
-		else
-		{
-			if (event->key.modifiers & KMOD_SHIFT)
-				liwdg_manager_cycle_focus (self, 0);
-			else
-				liwdg_manager_cycle_focus (self, 1);
-		}
-		return 1;
-	}
-
 	/* Get target widget. */
 	switch (event->type)
 	{

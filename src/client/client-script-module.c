@@ -37,6 +37,48 @@
 
 /* @luadoc
  * ---
+ * -- Cycles widget focus.
+ * --
+ * -- @param self Module class.
+ * -- @param back True for backward, false for forward cycling.
+ * function Module.cycle_focus(self, back)
+ */
+static int
+Module_cycle_focus (lua_State* lua)
+{
+	int prev;
+	licliModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
+	prev = lua_toboolean (lua, 2);
+
+	liwdg_manager_cycle_focus (module->widgets, !prev);
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Cycles window focus.
+ * --
+ * -- @param self Module class.
+ * -- @param back True for backward, false for forward cycling.
+ * function Module.cycle_focus(self, back)
+ */
+static int
+Module_cycle_window_focus (lua_State* lua)
+{
+	int prev;
+	licliModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
+	prev = lua_toboolean (lua, 2);
+
+	liwdg_manager_cycle_window_focus (module->widgets, !prev);
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Finds an object by ID.
  * --
  * -- @param self Module class.
@@ -352,6 +394,8 @@ licliModuleScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_MODULE, data);
+	liscr_class_insert_func (self, "cycle_focus", Module_cycle_focus);
+	liscr_class_insert_func (self, "cycle_window_focus", Module_cycle_window_focus);
 	liscr_class_insert_func (self, "find_object", Module_find_object);
 	liscr_class_insert_func (self, "host", Module_host);
 	liscr_class_insert_func (self, "join", Module_join);
