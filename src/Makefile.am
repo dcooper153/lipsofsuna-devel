@@ -421,7 +421,7 @@ wdgsrc = \
 
 prgdir = $(PROGDIR)
 prg_PROGRAMS = lipsofsuna
-bin_PROGRAMS = lipsofsuna-client lipsofsuna-generator lipsofsuna-server lipsofsuna-viewer
+bin_PROGRAMS = lipsofsuna-client lipsofsuna-generator lipsofsuna-import lipsofsuna-server lipsofsuna-viewer
 lib_LTLIBRARIES = liblipsofsunaclient.la liblipsofsunaserver.la
 
 liblipsofsunaclient_la_CFLAGS = $(LICLI_CFLAGS)
@@ -453,13 +453,25 @@ lipsofsuna_SOURCES = $(maisrc) \
 
 lipsofsuna_client_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_client_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lSDL_image
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lpng
 lipsofsuna_client_SOURCES = client/client-main.c
 
 lipsofsuna_generator_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_generator_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
 lipsofsuna_generator_LDADD = liblipsofsunaserver.la
 lipsofsuna_generator_SOURCES = $(gensrc) generator/generator-main.c
+
+lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_import_CFLAGS = $(LIPS_CFLAGS) $(LICLI_CFLAGS)
+lipsofsuna_import_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+lipsofsuna_import_LDADD = $(SQUISH_LIBS) -lpng
+lipsofsuna_import_SOURCES = $(pthsrc) $(relsrc) $(syssrc) $(thrsrc) \
+	image/image.c \
+	image/image.h \
+	image/image-compress.cpp \
+	image/image-compress.h \
+	image/image-dds.h \
+	reload/reload-main.c
 
 lipsofsuna_server_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_server_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
@@ -468,7 +480,7 @@ lipsofsuna_server_SOURCES = server/server-main.c
 
 lipsofsuna_viewer_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_viewer_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lSDL_image
+lipsofsuna_viewer_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lpng
 lipsofsuna_viewer_SOURCES = $(viesrc) viewer/viewer-main.c
 
 install-data-local:

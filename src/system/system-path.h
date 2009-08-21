@@ -52,6 +52,11 @@
  */
 #define LISYS_PATH_STRIPEXTS ((char*) -5)
 
+/**
+ * \brief Indicates that the last path component should be removed from the path.
+ */
+#define LISYS_PATH_STRIPLAST ((char*) -6)
+
 typedef const char* lisysPathFormat;
 
 char*

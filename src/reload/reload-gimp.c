@@ -82,7 +82,7 @@ lirel_reload_gimp (lirelReload* self,
 	free (script);
 
 	/* Convert to DDS. */
-	image = liimg_image_new_from_file (&self->video, tmp);
+	image = liimg_image_new_from_file (tmp);
 	if (image == NULL)
 	{
 		remove (tmp);

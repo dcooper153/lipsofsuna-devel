@@ -67,31 +67,15 @@ private_stroke_paint (ligenGenerator* self,
 /**
  * \brief Creates a new generator module.
  *
- * \param path Package root directory.
- * \param name Module name.
- * \return New generator or NULL.
- */
-ligenGenerator*
-ligen_generator_new (const char* path,
-                     const char* name)
-{
-	return ligen_generator_new_full (path, name, NULL, NULL);
-}
-
-/**
- * \brief Creates a new generator module.
- *
- * \param path Package root directory.
- * \param name Module name.
+ * \param paths Path information.
  * \param scene Render scene or NULL.
  * \param rndapi Render API or NULL.
  * \return New generator or NULL.
  */
 ligenGenerator*
-ligen_generator_new_full (const char* path,
-                          const char* name,
-                          lirndScene* scene,
-                          lirndApi*   rndapi)
+ligen_generator_new (lipthPaths* paths,
+                     lirndScene* scene,
+                     lirndApi*   rndapi)
 {
 	ligenGenerator* self;
 
@@ -103,12 +87,8 @@ ligen_generator_new_full (const char* path,
 		lisys_error_report ();
 		return NULL;
 	}
+	self->paths = paths;
 	ligen_generator_set_fill (self, 1);
-
-	/* Allocate paths. */
-	self->paths = lipth_paths_new (path, name);
-	if (self->paths == NULL)
-		goto error;
 
 	/* Allocate terrain structures. */
 	self->physics = liphy_physics_new ();
@@ -155,8 +135,6 @@ ligen_generator_free (ligenGenerator* self)
 		sqlite3_close (self->gensql);
 	if (self->gensql != NULL)
 		sqlite3_close (self->srvsql);
-	if (self->paths != NULL)
-		lipth_paths_free (self->paths);
 	free (self->strokes.array);
 	free (self);
 }

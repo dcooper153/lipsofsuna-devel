@@ -2,13 +2,20 @@
 
 set -e
 
+mkdir -p build
+cd build
+rm -f lipsofsuna
+cp ../src/lipsofsuna lipsofsuna
+cd ..
+
 mkdir -p build/bin
 cd build/bin
 rm -f lipsofsuna-*
-ln -s ../../src/.libs/lipsofsuna-client lipsofsuna-client
-ln -s ../../src/.libs/lipsofsuna-generator lipsofsuna-generator
-ln -s ../../src/.libs/lipsofsuna-server lipsofsuna-server
-ln -s ../../src/.libs/lipsofsuna-viewer lipsofsuna-viewer
+cp ../../src/.libs/lipsofsuna-client lipsofsuna-client
+cp ../../src/.libs/lipsofsuna-generator lipsofsuna-generator
+cp ../../src/.libs/lipsofsuna-import lipsofsuna-import
+cp ../../src/.libs/lipsofsuna-server lipsofsuna-server
+cp ../../src/.libs/lipsofsuna-viewer lipsofsuna-viewer
 cd ../..
 
 mkdir -p build/tool

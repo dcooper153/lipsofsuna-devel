@@ -29,25 +29,36 @@
 int
 main (int argc, char** argv)
 {
+	char* path;
 	licliClient* self;
 	lividCalls video;
 
-	if (argc != 3)
-		return 1;
-	if (!livid_calls_init (&video))
+	/* Resolve game directory. */
+	path = lipth_paths_get_root ();
+	if (path == NULL)
 	{
 		lisys_error_report ();
 		return 1;
 	}
-	self = licli_client_new (&video, argv[1], argv[2]);
+
+	/* Start the program. */
+	if (!livid_calls_init (&video))
+	{
+		lisys_error_report ();
+		free (path);
+		return 1;
+	}
+	self = licli_client_new (&video, path, argc > 1? argv[1] : "data");
 	if (self == NULL)
 	{
 		lisys_error_report ();
+		free (path);
 		return 1;
 	}
 	if (!licli_client_main (self))
 		lisys_error_report ();
 	licli_client_free (self);
+	free (path);
 
 	return 0;
 }

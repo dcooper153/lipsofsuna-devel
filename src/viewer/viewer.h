@@ -57,8 +57,7 @@ struct _livieViewer
 
 livieViewer*
 livie_viewer_new (lividCalls* video,
-                  const char* path,
-                  const char* name,
+                  lipthPaths* paths,
                   const char* model);
 
 void

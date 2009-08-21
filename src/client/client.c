@@ -44,7 +44,6 @@ licli_client_new (lividCalls* video,
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
-		lisys_error_report ();
 		return NULL;
 	}
 	self->video = *video;
@@ -53,7 +52,6 @@ licli_client_new (lividCalls* video,
 	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		lisys_error_report ();
 		free (self);
 		return NULL;
 	}
@@ -71,7 +69,6 @@ licli_client_new (lividCalls* video,
 	if (self->window == NULL)
 	{
 		licli_client_free (self);
-		lisys_error_report ();
 		return NULL;
 	}
 
@@ -80,7 +77,6 @@ licli_client_new (lividCalls* video,
 	if (self->module == NULL)
 	{
 		licli_client_free (self);
-		lisys_error_report ();
 		return NULL;
 	}
 

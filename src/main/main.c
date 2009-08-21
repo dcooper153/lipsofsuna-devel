@@ -33,6 +33,7 @@ enum
 	PRIVATE_MODE_CLIENT,
 	PRIVATE_MODE_DEDICATED,
 	PRIVATE_MODE_GENERATOR,
+	PRIVATE_MODE_IMPORT,
 	PRIVATE_MODE_VIEWER
 };
 
@@ -49,6 +50,9 @@ client_main (const char* name);
 
 static int
 generator_main (const char* name);
+
+static int
+import_main (const char* name);
 
 static int
 server_main (const char* name);
@@ -78,6 +82,9 @@ int main (int argc, char** argv)
 		else if (!strcmp (argv[i], "-g") ||
 		         !strcmp (argv[i], "--generator"))
 			mode = PRIVATE_MODE_GENERATOR;
+		else if (!strcmp (argv[i], "-i") ||
+		         !strcmp (argv[i], "--import"))
+			mode = PRIVATE_MODE_IMPORT;
 		else if (!strcmp (argv[i], "-m") ||
 		         !strcmp (argv[i], "--model"))
 		{
@@ -105,6 +112,8 @@ int main (int argc, char** argv)
 			return server_main (name);
 		case PRIVATE_MODE_GENERATOR:
 			return generator_main (name);
+		case PRIVATE_MODE_IMPORT:
+			return import_main (name);
 		case PRIVATE_MODE_VIEWER:
 			return viewer_main (name, model);
 		default:
@@ -163,7 +172,8 @@ private_exec_program (const char* name,
 #endif
 
 	/* Execute the program. */
-	ret = lisys_execvl (path, path, tmp, module, extra, NULL);
+	printf ("EXEC %s %s %s %s\n", path, path, module, extra);
+	ret = lisys_execvl (path, path, module, extra, NULL);
 	free (path);
 #ifdef LI_RELATIVE_PATHS
 	free (tmp);
@@ -181,6 +191,7 @@ print_help (const char* exe)
 	printf ("  -d, --dedicated     Run as a dedicated server.\n");
 	printf ("  -g, --generator     Run as a map generator.\n");
 	printf ("  -h, --help          Display this help and exit.\n");
+	printf ("  -i, --import        Import data files.\n\n");
 	printf ("  -m, --model <name>  Run as a simple model viewer.\n\n");
 	return 0;
 }
@@ -204,6 +215,19 @@ generator_main (const char* name)
 	if (!private_exec_program ("lipsofsuna-generator", name, NULL))
 	{
 		lisys_error_append ("cannot execute generator program");
+		lisys_error_report ();
+		return 1;
+	}
+
+	return 1;
+}
+
+static int
+import_main (const char* name)
+{
+	if (!private_exec_program ("lipsofsuna-import", name, NULL))
+	{
+		lisys_error_append ("cannot execute import program");
 		lisys_error_report ();
 		return 1;
 	}

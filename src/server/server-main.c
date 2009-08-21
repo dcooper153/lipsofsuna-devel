@@ -28,19 +28,29 @@
 int
 main (int argc, char** argv)
 {
+	lipthPaths* paths;
 	lisrvServer* self;
 
-	if (argc != 3)
+	/* Resolve game directory. */
+	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");
+	if (paths == NULL)
+	{
+		lisys_error_report ();
 		return 1;
-	self = lisrv_server_new (argv[1], argv[2]);
+	}
+
+	/* Execute program. */
+	self = lisrv_server_new (paths);
 	if (self == NULL)
 	{
 		lisys_error_report ();
+		lipth_paths_free (paths);
 		return 1;
 	}
 	if (!lisrv_server_main (self))
 		lisys_error_report ();
 	lisrv_server_free (self);
+	lipth_paths_free (paths);
 
 	return 0;
 }

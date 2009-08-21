@@ -16,25 +16,40 @@
  */
 
 /**
- * \addtogroup livie Viewer
+ * \addtogroup ligen Generator
  * @{
- * \addtogroup livieMain Main
+ * \addtogroup ligenMain Main
  * @{
  */
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_main.h>
-#include "viewer.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "reload.h"
+#undef main
+
+static void
+private_reload_image (lirelReload* self,
+                      const char*  name)
+{
+	printf ("Imported image `%s'\n", name);
+}
+
+static void
+private_reload_model (lirelReload* self,
+                      const char*  name)
+{
+	printf ("Imported model `%s'\n", name);
+}
 
 int
 main (int argc, char** argv)
 {
+	char* path;
 	lipthPaths* paths;
-	lividCalls video;
-	livieViewer* self;
+	lirelReload* self;
 
 	/* Resolve game directory. */
-	paths = lipth_paths_new (NULL, argc > 2? argv[2] : "data");
+	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");
 	if (paths == NULL)
 	{
 		lisys_error_report ();
@@ -42,28 +57,19 @@ main (int argc, char** argv)
 	}
 
 	/* Execute program. */
-	if (argc < 2)
-	{
-		lisys_error_set (EINVAL, "no model name passed");
-		lipth_paths_free (paths);
-		return 1;
-	}
-	if (!livid_calls_init (&video))
-	{
-		lisys_error_report ();
-		lipth_paths_free (paths);
-		return 1;
-	}
-	self = livie_viewer_new (&video, paths, argv[1]);
+	self = lirel_reload_new (paths);
 	if (self == NULL)
 	{
 		lisys_error_report ();
 		lipth_paths_free (paths);
 		return 1;
 	}
-	if (!livie_viewer_main (self))
+	lirel_reload_set_image_callback (self, private_reload_image, self);
+	lirel_reload_set_model_callback (self, private_reload_model, self);
+	lirel_reload_set_enabled (self, 1);
+	if (!lirel_reload_main (self))
 		lisys_error_report ();
-	livie_viewer_free (self);
+	lirel_reload_free (self);
 	lipth_paths_free (paths);
 
 	return 0;

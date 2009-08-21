@@ -36,8 +36,8 @@ host_triplet = @host@
 target_triplet = @target@
 prg_PROGRAMS = lipsofsuna$(EXEEXT)
 bin_PROGRAMS = lipsofsuna-client$(EXEEXT) \
-	lipsofsuna-generator$(EXEEXT) lipsofsuna-server$(EXEEXT) \
-	lipsofsuna-viewer$(EXEEXT)
+	lipsofsuna-generator$(EXEEXT) lipsofsuna-import$(EXEEXT) \
+	lipsofsuna-server$(EXEEXT) lipsofsuna-viewer$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
@@ -377,6 +377,35 @@ lipsofsuna_generator_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lipsofsuna_generator_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am__objects_48 = lipsofsuna_import-paths.$(OBJEXT)
+am__objects_49 = lipsofsuna_import-reload.$(OBJEXT) \
+	lipsofsuna_import-reload-blender.$(OBJEXT) \
+	lipsofsuna_import-reload-gimp.$(OBJEXT) \
+	lipsofsuna_import-reload-image.$(OBJEXT)
+am__objects_50 = lipsofsuna_import-system.$(OBJEXT) \
+	lipsofsuna_import-system-directory.$(OBJEXT) \
+	lipsofsuna_import-system-error.$(OBJEXT) \
+	lipsofsuna_import-system-file.$(OBJEXT) \
+	lipsofsuna_import-system-execute.$(OBJEXT) \
+	lipsofsuna_import-system-misc.$(OBJEXT) \
+	lipsofsuna_import-system-module.$(OBJEXT) \
+	lipsofsuna_import-system-notify.$(OBJEXT) \
+	lipsofsuna_import-system-path.$(OBJEXT) \
+	lipsofsuna_import-system-relative.$(OBJEXT) \
+	lipsofsuna_import-system-types.$(OBJEXT) \
+	lipsofsuna_import-system-user.$(OBJEXT)
+am__objects_51 = lipsofsuna_import-thread-async-call.$(OBJEXT)
+am_lipsofsuna_import_OBJECTS = $(am__objects_48) $(am__objects_49) \
+	$(am__objects_50) $(am__objects_51) \
+	lipsofsuna_import-image.$(OBJEXT) \
+	lipsofsuna_import-image-compress.$(OBJEXT) \
+	lipsofsuna_import-reload-main.$(OBJEXT)
+lipsofsuna_import_OBJECTS = $(am_lipsofsuna_import_OBJECTS)
+lipsofsuna_import_DEPENDENCIES = $(am__DEPENDENCIES_1)
+lipsofsuna_import_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(lipsofsuna_import_CXXFLAGS) $(CXXFLAGS) \
+	$(lipsofsuna_import_LDFLAGS) $(LDFLAGS) -o $@
 am_lipsofsuna_server_OBJECTS =  \
 	lipsofsuna_server-server-main.$(OBJEXT)
 lipsofsuna_server_OBJECTS = $(am_lipsofsuna_server_OBJECTS)
@@ -385,8 +414,8 @@ lipsofsuna_server_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(lipsofsuna_server_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__objects_48 = lipsofsuna_viewer-viewer.$(OBJEXT)
-am_lipsofsuna_viewer_OBJECTS = $(am__objects_48) \
+am__objects_52 = lipsofsuna_viewer-viewer.$(OBJEXT)
+am_lipsofsuna_viewer_OBJECTS = $(am__objects_52) \
 	lipsofsuna_viewer-viewer-main.$(OBJEXT)
 lipsofsuna_viewer_OBJECTS = $(am_lipsofsuna_viewer_OBJECTS)
 lipsofsuna_viewer_DEPENDENCIES = liblipsofsunaclient.la \
@@ -419,11 +448,13 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(liblipsofsunaclient_la_SOURCES) \
 	$(liblipsofsunaserver_la_SOURCES) $(lipsofsuna_SOURCES) \
 	$(lipsofsuna_client_SOURCES) $(lipsofsuna_generator_SOURCES) \
-	$(lipsofsuna_server_SOURCES) $(lipsofsuna_viewer_SOURCES)
+	$(lipsofsuna_import_SOURCES) $(lipsofsuna_server_SOURCES) \
+	$(lipsofsuna_viewer_SOURCES)
 DIST_SOURCES = $(liblipsofsunaclient_la_SOURCES) \
 	$(liblipsofsunaserver_la_SOURCES) $(lipsofsuna_SOURCES) \
 	$(lipsofsuna_client_SOURCES) $(lipsofsuna_generator_SOURCES) \
-	$(lipsofsuna_server_SOURCES) $(lipsofsuna_viewer_SOURCES)
+	$(lipsofsuna_import_SOURCES) $(lipsofsuna_server_SOURCES) \
+	$(lipsofsuna_viewer_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -1075,19 +1106,31 @@ lipsofsuna_SOURCES = $(maisrc) \
 
 lipsofsuna_client_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_client_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lSDL_image
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lpng
 lipsofsuna_client_SOURCES = client/client-main.c
 lipsofsuna_generator_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_generator_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
 lipsofsuna_generator_LDADD = liblipsofsunaserver.la
 lipsofsuna_generator_SOURCES = $(gensrc) generator/generator-main.c
+lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_import_CFLAGS = $(LIPS_CFLAGS) $(LICLI_CFLAGS)
+lipsofsuna_import_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+lipsofsuna_import_LDADD = $(SQUISH_LIBS) -lpng
+lipsofsuna_import_SOURCES = $(pthsrc) $(relsrc) $(syssrc) $(thrsrc) \
+	image/image.c \
+	image/image.h \
+	image/image-compress.cpp \
+	image/image-compress.h \
+	image/image-dds.h \
+	reload/reload-main.c
+
 lipsofsuna_server_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_server_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
 lipsofsuna_server_LDADD = liblipsofsunaserver.la
 lipsofsuna_server_SOURCES = server/server-main.c
 lipsofsuna_viewer_CFLAGS = $(LICLI_CFLAGS)
 lipsofsuna_viewer_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lSDL_image
+lipsofsuna_viewer_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lpng
 lipsofsuna_viewer_SOURCES = $(viesrc) viewer/viewer-main.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -1236,6 +1279,9 @@ lipsofsuna-client$(EXEEXT): $(lipsofsuna_client_OBJECTS) $(lipsofsuna_client_DEP
 lipsofsuna-generator$(EXEEXT): $(lipsofsuna_generator_OBJECTS) $(lipsofsuna_generator_DEPENDENCIES) 
 	@rm -f lipsofsuna-generator$(EXEEXT)
 	$(lipsofsuna_generator_LINK) $(lipsofsuna_generator_OBJECTS) $(lipsofsuna_generator_LDADD) $(LIBS)
+lipsofsuna-import$(EXEEXT): $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_DEPENDENCIES) 
+	@rm -f lipsofsuna-import$(EXEEXT)
+	$(lipsofsuna_import_LINK) $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_LDADD) $(LIBS)
 lipsofsuna-server$(EXEEXT): $(lipsofsuna_server_OBJECTS) $(lipsofsuna_server_DEPENDENCIES) 
 	@rm -f lipsofsuna-server$(EXEEXT)
 	$(lipsofsuna_server_LINK) $(lipsofsuna_server_OBJECTS) $(lipsofsuna_server_LDADD) $(LIBS)
@@ -1507,6 +1553,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_generator-generator-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_generator-generator-rule.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_generator-generator.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-image-compress.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-image.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-paths.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-reload-blender.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-reload-gimp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-reload-image.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-reload-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-reload.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-directory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-error.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-execute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-misc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-notify.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-relative.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-types.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system-user.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-system.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_import-thread-async-call.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_server-server-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_viewer-viewer-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lipsofsuna_viewer-viewer.Po@am__quote@
@@ -3345,6 +3412,286 @@ lipsofsuna_generator-generator-main.obj: generator/generator-main.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_generator_CFLAGS) $(CFLAGS) -c -o lipsofsuna_generator-generator-main.obj `if test -f 'generator/generator-main.c'; then $(CYGPATH_W) 'generator/generator-main.c'; else $(CYGPATH_W) '$(srcdir)/generator/generator-main.c'; fi`
 
+lipsofsuna_import-paths.o: paths/paths.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-paths.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-paths.Tpo -c -o lipsofsuna_import-paths.o `test -f 'paths/paths.c' || echo '$(srcdir)/'`paths/paths.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-paths.Tpo $(DEPDIR)/lipsofsuna_import-paths.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='paths/paths.c' object='lipsofsuna_import-paths.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-paths.o `test -f 'paths/paths.c' || echo '$(srcdir)/'`paths/paths.c
+
+lipsofsuna_import-paths.obj: paths/paths.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-paths.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-paths.Tpo -c -o lipsofsuna_import-paths.obj `if test -f 'paths/paths.c'; then $(CYGPATH_W) 'paths/paths.c'; else $(CYGPATH_W) '$(srcdir)/paths/paths.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-paths.Tpo $(DEPDIR)/lipsofsuna_import-paths.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='paths/paths.c' object='lipsofsuna_import-paths.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-paths.obj `if test -f 'paths/paths.c'; then $(CYGPATH_W) 'paths/paths.c'; else $(CYGPATH_W) '$(srcdir)/paths/paths.c'; fi`
+
+lipsofsuna_import-reload.o: reload/reload.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload.Tpo -c -o lipsofsuna_import-reload.o `test -f 'reload/reload.c' || echo '$(srcdir)/'`reload/reload.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload.Tpo $(DEPDIR)/lipsofsuna_import-reload.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload.c' object='lipsofsuna_import-reload.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload.o `test -f 'reload/reload.c' || echo '$(srcdir)/'`reload/reload.c
+
+lipsofsuna_import-reload.obj: reload/reload.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload.Tpo -c -o lipsofsuna_import-reload.obj `if test -f 'reload/reload.c'; then $(CYGPATH_W) 'reload/reload.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload.Tpo $(DEPDIR)/lipsofsuna_import-reload.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload.c' object='lipsofsuna_import-reload.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload.obj `if test -f 'reload/reload.c'; then $(CYGPATH_W) 'reload/reload.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload.c'; fi`
+
+lipsofsuna_import-reload-blender.o: reload/reload-blender.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-blender.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-blender.Tpo -c -o lipsofsuna_import-reload-blender.o `test -f 'reload/reload-blender.c' || echo '$(srcdir)/'`reload/reload-blender.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-blender.Tpo $(DEPDIR)/lipsofsuna_import-reload-blender.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-blender.c' object='lipsofsuna_import-reload-blender.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-blender.o `test -f 'reload/reload-blender.c' || echo '$(srcdir)/'`reload/reload-blender.c
+
+lipsofsuna_import-reload-blender.obj: reload/reload-blender.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-blender.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-blender.Tpo -c -o lipsofsuna_import-reload-blender.obj `if test -f 'reload/reload-blender.c'; then $(CYGPATH_W) 'reload/reload-blender.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-blender.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-blender.Tpo $(DEPDIR)/lipsofsuna_import-reload-blender.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-blender.c' object='lipsofsuna_import-reload-blender.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-blender.obj `if test -f 'reload/reload-blender.c'; then $(CYGPATH_W) 'reload/reload-blender.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-blender.c'; fi`
+
+lipsofsuna_import-reload-gimp.o: reload/reload-gimp.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-gimp.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-gimp.Tpo -c -o lipsofsuna_import-reload-gimp.o `test -f 'reload/reload-gimp.c' || echo '$(srcdir)/'`reload/reload-gimp.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-gimp.Tpo $(DEPDIR)/lipsofsuna_import-reload-gimp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-gimp.c' object='lipsofsuna_import-reload-gimp.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-gimp.o `test -f 'reload/reload-gimp.c' || echo '$(srcdir)/'`reload/reload-gimp.c
+
+lipsofsuna_import-reload-gimp.obj: reload/reload-gimp.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-gimp.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-gimp.Tpo -c -o lipsofsuna_import-reload-gimp.obj `if test -f 'reload/reload-gimp.c'; then $(CYGPATH_W) 'reload/reload-gimp.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-gimp.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-gimp.Tpo $(DEPDIR)/lipsofsuna_import-reload-gimp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-gimp.c' object='lipsofsuna_import-reload-gimp.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-gimp.obj `if test -f 'reload/reload-gimp.c'; then $(CYGPATH_W) 'reload/reload-gimp.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-gimp.c'; fi`
+
+lipsofsuna_import-reload-image.o: reload/reload-image.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-image.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-image.Tpo -c -o lipsofsuna_import-reload-image.o `test -f 'reload/reload-image.c' || echo '$(srcdir)/'`reload/reload-image.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-image.Tpo $(DEPDIR)/lipsofsuna_import-reload-image.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-image.c' object='lipsofsuna_import-reload-image.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-image.o `test -f 'reload/reload-image.c' || echo '$(srcdir)/'`reload/reload-image.c
+
+lipsofsuna_import-reload-image.obj: reload/reload-image.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-image.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-image.Tpo -c -o lipsofsuna_import-reload-image.obj `if test -f 'reload/reload-image.c'; then $(CYGPATH_W) 'reload/reload-image.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-image.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-image.Tpo $(DEPDIR)/lipsofsuna_import-reload-image.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-image.c' object='lipsofsuna_import-reload-image.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-image.obj `if test -f 'reload/reload-image.c'; then $(CYGPATH_W) 'reload/reload-image.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-image.c'; fi`
+
+lipsofsuna_import-system.o: system/system.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system.Tpo -c -o lipsofsuna_import-system.o `test -f 'system/system.c' || echo '$(srcdir)/'`system/system.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system.Tpo $(DEPDIR)/lipsofsuna_import-system.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system.c' object='lipsofsuna_import-system.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system.o `test -f 'system/system.c' || echo '$(srcdir)/'`system/system.c
+
+lipsofsuna_import-system.obj: system/system.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system.Tpo -c -o lipsofsuna_import-system.obj `if test -f 'system/system.c'; then $(CYGPATH_W) 'system/system.c'; else $(CYGPATH_W) '$(srcdir)/system/system.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system.Tpo $(DEPDIR)/lipsofsuna_import-system.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system.c' object='lipsofsuna_import-system.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system.obj `if test -f 'system/system.c'; then $(CYGPATH_W) 'system/system.c'; else $(CYGPATH_W) '$(srcdir)/system/system.c'; fi`
+
+lipsofsuna_import-system-directory.o: system/system-directory.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-directory.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-directory.Tpo -c -o lipsofsuna_import-system-directory.o `test -f 'system/system-directory.c' || echo '$(srcdir)/'`system/system-directory.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-directory.Tpo $(DEPDIR)/lipsofsuna_import-system-directory.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-directory.c' object='lipsofsuna_import-system-directory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-directory.o `test -f 'system/system-directory.c' || echo '$(srcdir)/'`system/system-directory.c
+
+lipsofsuna_import-system-directory.obj: system/system-directory.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-directory.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-directory.Tpo -c -o lipsofsuna_import-system-directory.obj `if test -f 'system/system-directory.c'; then $(CYGPATH_W) 'system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/system/system-directory.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-directory.Tpo $(DEPDIR)/lipsofsuna_import-system-directory.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-directory.c' object='lipsofsuna_import-system-directory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-directory.obj `if test -f 'system/system-directory.c'; then $(CYGPATH_W) 'system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/system/system-directory.c'; fi`
+
+lipsofsuna_import-system-error.o: system/system-error.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-error.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-error.Tpo -c -o lipsofsuna_import-system-error.o `test -f 'system/system-error.c' || echo '$(srcdir)/'`system/system-error.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-error.Tpo $(DEPDIR)/lipsofsuna_import-system-error.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-error.c' object='lipsofsuna_import-system-error.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-error.o `test -f 'system/system-error.c' || echo '$(srcdir)/'`system/system-error.c
+
+lipsofsuna_import-system-error.obj: system/system-error.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-error.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-error.Tpo -c -o lipsofsuna_import-system-error.obj `if test -f 'system/system-error.c'; then $(CYGPATH_W) 'system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/system/system-error.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-error.Tpo $(DEPDIR)/lipsofsuna_import-system-error.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-error.c' object='lipsofsuna_import-system-error.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-error.obj `if test -f 'system/system-error.c'; then $(CYGPATH_W) 'system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/system/system-error.c'; fi`
+
+lipsofsuna_import-system-file.o: system/system-file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-file.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-file.Tpo -c -o lipsofsuna_import-system-file.o `test -f 'system/system-file.c' || echo '$(srcdir)/'`system/system-file.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-file.Tpo $(DEPDIR)/lipsofsuna_import-system-file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-file.c' object='lipsofsuna_import-system-file.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-file.o `test -f 'system/system-file.c' || echo '$(srcdir)/'`system/system-file.c
+
+lipsofsuna_import-system-file.obj: system/system-file.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-file.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-file.Tpo -c -o lipsofsuna_import-system-file.obj `if test -f 'system/system-file.c'; then $(CYGPATH_W) 'system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/system/system-file.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-file.Tpo $(DEPDIR)/lipsofsuna_import-system-file.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-file.c' object='lipsofsuna_import-system-file.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-file.obj `if test -f 'system/system-file.c'; then $(CYGPATH_W) 'system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/system/system-file.c'; fi`
+
+lipsofsuna_import-system-execute.o: system/system-execute.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-execute.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-execute.Tpo -c -o lipsofsuna_import-system-execute.o `test -f 'system/system-execute.c' || echo '$(srcdir)/'`system/system-execute.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-execute.Tpo $(DEPDIR)/lipsofsuna_import-system-execute.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-execute.c' object='lipsofsuna_import-system-execute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-execute.o `test -f 'system/system-execute.c' || echo '$(srcdir)/'`system/system-execute.c
+
+lipsofsuna_import-system-execute.obj: system/system-execute.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-execute.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-execute.Tpo -c -o lipsofsuna_import-system-execute.obj `if test -f 'system/system-execute.c'; then $(CYGPATH_W) 'system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/system/system-execute.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-execute.Tpo $(DEPDIR)/lipsofsuna_import-system-execute.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-execute.c' object='lipsofsuna_import-system-execute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-execute.obj `if test -f 'system/system-execute.c'; then $(CYGPATH_W) 'system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/system/system-execute.c'; fi`
+
+lipsofsuna_import-system-misc.o: system/system-misc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-misc.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-misc.Tpo -c -o lipsofsuna_import-system-misc.o `test -f 'system/system-misc.c' || echo '$(srcdir)/'`system/system-misc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-misc.Tpo $(DEPDIR)/lipsofsuna_import-system-misc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-misc.c' object='lipsofsuna_import-system-misc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-misc.o `test -f 'system/system-misc.c' || echo '$(srcdir)/'`system/system-misc.c
+
+lipsofsuna_import-system-misc.obj: system/system-misc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-misc.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-misc.Tpo -c -o lipsofsuna_import-system-misc.obj `if test -f 'system/system-misc.c'; then $(CYGPATH_W) 'system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/system/system-misc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-misc.Tpo $(DEPDIR)/lipsofsuna_import-system-misc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-misc.c' object='lipsofsuna_import-system-misc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-misc.obj `if test -f 'system/system-misc.c'; then $(CYGPATH_W) 'system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/system/system-misc.c'; fi`
+
+lipsofsuna_import-system-module.o: system/system-module.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-module.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-module.Tpo -c -o lipsofsuna_import-system-module.o `test -f 'system/system-module.c' || echo '$(srcdir)/'`system/system-module.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-module.Tpo $(DEPDIR)/lipsofsuna_import-system-module.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-module.c' object='lipsofsuna_import-system-module.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-module.o `test -f 'system/system-module.c' || echo '$(srcdir)/'`system/system-module.c
+
+lipsofsuna_import-system-module.obj: system/system-module.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-module.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-module.Tpo -c -o lipsofsuna_import-system-module.obj `if test -f 'system/system-module.c'; then $(CYGPATH_W) 'system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/system/system-module.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-module.Tpo $(DEPDIR)/lipsofsuna_import-system-module.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-module.c' object='lipsofsuna_import-system-module.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-module.obj `if test -f 'system/system-module.c'; then $(CYGPATH_W) 'system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/system/system-module.c'; fi`
+
+lipsofsuna_import-system-notify.o: system/system-notify.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-notify.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-notify.Tpo -c -o lipsofsuna_import-system-notify.o `test -f 'system/system-notify.c' || echo '$(srcdir)/'`system/system-notify.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-notify.Tpo $(DEPDIR)/lipsofsuna_import-system-notify.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-notify.c' object='lipsofsuna_import-system-notify.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-notify.o `test -f 'system/system-notify.c' || echo '$(srcdir)/'`system/system-notify.c
+
+lipsofsuna_import-system-notify.obj: system/system-notify.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-notify.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-notify.Tpo -c -o lipsofsuna_import-system-notify.obj `if test -f 'system/system-notify.c'; then $(CYGPATH_W) 'system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/system/system-notify.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-notify.Tpo $(DEPDIR)/lipsofsuna_import-system-notify.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-notify.c' object='lipsofsuna_import-system-notify.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-notify.obj `if test -f 'system/system-notify.c'; then $(CYGPATH_W) 'system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/system/system-notify.c'; fi`
+
+lipsofsuna_import-system-path.o: system/system-path.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-path.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-path.Tpo -c -o lipsofsuna_import-system-path.o `test -f 'system/system-path.c' || echo '$(srcdir)/'`system/system-path.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-path.Tpo $(DEPDIR)/lipsofsuna_import-system-path.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-path.c' object='lipsofsuna_import-system-path.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-path.o `test -f 'system/system-path.c' || echo '$(srcdir)/'`system/system-path.c
+
+lipsofsuna_import-system-path.obj: system/system-path.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-path.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-path.Tpo -c -o lipsofsuna_import-system-path.obj `if test -f 'system/system-path.c'; then $(CYGPATH_W) 'system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/system/system-path.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-path.Tpo $(DEPDIR)/lipsofsuna_import-system-path.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-path.c' object='lipsofsuna_import-system-path.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-path.obj `if test -f 'system/system-path.c'; then $(CYGPATH_W) 'system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/system/system-path.c'; fi`
+
+lipsofsuna_import-system-relative.o: system/system-relative.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-relative.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-relative.Tpo -c -o lipsofsuna_import-system-relative.o `test -f 'system/system-relative.c' || echo '$(srcdir)/'`system/system-relative.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-relative.Tpo $(DEPDIR)/lipsofsuna_import-system-relative.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-relative.c' object='lipsofsuna_import-system-relative.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-relative.o `test -f 'system/system-relative.c' || echo '$(srcdir)/'`system/system-relative.c
+
+lipsofsuna_import-system-relative.obj: system/system-relative.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-relative.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-relative.Tpo -c -o lipsofsuna_import-system-relative.obj `if test -f 'system/system-relative.c'; then $(CYGPATH_W) 'system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/system/system-relative.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-relative.Tpo $(DEPDIR)/lipsofsuna_import-system-relative.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-relative.c' object='lipsofsuna_import-system-relative.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-relative.obj `if test -f 'system/system-relative.c'; then $(CYGPATH_W) 'system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/system/system-relative.c'; fi`
+
+lipsofsuna_import-system-types.o: system/system-types.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-types.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-types.Tpo -c -o lipsofsuna_import-system-types.o `test -f 'system/system-types.c' || echo '$(srcdir)/'`system/system-types.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-types.Tpo $(DEPDIR)/lipsofsuna_import-system-types.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-types.c' object='lipsofsuna_import-system-types.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-types.o `test -f 'system/system-types.c' || echo '$(srcdir)/'`system/system-types.c
+
+lipsofsuna_import-system-types.obj: system/system-types.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-types.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-types.Tpo -c -o lipsofsuna_import-system-types.obj `if test -f 'system/system-types.c'; then $(CYGPATH_W) 'system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/system/system-types.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-types.Tpo $(DEPDIR)/lipsofsuna_import-system-types.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-types.c' object='lipsofsuna_import-system-types.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-types.obj `if test -f 'system/system-types.c'; then $(CYGPATH_W) 'system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/system/system-types.c'; fi`
+
+lipsofsuna_import-system-user.o: system/system-user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-user.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-user.Tpo -c -o lipsofsuna_import-system-user.o `test -f 'system/system-user.c' || echo '$(srcdir)/'`system/system-user.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-user.Tpo $(DEPDIR)/lipsofsuna_import-system-user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-user.c' object='lipsofsuna_import-system-user.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-user.o `test -f 'system/system-user.c' || echo '$(srcdir)/'`system/system-user.c
+
+lipsofsuna_import-system-user.obj: system/system-user.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-system-user.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-system-user.Tpo -c -o lipsofsuna_import-system-user.obj `if test -f 'system/system-user.c'; then $(CYGPATH_W) 'system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/system/system-user.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-system-user.Tpo $(DEPDIR)/lipsofsuna_import-system-user.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-user.c' object='lipsofsuna_import-system-user.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-system-user.obj `if test -f 'system/system-user.c'; then $(CYGPATH_W) 'system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/system/system-user.c'; fi`
+
+lipsofsuna_import-thread-async-call.o: thread/thread-async-call.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-thread-async-call.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-thread-async-call.Tpo -c -o lipsofsuna_import-thread-async-call.o `test -f 'thread/thread-async-call.c' || echo '$(srcdir)/'`thread/thread-async-call.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-thread-async-call.Tpo $(DEPDIR)/lipsofsuna_import-thread-async-call.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='thread/thread-async-call.c' object='lipsofsuna_import-thread-async-call.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-thread-async-call.o `test -f 'thread/thread-async-call.c' || echo '$(srcdir)/'`thread/thread-async-call.c
+
+lipsofsuna_import-thread-async-call.obj: thread/thread-async-call.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-thread-async-call.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-thread-async-call.Tpo -c -o lipsofsuna_import-thread-async-call.obj `if test -f 'thread/thread-async-call.c'; then $(CYGPATH_W) 'thread/thread-async-call.c'; else $(CYGPATH_W) '$(srcdir)/thread/thread-async-call.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-thread-async-call.Tpo $(DEPDIR)/lipsofsuna_import-thread-async-call.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='thread/thread-async-call.c' object='lipsofsuna_import-thread-async-call.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-thread-async-call.obj `if test -f 'thread/thread-async-call.c'; then $(CYGPATH_W) 'thread/thread-async-call.c'; else $(CYGPATH_W) '$(srcdir)/thread/thread-async-call.c'; fi`
+
+lipsofsuna_import-image.o: image/image.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-image.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-image.Tpo -c -o lipsofsuna_import-image.o `test -f 'image/image.c' || echo '$(srcdir)/'`image/image.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-image.Tpo $(DEPDIR)/lipsofsuna_import-image.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='image/image.c' object='lipsofsuna_import-image.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-image.o `test -f 'image/image.c' || echo '$(srcdir)/'`image/image.c
+
+lipsofsuna_import-image.obj: image/image.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-image.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-image.Tpo -c -o lipsofsuna_import-image.obj `if test -f 'image/image.c'; then $(CYGPATH_W) 'image/image.c'; else $(CYGPATH_W) '$(srcdir)/image/image.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-image.Tpo $(DEPDIR)/lipsofsuna_import-image.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='image/image.c' object='lipsofsuna_import-image.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-image.obj `if test -f 'image/image.c'; then $(CYGPATH_W) 'image/image.c'; else $(CYGPATH_W) '$(srcdir)/image/image.c'; fi`
+
+lipsofsuna_import-reload-main.o: reload/reload-main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-main.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-main.Tpo -c -o lipsofsuna_import-reload-main.o `test -f 'reload/reload-main.c' || echo '$(srcdir)/'`reload/reload-main.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-main.Tpo $(DEPDIR)/lipsofsuna_import-reload-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-main.c' object='lipsofsuna_import-reload-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-main.o `test -f 'reload/reload-main.c' || echo '$(srcdir)/'`reload/reload-main.c
+
+lipsofsuna_import-reload-main.obj: reload/reload-main.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -MT lipsofsuna_import-reload-main.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-reload-main.Tpo -c -o lipsofsuna_import-reload-main.obj `if test -f 'reload/reload-main.c'; then $(CYGPATH_W) 'reload/reload-main.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-main.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-reload-main.Tpo $(DEPDIR)/lipsofsuna_import-reload-main.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='reload/reload-main.c' object='lipsofsuna_import-reload-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CFLAGS) $(CFLAGS) -c -o lipsofsuna_import-reload-main.obj `if test -f 'reload/reload-main.c'; then $(CYGPATH_W) 'reload/reload-main.c'; else $(CYGPATH_W) '$(srcdir)/reload/reload-main.c'; fi`
+
 lipsofsuna_server-server-main.o: server/server-main.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_server_CFLAGS) $(CFLAGS) -MT lipsofsuna_server-server-main.o -MD -MP -MF $(DEPDIR)/lipsofsuna_server-server-main.Tpo -c -o lipsofsuna_server-server-main.o `test -f 'server/server-main.c' || echo '$(srcdir)/'`server/server-main.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/lipsofsuna_server-server-main.Tpo $(DEPDIR)/lipsofsuna_server-server-main.Po
@@ -3470,6 +3817,20 @@ liblipsofsunaserver_la-physics-shape.lo: physics/physics-shape.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='physics/physics-shape.cpp' object='liblipsofsunaserver_la-physics-shape.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaserver_la_CXXFLAGS) $(CXXFLAGS) -c -o liblipsofsunaserver_la-physics-shape.lo `test -f 'physics/physics-shape.cpp' || echo '$(srcdir)/'`physics/physics-shape.cpp
+
+lipsofsuna_import-image-compress.o: image/image-compress.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CXXFLAGS) $(CXXFLAGS) -MT lipsofsuna_import-image-compress.o -MD -MP -MF $(DEPDIR)/lipsofsuna_import-image-compress.Tpo -c -o lipsofsuna_import-image-compress.o `test -f 'image/image-compress.cpp' || echo '$(srcdir)/'`image/image-compress.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-image-compress.Tpo $(DEPDIR)/lipsofsuna_import-image-compress.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='image/image-compress.cpp' object='lipsofsuna_import-image-compress.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CXXFLAGS) $(CXXFLAGS) -c -o lipsofsuna_import-image-compress.o `test -f 'image/image-compress.cpp' || echo '$(srcdir)/'`image/image-compress.cpp
+
+lipsofsuna_import-image-compress.obj: image/image-compress.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CXXFLAGS) $(CXXFLAGS) -MT lipsofsuna_import-image-compress.obj -MD -MP -MF $(DEPDIR)/lipsofsuna_import-image-compress.Tpo -c -o lipsofsuna_import-image-compress.obj `if test -f 'image/image-compress.cpp'; then $(CYGPATH_W) 'image/image-compress.cpp'; else $(CYGPATH_W) '$(srcdir)/image/image-compress.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/lipsofsuna_import-image-compress.Tpo $(DEPDIR)/lipsofsuna_import-image-compress.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='image/image-compress.cpp' object='lipsofsuna_import-image-compress.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_import_CXXFLAGS) $(CXXFLAGS) -c -o lipsofsuna_import-image-compress.obj `if test -f 'image/image-compress.cpp'; then $(CYGPATH_W) 'image/image-compress.cpp'; else $(CYGPATH_W) '$(srcdir)/image/image-compress.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

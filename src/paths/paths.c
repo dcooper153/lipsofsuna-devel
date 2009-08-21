@@ -32,7 +32,7 @@
 /**
  * \brief Creates a new paths object.
  *
- * \param path Package root directory.
+ * \param path Package root directory or NULL for auto-detect.
  * \param name Module name.
  * \return Paths or NULL.
  */
@@ -47,14 +47,22 @@ lipth_paths_new (const char* path,
 	if (self == NULL)
 		return NULL;
 
+	/* Set module name. */
+	self->module_name = strdup (name);
+	if (self->module_name == NULL)
+		goto error;
+
 	/* Set root directory. */
-	self->root = strdup (path);
+	if (path != NULL)
+		self->root = strdup (path);
+	else
+		self->root = lipth_paths_get_root ();
 	if (self->root == NULL)
 		goto error;
 
 	/* Get data directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_data = strdup (path);
+	self->global_data = strdup (self->root);
 	if (self->global_data == NULL)
 		goto error;
 	if (!strcmp (name, "data"))
@@ -127,6 +135,7 @@ lipth_paths_free (lipthPaths* self)
 	free (self->global_state);
 #endif
 	free (self->module_data);
+	free (self->module_name);
 	free (self->module_state);
 	free (self->root);
 	free (self);
@@ -214,6 +223,38 @@ lipth_paths_get_sound (const lipthPaths* self,
                        const char*       name)
 {
 	return lisys_path_concat (self->module_data, "sounds", name, NULL);
+}
+
+/**
+ * \brief Gets the game root directory.
+ *
+ * \return Path or NULL.
+ */
+char*
+lipth_paths_get_root ()
+{
+	char* tmp;
+	char* path;
+
+	/* Resolve game directory. */
+#ifdef LI_RELATIVE_PATHS
+	tmp = lisys_relative_exedir ();
+	if (tmp == NULL)
+		return NULL;
+	path = lisys_path_format (tmp, LISYS_PATH_STRIPLAST, NULL);
+	free (tmp);
+	if (path == NULL)
+		return NULL;
+#else
+	path = strdup (DATADIR);
+	if (path == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		return NULL;
+	}
+#endif
+
+	return path;
 }
 
 /** @} */

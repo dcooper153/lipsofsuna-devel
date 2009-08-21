@@ -41,7 +41,7 @@ lirel_reload_image (lirelReload* self,
 {
 	liimgImage* image;
 
-	image = liimg_image_new_from_file (&self->video, src);
+	image = liimg_image_new_from_file (src);
 	if (image == NULL)
 		return 0;
 	if (!liimg_image_save_s3tc (image, dst) &&

@@ -59,11 +59,6 @@ static int
 private_init_host (lisrvServer* self);
 
 static int
-private_init_paths (lisrvServer* self,
-                    const char*  path,
-                    const char*  name);
-
-static int
 private_init_script (lisrvServer* self);
 
 static int
@@ -81,13 +76,11 @@ private_sector_new (liengEngine* engine,
 /**
  * \brief Creates a new server instance.
  *
- * \param path Package root directory.
- * \param name Server name.
+ * \param paths Path information.
  * \return New server or NULL.
  */
 lisrvServer*
-lisrv_server_new (const char* path,
-                  const char* name)
+lisrv_server_new (lipthPaths* paths)
 {
 	lisrvServer* self;
 
@@ -98,13 +91,13 @@ lisrv_server_new (const char* path,
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
+	self->paths = paths;
 
 	/* Initialize mutexes. */
 	pthread_mutex_init (&self->mutexes.bans, NULL);
 
 	/* Initialize subsystems. */
-	if (!private_init_paths (self, path, name) ||
-	    !private_init_sql (self) ||
+	if (!private_init_sql (self) ||
 	    !private_init_ai (self) ||
 	    !private_init_host (self) ||
 	    !private_init_bans (self) ||
@@ -168,8 +161,6 @@ lisrv_server_free (lisrvServer* self)
 		licfg_bans_free (self->config.bans);
 	if (self->config.host != NULL)
 		licfg_host_free (self->config.host);
-	if (self->paths != NULL)
-		lipth_paths_free (self->paths);
 
 	/* Free helpers. */
 	if (self->helper.path_solver != NULL)
@@ -563,18 +554,6 @@ private_init_host (lisrvServer* self)
 	/* Initialize networking. */
 	self->network = lisrv_network_new (self, self->config.host->udp, self->config.host->port);
 	if (self->network == NULL)
-		return 0;
-
-	return 1;
-}
-
-static int
-private_init_paths (lisrvServer* self,
-                    const char*  path,
-                    const char*  name)
-{
-	self->paths = lipth_paths_new (path, name);
-	if (self->paths == NULL)
 		return 0;
 
 	return 1;

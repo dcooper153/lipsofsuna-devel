@@ -37,6 +37,14 @@ private_callback_tick (liextReload* self,
 static void
 private_progress_cancel (liextReload* self);
 
+static void
+private_reload_image (liextReload* self,
+                      const char*  name);
+
+static void
+private_reload_model (liextReload* self,
+                      const char*  name);
+
 /*****************************************************************************/
 
 liextReload*
@@ -54,12 +62,14 @@ liext_reload_new (licliModule* module)
 	self->module = module;
 
 	/* Allocate reloader. */
-	self->reload = lirel_reload_new (module->engine, &module->client->video, module->paths->root);
+	self->reload = lirel_reload_new (module->paths);
 	if (self->reload == NULL)
 	{
 		liext_reload_free (self);
 		return NULL;
 	}
+	lirel_reload_set_image_callback (self->reload, private_reload_image, self);
+	lirel_reload_set_model_callback (self->reload, private_reload_model, self);
 
 	/* Register callbacks. */
 	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
@@ -181,6 +191,22 @@ static void
 private_progress_cancel (liextReload* self)
 {
 	lirel_reload_cancel (self->reload);
+}
+
+static void
+private_reload_image (liextReload* self,
+                      const char*  name)
+{
+	printf ("Reloading model `%s'\n", name);
+	lieng_engine_load_model (self->module->engine, name);
+}
+
+static void
+private_reload_model (liextReload* self,
+                      const char*  name)
+{
+	printf ("Reloading texture `%s'\n", name);
+	lirnd_render_load_image (self->module->engine->render, name);
 }
 
 /** @} */

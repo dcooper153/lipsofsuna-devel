@@ -110,8 +110,7 @@ liext_preview_new (liwdgManager* manager,
 	}
 
 	/* Allocate generator. */
-	data->generator = ligen_generator_new_full (module->paths->root,
-		module->name, data->scene, module->engine->renderapi);
+	data->generator = ligen_generator_new (module->paths, data->scene, module->engine->renderapi);
 	if (data->generator == NULL)
 	{
 		liwdg_widget_free (self);

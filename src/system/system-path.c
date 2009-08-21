@@ -160,7 +160,9 @@ lisys_path_concat (const char* path,
  * \li \c LISYS_PATH_BASENAME Appends the base name of the next string.
  * \li \c LISYS_PATH_PATHNAME Appends the path name of the next string.
  * \li \c LISYS_PATH_SEPARATOR Appends a path separator if one isn't present already.
- * \li \c LISYS_PATH_STRIPEXT Removmes an extension from the path if one is present.
+ * \li \c LISYS_PATH_STRIPEXT Removes an extension from the path if one is present.
+ * \li \c LISYS_PATH_STRIPEXTS Removes all extensions from the path.
+ * \li \c LISYS_PATH_STRIPLAST Removes the last path component.
  *
  * \param format Path format instruction.
  * \param ... Variable array of path format instructions.
@@ -247,6 +249,24 @@ lisys_path_format (lisysPathFormat format,
 					pos = tmp - self;
 					last = tmp[-1];
 				}
+			}
+			continue;
+		}
+		else if (format == LISYS_PATH_STRIPLAST)
+		{
+			/* Strip last component. */
+			while (1)
+			{
+				tmp = strrchr (self, '/');
+				if (tmp > self)
+				{
+					pos = tmp - self;
+					last = '/';
+					*tmp = '\0';
+					if (tmp[1] == '\0')
+						continue;
+				}
+				break;
 			}
 			continue;
 		}

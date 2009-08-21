@@ -34,9 +34,7 @@ typedef struct _lividCalls lividCalls;
 struct _lividCalls
 {
 	lisysModule* libSDL;
-	lisysModule* libSDL_image;
 	lisysModule* libSDL_ttf;
-	SDL_Surface* (*IMG_Load)(const char *file);
 	SDL_Surface* (*SDL_ConvertSurface)(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
 	void (*SDL_Delay)(Uint32 ms);
 	int (*SDL_EnableKeyRepeat)(int delay, int interval);

@@ -32,23 +32,25 @@ static int
 private_init_camera (livieViewer* self);
 
 static int
-private_init_engine (livieViewer* self,
-                     const char*  name);
+private_init_engine (livieViewer* self);
 
 static int
 private_init_model (livieViewer* self,
                     const char*  model);
 
 static int
-private_init_paths (livieViewer* self,
-                    const char*  path,
-                    const char*  name);
-
-static int
 private_init_reload (livieViewer* self);
 
 static int
 private_init_video (livieViewer* self);
+
+static void
+private_reload_image (livieViewer* self,
+                      const char*  name);
+
+static void
+private_reload_model (livieViewer* self,
+                      const char*  name);
 
 static int
 private_resize (livieViewer* self,
@@ -60,8 +62,7 @@ private_resize (livieViewer* self,
 
 livieViewer*
 livie_viewer_new (lividCalls* video,
-                  const char* path,
-                  const char* name,
+                  lipthPaths* paths,
                   const char* model)
 {
 	char buf[256];
@@ -76,6 +77,7 @@ livie_viewer_new (lividCalls* video,
 		return NULL;
 	}
 	self->video = *video;
+	self->paths = paths;
 
 	/* Initialize SDL. */
 	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
@@ -88,9 +90,8 @@ livie_viewer_new (lividCalls* video,
 
 	/* Initialize subsystems. */
 	if (!private_init_video (self) ||
-	    !private_init_paths (self, path, name) ||
-	    !private_init_engine (self, name) ||
-		!private_init_reload (self) ||
+	    !private_init_engine (self) ||
+	    !private_init_reload (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_model (self, model))
 	{
@@ -123,8 +124,6 @@ livie_viewer_free (livieViewer* self)
 		lieng_camera_free (self->camera);
 	if (self->engine != NULL)
 		lieng_engine_free (self->engine);
-	if (self->paths != NULL)
-		lipth_paths_free (self->paths);
 	if (self->screen != NULL)
 		self->video.SDL_FreeSurface (self->screen);
 	self->video.SDL_Quit ();
@@ -242,8 +241,7 @@ private_init_camera (livieViewer* self)
 }
 
 static int
-private_init_engine (livieViewer* self,
-                     const char*  name)
+private_init_engine (livieViewer* self)
 {
 	int flags;
 	const float equation[3] = { 1.0f, 0.0f, 0.001f };
@@ -297,23 +295,13 @@ private_init_model (livieViewer* self,
 }
 
 static int
-private_init_paths (livieViewer* self,
-                    const char*  path,
-                    const char*  name)
-{
-	self->paths = lipth_paths_new (path, name);
-	if (self->paths == NULL)
-		return 0;
-
-	return 1;
-}
-
-static int
 private_init_reload (livieViewer* self)
 {
-	self->reload = lirel_reload_new (self->engine, &self->video, self->paths->root);
+	self->reload = lirel_reload_new (self->paths);
 	if (self->reload == NULL)
 		return 0;
+	lirel_reload_set_image_callback (self->reload, private_reload_image, self);
+	lirel_reload_set_model_callback (self->reload, private_reload_model, self);
 	lirel_reload_set_enabled (self->reload, 1);
 	lirel_reload_run (self->reload);
 
@@ -330,6 +318,22 @@ private_init_video (livieViewer* self)
 	livid_features_init ();
 
 	return 1;
+}
+
+static void
+private_reload_image (livieViewer* self,
+                      const char*  name)
+{
+	printf ("Reloading model `%s'\n", name);
+	lieng_engine_load_model (self->engine, name);
+}
+
+static void
+private_reload_model (livieViewer* self,
+                      const char*  name)
+{
+	printf ("Reloading texture `%s'\n", name);
+	lirnd_render_load_image (self->engine->render, name);
 }
 
 static int

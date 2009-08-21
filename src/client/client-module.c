@@ -105,13 +105,12 @@ licli_module_new (licliClient* client,
 	    !private_init_camera (self) ||
 	    !private_init_sound (self) ||
 	    !private_init_extensions (self) ||
-		!private_init_script (self))
+	    !private_init_script (self))
 		goto error;
 
 	return self;
 
 error:
-	lisys_error_report ();
 	licli_module_free (self);
 	return NULL;
 }
@@ -293,7 +292,7 @@ licli_module_host (licliModule* self)
 {
 	if (self->server != NULL)
 		lisrv_server_free (self->server);
-	self->server = lisrv_server_new (self->paths->root, self->name);
+	self->server = lisrv_server_new (self->paths);
 	if (self->server == NULL)
 		return 0;
 

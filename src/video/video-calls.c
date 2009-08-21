@@ -62,20 +62,6 @@ livid_calls_init (lividCalls* self)
 	CALL (SDL_WM_SetCaption);
 #undef CALL
 
-	/* SDL_image calls. */
-#define CALL(name) \
-	self->name = lisys_module_symbol (self->libSDL_image, #name); \
-	if (self->name == NULL) \
-	{ \
-		lisys_error_set (EINVAL, "cannot find function `%s'", #name); \
-		return 0; \
-	}
-	self->libSDL_image = lisys_module_new ("SDL_image", LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
-	if (self->libSDL_image == NULL)
-		return 0;
-	CALL (IMG_Load);
-#undef CALL
-
 	/* SDL_ttf calls. */
 #define CALL(name) \
 	self->name = lisys_module_symbol (self->libSDL_ttf, #name); \

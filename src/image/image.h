@@ -22,23 +22,19 @@
  * @{
  */
 
-#include <video/lips-video.h>
-
 typedef struct _liimgImage liimgImage;
 struct _liimgImage
 {
 	int width;
 	int height;
 	void* pixels;
-	lividCalls video;
 };
 
 liimgImage*
-liimg_image_new (lividCalls* video);
+liimg_image_new ();
 
 liimgImage*
-liimg_image_new_from_file (lividCalls* video,
-                           const char* path);
+liimg_image_new_from_file (const char* path);
 
 void
 liimg_image_free (liimgImage* self);

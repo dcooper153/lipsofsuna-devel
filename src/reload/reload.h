@@ -25,7 +25,7 @@
 #ifndef __RELOAD_H__
 #define __RELOAD_H__
 
-#include <engine/lips-engine.h>
+#include <paths/lips-paths.h>
 #include <system/lips-system.h>
 #include <thread/lips-thread.h>
 
@@ -33,23 +33,26 @@ typedef struct _lirelReload lirelReload;
 struct _lirelReload
 {
 	int queued;
-	char* path;
-	liengEngine* engine;
+	lipthPaths* paths;
 	lisysNotify* notify;
 	lithrAsyncCall* worker;
-	lividCalls video;
+	void (*reload_image_call)(void*, const char*);
+	void* reload_image_data;
+	void (*reload_model_call)(void*, const char*);
+	void* reload_model_data;
 };
 
 lirelReload*
-lirel_reload_new (liengEngine* engine,
-                  lividCalls*  video,
-                  const char*  path);
+lirel_reload_new (lipthPaths* paths);
 
 void
 lirel_reload_free (lirelReload* self);
 
 void
 lirel_reload_cancel (lirelReload* self);
+
+int
+lirel_reload_main (lirelReload* self);
 
 int
 lirel_reload_run (lirelReload* self);
@@ -66,6 +69,16 @@ lirel_reload_get_enabled (const lirelReload* self);
 int
 lirel_reload_set_enabled (lirelReload* self,
                           int          value);
+
+void
+lirel_reload_set_image_callback (lirelReload* self,
+                                 void       (*call)(),
+                                 void*        data);
+
+void
+lirel_reload_set_model_callback (lirelReload* self,
+                                 void       (*call)(),
+                                 void*        data);
 
 float
 lirel_reload_get_progress (const lirelReload* self);

@@ -57,22 +57,19 @@ private_filter_xcf_modified (const char* dir,
 /**
  * \brief Creates a new data reloader for the engine.
  *
- * The reload object provides automatic data file reloading services to the
- * associated engine. When modifications to the source files are detected in
- * the update call, a worker thread is created that converts the source file
- * to the native format supported by the engine. When the worker thread has
- * finished the conversion or if the user has manually edited the native data
- * file, the engine is instructed to reload the data file in question.
+ * The reload object provides automatic data file reloading services. When
+ * modifications to source data files are detected in the update call, a worker
+ * thread is created that converts the source file to the native format
+ * supported by the game. When the worker thread has finished the conversion or
+ * if the user has manually edited the native data file, a user provided
+ * callback is called so that, for example, the engine can reload the texture
+ * or model in question.
  *
- * \param engine Engine.
- * \param video Video calls.
- * \param path Path to global data directory.
+ * \param paths Path information.
  * \return New reloader or NULL.
  */
 lirelReload*
-lirel_reload_new (liengEngine* engine,
-                  lividCalls*  video,
-                  const char*  path)
+lirel_reload_new (lipthPaths* paths)
 {
 	lirelReload* self;
 
@@ -83,15 +80,7 @@ lirel_reload_new (liengEngine* engine,
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
-	self->engine = engine;
-	self->video = *video;
-	self->path = strdup (path);
-	if (self->path == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
-		return NULL;
-	}
+	self->paths = paths;
 
 	return self;
 }
@@ -100,7 +89,6 @@ void
 lirel_reload_free (lirelReload* self)
 {
 	lirel_reload_cancel (self);
-	free (self->path);
 	free (self);
 }
 
@@ -118,6 +106,20 @@ lirel_reload_cancel (lirelReload* self)
 	lithr_async_call_wait (self->worker);
 	lithr_async_call_free (self->worker);
 	self->worker = NULL;
+}
+
+int
+lirel_reload_main (lirelReload* self)
+{
+	if (!lirel_reload_run (self))
+		return 0;
+	while (self->worker != NULL)
+	{
+		lirel_reload_update (self);
+		lisys_usleep (1000);
+	}
+
+	return 1;
 }
 
 /**
@@ -173,26 +175,30 @@ lirel_reload_update (lirelReload* self)
 	/* Reload changed models. */
 	if (lisys_path_check_ext (self->notify->event.name, "lmdl"))
 	{
-		name = lisys_path_format (LISYS_PATH_BASENAME,
-			self->notify->event.name, LISYS_PATH_STRIPEXTS, NULL);
-		printf ("Reloading model `%s'\n", name);
-		if (name != NULL)
+		if (self->reload_model_call != NULL)
 		{
-			lieng_engine_load_model (self->engine, name);
-			free (name);
+			name = lisys_path_format (LISYS_PATH_BASENAME,
+				self->notify->event.name, LISYS_PATH_STRIPEXTS, NULL);
+			if (name != NULL)
+			{
+				self->reload_model_call (self->reload_model_data, name);
+				free (name);
+			}
 		}
 	}
 
 	/* Reload changed DDS textures. */
 	if (lisys_path_check_ext (self->notify->event.name, "dds"))
 	{
-		name = lisys_path_format (LISYS_PATH_BASENAME,
-			self->notify->event.name, LISYS_PATH_STRIPEXTS, NULL);
-		printf ("Reloading texture `%s'\n", name);
-		if (name != NULL)
+		if (self->reload_image_call != NULL)
 		{
-			lirnd_render_load_image (self->engine->render, name);
-			free (name);
+			name = lisys_path_format (LISYS_PATH_BASENAME,
+				self->notify->event.name, LISYS_PATH_STRIPEXTS, NULL);
+			if (name != NULL)
+			{
+				self->reload_image_call (self->reload_image_data, name);
+				free (name);
+			}
 		}
 	}
 
@@ -244,7 +250,7 @@ lirel_reload_set_enabled (lirelReload* self,
 		self->notify = lisys_notify_new ();
 		if (self->notify == NULL)
 			return 0;
-		path = lisys_path_concat (self->engine->config.dir, "graphics", NULL);
+		path = lisys_path_concat (self->paths->module_data, "graphics", NULL);
 		if (path == NULL)
 		{
 			lisys_notify_free (self->notify);
@@ -268,6 +274,24 @@ lirel_reload_set_enabled (lirelReload* self,
 	return 1;
 }
 
+void
+lirel_reload_set_image_callback (lirelReload* self,
+                                 void       (*call)(),
+                                 void*        data)
+{
+	self->reload_image_call = call;
+	self->reload_image_data = data;
+}
+
+void
+lirel_reload_set_model_callback (lirelReload* self,
+                                 void       (*call)(),
+                                 void*        data)
+{
+	self->reload_model_call = call;
+	self->reload_model_data = data;
+}
+
 float
 lirel_reload_get_progress (const lirelReload* self)
 {
@@ -285,7 +309,7 @@ private_async_reload (lithrAsyncCall* call)
 	lirelReload* self = call->data;
 
 	/* Convert textures. */
-	path = lisys_path_concat (self->engine->config.dir, "graphics", NULL);
+	path = lisys_path_concat (self->paths->module_data, "graphics", NULL);
 	if (path == NULL)
 		goto error;
 	if (!private_convert_textures (call, self, path))

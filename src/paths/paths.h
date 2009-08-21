@@ -33,6 +33,7 @@ struct _lipthPaths
 	char* global_data;
 	char* global_state;
 	char* module_data;
+	char* module_name;
 	char* module_state;
 };
 
@@ -66,6 +67,9 @@ lipth_paths_get_shader (const lipthPaths* self,
 char*
 lipth_paths_get_sound (const lipthPaths* self,
                        const char*       name);
+
+char*
+lipth_paths_get_root ();
 
 #endif
 

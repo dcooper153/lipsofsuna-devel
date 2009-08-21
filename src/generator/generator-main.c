@@ -30,20 +30,30 @@ int
 main (int argc, char** argv)
 {
 	ligenGenerator* self;
+	lipthPaths* paths;
 
-	if (argc != 3)
+	/* Resolve game directory. */
+	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");
+	if (paths == NULL)
+	{
+		lisys_error_report ();
 		return 1;
+	}
+
+	/* Execute program. */
 	srand (time (NULL));
-	self = ligen_generator_new (argv[1], argv[2]);
+	self = ligen_generator_new (paths, NULL, NULL);
 	if (self == NULL)
 	{
 		lisys_error_report ();
+		lipth_paths_free (paths);
 		return 1;
 	}
 	ligen_generator_load_materials (self);
 	if (!ligen_generator_main (self))
 		lisys_error_report ();
 	ligen_generator_free (self);
+	lipth_paths_free (paths);
 
 	return 0;
 }
