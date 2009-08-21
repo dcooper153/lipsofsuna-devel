@@ -54,9 +54,15 @@ struct _liextBrushes
 		liwdgWidget* button_paint[7];
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
+		liwdgWidget* entry_objextra;
+		liwdgWidget* entry_objtype;
 		liwdgWidget* label_size;
 		liwdgWidget* label_type;
+		liwdgWidget* label_objprob;
+		liwdgWidget* label_objtype;
+		liwdgWidget* label_objextra;
 		liwdgWidget* preview;
+		liwdgWidget* scroll_objprob;
 		liwdgWidget* scroll_radius;
 		liwdgWidget* spin_paint;
 		liwdgWidget* spin_sizex;

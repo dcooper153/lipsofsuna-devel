@@ -73,6 +73,9 @@ private_copy (liextBrushes* self,
               liwdgWidget*  widget);
 
 static int
+private_object_info (liextBrushes* self);
+
+static int
 private_paint_select (liextBrushes* self,
                       liwdgWidget*  widget);
 
@@ -242,7 +245,7 @@ private_init (liextBrushes* self,
 		return 0;
 	if (!liwdg_manager_alloc_widgets (manager,
 		&self->widgets.check_required, liwdg_check_new (manager),
-		&group_attr, liwdg_group_new_with_size (manager, 2, 3),
+		&group_attr, liwdg_group_new_with_size (manager, 2, 6),
 		&group_tree, liwdg_group_new_with_size (manager, 1, 4),
 		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 1, 10),
 		&self->widgets.group_size, liwdg_group_new_with_size (manager, 3, 1),
@@ -258,8 +261,14 @@ private_init (liextBrushes* self,
 		&self->widgets.button_paint[6], liwdg_button_new (manager),
 		&self->widgets.button_remove, liwdg_button_new (manager),
 		&self->widgets.entry_name, liwdg_entry_new (manager),
+		&self->widgets.entry_objtype, liwdg_entry_new (manager),
+		&self->widgets.entry_objextra, liwdg_entry_new (manager),
+		&self->widgets.label_objextra, liwdg_label_new (manager),
+		&self->widgets.label_objprob, liwdg_label_new (manager),
+		&self->widgets.label_objtype, liwdg_label_new (manager),
 		&self->widgets.label_size, liwdg_label_new (manager),
 		&self->widgets.label_type, liwdg_label_new (manager),
+		&self->widgets.scroll_objprob, liwdg_scroll_new (manager),
 		&self->widgets.scroll_radius, liwdg_scroll_new (manager),
 		&self->widgets.spin_paint, liwdg_spin_new (manager),
 		&self->widgets.spin_sizex, liwdg_spin_new (manager),
@@ -269,7 +278,7 @@ private_init (liextBrushes* self,
 		return 0;
 
 	/* Configure widgets. */
-	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_size), "Size");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_size), "Size:");
 	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_rename, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.tree, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.spin_sizex, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
@@ -320,7 +329,13 @@ private_init (liextBrushes* self,
 
 	/* View. */
 	liwdg_check_set_text (LIWDG_CHECK (self->widgets.check_required), "Required");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_objextra), "Extra:");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_objprob), "Probability:");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_objtype), "Type:");
 	liwdg_widget_insert_callback (self->widgets.check_required, LIWDG_CALLBACK_PRESSED, 0, private_stroke_flags, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.entry_objextra, LIWDG_CALLBACK_EDITED, 0, private_object_info, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.entry_objtype, LIWDG_CALLBACK_EDITED, 0, private_object_info, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.scroll_objprob, LIWDG_CALLBACK_PRESSED, 0, private_object_info, self, NULL);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_size), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_size), 0, 1);
 	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_size), 1);
@@ -328,11 +343,17 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 1, 0, self->widgets.spin_sizey);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 2, 0, self->widgets.spin_sizez);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_attr), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 2, self->widgets.check_required);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 1, self->widgets.label_type);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 1, self->widgets.entry_name);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 0, self->widgets.label_size);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 0, self->widgets.group_size);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 5, self->widgets.check_required);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 4, self->widgets.label_type);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 4, self->widgets.entry_name);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 3, self->widgets.label_size);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 3, self->widgets.group_size);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 2, self->widgets.label_objtype);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 2, self->widgets.entry_objtype);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 1, self->widgets.label_objextra);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 1, self->widgets.entry_objextra);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 0, self->widgets.label_objprob);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 0, self->widgets.scroll_objprob);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 1, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, group_attr);
@@ -499,6 +520,41 @@ private_copy (liextBrushes* self,
 	}
 
 	return 0;
+}
+
+static int
+private_object_info (liextBrushes* self)
+{
+	char* tmp;
+	liextBrushesTreerow* data;
+	ligenBrushobject* object;
+	liwdgTreerow* row;
+
+	/* Get active row. */
+	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (row == NULL)
+		return 0;
+	data = liwdg_treerow_get_data (row);
+	assert (data != NULL);
+	assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECT);
+	object = data->brush->objects.array[data->object];
+
+	/* Update object info. */
+	tmp = strdup (liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_objextra)));
+	if (tmp != NULL)
+	{
+		free (object->extra);
+		object->extra = tmp;
+	}
+	tmp = strdup (liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_objtype)));
+	if (tmp != NULL)
+	{
+		free (object->type);
+		object->type = tmp;
+	}
+	object->probability = liwdg_scroll_get_value (LIWDG_SCROLL (self->widgets.scroll_objprob));
+
+	return 1;
 }
 
 static int
@@ -1321,6 +1377,7 @@ private_rebuild_preview (liextBrushes* self)
 static void
 private_rebuild_selection (liextBrushes* self)
 {
+	int show;
 	liextBrushesTreerow* data;
 	ligenBrush* brush;
 	ligenBrushobject* object;
@@ -1386,6 +1443,22 @@ private_rebuild_selection (liextBrushes* self)
 		liwdg_check_set_active (LIWDG_CHECK (self->widgets.check_required), stroke->flags & LIGEN_RULE_REQUIRE);
 		liwdg_widget_set_visible (self->widgets.label_size, 0);
 		liwdg_widget_set_visible (self->widgets.group_size, 0);
+	}
+
+	/* Object info. */
+	show = (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECT);
+	liwdg_widget_set_visible (self->widgets.label_objextra, show);
+	liwdg_widget_set_visible (self->widgets.label_objprob, show);
+	liwdg_widget_set_visible (self->widgets.label_objtype, show);
+	liwdg_widget_set_visible (self->widgets.entry_objextra, show);
+	liwdg_widget_set_visible (self->widgets.entry_objtype, show);
+	liwdg_widget_set_visible (self->widgets.scroll_objprob, show);
+	if (show)
+	{
+		object = data->brush->objects.array[data->object];
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_objextra), object->extra);
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_objtype), object->type);
+		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_objprob), object->probability);
 	}
 
 	/* Rebuild preview. */

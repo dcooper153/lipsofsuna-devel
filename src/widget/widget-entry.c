@@ -174,6 +174,7 @@ private_event (liwdgEntry* self,
 	char* str;
 	char* tmp;
 	liwdgStyle* style;
+	liwdgRect rect;
 
 	switch (event->type)
 	{
@@ -236,17 +237,15 @@ private_event (liwdgEntry* self,
 			}
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
+			/* Draw base. */
+			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "entry", &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), "entry", NULL);
+			/* Draw text. */
 			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "entry");
-			glScissor (
-				LIWDG_WIDGET (self)->allocation.x,
-				LIWDG_WIDGET (self)->allocation.y,
-				LIWDG_WIDGET (self)->allocation.width,
-				LIWDG_WIDGET (self)->allocation.height);
+			glScissor (rect.x, rect.y, rect.width, rect.height);
 			glEnable (GL_SCISSOR_TEST);
 			glColor4fv (style->color);
-			lifnt_layout_render (self->text,
-				LIWDG_WIDGET (self)->allocation.x,
-				LIWDG_WIDGET (self)->allocation.y);
+			lifnt_layout_render (self->text, rect.x, rect.y);
 			glDisable (GL_SCISSOR_TEST);
 			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
