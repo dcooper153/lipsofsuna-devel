@@ -42,29 +42,48 @@ lipth_paths_new (const char* path,
 {
 	char* tmp;
 	lipthPaths* self;
+	lisysStat stat;
 
 	self = calloc (1, sizeof (lipthPaths));
 	if (self == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
 		return NULL;
+	}
 
 	/* Set module name. */
 	self->module_name = strdup (name);
 	if (self->module_name == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
 		goto error;
+	}
 
 	/* Set root directory. */
 	if (path != NULL)
+	{
 		self->root = strdup (path);
+		if (self->root == NULL)
+		{
+			lisys_error_set (ENOMEM, NULL);
+			goto error;
+		}
+	}
 	else
+	{
 		self->root = lipth_paths_get_root ();
-	if (self->root == NULL)
-		goto error;
+		if (self->root == NULL)
+			goto error;
+	}
 
 	/* Get data directory. */
 #ifdef LI_RELATIVE_PATHS
 	self->global_data = strdup (self->root);
 	if (self->global_data == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
 		goto error;
+	}
 	if (!strcmp (name, "data"))
 		self->module_data = lisys_path_concat (self->global_data, "data", NULL);
 	else
@@ -85,7 +104,10 @@ lipth_paths_new (const char* path,
 #ifdef LI_RELATIVE_PATHS
 	self->global_state = strdup (self->global_data);
 	if (self->global_state == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
 		goto error;
+	}
 	self->module_state = lisys_path_concat (self->module_data, "save", NULL);
 	if (self->module_state == NULL)
 		goto error;
@@ -104,6 +126,18 @@ lipth_paths_new (const char* path,
 #else
 	self->global_exts = LIEXTSDIR;
 #endif
+
+	/* Check for valid data directory. */
+	if (!lisys_stat (self->module_data, &stat))
+	{
+		lisys_error_set (EIO, "missing data directory `%s'", self->module_data);
+		goto error;
+	}
+	if (stat.type != LISYS_STAT_DIRECTORY && stat.type != LISYS_STAT_LINK)
+	{
+		lisys_error_set (EIO, "invalid data directory `%s': not a directory", self->module_data);
+		goto error;
+	}
 
 	/* Create the save directory. */
 	tmp = lisys_path_concat (self->module_state, "accounts", NULL);
