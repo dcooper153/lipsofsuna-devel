@@ -341,9 +341,6 @@ lieng_resources_load_from_dir (liengResources* self,
 	/* Create sample list. */
 	for (i = 0 ; i < count ; i++)
 	{
-		file = lisys_dir_get_path (directory, i);
-		if (file == NULL)
-			goto error;
 		name = lisys_path_format (lisys_dir_get_name (directory, i), LISYS_PATH_STRIPEXT, NULL);
 		if (name == NULL)
 			goto error;

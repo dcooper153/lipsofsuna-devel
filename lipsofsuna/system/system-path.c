@@ -257,14 +257,17 @@ lisys_path_format (lisysPathFormat format,
 			/* Strip last component. */
 			while (1)
 			{
-				tmp = strrchr (self, '/');
+				for (tmp = self + pos - 1 ; *tmp != '/' && tmp > self ; tmp--)
+					;
 				if (tmp > self)
 				{
-					pos = tmp - self;
 					last = '/';
-					*tmp = '\0';
-					if (tmp[1] == '\0')
+					if (tmp == self + pos - 1)
+					{
+						pos--;
 						continue;
+					}
+					pos = tmp - self;
 				}
 				break;
 			}

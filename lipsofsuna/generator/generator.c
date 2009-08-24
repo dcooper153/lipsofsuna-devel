@@ -133,7 +133,7 @@ ligen_generator_free (ligenGenerator* self)
 		liphy_physics_free (self->physics);
 	if (self->gensql != NULL)
 		sqlite3_close (self->gensql);
-	if (self->gensql != NULL)
+	if (self->srvsql != NULL)
 		sqlite3_close (self->srvsql);
 	free (self->strokes.array);
 	free (self);

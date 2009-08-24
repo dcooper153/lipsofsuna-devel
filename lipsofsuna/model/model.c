@@ -226,7 +226,10 @@ limdl_model_free (limdlModel* self)
 	if (self->weightgroups.weightgroups != NULL)
 	{
 		for (i = 0 ; i < self->weightgroups.count ; i++)
+		{
 			free (self->weightgroups.weightgroups[i].name);
+			free (self->weightgroups.weightgroups[i].bone);
+		}
 		free (self->weightgroups.weightgroups);
 	}
 
@@ -247,6 +250,14 @@ limdl_model_free (limdlModel* self)
 		for (i = 0 ; i < self->animation.count ; i++)
 			private_free_animation (self, self->animation.animations + i);
 		free (self->animation.animations);
+	}
+
+	/* Free particles. */
+	if (self->hairs.array != NULL)
+	{
+		for (i = 0 ; i < self->hairs.count ; i++)
+			limdl_hairs_free (self->hairs.array + i);
+		free (self->hairs.array);
 	}
 
 	free (self);
