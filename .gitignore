@@ -5,6 +5,7 @@ Makefile
 *.so
 *.so.*
 *.exe
+.dirstamp
 .deps
 .libs
 build
@@ -19,7 +20,8 @@ dep/bullet/bullet.pc
 dep/bullet/config.h
 dep/bullet/stamp-h1
 dep/libgrapple/test/unittest
-src/config.h
-src/stamp-h1
-src/main/lipsofsuna
-src/math/unittest
+lipsofsuna/config.h
+lipsofsuna/stamp-h1
+lipsofsuna/lipsofsuna
+lipsofsuna/lipsofsuna-*
+lipsofsuna/math/unittest

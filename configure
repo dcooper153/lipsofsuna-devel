@@ -794,10 +794,7 @@ PROGDIR
 MODSDIR
 DATADIR
 EXTSDIR
-MAYBE_VIEWER
-MAYBE_SERVER
 MAYBE_DEP
-MAYBE_CLIENT
 ZLIB_LIBS
 ZLIB_CFLAGS
 SQUISH_LIBS
@@ -814,6 +811,20 @@ LICLI_LIBS
 LICLI_CFLAGS
 LISRV_LIBS
 LISRV_CFLAGS
+MAYBE_VIEWER_FALSE
+MAYBE_VIEWER_TRUE
+MAYBE_SERVER_FALSE
+MAYBE_SERVER_TRUE
+MAYBE_IMPORT_FALSE
+MAYBE_IMPORT_TRUE
+MAYBE_GENERATOR_FALSE
+MAYBE_GENERATOR_TRUE
+MAYBE_CLIENT_FALSE
+MAYBE_CLIENT_TRUE
+MAYBE_SERVER_LIBRARY_FALSE
+MAYBE_SERVER_LIBRARY_TRUE
+MAYBE_CLIENT_LIBRARY_FALSE
+MAYBE_CLIENT_LIBRARY_TRUE
 VORBIS_LIBS
 VORBIS_CFLAGS
 OPENAL_LIBS
@@ -969,8 +980,10 @@ with_x
 enable_easy
 enable_debug
 enable_client
-enable_sound
+enable_generator
+enable_import
 enable_server
+enable_sound
 enable_viewer
 enable_luatest
 enable_relpath
@@ -1665,8 +1678,10 @@ Optional Features:
                           dependencies
   --disable-debug         Do not compile with debugging symbols
   --disable-client        Do not compile the client
-  --disable-sound         Do not compile with sound support
+  --disable-generator     Do not compile the generator
+  --disable-import        Do not compile the data file importer
   --disable-server        Do not compile the server
+  --disable-sound         Do not compile with sound support
   --disable-viewer        Do not compile the model viewer
   --disable-luatest       Do not try to detect whether Lua is available
   --enable-relpath        Install everything under a single directory
@@ -2866,7 +2881,7 @@ $as_echo "$am_cv_prog_tar_ustar" >&6; }
 
 
 
-ac_config_headers="$ac_config_headers src/config.h"
+ac_config_headers="$ac_config_headers lipsofsuna/config.h"
 
 { $as_echo "$as_me:$LINENO: checking whether to enable maintainer-specific portions of Makefiles" >&5
 $as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
@@ -5972,13 +5987,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:5975: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:5990: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5978: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:5993: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:5981: output\"" >&5)
+  (eval echo "\"\$as_me:5996: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7183,7 +7198,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7186 "configure"' > conftest.$ac_ext
+  echo '#line 7201 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9759,11 +9774,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9762: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9777: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9766: \$? = $ac_status" >&5
+   echo "$as_me:9781: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10098,11 +10113,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10101: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10116: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10105: \$? = $ac_status" >&5
+   echo "$as_me:10120: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10203,11 +10218,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10206: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10221: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10210: \$? = $ac_status" >&5
+   echo "$as_me:10225: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10258,11 +10273,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10261: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10276: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10265: \$? = $ac_status" >&5
+   echo "$as_me:10280: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -13071,7 +13086,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13074 "configure"
+#line 13089 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13167,7 +13182,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 13170 "configure"
+#line 13185 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15187,11 +15202,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15190: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15205: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15194: \$? = $ac_status" >&5
+   echo "$as_me:15209: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15286,11 +15301,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15289: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15304: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15293: \$? = $ac_status" >&5
+   echo "$as_me:15308: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15338,11 +15353,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15341: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15356: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15345: \$? = $ac_status" >&5
+   echo "$as_me:15360: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18133,11 +18148,18 @@ else
   want_client=yes
 fi
 
-# Check whether --enable-sound was given.
-if test "${enable_sound+set}" = set; then
-  enableval=$enable_sound; want_sound=no
+# Check whether --enable-generator was given.
+if test "${enable_generator+set}" = set; then
+  enableval=$enable_generator; want_generator=no
 else
-  want_sound=yes
+  want_generator=yes
+fi
+
+# Check whether --enable-import was given.
+if test "${enable_import+set}" = set; then
+  enableval=$enable_import; want_import=no
+else
+  want_import=yes
 fi
 
 # Check whether --enable-server was given.
@@ -18145,6 +18167,13 @@ if test "${enable_server+set}" = set; then
   enableval=$enable_server; want_server=no
 else
   want_server=yes
+fi
+
+# Check whether --enable-sound was given.
+if test "${enable_sound+set}" = set; then
+  enableval=$enable_sound; want_sound=no
+else
+  want_sound=yes
 fi
 
 # Check whether --enable-viewer was given.
@@ -21307,24 +21336,6 @@ else
 	ZLIB_LIBS="-lz"
 fi
 
-if test "$want_server" = yes; then
-	MAYBE_SERVER="server"
-else
-	MAYBE_SERVER=
-fi
-
-if test "$want_client" = yes; then
-	MAYBE_CLIENT="client"
-else
-	MAYBE_CLIENT=
-fi
-
-if test "$want_viewer" = yes; then
-	MAYBE_VIEWER="viewer"
-else
-	MAYBE_VIEWER=
-fi
-
 if test "$want_sound" = yes -a "$want_client" = yes; then
 
 pkg_failed=no
@@ -21579,6 +21590,63 @@ else
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLISAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
 fi
 
+ if test "$want_client" = yes -o "$want_viewer" = yes; then
+  MAYBE_CLIENT_LIBRARY_TRUE=
+  MAYBE_CLIENT_LIBRARY_FALSE='#'
+else
+  MAYBE_CLIENT_LIBRARY_TRUE='#'
+  MAYBE_CLIENT_LIBRARY_FALSE=
+fi
+
+ if test "$want_generator" = yes -o "$want_server" = yes; then
+  MAYBE_SERVER_LIBRARY_TRUE=
+  MAYBE_SERVER_LIBRARY_FALSE='#'
+else
+  MAYBE_SERVER_LIBRARY_TRUE='#'
+  MAYBE_SERVER_LIBRARY_FALSE=
+fi
+
+ if test "$want_client" = yes; then
+  MAYBE_CLIENT_TRUE=
+  MAYBE_CLIENT_FALSE='#'
+else
+  MAYBE_CLIENT_TRUE='#'
+  MAYBE_CLIENT_FALSE=
+fi
+
+ if test "$want_generator" = yes; then
+  MAYBE_GENERATOR_TRUE=
+  MAYBE_GENERATOR_FALSE='#'
+else
+  MAYBE_GENERATOR_TRUE='#'
+  MAYBE_GENERATOR_FALSE=
+fi
+
+ if test "$want_import" = yes; then
+  MAYBE_IMPORT_TRUE=
+  MAYBE_IMPORT_FALSE='#'
+else
+  MAYBE_IMPORT_TRUE='#'
+  MAYBE_IMPORT_FALSE=
+fi
+
+ if test "$want_server" = yes; then
+  MAYBE_SERVER_TRUE=
+  MAYBE_SERVER_FALSE='#'
+else
+  MAYBE_SERVER_TRUE='#'
+  MAYBE_SERVER_FALSE=
+fi
+
+ if test "$want_viewer" = yes; then
+  MAYBE_VIEWER_TRUE=
+  MAYBE_VIEWER_FALSE='#'
+else
+  MAYBE_VIEWER_TRUE='#'
+  MAYBE_VIEWER_FALSE=
+fi
+
+
 LISRV_CFLAGS="\
 	$LIPS_CFLAGS $PTHREAD_CFLAGS $GRAPPLE_CFLAGS $LUA_CFLAGS $ZLIB_CFLAGS $SQLITE_CFLAGS \
 	$SDL_CFLAGS $GL_CFLAGS $GLEW_CFLAGS $OPENAL_CFLAGS $VORBIS_CFLAGS \
@@ -21630,10 +21698,7 @@ LICLI_LIBS="\
 
 
 
-
-
-
-ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile ext/Makefile ext/client/Makefile ext/server/Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile lipsofsuna/Makefile lipsofsuna/client/extensions/Makefile lipsofsuna/server/extensions/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -21778,6 +21843,55 @@ if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_CLIENT_LIBRARY_TRUE}" && test -z "${MAYBE_CLIENT_LIBRARY_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_CLIENT_LIBRARY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_CLIENT_LIBRARY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_SERVER_LIBRARY_TRUE}" && test -z "${MAYBE_SERVER_LIBRARY_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_SERVER_LIBRARY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_SERVER_LIBRARY\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_CLIENT_TRUE}" && test -z "${MAYBE_CLIENT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_CLIENT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_CLIENT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_GENERATOR_TRUE}" && test -z "${MAYBE_GENERATOR_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_GENERATOR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_GENERATOR\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_IMPORT_TRUE}" && test -z "${MAYBE_IMPORT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_IMPORT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_IMPORT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_SERVER_TRUE}" && test -z "${MAYBE_SERVER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_SERVER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_SERVER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${MAYBE_VIEWER_TRUE}" && test -z "${MAYBE_VIEWER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"MAYBE_VIEWER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"MAYBE_VIEWER\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -22640,17 +22754,16 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h" ;;
+    "lipsofsuna/config.h") CONFIG_HEADERS="$CONFIG_HEADERS lipsofsuna/config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
     "dep/Makefile") CONFIG_FILES="$CONFIG_FILES dep/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
-    "ext/Makefile") CONFIG_FILES="$CONFIG_FILES ext/Makefile" ;;
-    "ext/client/Makefile") CONFIG_FILES="$CONFIG_FILES ext/client/Makefile" ;;
-    "ext/server/Makefile") CONFIG_FILES="$CONFIG_FILES ext/server/Makefile" ;;
-    "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "lipsofsuna/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/Makefile" ;;
+    "lipsofsuna/client/extensions/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/client/extensions/Makefile" ;;
+    "lipsofsuna/server/extensions/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/server/extensions/Makefile" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

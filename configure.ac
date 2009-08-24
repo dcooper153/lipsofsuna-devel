@@ -5,8 +5,8 @@ AC_INIT([Lips of Suna], [0.0.2], [http://lipsofsuna.org], [lipsofsuna])
 AC_CONFIG_AUX_DIR([msc])
 AC_CONFIG_MACRO_DIR([msc/m4])
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE([tar-ustar])
-AM_CONFIG_HEADER([src/config.h])
+AM_INIT_AUTOMAKE([subdir-objects tar-ustar])
+AM_CONFIG_HEADER([lipsofsuna/config.h])
 AM_MAINTAINER_MODE
 
 AC_ISC_POSIX
@@ -25,8 +25,10 @@ dnl Arguments.
 AC_ARG_ENABLE([easy], AC_HELP_STRING([--enable-easy], [Compile a relative binary using built-in dependencies]), [want_easy=yes], [want_easy=no])
 AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with debugging symbols]), [want_debug=no], [want_debug=yes])
 AC_ARG_ENABLE([client], AC_HELP_STRING([--disable-client], [Do not compile the client]), [want_client=no], [want_client=yes])
-AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with sound support]), [want_sound=no], [want_sound=yes])
+AC_ARG_ENABLE([generator], AC_HELP_STRING([--disable-generator], [Do not compile the generator]), [want_generator=no], [want_generator=yes])
+AC_ARG_ENABLE([import], AC_HELP_STRING([--disable-import], [Do not compile the data file importer]), [want_import=no], [want_import=yes])
 AC_ARG_ENABLE([server], AC_HELP_STRING([--disable-server], [Do not compile the server]), [want_server=no], [want_server=yes])
+AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with sound support]), [want_sound=no], [want_sound=yes])
 AC_ARG_ENABLE([viewer], AC_HELP_STRING([--disable-viewer], [Do not compile the model viewer]), [want_viewer=no], [want_viewer=yes])
 AC_ARG_ENABLE([luatest], AC_HELP_STRING([--disable-luatest], [Do not try to detect whether Lua is available]), [want_luatest=no], [want_luatest=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
@@ -178,27 +180,6 @@ else
 	ZLIB_LIBS="-lz"
 fi
 
-dnl Server support.
-if test "$want_server" = yes; then
-	MAYBE_SERVER="server"
-else
-	MAYBE_SERVER=
-fi
-
-dnl Client support.
-if test "$want_client" = yes; then
-	MAYBE_CLIENT="client"
-else
-	MAYBE_CLIENT=
-fi
-
-dnl Viewer support.
-if test "$want_viewer" = yes; then
-	MAYBE_VIEWER="viewer"
-else
-	MAYBE_VIEWER=
-fi
-
 dnl Sound support.
 if test "$want_sound" = yes -a "$want_client" = yes; then
 	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
@@ -230,6 +211,15 @@ else
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLISAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
 fi
+
+dnl Programs to build.
+AM_CONDITIONAL([MAYBE_CLIENT_LIBRARY], [test "$want_client" = yes -o "$want_viewer" = yes])
+AM_CONDITIONAL([MAYBE_SERVER_LIBRARY], [test "$want_generator" = yes -o "$want_server" = yes])
+AM_CONDITIONAL([MAYBE_CLIENT], [test "$want_client" = yes])
+AM_CONDITIONAL([MAYBE_GENERATOR], [test "$want_generator" = yes])
+AM_CONDITIONAL([MAYBE_IMPORT], [test "$want_import" = yes])
+AM_CONDITIONAL([MAYBE_SERVER], [test "$want_server" = yes])
+AM_CONDITIONAL([MAYBE_VIEWER], [test "$want_viewer" = yes])
 
 dnl Export configuration.
 LISRV_CFLAGS="\
@@ -275,10 +265,7 @@ AC_SUBST([VORBIS_CFLAGS])
 AC_SUBST([VORBIS_LIBS])
 AC_SUBST([ZLIB_CFLAGS])
 AC_SUBST([ZLIB_LIBS])
-AC_SUBST([MAYBE_CLIENT])
 AC_SUBST([MAYBE_DEP])
-AC_SUBST([MAYBE_SERVER])
-AC_SUBST([MAYBE_VIEWER])
 AC_SUBST([EXTSDIR])
 AC_SUBST([DATADIR])
 AC_SUBST([MODSDIR])
@@ -291,8 +278,7 @@ Makefile
 data/Makefile
 dep/Makefile
 doc/Makefile
-ext/Makefile
-ext/client/Makefile
-ext/server/Makefile
-src/Makefile
+lipsofsuna/Makefile
+lipsofsuna/client/extensions/Makefile
+lipsofsuna/server/extensions/Makefile
 ])

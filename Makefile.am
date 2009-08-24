@@ -1,3 +1,3 @@
-SUBDIRS = dep src ext data doc
+SUBDIRS = dep data doc lipsofsuna
 EXTRA_DIST = COPYING.LESSER
 ACLOCAL_AMFLAGS = -I msc/m4

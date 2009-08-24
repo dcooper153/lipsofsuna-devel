@@ -5,17 +5,17 @@ set -e
 mkdir -p build
 cd build
 rm -f lipsofsuna
-cp ../src/lipsofsuna lipsofsuna
+cp ../lipsofsuna/lipsofsuna lipsofsuna
 cd ..
 
 mkdir -p build/bin
 cd build/bin
 rm -f lipsofsuna-*
-cp ../../src/.libs/lipsofsuna-client lipsofsuna-client
-cp ../../src/.libs/lipsofsuna-generator lipsofsuna-generator
-cp ../../src/.libs/lipsofsuna-import lipsofsuna-import
-cp ../../src/.libs/lipsofsuna-server lipsofsuna-server
-cp ../../src/.libs/lipsofsuna-viewer lipsofsuna-viewer
+cp ../../lipsofsuna/.libs/lipsofsuna-client lipsofsuna-client
+cp ../../lipsofsuna/.libs/lipsofsuna-generator lipsofsuna-generator
+cp ../../lipsofsuna/.libs/lipsofsuna-import lipsofsuna-import
+cp ../../lipsofsuna/.libs/lipsofsuna-server lipsofsuna-server
+cp ../../lipsofsuna/.libs/lipsofsuna-viewer lipsofsuna-viewer
 cd ../..
 
 mkdir -p build/tool
@@ -33,7 +33,7 @@ for i in $libs; do
 	echo $i "->" $name
 	ln -s $i $name;
 done
-libs=`find ../../src/ -name "lib*.so.[0-9].[0-9].[0-9]"`
+libs=`find ../../lipsofsuna/ -name "lib*.so.[0-9].[0-9].[0-9]"`
 for i in $libs; do
 	name=$(echo `basename $i` | sed "s/\.[0-9]\.[0-9]//")
 	echo $i "->" $name
@@ -44,7 +44,8 @@ cd ../..
 mkdir -p build/lib/extensions
 cd build/lib/extensions
 rm -f *.so
-exts=`find ../../../ext/ -name lib\*.so`
+exts="$(find ../../../lipsofsuna/client/extensions -name lib\*.so) \
+      $(find ../../../lipsofsuna/server/extensions -name lib\*.so)"
 for i in $exts; do
 	name=$(echo `basename $i` | sed "s/\.[0-9]\.[0-9]//")
 	echo $i "->" $name

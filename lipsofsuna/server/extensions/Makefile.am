@@ -1,4 +1,5 @@
-INCLUDES = -I$(top_srcdir)/src
+INCLUDES = -I$(top_srcdir)
+AM_CFLAGS = $(LISRV_CFLAGS)
 EXTRA_DIST = skeleton/mkext.sh
 
 extdir = $(EXTSDIR)
@@ -15,9 +16,8 @@ ext_LTLIBRARIES = \
 	libspawner-ser.la \
 	libvoxel-ser.la
 
-libcreature_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libcreature_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libcreature_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libcreature_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libcreature_ser_la_SOURCES = \
 	creature/ext-creature.c \
 	creature/ext-creature.h \
@@ -25,9 +25,8 @@ libcreature_ser_la_SOURCES = \
 	creature/ext-module.h \
 	creature/ext-script.c
 
-libeditor_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libeditor_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libeditor_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libeditor_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libeditor_ser_la_SOURCES = \
 	editor/ext-editor.c \
 	editor/ext-editor.h \
@@ -35,17 +34,15 @@ libeditor_ser_la_SOURCES = \
 	editor/ext-module.h \
 	editor/ext-script.c
 
-libevents_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libevents_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libevents_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libevents_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libevents_ser_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
 
-libgenerator_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libgenerator_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libgenerator_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libgenerator_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libgenerator_ser_la_SOURCES = \
 	generator/ext-generator.c \
 	generator/ext-generator.h \
@@ -53,9 +50,8 @@ libgenerator_ser_la_SOURCES = \
 	generator/ext-module.h \
 	generator/ext-script.c
 
-libinventory_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libinventory_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libinventory_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libinventory_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libinventory_ser_la_SOURCES = \
 	inventory/ext-inventory.c \
 	inventory/ext-inventory.h \
@@ -63,9 +59,8 @@ libinventory_ser_la_SOURCES = \
 	inventory/ext-module.h \
 	inventory/ext-script.c
 
-libnpc_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libnpc_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libnpc_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libnpc_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libnpc_ser_la_SOURCES = \
 	npc/ext-module.c \
 	npc/ext-module.h \
@@ -73,9 +68,8 @@ libnpc_ser_la_SOURCES = \
 	npc/ext-npc.h \
 	npc/ext-script.c
 
-libskeleton_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libskeleton_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libskeleton_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libskeleton_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libskeleton_ser_la_SOURCES = \
 	skeleton/ext-skeleton.c \
 	skeleton/ext-skeleton.h \
@@ -83,9 +77,8 @@ libskeleton_ser_la_SOURCES = \
 	skeleton/ext-module.h \
 	skeleton/ext-script.c
 
-libskills_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libskills_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libskills_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libskills_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libskills_ser_la_SOURCES = \
 	skills/ext-module.c \
 	skills/ext-module.h \
@@ -95,9 +88,8 @@ libskills_ser_la_SOURCES = \
 	skills/ext-skills.h \
 	skills/ext-script.c
 
-libslots_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libslots_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libslots_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libslots_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libslots_ser_la_SOURCES = \
 	slots/ext-module.c \
 	slots/ext-module.h \
@@ -105,9 +97,8 @@ libslots_ser_la_SOURCES = \
 	slots/ext-slots.c \
 	slots/ext-slots.h
 
-libspawner_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libspawner_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libspawner_ser_la_LIBADD =$(top_builddir)/src/liblipsofsunaserver.la
+libspawner_ser_la_LIBADD =$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libspawner_ser_la_SOURCES = \
 	spawner/ext-module.c \
 	spawner/ext-module.h \
@@ -115,9 +106,8 @@ libspawner_ser_la_SOURCES = \
 	spawner/ext-spawner.h \
 	spawner/ext-script.c
 
-libvoxel_ser_la_CFLAGS = $(LISRV_CFLAGS)
 libvoxel_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libvoxel_ser_la_LIBADD = $(top_builddir)/src/liblipsofsunaserver.la
+libvoxel_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libvoxel_ser_la_SOURCES = \
 	voxel/ext-listener.c \
 	voxel/ext-listener.h \
