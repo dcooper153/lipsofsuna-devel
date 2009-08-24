@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <network/lips-network.h>
 #include "render-draw.h"
 #include "render-object.h"
 
@@ -87,7 +88,7 @@ lirnd_object_new (lirndScene* scene,
 	limat_aabb_init (&self->aabb);
 
 	/* Add to renderer. */
-	if (!lialg_ptrdic_insert (scene->objects, self, self))
+	if (!lialg_u32dic_insert (scene->objects, id, self))
 	{
 		free (self);
 		return NULL;
@@ -130,14 +131,24 @@ lirnd_object_new_from_data (lirndScene*      scene,
 	self = calloc (1, sizeof (lirndObject));
 	if (self == NULL)
 		return NULL;
-	self->id = id;
 	self->aabb = *aabb;
 	self->scene = scene;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 
+	/* Choose unique ID. */
+	while (!id)
+	{
+		id = (int)((LINET_RANGE_RENDER_END - LINET_RANGE_RENDER_START) *
+			((float) rand () / RAND_MAX)) + LINET_RANGE_RENDER_START;
+		if (lirnd_scene_find_object (scene, id))
+			id = 0;
+	}
+	self->id = id;
+	assert (!lirnd_scene_find_object (scene, id));
+
 	/* Add to renderer. */
-	if (!lialg_ptrdic_insert (scene->objects, self, self))
+	if (!lialg_u32dic_insert (scene->objects, self->id, self))
 	{
 		free (self);
 		return NULL;
@@ -154,7 +165,7 @@ lirnd_object_new_from_data (lirndScene*      scene,
 	/* Initialize extras. */
 	if (!private_init_envmap (self))
 	{
-		lialg_ptrdic_remove (scene->objects, self);
+		lialg_u32dic_remove (scene->objects, self->id);
 		free (self);
 		return NULL;
 	}
@@ -172,7 +183,7 @@ lirnd_object_new_from_data (lirndScene*      scene,
 void
 lirnd_object_free (lirndObject* self)
 {
-	lialg_ptrdic_remove (self->scene->objects, self);
+	lialg_u32dic_remove (self->scene->objects, self->id);
 	private_clear_envmap (self);
 	private_clear_lights (self);
 	private_clear_materials (self);
@@ -299,37 +310,6 @@ lirnd_object_get_center (const lirndObject* self,
 }
 
 /**
- * \brief Sets the transformation of the object.
- *
- * \param self Object.
- * \param transform Transformation.
- */
-void
-lirnd_object_set_transform (lirndObject*          self,
-                            const limatTransform* transform)
-{
-	limatVector center;
-	limdlModel* model;
-
-	/* Set transformation. */
-	self->transform = *transform;
-	self->orientation.matrix = limat_convert_transform_to_matrix (*transform);
-
-	/* Set box center. */
-	if (self->model != NULL)
-	{
-		/* FIXME: Incorrect for rotated objects. */
-		model = self->model->model;
-		center = limat_vector_add (model->bounds.min, model->bounds.max);
-		center = limat_vector_multiply (center, 0.5f);
-		center = limat_vector_add (center, transform->position);
-		self->orientation.center = center;
-	}
-	else
-		self->orientation.center = transform->position;
-}
-
-/**
  * \brief Sets the model of the object.
  *
  * Changes the model of the object and takes care of automatically registering
@@ -444,6 +424,50 @@ lirnd_object_set_realized (lirndObject* self,
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Gets the transformation of the object.
+ *
+ * \param self Object.
+ * \param value Return location for the transformation.
+ */
+void
+lirnd_object_get_transform (lirndObject*    self,
+                            limatTransform* value)
+{
+	*value = self->transform;
+}
+
+/**
+ * \brief Sets the transformation of the object.
+ *
+ * \param self Object.
+ * \param value Transformation.
+ */
+void
+lirnd_object_set_transform (lirndObject*          self,
+                            const limatTransform* value)
+{
+	limatVector center;
+	limdlModel* model;
+
+	/* Set transformation. */
+	self->transform = *value;
+	self->orientation.matrix = limat_convert_transform_to_matrix (*value);
+
+	/* Set box center. */
+	if (self->model != NULL)
+	{
+		/* FIXME: Incorrect for rotated objects. */
+		model = self->model->model;
+		center = limat_vector_add (model->bounds.min, model->bounds.max);
+		center = limat_vector_multiply (center, 0.5f);
+		center = limat_vector_add (center, value->position);
+		self->orientation.center = center;
+	}
+	else
+		self->orientation.center = value->position;
 }
 
 void*
@@ -771,7 +795,7 @@ static void
 private_update_envmap (lirndObject* self)
 {
 	int i;
-	lialgPtrdicIter iter;
+	lialgU32dicIter iter;
 	limatFrustum frustum;
 	limatVector ctr;
 	limatMatrix modelview;
@@ -825,7 +849,7 @@ private_update_envmap (lirndObject* self)
 		lirnd_context_set_modelview (&context, &modelview);
 		lirnd_context_set_projection (&context, &projection);
 		lirnd_context_set_frustum (&context, &frustum);
-		LI_FOREACH_PTRDIC (iter, self->scene->objects)
+		LI_FOREACH_U32DIC (iter, self->scene->objects)
 			lirnd_draw_exclude (&context, iter.value, self);
 	}
 

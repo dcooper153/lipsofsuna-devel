@@ -65,6 +65,7 @@ clisrc = \
 	client/client-network.h \
 	client/client-object.c \
 	client/client-object.h \
+	client/client-render.c \
 	client/client-script.h \
 	client/client-script-action.c \
 	client/client-script-binding.c \
@@ -141,6 +142,8 @@ maisrc = \
 matsrc = \
 	math/lips-math.h \
 	math/math-aabb.h \
+	math/math-camera.c \
+	math/math-camera.h \
 	math/math-convert.h \
 	math/math-frustum.h  \
 	math/math-generic.h \

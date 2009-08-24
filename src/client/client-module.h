@@ -61,6 +61,8 @@ struct _licliModule
 	liengCamera* camera;
 	liengEngine* engine;
 	lipthPaths* paths;
+	lirndRender* render;
+	lirndScene* scene;
 	liscrScript* script;
 	lisrvServer* server;
 #ifndef LI_DISABLE_SOUND

@@ -91,6 +91,18 @@ lieng_resources_new (liengEngine* engine)
 void
 lieng_resources_free (liengResources* self)
 {
+	lieng_resources_clear (self);
+	free (self);
+}
+
+/**
+ * \brief Unloads all resources.
+ *
+ * \param self Resources.
+ */
+void
+lieng_resources_clear (liengResources* self)
+{
 	int i;
 	liengAnimation* animation;
 	liengModel* model;
@@ -105,6 +117,8 @@ lieng_resources_free (liengResources* self)
 			free (animation->name);
 		}
 		free (self->animations.array);
+		self->animations.array = NULL;
+		self->animations.count = 0;
 	}
 
 	/* Free models. */
@@ -116,6 +130,8 @@ lieng_resources_free (liengResources* self)
 			lieng_model_free (model);
 		}
 		free (self->models.array);
+		self->models.array = NULL;
+		self->models.count = 0;
 	}
 
 	/* Free samples. */
@@ -128,9 +144,9 @@ lieng_resources_free (liengResources* self)
 			free (sample->path);
 		}
 		free (self->samples.array);
+		self->samples.array = NULL;
+		self->samples.count = 0;
 	}
-
-	free (self);
 }
 
 /**

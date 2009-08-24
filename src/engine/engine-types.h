@@ -20,9 +20,6 @@
 
 #include <system/lips-system.h>
 
-/* FIXME */
-#define LIENG_ENABLE_GRAPHICS
-
 enum
 {
 	LIENG_DATA_CLIENT,
@@ -37,6 +34,14 @@ enum
 
 enum
 {
+	LIENG_CALLBACK_FREE, /* (data, engine) */
+	LIENG_CALLBACK_MODEL_NEW, /* (data, model) */
+	LIENG_CALLBACK_MODEL_FREE, /* (data, model) */
+	LIENG_CALLBACK_OBJECT_NEW, /* (data, object) */
+	LIENG_CALLBACK_OBJECT_FREE, /* (data, object) */
+	LIENG_CALLBACK_OBJECT_MODEL, /* (data, object, model) */
+	LIENG_CALLBACK_OBJECT_REALIZE, /* (data, object, boolean) */
+	LIENG_CALLBACK_OBJECT_TRANSFORM, /* (data, object, transform) */
 	LIENG_CALLBACK_SECTOR_LOAD, /* (data, sector) */
 	LIENG_CALLBACK_SECTOR_UNLOAD, /* (data, sector) */
 	LIENG_CALLBACK_LAST
@@ -50,10 +55,11 @@ enum _liengMatrix
 
 enum
 {
-	LIENG_OBJECT_FLAG_DIRTY = 0x01,
-	LIENG_OBJECT_FLAG_DYNAMIC = 0x02,
-	LIENG_OBJECT_FLAG_INVISIBLE = 0x04,
-	LIENG_OBJECT_FLAG_SAVE = 0x08
+	LIENG_OBJECT_FLAG_DIRTY = 0x0001,
+	LIENG_OBJECT_FLAG_DYNAMIC = 0x0002,
+	LIENG_OBJECT_FLAG_INVISIBLE = 0x0004,
+	LIENG_OBJECT_FLAG_SAVE = 0x0008,
+	LIENG_OBJECT_FLAG_RELOAD = 0x8000
 };
 
 typedef struct _liengAnimation liengAnimation;

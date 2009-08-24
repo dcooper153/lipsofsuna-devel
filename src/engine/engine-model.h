@@ -30,10 +30,6 @@
 #include "engine.h"
 #include "engine-types.h"
 
-#ifndef LIENG_DISABLE_GRAPHICS
-#include <render/lips-render.h>
-#endif
-
 struct _liengModel
 {
 	int id;
@@ -44,9 +40,6 @@ struct _liengModel
 	liengEngine* engine;
 	limdlModel* model;
 	liphyShape* physics;
-#ifndef LIENG_DISABLE_GRAPHICS
-	lirndModel* render;
-#endif
 };
 
 liengModel*

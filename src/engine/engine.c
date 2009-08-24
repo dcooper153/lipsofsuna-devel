@@ -44,12 +44,10 @@ private_physics_transform (liphyObject* object);
  * \brief Creates a new game engine.
  *
  * \param path Module directory.
- * \param api Pointer to render calls or NULL for no graphics.
  * \return New engine or NULL.
  */
 liengEngine*
-lieng_engine_new (const char* path,
-                  lirndApi*   api)
+lieng_engine_new (const char* path)
 {
 	liengEngine* self;
 
@@ -63,10 +61,6 @@ lieng_engine_new (const char* path,
 	self->config.dir = strdup (path);
 	if (self->config.dir == NULL)
 		goto error;
-
-#ifndef LIENG_DISABLE_GRAPHICS
-	self->renderapi = api;
-#endif
 	if (!private_init (self))
 		goto error;
 
@@ -86,14 +80,15 @@ lieng_engine_free (liengEngine* self)
 	liengConstraint* constraint_next;
 	liengObject* object;
 
-	/* Free constraints. */
+	/* Clear constraints. */
 	for (constraint = self->constraints ; constraint != NULL ; constraint = constraint_next)
 	{
 		constraint_next = constraint->next;
 		lieng_constraint_free (constraint);
 	}
+	self->constraints = NULL;
 
-	/* Unrealize objects. */
+	/* Clear objects. */
 	if (self->objects != NULL)
 	{
 		LI_FOREACH_U32DIC (iter, self->objects)
@@ -101,54 +96,44 @@ lieng_engine_free (liengEngine* self)
 			object = iter.value;
 			lieng_object_set_realized (object, 0);
 		}
-	}
-
-	/* Free objects. */
-	if (self->objects != NULL)
-	{
 		while (self->objects->list)
 		{
 			object = self->objects->list->value;
 			lieng_object_free (object);
 		}
-		lialg_u32dic_free (self->objects);
 	}
 
-	/* Free selection. */
+	/* Clear selection. */
 	if (self->selection != NULL)
-	{
 		lieng_engine_clear_selection (self);
-		lialg_ptrdic_free (self->selection);
-	}
 
-	/* Free sectors. */
+	/* Clear sectors. */
 	if (self->sectors != NULL)
-	{
 		private_clear_sectors (self);
-		lialg_u32dic_free (self->sectors);
-	}
+
+	/* Clear resources. */
+	if (self->resources != NULL)
+		lieng_resources_clear (self->resources);
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self, LIENG_CALLBACK_FREE, self);
 
 	/* Free callbacks. */
 	if (self->callbacks != NULL)
 		lical_callbacks_free (self->callbacks);
 
-	/* Free resource list. */
-	if (self->resources != NULL)
-		lieng_resources_free (self->resources);
-
 	/* Free subsystems. */
 	if (self->physics != NULL)
 		liphy_physics_free (self->physics);
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->renderapi != NULL)
-	{
-		if (self->scene != NULL)
-			self->renderapi->lirnd_scene_free (self->scene);
-		if (self->render != NULL)
-			self->renderapi->lirnd_render_free (self->render);
-	}
-#endif
 
+	if (self->resources != NULL)
+		lieng_resources_free (self->resources);
+	if (self->sectors != NULL)
+		lialg_u32dic_free (self->sectors);
+	if (self->objects != NULL)
+		lialg_u32dic_free (self->objects);
+	if (self->selection != NULL)
+		lialg_ptrdic_free (self->selection);
 	free (self->config.dir);
 	free (self);
 }
@@ -338,12 +323,8 @@ lieng_engine_load_model (liengEngine* self,
                          const char*  name)
 {
 	lialgU32dicIter iter;
-	liengModel dummy;
 	liengModel* model;
 	liengObject* object;
-
-	if (self->render == NULL)
-		return 1;
 
 	/* Find model. */
 	model = lieng_resources_find_model_by_name (self->resources, name);
@@ -351,16 +332,13 @@ lieng_engine_load_model (liengEngine* self,
 		return 0;
 
 	/* Remove old instances. */
-	memset (&dummy, 0, sizeof (dummy));
-	dummy.invalid = 1;
-	dummy.engine = self;
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
 		if (object->model == model)
 		{
+			object->flags |= LIENG_OBJECT_FLAG_RELOAD;
 			lieng_object_set_model (object, NULL);
-			lieng_object_set_model (object, &dummy);
 		}
 	}
 
@@ -372,8 +350,11 @@ lieng_engine_load_model (liengEngine* self,
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
-		if (object->model == &dummy)
+		if (object->flags & LIENG_OBJECT_FLAG_RELOAD)
+		{
+			object->flags &= ~LIENG_OBJECT_FLAG_RELOAD;
 			lieng_object_set_model (object, model);
+		}
 	}
 
 	return 1;
@@ -520,20 +501,6 @@ lieng_engine_update (liengEngine* self,
 	{
 		lieng_constraint_update (constraint, secs);
 	}
-
-	/* Update renderer state. */
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->renderapi != NULL)
-	{
-		LI_FOREACH_U32DIC (iter, self->objects)
-		{
-			object = iter.value;
-			self->renderapi->lirnd_object_deform (object->render, object->pose);
-		}
-		self->renderapi->lirnd_render_update (self->render, secs);
-		self->renderapi->lirnd_scene_update (self->scene, secs);
-	}
-#endif
 }
 
 liengCalls*
@@ -621,7 +588,15 @@ private_init (liengEngine* self)
 	self->callbacks = lical_callbacks_new ();
 	if (self->callbacks == NULL)
 		return 0;
-	if (!lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_LOAD, lical_marshal_DATA_PTR_PTR) ||
+	if (!lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_FREE, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_MODEL_NEW, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_MODEL_FREE, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_NEW, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_FREE, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_REALIZE, lical_marshal_DATA_PTR_INT) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_TRANSFORM, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_LOAD, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_UNLOAD, lical_marshal_DATA_PTR_PTR))
 		return 0;
 
@@ -640,19 +615,6 @@ private_init (liengEngine* self)
 	if (self->physics == NULL)
 		return 0;
 	liphy_physics_set_transform_callback (self->physics, private_physics_transform);
-
-	/* Render. */
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->renderapi != NULL)
-	{
-		self->render = self->renderapi->lirnd_render_new (self->config.dir);
-		if (self->render == NULL)
-			return 0;
-		self->scene = self->renderapi->lirnd_scene_new (self->render);
-		if (self->scene == NULL)
-			return 0;
-	}
-#endif
 
 	/* Resources. */
 	self->resources = lieng_resources_new (self);

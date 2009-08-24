@@ -90,7 +90,7 @@ liext_preview_new (liwdgManager* manager,
 		return NULL;
 	data = LIEXT_PREVIEW (self);
 	data->module = module;
-	data->render = module->engine->render;
+	data->render = module->render;
 
 	/* Allocate scene. */
 	data->scene = lirnd_scene_new (data->render);
@@ -110,7 +110,7 @@ liext_preview_new (liwdgManager* manager,
 	}
 
 	/* Allocate generator. */
-	data->generator = ligen_generator_new (module->paths, data->scene, module->engine->renderapi);
+	data->generator = ligen_generator_new (module->paths, data->scene, &lirnd_render_api);
 	if (data->generator == NULL)
 	{
 		liwdg_widget_free (self);
@@ -217,12 +217,12 @@ liext_preview_insert_object (liextPreview*         self,
                              const limatTransform* transform,
                              const char*           model)
 {
-	liengModel* model_;
 	limatTransform t;
+	lirndModel* model_;
 	lirndObject* object;
 
 	/* Find model. */
-	model_ = lieng_engine_find_model_by_name (self->module->engine, model);
+	model_ = lirnd_render_find_model (self->module->render, model);
 	if (model_ == NULL)
 		return 0;
 
@@ -234,7 +234,7 @@ liext_preview_insert_object (liextPreview*         self,
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER));
 	t = limat_transform_multiply (t, *transform);
 	lirnd_object_set_transform (object, &t);
-	lirnd_object_set_model (object, model_->render, NULL);
+	lirnd_object_set_model (object, model_, NULL);
 	lirnd_object_set_realized (object, 1);
 
 	/* Add to dictionary. */

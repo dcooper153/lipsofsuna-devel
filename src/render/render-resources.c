@@ -54,9 +54,17 @@ lirnd_resources_new (lirndRender* render)
 		free (self);
 		return NULL;
 	}
+	self->models = lialg_strdic_new ();
+	if (self->models == NULL)
+	{
+		lialg_strdic_free (self->images);
+		free (self);
+		return NULL;
+	}
 	self->shaders = lialg_strdic_new ();
 	if (self->shaders == NULL)
 	{
+		lialg_strdic_free (self->models);
 		lialg_strdic_free (self->images);
 		free (self);
 		return NULL;
@@ -75,6 +83,7 @@ lirnd_resources_free (lirndResources* self)
 {
 	lialgStrdicIter iter;
 	lirndImage* image;
+	lirndModel* model;
 	lirndShader* shader;
 
 	/* Free shaders. */
@@ -86,6 +95,18 @@ lirnd_resources_free (lirndResources* self)
 			lirnd_shader_free (shader);
 		}
 		lialg_strdic_free (self->shaders);
+	}
+
+	/* Free models. */
+	if (self->models != NULL)
+	{
+		assert (self->models->size == 0);
+		LI_FOREACH_STRDIC (iter, self->models)
+		{
+			model = iter.value;
+			lirnd_model_free (model);
+		}
+		lialg_strdic_free (self->models);
 	}
 
 	/* Free images. */
@@ -118,6 +139,20 @@ lirnd_resources_find_image (lirndResources* self,
                             const char*     name)
 {
 	return lialg_strdic_find (self->images, name);
+}
+
+/**
+ * \brief Finds a model by name.
+ *
+ * \param self Resources.
+ * \param name Name.
+ * \return Model or NULL.
+ */
+lirndModel*
+lirnd_resources_find_model (lirndResources* self,
+                            const char*     name)
+{
+	return lialg_strdic_find (self->models, name);
 }
 
 /**
@@ -210,6 +245,53 @@ lirnd_resources_insert_image (lirndResources* self,
 	}
 
 	return image;
+}
+
+/**
+ * \brief Inserts a model to the resource list.
+ *
+ * \param self Resources.
+ * \param name Model name.
+ * \param model Model data.
+ * \return Model or NULL.
+ */
+lirndModel*
+lirnd_resources_insert_model (lirndResources* self,
+                              const char*     name,
+                              limdlModel*     model)
+{
+	lirndModel* model_;
+
+	model_ = lirnd_model_new (self->render, model);
+	if (model_ == NULL)
+		return NULL;
+	if (!lialg_strdic_insert (self->models, name, model_))
+	{
+		lirnd_model_free (model_);
+		return NULL;
+	}
+
+	return model_;
+}
+
+/**
+ * \brief Removes a model from the resource list.
+ *
+ * \param self Resources.
+ * \param name Model name.
+ */
+void
+lirnd_resources_remove_model (lirndResources* self,
+                              const char*     name)
+{
+	lirndModel* model;
+
+	model = lialg_strdic_find (self->models, name);
+	if (model != NULL)
+	{
+		lialg_strdic_remove (self->models, name);
+		lirnd_model_free (model);
+	}
 }
 
 int

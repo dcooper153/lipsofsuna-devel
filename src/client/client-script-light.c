@@ -73,7 +73,7 @@ Light_new (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_LIGHT);
 
 	/* Allocate light. */
-	light = lirnd_light_new (module->engine->scene, color, equation, M_PI, 0.0f, 0);
+	light = lirnd_light_new (module->scene, color, equation, M_PI, 0.0f, 0);
 	if (light == NULL)
 	{
 		lua_pushnil (lua);

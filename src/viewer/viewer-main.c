@@ -44,7 +44,8 @@ main (int argc, char** argv)
 	/* Execute program. */
 	if (argc < 2)
 	{
-		lisys_error_set (EINVAL, "no model name passed");
+		lisys_error_set (EINVAL, "no model name provided");
+		lisys_error_report ();
 		lipth_paths_free (paths);
 		return 1;
 	}

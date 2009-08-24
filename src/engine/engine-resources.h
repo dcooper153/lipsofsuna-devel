@@ -70,6 +70,9 @@ lieng_resources_new (liengEngine* engine);
 void
 lieng_resources_free (liengResources* self);
 
+void
+lieng_resources_clear (liengResources* self);
+
 liengAnimation*
 lieng_resources_find_animation_by_code (liengResources* self,
                                         int             id);

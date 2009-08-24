@@ -61,10 +61,10 @@ error:
 void
 lieng_model_free (liengModel* self)
 {
-#ifdef LIEND_ENABLE_RENDER
-	if (self->render != NULL)
-		self->engine->renderapi->lirnd_model_free (self->render);
-#endif
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_MODEL_FREE, self);
+
+	/* Free data. */
 	if (self->physics != NULL)
 		liphy_shape_free (self->physics);
 	if (self->model != NULL)
@@ -93,15 +93,8 @@ lieng_model_load (liengModel* self)
 	if (self->physics == NULL)
 		goto error;
 
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->engine->renderapi != NULL)
-	{
-		/* Create render model. */
-		self->render = self->engine->renderapi->lirnd_model_new (self->engine->render, self->model);
-		if (self->render == NULL)
-			goto error;
-	}
-#endif
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_MODEL_NEW, self);
 
 	return 1;
 
@@ -117,13 +110,9 @@ lieng_model_unload (liengModel* self)
 	if (self->invalid)
 		return;
 
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->render != NULL)
-	{
-		self->engine->renderapi->lirnd_model_free (self->render);
-		self->render = NULL;
-	}
-#endif
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_MODEL_FREE, self);
+
 	if (self->physics != NULL)
 	{
 		liphy_shape_free (self->physics);

@@ -27,12 +27,14 @@
 
 #include <image/lips-image.h>
 #include "render-image.h"
+#include "render-model.h"
 #include "render-shader.h"
 #include "render-types.h"
 
 struct _lirndResources
 {
 	lialgStrdic* images;
+	lialgStrdic* models;
 	lialgStrdic* shaders;
 	lirndRender* render;
 };
@@ -47,12 +49,25 @@ lirndImage*
 lirnd_resources_find_image (lirndResources* self,
                             const char*     name);
 
+lirndModel*
+lirnd_resources_find_model (lirndResources* self,
+                            const char*     name);
+
 lirndShader*
 lirnd_resources_find_shader (lirndResources* self,
                              const char*     name);
 
 lirndImage*
 lirnd_resources_insert_image (lirndResources* self,
+                              const char*     name);
+
+lirndModel*
+lirnd_resources_insert_model (lirndResources* self,
+                              const char*     name,
+                              limdlModel*     model);
+
+void
+lirnd_resources_remove_model (lirndResources* self,
                               const char*     name);
 
 int

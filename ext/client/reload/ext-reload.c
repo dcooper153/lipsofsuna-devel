@@ -197,16 +197,16 @@ static void
 private_reload_image (liextReload* self,
                       const char*  name)
 {
-	printf ("Reloading model `%s'\n", name);
-	lieng_engine_load_model (self->module->engine, name);
+	printf ("Reloading texture `%s'\n", name);
+	lirnd_render_load_image (self->module->render, name);
 }
 
 static void
 private_reload_model (liextReload* self,
                       const char*  name)
 {
-	printf ("Reloading texture `%s'\n", name);
-	lirnd_render_load_image (self->module->engine->render, name);
+	printf ("Reloading model `%s'\n", name);
+	lieng_engine_load_model (self->module->engine, name);
 }
 
 /** @} */

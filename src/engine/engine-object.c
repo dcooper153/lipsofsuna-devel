@@ -773,16 +773,6 @@ private_callback_new (liengEngine*     engine,
 	if (self->physics == NULL)
 		goto error;
 
-	/* Initialize graphics. */
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->engine->renderapi != NULL)
-	{
-		self->render = self->engine->renderapi->lirnd_object_new (engine->scene, self->id);
-		if (self->render == NULL)
-			goto error;
-	}
-#endif
-
 	/* Allocate pose buffer. */
 	self->pose = limdl_pose_new ();
 	if (self->pose == NULL)
@@ -795,6 +785,9 @@ private_callback_new (liengEngine*     engine,
 		lieng_object_set_animation (self, 0, "idle", -1, 0.0f);
 	}
 
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, self);
+
 	return self;
 
 error:
@@ -802,10 +795,6 @@ error:
 		limdl_pose_free (self->pose);
 	if (self->physics != NULL)
 		liphy_object_free (self->physics);
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->render != NULL)
-		self->engine->renderapi->lirnd_object_free (self->render);
-#endif
 	lialg_u32dic_remove (engine->objects, self->id);
 	free (self);
 	return NULL;
@@ -821,6 +810,9 @@ private_callback_free (liengObject* self)
 	if (self->sector != NULL)
 		lieng_object_set_realized (self, 0);
 	lieng_object_set_selected (self, 0);
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, self);
 
 	/* Free constraints. */
 	/* FIXME: Would be better to have objects remember their own constraints. */
@@ -849,10 +841,6 @@ private_callback_free (liengObject* self)
 
 	/* Free all memory. */
 	liphy_object_free (self->physics);
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->engine->renderapi != NULL)
-		self->engine->renderapi->lirnd_object_free (self->render);
-#endif
 	free (self);
 }
 
@@ -903,29 +891,23 @@ static int
 private_callback_set_model (liengObject* self,
                             liengModel*  model)
 {
-//	lirnd_render_remove_object (self->engine->render, self->render);
+	/* Switch model. */
 	if (model != NULL)
 	{
 		limdl_pose_set_model (self->pose, model->model);
-#ifndef LIENG_DISABLE_GRAPHICS
-		if (self->engine->renderapi != NULL)
-			self->engine->renderapi->lirnd_object_set_model (self->render, model->render, self->pose);
-#endif
 		liphy_object_set_shape (self->physics, model->physics,
 			liphy_object_get_shape_mode (self->physics));
 	}
 	else
 	{
 		limdl_pose_set_model (self->pose, NULL);
-#ifndef LIENG_DISABLE_GRAPHICS
-		if (self->engine->renderapi != NULL)
-			self->engine->renderapi->lirnd_object_set_model (self->render, NULL, NULL);
-#endif
 		liphy_object_set_shape (self->physics, NULL,
 			liphy_object_get_shape_mode (self->physics));
 	}
 	self->model = model;
-//	lirnd_render_insert_object (self->engine->render, self->render);
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, self, model);
 
 	return 1;
 }
@@ -944,12 +926,6 @@ private_callback_set_realized (liengObject* self,
 		if (!liphy_object_set_realized (self->physics, 1))
 			return 0;
 
-		/* Activate graphics. */
-#ifndef LIENG_DISABLE_GRAPHICS
-		if (self->render != NULL)
-			self->engine->renderapi->lirnd_object_set_realized (self->render, 1);
-#endif
-
 		/* Link to map. */
 		lieng_object_get_transform (self, &transform);
 		if (!private_warp (self, &transform.position))
@@ -958,19 +934,19 @@ private_callback_set_realized (liengObject* self,
 			return 0;
 		}
 
+		/* Invoke callbacks. */
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_REALIZE, self, 1);
+
 		/* Protect from deletion. */
 		lieng_object_ref (self, 1);
 	}
 	else
 	{
+		/* Invoke callbacks. */
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_REALIZE, self, 0);
+
 		/* Deactivate physics. */
 		liphy_object_set_realized (self->physics, 0);
-
-		/* Deactivate graphics. */
-#ifndef LIENG_DISABLE_GRAPHICS
-		if (self->render != NULL)
-			self->engine->renderapi->lirnd_object_set_realized (self->render, 0);
-#endif
 
 		/* Remove from map. */
 		lieng_sector_remove_object (self->sector, self);
@@ -988,12 +964,11 @@ private_callback_set_transform (liengObject*          self,
                                 const limatTransform* value)
 {
 	liphy_object_set_transform (self->physics, value);
-#ifndef LIENG_DISABLE_GRAPHICS
-	if (self->engine->renderapi != NULL)
-		self->engine->renderapi->lirnd_object_set_transform (self->render, value);
-#endif
 	if (lieng_object_get_realized (self))
 		private_warp (self, &value->position);
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, value);
 
 	return 1;
 }

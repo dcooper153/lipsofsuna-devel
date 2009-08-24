@@ -666,7 +666,7 @@ private_init_engine (licliModule* self)
 	liengCalls* calls;
 
 	/* Initialize engine. */
-	self->engine = lieng_engine_new (self->paths->module_data, &lirnd_render_api);
+	self->engine = lieng_engine_new (self->paths->module_data);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);
@@ -688,11 +688,20 @@ private_init_engine (licliModule* self)
 		return 0;
 	if (!licli_module_init_callbacks_binding (self) ||
 	    !licli_module_init_callbacks_misc (self) ||
-	    !licli_module_init_callbacks_widget (self))
+	    !licli_module_init_callbacks_widget (self) ||
+	    !licli_render_init (self))
+		return 0;
+
+	/* Initialize graphics. */
+	self->render = lirnd_render_new (self->paths->module_data);
+	if (self->render == NULL)
+		return 0;
+	self->scene = lirnd_scene_new (self->render);
+	if (self->scene == NULL)
 		return 0;
 
 	/* Initialize voxels. */
-	self->voxels = livox_manager_new (self->engine->physics, self->engine->scene, self->engine->renderapi);
+	self->voxels = livox_manager_new (self->engine->physics, self->scene, &lirnd_render_api);
 	if (self->voxels == NULL)
 		return 0;
 

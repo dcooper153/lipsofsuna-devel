@@ -123,8 +123,12 @@ lirnd_object_set_realized (lirndObject* self,
                            int          value);
 
 void
+lirnd_object_get_transform (lirndObject*    self,
+                            limatTransform* value);
+
+void
 lirnd_object_set_transform (lirndObject*          self,
-                            const limatTransform* transform);
+                            const limatTransform* value);
 
 void*
 lirnd_object_get_userdata (const lirndObject* self);

@@ -88,8 +88,8 @@ lirndImage*
 lirnd_render_find_image (lirndRender* self,
                          const char*  name);
 
-int
-lirnd_render_load_model (lirndRender* self,
+lirndModel*
+lirnd_render_find_model (lirndRender* self,
                          const char*  name);
 
 int

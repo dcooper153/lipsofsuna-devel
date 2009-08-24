@@ -29,20 +29,14 @@
 #define ROTATION_SPEED 0.01f
 
 static int
-private_init_camera (livieViewer* self);
-
-static int
-private_init_engine (livieViewer* self);
+private_init (livieViewer* self);
 
 static int
 private_init_model (livieViewer* self,
                     const char*  model);
 
-static int
-private_init_reload (livieViewer* self);
-
-static int
-private_init_video (livieViewer* self);
+static void
+private_clear_model (livieViewer* self);
 
 static void
 private_reload_image (livieViewer* self,
@@ -73,30 +67,31 @@ livie_viewer_new (lividCalls* video,
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
-		lisys_error_report ();
 		return NULL;
 	}
 	self->video = *video;
 	self->paths = paths;
+	self->file = strdup (model);
+	if (self->file == NULL)
+	{
+		lisys_error_set (ENOMEM, NULL);
+		free (self);
+		return NULL;
+	}
 
 	/* Initialize SDL. */
 	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		lisys_error_report ();
 		free (self);
 		return NULL;
 	}
 
 	/* Initialize subsystems. */
-	if (!private_init_video (self) ||
-	    !private_init_engine (self) ||
-	    !private_init_reload (self) ||
-	    !private_init_camera (self) ||
+	if (!private_init (self) ||
 	    !private_init_model (self, model))
 	{
 		livie_viewer_free (self);
-		lisys_error_report ();
 		return NULL;
 	}
 	snprintf (buf, 256, "%s - Lips of Suna Model Viewer", model);
@@ -108,25 +103,29 @@ livie_viewer_new (lividCalls* video,
 void
 livie_viewer_free (livieViewer* self)
 {
+	private_clear_model (self);
 	if (self->lights.key != NULL)
 	{
-		lirnd_lighting_remove_light (self->engine->scene->lighting, self->lights.key);
+		lirnd_lighting_remove_light (self->scene->lighting, self->lights.key);
 		lirnd_light_free (self->lights.key);
 	}
 	if (self->lights.fill != NULL)
 	{
-		lirnd_lighting_remove_light (self->engine->scene->lighting, self->lights.fill);
+		lirnd_lighting_remove_light (self->scene->lighting, self->lights.fill);
 		lirnd_light_free (self->lights.fill);
 	}
 	if (self->reload != NULL)
 		lirel_reload_free (self->reload);
 	if (self->camera != NULL)
-		lieng_camera_free (self->camera);
-	if (self->engine != NULL)
-		lieng_engine_free (self->engine);
+		limat_camera_free (self->camera);
+	if (self->scene != NULL)
+		lirnd_scene_free (self->scene);
+	if (self->render != NULL)
+		lirnd_render_free (self->render);
 	if (self->screen != NULL)
 		self->video.SDL_FreeSurface (self->screen);
 	self->video.SDL_Quit ();
+	free (self->file);
 	free (self);
 }
 
@@ -162,26 +161,26 @@ livie_viewer_main (livieViewer* self)
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_s)
 					{
-						lirnd_render_set_shaders_enabled (self->engine->render,
-							!lirnd_render_get_shaders_enabled (self->engine->render));
+						lirnd_render_set_shaders_enabled (self->render,
+							!lirnd_render_get_shaders_enabled (self->render));
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == 4)
-						lieng_camera_zoom (self->camera, -ZOOM_SPEED);
+						limat_camera_zoom (self->camera, -ZOOM_SPEED);
 					else if (event.button.button == 5)
-						lieng_camera_zoom (self->camera, ZOOM_SPEED);
+						limat_camera_zoom (self->camera, ZOOM_SPEED);
 					break;
 				case SDL_MOUSEMOTION:
 					if (SDL_GetMouseState (NULL, NULL))
 					{
-						lieng_camera_turn (self->camera, ROTATION_SPEED * -event.motion.xrel);
-						lieng_camera_tilt (self->camera, ROTATION_SPEED * -event.motion.yrel);
+						limat_camera_turn (self->camera, ROTATION_SPEED * -event.motion.xrel);
+						limat_camera_tilt (self->camera, ROTATION_SPEED * -event.motion.yrel);
 					}
 					break;
 				case SDL_VIDEORESIZE:
 					private_resize (self, event.resize.w, event.resize.h, self->mode.fsaa);
-					lieng_camera_set_viewport (self->camera, 0, 0, event.resize.w, event.resize.h);
+					limat_camera_set_viewport (self->camera, 0, 0, event.resize.w, event.resize.h);
 					glViewport (0, 0, event.resize.w, event.resize.h);
 					break;
 			}
@@ -191,29 +190,29 @@ livie_viewer_main (livieViewer* self)
 		lirel_reload_update (self->reload);
 
 		/* Update camera. */
-		lieng_object_get_bounds (self->object, &aabb);
-		lieng_object_get_transform (self->object, &transform);
+		lirnd_object_get_bounds (self->object, &aabb);
+		lirnd_object_get_transform (self->object, &transform);
 		transform.position = limat_vector_add (transform.position,
 			limat_vector_multiply (limat_vector_add (aabb.min, aabb.max), 0.5f));
-		lieng_camera_set_center (self->camera, &transform);
-		lieng_camera_update (self->camera, secs);
-		lieng_camera_warp (self->camera);
+		limat_camera_set_center (self->camera, &transform);
+		limat_camera_update (self->camera, secs);
+		limat_camera_warp (self->camera);
 
 		/* Update lights. */
-		lieng_camera_get_transform (self->camera, &transform);
+		limat_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
 		lirnd_light_set_transform (self->lights.key, &transform);
-		lieng_camera_get_transform (self->camera, &transform);
+		limat_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
 		lirnd_light_set_transform (self->lights.fill, &transform);
 
 		/* Render scene. */
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		lieng_camera_get_frustum (self->camera, &frustum);
-		lieng_camera_get_modelview (self->camera, &modelview);
-		lieng_camera_get_projection (self->camera, &projection);
-		lirnd_scene_render (self->engine->scene, &modelview, &projection, &frustum);
+		limat_camera_get_frustum (self->camera, &frustum);
+		limat_camera_get_modelview (self->camera, &modelview);
+		limat_camera_get_projection (self->camera, &projection);
+		lirnd_scene_render (self->scene, &modelview, &projection, &frustum);
 		self->video.SDL_GL_SwapBuffers ();
 		self->video.SDL_Delay (100);
 	}
@@ -224,79 +223,46 @@ livie_viewer_main (livieViewer* self)
 /*****************************************************************************/
 
 static int
-private_init_camera (livieViewer* self)
+private_init (livieViewer* self)
 {
 	GLint viewport[4];
-
-	self->camera = lieng_camera_new (self->engine);
-	if (self->camera == NULL)
-		return 0;
-	glGetIntegerv (GL_VIEWPORT, viewport);
-	lieng_camera_set_driver (self->camera, LIENG_CAMERA_DRIVER_THIRDPERSON);
-	lieng_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
-	lieng_camera_set_clip (self->camera, 0);
-	lieng_object_set_realized (self->camera->object, 1);
-
-	return 1;
-}
-
-static int
-private_init_engine (livieViewer* self)
-{
-	int flags;
 	const float equation[3] = { 1.0f, 0.0f, 0.001f };
 	const float diffuse0[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
 	const float diffuse1[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
-	/* Allocate engine. */
-	self->engine = lieng_engine_new (self->paths->module_data, &lirnd_render_api);
-	if (self->engine == NULL)
+	/* Create main window. */
+	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
+	    private_resize (self, 1024, 768, 0) == 0)
 		return 0;
-	flags = lieng_engine_get_flags (self->engine);
-	lieng_engine_set_flags (self->engine, flags | LIENG_FLAG_REMOTE_SECTORS);
-	lieng_engine_set_userdata (self->engine, LIENG_DATA_CLIENT, self);
-	if (!lieng_engine_load_resources (self->engine, NULL))
+	livid_features_init ();
+
+	/* Allocate camera. */
+	self->camera = limat_camera_new ();
+	if (self->camera == NULL)
+		return 0;
+	glGetIntegerv (GL_VIEWPORT, viewport);
+	limat_camera_set_driver (self->camera, LIMAT_CAMERA_THIRDPERSON);
+	limat_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
+
+	/* Allocate scene. */
+	self->render = lirnd_render_new (self->paths->module_data);
+	if (self->render == NULL)
+		return 0;
+	self->scene = lirnd_scene_new (self->render);
+	if (self->scene == NULL)
 		return 0;
 
 	/* Allocate lights. */
-	self->lights.key = lirnd_light_new (self->engine->scene, diffuse0, equation, M_PI, 0.0f, 0);
+	self->lights.key = lirnd_light_new (self->scene, diffuse0, equation, M_PI, 0.0f, 0);
 	if (self->lights.key == NULL)
 		return 0;
-	lirnd_lighting_insert_light (self->engine->scene->lighting, self->lights.key);
-	self->lights.fill = lirnd_light_new (self->engine->scene, diffuse1, equation, M_PI, 0.0f, 0);
+	lirnd_lighting_insert_light (self->scene->lighting, self->lights.key);
+	self->lights.fill = lirnd_light_new (self->scene, diffuse1, equation, M_PI, 0.0f, 0);
 	if (self->lights.fill == NULL)
 		return 0;
-	lirnd_lighting_insert_light (self->engine->scene->lighting, self->lights.fill);
+	lirnd_lighting_insert_light (self->scene->lighting, self->lights.fill);
 
-	return 1;
-}
-
-static int
-private_init_model (livieViewer* self,
-                    const char*  model)
-{
-	liengModel* mdl;
-
-	self->object = lieng_object_new (self->engine, NULL,
-		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_STATIC, 0, NULL);
-	if (self->object == NULL)
-		return 0;
-	mdl = lieng_engine_find_model_by_name (self->engine, model);
-	if (mdl == NULL)
-	{
-		lisys_error_set (EINVAL, "Cannot find model `%s'", model);
-		lisys_error_report ();
-		return 1;
-	}
-	lieng_object_set_model (self->object, mdl);
-	lieng_object_set_realized (self->object, 1);
-
-	return 1;
-}
-
-static int
-private_init_reload (livieViewer* self)
-{
+	/* Initialize reloading. */
 	self->reload = lirel_reload_new (self->paths);
 	if (self->reload == NULL)
 		return 0;
@@ -309,31 +275,84 @@ private_init_reload (livieViewer* self)
 }
 
 static int
-private_init_video (livieViewer* self)
+private_init_model (livieViewer* self,
+                    const char*  model)
 {
-	/* Create the window. */
-	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
-	    private_resize (self, 1024, 768, 0) == 0)
+	char* path;
+	limdlModel* mdl;
+
+	/* Format path. */
+	path = lisys_path_format (self->paths->module_data,
+		LISYS_PATH_SEPARATOR, "graphics",
+		LISYS_PATH_SEPARATOR, model, ".lmdl", NULL);
+	if (path == NULL)
 		return 0;
-	livid_features_init ();
+
+	/* Load model. */
+	mdl = limdl_model_new_from_file (path);
+	free (path);
+	if (mdl == NULL)
+	{
+		lisys_error_set (EINVAL, "Cannot open model `%s'", model);
+		lisys_error_report ();
+		return 1;
+	}
+	self->model = lirnd_model_new (self->render, mdl);
+	if (self->model == NULL)
+	{
+		limdl_model_free (mdl);
+		return 0;
+	}
+
+	/* Create object. */
+	self->object = lirnd_object_new (self->scene, 0);
+	if (self->object == NULL)
+	{
+		lirnd_model_free (self->model);
+		limdl_model_free (mdl);
+		return 0;
+	}
+	lirnd_object_set_model (self->object, self->model, NULL);
+	lirnd_object_set_realized (self->object, 1);
 
 	return 1;
+}
+
+static void
+private_clear_model (livieViewer* self)
+{
+	if (self->object != NULL)
+	{
+		lirnd_object_free (self->object);
+		self->object = NULL;
+	}
+	if (self->model != NULL)
+	{
+		limdl_model_free (self->model->model);
+		lirnd_model_free (self->model);
+		self->model = NULL;
+	}
 }
 
 static void
 private_reload_image (livieViewer* self,
                       const char*  name)
 {
-	printf ("Reloading model `%s'\n", name);
-	lieng_engine_load_model (self->engine, name);
+	printf ("Reloading texture `%s'\n", name);
+	if (lirnd_render_find_image (self->render, name))
+		lirnd_render_load_image (self->render, name);
 }
 
 static void
 private_reload_model (livieViewer* self,
                       const char*  name)
 {
-	printf ("Reloading texture `%s'\n", name);
-	lirnd_render_load_image (self->engine->render, name);
+	printf ("Reloading model `%s'\n", name);
+	if (!strcmp (name, self->file))
+	{
+		private_clear_model (self);
+		private_init_model (self, name);
+	}
 }
 
 static int

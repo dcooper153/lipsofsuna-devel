@@ -35,6 +35,7 @@ private_render (liwdgRender* self,
 	limatMatrix modelview;
 	limatMatrix projection;
 	lirndContext context;
+	lirndObject* object;
 	liwdgRect rect;
 
 	module = data;
@@ -52,14 +53,15 @@ private_render (liwdgRender* self,
 		lieng_camera_get_frustum (module->camera, &frustum);
 		lieng_camera_get_modelview (module->camera, &modelview);
 		lieng_camera_get_projection (module->camera, &projection);
-		lirnd_context_init (&context, module->engine->scene);
+		lirnd_context_init (&context, module->scene);
 		lirnd_context_set_modelview (&context, &modelview);
 		lirnd_context_set_projection (&context, &projection);
 		lirnd_context_set_frustum (&context, &frustum);
 		LIENG_FOREACH_SELECTION (iter, module->engine)
 		{
-			if (iter.object->render != NULL)
-				lirnd_draw_bounds (&context, iter.object->render, NULL);
+			object = lirnd_scene_find_object (module->scene, iter.object->id);
+			if (object != NULL)
+				lirnd_draw_bounds (&context, object, NULL);
 		}
 		lirnd_context_unbind (&context);
 
@@ -122,7 +124,7 @@ Scene_new (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_SCENE);
 
 	/* Allocate widget. */
-	widget = liwdg_render_new (module->widgets, module->engine->scene);
+	widget = liwdg_render_new (module->widgets, module->scene);
 	if (widget == NULL)
 	{
 		lua_pushnil (lua);

@@ -35,7 +35,7 @@
 
 struct _lirndScene
 {
-	lialgPtrdic* objects;
+	lialgU32dic* objects;
 	liparManager* particles;
 	lirndRender* render;
 	lirndLighting* lighting;
@@ -50,6 +50,10 @@ lirnd_scene_new (lirndRender* render);
 
 void
 lirnd_scene_free (lirndScene* self);
+
+lirndObject*
+lirnd_scene_find_object (lirndScene* self,
+                         int         id);
 
 liparPoint*
 lirnd_scene_insert_particle (lirndScene*        self,

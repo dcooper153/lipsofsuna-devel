@@ -33,9 +33,11 @@
 /* Object number ranges. */
 
 #define LINET_RANGE_SERVER_START 0x00000000
-#define LINET_RANGE_SERVER_END   0x0000EFFF
-#define LINET_RANGE_CLIENT_START 0x0000FFFF
-#define LINET_RANGE_CLIENT_END   0xFFFFFFFF
+#define LINET_RANGE_SERVER_END   0x0FFFFFFF
+#define LINET_RANGE_CLIENT_START 0x10000000
+#define LINET_RANGE_CLIENT_END   0x1FFFFFFF
+#define LINET_RANGE_RENDER_START 0x20000000
+#define LINET_RANGE_RENDER_END   0x2FFFFFFF
 
 /****************************************************************************/
 /* Network commands. */

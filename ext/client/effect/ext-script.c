@@ -59,7 +59,7 @@ Effect_particle (lua_State* lua)
 	pos = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
 	vel = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
 
-	point = lirnd_scene_insert_particle (module->module->engine->scene, pos->data, vel->data);
+	point = lirnd_scene_insert_particle (module->module->scene, pos->data, vel->data);
 	if (point != NULL)
 	{
 		point->time_fade = 0.0f;
@@ -97,7 +97,7 @@ Effect_ray (lua_State* lua)
 
 	/* FIXME */
 	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-	line = lipar_manager_insert_line (module->module->engine->scene->particles, src->data, dst->data, &tmp, &tmp);
+	line = lipar_manager_insert_line (module->module->scene->particles, src->data, dst->data, &tmp, &tmp);
 	if (line != NULL)
 	{
 		line->time_fade[0] = line->time_fade[1] = 0.0f;
@@ -138,7 +138,7 @@ Effect_system (lua_State* lua)
 			0.1*(rand()/(0.5*RAND_MAX)-1.0),
 			0.1*(rand()/(3.0*RAND_MAX)+3.0),
 			0.1*(rand()/(0.5*RAND_MAX)-1.0));
-		particle = lirnd_scene_insert_particle (module->module->engine->scene, &position, &velocity);
+		particle = lirnd_scene_insert_particle (module->module->scene, &position, &velocity);
 		if (particle != NULL)
 		{
 			particle->time_life = 2.0f;

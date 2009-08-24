@@ -156,7 +156,21 @@ lirnd_render_find_image (lirndRender* self,
 }
 
 /**
- * \brief Forces the engine to reload a texture image.
+ * \brief Finds a model by name.
+ *
+ * \param self Renderer.
+ * \param name Model name.
+ * \return Model.
+ */
+lirndModel*
+lirnd_render_find_model (lirndRender* self,
+                         const char*  name)
+{
+	return lirnd_resources_find_model (self->resources, name);
+}
+
+/**
+ * \brief Forces the renderer to reload a texture image.
  *
  * Reloads the requested texture and updates any materials that reference it
  * to point to the new texture. Any other references to the texture become
@@ -173,7 +187,7 @@ lirnd_render_load_image (lirndRender* self,
 	int i;
 	int j;
 	lialgPtrdicIter iter0;
-	lialgPtrdicIter iter1;
+	lialgU32dicIter iter1;
 	liimgTexture* imgtexture;
 	lirndImage* rndimage;
 	lirndObject* object;
@@ -202,7 +216,7 @@ lirnd_render_load_image (lirndRender* self,
 	LI_FOREACH_PTRDIC (iter0, self->scenes)
 	{
 		scene = iter0.value;
-		LI_FOREACH_PTRDIC (iter1, scene->objects)
+		LI_FOREACH_U32DIC (iter1, scene->objects)
 		{
 			object = iter1.value;
 			if (object->model == NULL)

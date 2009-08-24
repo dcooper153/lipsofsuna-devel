@@ -62,7 +62,7 @@ lirnd_scene_new (lirndRender* render)
 		goto error;
 
 	/* Allocate object list. */
-	self->objects = lialg_ptrdic_new ();
+	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
 		goto error;
 
@@ -97,13 +97,20 @@ lirnd_scene_free (lirndScene* self)
 	if (self->objects != NULL)
 	{
 		assert (self->objects->size == 0);
-		lialg_ptrdic_free (self->objects);
+		lialg_u32dic_free (self->objects);
 	}
 
 	/* Unregister self. */
 	lialg_ptrdic_remove (self->render->scenes, self);
 
 	free (self);
+}
+
+lirndObject*
+lirnd_scene_find_object (lirndScene* self,
+                         int         id)
+{
+	return lialg_u32dic_find (self->objects, id);
 }
 
 /**
@@ -299,11 +306,11 @@ void
 lirnd_scene_update (lirndScene* self,
                     float       secs)
 {
-	lialgPtrdicIter iter;
+	lialgU32dicIter iter;
 	lirndObject* object;
 
 	/* Update objects. */
-	LI_FOREACH_PTRDIC (iter, self->objects)
+	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
 		lirnd_object_update (object, secs);
@@ -452,10 +459,10 @@ private_render (lirndScene*   self,
                 lirndCallback call,
                 void*         data)
 {
-	lialgPtrdicIter iter;
+	lialgU32dicIter iter;
 	lirndObject* object;
 
-	LI_FOREACH_PTRDIC (iter, self->objects)
+	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
 		call (context, object, data);

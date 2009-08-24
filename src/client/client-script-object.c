@@ -44,6 +44,8 @@
 static int
 Object_emit_particles (lua_State* lua)
 {
+#warning Object_emit_particles is disabled
+#if 0
 	liscrData* object;
 	liengObject* data;
 
@@ -52,7 +54,8 @@ Object_emit_particles (lua_State* lua)
 
 	if (data->render != NULL)
 		lirnd_object_emit_particles (data->render);
-	return 1;
+#endif
+	return 0;
 }
 
 /* @luadoc
@@ -74,8 +77,7 @@ Object_say (lua_State* lua)
 	msg = luaL_checkstring (lua, 2);
 	data = LIENG_OBJECT (object->data);
 
-	if (data->render != NULL)
-		licli_object_set_speech (data, msg);
+	licli_object_set_speech (data, msg);
 	return 1;
 }
 

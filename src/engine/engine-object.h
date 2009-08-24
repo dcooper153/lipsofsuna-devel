@@ -35,9 +35,6 @@
 #ifndef LIENG_DISABLE_SCRIPT
 #include <script/lips-script.h>
 #endif
-#ifndef LIENG_DISABLE_GRAPHICS
-#include <render/lips-render.h>
-#endif
 
 #define LIENG_OBJECT(o) ((liengObject*)(o))
 
@@ -54,9 +51,6 @@ struct _liengObject
 	liphyObject* physics;
 #ifndef LIENG_DISABLE_SCRIPTS
 	liscrData* script;
-#endif
-#ifndef LIENG_DISABLE_GRAPHICS
-	lirndObject* render;
 #endif
 };
 

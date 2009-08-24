@@ -38,12 +38,6 @@
 #include "engine-sector.h"
 #include "engine-types.h"
 
-#ifndef LIENG_DISABLE_GRAPHICS
-#include <render/lips-render.h>
-#else
-#define lirndApi void
-#endif
-
 /*****************************************************************************/
 
 typedef struct _liengCalls liengCalls;
@@ -73,11 +67,6 @@ struct _liengEngine
 	liengConstraint* constraints;
 	liengResources* resources;
 	liphyPhysics* physics;
-#ifndef LIENG_DISABLE_GRAPHICS
-	lirndApi* renderapi;
-	lirndRender* render;
-	lirndScene* scene;
-#endif
 	struct
 	{
 		int flags;
@@ -92,8 +81,7 @@ struct _liengEngine
 };
 
 liengEngine*
-lieng_engine_new (const char* path,
-                  lirndApi*   api);
+lieng_engine_new (const char* path);
 
 void
 lieng_engine_free (liengEngine* self);

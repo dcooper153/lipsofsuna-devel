@@ -162,24 +162,24 @@ private_fsaa (liextOptions* self)
 static void
 private_global_shadows (liextOptions* self)
 {
-	lirnd_render_set_global_shadows (self->module->engine->render,
+	lirnd_render_set_global_shadows (self->module->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_global_shadows)));
 }
 
 static void
 private_local_shadows (liextOptions* self)
 {
-	lirnd_render_set_local_shadows (self->module->engine->render,
+	lirnd_render_set_local_shadows (self->module->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_local_shadows)));
 }
 
 static void
 private_shaders (liextOptions* self)
 {
-	lirnd_render_set_shaders_enabled (self->module->engine->render,
+	lirnd_render_set_shaders_enabled (self->module->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_shaders)));
 	liwdg_check_set_active (LIWDG_CHECK (self->check_shaders),
-		lirnd_render_get_shaders_enabled (self->module->engine->render));
+		lirnd_render_get_shaders_enabled (self->module->render));
 }
 
 /** @} */

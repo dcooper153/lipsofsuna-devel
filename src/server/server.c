@@ -466,7 +466,7 @@ private_init_engine (lisrvServer* self)
 	liengSample* sample;
 
 	/* Create engine. */
-	self->engine = lieng_engine_new (self->paths->module_data, NULL);
+	self->engine = lieng_engine_new (self->paths->module_data);
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);

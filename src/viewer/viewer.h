@@ -25,23 +25,26 @@
 #ifndef __VIEWER_H__
 #define __VIEWER_H__
 
-#include <SDL/SDL.h>
-#include <engine/lips-engine.h>
+#include <math/lips-math.h>
 #include <paths/lips-paths.h>
 #include <reload/lips-reload.h>
+#include <render/lips-render.h>
 #include <system/lips-system.h>
 #include <video/lips-video.h>
 
 typedef struct _livieViewer livieViewer;
 struct _livieViewer
 {
-	SDL_Surface* screen;
-	liengCamera* camera;
-	liengEngine* engine;
-	liengObject* object;
+	char* file;
+	limatCamera* camera;
 	lipthPaths* paths;
 	lirelReload* reload;
+	lirndModel* model;
+	lirndObject* object;
+	lirndRender* render;
+	lirndScene* scene;
 	lividCalls video;
+	SDL_Surface* screen;
 	struct
 	{
 		lirndLight* key;

@@ -31,7 +31,7 @@
 
 enum
 {
-	LICLI_CALLBACK_EVENT, /* (data, event) */
+	LICLI_CALLBACK_EVENT = 32, /* (data, event) */
 	LICLI_CALLBACK_PACKET, /* (data, type, packet) */
 	LICLI_CALLBACK_SELECT, /* (data, selection) */
 	LICLI_CALLBACK_TICK, /* (data, secs) */
@@ -41,6 +41,7 @@ enum
 int licli_module_init_callbacks_binding (licliModule* self);
 int licli_module_init_callbacks_misc (licliModule* self);
 int licli_module_init_callbacks_widget (licliModule* self);
+int licli_render_init (licliModule* self);
 
 #endif
 
