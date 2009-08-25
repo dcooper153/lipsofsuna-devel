@@ -43,25 +43,25 @@ private_client_client_login (lisrvServer* server,
 	if (path == NULL)
 	{
 		grapple_server_disconnect_client (self->network.server, message->NEW_USER.id);
-		free (pass);
+		lisys_free (pass);
 		return 1;
 	}
 
 	/* Parse the account file. */
 	account = licfg_account_new (path);
-	free (path);
+	lisys_free (path);
 	if (account == NULL)
 	{
 		if (lisys_error_peek () != EIO)
 		{
 			grapple_server_disconnect_client (self->network.server, message->NEW_USER.id);
-			free (pass);
+			lisys_free (pass);
 			return 1;
 		}
 		if (!self->config.server->enable_create_account)
 		{
 			grapple_server_disconnect_client (self->network.server, message->NEW_USER.id);
-			free (pass);
+			lisys_free (pass);
 			return 1;
 		}
 	}

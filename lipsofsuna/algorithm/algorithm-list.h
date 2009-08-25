@@ -25,8 +25,7 @@
 #ifndef __ALGORITHM_LIST_H__
 #define __ALGORITHM_LIST_H__
 
-#include <stddef.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 
 /**
  * \brief A doubly linked list class.
@@ -63,7 +62,7 @@ lialg_list_free (lialgList* self)
 	for (tmp = self ; tmp != NULL ; tmp = next)
 	{
 		next = tmp->next;
-		free (tmp);
+		lisys_free (tmp);
 	}
 }
 
@@ -114,7 +113,7 @@ lialg_list_append (lialgList** self,
 	lialgList* tmp;
 	lialgList* last;
 
-	tmp = (lialgList*) malloc (sizeof (lialgList));
+	tmp = (lialgList*) lisys_malloc (sizeof (lialgList));
 	if (tmp == NULL)
 		return 0;
 	if (*self != NULL)
@@ -179,7 +178,7 @@ lialg_list_prepend (lialgList** self,
 {
 	lialgList* tmp;
 
-	tmp = (lialgList*) malloc (sizeof (lialgList));
+	tmp = (lialgList*) lisys_malloc (sizeof (lialgList));
 	if (tmp == NULL)
 		return 0;
 	tmp->prev = NULL;
@@ -229,7 +228,7 @@ lialg_list_prepend_sorted (lialgList**      self,
 	lialgList* ptr;
 
 	/* Allocate memory. */
-	tmp = (lialgList*) malloc (sizeof (lialgList));
+	tmp = (lialgList*) lisys_malloc (sizeof (lialgList));
 	if (tmp == NULL)
 		return 0;
 	tmp->data = data;
@@ -303,7 +302,7 @@ lialg_list_remove (lialgList** self,
 		node->next->prev = node->prev;
 	if (*self == node)
 		*self = node->next;
-	free (node);
+	lisys_free (node);
 }
 
 /** @} */

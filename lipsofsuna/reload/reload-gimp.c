@@ -22,9 +22,6 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <image/lips-image.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
@@ -69,24 +66,24 @@ lirel_reload_gimp (lirelReload* self,
 	/* Format script. */
 	len0 = strlen (src);
 	len1 = strlen (tmp);
-	script = calloc (2 * len0 + 2 * len1 + strlen (format) + 9, sizeof (char));
+	script = lisys_calloc (2 * len0 + 2 * len1 + strlen (format) + 9, sizeof (char));
 	if (script == NULL)
 	{
-		free (tmp);
+		lisys_free (tmp);
 		return 0;
 	}
 	sprintf (script, format, src, src, tmp, tmp);
 
 	/* Convert to PNG. */
 	ret = lisys_execvl ("gimp", "gimp", "--no-interface", "--no-data", "-b", script, NULL);
-	free (script);
+	lisys_free (script);
 
 	/* Convert to DDS. */
 	image = liimg_image_new_from_file (tmp);
 	if (image == NULL)
 	{
 		remove (tmp);
-		free (tmp);
+		lisys_free (tmp);
 		return 0;
 	}
 	if (!liimg_image_save_s3tc (image, dst) &&
@@ -96,7 +93,7 @@ lirel_reload_gimp (lirelReload* self,
 	}
 	liimg_image_free (image);
 	remove (tmp);
-	free (tmp);
+	lisys_free (tmp);
 
 	return ret;
 }

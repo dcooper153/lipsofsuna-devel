@@ -33,14 +33,14 @@ lieng_model_new (liengEngine* engine,
 	liengModel* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liengModel));
+	self = lisys_calloc (1, sizeof (liengModel));
 	if (self == NULL)
 		return NULL;
 	self->id = id;
 	self->engine = engine;
 
 	/* Allocate name. */
-	self->name = strdup (name);
+	self->name = listr_dup (name);
 	if (self->name == NULL)
 		goto error;
 
@@ -69,9 +69,9 @@ lieng_model_free (liengModel* self)
 		liphy_shape_free (self->physics);
 	if (self->model != NULL)
 		limdl_model_free (self->model);
-	free (self->path);
-	free (self->name);
-	free (self);
+	lisys_free (self->path);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 int

@@ -24,8 +24,6 @@
 
 #ifndef LI_DISABLE_SOUND
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include <system/lips-system.h>
@@ -55,18 +53,15 @@ lisnd_sample_new (lisndSystem* system,
 	OggVorbis_File vorbis;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisndSample));
+	self = lisys_calloc (1, sizeof (lisndSample));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Allocate a buffer. */
 	alGenBuffers (1, &self->buffer);
 	if (alGetError() != AL_NO_ERROR)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -89,10 +84,9 @@ lisnd_sample_new (lisndSystem* system,
 	pos = 0;
 
 	/* Allocate the output buffer. */
-	buffer = malloc (len);
+	buffer = lisys_malloc (len);
 	if (buffer == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisnd_sample_free (self);
 		ov_clear (&vorbis);
 		return NULL;
@@ -115,7 +109,7 @@ lisnd_sample_new (lisndSystem* system,
 	else
 		alBufferData (self->buffer, AL_FORMAT_STEREO16, buffer, len, freq);
 	ov_clear (&vorbis);
-	free (buffer);
+	lisys_free (buffer);
 
 	return self;
 }
@@ -129,7 +123,7 @@ void
 lisnd_sample_free (lisndSample* self)
 {
 	alDeleteBuffers (1, &self->buffer);
-	free (self);
+	lisys_free (self);
 }
 
 #endif

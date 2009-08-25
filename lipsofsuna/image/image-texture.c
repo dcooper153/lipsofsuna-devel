@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <system/lips-system.h>
 #include "image-compress.h"
 #include "image-dds.h"
@@ -39,12 +37,9 @@ liimg_texture_new ()
 {
 	liimgTexture* self;
 
-	self = calloc (1, sizeof (liimgTexture));
+	self = lisys_calloc (1, sizeof (liimgTexture));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	return self;
 }
@@ -82,7 +77,7 @@ liimg_texture_free (liimgTexture* self)
 {
 	if (self->texture)
 		glDeleteTextures (1, &self->texture);
-	free (self);
+	lisys_free (self);
 }
 
 /**

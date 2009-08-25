@@ -22,9 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "config-host.h"
@@ -45,7 +42,7 @@ licfg_host_new (const char* dir)
 	licfgHost* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licfgHost));
+	self = lisys_calloc (1, sizeof (licfgHost));
 	if (self == NULL)
 		return NULL;
                                 
@@ -53,12 +50,11 @@ licfg_host_new (const char* dir)
 	path = lisys_path_concat (dir, "config", "host.def", NULL);
 	if (path == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		licfg_host_free (self);
 		return NULL;
 	}
 	reader = li_reader_new_from_file (path);
-	free (path);
+	lisys_free (path);
 	if (reader == NULL)
 	{
 		licfg_host_free (self);
@@ -77,12 +73,12 @@ licfg_host_new (const char* dir)
 		lisys_error_set (EINVAL, "excepted host field");
 		li_reader_free (reader);
 		licfg_host_free (self);
-		free (key);
-		free (value);
+		lisys_free (key);
+		lisys_free (value);
 		return NULL;
 	}
 	self->host = value;
-	free (key);
+	lisys_free (key);
 
 	/* Read the port. */
 	if (!li_reader_get_key_value_pair (reader, &key, &value))
@@ -96,13 +92,13 @@ licfg_host_new (const char* dir)
 		lisys_error_set (EINVAL, "expected port field");
 		li_reader_free (reader);
 		licfg_host_free (self);
-		free (key);
-		free (value);
+		lisys_free (key);
+		lisys_free (value);
 		return NULL;
 	}
 	self->port = atoi (value);
-	free (key);
-	free (value);
+	lisys_free (key);
+	lisys_free (value);
 
 	/* Read the protocol. */
 	if (!li_reader_get_key_value_pair (reader, &key, &value))
@@ -116,8 +112,8 @@ licfg_host_new (const char* dir)
 		lisys_error_set (EINVAL, "expected protocol field");
 		li_reader_free (reader);
 		licfg_host_free (self);
-		free (key);
-		free (value);
+		lisys_free (key);
+		lisys_free (value);
 		return NULL;
 	}
 	if (!strcmp (value, "udp"))
@@ -129,12 +125,12 @@ licfg_host_new (const char* dir)
 		lisys_error_set (EINVAL, "unknown protocol");
 		li_reader_free (reader);
 		licfg_host_free (self);
-		free (key);
-		free (value);
+		lisys_free (key);
+		lisys_free (value);
 		return NULL;
 	}
-	free (key);
-	free (value);
+	lisys_free (key);
+	lisys_free (value);
 
 	li_reader_free (reader);
 	return self;
@@ -148,8 +144,8 @@ licfg_host_new (const char* dir)
 void
 licfg_host_free (licfgHost* self)
 {
-	free (self->host);
-	free (self);
+	lisys_free (self->host);
+	lisys_free (self);
 }
 
 /** @} */

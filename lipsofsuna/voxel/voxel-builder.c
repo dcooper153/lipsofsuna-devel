@@ -86,12 +86,9 @@ livox_builder_new (livoxSector* sector)
 	livoxBuilder* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livoxBuilder));
+	self = lisys_calloc (1, sizeof (livoxBuilder));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->sector = sector;
 
 	/* Allocate rendering specific. */
@@ -132,7 +129,7 @@ livox_builder_free (livoxBuilder* self)
 			for (normal = iter.value ; normal != NULL ; normal = normal_next)
 			{
 				normal_next = normal->next;
-				free (normal);
+				lisys_free (normal);
 			}
 		}
 		lialg_memdic_free (self->helpers.normals);
@@ -142,15 +139,15 @@ livox_builder_free (livoxBuilder* self)
 		LI_FOREACH_U32DIC (iter1, self->helpers.materials)
 		{
 			faces = iter1.value;
-			free (faces->vertices.array);
-			free (faces);
+			lisys_free (faces->vertices.array);
+			lisys_free (faces);
 		}
 		lialg_u32dic_free (self->helpers.materials);
 	}
 	if (self->helpers.shape != NULL)
 		liphy_shape_free (self->helpers.shape);
-	free (self->vertices.array);
-	free (self);
+	lisys_free (self->vertices.array);
+	lisys_free (self);
 }
 
 int
@@ -243,13 +240,13 @@ livox_builder_get_render (livoxBuilder* self)
 	/* Allocate arrays. */
 	render = self->sector->manager->renderapi;
 	count = self->helpers.materials->size;
-	buffers = calloc (count, sizeof (lirndBuffer));
+	buffers = lisys_calloc (count, sizeof (lirndBuffer));
 	if (buffers == NULL)
 		return NULL;
-	materials = calloc (count, sizeof (lirndMaterial*));
+	materials = lisys_calloc (count, sizeof (lirndMaterial*));
 	if (materials == NULL)
 	{
-		free (buffers);
+		lisys_free (buffers);
 		return NULL;
 	}
 
@@ -287,8 +284,8 @@ error:
 		render->lirnd_material_free (materials[i]);
 		render->lirnd_buffer_free (buffers + i);
 	}
-	free (materials);
-	free (buffers);
+	lisys_free (materials);
+	lisys_free (buffers);
 
 	return NULL;
 }
@@ -504,13 +501,13 @@ private_insert_triangle (livoxBuilder* self,
 	/* Create new material. */
 	if (faces == NULL)
 	{
-		faces = calloc (1, sizeof (livoxFaces));
+		faces = lisys_calloc (1, sizeof (livoxFaces));
 		if (faces == NULL)
 			return 0;
 		faces->material = id;
 		if (!lialg_u32dic_insert (self->helpers.materials, id, faces))
 		{
-			free (faces);
+			lisys_free (faces);
 			return 0;
 		}
 	}
@@ -600,7 +597,7 @@ private_insert_vertices (livoxBuilder* self,
 				lookup0 = lialg_memdic_find (self->helpers.normals, &coord, sizeof (limatVector));
 				if (lookup0 != NULL)
 				{
-					lookup1 = malloc (sizeof (livoxBuilderNormal));
+					lookup1 = lisys_malloc (sizeof (livoxBuilderNormal));
 					if (lookup1 == NULL)
 						continue;
 					lookup1->next = lookup0->next;
@@ -609,13 +606,13 @@ private_insert_vertices (livoxBuilder* self,
 				}
 				else
 				{
-					lookup1 = malloc (sizeof (livoxBuilderNormal));
+					lookup1 = lisys_malloc (sizeof (livoxBuilderNormal));
 					if (lookup1 == NULL)
 						continue;
 					lookup1->next = NULL;
 					lookup1->normal = normal;
 					if (!lialg_memdic_insert (self->helpers.normals, &coord, sizeof (limatVector), lookup1))
-						free (lookup1);
+						lisys_free (lookup1);
 				}
 			}
 		}

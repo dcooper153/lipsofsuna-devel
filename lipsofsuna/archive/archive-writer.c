@@ -22,11 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 #include <zlib.h>
+#include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "archive-writer.h"
 
@@ -70,20 +67,16 @@ liarc_writer_new ()
 {
 	liarcWriter* self;
 
-	self = calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (liarcWriter));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->close = private_memory_close;
 	self->write = private_memory_write;
 	self->memory.capacity = DEFAULT_BUFFER_SIZE;
-	self->memory.buffer = malloc (self->memory.capacity);
+	self->memory.buffer = lisys_malloc (self->memory.capacity);
 	if (self->memory.buffer == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->memory.buffer[0] = '\0';
@@ -96,12 +89,9 @@ liarc_writer_new_file (const char* path)
 {
 	liarcWriter* self;
 
-	self = calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (liarcWriter));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->close = private_file_close;
 	self->write = private_file_write;
 	self->file.pointer = fopen (path, "wb");
@@ -119,12 +109,9 @@ liarc_writer_new_gzip (const char* path)
 {
 	liarcWriter* self;
 
-	self = calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (liarcWriter));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->close = private_gzip_close;
 	self->write = private_gzip_write;
 	self->gzip.pointer = gzopen (path, "wb9");
@@ -148,20 +135,16 @@ liarc_writer_new_packet (int type)
 {
 	liarcWriter* self;
 
-	self = calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (liarcWriter));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->close = private_memory_close;
 	self->write = private_memory_write;
 	self->memory.capacity = DEFAULT_BUFFER_SIZE;
-	self->memory.buffer = malloc (self->memory.capacity);
+	self->memory.buffer = lisys_malloc (self->memory.capacity);
 	if (self->memory.buffer == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->memory.buffer[0] = type;
@@ -179,7 +162,7 @@ void
 liarc_writer_free (liarcWriter* self)
 {
 	self->close (self);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -241,7 +224,7 @@ liarc_writer_append_format (liarcWriter* self,
 	va_list args;
 
 	size = FORMAT_BUFFER_SIZE;
-	tmp = malloc (size);
+	tmp = lisys_malloc (size);
 	if (tmp == NULL)
 	{
 		self->error = 1;
@@ -258,7 +241,7 @@ liarc_writer_append_format (liarcWriter* self,
 			ret = self->write (self, tmp, num);
 			break;
 		}
-		tmp1 = realloc (tmp, (size <<= 1));
+		tmp1 = lisys_realloc (tmp, (size <<= 1));
 		if (tmp1 == NULL)
 		{
 			ret = 0;
@@ -266,7 +249,7 @@ liarc_writer_append_format (liarcWriter* self,
 		}
 		tmp = tmp1;
 	}
-	free (tmp);
+	lisys_free (tmp);
 
 	return ret;
 }
@@ -297,7 +280,7 @@ liarc_writer_append_formatv (liarcWriter* self,
 	char* tmp1;
 
 	size = FORMAT_BUFFER_SIZE;
-	tmp = malloc (size);
+	tmp = lisys_malloc (size);
 	if (tmp == NULL)
 	{
 		self->error = 1;
@@ -311,7 +294,7 @@ liarc_writer_append_formatv (liarcWriter* self,
 			ret = self->write (self, tmp, num);
 			break;
 		}
-		tmp1 = realloc (tmp, (size <<= 1));
+		tmp1 = lisys_realloc (tmp, (size <<= 1));
 		if (tmp1 == NULL)
 		{
 			ret = 0;
@@ -319,7 +302,7 @@ liarc_writer_append_formatv (liarcWriter* self,
 		}
 		tmp = tmp1;
 	}
-	free (tmp);
+	lisys_free (tmp);
 
 	return ret;
 }
@@ -580,7 +563,7 @@ liarc_writer_clear (liarcWriter* self)
 	/* Resize the buffer. */
 	if (self->memory.capacity > CLEAR_BUFFER_SIZE)
 	{
-		tmp = realloc (self->memory.buffer, CLEAR_BUFFER_SIZE);
+		tmp = lisys_realloc (self->memory.buffer, CLEAR_BUFFER_SIZE);
 		if (tmp != NULL)
 		{
 			self->memory.buffer = tmp;
@@ -703,7 +686,7 @@ private_gzip_write (liarcWriter* self,
 static void
 private_memory_close (liarcWriter* self)
 {
-	free (self->memory.buffer);
+	lisys_free (self->memory.buffer);
 }
 
 static int
@@ -718,7 +701,7 @@ private_memory_write (liarcWriter* self,
 	if (self->memory.length + size > self->memory.capacity)
 	{
 		for (cap = self->memory.capacity ; cap < self->memory.length + size ; cap <<= 1);
-		tmp = realloc (self->memory.buffer, cap);
+		tmp = lisys_realloc (self->memory.buffer, cap);
 		if (tmp == NULL)
 		{
 			self->error = 1;

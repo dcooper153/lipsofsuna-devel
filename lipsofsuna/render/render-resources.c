@@ -22,9 +22,6 @@
  * @{
  */
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "render-resources.h"
@@ -41,24 +38,21 @@ lirnd_resources_new (lirndRender* render)
 	lirndResources* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndResources));
+	self = lisys_calloc (1, sizeof (lirndResources));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->render = render;
 	self->images = lialg_strdic_new ();
 	if (self->images == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->models = lialg_strdic_new ();
 	if (self->models == NULL)
 	{
 		lialg_strdic_free (self->images);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->shaders = lialg_strdic_new ();
@@ -66,7 +60,7 @@ lirnd_resources_new (lirndRender* render)
 	{
 		lialg_strdic_free (self->models);
 		lialg_strdic_free (self->images);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -117,14 +111,14 @@ lirnd_resources_free (lirndResources* self)
 			image = iter.value;
 			if (image->texture != NULL)
 				liimg_texture_free (image->texture);
-			free (image->name);
-			free (image->path);
-			free (image);
+			lisys_free (image->name);
+			lisys_free (image->path);
+			lisys_free (image);
 		}
 		lialg_strdic_free (self->images);
 	}
 
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -181,7 +175,7 @@ lirnd_resources_find_shader (lirndResources* self,
 	if (path == NULL)
 		return NULL;
 	shader = lirnd_shader_new_from_file (self->render, path);
-	free (path);
+	lisys_free (path);
 
 	/* Try fallback. */
 	if (shader == NULL)
@@ -190,10 +184,9 @@ lirnd_resources_find_shader (lirndResources* self,
 		return NULL;
 
 	/* Insert to dictionary. */
-	shader->name = strdup (name);
+	shader->name = listr_dup (name);
 	if (shader->name == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lirnd_shader_free (shader);
 		return NULL;
 	}
@@ -219,28 +212,24 @@ lirnd_resources_insert_image (lirndResources* self,
 {
 	lirndImage* image;
 
-	image = calloc (1, sizeof (lirndImage));
+	image = lisys_calloc (1, sizeof (lirndImage));
 	if (image == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
-	image->name = strdup (name);
+	image->name = listr_dup (name);
 	image->path = lisys_path_format (self->render->config.dir,
 		LISYS_PATH_SEPARATOR, "graphics",
 		LISYS_PATH_SEPARATOR, name, ".dds", NULL);
 	if (image->name == NULL || image->path == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (image->name);
-		free (image);
+		lisys_free (image->name);
+		lisys_free (image);
 		return NULL;
 	}
 	if (!lialg_strdic_insert (self->images, name, image))
 	{
-		free (image->name);
-		free (image->path);
-		free (image);
+		lisys_free (image->name);
+		lisys_free (image->path);
+		lisys_free (image);
 		return NULL;
 	}
 

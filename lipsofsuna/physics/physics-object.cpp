@@ -84,7 +84,7 @@ liphy_object_new (liphyPhysics*    physics,
 	btVector3 position (0.0f, 0.0f, 0.0f);
 	btQuaternion orientation (0.0f, 0.0f, 0.0f, 1.0f);
 
-	self = (liphyObject*) calloc (1, sizeof (liphyObject));
+	self = (liphyObject*) lisys_calloc (1, sizeof (liphyObject));
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
@@ -120,7 +120,7 @@ liphy_object_free (liphyObject* self)
 	self->flags &= ~PRIVATE_REALIZED;
 	private_update_state (self);
 	delete self->motion;
-	free (self);
+	lisys_free (self);
 }
 
 /**

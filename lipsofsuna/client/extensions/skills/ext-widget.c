@@ -72,10 +72,10 @@ liext_skill_widget_set_skill (liextSkillWidget* self,
 {
 	char* tmp;
 
-	tmp = strdup (name);
+	tmp = listr_dup (name);
 	if (tmp == NULL)
 		return 0;
-	free (self->skill);
+	lisys_free (self->skill);
 	self->skill = tmp;
 	self->object = object;
 
@@ -130,7 +130,7 @@ error:
 static void
 private_free (liextSkillWidget* self)
 {
-	free (self->skill);
+	lisys_free (self->skill);
 }
 
 static int

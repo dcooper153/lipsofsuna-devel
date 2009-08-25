@@ -37,9 +37,9 @@ limdl_faces_free (limdlFaces* self)
 	int i;
 
 	for (i = 0 ; i < self->weights.count ; i++)
-		free (self->weights.array[i].weights);
-	free (self->vertices.array);
-	free (self->weights.array);
+		lisys_free (self->weights.array[i].weights);
+	lisys_free (self->vertices.array);
+	lisys_free (self->weights.array);
 }
 
 int
@@ -60,12 +60,9 @@ limdl_faces_read (limdlFaces* self,
 	/* Read vertices. */
 	if (count)
 	{
-		self->vertices.array = calloc (count, sizeof (limdlVertex));
+		self->vertices.array = lisys_calloc (count, sizeof (limdlVertex));
 		if (self->vertices.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 		self->vertices.count = count;
 		for (i = 0 ; i < count ; i++)
 		{
@@ -89,12 +86,9 @@ limdl_faces_read (limdlFaces* self,
 	/* Read weights. */
 	if (count)
 	{
-		self->weights.array = calloc (count, sizeof (limdlWeights));
+		self->weights.array = lisys_calloc (count, sizeof (limdlWeights));
 		if (self->weights.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 		self->weights.count = count;
 		for (i = 0 ; i < self->weights.count ; i++)
 		{
@@ -176,18 +170,15 @@ private_read_weights (limdlFaces*  self,
 
 	/* Allocate weights. */
 	weights->count = count;
-	weights->weights = calloc (count, sizeof (limdlWeight));
+	weights->weights = lisys_calloc (count, sizeof (limdlWeight));
 	if (weights->weights == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	/* Read weights. */
 	for (i = 0 ; i < count ; i++)
 	{
 		if (!li_reader_get_uint32 (reader, &group) ||
-			!li_reader_get_float (reader, &weights->weights[i].weight))
+		    !li_reader_get_float (reader, &weights->weights[i].weight))
 			return 0;
 		weights->weights[i].group = group;
 	}

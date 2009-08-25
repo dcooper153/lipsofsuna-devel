@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "render-draw.h"
 #include "render-light.h"
 
@@ -54,12 +53,9 @@ lirnd_light_new (lirndScene*  scene,
 	lirndLight* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndLight));
+	self = lisys_calloc (1, sizeof (lirndLight));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->scene = scene;
 	self->ambient[0] = 0.0f;
 	self->ambient[1] = 0.0f;
@@ -186,7 +182,7 @@ void lirnd_light_free (lirndLight* self)
 	if (GLEW_EXT_framebuffer_object)
 		glDeleteFramebuffersEXT (1, &self->shadow.fbo);
 	glDeleteTextures (1, &self->shadow.map);
-	free (self);
+	lisys_free (self);
 }
 
 /**

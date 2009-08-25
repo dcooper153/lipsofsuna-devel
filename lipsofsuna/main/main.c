@@ -22,10 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <string/lips-string.h>
 #include <system/lips-system.h>
 
 enum
@@ -136,16 +133,13 @@ private_exec_program (const char* name,
 #ifdef LI_RELATIVE_PATHS
 	tmp = lisys_relative_exedir ();
 	if (tmp == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	path = lisys_path_format (tmp,
 		LISYS_PATH_SEPARATOR, "bin",
 		LISYS_PATH_SEPARATOR, name, LISYS_EXTENSION_EXE, NULL);
 	if (path == NULL)
 	{
-		free (tmp);
+		lisys_free (tmp);
 		return 0;
 	}
 #else
@@ -167,16 +161,16 @@ private_exec_program (const char* name,
 	if (val != NULL)
 	{
 		if (putenv (val))
-			free (val);
+			lisys_free (val);
 	}
 #endif
 
 	/* Execute the program. */
 	printf ("EXEC %s %s %s %s\n", path, path, module, extra);
 	ret = lisys_execvl (path, path, module, extra, NULL);
-	free (path);
+	lisys_free (path);
 #ifdef LI_RELATIVE_PATHS
-	free (tmp);
+	lisys_free (tmp);
 #endif
 	if (!ret)
 		return 0;

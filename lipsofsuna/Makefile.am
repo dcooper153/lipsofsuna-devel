@@ -434,6 +434,7 @@ sys_HEADERS = \
 	system/system-error.h \
 	system/system-file.h \
 	system/system-execute.h \
+	system/system-memory.h \
 	system/system-misc.h \
 	system/system-module.h \
 	system/system-notify.h \
@@ -447,6 +448,7 @@ syssrc = \
 	system/system-error.c \
 	system/system-file.c \
 	system/system-execute.c \
+	system/system-memory.c \
 	system/system-misc.c \
 	system/system-module.c \
 	system/system-notify.c \
@@ -571,6 +573,7 @@ lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
 lipsofsuna_SOURCES = $(maisrc) \
 	system/system-error.c \
 	system/system-execute.c \
+	system/system-memory.c \
 	system/system-path.c \
 	system/system-relative.c
 

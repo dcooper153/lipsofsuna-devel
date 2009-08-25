@@ -22,9 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "widget-group.h"
@@ -81,7 +78,7 @@ liwdg_manager_new (lividCalls* video,
 	liwdgManager* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liwdgManager));
+	self = lisys_calloc (1, sizeof (liwdgManager));
 	if (self == NULL)
 		return NULL;
 	self->width = 640;
@@ -110,7 +107,7 @@ liwdg_manager_free (liwdgManager* self)
 
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -157,7 +154,6 @@ liwdg_manager_alloc_widgets (liwdgManager* self,
 				liwdg_widget_free (ptr);
 		}
 		va_end (args);
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
 	}
 

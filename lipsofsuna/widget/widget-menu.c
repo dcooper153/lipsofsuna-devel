@@ -286,7 +286,7 @@ private_proxy_new (liwdgMenu*      self,
 	liwdgMenuProxy* proxy;
 
 	/* Allocate proxy. */
-	proxy = calloc (1, sizeof (liwdgMenuProxy));
+	proxy = lisys_calloc (1, sizeof (liwdgMenuProxy));
 	if (proxy == NULL)
 		return NULL;
 
@@ -294,7 +294,7 @@ private_proxy_new (liwdgMenu*      self,
 	proxy->label = lifnt_layout_new ();
 	if (proxy->label == NULL)
 	{
-		free (proxy);
+		lisys_free (proxy);
 		return NULL;
 	}
 	if (self->font != NULL)
@@ -304,7 +304,7 @@ private_proxy_new (liwdgMenu*      self,
 	if (!lialg_list_prepend (&proxy->items, item))
 	{
 		lifnt_layout_free (proxy->label);
-		free (proxy);
+		lisys_free (proxy);
 		return NULL;
 	}
 
@@ -318,7 +318,7 @@ private_proxy_free (liwdgMenu*      self,
 	lialg_list_free (proxy->items);
 	lialg_list_free (proxy->proxies);
 	lifnt_layout_free (proxy->label);
-	free (proxy);
+	lisys_free (proxy);
 }
 
 static liwdgMenuProxy*

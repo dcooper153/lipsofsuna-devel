@@ -629,26 +629,26 @@ liwdg_group_set_size (liwdgGroup* self,
 	/* Allocate memory. */
 	if (width > 0)
 	{
-		mem0 = (liwdgGroupCol*) calloc (width, sizeof (liwdgGroupCol));
+		mem0 = (liwdgGroupCol*) lisys_calloc (width, sizeof (liwdgGroupCol));
 		if (mem0 == NULL)
 			return 0;
 	}
 	if (height > 0)
 	{
-		mem1 = (liwdgGroupRow*) calloc (height, sizeof (liwdgGroupRow));
+		mem1 = (liwdgGroupRow*) lisys_calloc (height, sizeof (liwdgGroupRow));
 		if (mem1 == NULL)
 		{
-			free (mem0);
+			lisys_free (mem0);
 			return 0;
 		}
 	}
 	if (width > 0 && height > 0)
 	{
-		mem2 = (liwdgGroupCell*) calloc (width * height, sizeof (liwdgGroupCell));
+		mem2 = (liwdgGroupCell*) lisys_calloc (width * height, sizeof (liwdgGroupCell));
 		if (mem2 == NULL)
 		{
-			free (mem0);
-			free (mem1);
+			lisys_free (mem0);
+			lisys_free (mem1);
 			return 0;
 		}
 	}
@@ -658,7 +658,7 @@ liwdg_group_set_size (liwdgGroup* self,
 		memcpy (mem0, self->cols, self->width * sizeof (liwdgGroupCol));
 	else
 		memcpy (mem0, self->cols, width * sizeof (liwdgGroupCol));
-	free (self->cols);
+	lisys_free (self->cols);
 	self->cols = mem0;
 
 	/* Copy over the row data. */
@@ -666,7 +666,7 @@ liwdg_group_set_size (liwdgGroup* self,
 		memcpy (mem1, self->rows, self->height * sizeof (liwdgGroupRow));
 	else
 		memcpy (mem1, self->rows, height * sizeof (liwdgGroupRow));
-	free (self->rows);
+	lisys_free (self->rows);
 	self->rows = mem1;
 
 	/* Copy over the cell data. */
@@ -677,7 +677,7 @@ liwdg_group_set_size (liwdgGroup* self,
 			mem2[x + y * width].child = self->cells[x + y * self->width].child;
 		}
 	}
-	free (self->cells);
+	lisys_free (self->cells);
 	self->cells = mem2;
 	self->width = width;
 	self->height = height;
@@ -792,9 +792,9 @@ private_free (liwdgGroup* self)
 			liwdg_widget_free (self->cells[i].child);
 	}
 
-	free (self->cols);
-	free (self->rows);
-	free (self->cells);
+	lisys_free (self->cols);
+	lisys_free (self->rows);
+	lisys_free (self->cells);
 }
 
 static int

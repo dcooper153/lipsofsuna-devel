@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <system/lips-system.h>
 #include "voxel.h"
 #include "voxel-block.h"
 #include "voxel-manager.h"
@@ -53,7 +52,7 @@ livox_block_free (livoxBlock*   self,
 		case LIVOX_BLOCK_TYPE_FULL:
 			break;
 		case LIVOX_BLOCK_TYPE_TILES:
-			free (self->tiles);
+			lisys_free (self->tiles);
 			break;
 	}
 }
@@ -320,7 +319,7 @@ livox_block_optimize (livoxBlock* self)
 			if (self->tiles->tiles[i] != tile)
 				return;
 		}
-		free (self->tiles);
+		lisys_free (self->tiles);
 		self->full.terrain = tile;
 		self->type = LIVOX_BLOCK_TYPE_FULL;
 	}
@@ -525,7 +524,7 @@ livox_block_set_voxel (livoxBlock* self,
 			tmp = self->full.terrain;
 			if (tmp == terrain)
 				return 0;
-			tiles = calloc (1, sizeof (livoxBlockTiles));
+			tiles = lisys_calloc (1, sizeof (livoxBlockTiles));
 			if (tiles == NULL)
 				return 0;
 			for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)

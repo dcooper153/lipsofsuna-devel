@@ -25,8 +25,7 @@
 #ifndef __ALGORITHM_PTRDIC_H__
 #define __ALGORITHM_PTRDIC_H__
 
-#include <assert.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "algorithm-bst.h"
 
 typedef struct _lialgPtrdic lialgPtrdic;
@@ -81,15 +80,15 @@ lialg_ptrdic_new ()
 {
 	lialgPtrdic* self;
 
-	self = (lialgPtrdic*) malloc (sizeof (lialgPtrdic));
+	self = (lialgPtrdic*) lisys_malloc (sizeof (lialgPtrdic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_ptrdic_node_compare, malloc, free);
+	self->tree = lialg_bst_new ((lialgBstCompare) lialg_ptrdic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	return self;
@@ -103,10 +102,10 @@ lialg_ptrdic_new ()
 static inline void
 lialg_ptrdic_free (lialgPtrdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) free);
+	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -117,7 +116,7 @@ lialg_ptrdic_free (lialgPtrdic* self)
 static inline void
 lialg_ptrdic_clear (lialgPtrdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) free);
+	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -186,7 +185,7 @@ lialg_ptrdic_insert (lialgPtrdic* self,
 	lialgPtrdicNode* node;
 
 	/* Create node. */
-	node = (lialgPtrdicNode*) malloc (sizeof (lialgPtrdicNode));
+	node = (lialgPtrdicNode*) lisys_malloc (sizeof (lialgPtrdicNode));
 	if (node == NULL)
 		return NULL;
 	node->key = key;
@@ -239,7 +238,7 @@ lialg_ptrdic_remove (lialgPtrdic* self,
 		self->list = anode->next;
 	if (anode->next != NULL)
 		anode->next->prev = anode->prev;
-	free (anode);
+	lisys_free (anode);
 	self->size--;
 	return 0;
 }
@@ -261,7 +260,7 @@ lialg_ptrdic_remove_node (lialgPtrdic*     self,
 	if (node->next != NULL)
 		node->next->prev = node->prev;
 	lialg_bst_unlink (self->tree, &node->node);
-	free (node);
+	lisys_free (node);
 	self->size--;
 }
 

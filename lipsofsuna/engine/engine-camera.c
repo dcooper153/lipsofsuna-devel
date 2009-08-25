@@ -22,9 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <system/lips-system.h>
 #include "engine-camera.h"
 
 #define LIENG_CAMERA_DEFAULT_FOV (M_PI / 5.0f)
@@ -81,7 +79,7 @@ lieng_camera_new (liengEngine* engine)
 	liengCamera* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liengCamera));
+	self = lisys_calloc (1, sizeof (liengCamera));
 	if (self == NULL)
 		return NULL;
 	self->engine = engine;
@@ -128,7 +126,7 @@ lieng_camera_free (liengCamera* self)
 		lieng_object_free (self->object);
 	if (self->shape != NULL)
 		liphy_shape_free (self->shape);
-	free (self);
+	lisys_free (self);
 }
 
 /**

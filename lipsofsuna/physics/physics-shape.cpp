@@ -88,12 +88,9 @@ liphy_shape_new (liphyPhysics*     physics,
 {
 	liphyShape* self;
 
-	self = (liphyShape*) calloc (1, sizeof (liphyShape));
+	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->model = model;
 	try
 	{
@@ -127,12 +124,9 @@ liphy_shape_new_aabb (liphyPhysics*    physics,
 {
 	liphyShape* self;
 
-	self = (liphyShape*) calloc (1, sizeof (liphyShape));
+	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	try
 	{
 		self->physics = physics;
@@ -167,12 +161,9 @@ liphy_shape_new_concave (liphyPhysics*      physics,
 {
 	liphyShape* self;
 
-	self = (liphyShape*) calloc (1, sizeof (liphyShape));
+	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	try
 	{
 		self->physics = physics;
@@ -207,12 +198,9 @@ liphy_shape_new_convex (liphyPhysics*      physics,
 {
 	liphyShape* self;
 
-	self = (liphyShape*) calloc (1, sizeof (liphyShape));
+	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	try
 	{
 		self->physics = physics;
@@ -250,9 +238,9 @@ liphy_shape_free (liphyShape* self)
 		delete self->shapes.convex;
 	if (self->mesh != NULL)
 		delete self->mesh;
-	free (self->indices.array);
-	free (self->vertices.array);
-	free (self);
+	lisys_free (self->indices.array);
+	lisys_free (self->vertices.array);
+	lisys_free (self);
 }
 
 /**
@@ -438,23 +426,17 @@ private_init_concave (liphyShape*       self,
 	/* Allocate indices. */
 	/* FIXME: Pretty pointless to have something like this. */
 	self->indices.count = count;
-	self->indices.array = (int*) calloc (self->indices.count, sizeof (int));
+	self->indices.array = (int*) lisys_calloc (self->indices.count, sizeof (int));
 	if (self->indices.array == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	for (i = 0 ; i < self->indices.count ; i++)
 		self->indices.array[i] = i;
 
 	/* Allocate vertices. */
 	self->vertices.count = count;
-	self->vertices.array = (btScalar*) calloc (4 * self->vertices.count, sizeof (btScalar));
+	self->vertices.array = (btScalar*) lisys_calloc (4 * self->vertices.count, sizeof (btScalar));
 	if (self->vertices.array == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	for (i = 0 ; i < self->vertices.count ; i++)
 	{
 		self->vertices.array[4 * i + 0] = vertices[i].x;
@@ -517,23 +499,17 @@ private_init_model (liphyShape*       self,
 	/* Allocate indices. */
 	/* FIXME: Pretty pointless to have something like this. */
 	self->indices.count = count;
-	self->indices.array = (int*) calloc (self->indices.count, sizeof (int));
+	self->indices.array = (int*) lisys_calloc (self->indices.count, sizeof (int));
 	if (self->indices.array == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	for (i = 0 ; i < self->indices.count ; i++)
 		self->indices.array[i] = i;
 
 	/* Allocate vertices. */
 	self->vertices.count = count;
-	self->vertices.array = (btScalar*) calloc (4 * self->vertices.count, sizeof (btScalar));
+	self->vertices.array = (btScalar*) lisys_calloc (4 * self->vertices.count, sizeof (btScalar));
 	if (self->vertices.array == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	for (i = j = 0 ; j < model->facegroups.count ; j++)
 	{
 		group = model->facegroups.array + j;

@@ -22,22 +22,8 @@
  * @{
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#ifdef HAVE_SYS_MMAN_H
-#include <sys/mman.h>
-#endif
-#ifdef HAVE_WINDOWS_H
-#include <windows.h>
-#endif
-#include "string-reader.h"
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 
 /**
  * \brief Creates a new stream reader.
@@ -52,12 +38,9 @@ li_reader_new (const char* buffer,
 {
 	liReader* self;
 
-	self = malloc (sizeof (liReader));
+	self = lisys_malloc (sizeof (liReader));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->pos = 0;
 	self->mmap = NULL;
 	self->length = length;
@@ -78,19 +61,16 @@ li_reader_new_from_file (const char* path)
 	liReader* self;
 
 	/* Allocate self. */
-	self = malloc (sizeof (liReader));
+	self = lisys_malloc (sizeof (liReader));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->pos = 0;
 
 	/* Memory map the file. */
 	self->mmap = lisys_mmap_open (path);
 	if (self->mmap == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->length = lisys_mmap_get_size (self->mmap);
@@ -109,12 +89,9 @@ liReader* li_reader_new_from_string (const char* buffer)
 {
 	liReader* self;
 
-	self = malloc (sizeof (liReader));
+	self = lisys_malloc (sizeof (liReader));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->pos = 0;
 	self->mmap = NULL;
 	self->length = strlen (buffer) + 1;
@@ -131,7 +108,7 @@ void li_reader_free (liReader* self)
 {
 	if (self->mmap != NULL)
 		lisys_mmap_free (self->mmap);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -224,11 +201,11 @@ li_reader_check_text (liReader*   self,
 	/* Compare to the expected value. */
 	if (strcmp (str, data))
 	{
-		free (str);
+		lisys_free (str);
 		self->pos = tmp;
 		return 0;
 	}
-	free (str);
+	lisys_free (str);
 	return 1;
 }
 
@@ -262,16 +239,16 @@ li_reader_check_key_value_pair (liReader*   self,
 	if (strchr (k, '\n'))
 	{
 		self->pos = tmp;
-		free (k);
+		lisys_free (k);
 		return 0;
 	}
 	if (strcmp (key, k))
 	{
 		self->pos = tmp;
-		free (k);
+		lisys_free (k);
 		return 0;
 	}
-	free (k);
+	lisys_free (k);
 
 	/* Avoid overwriting error. */
 	li_reader_skip_chars (self, " \t");
@@ -290,10 +267,10 @@ li_reader_check_key_value_pair (liReader*   self,
 	if (strcmp (value, v))
 	{
 		self->pos = tmp;
-		free (v);
+		lisys_free (v);
 		return 0;
 	}
-	free (v);
+	lisys_free (v);
 
 	return 1;
 }
@@ -639,12 +616,9 @@ li_reader_get_text (liReader*   self,
 	}
 
 	/* Allocate a string. */
-	string = malloc (tmp + 1);
+	string = lisys_malloc (tmp + 1);
 	if (string == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	strncpy (string, self->buffer + self->pos, tmp);
 	string[tmp] = '\0';
 	self->pos += tmp + 1;
@@ -910,7 +884,7 @@ li_reader_get_key_value_pair (liReader* self,
 	}
 	if (strchr (*key, '\n'))
 	{
-		free (*key);
+		lisys_free (*key);
 		*key = NULL;
 		*value = NULL;
 		self->pos = tmp;
@@ -922,7 +896,7 @@ li_reader_get_key_value_pair (liReader* self,
 	li_reader_skip_chars (self, " \t");
 	if (!li_reader_get_text (self, "\n", value))
 	{
-		free (*key);
+		lisys_free (*key);
 		*key = NULL;
 		*value = NULL;
 		self->pos = tmp;

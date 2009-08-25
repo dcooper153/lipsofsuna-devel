@@ -22,10 +22,7 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "paths.h"
 
@@ -40,34 +37,24 @@ lipthPaths*
 lipth_paths_new (const char* path,
                  const char* name)
 {
-	char* tmp;
 	lipthPaths* self;
 	lisysStat stat;
 
-	self = calloc (1, sizeof (lipthPaths));
+	self = lisys_calloc (1, sizeof (lipthPaths));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Set module name. */
-	self->module_name = strdup (name);
+	self->module_name = listr_dup (name);
 	if (self->module_name == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 
 	/* Set root directory. */
 	if (path != NULL)
 	{
-		self->root = strdup (path);
+		self->root = listr_dup (path);
 		if (self->root == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 	}
 	else
 	{
@@ -78,12 +65,9 @@ lipth_paths_new (const char* path,
 
 	/* Get data directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_data = strdup (self->root);
+	self->global_data = listr_dup (self->root);
 	if (self->global_data == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 	if (!strcmp (name, "data"))
 		self->module_data = lisys_path_concat (self->global_data, "data", NULL);
 	else
@@ -102,12 +86,9 @@ lipth_paths_new (const char* path,
 
 	/* Get save directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_state = strdup (self->global_data);
+	self->global_state = listr_dup (self->global_data);
 	if (self->global_state == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 	self->module_state = lisys_path_concat (self->module_data, "save", NULL);
 	if (self->module_state == NULL)
 		goto error;
@@ -139,15 +120,6 @@ lipth_paths_new (const char* path,
 		goto error;
 	}
 
-	/* Create the save directory. */
-	tmp = lisys_path_concat (self->module_state, "accounts", NULL);
-	if (tmp != NULL)
-	{
-		mkdir (self->module_state, S_IRWXU);
-		mkdir (tmp, S_IRWXU);
-		free (tmp);
-	}
-
 	return self;
 
 error:
@@ -164,15 +136,15 @@ void
 lipth_paths_free (lipthPaths* self)
 {
 #ifdef LI_RELATIVE_PATHS
-	free (self->global_exts);
-	free (self->global_data);
-	free (self->global_state);
+	lisys_free (self->global_exts);
+	lisys_free (self->global_data);
+	lisys_free (self->global_state);
 #endif
-	free (self->module_data);
-	free (self->module_name);
-	free (self->module_state);
-	free (self->root);
-	free (self);
+	lisys_free (self->module_data);
+	lisys_free (self->module_name);
+	lisys_free (self->module_state);
+	lisys_free (self->root);
+	lisys_free (self);
 }
 
 /**
@@ -276,16 +248,13 @@ lipth_paths_get_root ()
 	if (tmp == NULL)
 		return NULL;
 	path = lisys_path_format (tmp, LISYS_PATH_STRIPLAST, NULL);
-	free (tmp);
+	lisys_free (tmp);
 	if (path == NULL)
 		return NULL;
 #else
-	path = strdup (DATADIR);
+	path = listr_dup (DATADIR);
 	if (path == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 #endif
 
 	return path;

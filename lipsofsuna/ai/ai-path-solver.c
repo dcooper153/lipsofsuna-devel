@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <system/lips-system.h>
 #include "ai-path-solver.h"
 
 static float
@@ -60,7 +61,7 @@ liai_path_solver_new ()
 {
 	liaiPathSolver* self;
 
-	self = calloc (1, sizeof (liaiPathSolver));
+	self = lisys_calloc (1, sizeof (liaiPathSolver));
 	if (self == NULL)
 		return NULL;
 	self->astar = lialg_astar_new (
@@ -70,7 +71,7 @@ liai_path_solver_new ()
 		(lialgAstarSuccessor) private_astar_successor);
 	if (self->astar == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -86,7 +87,7 @@ void
 liai_path_solver_free (liaiPathSolver* self)
 {
 	lialg_astar_free (self->astar);
-	free (self);
+	lisys_free (self);
 }
 
 /**

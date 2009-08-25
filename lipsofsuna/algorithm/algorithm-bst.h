@@ -25,7 +25,7 @@
 #ifndef __ALGORITHM_BST_H__
 #define __ALGORITHM_BST_H__
 
-#include <stdlib.h>
+#include <system/lips-system.h>
 
 typedef int (*lialgBstCompare)(const void*, const void*);
 typedef void (*lialgBstForeach)(void* a);

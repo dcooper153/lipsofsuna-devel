@@ -67,10 +67,10 @@ liwdg_image_set_image (liwdgImage* self,
 {
 	char* tmp;
 
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (self->image);
+	lisys_free (self->image);
 	self->image = tmp;
 	private_rebuild (self);
 
@@ -85,7 +85,7 @@ private_init (liwdgImage*   self,
 {
 	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA))
 		return 0;
-	self->image = calloc (1, 1);
+	self->image = lisys_calloc (1, 1);
 	if (self->image == NULL)
 		return 0;
 	private_rebuild (self);
@@ -96,7 +96,7 @@ private_init (liwdgImage*   self,
 static void
 private_free (liwdgImage* self)
 {
-	free (self->image);
+	lisys_free (self->image);
 }
 
 static int

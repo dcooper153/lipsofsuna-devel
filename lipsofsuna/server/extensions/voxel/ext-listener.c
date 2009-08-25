@@ -43,7 +43,7 @@ liext_listener_new (liextModule* module,
 {
 	liextListener* self;
 
-	self = calloc (1, sizeof (liextListener));
+	self = lisys_calloc (1, sizeof (liextListener));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -52,7 +52,7 @@ liext_listener_new (liextModule* module,
 	self->cache = lialg_memdic_new ();
 	if (self->cache == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -72,10 +72,10 @@ liext_listener_free (liextListener* self)
 	if (self->cache != NULL)
 	{
 		LI_FOREACH_MEMDIC (iter, self->cache)
-			free (iter.value);
+			lisys_free (iter.value);
 		lialg_memdic_free (self->cache);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -104,13 +104,13 @@ liext_listener_cache (liextListener* self,
 		value->stamp = stamp;
 		return 1;
 	}
-	value = calloc (1, sizeof (liextBlockValue));
+	value = lisys_calloc (1, sizeof (liextBlockValue));
 	if (value == NULL)
 		return 0;
 	value->stamp = stamp;
 	if (!lialg_memdic_insert (self->cache, &key, sizeof (liextBlockKey), value))
 	{
-		free (value);
+		lisys_free (value);
 		return 0;
 	}
 

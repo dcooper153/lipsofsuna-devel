@@ -18,7 +18,30 @@
 #ifndef __SYSTEM_MISC_H__
 #define __SYSTEM_MISC_H__
 
+#include <stdlib.h>
+#include <assert.h>
+#ifdef HAVE_TIME_H
+#include <time.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+float
+lisys_randf ();
+
+int
+lisys_randi (int max);
+
 void
 lisys_usleep (int usecs);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

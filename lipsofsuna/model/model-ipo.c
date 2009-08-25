@@ -59,12 +59,9 @@ limdl_ipo_read (limdlIpo* self,
 		if (self->channels[i].length)
 		{
 			/* Allocate memory. */
-			self->channels[i].nodes = calloc (self->channels[i].length, sizeof (float));
+			self->channels[i].nodes = lisys_calloc (self->channels[i].length, sizeof (float));
 			if (self->channels[i].nodes == NULL)
-			{
-				lisys_error_set (ENOMEM, NULL);
 				return 0;
-			}
 
 			/* Read the data. */
 			for (j = 0 ; j < self->channels[i].length ; j++)

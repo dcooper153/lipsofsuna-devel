@@ -22,10 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <system/lips-system.h>
 #include "widget.h"
 #include "widget-group.h"
 #include "widget-window.h"
@@ -73,12 +70,9 @@ liwdg_widget_new (liwdgManager*     manager,
 {
 	liwdgWidget* self;
 
-	self = calloc (1, clss->size);
+	self = lisys_calloc (1, clss->size);
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	self->manager = manager;
 	self->type = clss;
 	if (!private_new (self, clss, manager))
@@ -107,7 +101,7 @@ liwdg_widget_free (liwdgWidget* self)
 		if (ptr->free != NULL)
 			ptr->free (self);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 /**

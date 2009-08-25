@@ -29,31 +29,34 @@
 #include <system/lips-system.h>
 
 char*
-li_string_concat (const char* self,
-                  const char* string);
+listr_dup (const char* self);
 
 char*
-listr_string_format (const char* format,
-                                 ...) __LI_ATTRIBUTE_FORMAT(1, 2);
-
-int
-li_string_utf8_get_char (const char* self,
-                         wchar_t*    result);
-
-int
-li_string_utf8_get_length (const char* self);
+listr_concat (const char* self,
+              const char* string);
 
 char*
-li_string_utf8_get_next (const char* self);
+listr_format (const char* format,
+                          ...) __LI_ATTRIBUTE_FORMAT(1, 2);
 
 int
-li_string_utf8_get_valid (const char* self);
+listr_utf8_get_char (const char* self,
+                     wchar_t*    result);
+
+int
+listr_utf8_get_length (const char* self);
+
+char*
+listr_utf8_get_next (const char* self);
+
+int
+listr_utf8_get_valid (const char* self);
 
 wchar_t*
-li_string_utf8_to_wchar (const char* self);
+listr_utf8_to_wchar (const char* self);
 
 char*
-li_string_wchar_to_utf8 (wchar_t self);
+listr_wchar_to_utf8 (wchar_t self);
 
 #endif
 

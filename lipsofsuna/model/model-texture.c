@@ -45,10 +45,10 @@ limdl_texture_set_string (limdlTexture* self,
 {
 	char* tmp;
 
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (self->string);
+	lisys_free (self->string);
 	self->string = tmp;
 
 	return 1;

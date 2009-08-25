@@ -22,9 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <system/lips-system.h>
 #include "math-camera.h"
 #include "math-convert.h"
 
@@ -72,7 +70,7 @@ limat_camera_new ()
 	limatCamera* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (limatCamera));
+	self = lisys_calloc (1, sizeof (limatCamera));
 	if (self == NULL)
 		return NULL;
 	self->config.driver = LIMAT_CAMERA_FIRSTPERSON;
@@ -101,7 +99,7 @@ limat_camera_new ()
 void
 limat_camera_free (limatCamera* self)
 {
-	free (self);
+	lisys_free (self);
 }
 
 /**

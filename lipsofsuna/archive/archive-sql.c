@@ -22,9 +22,7 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
+#include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "archive-sql.h"
 
@@ -39,12 +37,9 @@ liarc_sql_delete (liarcSql*   self,
 
 	/* Format query. */
 	len = strlen (table);
-	query = calloc (len + 14, sizeof (char));
+	query = lisys_calloc (len + 14, sizeof (char));
 	if (query == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	strcpy (query, "DELETE FROM ");
 	pos = 12;
 	strcpy (query + pos, table);
@@ -93,12 +88,9 @@ liarc_sql_insert (liarcSql*   self,
 
 	/* Format query. */
 	len = strlen (table);
-	query = calloc (len + 15, sizeof (char));
+	query = lisys_calloc (len + 15, sizeof (char));
 	if (query == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	strcpy (query, "INSERT INTO ");
 	pos = 12;
 	strcpy (query + pos, table);
@@ -130,11 +122,10 @@ liarc_sql_insert (liarcSql*   self,
 				break;
 		}
 		len = strlen (field);
-		tmp = realloc (query, pos + len + 2);
+		tmp = lisys_realloc (query, pos + len + 2);
 		if (tmp == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (query);
+			lisys_free (query);
 			return 0;
 		}
 		query = tmp;
@@ -146,11 +137,10 @@ liarc_sql_insert (liarcSql*   self,
 		pos += len;
 	}
 	va_end (args);
-	tmp = realloc (query, pos + num * 2 + 12);
+	tmp = lisys_realloc (query, pos + num * 2 + 12);
 	if (tmp == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (query);
+		lisys_free (query);
 		return 0;
 	}
 	query = tmp;
@@ -172,10 +162,10 @@ liarc_sql_insert (liarcSql*   self,
 	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self));
-		free (query);
+		lisys_free (query);
 		return 0;
 	}
-	free (query);
+	lisys_free (query);
 
 	/* Bind values. */
 	va_start (args, table);
@@ -263,12 +253,9 @@ liarc_sql_replace (liarcSql*   self,
 
 	/* Format query. */
 	len = strlen (table);
-	query = calloc (len + 26, sizeof (char));
+	query = lisys_calloc (len + 26, sizeof (char));
 	if (query == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	strcpy (query, "INSERT OR REPLACE INTO ");
 	pos = 23;
 	strcpy (query + pos, table);
@@ -300,11 +287,10 @@ liarc_sql_replace (liarcSql*   self,
 				break;
 		}
 		len = strlen (field);
-		tmp = realloc (query, pos + len + 2);
+		tmp = lisys_realloc (query, pos + len + 2);
 		if (tmp == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (query);
+			lisys_free (query);
 			return 0;
 		}
 		query = tmp;
@@ -316,11 +302,10 @@ liarc_sql_replace (liarcSql*   self,
 		pos += len;
 	}
 	va_end (args);
-	tmp = realloc (query, pos + num * 2 + 12);
+	tmp = lisys_realloc (query, pos + num * 2 + 12);
 	if (tmp == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (query);
+		lisys_free (query);
 		return 0;
 	}
 	query = tmp;
@@ -342,10 +327,10 @@ liarc_sql_replace (liarcSql*   self,
 	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self));
-		free (query);
+		lisys_free (query);
 		return 0;
 	}
-	free (query);
+	lisys_free (query);
 
 	/* Bind values. */
 	va_start (args, table);

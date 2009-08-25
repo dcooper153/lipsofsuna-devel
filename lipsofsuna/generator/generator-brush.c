@@ -70,12 +70,9 @@ ligen_brush_new (ligenGenerator* generator,
 	ligenBrush* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (ligenBrush));
+	self = lisys_calloc (1, sizeof (ligenBrush));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->generator = generator;
 	self->id = -1;
 	self->size[0] = width;
@@ -83,21 +80,17 @@ ligen_brush_new (ligenGenerator* generator,
 	self->size[2] = depth;
 
 	/* Allocate name. */
-	self->name = calloc (1, sizeof (char));
+	self->name = lisys_calloc (1, sizeof (char));
 	if (self->name == NULL)
-	{
-		free (self);
 		return NULL;
-	}
 
 	/* Allocate voxels. */
 	self->voxels.count = width * height * depth;
-	self->voxels.array = calloc (self->voxels.count, sizeof (livoxVoxel));
+	self->voxels.array = lisys_calloc (self->voxels.count, sizeof (livoxVoxel));
 	if (self->voxels.array == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self->name);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -116,11 +109,11 @@ ligen_brush_free (ligenBrush* self)
 
 	for (i = 0 ; i < self->rules.count ; i++)
 		ligen_rule_free (self->rules.array[i]);
-	free (self->voxels.array);
-	free (self->objects.array);
-	free (self->rules.array);
-	free (self->name);
-	free (self);
+	lisys_free (self->voxels.array);
+	lisys_free (self->objects.array);
+	lisys_free (self->rules.array);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 /**
@@ -147,24 +140,18 @@ ligen_brush_insert_object (ligenBrush*           self,
 	ligenBrushobject* object;
 
 	/* Allocate object. */
-	object = calloc (1, sizeof (ligenBrushobject));
+	object = lisys_calloc (1, sizeof (ligenBrushobject));
 	if (object == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	object->id = self->objects.count;
 	object->flags = flags;
 	object->probability = prob;
-	object->type = strdup (type);
-	object->model = strdup (model);
-	object->extra = strdup (extra);
+	object->type = listr_dup (type);
+	object->model = listr_dup (model);
+	object->extra = listr_dup (extra);
 	object->transform = *transform;
 	if (object->type == NULL || object->model == NULL || object->extra == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 
 	/* Add to list. */
 	if (!lialg_array_append (&self->objects, &object))
@@ -173,10 +160,10 @@ ligen_brush_insert_object (ligenBrush*           self,
 	return 1;
 
 error:
-	free (object->type);
-	free (object->model);
-	free (object->extra);
-	free (object);
+	lisys_free (object->type);
+	lisys_free (object->model);
+	lisys_free (object->extra);
+	lisys_free (object);
 	return 0;
 }
 
@@ -233,10 +220,10 @@ ligen_brush_remove_object (ligenBrush* self,
 	assert (index < self->objects.count);
 
 	object = self->objects.array[index];
-	free (object->model);
-	free (object->type);
-	free (object->extra);
-	free (object);
+	lisys_free (object->model);
+	lisys_free (object->type);
+	lisys_free (object->extra);
+	lisys_free (object);
 	lialg_array_remove (&self->objects, index);
 
 	for (i = 0 ; i < self->objects.count ; i++)
@@ -368,10 +355,10 @@ ligen_brush_set_name (ligenBrush* self,
 {
 	char* tmp;
 
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (self->name);
+	lisys_free (self->name);
 	self->name = tmp;
 
 	return 1;
@@ -392,7 +379,7 @@ ligen_brush_set_size (ligenBrush* self,
 	assert (y > 0);
 	assert (z > 0);
 
-	tmp = calloc (x * y * z, sizeof (livoxVoxel));
+	tmp = lisys_calloc (x * y * z, sizeof (livoxVoxel));
 	if (tmp == NULL)
 		return 0;
 	for (k = 0 ; k < self->size[2] && k < z ; k++)
@@ -402,7 +389,7 @@ ligen_brush_set_size (ligenBrush* self,
 		tmp[i + j * x + k * x * y] = self->voxels.array[
 			i + j * self->size[0] + k * self->size[0] * self->size[1]];
 	}
-	free (self->voxels.array);
+	lisys_free (self->voxels.array);
 	self->voxels.array = tmp;
 	self->voxels.count = x * y * z;
 	self->size[0] = x;
@@ -498,26 +485,22 @@ private_read_objects (ligenBrush* self,
 		object.type = (char*) sqlite3_column_text (statement, col);
 		size = sqlite3_column_bytes (statement, col++);
 		if (size > 0 && object.type != NULL)
-			object.type = strdup (object.type);
+			object.type = listr_dup (object.type);
 		else
-			object.type = strdup ("");
+			object.type = listr_dup ("");
 		if (object.type == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 
 		/* Read model column. */
 		object.model = (char*) sqlite3_column_text (statement, col);
 		size = sqlite3_column_bytes (statement, col++);
 		if (size > 0 && object.model != NULL)
-			object.model = strdup (object.model);
+			object.model = listr_dup (object.model);
 		else
-			object.model = strdup ("");
+			object.model = listr_dup ("");
 		if (object.model == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (object.type);
+			lisys_free (object.type);
 			goto error;
 		}
 
@@ -525,14 +508,13 @@ private_read_objects (ligenBrush* self,
 		object.extra = (char*) sqlite3_column_text (statement, col);
 		size = sqlite3_column_bytes (statement, col);
 		if (size > 0 && object.extra != NULL)
-			object.extra = strdup (object.extra);
+			object.extra = listr_dup (object.extra);
 		else
-			object.extra = strdup ("");
+			object.extra = listr_dup ("");
 		if (object.extra == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (object.type);
-			free (object.model);
+			lisys_free (object.type);
+			lisys_free (object.model);
 			goto error;
 		}
 
@@ -542,9 +524,9 @@ private_read_objects (ligenBrush* self,
 			tmp = realloc (objects.array, (object.id + 1) * sizeof (ligenBrushobject*));
 			if (tmp == NULL)
 			{
-				free (object.type);
-				free (object.model);
-				free (object.extra);
+				lisys_free (object.type);
+				lisys_free (object.model);
+				lisys_free (object.extra);
 				goto error;
 			}
 			for (i = objects.count ; i < object.id ; i++)
@@ -552,12 +534,12 @@ private_read_objects (ligenBrush* self,
 			objects.array = tmp;
 			objects.count = object.id + 1;
 		}
-		objects.array[object.id] = malloc (sizeof (ligenBrushobject));
+		objects.array[object.id] = lisys_malloc (sizeof (ligenBrushobject));
 		if (objects.array[object.id] == NULL)
 		{
-			free (object.type);
-			free (object.model);
-			free (object.extra);
+			lisys_free (object.type);
+			lisys_free (object.model);
+			lisys_free (object.extra);
 			goto error;
 		}
 		*(objects.array[object.id]) = object;
@@ -568,12 +550,12 @@ private_read_objects (ligenBrush* self,
 	/* Use new objects. */
 	for (i = 0 ; i < self->objects.count ; i++)
 	{
-		free (self->objects.array[i]->type);
-		free (self->objects.array[i]->model);
-		free (self->objects.array[i]->extra);
-		free (self->objects.array[i]);
+		lisys_free (self->objects.array[i]->type);
+		lisys_free (self->objects.array[i]->model);
+		lisys_free (self->objects.array[i]->extra);
+		lisys_free (self->objects.array[i]);
 	}
-	free (self->objects.array);
+	lisys_free (self->objects.array);
 	self->objects.count = objects.count;
 	self->objects.array = objects.array;
 
@@ -584,12 +566,12 @@ error:
 	{
 		if (objects.array[i] != NULL)
 		{
-			free (objects.array[i]->type);
-			free (objects.array[i]->extra);
-			free (objects.array[i]);
+			lisys_free (objects.array[i]->type);
+			lisys_free (objects.array[i]->extra);
+			lisys_free (objects.array[i]);
 		}
 	}
-	free (objects.array);
+	lisys_free (objects.array);
 	sqlite3_finalize (statement);
 	return 0;
 }
@@ -655,12 +637,9 @@ private_read_rules (ligenBrush* self,
 		size = sqlite3_column_bytes (statement, col);
 		if (size > 0 && name != NULL)
 		{
-			name = strdup (name);
+			name = listr_dup (name);
 			if (name == NULL)
-			{
-				lisys_error_set (ENOMEM, NULL);
 				goto error;
-			}
 		}
 		else
 			name = NULL;
@@ -672,7 +651,7 @@ private_read_rules (ligenBrush* self,
 		rule->id = ruleid;
 		if (name != NULL)
 		{
-			free (rule->name);
+			lisys_free (rule->name);
 			rule->name = name;
 		}
 
@@ -740,8 +719,8 @@ private_read_rules (ligenBrush* self,
 
 	/* Use new rules. */
 	for (i = 0 ; i < self->rules.count ; i++)
-		free (self->rules.array[i]);
-	free (self->rules.array);
+		lisys_free (self->rules.array[i]);
+	lisys_free (self->rules.array);
 	self->rules.count = rules.count;
 	self->rules.array = rules.array;
 
@@ -753,7 +732,7 @@ error:
 		if (rules.array[i] != NULL)
 			ligen_rule_free (rules.array[i]);
 	}
-	free (rules.array);
+	lisys_free (rules.array);
 	sqlite3_finalize (statement);
 	return 0;
 }

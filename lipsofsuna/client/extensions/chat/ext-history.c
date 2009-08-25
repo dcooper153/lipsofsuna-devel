@@ -92,12 +92,12 @@ liext_chat_history_append (liextChatHistory* self,
 	int i;
 	char* msg;
 
-	msg = strdup (message);
+	msg = listr_dup (message);
 	if (msg == NULL)
 		return 0;
 
 	/* Scroll lines. */
-	free (self->lines.array[0]);
+	lisys_free (self->lines.array[0]);
 	for (i = 0 ; i < self->lines.count - 1 ; i++)
 		self->lines.array[i] = self->lines.array[i + 1];
 
@@ -122,7 +122,7 @@ private_init (liextChatHistory* self,
 {
 	/* Allocate lines. */
 	self->lines.count = LIEXT_CHAT_HISTORY_DEFAULT_LINES;
-	self->lines.array = calloc (1, self->lines.count * sizeof (char*));
+	self->lines.array = lisys_calloc (1, self->lines.count * sizeof (char*));
 	if (self->lines.array == NULL)
 		return 0;
 
@@ -140,8 +140,8 @@ private_free (liextChatHistory* self)
 	if (self->lines.array != NULL)
 	{
 		for (i = 0 ; i < self->lines.count ; i++)
-			free (self->lines.array[i]);
-		free (self->lines.array);
+			lisys_free (self->lines.array[i]);
+		lisys_free (self->lines.array);
 	}
 }
 

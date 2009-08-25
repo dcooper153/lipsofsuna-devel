@@ -26,9 +26,7 @@
  */
 
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <system/lips-system.h>
 #include "algorithm-bst.h"
 
 #define LI_SCAPEGOAT_ALPHA 0.55
@@ -83,7 +81,7 @@ lialg_bst_new (lialgBstCompare cmp,
 {
 	lialgBst* self;
 
-	self = malloc (sizeof (lialgBst));
+	self = lisys_malloc (sizeof (lialgBst));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;

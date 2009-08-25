@@ -45,7 +45,7 @@ liext_skills_new (liextModule* module)
 {
 	liextSkills* self;
 
-	self = calloc (1, sizeof (liextSkills));
+	self = lisys_calloc (1, sizeof (liextSkills));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -53,7 +53,7 @@ liext_skills_new (liextModule* module)
 	self->skills = lialg_strdic_new ();
 	if (self->skills == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -69,7 +69,7 @@ liext_skills_free (liextSkills* self)
 	LI_FOREACH_STRDIC (iter, self->skills)
 		liext_skill_free (iter.value);
 	lialg_strdic_free (self->skills);
-	free (self);
+	lisys_free (self);
 }
 
 liextSkill*

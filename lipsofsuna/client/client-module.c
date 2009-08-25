@@ -84,14 +84,14 @@ licli_module_new (licliClient* client,
 	licliModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licliModule));
+	self = lisys_calloc (1, sizeof (licliModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
 	self->window = client->window;
-	self->name = strdup (name);
-	self->login = strdup (login);
-	self->password = strdup (password);
+	self->name = listr_dup (name);
+	self->login = listr_dup (login);
+	self->password = listr_dup (password);
 	if (self->name == NULL ||
 	    self->login == NULL ||
 	    self->password == NULL)
@@ -142,7 +142,7 @@ licli_module_free (licliModule* self)
 			extension = iter.value;
 			((void (*)(void*)) extension->info->free) (extension->object);
 			lisys_module_free (extension->module);
-			free (extension);
+			lisys_free (extension);
 		}
 		lialg_strdic_free (self->extensions);
 	}
@@ -171,11 +171,11 @@ licli_module_free (licliModule* self)
 		lisrv_server_free (self->server);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
-	free (self->login);
-	free (self->password);
-	free (self->path);
-	free (self->name);
-	free (self);
+	lisys_free (self->login);
+	lisys_free (self->password);
+	lisys_free (self->path);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 /**
@@ -329,7 +329,7 @@ licli_module_load_extension (licliModule* self,
 
 	/* Open module file. */
 	module = lisys_module_new (path, 0);
-	free (path);
+	lisys_free (path);
 	if (module == NULL)
 		goto error;
 
@@ -355,20 +355,18 @@ licli_module_load_extension (licliModule* self,
 	}
 
 	/* Insert to extension list. */
-	extension = calloc (1, sizeof (licliExtension));
-	extension->info = info;
-	extension->module = module;
+	extension = lisys_calloc (1, sizeof (licliExtension));
 	if (extension == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_module_free (module);
 		goto error;
 	}
+	extension->info = info;
+	extension->module = module;
 	if (!lialg_strdic_insert (self->extensions, name, extension))
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_module_free (module);
-		free (extension);
+		lisys_free (extension);
 		goto error;
 	}
 
@@ -378,7 +376,7 @@ licli_module_load_extension (licliModule* self,
 	{
 		lialg_strdic_remove (self->extensions, name);
 		lisys_module_free (module);
-		free (extension);
+		lisys_free (extension);
 		goto error;
 	}
 
@@ -725,7 +723,7 @@ private_init_paths (licliModule* self,
 	self->paths = lipth_paths_new (path, name);
 	if (self->paths == NULL)
 		return 0;
-	self->path = strdup (self->paths->module_data);
+	self->path = listr_dup (self->paths->module_data);
 	if (self->path == NULL)
 		return 0;
 
@@ -765,12 +763,9 @@ private_init_script (licliModule* self)
 	/* Load script. */
 	path = lisys_path_concat (self->path, "scripts", "client", "main.lua", NULL);
 	if (path == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	ret = liscr_script_load (self->script, path);
-	free (path);
+	lisys_free (path);
 	if (!ret)
 		return 0;
 

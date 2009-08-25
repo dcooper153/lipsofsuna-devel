@@ -33,12 +33,9 @@
 int
 limdl_material_init (limdlMaterial* self)
 {
-	self->shader = strdup ("default");
+	self->shader = listr_dup ("default");
 	if (self->shader == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	self->flags = 0;
 	self->emission = 0.0f;
 	self->shininess = 1.0f;
@@ -73,33 +70,28 @@ limdl_material_init_copy (limdlMaterial*       self,
 	*self = *src;
 	if (src->shader != NULL)
 	{
-		self->shader = strdup (src->shader);
+		self->shader = listr_dup (src->shader);
 		if (self->shader == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 	}
 	if (src->textures.count)
 	{
-		self->textures.array = calloc (src->textures.count, sizeof (limdlTexture));
+		self->textures.array = lisys_calloc (src->textures.count, sizeof (limdlTexture));
 		if (self->textures.array == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (self->shader);
+			lisys_free (self->shader);
 			return 0;
 		}
 		memcpy (self->textures.array, src->textures.array, src->textures.count * sizeof (limdlTexture));
 		for (i = 0 ; i < src->textures.count ; i++)
 		{
-			self->textures.array[i].string = strdup (src->textures.array[i].string);
+			self->textures.array[i].string = listr_dup (src->textures.array[i].string);
 			if (self->textures.array[i].string == NULL)
 			{
 				for (i-- ; i >= 0 ; i--)
-					free (self->textures.array[i].string);
-				free (self->textures.array);
-				free (self->shader);
-				lisys_error_set (ENOMEM, NULL);
+					lisys_free (self->textures.array[i].string);
+				lisys_free (self->textures.array);
+				lisys_free (self->shader);
 				return 0;
 			}
 		}
@@ -119,8 +111,8 @@ limdl_material_clear_textures (limdlMaterial* self)
 	int i;
 
 	for (i = 0 ; i < self->textures.count ; i++)
-		free (self->textures.array[i].string);
-	free (self->textures.array);
+		lisys_free (self->textures.array[i].string);
+	lisys_free (self->textures.array);
 	self->textures.array = NULL;
 	self->textures.count = 0;
 }
@@ -166,12 +158,9 @@ limdl_material_read (limdlMaterial* self,
 	/* Read textures. */
 	if (self->textures.count > 0)
 	{
-		self->textures.array = calloc (self->textures.count, sizeof (limdlTexture));
+		self->textures.array = lisys_calloc (self->textures.count, sizeof (limdlTexture));
 		if (self->textures.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->textures.count ; i++)
 		{
 			if (!li_reader_get_uint32 (reader, tmp + 0) ||
@@ -214,20 +203,17 @@ limdl_material_realloc_textures (limdlMaterial* self,
 	else if (count < self->textures.count)
 	{
 		for (i = count ; i < self->textures.count ; i++)
-			free (self->textures.array[i].string);
-		tmp = realloc (self->textures.array, count * sizeof (limdlTexture));
+			lisys_free (self->textures.array[i].string);
+		tmp = lisys_realloc (self->textures.array, count * sizeof (limdlTexture));
 		if (tmp != NULL)
 			self->textures.array = tmp;
 		self->textures.count = count;
 	}
 	else
 	{
-		tmp = realloc (self->textures.array, count * sizeof (limdlTexture));
+		tmp = lisys_realloc (self->textures.array, count * sizeof (limdlTexture));
 		if (tmp == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		self->textures.array = tmp;
 		for (i = self->textures.count ; i < count ; i++)
 		{
@@ -312,13 +298,10 @@ limdl_material_set_texture (limdlMaterial* self,
 	assert (unit >= 0);
 	assert (unit < self->textures.count);
 
-	dup = strdup (name);
+	dup = listr_dup (name);
 	if (dup == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
-	free (self->textures.array[unit].string);
+	lisys_free (self->textures.array[unit].string);
 	self->textures.array[unit].type = type;
 	self->textures.array[unit].flags = flags;
 	self->textures.array[unit].string = dup;

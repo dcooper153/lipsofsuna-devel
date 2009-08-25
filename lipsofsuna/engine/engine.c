@@ -51,14 +51,14 @@ lieng_engine_new (const char* path)
 {
 	liengEngine* self;
 
-	self = calloc (1, sizeof (liengEngine));
+	self = lisys_calloc (1, sizeof (liengEngine));
 	if (self == NULL)
 		return NULL;
 	self->range.start = 0;
 	self->range.size = 0xFFFFFFFF;
 	self->calls = lieng_default_calls;
 	self->config.radius = 1;
-	self->config.dir = strdup (path);
+	self->config.dir = listr_dup (path);
 	if (self->config.dir == NULL)
 		goto error;
 	if (!private_init (self))
@@ -134,8 +134,8 @@ lieng_engine_free (liengEngine* self)
 		lialg_u32dic_free (self->objects);
 	if (self->selection != NULL)
 		lialg_ptrdic_free (self->selection);
-	free (self->config.dir);
-	free (self);
+	lisys_free (self->config.dir);
+	lisys_free (self);
 }
 
 int

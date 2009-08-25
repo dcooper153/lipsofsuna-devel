@@ -27,7 +27,7 @@
 #include "render-draw.h"
 
 #define LIRND_LIGHT_MAXIMUM_RATING 100.0f
-#define LIRND_PARTICLE_MAXIMUM_COUNT 500000
+#define LIRND_PARTICLE_MAXIMUM_COUNT 1000
 
 static int
 private_init_lights (lirndScene* self);
@@ -52,7 +52,7 @@ lirnd_scene_new (lirndRender* render)
 	lirndScene* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndScene));
+	self = lisys_calloc (1, sizeof (lirndScene));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -103,7 +103,7 @@ lirnd_scene_free (lirndScene* self)
 	/* Unregister self. */
 	lialg_ptrdic_remove (self->render->scenes, self);
 
-	free (self);
+	lisys_free (self);
 }
 
 lirndObject*

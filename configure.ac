@@ -40,6 +40,7 @@ AC_ARG_ENABLE([builtin-lua], AC_HELP_STRING([--enable-builtin-lua], [Compile bui
 AC_ARG_ENABLE([builtin-sqlite], AC_HELP_STRING([--enable-builtin-sqlite], [Compile built-in SQLite]), [want_builtin_sqlite=yes], [])
 AC_ARG_ENABLE([builtin-squish], AC_HELP_STRING([--enable-builtin-squish], [Compile built-in Squish]), [want_builtin_squish=yes], [])
 AC_ARG_ENABLE([builtin-zlib], AC_HELP_STRING([--enable-builtin-sqlite], [Compile built-in Zlib]), [want_builtin_zlib=yes], [])
+AC_ARG_ENABLE([malloc-debug], AC_HELP_STRING([--enable-malloc-debug], [Compile with logging memory management functions]), [want_mallocdebug=yes], [want_mallocdebug=no])
 
 if test "$want_easy" = yes; then
 	want_relative=yes
@@ -52,6 +53,7 @@ else
 	want_graphics=no
 fi
 AC_CHECK_HEADERS([dlfcn.h fcntl.h inttypes.h netdb.h poll.h stdint.h unistd.h])
+AC_CHECK_HEADERS([time.h sys/time.h])
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h])
 AC_CHECK_HEADERS([endian.h sys/byteorder.h])
 AC_CHECK_HEADERS([sys/mman.h sys/stat.h sys/wait.h])
@@ -90,6 +92,9 @@ if test "$want_debug" = yes; then
 	LIPS_CFLAGS="$LIPS_CFLAGS -g -Wall -DLI_ENABLE_ERROR"
 else
 	LIPS_CFLAGS="$LIPS_CFLAGS -Wall -DNDEBUG -DLI_ENABLE_ERROR"
+fi
+if test "$want_mallocdebug" = yes; then
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
 fi
 
 dnl All built-in dependencies.

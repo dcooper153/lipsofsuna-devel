@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <stdlib.h>
 #include <algorithm/lips-algorithm.h>
 #include <system/lips-system.h>
 #include "generator-rule.h"
@@ -38,19 +37,15 @@ ligen_rule_new ()
 	ligenRule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (ligenRule));
+	self = lisys_calloc (1, sizeof (ligenRule));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Allocate name. */
-	self->name = calloc (1, sizeof (char));
+	self->name = lisys_calloc (1, sizeof (char));
 	if (self->name == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -69,32 +64,27 @@ ligen_rule_new_copy (ligenRule* rule)
 	ligenRule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (ligenRule));
+	self = lisys_calloc (1, sizeof (ligenRule));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->flags = rule->flags;
 
 	/* Copy name. */
-	self->name = strdup (rule->name);
+	self->name = listr_dup (rule->name);
 	if (self->name == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
 	/* Copy strokes. */
 	if (rule->strokes.count)
 	{
-		self->strokes.array = calloc (1, rule->strokes.count * sizeof (ligenRulestroke));
+		self->strokes.array = lisys_calloc (1, rule->strokes.count * sizeof (ligenRulestroke));
 		if (self->strokes.array == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (self->name);
-			free (self);
+			lisys_free (self->name);
+			lisys_free (self);
 			return NULL;
 		}
 		memcpy (self->strokes.array, rule->strokes.array, rule->strokes.count * sizeof (ligenRulestroke));
@@ -112,8 +102,8 @@ ligen_rule_new_copy (ligenRule* rule)
 void
 ligen_rule_free (ligenRule* self)
 {
-	free (self->strokes.array);
-	free (self);
+	lisys_free (self->strokes.array);
+	lisys_free (self);
 }
 
 /**
@@ -143,10 +133,7 @@ ligen_rule_insert_stroke (ligenRule* self,
 	tmp.flags = flags;
 	tmp.brush = brush;
 	if (!lialg_array_append (&self->strokes, &tmp))
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	return 1;
 }
@@ -173,10 +160,10 @@ ligen_rule_set_name (ligenRule*  self,
 {
 	char* tmp;
 
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (self->name);
+	lisys_free (self->name);
 	self->name = tmp;
 
 	return 1;

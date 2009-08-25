@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "engine-sector.h"
@@ -35,12 +33,9 @@ lieng_sector_default_new (liengEngine* engine,
 	liengSector* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liengSector));
+	self = lisys_calloc (1, sizeof (liengSector));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->x = id % LIENG_SECTORS_PER_LINE;
 	self->y = id / LIENG_SECTORS_PER_LINE % LIENG_SECTORS_PER_LINE;
 	self->z = id / LIENG_SECTORS_PER_LINE / LIENG_SECTORS_PER_LINE;
@@ -52,7 +47,7 @@ lieng_sector_default_new (liengEngine* engine,
 	/* Insert to engine. */
 	if (!lialg_u32dic_insert (engine->sectors, id, self))
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -96,7 +91,7 @@ lieng_sector_free (liengSector* self)
 	if (self->objects != NULL)
 		lialg_u32dic_free (self->objects);
 
-	free (self);
+	lisys_free (self);
 }
 
 /**

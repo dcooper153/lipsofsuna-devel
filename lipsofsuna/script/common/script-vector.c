@@ -73,7 +73,7 @@ Vector___gc (lua_State* lua)
 
 	self = liscr_isdata (lua, 1, LICOM_SCRIPT_VECTOR);
 
-	free (self->data);
+	lisys_free (self->data);
 	liscr_data_free (self);
 	return 0;
 }
@@ -357,14 +357,14 @@ liscr_vector_new (liscrScript*       script,
 	limatVector* tmp;
 	liscrData* self;
 
-	tmp = malloc (sizeof (limatVector));
+	tmp = lisys_malloc (sizeof (limatVector));
 	if (tmp == NULL)
 		return NULL;
 	*tmp = *vector;
 	self = liscr_data_new (script, tmp, LICOM_SCRIPT_VECTOR);
 	if (self == NULL)
 	{
-		free (tmp);
+		lisys_free (tmp);
 		return NULL;
 	}
 

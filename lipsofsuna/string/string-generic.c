@@ -22,11 +22,9 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdarg.h>
-#include "string-generic.h"
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 
 /* Stolen from Glib. */
 #define UTF8_LENGTH(Char)              \
@@ -42,14 +40,36 @@
      ((Char) & 0xFFFE) != 0xFFFE)
 
 /**
+ * \brief Creates a duplicate of the string.
+ *
+ * \param self String.
+ * \return New string or NULL.
+ */
+char*
+listr_dup (const char* self)
+{
+	int i;
+	char* dup;
+
+	for (i = 0 ; self[i] != '\0' ; i++)
+		;
+	dup = lisys_malloc (i + 1);
+	if (dup != NULL)
+		memcpy (dup, self, i + 1);
+
+	return dup;
+}
+
+/**
  * \brief Concatenates two strings.
  *
- * \param self A string.
- * \param string A string.
- * \return A newly allocated string or NULL.
+ * \param self String.
+ * \param string String.
+ * \return New string or NULL.
  */
-char* li_string_concat (const char* self,
-                        const char* string)
+char*
+listr_concat (const char* self,
+              const char* string)
 {
 	int len1;
 	int len2;
@@ -57,11 +77,12 @@ char* li_string_concat (const char* self,
 
 	len1 = strlen (self);
 	len2 = strlen (string);
-	result = malloc (len1 + len2 + 1);
+	result = lisys_malloc (len1 + len2 + 1);
 	if (result == NULL)
 		return NULL;
 	strcpy (result, self);
 	strcpy (result + len1, string);
+
 	return result;
 }
 
@@ -73,8 +94,8 @@ char* li_string_concat (const char* self,
  * \return New string or NULL.
  */
 char*
-listr_string_format (const char* format,
-                                 ...)
+listr_format (const char* format,
+                          ...)
 {
 	int len;
 	int num;
@@ -83,7 +104,7 @@ listr_string_format (const char* format,
 	va_list args;
 
 	len = 64;
-	buf = malloc (len);
+	buf = lisys_malloc (len);
 	if (buf == NULL)
 		return NULL;
 
@@ -97,10 +118,10 @@ listr_string_format (const char* format,
 			break;
 
 		/* Try to expand the buffer. */
-		tmp = realloc (buf, len << 1);
+		tmp = lisys_realloc (buf, len << 1);
 		if (tmp == NULL)
 		{
-			free (buf);
+			lisys_free (buf);
 			return NULL;
 		}
 		buf = tmp;
@@ -108,7 +129,7 @@ listr_string_format (const char* format,
 	}
 
 	/* Try to shrink the buffer. */
-	tmp = realloc (buf, num + 1);
+	tmp = lisys_realloc (buf, num + 1);
 	if (tmp != NULL)
 		buf = tmp;
 
@@ -120,12 +141,13 @@ listr_string_format (const char* format,
  *
  * This function is stolen from Glib.
  *
- * \param self A string.
+ * \param self String.
  * \param result Return location for the character.
  * \return Nonzero on success.
  */
-int li_string_utf8_get_char (const char* self,
-                             wchar_t*    result)
+int
+listr_utf8_get_char (const char* self,
+                     wchar_t*    result)
 {
 	int i;
 	int len;
@@ -189,21 +211,23 @@ int li_string_utf8_get_char (const char* self,
 /**
  * \brief Gets the number of characters in an UTF-8 string.
  *
- * \param self A string.
- * \return The length or -1 on errors.
+ * \param self String.
+ * \return Length or -1 on error.
  */
-int li_string_utf8_get_length (const char* self)
+int
+listr_utf8_get_length (const char* self)
 {
 	const char* ptr;
 	wchar_t dummy;
 	int length = 0;
 
-	for (ptr = self ; *ptr != '\0' ; ptr = li_string_utf8_get_next (ptr))
+	for (ptr = self ; *ptr != '\0' ; ptr = listr_utf8_get_next (ptr))
 	{
-		if (!li_string_utf8_get_char (ptr, &dummy))
+		if (!listr_utf8_get_char (ptr, &dummy))
 			return -1;
 		length++;
 	}
+
 	return length;
 }
 
@@ -214,41 +238,46 @@ int li_string_utf8_get_length (const char* self)
  *
  * \warning This function will break if the current character isn't valid.
  *
- * \param self A string.
- * \return A pointer to the same string.
+ * \param self String.
+ * \return Pointer within the same string.
  */
-char* li_string_utf8_get_next (const char* self)
+char*
+listr_utf8_get_next (const char* self)
 {
 	for (self++ ; (*self & 0xC0) == 0x80 ; self++);
+
 	return (char*) self;
 }
 
 /**
  * \brief Checks if the UTF-8 string is valid.
  *
- * \param self A string.
+ * \param self String.
  * \return Nonzero if valid.
  */
-int li_string_utf8_get_valid (const char* self)
+int
+listr_utf8_get_valid (const char* self)
 {
 	const char* ptr;
 	wchar_t dummy;
 
-	for (ptr = self ; *ptr != '\0' ; ptr = li_string_utf8_get_next (ptr))
+	for (ptr = self ; *ptr != '\0' ; ptr = listr_utf8_get_next (ptr))
 	{
-		if (!li_string_utf8_get_char (ptr, &dummy))
+		if (!listr_utf8_get_char (ptr, &dummy))
 			return 0;
 	}
+
 	return 1;
 }
 
 /**
  * \brief Converts an UTF-8 encoded string to wide characters.
  *
- * \param self A string.
- * \return A wide string or NULL on errors.
+ * \param self String.
+ * \return Wide string or NULL on error.
  */
-wchar_t* li_string_utf8_to_wchar (const char* self)
+wchar_t*
+listr_utf8_to_wchar (const char* self)
 {
 	int i = 0;
 	int length;
@@ -256,20 +285,20 @@ wchar_t* li_string_utf8_to_wchar (const char* self)
 	wchar_t* result;
 
 	/* Get length. */
-	length = li_string_utf8_get_length (self);
+	length = listr_utf8_get_length (self);
 	if (length == -1)
 		return NULL;
 
 	/* Allocate result. */
-	result = malloc ((length + 1) * sizeof (wchar_t));
+	result = lisys_malloc ((length + 1) * sizeof (wchar_t));
 	if (result == NULL)
 		return NULL;
 
 	/* Actual conversion. */
 	for (ptr = self, i = 0 ; i < length ; i++)
 	{
-		li_string_utf8_get_char (ptr, result + i);
-		ptr = li_string_utf8_get_next (ptr);
+		listr_utf8_get_char (ptr, result + i);
+		ptr = listr_utf8_get_next (ptr);
 	}
 	result[length] = L'\0';
 
@@ -281,10 +310,11 @@ wchar_t* li_string_utf8_to_wchar (const char* self)
  *
  * This function is stolen from Glib.
  *
- * \param self A wide character.
- * \return A new string or NULL.
+ * \param self Wide character.
+ * \return New string or NULL.
  */
-char* li_string_wchar_to_utf8 (wchar_t self)
+char*
+listr_wchar_to_utf8 (wchar_t self)
 {
 	int i;
 	int first;
@@ -321,7 +351,7 @@ char* li_string_wchar_to_utf8 (wchar_t self)
 		first = 0xfc;
 		len = 6;
 	}
-	result = calloc (len + 1, sizeof (char));
+	result = lisys_calloc (len + 1, sizeof (char));
 	if (result == NULL)
 		return NULL;
 	for (i = len - 1 ; i > 0 ; --i)
@@ -330,6 +360,7 @@ char* li_string_wchar_to_utf8 (wchar_t self)
 		self >>= 6;
 	}
 	result[0] = self | first;
+
 	return result;
 }
 

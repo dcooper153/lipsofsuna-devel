@@ -370,13 +370,13 @@ liscr_packet_new_readable (liscrScript*    script,
 	liscrPacket* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liscrPacket));
+	self = lisys_calloc (1, sizeof (liscrPacket));
 	if (self == NULL)
 		return NULL;
-	self->buffer = calloc (reader->length, 1);
+	self->buffer = lisys_calloc (reader->length, 1);
 	if (self->buffer == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -384,8 +384,8 @@ liscr_packet_new_readable (liscrScript*    script,
 	self->reader = li_reader_new (self->buffer, reader->length);
 	if (self->reader == NULL)
 	{
-		free (self->buffer);
-		free (self);
+		lisys_free (self->buffer);
+		lisys_free (self);
 		return NULL;
 	}
 	memcpy (self->buffer, reader->buffer, reader->length);
@@ -395,8 +395,8 @@ liscr_packet_new_readable (liscrScript*    script,
 	if (data == NULL)
 	{
 		li_reader_free (self->reader);
-		free (self->buffer);
-		free (self);
+		lisys_free (self->buffer);
+		lisys_free (self);
 	}
 
 	return data;
@@ -410,7 +410,7 @@ liscr_packet_new_writable (liscrScript* script,
 	liscrPacket* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liscrPacket));
+	self = lisys_calloc (1, sizeof (liscrPacket));
 	if (self == NULL)
 		return NULL;
 
@@ -418,7 +418,7 @@ liscr_packet_new_writable (liscrScript* script,
 	self->writer = liarc_writer_new_packet (type);
 	if (self->writer == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -427,7 +427,7 @@ liscr_packet_new_writable (liscrScript* script,
 	if (data == NULL)
 	{
 		liarc_writer_free (self->writer);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -441,8 +441,8 @@ liscr_packet_free (liscrPacket* self)
 		liarc_writer_free (self->writer);
 	if (self->reader != NULL)
 		li_reader_free (self->reader);
-	free (self->buffer);
-	free (self);
+	lisys_free (self->buffer);
+	lisys_free (self);
 }
 
 /*****************************************************************************/
@@ -495,9 +495,9 @@ private_read (liscrPacket* data,
 			case LISCR_PACKET_FORMAT_STRING:
 				tmp.str = NULL;
 				if (ok) ok &= li_reader_get_text (data->reader, "", &tmp.str);
-				if (ok) ok &= li_string_utf8_get_valid (tmp.str);
+				if (ok) ok &= listr_utf8_get_valid (tmp.str);
 				if (ok) lua_pushstring (lua, tmp.str);
-				free (tmp.str);
+				lisys_free (tmp.str);
 				break;
 			case LISCR_PACKET_FORMAT_UINT8:
 				if (ok) ok &= li_reader_get_uint8 (data->reader, &tmp.u8);

@@ -51,7 +51,7 @@ liext_spawner_new (liextModule* module)
 {
 	liextSpawner* self;
 
-	self = calloc (1, sizeof (liextSpawner));
+	self = lisys_calloc (1, sizeof (liextSpawner));
 	if (self == NULL)
 		return NULL;
 	self->delay = 600.0f;
@@ -71,7 +71,7 @@ liext_spawner_free (liextSpawner* self)
 		lieng_engine_remove_calls (self->server->engine, self->calls,
 			sizeof (self->calls) / sizeof (licalHandle));
 	}
-	free (self);
+	lisys_free (self);
 }
 
 int

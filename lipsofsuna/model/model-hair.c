@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "model-hair.h"
 
 int
@@ -38,12 +38,9 @@ limdl_hair_read (limdlHair* self,
 		return 0;
 
 	/* Allocate nodes. */
-	self->nodes = calloc (count, sizeof (limdlHairNode));
+	self->nodes = lisys_calloc (count, sizeof (limdlHairNode));
 	if (self->nodes == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	self->count = count;
 
 	/* Read nodes. */
@@ -93,8 +90,8 @@ limdl_hairs_free (limdlHairs* self)
 	int i;
 
 	for (i = 0 ; i < self->count ; i++)
-		free (self->hairs[i].nodes);
-	free (self->hairs);
+		lisys_free (self->hairs[i].nodes);
+	lisys_free (self->hairs);
 }
 
 int
@@ -113,12 +110,9 @@ limdl_hairs_read (limdlHairs* self,
 	self->material = mat;
 
 	/* Allocate hairs. */
-	self->hairs = calloc (count, sizeof (limdlHair));
+	self->hairs = lisys_calloc (count, sizeof (limdlHair));
 	if (self->hairs == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	self->count = count;
 
 	/* Read hairs. */

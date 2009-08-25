@@ -365,12 +365,12 @@ liimg_dds_read_level (liimgDDS*      self,
 		result->size = self->info.bpp * result->width * result->height;
 
 	/* Load pixel data. */
-	result->data = malloc (result->size);
+	result->data = lisys_malloc (result->size);
 	if (result->data == NULL)
 		return 0;
 	if (!fread (result->data, result->size, 1, file))
 	{
-		free (result->data);
+		lisys_free (result->data);
 		return 0;
 	}
 
@@ -485,7 +485,7 @@ liimg_dds_load_texture (FILE*     file,
 			}
 			glTexImage2D (GL_TEXTURE_2D, i, fmt.internal, lvl.width,
 				lvl.height, 0, fmt.format, fmt.type, lvl.data);
-			free (lvl.data);
+			lisys_free (lvl.data);
 		}
 	}
 	else if (GLEW_EXT_texture_compression_s3tc)
@@ -500,7 +500,7 @@ liimg_dds_load_texture (FILE*     file,
 			}
 			glCompressedTexImage2DARB (GL_TEXTURE_2D, i, fmt.format,
 				lvl.width, lvl.height, 0, lvl.size, lvl.data);
-			free (lvl.data);
+			lisys_free (lvl.data);
 		}
 	}
 	else
@@ -524,16 +524,16 @@ liimg_dds_load_texture (FILE*     file,
 			}
 			if (type)
 			{
-				tmp = malloc (4 * lvl.width * lvl.height);
+				tmp = lisys_malloc (4 * lvl.width * lvl.height);
 				if (tmp != NULL)
 				{
 					liimg_compress_uncompress (lvl.data, lvl.width, lvl.height, type, tmp);
 					glTexImage2D (GL_TEXTURE_2D, i, 4, lvl.width, lvl.height,
 						0, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
-					free (tmp);
+					lisys_free (tmp);
 				}
 			}
-			free (lvl.data);
+			lisys_free (lvl.data);
 		}
 	}
 

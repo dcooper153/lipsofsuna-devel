@@ -24,6 +24,7 @@
 
 #include "physics.h"
 #include "physics-private.h"
+#include <system/lips-system.h>
 
 #define MAXPROXIES 1000000
 
@@ -70,7 +71,7 @@ liphy_physics_new ()
 	btVector3 min (-65535, -65535, -65535);
 	btVector3 max ( 65535,  65535,  65535);
 
-	self = (liphyPhysics*) calloc (1, sizeof (liphyPhysics));
+	self = (liphyPhysics*) lisys_calloc (1, sizeof (liphyPhysics));
 	if (self == NULL)
 		return NULL;
 	try
@@ -109,7 +110,7 @@ liphy_physics_free (liphyPhysics* self)
 	delete self->broadphase;
 	delete self->ghostcallback;
 	lialg_list_free (self->controllers);
-	free (self);
+	lisys_free (self);
 }
 
 /**

@@ -51,14 +51,14 @@ liext_module_new (lisrvServer* server)
 {
 	liextModule* self;
 
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 0,
@@ -82,7 +82,7 @@ liext_module_free (liextModule* self)
 	lialg_u32dic_free (self->dictionary);
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 liextInventory*

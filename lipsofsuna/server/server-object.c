@@ -22,11 +22,9 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <network/lips-network.h>
 #include <physics/lips-physics.h>
+#include <system/lips-system.h>
 #include "server.h"
 #include "server-callbacks.h"
 #include "server-client.h"
@@ -67,7 +65,6 @@ lisrv_object_new (liengEngine*     engine,
                   void*            ptr)
 {
 	int ret;
-	double rnd;
 	const char* query;
 	liengObject* self;
 	lisrvObject* data;
@@ -78,8 +75,7 @@ lisrv_object_new (liengEngine*     engine,
 	while (!id)
 	{
 		/* Choose random number. */
-		rnd = rand () / (double) RAND_MAX;
-		id = engine->range.start + (uint32_t)(engine->range.size * rnd);
+		id = engine->range.start + lisys_randi (engine->range.size - 1);
 		if (!id)
 			continue;
 
@@ -123,19 +119,13 @@ lisrv_object_new (liengEngine*     engine,
 		return NULL;
 
 	/* Allocate server data. */
-	data = calloc (1, sizeof (lisrvObject));
+	data = lisys_calloc (1, sizeof (lisrvObject));
 	if (data == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 	data->server = server;
 	data->animations = lialg_u32dic_new ();
 	if (data->animations == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 
 	/* Extend engine object. */
 	lieng_object_set_userdata (self, LIENG_DATA_SERVER, data);
@@ -175,10 +165,10 @@ lisrv_object_free (liengObject* self)
 	if (data != NULL)
 	{
 		LI_FOREACH_U32DIC (iter, data->animations)
-			free (iter.value);
+			lisys_free (iter.value);
 		lialg_u32dic_free (data->animations);
-		free (data->name);
-		free (data);
+		lisys_free (data->name);
+		lisys_free (data);
 	}
 
 	/* Free engine data. */
@@ -238,7 +228,7 @@ lisrv_object_animate (liengObject* self,
 	if (info != NULL)
 	{
 		lialg_u32dic_remove (data->animations, channel);
-		free (info);
+		lisys_free (info);
 	}
 	if (name != NULL && animation == NULL)
 		return 0;
@@ -246,7 +236,7 @@ lisrv_object_animate (liengObject* self,
 	/* Register channel if permanent. */
 	if (permanent)
 	{
-		info = calloc (1, sizeof (lisrvAniminfo));
+		info = lisys_calloc (1, sizeof (lisrvAniminfo));
 		if (info == NULL)
 			return 0;
 		info->animation = animation;
@@ -255,7 +245,7 @@ lisrv_object_animate (liengObject* self,
 		info->priority = priority;
 		if (!lialg_u32dic_insert (data->animations, channel, info))
 		{
-			free (info);
+			lisys_free (info);
 			return 0;
 		}
 	}
@@ -822,10 +812,10 @@ lisrv_object_set_name (liengObject* self,
 	char* tmp;
 	lisrvObject* data = LISRV_OBJECT (self);
 
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (data->name);
+	lisys_free (data->name);
 	data->name = tmp;
 
 	return 1;

@@ -24,8 +24,7 @@
 
 #ifndef LI_DISABLE_SOUND
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "sound-source.h"
 
 /**
@@ -40,7 +39,7 @@ lisnd_source_new (lisndSystem* system)
 	lisndSource* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisndSource));
+	self = lisys_calloc (1, sizeof (lisndSource));
 	if (self == NULL)
 		return NULL;
 
@@ -48,7 +47,7 @@ lisnd_source_new (lisndSystem* system)
 	alGenSources (1, &self->source);
 	if (alGetError() != AL_NO_ERROR)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	alSourcef (self->source, AL_REFERENCE_DISTANCE, 5.0f);
@@ -71,7 +70,7 @@ lisnd_source_new_with_sample (lisndSystem* system,
 	lisndSource* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisndSource));
+	self = lisys_calloc (1, sizeof (lisndSource));
 	if (self == NULL)
 		return NULL;
 
@@ -79,7 +78,7 @@ lisnd_source_new_with_sample (lisndSystem* system,
 	alGenSources (1, &self->source);
 	if (alGetError() != AL_NO_ERROR)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	alSourcef (self->source, AL_REFERENCE_DISTANCE, 5.0f);
@@ -100,7 +99,7 @@ lisnd_source_free (lisndSource* self)
 {
 	alSourceStop (self->source);
 	alDeleteSources (1, &self->source);
-	free (self);
+	lisys_free (self);
 }
 
 /**

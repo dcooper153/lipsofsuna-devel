@@ -32,14 +32,14 @@ liext_skills_new (liextModule* module)
 {
 	liextSkills* self;
 
-	self = calloc (1, sizeof (liextSkills));
+	self = lisys_calloc (1, sizeof (liextSkills));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
 	self->skills = lialg_strdic_new ();
 	if (self->skills == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -52,9 +52,9 @@ liext_skills_free (liextSkills* self)
 	lialgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->skills)
-		free (iter.value);
+		lisys_free (iter.value);
 	lialg_strdic_free (self->skills);
-	free (self);
+	lisys_free (self);
 }
 
 void
@@ -63,7 +63,7 @@ liext_skills_clear (liextSkills* self)
 	lialgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->skills)
-		free (iter.value);
+		lisys_free (iter.value);
 	lialg_strdic_clear (self->skills);
 }
 
@@ -77,20 +77,20 @@ liext_skills_find_skill (liextSkills* self,
 int
 liext_skills_set_skill (liextSkills* self,
                         const char*  name,
-						float        value,
-						float        maximum)
+                        float        value,
+                        float        maximum)
 {
 	liextSkill* skill;
 
 	skill = lialg_strdic_find (self->skills, name);
 	if (skill == NULL)
 	{
-		skill = calloc (1, sizeof (liextSkill));
+		skill = lisys_calloc (1, sizeof (liextSkill));
 		if (skill == NULL)
 			return 0;
 		if (!lialg_strdic_insert (self->skills, name, skill))
 		{
-			free (skill);
+			lisys_free (skill);
 			return 0;
 		}
 	}

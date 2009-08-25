@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <system/lips-system.h>
 #include "ai-sector.h"
 
 /**
@@ -34,7 +35,7 @@ liai_sector_new ()
 {
 	liaiSector* self;
 
-	self = calloc (1, sizeof (liaiSector));
+	self = lisys_calloc (1, sizeof (liaiSector));
 	if (self == NULL)
 		return NULL;
 
@@ -69,21 +70,15 @@ liai_sector_new_from_data (liReader* reader)
 		return NULL;
 
 	/* Allocate points. */
-	points = calloc (count, sizeof (liaiWaypoint*));
+	points = lisys_calloc (count, sizeof (liaiWaypoint*));
 	if (points == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	position = limat_vector_init (0.0f, 0.0f, 0.0f);
 	for (i = 0 ; i < count ; i++)
 	{
 		points[i] = liai_waypoint_new (&position);
 		if (points[i] == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 	}
 
 	/* Read points. */
@@ -104,30 +99,21 @@ liai_sector_new_from_data (liReader* reader)
 				goto error;
 			}
 			if (!liai_waypoint_insert_link (points[i], points[link]))
-			{
-				lisys_error_set (ENOMEM, NULL);
 				goto error;
-			}
 		}
 	}
 
 	/* Create sector. */
 	self = liai_sector_new ();
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 	for (i = 0 ; i < count ; i++)
 	{
 		if (!liai_sector_insert_waypoint (self, points[i]))
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 		points[i] = NULL;
 	}
-	free (points);
+	lisys_free (points);
 
 	return self;
 
@@ -137,7 +123,7 @@ error:
 		if (points[i] != NULL)
 			liai_waypoint_free (points[i]);
 	}
-	free (points);
+	lisys_free (points);
 	return NULL;
 }
 
@@ -175,7 +161,7 @@ liai_sector_free (liaiSector* self)
 	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
 		liai_waypoint_free (ptr->data);
 	lialg_list_free (self->waypoints);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -271,16 +257,12 @@ liai_sector_save (const liaiSector* self,
 	count = 0;
 	lookup = lialg_ptrdic_new ();
 	if (lookup == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
 	{
 		point = ptr->data;
 		if (!lialg_ptrdic_insert (lookup, point, (void*)(intptr_t)(++count)))
 		{
-			lisys_error_set (ENOMEM, NULL);
 			lialg_ptrdic_free (lookup);
 			return 0;
 		}

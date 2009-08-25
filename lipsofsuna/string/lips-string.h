@@ -18,6 +18,7 @@
 #ifndef __LIPS_STRING_H__
 #define __LIPS_STRING_H__
 
+#include <string.h>
 #include "string-generic.h"
 #include "string-parser.h"
 #include "string-reader.h"

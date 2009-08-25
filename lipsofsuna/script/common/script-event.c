@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <assert.h>
-#include <stdlib.h>
 #include <script/lips-script.h>
+#include <system/lips-system.h>
 #include "lips-common-script.h"
 
 typedef struct _licomEvent licomEvent;
@@ -53,7 +52,7 @@ Event___gc (lua_State* lua)
 	self = liscr_isdata (lua, 1, LICOM_SCRIPT_EVENT);
 	event = self->data;
 
-	free (event);
+	lisys_free (event);
 	liscr_data_free (self);
 	return 0;
 }
@@ -150,13 +149,13 @@ licom_event_new (liscrScript* script)
 	liscrData* self;
 	licomEvent* event;
 
-	event = calloc (1, sizeof (licomEvent));
+	event = lisys_calloc (1, sizeof (licomEvent));
 	if (event == NULL)
 		return NULL;
 	self = liscr_data_new (script, event, LICOM_SCRIPT_EVENT);
 	if (self == NULL)
 	{
-		free (event);
+		lisys_free (event);
 		return NULL;
 	}
 	event->data = self;

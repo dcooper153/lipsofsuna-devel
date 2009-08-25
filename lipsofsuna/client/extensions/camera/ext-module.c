@@ -46,7 +46,7 @@ liext_module_new (licliModule* module)
 	liextModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -71,7 +71,7 @@ liext_module_free (liextModule* self)
 	/* FIXME: Remove the class here. */
 	lieng_engine_remove_calls (self->module->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 /*****************************************************************************/

@@ -22,10 +22,8 @@
  * @{
  */
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "render-shader.h"
 
 static int
@@ -77,12 +75,9 @@ lirnd_shader_new (lirndRender* render)
 	lirndShader* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndShader));
+	self = lisys_calloc (1, sizeof (lirndShader));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->render = render;
 
 	return self;
@@ -102,12 +97,9 @@ lirnd_shader_new_from_data (lirndRender* render,
 	lirndShader* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndShader));
+	self = lisys_calloc (1, sizeof (lirndShader));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->render = render;
 
 	/* Load the shader. */
@@ -138,12 +130,9 @@ lirnd_shader_new_from_file (lirndRender* render,
 	lirndShader* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndShader));
+	self = lisys_calloc (1, sizeof (lirndShader));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->render = render;
 
 	/* Load the shader. */
@@ -181,10 +170,10 @@ lirnd_shader_free (lirndShader* self)
 	if (self->program)
 		glDeleteObjectARB (self->program);
 	for (i = 0 ; i < self->uniforms.count ; i++)
-		free (self->uniforms.array[i].name);
-	free (self->uniforms.array);
-	free (self->name);
-	free (self);
+		lisys_free (self->uniforms.array[i].name);
+	lisys_free (self->uniforms.array);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 /****************************************************************************/
@@ -212,7 +201,7 @@ private_check_compile (lirndShader* self,
 			while (li_reader_get_text (reader, "\n", &text))
 			{
 				printf ("WARNING: %s:%s%s\n", name, type, text);
-				free (text);
+				lisys_free (text);
 			}
 			li_reader_free (reader);
 		}
@@ -252,7 +241,7 @@ private_check_link (lirndShader* self,
 			while (li_reader_get_text (reader, "\n", &text))
 			{
 				printf ("WARNING: %s:%s\n", name, text);
-				free (text);
+				lisys_free (text);
 			}
 			li_reader_free (reader);
 		}
@@ -373,10 +362,10 @@ private_read_config (lirndShader* self,
 			return 0;
 		if (!strcmp (line, "[configuration]"))
 		{
-			free (line);
+			lisys_free (line);
 			break;
 		}
-		free (line);
+		lisys_free (line);
 	}
 
 	/* Parse options. */
@@ -386,18 +375,18 @@ private_read_config (lirndShader* self,
 			return 0;
 		if (!strlen (line))
 		{
-			free (line);
+			lisys_free (line);
 			continue;
 		}
 		if (!strcmp (line, "[vertex shader]"))
 		{
-			free (line);
+			lisys_free (line);
 			break;
 		}
 		else if (!strncmp (line, "light-count ", 12))
 		{
 			self->lights.count = atoi (line + 12);
-			free (line);
+			lisys_free (line);
 			if (self->lights.count < 0 ||
 			    self->lights.count >= 8)
 				return 0;
@@ -424,8 +413,7 @@ private_read_config (lirndShader* self,
 			uniform = realloc (self->uniforms.array, (self->uniforms.count + 1) * sizeof (lirndUniform));
 			if (uniform == NULL)
 			{
-				lisys_error_set (ENOMEM, NULL);
-				free (line);
+				lisys_free (line);
 				return 0;
 			}
 			self->uniforms.array = uniform;
@@ -434,20 +422,19 @@ private_read_config (lirndShader* self,
 			/* Initialize uniform. */
 			uniform->binding = 0;
 			uniform->value = private_uniform_value (self, value);
-			uniform->name = strdup (name);
+			uniform->name = listr_dup (name);
 			if (uniform->name == NULL)
 			{
-				lisys_error_set (ENOMEM, NULL);
-				free (line);
+				lisys_free (line);
 				return 0;
 			}
 			self->uniforms.count++;
-			free (line);
+			lisys_free (line);
 		}
 		else
 		{
 			lisys_error_set (EINVAL, NULL);
-			free (line);
+			lisys_free (line);
 			return 0;
 		}
 	}
@@ -481,10 +468,10 @@ private_read_source (lirndShader* self,
 		{
 			frag_start = reader->pos;
 			frag_end = reader->length;
-			free (line);
+			lisys_free (line);
 			break;
 		}
-		free (line);
+		lisys_free (line);
 	}
 
 	/* Upload shader source. */

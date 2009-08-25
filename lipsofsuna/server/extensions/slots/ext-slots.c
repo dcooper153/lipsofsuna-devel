@@ -54,7 +54,7 @@ liext_slots_new (liextModule* module)
 {
 	liextSlots* self;
 
-	self = calloc (1, sizeof (liextSlots));
+	self = lisys_calloc (1, sizeof (liextSlots));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -78,11 +78,11 @@ liext_slots_free (liextSlots* self)
 
 	for (i = 0 ; i < self->slots.count ; i++)
 	{
-		free (self->slots.array[i].name);
-		free (self->slots.array[i].node);
+		lisys_free (self->slots.array[i].name);
+		lisys_free (self->slots.array[i].node);
 	}
-	free (self->slots.array);
-	free (self);
+	lisys_free (self->slots.array);
+	lisys_free (self);
 }
 
 liextSlot*
@@ -118,20 +118,19 @@ liext_slots_insert_slot (liextSlots*   self,
 	liextSlot tmp;
 
 	tmp.type = type;
-	tmp.name = strdup (name);
-	tmp.node = strdup (node);
+	tmp.name = listr_dup (name);
+	tmp.node = listr_dup (node);
 	tmp.object = NULL;
 	if (tmp.name == NULL || tmp.node == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (tmp.name);
-		free (tmp.node);
+		lisys_free (tmp.name);
+		lisys_free (tmp.node);
 		return 0;
 	}
 	if (!lialg_array_append (&self->slots, &tmp))
 	{
-		free (tmp.name);
-		free (tmp.node);
+		lisys_free (tmp.name);
+		lisys_free (tmp.node);
 		return 0;
 	}
 

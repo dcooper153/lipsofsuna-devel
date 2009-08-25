@@ -36,12 +36,9 @@ limdl_node_new (limdlModel* model)
 {
 	limdlNode* self;
 
-	self = calloc (1, sizeof (limdlNode));
+	self = lisys_calloc (1, sizeof (limdlNode));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->model = model;
 	self->transform.pose = limat_transform_identity ();
 	self->transform.rest = limat_transform_identity ();
@@ -55,7 +52,7 @@ limdl_node_copy (const limdlNode* node)
 	int i;
 	limdlNode* self;
 
-	self = calloc (1, sizeof (limdlNode));
+	self = lisys_calloc (1, sizeof (limdlNode));
 	if (self == NULL)
 		return NULL;
 	self->type = node->type;
@@ -66,7 +63,7 @@ limdl_node_copy (const limdlNode* node)
 	/* Copy name. */
 	if (node->name != NULL)
 	{
-		self->name = strdup (node->name);
+		self->name = listr_dup (node->name);
 		if (self->name == NULL)
 			goto error;
 	}
@@ -91,7 +88,7 @@ limdl_node_copy (const limdlNode* node)
 	if (node->nodes.count)
 	{
 		self->nodes.count = node->nodes.count;
-		self->nodes.array = calloc (self->nodes.count, sizeof (limdlNode*));
+		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (limdlNode*));
 		if (self->nodes.array == NULL)
 			goto error;
 		for (i = 0 ; i < self->nodes.count ; i++)
@@ -122,11 +119,11 @@ limdl_node_free (limdlNode* self)
 			if (self->nodes.array[i] != NULL)
 				limdl_node_free (self->nodes.array[i]);
 		}
-		free (self->nodes.array);
+		lisys_free (self->nodes.array);
 	}
 
-	free (self->name);
-	free (self);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 /**
@@ -226,20 +223,14 @@ limdl_node_read (limdlNode* self,
 	/* Read child nodes. */
 	if (self->nodes.count)
 	{
-		self->nodes.array = calloc (self->nodes.count, sizeof (limdlNode*));
+		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (limdlNode*));
 		if (self->nodes.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->nodes.count ; i++)
 		{
 			self->nodes.array[i] = limdl_node_new (self->model);
 			if (self->nodes.array[i] == NULL)
-			{
-				lisys_error_set (ENOMEM, NULL);
 				return 0;
-			}
 			self->nodes.array[i]->parent = self;
 			if (!limdl_node_read (self->nodes.array[i], reader))
 				return 0;

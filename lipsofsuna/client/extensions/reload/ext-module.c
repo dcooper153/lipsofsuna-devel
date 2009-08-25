@@ -40,14 +40,14 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
 	self->reload = liext_reload_new (module);
 	if (self->reload == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -61,7 +61,7 @@ liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
 	liext_reload_free (self->reload);
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

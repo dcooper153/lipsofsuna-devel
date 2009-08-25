@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include "string-parser.h"
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 
 liParser*
 li_parser_new (void* data,
@@ -33,7 +32,7 @@ li_parser_new (void* data,
 	liParser* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liParser));
+	self = lisys_calloc (1, sizeof (liParser));
 	if (self == NULL)
 		return NULL;
 
@@ -41,7 +40,7 @@ li_parser_new (void* data,
 	self->reader = li_reader_new (data, length);
 	if (self->reader == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -54,18 +53,15 @@ li_parser_new_from_file (const char* path)
 	liParser* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liParser));
+	self = lisys_calloc (1, sizeof (liParser));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Create reader. */
 	self->reader = li_reader_new_from_file (path);
 	if (self->reader == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -76,8 +72,8 @@ void
 li_parser_free (liParser* self)
 {
 	li_reader_free (self->reader);
-	free (self->tmp);
-	free (self);
+	lisys_free (self->tmp);
+	lisys_free (self);
 }
 
 int
@@ -92,7 +88,7 @@ li_parser_next (liParser* self)
 
 	if (self->error)
 		return 0;
-	free (self->tmp);
+	lisys_free (self->tmp);
 	self->tmp = NULL;
 	self->name = NULL;
 	self->value = NULL;

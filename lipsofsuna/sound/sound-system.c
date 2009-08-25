@@ -24,9 +24,8 @@
 
 #ifndef LI_DISABLE_SOUND
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "sound-system.h"
 
 /*****************************************************************************/
@@ -42,7 +41,7 @@ lisnd_system_new ()
 	lisndSystem* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisndSystem));
+	self = lisys_calloc (1, sizeof (lisndSystem));
 	if (self == NULL)
 		return NULL;
 
@@ -80,7 +79,7 @@ lisnd_system_free (lisndSystem* self)
 	}
 	if (self->device != NULL)
 		alcCloseDevice (self->device);
-	free (self);
+	lisys_free (self);
 }
 
 /**

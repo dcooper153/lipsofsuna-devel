@@ -22,12 +22,8 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <unistd.h>
+#include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "archive-tar.h"
 
@@ -87,7 +83,7 @@ liarc_tar_new (liarcWriter* writer)
 {
 	liarcTar* self;
 
-	self = calloc (1, sizeof (liarcTar));
+	self = lisys_calloc (1, sizeof (liarcTar));
 	if (self == NULL)
 		return NULL;
 	self->writer = writer;
@@ -98,7 +94,7 @@ liarc_tar_new (liarcWriter* writer)
 void
 liarc_tar_free (liarcTar* self)
 {
-	free (self);
+	lisys_free (self);
 }
 
 int
@@ -227,7 +223,7 @@ liarc_tar_write_file (liarcTar*   self,
 	if (st.type == LISYS_STAT_LINK)
 	{
 		private_header_set_link (self, &header, link);
-		free (link);
+		lisys_free (link);
 	}
 	if (st.type == LISYS_STAT_CHAR) private_header_set_device (self, &header, st.rdev);
 	if (st.type == LISYS_STAT_BLOCK) private_header_set_device (self, &header, st.rdev);
@@ -352,13 +348,13 @@ private_header_set_owner (liarcTar*       self,
 	if (user != NULL)
 	{
 		snprintf (header->uname, 32, "%s", user);
-		free (user);
+		lisys_free (user);
 	}
 	group = lisys_group_get_name (gid);
 	if (group != NULL)
 	{
 		snprintf (header->gname, 32, "%s", group);
-		free (group);
+		lisys_free (group);
 	}
 }
 

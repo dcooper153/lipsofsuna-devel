@@ -74,12 +74,9 @@ lirel_reload_new (lipthPaths* paths)
 	lirelReload* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirelReload));
+	self = lisys_calloc (1, sizeof (lirelReload));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->paths = paths;
 
 	return self;
@@ -89,7 +86,7 @@ void
 lirel_reload_free (lirelReload* self)
 {
 	lirel_reload_cancel (self);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -182,7 +179,7 @@ lirel_reload_update (lirelReload* self)
 			if (name != NULL)
 			{
 				self->reload_model_call (self->reload_model_data, name);
-				free (name);
+				lisys_free (name);
 			}
 		}
 	}
@@ -197,7 +194,7 @@ lirel_reload_update (lirelReload* self)
 			if (name != NULL)
 			{
 				self->reload_image_call (self->reload_image_data, name);
-				free (name);
+				lisys_free (name);
 			}
 		}
 	}
@@ -261,9 +258,9 @@ lirel_reload_set_enabled (lirelReload* self,
 		{
 			lisys_notify_free (self->notify);
 			self->notify = NULL;
-			free (path);
+			lisys_free (path);
 		}
-		free (path);
+		lisys_free (path);
 	}
 	else
 	{
@@ -328,11 +325,11 @@ private_async_reload (lithrAsyncCall* call)
 	/* The rest is done in the free callback. */
 	call->result = 1;
 stop:
-	free (path);
+	lisys_free (path);
 	return;
 
 error:
-	free (path);
+	lisys_free (path);
 }
 
 static int
@@ -368,8 +365,8 @@ private_convert_models (lithrAsyncCall* call,
 			goto error;
 		if (!lirel_reload_blender (self, src, dst))
 			lisys_error_report ();
-		free (src);
-		free (dst);
+		lisys_free (src);
+		lisys_free (dst);
 	}
 	lisys_dir_free (directory);
 
@@ -377,8 +374,8 @@ private_convert_models (lithrAsyncCall* call,
 
 error:
 	lisys_dir_free (directory);
-	free (src);
-	free (dst);
+	lisys_free (src);
+	lisys_free (dst);
 	return 0;
 }
 
@@ -428,8 +425,8 @@ private_convert_textures (lithrAsyncCall* call,
 				goto error;
 			if (!converters[j].convert (self, src, dst))
 				lisys_error_report ();
-			free (src);
-			free (dst);
+			lisys_free (src);
+			lisys_free (dst);
 		}
 		lisys_dir_free (directory);
 	}
@@ -438,8 +435,8 @@ private_convert_textures (lithrAsyncCall* call,
 
 error:
 	lisys_dir_free (directory);
-	free (src);
-	free (dst);
+	lisys_free (src);
+	lisys_free (dst);
 	return 0;
 }
 
@@ -465,15 +462,15 @@ private_filter_blend_modified (const char* dir,
 	dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
 	if (dst == NULL)
 	{
-		free (src);
+		lisys_free (src);
 		return 1;
 	}
 
 	/* Check for modifications. */
 	ret = stat (src, &src_st);
 	ret |= stat (dst, &dst_st);
-	free (src);
-	free (dst);
+	lisys_free (src);
+	lisys_free (dst);
 	if (ret != 0)
 		return 1;
 	if (src_st.st_mtime < dst_st.st_mtime)
@@ -504,15 +501,15 @@ private_filter_img_modified (const char* dir,
 	dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
 	if (dst == NULL)
 	{
-		free (src);
+		lisys_free (src);
 		return 1;
 	}
 
 	/* Check for modifications. */
 	ret = stat (src, &src_st);
 	ret |= stat (dst, &dst_st);
-	free (src);
-	free (dst);
+	lisys_free (src);
+	lisys_free (dst);
 	if (ret != 0)
 		return 1;
 	if (src_st.st_mtime < dst_st.st_mtime)
@@ -543,15 +540,15 @@ private_filter_xcf_modified (const char* dir,
 	dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
 	if (dst == NULL)
 	{
-		free (src);
+		lisys_free (src);
 		return 1;
 	}
 
 	/* Check for modifications. */
 	ret = stat (src, &src_st);
 	ret |= stat (dst, &dst_st);
-	free (src);
-	free (dst);
+	lisys_free (src);
+	lisys_free (dst);
 	if (ret != 0)
 		return 1;
 	if (src_st.st_mtime < dst_st.st_mtime)

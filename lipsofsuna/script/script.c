@@ -22,10 +22,6 @@
  * @{
  */
 
-#include <assert.h>
-#include <time.h>
-#include <stdlib.h>
-#include <sys/time.h>
 #include <system/lips-system.h>
 #include "script.h"
 #include "script-class.h"
@@ -43,19 +39,15 @@ liscr_script_new ()
 	liscrScript* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liscrScript));
+	self = lisys_calloc (1, sizeof (liscrScript));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Allocate class tree. */
 	self->classes = lialg_strdic_new ();
 	if (self->classes == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -64,9 +56,8 @@ liscr_script_new ()
 	self->objects = lialg_ptrdic_new ();
 	if (self->objects == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lialg_strdic_free (self->classes);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 #endif
@@ -80,7 +71,7 @@ liscr_script_new ()
 		lialg_ptrdic_free (self->objects);
 #endif
 		lialg_strdic_free (self->classes);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -100,9 +91,6 @@ liscr_script_new ()
 	lua_setfield (self->lua, -2, "__mode");
 	lua_setmetatable (self->lua, -2);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
-
-	/* Crash at errors. */
-	lua_atpanic (self->lua, (lua_CFunction) abort);
 
 	return self;
 }
@@ -129,7 +117,7 @@ liscr_script_free (liscrScript* self)
 		liscr_class_free (iter.value);
 	lialg_strdic_free (self->classes);
 
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -198,15 +186,12 @@ liscr_script_load (liscrScript* self,
 	/* Set include path. */
 	inc = lisys_path_format (LISYS_PATH_PATHNAME, path, LISYS_PATH_SEPARATOR, "?.lua", NULL);
 	if (inc == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");
 	lua_pushstring (self->lua, inc);
 	lua_setfield (self->lua, -2, "path");
 	lua_pop (self->lua, 1);
-	free (inc);
+	lisys_free (inc);
 
 	/* Load the file. */
 	ret = luaL_loadfile (self->lua, path);

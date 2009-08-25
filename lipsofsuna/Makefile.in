@@ -231,10 +231,11 @@ am__objects_25 = string/string-generic.lo string/string-parser.lo \
 	string/string-reader.lo
 am__objects_26 = system/system.lo system/system-directory.lo \
 	system/system-error.lo system/system-file.lo \
-	system/system-execute.lo system/system-misc.lo \
-	system/system-module.lo system/system-notify.lo \
-	system/system-path.lo system/system-relative.lo \
-	system/system-types.lo system/system-user.lo
+	system/system-execute.lo system/system-memory.lo \
+	system/system-misc.lo system/system-module.lo \
+	system/system-notify.lo system/system-path.lo \
+	system/system-relative.lo system/system-types.lo \
+	system/system-user.lo
 am__objects_27 = thread/thread-async-call.lo
 am__objects_28 = voxel/voxel.lo voxel/voxel-block.lo \
 	voxel/voxel-builder.lo voxel/voxel-manager.lo \
@@ -276,6 +277,7 @@ am__objects_30 = main/lipsofsuna-main.$(OBJEXT)
 am_lipsofsuna_OBJECTS = $(am__objects_30) \
 	system/lipsofsuna-system-error.$(OBJEXT) \
 	system/lipsofsuna-system-execute.$(OBJEXT) \
+	system/lipsofsuna-system-memory.$(OBJEXT) \
 	system/lipsofsuna-system-path.$(OBJEXT) \
 	system/lipsofsuna-system-relative.$(OBJEXT)
 lipsofsuna_OBJECTS = $(am_lipsofsuna_OBJECTS)
@@ -1002,6 +1004,7 @@ sys_HEADERS = \
 	system/system-error.h \
 	system/system-file.h \
 	system/system-execute.h \
+	system/system-memory.h \
 	system/system-misc.h \
 	system/system-module.h \
 	system/system-notify.h \
@@ -1016,6 +1019,7 @@ syssrc = \
 	system/system-error.c \
 	system/system-file.c \
 	system/system-execute.c \
+	system/system-memory.c \
 	system/system-misc.c \
 	system/system-module.c \
 	system/system-notify.c \
@@ -1144,6 +1148,7 @@ lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
 lipsofsuna_SOURCES = $(maisrc) \
 	system/system-error.c \
 	system/system-execute.c \
+	system/system-memory.c \
 	system/system-path.c \
 	system/system-relative.c
 
@@ -1703,6 +1708,8 @@ system/system-file.lo: system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
 system/system-execute.lo: system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
+system/system-memory.lo: system/$(am__dirstamp) \
+	system/$(DEPDIR)/$(am__dirstamp)
 system/system-misc.lo: system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
 system/system-module.lo: system/$(am__dirstamp) \
@@ -1837,6 +1844,8 @@ main/lipsofsuna-main.$(OBJEXT): main/$(am__dirstamp) \
 system/lipsofsuna-system-error.$(OBJEXT): system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
 system/lipsofsuna-system-execute.$(OBJEXT): system/$(am__dirstamp) \
+	system/$(DEPDIR)/$(am__dirstamp)
+system/lipsofsuna-system-memory.$(OBJEXT): system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
 system/lipsofsuna-system-path.$(OBJEXT): system/$(am__dirstamp) \
 	system/$(DEPDIR)/$(am__dirstamp)
@@ -2163,6 +2172,7 @@ mostlyclean-compile:
 	-rm -f string/string-reader.lo
 	-rm -f system/lipsofsuna-system-error.$(OBJEXT)
 	-rm -f system/lipsofsuna-system-execute.$(OBJEXT)
+	-rm -f system/lipsofsuna-system-memory.$(OBJEXT)
 	-rm -f system/lipsofsuna-system-path.$(OBJEXT)
 	-rm -f system/lipsofsuna-system-relative.$(OBJEXT)
 	-rm -f system/system-directory.$(OBJEXT)
@@ -2173,6 +2183,8 @@ mostlyclean-compile:
 	-rm -f system/system-execute.lo
 	-rm -f system/system-file.$(OBJEXT)
 	-rm -f system/system-file.lo
+	-rm -f system/system-memory.$(OBJEXT)
+	-rm -f system/system-memory.lo
 	-rm -f system/system-misc.$(OBJEXT)
 	-rm -f system/system-misc.lo
 	-rm -f system/system-module.$(OBJEXT)
@@ -2405,12 +2417,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@string/$(DEPDIR)/string-reader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-execute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-memory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-relative.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-directory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-execute.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-memory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-misc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-notify.Plo@am__quote@
@@ -3110,6 +3124,20 @@ system/lipsofsuna-system-execute.obj: system/system-execute.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-execute.c' object='system/lipsofsuna-system-execute.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_CFLAGS) $(CFLAGS) -c -o system/lipsofsuna-system-execute.obj `if test -f 'system/system-execute.c'; then $(CYGPATH_W) 'system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/system/system-execute.c'; fi`
+
+system/lipsofsuna-system-memory.o: system/system-memory.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_CFLAGS) $(CFLAGS) -MT system/lipsofsuna-system-memory.o -MD -MP -MF system/$(DEPDIR)/lipsofsuna-system-memory.Tpo -c -o system/lipsofsuna-system-memory.o `test -f 'system/system-memory.c' || echo '$(srcdir)/'`system/system-memory.c
+@am__fastdepCC_TRUE@	mv -f system/$(DEPDIR)/lipsofsuna-system-memory.Tpo system/$(DEPDIR)/lipsofsuna-system-memory.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-memory.c' object='system/lipsofsuna-system-memory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_CFLAGS) $(CFLAGS) -c -o system/lipsofsuna-system-memory.o `test -f 'system/system-memory.c' || echo '$(srcdir)/'`system/system-memory.c
+
+system/lipsofsuna-system-memory.obj: system/system-memory.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_CFLAGS) $(CFLAGS) -MT system/lipsofsuna-system-memory.obj -MD -MP -MF system/$(DEPDIR)/lipsofsuna-system-memory.Tpo -c -o system/lipsofsuna-system-memory.obj `if test -f 'system/system-memory.c'; then $(CYGPATH_W) 'system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/system/system-memory.c'; fi`
+@am__fastdepCC_TRUE@	mv -f system/$(DEPDIR)/lipsofsuna-system-memory.Tpo system/$(DEPDIR)/lipsofsuna-system-memory.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='system/system-memory.c' object='system/lipsofsuna-system-memory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_CFLAGS) $(CFLAGS) -c -o system/lipsofsuna-system-memory.obj `if test -f 'system/system-memory.c'; then $(CYGPATH_W) 'system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/system/system-memory.c'; fi`
 
 system/lipsofsuna-system-path.o: system/system-path.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_CFLAGS) $(CFLAGS) -MT system/lipsofsuna-system-path.o -MD -MP -MF system/$(DEPDIR)/lipsofsuna-system-path.Tpo -c -o system/lipsofsuna-system-path.o `test -f 'system/system-path.c' || echo '$(srcdir)/'`system/system-path.c

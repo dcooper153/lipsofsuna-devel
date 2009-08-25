@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "binding.h"
 
 /**
@@ -46,13 +45,13 @@ libnd_action_new (const char*   identifier,
 {
 	libndAction* self;
 
-	self = calloc (1, sizeof (libndAction));
+	self = lisys_calloc (1, sizeof (libndAction));
 	if (self == NULL)
 		return NULL;
 	self->enabled = 1;
-	self->identifier = strdup (identifier);
-	self->name = strdup (name);
-	self->description = strdup (description);
+	self->identifier = listr_dup (identifier);
+	self->name = listr_dup (name);
+	self->description = listr_dup (description);
 	self->callback = callback;
 	self->data = data;
 	if (self->identifier == NULL ||
@@ -74,10 +73,10 @@ libnd_action_new (const char*   identifier,
 void
 libnd_action_free (libndAction* self)
 {
-	free (self->identifier);
-	free (self->name);
-	free (self->description);
-	free (self);
+	lisys_free (self->identifier);
+	lisys_free (self->name);
+	lisys_free (self->description);
+	lisys_free (self);
 }
 
 int

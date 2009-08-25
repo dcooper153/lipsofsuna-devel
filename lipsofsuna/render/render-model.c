@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "render-model.h"
 
 /**
@@ -43,7 +42,7 @@ lirnd_model_new (lirndRender* render,
 	lirndModel* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndModel));
+	self = lisys_calloc (1, sizeof (lirndModel));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -61,7 +60,7 @@ lirnd_model_new (lirndRender* render,
 void
 lirnd_model_free (lirndModel* self)
 {
-	free (self);
+	lisys_free (self);
 }
 
 void

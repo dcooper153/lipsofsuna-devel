@@ -155,25 +155,25 @@ liwdg_treerow_append_row (liwdgTreerow* self,
 	liwdgTreerow* tmp;
 
 	/* Format row. */
-	tmp = calloc (1, sizeof (liwdgTreerow));
+	tmp = lisys_calloc (1, sizeof (liwdgTreerow));
 	if (tmp == NULL)
 		return NULL;
 	tmp->parent = self;
 	tmp->data = data;
 	tmp->depth = self->depth + 1;
 	tmp->tree = self->tree;
-	tmp->text = strdup (text);
+	tmp->text = listr_dup (text);
 	if (tmp->text == NULL)
 	{
-		free (tmp);
+		lisys_free (tmp);
 		return NULL;
 	}
 	tmp->font = liwdg_manager_find_font (LIWDG_WIDGET (self->tree)->manager, "default");
 	tmp->layout = lifnt_layout_new ();
 	if (tmp->layout == NULL)
 	{
-		free (tmp->text);
-		free (tmp);
+		lisys_free (tmp->text);
+		lisys_free (tmp);
 		return NULL;
 	}
 	if (tmp->font != NULL)
@@ -186,8 +186,8 @@ liwdg_treerow_append_row (liwdgTreerow* self,
 	if (!lialg_array_append (&self->rows, &tmp))
 	{
 		lifnt_layout_free (tmp->layout);
-		free (tmp->text);
-		free (tmp);
+		lisys_free (tmp->text);
+		lisys_free (tmp);
 		return NULL;
 	}
 
@@ -303,10 +303,10 @@ liwdg_treerow_set_text (liwdgTreerow* self,
 	assert (self->text != NULL);
 
 	/* Set new text. */
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (self->text);
+	lisys_free (self->text);
 	self->text = tmp;
 
 	/* Update layout. */
@@ -391,10 +391,10 @@ private_treerow_free (liwdgTreerow* self)
 		lifnt_layout_free (self->layout);
 	for (i = 0 ; i < self->rows.count ; i++)
 		private_treerow_free (self->rows.array[i]);
-	free (self->rows.array);
-	free (self->text);
+	lisys_free (self->rows.array);
+	lisys_free (self->text);
 	if (self->parent != NULL)
-		free (self);
+		lisys_free (self);
 }
 
 static void

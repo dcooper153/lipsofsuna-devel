@@ -123,10 +123,10 @@ liwdg_entry_set_text (liwdgEntry* self,
 {
 	char* tmp;
 
-	tmp = strdup (text);
+	tmp = listr_dup (text);
 	if (tmp == NULL)
 		return 0;
-	free (self->string);
+	lisys_free (self->string);
 	self->string = tmp;
 	private_rebuild (self);
 
@@ -144,14 +144,14 @@ private_init (liwdgEntry*   self,
 		return 0;
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->editable = 1;
-	self->string = calloc (1, sizeof (char));
+	self->string = lisys_calloc (1, sizeof (char));
 	if (self->string == NULL)
 		return 0;
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 	{
-		free (self->string);
+		lisys_free (self->string);
 		return 0;
 	}
 	private_rebuild (self);
@@ -163,7 +163,7 @@ static void
 private_free (liwdgEntry* self)
 {
 	lifnt_layout_free (self->text);
-	free (self->string);
+	lisys_free (self->string);
 }
 
 static int
@@ -208,7 +208,7 @@ private_event (liwdgEntry* self,
 			}
 			if (event->key.unicode != 0)
 			{
-				str = li_string_wchar_to_utf8 (event->key.unicode);
+				str = listr_wchar_to_utf8 (event->key.unicode);
 				if (str != NULL)
 				{
 					len = strlen (self->string);
@@ -218,7 +218,7 @@ private_event (liwdgEntry* self,
 						self->string = tmp;
 						strcpy (self->string + len, str);
 					}
-					free (str);
+					lisys_free (str);
 					private_rebuild (self);
 					lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_EDITED);
 				}
@@ -270,19 +270,19 @@ private_backspace (liwdgEntry* self)
 		return;
 
 	/* Get wide character length. */
-	wstr = li_string_utf8_to_wchar (tmp);
+	wstr = listr_utf8_to_wchar (tmp);
 	if (wstr == NULL)
 		return;
 	len1 = wcslen (wstr);
 	assert (len1);
 
 	/* Get length of the last character. */
-	str = li_string_wchar_to_utf8 (wstr[len1 - 1]);
-	free (wstr);
+	str = listr_wchar_to_utf8 (wstr[len1 - 1]);
+	lisys_free (wstr);
 	if (str == NULL)
 		return;
 	len1 = strlen (str);
-	free (str);
+	lisys_free (str);
 
 	/* Discard the last character. */
 	self->string[len0 - len1] = '\0';

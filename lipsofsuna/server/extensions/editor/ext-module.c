@@ -40,14 +40,14 @@ liext_module_new (lisrvServer* server)
 {
 	liextModule* self;
 
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 	self->editor = liext_editor_new (server);
 	if (self->editor == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -61,7 +61,7 @@ liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
 	liext_editor_free (self->editor);
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

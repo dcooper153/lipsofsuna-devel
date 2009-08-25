@@ -68,7 +68,7 @@ licli_object_new (licliModule* module,
 		return NULL;
 
 	/* Allocate client data. */
-	data = calloc (1, sizeof (licliObject));
+	data = lisys_calloc (1, sizeof (licliObject));
 	if (data == NULL)
 		goto error;
 	data->module = module;
@@ -129,7 +129,7 @@ licli_object_free (liengObject* self)
 		lialg_list_free (data->sounds);
 #endif
 
-		free (data);
+		lisys_free (data);
 	}
 
 	/* Call base. */

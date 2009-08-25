@@ -39,12 +39,9 @@ lifnt_font_new (lividCalls* video,
 	lifntFont* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lifntFont));
+	self = lisys_calloc (1, sizeof (lifntFont));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->video = *video;
 
 	/* Open the font. */
@@ -64,7 +61,6 @@ lifnt_font_new (lividCalls* video,
 	self->index = lialg_u32dic_new ();
 	if (self->index == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lifnt_font_free (self);
 		return NULL;
 	}
@@ -76,10 +72,9 @@ lifnt_font_new (lividCalls* video,
 	self->table_height = LIFNT_CACHE_HEIGHT / self->table_glyph_height;
 	self->table_length = self->table_width * self->table_height;
 	self->table_filled = 0;
-	self->table = calloc (self->table_length, sizeof (lifntFontGlyph*));
+	self->table = lisys_calloc (self->table_length, sizeof (lifntFontGlyph*));
 	if (self->table == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lifnt_font_free (self);
 		return NULL;
 	}
@@ -104,14 +99,14 @@ lifnt_font_free (lifntFont* self)
 	if (self->index != NULL)
 	{
 		LI_FOREACH_U32DIC (iter, self->index)
-			free (iter.value);
+			lisys_free (iter.value);
 		lialg_u32dic_free (self->index);
 	}
 	if (self->table != NULL)
-		free (self->table);
+		lisys_free (self->table);
 	if (self->font != NULL)
 		self->video.TTF_CloseFont (self->font);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -220,14 +215,14 @@ private_cache_glyph (lifntFont* self,
 	if (self->table_filled < self->table_length)
 	{
 		/* Allocate glyph. */
-		cached = malloc (sizeof (lifntFontGlyph));
+		cached = lisys_malloc (sizeof (lifntFontGlyph));
 		if (cached == NULL)
 			return NULL;
 		if (!lialg_u32dic_insert (self->index, glyph, cached))
 		{
 			self->table_filled--;
 			self->video.SDL_FreeSurface (image);
-			free (cached);
+			lisys_free (cached);
 			return NULL;
 		}
 
@@ -251,7 +246,7 @@ private_cache_glyph (lifntFont* self,
 			self->table[index] = NULL;
 			self->table_filled--;
 			self->video.SDL_FreeSurface (image);
-			free (cached);
+			lisys_free (cached);
 			return NULL;
 		}
 	}

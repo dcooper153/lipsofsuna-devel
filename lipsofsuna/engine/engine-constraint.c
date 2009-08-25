@@ -33,7 +33,7 @@ lieng_constraint_new (liengObject* first_object,
 {
 	liengConstraint* self;
 
-	self = calloc (1, sizeof (liengConstraint));
+	self = lisys_calloc (1, sizeof (liengConstraint));
 	if (self == NULL)
 		return NULL;
 	self->objects[0] = first_object;
@@ -49,7 +49,7 @@ lieng_constraint_free (liengConstraint* self)
 {
 	assert (self->next == NULL);
 	assert (self->prev == NULL);
-	free (self);
+	lisys_free (self);
 }
 
 /*****************************************************************************/

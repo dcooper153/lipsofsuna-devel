@@ -65,14 +65,14 @@ liext_module_new (licliModule* module)
 	liextModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
 	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -101,7 +101,7 @@ liext_module_free (liextModule* self)
 	lialg_u32dic_free (self->dictionary);
 	lieng_engine_remove_calls (self->module->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 /*****************************************************************************/
@@ -162,13 +162,13 @@ private_packet_diff (liextModule* self,
 		    !li_reader_get_text (reader, "", &node) ||
 		    !li_reader_get_uint16 (reader, &model))
 		{
-			free (slot);
-			free (node);
-		    return 0;
+			lisys_free (slot);
+			lisys_free (node);
+			return 0;
 		}
 		liext_slots_set_slot (slots, slot, node, model);
-		free (slot);
-		free (node);
+		lisys_free (slot);
+		lisys_free (node);
 	}
 
 	return 1;
@@ -213,13 +213,13 @@ private_packet_reset (liextModule* self,
 		    !li_reader_get_text (reader, "", &node) ||
 		    !li_reader_get_uint16 (reader, &model))
 		{
-			free (slot);
-			free (node);
-		    return 0;
+			lisys_free (slot);
+			lisys_free (node);
+			return 0;
 		}
 		liext_slots_set_slot (slots, slot, node, model);
-		free (slot);
-		free (node);
+		lisys_free (slot);
+		lisys_free (node);
 	}
 
 	return 1;

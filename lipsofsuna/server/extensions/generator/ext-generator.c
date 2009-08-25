@@ -40,14 +40,14 @@ liext_generator_new (lisrvServer* server)
 {
 	liextGenerator* self;
 
-	self = calloc (1, sizeof (liextGenerator));
+	self = lisys_calloc (1, sizeof (liextGenerator));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 1,
 	     	private_client_packet, self, self->calls + 0))
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -59,7 +59,7 @@ liext_generator_free (liextGenerator* self)
 {
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 /*****************************************************************************/

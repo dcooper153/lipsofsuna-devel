@@ -45,20 +45,20 @@ main (int argc, char** argv)
 	if (!livid_calls_init (&video))
 	{
 		lisys_error_report ();
-		free (path);
+		lisys_free (path);
 		return 1;
 	}
 	self = licli_client_new (&video, path, argc > 1? argv[1] : "data");
 	if (self == NULL)
 	{
 		lisys_error_report ();
-		free (path);
+		lisys_free (path);
 		return 1;
 	}
 	if (!licli_client_main (self))
 		lisys_error_report ();
 	licli_client_free (self);
-	free (path);
+	lisys_free (path);
 
 	return 0;
 }

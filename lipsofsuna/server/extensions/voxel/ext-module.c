@@ -73,7 +73,7 @@ liext_module_new (lisrvServer* server)
 	livoxMaterial* material;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->radius = 20.0f;
@@ -81,7 +81,7 @@ liext_module_new (lisrvServer* server)
 	self->listeners = lialg_ptrdic_new ();
 	if (self->listeners == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -160,7 +160,7 @@ liext_module_free (liextModule* self)
 
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 int

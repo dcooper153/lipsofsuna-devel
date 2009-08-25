@@ -63,19 +63,15 @@ livie_viewer_new (lividCalls* video,
 	livieViewer* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livieViewer));
+	self = lisys_calloc (1, sizeof (livieViewer));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->video = *video;
 	self->paths = paths;
-	self->file = strdup (model);
+	self->file = listr_dup (model);
 	if (self->file == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -83,7 +79,7 @@ livie_viewer_new (lividCalls* video,
 	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -125,8 +121,8 @@ livie_viewer_free (livieViewer* self)
 	if (self->screen != NULL)
 		self->video.SDL_FreeSurface (self->screen);
 	self->video.SDL_Quit ();
-	free (self->file);
-	free (self);
+	lisys_free (self->file);
+	lisys_free (self);
 }
 
 int
@@ -290,7 +286,7 @@ private_init_model (livieViewer* self,
 
 	/* Load model. */
 	mdl = limdl_model_new_from_file (path);
-	free (path);
+	lisys_free (path);
 	if (mdl == NULL)
 	{
 		lisys_error_set (EINVAL, "Cannot open model `%s'", model);

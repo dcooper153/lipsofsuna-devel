@@ -29,12 +29,9 @@ lieng_selection_new (liengObject* object)
 {
 	liengSelection* self;
 
-	self = calloc (1, sizeof (liengSelection));
+	self = lisys_calloc (1, sizeof (liengSelection));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->object = object;
 	lieng_object_get_transform (object, &self->transform);
 
@@ -44,7 +41,7 @@ lieng_selection_new (liengObject* object)
 void
 lieng_selection_free (liengSelection* self)
 {
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

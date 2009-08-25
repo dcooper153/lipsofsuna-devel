@@ -25,9 +25,8 @@
 #ifndef __ALGORITHM_ARRAY_H__
 #define __ALGORITHM_ARRAY_H__
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 
 typedef struct _lialgArray lialgArray;
 struct _lialgArray
@@ -82,7 +81,7 @@ lialg_array_append_full (void*  self,
 	num = array->count + count;
 	if (num > array->count)
 	{
-		tmp = realloc (array->array, num * size);
+		tmp = lisys_realloc (array->array, num * size);
 		if (tmp == NULL)
 			return 0;
 		array->array = tmp;
@@ -109,7 +108,7 @@ lialg_array_insert_full (void*  self,
 	num = array->count + count;
 	if (num > array->count)
 	{
-		tmp = realloc (array->array, num * size);
+		tmp = lisys_realloc (array->array, num * size);
 		if (tmp == NULL)
 			return 0;
 		array->array = tmp;
@@ -138,7 +137,7 @@ lialg_array_prepend_full (void*  self,
 	num = array->count + count;
 	if (num > array->count)
 	{
-		tmp = realloc (array->array, num * size);
+		tmp = lisys_realloc (array->array, num * size);
 		if (tmp == NULL)
 			return 0;
 		array->array = tmp;
@@ -181,7 +180,7 @@ lialg_array_resize_full (void*  self,
 	assert (size > 0);
 	assert (count >= 0);
 
-	tmp = realloc (array->array, size * count);
+	tmp = lisys_realloc (array->array, size * count);
 	if (tmp == NULL)
 		return 0;
 	array->count = count;

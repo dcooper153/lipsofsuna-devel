@@ -37,7 +37,7 @@ licfg_bans_new ()
 	licfgBans* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licfgBans));
+	self = lisys_calloc (1, sizeof (licfgBans));
 	if (self == NULL)
 		return NULL;
 	self->bans = lialg_strdic_new ();
@@ -65,28 +65,19 @@ licfg_bans_new_from_file (const char* dir)
 	licfgBans* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licfgBans));
+	self = lisys_calloc (1, sizeof (licfgBans));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->bans = lialg_strdic_new ();
 	if (self->bans == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 
 	/* Open the file. */
 	path = lisys_path_concat (dir, "bans.def", NULL);
 	if (path == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 	reader = li_reader_new_from_file (path);
-	free (path);
+	lisys_free (path);
 	if (reader == NULL)
 		goto error;
 
@@ -100,11 +91,10 @@ licfg_bans_new_from_file (const char* dir)
 			goto error;
 		if (!licfg_bans_insert_ban (self, name))
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (name);
+			lisys_free (name);
 			goto error;
 		}
-		free (name);
+		lisys_free (name);
 	}
 
 	li_reader_free (reader);
@@ -127,7 +117,7 @@ licfg_bans_free (licfgBans* self)
 {
 	if (self->bans != NULL)
 		lialg_strdic_free (self->bans);
-	free (self);
+	lisys_free (self);
 }
 
 /**

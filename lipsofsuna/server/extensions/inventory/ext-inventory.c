@@ -61,7 +61,7 @@ liext_inventory_new (liextModule* module)
 	liextInventory* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextInventory));
+	self = lisys_calloc (1, sizeof (liextInventory));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -70,7 +70,7 @@ liext_inventory_new (liextModule* module)
 	/* Find unique ID. */
 	while (!self->id)
 	{
-		self->id = rand ();
+		self->id = lisys_randi (0x7FFFFFFF);
 		if (lialg_u32dic_find (module->dictionary, self->id))
 			self->id = 0;
 	}
@@ -78,7 +78,7 @@ liext_inventory_new (liextModule* module)
 	/* Register self. */
 	if (!lialg_u32dic_insert (module->dictionary, self->id, self))
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -114,8 +114,8 @@ liext_inventory_free (liextInventory* self)
 	lialg_u32dic_remove (self->module->dictionary, self->id);
 	if (self->listeners != NULL)
 		lialg_u32dic_free (self->listeners);
-	free (self->slots.array);
-	free (self);
+	lisys_free (self->slots.array);
+	lisys_free (self);
 }
 
 /**
@@ -272,12 +272,9 @@ liext_inventory_set_size (liextInventory* self,
 	/* Set new size. */
 	if (value > self->slots.count)
 	{
-		tmp = realloc (self->slots.array, value * sizeof (liengObject*));
+		tmp = lisys_realloc (self->slots.array, value * sizeof (liengObject*));
 		if (tmp == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		self->slots.array = tmp;
 		tmp += self->slots.count;
 		memset (tmp, 0, (value - self->slots.count) * sizeof (liengObject*));
@@ -290,7 +287,7 @@ liext_inventory_set_size (liextInventory* self,
 			if (self->slots.array[i] != NULL)
 				liscr_data_unref (self->slots.array[i]->script, self->script);
 		}
-		tmp = realloc (self->slots.array, value * sizeof (liengObject*));
+		tmp = lisys_realloc (self->slots.array, value * sizeof (liengObject*));
 		if (tmp != NULL || !value)
 			self->slots.array = tmp;
 		self->slots.count = value;

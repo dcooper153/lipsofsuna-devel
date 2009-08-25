@@ -87,7 +87,7 @@ liwdg_login_read_server_list (liwdgLogin* self)
 		lisys_dir_scan (servers0);
 		count1 = lisys_dir_get_count (servers0);
 	}
-	free (path);
+	lisys_free (path);
 
 	/* Read the local server list. */
 	path = lisys_path_concat (paths.local_data, "servers", NULL);
@@ -101,12 +101,12 @@ liwdg_login_read_server_list (liwdgLogin* self)
 		lisys_dir_scan (servers1);
 		count1 = lisys_dir_get_count (servers1);
 	}
-	free (path);
+	lisys_free (path);
 
 	/* Merge the server lists. */
 	if (count0 + count1)
 	{
-		servers = calloc (count0 + count1, sizeof (char*));
+		servers = lisys_calloc (count0 + count1, sizeof (char*));
 		if (servers == NULL)
 			goto error;
 		for (i = j = 0 ; i < count0 && j < count1 ; )
@@ -117,20 +117,20 @@ liwdg_login_read_server_list (liwdgLogin* self)
 			{
 				case -1:
 					i++;
-					servers[count] = strdup (name0);
+					servers[count] = listr_dup (name0);
 					if (servers[count++] == NULL)
 						goto error;
 					break;
 				case 0:
 					i++;
 					j++;
-					servers[count] = strdup (name1);
+					servers[count] = listr_dup (name1);
 					if (servers[count++] == NULL)
 						goto error;
 					break;
 				case 1:
 					j++;
-					servers[count] = strdup (name1);
+					servers[count] = listr_dup (name1);
 					if (servers[count++] == NULL)
 						goto error;
 					break;
@@ -138,13 +138,13 @@ liwdg_login_read_server_list (liwdgLogin* self)
 		}
 		while (i < count0)
 		{
-			servers[count] = strdup (lisys_dir_get_name (servers0, i++));
+			servers[count] = listr_dup (lisys_dir_get_name (servers0, i++));
 			if (servers[count++] == NULL)
 				goto error;
 		}
 		while (j < count1)
 		{
-			servers[count] = strdup (lisys_dir_get_name (servers1, i++));
+			servers[count] = listr_dup (lisys_dir_get_name (servers1, i++));
 			if (servers[count++] == NULL)
 				goto error;
 		}
@@ -158,8 +158,8 @@ liwdg_login_read_server_list (liwdgLogin* self)
 	if (self->servers != NULL)
 	{
 		for (i = 0 ; i < self->n_servers ; i++)
-			free (self->servers[i]);
-		free (self->servers);
+			lisys_free (self->servers[i]);
+		lisys_free (self->servers);
 	}
 	self->n_servers = count;
 	self->servers = servers;
@@ -167,8 +167,8 @@ liwdg_login_read_server_list (liwdgLogin* self)
 
 error:
 	for (i = 0 ; i < count ; i++)
-		free (servers[i]);
-	free (servers);
+		lisys_free (servers[i]);
+	lisys_free (servers);
 	if (servers0 != NULL)
 		lisys_dir_free (servers0);
 	if (servers1 != NULL)
@@ -285,8 +285,8 @@ private_free (liwdgLogin* self)
 	if (self->servers != NULL)
 	{
 		for (i = 0 ; i < self->n_servers ; i++)
-			free (self->servers[i]);
-		free (self->servers);
+			lisys_free (self->servers[i]);
+		lisys_free (self->servers);
 	}
 }
 

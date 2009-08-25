@@ -32,7 +32,7 @@ li_speech_new (licliModule* module,
 	liSpeech* self;
 	lifntFont* font;
 
-	self = malloc (sizeof (liSpeech));
+	self = lisys_malloc (sizeof (liSpeech));
 	if (self == NULL)
 		return NULL;
 	self->alpha = 1.0f;
@@ -40,7 +40,7 @@ li_speech_new (licliModule* module,
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	lifnt_layout_set_width_limit (self->text, 150);
@@ -55,7 +55,7 @@ void
 li_speech_free (liSpeech* self)
 {
 	lifnt_layout_free (self->text);
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

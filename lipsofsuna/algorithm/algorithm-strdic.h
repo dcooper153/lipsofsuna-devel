@@ -25,9 +25,8 @@
 #ifndef __ALGORITHM_STRDIC_H__
 #define __ALGORITHM_STRDIC_H__
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "algorithm-bst.h"
 
 typedef struct _lialgStrdic lialgStrdic;
@@ -64,13 +63,13 @@ struct _lialgStrdicIter
 static inline void
 lialg_strdic_node_free (lialgStrdicNode* self)
 {
-	free (self->key);
-	free (self);
+	lisys_free (self->key);
+	lisys_free (self);
 }
 
 static inline int
 lialg_strdic_node_compare (const lialgStrdicNode* self,
-                              const lialgStrdicNode* node)
+                           const lialgStrdicNode* node)
 {
 	return strcmp (self->key, node->key);
 }
@@ -87,15 +86,15 @@ lialg_strdic_new ()
 {
 	lialgStrdic* self;
 
-	self = (lialgStrdic*) malloc (sizeof (lialgStrdic));
+	self = (lialgStrdic*) lisys_malloc (sizeof (lialgStrdic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_strdic_node_compare, malloc, free);
+	self->tree = lialg_bst_new ((lialgBstCompare) lialg_strdic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	return self;
@@ -112,7 +111,7 @@ lialg_strdic_free (lialgStrdic* self)
 	lialg_bst_foreach (self->tree, (lialgBstForeach) lialg_strdic_node_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -123,7 +122,7 @@ lialg_strdic_free (lialgStrdic* self)
 static inline void
 lialg_strdic_clear (lialgStrdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) free);
+	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -139,7 +138,7 @@ lialg_strdic_clear (lialgStrdic* self)
  */
 static inline void*
 lialg_strdic_find (lialgStrdic* self,
-                      const char*    key)
+                   const char*  key)
 {
 	lialgStrdicNode tmp;
 	lialgStrdicNode* anode;
@@ -163,7 +162,7 @@ lialg_strdic_find (lialgStrdic* self,
  */
 static inline lialgStrdicNode*
 lialg_strdic_find_node (lialgStrdic* self,
-                           const char*    key)
+                        const char*  key)
 {
 	lialgStrdicNode tmp;
 	lialgBstNode* tnode;
@@ -186,19 +185,19 @@ lialg_strdic_find_node (lialgStrdic* self,
  */
 static inline lialgStrdicNode*
 lialg_strdic_insert (lialgStrdic* self,
-                        const char*    key,
-                        void*          value)
+                     const char*  key,
+                     void*        value)
 {
 	lialgStrdicNode* node;
 
 	/* Create node. */
-	node = (lialgStrdicNode*)malloc (sizeof (lialgStrdicNode));
+	node = (lialgStrdicNode*) lisys_malloc (sizeof (lialgStrdicNode));
 	if (node == NULL)
 		return NULL;
-	node->key = strdup (key);
+	node->key = listr_dup (key);
 	if (node->key == NULL)
 	{
-		free (node);
+		lisys_free (node);
 		return NULL;
 	}
 	node->value = value;
@@ -226,7 +225,7 @@ lialg_strdic_insert (lialgStrdic* self,
  */
 static inline int
 lialg_strdic_remove (lialgStrdic* self,
-                        const char*    key)
+                     const char*    key)
 {
 	lialgBstNode* tnode;
 	lialgStrdicNode* anode;
@@ -263,7 +262,7 @@ lialg_strdic_remove (lialgStrdic* self,
  */
 static inline void
 lialg_strdic_remove_node (lialgStrdic*     self,
-                             lialgStrdicNode* node)
+                          lialgStrdicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -285,7 +284,7 @@ lialg_strdic_remove_node (lialgStrdic*     self,
 
 static inline void
 lialg_strdic_iter_start (lialgStrdicIter* self,
-                            lialgStrdic*     assoc)
+                         lialgStrdic*     assoc)
 {
 	self->assoc = assoc;
 	if (assoc->list == NULL)

@@ -41,7 +41,7 @@ liext_module_new (licliModule* module)
 	liextModule* self;
 	liscrClass* clss;
 
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -55,7 +55,7 @@ void
 liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

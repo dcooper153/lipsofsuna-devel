@@ -255,11 +255,11 @@ private_add (liextMaterials* self,
 			return 0;
 		}
 		trow = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
-		row1 = calloc (1, sizeof (liextMaterialsTreerow));
+		row1 = lisys_calloc (1, sizeof (liextMaterialsTreerow));
 		row1->material = material;
 		row1->texture = -1;
 		if (!liwdg_treerow_append_row (trow, material->name, row1))
-			free (row1);
+			lisys_free (row1);
 	}
 
 	/* Texture? */
@@ -267,11 +267,11 @@ private_add (liextMaterials* self,
 	{
 		if (!livox_material_append_texture (row->material, "empty"))
 			return 0;
-		row1 = calloc (1, sizeof (liextMaterialsTreerow));
+		row1 = lisys_calloc (1, sizeof (liextMaterialsTreerow));
 		row1->material = row->material;
 		row1->texture = row->material->model.textures.count - 1;
 		if (!liwdg_treerow_append_row (trow, "empty", row1))
-			free (row1);
+			lisys_free (row1);
 	}
 
 	return 0;
@@ -301,7 +301,7 @@ private_remove (liextMaterials* self,
 
 	/* Remove the row. */
 	trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-	free (liwdg_treerow_get_data (trow));
+	lisys_free (liwdg_treerow_get_data (trow));
 	liwdg_treerow_remove_row (
 		liwdg_treerow_get_parent (trow),
 		liwdg_treerow_get_index (trow));
@@ -426,7 +426,9 @@ private_populate (liextMaterials* self)
 	liwdg_tree_clear (LIWDG_TREE (self->widgets.tree));
 
 	/* Add root info. */
-	tmp = calloc (1, sizeof (liextMaterialsTreerow));
+	tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
+	if (tmp == NULL)
+		return;
 	tmp->material = NULL;
 	tmp->texture = -1;
 	liwdg_treerow_append_row (tree, "Root", tmp);
@@ -437,7 +439,7 @@ private_populate (liextMaterials* self)
 		material = iter.value;
 
 		/* Add material info. */
-		tmp = calloc (1, sizeof (liextMaterialsTreerow));
+		tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
 		tmp->material = material;
 		tmp->texture = -1;
 		row0 = liwdg_treerow_append_row (tree, material->name, tmp);
@@ -450,7 +452,7 @@ private_populate (liextMaterials* self)
 			texture = material->model.textures.array + j;
 
 			/* Add texture info. */
-			tmp = calloc (1, sizeof (liextMaterialsTreerow));
+			tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
 			tmp->material = material;
 			tmp->texture = j;
 			row1 = liwdg_treerow_append_row (row0, texture->string, tmp);

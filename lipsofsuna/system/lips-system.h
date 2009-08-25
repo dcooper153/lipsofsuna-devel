@@ -25,6 +25,7 @@
 #include "system-error.h"
 #include "system-execute.h"
 #include "system-file.h"
+#include "system-memory.h"
 #include "system-misc.h"
 #include "system-module.h"
 #include "system-notify.h"

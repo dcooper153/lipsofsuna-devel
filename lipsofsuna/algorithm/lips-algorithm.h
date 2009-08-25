@@ -29,5 +29,4 @@
 #include "algorithm-octree.h"
 #include "algorithm-priority-queue.h"
 
-
 #endif

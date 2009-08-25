@@ -41,7 +41,7 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -69,7 +69,7 @@ liext_module_free (liextModule* self)
 	liwdg_manager_remove_window (self->module->widgets, self->dialog);
 	liwdg_widget_free (self->dialog);
 	liext_editor_free (self->editor);
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

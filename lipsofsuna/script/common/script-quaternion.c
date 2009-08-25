@@ -73,7 +73,7 @@ Quaternion___gc (lua_State* lua)
 
 	self = liscr_isdata (lua, 1, LICOM_SCRIPT_QUATERNION);
 
-	free (self->data);
+	lisys_free (self->data);
 	liscr_data_free (self);
 	return 0;
 }
@@ -547,14 +547,14 @@ liscr_quaternion_new (liscrScript*           script,
 	limatQuaternion* tmp;
 	liscrData* self;
 
-	tmp = malloc (sizeof (limatQuaternion));
+	tmp = lisys_malloc (sizeof (limatQuaternion));
 	if (tmp == NULL)
 		return NULL;
 	*tmp = *quaternion;
 	self = liscr_data_new (script, tmp, LICOM_SCRIPT_QUATERNION);
 	if (self == NULL)
 	{
-		free (tmp);
+		lisys_free (tmp);
 		return NULL;
 	}
 

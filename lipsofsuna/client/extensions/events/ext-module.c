@@ -56,7 +56,7 @@ liext_module_new (licliModule* module)
 	liscrScript* script = module->script;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -101,7 +101,7 @@ liext_module_free (liextModule* self)
 		sizeof (self->calls) / sizeof (licalHandle));
 
 	/* FIXME: Remove the class here. */
-	free (self);
+	lisys_free (self);
 }
 
 /**

@@ -41,7 +41,7 @@ liext_skeleton_new (lisrvServer* server)
 	liextSkeleton* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextSkeleton));
+	self = lisys_calloc (1, sizeof (liextSkeleton));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -62,7 +62,7 @@ liext_skeleton_free (liextSkeleton* self)
 {
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 /*****************************************************************************/

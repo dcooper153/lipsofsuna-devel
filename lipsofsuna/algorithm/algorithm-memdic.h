@@ -25,9 +25,8 @@
 #ifndef __ALGORITHM_MEMDIC_H__
 #define __ALGORITHM_MEMDIC_H__
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "algorithm-bst.h"
 
 typedef struct _lialgMemdic lialgMemdic;
@@ -66,8 +65,8 @@ struct _lialgMemdicIter
 static inline void
 lialg_memdic_node_free (lialgMemdicNode* self)
 {
-	free (self->key);
-	free (self);
+	lisys_free (self->key);
+	lisys_free (self);
 }
 
 static inline int
@@ -100,15 +99,15 @@ lialg_memdic_new ()
 {
 	lialgMemdic* self;
 
-	self = (lialgMemdic*) malloc (sizeof (lialgMemdic));
+	self = (lialgMemdic*) lisys_malloc (sizeof (lialgMemdic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_memdic_node_compare, malloc, free);
+	self->tree = lialg_bst_new ((lialgBstCompare) lialg_memdic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	return self;
@@ -125,7 +124,7 @@ lialg_memdic_free (lialgMemdic* self)
 	lialg_bst_foreach (self->tree, (lialgBstForeach) lialg_memdic_node_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -213,14 +212,14 @@ lialg_memdic_insert (lialgMemdic* self,
 	lialgMemdicNode* node;
 
 	/* Create node. */
-	node = (lialgMemdicNode*) malloc (sizeof (lialgMemdicNode));
+	node = (lialgMemdicNode*) lisys_malloc (sizeof (lialgMemdicNode));
 	if (node == NULL)
 		return NULL;
-	node->key = malloc (keysize? keysize : 1);
+	node->key = lisys_malloc (keysize? keysize : 1);
 	node->keysize = keysize;
 	if (node->key == NULL)
 	{
-		free (node);
+		lisys_free (node);
 		return NULL;
 	}
 	memcpy (node->key, key, keysize);

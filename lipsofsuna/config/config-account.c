@@ -22,10 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "config-account.h"
 
 /**
@@ -44,12 +42,9 @@ licfg_account_new (const char* path)
 	licfgAccount* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licfgAccount));
+	self = lisys_calloc (1, sizeof (licfgAccount));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Open the file. */
 	reader = li_reader_new_from_file (path);
@@ -89,8 +84,8 @@ licfg_account_new (const char* path)
 		}
 
 		/* Catch errors. */
-		free (key);
-		free (value);
+		lisys_free (key);
+		lisys_free (value);
 		if (!ok)
 			goto error;
 	}
@@ -120,8 +115,8 @@ error:
 void
 licfg_account_free (licfgAccount* self)
 {
-	free (self->password);
-	free (self);
+	lisys_free (self->password);
+	lisys_free (self);
 }
 
 /** @} */

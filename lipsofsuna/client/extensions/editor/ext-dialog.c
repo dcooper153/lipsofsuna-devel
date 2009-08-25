@@ -203,14 +203,11 @@ private_edit (liextDialog* self)
 		LISYS_PATH_SEPARATOR, "graphics",
 		LISYS_PATH_SEPARATOR, tmp, ".blend", NULL);
 	if (name == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	/* Execute Blender. */
 	lisys_execvl_detach ("blender", "blender", name, NULL);
-	free (name);
+	lisys_free (name);
 
 	return 0;
 }

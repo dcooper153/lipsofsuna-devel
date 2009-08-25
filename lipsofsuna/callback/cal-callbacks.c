@@ -44,17 +44,13 @@ lical_callbacks_new ()
 {
 	licalCallbacks* self;
 
-	self = calloc (1, sizeof (licalCallbacks));
+	self = lisys_calloc (1, sizeof (licalCallbacks));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->types = lialg_u32dic_new ();
 	if (self->types == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -70,7 +66,7 @@ lical_callbacks_free (licalCallbacks* self)
 	LI_FOREACH_U32DIC (iter, self->types)
 		private_free_type (iter.value);
 	lialg_u32dic_free (self->types);
-	free (self);
+	lisys_free (self);
 }
 
 int
@@ -138,17 +134,14 @@ lical_callbacks_insert_type (licalCallbacks* self,
 {
 	licalCalltype* typ;
 
-	typ = calloc (1, sizeof (licalCalltype));
+	typ = lisys_calloc (1, sizeof (licalCalltype));
 	if (typ == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	typ->marshal = marshal;
 	if (!lialg_u32dic_insert (self->types, type, typ))
 	{
 		lisys_error_set (ENOMEM, NULL);
-		free (typ);
+		lisys_free (typ);
 		return 0;
 	}
 
@@ -202,12 +195,9 @@ lical_callbacks_insert_callback (licalCallbacks* self,
 	}
 
 	/* Allocate function. */
-	func = calloc (1, sizeof (licalCallfunc));
+	func = lisys_calloc (1, sizeof (licalCallfunc));
 	if (func == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	func->prio = priority;
 	func->call = call;
 	func->data = data;
@@ -292,7 +282,7 @@ private_cleanup (licalCallbacks* self)
 	for (func = self->removed ; func != NULL ; func = prev)
 	{
 		prev = func->prev;
-		free (func);
+		lisys_free (func);
 	}
 	self->removed = NULL;
 }
@@ -306,9 +296,9 @@ private_free_type (licalCalltype* type)
 	for (func = type->funcs ; func != NULL ; func = func_next)
 	{
 		func_next = func->next;
-		free (func);
+		lisys_free (func);
 	}
-	free (type);
+	lisys_free (type);
 }
 
 /** @} */

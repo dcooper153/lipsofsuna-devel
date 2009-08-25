@@ -740,7 +740,7 @@ private_callback_new (liengEngine*     engine,
 	liengObject* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liengObject));
+	self = lisys_calloc (1, sizeof (liengObject));
 	if (self == NULL)
 		return NULL;
 	self->id = id;
@@ -750,7 +750,7 @@ private_callback_new (liengEngine*     engine,
 	/* Choose object number. */
 	while (!self->id)
 	{
-		rnd = rand () / (double) RAND_MAX;
+		rnd = lisys_randf ();
 		self->id = engine->range.start + (uint32_t)(engine->range.size * rnd);
 		if (!self->id)
 			continue;
@@ -761,7 +761,7 @@ private_callback_new (liengEngine*     engine,
 	/* Insert to object list. */
 	if (!lialg_u32dic_insert (engine->objects, self->id, self))
 	{
-		free (self);
+		lisys_free (self);
 		return 0;
 	}
 
@@ -796,7 +796,7 @@ error:
 	if (self->physics != NULL)
 		liphy_object_free (self->physics);
 	lialg_u32dic_remove (engine->objects, self->id);
-	free (self);
+	lisys_free (self);
 	return NULL;
 }
 
@@ -828,7 +828,7 @@ private_callback_free (liengObject* self)
 				self->engine->constraints = constraint->next;
 			if (constraint->next != NULL)
 				constraint->next->prev = constraint->prev;
-			free (constraint);
+			lisys_free (constraint);
 		}
 	}
 
@@ -841,7 +841,7 @@ private_callback_free (liengObject* self)
 
 	/* Free all memory. */
 	liphy_object_free (self->physics);
-	free (self);
+	lisys_free (self);
 }
 
 static int

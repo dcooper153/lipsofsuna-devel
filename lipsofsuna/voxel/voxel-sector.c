@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "voxel-builder.h"
@@ -56,12 +54,9 @@ livox_sector_new (livoxManager* manager,
 	livoxSector* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livoxSector));
+	self = lisys_calloc (1, sizeof (livoxSector));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->manager = manager;
 	self->x = id % LIVOX_SECTORS_PER_LINE;
 	self->y = id / LIVOX_SECTORS_PER_LINE % LIVOX_SECTORS_PER_LINE;
@@ -73,7 +68,7 @@ livox_sector_new (livoxManager* manager,
 	/* Insert to manager. */
 	if (!lialg_u32dic_insert (manager->sectors, id, self))
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -94,7 +89,7 @@ livox_sector_free (livoxSector* self)
 	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
 		livox_block_free (self->blocks + i, self->manager);
 
-	free (self);
+	lisys_free (self);
 }
 
 int

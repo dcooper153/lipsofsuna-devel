@@ -93,19 +93,16 @@ liwdg_tabs_append_tab (liwdgTabs*  self,
 
 	/* Format tab. */
 	memset (&tmp, 0, sizeof (liwdgTab));
-	tmp.text = strdup (title);
+	tmp.text = listr_dup (title);
 	if (tmp.text == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	tmp.font = liwdg_manager_find_font (LIWDG_WIDGET (self)->manager, "default");
 	if (tmp.font != NULL)
 	{
 		tmp.layout = lifnt_layout_new ();
 		if (tmp.layout == NULL)
 		{
-			free (tmp.text);
+			lisys_free (tmp.text);
 			return 0;
 		}
 		lifnt_layout_append_string (tmp.layout, tmp.font, tmp.text);
@@ -117,7 +114,7 @@ liwdg_tabs_append_tab (liwdgTabs*  self,
 	{
 		if (tmp.layout != NULL)
 			lifnt_layout_free (tmp.layout);
-		free (tmp.text);
+		lisys_free (tmp.text);
 		return 0;
 	}
 	widget->parent = LIWDG_WIDGET (self);
@@ -148,9 +145,9 @@ private_free (liwdgTabs* self)
 			liwdg_widget_free (self->tabs.array[i].widget);
 		if (self->tabs.array[i].layout != NULL)
 			lifnt_layout_free (self->tabs.array[i].layout);
-		free (self->tabs.array[i].text);
+		lisys_free (self->tabs.array[i].text);
 	}
-	free (self->tabs.array);
+	lisys_free (self->tabs.array);
 }
 
 static int

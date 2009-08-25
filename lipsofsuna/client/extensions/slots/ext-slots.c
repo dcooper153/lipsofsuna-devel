@@ -32,14 +32,14 @@ liext_slots_new (liextModule* module,
 {
 	liextSlots* self;
 
-	self = calloc (1, sizeof (liextSlots));
+	self = lisys_calloc (1, sizeof (liextSlots));
 	if (self == NULL)
 		return NULL;
 	self->object = object;
 	self->slots = lialg_strdic_new ();
 	if (self->slots == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -54,7 +54,7 @@ liext_slots_free (liextSlots* self)
 		liext_slots_clear (self);
 		lialg_strdic_free (self->slots);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 void

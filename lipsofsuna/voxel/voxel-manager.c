@@ -52,7 +52,7 @@ livox_manager_new (liphyPhysics* physics,
 {
 	livoxManager* self;
 
-	self = calloc (1, sizeof (livoxManager));
+	self = lisys_calloc (1, sizeof (livoxManager));
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
@@ -63,14 +63,14 @@ livox_manager_new (liphyPhysics* physics,
 	self->materials = lialg_u32dic_new ();
 	if (self->materials == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->sectors = lialg_u32dic_new ();
 	if (self->sectors == NULL)
 	{
 		lialg_u32dic_free (self->materials);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -82,21 +82,21 @@ livox_manager_new (liphyPhysics* physics)
 {
 	livoxManager* self;
 
-	self = calloc (1, sizeof (livoxManager));
+	self = lisys_calloc (1, sizeof (livoxManager));
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
 	self->materials = lialg_u32dic_new ();
 	if (self->materials == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->sectors = lialg_u32dic_new ();
 	if (self->sectors == NULL)
 	{
 		lialg_u32dic_free (self->materials);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -117,7 +117,7 @@ livox_manager_free (livoxManager* self)
 		private_clear_sectors (self);
 		lialg_u32dic_free (self->sectors);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 /**

@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "algorithm-astar.h"
 
 typedef struct _lialgAstarNode lialgAstarNode;
@@ -86,7 +85,7 @@ lialg_astar_new (lialgAstarCost      cost,
 	lialgAstar* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lialgAstar));
+	self = lisys_calloc (1, sizeof (lialgAstar));
 	if (self == NULL)
 		return NULL;
 	self->calls.cost = cost;
@@ -130,7 +129,7 @@ lialg_astar_free (lialgAstar* self)
 		lialg_ptrdic_free (self->closed);
 	if (self->priority != NULL)
 		lialg_priority_queue_free (self->priority);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -165,7 +164,7 @@ lialg_astar_solve (lialgAstar* self,
 	self->target = end;
 
 	/* Add the start node to the open list. */
-	current = malloc (sizeof (lialgAstarNode));
+	current = lisys_malloc (sizeof (lialgAstarNode));
 	if (current == NULL)
 		return NULL;
 	current->prev = NULL;
@@ -223,7 +222,7 @@ lialg_astar_solve (lialgAstar* self,
 	return result;
 
 error:
-	free (current);
+	lisys_free (current);
 	private_clear (self);
 	return NULL;
 }
@@ -236,8 +235,8 @@ error:
 void
 lialg_astar_result_free (lialgAstarResult* self)
 {
-	free (self->nodes);
-	free (self);
+	lisys_free (self->nodes);
+	lisys_free (self);
 }
 
 /*****************************************************************************/
@@ -259,14 +258,14 @@ private_build_path (lialgAstar*     self,
 	}
 
 	/* Allocate path. */
-	path = calloc (1, sizeof (lialgAstarResult));
+	path = lisys_calloc (1, sizeof (lialgAstarResult));
 	if (path == NULL)
 		return NULL;
 	path->length = count;
-	path->nodes = calloc (count, sizeof (void*));
+	path->nodes = lisys_calloc (count, sizeof (void*));
 	if (path->nodes == NULL)
 	{
-		free (path);
+		lisys_free (path);
 		return NULL;
 	}
 
@@ -283,9 +282,9 @@ private_clear (lialgAstar* self)
 	lialgPtrdicIter iter;
 
 	LI_FOREACH_PTRDIC (iter, self->open)
-		free (iter.value);
+		lisys_free (iter.value);
 	LI_FOREACH_PTRDIC (iter, self->closed)
-		free (iter.value);
+		lisys_free (iter.value);
 	lialg_ptrdic_clear (self->open);
 	lialg_ptrdic_clear (self->closed);
 	lialg_priority_queue_clear (self->priority);
@@ -298,7 +297,7 @@ private_next_open (lialgAstar*     self,
 	/* Close previous node. */
 	if (!lialg_ptrdic_insert (self->closed, current->node, current))
 	{
-		free (current);
+		lisys_free (current);
 		return NULL;
 	}
 
@@ -352,7 +351,7 @@ private_node_opened (lialgAstar*     self,
 	successor->nodes.priority = lialg_priority_queue_insert (self->priority, successor->cost + successor->heuristic, successor);
 	if (successor->nodes.priority == NULL)
 	{
-		free (successor);
+		lisys_free (successor);
 		return 2;
 	}
 
@@ -400,14 +399,14 @@ private_node_closed (lialgAstar*     self,
 	successor->nodes.assoc = lialg_ptrdic_insert (self->open, node, successor);
 	if (successor->nodes.assoc == NULL)
 	{
-		free (successor);
+		lisys_free (successor);
 		return 2;
 	}
 	successor->nodes.priority = lialg_priority_queue_insert (self->priority, successor->cost + successor->heuristic, successor);
 	if (successor->nodes.priority == NULL)
 	{
 		lialg_ptrdic_remove (self->open, node);
-		free (successor);
+		lisys_free (successor);
 		return 2;
 	}
 
@@ -421,7 +420,7 @@ private_open_node (lialgAstar*     self,
 {
 	lialgAstarNode* successor;
 
-	successor = malloc (sizeof (lialgAstarNode));
+	successor = lisys_malloc (sizeof (lialgAstarNode));
 	if (successor == NULL)
 		return 0;
 	successor->node = node;
@@ -431,14 +430,14 @@ private_open_node (lialgAstar*     self,
 	successor->nodes.assoc = lialg_ptrdic_insert (self->open, node, successor);
 	if (successor->nodes.assoc == NULL)
 	{
-		free (successor);
+		lisys_free (successor);
 		return 0;
 	}
 	successor->nodes.priority = lialg_priority_queue_insert (self->priority, successor->cost + successor->heuristic, successor);
 	if (successor->nodes.priority == NULL)
 	{
 		lialg_ptrdic_remove (self->open, node);
-		free (successor);
+		lisys_free (successor);
 		return 0;
 	}
 	return 1;

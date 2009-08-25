@@ -64,12 +64,9 @@ lisrv_network_new (lisrvServer* server,
 {
 	lisrvNetwork* self;
 
-	self = calloc (1, sizeof (lisrvNetwork));
+	self = lisys_calloc (1, sizeof (lisrvNetwork));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->server = server;
 
 	pthread_mutex_init (&self->mutex, NULL);
@@ -97,13 +94,13 @@ lisrv_network_free (lisrvNetwork* self)
 	if (self->passwords != NULL)
 	{
 		LI_FOREACH_STRDIC (iter1, self->passwords)
-			free (iter1.value);
+			lisys_free (iter1.value);
 		lialg_strdic_free (self->passwords);
 	}
 	if (self->server != 0)
 		grapple_server_destroy (self->socket);
 	pthread_mutex_destroy (&self->mutex);
-	free (self);
+	lisys_free (self);
 }
 
 void
@@ -163,16 +160,10 @@ private_init (lisrvNetwork* self,
 	/* Allocate client list. */
 	self->clients = lialg_u32dic_new ();
 	if (self->clients == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	self->passwords = lialg_strdic_new ();
 	if (self->passwords == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	/* Initialize socket. */
 	self->socket = grapple_server_init ("Lips of Suna", LINET_PROTOCOL_VERSION);
@@ -220,7 +211,7 @@ private_accept (grapple_user  user,
 	pthread_mutex_lock (&self->server->mutexes.bans);
 	ret = lisrv_server_get_banned (self->server, address);
 	pthread_mutex_unlock (&self->server->mutexes.bans);
-	free (address);
+	lisys_free (address);
 	return !ret;
 }
 
@@ -258,7 +249,7 @@ private_login (const char*   login,
 	/* Parse the account file. */
 #warning FIXME: Accounts should be done in a module.
 	account = licfg_account_new (path);
-	free (path);
+	lisys_free (path);
 	if (account == NULL)
 	{
 		if (1/*self->config.server->enable_create_account*/)
@@ -268,7 +259,7 @@ private_login (const char*   login,
 				/* Store the password. */
 				/* It will be retrieved when creating a new account and
 				   used as the password of the account. */
-				tmp = strdup (password);
+				tmp = listr_dup (password);
 				if (tmp == NULL)
 					return 0;
 				pthread_mutex_lock (&self->mutex);
@@ -276,7 +267,7 @@ private_login (const char*   login,
 				pthread_mutex_unlock (&self->mutex);
 				if (!ret)
 				{
-					free (tmp);
+					lisys_free (tmp);
 					return 0;
 				}
 				return 1;
@@ -312,7 +303,7 @@ private_connect (lisrvNetwork*    self,
 		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
 	if (object == NULL)
 	{
-		free (pass);
+		lisys_free (pass);
 		return 0;
 	}
 	flags = lieng_object_get_flags (object);
@@ -325,14 +316,14 @@ private_connect (lisrvNetwork*    self,
 	{
 		grapple_server_disconnect_client (self->socket, message->NEW_USER.id);
 		lisrv_object_free (object);
-		free (pass);
+		lisys_free (pass);
 		return 0;
 	}
 	if (!lialg_u32dic_insert (self->clients, message->NEW_USER.id, client))
 	{
 		lisrv_object_free (object);
 		lisrv_client_free (client);
-		free (pass);
+		lisys_free (pass);
 		return 0;
 	}
 
@@ -344,13 +335,13 @@ private_connect (lisrvNetwork*    self,
 	{
 		lisrv_client_free (client);
 		lisrv_object_free (object);
-		free (pass);
+		lisys_free (pass);
 		return 0;
 	}
 
 	/* Invoke callbacks. */
 	lieng_engine_call (self->server->engine, LISRV_CALLBACK_CLIENT_LOGIN, object, message->NEW_USER.name, pass);
-	free (pass);
+	lisys_free (pass);
 
 	return 1;
 }

@@ -53,7 +53,7 @@ liext_editor_new (licliModule* module)
 	liextEditor* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextEditor));
+	self = lisys_calloc (1, sizeof (liextEditor));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -74,7 +74,7 @@ liext_editor_free (liextEditor* self)
 {
 	lieng_engine_remove_calls (self->module->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 void

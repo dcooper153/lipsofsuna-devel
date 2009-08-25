@@ -48,7 +48,7 @@ liext_module_new (licliModule* module)
 	liextModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -57,7 +57,7 @@ liext_module_new (licliModule* module)
 	self->editor = liext_editor_new (module->widgets, self);
 	if (self->editor == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -66,7 +66,7 @@ liext_module_new (licliModule* module)
 	     	private_packet, self, self->calls + 0))
 	{
 		liwdg_widget_free (self->editor);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -86,7 +86,7 @@ liext_module_free (liextModule* self)
 	/* FIXME: Remove the class here. */
 	if (self->script == NULL)
 		liwdg_widget_free (self->editor);
-	free (self);
+	lisys_free (self);
 }
 
 int

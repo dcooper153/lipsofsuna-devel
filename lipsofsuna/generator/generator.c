@@ -22,10 +22,9 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <engine/lips-engine.h>
 #include <network/lips-network.h>
+#include <system/lips-system.h>
 #include "generator.h"
 
 static int
@@ -80,10 +79,9 @@ ligen_generator_new (lipthPaths* paths,
 	ligenGenerator* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (ligenGenerator));
+	self = lisys_calloc (1, sizeof (ligenGenerator));
 	if (self == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_error_report ();
 		return NULL;
 	}
@@ -135,8 +133,8 @@ ligen_generator_free (ligenGenerator* self)
 		sqlite3_close (self->gensql);
 	if (self->srvsql != NULL)
 		sqlite3_close (self->srvsql);
-	free (self->strokes.array);
-	free (self);
+	lisys_free (self->strokes.array);
+	lisys_free (self);
 }
 
 /**
@@ -148,7 +146,7 @@ void
 ligen_generator_clear_scene (ligenGenerator* self)
 {
 	/* Free strokes. */
-	free (self->strokes.array);
+	lisys_free (self->strokes.array);
 	self->strokes.array = NULL;
 	self->strokes.count = 0;
 
@@ -395,8 +393,7 @@ ligen_generator_step (ligenGenerator* self)
 		rnd1 = realloc (rnd, brush->rules.count * sizeof (int));
 		if (rnd1 == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
-			free (rnd);
+			lisys_free (rnd);
 			return 0;
 		}
 		rnd = rnd1;
@@ -416,14 +413,14 @@ ligen_generator_step (ligenGenerator* self)
 			rule = brush->rules.array[rnd[j]];
 			if (private_rule_test (self, &stroke, rule))
 			{
-				free (rnd);
+				lisys_free (rnd);
 				if (!private_rule_apply (self, &stroke, rule, brush))
 					return 0;
 				return 1;
 			}
 		}
 	}
-	free (rnd);
+	lisys_free (rnd);
 
 	return 0;
 }
@@ -670,11 +667,10 @@ private_init_brushes (ligenGenerator* self)
 		size0 = sqlite3_column_bytes (statement, col++);
 		if (size0 > 0 && name != NULL)
 		{
-			free (brush->name);
-			brush->name = strdup (name);
+			lisys_free (brush->name);
+			brush->name = listr_dup (name);
 			if (brush->name == NULL)
 			{
-				lisys_error_set (ENOMEM, NULL);
 				sqlite3_finalize (statement);
 				return 0;
 			}
@@ -728,10 +724,10 @@ private_init_sql (ligenGenerator* self)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->srvsql));
 		sqlite3_close (self->srvsql);
-		free (path);
+		lisys_free (path);
 		return 0;
 	}
-	free (path);
+	lisys_free (path);
 
 	/* Use for loading and saving voxel data. */
 	livox_manager_set_sql (self->voxels, self->srvsql);
@@ -746,10 +742,10 @@ private_init_sql (ligenGenerator* self)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->gensql));
 		sqlite3_close (self->gensql);
-		free (path);
+		lisys_free (path);
 		return 0;
 	}
-	free (path);
+	lisys_free (path);
 
 	return 1;
 }

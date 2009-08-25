@@ -90,7 +90,7 @@ liwdg_styles_new (liwdgManager* manager,
 	liwdgStyles* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liwdgStyles));
+	self = lisys_calloc (1, sizeof (liwdgStyles));
 	if (self == NULL)
 		return NULL;
 	self->manager = manager;
@@ -127,10 +127,10 @@ liwdg_styles_new (liwdgManager* manager,
 	if (!private_read (self, root, path))
 	{
 		liwdg_styles_free (self);
-		free (path);
+		lisys_free (path);
 		return NULL;
 	}
-	free (path);
+	lisys_free (path);
 
 	return self;
 }
@@ -155,10 +155,10 @@ liwdg_styles_free (liwdgStyles* self)
 	if (self->subimgs != NULL)
 	{
 		LI_FOREACH_STRDIC (iter, self->subimgs)
-			free (iter.value);
+			lisys_free (iter.value);
 		lialg_strdic_free (self->subimgs);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 /*****************************************************************************/
@@ -185,7 +185,7 @@ private_load_font (liwdgStyles* self,
 	if (path == NULL)
 		return NULL;
 	font = lifnt_font_new (&self->manager->video, path, size);
-	free (path);
+	lisys_free (path);
 
 	/* Add to list. */
 	if (!lialg_strdic_insert (self->fonts, name, font))
@@ -209,7 +209,7 @@ private_load_texture (liwdgStyles*   self,
 	if (path == NULL)
 		return 0;
 	*texture = liimg_texture_new_from_file (path);
-	free (path);
+	lisys_free (path);
 	if (*texture == NULL)
 		return 0;
 
@@ -247,7 +247,7 @@ private_read (liwdgStyles* self,
 		li_reader_skip_chars (reader, " \t");
 		if (!li_reader_get_text (reader, " \t", &name))
 		{
-			free (type);
+			lisys_free (type);
 			goto error;
 		}
 
@@ -256,35 +256,35 @@ private_read (liwdgStyles* self,
 		if (!li_reader_check_text (reader, "{", " \t\n"))
 		{
 			lisys_error_set (EINVAL, "expected '{' after `%s %s'", type, name);
-			free (type);
-			free (name);
+			lisys_free (type);
+			lisys_free (name);
 			goto error;
 		}
 
 		/* Read type specific data. */
 		if (!strcmp (type, "widget"))
 		{
-			free (type);
+			lisys_free (type);
 			if (!private_read_widget (self, root, name, reader))
 			{
-				free (name);
+				lisys_free (name);
 				goto error;
 			}
-			free (name);
+			lisys_free (name);
 		}
 		else if (!strcmp (type, "font"))
 		{
-			free (type);
+			lisys_free (type);
 			if (!private_read_font (self, root, name, reader))
 			{
-				free (name);
+				lisys_free (name);
 				goto error;
 			}
 		}
 		else
 		{
 			lisys_error_set (EINVAL, "unknown block type `%s'", type);
-			free (type);
+			lisys_free (type);
 			goto error;
 		}
 	}
@@ -339,15 +339,15 @@ private_read_font (liwdgStyles* self,
 	/* Load font. */
 	if (!private_load_font (self, root, name, font.file? font.file : "default.ttf", font.size))
 	{
-		free (font.file);
+		lisys_free (font.file);
 		return 0;
 	}
-	free (font.file);
+	lisys_free (font.file);
 
 	return 1;
 
 error:
-	free (line);
+	lisys_free (line);
 	return 0;
 }
 
@@ -361,8 +361,8 @@ private_read_font_attr (liwdgStyles* self,
 {
 	if (!strcmp (key, "file"))
 	{
-		free (font->file);
-		font->file = strdup (value);
+		lisys_free (font->file);
+		font->file = listr_dup (value);
 	}
 	else if (!strcmp (key, "size"))
 	{
@@ -383,12 +383,9 @@ private_read_widget (liwdgStyles* self,
 	liwdgStyle* widget;
 
 	/* Allocate info. */
-	widget = calloc (1, sizeof (liwdgStyle));
+	widget = lisys_calloc (1, sizeof (liwdgStyle));
 	if (widget == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	*widget = self->fallback;
 
 	/* Read attributes. */
@@ -424,15 +421,15 @@ private_read_widget (liwdgStyles* self,
 	/* Add to list. */
 	if (!lialg_strdic_insert (self->subimgs, name, widget))
 	{
-		free (widget);
+		lisys_free (widget);
 		return 0;
 	}
 
 	return 1;
 
 error:
-	free (widget);
-	free (line);
+	lisys_free (widget);
+	lisys_free (line);
 	return 0;
 }
 

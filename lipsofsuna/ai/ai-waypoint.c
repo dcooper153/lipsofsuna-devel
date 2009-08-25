@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <system/lips-system.h>
 #include "ai-waypoint.h"
 
 /**
@@ -35,7 +36,7 @@ liai_waypoint_new (const limatVector* point)
 {
 	liaiWaypoint* self;
 
-	self = calloc (1, sizeof (liaiWaypoint));
+	self = lisys_calloc (1, sizeof (liaiWaypoint));
 	if (self == NULL)
 		return NULL;
 	self->position = *point;
@@ -50,8 +51,8 @@ liai_waypoint_new (const limatVector* point)
 void
 liai_waypoint_free (liaiWaypoint* self)
 {
-	free (self->links.links);
-	free (self);
+	lisys_free (self->links.links);
+	lisys_free (self);
 }
 
 /**
@@ -68,7 +69,7 @@ liai_waypoint_insert_link (liaiWaypoint* self,
 	liaiWaypointLink* tmp;
 
 	/* Allocate space. */
-	tmp = realloc (self->links.links, (self->links.count + 1) * sizeof (liaiWaypointLink));
+	tmp = lisys_realloc (self->links.links, (self->links.count + 1) * sizeof (liaiWaypointLink));
 	if (tmp == NULL)
 		return 0;
 	self->links.links = tmp;

@@ -53,12 +53,9 @@ liext_reload_new (licliModule* module)
 	liextReload* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextReload));
+	self = lisys_calloc (1, sizeof (liextReload));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->module = module;
 
 	/* Allocate reloader. */
@@ -92,7 +89,7 @@ liext_reload_free (liextReload* self)
 	}
 	lieng_engine_remove_calls (self->module->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 /**

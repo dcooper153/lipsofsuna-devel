@@ -22,14 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <assert.h>
-#include <time.h>
-#include <unistd.h>
-#include <sys/time.h>
 #include <config/lips-config.h>
 #include <network/lips-network.h>
 #include <script/lips-script.h>
@@ -85,12 +77,9 @@ lisrv_server_new (lipthPaths* paths)
 	lisrvServer* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisrvServer));
+	self = lisys_calloc (1, sizeof (lisrvServer));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->paths = paths;
 
 	/* Initialize mutexes. */
@@ -136,7 +125,7 @@ lisrv_server_free (lisrvServer* self)
 			extension = iter.value;
 			((void (*)(void*)) extension->info->free) (extension->object);
 			lisys_module_free (extension->module);
-			free (extension);
+			lisys_free (extension);
 		}
 		lialg_strdic_free (self->extensions);
 	}
@@ -168,7 +157,7 @@ lisrv_server_free (lisrvServer* self)
 	if (self->helper.resources != NULL)
 		liarc_writer_free (self->helper.resources);
 
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -201,7 +190,7 @@ lisrv_server_load_extension (lisrvServer* self,
 
 	/* Open module file. */
 	module = lisys_module_new (path, 0);
-	free (path);
+	lisys_free (path);
 	if (module == NULL)
 		goto error;
 
@@ -227,20 +216,20 @@ lisrv_server_load_extension (lisrvServer* self,
 	}
 
 	/* Insert to extension list. */
-	extension = calloc (1, sizeof (lisrvExtension));
+	extension = lisys_calloc (1, sizeof (lisrvExtension));
+	if (extension == NULL)
+		goto error;
 	extension->info = info;
 	extension->module = module;
 	if (extension == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_module_free (module);
 		goto error;
 	}
 	if (!lialg_strdic_insert (self->extensions, name, extension))
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_module_free (module);
-		free (extension);
+		lisys_free (extension);
 		goto error;
 	}
 
@@ -250,7 +239,7 @@ lisrv_server_load_extension (lisrvServer* self,
 	{
 		lialg_strdic_remove (self->extensions, name);
 		lisys_module_free (module);
-		free (extension);
+		lisys_free (extension);
 		goto error;
 	}
 
@@ -596,7 +585,7 @@ private_init_script (lisrvServer* self)
 	if (path == NULL)
 		return 0;
 	ret = liscr_script_load (self->script, path);
-	free (path);
+	lisys_free (path);
 	if (!ret)
 		return 0;
 
@@ -621,10 +610,10 @@ private_init_sql (lisrvServer* self)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		sqlite3_close (self->sql);
-		free (path);
+		lisys_free (path);
 		return 0;
 	}
-	free (path);
+	lisys_free (path);
 
 	/* Create info table. */
 	query = "CREATE TABLE IF NOT EXISTS info (version TEXT);";

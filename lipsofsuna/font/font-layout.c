@@ -46,7 +46,7 @@ lifntLayout* lifnt_layout_new ()
 	lifntLayout* self;
 
 	/* Allocate self. */
-	self = malloc (sizeof (lifntLayout));
+	self = lisys_malloc (sizeof (lifntLayout));
 	if (self == NULL)
 		return NULL;
 	self->dirty = 0;
@@ -55,10 +55,10 @@ lifntLayout* lifnt_layout_new ()
 	self->c_glyphs = LI_TEXT_DEFAULT_CAPACITY;
 
 	/* Allocate glyphs. */
-	self->glyphs = malloc (self->c_glyphs * sizeof (lifntLayoutGlyph));
+	self->glyphs = lisys_malloc (self->c_glyphs * sizeof (lifntLayoutGlyph));
 	if (self->glyphs == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -67,8 +67,8 @@ lifntLayout* lifnt_layout_new ()
 
 void lifnt_layout_free (lifntLayout* self)
 {
-	free (self->glyphs);
-	free (self);
+	lisys_free (self->glyphs);
+	lisys_free (self);
 }
 
 void lifnt_layout_render (lifntLayout* self,
@@ -99,7 +99,7 @@ int lifnt_layout_append_string (lifntLayout* self,
 	lifntLayoutGlyph* glyph;
 
 	/* Convert to wide characters. */
-	wstr = li_string_utf8_to_wchar (string);
+	wstr = listr_utf8_to_wchar (string);
 	if (wstr == NULL)
 		return 0;
 	length = wcslen (wstr);
@@ -110,7 +110,7 @@ int lifnt_layout_append_string (lifntLayout* self,
 		glyph = realloc (self->glyphs, (self->n_glyphs + length) * sizeof (lifntLayoutGlyph));
 		if (glyph == NULL)
 		{
-			free (wstr);
+			lisys_free (wstr);
 			return 0;
 		}
 		self->glyphs = glyph;
@@ -126,7 +126,7 @@ int lifnt_layout_append_string (lifntLayout* self,
 		glyph->advance = lifnt_font_get_advance (font, wstr[i]);
 		self->n_glyphs++;
 	}
-	free (wstr);
+	lisys_free (wstr);
 
 	/* Needs relayouting. */
 	self->dirty = 1;

@@ -56,12 +56,9 @@ licli_network_new (licliModule* module,
 	licliNetwork* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licliNetwork));
+	self = lisys_calloc (1, sizeof (licliNetwork));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->module = module;
 
 	/* Read configuration. */
@@ -72,10 +69,7 @@ licli_network_new (licliModule* module,
 	/* Connect to the host. */
 	self->client = grapple_client_init ("Lips of Suna", LINET_PROTOCOL_VERSION);
 	if (self->client == 0)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 	grapple_client_address_set (self->client, self->host->host);
 	grapple_client_port_set (self->client, self->host->port);
 	if (self->host->udp)
@@ -111,7 +105,7 @@ licli_network_free (licliNetwork* self)
 		licfg_host_free (self->host);
 	if (self->client)
 		grapple_client_destroy (self->client);
-	free (self);
+	lisys_free (self);
 }
 
 /**

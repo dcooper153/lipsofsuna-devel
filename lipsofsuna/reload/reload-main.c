@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "reload.h"
 #undef main
 
@@ -44,7 +43,6 @@ private_reload_model (lirelReload* self,
 int
 main (int argc, char** argv)
 {
-	char* path;
 	lipthPaths* paths;
 	lirelReload* self;
 

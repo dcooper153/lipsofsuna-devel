@@ -25,8 +25,7 @@
 #ifndef __ALGORITHM_U32dic_H__
 #define __ALGORITHM_U32dic_H__
 
-#include <assert.h>
-#include <stdlib.h>
+#include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "algorithm-bst.h"
 
@@ -82,15 +81,15 @@ lialg_u32dic_new ()
 {
 	lialgU32dic* self;
 
-	self = (lialgU32dic*) malloc (sizeof (lialgU32dic));
+	self = (lialgU32dic*) lisys_malloc (sizeof (lialgU32dic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_u32dic_node_compare, malloc, free);
+	self->tree = lialg_bst_new ((lialgBstCompare) lialg_u32dic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	return self;
@@ -104,10 +103,10 @@ lialg_u32dic_new ()
 static inline void
 lialg_u32dic_free (lialgU32dic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) free);
+	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -118,7 +117,7 @@ lialg_u32dic_free (lialgU32dic* self)
 static inline void
 lialg_u32dic_clear (lialgU32dic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) free);
+	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -187,7 +186,7 @@ lialg_u32dic_insert (lialgU32dic* self,
 	lialgU32dicNode* node;
 
 	/* Create node. */
-	node = (lialgU32dicNode*) malloc (sizeof (lialgU32dicNode));
+	node = (lialgU32dicNode*) lisys_malloc (sizeof (lialgU32dicNode));
 	if (node == NULL)
 		return NULL;
 	node->key = key;
@@ -240,7 +239,7 @@ lialg_u32dic_remove (lialgU32dic* self,
 		self->list = anode->next;
 	if (anode->next != NULL)
 		anode->next->prev = anode->prev;
-	free (anode);
+	lisys_free (anode);
 	self->size--;
 	return 0;
 }
@@ -262,7 +261,7 @@ lialg_u32dic_remove_node (lialgU32dic*     self,
 	if (node->next != NULL)
 		node->next->prev = node->prev;
 	lialg_bst_unlink (self->tree, &node->node);
-	free (node);
+	lisys_free (node);
 	self->size--;
 }
 
@@ -279,7 +278,7 @@ lialg_u32dic_unique_key (const lialgU32dic* self)
 
 	for (key = 0 ; !key ; )
 	{
-		key = rand ();
+		key = lisys_randi (0x7FFFFFFF);
 		if (lialg_u32dic_find ((lialgU32dic*) self, key) != NULL)
 			key = 0;
 	}

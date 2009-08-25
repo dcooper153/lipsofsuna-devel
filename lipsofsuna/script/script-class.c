@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <assert.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
@@ -71,26 +70,26 @@ liscr_class_new_full (liscrScript* script,
 	liscrClass* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liscrClass));
+	self = lisys_calloc (1, sizeof (liscrClass));
 	if (self == NULL)
 		return NULL;
 	self->script = script;
 	self->base = base;
 
 	/* Allocate class name. */
-	self->name = strdup (name);
+	self->name = listr_dup (name);
 	if (self->name == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
 	/* Allocate metatable name. */
-	self->meta = malloc (strlen (name) + 6);
+	self->meta = lisys_malloc (strlen (name) + 6);
 	if (self->meta == NULL)
 	{
-		free (self->name);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self);
 		return NULL;
 	}
 	strcpy (self->meta, "Lips.");
@@ -100,9 +99,9 @@ liscr_class_new_full (liscrScript* script,
 	self->userdata = lialg_strdic_new ();
 	if (self->userdata == NULL)
 	{
-		free (self->name);
-		free (self->meta);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self->meta);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -140,24 +139,24 @@ liscr_class_free (liscrClass* self)
 	if (self->getters.getters != NULL)
 	{
 		for (i = 0 ; i < self->getters.count ; i++)
-			free (self->getters.getters[i].name);
-		free (self->getters.getters);
+			lisys_free (self->getters.getters[i].name);
+		lisys_free (self->getters.getters);
 	}
 
 	/* Free setters. */
 	if (self->setters.setters != NULL)
 	{
 		for (i = 0 ; i < self->setters.count ; i++)
-			free (self->setters.setters[i].name);
-		free (self->setters.setters);
+			lisys_free (self->setters.setters[i].name);
+		lisys_free (self->setters.setters);
 	}
 
 	/* Free interfaces. */
 	if (self->interfaces.array != NULL)
 	{
 		for (i = 0 ; i < self->interfaces.count ; i++)
-			free (self->interfaces.array[i]);
-		free (self->interfaces.array);
+			lisys_free (self->interfaces.array[i]);
+		lisys_free (self->interfaces.array);
 	}
 
 	/* Free class variable. */
@@ -171,9 +170,9 @@ liscr_class_free (liscrClass* self)
 	if (self->userdata != NULL)
 		lialg_strdic_free (self->userdata);
 
-	free (self->meta);
-	free (self->name);
-	free (self);
+	lisys_free (self->meta);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 /**
@@ -257,13 +256,13 @@ liscr_class_insert_getter (liscrClass*    self,
 	}
 
 	/* Create new. */
-	tmp = realloc (self->getters.getters, (self->getters.count + 1) * sizeof (liscrClassMemb));
+	tmp = lisys_realloc (self->getters.getters, (self->getters.count + 1) * sizeof (liscrClassMemb));
 	if (tmp == NULL)
 		return 0;
 	self->getters.getters = tmp;
 	tmp += self->getters.count;
 	tmp->call = value;
-	tmp->name = strdup (name);
+	tmp->name = listr_dup (name);
 	if (tmp->name == NULL)
 		return 0;
 	self->getters.count++;
@@ -285,12 +284,12 @@ liscr_class_insert_interface (liscrClass* self,
 {
 	char** tmp;
 
-	tmp = realloc (self->interfaces.array, (self->interfaces.count + 1) * sizeof (char*));
+	tmp = lisys_realloc (self->interfaces.array, (self->interfaces.count + 1) * sizeof (char*));
 	if (tmp == NULL)
 		return 0;
 	self->interfaces.array = tmp;
 	tmp += self->interfaces.count;
-	*tmp = strdup (name);
+	*tmp = listr_dup (name);
 	if (*tmp == NULL)
 		return 0;
 	self->interfaces.count++;
@@ -328,13 +327,13 @@ liscr_class_insert_setter (liscrClass*    self,
 	}
 
 	/* Create new. */
-	tmp = realloc (self->setters.setters, (self->setters.count + 1) * sizeof (liscrClassMemb));
+	tmp = lisys_realloc (self->setters.setters, (self->setters.count + 1) * sizeof (liscrClassMemb));
 	if (tmp == NULL)
 		return 0;
 	self->setters.setters = tmp;
 	tmp += self->setters.count;
 	tmp->call = value;
-	tmp->name = strdup (name);
+	tmp->name = listr_dup (name);
 	if (tmp->name == NULL)
 		return 0;
 	self->setters.count++;

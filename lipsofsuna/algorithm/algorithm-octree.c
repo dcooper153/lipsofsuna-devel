@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "algorithm-octree.h"
 
 static void
@@ -64,7 +63,7 @@ lialg_octree_new (int depth)
 {
 	lialgOctree* self;
 
-	self = calloc (1, sizeof (lialgOctree));
+	self = lisys_calloc (1, sizeof (lialgOctree));
 	if (self == NULL)
 		return NULL;
 	self->depth = depth;
@@ -88,12 +87,9 @@ lialg_octree_new_from_data (liReader*       reader,
 	}
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lialgOctree));
+	self = lisys_calloc (1, sizeof (lialgOctree));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->depth = depth;
 
 	/* Load nodes. */
@@ -135,7 +131,7 @@ lialg_octree_free (lialgOctree* self)
 {
 	if (self->root != NULL)
 		private_free_node (self, self->root, 0);
-	free (self);
+	lisys_free (self);
 }
 
 int
@@ -199,7 +195,7 @@ lialg_octree_set_data (lialgOctree*    self,
 		z = (off.z >= 0.5f);
 		if (*node == NULL)
 		{
-			*node = calloc (1, sizeof (lialgOcnode));
+			*node = lisys_calloc (1, sizeof (lialgOcnode));
 			if (*node == NULL)
 				return 0;
 		}
@@ -272,12 +268,9 @@ private_read_node (lialgOctree*    self,
 	}
 
 	/* Read branch header. */
-	*node = calloc (1, sizeof (lialgOcnode));
+	*node = lisys_calloc (1, sizeof (lialgOcnode));
 	if (*node == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	if (!li_reader_get_uint8 (reader, &mask) || !mask)
 	{
 		lisys_error_set (EINVAL, NULL);

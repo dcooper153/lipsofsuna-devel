@@ -40,19 +40,16 @@ licli_client_new (lividCalls* video,
 	const char* password = "none";
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licliClient));
+	self = lisys_calloc (1, sizeof (licliClient));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->video = *video;
 
 	/* Initialize SDL. */
 	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -95,7 +92,7 @@ licli_client_free (licliClient* self)
 		lisnd_system_free (self->sound);
 #endif
 	self->video.SDL_Quit ();
-	free (self);
+	lisys_free (self);
 }
 
 int

@@ -41,27 +41,23 @@ livox_material_new ()
 	livoxMaterial* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (livoxMaterial));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Allocate name. */
-	self->name = strdup ("");
+	self->name = listr_dup ("");
 	if (self->name == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
 	/* Initialize material. */
 	if (!limdl_material_init (&self->model))
 	{
-		free (self->name);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -80,27 +76,23 @@ livox_material_new_copy (const livoxMaterial* src)
 	livoxMaterial* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (livoxMaterial));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->id = src->id;
 	self->friction = src->friction;
 	self->scale = src->scale;
 	self->model = src->model;
-	self->name = strdup (src->name);
+	self->name = listr_dup (src->name);
 	if (self->name == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	if (!limdl_material_init_copy (&self->model, &src->model))
 	{
-		free (self->name);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -123,12 +115,9 @@ livox_material_new_from_sql (liarcSql*     sql,
 	livoxMaterial* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (livoxMaterial));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Read numeric values. */
 	col = 0;
@@ -150,13 +139,12 @@ livox_material_new_from_sql (liarcSql*     sql,
 	self->name = (char*) sqlite3_column_text (stmt, col);
 	size = sqlite3_column_bytes (stmt, col++);
 	if (size > 0 && self->name != NULL)
-		self->name = strdup (self->name);
+		self->name = listr_dup (self->name);
 	else
-		self->name = strdup ("");
+		self->name = listr_dup ("");
 	if (self->name == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -164,14 +152,13 @@ livox_material_new_from_sql (liarcSql*     sql,
 	self->model.shader = (char*) sqlite3_column_text (stmt, col);
 	size = sqlite3_column_bytes (stmt, col++);
 	if (size > 0 && self->model.shader != NULL)
-		self->model.shader = strdup (self->model.shader);
+		self->model.shader = listr_dup (self->model.shader);
 	else
-		self->model.shader = strdup ("default");
+		self->model.shader = listr_dup ("default");
 	if (self->model.shader == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (self->name);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -198,12 +185,9 @@ livox_material_new_from_stream (liReader* reader)
 	livoxMaterial* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (livoxMaterial));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Read values. */
 	if (!li_reader_get_uint32 (reader, &id) ||
@@ -212,8 +196,8 @@ livox_material_new_from_stream (liReader* reader)
 	    !li_reader_get_float (reader, &self->scale) ||
 	    !limdl_material_read (&self->model, reader))
 	{
-		free (self->name);
-		free (self);
+		lisys_free (self->name);
+		lisys_free (self);
 		return NULL;
 	}
 	self->id = id;
@@ -230,9 +214,9 @@ void
 livox_material_free (livoxMaterial* self)
 {
 	limdl_material_clear_textures (&self->model);
-	free (self->model.shader);
-	free (self->name);
-	free (self);
+	lisys_free (self->model.shader);
+	lisys_free (self->name);
+	lisys_free (self);
 }
 
 /**
@@ -275,7 +259,7 @@ livox_material_remove_texture (livoxMaterial* self,
 	assert (index >= 0);
 	assert (index < self->model.textures.count);
 
-	free (self->model.textures.array[index].string);
+	lisys_free (self->model.textures.array[index].string);
 	lialg_array_remove (&self->model.textures, index);
 }
 
@@ -350,10 +334,10 @@ livox_material_set_name (livoxMaterial* self,
 {
 	char* tmp;
 
-	tmp = strdup (value);
+	tmp = listr_dup (value);
 	if (tmp == NULL)
 		return 0;
-	free (self->name);
+	lisys_free (self->name);
 	self->name = tmp;
 
 	return 1;

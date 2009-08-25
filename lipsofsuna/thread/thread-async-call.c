@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <system/lips-system.h>
 #include "thread-async-call.h"
 
@@ -39,19 +37,16 @@ lithr_async_call_new (lithrAsyncFunc func,
 {
 	lithrAsyncCall* self;
 
-	self = calloc (1, sizeof (lithrAsyncCall));
+	self = lisys_calloc (1, sizeof (lithrAsyncCall));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->data = data;
 	self->func = func;
 	self->free = freecb;
 	if (pthread_create (&self->thread, NULL, private_thread, self) != 0)
 	{
 		lisys_error_set (ENOMEM, "not enough resources to create thread");
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -64,7 +59,7 @@ lithr_async_call_free (lithrAsyncCall* self)
 	lithr_async_call_wait (self);
 	if (self->free != NULL)
 		self->free (self);
-	free (self);
+	lisys_free (self);
 }
 
 void

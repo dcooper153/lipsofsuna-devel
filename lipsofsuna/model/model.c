@@ -22,10 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "model.h"
 
 static void
@@ -108,7 +106,7 @@ limdl_model_new ()
 	limdlModel* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (limdlModel));
+	self = lisys_calloc (1, sizeof (limdlModel));
 	if (self == NULL)
 		return NULL;
 
@@ -127,10 +125,9 @@ limdl_model_new_from_data (liReader* reader)
 	limdlModel* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (limdlModel));
+	self = lisys_calloc (1, sizeof (limdlModel));
 	if (self == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_error_append ("cannot load model");
 		return NULL;
 	}
@@ -161,10 +158,9 @@ limdl_model_new_from_file (const char* path)
 	limdlModel* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (limdlModel));
+	self = lisys_calloc (1, sizeof (limdlModel));
 	if (self == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lisys_error_append ("cannot load model `%s'", path);
 		return NULL;
 	}
@@ -209,9 +205,9 @@ limdl_model_free (limdlModel* self)
 		{
 			material = self->materials.array + i;
 			limdl_material_clear_textures (material);
-			free (material->shader);
+			lisys_free (material->shader);
 		}
-		free (self->materials.array);
+		lisys_free (self->materials.array);
 	}
 
 	/* Free face groups. */
@@ -219,7 +215,7 @@ limdl_model_free (limdlModel* self)
 	{
 		for (i = 0 ; i < self->facegroups.count ; i++)
 			limdl_faces_free (self->facegroups.array + i);
-		free (self->facegroups.array);
+		lisys_free (self->facegroups.array);
 	}
 
 	/* Free weight groups. */
@@ -227,10 +223,10 @@ limdl_model_free (limdlModel* self)
 	{
 		for (i = 0 ; i < self->weightgroups.count ; i++)
 		{
-			free (self->weightgroups.weightgroups[i].name);
-			free (self->weightgroups.weightgroups[i].bone);
+			lisys_free (self->weightgroups.weightgroups[i].name);
+			lisys_free (self->weightgroups.weightgroups[i].bone);
 		}
-		free (self->weightgroups.weightgroups);
+		lisys_free (self->weightgroups.weightgroups);
 	}
 
 	/* Free nodes. */
@@ -241,7 +237,7 @@ limdl_model_free (limdlModel* self)
 			if (self->nodes.array[i] != NULL)
 				limdl_node_free (self->nodes.array[i]);
 		}
-		free (self->nodes.array);
+		lisys_free (self->nodes.array);
 	}
 
 	/* Free animations. */
@@ -249,7 +245,7 @@ limdl_model_free (limdlModel* self)
 	{
 		for (i = 0 ; i < self->animation.count ; i++)
 			private_free_animation (self, self->animation.animations + i);
-		free (self->animation.animations);
+		lisys_free (self->animation.animations);
 	}
 
 	/* Free particles. */
@@ -257,10 +253,10 @@ limdl_model_free (limdlModel* self)
 	{
 		for (i = 0 ; i < self->hairs.count ; i++)
 			limdl_hairs_free (self->hairs.array + i);
-		free (self->hairs.array);
+		lisys_free (self->hairs.array);
 	}
 
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -402,7 +398,7 @@ limdl_model_insert_group (limdlModel* self,
 
 	/* Resize buffer. */
 	count = self->facegroups.count + 1;
-	tmp = realloc (self->facegroups.array, count * sizeof (limdlFaces));
+	tmp = lisys_realloc (self->facegroups.array, count * sizeof (limdlFaces));
 	if (tmp == NULL)
 		return 0;
 	self->facegroups.array = tmp;
@@ -435,14 +431,14 @@ limdl_model_insert_material (limdlModel*          self,
 
 	/* Resize buffer. */
 	count = self->materials.count + 1;
-	tmp = realloc (self->materials.array, count * sizeof (limdlMaterial));
+	tmp = lisys_realloc (self->materials.array, count * sizeof (limdlMaterial));
 	if (tmp == NULL)
 		return 0;
 	self->materials.array = tmp;
 	tmp += self->materials.count;
 
 	/* Copy attributes. */
-	tmp->shader = strdup (material->shader);
+	tmp->shader = listr_dup (material->shader);
 	if (tmp->shader == NULL)
 		return 0;
 	tmp->flags = material->flags;
@@ -459,19 +455,19 @@ limdl_model_insert_material (limdlModel*          self,
 	/* Copy textures. */
 	tmp->textures.count = material->textures.count;
 	if (tmp->textures.count)
-		tmp->textures.array = calloc (tmp->textures.count, sizeof (limdlTexture));
+		tmp->textures.array = lisys_calloc (tmp->textures.count, sizeof (limdlTexture));
 	else
 		tmp->textures.array = NULL;
 	for (i = 0 ; i < tmp->textures.count ; i++)
 	{
 		tmp->textures.array[i] = material->textures.array[i];
-		tmp->textures.array[i].string = strdup (material->textures.array[i].string);
+		tmp->textures.array[i].string = listr_dup (material->textures.array[i].string);
 		if (tmp->textures.array[i].string == NULL)
 		{
 			while (i)
-				free (tmp->textures.array[i--].string);
-			free (tmp->textures.array);
-			free (tmp->shader);
+				lisys_free (tmp->textures.array[i--].string);
+			lisys_free (tmp->textures.array);
+			lisys_free (tmp->shader);
 			return 0;
 		}
 	}
@@ -535,7 +531,7 @@ limdl_model_insert_triangle (limdlModel*         self,
 		{
 			if (!weights[0].count)
 				continue;
-			weightbuf[i].weights = malloc (weights[i].count * sizeof (limdlWeight));
+			weightbuf[i].weights = lisys_malloc (weights[i].count * sizeof (limdlWeight));
 			if (weightbuf[i].weights == NULL)
 				goto error;
 			memcpy (weightbuf[i].weights, weights[i].weights, weights[i].count * sizeof (limdlWeight));
@@ -545,13 +541,13 @@ limdl_model_insert_triangle (limdlModel*         self,
 
 	/* Resize vertex buffer. */
 	count = group_->vertices.count + 3;
-	vertex = realloc (group_->vertices.array, count * sizeof (limdlVertex));
+	vertex = lisys_realloc (group_->vertices.array, count * sizeof (limdlVertex));
 	if (vertex == NULL)
 		goto error;
 	group_->vertices.array = vertex;
 
 	/* Resize weight buffer. */
-	weight = realloc (group_->weights.array, count * sizeof (limdlWeights));
+	weight = lisys_realloc (group_->weights.array, count * sizeof (limdlWeights));
 	if (weight == NULL)
 		goto error;
 	group_->weights.array = weight;
@@ -566,9 +562,9 @@ limdl_model_insert_triangle (limdlModel*         self,
 	return 1;
 
 error:
-	free (weightbuf[0].weights);
-	free (weightbuf[1].weights);
-	free (weightbuf[2].weights);
+	lisys_free (weightbuf[0].weights);
+	lisys_free (weightbuf[1].weights);
+	lisys_free (weightbuf[2].weights);
 	return 0;
 }
 
@@ -592,15 +588,12 @@ limdl_model_write_file (const limdlModel* self,
 	/* Create a writer. */
 	writer = liarc_writer_new_file (path);
 	if (writer == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	/* Pack to the writer. */
 	if (!limdl_model_write (self, writer))
 	{
-		lisys_error_set (ENOMEM, NULL);
+		liarc_writer_free (writer);
 		return 0;
 	}
 
@@ -707,9 +700,9 @@ private_free_animation (limdlModel*     self,
 	{
 		for (i = 0 ; i < animation->ipos.count ; i++)
 			private_free_ipo (self, animation->ipos.array + i);
-		free (animation->ipos.array);
+		lisys_free (animation->ipos.array);
 	}
-	free (animation->name);
+	lisys_free (animation->name);
 }
 
 static void
@@ -719,8 +712,8 @@ private_free_ipo (limdlModel* self,
 	int i;
 
 	for (i = 0 ; i < LIMDL_IPO_CHANNEL_NUM ; i++)
-		free (ipo->channels[i].nodes);
-	free (ipo->name);
+		lisys_free (ipo->channels[i].nodes);
+	lisys_free (ipo->name);
 }
 
 static int
@@ -819,12 +812,9 @@ private_read_animations (limdlModel* self,
 	/* Read animations. */
 	if (self->animation.count)
 	{
-		self->animation.animations = calloc (self->animation.count, sizeof (limdlAnimation));
+		self->animation.animations = lisys_calloc (self->animation.count, sizeof (limdlAnimation));
 		if (self->animation.animations == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->animation.count ; i++)
 		{
 			animation = self->animation.animations + i;
@@ -857,12 +847,9 @@ private_read_faces (limdlModel* self,
 	/* Read face groups. */
 	if (self->facegroups.count)
 	{
-		self->facegroups.array = calloc (self->facegroups.count, sizeof (limdlFaces));
+		self->facegroups.array = lisys_calloc (self->facegroups.count, sizeof (limdlFaces));
 		if (self->facegroups.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->facegroups.count ; i++)
 		{
 			group = self->facegroups.array + i;
@@ -894,12 +881,9 @@ private_read_hairs (limdlModel* self,
 	/* Read hairs. */
 	if (self->hairs.count)
 	{
-		self->hairs.array = calloc (self->hairs.count, sizeof (limdlHairs));
+		self->hairs.array = lisys_calloc (self->hairs.count, sizeof (limdlHairs));
 		if (self->hairs.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->hairs.count ; i++)
 		{
 			if (!limdl_hairs_read (self->hairs.array + i, reader))
@@ -930,12 +914,9 @@ private_read_materials (limdlModel* self,
 	/* Read materials. */
 	if (self->materials.count)
 	{
-		self->materials.array = calloc (self->materials.count, sizeof (limdlMaterial));
+		self->materials.array = lisys_calloc (self->materials.count, sizeof (limdlMaterial));
 		if (self->materials.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->materials.count ; i++)
 		{
 			if (!limdl_material_read (self->materials.array + i, reader))
@@ -966,20 +947,14 @@ private_read_nodes (limdlModel* self,
 	/* Read nodes. */
 	if (self->nodes.count)
 	{
-		self->nodes.array = calloc (self->nodes.count, sizeof (limdlNode*));
+		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (limdlNode*));
 		if (self->nodes.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->nodes.count ; i++)
 		{
 			self->nodes.array[i] = limdl_node_new (self);
 			if (self->nodes.array[i] == NULL)
-			{
-				lisys_error_set (ENOMEM, NULL);
 				return 0;
-			}
 			if (!limdl_node_read (self->nodes.array[i], reader))
 				return 0;
 		}
@@ -1009,12 +984,9 @@ private_read_weights (limdlModel* self,
 	/* Read weight groups. */
 	if (self->weightgroups.count)
 	{
-		self->weightgroups.weightgroups = calloc (self->weightgroups.count, sizeof (limdlWeightGroup));
+		self->weightgroups.weightgroups = lisys_calloc (self->weightgroups.count, sizeof (limdlWeightGroup));
 		if (self->weightgroups.weightgroups == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 		for (i = 0 ; i < self->weightgroups.count ; i++)
 		{
 			group = self->weightgroups.weightgroups + i;
@@ -1047,12 +1019,9 @@ private_read_animation (limdlModel*     self,
 	animation->ipos.count = count;
 	if (count)
 	{
-		animation->ipos.array = calloc (count, sizeof (limdlIpo));
+		animation->ipos.array = lisys_calloc (count, sizeof (limdlIpo));
 		if (animation->ipos.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 	}
 
 	/* Read curves. */

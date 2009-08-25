@@ -22,10 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <network/lips-network.h>
+#include <system/lips-system.h>
 #include "render-draw.h"
 #include "render-object.h"
 
@@ -78,7 +76,7 @@ lirnd_object_new (lirndScene* scene,
 	lirndObject* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndObject));
+	self = lisys_calloc (1, sizeof (lirndObject));
 	if (self == NULL)
 		return NULL;
 	self->id = id;
@@ -90,7 +88,7 @@ lirnd_object_new (lirndScene* scene,
 	/* Add to renderer. */
 	if (!lialg_u32dic_insert (scene->objects, id, self))
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -128,7 +126,7 @@ lirnd_object_new_from_data (lirndScene*      scene,
 	lirndObject* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndObject));
+	self = lisys_calloc (1, sizeof (lirndObject));
 	if (self == NULL)
 		return NULL;
 	self->aabb = *aabb;
@@ -150,7 +148,7 @@ lirnd_object_new_from_data (lirndScene*      scene,
 	/* Add to renderer. */
 	if (!lialg_u32dic_insert (scene->objects, self->id, self))
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -166,7 +164,7 @@ lirnd_object_new_from_data (lirndScene*      scene,
 	if (!private_init_envmap (self))
 	{
 		lialg_u32dic_remove (scene->objects, self->id);
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -188,7 +186,7 @@ lirnd_object_free (lirndObject* self)
 	private_clear_lights (self);
 	private_clear_materials (self);
 	private_clear_model (self);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -524,7 +522,7 @@ private_clear_lights (lirndObject* self)
 			lirnd_light_free (self->lights.array[i]);
 		}
 	}
-	free (self->lights.array);
+	lisys_free (self->lights.array);
 	self->lights.array = NULL;
 	self->lights.count = 0;
 }
@@ -539,7 +537,7 @@ private_clear_materials (lirndObject* self)
 		if (self->materials.array[i] != NULL)
 			lirnd_material_free (self->materials.array[i]);
 	}
-	free (self->materials.array);
+	lisys_free (self->materials.array);
 	self->materials.array = NULL;
 	self->materials.count = 0;
 }
@@ -551,7 +549,7 @@ private_clear_model (lirndObject* self)
 
 	for (i = 0 ; i < self->buffers.count ; i++)
 		lirnd_buffer_free (self->buffers.array + i);
-	free (self->buffers.array);
+	lisys_free (self->buffers.array);
 	self->buffers.array = NULL;
 	self->buffers.count = 0;
 }
@@ -737,7 +735,7 @@ private_init_materials (lirndObject* self,
 	self->materials.count = model->model->materials.count;
 	if (self->materials.count)
 	{
-		self->materials.array = calloc (self->materials.count, sizeof (lirndMaterial*));
+		self->materials.array = lisys_calloc (self->materials.count, sizeof (lirndMaterial*));
 		if (self->materials.array == NULL)
 			return 0;
 	}
@@ -771,7 +769,7 @@ private_init_model (lirndObject* self,
 	};
 
 	/* Allocate buffer list. */
-	self->buffers.array = calloc (model->model->facegroups.count, sizeof (lirndBuffer));
+	self->buffers.array = lisys_calloc (model->model->facegroups.count, sizeof (lirndBuffer));
 	if (self->buffers.array == NULL)
 		return 0;
 	self->buffers.count = model->model->facegroups.count;

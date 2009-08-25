@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <system/lips-system.h>
 #include "ai-path.h"
 
 /**
@@ -34,7 +35,7 @@ liai_path_new ()
 {
 	liaiPath* self;
 
-	self = calloc (1, sizeof (liaiPath));
+	self = lisys_calloc (1, sizeof (liaiPath));
 	return self;
 }
 
@@ -46,8 +47,8 @@ liai_path_new ()
 void
 liai_path_free (liaiPath* self)
 {
-	free (self->points.points);
-	free (self);
+	lisys_free (self->points.points);
+	lisys_free (self);
 }
 
 /**
@@ -64,7 +65,7 @@ liai_path_append_point (liaiPath*       self,
 	limatVector* tmp;
 
 	/* Allocate space. */
-	tmp = realloc (self->points.points, (self->points.count + 1) * sizeof (limatVector));
+	tmp = lisys_realloc (self->points.points, (self->points.count + 1) * sizeof (limatVector));
 	if (tmp == NULL)
 		return 0;
 	self->points.points = tmp;

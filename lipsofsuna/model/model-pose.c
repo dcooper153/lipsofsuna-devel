@@ -22,9 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <system/lips-system.h>
 #include "model-pose.h"
 
 static void
@@ -86,7 +84,7 @@ limdl_pose_new (limdlModel* model)
 	limdlPose* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (limdlPose));
+	self = lisys_calloc (1, sizeof (limdlPose));
 	if (self == NULL)
 		return NULL;
 
@@ -120,7 +118,7 @@ limdl_pose_free (limdlPose* self)
 	for (fade = self->fades ; fade != NULL ; fade = fade_next)
 	{
 		fade_next = fade->next;
-		free (fade);
+		lisys_free (fade);
 	}
 
 	/* Free channel tree. */
@@ -129,7 +127,7 @@ limdl_pose_free (limdlPose* self)
 		LI_FOREACH_U32DIC (iter, self->channels)
 		{
 			chan = iter.value;
-			free (chan);
+			lisys_free (chan);
 		}
 		lialg_u32dic_free (self->channels);
 	}
@@ -142,7 +140,7 @@ limdl_pose_free (limdlPose* self)
 			if (self->nodes.array[i] != NULL)
 				limdl_node_free (self->nodes.array[i]);
 		}
-		free (self->nodes.array);
+		lisys_free (self->nodes.array);
 	}
 
 	/* Free weight groups. */
@@ -150,13 +148,13 @@ limdl_pose_free (limdlPose* self)
 	{
 		for (i = 0 ; i < self->groups.count ; i++)
 		{
-			free (self->groups.array[i].name);
-			free (self->groups.array[i].bone);
+			lisys_free (self->groups.array[i].name);
+			lisys_free (self->groups.array[i].bone);
 		}
-		free (self->groups.array);
+		lisys_free (self->groups.array);
 	}
 
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -178,7 +176,7 @@ limdl_pose_destroy_channel (limdlPose* self,
 	if (chan == NULL)
 		return;
 	lialg_u32dic_remove (self->channels, channel);
-	free (chan);
+	lisys_free (chan);
 }
 
 /**
@@ -212,7 +210,7 @@ limdl_pose_fade_channel (limdlPose* self,
 		rate = 1.0f / chan->animation->blendout;
 
 	/* Create a fade sequence. */
-	fade = calloc (1, sizeof (limdlPoseFade));
+	fade = lisys_calloc (1, sizeof (limdlPoseFade));
 	if (fade == NULL)
 	{
 		limdl_pose_destroy_channel (self, channel);
@@ -312,7 +310,7 @@ limdl_pose_update (limdlPose* self,
 				fade->prev->next = fade->next;
 			else
 				self->fades = fade->next;
-			free (fade);
+			lisys_free (fade);
 		}
 	}
 
@@ -662,7 +660,7 @@ private_clear_pose (limdlPose* self)
 	for (fade = self->fades ; fade != NULL ; fade = fade_next)
 	{
 		fade_next = fade->next;
-		free (fade);
+		lisys_free (fade);
 	}
 	self->fades = NULL;
 
@@ -672,7 +670,7 @@ private_clear_pose (limdlPose* self)
 		LI_FOREACH_U32DIC (iter, self->channels)
 		{
 			chan = iter.value;
-			free (chan);
+			lisys_free (chan);
 		}
 		lialg_u32dic_clear (self->channels);
 	}
@@ -685,7 +683,7 @@ private_clear_pose (limdlPose* self)
 			if (self->nodes.array[i] != NULL)
 				limdl_node_free (self->nodes.array[i]);
 		}
-		free (self->nodes.array);
+		lisys_free (self->nodes.array);
 	}
 
 	/* Free weight groups. */
@@ -693,10 +691,10 @@ private_clear_pose (limdlPose* self)
 	{
 		for (i = 0 ; i < self->groups.count ; i++)
 		{
-			free (self->groups.array[i].name);
-			free (self->groups.array[i].bone);
+			lisys_free (self->groups.array[i].name);
+			lisys_free (self->groups.array[i].bone);
 		}
-		free (self->groups.array);
+		lisys_free (self->groups.array);
 	}
 }
 
@@ -709,7 +707,7 @@ private_create_channel (limdlPose* self,
 	chan = private_find_channel (self, channel);
 	if (chan != NULL)
 		return chan;
-	chan = calloc (1, sizeof (limdlPoseChannel));
+	chan = lisys_calloc (1, sizeof (limdlPoseChannel));
 	if (chan == NULL)
 		return 0;
 	if (!lialg_u32dic_insert (self->channels, channel, chan))
@@ -741,7 +739,7 @@ private_init_pose (limdlPose*  self,
 	/* Copy nodes. */
 	if (self->nodes.count)
 	{
-		self->nodes.array = calloc (self->nodes.count, sizeof (limdlNode*));
+		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (limdlNode*));
 		if (self->nodes.array == NULL)
 			return 0;
 		for (i = 0 ; i < self->nodes.count ; i++)
@@ -755,13 +753,13 @@ private_init_pose (limdlPose*  self,
 	/* Copy weight groups. */
 	if (self->groups.count)
 	{
-		self->groups.array = calloc (self->groups.count, sizeof (limdlWeightGroup));
+		self->groups.array = lisys_calloc (self->groups.count, sizeof (limdlWeightGroup));
 		if (self->groups.array == NULL)
 			return 0;
 		for (i = 0 ; i < self->groups.count ; i++)
 		{
-			self->groups.array[i].name = strdup (model->weightgroups.weightgroups[i].name);
-			self->groups.array[i].bone = strdup (model->weightgroups.weightgroups[i].bone);
+			self->groups.array[i].name = listr_dup (model->weightgroups.weightgroups[i].name);
+			self->groups.array[i].bone = listr_dup (model->weightgroups.weightgroups[i].bone);
 			self->groups.array[i].node = limdl_pose_find_node (self, self->groups.array[i].bone);
 			if (self->groups.array[i].name == NULL ||
 				self->groups.array[i].bone == NULL)

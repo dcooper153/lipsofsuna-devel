@@ -22,9 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <system/lips-system.h>
 #include "render-material.h"
 
 /**
@@ -37,7 +35,7 @@ lirnd_material_new ()
 {
 	lirndMaterial* self;
 
-	self = calloc (1, sizeof (lirndMaterial));
+	self = lisys_calloc (1, sizeof (lirndMaterial));
 	if (self == NULL)
 		return NULL;
 	self->shininess = 64;
@@ -55,7 +53,7 @@ lirnd_material_new_from_model (lirndRender*         render,
 	lirndMaterial* self;
 	lirndShader* shader;
 
-	self = calloc (1, sizeof (lirndMaterial));
+	self = lisys_calloc (1, sizeof (lirndMaterial));
 	if (self == NULL)
 		return NULL;
 	if (material->flags & LIMDL_MATERIAL_FLAG_BILLBOARD)
@@ -105,8 +103,8 @@ lirnd_material_new_from_model (lirndRender*         render,
 void
 lirnd_material_free (lirndMaterial* self)
 {
-	free (self->textures.array);
-	free (self);
+	lisys_free (self->textures.array);
+	lisys_free (self);
 }
 
 /**
@@ -193,7 +191,7 @@ lirnd_material_set_texture_count (lirndMaterial* self,
 	}
 	else
 	{
-		free (self->textures.array);
+		lisys_free (self->textures.array);
 		self->textures.array = NULL;
 		self->textures.count = 0;
 	}

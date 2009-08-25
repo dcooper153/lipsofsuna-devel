@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <stdlib.h>
 #include <network/lips-network.h>
 #include <system/lips-system.h>
 #include "lips-client.h"

@@ -72,12 +72,9 @@ lieng_resources_new (liengEngine* engine)
 	liengResources* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liengResources));
+	self = lisys_calloc (1, sizeof (liengResources));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->engine = engine;
 
 	return self;
@@ -92,7 +89,7 @@ void
 lieng_resources_free (liengResources* self)
 {
 	lieng_resources_clear (self);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -114,9 +111,9 @@ lieng_resources_clear (liengResources* self)
 		for (i = 0 ; i < self->animations.count ; i++)
 		{
 			animation = self->animations.array + i;
-			free (animation->name);
+			lisys_free (animation->name);
 		}
-		free (self->animations.array);
+		lisys_free (self->animations.array);
 		self->animations.array = NULL;
 		self->animations.count = 0;
 	}
@@ -129,7 +126,7 @@ lieng_resources_clear (liengResources* self)
 			model = self->models.array[i];
 			lieng_model_free (model);
 		}
-		free (self->models.array);
+		lisys_free (self->models.array);
 		self->models.array = NULL;
 		self->models.count = 0;
 	}
@@ -140,10 +137,10 @@ lieng_resources_clear (liengResources* self)
 		for (i = 0 ; i < self->samples.count ; i++)
 		{
 			sample = self->samples.array + i;
-			free (sample->name);
-			free (sample->path);
+			lisys_free (sample->name);
+			lisys_free (sample->path);
 		}
-		free (self->samples.array);
+		lisys_free (self->samples.array);
 		self->samples.array = NULL;
 		self->samples.count = 0;
 	}
@@ -283,7 +280,7 @@ lieng_resources_load_from_dir (liengResources* self,
 	if (tmp == NULL)
 		return 0;
 	directory = lisys_dir_open (tmp);
-	free (tmp);
+	lisys_free (tmp);
 	if (directory == NULL)
 		return 0;
 	lisys_dir_set_filter (directory, private_filter_models);
@@ -303,7 +300,7 @@ lieng_resources_load_from_dir (liengResources* self,
 		if (file == NULL)
 			goto error;
 		model = limdl_model_new_from_file (file);
-		free (file);
+		lisys_free (file);
 		if (model == NULL)
 			goto error;
 
@@ -312,7 +309,7 @@ lieng_resources_load_from_dir (liengResources* self,
 		if (name == NULL)
 			goto error;
 		ret = private_insert_model (self, name, model);
-		free (name);
+		lisys_free (name);
 		if (!ret)
 			goto error;
 
@@ -326,7 +323,7 @@ lieng_resources_load_from_dir (liengResources* self,
 	if (tmp == NULL)
 		return 0;
 	directory = lisys_dir_open (tmp);
-	free (tmp);
+	lisys_free (tmp);
 	if (directory == NULL)
 		return 0;
 	lisys_dir_set_filter (directory, private_filter_samples);
@@ -345,7 +342,7 @@ lieng_resources_load_from_dir (liengResources* self,
 		if (name == NULL)
 			goto error;
 		ret = private_insert_sample (self, name);
-		free (name);
+		lisys_free (name);
 		if (!ret)
 			goto error;
 	}
@@ -408,12 +405,9 @@ lieng_resources_load_from_stream (liengResources* self,
 	if (n_animations)
 	{
 		self->animations.count = n_animations;
-		self->animations.array = calloc (n_animations, sizeof (liengAnimation));
+		self->animations.array = lisys_calloc (n_animations, sizeof (liengAnimation));
 		if (self->animations.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 		for (id = 0 ; id < n_animations ; id++)
 		{
 			animation = self->animations.array + id;
@@ -427,18 +421,15 @@ lieng_resources_load_from_stream (liengResources* self,
 	if (n_models)
 	{
 		self->models.count = n_models;
-		self->models.array = calloc (n_models, sizeof (liengModel*));
+		self->models.array = lisys_calloc (n_models, sizeof (liengModel*));
 		if (self->models.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 		for (id = 0 ; id < n_models ; id++)
 		{
 			if (!li_reader_get_text (reader, "", &name))
 				goto error;
 			model = lieng_model_new (self->engine, id, self->engine->config.dir, name);
-			free (name);
+			lisys_free (name);
 			if (model == NULL)
 				goto error;
 			self->models.array[id] = model;
@@ -449,12 +440,9 @@ lieng_resources_load_from_stream (liengResources* self,
 	if (n_samples)
 	{
 		self->samples.count = n_samples;
-		self->samples.array = calloc (n_samples, sizeof (liengSample));
+		self->samples.array = lisys_calloc (n_samples, sizeof (liengSample));
 		if (self->samples.array == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			goto error;
-		}
 		for (id = 0 ; id < n_samples ; id++)
 		{
 			sample = self->samples.array + id;
@@ -587,7 +575,6 @@ private_insert_model (liengResources*   self,
 	tmp->bounds = model->bounds;
 	if (!lialg_array_append (&self->models, &tmp))
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lieng_model_free (tmp);
 		return 0;
 	}
@@ -614,10 +601,9 @@ private_insert_model (liengResources*   self,
 		eanim = self->animations.array + count;
 		eanim->id = 0;
 		eanim->data = NULL;
-		eanim->name = strdup (manim->name);
+		eanim->name = listr_dup (manim->name);
 		if (eanim->name == NULL)
 		{
-			lisys_error_set (ENOMEM, NULL);
 			self->animations.count--;
 			return 0;
 		}
@@ -644,26 +630,23 @@ private_insert_sample (liengResources* self,
 	sample.id = 0;
 	sample.invalid = 0;
 	sample.data = NULL;
-	sample.name = strdup (name);
+	sample.name = listr_dup (name);
 	if (sample.name == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	sample.path = lisys_path_format (self->engine->config.dir,
 		LISYS_PATH_SEPARATOR, "sounds",
 		LISYS_PATH_SEPARATOR, name, ".ogg", NULL);
 	if (sample.path == NULL)
 	{
-		free (sample.name);
+		lisys_free (sample.name);
 		return 0;
 	}
 
 	/* Append to sample array. */
 	if (!lialg_array_append (&self->samples, &sample))
 	{
-		free (sample.name);
-		free (sample.path);
+		lisys_free (sample.name);
+		lisys_free (sample.path);
 		return 0;
 	}
 

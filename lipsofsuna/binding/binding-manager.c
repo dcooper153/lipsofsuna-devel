@@ -22,10 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "binding-manager.h"
 
 /**
@@ -38,7 +36,7 @@ libnd_manager_new ()
 {
 	libndManager* self;
 
-	self = calloc (1, sizeof (libndManager));
+	self = lisys_calloc (1, sizeof (libndManager));
 	if (self == NULL)
 		return NULL;
 	return self;
@@ -67,7 +65,7 @@ libnd_manager_free (libndManager* self)
 		binding_next = binding->next;
 		libnd_binding_free (binding);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 /**

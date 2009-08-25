@@ -40,14 +40,14 @@ liext_module_new (licliModule* module)
 {
 	liextModule* self;
 
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
 	self->packager = liext_packager_new (module);
 	if (self->packager == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -61,7 +61,7 @@ liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
 	liext_packager_free (self->packager);
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

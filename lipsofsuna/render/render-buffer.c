@@ -47,7 +47,7 @@ lirnd_buffer_init (lirndBuffer*   self,
 		}
 		else
 		{
-			self->vertices.array = malloc (count * format->size);
+			self->vertices.array = lisys_malloc (count * format->size);
 			if (self->vertices.array == NULL)
 				return 0;
 			memcpy (self->vertices.array, data, size);
@@ -63,7 +63,7 @@ lirnd_buffer_free (lirndBuffer* self)
 {
 	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
-	free (self->vertices.array);
+	lisys_free (self->vertices.array);
 }
 
 void*

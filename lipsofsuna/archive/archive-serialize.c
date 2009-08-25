@@ -36,7 +36,7 @@ liarc_serialize_new_read (const char*  file)
 	liarcSerialize* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liarcSerialize));
+	self = lisys_calloc (1, sizeof (liarcSerialize));
 	if (self == NULL)
 		return NULL;
 
@@ -79,7 +79,7 @@ liarc_serialize_new_write (const char*  file)
 	liarcSerialize* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liarcSerialize));
+	self = lisys_calloc (1, sizeof (liarcSerialize));
 	if (self == NULL)
 		return NULL;
 
@@ -137,7 +137,7 @@ liarc_serialize_free (liarcSerialize* self)
 		lialg_ptrdic_free (self->pointers);
 	if (self->reader != NULL)
 		li_reader_free (self->reader);
-	free (self);
+	lisys_free (self);
 }
 
 /**

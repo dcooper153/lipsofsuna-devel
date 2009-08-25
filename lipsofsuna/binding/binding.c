@@ -22,10 +22,8 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "binding.h"
 
 /**
@@ -52,15 +50,15 @@ libnd_binding_new (libndType    type,
 
 	assert (action != NULL);
 
-	self = calloc (1, sizeof (libndBinding));
+	self = lisys_calloc (1, sizeof (libndBinding));
 	if (self == NULL)
 		return NULL;
 	if (params == NULL)
 		params = "";
-	self->params = strdup (params);
+	self->params = listr_dup (params);
 	if (self->params == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->type = type;
@@ -84,8 +82,8 @@ libnd_binding_new (libndType    type,
 void
 libnd_binding_free (libndBinding* self)
 {
-	free (self->params);
-	free (self);
+	lisys_free (self->params);
+	lisys_free (self);
 }
 
 void*

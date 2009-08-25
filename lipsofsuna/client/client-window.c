@@ -22,9 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <system/lips-system.h>
 #include "client.h"
 #include "client-window.h"
 
@@ -48,7 +46,7 @@ licli_window_new (licliClient* client)
 	licliWindow* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (licliWindow));
+	self = lisys_calloc (1, sizeof (licliWindow));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -73,7 +71,7 @@ licli_window_free (licliWindow* self)
 		self->client->video.SDL_FreeSurface (self->screen);
 	if (self->client->video.TTF_WasInit ())
 		self->client->video.TTF_Quit ();
-	free (self);
+	lisys_free (self);
 }
 
 void

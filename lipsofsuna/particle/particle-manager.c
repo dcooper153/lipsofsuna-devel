@@ -33,25 +33,20 @@ lipar_manager_new (int points,
 	liparManager* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liparManager));
+	self = lisys_calloc (1, sizeof (liparManager));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	/* Allocate particles. */
-	self->points.all = calloc (points, sizeof (liparPoint));
+	self->points.all = lisys_calloc (points, sizeof (liparPoint));
 	if (self->points.all == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lipar_manager_free (self);
 		return NULL;
 	}
-	self->lines.all = calloc (lines, sizeof (liparLine));
+	self->lines.all = lisys_calloc (lines, sizeof (liparLine));
 	if (self->lines.all == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		lipar_manager_free (self);
 		return NULL;
 	}
@@ -84,9 +79,9 @@ lipar_manager_new (int points,
 void
 lipar_manager_free (liparManager* self)
 {
-	free (self->lines.all);
-	free (self->points.all);
-	free (self);
+	lisys_free (self->lines.all);
+	lisys_free (self->points.all);
+	lisys_free (self);
 }
 
 liparLine*

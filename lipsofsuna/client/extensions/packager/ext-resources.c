@@ -24,11 +24,9 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <model/lips-model.h>
 #include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "ext-resources.h"
 
 static int
@@ -62,12 +60,9 @@ liext_resources_new ()
 {
 	liextResources* self;
 
-	self = calloc (1, sizeof (liextResources));
+	self = lisys_calloc (1, sizeof (liextResources));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	return self;
 }
@@ -78,18 +73,18 @@ liext_resources_free (liextResources* self)
 	int i;
 
 	for (i = 0 ; i < self->animations.count ; i++)
-		free (self->animations.array[i]);
+		lisys_free (self->animations.array[i]);
 	for (i = 0 ; i < self->models.count ; i++)
-		free (self->models.array[i].name);
+		lisys_free (self->models.array[i].name);
 	for (i = 0 ; i < self->shaders.count ; i++)
-		free (self->shaders.array[i]);
+		lisys_free (self->shaders.array[i]);
 	for (i = 0 ; i < self->textures.count ; i++)
-		free (self->textures.array[i]);
-	free (self->animations.array);
-	free (self->models.array);
-	free (self->shaders.array);
-	free (self->textures.array);
-	free (self);
+		lisys_free (self->textures.array[i]);
+	lisys_free (self->animations.array);
+	lisys_free (self->models.array);
+	lisys_free (self->shaders.array);
+	lisys_free (self->textures.array);
+	lisys_free (self);
 }
 
 void
@@ -98,17 +93,17 @@ liext_resources_clear (liextResources* self)
 	int i;
 
 	for (i = 0 ; i < self->animations.count ; i++)
-		free (self->animations.array[i]);
+		lisys_free (self->animations.array[i]);
 	for (i = 0 ; i < self->models.count ; i++)
-		free (self->models.array[i].name);
+		lisys_free (self->models.array[i].name);
 	for (i = 0 ; i < self->shaders.count ; i++)
-		free (self->shaders.array[i]);
+		lisys_free (self->shaders.array[i]);
 	for (i = 0 ; i < self->textures.count ; i++)
-		free (self->textures.array[i]);
-	free (self->animations.array);
-	free (self->models.array);
-	free (self->shaders.array);
-	free (self->textures.array);
+		lisys_free (self->textures.array[i]);
+	lisys_free (self->animations.array);
+	lisys_free (self->models.array);
+	lisys_free (self->shaders.array);
+	lisys_free (self->textures.array);
 	memset (self, 0, sizeof (liextResources));
 }
 
@@ -120,26 +115,22 @@ liext_resources_insert_model (liextResources*   self,
 	liextModel tmp;
 
 	/* Create model. */
-	tmp.name = strdup (name);
+	tmp.name = listr_dup (name);
 	tmp.bounds = model->bounds;
 	if (tmp.name == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	/* Append model. */
 	if (!lialg_array_append (&self->models, &tmp))
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (tmp.name);
+		lisys_free (tmp.name);
 		return 0;
 	}
 
 	/* Append animations and materials. */
 	if (!private_read_animations (self, model) ||
-		!private_read_shaders (self, model) ||
-		!private_read_textures (self, model))
+	    !private_read_shaders (self, model) ||
+	    !private_read_textures (self, model))
 		return 0;
 
 	return 1;
@@ -165,7 +156,7 @@ liext_resources_insert_texture (liextResources* self,
 	/* Append texture. */
 	if (!lialg_array_resize (&self->textures, count + 1))
 		return 0;
-	self->textures.array[count] = strdup (name);
+	self->textures.array[count] = listr_dup (name);
 	if (self->textures.array[count] == NULL)
 		return 0;
 
@@ -235,12 +226,9 @@ private_read_animations (liextResources*   self,
 		/* Append animation. */
 		if (!lialg_array_resize (&self->animations, count + 1))
 			return 0;
-		self->animations.array[count] = strdup (animation->name);
+		self->animations.array[count] = listr_dup (animation->name);
 		if (self->animations.array[count] == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
 			return 0;
-		}
 	}
 
 	return 1;
@@ -272,7 +260,7 @@ private_read_shaders (liextResources*   self,
 		/* Append shader. */
 		if (!lialg_array_resize (&self->shaders, count + 1))
 			return 0;
-		self->shaders.array[count] = strdup (material->shader);
+		self->shaders.array[count] = listr_dup (material->shader);
 		if (self->shaders.array[count] == NULL)
 			return 0;
 	}
@@ -315,7 +303,7 @@ private_read_textures (liextResources*   self,
 			/* Append to texture list. */
 			if (!lialg_array_resize (&self->textures, count + 1))
 				return 0;
-			self->textures.array[count] = strdup (texture->string);
+			self->textures.array[count] = listr_dup (texture->string);
 			if (self->textures.array[count] == NULL)
 				return 0;
 		}

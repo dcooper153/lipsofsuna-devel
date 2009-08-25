@@ -25,7 +25,7 @@
 #ifndef __MATH_POLYGON_H__
 #define __MATH_POLYGON_H__
 
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "math-aabb.h"
 #include "math-plane.h"
 #include "math-types.h"
@@ -63,7 +63,7 @@ li_polygon_new (const liVtxops* ops,
 	liPolygon* self;
 
 	/* Allocate self. */
-	self = (liPolygon*) calloc (1, sizeof (liPolygon));
+	self = (liPolygon*) lisys_calloc (1, sizeof (liPolygon));
 	if (self == NULL)
 		return NULL;
 	self->ops = ops;
@@ -73,10 +73,10 @@ li_polygon_new (const liVtxops* ops,
 
 	/* Allocate vertices. */
 	self->vertices.capacity = count;
-	self->vertices.vertices = malloc (count * ops->size);
+	self->vertices.vertices = lisys_malloc (count * ops->size);
 	if (self->vertices.vertices == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -108,7 +108,7 @@ li_polygon_new_from_triangle (const liVtxops* ops,
 	limatVector coord2;
 
 	/* Allocate self. */
-	self = (liPolygon*) calloc (1, sizeof (liPolygon));
+	self = (liPolygon*) lisys_calloc (1, sizeof (liPolygon));
 	if (self == NULL)
 		return NULL;
 	self->ops = ops;
@@ -123,10 +123,10 @@ li_polygon_new_from_triangle (const liVtxops* ops,
 	/* Allocate vertices. */
 	self->vertices.capacity = 3;
 	self->vertices.count = 3;
-	self->vertices.vertices = malloc (3 * ops->size);
+	self->vertices.vertices = lisys_malloc (3 * ops->size);
 	if (self->vertices.vertices == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	memcpy ((char*) self->vertices.vertices + 0 * ops->size, v0, ops->size);
@@ -144,8 +144,8 @@ li_polygon_new_from_triangle (const liVtxops* ops,
 static inline void
 li_polygon_free (liPolygon* self)
 {
-	free (self->vertices.vertices);
-	free (self);
+	lisys_free (self->vertices.vertices);
+	lisys_free (self);
 }
 
 /**
@@ -168,7 +168,7 @@ li_polygon_add_vertices (liPolygon*  self,
 	num = self->vertices.count + count;
 	if (num > self->vertices.capacity)
 	{
-		tmp = (limatVector*) realloc (self->vertices.vertices, num * ops->size);
+		tmp = (limatVector*) lisys_realloc (self->vertices.vertices, num * ops->size);
 		if (tmp == NULL)
 			return 0;
 		self->vertices.vertices = tmp;
@@ -176,6 +176,7 @@ li_polygon_add_vertices (liPolygon*  self,
 	}
 	memcpy ((char*) self->vertices.vertices + self->vertices.count * ops->size, vertices, count * ops->size);
 	self->vertices.count += count;
+
 	return 1;
 }
 
@@ -219,11 +220,9 @@ li_polygon_clip (const liPolygon* self,
 	prev_vtx = (char*) self->vertices.vertices + (self->vertices.count - 1) * ops->size;
 	ops->getcoord (prev_vtx, &prev_coord);
 	prev_in = li_plane_signed_distance_to_point (plane, &prev_coord) >= 0.0f;
-#ifdef linux
-	tmp_vtx = alloca (ops->size);
-#else
-	tmp_vtx = malloc (ops->size);
-#endif
+	tmp_vtx = lisys_malloc (ops->size);
+	if (tmp_vtx == NULL)
+		return 0;
 
 	/* Calculate the vertices of the new polygons. */
 	for (i = 0 ; i < self->vertices.count ; i++)
@@ -261,9 +260,8 @@ li_polygon_clip (const liPolygon* self,
 		prev_in = curr_in;
 	}
 
-#ifndef linux
-	free (tmp_vtx);
-#endif
+	lisys_free (tmp_vtx);
+
 	return ret;
 }
 
@@ -305,13 +303,9 @@ li_polygon_clip_with_planes (const liPolygon* self,
 	tmp.ops = ops;
 	tmp.vertices.capacity = self->vertices.count + count;
 	tmp.vertices.count = 0;
-#ifdef linux
-	tmp.vertices.vertices = alloca (tmp.vertices.capacity * ops->size);
-#else
-	tmp.vertices.vertices = malloc (tmp.vertices.capacity * ops->size);
+	tmp.vertices.vertices = lisys_malloc (tmp.vertices.capacity * ops->size);
 	if (tmp.vertices.vertices == NULL)
 		return 0;
-#endif
 
 	/* Let each plane clip. */
 	if (count % 2)
@@ -335,9 +329,8 @@ li_polygon_clip_with_planes (const liPolygon* self,
 	}
 
 	/* Free the temporary polygon. */
-#ifndef linux
-	free (tmp.vertices.vertices);
-#endif
+	lisys_free (tmp.vertices.vertices);
+
 	return ret;
 }
 
@@ -417,11 +410,9 @@ li_polygon_split (const liPolygon* self,
 	prev_vtx = (char*) self->vertices.vertices + (self->vertices.count - 1) * ops->size;
 	ops->getcoord (prev_vtx, &prev_coord);
 	prev_in = li_plane_signed_distance_to_point (plane, &prev_coord) >= 0.0f;
-#ifdef linux
-	tmp_vtx = alloca (ops->size);
-#else
-	tmp_vtx = malloc (ops->size);
-#endif
+	tmp_vtx = lisys_malloc (ops->size);
+	if (tmp_vtx == NULL)
+		return 0;
 
 	/* Calculate the vertices of the new polygons. */
 	for (i = 0 ; i < self->vertices.count ; i++)
@@ -468,9 +459,8 @@ li_polygon_split (const liPolygon* self,
 		prev_in = curr_in;
 	}
 
-#ifndef linux
-	free (tmp_vtx);
-#endif
+	lisys_free (tmp_vtx);
+
 	return ret;
 }
 

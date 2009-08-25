@@ -78,7 +78,7 @@ private_convert (lirelReload* self,
 
 	/* Convert the file. */
 	ret = lisys_execvl_redir_call (private_filter, NULL, "blender", "blender", "-b", name, "-P", script, NULL);
-	free (script);
+	lisys_free (script);
 
 	return ret;
 }

@@ -22,9 +22,6 @@
  * @{
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <network/lips-network.h>
 #include <system/lips-system.h>
 #include "server.h"
@@ -107,7 +104,7 @@ lisrv_client_new (lisrvServer* server,
 	lisrvClient* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisrvClient));
+	self = lisys_calloc (1, sizeof (lisrvClient));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -128,7 +125,7 @@ lisrv_client_new (lisrvServer* server,
 error:
 	if (self->vision != NULL)
 		lialg_u32dic_free (self->vision);
-	free (self);
+	lisys_free (self);
 	return NULL;
 }
 
@@ -158,7 +155,7 @@ lisrv_client_free (lisrvClient* self)
 
 	/* Free callbacks. */
 	private_callbacks_clear (self, self->server->engine);
-	free (self);
+	lisys_free (self);
 }
 
 /**

@@ -81,10 +81,10 @@ liwdg_progress_set_text (liwdgProgress* self,
 {
 	char* tmp;
 
-	tmp = strdup (text);
+	tmp = listr_dup (text);
 	if (tmp == NULL)
 		return 0;
-	free (self->string);
+	lisys_free (self->string);
 	self->string = tmp;
 	private_rebuild (self);
 	return 1;
@@ -109,14 +109,14 @@ static int
 private_init (liwdgProgress*   self,
               liwdgManager* manager)
 {
-	self->string = calloc (1, 1);
+	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
 		return 0;
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 	{
-		free (self->string);
+		lisys_free (self->string);
 		return 0;
 	}
 	private_rebuild (self);
@@ -127,7 +127,7 @@ static void
 private_free (liwdgProgress* self)
 {
 	lifnt_layout_free (self->text);
-	free (self->string);
+	lisys_free (self->string);
 }
 
 static int

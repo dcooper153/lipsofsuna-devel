@@ -38,7 +38,7 @@ lisnd_manager_new (lisndSystem* system)
 	lisndManager* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisndManager));
+	self = lisys_calloc (1, sizeof (lisndManager));
 	if (self == NULL)
 		return NULL;
 	self->system = system;
@@ -68,7 +68,7 @@ lisnd_manager_free (lisndManager* self)
 			lisnd_sample_free (iter.value);
 		lialg_strdic_free (self->samples);
 	}
-	free (self);
+	lisys_free (self);
 }
 
 /**

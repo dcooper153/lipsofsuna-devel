@@ -45,7 +45,7 @@ lirnd_render_new (const char* dir)
 	lirndRender* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndRender));
+	self = lisys_calloc (1, sizeof (lirndRender));
 	if (self == NULL)
 		return NULL;
 	self->shader.enabled = 0;//(livid_features.shader_model >= 3);
@@ -56,7 +56,7 @@ lirnd_render_new (const char* dir)
 		goto error;
 
 	/* Load data. */
-	self->config.dir = strdup (dir);
+	self->config.dir = listr_dup (dir);
 	if (self->config.dir == NULL)
 		goto error;
 	if (!private_init_shaders (self) ||
@@ -92,8 +92,8 @@ lirnd_render_free (lirndRender* self)
 		lialg_ptrdic_free (self->scenes);
 	}
 
-	free (self->config.dir);
-	free (self);
+	lisys_free (self->config.dir);
+	lisys_free (self);
 }
 
 /**
@@ -351,7 +351,7 @@ private_init_resources (lirndRender* self,
 	}
 
 	/* Initialize noise texture. */
-	pixels = malloc (4 * 256 * 256);
+	pixels = lisys_malloc (4 * 256 * 256);
 	pixel = pixels;
 	if (pixels == NULL)
 		return 0;
@@ -371,7 +371,7 @@ private_init_resources (lirndRender* self,
 	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	free (pixels);
+	lisys_free (pixels);
 
 	return 1;
 }
@@ -391,7 +391,7 @@ private_init_shaders (lirndRender* self)
 		if (path == NULL)
 			return 0;
 		reader = li_reader_new_from_file (path);
-		free (path);
+		lisys_free (path);
 		if (reader == NULL)
 			return 0;
 		self->shader.shadowmap = lirnd_shader_new_from_data (self, reader);
@@ -416,7 +416,7 @@ private_load_image (lirndRender* self,
 	if (path == NULL)
 		return NULL;
 	result = liimg_texture_new_from_file (path);
-	free (path);
+	lisys_free (path);
 
 	return result;
 }

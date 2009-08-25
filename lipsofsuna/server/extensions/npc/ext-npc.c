@@ -50,7 +50,7 @@ liext_npc_new (lisrvServer* server)
 {
 	liextNpc* self;
 
-	self = calloc (1, sizeof (liextNpc));
+	self = lisys_calloc (1, sizeof (liextNpc));
 	if (self == NULL)
 		return NULL;
 	self->alert = 1;
@@ -75,7 +75,7 @@ liext_npc_free (liextNpc* self)
 		lieng_engine_remove_calls (self->server->engine, self->calls,
 			sizeof (self->calls) / sizeof (licalHandle));
 	}
-	free (self);
+	lisys_free (self);
 }
 
 int

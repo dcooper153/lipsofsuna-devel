@@ -49,14 +49,14 @@ liext_module_new (lisrvServer* server)
 	liextModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 	self->dictionary = lialg_ptrdic_new ();
 	if (self->dictionary == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -81,7 +81,7 @@ liext_module_free (liextModule* self)
 	lialg_ptrdic_free (self->dictionary);
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
-	free (self);
+	lisys_free (self);
 }
 
 int

@@ -98,12 +98,9 @@ liext_packager_new (licliModule* module)
 {
 	liextPackager* self;
 
-	self = calloc (1, sizeof (liextPackager));
+	self = lisys_calloc (1, sizeof (liextPackager));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->module = module;
 
 	return self;
@@ -113,7 +110,7 @@ void
 liext_packager_free (liextPackager* self)
 {
 	liext_packager_cancel (self);
-	free (self);
+	lisys_free (self);
 }
 
 /**
@@ -157,27 +154,22 @@ liext_packager_save (liextPackager* self,
 	}
 
 	/* Allocate data. */
-	data = calloc (1, sizeof (liextPackagerData));
+	data = lisys_calloc (1, sizeof (liextPackagerData));
 	if (data == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 	data->packager = self;
 	data->module = self->module;
-	data->target = strdup (name);
+	data->target = listr_dup (name);
 	if (data->target == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (data);
+		lisys_free (data);
 		return 0;
 	}
-	data->directory = strdup (dir);
+	data->directory = listr_dup (dir);
 	if (data->directory == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
-		free (data->target);
-		free (data);
+		lisys_free (data->target);
+		lisys_free (data);
 		return 0;
 	}
 
@@ -185,9 +177,9 @@ liext_packager_save (liextPackager* self,
 	self->worker = lithr_async_call_new (private_async_save, private_async_free, data);
 	if (self->worker == NULL)
 	{
-		free (data->target);
-		free (data->directory);
-		free (data);
+		lisys_free (data->target);
+		lisys_free (data->directory);
+		lisys_free (data);
 		return 0;
 	}
 
@@ -251,12 +243,12 @@ private_async_free (lithrAsyncCall* call)
 		liarc_writer_free (self->writer);
 	for (i = 0 ; i < self->files.count ; i++)
 	{
-		free (self->files.array[i].src);
-		free (self->files.array[i].dst);
+		lisys_free (self->files.array[i].src);
+		lisys_free (self->files.array[i].dst);
 	}
-	free (self->files.array);
-	free (self->target);
-	free (self->directory);
+	lisys_free (self->files.array);
+	lisys_free (self->target);
+	lisys_free (self->directory);
 }
 
 static void
@@ -285,10 +277,10 @@ private_async_save (lithrAsyncCall* call)
 	if (!private_insert_models (call, self, path) ||
 	    !private_insert_extra (call, self))
 	{
-		free (path);
+		lisys_free (path);
 		goto error;
 	}
-	free (path);
+	lisys_free (path);
 	if (call->stop)
 		goto stop;
 
@@ -326,10 +318,10 @@ private_async_save (lithrAsyncCall* call)
 		goto error;
 	if (!private_insert_samples (call, self, path))
 	{
-		free (path);
+		lisys_free (path);
 		goto error;
 	}
-	free (path);
+	lisys_free (path);
 	if (call->stop)
 		goto stop;
 
@@ -432,7 +424,7 @@ private_insert_directory (liextPackagerData* self,
 	if (src == NULL)
 		return 0;
 	dir = lisys_dir_open (src);
-	free (src);
+	lisys_free (src);
 	if (dir == NULL)
 		return 0;
 	lisys_dir_set_filter (dir, LISYS_DIR_FILTER_VISIBLE);
@@ -449,8 +441,8 @@ private_insert_directory (liextPackagerData* self,
 			ret = 0;
 		if (!ret)
 		{
-			free (tmp.src);
-			free (tmp.dst);
+			lisys_free (tmp.src);
+			lisys_free (tmp.dst);
 			return 0;
 		}
 	}
@@ -471,7 +463,7 @@ private_insert_extra (lithrAsyncCall*    call,
 	if (path == NULL)
 		return 0;
 	reader = li_reader_new_from_file (path);
-	free (path);
+	lisys_free (path);
 	if (reader == NULL)
 	{
 		if (lisys_error_peek () != EIO)
@@ -490,10 +482,10 @@ private_insert_extra (lithrAsyncCall*    call,
 		}
 		if (!liext_resources_insert_texture (self->resources, tmp))
 		{
-			free (tmp);
+			lisys_free (tmp);
 			return 0;
 		}
-		free (tmp);
+		lisys_free (tmp);
 	}
 	li_reader_free (reader);
 
@@ -522,8 +514,8 @@ private_insert_file (liextPackagerData* self,
 		ret = 0;
 	if (!ret)
 	{
-		free (tmp.src);
-		free (tmp.dst);
+		lisys_free (tmp.src);
+		lisys_free (tmp.dst);
 	}
 
 	return ret;
@@ -565,7 +557,7 @@ private_insert_models (lithrAsyncCall*    call,
 		if (file == NULL)
 			goto error;
 		model = limdl_model_new_from_file (file);
-		free (file);
+		lisys_free (file);
 		if (model == NULL)
 			goto error;
 
@@ -578,7 +570,7 @@ private_insert_models (lithrAsyncCall*    call,
 		if (name == NULL)
 			goto error;
 		ret = liext_resources_insert_model (self->resources, name, model);
-		free (name);
+		lisys_free (name);
 		if (!ret)
 			goto error;
 
@@ -701,7 +693,7 @@ private_write_directory (liextPackagerData* self,
 		return 0;
 	if (!liarc_tar_write_directory (self->tar, path))
 	{
-		free (path);
+		lisys_free (path);
 		return 0;
 	}
 

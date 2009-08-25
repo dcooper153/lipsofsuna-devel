@@ -45,12 +45,9 @@ liext_slot_new (liengObject* object,
 	liextSlot* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liextSlot));
+	self = lisys_calloc (1, sizeof (liextSlot));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->module = LICLI_OBJECT (object)->module;
 
 	/* Allocate model. */
@@ -112,7 +109,7 @@ liext_slot_free (liextSlot* self)
 	if (tmp != NULL)
 		lieng_object_set_realized (tmp, 0);
 
-	free (self);
+	lisys_free (self);
 }
 
 /** @} */

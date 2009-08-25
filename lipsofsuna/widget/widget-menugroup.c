@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <stdlib.h>
-#include <string.h>
 #include <string/lips-string.h>
+#include <system/lips-system.h>
 #include "widget-menugroup.h"
 #include "widget-private.h"
 
@@ -56,7 +55,7 @@ liwdg_menu_group_new (const char* markup)
 	liwdgMenuItem* parent;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (liwdgMenuGroup));
+	self = lisys_calloc (1, sizeof (liwdgMenuGroup));
 	if (self == NULL)
 		return NULL;
 
@@ -82,7 +81,7 @@ liwdg_menu_group_new (const char* markup)
 			/* Read path component. */
 			if (!li_reader_get_text (reader, "|\n", &name))
 			{
-				free (icon);
+				lisys_free (icon);
 				goto error;
 			}
 
@@ -94,13 +93,12 @@ liwdg_menu_group_new (const char* markup)
 				item = private_item_create (self, parent, name);
 				if (item == NULL)
 				{
-					lisys_error_set (ENOMEM, NULL);
-					free (icon);
-					free (name);
+					lisys_free (icon);
+					lisys_free (name);
 					goto error;
 				}
 			}
-			free (name);
+			lisys_free (name);
 		}
 
 		/* Skip whitespace. */
@@ -132,8 +130,8 @@ liwdg_menu_group_free (liwdgMenuGroup* self)
 
 	for (i = 0 ; i < self->items.count ; i++)
 		private_item_free (self, self->items.array[i]);
-	free (self->items.array);
-	free (self);
+	lisys_free (self->items.array);
+	lisys_free (self);
 }
 
 void
@@ -168,15 +166,15 @@ private_item_create (liwdgMenuGroup* self,
 	liwdgMenuItem* item;
 
 	/* Allocate item. */
-	item = calloc (1, sizeof (liwdgMenuItem));
+	item = lisys_calloc (1, sizeof (liwdgMenuItem));
 	if (item == NULL)
 		return 0;
 	item->id = -1;
 	item->group = self;
-	item->text = strdup (text);
+	item->text = listr_dup (text);
 	if (item->text == NULL)
 	{
-		free (item);
+		lisys_free (item);
 		return NULL;
 	}
 
@@ -185,8 +183,8 @@ private_item_create (liwdgMenuGroup* self,
 	{
 		if (!lialg_array_append (&parent->items, &item))
 		{
-			free (item->text);
-			free (item);
+			lisys_free (item->text);
+			lisys_free (item);
 			return NULL;
 		}
 	}
@@ -194,8 +192,8 @@ private_item_create (liwdgMenuGroup* self,
 	{
 		if (!lialg_array_append (&self->items, &item))
 		{
-			free (item->text);
-			free (item);
+			lisys_free (item->text);
+			lisys_free (item);
 			return NULL;
 		}
 	}
@@ -211,10 +209,10 @@ private_item_free (liwdgMenuGroup* self,
 
 	for (i = 0 ; i < item->items.count ; i++)
 		private_item_free (self, item->items.array[i]);
-	free (item->items.array);
-	free (item->icon);
-	free (item->text);
-	free (item);
+	lisys_free (item->items.array);
+	lisys_free (item->icon);
+	lisys_free (item->text);
+	lisys_free (item);
 }
 
 static liwdgMenuItem*

@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <assert.h>
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "render-context.h"
 #include "render-draw.h"
 #include "render-lighting.h"
@@ -51,27 +50,18 @@ lirnd_lighting_new (lirndRender* render)
 	lirndLighting* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lirndLighting));
+	self = lisys_calloc (1, sizeof (lirndLighting));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 	self->render = render;
 
 	/* Allocate light arrays. */
 	self->lights = lialg_ptrdic_new ();
 	if (self->lights == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
-	self->active_lights.array = calloc (8, sizeof (lirndLight*));
+	self->active_lights.array = lisys_calloc (8, sizeof (lirndLight*));
 	if (self->active_lights.array == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		goto error;
-	}
 
 	return self;
 
@@ -93,8 +83,8 @@ lirnd_lighting_free (lirndLighting* self)
 		assert (self->lights->size == 0);
 		lialg_ptrdic_free (self->lights);
 	}
-	free (self->active_lights.array);
-	free (self);
+	lisys_free (self->active_lights.array);
+	lisys_free (self);
 }
 
 /**

@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <stdlib.h>
+#include <system/lips-system.h>
 #include "lips-client.h"
 
 /* @luadoc

@@ -18,6 +18,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <stdlib.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -25,6 +26,18 @@
 #include <windows.h>
 #endif
 #include "system-misc.h"
+
+float
+lisys_randf ()
+{
+	return (float) rand () / RAND_MAX;
+}
+
+int
+lisys_randi (int max)
+{
+	return max * ((float) rand () / RAND_MAX);
+}
 
 void
 lisys_usleep (int usecs)

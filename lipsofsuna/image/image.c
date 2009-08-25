@@ -22,9 +22,6 @@
  * @{
  */
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <png.h>
 #include <system/lips-system.h>
 #include "image-compress.h"
@@ -41,12 +38,9 @@ liimg_image_new ()
 {
 	liimgImage* self;
 
-	self = calloc (1, sizeof (liimgImage));
+	self = lisys_calloc (1, sizeof (liimgImage));
 	if (self == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return NULL;
-	}
 
 	return self;
 }
@@ -82,8 +76,8 @@ liimg_image_new_from_file (const char* path)
 void
 liimg_image_free (liimgImage* self)
 {
-	free (self->pixels);
-	free (self);
+	lisys_free (self->pixels);
+	lisys_free (self);
 }
 
 /**
@@ -152,10 +146,9 @@ liimg_image_load (liimgImage* self,
 	fclose (file);
 
 	/* Allocate pixel data. */
-	pixels = malloc (width * height * 4);
+	pixels = lisys_malloc (width * height * 4);
 	if (pixels == NULL)
 	{
-		lisys_error_set (ENOMEM, NULL);
 		png_destroy_read_struct (&png, &info, NULL);
 		return 0;
 	}
@@ -183,7 +176,7 @@ liimg_image_load (liimgImage* self,
 			memcpy (dst, rows[y], 4 * width);
 		}
 	}
-	free (self->pixels);
+	lisys_free (self->pixels);
 	self->pixels = pixels;
 	self->width = width;
 	self->height = height;
@@ -258,12 +251,9 @@ liimg_image_save_s3tc (liimgImage* self,
 	liimgDDS dds;
 
 	/* Allocate buffers. */
-	bytes = malloc (4 * self->width * self->height);
+	bytes = lisys_malloc (4 * self->width * self->height);
 	if (bytes == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
 		return 0;
-	}
 
 	/* Get mipmap count. */
 	w = self->width;
@@ -277,7 +267,7 @@ liimg_image_save_s3tc (liimgImage* self,
 	if (file == NULL)
 	{
 		lisys_error_set (EIO, NULL);
-		free (bytes);
+		lisys_free (bytes);
 		return 0;
 	}
 	size = liimg_compress_storage (self->width, self->height, 5);
@@ -295,7 +285,7 @@ liimg_image_save_s3tc (liimgImage* self,
 		h = h? h : 1;
 		liimg_image_shrink_half (self);
 	}
-	free (bytes);
+	lisys_free (bytes);
 	fclose (file);
 
 	return 1;
