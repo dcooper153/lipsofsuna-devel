@@ -26,24 +26,24 @@
 #include "model-node.h"
 
 int
-limdl_light_read (limdlNode* self,
-                  liReader*  reader)
+limdl_light_read (limdlNode*   self,
+                  liarcReader* reader)
 {
 	uint32_t tmp;
 	limdlLight* light = &self->light;
 
-	if (!li_reader_get_uint32 (reader, &tmp) ||
-	    !li_reader_get_float (reader, &light->projection.fov) ||
-	    !li_reader_get_float (reader, &light->projection.nearz) ||
-	    !li_reader_get_float (reader, &light->projection.farz) ||
-	    !li_reader_get_float (reader, light->color + 0) ||
-	    !li_reader_get_float (reader, light->color + 1) ||
-	    !li_reader_get_float (reader, light->color + 2) ||
-	    !li_reader_get_float (reader, light->equation + 0) ||
-	    !li_reader_get_float (reader, light->equation + 1) ||
-	    !li_reader_get_float (reader, light->equation + 2) ||
-	    !li_reader_get_float (reader, &light->spot.cutoff) ||
-	    !li_reader_get_float (reader, &light->spot.exponent))
+	if (!liarc_reader_get_uint32 (reader, &tmp) ||
+	    !liarc_reader_get_float (reader, &light->projection.fov) ||
+	    !liarc_reader_get_float (reader, &light->projection.nearz) ||
+	    !liarc_reader_get_float (reader, &light->projection.farz) ||
+	    !liarc_reader_get_float (reader, light->color + 0) ||
+	    !liarc_reader_get_float (reader, light->color + 1) ||
+	    !liarc_reader_get_float (reader, light->color + 2) ||
+	    !liarc_reader_get_float (reader, light->equation + 0) ||
+	    !liarc_reader_get_float (reader, light->equation + 1) ||
+	    !liarc_reader_get_float (reader, light->equation + 2) ||
+	    !liarc_reader_get_float (reader, &light->spot.cutoff) ||
+	    !liarc_reader_get_float (reader, &light->spot.exponent))
 		return 0;
 	self->light.flags = tmp;
 

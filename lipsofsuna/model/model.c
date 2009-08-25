@@ -38,37 +38,37 @@ private_free_ipo (limdlModel* self,
                   limdlIpo*   ipo);
 
 static int
-private_read (limdlModel* self,
-              liReader*   reader);
+private_read (limdlModel*  self,
+              liarcReader* reader);
 
 static int
-private_read_animations (limdlModel* self,
-                         liReader*   reader);
+private_read_animations (limdlModel*  self,
+                         liarcReader* reader);
 
 static int
-private_read_faces (limdlModel* self,
-                    liReader*   reader);
+private_read_faces (limdlModel*  self,
+                    liarcReader* reader);
 
 static int
-private_read_hairs (limdlModel* self,
-                    liReader*   reader);
+private_read_hairs (limdlModel*  self,
+                    liarcReader* reader);
 
 static int
-private_read_materials (limdlModel* self,
-                        liReader*   reader);
+private_read_materials (limdlModel*  self,
+                        liarcReader* reader);
 
 static int
-private_read_nodes (limdlModel* self,
-                    liReader*   reader);
+private_read_nodes (limdlModel*  self,
+                    liarcReader* reader);
 
 static int
-private_read_weights (limdlModel* self,
-                      liReader*   reader);
+private_read_weights (limdlModel*  self,
+                      liarcReader* reader);
 
 static int
 private_read_animation (limdlModel*     self,
                         limdlAnimation* animation,
-                        liReader*       reader);
+                        liarcReader*    reader);
 
 static int
 private_write (const limdlModel* self,
@@ -120,7 +120,7 @@ limdl_model_new ()
  * \return A new model or NULL.
  */
 limdlModel*
-limdl_model_new_from_data (liReader* reader)
+limdl_model_new_from_data (liarcReader* reader)
 {
 	limdlModel* self;
 
@@ -154,7 +154,7 @@ limdl_model_new_from_data (liReader* reader)
 limdlModel*
 limdl_model_new_from_file (const char* path)
 {
-	liReader* reader;
+	liarcReader* reader;
 	limdlModel* self;
 
 	/* Allocate self. */
@@ -166,14 +166,14 @@ limdl_model_new_from_file (const char* path)
 	}
 
 	/* Open the file. */
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
 		goto error;
 
 	/* Read from stream. */
 	if (!private_read (self, reader))
 		goto error;
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	/* Construct the rest pose. */
 	private_build (self);
@@ -183,7 +183,7 @@ error:
 	lisys_error_append ("cannot load model `%s'", path);
 	limdl_model_free (self);
 	if (reader != NULL)
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 	return NULL;
 }
 
@@ -717,8 +717,8 @@ private_free_ipo (limdlModel* self,
 }
 
 static int
-private_read (limdlModel* self,
-              liReader*   reader)
+private_read (limdlModel*  self,
+              liarcReader* reader)
 {
 	int i;
 	int j;
@@ -730,14 +730,14 @@ private_read (limdlModel* self,
 	limdlFaces* group;
 
 	/* Read magic. */
-	if (!li_reader_check_text (reader, "lips/mdl", ""))
+	if (!liarc_reader_check_text (reader, "lips/mdl", ""))
 	{
 		lisys_error_set (EINVAL, "wrong file format");
 		return 0;
 	}
 
 	/* Read version. */
-	if (!li_reader_get_uint32 (reader, &version))
+	if (!liarc_reader_get_uint32 (reader, &version))
 		return 0;
 	if (version != LIMDL_FORMAT_VERSION)
 	{
@@ -746,13 +746,13 @@ private_read (limdlModel* self,
 	}
 
 	/* Read header. */
-	if (!li_reader_get_uint32 (reader, &tmp) ||
-	    !li_reader_get_float (reader, &min.x) ||
-	    !li_reader_get_float (reader, &min.y) ||
-	    !li_reader_get_float (reader, &min.z) ||
-	    !li_reader_get_float (reader, &max.x) ||
-	    !li_reader_get_float (reader, &max.y) ||
-	    !li_reader_get_float (reader, &max.z))
+	if (!liarc_reader_get_uint32 (reader, &tmp) ||
+	    !liarc_reader_get_float (reader, &min.x) ||
+	    !liarc_reader_get_float (reader, &min.y) ||
+	    !liarc_reader_get_float (reader, &min.z) ||
+	    !liarc_reader_get_float (reader, &max.x) ||
+	    !liarc_reader_get_float (reader, &max.y) ||
+	    !liarc_reader_get_float (reader, &max.z))
 		return 0;
 	self->flags = tmp;
 	limat_aabb_init_from_points (&self->bounds, &min, &max);
@@ -792,20 +792,20 @@ private_read (limdlModel* self,
 }
 
 static int
-private_read_animations (limdlModel* self,
-                         liReader*   reader)
+private_read_animations (limdlModel*  self,
+                         liarcReader* reader)
 {
 	int i;
 	uint32_t tmp;
 	limdlAnimation* animation;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "ani", ""))
+	if (!liarc_reader_check_text (reader, "ani", ""))
 	{
 		lisys_error_set (EINVAL, "invalid animation block header");
 		return 0;
 	}
-	if (!li_reader_get_uint32 (reader, &tmp))
+	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->animation.count = tmp;
 
@@ -827,20 +827,20 @@ private_read_animations (limdlModel* self,
 }
 
 static int
-private_read_faces (limdlModel* self,
-                    liReader*   reader)
+private_read_faces (limdlModel*  self,
+                    liarcReader* reader)
 {
 	int i;
 	uint32_t tmp;
 	limdlFaces* group;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "fac", ""))
+	if (!liarc_reader_check_text (reader, "fac", ""))
 	{
 		lisys_error_set (EINVAL, "invalid face block header");
 		return 0;
 	}
-	if (!li_reader_get_uint32 (reader, &tmp))
+	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->facegroups.count = tmp;
 
@@ -862,19 +862,19 @@ private_read_faces (limdlModel* self,
 }
 
 static int
-private_read_hairs (limdlModel* self,
-                    liReader*   reader)
+private_read_hairs (limdlModel*  self,
+                    liarcReader* reader)
 {
 	int i;
 	uint32_t count;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "hai", ""))
+	if (!liarc_reader_check_text (reader, "hai", ""))
 	{
 		lisys_error_set (EINVAL, "invalid hair block header");
 		return 0;
 	}
-	if (!li_reader_get_uint32 (reader, &count))
+	if (!liarc_reader_get_uint32 (reader, &count))
 		return 0;
 	self->hairs.count = count;
 
@@ -895,19 +895,19 @@ private_read_hairs (limdlModel* self,
 }
 
 static int
-private_read_materials (limdlModel* self,
-                        liReader*   reader)
+private_read_materials (limdlModel*  self,
+                        liarcReader* reader)
 {
 	int i;
 	uint32_t tmp;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "mat", ""))
+	if (!liarc_reader_check_text (reader, "mat", ""))
 	{
 		lisys_error_set (EINVAL, "invalid material block header");
 		return 0;
 	}
-	if (!li_reader_get_uint32 (reader, &tmp))
+	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->materials.count = tmp;
 
@@ -928,19 +928,19 @@ private_read_materials (limdlModel* self,
 }
 
 static int
-private_read_nodes (limdlModel* self,
-                    liReader*   reader)
+private_read_nodes (limdlModel*  self,
+                    liarcReader* reader)
 {
 	int i;
 	uint32_t tmp;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "nod", ""))
+	if (!liarc_reader_check_text (reader, "nod", ""))
 	{
 		lisys_error_set (EINVAL, "invalid node block header");
 		return 0;
 	}
-	if (!li_reader_get_uint32 (reader, &tmp))
+	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->nodes.count = tmp;
 
@@ -964,20 +964,20 @@ private_read_nodes (limdlModel* self,
 }
 
 static int
-private_read_weights (limdlModel* self,
-                      liReader*   reader)
+private_read_weights (limdlModel*  self,
+                      liarcReader* reader)
 {
 	int i;
 	uint32_t tmp;
 	limdlWeightGroup* group;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "wei", ""))
+	if (!liarc_reader_check_text (reader, "wei", ""))
 	{
 		lisys_error_set (EINVAL, "invalid weight block header");
 		return 0;
 	}
-	if (!li_reader_get_uint32 (reader, &tmp))
+	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->weightgroups.count = tmp;
 
@@ -990,8 +990,8 @@ private_read_weights (limdlModel* self,
 		for (i = 0 ; i < self->weightgroups.count ; i++)
 		{
 			group = self->weightgroups.weightgroups + i;
-			if (!li_reader_get_text (reader, "", &group->name) ||
-				!li_reader_get_text (reader, "", &group->bone))
+			if (!liarc_reader_get_text (reader, "", &group->name) ||
+				!liarc_reader_get_text (reader, "", &group->bone))
 				return 0;
 		}
 	}
@@ -1002,17 +1002,17 @@ private_read_weights (limdlModel* self,
 static int
 private_read_animation (limdlModel*     self,
                         limdlAnimation* animation,
-                        liReader*       reader)
+                        liarcReader*    reader)
 {
 	int i;
 	uint32_t count;
 
 	/* Read the header. */
-	if (!li_reader_get_text (reader, "", &animation->name) ||
-	    !li_reader_get_uint32 (reader, &count) ||
-	    !li_reader_get_float (reader, &animation->duration) ||
-	    !li_reader_get_float (reader, &animation->blendin) ||
-	    !li_reader_get_float (reader, &animation->blendout))
+	if (!liarc_reader_get_text (reader, "", &animation->name) ||
+	    !liarc_reader_get_uint32 (reader, &count) ||
+	    !liarc_reader_get_float (reader, &animation->duration) ||
+	    !liarc_reader_get_float (reader, &animation->blendin) ||
+	    !liarc_reader_get_float (reader, &animation->blendout))
 		return 0;
 
 	/* Allocate curves. */

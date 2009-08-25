@@ -366,7 +366,7 @@ static int
 private_message (lisrvNetwork*    self,
                  grapple_message* message)
 {
-	liReader* reader;
+	liarcReader* reader;
 	lisrvClient* client;
 
 	/* Get the client. */
@@ -377,14 +377,14 @@ private_message (lisrvNetwork*    self,
 	/* Create packet reader. */
 	if (message->USER_MSG.length < 1)
 		return 0;
-	reader = li_reader_new (message->USER_MSG.data, message->USER_MSG.length);
+	reader = liarc_reader_new (message->USER_MSG.data, message->USER_MSG.length);
 	if (reader == NULL)
 		return 0;
 	reader->pos = 1;
 
 	/* Invoke callbacks. */
 	lieng_engine_call (self->server->engine, LISRV_CALLBACK_CLIENT_PACKET, client, reader);
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	return 1;
 }

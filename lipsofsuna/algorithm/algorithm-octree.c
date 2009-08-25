@@ -34,8 +34,8 @@ static int
 private_read_node (lialgOctree*    self,
                    lialgOcnode**   node,
                    int             depth,
-                   limatVector*       offset,
-                   liReader*       reader,
+                   limatVector*    offset,
+                   liarcReader*    reader,
                    lialgOctreeRead callback,
                    void*           data);
 
@@ -71,7 +71,7 @@ lialg_octree_new (int depth)
 }
 
 lialgOctree*
-lialg_octree_new_from_data (liReader*       reader,
+lialg_octree_new_from_data (liarcReader*    reader,
                             lialgOctreeRead callback,
                             void*           data)
 {
@@ -80,7 +80,7 @@ lialg_octree_new_from_data (liReader*       reader,
 	limatVector offset = { 0.0f, 0.0f, 0.0f };
 
 	/* Read in header. */
-	if (!li_reader_get_uint8 (reader, &depth))
+	if (!liarc_reader_get_uint8 (reader, &depth))
 	{
 		lisys_error_set (EINVAL, NULL);
 		return NULL;
@@ -107,14 +107,14 @@ lialg_octree_new_from_file (const char*     path,
                             lialgOctreeRead callback,
                             void*           data)
 {
-	liReader* reader;
+	liarcReader* reader;
 	lialgOctree* self;
 
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
 		return NULL;
 	self = lialg_octree_new_from_data (reader, callback, data);
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	return self;
 }
 
@@ -247,8 +247,8 @@ static int
 private_read_node (lialgOctree*    self,
                    lialgOcnode**   node,
                    int             depth,
-                   limatVector*       offset,
-                   liReader*       reader,
+                   limatVector*    offset,
+                   liarcReader*    reader,
                    lialgOctreeRead callback,
                    void*           data)
 {
@@ -271,7 +271,7 @@ private_read_node (lialgOctree*    self,
 	*node = lisys_calloc (1, sizeof (lialgOcnode));
 	if (*node == NULL)
 		return 0;
-	if (!li_reader_get_uint8 (reader, &mask) || !mask)
+	if (!liarc_reader_get_uint8 (reader, &mask) || !mask)
 	{
 		lisys_error_set (EINVAL, NULL);
 		return 0;

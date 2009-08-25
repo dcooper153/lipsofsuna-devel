@@ -31,10 +31,10 @@
 #include "math-types.h"
 #include "math-vertex.h"
 
-typedef struct _liPolygon liPolygon;
-struct _liPolygon
+typedef struct _limatPolygon limatPolygon;
+struct _limatPolygon
 {
-	const liVtxops* ops;
+	const limatVtxops* ops;
 	void* data;
 	limatVector normal;
 	struct
@@ -54,16 +54,16 @@ struct _liPolygon
  * \param count Number of vertices in the array.
  * \return New polygon or NULL.
  */
-static inline liPolygon*
-li_polygon_new (const liVtxops* ops,
-                const limatVector* normal,
-                const void*     vertices,
-                int             count)
+static inline limatPolygon*
+limat_polygon_new (const limatVtxops* ops,
+                   const limatVector* normal,
+                   const void*        vertices,
+                   int                count)
 {
-	liPolygon* self;
+	limatPolygon* self;
 
 	/* Allocate self. */
-	self = (liPolygon*) lisys_calloc (1, sizeof (liPolygon));
+	self = (limatPolygon*) lisys_calloc (1, sizeof (limatPolygon));
 	if (self == NULL)
 		return NULL;
 	self->ops = ops;
@@ -96,19 +96,19 @@ li_polygon_new (const liVtxops* ops,
  * \param v2 Vertex.
  * \return New polygon or NULL.
  */
-static inline liPolygon*
-li_polygon_new_from_triangle (const liVtxops* ops,
-                              const void*     v0,
-                              const void*     v1,
-                              const void*     v2)
+static inline limatPolygon*
+limat_polygon_new_from_triangle (const limatVtxops* ops,
+                                 const void*        v0,
+                                 const void*        v1,
+                                 const void*        v2)
 {
-	liPolygon* self;
+	limatPolygon* self;
 	limatVector coord0;
 	limatVector coord1;
 	limatVector coord2;
 
 	/* Allocate self. */
-	self = (liPolygon*) lisys_calloc (1, sizeof (liPolygon));
+	self = (limatPolygon*) lisys_calloc (1, sizeof (limatPolygon));
 	if (self == NULL)
 		return NULL;
 	self->ops = ops;
@@ -142,7 +142,7 @@ li_polygon_new_from_triangle (const liVtxops* ops,
  * \param self Polygon.
  */
 static inline void
-li_polygon_free (liPolygon* self)
+limat_polygon_free (limatPolygon* self)
 {
 	lisys_free (self->vertices.vertices);
 	lisys_free (self);
@@ -157,13 +157,13 @@ li_polygon_free (liPolygon* self)
  * \return Nonzero on success.
  */
 static inline int
-li_polygon_add_vertices (liPolygon*  self,
-                         const void* vertices,
-                         int         count)
+limat_polygon_add_vertices (limatPolygon* self,
+                            const void*   vertices,
+                            int           count)
 {
 	int num;
 	limatVector* tmp;
-	const liVtxops* ops = self->ops;
+	const limatVtxops* ops = self->ops;
 
 	num = self->vertices.count + count;
 	if (num > self->vertices.capacity)
@@ -194,9 +194,9 @@ li_polygon_add_vertices (liPolygon*  self,
  * \return Nonzero on success.
  */
 static inline int
-li_polygon_clip (const liPolygon* self,
-                 const liPlane*   plane,
-                 liPolygon*       front)
+limat_polygon_clip (const limatPolygon* self,
+                    const limatPlane*   plane,
+                    limatPolygon*       front)
 {
 	int i;
 	int ret = 1;
@@ -209,7 +209,7 @@ li_polygon_clip (const liPolygon* self,
 	limatVector curr_coord;
 	limatVector prev_coord;
 	limatVector tmp_coord;
-	const liVtxops* ops = self->ops;
+	const limatVtxops* ops = self->ops;
 
 	/* Initialize. */
 	front->data = self->data;
@@ -219,7 +219,7 @@ li_polygon_clip (const liPolygon* self,
 		return 1;
 	prev_vtx = (char*) self->vertices.vertices + (self->vertices.count - 1) * ops->size;
 	ops->getcoord (prev_vtx, &prev_coord);
-	prev_in = li_plane_signed_distance_to_point (plane, &prev_coord) >= 0.0f;
+	prev_in = limat_plane_signed_distance_to_point (plane, &prev_coord) >= 0.0f;
 	tmp_vtx = lisys_malloc (ops->size);
 	if (tmp_vtx == NULL)
 		return 0;
@@ -229,30 +229,30 @@ li_polygon_clip (const liPolygon* self,
 	{
 		curr_vtx = (char*) self->vertices.vertices + i * ops->size;
 		ops->getcoord (curr_vtx, &curr_coord);
-		curr_in = li_plane_signed_distance_to_point (plane, &curr_coord) >= 0.0f;
+		curr_in = limat_plane_signed_distance_to_point (plane, &curr_coord) >= 0.0f;
 		if (curr_in)
 		{
 			if (!prev_in)
 			{
-				li_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
+				limat_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
 				frac = limat_vector_get_length (limat_vector_subtract (prev_coord, tmp_coord)) /
 				       limat_vector_get_length (limat_vector_subtract (prev_coord, curr_coord));
 				ops->setcoord (tmp_vtx, &tmp_coord);
 				ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-				ret &= li_polygon_add_vertices (front, tmp_vtx, 1);
+				ret &= limat_polygon_add_vertices (front, tmp_vtx, 1);
 			}
-			ret &= li_polygon_add_vertices (front, curr_vtx, 1);
+			ret &= limat_polygon_add_vertices (front, curr_vtx, 1);
 		}
 		else
 		{
 			if (prev_in)
 			{
-				li_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
+				limat_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
 				frac = limat_vector_get_length (limat_vector_subtract (prev_coord, tmp_coord)) /
 				       limat_vector_get_length (limat_vector_subtract (prev_coord, curr_coord));
 				ops->setcoord (tmp_vtx, &tmp_coord);
 				ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-				ret &= li_polygon_add_vertices (front, tmp_vtx, 1);
+				ret &= limat_polygon_add_vertices (front, tmp_vtx, 1);
 			}
 		}
 		prev_coord = curr_coord;
@@ -280,24 +280,24 @@ li_polygon_clip (const liPolygon* self,
  * \return Nonzero on success.
  */
 static inline int
-li_polygon_clip_with_planes (const liPolygon* self,
-                             const liPlane*   planes,
-                             int              count,
-                             liPolygon*       front)
+limat_polygon_clip_with_planes (const limatPolygon* self,
+                                const limatPlane*   planes,
+                                int                 count,
+                                limatPolygon*       front)
 {
 	int i;
 	int ret = 1;
-	liPolygon tmp;
-	const liVtxops* ops = self->ops;
+	limatPolygon tmp;
+	const limatVtxops* ops = self->ops;
 
 	/* Special cases. */
 	if (count == 0)
 	{
 		front->vertices.count = 0;
-		return li_polygon_add_vertices (front, self->vertices.vertices, self->vertices.count);
+		return limat_polygon_add_vertices (front, self->vertices.vertices, self->vertices.count);
 	}
 	if (count == 1)
-		return li_polygon_clip (self, planes, front);
+		return limat_polygon_clip (self, planes, front);
 
 	/* Allocate a temporary polygon. */
 	tmp.ops = ops;
@@ -310,21 +310,21 @@ li_polygon_clip_with_planes (const liPolygon* self,
 	/* Let each plane clip. */
 	if (count % 2)
 	{
-		ret &= li_polygon_clip (self, planes, front);
+		ret &= limat_polygon_clip (self, planes, front);
 		for (i = 1 ; i < count ; i += 2)
 		{
-			ret &= li_polygon_clip (front, planes + i, &tmp);
-			ret &= li_polygon_clip (&tmp, planes + i + 1, front);
+			ret &= limat_polygon_clip (front, planes + i, &tmp);
+			ret &= limat_polygon_clip (&tmp, planes + i + 1, front);
 		}
 	}
 	else
 	{
-		ret &= li_polygon_clip (self, planes, &tmp);
-		ret &= li_polygon_clip (&tmp, planes + 1, front);
+		ret &= limat_polygon_clip (self, planes, &tmp);
+		ret &= limat_polygon_clip (&tmp, planes + 1, front);
 		for (i = 2 ; i < count ; i += 2)
 		{
-			ret &= li_polygon_clip (front, planes + i, &tmp);
-			ret &= li_polygon_clip (&tmp, planes + i + 1, front);
+			ret &= limat_polygon_clip (front, planes + i, &tmp);
+			ret &= limat_polygon_clip (&tmp, planes + i + 1, front);
 		}
 	}
 
@@ -348,11 +348,11 @@ li_polygon_clip_with_planes (const liPolygon* self,
  * \return Nonzero on success.
  */
 static inline int
-li_polygon_clip_with_aabb (const liPolygon* self,
-                           const limatAabb* bounds,
-                           liPolygon*       front)
+limat_polygon_clip_with_aabb (const limatPolygon* self,
+                              const limatAabb*    bounds,
+                              limatPolygon*       front)
 {
-	liPlane p[6] =
+	limatPlane p[6] =
 	{
 		{ 1, 0, 0, bounds->min.x }, /* Left. */
 		{ -1, 0, 0, -bounds->max.x }, /* Right. */
@@ -362,7 +362,7 @@ li_polygon_clip_with_aabb (const liPolygon* self,
 		{ 0, 0, -1, -bounds->max.z }, /* Back. */
 	};
 
-	return li_polygon_clip_with_planes (self, p, 6, front);
+	return limat_polygon_clip_with_planes (self, p, 6, front);
 }
 
 /**
@@ -380,10 +380,10 @@ li_polygon_clip_with_aabb (const liPolygon* self,
  * \return Nonzero on success.
  */
 static inline int
-li_polygon_split (const liPolygon* self,
-                  const liPlane*   plane,
-                  liPolygon*       front,
-                  liPolygon*       back)
+limat_polygon_split (const limatPolygon* self,
+                     const limatPlane*   plane,
+                     limatPolygon*       front,
+                     limatPolygon*       back)
 {
 	int i;
 	int ret = 1;
@@ -396,7 +396,7 @@ li_polygon_split (const liPolygon* self,
 	limatVector curr_coord;
 	limatVector prev_coord;
 	limatVector tmp_coord = { 0.0f, 0.0f, 0.0f };
-	const liVtxops* ops = self->ops;
+	const limatVtxops* ops = self->ops;
 
 	/* Initialize. */
 	front->data = self->data;
@@ -409,7 +409,7 @@ li_polygon_split (const liPolygon* self,
 		return 1;
 	prev_vtx = (char*) self->vertices.vertices + (self->vertices.count - 1) * ops->size;
 	ops->getcoord (prev_vtx, &prev_coord);
-	prev_in = li_plane_signed_distance_to_point (plane, &prev_coord) >= 0.0f;
+	prev_in = limat_plane_signed_distance_to_point (plane, &prev_coord) >= 0.0f;
 	tmp_vtx = lisys_malloc (ops->size);
 	if (tmp_vtx == NULL)
 		return 0;
@@ -419,40 +419,40 @@ li_polygon_split (const liPolygon* self,
 	{
 		curr_vtx = (char*) self->vertices.vertices + i * ops->size;
 		ops->getcoord (curr_vtx, &curr_coord);
-		curr_in = li_plane_signed_distance_to_point (plane, &curr_coord) >= 0.0f;
+		curr_in = limat_plane_signed_distance_to_point (plane, &curr_coord) >= 0.0f;
 		if (curr_in && !prev_in)
 		{
 			/* Back to front. */
-			li_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
+			limat_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
 			frac = limat_vector_get_length (limat_vector_subtract (prev_coord, tmp_coord)) /
 			       limat_vector_get_length (limat_vector_subtract (prev_coord, curr_coord));
 			ops->setcoord (tmp_vtx, &tmp_coord);
 			ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-			ret &= li_polygon_add_vertices (back, tmp_vtx, 1);
-			ret &= li_polygon_add_vertices (front, tmp_vtx, 1);
-			ret &= li_polygon_add_vertices (front, curr_vtx, 1);
+			ret &= limat_polygon_add_vertices (back, tmp_vtx, 1);
+			ret &= limat_polygon_add_vertices (front, tmp_vtx, 1);
+			ret &= limat_polygon_add_vertices (front, curr_vtx, 1);
 		}
 		else if (!curr_in && prev_in)
 		{
 			/* Front to back. */
-			li_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
+			limat_plane_intersects_segment (plane, &prev_coord, &curr_coord, &tmp_coord);
 			frac = limat_vector_get_length (limat_vector_subtract (prev_coord, tmp_coord)) /
 			       limat_vector_get_length (limat_vector_subtract (prev_coord, curr_coord));
 			ops->setcoord (tmp_vtx, &tmp_coord);
 			ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-			ret &= li_polygon_add_vertices (front, tmp_vtx, 1);
-			ret &= li_polygon_add_vertices (back, tmp_vtx, 1);
-			ret &= li_polygon_add_vertices (back, curr_vtx, 1);
+			ret &= limat_polygon_add_vertices (front, tmp_vtx, 1);
+			ret &= limat_polygon_add_vertices (back, tmp_vtx, 1);
+			ret &= limat_polygon_add_vertices (back, curr_vtx, 1);
 		}
 		else if (curr_in)
 		{
 			/* Stay in front. */
-			ret &= li_polygon_add_vertices (front, curr_vtx, 1);
+			ret &= limat_polygon_add_vertices (front, curr_vtx, 1);
 		}
 		else
 		{
 			/* Stay behind. */
-			ret &= li_polygon_add_vertices (back, curr_vtx, 1);
+			ret &= limat_polygon_add_vertices (back, curr_vtx, 1);
 		}
 		prev_coord = curr_coord;
 		prev_vtx = curr_vtx;
@@ -474,11 +474,11 @@ li_polygon_split (const liPolygon* self,
  * \return Nonzero if the polygon is degenerate.
  */
 static inline int
-li_polygon_get_degenerate (const liPolygon* self)
+limat_polygon_get_degenerate (const limatPolygon* self)
 {
 	int i;
 	limatVector coord[3];
-	const liVtxops* ops = self->ops;
+	const limatVtxops* ops = self->ops;
 
 	if (self->vertices.count < 3)
 		return 1;
@@ -505,11 +505,11 @@ li_polygon_get_degenerate (const liPolygon* self)
  * \param coord Return location for a vector.
  */
 static inline void
-li_polygon_get_coord (const liPolygon* self,
-                      int              index,
-                      limatVector*        coord)
+limat_polygon_get_coord (const limatPolygon* self,
+                         int                 index,
+                         limatVector*        coord)
 {
-	const liVtxops* ops = self->ops;
+	const limatVtxops* ops = self->ops;
 
 	assert (index >= 0 && index < self->vertices.count);
 	self->ops->getcoord ((char*) self->vertices.vertices + index * ops->size, coord);
@@ -523,10 +523,10 @@ li_polygon_get_coord (const liPolygon* self,
  * \return Pointer to vertex.
  */
 static inline void*
-li_polygon_get_vertex (const liPolygon* self,
-                       int              index)
+limat_polygon_get_vertex (const limatPolygon* self,
+                          int                 index)
 {
-	const liVtxops* ops = self->ops;
+	const limatVtxops* ops = self->ops;
 
 	assert (index >= 0 && index < self->vertices.count);
 	return (char*) self->vertices.vertices + index * ops->size;

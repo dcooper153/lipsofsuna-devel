@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <string/lips-string.h>
 #include "model-material.h"
 
 /**
@@ -126,33 +127,33 @@ limdl_material_clear_textures (limdlMaterial* self)
  */
 int
 limdl_material_read (limdlMaterial* self,
-                     liReader*      reader)
+                     liarcReader*   reader)
 {
 	int i;
 	uint32_t tmp[2];
 
 	/* Read header. */
-	if (!li_reader_get_uint32 (reader, tmp + 0) ||
-		!li_reader_get_float (reader, &self->emission) ||
-		!li_reader_get_float (reader, &self->shininess) ||
-		!li_reader_get_float (reader, self->diffuse + 0) ||
-		!li_reader_get_float (reader, self->diffuse + 1) ||
-		!li_reader_get_float (reader, self->diffuse + 2) ||
-		!li_reader_get_float (reader, self->diffuse + 3) ||
-		!li_reader_get_float (reader, self->specular + 0) ||
-		!li_reader_get_float (reader, self->specular + 1) ||
-		!li_reader_get_float (reader, self->specular + 2) ||
-		!li_reader_get_float (reader, self->specular + 3) ||
-		!li_reader_get_float (reader, &self->strand_start) ||
-		!li_reader_get_float (reader, &self->strand_end) ||
-		!li_reader_get_float (reader, &self->strand_shape) ||
-		!li_reader_get_uint32 (reader, tmp + 1))
+	if (!liarc_reader_get_uint32 (reader, tmp + 0) ||
+		!liarc_reader_get_float (reader, &self->emission) ||
+		!liarc_reader_get_float (reader, &self->shininess) ||
+		!liarc_reader_get_float (reader, self->diffuse + 0) ||
+		!liarc_reader_get_float (reader, self->diffuse + 1) ||
+		!liarc_reader_get_float (reader, self->diffuse + 2) ||
+		!liarc_reader_get_float (reader, self->diffuse + 3) ||
+		!liarc_reader_get_float (reader, self->specular + 0) ||
+		!liarc_reader_get_float (reader, self->specular + 1) ||
+		!liarc_reader_get_float (reader, self->specular + 2) ||
+		!liarc_reader_get_float (reader, self->specular + 3) ||
+		!liarc_reader_get_float (reader, &self->strand_start) ||
+		!liarc_reader_get_float (reader, &self->strand_end) ||
+		!liarc_reader_get_float (reader, &self->strand_shape) ||
+		!liarc_reader_get_uint32 (reader, tmp + 1))
 		return 0;
 	self->flags = tmp[0];
 	self->textures.count = tmp[1];
 
 	/* Read shader. */
-	if (!li_reader_get_text (reader, "", &self->shader))
+	if (!liarc_reader_get_text (reader, "", &self->shader))
 		return 0;
 
 	/* Read textures. */
@@ -163,11 +164,11 @@ limdl_material_read (limdlMaterial* self,
 			return 0;
 		for (i = 0 ; i < self->textures.count ; i++)
 		{
-			if (!li_reader_get_uint32 (reader, tmp + 0) ||
-			    !li_reader_get_uint32 (reader, tmp + 1) ||
-			    !li_reader_get_uint32 (reader, tmp + 2) ||
-			    !li_reader_get_uint32 (reader, tmp + 3) ||
-			    !li_reader_get_text (reader, "", &self->textures.array[i].string))
+			if (!liarc_reader_get_uint32 (reader, tmp + 0) ||
+			    !liarc_reader_get_uint32 (reader, tmp + 1) ||
+			    !liarc_reader_get_uint32 (reader, tmp + 2) ||
+			    !liarc_reader_get_uint32 (reader, tmp + 3) ||
+			    !liarc_reader_get_text (reader, "", &self->textures.array[i].string))
 				return 0;
 			self->textures.array[i].type = tmp[0];
 			self->textures.array[i].flags = tmp[1];

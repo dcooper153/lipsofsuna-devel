@@ -64,8 +64,8 @@ void
 limdl_faces_free (limdlFaces* self);
 
 int
-limdl_faces_read (limdlFaces* self,
-                  liReader*   reader);
+limdl_faces_read (limdlFaces*  self,
+                  liarcReader* reader);
 
 int
 limdl_faces_write (limdlFaces*  self,

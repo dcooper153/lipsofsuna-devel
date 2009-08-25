@@ -363,8 +363,8 @@ licomPacketScript (liscrClass* self,
 }
 
 liscrData*
-liscr_packet_new_readable (liscrScript*    script,
-                           const liReader* reader)
+liscr_packet_new_readable (liscrScript*       script,
+                           const liarcReader* reader)
 {
 	liscrData* data;
 	liscrPacket* self;
@@ -381,7 +381,7 @@ liscr_packet_new_readable (liscrScript*    script,
 	}
 
 	/* Allocate reader. */
-	self->reader = li_reader_new (self->buffer, reader->length);
+	self->reader = liarc_reader_new (self->buffer, reader->length);
 	if (self->reader == NULL)
 	{
 		lisys_free (self->buffer);
@@ -394,7 +394,7 @@ liscr_packet_new_readable (liscrScript*    script,
 	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET);
 	if (data == NULL)
 	{
-		li_reader_free (self->reader);
+		liarc_reader_free (self->reader);
 		lisys_free (self->buffer);
 		lisys_free (self);
 	}
@@ -440,7 +440,7 @@ liscr_packet_free (liscrPacket* self)
 	if (self->writer != NULL)
 		liarc_writer_free (self->writer);
 	if (self->reader != NULL)
-		li_reader_free (self->reader);
+		liarc_reader_free (self->reader);
 	lisys_free (self->buffer);
 	lisys_free (self);
 }
@@ -473,42 +473,42 @@ private_read (liscrPacket* data,
 		switch (type)
 		{
 			case LISCR_PACKET_FORMAT_BOOL:
-				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
+				if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
 				if (ok) lua_pushboolean (lua, tmp.i8);
 				break;
 			case LISCR_PACKET_FORMAT_FLOAT:
-				if (ok) ok &= li_reader_get_float (data->reader, &tmp.flt);
+				if (ok) ok &= liarc_reader_get_float (data->reader, &tmp.flt);
 				if (ok) lua_pushnumber (lua, tmp.flt);
 				break;
 			case LISCR_PACKET_FORMAT_INT8:
-				if (ok) ok &= li_reader_get_int8 (data->reader, &tmp.i8);
+				if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
 				if (ok) lua_pushnumber (lua, tmp.i8);
 				break;
 			case LISCR_PACKET_FORMAT_INT16:
-				if (ok) ok &= li_reader_get_int16 (data->reader, &tmp.i16);
+				if (ok) ok &= liarc_reader_get_int16 (data->reader, &tmp.i16);
 				if (ok) lua_pushnumber (lua, tmp.i16);
 				break;
 			case LISCR_PACKET_FORMAT_INT32:
-				if (ok) ok &= li_reader_get_int32 (data->reader, &tmp.i32);
+				if (ok) ok &= liarc_reader_get_int32 (data->reader, &tmp.i32);
 				if (ok) lua_pushnumber (lua, tmp.i32);
 				break;
 			case LISCR_PACKET_FORMAT_STRING:
 				tmp.str = NULL;
-				if (ok) ok &= li_reader_get_text (data->reader, "", &tmp.str);
+				if (ok) ok &= liarc_reader_get_text (data->reader, "", &tmp.str);
 				if (ok) ok &= listr_utf8_get_valid (tmp.str);
 				if (ok) lua_pushstring (lua, tmp.str);
 				lisys_free (tmp.str);
 				break;
 			case LISCR_PACKET_FORMAT_UINT8:
-				if (ok) ok &= li_reader_get_uint8 (data->reader, &tmp.u8);
+				if (ok) ok &= liarc_reader_get_uint8 (data->reader, &tmp.u8);
 				if (ok) lua_pushnumber (lua, tmp.u8);
 				break;
 			case LISCR_PACKET_FORMAT_UINT16:
-				if (ok) ok &= li_reader_get_uint16 (data->reader, &tmp.u16);
+				if (ok) ok &= liarc_reader_get_uint16 (data->reader, &tmp.u16);
 				if (ok) lua_pushnumber (lua, tmp.u16);
 				break;
 			case LISCR_PACKET_FORMAT_UINT32:
-				if (ok) ok &= li_reader_get_uint32 (data->reader, &tmp.u32);
+				if (ok) ok &= liarc_reader_get_uint32 (data->reader, &tmp.u32);
 				if (ok) lua_pushnumber (lua, tmp.u32);
 				break;
 			default:

@@ -380,7 +380,7 @@ error:
  */
 int
 lieng_resources_load_from_stream (liengResources* self,
-                                  liReader*       reader)
+                                  liarcReader*    reader)
 {
 	int id;
 	char* name;
@@ -393,9 +393,9 @@ lieng_resources_load_from_stream (liengResources* self,
 	liengSample* sample;
 
 	/* Read the header. */
-	if (!li_reader_get_uint32 (reader, &n_animations) ||
-	    !li_reader_get_uint32 (reader, &n_models) ||
-	    !li_reader_get_uint32 (reader, &n_samples))
+	if (!liarc_reader_get_uint32 (reader, &n_animations) ||
+	    !liarc_reader_get_uint32 (reader, &n_models) ||
+	    !liarc_reader_get_uint32 (reader, &n_samples))
 	{
 		lisys_error_set (EINVAL, "invalid resource list header");
 		goto error;
@@ -412,7 +412,7 @@ lieng_resources_load_from_stream (liengResources* self,
 		{
 			animation = self->animations.array + id;
 			animation->id = id;
-			if (!li_reader_get_text (reader, "", &animation->name))
+			if (!liarc_reader_get_text (reader, "", &animation->name))
 				goto error;
 		}
 	}
@@ -426,7 +426,7 @@ lieng_resources_load_from_stream (liengResources* self,
 			goto error;
 		for (id = 0 ; id < n_models ; id++)
 		{
-			if (!li_reader_get_text (reader, "", &name))
+			if (!liarc_reader_get_text (reader, "", &name))
 				goto error;
 			model = lieng_model_new (self->engine, id, self->engine->config.dir, name);
 			lisys_free (name);
@@ -448,7 +448,7 @@ lieng_resources_load_from_stream (liengResources* self,
 			sample = self->samples.array + id;
 			sample->id = id;
 			sample->invalid = 0;
-			if (!li_reader_get_text (reader, "", &sample->name))
+			if (!liarc_reader_get_text (reader, "", &sample->name))
 				goto error;
 			path = lisys_path_format (self->engine->config.dir,
 				LISYS_PATH_SEPARATOR, "sounds",
@@ -460,7 +460,7 @@ lieng_resources_load_from_stream (liengResources* self,
 	}
 
 	/* Read end. */
-	if (!li_reader_check_end (reader))
+	if (!liarc_reader_check_end (reader))
 	{
 		lisys_error_set (EINVAL, "end of stream expected");
 		goto error;

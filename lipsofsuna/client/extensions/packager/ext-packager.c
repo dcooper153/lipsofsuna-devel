@@ -456,13 +456,13 @@ private_insert_extra (lithrAsyncCall*    call,
 {
 	char* tmp;
 	char* path;
-	liReader* reader;
+	liarcReader* reader;
 
 	/* Open extra texture list. */
 	path = lisys_path_concat (self->module->path, "graphics", "textures.cfg", NULL);
 	if (path == NULL)
 		return 0;
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	lisys_free (path);
 	if (reader == NULL)
 	{
@@ -473,11 +473,11 @@ private_insert_extra (lithrAsyncCall*    call,
 	}
 
 	/* Read texture lines. */
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
-		if (!li_reader_get_text (reader, "\n", &tmp))
+		if (!liarc_reader_get_text (reader, "\n", &tmp))
 		{
-			li_reader_free (reader);
+			liarc_reader_free (reader);
 			return 0;
 		}
 		if (!liext_resources_insert_texture (self->resources, tmp))
@@ -487,7 +487,7 @@ private_insert_extra (lithrAsyncCall*    call,
 		}
 		lisys_free (tmp);
 	}
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	return 1;
 }

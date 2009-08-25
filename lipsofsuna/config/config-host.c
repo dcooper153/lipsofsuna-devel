@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <archive/lips-archive.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "config-host.h"
@@ -38,7 +39,7 @@ licfg_host_new (const char* dir)
 	char* path;
 	char* key;
 	char* value;
-	liReader* reader;
+	liarcReader* reader;
 	licfgHost* self;
 
 	/* Allocate self. */
@@ -53,7 +54,7 @@ licfg_host_new (const char* dir)
 		licfg_host_free (self);
 		return NULL;
 	}
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	lisys_free (path);
 	if (reader == NULL)
 	{
@@ -62,16 +63,16 @@ licfg_host_new (const char* dir)
 	}
 
 	/* Read the host name. */
-	if (!li_reader_get_key_value_pair (reader, &key, &value))
+	if (!liarc_reader_get_key_value_pair (reader, &key, &value))
 	{
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		return NULL;
 	}
 	if (strcmp (key, "host"))
 	{
 		lisys_error_set (EINVAL, "excepted host field");
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		lisys_free (key);
 		lisys_free (value);
@@ -81,16 +82,16 @@ licfg_host_new (const char* dir)
 	lisys_free (key);
 
 	/* Read the port. */
-	if (!li_reader_get_key_value_pair (reader, &key, &value))
+	if (!liarc_reader_get_key_value_pair (reader, &key, &value))
 	{
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		return NULL;
 	}
 	if (strcmp (key, "port"))
 	{
 		lisys_error_set (EINVAL, "expected port field");
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		lisys_free (key);
 		lisys_free (value);
@@ -101,16 +102,16 @@ licfg_host_new (const char* dir)
 	lisys_free (value);
 
 	/* Read the protocol. */
-	if (!li_reader_get_key_value_pair (reader, &key, &value))
+	if (!liarc_reader_get_key_value_pair (reader, &key, &value))
 	{
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		return NULL;
 	}
 	if (strcmp (key, "protocol"))
 	{
 		lisys_error_set (EINVAL, "expected protocol field");
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		lisys_free (key);
 		lisys_free (value);
@@ -123,7 +124,7 @@ licfg_host_new (const char* dir)
 	else
 	{
 		lisys_error_set (EINVAL, "unknown protocol");
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		licfg_host_free (self);
 		lisys_free (key);
 		lisys_free (value);
@@ -132,7 +133,7 @@ licfg_host_new (const char* dir)
 	lisys_free (key);
 	lisys_free (value);
 
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	return self;
 }
 

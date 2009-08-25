@@ -49,7 +49,7 @@ liwdg_menu_group_new (const char* markup)
 	int id;
 	char* icon;
 	char* name;
-	liReader* reader;
+	liarcReader* reader;
 	liwdgMenuGroup* self;
 	liwdgMenuItem* item;
 	liwdgMenuItem* parent;
@@ -60,9 +60,9 @@ liwdg_menu_group_new (const char* markup)
 		return NULL;
 
 	/* Parse markup. */
-	reader = li_reader_new (markup, strlen (markup));
-	li_reader_skip_chars (reader, " \t\n");
-	while (!li_reader_check_end (reader))
+	reader = liarc_reader_new (markup, strlen (markup));
+	liarc_reader_skip_chars (reader, " \t\n");
+	while (!liarc_reader_check_end (reader))
 	{
 		icon = NULL;
 		name = NULL;
@@ -70,16 +70,16 @@ liwdg_menu_group_new (const char* markup)
 		parent = NULL;
 
 		/* Read id and icon. */
-		if (!li_reader_get_text_int (reader, &id) ||
-		    !li_reader_skip_chars (reader, " \t") ||
-		    !li_reader_get_text (reader, " \t", &icon))
+		if (!liarc_reader_get_text_int (reader, &id) ||
+		    !liarc_reader_skip_chars (reader, " \t") ||
+		    !liarc_reader_get_text (reader, " \t", &icon))
 			goto error;
 
 		/* Read path. */
-		while (!li_reader_check_end (reader) && reader->buffer[reader->pos - 1] != '\n')
+		while (!liarc_reader_check_end (reader) && reader->buffer[reader->pos - 1] != '\n')
 		{
 			/* Read path component. */
-			if (!li_reader_get_text (reader, "|\n", &name))
+			if (!liarc_reader_get_text (reader, "|\n", &name))
 			{
 				lisys_free (icon);
 				goto error;
@@ -102,7 +102,7 @@ liwdg_menu_group_new (const char* markup)
 		}
 
 		/* Skip whitespace. */
-		li_reader_skip_chars (reader, " \t\n");
+		liarc_reader_skip_chars (reader, " \t\n");
 
 		/* Set id and icon. */
 		if (item == NULL)
@@ -113,12 +113,12 @@ liwdg_menu_group_new (const char* markup)
 		item->id = id;
 		item->icon = icon;
 	}
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	return self;
 
 error:
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	liwdg_menu_group_free (self);
 	return NULL;
 }

@@ -31,15 +31,15 @@
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader);
+                liarcReader* reader);
 
 static int
 private_packet_diff (liextModule* self,
-                     liReader*    reader);
+                     liarcReader* reader);
 
 static int
 private_packet_reset (liextModule* self,
-                      liReader*    reader);
+                      liarcReader* reader);
 
 static int
 private_tick (liextModule* self,
@@ -109,7 +109,7 @@ liext_module_free (liextModule* self)
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader)
+                liarcReader* reader)
 {
 	reader->pos = 1;
 	switch (type)
@@ -127,7 +127,7 @@ private_packet (liextModule* self,
 
 static int
 private_packet_diff (liextModule* self,
-                     liReader*    reader)
+                     liarcReader* reader)
 {
 	char* slot = NULL;
 	char* node = NULL;
@@ -137,7 +137,7 @@ private_packet_diff (liextModule* self,
 	liextSlots* slots;
 
 	/* Find or create slots block. */
-	if (!li_reader_get_uint32 (reader, &id))
+	if (!liarc_reader_get_uint32 (reader, &id))
 		return 0;
 	slots = lialg_u32dic_find (self->dictionary, id);
 	if (slots == NULL)
@@ -156,11 +156,11 @@ private_packet_diff (liextModule* self,
 	}
 
 	/* Insert models to slots. */
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
-		if (!li_reader_get_text (reader, "", &slot) ||
-		    !li_reader_get_text (reader, "", &node) ||
-		    !li_reader_get_uint16 (reader, &model))
+		if (!liarc_reader_get_text (reader, "", &slot) ||
+		    !liarc_reader_get_text (reader, "", &node) ||
+		    !liarc_reader_get_uint16 (reader, &model))
 		{
 			lisys_free (slot);
 			lisys_free (node);
@@ -176,7 +176,7 @@ private_packet_diff (liextModule* self,
 
 static int
 private_packet_reset (liextModule* self,
-                      liReader*    reader)
+                      liarcReader* reader)
 {
 	char* slot = NULL;
 	char* node = NULL;
@@ -186,7 +186,7 @@ private_packet_reset (liextModule* self,
 	liextSlots* slots;
 
 	/* Create or clear slots block. */
-	if (!li_reader_get_uint32 (reader, &id))
+	if (!liarc_reader_get_uint32 (reader, &id))
 		return 0;
 	slots = lialg_u32dic_find (self->dictionary, id);
 	if (slots == NULL)
@@ -207,11 +207,11 @@ private_packet_reset (liextModule* self,
 		liext_slots_clear (slots);
 
 	/* Insert models to slots. */
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
-		if (!li_reader_get_text (reader, "", &slot) ||
-		    !li_reader_get_text (reader, "", &node) ||
-		    !li_reader_get_uint16 (reader, &model))
+		if (!liarc_reader_get_text (reader, "", &slot) ||
+		    !liarc_reader_get_text (reader, "", &node) ||
+		    !liarc_reader_get_uint16 (reader, &model))
 		{
 			lisys_free (slot);
 			lisys_free (node);

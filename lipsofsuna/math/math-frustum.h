@@ -33,7 +33,7 @@
 typedef struct _limatFrustum limatFrustum;
 struct _limatFrustum
 {
-	liPlane planes[6];
+	limatPlane planes[6];
 };
 
 /**

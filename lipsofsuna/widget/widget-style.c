@@ -56,7 +56,7 @@ static int
 private_read_font (liwdgStyles* self,
                    const char*  root,
                    const char*  name,
-                   liReader*    reader);
+                   liarcReader* reader);
 
 static int
 private_read_font_attr (liwdgStyles* self,
@@ -70,7 +70,7 @@ static int
 private_read_widget (liwdgStyles* self,
                      const char*  root,
                      const char*  name,
-                     liReader*    reader);
+                     liarcReader* reader);
 
 static int
 private_read_widget_attr (liwdgStyles* self,
@@ -223,10 +223,10 @@ private_read (liwdgStyles* self,
 {
 	char* name;
 	char* type;
-	liReader* reader;
+	liarcReader* reader;
 
 	/* Open the file. */
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
 	{
 		if (lisys_error_get (NULL) != EIO)
@@ -235,25 +235,25 @@ private_read (liwdgStyles* self,
 	}
 
 	/* Read blocks. */
-	for (li_reader_skip_chars (reader, " \t\n") ;
-	    !li_reader_check_end (reader) ;
-	     li_reader_skip_chars (reader, " \t\n"))
+	for (liarc_reader_skip_chars (reader, " \t\n") ;
+	    !liarc_reader_check_end (reader) ;
+	     liarc_reader_skip_chars (reader, " \t\n"))
 	{
 		/* Read block type. */
-		if (!li_reader_get_text (reader, " ", &type))
+		if (!liarc_reader_get_text (reader, " ", &type))
 			goto error;
 
 		/* Read block name. */
-		li_reader_skip_chars (reader, " \t");
-		if (!li_reader_get_text (reader, " \t", &name))
+		liarc_reader_skip_chars (reader, " \t");
+		if (!liarc_reader_get_text (reader, " \t", &name))
 		{
 			lisys_free (type);
 			goto error;
 		}
 
 		/* Read opening brace. */
-		li_reader_skip_chars (reader, " \t");
-		if (!li_reader_check_text (reader, "{", " \t\n"))
+		liarc_reader_skip_chars (reader, " \t");
+		if (!liarc_reader_check_text (reader, "{", " \t\n"))
 		{
 			lisys_error_set (EINVAL, "expected '{' after `%s %s'", type, name);
 			lisys_free (type);
@@ -288,12 +288,12 @@ private_read (liwdgStyles* self,
 			goto error;
 		}
 	}
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	return 1;
 
 error:
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	return 0;
 }
 
@@ -301,7 +301,7 @@ static int
 private_read_font (liwdgStyles* self,
                    const char*  root,
                    const char*  name,
-                   liReader*    reader)
+                   liarcReader* reader)
 {
 	char* line;
 	char* value;
@@ -310,8 +310,8 @@ private_read_font (liwdgStyles* self,
 	while (1)
 	{
 		/* Read line. */
-		li_reader_skip_chars (reader, " \t\n");
-		if (!li_reader_get_text (reader, ";\n", &line))
+		liarc_reader_skip_chars (reader, " \t\n");
+		if (!liarc_reader_get_text (reader, ";\n", &line))
 		{
 			line = NULL;
 			goto error;
@@ -376,7 +376,7 @@ static int
 private_read_widget (liwdgStyles* self,
                      const char*  root,
                      const char*  name,
-                     liReader*    reader)
+                     liarcReader* reader)
 {
 	char* line;
 	char* value;
@@ -392,8 +392,8 @@ private_read_widget (liwdgStyles* self,
 	while (1)
 	{
 		/* Read line. */
-		li_reader_skip_chars (reader, " \t\n");
-		if (!li_reader_get_text (reader, ";\n", &line))
+		liarc_reader_skip_chars (reader, " \t\n");
+		if (!liarc_reader_get_text (reader, ";\n", &line))
 		{
 			line = NULL;
 			goto error;

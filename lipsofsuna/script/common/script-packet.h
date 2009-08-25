@@ -47,13 +47,13 @@ typedef struct _liscrPacket liscrPacket;
 struct _liscrPacket
 {
 	char* buffer;
-	liReader* reader;
+	liarcReader* reader;
 	liarcWriter* writer;
 };
 
 liscrData*
-liscr_packet_new_readable (liscrScript*    script,
-                           const liReader* reader);
+liscr_packet_new_readable (liscrScript*       script,
+                           const liarcReader* reader);
 
 liscrData*
 liscr_packet_new_writable (liscrScript* script,

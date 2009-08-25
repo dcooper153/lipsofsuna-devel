@@ -29,7 +29,7 @@
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader);
+                liarcReader* reader);
 
 static int
 private_select (liextModule*    self,
@@ -181,7 +181,7 @@ liext_module_event (liextModule* self,
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader)
+                liarcReader* reader)
 {
 	liscrData* data0;
 

@@ -70,7 +70,7 @@ livox_block_optimize (livoxBlock* self);
 int
 livox_block_read (livoxBlock*   self,
                   livoxManager* manager,
-                  liReader*     reader);
+                  liarcReader*  reader);
 
 int
 livox_block_write (livoxBlock*  self,

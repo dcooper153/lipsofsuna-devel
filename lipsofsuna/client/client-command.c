@@ -27,43 +27,43 @@
 
 static int
 private_assign (licliModule* module,
-                liReader*    reader);
+                liarcReader* reader);
 
 static int
 private_object_animation (licliModule* module,
-                          liReader*    reader);
+                          liarcReader* reader);
 
 static int
 private_object_create (licliModule* module,
-                       liReader*    reader);
+                       liarcReader* reader);
 
 static int
 private_object_destroy (licliModule* module,
-                        liReader*    reader);
+                        liarcReader* reader);
 
 static int
 private_object_effect (licliModule* module,
-                       liReader*    reader);
+                       liarcReader* reader);
 
 static int
 private_object_graphic (licliModule* module,
-                        liReader*    reader);
+                        liarcReader* reader);
 
 static int
 private_object_simulate (licliModule* module,
-                         liReader*    reader);
+                         liarcReader* reader);
 
 static int
 private_resources (licliModule* module,
-                   liReader*    reader);
+                   liarcReader* reader);
 
 static int
 private_voxel_assign (licliModule* module,
-                      liReader*    reader);
+                      liarcReader* reader);
 
 static int
 private_voxel_diff (licliModule* module,
-                    liReader*    reader);
+                    liarcReader* reader);
 
 /*****************************************************************************/
 
@@ -78,7 +78,7 @@ private_voxel_diff (licliModule* module,
 int
 licli_module_handle_packet (licliModule* self,
                             int          type,
-                            liReader*    reader)
+                            liarcReader* reader)
 {
 	reader->pos = 1;
 	switch (type)
@@ -123,14 +123,14 @@ licli_module_handle_packet (licliModule* self,
 
 static int
 private_assign (licliModule* module,
-                liReader*    reader)
+                liarcReader* reader)
 {
 	lialgU32dicIter iter;
 	licliObject* object;
 
-	if (!li_reader_get_uint32 (reader, &module->network->id) ||
-	    !li_reader_get_uint32 (reader, &module->network->features) ||
-	    !li_reader_check_end (reader))
+	if (!liarc_reader_get_uint32 (reader, &module->network->id) ||
+	    !liarc_reader_get_uint32 (reader, &module->network->features) ||
+	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* Clear scene. */
@@ -146,7 +146,7 @@ private_assign (licliModule* module,
 
 static int
 private_object_animation (licliModule* module,
-                          liReader*    reader)
+                          liarcReader* reader)
 {
 	float priority;
 	uint8_t channel;
@@ -156,12 +156,12 @@ private_object_animation (licliModule* module,
 	liengObject* object;
 
 	/* Parse the packet. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_uint16 (reader, &animation) ||
-	    !li_reader_get_uint8 (reader, &channel) ||
-	    !li_reader_get_uint8 (reader, &permanent) ||
-	    !li_reader_get_float (reader, &priority) ||
-	    !li_reader_check_end (reader))
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint16 (reader, &animation) ||
+	    !liarc_reader_get_uint8 (reader, &channel) ||
+	    !liarc_reader_get_uint8 (reader, &permanent) ||
+	    !liarc_reader_get_float (reader, &priority) ||
+	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* Change the animations of the object. */
@@ -175,7 +175,7 @@ private_object_animation (licliModule* module,
 
 static int
 private_object_create (licliModule* module,
-                       liReader*    reader)
+                       liarcReader* reader)
 {
 	int i;
 	float priority;
@@ -196,20 +196,20 @@ private_object_create (licliModule* module,
 	limatVector velocity;
 
 	/* Parse the packet. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_uint16 (reader, &graphic) ||
-	    !li_reader_get_uint8 (reader, &flags) ||
-	    !li_reader_get_int8 (reader, &x) ||
-	    !li_reader_get_int8 (reader, &y) ||
-	    !li_reader_get_int8 (reader, &z) ||
-	    !li_reader_get_int8 (reader, &w) ||
-	    !li_reader_get_float (reader, &velocity.x) ||
-	    !li_reader_get_float (reader, &velocity.y) ||
-	    !li_reader_get_float (reader, &velocity.z) ||
-	    !li_reader_get_float (reader, &position.x) ||
-	    !li_reader_get_float (reader, &position.y) ||
-	    !li_reader_get_float (reader, &position.z) ||
-	    !li_reader_get_uint8 (reader, &anims))
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint16 (reader, &graphic) ||
+	    !liarc_reader_get_uint8 (reader, &flags) ||
+	    !liarc_reader_get_int8 (reader, &x) ||
+	    !liarc_reader_get_int8 (reader, &y) ||
+	    !liarc_reader_get_int8 (reader, &z) ||
+	    !liarc_reader_get_int8 (reader, &w) ||
+	    !liarc_reader_get_float (reader, &velocity.x) ||
+	    !liarc_reader_get_float (reader, &velocity.y) ||
+	    !liarc_reader_get_float (reader, &velocity.z) ||
+	    !liarc_reader_get_float (reader, &position.x) ||
+	    !liarc_reader_get_float (reader, &position.y) ||
+	    !liarc_reader_get_float (reader, &position.z) ||
+	    !liarc_reader_get_uint8 (reader, &anims))
 		return 0;
 
 	/* Create an object. */
@@ -232,14 +232,14 @@ private_object_create (licliModule* module,
 	/* Set animations. */
 	for (i = 0 ; i < anims ; i++)
 	{
-		if (!li_reader_get_uint16 (reader, &anim) ||
-		    !li_reader_get_uint8 (reader, &channel) ||
-		    !li_reader_get_uint8 (reader, &flags) ||
-		    !li_reader_get_float (reader, &priority))
+		if (!liarc_reader_get_uint16 (reader, &anim) ||
+		    !liarc_reader_get_uint8 (reader, &channel) ||
+		    !liarc_reader_get_uint8 (reader, &flags) ||
+		    !liarc_reader_get_float (reader, &priority))
 			return 0;
 		licli_object_set_animation (object, anim, channel, flags, priority);
 	}
-	if (!li_reader_check_end (reader))
+	if (!liarc_reader_check_end (reader))
 		return 0;
 
 	return 1;
@@ -247,14 +247,14 @@ private_object_create (licliModule* module,
 
 static int
 private_object_destroy (licliModule* module,
-                        liReader*    reader)
+                        liarcReader* reader)
 {
 	uint32_t id;
 	liengObject* object;
 
 	/* Parse the packet. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_check_end (reader))
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* Destroy the object. */
@@ -269,7 +269,7 @@ private_object_destroy (licliModule* module,
 
 static int
 private_object_effect (licliModule* module,
-                       liReader*    reader)
+                       liarcReader* reader)
 {
 	uint32_t id;
 	uint16_t effect;
@@ -277,10 +277,10 @@ private_object_effect (licliModule* module,
 	liengObject* object;
 
 	/* Parse the packet. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_uint16 (reader, &effect) ||
-	    !li_reader_get_uint16 (reader, &flags) ||
-	    !li_reader_check_end (reader))
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint16 (reader, &effect) ||
+	    !liarc_reader_get_uint16 (reader, &flags) ||
+	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* Change the graphics of the object. */
@@ -294,16 +294,16 @@ private_object_effect (licliModule* module,
 
 static int
 private_object_graphic (licliModule* module,
-                        liReader*    reader)
+                        liarcReader* reader)
 {
 	uint32_t id;
 	uint16_t graphic;
 	liengObject* object;
 
 	/* Parse the packet. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_uint16 (reader, &graphic) ||
-	    !li_reader_check_end (reader))
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint16 (reader, &graphic) ||
+	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* Change the graphics of the object. */
@@ -317,7 +317,7 @@ private_object_graphic (licliModule* module,
 
 static int
 private_object_simulate (licliModule* module,
-                         liReader*    reader)
+                         liarcReader* reader)
 {
 	int8_t x;
 	int8_t y;
@@ -333,19 +333,19 @@ private_object_simulate (licliModule* module,
 	limatVector velocity;
 
 	/* Parse the packet. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_uint8 (reader, &flags) ||
-	    !li_reader_get_int8 (reader, &x) ||
-	    !li_reader_get_int8 (reader, &y) ||
-	    !li_reader_get_int8 (reader, &z) ||
-	    !li_reader_get_int8 (reader, &w) ||
-	    !li_reader_get_float (reader, &velocity.x) ||
-	    !li_reader_get_float (reader, &velocity.y) ||
-	    !li_reader_get_float (reader, &velocity.z) ||
-	    !li_reader_get_float (reader, &position.x) ||
-	    !li_reader_get_float (reader, &position.y) ||
-	    !li_reader_get_float (reader, &position.z) ||
-	    !li_reader_check_end (reader))
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint8 (reader, &flags) ||
+	    !liarc_reader_get_int8 (reader, &x) ||
+	    !liarc_reader_get_int8 (reader, &y) ||
+	    !liarc_reader_get_int8 (reader, &z) ||
+	    !liarc_reader_get_int8 (reader, &w) ||
+	    !liarc_reader_get_float (reader, &velocity.x) ||
+	    !liarc_reader_get_float (reader, &velocity.y) ||
+	    !liarc_reader_get_float (reader, &velocity.z) ||
+	    !liarc_reader_get_float (reader, &position.x) ||
+	    !liarc_reader_get_float (reader, &position.y) ||
+	    !liarc_reader_get_float (reader, &position.z) ||
+	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* FIXME: No analog. */
@@ -372,7 +372,7 @@ private_object_simulate (licliModule* module,
 
 static int
 private_resources (licliModule* module,
-                   liReader*    reader)
+                   liarcReader* reader)
 {
 	lieng_engine_load_resources (module->engine, reader);
 
@@ -381,11 +381,11 @@ private_resources (licliModule* module,
 
 static int
 private_voxel_assign (licliModule* module,
-                      liReader*    reader)
+                      liarcReader* reader)
 {
 	livoxMaterial* material;
 
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
 		material = livox_material_new_from_stream (reader);
 		if (material == NULL)
@@ -399,7 +399,7 @@ private_voxel_assign (licliModule* module,
 
 static int
 private_voxel_diff (licliModule* module,
-                    liReader*    reader)
+                    liarcReader* reader)
 {
 	uint8_t sectorx;
 	uint8_t sectory;
@@ -408,13 +408,13 @@ private_voxel_diff (licliModule* module,
 	livoxBlock* block;
 	livoxSector* sector;
 
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
 		/* Read block offset. */
-		if (!li_reader_get_uint8 (reader, &sectorx) ||
-		    !li_reader_get_uint8 (reader, &sectory) ||
-		    !li_reader_get_uint8 (reader, &sectorz) ||
-		    !li_reader_get_uint16 (reader, &blockid))
+		if (!liarc_reader_get_uint8 (reader, &sectorx) ||
+		    !liarc_reader_get_uint8 (reader, &sectory) ||
+		    !liarc_reader_get_uint8 (reader, &sectorz) ||
+		    !liarc_reader_get_uint16 (reader, &blockid))
 			return 0;
 		if (blockid >= LIVOX_BLOCKS_PER_SECTOR)
 			return 0;

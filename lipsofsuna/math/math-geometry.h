@@ -96,7 +96,7 @@ limat_ellipsoid_unmap_vector (limatVector center,
  */
 
 static inline limatVector
-limat_nearest_plane_to_origin (liPlane plane)
+limat_nearest_plane_to_origin (limatPlane plane)
 {
 	limatVector n;
 
@@ -105,7 +105,7 @@ limat_nearest_plane_to_origin (liPlane plane)
 }
 
 static inline limatVector
-limat_nearest_plane_to_point (liPlane  plane,
+limat_nearest_plane_to_point (limatPlane  plane,
                               limatVector p)
 {
 	float d;
@@ -147,7 +147,7 @@ limat_nearest_segment_to_point (limatVector p0,
 }
 
 static inline limatVector
-limat_nearest_triangle_to_origin (liPlane  plane,
+limat_nearest_triangle_to_origin (limatPlane  plane,
                                   limatVector p0,
                                   limatVector p1,
                                   limatVector p2)
@@ -161,7 +161,7 @@ limat_nearest_triangle_to_origin (liPlane  plane,
 	limatVector i2;
 
 	i = limat_nearest_plane_to_origin (plane);
-	if (li_triangle_intersects_point (&i, &p0, &p1, &p2))
+	if (limat_triangle_intersects_point (&i, &p0, &p1, &p2))
 		return i;
 	i0 = limat_nearest_segment_to_origin (p0, p1);
 	i1 = limat_nearest_segment_to_origin (p1, p2);
@@ -177,7 +177,7 @@ limat_nearest_triangle_to_origin (liPlane  plane,
 }
 
 static inline limatVector
-limat_nearest_triangle_to_point (liPlane  plane,
+limat_nearest_triangle_to_point (limatPlane  plane,
                                  limatVector p0,
                                  limatVector p1,
                                  limatVector p2,
@@ -192,7 +192,7 @@ limat_nearest_triangle_to_point (liPlane  plane,
 	limatVector i2;
 
 	i = limat_nearest_plane_to_point (plane, p);
-	if (li_triangle_intersects_point (&i, &p0, &p1, &p2))
+	if (limat_triangle_intersects_point (&i, &p0, &p1, &p2))
 		return i;
 	p0 = limat_vector_subtract (p0, p);
 	p1 = limat_vector_subtract (p1, p);
@@ -211,7 +211,7 @@ limat_nearest_triangle_to_point (liPlane  plane,
 }
 
 static inline limatVector
-limat_nearest_triangle_to_ellipsoid (liPlane  plane,
+limat_nearest_triangle_to_ellipsoid (limatPlane  plane,
                                      limatVector p0,
                                      limatVector p1,
                                      limatVector p2,

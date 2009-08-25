@@ -70,8 +70,8 @@ struct _limdlIpo
 };
 
 int
-limdl_ipo_read (limdlIpo* self,
-                liReader* reader);
+limdl_ipo_read (limdlIpo*    self,
+                liarcReader* reader);
 
 int
 limdl_ipo_write (const limdlIpo* self,

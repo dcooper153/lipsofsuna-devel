@@ -336,7 +336,7 @@ livox_block_optimize (livoxBlock* self)
 int
 livox_block_read (livoxBlock*   self,
                   livoxManager* manager,
-                  liReader*     reader)
+                  liarcReader*  reader)
 {
 	int x;
 	int y;
@@ -344,12 +344,12 @@ livox_block_read (livoxBlock*   self,
 	uint8_t type;
 	uint16_t terrain;
 
-	if (!li_reader_get_uint8 (reader, &type))
+	if (!liarc_reader_get_uint8 (reader, &type))
 		return 0;
 	switch (type)
 	{
 		case LIVOX_BLOCK_TYPE_FULL:
-			if (!li_reader_get_uint16 (reader, &terrain))
+			if (!liarc_reader_get_uint16 (reader, &terrain))
 				return 0;
 			livox_block_fill (self, manager, terrain);
 			break;
@@ -358,7 +358,7 @@ livox_block_read (livoxBlock*   self,
 			for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 			for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 			{
-				if (!li_reader_get_uint16 (reader, &terrain))
+				if (!liarc_reader_get_uint16 (reader, &terrain))
 					return 0;
 				livox_block_set_voxel (self, x, y, z, terrain);
 			}

@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <archive/lips-archive.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "config-account.h"
@@ -38,7 +39,7 @@ licfg_account_new (const char* path)
 	int ok;
 	char* key;
 	char* value;
-	liReader* reader = NULL;
+	liarcReader* reader = NULL;
 	licfgAccount* self;
 
 	/* Allocate self. */
@@ -47,7 +48,7 @@ licfg_account_new (const char* path)
 		return NULL;
 
 	/* Open the file. */
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
 		goto error;
 	
@@ -55,12 +56,12 @@ licfg_account_new (const char* path)
 	while (1)
 	{
 		/* Skip empty lines. */
-		li_reader_skip_chars (reader, " \t\n");
-		if (li_reader_check_end (reader))
+		liarc_reader_skip_chars (reader, " \t\n");
+		if (liarc_reader_check_end (reader))
 			break;
 
 		/* Extract a key value pair. */
-		if (!li_reader_get_key_value_pair (reader, &key, &value))
+		if (!liarc_reader_get_key_value_pair (reader, &key, &value))
 			goto error;
 		ok = 1;
 
@@ -97,13 +98,13 @@ licfg_account_new (const char* path)
 		goto error;
 	}
 
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	return self;
 
 error:
 	licfg_account_free (self);
 	if (reader != NULL)
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 	return NULL;
 }
 

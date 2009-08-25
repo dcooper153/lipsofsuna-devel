@@ -314,7 +314,7 @@ livox_sector_read (livoxSector* self,
 	int size;
 	const char* query;
 	const void* bytes;
-	liReader* reader;
+	liarcReader* reader;
 	livoxBlock* block;
 	sqlite3_stmt* statement;
 
@@ -344,7 +344,7 @@ livox_sector_read (livoxSector* self,
 	/* Read columns. */
 	bytes = sqlite3_column_blob (statement, 0);
 	size = sqlite3_column_bytes (statement, 0);
-	reader = li_reader_new (bytes, size);
+	reader = liarc_reader_new (bytes, size);
 	if (reader == NULL)
 	{
 		sqlite3_finalize (statement);

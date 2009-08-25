@@ -30,8 +30,8 @@
 #include "math-vector.h"
 
 static inline void
-li_plane_get_normal (const liPlane* self,
-                     limatVector*      vector)
+limat_plane_get_normal (const limatPlane* self,
+                        limatVector*      vector)
 {
 	vector->x = self->x;
 	vector->y = self->y;
@@ -39,8 +39,8 @@ li_plane_get_normal (const liPlane* self,
 }
 
 static inline void
-li_plane_get_point (const liPlane* self,
-                    limatVector*      vector)
+limat_plane_get_point (const limatPlane* self,
+                       limatVector*      vector)
 {
 	vector->x = self->x * self->w;
 	vector->y = self->y * self->w;
@@ -57,11 +57,11 @@ li_plane_get_point (const liPlane* self,
  * \param d Signed distance from the plane to the origin.
  */
 static inline void
-li_plane_init (liPlane* self,
-               float    a,
-               float    b,
-               float    c,
-               float    d)
+limat_plane_init (limatPlane* self,
+                  float       a,
+                  float       b,
+                  float       c,
+                  float       d)
 {
 	self->x = a;
 	self->y = b;
@@ -77,9 +77,9 @@ li_plane_init (liPlane* self,
  * \param normal Normal of the plane.
  */
 static inline void
-li_plane_init_from_point (liPlane*        self,
-                          const limatVector* point,
-                          const limatVector* normal)
+limat_plane_init_from_point (limatPlane*        self,
+                             const limatVector* point,
+                             const limatVector* normal)
 {
 	self->x = normal->x;
 	self->y = normal->y;
@@ -96,10 +96,10 @@ li_plane_init_from_point (liPlane*        self,
  * \param vertex2 Vertex.
  */
 static inline void
-li_plane_init_from_points (liPlane*        self,
-                           const limatVector* vertex0,
-                           const limatVector* vertex1,
-                           const limatVector* vertex2)
+limat_plane_init_from_points (limatPlane*        self,
+                              const limatVector* vertex0,
+                              const limatVector* vertex1,
+                              const limatVector* vertex2)
 {
 	limatVector normal;
 
@@ -120,8 +120,8 @@ li_plane_init_from_points (liPlane*        self,
  * \return Distance to the point.
  */
 static inline float
-li_plane_distance_to_point (liPlane*        self,
-                            const limatVector* point)
+limat_plane_distance_to_point (limatPlane*        self,
+                               const limatVector* point)
 {
 	return LI_ABS (self->x * point->x + self->y * point->y + self->z * point->z - self->w);
 }
@@ -134,8 +134,8 @@ li_plane_distance_to_point (liPlane*        self,
  * \return Signed distance to the point.
  */
 static inline float
-li_plane_signed_distance_to_point (const liPlane*  self,
-                                   const limatVector* point)
+limat_plane_signed_distance_to_point (const limatPlane*  self,
+                                      const limatVector* point)
 {
 	return self->x * point->x + self->y * point->y + self->z * point->z - self->w;
 }
@@ -152,10 +152,10 @@ li_plane_signed_distance_to_point (const liPlane*  self,
  * \return Nonzero if the plane and the line intersect.
  */
 static inline int
-li_plane_intersects_line (const liPlane*  self,
-                          const limatVector* point0,
-                          const limatVector* point1,
-                          limatVector*       point)
+limat_plane_intersects_line (const limatPlane*  self,
+                             const limatVector* point0,
+                             const limatVector* point1,
+                             limatVector*       point)
 {
 	float t;
 	limatVector tmp;
@@ -163,7 +163,7 @@ li_plane_intersects_line (const liPlane*  self,
 	limatVector offs;
 
 	/* Line vector and plane offset. */
-	li_plane_get_point (self, &tmp);
+	limat_plane_get_point (self, &tmp);
 	line = limat_vector_subtract (*point1, *point0);
 	offs = limat_vector_subtract (tmp, *point0);
 
@@ -190,10 +190,10 @@ li_plane_intersects_line (const liPlane*  self,
  * \return Nonzero if the plane and the line segment intersect.
  */
 static inline int
-li_plane_intersects_segment (const liPlane*  self,
-                             const limatVector* point0,
-                             const limatVector* point1,
-                             limatVector*       point)
+limat_plane_intersects_segment (const limatPlane*  self,
+                                const limatVector* point0,
+                                const limatVector* point1,
+                                limatVector*       point)
 {
 	float t;
 	limatVector tmp;
@@ -201,7 +201,7 @@ li_plane_intersects_segment (const liPlane*  self,
 	limatVector offs;
 
 	/* Line vector and plane offset. */
-	li_plane_get_point (self, &tmp);
+	limat_plane_get_point (self, &tmp);
 	line = limat_vector_subtract (*point1, *point0);
 	offs = limat_vector_subtract (tmp, *point0);
 
@@ -232,24 +232,24 @@ li_plane_intersects_segment (const liPlane*  self,
  * \return Nonzero if the plane and the line segment intersect.
  */
 static inline int
-li_plane_intersects_triangle (const liPlane*    self,
-                              const liTriangle* triangle,
-                              limatVector*         result0,
-                              limatVector*         result1)
+limat_plane_intersects_triangle (const limatPlane*    self,
+                                 const limatTriangle* triangle,
+                                 limatVector*         result0,
+                                 limatVector*         result1)
 {
 	limatVector p[2];
 
 	/* Find the two edges intersecting the plane. */
-	if (!li_plane_intersects_segment (self, triangle->vertices + 0, triangle->vertices + 1, p + 0))
+	if (!limat_plane_intersects_segment (self, triangle->vertices + 0, triangle->vertices + 1, p + 0))
 	{
-		if (!li_plane_intersects_segment (self, triangle->vertices + 0, triangle->vertices + 2, p + 0) ||
-		    !li_plane_intersects_segment (self, triangle->vertices + 1, triangle->vertices + 2, p + 1))
+		if (!limat_plane_intersects_segment (self, triangle->vertices + 0, triangle->vertices + 2, p + 0) ||
+		    !limat_plane_intersects_segment (self, triangle->vertices + 1, triangle->vertices + 2, p + 1))
 			return 0;
 	}
 	else
 	{
-		if (!li_plane_intersects_segment (self, triangle->vertices + 0, triangle->vertices + 2, p + 1) &&
-		    !li_plane_intersects_segment (self, triangle->vertices + 1, triangle->vertices + 2, p + 1))
+		if (!limat_plane_intersects_segment (self, triangle->vertices + 0, triangle->vertices + 2, p + 1) &&
+		    !limat_plane_intersects_segment (self, triangle->vertices + 1, triangle->vertices + 2, p + 1))
 			return 0;
 	}
 
@@ -278,18 +278,18 @@ li_plane_intersects_triangle (const liPlane*    self,
  * \return Nonzero if no intersection was found.
  */
 static inline int
-li_plane_subdivide_triangle (const liPlane*    self,
-                             const liTriangle* triangle,
-                             liTriangle*       results)
+limat_plane_subdivide_triangle (const limatPlane*    self,
+                                const limatTriangle* triangle,
+                                limatTriangle*       results)
 {
 	limatVector p[2];
 	const limatVector* v = triangle->vertices;
 
 	/* Find the two edges intersecting the plane. */
-	if (!li_plane_intersects_segment (self, v + 0, v + 1, p + 0))
+	if (!limat_plane_intersects_segment (self, v + 0, v + 1, p + 0))
 	{
-		if (li_plane_intersects_segment (self, v + 0, v + 2, p + 0) &&
-		    li_plane_intersects_segment (self, v + 1, v + 2, p + 1))
+		if (limat_plane_intersects_segment (self, v + 0, v + 2, p + 0) &&
+		    limat_plane_intersects_segment (self, v + 1, v + 2, p + 1))
 		{
 			/*        v2
 			 *        /\
@@ -298,15 +298,15 @@ li_plane_subdivide_triangle (const liPlane*    self,
 			 *     /    `.\
 			 * v0 +--------+ v1
 			 */
-			li_triangle_set_from_points (results + 0, v + 2, p + 0, p + 1);
-			li_triangle_set_from_points (results + 1, v + 1, p + 1, p + 0);
-			li_triangle_set_from_points (results + 2, v + 0, v + 1, p + 0);
+			limat_triangle_set_from_points (results + 0, v + 2, p + 0, p + 1);
+			limat_triangle_set_from_points (results + 1, v + 1, p + 1, p + 0);
+			limat_triangle_set_from_points (results + 2, v + 0, v + 1, p + 0);
 			return 1;
 		}
 	}
 	else
 	{
-		if (li_plane_intersects_segment (self, v + 0, v + 2, p + 1))
+		if (limat_plane_intersects_segment (self, v + 0, v + 2, p + 1))
 		{
 			/*        v0
 			 *        /\
@@ -315,12 +315,12 @@ li_plane_subdivide_triangle (const liPlane*    self,
 			 *     /    `.\
 			 * v1 +--------+ v2
 			 */
-			li_triangle_set_from_points (results + 0, v + 0, p + 0, p + 1);
-			li_triangle_set_from_points (results + 1, v + 2, p + 1, p + 0);
-			li_triangle_set_from_points (results + 2, v + 2, p + 0, v + 1);
+			limat_triangle_set_from_points (results + 0, v + 0, p + 0, p + 1);
+			limat_triangle_set_from_points (results + 1, v + 2, p + 1, p + 0);
+			limat_triangle_set_from_points (results + 2, v + 2, p + 0, v + 1);
 			return 1;
 		}
-		if (li_plane_intersects_segment (self, v + 1, v + 2, p + 1))
+		if (limat_plane_intersects_segment (self, v + 1, v + 2, p + 1))
 		{
 			/*        v1
 			 *        /\
@@ -329,9 +329,9 @@ li_plane_subdivide_triangle (const liPlane*    self,
 			 *     /    `.\
 			 * v0 +--------+ v2
 			 */
-			li_triangle_set_from_points (results + 0, v + 1, p + 1, p + 0);
-			li_triangle_set_from_points (results + 1, v + 2, p + 0, p + 1);
-			li_triangle_set_from_points (results + 2, v + 0, p + 1, v + 2);
+			limat_triangle_set_from_points (results + 0, v + 1, p + 1, p + 0);
+			limat_triangle_set_from_points (results + 1, v + 2, p + 0, p + 1);
+			limat_triangle_set_from_points (results + 2, v + 0, p + 1, v + 2);
 			return 1;
 		}
 	}

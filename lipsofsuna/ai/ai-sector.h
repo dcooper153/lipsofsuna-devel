@@ -39,7 +39,7 @@ liaiSector*
 liai_sector_new ();
 
 liaiSector*
-liai_sector_new_from_data (liReader* reader);
+liai_sector_new_from_data (liarcReader* reader);
 
 liaiSector*
 liai_sector_new_from_file (const char* path);

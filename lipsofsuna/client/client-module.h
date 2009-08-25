@@ -105,7 +105,7 @@ licli_module_find_sample_by_name (licliModule* self,
 int
 licli_module_handle_packet (licliModule* self,
                             int          type,
-                            liReader*    reader);
+                            liarcReader* reader);
 
 int
 licli_module_host (licliModule* self);

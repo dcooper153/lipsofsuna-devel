@@ -27,16 +27,15 @@
 
 #include <archive/lips-archive.h>
 #include <math/lips-math.h>
-#include <string/lips-string.h>
 
 typedef struct _lialgOcnode lialgOcnode;
 typedef struct _lialgOctree lialgOctree;
-typedef int (*lialgOctreeRead) (void*     data,
-                                void**    value,
+typedef int (*lialgOctreeRead) (void*        data,
+                                void**       value,
                                 limatVector* offset,
-                                liReader* reader);
-typedef int (*lialgOctreeWrite)(void*     data,
-                                void*     value,
+                                liarcReader* reader);
+typedef int (*lialgOctreeWrite)(void*        data,
+                                void*        value,
                                 limatVector* offset,
                                 liarcWriter* writer);
 
@@ -59,7 +58,7 @@ lialg_octree_new_from_file (const char*     path,
                             lialgOctreeRead callback,
                             void*           data);
 lialgOctree*
-lialg_octree_new_from_data (liReader*       reader,
+lialg_octree_new_from_data (liarcReader*    reader,
                             lialgOctreeRead callback,
                             void*           data);
 void

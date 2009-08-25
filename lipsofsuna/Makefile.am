@@ -72,14 +72,14 @@ algsrc = \
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \
 	archive/lips-archive.h \
-	archive/archive-tar.h \
-	archive/archive-serialize.h \
+	archive/archive-reader.h \
 	archive/archive-sql.h \
+	archive/archive-tar.h \
 	archive/archive-writer.h
 arcsrc = \
-	archive/archive-tar.c \
-	archive/archive-serialize.c \
+	archive/archive-reader.c \
 	archive/archive-sql.c \
+	archive/archive-tar.c \
 	archive/archive-writer.c
 
 bnddir = $(includedir)/lipsofsuna/binding
@@ -416,13 +416,9 @@ srvsrc = \
 strdir = $(includedir)/lipsofsuna/string
 str_HEADERS = \
 	string/lips-string.h \
-	string/string-generic.h \
-	string/string-parser.h \
-	string/string-reader.h
+	string/string-generic.h
 strsrc = \
-	string/string-generic.c \
-	string/string-parser.c \
-	string/string-reader.c
+	string/string-generic.c
 
 sysdir = $(includedir)/lipsofsuna/system
 sys_HEADERS = \

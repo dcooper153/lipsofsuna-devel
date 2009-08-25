@@ -36,15 +36,15 @@ private_visibility (liextModule* self,
 static int
 private_packet (liextModule* module,
                 int          type,
-                liReader*    reader);
+                liarcReader* reader);
 
 static int
 private_packet_diff (liextModule* module,
-                     liReader*    reader);
+                     liarcReader* reader);
 
 static int
 private_packet_reset (liextModule* module,
-                      liReader*    reader);
+                      liarcReader* reader);
 
 /*****************************************************************************/
 
@@ -113,7 +113,7 @@ liext_module_find_skills (liextModule* self,
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader)
+                liarcReader* reader)
 {
 	reader->pos = 1;
 	switch (type)
@@ -131,7 +131,7 @@ private_packet (liextModule* self,
 
 static int
 private_packet_diff (liextModule* self,
-                     liReader*    reader)
+                     liarcReader* reader)
 {
 	uint32_t id;
 	float value;
@@ -140,7 +140,7 @@ private_packet_diff (liextModule* self,
 	liextSkills* skills;
 
 	/* Find or create skill block. */
-	if (!li_reader_get_uint32 (reader, &id))
+	if (!liarc_reader_get_uint32 (reader, &id))
 		return 0;
 	skills = lialg_u32dic_find (self->dictionary, id);
 	if (skills == NULL)
@@ -156,11 +156,11 @@ private_packet_diff (liextModule* self,
 	}
 
 	/* Insert skills. */
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
-		if (!li_reader_get_text (reader, "", &name) ||
-		    !li_reader_get_float (reader, &value) ||
-		    !li_reader_get_float (reader, &maximum) ||
+		if (!liarc_reader_get_text (reader, "", &name) ||
+		    !liarc_reader_get_float (reader, &value) ||
+		    !liarc_reader_get_float (reader, &maximum) ||
 		    !liext_skills_set_skill (skills, name, value, maximum))
 		{
 			lisys_free (name);
@@ -174,7 +174,7 @@ private_packet_diff (liextModule* self,
 
 static int
 private_packet_reset (liextModule* self,
-                      liReader*    reader)
+                      liarcReader* reader)
 {
 	uint32_t id;
 	float value;
@@ -183,7 +183,7 @@ private_packet_reset (liextModule* self,
 	liextSkills* skills;
 
 	/* Create or clear skill block. */
-	if (!li_reader_get_uint32 (reader, &id))
+	if (!liarc_reader_get_uint32 (reader, &id))
 		return 0;
 	skills = lialg_u32dic_find (self->dictionary, id);
 	if (skills == NULL)
@@ -201,11 +201,11 @@ private_packet_reset (liextModule* self,
 		liext_skills_clear (skills);
 
 	/* Insert skills. */
-	while (!li_reader_check_end (reader))
+	while (!liarc_reader_check_end (reader))
 	{
-		if (!li_reader_get_text (reader, "", &name) ||
-		    !li_reader_get_float (reader, &value) ||
-		    !li_reader_get_float (reader, &maximum) ||
+		if (!liarc_reader_get_text (reader, "", &name) ||
+		    !liarc_reader_get_float (reader, &value) ||
+		    !liarc_reader_get_float (reader, &maximum) ||
 		    !liext_skills_set_skill (skills, name, value, maximum))
 		{
 			lisys_free (name);

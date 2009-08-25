@@ -23,8 +23,8 @@
 /**
  * \brief A plane defined by a point and a normal.
  */
-typedef struct _liPlane liPlane;
-struct _liPlane
+typedef struct _limatPlane limatPlane;
+struct _limatPlane
 {
 	float x;
 	float y;
@@ -32,17 +32,17 @@ struct _liPlane
 	float w;
 };
 
-typedef struct _liTriangle liTriangle;
-struct _liTriangle
+typedef struct _limatTriangle limatTriangle;
+struct _limatTriangle
 {
-	liPlane plane;
+	limatPlane plane;
 	limatVector vertices[3];
 };
 
 static inline void
-li_triangle_set_from_points (liTriangle*     self,
-                             const limatVector* vertex0,
-                             const limatVector* vertex1,
-                             const limatVector* vertex2);
+limat_triangle_set_from_points (limatTriangle*     self,
+                                const limatVector* vertex0,
+                                const limatVector* vertex1,
+                                const limatVector* vertex2);
 
 #endif

@@ -140,7 +140,7 @@ lieng_engine_load_model (liengEngine* self,
 
 int
 lieng_engine_load_resources (liengEngine* self,
-                             liReader*    reader);
+                             liarcReader* reader);
 
 liengSector*
 lieng_engine_load_sector (liengEngine* self,

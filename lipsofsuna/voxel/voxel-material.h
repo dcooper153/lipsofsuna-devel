@@ -49,7 +49,7 @@ livox_material_new_from_sql (liarcSql*     sql,
                              sqlite3_stmt* stmt);
 
 livoxMaterial*
-livox_material_new_from_stream (liReader* reader);
+livox_material_new_from_stream (liarcReader* reader);
 
 void
 livox_material_free (livoxMaterial* self);

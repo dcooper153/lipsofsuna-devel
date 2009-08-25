@@ -30,8 +30,8 @@
 /**
  * \brief A class respresenting a rectangle.
  */
-typedef struct _liRectangle liRectangle;
-struct _liRectangle
+typedef struct _limatRectangle limatRectangle;
+struct _limatRectangle
 {
 	float x;
 	float y;
@@ -49,11 +49,11 @@ struct _liRectangle
  * \param height An integer.
  */
 static inline void
-li_rectangle_set (liRectangle* self,
-                  int          x,
-                  int          y,
-                  int          width,
-                  int          height)
+limat_rectangle_set (limatRectangle* self,
+                     int             x,
+                     int             y,
+                     int             width,
+                     int             height)
 {
 	self->x = x;
 	self->y = y;
@@ -70,9 +70,9 @@ li_rectangle_set (liRectangle* self,
  * \return Nonzero if the rectangle has an area greater than zero.
  */
 static inline int
-li_rectangle_union (liRectangle*       self,
-                    const liRectangle* rect0,
-                    const liRectangle* rect1)
+limat_rectangle_union (limatRectangle*       self,
+                       const limatRectangle* rect0,
+                       const limatRectangle* rect1)
 {
 	int x0;
 	int y0;
@@ -100,9 +100,9 @@ li_rectangle_union (liRectangle*       self,
  * \return Nonzero if the rectangle has an area greater than zero.
  */
 static inline int
-li_rectangle_intersection (liRectangle*       self,
-                           const liRectangle* rect0,
-                           const liRectangle* rect1)
+limat_rectangle_intersection (limatRectangle*       self,
+                              const limatRectangle* rect0,
+                              const limatRectangle* rect1)
 {
 	int x0;
 	int y0;
@@ -132,11 +132,11 @@ li_rectangle_intersection (liRectangle*       self,
  * \return Zero if the segment was completely eliminated.
  */
 static inline int
-li_rectangle_clip_segment (const liRectangle* self,
-                           float*             x0,
-                           float*             y0,
-                           float*             x1,
-                           float*             y1)
+limat_rectangle_clip_segment (const limatRectangle* self,
+                              float*                x0,
+                              float*                y0,
+                              float*                x1,
+                              float*                y1)
 {
 	float t;
 	float t0;
@@ -224,11 +224,11 @@ li_rectangle_clip_segment (const liRectangle* self,
  * \return Nonzero if intersects.
  */
 static inline int
-li_rectangle_intersects_segment (const liRectangle* self,
-                                 float              x0,
-                                 float              y0,
-                                 float              x1,
-                                 float              y1)
+limat_rectangle_intersects_segment (const limatRectangle* self,
+                                    float                 x0,
+                                    float                 y0,
+                                    float                 x1,
+                                    float                 y1)
 {
 	float t;
 	float x;

@@ -31,7 +31,7 @@
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader);
+                liarcReader* reader);
 
 /*****************************************************************************/
 
@@ -100,7 +100,7 @@ liext_module_save (liextModule* self)
 static int
 private_packet (liextModule* self,
                 int          type,
-                liReader*    reader)
+                liarcReader* reader)
 {
 	reader->pos = 1;
 	if (type == LIEXT_VOXEL_PACKET_ASSIGN)

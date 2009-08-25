@@ -18,9 +18,9 @@
 #ifndef __LIPS_ARCHIVE_H__
 #define __LIPS_ARCHIVE_H__
 
-#include "archive-tar.h"
-#include "archive-serialize.h"
+#include "archive-reader.h"
 #include "archive-sql.h"
+#include "archive-tar.h"
 #include "archive-writer.h"
 
 #endif

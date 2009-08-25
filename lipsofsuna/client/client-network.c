@@ -322,7 +322,7 @@ private_message (licliNetwork*    self,
 {
 	int len;
 	const uint8_t* data;
-	liReader* reader;
+	liarcReader* reader;
 
 	/* Check for valid length. */
 	len = message->USER_MSG.length;
@@ -334,14 +334,14 @@ private_message (licliNetwork*    self,
 	}
 
 	/* Create packet reader. */
-	reader = li_reader_new ((char*) data, len);
+	reader = liarc_reader_new ((char*) data, len);
 	if (reader == NULL)
 		return 0;
 	reader->pos = 1;
 
 	/* Invoke callbacks. */
 	lieng_engine_call (self->module->engine, LICLI_CALLBACK_PACKET, data[0], reader);
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	return 1;
 }

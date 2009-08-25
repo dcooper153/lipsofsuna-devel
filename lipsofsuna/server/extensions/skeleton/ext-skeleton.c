@@ -31,7 +31,7 @@
 static int
 private_client_packet (liextSkeleton* self,
                        lisrvClient*   client,
-                       liReader*      packet);
+                       liarcReader*   packet);
 
 /*****************************************************************************/
 
@@ -70,7 +70,7 @@ liext_skeleton_free (liextSkeleton* self)
 static int
 private_client_packet (liextSkeleton* self,
                        lisrvClient*   client,
-                       liReader*      packet)
+                       liarcReader*   packet)
 {
 #if 0
 	switch (((uint8_t*) packet->buffer)[0])

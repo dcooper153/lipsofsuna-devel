@@ -77,8 +77,8 @@ limdl_node_find_node (const limdlNode* self,
                       const char*      name);
 
 int
-limdl_node_read (limdlNode* self,
-                 liReader*  reader);
+limdl_node_read (limdlNode*   self,
+                 liarcReader* reader);
 
 void
 limdl_node_transform (limdlNode*            self,

@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <string/lips-string.h>
 #include "model-texture.h"
 
 int

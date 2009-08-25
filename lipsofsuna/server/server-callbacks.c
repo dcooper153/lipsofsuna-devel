@@ -78,7 +78,7 @@ private_client_client_login (lisrvServer* server,
 static int
 private_client_client_packet (lisrvServer* server,
                               lisrvClient* client,
-                              liReader*    reader)
+                              liarcReader* reader)
 {
 	int8_t x;
 	int8_t y;
@@ -89,12 +89,12 @@ private_client_client_packet (lisrvServer* server,
 
 	if (((uint8_t*) reader->buffer)[0] == LINET_CLIENT_PACKET_MOVE)
 	{
-		if (!li_reader_get_uint8 (reader, &flags) || (flags & ~LI_CONTROL_MASK) ||
-			!li_reader_get_int8 (reader, &x) ||
-			!li_reader_get_int8 (reader, &y) ||
-			!li_reader_get_int8 (reader, &z) ||
-			!li_reader_get_int8 (reader, &w) ||
-			!li_reader_check_end (reader))
+		if (!liarc_reader_get_uint8 (reader, &flags) || (flags & ~LI_CONTROL_MASK) ||
+			!liarc_reader_get_int8 (reader, &x) ||
+			!liarc_reader_get_int8 (reader, &y) ||
+			!liarc_reader_get_int8 (reader, &z) ||
+			!liarc_reader_get_int8 (reader, &w) ||
+			!liarc_reader_check_end (reader))
 			return 1;
 		tmp = limat_quaternion_init (x / 127.0f, y / 127.0f, z / 127.0f, w / 127.0f);
 		lieng_engine_call (server->engine, LISRV_CALLBACK_CLIENT_CONTROL, client->object, &tmp, flags);

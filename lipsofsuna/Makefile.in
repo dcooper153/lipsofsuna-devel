@@ -201,8 +201,8 @@ am__objects_13 = ai/ai-path.lo ai/ai-path-solver.lo ai/ai-sector.lo \
 	ai/ai-waypoint.lo
 am__objects_14 = algorithm/algorithm-astar.lo \
 	algorithm/algorithm-bst.lo algorithm/algorithm-octree.lo
-am__objects_15 = archive/archive-tar.lo archive/archive-serialize.lo \
-	archive/archive-sql.lo archive/archive-writer.lo
+am__objects_15 = archive/archive-reader.lo archive/archive-sql.lo \
+	archive/archive-tar.lo archive/archive-writer.lo
 am__objects_16 = callback/cal-callbacks.lo callback/cal-marshal.lo
 am__objects_17 = config/config-account.lo config/config-bans.lo \
 	config/config-host.lo
@@ -227,8 +227,7 @@ am__objects_24 = script/script.lo script/script-class.lo \
 	script/common/script-packet.lo script/common/script-path.lo \
 	script/common/script-quaternion.lo \
 	script/common/script-vector.lo
-am__objects_25 = string/string-generic.lo string/string-parser.lo \
-	string/string-reader.lo
+am__objects_25 = string/string-generic.lo
 am__objects_26 = system/system.lo system/system-directory.lo \
 	system/system-error.lo system/system-file.lo \
 	system/system-execute.lo system/system-memory.lo \
@@ -621,15 +620,15 @@ algsrc = \
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \
 	archive/lips-archive.h \
-	archive/archive-tar.h \
-	archive/archive-serialize.h \
+	archive/archive-reader.h \
 	archive/archive-sql.h \
+	archive/archive-tar.h \
 	archive/archive-writer.h
 
 arcsrc = \
-	archive/archive-tar.c \
-	archive/archive-serialize.c \
+	archive/archive-reader.c \
 	archive/archive-sql.c \
+	archive/archive-tar.c \
 	archive/archive-writer.c
 
 bnddir = $(includedir)/lipsofsuna/binding
@@ -985,14 +984,10 @@ srvsrc = \
 strdir = $(includedir)/lipsofsuna/string
 str_HEADERS = \
 	string/lips-string.h \
-	string/string-generic.h \
-	string/string-parser.h \
-	string/string-reader.h
+	string/string-generic.h
 
 strsrc = \
-	string/string-generic.c \
-	string/string-parser.c \
-	string/string-reader.c
+	string/string-generic.c
 
 sysdir = $(includedir)/lipsofsuna/system
 sys_HEADERS = \
@@ -1526,11 +1521,11 @@ archive/$(am__dirstamp):
 archive/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) archive/$(DEPDIR)
 	@: > archive/$(DEPDIR)/$(am__dirstamp)
-archive/archive-tar.lo: archive/$(am__dirstamp) \
-	archive/$(DEPDIR)/$(am__dirstamp)
-archive/archive-serialize.lo: archive/$(am__dirstamp) \
+archive/archive-reader.lo: archive/$(am__dirstamp) \
 	archive/$(DEPDIR)/$(am__dirstamp)
 archive/archive-sql.lo: archive/$(am__dirstamp) \
+	archive/$(DEPDIR)/$(am__dirstamp)
+archive/archive-tar.lo: archive/$(am__dirstamp) \
 	archive/$(DEPDIR)/$(am__dirstamp)
 archive/archive-writer.lo: archive/$(am__dirstamp) \
 	archive/$(DEPDIR)/$(am__dirstamp)
@@ -1687,10 +1682,6 @@ string/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) string/$(DEPDIR)
 	@: > string/$(DEPDIR)/$(am__dirstamp)
 string/string-generic.lo: string/$(am__dirstamp) \
-	string/$(DEPDIR)/$(am__dirstamp)
-string/string-parser.lo: string/$(am__dirstamp) \
-	string/$(DEPDIR)/$(am__dirstamp)
-string/string-reader.lo: string/$(am__dirstamp) \
 	string/$(DEPDIR)/$(am__dirstamp)
 system/$(am__dirstamp):
 	@$(MKDIR_P) system
@@ -1922,8 +1913,8 @@ mostlyclean-compile:
 	-rm -f algorithm/algorithm-bst.lo
 	-rm -f algorithm/algorithm-octree.$(OBJEXT)
 	-rm -f algorithm/algorithm-octree.lo
-	-rm -f archive/archive-serialize.$(OBJEXT)
-	-rm -f archive/archive-serialize.lo
+	-rm -f archive/archive-reader.$(OBJEXT)
+	-rm -f archive/archive-reader.lo
 	-rm -f archive/archive-sql.$(OBJEXT)
 	-rm -f archive/archive-sql.lo
 	-rm -f archive/archive-tar.$(OBJEXT)
@@ -2166,10 +2157,6 @@ mostlyclean-compile:
 	-rm -f sound/liblipsofsunaclient_la-sound-system.lo
 	-rm -f string/string-generic.$(OBJEXT)
 	-rm -f string/string-generic.lo
-	-rm -f string/string-parser.$(OBJEXT)
-	-rm -f string/string-parser.lo
-	-rm -f string/string-reader.$(OBJEXT)
-	-rm -f string/string-reader.lo
 	-rm -f system/lipsofsuna-system-error.$(OBJEXT)
 	-rm -f system/lipsofsuna-system-execute.$(OBJEXT)
 	-rm -f system/lipsofsuna-system-memory.$(OBJEXT)
@@ -2284,7 +2271,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-astar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-bst.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-octree.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-serialize.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-reader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-tar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-writer.Plo@am__quote@
@@ -2413,8 +2400,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/liblipsofsunaclient_la-sound-source.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/liblipsofsunaclient_la-sound-system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@string/$(DEPDIR)/string-generic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@string/$(DEPDIR)/string-parser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@string/$(DEPDIR)/string-reader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-execute.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/lipsofsuna-system-memory.Po@am__quote@

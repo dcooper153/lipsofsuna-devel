@@ -54,7 +54,7 @@ lirnd_shader_new (lirndRender* render);
 
 lirndShader*
 lirnd_shader_new_from_data (lirndRender* render,
-                            liReader*    reader);
+                            liarcReader* reader);
 
 lirndShader*
 lirnd_shader_new_from_file (lirndRender* render,

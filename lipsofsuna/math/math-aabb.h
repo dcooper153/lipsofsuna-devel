@@ -137,7 +137,7 @@ limat_aabb_transform (const limatAabb    self,
  */
 static inline int
 limat_aabb_clip_triangle (const limatAabb*     self,
-                          const liTriangle* triangle,
+                          const limatTriangle* triangle,
                           limatVector*         result)
 {
 	int curr;
@@ -151,7 +151,7 @@ limat_aabb_clip_triangle (const limatAabb*     self,
 	limatVector* tmpbuf;
 	limatVector* prevbuf = buffer + 0;
 	limatVector* currbuf = buffer + 9;
-	liPlane p[6] =
+	limatPlane p[6] =
 	{
 		{ 1, 0, 0, self->min.x }, /* Left. */
 		{ -1, 0, 0, -self->max.x }, /* Right. */
@@ -170,22 +170,22 @@ limat_aabb_clip_triangle (const limatAabb*     self,
 		curr = prevlen;
 		currlen = 0;
 		prev = 0;
-		previn = li_plane_signed_distance_to_point (p + plane, prevbuf) >= 0.0f;
+		previn = limat_plane_signed_distance_to_point (p + plane, prevbuf) >= 0.0f;
 		while (curr--)
 		{
-			currin = li_plane_signed_distance_to_point (p + plane, prevbuf + curr) >= 0.0f;
+			currin = limat_plane_signed_distance_to_point (p + plane, prevbuf + curr) >= 0.0f;
 			if (currin)
 			{
 				if (!previn)
 				{
-					li_plane_intersects_segment (p + plane,
+					limat_plane_intersects_segment (p + plane,
 						prevbuf + prev, prevbuf + curr, currbuf + currlen++);
 				}
 				currbuf[currlen++] = prevbuf[curr];
 			}
 			else if (previn)
 			{
-				li_plane_intersects_segment (p + plane,
+				limat_plane_intersects_segment (p + plane,
 					prevbuf + prev, prevbuf + curr, currbuf + currlen++);
 			}
 			previn = currin;

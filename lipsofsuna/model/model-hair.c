@@ -26,15 +26,15 @@
 #include "model-hair.h"
 
 int
-limdl_hair_read (limdlHair* self,
-                 liReader*  reader)
+limdl_hair_read (limdlHair*   self,
+                 liarcReader* reader)
 {
 	uint32_t i;
 	uint32_t count;
 	limdlHairNode* node;
 
 	/* Read node count. */
-	if (!li_reader_get_uint32 (reader, &count))
+	if (!liarc_reader_get_uint32 (reader, &count))
 		return 0;
 
 	/* Allocate nodes. */
@@ -47,10 +47,10 @@ limdl_hair_read (limdlHair* self,
 	for (i = 0 ; i < count ; i++)
 	{
 		node = self->nodes + i;
-		if (!li_reader_get_float (reader, &node->position.x) ||
-		    !li_reader_get_float (reader, &node->position.y) ||
-		    !li_reader_get_float (reader, &node->position.z) ||
-		    !li_reader_get_float (reader, &node->size))
+		if (!liarc_reader_get_float (reader, &node->position.x) ||
+		    !liarc_reader_get_float (reader, &node->position.y) ||
+		    !liarc_reader_get_float (reader, &node->position.z) ||
+		    !liarc_reader_get_float (reader, &node->size))
 			return 0;
 	}
 
@@ -95,8 +95,8 @@ limdl_hairs_free (limdlHairs* self)
 }
 
 int
-limdl_hairs_read (limdlHairs* self,
-                  liReader*   reader)
+limdl_hairs_read (limdlHairs*  self,
+                  liarcReader* reader)
 {
 	uint32_t i;
 	uint32_t mat;
@@ -104,8 +104,8 @@ limdl_hairs_read (limdlHairs* self,
 	limdlHair* hair;
 
 	/* Read header. */
-	if (!li_reader_get_uint32 (reader, &mat) ||
-	    !li_reader_get_uint32 (reader, &count))
+	if (!liarc_reader_get_uint32 (reader, &mat) ||
+	    !liarc_reader_get_uint32 (reader, &count))
 		return 0;
 	self->material = mat;
 

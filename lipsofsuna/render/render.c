@@ -380,7 +380,7 @@ static int
 private_init_shaders (lirndRender* self)
 {
 	char* path;
-	liReader* reader;
+	liarcReader* reader;
 
 	self->shader.fixed = lirnd_shader_new (self);
 	if (self->shader.fixed == NULL)
@@ -390,12 +390,12 @@ private_init_shaders (lirndRender* self)
 		path = lisys_path_concat (self->config.dir, "shaders", "shadowmap", NULL);
 		if (path == NULL)
 			return 0;
-		reader = li_reader_new_from_file (path);
+		reader = liarc_reader_new_from_file (path);
 		lisys_free (path);
 		if (reader == NULL)
 			return 0;
 		self->shader.shadowmap = lirnd_shader_new_from_data (self, reader);
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 		if (self->shader.shadowmap == NULL)
 			return 0;
 	}

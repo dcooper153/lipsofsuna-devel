@@ -30,8 +30,8 @@
 
 static int
 private_client_packet (liextEditor* self,
-	                   lisrvClient* client,
-	                   liReader*    packet);
+                       lisrvClient* client,
+                       liarcReader* packet);
 
 /*****************************************************************************/
 
@@ -67,7 +67,7 @@ liext_editor_free (liextEditor* self)
 static int
 private_client_packet (liextEditor* self,
                        lisrvClient* client,
-                       liReader*    packet)
+                       liarcReader* packet)
 {
 	uint8_t cmd;
 	uint32_t id;
@@ -79,19 +79,19 @@ private_client_packet (liextEditor* self,
 
 	if (((uint8_t*) packet->buffer)[0] != LINET_EXT_CLIENT_PACKET_EDITOR)
 		return 1;
-	if (!li_reader_get_uint8 (packet, &cmd))
+	if (!liarc_reader_get_uint8 (packet, &cmd))
 		return 1;
 	switch (cmd)
 	{
 		case LINET_EXT_EDITOR_PACKET_CREATE:
-			if (!li_reader_get_uint32 (packet, &id) ||
-				!li_reader_get_float (packet, &position.x) ||
-				!li_reader_get_float (packet, &position.y) ||
-				!li_reader_get_float (packet, &position.z) ||
-				!li_reader_get_float (packet, &rotation.x) ||
-				!li_reader_get_float (packet, &rotation.y) ||
-				!li_reader_get_float (packet, &rotation.z) ||
-				!li_reader_get_float (packet, &rotation.w))
+			if (!liarc_reader_get_uint32 (packet, &id) ||
+				!liarc_reader_get_float (packet, &position.x) ||
+				!liarc_reader_get_float (packet, &position.y) ||
+				!liarc_reader_get_float (packet, &position.z) ||
+				!liarc_reader_get_float (packet, &rotation.x) ||
+				!liarc_reader_get_float (packet, &rotation.y) ||
+				!liarc_reader_get_float (packet, &rotation.z) ||
+				!liarc_reader_get_float (packet, &rotation.w))
 				return 1;
 			model = lieng_engine_find_model_by_code (self->server->engine, id);
 			if (model == NULL)
@@ -107,7 +107,7 @@ private_client_packet (liextEditor* self,
 			lieng_object_set_realized (object, 1);
 			break;
 		case LINET_EXT_EDITOR_PACKET_DESTROY:
-			if (!li_reader_get_uint32 (packet, &id))
+			if (!liarc_reader_get_uint32 (packet, &id))
 				return 1;
 			object = lieng_engine_find_object (self->server->engine, id);
 			if (object == NULL)
@@ -119,14 +119,14 @@ private_client_packet (liextEditor* self,
 			lisrv_server_save (self->server);
 			break;
 		case LINET_EXT_EDITOR_PACKET_TRANSFORM:
-			if (!li_reader_get_uint32 (packet, &id) ||
-				!li_reader_get_float (packet, &position.x) ||
-				!li_reader_get_float (packet, &position.y) ||
-				!li_reader_get_float (packet, &position.z) ||
-				!li_reader_get_float (packet, &rotation.x) ||
-				!li_reader_get_float (packet, &rotation.y) ||
-				!li_reader_get_float (packet, &rotation.z) ||
-				!li_reader_get_float (packet, &rotation.w))
+			if (!liarc_reader_get_uint32 (packet, &id) ||
+				!liarc_reader_get_float (packet, &position.x) ||
+				!liarc_reader_get_float (packet, &position.y) ||
+				!liarc_reader_get_float (packet, &position.z) ||
+				!liarc_reader_get_float (packet, &rotation.x) ||
+				!liarc_reader_get_float (packet, &rotation.y) ||
+				!liarc_reader_get_float (packet, &rotation.z) ||
+				!liarc_reader_get_float (packet, &rotation.w))
 				return 1;
 			object = lieng_engine_find_object (self->server->engine, id);
 			if (object == NULL)

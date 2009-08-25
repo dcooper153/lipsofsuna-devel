@@ -37,8 +37,8 @@ struct _limdlBone
 };
 
 int
-limdl_bone_read (limdlNode* self,
-                 liReader*  reader);
+limdl_bone_read (limdlNode*   self,
+                 liarcReader* reader);
 
 int
 limdl_bone_write (const limdlNode* self,

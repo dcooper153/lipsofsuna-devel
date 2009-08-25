@@ -176,8 +176,8 @@ limdl_node_find_node (const limdlNode* self,
 }
 
 int
-limdl_node_read (limdlNode* self,
-                 liReader*  reader)
+limdl_node_read (limdlNode*   self,
+                 liarcReader* reader)
 {
 	int i;
 	uint32_t count;
@@ -186,16 +186,16 @@ limdl_node_read (limdlNode* self,
 	limatQuaternion rotation;
 
 	/* Read header. */
-	if (!li_reader_get_uint32 (reader, &type) ||
-	    !li_reader_get_uint32 (reader, &count) ||
-	    !li_reader_get_text (reader, "", &self->name) ||
-	    !li_reader_get_float (reader, &position.x) ||
-	    !li_reader_get_float (reader, &position.y) ||
-	    !li_reader_get_float (reader, &position.z) ||
-	    !li_reader_get_float (reader, &rotation.x) ||
-	    !li_reader_get_float (reader, &rotation.y) ||
-	    !li_reader_get_float (reader, &rotation.z) ||
-	    !li_reader_get_float (reader, &rotation.w))
+	if (!liarc_reader_get_uint32 (reader, &type) ||
+	    !liarc_reader_get_uint32 (reader, &count) ||
+	    !liarc_reader_get_text (reader, "", &self->name) ||
+	    !liarc_reader_get_float (reader, &position.x) ||
+	    !liarc_reader_get_float (reader, &position.y) ||
+	    !liarc_reader_get_float (reader, &position.z) ||
+	    !liarc_reader_get_float (reader, &rotation.x) ||
+	    !liarc_reader_get_float (reader, &rotation.y) ||
+	    !liarc_reader_get_float (reader, &rotation.z) ||
+	    !liarc_reader_get_float (reader, &rotation.w))
 		return 0;
 	self->type = type;
 	self->nodes.count = count;

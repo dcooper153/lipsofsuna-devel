@@ -53,8 +53,8 @@ extern "C" {
 #endif
 
 int
-limdl_light_read (limdlNode* self,
-                  liReader*  reader);
+limdl_light_read (limdlNode*   self,
+                  liarcReader* reader);
 
 int
 limdl_light_write (const limdlNode* self,

@@ -27,7 +27,7 @@
 static int
 private_read_weights (limdlFaces*   self,
                       limdlWeights* weights,
-                      liReader*     reader);
+                      liarcReader*  reader);
 
 /*****************************************************************************/
 
@@ -43,8 +43,8 @@ limdl_faces_free (limdlFaces* self)
 }
 
 int
-limdl_faces_read (limdlFaces* self,
-                  liReader*   reader)
+limdl_faces_read (limdlFaces*  self,
+                  liarcReader* reader)
 {
 	uint32_t i;
 	uint32_t mat;
@@ -52,8 +52,8 @@ limdl_faces_read (limdlFaces* self,
 	limdlVertex* vertex;
 
 	/* Read header. */
-	if (!li_reader_get_uint32 (reader, &mat) ||
-	    !li_reader_get_uint32 (reader, &count))
+	if (!liarc_reader_get_uint32 (reader, &mat) ||
+	    !liarc_reader_get_uint32 (reader, &count))
 		goto error;
 	self->material = mat;
 
@@ -67,18 +67,18 @@ limdl_faces_read (limdlFaces* self,
 		for (i = 0 ; i < count ; i++)
 		{
 			vertex = self->vertices.array + i;
-			if (!li_reader_get_float (reader, vertex->texcoord + 0) ||
-				!li_reader_get_float (reader, vertex->texcoord + 1) ||
-				!li_reader_get_float (reader, vertex->texcoord + 2) ||
-				!li_reader_get_float (reader, vertex->texcoord + 3) ||
-				!li_reader_get_float (reader, vertex->texcoord + 4) ||
-				!li_reader_get_float (reader, vertex->texcoord + 5) ||
-				!li_reader_get_float (reader, &vertex->normal.x) ||
-				!li_reader_get_float (reader, &vertex->normal.y) ||
-				!li_reader_get_float (reader, &vertex->normal.z) ||
-				!li_reader_get_float (reader, &vertex->coord.x) ||
-				!li_reader_get_float (reader, &vertex->coord.y) ||
-				!li_reader_get_float (reader, &vertex->coord.z))
+			if (!liarc_reader_get_float (reader, vertex->texcoord + 0) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 1) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 2) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 3) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 4) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 5) ||
+				!liarc_reader_get_float (reader, &vertex->normal.x) ||
+				!liarc_reader_get_float (reader, &vertex->normal.y) ||
+				!liarc_reader_get_float (reader, &vertex->normal.z) ||
+				!liarc_reader_get_float (reader, &vertex->coord.x) ||
+				!liarc_reader_get_float (reader, &vertex->coord.y) ||
+				!liarc_reader_get_float (reader, &vertex->coord.z))
 				goto error;
 		}
 	}
@@ -156,16 +156,16 @@ limdl_faces_write (limdlFaces*  self,
 /*****************************************************************************/
 
 static int
-private_read_weights (limdlFaces*  self,
+private_read_weights (limdlFaces*   self,
                       limdlWeights* weights,
-                      liReader*     reader)
+                      liarcReader*  reader)
 {
 	uint32_t i;
 	uint32_t count;
 	uint32_t group;
 
 	/* Read header. */
-	if (!li_reader_get_uint32 (reader, &count))
+	if (!liarc_reader_get_uint32 (reader, &count))
 		return 0;
 
 	/* Allocate weights. */
@@ -177,8 +177,8 @@ private_read_weights (limdlFaces*  self,
 	/* Read weights. */
 	for (i = 0 ; i < count ; i++)
 	{
-		if (!li_reader_get_uint32 (reader, &group) ||
-		    !li_reader_get_float (reader, &weights->weights[i].weight))
+		if (!liarc_reader_get_uint32 (reader, &group) ||
+		    !liarc_reader_get_float (reader, &weights->weights[i].weight))
 			return 0;
 		weights->weights[i].group = group;
 	}

@@ -373,7 +373,7 @@ lieng_engine_load_model (liengEngine* self,
  */
 int
 lieng_engine_load_resources (liengEngine* self,
-                             liReader*    reader)
+                             liarcReader* reader)
 {
 #warning Breaks due to old models being lost if called multiple times.
 #warning Should unload and reload models so that the list can change without restarting.

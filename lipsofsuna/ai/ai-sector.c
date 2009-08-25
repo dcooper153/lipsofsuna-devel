@@ -49,7 +49,7 @@ liai_sector_new ()
  * \return New sector or NULL.
  */
 liaiSector*
-liai_sector_new_from_data (liReader* reader)
+liai_sector_new_from_data (liarcReader* reader)
 {
 	uint32_t i;
 	uint32_t j;
@@ -61,12 +61,12 @@ liai_sector_new_from_data (liReader* reader)
 	liaiWaypoint** points;
 
 	/* Read header. */
-	if (!li_reader_check_text (reader, "lips/pth", ""))
+	if (!liarc_reader_check_text (reader, "lips/pth", ""))
 	{
 		lisys_error_set (EINVAL, "incorrect file type");
 		return NULL;
 	}
-	if (!li_reader_get_uint32 (reader, &count))
+	if (!liarc_reader_get_uint32 (reader, &count))
 		return NULL;
 
 	/* Allocate points. */
@@ -84,14 +84,14 @@ liai_sector_new_from_data (liReader* reader)
 	/* Read points. */
 	for (i = 0 ; i < count ; i++)
 	{
-		if (!li_reader_get_float (reader, &(points[i]->position.x)) ||
-		    !li_reader_get_float (reader, &(points[i]->position.y)) ||
-		    !li_reader_get_float (reader, &(points[i]->position.z)) ||
-		    !li_reader_get_uint16 (reader, &links))
+		if (!liarc_reader_get_float (reader, &(points[i]->position.x)) ||
+		    !liarc_reader_get_float (reader, &(points[i]->position.y)) ||
+		    !liarc_reader_get_float (reader, &(points[i]->position.z)) ||
+		    !liarc_reader_get_uint16 (reader, &links))
 			goto error;
 		for (j = 0 ; j < links ; j++)
 		{
-			if (!li_reader_get_uint32 (reader, &link))
+			if (!liarc_reader_get_uint32 (reader, &link))
 				goto error;
 			if (link >= count)
 			{
@@ -136,14 +136,14 @@ error:
 liaiSector*
 liai_sector_new_from_file (const char* path)
 {
-	liReader* reader;
+	liarcReader* reader;
 	liaiSector* self;
 
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
 		return NULL;
 	self = liai_sector_new_from_data (reader);
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 
 	return self;
 }

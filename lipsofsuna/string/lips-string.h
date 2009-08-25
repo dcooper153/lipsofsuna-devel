@@ -20,7 +20,5 @@
 
 #include <string.h>
 #include "string-generic.h"
-#include "string-parser.h"
-#include "string-reader.h"
 
 #endif

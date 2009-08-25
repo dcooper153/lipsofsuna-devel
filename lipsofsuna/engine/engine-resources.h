@@ -103,7 +103,7 @@ lieng_resources_load_from_dir (liengResources* self,
 
 int
 lieng_resources_load_from_stream (liengResources* self,
-                                  liReader*       reader);
+                                  liarcReader*    reader);
 
 int
 lieng_resources_get_animation_count (liengResources* self);

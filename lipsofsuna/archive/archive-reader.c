@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,6 +24,7 @@
 
 #include <string/lips-string.h>
 #include <system/lips-system.h>
+#include "archive-reader.h"
 
 /**
  * \brief Creates a new stream reader.
@@ -32,13 +33,13 @@
  * \param length Length of the buffer.
  * \return New packet reader or NULL if ran out of memory.
  */
-liReader*
-li_reader_new (const char* buffer,
-               int         length)
+liarcReader*
+liarc_reader_new (const char* buffer,
+                  int         length)
 {
-	liReader* self;
+	liarcReader* self;
 
-	self = lisys_malloc (sizeof (liReader));
+	self = lisys_malloc (sizeof (liarcReader));
 	if (self == NULL)
 		return NULL;
 	self->pos = 0;
@@ -55,13 +56,13 @@ li_reader_new (const char* buffer,
  * \param path Path to the file.
  * \return New reader or NULL.
  */
-liReader*
-li_reader_new_from_file (const char* path)
+liarcReader*
+liarc_reader_new_from_file (const char* path)
 {
-	liReader* self;
+	liarcReader* self;
 
 	/* Allocate self. */
-	self = lisys_malloc (sizeof (liReader));
+	self = lisys_malloc (sizeof (liarcReader));
 	if (self == NULL)
 		return NULL;
 	self->pos = 0;
@@ -85,11 +86,12 @@ li_reader_new_from_file (const char* path)
  * \param buffer String to read.
  * \return New packet reader or NULL.
  */
-liReader* li_reader_new_from_string (const char* buffer)
+liarcReader*
+liarc_reader_new_from_string (const char* buffer)
 {
-	liReader* self;
+	liarcReader* self;
 
-	self = lisys_malloc (sizeof (liReader));
+	self = lisys_malloc (sizeof (liarcReader));
 	if (self == NULL)
 		return NULL;
 	self->pos = 0;
@@ -104,7 +106,7 @@ liReader* li_reader_new_from_string (const char* buffer)
  *
  * \param self Stream reader.
  */
-void li_reader_free (liReader* self)
+void liarc_reader_free (liarcReader* self)
 {
 	if (self->mmap != NULL)
 		lisys_mmap_free (self->mmap);
@@ -118,7 +120,7 @@ void li_reader_free (liReader* self)
  * \return Nonzero if the end has been reached.
  */
 int
-li_reader_check_end (liReader* self)
+liarc_reader_check_end (liarcReader* self)
 {
 	return (self->pos == self->length);
 }
@@ -133,8 +135,8 @@ li_reader_check_end (liReader* self)
  * \return Nonzero on success.
  */
 int
-li_reader_check_char (liReader* self,
-                      char      chr)
+liarc_reader_check_char (liarcReader* self,
+                         char         chr)
 {
 	if (self->pos == self->length)
 		return 0;
@@ -155,9 +157,9 @@ li_reader_check_char (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_check_data (liReader*   self,
-                      const void* data,
-                      int         length)
+liarc_reader_check_data (liarcReader* self,
+                         const void*  data,
+                         int          length)
 {
 	/* Check for read errors. */
 	if (self->pos + length > self->length)
@@ -183,9 +185,9 @@ li_reader_check_data (liReader*   self,
  * \return Nonzero on success.
  */
 int
-li_reader_check_text (liReader*   self,
-                      const char* data,
-                      const char* list)
+liarc_reader_check_text (liarcReader* self,
+                         const char*  data,
+                         const char*  list)
 {
 	char* str;
 	int tmp = self->pos;
@@ -195,7 +197,7 @@ li_reader_check_text (liReader*   self,
 		return 0;
 
 	/* Read text. */
-	if (!li_reader_get_text (self, list, &str))
+	if (!liarc_reader_get_text (self, list, &str))
 		return 0;
 
 	/* Compare to the expected value. */
@@ -220,21 +222,21 @@ li_reader_check_text (liReader*   self,
  * \return Nonzero on success.
  */
 int
-li_reader_check_key_value_pair (liReader*   self,
-                                const char* key,
-                                const char* value)
+liarc_reader_check_key_value_pair (liarcReader* self,
+                                   const char*  key,
+                                   const char*  value)
 {
 	char* k;
 	char* v;
 	int tmp = self->pos;
 
 	/* Avoid overwriting error. */
-	li_reader_skip_chars (self, " \t");
+	liarc_reader_skip_chars (self, " \t");
 	if (self->pos >= self->length)
 		return 0;
 
 	/* Read the key. */
-	if (!li_reader_get_text (self, " \t", &k))
+	if (!liarc_reader_get_text (self, " \t", &k))
 		return 0;
 	if (strchr (k, '\n'))
 	{
@@ -251,7 +253,7 @@ li_reader_check_key_value_pair (liReader*   self,
 	lisys_free (k);
 
 	/* Avoid overwriting error. */
-	li_reader_skip_chars (self, " \t");
+	liarc_reader_skip_chars (self, " \t");
 	if (self->pos >= self->length)
 	{
 		self->pos = tmp;
@@ -259,7 +261,7 @@ li_reader_check_key_value_pair (liReader*   self,
 	}
 
 	/* Read the value. */
-	if (!li_reader_get_text (self, "\n", &v))
+	if (!liarc_reader_get_text (self, "\n", &v))
 	{
 		self->pos = tmp;
 		return 0;
@@ -285,15 +287,15 @@ li_reader_check_key_value_pair (liReader*   self,
  * \return Nonzero on success.
  */
 int
-li_reader_check_uint32 (liReader* self,
-                        uint32_t  value)
+liarc_reader_check_uint32 (liarcReader* self,
+                           uint32_t     value)
 {
 	int pos;
 	int ret;
 	uint32_t tmp;
 
 	pos = self->pos;
-	ret = li_reader_get_uint32 (self, &tmp);
+	ret = liarc_reader_get_uint32 (self, &tmp);
 	if (!ret || tmp != value)
 	{
 		lisys_error_get (NULL);
@@ -313,8 +315,8 @@ li_reader_check_uint32 (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_char (liReader* self,
-                    char*     value)
+liarc_reader_get_char (liarcReader* self,
+                       char*        value)
 {
 	/* Check for read errors. */
 	if (self->pos >= self->length)
@@ -336,8 +338,8 @@ li_reader_get_char (liReader* self,
  * \param value Return location for the value.
  */
 int
-li_reader_get_float (liReader* self,
-                     float*    value)
+liarc_reader_get_float (liarcReader* self,
+                        float*       value)
 {
 	uint8_t tmp[4];
 
@@ -375,8 +377,8 @@ li_reader_get_float (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_int8 (liReader* self,
-                    int8_t*   value)
+liarc_reader_get_int8 (liarcReader* self,
+                       int8_t*      value)
 {
 	/* Check for read errors. */
 	if (self->pos >= self->length)
@@ -401,8 +403,8 @@ li_reader_get_int8 (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_int16 (liReader* self,
-                     int16_t*  value)
+liarc_reader_get_int16 (liarcReader* self,
+                        int16_t*     value)
 {
 	int8_t* tmp;
 
@@ -431,8 +433,8 @@ li_reader_get_int16 (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_int32 (liReader* self,
-                     int32_t*  value)
+liarc_reader_get_int32 (liarcReader* self,
+                        int32_t*     value)
 {
 	int8_t* tmp;
 
@@ -460,7 +462,7 @@ li_reader_get_int32 (liReader* self,
  * \return Stream offset.
  */
 int
-li_reader_get_offset (liReader* self)
+liarc_reader_get_offset (liarcReader* self)
 {
 	return self->pos;
 }
@@ -473,8 +475,8 @@ li_reader_get_offset (liReader* self)
  * \return Nonzero on success.
  */
 int
-li_reader_set_offset (liReader* self,
-                      int       offset)
+liarc_reader_set_offset (liarcReader* self,
+                         int          offset)
 {
 	if (offset < 0 || offset > self->length)
 		return 0;
@@ -493,8 +495,8 @@ li_reader_set_offset (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_uint8 (liReader* self,
-                     uint8_t*  value)
+liarc_reader_get_uint8 (liarcReader* self,
+                        uint8_t*     value)
 {
 	/* Check for read errors. */
 	if (self->pos >= self->length)
@@ -519,8 +521,8 @@ li_reader_get_uint8 (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_uint16 (liReader* self,
-                      uint16_t* value)
+liarc_reader_get_uint16 (liarcReader* self,
+                         uint16_t*    value)
 {
 	uint8_t* tmp;
 
@@ -549,8 +551,8 @@ li_reader_get_uint16 (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_uint32 (liReader* self,
-                      uint32_t* value)
+liarc_reader_get_uint32 (liarcReader* self,
+                         uint32_t*    value)
 {
 	uint8_t* tmp;
 
@@ -585,9 +587,9 @@ li_reader_get_uint32 (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_text (liReader*   self,
-                    const char* list,
-                    char**      value)
+liarc_reader_get_text (liarcReader* self,
+                       const char*  list,
+                       char**       value)
 {
 	int i;
 	int tmp = 0;
@@ -638,8 +640,8 @@ li_reader_get_text (liReader*   self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_text_int (liReader* self,
-                        int*      value)
+liarc_reader_get_text_int (liarcReader* self,
+                           int*         value)
 {
 	int tmp = 0;
 	int sign = 1;
@@ -709,7 +711,8 @@ li_reader_get_text_int (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_text_uint (liReader* self, int* value)
+liarc_reader_get_text_uint (liarcReader* self,
+                            int*         value)
 {
 	int tmp = 0;
 	*value = 0;
@@ -770,8 +773,8 @@ li_reader_get_text_uint (liReader* self, int* value)
  * \return Nonzero on success.
  */
 int
-li_reader_get_text_float (liReader* self,
-                          float*    value)
+liarc_reader_get_text_float (liarcReader* self,
+                             float*       value)
 {
 	int tmp = 0;
 	int sign = 1;
@@ -867,15 +870,15 @@ li_reader_get_text_float (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_get_key_value_pair (liReader* self,
-                              char**    key,
-                              char**    value)
+liarc_reader_get_key_value_pair (liarcReader* self,
+                                 char**       key,
+                                 char**       value)
 {
 	int tmp = self->pos;
 
 	/* Read the key. */
-	li_reader_skip_chars (self, " \t");
-	if (!li_reader_get_text (self, " \t", key))
+	liarc_reader_skip_chars (self, " \t");
+	if (!liarc_reader_get_text (self, " \t", key))
 	{
 		*key = NULL;
 		*value = NULL;
@@ -893,8 +896,8 @@ li_reader_get_key_value_pair (liReader* self,
 	}
 
 	/* Read the value. */
-	li_reader_skip_chars (self, " \t");
-	if (!li_reader_get_text (self, "\n", value))
+	liarc_reader_skip_chars (self, " \t");
+	if (!liarc_reader_get_text (self, "\n", value))
 	{
 		lisys_free (*key);
 		*key = NULL;
@@ -915,8 +918,8 @@ li_reader_get_key_value_pair (liReader* self,
  * \return Nonzero on success.
  */
 int
-li_reader_skip_bytes (liReader* self,
-                      int       num)
+liarc_reader_skip_bytes (liarcReader* self,
+                         int          num)
 {
 	/* Check for read errors. */
 	if (self->pos >= self->length - num - 1)
@@ -938,8 +941,8 @@ li_reader_skip_bytes (liReader* self,
  * \return Number of characters skipped.
  */
 int
-li_reader_skip_chars (liReader*   self,
-                      const char* list)
+liarc_reader_skip_chars (liarcReader* self,
+                         const char*  list)
 {
 	int c = 0;
 	const char* p;

@@ -64,7 +64,7 @@ limdl_material_clear_textures (limdlMaterial* self);
 
 int
 limdl_material_read (limdlMaterial* self,
-                     liReader*      reader);
+                     liarcReader*   reader);
 
 int
 limdl_material_realloc_textures (limdlMaterial* self,

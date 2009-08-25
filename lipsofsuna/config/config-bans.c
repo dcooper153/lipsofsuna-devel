@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <archive/lips-archive.h>
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "config-bans.h"
@@ -61,7 +62,7 @@ licfg_bans_new_from_file (const char* dir)
 {
 	char* name;
 	char* path;
-	liReader* reader = NULL;
+	liarcReader* reader = NULL;
 	licfgBans* self;
 
 	/* Allocate self. */
@@ -76,7 +77,7 @@ licfg_bans_new_from_file (const char* dir)
 	path = lisys_path_concat (dir, "bans.def", NULL);
 	if (path == NULL)
 		goto error;
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	lisys_free (path);
 	if (reader == NULL)
 		goto error;
@@ -84,10 +85,10 @@ licfg_bans_new_from_file (const char* dir)
 	/* Read bans. */
 	while (1)
 	{
-		li_reader_skip_chars (reader, " \t\n");
-		if (li_reader_check_end (reader))
+		liarc_reader_skip_chars (reader, " \t\n");
+		if (liarc_reader_check_end (reader))
 			break;
-		if (!li_reader_get_text (reader, " \t\n", &name))
+		if (!liarc_reader_get_text (reader, " \t\n", &name))
 			goto error;
 		if (!licfg_bans_insert_ban (self, name))
 		{
@@ -97,12 +98,12 @@ licfg_bans_new_from_file (const char* dir)
 		lisys_free (name);
 	}
 
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	return self;
 
 error:
 	if (reader != NULL)
-		li_reader_free (reader);
+		liarc_reader_free (reader);
 	licfg_bans_free (self);
 	return NULL;
 }

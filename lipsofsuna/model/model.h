@@ -106,7 +106,7 @@ limdlModel*
 limdl_model_new ();
 
 limdlModel*
-limdl_model_new_from_data (liReader* reader);
+limdl_model_new_from_data (liarcReader* reader);
 
 limdlModel*
 limdl_model_new_from_file (const char* path);

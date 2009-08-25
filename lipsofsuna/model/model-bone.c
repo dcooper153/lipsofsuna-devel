@@ -27,14 +27,14 @@
 #include "model-node.h"
 
 int
-limdl_bone_read (limdlNode* self,
-                 liReader*  reader)
+limdl_bone_read (limdlNode*   self,
+                 liarcReader* reader)
 {
 	limdlBone* bone = &self->bone;
 
-	if (!li_reader_get_float (reader, &bone->length.x) ||
-		!li_reader_get_float (reader, &bone->length.y) ||
-		!li_reader_get_float (reader, &bone->length.z))
+	if (!liarc_reader_get_float (reader, &bone->length.x) ||
+		!liarc_reader_get_float (reader, &bone->length.y) ||
+		!liarc_reader_get_float (reader, &bone->length.z))
 		return 0;
 
 	return 1;

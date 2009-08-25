@@ -54,7 +54,7 @@ private_motion (liextModule* self,
 static int
 private_packet (liextModule* self,
                 lisrvClient* client,
-                liReader*    packet);
+                liarcReader* packet);
 
 static int
 private_sample (liextModule* self,
@@ -285,7 +285,7 @@ private_motion (liextModule* self,
 static int
 private_packet (liextModule* self,
                 lisrvClient* client,
-                liReader*    packet)
+                liarcReader* packet)
 {
 	int type;
 	liscrData* data0;

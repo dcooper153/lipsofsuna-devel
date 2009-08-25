@@ -179,7 +179,7 @@ livox_material_new_from_sql (liarcSql*     sql,
  * \return New material or NULL.
  */
 livoxMaterial*
-livox_material_new_from_stream (liReader* reader)
+livox_material_new_from_stream (liarcReader* reader)
 {
 	uint32_t id;
 	livoxMaterial* self;
@@ -190,10 +190,10 @@ livox_material_new_from_stream (liReader* reader)
 		return NULL;
 
 	/* Read values. */
-	if (!li_reader_get_uint32 (reader, &id) ||
-	    !li_reader_get_text (reader, "", &self->name) ||
-	    !li_reader_get_float (reader, &self->friction) ||
-	    !li_reader_get_float (reader, &self->scale) ||
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_text (reader, "", &self->name) ||
+	    !liarc_reader_get_float (reader, &self->friction) ||
+	    !liarc_reader_get_float (reader, &self->scale) ||
 	    !limdl_material_read (&self->model, reader))
 	{
 		lisys_free (self->name);

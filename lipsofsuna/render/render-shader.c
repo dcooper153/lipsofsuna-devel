@@ -47,15 +47,15 @@ private_read_file (lirndShader* self,
 static int
 private_read_stream (lirndShader* self,
                      const char*  name,
-                     liReader*    reader);
+                     liarcReader* reader);
 
 static int
 private_read_config (lirndShader* self,
-                     liReader*    reader);
+                     liarcReader* reader);
 
 static int
 private_read_source (lirndShader* self,
-                     liReader*    reader);
+                     liarcReader* reader);
 
 static int
 private_uniform_value (lirndShader* self,
@@ -92,7 +92,7 @@ lirnd_shader_new (lirndRender* render)
  */
 lirndShader*
 lirnd_shader_new_from_data (lirndRender* render,
-                            liReader*    reader)
+                            liarcReader* reader)
 {
 	lirndShader* self;
 
@@ -188,22 +188,22 @@ private_check_compile (lirndShader* self,
 	GLint status;
 	GLchar log[512];
 	GLsizei length;
-	liReader* reader;
+	liarcReader* reader;
 
 	type = (shader == self->vertex)? "vertex" : "fragment";
 	glGetObjectParameterivARB (shader, GL_COMPILE_STATUS, &status);
 	glGetInfoLogARB (shader, sizeof (log), &length, log);
 	if (length)
 	{
-		reader = li_reader_new (log, length);
+		reader = liarc_reader_new (log, length);
 		if (reader != NULL)
 		{
-			while (li_reader_get_text (reader, "\n", &text))
+			while (liarc_reader_get_text (reader, "\n", &text))
 			{
 				printf ("WARNING: %s:%s%s\n", name, type, text);
 				lisys_free (text);
 			}
-			li_reader_free (reader);
+			liarc_reader_free (reader);
 		}
 		if (strstr (log, "software"))
 		{
@@ -229,21 +229,21 @@ private_check_link (lirndShader* self,
 	GLint status;
 	GLchar log[512];
 	GLsizei length;
-	liReader* reader;
+	liarcReader* reader;
 
 	glGetObjectParameterivARB (program, GL_LINK_STATUS, &status);
 	glGetInfoLogARB (program, sizeof (log), &length, log);
 	if (length)
 	{
-		reader = li_reader_new (log, length);
+		reader = liarc_reader_new (log, length);
 		if (reader != NULL)
 		{
-			while (li_reader_get_text (reader, "\n", &text))
+			while (liarc_reader_get_text (reader, "\n", &text))
 			{
 				printf ("WARNING: %s:%s\n", name, text);
 				lisys_free (text);
 			}
-			li_reader_free (reader);
+			liarc_reader_free (reader);
 		}
 		if (strstr (log, "software"))
 		{
@@ -289,23 +289,23 @@ private_read_file (lirndShader* self,
                    const char*  name)
 {
 	int ret;
-	liReader* reader;
+	liarcReader* reader;
 
 	/* Open the file. */
-	reader = li_reader_new_from_file (path);
+	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
 		return 0;
 
 	/* Read from stream. */
 	ret = private_read_stream (self, name, reader);
-	li_reader_free (reader);
+	liarc_reader_free (reader);
 	return ret;
 }
 
 static int
 private_read_stream (lirndShader* self,
                      const char*  name,
-                     liReader*    reader)
+                     liarcReader* reader)
 {
 	if (livid_features.shader_model >= 3)
 	{
@@ -347,7 +347,7 @@ private_read_stream (lirndShader* self,
 
 static int
 private_read_config (lirndShader* self,
-                     liReader*    reader)
+                     liarcReader* reader)
 {
 	char* line;
 	char* name;
@@ -358,7 +358,7 @@ private_read_config (lirndShader* self,
 	/* Find start. */
 	while (1)
 	{
-		if (!li_reader_get_text (reader, "\n", &line))
+		if (!liarc_reader_get_text (reader, "\n", &line))
 			return 0;
 		if (!strcmp (line, "[configuration]"))
 		{
@@ -371,7 +371,7 @@ private_read_config (lirndShader* self,
 	/* Parse options. */
 	while (1)
 	{
-		if (!li_reader_get_text (reader, "\n", &line))
+		if (!liarc_reader_get_text (reader, "\n", &line))
 			return 0;
 		if (!strlen (line))
 		{
@@ -444,7 +444,7 @@ private_read_config (lirndShader* self,
 
 static int
 private_read_source (lirndShader* self,
-                     liReader*    reader)
+                     liarcReader* reader)
 {
 	GLint length;
 	GLint vert_start;
@@ -459,9 +459,9 @@ private_read_source (lirndShader* self,
 	while (1)
 	{
 		vert_end = reader->pos;
-		if (!li_reader_get_text (reader, "\n", &line))
+		if (!liarc_reader_get_text (reader, "\n", &line))
 		{
-			li_reader_free (reader);
+			liarc_reader_free (reader);
 			return 0;
 		}
 		if (!strcmp (line, "[fragment shader]"))

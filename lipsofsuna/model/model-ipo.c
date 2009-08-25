@@ -27,8 +27,8 @@
 #include "model-ipo.h"
 
 int
-limdl_ipo_read (limdlIpo* self,
-                liReader* reader)
+limdl_ipo_read (limdlIpo*    self,
+                liarcReader* reader)
 {
 	int i;
 	int j;
@@ -36,8 +36,8 @@ limdl_ipo_read (limdlIpo* self,
 	uint32_t tmp[2];
 
 	/* Read the number of channels. */
-	if (!li_reader_get_text (reader, "", &self->name) ||
-	    !li_reader_get_uint32 (reader, tmp))
+	if (!liarc_reader_get_text (reader, "", &self->name) ||
+	    !liarc_reader_get_uint32 (reader, tmp))
 		return 0;
 	channels = tmp[0];
 	if (channels != LIMDL_IPO_CHANNEL_NUM)
@@ -50,8 +50,8 @@ limdl_ipo_read (limdlIpo* self,
 	for (i = 0 ; i < channels ; i++)
 	{
 		/* Read the header. */
-		if (!li_reader_get_uint32 (reader, tmp + 0) ||
-		    !li_reader_get_uint32 (reader, tmp + 1))
+		if (!liarc_reader_get_uint32 (reader, tmp + 0) ||
+		    !liarc_reader_get_uint32 (reader, tmp + 1))
 			return 0;
 		self->channels[i].type = tmp[0];
 		self->channels[i].length = tmp[1];
@@ -66,7 +66,7 @@ limdl_ipo_read (limdlIpo* self,
 			/* Read the data. */
 			for (j = 0 ; j < self->channels[i].length ; j++)
 			{
-				if (!li_reader_get_float (reader, self->channels[i].nodes + j))
+				if (!liarc_reader_get_float (reader, self->channels[i].nodes + j))
 					return 0;
 			}
 		}

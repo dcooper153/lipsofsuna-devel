@@ -47,8 +47,8 @@ extern "C" {
 #endif
 
 int
-limdl_hair_read (limdlHair* self,
-                 liReader*  reader);
+limdl_hair_read (limdlHair*   self,
+                 liarcReader* reader);
 
 int
 limdl_hair_write (limdlHair*   self,
@@ -73,8 +73,8 @@ void
 limdl_hairs_free (limdlHairs* self);
 
 int
-limdl_hairs_read (limdlHairs* self,
-                  liReader*   reader);
+limdl_hairs_read (limdlHairs*  self,
+                  liarcReader* reader);
 
 int
 limdl_hairs_write (limdlHairs*  self,
