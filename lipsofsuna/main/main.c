@@ -166,7 +166,6 @@ private_exec_program (const char* name,
 #endif
 
 	/* Execute the program. */
-	printf ("EXEC %s %s %s %s\n", path, path, module, extra);
 	ret = lisys_execvl (path, path, module, extra, NULL);
 	lisys_free (path);
 #ifdef LI_RELATIVE_PATHS
