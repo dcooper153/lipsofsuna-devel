@@ -81,7 +81,7 @@ liext_module_new (licliModule* module)
 	     	private_packet, self, self->calls + 0) ||
 	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
 	     	private_tick, self, self->calls + 1) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_VISIBILITY, 0,
+	    !lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 0,
 	     	private_visibility, self, self->calls + 2))
 	{
 		liext_module_free (self);

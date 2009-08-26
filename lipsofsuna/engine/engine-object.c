@@ -807,8 +807,7 @@ private_callback_free (liengObject* self)
 	liengConstraint* constraint_next;
 
 	/* Unrealize. */
-	if (self->sector != NULL)
-		lieng_object_set_realized (self, 0);
+	lieng_object_set_realized (self, 0);
 	lieng_object_set_selected (self, 0);
 
 	/* Invoke callbacks. */
@@ -935,7 +934,7 @@ private_callback_set_realized (liengObject* self,
 		}
 
 		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_REALIZE, self, 1);
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 1);
 
 		/* Protect from deletion. */
 		lieng_object_ref (self, 1);
@@ -943,7 +942,7 @@ private_callback_set_realized (liengObject* self,
 	else
 	{
 		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_REALIZE, self, 0);
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 0);
 
 		/* Deactivate physics. */
 		liphy_object_set_realized (self->physics, 0);

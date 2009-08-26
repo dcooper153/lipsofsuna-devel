@@ -293,6 +293,7 @@ phy_HEADERS = \
 	physics/physics-types.h
 physrc = \
 	physics/physics.cpp \
+	physics/physics-control.cpp \
 	physics/physics-object.cpp \
 	physics/physics-private.cpp \
 	physics/physics-private.h \

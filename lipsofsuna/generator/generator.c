@@ -546,7 +546,7 @@ ligen_generator_write (ligenGenerator* self)
 				"shape", LIARC_SQL_INT, LIPHY_SHAPE_MODE_CONCAVE,
 				"model", LIARC_SQL_TEXT, object->model,
 				"type", LIARC_SQL_TEXT, object->type,
-				"extra", LIARC_SQL_TEXT, object->extra))
+				"extra", LIARC_SQL_TEXT, object->extra, NULL))
 				return 0;
 		}
 	}

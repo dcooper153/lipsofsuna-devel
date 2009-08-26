@@ -187,7 +187,7 @@ liext_editor_duplicate (liextEditor* self)
 	{
 		selection = iter.value;
 		code = lieng_object_get_model_code (selection->object);
-		licli_object_get_transform_target (selection->object, &transform);
+		lieng_object_get_transform (selection->object, &transform);
 		if (!liext_editor_create (self, code, &transform))
 			return 0;
 	}
@@ -218,7 +218,7 @@ liext_editor_rotate (liextEditor*           self,
 		position = limat_vector_add (position, center);
 		newrotat = limat_quaternion_multiply (*rotation, selection->transform.rotation);
 		transform = limat_transform_init (position, newrotat);
-		licli_object_set_transform (selection->object, &transform);
+		lieng_object_set_transform (selection->object, &transform);
 	}
 }
 
@@ -277,7 +277,7 @@ liext_editor_snap (liextEditor* self,
 		selection->transform.rotation = limat_quaternion_euler (a, b, c);
 
 		transform = limat_transform_init (position, selection->transform.rotation);
-		licli_object_set_transform (selection->object, &transform);
+		lieng_object_set_transform (selection->object, &transform);
 	}
 
 	/* Send commands to server. */
@@ -305,10 +305,10 @@ liext_editor_translate (liextEditor*       self,
 	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
 	{
 		selection = iter.value;
-		licli_object_get_transform_target (selection->object, &transform);
+		lieng_object_get_transform (selection->object, &transform);
 		position = limat_vector_add (selection->transform.position, *translation);
 		transform = limat_transform_init (position, transform.rotation);
-		licli_object_set_transform (selection->object, &transform);
+		lieng_object_set_transform (selection->object, &transform);
 	}
 }
 
@@ -330,7 +330,7 @@ liext_editor_transform_apply (liextEditor* self)
 	{
 		/* Get target. */
 		selection = iter.value;
-		licli_object_get_transform_target (selection->object, &transform);
+		lieng_object_get_transform (selection->object, &transform);
 		selection->transform = transform;
 
 		/* Send a transform packet. */
@@ -367,7 +367,7 @@ liext_editor_transform_cancel (liextEditor* self)
 	{
 		selection = iter.value;
 		transform = selection->transform;
-		licli_object_set_transform (selection->object, &transform);
+		lieng_object_set_transform (selection->object, &transform);
 	}
 }
 

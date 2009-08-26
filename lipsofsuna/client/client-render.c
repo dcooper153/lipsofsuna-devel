@@ -138,6 +138,21 @@ private_tick (licliModule* self,
 	liengObject* eobject;
 	lirndObject* robject;
 
+#if 0
+	/* Interpolate position. */
+	data->prev.transform.position = limat_vector_lerp (
+		data->curr.transform.position, data->prev.transform.position,
+		0.5f * LI_OBJECT_POSITION_CORRECTION);
+
+	/* Interpolate orientation. */
+	data->prev.transform.rotation = limat_quaternion_get_nearest (
+		data->prev.transform.rotation, data->curr.transform.rotation);
+	data->prev.transform.rotation = limat_quaternion_nlerp (
+		data->curr.transform.rotation, data->prev.transform.rotation,
+		0.5f * LI_OBJECT_DIRECTION_CORRECTION);
+	lieng_default_calls.lieng_object_set_transform (self, &data->prev.transform);
+#endif
+
 	LI_FOREACH_U32DIC (iter, self->engine->objects)
 	{
 		eobject = iter.value;
@@ -162,7 +177,7 @@ licli_render_init (licliModule* self)
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, 1, private_object_new, self, NULL);
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, 1, private_object_free, self, NULL);
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, 1, private_object_model, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_REALIZE, 1, private_object_realize, self, NULL);
+	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 1, private_object_realize, self, NULL);
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, 1, private_object_transform, self, NULL);
 	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_TICK, 1, private_tick, self, NULL);
 	return 1;

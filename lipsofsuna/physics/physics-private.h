@@ -29,10 +29,10 @@
 #define LIPHY_MOTION_TOLERANCE 0.25f
 #define LIPHY_ROTATION_TOLERANCE 0.1f
 
-class liphyMotionState;
-class liphyCustomController;
+class liphyControl;
 class liphyContactController;
 class liphyCharacterController;
+class liphyMotionState;
 
 struct _liphyPhysics
 {
@@ -73,19 +73,12 @@ struct _liphyShape
 
 struct _liphyObject
 {
+	liphyControlMode control_mode;
+	liphyControl* control;
+	liphyMotionState* motion;
 	liphyPhysics* physics;
 	liphyShape* shape;
 	liphyShapeMode shape_mode;
-	liphyControlMode control_mode;
-	liphyMotionState* motion;
-	liphyCustomController* custom_controller;
-	liphyContactController* contact_controller;
-	btKinematicCharacterController* character_controller;
-	btPairCachingGhostObject* ghost;
-	btRigidBody* body;
-	btRaycastVehicle* vehicle;
-	btVehicleRaycaster* vehicle_caster;
-	btRaycastVehicle::btVehicleTuning* vehicle_tuning;
 	int flags;
 	struct
 	{
@@ -117,17 +110,6 @@ public:
 	btTransform previous;
 };
 
-class liphyCustomController : public btActionInterface
-{
-public:
-	liphyCustomController (liphyCallback call, liphyObject* data);
-	virtual void updateAction (btCollisionWorld* world, btScalar delta);
-	virtual void debugDraw (btIDebugDraw* debugDrawer);
-public:
-	liphyCallback call;
-	liphyObject* data;
-};
-
 class liphyContactController : public btActionInterface
 {
 public:
@@ -143,11 +125,107 @@ public:
 class liphyCharacterController : public btKinematicCharacterController
 {
 public:
-	liphyCharacterController (liphyObject* object, btConvexShape* shape);
+	liphyCharacterController (liphyObject* object, btPairCachingGhostObject* ghost, btConvexShape* shape);
 	virtual bool onGround () const;
 	virtual void updateAction (btCollisionWorld* world, btScalar delta);
 public:
 	liphyObject* object;
+};
+
+class liphyControl
+{
+public:
+	liphyControl (liphyObject* object, btCollisionShape* shape);
+	virtual ~liphyControl ();
+public:
+	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
+	virtual void transform (const btTransform& value);
+	virtual void update ();
+	virtual void get_angular (btVector3* value);
+	virtual void set_angular (const btVector3& value);
+	virtual void get_gravity (btVector3* value);
+	virtual void set_gravity (const btVector3& value);
+	virtual bool get_ground ();
+	virtual void set_collision_group (int mask);
+	virtual void set_collision_mask (int mask);
+	virtual void set_mass (float value, const btVector3& inertia);
+	virtual btCollisionObject* get_object ();
+	virtual void set_velocity (const btVector3& value);
+public:
+	liphyObject* object;
+	liphyContactController* contact_controller;
+};
+
+class liphyCharacterControl : public liphyControl
+{
+public:
+	liphyCharacterControl (liphyObject* object, btCollisionShape* shape);
+	virtual ~liphyCharacterControl ();
+public:
+	virtual void transform (const btTransform& value);
+	virtual void set_collision_group (int mask);
+	virtual void set_collision_mask (int mask);
+	virtual bool get_ground ();
+	virtual btCollisionObject* get_object ();
+public:
+	btPairCachingGhostObject ghost;
+	liphyCharacterController controller;
+};
+
+class liphyRigidControl : public liphyControl
+{
+public:
+	liphyRigidControl (liphyObject* object, btCollisionShape* shape);
+	virtual ~liphyRigidControl ();
+public:
+	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
+	virtual void transform (const btTransform& value);
+	virtual void update ();
+	virtual void get_angular (btVector3* res);
+	virtual void set_angular (const btVector3& value);
+	virtual void set_collision_group (int mask);
+	virtual void set_collision_mask (int mask);
+	virtual void get_gravity (btVector3* value);
+	virtual void set_gravity (const btVector3& value);
+	virtual void set_mass (float value, const btVector3& inertia);
+	virtual btCollisionObject* get_object ();
+	virtual void set_velocity (const btVector3& value);
+public:
+	btRigidBody body;
+};
+
+class liphyStaticControl : public liphyControl
+{
+public:
+	liphyStaticControl (liphyObject* object, btCollisionShape* shape);
+	virtual ~liphyStaticControl ();
+public:
+	virtual void transform (const btTransform& value);
+	virtual btCollisionObject* get_object ();
+public:
+	btRigidBody body;
+};
+
+class liphyVehicleControl : public liphyControl
+{
+public:
+	liphyVehicleControl (liphyObject* object, btCollisionShape* shape);
+	virtual ~liphyVehicleControl ();
+public:
+	virtual void transform (const btTransform& value);
+	virtual void update ();
+	virtual void set_collision_group (int mask);
+	virtual void set_collision_mask (int mask);
+	virtual void get_gravity (btVector3* value);
+	virtual void set_gravity (const btVector3& value);
+	virtual void set_mass (float value, const btVector3& inertia);
+	virtual btCollisionObject* get_object ();
+	virtual void set_velocity (const btVector3& value);
+public:
+	btRigidBody body;
+	btRaycastVehicle* vehicle;
+	btDefaultVehicleRaycaster caster;
+	btRaycastVehicle::btVehicleTuning tuning;
 };
 
 #endif

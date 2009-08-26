@@ -218,12 +218,14 @@ liext_preview_insert_object (liextPreview*         self,
                              const char*           model)
 {
 	limatTransform t;
-	lirndModel* model_;
+	liengModel* emodel;
+	lirndModel* rmodel;
 	lirndObject* object;
 
 	/* Find model. */
-	model_ = lirnd_render_find_model (self->module->render, model);
-	if (model_ == NULL)
+	emodel = lieng_engine_find_model_by_name (self->module->engine, model);
+	rmodel = lirnd_render_find_model (self->module->render, model);
+	if (rmodel == NULL)
 		return 0;
 
 	/* Create object. */
@@ -234,7 +236,7 @@ liext_preview_insert_object (liextPreview*         self,
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER));
 	t = limat_transform_multiply (t, *transform);
 	lirnd_object_set_transform (object, &t);
-	lirnd_object_set_model (object, model_, NULL);
+	lirnd_object_set_model (object, rmodel, NULL);
 	lirnd_object_set_realized (object, 1);
 
 	/* Add to dictionary. */

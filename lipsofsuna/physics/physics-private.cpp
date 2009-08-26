@@ -45,34 +45,21 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 	float len0;
 	float len1;
 
+	assert (!isnan (transform.getOrigin ()[0]));
+	assert (!isnan (transform.getOrigin ()[1]));
+	assert (!isnan (transform.getOrigin ()[2]));
+
 	this->current = transform;
 	len0 = (this->current.getOrigin () - this->previous.getOrigin ()).length ();
 	len1 = (this->current.getRotation () - this->previous.getRotation ()).length ();
 	if (len0 > LIPHY_MOTION_TOLERANCE || len1 > LIPHY_ROTATION_TOLERANCE)
 	{
 		this->previous = this->current;
+		if (this->object->control != NULL)
+			this->object->control->update ();
 		if (this->object->physics->transform_callback != NULL)
 			this->object->physics->transform_callback (this->object);
 	}
-}
-
-/*****************************************************************************/
-
-liphyCustomController::liphyCustomController (liphyCallback call, liphyObject* data)
-{
-	this->call = call;
-	this->data = data;
-}
-
-void
-liphyCustomController::updateAction (btCollisionWorld* world, btScalar delta)
-{
-	this->call (this->data, delta);
-}
-
-void
-liphyCustomController::debugDraw (btIDebugDraw* debugDrawer)
-{
 }
 
 /*****************************************************************************/
@@ -90,6 +77,7 @@ liphyContactController::~liphyContactController ()
 
 void liphyContactController::updateAction (btCollisionWorld* world, btScalar delta)
 {
+#if 0
 	int i;
 	int j;
 	int p;
@@ -189,6 +177,7 @@ void liphyContactController::updateAction (btCollisionWorld* world, btScalar del
 			}
 		}
 	}
+#endif
 }
 
 void liphyContactController::debugDraw (btIDebugDraw* debugDrawer)
@@ -197,8 +186,8 @@ void liphyContactController::debugDraw (btIDebugDraw* debugDrawer)
 
 /*****************************************************************************/
 
-liphyCharacterController::liphyCharacterController (liphyObject* object, btConvexShape* shape) :
-	btKinematicCharacterController (object->ghost, shape, object->config.character_step)
+liphyCharacterController::liphyCharacterController (liphyObject* object, btPairCachingGhostObject* ghost, btConvexShape* shape) :
+	btKinematicCharacterController (ghost, shape, object->config.character_step)
 {
 	this->object = object;
 }
@@ -214,6 +203,7 @@ liphyCharacterController::onGround () const
 void
 liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
 {
+	float s;
 	limatVector* f;
 	limatVector* v;
 	btTransform transform = m_ghostObject->getWorldTransform ();
@@ -231,10 +221,10 @@ liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
 	if (this->object->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
 	{
 		/* v = v0+at = v0+tF/m */
+		s = delta / LI_MAX (0.1f, this->object->config.mass);
 		f = &this->object->config.character_force;
 		v = &this->object->config.velocity;
-		*v = limat_vector_add (this->object->config.velocity,
-			limat_vector_multiply (*f, delta / this->object->config.mass));
+		*v = limat_vector_add (this->object->config.velocity, limat_vector_multiply (*f, s));
 		/* x = vt */
 		dir += delta * btVector3 (v->x, v->y, v->z);
 		/* FIXME: Hardcoded decay. */

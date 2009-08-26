@@ -594,8 +594,8 @@ private_init (liengEngine* self)
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_NEW, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_FREE, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_REALIZE, lical_marshal_DATA_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_TRANSFORM, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_VISIBILITY, lical_marshal_DATA_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_LOAD, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_UNLOAD, lical_marshal_DATA_PTR_PTR))
 		return 0;

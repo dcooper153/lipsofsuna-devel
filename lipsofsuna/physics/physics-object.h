@@ -114,6 +114,10 @@ liphy_object_set_gravity (const liphyObject* self,
 int
 liphy_object_get_ground (const liphyObject* self);
 
+void
+liphy_object_get_inertia (liphyObject* self,
+                          limatVector* result);
+
 float
 liphy_object_get_mass (const liphyObject* self);
 

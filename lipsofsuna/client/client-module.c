@@ -674,15 +674,12 @@ private_init_engine (licliModule* self)
 	calls = lieng_engine_get_calls (self->engine);
 	calls->lieng_object_free = licli_object_free;
 	calls->lieng_object_update = licli_object_update;
-	calls->lieng_object_set_realized = licli_object_set_realized;
-	calls->lieng_object_set_velocity = licli_object_set_velocity;
 
 	/* Initialize callbacks. */
 	if (!lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_EVENT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_PACKET, lical_marshal_DATA_INT_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_SELECT, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_VISIBILITY, lical_marshal_DATA_PTR_INT))
+	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_TICK, lical_marshal_DATA_FLT))
 		return 0;
 	if (!licli_module_init_callbacks_binding (self) ||
 	    !licli_module_init_callbacks_misc (self) ||

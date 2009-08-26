@@ -50,7 +50,7 @@ liext_slot_new (liengObject* object,
 		return NULL;
 	self->module = LICLI_OBJECT (object)->module;
 
-	/* Allocate model. */
+	/* Allocate object. */
 	mdl = lieng_engine_find_model_by_code (object->engine, model);
 	if (mdl == NULL)
 	{
@@ -65,7 +65,6 @@ liext_slot_new (liengObject* object,
 	}
 	lieng_object_set_model (self->object, mdl);
 	liphy_object_set_collision_group (self->object->physics, LICLI_PHYSICS_GROUP_OBJECTS);
-	lieng_object_set_realized (self->object, 1);
 
 	/* Allocate constraint. */
 	self->constraint = lieng_constraint_new (object, node0, self->object, node1);
@@ -75,6 +74,10 @@ liext_slot_new (liengObject* object,
 		goto error;
 	}
 	lieng_engine_insert_constraint (self->object->engine, self->constraint);
+
+	/* Snap to anchor. */
+	lieng_constraint_update (self->constraint, 1.0f);
+	lieng_object_set_realized (self->object, 1);
 
 	return self;
 
@@ -91,23 +94,24 @@ error:
 void
 liext_slot_free (liextSlot* self)
 {
-	liengObject* tmp;
+	liextSlot tmp;
 
 	/* Avoid feedback loops that may lead to double removal of our object in
 	 * its own free callback by clearing the object pointer. */
-	tmp = self->object;
+	tmp = *self;
 	self->object = NULL;
+	self->constraint = NULL;
 
 	/* Free constraint. */
-	if (self->constraint != NULL)
+	if (tmp.constraint != NULL)
 	{
-		lieng_engine_remove_constraint (self->module->engine, self->constraint);
-		lieng_constraint_free (self->constraint);
+		lieng_engine_remove_constraint (self->module->engine, tmp.constraint);
+		lieng_constraint_free (tmp.constraint);
 	}
 
 	/* Free object. */
-	if (tmp != NULL)
-		lieng_object_set_realized (tmp, 0);
+	if (tmp.object != NULL)
+		lieng_object_set_realized (tmp.object, 0);
 
 	lisys_free (self);
 }

@@ -181,11 +181,12 @@ private_miscellaneous_tick (licliModule* module,
 	if (player != NULL && module->network != NULL)
 	{
 		/* Update player transform. */
-		licli_object_set_direction (player, &module->network->curr.direction);
 		lieng_object_get_transform (player, &transform);
+		transform.rotation = module->network->curr.direction;
+		lieng_object_set_transform (player, &transform);
 
 		/* Update camera center. */
-		licli_object_get_bounds (player, &bounds);
+		lieng_object_get_bounds (player, &bounds);
 		transform.position.y += bounds.max.y;
 		lieng_camera_set_center (module->camera, &transform);
 		lieng_camera_update (module->camera, secs);
@@ -194,7 +195,7 @@ private_miscellaneous_tick (licliModule* module,
 #ifndef LI_DISABLE_SOUND
 		direction = limat_quaternion_get_basis (transform.rotation, 2);
 		up = limat_quaternion_get_basis (transform.rotation, 1);
-		velocity = LICLI_OBJECT (player)->curr.velocity;
+		lieng_object_get_velocity (player, &velocity);
 		lisnd_system_set_listener (module->client->sound,
 			&transform.position, &velocity, &direction, &up);
 #endif

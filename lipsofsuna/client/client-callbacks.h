@@ -35,7 +35,6 @@ enum
 	LICLI_CALLBACK_PACKET, /* (data, type, packet) */
 	LICLI_CALLBACK_SELECT, /* (data, selection) */
 	LICLI_CALLBACK_TICK, /* (data, secs) */
-	LICLI_CALLBACK_VISIBILITY, /* (data, object) */
 };
 
 int licli_module_init_callbacks_binding (licliModule* self);

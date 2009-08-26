@@ -72,8 +72,6 @@ licli_object_new (licliModule* module,
 	if (data == NULL)
 		goto error;
 	data->module = module;
-	data->curr.transform = limat_transform_identity ();
-	data->prev.transform = limat_transform_identity ();
 
 	/* Extend engine object. */
 	lieng_object_set_userdata (self, LIENG_DATA_CLIENT, data);
@@ -152,6 +150,8 @@ licli_object_update (liengObject* self,
 	licliObject* data;
 	liSpeech* speech;
 #ifndef LI_DISABLE_SOUND
+	limatVector vector;
+	limatTransform transform;
 	lisndSource* source;
 #endif
 
@@ -161,19 +161,6 @@ licli_object_update (liengObject* self,
 	data = LICLI_OBJECT (self);
 	if (data == NULL)
 		return;
-
-	/* Interpolate position. */
-	data->prev.transform.position = limat_vector_lerp (
-		data->curr.transform.position, data->prev.transform.position,
-		0.5f * LI_OBJECT_POSITION_CORRECTION);
-
-	/* Interpolate orientation. */
-	data->prev.transform.rotation = limat_quaternion_get_nearest (
-		data->prev.transform.rotation, data->curr.transform.rotation);
-	data->prev.transform.rotation = limat_quaternion_nlerp (
-		data->curr.transform.rotation, data->prev.transform.rotation,
-		0.5f * LI_OBJECT_DIRECTION_CORRECTION);
-	lieng_default_calls.lieng_object_set_transform (self, &data->prev.transform);
 
 	/* Update speech. */
 	for (ptr = data->speech ; ptr != NULL ; ptr = next)
@@ -202,8 +189,10 @@ licli_object_update (liengObject* self,
 	{
 		next = ptr->next;
 		source = ptr->data;
-		lisnd_source_set_position (source, &data->curr.transform.position);
-		lisnd_source_set_velocity (source, &data->curr.velocity);
+		lieng_object_get_transform (self, &transform);
+		lieng_object_get_velocity (self, &vector);
+		lisnd_source_set_position (source, &transform.position);
+		lisnd_source_set_velocity (source, &vector);
 		if (!lisnd_source_update (source))
 		{
 			lisnd_source_free (source);
@@ -211,21 +200,6 @@ licli_object_update (liengObject* self,
 		}
 	}
 #endif
-}
-
-/**
- * \brief Sets the object to its target state.
- *
- * \param self Object.
- */
-void
-licli_object_warp (liengObject* self)
-{
-	licliObject* data = LICLI_OBJECT (self);
-
-	data->prev.transform = data->curr.transform;
-	data->prev.velocity = data->curr.velocity;
-	lieng_default_calls.lieng_object_set_transform (self, &data->prev.transform);
 }
 
 void
@@ -260,44 +234,6 @@ licli_object_set_animation (liengObject* self,
 	limdl_pose_set_channel_state (pose, chan, LIMDL_POSE_CHANNEL_STATE_PLAYING);
 }
 
-/**
- * \brief Gets the bounding box size of the object.
- *
- * \param self Object.
- * \param bounds Return location for the bounding box.
- */
-void
-licli_object_get_bounds (const liengObject* self,
-                         limatAabb*         bounds)
-{
-	lieng_object_get_bounds (self, bounds);
-}
-
-void
-licli_object_get_center (const liengObject* self,
-                         limatVector*       center)
-{
-	licliObject* data = LICLI_OBJECT (self);
-
-	*center = data->curr.transform.position;
-	/* FIXME: Take bounding box into account. */
-}
-
-/**
- * \brief Sets the target direction of the object.
- *
- * \param self Object.
- * \param direction Quaternion.
- */
-void
-licli_object_set_direction (liengObject*           self,
-                            const limatQuaternion* direction)
-{
-	licliObject* data = LICLI_OBJECT (self);
-
-	data->curr.transform.rotation = *direction;
-}
-
 void
 licli_object_set_effect (liengObject* self,
                          uint32_t     id,
@@ -305,6 +241,8 @@ licli_object_set_effect (liengObject* self,
 {
 #ifndef LI_DISABLE_SOUND
 	licliObject* data = LICLI_OBJECT (self);
+	limatTransform transform;
+	limatVector vector;
 	lisndSample* sample;
 	lisndSource* source;
 
@@ -319,8 +257,10 @@ licli_object_set_effect (liengObject* self,
 			{
 				if (lialg_list_prepend (&data->sounds, source))
 				{
-					lisnd_source_set_position (source, &data->curr.transform.position);
-					lisnd_source_set_velocity (source, &data->curr.velocity);
+					lieng_object_get_transform (self, &transform);
+					lieng_object_get_velocity (self, &vector);
+					lisnd_source_set_position (source, &transform.position);
+					lisnd_source_set_velocity (source, &vector);
 					if (flags & LI_EFFECT_REPEAT)
 						lisnd_source_set_looping (source, 1);
 					lisnd_source_set_playing (source, 1);
@@ -331,38 +271,6 @@ licli_object_set_effect (liengObject* self,
 		}
 	}
 #endif
-}
-
-int
-licli_object_set_realized (liengObject* self,
-                           int          value)
-{
-	if (value == lieng_object_get_realized (self))
-		return 1;
-	if (value)
-	{
-		/* Clear interpolation. */
-		if (LICLI_OBJECT (self) != NULL)
-			licli_object_warp (self);
-
-		/* Call base. */
-		if (!lieng_default_calls.lieng_object_set_realized (self, 1))
-			return 0;
-
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LICLI_CALLBACK_VISIBILITY, self, 1);
-	}
-	else
-	{
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LICLI_CALLBACK_VISIBILITY, self, 0);
-
-		/* Call base. */
-		if (!lieng_default_calls.lieng_object_set_realized (self, 0))
-			return 0;
-	}
-
-	return 1;
 }
 
 /**
@@ -383,61 +291,6 @@ licli_object_set_speech (liengObject* self,
 		return;
 	if (!lialg_list_prepend (&data->speech, speech))
 		li_speech_free (speech);
-}
-
-/**
- * \brief Sets the target transformation of the object.
- *
- * \param self Object.
- * \param value Transformation.
- * \return Nonzero on success.
- */
-int
-licli_object_set_transform (liengObject*          self,
-                            const limatTransform* value)
-{
-	licliObject* data = LICLI_OBJECT (self);
-
-	if (data == NULL)
-		lieng_default_calls.lieng_object_set_transform (self, value);
-	else
-		data->curr.transform = *value;
-
-	return 1;
-}
-
-void
-licli_object_get_transform_target (liengObject*    self,
-                                   limatTransform* value)
-{
-	licliObject* data = LICLI_OBJECT (self);
-
-	*value = data->curr.transform;
-}
-
-/**
- * \brief Sets the target velocity of the object.
- *
- * \param self Object.
- * \param value Velocity vector.
- * \return Nonzero on success.
- */
-int
-licli_object_set_velocity (liengObject*       self,
-                           const limatVector* value)
-{
-	licliObject* data = LICLI_OBJECT (self);
-
-	if (data != NULL)
-	{
-		data->curr.velocity = *value;
-		/* FIXME: No interpolation. */
-		data->prev.velocity = *value;
-	}
-	else
-		return lieng_default_calls.lieng_object_set_velocity (self, value);
-
-	return 1;
 }
 
 /** @} */

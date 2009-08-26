@@ -217,8 +217,9 @@ am__objects_20 = model/model.lo model/model-animation.lo \
 	model/model-light.lo model/model-material.lo \
 	model/model-node.lo model/model-pose.lo model/model-texture.lo
 am__objects_21 = network/network.lo
-am__objects_22 = physics/physics.lo physics/physics-object.lo \
-	physics/physics-private.lo physics/physics-shape.lo
+am__objects_22 = physics/physics.lo physics/physics-control.lo \
+	physics/physics-object.lo physics/physics-private.lo \
+	physics/physics-shape.lo
 am__objects_23 = paths/paths.lo
 am__objects_24 = script/script.lo script/script-class.lo \
 	script/script-data.lo script/script-util.lo \
@@ -855,6 +856,7 @@ phy_HEADERS = \
 
 physrc = \
 	physics/physics.cpp \
+	physics/physics-control.cpp \
 	physics/physics-object.cpp \
 	physics/physics-private.cpp \
 	physics/physics-private.h \
@@ -1628,6 +1630,8 @@ physics/$(DEPDIR)/$(am__dirstamp):
 	@: > physics/$(DEPDIR)/$(am__dirstamp)
 physics/physics.lo: physics/$(am__dirstamp) \
 	physics/$(DEPDIR)/$(am__dirstamp)
+physics/physics-control.lo: physics/$(am__dirstamp) \
+	physics/$(DEPDIR)/$(am__dirstamp)
 physics/physics-object.lo: physics/$(am__dirstamp) \
 	physics/$(DEPDIR)/$(am__dirstamp)
 physics/physics-private.lo: physics/$(am__dirstamp) \
@@ -2057,6 +2061,8 @@ mostlyclean-compile:
 	-rm -f particle/liblipsofsunaclient_la-particle-point.lo
 	-rm -f paths/paths.$(OBJEXT)
 	-rm -f paths/paths.lo
+	-rm -f physics/physics-control.$(OBJEXT)
+	-rm -f physics/physics-control.lo
 	-rm -f physics/physics-object.$(OBJEXT)
 	-rm -f physics/physics-object.lo
 	-rm -f physics/physics-private.$(OBJEXT)
@@ -2347,6 +2353,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@particle/$(DEPDIR)/liblipsofsunaclient_la-particle-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@particle/$(DEPDIR)/liblipsofsunaclient_la-particle-point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@paths/$(DEPDIR)/paths.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-control.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-private.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-shape.Plo@am__quote@

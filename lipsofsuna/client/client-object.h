@@ -50,11 +50,6 @@ struct _licliObject
 	lialgList* speech;
 	lialgList* sounds;
 	licliModule* module;
-	struct
-	{
-		limatTransform transform;
-		limatVector velocity;
-	} curr, prev;
 };
 
 liengObject*
@@ -70,9 +65,6 @@ licli_object_update (liengObject* self,
                      float        secs);
 
 void
-licli_object_warp (liengObject* self);
-
-void
 licli_object_set_animation (liengObject* self,
                             int          value,
                             int          channel,
@@ -80,20 +72,8 @@ licli_object_set_animation (liengObject* self,
                             float        priority);
 
 void
-licli_object_get_bounds (const liengObject* self,
-                         limatAabb*         bounds);
-
-void
-licli_object_get_center (const liengObject* self,
-                         limatVector*       center);
-
-void
 licli_object_set_controls (liengObject*         self,
                            const licliControls* controls);
-
-void
-licli_object_set_direction (liengObject*           self,
-                            const limatQuaternion* direction);
 
 void
 licli_object_set_effect (liengObject* self,
@@ -103,22 +83,6 @@ licli_object_set_effect (liengObject* self,
 void
 licli_object_set_speech (liengObject* self,
                          const char*  message);
-
-int
-licli_object_set_realized (liengObject* self,
-                           int          value);
-
-int
-licli_object_set_transform (liengObject*          self,
-                            const limatTransform* value);
-
-void
-licli_object_get_transform_target (liengObject*    self,
-                                   limatTransform* value);
-
-int
-licli_object_set_velocity (liengObject*       self,
-                           const limatVector* value);
 
 #endif
 
