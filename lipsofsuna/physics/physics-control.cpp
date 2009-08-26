@@ -33,16 +33,10 @@ liphyControl::liphyControl (liphyObject* object, btCollisionShape* shape) :
 	object (object),
 	contact_controller (NULL)
 {
-/*
-	self->contact_controller = new liphyContactController (self);
-	self->physics->dynamics->addAction (self->contact_controller);
-*/
 }
 
 liphyControl::~liphyControl ()
 {
-	if (this->contact_controller != NULL)
-		this->object->physics->dynamics->removeAction (this->contact_controller);
 }
 
 void
