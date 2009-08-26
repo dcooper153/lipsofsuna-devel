@@ -384,7 +384,8 @@ liphy_object_set_contact_call (liphyObject*     self,
                                liphyContactCall value)
 {
 	self->config.contact_call = value;
-	private_update_state (self);
+	if (self->control != NULL)
+		self->control->set_contacts (value != NULL);
 }
 
 /**
@@ -985,6 +986,8 @@ private_update_state (liphyObject* self)
 				assert (0);
 				break;
 		}
+		if (self->control != NULL)
+			self->control->set_contacts (self->config.contact_call != NULL);
 	}
 }
 

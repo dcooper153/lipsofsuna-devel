@@ -72,6 +72,21 @@ liphyControl::set_angular (const btVector3& value)
 }
 
 void
+liphyControl::set_collision_group (int mask)
+{
+}
+
+void
+liphyControl::set_collision_mask (int mask)
+{
+}
+
+void
+liphyControl::set_contacts (bool value)
+{
+}
+
+void
 liphyControl::get_gravity (btVector3* value)
 {
 	*value = btVector3 (0.0, 0.0, 0.0);
@@ -86,16 +101,6 @@ bool
 liphyControl::get_ground ()
 {
 	return false;
-}
-
-void
-liphyControl::set_collision_group (int mask)
-{
-}
-
-void
-liphyControl::set_collision_mask (int mask)
-{
 }
 
 void
@@ -160,6 +165,21 @@ liphyCharacterControl::set_collision_mask (int mask)
 	proxy = this->ghost.getBroadphaseHandle ();
 	if (proxy != NULL)
 		proxy->m_collisionFilterMask = mask;
+}
+
+void
+liphyCharacterControl::set_contacts (bool value)
+{
+	if (value)
+	{
+		this->ghost.setCollisionFlags (this->ghost.getCollisionFlags() |
+			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
+	else
+	{
+		this->ghost.setCollisionFlags (this->ghost.getCollisionFlags() &
+			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
 }
 
 bool
@@ -253,6 +273,21 @@ liphyRigidControl::set_collision_mask (int mask)
 }
 
 void
+liphyRigidControl::set_contacts (bool value)
+{
+	if (value)
+	{
+		this->body.setCollisionFlags (this->body.getCollisionFlags() |
+			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
+	else
+	{
+		this->body.setCollisionFlags (this->body.getCollisionFlags() &
+			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
+}
+
+void
 liphyRigidControl::get_gravity (btVector3* value)
 {
 	*value = this->body.getGravity ();
@@ -307,6 +342,21 @@ liphyStaticControl::transform (const btTransform& value)
 	this->object->physics->dynamics->addRigidBody (&this->body,
 		this->object->config.collision_group,
 		this->object->config.collision_mask);
+}
+
+void
+liphyStaticControl::set_contacts (bool value)
+{
+	if (value)
+	{
+		this->body.setCollisionFlags (this->body.getCollisionFlags() |
+			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
+	else
+	{
+		this->body.setCollisionFlags (this->body.getCollisionFlags() &
+			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
 }
 
 btCollisionObject*
@@ -381,6 +431,21 @@ liphyVehicleControl::set_collision_mask (int mask)
 	proxy = this->body.getBroadphaseHandle ();
 	if (proxy != NULL)
 		proxy->m_collisionFilterMask = mask;
+}
+
+void
+liphyVehicleControl::set_contacts (bool value)
+{
+	if (value)
+	{
+		this->body.setCollisionFlags (this->body.getCollisionFlags() |
+			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
+	else
+	{
+		this->body.setCollisionFlags (this->body.getCollisionFlags() &
+			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+	}
 }
 
 void

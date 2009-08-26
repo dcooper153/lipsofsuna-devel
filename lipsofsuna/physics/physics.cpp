@@ -22,9 +22,10 @@
  * @{
  */
 
-#include "physics.h"
-#include "physics-private.h"
 #include <system/lips-system.h>
+#include "physics.h"
+#include "physics-object.h"
+#include "physics-private.h"
 
 #define MAXPROXIES 1000000
 
@@ -52,6 +53,11 @@ protected:
 	int ignore_count;
 	liphyObject** ignore_array;
 };
+
+static bool
+private_contact_processed (btManifoldPoint& cp,
+                           void*            body0,
+                           void*            body1);
 
 static void
 private_internal_tick (btDynamicsWorld* dynamics,
@@ -91,6 +97,9 @@ liphy_physics_new ()
 		liphy_physics_free (self);
 		return NULL;
 	}
+
+	extern ContactProcessedCallback gContactProcessedCallback;
+	gContactProcessedCallback = private_contact_processed;
 
 	return self;
 }
@@ -273,6 +282,52 @@ liphy_physics_set_userdata (liphyPhysics* self,
 }
 
 /*****************************************************************************/
+
+static bool
+private_contact_processed (btManifoldPoint& point,
+                           void*            body0,
+                           void*            body1)
+{
+	limatVector momentum0;
+	limatVector momentum1;
+	liphyContact contact;
+	liphyObject* obj0;
+	liphyObject* obj1;
+
+	/* Get objects. */
+	obj0 = (liphyObject*)((btCollisionObject*) body0)->getUserPointer ();
+	obj1 = (liphyObject*)((btCollisionObject*) body1)->getUserPointer ();
+	if (obj0 == NULL || obj1 == NULL)
+		return false;
+
+	/* Get collision point. */
+	const btVector3& pt = point.getPositionWorldOnB ();
+	const btVector3& nm = point.m_normalWorldOnB;
+	contact.point = limat_vector_init (pt[0], pt[1], pt[2]);
+	contact.normal = limat_vector_init (nm[0], nm[1], nm[2]);
+
+	/* Calculate impulse. */
+	/* FIXME: This is sloppy. */
+	liphy_object_get_velocity (obj0, &momentum0);
+	liphy_object_get_velocity (obj1, &momentum1);
+	momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (obj0));
+	momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (obj1));
+	contact.impulse = limat_vector_get_length (limat_vector_subtract (momentum0, momentum1));
+
+	/* Call custom contact callbacks. */
+	if (obj0->config.contact_call != NULL)
+	{
+		contact.object = obj1;
+		obj0->config.contact_call (obj0, &contact);
+	}
+	if (obj1->config.contact_call != NULL)
+	{
+		contact.object = obj0;
+		obj1->config.contact_call (obj1, &contact);
+	}
+
+	return false;
+}
 
 static void
 private_internal_tick (btDynamicsWorld* dynamics,

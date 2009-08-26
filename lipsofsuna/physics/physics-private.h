@@ -143,11 +143,12 @@ public:
 	virtual void update ();
 	virtual void get_angular (btVector3* value);
 	virtual void set_angular (const btVector3& value);
+	virtual void set_collision_group (int mask);
+	virtual void set_collision_mask (int mask);
+	virtual void set_contacts (bool value);
 	virtual void get_gravity (btVector3* value);
 	virtual void set_gravity (const btVector3& value);
 	virtual bool get_ground ();
-	virtual void set_collision_group (int mask);
-	virtual void set_collision_mask (int mask);
 	virtual void set_mass (float value, const btVector3& inertia);
 	virtual btCollisionObject* get_object ();
 	virtual void set_velocity (const btVector3& value);
@@ -165,6 +166,7 @@ public:
 	virtual void transform (const btTransform& value);
 	virtual void set_collision_group (int mask);
 	virtual void set_collision_mask (int mask);
+	virtual void set_contacts (bool value);
 	virtual bool get_ground ();
 	virtual btCollisionObject* get_object ();
 public:
@@ -185,6 +187,7 @@ public:
 	virtual void set_angular (const btVector3& value);
 	virtual void set_collision_group (int mask);
 	virtual void set_collision_mask (int mask);
+	virtual void set_contacts (bool value);
 	virtual void get_gravity (btVector3* value);
 	virtual void set_gravity (const btVector3& value);
 	virtual void set_mass (float value, const btVector3& inertia);
@@ -201,6 +204,7 @@ public:
 	virtual ~liphyStaticControl ();
 public:
 	virtual void transform (const btTransform& value);
+	virtual void set_contacts (bool value);
 	virtual btCollisionObject* get_object ();
 public:
 	btRigidBody body;
@@ -216,6 +220,7 @@ public:
 	virtual void update ();
 	virtual void set_collision_group (int mask);
 	virtual void set_collision_mask (int mask);
+	virtual void set_contacts (bool value);
 	virtual void get_gravity (btVector3* value);
 	virtual void set_gravity (const btVector3& value);
 	virtual void set_mass (float value, const btVector3& inertia);
