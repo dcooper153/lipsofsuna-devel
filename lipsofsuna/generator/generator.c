@@ -715,7 +715,7 @@ private_init_sql (ligenGenerator* self)
 	char* path;
 
 	/* Format path. */
-	path = lipth_paths_get_data (self->paths, "server.db");
+	path = lipth_paths_get_sql (self->paths, "server.db");
 	if (path == NULL)
 		return 0;
 
@@ -733,7 +733,7 @@ private_init_sql (ligenGenerator* self)
 	livox_manager_set_sql (self->voxels, self->srvsql);
 
 	/* Format path. */
-	path = lipth_paths_get_data (self->paths, "generator.db");
+	path = lipth_paths_get_sql (self->paths, "generator.db");
 	if (path == NULL)
 		return 0;
 

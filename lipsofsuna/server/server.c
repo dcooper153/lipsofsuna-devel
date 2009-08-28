@@ -601,7 +601,7 @@ private_init_sql (lisrvServer* self)
 	sqlite3_stmt* statement;
 
 	/* Format path. */
-	path = lipth_paths_get_data (self->paths, "server.db");
+	path = lipth_paths_get_sql (self->paths, "server.db");
 	if (path == NULL)
 		return 0;
 

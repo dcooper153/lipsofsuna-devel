@@ -69,6 +69,10 @@ lipth_paths_get_sound (const lipthPaths* self,
                        const char*       name);
 
 char*
+lipth_paths_get_sql (const lipthPaths* self,
+                     const char*       name);
+
+char*
 lipth_paths_get_root ();
 
 #endif

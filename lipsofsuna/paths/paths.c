@@ -232,6 +232,20 @@ lipth_paths_get_sound (const lipthPaths* self,
 }
 
 /**
+ * \brief Gets the path to an SQL database.
+ *
+ * \param self Paths object.
+ * \param name File name.
+ * \return Full path or NULL.
+ */
+char*
+lipth_paths_get_sql (const lipthPaths* self,
+                     const char*       name)
+{
+	return lisys_path_concat (self->module_state, name, NULL);
+}
+
+/**
  * \brief Gets the game root directory.
  *
  * \return Path or NULL.

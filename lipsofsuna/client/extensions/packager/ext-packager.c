@@ -333,7 +333,7 @@ private_async_save (lithrAsyncCall* call)
 	    !private_insert_directory (self, "scripts", "client") ||
 #ifdef ENABLE_PACKAGE_SERVER
 	    !private_insert_directory (self, "scripts", "server") ||
-	    !private_insert_directory (self, "", "world")
+	    !private_insert_directory (self, "", "save")
 #endif
        )
 		goto error;
@@ -352,7 +352,7 @@ private_async_save (lithrAsyncCall* call)
 	    !private_write_directory (self, "data/shaders/") ||
 	    !private_write_directory (self, "data/sounds/") ||
 #ifdef ENABLE_PACKAGE_SERVER
-	    !private_write_directory (self, "data/world/")
+	    !private_write_directory (self, "data/save/")
 #endif
 	   )
 		goto error;
