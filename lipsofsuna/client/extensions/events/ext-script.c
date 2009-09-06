@@ -138,6 +138,7 @@ liextEventsScript (liscrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EVENTS, data);
 	liscr_class_insert_enum (self, "ACTION", LIEXT_EVENT_ACTION);
+	liscr_class_insert_enum (self, "ASSIGN", LIEXT_EVENT_ASSIGN);
 	liscr_class_insert_enum (self, "PACKET", LIEXT_EVENT_PACKET);
 	liscr_class_insert_enum (self, "SELECT", LIEXT_EVENT_SELECT);
 	liscr_class_insert_enum (self, "TICK", LIEXT_EVENT_TICK);

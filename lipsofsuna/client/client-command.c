@@ -85,34 +85,34 @@ licli_module_handle_packet (licliModule* self,
 	{
 		case LINET_SERVER_PACKET_ASSIGN:
 			private_assign (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_OBJECT_ANIMATION:
 			private_object_animation (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_OBJECT_CREATE:
 			private_object_create (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_OBJECT_DESTROY:
 			private_object_destroy (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_OBJECT_EFFECT:
 			private_object_effect (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_OBJECT_GRAPHIC:
 			private_object_graphic (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_OBJECT_SIMULATE:
 			private_object_simulate (self, reader);
-			return 0;
+			break;
 		case LINET_SERVER_PACKET_RESOURCES:
 			private_resources (self, reader);
-			return 0;
+			break;
 		case LIEXT_VOXEL_PACKET_ASSIGN:
 			private_voxel_assign (self, reader);
 			break;
 		case LIEXT_VOXEL_PACKET_DIFF:
 			private_voxel_diff (self, reader);
-			return 0;
+			break;
 	}
 
 	reader->pos = 1;

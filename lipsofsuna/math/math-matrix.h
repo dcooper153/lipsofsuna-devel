@@ -394,7 +394,7 @@ limat_matrix_get_singular (const limatMatrix self)
 	det = self.m[0] * (self.m[5] * self.m[10] - self.m[9] * self.m[6])
 	    - self.m[4] * (self.m[1] * self.m[10] - self.m[9] * self.m[2])
 	    + self.m[8] * (self.m[1] * self.m[ 6] - self.m[5] * self.m[2]);
-	if (-LI_MATH_EPSILON <= det && det <= LI_MATH_EPSILON)
+	if (-LIMAT_VECTOR_EPSILON <= det && det <= LIMAT_VECTOR_EPSILON)
 		return 1;
 	return 0;
 }

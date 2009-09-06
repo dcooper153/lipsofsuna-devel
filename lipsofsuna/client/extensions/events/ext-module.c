@@ -193,6 +193,9 @@ private_packet (liextModule* self,
 	if (data0 != NULL)
 		liscr_data_unref (data0, NULL);
 
+	if (type == LINET_SERVER_PACKET_ASSIGN)
+		liext_module_event (self, LIEXT_EVENT_ASSIGN, NULL);
+
 	return 1;
 }
 

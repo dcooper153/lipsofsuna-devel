@@ -26,7 +26,8 @@
 #define __MATH_VECTOR_H__
 
 #include <math.h>
-#include "math-generic.h"
+
+#define LIMAT_VECTOR_EPSILON 0.0001f
 
 /**
  * \brief A three-dimensional vector type.
@@ -150,7 +151,7 @@ limat_vector_normalize (limatVector self)
 	limatVector result;
 	float len = limat_vector_get_length (self);
 
-	if (len < LI_MATH_EPSILON)
+	if (len < LIMAT_VECTOR_EPSILON)
 	{
 		result.x = 0.0f;
 		result.y = 0.0f;
