@@ -166,6 +166,20 @@ void
 livox_manager_set_sql (livoxManager* self,
                        liarcSql*     sql);
 
+void
+livox_manager_get_voxel (livoxManager* self,
+                         int           x,
+                         int           y,
+                         int           z,
+                         livoxVoxel*   value);
+
+int
+livox_manager_set_voxel (livoxManager*     self,
+                         int               x,
+                         int               y,
+                         int               z,
+                         const livoxVoxel* value);
+
 #endif
 
 /** @} */

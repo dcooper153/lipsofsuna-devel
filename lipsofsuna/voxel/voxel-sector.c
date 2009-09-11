@@ -191,7 +191,7 @@ livox_sector_erase_sphere (livoxSector*       self,
  */
 void
 livox_sector_fill (livoxSector* self,
-                   livoxVoxel   terrain)
+                   uint8_t      terrain)
 {
 	int x;
 	int y;
@@ -222,7 +222,7 @@ livox_sector_fill (livoxSector* self,
 void
 livox_sector_fill_aabb (livoxSector*     self,
                         const limatAabb* box,
-                        livoxVoxel       terrain)
+                        uint8_t          terrain)
 {
 	int i;
 	int x;
@@ -265,7 +265,7 @@ void
 livox_sector_fill_sphere (livoxSector*       self,
                           const limatVector* center,
                           float              radius,
-                          livoxVoxel         terrain)
+                          uint8_t            terrain)
 {
 	int i;
 	int x;
@@ -358,12 +358,14 @@ livox_sector_read (livoxSector* self,
 		if (!livox_block_read (block, self->manager, reader))
 		{
 			sqlite3_finalize (statement);
+			liarc_reader_free (reader);
 			return 0;
 		}
 	}
 	sqlite3_finalize (statement);
 
 	/* Force rebuild. */
+	liarc_reader_free (reader);
 	self->dirty = 1;
 
 	return 1;
@@ -543,8 +545,7 @@ livox_sector_get_empty (const livoxSector* self)
 
 	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
 	{
-		if (self->blocks[i].type != LIVOX_BLOCK_TYPE_FULL ||
-		    self->blocks[i].full.terrain != 0)
+		if (!livox_block_get_empty (self->blocks + i))
 			return 0;
 	}
 
@@ -592,7 +593,7 @@ livox_sector_get_origin (const livoxSector* self,
  * \param z Offset of the voxel within the sector.
  * \return Terrain type or zero.
  */
-livoxVoxel
+livoxVoxel*
 livox_sector_get_voxel (livoxSector* sector,
                         int          x,
                         int          y,
@@ -606,11 +607,10 @@ livox_sector_get_voxel (livoxSector* sector,
 	int ty = y % LIVOX_TILES_PER_LINE;
 	int tz = z % LIVOX_TILES_PER_LINE;
 
-	if (x < 0 || y < 0 || z < 0 ||
+	assert (!(x < 0 || y < 0 || z < 0 ||
 	    bx < 0 || bx >= LIVOX_BLOCKS_PER_LINE ||
 	    by < 0 || by >= LIVOX_BLOCKS_PER_LINE ||
-	    bz < 0 || bz >= LIVOX_BLOCKS_PER_LINE)
-		return 0;
+	    bz < 0 || bz >= LIVOX_BLOCKS_PER_LINE));
 	block = sector->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 
 	return livox_block_get_voxel (block, tx, ty, tz);
@@ -651,7 +651,7 @@ livox_sector_set_voxel (livoxSector* self,
 		return 0;
 	}
 	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
-	ret = livox_block_set_voxel (block, tx, ty, tz, terrain);
+	ret = livox_block_set_voxel (block, tx, ty, tz, &terrain);
 	if (ret)
 	{
 		block->stamp++;

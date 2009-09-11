@@ -174,10 +174,10 @@ Voxel_erase_voxel (lua_State* lua)
 static int
 Voxel_fill_box (lua_State* lua)
 {
+	int terrain;
 	liextModule* module;
 	liscrData* min;
 	liscrData* max;
-	livoxVoxel terrain;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	min = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
@@ -228,10 +228,10 @@ Voxel_fill_point (lua_State* lua)
 static int
 Voxel_fill_sphere (lua_State* lua)
 {
+	int terrain;
 	float radius;
 	liextModule* module;
 	liscrData* center;
-	livoxVoxel terrain;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);

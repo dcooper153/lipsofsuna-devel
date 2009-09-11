@@ -79,14 +79,6 @@ if test "$want_graphics" -a "$have_sdl" = no; then
 	AC_MSG_ERROR([cannot find SDL]);
 fi
 
-dnl Check for OpenGL.
-AX_CHECK_GL
-OPENGL_CFLAGS="$GL_CFLAGS"
-OPENGL_LIBS="$GL_LIBS"
-if test "$want_graphics" = yes -a "x$no_gl" = xyes; then
-	AC_MSG_ERROR([cannot find OpenGL]);
-fi
-
 dnl Compiler flags.
 if test "$want_debug" = yes; then
 	LIPS_CFLAGS="$LIPS_CFLAGS -g -Wall -DLI_ENABLE_ERROR"
@@ -126,7 +118,7 @@ if test "x$want_builtin_glew" = xyes; then
 	AC_CONFIG_SUBDIRS(dep/glew)
 else
 	GLEW_CFLAGS=""
-	GLEW_LIBS="-LGLEW"
+	GLEW_LIBS="-lGLEW"
 fi
 
 dnl Grapple dependency.

@@ -43,13 +43,13 @@ struct _ligenStroke
 
 struct _ligenGenerator
 {
+	int fill;
 	lialgU32dic* brushes;
 	liarcSql* gensql;
 	liarcSql* srvsql;
 	lipthPaths* paths;
 	liphyPhysics* physics;
 	livoxManager* voxels;
-	livoxVoxel fill;
 	struct
 	{
 		int count;

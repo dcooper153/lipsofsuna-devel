@@ -36,12 +36,12 @@ struct _livoxBuilderNormal
 	livoxBuilderNormal* next;
 };
 
-typedef struct _livoxVertex livoxVertex;
-struct _livoxVertex
+typedef struct _livoxBuilderVertex livoxBuilderVertex;
+struct _livoxBuilderVertex
 {
 	float texcoord[2];
 	float normal[3];
-	uint16_t coord[3];
+	float coord[3];
 };
 
 typedef struct _livoxFaces livoxFaces;
@@ -51,7 +51,7 @@ struct _livoxFaces
 	struct
 	{
 		int count;
-		livoxVertex* array;
+		livoxBuilderVertex* array;
 	} vertices;
 };
 

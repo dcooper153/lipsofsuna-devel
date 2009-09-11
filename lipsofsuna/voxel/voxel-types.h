@@ -40,13 +40,16 @@
 #define LIVOX_TILES_PER_PLANE (LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE)
 #define LIVOX_TILES_PER_BLOCK (LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE)
 
-enum
+typedef struct _livoxVoxel livoxVoxel;
+struct _livoxVoxel
 {
-	LIVOX_BLOCK_TYPE_FULL,
-	LIVOX_BLOCK_TYPE_TILES
+	uint8_t terrain;
+	int8_t displacex;
+	int8_t displacey;
+	int8_t displacez;
 };
 
-typedef uint16_t livoxVoxel;
+//typedef uint16_t livoxVoxel;
 typedef struct _livoxManager livoxManager;
 typedef struct _livoxMaterial livoxMaterial;
 typedef struct _livoxSector livoxSector;

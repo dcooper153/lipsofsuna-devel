@@ -260,8 +260,8 @@ ligen_generator_main (ligenGenerator* self)
 	ligenStroke stroke;
 
 	/* FIXME: This should be configurable. */
-	brush = lialg_u32dic_find (self->brushes, 0);
-	if (brush != NULL);
+	brush = lialg_u32dic_find (self->brushes, 3);
+	if (brush != NULL)
 	{
 		stroke.pos[0] = 8160 - brush->size[0] / 2;
 		stroke.pos[1] = 8160 - brush->size[1] / 2;
@@ -281,7 +281,6 @@ ligen_generator_main (ligenGenerator* self)
 		if (!ligen_generator_step (self))
 			break;
 	}
-	printf ("Strokes: %d\n", i);
 
 	/* Generate geometry. */
 	if (!ligen_generator_rebuild_scene (self) ||
@@ -587,9 +586,9 @@ ligen_generator_set_fill (ligenGenerator* self,
                           int             fill)
 {
 	if (fill < 0)
-		self->fill = livox_voxel_init (0x00, 0);
+		self->fill = 0;
 	else
-		self->fill = livox_voxel_init (0xFF, fill);
+		self->fill = fill;
 }
 
 /*****************************************************************************/
@@ -597,6 +596,7 @@ ligen_generator_set_fill (ligenGenerator* self,
 static int
 private_init_brushes (ligenGenerator* self)
 {
+	int i;
 	int id;
 	int col;
 	int ret;
@@ -679,18 +679,16 @@ private_init_brushes (ligenGenerator* self)
 		/* Read voxels column. */
 		bytes = sqlite3_column_blob (statement, col);
 		size0 = sqlite3_column_bytes (statement, col);
-		size1 = size[0] * size[1] * size[2] * sizeof (livoxVoxel);
+		size1 = size[0] * size[1] * size[2] * 4;
 		if (size0 == size1)
 		{
-			memcpy (brush->voxels.array, bytes, size1);
-#if LI_BYTE_ORDER != LI_BIG_ENDIAN
-			for (size0 = 0 ; size0 < brush->voxels.count ; size0++)
+			for (i = 0 ; i < size[0] * size[1] * size[2] ; i++)
 			{
-				brush->voxels.array[size0] =
-					(((brush->voxels.array[size0] & 0x00FF) << 8) |
-					 ((brush->voxels.array[size0] & 0xFF00) >> 8));
+				brush->voxels.array[i].terrain = ((uint8_t*) bytes)[4 * i + 0];
+				brush->voxels.array[i].displacex = ((uint8_t*) bytes)[4 * i + 1];
+				brush->voxels.array[i].displacey = ((uint8_t*) bytes)[4 * i + 2];
+				brush->voxels.array[i].displacez = ((uint8_t*) bytes)[4 * i + 3];
 			}
-#endif
 		}
 	}
 	sqlite3_finalize (statement);

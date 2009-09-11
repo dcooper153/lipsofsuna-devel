@@ -84,7 +84,7 @@ livox_block_set_dirty (livoxBlock* self,
                        int         value);
 
 int
-livox_block_get_empty (livoxBlock* self);
+livox_block_get_empty (const livoxBlock* self);
 
 #ifndef LIVOX_DISABLE_GRAPHICS
 lirndObject*
@@ -94,7 +94,7 @@ livox_block_get_render (livoxBlock* self);
 int
 livox_block_get_stamp (const livoxBlock* self);
 
-livoxVoxel
+livoxVoxel*
 livox_block_get_voxel (livoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
@@ -105,7 +105,7 @@ livox_block_set_voxel (livoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z,
-                       livoxVoxel  terrain);
+                       livoxVoxel* voxel);
 
 #endif
 

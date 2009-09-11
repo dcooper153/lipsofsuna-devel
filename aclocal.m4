@@ -1299,8 +1299,6 @@ AC_SUBST([am__untar])
 ]) # _AM_PROG_TAR
 
 m4_include([msc/m4/acx_pthread.m4])
-m4_include([msc/m4/ax_check_gl.m4])
-m4_include([msc/m4/ax_lang_compiler_ms.m4])
 m4_include([msc/m4/libtool.m4])
 m4_include([msc/m4/ltoptions.m4])
 m4_include([msc/m4/ltsugar.m4])

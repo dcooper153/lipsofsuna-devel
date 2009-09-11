@@ -313,7 +313,10 @@ ligen_brush_write (ligenBrush* self,
 		return 0;
 	for (i = 0 ; i < self->voxels.count ; i++)
 	{
-		if (!liarc_writer_append_uint16 (writer, self->voxels.array[i]))
+		if (!liarc_writer_append_uint8 (writer, self->voxels.array[i].terrain) ||
+		    !liarc_writer_append_uint8 (writer, self->voxels.array[i].displacex) ||
+		    !liarc_writer_append_uint8 (writer, self->voxels.array[i].displacey) ||
+		    !liarc_writer_append_uint8 (writer, self->voxels.array[i].displacez))
 		{
 			liarc_writer_free (writer);
 			return 0;

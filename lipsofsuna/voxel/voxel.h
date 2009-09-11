@@ -28,21 +28,9 @@
 #include <math/lips-math.h>
 #include "voxel-types.h"
 
-livoxVoxel
-livox_voxel_init (int shape,
-                  int type);
-
-int
-livox_voxel_triangulate (livoxVoxel   self,
-                         livoxVoxel*  neighbors,
-                         limatVector* coords,
-                         limatVector* normals);
-
-livoxVoxel
-livox_voxel_validate (livoxVoxel self);
-
-int
-livox_voxel_get_shape (livoxVoxel self);
+void
+livox_voxel_init (livoxVoxel* self,
+                  int         type);
 
 int
 livox_voxel_get_type (livoxVoxel self);

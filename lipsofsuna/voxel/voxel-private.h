@@ -28,17 +28,6 @@
 typedef struct _livoxBlockFull livoxBlockFull;
 typedef struct _livoxBlockTiles livoxBlockTiles;
 
-struct _livoxBlockFull
-{
-	livoxVoxel terrain;
-};
-
-struct _livoxBlockTiles
-{
-	uint8_t flags;
-	livoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
-};
-
 struct _livoxBlock
 {
 	uint8_t type;
@@ -49,11 +38,7 @@ struct _livoxBlock
 #ifndef LIVOX_DISABLE_GRAPHICS
 	lirndObject* render;
 #endif
-	union
-	{
-		livoxBlockFull full;
-		livoxBlockTiles* tiles;
-	};
+	livoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
 };
 
 struct _livoxSector
