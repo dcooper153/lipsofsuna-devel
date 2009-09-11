@@ -397,7 +397,7 @@ html-local:
 	mkdir -p html/lua
 	mkdir -p tmp
 	doxygen "$(srcdir)/Doxyfile"
-	ruby "$(srcdir)/makedoc.rb" "$(srcdir)/../src" "$(srcdir)/../ext" tmp
+	ruby "$(srcdir)/makedoc.rb" "$(srcdir)/../lipsofsuna" tmp
 	luadoc --nofiles -d html/lua tmp
 	rm -Rf tmp
 	cp -R html "lipsofsuna-docs-$(VERSION)"

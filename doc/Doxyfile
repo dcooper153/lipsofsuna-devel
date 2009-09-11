@@ -1,7 +1,7 @@
 PROJECT_NAME           = "Lips of Suna"
 PROJECT_NUMBER         = "0.1"
 OUTPUT_DIRECTORY       = html/
-INPUT                  = ../src ../ext
+INPUT                  = ../lipsofsuna
 RECURSIVE              = YES
 EXTRACT_ALL            = YES
 EXTRACT_STATIC         = NO
