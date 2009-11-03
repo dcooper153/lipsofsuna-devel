@@ -39,6 +39,7 @@ typedef struct _lirndBuffer lirndBuffer;
 typedef struct _lirndContext lirndContext;
 typedef enum _lirndFlags lirndFlags;
 typedef struct _lirndFormat lirndFormat;
+typedef struct _lirndGroup lirndGroup;
 typedef struct _lirndLight lirndLight;
 typedef struct _lirndLighting lirndLighting;
 typedef struct _lirndMaterial lirndMaterial;

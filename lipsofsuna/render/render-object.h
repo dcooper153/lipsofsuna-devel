@@ -41,13 +41,12 @@ struct _lirndObject
 	void* userdata;
 	limatAabb aabb;
 	limatTransform transform;
+#ifndef NDEBUG
+	limdlPose* debug_pose;
+#endif
 	lirndScene* scene;
 	lirndModel* model;
-	struct
-	{
-		int count;
-		lirndBuffer* array;
-	} buffers;
+	lirndModel* instance;
 	struct
 	{
 		int width;
@@ -63,11 +62,6 @@ struct _lirndObject
 	} lights;
 	struct
 	{
-		int count;
-		lirndMaterial** array;
-	} materials;
-	struct
-	{
 		limatVector center;
 		limatMatrix matrix;
 	} orientation;
@@ -76,17 +70,6 @@ struct _lirndObject
 lirndObject*
 lirnd_object_new (lirndScene* scene,
                   int         id);
-
-lirndObject*
-lirnd_object_new_from_data (lirndScene*      scene,
-                            int              id,
-                            const limatAabb* aabb,
-                            lirndBuffer*     buffers,
-                            int              buffercount,
-                            lirndMaterial**  materials,
-                            int              materialcount,
-                            lirndLight**     lights,
-                            int              lightcount);
 
 void
 lirnd_object_free (lirndObject* self);

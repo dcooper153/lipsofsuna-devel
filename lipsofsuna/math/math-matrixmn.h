@@ -48,7 +48,7 @@ limat_matrixmn_new (int rows,
 	self->data = (float*) lisys_calloc (rows * cols, sizeof (float));
 	if (self->data == NULL)
 	{
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 	self->rows = rows;
@@ -60,8 +60,8 @@ limat_matrixmn_new (int rows,
 static inline void
 limat_matrixmn_free (limatMatrixMN* self)
 {
-	free (self->data);
-	free (self);
+	lisys_free (self->data);
+	lisys_free (self);
 }
 
 static inline float

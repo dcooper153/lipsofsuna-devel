@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I msc/m4
+ACLOCAL_AMFLAGS = -I m4
 INCLUDES = -I$(srcdir)
 AM_CFLAGS = -g -Wall
 

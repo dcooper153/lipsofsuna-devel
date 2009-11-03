@@ -218,10 +218,11 @@ liext_brushes_save (liextBrushes* self)
 }
 
 void
-liext_brushes_reset (liextBrushes* self)
+liext_brushes_reset (liextBrushes* self,
+                     liarcReader*  reader)
 {
-	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview),
-		self->module->module->voxels);
+	reader->pos = 1;
+	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview), reader);
 	private_populate (self);
 }
 
@@ -255,10 +256,6 @@ private_init (liextBrushes* self,
 		&self->widgets.button_paint[0], liwdg_button_new (manager),
 		&self->widgets.button_paint[1], liwdg_button_new (manager),
 		&self->widgets.button_paint[2], liwdg_button_new (manager),
-		&self->widgets.button_paint[3], liwdg_button_new (manager),
-		&self->widgets.button_paint[4], liwdg_button_new (manager),
-		&self->widgets.button_paint[5], liwdg_button_new (manager),
-		&self->widgets.button_paint[6], liwdg_button_new (manager),
 		&self->widgets.button_remove, liwdg_button_new (manager),
 		&self->widgets.entry_name, liwdg_entry_new (manager),
 		&self->widgets.entry_objtype, liwdg_entry_new (manager),
@@ -286,30 +283,18 @@ private_init (liextBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 
 	/* Paint. */
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Color voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Erase point");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Erase voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Erase sphere");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[4]), "Paint point");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[5]), "Paint voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[6]), "Paint sphere");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Insert voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Erase voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace voxel");
 	liwdg_scroll_set_range (LIWDG_SCROLL (self->widgets.scroll_radius), 0.0f, 10.0f);
 	liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_radius), 2.0f);
 	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[3], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[4], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[5], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[6], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 1, self->widgets.button_paint[0]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 2, self->widgets.button_paint[1]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 3, self->widgets.button_paint[2]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 4, self->widgets.button_paint[3]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 5, self->widgets.button_paint[4]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 6, self->widgets.button_paint[5]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 7, self->widgets.button_paint[6]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 8, self->widgets.scroll_radius);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 9, self->widgets.spin_paint);
 
@@ -563,7 +548,7 @@ private_paint_select (liextBrushes* self,
 {
 	int i;
 
-	for (i = 0 ; i < 7 ; i++)
+	for (i = 0 ; i < sizeof (self->widgets.button_paint) / sizeof (liwdgWidget*) ; i++)
 	{
 		if (widget == self->widgets.button_paint[i])
 		{
@@ -581,6 +566,7 @@ private_paint_terrain (liextBrushes* self,
                        int           y)
 {
 	liextBrushesTreerow* data;
+	limatAabb aabb;
 	liwdgTreerow* row;
 	lirndSelection result;
 
@@ -596,7 +582,33 @@ private_paint_terrain (liextBrushes* self,
 	/* Pick from the scene. */
 	/* TODO: Select the far intersection point with the box if no hit. */
 	if (!liwdg_render_pick (LIWDG_RENDER (self->widgets.preview), &result, x, y))
-		return 0;
+	{
+/*		limatPlane planes[6];
+		limatVector point[3];
+		const limatVector normals[6] =
+		{
+			{ -1.0f,  0.0f,  0.0f },
+			{  1.0f,  0.0f,  0.0f },
+			{  0.0f, -1.0f,  0.0f },
+			{  0.0f,  1.0f,  0.0f },
+			{  0.0f,  0.0f, -1.0f },
+			{  0.0f,  0.0f,  1.0f }
+		};*/
+		liext_preview_get_bounds (LIEXT_PREVIEW (self->widgets.preview), &aabb);
+		result.point = limat_vector_add (aabb.min, aabb.max);
+		result.point = limat_vector_multiply (result.point, 0.5f);
+		printf ("%f,%f,%f\n", result.point.x, result.point.y, result.point.z);
+/*		limat_plane_init_from_point (planes + 0, aabb.min, normals + 0);
+		limat_plane_init_from_point (planes + 1, aabb.min, normals + 1);
+		limat_plane_init_from_point (planes + 2, aabb.min, normals + 2);
+		limat_plane_init_from_point (planes + 3, aabb.max, normals + 3);
+		limat_plane_init_from_point (planes + 4, aabb.max, normals + 4);
+		limat_plane_init_from_point (planes + 5, aabb.max, normals + 5);
+		if (limat_plane_intersects_line (planes + 0, point + 0, point + 1, point + 2))
+		{
+		}
+		return 0;*/
+	}
 
 	/* Paint terrain. */
 	liext_preview_paint_terrain (LIEXT_PREVIEW (self->widgets.preview), &result.point, self->paint,
@@ -1285,8 +1297,11 @@ private_rebuild_brush (liextBrushes* self)
 	x = (int)(round (transform.position.x / LIVOX_TILE_WIDTH));
 	y = (int)(round (transform.position.y / LIVOX_TILE_WIDTH));
 	z = (int)(round (transform.position.z / LIVOX_TILE_WIDTH));
+#warning Brush rebuilding is broken.
+#if 0
 	livox_manager_copy_voxels (self->module->module->voxels, x, y, z,
 		brush->size[0], brush->size[1], brush->size[2], brush->voxels.array);
+#endif
 
 	/* Rebuild preview. */
 	private_rebuild_preview (self);

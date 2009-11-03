@@ -29,20 +29,17 @@
 
 #include "ext-module.h"
 
-typedef struct _liextBlockKey liextBlockKey;
 struct _liextBlockKey
 {
 	int sector;
 	int block;
 };
 
-typedef struct _liextBlockValue liextBlockValue;
-struct _liextBlockValue
+struct _liextListenerBlock
 {
 	int stamp;
 };
 
-typedef struct _liextListener liextListener;
 struct _liextListener
 {
 	int moved;

@@ -109,6 +109,8 @@ libspawner_ser_la_SOURCES = \
 libvoxel_ser_la_LDFLAGS = -module -avoid-version -no-undefined
 libvoxel_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
 libvoxel_ser_la_SOURCES = \
+	voxel/ext-block.c \
+	voxel/ext-block.h \
 	voxel/ext-listener.c \
 	voxel/ext-listener.h \
 	voxel/ext-module.c \

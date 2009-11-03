@@ -34,10 +34,8 @@ void
 livox_voxel_init (livoxVoxel* self,
                   int         type)
 {
-	self->terrain = type;
-	self->displacex = 0;
-	self->displacey = 0;
-	self->displacez = 0;
+	self->type = type;
+	self->damage = 0;
 }
 
 /**
@@ -49,7 +47,7 @@ livox_voxel_init (livoxVoxel* self,
 int
 livox_voxel_get_type (livoxVoxel self)
 {
-	return self.terrain;
+	return self.type;
 }
 
 /** @} */

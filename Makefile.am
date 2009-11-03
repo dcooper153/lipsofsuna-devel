@@ -1,3 +1,3 @@
 SUBDIRS = dep data doc lipsofsuna
 EXTRA_DIST = COPYING.LESSER
-ACLOCAL_AMFLAGS = -I msc/m4
+ACLOCAL_AMFLAGS = -I m4

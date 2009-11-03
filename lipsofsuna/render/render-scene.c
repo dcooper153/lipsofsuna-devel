@@ -25,6 +25,7 @@
 #include <system/lips-system.h>
 #include "render.h"
 #include "render-draw.h"
+#include "render-group.h"
 
 #define LIRND_LIGHT_MAXIMUM_RATING 100.0f
 #define LIRND_PARTICLE_MAXIMUM_COUNT 1000
@@ -65,6 +66,9 @@ lirnd_scene_new (lirndRender* render)
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
 		goto error;
+	self->groups = lialg_ptrdic_new ();
+	if (self->groups == NULL)
+		goto error;
 
 	/* Initialize subsystems. */
 	if (!private_init_lights (self) ||
@@ -94,6 +98,11 @@ lirnd_scene_free (lirndScene* self)
 		lipar_manager_free (self->particles);
 
 	/* Free objects. */
+	if (self->groups != NULL)
+	{
+		assert (self->groups->size == 0);
+		lialg_ptrdic_free (self->groups);
+	}
 	if (self->objects != NULL)
 	{
 		assert (self->objects->size == 0);
@@ -281,6 +290,7 @@ lirnd_scene_render (lirndScene*   self,
 	glDisable (GL_BLEND);
 	glDepthMask (GL_FALSE);
 	private_particle_render (self);
+	private_render (self, &context, lirnd_draw_debug, NULL);
 	glDepthMask (GL_TRUE);
 
 	/* Restore state. */
@@ -459,13 +469,42 @@ private_render (lirndScene*   self,
                 lirndCallback call,
                 void*         data)
 {
-	lialgU32dicIter iter;
-	lirndObject* object;
+	lialgU32dicIter iter0;
+	lialgPtrdicIter iter1;
+	limatAabb aabb;
+	lirndGroup* group;
+	lirndObject tmpobj;
+	lirndObject* rndobj;
+	lirndGroupObject* grpobj;
 
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LI_FOREACH_U32DIC (iter0, self->objects)
 	{
-		object = iter.value;
-		call (context, object, data);
+		rndobj = iter0.value;
+		if (!lirnd_object_get_realized (rndobj))
+			continue;
+		lirnd_object_get_bounds (rndobj, &aabb);
+		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
+			continue;
+		call (context, rndobj, data);
+	}
+	LI_FOREACH_PTRDIC (iter1, self->groups)
+	{
+		group = iter1.value;
+		if (!lirnd_group_get_realized (group))
+			continue;
+		lirnd_group_get_bounds (group, &aabb);
+		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
+			continue;
+		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
+		{
+			memset (&tmpobj, 0, sizeof (lirndObject));
+			tmpobj.transform = grpobj->transform;
+			tmpobj.scene = self;
+			tmpobj.model = grpobj->model;
+			tmpobj.orientation.center = grpobj->transform.position;
+			tmpobj.orientation.matrix = limat_convert_transform_to_matrix (grpobj->transform);
+			call (context, &tmpobj, data);
+		}
 	}
 }
 

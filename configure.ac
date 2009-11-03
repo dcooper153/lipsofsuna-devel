@@ -2,28 +2,17 @@ dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
 AC_INIT([Lips of Suna], [0.0.2], [http://lipsofsuna.org], [lipsofsuna])
-AC_CONFIG_AUX_DIR([msc])
-AC_CONFIG_MACRO_DIR([msc/m4])
+AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE([subdir-objects tar-ustar])
+AM_INIT_AUTOMAKE([silent-rules subdir-objects tar-ustar])
 AM_CONFIG_HEADER([lipsofsuna/config.h])
 AM_MAINTAINER_MODE
-
-AC_ISC_POSIX
-AC_PROG_CC
-AC_PROG_CXX
-AM_PROG_LIBTOOL
-AM_PROG_CC_STDC
-PKG_PROG_PKG_CONFIG
-AC_HEADER_STDC
-AC_PATH_X
-
-dnl Pthread dependency.
-ACX_PTHREAD
+AM_SILENT_RULES([yes])
 
 dnl Arguments.
 AC_ARG_ENABLE([easy], AC_HELP_STRING([--enable-easy], [Compile a relative binary using built-in dependencies]), [want_easy=yes], [want_easy=no])
 AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with debugging symbols]), [want_debug=no], [want_debug=yes])
+AC_ARG_ENABLE([optimization], AC_HELP_STRING([--disable-optimization], [Compile with optimization enabled]), [want_optimization=no], [want_optimization=yes])
 AC_ARG_ENABLE([client], AC_HELP_STRING([--disable-client], [Do not compile the client]), [want_client=no], [want_client=yes])
 AC_ARG_ENABLE([generator], AC_HELP_STRING([--disable-generator], [Do not compile the generator]), [want_generator=no], [want_generator=yes])
 AC_ARG_ENABLE([import], AC_HELP_STRING([--disable-import], [Do not compile the data file importer]), [want_import=no], [want_import=yes])
@@ -42,16 +31,31 @@ AC_ARG_ENABLE([builtin-squish], AC_HELP_STRING([--enable-builtin-squish], [Compi
 AC_ARG_ENABLE([builtin-zlib], AC_HELP_STRING([--enable-builtin-sqlite], [Compile built-in Zlib]), [want_builtin_zlib=yes], [])
 AC_ARG_ENABLE([malloc-debug], AC_HELP_STRING([--enable-malloc-debug], [Compile with logging memory management functions]), [want_mallocdebug=yes], [want_mallocdebug=no])
 
-if test "$want_easy" = yes; then
-	want_relative=yes
-	want_builtin_all=yes
-	prefix="$PWD/build"
+dnl Compiler flags.
+if test "x$CFLAGS" = "x"; then
+	if test "$want_debug" = yes; then
+		CFLAGS="$CFLAGS -g"
+	else
+		CFLAGS="$CFLAGS -DNDEBUG"
+	fi
+	if test "$want_optimization" = yes; then
+		CFLAGS="$CFLAGS -O3"
+	fi
 fi
-if test "$want_client" = yes -o "$want_viewer" = yes; then
-	want_graphics=yes
-else
-	want_graphics=no
+if test "$want_mallocdebug" = yes; then
+	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
 fi
+
+dnl Tools, headers, libraries.
+AC_ISC_POSIX
+AC_PROG_CC
+AC_PROG_CXX
+AM_PROG_LIBTOOL
+AM_PROG_CC_STDC
+PKG_PROG_PKG_CONFIG
+AC_HEADER_STDC
+AC_PATH_X
+ACX_PTHREAD
 AC_CHECK_HEADERS([dlfcn.h fcntl.h inttypes.h netdb.h poll.h stdint.h unistd.h])
 AC_CHECK_HEADERS([time.h sys/time.h])
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h])
@@ -65,28 +69,29 @@ AC_CHECK_HEADERS([rpcndr.h], [], [],
 #include <windows.h>
 #endif
 ])
-
 AC_CHECK_LIB(dl, dlsym)
 AC_CHECK_LIB(m, main)
 AC_CHECK_FUNCS(fork lstat readlink stat usleep)
 AC_SEARCH_LIBS(socket, socket)
-LIPS_CFLAGS="$CFLAGS"
+LIPS_CFLAGS="$CFLAGS -Wall -DLI_ENABLE_ERROR"
 LIPS_LIBS="$LIBS"
+
+dnl Compilation options.
+if test "$want_easy" = yes; then
+	want_relative=yes
+	want_builtin_all=yes
+	prefix="$PWD/build"
+fi
+if test "$want_client" = yes -o "$want_viewer" = yes; then
+	want_graphics=yes
+else
+	want_graphics=no
+fi
 
 dnl Check for SDL.
 AM_PATH_SDL([1.2.0], [have_sdl=yes], [have_sdl=no])
 if test "$want_graphics" -a "$have_sdl" = no; then
 	AC_MSG_ERROR([cannot find SDL]);
-fi
-
-dnl Compiler flags.
-if test "$want_debug" = yes; then
-	LIPS_CFLAGS="$LIPS_CFLAGS -g -Wall -DLI_ENABLE_ERROR"
-else
-	LIPS_CFLAGS="$LIPS_CFLAGS -Wall -DNDEBUG -DLI_ENABLE_ERROR"
-fi
-if test "$want_mallocdebug" = yes; then
-	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
 fi
 
 dnl All built-in dependencies.

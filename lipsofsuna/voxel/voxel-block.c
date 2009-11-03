@@ -38,44 +38,6 @@ void
 livox_block_free (livoxBlock*   self,
                   livoxManager* manager)
 {
-#ifndef LIVOX_DISABLE_GRAPHICS
-	if (self->render != NULL)
-		manager->renderapi->lirnd_object_free (self->render);
-#endif
-	if (self->physics != NULL)
-		liphy_object_free (self->physics);
-	if (self->shape != NULL)
-		liphy_shape_free (self->shape);
-}
-
-/**
- * \brief Erases terrain inside the box.
- *
- * \param self Block.
- * \param aabb Bounding box relative to the origin of the block.
- * \return Nonzero if at least one voxel was modified.
- */
-int
-livox_block_erase_aabb (livoxBlock*      self,
-                        const limatAabb* box)
-{
-	return livox_block_fill_aabb (self, box, 0);
-}
-
-/**
- * \brief Erases terrain inside the sphere.
- *
- * \param self Block.
- * \param center Center of the sphere relative to the origin of the block.
- * \param radius Radius of the sphere.
- * \return Nonzero if at least one voxel was modified.
- */
-int
-livox_block_erase_sphere (livoxBlock*        self,
-                          const limatVector* center,
-                          float              radius)
-{
-	return livox_block_fill_sphere (self, center, radius, 0);
 }
 
 /**
@@ -96,92 +58,6 @@ livox_block_fill (livoxBlock*   self,
 		livox_voxel_init (self->tiles + i, terrain);
 	self->dirty = 0xFF;
 	self->stamp++;
-}
-
-/**
- * \brief Fills a box with the given terrain type.
- *
- * \param self Block.
- * \param aabb Bounding box relative to the origin of the block.
- * \param terrain Terrain type.
- * \return Nonzero if at least one voxel was modified.
- */
-int
-livox_block_fill_aabb (livoxBlock*      self,
-                       const limatAabb* box,
-                       int              terrain)
-{
-	int x;
-	int y;
-	int z;
-	int ret = 0;
-	limatAabb child;
-	livoxVoxel tmp;
-
-	livox_voxel_init (&tmp, terrain);
-
-	/* Paint terrain. */
-	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-	{
-		child.min = limat_vector_init (
-			x * LIVOX_TILE_WIDTH,
-			y * LIVOX_TILE_WIDTH,
-			z * LIVOX_TILE_WIDTH);
-		child.max = limat_vector_init (
-			(x + 1) * LIVOX_TILE_WIDTH,
-			(y + 1) * LIVOX_TILE_WIDTH,
-			(z + 1) * LIVOX_TILE_WIDTH);
-		if (limat_aabb_intersects_aabb (box, &child))
-			ret |= livox_block_set_voxel (self, x, y, z, &tmp);
-	}
-	if (ret)
-		self->stamp++;
-
-	return ret;
-}
-
-/**
- * \brief Fills a sphere with the given terrain type.
- *
- * \param self Block.
- * \param center Center of the sphere relative to the origin of the block.
- * \param radius Radius of the sphere.
- * \param terrain Terrain type.
- * \return Nonzero if at least one voxel was modified.
- */
-int
-livox_block_fill_sphere (livoxBlock*        self,
-                         const limatVector* center,
-                         float              radius,
-                         int                terrain)
-{
-	int x;
-	int y;
-	int z;
-	int ret = 0;
-	livoxVoxel tmp;
-	limatVector dist;
-
-	livox_voxel_init (&tmp, terrain);
-
-	/* Paint terrain. */
-	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-	{
-		dist = limat_vector_subtract (*center, limat_vector_init (
-			x * LIVOX_TILE_WIDTH,
-			y * LIVOX_TILE_WIDTH,
-			z * LIVOX_TILE_WIDTH));
-		if (limat_vector_dot (dist, dist) <= radius * radius)
-			ret |= livox_block_set_voxel (self, x, y, z, &tmp);
-	}
-	if (ret)
-		self->stamp++;
-
-	return ret;
 }
 
 /**
@@ -212,10 +88,8 @@ livox_block_read (livoxBlock*   self,
 	int y;
 	int z;
 	uint8_t type;
-	uint8_t terrain;
-	int8_t displacex;
-	int8_t displacey;
-	int8_t displacez;
+	uint8_t damage;
+	uint16_t terrain;
 	livoxVoxel tmp;
 
 	if (!liarc_reader_get_uint8 (reader, &type))
@@ -224,15 +98,11 @@ livox_block_read (livoxBlock*   self,
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
-		if (!liarc_reader_get_uint8 (reader, &terrain) ||
-		    !liarc_reader_get_int8 (reader, &displacex) ||
-		    !liarc_reader_get_int8 (reader, &displacey) ||
-		    !liarc_reader_get_int8 (reader, &displacez))
+		if (!liarc_reader_get_uint16 (reader, &terrain) ||
+		    !liarc_reader_get_uint8 (reader, &damage))
 			return 0;
 		livox_voxel_init (&tmp, terrain);
-		tmp.displacex = displacex;
-		tmp.displacey = displacey;
-		tmp.displacez = displacez;
+		tmp.damage = damage;
 		livox_block_set_voxel (self, x, y, z, &tmp);
 	}
 
@@ -256,10 +126,8 @@ livox_block_write (livoxBlock*  self,
 		return 0;
 	for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
 	{
-		if (!liarc_writer_append_uint8 (writer, self->tiles[i].terrain) ||
-		    !liarc_writer_append_int8 (writer, self->tiles[i].displacex) ||
-		    !liarc_writer_append_int8 (writer, self->tiles[i].displacey) ||
-		    !liarc_writer_append_int8 (writer, self->tiles[i].displacez))
+		if (!liarc_writer_append_uint16 (writer, self->tiles[i].type) ||
+		    !liarc_writer_append_int8 (writer, self->tiles[i].damage))
 			return 0;
 	}
 
@@ -300,22 +168,9 @@ livox_block_set_dirty (livoxBlock* self,
 int
 livox_block_get_empty (const livoxBlock* self)
 {
-	return self->physics != NULL;
+#warning livox_block_get_empty not implemented.
+	return 0;//self->objects.count == 0;
 }
-
-#ifndef LIVOX_DISABLE_GRAPHICS
-/**
- * \brief Gets the render object of the block.
- *
- * \param self Block.
- * \return Render object or NULL.
- */
-lirndObject*
-livox_block_get_render (livoxBlock* self)
-{
-	return self->render;
-}
-#endif
 
 /**
  * \brief Gets the modification stamp of the block.
@@ -373,15 +228,10 @@ livox_block_set_voxel (livoxBlock* self,
 
 	/* Modify terrain. */
 	i = LIVOX_TILE_INDEX (x, y, z);
-	if (self->tiles[i].terrain == voxel->terrain &&
-	    self->tiles[i].displacex == voxel->displacex &&
-	    self->tiles[i].displacey == voxel->displacey &&
-	    self->tiles[i].displacez == voxel->displacez)
+	if (self->tiles[i].type == voxel->type &&
+	    self->tiles[i].damage == voxel->damage)
 		return 0;
-	self->tiles[i].terrain = voxel->terrain;
-    self->tiles[i].displacex = voxel->displacex;
-    self->tiles[i].displacey = voxel->displacey;
-    self->tiles[i].displacez = voxel->displacez;
+	self->tiles[i] = *voxel;
 
 	/* Mark faces dirty. */
 	if (x == 0)

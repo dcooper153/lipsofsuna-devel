@@ -12,15 +12,6 @@
 /* Architecture is x86-64 */
 #undef ARCH_X86_64
 
-/* Define when compiling for MacOS/X */
-#undef CS_PLATFORM_MACOSX
-
-/* Define when compiling for Unix and Unix-like (i.e. MacOS/X) */
-#undef CS_PLATFORM_UNIX
-
-/* Define when compiling for Win32 */
-#undef CS_PLATFORM_WIN32
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -70,6 +61,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -99,6 +93,3 @@
 #  undef WORDS_BIGENDIAN
 # endif
 #endif
-
-/* Avoid problem caused by missing <Carbon/CarbonSound.h> */
-#undef __CARBONSOUND__

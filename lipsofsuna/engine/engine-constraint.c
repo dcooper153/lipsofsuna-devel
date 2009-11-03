@@ -114,7 +114,7 @@ lieng_constraint_get_transform (liengConstraint* self,
 	{
 		if (self->nodes[index] != NULL)
 		{
-			limdl_node_get_pose_transform (self->nodes[index], &t1);
+			limdl_node_get_world_transform (self->nodes[index], &t1);
 			lieng_object_get_transform (self->objects[index], &t0);
 			t0 = limat_transform_multiply (t0, t1);
 		}
@@ -124,7 +124,7 @@ lieng_constraint_get_transform (liengConstraint* self,
 	else
 	{
 		if (self->nodes[index] != NULL)
-			limdl_node_get_pose_transform (self->nodes[index], &t0);
+			limdl_node_get_world_transform (self->nodes[index], &t0);
 		else
 			t0 = limat_transform_identity ();
 	}

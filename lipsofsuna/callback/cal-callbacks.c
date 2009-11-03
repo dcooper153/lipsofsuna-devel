@@ -271,6 +271,24 @@ lical_callbacks_remove_callback (licalCallbacks* self,
 	handle->func = NULL;
 }
 
+/**
+ * \brief Removes event handler callbacks.
+ *
+ * \param self Callbacks.
+ * \param handle Array of callback handles.
+ * \param count Number of handles.
+ */
+void
+lical_callbacks_remove_callbacks (licalCallbacks* self,
+                                  licalHandle*    handles,
+                                  int             count)
+{
+	int i;
+
+	for (i = 0 ; i < count ; i++)
+		lical_callbacks_remove_callback (self, handles + i);
+}
+
 /*****************************************************************************/
 
 static void

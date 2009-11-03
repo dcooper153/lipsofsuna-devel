@@ -184,16 +184,14 @@ int
 lirnd_render_load_image (lirndRender* self,
                          const char*  name)
 {
-	int i;
-	int j;
 	lialgPtrdicIter iter0;
 	lialgU32dicIter iter1;
+	lialgStrdicIter iter2;
 	liimgTexture* imgtexture;
 	lirndImage* rndimage;
+	lirndModel* model;
 	lirndObject* object;
 	lirndScene* scene;
-	lirndTexture* texture;
-	lirndMaterial* material;
 
 	/* Find image info. */
 	rndimage = lirnd_resources_find_image (self->resources, name);
@@ -212,28 +210,24 @@ lirnd_render_load_image (lirndRender* self,
 		liimg_texture_free (rndimage->texture);
 	rndimage->texture = imgtexture;
 
-	/* Replace all instances. */
+	/* Replace in all instances. */
 	LI_FOREACH_PTRDIC (iter0, self->scenes)
 	{
 		scene = iter0.value;
 		LI_FOREACH_U32DIC (iter1, scene->objects)
 		{
 			object = iter1.value;
-			if (object->model == NULL)
+			if (object->instance == NULL)
 				continue;
-			for (i = 0 ; i < object->materials.count ; i++)
-			{
-				material = object->materials.array[i];
-				for (j = 0 ; j < material->textures.count ; j++)
-				{
-					texture = material->textures.array + j;
-					if (texture->image == rndimage)
-					{
-						lirnd_texture_set_image (texture, rndimage);
-					}
-				}
-			}
+			lirnd_model_replace_image (object->instance, rndimage);
 		}
+	}
+
+	/* Replace in all models. */
+	LI_FOREACH_STRDIC (iter2, self->resources->models)
+	{
+		model = iter0.value;
+		lirnd_model_replace_image (model, rndimage);
 	}
 
 	return 1;

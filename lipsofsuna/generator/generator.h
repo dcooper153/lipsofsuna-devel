@@ -58,9 +58,7 @@ struct _ligenGenerator
 };
 
 ligenGenerator*
-ligen_generator_new (lipthPaths* paths,
-                     lirndScene* scene,
-                     lirndApi*   rndapi);
+ligen_generator_new (lipthPaths*  paths);
 
 void
 ligen_generator_free (ligenGenerator* self);

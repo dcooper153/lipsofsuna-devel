@@ -42,7 +42,7 @@ main (int argc, char** argv)
 
 	/* Execute program. */
 	srand (time (NULL));
-	self = ligen_generator_new (paths, NULL, NULL);
+	self = ligen_generator_new (paths);
 	if (self == NULL)
 	{
 		lisys_error_report ();

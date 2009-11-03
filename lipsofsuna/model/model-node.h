@@ -45,8 +45,9 @@ struct _limdlNode
 	} nodes;
 	struct
 	{
-		limatTransform pose;
 		limatTransform rest;
+		limatTransform local;
+		limatTransform global;
 	} transform;
 	union
 	{
@@ -68,10 +69,6 @@ limdl_node_copy (const limdlNode* node);
 void
 limdl_node_free (limdlNode* self);
 
-void
-limdl_node_calculate_transform (const limdlNode* self,
-                                limatTransform*  result);
-
 limdlNode*
 limdl_node_find_node (const limdlNode* self,
                       const char*      name);
@@ -81,9 +78,8 @@ limdl_node_read (limdlNode*   self,
                  liarcReader* reader);
 
 void
-limdl_node_transform (limdlNode*            self,
-                      const limatTransform* parent,
-                      const limatTransform* pose);
+limdl_node_rebuild (limdlNode* self,
+                    int        recursive);
 
 int
 limdl_node_write (const limdlNode* self,
@@ -109,17 +105,16 @@ limdl_node_get_pose_axes (const limdlNode* self,
                           limatVector*     z);
 
 void
-limdl_node_get_pose_transform (const limdlNode* self,
-                               limatTransform*  value);
-
-void
-limdl_node_set_pose_transform (limdlNode*            self,
-                               const limatTransform* parent,
-                               const limatTransform* pose);
+limdl_node_set_local_transform (limdlNode*            self,
+                                const limatTransform* value);
 
 void
 limdl_node_get_rest_transform (const limdlNode* self,
                                limatTransform*  value);
+
+void
+limdl_node_get_world_transform (const limdlNode* self,
+                                limatTransform*  value);
 
 limdlNodeType
 limdl_node_get_type (const limdlNode* self);

@@ -97,10 +97,11 @@ liext_editor_save (liextEditor* self)
 }
 
 void
-liext_editor_reset (liextEditor* self)
+liext_editor_reset (liextEditor* self,
+                    liarcReader* reader)
 {
-	liext_brushes_reset (LIEXT_BRUSHES (self->brushes));
-	liext_materials_reset (LIEXT_MATERIALS (self->materials));
+	liext_brushes_reset (LIEXT_BRUSHES (self->brushes), reader);
+	liext_materials_reset (LIEXT_MATERIALS (self->materials), reader);
 }
 
 /****************************************************************************/

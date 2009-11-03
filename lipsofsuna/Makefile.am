@@ -242,6 +242,7 @@ mdl_HEADERS = \
 	model/model.h \
 	model/model-animation.h \
 	model/model-bone.h \
+	model/model-constraint.h \
 	model/model-faces.h \
 	model/model-hair.h \
 	model/model-ipo.h \
@@ -256,6 +257,7 @@ mdlsrc = \
 	model/model.c \
 	model/model-animation.c \
 	model/model-bone.c \
+	model/model-constraint.c \
 	model/model-faces.c \
 	model/model-hair.c \
 	model/model-ipo.c \
@@ -324,6 +326,7 @@ rnd_HEADERS = \
 	render/render-buffer.h \
 	render/render-context.h \
 	render/render-draw.h \
+	render/render-group.h \
 	render/render-image.h \
 	render/render-light.h \
 	render/render-lighting.h \
@@ -341,6 +344,7 @@ rndsrc = \
 	render/render-buffer.c \
 	render/render-context.c \
 	render/render-draw.c \
+	render/render-group.c \
 	render/render-light.c \
 	render/render-lighting.c \
 	render/render-material.c \
@@ -482,7 +486,6 @@ vox_HEADERS = \
 	voxel/lips-voxel.h \
 	voxel/voxel.h \
 	voxel/voxel-block.h \
-	voxel/voxel-builder.h \
 	voxel/voxel-iterator.h \
 	voxel/voxel-manager.h \
 	voxel/voxel-material.h \
@@ -491,7 +494,6 @@ vox_HEADERS = \
 voxsrc = \
 	voxel/voxel.c \
 	voxel/voxel-block.c \
-	voxel/voxel-builder.c \
 	voxel/voxel-manager.c \
 	voxel/voxel-material.c \
 	voxel/voxel-sector.c

@@ -46,6 +46,10 @@ private_read_animations (limdlModel*  self,
                          liarcReader* reader);
 
 static int
+private_read_constraints (limdlModel*  self,
+                          liarcReader* reader);
+
+static int
 private_read_faces (limdlModel*  self,
                     liarcReader* reader);
 
@@ -77,6 +81,10 @@ private_write (const limdlModel* self,
 static int
 private_write_animations (const limdlModel* self,
                           liarcWriter*      writer);
+
+static int
+private_write_constraints (const limdlModel* self,
+                           liarcWriter*      writer);
 
 static int
 private_write_faces (const limdlModel* self,
@@ -227,6 +235,17 @@ limdl_model_free (limdlModel* self)
 			lisys_free (self->weightgroups.weightgroups[i].bone);
 		}
 		lisys_free (self->weightgroups.weightgroups);
+	}
+
+	/* Free constraints. */
+	if (self->constraints.array != NULL)
+	{
+		for (i = 0 ; i < self->constraints.count ; i++)
+		{
+			if (self->constraints.array[i] != NULL)
+				limdl_constraint_free (self->constraints.array[i]);
+		}
+		lisys_free (self->constraints.array);
 	}
 
 	/* Free nodes. */
@@ -670,7 +689,6 @@ static void
 private_build (limdlModel* self)
 {
 	int i;
-	limatTransform rest;
 	limdlNode* node;
 	limdlWeightGroup* group;
 
@@ -685,8 +703,7 @@ private_build (limdlModel* self)
 	for (i = 0 ; i < self->nodes.count ; i++)
 	{
 		node = self->nodes.array[i];
-		rest = limat_transform_identity ();
-		limdl_node_transform (node, &rest, &rest);
+		limdl_node_rebuild (node, 1);
 	}
 }
 
@@ -762,6 +779,7 @@ private_read (limdlModel*  self,
 	    !private_read_faces (self, reader) ||
 	    !private_read_weights (self, reader) ||
 	    !private_read_nodes (self, reader) ||
+	    !private_read_constraints (self, reader) ||
 	    !private_read_animations (self, reader) ||
 	    !private_read_hairs (self, reader))
 		return 0;
@@ -819,6 +837,40 @@ private_read_animations (limdlModel*  self,
 		{
 			animation = self->animation.animations + i;
 			if (!private_read_animation (self, animation, reader))
+				return 0;
+		}
+	}
+
+	return 1;
+}
+
+static int
+private_read_constraints (limdlModel*  self,
+                          liarcReader* reader)
+{
+	int i;
+	uint32_t tmp;
+
+	/* Read header. */
+	if (!liarc_reader_check_text (reader, "con", ""))
+	{
+		lisys_error_set (EINVAL, "invalid constraint block header");
+		return 0;
+	}
+	if (!liarc_reader_get_uint32 (reader, &tmp))
+		return 0;
+	self->constraints.count = tmp;
+
+	/* Read constraints. */
+	if (self->constraints.count)
+	{
+		self->constraints.array = lisys_calloc (self->constraints.count, sizeof (limdlConstraint*));
+		if (self->constraints.array == NULL)
+			return 0;
+		for (i = 0 ; i < self->constraints.count ; i++)
+		{
+			self->constraints.array[i] = limdl_constraint_new_from_stream (reader);
+			if (self->constraints.array[i] == NULL)
 				return 0;
 		}
 	}
@@ -1051,6 +1103,7 @@ private_write (const limdlModel* self,
 	    !private_write_faces (self, writer) ||
 	    !private_write_weights (self, writer) ||
 	    !private_write_nodes (self, writer) ||
+	    !private_write_constraints (self, writer) ||
 	    !private_write_animations (self, writer) ||
 	    !private_write_hairs (self, writer))
 		return 0;
@@ -1087,6 +1140,25 @@ private_write_animations (const limdlModel* self,
 			if (!limdl_ipo_write (ipo, writer))
 				return 0;
 		}
+	}
+
+	return 1;
+}
+
+static int
+private_write_constraints (const limdlModel* self,
+                           liarcWriter*      writer)
+{
+	int i;
+
+	if (!liarc_writer_append_string (writer, "con") ||
+	    !liarc_writer_append_nul (writer) ||
+	    !liarc_writer_append_uint32 (writer, self->constraints.count))
+		return 0;
+	for (i = 0 ; i < self->constraints.count ; i++)
+	{
+		if (!limdl_constraint_write (self->constraints.array[i], writer))
+			return 0;
 	}
 
 	return 1;

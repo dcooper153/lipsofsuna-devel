@@ -51,7 +51,7 @@ struct _liextBrushes
 		liwdgWidget* group_size;
 		liwdgWidget* button_add;
 		liwdgWidget* button_copy;
-		liwdgWidget* button_paint[7];
+		liwdgWidget* button_paint[3];
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
 		liwdgWidget* entry_objextra;
@@ -86,7 +86,8 @@ int
 liext_brushes_save (liextBrushes* self);
 
 void
-liext_brushes_reset (liextBrushes* self);
+liext_brushes_reset (liextBrushes* self,
+                     liarcReader*  reader);
 
 #endif
 

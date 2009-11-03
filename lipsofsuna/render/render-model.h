@@ -37,14 +37,31 @@ struct _lirndModel
 	limatAabb aabb;
 	limdlModel* model;
 	lirndRender* render;
+	struct
+	{
+		int count;
+		lirndBuffer* array;
+	} buffers;
+	struct
+	{
+		int count;
+		lirndMaterial** array;
+	} materials;
 };
 
 lirndModel*
 lirnd_model_new (lirndRender* render,
                  limdlModel*  model);
 
+lirndModel*
+lirnd_model_new_instance (lirndModel* model);
+
 void
 lirnd_model_free (lirndModel*  self);
+
+void
+lirnd_model_replace_image (lirndModel* self,
+                           lirndImage* image);
 
 void
 lirnd_model_get_bounds (lirndModel* self,

@@ -64,7 +64,7 @@ void
 limdl_bone_get_pose_head (const limdlNode* self,
                           limatVector*     head)
 {
-	*head = self->transform.pose.position;
+	*head = self->transform.global.position;
 }
 
 /**

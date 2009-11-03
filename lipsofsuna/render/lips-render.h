@@ -23,6 +23,7 @@
 #include "render-buffer.h"
 #include "render-context.h"
 #include "render-draw.h"
+#include "render-group.h"
 #include "render-image.h"
 #include "render-light.h"
 #include "render-lighting.h"

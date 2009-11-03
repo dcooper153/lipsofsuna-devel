@@ -104,7 +104,7 @@ private_packet (liextModule* self,
 {
 	reader->pos = 1;
 	if (type == LIEXT_VOXEL_PACKET_ASSIGN)
-		liext_editor_reset (LIEXT_EDITOR (self->editor));
+		liext_editor_reset (LIEXT_EDITOR (self->editor), reader);
 
 	return 1;
 }

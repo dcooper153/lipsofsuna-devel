@@ -32,17 +32,27 @@
 #include <script/lips-script.h>
 #include <server/lips-server.h>
 #include <voxel/lips-voxel.h>
+
+typedef struct _liextBlock liextBlock;
+typedef struct _liextBlockAddr liextBlockAddr;
+typedef struct _liextBlockKey liextBlockKey;
+typedef struct _liextListener liextListener;
+typedef struct _liextListenerBlock liextListenerBlock;
+typedef struct _liextModule liextModule;
+
+#include "ext-block.h"
 #include "ext-listener.h"
 
 #define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
 
-typedef struct _liextModule liextModule;
 struct _liextModule
 {
 	float radius;
 	lialgPtrdic* listeners;
+	lialgMemdic* blocks;
 	liarcWriter* assign_packet;
 	licalHandle calls[6];
+	licalHandle calls1[2];
 	lisrvServer* server;
 	livoxManager* voxels;
 };

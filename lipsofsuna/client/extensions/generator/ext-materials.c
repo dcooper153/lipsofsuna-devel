@@ -125,10 +125,11 @@ liext_materials_save (liextMaterials* self)
 }
 
 void
-liext_materials_reset (liextMaterials* self)
+liext_materials_reset (liextMaterials* self,
+                       liarcReader*    reader)
 {
-	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview),
-		self->module->module->voxels);
+	reader->pos = 1;
+	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview), reader);
 	private_populate (self);
 }
 

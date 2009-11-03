@@ -28,15 +28,21 @@
 
 #define LIPHY_MOTION_TOLERANCE 0.25f
 #define LIPHY_ROTATION_TOLERANCE 0.1f
+#define LIPHY_BROADPHASE_DBVT
 
 class liphyControl;
 class liphyContactController;
 class liphyCharacterController;
+class liphyObjectShape;
 class liphyMotionState;
 
 struct _liphyPhysics
 {
+#ifdef LIPHY_BROADPHASE_DBVT
+	btDbvtBroadphase* broadphase;
+#else
 	bt32BitAxisSweep3* broadphase;
+#endif
 	btDefaultCollisionConfiguration* configuration;
 	btCollisionDispatcher* dispatcher;
 	btConstraintSolver* solver;
@@ -77,8 +83,8 @@ struct _liphyObject
 	liphyControl* control;
 	liphyMotionState* motion;
 	liphyPhysics* physics;
-	liphyShape* shape;
 	liphyShapeMode shape_mode;
+	btCompoundShape* shape;
 	int flags;
 	struct
 	{

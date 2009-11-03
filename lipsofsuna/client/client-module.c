@@ -152,8 +152,6 @@ licli_module_free (licliModule* self)
 		licli_network_free (self->network);
 
 	/* Free engine. */
-	if (self->voxels != NULL)
-		livox_manager_free (self->voxels);
 	if (self->engine != NULL)
 		lieng_engine_free (self->engine);
 
@@ -693,11 +691,6 @@ private_init_engine (licliModule* self)
 		return 0;
 	self->scene = lirnd_scene_new (self->render);
 	if (self->scene == NULL)
-		return 0;
-
-	/* Initialize voxels. */
-	self->voxels = livox_manager_new (self->engine->physics, self->scene, &lirnd_render_api);
-	if (self->voxels == NULL)
 		return 0;
 
 	return 1;

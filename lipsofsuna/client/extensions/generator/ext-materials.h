@@ -73,7 +73,8 @@ int
 liext_materials_save (liextMaterials* self);
 
 void
-liext_materials_reset (liextMaterials* self);
+liext_materials_reset (liextMaterials* self,
+                       liarcReader*    reader);
 
 #endif
 

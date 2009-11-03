@@ -29,6 +29,8 @@
 #include "model.h"
 #include "model-animation.h"
 #include "model-bone.h"
+#include "model-types.h"
+#include "model-vertex.h"
 
 #define LIMDL_POSE_FADE_AUTOMATIC -1.0f
 
@@ -38,9 +40,7 @@ enum _limdlPoseChannelState
 	LIMDL_POSE_CHANNEL_STATE_PLAYING,
 	LIMDL_POSE_CHANNEL_STATE_PAUSED,
 };
-typedef enum _limdlPoseChannelState limdlPoseChannelState;
 
-typedef struct _limdlPoseChannel limdlPoseChannel;
 struct _limdlPoseChannel
 {
 	int state;
@@ -51,7 +51,6 @@ struct _limdlPoseChannel
 	limdlAnimation* animation;
 };
 
-typedef struct _limdlPoseFade limdlPoseFade;
 struct _limdlPoseFade
 {
 	float rate;
@@ -62,7 +61,6 @@ struct _limdlPoseFade
 	limdlAnimation* animation;
 };
 
-typedef struct _limdlPose limdlPose;
 struct _limdlPose
 {
 	limdlModel* model;

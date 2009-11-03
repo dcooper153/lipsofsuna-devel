@@ -130,7 +130,7 @@ limdl_material_read (limdlMaterial* self,
                      liarcReader*   reader)
 {
 	int i;
-	uint32_t tmp[2];
+	uint32_t tmp[4];
 
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, tmp + 0) ||

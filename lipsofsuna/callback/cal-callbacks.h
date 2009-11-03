@@ -95,6 +95,11 @@ void
 lical_callbacks_remove_callback (licalCallbacks* self,
                                  licalHandle*    handle);
 
+void
+lical_callbacks_remove_callbacks (licalCallbacks* self,
+                                  licalHandle*    handles,
+                                  int             count);
+
 #endif
 
 /** @} */

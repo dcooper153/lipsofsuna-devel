@@ -39,30 +39,10 @@ void
 livox_block_free (livoxBlock*   self,
                   livoxManager* manager);
 
-int
-livox_block_erase_aabb (livoxBlock*      self,
-                        const limatAabb* box);
-
-int
-livox_block_erase_sphere (livoxBlock*        self,
-                          const limatVector* center,
-                          float              radius);
-
 void
 livox_block_fill (livoxBlock*   self,
                   livoxManager* manager,
                   int           terrain);
-
-int
-livox_block_fill_aabb (livoxBlock*      self,
-                       const limatAabb* box,
-                       int              terrain);
-
-int
-livox_block_fill_sphere (livoxBlock*        self,
-                         const limatVector* center,
-                         float              radius,
-                         int                terrain);
 
 void
 livox_block_optimize (livoxBlock* self);
@@ -85,11 +65,6 @@ livox_block_set_dirty (livoxBlock* self,
 
 int
 livox_block_get_empty (const livoxBlock* self);
-
-#ifndef LIVOX_DISABLE_GRAPHICS
-lirndObject*
-livox_block_get_render (livoxBlock* self);
-#endif
 
 int
 livox_block_get_stamp (const livoxBlock* self);

@@ -75,37 +75,37 @@ AC_CONFIG_HEADERS([config.h])
 #----------------------------------------------------------------------------
 # Check for tools.
 #----------------------------------------------------------------------------
-CS_PROG_CC
-AS_IF([test -z "$CC"],
-    [AC_MSG_ERROR([Could not find a usable C compiler.])])
-CS_PROG_CXX
-AS_IF([test -z "$CXX"],
-    [AC_MSG_ERROR([Could not find a usable C++ compiler.])])
-CS_PROG_LINK
+#CS_PROG_CC
+#AS_IF([test -z "$CC"],
+#    [AC_MSG_ERROR([Could not find a usable C compiler.])])
+#CS_PROG_CXX
+#AS_IF([test -z "$CXX"],
+#    [AC_MSG_ERROR([Could not find a usable C++ compiler.])])
+#CS_PROG_LINK
 
-CS_CHECK_COMMON_TOOLS_LINK
-CS_CHECK_COMMON_TOOLS_BASIC
-CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN
+#CS_CHECK_COMMON_TOOLS_LINK
+#CS_CHECK_COMMON_TOOLS_BASIC
+#CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN
 
-CS_CHECK_PROGS([PERL], [perl5 perl])
-CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
+#CS_CHECK_PROGS([PERL], [perl5 perl])
+#CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
 
-CS_CHECK_TEMPLATE_TOOLKIT2([emit])
+#CS_CHECK_TEMPLATE_TOOLKIT2([emit])
 
 #----------------------------------------------------------------------------
 # Check if C++ exceptions can be disabled.
 #----------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
-    [cs_cv_prog_cxx_disable_exceptions], [CS_CREATE_TUPLE([-fno-exceptions])],
-    [C++], [COMPILER.C++FLAGS.EXCEPTIONS.DISABLE], [],
-    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
-	[$cs_cv_prog_cxx_disable_exceptions], [+])])
+#CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
+#    [cs_cv_prog_cxx_disable_exceptions], [CS_CREATE_TUPLE([-fno-exceptions])],
+#    [C++], [COMPILER.C++FLAGS.EXCEPTIONS.DISABLE], [],
+#    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
+#	[$cs_cv_prog_cxx_disable_exceptions], [+])])
 
 
 #----------------------------------------------------------------------------
 # Determine system type
 #----------------------------------------------------------------------------
-CS_CHECK_HOST
+#CS_CHECK_HOST
 
 #----------------------------------------------------------------------------
 # Check for syntax problems / header files

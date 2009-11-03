@@ -24,7 +24,6 @@
 
 #include <string/lips-string.h>
 #include <system/lips-system.h>
-#include "voxel-builder.h"
 #include "voxel-manager.h"
 #include "voxel-sector.h"
 #include "voxel-private.h"
@@ -102,88 +101,6 @@ livox_sector_build_block (livoxSector* self,
 }
 
 /**
- * \brief Erases terrain inside the box.
- *
- * \param self Sector.
- * \param box Bounding box relative to the origin of the sector.
- */
-void
-livox_sector_erase_aabb (livoxSector*     self,
-                         const limatAabb* box)
-{
-	int i;
-	int x;
-	int y;
-	int z;
-	limatAabb block;
-	limatAabb child;
-
-	for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
-	{
-		block.min = limat_vector_init (
-			x * LIVOX_BLOCK_WIDTH,
-			y * LIVOX_BLOCK_WIDTH,
-			z * LIVOX_BLOCK_WIDTH);
-		block.max = limat_vector_init (
-			(x + 1) * LIVOX_BLOCK_WIDTH,
-			(y + 1) * LIVOX_BLOCK_WIDTH,
-			(z + 1) * LIVOX_BLOCK_WIDTH);
-		if (limat_aabb_intersects_aabb (box, &block))
-		{
-			child.min = limat_vector_subtract (box->min, block.min);
-			child.max = limat_vector_subtract (box->max, block.min);
-			if (livox_block_erase_aabb (self->blocks + i, &child))
-				self->dirty = 1;
-		}
-	}
-}
-
-/**
- * \brief Erases terrain inside the sphere.
- *
- * \param self Sector.
- * \param center Center of the sphere relative to the origin of the sector.
- * \param radius Radius of the sphere.
- */
-void
-livox_sector_erase_sphere (livoxSector*       self,
-                           const limatVector* center,
-                           float              radius)
-{
-	int i;
-	int x;
-	int y;
-	int z;
-	float r;
-	limatVector block;
-	limatVector dist;
-
-	r = radius + LIVOX_BLOCK_WIDTH;
-	for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
-	{
-		block = limat_vector_init (
-			(x + 0.5f) * LIVOX_BLOCK_WIDTH,
-			(y + 0.5f) * LIVOX_BLOCK_WIDTH,
-			(z + 0.5f) * LIVOX_BLOCK_WIDTH);
-		dist = limat_vector_subtract (*center, block);
-		if (limat_vector_dot (dist, dist) < r * r)
-		{
-			block = limat_vector_init (
-				x * LIVOX_BLOCK_WIDTH,
-				y * LIVOX_BLOCK_WIDTH,
-				z * LIVOX_BLOCK_WIDTH);
-			block = limat_vector_subtract (*center, block);
-			if (livox_block_erase_sphere (self->blocks + i, &block, radius))
-				self->dirty = 1;
-		}
-	}
-}
-
-/**
  * \brief Fills the sector with the given terrain type.
  *
  * \param self Sector.
@@ -210,92 +127,6 @@ livox_sector_fill (livoxSector* self,
 		}
 	}
 	self->dirty = 1;
-}
-
-/**
- * \brief Fills a sphere with the given terrain type.
- *
- * \param self Sector.
- * \param box Bounding box relative to the origin of the sector.
- * \param terrain Terrain type.
- */
-void
-livox_sector_fill_aabb (livoxSector*     self,
-                        const limatAabb* box,
-                        uint8_t          terrain)
-{
-	int i;
-	int x;
-	int y;
-	int z;
-	limatAabb block;
-	limatAabb child;
-
-	for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
-	{
-		block.min = limat_vector_init (
-			x * LIVOX_BLOCK_WIDTH,
-			y * LIVOX_BLOCK_WIDTH,
-			z * LIVOX_BLOCK_WIDTH);
-		block.max = limat_vector_init (
-			(x + 1) * LIVOX_BLOCK_WIDTH,
-			(y + 1) * LIVOX_BLOCK_WIDTH,
-			(z + 1) * LIVOX_BLOCK_WIDTH);
-		if (limat_aabb_intersects_aabb (box, &block))
-		{
-			child.min = limat_vector_subtract (box->min, block.min);
-			child.max = limat_vector_subtract (box->max, block.min);
-			if (livox_block_fill_aabb (self->blocks + i, &child, terrain))
-				self->dirty = 1;
-		}
-	}
-}
-
-/**
- * \brief Fills a sphere with the given terrain type.
- *
- * \param self Sector.
- * \param center Center of the sphere relative to the origin of the sector.
- * \param radius Radius of the sphere.
- * \param terrain Terrain type.
- */
-void
-livox_sector_fill_sphere (livoxSector*       self,
-                          const limatVector* center,
-                          float              radius,
-                          uint8_t            terrain)
-{
-	int i;
-	int x;
-	int y;
-	int z;
-	float r;
-	limatVector block;
-	limatVector dist;
-
-	r = radius + LIVOX_BLOCK_WIDTH;
-	for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
-	{
-		block = limat_vector_init (
-			(x + 0.5f) * LIVOX_BLOCK_WIDTH,
-			(y + 0.5f) * LIVOX_BLOCK_WIDTH,
-			(z + 0.5f) * LIVOX_BLOCK_WIDTH);
-		dist = limat_vector_subtract (*center, block);
-		if (limat_vector_dot (dist, dist) < r * r)
-		{
-			block = limat_vector_init (
-				x * LIVOX_BLOCK_WIDTH,
-				y * LIVOX_BLOCK_WIDTH,
-				z * LIVOX_BLOCK_WIDTH);
-			block = limat_vector_subtract (*center, block);
-			if (livox_block_fill_sphere (self->blocks + i, &block, radius, terrain))
-				self->dirty = 1;
-		}
-	}
 }
 
 /**
@@ -607,10 +438,10 @@ livox_sector_get_voxel (livoxSector* sector,
 	int ty = y % LIVOX_TILES_PER_LINE;
 	int tz = z % LIVOX_TILES_PER_LINE;
 
-	assert (!(x < 0 || y < 0 || z < 0 ||
-	    bx < 0 || bx >= LIVOX_BLOCKS_PER_LINE ||
-	    by < 0 || by >= LIVOX_BLOCKS_PER_LINE ||
-	    bz < 0 || bz >= LIVOX_BLOCKS_PER_LINE));
+	assert (x >= 0 && y >= 0 && z >= 0);
+	assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
 	block = sector->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 
 	return livox_block_get_voxel (block, tx, ty, tz);
@@ -634,22 +465,18 @@ livox_sector_set_voxel (livoxSector* self,
                         livoxVoxel   terrain)
 {
 	int ret;
-	int bx = x / LIVOX_BLOCKS_PER_LINE;
-	int by = y / LIVOX_BLOCKS_PER_LINE;
-	int bz = z / LIVOX_BLOCKS_PER_LINE;
-	int tx = x % LIVOX_BLOCKS_PER_LINE;
-	int ty = y % LIVOX_BLOCKS_PER_LINE;
-	int tz = z % LIVOX_BLOCKS_PER_LINE;
+	int bx = x / LIVOX_TILES_PER_LINE;
+	int by = y / LIVOX_TILES_PER_LINE;
+	int bz = z / LIVOX_TILES_PER_LINE;
+	int tx = x % LIVOX_TILES_PER_LINE;
+	int ty = y % LIVOX_TILES_PER_LINE;
+	int tz = z % LIVOX_TILES_PER_LINE;
 	livoxBlock* block;
 
-	if (x < 0 || y < 0 || z < 0 ||
-	    bx < 0 || bx >= LIVOX_BLOCKS_PER_LINE || 
-	    by < 0 || by >= LIVOX_BLOCKS_PER_LINE || 
-	    bz < 0 || bz >= LIVOX_BLOCKS_PER_LINE)
-	{
-		assert (0);
-		return 0;
-	}
+	assert (x >= 0 && y >= 0 && z >= 0);
+	assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
 	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 	ret = livox_block_set_voxel (block, tx, ty, tz, &terrain);
 	if (ret)
@@ -669,59 +496,16 @@ private_build_block (livoxSector* self,
                      int          y,
                      int          z)
 {
-	livoxBlock* block;
-	livoxBuilder* builder;
+	livoxUpdateEvent event;
 
-	/* Optimize block. */
-	block = self->blocks + LIVOX_BLOCK_INDEX (x, y, z);
-	livox_block_optimize (block);
-
-	/* Generate mesh. */
-	builder = livox_builder_new (self);
-	if (builder == NULL)
-		return 0;
-	if (!livox_builder_build (builder, x, y, z))
-	{
-		livox_builder_free (builder);
-		return 0;
-	}
-
-	/* Replace physics data. */
-	if (block->physics != NULL)
-		liphy_object_free (block->physics);
-	if (block->shape != NULL)
-		liphy_shape_free (block->shape);
-	block->physics = NULL;
-	block->shape = livox_builder_get_shape (builder);
-	if (block->shape != NULL)
-	{
-		block->physics = liphy_object_new (self->manager->physics, block->shape,
-			LIPHY_SHAPE_MODE_CONCAVE, LIPHY_CONTROL_MODE_STATIC);
-		if (block->physics != NULL)
-		{
-			liphy_object_set_collision_group (block->physics, LIPHY_GROUP_TILES);
-			liphy_object_set_collision_mask (block->physics, ~(LIPHY_GROUP_TILES | LIPHY_GROUP_STATICS));
-			liphy_object_set_realized (block->physics, 1);
-		}
-	}
-
-	/* Replace render data. */
-#ifndef LIVOX_DISABLE_GRAPHICS
-	if (self->manager->render != NULL)
-	{
-		if (block->render != NULL)
-			self->manager->renderapi->lirnd_object_free (block->render);
-		block->render = livox_builder_get_render (builder);
-		if (block->render == NULL)
-		{
-			livox_builder_free (builder);
-			return 0;
-		}
-		self->manager->renderapi->lirnd_object_set_realized (block->render, 1);
-	}
-#endif
-
-	livox_builder_free (builder);
+	/* Invoke callbacks. */
+	event.sector[0] = self->x;
+	event.sector[1] = self->y;
+	event.sector[2] = self->z;
+	event.block[0] = x;
+	event.block[1] = y;
+	event.block[2] = z;
+	lical_callbacks_call (self->manager->callbacks, LIVOX_CALLBACK_LOAD_BLOCK, &event);
 
 	return 1;
 }

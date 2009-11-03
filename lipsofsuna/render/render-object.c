@@ -33,26 +33,12 @@ private_clear_envmap (lirndObject* self);
 static void
 private_clear_lights (lirndObject* self);
 
-static void
-private_clear_materials (lirndObject* self);
-
-static void
-private_clear_model (lirndObject* self);
-
 static int
 private_init_envmap (lirndObject* self);
 
 static int
 private_init_lights (lirndObject* self,
                      limdlPose*   pose);
-
-static int
-private_init_materials (lirndObject* self,
-                        lirndModel*  model);
-
-static int
-private_init_model (lirndObject* self,
-                    lirndModel*  model);
 
 static void
 private_update_envmap (lirndObject* self);
@@ -79,60 +65,10 @@ lirnd_object_new (lirndScene* scene,
 	self = lisys_calloc (1, sizeof (lirndObject));
 	if (self == NULL)
 		return NULL;
-	self->id = id;
 	self->scene = scene;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 	limat_aabb_init (&self->aabb);
-
-	/* Add to renderer. */
-	if (!lialg_u32dic_insert (scene->objects, id, self))
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
-	return self;
-}
-
-/**
- * \brief Creates a new render object from raw data.
- *
- * If the creation of the object succeeds, the ownership of the passed
- * mesh data is given to the object.
- *
- * \param scene Scene.
- * \param id Object number.
- * \param aabb Bounding box.
- * \param buffer Render buffer array.
- * \param buffercount Number of buffers.
- * \param materials Material array.
- * \param materialcount Number of materials.
- * \param lights Light buffer.
- * \param lightcount Number of lights.
- * \return New render object or NULL.
- */
-lirndObject*
-lirnd_object_new_from_data (lirndScene*      scene,
-                            int              id,
-                            const limatAabb* aabb,
-                            lirndBuffer*     buffers,
-                            int              buffercount,
-                            lirndMaterial**  materials,
-                            int              materialcount,
-                            lirndLight**     lights,
-                            int              lightcount)
-{
-	lirndObject* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndObject));
-	if (self == NULL)
-		return NULL;
-	self->aabb = *aabb;
-	self->scene = scene;
-	self->transform = limat_transform_identity ();
-	self->orientation.matrix = limat_matrix_identity ();
 
 	/* Choose unique ID. */
 	while (!id)
@@ -146,24 +82,8 @@ lirnd_object_new_from_data (lirndScene*      scene,
 	assert (!lirnd_scene_find_object (scene, id));
 
 	/* Add to renderer. */
-	if (!lialg_u32dic_insert (scene->objects, self->id, self))
+	if (!lialg_u32dic_insert (scene->objects, id, self))
 	{
-		lisys_free (self);
-		return NULL;
-	}
-
-	/* Hijack data. */
-	self->buffers.count = buffercount;
-	self->buffers.array = buffers;
-	self->materials.count = materialcount;
-	self->materials.array = materials;
-	self->lights.count = lightcount;
-	self->lights.array = lights;
-
-	/* Initialize extras. */
-	if (!private_init_envmap (self))
-	{
-		lialg_u32dic_remove (scene->objects, self->id);
 		lisys_free (self);
 		return NULL;
 	}
@@ -184,13 +104,13 @@ lirnd_object_free (lirndObject* self)
 	lialg_u32dic_remove (self->scene->objects, self->id);
 	private_clear_envmap (self);
 	private_clear_lights (self);
-	private_clear_materials (self);
-	private_clear_model (self);
+	if (self->instance != NULL)
+		lirnd_model_free (self->instance);
 	lisys_free (self);
 }
 
 /**
- * \brief Transforms the object.
+ * \brief Deforms the object.
  *
  * \param self Object.
  * \param pose Pose transformation.
@@ -203,11 +123,11 @@ lirnd_object_deform (lirndObject* self,
 	void* vertices;
 	lirndBuffer* buffer;
 
-	if (self->model == NULL)
+	if (self->instance == NULL)
 		return;
-	for (i = 0 ; i < self->buffers.count ; i++)
+	for (i = 0 ; i < self->instance->buffers.count ; i++)
 	{
-		buffer = self->buffers.array + i;
+		buffer = self->instance->buffers.array + i;
 		vertices = lirnd_buffer_lock (buffer);
 		if (vertices != NULL)
 		{
@@ -216,6 +136,9 @@ lirnd_object_deform (lirndObject* self,
 		}
 	}
 	private_update_lights (self);
+#ifndef NDEBUG
+	self->debug_pose = pose;
+#endif
 }
 
 void
@@ -275,7 +198,7 @@ void
 lirnd_object_update (lirndObject* self,
                      float        secs)
 {
-	if (self->buffers.count)
+	if (self->instance != NULL && self->instance->buffers.count)
 		private_update_envmap (self);
 }
 
@@ -323,44 +246,23 @@ lirnd_object_set_model (lirndObject* self,
                         lirndModel*  model,
                         limdlPose*   pose)
 {
-	lirndObject backup;
-
-	/* Clear old model. */
-	memcpy (&backup, self, sizeof (lirndObject));
-	memset (&self->cubemap, 0, sizeof (self->cubemap));
-	self->buffers.count = 0;
-	self->buffers.array = NULL;
-	self->lights.count = 0;
-	self->lights.array = NULL;
-	self->materials.count = 0;
-	self->materials.array = NULL;
-
-	/* Create new model. */
-	if (model != NULL)
-	{
-		if (!private_init_materials (self, model) ||
-		    !private_init_model (self, model) ||
-		    !private_init_lights (self, pose) || 
-		    !private_init_envmap (self))
-		{
-			private_clear_lights (self);
-			private_clear_materials (self);
-			private_clear_model (self);
-			private_clear_envmap (self);
-			memcpy (self, &backup, sizeof (lirndObject));
-			return 0;
-		}
-		self->aabb = model->aabb;
-	}
-	else
-		limat_aabb_init (&self->aabb);
-
-	/* Replace old model. */
-	private_clear_lights (&backup);
-	private_clear_materials (&backup);
-	private_clear_model (&backup);
-	private_clear_envmap (&backup);
+	/* Replace model. */
 	self->model = model;
+
+	/* Replace instance. */
+	if (self->instance != NULL)
+		lirnd_model_free (self->instance);
+	if (model != NULL && pose != NULL)
+		self->instance = lirnd_model_new_instance (model);
+	else
+		self->instance = NULL;
+	self->aabb = model->aabb;
+
+	/* Replace lights and environment map. */
+	private_clear_lights (self);
+	private_clear_envmap (self);
+	private_init_lights (self, pose);
+	private_init_envmap (self);
 
 	return 1;
 }
@@ -377,7 +279,7 @@ lirnd_object_set_model (lirndObject* self,
 int
 lirnd_object_get_realized (const lirndObject* self)
 {
-	return self->realized && self->buffers.count;
+	return self->realized && (self->model != NULL || self->instance != NULL);
 }
 
 /**
@@ -491,15 +393,17 @@ private_clear_envmap (lirndObject* self)
 	lirndMaterial* material;
 	lirndTexture* texture;
 
+	if (self->instance == NULL)
+		return;
 	glDeleteFramebuffersEXT (6, self->cubemap.fbo);
 	glDeleteTextures (1, &self->cubemap.depth);
 	glDeleteTextures (1, &self->cubemap.map);
 	memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
 	self->cubemap.depth = 0;
 	self->cubemap.map = 0;
-	for (i = 0 ; i < self->materials.count ; i++)
+	for (i = 0 ; i < self->instance->materials.count ; i++)
 	{
-		material = self->materials.array[i];
+		material = self->instance->materials.array[i];
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;
@@ -527,33 +431,6 @@ private_clear_lights (lirndObject* self)
 	self->lights.count = 0;
 }
 
-static void
-private_clear_materials (lirndObject* self)
-{
-	int i;
-
-	for (i = 0 ; i < self->materials.count ; i++)
-	{
-		if (self->materials.array[i] != NULL)
-			lirnd_material_free (self->materials.array[i]);
-	}
-	lisys_free (self->materials.array);
-	self->materials.array = NULL;
-	self->materials.count = 0;
-}
-
-static void
-private_clear_model (lirndObject* self)
-{
-	int i;
-
-	for (i = 0 ; i < self->buffers.count ; i++)
-		lirnd_buffer_free (self->buffers.array + i);
-	lisys_free (self->buffers.array);
-	self->buffers.array = NULL;
-	self->buffers.count = 0;
-}
-
 static int
 private_init_envmap (lirndObject* self)
 {
@@ -571,9 +448,11 @@ private_init_envmap (lirndObject* self)
 		return 1;
 
 	/* Check if needed by textures. */
-	for (i = 0 ; i < self->materials.count ; i++)
+	if (self->instance == NULL)
+		return 1;
+	for (i = 0 ; i < self->instance->materials.count ; i++)
 	{
-		material = self->materials.array[i];
+		material = self->instance->materials.array[i];
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;
@@ -646,9 +525,9 @@ private_init_envmap (lirndObject* self)
 	self->cubemap.height = height;
 
 	/* Bind it to environment map textures. */
-	for (i = 0 ; i < self->materials.count ; i++)
+	for (i = 0 ; i < self->instance->materials.count ; i++)
 	{
-		material = self->materials.array[i];
+		material = self->instance->materials.array[i];
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;
@@ -715,75 +594,6 @@ private_init_lights (lirndObject* self,
 				return 0;
 			}
 		}
-	}
-
-	return 1;
-}
-
-static int
-private_init_materials (lirndObject* self,
-                        lirndModel*  model)
-{
-	uint32_t i;
-	limdlMaterial* src;
-	lirndMaterial* dst;
-
-	if (model == NULL || model->model == NULL)
-		return 1;
-
-	/* Allocate materials. */
-	self->materials.count = model->model->materials.count;
-	if (self->materials.count)
-	{
-		self->materials.array = lisys_calloc (self->materials.count, sizeof (lirndMaterial*));
-		if (self->materials.array == NULL)
-			return 0;
-	}
-
-	/* Resolve materials. */
-	for (i = 0 ; i < self->materials.count ; i++)
-	{
-		src = model->model->materials.array + i;
-		dst = lirnd_material_new_from_model (self->scene->render, src);
-		if (dst == NULL)
-			return 0;
-		self->materials.array[i] = dst;
-	}
-
-	return 1;
-}
-
-static int
-private_init_model (lirndObject* self,
-                    lirndModel*  model)
-{
-	int i;
-	limdlFaces* group;
-	lirndFormat format =
-	{
-		12 * sizeof (float), 3,
-		{ GL_FLOAT, GL_FLOAT, GL_FLOAT },
-		{ 0 * sizeof (float), 2 * sizeof (float), 4 * sizeof (float) },
-		GL_FLOAT, 6 * sizeof (float),
-		GL_FLOAT, 9 * sizeof (float)
-	};
-
-	/* Allocate buffer list. */
-	self->buffers.array = lisys_calloc (model->model->facegroups.count, sizeof (lirndBuffer));
-	if (self->buffers.array == NULL)
-		return 0;
-	self->buffers.count = model->model->facegroups.count;
-
-	/* Allocate buffer data. */
-	for (i = 0 ; i < self->buffers.count ; i++)
-	{
-		group = model->model->facegroups.array + i;
-		assert (group->material >= 0);
-		assert (group->material < self->materials.count);
-		if (!lirnd_buffer_init (self->buffers.array + i,
-		                        self->materials.array[group->material], &format,
-		                        group->vertices.array, group->vertices.count))
-			return 0;
 	}
 
 	return 1;
@@ -868,7 +678,7 @@ private_update_lights (lirndObject* self)
 		light = self->lights.array[i];
 		if (light->node != NULL)
 		{
-			limdl_node_get_pose_transform (light->node, &transform);
+			limdl_node_get_world_transform (light->node, &transform);
 			transform = limat_transform_multiply (self->transform, transform);
 			lirnd_light_set_transform (light, &transform);
 		}

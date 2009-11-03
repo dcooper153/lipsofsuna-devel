@@ -131,12 +131,20 @@ lieng_camera_set_driver (liengCamera*      self,
                          liengCameraDriver value);
 
 void
+lieng_camera_set_far (liengCamera* self,
+                      int          value);
+
+void
 lieng_camera_get_frustum (const liengCamera* self,
                           limatFrustum*      result);
 
 void
 lieng_camera_get_modelview (const liengCamera* self,
                             limatMatrix*       value);
+
+void
+lieng_camera_set_near (liengCamera* self,
+                       int          value);
 
 void
 lieng_camera_get_projection (const liengCamera* self,

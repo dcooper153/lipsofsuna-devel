@@ -31,11 +31,11 @@
 #define LIVOX_SECTORS_PER_WORLD (LIVOX_SECTORS_PER_LINE * LIVOX_SECTORS_PER_LINE * LIVOX_SECTORS_PER_LINE)
 #define LIVOX_BLOCK_INDEX(x, y, z) ((x) + LIVOX_BLOCKS_PER_LINE * (y) + LIVOX_BLOCKS_PER_PLANE * (z))
 #define LIVOX_BLOCK_WIDTH (LIVOX_TILE_WIDTH * LIVOX_TILES_PER_LINE)
-#define LIVOX_BLOCKS_PER_LINE 8
+#define LIVOX_BLOCKS_PER_LINE 4
 #define LIVOX_BLOCKS_PER_PLANE (LIVOX_BLOCKS_PER_LINE * LIVOX_BLOCKS_PER_LINE)
 #define LIVOX_BLOCKS_PER_SECTOR (LIVOX_BLOCKS_PER_LINE * LIVOX_BLOCKS_PER_LINE * LIVOX_BLOCKS_PER_LINE)
 #define LIVOX_TILE_INDEX(x, y, z) ((x) + LIVOX_TILES_PER_LINE * (y) + LIVOX_TILES_PER_PLANE * (z))
-#define LIVOX_TILE_WIDTH (64.0f / 64.0f)
+#define LIVOX_TILE_WIDTH (64.0f / 32.0f)
 #define LIVOX_TILES_PER_LINE 8
 #define LIVOX_TILES_PER_PLANE (LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE)
 #define LIVOX_TILES_PER_BLOCK (LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE)
@@ -43,13 +43,10 @@
 typedef struct _livoxVoxel livoxVoxel;
 struct _livoxVoxel
 {
-	uint8_t terrain;
-	int8_t displacex;
-	int8_t displacey;
-	int8_t displacez;
+	uint16_t type;
+	uint8_t damage;
 };
 
-//typedef uint16_t livoxVoxel;
 typedef struct _livoxManager livoxManager;
 typedef struct _livoxMaterial livoxMaterial;
 typedef struct _livoxSector livoxSector;

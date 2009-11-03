@@ -50,15 +50,9 @@ private_play_channel (const limdlPose*  self,
                       limdlPoseChannel* channel,
                       float             secs);
 
-static inline void
-private_pose_orientation (const limdlPose* self,
-                          const limdlNode* node,
-                          limatTransform*  value);
-
 static void
-private_transform_node (limdlPose*       self,
-                        limdlNode*       node,
-                        const limdlNode* parent);
+private_transform_node (limdlPose* self,
+                        limdlNode* node);
 
 static float
 private_get_channel_weight (const limdlPose*        self,
@@ -272,6 +266,7 @@ limdl_pose_update (limdlPose* self,
 {
 	int i;
 	lialgU32dicIter iter;
+	limdlConstraint* constraint;
 	limdlPoseFade* fade;
 	limdlPoseFade* fade_next;
 	limdlPoseChannel* chan;
@@ -326,7 +321,14 @@ limdl_pose_update (limdlPose* self,
 	for (i = 0 ; i < self->nodes.count ; i++)
 	{
 		node0 = self->nodes.array[i];
-		private_transform_node (self, node0, NULL);
+		private_transform_node (self, node0);
+	}
+
+	/* Update constraints. */
+	for (i = 0 ; i < self->model->constraints.count ; i++)
+	{
+		constraint = self->model->constraints.array[i];
+		limdl_constraint_solve (constraint, self);
 	}
 }
 
@@ -389,23 +391,23 @@ limdl_pose_transform_group (limdlPose*   self,
 
 #warning Possible to use transforms here?
 			/* Get the rotations. */
-			quat0 = restbone->transform.pose.rotation;
-			quat1 = posebone->transform.pose.rotation;
+			quat0 = restbone->transform.global.rotation;
+			quat1 = posebone->transform.global.rotation;
 			quat0 = limat_quaternion_conjugate (quat0);
 
 			/* Transform the vertex. */
-			tmp = limat_vector_subtract (rest_vertex, restbone->transform.pose.position);
+			tmp = limat_vector_subtract (rest_vertex, restbone->transform.global.position);
 			tmp = limat_quaternion_transform (quat0, tmp);
 			tmp = limat_quaternion_transform (quat1, tmp);
-			tmp = limat_vector_add (tmp, posebone->transform.pose.position);
+			tmp = limat_vector_add (tmp, posebone->transform.global.position);
 			pose_vertex = limat_vector_add (pose_vertex,
 				limat_vector_multiply (tmp, weight->weight));
 
 			/* Transform the normal. */
-			tmp = limat_vector_subtract (rest_normal, restbone->transform.pose.position);
+			tmp = limat_vector_subtract (rest_normal, restbone->transform.global.position);
 			tmp = limat_quaternion_transform (quat0, tmp);
 			tmp = limat_quaternion_transform (quat1, tmp);
-			tmp = limat_vector_add (tmp, posebone->transform.pose.position);
+			tmp = limat_vector_add (tmp, posebone->transform.global.position);
 			pose_normal = limat_vector_add (pose_normal,
 				limat_vector_multiply (tmp, weight->weight));
 		}
@@ -638,7 +640,7 @@ private_clear_node (limdlPose*       self,
 	limdlNode* node0;
 	limdlNode* node1;
 
-	node->transform.pose = rest->transform.pose;
+	node->transform.global = rest->transform.global;
 	for (i = 0 ; i < node->nodes.count ; i++)
 	{
 		node0 = node->nodes.array[i];
@@ -770,39 +772,6 @@ private_init_pose (limdlPose*  self,
 	return 1;
 }
 
-static void
-private_transform_node (limdlPose*       self,
-                        limdlNode*       node,
-                        const limdlNode* parent)
-{
-	int i;
-	limatTransform pose;
-	limatTransform rest;
-	limdlNode* child;
-
-	/* Get rest transformation. */
-	if (parent != NULL)
-	{
-		rest = parent->transform.pose;
-		if (parent->type == LIMDL_NODE_BONE)
-			rest.position = parent->bone.tail;
-	}
-	else
-		rest = limat_transform_identity ();
-
-	/* Calculate pose transformation. */
-	pose = limat_transform_identity ();
-	private_pose_orientation (self, node, &pose);
-	limdl_node_set_pose_transform (node, &rest, &pose);
-
-	/* Transform child nodes. */
-	for (i = 0 ; i < node->nodes.count ; i++)
-	{
-		child = node->nodes.array[i];
-		private_transform_node (self, child, node);
-	}
-}
-
 static int
 private_play_channel (const limdlPose*  self,
                       limdlPoseChannel* channel,
@@ -837,17 +806,18 @@ private_play_channel (const limdlPose*  self,
 	return 1;
 }
 
-static inline void
-private_pose_orientation (const limdlPose* self,
-                          const limdlNode* node,
-                          limatTransform*  value)
+static void
+private_transform_node (limdlPose* self,
+                        limdlNode* node)
 {
+	int i;
 	int channels;
 	float total;
 	float weight;
 	lialgU32dicIter iter;
 	limatQuaternion bonerot;
 	limatQuaternion rotation;
+	limatTransform transform;
 	limatVector bonepos;
 	limatVector position;
 	limdlIpo* ipo;
@@ -917,7 +887,14 @@ private_pose_orientation (const limdlPose* self,
 		position = limat_vector_lerp (bonepos, position, weight / total);
 	}
 
-	*value = limat_transform_init (position, rotation);
+	/* Update node transformation. */
+	transform = limat_transform_init (position, rotation);
+	limdl_node_set_local_transform (node, &transform);
+	limdl_node_rebuild (node, 0);
+
+	/* Update child transformations recursively. */
+	for (i = 0 ; i < node->nodes.count ; i++)
+		private_transform_node (self, node->nodes.array[i]);
 }
 
 static float

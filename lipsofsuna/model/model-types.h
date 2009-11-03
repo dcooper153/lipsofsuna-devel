@@ -25,7 +25,17 @@
 #ifndef __MODEL_TYPES_H__
 #define __MODEL_TYPES_H__
 
+#include <math/lips-math.h>
+
 typedef struct _limdlBone limdlBone;
+
+/**
+ * @}
+ * \addtogroup limdlConstraint Constraint
+ * @{
+ */
+
+typedef union _limdlConstraint limdlConstraint;
 
 /**
  * @}
@@ -47,6 +57,7 @@ typedef struct _limdlLight limdlLight;
  */
 
 typedef struct _limdlModel limdlModel;
+typedef struct _limdlWeightGroup limdlWeightGroup;
 
 /**
  * @}
@@ -63,6 +74,18 @@ enum _limdlNodeType
 
 typedef enum _limdlNodeType limdlNodeType;
 typedef struct _limdlNode limdlNode;
+typedef void (*limdlNodeTransformFunc)(void*, limdlNode*, limatTransform*);
+
+/**
+ * @}
+ * \addtogroup limdlPose Pose
+ * @{
+ */
+
+typedef int limdlPoseChannelState;
+typedef struct _limdlPoseChannel limdlPoseChannel;
+typedef struct _limdlPoseFade limdlPoseFade;
+typedef struct _limdlPose limdlPose;
 
 /**
  * @}

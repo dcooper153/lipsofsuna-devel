@@ -225,6 +225,29 @@ limat_aabb_intersects_aabb (const limatAabb* self,
 	return 1;
 }
 
+/**
+ * \brief Calculates a bounding box that encloses both of the passed AABBs.
+ *
+ * \param self Axis-aligned bounding box.
+ * \param aabb Axis-aligned bounding box.
+ * \return Axis-aligned bounding box.
+ */
+static inline limatAabb
+limat_aabb_union (const limatAabb self,
+                  const limatAabb aabb)
+{
+	limatAabb ret;
+
+	ret.min.x = self.min.x < aabb.min.x? self.min.x : aabb.min.x;
+	ret.min.y = self.min.y < aabb.min.y? self.min.y : aabb.min.y;
+	ret.min.z = self.min.z < aabb.min.z? self.min.z : aabb.min.z;
+	ret.max.x = self.max.x > aabb.max.x? self.max.x : aabb.max.x;
+	ret.max.y = self.max.y > aabb.max.y? self.max.y : aabb.max.y;
+	ret.max.z = self.max.z > aabb.max.z? self.max.z : aabb.max.z;
+
+	return ret;
+}
+
 #endif
 
 /** @} */

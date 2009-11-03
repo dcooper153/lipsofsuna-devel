@@ -64,7 +64,8 @@ int
 liext_editor_save (liextEditor* self);
 
 void
-liext_editor_reset (liextEditor* self);
+liext_editor_reset (liextEditor* self,
+                    liarcReader* reader);
 
 #endif
 

@@ -13,8 +13,14 @@ def PowerOfTwo(value):
 
 class LipsEnum:
 	def __init__(self):
+		self.ConstraintTypes = LipsEnumConstraintTypes()
 		self.TexFlags = LipsEnumTexFlags()
 		self.TexTypes = LipsEnumTexTypes()
+class LipsEnumConstraintTypes:
+	def __init__(self):
+		self.COPY_ROTATION = 0
+		self.INVERSE_KINEMATICS = 1
+		self.LIMIT_ROTATION = 2
 class LipsEnumTexFlags:
 	def __init__(self):
 		self.BILINEAR = 1
@@ -139,7 +145,7 @@ def MaterialTextures(bmat, bmesh, bface):
 					flags = textures[0].flags
 				textures[0] = LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)
 			else:
-				textures[0] = LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)
+				textures = [LipsTexture(Lips.TexTypes.IMAGE, flags, 0, 0, name)]
 				count = 1
 	return textures[:count]
 
@@ -962,6 +968,7 @@ class LipsStorage:
 		self.animations = LipsAnimations()
 		self.hairs = LipsHairs()
 		self.faces = LipsFaces()
+		self.constraints = []
 		self.materials = {}
 		self.node = None
 		self.weightnames = []
@@ -976,6 +983,18 @@ class LipsStorage:
 
 	def AddArmature(self, bobj):
 		self.animations.AddArmature(bobj, bobj.getData())
+		pose = bobj.getPose()
+		for name in pose.bones.keys():
+			bone = pose.bones[name]
+			for constraint in bone.constraints:
+				if constraint.type == Blender.Constraint.Type.IKSOLVER:
+						#offs = constraint[Constraint.Settings.OFFSET]
+						chainlen = constraint[Blender.Constraint.Settings.CHAINLEN]
+						target = constraint[Blender.Constraint.Settings.BONE]
+						self.constraints.append([Lips.ConstraintTypes.INVERSE_KINEMATICS, bone.name, target, chainlen])
+				elif constraint.type == Blender.Constraint.Type.COPYROT:
+						target = constraint[Blender.Constraint.Settings.BONE]
+						self.constraints.append([Lips.ConstraintTypes.COPY_ROTATION, bone.name, target])
 
 	def AddHair(self, bmat, hair):
 		mat = self.AddMaterial(bmat, None, None)
@@ -1076,6 +1095,18 @@ class LipsStorage:
 		writer.WriteString("nod")
 		writer.WriteInt(1)
 		self.node.Write(writer)
+		# Constraints.
+		writer.WriteString("con")
+		writer.WriteInt(len(self.constraints))
+		for ary in self.constraints:
+			writer.WriteInt(ary[0])
+			if ary[0] == Lips.ConstraintTypes.COPY_ROTATION:
+				writer.WriteString(ary[1])
+				writer.WriteString(ary[2])
+			elif ary[0] == Lips.ConstraintTypes.INVERSE_KINEMATICS:
+				writer.WriteString(ary[1])
+				writer.WriteString(ary[2])
+				writer.WriteInt(ary[3])
 		# Animations.
 		writer.WriteString("ani")
 		self.animations.Write(writer)

@@ -37,6 +37,7 @@
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
+#include "system-relative.h"
 
 /**
  * \brief Gets the file name of the calling executable.
@@ -145,38 +146,23 @@ lisys_relative_exename ()
 	return tmp;
 #elif defined WIN32
 	char* tmp;
-	char* path;
-	size_t ret;
-	size_t size = 256;
+	char name[MAX_PATH];
 
-	path = malloc (size);
-	if (path == NULL)
+	/* Get executable name. */
+	name[0] = '\0';
+	GetModuleFileNameA (NULL, name, MAX_PATH);
+	if (name[0] == '\0')
 		return NULL;
-	while (1)
-	{
-		ret = GetModuleFileNameA (NULL, path, size);
-		if (!ret)
-		{
-			free (path);
-			return NULL;
-		}
-		if (ret < size)
-			break;
-		tmp = realloc (path, size <<= 1);
-		if (tmp == NULL)
-		{
-			free (path);
-			return NULL;
-		}
-		path = tmp;
-	}
-	for (tmp = path ; *tmp != '\0' ; tmp++)
+	name[MAX_PATH - 1] = '\0';
+
+	/* Fix backslashes. */
+	for (tmp = name ; *tmp != '\0' ; tmp++)
 	{
 		if (*tmp == '\\')
 			*tmp = '/';
 	}
 
-	return path;
+	return strdup (name);
 #else
 #warning "Not supported."
 	return NULL;

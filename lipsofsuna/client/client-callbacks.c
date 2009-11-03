@@ -174,7 +174,6 @@ private_miscellaneous_tick (licliModule* module,
 
 	/* Update engine state. */
 	lieng_engine_update (module->engine, secs);
-	livox_manager_update (module->voxels, secs);
 
 	/* Check for player. */
 	player = licli_module_get_player (module);

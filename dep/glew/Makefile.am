@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I msc/m4
+ACLOCAL_AMFLAGS = -I m4
 INCLUDES = -I$(srcdir)/include
 AM_CFLAGS = -g -Wall -DGLEW_BUILD $(GL_CFLAGS)
 

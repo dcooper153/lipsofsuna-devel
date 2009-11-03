@@ -83,7 +83,11 @@ liphy_physics_new ()
 	try
 	{
 		self->ghostcallback = new btGhostPairCallback ();
+#ifdef LIPHY_BROADPHASE_DBVT
+		self->broadphase = new btDbvtBroadphase ();
+#else
 		self->broadphase = new bt32BitAxisSweep3 (min, max, MAXPROXIES);
+#endif
 		self->broadphase->getOverlappingPairCache ()->setInternalGhostPairCallback (self->ghostcallback);
 		self->configuration = new btDefaultCollisionConfiguration ();
 		self->dispatcher = new btCollisionDispatcher (self->configuration);

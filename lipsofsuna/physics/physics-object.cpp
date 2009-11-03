@@ -81,6 +81,7 @@ liphy_object_new (liphyPhysics*    physics,
 	self->config.collision_mask = LIPHY_DEFAULT_COLLISION_MASK;
 	try
 	{
+		self->shape = new btCompoundShape ();
 		self->motion = new liphyMotionState (self, btTransform (orientation, position));
 	}
 	catch (...)
@@ -106,8 +107,21 @@ liphy_object_free (liphyObject* self)
 {
 	self->flags &= ~PRIVATE_REALIZED;
 	private_update_state (self);
+	delete self->shape;
 	delete self->motion;
 	lisys_free (self);
+}
+
+/**
+ * \brief Clears the current shape of the object.
+ *
+ * \param self Object.
+ */
+void
+liphy_object_clear_shape (liphyObject* self)
+{
+	while (self->shape->getNumChildShapes ())
+		self->shape->removeChildShapeByIndex (0);
 }
 
 /**
@@ -129,6 +143,25 @@ liphy_object_impulse (liphyObject*       self,
 		self->config.character_force = limat_vector_add (self->config.character_force, *impulse);
 	if (self->control != NULL)
 		self->control->apply_impulse (v0, v1);
+}
+
+int
+liphy_object_insert_shape (liphyObject*       self,
+                           liphyShape*        shape,
+                           liphyShapeMode     mode,
+                           const limatVector* origin)
+{
+	btTransform transform;
+
+#warning Only supports convex shapes.
+	if (origin != NULL)
+		transform.setOrigin (btVector3 (origin->x, origin->y, origin->z));
+	else
+		transform.setOrigin (btVector3 (0.0f, 0.0f, 0.0f));
+	transform.setRotation (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
+	self->shape->addChildShape (transform, shape->shapes.convex);
+
+	return 1;
 }
 
 /**
@@ -490,10 +523,12 @@ void
 liphy_object_get_inertia (liphyObject* self,
                           limatVector* result)
 {
-	if (self->shape != NULL)
-		liphy_shape_get_inertia (self->shape, self->config.mass, result);
-	else
-		*result = limat_vector_init (0.0f, 0.0f, 0.0f);
+	btVector3 inertia;
+
+	self->shape->calculateLocalInertia (self->config.mass, inertia);
+	result->x = inertia[0];
+	result->y = inertia[1];
+	result->z = inertia[2];
 }
 
 /**
@@ -521,18 +556,15 @@ liphy_object_set_mass (liphyObject* self,
 	limatVector v;
 	btVector3 inertia(0.0, 0.0, 0.0);
 
+	self->config.mass = value;
 	if (self->control != NULL)
 	{
-		if (self->shape != NULL)
-		{
-			liphy_shape_get_inertia (self->shape, value, &v);
-			inertia[0] = v.x;
-			inertia[1] = v.y;
-			inertia[2] = v.z;
-		}
+		liphy_object_get_inertia (self, &v);
+		inertia[0] = v.x;
+		inertia[1] = v.y;
+		inertia[2] = v.z;
 		self->control->set_mass (value, inertia);
 	}
-	self->config.mass = value;
 }
 
 /**
@@ -651,18 +683,6 @@ liphy_object_set_speed (liphyObject* self,
 }
 
 /**
- * \brief Gets the collision shape of the object.
- *
- * \param self Object.
- * \return Collision shape or NULL.
- */
-const liphyShape*
-liphy_object_get_shape (const liphyObject* self)
-{
-	return self->shape;
-}
-
-/**
  * \brief Sets the collision shape of the object.
  *
  * \param self Object.
@@ -674,9 +694,9 @@ liphy_object_set_shape (liphyObject*   self,
                         liphyShape*    shape,
                         liphyShapeMode mode)
 {
-	if (self->shape == shape && self->shape_mode == mode)
-		return;
-	self->shape = shape;
+	liphy_object_clear_shape (self);
+	if (shape != NULL)
+		liphy_object_insert_shape (self, shape, mode, NULL);
 	self->shape_mode = mode;
 	private_update_state (self);
 }
@@ -703,7 +723,8 @@ void
 liphy_object_set_shape_mode (liphyObject*   self,
                              liphyShapeMode value)
 {
-	liphy_object_set_shape (self, self->shape, value);
+#warning Shape mode switching id disabled.
+//	liphy_object_set_shape (self, self->shape, value);
 }
 
 /**
@@ -877,8 +898,6 @@ private_sweep_sphere (const liphyObject* self,
 	/* Get own object. */
 	if (self->control == NULL)
 		return 0;
-	if (self->shape == NULL)
-		return 0;
 	object = self->control->get_object ();
 	if (object == NULL)
 		return 0;
@@ -913,6 +932,7 @@ private_sweep_shape (const liphyObject* self,
                      const btVector3&   sweep,
                      btVector3*         normal)
 {
+	int i;
 	btTransform src;
 	btTransform dst;
 	btCollisionObject* object;
@@ -925,29 +945,34 @@ private_sweep_shape (const liphyObject* self,
 	object = self->control->get_object ();
 	if (object == NULL)
 		return 1.0f;
-	if (self->shape == NULL)
+	if (self->shape->getNumChildShapes () == 0)
 		return 1.0f;
 
 	/* Initialize sweep. */
+	float best = 1.0f;
 	PrivateConvexTest test (object);
 	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = self->config.collision_group;
 	test.m_collisionFilterMask = self->config.collision_mask;
 
 	/* Sweep the shape. */
-	collision = self->physics->dynamics->getCollisionWorld ();
-	if (self->shape_mode != LIPHY_SHAPE_MODE_CONCAVE)
-		shape = (btConvexShape*) private_choose_shape (self, self->shape, self->shape_mode);
-	else
-		shape = (btConvexShape*) private_choose_shape (self, self->shape, LIPHY_SHAPE_MODE_CONVEX);
-	src = start;
-	dst = src;
-	dst.setOrigin (dst.getOrigin () + sweep);
-	collision->convexSweepTest (shape, src, dst, test);
-	if (normal != NULL)
-		*normal = test.m_hitNormalWorld;
+	for (i = 0 ; i < self->shape->getNumChildShapes () ; i++)
+	{
+		collision = self->physics->dynamics->getCollisionWorld ();
+		shape = (btConvexShape*) self->shape->getChildShape (i);
+		src = start;
+		dst = src;
+		dst.setOrigin (dst.getOrigin () + sweep);
+		collision->convexSweepTest (shape, src, dst, test);
+		if (test.m_closestHitFraction <= best)
+		{
+			best = test.m_closestHitFraction;
+			if (normal != NULL)
+				*normal = test.m_hitNormalWorld;
+		}
+	}
 
-	return test.m_closestHitFraction;
+	return best;
 }
 
 static void
@@ -962,10 +987,14 @@ private_update_state (liphyObject* self)
 	}
 	if (self->flags & PRIVATE_REALIZED)
 	{
-		if (self->control_mode != LIPHY_CONTROL_MODE_STATIC && self->shape_mode == LIPHY_SHAPE_MODE_CONCAVE)
+#warning Broken collision shape selection.
+/*		if (self->control_mode != LIPHY_CONTROL_MODE_STATIC && self->shape_mode == LIPHY_SHAPE_MODE_CONCAVE)
 			shape = private_choose_shape (self, self->shape, LIPHY_SHAPE_MODE_CONVEX);
 		else
 			shape = private_choose_shape (self, self->shape, self->shape_mode);
+		if (shape == NULL)
+			return;*/
+		shape = self->shape;
 		switch (self->control_mode)
 		{
 			case LIPHY_CONTROL_MODE_NONE:

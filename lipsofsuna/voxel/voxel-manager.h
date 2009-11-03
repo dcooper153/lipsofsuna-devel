@@ -26,34 +26,36 @@
 #define __VOXEL_MANAGER_H__
 
 #include <algorithm/lips-algorithm.h>
+#include <callback/lips-callback.h>
 #include <system/lips-system.h>
 #include "voxel-sector.h"
 #include "voxel-types.h"
 
 /*****************************************************************************/
 
+enum
+{
+	LIVOX_CALLBACK_FREE_BLOCK,
+	LIVOX_CALLBACK_LOAD_BLOCK
+};
+
+typedef struct _livoxUpdateEvent livoxUpdateEvent;
+struct _livoxUpdateEvent
+{
+	int sector[3];
+	int block[3];
+};
+
 struct _livoxManager
 {
 	lialgU32dic* materials;
 	lialgU32dic* sectors;
 	liarcSql* sql;
-	liphyPhysics* physics;
-#ifndef LIVOX_DISABLE_GRAPHICS
-	lirndApi* renderapi;
-	lirndRender* render;
-	lirndScene* scene;
-#endif
+	licalCallbacks* callbacks;
 };
 
-#ifndef LIVOX_DISABLE_GRAPHICS
 livoxManager*
-livox_manager_new (liphyPhysics* physics,
-                   lirndScene*   scene,
-                   lirndApi*     rndapi);
-#else
-livoxManager*
-livox_manager_new (liphyPhysics* physics);
-#endif
+livox_manager_new ();
 
 void
 livox_manager_free (livoxManager* self);
@@ -63,11 +65,6 @@ livox_manager_clear (livoxManager* self);
 
 void
 livox_manager_clear_materials (livoxManager* self);
-
-int
-livox_manager_color_voxel (livoxManager*      self,
-                           const limatVector* point,
-                           int                terrain);
 
 void
 livox_manager_copy_voxels (livoxManager* self,
@@ -83,45 +80,9 @@ livoxSector*
 livox_manager_create_sector (livoxManager* self,
                              uint32_t      id);
 
-void
-livox_manager_erase_box (livoxManager*      self,
-                         const limatVector* min,
-                         const limatVector* max);
-
-int
-livox_manager_erase_point (livoxManager*      self,
-                           const limatVector* point);
-
-void
-livox_manager_erase_sphere (livoxManager*      self,
-                            const limatVector* center,
-                            float              radius);
-
 int
 livox_manager_erase_voxel (livoxManager*      self,
                            const limatVector* point);
-
-void
-livox_manager_fill_box (livoxManager*      self,
-                        const limatVector* min,
-                        const limatVector* max,
-                        int                terrain);
-
-int
-livox_manager_fill_point (livoxManager*      self,
-                          const limatVector* point,
-                          int                terrain);
-
-void
-livox_manager_fill_sphere (livoxManager*      self,
-                           const limatVector* center,
-                           float              radius,
-                           int                terrain);
-
-int
-livox_manager_fill_voxel (livoxManager*      self,
-                          const limatVector* point,
-                          int                terrain);
 
 livoxMaterial*
 livox_manager_find_material (livoxManager* self,
@@ -136,6 +97,11 @@ livox_manager_insert_material (livoxManager*  self,
                                livoxMaterial* material);
 
 int
+livox_manager_insert_voxel (livoxManager*      self,
+                            const limatVector* point,
+                            int                terrain);
+
+int
 livox_manager_load_materials (livoxManager* self);
 
 livoxSector*
@@ -148,6 +114,11 @@ livox_manager_mark_updates (livoxManager* self);
 void
 livox_manager_remove_material (livoxManager* self,
                                int           id);
+
+int
+livox_manager_replace_voxel (livoxManager*      self,
+                             const limatVector* point,
+                             int                terrain);
 
 void
 livox_manager_update (livoxManager* self,

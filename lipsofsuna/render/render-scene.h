@@ -35,6 +35,7 @@
 
 struct _lirndScene
 {
+	lialgPtrdic* groups;
 	lialgU32dic* objects;
 	liparManager* particles;
 	lirndRender* render;

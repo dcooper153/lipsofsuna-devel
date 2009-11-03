@@ -57,14 +57,6 @@ static int
 private_resources (licliModule* module,
                    liarcReader* reader);
 
-static int
-private_voxel_assign (licliModule* module,
-                      liarcReader* reader);
-
-static int
-private_voxel_diff (licliModule* module,
-                    liarcReader* reader);
-
 /*****************************************************************************/
 
 /**
@@ -106,12 +98,6 @@ licli_module_handle_packet (licliModule* self,
 			break;
 		case LINET_SERVER_PACKET_RESOURCES:
 			private_resources (self, reader);
-			break;
-		case LIEXT_VOXEL_PACKET_ASSIGN:
-			private_voxel_assign (self, reader);
-			break;
-		case LIEXT_VOXEL_PACKET_DIFF:
-			private_voxel_diff (self, reader);
 			break;
 	}
 
@@ -378,63 +364,6 @@ private_resources (licliModule* module,
                    liarcReader* reader)
 {
 	lieng_engine_load_resources (module->engine, reader);
-
-	return 1;
-}
-
-static int
-private_voxel_assign (licliModule* module,
-                      liarcReader* reader)
-{
-	livoxMaterial* material;
-
-	while (!liarc_reader_check_end (reader))
-	{
-		material = livox_material_new_from_stream (reader);
-		if (material == NULL)
-			return 0;
-		if (!livox_manager_insert_material (module->voxels, material))
-			livox_material_free (material);
-	}
-
-	return 1;
-}
-
-static int
-private_voxel_diff (licliModule* module,
-                    liarcReader* reader)
-{
-	uint8_t sectorx;
-	uint8_t sectory;
-	uint8_t sectorz;
-	uint16_t blockid;
-	livoxBlock* block;
-	livoxSector* sector;
-
-	while (!liarc_reader_check_end (reader))
-	{
-		/* Read block offset. */
-		if (!liarc_reader_get_uint8 (reader, &sectorx) ||
-		    !liarc_reader_get_uint8 (reader, &sectory) ||
-		    !liarc_reader_get_uint8 (reader, &sectorz) ||
-		    !liarc_reader_get_uint16 (reader, &blockid))
-			return 0;
-		if (blockid >= LIVOX_BLOCKS_PER_SECTOR)
-			return 0;
-
-		/* Find block. */
-		sector = livox_manager_create_sector (module->voxels,
-			LIENG_SECTOR_INDEX (sectorx, sectory, sectorz));
-		if (sector == NULL)
-			return 0;
-		block = livox_sector_get_block (sector, blockid);
-
-		/* Read block data. */
-		if (!livox_block_read (block, module->voxels, reader))
-			return 0;
-		if (livox_block_get_dirty (block))
-			livox_sector_set_dirty (sector, 1);
-	}
 
 	return 1;
 }

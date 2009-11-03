@@ -43,9 +43,18 @@ void
 liphy_object_free (liphyObject* self);
 
 void
+liphy_object_clear_shape (liphyObject* self);
+
+void
 liphy_object_impulse (liphyObject*       self,
                       const limatVector* point,
                       const limatVector* impulse);
+
+int
+liphy_object_insert_shape (liphyObject*       self,
+                           liphyShape*        shape,
+                           liphyShapeMode     mode,
+                           const limatVector* origin);
 
 void
 liphy_object_jump (liphyObject*       self,
@@ -149,9 +158,6 @@ liphy_object_get_speed (const liphyObject* self);
 void
 liphy_object_set_speed (liphyObject* self,
                         float        value);
-
-const liphyShape*
-liphy_object_get_shape (const liphyObject* self);
 
 void
 liphy_object_set_shape (liphyObject*   self,

@@ -67,14 +67,10 @@ private_stroke_paint (ligenGenerator* self,
  * \brief Creates a new generator module.
  *
  * \param paths Path information.
- * \param scene Render scene or NULL.
- * \param rndapi Render API or NULL.
  * \return New generator or NULL.
  */
 ligenGenerator*
-ligen_generator_new (lipthPaths* paths,
-                     lirndScene* scene,
-                     lirndApi*   rndapi)
+ligen_generator_new (lipthPaths*  paths)
 {
 	ligenGenerator* self;
 
@@ -92,7 +88,7 @@ ligen_generator_new (lipthPaths* paths,
 	self->physics = liphy_physics_new ();
 	if (self->physics == NULL)
 		goto error;
-	self->voxels = livox_manager_new (self->physics, scene, rndapi);
+	self->voxels = livox_manager_new ();
 	if (self->voxels == NULL)
 		goto error;
 
@@ -313,8 +309,7 @@ ligen_generator_rebuild_scene (ligenGenerator* self)
 	}
 
 	/* Rebuild geometry. */
-	if (self->voxels->scene != NULL)
-		livox_manager_update (self->voxels, 1.0f);
+	livox_manager_update (self->voxels, 1.0f);
 
 	return 1;
 }
@@ -607,6 +602,7 @@ private_init_brushes (ligenGenerator* self)
 	const char* query;
 	const void* bytes;
 	lialgU32dicIter iter;
+	liarcReader* reader;
 	liarcSql* sql;
 	ligenBrush* brush;
 	sqlite3_stmt* statement;
@@ -679,15 +675,18 @@ private_init_brushes (ligenGenerator* self)
 		/* Read voxels column. */
 		bytes = sqlite3_column_blob (statement, col);
 		size0 = sqlite3_column_bytes (statement, col);
-		size1 = size[0] * size[1] * size[2] * 4;
+		size1 = size[0] * size[1] * size[2] * 3;
 		if (size0 == size1)
 		{
-			for (i = 0 ; i < size[0] * size[1] * size[2] ; i++)
+			reader = liarc_reader_new (bytes, size0);
+			if (reader != NULL)
 			{
-				brush->voxels.array[i].terrain = ((uint8_t*) bytes)[4 * i + 0];
-				brush->voxels.array[i].displacex = ((uint8_t*) bytes)[4 * i + 1];
-				brush->voxels.array[i].displacey = ((uint8_t*) bytes)[4 * i + 2];
-				brush->voxels.array[i].displacez = ((uint8_t*) bytes)[4 * i + 3];
+				for (i = 0 ; i < size[0] * size[1] * size[2] ; i++)
+				{
+					liarc_reader_get_uint16 (reader, &brush->voxels.array[i].type);
+					liarc_reader_get_uint8 (reader, &brush->voxels.array[i].damage);
+				}
+				liarc_reader_free (reader);
 			}
 		}
 	}

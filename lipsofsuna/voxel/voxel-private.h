@@ -25,19 +25,13 @@
 #ifndef __VOXEL_PRIVATE_H__
 #define __VOXEL_PRIVATE_H__
 
-typedef struct _livoxBlockFull livoxBlockFull;
-typedef struct _livoxBlockTiles livoxBlockTiles;
+#include <engine/lips-engine.h>
 
 struct _livoxBlock
 {
 	uint8_t type;
 	uint8_t dirty;
 	uint16_t stamp;
-	liphyShape* shape;
-	liphyObject* physics;
-#ifndef LIVOX_DISABLE_GRAPHICS
-	lirndObject* render;
-#endif
 	livoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
 };
 

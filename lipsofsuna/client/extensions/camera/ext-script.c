@@ -172,6 +172,25 @@ Camera_zoom (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Far plane of the camera.
+ * -- @name Camera.far
+ * -- @class table
+ */
+static int
+Camera_setter_far (lua_State* lua)
+{
+	int value;
+	liextModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
+	value = luaL_checkint (lua, 3);
+
+	lieng_camera_set_far (module->module->camera, value);
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Camera mode.
  * -- @name Camera.mode
  * -- @class table
@@ -196,6 +215,25 @@ Camera_setter_mode (lua_State* lua)
 	value = luaL_checkint (lua, 3);
 
 	lieng_camera_set_driver (module->module->camera, value);
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Near plane of the camera.
+ * -- @name Camera.far
+ * -- @class table
+ */
+static int
+Camera_setter_near (lua_State* lua)
+{
+	int value;
+	liextModule* module;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
+	value = luaL_checkint (lua, 3);
+
+	lieng_camera_set_near (module->module->camera, value);
 	return 0;
 }
 
@@ -272,7 +310,9 @@ liextCameraScript (liscrClass* self,
 	liscr_class_insert_getter (self, "mode", Camera_getter_mode);
 	liscr_class_insert_getter (self, "position", Camera_getter_position);
 	liscr_class_insert_getter (self, "rotation", Camera_getter_rotation);
+	liscr_class_insert_setter (self, "far", Camera_setter_far);
 	liscr_class_insert_setter (self, "mode", Camera_setter_mode);
+	liscr_class_insert_setter (self, "near", Camera_setter_near);
 }
 
 /** @} */

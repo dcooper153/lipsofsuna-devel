@@ -14,6 +14,7 @@ ext_LTLIBRARIES = \
 	libreload-cli.la \
 	libskills-cli.la \
 	libslots-cli.la \
+	libvoxel-cli.la \
 	libwidgets-cli.la
 
 libcamera_cli_la_LDFLAGS = -module -avoid-version -no-undefined
@@ -121,6 +122,15 @@ libslots_cli_la_SOURCES = \
 	slots/ext-slot.h \
 	slots/ext-slots.c \
 	slots/ext-slots.h
+
+libvoxel_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libvoxel_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libvoxel_cli_la_SOURCES = \
+	voxel/ext-block.c \
+	voxel/ext-block.h \
+	voxel/ext-module.c \
+	voxel/ext-module.h \
+	voxel/ext-script.c
 
 libwidgets_cli_la_LDFLAGS = -module -avoid-version -no-undefined
 libwidgets_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la

@@ -94,7 +94,7 @@ liext_listener_cache (liextListener* self,
                       int            stamp)
 {
 	liextBlockKey key;
-	liextBlockValue* value;
+	liextListenerBlock* value;
 
 	key.sector = sector;
 	key.block = block;
@@ -104,7 +104,7 @@ liext_listener_cache (liextListener* self,
 		value->stamp = stamp;
 		return 1;
 	}
-	value = lisys_calloc (1, sizeof (liextBlockValue));
+	value = lisys_calloc (1, sizeof (liextListenerBlock));
 	if (value == NULL)
 		return 0;
 	value->stamp = stamp;
@@ -247,7 +247,7 @@ liext_listener_get_cached (const liextListener* self,
                            int                  stamp)
 {
 	liextBlockKey key;
-	liextBlockValue* value;
+	liextListenerBlock* value;
 
 	key.sector = sector;
 	key.block = block;

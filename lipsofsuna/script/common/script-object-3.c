@@ -112,7 +112,7 @@ Object_find_node (lua_State* lua)
 		return 0;
 
 	/* Return transform. */
-	limdl_node_get_pose_transform (node, &transform);
+	limdl_node_get_world_transform (node, &transform);
 	tmp = liscr_vector_new (script, &transform.position);
 	if (tmp != NULL)
 	{

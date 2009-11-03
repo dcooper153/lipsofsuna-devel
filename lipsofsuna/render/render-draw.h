@@ -35,6 +35,11 @@ lirnd_draw_bounds (lirndContext* context,
                    void*         data);
 
 void
+lirnd_draw_debug (lirndContext* context,
+                  lirndObject*  object,
+                  void*         data);
+
+void
 lirnd_draw_exclude (lirndContext* context,
                     lirndObject*  object,
                     void*         data);

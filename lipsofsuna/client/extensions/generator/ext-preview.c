@@ -110,7 +110,7 @@ liext_preview_new (liwdgManager* manager,
 	}
 
 	/* Allocate generator. */
-	data->generator = ligen_generator_new (module->paths, data->scene, &lirnd_render_api);
+	data->generator = ligen_generator_new (module->paths);
 	if (data->generator == NULL)
 	{
 		liwdg_widget_free (self);
@@ -165,6 +165,13 @@ liext_preview_build_box (liextPreview* self,
                          int           zs,
                          int           material)
 {
+	livoxVoxel voxel;
+
+#warning Generator previews are broken.
+	livox_voxel_init (&voxel, material);
+	livox_manager_set_voxel (self->generator->voxels,
+		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, &voxel);
+#if 0
 	limatVector min;
 	limatVector max;
 
@@ -173,8 +180,9 @@ liext_preview_build_box (liextPreview* self,
 	min = limat_vector_multiply (min, LIVOX_TILE_WIDTH);
 	max = limat_vector_multiply (max, LIVOX_TILE_WIDTH);
 	livox_manager_clear (self->generator->voxels);
-	livox_manager_fill_box (self->generator->voxels, &min, &max, material);
+//	livox_manager_fill_box (self->generator->voxels, &min, &max, material);
 	livox_manager_update (self->generator->voxels, 1.0f);
+#endif
 
 	return 1;
 }
@@ -271,26 +279,14 @@ liext_preview_paint_terrain (liextPreview* self,
 {
 	switch (mode)
 	{
-		case LIEXT_PREVIEW_COLOR_VOXEL:
-			livox_manager_color_voxel (self->generator->voxels, point, material);
-			break;
-		case LIEXT_PREVIEW_ERASE_POINT:
-			livox_manager_erase_point (self->generator->voxels, point);
-			break;
 		case LIEXT_PREVIEW_ERASE_VOXEL:
 			livox_manager_erase_voxel (self->generator->voxels, point);
 			break;
-		case LIEXT_PREVIEW_ERASE_SPHERE:
-			livox_manager_erase_sphere (self->generator->voxels, point, radius);
+		case LIEXT_PREVIEW_INSERT_VOXEL:
+			livox_manager_insert_voxel (self->generator->voxels, point, material);
 			break;
-		case LIEXT_PREVIEW_PAINT_POINT:
-			livox_manager_fill_point (self->generator->voxels, point, material);
-			break;
-		case LIEXT_PREVIEW_PAINT_VOXEL:
-			livox_manager_fill_voxel (self->generator->voxels, point, material);
-			break;
-		case LIEXT_PREVIEW_PAINT_SPHERE:
-			livox_manager_fill_sphere (self->generator->voxels, point, radius, material);
+		case LIEXT_PREVIEW_REPLACE_VOXEL:
+			livox_manager_replace_voxel (self->generator->voxels, point, material);
 			break;
 	}
 	livox_manager_update (self->generator->voxels, 1.0f);
@@ -300,20 +296,19 @@ liext_preview_paint_terrain (liextPreview* self,
  * \brief Replaces the materials of the preview with those of the passed voxel manager.
  *
  * \param self Preview.
- * \param voxel Voxel manager.
+ * \param reader Stream reader.
  * \return Nonzero on success.
  */
 int
 liext_preview_replace_materials (liextPreview* self,
-                                 livoxManager* voxels)
+                                 liarcReader*  reader)
 {
-	lialgU32dicIter iter;
 	livoxMaterial* material;
 
 	livox_manager_clear_materials (self->generator->voxels);
-	LI_FOREACH_U32DIC (iter, voxels->materials)
+	while (!liarc_reader_check_end (reader))
 	{
-		material = livox_material_new_copy (iter.value);
+		material = livox_material_new_from_stream (reader);
 		if (material == NULL)
 			return 0;
 		if (!livox_manager_insert_material (self->generator->voxels, material))
@@ -324,6 +319,37 @@ liext_preview_replace_materials (liextPreview* self,
 	}
 
 	return 1;
+}
+
+void
+liext_preview_get_bounds (liextPreview* self,
+                          limatAabb*    aabb)
+{
+	int i;
+	int x[2];
+	int y[2];
+	int z[2];
+	ligenStroke* stroke;
+
+	aabb->min = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
+	aabb->min = limat_vector_multiply (aabb->min, LIVOX_TILE_WIDTH);
+	aabb->max = aabb->min;
+	for (i = 0 ; i < self->generator->strokes.count ; i++)
+	{
+		stroke = self->generator->strokes.array + i;
+		x[0] = LIVOX_TILE_WIDTH * (stroke->pos[0]);
+		x[1] = LIVOX_TILE_WIDTH * (stroke->pos[0] + stroke->size[0]);
+		y[0] = LIVOX_TILE_WIDTH * (stroke->pos[1]);
+		y[1] = LIVOX_TILE_WIDTH * (stroke->pos[1] + stroke->size[1]);
+		z[0] = LIVOX_TILE_WIDTH * (stroke->pos[2]);
+		z[1] = LIVOX_TILE_WIDTH * (stroke->pos[2] + stroke->size[2]);
+		if (aabb->min.x > x[0]) aabb->min.x = x[0];
+		if (aabb->min.y > y[0]) aabb->min.y = y[0];
+		if (aabb->min.z > z[0]) aabb->min.z = z[0];
+		if (aabb->max.x < x[1]) aabb->max.x = x[1];
+		if (aabb->max.y < y[1]) aabb->max.y = y[1];
+		if (aabb->max.z < z[1]) aabb->max.z = z[1];
+	}
 }
 
 void

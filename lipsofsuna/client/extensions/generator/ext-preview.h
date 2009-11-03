@@ -39,13 +39,9 @@
 
 enum
 {
-	LIEXT_PREVIEW_COLOR_VOXEL,
-	LIEXT_PREVIEW_ERASE_POINT,
 	LIEXT_PREVIEW_ERASE_VOXEL,
-	LIEXT_PREVIEW_ERASE_SPHERE,
-	LIEXT_PREVIEW_PAINT_POINT,
-	LIEXT_PREVIEW_PAINT_VOXEL,
-	LIEXT_PREVIEW_PAINT_SPHERE
+	LIEXT_PREVIEW_INSERT_VOXEL,
+	LIEXT_PREVIEW_REPLACE_VOXEL
 };
 
 typedef struct _liextPreview liextPreview;
@@ -112,7 +108,11 @@ liext_preview_paint_terrain (liextPreview* self,
 
 int
 liext_preview_replace_materials (liextPreview* self,
-                                 livoxManager* voxels);
+                                 liarcReader*  reader);
+
+void
+liext_preview_get_bounds (liextPreview* self,
+                          limatAabb*    aabb);
 
 void
 liext_preview_get_transform (liextPreview*   self,

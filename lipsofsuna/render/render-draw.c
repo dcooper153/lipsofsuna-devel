@@ -25,21 +25,36 @@
 #include "render-context.h"
 #include "render-draw.h"
 
+#ifdef LIMDL_DEBUG_ARMATURE
+static void
+private_draw_node (limdlNode* node)
+{
+	int i;
+
+	glColor3f (1.0f, 1.0f, 0.0f);
+	if (node->type == LIMDL_NODE_BONE)
+	{
+		glVertex3f (node->transform.global.position.x,
+					node->transform.global.position.y,
+					node->transform.global.position.z);
+		glVertex3f (node->bone.tail.x,
+					node->bone.tail.y,
+					node->bone.tail.z);
+	}
+
+	for (i = 0 ; i < node->nodes.count ; i++)
+		private_draw_node (node->nodes.array[i]);
+}
+#endif
+
+/*****************************************************************************/
+
 void
 lirnd_draw_bounds (lirndContext* context,
                    lirndObject*  object,
                    void*         data)
 {
 	limatAabb aabb;
-
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
 
 	/* Render bounds. */
 	glBegin (GL_LINE_LOOP);
@@ -71,28 +86,103 @@ lirnd_draw_bounds (lirndContext* context,
 }
 
 void
+lirnd_draw_debug (lirndContext* context,
+                  lirndObject*  object,
+                  void*         data)
+{
+#if defined LIMDL_DEBUG_ARMATURE || defined LIMDL_DEBUG_CONSTRAINT
+	int i;
+	int j;
+	limatAabb aabb;
+	limdlConstraint* constraint;
+	limdlNode* node;
+	limdlNode* effector;
+	limdlNode* target;
+
+	/* Check if renderable. */
+	if (object->model == NULL)
+		return;
+
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_LIGHTING);
+	glPointSize (6.0f);
+
+	/* Render armature. */
+#ifdef LIMDL_DEBUG_ARMATURE
+	glPushMatrix ();
+	glMultMatrixf (object->orientation.matrix.m);
+	glBegin (GL_LINES);
+	for (i = 0 ; i < object->debug_pose->nodes.count ; i++)
+		private_draw_node (object->debug_pose->nodes.array[i]);
+	glEnd ();
+	glPopMatrix ();
+#endif
+
+	/* Render constraints. */
+#ifdef LIMDL_DEBUG_CONSTRAINT
+	for (i = 0 ; i < object->model->model->constraints.count ; i++)
+	{
+		/* Get IK constraint. */
+		constraint = object->model->model->constraints.array[i];
+		if (constraint->type != LIMDL_CONSTRAINT_INVERSE_KINEMATICS)
+			continue;
+
+		/* Get effector and target. */
+		effector = limdl_pose_find_node (object->debug_pose, constraint->inverse_kinematics.node_name);
+		target = limdl_pose_find_node (object->debug_pose, constraint->inverse_kinematics.target_name);
+		if (effector == NULL || target == NULL)
+			continue;
+
+		/* Draw target. */
+		glPushMatrix ();
+		glMultMatrixf (object->orientation.matrix.m);
+		glBegin (GL_POINTS);
+		glColor3f (1.0f, 0.0f, 0.0f);
+		glVertex3f (target->transform.global.position.x,
+		            target->transform.global.position.y,
+		            target->transform.global.position.z);
+		glEnd ();
+		glPopMatrix ();
+
+		/* Draw node chain. */
+		glPushMatrix ();
+		glMultMatrixf (object->orientation.matrix.m);
+		glBegin (GL_POINTS);
+		glColor3f (0.0f, 1.0f, 0.0f);
+		for (j = 0, node = effector ; j < constraint->inverse_kinematics.chain_length ; j++, node = node->parent)
+		{
+			glVertex3f (node->transform.global.position.x,
+						node->transform.global.position.y,
+						node->transform.global.position.z);
+			if (node->parent == NULL)
+				break;
+		}
+		glEnd ();
+		glPopMatrix ();
+	}
+#endif
+#endif
+}
+
+void
 lirnd_draw_exclude (lirndContext* context,
                     lirndObject*  object,
                     void*         data)
 {
 	int i;
 	int flags;
-	limatAabb aabb;
 	limatMatrix matrix;
 	limatVector center;
 	lirndMaterial* material;
+	lirndModel* model;
 
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Exlude object. */
 	if ((lirndObject*) data == object)
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
 		return;
 
 	/* Lighting. */
@@ -108,9 +198,9 @@ lirnd_draw_exclude (lirndContext* context,
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
-	for (i = 0 ; i < object->buffers.count ; i++)
+	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = object->buffers.array[i].material;
+		material = model->buffers.array[i].material;
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_lights (context,
 			context->scene->lighting->active_lights.array,
@@ -120,7 +210,7 @@ lirnd_draw_exclude (lirndContext* context,
 		lirnd_context_set_shader (context, material->shader);
 		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, object->buffers.array + i);
+		lirnd_context_render (context, model->buffers.array + i);
 	}
 
 #ifdef LIRND_ENABLE_PROFILING
@@ -143,7 +233,6 @@ lirnd_draw_hair (lirndContext* context,
 	float len0;
 	float len1;
 	float blend;
-	limatAabb aabb;
 	limatMatrix matrix;
 	limatVector bbx;
 	limatVector bby;
@@ -156,15 +245,15 @@ lirnd_draw_hair (lirndContext* context,
 	limdlHair* hair;
 	limdlHairs* hairs;
 	lirndMaterial* material;
+	lirndModel* model;
 
 	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object) || object->model == NULL)
+	if (object->model == NULL)
 		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Lighting. */
 	lirnd_object_get_center (object, &center);
@@ -195,10 +284,10 @@ lirnd_draw_hair (lirndContext* context,
 	{
 		hairs = object->model->model->hairs.array + i;
 		assert (hairs->material >= 0);
-		assert (hairs->material < object->materials.count);
+		assert (hairs->material < model->materials.count);
 
 		/* Bind hair group material. */
-		material = object->materials.array[hairs->material];
+		material = model->materials.array[hairs->material];
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_shader (context, material->shader);
 		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
@@ -261,19 +350,15 @@ lirnd_draw_opaque (lirndContext* context,
 {
 	int i;
 	int flags;
-	limatAabb aabb;
 	limatMatrix matrix;
 	limatVector center;
 	lirndMaterial* material;
+	lirndModel* model;
 
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Lighting. */
 	lirnd_object_get_center (object, &center);
@@ -288,9 +373,9 @@ lirnd_draw_opaque (lirndContext* context,
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
-	for (i = 0 ; i < object->buffers.count ; i++)
+	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = object->buffers.array[i].material;
+		material = model->buffers.array[i].material;
 		if (!(material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			lirnd_context_set_flags (context, flags);
@@ -302,7 +387,7 @@ lirnd_draw_opaque (lirndContext* context,
 			lirnd_context_set_shader (context, material->shader);
 			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 			lirnd_context_bind (context);
-			lirnd_context_render (context, object->buffers.array + i);
+			lirnd_context_render (context, model->buffers.array + i);
 		}
 	}
 
@@ -318,18 +403,14 @@ lirnd_draw_picking (lirndContext* context,
 {
 	int i;
 	int flags;
-	limatAabb aabb;
 	limatMatrix matrix;
 	lirndMaterial* material;
+	lirndModel* model;
 
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Rendering mode. */
 	flags = LIRND_FLAG_FIXED;
@@ -337,13 +418,13 @@ lirnd_draw_picking (lirndContext* context,
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
-	for (i = 0 ; i < object->buffers.count ; i++)
+	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = object->buffers.array[i].material;
+		material = model->buffers.array[i].material;
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, object->buffers.array + i);
+		lirnd_context_render (context, model->buffers.array + i);
 	}
 }
 
@@ -354,18 +435,14 @@ lirnd_draw_shadeless (lirndContext* context,
 {
 	int i;
 	int flags;
-//	limatAabb aabb;
 	limatMatrix matrix;
 	lirndMaterial* material;
+	lirndModel* model;
 
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-/*	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (context->frustum, &aabb))
-		return;*/
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
@@ -373,16 +450,16 @@ lirnd_draw_shadeless (lirndContext* context,
 
 	/* Render the mesh. */
 	matrix = limat_matrix_identity ();
-	for (i = 0 ; i < object->buffers.count ; i++)
+	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = object->buffers.array[i].material;
+		material = model->buffers.array[i].material;
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_shader (context, material->shader);
 		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, object->buffers.array + i);
+		lirnd_context_render (context, model->buffers.array + i);
 	}
 
 #ifdef LIRND_ENABLE_PROFILING
@@ -396,27 +473,23 @@ lirnd_draw_shadowmap (lirndContext* context,
                       void*         data)
 {
 	int i;
-	limatAabb aabb;
 	limatMatrix matrix;
+	lirndModel* model;
 
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
-	for (i = 0 ; i < object->buffers.count ; i++)
+	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		lirnd_context_set_flags (context, LIRND_FLAG_FIXED);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_shader (context, context->render->shader.shadowmap);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, object->buffers.array + i);
+		lirnd_context_render (context, model->buffers.array + i);
 	}
 
 #ifdef LIRND_ENABLE_PROFILING
@@ -431,19 +504,15 @@ lirnd_draw_transparent (lirndContext* context,
 {
 	int i;
 	int flags;
-	limatAabb aabb;
 	limatMatrix matrix;
 	limatVector center;
 	lirndMaterial* material;
+	lirndModel* model;
 
-	/* Check if renderable. */
-	if (!lirnd_object_get_realized (object))
-		return;
-
-	/* Frustum culling. */
-	lirnd_object_get_bounds (object, &aabb);
-	if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-		return;
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
 
 	/* Lighting. */
 	lirnd_object_get_center (object, &center);
@@ -458,9 +527,9 @@ lirnd_draw_transparent (lirndContext* context,
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
-	for (i = 0 ; i < object->buffers.count ; i++)
+	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = object->buffers.array[i].material;
+		material = model->buffers.array[i].material;
 		if (material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY)
 		{
 			lirnd_context_set_flags (context, flags);
@@ -472,7 +541,7 @@ lirnd_draw_transparent (lirndContext* context,
 			lirnd_context_set_shader (context, material->shader);
 			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 			lirnd_context_bind (context);
-			lirnd_context_render (context, object->buffers.array + i);
+			lirnd_context_render (context, model->buffers.array + i);
 		}
 	}
 

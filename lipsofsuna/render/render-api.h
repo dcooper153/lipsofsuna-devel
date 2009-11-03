@@ -45,15 +45,6 @@ struct _lirndApi
 	lirndModel* (*lirnd_model_new)(lirndRender*, limdlModel*);
 	void (*lirnd_model_free)(lirndModel*);
 	lirndObject* (*lirnd_object_new)(lirndScene*, int);
-	lirndObject* (*lirnd_object_new_from_data)(lirndScene*      scene,
-	                                           int              id,
-	                                           const limatAabb* aabb,
-	                                           lirndBuffer*     buffers,
-	                                           int              buffercount,
-	                                           lirndMaterial**  materials,
-	                                           int              materialcount,
-	                                           lirndLight**     lights,
-	                                           int              lightcount);
 	void (*lirnd_object_free)(lirndObject*);
 	void (*lirnd_object_deform)(lirndObject*, limdlPose*);
 	void (*lirnd_object_update)(lirndObject*, float);

@@ -164,7 +164,7 @@ lirnd_light_new_from_model (lirndScene*      scene,
 
 	/* Set transform. */
 	self->node = light;
-	limdl_node_get_pose_transform (light, &transform);
+	limdl_node_get_world_transform (light, &transform);
 	lirnd_light_set_transform (self, &transform);
 	limdl_light_get_projection (light, &projection);
 	lirnd_light_set_projection (self, &projection);

@@ -30,6 +30,7 @@
 #include <string/lips-string.h>
 #include "model-animation.h"
 #include "model-bone.h"
+#include "model-constraint.h"
 #include "model-faces.h"
 #include "model-hair.h"
 #include "model-light.h"
@@ -41,7 +42,6 @@
 #define LIMDL_FORMAT_VERSION 0xFFFFFFF9
 
 typedef int limdlModelFlags;
-typedef struct _limdlWeightGroup limdlWeightGroup;
 
 enum
 {
@@ -84,6 +84,11 @@ struct _limdlModel
 	} weightgroups;
 
 	/* Hierarchy. */
+	struct
+	{
+		int count;
+		limdlConstraint** array;
+	} constraints;
 	struct
 	{
 		int count;

@@ -466,6 +466,20 @@ lieng_camera_set_driver (liengCamera*      self,
 }
 
 /**
+ * \brief Sets the far plane of the camera.
+ *
+ * \param self Camera.
+ * \param value Far plane distance.
+ */
+void
+lieng_camera_set_far (liengCamera* self,
+                      int          value)
+{
+	self->view.far = value;
+	private_update_projection (self);
+}
+
+/**
  * \brief Gets the frustum of the camera.
  *
  * \param self Camera.
@@ -491,6 +505,20 @@ lieng_camera_get_modelview (const liengCamera* self,
                             limatMatrix*       value)
 {
 	*value = self->view.modelview;
+}
+
+/**
+ * \brief Sets the near plane of the camera.
+ *
+ * \param self Camera.
+ * \param value Near plane distance.
+ */
+void
+lieng_camera_set_near (liengCamera* self,
+                       int          value)
+{
+	self->view.near = value;
+	private_update_projection (self);
 }
 
 /**
