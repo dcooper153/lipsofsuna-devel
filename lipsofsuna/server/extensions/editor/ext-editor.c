@@ -96,8 +96,7 @@ private_client_packet (liextEditor* self,
 			model = lieng_engine_find_model_by_code (self->server->engine, id);
 			if (model == NULL)
 				return 1;
-			object = lieng_object_new (self->server->engine, model,
-				LIPHY_SHAPE_MODE_CONCAVE, LIPHY_CONTROL_MODE_STATIC, 0, NULL);
+			object = lieng_object_new (self->server->engine, model, LIPHY_CONTROL_MODE_STATIC, 0, NULL);
 			if (object == NULL)
 				return 1;
 			lieng_object_set_collision_group (object, LIPHY_GROUP_STATICS);

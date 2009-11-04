@@ -57,24 +57,7 @@ struct _liphyShape
 {
 	liphyPhysics* physics;
 	const limdlModel* model;
-	btTriangleIndexVertexArray* mesh;
-	struct
-	{
-		int count;
-		int* array;
-	} indices;
-	struct
-	{
-		int count;
-		btScalar* array;
-	} vertices;
-	struct
-	{
-		btConvexShape* box;
-		btMultiSphereShape* capsule;
-		btConvexShape* convex;
-		btBvhTriangleMeshShape* concave;
-	} shapes;
+	btConvexShape* shape;
 };
 
 struct _liphyObject
@@ -83,7 +66,6 @@ struct _liphyObject
 	liphyControl* control;
 	liphyMotionState* motion;
 	liphyPhysics* physics;
-	liphyShapeMode shape_mode;
 	btCompoundShape* shape;
 	int flags;
 	struct

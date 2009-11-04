@@ -210,8 +210,7 @@ Object_new (lua_State* lua)
 	lisrvServer* server = liscr_script_get_userdata (script);
 
 	/* Allocate object. */
-	object = lieng_object_new (server->engine, NULL,
-		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
+	object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
 	if (object == NULL)
 	{
 		lua_pushnil (lua);

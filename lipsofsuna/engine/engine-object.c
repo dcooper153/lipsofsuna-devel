@@ -39,12 +39,11 @@ private_warp (liengObject*       self,
 liengObject*
 lieng_object_new (liengEngine*     engine,
                   liengModel*      model,
-                  liphyShapeMode   shape_mode,
                   liphyControlMode control_mode,
                   uint32_t         id,
                   void*            data)
 {
-	return engine->calls.lieng_object_new (engine, model, shape_mode, control_mode, id, data);
+	return engine->calls.lieng_object_new (engine, model, control_mode, id, data);
 }
 
 /**
@@ -627,9 +626,9 @@ lieng_object_set_shape (liengObject* self,
                         liphyShape*  shape)
 {
 	if (shape != NULL)
-		liphy_object_set_shape (self->physics, shape, liphy_object_get_shape_mode (self->physics));
+		liphy_object_set_shape (self->physics, shape);
 	else
-		liphy_object_set_shape (self->physics, NULL, liphy_object_get_shape_mode (self->physics));
+		liphy_object_set_shape (self->physics, NULL);
 }
 
 /**
@@ -731,7 +730,6 @@ lieng_object_set_velocity (liengObject*       self,
 static liengObject*
 private_callback_new (liengEngine*     engine,
                       liengModel*      model,
-                      liphyShapeMode   shape_mode,
                       liphyControlMode control_mode,
                       uint32_t         id,
                       void*            data)
@@ -767,9 +765,9 @@ private_callback_new (liengEngine*     engine,
 
 	/* Initialize physics. */
 	if (model != NULL)
-		self->physics = liphy_object_new (engine->physics, model->physics, shape_mode, control_mode);
+		self->physics = liphy_object_new (engine->physics, model->physics, control_mode);
 	else
-		self->physics = liphy_object_new (engine->physics, NULL, shape_mode, control_mode);
+		self->physics = liphy_object_new (engine->physics, NULL, control_mode);
 	if (self->physics == NULL)
 		goto error;
 
@@ -894,14 +892,12 @@ private_callback_set_model (liengObject* self,
 	if (model != NULL)
 	{
 		limdl_pose_set_model (self->pose, model->model);
-		liphy_object_set_shape (self->physics, model->physics,
-			liphy_object_get_shape_mode (self->physics));
+		liphy_object_set_shape (self->physics, model->physics);
 	}
 	else
 	{
 		limdl_pose_set_model (self->pose, NULL);
-		liphy_object_set_shape (self->physics, NULL,
-			liphy_object_get_shape_mode (self->physics));
+		liphy_object_set_shape (self->physics, NULL);
 	}
 	self->model = model;
 

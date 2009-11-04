@@ -27,11 +27,6 @@
 
 #define PRIVATE_REALIZED 0x0200
 
-static btCollisionShape*
-private_choose_shape (const liphyObject* self,
-                      liphyShape*        shape,
-                      liphyShapeMode     mode);
-
 static float
 private_sweep_shape (const liphyObject* self,
                      const btTransform& start,
@@ -55,14 +50,12 @@ private_update_state (liphyObject* self);
  *
  * \param physics Physics system.
  * \param shape Collision shape or NULL.
- * \param shape_mode Collision shape mode.
  * \param control_mode Simulation mode.
  * \return New object or NULL.
  */
 liphyObject*
 liphy_object_new (liphyPhysics*    physics,
                   liphyShape*      shape,
-                  liphyShapeMode   shape_mode,
                   liphyControlMode control_mode)
 {
 	liphyObject* self;
@@ -89,10 +82,7 @@ liphy_object_new (liphyPhysics*    physics,
 		liphy_object_free (self);
 		return NULL;
 	}
-	liphy_object_set_shape (self, shape, shape_mode);
-
-	limatTransform foo;
-	liphy_object_get_transform (self, &foo);
+	liphy_object_set_shape (self, shape);
 
 	return self;
 }
@@ -148,18 +138,16 @@ liphy_object_impulse (liphyObject*       self,
 int
 liphy_object_insert_shape (liphyObject*       self,
                            liphyShape*        shape,
-                           liphyShapeMode     mode,
                            const limatVector* origin)
 {
 	btTransform transform;
 
-#warning Only supports convex shapes.
 	if (origin != NULL)
 		transform.setOrigin (btVector3 (origin->x, origin->y, origin->z));
 	else
 		transform.setOrigin (btVector3 (0.0f, 0.0f, 0.0f));
 	transform.setRotation (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
-	self->shape->addChildShape (transform, shape->shapes.convex);
+	self->shape->addChildShape (transform, shape->shape);
 
 	return 1;
 }
@@ -687,44 +675,15 @@ liphy_object_set_speed (liphyObject* self,
  *
  * \param self Object.
  * \param shape Collision shape or NULL.
- * \param mode Collision shape mode.
  */
 void
-liphy_object_set_shape (liphyObject*   self,
-                        liphyShape*    shape,
-                        liphyShapeMode mode)
+liphy_object_set_shape (liphyObject* self,
+                        liphyShape*  shape)
 {
 	liphy_object_clear_shape (self);
 	if (shape != NULL)
-		liphy_object_insert_shape (self, shape, mode, NULL);
-	self->shape_mode = mode;
+		liphy_object_insert_shape (self, shape, NULL);
 	private_update_state (self);
-}
-
-/**
- * \brief Gets the collision shape mode of the object.
- *
- * \param self Object.
- * \return Shape mode.
- */
-liphyShapeMode
-liphy_object_get_shape_mode (const liphyObject* self)
-{
-	return self->shape_mode;
-}
-
-/**
- * \brief Sets the collision shape mode of the object.
- *
- * \param self Object.
- * \param value Shape mode.
- */
-void
-liphy_object_set_shape_mode (liphyObject*   self,
-                             liphyShapeMode value)
-{
-#warning Shape mode switching id disabled.
-//	liphy_object_set_shape (self, self->shape, value);
 }
 
 /**
@@ -847,42 +806,6 @@ protected:
 	btCollisionObject* self;
 };
 
-static btCollisionShape*
-private_choose_shape (const liphyObject* self,
-                      liphyShape*        shape,
-                      liphyShapeMode     mode)
-{
-	int fallback;
-	btCollisionShape* btshape = NULL;
-
-	if (shape != NULL)
-	{
-		fallback = 0;
-		if (mode == LIPHY_SHAPE_MODE_CONCAVE)
-		{
-			btshape = shape->shapes.concave;
-			fallback = (btshape == NULL);
-		}
-		if (fallback || mode == LIPHY_SHAPE_MODE_CONVEX)
-		{
-			btshape = shape->shapes.convex;
-			fallback = (btshape == NULL);
-		}
-		if (fallback || mode == LIPHY_SHAPE_MODE_CAPSULE)
-		{
-			btshape = shape->shapes.capsule;
-			fallback = (btshape == NULL);
-		}
-		if (fallback || mode == LIPHY_SHAPE_MODE_BOX)
-		{
-			btshape = shape->shapes.box;
-			fallback = (btshape == NULL);
-		}
-	}
-
-	return btshape;
-}
-
 static int
 private_sweep_sphere (const liphyObject* self,
                       btConvexShape*     shape,
@@ -987,19 +910,15 @@ private_update_state (liphyObject* self)
 	}
 	if (self->flags & PRIVATE_REALIZED)
 	{
-#warning Broken collision shape selection.
-/*		if (self->control_mode != LIPHY_CONTROL_MODE_STATIC && self->shape_mode == LIPHY_SHAPE_MODE_CONCAVE)
-			shape = private_choose_shape (self, self->shape, LIPHY_SHAPE_MODE_CONVEX);
-		else
-			shape = private_choose_shape (self, self->shape, self->shape_mode);
-		if (shape == NULL)
-			return;*/
 		shape = self->shape;
 		switch (self->control_mode)
 		{
 			case LIPHY_CONTROL_MODE_NONE:
 				break;
 			case LIPHY_CONTROL_MODE_CHARACTER:
+				#warning Character controller does not support compound shapes.
+				if (self->shape->getNumChildShapes ())
+					shape = self->shape->getChildShape (0);
 				self->control = new liphyCharacterControl (self, shape);
 				break;
 			case LIPHY_CONTROL_MODE_RIGID:

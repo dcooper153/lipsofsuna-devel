@@ -97,8 +97,7 @@ lieng_camera_new (liengEngine* engine)
 	self->view.aspect = 1.0f;
 
 	/* Create object. */
-	self->object = lieng_object_new (engine, NULL,
-		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
+	self->object = lieng_object_new (engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
 	if (self->object == NULL)
 		goto error;
 	lieng_object_ref (self->object, 1);

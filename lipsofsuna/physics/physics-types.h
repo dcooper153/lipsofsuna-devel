@@ -40,18 +40,8 @@ enum _liphyControlMode
 	LIPHY_CONTROL_MODE_MAX
 };
 
-enum _liphyShapeMode
-{
-	LIPHY_SHAPE_MODE_BOX,
-	LIPHY_SHAPE_MODE_CAPSULE,
-	LIPHY_SHAPE_MODE_CONCAVE,
-	LIPHY_SHAPE_MODE_CONVEX,
-	LIPHY_SHAPE_MODE_MAX
-};
-
 typedef struct _liphyContact liphyContact;
 typedef enum _liphyControlMode liphyControlMode;
-typedef enum _liphyShapeMode liphyShapeMode;
 typedef struct _liphyObject liphyObject;
 typedef void (*liphyCallback)(liphyObject* self, float secs);
 typedef void (*liphyContactCall)(liphyObject* self, liphyContact* contact);

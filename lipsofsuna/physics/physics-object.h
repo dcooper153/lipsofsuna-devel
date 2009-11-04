@@ -36,7 +36,6 @@ LI_BEGIN_DECLS
 liphyObject*
 liphy_object_new (liphyPhysics*    physics,
                   liphyShape*      shape,
-                  liphyShapeMode   shape_mode,
                   liphyControlMode control_mode);
 
 void
@@ -53,7 +52,6 @@ liphy_object_impulse (liphyObject*       self,
 int
 liphy_object_insert_shape (liphyObject*       self,
                            liphyShape*        shape,
-                           liphyShapeMode     mode,
                            const limatVector* origin);
 
 void
@@ -160,16 +158,8 @@ liphy_object_set_speed (liphyObject* self,
                         float        value);
 
 void
-liphy_object_set_shape (liphyObject*   self,
-                        liphyShape*    shape,
-                        liphyShapeMode mode);
-
-liphyShapeMode
-liphy_object_get_shape_mode (const liphyObject* self);
-
-void
-liphy_object_set_shape_mode (liphyObject*   self,
-                             liphyShapeMode value);
+liphy_object_set_shape (liphyObject* self,
+                        liphyShape*  shape);
 
 void
 liphy_object_get_transform (const liphyObject* self,

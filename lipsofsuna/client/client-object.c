@@ -60,8 +60,7 @@ licli_object_new (licliModule* module,
 	liscrScript* script = module->script;
 
 	/* Allocate engine data. */
-	self = lieng_default_calls.lieng_object_new (module->engine, NULL,
-		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_STATIC, id, NULL);
+	self = lieng_default_calls.lieng_object_new (module->engine, NULL, LIPHY_CONTROL_MODE_STATIC, id, NULL);
 	if (self == NULL)
 		return NULL;
 

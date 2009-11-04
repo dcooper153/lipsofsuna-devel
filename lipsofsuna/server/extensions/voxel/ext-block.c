@@ -39,8 +39,7 @@ liext_block_new (liextModule* module)
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->object = liphy_object_new (module->server->engine->physics, NULL,
-		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_STATIC);
+	self->object = liphy_object_new (module->server->engine->physics, NULL, LIPHY_CONTROL_MODE_STATIC);
 	if (self->object == NULL)
 	{
 		lisys_free (self);
@@ -93,7 +92,7 @@ liext_block_build (liextBlock*  self,
 			continue;
 		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
-		liphy_object_insert_shape (self->object, model->physics, LIPHY_SHAPE_MODE_CONVEX, &vector);
+		liphy_object_insert_shape (self->object, model->physics, &vector);
 		self->empty = 0;
 	}
 

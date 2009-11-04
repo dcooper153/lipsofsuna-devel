@@ -50,7 +50,6 @@ private_write_animations (liengObject* self);
  *
  * \param engine Engine.
  * \param model Model or NULL.
- * \param shape_mode Collision shape type.
  * \param control_mode Interaction type.
  * \param id Object number or zero.
  * \param ptr Data passed to engine.
@@ -59,7 +58,6 @@ private_write_animations (liengObject* self);
 liengObject*
 lisrv_object_new (liengEngine*     engine,
                   liengModel*      model,
-                  liphyShapeMode   shape_mode,
                   liphyControlMode control_mode,
                   uint32_t         id,
                   void*            ptr)
@@ -114,7 +112,7 @@ lisrv_object_new (liengEngine*     engine,
 	}
 
 	/* Allocate engine data. */
-	self = lieng_default_calls.lieng_object_new (engine, model, shape_mode, control_mode, id, ptr);
+	self = lieng_default_calls.lieng_object_new (engine, model, control_mode, id, ptr);
 	if (self == NULL)
 		return NULL;
 
@@ -392,7 +390,6 @@ lisrv_object_serialize (liengObject* self,
 	int control;
 	int flags;
 	int sector;
-	int shape;
 	float mass;
 	float movement;
 	float speed;
@@ -414,7 +411,7 @@ lisrv_object_serialize (liengObject* self,
 		/* Prepare statement. */
 		query = "SELECT "
 			"flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
-			"mass,move,speed,step,colgrp,colmsk,control,shape,model,type,extra "
+			"mass,move,speed,step,colgrp,colmsk,control,model,type,extra "
 			"FROM objects WHERE id=?;";
 		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 		{
@@ -462,7 +459,6 @@ lisrv_object_serialize (liengObject* self,
 		colgroup = sqlite3_column_int (statement, col++);
 		colmask = sqlite3_column_int (statement, col++);
 		control = sqlite3_column_int (statement, col++);
-		shape = sqlite3_column_int (statement, col++);
 		if (sqlite3_column_type (statement, col) == SQLITE_TEXT)
 			model = (char*) sqlite3_column_text (statement, col++);
 		else
@@ -485,7 +481,6 @@ lisrv_object_serialize (liengObject* self,
 		lieng_object_set_collision_group (self, colgroup);
 		lieng_object_set_collision_mask (self, colmask);
 		liphy_object_set_control_mode (self->physics, control);
-		liphy_object_set_shape_mode (self->physics, shape);
 		if (model != NULL)
 			lieng_object_set_model_name (self, model);
 
@@ -534,7 +529,6 @@ lisrv_object_serialize (liengObject* self,
 			colgroup = lieng_object_get_collision_group (self);
 			colmask = lieng_object_get_collision_mask (self);
 			control = liphy_object_get_control_mode (self->physics);
-			shape = liphy_object_get_shape_mode (self->physics);
 			lieng_object_get_transform (self, &transform);
 			lieng_object_get_angular_momentum (self, &angular);
 			type = NULL;
@@ -543,7 +537,7 @@ lisrv_object_serialize (liengObject* self,
 			/* Prepare statement. */
 			query = "INSERT OR REPLACE INTO objects "
 				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
-				"mass,move,speed,step,colgrp,colmsk,control,shape,model,type,extra) VALUES "
+				"mass,move,speed,step,colgrp,colmsk,control,model,type,extra) VALUES "
 				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 			{
@@ -572,8 +566,7 @@ lisrv_object_serialize (liengObject* self,
 				sqlite3_bind_double (statement, col++, step) != SQLITE_OK ||
 				sqlite3_bind_int (statement, col++, colgroup) != SQLITE_OK ||
 				sqlite3_bind_int (statement, col++, colmask) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, control) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, shape) != SQLITE_OK);
+				sqlite3_bind_int (statement, col++, control) != SQLITE_OK);
 			if (!ret)
 			{
 				if (model != NULL)

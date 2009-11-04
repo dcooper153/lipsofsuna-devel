@@ -299,8 +299,7 @@ private_connect (lisrvNetwork*    self,
 	pthread_mutex_unlock (&self->mutex);
 
 	/* Create object. */
-	object = lieng_object_new (self->server->engine, NULL,
-		LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
+	object = lieng_object_new (self->server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
 	if (object == NULL)
 	{
 		lisys_free (pass);

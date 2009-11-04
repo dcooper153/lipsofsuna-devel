@@ -634,8 +634,7 @@ private_init_sql (lisrvServer* self)
 		"flags UNSIGNED INTEGER,angx REAL,angy REAL,angz REAL,posx REAL,"
 		"posy REAL,posz REAL,rotx REAL,roty REAL,rotz REAL,rotw REAL,"
 		"mass REAL,move REAL,speed REAL,step REAL,colgrp UNSIGNED INTEGER,"
-		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,shape UNSIGNED INTEGER,"
-		"type TEXT,extra TEXT);";
+		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,type TEXT,extra TEXT);";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
@@ -722,7 +721,7 @@ private_sector_new (liengEngine* engine,
 			return NULL;
 		}
 		id = sqlite3_column_int (statement, 0);
-		object = lieng_object_new (engine, NULL, LIPHY_SHAPE_MODE_CONVEX, LIPHY_CONTROL_MODE_RIGID, id, NULL);
+		object = lieng_object_new (engine, NULL, LIPHY_CONTROL_MODE_RIGID, id, NULL);
 		if (object != NULL)
 		{
 			if (lisrv_object_serialize (object, 0))

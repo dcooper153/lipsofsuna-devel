@@ -57,7 +57,6 @@ struct _liengObject
 liengObject*
 lieng_object_new (liengEngine*     engine,
                   liengModel*      model,
-                  liphyShapeMode   shape_mode,
                   liphyControlMode control_mode,
                   uint32_t         id,
                   void*            data);

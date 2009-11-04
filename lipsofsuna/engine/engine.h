@@ -43,7 +43,7 @@
 typedef struct _liengCalls liengCalls;
 struct _liengCalls
 {
-	liengObject* (*lieng_object_new)(liengEngine*, liengModel*, liphyShapeMode, liphyControlMode, uint32_t, void*);
+	liengObject* (*lieng_object_new)(liengEngine*, liengModel*, liphyControlMode, uint32_t, void*);
 	void (*lieng_object_free)(liengObject*);
 	int (*lieng_object_moved)(liengObject*);
 	void (*lieng_object_update)(liengObject*, float);

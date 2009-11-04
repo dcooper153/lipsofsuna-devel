@@ -42,11 +42,6 @@ liphy_shape_new_aabb (liphyPhysics*    physics,
                       const limatAabb* aabb);
 
 liphyShape*
-liphy_shape_new_concave (liphyPhysics*      physics,
-                         const limatVector* vertices,
-                         int                count);
-
-liphyShape*
 liphy_shape_new_convex (liphyPhysics*      physics,
                         const limatVector* vertices,
                         int                count);

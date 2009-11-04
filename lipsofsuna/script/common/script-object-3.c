@@ -659,37 +659,6 @@ Object_setter_selected (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Collision shape mode.
- * --
- * -- @name Object.shape_mode
- * -- @class table
- */
-static int
-Object_getter_shape_mode (lua_State* lua)
-{
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, liphy_object_get_shape_mode (LIENG_OBJECT (object->data)->physics));
-	return 1;
-}
-static int
-Object_setter_shape_mode (lua_State* lua)
-{
-	int value;
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = (int) luaL_checkinteger (lua, 3);
-	luaL_argcheck (lua, value >= 0 && value < LIPHY_SHAPE_MODE_MAX, 3, "invalid shape mode");
-
-	liphy_object_set_shape_mode (LIENG_OBJECT (object->data)->physics, value);
-	return 0;
-}
-
-/* @luadoc
- * ---
  * -- Movement speed.
  * --
  * -- Only used by creature objects.
@@ -789,10 +758,6 @@ void
 licomObjectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_insert_enum (self, "SHAPE_MODE_BOX", LIPHY_SHAPE_MODE_BOX);
-	liscr_class_insert_enum (self, "SHAPE_MODE_CAPSULE", LIPHY_SHAPE_MODE_CAPSULE);
-	liscr_class_insert_enum (self, "SHAPE_MODE_CONCAVE", LIPHY_SHAPE_MODE_CONCAVE);
-	liscr_class_insert_enum (self, "SHAPE_MODE_CONVEX", LIPHY_SHAPE_MODE_CONVEX);
 	liscr_class_insert_func (self, "__gc", Object___gc);
 	liscr_class_insert_func (self, "approach", Object_approach);
 	liscr_class_insert_func (self, "find_node", Object_find_node);
@@ -812,7 +777,6 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_getter (self, "rotation", Object_getter_rotation);
 	liscr_class_insert_getter (self, "save", Object_getter_save);
 	liscr_class_insert_getter (self, "selected", Object_getter_selected);
-	liscr_class_insert_getter (self, "shape_mode", Object_getter_shape_mode);
 	liscr_class_insert_getter (self, "speed", Object_getter_speed);
 	liscr_class_insert_getter (self, "valid", Object_getter_valid);
 	liscr_class_insert_getter (self, "velocity", Object_getter_velocity);
@@ -828,7 +792,6 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_setter (self, "rotation", Object_setter_rotation);
 	liscr_class_insert_setter (self, "save", Object_setter_save);
 	liscr_class_insert_setter (self, "selected", Object_setter_selected);
-	liscr_class_insert_setter (self, "shape_mode", Object_setter_shape_mode);
 	liscr_class_insert_setter (self, "speed", Object_setter_speed);
 	liscr_class_insert_setter (self, "velocity", Object_setter_velocity);
 }

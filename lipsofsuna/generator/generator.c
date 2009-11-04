@@ -537,7 +537,6 @@ ligen_generator_write (ligenGenerator* self)
 				"colgrp", LIARC_SQL_INT, LIPHY_DEFAULT_COLLISION_GROUP,
 				"colmsk", LIARC_SQL_INT, LIPHY_DEFAULT_COLLISION_MASK,
 				"control", LIARC_SQL_INT, LIPHY_CONTROL_MODE_NONE,
-				"shape", LIARC_SQL_INT, LIPHY_SHAPE_MODE_CONCAVE,
 				"model", LIARC_SQL_TEXT, object->model,
 				"type", LIARC_SQL_TEXT, object->type,
 				"extra", LIARC_SQL_TEXT, object->extra, NULL))
