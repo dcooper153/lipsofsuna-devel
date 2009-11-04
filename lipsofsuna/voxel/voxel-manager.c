@@ -283,6 +283,90 @@ livox_manager_find_sector (livoxManager* self,
 }
 
 /**
+ * \brief Finds the nearest voxel to the given point.
+ *
+ * \param self Voxel manager.
+ * \param flags Search flags.
+ * \param point Point in world space.
+ * \param center Return location for voxel center or NULL.
+ *
+ * \return Voxel or NULL.
+ */
+livoxVoxel*
+livox_manager_find_voxel (livoxManager*      self,
+                          int                flags,
+                          const limatVector* point,
+                          limatVector*       center)
+{
+	float d;
+	liengRange range0;
+	liengRange range1;
+	liengRangeIter rangei0;
+	liengRangeIter rangei1;
+	limatVector tmp;
+	limatVector diff;
+	limatVector origin;
+	limatVector vector;
+	livoxSector* sector;
+	livoxVoxel voxel;
+	struct
+	{
+		int x;
+		int y;
+		int z;
+		float dist;
+		limatVector center;
+		livoxSector* sector;
+	}
+	best = { 0, 0, 0, 10.0E10f, { 0.0f, 0.0f, 0.0f }, NULL };
+
+	/* Loop through affected sectors. */
+	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
+	LIENG_FOREACH_RANGE (rangei0, range0)
+	{
+		sector = livox_manager_load_sector (self, rangei0.index);
+		if (sector == NULL)
+			continue;
+		livox_sector_get_origin (sector, &origin);
+		vector = limat_vector_subtract (*point, origin);
+		range1 = lieng_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH, 0,
+			LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+
+		/* Loop through affected voxels. */
+		LIENG_FOREACH_RANGE (rangei1, range1)
+		{
+			voxel = *livox_sector_get_voxel (sector, rangei1.x, rangei1.y, rangei1.z);
+			if ((!voxel.type && (flags & LIVOX_FIND_EMPTY)) ||
+			    ( voxel.type && (flags & LIVOX_FIND_FULL)))
+			{
+				tmp = limat_vector_init (
+					LIVOX_SECTOR_WIDTH * rangei0.x + LIVOX_TILE_WIDTH * (rangei1.x + 0.5f),
+					LIVOX_SECTOR_WIDTH * rangei0.y + LIVOX_TILE_WIDTH * (rangei1.y + 0.5f),
+					LIVOX_SECTOR_WIDTH * rangei0.z + LIVOX_TILE_WIDTH * (rangei1.z + 0.5f));
+				diff = limat_vector_subtract (*point, tmp);
+				d = limat_vector_dot (diff, diff);
+				if (best.sector == NULL || d < best.dist)
+				{
+					best.x = rangei1.x;
+					best.y = rangei1.y;
+					best.z = rangei1.z;
+					best.dist = d;
+					best.center = tmp;
+					best.sector = sector;
+				}
+			}
+		}
+	}
+
+	if (best.sector == NULL)
+		return NULL;
+	if (center != NULL)
+		*center = best.center;
+
+	return livox_sector_get_voxel (best.sector, best.x, best.y, best.z);
+}
+
+/**
  * \brief Inserts a material to the material database.
  *
  * Any existing material with a conflicting ID is removed and freed
@@ -561,7 +645,8 @@ livox_manager_remove_material (livoxManager* self,
 int
 livox_manager_replace_voxel (livoxManager*      self,
                              const limatVector* point,
-                             int                terrain)
+                             int                terrain,
+                             int                damage)
 {
 	float d;
 	liengRange range0;
@@ -622,6 +707,7 @@ livox_manager_replace_voxel (livoxManager*      self,
 	if (best.sector != NULL)
 	{
 		livox_voxel_init (&voxel, terrain);
+		voxel.damage = damage;
 		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, voxel);
 	}
 

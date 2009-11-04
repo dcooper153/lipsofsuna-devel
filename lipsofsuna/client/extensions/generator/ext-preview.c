@@ -286,7 +286,7 @@ liext_preview_paint_terrain (liextPreview* self,
 			livox_manager_insert_voxel (self->generator->voxels, point, material);
 			break;
 		case LIEXT_PREVIEW_REPLACE_VOXEL:
-			livox_manager_replace_voxel (self->generator->voxels, point, material);
+			livox_manager_replace_voxel (self->generator->voxels, point, material, 0);
 			break;
 	}
 	livox_manager_update (self->generator->voxels, 1.0f);

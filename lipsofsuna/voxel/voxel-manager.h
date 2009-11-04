@@ -35,6 +35,13 @@
 
 enum
 {
+	LIVOX_FIND_EMPTY = 0x01,
+	LIVOX_FIND_FULL  = 0x02,
+	LIVOX_FIND_ALL   = 0xFF
+};
+
+enum
+{
 	LIVOX_CALLBACK_FREE_BLOCK,
 	LIVOX_CALLBACK_LOAD_BLOCK
 };
@@ -92,6 +99,12 @@ livoxSector*
 livox_manager_find_sector (livoxManager* self,
                            uint32_t      id);
 
+livoxVoxel*
+livox_manager_find_voxel (livoxManager*      self,
+                          int                flags,
+                          const limatVector* point,
+                          limatVector*       center);
+
 int
 livox_manager_insert_material (livoxManager*  self,
                                livoxMaterial* material);
@@ -118,7 +131,8 @@ livox_manager_remove_material (livoxManager* self,
 int
 livox_manager_replace_voxel (livoxManager*      self,
                              const limatVector* point,
-                             int                terrain);
+                             int                terrain,
+                             int                damage);
 
 void
 livox_manager_update (livoxManager* self,
