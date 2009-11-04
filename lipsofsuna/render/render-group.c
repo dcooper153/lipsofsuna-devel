@@ -71,6 +71,7 @@ lirnd_group_free (lirndGroup* self)
 		next = object->next;
 		lisys_free (object);
 	}
+	lialg_ptrdic_remove (self->scene->groups, self);
 	lisys_free (self);
 }
 

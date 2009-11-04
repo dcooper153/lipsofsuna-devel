@@ -147,6 +147,22 @@ static int
 private_block_free (liextModule*      self,
                     livoxUpdateEvent* event)
 {
+	liextBlock* eblock;
+	liextBlockAddr addr;
+
+	addr.sector[0] = event->sector[0];
+	addr.sector[1] = event->sector[1];
+	addr.sector[2] = event->sector[2];
+	addr.block[0] = event->block[0];
+	addr.block[1] = event->block[1];
+	addr.block[2] = event->block[2];
+	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
+	if (eblock != NULL)
+	{
+		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
+		liext_block_free (eblock);
+	}
+
 	return 1;
 }
 
