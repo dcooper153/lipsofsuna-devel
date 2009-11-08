@@ -15,18 +15,20 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ENGINE_RANGE_H__
-#define __ENGINE_RANGE_H__
+#ifndef __ALGORITHM_RANGE_H__
+#define __ALGORITHM_RANGE_H__
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup lialg Algorithm
  * @{
- * \addtogroup liengRange Range
+ * \addtogroup lialgRange Range
  * @{
  */
 
-typedef struct _liengRange liengRange;
-struct _liengRange
+#define LIALG_RANGE_DEFAULT_SIZE 1024
+
+typedef struct _lialgRange lialgRange;
+struct _lialgRange
 {
 	int min;
 	int max;
@@ -45,34 +47,24 @@ struct _liengRange
  * \param y Center bin offset.
  * \param z Center bin offset.
  * \param radius Radius of the sphere in bins.
- * \param unit Bin side length.
- * \param mini Minimum range coordinate.
- * \param maxi Maximum range coordinate.
  * \return Range.
  */
-static inline liengRange
-lieng_range_new (int x,
+static inline lialgRange
+lialg_range_new (int x,
                  int y,
                  int z,
-                 int radius,
-                 int mini,
-                 int maxi)
+                 int radius)
 {
-	int size;
-	liengRange self;
+	lialgRange self;
 
-	size = maxi - mini;
-	self.min = mini;
-	self.max = maxi;
-	self.minx = x;
-	self.miny = y;
-	self.minz = z;
-	self.maxx = LI_MIN (self.minx + radius, maxi);
-	self.maxy = LI_MIN (self.miny + radius, maxi);
-	self.maxz = LI_MIN (self.minz + radius, maxi);
-	self.minx = LI_MAX (self.minx - radius, mini);
-	self.miny = LI_MAX (self.miny - radius, mini);
-	self.minz = LI_MAX (self.minz - radius, mini);
+	self.min = 0;
+	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
+	self.minx = x - radius;
+	self.miny = y - radius;
+	self.minz = z - radius;
+	self.maxx = x + radius;
+	self.maxy = y + radius;
+	self.maxz = z + radius;
 
 	return self;
 }
@@ -83,33 +75,23 @@ lieng_range_new (int x,
  * \param min Minimum point of the AABB.
  * \param max Maximum point of the AABB.
  * \param unit Bin side length.
- * \param mini Minimum range coordinate.
- * \param maxi Maximum range coordinate.
  * \return Range.
  */
-static inline liengRange
-lieng_range_new_from_aabb (const limatVector* min,
+static inline lialgRange
+lialg_range_new_from_aabb (const limatVector* min,
                            const limatVector* max,
-                           float              unit,
-                           int                mini,
-                           int                maxi)
+                           float              unit)
 {
-	liengRange self;
+	lialgRange self;
 
-	self.min = mini;
-	self.max = maxi;
+	self.min = 0;
+	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
 	self.minx = (int)(min->x / unit);
 	self.miny = (int)(min->y / unit);
 	self.minz = (int)(min->z / unit);
 	self.maxx = (int)(max->x / unit);
 	self.maxy = (int)(max->y / unit);
 	self.maxz = (int)(max->z / unit);
-	self.minx = LI_MAX (self.minx, mini);
-	self.miny = LI_MAX (self.miny, mini);
-	self.minz = LI_MAX (self.minz, mini);
-	self.maxx = LI_MIN (self.maxx, maxi);
-	self.maxy = LI_MIN (self.maxy, maxi);
-	self.maxz = LI_MIN (self.maxz, maxi);
 
 	return self;
 }
@@ -119,23 +101,22 @@ lieng_range_new_from_aabb (const limatVector* min,
  *
  * \param index Index of the center bin.
  * \param radius Radius of the sphere in bins.
- * \param unit Bin side length.
  * \param mini Minimum range coordinate.
  * \param maxi Maximum range coordinate.
  * \return Range.
  */
-static inline liengRange
-lieng_range_new_from_index (int index,
+static inline lialgRange
+lialg_range_new_from_index (int index,
                             int radius,
                             int mini,
                             int maxi)
 {
 	int size;
-	liengRange self;
+	lialgRange self;
 
 	size = maxi - mini;
 	self.min = mini;
-	self.max = maxi;
+	self.max = maxi + 1;
 	self.minx = index % size;
 	self.miny = index / size % size;
 	self.minz = index / size / size;
@@ -155,30 +136,61 @@ lieng_range_new_from_index (int index,
  * \param center Center point of the sphere.
  * \param radius Radius of the sphere.
  * \param unit Bin side length.
- * \param mini Minimum range coordinate.
- * \param maxi Maximum range coordinate.
  * \return Range.
  */
-static inline liengRange
-lieng_range_new_from_sphere (const limatVector* center,
+static inline lialgRange
+lialg_range_new_from_sphere (const limatVector* center,
                              float              radius,
-                             float              unit,
-                             int                mini,
-                             int                maxi)
+                             float              unit)
 {
 	limatVector min;
 	limatVector max;
-	liengRange self;
+	lialgRange self;
 
 	min = limat_vector_subtract (*center, limat_vector_init (radius, radius, radius));
 	max = limat_vector_add (*center, limat_vector_init (radius, radius, radius));
-	self = lieng_range_new_from_aabb (&min, &max, unit, mini, maxi);
+	self = lialg_range_new_from_aabb (&min, &max, unit);
 
 	return self;
 }
 
+/**
+ * \brief Clamps the range.
+ *
+ * \param self Range.
+ * \param min Minimum range coordinate.
+ * \param min Maximum range coordinate.
+ * \return New range.
+ */
+static inline lialgRange
+lialg_range_clamp (const lialgRange self,
+                   int              min,
+                   int              max)
+{
+	lialgRange ret;
+
+	ret.min = min;
+	ret.max = max + 1;
+	ret.minx = LI_MAX (self.minx, min);
+	ret.miny = LI_MAX (self.miny, min);
+	ret.minz = LI_MAX (self.minz, min);
+	ret.maxx = LI_MIN (self.maxx, max);
+	ret.maxy = LI_MIN (self.maxy, max);
+	ret.maxz = LI_MIN (self.maxz, max);
+
+	return ret;
+}
+
+/**
+ * \brief Checks if the range contains the given bin.
+ *
+ * \param self Range.
+ * \param x Bin coordinate.
+ * \param y Bin coordinate.
+ * \param z Bin coordinate.
+ */
 static inline int
-lieng_range_contains (const liengRange* self,
+lialg_range_contains (const lialgRange* self,
                       int               x,
                       int               y,
                       int               z)
@@ -191,8 +203,14 @@ lieng_range_contains (const liengRange* self,
 	return 0;
 }
 
+/**
+ * \brief Checks if the range contains the given index.
+ *
+ * \param self Range.
+ * \param index Bin index.
+ */
 static inline int
-lieng_range_contains_index (const liengRange* self,
+lialg_range_contains_index (const lialgRange* self,
                             int               index)
 {
 	int x;
@@ -205,7 +223,7 @@ lieng_range_contains_index (const liengRange* self,
 	y = index / size % size;
 	z = index / size / size;
 
-	return lieng_range_contains (self, x, y, z);
+	return lialg_range_contains (self, x, y, z);
 }
 
 #endif

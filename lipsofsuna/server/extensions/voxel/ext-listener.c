@@ -137,9 +137,9 @@ liext_listener_update (liextListener* self,
 	int stamp;
 	liarcWriter* writer = NULL;
 	liengObject* object;
-	liengRange sectors;
-	liengRange blocks;
-	liengRange range;
+	lialgRange sectors;
+	lialgRange blocks;
+	lialgRange range;
 	liengRangeIter iter0;
 	liengRangeIter iter1;
 	limatTransform transform;
@@ -163,10 +163,10 @@ liext_listener_update (liextListener* self,
 	size = limat_vector_init (self->radius, self->radius, self->radius);
 	min = limat_vector_subtract (transform.position, size);
 	max = limat_vector_add (transform.position, size);
-	sectors = lieng_range_new_from_aabb (&min, &max, LIVOX_SECTOR_WIDTH,
-		0, LIVOX_SECTORS_PER_LINE);
-	blocks = lieng_range_new_from_aabb (&min, &max, LIVOX_BLOCK_WIDTH,
-		0, LIVOX_SECTORS_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	sectors = lialg_range_new_from_aabb (&min, &max, LIVOX_SECTOR_WIDTH);
+	sectors = lialg_range_clamp (sectors, 0, LIVOX_SECTORS_PER_LINE - 1);
+	blocks = lialg_range_new_from_aabb (&min, &max, LIVOX_BLOCK_WIDTH);
+	blocks = lialg_range_clamp (blocks, 0, LIVOX_SECTORS_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 	/* Loop through visible sector. */
 	LIENG_FOREACH_RANGE (iter0, sectors)

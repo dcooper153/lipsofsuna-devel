@@ -283,8 +283,8 @@ private_init (liextBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 
 	/* Paint. */
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Insert voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Erase voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Erase voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Insert voxel");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace voxel");
 	liwdg_scroll_set_range (LIWDG_SCROLL (self->widgets.scroll_radius), 0.0f, 10.0f);
 	liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_radius), 2.0f);
@@ -355,6 +355,7 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (self), 2, 0, self->widgets.group_paint);
 
 	self->transform = limat_transform_identity ();
+	self->paint = LIEXT_PREVIEW_INSERT_VOXEL;
 
 	return 1;
 }

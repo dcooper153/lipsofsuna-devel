@@ -62,6 +62,7 @@ alg_HEADERS = \
 	algorithm/algorithm-octree.h \
 	algorithm/algorithm-priority-queue.h \
 	algorithm/algorithm-ptrdic.h \
+	algorithm/algorithm-range.h \
 	algorithm/algorithm-strdic.h \
 	algorithm/algorithm-u32dic.h
 algsrc = \
@@ -160,7 +161,6 @@ eng_HEADERS = \
 	engine/engine-iterator.h \
 	engine/engine-model.h \
 	engine/engine-object.h \
-	engine/engine-range.h \
 	engine/engine-resources.h \
 	engine/engine-sector.h \
 	engine/engine-selection.h \

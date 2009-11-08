@@ -26,7 +26,6 @@
 #define __ENGINE_ITERATOR_H__
 
 #include <algorithm/lips-algorithm.h>
-#include "engine-range.h"
 #include "engine-sector.h"
 #include "engine-selection.h"
 
@@ -50,12 +49,12 @@ struct _liengRangeIter
 	int y;
 	int z;
 	int more;
-	liengRange range;
+	lialgRange range;
 };
 
 static inline int
 lieng_range_iter_first (liengRangeIter* self,
-                        liengRange*     range)
+                        lialgRange*     range)
 {
 	int r = range->max - range->min;
 
@@ -146,12 +145,13 @@ lieng_sector_iter_first (liengSectorIter* self,
                          int              z,
                          int              radius)
 {
-	liengRange range;
+	lialgRange range;
 
 	/* Initialize self. */
 	memset (self, 0, sizeof (liengSectorIter));
 	self->engine = engine;
-	range = lieng_range_new (x, y, z, radius, 0, 256);
+	range = lialg_range_new (x, y, z, radius);
+	range = lialg_range_clamp (range, 0, 255);
 	if (!lieng_range_iter_first (&self->range, &range))
 		return 0;
 

@@ -28,5 +28,6 @@
 #include "algorithm-list.h"
 #include "algorithm-octree.h"
 #include "algorithm-priority-queue.h"
+#include "algorithm-range.h"
 
 #endif

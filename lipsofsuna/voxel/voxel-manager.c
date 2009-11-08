@@ -204,8 +204,8 @@ livox_manager_erase_voxel (livoxManager*      self,
                            const limatVector* point)
 {
 	float d;
-	liengRange range0;
-	liengRange range1;
+	lialgRange range0;
+	lialgRange range1;
 	liengRangeIter rangei0;
 	liengRangeIter rangei1;
 	limatVector diff;
@@ -224,7 +224,8 @@ livox_manager_erase_voxel (livoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
+	range0 = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH);
+	range0 = lialg_range_clamp (range0, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
 		sector = livox_manager_load_sector (self, rangei0.index);
@@ -232,8 +233,8 @@ livox_manager_erase_voxel (livoxManager*      self,
 			continue;
 		livox_sector_get_origin (sector, &origin);
 		vector = limat_vector_subtract (*point, origin);
-		range1 = lieng_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH, 0,
-			LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		range1 = lialg_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+		range1 = lialg_range_clamp (range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through affected voxels. */
 		LIENG_FOREACH_RANGE (rangei1, range1)
@@ -299,8 +300,8 @@ livox_manager_find_voxel (livoxManager*      self,
                           limatVector*       center)
 {
 	float d;
-	liengRange range0;
-	liengRange range1;
+	lialgRange range0;
+	lialgRange range1;
 	liengRangeIter rangei0;
 	liengRangeIter rangei1;
 	limatVector tmp;
@@ -321,7 +322,8 @@ livox_manager_find_voxel (livoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, { 0.0f, 0.0f, 0.0f }, NULL };
 
 	/* Loop through affected sectors. */
-	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
+	range0 = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH);
+	range0 = lialg_range_clamp (range0, 0, 255);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
 		sector = livox_manager_load_sector (self, rangei0.index);
@@ -329,8 +331,8 @@ livox_manager_find_voxel (livoxManager*      self,
 			continue;
 		livox_sector_get_origin (sector, &origin);
 		vector = limat_vector_subtract (*point, origin);
-		range1 = lieng_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH, 0,
-			LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		range1 = lialg_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+		range1 = lialg_range_clamp (range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through affected voxels. */
 		LIENG_FOREACH_RANGE (rangei1, range1)
@@ -403,8 +405,8 @@ livox_manager_insert_voxel (livoxManager*      self,
                             int                terrain)
 {
 	float d;
-	liengRange range0;
-	liengRange range1;
+	lialgRange range0;
+	lialgRange range1;
 	liengRangeIter rangei0;
 	liengRangeIter rangei1;
 	limatVector diff;
@@ -423,7 +425,8 @@ livox_manager_insert_voxel (livoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
+	range0 = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH);
+	range0 = lialg_range_clamp (range0, 0, 255);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
 		sector = livox_manager_load_sector (self, rangei0.index);
@@ -431,8 +434,8 @@ livox_manager_insert_voxel (livoxManager*      self,
 			continue;
 		livox_sector_get_origin (sector, &origin);
 		vector = limat_vector_subtract (*point, origin);
-		range1 = lieng_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH, 0,
-			LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		range1 = lialg_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+		range1 = lialg_range_clamp (range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through affected voxels. */
 		LIENG_FOREACH_RANGE (rangei1, range1)
@@ -649,8 +652,8 @@ livox_manager_replace_voxel (livoxManager*      self,
                              int                damage)
 {
 	float d;
-	liengRange range0;
-	liengRange range1;
+	lialgRange range0;
+	lialgRange range1;
 	liengRangeIter rangei0;
 	liengRangeIter rangei1;
 	limatVector diff;
@@ -669,7 +672,8 @@ livox_manager_replace_voxel (livoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range0 = lieng_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH, 0, 256);
+	range0 = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH);
+	range0 = lialg_range_clamp (range0, 0, 256);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
 		sector = livox_manager_load_sector (self, rangei0.index);
@@ -677,8 +681,8 @@ livox_manager_replace_voxel (livoxManager*      self,
 			continue;
 		livox_sector_get_origin (sector, &origin);
 		vector = limat_vector_subtract (*point, origin);
-		range1 = lieng_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH, 0,
-			LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		range1 = lialg_range_new_from_sphere (&vector, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+		range1 = lialg_range_clamp (range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through affected voxels. */
 		LIENG_FOREACH_RANGE (rangei1, range1)

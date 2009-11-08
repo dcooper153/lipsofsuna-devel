@@ -26,7 +26,6 @@
 #include "engine.h"
 #include "engine-constraint.h"
 #include "engine-iterator.h"
-#include "engine-range.h"
 #include "engine-selection.h"
 
 static int

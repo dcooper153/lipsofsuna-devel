@@ -287,7 +287,7 @@ private_object_motion (lisrvClient* self,
                        liengObject* object)
 {
 	float dist;
-	liengRange range;
+	lialgRange range;
 	liengRangeIter iter;
 	limatTransform transform;
 
@@ -295,8 +295,9 @@ private_object_motion (lisrvClient* self,
 	if (object == self->object)
 	{
 		lieng_object_get_transform (self->object, &transform);
-		range = lieng_range_new_from_sphere (&transform.position, 
-			LISRV_CLIENT_LOAD_RADIUS, LIENG_SECTOR_WIDTH, 0, 256);
+		range = lialg_range_new_from_sphere (&transform.position, 
+			LISRV_CLIENT_LOAD_RADIUS, LIENG_SECTOR_WIDTH);
+		range = lialg_range_clamp (range, 0, 255);
 		LIENG_FOREACH_RANGE (iter, range)
 		{
 			lieng_engine_load_sector (self->server->engine, iter.index);
@@ -475,7 +476,7 @@ private_vision_update (lisrvClient* self)
 {
 	float dist;
 	lialgU32dicIter obj_iter;
-	liengRange range;
+	lialgRange range;
 	liengRangeIter rangeiter;
 	liengSector* sector;
 	liengObject* object = self->object;
@@ -483,7 +484,8 @@ private_vision_update (lisrvClient* self)
 	if (object->sector == NULL)
 		return;
 	sector = object->sector;
-	range = lieng_range_new (sector->x, sector->y, sector->z, 1, 0, 256);
+	range = lialg_range_new (sector->x, sector->y, sector->z, 1);
+	range = lialg_range_clamp (range, 0, 255);
 
 	/* Remove from vision. */
 	LI_FOREACH_U32DIC (obj_iter, self->vision)

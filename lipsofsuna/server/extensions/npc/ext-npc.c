@@ -264,7 +264,7 @@ private_rescan (liextNpc* self)
 	liengObject* object;
 	liengObject* target;
 	liengSector* sector;
-	liengRange range;
+	lialgRange range;
 	liengRangeIter rangeiter;
 
 	dist = self->radius;
@@ -272,7 +272,8 @@ private_rescan (liextNpc* self)
 	object = self->object;
 	sector = object->sector;
 	assert (object->sector != NULL);
-	range = lieng_range_new (sector->x, sector->y, sector->z, 1, 0, 256);
+	range = lialg_range_new (sector->x, sector->y, sector->z, 1);
+	range = lialg_range_clamp (range, 0, 255);
 
 	/* Search for target. */
 	LIENG_FOREACH_RANGE (rangeiter, range)

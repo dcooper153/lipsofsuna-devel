@@ -24,7 +24,6 @@
 #include "engine-iterator.h"
 #include "engine-model.h"
 #include "engine-object.h"
-#include "engine-range.h"
 #include "engine-resources.h"
 #include "engine-sector.h"
 #include "engine-selection.h"
