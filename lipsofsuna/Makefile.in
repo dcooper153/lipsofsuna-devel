@@ -152,7 +152,6 @@ am__objects_7 = reload/liblipsofsunaclient_la-reload.lo \
 	reload/liblipsofsunaclient_la-reload-gimp.lo \
 	reload/liblipsofsunaclient_la-reload-image.lo
 am__objects_8 = render/liblipsofsunaclient_la-render.lo \
-	render/liblipsofsunaclient_la-render-api.lo \
 	render/liblipsofsunaclient_la-render-buffer.lo \
 	render/liblipsofsunaclient_la-render-context.lo \
 	render/liblipsofsunaclient_la-render-draw.lo \
@@ -924,7 +923,6 @@ rnddir = $(includedir)/lipsofsuna/render
 rnd_HEADERS = \
 	render/lips-render.h \
 	render/render.h \
-	render/render-api.h \
 	render/render-buffer.h \
 	render/render-context.h \
 	render/render-draw.h \
@@ -943,7 +941,6 @@ rnd_HEADERS = \
 
 rndsrc = \
 	render/render.c \
-	render/render-api.c \
 	render/render-buffer.c \
 	render/render-context.c \
 	render/render-draw.c \
@@ -1422,8 +1419,6 @@ render/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) render/$(DEPDIR)
 	@: > render/$(DEPDIR)/$(am__dirstamp)
 render/liblipsofsunaclient_la-render.lo: render/$(am__dirstamp) \
-	render/$(DEPDIR)/$(am__dirstamp)
-render/liblipsofsunaclient_la-render-api.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
 render/liblipsofsunaclient_la-render-buffer.lo:  \
 	render/$(am__dirstamp) render/$(DEPDIR)/$(am__dirstamp)
@@ -2160,8 +2155,6 @@ mostlyclean-compile:
 	-rm -f reload/lipsofsuna_import-reload-image.$(OBJEXT)
 	-rm -f reload/lipsofsuna_import-reload-main.$(OBJEXT)
 	-rm -f reload/lipsofsuna_import-reload.$(OBJEXT)
-	-rm -f render/liblipsofsunaclient_la-render-api.$(OBJEXT)
-	-rm -f render/liblipsofsunaclient_la-render-api.lo
 	-rm -f render/liblipsofsunaclient_la-render-buffer.$(OBJEXT)
 	-rm -f render/liblipsofsunaclient_la-render-buffer.lo
 	-rm -f render/liblipsofsunaclient_la-render-context.$(OBJEXT)
@@ -2442,7 +2435,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@reload/$(DEPDIR)/lipsofsuna_import-reload-image.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@reload/$(DEPDIR)/lipsofsuna_import-reload-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@reload/$(DEPDIR)/lipsofsuna_import-reload.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/liblipsofsunaclient_la-render-api.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/liblipsofsunaclient_la-render-buffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/liblipsofsunaclient_la-render-context.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/liblipsofsunaclient_la-render-draw.Plo@am__quote@
@@ -2875,14 +2867,6 @@ render/liblipsofsunaclient_la-render.lo: render/render.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render.c' object='render/liblipsofsunaclient_la-render.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o render/liblipsofsunaclient_la-render.lo `test -f 'render/render.c' || echo '$(srcdir)/'`render/render.c
-
-render/liblipsofsunaclient_la-render-api.lo: render/render-api.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT render/liblipsofsunaclient_la-render-api.lo -MD -MP -MF render/$(DEPDIR)/liblipsofsunaclient_la-render-api.Tpo -c -o render/liblipsofsunaclient_la-render-api.lo `test -f 'render/render-api.c' || echo '$(srcdir)/'`render/render-api.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) render/$(DEPDIR)/liblipsofsunaclient_la-render-api.Tpo render/$(DEPDIR)/liblipsofsunaclient_la-render-api.Plo
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='render/render-api.c' object='render/liblipsofsunaclient_la-render-api.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o render/liblipsofsunaclient_la-render-api.lo `test -f 'render/render-api.c' || echo '$(srcdir)/'`render/render-api.c
 
 render/liblipsofsunaclient_la-render-buffer.lo: render/render-buffer.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT render/liblipsofsunaclient_la-render-buffer.lo -MD -MP -MF render/$(DEPDIR)/liblipsofsunaclient_la-render-buffer.Tpo -c -o render/liblipsofsunaclient_la-render-buffer.lo `test -f 'render/render-buffer.c' || echo '$(srcdir)/'`render/render-buffer.c

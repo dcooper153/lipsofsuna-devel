@@ -322,7 +322,6 @@ rnddir = $(includedir)/lipsofsuna/render
 rnd_HEADERS = \
 	render/lips-render.h \
 	render/render.h \
-	render/render-api.h \
 	render/render-buffer.h \
 	render/render-context.h \
 	render/render-draw.h \
@@ -340,7 +339,6 @@ rnd_HEADERS = \
 	render/render-uniform.h
 rndsrc = \
 	render/render.c \
-	render/render-api.c \
 	render/render-buffer.c \
 	render/render-context.c \
 	render/render-draw.c \
