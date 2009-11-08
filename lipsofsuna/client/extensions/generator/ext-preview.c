@@ -56,6 +56,19 @@ static int
 private_event (liextPreview* self,
                liwdgEvent*   event);
 
+static int
+private_block_build (liextPreview* self,
+                     livoxBlock*   block,
+                     limatVector*  offset);
+
+static int
+private_block_free (liextPreview*     self,
+                    livoxUpdateEvent* event);
+
+static int
+private_block_load (liextPreview*     self,
+                    livoxUpdateEvent* event);
+
 static void
 private_motion (liextPreview* self,
                 liwdgEvent*   event);
@@ -101,6 +114,15 @@ liext_preview_new (liwdgManager* manager,
 	}
 	LIWDG_RENDER (self)->scene = data->scene;
 
+	/* Allocate group. */
+	data->group = lirnd_group_new (data->scene);
+	if (data->group == NULL)
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+	lirnd_group_set_realized (data->group, 1);
+
 	/* Allocate objects. */
 	data->objects = lialg_ptrdic_new ();
 	if (data->objects == NULL)
@@ -118,6 +140,18 @@ liext_preview_new (liwdgManager* manager,
 	}
 	ligen_generator_set_fill (data->generator, -1);
 	livox_manager_set_sql (data->generator->voxels, NULL);
+
+	/* Register voxel callbacks. */
+	if (!lical_callbacks_insert_callback (data->generator->voxels->callbacks,
+	     	LIVOX_CALLBACK_FREE_BLOCK, 1,
+	     	private_block_free, self, data->calls + 0) ||
+	    !lical_callbacks_insert_callback (data->generator->voxels->callbacks,
+	     	LIVOX_CALLBACK_LOAD_BLOCK, 1,
+	     	private_block_load, self, data->calls + 1))
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
 
 	/* Create camera. */
 	data->camera = lieng_camera_new (module->engine);
@@ -167,22 +201,11 @@ liext_preview_build_box (liextPreview* self,
 {
 	livoxVoxel voxel;
 
-#warning Generator previews are broken.
 	livox_voxel_init (&voxel, material);
+	livox_manager_clear (self->generator->voxels);
 	livox_manager_set_voxel (self->generator->voxels,
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, &voxel);
-#if 0
-	limatVector min;
-	limatVector max;
-
-	min = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
-	max = limat_vector_add (min, limat_vector_init (xs, ys, zs));
-	min = limat_vector_multiply (min, LIVOX_TILE_WIDTH);
-	max = limat_vector_multiply (max, LIVOX_TILE_WIDTH);
-	livox_manager_clear (self->generator->voxels);
-//	livox_manager_fill_box (self->generator->voxels, &min, &max, material);
 	livox_manager_update (self->generator->voxels, 1.0f);
-#endif
 
 	return 1;
 }
@@ -192,6 +215,7 @@ liext_preview_clear (liextPreview* self)
 {
 	lialgPtrdicIter iter;
 
+	lirnd_group_clear (self->group);
 	ligen_generator_clear_scene (self->generator);
 	LI_FOREACH_PTRDIC (iter, self->objects)
 		lirnd_object_free (iter.value);
@@ -387,6 +411,8 @@ private_free (liextPreview* self)
 {
 	lialgPtrdicIter iter;
 
+	lical_callbacks_remove_callbacks (self->generator->voxels->callbacks,
+		self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	if (self->light0 != NULL)
 	{
 		lirnd_lighting_remove_light (self->scene->lighting, self->light0);
@@ -403,6 +429,8 @@ private_free (liextPreview* self)
 			lirnd_object_free (iter.value);
 		lialg_ptrdic_free (self->objects);
 	}
+	if (self->group != NULL)
+		lirnd_group_free (self->group);
 	if (self->camera != NULL)
 		lieng_camera_free (self->camera);
 	if (self->generator != NULL)
@@ -540,6 +568,83 @@ private_event (liextPreview* self,
 	}
 
 	return liwdgRenderType.event (LIWDG_WIDGET (self), event);
+}
+
+static int
+private_block_build (liextPreview* self,
+                     livoxBlock*   block,
+                     limatVector*  offset)
+{
+	int x;
+	int y;
+	int z;
+	char name[16];
+	limatTransform transform;
+	limatVector vector;
+	lirndModel* model;
+	livoxVoxel* voxel;
+
+	/* Create new objects. */
+	/* FIXME */
+	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
+	{
+		voxel = livox_block_get_voxel (block, x, y, z);
+		if (!voxel->type)
+			continue;
+
+		snprintf (name, 16, "tile-%03d", voxel->type);
+		lieng_engine_find_model_by_name (self->module->engine, name);
+		model = lirnd_render_find_model (self->module->render, name);
+		if (model == NULL)
+			continue;
+
+		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
+		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
+		vector = limat_vector_add (vector, *offset);
+		transform = limat_convert_vector_to_transform (vector);
+		lirnd_group_insert_model (self->group, model, &transform);
+	}
+
+	return 1;
+}
+
+static int
+private_block_free (liextPreview*     self,
+                    livoxUpdateEvent* event)
+{
+	return 1;
+}
+
+static int
+private_block_load (liextPreview*     self,
+                    livoxUpdateEvent* event)
+{
+	limatVector offset;
+	limatVector vector;
+	livoxBlock* vblock;
+	livoxSector* vsector;
+
+	/* Find sector. */
+	vsector = livox_manager_find_sector (self->generator->voxels, LIVOX_SECTOR_INDEX (
+		event->sector[0], event->sector[1], event->sector[2]));
+	if (vsector == NULL)
+		return 1;
+
+	/* Find block. */
+	vblock = livox_sector_get_block (vsector, LIVOX_BLOCK_INDEX (
+		event->block[0], event->block[1], event->block[2]));
+
+	/* Build block. */
+	vector = limat_vector_init (event->sector[0], event->sector[1], event->sector[2]);
+	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
+	offset = limat_vector_init (event->block[0], event->block[1], event->block[2]);
+	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
+	offset = limat_vector_add (offset, vector);
+	private_block_build (self, vblock, &offset);
+
+	return 1;
 }
 
 static void

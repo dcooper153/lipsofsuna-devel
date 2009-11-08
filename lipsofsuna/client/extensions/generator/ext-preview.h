@@ -49,6 +49,7 @@ struct _liextPreview
 {
 	liwdgRender base;
 	lialgPtrdic* objects;
+	licalHandle calls[2];
 	licliModule* module;
 	ligenGenerator* generator;
 	liengCamera* camera;
@@ -56,6 +57,7 @@ struct _liextPreview
 	limatTransform transform;
 	lirndLight* light0;
 	lirndLight* light1;
+	lirndGroup* group;
 	lirndRender* render;
 	lirndScene* scene;
 	int mode;
