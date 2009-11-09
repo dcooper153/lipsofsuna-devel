@@ -47,7 +47,7 @@ livox_sector_build_block (livoxSector* self,
 
 void
 livox_sector_fill (livoxSector* self,
-                   uint8_t      terrain);
+                   livoxVoxel*  terrain);
 
 int
 livox_sector_read (livoxSector* self,

@@ -50,12 +50,12 @@ livox_block_free (livoxBlock*   self,
 void
 livox_block_fill (livoxBlock*   self,
                   livoxManager* manager,
-                  int           terrain)
+                  livoxVoxel*   terrain)
 {
 	int i;
 
 	for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
-		livox_voxel_init (self->tiles + i, terrain);
+		self->tiles[i] = *terrain;
 	self->dirty = 0xFF;
 	self->stamp++;
 }

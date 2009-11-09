@@ -42,7 +42,7 @@ livox_block_free (livoxBlock*   self,
 void
 livox_block_fill (livoxBlock*   self,
                   livoxManager* manager,
-                  int           terrain);
+                  livoxVoxel*   terrain);
 
 void
 livox_block_optimize (livoxBlock* self);

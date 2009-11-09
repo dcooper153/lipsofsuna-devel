@@ -70,7 +70,7 @@ private_stroke_paint (ligenGenerator* self,
  * \return New generator or NULL.
  */
 ligenGenerator*
-ligen_generator_new (lipthPaths*  paths)
+ligen_generator_new (lipthPaths* paths)
 {
 	ligenGenerator* self;
 
@@ -259,9 +259,10 @@ ligen_generator_main (ligenGenerator* self)
 	brush = lialg_u32dic_find (self->brushes, 3);
 	if (brush != NULL)
 	{
-		stroke.pos[0] = 8160 - brush->size[0] / 2;
-		stroke.pos[1] = 8160 - brush->size[1] / 2;
-		stroke.pos[2] = 8160 - brush->size[2] / 2;
+		i = LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE * 255 / 2;
+		stroke.pos[0] = i - brush->size[0] / 2;
+		stroke.pos[1] = i - brush->size[1] / 2;
+		stroke.pos[2] = i - brush->size[2] / 2;
 		stroke.size[0] = brush->size[0];
 		stroke.size[1] = brush->size[1];
 		stroke.size[2] = brush->size[2];
@@ -443,15 +444,17 @@ ligen_generator_write (ligenGenerator* self)
 	sqlite3_stmt* statement;
 
 	/* Remove old terrain. */
-	if (!liarc_sql_delete (self->srvsql, "voxel_sectors"))
-		return 0;
+	liarc_sql_delete (self->srvsql, "voxel_sectors");
+
+	/* FIXME: Side effects? */
+	livox_manager_set_sql (self->voxels, self->srvsql);
 
 	/* Save terrain. */
-	livox_manager_write (self->voxels);
+	if (!livox_manager_write (self->voxels))
+		lisys_error_report ();
 
 	/* Remove old objects. */
-	if (!liarc_sql_delete (self->srvsql, "objects"))
-		return 0;
+	liarc_sql_delete (self->srvsql, "objects");
 
 	/* Save new objects. */
 	for (i = 0 ; i < self->strokes.count ; i++)
@@ -981,6 +984,7 @@ private_stroke_paint (ligenGenerator* self,
 	int dst[3];
 	ligenBrush* brush;
 	livoxSector* sector;
+	livoxVoxel voxel;
 
 	/* Determine affected sectors. */
 	brush = lialg_u32dic_find (self->brushes, stroke->brush);
@@ -1004,7 +1008,10 @@ private_stroke_paint (ligenGenerator* self,
 		{
 			sector = livox_manager_create_sector (self->voxels, index);
 			if (self->fill != 0)
-				livox_sector_fill (sector, self->fill);
+			{
+				livox_voxel_init (&voxel, self->fill);
+				livox_sector_fill (sector, &voxel);
+			}
 		}
 
 		/* Calculate paint offset. */
