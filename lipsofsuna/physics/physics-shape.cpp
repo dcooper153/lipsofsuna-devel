@@ -27,6 +27,8 @@
 #include "physics-shape.h"
 #include "physics-private.h"
 
+#define VERTEX_WELD_EPSILON 0.05
+
 static btConvexHullShape*
 private_create_convex (liphyShape* self,
                        btScalar*   vertices,
@@ -44,6 +46,12 @@ private_init_convex (liphyShape*        self,
 static inline int
 private_init_model (liphyShape*       self,
                     const limdlModel* model);
+
+static btScalar*
+private_weld_vertices (liphyShape*        self,
+                       const limatVector* vertices,
+                       int                count_in,
+                       int*               count_out);
 
 /*****************************************************************************/
 
@@ -206,13 +214,15 @@ private_create_convex (liphyShape* self,
 	shape1 = new btConvexHullShape (vertices, count, 4 * sizeof (btScalar));
 	try
 	{
-		hull = new btShapeHull (shape1);
-		hull->buildHull (shape1->getMargin ());
-		shape = new btConvexHullShape ((btScalar*) hull->getVertexPointer (), hull->numVertices ());
-		delete shape1;
-		delete hull;
-
-		return shape;
+		if (count > 42)
+		{
+			hull = new btShapeHull (shape1);
+			hull->buildHull (shape1->getMargin ());
+			shape = new btConvexHullShape ((btScalar*) hull->getVertexPointer (), hull->numVertices ());
+			delete shape1;
+			delete hull;
+			return shape;
+		}
 	}
 	catch (...)
 	{
@@ -247,20 +257,13 @@ private_init_convex (liphyShape*        self,
                      const limatVector* vertices,
                      int                count)
 {
-	int i;
+	int num;
 	btScalar* tmp;
 
-	tmp = (btScalar*) lisys_calloc (4 * count, sizeof (btScalar));
+	tmp = private_weld_vertices (self, vertices, count, &num);
 	if (tmp == NULL)
 		return 0;
-	for (i = 0 ; i < count ; i++)
-	{
-		tmp[4 * i + 0] = vertices[i].x;
-		tmp[4 * i + 1] = vertices[i].y;
-		tmp[4 * i + 2] = vertices[i].z;
-		tmp[4 * i + 3] = 0.0;
-	}
-	self->shape = private_create_convex (self, tmp, count);
+	self->shape = private_create_convex (self, tmp, num);
 	lisys_free (tmp);
 
 	return 1;
@@ -273,9 +276,10 @@ private_init_model (liphyShape*       self,
 	int i;
 	int j;
 	int k;
+	int ret;
 	int count;
 	limdlFaces* group;
-	btScalar* vertices;
+	limatVector* vertices;
 
 	/* Count vertices. */
 	count = limdl_model_get_index_count (model);
@@ -283,26 +287,59 @@ private_init_model (liphyShape*       self,
 		return 1;
 
 	/* Allocate vertices. */
-	vertices = (btScalar*) lisys_calloc (4 * count, sizeof (btScalar));
+	vertices = (limatVector*) lisys_calloc (count, sizeof (limatVector));
 	if (vertices == NULL)
 		return 0;
 	for (i = j = 0 ; j < model->facegroups.count ; j++)
 	{
 		group = model->facegroups.array + j;
 		for (k = 0 ; k < group->vertices.count ; k++)
-		{
-			vertices[i++] = group->vertices.array[k].coord.x;
-			vertices[i++] = group->vertices.array[k].coord.y;
-			vertices[i++] = group->vertices.array[k].coord.z;
-			vertices[i++] = 0.0;
-		}
+			vertices[i++] = group->vertices.array[k].coord;
 	}
 
 	/* Create shape. */
-	self->shape = private_create_convex (self, vertices, count);
+	ret = private_init_convex (self, vertices, count);
 	lisys_free (vertices);
 
-	return 1;
+	return ret;
+}
+
+static btScalar*
+private_weld_vertices (liphyShape*        self,
+                       const limatVector* vertices,
+                       int                count_in,
+                       int*               count_out)
+{
+	int i;
+	int j;
+	int num;
+	btScalar* ret;
+
+	num = 0;
+	ret = (btScalar*) lisys_calloc (4 * count_in, sizeof (btScalar));
+	if (ret == NULL)
+		return NULL;
+	for (i = 0 ; i < count_in ; i++)
+	{
+		for (j = 0 ; j < num ; j++)
+		{
+			if (LI_ABS (vertices[i].x - ret[4 * j + 0]) < VERTEX_WELD_EPSILON &&
+			    LI_ABS (vertices[i].y - ret[4 * j + 1]) < VERTEX_WELD_EPSILON &&
+			    LI_ABS (vertices[i].z - ret[4 * j + 2]) < VERTEX_WELD_EPSILON)
+				break;
+		}
+		if (j == num)
+		{
+			ret[4 * num + 0] = vertices[i].x;
+			ret[4 * num + 1] = vertices[i].y;
+			ret[4 * num + 2] = vertices[i].z;
+			ret[4 * num + 3] = 0.0;
+			num++;
+		}
+	}
+	*count_out = num;
+
+	return ret;
 }
 
 /** @} */
