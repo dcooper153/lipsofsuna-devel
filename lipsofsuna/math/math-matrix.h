@@ -516,7 +516,7 @@ limat_matrix_unproject (const limatMatrix  projection,
 {
 	float w;
 	limatMatrix m;
-	limatVector tmp;
+	limatVector v;
 
 	/* Get inverse matrix. */
 	m = limat_matrix_multiply (projection, modelview);
@@ -525,16 +525,17 @@ limat_matrix_unproject (const limatMatrix  projection,
 	m = limat_matrix_invert (m);
 
 	/* Vector to [-1,1] range. */
-	tmp.x = 2.0f * (window->x - viewport[0]) / viewport[2] - 1.0f;
-	tmp.y = 2.0f * (window->y - viewport[1]) / viewport[3] - 1.0f;
-	tmp.z = 2.0f * window->z - 1.0f;
+	v.x = 2.0f * (window->x - viewport[0]) / viewport[2] - 1.0f;
+	v.y = 2.0f * (window->y - viewport[1]) / viewport[3] - 1.0f;
+	v.z = 2.0f * window->z - 1.0f;
 
 	/* Multiply by the inverse matrix. */
-	w = m.m[3] * tmp.x + m.m[7] * tmp.y + m.m[11] * tmp.z + m.m[15];
-	tmp = limat_matrix_transform (m, tmp);
-	object->x = tmp.x / w;
-	object->y = tmp.y / w;
-	object->z = tmp.z / w;
+	w = m.m[3] * v.x + m.m[7] * v.y + m.m[11] * v.z + m.m[15];
+	if (-LIMAT_VECTOR_EPSILON < w && w < LIMAT_VECTOR_EPSILON)
+		return 0;
+	object->x = (m.m[0] * v.x + m.m[4] * v.y + m.m[8] * v.z + m.m[12]) / w;
+	object->y = (m.m[1] * v.x + m.m[5] * v.y + m.m[9] * v.z + m.m[13]) / w;
+	object->z = (m.m[2] * v.x + m.m[6] * v.y + m.m[10] * v.z + m.m[14]) / w;
 
 	return 1;
 }

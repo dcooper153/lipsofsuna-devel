@@ -25,6 +25,7 @@
 #include "math-generic.h"
 #include "math-geometry.h"
 #include "math-halton.h"
+#include "math-intersect.h"
 #include "math-matrix.h"
 #include "math-matrixmn.h"
 #include "math-marching-cubes.h"

@@ -258,23 +258,9 @@ limat_camera_unproject (limatCamera*       self,
                         const limatVector* window,
                         limatVector*       object)
 {
-	limatMatrix m;
-	limatVector tmp;
-
-	/* Get inverse matrix. */
-	m = limat_matrix_multiply (self->view.projection, self->view.modelview);
-	if (limat_matrix_get_singular (m))
-		return 0;
-	m = limat_matrix_invert (m);
-
-	/* Vector to [-1,1] range. */
-	tmp.x = 2.0f * (window->x - self->view.viewport[0]) / self->view.viewport[2] - 1.0f;
-	tmp.y = 2.0f * (window->y - self->view.viewport[1]) / self->view.viewport[3] - 1.0f;
-	tmp.z = 2.0f * window->z - 1.0f;
-
-	/* Multiply by the inverse matrix. */
-	*object = limat_matrix_transform (m, tmp);
-	return 1;
+	return limat_matrix_unproject (
+		self->view.projection, self->view.modelview,
+		self->view.viewport, window, object);
 }
 
 /**

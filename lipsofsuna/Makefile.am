@@ -214,11 +214,13 @@ matdir = $(includedir)/lipsofsuna/math
 mat_HEADERS = \
 	math/lips-math.h \
 	math/math-aabb.h \
+	math/math-camera.h \
 	math/math-convert.h \
 	math/math-frustum.h  \
 	math/math-generic.h \
 	math/math-geometry.h \
 	math/math-halton.h \
+	math/math-intersect.h \
 	math/math-matrix.h \
 	math/math-marching-cubes.h \
 	math/math-plane.h \
@@ -233,7 +235,6 @@ mat_HEADERS = \
 	math/math-vertex.h
 matsrc = \
 	math/math-camera.c \
-	math/math-camera.h \
 	math/math-marching-cubes.c
 
 mdldir = $(includedir)/lipsofsuna/model

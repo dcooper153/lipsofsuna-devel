@@ -566,6 +566,9 @@ private_paint_terrain (liextBrushes* self,
                        int           x,
                        int           y)
 {
+	limatVector line[2];
+	limatVector point[2];
+	liextPreview* preview;
 	liextBrushesTreerow* data;
 	limatAabb aabb;
 	liwdgTreerow* row;
@@ -581,34 +584,24 @@ private_paint_terrain (liextBrushes* self,
 		return 0;
 
 	/* Pick from the scene. */
-	/* TODO: Select the far intersection point with the box if no hit. */
+	/* Selects far intersection point with the box if no polygon hit. */
 	if (!liwdg_render_pick (LIWDG_RENDER (self->widgets.preview), &result, x, y))
 	{
-/*		limatPlane planes[6];
-		limatVector point[3];
-		const limatVector normals[6] =
-		{
-			{ -1.0f,  0.0f,  0.0f },
-			{  1.0f,  0.0f,  0.0f },
-			{  0.0f, -1.0f,  0.0f },
-			{  0.0f,  1.0f,  0.0f },
-			{  0.0f,  0.0f, -1.0f },
-			{  0.0f,  0.0f,  1.0f }
-		};*/
-		liext_preview_get_bounds (LIEXT_PREVIEW (self->widgets.preview), &aabb);
-		result.point = limat_vector_add (aabb.min, aabb.max);
-		result.point = limat_vector_multiply (result.point, 0.5f);
-		printf ("%f,%f,%f\n", result.point.x, result.point.y, result.point.z);
-/*		limat_plane_init_from_point (planes + 0, aabb.min, normals + 0);
-		limat_plane_init_from_point (planes + 1, aabb.min, normals + 1);
-		limat_plane_init_from_point (planes + 2, aabb.min, normals + 2);
-		limat_plane_init_from_point (planes + 3, aabb.max, normals + 3);
-		limat_plane_init_from_point (planes + 4, aabb.max, normals + 4);
-		limat_plane_init_from_point (planes + 5, aabb.max, normals + 5);
-		if (limat_plane_intersects_line (planes + 0, point + 0, point + 1, point + 2))
-		{
-		}
-		return 0;*/
+		preview = LIEXT_PREVIEW (self->widgets.preview);
+		point[0] = limat_vector_init (x, y, 0.0f);
+		point[1] = limat_vector_init (x, y, 0.5f);
+		lieng_camera_unproject (preview->camera, point + 0, line + 0);
+		lieng_camera_unproject (preview->camera, point + 1, line + 1);
+		liext_preview_get_bounds (preview, &aabb);
+		if (!limat_intersect_aabb_line_far (&aabb, line + 0, line + 1, point))
+			return 0;
+		if (LI_ABS (point->x - aabb.min.x) < LI_MATH_EPSILON) point->x += 0.5;
+		if (LI_ABS (point->y - aabb.max.y) < LI_MATH_EPSILON) point->y -= 0.5;
+		if (LI_ABS (point->y - aabb.min.y) < LI_MATH_EPSILON) point->y += 0.5;
+		if (LI_ABS (point->y - aabb.max.y) < LI_MATH_EPSILON) point->y -= 0.5;
+		if (LI_ABS (point->z - aabb.min.z) < LI_MATH_EPSILON) point->z += 0.5;
+		if (LI_ABS (point->z - aabb.max.z) < LI_MATH_EPSILON) point->z -= 0.5;
+		result.point = *point;
 	}
 
 	/* Paint terrain. */
