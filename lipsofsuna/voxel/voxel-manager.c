@@ -225,7 +225,7 @@ livox_manager_erase_voxel (livoxManager*      self,
 
 	/* Loop through affected sectors. */
 	range0 = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH);
-	range0 = lialg_range_clamp (range0, 0, 256);
+	range0 = lialg_range_clamp (range0, 0, 255);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
 		sector = livox_manager_load_sector (self, rangei0.index);
@@ -673,7 +673,7 @@ livox_manager_replace_voxel (livoxManager*      self,
 
 	/* Loop through affected sectors. */
 	range0 = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIENG_SECTOR_WIDTH);
-	range0 = lialg_range_clamp (range0, 0, 256);
+	range0 = lialg_range_clamp (range0, 0, 255);
 	LIENG_FOREACH_RANGE (rangei0, range0)
 	{
 		sector = livox_manager_load_sector (self, rangei0.index);
