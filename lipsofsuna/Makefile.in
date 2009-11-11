@@ -647,6 +647,7 @@ alg_HEADERS = \
 	algorithm/algorithm-priority-queue.h \
 	algorithm/algorithm-ptrdic.h \
 	algorithm/algorithm-range.h \
+	algorithm/algorithm-range-iter.h \
 	algorithm/algorithm-strdic.h \
 	algorithm/algorithm-u32dic.h
 

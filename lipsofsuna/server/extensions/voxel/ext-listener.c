@@ -135,13 +135,13 @@ liext_listener_update (liextListener* self,
 	int y;
 	int z;
 	int stamp;
-	liarcWriter* writer = NULL;
-	liengObject* object;
 	lialgRange sectors;
 	lialgRange blocks;
 	lialgRange range;
-	liengRangeIter iter0;
-	liengRangeIter iter1;
+	lialgRangeIter iter0;
+	lialgRangeIter iter1;
+	liarcWriter* writer = NULL;
+	liengObject* object;
 	limatTransform transform;
 	limatVector min;
 	limatVector max;
@@ -169,7 +169,7 @@ liext_listener_update (liextListener* self,
 	blocks = lialg_range_clamp (blocks, 0, LIVOX_SECTORS_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 	/* Loop through visible sector. */
-	LIENG_FOREACH_RANGE (iter0, sectors)
+	LIALG_RANGE_FOREACH (iter0, sectors)
 	{
 		/* Get dirty sector. */
 		sector = livox_manager_find_sector (self->module->voxels, iter0.index);
@@ -190,7 +190,7 @@ liext_listener_update (liextListener* self,
 		range.maxz = LI_MIN (blocks.maxz - z * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through visible blocks. */
-		LIENG_FOREACH_RANGE (iter1, range)
+		LIALG_RANGE_FOREACH (iter1, range)
 		{
 			block = livox_sector_get_block (sector, iter1.index);
 			stamp = livox_block_get_stamp (block);

@@ -29,94 +29,10 @@
 #include "engine-sector.h"
 #include "engine-selection.h"
 
-/**
- * \brief Iterates through a range of bins in 3D.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Range iterator.
- * \param range Iterated range.
- */
-#define LIENG_FOREACH_RANGE(iter, range) \
-	for (lieng_range_iter_first (&iter, &range) ; iter.more ; \
-	     lieng_range_iter_next (&iter))
-
-typedef struct _liengRangeIter liengRangeIter;
-struct _liengRangeIter
-{
-	int index;
-	int x;
-	int y;
-	int z;
-	int more;
-	lialgRange range;
-};
-
-static inline int
-lieng_range_iter_first (liengRangeIter* self,
-                        lialgRange*     range)
-{
-	int r = range->max - range->min;
-
-	/* Find first bin. */
-	self->range = *range;
-	self->x = range->minx;
-	self->y = range->miny;
-	self->z = range->minz;
-	if (range->minx > range->maxx ||
-	    range->miny > range->maxy ||
-	    range->minz > range->maxz)
-	{
-		self->index = 0;
-		self->more = 0;
-		return 0;
-	}
-
-	/* Calculate bin index. */
-	self->more = 1;
-	self->index =
-		(self->x - self->range.min) +
-		(self->y - self->range.min) * r +
-		(self->z - self->range.min) * r * r;
-
-	return 1;
-}
-
-static inline int
-lieng_range_iter_next (liengRangeIter* self)
-{
-	int r = self->range.max - self->range.min;
-
-	/* Find next bin. */
-	if (++self->x > self->range.maxx)
-	{
-		self->x = self->range.minx;
-		if (++self->y > self->range.maxy)
-		{
-			self->y = self->range.miny;
-			if (++self->z > self->range.maxz)
-			{
-				self->more = 0;
-				return 0;
-			}
-		}
-	}
-
-	/* Calculate bin index. */
-	self->index =
-		(self->x - self->range.min) +
-		(self->y - self->range.min) * r +
-		(self->z - self->range.min) * r * r;
-
-	return 1;
-}
-
-/*****************************************************************************/
-
 typedef struct _liengSectorIter liengSectorIter;
 struct _liengSectorIter
 {
-	liengRangeIter range;
+	lialgRangeIter range;
 	liengEngine* engine;
 	liengSector* sector;
 };
@@ -152,14 +68,14 @@ lieng_sector_iter_first (liengSectorIter* self,
 	self->engine = engine;
 	range = lialg_range_new (x, y, z, radius);
 	range = lialg_range_clamp (range, 0, 255);
-	if (!lieng_range_iter_first (&self->range, &range))
+	if (!lialg_range_iter_first (&self->range, &range))
 		return 0;
 
 	/* Find first non-empty sector. */
 	while (self->range.more)
 	{
 		self->sector = lieng_engine_find_sector (engine, self->range.index);
-		lieng_range_iter_next (&self->range);
+		lialg_range_iter_next (&self->range);
 		if (self->sector != NULL)
 			return 1;
 	}
@@ -174,7 +90,7 @@ lieng_sector_iter_next (liengSectorIter* self)
 	while (self->range.more)
 	{
 		self->sector = lieng_engine_find_sector (self->engine, self->range.index);
-		lieng_range_iter_next (&self->range);
+		lialg_range_iter_next (&self->range);
 		if (self->sector != NULL)
 			return 1;
 	}

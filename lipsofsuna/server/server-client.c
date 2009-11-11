@@ -288,7 +288,7 @@ private_object_motion (lisrvClient* self,
 {
 	float dist;
 	lialgRange range;
-	liengRangeIter iter;
+	lialgRangeIter iter;
 	limatTransform transform;
 
 	/* Make sure nearby sectors are loaded when self moved. */
@@ -298,7 +298,7 @@ private_object_motion (lisrvClient* self,
 		range = lialg_range_new_from_sphere (&transform.position, 
 			LISRV_CLIENT_LOAD_RADIUS, LIENG_SECTOR_WIDTH);
 		range = lialg_range_clamp (range, 0, 255);
-		LIENG_FOREACH_RANGE (iter, range)
+		LIALG_RANGE_FOREACH (iter, range)
 		{
 			lieng_engine_load_sector (self->server->engine, iter.index);
 		}
@@ -477,7 +477,7 @@ private_vision_update (lisrvClient* self)
 	float dist;
 	lialgU32dicIter obj_iter;
 	lialgRange range;
-	liengRangeIter rangeiter;
+	lialgRangeIter rangeiter;
 	liengSector* sector;
 	liengObject* object = self->object;
 
@@ -496,7 +496,7 @@ private_vision_update (lisrvClient* self)
 	}
 
 	/* Add to vision. */
-	LIENG_FOREACH_RANGE (rangeiter, range)
+	LIALG_RANGE_FOREACH (rangeiter, range)
 	{
 		sector = lieng_engine_find_sector (object->engine, rangeiter.index);
 		if (sector == NULL)

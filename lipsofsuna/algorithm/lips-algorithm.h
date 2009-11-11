@@ -29,5 +29,6 @@
 #include "algorithm-octree.h"
 #include "algorithm-priority-queue.h"
 #include "algorithm-range.h"
+#include "algorithm-range-iter.h"
 
 #endif

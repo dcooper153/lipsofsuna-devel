@@ -259,13 +259,13 @@ private_rescan (liextNpc* self)
 {
 	float d;
 	float dist;
+	lialgRange range;
+	lialgRangeIter rangeiter;
 	lialgU32dicIter iter1;
 	liengObject* tmp;
 	liengObject* object;
 	liengObject* target;
 	liengSector* sector;
-	lialgRange range;
-	liengRangeIter rangeiter;
 
 	dist = self->radius;
 	target = NULL;
@@ -276,7 +276,7 @@ private_rescan (liextNpc* self)
 	range = lialg_range_clamp (range, 0, 255);
 
 	/* Search for target. */
-	LIENG_FOREACH_RANGE (rangeiter, range)
+	LIALG_RANGE_FOREACH (rangeiter, range)
 	{
 		sector = lieng_engine_find_sector (object->engine, rangeiter.index);
 		if (sector == NULL)
