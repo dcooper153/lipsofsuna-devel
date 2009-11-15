@@ -27,6 +27,11 @@
 #include <network/lips-network.h>
 #include "ext-module.h"
 
+static int
+private_check_occluder (livoxVoxel* voxel);
+
+/*****************************************************************************/
+
 liextBlock*
 liext_block_new (licliModule* module)
 {
@@ -56,47 +61,86 @@ liext_block_free (liextBlock* self)
 }
 
 int
-liext_block_build (liextBlock*  self,
-                   liextModule* module,
-                   livoxBlock*  block,
-                   limatVector* offset)
+liext_block_build (liextBlock*     self,
+                   liextModule*    module,
+                   livoxBlock*     block,
+                   livoxBlockAddr* addr)
 {
+#define LINE (LIVOX_TILES_PER_LINE + 2)
+#define INDEX(x, y, z) ((x) + (y) * LINE + (z) * LINE * LINE)
 	int x;
 	int y;
 	int z;
 	char name[16];
 	limatTransform transform;
 	limatVector vector;
+	limatVector offset;
 	lirndModel* model;
 	livoxVoxel* voxel;
+	livoxVoxel voxels[LINE * LINE * LINE];
+
+	/* Calculate offset. */
+	vector = limat_vector_init (addr->sector[0], addr->sector[1], addr->sector[2]);
+	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
+	offset = limat_vector_init (addr->block[0], addr->block[1], addr->block[2]);
+	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
+	offset = limat_vector_add (offset, vector);
 
 	/* Free old objects. */
 	lirnd_group_clear (self->group);
 
+	/* Prepare occlusion test. */
+	livox_manager_copy_voxels (module->voxels,
+		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[0] + addr->block[0]) - 1,
+		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[1] + addr->block[1]) - 1,
+		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[2] + addr->block[2]) - 1,
+		LINE, LINE, LINE, voxels);
+
 	/* Create new objects. */
-	/* FIXME */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
-		voxel = livox_block_get_voxel (block, x, y, z);
+		/* Type and occlusion check. */
+		voxel = voxels + INDEX (x + 1, y + 1, z + 1);
 		if (!voxel->type)
 			continue;
+		if (private_check_occluder (voxels + INDEX (x    , y + 1, z + 1)) &&
+		    private_check_occluder (voxels + INDEX (x + 2, y + 1, z + 1)) &&
+		    private_check_occluder (voxels + INDEX (x + 1, y    , z + 1)) &&
+		    private_check_occluder (voxels + INDEX (x + 1, y + 2, z + 1)) &&
+		    private_check_occluder (voxels + INDEX (x + 1, y + 1, z    )) &&
+		    private_check_occluder (voxels + INDEX (x + 1, y + 1, z + 2)))
+		    continue;
 
+		/* Get render model. */
+		/* FIXME */
 		snprintf (name, 16, "tile-%03d", voxel->type);
 		lieng_engine_find_model_by_name (module->module->engine, name);
 		model = lirnd_render_find_model (module->module->render, name);
 		if (model == NULL)
 			continue;
 
+		/* Add to render list. */
 		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
-		vector = limat_vector_add (vector, *offset);
+		vector = limat_vector_add (vector, offset);
 		transform = limat_convert_vector_to_transform (vector);
 		lirnd_group_insert_model (self->group, model, &transform);
 	}
 
 	return 1;
+#undef INDEX
+#undef LINE
+}
+
+/*****************************************************************************/
+
+static int
+private_check_occluder (livoxVoxel* voxel)
+{
+	/* FIXME */
+	return voxel->type != 0;
 }
 
 /** @} */

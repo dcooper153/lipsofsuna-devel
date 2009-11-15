@@ -34,7 +34,6 @@
 #include <voxel/lips-voxel.h>
 
 typedef struct _liextBlock liextBlock;
-typedef struct _liextBlockAddr liextBlockAddr;
 typedef struct _liextBlockKey liextBlockKey;
 typedef struct _liextListener liextListener;
 typedef struct _liextListenerBlock liextListenerBlock;

@@ -31,12 +31,6 @@
 #include <system/lips-system.h>
 #include <voxel/lips-voxel.h>
 
-struct _liextBlockAddr
-{
-	uint8_t sector[3];
-	uint8_t block[3];
-};
-
 struct _liextBlock
 {
 	int empty;

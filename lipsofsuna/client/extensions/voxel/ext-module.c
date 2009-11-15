@@ -141,6 +141,57 @@ liext_module_free (liextModule* self)
 	lisys_free (self);
 }
 
+int
+liext_module_build_block (liextModule* self,
+                          int          sx,
+                          int          sy,
+                          int          sz,
+                          int          bx,
+                          int          by,
+                          int          bz)
+{
+	liextBlock* eblock;
+	livoxBlock* vblock;
+	livoxBlockAddr addr;
+	livoxSector* vsector;
+
+	/* Find sector. */
+	vsector = livox_manager_find_sector (self->voxels, LIVOX_SECTOR_INDEX (sx, sy, sz));
+	if (vsector == NULL)
+		return 1;
+
+	/* Find block. */
+	vblock = livox_sector_get_block (vsector, LIVOX_BLOCK_INDEX (bx, by, bz));
+	addr.sector[0] = sx;
+	addr.sector[1] = sy;
+	addr.sector[2] = sz;
+	addr.block[0] = bx;
+	addr.block[1] = by;
+	addr.block[2] = bz;
+	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
+	if (eblock == NULL)
+	{
+		eblock = liext_block_new (self->module);
+		if (eblock == NULL)
+			return 0;
+		if (!lialg_memdic_insert (self->blocks, &addr, sizeof (addr), eblock))
+		{
+			liext_block_free (eblock);
+			return 0;
+		}
+	}
+
+	/* Build block. */
+	if (!liext_block_build (eblock, self, vblock, &addr))
+	{
+		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
+		liext_block_free (eblock);
+		return 0;
+	}
+
+	return 1;
+}
+
 /*****************************************************************************/
 
 static int
@@ -148,7 +199,7 @@ private_block_free (liextModule*      self,
                     livoxUpdateEvent* event)
 {
 	liextBlock* eblock;
-	liextBlockAddr addr;
+	livoxBlockAddr addr;
 
 	addr.sector[0] = event->sector[0];
 	addr.sector[1] = event->sector[1];
@@ -170,52 +221,40 @@ static int
 private_block_load (liextModule*      self,
                     livoxUpdateEvent* event)
 {
-	liextBlock* eblock;
-	liextBlockAddr addr;
-	limatVector offset;
-	limatVector vector;
-	livoxBlock* vblock;
-	livoxSector* vsector;
+	int sx = event->sector[0];
+	int sy = event->sector[1];
+	int sz = event->sector[2];
+	int bx = event->block[0];
+	int by = event->block[1];
+	int bz = event->block[2];
 
-	/* Find sector. */
-	vsector = livox_manager_find_sector (self->voxels, LIVOX_SECTOR_INDEX (
-		event->sector[0], event->sector[1], event->sector[2]));
-	if (vsector == NULL)
-		return 1;
+	liext_module_build_block (self, sx, sy, sz, bx, by, bz);
 
-	/* Find block. */
-	vblock = livox_sector_get_block (vsector, LIVOX_BLOCK_INDEX (
-		event->block[0], event->block[1], event->block[2]));
-	addr.sector[0] = event->sector[0];
-	addr.sector[1] = event->sector[1];
-	addr.sector[2] = event->sector[2];
-	addr.block[0] = event->block[0];
-	addr.block[1] = event->block[1];
-	addr.block[2] = event->block[2];
-	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
-	if (eblock == NULL)
-	{
-		eblock = liext_block_new (self->module);
-		if (eblock == NULL)
-			return 1;
-		if (!lialg_memdic_insert (self->blocks, &addr, sizeof (addr), eblock))
-		{
-			liext_block_free (eblock);
-			return 1;
-		}
-	}
+	if (bx)
+		liext_module_build_block (self, sx, sy, sz, bx - 1, by, bz);
+	else
+		liext_module_build_block (self, sx - 1, sy, sz, LIVOX_BLOCKS_PER_LINE - 1, by, bz);
+	if (by)
+		liext_module_build_block (self, sx, sy, sz, bx, by - 1, bz);
+	else
+		liext_module_build_block (self, sx, sy - 1, sz, bx, LIVOX_BLOCKS_PER_LINE - 1, bz);
+	if (bz)
+		liext_module_build_block (self, sx, sy, sz, bx, by, bz - 1);
+	else
+		liext_module_build_block (self, sx, sy, sz - 1, bx, by, LIVOX_BLOCKS_PER_LINE - 1);
 
-	/* Build block. */
-	vector = limat_vector_init (event->sector[0], event->sector[1], event->sector[2]);
-	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
-	offset = limat_vector_init (event->block[0], event->block[1], event->block[2]);
-	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
-	offset = limat_vector_add (offset, vector);
-	if (!liext_block_build (eblock, self, vblock, &offset))
-	{
-		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
-		liext_block_free (eblock);
-	}
+	if (bx < LIVOX_BLOCKS_PER_LINE - 1)
+		liext_module_build_block (self, sx, sy, sz, bx + 1, by, bz);
+	else
+		liext_module_build_block (self, sx + 1, sy, sz, 0, by, bz);
+	if (by < LIVOX_BLOCKS_PER_LINE - 1)
+		liext_module_build_block (self, sx, sy, sz, bx, by + 1, bz);
+	else
+		liext_module_build_block (self, sx, sy + 1, sz, bx, 0, bz);
+	if (bz < LIVOX_BLOCKS_PER_LINE - 1)
+		liext_module_build_block (self, sx, sy, sz, bx, by, bz + 1);
+	else
+		liext_module_build_block (self, sx, sy, sz + 1, bx, by, 0);
 
 	return 1;
 }

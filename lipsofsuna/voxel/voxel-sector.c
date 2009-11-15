@@ -140,13 +140,17 @@ int
 livox_sector_read (livoxSector* self,
                    liarcSql*    sql)
 {
-	int i;
+	int x;
+	int y;
+	int z;
 	int id;
 	int size;
+	uint16_t terrain;
+	uint8_t damage;
 	const char* query;
 	const void* bytes;
 	liarcReader* reader;
-	livoxBlock* block;
+	livoxVoxel tmp;
 	sqlite3_stmt* statement;
 
 	/* Prepare statement. */
@@ -183,14 +187,22 @@ livox_sector_read (livoxSector* self,
 	}
 
 	/* Deserialize terrain. */
-	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
+	for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; x++)
 	{
-		block = livox_sector_get_block (self, i);
-		if (!livox_block_read (block, self->manager, reader))
+		if (!liarc_reader_get_uint16 (reader, &terrain) ||
+		    !liarc_reader_get_uint8 (reader, &damage))
 		{
 			sqlite3_finalize (statement);
 			liarc_reader_free (reader);
 			return 0;
+		}
+		if (terrain || damage)
+		{
+			livox_voxel_init (&tmp, terrain);
+			tmp.damage = damage;
+			livox_sector_set_voxel (self, x, y, z, tmp);
 		}
 	}
 	sqlite3_finalize (statement);
@@ -225,13 +237,15 @@ int
 livox_sector_write (livoxSector* self,
                     liarcSql*    sql)
 {
-	int i;
+	int x;
+	int y;
+	int z;
 	int id;
 	int col = 1;
 	const char* query;
 	sqlite3_stmt* statement;
 	liarcWriter* writer;
-	livoxBlock* block;
+	livoxVoxel* tmp;
 
 	id = LIVOX_SECTOR_INDEX (self->x, self->y, self->z);
 
@@ -264,10 +278,14 @@ livox_sector_write (livoxSector* self,
 	writer = liarc_writer_new ();
 	if (writer == NULL)
 		return 0;
-	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
+	for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; z++)
+	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; y++)
+	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; x++)
 	{
-		block = livox_sector_get_block (self, i);
-		livox_block_write (block, writer);
+		tmp = livox_sector_get_voxel (self, x, y, z);
+		if (!liarc_writer_append_uint16 (writer, tmp->type) ||
+		    !liarc_writer_append_int8 (writer, tmp->damage))
+			return 0;
 	}
 
 	/* Prepare statement. */

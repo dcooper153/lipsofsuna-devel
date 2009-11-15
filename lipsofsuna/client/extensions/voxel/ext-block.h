@@ -31,13 +31,6 @@
 #include <system/lips-system.h>
 #include <voxel/lips-voxel.h>
 
-typedef struct _liextBlockAddr liextBlockAddr;
-struct _liextBlockAddr
-{
-	uint8_t sector[3];
-	uint8_t block[3];
-};
-
 typedef struct _liextBlock liextBlock;
 struct _liextBlock
 {
@@ -51,10 +44,10 @@ void
 liext_block_free (liextBlock* self);
 
 int
-liext_block_build (liextBlock*  self,
-                   liextModule* module,
-                   livoxBlock*  block,
-                   limatVector* offset);
+liext_block_build (liextBlock*     self,
+                   liextModule*    module,
+                   livoxBlock*     block,
+                   livoxBlockAddr* addr);
 
 #endif
 

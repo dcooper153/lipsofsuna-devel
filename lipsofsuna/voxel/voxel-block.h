@@ -34,6 +34,13 @@
 #endif
 
 typedef struct _livoxBlock livoxBlock;
+typedef struct _livoxBlockAddr livoxBlockAddr;
+
+struct _livoxBlockAddr
+{
+	uint8_t sector[3];
+	uint8_t block[3];
+};
 
 void
 livox_block_free (livoxBlock*   self,

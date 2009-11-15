@@ -87,13 +87,10 @@ livox_block_read (livoxBlock*   self,
 	int x;
 	int y;
 	int z;
-	uint8_t type;
 	uint8_t damage;
 	uint16_t terrain;
 	livoxVoxel tmp;
 
-	if (!liarc_reader_get_uint8 (reader, &type))
-		return 0;
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
@@ -122,8 +119,6 @@ livox_block_write (livoxBlock*  self,
 {
 	int i;
 
-	if (!liarc_writer_append_uint8 (writer, 0))
-		return 0;
 	for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
 	{
 		if (!liarc_writer_append_uint16 (writer, self->tiles[i].type) ||

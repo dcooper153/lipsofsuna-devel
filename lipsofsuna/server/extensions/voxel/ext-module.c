@@ -225,7 +225,7 @@ private_block_load (liextModule*      self,
                     livoxUpdateEvent* event)
 {
 	liextBlock* eblock;
-	liextBlockAddr addr;
+	livoxBlockAddr addr;
 	limatVector orig;
 	limatVector vector;
 	livoxBlock* vblock;
@@ -246,7 +246,7 @@ private_block_load (liextModule*      self,
 	addr.block[2] = event->block[2];
 	vblock = livox_sector_get_block (sector, LIVOX_BLOCK_INDEX (
 		event->block[0], event->block[1], event->block[2]));
-	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (liextBlockAddr));
+	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (livoxBlockAddr));
 	if (eblock == NULL)
 	{
 		eblock = liext_block_new (self);
