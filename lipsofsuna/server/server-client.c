@@ -29,8 +29,8 @@
 #include "server-client.h"
 #include "server-script.h"
 
-#define LISRV_CLIENT_DEFAULT_RADIUS 2
-#define LISRV_CLIENT_LOAD_RADIUS 2
+#define LISRV_CLIENT_DEFAULT_RADIUS 24
+#define LISRV_CLIENT_LOAD_RADIUS 24
 
 static void
 private_callbacks_setup (lisrvClient* self,
