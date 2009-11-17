@@ -31,14 +31,6 @@ typedef struct _limdlBone limdlBone;
 
 /**
  * @}
- * \addtogroup limdlConstraint Constraint
- * @{
- */
-
-typedef union _limdlConstraint limdlConstraint;
-
-/**
- * @}
  * \addtogroup limdlLight Light
  * @{
  */

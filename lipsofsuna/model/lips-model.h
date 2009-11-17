@@ -21,7 +21,6 @@
 #include "model.h"
 #include "model-animation.h"
 #include "model-bone.h"
-#include "model-constraint.h"
 #include "model-hair.h"
 #include "model-ipo.h"
 #include "model-material.h"

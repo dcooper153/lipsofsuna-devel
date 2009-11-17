@@ -92,15 +92,9 @@ lirnd_draw_debug (lirndContext* context,
 {
 #if defined LIMDL_DEBUG_ARMATURE || defined LIMDL_DEBUG_CONSTRAINT
 	int i;
-	int j;
-	limatAabb aabb;
-	limdlConstraint* constraint;
-	limdlNode* node;
-	limdlNode* effector;
-	limdlNode* target;
 
 	/* Check if renderable. */
-	if (object->model == NULL)
+	if (object->model == NULL || object->debug_pose == NULL)
 		return;
 
 	glDisable (GL_DEPTH_TEST);
@@ -120,6 +114,13 @@ lirnd_draw_debug (lirndContext* context,
 
 	/* Render constraints. */
 #ifdef LIMDL_DEBUG_CONSTRAINT
+	int j;
+	limatAabb aabb;
+	limdlNode* node;
+	limdlNode* effector;
+	limdlNode* target;
+	limdlConstraint* constraint;
+
 	for (i = 0 ; i < object->model->model->constraints.count ; i++)
 	{
 		/* Get IK constraint. */

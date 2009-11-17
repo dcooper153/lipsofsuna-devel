@@ -61,7 +61,7 @@ private_get_channel_weight (const limdlPose*        self,
 static limdlAnimation
 private_empty_anim =
 {
-	"empty", 0.0f, 0.0f, 0.0f, { 0, NULL }
+	0, "empty", 0.0f, 0.0f, { 0, NULL }, { 0, NULL }
 };
 
 /*****************************************************************************/
@@ -266,7 +266,6 @@ limdl_pose_update (limdlPose* self,
 {
 	int i;
 	lialgU32dicIter iter;
-	limdlConstraint* constraint;
 	limdlPoseFade* fade;
 	limdlPoseFade* fade_next;
 	limdlPoseChannel* chan;
@@ -322,13 +321,6 @@ limdl_pose_update (limdlPose* self,
 	{
 		node0 = self->nodes.array[i];
 		private_transform_node (self, node0);
-	}
-
-	/* Update constraints. */
-	for (i = 0 ; i < self->model->constraints.count ; i++)
-	{
-		constraint = self->model->constraints.array[i];
-		limdl_constraint_solve (constraint, self);
 	}
 }
 
@@ -820,7 +812,6 @@ private_transform_node (limdlPose* self,
 	limatTransform transform;
 	limatVector bonepos;
 	limatVector position;
-	limdlIpo* ipo;
 	limdlPoseFade* fade;
 	limdlPoseChannel* chan;
 
@@ -833,8 +824,7 @@ private_transform_node (limdlPose* self,
 	LI_FOREACH_U32DIC (iter, self->channels)
 	{
 		chan = iter.value;
-		ipo = limdl_animation_find_curve (chan->animation, node->name);
-		if (ipo != NULL)
+		if (limdl_animation_get_channel (chan->animation, node->name) != -1)
 		{
 			weight = private_get_channel_weight (self, chan);
 			total += chan->priority * weight;
@@ -845,46 +835,42 @@ private_transform_node (limdlPose* self,
 	/* Sum fade weights. */
 	for (fade = self->fades ; fade != NULL ; fade = fade->next)
 	{
-		ipo = limdl_animation_find_curve (fade->animation, node->name);
-		if (ipo == NULL)
-			continue;
-		total += fade->weight;
-		channels++;
-	}
-
-	/* Apply channel influences. */
-	LI_FOREACH_U32DIC (iter, self->channels)
-	{
-		chan = iter.value;
-		ipo = limdl_animation_find_curve (chan->animation, node->name);
-		if (ipo == NULL)
-			continue;
-		limdl_ipo_get_quaternion (ipo, chan->time, &bonerot);
-		limdl_ipo_get_location (ipo, chan->time, &bonepos);
-		if (total >= LI_MATH_EPSILON)
+		if (limdl_animation_get_channel (fade->animation, node->name) != -1)
 		{
-			weight = chan->priority * private_get_channel_weight (self, chan);
-			rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total);
-			position = limat_vector_lerp (bonepos, position, weight / total);
-		}
-		else
-		{
-			rotation = limat_quaternion_nlerp (bonerot, rotation, 1.0f / channels);
-			position = limat_vector_lerp (bonepos, position, 1.0f / channels);
+			total += fade->weight;
+			channels++;
 		}
 	}
 
-	/* Apply fade influences. */
-	for (fade = self->fades ; fade != NULL ; fade = fade->next)
+	/* Apply valid influences. */
+	if (channels && total >= LI_MATH_EPSILON)
 	{
-		ipo = limdl_animation_find_curve (fade->animation, node->name);
-		if (ipo == NULL)
-			continue;
-		limdl_ipo_get_quaternion (ipo, fade->time, &bonerot);
-		limdl_ipo_get_location (ipo, fade->time, &bonepos);
-		weight = fade->weight;
-		rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total);
-		position = limat_vector_lerp (bonepos, position, weight / total);
+		/* Apply channel influences. */
+		LI_FOREACH_U32DIC (iter, self->channels)
+		{
+			chan = iter.value;
+			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &transform))
+			{
+				bonepos = transform.position;
+				bonerot = transform.rotation;
+				weight = chan->priority * private_get_channel_weight (self, chan);
+				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total);
+				position = limat_vector_lerp (bonepos, position, weight / total);
+			}
+		}
+
+		/* Apply fade influences. */
+		for (fade = self->fades ; fade != NULL ; fade = fade->next)
+		{
+			if (limdl_animation_get_transform (fade->animation, node->name, chan->time, &transform))
+			{
+				bonepos = transform.position;
+				bonerot = transform.rotation;
+				weight = fade->weight;
+				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total);
+				position = limat_vector_lerp (bonepos, position, weight / total);
+			}
+		}
 	}
 
 	/* Update node transformation. */

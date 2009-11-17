@@ -25,28 +25,45 @@
 #ifndef __MODEL_ANIMATION_H__
 #define __MODEL_ANIMATION_H__
 
-#include "model-ipo.h"
+#include <math/lips-math.h>
+
+typedef struct _limdlFrame limdlFrame;
+struct _limdlFrame
+{
+	limatTransform transform;
+};
 
 typedef struct _limdlAnimation limdlAnimation;
 struct _limdlAnimation
 {
+	int length;
 	char* name;
-	float duration;
 	float blendin;
 	float blendout;
 	struct
 	{
 		int count;
-		limdlIpo* array;
-	} ipos;
+		limdlFrame* array;
+	} buffer;
+	struct
+	{
+		int count;
+		char** array;
+	} channels;
 };
 
-limdlIpo*
-limdl_animation_find_curve (limdlAnimation* self,
-                            const char*     name);
+int
+limdl_animation_get_channel (limdlAnimation* self,
+                             const char*     name);
 
 float
 limdl_animation_get_duration (const limdlAnimation* self);
+
+int
+limdl_animation_get_transform (limdlAnimation* self,
+                               const char*     name,
+                               float           secs,
+                               limatTransform* value);
 
 float
 limdl_animation_get_weight (const limdlAnimation* self,

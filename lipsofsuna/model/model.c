@@ -33,10 +33,6 @@ static void
 private_free_animation (limdlModel*     self,
                         limdlAnimation* animation);
 
-static void
-private_free_ipo (limdlModel* self,
-                  limdlIpo*   ipo);
-
 static int
 private_read (limdlModel*  self,
               liarcReader* reader);
@@ -44,10 +40,6 @@ private_read (limdlModel*  self,
 static int
 private_read_animations (limdlModel*  self,
                          liarcReader* reader);
-
-static int
-private_read_constraints (limdlModel*  self,
-                          liarcReader* reader);
 
 static int
 private_read_faces (limdlModel*  self,
@@ -81,10 +73,6 @@ private_write (const limdlModel* self,
 static int
 private_write_animations (const limdlModel* self,
                           liarcWriter*      writer);
-
-static int
-private_write_constraints (const limdlModel* self,
-                           liarcWriter*      writer);
 
 static int
 private_write_faces (const limdlModel* self,
@@ -235,17 +223,6 @@ limdl_model_free (limdlModel* self)
 			lisys_free (self->weightgroups.weightgroups[i].bone);
 		}
 		lisys_free (self->weightgroups.weightgroups);
-	}
-
-	/* Free constraints. */
-	if (self->constraints.array != NULL)
-	{
-		for (i = 0 ; i < self->constraints.count ; i++)
-		{
-			if (self->constraints.array[i] != NULL)
-				limdl_constraint_free (self->constraints.array[i]);
-		}
-		lisys_free (self->constraints.array);
 	}
 
 	/* Free nodes. */
@@ -713,24 +690,14 @@ private_free_animation (limdlModel*     self,
 {
 	int i;
 
-	if (animation->ipos.array != NULL)
+	if (animation->channels.array != NULL)
 	{
-		for (i = 0 ; i < animation->ipos.count ; i++)
-			private_free_ipo (self, animation->ipos.array + i);
-		lisys_free (animation->ipos.array);
+		for (i = 0 ; i < animation->channels.count ; i++)
+			lisys_free (animation->channels.array[i]);
+		lisys_free (animation->channels.array);
 	}
+	lisys_free (animation->buffer.array);
 	lisys_free (animation->name);
-}
-
-static void
-private_free_ipo (limdlModel* self,
-                  limdlIpo*   ipo)
-{
-	int i;
-
-	for (i = 0 ; i < LIMDL_IPO_CHANNEL_NUM ; i++)
-		lisys_free (ipo->channels[i].nodes);
-	lisys_free (ipo->name);
 }
 
 static int
@@ -779,7 +746,6 @@ private_read (limdlModel*  self,
 	    !private_read_faces (self, reader) ||
 	    !private_read_weights (self, reader) ||
 	    !private_read_nodes (self, reader) ||
-	    !private_read_constraints (self, reader) ||
 	    !private_read_animations (self, reader) ||
 	    !private_read_hairs (self, reader))
 		return 0;
@@ -837,40 +803,6 @@ private_read_animations (limdlModel*  self,
 		{
 			animation = self->animation.animations + i;
 			if (!private_read_animation (self, animation, reader))
-				return 0;
-		}
-	}
-
-	return 1;
-}
-
-static int
-private_read_constraints (limdlModel*  self,
-                          liarcReader* reader)
-{
-	int i;
-	uint32_t tmp;
-
-	/* Read header. */
-	if (!liarc_reader_check_text (reader, "con", ""))
-	{
-		lisys_error_set (EINVAL, "invalid constraint block header");
-		return 0;
-	}
-	if (!liarc_reader_get_uint32 (reader, &tmp))
-		return 0;
-	self->constraints.count = tmp;
-
-	/* Read constraints. */
-	if (self->constraints.count)
-	{
-		self->constraints.array = lisys_calloc (self->constraints.count, sizeof (limdlConstraint*));
-		if (self->constraints.array == NULL)
-			return 0;
-		for (i = 0 ; i < self->constraints.count ; i++)
-		{
-			self->constraints.array[i] = limdl_constraint_new_from_stream (reader);
-			if (self->constraints.array[i] == NULL)
 				return 0;
 		}
 	}
@@ -1057,29 +989,53 @@ private_read_animation (limdlModel*     self,
                         liarcReader*    reader)
 {
 	int i;
-	uint32_t count;
+	uint32_t count0;
+	uint32_t count1;
+	limatTransform* transform;
 
 	/* Read the header. */
 	if (!liarc_reader_get_text (reader, "", &animation->name) ||
-	    !liarc_reader_get_uint32 (reader, &count) ||
-	    !liarc_reader_get_float (reader, &animation->duration) ||
-	    !liarc_reader_get_float (reader, &animation->blendin) ||
-	    !liarc_reader_get_float (reader, &animation->blendout))
+	    !liarc_reader_get_uint32 (reader, &count0) ||
+	    !liarc_reader_get_uint32 (reader, &count1))
 		return 0;
 
-	/* Allocate curves. */
-	animation->ipos.count = count;
-	if (count)
+	/* Allocate channels. */
+	animation->channels.count = count0;
+	if (count0)
 	{
-		animation->ipos.array = lisys_calloc (count, sizeof (limdlIpo));
-		if (animation->ipos.array == NULL)
+		animation->channels.array = lisys_calloc (count0, sizeof (char*));
+		if (animation->channels.array == NULL)
 			return 0;
 	}
 
-	/* Read curves. */
-	for (i = 0 ; i < animation->ipos.count ; i++)
+	/* Read channels. */
+	for (i = 0 ; i < animation->channels.count ; i++)
 	{
-		if (!limdl_ipo_read (animation->ipos.array + i, reader))
+		if (!liarc_reader_get_text (reader, "", animation->channels.array + i))
+			return 0;
+	}
+
+	/* Allocate frames. */
+	animation->length = count1;
+	animation->buffer.count = count0 * count1;
+	if (animation->buffer.count)
+	{
+		animation->buffer.array = lisys_calloc (animation->buffer.count, sizeof (limdlFrame));
+		if (animation->buffer.array == NULL)
+			return 0;
+	}
+
+	/* Read frames. */
+	for (i = 0 ; i < animation->buffer.count ; i++)
+	{
+		transform = &animation->buffer.array[i].transform;
+		if (!liarc_reader_get_float (reader, &transform->position.x) ||
+			!liarc_reader_get_float (reader, &transform->position.y) ||
+			!liarc_reader_get_float (reader, &transform->position.z) ||
+			!liarc_reader_get_float (reader, &transform->rotation.x) ||
+			!liarc_reader_get_float (reader, &transform->rotation.y) ||
+			!liarc_reader_get_float (reader, &transform->rotation.z) ||
+			!liarc_reader_get_float (reader, &transform->rotation.w))
 			return 0;
 	}
 
@@ -1103,7 +1059,6 @@ private_write (const limdlModel* self,
 	    !private_write_faces (self, writer) ||
 	    !private_write_weights (self, writer) ||
 	    !private_write_nodes (self, writer) ||
-	    !private_write_constraints (self, writer) ||
 	    !private_write_animations (self, writer) ||
 	    !private_write_hairs (self, writer))
 		return 0;
@@ -1117,7 +1072,7 @@ private_write_animations (const limdlModel* self,
 	int i;
 	int j;
 	limdlAnimation* animation;
-	limdlIpo* ipo;
+	limatTransform* transform;
 
 	/* Write animations. */
 	if (!liarc_writer_append_string (writer, "ani") ||
@@ -1129,36 +1084,27 @@ private_write_animations (const limdlModel* self,
 		animation = self->animation.animations + i;
 		if (!liarc_writer_append_string (writer, animation->name) ||
 		    !liarc_writer_append_nul (writer) ||
-		    !liarc_writer_append_uint32 (writer, animation->ipos.count) ||
-		    !liarc_writer_append_float (writer, animation->duration) ||
-		    !liarc_writer_append_float (writer, animation->blendin) ||
-		    !liarc_writer_append_float (writer, animation->blendout))
-			return 1;
-		for (j = 0 ; j < animation->ipos.count ; j++)
+		    !liarc_writer_append_uint32 (writer, animation->channels.count) ||
+		    !liarc_writer_append_uint32 (writer, animation->length))
+			return 0;
+		for (j = 0 ; j < animation->channels.count ; j++)
 		{
-			ipo = animation->ipos.array + j;
-			if (!limdl_ipo_write (ipo, writer))
+			if (!liarc_writer_append_string (writer, animation->channels.array[j]) ||
+				!liarc_writer_append_nul (writer))
 				return 0;
 		}
-	}
-
-	return 1;
-}
-
-static int
-private_write_constraints (const limdlModel* self,
-                           liarcWriter*      writer)
-{
-	int i;
-
-	if (!liarc_writer_append_string (writer, "con") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->constraints.count))
-		return 0;
-	for (i = 0 ; i < self->constraints.count ; i++)
-	{
-		if (!limdl_constraint_write (self->constraints.array[i], writer))
-			return 0;
+		for (j = 0 ; j < animation->buffer.count ; j++)
+		{
+			transform = &animation->buffer.array[j].transform;
+			if (!liarc_writer_append_float (writer, transform->position.x) ||
+			    !liarc_writer_append_float (writer, transform->position.y) ||
+			    !liarc_writer_append_float (writer, transform->position.z) ||
+			    !liarc_writer_append_float (writer, transform->rotation.x) ||
+			    !liarc_writer_append_float (writer, transform->rotation.y) ||
+			    !liarc_writer_append_float (writer, transform->rotation.z) ||
+			    !liarc_writer_append_float (writer, transform->rotation.w))
+				return 0;
+		}
 	}
 
 	return 1;

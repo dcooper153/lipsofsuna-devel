@@ -25,28 +25,35 @@
 #include <stdio.h>
 #include "model-animation.h"
 
+#define TIMESCALE 0.02f
+
+static limatTransform*
+private_frame_transform (limdlAnimation* self,
+                         int             chan,
+                         int             frame);
+
+/*****************************************************************************/
+
 /**
- * \brief Finds an interpolation curve by name.
+ * \brief Gets the index of a channel.
  *
  * \param self Animation.
- * \param name Name.
- * \return Interpolation curve or NULL.
+ * \param name Channel name.
+ * \return Channel index or -1.
  */
-limdlIpo*
-limdl_animation_find_curve (limdlAnimation* self,
-                            const char*     name)
+int
+limdl_animation_get_channel (limdlAnimation* self,
+                             const char*     name)
 {
 	int i;
-	limdlIpo* ipo;
 
-	for (i = 0 ; i < self->ipos.count ; i++)
+	for (i = 0 ; i < self->channels.count ; i++)
 	{
-		ipo = self->ipos.array + i;
-		if (!strcmp (ipo->name, name))
-			return ipo;
+		if (!strcmp (self->channels.array[i], name))
+			return i;
 	}
 
-	return NULL;
+	return -1;
 }
 
 /**
@@ -58,7 +65,51 @@ limdl_animation_find_curve (limdlAnimation* self,
 float
 limdl_animation_get_duration (const limdlAnimation* self)
 {
-	return self->duration;
+	return (self->length - 1) * TIMESCALE;
+}
+
+/**
+ * \brief Gets the node transformation.
+ *
+ * \param self Animation.
+ * \param name Channel name.
+ * \param secs Animation position.
+ * \param value Return location for the transformation.
+ * \return Nonzero on success.
+ */
+int
+limdl_animation_get_transform (limdlAnimation* self,
+                               const char*     name,
+                               float           secs,
+                               limatTransform* value)
+{
+	int chan;
+	int frame;
+	float blend;
+	float frames;
+	limatTransform* t0;
+	limatTransform* t1;
+
+	chan = limdl_animation_get_channel (self, name);
+	if (chan == -1)
+		return 0;
+
+	frames = secs / TIMESCALE;
+	frame = (int) frames;
+	if (frame <= 0)
+		*value = *private_frame_transform (self, chan, 0);
+	else if (frame >= self->length - 1)
+		*value = *private_frame_transform (self, chan, self->length - 1);
+	else
+	{
+		blend = frames - frame;
+		t0 = private_frame_transform (self, chan, frame);
+		t1 = private_frame_transform (self, chan, frame + 1);
+		value->position = limat_vector_lerp (t1->position, t0->position, blend);
+		value->rotation = limat_quaternion_nlerp (t1->rotation, t0->rotation, blend);
+	}
+
+	return 1;
 }
 
 /**
@@ -86,6 +137,8 @@ limdl_animation_get_weight (const limdlAnimation* self,
                             float                 mweight,
                             float                 eweight)
 {
+#warning No animation weights
+#if 0
 	if (time < 0.0f)
 		return sweight;
 	if (time < self->blendin)
@@ -95,6 +148,18 @@ limdl_animation_get_weight (const limdlAnimation* self,
 	if (time < self->duration)
 		return mweight + (eweight - mweight) * (1.0f - (self->duration - time) / self->blendout);
 	return eweight;
+#endif
+	return 1.0f;
+}
+
+/*****************************************************************************/
+
+static limatTransform*
+private_frame_transform (limdlAnimation* self,
+                         int             chan,
+                         int             frame)
+{
+	return &self->buffer.array[self->channels.count * frame + chan].transform;
 }
 
 /** @} */

@@ -244,7 +244,6 @@ mdl_HEADERS = \
 	model/model.h \
 	model/model-animation.h \
 	model/model-bone.h \
-	model/model-constraint.h \
 	model/model-faces.h \
 	model/model-hair.h \
 	model/model-ipo.h \
@@ -259,7 +258,6 @@ mdlsrc = \
 	model/model.c \
 	model/model-animation.c \
 	model/model-bone.c \
-	model/model-constraint.c \
 	model/model-faces.c \
 	model/model-hair.c \
 	model/model-ipo.c \

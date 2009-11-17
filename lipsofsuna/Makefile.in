@@ -227,11 +227,10 @@ am__objects_18 = engine/engine.lo engine/engine-camera.lo \
 	engine/engine-sector.lo engine/engine-selection.lo
 am__objects_19 = math/math-camera.lo math/math-marching-cubes.lo
 am__objects_20 = model/model.lo model/model-animation.lo \
-	model/model-bone.lo model/model-constraint.lo \
-	model/model-faces.lo model/model-hair.lo model/model-ipo.lo \
-	model/model-ipo-channel.lo model/model-light.lo \
-	model/model-material.lo model/model-node.lo \
-	model/model-pose.lo model/model-texture.lo
+	model/model-bone.lo model/model-faces.lo model/model-hair.lo \
+	model/model-ipo.lo model/model-ipo-channel.lo \
+	model/model-light.lo model/model-material.lo \
+	model/model-node.lo model/model-pose.lo model/model-texture.lo
 am__objects_21 = network/network.lo
 am__objects_22 = physics/physics.lo physics/physics-control.lo \
 	physics/physics-object.lo physics/physics-private.lo \
@@ -839,7 +838,6 @@ mdl_HEADERS = \
 	model/model.h \
 	model/model-animation.h \
 	model/model-bone.h \
-	model/model-constraint.h \
 	model/model-faces.h \
 	model/model-hair.h \
 	model/model-ipo.h \
@@ -855,7 +853,6 @@ mdlsrc = \
 	model/model.c \
 	model/model-animation.c \
 	model/model-bone.c \
-	model/model-constraint.c \
 	model/model-faces.c \
 	model/model-hair.c \
 	model/model-ipo.c \
@@ -1637,8 +1634,6 @@ model/model-animation.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
 model/model-bone.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
-model/model-constraint.lo: model/$(am__dirstamp) \
-	model/$(DEPDIR)/$(am__dirstamp)
 model/model-faces.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
 model/model-hair.lo: model/$(am__dirstamp) \
@@ -2102,8 +2097,6 @@ mostlyclean-compile:
 	-rm -f model/model-animation.lo
 	-rm -f model/model-bone.$(OBJEXT)
 	-rm -f model/model-bone.lo
-	-rm -f model/model-constraint.$(OBJEXT)
-	-rm -f model/model-constraint.lo
 	-rm -f model/model-faces.$(OBJEXT)
 	-rm -f model/model-faces.lo
 	-rm -f model/model-hair.$(OBJEXT)
@@ -2407,7 +2400,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@math/$(DEPDIR)/math-marching-cubes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-animation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-bone.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-faces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-hair.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-ipo-channel.Plo@am__quote@

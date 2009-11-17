@@ -37,6 +37,21 @@ Lips = LipsEnum()
 #############################################################################
 # Default functions.
 
+def BoneLocalMatrix(restbone, posebone):
+	if restbone.parent:
+		#return posebone.poseMatrix.copy().identity()
+		tailmat = TranslationMatrix(Vector(0, restbone.parent.length, 0))
+		bonematr = restbone.matrix['ARMATURESPACE']
+		bonematp = posebone.poseMatrix
+		parentmatr = tailmat * restbone.parent.matrix['ARMATURESPACE']
+		parentmatp = tailmat * posebone.parent.poseMatrix
+		restmatrix = bonematr * parentmatr.invert()
+		posematrix = bonematp * parentmatp.invert()
+	else:
+		posematrix = posebone.poseMatrix
+		restmatrix = restbone.matrix['ARMATURESPACE']
+	return posematrix * restmatrix.invert()
+
 def MaterialDiffuse(bmat):
 	if bmat:
 		if bmat.getMode() & Blender.Material.Modes['ZTRANSP']:
@@ -158,6 +173,16 @@ def MeshVisible(object, mesh):
 			return 1
 	return 0
 
+def ObjectLocalMatrix(object):
+	if object.parent and object.parentbonename:
+		parentrbone = object.parent.getData().bones[object.parentbonename]
+		parentpbone = object.parent.getPose().bones[object.parentbonename]
+		matrix = TranslationMatrix(Vector(0, parentrbone.length, 0)) * parentpbone.poseMatrix
+		matrix = object.matrixLocal * matrix.invert()
+	else:
+		matrix = object.matrixLocal.copy()
+	return matrix
+
 def NodeChild(scene, object, bone, child):
 	if object != child.parent:
 		return 0
@@ -263,13 +288,14 @@ def VertexWeights(object, mesh, face, index, bones):
 #############################################################################
 # Function customization.
 
-lips_format_version = 0xFFFFFFF9
+lips_format_version = 0xFFFFFFF8
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
 lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
 lips_correction_quat = Euler(-90, 0, 0).toQuat()
 lips_exporter_calls = \
 { \
+	"BoneLocalMatrix": BoneLocalMatrix, \
 	"MaterialDiffuse": MaterialDiffuse, \
 	"MaterialEmission": MaterialEmission, \
 	"MaterialFlags": MaterialFlags, \
@@ -279,6 +305,7 @@ lips_exporter_calls = \
 	"MaterialStrands": MaterialStrands, \
 	"MaterialTextures": MaterialTextures, \
 	"ObjectHairs": ObjectHairs, \
+	"ObjectLocalMatrix": ObjectLocalMatrix, \
 	"MeshVisible": MeshVisible, \
 	"NodeChild": NodeChild, \
 	"NodeChildren": NodeChildren, \
@@ -297,58 +324,47 @@ if os.access("custom.py", os.R_OK):
 
 class LipsAnimation:
 
-	# Initializes an animation from Blender data.
-	def __init__(self, bstrip):
-		self.strip = bstrip
-		self.action = bstrip.action
+	# \brief Initializes an animation from Blender data.
+	#
+	# \param self Animation.
+	# \param baction Blender action.
+	# \param start Start frame.
+	# \param end End frame.
+	# \param bones Dictionary of valid bone names.
+	def __init__(self, baction, start, end, bones):
+		self.action = baction
+		self.start = start
+		self.end = end
+		self.name = baction.name
+		self.channels = []
+		self.ikchannels = []
 
-	# Gets the interpolation curves for the requested bone.
-	def GetCurves(self, name):
-		if name not in self.action.getChannelNames():
-			return [LipsCurve(self.strip, None), \
-			        LipsCurve(self.strip, None), \
-			        LipsCurve(self.strip, None), \
-			        LipsCurve(self.strip, None), \
-			        LipsCurve(self.strip, None), \
-			        LipsCurve(self.strip, None), \
-			        LipsCurve(self.strip, None),]
-		ipo = self.action.getChannelIpo(name)
-		curves = []
-		channels = ["LocX", "LocY", "LocZ", "QuatX", "QuatY", "QuatZ", "QuatW"]
+		# Add manually controlled bones.
+		channels = baction.getChannelNames()
 		for channel in channels:
-			found = 0
-			for curve in ipo.curves:
-				if curve.name == channel:
-					curves.append(LipsCurve(self.strip, curve))
-					found = 1
-					break
-			if not found:
-				curves.append(LipsCurve(self.strip, None))
-		return curves
+			if channel in bones:
+				bone = bones[channel]
+				if Blender.Armature.NO_DEFORM not in bone.options:
+					self.channels.append(channel)
+				else:
+					self.ikchannels.append(channel)
 
-	def Write(self, writer):
-		channels = self.action.getChannelNames()
-		writer.WriteString(self.action.name)
-		writer.WriteInt(len(channels))
-		writer.WriteFloat(lips_animation_timescale * (self.strip.actionEnd - self.strip.actionStart))
-		writer.WriteFloat(lips_animation_timescale * self.strip.blendIn)
-		writer.WriteFloat(lips_animation_timescale * self.strip.blendOut)
-		for channel in channels:
-			curves = self.GetCurves(channel)
-			writer.WriteString(channel)
-			writer.WriteInt(len(curves))
-			for curve in curves:
-				writer.WriteInt(curve.type)
-				writer.WriteInt(curve.length)
-				for value in curve.values:
-					writer.WriteFloat(value)
+	# \brief Adds a channel to the animation.
+	#
+	# \param self Animation.
+	# \param channel Channel name.
+	def AddChannel(self, name):
+		self.channels.append(name)
 
 
 class LipsAnimations:
 
 	# \brief Initializes a new armature.
 	def __init__(self):
+		self.armatures = []
 		self.animations = []
+		self.posebones = {}
+		self.restbones = {}
 
 	# \brief Add animations from a Blender armature object.
 	#
@@ -356,56 +372,111 @@ class LipsAnimations:
 	# \param object Blender armature object.
 	# \param armature Blender armature data.
 	def AddArmature(self, object, armature):
-		for action in object.actionStrips:
-			self.animations.append(LipsAnimation(action))
+		self.armatures.append([object, armature])
+
+		# Collect rest bones.
+		for name in armature.bones.keys():
+			self.restbones[name] = armature.bones[name]
+
+		# Collect pose bones.
+		pose = object.getPose()
+		for name in pose.bones.keys():
+			self.posebones[name] = pose.bones[name]
 
 	# \brief Writes animations.
 	#
 	# \param self Animation manager.
 	# \param writer Writer.
 	def Write(self, writer):
+
+		# Collect animations.
+		actions = Blender.Armature.NLA.GetActions()
+		for action in actions:
+			frames = actions[action].getFrameNumbers()
+			start = 1000
+			end = 1
+			for frame in frames:
+				if start > frame:
+					start = frame
+				if end < frame:
+					end = frame
+			if start < 1:
+				start = 1
+			if start < end:
+				self.animations.append(LipsAnimation(actions[action], start, end, self.restbones))
+
+		# Add IK controlled bones to animations.
+		for armature in self.armatures:
+			pose = armature[0].getPose()
+			for name in pose.bones.keys():
+				for constraint in pose.bones[name].constraints:
+					if constraint.type != Blender.Constraint.Type.IKSOLVER:
+						continue
+
+					# Get chain length and target.
+					chainlen = constraint[Blender.Constraint.Settings.CHAINLEN]
+					target = constraint[Blender.Constraint.Settings.BONE]
+
+					# Add bones in the chain to animations.
+					for animation in self.animations:
+						if target not in animation.ikchannels or name in animation.channels:
+							continue
+						bone = armature[1].bones[name]
+						for depth in xrange(0, chainlen):
+							animation.AddChannel(bone.name)
+							if not bone.parent:
+								break
+							bone = bone.parent
+
+		# Write header.
 		writer.WriteInt(len(self.animations))
+
+		# Write animations.
 		for animation in self.animations:
-			animation.Write(writer)
 
+			# Clear user rotation of all bones.
+			# FIXME: Does this work?
+			for bone in self.posebones.values():
+				bone.loc = Vector(0, 0, 0)
+				bone.quat = Quaternion(1, 0, 0, 0)
 
-class LipsCurve:
+			# Bind the animation.
+			for armature in self.armatures:
+				animation.action.setActive(armature[0])
+				#pose = armature[0].getPose()
+				#pose.update()
 
-	# \brief Initializes a new IPO curve from Blender data.
-	def __init__(self, bstrip, bcurve):
-		self.strip = bstrip
-		self.curve = bcurve
-		self.values = []
-		if bcurve is None:
-			self.type = 0
-			self.length = 0
-			return
-		scale = lips_animation_timescale
-		offset = self.strip.actionStart
-		if bcurve.interpolation == Blender.IpoCurve.InterpTypes.CONST:
-			self.type = 0
-			self.length = 2 * len(bcurve.bezierPoints)
-			for bezier in bcurve.bezierPoints:
-				self.values.append(scale * (bezier.vec[1][0] - offset))
-				self.values.append(bezier.vec[1][1])
-		elif bcurve.interpolation == Blender.IpoCurve.InterpTypes.LINEAR:
-			self.type = 1
-			self.length = 2 * len(bcurve.bezierPoints)
-			for bezier in bcurve.bezierPoints:
-				self.values.append(scale * (bezier.vec[1][0] - offset))
-				self.values.append(bezier.vec[1][1])
-		elif bcurve.interpolation == Blender.IpoCurve.InterpTypes.BEZIER:
-			self.type = 2
-			self.length = 6 * len(bcurve.bezierPoints)
-			for bezier in bcurve.bezierPoints:
-				self.values.append(scale * (bezier.vec[0][0] - offset))
-				self.values.append(bezier.vec[0][1])
-				self.values.append(scale * (bezier.vec[1][0] - offset))
-				self.values.append(bezier.vec[1][1])
-				self.values.append(scale * (bezier.vec[2][0] - offset))
-				self.values.append(bezier.vec[2][1])
-		else:
-			print("W: Unknown curve type.")
+			# Writer header.
+			writer.WriteString(animation.name)
+			writer.WriteInt(len(animation.channels))
+			writer.WriteInt(animation.end)
+
+			# Write channel list.
+			for channel in animation.channels:
+				writer.WriteString(channel)
+
+			# Write frames.
+			for frame in xrange(1, animation.end + 1):
+				Blender.Set('curframe', frame)
+				for armature in self.armatures:
+					armature[0].evaluatePose(frame)
+					armature[0].makeDisplayList()
+					Blender.Redraw()
+
+				# Write channels.
+				for channel in animation.channels:
+					bone = self.posebones[channel]
+					rest = self.restbones[channel]
+					mat = lips_exporter_calls["BoneLocalMatrix"](rest, bone)
+					loc = mat.translationPart().resize3D()
+					rot = mat.rotationPart().toQuat()
+					writer.WriteFloat(loc.x)
+					writer.WriteFloat(loc.y)
+					writer.WriteFloat(loc.z)
+					writer.WriteFloat(rot.x)
+					writer.WriteFloat(rot.y)
+					writer.WriteFloat(rot.z)
+					writer.WriteFloat(rot.w)
 
 #############################################################################
 # Mesh.
@@ -843,12 +914,6 @@ class LipsNode:
 		else:
 			return "#"
 
-	def GetPoseMatrix(self):
-		posebone = self.object.getPose().bones[self.bone.name]
-		matrix = Matrix(posebone.poseMatrix)
-		matrix = TranslationMatrix(self.GetLength()) * matrix
-		return matrix
-
 	# \brief Gets the position of the object relative to its parent.
 	#
 	# \param self Node.
@@ -857,7 +922,7 @@ class LipsNode:
 		if self.bone:
 			return self.bone.head['BONESPACE']
 		elif self.object:
-			matrix = self.GetRestMatrix()
+			matrix = lips_exporter_calls["ObjectLocalMatrix"](self.object)
 			return matrix.translationPart()
 		else:
 			return Vector(0, 0, 0)
@@ -866,14 +931,6 @@ class LipsNode:
 	def GetResolution(self):
 		return self.data.bufferSize
 
-	def GetRestMatrix(self):
-		if self.parent and self.parent.bone:
-			matrix = self.parent.GetPoseMatrix()
-			matrix = self.object.matrixLocal * matrix.invert()
-		else:
-			matrix = self.object.matrixLocal
-		return Matrix(matrix)
-
 	# \brief Gets the rotation of the object relative to its parent.
 	#
 	# \param self Node.
@@ -881,13 +938,12 @@ class LipsNode:
 	def GetRotation(self):
 		global lips_correction_quat
 		if self.bone:
-			matrix = Matrix(self.bone.matrix['BONESPACE'])
-			matrix = matrix.rotationPart()
+			matrix = self.bone.matrix['BONESPACE'].rotationPart()
 			quat = matrix.toQuat()
 			quat.normalize()
 			return quat
 		elif self.object:
-			matrix = self.GetRestMatrix()
+			matrix = lips_exporter_calls["ObjectLocalMatrix"](self.object)
 			matrix = matrix.rotationPart()
 			#matrix = blender_rotation_to_lips(matrix)
 			quat = matrix.toQuat()
@@ -968,7 +1024,6 @@ class LipsStorage:
 		self.animations = LipsAnimations()
 		self.hairs = LipsHairs()
 		self.faces = LipsFaces()
-		self.constraints = []
 		self.materials = {}
 		self.node = None
 		self.weightnames = []
@@ -983,18 +1038,6 @@ class LipsStorage:
 
 	def AddArmature(self, bobj):
 		self.animations.AddArmature(bobj, bobj.getData())
-		pose = bobj.getPose()
-		for name in pose.bones.keys():
-			bone = pose.bones[name]
-			for constraint in bone.constraints:
-				if constraint.type == Blender.Constraint.Type.IKSOLVER:
-						#offs = constraint[Constraint.Settings.OFFSET]
-						chainlen = constraint[Blender.Constraint.Settings.CHAINLEN]
-						target = constraint[Blender.Constraint.Settings.BONE]
-						self.constraints.append([Lips.ConstraintTypes.INVERSE_KINEMATICS, bone.name, target, chainlen])
-				elif constraint.type == Blender.Constraint.Type.COPYROT:
-						target = constraint[Blender.Constraint.Settings.BONE]
-						self.constraints.append([Lips.ConstraintTypes.COPY_ROTATION, bone.name, target])
 
 	def AddHair(self, bmat, hair):
 		mat = self.AddMaterial(bmat, None, None)
@@ -1095,18 +1138,6 @@ class LipsStorage:
 		writer.WriteString("nod")
 		writer.WriteInt(1)
 		self.node.Write(writer)
-		# Constraints.
-		writer.WriteString("con")
-		writer.WriteInt(len(self.constraints))
-		for ary in self.constraints:
-			writer.WriteInt(ary[0])
-			if ary[0] == Lips.ConstraintTypes.COPY_ROTATION:
-				writer.WriteString(ary[1])
-				writer.WriteString(ary[2])
-			elif ary[0] == Lips.ConstraintTypes.INVERSE_KINEMATICS:
-				writer.WriteString(ary[1])
-				writer.WriteString(ary[2])
-				writer.WriteInt(ary[3])
 		# Animations.
 		writer.WriteString("ani")
 		self.animations.Write(writer)
@@ -1122,6 +1153,7 @@ class LipsWriter:
 	# Initializes a new data writer.
 	def __init__(self, name):
 		self.file = open(name, "wb")
+		self.pos = 0
 
 	def Close(self):
 		self.file.close()
@@ -1129,15 +1161,18 @@ class LipsWriter:
 	# Appends an integer.
 	def WriteInt(self, value):
 		self.file.write(struct.pack("!I", value))
+		self.pos += 4
 
 	# Appends a floating point number.
 	def WriteFloat(self, value):
 		self.file.write(struct.pack("!f", value))
+		self.pos += 4
 
 	# Appends a string.
 	def WriteString(self, value):
 		self.file.write(value)
 		self.file.write(struct.pack('c', '\0'))
+		self.pos += len(value) + 1
 
 #############################################################################
 # Main.
