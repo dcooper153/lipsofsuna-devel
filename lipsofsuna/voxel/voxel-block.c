@@ -88,6 +88,7 @@ livox_block_read (livoxBlock*   self,
 	int y;
 	int z;
 	uint8_t damage;
+	uint8_t rotation;
 	uint16_t terrain;
 	livoxVoxel tmp;
 
@@ -96,10 +97,12 @@ livox_block_read (livoxBlock*   self,
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
 		if (!liarc_reader_get_uint16 (reader, &terrain) ||
-		    !liarc_reader_get_uint8 (reader, &damage))
+		    !liarc_reader_get_uint8 (reader, &damage) ||
+		    !liarc_reader_get_uint8 (reader, &rotation))
 			return 0;
 		livox_voxel_init (&tmp, terrain);
 		tmp.damage = damage;
+		tmp.rotation = rotation;
 		livox_block_set_voxel (self, x, y, z, &tmp);
 	}
 
@@ -122,7 +125,8 @@ livox_block_write (livoxBlock*  self,
 	for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
 	{
 		if (!liarc_writer_append_uint16 (writer, self->tiles[i].type) ||
-		    !liarc_writer_append_int8 (writer, self->tiles[i].damage))
+		    !liarc_writer_append_uint8 (writer, self->tiles[i].damage) ||
+		    !liarc_writer_append_uint8 (writer, self->tiles[i].rotation))
 			return 0;
 	}
 
@@ -224,7 +228,8 @@ livox_block_set_voxel (livoxBlock* self,
 	/* Modify terrain. */
 	i = LIVOX_TILE_INDEX (x, y, z);
 	if (self->tiles[i].type == voxel->type &&
-	    self->tiles[i].damage == voxel->damage)
+	    self->tiles[i].damage == voxel->damage &&
+	    self->tiles[i].rotation == voxel->rotation)
 		return 0;
 	self->tiles[i] = *voxel;
 

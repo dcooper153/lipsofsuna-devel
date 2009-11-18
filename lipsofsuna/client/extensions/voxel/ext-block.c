@@ -124,8 +124,8 @@ liext_block_build (liextBlock*     self,
 		/* Add to render list. */
 		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
-		vector = limat_vector_add (vector, offset);
-		transform = limat_convert_vector_to_transform (vector);
+		transform.position = limat_vector_add (vector, offset);
+		livox_voxel_get_quaternion (voxel, &transform.rotation);
 		lirnd_group_insert_model (self->group, model, &transform);
 	}
 

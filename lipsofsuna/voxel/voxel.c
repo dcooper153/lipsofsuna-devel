@@ -27,8 +27,8 @@
 /**
  * \brief Initializes a voxel of the given type.
  *
+ * \param self Voxel.
  * \param type Terrain type.
- * \return Voxel.
  */
 void
 livox_voxel_init (livoxVoxel* self,
@@ -36,6 +36,22 @@ livox_voxel_init (livoxVoxel* self,
 {
 	self->type = type;
 	self->damage = 0;
+	self->rotation = 0;
+}
+
+/**
+ * \brief Rotates the voxel.
+ *
+ * \param self Voxel.
+ */
+void
+livox_voxel_rotate (livoxVoxel* self)
+{
+	/* TODO: Support all 24 orientations. */
+	/* TODO: Support rotating around different axis. */
+	self->rotation++;
+	if (self->rotation >= 4)
+		self->rotation = 0;
 }
 
 /**
@@ -45,9 +61,31 @@ livox_voxel_init (livoxVoxel* self,
  * \return Terrain type.
  */
 int
-livox_voxel_get_type (livoxVoxel self)
+livox_voxel_get_type (const livoxVoxel* self)
 {
-	return self.type;
+	return self->type;
+}
+
+/**
+ * \brief Gets the rotation quaternion of the voxel.
+ *
+ * \param self Voxel.
+ * \param value Return location for the quaternion.
+ */
+void
+livox_voxel_get_quaternion (const livoxVoxel* self,
+                            limatQuaternion*  value)
+{
+	switch (self->rotation)
+	{
+		case 1: *value = limat_quaternion_rotation (0.5f * M_PI, limat_vector_init (0.0f, 1.0f, 0.0f)); break;
+		case 2: *value = limat_quaternion_rotation (1.0f * M_PI, limat_vector_init (0.0f, 1.0f, 0.0f)); break;
+		case 3: *value = limat_quaternion_rotation (1.5f * M_PI, limat_vector_init (0.0f, 1.0f, 0.0f)); break;
+		/* TODO: Add the rest of the 24 orientations here. */
+		default:
+			*value = limat_quaternion_identity ();
+			break;
+	}
 }
 
 /** @} */

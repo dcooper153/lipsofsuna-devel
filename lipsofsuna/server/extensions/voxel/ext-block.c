@@ -91,8 +91,9 @@ liext_block_build (liextBlock*  self,
 		if (model == NULL || model->physics == NULL)
 			continue;
 		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
-		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
-		liphy_object_insert_shape (self->object, model->physics, &vector);
+		transform.position = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
+		livox_voxel_get_quaternion (voxel, &transform.rotation);
+		liphy_object_insert_shape (self->object, model->physics, &transform);
 		self->empty = 0;
 	}
 

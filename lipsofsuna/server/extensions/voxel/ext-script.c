@@ -334,6 +334,31 @@ Voxel_replace_voxel (lua_State* lua)
 	return 1;
 }
 
+
+/* @luadoc
+ * ---
+ * -- Rotates a voxel near the given point.
+ * --
+ * -- @param self Voxel class.
+ * -- @param point Point.
+ * -- @return True if a voxel was rotated.
+ * function Voxel.rotate_voxel(self, point)
+ */
+static int
+Voxel_rotate_voxel (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* center;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+
+	lua_pushboolean (lua, livox_manager_rotate_voxel (module->voxels, center->data));
+
+	return 1;
+}
+
+
 /* @luadoc
  * ---
  * -- Saves the terrain of the currently loaded sectors.
@@ -383,6 +408,7 @@ liextVoxelScript (liscrClass* self,
 	liscr_class_insert_func (self, "find_voxel", Voxel_find_voxel);
 	liscr_class_insert_func (self, "insert_voxel", Voxel_insert_voxel);
 	liscr_class_insert_func (self, "replace_voxel", Voxel_replace_voxel);
+	liscr_class_insert_func (self, "rotate_voxel", Voxel_rotate_voxel);
 	liscr_class_insert_func (self, "save", Voxel_save);
 }
 

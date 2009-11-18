@@ -655,6 +655,61 @@ livox_manager_replace_voxel (livoxManager*      self,
 	return 0;
 }
 
+int
+livox_manager_rotate_voxel (livoxManager*      self,
+                            const limatVector* point)
+{
+	float d;
+	lialgRange range;
+	limatVector diff;
+	limatVector origin;
+	livoxVoxel voxel;
+	livoxVoxelIter iter;
+	struct
+	{
+		int x;
+		int y;
+		int z;
+		float dist;
+		livoxSector* sector;
+	}
+	best = { 0, 0, 0, 10.0E10f, NULL };
+
+	/* Loop through affected sectors. */
+	range = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
+	{
+		livox_sector_get_origin (iter.sector, &origin);
+		voxel = *livox_sector_get_voxel (iter.sector, iter.voxel[0], iter.voxel[1], iter.voxel[2]);
+		if (voxel.type)
+		{
+			diff = limat_vector_subtract (*point, limat_vector_init (
+				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
+				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
+				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f)));
+			d = limat_vector_dot (diff, diff);
+			if (best.sector == NULL || d < best.dist)
+			{
+				best.x = iter.voxel[0];
+				best.y = iter.voxel[1];
+				best.z = iter.voxel[2];
+				best.dist = d;
+				best.sector = iter.sector;
+			}
+		}
+	}
+
+	/* Replace the material of the best match. */
+	if (best.sector != NULL)
+	{
+		voxel = *livox_sector_get_voxel (best.sector, best.x, best.y, best.z);
+		livox_voxel_rotate (&voxel);
+		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, voxel);
+	}
+
+	return 0;
+}
+
 void
 livox_manager_update (livoxManager* self,
                       float         secs)

@@ -32,8 +32,15 @@ void
 livox_voxel_init (livoxVoxel* self,
                   int         type);
 
+void
+livox_voxel_rotate (livoxVoxel* self);
+
 int
-livox_voxel_get_type (livoxVoxel self);
+livox_voxel_get_type (const livoxVoxel* self);
+
+void
+livox_voxel_get_quaternion (const livoxVoxel* self,
+                            limatQuaternion*  value);
 
 #endif
 

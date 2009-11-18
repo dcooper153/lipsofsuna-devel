@@ -312,6 +312,9 @@ liext_preview_paint_terrain (liextPreview* self,
 		case LIEXT_PREVIEW_REPLACE_VOXEL:
 			livox_manager_replace_voxel (self->generator->voxels, point, material, 0);
 			break;
+		case LIEXT_PREVIEW_ROTATE_VOXEL:
+			livox_manager_rotate_voxel (self->generator->voxels, point);
+			break;
 	}
 	livox_manager_update (self->generator->voxels, 1.0f);
 }
@@ -602,8 +605,8 @@ private_block_build (liextPreview* self,
 
 		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
-		vector = limat_vector_add (vector, *offset);
-		transform = limat_convert_vector_to_transform (vector);
+		transform.position = limat_vector_add (vector, *offset);
+		livox_voxel_get_quaternion (voxel, &transform.rotation);
 		lirnd_group_insert_model (self->group, model, &transform);
 	}
 

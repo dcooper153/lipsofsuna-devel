@@ -187,7 +187,7 @@ livox_voxel_iter_first (livoxVoxelIter* self,
 		self->tiles.maxx - offset[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
 		self->tiles.maxy - offset[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
 		self->tiles.maxz - offset[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
-	self->range0 = lialg_range_clamp (self->range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	self->range1 = lialg_range_clamp (self->range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 	/* Find first voxel. */
 	ret = lialg_range_iter_first (&self->rangei1, &self->range1);
@@ -239,7 +239,7 @@ livox_voxel_iter_next (livoxVoxelIter* self)
 		self->tiles.maxx - offset[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
 		self->tiles.maxy - offset[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
 		self->tiles.maxz - offset[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
-	self->range0 = lialg_range_clamp (self->range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	self->range1 = lialg_range_clamp (self->range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
 
 	/* Find first voxel. */
 	ret = lialg_range_iter_first (&self->rangei1, &self->range1);

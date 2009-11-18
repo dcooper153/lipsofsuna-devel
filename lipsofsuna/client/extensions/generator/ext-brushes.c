@@ -256,6 +256,7 @@ private_init (liextBrushes* self,
 		&self->widgets.button_paint[0], liwdg_button_new (manager),
 		&self->widgets.button_paint[1], liwdg_button_new (manager),
 		&self->widgets.button_paint[2], liwdg_button_new (manager),
+		&self->widgets.button_paint[3], liwdg_button_new (manager),
 		&self->widgets.button_remove, liwdg_button_new (manager),
 		&self->widgets.entry_name, liwdg_entry_new (manager),
 		&self->widgets.entry_objtype, liwdg_entry_new (manager),
@@ -286,15 +287,18 @@ private_init (liextBrushes* self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Erase voxel");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Insert voxel");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Rotate voxel");
 	liwdg_scroll_set_range (LIWDG_SCROLL (self->widgets.scroll_radius), 0.0f, 10.0f);
 	liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_radius), 2.0f);
 	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[3], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 1, self->widgets.button_paint[0]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 2, self->widgets.button_paint[1]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 3, self->widgets.button_paint[2]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 4, self->widgets.button_paint[3]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 8, self->widgets.scroll_radius);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 9, self->widgets.spin_paint);
 

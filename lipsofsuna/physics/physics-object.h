@@ -50,9 +50,9 @@ liphy_object_impulse (liphyObject*       self,
                       const limatVector* impulse);
 
 int
-liphy_object_insert_shape (liphyObject*       self,
-                           liphyShape*        shape,
-                           const limatVector* origin);
+liphy_object_insert_shape (liphyObject*          self,
+                           liphyShape*           shape,
+                           const limatTransform* transform);
 
 void
 liphy_object_jump (liphyObject*       self,

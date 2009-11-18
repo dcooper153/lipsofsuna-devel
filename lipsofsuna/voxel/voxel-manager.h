@@ -134,6 +134,10 @@ livox_manager_replace_voxel (livoxManager*      self,
                              int                terrain,
                              int                damage);
 
+int
+livox_manager_rotate_voxel (livoxManager*      self,
+                            const limatVector* point);
+
 void
 livox_manager_update (livoxManager* self,
                       float         secs);

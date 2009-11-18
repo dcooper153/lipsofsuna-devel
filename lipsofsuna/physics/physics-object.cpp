@@ -135,19 +135,33 @@ liphy_object_impulse (liphyObject*       self,
 		self->control->apply_impulse (v0, v1);
 }
 
+/**
+ * \brief Adds a collision shape to the object.
+ *
+ * \param self Object.
+ * \param shape Collision shape.
+ * \param transform Shape transformation or NULL for identity.
+ */
 int
-liphy_object_insert_shape (liphyObject*       self,
-                           liphyShape*        shape,
-                           const limatVector* origin)
+liphy_object_insert_shape (liphyObject*          self,
+                           liphyShape*           shape,
+                           const limatTransform* transform)
 {
-	btTransform transform;
+	btTransform btransform;
 
-	if (origin != NULL)
-		transform.setOrigin (btVector3 (origin->x, origin->y, origin->z));
+	if (transform != NULL)
+	{
+		btransform.setOrigin (btVector3 (transform->position.x,
+			transform->position.y, transform->position.z));
+		btransform.setRotation (btQuaternion (transform->rotation.x,
+			transform->rotation.y, transform->rotation.z, transform->rotation.w));
+	}
 	else
-		transform.setOrigin (btVector3 (0.0f, 0.0f, 0.0f));
-	transform.setRotation (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
-	self->shape->addChildShape (transform, shape->shape);
+	{
+		btransform.setOrigin (btVector3 (0.0f, 0.0f, 0.0f));
+		btransform.setRotation (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
+	}
+	self->shape->addChildShape (btransform, shape->shape);
 
 	return 1;
 }
