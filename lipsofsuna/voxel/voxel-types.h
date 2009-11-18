@@ -20,9 +20,6 @@
 
 #include <system/lips-system.h>
 
-/* FIXME */
-#define LIVOX_ENABLE_GRAPHICS
-
 #define LIVOX_SECTOR_INDEX_FROM_POINT(p) LIVOX_SECTOR_INDEX((int)((p).x / LIVOX_SECTOR_WIDTH), (int)((p).y / LIVOX_SECTOR_WIDTH), (int)((p).z / LIVOX_SECTOR_WIDTH))
 #define LIVOX_SECTOR_INDEX(x, y, z) ((x) + LIVOX_SECTORS_PER_LINE * (y) + LIVOX_SECTORS_PER_PLANE * (z))
 #define LIVOX_SECTOR_WIDTH (LIVOX_BLOCKS_PER_LINE * LIVOX_BLOCK_WIDTH)
@@ -45,6 +42,7 @@ struct _livoxVoxel
 {
 	uint16_t type;
 	uint8_t damage;
+	uint8_t rotation;
 };
 
 typedef struct _livoxManager livoxManager;

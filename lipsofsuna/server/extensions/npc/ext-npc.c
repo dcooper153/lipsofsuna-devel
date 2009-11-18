@@ -272,7 +272,7 @@ private_rescan (liextNpc* self)
 	object = self->object;
 	sector = object->sector;
 	assert (object->sector != NULL);
-	range = lialg_range_new (sector->x, sector->y, sector->z, 1);
+	range = lialg_range_new_from_center (sector->x, sector->y, sector->z, 1);
 	range = lialg_range_clamp (range, 0, 255);
 
 	/* Search for target. */

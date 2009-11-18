@@ -38,6 +38,167 @@
  * -- @class table
  */
 
+static int
+Tile___gc (lua_State* lua)
+{
+	liscrData* self;
+
+	self = liscr_isdata (lua, 1, LIEXT_SCRIPT_TILE);
+
+	lisys_free (self->data);
+	liscr_data_free (self);
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Creates a new tile.
+ * --
+ * -- @param self Tile class.
+ * -- @param args Optional table of arguments.
+ * -- @return New tile.
+ * function Tile.new(self, args)
+ */
+static int
+Tile_new (lua_State* lua)
+{
+	liextModule* module;
+	liscrData* self;
+	liscrScript* script = liscr_script (lua);
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_TILE);
+
+	/* Allocate self. */
+	self = liscr_data_new_alloc (script, sizeof (livoxVoxel), LIEXT_SCRIPT_TILE);
+	if (self == NULL)
+		return 0;
+
+	/* Copy attributes. */
+	if (!lua_isnoneornil (lua, 2))
+		liscr_copyargs (lua, self, 2);
+
+	liscr_pushdata (lua, self);
+	liscr_data_unref (self, NULL);
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Damage counter of the tile.
+ * --
+ * -- @name Tile.damage
+ * -- @class table
+ */
+static int
+Tile_getter_damage (lua_State* lua)
+{
+	liscrData* self;
+	livoxVoxel* voxel;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TILE);
+	voxel = self->data;
+
+	lua_pushnumber (lua, voxel->damage);
+	return 1;
+}
+static int
+Tile_setter_damage (lua_State* lua)
+{
+	int value;
+	liscrData* self;
+	livoxVoxel* voxel;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TILE);
+	value = luaL_checknumber (lua, 3);
+	voxel = self->data;
+
+	if (value <= 0)
+		voxel->damage = 0;
+	else if (value >= 0xFF)
+		voxel->damage = 0xFF;
+	else
+		voxel->damage = value;
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Rotation of the tile.
+ * --
+ * -- @name Tile.rotation
+ * -- @class table
+ */
+static int
+Tile_getter_rotation (lua_State* lua)
+{
+	liscrData* self;
+	livoxVoxel* voxel;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TILE);
+	voxel = self->data;
+
+	lua_pushnumber (lua, voxel->rotation);
+	return 1;
+}
+static int
+Tile_setter_rotation (lua_State* lua)
+{
+	int value;
+	liscrData* self;
+	livoxVoxel* voxel;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TILE);
+	value = luaL_checknumber (lua, 3);
+	voxel = self->data;
+
+	if (value <= 0)
+		voxel->rotation = 0;
+	else if (value >= 24)
+		voxel->rotation = 0;
+	else
+		voxel->rotation = value;
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Terrain type of the tile.
+ * --
+ * -- @name Tile.terrain
+ * -- @class table
+ */
+static int
+Tile_getter_terrain (lua_State* lua)
+{
+	liscrData* self;
+	livoxVoxel* voxel;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TILE);
+	voxel = self->data;
+
+	lua_pushnumber (lua, voxel->type);
+	return 1;
+}
+static int
+Tile_setter_terrain (lua_State* lua)
+{
+	int value;
+	liscrData* self;
+	livoxVoxel* voxel;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TILE);
+	value = luaL_checknumber (lua, 3);
+	voxel = self->data;
+
+	if (value <= 0)
+		voxel->type = 0;
+	else if (value >= 0xFFFF)
+		voxel->type = 0xFFFF;
+	else
+		voxel->type = value;
+	return 0;
+}
+
 /* @luadoc
  * ---
  * -- Erases a voxel near the given point.
@@ -78,8 +239,11 @@ Voxel_find_voxel (lua_State* lua)
 	liextModule* module;
 	limatVector result;
 	liscrData* center;
+	liscrData* tile;
+	liscrScript* script;
 	livoxVoxel* voxel;
 
+	script = liscr_script (lua);
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
 	if (lua_isnumber (lua, 3))
@@ -87,17 +251,26 @@ Voxel_find_voxel (lua_State* lua)
 	else
 		flags = LIVOX_FIND_ALL;
 
+	/* Find voxel. */
 	voxel = livox_manager_find_voxel (module->voxels, flags, center->data, &result);
 	if (voxel == NULL)
 		return 0;
-	lua_pushnumber (lua, voxel->type);
-	lua_pushnumber (lua, voxel->damage);
+
+	/* Return tile object. */
+	tile = liscr_data_new_alloc (script, sizeof (livoxVoxel), LIEXT_SCRIPT_TILE);
+	if (tile == NULL)
+		return 0;
+	*((livoxVoxel*) tile->data) = *voxel;
+	liscr_pushdata (lua, tile);
+	liscr_data_unref (tile, NULL);
+
+	/* Return position vector. */
 	center = liscr_vector_new (liscr_script (lua), &result);
 	if (center == NULL)
-		return 2;
+		return 1;
 	liscr_pushdata (lua, center);
 
-	return 3;
+	return 2;
 }
 
 /* @luadoc
@@ -182,6 +355,21 @@ Voxel_save (lua_State* lua)
 }
 
 /*****************************************************************************/
+
+void
+liextTileScript (liscrClass* self,
+                 void*       data)
+{
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_insert_func (self, "__gc", Tile___gc);
+	liscr_class_insert_func (self, "new", Tile_new);
+	liscr_class_insert_getter (self, "damage", Tile_getter_damage);
+	liscr_class_insert_getter (self, "rotation", Tile_getter_rotation);
+	liscr_class_insert_getter (self, "terrain", Tile_getter_terrain);
+	liscr_class_insert_setter (self, "damage", Tile_setter_damage);
+	liscr_class_insert_setter (self, "rotation", Tile_setter_rotation);
+	liscr_class_insert_setter (self, "terrain", Tile_setter_terrain);
+}
 
 void
 liextVoxelScript (liscrClass* self,

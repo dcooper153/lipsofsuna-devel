@@ -99,6 +99,37 @@ liscr_data_new (liscrScript* script,
 }
 
 /**
+ * \brief Allocates a script userdata object.
+ *
+ * Like #liscr_data_new but allocates a new wrapped data.
+ *
+ * \param script Script.
+ * \param size Wrapped data size.
+ * \param meta Name of the metatable.
+ * \return New script userdata or NULL.
+ */
+liscrData*
+liscr_data_new_alloc (liscrScript* script,
+                      size_t       size,
+                      const char*  meta)
+{
+	void* data;
+	liscrData* self;
+
+	data = lisys_calloc (1, size);
+	if (data == NULL)
+		return NULL;
+	self = liscr_data_new (script, data, meta);
+	if (self == NULL)
+	{
+		lisys_free (data);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
  * \brief Called in the garbage collection routines.
  *
  * All the values referenced by the userdata are garbage

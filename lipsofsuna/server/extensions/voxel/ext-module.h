@@ -42,6 +42,7 @@ typedef struct _liextModule liextModule;
 #include "ext-block.h"
 #include "ext-listener.h"
 
+#define LIEXT_SCRIPT_TILE "Lips.Tile"
 #define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
 
 struct _liextModule
@@ -83,6 +84,10 @@ liext_module_write (liextModule* self,
                     liarcSql*    sql);
 
 /*****************************************************************************/
+
+void
+liextTileScript (liscrClass* self,
+                 void*       data);
 
 void
 liextVoxelScript (liscrClass* self,

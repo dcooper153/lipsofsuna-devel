@@ -43,28 +43,32 @@ struct _lialgRange
 /**
  * \brief Creates a three-dimensional bin range that enclose a sphere.
  *
- * \param x Center bin offset.
- * \param y Center bin offset.
- * \param z Center bin offset.
- * \param radius Radius of the sphere in bins.
+ * \param xmin Minimum bin coordinate.
+ * \param ymin Minimum bin coordinate.
+ * \param zmin Minimum bin coordinate.
+ * \param xmax Maximum bin coordinate.
+ * \param ymax Maximum bin coordinate.
+ * \param zmax Maximum bin coordinate.
  * \return Range.
  */
 static inline lialgRange
-lialg_range_new (int x,
-                 int y,
-                 int z,
-                 int radius)
+lialg_range_new (int xmin,
+                 int ymin,
+                 int zmin,
+                 int xmax,
+                 int ymax,
+                 int zmax)
 {
 	lialgRange self;
 
 	self.min = 0;
 	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
-	self.minx = x - radius;
-	self.miny = y - radius;
-	self.minz = z - radius;
-	self.maxx = x + radius;
-	self.maxy = y + radius;
-	self.maxz = z + radius;
+	self.minx = xmin;
+	self.miny = ymin;
+	self.minz = zmin;
+	self.maxx = xmax;
+	self.maxy = ymax;
+	self.maxz = zmax;
 
 	return self;
 }
@@ -92,6 +96,35 @@ lialg_range_new_from_aabb (const limatVector* min,
 	self.maxx = (int)(max->x / unit);
 	self.maxy = (int)(max->y / unit);
 	self.maxz = (int)(max->z / unit);
+
+	return self;
+}
+
+/**
+ * \brief Creates a three-dimensional bin range that enclose a sphere.
+ *
+ * \param x Center bin offset.
+ * \param y Center bin offset.
+ * \param z Center bin offset.
+ * \param radius Radius of the sphere in bins.
+ * \return Range.
+ */
+static inline lialgRange
+lialg_range_new_from_center (int x,
+                             int y,
+                             int z,
+                             int radius)
+{
+	lialgRange self;
+
+	self.min = 0;
+	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
+	self.minx = x - radius;
+	self.miny = y - radius;
+	self.minz = z - radius;
+	self.maxx = x + radius;
+	self.maxy = y + radius;
+	self.maxz = z + radius;
 
 	return self;
 }

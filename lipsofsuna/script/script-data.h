@@ -25,13 +25,17 @@
 #ifndef __SCRIPT_DATA_H__
 #define __SCRIPT_DATA_H__
 
-#include <archive/lips-archive.h>
 #include "script-types.h"
 
 liscrData*
 liscr_data_new (liscrScript* script,
                 void*        data,
                 const char*  meta);
+
+liscrData*
+liscr_data_new_alloc (liscrScript* script,
+                      size_t       size,
+                      const char*  meta);
 
 void
 liscr_data_free (liscrData* object);

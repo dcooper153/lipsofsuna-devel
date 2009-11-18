@@ -66,7 +66,7 @@ lieng_sector_iter_first (liengSectorIter* self,
 	/* Initialize self. */
 	memset (self, 0, sizeof (liengSectorIter));
 	self->engine = engine;
-	range = lialg_range_new (x, y, z, radius);
+	range = lialg_range_new_from_center (x, y, z, radius);
 	range = lialg_range_clamp (range, 0, 255);
 	if (!lialg_range_iter_first (&self->range, &range))
 		return 0;

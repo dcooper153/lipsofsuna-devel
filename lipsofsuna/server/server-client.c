@@ -484,7 +484,7 @@ private_vision_update (lisrvClient* self)
 	if (object->sector == NULL)
 		return;
 	sector = object->sector;
-	range = lialg_range_new (sector->x, sector->y, sector->z, 1);
+	range = lialg_range_new_from_center (sector->x, sector->y, sector->z, 1);
 	range = lialg_range_clamp (range, 0, 255);
 
 	/* Remove from vision. */
