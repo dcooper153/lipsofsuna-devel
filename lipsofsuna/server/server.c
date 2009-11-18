@@ -627,6 +627,7 @@ private_init_sql (lisrvServer* self)
 		sqlite3_finalize (statement);
 		return 0;
 	}
+	sqlite3_finalize (statement);
 
 	/* Create object table. */
 	query = "CREATE TABLE IF NOT EXISTS objects "
@@ -645,6 +646,7 @@ private_init_sql (lisrvServer* self)
 		sqlite3_finalize (statement);
 		return 0;
 	}
+	sqlite3_finalize (statement);
 
 	/* Create object animation table. */
 	query = "CREATE TABLE IF NOT EXISTS object_anims "
@@ -660,6 +662,7 @@ private_init_sql (lisrvServer* self)
 		sqlite3_finalize (statement);
 		return 0;
 	}
+	sqlite3_finalize (statement);
 
 	return 1;
 }

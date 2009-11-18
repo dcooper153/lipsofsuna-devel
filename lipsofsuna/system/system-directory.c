@@ -84,7 +84,7 @@ lisys_dir_open (const char* path)
 
 	/* Store path. */
 	self->path = strdup (path);
-	if (path == NULL)
+	if (self->path == NULL)
 	{
 		error_memory ();
 		free (self);

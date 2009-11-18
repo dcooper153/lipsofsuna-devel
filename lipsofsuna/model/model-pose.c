@@ -705,7 +705,10 @@ private_create_channel (limdlPose* self,
 	if (chan == NULL)
 		return 0;
 	if (!lialg_u32dic_insert (self->channels, channel, chan))
+	{
+		lisys_free (chan);
 		return 0;
+	}
 	chan->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
 	chan->animation = &private_empty_anim;
 

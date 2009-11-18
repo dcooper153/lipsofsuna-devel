@@ -317,6 +317,7 @@ lieng_resources_load_from_dir (liengResources* self,
 		limdl_model_free (model);
 		model = NULL;
 	}
+	lisys_dir_free (directory);
 
 	/* Find all samples. */
 	tmp = lisys_path_concat (path, "sounds", NULL);
@@ -346,6 +347,7 @@ lieng_resources_load_from_dir (liengResources* self,
 		if (!ret)
 			goto error;
 	}
+	lisys_dir_free (directory);
 
 	/* Sort loaded data. */
 	qsort (self->animations.array, self->animations.count,
@@ -360,7 +362,6 @@ lieng_resources_load_from_dir (liengResources* self,
 		self->models.array[i]->id = i;
 	for (i = 0 ; i < self->samples.count ; i++)
 		self->samples.array[i].id = i;
-	lisys_dir_free (directory);
 
 	return 1;
 
