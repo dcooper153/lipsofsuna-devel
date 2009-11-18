@@ -347,7 +347,8 @@ class LipsAnimation:
 	# \param self Animation.
 	# \param channel Channel name.
 	def AddChannel(self, name):
-		self.channels.append(name)
+		if name not in self.channels:
+			self.channels.append(name)
 
 
 class LipsAnimations:
@@ -421,7 +422,7 @@ class LipsAnimations:
 
 					# Add bones in the chain to animations.
 					for animation in self.animations:
-						if target not in animation.ikchannels or name in animation.channels:
+						if target not in animation.ikchannels:
 							continue
 						bone = armature[1].bones[name]
 						for depth in xrange(0, chainlen):

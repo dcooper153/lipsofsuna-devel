@@ -269,6 +269,7 @@ Voxel_find_voxel (lua_State* lua)
 	if (center == NULL)
 		return 1;
 	liscr_pushdata (lua, center);
+	liscr_data_unref (center, NULL);
 
 	return 2;
 }

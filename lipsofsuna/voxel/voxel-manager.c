@@ -311,10 +311,10 @@ livox_manager_find_voxel (livoxManager*      self,
 		if ((!voxel.type && (flags & LIVOX_FIND_EMPTY)) ||
 			( voxel.type && (flags & LIVOX_FIND_FULL)))
 		{
-			diff = limat_vector_subtract (*point, limat_vector_init (
+			tmp = limat_vector_init (
 				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
 				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
-				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f)));
+				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f));
 			diff = limat_vector_subtract (*point, tmp);
 			d = limat_vector_dot (diff, diff);
 			if (best.sector == NULL || d < best.dist)
