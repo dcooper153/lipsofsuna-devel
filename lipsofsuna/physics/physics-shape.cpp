@@ -281,25 +281,37 @@ private_init_model (liphyShape*       self,
 	limdlFaces* group;
 	limatVector* vertices;
 
-	/* Count vertices. */
-	count = limdl_model_get_index_count (model);
-	if (!count)
-		return 1;
-
-	/* Allocate vertices. */
-	vertices = (limatVector*) lisys_calloc (count, sizeof (limatVector));
-	if (vertices == NULL)
-		return 0;
-	for (i = j = 0 ; j < model->facegroups.count ; j++)
+	/* FIXME: One model can have multiple shapes. */
+	/* FIXME: All shapes should be precalculated. */
+	if (model->shapes.count)
 	{
-		group = model->facegroups.array + j;
-		for (k = 0 ; k < group->vertices.count ; k++)
-			vertices[i++] = group->vertices.array[k].coord;
+		/* Create predefined shape. */
+		ret = private_init_convex (self,
+			model->shapes.array[0].vertices.array,
+			model->shapes.array[0].vertices.count);
 	}
+	else
+	{
+		/* Count vertices. */
+		count = limdl_model_get_index_count (model);
+		if (!count)
+			return 1;
 
-	/* Create shape. */
-	ret = private_init_convex (self, vertices, count);
-	lisys_free (vertices);
+		/* Allocate vertices. */
+		vertices = (limatVector*) lisys_calloc (count, sizeof (limatVector));
+		if (vertices == NULL)
+			return 0;
+		for (i = j = 0 ; j < model->facegroups.count ; j++)
+		{
+			group = model->facegroups.array + j;
+			for (k = 0 ; k < group->vertices.count ; k++)
+				vertices[i++] = group->vertices.array[k].coord;
+		}
+
+		/* Create shape. */
+		ret = private_init_convex (self, vertices, count);
+		lisys_free (vertices);
+	}
 
 	return ret;
 }

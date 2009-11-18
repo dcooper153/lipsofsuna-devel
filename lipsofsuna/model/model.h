@@ -35,10 +35,11 @@
 #include "model-light.h"
 #include "model-material.h"
 #include "model-node.h"
+#include "model-shape.h"
 #include "model-types.h"
 #include "model-vertex.h"
 
-#define LIMDL_FORMAT_VERSION 0xFFFFFFF8
+#define LIMDL_FORMAT_VERSION 0xFFFFFFF7
 
 typedef int limdlModelFlags;
 
@@ -95,6 +96,13 @@ struct _limdlModel
 		int count;
 		limdlHairs* array;
 	} hairs;
+
+	/* Shapes. */
+	struct
+	{
+		int count;
+		limdlShape* array;
+	} shapes;
 };
 
 #ifdef __cplusplus

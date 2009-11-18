@@ -228,9 +228,9 @@ am__objects_18 = engine/engine.lo engine/engine-camera.lo \
 am__objects_19 = math/math-camera.lo math/math-marching-cubes.lo
 am__objects_20 = model/model.lo model/model-animation.lo \
 	model/model-bone.lo model/model-faces.lo model/model-hair.lo \
-	model/model-ipo.lo model/model-ipo-channel.lo \
 	model/model-light.lo model/model-material.lo \
-	model/model-node.lo model/model-pose.lo model/model-texture.lo
+	model/model-node.lo model/model-pose.lo model/model-shape.lo \
+	model/model-texture.lo
 am__objects_21 = network/network.lo
 am__objects_22 = physics/physics.lo physics/physics-control.lo \
 	physics/physics-object.lo physics/physics-private.lo \
@@ -840,11 +840,11 @@ mdl_HEADERS = \
 	model/model-bone.h \
 	model/model-faces.h \
 	model/model-hair.h \
-	model/model-ipo.h \
 	model/model-light.h \
 	model/model-material.h \
 	model/model-node.h \
 	model/model-pose.h \
+	model/model-shape.h \
 	model/model-texture.h \
 	model/model-types.h \
 	model/model-vertex.h
@@ -855,12 +855,11 @@ mdlsrc = \
 	model/model-bone.c \
 	model/model-faces.c \
 	model/model-hair.c \
-	model/model-ipo.c \
-	model/model-ipo-channel.c \
 	model/model-light.c \
 	model/model-material.c \
 	model/model-node.c \
 	model/model-pose.c \
+	model/model-shape.c \
 	model/model-texture.c
 
 netdir = $(includedir)/lipsofsuna/network
@@ -1638,10 +1637,6 @@ model/model-faces.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
 model/model-hair.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
-model/model-ipo.lo: model/$(am__dirstamp) \
-	model/$(DEPDIR)/$(am__dirstamp)
-model/model-ipo-channel.lo: model/$(am__dirstamp) \
-	model/$(DEPDIR)/$(am__dirstamp)
 model/model-light.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
 model/model-material.lo: model/$(am__dirstamp) \
@@ -1649,6 +1644,8 @@ model/model-material.lo: model/$(am__dirstamp) \
 model/model-node.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
 model/model-pose.lo: model/$(am__dirstamp) \
+	model/$(DEPDIR)/$(am__dirstamp)
+model/model-shape.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
 model/model-texture.lo: model/$(am__dirstamp) \
 	model/$(DEPDIR)/$(am__dirstamp)
@@ -2101,10 +2098,6 @@ mostlyclean-compile:
 	-rm -f model/model-faces.lo
 	-rm -f model/model-hair.$(OBJEXT)
 	-rm -f model/model-hair.lo
-	-rm -f model/model-ipo-channel.$(OBJEXT)
-	-rm -f model/model-ipo-channel.lo
-	-rm -f model/model-ipo.$(OBJEXT)
-	-rm -f model/model-ipo.lo
 	-rm -f model/model-light.$(OBJEXT)
 	-rm -f model/model-light.lo
 	-rm -f model/model-material.$(OBJEXT)
@@ -2113,6 +2106,8 @@ mostlyclean-compile:
 	-rm -f model/model-node.lo
 	-rm -f model/model-pose.$(OBJEXT)
 	-rm -f model/model-pose.lo
+	-rm -f model/model-shape.$(OBJEXT)
+	-rm -f model/model-shape.lo
 	-rm -f model/model-texture.$(OBJEXT)
 	-rm -f model/model-texture.lo
 	-rm -f model/model.$(OBJEXT)
@@ -2402,12 +2397,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-bone.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-faces.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-hair.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-ipo-channel.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-ipo.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-light.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-pose.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-shape.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@model/$(DEPDIR)/model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@network/$(DEPDIR)/network.Plo@am__quote@

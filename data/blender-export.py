@@ -34,12 +34,17 @@ class LipsEnumTexTypes:
 		self.IMAGE = 2
 Lips = LipsEnum()
 
+lips_format_version = 0xFFFFFFF7
+lips_animation_timescale = 0.01
+lips_minimum_box_size = 0.3
+lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
+lips_correction_quat = Euler(-90, 0, 0).toQuat()
+
 #############################################################################
 # Default functions.
 
 def BoneLocalMatrix(restbone, posebone):
 	if restbone.parent:
-		#return posebone.poseMatrix.copy().identity()
 		tailmat = TranslationMatrix(Vector(0, restbone.parent.length, 0))
 		bonematr = restbone.matrix['ARMATURESPACE']
 		bonematp = posebone.poseMatrix
@@ -164,7 +169,16 @@ def MaterialTextures(bmat, bmesh, bface):
 				count = 1
 	return textures[:count]
 
+def MeshShape(object, mesh):
+	prop = ObjectProperty(object, "shape")
+	if prop:
+		return LipsShape(prop.data, object, mesh)
+	return None
+
 def MeshVisible(object, mesh):
+	prop = ObjectProperty(object, "render")
+	if prop and not prop.data:
+		return 0
 	bsystems = object.getParticleSystems()
 	if len(bsystems) == 0:
 		return 1
@@ -182,6 +196,12 @@ def ObjectLocalMatrix(object):
 	else:
 		matrix = object.matrixLocal.copy()
 	return matrix
+
+def ObjectProperty(object, name):
+	try:
+		return object.getProperty(name)
+	except:
+		return None
 
 def NodeChild(scene, object, bone, child):
 	if object != child.parent:
@@ -207,7 +227,7 @@ def NodeChildren(scene, object, bone, parent):
 			if b.parent == bone:
 				nodes.append(LipsNode(LipsNodeType.BONE, scene, object, b, parent))
 	for o in scene.objects:
-		if lips_exporter_calls["NodeChild"](scene, object, bone, o):
+		if NodeChild(scene, object, bone, o):
 			if o.type == "Armature":
 				nodes.append(LipsNode(LipsNodeType.EMPTY, scene, o, None, parent))
 			if o.type == "Empty":
@@ -288,33 +308,6 @@ def VertexWeights(object, mesh, face, index, bones):
 #############################################################################
 # Function customization.
 
-lips_format_version = 0xFFFFFFF8
-lips_animation_timescale = 0.01
-lips_minimum_box_size = 0.3
-lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
-lips_correction_quat = Euler(-90, 0, 0).toQuat()
-lips_exporter_calls = \
-{ \
-	"BoneLocalMatrix": BoneLocalMatrix, \
-	"MaterialDiffuse": MaterialDiffuse, \
-	"MaterialEmission": MaterialEmission, \
-	"MaterialFlags": MaterialFlags, \
-	"MaterialShader": MaterialShader, \
-	"MaterialShininess": MaterialShininess, \
-	"MaterialSpecular": MaterialSpecular, \
-	"MaterialStrands": MaterialStrands, \
-	"MaterialTextures": MaterialTextures, \
-	"ObjectHairs": ObjectHairs, \
-	"ObjectLocalMatrix": ObjectLocalMatrix, \
-	"MeshVisible": MeshVisible, \
-	"NodeChild": NodeChild, \
-	"NodeChildren": NodeChildren, \
-	"VertexCoord": VertexCoord, \
-	"VertexNormal": VertexNormal, \
-	"VertexTexcoords": VertexTexcoords, \
-	"VertexWeights": VertexWeights \
-}
-
 sys.path.append(os.getcwd())
 if os.access("custom.py", os.R_OK):
 	import custom
@@ -360,11 +353,20 @@ class LipsAnimation:
 class LipsAnimations:
 
 	# \brief Initializes a new armature.
-	def __init__(self):
+	#
+	# \param self Animation manager.
+	# \param scene Scene.
+	def __init__(self, scene):
 		self.armatures = []
 		self.animations = []
 		self.posebones = {}
 		self.restbones = {}
+
+		# Add animations from armatures.
+		for obj in scene.objects:
+			if obj.parent == None:
+				if obj.type == "Armature":
+					self.AddArmature(obj, obj.getData())
 
 	# \brief Add animations from a Blender armature object.
 	#
@@ -467,7 +469,7 @@ class LipsAnimations:
 				for channel in animation.channels:
 					bone = self.posebones[channel]
 					rest = self.restbones[channel]
-					mat = lips_exporter_calls["BoneLocalMatrix"](rest, bone)
+					mat = BoneLocalMatrix(rest, bone)
 					loc = mat.translationPart().resize3D()
 					rot = mat.rotationPart().toQuat()
 					writer.WriteFloat(loc.x)
@@ -816,7 +818,7 @@ class LipsNode:
 			self.data = object.getData()
 		self.bone = bone
 		self.parent = parent
-		self.nodes = lips_exporter_calls["NodeChildren"](scene, object, bone, self)
+		self.nodes = NodeChildren(scene, object, bone, self)
 		return
 
 	# \brief Prints debug information about the node and its children.
@@ -922,7 +924,7 @@ class LipsNode:
 		if self.bone:
 			return self.bone.head['BONESPACE']
 		elif self.object:
-			matrix = lips_exporter_calls["ObjectLocalMatrix"](self.object)
+			matrix = ObjectLocalMatrix(self.object)
 			return matrix.translationPart()
 		else:
 			return Vector(0, 0, 0)
@@ -943,7 +945,7 @@ class LipsNode:
 			quat.normalize()
 			return quat
 		elif self.object:
-			matrix = lips_exporter_calls["ObjectLocalMatrix"](self.object)
+			matrix = ObjectLocalMatrix(self.object)
 			matrix = matrix.rotationPart()
 			#matrix = blender_rotation_to_lips(matrix)
 			quat = matrix.toQuat()
@@ -975,7 +977,7 @@ class LipsHairs:
 		else:
 			self.groups[mat] = [hair]
 
-	# Saves all hair groups.
+	# \brief Saves all hair groups.
 	#
 	# \param self Hair manager.
 	# \param writer Writer.
@@ -1016,41 +1018,85 @@ class LipsHair:
 
 
 #############################################################################
+# Collision.
+
+class LipsShapes:
+
+	# Initializes a new collision shape manager.
+	#
+	# \param self Shape manager.
+	def __init__(self, scene):
+		self.shapes = {}
+		for obj in scene.objects:
+			if obj.type == "Mesh":
+				mesh = obj.getData(0, 1)
+				shape = MeshShape(obj, mesh)
+				if shape and shape.name not in self.shapes:
+					self.shapes[shape.name] = shape
+		if not len(self.shapes):
+			print("TODO: Add default shape")
+
+	# \brief Saves all shapes.
+	#
+	# \param self Shape manager.
+	# \param writer Writer.
+	def Write(self, writer):
+		keys = self.shapes.keys()
+		writer.WriteInt(len(keys))
+		for name in keys:
+			shape = self.shapes[name]
+			shape.Write(writer)
+
+class LipsShape:
+
+	def __init__(self, name, bobj, bmesh):
+		global lips_correction_matrix
+		self.name = name
+		self.vertices = []
+		matrix = bobj.matrix * lips_correction_matrix
+		for v in bmesh.verts:
+			self.vertices.append(v.co.copy().resize4D() * matrix)
+
+	def Write(self, writer):
+		writer.WriteString(self.name)
+		writer.WriteInt(len(self.vertices))
+		for v in self.vertices:
+			writer.WriteFloat(v.x)
+			writer.WriteFloat(v.y)
+			writer.WriteFloat(v.z)
+
+#############################################################################
 # Storage.
 
 class LipsStorage:
 
 	def __init__(self, scene):
-		self.animations = LipsAnimations()
+		self.animations = LipsAnimations(scene)
 		self.hairs = LipsHairs()
 		self.faces = LipsFaces()
 		self.materials = {}
 		self.node = None
+		self.shapes = LipsShapes(scene)
 		self.weightnames = []
 		self.AddNode(LipsNode(LipsNodeType.EMPTY, scene, None, None, None))
 		for obj in scene.objects:
 			if obj.parent == None:
-				if obj.type == "Armature":
-					self.AddArmature(obj)
 				if obj.type == "Mesh":
 					self.AddMesh(obj)
-					lips_exporter_calls["ObjectHairs"](self, obj)
-
-	def AddArmature(self, bobj):
-		self.animations.AddArmature(bobj, bobj.getData())
+					ObjectHairs(self, obj)
 
 	def AddHair(self, bmat, hair):
 		mat = self.AddMaterial(bmat, None, None)
 		self.hairs.AddHair(mat.index, hair)
 
 	def AddMaterial(self, bmat, bmesh, bface):
-		flag = lips_exporter_calls["MaterialFlags"](bmat, bmesh, bface)
-		shin = lips_exporter_calls["MaterialShininess"](bmat)
-		diff = lips_exporter_calls["MaterialDiffuse"](bmat)
-		spec = lips_exporter_calls["MaterialSpecular"](bmat)
-		stra = lips_exporter_calls["MaterialStrands"](bmat)
-		shad = lips_exporter_calls["MaterialShader"](bmat)
-		text = lips_exporter_calls["MaterialTextures"](bmat, bmesh, bface)
+		flag = MaterialFlags(bmat, bmesh, bface)
+		shin = MaterialShininess(bmat)
+		diff = MaterialDiffuse(bmat)
+		spec = MaterialSpecular(bmat)
+		stra = MaterialStrands(bmat)
+		shad = MaterialShader(bmat)
+		text = MaterialTextures(bmat, bmesh, bface)
 		key = ""
 		for tex in text:
 			key = "%s %s" % (key, tex.GetKey())
@@ -1074,7 +1120,7 @@ class LipsStorage:
 	# \param bobj Blender object.
 	def AddMesh(self, bobj):
 		bmesh = bobj.getData(0, 1)
-		if lips_exporter_calls["MeshVisible"](bobj, bmesh):
+		if MeshVisible(bobj, bmesh):
 			conn = LipsConnectivity(bobj, bmesh)
 			for name in bmesh.getVertGroupNames():
 				if name not in self.weightnames:
@@ -1088,10 +1134,10 @@ class LipsStorage:
 				# Create vertices.
 				v = []
 				for i in range(len(bface.v)):
-					co = lips_exporter_calls["VertexCoord"](bobj, bmesh, bface, i)
-					no = lips_exporter_calls["VertexNormal"](bobj, bmesh, bface, i, conn)
-					te = lips_exporter_calls["VertexTexcoords"](bobj, bmesh, bface, i)
-					we = lips_exporter_calls["VertexWeights"](bobj, bmesh, bface, i, self.weightnames)
+					co = VertexCoord(bobj, bmesh, bface, i)
+					no = VertexNormal(bobj, bmesh, bface, i, conn)
+					te = VertexTexcoords(bobj, bmesh, bface, i)
+					we = VertexWeights(bobj, bmesh, bface, i, self.weightnames)
 					v.append(LipsVertex(co, no, te, we))
 				# Insert faces.
 				if len(v) == 3:
@@ -1144,6 +1190,9 @@ class LipsStorage:
 		# Hairs.
 		writer.WriteString("hai")
 		self.hairs.Write(writer)
+		# Shapes
+		writer.WriteString("sha")
+		self.shapes.Write(writer)
 
 #############################################################################
 # Writer.

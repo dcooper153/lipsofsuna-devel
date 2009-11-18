@@ -58,6 +58,10 @@ private_read_nodes (limdlModel*  self,
                     liarcReader* reader);
 
 static int
+private_read_shapes (limdlModel*  self,
+                     liarcReader* reader);
+
+static int
 private_read_weights (limdlModel*  self,
                       liarcReader* reader);
 
@@ -89,6 +93,10 @@ private_write_materials (const limdlModel* self,
 static int
 private_write_nodes (const limdlModel* self,
                      liarcWriter*      writer);
+
+static int
+private_write_shapes (const limdlModel* self,
+                      liarcWriter*      writer);
 
 static int
 private_write_weights (const limdlModel* self,
@@ -250,6 +258,17 @@ limdl_model_free (limdlModel* self)
 		for (i = 0 ; i < self->hairs.count ; i++)
 			limdl_hairs_free (self->hairs.array + i);
 		lisys_free (self->hairs.array);
+	}
+
+	/* Free shapes. */
+	if (self->shapes.array != NULL)
+	{
+		for (i = 0 ; i < self->shapes.count ; i++)
+		{
+			lisys_free (self->shapes.array[i].name);
+			lisys_free (self->shapes.array[i].vertices.array);
+		}
+		lisys_free (self->shapes.array);
 	}
 
 	lisys_free (self);
@@ -747,7 +766,8 @@ private_read (limdlModel*  self,
 	    !private_read_weights (self, reader) ||
 	    !private_read_nodes (self, reader) ||
 	    !private_read_animations (self, reader) ||
-	    !private_read_hairs (self, reader))
+	    !private_read_hairs (self, reader) ||
+	    !private_read_shapes (self, reader))
 		return 0;
 
 	/* Sanity checks. */
@@ -948,6 +968,39 @@ private_read_nodes (limdlModel*  self,
 }
 
 static int
+private_read_shapes (limdlModel*  self,
+                     liarcReader* reader)
+{
+	int i;
+	uint32_t tmp;
+
+	/* Read header. */
+	if (!liarc_reader_check_text (reader, "sha", ""))
+	{
+		lisys_error_set (EINVAL, "invalid shape block header");
+		return 0;
+	}
+	if (!liarc_reader_get_uint32 (reader, &tmp))
+		return 0;
+	self->shapes.count = tmp;
+
+	/* Read shapes. */
+	if (self->shapes.count)
+	{
+		self->shapes.array = lisys_calloc (self->shapes.count, sizeof (limdlShape));
+		if (self->shapes.array == NULL)
+			return 0;
+		for (i = 0 ; i < self->shapes.count ; i++)
+		{
+			if (!limdl_shape_read (self->shapes.array + i, reader))
+				return 0;
+		}
+	}
+
+	return 1;
+}
+
+static int
 private_read_weights (limdlModel*  self,
                       liarcReader* reader)
 {
@@ -1060,7 +1113,8 @@ private_write (const limdlModel* self,
 	    !private_write_weights (self, writer) ||
 	    !private_write_nodes (self, writer) ||
 	    !private_write_animations (self, writer) ||
-	    !private_write_hairs (self, writer))
+	    !private_write_hairs (self, writer) ||
+	    !private_write_shapes (self, writer))
 		return 0;
 	return 1;
 }
@@ -1188,6 +1242,28 @@ private_write_nodes (const limdlModel* self,
 	{
 		node = self->nodes.array[i];
 		if (!limdl_node_write (node, writer))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int
+private_write_shapes (const limdlModel* self,
+                      liarcWriter*      writer)
+{
+	int i;
+	limdlShape* shape;
+
+	/* Write nodes. */
+	if (!liarc_writer_append_string (writer, "sha") ||
+	    !liarc_writer_append_nul (writer) ||
+	    !liarc_writer_append_uint32 (writer, self->shapes.count))
+		return 0;
+	for (i = 0 ; i < self->shapes.count ; i++)
+	{
+		shape = self->shapes.array + i;
+		if (!limdl_shape_write (shape, writer))
 			return 0;
 	}
 

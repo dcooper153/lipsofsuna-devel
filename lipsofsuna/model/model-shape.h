@@ -15,19 +15,39 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_MODEL_H__
-#define __LIPS_MODEL_H__
+/**
+ * \addtogroup limdl Model
+ * @{
+ * \addtogroup limdlShape Shape
+ * @{
+ */
 
-#include "model.h"
-#include "model-animation.h"
-#include "model-bone.h"
-#include "model-hair.h"
-#include "model-material.h"
-#include "model-node.h"
-#include "model-light.h"
-#include "model-pose.h"
-#include "model-shape.h"
-#include "model-texture.h"
-#include "model-vertex.h"
+#ifndef __MODEL_SHAPE_H__
+#define __MODEL_SHAPE_H__
+
+#include <archive/lips-archive.h>
+#include <math/lips-math.h>
+
+typedef struct _limdlShape limdlShape;
+struct _limdlShape
+{
+	char* name;
+	struct
+	{
+		int count;
+		limatVector* array;
+	} vertices;
+};
+
+int
+limdl_shape_read (limdlShape*  self,
+                  liarcReader* reader);
+
+int
+limdl_shape_write (const limdlShape* self,
+                   liarcWriter*      writer);
 
 #endif
+
+/** @} */
+/** @} */

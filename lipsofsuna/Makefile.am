@@ -246,11 +246,11 @@ mdl_HEADERS = \
 	model/model-bone.h \
 	model/model-faces.h \
 	model/model-hair.h \
-	model/model-ipo.h \
 	model/model-light.h \
 	model/model-material.h \
 	model/model-node.h \
 	model/model-pose.h \
+	model/model-shape.h \
 	model/model-texture.h \
 	model/model-types.h \
 	model/model-vertex.h
@@ -260,12 +260,11 @@ mdlsrc = \
 	model/model-bone.c \
 	model/model-faces.c \
 	model/model-hair.c \
-	model/model-ipo.c \
-	model/model-ipo-channel.c \
 	model/model-light.c \
 	model/model-material.c \
 	model/model-node.c \
 	model/model-pose.c \
+	model/model-shape.c \
 	model/model-texture.c
 
 netdir = $(includedir)/lipsofsuna/network
