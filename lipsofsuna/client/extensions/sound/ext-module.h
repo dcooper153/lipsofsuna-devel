@@ -20,7 +20,7 @@
  * @{
  * \addtogroup liextcli Client
  * @{
- * \addtogroup liextsrvSound Sound
+ * \addtogroup liextcliSound Sound
  * @{
  */
 
