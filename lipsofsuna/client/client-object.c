@@ -26,6 +26,9 @@
 #include "client-object.h"
 #include "client-window.h"
 
+#define LICLI_OBJECT_POSITION_SMOOTHING 0.5f
+#define LICLI_OBJECT_ROTATION_SMOOTHING 0.5f
+
 /**
  * \brief Creates a new object.
  *
@@ -48,6 +51,7 @@ licli_object_new (licliModule* module,
 		return NULL;
 
 	/* Extend engine object. */
+	lieng_object_set_smoothing (self, LICLI_OBJECT_POSITION_SMOOTHING, LICLI_OBJECT_ROTATION_SMOOTHING);
 	lieng_object_set_userdata (self, LIENG_DATA_CLIENT, (void*) -1);
 //	lieng_object_set_flags (self, flags);
 	if (flags & LINET_OBJECT_FLAG_DYNAMIC)

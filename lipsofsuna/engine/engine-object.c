@@ -632,6 +632,27 @@ lieng_object_set_shape (liengObject* self,
 }
 
 /**
+ * \brief Sets positional and rotation smoothing.
+ *
+ * By setting either of the smoothing values to non-zero, the engine object is
+ * set to interpolation mode. In interpolation mode, all transformations are
+ * delayed and happen gradually each time the engine state is updated. Both
+ * values default to zero.
+ *
+ * \param self Object.
+ * \param pos Positional smoothing.
+ * \param rot Rotational smoothing.
+ */
+void
+lieng_object_set_smoothing (liengObject* self,
+                            float        pos,
+                            float        rot)
+{
+	self->smoothing.pos = pos;
+	self->smoothing.rot = rot;
+}
+
+/**
  * \brief Gets the movement speed of the object.
  *
  * \param self Object.
@@ -654,6 +675,23 @@ lieng_object_set_speed (liengObject* self,
                         float        value)
 {
 	liphy_object_set_speed (self->physics, value);
+}
+
+/**
+ * \brief Gets the smoothing target transformation of the object.
+ *
+ * Works exactly like #lieng_object_get_transform when smoothing is disabled.
+ * However, if smoothing is enabled, this returns the target transformation
+ * instead of the current interpolation state. 
+ *
+ * \param self Object.
+ * \param value Return location for the transformation.
+ */
+void
+lieng_object_get_target (const liengObject* self,
+                         limatTransform*    value)
+{
+	*value = self->smoothing.target;
 }
 
 /**
@@ -873,6 +911,9 @@ private_callback_moved (liengObject* self)
 		self->sector = dst;
 	}
 
+	/* Physics defeat smoothing. */
+	self->smoothing.target = transform;
+
 	return 1;
 }
 
@@ -880,8 +921,33 @@ static void
 private_callback_update (liengObject* self,
                          float        secs)
 {
+	limatTransform transform;
+	limatTransform transform0;
+	limatTransform transform1;
+
+	/* Animations. */
 	if (self->pose != NULL)
 		limdl_pose_update (self->pose, secs);
+
+	/* Smoothing. */
+	if (self->smoothing.rot != 0.0f || self->smoothing.pos != 0.0f)
+	{
+		if (lieng_object_get_realized (self))
+		{
+			liphy_object_get_transform (self->physics, &transform0);
+			transform1 = self->smoothing.target;
+			transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
+			transform.position = limat_vector_lerp (
+				transform1.position, transform0.position,
+				0.5f * self->smoothing.pos);
+			transform.rotation = limat_quaternion_nlerp (
+				transform1.rotation, transform0.rotation,
+				0.5f * self->smoothing.rot);
+			liphy_object_set_transform (self->physics, &transform);
+			private_warp (self, &transform.position);
+			lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, &transform);
+		}
+	}
 }
 
 static int
@@ -958,12 +1024,20 @@ static int
 private_callback_set_transform (liengObject*          self,
                                 const limatTransform* value)
 {
-	liphy_object_set_transform (self->physics, value);
-	if (lieng_object_get_realized (self))
-		private_warp (self, &value->position);
+	int realized;
 
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, value);
+	realized = lieng_object_get_realized (self);
+	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
+	{
+		/* Transform immediately. */
+		liphy_object_set_transform (self->physics, value);
+		if (realized)
+			private_warp (self, &value->position);
+
+		/* Invoke callbacks. */
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, value);
+	}
+	self->smoothing.target = *value;
 
 	return 1;
 }

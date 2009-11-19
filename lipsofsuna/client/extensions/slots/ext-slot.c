@@ -60,6 +60,7 @@ liext_slot_new (licliModule* module,
 		goto error;
 	}
 	self->object = licli_object_new (self->module, 0, LINET_OBJECT_FLAG_DYNAMIC);
+	lieng_object_set_smoothing (self->object, 0.0f, 0.0f);
 	if (self->object == NULL)
 	{
 		lisys_error_append ("cannot create object");
@@ -72,7 +73,7 @@ liext_slot_new (licliModule* module,
 	self->constraint = lieng_constraint_new (object, node0, self->object, node1);
 	if (self->constraint == NULL)
 	{
-		lisys_error_append ("cannot create object");
+		lisys_error_append ("cannot create constraint");
 		goto error;
 	}
 	lieng_engine_insert_constraint (self->object->engine, self->constraint);

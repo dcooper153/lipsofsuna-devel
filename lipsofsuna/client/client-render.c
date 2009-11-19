@@ -24,9 +24,6 @@
 
 #include "client.h"
 
-#define LICLI_OBJECT_POSITION_SMOOTHING 0.5f
-#define LICLI_OBJECT_ROTATION_SMOOTHING 0.5f
-
 static int
 private_engine_free (licliModule* self,
                      liengEngine* engine)
@@ -127,7 +124,7 @@ private_object_transform (licliModule*    self,
 	lirndObject* object_;
 
 	object_ = lirnd_scene_find_object (self->scene, object->id);
-	if (object_ != NULL && !lieng_object_get_realized (object))
+	if (object_ != NULL)
 		lirnd_object_set_transform (object_, value);
 
 	return 1;
@@ -139,32 +136,14 @@ private_tick (licliModule* self,
 {
 	lialgU32dicIter iter;
 	liengObject* eobject;
-	limatTransform transform;
-	limatTransform transform0;
-	limatTransform transform1;
 	lirndObject* robject;
 
 	LI_FOREACH_U32DIC (iter, self->engine->objects)
 	{
 		eobject = iter.value;
 		robject = lirnd_scene_find_object (self->scene, eobject->id);
-		if (robject == NULL)
-			continue;
-
-		/* Deform. */
-		lirnd_object_deform (robject, eobject->pose);
-
-		/* Interpolate. */
-		lirnd_object_get_transform (robject, &transform0);
-		lieng_object_get_transform (eobject, &transform1);
-		transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
-		transform.position = limat_vector_lerp (
-			transform1.position, transform0.position,
-			0.5f * LICLI_OBJECT_POSITION_SMOOTHING);
-		transform.rotation = limat_quaternion_nlerp (
-			transform1.rotation, transform0.rotation,
-			0.5f * LICLI_OBJECT_ROTATION_SMOOTHING);
-		lirnd_object_set_transform (robject, &transform);
+		if (robject != NULL)
+			lirnd_object_deform (robject, eobject->pose);
 	}
 	lirnd_render_update (self->render, secs);
 	lirnd_scene_update (self->scene, secs);

@@ -58,9 +58,6 @@ liext_slots_set_slot (liextSlots* self,
                       const char* node,
                       int         model);
 
-int
-licli_object_get_size (const liextSlots* self);
-
 #endif
 
 /** @} */

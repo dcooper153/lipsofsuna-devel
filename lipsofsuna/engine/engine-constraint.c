@@ -54,19 +54,6 @@ lieng_constraint_free (liengConstraint* self)
 
 /*****************************************************************************/
 
-static inline limatTransform
-limat_transform_snap (limatTransform self,
-                      limatTransform child)
-{
-	limatTransform result;
-	limatTransform inverse;
-
-	inverse = limat_transform_invert (child);
-	result = limat_transform_multiply (self, inverse);
-
-	return result;
-}
-
 /**
  * \brief Updates the constraint.
  *

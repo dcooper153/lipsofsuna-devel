@@ -165,6 +165,19 @@ limat_transform_transform (limatTransform self,
 	return result;
 }
 
+static inline limatTransform
+limat_transform_snap (limatTransform self,
+                      limatTransform child)
+{
+	limatTransform result;
+	limatTransform inverse;
+
+	inverse = limat_transform_invert (child);
+	result = limat_transform_multiply (self, inverse);
+
+	return result;
+}
+
 static inline limatMatrix
 limat_transform_get_modelview (limatTransform self)
 {

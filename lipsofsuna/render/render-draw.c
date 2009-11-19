@@ -41,6 +41,16 @@ private_draw_node (limdlNode* node)
 					node->bone.tail.y,
 					node->bone.tail.z);
 	}
+	else
+	{
+		glColor3f (0.0f, 1.0f, 0.0f);
+		glVertex3f (node->transform.global.position.x,
+					node->transform.global.position.y,
+					node->transform.global.position.z);
+		glVertex3f (node->transform.global.position.x,
+					node->transform.global.position.y + 0.2,
+					node->transform.global.position.z);
+	}
 
 	for (i = 0 ; i < node->nodes.count ; i++)
 		private_draw_node (node->nodes.array[i]);

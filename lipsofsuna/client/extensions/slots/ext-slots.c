@@ -35,6 +35,7 @@ liext_slots_new (liextModule* module,
 	self = lisys_calloc (1, sizeof (liextSlots));
 	if (self == NULL)
 		return NULL;
+	self->module = module;
 	self->object = object;
 	self->slots = lialg_strdic_new ();
 	if (self->slots == NULL)
@@ -117,12 +118,6 @@ liext_slots_set_slot (liextSlots* self,
 	}
 
 	return 1;
-}
-
-int
-licli_object_get_size (const liextSlots* self)
-{
-	return self->slots->size;
 }
 
 /** @} */

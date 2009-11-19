@@ -52,6 +52,12 @@ struct _liengObject
 #ifndef LIENG_DISABLE_SCRIPTS
 	liscrData* script;
 #endif
+	struct
+	{
+		float pos;
+		float rot;
+		limatTransform target;
+	} smoothing;
 };
 
 liengObject*
@@ -190,12 +196,21 @@ void
 lieng_object_set_shape (liengObject* self,
                         liphyShape*  shape);
 
+void
+lieng_object_set_smoothing (liengObject* self,
+                            float        pos,
+                            float        rot);
+
 float
 lieng_object_get_speed (const liengObject* self);
 
 void
 lieng_object_set_speed (liengObject* self,
                         float        value);
+
+void
+lieng_object_get_target (const liengObject* self,
+                         limatTransform*    value);
 
 void
 lieng_object_get_transform (const liengObject* self,

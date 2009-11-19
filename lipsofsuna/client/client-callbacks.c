@@ -167,19 +167,23 @@ private_miscellaneous_tick (licliModule* module,
 			return 0;
 	}
 
+	/* Update player transformation. */
+	player = licli_module_get_player (module);
+	if (player != NULL && module->network != NULL)
+	{
+		lieng_object_get_target (player, &transform);
+		transform.rotation = module->network->curr.direction;
+		lieng_object_set_transform (player, &transform);
+	}
+
 	/* Update engine state. */
 	lieng_engine_update (module->engine, secs);
 
-	/* Check for player. */
-	player = licli_module_get_player (module);
+	/* Update camera center. */
 	if (player != NULL && module->network != NULL)
 	{
 		/* Update player transform. */
 		lieng_object_get_transform (player, &transform);
-		transform.rotation = module->network->curr.direction;
-		lieng_object_set_transform (player, &transform);
-
-		/* Update camera center. */
 		lieng_object_get_bounds (player, &bounds);
 		transform.position.y += bounds.max.y;
 		lieng_camera_set_center (module->camera, &transform);
