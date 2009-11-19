@@ -342,19 +342,33 @@ Voxel_replace_voxel (lua_State* lua)
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
+ * -- @param axis Optional axis of rotation in the range from 1 to 3].
+ * -- @param step Optional step size.
  * -- @return True if a voxel was rotated.
  * function Voxel.rotate_voxel(self, point)
  */
 static int
 Voxel_rotate_voxel (lua_State* lua)
 {
+	int axis;
+	int step;
 	liextModule* module;
 	liscrData* center;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	if (!lua_isnoneornil (lua, 3))
+	{
+		axis = luaL_checkinteger (lua, 3);
+		luaL_argcheck (lua, axis >= 1 && axis <= 3, 3, "invalid axis of rotation");
+		axis -= 1;
+	}
+	else
+		axis = 0;
+	if (!lua_isnoneornil (lua, 4))
+		step = luaL_checkinteger (lua, 4);
 
-	lua_pushboolean (lua, livox_manager_rotate_voxel (module->voxels, center->data));
+	lua_pushboolean (lua, livox_manager_rotate_voxel (module->voxels, center->data, axis, step));
 
 	return 1;
 }

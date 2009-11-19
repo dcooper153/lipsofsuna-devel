@@ -267,7 +267,7 @@ private_init (liextBrushes* self,
 		&self->widgets.label_size, liwdg_label_new (manager),
 		&self->widgets.label_type, liwdg_label_new (manager),
 		&self->widgets.scroll_objprob, liwdg_scroll_new (manager),
-		&self->widgets.scroll_radius, liwdg_scroll_new (manager),
+		&self->widgets.spin_axis, liwdg_spin_new (manager),
 		&self->widgets.spin_paint, liwdg_spin_new (manager),
 		&self->widgets.spin_sizex, liwdg_spin_new (manager),
 		&self->widgets.spin_sizey, liwdg_spin_new (manager),
@@ -288,8 +288,6 @@ private_init (liextBrushes* self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Insert voxel");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace voxel");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Rotate voxel");
-	liwdg_scroll_set_range (LIWDG_SCROLL (self->widgets.scroll_radius), 0.0f, 10.0f);
-	liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_radius), 2.0f);
 	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
@@ -299,7 +297,7 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 2, self->widgets.button_paint[1]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 3, self->widgets.button_paint[2]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 4, self->widgets.button_paint[3]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 8, self->widgets.scroll_radius);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 8, self->widgets.spin_axis);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 9, self->widgets.spin_paint);
 
 	/* Tree. */
@@ -611,7 +609,7 @@ private_paint_terrain (liextBrushes* self,
 	/* Paint terrain. */
 	liext_preview_paint_terrain (LIEXT_PREVIEW (self->widgets.preview), &result.point, self->paint,
 		liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_paint)),
-		liwdg_scroll_get_value (LIWDG_SCROLL (self->widgets.scroll_radius)));
+		liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_axis)));
 	liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview),
 		data->brush->size[0], data->brush->size[1], data->brush->size[2],
 		data->brush->voxels.array);

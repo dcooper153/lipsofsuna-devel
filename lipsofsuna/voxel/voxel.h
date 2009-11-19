@@ -33,7 +33,9 @@ livox_voxel_init (livoxVoxel* self,
                   int         type);
 
 void
-livox_voxel_rotate (livoxVoxel* self);
+livox_voxel_rotate (livoxVoxel* self,
+                    int         axis,
+                    int         step);
 
 int
 livox_voxel_get_type (const livoxVoxel* self);

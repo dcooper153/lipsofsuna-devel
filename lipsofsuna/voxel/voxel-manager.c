@@ -657,7 +657,9 @@ livox_manager_replace_voxel (livoxManager*      self,
 
 int
 livox_manager_rotate_voxel (livoxManager*      self,
-                            const limatVector* point)
+                            const limatVector* point,
+                            int                axis,
+                            int                step)
 {
 	float d;
 	lialgRange range;
@@ -703,7 +705,7 @@ livox_manager_rotate_voxel (livoxManager*      self,
 	if (best.sector != NULL)
 	{
 		voxel = *livox_sector_get_voxel (best.sector, best.x, best.y, best.z);
-		livox_voxel_rotate (&voxel);
+		livox_voxel_rotate (&voxel, axis, step);
 		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, voxel);
 	}
 

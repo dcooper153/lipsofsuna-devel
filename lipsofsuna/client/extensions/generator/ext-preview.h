@@ -107,7 +107,7 @@ liext_preview_paint_terrain (liextPreview* self,
                              limatVector*  point,
                              int           mode,
                              int           material,
-                             float         radius);
+                             int           axis);
 
 int
 liext_preview_replace_materials (liextPreview* self,

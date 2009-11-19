@@ -299,7 +299,7 @@ liext_preview_paint_terrain (liextPreview* self,
                              limatVector*  point,
                              int           mode,
                              int           material,
-                             float         radius)
+                             int           axis)
 {
 	switch (mode)
 	{
@@ -313,7 +313,7 @@ liext_preview_paint_terrain (liextPreview* self,
 			livox_manager_replace_voxel (self->generator->voxels, point, material, 0);
 			break;
 		case LIEXT_PREVIEW_ROTATE_VOXEL:
-			livox_manager_rotate_voxel (self->generator->voxels, point);
+			livox_manager_rotate_voxel (self->generator->voxels, point, axis, 1);
 			break;
 	}
 	livox_manager_update (self->generator->voxels, 1.0f);

@@ -136,7 +136,9 @@ livox_manager_replace_voxel (livoxManager*      self,
 
 int
 livox_manager_rotate_voxel (livoxManager*      self,
-                            const limatVector* point);
+                            const limatVector* point,
+                            int                axis,
+                            int                step);
 
 void
 livox_manager_update (livoxManager* self,

@@ -63,7 +63,7 @@ struct _liextBrushes
 		liwdgWidget* label_objextra;
 		liwdgWidget* preview;
 		liwdgWidget* scroll_objprob;
-		liwdgWidget* scroll_radius;
+		liwdgWidget* spin_axis;
 		liwdgWidget* spin_paint;
 		liwdgWidget* spin_sizex;
 		liwdgWidget* spin_sizey;
