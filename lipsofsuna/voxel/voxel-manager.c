@@ -184,7 +184,7 @@ livox_manager_copy_voxels (livoxManager* self,
  * If a sector with the same number already exists, it is returned instead of
  * creating a new one.
  *
- * \brief Voxel manager.
+ * \param self Voxel manager.
  * \param id Sector index.
  * \return Sector owned by the manager or NULL.
  */
@@ -492,7 +492,7 @@ livox_manager_load_materials (livoxManager* self)
  * If a sector with the requested ID cannot be found from the database,
  * an empty sector is created.
  *
- * \brief Voxel manager.
+ * \param self Voxel manager.
  * \param id Sector index.
  * \return Sector owned by the manager or NULL.
  */

@@ -191,7 +191,6 @@ lirnd_object_emit_particles (lirndObject* self)
  * \brief Advances the timer of the object and deforms its mesh.
  *
  * \param self Object.
- * \param scene Scene around the object.
  * \param secs Number of seconds since the last update.
  */
 void

@@ -223,7 +223,7 @@ limdl_node_read (limdlNode*   self,
  * \brief Updates the world space transformation of the node and, optionally, its children.
  *
  * \param self Node.
- * \param recurive Nonzero if children should be rebuilt.
+ * \param recursive Nonzero if children should be rebuilt.
  */
 void
 limdl_node_rebuild (limdlNode* self,

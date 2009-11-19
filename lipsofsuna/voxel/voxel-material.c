@@ -267,7 +267,7 @@ livox_material_remove_texture (livoxMaterial* self,
  * \brief Serializes the material to a database.
  *
  * \param self Material.
- * \param writer Stream writer.
+ * \param sql Database.
  * \return Nonzero on success.
  */
 int

@@ -16,14 +16,14 @@
  */
 
 /**
- * \addtogroup lieng Render
+ * \addtogroup lieng Engine
  * @{
  * \addtogroup liengConstraint Constraint
  * @{
  */
 
-#ifndef __RENDER_CONSTRAINT_H__
-#define __RENDER_CONSTRAINT_H__
+#ifndef __ENGINE_CONSTRAINT_H__
+#define __ENGINE_CONSTRAINT_H__
 
 #include <model/lips-model.h>
 #include "engine-types.h"

@@ -90,11 +90,14 @@ private_vision_update (lisrvClient* self);
 /*****************************************************************************/
 
 /**
- * \brief Frees the client.
+ * \brief Allocates a new client block.
  *
  * Only called by #lisrv_network_update.
  *
- * \param self Client.
+ * \param server Server.
+ * \param object Object associated to the client.
+ * \param user Network user.
+ * \return New client or NULL.
  */
 lisrvClient*
 lisrv_client_new (lisrvServer* server,
@@ -164,7 +167,7 @@ lisrv_client_free (lisrvClient* self)
  * Only called by #lisrv_object_set_client.
  *
  * \param self Client.
- * \param object Object.
+ * \param value Object.
  * \return Nonzero on success.
  */
 int

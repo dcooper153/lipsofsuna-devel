@@ -460,16 +460,16 @@ lieng_object_get_model_code (const liengObject* self)
  * \brief Replaces the current model of the object.
  *
  * \param self Object.
- * \param model Model number.
+ * \param value Model number.
  * \return Nonzero on success.
  */
 int
 lieng_object_set_model_code (liengObject* self,
-                             int          id)
+                             int          value)
 {
 	liengModel* model;
 
-	model = lieng_engine_find_model_by_code (self->engine, id);
+	model = lieng_engine_find_model_by_code (self->engine, value);
 	if (model == NULL)
 		return 0;
 	lieng_object_set_model (self, model);
@@ -489,7 +489,7 @@ lieng_object_get_model_name (const liengObject* self)
  * \brief Replaces the current model of the object.
  *
  * \param self Object.
- * \param model Model string.
+ * \param value Model string.
  * \return Nonzero on success.
  */
 int

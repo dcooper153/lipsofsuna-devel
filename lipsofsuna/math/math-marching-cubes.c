@@ -320,7 +320,7 @@ static const int triangle_index_table[256][16] =
  * Takes corner connectivity information as an argument and generates zero or
  * more triangles that are stored to the vertex list.
  *
- * \param corner Corner mask.
+ * \param corners Corner mask.
  * \param vertices Return location for vertices.
  * \return Number of generated vertices.
  */

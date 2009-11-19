@@ -155,6 +155,7 @@ ligen_generator_clear_scene (ligenGenerator* self)
  * \brief Finds a brush by id.
  *
  * \param self Generator.
+ * \param id Brush number.
  * \return Brush or NULL.
  */
 ligenBrush*

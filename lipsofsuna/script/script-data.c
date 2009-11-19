@@ -279,7 +279,7 @@ liscr_data_unref (liscrData* object,
 /**
  * \brief Gets the class of the userdata.
  *
- * \param object Script userdata.
+ * \param self Script userdata.
  * \return Script class.
  */
 liscrClass*
@@ -291,7 +291,7 @@ liscr_data_get_class (liscrData* self)
 /**
  * \brief Sets the class of the userdata to a compatible class.
  *
- * \param object Script userdata.
+ * \param self Script userdata.
  * \param clss Script class.
  * \return Nonzero if set successfully.
  */
@@ -319,7 +319,7 @@ liscr_data_set_class (liscrData*  self,
 /**
  * \brief Gets the script that owns this userdata.
  *
- * \param object Script userdata.
+ * \param self Script userdata.
  * \return Script.
  */
 liscrScript*

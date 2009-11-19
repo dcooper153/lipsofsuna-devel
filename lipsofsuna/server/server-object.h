@@ -34,10 +34,6 @@
 
 #define LISRV_OBJECT(o) ((lisrvObject*) lieng_object_get_userdata ((liengObject*)(o), LIENG_DATA_SERVER))
 
-#define LISRC_OBJECT_POSITION_ERROR 0.4f
-#define LISRC_OBJECT_VELOCITY_ERROR 1.0f
-#define LISRC_OBJECT_DIRECTION_ERROR 0.01f
-
 struct _lisrvObject
 {
 	char* name;

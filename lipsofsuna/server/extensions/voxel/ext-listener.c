@@ -125,6 +125,7 @@ liext_listener_cache (liextListener* self,
  * terrain in order to avoid resending already known terrain blocks.
  *
  * \param self Listener.
+ * \param secs Number of seconds since the last update.
  * \return Nonzero on success.
  */
 int

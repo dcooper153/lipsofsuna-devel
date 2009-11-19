@@ -275,7 +275,7 @@ lical_callbacks_remove_callback (licalCallbacks* self,
  * \brief Removes event handler callbacks.
  *
  * \param self Callbacks.
- * \param handle Array of callback handles.
+ * \param handles Array of callback handles.
  * \param count Number of handles.
  */
 void

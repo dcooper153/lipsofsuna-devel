@@ -145,6 +145,7 @@ lirnd_context_render (lirndContext* self,
  * \param self Rendering context.
  * \param vertex0 Vertex from which to begin rendering.
  * \param vertex1 Vertex to which to end rendering.
+ * \param format Vertex format.
  * \param vertices Vertex array.
  */
 void
@@ -208,6 +209,7 @@ lirnd_context_render_vbo (lirndContext*      self,
  * \param self Rendering context.
  * \param vertex0 Vertex from which to begin rendering.
  * \param vertex1 Vertex to which to end rendering.
+ * \param format Vertex format.
  * \param vertices Vertex array.
  */
 void

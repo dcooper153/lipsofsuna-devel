@@ -49,8 +49,8 @@ const liwdgClass liwdgContainerType =
  * \brief Gets a child widget under the cursor position.
  *
  * \param self Container.
- * \param pixx Cursor position.
- * \param pixy Cursor position.
+ * \param x Cursor position in pixels.
+ * \param y Cursor position in pixels.
  * \return Widget owned by the group or NULL.
  */
 liwdgWidget*

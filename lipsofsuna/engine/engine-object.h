@@ -160,7 +160,7 @@ lieng_object_get_model_code (const liengObject* self);
 
 int
 lieng_object_set_model_code (liengObject* self,
-                             int          id);
+                             int          value);
 
 const char*
 lieng_object_get_model_name (const liengObject* self);

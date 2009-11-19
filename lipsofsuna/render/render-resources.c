@@ -29,7 +29,7 @@
 /**
  * \brief Creates a new resource manager.
  *
- * \param self Renderer.
+ * \param render Renderer.
  * \return New resource manager or NULL.
  */
 lirndResources*

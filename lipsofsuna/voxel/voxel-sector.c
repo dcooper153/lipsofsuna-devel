@@ -42,7 +42,7 @@ private_build_block (livoxSector* self,
 /**
  * \brief Creates a new sector.
  *
- * \param engine Engine.
+ * \param manager Voxel manager.
  * \param id Sector number.
  * \return New sector or NULL.
  */
@@ -373,10 +373,10 @@ livox_sector_get_dirty (const livoxSector* self)
 }
 
 /**
- * \brief Returns nonzero if the sector is dirty.
+ * \brief Sets or clears the dirty flag of the sector.
  *
  * \param self Sector.
- * \return Nonzero if dirty.
+ * \param value Zero to clear, nonzero to set.
  */
 void
 livox_sector_set_dirty (livoxSector* self,
@@ -410,7 +410,7 @@ livox_sector_get_empty (const livoxSector* self)
  *
  * \param self Sector.
  * \param x Return location for the offset.
- * \param t Return location for the offset.
+ * \param y Return location for the offset.
  * \param z Return location for the offset.
  */
 void
@@ -447,7 +447,7 @@ livox_sector_get_origin (const livoxSector* self,
  * \return Terrain type or zero.
  */
 livoxVoxel*
-livox_sector_get_voxel (livoxSector* sector,
+livox_sector_get_voxel (livoxSector* self,
                         int          x,
                         int          y,
                         int          z)
@@ -464,7 +464,7 @@ livox_sector_get_voxel (livoxSector* sector,
 	assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
 	assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
 	assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	block = sector->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
+	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 
 	return livox_block_get_voxel (block, tx, ty, tz);
 }

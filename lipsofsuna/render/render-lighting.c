@@ -122,7 +122,6 @@ lirnd_lighting_remove_light (lirndLighting* self,
  * \brief Updates the status of all registered light sources.
  *
  * \param self Light manager.
- * \param scene Current scene.
  */
 void
 lirnd_lighting_update (lirndLighting* self)

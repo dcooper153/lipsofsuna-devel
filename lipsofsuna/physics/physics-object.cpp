@@ -412,7 +412,7 @@ liphy_object_set_collision_mask (liphyObject* self,
  * collides with something.
  *
  * \param self Object.
- * \return Simulation mode.
+ * \param value Contact callback.
  */
 void
 liphy_object_set_contact_call (liphyObject*     self,

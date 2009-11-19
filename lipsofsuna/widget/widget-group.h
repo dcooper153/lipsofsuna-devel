@@ -140,8 +140,7 @@ liwdg_group_get_col_size (liwdgGroup* self,
                           int         x);
 
 int
-liwdg_group_get_homogeneous (const liwdgGroup* self,
-                             int               value);
+liwdg_group_get_homogeneous (const liwdgGroup* self);
 
 void
 liwdg_group_set_homogeneous (liwdgGroup* self,

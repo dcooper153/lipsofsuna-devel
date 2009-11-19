@@ -113,7 +113,7 @@ livox_block_read (livoxBlock*   self,
  * \brief Writes block data to a stream.
  *
  * \param self Block.
- * \param reader Reader.
+ * \param writer Writer.
  * \return Nonzero on success.
  */
 int
@@ -146,10 +146,10 @@ livox_block_get_dirty (const livoxBlock* self)
 }
 
 /**
- * \brief Returns nonzero if the block is dirty.
+ * \brief Sets or clears the dirty flag of the block.
  *
  * \param self Block.
- * \return Nonzero if dirty.
+ * \param value Zero to clear, nonzero to set.
  */
 void
 livox_block_set_dirty (livoxBlock* self,
@@ -204,10 +204,7 @@ livox_block_get_voxel (livoxBlock* self,
 /**
  * \brief Sets the terrain type of a voxel.
  *
- * This can alter the type of the block if, for example, a tile is removed from
- * a full block, in which case the block would be converted to a tiles block.
- *
- * You need to call #livox_block_rebuild manually if something was changed.
+ * If the voxel data is changed, the dirty flag of the block is updated.
  *
  * \param self Block.
  * \param x Offset of the voxel within the block.

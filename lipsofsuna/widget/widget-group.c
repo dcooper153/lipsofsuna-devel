@@ -472,8 +472,7 @@ liwdg_group_get_col_size (liwdgGroup* self,
  * \return value Nonzero if homogeneous.
  */
 int
-liwdg_group_get_homogeneous (const liwdgGroup* self,
-                             int               value)
+liwdg_group_get_homogeneous (const liwdgGroup* self)
 {
 	return self->homogeneous;
 }

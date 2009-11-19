@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lipth Server
+ * \addtogroup lipth Paths
  * @{
  * \addtogroup lipthPaths Paths
  * @{

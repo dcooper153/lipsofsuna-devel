@@ -34,7 +34,7 @@
  * \param params Parameters to be passed to the action.
  * \param code Key symbol, mouse button, mouse axis, joystick button, or joystick axis.
  * \param mods Modifier mask.
- * \param multplier Value of handled events will be premultiplied by this.
+ * \param multiplier Value of handled events will be premultiplied by this.
  * \return New binding or NULL.
  */
 libndBinding*

@@ -424,7 +424,7 @@ lieng_engine_remove_call (liengEngine* self,
  * \brief Removes event handler callbacks.
  *
  * \param self Engine.
- * \param handle Callback handles.
+ * \param handles Callback handles.
  * \param count Number of handles.
  */
 void

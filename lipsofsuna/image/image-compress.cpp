@@ -31,6 +31,7 @@
 /**
  * \brief Compresses RGBA pixel data to DXT5 bytes.
  *
+ * \param pixels RGBA pixels to compress.
  * \param width Width.
  * \param height Height.
  * \param type DXT format number.
@@ -57,6 +58,7 @@ liimg_compress_compress (const void* pixels,
 /**
  * \brief Uncompresses DXT5 bytes to RGBA pixel data.
  *
+ * \param pixels DXT5 bytes to uncompress.
  * \param width Width.
  * \param height Height.
  * \param type DXT format number.
