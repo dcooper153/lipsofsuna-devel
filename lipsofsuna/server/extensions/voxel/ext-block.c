@@ -90,7 +90,7 @@ liext_block_build (liextBlock*  self,
 		model = lieng_engine_find_model_by_name (self->module->server->engine, name);
 		if (model == NULL || model->physics == NULL)
 			continue;
-		vector = limat_vector_init (x + 0.5f, y, z + 0.5f);
+		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
 		transform.position = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
 		liphy_object_insert_shape (self->object, model->physics, &transform);
