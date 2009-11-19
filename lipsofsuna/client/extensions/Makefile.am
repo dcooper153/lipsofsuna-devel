@@ -15,6 +15,7 @@ ext_LTLIBRARIES = \
 	libskills-cli.la \
 	libslots-cli.la \
 	libsound-cli.la \
+	libspeech-cli.la \
 	libvoxel-cli.la \
 	libwidgets-cli.la
 
@@ -130,6 +131,15 @@ libsound_cli_la_SOURCES = \
 	sound/ext-module.c \
 	sound/ext-module.h \
 	sound/ext-script.c
+
+libspeech_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libspeech_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libspeech_cli_la_SOURCES = \
+	speech/ext-module.c \
+	speech/ext-module.h \
+	speech/ext-script.c \
+	speech/ext-speech.h \
+	speech/ext-speech.c
 
 libvoxel_cli_la_LDFLAGS = -module -avoid-version -no-undefined
 libvoxel_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la

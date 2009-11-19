@@ -115,7 +115,6 @@ cli_HEADERS = \
 	client/client-network.h \
 	client/client-object.h \
 	client/client-script.h \
-	client/client-speech.h \
 	client/client-types.h \
 	client/client-window.h \
 	client/widget-login.h
@@ -138,7 +137,6 @@ clisrc = \
 	client/client-script-scene.c \
 	client/client-script-widget.c \
 	client/client-script-window.c \
-	client/client-speech.c \
 	client/client-window.c \
 	client/widget-login.c
 

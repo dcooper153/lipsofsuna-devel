@@ -102,9 +102,6 @@ void
 licli_module_render (licliModule* self);
 
 void
-licli_module_render_speech (licliModule* self);
-
-void
 licli_module_send (licliModule* self,
                    liarcWriter* writer,
                    int          flags);

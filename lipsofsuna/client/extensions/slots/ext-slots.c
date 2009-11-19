@@ -106,7 +106,7 @@ liext_slots_set_slot (liextSlots* self,
 	/* Create new slot. */
 	if (model != LINET_INVALID_MODEL)
 	{
-		slot_ = liext_slot_new (self->object, node, "#root", model);
+		slot_ = liext_slot_new (self->module->module, self->object, node, "#root", model);
 		if (slot_ == NULL)
 			return 0;
 		if (!lialg_strdic_insert (self->slots, slot, slot_))

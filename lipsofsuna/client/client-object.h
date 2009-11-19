@@ -33,7 +33,7 @@
 #include <system/lips-system.h>
 #include "client-types.h"
 
-#define LICLI_OBJECT(o) ((licliObject*) lieng_object_get_userdata ((liengObject*)(o), LIENG_DATA_CLIENT))
+#define LICLI_IS_CLIENT_OBJECT(o) (lieng_object_get_userdata (o, LIENG_DATA_CLIENT) != NULL)
 
 typedef struct _licliControls licliControls;
 struct _licliControls
@@ -44,24 +44,10 @@ struct _licliControls
 	float move;
 };
 
-struct _licliObject
-{
-	uint16_t animation;
-	lialgList* speech;
-	licliModule* module;
-};
-
 liengObject*
 licli_object_new (licliModule* module,
                   uint32_t     id,
                   int          flags);
-
-void
-licli_object_free (liengObject* self);
-
-void
-licli_object_update (liengObject* self,
-                     float        secs);
 
 void
 licli_object_set_animation (liengObject* self,
@@ -69,14 +55,6 @@ licli_object_set_animation (liengObject* self,
                             int          channel,
                             int          permanent,
                             float        priority);
-
-void
-licli_object_set_controls (liengObject*         self,
-                           const licliControls* controls);
-
-void
-licli_object_set_speech (liengObject* self,
-                         const char*  message);
 
 #endif
 

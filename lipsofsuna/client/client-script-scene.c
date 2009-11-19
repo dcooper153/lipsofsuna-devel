@@ -38,25 +38,27 @@ private_render (liwdgRender* self,
 	lirndObject* object;
 	liwdgRect rect;
 
+	/* Set 3D mode. */
 	module = data;
+	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+	lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
+	lieng_camera_get_frustum (module->camera, &frustum);
+	lieng_camera_get_modelview (module->camera, &modelview);
+	lieng_camera_get_projection (module->camera, &projection);
+	lirnd_context_init (&context, module->scene);
+	lirnd_context_set_modelview (&context, &modelview);
+	lirnd_context_set_projection (&context, &projection);
+	lirnd_context_set_frustum (&context, &frustum);
+
+	/* Draw selection. */
 	if (module->network != NULL)
 	{
-		/* Draw selection. */
 		glDisable (GL_LIGHTING);
 		glDisable (GL_DEPTH_TEST);
 		glDisable (GL_CULL_FACE);
 		glDisable (GL_TEXTURE_2D);
 		glDepthMask (GL_FALSE);
 		glColor3f (1.0f, 0.0f, 0.0f);
-		liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-		lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
-		lieng_camera_get_frustum (module->camera, &frustum);
-		lieng_camera_get_modelview (module->camera, &modelview);
-		lieng_camera_get_projection (module->camera, &projection);
-		lirnd_context_init (&context, module->scene);
-		lirnd_context_set_modelview (&context, &modelview);
-		lirnd_context_set_projection (&context, &projection);
-		lirnd_context_set_frustum (&context, &frustum);
 		LIENG_FOREACH_SELECTION (iter, module->engine)
 		{
 			object = lirnd_scene_find_object (module->scene, iter.object->id);
@@ -64,15 +66,20 @@ private_render (liwdgRender* self,
 				lirnd_draw_bounds (&context, object, NULL);
 		}
 		lirnd_context_unbind (&context);
-
-		/* Draw speech. */
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho (0, rect.width, 0, rect.height, -100.0f, 100.0f);
-		glMatrixMode (GL_MODELVIEW);
-		glLoadIdentity ();
-		licli_module_render_speech (module);
 	}
+
+	/* Render custom 3D scene. */
+	lieng_engine_call (module->engine, LICLI_CALLBACK_RENDER_3D, self);
+
+	/* Set 2D mode. */
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho (0, rect.width, 0, rect.height, -100.0f, 100.0f);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+
+	/* Render custom 2D scene. */
+	lieng_engine_call (module->engine, LICLI_CALLBACK_RENDER_2D, self);
 }
 
 static void

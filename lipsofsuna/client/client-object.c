@@ -24,23 +24,7 @@
 
 #include "client.h"
 #include "client-object.h"
-#include "client-speech.h"
 #include "client-window.h"
-
-#define LI_OBJECT_SPEED_UNIT (0.01f / LI_MAP_SCALE)
-#define LI_OBJECT_SPEED_MODIFIER 1.0f
-#define LI_OBJECT_ROTATION_MODIFIER 1.5f
-#define LI_OBJECT_POSITION_ERROR 0.3f
-
-enum
-{
-	LI_OBJECT_CHANNEL_MOVE,
-	LI_OBJECT_CHANNEL_TURN,
-	LI_OBJECT_CHANNEL_ACTION,
-	LI_OBJECT_CHANNEL_COUNT,
-};
-
-/*****************************************************************************/
 
 /**
  * \brief Creates a new object.
@@ -55,7 +39,6 @@ licli_object_new (licliModule* module,
                   uint32_t     id,
                   int          flags)
 {
-	licliObject* data;
 	liengObject* self;
 	liscrScript* script = module->script;
 
@@ -64,14 +47,8 @@ licli_object_new (licliModule* module,
 	if (self == NULL)
 		return NULL;
 
-	/* Allocate client data. */
-	data = lisys_calloc (1, sizeof (licliObject));
-	if (data == NULL)
-		goto error;
-	data->module = module;
-
 	/* Extend engine object. */
-	lieng_object_set_userdata (self, LIENG_DATA_CLIENT, data);
+	lieng_object_set_userdata (self, LIENG_DATA_CLIENT, (void*) -1);
 //	lieng_object_set_flags (self, flags);
 	if (flags & LINET_OBJECT_FLAG_DYNAMIC)
 	{
@@ -98,76 +75,6 @@ error:
 	return NULL;
 }
 
-/**
- * \brief Frees the object.
- *
- * \param self An object.
- */
-void
-licli_object_free (liengObject* self)
-{
-	lialgList* ptr;
-	licliObject* data = LICLI_OBJECT (self);
-
-	/* Free client data. */
-	if (data != NULL)
-	{
-		/* Free speech. */
-		for (ptr = data->speech ; ptr != NULL ; ptr = ptr->next)
-			li_speech_free (ptr->data);
-		lialg_list_free (data->speech);
-		lisys_free (data);
-	}
-
-	/* Call base. */
-	lieng_default_calls.lieng_object_free (self);
-}
-
-/**
- * \brief Updates the orientation of the object.
- *
- * \param self An object.
- * \param secs The number of seconds since the last update.
- */
-void
-licli_object_update (liengObject* self,
-                     float        secs)
-{
-	float t;
-	lialgList* ptr;
-	lialgList* next;
-	licliObject* data;
-	liSpeech* speech;
-
-	/* Call base. */
-	lieng_default_calls.lieng_object_update (self, secs);
-
-	data = LICLI_OBJECT (self);
-	if (data == NULL)
-		return;
-
-	/* Update speech. */
-	for (ptr = data->speech ; ptr != NULL ; ptr = next)
-	{
-		next = ptr->next;
-		speech = ptr->data;
-		speech->timer += secs;
-		if (speech->timer > LI_SPEECH_TIMEOUT)
-		{
-			li_speech_free (speech);
-			lialg_list_remove (&data->speech, ptr);
-		}
-		else
-		{
-			t = speech->timer / LI_SPEECH_TIMEOUT;
-			if (t < 0.5)
-				speech->alpha = 1.0f;
-			else
-				speech->alpha = 1.0f - powf (2.0f * t - 0.5, 4);
-		}
-	}
-}
-
 void
 licli_object_set_animation (liengObject* self,
                             int          value,
@@ -176,7 +83,6 @@ licli_object_set_animation (liengObject* self,
                             float        priority)
 {
 	int chan;
-	licliObject* data = LICLI_OBJECT (self);
 	liengAnimation* animation;
 	limdlPose* pose;
 
@@ -189,7 +95,7 @@ licli_object_set_animation (liengObject* self,
 		return;
 	}
 
-	animation = lieng_engine_find_animation_by_code (data->module->engine, value);
+	animation = lieng_engine_find_animation_by_code (self->engine, value);
 	if (animation == NULL)
 		return;
 
@@ -198,26 +104,6 @@ licli_object_set_animation (liengObject* self,
 	limdl_pose_set_channel_repeats (pose, chan, permanent? -1 : 1);
 	limdl_pose_set_channel_priority (pose, chan, priority);
 	limdl_pose_set_channel_state (pose, chan, LIMDL_POSE_CHANNEL_STATE_PLAYING);
-}
-
-/**
- * \brief Sets the latest chat message of the object.
- *
- * \param self An object.
- * \param message A string.
- */
-void
-licli_object_set_speech (liengObject* self,
-                         const char*  message)
-{
-	licliObject* data = LICLI_OBJECT (self);
-	liSpeech* speech;
-
-	speech = li_speech_new (data->module, message);
-	if (speech == NULL)
-		return;
-	if (!lialg_list_prepend (&data->speech, speech))
-		li_speech_free (speech);
 }
 
 /** @} */

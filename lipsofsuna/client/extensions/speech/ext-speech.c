@@ -16,35 +16,49 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup liext Extension
  * @{
- * \addtogroup licliSpeech Speech
+ * \addtogroup liextcli Client
+ * @{
+ * \addtogroup liextcliSpeech Speech
  * @{
  */
 
-#ifndef __SPEECH_H__
-#define __SPEECH_H__
+#include "ext-speech.h"
 
-#include <font/lips-font.h>
-
-#define LI_SPEECH_TIMEOUT 10.0f
-
-typedef struct _liSpeech liSpeech;
-struct _liSpeech
+liextSpeech*
+liext_speech_new (licliModule* module,
+                  const char*  text)
 {
-	float timer;
-	float alpha;
-	lifntLayout* text;
-};
+	liextSpeech* self;
+	lifntFont* font;
 
-liSpeech*
-li_speech_new (licliModule* module,
-               const char*  text);
+	self = lisys_malloc (sizeof (liextSpeech));
+	if (self == NULL)
+		return NULL;
+	self->alpha = 1.0f;
+	self->timer = 0.0f;
+	self->text = lifnt_layout_new ();
+	if (self->text == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+	lifnt_layout_set_width_limit (self->text, 150);
+	font = liwdg_manager_find_font (module->widgets, "default");
+	if (font != NULL)
+		lifnt_layout_append_string (self->text, font, text);
+
+	return self;
+}
 
 void
-li_speech_free (liSpeech* self);
+liext_speech_free (liextSpeech* self)
+{
+	lifnt_layout_free (self->text);
+	lisys_free (self);
+}
 
-#endif
-
+/** @} */
 /** @} */
 /** @} */

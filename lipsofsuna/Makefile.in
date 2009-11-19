@@ -133,7 +133,6 @@ am__objects_2 = client/liblipsofsunaclient_la-client.lo \
 	client/liblipsofsunaclient_la-client-script-scene.lo \
 	client/liblipsofsunaclient_la-client-script-widget.lo \
 	client/liblipsofsunaclient_la-client-script-window.lo \
-	client/liblipsofsunaclient_la-client-speech.lo \
 	client/liblipsofsunaclient_la-client-window.lo \
 	client/liblipsofsunaclient_la-widget-login.lo
 am__objects_3 = font/liblipsofsunaclient_la-font.lo \
@@ -702,7 +701,6 @@ cli_HEADERS = \
 	client/client-network.h \
 	client/client-object.h \
 	client/client-script.h \
-	client/client-speech.h \
 	client/client-types.h \
 	client/client-window.h \
 	client/widget-login.h
@@ -726,7 +724,6 @@ clisrc = \
 	client/client-script-scene.c \
 	client/client-script-widget.c \
 	client/client-script-window.c \
-	client/client-speech.c \
 	client/client-window.c \
 	client/widget-login.c
 
@@ -1343,8 +1340,6 @@ client/liblipsofsunaclient_la-client-script-scene.lo:  \
 client/liblipsofsunaclient_la-client-script-widget.lo:  \
 	client/$(am__dirstamp) client/$(DEPDIR)/$(am__dirstamp)
 client/liblipsofsunaclient_la-client-script-window.lo:  \
-	client/$(am__dirstamp) client/$(DEPDIR)/$(am__dirstamp)
-client/liblipsofsunaclient_la-client-speech.lo:  \
 	client/$(am__dirstamp) client/$(DEPDIR)/$(am__dirstamp)
 client/liblipsofsunaclient_la-client-window.lo:  \
 	client/$(am__dirstamp) client/$(DEPDIR)/$(am__dirstamp)
@@ -2032,8 +2027,6 @@ mostlyclean-compile:
 	-rm -f client/liblipsofsunaclient_la-client-script-widget.lo
 	-rm -f client/liblipsofsunaclient_la-client-script-window.$(OBJEXT)
 	-rm -f client/liblipsofsunaclient_la-client-script-window.lo
-	-rm -f client/liblipsofsunaclient_la-client-speech.$(OBJEXT)
-	-rm -f client/liblipsofsunaclient_la-client-speech.lo
 	-rm -f client/liblipsofsunaclient_la-client-window.$(OBJEXT)
 	-rm -f client/liblipsofsunaclient_la-client-window.lo
 	-rm -f client/liblipsofsunaclient_la-client.$(OBJEXT)
@@ -2360,7 +2353,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-client-script-scene.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-client-script-widget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-client-script-window.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-client-speech.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-client-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/liblipsofsunaclient_la-widget-login.Plo@am__quote@
@@ -2711,14 +2703,6 @@ client/liblipsofsunaclient_la-client-script-window.lo: client/client-script-wind
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-script-window.c' object='client/liblipsofsunaclient_la-client-script-window.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o client/liblipsofsunaclient_la-client-script-window.lo `test -f 'client/client-script-window.c' || echo '$(srcdir)/'`client/client-script-window.c
-
-client/liblipsofsunaclient_la-client-speech.lo: client/client-speech.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT client/liblipsofsunaclient_la-client-speech.lo -MD -MP -MF client/$(DEPDIR)/liblipsofsunaclient_la-client-speech.Tpo -c -o client/liblipsofsunaclient_la-client-speech.lo `test -f 'client/client-speech.c' || echo '$(srcdir)/'`client/client-speech.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) client/$(DEPDIR)/liblipsofsunaclient_la-client-speech.Tpo client/$(DEPDIR)/liblipsofsunaclient_la-client-speech.Plo
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='client/client-speech.c' object='client/liblipsofsunaclient_la-client-speech.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -c -o client/liblipsofsunaclient_la-client-speech.lo `test -f 'client/client-speech.c' || echo '$(srcdir)/'`client/client-speech.c
 
 client/liblipsofsunaclient_la-client-window.lo: client/client-window.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(liblipsofsunaclient_la_CFLAGS) $(CFLAGS) -MT client/liblipsofsunaclient_la-client-window.lo -MD -MP -MF client/$(DEPDIR)/liblipsofsunaclient_la-client-window.Tpo -c -o client/liblipsofsunaclient_la-client-window.lo `test -f 'client/client-window.c' || echo '$(srcdir)/'`client/client-window.c

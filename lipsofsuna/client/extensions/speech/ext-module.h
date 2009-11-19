@@ -20,33 +20,57 @@
  * @{
  * \addtogroup liextcli Client
  * @{
- * \addtogroup liextcliSlots Slots      
+ * \addtogroup liextcliSpeech Speech
  * @{
  */
 
-#ifndef __CLIENT_SLOT_H__
-#define __CLIENT_SLOT_H__
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
 #include <client/lips-client.h>
-#include <render/lips-render.h>
+#include <script/lips-script.h>
 
-typedef struct _liextSlot liextSlot;
-struct _liextSlot
+#define LIEXT_SCRIPT_SPEECH "Lips.Speech"
+
+typedef struct _liextModule liextModule;
+struct _liextModule
 {
 	licliModule* module;
-	liengObject* object;
-	liengConstraint* constraint;
+	lialgU32dic* objects;
+	licalHandle calls[2];
 };
 
-liextSlot*
-liext_slot_new (licliModule* module,
-                liengObject* object,
-                const char*  node0,
-                const char*  node1,
-                int          model);
+liextModule*
+liext_module_new (licliModule* module);
 
 void
-liext_slot_free (liextSlot* self);
+liext_module_free (liextModule* self);
+
+int
+liext_module_set_speech (liextModule* self,
+                         uint32_t     object,
+                         const char*  message);
+
+/*****************************************************************************/
+
+typedef struct _liextObject liextObject;
+struct _liextObject
+{
+	lialgList* speech;
+	limatVector position;
+};
+
+liextObject*
+liext_object_new ();
+
+void
+liext_object_free (liextObject* self);
+
+/*****************************************************************************/
+
+void
+liextSpeechScript (liscrClass* self,
+                   void*       data);
 
 #endif
 

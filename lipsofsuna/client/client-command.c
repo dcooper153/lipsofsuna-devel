@@ -105,7 +105,6 @@ private_assign (licliModule* module,
                 liarcReader* reader)
 {
 	lialgU32dicIter iter;
-	licliObject* object;
 
 	if (!liarc_reader_get_uint32 (reader, &module->network->id) ||
 	    !liarc_reader_get_uint32 (reader, &module->network->features) ||
@@ -115,8 +114,7 @@ private_assign (licliModule* module,
 	/* Clear scene. */
 	LI_FOREACH_U32DIC (iter, module->engine->objects)
 	{
-		object = LICLI_OBJECT (iter.value);
-		if (object != NULL)
+		if (LICLI_IS_CLIENT_OBJECT (iter.value))
 			lieng_object_set_realized (iter.value, 0);
 	}
 

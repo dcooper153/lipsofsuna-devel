@@ -33,6 +33,8 @@ enum
 {
 	LICLI_CALLBACK_EVENT = 32, /* (data, event) */
 	LICLI_CALLBACK_PACKET, /* (data, type, packet) */
+	LICLI_CALLBACK_RENDER_2D, /* (data, widget) */
+	LICLI_CALLBACK_RENDER_3D, /* (data, widget) */
 	LICLI_CALLBACK_SELECT, /* (data, selection) */
 	LICLI_CALLBACK_TICK, /* (data, secs) */
 };

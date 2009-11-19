@@ -29,6 +29,7 @@
 /**
  * \brief Creates a new equipment slot.
  *
+ * \param module Module.
  * \param object Parent object.
  * \param node0 Node name in parent model.
  * \param node1 Node name in equipment model.
@@ -36,7 +37,8 @@
  * \return New slot or NULL.
  */
 liextSlot*
-liext_slot_new (liengObject* object,
+liext_slot_new (licliModule* module,
+                liengObject* object,
                 const char*  node0,
                 const char*  node1,
                 int          model)
@@ -48,7 +50,7 @@ liext_slot_new (liengObject* object,
 	self = lisys_calloc (1, sizeof (liextSlot));
 	if (self == NULL)
 		return NULL;
-	self->module = LICLI_OBJECT (object)->module;
+	self->module = module;
 
 	/* Allocate object. */
 	mdl = lieng_engine_find_model_by_code (object->engine, model);

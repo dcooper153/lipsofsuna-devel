@@ -31,7 +31,6 @@
 #include "client-callbacks.h"
 #include "client-module.h"
 #include "client-script.h"
-#include "client-speech.h"
 #include "client-window.h"
 
 static int
@@ -395,49 +394,6 @@ licli_module_render (licliModule* self)
 	self->client->video.SDL_GL_SwapBuffers ();
 }
 
-void
-licli_module_render_speech (licliModule* self)
-{
-	int width;
-	lialgU32dicIter iter;
-	lialgList* ptr;
-	liengObject* object;
-	liSpeech* speech;
-	limatAabb bounds;
-	limatTransform transform;
-	limatVector win;
-
-	LI_FOREACH_U32DIC (iter, self->engine->objects)
-	{
-		/* Get object. */
-		object = iter.value;
-		if (LICLI_OBJECT (object) == NULL)
-			continue;
-		if (LICLI_OBJECT (object)->speech == NULL)
-			continue;
-
-		/* Get text offset. */
-		lieng_object_get_transform (object, &transform);
-		lieng_object_get_bounds (object, &bounds);
-		transform.position.y += bounds.max.y;
-		if (!lieng_camera_project (self->camera, &transform.position, &win))
-			continue;
-		win.y -= 5;
-
-		/* Render all messages. */
-		for (ptr = LICLI_OBJECT (object)->speech ; ptr != NULL ; ptr = ptr->next)
-		{
-			speech = ptr->data;
-			win.y += lifnt_layout_get_height (speech->text);
-			width = lifnt_layout_get_width (speech->text) / 2;
-			glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
-			lifnt_layout_render (speech->text, win.x - width + 1, win.y + 1);
-			glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
-			lifnt_layout_render (speech->text, win.x - width, win.y);
-		}
-	}
-}
-
 /**
  * \brief Sends a network package to the server.
  *
@@ -583,7 +539,6 @@ static int
 private_init_engine (licliModule* self)
 {
 	int flags;
-	liengCalls* calls;
 
 	/* Initialize engine. */
 	self->engine = lieng_engine_new (self->paths->module_data);
@@ -593,14 +548,13 @@ private_init_engine (licliModule* self)
 	lieng_engine_set_flags (self->engine, flags | LIENG_FLAG_REMOTE_SECTORS);
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
 	lieng_engine_set_userdata (self->engine, LIENG_DATA_CLIENT, self);
-	calls = lieng_engine_get_calls (self->engine);
-	calls->lieng_object_free = licli_object_free;
-	calls->lieng_object_update = licli_object_update;
 
 	/* Initialize callbacks. */
 	if (!lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_EVENT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_PACKET, lical_marshal_DATA_INT_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_SELECT, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_RENDER_2D, lical_marshal_DATA_PTR) ||
+	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_RENDER_3D, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_TICK, lical_marshal_DATA_FLT))
 		return 0;
 	if (!licli_module_init_callbacks_binding (self) ||

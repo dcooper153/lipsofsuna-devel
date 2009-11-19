@@ -16,57 +16,67 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup liext Extension
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup liextcli Client
+ * @{
+ * \addtogroup liextcliSpeech Speech
  * @{
  */
 
-#include "lips-client.h"
-
-/*****************************************************************************/
+#include "ext-module.h"
 
 /* @luadoc
- * module "Core.Client.Object"
+ * module "Extension.Client.Speech"
  * ---
- * -- Create and manipulate client side objects.
- * -- @name Object
+ * -- Display speech above objects.
+ * -- @name Sound
  * -- @class table
  */
 
 /* @luadoc
  * ---
- * -- FIXME
+ * -- Displays a message above the object.
  * --
- * -- @param self Object.
- * function Object.emit_particles(self)
+ * -- @param self Speech class.
+ * -- @param object Object or object id.
+ * -- @param message Message.
+ * function Speech.add(self, object, message)
  */
 static int
-Object_emit_particles (lua_State* lua)
+Speech_add (lua_State* lua)
 {
-#warning Object_emit_particles is disabled
-#if 0
-	liscrData* object;
-	liengObject* data;
+	uint32_t id;
+	const char* msg;
+	liscrData* data;
+	liengObject* object;
+	liextModule* module;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	data = LIENG_OBJECT (object->data);
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SPEECH);
+	data = liscr_isdata (lua, 2, LICOM_SCRIPT_OBJECT);
+	if (data != NULL)
+	{
+		object = data->data;
+		id = object->id;
+	}
+	else
+		id = luaL_checknumber (lua, 2);
+	msg = luaL_checkstring (lua, 3);
 
-	if (data->render != NULL)
-		lirnd_object_emit_particles (data->render);
-#endif
+	liext_module_set_speech (module, id, msg);
 	return 0;
 }
 
 /*****************************************************************************/
 
 void
-licliObjectScript (liscrClass* self,
+liextSpeechScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licomObjectScript, NULL);
-	liscr_class_insert_func (self, "emit_particles", Object_emit_particles);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);
+	liscr_class_insert_func (self, "add", Speech_add);
 }
 
+/** @} */
 /** @} */
 /** @} */
