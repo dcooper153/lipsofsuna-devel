@@ -32,9 +32,6 @@
 #include <render/lips-render.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
-#ifndef LI_DISABLE_SOUND
-#include <sound/lips-sound.h>
-#endif
 #include <widget/lips-widget.h>
 #include "client.h"
 #include "client-callbacks.h"
@@ -64,10 +61,6 @@ struct _licliModule
 	lirndScene* scene;
 	liscrScript* script;
 	lisrvServer* server;
-#ifndef LI_DISABLE_SOUND
-	lisndManager* sound;
-	lisndSource* music;
-#endif
 	liwdgManager* widgets;
 };
 
@@ -89,16 +82,6 @@ licli_module_connect (licliModule* self,
 liengObject*
 licli_module_find_object (licliModule* self,
                           uint32_t     id);
-
-#ifndef LI_DISABLE_SOUND
-lisndSample*
-licli_module_find_sample_by_id (licliModule* self,
-                                int          id);
-
-lisndSample*
-licli_module_find_sample_by_name (licliModule* self,
-                                  const char*  name);
-#endif
 
 int
 licli_module_handle_packet (licliModule* self,

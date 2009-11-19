@@ -53,13 +53,6 @@ licli_client_new (lividCalls* video,
 		return NULL;
 	}
 
-	/* Initialize sound. */
-#ifndef LI_DISABLE_SOUND
-	self->sound = lisnd_system_new ();
-	if (self->sound == NULL)
-		printf ("WARNING: cannot initialize sound\n");
-#endif
-
 	/* Create window. */
 	self->video.SDL_EnableUNICODE (1);
 	self->window = licli_window_new (self);
@@ -87,10 +80,6 @@ licli_client_free (licliClient* self)
 		licli_module_free (self->module);
 	if (self->window != NULL)
 		licli_window_free (self->window);
-#ifndef LI_DISABLE_SOUND
-	if (self->sound != NULL)
-		lisnd_system_free (self->sound);
-#endif
 	self->video.SDL_Quit ();
 	lisys_free (self);
 }

@@ -116,14 +116,6 @@ licli_object_free (liengObject* self)
 		for (ptr = data->speech ; ptr != NULL ; ptr = ptr->next)
 			li_speech_free (ptr->data);
 		lialg_list_free (data->speech);
-
-		/* Free sounds. */
-#ifndef LI_DISABLE_SOUND
-		for (ptr = data->sounds ; ptr != NULL ; ptr = ptr->next)
-			lisnd_source_free (ptr->data);
-		lialg_list_free (data->sounds);
-#endif
-
 		lisys_free (data);
 	}
 
@@ -146,11 +138,6 @@ licli_object_update (liengObject* self,
 	lialgList* next;
 	licliObject* data;
 	liSpeech* speech;
-#ifndef LI_DISABLE_SOUND
-	limatVector vector;
-	limatTransform transform;
-	lisndSource* source;
-#endif
 
 	/* Call base. */
 	lieng_default_calls.lieng_object_update (self, secs);
@@ -179,24 +166,6 @@ licli_object_update (liengObject* self,
 				speech->alpha = 1.0f - powf (2.0f * t - 0.5, 4);
 		}
 	}
-
-	/* Update sound effects. */
-#ifndef LI_DISABLE_SOUND
-	for (ptr = data->sounds ; ptr != NULL ; ptr = next)
-	{
-		next = ptr->next;
-		source = ptr->data;
-		lieng_object_get_transform (self, &transform);
-		lieng_object_get_velocity (self, &vector);
-		lisnd_source_set_position (source, &transform.position);
-		lisnd_source_set_velocity (source, &vector);
-		if (!lisnd_source_update (source))
-		{
-			lisnd_source_free (source);
-			lialg_list_remove (&data->sounds, ptr);
-		}
-	}
-#endif
 }
 
 void
@@ -229,45 +198,6 @@ licli_object_set_animation (liengObject* self,
 	limdl_pose_set_channel_repeats (pose, chan, permanent? -1 : 1);
 	limdl_pose_set_channel_priority (pose, chan, priority);
 	limdl_pose_set_channel_state (pose, chan, LIMDL_POSE_CHANNEL_STATE_PLAYING);
-}
-
-void
-licli_object_set_effect (liengObject* self,
-                         uint32_t     id,
-                         int          flags)
-{
-#ifndef LI_DISABLE_SOUND
-	licliObject* data = LICLI_OBJECT (self);
-	limatTransform transform;
-	limatVector vector;
-	lisndSample* sample;
-	lisndSource* source;
-
-	/* Set sound effect. */
-	if (data->module->client->sound != NULL)
-	{
-		sample = licli_module_find_sample_by_id (data->module, id);
-		if (sample != NULL)
-		{
-			source = lisnd_source_new_with_sample (data->module->client->sound, sample);
-			if (source != NULL)
-			{
-				if (lialg_list_prepend (&data->sounds, source))
-				{
-					lieng_object_get_transform (self, &transform);
-					lieng_object_get_velocity (self, &vector);
-					lisnd_source_set_position (source, &transform.position);
-					lisnd_source_set_velocity (source, &vector);
-					if (flags & LI_EFFECT_REPEAT)
-						lisnd_source_set_looping (source, 1);
-					lisnd_source_set_playing (source, 1);
-				}
-				else
-					lisnd_source_free (source);
-			}
-		}
-	}
-#endif
 }
 
 /**

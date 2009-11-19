@@ -262,42 +262,6 @@ Module_setter_moving (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Music.
- * -- @name Module.music
- * -- @class table
- */
-static int
-Module_setter_music (lua_State* lua)
-{
-#ifndef LI_DISABLE_SOUND
-	const char* value;
-	licliModule* module;
-	lisndSample* sample;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	value = luaL_checkstring (lua, 3);
-
-	/* Set sound effect. */
-	if (module->client->sound != NULL)
-	{
-		sample = licli_module_find_sample_by_name (module, value);
-		if (sample != NULL)
-		{
-			/* FIXME: Doesn't work if already playing. */
-			lisnd_source_queue_sample (module->music, sample);
-			lisnd_source_set_looping (module->music, 1);
-			lisnd_source_set_playing (module->music, 1);
-		}
-	}
-#else
-	liscr_checkclass (lua, 1, LICLI_SCRIPT_MODULE);
-#endif
-
-	return 0;
-}
-
-/* @luadoc
- * ---
  * -- Root widget.
  * -- @name Module.root
  * -- @class table
@@ -402,7 +366,6 @@ licliModuleScript (liscrClass* self,
 	liscr_class_insert_getter (self, "cursor_pos", Module_getter_cursor_pos);
 	liscr_class_insert_getter (self, "moving", Module_getter_moving);
 	liscr_class_insert_setter (self, "moving", Module_setter_moving);
-	liscr_class_insert_setter (self, "music", Module_setter_music);
 	liscr_class_insert_setter (self, "root", Module_setter_root);
 	liscr_class_insert_setter (self, "sky", Module_setter_sky);
 	liscr_class_insert_setter (self, "title", Module_setter_title);

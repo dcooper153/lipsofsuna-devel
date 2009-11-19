@@ -42,10 +42,6 @@ private_object_destroy (licliModule* module,
                         liarcReader* reader);
 
 static int
-private_object_effect (licliModule* module,
-                       liarcReader* reader);
-
-static int
 private_object_graphic (licliModule* module,
                         liarcReader* reader);
 
@@ -86,9 +82,6 @@ licli_module_handle_packet (licliModule* self,
 			break;
 		case LINET_SERVER_PACKET_OBJECT_DESTROY:
 			private_object_destroy (self, reader);
-			break;
-		case LINET_SERVER_PACKET_OBJECT_EFFECT:
-			private_object_effect (self, reader);
 			break;
 		case LINET_SERVER_PACKET_OBJECT_GRAPHIC:
 			private_object_graphic (self, reader);
@@ -249,31 +242,6 @@ private_object_destroy (licliModule* module,
 		return 1;
 	lieng_object_set_selected (object, 0);
 	lieng_object_set_realized (object, 0);
-
-	return 1;
-}
-
-static int
-private_object_effect (licliModule* module,
-                       liarcReader* reader)
-{
-	uint32_t id;
-	uint16_t effect;
-	uint16_t flags;
-	liengObject* object;
-
-	/* Parse the packet. */
-	if (!liarc_reader_get_uint32 (reader, &id) ||
-	    !liarc_reader_get_uint16 (reader, &effect) ||
-	    !liarc_reader_get_uint16 (reader, &flags) ||
-	    !liarc_reader_check_end (reader))
-		return 0;
-
-	/* Change the graphics of the object. */
-	object = licli_module_find_object (module, id);
-	if (object == NULL)
-		return 1;
-	licli_object_set_effect (object, effect, flags);
 
 	return 1;
 }

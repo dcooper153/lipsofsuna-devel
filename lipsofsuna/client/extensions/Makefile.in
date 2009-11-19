@@ -177,6 +177,14 @@ libslots_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(libslots_cli_la_LDFLAGS) $(LDFLAGS) \
 	-o $@
+libsound_cli_la_DEPENDENCIES =  \
+	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+am_libsound_cli_la_OBJECTS = sound/ext-module.lo sound/ext-script.lo
+libsound_cli_la_OBJECTS = $(am_libsound_cli_la_OBJECTS)
+libsound_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(libsound_cli_la_LDFLAGS) $(LDFLAGS) \
+	-o $@
 libvoxel_cli_la_DEPENDENCIES =  \
 	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
 am_libvoxel_cli_la_OBJECTS = voxel/ext-block.lo voxel/ext-module.lo \
@@ -226,15 +234,15 @@ SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
 	$(libevents_cli_la_SOURCES) $(libgenerator_cli_la_SOURCES) \
 	$(liboptions_cli_la_SOURCES) $(libpackager_cli_la_SOURCES) \
 	$(libreload_cli_la_SOURCES) $(libskills_cli_la_SOURCES) \
-	$(libslots_cli_la_SOURCES) $(libvoxel_cli_la_SOURCES) \
-	$(libwidgets_cli_la_SOURCES)
+	$(libslots_cli_la_SOURCES) $(libsound_cli_la_SOURCES) \
+	$(libvoxel_cli_la_SOURCES) $(libwidgets_cli_la_SOURCES)
 DIST_SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
 	$(libeditor_cli_la_SOURCES) $(libeffect_cli_la_SOURCES) \
 	$(libevents_cli_la_SOURCES) $(libgenerator_cli_la_SOURCES) \
 	$(liboptions_cli_la_SOURCES) $(libpackager_cli_la_SOURCES) \
 	$(libreload_cli_la_SOURCES) $(libskills_cli_la_SOURCES) \
-	$(libslots_cli_la_SOURCES) $(libvoxel_cli_la_SOURCES) \
-	$(libwidgets_cli_la_SOURCES)
+	$(libslots_cli_la_SOURCES) $(libsound_cli_la_SOURCES) \
+	$(libvoxel_cli_la_SOURCES) $(libwidgets_cli_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -418,6 +426,7 @@ ext_LTLIBRARIES = \
 	libreload-cli.la \
 	libskills-cli.la \
 	libslots-cli.la \
+	libsound-cli.la \
 	libvoxel-cli.la \
 	libwidgets-cli.la
 
@@ -526,6 +535,13 @@ libslots_cli_la_SOURCES = \
 	slots/ext-slot.h \
 	slots/ext-slots.c \
 	slots/ext-slots.h
+
+libsound_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libsound_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libsound_cli_la_SOURCES = \
+	sound/ext-module.c \
+	sound/ext-module.h \
+	sound/ext-script.c
 
 libvoxel_cli_la_LDFLAGS = -module -avoid-version -no-undefined
 libvoxel_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
@@ -768,6 +784,18 @@ slots/ext-slots.lo: slots/$(am__dirstamp) \
 	slots/$(DEPDIR)/$(am__dirstamp)
 libslots-cli.la: $(libslots_cli_la_OBJECTS) $(libslots_cli_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libslots_cli_la_LINK) -rpath $(extdir) $(libslots_cli_la_OBJECTS) $(libslots_cli_la_LIBADD) $(LIBS)
+sound/$(am__dirstamp):
+	@$(MKDIR_P) sound
+	@: > sound/$(am__dirstamp)
+sound/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) sound/$(DEPDIR)
+	@: > sound/$(DEPDIR)/$(am__dirstamp)
+sound/ext-module.lo: sound/$(am__dirstamp) \
+	sound/$(DEPDIR)/$(am__dirstamp)
+sound/ext-script.lo: sound/$(am__dirstamp) \
+	sound/$(DEPDIR)/$(am__dirstamp)
+libsound-cli.la: $(libsound_cli_la_OBJECTS) $(libsound_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libsound_cli_la_LINK) -rpath $(extdir) $(libsound_cli_la_OBJECTS) $(libsound_cli_la_LIBADD) $(LIBS)
 voxel/$(am__dirstamp):
 	@$(MKDIR_P) voxel
 	@: > voxel/$(am__dirstamp)
@@ -869,6 +897,10 @@ mostlyclean-compile:
 	-rm -f slots/ext-slot.lo
 	-rm -f slots/ext-slots.$(OBJEXT)
 	-rm -f slots/ext-slots.lo
+	-rm -f sound/ext-module.$(OBJEXT)
+	-rm -f sound/ext-module.lo
+	-rm -f sound/ext-script.$(OBJEXT)
+	-rm -f sound/ext-script.lo
 	-rm -f voxel/ext-block.$(OBJEXT)
 	-rm -f voxel/ext-block.lo
 	-rm -f voxel/ext-module.$(OBJEXT)
@@ -919,6 +951,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-slot.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-slots.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-block.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-script.Plo@am__quote@
@@ -968,6 +1002,7 @@ clean-libtool:
 	-rm -rf reload/.libs reload/_libs
 	-rm -rf skills/.libs skills/_libs
 	-rm -rf slots/.libs slots/_libs
+	-rm -rf sound/.libs sound/_libs
 	-rm -rf voxel/.libs voxel/_libs
 	-rm -rf widgets/.libs widgets/_libs
 
@@ -1103,6 +1138,8 @@ distclean-generic:
 	-rm -f skills/$(am__dirstamp)
 	-rm -f slots/$(DEPDIR)/$(am__dirstamp)
 	-rm -f slots/$(am__dirstamp)
+	-rm -f sound/$(DEPDIR)/$(am__dirstamp)
+	-rm -f sound/$(am__dirstamp)
 	-rm -f voxel/$(DEPDIR)/$(am__dirstamp)
 	-rm -f voxel/$(am__dirstamp)
 	-rm -f widgets/$(DEPDIR)/$(am__dirstamp)
@@ -1117,7 +1154,7 @@ clean-am: clean-extLTLIBRARIES clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf camera/$(DEPDIR) chat/$(DEPDIR) editor/$(DEPDIR) effect/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) options/$(DEPDIR) packager/$(DEPDIR) reload/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) voxel/$(DEPDIR) widgets/$(DEPDIR)
+	-rm -rf camera/$(DEPDIR) chat/$(DEPDIR) editor/$(DEPDIR) effect/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) options/$(DEPDIR) packager/$(DEPDIR) reload/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) sound/$(DEPDIR) voxel/$(DEPDIR) widgets/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1163,7 +1200,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf camera/$(DEPDIR) chat/$(DEPDIR) editor/$(DEPDIR) effect/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) options/$(DEPDIR) packager/$(DEPDIR) reload/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) voxel/$(DEPDIR) widgets/$(DEPDIR)
+	-rm -rf camera/$(DEPDIR) chat/$(DEPDIR) editor/$(DEPDIR) effect/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) options/$(DEPDIR) packager/$(DEPDIR) reload/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) sound/$(DEPDIR) voxel/$(DEPDIR) widgets/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

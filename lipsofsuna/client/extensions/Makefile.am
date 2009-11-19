@@ -14,6 +14,7 @@ ext_LTLIBRARIES = \
 	libreload-cli.la \
 	libskills-cli.la \
 	libslots-cli.la \
+	libsound-cli.la \
 	libvoxel-cli.la \
 	libwidgets-cli.la
 
@@ -122,6 +123,13 @@ libslots_cli_la_SOURCES = \
 	slots/ext-slot.h \
 	slots/ext-slots.c \
 	slots/ext-slots.h
+
+libsound_cli_la_LDFLAGS = -module -avoid-version -no-undefined
+libsound_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libsound_cli_la_SOURCES = \
+	sound/ext-module.c \
+	sound/ext-module.h \
+	sound/ext-script.c
 
 libvoxel_cli_la_LDFLAGS = -module -avoid-version -no-undefined
 libvoxel_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la

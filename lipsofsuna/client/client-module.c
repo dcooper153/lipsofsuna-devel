@@ -55,9 +55,6 @@ static int
 private_init_script (licliModule* self);
 
 static int
-private_init_sound (licliModule* self);
-
-static int
 private_init_widgets (licliModule* self);
 
 /*****************************************************************************/
@@ -103,7 +100,6 @@ licli_module_new (licliClient* client,
 	    !private_init_engine (self) ||
 	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
-	    !private_init_sound (self) ||
 	    !private_init_extensions (self) ||
 	    !private_init_script (self))
 		goto error;
@@ -159,12 +155,6 @@ licli_module_free (licliModule* self)
 		libnd_manager_free (self->bindings);
 	if (self->widgets != NULL)
 		liwdg_manager_free (self->widgets);
-#ifndef LI_DISABLE_SOUND
-	if (self->music != NULL)
-		lisnd_source_free (self->music);
-	if (self->sound != NULL)
-		lisnd_manager_free (self->sound);
-#endif
 	if (self->server != NULL)
 		lisrv_server_free (self->server);
 	if (self->paths != NULL)
@@ -212,72 +202,6 @@ licli_module_find_object (licliModule* self,
 {
 	return lieng_engine_find_object (self->engine, id);
 }
-
-#ifndef LI_DISABLE_SOUND
-/**
- * \brief Finds a sound sample by effect number.
- *
- * \param self Module.
- * \param id Effect number.
- * \return Sample owned by the module or NULL.
- */
-lisndSample*
-licli_module_find_sample_by_id (licliModule* self,
-                                int          id)
-{
-	liengSample* sample;
-
-	/* Find sample. */
-	sample = lieng_resources_find_sample_by_code (self->engine->resources, id);
-	if (sample == NULL || sample->invalid)
-		return NULL;
-	if (sample->data != NULL)
-		return sample->data;
-
-	/* Load sample. */
-	if (!lisnd_manager_set_sample (self->sound, sample->name, sample->path))
-	{
-		lisys_error_report ();
-		sample->invalid = 1;
-		return NULL;
-	}
-	sample->data = lisnd_manager_get_sample (self->sound, sample->name);
-
-	return sample->data;
-}
-
-/**
- * \brief Finds a sound sample by name.
- *
- * \param self Module.
- * \param name Name of the sample.
- * \return Sample owned by the module or NULL.
- */
-lisndSample*
-licli_module_find_sample_by_name (licliModule* self,
-                                  const char*  name)
-{
-	liengSample* sample;
-
-	/* Find sample. */
-	sample = lieng_resources_find_sample_by_name (self->engine->resources, name);
-	if (sample == NULL || sample->invalid)
-		return NULL;
-	if (sample->data != NULL)
-		return sample->data;
-
-	/* Load sample. */
-	if (!lisnd_manager_set_sample (self->sound, sample->name, sample->path))
-	{
-		lisys_error_report ();
-		sample->invalid = 1;
-		return NULL;
-	}
-	sample->data = lisnd_manager_get_sample (self->sound, sample->name);
-
-	return sample->data;
-}
-#endif
 
 /**
  * \brief Starts an embedded server.
@@ -758,22 +682,6 @@ private_init_script (licliModule* self)
 	lisys_free (path);
 	if (!ret)
 		return 0;
-
-	return 1;
-}
-
-static int
-private_init_sound (licliModule* self)
-{
-#ifndef LI_DISABLE_SOUND
-	if (self->client->sound == NULL)
-		return 1;
-	self->sound = lisnd_manager_new (self->client->sound);
-	self->music = lisnd_source_new (self->client->sound);
-	if (self->sound == NULL ||
-	    self->music == NULL)
-		return 0;
-#endif
 
 	return 1;
 }

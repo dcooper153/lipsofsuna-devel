@@ -25,9 +25,6 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
-#ifndef LI_DISABLE_SOUND
-#include <sound/lips-sound.h>
-#endif
 #include <video/lips-video.h>
 #include "client-module.h"
 #include "client-types.h"
@@ -39,9 +36,6 @@ struct _licliClient
 {
 	licliModule* module;
 	licliWindow* window;
-#ifndef LI_DISABLE_SOUND
-	lisndSystem* sound;
-#endif
 	lividCalls video;
 };
 

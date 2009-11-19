@@ -48,7 +48,6 @@ struct _licliObject
 {
 	uint16_t animation;
 	lialgList* speech;
-	lialgList* sounds;
 	licliModule* module;
 };
 
@@ -74,11 +73,6 @@ licli_object_set_animation (liengObject* self,
 void
 licli_object_set_controls (liengObject*         self,
                            const licliControls* controls);
-
-void
-licli_object_set_effect (liengObject* self,
-                         uint32_t     id,
-                         int          flags);
 
 void
 licli_object_set_speech (liengObject* self,

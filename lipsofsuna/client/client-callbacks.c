@@ -156,11 +156,6 @@ private_miscellaneous_tick (licliModule* module,
 	liengObject* player;
 	limatAabb bounds;
 	limatTransform transform;
-#ifndef LI_DISABLE_SOUND
-	limatVector direction;
-	limatVector velocity;
-	limatVector up;
-#endif
 
 	/* Update script. */
 	liscr_script_update (module->script, secs);
@@ -189,15 +184,6 @@ private_miscellaneous_tick (licliModule* module,
 		transform.position.y += bounds.max.y;
 		lieng_camera_set_center (module->camera, &transform);
 		lieng_camera_update (module->camera, secs);
-
-		/* Update listener state. */
-#ifndef LI_DISABLE_SOUND
-		direction = limat_quaternion_get_basis (transform.rotation, 2);
-		up = limat_quaternion_get_basis (transform.rotation, 1);
-		lieng_object_get_velocity (player, &velocity);
-		lisnd_system_set_listener (module->client->sound,
-			&transform.position, &velocity, &direction, &up);
-#endif
 	}
 
 	return 1;
