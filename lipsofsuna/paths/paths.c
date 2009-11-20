@@ -95,7 +95,7 @@ lipth_paths_new (const char* path,
 #else
 	self->global_state = LISAVEDIR;
 	if (!strcmp (name, "data"))
-		self->module_data = lisys_path_concat (self->global_state, "data", NULL);
+		self->module_state = lisys_path_concat (self->global_state, "data", NULL);
 	else
 		self->module_state = lisys_path_concat (self->global_state, "mods", name, NULL);
 	if (self->module_state == NULL)
