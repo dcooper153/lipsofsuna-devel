@@ -607,8 +607,8 @@ limdl_pose_set_model (limdlPose*  self,
 	for (fade = self->fades ; fade != NULL ; fade = fade_next)
 	{
 		fade_next = fade->next;
-		if (model != NULL && chan->animation_name != NULL)
-			anim = limdl_model_get_animation (model, chan->animation_name);
+		if (model != NULL && fade->animation_name != NULL)
+			anim = limdl_model_get_animation (model, fade->animation_name);
 		else
 			anim = NULL;
 		if (anim == NULL)
@@ -891,7 +891,7 @@ private_transform_node (limdlPose* self,
 		/* Apply fade influences. */
 		for (fade = self->fades ; fade != NULL ; fade = fade->next)
 		{
-			if (limdl_animation_get_transform (fade->animation, node->name, chan->time, &transform))
+			if (limdl_animation_get_transform (fade->animation, node->name, fade->time, &transform))
 			{
 				bonepos = transform.position;
 				bonerot = transform.rotation;

@@ -414,8 +414,6 @@ private_free (liextPreview* self)
 {
 	lialgPtrdicIter iter;
 
-	lical_callbacks_remove_callbacks (self->generator->voxels->callbacks,
-		self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	if (self->light0 != NULL)
 	{
 		lirnd_lighting_remove_light (self->scene->lighting, self->light0);
@@ -437,7 +435,11 @@ private_free (liextPreview* self)
 	if (self->camera != NULL)
 		lieng_camera_free (self->camera);
 	if (self->generator != NULL)
+	{
+		lical_callbacks_remove_callbacks (self->generator->voxels->callbacks,
+			self->calls, sizeof (self->calls) / sizeof (licalHandle));
 		ligen_generator_free (self->generator);
+	}
 	if (self->scene != NULL)
 		lirnd_scene_free (self->scene);
 }

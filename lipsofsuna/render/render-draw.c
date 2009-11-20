@@ -67,6 +67,7 @@ lirnd_draw_bounds (lirndContext* context,
 	limatAabb aabb;
 
 	/* Render bounds. */
+	lirnd_object_get_bounds (object, &aabb);
 	glBegin (GL_LINE_LOOP);
 	glVertex3f (aabb.min.x, aabb.min.y, aabb.min.z);
 	glVertex3f (aabb.max.x, aabb.min.y, aabb.min.z);

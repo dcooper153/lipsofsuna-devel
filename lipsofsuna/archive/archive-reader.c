@@ -341,7 +341,7 @@ int
 liarc_reader_get_float (liarcReader* self,
                         float*       value)
 {
-	uint8_t tmp[4];
+	union { float f; uint8_t b[4]; } tmp;
 
 	/* Check for read errors. */
 	if (self->pos >= self->length - 3)
@@ -352,17 +352,17 @@ liarc_reader_get_float (liarcReader* self,
 
 	/* Read the value. */
 #if LI_BYTE_ORDER == LI_LITTLE_ENDIAN
-	tmp[0] = ((uint8_t*)(self->buffer + self->pos))[3];
-	tmp[1] = ((uint8_t*)(self->buffer + self->pos))[2];
-	tmp[2] = ((uint8_t*)(self->buffer + self->pos))[1];
-	tmp[3] = ((uint8_t*)(self->buffer + self->pos))[0];
+	tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[3];
+	tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[2];
+	tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[1];
+	tmp.b[3] = ((uint8_t*)(self->buffer + self->pos))[0];
 #else
-	tmp[0] = ((uint8_t*)(self->buffer + self->pos))[0];
-	tmp[1] = ((uint8_t*)(self->buffer + self->pos))[1];
-	tmp[2] = ((uint8_t*)(self->buffer + self->pos))[2];
-	tmp[3] = ((uint8_t*)(self->buffer + self->pos))[3];
+	tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[0];
+	tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[1];
+	tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[2];
+	tmp.b[3] = ((uint8_t*)(self->buffer + self->pos))[3];
 #endif
-	*value = *((float*) &tmp);
+	*value = tmp.f;
 	self->pos += 4;
 	return 1;
 }

@@ -25,9 +25,9 @@
 #ifndef __VIDEO_CALLS_H__
 #define __VIDEO_CALLS_H__
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_main.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_main.h>
+#include <SDL_ttf.h>
 #include <system/lips-system.h>
 
 typedef struct _lividCalls lividCalls;

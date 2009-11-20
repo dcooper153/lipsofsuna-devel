@@ -162,7 +162,7 @@ livox_voxel_iter_first (livoxVoxelIter* self,
 
 	/* Find first valid sector. */
 	if (!lialg_range_iter_first (&self->rangei0, &self->range0))
-		return 0;
+		goto empty;
 	while (1)
 	{
 		if (self->load)
@@ -174,7 +174,7 @@ livox_voxel_iter_first (livoxVoxelIter* self,
 		if (!lialg_range_iter_next (&self->rangei0))
 		{
 			self->sector = NULL;
-			return 0;
+			goto empty;
 		}
 	}
 
@@ -197,6 +197,15 @@ livox_voxel_iter_first (livoxVoxelIter* self,
 	self->voxel[2] = self->rangei1.z;
 
 	return 1;
+
+empty:
+	self->range1 = lialg_range_new (0, 0, 0, 0, 0, 0);
+	lialg_range_iter_first (&self->rangei1, &self->range1);
+	self->voxel[0] = 0;
+	self->voxel[1] = 0;
+	self->voxel[2] = 0;
+
+	return 0;
 }
 
 static inline int

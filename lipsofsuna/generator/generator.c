@@ -85,9 +85,6 @@ ligen_generator_new (lipthPaths* paths)
 	ligen_generator_set_fill (self, 1);
 
 	/* Allocate terrain structures. */
-	self->physics = liphy_physics_new ();
-	if (self->physics == NULL)
-		goto error;
 	self->voxels = livox_manager_new ();
 	if (self->voxels == NULL)
 		goto error;
@@ -123,8 +120,6 @@ ligen_generator_free (ligenGenerator* self)
 	}
 	if (self->voxels != NULL)
 		livox_manager_free (self->voxels);
-	if (self->physics != NULL)
-		liphy_physics_free (self->physics);
 	if (self->gensql != NULL)
 		sqlite3_close (self->gensql);
 	if (self->srvsql != NULL)

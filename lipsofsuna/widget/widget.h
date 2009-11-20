@@ -25,7 +25,7 @@
 #ifndef __WIDGET_H__
 #define __WIDGET_H__
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <callback/lips-callback.h>
 #include "widget-class.h"
 #include "widget-event.h"

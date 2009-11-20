@@ -367,6 +367,8 @@ Voxel_rotate_voxel (lua_State* lua)
 		axis = 0;
 	if (!lua_isnoneornil (lua, 4))
 		step = luaL_checkinteger (lua, 4);
+	else
+		step = 1;
 
 	lua_pushboolean (lua, livox_manager_rotate_voxel (module->voxels, center->data, axis, step));
 

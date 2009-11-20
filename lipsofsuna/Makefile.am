@@ -6,37 +6,37 @@ if MAYBE_SERVER
 SUBDIRS += server/extensions
 endif
 
-AM_CFLAGS = $(LISRV_CFLAGS)
-AM_CXXFLAGS = $(CXXFLAGS) $(LISRV_CFLAGS)
+AM_CFLAGS = $(LICLI_CFLAGS)
+AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+INCLUDES = -I$(top_srcdir)
+EXTRA_DIST = math/unittest.c
 
 prgdir = $(PROGDIR)
 prg_PROGRAMS = lipsofsuna
-bin_PROGRAMS = 
-lib_LTLIBRARIES = liblipsofsunacommon.la
+bin_PROGRAMS =
+lib_LTLIBRARIES =
 if MAYBE_CLIENT
 bin_PROGRAMS += lipsofsuna-client
+lib_LTLIBRARIES += liblipsofsunaclient.la
 endif
 if MAYBE_GENERATOR
 bin_PROGRAMS += lipsofsuna-generator
+lib_LTLIBRARIES += liblipsofsunagenerator.la
 endif
 if MAYBE_IMPORT
 bin_PROGRAMS += lipsofsuna-import
+lib_LTLIBRARIES += liblipsofsunaimport.la
 endif
 if MAYBE_SERVER
 bin_PROGRAMS += lipsofsuna-server
+lib_LTLIBRARIES += liblipsofsunaserver.la
 endif
 if MAYBE_VIEWER
 bin_PROGRAMS += lipsofsuna-viewer
-endif
-if MAYBE_CLIENT_LIBRARY
-lib_LTLIBRARIES += liblipsofsunaclient.la
-endif
-if MAYBE_SERVER_LIBRARY
-lib_LTLIBRARIES += liblipsofsunaserver.la
+lib_LTLIBRARIES += liblipsofsunaviewer.la
 endif
 
-INCLUDES = -I$(top_srcdir)
-EXTRA_DIST = src/math/unittest.c
+##############################################################################
 
 aidir = $(includedir)/lipsofsuna/ai
 ai_HEADERS = \
@@ -188,7 +188,8 @@ gen_HEADERS = \
 	generator/lips-generator.h \
 	generator/generator.h \
 	generator/generator-brush.h \
-	generator/generator-rule.h
+	generator/generator-rule.h \
+	generator/generator-types.h
 gensrc = \
 	generator/generator.c \
 	generator/generator-brush.c \
@@ -221,7 +222,6 @@ mat_HEADERS = \
 	math/math-halton.h \
 	math/math-intersect.h \
 	math/math-matrix.h \
-	math/math-marching-cubes.h \
 	math/math-plane.h \
 	math/math-polygon.h \
 	math/math-quadratic.h \
@@ -233,8 +233,7 @@ mat_HEADERS = \
 	math/math-vector.h \
 	math/math-vertex.h
 matsrc = \
-	math/math-camera.c \
-	math/math-marching-cubes.c
+	math/math-camera.c
 
 mdldir = $(includedir)/lipsofsuna/model
 mdl_HEADERS = \
@@ -275,6 +274,7 @@ netsrc = \
 
 pardir = $(includedir)/lipsofsuna/particle
 par_HEADERS = \
+	particle/lips-particle.h \
 	particle/particle-line.h \
 	particle/particle-manager.h \
 	particle/particle-point.h
@@ -493,6 +493,7 @@ voxsrc = \
 	voxel/voxel-block.c \
 	voxel/voxel-manager.c \
 	voxel/voxel-material.c \
+	voxel/voxel-private.h \
 	voxel/voxel-sector.c
 
 wdgdir = $(includedir)/lipsofsuna/widget
@@ -544,62 +545,71 @@ wdgsrc = \
 	widget/widget-tree.c \
 	widget/widget-window.c
 
-liblipsofsunacommon_la_LDFLAGS = -no-undefined
-liblipsofsunacommon_la_LIBADD = $(LISRV_LIBS)
-liblipsofsunacommon_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) \
-	$(thrsrc) $(voxsrc)
+##############################################################################
 
-liblipsofsunaclient_la_CFLAGS = $(LICLI_CFLAGS)
-liblipsofsunaclient_la_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
 liblipsofsunaclient_la_LDFLAGS = -no-undefined
-liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS) liblipsofsunaserver.la liblipsofsunacommon.la
+liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS) -lpng
 liblipsofsunaclient_la_SOURCES = \
-	$(bndsrc) $(clisrc) $(fntsrc) $(gensrc) $(imgsrc) $(parsrc) $(relsrc) \
-	$(rndsrc) $(sndsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
+	$(fntsrc) $(gensrc) $(engsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
+	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
+	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 liblipsofsunaserver_la_LDFLAGS = -no-undefined
-liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS) liblipsofsunacommon.la
-liblipsofsunaserver_la_SOURCES = $(srvsrc)
-liblipsofsunaserver_la_headers = $(srvhdr)
+liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
+liblipsofsunaserver_la_SOURCES = \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
+	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
 
-lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_CFLAGS = $(LIPS_CFLAGS)
-lipsofsuna_SOURCES = $(maisrc) \
-	system/system-error.c \
-	system/system-execute.c \
-	system/system-memory.c \
-	system/system-path.c \
-	system/system-relative.c
+liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) -lz
+liblipsofsunagenerator_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(gensrc) $(matsrc) $(mdlsrc) \
+	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
-lipsofsuna_client_CFLAGS = $(LICLI_CFLAGS)
-lipsofsuna_client_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lpng
-lipsofsuna_client_SOURCES = client/client-main.c
-
-lipsofsuna_generator_LDADD = liblipsofsunacommon.la
-lipsofsuna_generator_SOURCES = $(gensrc) generator/generator-main.c
-
-lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_import_CFLAGS = $(LIPS_CFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_import_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_import_LDADD = liblipsofsunacommon.la $(SQUISH_LIBS) -lpng
-lipsofsuna_import_SOURCES = $(relsrc) \
+liblipsofsunaimport_la_LIBADD = $(SQUISH_LIBS) $(SQLITE_LIBS) -lpng
+liblipsofsunaimport_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(cfgsrc) $(matsrc) $(mdlsrc) $(pthsrc) $(relsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) \
 	image/image.c \
 	image/image.h \
 	image/image-compress.cpp \
 	image/image-compress.h \
-	image/image-dds.h \
-	reload/reload-main.c
+	image/image-dds.h
 
+liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
+liblipsofsunaviewer_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(cfgsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
+	$(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(strsrc) $(syssrc) $(thrsrc) \
+	$(vidsrc) $(viesrc)
+
+##############################################################################
+
+lipsofsuna_CFLAGS = $(AM_CFLAGS)
+lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_SOURCES = $(maisrc) $(syssrc)
+
+lipsofsuna_client_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_client_LDADD = liblipsofsunaclient.la
+lipsofsuna_client_SOURCES = client/client-main.c
+
+lipsofsuna_generator_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_generator_LDADD = liblipsofsunagenerator.la
+lipsofsuna_generator_SOURCES = generator/generator-main.c
+
+lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_import_LDADD = liblipsofsunaimport.la
+lipsofsuna_import_SOURCES = reload/reload-main.c
+
+lipsofsuna_server_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
 lipsofsuna_server_LDADD = liblipsofsunaserver.la
 lipsofsuna_server_SOURCES = server/server-main.c
 
-lipsofsuna_viewer_CFLAGS = $(LICLI_CFLAGS)
-lipsofsuna_viewer_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf -lpng
-lipsofsuna_viewer_SOURCES = $(viesrc) viewer/viewer-main.c
+lipsofsuna_viewer_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la
+lipsofsuna_viewer_SOURCES = viewer/viewer-main.c
+
+##############################################################################
 
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)

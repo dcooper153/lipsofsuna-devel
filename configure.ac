@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT([Lips of Suna], [0.0.2], [http://lipsofsuna.org], [lipsofsuna])
+AC_INIT([Lips of Suna], [0.0.3], [http://lipsofsuna.org], [lipsofsuna])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([silent-rules subdir-objects tar-ustar])
@@ -23,7 +23,7 @@ AC_ARG_ENABLE([luatest], AC_HELP_STRING([--disable-luatest], [Do not try to dete
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
 AC_ARG_ENABLE([builtin], AC_HELP_STRING([--enable-builtin], [Compile all built-in dependencies]), [want_builtin_all=yes], [])
 AC_ARG_ENABLE([builtin-bullet], AC_HELP_STRING([--enable-builtin-bullet], [Compile built-in Bullet]), [want_builtin_bullet=yes], [])
-AC_ARG_ENABLE([builtin-glew], AC_HELP_STRING([--enable-builtin-lua], [Compile built-in GLEW]), [want_builtin_glew=yes], [])
+AC_ARG_ENABLE([builtin-glew], AC_HELP_STRING([--enable-builtin-glew], [Compile built-in GLEW]), [want_builtin_glew=yes], [])
 AC_ARG_ENABLE([builtin-grapple], AC_HELP_STRING([--enable-builtin-grapple], [Compile built-in Grapple]), [want_builtin_grapple=yes], [])
 AC_ARG_ENABLE([builtin-lua], AC_HELP_STRING([--enable-builtin-lua], [Compile built-in Lua]), [want_builtin_lua=yes], [])
 AC_ARG_ENABLE([builtin-sqlite], AC_HELP_STRING([--enable-builtin-sqlite], [Compile built-in SQLite]), [want_builtin_sqlite=yes], [])
@@ -183,7 +183,7 @@ else
 fi
 
 dnl Sound support.
-if test "$want_sound" = yes -a "$want_client" = yes; then
+if test "$xwant_sound" = xyes -a "$xwant_client" = xyes; then
 	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
 	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
 else
@@ -215,8 +215,6 @@ else
 fi
 
 dnl Programs to build.
-AM_CONDITIONAL([MAYBE_CLIENT_LIBRARY], [test "$want_client" = yes -o "$want_viewer" = yes])
-AM_CONDITIONAL([MAYBE_SERVER_LIBRARY], [test "$want_generator" = yes -o "$want_server" = yes])
 AM_CONDITIONAL([MAYBE_CLIENT], [test "$want_client" = yes])
 AM_CONDITIONAL([MAYBE_GENERATOR], [test "$want_generator" = yes])
 AM_CONDITIONAL([MAYBE_IMPORT], [test "$want_import" = yes])

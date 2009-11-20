@@ -94,7 +94,10 @@ lipth_paths_new (const char* path,
 		goto error;
 #else
 	self->global_state = LISAVEDIR;
-	self->module_state = lisys_path_concat (self->global_state, name, NULL);
+	if (!strcmp (name, "data"))
+		self->module_data = lisys_path_concat (self->global_state, "data", NULL);
+	else
+		self->module_state = lisys_path_concat (self->global_state, "mods", name, NULL);
 	if (self->module_state == NULL)
 		goto error;
 #endif
@@ -253,25 +256,21 @@ lipth_paths_get_sql (const lipthPaths* self,
 char*
 lipth_paths_get_root ()
 {
+#ifdef LI_RELATIVE_PATHS
 	char* tmp;
 	char* path;
 
 	/* Resolve game directory. */
-#ifdef LI_RELATIVE_PATHS
 	tmp = lisys_relative_exedir ();
 	if (tmp == NULL)
 		return NULL;
 	path = lisys_path_format (tmp, LISYS_PATH_STRIPLAST, NULL);
 	lisys_free (tmp);
-	if (path == NULL)
-		return NULL;
-#else
-	path = listr_dup (DATADIR);
-	if (path == NULL)
-		return NULL;
-#endif
 
 	return path;
+#else
+	return listr_dup (LIDATADIR);
+#endif
 }
 
 /** @} */

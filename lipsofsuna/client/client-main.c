@@ -22,8 +22,8 @@
  * @{
  */
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_main.h>
+#include <SDL.h>
+#include <SDL_main.h>
 #include "client.h"
 
 int

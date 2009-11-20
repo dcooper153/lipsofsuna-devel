@@ -48,7 +48,6 @@ struct _ligenGenerator
 	liarcSql* gensql;
 	liarcSql* srvsql;
 	lipthPaths* paths;
-	liphyPhysics* physics;
 	livoxManager* voxels;
 	struct
 	{

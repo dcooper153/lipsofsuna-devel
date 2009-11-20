@@ -1,6 +1,7 @@
 ACLOCAL_AMFLAGS = -I m4
 INCLUDES = -I$(srcdir)
 AM_CFLAGS = -g -Wall
+EXTRA_DIST = singlecolourlookup.inl
 
 lib_LTLIBRARIES = \
 	libsquish.la
