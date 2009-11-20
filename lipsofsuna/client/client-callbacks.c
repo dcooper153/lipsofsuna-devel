@@ -155,7 +155,9 @@ private_miscellaneous_tick (licliModule* module,
 {
 	liengObject* player;
 	limatAabb bounds;
+	limdlNode* node;
 	limatTransform transform;
+	limatTransform transform0;
 
 	/* Update script. */
 	liscr_script_update (module->script, secs);
@@ -182,10 +184,18 @@ private_miscellaneous_tick (licliModule* module,
 	/* Update camera center. */
 	if (player != NULL && module->network != NULL)
 	{
-		/* Update player transform. */
 		lieng_object_get_transform (player, &transform);
-		lieng_object_get_bounds (player, &bounds);
-		transform.position.y += bounds.max.y;
+		node = lieng_object_find_node (player, module->camera_node);
+		if (node != NULL && lieng_camera_get_driver (module->camera) == LIENG_CAMERA_DRIVER_FIRSTPERSON)
+		{
+			limdl_node_get_world_transform (node, &transform0);
+			transform = limat_transform_multiply (transform, transform0);
+		}
+		else
+		{
+			lieng_object_get_bounds (player, &bounds);
+			transform.position.y += bounds.max.y;
+		}
 		lieng_camera_set_center (module->camera, &transform);
 		lieng_camera_update (module->camera, secs);
 	}

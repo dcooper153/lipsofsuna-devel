@@ -79,6 +79,10 @@ lieng_object_approach (liengObject*       self,
                        const limatVector* target,
                        float              speed);
 
+limdlNode*
+lieng_object_find_node (liengObject* self,
+                        const char*  name);
+
 void
 lieng_object_impulse (liengObject*       self,
                       const limatVector* point,

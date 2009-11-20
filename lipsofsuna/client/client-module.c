@@ -158,6 +158,7 @@ licli_module_free (licliModule* self)
 		lisrv_server_free (self->server);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
+	lisys_free (self->camera_node);
 	lisys_free (self->login);
 	lisys_free (self->password);
 	lisys_free (self->path);
@@ -522,6 +523,9 @@ private_init_camera (licliModule* self)
 {
 	GLint viewport[4];
 
+	self->camera_node = strdup ("#camera");
+	if (self->camera_node == NULL)
+		return 0;
 	self->camera = lieng_camera_new (self->engine);
 	if (self->camera == NULL)
 		return 0;

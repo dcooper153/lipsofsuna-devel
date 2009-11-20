@@ -131,6 +131,27 @@ lieng_object_approach (liengObject*       self,
 }
 
 /**
+ * \brief Finds a node by name.
+ *
+ * Searches for a pose node if the object has a pose associated to it and a
+ * model node otherwise.
+ *
+ * \param self Object.
+ * \param name Node name or NULL.
+ */
+limdlNode*
+lieng_object_find_node (liengObject* self,
+                        const char*  name)
+{
+	if (self->pose != NULL)
+		return limdl_pose_find_node (self->pose, name);
+	if (self->model != NULL)
+		return limdl_model_find_node (self->model->model, name);
+
+	return NULL;
+}
+
+/**
  * \brief Modifies the velocity of the object with an impulse.
  *
  * \param self Object.

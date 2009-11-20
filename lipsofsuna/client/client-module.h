@@ -49,6 +49,7 @@ struct _licliModule
 	char* path;
 	char* login;
 	char* password;
+	char* camera_node;
 	lialgStrdic* extensions;
 	libndManager* bindings;
 	licliClient* client;
