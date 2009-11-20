@@ -330,22 +330,21 @@ lieng_engine_load_model (liengEngine* self,
 	if (model == NULL)
 		return 0;
 
-	/* Remove old instances. */
+	/* Mark affected objects. */
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
 		if (object->model == model)
-		{
 			object->flags |= LIENG_OBJECT_FLAG_RELOAD;
-			lieng_object_set_model (object, NULL);
-		}
 	}
 
 	/* Reload model. */
 	lieng_model_unload (model);
 	lieng_model_load (model);
 
-	/* Create new instances. */
+	/* Rebuild affected objects. */
+	/* TODO: Constraints are currently rebuild by lieng_object_set_model so
+	         this loop can result to a lot of unnecessary rebuilds. */
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;

@@ -40,6 +40,8 @@ lieng_constraint_new (liengObject* first_object,
 	self->objects[1] = second_object;
 	self->nodes[0] = limdl_pose_find_node (first_object->pose, first_anchor);
 	self->nodes[1] = limdl_pose_find_node (second_object->pose, second_anchor);
+	self->node_names[0] = strdup (first_anchor);
+	self->node_names[1] = strdup (second_anchor);
 
 	return self;
 }
@@ -49,10 +51,28 @@ lieng_constraint_free (liengConstraint* self)
 {
 	assert (self->next == NULL);
 	assert (self->prev == NULL);
+	lisys_free (self->node_names[0]);
+	lisys_free (self->node_names[1]);
 	lisys_free (self);
 }
 
-/*****************************************************************************/
+/**
+ * \brief Called when a models of a constrained object changes.
+ *
+ * \param self Constraint.
+ */
+void
+lieng_constraint_rebuild (liengConstraint* self)
+{
+	if (self->node_names[0] != NULL)
+		self->nodes[0] = lieng_object_find_node (self->objects[0], self->node_names[0]);
+	else
+		self->nodes[0] = NULL;
+	if (self->node_names[1] != NULL)
+		self->nodes[1] = lieng_object_find_node (self->objects[1], self->node_names[1]);
+	else
+		self->nodes[1] = NULL;
+}
 
 /**
  * \brief Updates the constraint.

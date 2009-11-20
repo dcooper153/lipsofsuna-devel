@@ -26,6 +26,9 @@
 #include "model-pose.h"
 
 static void
+private_channel_free (limdlPoseChannel* chan);
+
+static void
 private_clear_node (limdlPose*       self,
                     limdlNode*       node,
                     const limdlNode* rest);
@@ -36,6 +39,13 @@ private_clear_pose (limdlPose* self);
 static limdlPoseChannel*
 private_create_channel (limdlPose* self,
                         int        channel);
+
+static void
+private_fade_free (limdlPoseFade* fade);
+
+static void
+private_fade_remove (limdlPose*     self,
+                     limdlPoseFade* fade);
 
 static limdlPoseChannel*
 private_find_channel (const limdlPose* self,
@@ -102,52 +112,9 @@ error:
 void
 limdl_pose_free (limdlPose* self)
 {
-	int i;
-	lialgU32dicIter iter;
-	limdlPoseFade* fade;
-	limdlPoseFade* fade_next;
-	limdlPoseChannel* chan;
-
-	/* Free fades. */
-	for (fade = self->fades ; fade != NULL ; fade = fade_next)
-	{
-		fade_next = fade->next;
-		lisys_free (fade);
-	}
-
-	/* Free channel tree. */
+	private_clear_pose (self);
 	if (self->channels != NULL)
-	{
-		LI_FOREACH_U32DIC (iter, self->channels)
-		{
-			chan = iter.value;
-			lisys_free (chan);
-		}
 		lialg_u32dic_free (self->channels);
-	}
-
-	/* Free nodes. */
-	if (self->nodes.array != NULL)
-	{
-		for (i = 0 ; i < self->nodes.count ; i++)
-		{
-			if (self->nodes.array[i] != NULL)
-				limdl_node_free (self->nodes.array[i]);
-		}
-		lisys_free (self->nodes.array);
-	}
-
-	/* Free weight groups. */
-	if (self->groups.array != NULL)
-	{
-		for (i = 0 ; i < self->groups.count ; i++)
-		{
-			lisys_free (self->groups.array[i].name);
-			lisys_free (self->groups.array[i].bone);
-		}
-		lisys_free (self->groups.array);
-	}
-
 	lisys_free (self);
 }
 
@@ -170,7 +137,7 @@ limdl_pose_destroy_channel (limdlPose* self,
 	if (chan == NULL)
 		return;
 	lialg_u32dic_remove (self->channels, channel);
-	lisys_free (chan);
+	private_channel_free (chan);
 }
 
 /**
@@ -298,13 +265,8 @@ limdl_pose_update (limdlPose* self,
 		fade->weight -= secs * fade->rate;
 		if (fade->weight <= 0.0f)
 		{
-			if (fade->next != NULL)
-				fade->next->prev = fade->prev;
-			if (fade->prev != NULL)
-				fade->prev->next = fade->next;
-			else
-				self->fades = fade->next;
-			lisys_free (fade);
+			private_fade_remove (self, fade);
+			private_fade_free (fade);
 		}
 	}
 
@@ -452,6 +414,8 @@ limdl_pose_set_channel_animation (limdlPose*  self,
 		return;
 	chan->time = 0.0f;
 	chan->animation = anim;
+	lisys_free (chan->animation_name);
+	chan->animation_name = strdup (animation);
 }
 
 const char*
@@ -590,7 +554,12 @@ int
 limdl_pose_set_model (limdlPose*  self,
                       limdlModel* model)
 {
+	lialgU32dicIter iter;
+	limdlAnimation* anim;
 	limdlPose backup;
+	limdlPoseChannel* chan;
+	limdlPoseFade* fade;
+	limdlPoseFade* fade_next;
 
 	/* Backup old data. */
 	memcpy (&backup, self, sizeof (limdlPose));
@@ -602,7 +571,7 @@ limdl_pose_set_model (limdlPose*  self,
 	self->nodes.count = 0;
 	self->nodes.array = NULL;
 
-	/* Create new pose data. */
+	/* Initialize new pose. */
 	if (model != NULL)
 	{
 		if (!private_init_pose (self, model))
@@ -613,15 +582,56 @@ limdl_pose_set_model (limdlPose*  self,
 		}
 	}
 
-	/* Replace old data. */
-	/* This also clears the incompatible channels and fade sequences. */
+	/* Clear invalid animations. */
 	self->channels = backup.channels;
+	backup.channels = NULL;
+	LI_FOREACH_U32DIC (iter, self->channels)
+	{
+		chan = iter.value;
+		if (model != NULL && chan->animation_name != NULL)
+			anim = limdl_model_get_animation (model, chan->animation_name);
+		else
+			anim = NULL;
+		if (anim == NULL)
+		{
+			lialg_u32dic_remove (self->channels, iter.key);
+			private_channel_free (chan);
+		}
+		else
+			chan->animation = anim;
+	}
+
+	/* Clear invalid fades. */
+	self->fades = backup.fades;
+	backup.fades = NULL;
+	for (fade = self->fades ; fade != NULL ; fade = fade_next)
+	{
+		fade_next = fade->next;
+		if (model != NULL && chan->animation_name != NULL)
+			anim = limdl_model_get_animation (model, chan->animation_name);
+		else
+			anim = NULL;
+		if (anim == NULL)
+		{
+			private_fade_remove (self, fade);
+			private_fade_free (fade);
+		}
+	}
+
+	/* Clear old data. */
 	private_clear_pose (&backup);
 
 	return 1;
 }
 
 /*****************************************************************************/
+
+static void
+private_channel_free (limdlPoseChannel* chan)
+{
+	lisys_free (chan->animation_name);
+	lisys_free (chan);
+}
 
 static void
 private_clear_node (limdlPose*       self,
@@ -648,13 +658,12 @@ private_clear_pose (limdlPose* self)
 	lialgU32dicIter iter;
 	limdlPoseFade* fade;
 	limdlPoseFade* fade_next;
-	limdlPoseChannel* chan;
 
 	/* Free fades. */
 	for (fade = self->fades ; fade != NULL ; fade = fade_next)
 	{
 		fade_next = fade->next;
-		lisys_free (fade);
+		private_fade_free (fade);
 	}
 	self->fades = NULL;
 
@@ -662,10 +671,7 @@ private_clear_pose (limdlPose* self)
 	if (self->channels != NULL)
 	{
 		LI_FOREACH_U32DIC (iter, self->channels)
-		{
-			chan = iter.value;
-			lisys_free (chan);
-		}
+			private_channel_free (iter.value);
 		lialg_u32dic_clear (self->channels);
 	}
 
@@ -711,8 +717,28 @@ private_create_channel (limdlPose* self,
 	}
 	chan->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
 	chan->animation = &private_empty_anim;
+	chan->animation_name = strdup ("idle");
 
 	return chan;
+}
+
+static void
+private_fade_free (limdlPoseFade* fade)
+{
+	lisys_free (fade->animation_name);
+	lisys_free (fade);
+}
+
+static void
+private_fade_remove (limdlPose*     self,
+                     limdlPoseFade* fade)
+{
+	if (fade->next != NULL)
+		fade->next->prev = fade->prev;
+	if (fade->prev != NULL)
+		fade->prev->next = fade->next;
+	else
+		self->fades = fade->next;
 }
 
 static limdlPoseChannel*

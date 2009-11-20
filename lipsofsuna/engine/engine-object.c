@@ -971,10 +971,23 @@ private_callback_update (liengObject* self,
 	}
 }
 
+/**
+ * \brief Sets the model of the object.
+ *
+ * \warning This function is also called by #lieng_engine_load_model when a
+ * model has been reloaded so we must not early exit even if the model is the
+ * same.
+ *
+ * \param self Object.
+ * \param model Model.
+ * \return Nonzero on success.
+ */
 static int
 private_callback_set_model (liengObject* self,
                             liengModel*  model)
 {
+	liengConstraint* constraint;
+
 	/* Switch model. */
 	if (model != NULL)
 	{
@@ -987,6 +1000,15 @@ private_callback_set_model (liengObject* self,
 		liphy_object_set_shape (self->physics, NULL);
 	}
 	self->model = model;
+
+	/* Rebuild constraints. */
+	/* TODO: Looping through all constraints in the engine is wasteful. */
+	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint->next)
+	{
+		if (constraint->objects[0] == self ||
+		    constraint->objects[1] == self)
+			lieng_constraint_rebuild (constraint);
+	}
 
 	/* Invoke callbacks. */
 	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, self, model);

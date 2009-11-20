@@ -30,6 +30,7 @@
 
 struct _liengConstraint
 {
+	char* node_names[2];
 	liengConstraint* prev;
 	liengConstraint* next;
 	liengObject* objects[2];
@@ -48,6 +49,9 @@ lieng_constraint_free (liengConstraint* self);
 void
 lieng_constraint_update (liengConstraint* self,
                          float            secs);
+
+void
+lieng_constraint_rebuild (liengConstraint* self);
 
 void
 lieng_constraint_get_transform (liengConstraint* self,

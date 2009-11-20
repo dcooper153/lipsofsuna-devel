@@ -48,6 +48,7 @@ struct _limdlPoseChannel
 	int repeats;
 	float time;
 	float priority;
+	char* animation_name;
 	limdlAnimation* animation;
 };
 
@@ -56,6 +57,7 @@ struct _limdlPoseFade
 	float rate;
 	float time;
 	float weight;
+	char* animation_name;
 	limdlPoseFade* prev;
 	limdlPoseFade* next;
 	limdlAnimation* animation;
