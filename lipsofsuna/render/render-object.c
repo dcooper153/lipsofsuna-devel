@@ -255,7 +255,12 @@ lirnd_object_set_model (lirndObject* self,
 		self->instance = lirnd_model_new_instance (model);
 	else
 		self->instance = NULL;
-	self->aabb = model->aabb;
+
+	/* Update bounds. */
+	if (model != NULL)
+		self->aabb = model->aabb;
+	else
+		limat_aabb_init (&self->aabb);
 
 	/* Replace lights and environment map. */
 	private_clear_lights (self);

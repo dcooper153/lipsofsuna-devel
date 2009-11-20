@@ -226,7 +226,7 @@ lirnd_render_load_image (lirndRender* self,
 	/* Replace in all models. */
 	LI_FOREACH_STRDIC (iter2, self->resources->models)
 	{
-		model = iter0.value;
+		model = iter2.value;
 		lirnd_model_replace_image (model, rndimage);
 	}
 
