@@ -456,8 +456,10 @@ syssrc = \
 thrdir = $(includedir)/lipsofsuna/thread
 thr_HEADERS = \
 	thread/lips-thread.h \
+	thread/thread.h \
 	thread/thread-async-call.h
 thrsrc = \
+	thread/thread.c \
 	thread/thread-async-call.c
 
 viddir = $(includedir)/lipsofsuna/video

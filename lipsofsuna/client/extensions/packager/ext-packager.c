@@ -38,10 +38,12 @@
 #define ENABLE_PACKAGE_SERVER
 
 static void
-private_async_free (lithrAsyncCall* call);
+private_async_free (lithrAsyncCall* call,
+                    void*           data);
 
 static void
-private_async_save (lithrAsyncCall* call);
+private_async_save (lithrAsyncCall* call,
+                    void*           data);
 
 static inline int
 private_filter_models (const char* dir,
@@ -124,7 +126,7 @@ liext_packager_cancel (liextPackager* self)
 	if (self->worker == NULL)
 		return;
 	lithr_async_call_stop (self->worker);
-	lithr_async_call_wait (self->worker);
+	lithr_async_call_join (self->worker);
 	private_progress_update (self);
 }
 
@@ -188,7 +190,7 @@ liext_packager_save (liextPackager* self,
 	if (self->progress == NULL)
 	{
 		lithr_async_call_stop (self->worker);
-		lithr_async_call_wait (self->worker);
+		lithr_async_call_join (self->worker);
 		lithr_async_call_free (self->worker);
 		self->worker = NULL;
 		return 0;
@@ -230,10 +232,11 @@ liext_packager_set_verbose (liextPackager* self,
 /*****************************************************************************/
 
 static void
-private_async_free (lithrAsyncCall* call)
+private_async_free (lithrAsyncCall* call,
+                    void*           data)
 {
 	int i;
-	liextPackagerData* self = call->data;
+	liextPackagerData* self = data;
 
 	if (self->resources != NULL)
 		liext_resources_free (self->resources);
@@ -252,12 +255,13 @@ private_async_free (lithrAsyncCall* call)
 }
 
 static void
-private_async_save (lithrAsyncCall* call)
+private_async_save (lithrAsyncCall* call,
+                    void*           data)
 {
 	int i;
 	char* path;
 	const char* name;
-	liextPackagerData* self = call->data;
+	liextPackagerData* self = data;
 
 	/* Allocate writer. */
 	self->writer = liarc_writer_new_gzip (self->target);
@@ -281,7 +285,7 @@ private_async_save (lithrAsyncCall* call)
 		goto error;
 	}
 	lisys_free (path);
-	if (call->stop)
+	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* Collect graphics. */
@@ -290,7 +294,7 @@ private_async_save (lithrAsyncCall* call)
 		name = self->resources->models.array[i].name;
 		if (!private_insert_file (self, "graphics", name, ".lmdl"))
 			goto error;
-		if (call->stop)
+		if (lithr_async_call_get_stop (call))
 			goto stop;
 	}
 #if 0
@@ -299,7 +303,7 @@ private_async_save (lithrAsyncCall* call)
 		name = self->resources->shaders.array[i];
 		if (!private_insert_file (self, "shaders", name, ""))
 			goto error;
-		if (call->stop)
+		if (lithr_async_call_get_stop (call))
 			goto stop;
 	}
 #endif
@@ -308,7 +312,7 @@ private_async_save (lithrAsyncCall* call)
 		name = self->resources->textures.array[i];
 		if (!private_insert_file (self, "graphics", name, ".dds"))
 			goto error;
-		if (call->stop)
+		if (lithr_async_call_get_stop (call))
 			goto stop;
 	}
 
@@ -322,7 +326,7 @@ private_async_save (lithrAsyncCall* call)
 		goto error;
 	}
 	lisys_free (path);
-	if (call->stop)
+	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* Collect miscellaneous. */
@@ -337,7 +341,7 @@ private_async_save (lithrAsyncCall* call)
 #endif
        )
 		goto error;
-	if (call->stop)
+	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* Create archive. */
@@ -358,20 +362,20 @@ private_async_save (lithrAsyncCall* call)
 		goto error;
 	for (i = 0 ; i < self->files.count ; i++)
 	{
-		call->progress = (float) i / self->files.count;
-		if (call->stop)
+		lithr_async_call_set_progress (call, (float) i / self->files.count);
+		if (lithr_async_call_get_stop (call))
 			goto stop;
 		if (!liarc_tar_write_file (self->tar, self->files.array[i].src, self->files.array[i].dst))
 			goto error;
 	}
 
 	/* Write to disk. */
-	call->progress = 1.0f;
-	if (call->stop)
+	lithr_async_call_set_progress (call, 1.0f);
+	if (lithr_async_call_get_stop (call))
 		goto stop;
 	if (!liarc_tar_write_end (self->tar))
 		goto error;
-	call->result = 1;
+	lithr_async_call_set_result (call, 1);
 
 stop:
 	return;
@@ -548,8 +552,8 @@ private_insert_models (lithrAsyncCall*    call,
 	/* FIXME: Use cache unless some models were rebuilt above. */
 	for (i = 0 ; i < count ; i++)
 	{
-		call->progress = (float) i / count;
-		if (call->stop)
+		lithr_async_call_set_progress (call, (float) i / count);
+		if (lithr_async_call_get_stop (call))
 			break;
 
 		/* Open model file. */
@@ -611,8 +615,8 @@ private_insert_samples (lithrAsyncCall*    call,
 	/* Insert found files. */
 	for (i = 0 ; i < count ; i++)
 	{
-		call->progress = (float) i / count;
-		if (call->stop)
+		lithr_async_call_set_progress (call, (float) i / count);
+		if (lithr_async_call_get_stop (call))
 			break;
 		name = lisys_dir_get_name (directory, i);
 		if (!private_insert_file (self, "sounds", name, ""))

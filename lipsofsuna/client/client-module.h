@@ -32,6 +32,7 @@
 #include <render/lips-render.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
+#include <thread/lips-thread.h>
 #include <widget/lips-widget.h>
 #include "client.h"
 #include "client-callbacks.h"
@@ -62,6 +63,7 @@ struct _licliModule
 	lirndScene* scene;
 	liscrScript* script;
 	lisrvServer* server;
+	lithrThread* server_thread;
 	liwdgManager* widgets;
 };
 

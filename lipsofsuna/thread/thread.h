@@ -15,10 +15,33 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_THREAD_H__
-#define __LIPS_THREAD_H__
+/**
+ * \addtogroup lithr Thread
+ * @{
+ * \addtogroup lithrThread Thread
+ * @{
+ */
 
-#include "thread.h"
-#include "thread-async-call.h"
+#ifndef __THREAD_H__
+#define __THREAD_H__
+
+typedef struct _lithrThread lithrThread;
+typedef void (*lithrThreadFunc)(lithrThread*, void*);
+
+lithrThread*
+lithr_thread_new (lithrThreadFunc func,
+                  void*           data);
+
+void
+lithr_thread_free (lithrThread* self);
+
+void
+lithr_thread_join (lithrThread* self);
+
+int
+lithr_thread_get_done (lithrThread* self);
 
 #endif
+
+/** @} */
+/** @} */

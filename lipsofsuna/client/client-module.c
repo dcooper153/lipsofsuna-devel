@@ -56,6 +56,10 @@ private_init_script (licliModule* self);
 static int
 private_init_widgets (licliModule* self);
 
+static void
+private_server_main (lithrThread* thread,
+                     void*        data);
+
 /*****************************************************************************/
 
 /**
@@ -154,8 +158,12 @@ licli_module_free (licliModule* self)
 		libnd_manager_free (self->bindings);
 	if (self->widgets != NULL)
 		liwdg_manager_free (self->widgets);
-	if (self->server != NULL)
-		lisrv_server_free (self->server);
+	if (self->server_thread != NULL)
+	{
+		self->server->quit = 1;
+		lithr_thread_free (self->server_thread);
+	}
+	assert (self->server == NULL);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
 	lisys_free (self->camera_node);
@@ -212,11 +220,27 @@ licli_module_find_object (licliModule* self,
 int
 licli_module_host (licliModule* self)
 {
-	if (self->server != NULL)
-		lisrv_server_free (self->server);
+	/* Kill old thread. */
+	if (self->server_thread != NULL)
+	{
+		assert (self->server != NULL);
+		self->server->quit = 1;
+		lithr_thread_free (self->server_thread);
+		assert (self->server == NULL);
+	}
+
+	/* Create new server. */
 	self->server = lisrv_server_new (self->paths);
 	if (self->server == NULL)
 		return 0;
+
+	/* Create server thread. */
+	self->server_thread = lithr_thread_new (private_server_main, self);
+	if (self->server_thread == NULL)
+	{
+		lisrv_server_free (self->server);
+		self->server = NULL;
+	}
 
 	return 1;
 }
@@ -354,19 +378,7 @@ licli_module_main (licliModule* self)
 		if (self->quit)
 			break;
 		licli_module_render (self);
-
-		/* FIXME: Move to callbacks. */
-		if (self->server != NULL)
-		{
-			if (!lisrv_server_update (self->server, secs))
-			{
-				/* TODO: Event. */
-				lisys_error_report ();
-				lisrv_server_free (self->server);
-				self->server = NULL;
-			}
-		}
-		else if (!active)
+		if (!active)
 			self->client->video.SDL_Delay (100);
 
 		/* TODO: Do we want to keep running even when not connected? */
@@ -653,6 +665,18 @@ private_init_widgets (licliModule* self)
 	liwdg_manager_set_size (self->widgets, self->window->mode.width, self->window->mode.height);
 
 	return 1;
+}
+
+static void
+private_server_main (lithrThread* thread,
+                     void*        data)
+{
+	licliModule* self = data;
+
+	if (!lisrv_server_main (self->server))
+		lisys_error_report ();
+	lisrv_server_free (self->server);
+	self->server = NULL;
 }
 
 /** @} */

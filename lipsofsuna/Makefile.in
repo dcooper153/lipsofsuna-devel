@@ -250,7 +250,7 @@ am__objects_26 = system/system.lo system/system-directory.lo \
 	system/system-notify.lo system/system-path.lo \
 	system/system-relative.lo system/system-types.lo \
 	system/system-user.lo
-am__objects_27 = thread/thread-async-call.lo
+am__objects_27 = thread/thread.lo thread/thread-async-call.lo
 am__objects_28 = voxel/voxel.lo voxel/voxel-block.lo \
 	voxel/voxel-manager.lo voxel/voxel-material.lo \
 	voxel/voxel-sector.lo
@@ -1061,9 +1061,11 @@ syssrc = \
 thrdir = $(includedir)/lipsofsuna/thread
 thr_HEADERS = \
 	thread/lips-thread.h \
+	thread/thread.h \
 	thread/thread-async-call.h
 
 thrsrc = \
+	thread/thread.c \
 	thread/thread-async-call.c
 
 viddir = $(includedir)/lipsofsuna/video
@@ -1755,6 +1757,8 @@ thread/$(am__dirstamp):
 thread/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) thread/$(DEPDIR)
 	@: > thread/$(DEPDIR)/$(am__dirstamp)
+thread/thread.lo: thread/$(am__dirstamp) \
+	thread/$(DEPDIR)/$(am__dirstamp)
 thread/thread-async-call.lo: thread/$(am__dirstamp) \
 	thread/$(DEPDIR)/$(am__dirstamp)
 voxel/voxel.lo: voxel/$(am__dirstamp) voxel/$(DEPDIR)/$(am__dirstamp)
@@ -2250,6 +2254,8 @@ mostlyclean-compile:
 	-rm -f system/system.lo
 	-rm -f thread/thread-async-call.$(OBJEXT)
 	-rm -f thread/thread-async-call.lo
+	-rm -f thread/thread.$(OBJEXT)
+	-rm -f thread/thread.lo
 	-rm -f video/liblipsofsunaclient_la-video-calls.$(OBJEXT)
 	-rm -f video/liblipsofsunaclient_la-video-calls.lo
 	-rm -f video/liblipsofsunaclient_la-video-features.$(OBJEXT)
@@ -2474,6 +2480,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system-user.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@system/$(DEPDIR)/system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@thread/$(DEPDIR)/thread-async-call.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@thread/$(DEPDIR)/thread.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@video/$(DEPDIR)/liblipsofsunaclient_la-video-calls.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@video/$(DEPDIR)/liblipsofsunaclient_la-video-features.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@viewer/$(DEPDIR)/lipsofsuna_viewer-viewer-main.Po@am__quote@

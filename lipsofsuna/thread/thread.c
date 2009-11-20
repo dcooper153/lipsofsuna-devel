@@ -18,24 +18,20 @@
 /**
  * \addtogroup lithr Thread
  * @{
- * \addtogroup lithrAsyncCall Async Call
+ * \addtogroup lithrThread Thread
  * @{
  */
 
 #include <pthread.h>
 #include <system/lips-system.h>
-#include "thread-async-call.h"
+#include "thread.h"
 
-struct _lithrAsyncCall
+struct _lithrThread
 {
 	pthread_t thread;
 	int done;
-	int result;
-	int stop;
-	float progress;
 	void* data;
-	lithrAsyncFunc func;
-	lithrAsyncFunc free;
+	lithrThreadFunc func;
 };
 
 static void*
@@ -43,19 +39,17 @@ private_thread (void* data);
 
 /*****************************************************************************/
 
-lithrAsyncCall*
-lithr_async_call_new (lithrAsyncFunc func,
-                      lithrAsyncFunc freecb,
-                      void*          data)
+lithrThread*
+lithr_thread_new (lithrThreadFunc func,
+                  void*           data)
 {
-	lithrAsyncCall* self;
+	lithrThread* self;
 
-	self = lisys_calloc (1, sizeof (lithrAsyncCall));
+	self = lisys_calloc (1, sizeof (lithrThread));
 	if (self == NULL)
 		return NULL;
 	self->data = data;
 	self->func = func;
-	self->free = freecb;
 	if (pthread_create (&self->thread, NULL, private_thread, self) != 0)
 	{
 		lisys_error_set (ENOMEM, "not enough resources to create thread");
@@ -67,69 +61,22 @@ lithr_async_call_new (lithrAsyncFunc func,
 }
 
 void
-lithr_async_call_free (lithrAsyncCall* self)
+lithr_thread_free (lithrThread* self)
 {
-	lithr_async_call_join (self);
-	if (self->free != NULL)
-		self->free (self, self->data);
+	lithr_thread_join (self);
 	lisys_free (self);
 }
 
-int
-lithr_async_call_join (lithrAsyncCall* self)
+void
+lithr_thread_join (lithrThread* self)
 {
 	pthread_join (self->thread, NULL);
-	return self->result;
-}
-
-void
-lithr_async_call_stop (lithrAsyncCall* self)
-{
-	self->stop = 1;
 }
 
 int
-lithr_async_call_get_done (lithrAsyncCall* self)
+lithr_thread_call_get_done (lithrThread* self)
 {
 	return self->done;
-}
-
-float
-lithr_async_call_get_progress (lithrAsyncCall* self)
-{
-	return self->progress;
-}
-
-void
-lithr_async_call_set_progress (lithrAsyncCall* self,
-                               float           value)
-{
-	self->progress = value;
-}
-
-int
-lithr_async_call_get_result (lithrAsyncCall* self)
-{
-	return self->result;
-}
-
-void
-lithr_async_call_set_result (lithrAsyncCall* self,
-                             int             value)
-{
-	self->result = value;
-}
-
-int
-lithr_async_call_get_stop (lithrAsyncCall* self)
-{
-	return self->stop;
-}
-
-void*
-lithr_async_call_get_userdata (lithrAsyncCall* self)
-{
-	return self->data;
 }
 
 /*****************************************************************************/
@@ -137,7 +84,7 @@ lithr_async_call_get_userdata (lithrAsyncCall* self)
 static void*
 private_thread (void* data)
 {
-	lithrAsyncCall* self;
+	lithrThread* self;
 
 	self = data;
 	self->func (self, self->data);

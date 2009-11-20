@@ -28,7 +28,8 @@
 #include "reload.h"
 
 static void
-private_async_reload (lithrAsyncCall* call);
+private_async_reload (lithrAsyncCall* call,
+                      void*           data);
 
 static int
 private_convert_models (lithrAsyncCall* call,
@@ -100,7 +101,7 @@ lirel_reload_cancel (lirelReload* self)
 	if (self->worker == NULL)
 		return;
 	lithr_async_call_stop (self->worker);
-	lithr_async_call_wait (self->worker);
+	lithr_async_call_join (self->worker);
 	lithr_async_call_free (self->worker);
 	self->worker = NULL;
 }
@@ -300,10 +301,11 @@ lirel_reload_get_progress (const lirelReload* self)
 /*****************************************************************************/
 
 static void
-private_async_reload (lithrAsyncCall* call)
+private_async_reload (lithrAsyncCall* call,
+                      void*           data)
 {
 	char* path;
-	lirelReload* self = call->data;
+	lirelReload* self = data;
 
 	/* Convert textures. */
 	path = lisys_path_concat (self->paths->module_data, "graphics", NULL);
@@ -311,7 +313,7 @@ private_async_reload (lithrAsyncCall* call)
 		goto error;
 	if (!private_convert_textures (call, self, path))
 		goto error;
-	if (call->stop)
+	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* Convert models. */
@@ -319,11 +321,11 @@ private_async_reload (lithrAsyncCall* call)
 		goto error;
 	if (!private_convert_models (call, self, path))
 		goto error;
-	if (call->stop)
+	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* The rest is done in the free callback. */
-	call->result = 1;
+	lithr_async_call_set_result (call, 1);
 stop:
 	lisys_free (path);
 	return;
@@ -356,8 +358,8 @@ private_convert_models (lithrAsyncCall* call,
 	/* Convert modified models. */
 	for (i = 0 ; i < count ; i++)
 	{
-		call->progress = (float) i / count;
-		if (call->stop)
+		lithr_async_call_set_progress (call, (float) i / count);
+		if (lithr_async_call_get_stop (call))
 			break;
 		src = lisys_dir_get_path (directory, i);
 		dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
@@ -416,8 +418,8 @@ private_convert_textures (lithrAsyncCall* call,
 		count = lisys_dir_get_count (directory);
 		for (i = 0 ; i < count ; i++)
 		{
-			call->progress = (float) i / count;
-			if (call->stop)
+			lithr_async_call_set_progress (call, (float) i / count);
+			if (lithr_async_call_get_stop (call))
 				break;
 			src = lisys_dir_get_path (directory, i);
 			dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
