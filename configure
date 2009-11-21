@@ -2230,6 +2230,99 @@ fi
   eval $as_lineno_stack; test "x$as_lineno_stack" = x && { as_lineno=; unset as_lineno;}
 
 } # ac_fn_c_check_header_mongrel
+
+# ac_fn_cxx_check_header_mongrel LINENO HEADER VAR INCLUDES
+# ---------------------------------------------------------
+# Tests whether HEADER exists, giving a warning if it cannot be compiled using
+# the include files in INCLUDES and setting the cache variable VAR
+# accordingly.
+ac_fn_cxx_check_header_mongrel ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
+  $as_echo_n "(cached) " >&6
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $2 usability" >&5
+$as_echo_n "checking $2 usability... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  ac_header_compiler=yes
+else
+  ac_header_compiler=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $2 presence" >&5
+$as_echo_n "checking $2 presence... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <$2>
+_ACEOF
+if ac_fn_cxx_try_cpp "$LINENO"; then :
+  ac_header_preproc=yes
+else
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_cxx_preproc_warn_flag in #((
+  yes:no: )
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: $2: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $2: proceeding with the compiler's result" >&2;}
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: $2: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: $2:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: $2: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: $2:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $2: proceeding with the compiler's result" >&2;}
+( cat <<\_ASBOX
+## ------------------------------------ ##
+## Report this to http://lipsofsuna.org ##
+## ------------------------------------ ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if { as_var=$3; eval "test \"\${$as_var+set}\" = set"; }; then :
+  $as_echo_n "(cached) " >&6
+else
+  eval "$3=\$ac_header_compiler"
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+fi
+  eval $as_lineno_stack; test "x$as_lineno_stack" = x && { as_lineno=; unset as_lineno;}
+
+} # ac_fn_cxx_check_header_mongrel
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -3403,31 +3496,33 @@ else
 fi
 
 
-if test "x$CFLAGS" = "x"; then
-	if test "x$want_debug" = xyes; then
-		CFLAGS="$CFLAGS -g"
-	else
-		CFLAGS="$CFLAGS -DNDEBUG"
-	fi
-	if test "x$want_optimization" = xyes; then
-		CFLAGS="$CFLAGS -O3"
-	fi
-fi
-if test "x$want_mallocdebug" = xyes; then
-	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
-fi
-
 # Check whether --with-dep-prefix was given.
 if test "${with_dep_prefix+set}" = set; then :
-  withval=$with_dep_prefix; CFLAGS="$CFLAGS -I$withval/include"
+  withval=$with_dep_prefix;
+	CFLAGS="$CFLAGS -I$withval/include"
+	CPPFLAGS="$CPPFLAGS -I$withval/include"
+	CXXFLAGS="$CXXFLAGS -I$withval/include"
 	LDFLAGS="$LDFLAGS -L$withval/lib"
 	if test "x$PKG_CONFIG_PATH" = x; then
 		PKG_CONFIG_PATH="$withval/lib/pkgconfig"
 	else
 		PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"
 	fi
+		export PKG_CONFIG_PATH
 fi
 
+
+if test "x$want_debug" = xyes; then
+	CFLAGS="$CFLAGS -g"
+else
+	CFLAGS="$CFLAGS -DNDEBUG"
+fi
+if test "x$want_optimization" = xyes; then
+	CFLAGS="$CFLAGS -O3"
+fi
+if test "x$want_mallocdebug" = xyes; then
+	CFLAGS="$CFLAGS -DLI_MALLOC_DEBUG"
+fi
 
 DEPDIR="${am__leading_dot}deps"
 
@@ -6102,13 +6197,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6105: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6200: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6108: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6203: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6111: output\"" >&5)
+  (eval echo "\"\$as_me:6206: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7313,7 +7408,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7316 "configure"' > conftest.$ac_ext
+  echo '#line 7411 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9370,11 +9465,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9373: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9468: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9377: \$? = $ac_status" >&5
+   echo "$as_me:9472: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9709,11 +9804,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9712: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9807: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9716: \$? = $ac_status" >&5
+   echo "$as_me:9811: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9814,11 +9909,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9817: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9912: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9821: \$? = $ac_status" >&5
+   echo "$as_me:9916: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9869,11 +9964,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9872: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9967: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9876: \$? = $ac_status" >&5
+   echo "$as_me:9971: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12252,7 +12347,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12255 "configure"
+#line 12350 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12348,7 +12443,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12351 "configure"
+#line 12446 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14304,11 +14399,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14307: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14402: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14311: \$? = $ac_status" >&5
+   echo "$as_me:14406: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14403,11 +14498,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14406: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14501: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14410: \$? = $ac_status" >&5
+   echo "$as_me:14505: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14455,11 +14550,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14458: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14553: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14462: \$? = $ac_status" >&5
+   echo "$as_me:14557: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17136,6 +17231,7 @@ if test "$ac_res" != no; then :
 
 fi
 
+
 LIPS_CFLAGS="$CFLAGS -Wall -DLI_ENABLE_ERROR"
 LIPS_LIBS="$LIBS"
 
@@ -17153,7 +17249,7 @@ if test "x$want_easy" = xyes; then
 	prefix="$PWD/build"
 fi
 
-if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+if test "x$want_client" = xyes || test "x$want_server" = xyes; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for LUA" >&5
@@ -17355,16 +17451,12 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua5_1_lua_newtable" >&5
 $as_echo "$ac_cv_lib_lua5_1_lua_newtable" >&6; }
 if test "x$ac_cv_lib_lua5_1_lua_newtable" = x""yes; then :
-  found=yes
+  founda=yes
 else
-  found=no
+  founda=no
 fi
 
-		if test "x$found" = xyes; then
-			LUA_CFLAGS=""
-			LUA_LIBS="-llua5.1"
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newtable in -llua" >&5
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newtable in -llua" >&5
 $as_echo_n "checking for lua_newtable in -llua... " >&6; }
 if test "${ac_cv_lib_lua_lua_newtable+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -17401,23 +17493,43 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua_lua_newtable" >&5
 $as_echo "$ac_cv_lib_lua_lua_newtable" >&6; }
 if test "x$ac_cv_lib_lua_lua_newtable" = x""yes; then :
-  found=yes
+  foundb=yes
 else
-  found=no
+  foundb=no
 fi
 
-			LUA_CFLAGS=""
-			LUA_LIBS="-llua"
-		fi
-		if test "x$found" = xno; then
+		ac_fn_c_check_header_mongrel "$LINENO" "lua.h" "ac_cv_header_lua_h" "$ac_includes_default"
+if test "x$ac_cv_header_lua_h" = x""yes; then :
+  foundc=yes
+else
+  foundc=no
+fi
+
+
+		ac_fn_c_check_header_mongrel "$LINENO" "lauxlib.h" "ac_cv_header_lauxlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_lauxlib_h" = x""yes; then :
+  foundd=yes
+else
+  foundd=no
+fi
+
+
+		if ( test "x$founda" = xno && test "x$foundb" = xno ) || test "x$foundc" = xno || test "x$foundd" = xno; then
 			as_fn_error "
 
 Cannot find Lua. You may set the environment variables
 LUA_CFLAGS and LUA_LIBS to bypass this test." "$LINENO" 5
 		fi
+		if test "x$founda" = xyes; then
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua5.1"
+		else
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua"
+		fi
 	fi
 fi
-if test "$xwant_sound" = xyes -a "$xwant_client" = xyes; then
+if test "$xwant_sound" = xyes && test "$xwant_client" = xyes; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OPENAL" >&5
@@ -17711,12 +17823,20 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_sqlite3_sqlite3_open" >&5
 $as_echo "$ac_cv_lib_sqlite3_sqlite3_open" >&6; }
 if test "x$ac_cv_lib_sqlite3_sqlite3_open" = x""yes; then :
-  found=yes
+  founda=yes
 else
-  found=no
+  founda=no
 fi
 
-		if test "x$found" = xno; then
+		ac_fn_c_check_header_mongrel "$LINENO" "sqlite3.h" "ac_cv_header_sqlite3_h" "$ac_includes_default"
+if test "x$ac_cv_header_sqlite3_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			as_fn_error "
 
 Cannot find SQLite. You may set the environment variables
@@ -17727,7 +17847,7 @@ SQLITE_CFLAGS and SQLITE_LIBS to bypass this test." "$LINENO" 5
 		fi
 	fi
 fi
-if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+if test "x$want_client" = xyes || test "x$want_server" = xyes; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for BULLET" >&5
@@ -17787,36 +17907,17 @@ fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$BULLET_PKG_ERRORS" >&5
 
-	as_fn_error "Package requirements (bullet >= 2.74) were not met:
-
-$BULLET_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables BULLET_CFLAGS
-and BULLET_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                found=no
 elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables BULLET_CFLAGS
-and BULLET_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
+	found=no
 else
 	BULLET_CFLAGS=$pkg_cv_BULLET_CFLAGS
 	BULLET_LIBS=$pkg_cv_BULLET_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	:
+	found=yes
 fi
 	if test "x$found" = xno; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lbulletdynamics" >&5
@@ -17850,12 +17951,41 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bulletdynamics_main" >&5
 $as_echo "$ac_cv_lib_bulletdynamics_main" >&6; }
 if test "x$ac_cv_lib_bulletdynamics_main" = x""yes; then :
-  found=yes
+  founda=yes
 else
-  found=no
+  founda=no
 fi
 
-		if test "x$found" = xyes; then
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+ac_fn_cxx_check_header_mongrel "$LINENO" "btBulletCollisionCommon.h" "ac_cv_header_btBulletCollisionCommon_h" "$ac_includes_default"
+if test "x$ac_cv_header_btBulletCollisionCommon_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		ac_fn_cxx_check_header_mongrel "$LINENO" "btBulletDynamicsCommon.h" "ac_cv_header_btBulletDynamicsCommon_h" "$ac_includes_default"
+if test "x$ac_cv_header_btBulletDynamicsCommon_h" = x""yes; then :
+  foundc=yes
+else
+  foundc=no
+fi
+
+
+		ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+		if test "x$founda" = xno || test "x$foundb" = xno || test "x$foundc" = xno; then
 			as_fn_error "
 
 Cannot find Bullet. You may set the environment variables
@@ -17866,7 +17996,7 @@ BULLET_CFLAGS and BULLET_LIBS to bypass this test." "$LINENO" 5
 		fi
 	fi
 fi
-if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
+if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
 
 # Check whether --with-sdl-prefix was given.
 if test "${with_sdl_prefix+set}" = set; then :
@@ -18128,8 +18258,8 @@ SDL_CFLAGS and SDL_LIBS or use the --disable-sdltest
 option to bypass this test." "$LINENO" 5
 	fi
 fi
-if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
-	if test "x$GLEW_CFLAGS" = "x" -a "x$GLEW_LIBS" = "x"; then
+if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
+	if test "x$GLEW_CFLAGS" = "x" && test "x$GLEW_LIBS" = "x"; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for glewInit in -lGLEW" >&5
 $as_echo_n "checking for glewInit in -lGLEW... " >&6; }
 if test "${ac_cv_lib_GLEW_glewInit+set}" = set; then :
@@ -18167,12 +18297,20 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_GLEW_glewInit" >&5
 $as_echo "$ac_cv_lib_GLEW_glewInit" >&6; }
 if test "x$ac_cv_lib_GLEW_glewInit" = x""yes; then :
-  found=yes
+  founda=yes
 else
-  found=no
+  founda=no
 fi
 
-		if test "x$found" = xno; then
+		ac_fn_c_check_header_mongrel "$LINENO" "GL/glew.h" "ac_cv_header_GL_glew_h" "$ac_includes_default"
+if test "x$ac_cv_header_GL_glew_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			as_fn_error "
 
 Cannot find GLEW. You may set the environment variables
@@ -18182,8 +18320,8 @@ GLEW_CFLAGS and GLEW_LIBS to bypass this test." "$LINENO" 5
 		GLEW_LIBS="-lGLEW"
 	fi
 fi
-if test "x$want_client" = xyes -o "x$want_server" = xyes; then
-	if test "x$GRAPPLE_CFLAGS" = "x" -a "x$GRAPPLE_LIBS" = "x"; then
+if test "x$want_client" = xyes || test "x$want_server" = xyes; then
+	if test "x$GRAPPLE_CFLAGS" = "x" && test "x$GRAPPLE_LIBS" = "x"; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for grapple_server_default_get in -lgrapple" >&5
 $as_echo_n "checking for grapple_server_default_get in -lgrapple... " >&6; }
 if test "${ac_cv_lib_grapple_grapple_server_default_get+set}" = set; then :
@@ -18226,7 +18364,23 @@ else
   found=no
 fi
 
-		if test "x$found" = xno; then
+		ac_fn_c_check_header_mongrel "$LINENO" "grapple/grapple_client.h" "ac_cv_header_grapple_grapple_client_h" "$ac_includes_default"
+if test "x$ac_cv_header_grapple_grapple_client_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		ac_fn_c_check_header_mongrel "$LINENO" "grapple/grapple_server.h" "ac_cv_header_grapple_grapple_server_h" "$ac_includes_default"
+if test "x$ac_cv_header_grapple_grapple_server_h" = x""yes; then :
+  foundc=yes
+else
+  foundc=no
+fi
+
+
+		if test "x$founda" = xno || test "x$foundb" = xno || test "x$foundc" = xno; then
 			as_fn_error "
 
 Cannot find grapple. You may set the environment variables
@@ -18237,8 +18391,8 @@ GRAPPLE_CFLAGS and GRAPPLE_LIBS to bypass this test." "$LINENO" 5
 		fi
 	fi
 fi
-if test "$want_client" = xyes -o "x$want_viewer" = xyes -o "x$want_import" = xyes; then
-	if test "x$SQUISH_CFLAGS" = "x" -a "x$SQUISH_LIBS" = "x"; then
+if test "$want_client" = xyes || test "x$want_viewer" = xyes || test "x$want_import" = xyes; then
+	if test "x$SQUISH_CFLAGS" = "x" && test "x$SQUISH_LIBS" = "x"; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lsquish" >&5
 $as_echo_n "checking for main in -lsquish... " >&6; }
 if test "${ac_cv_lib_squish_main+set}" = set; then :
@@ -18270,12 +18424,32 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_squish_main" >&5
 $as_echo "$ac_cv_lib_squish_main" >&6; }
 if test "x$ac_cv_lib_squish_main" = x""yes; then :
-  found=yes
+  founda=yes
 else
-  found=no
+  founda=no
 fi
 
-		if test "x$found" = xno; then
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		ac_fn_cxx_check_header_mongrel "$LINENO" "squish.h" "ac_cv_header_squish_h" "$ac_includes_default"
+if test "x$ac_cv_header_squish_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			as_fn_error "
 
 Cannot find squish. You may set the environment variables
@@ -18287,7 +18461,7 @@ SQUISH_CFLAGS and SQUISH_LIBS to bypass this test." "$LINENO" 5
 	fi
 fi
 if test xyes = xyes; then
-	if test "x$ZLIB_CFLAGS" = "x" -a "x$ZLIB_LIBS" = "x"; then
+	if test "x$ZLIB_CFLAGS" = "x" && test "x$ZLIB_LIBS" = "x"; then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for deflate in -lz" >&5
 $as_echo_n "checking for deflate in -lz... " >&6; }
 if test "${ac_cv_lib_z_deflate+set}" = set; then :
@@ -18330,7 +18504,15 @@ else
   found=no
 fi
 
-		if test "x$found" = xno; then
+		ac_fn_c_check_header_mongrel "$LINENO" "zlib.h" "ac_cv_header_zlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_zlib_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			as_fn_error "
 
 Cannot find zlib. You may set the environment variables

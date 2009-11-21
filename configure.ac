@@ -18,30 +18,32 @@ AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with so
 AC_ARG_ENABLE([viewer], AC_HELP_STRING([--disable-viewer], [Do not compile the model viewer]), [want_viewer=no], [want_viewer=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
 AC_ARG_ENABLE([malloc-debug], AC_HELP_STRING([--enable-malloc-debug], [Compile with logging memory management functions]), [want_mallocdebug=yes], [want_mallocdebug=no])
-
-dnl Compiler flags.
-if test "x$CFLAGS" = "x"; then
-	if test "x$want_debug" = xyes; then
-		CFLAGS="$CFLAGS -g"
-	else
-		CFLAGS="$CFLAGS -DNDEBUG"
-	fi
-	if test "x$want_optimization" = xyes; then
-		CFLAGS="$CFLAGS -O3"
-	fi
-fi
-if test "x$want_mallocdebug" = xyes; then
-	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
-fi
 AC_ARG_WITH([dep-prefix],
-	AC_HELP_STRING([--with-dep-prefix=PFX], [Prefix where to search for dependencies (optional)]),
-	[CFLAGS="$CFLAGS -I$withval/include"
+	AC_HELP_STRING([--with-dep-prefix=PFX], [Prefix where to search for dependencies (optional)]), [
+	CFLAGS="$CFLAGS -I$withval/include"
+	CPPFLAGS="$CPPFLAGS -I$withval/include"
+	CXXFLAGS="$CXXFLAGS -I$withval/include"
 	LDFLAGS="$LDFLAGS -L$withval/lib"
 	if test "x$PKG_CONFIG_PATH" = x; then
 		PKG_CONFIG_PATH="$withval/lib/pkgconfig"
 	else
 		PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"
-	fi], [])
+	fi
+	dnl No way to avoid this?
+	export PKG_CONFIG_PATH], [])
+
+dnl Compiler flags.
+if test "x$want_debug" = xyes; then
+	CFLAGS="$CFLAGS -g"
+else
+	CFLAGS="$CFLAGS -DNDEBUG"
+fi
+if test "x$want_optimization" = xyes; then
+	CFLAGS="$CFLAGS -O3"
+fi
+if test "x$want_mallocdebug" = xyes; then
+	CFLAGS="$CFLAGS -DLI_MALLOC_DEBUG"
+fi
 
 dnl Tools, headers, libraries.
 AC_ISC_POSIX
@@ -70,6 +72,7 @@ AC_CHECK_LIB(dl, dlsym)
 AC_CHECK_LIB(m, main)
 AC_CHECK_FUNCS(fork lstat readlink stat usleep)
 AC_SEARCH_LIBS(socket, socket)
+
 LIPS_CFLAGS="$CFLAGS -Wall -DLI_ENABLE_ERROR"
 LIPS_LIBS="$LIBS"
 
@@ -89,30 +92,32 @@ if test "x$want_easy" = xyes; then
 fi
 
 dnl Dependencies.
-if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+if test "x$want_client" = xyes || test "x$want_server" = xyes; then
 	PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [found=yes], [found=no])
 	if test "x$found" = "xno"; then
 		PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])
 	fi
 	if test "x$found" = xno; then
-		AC_CHECK_LIB([lua5.1], [lua_newtable], [found=yes], [found=no])
-		if test "x$found" = xyes; then
-			LUA_CFLAGS=""
-			LUA_LIBS="-llua5.1"
-		else
-			AC_CHECK_LIB([lua], [lua_newtable], [found=yes], [found=no])
-			LUA_CFLAGS=""
-			LUA_LIBS="-llua"
-		fi
-		if test "x$found" = xno; then
+		AC_CHECK_LIB([lua5.1], [lua_newtable], [founda=yes], [founda=no])
+		AC_CHECK_LIB([lua], [lua_newtable], [foundb=yes], [foundb=no])
+		AC_CHECK_HEADER([lua.h], [foundc=yes], [foundc=no])
+		AC_CHECK_HEADER([lauxlib.h], [foundd=yes], [foundd=no])
+		if ( test "x$founda" = xno && test "x$foundb" = xno ) || test "x$foundc" = xno || test "x$foundd" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find Lua. You may set the environment variables
 LUA_CFLAGS and LUA_LIBS to bypass this test.])
 		fi
+		if test "x$founda" = xyes; then
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua5.1"
+		else
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua"
+		fi
 	fi
 fi
-if test "$xwant_sound" = xyes -a "$xwant_client" = xyes; then
+if test "$xwant_sound" = xyes && test "$xwant_client" = xyes; then
 	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
 	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
 else
@@ -121,8 +126,9 @@ fi
 if test xyes = xyes; then
 	PKG_CHECK_MODULES([SQLITE], [sqlite3 >= 3.6.0], [found=yes], [found=no])
 	if test "x$found" = xno; then
-		AC_CHECK_LIB([sqlite3], [sqlite3_open], [found=yes], [found=no])
-		if test "x$found" = xno; then
+		AC_CHECK_LIB([sqlite3], [sqlite3_open], [founda=yes], [founda=no])
+		AC_CHECK_HEADER([sqlite3.h], [foundb=yes], [foundb=no])
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find SQLite. You may set the environment variables
@@ -133,11 +139,15 @@ SQLITE_CFLAGS and SQLITE_LIBS to bypass this test.])
 		fi
 	fi
 fi
-if test "x$want_client" = xyes -o "x$want_server" = xyes; then
-	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
+if test "x$want_client" = xyes || test "x$want_server" = xyes; then
+	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74], [found=yes], [found=no])
 	if test "x$found" = xno; then
-		AC_CHECK_LIB([bulletdynamics], [main], [found=yes], [found=no])
-		if test "x$found" = xyes; then
+		AC_CHECK_LIB([bulletdynamics], [main], [founda=yes], [founda=no])
+		AC_LANG_PUSH([C++])
+		AC_CHECK_HEADER([btBulletCollisionCommon.h], [foundb=yes], [foundb=no])
+		AC_CHECK_HEADER([btBulletDynamicsCommon.h], [foundc=yes], [foundc=no])
+		AC_LANG_POP()
+		if test "x$founda" = xno || test "x$foundb" = xno || test "x$foundc" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find Bullet. You may set the environment variables
@@ -148,7 +158,7 @@ BULLET_CFLAGS and BULLET_LIBS to bypass this test.])
 		fi
 	fi
 fi
-if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
+if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
 	AM_PATH_SDL([1.2.0], [found=yes], [found=no])
 	if test "x$found" = xno; then
 		AC_MSG_ERROR([
@@ -158,10 +168,11 @@ SDL_CFLAGS and SDL_LIBS or use the --disable-sdltest
 option to bypass this test.])
 	fi
 fi
-if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
-	if test "x$GLEW_CFLAGS" = "x" -a "x$GLEW_LIBS" = "x"; then
-		AC_CHECK_LIB([GLEW], [glewInit], [found=yes], [found=no])
-		if test "x$found" = xno; then
+if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
+	if test "x$GLEW_CFLAGS" = "x" && test "x$GLEW_LIBS" = "x"; then
+		AC_CHECK_LIB([GLEW], [glewInit], [founda=yes], [founda=no])
+		AC_CHECK_HEADER([GL/glew.h], [foundb=yes], [foundb=no])
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find GLEW. You may set the environment variables
@@ -171,10 +182,12 @@ GLEW_CFLAGS and GLEW_LIBS to bypass this test.])
 		GLEW_LIBS="-lGLEW"
 	fi
 fi
-if test "x$want_client" = xyes -o "x$want_server" = xyes; then
-	if test "x$GRAPPLE_CFLAGS" = "x" -a "x$GRAPPLE_LIBS" = "x"; then
+if test "x$want_client" = xyes || test "x$want_server" = xyes; then
+	if test "x$GRAPPLE_CFLAGS" = "x" && test "x$GRAPPLE_LIBS" = "x"; then
 		AC_CHECK_LIB([grapple], [grapple_server_default_get], [found=yes], [found=no])
-		if test "x$found" = xno; then
+		AC_CHECK_HEADER([grapple/grapple_client.h], [foundb=yes], [foundb=no])
+		AC_CHECK_HEADER([grapple/grapple_server.h], [foundc=yes], [foundc=no])
+		if test "x$founda" = xno || test "x$foundb" = xno || test "x$foundc" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find grapple. You may set the environment variables
@@ -185,10 +198,13 @@ GRAPPLE_CFLAGS and GRAPPLE_LIBS to bypass this test.])
 		fi
 	fi
 fi
-if test "$want_client" = xyes -o "x$want_viewer" = xyes -o "x$want_import" = xyes; then
-	if test "x$SQUISH_CFLAGS" = "x" -a "x$SQUISH_LIBS" = "x"; then
-		AC_CHECK_LIB([squish], [main], [found=yes], [found=no])
-		if test "x$found" = xno; then
+if test "$want_client" = xyes || test "x$want_viewer" = xyes || test "x$want_import" = xyes; then
+	if test "x$SQUISH_CFLAGS" = "x" && test "x$SQUISH_LIBS" = "x"; then
+		AC_CHECK_LIB([squish], [main], [founda=yes], [founda=no])
+		AC_LANG_PUSH([C++])
+		AC_CHECK_HEADER([squish.h], [foundb=yes], [foundb=no])
+		AC_LANG_POP()
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find squish. You may set the environment variables
@@ -200,9 +216,10 @@ SQUISH_CFLAGS and SQUISH_LIBS to bypass this test.])
 	fi
 fi
 if test xyes = xyes; then
-	if test "x$ZLIB_CFLAGS" = "x" -a "x$ZLIB_LIBS" = "x"; then
+	if test "x$ZLIB_CFLAGS" = "x" && test "x$ZLIB_LIBS" = "x"; then
 		AC_CHECK_LIB([z], [deflate], [found=yes], [found=no])
-		if test "x$found" = xno; then
+		AC_CHECK_HEADER([zlib.h], [foundb=yes], [foundb=no])
+		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([
 
 Cannot find zlib. You may set the environment variables
