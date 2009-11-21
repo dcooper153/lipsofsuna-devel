@@ -74,10 +74,10 @@ limat_rectangle_union (limatRectangle*       self,
                        const limatRectangle* rect0,
                        const limatRectangle* rect1)
 {
-	int x0;
-	int y0;
-	int x1;
-	int y1;
+	float x0;
+	float y0;
+	float x1;
+	float y1;
 
 	x0 = LI_MIN (rect0->x, rect1->x);
 	y0 = LI_MIN (rect0->y, rect1->y);
@@ -104,10 +104,10 @@ limat_rectangle_intersection (limatRectangle*       self,
                               const limatRectangle* rect0,
                               const limatRectangle* rect1)
 {
-	int x0;
-	int y0;
-	int x1;
-	int y1;
+	float x0;
+	float y0;
+	float x1;
+	float y1;
 
 	x0 = LI_MAX (rect0->x, rect1->x);
 	y0 = LI_MAX (rect0->y, rect1->y);

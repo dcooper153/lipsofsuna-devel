@@ -296,35 +296,41 @@ lipsofsuna_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(CFLAGS) $(lipsofsuna_LDFLAGS) $(LDFLAGS) -o $@
 am_lipsofsuna_client_OBJECTS = client/client-main.$(OBJEXT)
 lipsofsuna_client_OBJECTS = $(am_lipsofsuna_client_OBJECTS)
-lipsofsuna_client_DEPENDENCIES = liblipsofsunaclient.la
+lipsofsuna_client_DEPENDENCIES = liblipsofsunaclient.la \
+	$(am__DEPENDENCIES_1)
 lipsofsuna_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_client_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am_lipsofsuna_generator_OBJECTS = generator/generator-main.$(OBJEXT)
 lipsofsuna_generator_OBJECTS = $(am_lipsofsuna_generator_OBJECTS)
-lipsofsuna_generator_DEPENDENCIES = liblipsofsunagenerator.la
+lipsofsuna_generator_DEPENDENCIES = liblipsofsunagenerator.la \
+	$(am__DEPENDENCIES_1)
 lipsofsuna_generator_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_generator_LDFLAGS) \
 	$(LDFLAGS) -o $@
 am_lipsofsuna_import_OBJECTS = reload/reload-main.$(OBJEXT)
 lipsofsuna_import_OBJECTS = $(am_lipsofsuna_import_OBJECTS)
-lipsofsuna_import_DEPENDENCIES = liblipsofsunaimport.la
+lipsofsuna_import_DEPENDENCIES = liblipsofsunaimport.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 lipsofsuna_import_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_import_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am_lipsofsuna_server_OBJECTS = server/server-main.$(OBJEXT)
 lipsofsuna_server_OBJECTS = $(am_lipsofsuna_server_OBJECTS)
-lipsofsuna_server_DEPENDENCIES = liblipsofsunaserver.la
+lipsofsuna_server_DEPENDENCIES = liblipsofsunaserver.la \
+	$(am__DEPENDENCIES_1)
 lipsofsuna_server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_server_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am_lipsofsuna_viewer_OBJECTS = viewer/viewer-main.$(OBJEXT)
 lipsofsuna_viewer_OBJECTS = $(am_lipsofsuna_viewer_OBJECTS)
-lipsofsuna_viewer_DEPENDENCIES = liblipsofsunaviewer.la
+lipsofsuna_viewer_DEPENDENCIES = liblipsofsunaviewer.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 lipsofsuna_viewer_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_viewer_LDFLAGS) $(LDFLAGS) \
@@ -1155,13 +1161,6 @@ liblipsofsunaclient_la_SOURCES = \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
-liblipsofsunaserver_la_LDFLAGS = -no-undefined
-liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
-liblipsofsunaserver_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(voxsrc)
-
 liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) -lz
 liblipsofsunagenerator_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(gensrc) $(matsrc) $(mdlsrc) \
@@ -1177,6 +1176,13 @@ liblipsofsunaimport_la_SOURCES = \
 	image/image-compress.h \
 	image/image-dds.h
 
+liblipsofsunaserver_la_LDFLAGS = -no-undefined
+liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
+liblipsofsunaserver_la_SOURCES = \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
+	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
+
 liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
 liblipsofsunaviewer_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(cfgsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
@@ -1189,19 +1195,19 @@ lipsofsuna_CFLAGS = $(AM_CFLAGS)
 lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
 lipsofsuna_SOURCES = $(maisrc) $(syssrc)
 lipsofsuna_client_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(LICLI_LIBS) -lpng
 lipsofsuna_client_SOURCES = client/client-main.c
 lipsofsuna_generator_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_generator_LDADD = liblipsofsunagenerator.la
+lipsofsuna_generator_LDADD = liblipsofsunagenerator.la $(SQLITE_LIBS) -lz
 lipsofsuna_generator_SOURCES = generator/generator-main.c
 lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_import_LDADD = liblipsofsunaimport.la
+lipsofsuna_import_LDADD = liblipsofsunaimport.la $(SQUISH_LIBS) $(SQLITE_LIBS) -lpng
 lipsofsuna_import_SOURCES = reload/reload-main.c
 lipsofsuna_server_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_server_LDADD = liblipsofsunaserver.la
+lipsofsuna_server_LDADD = liblipsofsunaserver.la $(LISRV_LIBS)
 lipsofsuna_server_SOURCES = server/server-main.c
 lipsofsuna_viewer_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la
+lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
 lipsofsuna_viewer_SOURCES = viewer/viewer-main.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

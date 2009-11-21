@@ -555,13 +555,6 @@ liblipsofsunaclient_la_SOURCES = \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
-liblipsofsunaserver_la_LDFLAGS = -no-undefined
-liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
-liblipsofsunaserver_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(voxsrc)
-
 liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) -lz
 liblipsofsunagenerator_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(gensrc) $(matsrc) $(mdlsrc) \
@@ -577,6 +570,13 @@ liblipsofsunaimport_la_SOURCES = \
 	image/image-compress.h \
 	image/image-dds.h
 
+liblipsofsunaserver_la_LDFLAGS = -no-undefined
+liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
+liblipsofsunaserver_la_SOURCES = \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
+	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
+
 liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
 liblipsofsunaviewer_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(cfgsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
@@ -590,23 +590,23 @@ lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAG
 lipsofsuna_SOURCES = $(maisrc) $(syssrc)
 
 lipsofsuna_client_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(LICLI_LIBS) -lpng
 lipsofsuna_client_SOURCES = client/client-main.c
 
 lipsofsuna_generator_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_generator_LDADD = liblipsofsunagenerator.la
+lipsofsuna_generator_LDADD = liblipsofsunagenerator.la $(SQLITE_LIBS) -lz
 lipsofsuna_generator_SOURCES = generator/generator-main.c
 
 lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_import_LDADD = liblipsofsunaimport.la
+lipsofsuna_import_LDADD = liblipsofsunaimport.la $(SQUISH_LIBS) $(SQLITE_LIBS) -lpng
 lipsofsuna_import_SOURCES = reload/reload-main.c
 
 lipsofsuna_server_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_server_LDADD = liblipsofsunaserver.la
+lipsofsuna_server_LDADD = liblipsofsunaserver.la $(LISRV_LIBS)
 lipsofsuna_server_SOURCES = server/server-main.c
 
 lipsofsuna_viewer_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la
+lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
 lipsofsuna_viewer_SOURCES = viewer/viewer-main.c
 
 ##############################################################################
