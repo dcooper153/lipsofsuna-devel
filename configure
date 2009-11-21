@@ -739,7 +739,6 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-enable_option_checking=no
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
@@ -750,17 +749,8 @@ PROGDIR
 MODSDIR
 DATADIR
 EXTSDIR
-MAYBE_DEP
-ZLIB_LIBS
-ZLIB_CFLAGS
-SQUISH_LIBS
-SQUISH_CFLAGS
 OPENGL_LIBS
 OPENGL_CFLAGS
-GRAPPLE_LIBS
-GRAPPLE_CFLAGS
-GLEW_LIBS
-GLEW_CFLAGS
 LIPS_LIBS
 LIPS_CFLAGS
 LICLI_LIBS
@@ -777,20 +767,27 @@ MAYBE_GENERATOR_FALSE
 MAYBE_GENERATOR_TRUE
 MAYBE_CLIENT_FALSE
 MAYBE_CLIENT_TRUE
+SDL_LIBS
+SDL_CFLAGS
+SDL_CONFIG
+BULLET_LIBS
+BULLET_CFLAGS
+SQLITE_LIBS
+SQLITE_CFLAGS
 VORBIS_LIBS
 VORBIS_CFLAGS
 OPENAL_LIBS
 OPENAL_CFLAGS
-SQLITE_LIBS
-SQLITE_CFLAGS
 LUA_LIBS
 LUA_CFLAGS
-BULLET_LIBS
-BULLET_CFLAGS
-subdirs
-SDL_LIBS
-SDL_CFLAGS
-SDL_CONFIG
+ZLIB_LIBS
+ZLIB_CFLAGS
+SQUISH_LIBS
+SQUISH_CFLAGS
+GRAPPLE_LIBS
+GRAPPLE_CFLAGS
+GLEW_LIBS
+GLEW_CFLAGS
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -932,17 +929,9 @@ enable_import
 enable_server
 enable_sound
 enable_viewer
-enable_luatest
 enable_relpath
-enable_builtin
-enable_builtin_bullet
-enable_builtin_glew
-enable_builtin_grapple
-enable_builtin_lua
-enable_builtin_sqlite
-enable_builtin_squish
-enable_builtin_zlib
 enable_malloc_debug
+with_dep_prefix
 enable_dependency_tracking
 enable_shared
 enable_static
@@ -970,23 +959,25 @@ CPP
 CXXCPP
 PKG_CONFIG
 XMKMF
-BULLET_CFLAGS
-BULLET_LIBS
+GLEW_CFLAGS
+GLEW_LIBS
+GRAPPLE_CFLAGS
+GRAPPLE_LIBS
+SQUISH_CFLAGS
+SQUISH_LIBS
+ZLIB_CFLAGS
+ZLIB_LIBS
 LUA_CFLAGS
 LUA_LIBS
-SQLITE_CFLAGS
-SQLITE_LIBS
 OPENAL_CFLAGS
 OPENAL_LIBS
 VORBIS_CFLAGS
-VORBIS_LIBS'
-ac_subdirs_all='dep/bullet
-dep/glew
-dep/libgrapple
-dep/lua
-dep/sqlite
-dep/libsquish
-dep/zlib'
+VORBIS_LIBS
+SQLITE_CFLAGS
+SQLITE_LIBS
+BULLET_CFLAGS
+BULLET_LIBS'
+
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -1614,27 +1605,16 @@ Optional Features:
   --disable-silent-rules         verbose build output (undo: `make V=0')
   --enable-maintainer-mode  enable make rules and dependencies not useful
 			  (and sometimes confusing) to the casual installer
-  --enable-easy           Compile a relative binary using built-in
-                          dependencies
+  --enable-easy           Compile a relative binary and install it to ./build
   --disable-debug         Do not compile with debugging symbols
-  --disable-optimization  Compile with optimization enabled
+  --disable-optimization  Do not compile with optimization
   --disable-client        Do not compile the client
   --disable-generator     Do not compile the generator
   --disable-import        Do not compile the data file importer
   --disable-server        Do not compile the server
   --disable-sound         Do not compile with sound support
   --disable-viewer        Do not compile the model viewer
-  --disable-luatest       Do not try to detect whether Lua is available
   --enable-relpath        Install everything under a single directory
-  --enable-builtin        Compile all built-in dependencies
-  --enable-builtin-bullet Compile built-in Bullet
-  --enable-builtin-glew   Compile built-in GLEW
-  --enable-builtin-grapple
-                          Compile built-in Grapple
-  --enable-builtin-lua    Compile built-in Lua
-  --enable-builtin-sqlite Compile built-in SQLite
-  --enable-builtin-squish Compile built-in Squish
-  --enable-builtin-sqlite Compile built-in Zlib
   --enable-malloc-debug   Compile with logging memory management functions
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
@@ -1648,6 +1628,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-dep-prefix=PFX   Prefix where to search for dependencies (optional)
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -1669,20 +1650,31 @@ Some influential environment variables:
   CXXCPP      C++ preprocessor
   PKG_CONFIG  path to pkg-config utility
   XMKMF       Path to xmkmf, Makefile generator for X Window System
-  BULLET_CFLAGS
-              C compiler flags for BULLET, overriding pkg-config
-  BULLET_LIBS linker flags for BULLET, overriding pkg-config
+  GLEW_CFLAGS C compiler flags for GLEW
+  GLEW_LIBS   linker flags for GLEW [-lGLEW]
+  GRAPPLE_CFLAGS
+              C compiler flags for grapple
+  GRAPPLE_LIBS
+              linker flags for grapple [-lgrapple]
+  SQUISH_CFLAGS
+              C compiler flags for squish
+  SQUISH_LIBS linker flags for squish [-lsquish]
+  ZLIB_CFLAGS C compiler flags for zlib
+  ZLIB_LIBS   linker flags for zlib [-lz]
   LUA_CFLAGS  C compiler flags for LUA, overriding pkg-config
   LUA_LIBS    linker flags for LUA, overriding pkg-config
-  SQLITE_CFLAGS
-              C compiler flags for SQLITE, overriding pkg-config
-  SQLITE_LIBS linker flags for SQLITE, overriding pkg-config
   OPENAL_CFLAGS
               C compiler flags for OPENAL, overriding pkg-config
   OPENAL_LIBS linker flags for OPENAL, overriding pkg-config
   VORBIS_CFLAGS
               C compiler flags for VORBIS, overriding pkg-config
   VORBIS_LIBS linker flags for VORBIS, overriding pkg-config
+  SQLITE_CFLAGS
+              C compiler flags for SQLITE, overriding pkg-config
+  SQLITE_LIBS linker flags for SQLITE, overriding pkg-config
+  BULLET_CFLAGS
+              C compiler flags for BULLET, overriding pkg-config
+  BULLET_LIBS linker flags for BULLET, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3396,58 +3388,11 @@ else
   want_viewer=yes
 fi
 
-# Check whether --enable-luatest was given.
-if test "${enable_luatest+set}" = set; then :
-  enableval=$enable_luatest; want_luatest=no
-else
-  want_luatest=yes
-fi
-
 # Check whether --enable-relpath was given.
 if test "${enable_relpath+set}" = set; then :
   enableval=$enable_relpath; want_relative=yes
 else
   want_relative=no
-fi
-
-# Check whether --enable-builtin was given.
-if test "${enable_builtin+set}" = set; then :
-  enableval=$enable_builtin; want_builtin_all=yes
-fi
-
-# Check whether --enable-builtin-bullet was given.
-if test "${enable_builtin_bullet+set}" = set; then :
-  enableval=$enable_builtin_bullet; want_builtin_bullet=yes
-fi
-
-# Check whether --enable-builtin-glew was given.
-if test "${enable_builtin_glew+set}" = set; then :
-  enableval=$enable_builtin_glew; want_builtin_glew=yes
-fi
-
-# Check whether --enable-builtin-grapple was given.
-if test "${enable_builtin_grapple+set}" = set; then :
-  enableval=$enable_builtin_grapple; want_builtin_grapple=yes
-fi
-
-# Check whether --enable-builtin-lua was given.
-if test "${enable_builtin_lua+set}" = set; then :
-  enableval=$enable_builtin_lua; want_builtin_lua=yes
-fi
-
-# Check whether --enable-builtin-sqlite was given.
-if test "${enable_builtin_sqlite+set}" = set; then :
-  enableval=$enable_builtin_sqlite; want_builtin_sqlite=yes
-fi
-
-# Check whether --enable-builtin-squish was given.
-if test "${enable_builtin_squish+set}" = set; then :
-  enableval=$enable_builtin_squish; want_builtin_squish=yes
-fi
-
-# Check whether --enable-builtin-zlib was given.
-if test "${enable_builtin_zlib+set}" = set; then :
-  enableval=$enable_builtin_zlib; want_builtin_zlib=yes
 fi
 
 # Check whether --enable-malloc-debug was given.
@@ -3459,18 +3404,30 @@ fi
 
 
 if test "x$CFLAGS" = "x"; then
-	if test "$want_debug" = yes; then
+	if test "x$want_debug" = xyes; then
 		CFLAGS="$CFLAGS -g"
 	else
 		CFLAGS="$CFLAGS -DNDEBUG"
 	fi
-	if test "$want_optimization" = yes; then
+	if test "x$want_optimization" = xyes; then
 		CFLAGS="$CFLAGS -O3"
 	fi
 fi
-if test "$want_mallocdebug" = yes; then
+if test "x$want_mallocdebug" = xyes; then
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
 fi
+
+# Check whether --with-dep-prefix was given.
+if test "${with_dep_prefix+set}" = set; then :
+  withval=$with_dep_prefix; CFLAGS="$CFLAGS -I$withval/include"
+	LDFLAGS="$LDFLAGS -L$withval/lib"
+	if test "x$PKG_CONFIG_PATH" = x; then
+		PKG_CONFIG_PATH="$withval/lib/pkgconfig"
+	else
+		PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"
+	fi
+fi
+
 
 DEPDIR="${am__leading_dot}deps"
 
@@ -6145,13 +6102,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6148: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6105: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6151: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6108: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6154: output\"" >&5)
+  (eval echo "\"\$as_me:6111: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7356,7 +7313,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7359 "configure"' > conftest.$ac_ext
+  echo '#line 7316 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9413,11 +9370,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9416: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9373: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9420: \$? = $ac_status" >&5
+   echo "$as_me:9377: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9752,11 +9709,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9755: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9712: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9759: \$? = $ac_status" >&5
+   echo "$as_me:9716: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9857,11 +9814,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9860: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9817: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9864: \$? = $ac_status" >&5
+   echo "$as_me:9821: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9912,11 +9869,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9915: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9872: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9919: \$? = $ac_status" >&5
+   echo "$as_me:9876: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12295,7 +12252,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12298 "configure"
+#line 12255 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12391,7 +12348,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12394 "configure"
+#line 12351 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14347,11 +14304,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14350: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14307: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14354: \$? = $ac_status" >&5
+   echo "$as_me:14311: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14446,11 +14403,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14449: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14406: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14453: \$? = $ac_status" >&5
+   echo "$as_me:14410: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14498,11 +14455,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14501: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14458: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14505: \$? = $ac_status" >&5
+   echo "$as_me:14462: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17182,17 +17139,734 @@ fi
 LIPS_CFLAGS="$CFLAGS -Wall -DLI_ENABLE_ERROR"
 LIPS_LIBS="$LIBS"
 
-if test "$want_easy" = yes; then
+
+
+
+
+
+
+
+
+
+if test "x$want_easy" = xyes; then
 	want_relative=yes
-	want_builtin_all=yes
 	prefix="$PWD/build"
 fi
-if test "$want_client" = yes -o "$want_viewer" = yes; then
-	want_graphics=yes
+
+if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LUA" >&5
+$as_echo_n "checking for LUA... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$LUA_CFLAGS"; then
+        pkg_cv_LUA_CFLAGS="$LUA_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua5.1 >= 5.1.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "lua5.1 >= 5.1.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LUA_CFLAGS=`$PKG_CONFIG --cflags "lua5.1 >= 5.1.0" 2>/dev/null`
 else
-	want_graphics=no
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$LUA_LIBS"; then
+        pkg_cv_LUA_LIBS="$LUA_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua5.1 >= 5.1.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "lua5.1 >= 5.1.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LUA_LIBS=`$PKG_CONFIG --libs "lua5.1 >= 5.1.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
 fi
 
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LUA_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "lua5.1 >= 5.1.0"`
+        else
+	        LUA_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "lua5.1 >= 5.1.0"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LUA_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                found=no
+elif test $pkg_failed = untried; then
+	found=no
+else
+	LUA_CFLAGS=$pkg_cv_LUA_CFLAGS
+	LUA_LIBS=$pkg_cv_LUA_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	found=yes
+fi
+	if test "x$found" = "xno"; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LUA" >&5
+$as_echo_n "checking for LUA... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$LUA_CFLAGS"; then
+        pkg_cv_LUA_CFLAGS="$LUA_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua >= 5.1.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "lua >= 5.1.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LUA_CFLAGS=`$PKG_CONFIG --cflags "lua >= 5.1.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$LUA_LIBS"; then
+        pkg_cv_LUA_LIBS="$LUA_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua >= 5.1.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "lua >= 5.1.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LUA_LIBS=`$PKG_CONFIG --libs "lua >= 5.1.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LUA_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "lua >= 5.1.0"`
+        else
+	        LUA_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "lua >= 5.1.0"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LUA_PKG_ERRORS" >&5
+
+	as_fn_error "Package requirements (lua >= 5.1.0) were not met:
+
+$LUA_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables LUA_CFLAGS
+and LUA_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" "$LINENO" 5
+elif test $pkg_failed = untried; then
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables LUA_CFLAGS
+and LUA_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details." "$LINENO" 5; }
+else
+	LUA_CFLAGS=$pkg_cv_LUA_CFLAGS
+	LUA_LIBS=$pkg_cv_LUA_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	:
+fi
+	fi
+	if test "x$found" = xno; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newtable in -llua5.1" >&5
+$as_echo_n "checking for lua_newtable in -llua5.1... " >&6; }
+if test "${ac_cv_lib_lua5_1_lua_newtable+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llua5.1  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lua_newtable ();
+int
+main ()
+{
+return lua_newtable ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_lua5_1_lua_newtable=yes
+else
+  ac_cv_lib_lua5_1_lua_newtable=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua5_1_lua_newtable" >&5
+$as_echo "$ac_cv_lib_lua5_1_lua_newtable" >&6; }
+if test "x$ac_cv_lib_lua5_1_lua_newtable" = x""yes; then :
+  found=yes
+else
+  found=no
+fi
+
+		if test "x$found" = xyes; then
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua5.1"
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newtable in -llua" >&5
+$as_echo_n "checking for lua_newtable in -llua... " >&6; }
+if test "${ac_cv_lib_lua_lua_newtable+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-llua  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char lua_newtable ();
+int
+main ()
+{
+return lua_newtable ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_lua_lua_newtable=yes
+else
+  ac_cv_lib_lua_lua_newtable=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua_lua_newtable" >&5
+$as_echo "$ac_cv_lib_lua_lua_newtable" >&6; }
+if test "x$ac_cv_lib_lua_lua_newtable" = x""yes; then :
+  found=yes
+else
+  found=no
+fi
+
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua"
+		fi
+		if test "x$found" = xno; then
+			as_fn_error "
+
+Cannot find Lua. You may set the environment variables
+LUA_CFLAGS and LUA_LIBS to bypass this test." "$LINENO" 5
+		fi
+	fi
+fi
+if test "$xwant_sound" = xyes -a "$xwant_client" = xyes; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OPENAL" >&5
+$as_echo_n "checking for OPENAL... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$OPENAL_CFLAGS"; then
+        pkg_cv_OPENAL_CFLAGS="$OPENAL_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openal >= 0.0.8\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "openal >= 0.0.8") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_OPENAL_CFLAGS=`$PKG_CONFIG --cflags "openal >= 0.0.8" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$OPENAL_LIBS"; then
+        pkg_cv_OPENAL_LIBS="$OPENAL_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openal >= 0.0.8\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "openal >= 0.0.8") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_OPENAL_LIBS=`$PKG_CONFIG --libs "openal >= 0.0.8" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        OPENAL_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "openal >= 0.0.8"`
+        else
+	        OPENAL_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "openal >= 0.0.8"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$OPENAL_PKG_ERRORS" >&5
+
+	as_fn_error "Package requirements (openal >= 0.0.8) were not met:
+
+$OPENAL_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables OPENAL_CFLAGS
+and OPENAL_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" "$LINENO" 5
+elif test $pkg_failed = untried; then
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables OPENAL_CFLAGS
+and OPENAL_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details." "$LINENO" 5; }
+else
+	OPENAL_CFLAGS=$pkg_cv_OPENAL_CFLAGS
+	OPENAL_LIBS=$pkg_cv_OPENAL_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	:
+fi
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for VORBIS" >&5
+$as_echo_n "checking for VORBIS... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$VORBIS_CFLAGS"; then
+        pkg_cv_VORBIS_CFLAGS="$VORBIS_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"vorbis >= 1.2.0 vorbisfile >= 1.2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_VORBIS_CFLAGS=`$PKG_CONFIG --cflags "vorbis >= 1.2.0 vorbisfile >= 1.2.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$VORBIS_LIBS"; then
+        pkg_cv_VORBIS_LIBS="$VORBIS_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"vorbis >= 1.2.0 vorbisfile >= 1.2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_VORBIS_LIBS=`$PKG_CONFIG --libs "vorbis >= 1.2.0 vorbisfile >= 1.2.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        VORBIS_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0"`
+        else
+	        VORBIS_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$VORBIS_PKG_ERRORS" >&5
+
+	as_fn_error "Package requirements (vorbis >= 1.2.0 vorbisfile >= 1.2.0) were not met:
+
+$VORBIS_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables VORBIS_CFLAGS
+and VORBIS_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" "$LINENO" 5
+elif test $pkg_failed = untried; then
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables VORBIS_CFLAGS
+and VORBIS_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details." "$LINENO" 5; }
+else
+	VORBIS_CFLAGS=$pkg_cv_VORBIS_CFLAGS
+	VORBIS_LIBS=$pkg_cv_VORBIS_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	:
+fi
+else
+	OPENAL_CFLAGS="-DLI_DISABLE_SOUND"
+fi
+if test xyes = xyes; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SQLITE" >&5
+$as_echo_n "checking for SQLITE... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$SQLITE_CFLAGS"; then
+        pkg_cv_SQLITE_CFLAGS="$SQLITE_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sqlite3 >= 3.6.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sqlite3 >= 3.6.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SQLITE_CFLAGS=`$PKG_CONFIG --cflags "sqlite3 >= 3.6.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$SQLITE_LIBS"; then
+        pkg_cv_SQLITE_LIBS="$SQLITE_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sqlite3 >= 3.6.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sqlite3 >= 3.6.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SQLITE_LIBS=`$PKG_CONFIG --libs "sqlite3 >= 3.6.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        SQLITE_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "sqlite3 >= 3.6.0"`
+        else
+	        SQLITE_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "sqlite3 >= 3.6.0"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$SQLITE_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                found=no
+elif test $pkg_failed = untried; then
+	found=no
+else
+	SQLITE_CFLAGS=$pkg_cv_SQLITE_CFLAGS
+	SQLITE_LIBS=$pkg_cv_SQLITE_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	found=yes
+fi
+	if test "x$found" = xno; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_open in -lsqlite3" >&5
+$as_echo_n "checking for sqlite3_open in -lsqlite3... " >&6; }
+if test "${ac_cv_lib_sqlite3_sqlite3_open+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsqlite3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sqlite3_open ();
+int
+main ()
+{
+return sqlite3_open ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_sqlite3_sqlite3_open=yes
+else
+  ac_cv_lib_sqlite3_sqlite3_open=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_sqlite3_sqlite3_open" >&5
+$as_echo "$ac_cv_lib_sqlite3_sqlite3_open" >&6; }
+if test "x$ac_cv_lib_sqlite3_sqlite3_open" = x""yes; then :
+  found=yes
+else
+  found=no
+fi
+
+		if test "x$found" = xno; then
+			as_fn_error "
+
+Cannot find SQLite. You may set the environment variables
+SQLITE_CFLAGS and SQLITE_LIBS to bypass this test." "$LINENO" 5
+		else
+			SQLITE_CFLAGS=""
+			SQLITE_LIBS="-lsqlite3"
+		fi
+	fi
+fi
+if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for BULLET" >&5
+$as_echo_n "checking for BULLET... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$BULLET_CFLAGS"; then
+        pkg_cv_BULLET_CFLAGS="$BULLET_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"bullet >= 2.74\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "bullet >= 2.74") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_BULLET_CFLAGS=`$PKG_CONFIG --cflags "bullet >= 2.74" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$BULLET_LIBS"; then
+        pkg_cv_BULLET_LIBS="$BULLET_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"bullet >= 2.74\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "bullet >= 2.74") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_BULLET_LIBS=`$PKG_CONFIG --libs "bullet >= 2.74" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        BULLET_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "bullet >= 2.74"`
+        else
+	        BULLET_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "bullet >= 2.74"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$BULLET_PKG_ERRORS" >&5
+
+	as_fn_error "Package requirements (bullet >= 2.74) were not met:
+
+$BULLET_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables BULLET_CFLAGS
+and BULLET_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" "$LINENO" 5
+elif test $pkg_failed = untried; then
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables BULLET_CFLAGS
+and BULLET_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details." "$LINENO" 5; }
+else
+	BULLET_CFLAGS=$pkg_cv_BULLET_CFLAGS
+	BULLET_LIBS=$pkg_cv_BULLET_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	:
+fi
+	if test "x$found" = xno; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lbulletdynamics" >&5
+$as_echo_n "checking for main in -lbulletdynamics... " >&6; }
+if test "${ac_cv_lib_bulletdynamics_main+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lbulletdynamics  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_bulletdynamics_main=yes
+else
+  ac_cv_lib_bulletdynamics_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bulletdynamics_main" >&5
+$as_echo "$ac_cv_lib_bulletdynamics_main" >&6; }
+if test "x$ac_cv_lib_bulletdynamics_main" = x""yes; then :
+  found=yes
+else
+  found=no
+fi
+
+		if test "x$found" = xyes; then
+			as_fn_error "
+
+Cannot find Bullet. You may set the environment variables
+BULLET_CFLAGS and BULLET_LIBS to bypass this test." "$LINENO" 5
+		else
+			BULLET_CFLAGS=""
+			BULLET_LIBS="-lbulletdynamics -lbulletcollision -lbulletmath"
+		fi
+	fi
+fi
+if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
 
 # Check whether --with-sdl-prefix was given.
 if test "${with_sdl_prefix+set}" = set; then :
@@ -17379,7 +18053,7 @@ fi
   if test "x$no_sdl" = x ; then
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-     have_sdl=yes
+     found=yes
   else
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -17440,714 +18114,232 @@ rm -f core conftest.err conftest.$ac_objext \
      fi
      SDL_CFLAGS=""
      SDL_LIBS=""
-     have_sdl=no
+     found=no
   fi
 
 
   rm -f conf.sdltest
 
-if test "$want_graphics" -a "$have_sdl" = no; then
-	as_fn_error "cannot find SDL" "$LINENO" 5;
-fi
+	if test "x$found" = xno; then
+		as_fn_error "
 
-if test "x$want_builtin_all" = xyes; then
-	want_builtin_bullet=yes
-	want_builtin_glew=yes
-	want_builtin_grapple=yes
-	want_builtin_lua=yes
-	want_builtin_sqlite=yes
-	want_builtin_squish=yes
-	want_builtin_zlib=yes
-fi
-
-if test "x$want_builtin_bullet" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP bullet"
-	BULLET_CFLAGS="-I\$(top_srcdir)/dep/bullet/src"
-	BULLET_LIBS="\$(top_builddir)/dep/bullet/src/libbulletdynamics.la \$(top_builddir)/dep/bullet/src/libbulletcollision.la \$(top_builddir)/dep/bullet/src/libbulletmath.la"
-
-
-subdirs="$subdirs dep/bullet"
-
-else
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for BULLET" >&5
-$as_echo_n "checking for BULLET... " >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$BULLET_CFLAGS"; then
-        pkg_cv_BULLET_CFLAGS="$BULLET_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"bullet >= 2.74\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "bullet >= 2.74") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_BULLET_CFLAGS=`$PKG_CONFIG --cflags "bullet >= 2.74" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$BULLET_LIBS"; then
-        pkg_cv_BULLET_LIBS="$BULLET_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"bullet >= 2.74\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "bullet >= 2.74") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_BULLET_LIBS=`$PKG_CONFIG --libs "bullet >= 2.74" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        BULLET_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "bullet >= 2.74"`
-        else
-	        BULLET_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "bullet >= 2.74"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$BULLET_PKG_ERRORS" >&5
-
-	as_fn_error "Package requirements (bullet >= 2.74) were not met:
-
-$BULLET_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables BULLET_CFLAGS
-and BULLET_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
-elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables BULLET_CFLAGS
-and BULLET_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
-else
-	BULLET_CFLAGS=$pkg_cv_BULLET_CFLAGS
-	BULLET_LIBS=$pkg_cv_BULLET_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
-fi
-fi
-
-if test "x$want_builtin_glew" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP glew"
-	GLEW_CFLAGS="-I\$(top_srcdir)/dep/glew/include"
-	GLEW_LIBS="\$(top_builddir)/dep/glew/libGLEW.la"
-	subdirs="$subdirs dep/glew"
-
-else
-	GLEW_CFLAGS=""
-	GLEW_LIBS="-lGLEW"
-fi
-
-if test "x$want_builtin_grapple" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP libgrapple"
-	GRAPPLE_CFLAGS="-I\$(top_srcdir)/dep/libgrapple/src"
-	GRAPPLE_LIBS="\$(top_builddir)/dep/libgrapple/src/libgrapple.la"
-	subdirs="$subdirs dep/libgrapple"
-
-	LIPS_CFLAGS="$LIPS_CFLAGS -DBUILTIN_GRAPPLE"
-else
-	GRAPPLE_CFLAGS=""
-	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
-fi
-
-if test "x$want_builtin_lua" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP lua"
-	LUA_CFLAGS="-I\$(top_srcdir)/dep/lua/src"
-	LUA_LIBS="\$(top_builddir)/dep/lua/liblua5.1.la"
-	subdirs="$subdirs dep/lua"
-
-else
-	if test "$want_luatest" = yes; then
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LUA" >&5
-$as_echo_n "checking for LUA... " >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$LUA_CFLAGS"; then
-        pkg_cv_LUA_CFLAGS="$LUA_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua5.1 >= 5.1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "lua5.1 >= 5.1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LUA_CFLAGS=`$PKG_CONFIG --cflags "lua5.1 >= 5.1.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$LUA_LIBS"; then
-        pkg_cv_LUA_LIBS="$LUA_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua5.1 >= 5.1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "lua5.1 >= 5.1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LUA_LIBS=`$PKG_CONFIG --libs "lua5.1 >= 5.1.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LUA_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "lua5.1 >= 5.1.0"`
-        else
-	        LUA_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "lua5.1 >= 5.1.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LUA_PKG_ERRORS" >&5
-
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LUA" >&5
-$as_echo_n "checking for LUA... " >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$LUA_CFLAGS"; then
-        pkg_cv_LUA_CFLAGS="$LUA_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua >= 5.1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "lua >= 5.1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LUA_CFLAGS=`$PKG_CONFIG --cflags "lua >= 5.1.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$LUA_LIBS"; then
-        pkg_cv_LUA_LIBS="$LUA_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua >= 5.1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "lua >= 5.1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LUA_LIBS=`$PKG_CONFIG --libs "lua >= 5.1.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LUA_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "lua >= 5.1.0"`
-        else
-	        LUA_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "lua >= 5.1.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LUA_PKG_ERRORS" >&5
-
-	as_fn_error "Package requirements (lua >= 5.1.0) were not met:
-
-$LUA_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LUA_CFLAGS
-and LUA_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
-elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LUA_CFLAGS
-and LUA_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
-else
-	LUA_CFLAGS=$pkg_cv_LUA_CFLAGS
-	LUA_LIBS=$pkg_cv_LUA_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
-fi
-elif test $pkg_failed = untried; then
-
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LUA" >&5
-$as_echo_n "checking for LUA... " >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$LUA_CFLAGS"; then
-        pkg_cv_LUA_CFLAGS="$LUA_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua >= 5.1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "lua >= 5.1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LUA_CFLAGS=`$PKG_CONFIG --cflags "lua >= 5.1.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$LUA_LIBS"; then
-        pkg_cv_LUA_LIBS="$LUA_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"lua >= 5.1.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "lua >= 5.1.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_LUA_LIBS=`$PKG_CONFIG --libs "lua >= 5.1.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        LUA_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "lua >= 5.1.0"`
-        else
-	        LUA_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "lua >= 5.1.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$LUA_PKG_ERRORS" >&5
-
-	as_fn_error "Package requirements (lua >= 5.1.0) were not met:
-
-$LUA_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LUA_CFLAGS
-and LUA_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
-elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LUA_CFLAGS
-and LUA_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
-else
-	LUA_CFLAGS=$pkg_cv_LUA_CFLAGS
-	LUA_LIBS=$pkg_cv_LUA_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
-fi
-else
-	LUA_CFLAGS=$pkg_cv_LUA_CFLAGS
-	LUA_LIBS=$pkg_cv_LUA_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
-fi
+Cannot find SDL. You may set the environment variables
+SDL_CFLAGS and SDL_LIBS or use the --disable-sdltest
+option to bypass this test." "$LINENO" 5
 	fi
 fi
-
-if test "x$want_builtin_sqlite" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP sqlite"
-	SQLITE_CFLAGS="-I\$(top_srcdir)/dep/sqlite"
-	SQLITE_LIBS="\$(top_builddir)/dep/sqlite/libsqlite3.la"
-	subdirs="$subdirs dep/sqlite"
-
+if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
+	if test "x$GLEW_CFLAGS" = "x" -a "x$GLEW_LIBS" = "x"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for glewInit in -lGLEW" >&5
+$as_echo_n "checking for glewInit in -lGLEW... " >&6; }
+if test "${ac_cv_lib_GLEW_glewInit+set}" = set; then :
+  $as_echo_n "(cached) " >&6
 else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lGLEW  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SQLITE" >&5
-$as_echo_n "checking for SQLITE... " >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$SQLITE_CFLAGS"; then
-        pkg_cv_SQLITE_CFLAGS="$SQLITE_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sqlite3 >= 3.6.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "sqlite3 >= 3.6.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_SQLITE_CFLAGS=`$PKG_CONFIG --cflags "sqlite3 >= 3.6.0" 2>/dev/null`
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char glewInit ();
+int
+main ()
+{
+return glewInit ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_GLEW_glewInit=yes
 else
-  pkg_failed=yes
+  ac_cv_lib_GLEW_glewInit=no
 fi
-    fi
-else
-	pkg_failed=untried
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$SQLITE_LIBS"; then
-        pkg_cv_SQLITE_LIBS="$SQLITE_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sqlite3 >= 3.6.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "sqlite3 >= 3.6.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_SQLITE_LIBS=`$PKG_CONFIG --libs "sqlite3 >= 3.6.0" 2>/dev/null`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_GLEW_glewInit" >&5
+$as_echo "$ac_cv_lib_GLEW_glewInit" >&6; }
+if test "x$ac_cv_lib_GLEW_glewInit" = x""yes; then :
+  found=yes
 else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
+  found=no
 fi
 
+		if test "x$found" = xno; then
+			as_fn_error "
 
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
+Cannot find GLEW. You may set the environment variables
+GLEW_CFLAGS and GLEW_LIBS to bypass this test." "$LINENO" 5
+		fi
+		GLEW_CFLAGS=""
+		GLEW_LIBS="-lGLEW"
+	fi
 fi
-        if test $_pkg_short_errors_supported = yes; then
-	        SQLITE_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "sqlite3 >= 3.6.0"`
-        else
-	        SQLITE_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "sqlite3 >= 3.6.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$SQLITE_PKG_ERRORS" >&5
-
-	as_fn_error "Package requirements (sqlite3 >= 3.6.0) were not met:
-
-$SQLITE_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables SQLITE_CFLAGS
-and SQLITE_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
-elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables SQLITE_CFLAGS
-and SQLITE_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
+if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+	if test "x$GRAPPLE_CFLAGS" = "x" -a "x$GRAPPLE_LIBS" = "x"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for grapple_server_default_get in -lgrapple" >&5
+$as_echo_n "checking for grapple_server_default_get in -lgrapple... " >&6; }
+if test "${ac_cv_lib_grapple_grapple_server_default_get+set}" = set; then :
+  $as_echo_n "(cached) " >&6
 else
-	SQLITE_CFLAGS=$pkg_cv_SQLITE_CFLAGS
-	SQLITE_LIBS=$pkg_cv_SQLITE_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
-fi
-fi
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgrapple  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-if test "x$want_builtin_squish" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP libsquish"
-	SQUISH_CFLAGS="-I\$(top_srcdir)/dep/libsquish"
-	SQUISH_LIBS="\$(top_builddir)/dep/libsquish/libsquish.la"
-	subdirs="$subdirs dep/libsquish"
-
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char grapple_server_default_get ();
+int
+main ()
+{
+return grapple_server_default_get ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_grapple_grapple_server_default_get=yes
 else
-	SQUISH_CFLAGS=""
-	SQUISH_LIBS="-lsquish"
+  ac_cv_lib_grapple_grapple_server_default_get=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_grapple_grapple_server_default_get" >&5
+$as_echo "$ac_cv_lib_grapple_grapple_server_default_get" >&6; }
+if test "x$ac_cv_lib_grapple_grapple_server_default_get" = x""yes; then :
+  found=yes
+else
+  found=no
 fi
 
-if test "x$want_builtin_zlib" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP zlib"
-	ZLIB_CFLAGS="-I\$(top_srcdir)/dep/zlib"
-	ZLIB_LIBS="\$(top_builddir)/dep/zlib/libz.la"
-	subdirs="$subdirs dep/zlib"
+		if test "x$found" = xno; then
+			as_fn_error "
 
+Cannot find grapple. You may set the environment variables
+GRAPPLE_CFLAGS and GRAPPLE_LIBS to bypass this test." "$LINENO" 5
+		else
+			GRAPPLE_CFLAGS=""
+			GRAPPLE_LIBS="-lgrapple"
+		fi
+	fi
+fi
+if test "$want_client" = xyes -o "x$want_viewer" = xyes -o "x$want_import" = xyes; then
+	if test "x$SQUISH_CFLAGS" = "x" -a "x$SQUISH_LIBS" = "x"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lsquish" >&5
+$as_echo_n "checking for main in -lsquish... " >&6; }
+if test "${ac_cv_lib_squish_main+set}" = set; then :
+  $as_echo_n "(cached) " >&6
 else
-	ZLIB_CFLAGS=""
-	ZLIB_LIBS="-lz"
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsquish  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_squish_main=yes
+else
+  ac_cv_lib_squish_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_squish_main" >&5
+$as_echo "$ac_cv_lib_squish_main" >&6; }
+if test "x$ac_cv_lib_squish_main" = x""yes; then :
+  found=yes
+else
+  found=no
 fi
 
-if test "$xwant_sound" = xyes -a "$xwant_client" = xyes; then
+		if test "x$found" = xno; then
+			as_fn_error "
 
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OPENAL" >&5
-$as_echo_n "checking for OPENAL... " >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$OPENAL_CFLAGS"; then
-        pkg_cv_OPENAL_CFLAGS="$OPENAL_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openal >= 0.0.8\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "openal >= 0.0.8") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_OPENAL_CFLAGS=`$PKG_CONFIG --cflags "openal >= 0.0.8" 2>/dev/null`
-else
-  pkg_failed=yes
+Cannot find squish. You may set the environment variables
+SQUISH_CFLAGS and SQUISH_LIBS to bypass this test." "$LINENO" 5
+		else
+			SQUISH_CFLAGS=""
+			SQUISH_LIBS="-lsquish"
+		fi
+	fi
 fi
-    fi
+if test xyes = xyes; then
+	if test "x$ZLIB_CFLAGS" = "x" -a "x$ZLIB_LIBS" = "x"; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for deflate in -lz" >&5
+$as_echo_n "checking for deflate in -lz... " >&6; }
+if test "${ac_cv_lib_z_deflate+set}" = set; then :
+  $as_echo_n "(cached) " >&6
 else
-	pkg_failed=untried
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lz  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char deflate ();
+int
+main ()
+{
+return deflate ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_z_deflate=yes
+else
+  ac_cv_lib_z_deflate=no
 fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$OPENAL_LIBS"; then
-        pkg_cv_OPENAL_LIBS="$OPENAL_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openal >= 0.0.8\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "openal >= 0.0.8") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_OPENAL_LIBS=`$PKG_CONFIG --libs "openal >= 0.0.8" 2>/dev/null`
-else
-  pkg_failed=yes
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-    fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_deflate" >&5
+$as_echo "$ac_cv_lib_z_deflate" >&6; }
+if test "x$ac_cv_lib_z_deflate" = x""yes; then :
+  found=yes
 else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        OPENAL_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "openal >= 0.0.8"`
-        else
-	        OPENAL_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "openal >= 0.0.8"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$OPENAL_PKG_ERRORS" >&5
-
-	as_fn_error "Package requirements (openal >= 0.0.8) were not met:
-
-$OPENAL_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables OPENAL_CFLAGS
-and OPENAL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
-elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables OPENAL_CFLAGS
-and OPENAL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
-else
-	OPENAL_CFLAGS=$pkg_cv_OPENAL_CFLAGS
-	OPENAL_LIBS=$pkg_cv_OPENAL_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
+  found=no
 fi
 
-pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for VORBIS" >&5
-$as_echo_n "checking for VORBIS... " >&6; }
+		if test "x$found" = xno; then
+			as_fn_error "
 
-if test -n "$PKG_CONFIG"; then
-    if test -n "$VORBIS_CFLAGS"; then
-        pkg_cv_VORBIS_CFLAGS="$VORBIS_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"vorbis >= 1.2.0 vorbisfile >= 1.2.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_VORBIS_CFLAGS=`$PKG_CONFIG --cflags "vorbis >= 1.2.0 vorbisfile >= 1.2.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$VORBIS_LIBS"; then
-        pkg_cv_VORBIS_LIBS="$VORBIS_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"vorbis >= 1.2.0 vorbisfile >= 1.2.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_VORBIS_LIBS=`$PKG_CONFIG --libs "vorbis >= 1.2.0 vorbisfile >= 1.2.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        VORBIS_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0"`
-        else
-	        VORBIS_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "vorbis >= 1.2.0 vorbisfile >= 1.2.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$VORBIS_PKG_ERRORS" >&5
-
-	as_fn_error "Package requirements (vorbis >= 1.2.0 vorbisfile >= 1.2.0) were not met:
-
-$VORBIS_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables VORBIS_CFLAGS
-and VORBIS_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
-elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables VORBIS_CFLAGS
-and VORBIS_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
-else
-	VORBIS_CFLAGS=$pkg_cv_VORBIS_CFLAGS
-	VORBIS_LIBS=$pkg_cv_VORBIS_LIBS
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-	:
-fi
-else
-	OPENAL_CFLAGS="-DLI_DISABLE_SOUND"
+Cannot find zlib. You may set the environment variables
+ZLIB_CFLAGS and ZLIB_LIBS to bypass this test." "$LINENO" 5
+		else
+			ZLIB_CFLAGS=""
+			ZLIB_LIBS="-lz"
+		fi
+	fi
 fi
 
 if test "$want_relative" = yes; then
@@ -18264,8 +18456,7 @@ LICLI_LIBS="\
 
 
 
-
-ac_config_files="$ac_config_files Makefile data/Makefile dep/Makefile doc/Makefile lipsofsuna/Makefile lipsofsuna/client/extensions/Makefile lipsofsuna/server/extensions/Makefile"
+ac_config_files="$ac_config_files Makefile data/Makefile doc/Makefile lipsofsuna/Makefile lipsofsuna/client/extensions/Makefile lipsofsuna/server/extensions/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19369,7 +19560,6 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "data/Makefile") CONFIG_FILES="$CONFIG_FILES data/Makefile" ;;
-    "dep/Makefile") CONFIG_FILES="$CONFIG_FILES dep/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "lipsofsuna/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/Makefile" ;;
     "lipsofsuna/client/extensions/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/client/extensions/Makefile" ;;
@@ -20887,151 +21077,6 @@ if test "$no_create" != yes; then
   # Use ||, not &&, to avoid exiting from the if with $? = 1, which
   # would make configure fail if this is the last instruction.
   $ac_cs_success || as_fn_exit $?
-fi
-
-#
-# CONFIG_SUBDIRS section.
-#
-if test "$no_recursion" != yes; then
-
-  # Remove --cache-file, --srcdir, and --disable-option-checking arguments
-  # so they do not pile up.
-  ac_sub_configure_args=
-  ac_prev=
-  eval "set x $ac_configure_args"
-  shift
-  for ac_arg
-  do
-    if test -n "$ac_prev"; then
-      ac_prev=
-      continue
-    fi
-    case $ac_arg in
-    -cache-file | --cache-file | --cache-fil | --cache-fi \
-    | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
-      ac_prev=cache_file ;;
-    -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
-    | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* \
-    | --c=*)
-      ;;
-    --config-cache | -C)
-      ;;
-    -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
-      ac_prev=srcdir ;;
-    -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
-      ;;
-    -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
-      ac_prev=prefix ;;
-    -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
-      ;;
-    --disable-option-checking)
-      ;;
-    *)
-      case $ac_arg in
-      *\'*) ac_arg=`$as_echo "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
-      esac
-      as_fn_append ac_sub_configure_args " '$ac_arg'" ;;
-    esac
-  done
-
-  # Always prepend --prefix to ensure using the same prefix
-  # in subdir configurations.
-  ac_arg="--prefix=$prefix"
-  case $ac_arg in
-  *\'*) ac_arg=`$as_echo "$ac_arg" | sed "s/'/'\\\\\\\\''/g"` ;;
-  esac
-  ac_sub_configure_args="'$ac_arg' $ac_sub_configure_args"
-
-  # Pass --silent
-  if test "$silent" = yes; then
-    ac_sub_configure_args="--silent $ac_sub_configure_args"
-  fi
-
-  # Always prepend --disable-option-checking to silence warnings, since
-  # different subdirs can have different --enable and --with options.
-  ac_sub_configure_args="--disable-option-checking $ac_sub_configure_args"
-
-  ac_popdir=`pwd`
-  for ac_dir in : $subdirs; do test "x$ac_dir" = x: && continue
-
-    # Do not complain, so a configure script can configure whichever
-    # parts of a large source tree are present.
-    test -d "$srcdir/$ac_dir" || continue
-
-    ac_msg="=== configuring in $ac_dir (`pwd`/$ac_dir)"
-    $as_echo "$as_me:${as_lineno-$LINENO}: $ac_msg" >&5
-    $as_echo "$ac_msg" >&6
-    as_dir="$ac_dir"; as_fn_mkdir_p
-    ac_builddir=.
-
-case "$ac_dir" in
-.) ac_dir_suffix= ac_top_builddir_sub=. ac_top_build_prefix= ;;
-*)
-  ac_dir_suffix=/`$as_echo "$ac_dir" | sed 's|^\.[\\/]||'`
-  # A ".." for each directory in $ac_dir_suffix.
-  ac_top_builddir_sub=`$as_echo "$ac_dir_suffix" | sed 's|/[^\\/]*|/..|g;s|/||'`
-  case $ac_top_builddir_sub in
-  "") ac_top_builddir_sub=. ac_top_build_prefix= ;;
-  *)  ac_top_build_prefix=$ac_top_builddir_sub/ ;;
-  esac ;;
-esac
-ac_abs_top_builddir=$ac_pwd
-ac_abs_builddir=$ac_pwd$ac_dir_suffix
-# for backward compatibility:
-ac_top_builddir=$ac_top_build_prefix
-
-case $srcdir in
-  .)  # We are building in place.
-    ac_srcdir=.
-    ac_top_srcdir=$ac_top_builddir_sub
-    ac_abs_top_srcdir=$ac_pwd ;;
-  [\\/]* | ?:[\\/]* )  # Absolute name.
-    ac_srcdir=$srcdir$ac_dir_suffix;
-    ac_top_srcdir=$srcdir
-    ac_abs_top_srcdir=$srcdir ;;
-  *) # Relative name.
-    ac_srcdir=$ac_top_build_prefix$srcdir$ac_dir_suffix
-    ac_top_srcdir=$ac_top_build_prefix$srcdir
-    ac_abs_top_srcdir=$ac_pwd/$srcdir ;;
-esac
-ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
-
-
-    cd "$ac_dir"
-
-    # Check for guested configure; otherwise get Cygnus style configure.
-    if test -f "$ac_srcdir/configure.gnu"; then
-      ac_sub_configure=$ac_srcdir/configure.gnu
-    elif test -f "$ac_srcdir/configure"; then
-      ac_sub_configure=$ac_srcdir/configure
-    elif test -f "$ac_srcdir/configure.in"; then
-      # This should be Cygnus configure.
-      ac_sub_configure=$ac_aux_dir/configure
-    else
-      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: no configuration information is in $ac_dir" >&5
-$as_echo "$as_me: WARNING: no configuration information is in $ac_dir" >&2;}
-      ac_sub_configure=
-    fi
-
-    # The recursion is here.
-    if test -n "$ac_sub_configure"; then
-      # Make the cache file name correct relative to the subdirectory.
-      case $cache_file in
-      [\\/]* | ?:[\\/]* ) ac_sub_cache_file=$cache_file ;;
-      *) # Relative name.
-	ac_sub_cache_file=$ac_top_build_prefix$cache_file ;;
-      esac
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&5
-$as_echo "$as_me: running $SHELL $ac_sub_configure $ac_sub_configure_args --cache-file=$ac_sub_cache_file --srcdir=$ac_srcdir" >&6;}
-      # The eval makes quoting arguments work.
-      eval "\$SHELL \"\$ac_sub_configure\" $ac_sub_configure_args \
-	   --cache-file=\"\$ac_sub_cache_file\" --srcdir=\"\$ac_srcdir\"" ||
-	as_fn_error "$ac_sub_configure failed for $ac_dir" "$LINENO" 5
-    fi
-
-    cd "$ac_popdir"
-  done
 fi
 if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unrecognized options: $ac_unrecognized_opts" >&5

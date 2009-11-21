@@ -1,6 +1,3 @@
-dnl Process this file with autoconf to produce a configure script.
-dnl Created by Anjuta application wizard.
-
 AC_INIT([Lips of Suna], [0.0.3], [http://lipsofsuna.org], [lipsofsuna])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_SYSTEM
@@ -10,41 +7,41 @@ AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 
 dnl Arguments.
-AC_ARG_ENABLE([easy], AC_HELP_STRING([--enable-easy], [Compile a relative binary using built-in dependencies]), [want_easy=yes], [want_easy=no])
+AC_ARG_ENABLE([easy], AC_HELP_STRING([--enable-easy], [Compile a relative binary and install it to ./build]), [want_easy=yes], [want_easy=no])
 AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with debugging symbols]), [want_debug=no], [want_debug=yes])
-AC_ARG_ENABLE([optimization], AC_HELP_STRING([--disable-optimization], [Compile with optimization enabled]), [want_optimization=no], [want_optimization=yes])
+AC_ARG_ENABLE([optimization], AC_HELP_STRING([--disable-optimization], [Do not compile with optimization]), [want_optimization=no], [want_optimization=yes])
 AC_ARG_ENABLE([client], AC_HELP_STRING([--disable-client], [Do not compile the client]), [want_client=no], [want_client=yes])
 AC_ARG_ENABLE([generator], AC_HELP_STRING([--disable-generator], [Do not compile the generator]), [want_generator=no], [want_generator=yes])
 AC_ARG_ENABLE([import], AC_HELP_STRING([--disable-import], [Do not compile the data file importer]), [want_import=no], [want_import=yes])
 AC_ARG_ENABLE([server], AC_HELP_STRING([--disable-server], [Do not compile the server]), [want_server=no], [want_server=yes])
 AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with sound support]), [want_sound=no], [want_sound=yes])
 AC_ARG_ENABLE([viewer], AC_HELP_STRING([--disable-viewer], [Do not compile the model viewer]), [want_viewer=no], [want_viewer=yes])
-AC_ARG_ENABLE([luatest], AC_HELP_STRING([--disable-luatest], [Do not try to detect whether Lua is available]), [want_luatest=no], [want_luatest=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
-AC_ARG_ENABLE([builtin], AC_HELP_STRING([--enable-builtin], [Compile all built-in dependencies]), [want_builtin_all=yes], [])
-AC_ARG_ENABLE([builtin-bullet], AC_HELP_STRING([--enable-builtin-bullet], [Compile built-in Bullet]), [want_builtin_bullet=yes], [])
-AC_ARG_ENABLE([builtin-glew], AC_HELP_STRING([--enable-builtin-glew], [Compile built-in GLEW]), [want_builtin_glew=yes], [])
-AC_ARG_ENABLE([builtin-grapple], AC_HELP_STRING([--enable-builtin-grapple], [Compile built-in Grapple]), [want_builtin_grapple=yes], [])
-AC_ARG_ENABLE([builtin-lua], AC_HELP_STRING([--enable-builtin-lua], [Compile built-in Lua]), [want_builtin_lua=yes], [])
-AC_ARG_ENABLE([builtin-sqlite], AC_HELP_STRING([--enable-builtin-sqlite], [Compile built-in SQLite]), [want_builtin_sqlite=yes], [])
-AC_ARG_ENABLE([builtin-squish], AC_HELP_STRING([--enable-builtin-squish], [Compile built-in Squish]), [want_builtin_squish=yes], [])
-AC_ARG_ENABLE([builtin-zlib], AC_HELP_STRING([--enable-builtin-sqlite], [Compile built-in Zlib]), [want_builtin_zlib=yes], [])
 AC_ARG_ENABLE([malloc-debug], AC_HELP_STRING([--enable-malloc-debug], [Compile with logging memory management functions]), [want_mallocdebug=yes], [want_mallocdebug=no])
 
 dnl Compiler flags.
 if test "x$CFLAGS" = "x"; then
-	if test "$want_debug" = yes; then
+	if test "x$want_debug" = xyes; then
 		CFLAGS="$CFLAGS -g"
 	else
 		CFLAGS="$CFLAGS -DNDEBUG"
 	fi
-	if test "$want_optimization" = yes; then
+	if test "x$want_optimization" = xyes; then
 		CFLAGS="$CFLAGS -O3"
 	fi
 fi
-if test "$want_mallocdebug" = yes; then
+if test "x$want_mallocdebug" = xyes; then
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_MALLOC_DEBUG"
 fi
+AC_ARG_WITH([dep-prefix],
+	AC_HELP_STRING([--with-dep-prefix=PFX], [Prefix where to search for dependencies (optional)]),
+	[CFLAGS="$CFLAGS -I$withval/include"
+	LDFLAGS="$LDFLAGS -L$withval/lib"
+	if test "x$PKG_CONFIG_PATH" = x; then
+		PKG_CONFIG_PATH="$withval/lib/pkgconfig"
+	else
+		PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"
+	fi], [])
 
 dnl Tools, headers, libraries.
 AC_ISC_POSIX
@@ -76,118 +73,145 @@ AC_SEARCH_LIBS(socket, socket)
 LIPS_CFLAGS="$CFLAGS -Wall -DLI_ENABLE_ERROR"
 LIPS_LIBS="$LIBS"
 
+AC_ARG_VAR([GLEW_CFLAGS], [C compiler flags for GLEW])
+AC_ARG_VAR([GLEW_LIBS], [linker flags for GLEW [-lGLEW]])
+AC_ARG_VAR([GRAPPLE_CFLAGS], [C compiler flags for grapple])
+AC_ARG_VAR([GRAPPLE_LIBS], [linker flags for grapple [-lgrapple]])
+AC_ARG_VAR([SQUISH_CFLAGS], [C compiler flags for squish])
+AC_ARG_VAR([SQUISH_LIBS], [linker flags for squish [-lsquish]])
+AC_ARG_VAR([ZLIB_CFLAGS], [C compiler flags for zlib])
+AC_ARG_VAR([ZLIB_LIBS], [linker flags for zlib [-lz]])
+
 dnl Compilation options.
-if test "$want_easy" = yes; then
+if test "x$want_easy" = xyes; then
 	want_relative=yes
-	want_builtin_all=yes
 	prefix="$PWD/build"
 fi
-if test "$want_client" = yes -o "$want_viewer" = yes; then
-	want_graphics=yes
-else
-	want_graphics=no
-fi
 
-dnl Check for SDL.
-AM_PATH_SDL([1.2.0], [have_sdl=yes], [have_sdl=no])
-if test "$want_graphics" -a "$have_sdl" = no; then
-	AC_MSG_ERROR([cannot find SDL]);
-fi
+dnl Dependencies.
+if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+	PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [found=yes], [found=no])
+	if test "x$found" = "xno"; then
+		PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])
+	fi
+	if test "x$found" = xno; then
+		AC_CHECK_LIB([lua5.1], [lua_newtable], [found=yes], [found=no])
+		if test "x$found" = xyes; then
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua5.1"
+		else
+			AC_CHECK_LIB([lua], [lua_newtable], [found=yes], [found=no])
+			LUA_CFLAGS=""
+			LUA_LIBS="-llua"
+		fi
+		if test "x$found" = xno; then
+			AC_MSG_ERROR([
 
-dnl All built-in dependencies.
-if test "x$want_builtin_all" = xyes; then
-	want_builtin_bullet=yes
-	want_builtin_glew=yes
-	want_builtin_grapple=yes
-	want_builtin_lua=yes
-	want_builtin_sqlite=yes
-	want_builtin_squish=yes
-	want_builtin_zlib=yes
-fi
-
-dnl Bullet dependency.
-if test "x$want_builtin_bullet" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP bullet"
-	BULLET_CFLAGS="-I\$(top_srcdir)/dep/bullet/src"
-	BULLET_LIBS="\$(top_builddir)/dep/bullet/src/libbulletdynamics.la \$(top_builddir)/dep/bullet/src/libbulletcollision.la \$(top_builddir)/dep/bullet/src/libbulletmath.la"
-	AC_CONFIG_SUBDIRS(dep/bullet)
-else
-	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
-fi
-
-dnl GLEW dependency.
-if test "x$want_builtin_glew" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP glew"
-	GLEW_CFLAGS="-I\$(top_srcdir)/dep/glew/include"
-	GLEW_LIBS="\$(top_builddir)/dep/glew/libGLEW.la"
-	AC_CONFIG_SUBDIRS(dep/glew)
-else
-	GLEW_CFLAGS=""
-	GLEW_LIBS="-lGLEW"
-fi
-
-dnl Grapple dependency.
-if test "x$want_builtin_grapple" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP libgrapple"
-	GRAPPLE_CFLAGS="-I\$(top_srcdir)/dep/libgrapple/src"
-	GRAPPLE_LIBS="\$(top_builddir)/dep/libgrapple/src/libgrapple.la"
-	AC_CONFIG_SUBDIRS(dep/libgrapple)
-	LIPS_CFLAGS="$LIPS_CFLAGS -DBUILTIN_GRAPPLE"
-else
-	GRAPPLE_CFLAGS=""
-	GRAPPLE_LIBS="-lgrapple -lcrypt -lpthread"
-fi
-
-dnl Lua dependency.
-if test "x$want_builtin_lua" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP lua"
-	LUA_CFLAGS="-I\$(top_srcdir)/dep/lua/src"
-	LUA_LIBS="\$(top_builddir)/dep/lua/liblua5.1.la"
-	AC_CONFIG_SUBDIRS(dep/lua)
-else
-	if test "$want_luatest" = yes; then
-		PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [], [PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])])
+Cannot find Lua. You may set the environment variables
+LUA_CFLAGS and LUA_LIBS to bypass this test.])
+		fi
 	fi
 fi
-
-dnl Sqlite dependency.
-if test "x$want_builtin_sqlite" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP sqlite"
-	SQLITE_CFLAGS="-I\$(top_srcdir)/dep/sqlite"
-	SQLITE_LIBS="\$(top_builddir)/dep/sqlite/libsqlite3.la"
-	AC_CONFIG_SUBDIRS(dep/sqlite)
-else
-	PKG_CHECK_MODULES([SQLITE], [sqlite3 >= 3.6.0])
-fi
-
-dnl Squish dependency.
-if test "x$want_builtin_squish" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP libsquish"
-	SQUISH_CFLAGS="-I\$(top_srcdir)/dep/libsquish"
-	SQUISH_LIBS="\$(top_builddir)/dep/libsquish/libsquish.la"
-	AC_CONFIG_SUBDIRS(dep/libsquish)
-else
-	SQUISH_CFLAGS=""
-	SQUISH_LIBS="-lsquish"
-fi
-
-dnl Zlib dependency.
-if test "x$want_builtin_zlib" = xyes; then
-	MAYBE_DEP="$MAYBE_DEP zlib"
-	ZLIB_CFLAGS="-I\$(top_srcdir)/dep/zlib"
-	ZLIB_LIBS="\$(top_builddir)/dep/zlib/libz.la"
-	AC_CONFIG_SUBDIRS(dep/zlib)
-else
-	ZLIB_CFLAGS=""
-	ZLIB_LIBS="-lz"
-fi
-
-dnl Sound support.
 if test "$xwant_sound" = xyes -a "$xwant_client" = xyes; then
 	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
 	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
 else
 	OPENAL_CFLAGS="-DLI_DISABLE_SOUND"
+fi
+if test xyes = xyes; then
+	PKG_CHECK_MODULES([SQLITE], [sqlite3 >= 3.6.0], [found=yes], [found=no])
+	if test "x$found" = xno; then
+		AC_CHECK_LIB([sqlite3], [sqlite3_open], [found=yes], [found=no])
+		if test "x$found" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find SQLite. You may set the environment variables
+SQLITE_CFLAGS and SQLITE_LIBS to bypass this test.])
+		else
+			SQLITE_CFLAGS=""
+			SQLITE_LIBS="-lsqlite3"
+		fi
+	fi
+fi
+if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+	PKG_CHECK_MODULES([BULLET], [bullet >= 2.74])
+	if test "x$found" = xno; then
+		AC_CHECK_LIB([bulletdynamics], [main], [found=yes], [found=no])
+		if test "x$found" = xyes; then
+			AC_MSG_ERROR([
+
+Cannot find Bullet. You may set the environment variables
+BULLET_CFLAGS and BULLET_LIBS to bypass this test.])
+		else
+			BULLET_CFLAGS=""
+			BULLET_LIBS="-lbulletdynamics -lbulletcollision -lbulletmath"
+		fi
+	fi
+fi
+if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
+	AM_PATH_SDL([1.2.0], [found=yes], [found=no])
+	if test "x$found" = xno; then
+		AC_MSG_ERROR([
+
+Cannot find SDL. You may set the environment variables
+SDL_CFLAGS and SDL_LIBS or use the --disable-sdltest
+option to bypass this test.])
+	fi
+fi
+if test "x$want_client" = yes -o "x$want_viewer" = xyes; then
+	if test "x$GLEW_CFLAGS" = "x" -a "x$GLEW_LIBS" = "x"; then
+		AC_CHECK_LIB([GLEW], [glewInit], [found=yes], [found=no])
+		if test "x$found" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find GLEW. You may set the environment variables
+GLEW_CFLAGS and GLEW_LIBS to bypass this test.])
+		fi
+		GLEW_CFLAGS=""
+		GLEW_LIBS="-lGLEW"
+	fi
+fi
+if test "x$want_client" = xyes -o "x$want_server" = xyes; then
+	if test "x$GRAPPLE_CFLAGS" = "x" -a "x$GRAPPLE_LIBS" = "x"; then
+		AC_CHECK_LIB([grapple], [grapple_server_default_get], [found=yes], [found=no])
+		if test "x$found" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find grapple. You may set the environment variables
+GRAPPLE_CFLAGS and GRAPPLE_LIBS to bypass this test.])
+		else
+			GRAPPLE_CFLAGS=""
+			GRAPPLE_LIBS="-lgrapple"
+		fi
+	fi
+fi
+if test "$want_client" = xyes -o "x$want_viewer" = xyes -o "x$want_import" = xyes; then
+	if test "x$SQUISH_CFLAGS" = "x" -a "x$SQUISH_LIBS" = "x"; then
+		AC_CHECK_LIB([squish], [main], [found=yes], [found=no])
+		if test "x$found" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find squish. You may set the environment variables
+SQUISH_CFLAGS and SQUISH_LIBS to bypass this test.])
+		else
+			SQUISH_CFLAGS=""
+			SQUISH_LIBS="-lsquish"
+		fi
+	fi
+fi
+if test xyes = xyes; then
+	if test "x$ZLIB_CFLAGS" = "x" -a "x$ZLIB_LIBS" = "x"; then
+		AC_CHECK_LIB([z], [deflate], [found=yes], [found=no])
+		if test "x$found" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find zlib. You may set the environment variables
+ZLIB_CFLAGS and ZLIB_LIBS to bypass this test.])
+		else
+			ZLIB_CFLAGS=""
+			ZLIB_LIBS="-lz"
+		fi
+	fi
 fi
 
 dnl Relative paths.
@@ -214,14 +238,14 @@ else
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLISAVEDIR=\\\"\"${localstatedir}/${PACKAGE}\"\\\""
 fi
 
-dnl Programs to build.
+dnl Targets.
 AM_CONDITIONAL([MAYBE_CLIENT], [test "$want_client" = yes])
 AM_CONDITIONAL([MAYBE_GENERATOR], [test "$want_generator" = yes])
 AM_CONDITIONAL([MAYBE_IMPORT], [test "$want_import" = yes])
 AM_CONDITIONAL([MAYBE_SERVER], [test "$want_server" = yes])
 AM_CONDITIONAL([MAYBE_VIEWER], [test "$want_viewer" = yes])
 
-dnl Export configuration.
+dnl Export.
 LISRV_CFLAGS="\
 	$LIPS_CFLAGS $PTHREAD_CFLAGS $GRAPPLE_CFLAGS $LUA_CFLAGS $ZLIB_CFLAGS $SQLITE_CFLAGS \
 	$SDL_CFLAGS $GL_CFLAGS $GLEW_CFLAGS $OPENAL_CFLAGS $VORBIS_CFLAGS \
@@ -265,7 +289,6 @@ AC_SUBST([VORBIS_CFLAGS])
 AC_SUBST([VORBIS_LIBS])
 AC_SUBST([ZLIB_CFLAGS])
 AC_SUBST([ZLIB_LIBS])
-AC_SUBST([MAYBE_DEP])
 AC_SUBST([EXTSDIR])
 AC_SUBST([DATADIR])
 AC_SUBST([MODSDIR])
@@ -276,7 +299,6 @@ AC_SUBST([TOOLDIR])
 AC_OUTPUT([
 Makefile
 data/Makefile
-dep/Makefile
 doc/Makefile
 lipsofsuna/Makefile
 lipsofsuna/client/extensions/Makefile
