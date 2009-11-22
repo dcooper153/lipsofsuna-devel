@@ -16,36 +16,43 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liscr Script
  * @{
- * \addtogroup lisrvscr Script
+ * \addtogroup liscrEvent Event
  * @{
  */
 
-#ifndef __LIPS_SERVER_SCRIPT_H__
-#define __LIPS_SERVER_SCRIPT_H__
+#ifndef __SCRIPT_EVENT_H__
+#define __SCRIPT_EVENT_H__
 
+#include <stdarg.h>
 #include <script/lips-script.h>
 
-#define LISRV_SCRIPT_EXTENSION "Lips.Extension"
-#define LISRV_SCRIPT_OBJECT "Lips.Object"
-#define LISRV_SCRIPT_SERVER "Lips.Server"
+liscrData*
+licom_event_new (liscrScript* script);
+
+liscrData*
+licom_event_newv (liscrScript* script,
+                  va_list      args);
+
+liscrData*
+licom_event_newva (liscrScript* script,
+                                ...);
 
 void
-lisrvEffectScript (liscrClass* self,
-                   void*       data);
+licom_event_set (liscrData*   self,
+                              ...);
 
 void
-lisrvExtensionScript (liscrClass* self,
-                      void*       data);
+licom_event_setv (liscrData*   self,
+                  va_list      args);
+
+int
+licom_event_get_type (const liscrData* self);
 
 void
-lisrvObjectScript (liscrClass* self,
-                   void*       data);
-
-void
-lisrvServerScript (liscrClass* self,
-                   void*       data);
+licom_event_set_type (liscrData*   self,
+                      int          type);
 
 #endif
 

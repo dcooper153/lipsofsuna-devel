@@ -16,15 +16,14 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomEvent Event
+ * \addtogroup liscrEvent Event
  * @{
  */
 
 #include <script/lips-script.h>
 #include <system/lips-system.h>
-#include "lips-common-script.h"
 
 typedef struct _licomEvent licomEvent;
 struct _licomEvent

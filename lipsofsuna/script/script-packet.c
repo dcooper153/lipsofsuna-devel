@@ -16,16 +16,15 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomPacket Packet
+ * \addtogroup liscrPacket Packet
  * @{
  */
 
 #include <string.h>
 #include <network/lips-network.h>
 #include <script/lips-script.h>
-#include "lips-common-script.h"
 
 static int
 private_read (liscrPacket* data,

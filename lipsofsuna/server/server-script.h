@@ -15,10 +15,39 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * \addtogroup lisrv Server
+ * @{
+ * \addtogroup lisrvscr Script
+ * @{
+ */
+
 #ifndef __SERVER_SCRIPT_H__
 #define __SERVER_SCRIPT_H__
 
-#include <script/common/lips-common-script.h>
-#include "script/lips-server-script.h"
+#include <script/lips-script.h>
+
+#define LISRV_SCRIPT_EXTENSION "Lips.Extension"
+#define LISRV_SCRIPT_OBJECT "Lips.Object"
+#define LISRV_SCRIPT_SERVER "Lips.Server"
+
+void
+lisrvEffectScript (liscrClass* self,
+                   void*       data);
+
+void
+lisrvExtensionScript (liscrClass* self,
+                      void*       data);
+
+void
+lisrvObjectScript (liscrClass* self,
+                   void*       data);
+
+void
+lisrvServerScript (liscrClass* self,
+                   void*       data);
 
 #endif
+
+/** @} */
+/** @} */

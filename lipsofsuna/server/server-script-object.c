@@ -25,9 +25,8 @@
  */
 
 #include <network/lips-network.h>
-#include <script/common/lips-common-script.h>
+#include <script/lips-script.h>
 #include <server/lips-server.h>
-#include "lips-server-script.h"
 
 #define MAGICPTR_CONTACT_CALLBACK (NULL + 2)
 

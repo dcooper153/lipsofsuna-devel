@@ -357,24 +357,24 @@ scr_HEADERS = \
 	script/script.h \
 	script/script-class.h \
 	script/script-data.h \
+	script/script-event.h \
+	script/script-library.h \
+	script/script-packet.h \
 	script/script-types.h \
-	script/script-util.h \
-	script/common/lips-common-script.h \
-	script/common/script-event.h \
-	script/common/script-packet.h
+	script/script-util.h
 scrsrc = \
 	script/script.c \
 	script/script-class.c \
 	script/script-data.c \
+	script/script-event.c \
+	script/script-library.c \
+	script/script-object.c \
+	script/script-packet.c \
+	script/script-path.c \
 	script/script-private.h \
+	script/script-quaternion.c \
 	script/script-util.c \
-	script/common/script-class-1.c \
-	script/common/script-event.c \
-	script/common/script-object-3.c \
-	script/common/script-packet.c \
-	script/common/script-path.c \
-	script/common/script-quaternion.c \
-	script/common/script-vector.c
+	script/script-vector.c
 
 snddir = $(includedir)/lipsofsuna/sound
 snd_HEADERS = \
@@ -400,18 +400,17 @@ srv_HEADERS = \
 	server/server-object.h \
 	server/server-observer.h \
 	server/server-script.h \
-	server/server-types.h \
-	server/script/lips-server-script.h
+	server/server-types.h
 srvsrc = \
 	server/server.c \
 	server/server-callbacks.c \
 	server/server-client.c \
 	server/server-network.c \
 	server/server-object.c \
-	server/script/script-effect.c \
-	server/script/script-extension-2.c \
-	server/script/script-object-2.c \
-	server/script/script-server.c
+	server/server-script-effect.c \
+	server/server-script-extension.c \
+	server/server-script-object.c \
+	server/server-script-server.c
 
 strdir = $(includedir)/lipsofsuna/string
 str_HEADERS = \

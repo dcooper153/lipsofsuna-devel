@@ -16,45 +16,53 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomEvent Event
+ * \addtogroup liscrPacket Packet
  * @{
  */
 
-#ifndef __SCRIPT_EVENT_H__
-#define __SCRIPT_EVENT_H__
+#ifndef __SCRIPT_PACKET_H__
+#define __SCRIPT_PACKET_H__
 
-#include <stdarg.h>
+#include <archive/lips-archive.h>
 #include <script/lips-script.h>
+#include <string/lips-string.h>
+
+enum
+{
+	LISCR_PACKET_FORMAT_BOOL,
+	LISCR_PACKET_FORMAT_FLOAT,
+	LISCR_PACKET_FORMAT_INT8,
+	LISCR_PACKET_FORMAT_INT16,
+	LISCR_PACKET_FORMAT_INT32,
+	LISCR_PACKET_FORMAT_STRING,
+	LISCR_PACKET_FORMAT_UINT8,
+	LISCR_PACKET_FORMAT_UINT16,
+	LISCR_PACKET_FORMAT_UINT32,
+};
+
+typedef struct _liscrPacket liscrPacket;
+struct _liscrPacket
+{
+	char* buffer;
+	liarcReader* reader;
+	liarcWriter* writer;
+};
 
 liscrData*
-licom_event_new (liscrScript* script);
+liscr_packet_new_readable (liscrScript*       script,
+                           const liarcReader* reader);
 
 liscrData*
-licom_event_newv (liscrScript* script,
-                  va_list      args);
-
-liscrData*
-licom_event_newva (liscrScript* script,
-                                ...);
+liscr_packet_new_writable (liscrScript* script,
+                           int          type);
 
 void
-licom_event_set (liscrData*   self,
-                              ...);
-
-void
-licom_event_setv (liscrData*   self,
-                  va_list      args);
-
-int
-licom_event_get_type (const liscrData* self);
-
-void
-licom_event_set_type (liscrData*   self,
-                      int          type);
+liscr_packet_free (liscrPacket* self);
 
 #endif
 
 /** @} */
 /** @} */
+

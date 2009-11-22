@@ -16,14 +16,13 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomVector Vector
+ * \addtogroup liscrVector Vector
  * @{
  */
 
 #include <script/lips-script.h>
-#include "lips-common-script.h"
 
 /* @luadoc
  * module "Core.Common.Vector"

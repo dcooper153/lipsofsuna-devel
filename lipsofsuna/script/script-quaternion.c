@@ -16,14 +16,13 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomQuaternion Quaternion
+ * \addtogroup liscrQuaternion Quaternion
  * @{
  */
 
 #include <script/lips-script.h>
-#include "lips-common-script.h"
 
 /* @luadoc
  * module "Core.Common.Quaternion"

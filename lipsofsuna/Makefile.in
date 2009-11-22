@@ -168,21 +168,19 @@ am__objects_19 = render/render.lo render/render-buffer.lo \
 	render/render-resources.lo render/render-scene.lo \
 	render/render-shader.lo render/render-texture.lo
 am__objects_20 = script/script.lo script/script-class.lo \
-	script/script-data.lo script/script-util.lo \
-	script/common/script-class-1.lo script/common/script-event.lo \
-	script/common/script-object-3.lo \
-	script/common/script-packet.lo script/common/script-path.lo \
-	script/common/script-quaternion.lo \
-	script/common/script-vector.lo
+	script/script-data.lo script/script-event.lo \
+	script/script-library.lo script/script-object.lo \
+	script/script-packet.lo script/script-path.lo \
+	script/script-quaternion.lo script/script-util.lo \
+	script/script-vector.lo
 am__objects_21 = string/string-generic.lo
 am__objects_22 = sound/sound-manager.lo sound/sound-sample.lo \
 	sound/sound-source.lo sound/sound-system.lo
 am__objects_23 = server/server.lo server/server-callbacks.lo \
 	server/server-client.lo server/server-network.lo \
-	server/server-object.lo server/script/script-effect.lo \
-	server/script/script-extension-2.lo \
-	server/script/script-object-2.lo \
-	server/script/script-server.lo
+	server/server-object.lo server/server-script-effect.lo \
+	server/server-script-extension.lo \
+	server/server-script-object.lo server/server-script-server.lo
 am__objects_24 = system/system.lo system/system-directory.lo \
 	system/system-error.lo system/system-file.lo \
 	system/system-execute.lo system/system-memory.lo \
@@ -953,25 +951,25 @@ scr_HEADERS = \
 	script/script.h \
 	script/script-class.h \
 	script/script-data.h \
+	script/script-event.h \
+	script/script-library.h \
+	script/script-packet.h \
 	script/script-types.h \
-	script/script-util.h \
-	script/common/lips-common-script.h \
-	script/common/script-event.h \
-	script/common/script-packet.h
+	script/script-util.h
 
 scrsrc = \
 	script/script.c \
 	script/script-class.c \
 	script/script-data.c \
+	script/script-event.c \
+	script/script-library.c \
+	script/script-object.c \
+	script/script-packet.c \
+	script/script-path.c \
 	script/script-private.h \
+	script/script-quaternion.c \
 	script/script-util.c \
-	script/common/script-class-1.c \
-	script/common/script-event.c \
-	script/common/script-object-3.c \
-	script/common/script-packet.c \
-	script/common/script-path.c \
-	script/common/script-quaternion.c \
-	script/common/script-vector.c
+	script/script-vector.c
 
 snddir = $(includedir)/lipsofsuna/sound
 snd_HEADERS = \
@@ -998,8 +996,7 @@ srv_HEADERS = \
 	server/server-object.h \
 	server/server-observer.h \
 	server/server-script.h \
-	server/server-types.h \
-	server/script/lips-server-script.h
+	server/server-types.h
 
 srvsrc = \
 	server/server.c \
@@ -1007,10 +1004,10 @@ srvsrc = \
 	server/server-client.c \
 	server/server-network.c \
 	server/server-object.c \
-	server/script/script-effect.c \
-	server/script/script-extension-2.c \
-	server/script/script-object-2.c \
-	server/script/script-server.c
+	server/server-script-effect.c \
+	server/server-script-extension.c \
+	server/server-script-object.c \
+	server/server-script-server.c
 
 strdir = $(includedir)/lipsofsuna/string
 str_HEADERS = \
@@ -1600,28 +1597,22 @@ script/script-class.lo: script/$(am__dirstamp) \
 	script/$(DEPDIR)/$(am__dirstamp)
 script/script-data.lo: script/$(am__dirstamp) \
 	script/$(DEPDIR)/$(am__dirstamp)
+script/script-event.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
+script/script-library.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
+script/script-object.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
+script/script-packet.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
+script/script-path.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
+script/script-quaternion.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
 script/script-util.lo: script/$(am__dirstamp) \
 	script/$(DEPDIR)/$(am__dirstamp)
-script/common/$(am__dirstamp):
-	@$(MKDIR_P) script/common
-	@: > script/common/$(am__dirstamp)
-script/common/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) script/common/$(DEPDIR)
-	@: > script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-class-1.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-event.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-object-3.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-packet.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-path.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-quaternion.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
-script/common/script-vector.lo: script/common/$(am__dirstamp) \
-	script/common/$(DEPDIR)/$(am__dirstamp)
+script/script-vector.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
 string/$(am__dirstamp):
 	@$(MKDIR_P) string
 	@: > string/$(am__dirstamp)
@@ -1660,20 +1651,14 @@ server/server-network.lo: server/$(am__dirstamp) \
 	server/$(DEPDIR)/$(am__dirstamp)
 server/server-object.lo: server/$(am__dirstamp) \
 	server/$(DEPDIR)/$(am__dirstamp)
-server/script/$(am__dirstamp):
-	@$(MKDIR_P) server/script
-	@: > server/script/$(am__dirstamp)
-server/script/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) server/script/$(DEPDIR)
-	@: > server/script/$(DEPDIR)/$(am__dirstamp)
-server/script/script-effect.lo: server/script/$(am__dirstamp) \
-	server/script/$(DEPDIR)/$(am__dirstamp)
-server/script/script-extension-2.lo: server/script/$(am__dirstamp) \
-	server/script/$(DEPDIR)/$(am__dirstamp)
-server/script/script-object-2.lo: server/script/$(am__dirstamp) \
-	server/script/$(DEPDIR)/$(am__dirstamp)
-server/script/script-server.lo: server/script/$(am__dirstamp) \
-	server/script/$(DEPDIR)/$(am__dirstamp)
+server/server-script-effect.lo: server/$(am__dirstamp) \
+	server/$(DEPDIR)/$(am__dirstamp)
+server/server-script-extension.lo: server/$(am__dirstamp) \
+	server/$(DEPDIR)/$(am__dirstamp)
+server/server-script-object.lo: server/$(am__dirstamp) \
+	server/$(DEPDIR)/$(am__dirstamp)
+server/server-script-server.lo: server/$(am__dirstamp) \
+	server/$(DEPDIR)/$(am__dirstamp)
 system/$(am__dirstamp):
 	@$(MKDIR_P) system
 	@: > system/$(am__dirstamp)
@@ -2150,36 +2135,28 @@ mostlyclean-compile:
 	-rm -f render/render-texture.lo
 	-rm -f render/render.$(OBJEXT)
 	-rm -f render/render.lo
-	-rm -f script/common/script-class-1.$(OBJEXT)
-	-rm -f script/common/script-class-1.lo
-	-rm -f script/common/script-event.$(OBJEXT)
-	-rm -f script/common/script-event.lo
-	-rm -f script/common/script-object-3.$(OBJEXT)
-	-rm -f script/common/script-object-3.lo
-	-rm -f script/common/script-packet.$(OBJEXT)
-	-rm -f script/common/script-packet.lo
-	-rm -f script/common/script-path.$(OBJEXT)
-	-rm -f script/common/script-path.lo
-	-rm -f script/common/script-quaternion.$(OBJEXT)
-	-rm -f script/common/script-quaternion.lo
-	-rm -f script/common/script-vector.$(OBJEXT)
-	-rm -f script/common/script-vector.lo
 	-rm -f script/script-class.$(OBJEXT)
 	-rm -f script/script-class.lo
 	-rm -f script/script-data.$(OBJEXT)
 	-rm -f script/script-data.lo
+	-rm -f script/script-event.$(OBJEXT)
+	-rm -f script/script-event.lo
+	-rm -f script/script-library.$(OBJEXT)
+	-rm -f script/script-library.lo
+	-rm -f script/script-object.$(OBJEXT)
+	-rm -f script/script-object.lo
+	-rm -f script/script-packet.$(OBJEXT)
+	-rm -f script/script-packet.lo
+	-rm -f script/script-path.$(OBJEXT)
+	-rm -f script/script-path.lo
+	-rm -f script/script-quaternion.$(OBJEXT)
+	-rm -f script/script-quaternion.lo
 	-rm -f script/script-util.$(OBJEXT)
 	-rm -f script/script-util.lo
+	-rm -f script/script-vector.$(OBJEXT)
+	-rm -f script/script-vector.lo
 	-rm -f script/script.$(OBJEXT)
 	-rm -f script/script.lo
-	-rm -f server/script/script-effect.$(OBJEXT)
-	-rm -f server/script/script-effect.lo
-	-rm -f server/script/script-extension-2.$(OBJEXT)
-	-rm -f server/script/script-extension-2.lo
-	-rm -f server/script/script-object-2.$(OBJEXT)
-	-rm -f server/script/script-object-2.lo
-	-rm -f server/script/script-server.$(OBJEXT)
-	-rm -f server/script/script-server.lo
 	-rm -f server/server-callbacks.$(OBJEXT)
 	-rm -f server/server-callbacks.lo
 	-rm -f server/server-client.$(OBJEXT)
@@ -2189,6 +2166,14 @@ mostlyclean-compile:
 	-rm -f server/server-network.lo
 	-rm -f server/server-object.$(OBJEXT)
 	-rm -f server/server-object.lo
+	-rm -f server/server-script-effect.$(OBJEXT)
+	-rm -f server/server-script-effect.lo
+	-rm -f server/server-script-extension.$(OBJEXT)
+	-rm -f server/server-script-extension.lo
+	-rm -f server/server-script-object.$(OBJEXT)
+	-rm -f server/server-script-object.lo
+	-rm -f server/server-script-server.$(OBJEXT)
+	-rm -f server/server-script-server.lo
 	-rm -f server/server.$(OBJEXT)
 	-rm -f server/server.lo
 	-rm -f sound/sound-manager.$(OBJEXT)
@@ -2406,25 +2391,25 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-class.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-event.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-library.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-packet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-path.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-quaternion.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-class-1.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-event.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-object-3.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-packet.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-path.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-quaternion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@script/common/$(DEPDIR)/script-vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-callbacks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-script-effect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-script-extension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-script-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server-script-server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@server/$(DEPDIR)/server.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@server/script/$(DEPDIR)/script-effect.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@server/script/$(DEPDIR)/script-extension-2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@server/script/$(DEPDIR)/script-object-2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@server/script/$(DEPDIR)/script-server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/sound-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/sound-sample.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/sound-source.Plo@am__quote@
@@ -2791,9 +2776,7 @@ clean-libtool:
 	-rm -rf reload/.libs reload/_libs
 	-rm -rf render/.libs render/_libs
 	-rm -rf script/.libs script/_libs
-	-rm -rf script/common/.libs script/common/_libs
 	-rm -rf server/.libs server/_libs
-	-rm -rf server/script/.libs server/script/_libs
 	-rm -rf sound/.libs sound/_libs
 	-rm -rf string/.libs string/_libs
 	-rm -rf system/.libs system/_libs
@@ -3649,12 +3632,8 @@ distclean-generic:
 	-rm -f render/$(am__dirstamp)
 	-rm -f script/$(DEPDIR)/$(am__dirstamp)
 	-rm -f script/$(am__dirstamp)
-	-rm -f script/common/$(DEPDIR)/$(am__dirstamp)
-	-rm -f script/common/$(am__dirstamp)
 	-rm -f server/$(DEPDIR)/$(am__dirstamp)
 	-rm -f server/$(am__dirstamp)
-	-rm -f server/script/$(DEPDIR)/$(am__dirstamp)
-	-rm -f server/script/$(am__dirstamp)
 	-rm -f sound/$(DEPDIR)/$(am__dirstamp)
 	-rm -f sound/$(am__dirstamp)
 	-rm -f string/$(DEPDIR)/$(am__dirstamp)
@@ -3681,7 +3660,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
 	clean-libtool clean-prgPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ai/$(DEPDIR) algorithm/$(DEPDIR) archive/$(DEPDIR) binding/$(DEPDIR) callback/$(DEPDIR) client/$(DEPDIR) config/$(DEPDIR) engine/$(DEPDIR) font/$(DEPDIR) generator/$(DEPDIR) image/$(DEPDIR) main/$(DEPDIR) math/$(DEPDIR) model/$(DEPDIR) network/$(DEPDIR) particle/$(DEPDIR) paths/$(DEPDIR) physics/$(DEPDIR) reload/$(DEPDIR) render/$(DEPDIR) script/$(DEPDIR) script/common/$(DEPDIR) server/$(DEPDIR) server/script/$(DEPDIR) sound/$(DEPDIR) string/$(DEPDIR) system/$(DEPDIR) thread/$(DEPDIR) video/$(DEPDIR) viewer/$(DEPDIR) voxel/$(DEPDIR) widget/$(DEPDIR)
+	-rm -rf ai/$(DEPDIR) algorithm/$(DEPDIR) archive/$(DEPDIR) binding/$(DEPDIR) callback/$(DEPDIR) client/$(DEPDIR) config/$(DEPDIR) engine/$(DEPDIR) font/$(DEPDIR) generator/$(DEPDIR) image/$(DEPDIR) main/$(DEPDIR) math/$(DEPDIR) model/$(DEPDIR) network/$(DEPDIR) particle/$(DEPDIR) paths/$(DEPDIR) physics/$(DEPDIR) reload/$(DEPDIR) render/$(DEPDIR) script/$(DEPDIR) server/$(DEPDIR) sound/$(DEPDIR) string/$(DEPDIR) system/$(DEPDIR) thread/$(DEPDIR) video/$(DEPDIR) viewer/$(DEPDIR) voxel/$(DEPDIR) widget/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
@@ -3737,7 +3716,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ai/$(DEPDIR) algorithm/$(DEPDIR) archive/$(DEPDIR) binding/$(DEPDIR) callback/$(DEPDIR) client/$(DEPDIR) config/$(DEPDIR) engine/$(DEPDIR) font/$(DEPDIR) generator/$(DEPDIR) image/$(DEPDIR) main/$(DEPDIR) math/$(DEPDIR) model/$(DEPDIR) network/$(DEPDIR) particle/$(DEPDIR) paths/$(DEPDIR) physics/$(DEPDIR) reload/$(DEPDIR) render/$(DEPDIR) script/$(DEPDIR) script/common/$(DEPDIR) server/$(DEPDIR) server/script/$(DEPDIR) sound/$(DEPDIR) string/$(DEPDIR) system/$(DEPDIR) thread/$(DEPDIR) video/$(DEPDIR) viewer/$(DEPDIR) voxel/$(DEPDIR) widget/$(DEPDIR)
+	-rm -rf ai/$(DEPDIR) algorithm/$(DEPDIR) archive/$(DEPDIR) binding/$(DEPDIR) callback/$(DEPDIR) client/$(DEPDIR) config/$(DEPDIR) engine/$(DEPDIR) font/$(DEPDIR) generator/$(DEPDIR) image/$(DEPDIR) main/$(DEPDIR) math/$(DEPDIR) model/$(DEPDIR) network/$(DEPDIR) particle/$(DEPDIR) paths/$(DEPDIR) physics/$(DEPDIR) reload/$(DEPDIR) render/$(DEPDIR) script/$(DEPDIR) server/$(DEPDIR) sound/$(DEPDIR) string/$(DEPDIR) system/$(DEPDIR) thread/$(DEPDIR) video/$(DEPDIR) viewer/$(DEPDIR) voxel/$(DEPDIR) widget/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

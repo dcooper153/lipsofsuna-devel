@@ -15,13 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup licom Common
- * @{
- */
-
-#ifndef __LIPS_COMMON_SCRIPT_H__
-#define __LIPS_COMMON_SCRIPT_H__
+#ifndef __SCRIPT_LIBRARY_H__
+#define __SCRIPT_LIBRARY_H__
 
 #include <math/lips-math.h>
 #include <script/lips-script.h>

@@ -26,7 +26,6 @@
 #define __CLIENT_SCRIPT_H__
 
 #include <script/lips-script.h>
-#include <script/common/lips-common-script.h>
 #include <widget/lips-widget.h>
 
 #define LICLI_SCRIPT_ACTION "Lips.Action"

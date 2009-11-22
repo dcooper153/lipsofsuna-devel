@@ -25,8 +25,8 @@
  */
 
 #include <network/lips-network.h>
+#include <script/lips-script.h>
 #include <system/lips-system.h>
-#include "lips-server-script.h"
 
 void
 lisrvEffectScript (liscrClass* self,

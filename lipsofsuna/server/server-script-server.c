@@ -26,7 +26,6 @@
 
 #include <script/lips-script.h>
 #include <server/lips-server.h>
-#include "lips-server-script.h"
 
 /* @luadoc
  * module "Core.Server.Server"

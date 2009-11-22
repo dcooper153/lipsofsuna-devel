@@ -16,15 +16,14 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomPath Path
+ * \addtogroup liscrClass Class
  * @{
  */
 
 #include <ai/lips-ai.h>
 #include <script/lips-script.h>
-#include "lips-common-script.h"
 
 /* @luadoc
  * module "Core.Common.Class"

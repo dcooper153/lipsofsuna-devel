@@ -16,14 +16,14 @@
  */
 
 /**
- * \addtogroup licom Common
+ * \addtogroup liscr Script
  * @{
- * \addtogroup licomObject Object
+ * \addtogroup liscrObject Object
  * @{
  */
 
 #include <engine/lips-engine.h>
-#include "lips-common-script.h"
+#include <script/lips-script.h>
 
 /* @luadoc
  * module "Core.Common.Object"
