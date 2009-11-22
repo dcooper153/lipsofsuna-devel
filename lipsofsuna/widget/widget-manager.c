@@ -88,7 +88,10 @@ liwdg_manager_new (lividCalls* video,
 
 	/* Load config and resources. */
 	if (!private_load_config (self, root))
-		lisys_error_report ();
+	{
+		liwdg_manager_free (self);
+		return NULL;
+	}
 
 	return self;
 }

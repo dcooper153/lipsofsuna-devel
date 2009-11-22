@@ -45,6 +45,36 @@ liimg_texture_new ()
 }
 
 /**
+ * \brief Creates a texture from RGBA data.
+ *
+ * \param width Width in pixels.
+ * \param height Height in pixels.
+ * \param pixels Pixel data.
+ * \return New texture or NULL.
+ */
+liimgTexture*
+liimg_texture_new_from_rgba (int         width,
+                             int         height,
+                             const void* pixels)
+{
+	liimgTexture* self;
+
+	self = lisys_calloc (1, sizeof (liimgTexture));
+	if (self == NULL)
+		return NULL;
+	self->width = width;
+	self->height = height;
+	glGenTextures (1, &self->texture);
+	glBindTexture (GL_TEXTURE_2D, self->texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D (GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	return self;
+}
+
+/**
  * \brief Loads a texture from a file.
  *
  * \param path Path to the texture file.

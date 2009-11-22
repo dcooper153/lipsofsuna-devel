@@ -88,6 +88,7 @@ liwdg_styles_new (liwdgManager* manager,
 {
 	char* path;
 	liwdgStyles* self;
+	unsigned char tmp[16];
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liwdgStyles));
@@ -96,6 +97,7 @@ liwdg_styles_new (liwdgManager* manager,
 	self->manager = manager;
 
 	/* Initialize defaults. */
+	memset (tmp, 0, sizeof (tmp));
 	self->fallback.color[0] = 0.0f;
 	self->fallback.color[1] = 0.0f;
 	self->fallback.color[2] = 0.0f;
@@ -104,6 +106,12 @@ liwdg_styles_new (liwdgManager* manager,
 	self->fallback.selection[1] = 0.5f;
 	self->fallback.selection[2] = 0.5f;
 	self->fallback.selection[3] = 1.0f;
+	self->fallback.texture = liimg_texture_new_from_rgba (2, 2, tmp);
+	if (self->fallback.texture == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 
 	/* Allocate resource lists. */
 	self->fonts = lialg_strdic_new ();
@@ -158,6 +166,8 @@ liwdg_styles_free (liwdgStyles* self)
 			lisys_free (iter.value);
 		lialg_strdic_free (self->subimgs);
 	}
+	if (self->fallback.texture != NULL)
+		liimg_texture_free (self->fallback.texture);
 	lisys_free (self);
 }
 
@@ -449,14 +459,15 @@ private_read_widget_attr (liwdgStyles* self,
 		if (image == NULL)
 		{
 			if (!private_load_texture (self, &image, root, value))
-				return 0;
-			if (!lialg_strdic_insert (self->images, value, image))
+				lisys_error_report ();
+			else if (!lialg_strdic_insert (self->images, value, image))
 			{
 				liimg_texture_free (image);
 				return 0;
 			}
 		}
-		widget->texture = image;
+		if (image != NULL)
+			widget->texture = image;
 	}
 	else if (!strcmp (key, "source"))
 	{

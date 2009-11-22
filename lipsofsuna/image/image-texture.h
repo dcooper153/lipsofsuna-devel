@@ -39,6 +39,11 @@ liimgTexture*
 liimg_texture_new ();
 
 liimgTexture*
+liimg_texture_new_from_rgba (int         width,
+                             int         height,
+                             const void* pixels);
+
+liimgTexture*
 liimg_texture_new_from_file (const char* path);
 
 void
