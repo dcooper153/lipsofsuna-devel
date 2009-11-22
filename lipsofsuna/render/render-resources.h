@@ -61,10 +61,10 @@ lirndImage*
 lirnd_resources_insert_image (lirndResources* self,
                               const char*     name);
 
-lirndModel*
+int
 lirnd_resources_insert_model (lirndResources* self,
                               const char*     name,
-                              limdlModel*     model);
+                              lirndModel*     model);
 
 void
 lirnd_resources_remove_model (lirndResources* self,

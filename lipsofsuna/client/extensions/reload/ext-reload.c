@@ -202,8 +202,13 @@ static void
 private_reload_model (liextReload* self,
                       const char*  name)
 {
+	liengModel* model;
+
 	printf ("Reloading model `%s'\n", name);
 	lieng_engine_load_model (self->module->engine, name);
+	model = lieng_engine_find_model_by_name (self->module->engine, name);
+	if (model != NULL)
+		lirnd_render_load_model (self->module->render, name, model->model);
 }
 
 /** @} */

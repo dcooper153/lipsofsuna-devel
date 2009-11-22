@@ -41,9 +41,7 @@ struct _lirndObject
 	void* userdata;
 	limatAabb aabb;
 	limatTransform transform;
-#ifndef NDEBUG
-	limdlPose* debug_pose;
-#endif
+	limdlPose* pose;
 	lirndScene* scene;
 	lirndModel* model;
 	lirndModel* instance;
@@ -75,8 +73,7 @@ void
 lirnd_object_free (lirndObject* self);
 
 void
-lirnd_object_deform (lirndObject* self,
-                     limdlPose*   pose);
+lirnd_object_deform (lirndObject* self);
 
 void
 lirnd_object_emit_particles (lirndObject* self);
@@ -95,8 +92,11 @@ lirnd_object_get_center (const lirndObject* self,
 
 int
 lirnd_object_set_model (lirndObject* self,
-                        lirndModel*  model,
-                        limdlPose*   pose);
+                        lirndModel*  model);
+
+int
+lirnd_object_set_pose (lirndObject* self,
+                       limdlPose*   pose);
 
 int
 lirnd_object_get_realized (const lirndObject* self);

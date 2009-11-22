@@ -105,7 +105,7 @@ lirnd_draw_debug (lirndContext* context,
 	int i;
 
 	/* Check if renderable. */
-	if (object->model == NULL || object->debug_pose == NULL)
+	if (object->model == NULL || object->pose == NULL)
 		return;
 
 	glDisable (GL_DEPTH_TEST);
@@ -117,8 +117,8 @@ lirnd_draw_debug (lirndContext* context,
 	glPushMatrix ();
 	glMultMatrixf (object->orientation.matrix.m);
 	glBegin (GL_LINES);
-	for (i = 0 ; i < object->debug_pose->nodes.count ; i++)
-		private_draw_node (object->debug_pose->nodes.array[i]);
+	for (i = 0 ; i < object->pose->nodes.count ; i++)
+		private_draw_node (object->pose->nodes.array[i]);
 	glEnd ();
 	glPopMatrix ();
 #endif
@@ -140,8 +140,8 @@ lirnd_draw_debug (lirndContext* context,
 			continue;
 
 		/* Get effector and target. */
-		effector = limdl_pose_find_node (object->debug_pose, constraint->inverse_kinematics.node_name);
-		target = limdl_pose_find_node (object->debug_pose, constraint->inverse_kinematics.target_name);
+		effector = limdl_pose_find_node (object->pose, constraint->inverse_kinematics.node_name);
+		target = limdl_pose_find_node (object->pose, constraint->inverse_kinematics.target_name);
 		if (effector == NULL || target == NULL)
 			continue;
 

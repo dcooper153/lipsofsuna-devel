@@ -241,26 +241,15 @@ lirnd_resources_insert_image (lirndResources* self,
  *
  * \param self Resources.
  * \param name Model name.
- * \param model Model data.
- * \return Model or NULL.
+ * \param model Render model.
+ * \return Nonzero on success.
  */
-lirndModel*
+int
 lirnd_resources_insert_model (lirndResources* self,
                               const char*     name,
-                              limdlModel*     model)
+                              lirndModel*     model)
 {
-	lirndModel* model_;
-
-	model_ = lirnd_model_new (self->render, model);
-	if (model_ == NULL)
-		return NULL;
-	if (!lialg_strdic_insert (self->models, name, model_))
-	{
-		lirnd_model_free (model_);
-		return NULL;
-	}
-
-	return model_;
+	return lialg_strdic_insert (self->models, name, model) != NULL;
 }
 
 /**

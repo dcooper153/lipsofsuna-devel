@@ -96,6 +96,11 @@ int
 lirnd_render_load_image (lirndRender* self,
                          const char*  name);
 
+int
+lirnd_render_load_model (lirndRender* self,
+                         const char*  name,
+                         limdlModel*  model);
+
 void
 lirnd_render_update (lirndRender* self,
                      float        secs);

@@ -25,6 +25,7 @@
 #include <system/lips-system.h>
 #include "render.h"
 #include "render-draw.h"
+#include "render-group.h"
 
 static int
 private_init_resources (lirndRender* self,
@@ -170,7 +171,7 @@ lirnd_render_find_model (lirndRender* self,
 }
 
 /**
- * \brief Forces the renderer to reload a texture image.
+ * \brief Forces the renderer to load or reload a texture image.
  *
  * Reloads the requested texture and updates any materials that reference it
  * to point to the new texture. Any other references to the texture become
@@ -229,6 +230,89 @@ lirnd_render_load_image (lirndRender* self,
 		model = iter2.value;
 		lirnd_model_replace_image (model, rndimage);
 	}
+
+	return 1;
+}
+
+/**
+ * \brief Forces the renderer to load or reload a model.
+ *
+ * Reloads the requested model and updates any objects or groups that reference
+ * it to point to the new model. Any other references to the model become
+ * invalid and need to be manually replaced.
+ *
+ * \param self Renderer.
+ * \param name Model name.
+ * \param model Model data.
+ * \return Nonzero on success.
+ */
+int
+lirnd_render_load_model (lirndRender* self,
+                         const char*  name,
+                         limdlModel*  model)
+{
+	lirndGroup* group;
+	lirndGroupObject* grpobj;
+	lirndObject* object;
+	lirndModel* model0;
+	lirndModel* model1;
+	lirndScene* scene;
+	lialgPtrdicIter iter0;
+	lialgU32dicIter iter1;
+	lialgPtrdicIter iter2;
+
+	/* Create new model. */
+	model1 = lirnd_model_new (self, model);
+	if (model1 == NULL)
+		return 1;
+
+	/* Early exit if not reloading. */
+	model0 = lirnd_resources_find_model (self->resources, name);
+	if (model0 == NULL)
+	{
+		if (!lirnd_resources_insert_model (self->resources, name, model1))
+		{
+			lirnd_model_free (model1);
+			return 0;
+		}
+		return 1;
+	}
+
+	/* Replace in all instances. */
+	LI_FOREACH_PTRDIC (iter0, self->scenes)
+	{
+		scene = iter0.value;
+
+		/* Replace in all objects. */
+		LI_FOREACH_U32DIC (iter1, scene->objects)
+		{
+			object = iter1.value;
+			if (object->model == model0)
+			{
+				if (!lirnd_object_set_model (object, model1))
+				{
+					lirnd_object_set_model (object, NULL);
+					lirnd_object_set_pose (object, NULL);
+				}
+			}
+		}
+
+		/* Replace in all groups. */
+		LI_FOREACH_PTRDIC (iter2, scene->groups)
+		{
+			group = iter2.value;
+			for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
+			{
+				if (grpobj->model == model0)
+					grpobj->model = model1;
+			}
+		}
+	}
+
+	/* Replace in resource manager. */
+	/* FIXME: Leaves the manager to a broken state if fails to allocate memory. */
+	lirnd_resources_remove_model (self->resources, name);
+	lirnd_resources_insert_model (self->resources, name, model1);
 
 	return 1;
 }

@@ -113,11 +113,9 @@ lirnd_object_free (lirndObject* self)
  * \brief Deforms the object.
  *
  * \param self Object.
- * \param pose Pose transformation.
  */
 void
-lirnd_object_deform (lirndObject* self,
-                     limdlPose*   pose)
+lirnd_object_deform (lirndObject* self)
 {
 	int i;
 	void* vertices;
@@ -131,14 +129,11 @@ lirnd_object_deform (lirndObject* self,
 		vertices = lirnd_buffer_lock (buffer);
 		if (vertices != NULL)
 		{
-			limdl_pose_transform_group (pose, i, vertices);
+			limdl_pose_transform_group (self->pose, i, vertices);
 			lirnd_buffer_unlock (buffer, vertices);
 		}
 	}
 	private_update_lights (self);
-#ifndef NDEBUG
-	self->debug_pose = pose;
-#endif
 }
 
 void
@@ -198,7 +193,11 @@ lirnd_object_update (lirndObject* self,
                      float        secs)
 {
 	if (self->instance != NULL && self->instance->buffers.count)
+	{
 		private_update_envmap (self);
+		if (self->pose != NULL)
+			lirnd_object_deform (self);
+	}
 }
 
 /**
@@ -237,13 +236,11 @@ lirnd_object_get_center (const lirndObject* self,
  *
  * \param self Object.
  * \param model Model.
- * \param pose Pose.
  * \return Nonzero on success.
  */
 int
 lirnd_object_set_model (lirndObject* self,
-                        lirndModel*  model,
-                        limdlPose*   pose)
+                        lirndModel*  model)
 {
 	/* Replace model. */
 	self->model = model;
@@ -251,7 +248,7 @@ lirnd_object_set_model (lirndObject* self,
 	/* Replace instance. */
 	if (self->instance != NULL)
 		lirnd_model_free (self->instance);
-	if (model != NULL && pose != NULL)
+	if (model != NULL && self->pose != NULL)
 		self->instance = lirnd_model_new_instance (model);
 	else
 		self->instance = NULL;
@@ -265,8 +262,28 @@ lirnd_object_set_model (lirndObject* self,
 	/* Replace lights and environment map. */
 	private_clear_lights (self);
 	private_clear_envmap (self);
-	private_init_lights (self, pose);
+	private_init_lights (self, self->pose);
 	private_init_envmap (self);
+
+	return 1;
+}
+
+/**
+ * \brief Sets the pose of the object.
+ *
+ * \param self Object.
+ * \param pose Pose.
+ * \return Nonzero on success.
+ */
+int
+lirnd_object_set_pose (lirndObject* self,
+                       limdlPose*   pose)
+{
+	if (self->pose != pose)
+	{
+		self->pose = pose;
+		return lirnd_object_set_model (self, self->model);
+	}
 
 	return 1;
 }

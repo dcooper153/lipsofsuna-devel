@@ -268,7 +268,7 @@ liext_preview_insert_object (liextPreview*         self,
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER));
 	t = limat_transform_multiply (t, *transform);
 	lirnd_object_set_transform (object, &t);
-	lirnd_object_set_model (object, rmodel, NULL);
+	lirnd_object_set_model (object, rmodel);
 	lirnd_object_set_realized (object, 1);
 
 	/* Add to dictionary. */

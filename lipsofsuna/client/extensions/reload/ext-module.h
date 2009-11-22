@@ -34,7 +34,7 @@
 typedef struct _liextModule liextModule;
 struct _liextModule
 {
-	licalHandle calls[2];
+	licalHandle calls[1];
 	licliModule* module;
 	liextReload* reload;
 };

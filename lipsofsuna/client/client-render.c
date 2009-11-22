@@ -40,7 +40,7 @@ static int
 private_model_new (licliModule* self,
                    liengModel*  model)
 {
-	lirnd_resources_insert_model (self->render->resources, model->name, model->model);
+	lirnd_render_load_model (self->render, model->name, model->model);
 
 	return 1;
 }
@@ -92,11 +92,13 @@ private_object_model (licliModule* self,
 			model_ = lirnd_render_find_model (self->render, model->name);
 			if (model_ != NULL)
 			{
-				lirnd_object_set_model (object_, model_, object->pose);
+				lirnd_object_set_pose (object_, object->pose);
+				lirnd_object_set_model (object_, model_);
 				return 1;
 			}
 		}
-		lirnd_object_set_model (object_, NULL, NULL);
+		lirnd_object_set_pose (object_, NULL);
+		lirnd_object_set_model (object_, NULL);
 	}
 
 	return 1;
@@ -134,17 +136,6 @@ static int
 private_tick (licliModule* self,
               float        secs)
 {
-	lialgU32dicIter iter;
-	liengObject* eobject;
-	lirndObject* robject;
-
-	LI_FOREACH_U32DIC (iter, self->engine->objects)
-	{
-		eobject = iter.value;
-		robject = lirnd_scene_find_object (self->scene, eobject->id);
-		if (robject != NULL)
-			lirnd_object_deform (robject, eobject->pose);
-	}
 	lirnd_render_update (self->render, secs);
 	lirnd_scene_update (self->scene, secs);
 

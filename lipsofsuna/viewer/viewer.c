@@ -308,7 +308,7 @@ private_init_model (livieViewer* self,
 		limdl_model_free (mdl);
 		return 0;
 	}
-	lirnd_object_set_model (self->object, self->model, NULL);
+	lirnd_object_set_model (self->object, self->model);
 	lirnd_object_set_realized (self->object, 1);
 
 	return 1;
