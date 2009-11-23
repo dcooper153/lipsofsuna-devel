@@ -117,7 +117,7 @@ LUA_CFLAGS and LUA_LIBS to bypass this test.])
 		fi
 	fi
 fi
-if test "$xwant_sound" = xyes && test "$xwant_client" = xyes; then
+if test "x$want_sound" = xyes && test "x$want_client" = xyes; then
 	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
 	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
 else

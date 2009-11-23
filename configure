@@ -17529,7 +17529,7 @@ LUA_CFLAGS and LUA_LIBS to bypass this test." "$LINENO" 5
 		fi
 	fi
 fi
-if test "$xwant_sound" = xyes && test "$xwant_client" = xyes; then
+if test "x$want_sound" = xyes && test "x$want_client" = xyes; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OPENAL" >&5
