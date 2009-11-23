@@ -17,6 +17,7 @@
 
 
 
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -95,21 +96,22 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(prgdir)" "$(DESTDIR)$(aidir)" \
-	"$(DESTDIR)$(algdir)" "$(DESTDIR)$(arcdir)" \
-	"$(DESTDIR)$(bnddir)" "$(DESTDIR)$(caldir)" \
-	"$(DESTDIR)$(cfgdir)" "$(DESTDIR)$(clidir)" \
-	"$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" \
-	"$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" \
-	"$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" \
-	"$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" \
-	"$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" \
-	"$(DESTDIR)$(reldir)" "$(DESTDIR)$(rnddir)" \
-	"$(DESTDIR)$(scrdir)" "$(DESTDIR)$(snddir)" \
-	"$(DESTDIR)$(srvdir)" "$(DESTDIR)$(strdir)" \
-	"$(DESTDIR)$(sysdir)" "$(DESTDIR)$(thrdir)" \
-	"$(DESTDIR)$(viddir)" "$(DESTDIR)$(viedir)" \
-	"$(DESTDIR)$(voxdir)" "$(DESTDIR)$(wdgdir)"
+	"$(DESTDIR)$(prgdir)" "$(DESTDIR)$(editordir)" \
+	"$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" \
+	"$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" \
+	"$(DESTDIR)$(caldir)" "$(DESTDIR)$(cfgdir)" \
+	"$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" \
+	"$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" \
+	"$(DESTDIR)$(imgdir)" "$(DESTDIR)$(matdir)" \
+	"$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" \
+	"$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" \
+	"$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" \
+	"$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" \
+	"$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" \
+	"$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" \
+	"$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" \
+	"$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" \
+	"$(DESTDIR)$(wdgdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 liblipsofsunaclient_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -398,6 +400,7 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-pdf-recursive install-ps-recursive install-recursive \
 	installcheck-recursive installdirs-recursive pdf-recursive \
 	ps-recursive uninstall-recursive
+DATA = $(editor_DATA)
 HEADERS = $(ai_HEADERS) $(alg_HEADERS) $(arc_HEADERS) $(bnd_HEADERS) \
 	$(cal_HEADERS) $(cfg_HEADERS) $(cli_HEADERS) $(eng_HEADERS) \
 	$(fnt_HEADERS) $(gen_HEADERS) $(img_HEADERS) $(mat_HEADERS) \
@@ -607,7 +610,9 @@ SUBDIRS = . $(am__append_1) $(am__append_2)
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
 INCLUDES = -I$(top_srcdir)
-EXTRA_DIST = math/unittest.c
+EXTRA_DIST = math/unittest.c reload/blender-export.py
+editordir = $(TOOLDIR)
+editor_DATA = reload/blender-export.py
 prgdir = $(PROGDIR)
 lib_LTLIBRARIES = $(am__append_4) $(am__append_6) $(am__append_8) \
 	$(am__append_10) $(am__append_12)
@@ -2785,6 +2790,26 @@ clean-libtool:
 	-rm -rf viewer/.libs viewer/_libs
 	-rm -rf voxel/.libs voxel/_libs
 	-rm -rf widget/.libs widget/_libs
+install-editorDATA: $(editor_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(editordir)" || $(MKDIR_P) "$(DESTDIR)$(editordir)"
+	@list='$(editor_DATA)'; test -n "$(editordir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(editordir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(editordir)" || exit $$?; \
+	done
+
+uninstall-editorDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(editor_DATA)'; test -n "$(editordir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(editordir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(editordir)" && rm -f $$files
 install-aiHEADERS: $(ai_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(aidir)" || $(MKDIR_P) "$(DESTDIR)$(aidir)"
@@ -3561,12 +3586,13 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS) \
+		config.h
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" "$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" "$(DESTDIR)$(caldir)" "$(DESTDIR)$(cfgdir)" "$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" "$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" "$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" "$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" "$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" "$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" "$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" "$(DESTDIR)$(wdgdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(editordir)" "$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" "$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" "$(DESTDIR)$(caldir)" "$(DESTDIR)$(cfgdir)" "$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" "$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" "$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" "$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" "$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" "$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" "$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" "$(DESTDIR)$(wdgdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -3680,14 +3706,14 @@ info-am:
 install-data-am: install-aiHEADERS install-algHEADERS \
 	install-arcHEADERS install-bndHEADERS install-calHEADERS \
 	install-cfgHEADERS install-cliHEADERS install-data-local \
-	install-engHEADERS install-fntHEADERS install-genHEADERS \
-	install-imgHEADERS install-matHEADERS install-mdlHEADERS \
-	install-netHEADERS install-parHEADERS install-phyHEADERS \
-	install-prgPROGRAMS install-pthHEADERS install-relHEADERS \
-	install-rndHEADERS install-scrHEADERS install-sndHEADERS \
-	install-srvHEADERS install-strHEADERS install-sysHEADERS \
-	install-thrHEADERS install-vidHEADERS install-vieHEADERS \
-	install-voxHEADERS install-wdgHEADERS
+	install-editorDATA install-engHEADERS install-fntHEADERS \
+	install-genHEADERS install-imgHEADERS install-matHEADERS \
+	install-mdlHEADERS install-netHEADERS install-parHEADERS \
+	install-phyHEADERS install-prgPROGRAMS install-pthHEADERS \
+	install-relHEADERS install-rndHEADERS install-scrHEADERS \
+	install-sndHEADERS install-srvHEADERS install-strHEADERS \
+	install-sysHEADERS install-thrHEADERS install-vidHEADERS \
+	install-vieHEADERS install-voxHEADERS install-wdgHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -3736,8 +3762,8 @@ ps-am:
 uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	uninstall-arcHEADERS uninstall-binPROGRAMS \
 	uninstall-bndHEADERS uninstall-calHEADERS uninstall-cfgHEADERS \
-	uninstall-cliHEADERS uninstall-engHEADERS uninstall-fntHEADERS \
-	uninstall-genHEADERS uninstall-imgHEADERS \
+	uninstall-cliHEADERS uninstall-editorDATA uninstall-engHEADERS \
+	uninstall-fntHEADERS uninstall-genHEADERS uninstall-imgHEADERS \
 	uninstall-libLTLIBRARIES uninstall-matHEADERS \
 	uninstall-mdlHEADERS uninstall-netHEADERS uninstall-parHEADERS \
 	uninstall-phyHEADERS uninstall-prgPROGRAMS \
@@ -3761,9 +3787,9 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	install-binPROGRAMS install-bndHEADERS install-calHEADERS \
 	install-cfgHEADERS install-cliHEADERS install-data \
 	install-data-am install-data-local install-dvi install-dvi-am \
-	install-engHEADERS install-exec install-exec-am \
-	install-fntHEADERS install-genHEADERS install-html \
-	install-html-am install-imgHEADERS install-info \
+	install-editorDATA install-engHEADERS install-exec \
+	install-exec-am install-fntHEADERS install-genHEADERS \
+	install-html install-html-am install-imgHEADERS install-info \
 	install-info-am install-libLTLIBRARIES install-man \
 	install-matHEADERS install-mdlHEADERS install-netHEADERS \
 	install-parHEADERS install-pdf install-pdf-am \
@@ -3780,8 +3806,8 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	uninstall-aiHEADERS uninstall-algHEADERS uninstall-am \
 	uninstall-arcHEADERS uninstall-binPROGRAMS \
 	uninstall-bndHEADERS uninstall-calHEADERS uninstall-cfgHEADERS \
-	uninstall-cliHEADERS uninstall-engHEADERS uninstall-fntHEADERS \
-	uninstall-genHEADERS uninstall-imgHEADERS \
+	uninstall-cliHEADERS uninstall-editorDATA uninstall-engHEADERS \
+	uninstall-fntHEADERS uninstall-genHEADERS uninstall-imgHEADERS \
 	uninstall-libLTLIBRARIES uninstall-matHEADERS \
 	uninstall-mdlHEADERS uninstall-netHEADERS uninstall-parHEADERS \
 	uninstall-phyHEADERS uninstall-prgPROGRAMS \

@@ -315,7 +315,6 @@ AC_SUBST([TOOLDIR])
 
 AC_OUTPUT([
 Makefile
-data/Makefile
 doc/Makefile
 lipsofsuna/Makefile
 lipsofsuna/client/extensions/Makefile

@@ -21,7 +21,7 @@ cd ../..
 mkdir -p build/tool
 cd build/tool
 rm -f *.py
-ln -s ../../data/blender-export.py blender-export.py
+ln -s ../../lipsofsuna/reload/blender-export.py blender-export.py
 cd ../..
 
 mkdir -p build/lib

@@ -9,7 +9,10 @@ endif
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
 INCLUDES = -I$(top_srcdir)
-EXTRA_DIST = math/unittest.c
+EXTRA_DIST = math/unittest.c reload/blender-export.py
+
+editordir = $(TOOLDIR)
+editor_DATA = reload/blender-export.py
 
 prgdir = $(PROGDIR)
 prg_PROGRAMS = lipsofsuna
