@@ -280,22 +280,22 @@ Voxel_find_voxel (lua_State* lua)
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
- * -- @param type Terrain type.
+ * -- @param tile Tile.
  * -- @return True if terrain was filled.
- * function Voxel.insert_voxel(self, point, type)
+ * function Voxel.insert_voxel(self, point, tile)
  */
 static int
 Voxel_insert_voxel (lua_State* lua)
 {
-	int type;
 	liextModule* module;
 	liscrData* center;
+	liscrData* voxel;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	type = luaL_checkinteger (lua, 3);
+	voxel = liscr_checkdata (lua, 3, LIEXT_SCRIPT_TILE);
 
-	lua_pushboolean (lua, livox_manager_insert_voxel (module->voxels, center->data, type));
+	lua_pushboolean (lua, livox_manager_insert_voxel (module->voxels, center->data, voxel->data));
 
 	return 1;
 }
@@ -306,31 +306,22 @@ Voxel_insert_voxel (lua_State* lua)
  * --
  * -- @param self Voxel class.
  * -- @param point Point.
- * -- @param type Terrain type.
- * -- @param damage Optional damage value.
+ * -- @param tile Tile.
  * -- @return True if terrain was replaced.
- * function Voxel.replace_voxel(self, point, type, damage)
+ * function Voxel.replace_voxel(self, tile)
  */
 static int
 Voxel_replace_voxel (lua_State* lua)
 {
-	int type;
-	int damage;
 	liextModule* module;
 	liscrData* center;
+	liscrData* voxel;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
 	center = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	type = luaL_checkinteger (lua, 3);
-	if (lua_isnumber (lua, 4))
-		damage = lua_tointeger (lua, 4);
-	else
-		damage = 0;
+	voxel = liscr_checkdata (lua, 3, LIEXT_SCRIPT_TILE);
 
-	if (type)
-		lua_pushboolean (lua, livox_manager_replace_voxel (module->voxels, center->data, type, damage));
-	else
-		lua_pushboolean (lua, livox_manager_erase_voxel (module->voxels, center->data));
+	lua_pushboolean (lua, livox_manager_replace_voxel (module->voxels, center->data, voxel->data));
 
 	return 1;
 }
@@ -402,7 +393,7 @@ void
 liextTileScript (liscrClass* self,
                  void*       data)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
 	liscr_class_insert_func (self, "__gc", Tile___gc);
 	liscr_class_insert_func (self, "new", Tile_new);
 	liscr_class_insert_getter (self, "damage", Tile_getter_damage);

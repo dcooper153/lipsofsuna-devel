@@ -112,7 +112,7 @@ livox_manager_insert_material (livoxManager*  self,
 int
 livox_manager_insert_voxel (livoxManager*      self,
                             const limatVector* point,
-                            int                terrain);
+                            const livoxVoxel*  terrain);
 
 int
 livox_manager_load_materials (livoxManager* self);
@@ -131,8 +131,7 @@ livox_manager_remove_material (livoxManager* self,
 int
 livox_manager_replace_voxel (livoxManager*      self,
                              const limatVector* point,
-                             int                terrain,
-                             int                damage);
+                             const livoxVoxel*  terrain);
 
 int
 livox_manager_rotate_voxel (livoxManager*      self,

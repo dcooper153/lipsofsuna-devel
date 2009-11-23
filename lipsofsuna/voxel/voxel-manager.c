@@ -371,13 +371,13 @@ livox_manager_insert_material (livoxManager*  self,
 int
 livox_manager_insert_voxel (livoxManager*      self,
                             const limatVector* point,
-                            int                terrain)
+                            const livoxVoxel*  terrain)
 {
 	float d;
 	lialgRange range;
 	limatVector diff;
 	limatVector origin;
-	livoxVoxel voxel;
+	livoxVoxel* voxel;
 	livoxVoxelIter iter;
 	struct
 	{
@@ -394,8 +394,8 @@ livox_manager_insert_voxel (livoxManager*      self,
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
 		livox_sector_get_origin (iter.sector, &origin);
-		voxel = *livox_sector_get_voxel (iter.sector, iter.voxel[0], iter.voxel[1], iter.voxel[2]);
-		if (!voxel.type)
+		voxel = livox_sector_get_voxel (iter.sector, iter.voxel[0], iter.voxel[1], iter.voxel[2]);
+		if (!voxel->type)
 		{
 			diff = limat_vector_subtract (*point, limat_vector_init (
 				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
@@ -415,10 +415,7 @@ livox_manager_insert_voxel (livoxManager*      self,
 
 	/* Fill the best match. */
 	if (best.sector != NULL)
-	{
-		livox_voxel_init (&voxel, terrain);
-		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, voxel);
-	}
+		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, *terrain);
 
 	return 0;
 }
@@ -601,8 +598,7 @@ livox_manager_remove_material (livoxManager* self,
 int
 livox_manager_replace_voxel (livoxManager*      self,
                              const limatVector* point,
-                             int                terrain,
-                             int                damage)
+                             const livoxVoxel*  terrain)
 {
 	float d;
 	lialgRange range;
@@ -646,11 +642,7 @@ livox_manager_replace_voxel (livoxManager*      self,
 
 	/* Replace the material of the best match. */
 	if (best.sector != NULL)
-	{
-		livox_voxel_init (&voxel, terrain);
-		voxel.damage = damage;
-		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, voxel);
-	}
+		return livox_sector_set_voxel (best.sector, best.x, best.y, best.z, *terrain);
 
 	return 0;
 }

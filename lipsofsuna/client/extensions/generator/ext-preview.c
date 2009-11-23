@@ -301,16 +301,20 @@ liext_preview_paint_terrain (liextPreview* self,
                              int           material,
                              int           axis)
 {
+	livoxVoxel voxel;
+
 	switch (mode)
 	{
 		case LIEXT_PREVIEW_ERASE_VOXEL:
 			livox_manager_erase_voxel (self->generator->voxels, point);
 			break;
 		case LIEXT_PREVIEW_INSERT_VOXEL:
-			livox_manager_insert_voxel (self->generator->voxels, point, material);
+			livox_voxel_init (&voxel, material);
+			livox_manager_insert_voxel (self->generator->voxels, point, &voxel);
 			break;
 		case LIEXT_PREVIEW_REPLACE_VOXEL:
-			livox_manager_replace_voxel (self->generator->voxels, point, material, 0);
+			livox_voxel_init (&voxel, material);
+			livox_manager_replace_voxel (self->generator->voxels, point, &voxel);
 			break;
 		case LIEXT_PREVIEW_ROTATE_VOXEL:
 			livox_manager_rotate_voxel (self->generator->voxels, point, axis, 1);
