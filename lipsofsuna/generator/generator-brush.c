@@ -314,7 +314,8 @@ ligen_brush_write (ligenBrush* self,
 	for (i = 0 ; i < self->voxels.count ; i++)
 	{
 		if (!liarc_writer_append_uint16 (writer, self->voxels.array[i].type) ||
-		    !liarc_writer_append_uint8 (writer, self->voxels.array[i].damage))
+		    !liarc_writer_append_uint8 (writer, self->voxels.array[i].damage) ||
+		    !liarc_writer_append_uint8 (writer, self->voxels.array[i].rotation))
 		{
 			liarc_writer_free (writer);
 			return 0;

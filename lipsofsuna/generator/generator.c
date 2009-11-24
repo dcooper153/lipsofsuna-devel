@@ -673,7 +673,7 @@ private_init_brushes (ligenGenerator* self)
 		/* Read voxels column. */
 		bytes = sqlite3_column_blob (statement, col);
 		size0 = sqlite3_column_bytes (statement, col);
-		size1 = size[0] * size[1] * size[2] * 3;
+		size1 = size[0] * size[1] * size[2] * 4;
 		if (size0 == size1)
 		{
 			reader = liarc_reader_new (bytes, size0);
@@ -683,6 +683,7 @@ private_init_brushes (ligenGenerator* self)
 				{
 					liarc_reader_get_uint16 (reader, &brush->voxels.array[i].type);
 					liarc_reader_get_uint8 (reader, &brush->voxels.array[i].damage);
+					liarc_reader_get_uint8 (reader, &brush->voxels.array[i].rotation);
 				}
 				liarc_reader_free (reader);
 			}
