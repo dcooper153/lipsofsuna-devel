@@ -72,6 +72,10 @@ liext_module_set_effect (liextModule* self,
 int
 liext_module_set_music (liextModule* self,
                         const char*  value);
+
+void
+liext_module_set_music_volume (liextModule* self,
+                               float        value);
 #endif
 
 /*****************************************************************************/

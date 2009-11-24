@@ -72,6 +72,10 @@ void
 lisnd_source_set_velocity (lisndSource*       self,
                            const limatVector* value);
 
+void
+lisnd_source_set_volume (lisndSource* self,
+                         float        value);
+
 #endif
 
 /** @} */

@@ -286,6 +286,20 @@ liext_module_set_music (liextModule* self,
 
 	return 1;
 }
+
+void
+liext_module_set_music_volume (liextModule* self,
+                               float        value)
+{
+	if (self->sound == NULL)
+		return;
+	if (value < 0.0f)
+		value = 0.0f;
+	if (value > 1.0f)
+		value = 1.0f;
+
+	lisnd_source_set_volume (self->music, value);
+}
 #endif
 
 /*****************************************************************************/

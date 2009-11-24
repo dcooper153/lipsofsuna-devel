@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -207,6 +207,19 @@ lisnd_source_set_velocity (lisndSource*       self,
                            const limatVector* value)
 {
 	alSource3f (self->source, AL_VELOCITY, value->x, value->y, value->z);
+}
+
+/**
+ * \brief Sets the volume of the source.
+ *
+ * \param self Sound source.
+ * \param value Volume.
+ */
+void
+lisnd_source_set_volume (lisndSource* self,
+                         float        value)
+{
+	alSourcef (self->source, AL_GAIN, value);
 }
 
 #endif
