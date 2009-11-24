@@ -90,11 +90,6 @@ liscr_data_new (liscrScript* script,
 	liscr_data_ref (object, NULL);
 	lua_pop (script->lua, 1);
 
-#ifndef NDEBUG
-	assert (lialg_ptrdic_find (object->script->objects, object) == NULL);
-	lialg_ptrdic_insert (object->script->objects, object, object);
-#endif
-
 	return object;
 }
 
@@ -153,11 +148,6 @@ liscr_data_free (liscrData* object)
 	lua_pushnil (script->lua);
 	lua_settable (script->lua, -3);
 	lua_pop (script->lua, 1);
-
-#ifndef NDEBUG
-	assert (lialg_ptrdic_find (object->script->objects, object) != NULL);
-	lialg_ptrdic_remove (object->script->objects, object);
-#endif
 }
 
 /**

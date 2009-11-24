@@ -51,25 +51,11 @@ liscr_script_new ()
 		return NULL;
 	}
 
-	/* Allocate object lookup. */
-#ifndef NDEBUG
-	self->objects = lialg_ptrdic_new ();
-	if (self->objects == NULL)
-	{
-		lialg_strdic_free (self->classes);
-		lisys_free (self);
-		return NULL;
-	}
-#endif
-
 	/* Allocate script. */
 	self->lua = lua_open ();
 	if (self->lua == NULL)
 	{
 		lisys_error_set (ENOMEM, "cannot allocate script");
-#ifndef NDEBUG
-		lialg_ptrdic_free (self->objects);
-#endif
 		lialg_strdic_free (self->classes);
 		lisys_free (self);
 		return NULL;
@@ -108,9 +94,6 @@ liscr_script_free (liscrScript* self)
 	/* Free all objects. */
 	lua_close (self->lua);
 	self->lua = NULL;
-#ifndef NDEBUG
-	lialg_ptrdic_free (self->objects);
-#endif
 
 	/* Free classes. */
 	LI_FOREACH_STRDIC (iter, self->classes)

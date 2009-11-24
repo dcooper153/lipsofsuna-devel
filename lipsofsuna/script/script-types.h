@@ -49,9 +49,6 @@ struct _liscrScript
 	void* userpointer;
 	lua_State* lua;
 	lialgStrdic* classes;
-#ifndef NDEBUG
-	lialgPtrdic* objects;
-#endif
 };
 
 /* FIXME */
