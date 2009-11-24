@@ -330,17 +330,13 @@ class LipsAnimation:
 		self.end = end
 		self.name = baction.name
 		self.channels = []
-		self.ikchannels = []
 
 		# Add manually controlled bones.
 		channels = baction.getChannelNames()
 		for channel in channels:
 			if channel in bones:
 				bone = bones[channel]
-				if Blender.Armature.NO_DEFORM not in bone.options:
-					self.channels.append(channel)
-				else:
-					self.ikchannels.append(channel)
+				self.channels.append(channel)
 
 	# \brief Adds a channel to the animation.
 	#
@@ -405,8 +401,9 @@ class LipsAnimations:
 					end = frame
 			if start < 1:
 				start = 1
-			if start < end:
-				self.animations.append(LipsAnimation(actions[action], start, end, self.restbones))
+			if end < start:
+				end = start
+			self.animations.append(LipsAnimation(actions[action], start, end, self.restbones))
 
 		# Add IK controlled bones to animations.
 		for armature in self.armatures:
@@ -422,8 +419,6 @@ class LipsAnimations:
 
 					# Add bones in the chain to animations.
 					for animation in self.animations:
-						if target not in animation.ikchannels:
-							continue
 						bone = armature[1].bones[name]
 						for depth in xrange(0, chainlen):
 							animation.AddChannel(bone.name)
