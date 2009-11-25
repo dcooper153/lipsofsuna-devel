@@ -39,6 +39,8 @@ subdir = lipsofsuna/server/extensions
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
+	$(top_srcdir)/m4/ax_check_gl.m4 \
+	$(top_srcdir)/m4/ax_lang_compiler_ms.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
@@ -71,8 +73,11 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(extdir)"
 LTLIBRARIES = $(ext_LTLIBRARIES)
-libcreature_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 =  \
+	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la \
+	$(am__DEPENDENCIES_1)
+libcreature_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libcreature_ser_la_OBJECTS = creature/ext-creature.lo \
 	creature/ext-module.lo creature/ext-script.lo
@@ -80,99 +85,46 @@ libcreature_ser_la_OBJECTS = $(am_libcreature_ser_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-libcreature_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libcreature_ser_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-libeditor_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libeditor_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libeditor_ser_la_OBJECTS = editor/ext-editor.lo \
 	editor/ext-module.lo editor/ext-script.lo
 libeditor_ser_la_OBJECTS = $(am_libeditor_ser_la_OBJECTS)
-libeditor_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libeditor_ser_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libevents_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libevents_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libevents_ser_la_OBJECTS = events/ext-module.lo \
 	events/ext-script.lo
 libevents_ser_la_OBJECTS = $(am_libevents_ser_la_OBJECTS)
-libevents_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libevents_ser_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libgenerator_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libgenerator_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libgenerator_ser_la_OBJECTS = generator/ext-generator.lo \
 	generator/ext-module.lo generator/ext-script.lo
 libgenerator_ser_la_OBJECTS = $(am_libgenerator_ser_la_OBJECTS)
-libgenerator_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libgenerator_ser_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-libinventory_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libinventory_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libinventory_ser_la_OBJECTS = inventory/ext-inventory.lo \
 	inventory/ext-module.lo inventory/ext-script.lo
 libinventory_ser_la_OBJECTS = $(am_libinventory_ser_la_OBJECTS)
-libinventory_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libinventory_ser_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-libnpc_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libnpc_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libnpc_ser_la_OBJECTS = npc/ext-module.lo npc/ext-npc.lo \
 	npc/ext-script.lo
 libnpc_ser_la_OBJECTS = $(am_libnpc_ser_la_OBJECTS)
-libnpc_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libnpc_ser_la_LDFLAGS) $(LDFLAGS) -o $@
-libskeleton_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libskeleton_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libskeleton_ser_la_OBJECTS = skeleton/ext-skeleton.lo \
 	skeleton/ext-module.lo skeleton/ext-script.lo
 libskeleton_ser_la_OBJECTS = $(am_libskeleton_ser_la_OBJECTS)
-libskeleton_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libskeleton_ser_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-libskills_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libskills_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libskills_ser_la_OBJECTS = skills/ext-module.lo skills/ext-skill.lo \
 	skills/ext-skills.lo skills/ext-script.lo
 libskills_ser_la_OBJECTS = $(am_libskills_ser_la_OBJECTS)
-libskills_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libskills_ser_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libslots_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libslots_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libslots_ser_la_OBJECTS = slots/ext-module.lo slots/ext-script.lo \
 	slots/ext-slots.lo
 libslots_ser_la_OBJECTS = $(am_libslots_ser_la_OBJECTS)
-libslots_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libslots_ser_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libspawner_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libspawner_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libspawner_ser_la_OBJECTS = spawner/ext-module.lo \
 	spawner/ext-spawner.lo spawner/ext-script.lo
 libspawner_ser_la_OBJECTS = $(am_libspawner_ser_la_OBJECTS)
-libspawner_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libspawner_ser_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libvoxel_ser_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libvoxel_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libvoxel_ser_la_OBJECTS = voxel/ext-block.lo voxel/ext-listener.lo \
 	voxel/ext-module.lo voxel/ext-script.lo
 libvoxel_ser_la_OBJECTS = $(am_libvoxel_ser_la_OBJECTS)
-libvoxel_ser_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libvoxel_ser_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/lipsofsuna
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -248,6 +200,8 @@ EXTSDIR = @EXTSDIR@
 FGREP = @FGREP@
 GLEW_CFLAGS = @GLEW_CFLAGS@
 GLEW_LIBS = @GLEW_LIBS@
+GL_CFLAGS = @GL_CFLAGS@
+GL_LIBS = @GL_LIBS@
 GRAPPLE_CFLAGS = @GRAPPLE_CFLAGS@
 GRAPPLE_LIBS = @GRAPPLE_LIBS@
 GREP = @GREP@
@@ -259,6 +213,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
+LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
+LIBPNG_LIBS = @LIBPNG_LIBS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LICLI_CFLAGS = @LICLI_CFLAGS@
@@ -377,8 +333,10 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -I$(top_srcdir)
+LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la $(LISRV_LIBS)
+INCLUDES = -I$(top_srcdir)/lipsofsuna
 AM_CFLAGS = $(LISRV_CFLAGS)
+AM_LDFLAGS = -module -avoid-version -no-undefined
 EXTRA_DIST = skeleton/mkext.sh
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
@@ -394,8 +352,7 @@ ext_LTLIBRARIES = \
 	libspawner-ser.la \
 	libvoxel-ser.la
 
-libcreature_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libcreature_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libcreature_ser_la_LIBADD = $(LIBADD)
 libcreature_ser_la_SOURCES = \
 	creature/ext-creature.c \
 	creature/ext-creature.h \
@@ -403,8 +360,7 @@ libcreature_ser_la_SOURCES = \
 	creature/ext-module.h \
 	creature/ext-script.c
 
-libeditor_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libeditor_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libeditor_ser_la_LIBADD = $(LIBADD)
 libeditor_ser_la_SOURCES = \
 	editor/ext-editor.c \
 	editor/ext-editor.h \
@@ -412,15 +368,13 @@ libeditor_ser_la_SOURCES = \
 	editor/ext-module.h \
 	editor/ext-script.c
 
-libevents_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libevents_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libevents_ser_la_LIBADD = $(LIBADD)
 libevents_ser_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
 
-libgenerator_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libgenerator_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libgenerator_ser_la_LIBADD = $(LIBADD)
 libgenerator_ser_la_SOURCES = \
 	generator/ext-generator.c \
 	generator/ext-generator.h \
@@ -428,8 +382,7 @@ libgenerator_ser_la_SOURCES = \
 	generator/ext-module.h \
 	generator/ext-script.c
 
-libinventory_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libinventory_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libinventory_ser_la_LIBADD = $(LIBADD)
 libinventory_ser_la_SOURCES = \
 	inventory/ext-inventory.c \
 	inventory/ext-inventory.h \
@@ -437,8 +390,7 @@ libinventory_ser_la_SOURCES = \
 	inventory/ext-module.h \
 	inventory/ext-script.c
 
-libnpc_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libnpc_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libnpc_ser_la_LIBADD = $(LIBADD)
 libnpc_ser_la_SOURCES = \
 	npc/ext-module.c \
 	npc/ext-module.h \
@@ -446,8 +398,7 @@ libnpc_ser_la_SOURCES = \
 	npc/ext-npc.h \
 	npc/ext-script.c
 
-libskeleton_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libskeleton_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libskeleton_ser_la_LIBADD = $(LIBADD)
 libskeleton_ser_la_SOURCES = \
 	skeleton/ext-skeleton.c \
 	skeleton/ext-skeleton.h \
@@ -455,8 +406,7 @@ libskeleton_ser_la_SOURCES = \
 	skeleton/ext-module.h \
 	skeleton/ext-script.c
 
-libskills_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libskills_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libskills_ser_la_LIBADD = $(LIBADD)
 libskills_ser_la_SOURCES = \
 	skills/ext-module.c \
 	skills/ext-module.h \
@@ -466,8 +416,7 @@ libskills_ser_la_SOURCES = \
 	skills/ext-skills.h \
 	skills/ext-script.c
 
-libslots_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libslots_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libslots_ser_la_LIBADD = $(LIBADD)
 libslots_ser_la_SOURCES = \
 	slots/ext-module.c \
 	slots/ext-module.h \
@@ -475,8 +424,7 @@ libslots_ser_la_SOURCES = \
 	slots/ext-slots.c \
 	slots/ext-slots.h
 
-libspawner_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libspawner_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libspawner_ser_la_LIBADD = $(LIBADD)
 libspawner_ser_la_SOURCES = \
 	spawner/ext-module.c \
 	spawner/ext-module.h \
@@ -484,8 +432,7 @@ libspawner_ser_la_SOURCES = \
 	spawner/ext-spawner.h \
 	spawner/ext-script.c
 
-libvoxel_ser_la_LDFLAGS = -module -avoid-version -no-undefined
-libvoxel_ser_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la
+libvoxel_ser_la_LIBADD = $(LIBADD)
 libvoxel_ser_la_SOURCES = \
 	voxel/ext-block.c \
 	voxel/ext-block.h \
@@ -573,7 +520,7 @@ creature/ext-module.lo: creature/$(am__dirstamp) \
 creature/ext-script.lo: creature/$(am__dirstamp) \
 	creature/$(DEPDIR)/$(am__dirstamp)
 libcreature-ser.la: $(libcreature_ser_la_OBJECTS) $(libcreature_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libcreature_ser_la_LINK) -rpath $(extdir) $(libcreature_ser_la_OBJECTS) $(libcreature_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libcreature_ser_la_OBJECTS) $(libcreature_ser_la_LIBADD) $(LIBS)
 editor/$(am__dirstamp):
 	@$(MKDIR_P) editor
 	@: > editor/$(am__dirstamp)
@@ -587,7 +534,7 @@ editor/ext-module.lo: editor/$(am__dirstamp) \
 editor/ext-script.lo: editor/$(am__dirstamp) \
 	editor/$(DEPDIR)/$(am__dirstamp)
 libeditor-ser.la: $(libeditor_ser_la_OBJECTS) $(libeditor_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libeditor_ser_la_LINK) -rpath $(extdir) $(libeditor_ser_la_OBJECTS) $(libeditor_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libeditor_ser_la_OBJECTS) $(libeditor_ser_la_LIBADD) $(LIBS)
 events/$(am__dirstamp):
 	@$(MKDIR_P) events
 	@: > events/$(am__dirstamp)
@@ -599,7 +546,7 @@ events/ext-module.lo: events/$(am__dirstamp) \
 events/ext-script.lo: events/$(am__dirstamp) \
 	events/$(DEPDIR)/$(am__dirstamp)
 libevents-ser.la: $(libevents_ser_la_OBJECTS) $(libevents_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libevents_ser_la_LINK) -rpath $(extdir) $(libevents_ser_la_OBJECTS) $(libevents_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libevents_ser_la_OBJECTS) $(libevents_ser_la_LIBADD) $(LIBS)
 generator/$(am__dirstamp):
 	@$(MKDIR_P) generator
 	@: > generator/$(am__dirstamp)
@@ -613,7 +560,7 @@ generator/ext-module.lo: generator/$(am__dirstamp) \
 generator/ext-script.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
 libgenerator-ser.la: $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libgenerator_ser_la_LINK) -rpath $(extdir) $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_LIBADD) $(LIBS)
 inventory/$(am__dirstamp):
 	@$(MKDIR_P) inventory
 	@: > inventory/$(am__dirstamp)
@@ -627,7 +574,7 @@ inventory/ext-module.lo: inventory/$(am__dirstamp) \
 inventory/ext-script.lo: inventory/$(am__dirstamp) \
 	inventory/$(DEPDIR)/$(am__dirstamp)
 libinventory-ser.la: $(libinventory_ser_la_OBJECTS) $(libinventory_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libinventory_ser_la_LINK) -rpath $(extdir) $(libinventory_ser_la_OBJECTS) $(libinventory_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libinventory_ser_la_OBJECTS) $(libinventory_ser_la_LIBADD) $(LIBS)
 npc/$(am__dirstamp):
 	@$(MKDIR_P) npc
 	@: > npc/$(am__dirstamp)
@@ -638,7 +585,7 @@ npc/ext-module.lo: npc/$(am__dirstamp) npc/$(DEPDIR)/$(am__dirstamp)
 npc/ext-npc.lo: npc/$(am__dirstamp) npc/$(DEPDIR)/$(am__dirstamp)
 npc/ext-script.lo: npc/$(am__dirstamp) npc/$(DEPDIR)/$(am__dirstamp)
 libnpc-ser.la: $(libnpc_ser_la_OBJECTS) $(libnpc_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libnpc_ser_la_LINK) -rpath $(extdir) $(libnpc_ser_la_OBJECTS) $(libnpc_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libnpc_ser_la_OBJECTS) $(libnpc_ser_la_LIBADD) $(LIBS)
 skeleton/$(am__dirstamp):
 	@$(MKDIR_P) skeleton
 	@: > skeleton/$(am__dirstamp)
@@ -652,7 +599,7 @@ skeleton/ext-module.lo: skeleton/$(am__dirstamp) \
 skeleton/ext-script.lo: skeleton/$(am__dirstamp) \
 	skeleton/$(DEPDIR)/$(am__dirstamp)
 libskeleton-ser.la: $(libskeleton_ser_la_OBJECTS) $(libskeleton_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libskeleton_ser_la_LINK) -rpath $(extdir) $(libskeleton_ser_la_OBJECTS) $(libskeleton_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libskeleton_ser_la_OBJECTS) $(libskeleton_ser_la_LIBADD) $(LIBS)
 skills/$(am__dirstamp):
 	@$(MKDIR_P) skills
 	@: > skills/$(am__dirstamp)
@@ -668,7 +615,7 @@ skills/ext-skills.lo: skills/$(am__dirstamp) \
 skills/ext-script.lo: skills/$(am__dirstamp) \
 	skills/$(DEPDIR)/$(am__dirstamp)
 libskills-ser.la: $(libskills_ser_la_OBJECTS) $(libskills_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libskills_ser_la_LINK) -rpath $(extdir) $(libskills_ser_la_OBJECTS) $(libskills_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libskills_ser_la_OBJECTS) $(libskills_ser_la_LIBADD) $(LIBS)
 slots/$(am__dirstamp):
 	@$(MKDIR_P) slots
 	@: > slots/$(am__dirstamp)
@@ -682,7 +629,7 @@ slots/ext-script.lo: slots/$(am__dirstamp) \
 slots/ext-slots.lo: slots/$(am__dirstamp) \
 	slots/$(DEPDIR)/$(am__dirstamp)
 libslots-ser.la: $(libslots_ser_la_OBJECTS) $(libslots_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libslots_ser_la_LINK) -rpath $(extdir) $(libslots_ser_la_OBJECTS) $(libslots_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libslots_ser_la_OBJECTS) $(libslots_ser_la_LIBADD) $(LIBS)
 spawner/$(am__dirstamp):
 	@$(MKDIR_P) spawner
 	@: > spawner/$(am__dirstamp)
@@ -696,7 +643,7 @@ spawner/ext-spawner.lo: spawner/$(am__dirstamp) \
 spawner/ext-script.lo: spawner/$(am__dirstamp) \
 	spawner/$(DEPDIR)/$(am__dirstamp)
 libspawner-ser.la: $(libspawner_ser_la_OBJECTS) $(libspawner_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libspawner_ser_la_LINK) -rpath $(extdir) $(libspawner_ser_la_OBJECTS) $(libspawner_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libspawner_ser_la_OBJECTS) $(libspawner_ser_la_LIBADD) $(LIBS)
 voxel/$(am__dirstamp):
 	@$(MKDIR_P) voxel
 	@: > voxel/$(am__dirstamp)
@@ -712,7 +659,7 @@ voxel/ext-module.lo: voxel/$(am__dirstamp) \
 voxel/ext-script.lo: voxel/$(am__dirstamp) \
 	voxel/$(DEPDIR)/$(am__dirstamp)
 libvoxel-ser.la: $(libvoxel_ser_la_OBJECTS) $(libvoxel_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libvoxel_ser_la_LINK) -rpath $(extdir) $(libvoxel_ser_la_OBJECTS) $(libvoxel_ser_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libvoxel_ser_la_OBJECTS) $(libvoxel_ser_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

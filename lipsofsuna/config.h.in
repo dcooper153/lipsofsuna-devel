@@ -18,6 +18,9 @@
 /* Define to 1 if you have the <GL/glx.h> header file. */
 #undef HAVE_GL_GLX_H
 
+/* Define to 1 if you have the <GL/gl.h> header file. */
+#undef HAVE_GL_GL_H
+
 /* Define to 1 if you have the <inotifytools/inotify.h> header file. */
 #undef HAVE_INOTIFYTOOLS_INOTIFY_H
 
@@ -41,6 +44,9 @@
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <OpenGL/gl.h> header file. */
+#undef HAVE_OPENGL_GL_H
 
 /* Define to 1 if you have the <poll.h> header file. */
 #undef HAVE_POLL_H

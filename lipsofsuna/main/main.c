@@ -60,6 +60,7 @@ viewer_main (const char* name,
 
 /*****************************************************************************/
 
+#undef main
 int main (int argc, char** argv)
 {
 	int i;

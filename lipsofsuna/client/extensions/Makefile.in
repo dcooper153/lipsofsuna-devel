@@ -39,6 +39,8 @@ subdir = lipsofsuna/client/extensions
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
+	$(top_srcdir)/m4/ax_check_gl.m4 \
+	$(top_srcdir)/m4/ax_lang_compiler_ms.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
@@ -71,8 +73,11 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(extdir)"
 LTLIBRARIES = $(ext_LTLIBRARIES)
-libcamera_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+am__DEPENDENCIES_1 =
+am__DEPENDENCIES_2 =  \
+	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la \
+	$(am__DEPENDENCIES_1)
+libcamera_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libcamera_cli_la_OBJECTS = camera/ext-module.lo \
 	camera/ext-script.lo
@@ -80,138 +85,64 @@ libcamera_cli_la_OBJECTS = $(am_libcamera_cli_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-libcamera_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libcamera_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libchat_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libchat_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libchat_cli_la_OBJECTS = chat/ext-history.lo chat/ext-module.lo \
 	chat/ext-script.lo
 libchat_cli_la_OBJECTS = $(am_libchat_cli_la_OBJECTS)
-libchat_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libchat_cli_la_LDFLAGS) $(LDFLAGS) -o \
-	$@
-libeditor_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libeditor_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libeditor_cli_la_OBJECTS = editor/ext-dialog.lo \
 	editor/ext-editor.lo editor/ext-module.lo editor/ext-script.lo
 libeditor_cli_la_OBJECTS = $(am_libeditor_cli_la_OBJECTS)
-libeditor_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libeditor_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libeffect_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libeffect_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libeffect_cli_la_OBJECTS = effect/ext-module.lo \
 	effect/ext-script.lo
 libeffect_cli_la_OBJECTS = $(am_libeffect_cli_la_OBJECTS)
-libeffect_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libeffect_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libevents_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libevents_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libevents_cli_la_OBJECTS = events/ext-module.lo \
 	events/ext-script.lo
 libevents_cli_la_OBJECTS = $(am_libevents_cli_la_OBJECTS)
-libevents_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libevents_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libgenerator_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libgenerator_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libgenerator_cli_la_OBJECTS = generator/ext-brushes.lo \
 	generator/ext-dialog.lo generator/ext-materials.lo \
 	generator/ext-module.lo generator/ext-preview.lo \
 	generator/ext-script.lo
 libgenerator_cli_la_OBJECTS = $(am_libgenerator_cli_la_OBJECTS)
-libgenerator_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libgenerator_cli_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-liboptions_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+liboptions_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_liboptions_cli_la_OBJECTS = options/ext-module.lo \
 	options/ext-options.lo options/ext-script.lo
 liboptions_cli_la_OBJECTS = $(am_liboptions_cli_la_OBJECTS)
-liboptions_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(liboptions_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libpackager_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libpackager_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libpackager_cli_la_OBJECTS = packager/ext-module.lo \
 	packager/ext-packager.lo packager/ext-resources.lo \
 	packager/ext-script.lo
 libpackager_cli_la_OBJECTS = $(am_libpackager_cli_la_OBJECTS)
-libpackager_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libpackager_cli_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
-libreload_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libreload_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libreload_cli_la_OBJECTS = reload/ext-module.lo \
 	reload/ext-reload.lo reload/ext-script.lo
 libreload_cli_la_OBJECTS = $(am_libreload_cli_la_OBJECTS)
-libreload_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libreload_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libskills_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libskills_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libskills_cli_la_OBJECTS = skills/ext-module.lo \
 	skills/ext-script.lo skills/ext-skills.lo skills/ext-widget.lo
 libskills_cli_la_OBJECTS = $(am_libskills_cli_la_OBJECTS)
-libskills_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libskills_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libslots_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libslots_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libslots_cli_la_OBJECTS = slots/ext-module.lo slots/ext-slot.lo \
 	slots/ext-slots.lo
 libslots_cli_la_OBJECTS = $(am_libslots_cli_la_OBJECTS)
-libslots_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libslots_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libsound_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libsound_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libsound_cli_la_OBJECTS = sound/ext-module.lo sound/ext-script.lo
 libsound_cli_la_OBJECTS = $(am_libsound_cli_la_OBJECTS)
-libsound_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libsound_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libspeech_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libspeech_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libspeech_cli_la_OBJECTS = speech/ext-module.lo \
 	speech/ext-script.lo speech/ext-speech.lo
 libspeech_cli_la_OBJECTS = $(am_libspeech_cli_la_OBJECTS)
-libspeech_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libspeech_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libvoxel_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libvoxel_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libvoxel_cli_la_OBJECTS = voxel/ext-block.lo voxel/ext-module.lo \
 	voxel/ext-script.lo
 libvoxel_cli_la_OBJECTS = $(am_libvoxel_cli_la_OBJECTS)
-libvoxel_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libvoxel_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
-libwidgets_cli_la_DEPENDENCIES =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libwidgets_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libwidgets_cli_la_OBJECTS = widgets/ext-module.lo \
 	widgets/ext-script.lo
 libwidgets_cli_la_OBJECTS = $(am_libwidgets_cli_la_OBJECTS)
-libwidgets_cli_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libwidgets_cli_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/lipsofsuna
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -291,6 +222,8 @@ EXTSDIR = @EXTSDIR@
 FGREP = @FGREP@
 GLEW_CFLAGS = @GLEW_CFLAGS@
 GLEW_LIBS = @GLEW_LIBS@
+GL_CFLAGS = @GL_CFLAGS@
+GL_LIBS = @GL_LIBS@
 GRAPPLE_CFLAGS = @GRAPPLE_CFLAGS@
 GRAPPLE_LIBS = @GRAPPLE_LIBS@
 GREP = @GREP@
@@ -302,6 +235,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
+LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
+LIBPNG_LIBS = @LIBPNG_LIBS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LICLI_CFLAGS = @LICLI_CFLAGS@
@@ -420,7 +355,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -I$(top_srcdir)
+LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la $(LICLI_LIBS)
+INCLUDES = -I$(top_srcdir)/lipsofsuna
+AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = $(LICLI_CFLAGS)
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
@@ -440,15 +377,13 @@ ext_LTLIBRARIES = \
 	libvoxel-cli.la \
 	libwidgets-cli.la
 
-libcamera_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libcamera_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libcamera_cli_la_LIBADD = $(LIBADD)
 libcamera_cli_la_SOURCES = \
 	camera/ext-module.c \
 	camera/ext-module.h \
 	camera/ext-script.c
 
-libchat_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libchat_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libchat_cli_la_LIBADD = $(LIBADD)
 libchat_cli_la_SOURCES = \
 	chat/ext-history.c \
 	chat/ext-history.h \
@@ -456,8 +391,7 @@ libchat_cli_la_SOURCES = \
 	chat/ext-module.h \
 	chat/ext-script.c
 
-libeditor_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libeditor_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libeditor_cli_la_LIBADD = $(LIBADD)
 libeditor_cli_la_SOURCES = \
 	editor/ext-dialog.c \
 	editor/ext-dialog.h \
@@ -467,22 +401,19 @@ libeditor_cli_la_SOURCES = \
 	editor/ext-module.h \
 	editor/ext-script.c
 
-libeffect_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libeffect_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libeffect_cli_la_LIBADD = $(LIBADD)
 libeffect_cli_la_SOURCES = \
 	effect/ext-module.c \
 	effect/ext-module.h \
 	effect/ext-script.c
 
-libevents_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libevents_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libevents_cli_la_LIBADD = $(LIBADD)
 libevents_cli_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
 
-libgenerator_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libgenerator_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libgenerator_cli_la_LIBADD = $(LIBADD)
 libgenerator_cli_la_SOURCES = \
 	generator/ext-brushes.c \
 	generator/ext-brushes.h \
@@ -496,8 +427,7 @@ libgenerator_cli_la_SOURCES = \
 	generator/ext-preview.h \
 	generator/ext-script.c
 
-liboptions_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-liboptions_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+liboptions_cli_la_LIBADD = $(LIBADD)
 liboptions_cli_la_SOURCES = \
 	options/ext-module.c \
 	options/ext-module.h \
@@ -505,8 +435,7 @@ liboptions_cli_la_SOURCES = \
 	options/ext-options.h \
 	options/ext-script.c
 
-libpackager_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libpackager_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libpackager_cli_la_LIBADD = $(LIBADD)
 libpackager_cli_la_SOURCES = \
 	packager/ext-module.c \
 	packager/ext-module.h \
@@ -516,8 +445,7 @@ libpackager_cli_la_SOURCES = \
 	packager/ext-resources.h \
 	packager/ext-script.c
 
-libreload_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libreload_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libreload_cli_la_LIBADD = $(LIBADD)
 libreload_cli_la_SOURCES = \
 	reload/ext-module.c \
 	reload/ext-module.h \
@@ -525,8 +453,7 @@ libreload_cli_la_SOURCES = \
 	reload/ext-reload.h \
 	reload/ext-script.c
 
-libskills_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libskills_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libskills_cli_la_LIBADD = $(LIBADD)
 libskills_cli_la_SOURCES = \
 	skills/ext-module.c \
 	skills/ext-module.h \
@@ -536,8 +463,7 @@ libskills_cli_la_SOURCES = \
 	skills/ext-widget.c \
 	skills/ext-widget.h
 
-libslots_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libslots_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libslots_cli_la_LIBADD = $(LIBADD)
 libslots_cli_la_SOURCES = \
 	slots/ext-module.c \
 	slots/ext-module.h \
@@ -546,15 +472,13 @@ libslots_cli_la_SOURCES = \
 	slots/ext-slots.c \
 	slots/ext-slots.h
 
-libsound_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libsound_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libsound_cli_la_LIBADD = $(LIBADD)
 libsound_cli_la_SOURCES = \
 	sound/ext-module.c \
 	sound/ext-module.h \
 	sound/ext-script.c
 
-libspeech_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libspeech_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libspeech_cli_la_LIBADD = $(LIBADD)
 libspeech_cli_la_SOURCES = \
 	speech/ext-module.c \
 	speech/ext-module.h \
@@ -562,8 +486,7 @@ libspeech_cli_la_SOURCES = \
 	speech/ext-speech.h \
 	speech/ext-speech.c
 
-libvoxel_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libvoxel_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libvoxel_cli_la_LIBADD = $(LIBADD)
 libvoxel_cli_la_SOURCES = \
 	voxel/ext-block.c \
 	voxel/ext-block.h \
@@ -571,8 +494,7 @@ libvoxel_cli_la_SOURCES = \
 	voxel/ext-module.h \
 	voxel/ext-script.c
 
-libwidgets_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libwidgets_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libwidgets_cli_la_LIBADD = $(LIBADD)
 libwidgets_cli_la_SOURCES = \
 	widgets/ext-module.c \
 	widgets/ext-module.h \
@@ -654,7 +576,7 @@ camera/ext-module.lo: camera/$(am__dirstamp) \
 camera/ext-script.lo: camera/$(am__dirstamp) \
 	camera/$(DEPDIR)/$(am__dirstamp)
 libcamera-cli.la: $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libcamera_cli_la_LINK) -rpath $(extdir) $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_LIBADD) $(LIBS)
 chat/$(am__dirstamp):
 	@$(MKDIR_P) chat
 	@: > chat/$(am__dirstamp)
@@ -668,7 +590,7 @@ chat/ext-module.lo: chat/$(am__dirstamp) \
 chat/ext-script.lo: chat/$(am__dirstamp) \
 	chat/$(DEPDIR)/$(am__dirstamp)
 libchat-cli.la: $(libchat_cli_la_OBJECTS) $(libchat_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libchat_cli_la_LINK) -rpath $(extdir) $(libchat_cli_la_OBJECTS) $(libchat_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libchat_cli_la_OBJECTS) $(libchat_cli_la_LIBADD) $(LIBS)
 editor/$(am__dirstamp):
 	@$(MKDIR_P) editor
 	@: > editor/$(am__dirstamp)
@@ -684,7 +606,7 @@ editor/ext-module.lo: editor/$(am__dirstamp) \
 editor/ext-script.lo: editor/$(am__dirstamp) \
 	editor/$(DEPDIR)/$(am__dirstamp)
 libeditor-cli.la: $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libeditor_cli_la_LINK) -rpath $(extdir) $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_LIBADD) $(LIBS)
 effect/$(am__dirstamp):
 	@$(MKDIR_P) effect
 	@: > effect/$(am__dirstamp)
@@ -696,7 +618,7 @@ effect/ext-module.lo: effect/$(am__dirstamp) \
 effect/ext-script.lo: effect/$(am__dirstamp) \
 	effect/$(DEPDIR)/$(am__dirstamp)
 libeffect-cli.la: $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libeffect_cli_la_LINK) -rpath $(extdir) $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_LIBADD) $(LIBS)
 events/$(am__dirstamp):
 	@$(MKDIR_P) events
 	@: > events/$(am__dirstamp)
@@ -708,7 +630,7 @@ events/ext-module.lo: events/$(am__dirstamp) \
 events/ext-script.lo: events/$(am__dirstamp) \
 	events/$(DEPDIR)/$(am__dirstamp)
 libevents-cli.la: $(libevents_cli_la_OBJECTS) $(libevents_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libevents_cli_la_LINK) -rpath $(extdir) $(libevents_cli_la_OBJECTS) $(libevents_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libevents_cli_la_OBJECTS) $(libevents_cli_la_LIBADD) $(LIBS)
 generator/$(am__dirstamp):
 	@$(MKDIR_P) generator
 	@: > generator/$(am__dirstamp)
@@ -728,7 +650,7 @@ generator/ext-preview.lo: generator/$(am__dirstamp) \
 generator/ext-script.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
 libgenerator-cli.la: $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libgenerator_cli_la_LINK) -rpath $(extdir) $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_LIBADD) $(LIBS)
 options/$(am__dirstamp):
 	@$(MKDIR_P) options
 	@: > options/$(am__dirstamp)
@@ -742,7 +664,7 @@ options/ext-options.lo: options/$(am__dirstamp) \
 options/ext-script.lo: options/$(am__dirstamp) \
 	options/$(DEPDIR)/$(am__dirstamp)
 liboptions-cli.la: $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(liboptions_cli_la_LINK) -rpath $(extdir) $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_LIBADD) $(LIBS)
 packager/$(am__dirstamp):
 	@$(MKDIR_P) packager
 	@: > packager/$(am__dirstamp)
@@ -758,7 +680,7 @@ packager/ext-resources.lo: packager/$(am__dirstamp) \
 packager/ext-script.lo: packager/$(am__dirstamp) \
 	packager/$(DEPDIR)/$(am__dirstamp)
 libpackager-cli.la: $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libpackager_cli_la_LINK) -rpath $(extdir) $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_LIBADD) $(LIBS)
 reload/$(am__dirstamp):
 	@$(MKDIR_P) reload
 	@: > reload/$(am__dirstamp)
@@ -772,7 +694,7 @@ reload/ext-reload.lo: reload/$(am__dirstamp) \
 reload/ext-script.lo: reload/$(am__dirstamp) \
 	reload/$(DEPDIR)/$(am__dirstamp)
 libreload-cli.la: $(libreload_cli_la_OBJECTS) $(libreload_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libreload_cli_la_LINK) -rpath $(extdir) $(libreload_cli_la_OBJECTS) $(libreload_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libreload_cli_la_OBJECTS) $(libreload_cli_la_LIBADD) $(LIBS)
 skills/$(am__dirstamp):
 	@$(MKDIR_P) skills
 	@: > skills/$(am__dirstamp)
@@ -788,7 +710,7 @@ skills/ext-skills.lo: skills/$(am__dirstamp) \
 skills/ext-widget.lo: skills/$(am__dirstamp) \
 	skills/$(DEPDIR)/$(am__dirstamp)
 libskills-cli.la: $(libskills_cli_la_OBJECTS) $(libskills_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libskills_cli_la_LINK) -rpath $(extdir) $(libskills_cli_la_OBJECTS) $(libskills_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libskills_cli_la_OBJECTS) $(libskills_cli_la_LIBADD) $(LIBS)
 slots/$(am__dirstamp):
 	@$(MKDIR_P) slots
 	@: > slots/$(am__dirstamp)
@@ -802,7 +724,7 @@ slots/ext-slot.lo: slots/$(am__dirstamp) \
 slots/ext-slots.lo: slots/$(am__dirstamp) \
 	slots/$(DEPDIR)/$(am__dirstamp)
 libslots-cli.la: $(libslots_cli_la_OBJECTS) $(libslots_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libslots_cli_la_LINK) -rpath $(extdir) $(libslots_cli_la_OBJECTS) $(libslots_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libslots_cli_la_OBJECTS) $(libslots_cli_la_LIBADD) $(LIBS)
 sound/$(am__dirstamp):
 	@$(MKDIR_P) sound
 	@: > sound/$(am__dirstamp)
@@ -814,7 +736,7 @@ sound/ext-module.lo: sound/$(am__dirstamp) \
 sound/ext-script.lo: sound/$(am__dirstamp) \
 	sound/$(DEPDIR)/$(am__dirstamp)
 libsound-cli.la: $(libsound_cli_la_OBJECTS) $(libsound_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libsound_cli_la_LINK) -rpath $(extdir) $(libsound_cli_la_OBJECTS) $(libsound_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libsound_cli_la_OBJECTS) $(libsound_cli_la_LIBADD) $(LIBS)
 speech/$(am__dirstamp):
 	@$(MKDIR_P) speech
 	@: > speech/$(am__dirstamp)
@@ -828,7 +750,7 @@ speech/ext-script.lo: speech/$(am__dirstamp) \
 speech/ext-speech.lo: speech/$(am__dirstamp) \
 	speech/$(DEPDIR)/$(am__dirstamp)
 libspeech-cli.la: $(libspeech_cli_la_OBJECTS) $(libspeech_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libspeech_cli_la_LINK) -rpath $(extdir) $(libspeech_cli_la_OBJECTS) $(libspeech_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libspeech_cli_la_OBJECTS) $(libspeech_cli_la_LIBADD) $(LIBS)
 voxel/$(am__dirstamp):
 	@$(MKDIR_P) voxel
 	@: > voxel/$(am__dirstamp)
@@ -842,7 +764,7 @@ voxel/ext-module.lo: voxel/$(am__dirstamp) \
 voxel/ext-script.lo: voxel/$(am__dirstamp) \
 	voxel/$(DEPDIR)/$(am__dirstamp)
 libvoxel-cli.la: $(libvoxel_cli_la_OBJECTS) $(libvoxel_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libvoxel_cli_la_LINK) -rpath $(extdir) $(libvoxel_cli_la_OBJECTS) $(libvoxel_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libvoxel_cli_la_OBJECTS) $(libvoxel_cli_la_LIBADD) $(LIBS)
 widgets/$(am__dirstamp):
 	@$(MKDIR_P) widgets
 	@: > widgets/$(am__dirstamp)
@@ -854,7 +776,7 @@ widgets/ext-module.lo: widgets/$(am__dirstamp) \
 widgets/ext-script.lo: widgets/$(am__dirstamp) \
 	widgets/$(DEPDIR)/$(am__dirstamp)
 libwidgets-cli.la: $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libwidgets_cli_la_LINK) -rpath $(extdir) $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

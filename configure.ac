@@ -18,6 +18,7 @@ AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with so
 AC_ARG_ENABLE([viewer], AC_HELP_STRING([--disable-viewer], [Do not compile the model viewer]), [want_viewer=no], [want_viewer=yes])
 AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
 AC_ARG_ENABLE([malloc-debug], AC_HELP_STRING([--enable-malloc-debug], [Compile with logging memory management functions]), [want_mallocdebug=yes], [want_mallocdebug=no])
+AC_ARG_WITH([sdl-config], AC_HELP_STRING([--with-sdl-config=PTH], [Path to sdl-config (optional)]), [SDL_CONFIG="$withval"], [])
 AC_ARG_WITH([dep-prefix],
 	AC_HELP_STRING([--with-dep-prefix=PFX], [Prefix where to search for dependencies (optional)]), [
 	CFLAGS="$CFLAGS -I$withval/include"
@@ -76,10 +77,15 @@ AC_SEARCH_LIBS(socket, socket)
 LIPS_CFLAGS="$CFLAGS -Wall -DLI_ENABLE_ERROR"
 LIPS_LIBS="$LIBS"
 
+AC_ARG_VAR([GL_CFLAGS], [C compiler flags for OpenGL])
+AC_ARG_VAR([GL_LIBS], [linker flags for OpenGL [-lGL]])
 AC_ARG_VAR([GLEW_CFLAGS], [C compiler flags for GLEW])
 AC_ARG_VAR([GLEW_LIBS], [linker flags for GLEW [-lGLEW]])
 AC_ARG_VAR([GRAPPLE_CFLAGS], [C compiler flags for grapple])
 AC_ARG_VAR([GRAPPLE_LIBS], [linker flags for grapple [-lgrapple]])
+AC_ARG_VAR([SDL_CONFIG], [path to sdl-config])
+AC_ARG_VAR([SDL_CFLAGS], [C compiler flags for SDL])
+AC_ARG_VAR([SDL_LIBS], [linker flags for SDL])
 AC_ARG_VAR([SQUISH_CFLAGS], [C compiler flags for squish])
 AC_ARG_VAR([SQUISH_LIBS], [linker flags for squish [-lsquish]])
 AC_ARG_VAR([ZLIB_CFLAGS], [C compiler flags for zlib])
@@ -114,6 +120,22 @@ LUA_CFLAGS and LUA_LIBS to bypass this test.])
 		else
 			LUA_CFLAGS=""
 			LUA_LIBS="-llua"
+		fi
+	fi
+fi
+if test "x$want_client" = xyes || test "x$want_import" = xyes || test "x$want_viewer" = xyes; then
+	PKG_CHECK_MODULES([LIBPNG], [libpng12 >= 1.2.0], [found=yes], [found=no])
+	if test "x$found" = xno; then
+		AC_CHECK_LIB([png], [spng_create_read_struct], [founda=yes], [founda=no])
+		AC_CHECK_HEADER([png.h], [foundb=yes], [foundb=no])
+		if test "x$founda" = xno || test "x$foundb" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find libpng. You may set the environment variables
+LIBPNG_CFLAGS and LIBPNG_LIBS to bypass this test.])
+		else
+			LIBPNG_CFLAGS=""
+			LIBPNG_LIBS="-lpng"
 		fi
 	fi
 fi
@@ -159,13 +181,30 @@ BULLET_CFLAGS and BULLET_LIBS to bypass this test.])
 	fi
 fi
 if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
-	AM_PATH_SDL([1.2.0], [found=yes], [found=no])
-	if test "x$found" = xno; then
-		AC_MSG_ERROR([
+	if test "x$SDL_CFLAGS" = "x" && test "x$SDL_LIBS" = "x"; then
+		if test "x$SDL_CONFIG" = "x"; then
+			AM_PATH_SDL([1.2.0], [found=yes], [found=no])
+			if test "x$found" = xno; then
+				AC_MSG_ERROR([
 
 Cannot find SDL. You may set the environment variables
-SDL_CFLAGS and SDL_LIBS or use the --disable-sdltest
-option to bypass this test.])
+SDL_CONFIG, SDL_CFLAGS, and SDL_LIBS to bypass this test.])
+			fi
+		else
+			SDL_CFLAGS="`$SDL_CONFIG --cflags`"
+			SDL_LIBS="`$SDL_CONFIG --libs`"
+		fi
+	fi
+fi
+if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
+	if test "x$GL_CFLAGS" = "x" && test "x$GL_LIBS" = "x"; then
+		AX_CHECK_GL
+		if test "x$no_gl" = "xyes"; then
+			AC_MSG_ERROR([
+
+Cannot find OpenGL. You may set the environment variables
+GL_CFLAGS and GL_LIBS to bypass this test.])
+		fi
 	fi
 fi
 if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
@@ -269,15 +308,15 @@ LISRV_CFLAGS="\
 	$SQUISH_CFLAGS $BULLET_CFLAGS"
 LISRV_LIBS="\
 	$LUA_LIBS $GRAPPLE_LIBS $SQLITE_LIBS $BULLET_LIBS $ZLIB_LIBS \
-	$PTHREAD_LIBS $PTHREAD_CFLAGS $LIPS_LIBS"
+	$PTHREAD_LIBS $LIPS_LIBS"
 LICLI_CFLAGS="\
-	$LIPS_CFLAGS $PTHREAD_CFLAGS $GRAPPLE_CFLAGS $LUA_CFLAGS $ZLIB_CFLAGS $SQLITE_CFLAGS \
-	$SDL_CFLAGS $GL_CFLAGS $GLEW_CFLAGS $OPENAL_CFLAGS $VORBIS_CFLAGS \
-	$SQUISH_CFLAGS $BULLET_CFLAGS"
+	$GRAPPLE_CFLAGS $LUA_CFLAGS $SQLITE_CFLAGS $BULLET_CFLAGS \
+	$SDL_CFLAGS $GLEW_CFLAGS $GL_CFLAGS $OPENAL_CFLAGS $VORBIS_CFLAGS \
+	$SQUISH_CFLAGS $ZLIB_CFLAGS $LIBPNG_CFLAGS $PTHREAD_CFLAGS $LIPS_CFLAGS"
 LICLI_LIBS="\
-	$LUA_LIBS $GRAPPLE_LIBS $SQLITE_LIBS $BULLET_LIBS $ZLIB_LIBS \
-	$GLEW_LIBS $GL_LIBS $OPENAL_LIBS $VORBIS_LIBS $SQUISH_LIBS \
-	$PTHREAD_LIBS $PTHREAD_CFLAGS $LIPS_LIBS"
+	$GRAPPLE_LIBS $LUA_LIBS $SQLITE_LIBS $BULLET_LIBS $GLEW_LIBS \
+	$GL_LIBS $OPENAL_LIBS $VORBIS_LIBS $SQUISH_LIBS $ZLIB_LIBS \
+	$LIBPNG_LIBS $PTHREAD_LIBS $LIPS_LIBS"
 AC_SUBST([LISRV_CFLAGS])
 AC_SUBST([LISRV_LIBS])
 AC_SUBST([LICLI_CFLAGS])

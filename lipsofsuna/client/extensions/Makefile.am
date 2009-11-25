@@ -1,4 +1,6 @@
-INCLUDES = -I$(top_srcdir)
+LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la $(LICLI_LIBS)
+INCLUDES = -I$(top_srcdir)/lipsofsuna
+AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = $(LICLI_CFLAGS)
 
 extdir = $(EXTSDIR)
@@ -19,15 +21,13 @@ ext_LTLIBRARIES = \
 	libvoxel-cli.la \
 	libwidgets-cli.la
 
-libcamera_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libcamera_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libcamera_cli_la_LIBADD = $(LIBADD)
 libcamera_cli_la_SOURCES = \
 	camera/ext-module.c \
 	camera/ext-module.h \
 	camera/ext-script.c
 
-libchat_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libchat_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libchat_cli_la_LIBADD = $(LIBADD)
 libchat_cli_la_SOURCES = \
 	chat/ext-history.c \
 	chat/ext-history.h \
@@ -35,8 +35,7 @@ libchat_cli_la_SOURCES = \
 	chat/ext-module.h \
 	chat/ext-script.c
 
-libeditor_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libeditor_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libeditor_cli_la_LIBADD = $(LIBADD)
 libeditor_cli_la_SOURCES = \
 	editor/ext-dialog.c \
 	editor/ext-dialog.h \
@@ -46,22 +45,19 @@ libeditor_cli_la_SOURCES = \
 	editor/ext-module.h \
 	editor/ext-script.c
 
-libeffect_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libeffect_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libeffect_cli_la_LIBADD = $(LIBADD)
 libeffect_cli_la_SOURCES = \
 	effect/ext-module.c \
 	effect/ext-module.h \
 	effect/ext-script.c
 
-libevents_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libevents_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libevents_cli_la_LIBADD = $(LIBADD)
 libevents_cli_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
 
-libgenerator_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libgenerator_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libgenerator_cli_la_LIBADD = $(LIBADD)
 libgenerator_cli_la_SOURCES = \
 	generator/ext-brushes.c \
 	generator/ext-brushes.h \
@@ -75,8 +71,7 @@ libgenerator_cli_la_SOURCES = \
 	generator/ext-preview.h \
 	generator/ext-script.c
 
-liboptions_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-liboptions_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+liboptions_cli_la_LIBADD = $(LIBADD)
 liboptions_cli_la_SOURCES = \
 	options/ext-module.c \
 	options/ext-module.h \
@@ -84,8 +79,7 @@ liboptions_cli_la_SOURCES = \
 	options/ext-options.h \
 	options/ext-script.c
 
-libpackager_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libpackager_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libpackager_cli_la_LIBADD = $(LIBADD)
 libpackager_cli_la_SOURCES = \
 	packager/ext-module.c \
 	packager/ext-module.h \
@@ -95,8 +89,7 @@ libpackager_cli_la_SOURCES = \
 	packager/ext-resources.h \
 	packager/ext-script.c
 
-libreload_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libreload_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libreload_cli_la_LIBADD = $(LIBADD)
 libreload_cli_la_SOURCES = \
 	reload/ext-module.c \
 	reload/ext-module.h \
@@ -104,8 +97,7 @@ libreload_cli_la_SOURCES = \
 	reload/ext-reload.h \
 	reload/ext-script.c
 
-libskills_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libskills_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libskills_cli_la_LIBADD = $(LIBADD)
 libskills_cli_la_SOURCES = \
 	skills/ext-module.c \
 	skills/ext-module.h \
@@ -115,8 +107,7 @@ libskills_cli_la_SOURCES = \
 	skills/ext-widget.c \
 	skills/ext-widget.h
 
-libslots_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libslots_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libslots_cli_la_LIBADD = $(LIBADD)
 libslots_cli_la_SOURCES = \
 	slots/ext-module.c \
 	slots/ext-module.h \
@@ -125,15 +116,13 @@ libslots_cli_la_SOURCES = \
 	slots/ext-slots.c \
 	slots/ext-slots.h
 
-libsound_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libsound_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libsound_cli_la_LIBADD = $(LIBADD)
 libsound_cli_la_SOURCES = \
 	sound/ext-module.c \
 	sound/ext-module.h \
 	sound/ext-script.c
 
-libspeech_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libspeech_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libspeech_cli_la_LIBADD = $(LIBADD)
 libspeech_cli_la_SOURCES = \
 	speech/ext-module.c \
 	speech/ext-module.h \
@@ -141,8 +130,7 @@ libspeech_cli_la_SOURCES = \
 	speech/ext-speech.h \
 	speech/ext-speech.c
 
-libvoxel_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libvoxel_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libvoxel_cli_la_LIBADD = $(LIBADD)
 libvoxel_cli_la_SOURCES = \
 	voxel/ext-block.c \
 	voxel/ext-block.h \
@@ -150,8 +138,7 @@ libvoxel_cli_la_SOURCES = \
 	voxel/ext-module.h \
 	voxel/ext-script.c
 
-libwidgets_cli_la_LDFLAGS = -module -avoid-version -no-undefined
-libwidgets_cli_la_LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la
+libwidgets_cli_la_LIBADD = $(LIBADD)
 libwidgets_cli_la_SOURCES = \
 	widgets/ext-module.c \
 	widgets/ext-module.h \

@@ -767,9 +767,6 @@ MAYBE_GENERATOR_FALSE
 MAYBE_GENERATOR_TRUE
 MAYBE_CLIENT_FALSE
 MAYBE_CLIENT_TRUE
-SDL_LIBS
-SDL_CFLAGS
-SDL_CONFIG
 BULLET_LIBS
 BULLET_CFLAGS
 SQLITE_LIBS
@@ -778,16 +775,23 @@ VORBIS_LIBS
 VORBIS_CFLAGS
 OPENAL_LIBS
 OPENAL_CFLAGS
+LIBPNG_LIBS
+LIBPNG_CFLAGS
 LUA_LIBS
 LUA_CFLAGS
 ZLIB_LIBS
 ZLIB_CFLAGS
 SQUISH_LIBS
 SQUISH_CFLAGS
+SDL_LIBS
+SDL_CFLAGS
+SDL_CONFIG
 GRAPPLE_LIBS
 GRAPPLE_CFLAGS
 GLEW_LIBS
 GLEW_CFLAGS
+GL_LIBS
+GL_CFLAGS
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -931,6 +935,7 @@ enable_sound
 enable_viewer
 enable_relpath
 enable_malloc_debug
+with_sdl_config
 with_dep_prefix
 enable_dependency_tracking
 enable_shared
@@ -959,16 +964,23 @@ CPP
 CXXCPP
 PKG_CONFIG
 XMKMF
+GL_CFLAGS
+GL_LIBS
 GLEW_CFLAGS
 GLEW_LIBS
 GRAPPLE_CFLAGS
 GRAPPLE_LIBS
+SDL_CONFIG
+SDL_CFLAGS
+SDL_LIBS
 SQUISH_CFLAGS
 SQUISH_LIBS
 ZLIB_CFLAGS
 ZLIB_LIBS
 LUA_CFLAGS
 LUA_LIBS
+LIBPNG_CFLAGS
+LIBPNG_LIBS
 OPENAL_CFLAGS
 OPENAL_LIBS
 VORBIS_CFLAGS
@@ -1628,6 +1640,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-sdl-config=PTH   Path to sdl-config (optional)
   --with-dep-prefix=PFX   Prefix where to search for dependencies (optional)
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
@@ -1650,12 +1663,17 @@ Some influential environment variables:
   CXXCPP      C++ preprocessor
   PKG_CONFIG  path to pkg-config utility
   XMKMF       Path to xmkmf, Makefile generator for X Window System
+  GL_CFLAGS   C compiler flags for OpenGL
+  GL_LIBS     linker flags for OpenGL [-lGL]
   GLEW_CFLAGS C compiler flags for GLEW
   GLEW_LIBS   linker flags for GLEW [-lGLEW]
   GRAPPLE_CFLAGS
               C compiler flags for grapple
   GRAPPLE_LIBS
               linker flags for grapple [-lgrapple]
+  SDL_CONFIG  path to sdl-config
+  SDL_CFLAGS  C compiler flags for SDL
+  SDL_LIBS    linker flags for SDL
   SQUISH_CFLAGS
               C compiler flags for squish
   SQUISH_LIBS linker flags for squish [-lsquish]
@@ -1663,6 +1681,9 @@ Some influential environment variables:
   ZLIB_LIBS   linker flags for zlib [-lz]
   LUA_CFLAGS  C compiler flags for LUA, overriding pkg-config
   LUA_LIBS    linker flags for LUA, overriding pkg-config
+  LIBPNG_CFLAGS
+              C compiler flags for LIBPNG, overriding pkg-config
+  LIBPNG_LIBS linker flags for LIBPNG, overriding pkg-config
   OPENAL_CFLAGS
               C compiler flags for OPENAL, overriding pkg-config
   OPENAL_LIBS linker flags for OPENAL, overriding pkg-config
@@ -3493,6 +3514,12 @@ if test "${enable_malloc_debug+set}" = set; then :
   enableval=$enable_malloc_debug; want_mallocdebug=yes
 else
   want_mallocdebug=no
+fi
+
+
+# Check whether --with-sdl-config was given.
+if test "${with_sdl_config+set}" = set; then :
+  withval=$with_sdl_config; SDL_CONFIG="$withval"
 fi
 
 
@@ -6197,13 +6224,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6200: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6227: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6203: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6230: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6206: output\"" >&5)
+  (eval echo "\"\$as_me:6233: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7408,7 +7435,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7411 "configure"' > conftest.$ac_ext
+  echo '#line 7438 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9465,11 +9492,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9468: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9495: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9472: \$? = $ac_status" >&5
+   echo "$as_me:9499: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9804,11 +9831,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9807: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9834: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9811: \$? = $ac_status" >&5
+   echo "$as_me:9838: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -9909,11 +9936,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9912: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9939: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9916: \$? = $ac_status" >&5
+   echo "$as_me:9943: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9964,11 +9991,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9967: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9994: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9971: \$? = $ac_status" >&5
+   echo "$as_me:9998: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12347,7 +12374,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12350 "configure"
+#line 12377 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12443,7 +12470,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12446 "configure"
+#line 12473 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14399,11 +14426,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14402: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14429: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14406: \$? = $ac_status" >&5
+   echo "$as_me:14433: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14498,11 +14525,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14501: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14528: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14505: \$? = $ac_status" >&5
+   echo "$as_me:14532: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14550,11 +14577,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14553: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14580: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14557: \$? = $ac_status" >&5
+   echo "$as_me:14584: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17244,6 +17271,11 @@ LIPS_LIBS="$LIBS"
 
 
 
+
+
+
+
+
 if test "x$want_easy" = xyes; then
 	want_relative=yes
 	prefix="$PWD/build"
@@ -17526,6 +17558,140 @@ LUA_CFLAGS and LUA_LIBS to bypass this test." "$LINENO" 5
 		else
 			LUA_CFLAGS=""
 			LUA_LIBS="-llua"
+		fi
+	fi
+fi
+if test "x$want_client" = xyes || test "x$want_import" = xyes || test "x$want_viewer" = xyes; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for LIBPNG" >&5
+$as_echo_n "checking for LIBPNG... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$LIBPNG_CFLAGS"; then
+        pkg_cv_LIBPNG_CFLAGS="$LIBPNG_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpng12 >= 1.2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libpng12 >= 1.2.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBPNG_CFLAGS=`$PKG_CONFIG --cflags "libpng12 >= 1.2.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$LIBPNG_LIBS"; then
+        pkg_cv_LIBPNG_LIBS="$LIBPNG_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libpng12 >= 1.2.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libpng12 >= 1.2.0") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_LIBPNG_LIBS=`$PKG_CONFIG --libs "libpng12 >= 1.2.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        LIBPNG_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libpng12 >= 1.2.0"`
+        else
+	        LIBPNG_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libpng12 >= 1.2.0"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$LIBPNG_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                found=no
+elif test $pkg_failed = untried; then
+	found=no
+else
+	LIBPNG_CFLAGS=$pkg_cv_LIBPNG_CFLAGS
+	LIBPNG_LIBS=$pkg_cv_LIBPNG_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	found=yes
+fi
+	if test "x$found" = xno; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for spng_create_read_struct in -lpng" >&5
+$as_echo_n "checking for spng_create_read_struct in -lpng... " >&6; }
+if test "${ac_cv_lib_png_spng_create_read_struct+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpng  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char spng_create_read_struct ();
+int
+main ()
+{
+return spng_create_read_struct ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_png_spng_create_read_struct=yes
+else
+  ac_cv_lib_png_spng_create_read_struct=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_png_spng_create_read_struct" >&5
+$as_echo "$ac_cv_lib_png_spng_create_read_struct" >&6; }
+if test "x$ac_cv_lib_png_spng_create_read_struct" = x""yes; then :
+  founda=yes
+else
+  founda=no
+fi
+
+		ac_fn_c_check_header_mongrel "$LINENO" "png.h" "ac_cv_header_png_h" "$ac_includes_default"
+if test "x$ac_cv_header_png_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		if test "x$founda" = xno || test "x$foundb" = xno; then
+			as_fn_error "
+
+Cannot find libpng. You may set the environment variables
+LIBPNG_CFLAGS and LIBPNG_LIBS to bypass this test." "$LINENO" 5
+		else
+			LIBPNG_CFLAGS=""
+			LIBPNG_LIBS="-lpng"
 		fi
 	fi
 fi
@@ -17997,6 +18163,8 @@ BULLET_CFLAGS and BULLET_LIBS to bypass this test." "$LINENO" 5
 	fi
 fi
 if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
+	if test "x$SDL_CFLAGS" = "x" && test "x$SDL_LIBS" = "x"; then
+		if test "x$SDL_CONFIG" = "x"; then
 
 # Check whether --with-sdl-prefix was given.
 if test "${with_sdl_prefix+set}" = set; then :
@@ -18250,12 +18418,271 @@ rm -f core conftest.err conftest.$ac_objext \
 
   rm -f conf.sdltest
 
-	if test "x$found" = xno; then
-		as_fn_error "
+			if test "x$found" = xno; then
+				as_fn_error "
 
 Cannot find SDL. You may set the environment variables
-SDL_CFLAGS and SDL_LIBS or use the --disable-sdltest
-option to bypass this test." "$LINENO" 5
+SDL_CONFIG, SDL_CFLAGS, and SDL_LIBS to bypass this test." "$LINENO" 5
+			fi
+		else
+			SDL_CFLAGS="`$SDL_CONFIG --cflags`"
+			SDL_LIBS="`$SDL_CONFIG --libs`"
+		fi
+	fi
+fi
+if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
+	if test "x$GL_CFLAGS" = "x" && test "x$GL_LIBS" = "x"; then
+
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the Microsoft C compiler" >&5
+$as_echo_n "checking whether we are using the Microsoft C compiler... " >&6; }
+if test "${ax_cv_c_compiler_ms+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+#ifndef _MSC_VER
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ax_compiler_ms=yes
+else
+  ax_compiler_ms=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+ax_cv_c_compiler_ms=$ax_compiler_ms
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_c_compiler_ms" >&5
+$as_echo "$ax_cv_c_compiler_ms" >&6; }
+if test X$ax_compiler_ms = Xno; then :
+  GL_CFLAGS="${PTHREAD_CFLAGS}"; GL_LIBS="${PTHREAD_LIBS} -lm"
+fi
+
+#
+# Use x_includes and x_libraries if they have been set (presumably by
+# AC_PATH_X).
+#
+if test "X$no_x" != "Xyes"; then :
+  if test -n "$x_includes"; then :
+  GL_CFLAGS="-I${x_includes} ${GL_CFLAGS}"
+fi
+       if test -n "$x_libraries"; then :
+  GL_LIBS="-L${x_libraries} -lX11 ${GL_LIBS}"
+fi
+fi
+
+ax_save_CPPFLAGS="${CPPFLAGS}"
+CPPFLAGS="${GL_CFLAGS} ${CPPFLAGS}"
+for ac_header in GL/gl.h OpenGL/gl.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
+eval as_val=\$$as_ac_Header
+   if test "x$as_val" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+
+done
+
+CPPFLAGS="${ax_save_CPPFLAGS}"
+
+for ac_header in windows.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "windows.h" "ac_cv_header_windows_h" "$ac_includes_default"
+if test "x$ac_cv_header_windows_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_WINDOWS_H 1
+_ACEOF
+
+fi
+
+done
+
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenGL library" >&5
+$as_echo_n "checking for OpenGL library... " >&6; }
+if test "${ax_cv_check_gl_libgl+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ax_cv_check_gl_libgl="no"
+case $host_cpu in
+  x86_64) ax_check_gl_libdir=lib64 ;;
+  *)      ax_check_gl_libdir=lib ;;
+esac
+ax_save_CPPFLAGS="${CPPFLAGS}"
+CPPFLAGS="${GL_CFLAGS} ${CPPFLAGS}"
+ax_save_LIBS="${LIBS}"
+LIBS=""
+ax_check_libs="-lopengl32 -lGL"
+for ax_lib in ${ax_check_libs}; do
+  if test X$ax_compiler_ms = Xyes; then :
+  ax_try_lib=`echo $ax_lib | sed -e 's/^-l//' -e 's/$/.lib/'`
+else
+  ax_try_lib="${ax_lib}"
+fi
+  LIBS="${ax_try_lib} ${GL_LIBS} ${ax_save_LIBS}"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
+#   include <windows.h>
+# endif
+# ifdef HAVE_GL_GL_H
+#   include <GL/gl.h>
+# elif defined(HAVE_OPENGL_GL_H)
+#   include <OpenGL/gl.h>
+# else
+#   error no gl.h
+# endif
+int
+main ()
+{
+glBegin(0)
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ax_cv_check_gl_libgl="${ax_try_lib}"; break
+else
+  ax_check_gl_nvidia_flags="-L/usr/${ax_check_gl_libdir}/nvidia" LIBS="${ax_try_lib} ${ax_check_gl_nvidia_flags} ${GL_LIBS} ${ax_save_LIBS}"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
+#   include <windows.h>
+# endif
+# ifdef HAVE_GL_GL_H
+#   include <GL/gl.h>
+# elif defined(HAVE_OPENGL_GL_H)
+#   include <OpenGL/gl.h>
+# else
+#   error no gl.h
+# endif
+int
+main ()
+{
+glBegin(0)
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ax_cv_check_gl_libgl="${ax_try_lib} ${ax_check_gl_nvidia_flags}"; break
+else
+  ax_check_gl_dylib_flag='-dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib' LIBS="${ax_try_lib} ${ax_check_gl_dylib_flag} ${GL_LIBS} ${ax_save_LIBS}"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
+#   include <windows.h>
+# endif
+# ifdef HAVE_GL_GL_H
+#   include <GL/gl.h>
+# elif defined(HAVE_OPENGL_GL_H)
+#   include <OpenGL/gl.h>
+# else
+#   error no gl.h
+# endif
+int
+main ()
+{
+glBegin(0)
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ax_cv_check_gl_libgl="${ax_try_lib} ${ax_check_gl_dylib_flag}"; break
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+done
+
+if test "X$ax_cv_check_gl_libgl" = Xno -a "X$no_x" = Xyes; then :
+  LIBS='-framework OpenGL'
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+# if defined(HAVE_WINDOWS_H) && defined(_WIN32)
+#   include <windows.h>
+# endif
+# ifdef HAVE_GL_GL_H
+#   include <GL/gl.h>
+# elif defined(HAVE_OPENGL_GL_H)
+#   include <OpenGL/gl.h>
+# else
+#   error no gl.h
+# endif
+int
+main ()
+{
+glBegin(0)
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ax_cv_check_gl_libgl="$LIBS"
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+
+LIBS=${ax_save_LIBS}
+CPPFLAGS=${ax_save_CPPFLAGS}
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_gl_libgl" >&5
+$as_echo "$ax_cv_check_gl_libgl" >&6; }
+
+if test "X$ax_cv_check_gl_libgl" = Xno; then :
+  no_gl=yes; GL_CFLAGS=""; GL_LIBS=""
+else
+  GL_LIBS="${ax_cv_check_gl_libgl} ${GL_LIBS}"
+fi
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+
+
+		if test "x$no_gl" = "xyes"; then
+			as_fn_error "
+
+Cannot find OpenGL. You may set the environment variables
+GL_CFLAGS and GL_LIBS to bypass this test." "$LINENO" 5
+		fi
 	fi
 fi
 if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
@@ -18594,15 +19021,15 @@ LISRV_CFLAGS="\
 	$SQUISH_CFLAGS $BULLET_CFLAGS"
 LISRV_LIBS="\
 	$LUA_LIBS $GRAPPLE_LIBS $SQLITE_LIBS $BULLET_LIBS $ZLIB_LIBS \
-	$PTHREAD_LIBS $PTHREAD_CFLAGS $LIPS_LIBS"
+	$PTHREAD_LIBS $LIPS_LIBS"
 LICLI_CFLAGS="\
-	$LIPS_CFLAGS $PTHREAD_CFLAGS $GRAPPLE_CFLAGS $LUA_CFLAGS $ZLIB_CFLAGS $SQLITE_CFLAGS \
-	$SDL_CFLAGS $GL_CFLAGS $GLEW_CFLAGS $OPENAL_CFLAGS $VORBIS_CFLAGS \
-	$SQUISH_CFLAGS $BULLET_CFLAGS"
+	$GRAPPLE_CFLAGS $LUA_CFLAGS $SQLITE_CFLAGS $BULLET_CFLAGS \
+	$SDL_CFLAGS $GLEW_CFLAGS $GL_CFLAGS $OPENAL_CFLAGS $VORBIS_CFLAGS \
+	$SQUISH_CFLAGS $ZLIB_CFLAGS $LIBPNG_CFLAGS $PTHREAD_CFLAGS $LIPS_CFLAGS"
 LICLI_LIBS="\
-	$LUA_LIBS $GRAPPLE_LIBS $SQLITE_LIBS $BULLET_LIBS $ZLIB_LIBS \
-	$GLEW_LIBS $GL_LIBS $OPENAL_LIBS $VORBIS_LIBS $SQUISH_LIBS \
-	$PTHREAD_LIBS $PTHREAD_CFLAGS $LIPS_LIBS"
+	$GRAPPLE_LIBS $LUA_LIBS $SQLITE_LIBS $BULLET_LIBS $GLEW_LIBS \
+	$GL_LIBS $OPENAL_LIBS $VORBIS_LIBS $SQUISH_LIBS $ZLIB_LIBS \
+	$LIBPNG_LIBS $PTHREAD_LIBS $LIPS_LIBS"
 
 
 

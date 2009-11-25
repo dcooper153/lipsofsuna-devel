@@ -168,7 +168,7 @@ livie_viewer_main (livieViewer* self)
 						limat_camera_zoom (self->camera, ZOOM_SPEED);
 					break;
 				case SDL_MOUSEMOTION:
-					if (SDL_GetMouseState (NULL, NULL))
+					if (self->video.SDL_GetMouseState (NULL, NULL))
 					{
 						limat_camera_turn (self->camera, ROTATION_SPEED * -event.motion.xrel);
 						limat_camera_tilt (self->camera, ROTATION_SPEED * -event.motion.yrel);
@@ -370,7 +370,7 @@ private_resize (livieViewer* self,
 			self->video.SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
 			self->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
 			self->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
-			self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
+			self->screen = self->video.SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
 			if (self->screen != NULL)
 				break;
 		}

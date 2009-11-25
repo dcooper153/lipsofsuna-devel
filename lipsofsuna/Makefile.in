@@ -65,6 +65,8 @@ DIST_COMMON = $(ai_HEADERS) $(alg_HEADERS) $(arc_HEADERS) \
 	$(vie_HEADERS) $(vox_HEADERS) $(wdg_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
+	$(top_srcdir)/m4/ax_check_gl.m4 \
+	$(top_srcdir)/m4/ax_lang_compiler_ms.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
@@ -114,7 +116,13 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(wdgdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-liblipsofsunaclient_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+liblipsofsunaclient_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = ai/ai-path.lo ai/ai-path-solver.lo ai/ai-sector.lo \
 	ai/ai-waypoint.lo
@@ -224,7 +232,8 @@ liblipsofsunaclient_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaclient_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
 @MAYBE_CLIENT_TRUE@am_liblipsofsunaclient_la_rpath = -rpath $(libdir)
-liblipsofsunagenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+liblipsofsunagenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_liblipsofsunagenerator_la_OBJECTS = $(am__objects_2) \
 	$(am__objects_3) $(am__objects_5) $(am__objects_6) \
 	$(am__objects_9) $(am__objects_12) $(am__objects_13) \
@@ -232,18 +241,30 @@ am_liblipsofsunagenerator_la_OBJECTS = $(am__objects_2) \
 	$(am__objects_25) $(am__objects_27)
 liblipsofsunagenerator_la_OBJECTS =  \
 	$(am_liblipsofsunagenerator_la_OBJECTS)
+liblipsofsunagenerator_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(liblipsofsunagenerator_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 @MAYBE_GENERATOR_TRUE@am_liblipsofsunagenerator_la_rpath = -rpath \
 @MAYBE_GENERATOR_TRUE@	$(libdir)
 liblipsofsunaimport_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_liblipsofsunaimport_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
 	$(am__objects_6) $(am__objects_12) $(am__objects_13) \
 	$(am__objects_17) $(am__objects_18) $(am__objects_21) \
 	$(am__objects_24) $(am__objects_25) image/image.lo \
 	image/image-compress.lo
 liblipsofsunaimport_la_OBJECTS = $(am_liblipsofsunaimport_la_OBJECTS)
+liblipsofsunaimport_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaimport_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 @MAYBE_IMPORT_TRUE@am_liblipsofsunaimport_la_rpath = -rpath $(libdir)
-liblipsofsunaserver_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+liblipsofsunaserver_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_liblipsofsunaserver_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_5) $(am__objects_6) \
 	$(am__objects_10) $(am__objects_12) $(am__objects_13) \
@@ -258,6 +279,8 @@ liblipsofsunaserver_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @MAYBE_SERVER_TRUE@am_liblipsofsunaserver_la_rpath = -rpath $(libdir)
 liblipsofsunaviewer_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__objects_29 = viewer/viewer.lo
 am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
@@ -267,6 +290,10 @@ am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
 	$(am__objects_21) $(am__objects_24) $(am__objects_25) \
 	$(am__objects_26) $(am__objects_29)
 liblipsofsunaviewer_la_OBJECTS = $(am_liblipsofsunaviewer_la_OBJECTS)
+liblipsofsunaviewer_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaviewer_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 @MAYBE_VIEWER_TRUE@am_liblipsofsunaviewer_la_rpath = -rpath $(libdir)
 @MAYBE_CLIENT_TRUE@am__EXEEXT_1 = lipsofsuna-client$(EXEEXT)
 @MAYBE_GENERATOR_TRUE@am__EXEEXT_2 = lipsofsuna-generator$(EXEEXT)
@@ -290,14 +317,14 @@ am__objects_31 = system/lipsofsuna-system.$(OBJEXT) \
 	system/lipsofsuna-system-user.$(OBJEXT)
 am_lipsofsuna_OBJECTS = $(am__objects_30) $(am__objects_31)
 lipsofsuna_OBJECTS = $(am_lipsofsuna_OBJECTS)
-lipsofsuna_LDADD = $(LDADD)
+lipsofsuna_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 lipsofsuna_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(lipsofsuna_CFLAGS) \
-	$(CFLAGS) $(lipsofsuna_LDFLAGS) $(LDFLAGS) -o $@
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am_lipsofsuna_client_OBJECTS = client/client-main.$(OBJEXT)
 lipsofsuna_client_OBJECTS = $(am_lipsofsuna_client_OBJECTS)
 lipsofsuna_client_DEPENDENCIES = liblipsofsunaclient.la \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 lipsofsuna_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_client_LDFLAGS) $(LDFLAGS) \
@@ -305,6 +332,7 @@ lipsofsuna_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 am_lipsofsuna_generator_OBJECTS = generator/generator-main.$(OBJEXT)
 lipsofsuna_generator_OBJECTS = $(am_lipsofsuna_generator_OBJECTS)
 lipsofsuna_generator_DEPENDENCIES = liblipsofsunagenerator.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 lipsofsuna_generator_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
@@ -313,7 +341,9 @@ lipsofsuna_generator_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 am_lipsofsuna_import_OBJECTS = reload/reload-main.$(OBJEXT)
 lipsofsuna_import_OBJECTS = $(am_lipsofsuna_import_OBJECTS)
 lipsofsuna_import_DEPENDENCIES = liblipsofsunaimport.la \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 lipsofsuna_import_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_import_LDFLAGS) $(LDFLAGS) \
@@ -330,7 +360,10 @@ am_lipsofsuna_viewer_OBJECTS = viewer/viewer-main.$(OBJEXT)
 lipsofsuna_viewer_OBJECTS = $(am_lipsofsuna_viewer_OBJECTS)
 lipsofsuna_viewer_DEPENDENCIES = liblipsofsunaviewer.la \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 lipsofsuna_viewer_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_viewer_LDFLAGS) $(LDFLAGS) \
@@ -477,6 +510,8 @@ EXTSDIR = @EXTSDIR@
 FGREP = @FGREP@
 GLEW_CFLAGS = @GLEW_CFLAGS@
 GLEW_LIBS = @GLEW_LIBS@
+GL_CFLAGS = @GL_CFLAGS@
+GL_LIBS = @GL_LIBS@
 GRAPPLE_CFLAGS = @GRAPPLE_CFLAGS@
 GRAPPLE_LIBS = @GRAPPLE_LIBS@
 GREP = @GREP@
@@ -488,6 +523,8 @@ INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
+LIBPNG_CFLAGS = @LIBPNG_CFLAGS@
+LIBPNG_LIBS = @LIBPNG_LIBS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LICLI_CFLAGS = @LICLI_CFLAGS@
@@ -1156,19 +1193,25 @@ wdgsrc = \
 
 ##############################################################################
 liblipsofsunaclient_la_LDFLAGS = -no-undefined
-liblipsofsunaclient_la_LIBADD = $(LICLI_LIBS) -lpng
+liblipsofsunaclient_la_LIBADD = \
+	$(GRAPPLE_LIBS) $(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(GLEW_LIBS) \
+	$(GL_LIBS) $(OPENAL_LIBS) $(VORBIS_LIBS) $(SQUISH_LIBS) $(ZLIB_LIBS) \
+	$(LIPS_LIBS) $(LIBPNG_LIBS) $(PTHREAD_LIBS)
+
 liblipsofsunaclient_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
 	$(fntsrc) $(gensrc) $(engsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
-liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) -lz
+liblipsofsunagenerator_la_LDFLAGS = -no-undefined
+liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 liblipsofsunagenerator_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(gensrc) $(matsrc) $(mdlsrc) \
 	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunaimport_la_LIBADD = $(SQUISH_LIBS) $(SQLITE_LIBS) -lpng
+liblipsofsunaimport_la_LDFLAGS = -no-undefined
+liblipsofsunaimport_la_LIBADD = $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaimport_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(cfgsrc) $(matsrc) $(mdlsrc) $(pthsrc) $(relsrc) \
 	$(strsrc) $(syssrc) $(thrsrc) \
@@ -1179,13 +1222,17 @@ liblipsofsunaimport_la_SOURCES = \
 	image/image-dds.h
 
 liblipsofsunaserver_la_LDFLAGS = -no-undefined
-liblipsofsunaserver_la_LIBADD = $(LISRV_LIBS)
+liblipsofsunaserver_la_LIBADD = \
+	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
+	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
+
 liblipsofsunaserver_la_SOURCES = \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
+liblipsofsunaviewer_la_LDFLAGS = -no-undefined
+liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaviewer_la_SOURCES = \
 	$(algsrc) $(arcsrc) $(cfgsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
 	$(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(strsrc) $(syssrc) $(thrsrc) \
@@ -1193,23 +1240,23 @@ liblipsofsunaviewer_la_SOURCES = \
 
 
 ##############################################################################
-lipsofsuna_CFLAGS = $(AM_CFLAGS)
-lipsofsuna_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
 lipsofsuna_SOURCES = $(maisrc) $(syssrc)
-lipsofsuna_client_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la $(LICLI_LIBS) -lpng
+lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)
 lipsofsuna_client_SOURCES = client/client-main.c
-lipsofsuna_generator_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_generator_LDADD = liblipsofsunagenerator.la $(SQLITE_LIBS) -lz
+lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_generator_LDADD = liblipsofsunagenerator.la $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 lipsofsuna_generator_SOURCES = generator/generator-main.c
-lipsofsuna_import_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_import_LDADD = liblipsofsunaimport.la $(SQUISH_LIBS) $(SQLITE_LIBS) -lpng
+lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_import_LDADD = liblipsofsunaimport.la $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 lipsofsuna_import_SOURCES = reload/reload-main.c
-lipsofsuna_server_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
+lipsofsuna_server_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_server_LDADD = liblipsofsunaserver.la $(LISRV_LIBS)
 lipsofsuna_server_SOURCES = server/server-main.c
-lipsofsuna_viewer_LDFLAGS = $(PTHREAD_LIBS) $(PTHREAD_CFLAGS) $(LIPS_LIBS) $(LIPS_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(GLEW_LIBS) $(SDL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) -lSDL_ttf -lpng
+lipsofsuna_viewer_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(SDL_LIBS) -lSDL_ttf $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
 lipsofsuna_viewer_SOURCES = viewer/viewer-main.c
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -1780,9 +1827,9 @@ widget/widget-window.lo: widget/$(am__dirstamp) \
 liblipsofsunaclient.la: $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(liblipsofsunaclient_la_LINK) $(am_liblipsofsunaclient_la_rpath) $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_LIBADD) $(LIBS)
 liblipsofsunagenerator.la: $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) $(am_liblipsofsunagenerator_la_rpath) $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(liblipsofsunagenerator_la_LINK) $(am_liblipsofsunagenerator_la_rpath) $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_LIBADD) $(LIBS)
 liblipsofsunaimport.la: $(liblipsofsunaimport_la_OBJECTS) $(liblipsofsunaimport_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) $(am_liblipsofsunaimport_la_rpath) $(liblipsofsunaimport_la_OBJECTS) $(liblipsofsunaimport_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(liblipsofsunaimport_la_LINK) $(am_liblipsofsunaimport_la_rpath) $(liblipsofsunaimport_la_OBJECTS) $(liblipsofsunaimport_la_LIBADD) $(LIBS)
 liblipsofsunaserver.la: $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(liblipsofsunaserver_la_LINK) $(am_liblipsofsunaserver_la_rpath) $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_LIBADD) $(LIBS)
 viewer/$(am__dirstamp):
@@ -1794,7 +1841,7 @@ viewer/$(DEPDIR)/$(am__dirstamp):
 viewer/viewer.lo: viewer/$(am__dirstamp) \
 	viewer/$(DEPDIR)/$(am__dirstamp)
 liblipsofsunaviewer.la: $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) $(am_liblipsofsunaviewer_la_rpath) $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(liblipsofsunaviewer_la_LINK) $(am_liblipsofsunaviewer_la_rpath) $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
