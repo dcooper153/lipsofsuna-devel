@@ -101,11 +101,11 @@ dnl Dependencies.
 if test "x$want_client" = xyes || test "x$want_server" = xyes; then
 	PKG_CHECK_MODULES([LUA], [lua5.1 >= 5.1.0], [found=yes], [found=no])
 	if test "x$found" = "xno"; then
-		PKG_CHECK_MODULES([LUA], [lua >= 5.1.0])
+		PKG_CHECK_MODULES([LUA], [lua >= 5.1.0], [found=yes], [found=no])
 	fi
 	if test "x$found" = xno; then
-		AC_CHECK_LIB([lua5.1], [lua_newtable], [founda=yes], [founda=no])
-		AC_CHECK_LIB([lua], [lua_newtable], [foundb=yes], [foundb=no])
+		AC_CHECK_LIB([lua5.1], [lua_newstate], [founda=yes], [founda=no])
+		AC_CHECK_LIB([lua], [lua_newstate], [foundb=yes], [foundb=no])
 		AC_CHECK_HEADER([lua.h], [foundc=yes], [foundc=no])
 		AC_CHECK_HEADER([lauxlib.h], [foundd=yes], [foundd=no])
 		if ( test "x$founda" = xno && test "x$foundb" = xno ) || test "x$foundc" = xno || test "x$foundd" = xno; then
@@ -140,7 +140,20 @@ LIBPNG_CFLAGS and LIBPNG_LIBS to bypass this test.])
 	fi
 fi
 if test "x$want_sound" = xyes && test "x$want_client" = xyes; then
-	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8])
+	PKG_CHECK_MODULES([OPENAL], [openal >= 0.0.8], [found=yes], [found=no])
+	if test "x$found" = xno; then
+		AC_CHECK_LIB([openal], [alSourcef], [founda=yes], [founda=no])
+		AC_CHECK_HEADER([AL/al.h], [foundb=yes], [foundb=no])
+		if test "x$founda" = xno || test "x$foundb" = xno; then
+			AC_MSG_ERROR([
+
+Cannot find OpenAL. You may set the environment variables
+OPENAL_CFLAGS and OPENAL_LIBS to bypass this test.])
+		else
+			OPENAL_CFLAGS=""
+			OPENAL_LIBS="-lopenal"
+		fi
+	fi
 	PKG_CHECK_MODULES([VORBIS], [vorbis >= 1.2.0 vorbisfile >= 1.2.0])
 else
 	OPENAL_CFLAGS="-DLI_DISABLE_SOUND"
@@ -148,7 +161,7 @@ fi
 if test xyes = xyes; then
 	PKG_CHECK_MODULES([SQLITE], [sqlite3 >= 3.6.0], [found=yes], [found=no])
 	if test "x$found" = xno; then
-		AC_CHECK_LIB([sqlite3], [sqlite3_open], [founda=yes], [founda=no])
+		AC_CHECK_LIB([sqlite3], [sqlite3_open], [founda=yes], [founda=no], [$PTHREAD_CFLAGS $PTHREAD_LIBS])
 		AC_CHECK_HEADER([sqlite3.h], [foundb=yes], [foundb=no])
 		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([
@@ -209,7 +222,7 @@ GL_CFLAGS and GL_LIBS to bypass this test.])
 fi
 if test "x$want_client" = yes || test "x$want_viewer" = xyes; then
 	if test "x$GLEW_CFLAGS" = "x" && test "x$GLEW_LIBS" = "x"; then
-		AC_CHECK_LIB([GLEW], [glewInit], [founda=yes], [founda=no])
+		AC_CHECK_LIB([GLEW], [glewInit], [founda=yes], [founda=no], [$GL_LIBS])
 		AC_CHECK_HEADER([GL/glew.h], [foundb=yes], [foundb=no])
 		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([

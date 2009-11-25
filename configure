@@ -17413,42 +17413,23 @@ fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$LUA_PKG_ERRORS" >&5
 
-	as_fn_error "Package requirements (lua >= 5.1.0) were not met:
-
-$LUA_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables LUA_CFLAGS
-and LUA_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                found=no
 elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables LUA_CFLAGS
-and LUA_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
+	found=no
 else
 	LUA_CFLAGS=$pkg_cv_LUA_CFLAGS
 	LUA_LIBS=$pkg_cv_LUA_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	:
+	found=yes
 fi
 	fi
 	if test "x$found" = xno; then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newtable in -llua5.1" >&5
-$as_echo_n "checking for lua_newtable in -llua5.1... " >&6; }
-if test "${ac_cv_lib_lua5_1_lua_newtable+set}" = set; then :
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newstate in -llua5.1" >&5
+$as_echo_n "checking for lua_newstate in -llua5.1... " >&6; }
+if test "${ac_cv_lib_lua5_1_lua_newstate+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -17462,35 +17443,35 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char lua_newtable ();
+char lua_newstate ();
 int
 main ()
 {
-return lua_newtable ();
+return lua_newstate ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_lua5_1_lua_newtable=yes
+  ac_cv_lib_lua5_1_lua_newstate=yes
 else
-  ac_cv_lib_lua5_1_lua_newtable=no
+  ac_cv_lib_lua5_1_lua_newstate=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua5_1_lua_newtable" >&5
-$as_echo "$ac_cv_lib_lua5_1_lua_newtable" >&6; }
-if test "x$ac_cv_lib_lua5_1_lua_newtable" = x""yes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua5_1_lua_newstate" >&5
+$as_echo "$ac_cv_lib_lua5_1_lua_newstate" >&6; }
+if test "x$ac_cv_lib_lua5_1_lua_newstate" = x""yes; then :
   founda=yes
 else
   founda=no
 fi
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newtable in -llua" >&5
-$as_echo_n "checking for lua_newtable in -llua... " >&6; }
-if test "${ac_cv_lib_lua_lua_newtable+set}" = set; then :
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for lua_newstate in -llua" >&5
+$as_echo_n "checking for lua_newstate in -llua... " >&6; }
+if test "${ac_cv_lib_lua_lua_newstate+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -17504,27 +17485,27 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char lua_newtable ();
+char lua_newstate ();
 int
 main ()
 {
-return lua_newtable ();
+return lua_newstate ();
   ;
   return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_lua_lua_newtable=yes
+  ac_cv_lib_lua_lua_newstate=yes
 else
-  ac_cv_lib_lua_lua_newtable=no
+  ac_cv_lib_lua_lua_newstate=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua_lua_newtable" >&5
-$as_echo "$ac_cv_lib_lua_lua_newtable" >&6; }
-if test "x$ac_cv_lib_lua_lua_newtable" = x""yes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_lua_lua_newstate" >&5
+$as_echo "$ac_cv_lib_lua_lua_newstate" >&6; }
+if test "x$ac_cv_lib_lua_lua_newstate" = x""yes; then :
   foundb=yes
 else
   foundb=no
@@ -17755,37 +17736,79 @@ fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$OPENAL_PKG_ERRORS" >&5
 
-	as_fn_error "Package requirements (openal >= 0.0.8) were not met:
-
-$OPENAL_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables OPENAL_CFLAGS
-and OPENAL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" "$LINENO" 5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                found=no
 elif test $pkg_failed = untried; then
-	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error "The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables OPENAL_CFLAGS
-and OPENAL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.
-See \`config.log' for more details." "$LINENO" 5; }
+	found=no
 else
 	OPENAL_CFLAGS=$pkg_cv_OPENAL_CFLAGS
 	OPENAL_LIBS=$pkg_cv_OPENAL_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-	:
+	found=yes
 fi
+	if test "x$found" = xno; then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for alSourcef in -lopenal" >&5
+$as_echo_n "checking for alSourcef in -lopenal... " >&6; }
+if test "${ac_cv_lib_openal_alSourcef+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopenal  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char alSourcef ();
+int
+main ()
+{
+return alSourcef ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_openal_alSourcef=yes
+else
+  ac_cv_lib_openal_alSourcef=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_openal_alSourcef" >&5
+$as_echo "$ac_cv_lib_openal_alSourcef" >&6; }
+if test "x$ac_cv_lib_openal_alSourcef" = x""yes; then :
+  founda=yes
+else
+  founda=no
+fi
+
+		ac_fn_c_check_header_mongrel "$LINENO" "AL/al.h" "ac_cv_header_AL_al_h" "$ac_includes_default"
+if test "x$ac_cv_header_AL_al_h" = x""yes; then :
+  foundb=yes
+else
+  foundb=no
+fi
+
+
+		if test "x$founda" = xno || test "x$foundb" = xno; then
+			as_fn_error "
+
+Cannot find OpenAL. You may set the environment variables
+OPENAL_CFLAGS and OPENAL_LIBS to bypass this test." "$LINENO" 5
+		else
+			OPENAL_CFLAGS=""
+			OPENAL_LIBS="-lopenal"
+		fi
+	fi
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for VORBIS" >&5
@@ -17958,7 +17981,7 @@ if test "${ac_cv_lib_sqlite3_sqlite3_open+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsqlite3  $LIBS"
+LIBS="-lsqlite3 $PTHREAD_CFLAGS $PTHREAD_LIBS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -18693,7 +18716,7 @@ if test "${ac_cv_lib_GLEW_glewInit+set}" = set; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lGLEW  $LIBS"
+LIBS="-lGLEW $GL_LIBS $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
