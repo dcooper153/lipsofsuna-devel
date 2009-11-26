@@ -22,13 +22,8 @@
  * @{
  */
 
+#include <string/lips-string.h>
 #include "voxel-material.h"
-
-static int
-private_read_textures (livoxMaterial* self,
-                       liarcSql*      sql);
-
-/*****************************************************************************/
 
 /**
  * \brief Creates a new material.
@@ -53,8 +48,9 @@ livox_material_new ()
 		return NULL;
 	}
 
-	/* Initialize material. */
-	if (!limdl_material_init (&self->model))
+	/* Allocate model. */
+	self->model = listr_dup ("");
+	if (self->model == NULL)
 	{
 		lisys_free (self->name);
 		lisys_free (self);
@@ -79,17 +75,23 @@ livox_material_new_copy (const livoxMaterial* src)
 	self = lisys_calloc (1, sizeof (livoxMaterial));
 	if (self == NULL)
 		return NULL;
+
+	/* Copy values. */
 	self->id = src->id;
+	self->flags = src->flags;
 	self->friction = src->friction;
-	self->scale = src->scale;
-	self->model = src->model;
+
+	/* Copy name. */
 	self->name = listr_dup (src->name);
 	if (self->name == NULL)
 	{
 		lisys_free (self);
 		return NULL;
 	}
-	if (!limdl_material_init_copy (&self->model, &src->model))
+
+	/* Copy model. */
+	self->model = listr_dup (src->model);
+	if (self->model == NULL)
 	{
 		lisys_free (self->name);
 		lisys_free (self);
@@ -122,18 +124,8 @@ livox_material_new_from_sql (liarcSql*     sql,
 	/* Read numeric values. */
 	col = 0;
 	self->id = sqlite3_column_int (stmt, col++);
-	self->model.flags = sqlite3_column_int (stmt, col++);
+	self->flags = sqlite3_column_int (stmt, col++);
 	self->friction = sqlite3_column_double (stmt, col++);
-	self->scale = sqlite3_column_double (stmt, col++);
-	self->model.shininess = sqlite3_column_double (stmt, col++);
-	self->model.diffuse[0] = sqlite3_column_double (stmt, col++);
-	self->model.diffuse[1] = sqlite3_column_double (stmt, col++);
-	self->model.diffuse[2] = sqlite3_column_double (stmt, col++);
-	self->model.diffuse[3] = sqlite3_column_double (stmt, col++);
-	self->model.specular[0] = sqlite3_column_double (stmt, col++);
-	self->model.specular[1] = sqlite3_column_double (stmt, col++);
-	self->model.specular[2] = sqlite3_column_double (stmt, col++);
-	self->model.specular[3] = sqlite3_column_double (stmt, col++);
 
 	/* Read name column. */
 	self->name = (char*) sqlite3_column_text (stmt, col);
@@ -148,24 +140,17 @@ livox_material_new_from_sql (liarcSql*     sql,
 		return NULL;
 	}
 
-	/* Read shader column. */
-	self->model.shader = (char*) sqlite3_column_text (stmt, col);
+	/* Read model column. */
+	self->model = (char*) sqlite3_column_text (stmt, col);
 	size = sqlite3_column_bytes (stmt, col++);
-	if (size > 0 && self->model.shader != NULL)
-		self->model.shader = listr_dup (self->model.shader);
+	if (size > 0 && self->model != NULL)
+		self->model = listr_dup (self->model);
 	else
-		self->model.shader = listr_dup ("default");
-	if (self->model.shader == NULL)
+		self->model = listr_dup ("");
+	if (self->model == NULL)
 	{
 		lisys_free (self->name);
 		lisys_free (self);
-		return NULL;
-	}
-
-	/* Read textures. */
-	if (!private_read_textures (self, sql))
-	{
-		livox_material_free (self);
 		return NULL;
 	}
 
@@ -182,6 +167,7 @@ livoxMaterial*
 livox_material_new_from_stream (liarcReader* reader)
 {
 	uint32_t id;
+	uint32_t flags;
 	livoxMaterial* self;
 
 	/* Allocate self. */
@@ -191,16 +177,18 @@ livox_material_new_from_stream (liarcReader* reader)
 
 	/* Read values. */
 	if (!liarc_reader_get_uint32 (reader, &id) ||
-	    !liarc_reader_get_text (reader, "", &self->name) ||
+	    !liarc_reader_get_uint32 (reader, &flags) ||
 	    !liarc_reader_get_float (reader, &self->friction) ||
-	    !liarc_reader_get_float (reader, &self->scale) ||
-	    !limdl_material_read (&self->model, reader))
+	    !liarc_reader_get_text (reader, "", &self->name) ||
+	    !liarc_reader_get_text (reader, "", &self->model))
 	{
+		lisys_free (self->model);
 		lisys_free (self->name);
 		lisys_free (self);
 		return NULL;
 	}
 	self->id = id;
+	self->flags = flags;
 
 	return self;
 }
@@ -213,54 +201,9 @@ livox_material_new_from_stream (liarcReader* reader)
 void
 livox_material_free (livoxMaterial* self)
 {
-	limdl_material_clear_textures (&self->model);
-	lisys_free (self->model.shader);
+	lisys_free (self->model);
 	lisys_free (self->name);
 	lisys_free (self);
-}
-
-/**
- * \brief Appends a new texture to the material.
- *
- * \param self Material.
- * \param string Texture string.
- * \return Nonzero on success.
- */
-int
-livox_material_append_texture (livoxMaterial* self,
-                               const char*    string)
-{
-	int i;
-	int flags;
-
-	i = self->model.textures.count;
-	if (!limdl_material_realloc_textures (&self->model, i + 1))
-		return 0;
-	flags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
-	if (!limdl_material_set_texture (&self->model, i, LIMDL_TEXTURE_TYPE_IMAGE, flags, string))
-	{
-		limdl_material_realloc_textures (&self->model, i);
-		return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Removes a texture from the material.
- *
- * \param self Material.
- * \param index Texture index.
- */
-void
-livox_material_remove_texture (livoxMaterial* self,
-                               int            index)
-{
-	assert (index >= 0);
-	assert (index < self->model.textures.count);
-
-	lisys_free (self->model.textures.array[index].string);
-	lialg_array_remove (&self->model.textures, index);
 }
 
 /**
@@ -274,37 +217,13 @@ int
 livox_material_write_to_sql (livoxMaterial* self,
                              liarcSql*      sql)
 {
-	int i;
-	limdlTexture* texture;
-
 	if (!liarc_sql_insert (sql, "voxel_materials",
 		"id", LIARC_SQL_INT, self->id,
-		"flags", LIARC_SQL_INT, self->model.flags,
+		"flags", LIARC_SQL_INT, self->flags,
 		"fric", LIARC_SQL_FLOAT, self->friction,
-		"scal", LIARC_SQL_FLOAT, self->scale,
-		"shi", LIARC_SQL_FLOAT, self->model.shininess,
-		"dif0", LIARC_SQL_FLOAT, self->model.diffuse[0],
-		"dif1", LIARC_SQL_FLOAT, self->model.diffuse[1],
-		"dif2", LIARC_SQL_FLOAT, self->model.diffuse[2],
-		"dif3", LIARC_SQL_FLOAT, self->model.diffuse[3],
-		"spe0", LIARC_SQL_FLOAT, self->model.specular[0],
-		"spe1", LIARC_SQL_FLOAT, self->model.specular[1],
-		"spe2", LIARC_SQL_FLOAT, self->model.specular[2],
-		"spe3", LIARC_SQL_FLOAT, self->model.specular[3],
 		"name", LIARC_SQL_TEXT, self->name,
-		"shdr", LIARC_SQL_TEXT, self->model.shader, NULL))
+		"model", LIARC_SQL_TEXT, self->model, NULL))
 		return 0;
-
-	for (i = 0 ; i < self->model.textures.count ; i++)
-	{
-		texture = self->model.textures.array + i;
-		if (!liarc_sql_insert (sql, "voxel_textures",
-			"mat", LIARC_SQL_INT, self->id,
-			"unit", LIARC_SQL_INT, i,
-			"flags", LIARC_SQL_INT, texture->flags,
-			"name", LIARC_SQL_TEXT, texture->string, NULL))
-			return 0;
-	}
 
 	return 1;
 }
@@ -321,11 +240,12 @@ livox_material_write_to_stream (livoxMaterial* self,
                                 liarcWriter*   writer)
 {
 	return liarc_writer_append_uint32 (writer, self->id) &&
+	       liarc_writer_append_uint32 (writer, self->flags) &&
+	       liarc_writer_append_float (writer, self->friction) &&
 	       liarc_writer_append_string (writer, self->name) &&
 	       liarc_writer_append_nul (writer) &&
-	       liarc_writer_append_float (writer, self->friction) &&
-	       liarc_writer_append_float (writer, self->scale) &&
-	       limdl_material_write (&self->model, writer);
+	       liarc_writer_append_string (writer, self->model) &&
+	       liarc_writer_append_nul (writer);
 }
 
 int
@@ -343,75 +263,17 @@ livox_material_set_name (livoxMaterial* self,
 	return 1;
 }
 
-/*****************************************************************************/
-
-static int
-private_read_textures (livoxMaterial* self,
-                       liarcSql*      sql)
+int
+livox_material_set_model (livoxMaterial* self,
+                          const char*    value)
 {
-	int col;
-	int ret;
-	int unit;
-	int flags;
-	int size;
-	const char* name;
-	const char* query;
-	sqlite3_stmt* statement;
+	char* tmp;
 
-	/* Prepare statement. */
-	query = "SELECT unit,flags,name FROM voxel_textures WHERE mat=?;";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+	tmp = listr_dup (value);
+	if (tmp == NULL)
 		return 0;
-	}
-	if (sqlite3_bind_int (statement, 1, self->id) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Read textures. */
-	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
-	{
-		/* Check for errors. */
-		if (ret != SQLITE_ROW)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Read values. */
-		col = 0;
-		unit = sqlite3_column_int (statement, col++);
-		if (unit < 0)
-			continue;
-		flags = sqlite3_column_int (statement, col++);
-		name = (char*) sqlite3_column_text (statement, col);
-		size = sqlite3_column_bytes (statement, col++);
-		if (!size || name == NULL)
-			name = "";
-
-		/* Allocate materials. */
-		if (self->model.textures.count <= unit)
-		{
-			if (!limdl_material_realloc_textures (&self->model, unit + 1))
-			{
-				sqlite3_finalize (statement);
-				return 0;
-			}
-		}
-
-		/* Set values. */
-		if (!limdl_material_set_texture (&self->model, unit, LIMDL_TEXTURE_TYPE_IMAGE, flags, name))
-		{
-			sqlite3_finalize (statement);
-			return 0;
-		}
-	}
-	sqlite3_finalize (statement);
+	lisys_free (self->model);
+	self->model = tmp;
 
 	return 1;
 }

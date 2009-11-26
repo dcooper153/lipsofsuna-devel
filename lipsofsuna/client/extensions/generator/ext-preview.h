@@ -74,11 +74,8 @@ void
 liext_preview_build (liextPreview* self);
 
 int
-liext_preview_build_box (liextPreview* self,
-                         int           xs,
-                         int           ys,
-                         int           zs,
-                         int           material);
+liext_preview_build_tile (liextPreview* self,
+                          int           material);
 
 int
 liext_preview_clear (liextPreview* self);
@@ -112,6 +109,13 @@ liext_preview_paint_terrain (liextPreview* self,
 int
 liext_preview_replace_materials (liextPreview* self,
                                  liarcReader*  reader);
+
+void
+liext_preview_setup_camera (liextPreview* self,
+                            limatVector*  eye,
+                            limatVector*  ctr,
+                            limatVector*  up,
+                            int           driver);
 
 void
 liext_preview_get_bounds (liextPreview* self,

@@ -26,16 +26,20 @@
 #define __VOXEL_MATERIAL_H__
 
 #include <archive/lips-archive.h>
-#include <model/lips-model.h>
 #include "voxel-types.h"
+
+enum
+{
+	LIVOX_MATERIAL_FLAG_OCCLUDER = 0x01
+};
 
 struct _livoxMaterial
 {
 	int id;
+	int flags;
 	char* name;
+	char* model;
 	float friction;
-	float scale;
-	limdlMaterial model;
 };
 
 livoxMaterial*
@@ -55,14 +59,6 @@ void
 livox_material_free (livoxMaterial* self);
 
 int
-livox_material_append_texture (livoxMaterial* self,
-                               const char*    string);
-
-void
-livox_material_remove_texture (livoxMaterial* self,
-                               int            index);
-
-int
 livox_material_write_to_sql (livoxMaterial* self,
                              liarcSql*      sql);
 
@@ -73,6 +69,10 @@ livox_material_write_to_stream (livoxMaterial* self,
 int
 livox_material_set_name (livoxMaterial* self,
                          const char*    value);
+
+int
+livox_material_set_model (livoxMaterial* self,
+                          const char*    value);
 
 #endif
 

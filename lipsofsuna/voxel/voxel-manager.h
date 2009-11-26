@@ -67,6 +67,10 @@ livox_manager_new ();
 void
 livox_manager_free (livoxManager* self);
 
+int
+livox_manager_check_occluder (const livoxManager* self,
+                              const livoxVoxel*   voxel);
+
 void
 livox_manager_clear (livoxManager* self);
 

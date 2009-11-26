@@ -75,7 +75,7 @@ liext_editor_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	liwdg_tabs_append_tab (LIWDG_TABS (data->tabs), "Brushes", data->brushes);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, data->brushes);
 
 	/* Initialize material editor. */
 	data->materials = liext_materials_new (manager, module);
@@ -84,7 +84,7 @@ liext_editor_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	liwdg_tabs_append_tab (LIWDG_TABS (data->tabs), "Materials", data->materials);
+	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, data->materials);
 
 	return self;
 }
@@ -119,15 +119,10 @@ private_init (liextEditor*  self,
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
 		return 0;
 
-	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
+	liwdg_group_set_spacings (LIWDG_GROUP (self), 0, 0);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
-
-	self->tabs = liwdg_tabs_new (manager);
-	if (self->tabs == NULL)
-		return 0;
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->tabs);
 
 	return 1;
 }

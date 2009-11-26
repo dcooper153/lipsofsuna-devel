@@ -36,6 +36,12 @@ private_clear_materials (livoxManager* self);
 static void
 private_clear_sectors (livoxManager* self);
 
+static int
+private_ensure_materials (livoxManager* self);
+
+static int
+private_ensure_sectors (livoxManager* self);
+
 static void
 private_mark_block (livoxManager* self,
                     livoxSector*  sector,
@@ -100,6 +106,28 @@ livox_manager_free (livoxManager* self)
 	if (self->callbacks != NULL)
 		lical_callbacks_free (self->callbacks);
 	lisys_free (self);
+}
+
+/**
+ * \brief Checks if the voxel is an occluder.
+ *
+ * \param self Voxel manager.
+ * \param voxel Voxel.
+ * \return Nonzero if occluder.
+ */
+int
+livox_manager_check_occluder (const livoxManager* self,
+                              const livoxVoxel*   voxel)
+{
+	livoxMaterial* material;
+
+	if (!voxel->type)
+		return 0;
+	material = livox_manager_find_material ((livoxManager*) self, voxel->type);
+	if (material == NULL)
+		return 0;
+
+	return (material->flags & LIVOX_MATERIAL_FLAG_OCCLUDER) != 0;
 }
 
 /**
@@ -441,8 +469,7 @@ livox_manager_load_materials (livoxManager* self)
 	}
 
 	/* Prepare statement. */
-	query = "SELECT id,flags,fric,scal,shi,dif0,dif1,dif2,dif3,spe0,spe1,"
-		"spe2,spe3,name,shdr FROM voxel_materials;";
+	query = "SELECT id,flags,fric,name,model FROM voxel_materials;";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
@@ -750,8 +777,6 @@ livox_manager_update_marked (livoxManager* self)
 int
 livox_manager_write (livoxManager* self)
 {
-	const char* query;
-	sqlite3_stmt* statement;
 	lialgU32dicIter iter;
 
 	if (self->sql == NULL)
@@ -759,22 +784,6 @@ livox_manager_write (livoxManager* self)
 		lisys_error_set (EINVAL, "no database");
 		return 0;
 	}
-
-	/* Create sector table. */
-	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
-		"(id INTEGER PRIMARY KEY,data BLOB);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Save terrain. */
 	LI_FOREACH_U32DIC (iter, self->sectors)
@@ -795,8 +804,6 @@ livox_manager_write (livoxManager* self)
 int
 livox_manager_write_materials (livoxManager* self)
 {
-	const char* query;
-	sqlite3_stmt* statement;
 	lialgU32dicIter iter;
 
 	if (self->sql == NULL)
@@ -805,45 +812,8 @@ livox_manager_write_materials (livoxManager* self)
 		return 0;
 	}
 
-	/* Create material table. */
-	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
-		"(id INTEGER PRIMARY KEY,flags UNSIGNED INTEGER,"
-		"fric REAL,scal REAL,shi REAL,"
-		"dif0 REAL,dif1 REAL,dif2 REAL,dif3 REAL,"
-		"spe0 REAL,spe1 REAL,spe2 REAL,spe3 REAL,name TEXT,shdr TEXT);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Create texture table. */
-	query = "CREATE TABLE IF NOT EXISTS voxel_textures "
-		"(mat INTEGER REFERENCES voxel_materials(id),"
-		"unit UNSIGNED INTEGER,flags UNSIGNED INTEGER,name TEXT);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
 	/* Remove old materials. */
-	if (!liarc_sql_delete (self->sql, "voxel_materials") ||
-	    !liarc_sql_delete (self->sql, "voxel_textures"))
+	if (!liarc_sql_delete (self->sql, "voxel_materials"))
 		return 0;
 
 	/* Save materials. */
@@ -861,6 +831,11 @@ livox_manager_set_sql (livoxManager* self,
                        liarcSql*     sql)
 {
 	self->sql = sql;
+	if (sql != NULL)
+	{
+		private_ensure_materials (self);
+		private_ensure_sectors (self);
+	}
 }
 
 void
@@ -943,6 +918,57 @@ private_clear_sectors (livoxManager* self)
 		livox_sector_free (sector);
 	}
 	lialg_u32dic_clear (self->sectors);
+}
+
+static int
+private_ensure_materials (livoxManager* self)
+{
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Create material table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
+		"(id INTEGER PRIMARY KEY,flags UNSIGNED INTEGER,"
+		"fric REAL,name TEXT,model TEXT);";
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
+}
+
+static int
+private_ensure_sectors (livoxManager* self)
+{
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Create sector table. */
+	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
+		"(id INTEGER PRIMARY KEY,data BLOB);";
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
 }
 
 static void

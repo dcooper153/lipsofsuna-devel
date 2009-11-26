@@ -25,8 +25,6 @@
 #ifndef __VOXEL_PRIVATE_H__
 #define __VOXEL_PRIVATE_H__
 
-#include <engine/lips-engine.h>
-
 struct _livoxBlock
 {
 	uint8_t type;

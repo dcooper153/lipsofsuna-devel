@@ -51,12 +51,16 @@ private_remove (liextMaterials* self,
                 liwdgWidget*    widget);
 
 static int
-private_rename (liextMaterials* self,
-                liwdgWidget*    widget);
+private_changed_friction (liextMaterials* self,
+                          liwdgWidget*    widget);
 
 static int
-private_scaled_material (liextMaterials* self,
-                         liwdgWidget*    widget);
+private_changed_model (liextMaterials* self,
+                       liwdgWidget*    widget);
+
+static int
+private_changed_name (liextMaterials* self,
+                      liwdgWidget*    widget);
 
 static int
 private_selected (liextMaterials* self,
@@ -68,6 +72,10 @@ private_populate (liextMaterials* self);
 
 static void
 private_rebuild_preview (liextMaterials* self);
+
+static void
+private_rebuild_selection (liextMaterials* self,
+                           liwdgTreerow*   row);
 
 static liextMaterialsTreerow*
 private_get_active (liextMaterials* self);
@@ -102,8 +110,8 @@ liext_materials_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	liwdg_widget_set_request (data->widgets.preview, 320, 240);
-	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 3, data->widgets.preview);
+	liwdg_widget_set_request (data->widgets.preview, 128, 128);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 2, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
 
 	/* Populate list. */
@@ -133,6 +141,17 @@ liext_materials_reset (liextMaterials* self,
 	private_populate (self);
 }
 
+int
+liext_materials_get_active (liextMaterials* self)
+{
+	liextMaterialsTreerow* row;
+
+	row = private_get_active (self);
+	if (row == NULL)
+		return 0;
+	return row->material->id;
+}
+
 /****************************************************************************/
 
 static const void*
@@ -148,59 +167,61 @@ private_init (liextMaterials* self,
 	liwdgWidget* group_tree;
 
 	/* Allocate widgets. */
-	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
+	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 3))
 		return 0;
 	if (!liwdg_manager_alloc_widgets (manager,
 		&group_tree, liwdg_group_new_with_size (manager, 1, 3),
-		&self->widgets.group_name, liwdg_group_new_with_size (manager, 2, 1),
-		&self->widgets.group_scale, liwdg_group_new_with_size (manager, 2, 1),
-		&self->widgets.group_view, liwdg_group_new_with_size (manager, 1, 4),
+		&self->widgets.group_attr, liwdg_group_new_with_size (manager, 2, 3),
+		&self->widgets.group_view, liwdg_group_new_with_size (manager, 1, 1),
 		&self->widgets.button_add, liwdg_button_new (manager),
 		&self->widgets.button_remove, liwdg_button_new (manager),
 		&self->widgets.entry_name, liwdg_entry_new (manager),
-		&self->widgets.label_type, liwdg_label_new (manager),
-		&self->widgets.label_scale, liwdg_label_new (manager),
-		&self->widgets.scroll_scale, liwdg_scroll_new (manager),
+		&self->widgets.entry_model, liwdg_entry_new (manager),
+		&self->widgets.label_name, liwdg_label_new (manager),
+		&self->widgets.label_model, liwdg_label_new (manager),
+		&self->widgets.label_friction, liwdg_label_new (manager),
+		&self->widgets.scroll_friction, liwdg_scroll_new (manager),
 		&self->widgets.tree, liwdg_tree_new (manager), NULL))
 		return 0;
 
 	/* Configure widgets. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
-	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_scale), "Scale:");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_friction), "Friction:");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_model), "Model:");
+	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_name), "Name:");
 	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_rename, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.entry_model, LIWDG_CALLBACK_EDITED, 0, private_changed_model, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_changed_name, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.tree, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.scroll_scale, LIWDG_CALLBACK_PRESSED, 0, private_scaled_material, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.scroll_friction, LIWDG_CALLBACK_PRESSED, 0, private_changed_friction, self, NULL);
 
 	/* Tree. */
-	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 2, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.tree);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_add);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_remove);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_remove);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.tree);
 
 	/* Preview. */
-	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_name), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_name), 0, 0, self->widgets.label_type);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_name), 1, 0, self->widgets.entry_name);
-	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_scale), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_scale), 0, 0, self->widgets.label_scale);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_scale), 1, 0, self->widgets.scroll_scale);
+	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_attr), 1, 1);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 2, self->widgets.label_name);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 2, self->widgets.entry_name);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 1, self->widgets.label_model);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 1, self->widgets.entry_model);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 0, self->widgets.label_friction);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 0, self->widgets.scroll_friction);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 3, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 1, self->widgets.group_name);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, self->widgets.group_scale);
-	liwdg_widget_set_visible (self->widgets.group_scale, 0);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, self->widgets.group_attr);
+	liwdg_widget_set_visible (self->widgets.group_attr, 0);
 
 	/* Pack self. */
 	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
-	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, group_tree);
-	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, self->widgets.group_view);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self), 1, 1);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 1, group_tree);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->widgets.group_view);
 
 	return 1;
 }
@@ -228,52 +249,48 @@ private_add (liextMaterials* self,
 {
 	int i;
 	liextMaterialsTreerow* row;
-	liextMaterialsTreerow* row1;
 	livoxMaterial* material;
-	liwdgTreerow* trow;
+	liwdgTreerow* trow[2];
 
-	/* Get active item. */
-	row = private_get_active (self);
-	trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-
-	/* Material? */
-	if (row == NULL || row->material == NULL)
+	/* Allocate material. */
+	material = livox_material_new ();
+	if (material == NULL)
+		return 0;
+	for (i = 1 ; i < 256 ; i++)
 	{
-		material = livox_material_new ();
-		if (material == NULL)
-			return 0;
-		for (i = 0 ; i < 256 ; i++)
-		{
-			if (livox_manager_find_material (self->generator->voxels, i) == NULL)
-				break;
-		}
-		if (i == 256)
-			return 0;
-		material->id = i;
-		if (!livox_manager_insert_material (self->generator->voxels, material))
-		{
-			livox_material_free (material);
-			return 0;
-		}
-		trow = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
-		row1 = lisys_calloc (1, sizeof (liextMaterialsTreerow));
-		row1->material = material;
-		row1->texture = -1;
-		if (!liwdg_treerow_append_row (trow, material->name, row1))
-			lisys_free (row1);
+		if (livox_manager_find_material (self->generator->voxels, i) == NULL)
+			break;
+	}
+	if (i == 256)
+		return 0;
+	material->id = i;
+
+	/* Add to voxel manager. */
+	if (!livox_manager_insert_material (self->generator->voxels, material))
+	{
+		livox_material_free (material);
+		return 0;
 	}
 
-	/* Texture? */
-	else
+	/* Add to tree view. */
+	row = lisys_calloc (1, sizeof (liextMaterialsTreerow));
+	if (row == NULL)
+		return 0;
+	row->material = material;
+	trow[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
+	trow[1] = liwdg_treerow_append_row (trow[0], material->name, row);
+	if (trow[1] == NULL)
 	{
-		if (!livox_material_append_texture (row->material, "empty"))
-			return 0;
-		row1 = lisys_calloc (1, sizeof (liextMaterialsTreerow));
-		row1->material = row->material;
-		row1->texture = row->material->model.textures.count - 1;
-		if (!liwdg_treerow_append_row (trow, "empty", row1))
-			lisys_free (row1);
+		lisys_free (row);
+		return 0;
 	}
+
+	/* Set active. */
+	trow[0] = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (trow[0] != NULL)
+		liwdg_treerow_set_highlighted (trow[0], 0);
+	liwdg_treerow_set_highlighted (trow[1], 1);
+	private_rebuild_selection (self, trow[1]);
 
 	return 0;
 }
@@ -288,17 +305,10 @@ private_remove (liextMaterials* self,
 	/* Get active item. */
 	row = private_get_active (self);
 	if (row == NULL || row->material == NULL)
-	{
-#warning FIXME: Abusing this for material saving!
-		liext_materials_save (self);
 		return 0;
-	}
 
 	/* Remove the selected item. */
-	if (row->texture < 0)
-		livox_manager_remove_material (self->generator->voxels, row->material->id);
-	else
-		livox_material_remove_texture (row->material, row->texture);
+	livox_manager_remove_material (self->generator->voxels, row->material->id);
 
 	/* Remove the row. */
 	trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -313,11 +323,26 @@ private_remove (liextMaterials* self,
 }
 
 static int
-private_rename (liextMaterials* self,
-                liwdgWidget*    widget)
+private_changed_friction (liextMaterials* self,
+                          liwdgWidget*    widget)
 {
-	const char* name;
-	limdlTexture* texture;
+	liextMaterialsTreerow* row;
+
+	row = private_get_active (self);
+	assert (row != NULL);
+	assert (row->material != NULL);
+
+	row->material->friction = liwdg_scroll_get_value (LIWDG_SCROLL (widget));
+	private_rebuild_preview (self);
+
+	return 0;
+}
+
+static int
+private_changed_model (liextMaterials* self,
+                       liwdgWidget*    widget)
+{
+	const char* model;
 	liextMaterialsTreerow* row;
 	liwdgTreerow* trow;
 
@@ -326,38 +351,31 @@ private_rename (liextMaterials* self,
 	if (row == NULL || row->material == NULL)
 		return 0;
 
-	/* Material? */
-	if (row->texture < 0)
-	{
-		name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
-		livox_material_set_name (row->material, name);
-		liwdg_treerow_set_text (trow, name);
-	}
-
-	/* Texture? */
-	else
-	{
-		texture = row->material->model.textures.array + row->texture;
-		name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
-		limdl_texture_set_string (texture, name);
-		liwdg_treerow_set_text (trow, name);
-	}
+	/* Material. */
+	model = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_model));
+	livox_material_set_model (row->material, model);
+	private_rebuild_preview (self);
 
 	return 0;
 }
 
 static int
-private_scaled_material (liextMaterials* self,
-                         liwdgWidget*    widget)
+private_changed_name (liextMaterials* self,
+                      liwdgWidget*    widget)
 {
+	const char* name;
 	liextMaterialsTreerow* row;
+	liwdgTreerow* trow;
 
 	row = private_get_active (self);
-	assert (row != NULL);
-	assert (row->material != NULL);
+	trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
+	if (row == NULL || row->material == NULL)
+		return 0;
 
-	row->material->scale = liwdg_scroll_get_value (LIWDG_SCROLL (widget));
-	private_rebuild_preview (self);
+	/* Material. */
+	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
+	livox_material_set_name (row->material, name);
+	liwdg_treerow_set_text (trow, name);
 
 	return 0;
 }
@@ -367,8 +385,6 @@ private_selected (liextMaterials* self,
                   liwdgWidget*    widget,
                   liwdgTreerow*   row)
 {
-	liextMaterialsTreerow* data;
-	limdlTexture* texture;
 	liwdgTreerow* row0;
 
 	/* Deselect old. */
@@ -378,33 +394,7 @@ private_selected (liextMaterials* self,
 
 	/* Select new. */
 	liwdg_treerow_set_highlighted (row, 1);
-	data = liwdg_treerow_get_data (row);
-
-	/* Set info. */
-	if (data == NULL || data->material == NULL)
-	{
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
-		liwdg_widget_set_visible (self->widgets.group_scale, 0);
-	}
-	else if (data->texture < 0)
-	{
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Material:");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->material->name);
-		liwdg_widget_set_visible (self->widgets.group_scale, 1);
-		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_scale), data->material->scale);
-	}
-	else
-	{
-		texture = data->material->model.textures.array + data->texture;
-		liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_type), "Texture:");
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), texture->string);
-		liwdg_widget_set_visible (self->widgets.group_scale, 1);
-		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_scale), data->material->scale);
-	}
-
-	/* Rebuild preview. */
-	private_rebuild_preview (self);
+	private_rebuild_selection (self, row);
 
 	return 0;
 }
@@ -412,10 +402,8 @@ private_selected (liextMaterials* self,
 static void
 private_populate (liextMaterials* self)
 {
-	int j;
 	lialgU32dicIter iter;
 	liextMaterialsTreerow* tmp;
-	limdlTexture* texture;
 	livoxMaterial* material;
 	liwdgTreerow* tree;
 	liwdgTreerow* row0;
@@ -431,35 +419,17 @@ private_populate (liextMaterials* self)
 	if (tmp == NULL)
 		return;
 	tmp->material = NULL;
-	tmp->texture = -1;
-	liwdg_treerow_append_row (tree, "Root", tmp);
+	row0 = tree;
 
-	/* Loop through materials. */
+	/* Add each material. */
 	LI_FOREACH_U32DIC (iter, self->generator->voxels->materials)
 	{
 		material = iter.value;
-
-		/* Add material info. */
 		tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
 		tmp->material = material;
-		tmp->texture = -1;
-		row0 = liwdg_treerow_append_row (tree, material->name, tmp);
-		if (row0 == NULL)
-			return;
-
-		/* Loop through textures. */
-		for (j = 0 ; j < material->model.textures.count ; j++)
-		{
-			texture = material->model.textures.array + j;
-
-			/* Add texture info. */
-			tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
-			tmp->material = material;
-			tmp->texture = j;
-			row1 = liwdg_treerow_append_row (row0, texture->string, tmp);
-			if (row1 == NULL)
-				return;
-		}
+		row1 = liwdg_treerow_append_row (row0, material->name, tmp);
+		if (row1 == NULL)
+			lisys_free (tmp);
 	}
 }
 
@@ -467,22 +437,52 @@ static void
 private_rebuild_preview (liextMaterials* self)
 {
 	liextMaterialsTreerow* row;
+	limatVector eye;
+	limatVector ctr;
+	limatVector up;
 
 	row = private_get_active (self);
-
-	/* None? */
 	if (row == NULL || row->material == NULL)
 	{
 		liext_preview_clear (LIEXT_PREVIEW (self->widgets.preview));
 		liext_preview_build (LIEXT_PREVIEW (self->widgets.preview));
 	}
-
-	/* Material? */
 	else
 	{
 		liext_preview_clear (LIEXT_PREVIEW (self->widgets.preview));
-		liext_preview_build_box (LIEXT_PREVIEW (self->widgets.preview), 10, 10, 10, row->material->id);
+		liext_preview_build_tile (LIEXT_PREVIEW (self->widgets.preview), row->material->id);
+		eye = limat_vector_init (0.0f, 0.0f, 0.0f);
+		ctr = limat_vector_init (0.0f, 0.0f, 0.0f);
+		up = limat_vector_init (0.0f, 1.0f, 0.0f);
+		LIEXT_PREVIEW (self->widgets.preview)->camera->config.distance = 6.0f;
+		liext_preview_setup_camera (LIEXT_PREVIEW (self->widgets.preview),
+			&eye, &ctr, &up, LIENG_CAMERA_DRIVER_THIRDPERSON);
 	}
+}
+
+static void
+private_rebuild_selection (liextMaterials* self,
+                           liwdgTreerow*   row)
+{
+	liextMaterialsTreerow* data;
+
+	/* Set info. */
+	data = liwdg_treerow_get_data (row);
+	if (data == NULL || data->material == NULL)
+	{
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), "");
+		liwdg_widget_set_visible (self->widgets.group_attr, 0);
+	}
+	else
+	{
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), data->material->name);
+		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_model), data->material->model);
+		liwdg_widget_set_visible (self->widgets.group_attr, 1);
+		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_friction), data->material->friction);
+	}
+
+	/* Rebuild preview. */
+	private_rebuild_preview (self);
 }
 
 static liextMaterialsTreerow*

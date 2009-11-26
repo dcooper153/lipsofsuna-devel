@@ -28,7 +28,8 @@
 #include "ext-module.h"
 
 static int
-private_check_occluder (livoxVoxel* voxel);
+private_check_occluder (liextModule* module,
+                        livoxVoxel*  voxel);
 
 /*****************************************************************************/
 
@@ -71,11 +72,11 @@ liext_block_build (liextBlock*     self,
 	int x;
 	int y;
 	int z;
-	char name[16];
 	limatTransform transform;
 	limatVector vector;
 	limatVector offset;
 	lirndModel* model;
+	livoxMaterial* material;
 	livoxVoxel* voxel;
 	livoxVoxel voxels[LINE * LINE * LINE];
 
@@ -105,19 +106,20 @@ liext_block_build (liextBlock*     self,
 		voxel = voxels + INDEX (x + 1, y + 1, z + 1);
 		if (!voxel->type)
 			continue;
-		if (private_check_occluder (voxels + INDEX (x    , y + 1, z + 1)) &&
-		    private_check_occluder (voxels + INDEX (x + 2, y + 1, z + 1)) &&
-		    private_check_occluder (voxels + INDEX (x + 1, y    , z + 1)) &&
-		    private_check_occluder (voxels + INDEX (x + 1, y + 2, z + 1)) &&
-		    private_check_occluder (voxels + INDEX (x + 1, y + 1, z    )) &&
-		    private_check_occluder (voxels + INDEX (x + 1, y + 1, z + 2)))
+		if (private_check_occluder (module, voxels + INDEX (x    , y + 1, z + 1)) &&
+		    private_check_occluder (module, voxels + INDEX (x + 2, y + 1, z + 1)) &&
+		    private_check_occluder (module, voxels + INDEX (x + 1, y    , z + 1)) &&
+		    private_check_occluder (module, voxels + INDEX (x + 1, y + 2, z + 1)) &&
+		    private_check_occluder (module, voxels + INDEX (x + 1, y + 1, z    )) &&
+		    private_check_occluder (module, voxels + INDEX (x + 1, y + 1, z + 2)))
 		    continue;
 
 		/* Get render model. */
-		/* FIXME */
-		snprintf (name, 16, "tile-%03d", voxel->type);
-		lieng_engine_find_model_by_name (module->module->engine, name);
-		model = lirnd_render_find_model (module->module->render, name);
+		material = livox_manager_find_material (module->voxels, voxel->type);
+		if (material == NULL)
+			continue;
+		lieng_engine_find_model_by_name (module->module->engine, material->model);
+		model = lirnd_render_find_model (module->module->render, material->model);
 		if (model == NULL)
 			continue;
 
@@ -137,10 +139,10 @@ liext_block_build (liextBlock*     self,
 /*****************************************************************************/
 
 static int
-private_check_occluder (livoxVoxel* voxel)
+private_check_occluder (liextModule* module,
+                        livoxVoxel*  voxel)
 {
-	/* FIXME */
-	return voxel->type != 0;
+	return livox_manager_check_occluder (module->voxels, voxel);
 }
 
 /** @} */

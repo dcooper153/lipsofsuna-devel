@@ -39,7 +39,6 @@ typedef struct _liextMaterialsTreerow liextMaterialsTreerow;
 struct _liextMaterialsTreerow
 {
 	livoxMaterial* material;
-	int texture;
 };
 
 struct _liextMaterials
@@ -49,16 +48,17 @@ struct _liextMaterials
 	ligenGenerator* generator;
 	struct
 	{
-		liwdgWidget* group_name;
-		liwdgWidget* group_scale;
+		liwdgWidget* group_attr;
 		liwdgWidget* group_view;
 		liwdgWidget* button_add;
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
-		liwdgWidget* label_type;
-		liwdgWidget* label_scale;
+		liwdgWidget* entry_model;
+		liwdgWidget* label_name;
+		liwdgWidget* label_model;
+		liwdgWidget* label_friction;
 		liwdgWidget* preview;
-		liwdgWidget* scroll_scale;
+		liwdgWidget* scroll_friction;
 		liwdgWidget* tree;
 	} widgets;
 };
@@ -75,6 +75,9 @@ liext_materials_save (liextMaterials* self);
 void
 liext_materials_reset (liextMaterials* self,
                        liarcReader*    reader);
+
+int
+liext_materials_get_active (liextMaterials* self);
 
 #endif
 

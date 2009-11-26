@@ -26,6 +26,7 @@
 
 #include <system/lips-system.h>
 #include "ext-brushes.h"
+#include "ext-dialog.h"
 #include "ext-module.h"
 #include "ext-preview.h"
 
@@ -185,7 +186,7 @@ liext_brushes_new (liwdgManager* manager,
 	}
 	liwdg_widget_insert_callback (data->widgets.preview, LIEXT_CALLBACK_PRESSED, 0, private_paint_terrain, self, NULL);
 	liwdg_widget_insert_callback (data->widgets.preview, LIEXT_CALLBACK_TRANSFORM, 0, private_transform, self, NULL);
-	liwdg_widget_set_request (data->widgets.preview, 640, 240);
+	liwdg_widget_set_request (data->widgets.preview, 440, 240);
 	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 1, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
 
@@ -248,9 +249,9 @@ private_init (liextBrushes* self,
 		&self->widgets.check_required, liwdg_check_new (manager),
 		&group_attr, liwdg_group_new_with_size (manager, 2, 6),
 		&group_tree, liwdg_group_new_with_size (manager, 1, 4),
-		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 1, 10),
+		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 5, 1),
 		&self->widgets.group_size, liwdg_group_new_with_size (manager, 3, 1),
-		&self->widgets.group_view, liwdg_group_new_with_size (manager, 2, 2),
+		&self->widgets.group_view, liwdg_group_new_with_size (manager, 1, 3),
 		&self->widgets.button_add, liwdg_button_new (manager),
 		&self->widgets.button_copy, liwdg_button_new (manager),
 		&self->widgets.button_paint[0], liwdg_button_new (manager),
@@ -268,7 +269,6 @@ private_init (liextBrushes* self,
 		&self->widgets.label_type, liwdg_label_new (manager),
 		&self->widgets.scroll_objprob, liwdg_scroll_new (manager),
 		&self->widgets.spin_axis, liwdg_spin_new (manager),
-		&self->widgets.spin_paint, liwdg_spin_new (manager),
 		&self->widgets.spin_sizex, liwdg_spin_new (manager),
 		&self->widgets.spin_sizey, liwdg_spin_new (manager),
 		&self->widgets.spin_sizez, liwdg_spin_new (manager),
@@ -284,21 +284,22 @@ private_init (liextBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 
 	/* Paint. */
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Erase voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Insert voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace voxel");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Rotate voxel");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Erase");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Insert");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Rotate");
+	liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_axis), 1);
 	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[3], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 1, self->widgets.button_paint[0]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 2, self->widgets.button_paint[1]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 3, self->widgets.button_paint[2]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 4, self->widgets.button_paint[3]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 8, self->widgets.spin_axis);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 9, self->widgets.spin_paint);
+	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_paint), 1);
+	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 0, self->widgets.button_paint[0]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 1, 0, self->widgets.button_paint[1]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 2, 0, self->widgets.button_paint[2]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 3, 0, self->widgets.button_paint[3]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 4, 0, self->widgets.spin_axis);
 
 	/* Tree. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
@@ -343,6 +344,7 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 0, self->widgets.scroll_objprob);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 1, 1);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 2, self->widgets.group_paint);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, group_attr);
 	liwdg_widget_set_visible (self->widgets.label_size, 0);
 	liwdg_widget_set_visible (self->widgets.group_size, 0);
@@ -354,7 +356,6 @@ private_init (liextBrushes* self,
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, group_tree);
 	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, self->widgets.group_view);
-	liwdg_group_set_child (LIWDG_GROUP (self), 2, 0, self->widgets.group_paint);
 
 	self->transform = limat_transform_identity ();
 	self->paint = LIEXT_PREVIEW_INSERT_VOXEL;
@@ -608,7 +609,7 @@ private_paint_terrain (liextBrushes* self,
 
 	/* Paint terrain. */
 	liext_preview_paint_terrain (LIEXT_PREVIEW (self->widgets.preview), &result.point, self->paint,
-		liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_paint)),
+		liext_materials_get_active (LIEXT_MATERIALS (LIEXT_EDITOR (self->module->editor)->materials)),
 		liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_axis)));
 	liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview),
 		data->brush->size[0], data->brush->size[1], data->brush->size[2],

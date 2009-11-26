@@ -193,11 +193,8 @@ liext_preview_build (liextPreview* self)
 }
 
 int
-liext_preview_build_box (liextPreview* self,
-                         int           xs,
-                         int           ys,
-                         int           zs,
-                         int           material)
+liext_preview_build_tile (liextPreview* self,
+                          int           material)
 {
 	livoxVoxel voxel;
 
@@ -350,6 +347,30 @@ liext_preview_replace_materials (liextPreview* self,
 	}
 
 	return 1;
+}
+
+void
+liext_preview_setup_camera (liextPreview* self,
+                            limatVector*  eye,
+                            limatVector*  ctr,
+                            limatVector*  up,
+                            int           driver)
+{
+	limatTransform transform0;
+	limatTransform transform1;
+
+	transform0.rotation = limat_quaternion_identity ();
+	transform0.position = limat_vector_init (
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f) + eye->x,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f) + eye->y,
+		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f) + eye->z);
+	transform1.rotation = limat_quaternion_look (limat_vector_subtract (*ctr, *eye), *up);
+	transform1.position = transform0.position;
+	lieng_camera_set_clip (self->camera, 0);
+	lieng_camera_set_center (self->camera, &transform0);
+	lieng_camera_set_driver (self->camera, driver);
+	lieng_camera_set_transform (self->camera, &transform1);
+	lieng_camera_warp (self->camera);
 }
 
 void
@@ -587,28 +608,32 @@ private_block_build (liextPreview* self,
 	int x;
 	int y;
 	int z;
-	char name[16];
 	limatTransform transform;
 	limatVector vector;
 	lirndModel* model;
+	livoxMaterial* material;
 	livoxVoxel* voxel;
 
 	/* Create new objects. */
-	/* FIXME */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
+		/* Type check. */
 		voxel = livox_block_get_voxel (block, x, y, z);
 		if (!voxel->type)
 			continue;
 
-		snprintf (name, 16, "tile-%03d", voxel->type);
-		lieng_engine_find_model_by_name (self->module->engine, name);
-		model = lirnd_render_find_model (self->module->render, name);
+		/* Get render model. */
+		material = livox_manager_find_material (self->generator->voxels, voxel->type);
+		if (material == NULL)
+			continue;
+		lieng_engine_find_model_by_name (self->module->engine, material->model);
+		model = lirnd_render_find_model (self->module->render, material->model);
 		if (model == NULL)
 			continue;
 
+		/* Add to render list. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		transform.position = limat_vector_add (vector, *offset);

@@ -25,13 +25,10 @@
 #ifndef __VOXEL_BLOCK_H__
 #define __VOXEL_BLOCK_H__
 
+#include <archive/lips-archive.h>
 #include <math/lips-math.h>
-#include <physics/lips-physics.h>
 #include <system/lips-system.h>
 #include "voxel-types.h"
-#ifndef LIVOX_DISABLE_GRAPHICS
-#include <render/lips-render.h>
-#endif
 
 typedef struct _livoxBlock livoxBlock;
 typedef struct _livoxBlockAddr livoxBlockAddr;

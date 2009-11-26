@@ -66,10 +66,10 @@ liext_block_build (liextBlock*  self,
 	int x;
 	int y;
 	int z;
-	char name[16];
 	limatTransform transform;
 	limatVector vector;
 	liengModel* model;
+	livoxMaterial* material;
 	livoxVoxel* voxel;
 
 	/* Clear old shape. */
@@ -78,18 +78,24 @@ liext_block_build (liextBlock*  self,
 	self->empty = 1;
 
 	/* Create new shape. */
-	/* FIXME */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
+		/* Type check. */
 		voxel = livox_block_get_voxel (block, x, y, z);
 		if (!voxel->type)
 			continue;
-		snprintf (name, 16, "tile-%03d", voxel->type);
-		model = lieng_engine_find_model_by_name (self->module->server->engine, name);
+
+		/* Get model. */
+		material = livox_manager_find_material (module->voxels, voxel->type);
+		if (material == NULL)
+			continue;
+		model = lieng_engine_find_model_by_name (self->module->server->engine, material->model);
 		if (model == NULL || model->physics == NULL)
 			continue;
+
+		/* Add to render list. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
 		transform.position = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
