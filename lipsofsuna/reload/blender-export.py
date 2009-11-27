@@ -187,22 +187,6 @@ def MeshVisible(object, mesh):
 			return 1
 	return 0
 
-def ObjectLocalMatrix(object):
-	if object.parent and object.parentbonename:
-		parentrbone = object.parent.getData().bones[object.parentbonename]
-		parentpbone = object.parent.getPose().bones[object.parentbonename]
-		matrix = TranslationMatrix(Vector(0, parentrbone.length, 0)) * parentpbone.poseMatrix
-		matrix = object.matrixLocal * matrix.invert()
-	else:
-		matrix = object.matrixLocal.copy()
-	return matrix
-
-def ObjectProperty(object, name):
-	try:
-		return object.getProperty(name)
-	except:
-		return None
-
 def NodeChild(scene, object, bone, child):
 	if object != child.parent:
 		return 0
@@ -236,6 +220,14 @@ def NodeChildren(scene, object, bone, parent):
 				nodes.append(LipsNode(LipsNodeType.LIGHT, scene, o, None, parent))
 	return nodes
 
+def ObjectFile(object):
+	name = os.path.splitext(Blender.Get("filename"))[0]
+	prop = ObjectProperty(object, "file")
+	if prop:
+		name = name.replace("-000", "") # FIXME
+		name = prop.data.replace('$', name)
+	return name + ".lmdl"
+
 def ObjectHairs(lips, object):
 	global lips_correction_matrix
 	for bparticles in object.getParticleSystems():
@@ -252,6 +244,22 @@ def ObjectHairs(lips, object):
 					hair.AppendNode(tmp[0], tmp[1], tmp[2], 1.0) # FIXME: Size.
 				if len(hair.nodes):
 					lips.AddHair(bmat, hair)
+
+def ObjectLocalMatrix(object):
+	if object.parent and object.parentbonename:
+		parentrbone = object.parent.getData().bones[object.parentbonename]
+		parentpbone = object.parent.getPose().bones[object.parentbonename]
+		matrix = TranslationMatrix(Vector(0, parentrbone.length, 0)) * parentpbone.poseMatrix
+		matrix = object.matrixLocal * matrix.invert()
+	else:
+		matrix = object.matrixLocal.copy()
+	return matrix
+
+def ObjectProperty(object, name):
+	try:
+		return object.getProperty(name)
+	except:
+		return None
 
 def VertexCoord(object, mesh, face, index):
 	global lips_correction_matrix
@@ -358,12 +366,6 @@ class LipsAnimations:
 		self.animations = []
 		self.posebones = {}
 		self.restbones = {}
-
-		# Add animations from armatures.
-		for obj in scene.objects:
-			if obj.parent == None:
-				if obj.type == "Armature":
-					self.AddArmature(obj, obj.getData())
 
 	# \brief Add animations from a Blender armature object.
 	#
@@ -1023,20 +1025,20 @@ class LipsShapes:
 	# \param self Shape manager.
 	def __init__(self, scene):
 		self.shapes = {}
-		for obj in scene.objects:
-			if obj.type == "Mesh":
-				mesh = obj.getData(0, 1)
-				shape = MeshShape(obj, mesh)
-				if shape and shape.name not in self.shapes:
-					self.shapes[shape.name] = shape
-		if not len(self.shapes):
-			print("TODO: Add default shape")
+
+	def AddMesh(self, obj):
+		mesh = obj.getData(0, 1)
+		shape = MeshShape(obj, mesh)
+		if shape and shape.name not in self.shapes:
+			self.shapes[shape.name] = shape
 
 	# \brief Saves all shapes.
 	#
 	# \param self Shape manager.
 	# \param writer Writer.
 	def Write(self, writer):
+		if not len(self.shapes):
+			print("TODO: Add default shape")
 		keys = self.shapes.keys()
 		writer.WriteInt(len(keys))
 		for name in keys:
@@ -1064,9 +1066,9 @@ class LipsShape:
 #############################################################################
 # Storage.
 
-class LipsStorage:
+class LipsFile:
 
-	def __init__(self, scene):
+	def __init__(self, scene, file):
 		self.animations = LipsAnimations(scene)
 		self.hairs = LipsHairs()
 		self.faces = LipsFaces()
@@ -1074,12 +1076,17 @@ class LipsStorage:
 		self.node = None
 		self.shapes = LipsShapes(scene)
 		self.weightnames = []
+		# FIXME: All nodes are added to all files.
 		self.AddNode(LipsNode(LipsNodeType.EMPTY, scene, None, None, None))
 		for obj in scene.objects:
-			if obj.parent == None:
-				if obj.type == "Mesh":
-					self.AddMesh(obj)
-					ObjectHairs(self, obj)
+			if ObjectFile(obj) == file:
+				if obj.parent == None:
+					if obj.type == "Armature":
+						self.animations.AddArmature(obj, obj.getData())
+					if obj.type == "Mesh":
+						self.AddMesh(obj)
+						self.shapes.AddMesh(obj)
+						ObjectHairs(self, obj)
 
 	def AddHair(self, bmat, hair):
 		mat = self.AddMaterial(bmat, None, None)
@@ -1190,6 +1197,20 @@ class LipsStorage:
 		writer.WriteString("sha")
 		self.shapes.Write(writer)
 
+class LipsStorage:
+
+	def __init__(self, scene):
+		self.files = {}
+		for obj in scene.objects:
+			file = ObjectFile(obj)
+			if file not in self.files:
+				self.files[file] = LipsFile(scene, file)
+		for file in self.files:
+			if len(self.files[file].faces.groups):
+				writer = LipsWriter(file)
+				self.files[file].Write(writer)
+				writer.Close()
+
 #############################################################################
 # Writer.
 
@@ -1222,8 +1243,4 @@ class LipsWriter:
 #############################################################################
 # Main.
 
-name = os.path.splitext(Blender.Get("filename"))[0]
-lips = LipsStorage(Blender.Scene.GetCurrent())
-writer = LipsWriter(name + ".lmdl")
-lips.Write(writer)
-writer.Close()
+LipsStorage(Blender.Scene.GetCurrent())
