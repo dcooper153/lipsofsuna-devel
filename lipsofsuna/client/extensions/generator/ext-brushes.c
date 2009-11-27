@@ -249,7 +249,7 @@ private_init (liextBrushes* self,
 		&self->widgets.check_required, liwdg_check_new (manager),
 		&group_attr, liwdg_group_new_with_size (manager, 2, 6),
 		&group_tree, liwdg_group_new_with_size (manager, 1, 4),
-		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 5, 1),
+		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 7, 1),
 		&self->widgets.group_size, liwdg_group_new_with_size (manager, 3, 1),
 		&self->widgets.group_view, liwdg_group_new_with_size (manager, 1, 3),
 		&self->widgets.button_add, liwdg_button_new (manager),
@@ -258,6 +258,8 @@ private_init (liextBrushes* self,
 		&self->widgets.button_paint[1], liwdg_button_new (manager),
 		&self->widgets.button_paint[2], liwdg_button_new (manager),
 		&self->widgets.button_paint[3], liwdg_button_new (manager),
+		&self->widgets.button_paint[4], liwdg_button_new (manager),
+		&self->widgets.button_paint[5], liwdg_button_new (manager),
 		&self->widgets.button_remove, liwdg_button_new (manager),
 		&self->widgets.entry_name, liwdg_entry_new (manager),
 		&self->widgets.entry_objtype, liwdg_entry_new (manager),
@@ -284,22 +286,28 @@ private_init (liextBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
 
 	/* Paint. */
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Erase");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Insert");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Replace");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Rotate");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Copy");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Paste");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Erase");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Insert");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[4]), "Replace");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[5]), "Rotate");
 	liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_axis), 1);
 	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_paint[3], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[4], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[5], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
 	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_paint), 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 0, self->widgets.button_paint[0]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 1, 0, self->widgets.button_paint[1]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 2, 0, self->widgets.button_paint[2]);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 3, 0, self->widgets.button_paint[3]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 4, 0, self->widgets.spin_axis);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 4, 0, self->widgets.button_paint[4]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 5, 0, self->widgets.button_paint[5]);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 6, 0, self->widgets.spin_axis);
 
 	/* Tree. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
@@ -366,6 +374,8 @@ private_init (liextBrushes* self,
 static void
 private_free (liextBrushes* self)
 {
+	if (self->clipboard != NULL)
+		ligen_brush_free (self->clipboard);
 	liwdg_tree_foreach (LIWDG_TREE (self->widgets.tree), free);
 }
 
@@ -560,6 +570,7 @@ private_paint_select (liextBrushes* self,
 			break;
 		}
 	}
+	self->select.index = 0;
 
 	return 0;
 }
@@ -569,6 +580,10 @@ private_paint_terrain (liextBrushes* self,
                        int           x,
                        int           y)
 {
+	int i;
+	int tmp;
+	int border;
+	ligenBrush* brush;
 	limatVector line[2];
 	limatVector point[2];
 	liextPreview* preview;
@@ -605,16 +620,90 @@ private_paint_terrain (liextBrushes* self,
 		if (LI_ABS (point->z - aabb.min.z) < LI_MATH_EPSILON) point->z += 0.5;
 		if (LI_ABS (point->z - aabb.max.z) < LI_MATH_EPSILON) point->z -= 0.5;
 		result.point = *point;
+		border = 1;
 	}
+	else
+		border = 0;
 
 	/* Paint terrain. */
-	liext_preview_paint_terrain (LIEXT_PREVIEW (self->widgets.preview), &result.point, self->paint,
-		liext_materials_get_active (LIEXT_MATERIALS (LIEXT_EDITOR (self->module->editor)->materials)),
-		liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_axis)));
-	liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview),
-		data->brush->size[0], data->brush->size[1], data->brush->size[2],
-		data->brush->voxels.array);
-	private_rebuild_preview (self);
+	if (self->paint == LIEXT_PREVIEW_COPY_VOXEL)
+	{
+		if (!border)
+			livox_manager_find_voxel (self->generator->voxels, LIVOX_FIND_FULL, &result.point, point);
+		else
+			*point = result.point;
+		if (!self->select.index)
+		{
+			self->select.start[0] = point->x / LIVOX_TILE_WIDTH;
+			self->select.start[1] = point->y / LIVOX_TILE_WIDTH;
+			self->select.start[2] = point->z / LIVOX_TILE_WIDTH;
+		}
+		else
+		{
+			self->select.end[0] = point->x / LIVOX_TILE_WIDTH;
+			self->select.end[1] = point->y / LIVOX_TILE_WIDTH;
+			self->select.end[2] = point->z / LIVOX_TILE_WIDTH;
+		}
+		if (++self->select.index == 2)
+		{
+			for (i = 0 ; i < 3 ; i++)
+			{
+				if (self->select.start[i] > self->select.end[i])
+				{
+					tmp = self->select.start[i];
+					self->select.start[i] = self->select.end[i];
+					self->select.end[i] = tmp;
+				}
+			}
+			brush = ligen_brush_new (self->generator,
+				self->select.end[0] - self->select.start[0] + 1,
+				self->select.end[1] - self->select.start[1] + 1,
+				self->select.end[2] - self->select.start[2] + 1);
+			if (brush == NULL)
+				return 0;
+			livox_manager_copy_voxels (self->generator->voxels,
+				self->select.start[0], self->select.start[1], self->select.start[2],
+				self->select.end[0] - self->select.start[0] + 1,
+				self->select.end[1] - self->select.start[1] + 1,
+				self->select.end[2] - self->select.start[2] + 1,
+				brush->voxels.array);
+			if (self->clipboard != NULL)
+				ligen_brush_free (self->clipboard);
+			self->clipboard = brush;
+			self->select.index = 0;
+		}
+	}
+	else if (self->paint == LIEXT_PREVIEW_PASTE_VOXEL)
+	{
+		if (self->clipboard != NULL)
+		{
+			if (!border)
+				livox_manager_find_voxel (self->generator->voxels, LIVOX_FIND_FULL, &result.point, point);
+			else
+				*point = result.point;
+			self->select.start[0] = point->x / LIVOX_TILE_WIDTH;
+			self->select.start[1] = point->y / LIVOX_TILE_WIDTH;
+			self->select.start[2] = point->z / LIVOX_TILE_WIDTH;
+			livox_manager_paste_voxels (self->generator->voxels,
+				self->select.start[0], self->select.start[1], self->select.start[2],
+				self->clipboard->size[0], self->clipboard->size[1], self->clipboard->size[2],
+				self->clipboard->voxels.array);
+			liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0,
+				data->brush->size[0], data->brush->size[1], data->brush->size[2],
+				data->brush->voxels.array);
+			private_rebuild_preview (self);
+		}
+	}
+	else
+	{
+		liext_preview_paint_terrain (LIEXT_PREVIEW (self->widgets.preview), &result.point, self->paint,
+			liext_materials_get_active (LIEXT_MATERIALS (LIEXT_EDITOR (self->module->editor)->materials)),
+			liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_axis)));
+		liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0,
+			data->brush->size[0], data->brush->size[1], data->brush->size[2],
+			data->brush->voxels.array);
+		private_rebuild_preview (self);
+	}
 
 	return 0;
 }

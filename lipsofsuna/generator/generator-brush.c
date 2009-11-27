@@ -86,12 +86,15 @@ ligen_brush_new (ligenGenerator* generator,
 
 	/* Allocate voxels. */
 	self->voxels.count = width * height * depth;
-	self->voxels.array = lisys_calloc (self->voxels.count, sizeof (livoxVoxel));
-	if (self->voxels.array == NULL)
+	if (self->voxels.count)
 	{
-		lisys_free (self->name);
-		lisys_free (self);
-		return NULL;
+		self->voxels.array = lisys_calloc (self->voxels.count, sizeof (livoxVoxel));
+		if (self->voxels.array == NULL)
+		{
+			lisys_free (self->name);
+			lisys_free (self);
+			return NULL;
+		}
 	}
 
 	return self;

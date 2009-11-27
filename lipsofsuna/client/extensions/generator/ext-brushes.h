@@ -41,8 +41,15 @@ struct _liextBrushes
 	liwdgGroup base;
 	liextModule* module;
 	ligenGenerator* generator;
+	ligenBrush* clipboard;
 	limatTransform transform;
 	int paint;
+	struct
+	{
+		int index;
+		int start[3];
+		int end[3];
+	} select;
 	struct
 	{
 		liwdgWidget* check_required;
@@ -51,7 +58,7 @@ struct _liextBrushes
 		liwdgWidget* group_size;
 		liwdgWidget* button_add;
 		liwdgWidget* button_copy;
-		liwdgWidget* button_paint[4];
+		liwdgWidget* button_paint[6];
 		liwdgWidget* button_remove;
 		liwdgWidget* entry_name;
 		liwdgWidget* entry_objextra;

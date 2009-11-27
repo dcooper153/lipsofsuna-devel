@@ -223,14 +223,19 @@ liext_preview_clear (liextPreview* self)
 
 void
 liext_preview_copy_voxels (liextPreview* self,
-                           int           sx,
-                           int           sy,
-                           int           sz,
+                           int           startx,
+                           int           starty,
+                           int           startz,
+                           int           sizex,
+                           int           sizey,
+                           int           sizez,
                            livoxVoxel*   result)
 {
 	livox_manager_copy_voxels (self->generator->voxels,
-		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER,
-		sx, sy, sz, result);
+		LIEXT_PREVIEW_CENTER + startx,
+		LIEXT_PREVIEW_CENTER + starty,
+		LIEXT_PREVIEW_CENTER + startz,
+		sizex, sizey, sizez, result);
 }
 
 /**

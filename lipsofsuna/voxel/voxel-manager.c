@@ -608,6 +608,58 @@ livox_manager_mark_updates (livoxManager* self)
 	}
 }
 
+/**
+ * \brief Pastes a box of voxels from the scene.
+ *
+ * \param self Voxel manager.
+ * \param xstart Start voxel in voxels in world space.
+ * \param ystart Start voxel in voxels in world space.
+ * \param zstart Start voxel in voxels in world space.
+ * \param xsize Number of voxels to paste.
+ * \param ysize Number of voxels to paste.
+ * \param zsize Number of voxels to paste.
+ * \param voxels Buffer containing xsize*ysize*zsize voxels.
+ */
+void
+livox_manager_paste_voxels (livoxManager* self,
+                            int           xstart,
+                            int           ystart,
+                            int           zstart,
+                            int           xsize,
+                            int           ysize,
+                            int           zsize,
+                            livoxVoxel*   voxels)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	int sx;
+	int sy;
+	int sz;
+	int idx;
+	livoxSector* sec;
+
+	/* FIXME: Avoid excessive sector lookups. */
+	for (i = 0, z = zstart ; z < zstart + zsize ; z++)
+	for (y = ystart ; y < ystart + ysize ; y++)
+	for (x = xstart ; x < xstart + xsize ; x++, i++)
+	{
+		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		idx = LIVOX_SECTOR_INDEX (sx, sy, sz);
+		sec = livox_manager_load_sector (self, idx);
+		if (sec != NULL)
+		{
+			livox_sector_set_voxel (sec,
+				x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
+				y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
+				z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE), voxels[i]);
+		}
+	}
+}
+
 void
 livox_manager_remove_material (livoxManager* self,
                                int           id)

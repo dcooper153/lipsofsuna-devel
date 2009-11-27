@@ -39,10 +39,12 @@
 
 enum
 {
+	LIEXT_PREVIEW_COPY_VOXEL,
+	LIEXT_PREVIEW_PASTE_VOXEL,
 	LIEXT_PREVIEW_ERASE_VOXEL,
 	LIEXT_PREVIEW_INSERT_VOXEL,
 	LIEXT_PREVIEW_REPLACE_VOXEL,
-	LIEXT_PREVIEW_ROTATE_VOXEL
+	LIEXT_PREVIEW_ROTATE_VOXEL,
 };
 
 typedef struct _liextPreview liextPreview;
@@ -82,9 +84,12 @@ liext_preview_clear (liextPreview* self);
 
 void
 liext_preview_copy_voxels (liextPreview* self,
-                           int           sx,
-                           int           sy,
-                           int           sz,
+                           int           startx,
+                           int           starty,
+                           int           startz,
+                           int           sizex,
+                           int           sizey,
+                           int           sizez,
                            livoxVoxel*   result);
 
 int

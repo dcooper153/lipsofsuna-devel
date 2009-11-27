@@ -129,6 +129,16 @@ void
 livox_manager_mark_updates (livoxManager* self);
 
 void
+livox_manager_paste_voxels (livoxManager* self,
+                            int           xstart,
+                            int           ystart,
+                            int           zstart,
+                            int           xsize,
+                            int           ysize,
+                            int           zsize,
+                            livoxVoxel*   voxels);
+
+void
 livox_manager_remove_material (livoxManager* self,
                                int           id);
 
