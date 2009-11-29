@@ -60,6 +60,7 @@ alg_HEADERS = \
 	algorithm/algorithm-array.h \
 	algorithm/algorithm-astar.h \
 	algorithm/algorithm-bst.h \
+	algorithm/algorithm-camera.h \
 	algorithm/algorithm-list.h \
 	algorithm/algorithm-memdic.h \
 	algorithm/algorithm-octree.h \
@@ -72,6 +73,7 @@ alg_HEADERS = \
 algsrc = \
 	algorithm/algorithm-astar.c \
 	algorithm/algorithm-bst.c \
+	algorithm/algorithm-camera.c \
 	algorithm/algorithm-octree.c
 
 arcdir = $(includedir)/lipsofsuna/archive
@@ -158,7 +160,6 @@ engdir = $(includedir)/lipsofsuna/engine
 eng_HEADERS = \
 	engine/lips-engine.h \
 	engine/engine.h \
-	engine/engine-camera.h \
 	engine/engine-constraint.h \
 	engine/engine-iterator.h \
 	engine/engine-model.h \
@@ -169,7 +170,6 @@ eng_HEADERS = \
 	engine/engine-types.h
 engsrc = \
 	engine/engine.c \
-	engine/engine-camera.c \
 	engine/engine-constraint.c \
 	engine/engine-model.c \
 	engine/engine-object.c \
@@ -217,7 +217,6 @@ matdir = $(includedir)/lipsofsuna/math
 mat_HEADERS = \
 	math/lips-math.h \
 	math/math-aabb.h \
-	math/math-camera.h \
 	math/math-convert.h \
 	math/math-frustum.h  \
 	math/math-generic.h \
@@ -236,7 +235,7 @@ mat_HEADERS = \
 	math/math-vector.h \
 	math/math-vertex.h
 matsrc = \
-	math/math-camera.c
+	math/math.c
 
 mdldir = $(includedir)/lipsofsuna/model
 mdl_HEADERS = \

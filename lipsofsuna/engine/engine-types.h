@@ -63,7 +63,6 @@ enum
 };
 
 typedef struct _liengAnimation liengAnimation;
-typedef struct _liengCamera liengCamera;
 typedef struct _liengConstraint liengConstraint;
 typedef struct _liengEngine liengEngine;
 typedef enum _liengMatrix liengMatrix;

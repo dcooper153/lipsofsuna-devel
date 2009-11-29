@@ -80,10 +80,10 @@ static int
 private_tick (liextModule* self,
               float        secs)
 {
-	lieng_camera_move (self->module->camera, secs * self->move);
-	lieng_camera_tilt (self->module->camera, secs * self->tilt);
-	lieng_camera_turn (self->module->camera, secs * self->turn);
-	lieng_camera_zoom (self->module->camera, secs * self->zoom);
+	lialg_camera_move (self->module->camera, secs * self->move);
+	lialg_camera_tilt (self->module->camera, secs * self->tilt);
+	lialg_camera_turn (self->module->camera, secs * self->turn);
+	lialg_camera_zoom (self->module->camera, secs * self->zoom);
 
 	return 1;
 }

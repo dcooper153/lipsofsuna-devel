@@ -496,9 +496,9 @@ private_mouse_motion (liextEditor*          self,
 	if (self->drag.mode == LIEXT_DRAG_ROTATE)
 	{
 		liext_editor_get_center (self, &world);
-		lieng_camera_get_transform (self->module->camera, &transform);
+		lialg_camera_get_transform (self->module->camera, &transform);
 		axis = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 0.0f, 1.0f));
-		if (lieng_camera_project (self->module->camera, &world, &center))
+		if (lialg_camera_project (self->module->camera, &world, &center))
 		{
 			licli_window_get_size (self->module->window, NULL, &h);
 			center.y = h - center.y;
@@ -528,7 +528,7 @@ private_mouse_motion (liextEditor*          self,
 	}
 	else if (self->drag.mode == LIEXT_DRAG_TRANSLATE)
 	{
-		lieng_camera_get_transform (self->module->camera, &transform);
+		lialg_camera_get_transform (self->module->camera, &transform);
 		vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
 		vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, -1.0f, 0.0f));
 		vx = limat_vector_multiply (vx, 0.05f * (event->x - self->drag.start.x));

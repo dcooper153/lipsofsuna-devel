@@ -19,7 +19,6 @@
 #define __LIPS_MATH_H__
 
 #include "math-aabb.h"
-#include "math-camera.h"
 #include "math-convert.h"
 #include "math-frustum.h"
 #include "math-generic.h"

@@ -19,6 +19,7 @@
 #define __LIPS_ALGORITHM_H__
 
 #include "algorithm-array.h"
+#include "algorithm-camera.h"
 #include "algorithm-memdic.h"
 #include "algorithm-ptrdic.h"
 #include "algorithm-strdic.h"

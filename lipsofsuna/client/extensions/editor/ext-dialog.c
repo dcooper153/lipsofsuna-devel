@@ -230,7 +230,7 @@ private_insert (liextDialog* self)
 	model = liext_dialog_get_model (self);
 	if (model == NULL)
 		return 0;
-	lieng_camera_get_transform (self->module->camera, &transform);
+	lialg_camera_get_transform (self->module->camera, &transform);
 	position = limat_vector_init (0.0f, 3.0f, -15.0f);
 	position = limat_transform_transform (transform, position);
 	rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);

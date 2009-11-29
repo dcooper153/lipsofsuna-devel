@@ -154,7 +154,7 @@ liext_preview_new (liwdgManager* manager,
 	}
 
 	/* Create camera. */
-	data->camera = lieng_camera_new (module->engine);
+	data->camera = lialg_camera_new (module->engine);
 	if (data->camera == NULL)
 	{
 		liwdg_widget_free (self);
@@ -167,10 +167,9 @@ liext_preview_new (liwdgManager* manager,
 	transform.rotation = limat_quaternion_look (
 		limat_vector_init (0.0f, -1.0f, 0.0f),
 		limat_vector_init (0.0f, 0.0f, 1.0f));
-	lieng_camera_set_clip (data->camera, 0);
-	lieng_camera_set_driver (data->camera, LIENG_CAMERA_DRIVER_MANUAL);
-	lieng_camera_set_transform (data->camera, &transform);
-	lieng_camera_warp (data->camera);
+	lialg_camera_set_driver (data->camera, LIALG_CAMERA_MANUAL);
+	lialg_camera_set_transform (data->camera, &transform);
+	lialg_camera_warp (data->camera);
 
 	/* Create lights. */
 	data->light0 = lirnd_light_new (data->scene, diffuse, equation, M_PI, 0.0f, 0);
@@ -371,11 +370,10 @@ liext_preview_setup_camera (liextPreview* self,
 		LIVOX_TILE_WIDTH * (LIEXT_PREVIEW_CENTER + 0.5f) + eye->z);
 	transform1.rotation = limat_quaternion_look (limat_vector_subtract (*ctr, *eye), *up);
 	transform1.position = transform0.position;
-	lieng_camera_set_clip (self->camera, 0);
-	lieng_camera_set_center (self->camera, &transform0);
-	lieng_camera_set_driver (self->camera, driver);
-	lieng_camera_set_transform (self->camera, &transform1);
-	lieng_camera_warp (self->camera);
+	lialg_camera_set_center (self->camera, &transform0);
+	lialg_camera_set_driver (self->camera, driver);
+	lialg_camera_set_transform (self->camera, &transform1);
+	lialg_camera_warp (self->camera);
 }
 
 void
@@ -463,7 +461,7 @@ private_free (liextPreview* self)
 	if (self->group != NULL)
 		lirnd_group_free (self->group);
 	if (self->camera != NULL)
-		lieng_camera_free (self->camera);
+		lialg_camera_free (self->camera);
 	if (self->generator != NULL)
 	{
 		lical_callbacks_remove_callbacks (self->generator->voxels->callbacks,
@@ -507,10 +505,10 @@ private_event (liextPreview* self,
 					}
 					break;
 				case 4:
-					lieng_camera_move (self->camera, 5.0f);
+					lialg_camera_move (self->camera, 5.0f);
 					break;
 				case 5:
-					lieng_camera_move (self->camera, -5.0f);
+					lialg_camera_move (self->camera, -5.0f);
 					break;
 			}
 		}
@@ -583,10 +581,10 @@ private_event (liextPreview* self,
 	{
 		/* Update camera. */
 		liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-		lieng_camera_set_viewport (self->camera, rect.x, rect.y, rect.width, rect.height);
-		lieng_camera_update (self->camera, event->update.secs);
-		lieng_camera_get_modelview (self->camera, &modelview);
-		lieng_camera_get_projection (self->camera, &projection);
+		lialg_camera_set_viewport (self->camera, rect.x, rect.y, rect.width, rect.height);
+		lialg_camera_update (self->camera, event->update.secs);
+		lialg_camera_get_modelview (self->camera, &modelview);
+		lialg_camera_get_projection (self->camera, &projection);
 
 		/* Update scene. */
 		liwdg_render_set_modelview (LIWDG_RENDER (self), &modelview);
@@ -594,10 +592,10 @@ private_event (liextPreview* self,
 		lirnd_scene_update (self->scene, event->update.secs);
 
 		/* Setup lights. */
-		lieng_camera_get_transform (self->camera, &transform);
+		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
 		lirnd_light_set_transform (self->light0, &transform);
-		lieng_camera_get_transform (self->camera, &transform);
+		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
 		lirnd_light_set_transform (self->light1, &transform);
 	}
@@ -704,7 +702,7 @@ private_motion (liextPreview* self,
 	switch (self->mode)
 	{
 		case LIEXT_PREVIEW_MODE_TRANSLATE:
-			lieng_camera_get_transform (self->camera, &transform);
+			lialg_camera_get_transform (self->camera, &transform);
 			vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
 			vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
 			vx = limat_vector_multiply (vx, 0.05f * self->drag.x);
@@ -736,7 +734,7 @@ private_motion (liextPreview* self,
 				LIEXT_CALLBACK_TRANSFORM, &self->transform, 0);
 			return;
 		case LIEXT_PREVIEW_MODE_ROTATE:
-			lieng_camera_get_transform (self->camera, &transform);
+			lialg_camera_get_transform (self->camera, &transform);
 			axis = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 0.0f, 1.0f));
 			amount = atan2 (self->drag.y, self->drag.x);
 			quat = limat_quaternion_rotation (amount, axis);
@@ -769,19 +767,19 @@ private_motion (liextPreview* self,
 
 	if (event->motion.buttons & 0x02)
 	{
-		lieng_camera_get_transform (self->camera, &transform);
+		lialg_camera_get_transform (self->camera, &transform);
 		vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
 		vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
 		vx = limat_vector_multiply (vx, LIEXT_PREVIEW_PAN * event->motion.dx);
 		vy = limat_vector_multiply (vy, LIEXT_PREVIEW_PAN * event->motion.dy);
 		transform1 = limat_convert_vector_to_transform (limat_vector_add (vx, vy));
 		transform1 = limat_transform_multiply (transform1, transform);
-		lieng_camera_set_transform (self->camera, &transform1);
+		lialg_camera_set_transform (self->camera, &transform1);
 	}
 	else
 	{
-		lieng_camera_turn (self->camera, -0.01 * event->motion.dx);
-		lieng_camera_tilt (self->camera, 0.01 * event->motion.dy);
+		lialg_camera_turn (self->camera, -0.01 * event->motion.dx);
+		lialg_camera_tilt (self->camera, 0.01 * event->motion.dy);
 	}
 }
 

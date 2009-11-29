@@ -186,7 +186,7 @@ private_miscellaneous_tick (licliModule* module,
 	{
 		lieng_object_get_transform (player, &transform);
 		node = lieng_object_find_node (player, module->camera_node);
-		if (node != NULL && lieng_camera_get_driver (module->camera) == LIENG_CAMERA_DRIVER_FIRSTPERSON)
+		if (node != NULL && lialg_camera_get_driver (module->camera) == LIALG_CAMERA_FIRSTPERSON)
 		{
 			limdl_node_get_world_transform (node, &transform0);
 			transform = limat_transform_multiply (transform, transform0);
@@ -196,8 +196,8 @@ private_miscellaneous_tick (licliModule* module,
 			lieng_object_get_bounds (player, &bounds);
 			transform.position.y += bounds.max.y;
 		}
-		lieng_camera_set_center (module->camera, &transform);
-		lieng_camera_update (module->camera, secs);
+		lialg_camera_set_center (module->camera, &transform);
+		lialg_camera_update (module->camera, secs);
 	}
 
 	return 1;

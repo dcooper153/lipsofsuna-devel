@@ -113,7 +113,7 @@ livie_viewer_free (livieViewer* self)
 	if (self->reload != NULL)
 		lirel_reload_free (self->reload);
 	if (self->camera != NULL)
-		limat_camera_free (self->camera);
+		lialg_camera_free (self->camera);
 	if (self->scene != NULL)
 		lirnd_scene_free (self->scene);
 	if (self->render != NULL)
@@ -163,20 +163,20 @@ livie_viewer_main (livieViewer* self)
 					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == 4)
-						limat_camera_zoom (self->camera, -ZOOM_SPEED);
+						lialg_camera_zoom (self->camera, -ZOOM_SPEED);
 					else if (event.button.button == 5)
-						limat_camera_zoom (self->camera, ZOOM_SPEED);
+						lialg_camera_zoom (self->camera, ZOOM_SPEED);
 					break;
 				case SDL_MOUSEMOTION:
 					if (self->video.SDL_GetMouseState (NULL, NULL))
 					{
-						limat_camera_turn (self->camera, ROTATION_SPEED * -event.motion.xrel);
-						limat_camera_tilt (self->camera, ROTATION_SPEED * -event.motion.yrel);
+						lialg_camera_turn (self->camera, ROTATION_SPEED * -event.motion.xrel);
+						lialg_camera_tilt (self->camera, ROTATION_SPEED * -event.motion.yrel);
 					}
 					break;
 				case SDL_VIDEORESIZE:
 					private_resize (self, event.resize.w, event.resize.h, self->mode.fsaa);
-					limat_camera_set_viewport (self->camera, 0, 0, event.resize.w, event.resize.h);
+					lialg_camera_set_viewport (self->camera, 0, 0, event.resize.w, event.resize.h);
 					glViewport (0, 0, event.resize.w, event.resize.h);
 					break;
 			}
@@ -190,24 +190,24 @@ livie_viewer_main (livieViewer* self)
 		lirnd_object_get_transform (self->object, &transform);
 		transform.position = limat_vector_add (transform.position,
 			limat_vector_multiply (limat_vector_add (aabb.min, aabb.max), 0.5f));
-		limat_camera_set_center (self->camera, &transform);
-		limat_camera_update (self->camera, secs);
-		limat_camera_warp (self->camera);
+		lialg_camera_set_center (self->camera, &transform);
+		lialg_camera_update (self->camera, secs);
+		lialg_camera_warp (self->camera);
 
 		/* Update lights. */
-		limat_camera_get_transform (self->camera, &transform);
+		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
 		lirnd_light_set_transform (self->lights.key, &transform);
-		limat_camera_get_transform (self->camera, &transform);
+		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
 		lirnd_light_set_transform (self->lights.fill, &transform);
 
 		/* Render scene. */
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		limat_camera_get_frustum (self->camera, &frustum);
-		limat_camera_get_modelview (self->camera, &modelview);
-		limat_camera_get_projection (self->camera, &projection);
+		lialg_camera_get_frustum (self->camera, &frustum);
+		lialg_camera_get_modelview (self->camera, &modelview);
+		lialg_camera_get_projection (self->camera, &projection);
 		lirnd_scene_render (self->scene, NULL, &modelview, &projection, &frustum);
 		self->video.SDL_GL_SwapBuffers ();
 		self->video.SDL_Delay (100);
@@ -233,12 +233,12 @@ private_init (livieViewer* self)
 	livid_features_init ();
 
 	/* Allocate camera. */
-	self->camera = limat_camera_new ();
+	self->camera = lialg_camera_new ();
 	if (self->camera == NULL)
 		return 0;
 	glGetIntegerv (GL_VIEWPORT, viewport);
-	limat_camera_set_driver (self->camera, LIMAT_CAMERA_THIRDPERSON);
-	limat_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
+	lialg_camera_set_driver (self->camera, LIALG_CAMERA_THIRDPERSON);
+	lialg_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
 
 	/* Allocate scene. */
 	self->render = lirnd_render_new (self->paths->module_data);

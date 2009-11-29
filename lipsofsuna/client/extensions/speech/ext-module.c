@@ -200,7 +200,7 @@ private_render_2d (liextModule* self,
 		object = iter.value;
 
 		/* Project start offset. */
-		if (!lieng_camera_project (self->module->camera, &object->position, &win))
+		if (!lialg_camera_project (self->module->camera, &object->position, &win))
 			continue;
 		if (win.z < 0.0f)
 			continue;

@@ -51,11 +51,11 @@ typedef struct _liextPreview liextPreview;
 struct _liextPreview
 {
 	liwdgRender base;
+	lialgCamera* camera;
 	lialgPtrdic* objects;
 	licalHandle calls[2];
 	licliModule* module;
 	ligenGenerator* generator;
-	liengCamera* camera;
 	limatVector drag;
 	limatTransform transform;
 	lirndLight* light0;

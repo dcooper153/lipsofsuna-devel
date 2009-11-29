@@ -127,7 +127,7 @@ licli_module_free (licliModule* self)
 
 	/* Free camera. */
 	if (self->camera != NULL)
-		lieng_camera_free (self->camera);
+		lialg_camera_free (self->camera);
 
 	/* Free script. */
 	if (self->script != NULL)
@@ -402,7 +402,7 @@ licli_module_render (licliModule* self)
 
 	licli_window_get_size (self->window, &w, &h);
 	liwdg_manager_set_size (self->widgets, w, h);
-	lieng_camera_set_viewport (self->camera, 0, 0, w, h);
+	lialg_camera_set_viewport (self->camera, 0, 0, w, h);
 	liwdg_manager_render (self->widgets);
 	self->client->video.SDL_GL_SwapBuffers ();
 }
@@ -538,15 +538,12 @@ private_init_camera (licliModule* self)
 	self->camera_node = strdup ("#camera");
 	if (self->camera_node == NULL)
 		return 0;
-	self->camera = lieng_camera_new (self->engine);
+	self->camera = lialg_camera_new ();
 	if (self->camera == NULL)
 		return 0;
 	glGetIntegerv (GL_VIEWPORT, viewport);
-	lieng_camera_set_driver (self->camera, LIENG_CAMERA_DRIVER_THIRDPERSON);
-	lieng_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
-	lieng_object_set_collision_group (self->camera->object, LICLI_PHYSICS_GROUP_CAMERA);
-	lieng_object_set_collision_mask (self->camera->object, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES);
-	lieng_object_set_realized (self->camera->object, 1);
+	lialg_camera_set_driver (self->camera, LIALG_CAMERA_THIRDPERSON);
+	lialg_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
 
 	return 1;
 }

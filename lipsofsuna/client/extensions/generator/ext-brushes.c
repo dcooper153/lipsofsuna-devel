@@ -608,8 +608,8 @@ private_paint_terrain (liextBrushes* self,
 		preview = LIEXT_PREVIEW (self->widgets.preview);
 		point[0] = limat_vector_init (x, y, 0.0f);
 		point[1] = limat_vector_init (x, y, 0.5f);
-		lieng_camera_unproject (preview->camera, point + 0, line + 0);
-		lieng_camera_unproject (preview->camera, point + 1, line + 1);
+		lialg_camera_unproject (preview->camera, point + 0, line + 0);
+		lialg_camera_unproject (preview->camera, point + 1, line + 1);
 		liext_preview_get_bounds (preview, &aabb);
 		if (!limat_intersect_aabb_line_far (&aabb, line + 0, line + 1, point))
 			return 0;

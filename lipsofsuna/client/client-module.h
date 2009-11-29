@@ -51,12 +51,12 @@ struct _licliModule
 	char* login;
 	char* password;
 	char* camera_node;
+	lialgCamera* camera;
 	lialgStrdic* extensions;
 	libndManager* bindings;
 	licliClient* client;
 	licliNetwork* network;
 	licliWindow* window;
-	liengCamera* camera;
 	liengEngine* engine;
 	lipthPaths* paths;
 	lirndRender* render;

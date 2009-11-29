@@ -16,38 +16,32 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup lialg Algorithm
  * @{
- * \addtogroup liengCamera Camera
+ * \addtogroup lialgCamera Camerai
  * @{
  */
 
-#ifndef __ENGINE_CAMERA_H__
-#define __ENGINE_CAMERA_H__
+#ifndef __ALGORITHM_CAMERA_H__
+#define __ALGORITHM_CAMERA_H__
 
 #include <math/lips-math.h>
-#include <physics/lips-physics.h>
-#include "engine.h"
-#include "engine-types.h"
 
-typedef enum _liengCameraDriver liengCameraDriver;
-enum _liengCameraDriver
+typedef int lialgCameraDriver;
+enum 
 {
-	LIENG_CAMERA_DRIVER_FIRSTPERSON,
-	LIENG_CAMERA_DRIVER_THIRDPERSON,
-	LIENG_CAMERA_DRIVER_MANUAL
+	LIALG_CAMERA_FIRSTPERSON,
+	LIALG_CAMERA_THIRDPERSON,
+	LIALG_CAMERA_MANUAL
 };
 
-struct _liengCamera
+typedef struct _lialgCamera lialgCamera;
+struct _lialgCamera
 {
-	liengEngine* engine;
-	liengObject* object;
-	liphyShape* shape;
 	struct
 	{
-		int clip;
 		float distance;
-		liengCameraDriver driver;
+		lialgCameraDriver driver;
 	} config;
 	struct
 	{
@@ -59,118 +53,111 @@ struct _liengCamera
 	} transform;
 	struct
 	{
-		int viewport[4];
-		limatMatrix modelview;
-		limatMatrix projection;
 		float aspect;
 		float fov;
 		float near;
 		float far;
+		int viewport[4];
+		limatMatrix modelview;
+		limatMatrix projection;
 	} view;
 };
 
-liengCamera*
-lieng_camera_new (liengEngine* engine);
+lialgCamera*
+lialg_camera_new ();
 
 void
-lieng_camera_free (liengCamera* self);
+lialg_camera_free (lialgCamera* self);
 
 void
-lieng_camera_move (liengCamera* self,
+lialg_camera_move (lialgCamera* self,
                    float        value);
 
 int
-lieng_camera_project (liengCamera*       self,
+lialg_camera_project (lialgCamera*       self,
                       const limatVector* object,
                       limatVector*       window);
 
 void
-lieng_camera_tilt (liengCamera* self,
+lialg_camera_tilt (lialgCamera* self,
                    float        value);
 
 void
-lieng_camera_turn (liengCamera* self,
+lialg_camera_turn (lialgCamera* self,
                    float        value);
 
 int
-lieng_camera_unproject (liengCamera*       self,
+lialg_camera_unproject (lialgCamera*       self,
                         const limatVector* window,
                         limatVector*       object);
 
 void
-lieng_camera_update (liengCamera* self,
+lialg_camera_update (lialgCamera* self,
                      float        secs);
 
 void
-lieng_camera_warp (liengCamera* self);
+lialg_camera_warp (lialgCamera* self);
 
 void
-lieng_camera_zoom (liengCamera* self,
+lialg_camera_zoom (lialgCamera* self,
                    float        value);
 
 void
-lieng_camera_get_bounds (const liengCamera* self,
+lialg_camera_get_bounds (const lialgCamera* self,
                          limatAabb*         aabb);
 
 void
-lieng_camera_set_center (liengCamera*          self,
+lialg_camera_set_center (lialgCamera*          self,
                          const limatTransform* value);
 
-int
-lieng_camera_get_clip (const liengCamera* self);
+lialgCameraDriver
+lialg_camera_get_driver (lialgCamera* self);
 
 void
-lieng_camera_set_clip (liengCamera* self,
-                       int          clip);
-
-liengCameraDriver
-lieng_camera_get_driver (liengCamera* self);
+lialg_camera_set_driver (lialgCamera*      self,
+                         lialgCameraDriver value);
 
 void
-lieng_camera_set_driver (liengCamera*      self,
-                         liengCameraDriver value);
-
-void
-lieng_camera_set_far (liengCamera* self,
+lialg_camera_set_far (lialgCamera* self,
                       int          value);
 
 void
-lieng_camera_get_frustum (const liengCamera* self,
+lialg_camera_get_frustum (const lialgCamera* self,
                           limatFrustum*      result);
 
 void
-lieng_camera_get_modelview (const liengCamera* self,
+lialg_camera_get_modelview (const lialgCamera* self,
                             limatMatrix*       value);
 
 void
-lieng_camera_set_near (liengCamera* self,
+lialg_camera_set_near (lialgCamera* self,
                        int          value);
 
 void
-lieng_camera_get_projection (const liengCamera* self,
+lialg_camera_get_projection (const lialgCamera* self,
                              limatMatrix*       value);
 
 void
-lieng_camera_set_projection (liengCamera* self,
+lialg_camera_set_projection (lialgCamera* self,
                              float        fov,
                              float        aspect,
                              float        near,
                              float        far);
 
 void
-lieng_camera_get_transform (const liengCamera* self,
+lialg_camera_get_transform (const lialgCamera* self,
                             limatTransform*    value);
 
 void
-lieng_camera_set_transform (liengCamera*          self,
+lialg_camera_set_transform (lialgCamera*          self,
                             const limatTransform* value);
 
 void
-lieng_camera_get_up (const liengCamera* self,
+lialg_camera_get_up (const lialgCamera* self,
                      limatVector*       result);
 
 void
-lieng_camera_set_viewport (liengCamera* self,
+lialg_camera_set_viewport (lialgCamera* self,
                            int          x,
                            int          y,
                            int          width,

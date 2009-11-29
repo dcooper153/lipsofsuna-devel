@@ -15,17 +15,4 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_ENGINE_H__
-#define __LIPS_ENGINE_H__
-
-#include "engine.h"
-#include "engine-constraint.h"
-#include "engine-iterator.h"
-#include "engine-model.h"
-#include "engine-object.h"
-#include "engine-resources.h"
-#include "engine-sector.h"
-#include "engine-selection.h"
-#include "engine-types.h"
-
-#endif
+int __limat_dummy_symbol = 0;

@@ -25,7 +25,7 @@
 #ifndef __VIEWER_H__
 #define __VIEWER_H__
 
-#include <math/lips-math.h>
+#include <algorithm/lips-algorithm.h>
 #include <paths/lips-paths.h>
 #include <reload/lips-reload.h>
 #include <render/lips-render.h>
@@ -36,7 +36,7 @@ typedef struct _livieViewer livieViewer;
 struct _livieViewer
 {
 	char* file;
-	limatCamera* camera;
+	lialgCamera* camera;
 	lipthPaths* paths;
 	lirelReload* reload;
 	lirndModel* model;

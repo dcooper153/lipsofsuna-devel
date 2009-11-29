@@ -456,7 +456,7 @@ private_rebuild_preview (liextMaterials* self)
 		up = limat_vector_init (0.0f, 1.0f, 0.0f);
 		LIEXT_PREVIEW (self->widgets.preview)->camera->config.distance = 6.0f;
 		liext_preview_setup_camera (LIEXT_PREVIEW (self->widgets.preview),
-			&eye, &ctr, &up, LIENG_CAMERA_DRIVER_THIRDPERSON);
+			&eye, &ctr, &up, LIALG_CAMERA_THIRDPERSON);
 	}
 }
 

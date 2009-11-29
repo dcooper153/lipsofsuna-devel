@@ -41,10 +41,10 @@ private_render (liwdgRender* self,
 	/* Set 3D mode. */
 	module = data;
 	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-	lieng_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
-	lieng_camera_get_frustum (module->camera, &frustum);
-	lieng_camera_get_modelview (module->camera, &modelview);
-	lieng_camera_get_projection (module->camera, &projection);
+	lialg_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
+	lialg_camera_get_frustum (module->camera, &frustum);
+	lialg_camera_get_modelview (module->camera, &modelview);
+	lialg_camera_get_projection (module->camera, &projection);
 	lirnd_context_init (&context, module->scene);
 	lirnd_context_set_modelview (&context, &modelview);
 	lirnd_context_set_projection (&context, &projection);
@@ -93,8 +93,8 @@ private_update (liwdgRender* self,
 	module = data;
 	if (module->network != NULL)
 	{
-		lieng_camera_get_modelview (module->camera, &modelview);
-		lieng_camera_get_projection (module->camera, &projection);
+		lialg_camera_get_modelview (module->camera, &modelview);
+		lialg_camera_get_projection (module->camera, &projection);
 		liwdg_render_set_modelview (LIWDG_RENDER (self), &modelview);
 		liwdg_render_set_projection (LIWDG_RENDER (self), &projection);
 	}
