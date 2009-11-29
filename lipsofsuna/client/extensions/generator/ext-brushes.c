@@ -678,7 +678,7 @@ private_paint_terrain (liextBrushes* self,
 		if (self->clipboard != NULL)
 		{
 			if (!border)
-				livox_manager_find_voxel (self->generator->voxels, LIVOX_FIND_FULL, &result.point, point);
+				livox_manager_find_voxel (self->generator->voxels, LIVOX_FIND_EMPTY, &result.point, point);
 			else
 				*point = result.point;
 			self->select.start[0] = point->x / LIVOX_TILE_WIDTH;
