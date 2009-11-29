@@ -46,6 +46,11 @@ struct _lirndGroup
 	limatAabb aabb;
 	lirndScene* scene;
 	lirndGroupObject* objects;
+	struct
+	{
+		int count;
+		lirndLight** array;
+	} lights;
 };
 
 lirndGroup*

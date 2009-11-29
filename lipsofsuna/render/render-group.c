@@ -27,6 +27,12 @@
 #include "render-group.h"
 #include "render-scene.h"
 
+static void
+private_build_lights (lirndGroup*       self,
+                      lirndGroupObject* object);
+
+/*****************************************************************************/
+
 /**
  * \brief Creates a new render group and adds it to the scene.
  *
@@ -63,6 +69,7 @@ lirnd_group_new (lirndScene* scene)
 void
 lirnd_group_free (lirndGroup* self)
 {
+	int i;
 	lirndGroupObject* object;
 	lirndGroupObject* next;
 
@@ -71,18 +78,26 @@ lirnd_group_free (lirndGroup* self)
 		next = object->next;
 		lisys_free (object);
 	}
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		if (self->realized)
+			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+		lirnd_light_free (self->lights.array[i]);
+	}
 	lialg_ptrdic_remove (self->scene->groups, self);
+	lisys_free (self->lights.array);
 	lisys_free (self);
 }
 
 /**
- * \brief Removes all the models from the group.
+ * \brief Removes all models from the group.
  *
  * \param self Group.
  */
 void
 lirnd_group_clear (lirndGroup* self)
 {
+	int i;
 	lirndGroupObject* object;
 	lirndGroupObject* next;
 
@@ -91,6 +106,15 @@ lirnd_group_clear (lirndGroup* self)
 		next = object->next;
 		lisys_free (object);
 	}
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		if (self->realized)
+			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+		lirnd_light_free (self->lights.array[i]);
+	}
+	lisys_free (self->lights.array);
+	self->lights.array = NULL;
+	self->lights.count = 0;
 	limat_aabb_init (&self->aabb);
 	self->objects = NULL;
 }
@@ -158,6 +182,7 @@ lirnd_group_insert_model (lirndGroup*     self,
 	object->aabb = aabb;
 	object->next = self->objects;
 	self->objects = object;
+	private_build_lights (self, object);
 
 	return 1;
 }
@@ -187,9 +212,56 @@ int
 lirnd_group_set_realized (lirndGroup* self,
                           int         value)
 {
+	int i;
+
+	/* Register or unregister light sources. */
+	if (!self->realized && value)
+	{
+		for (i = 0 ; i < self->lights.count ; i++)
+			lirnd_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
+	}
+	else if (self->realized && !value)
+	{
+		for (i = 0 ; i < self->lights.count ; i++)
+			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+	}
+
+	/* Set state. */
 	self->realized = value;
 
 	return 1;
+}
+
+/*****************************************************************************/
+
+static void
+private_build_lights (lirndGroup*       self,
+                      lirndGroupObject* object)
+{
+	limatTransform tmp;
+	limdlNode* node;
+	limdlNodeIter iter;
+	lirndLight* light;
+
+	LIMDL_FOREACH_NODE (iter, &object->model->model->nodes)
+	{
+		node = iter.value;
+		if (node->type != LIMDL_NODE_LIGHT)
+			continue;
+		light = lirnd_light_new_from_model (self->scene, node);
+		if (light == NULL)
+			continue;
+		if (!lialg_array_append (&self->lights, &light))
+		{
+			lirnd_light_free (light);
+			continue;
+		}
+		tmp = light->transform;
+		tmp = limat_transform_multiply (object->transform, tmp);
+		lirnd_light_set_transform (light, &tmp);
+		if (self->realized)
+			lirnd_lighting_insert_light (self->scene->lighting, light);
+	}
 }
 
 /** @} */
