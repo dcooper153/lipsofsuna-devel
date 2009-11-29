@@ -169,38 +169,9 @@ lieng_camera_project (liengCamera*       self,
                       const limatVector* object,
                       limatVector*       window)
 {
-	float w;
-	limatMatrix m;
-	limatVector v;
-	limatVector result;
-
-	/* Multiply by modelview matrix. */
-	w = 1.0f;
-	v = *object;
-	m = self->view.modelview;
-	result.x = m.m[0] * v.x + m.m[4] * v.y + m.m[8] * v.z + m.m[12] * w;
-	result.y = m.m[1] * v.x + m.m[5] * v.y + m.m[9] * v.z + m.m[13] * w;
-	result.z = m.m[2] * v.x + m.m[6] * v.y + m.m[10] * v.z + m.m[14] * w;
-	w = m.m[3] * v.x + m.m[7] * v.y + m.m[11] * v.z + m.m[15] * w;
-
-	/* Multiply by projection matrix. */
-	v = result;
-	m = self->view.projection;
-	result.x = m.m[0] * v.x + m.m[4] * v.y + m.m[8] * v.z + m.m[12] * w;
-	result.y = m.m[1] * v.x + m.m[5] * v.y + m.m[9] * v.z + m.m[13] * w;
-	result.z = m.m[2] * v.x + m.m[6] * v.y + m.m[10] * v.z + m.m[14] * w;
-	w = m.m[3] * v.x + m.m[7] * v.y + m.m[11] * v.z + m.m[15] * w;
-
-	/* Convert to window space. */
-	if (LI_ABS (w) < LI_MATH_EPSILON)
-		return 0;
-	result.x /= w;
-	result.y /= w;
-	result.z /= w;
-	window->x = self->view.viewport[0] + self->view.viewport[2] * (result.x + 1.0f) / 2.0f;
-	window->y = self->view.viewport[1] + self->view.viewport[3] * (result.y + 1.0f) / 2.0f;
-	window->z = (result.z + 1.0f) / 2.0f;
-	return 1;
+	return limat_matrix_project (
+		self->view.projection, self->view.modelview,
+		self->view.viewport, object, window);
 }
 
 /**

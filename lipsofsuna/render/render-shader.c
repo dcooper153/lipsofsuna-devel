@@ -521,6 +521,13 @@ private_uniform_value (lirndShader* self,
 			return LIRND_UNIFORM_NONE;
 		return LIRND_UNIFORM_LIGHTMATRIX0 + index;
 	}
+	if (!strncmp (value, "LIGHTPOSITION", 13))
+	{
+		index = atoi (value + 13);
+		if (index < 0 || index > 9)
+			return LIRND_UNIFORM_NONE;
+		return LIRND_UNIFORM_LIGHTPOSITION0 + index;
+	}
 	if (!strcmp (value, "MODELMATRIX"))
 		return LIRND_UNIFORM_MODELMATRIX;
 	if (!strcmp (value, "MODELVIEWINVERSE"))

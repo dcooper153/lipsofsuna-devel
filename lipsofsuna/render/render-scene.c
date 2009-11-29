@@ -36,6 +36,18 @@ private_init_lights (lirndScene* self);
 static int
 private_init_particles (lirndScene* self);
 
+static int
+private_light_bounds (lirndScene*   self,
+                      lirndLight*   light,
+                      lirndContext* context,
+                      int*          viewport,
+                      float*        result);
+
+static void
+private_lighting_render (lirndScene*    self,
+                         lirndContext*  context,
+                         lirndDeferred* framebuffer);
+
 static void
 private_particle_render (lirndScene* self);
 
@@ -228,15 +240,17 @@ lirnd_scene_pick (lirndScene*     self,
  * \brief Renders the scene.
  *
  * \param self Scene.
+ * \param framebuffer Framebuffer or NULL.
  * \param modelview Modelview matrix.
  * \param projection Projection matrix.
  * \param frustum Frustum used for culling.
  */
 void
-lirnd_scene_render (lirndScene*   self,
-                    limatMatrix*  modelview,
-                    limatMatrix*  projection,
-                    limatFrustum* frustum)
+lirnd_scene_render (lirndScene*    self,
+                    lirndDeferred* framebuffer,
+                    limatMatrix*   modelview,
+                    limatMatrix*   projection,
+                    limatFrustum*  frustum)
 {
 	int i;
 	lirndContext context;
@@ -250,6 +264,18 @@ lirnd_scene_render (lirndScene*   self,
 	lirnd_context_set_modelview (&context, modelview);
 	lirnd_context_set_projection (&context, projection);
 	lirnd_context_set_frustum (&context, frustum);
+
+	/* Bind framebuffer. */
+	if (!self->render->shader.enabled)
+		framebuffer = NULL;
+	if (framebuffer != NULL)
+	{
+		glPushAttrib (GL_VIEWPORT_BIT);
+		glViewport (0, 0, framebuffer->width, framebuffer->height);
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->fbo);
+		glClearColor (1.0f, 1.0f, 0.0f, 1.0f);
+		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 
 	/* Set default rendering mode. */
 	glEnable (GL_LIGHTING);
@@ -293,6 +319,14 @@ lirnd_scene_render (lirndScene*   self,
 	private_render (self, &context, lirnd_draw_debug, NULL);
 	glDepthMask (GL_TRUE);
 
+	/* Deferred lighting. */
+	if (framebuffer != NULL)
+	{
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+		glPopAttrib ();
+		private_lighting_render (self, &context, framebuffer);
+	}
+
 	/* Restore state. */
 	if (self->render->shader.enabled)
 		glUseProgramObjectARB (0);
@@ -331,19 +365,6 @@ lirnd_scene_update (lirndScene* self,
 
 	/* Update particles. */
 	lipar_manager_update (self->particles, secs);
-}
-
-/**
- * \brief Enables light sources that affect the provided point the most.
- *
- * \param self Scene.
- * \param point Point in world coordinates.
- */
-void
-lirnd_scene_set_light_focus (lirndScene*        self,
-                             const limatVector* point)
-{
-	lirnd_lighting_set_center (self->lighting, point);
 }
 
 /**
@@ -397,6 +418,164 @@ private_init_particles (lirndScene* self)
 	if (self->particles == NULL)
 		return 0;
 	return 1;
+}
+
+static int
+private_light_bounds (lirndScene*   self,
+                      lirndLight*   light,
+                      lirndContext* context,
+                      int*          viewport,
+                      float*        result)
+{
+	int i;
+	limatAabb bounds;
+	limatVector min;
+	limatVector max;
+	limatVector tmp;
+	limatVector p[8];
+
+	if (!lirnd_light_get_bounds (light, &bounds))
+		return 0;
+	p[0] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.min.z);
+	p[1] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.max.z);
+	p[2] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.min.z);
+	p[3] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.max.z);
+	p[4] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.min.z);
+	p[5] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.max.z);
+	p[6] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.min.z);
+	p[7] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.max.z);
+	limat_matrix_project (context->projection, context->modelview, viewport, p, &tmp);
+	min = max = tmp;
+	for (i = 1 ; i < 8 ; i++)
+	{
+		limat_matrix_project (context->projection, context->modelview, viewport, p + i, &tmp);
+		if (tmp.x < min.x) min.x = tmp.x;
+		if (tmp.y < min.y) min.y = tmp.y;
+		if (tmp.z < min.z) min.z = tmp.z;
+		if (tmp.x > max.x) max.x = tmp.x;
+		if (tmp.y > max.y) max.y = tmp.y;
+		if (tmp.z > max.z) max.z = tmp.z;
+	}
+	result[0] = min.x;
+	result[1] = min.y;
+	result[2] = max.x - min.x;
+	result[3] = max.y - min.y;
+
+	return 1;
+}
+
+static void
+private_lighting_render (lirndScene*    self,
+                         lirndContext*  context,
+                         lirndDeferred* framebuffer)
+{
+	int index = 0;
+	int viewport[4];
+	float bounds[4];
+	lialgPtrdicIter iter;
+	limatMatrix matrix;
+	lirndLight* light;
+	lirndShader* shader;
+	lirndTexture textures[4];
+
+	shader = lirnd_render_find_shader (self->render, "deferred");
+	if (shader == NULL)
+		return;
+
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_BLEND);
+	glGetIntegerv (GL_VIEWPORT, viewport);
+	matrix = limat_matrix_identity ();
+	textures[0].texture = framebuffer->diffuse_texture;
+	textures[0].params.magfilter = GL_NEAREST;
+	textures[0].params.minfilter = GL_NEAREST;
+	textures[0].params.wraps = GL_CLAMP_TO_EDGE;
+	textures[0].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[1].texture = framebuffer->specular_texture;
+	textures[1].params.magfilter = GL_NEAREST;
+	textures[1].params.minfilter = GL_NEAREST;
+	textures[1].params.wraps = GL_CLAMP_TO_EDGE;
+	textures[1].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[2].texture = framebuffer->normal_texture;
+	textures[2].params.magfilter = GL_NEAREST;
+	textures[2].params.minfilter = GL_NEAREST;
+	textures[2].params.wraps = GL_CLAMP_TO_EDGE;
+	textures[2].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[3].texture = framebuffer->depth_texture;
+	textures[3].params.magfilter = GL_NEAREST;
+	textures[3].params.minfilter = GL_NEAREST;
+	textures[3].params.wraps = GL_CLAMP_TO_EDGE;
+	textures[3].params.wrapt = GL_CLAMP_TO_EDGE;
+	lirnd_context_set_flags (context, LIRND_FLAG_LIGHTING | LIRND_FLAG_TEXTURING);
+	lirnd_context_set_matrix (context, &matrix);
+	lirnd_context_set_shader (context, shader);
+	lirnd_context_set_lights (context, NULL, 0);
+	lirnd_context_set_textures (context, textures, 4);
+
+	/* Let each light lit the scene. */
+	LI_FOREACH_PTRDIC (iter, self->lighting->lights)
+	{
+		light = iter.value;
+		lirnd_context_set_lights (context, &light, 1);
+		lirnd_context_bind (context);
+
+		/* FIXME: It should be possible to avoid these state changes. */
+		glDisable (GL_CULL_FACE);
+		if (index++ >= 1)
+		{
+			glBlendFunc (GL_ONE, GL_ONE);
+			glEnable (GL_BLEND);
+		}
+
+		/* Calculate light rectangle. */
+		if (private_light_bounds (self, light, context, viewport, bounds))
+		{
+			glScissor (bounds[0], bounds[1], bounds[2], bounds[3]);
+			glEnable (GL_SCISSOR_TEST);
+		}
+		else
+			glDisable (GL_SCISSOR_TEST);
+
+		/* Shade light rectangle. */
+		glBegin (GL_QUADS);
+		glTexCoord2i (0, 0);
+		glVertex2i (-1, -1);
+		glTexCoord2i (0, 1);
+		glVertex2i (-1, 1);
+		glTexCoord2i (1, 1);
+		glVertex2i (1, 1);
+		glTexCoord2i (1, 0);
+		glVertex2i (1, -1);
+		glEnd ();
+	}
+
+	lirnd_context_unbind (context);
+	glDisable (GL_SCISSOR_TEST);
+
+#ifdef DEBUG_LIGHT_BOUNDS
+	matrix = limat_matrix_ortho (0.0, framebuffer->width, framebuffer->height, 0.0f, -1.0f, 1.0f);
+	lirnd_context_unbind (context);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+	glMatrixMode (GL_PROJECTION);
+	glLoadMatrixf (matrix.m);
+	glDisable (GL_LIGHTING);
+	LI_FOREACH_PTRDIC (iter, self->lighting->lights)
+	{
+		light = iter.value;
+		if (private_light_bounds (self, light, context, viewport, bounds))
+		{
+			glColor3f (0.3f, 0.0f, 0.0f);
+			glBegin (GL_LINE_LOOP);
+			glVertex2f (bounds[0], bounds[1]);
+			glVertex2f (bounds[0] + bounds[2], bounds[1]);
+			glVertex2f (bounds[0] + bounds[2], bounds[1] + bounds[3]);
+			glVertex2f (bounds[0], bounds[1] + bounds[3]);
+			glEnd ();
+		}
+	}
+#endif
 }
 
 static void

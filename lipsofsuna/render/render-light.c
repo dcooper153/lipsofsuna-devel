@@ -26,6 +26,8 @@
 #include "render-draw.h"
 #include "render-light.h"
 
+#define LIGHT_CONTRIBUTION_EPSILON 0.01f
+
 static void
 private_update_shadow (lirndLight* self);
 
@@ -224,6 +226,48 @@ lirnd_light_set_ambient (lirndLight*  self,
                          const float* value)
 {
 	memcpy (self->ambient, value, 4 * sizeof (float));
+}
+
+/**
+ * \brief Gets the area of effect of the light source.
+ *
+ * \param self Light source.
+ * \param result Return location for a bounding box.
+ * \return Nonzero if has bounds.
+ */
+int
+lirnd_light_get_bounds (const lirndLight* self,
+                        limatAabb*        result)
+{
+	double a;
+	double b;
+	double c;
+	double r;
+	double det;
+	double eps;
+
+	/* Choose epsilon. */
+	eps = LI_MAX (LI_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
+	eps /= 255.0;
+	if (eps < LIGHT_CONTRIBUTION_EPSILON)
+		eps = LIGHT_CONTRIBUTION_EPSILON;
+	eps *= 0.5;
+
+	/* Solve radius. */
+	/* (e0 * r^2) + (e1 * r) + (e2 - 1 / EPSILON) < 0 */
+	a = self->equation[0];
+	b = self->equation[1];
+	c = self->equation[2] - 1.0 / eps;
+	det = b * b - 4 * a * c;
+	if (det < 0.0)
+		return 0;
+	r = (-b + sqrt (det)) / (4 * a);
+
+	/* Create bounding box. */
+	result->min = limat_vector_subtract (self->transform.position, limat_vector_init (r, r, r));
+	result->max = limat_vector_add (self->transform.position, limat_vector_init (r, r, r));
+
+	return 1;
 }
 
 /**

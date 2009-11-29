@@ -49,7 +49,7 @@ lirnd_render_new (const char* dir)
 	self = lisys_calloc (1, sizeof (lirndRender));
 	if (self == NULL)
 		return NULL;
-	self->shader.enabled = 0;//(livid_features.shader_model >= 3);
+	self->shader.enabled = (livid_features.shader_model >= 3);
 
 	/* Allocate scene list. */
 	self->scenes = lialg_ptrdic_new ();

@@ -28,6 +28,7 @@
 #include <algorithm/lips-algorithm.h>
 #include <particle/lips-particle.h>
 #include <system/lips-system.h>
+#include "render-deferred.h"
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-object.h"
@@ -73,18 +74,15 @@ lirnd_scene_pick (lirndScene*     self,
                   lirndSelection* result);
 
 void
-lirnd_scene_render (lirndScene*   self,
-                    limatMatrix*  modelview,
-                    limatMatrix*  projection,
-                    limatFrustum* frustum);
+lirnd_scene_render (lirndScene*    self,
+                    lirndDeferred* framebuffer,
+                    limatMatrix*   modelview,
+                    limatMatrix*   projection,
+                    limatFrustum*  frustum);
 
 void
 lirnd_scene_update (lirndScene* self,
                     float       secs);
-
-void
-lirnd_scene_set_light_focus (lirndScene*        self,
-                             const limatVector* point);
 
 int
 lirnd_scene_set_sky (lirndScene* self,

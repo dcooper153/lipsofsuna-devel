@@ -37,6 +37,7 @@ struct _liwdgRender
 	liwdgGroup base;
 	limatMatrix modelview;
 	limatMatrix projection;
+	lirndDeferred* deferred;
 	lirndScene* scene;
 	void (*custom_render_func)(liwdgRender*, void*);
 	void* custom_render_data;

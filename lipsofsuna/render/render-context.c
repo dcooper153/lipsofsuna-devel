@@ -588,6 +588,28 @@ private_bind_uniform (lirndContext* self,
 			else
 				glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, bias.m);
 			break;
+		case LIRND_UNIFORM_LIGHTPOSITION0:
+		case LIRND_UNIFORM_LIGHTPOSITION1:
+		case LIRND_UNIFORM_LIGHTPOSITION2:
+		case LIRND_UNIFORM_LIGHTPOSITION3:
+		case LIRND_UNIFORM_LIGHTPOSITION4:
+		case LIRND_UNIFORM_LIGHTPOSITION5:
+		case LIRND_UNIFORM_LIGHTPOSITION6:
+		case LIRND_UNIFORM_LIGHTPOSITION7:
+		case LIRND_UNIFORM_LIGHTPOSITION8:
+		case LIRND_UNIFORM_LIGHTPOSITION9:
+			index = uniform->value - LIRND_UNIFORM_LIGHTPOSITION0;
+			if (index < self->lights.count)
+			{
+				light = self->lights.array[index];
+				glUniform3fARB (uniform->binding,
+					light->transform.position.x,
+					light->transform.position.y,
+					light->transform.position.z);
+			}
+			else
+				glUniform3fARB (uniform->binding, 0.0f, 0.0f, 0.0f);
+			break;
 		case LIRND_UNIFORM_MODELMATRIX:
 			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->matrix.m);
 			break;

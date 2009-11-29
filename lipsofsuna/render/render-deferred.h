@@ -18,41 +18,47 @@
 /**
  * \addtogroup lirnd Render
  * @{
- * \addtogroup lirndLighting Lighting
+ * \addtogroup lirndDeferred Deferred
  * @{
  */
 
-#ifndef __RENDER_LIGHTING_H__
-#define __RENDER_LIGHTING_H__
+#ifndef __RENDER_DEFERRED_H__
+#define __RENDER_DEFERRED_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <video/lips-video.h>
 #include "render.h"
-#include "render-light.h"
 #include "render-types.h"
 
-struct _lirndLighting
+struct _lirndDeferred
 {
-	lialgPtrdic* lights;
+	int width;
+	int height;
+	GLuint fbo;
+	GLuint depth_texture;
+	GLuint diffuse_texture;
+	GLuint specular_texture;
+	GLuint normal_texture;
 	lirndRender* render;
 };
 
-lirndLighting*
-lirnd_lighting_new (lirndRender* render);
+lirndDeferred*
+lirnd_deferred_new (lirndRender* render,
+                    int          width,
+                    int          height);
 
 void
-lirnd_lighting_free (lirndLighting* self);
+lirnd_deferred_free (lirndDeferred* self);
 
 int
-lirnd_lighting_insert_light (lirndLighting* self,
-                             lirndLight*    light);
+lirnd_deferred_resize (lirndDeferred* self,
+                       int            width,
+                       int            height);
 
 void
-lirnd_lighting_remove_light (lirndLighting* self,
-                             lirndLight*    light);
-
-void
-lirnd_lighting_update (lirndLighting* self);
+lirnd_deferred_read_pixel (lirndDeferred* self,
+                           int            x,
+                           int            y,
+                           int            texture,
+                           float*         result);
 
 #endif
 

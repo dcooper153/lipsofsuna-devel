@@ -101,7 +101,7 @@ lirnd_draw_debug (lirndContext* context,
                   lirndObject*  object,
                   void*         data)
 {
-#if defined LIMDL_DEBUG_ARMATURE || defined LIMDL_DEBUG_CONSTRAINT
+#if defined LIMDL_DEBUG_ARMATURE
 	int i;
 
 	/* Check if renderable. */
@@ -110,10 +110,8 @@ lirnd_draw_debug (lirndContext* context,
 
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_LIGHTING);
-	glPointSize (6.0f);
 
 	/* Render armature. */
-#ifdef LIMDL_DEBUG_ARMATURE
 	glPushMatrix ();
 	glMultMatrixf (object->orientation.matrix.m);
 	glBegin (GL_LINES);
@@ -121,58 +119,6 @@ lirnd_draw_debug (lirndContext* context,
 		private_draw_node (object->pose->nodes.array[i]);
 	glEnd ();
 	glPopMatrix ();
-#endif
-
-	/* Render constraints. */
-#ifdef LIMDL_DEBUG_CONSTRAINT
-	int j;
-	limatAabb aabb;
-	limdlNode* node;
-	limdlNode* effector;
-	limdlNode* target;
-	limdlConstraint* constraint;
-
-	for (i = 0 ; i < object->model->model->constraints.count ; i++)
-	{
-		/* Get IK constraint. */
-		constraint = object->model->model->constraints.array[i];
-		if (constraint->type != LIMDL_CONSTRAINT_INVERSE_KINEMATICS)
-			continue;
-
-		/* Get effector and target. */
-		effector = limdl_pose_find_node (object->pose, constraint->inverse_kinematics.node_name);
-		target = limdl_pose_find_node (object->pose, constraint->inverse_kinematics.target_name);
-		if (effector == NULL || target == NULL)
-			continue;
-
-		/* Draw target. */
-		glPushMatrix ();
-		glMultMatrixf (object->orientation.matrix.m);
-		glBegin (GL_POINTS);
-		glColor3f (1.0f, 0.0f, 0.0f);
-		glVertex3f (target->transform.global.position.x,
-		            target->transform.global.position.y,
-		            target->transform.global.position.z);
-		glEnd ();
-		glPopMatrix ();
-
-		/* Draw node chain. */
-		glPushMatrix ();
-		glMultMatrixf (object->orientation.matrix.m);
-		glBegin (GL_POINTS);
-		glColor3f (0.0f, 1.0f, 0.0f);
-		for (j = 0, node = effector ; j < constraint->inverse_kinematics.chain_length ; j++, node = node->parent)
-		{
-			glVertex3f (node->transform.global.position.x,
-						node->transform.global.position.y,
-						node->transform.global.position.z);
-			if (node->parent == NULL)
-				break;
-		}
-		glEnd ();
-		glPopMatrix ();
-	}
-#endif
 #endif
 }
 
@@ -184,7 +130,6 @@ lirnd_draw_exclude (lirndContext* context,
 	int i;
 	int flags;
 	limatMatrix matrix;
-	limatVector center;
 	lirndMaterial* material;
 	lirndModel* model;
 
@@ -196,10 +141,6 @@ lirnd_draw_exclude (lirndContext* context,
 	/* Exlude object. */
 	if ((lirndObject*) data == object)
 		return;
-
-	/* Lighting. */
-	lirnd_object_get_center (object, &center);
-	lirnd_scene_set_light_focus (context->scene, &center);
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
@@ -214,9 +155,6 @@ lirnd_draw_exclude (lirndContext* context,
 	{
 		material = model->buffers.array[i].material;
 		lirnd_context_set_flags (context, flags);
-		lirnd_context_set_lights (context,
-			context->scene->lighting->active_lights.array,
-			context->scene->lighting->active_lights.count);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_shader (context, material->shader);
@@ -252,7 +190,6 @@ lirnd_draw_hair (lirndContext* context,
 	limatVector ctr;
 	limatVector dir;
 	limatVector tmp;
-	limatVector center;
 	limatVector coord[4];
 	limdlHair* hair;
 	limdlHairs* hairs;
@@ -267,10 +204,6 @@ lirnd_draw_hair (lirndContext* context,
 	else
 		model = object->model;
 
-	/* Lighting. */
-	lirnd_object_get_center (object, &center);
-	lirnd_scene_set_light_focus (context->scene, &center);
-
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
 	flags |= LIRND_FLAG_LIGHTING;
@@ -280,9 +213,6 @@ lirnd_draw_hair (lirndContext* context,
 	matrix = object->orientation.matrix;
 	lirnd_context_set_flags (context, flags);
 	lirnd_context_set_matrix (context, &matrix);
-	lirnd_context_set_lights (context,
-		context->scene->lighting->active_lights.array,
-		context->scene->lighting->active_lights.count);
 
 	/* Calculate billboard axis. */
 	bbx = limat_vector_init (context->modelview.m[0], context->modelview.m[4], context->modelview.m[8]);
@@ -363,7 +293,6 @@ lirnd_draw_opaque (lirndContext* context,
 	int i;
 	int flags;
 	limatMatrix matrix;
-	limatVector center;
 	lirndMaterial* material;
 	lirndModel* model;
 
@@ -371,10 +300,6 @@ lirnd_draw_opaque (lirndContext* context,
 		model = object->instance;
 	else
 		model = object->model;
-
-	/* Lighting. */
-	lirnd_object_get_center (object, &center);
-	lirnd_scene_set_light_focus (context->scene, &center);
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
@@ -391,9 +316,6 @@ lirnd_draw_opaque (lirndContext* context,
 		if (!(material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			lirnd_context_set_flags (context, flags);
-			lirnd_context_set_lights (context,
-				context->scene->lighting->active_lights.array,
-				context->scene->lighting->active_lights.count);
 			lirnd_context_set_material (context, material);
 			lirnd_context_set_matrix (context, &matrix);
 			lirnd_context_set_shader (context, material->shader);
@@ -517,7 +439,6 @@ lirnd_draw_transparent (lirndContext* context,
 	int i;
 	int flags;
 	limatMatrix matrix;
-	limatVector center;
 	lirndMaterial* material;
 	lirndModel* model;
 
@@ -525,10 +446,6 @@ lirnd_draw_transparent (lirndContext* context,
 		model = object->instance;
 	else
 		model = object->model;
-
-	/* Lighting. */
-	lirnd_object_get_center (object, &center);
-	lirnd_scene_set_light_focus (context->scene, &center);
 
 	/* Rendering mode. */
 	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
@@ -545,9 +462,6 @@ lirnd_draw_transparent (lirndContext* context,
 		if (material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY)
 		{
 			lirnd_context_set_flags (context, flags);
-			lirnd_context_set_lights (context,
-				context->scene->lighting->active_lights.array,
-				context->scene->lighting->active_lights.count);
 			lirnd_context_set_matrix (context, &matrix);
 			lirnd_context_set_material (context, material);
 			lirnd_context_set_shader (context, material->shader);

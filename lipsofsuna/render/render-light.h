@@ -87,6 +87,10 @@ void
 lirnd_light_set_ambient (lirndLight*  self,
                          const float* value);
 
+int
+lirnd_light_get_bounds (const lirndLight* self,
+                        limatAabb*        result);
+
 void
 lirnd_light_get_direction (const lirndLight* self,
                            limatVector*      value);

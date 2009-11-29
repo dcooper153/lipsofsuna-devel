@@ -324,6 +324,7 @@ rnd_HEADERS = \
 	render/render.h \
 	render/render-buffer.h \
 	render/render-context.h \
+	render/render-deferred.h \
 	render/render-draw.h \
 	render/render-group.h \
 	render/render-image.h \
@@ -341,6 +342,7 @@ rndsrc = \
 	render/render.c \
 	render/render-buffer.c \
 	render/render-context.c \
+	render/render-deferred.c \
 	render/render-draw.c \
 	render/render-group.c \
 	render/render-light.c \

@@ -27,17 +27,6 @@
 #include "render-draw.h"
 #include "render-lighting.h"
 
-static int
-private_compare_lights (const void* a,
-                        const void* b);
-
-static void
-private_select_light (lirndLighting*     self,
-                      lirndLight*        light,
-                      const limatVector* center);
-
-/*****************************************************************************/
-
 /**
  * \brief Creates a new light manager.
  *
@@ -58,9 +47,6 @@ lirnd_lighting_new (lirndRender* render)
 	/* Allocate light arrays. */
 	self->lights = lialg_ptrdic_new ();
 	if (self->lights == NULL)
-		goto error;
-	self->active_lights.array = lisys_calloc (8, sizeof (lirndLight*));
-	if (self->active_lights.array == NULL)
 		goto error;
 
 	return self;
@@ -83,7 +69,6 @@ lirnd_lighting_free (lirndLighting* self)
 		assert (self->lights->size == 0);
 		lialg_ptrdic_free (self->lights);
 	}
-	lisys_free (self->active_lights.array);
 	lisys_free (self);
 }
 
@@ -133,87 +118,6 @@ lirnd_lighting_update (lirndLighting* self)
 	{
 		light = iter.value;
 		lirnd_light_update (light);
-	}
-}
-
-/**
- * \brief Sets the center of the scene and selects lights affecting it.
- *
- * \param self Light manager.
- * \param point Lighting focus point.
- */
-void
-lirnd_lighting_set_center (lirndLighting*     self,
-                           const limatVector* point)
-{
-	lialgPtrdicIter iter;
-	lirndLight* light;
-
-	self->active_lights.count = 0;
-	LI_FOREACH_PTRDIC (iter, self->lights)
-	{
-		light = iter.value;
-		private_select_light (self, light, point);
-	}
-	qsort (self->active_lights.array, self->active_lights.count, sizeof (lirndLight*), private_compare_lights);
-}
-
-/*****************************************************************************/
-
-static int
-private_compare_lights (const void* a,
-                        const void* b)
-{
-	const lirndLight* l0 = a;
-	const lirndLight* l1 = b;
-
-	return lirnd_light_compare (l0, l1);
-}
-
-static void
-private_select_light (lirndLighting*     self,
-                      lirndLight*        light,
-                      const limatVector* center)
-{
-	int i;
-	int best_index;
-	float best_rating;
-	float rating;
-	limatVector position;
-
-	position = light->transform.position;
-	rating = limat_vector_get_length (limat_vector_subtract (position, *center));
-	rating = light->equation[0] +
-		     light->equation[1] * rating +
-		     light->equation[2] * rating * rating;
-//	if (rating > LIRND_LIGHT_MAXIMUM_RATING)
-//		return;
-
-	/* Try to add a new light. */
-	if (self->active_lights.count < 8)
-	{
-		i = self->active_lights.count;
-		self->active_lights.array[i] = light;
-		self->active_lights.array[i]->rating = rating;
-		self->active_lights.count++;
-		return;
-	}
-
-	/* Try to replace an existing light. */
-	best_index = -1;
-	best_rating = rating;
-	for (i = 0 ; i < 8 ; i++)
-	{
-		if (self->active_lights.array[i]->rating < best_rating)
-		{
-			best_rating = self->active_lights.array[i]->rating;
-			best_index = i;
-		}
-	}
-	if (best_index != -1)
-	{
-		self->active_lights.array[best_index] = light;
-		self->active_lights.array[best_index]->rating = rating;
 	}
 }
 

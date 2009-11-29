@@ -37,6 +37,7 @@ enum _lirndSelect
 
 typedef struct _lirndBuffer lirndBuffer;
 typedef struct _lirndContext lirndContext;
+typedef struct _lirndDeferred lirndDeferred;
 typedef enum _lirndFlags lirndFlags;
 typedef struct _lirndFormat lirndFormat;
 typedef struct _lirndGroup lirndGroup;

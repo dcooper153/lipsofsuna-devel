@@ -156,9 +156,17 @@ private_exec_program (const char* name,
 	char* val;
 	env = getenv ("PATH");
 	if (env != NULL)
-		val = lisys_path_format ("PATH=", env, ";", tmp, LISYS_PATH_SEPARATOR, "lib", NULL);
+	{
+		val = lisys_path_format ("PATH=", env, ";",
+			tmp, LISYS_PATH_SEPARATOR, "lib", ";",
+			tmp, LISYS_PATH_SEPARATOR, "bin", NULL);
+	}
 	else
-		val = lisys_path_format ("PATH=", tmp, LISYS_PATH_SEPARATOR, "lib", NULL);
+	{
+		val = lisys_path_format ("PATH=",
+			tmp, LISYS_PATH_SEPARATOR, "lib", ";",
+			tmp, LISYS_PATH_SEPARATOR, "bin", NULL);
+	}
 	if (val != NULL)
 	{
 		if (putenv (val))

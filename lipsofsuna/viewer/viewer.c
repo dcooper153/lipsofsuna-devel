@@ -208,7 +208,7 @@ livie_viewer_main (livieViewer* self)
 		limat_camera_get_frustum (self->camera, &frustum);
 		limat_camera_get_modelview (self->camera, &modelview);
 		limat_camera_get_projection (self->camera, &projection);
-		lirnd_scene_render (self->scene, &modelview, &projection, &frustum);
+		lirnd_scene_render (self->scene, NULL, &modelview, &projection, &frustum);
 		self->video.SDL_GL_SwapBuffers ();
 		self->video.SDL_Delay (100);
 	}

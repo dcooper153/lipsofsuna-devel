@@ -63,6 +63,9 @@ liwdg_render_new (liwdgManager* manager,
 	if (self == NULL)
 		return NULL;
 	LIWDG_RENDER (self)->scene = scene;
+	LIWDG_RENDER (self)->deferred = lirnd_deferred_new (scene->render, 32, 32);
+	if (LIWDG_RENDER (self)->deferred == NULL)
+		lisys_error_report ();
 
 	return self;
 }
@@ -162,6 +165,14 @@ private_event (liwdgRender* self,
 
 	switch (event->type)
 	{
+		case LIWDG_EVENT_TYPE_ALLOCATION:
+			if (self->deferred != NULL)
+			{
+				lirnd_deferred_resize (self->deferred,
+					LIWDG_WIDGET (self)->allocation.width,
+					LIWDG_WIDGET (self)->allocation.height);
+			}
+			break;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			if (!lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self))
 				return 0;
@@ -187,7 +198,7 @@ private_event (liwdgRender* self,
 			if (self->scene != NULL)
 			{
 				limat_frustum_init (&frustum, &self->modelview, &self->projection);
-				lirnd_scene_render (self->scene, &self->modelview, &self->projection, &frustum);
+				lirnd_scene_render (self->scene, self->deferred, &self->modelview, &self->projection, &frustum);
 			}
 			if (self->custom_render_func != NULL)
 			{
