@@ -419,11 +419,12 @@ class LipsAnimations:
 					# Add bones in the chain to animations.
 					for animation in self.animations:
 						bone = armature[1].bones[name]
-						for depth in xrange(0, chainlen):
-							animation.AddChannel(bone.name)
-							if not bone.parent:
-								break
-							bone = bone.parent
+						if target in animation.channels:
+							for depth in xrange(0, chainlen):
+								animation.AddChannel(bone.name)
+								if not bone.parent:
+									break
+								bone = bone.parent
 
 		# Write header.
 		writer.WriteInt(len(self.animations))
