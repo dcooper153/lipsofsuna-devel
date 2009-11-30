@@ -273,7 +273,6 @@ lirnd_scene_render (lirndScene*    self,
 		glPushAttrib (GL_VIEWPORT_BIT);
 		glViewport (0, 0, framebuffer->width, framebuffer->height);
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->fbo);
-		glClearColor (1.0f, 1.0f, 0.0f, 1.0f);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
