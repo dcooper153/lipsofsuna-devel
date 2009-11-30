@@ -164,6 +164,7 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
+	liscr_script_create_class (server->script, "Material", liextMaterialScript, self);
 	liscr_script_create_class (server->script, "Tile", liextTileScript, self);
 	liscr_script_create_class (server->script, "Voxel", liextVoxelScript, self);
 

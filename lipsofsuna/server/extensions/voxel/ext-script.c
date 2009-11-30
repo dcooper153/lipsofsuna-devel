@@ -38,6 +38,68 @@
  * -- @class table
  */
 
+/* @luadoc
+ * ---
+ * -- Material friction.
+ * --
+ * -- @name Material.friction
+ * -- @class table
+ */
+static int
+Material_getter_friction (lua_State* lua)
+{
+	liscrData* self;
+	livoxMaterial* material;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MATERIAL);
+	material = self->data;
+
+	lua_pushnumber (lua, material->friction);
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Material model.
+ * --
+ * -- @name Material.model
+ * -- @class table
+ */
+static int
+Material_getter_model (lua_State* lua)
+{
+	liscrData* self;
+	livoxMaterial* material;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MATERIAL);
+	material = self->data;
+
+	lua_pushstring (lua, material->model);
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Material name.
+ * --
+ * -- @name Material.name
+ * -- @class table
+ */
+static int
+Material_getter_name (lua_State* lua)
+{
+	liscrData* self;
+	livoxMaterial* material;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MATERIAL);
+	material = self->data;
+
+	lua_pushstring (lua, material->name);
+	return 1;
+}
+
+/*****************************************************************************/
+
 static int
 Tile___gc (lua_State* lua)
 {
@@ -199,6 +261,8 @@ Tile_setter_terrain (lua_State* lua)
 	return 0;
 }
 
+/*****************************************************************************/
+
 /* @luadoc
  * ---
  * -- Erases a voxel near the given point.
@@ -219,6 +283,39 @@ Voxel_erase_voxel (lua_State* lua)
 
 	lua_pushboolean (lua, livox_manager_erase_voxel (module->voxels, center->data));
 
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Finds information on a material.
+ * --
+ * -- @param self Voxel class.
+ * -- @param number Material number.
+ * -- @return Material or nil.
+ */
+static int
+Voxel_find_material (lua_State* lua)
+{
+	int id;
+	liextModule* module;
+	liscrData* data;
+	liscrScript* script;
+	livoxMaterial* material;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
+	id = luaL_checknumber (lua, 2);
+
+	material = livox_manager_find_material (module->voxels, id);
+	if (material == NULL)
+		return 0;
+	script = liscr_script (lua);
+	data = liscr_data_new (script, material, LIEXT_SCRIPT_MATERIAL);
+	if (data == NULL)
+		return 0;
+
+	liscr_pushdata (lua, data);
+	liscr_data_unref (data, NULL);
 	return 1;
 }
 
@@ -390,6 +487,16 @@ Voxel_save (lua_State* lua)
 /*****************************************************************************/
 
 void
+liextMaterialScript (liscrClass* self,
+                     void*       data)
+{
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
+	liscr_class_insert_getter (self, "friction", Material_getter_friction);
+	liscr_class_insert_getter (self, "name", Material_getter_name);
+	liscr_class_insert_getter (self, "model", Material_getter_model);
+}
+
+void
 liextTileScript (liscrClass* self,
                  void*       data)
 {
@@ -413,6 +520,7 @@ liextVoxelScript (liscrClass* self,
 	liscr_class_insert_enum (self, "FIND_EMPTY", LIVOX_FIND_EMPTY);
 	liscr_class_insert_enum (self, "FIND_FULL", LIVOX_FIND_FULL);
 	liscr_class_insert_func (self, "erase_voxel", Voxel_erase_voxel);
+	liscr_class_insert_func (self, "find_material", Voxel_find_material);
 	liscr_class_insert_func (self, "find_voxel", Voxel_find_voxel);
 	liscr_class_insert_func (self, "insert_voxel", Voxel_insert_voxel);
 	liscr_class_insert_func (self, "replace_voxel", Voxel_replace_voxel);
