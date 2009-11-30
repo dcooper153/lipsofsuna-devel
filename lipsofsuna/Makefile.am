@@ -524,6 +524,7 @@ wdg_HEADERS = \
 	widget/widget-tabs.h \
 	widget/widget-tree.h \
 	widget/widget-types.h \
+	widget/widget-view.h \
 	widget/widget-window.h
 wdgsrc = \
 	widget/widget.c \
@@ -546,6 +547,7 @@ wdgsrc = \
 	widget/widget-style.c \
 	widget/widget-tabs.c \
 	widget/widget-tree.c \
+	widget/widget-view.c \
 	widget/widget-window.c
 
 ##############################################################################

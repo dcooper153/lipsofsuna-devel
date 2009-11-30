@@ -75,6 +75,7 @@ struct _liextBrushes
 		liwdgWidget* spin_sizey;
 		liwdgWidget* spin_sizez;
 		liwdgWidget* tree;
+		liwdgWidget* view;
 	} widgets;
 };
 

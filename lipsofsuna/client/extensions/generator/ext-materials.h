@@ -60,6 +60,7 @@ struct _liextMaterials
 		liwdgWidget* preview;
 		liwdgWidget* scroll_friction;
 		liwdgWidget* tree;
+		liwdgWidget* view;
 	} widgets;
 };
 

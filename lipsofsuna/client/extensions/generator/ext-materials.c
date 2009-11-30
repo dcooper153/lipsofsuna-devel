@@ -181,7 +181,8 @@ private_init (liextMaterials* self,
 		&self->widgets.label_model, liwdg_label_new (manager),
 		&self->widgets.label_friction, liwdg_label_new (manager),
 		&self->widgets.scroll_friction, liwdg_scroll_new (manager),
-		&self->widgets.tree, liwdg_tree_new (manager), NULL))
+		&self->widgets.tree, liwdg_tree_new (manager),
+		&self->widgets.view, liwdg_view_new (manager), NULL))
 		return 0;
 
 	/* Configure widgets. */
@@ -198,11 +199,13 @@ private_init (liextMaterials* self,
 	liwdg_widget_insert_callback (self->widgets.scroll_friction, LIWDG_CALLBACK_PRESSED, 0, private_changed_friction, self, NULL);
 
 	/* Tree. */
+	liwdg_view_set_vscroll (LIWDG_VIEW (self->widgets.view), 1);
+	liwdg_view_set_child (LIWDG_VIEW (self->widgets.view), self->widgets.tree);
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_remove);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.tree);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.view);
 
 	/* Preview. */
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_attr), 1, 1);

@@ -214,7 +214,8 @@ am__objects_28 = widget/widget.lo widget/widget-busy.lo \
 	widget/widget-progress.lo widget/widget-render.lo \
 	widget/widget-scroll.lo widget/widget-spin.lo \
 	widget/widget-style.lo widget/widget-tabs.lo \
-	widget/widget-tree.lo widget/widget-window.lo
+	widget/widget-tree.lo widget/widget-view.lo \
+	widget/widget-window.lo
 am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
@@ -1168,6 +1169,7 @@ wdg_HEADERS = \
 	widget/widget-tabs.h \
 	widget/widget-tree.h \
 	widget/widget-types.h \
+	widget/widget-view.h \
 	widget/widget-window.h
 
 wdgsrc = \
@@ -1191,6 +1193,7 @@ wdgsrc = \
 	widget/widget-style.c \
 	widget/widget-tabs.c \
 	widget/widget-tree.c \
+	widget/widget-view.c \
 	widget/widget-window.c
 
 
@@ -1826,6 +1829,8 @@ widget/widget-tabs.lo: widget/$(am__dirstamp) \
 	widget/$(DEPDIR)/$(am__dirstamp)
 widget/widget-tree.lo: widget/$(am__dirstamp) \
 	widget/$(DEPDIR)/$(am__dirstamp)
+widget/widget-view.lo: widget/$(am__dirstamp) \
+	widget/$(DEPDIR)/$(am__dirstamp)
 widget/widget-window.lo: widget/$(am__dirstamp) \
 	widget/$(DEPDIR)/$(am__dirstamp)
 liblipsofsunaclient.la: $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_DEPENDENCIES) 
@@ -2340,6 +2345,8 @@ mostlyclean-compile:
 	-rm -f widget/widget-tabs.lo
 	-rm -f widget/widget-tree.$(OBJEXT)
 	-rm -f widget/widget-tree.lo
+	-rm -f widget/widget-view.$(OBJEXT)
+	-rm -f widget/widget-view.lo
 	-rm -f widget/widget-window.$(OBJEXT)
 	-rm -f widget/widget-window.lo
 	-rm -f widget/widget.$(OBJEXT)
@@ -2529,6 +2536,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-style.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-tabs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-view.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-window.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget.Plo@am__quote@
 

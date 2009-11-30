@@ -15,32 +15,54 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_WIDGET_H__
-#define __LIPS_WIDGET_H__
+/**
+ * \addtogroup liwdg Widget
+ * @{
+ * \addtogroup liwdgView View
+ * @{
+ */
+
+#ifndef __WIDGET_VIEW_H__
+#define __WIDGET_VIEW_H__
 
 #include "widget.h"
-#include "widget-button.h"
-#include "widget-busy.h"
-#include "widget-check.h"
-#include "widget-class.h"
 #include "widget-container.h"
-#include "widget-entry.h"
-#include "widget-event.h"
-#include "widget-group.h"
-#include "widget-image.h"
-#include "widget-label.h"
-#include "widget-manager.h"
-#include "widget-menu.h"
-#include "widget-menugroup.h"
-#include "widget-progress.h"
-#include "widget-render.h"
-#include "widget-scroll.h"
-#include "widget-spin.h"
-#include "widget-style.h"
-#include "widget-tabs.h"
-#include "widget-tree.h"
 #include "widget-types.h"
-#include "widget-view.h"
-#include "widget-window.h"
+
+#define LIWDG_VIEW(o) ((liwdgView*)(o))
+
+typedef struct _liwdgView liwdgView;
+struct _liwdgView
+{
+	liwdgContainer base;
+	liwdgWidget* child;
+	int hscroll;
+	int hscrollpos;
+	int vscroll;
+	int vscrollpos;
+};
+
+extern const liwdgClass liwdgViewType;
+
+liwdgWidget*
+liwdg_view_new (liwdgManager* manager);
+
+liwdgWidget*
+liwdg_view_get_child (liwdgView* self);
+
+void
+liwdg_view_set_child (liwdgView*   self,
+                      liwdgWidget* widget);
+
+void
+liwdg_view_set_hscroll (liwdgView* self,
+                        int        value);
+
+void
+liwdg_view_set_vscroll (liwdgView* self,
+                        int        value);
 
 #endif
+
+/** @} */
+/** @} */

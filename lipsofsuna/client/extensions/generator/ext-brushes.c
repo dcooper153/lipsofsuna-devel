@@ -274,7 +274,8 @@ private_init (liextBrushes* self,
 		&self->widgets.spin_sizex, liwdg_spin_new (manager),
 		&self->widgets.spin_sizey, liwdg_spin_new (manager),
 		&self->widgets.spin_sizez, liwdg_spin_new (manager),
-		&self->widgets.tree, liwdg_tree_new (manager), NULL))
+		&self->widgets.tree, liwdg_tree_new (manager),
+		&self->widgets.view, liwdg_view_new (manager), NULL))
 		return 0;
 
 	/* Configure widgets. */
@@ -310,6 +311,8 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 6, 0, self->widgets.spin_axis);
 
 	/* Tree. */
+	liwdg_view_set_vscroll (LIWDG_VIEW (self->widgets.view), 1);
+	liwdg_view_set_child (LIWDG_VIEW (self->widgets.view), self->widgets.tree);
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_copy), "Copy");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
@@ -318,7 +321,7 @@ private_init (liextBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 3, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 3, self->widgets.tree);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 3, self->widgets.view);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_remove);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_copy);

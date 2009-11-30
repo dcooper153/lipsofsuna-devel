@@ -58,7 +58,7 @@ private_foreach_child (liwdgTabs* self,
                        void     (*call)(),
                        void*      data);
 
-void
+static void
 private_rebuild (liwdgTabs* self);
 
 /*****************************************************************************/
@@ -325,7 +325,7 @@ private_foreach_child (liwdgTabs* self,
 	}
 }
 
-void
+static void
 private_rebuild (liwdgTabs* self)
 {
 	int i;
