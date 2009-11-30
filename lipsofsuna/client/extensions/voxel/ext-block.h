@@ -34,6 +34,7 @@
 typedef struct _liextBlock liextBlock;
 struct _liextBlock
 {
+	licliModule* module;
 	lirndGroup* group;
 };
 

@@ -62,6 +62,16 @@ lirnd_group_free (lirndGroup* self);
 void
 lirnd_group_clear (lirndGroup* self);
 
+int
+lirnd_group_insert_model (lirndGroup*     self,
+                          lirndModel*     model,
+                          limatTransform* transform);
+
+void
+lirnd_group_reload_model (lirndGroup* self,
+                          lirndModel* model_old,
+                          lirndModel* model_new);
+
 void
 lirnd_group_update (lirndGroup* self,
                     float       secs);
@@ -69,11 +79,6 @@ lirnd_group_update (lirndGroup* self,
 void
 lirnd_group_get_bounds (const lirndGroup* self,
                         limatAabb*        result);
-
-int
-lirnd_group_insert_model (lirndGroup*     self,
-                          lirndModel*     model,
-                          limatTransform* transform);
 
 int
 lirnd_group_get_realized (const lirndGroup* self);

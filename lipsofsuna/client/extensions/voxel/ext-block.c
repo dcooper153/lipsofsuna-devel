@@ -42,13 +42,7 @@ liext_block_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextBlock));
 	if (self == NULL)
 		return NULL;
-	self->group = lirnd_group_new (module->scene);
-	if (self->group == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-	lirnd_group_set_realized (self->group, 1);
+	self->module = module;
 
 	return self;
 }
@@ -72,6 +66,7 @@ liext_block_build (liextBlock*     self,
 	int x;
 	int y;
 	int z;
+	liengModel* emdl;
 	limatTransform transform;
 	limatVector vector;
 	limatVector offset;
@@ -87,15 +82,26 @@ liext_block_build (liextBlock*     self,
 	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
 	offset = limat_vector_add (offset, vector);
 
-	/* Free old objects. */
-	lirnd_group_clear (self->group);
-
 	/* Prepare occlusion test. */
 	livox_manager_copy_voxels (module->voxels,
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[0] + addr->block[0]) - 1,
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[1] + addr->block[1]) - 1,
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[2] + addr->block[2]) - 1,
 		LINE, LINE, LINE, voxels);
+
+	/* Free old objects. */
+	if (self->group == NULL)
+	{
+		self->group = lirnd_group_new (self->module->scene);
+		if (self->group == NULL)
+		{
+			lisys_free (self);
+			return 0;
+		}
+		lirnd_group_set_realized (self->group, 1);
+	}
+	else
+		lirnd_group_clear (self->group);
 
 	/* Create new objects. */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
@@ -118,10 +124,17 @@ liext_block_build (liextBlock*     self,
 		material = livox_manager_find_material (module->voxels, voxel->type);
 		if (material == NULL)
 			continue;
-		lieng_engine_find_model_by_name (module->module->engine, material->model);
 		model = lirnd_render_find_model (module->module->render, material->model);
 		if (model == NULL)
-			continue;
+		{
+			emdl = lieng_engine_find_model_by_name (module->module->engine, material->model);
+			if (emdl == NULL)
+				continue;
+			lirnd_render_load_model (module->module->render, emdl->name, emdl->model);
+			model = lirnd_render_find_model (module->module->render, material->model);
+			if (model == NULL)
+				continue;
+		}
 
 		/* Add to render list. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
@@ -129,6 +142,13 @@ liext_block_build (liextBlock*     self,
 		transform.position = limat_vector_add (vector, offset);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
 		lirnd_group_insert_model (self->group, model, &transform);
+	}
+
+	/* Clear if empty. */
+	if (self->group->objects == NULL)
+	{
+		lirnd_group_free (self->group);
+		self->group = NULL;
 	}
 
 	return 1;

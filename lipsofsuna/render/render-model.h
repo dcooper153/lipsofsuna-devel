@@ -34,6 +34,7 @@
 struct _lirndModel
 {
 	int id;
+	int refs;
 	limatAabb aabb;
 	limdlModel* model;
 	lirndRender* render;

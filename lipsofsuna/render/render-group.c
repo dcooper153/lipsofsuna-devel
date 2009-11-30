@@ -28,6 +28,11 @@
 #include "render-scene.h"
 
 static void
+private_build_bounds (lirndGroup*       self,
+                      lirndGroupObject* object,
+                      int               first);
+
+static void
 private_build_lights (lirndGroup*       self,
                       lirndGroupObject* object);
 
@@ -120,6 +125,90 @@ lirnd_group_clear (lirndGroup* self)
 }
 
 /**
+ * \brief Inserts a model to the group.
+ *
+ * \param self Group.
+ * \param model Model.
+ * \param transform Model transformation.
+ * \return Nonzero on success.
+ */
+int
+lirnd_group_insert_model (lirndGroup*     self,
+                          lirndModel*     model,
+                          limatTransform* transform)
+{
+	lirndGroupObject* object;
+
+	/* Allocate object. */
+	object = lisys_calloc (1, sizeof (lirndGroupObject));
+	if (object == NULL)
+		return 0;
+	object->model = model;
+	object->transform = *transform;
+
+	/* Calculate bounds. */
+	private_build_bounds (self, object, self->objects == NULL);
+
+	/* Add to list. */
+	object->next = self->objects;
+	self->objects = object;
+	private_build_lights (self, object);
+
+	return 1;
+}
+
+/**
+ * \brief Called when a model is being reloaded.
+ *
+ * Replaces all instances of the old model with the new model and rebuilds
+ * the light list of the group if any of the state of the group was changed.
+ *
+ * \param self Group.
+ * \param model_old Model to be deleted.
+ * \param model_new Model that has been loaded as a replacement.
+ */
+void
+lirnd_group_reload_model (lirndGroup* self,
+                          lirndModel* model_old,
+                          lirndModel* model_new)
+{
+	int i;
+	int found = 0;
+	lirndGroupObject* object;
+
+	/* Replace objects. */
+	for (object = self->objects ; object != NULL ; object = object->next)
+	{
+		if (object->model == model_old)
+		{
+			object->model = model_new;
+			found = 1;
+		}
+	}
+	if (!found)
+		return;
+
+	/* Recalculate bounds. */
+	for (object = self->objects ; object != NULL ; object = object->next)
+		private_build_bounds (self, object, object == self->objects);
+
+	/* Remove old lights. */
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		if (self->realized)
+			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+		lirnd_light_free (self->lights.array[i]);
+	}
+	lisys_free (self->lights.array);
+	self->lights.array = NULL;
+	self->lights.count = 0;
+
+	/* Create new lights. */
+	for (object = self->objects ; object != NULL ; object = object->next)
+		private_build_lights (self, object);
+}
+
+/**
  * \brief Advances the timer of the group.
  *
  * \param self Group.
@@ -143,48 +232,6 @@ lirnd_group_get_bounds (const lirndGroup* self,
                         limatAabb*        result)
 {
 	*result = self->aabb;
-}
-
-/**
- * \brief Inserts a model to the group.
- *
- * \param self Group.
- * \param model Model.
- * \param transform Model transformation.
- * \return Nonzero on success.
- */
-int
-lirnd_group_insert_model (lirndGroup*     self,
-                          lirndModel*     model,
-                          limatTransform* transform)
-{
-	limatAabb aabb;
-	limatMatrix matrix;
-	lirndGroupObject* object;
-
-	/* Allocate object. */
-	object = lisys_calloc (1, sizeof (lirndGroupObject));
-	if (object == NULL)
-		return 0;
-
-	/* Calculate bounds. */
-	matrix = limat_convert_transform_to_matrix (*transform);
-	lirnd_model_get_bounds (model, &aabb);
-	aabb = limat_aabb_transform (aabb, &matrix);
-	if (self->objects != NULL)
-		self->aabb = limat_aabb_union (self->aabb, aabb);
-	else
-		self->aabb = aabb;
-
-	/* Add to list. */
-	object->model = model;
-	object->transform = *transform;
-	object->aabb = aabb;
-	object->next = self->objects;
-	self->objects = object;
-	private_build_lights (self, object);
-
-	return 1;
 }
 
 /**
@@ -233,6 +280,24 @@ lirnd_group_set_realized (lirndGroup* self,
 }
 
 /*****************************************************************************/
+
+static void
+private_build_bounds (lirndGroup*       self,
+                      lirndGroupObject* object,
+                      int               first)
+{
+	limatAabb aabb;
+	limatMatrix matrix;
+
+	matrix = limat_convert_transform_to_matrix (object->transform);
+	lirnd_model_get_bounds (object->model, &aabb);
+	aabb = limat_aabb_transform (aabb, &matrix);
+	object->aabb = aabb;
+	if (first)
+		self->aabb = aabb;
+	else
+		self->aabb = limat_aabb_union (self->aabb, aabb);
+}
 
 static void
 private_build_lights (lirndGroup*       self,

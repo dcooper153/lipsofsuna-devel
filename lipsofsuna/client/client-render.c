@@ -37,24 +37,6 @@ private_engine_free (licliModule* self,
 }
 
 static int
-private_model_new (licliModule* self,
-                   liengModel*  model)
-{
-	lirnd_render_load_model (self->render, model->name, model->model);
-
-	return 1;
-}
-
-static int
-private_model_free (licliModule* self,
-                    liengModel*  model)
-{
-	lirnd_resources_remove_model (self->render->resources, model->name);
-
-	return 1;
-}
-
-static int
 private_object_new (licliModule* self,
                     liengObject* object)
 {
@@ -90,6 +72,11 @@ private_object_model (licliModule* self,
 		if (model != NULL)
 		{
 			model_ = lirnd_render_find_model (self->render, model->name);
+			if (model_ == NULL)
+			{
+				lirnd_render_load_model (self->render, model->name, model->model);
+				model_ = lirnd_render_find_model (self->render, model->name);
+			}
 			if (model_ != NULL)
 			{
 				lirnd_object_set_pose (object_, object->pose);
@@ -148,8 +135,6 @@ int
 licli_render_init (licliModule* self)
 {
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_FREE, 1, private_engine_free, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_MODEL_NEW, 1, private_model_new, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_MODEL_FREE, 1, private_model_free, self, NULL);
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, 1, private_object_new, self, NULL);
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, 1, private_object_free, self, NULL);
 	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, 1, private_object_model, self, NULL);

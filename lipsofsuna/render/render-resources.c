@@ -94,7 +94,6 @@ lirnd_resources_free (lirndResources* self)
 	/* Free models. */
 	if (self->models != NULL)
 	{
-		assert (self->models->size == 0);
 		LI_FOREACH_STRDIC (iter, self->models)
 		{
 			model = iter.value;

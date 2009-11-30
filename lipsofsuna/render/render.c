@@ -252,10 +252,9 @@ lirnd_render_load_model (lirndRender* self,
                          limdlModel*  model)
 {
 	lirndGroup* group;
-	lirndGroupObject* grpobj;
-	lirndObject* object;
 	lirndModel* model0;
 	lirndModel* model1;
+	lirndObject* object;
 	lirndScene* scene;
 	lialgPtrdicIter iter0;
 	lialgU32dicIter iter1;
@@ -301,11 +300,7 @@ lirnd_render_load_model (lirndRender* self,
 		LI_FOREACH_PTRDIC (iter2, scene->groups)
 		{
 			group = iter2.value;
-			for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
-			{
-				if (grpobj->model == model0)
-					grpobj->model = model1;
-			}
+			lirnd_group_reload_model (group, model0, model1);
 		}
 	}
 
