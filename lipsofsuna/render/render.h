@@ -127,6 +127,13 @@ void
 lirnd_render_set_shaders_enabled (lirndRender* self,
                                   int          value);
 
+#ifndef NDEBUG
+void
+lirnd_check_errors ();
+#else
+#define lirnd_check_errors()
+#endif
+
 #endif
 
 /** @} */

@@ -373,7 +373,7 @@ lialg_camera_set_driver (lialgCamera*      self,
  */
 void
 lialg_camera_set_far (lialgCamera* self,
-                      int          value)
+                      float        value)
 {
 	self->view.far = value;
 	private_update_projection (self);
@@ -415,7 +415,7 @@ lialg_camera_get_modelview (const lialgCamera* self,
  */
 void
 lialg_camera_set_near (lialgCamera* self,
-                       int          value)
+                       float        value)
 {
 	self->view.near = value;
 	private_update_projection (self);

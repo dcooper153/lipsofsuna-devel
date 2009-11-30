@@ -119,7 +119,7 @@ lialg_camera_set_driver (lialgCamera*      self,
 
 void
 lialg_camera_set_far (lialgCamera* self,
-                      int          value);
+                      float        value);
 
 void
 lialg_camera_get_frustum (const lialgCamera* self,
@@ -131,7 +131,7 @@ lialg_camera_get_modelview (const lialgCamera* self,
 
 void
 lialg_camera_set_near (lialgCamera* self,
-                       int          value);
+                       float        value);
 
 void
 lialg_camera_get_projection (const lialgCamera* self,

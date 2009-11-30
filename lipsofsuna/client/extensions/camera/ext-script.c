@@ -179,11 +179,11 @@ Camera_zoom (lua_State* lua)
 static int
 Camera_setter_far (lua_State* lua)
 {
-	int value;
+	float value;
 	liextModule* module;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checkint (lua, 3);
+	value = luaL_checknumber (lua, 3);
 
 	lialg_camera_set_far (module->module->camera, value);
 	return 0;
@@ -227,11 +227,11 @@ Camera_setter_mode (lua_State* lua)
 static int
 Camera_setter_near (lua_State* lua)
 {
-	int value;
+	float value;
 	liextModule* module;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checkint (lua, 3);
+	value = luaL_checknumber (lua, 3);
 
 	lialg_camera_set_near (module->module->camera, value);
 	return 0;

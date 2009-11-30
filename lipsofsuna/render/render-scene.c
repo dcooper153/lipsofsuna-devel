@@ -260,6 +260,7 @@ lirnd_scene_render (lirndScene*    self,
 	assert (projection != NULL);
 	assert (frustum != NULL);
 
+	lirnd_check_errors ();
 	lirnd_context_init (&context, self);
 	lirnd_context_set_modelview (&context, modelview);
 	lirnd_context_set_projection (&context, projection);
@@ -303,6 +304,7 @@ lirnd_scene_render (lirndScene*    self,
 	private_render (self, &context, lirnd_draw_opaque, NULL);
 	private_render (self, &context, lirnd_draw_hair, NULL);
 	private_render (self, &context, lirnd_draw_transparent, NULL);
+	lirnd_check_errors ();
 #ifdef LIRND_ENABLE_PROFILING
 	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",
 		self->render->profiling.objects, self->render->profiling.materials,
@@ -316,6 +318,7 @@ lirnd_scene_render (lirndScene*    self,
 	glDepthMask (GL_FALSE);
 	private_particle_render (self);
 	private_render (self, &context, lirnd_draw_debug, NULL);
+	lirnd_check_errors ();
 	glDepthMask (GL_TRUE);
 
 	/* Deferred lighting. */
@@ -337,6 +340,7 @@ lirnd_scene_render (lirndScene*    self,
 		glDisable (GL_TEXTURE_2D);
 	}
 	glMatrixMode (GL_MODELVIEW);
+	lirnd_check_errors ();
 }
 
 /**

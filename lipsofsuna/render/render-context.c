@@ -26,9 +26,6 @@
 #include "render-context.h"
 
 static void
-private_bind_lights_fixed (lirndContext* self);
-
-static void
 private_bind_lights_shader (lirndContext* self);
 
 static void
@@ -109,18 +106,16 @@ lirnd_context_bind (lirndContext* self)
 	glLoadMatrixf (self->modelview.m);
 
 	/* Bind lights. */
-	if (self->fixed || self->shader == NULL)
-	{
-		private_bind_lights_fixed (self);
-		glEnable (GL_LIGHTING);
-	}
-	else
+	if (!self->fixed && self->shader != NULL)
 	{
 		private_bind_lights_shader (self);
 		for (i = 0 ; i < self->shader->uniforms.count ; i++)
 			private_bind_uniform (self, self->shader->uniforms.array + i);
 	}
+	else
+		glDisable (GL_LIGHTING);
 	glActiveTextureARB (GL_TEXTURE0);
+	lirnd_check_errors ();
 }
 
 /**
@@ -360,17 +355,6 @@ lirnd_context_set_textures (lirndContext* self,
 /*****************************************************************************/
 
 static void
-private_bind_lights_fixed (lirndContext* self)
-{
-	int i;
-
-	for (i = 0 ; i < self->lights.count && i < 8 ; i++)
-		private_enable_light (self, i, self->lights.array[i]);
-	for ( ; i < 8 ; i++)
-		glDisable (GL_LIGHT0 + i);
-}
-
-static void
 private_bind_lights_shader (lirndContext* self)
 {
 	int i;
@@ -529,7 +513,7 @@ private_bind_uniform (lirndContext* self,
 				texture = self->textures.array + index;
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 				glBindTexture (GL_TEXTURE_2D, texture->texture);
-				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->params.minfilter);
+				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->params.magfilter);
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->params.minfilter);
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->params.wraps);
 				glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->params.wrapt);
