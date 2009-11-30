@@ -187,7 +187,7 @@ def MeshVisible(object, mesh):
 			return 1
 	return 0
 
-def NodeChild(scene, object, bone, child):
+def NodeChild(file, object, bone, child):
 	if object != child.parent:
 		return 0
 	if child.parentbonename:
@@ -195,29 +195,24 @@ def NodeChild(scene, object, bone, child):
 			return 0
 	elif bone:
 		return 0
-	if child.type == "Armature":
-		return 1
-	if child.type == "Empty":
-		return 1
-	if child.type == "Lamp" and child.name.find("::on") != -1:
-		#if child.getData().type == Blender.Lamp.Types["Spot"]:
-		return 1
-	return 0
+	if child and file.file != ObjectFile(child):
+		return 0
+	return 1
 
-def NodeChildren(scene, object, bone, parent):
+def NodeChildren(file, object, bone, parent):
 	nodes = []
 	if object and object.type == "Armature":
 		for b in object.getData().bones.values():
 			if b.parent == bone:
-				nodes.append(LipsNode(LipsNodeType.BONE, scene, object, b, parent))
-	for o in scene.objects:
-		if NodeChild(scene, object, bone, o):
+				nodes.append(LipsNode(LipsNodeType.BONE, file, object, b, parent))
+	for o in file.scene.objects:
+		if NodeChild(file, object, bone, o):
 			if o.type == "Armature":
-				nodes.append(LipsNode(LipsNodeType.EMPTY, scene, o, None, parent))
+				nodes.append(LipsNode(LipsNodeType.EMPTY, file, o, None, parent))
 			if o.type == "Empty":
-				nodes.append(LipsNode(LipsNodeType.EMPTY, scene, o, None, parent))
+				nodes.append(LipsNode(LipsNodeType.EMPTY, file, o, None, parent))
 			if o.type == "Lamp":
-				nodes.append(LipsNode(LipsNodeType.LIGHT, scene, o, None, parent))
+				nodes.append(LipsNode(LipsNodeType.LIGHT, file, o, None, parent))
 	return nodes
 
 def ObjectFile(object):
@@ -226,6 +221,8 @@ def ObjectFile(object):
 	if prop:
 		name = name.replace("-000", "") # FIXME
 		name = prop.data.replace('$', name)
+	elif object.type == "Lamp":
+		return None
 	return name + ".lmdl"
 
 def ObjectHairs(lips, object):
@@ -804,19 +801,19 @@ class LipsNode:
 	# \brief Creates a new node and its children recursively.
 	#
 	# \param type Lips node type.
-	# \param scene Lips scene.
+	# \param file Lips file.
 	# \param object Blender object or None if this is the root node.
 	# \param bone Blender bone or None.
 	# \param parent Lips node or None if this is the root node.
-	def __init__(self, type, scene, object, bone, parent):
+	def __init__(self, type, file, object, bone, parent):
 		self.type = type
-		self.scene = scene
+		self.scene = file.scene
 		self.object = object
 		if object:
 			self.data = object.getData()
 		self.bone = bone
 		self.parent = parent
-		self.nodes = NodeChildren(scene, object, bone, self)
+		self.nodes = NodeChildren(file, object, bone, self)
 		return
 
 	# \brief Prints debug information about the node and its children.
@@ -1069,6 +1066,8 @@ class LipsShape:
 class LipsFile:
 
 	def __init__(self, scene, file):
+		self.scene = scene
+		self.file = file
 		self.animations = LipsAnimations(scene)
 		self.hairs = LipsHairs()
 		self.faces = LipsFaces()
@@ -1076,8 +1075,7 @@ class LipsFile:
 		self.node = None
 		self.shapes = LipsShapes(scene)
 		self.weightnames = []
-		# FIXME: All nodes are added to all files.
-		self.AddNode(LipsNode(LipsNodeType.EMPTY, scene, None, None, None))
+		self.AddNode(LipsNode(LipsNodeType.EMPTY, self, None, None, None))
 		for obj in scene.objects:
 			if ObjectFile(obj) == file:
 				if obj.parent == None:
