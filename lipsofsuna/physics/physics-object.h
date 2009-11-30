@@ -50,6 +50,14 @@ liphy_object_impulse (liphyObject*       self,
                       const limatVector* impulse);
 
 int
+liphy_object_insert_hinge_constraint (liphyObject*       self,
+                                      const limatVector* pos,
+                                      const limatVector* axis,
+                                      int                limit,
+                                      float              limit_min,
+                                      float              limit_max);
+
+int
 liphy_object_insert_shape (liphyObject*          self,
                            liphyShape*           shape,
                            const limatTransform* transform);

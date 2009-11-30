@@ -233,6 +233,37 @@ liphy_physics_cast_sphere (const liphyPhysics* self,
 }
 
 /**
+ * \brief Clear all pending contact callbacks for the object.
+ *
+ * This function can be safely called from inside the contact processing loop.
+ * It's used by object cleanup code to clear references that are going invalid.
+ *
+ * \param self Physics.
+ * \param object Object.
+ */
+void
+liphy_physics_clear_contacts (liphyPhysics* self,
+                              liphyObject*  object)
+{
+	lialgList* ptr;
+	lialgList* next;
+	liphyContactRecord* record;
+
+	for (ptr = self->contacts ; ptr != NULL ; ptr = next)
+	{
+		next = ptr->next;
+		record = (liphyContactRecord*) ptr->data;
+		if (record->object0 == object || record->object1 == object)
+		{
+			if (self->contacts_iter == ptr)
+				self->contacts_iter = ptr->next;
+			lialg_list_remove (&self->contacts, ptr);
+			lisys_free (record);
+		}
+	}
+}
+
+/**
  * \brief Updates the physics simulation.
  *
  * \param self Physics simulation.
@@ -242,7 +273,35 @@ void
 liphy_physics_update (liphyPhysics* self,
                       float         secs)
 {
+	lialgList* ptr;
+	liphyContact contact;
+	liphyContactRecord* record;
+
+	/* Step simulation. */
 	self->dynamics->stepSimulation (secs, 20);
+
+	/* Process contacts. */
+	for (ptr = self->contacts ; ptr != NULL ; ptr = self->contacts_iter)
+	{
+		self->contacts_iter = ptr->next;
+		record = (liphyContactRecord*) ptr->data;
+		lialg_list_remove (&self->contacts, ptr);
+		contact.impulse = record->impulse;
+		contact.point = record->point;
+		contact.normal = record->normal;
+		if (record->object0->config.contact_call != NULL)
+		{
+			contact.object = record->object1;
+			record->object0->config.contact_call (record->object0, &contact);
+		}
+		if (record->object1->config.contact_call != NULL)
+		{
+			contact.object = record->object0;
+			record->object1->config.contact_call (record->object1, &contact);
+		}
+		lisys_free (record);
+	}
+	self->contacts_iter = NULL;
 }
 
 /**
@@ -294,14 +353,18 @@ private_contact_processed (btManifoldPoint& point,
 {
 	limatVector momentum0;
 	limatVector momentum1;
-	liphyContact contact;
-	liphyObject* obj0;
-	liphyObject* obj1;
+	liphyObject* object;
+	liphyContactRecord contact;
+	liphyContactRecord* tmp;
 
 	/* Get objects. */
-	obj0 = (liphyObject*)((btCollisionObject*) body0)->getUserPointer ();
-	obj1 = (liphyObject*)((btCollisionObject*) body1)->getUserPointer ();
-	if (obj0 == NULL || obj1 == NULL)
+	contact.object0 = (liphyObject*)((btCollisionObject*) body0)->getUserPointer ();
+	contact.object1 = (liphyObject*)((btCollisionObject*) body1)->getUserPointer ();
+	if (contact.object0 != NULL) object = contact.object0;
+	else if (contact.object1 == NULL) object = contact.object1;
+	else return false;
+	if (contact.object0->config.contact_call == NULL &&
+	    contact.object1->config.contact_call == NULL)
 		return false;
 
 	/* Get collision point. */
@@ -312,23 +375,20 @@ private_contact_processed (btManifoldPoint& point,
 
 	/* Calculate impulse. */
 	/* FIXME: This is sloppy. */
-	liphy_object_get_velocity (obj0, &momentum0);
-	liphy_object_get_velocity (obj1, &momentum1);
-	momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (obj0));
-	momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (obj1));
+	liphy_object_get_velocity (contact.object0, &momentum0);
+	liphy_object_get_velocity (contact.object1, &momentum1);
+	momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (contact.object0));
+	momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (contact.object1));
 	contact.impulse = limat_vector_get_length (limat_vector_subtract (momentum0, momentum1));
 
-	/* Call custom contact callbacks. */
-	if (obj0->config.contact_call != NULL)
-	{
-		contact.object = obj1;
-		obj0->config.contact_call (obj0, &contact);
-	}
-	if (obj1->config.contact_call != NULL)
-	{
-		contact.object = obj0;
-		obj1->config.contact_call (obj1, &contact);
-	}
+	/* Manipulating the physics state in the contact callback is dangerous
+	   so let's store the contact to a list and process it later. */
+	tmp = (liphyContactRecord*) lisys_calloc (1, sizeof (liphyContactRecord));
+	if (tmp == NULL)
+		return false;
+	*tmp = contact;
+	if (!lialg_list_prepend (&object->physics->contacts, tmp))
+		lisys_free (tmp);
 
 	return false;
 }

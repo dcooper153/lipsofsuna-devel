@@ -192,6 +192,32 @@ Object_effect (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- FIXME
+ * --
+ * -- @param self Object.
+ * -- @param pos Vector.
+ * -- @param axis Vector.
+ * function Object.insert_hinge_constraint(self, name)
+ */
+static int
+Object_insert_hinge_constraint (lua_State* lua)
+{
+	liengObject* data;
+	liscrData* object;
+	liscrData* pos;
+	liscrData* axis;
+
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+	pos = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	axis = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
+	data = object->data;
+
+	liphy_object_insert_hinge_constraint (data->physics, pos->data, axis->data, 0, 0.0f, 0.0f);
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new object.
  * --
  * -- @param self Object class.
@@ -553,6 +579,7 @@ lisrvObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "animate", Object_animate);
 	liscr_class_insert_func (self, "disconnect", Object_disconnect);
 	liscr_class_insert_func (self, "effect", Object_effect);
+	liscr_class_insert_func (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
 	liscr_class_insert_func (self, "new", Object_new);
 	liscr_class_insert_func (self, "purge", Object_purge);
 	liscr_class_insert_func (self, "send", Object_send);

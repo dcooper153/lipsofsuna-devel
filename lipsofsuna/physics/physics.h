@@ -54,6 +54,10 @@ liphy_physics_cast_sphere (const liphyPhysics* self,
                            liphyCollision*     result);
 
 void
+liphy_physics_clear_contacts (liphyPhysics* self,
+                              liphyObject*  object);
+
+void
 liphy_physics_update (liphyPhysics* self,
                       float         secs);
 

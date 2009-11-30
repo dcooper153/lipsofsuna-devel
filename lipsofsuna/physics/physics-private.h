@@ -48,6 +48,8 @@ struct _liphyPhysics
 	btConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamics;
 	btGhostPairCallback* ghostcallback;
+	lialgList* contacts;
+	lialgList* contacts_iter;
 	lialgList* controllers;
 	liphyTransformCall transform_callback;
 	void* userdata;
@@ -84,6 +86,15 @@ struct _liphyObject
 		liphyCallback custom_call;
 		liphyContactCall contact_call;
 	} config;
+};
+
+struct liphyContactRecord
+{
+	float impulse;
+	limatVector point;
+	limatVector normal;
+	liphyObject* object0;
+	liphyObject* object1;
 };
 
 class liphyMotionState : public btMotionState
