@@ -71,6 +71,18 @@ struct _liphyCollision
 /**
  * \addtogroup liphy Physics
  * @{
+ * \addtogroup liphyConstraint Constraint
+ * @{
+ */
+
+typedef struct _liphyConstraint liphyConstraint;
+
+/** @} */
+/** @} */
+
+/**
+ * \addtogroup liphy Physics
+ * @{
  * \addtogroup liphyContact Contact
  * @{
  */

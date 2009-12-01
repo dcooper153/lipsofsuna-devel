@@ -212,7 +212,7 @@ Object_insert_hinge_constraint (lua_State* lua)
 	axis = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
 	data = object->data;
 
-	liphy_object_insert_hinge_constraint (data->physics, pos->data, axis->data, 0, 0.0f, 0.0f);
+	liphy_constraint_new_hinge (data->engine->physics, data->physics, pos->data, axis->data, 0, 0.0f, 0.0f);
 	return 0;
 }
 

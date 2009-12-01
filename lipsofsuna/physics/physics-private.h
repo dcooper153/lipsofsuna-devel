@@ -48,6 +48,7 @@ struct _liphyPhysics
 	btConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamics;
 	btGhostPairCallback* ghostcallback;
+	lialgList* constraints;
 	lialgList* contacts;
 	lialgList* contacts_iter;
 	lialgList* controllers;
@@ -86,6 +87,14 @@ struct _liphyObject
 		liphyCallback custom_call;
 		liphyContactCall contact_call;
 	} config;
+};
+
+struct _liphyConstraint
+{
+	liphyPhysics* physics;
+	liphyObject* object0;
+	liphyObject* object1;
+	btTypedConstraint* constraint;
 };
 
 struct liphyContactRecord

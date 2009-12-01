@@ -140,43 +140,6 @@ liphy_object_impulse (liphyObject*       self,
 }
 
 /**
- * \brief Adds a hinge constraint to the object.
- *
- * \param self Object.
- * \param pos Constraint position in world space.
- * \param axis Axis of rotation in world space.
- * \param limit Nonzero if should use rotation limit.
- * \param limit_min Minimum angle in radians.
- * \param limit_max Maximum angle in radians.
- * \return Nonzero on success.
- */
-int
-liphy_object_insert_hinge_constraint (liphyObject*       self,
-                                      const limatVector* pos,
-                                      const limatVector* axis,
-                                      int                limit,
-                                      float              limit_min,
-                                      float              limit_max)
-{
-	btCollisionObject* object;
-
-	if (self->control == NULL)
-		return 0;
-	object = self->control->get_object ();
-	if (object == NULL)
-		return 0;
-	btVector3 bpos (pos->x, pos->y, pos->z);
-	btVector3 baxis (axis->x, axis->y, axis->z);
-	btHingeConstraint* constraint = new btHingeConstraint ((btRigidBody&) *object, bpos, baxis);
-	if (limit)
-		constraint->setLimit (limit_min, limit_max);
-	/* FIXME: No memory management! */
-	self->physics->dynamics->addConstraint (constraint);
-
-	return 1;
-}
-
-/**
  * \brief Adds a collision shape to the object.
  *
  * \param self Object.
@@ -958,11 +921,17 @@ private_update_state (liphyObject* self)
 {
 	btCollisionShape* shape;
 
+	/* Remove all constraints involving us. */
+	liphy_physics_clear_constraints (self->physics, self);
+
+	/* Remove old controller. */
 	if (self->control != NULL)
 	{
 		delete self->control;
 		self->control = NULL;
 	}
+
+	/* Create new controller. */
 	if (self->flags & PRIVATE_REALIZED)
 	{
 		shape = self->shape;

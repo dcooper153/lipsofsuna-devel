@@ -15,13 +15,38 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_PHYSICS_H__
-#define __LIPS_PHYSICS_H__
+/**
+ * \addtogroup liphy Physics
+ * @{
+ * \addtogroup liphyConstraint Constraint
+ * @{
+ */
 
+#ifndef __PHYSICS_CONSTRAINT_H__
+#define __PHYSICS_CONSTRAINT_H__
+
+#include <math/lips-math.h>
+#include <system/lips-system.h>
 #include "physics.h"
-#include "physics-constraint.h"
-#include "physics-object.h"
-#include "physics-shape.h"
 #include "physics-types.h"
 
+LI_BEGIN_DECLS
+
+liphyConstraint*
+liphy_constraint_new_hinge (liphyPhysics*      physics,
+                            liphyObject*       object,
+                            const limatVector* point,
+                            const limatVector* axis,
+                            int                limit,
+                            float              limit_min,
+                            float              limit_max);
+
+void
+liphy_constraint_free (liphyConstraint* self);
+
+LI_END_DECLS
+
 #endif
+
+/** @} */
+/** @} */

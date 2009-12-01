@@ -24,6 +24,7 @@
 
 #include <system/lips-system.h>
 #include "physics.h"
+#include "physics-constraint.h"
 #include "physics-object.h"
 #include "physics-private.h"
 
@@ -116,6 +117,9 @@ liphy_physics_new ()
 void
 liphy_physics_free (liphyPhysics* self)
 {
+	assert (self->contacts == NULL);
+	assert (self->constraints == NULL);
+
 	delete self->dynamics;
 	delete self->solver;
 	delete self->configuration;
@@ -233,7 +237,35 @@ liphy_physics_cast_sphere (const liphyPhysics* self,
 }
 
 /**
- * \brief Clear all pending contact callbacks for the object.
+ * \brief Clears all constraints affecting the object.
+ *
+ * Use by the object class to remove invalid constraints.
+ *
+ * \param self Physics.
+ * \param object Object.
+ */
+void
+liphy_physics_clear_constraints (liphyPhysics* self,
+                                 liphyObject*  object)
+{
+	lialgList* ptr;
+	lialgList* next;
+	liphyConstraint* constraint;
+
+	for (ptr = self->constraints ; ptr != NULL ; ptr = next)
+	{
+		next = ptr->next;
+		constraint = (liphyConstraint*) ptr->data;
+		if (constraint->object0 == object || constraint->object1 == object)
+		{
+			lialg_list_remove (&self->constraints, ptr);
+			liphy_constraint_free (constraint);
+		}
+	}
+}
+
+/**
+ * \brief Clears all pending contact callbacks for the object.
  *
  * This function can be safely called from inside the contact processing loop.
  * It's used by object cleanup code to clear references that are going invalid.

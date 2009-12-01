@@ -289,11 +289,13 @@ phydir = $(includedir)/lipsofsuna/physics
 phy_HEADERS = \
 	physics/lips-physics.h \
 	physics/physics.h \
+	physics/physics-constraint.h \
 	physics/physics-object.h \
 	physics/physics-shape.h \
 	physics/physics-types.h
 physrc = \
 	physics/physics.cpp \
+	physics/physics-constraint.cpp \
 	physics/physics-control.cpp \
 	physics/physics-object.cpp \
 	physics/physics-private.cpp \

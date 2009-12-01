@@ -163,9 +163,9 @@ am__objects_13 = model/model.lo model/model-animation.lo \
 	model/model-node.lo model/model-pose.lo model/model-shape.lo \
 	model/model-texture.lo
 am__objects_14 = network/network.lo
-am__objects_15 = physics/physics.lo physics/physics-control.lo \
-	physics/physics-object.lo physics/physics-private.lo \
-	physics/physics-shape.lo
+am__objects_15 = physics/physics.lo physics/physics-constraint.lo \
+	physics/physics-control.lo physics/physics-object.lo \
+	physics/physics-private.lo physics/physics-shape.lo
 am__objects_16 = particle/particle-line.lo \
 	particle/particle-manager.lo particle/particle-point.lo
 am__objects_17 = paths/paths.lo
@@ -921,12 +921,14 @@ phydir = $(includedir)/lipsofsuna/physics
 phy_HEADERS = \
 	physics/lips-physics.h \
 	physics/physics.h \
+	physics/physics-constraint.h \
 	physics/physics-object.h \
 	physics/physics-shape.h \
 	physics/physics-types.h
 
 physrc = \
 	physics/physics.cpp \
+	physics/physics-constraint.cpp \
 	physics/physics-control.cpp \
 	physics/physics-object.cpp \
 	physics/physics-private.cpp \
@@ -1567,6 +1569,8 @@ physics/$(DEPDIR)/$(am__dirstamp):
 	@: > physics/$(DEPDIR)/$(am__dirstamp)
 physics/physics.lo: physics/$(am__dirstamp) \
 	physics/$(DEPDIR)/$(am__dirstamp)
+physics/physics-constraint.lo: physics/$(am__dirstamp) \
+	physics/$(DEPDIR)/$(am__dirstamp)
 physics/physics-control.lo: physics/$(am__dirstamp) \
 	physics/$(DEPDIR)/$(am__dirstamp)
 physics/physics-object.lo: physics/$(am__dirstamp) \
@@ -2149,6 +2153,8 @@ mostlyclean-compile:
 	-rm -f particle/particle-point.lo
 	-rm -f paths/paths.$(OBJEXT)
 	-rm -f paths/paths.lo
+	-rm -f physics/physics-constraint.$(OBJEXT)
+	-rm -f physics/physics-constraint.lo
 	-rm -f physics/physics-control.$(OBJEXT)
 	-rm -f physics/physics-control.lo
 	-rm -f physics/physics-object.$(OBJEXT)
@@ -2430,6 +2436,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@particle/$(DEPDIR)/particle-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@particle/$(DEPDIR)/particle-point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@paths/$(DEPDIR)/paths.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-constraint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-control.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@physics/$(DEPDIR)/physics-private.Plo@am__quote@
