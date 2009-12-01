@@ -195,6 +195,9 @@ private_render_2d (liextModule* self,
 	liextSpeech* speech;
 	limatVector win;
 
+	glEnable (GL_TEXTURE_2D);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
