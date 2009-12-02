@@ -679,12 +679,12 @@ class LipsFaces:
 
 class LipsMaterial:
 
-	def __init__(self, index, flags, shininess, diffuse, specular, strands, shader, textures):
+	def __init__(self, index, flags, shininess, diffuse, specular, emission, strands, shader, textures):
 		self.index = index
 		self.flags = flags
 		self.shader = shader
 		self.textures = textures
-		self.emission = 0.0
+		self.emission = emission
 		self.shininess = shininess
 		self.diffuse = diffuse
 		self.strands = strands
@@ -1093,6 +1093,7 @@ class LipsFile:
 
 	def AddMaterial(self, bmat, bmesh, bface):
 		flag = MaterialFlags(bmat, bmesh, bface)
+		emit = MaterialEmission(bmat)
 		shin = MaterialShininess(bmat)
 		diff = MaterialDiffuse(bmat)
 		spec = MaterialSpecular(bmat)
@@ -1107,7 +1108,7 @@ class LipsFile:
 			mat = self.materials[key]
 		else:
 			idx = len(self.materials.keys())
-			mat = LipsMaterial(idx, flag, shin, diff, spec, stra, shad, text)
+			mat = LipsMaterial(idx, flag, shin, diff, spec, emit, stra, shad, text)
 			self.materials[key] = mat
 		return mat
 

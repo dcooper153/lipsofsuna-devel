@@ -328,6 +328,7 @@ lirnd_scene_render (lirndScene*    self,
 		glPopAttrib ();
 		private_lighting_render (self, &context, framebuffer);
 	}
+	lirnd_check_errors ();
 
 	/* Restore state. */
 	if (self->render->shader.enabled)

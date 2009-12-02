@@ -534,6 +534,8 @@ private_uniform_value (lirndShader* self,
 		return LIRND_UNIFORM_MODELVIEWINVERSE;
 	if (!strcmp (value, "NOISETEXTURE"))
 		return LIRND_UNIFORM_NOISETEXTURE;
+	if (!strcmp (value, "PARAM0"))
+		return LIRND_UNIFORM_PARAM0;
 	if (!strncmp (value, "SHADOWTEXTURE", 13))
 	{
 		index = atoi (value + 13);

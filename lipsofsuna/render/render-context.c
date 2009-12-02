@@ -604,6 +604,13 @@ private_bind_uniform (lirndContext* self,
 			glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 			glBindTexture (GL_TEXTURE_2D, self->render->helpers.noise);
 			break;
+		case LIRND_UNIFORM_PARAM0:
+			glUniform4fARB (uniform->binding,
+				self->material.parameters[0],
+				self->material.parameters[1],
+				self->material.parameters[2],
+				self->material.parameters[3]);
+			break;
 		case LIRND_UNIFORM_SHADOWTEXTURE0:
 		case LIRND_UNIFORM_SHADOWTEXTURE1:
 		case LIRND_UNIFORM_SHADOWTEXTURE2:

@@ -378,36 +378,30 @@ lirnd_check_errors ()
 	switch (glGetError ())
 	{
 		case GL_NO_ERROR:
-			break;
+			return;
 		case GL_INVALID_ENUM:
 			fprintf (stderr, "ERROR: GL_INVALID_ENUM\n");
-			assert (0);
 			break;
-		case GL_INVALID_VALUE: assert (GL_INVALID_ENUM  && 0); break;
+		case GL_INVALID_VALUE:
 			fprintf (stderr, "ERROR: GL_INVALID_VALUE\n");
-			assert (0);
 			break;
-		case GL_INVALID_OPERATION: assert (GL_INVALID_OPERATION && 0); break;
+		case GL_INVALID_OPERATION:
 			fprintf (stderr, "ERROR: GL_INVALID_OPERATION\n");
-			assert (0);
 			break;
-		case GL_STACK_OVERFLOW: assert (GL_STACK_OVERFLOW && 0); break;
+		case GL_STACK_OVERFLOW:
 			fprintf (stderr, "ERROR: GL_STACK_OVERFLOW\n");
-			assert (0);
 			break;
-		case GL_STACK_UNDERFLOW: assert (GL_STACK_UNDERFLOW && 0); break;
+		case GL_STACK_UNDERFLOW:
 			fprintf (stderr, "ERROR: GL_STACK_UNDERFLOW\n");
-			assert (0);
 			break;
-		case GL_OUT_OF_MEMORY: assert (GL_OUT_OF_MEMORY && 0); break;
+		case GL_OUT_OF_MEMORY:
 			fprintf (stderr, "ERROR: GL_OUT_OF_MEMORY\n");
-			assert (0);
 			break;
 		default:
 			fprintf (stderr, "ERROR: Unknown GL error\n");
-			assert (0);
 			break;
 	}
+	/* assert (0); */
 }
 #endif
 
