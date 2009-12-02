@@ -611,6 +611,7 @@ private_block_build (liextPreview* self,
 	int x;
 	int y;
 	int z;
+	liengModel* emdl;
 	limatTransform transform;
 	limatVector vector;
 	lirndModel* model;
@@ -631,10 +632,17 @@ private_block_build (liextPreview* self,
 		material = livox_manager_find_material (self->generator->voxels, voxel->type);
 		if (material == NULL)
 			continue;
-		lieng_engine_find_model_by_name (self->module->engine, material->model);
 		model = lirnd_render_find_model (self->module->render, material->model);
 		if (model == NULL)
-			continue;
+		{
+			emdl = lieng_engine_find_model_by_name (self->module->engine, material->model);
+			if (emdl == NULL)
+				continue;
+			lirnd_render_load_model (self->module->render, material->model, emdl->model);
+			model = lirnd_render_find_model (self->module->render, material->model);
+			if (model == NULL)
+				continue;
+		}
 
 		/* Add to render list. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
