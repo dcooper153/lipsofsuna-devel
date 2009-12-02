@@ -47,7 +47,7 @@ private_action_callback (libndAction*  action,
 	event = licom_event_newva (script,
 		"binding", LICLI_SCRIPT_BINDING, libnd_binding_get_userdata (binding),
 		"action", LICLI_SCRIPT_ACTION, libnd_action_get_userdata (action),
-		"active", LISCR_TYPE_BOOLEAN, value > 0.0f,
+		"active", LISCR_TYPE_BOOLEAN, value != 0.0f,
 		"value", LISCR_TYPE_FLOAT, value,
 		"params", LISCR_TYPE_STRING, binding->params, NULL);
 	if (event == NULL)
