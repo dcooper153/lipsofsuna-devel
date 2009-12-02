@@ -86,16 +86,13 @@ liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
 	limatVector* v;
 	btTransform transform = m_ghostObject->getWorldTransform ();
 	btVector3 dir;
-	btVector3 pos =
-		transform * btVector3 (0.0f, 0.0f, 0.0f);
-	btVector3 down =
-		transform * btVector3 (0.0f, -1.0f, 0.0f) -
-		transform * btVector3 (0.0f, 0.0f, 0.0f);
-	btVector3 forward =
-		transform * btVector3 (0.0f, 0.0f, 0.0f) -
-		transform * btVector3 (0.0f, 0.0f, 1.0f);
+	btVector3 pos = transform * btVector3 (0.0f, 0.0f, 0.0f);
+	btVector3 down = transform * btVector3 (0.0f, -1.0f, 0.0f) - pos;
+	btVector3 right = transform * btVector3 (1.0f, 0.0f, 0.0f) - pos;
+	btVector3 forward = transform * btVector3 (0.0f, 0.0f, -1.0f) - pos;
 
 	dir = forward * this->object->config.movement * this->object->config.speed * delta;
+	dir += right * this->object->config.strafing * this->object->config.speed * delta;
 	if (this->object->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
 	{
 		/* v = v0+at = v0+tF/m */

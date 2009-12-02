@@ -78,6 +78,7 @@ struct _liphyObject
 		float mass;
 		float movement;
 		float speed;
+		float strafing;
 		float character_step;
 		void* userdata;
 		limatTransform transform;

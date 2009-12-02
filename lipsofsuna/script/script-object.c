@@ -33,31 +33,6 @@
  * -- @class table
  */
 
-/* @luadoc
- * ---
- * -- Use bounding box shape for collisions.
- * -- @name Object.SHAPE_MODE_BOX
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Use capsule shape for collisions.
- * -- @name Object.SHAPE_MODE_CAPSULE
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Use triangle mesh shape for collisions.
- * -- @name Object.SHAPE_MODE_CONCAVE
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Use convex shape for collisions.
- * -- @name Object.SHAPE_MODE_CONVEX
- * -- @class table
- */
-
 static int
 Object___gc (lua_State* lua)
 {
@@ -692,6 +667,40 @@ Object_setter_speed (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Strafing direction.
+ * --
+ * -- Only used by creature objects. The value of -1 means that the creature is
+ * -- strafing to the left at walking speed. The value of 1 means right, and the
+ * -- value of 0 means no strafing.
+ * --
+ * -- @name Object.strafing
+ * -- @class table
+ */
+static int
+Object_getter_strafing (lua_State* lua)
+{
+	liscrData* object;
+
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+
+	lua_pushnumber (lua, liphy_object_get_strafing (LIENG_OBJECT (object->data)->physics));
+	return 1;
+}
+static int
+Object_setter_strafing (lua_State* lua)
+{
+	float value;
+	liscrData* object;
+
+	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
+	value = luaL_checknumber (lua, 3);
+
+	liphy_object_set_strafing (LIENG_OBJECT (object->data)->physics, value);
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Validity flag.
  * --
  * -- Evaluates to true if the object hasn't been destroyed. This is
@@ -778,6 +787,7 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_getter (self, "save", Object_getter_save);
 	liscr_class_insert_getter (self, "selected", Object_getter_selected);
 	liscr_class_insert_getter (self, "speed", Object_getter_speed);
+	liscr_class_insert_getter (self, "strafing", Object_getter_strafing);
 	liscr_class_insert_getter (self, "valid", Object_getter_valid);
 	liscr_class_insert_getter (self, "velocity", Object_getter_velocity);
 	liscr_class_insert_setter (self, "angular_momentum", Object_setter_angular_momentum);
@@ -793,6 +803,7 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_setter (self, "save", Object_setter_save);
 	liscr_class_insert_setter (self, "selected", Object_setter_selected);
 	liscr_class_insert_setter (self, "speed", Object_setter_speed);
+	liscr_class_insert_setter (self, "strafing", Object_setter_strafing);
 	liscr_class_insert_setter (self, "velocity", Object_setter_velocity);
 }
 

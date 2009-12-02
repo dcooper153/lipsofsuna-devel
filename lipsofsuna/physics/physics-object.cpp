@@ -705,6 +705,31 @@ liphy_object_set_shape (liphyObject* self,
 }
 
 /**
+ * \brief Gets the strafing force of the object.
+ *
+ * \param self Object.
+ * \return Strafing force.
+ */
+float
+liphy_object_get_strafing (const liphyObject* self)
+{
+	return self->config.strafing;
+}
+
+/**
+ * \brief Sets the strafing force of the object.
+ *
+ * \param self Object.
+ * \param value Strafing force.
+ */
+void
+liphy_object_set_strafing (liphyObject* self,
+                           float        value)
+{
+	self->config.strafing = value;
+}
+
+/**
  * \brief Gets the world space transformation of the object.
  *
  * \param self Object.

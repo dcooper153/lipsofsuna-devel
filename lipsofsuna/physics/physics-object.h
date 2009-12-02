@@ -151,6 +151,13 @@ liphy_object_set_rotating (liphyObject* self,
                            float        value);
 
 float
+liphy_object_get_strafing (const liphyObject* self);
+
+void
+liphy_object_set_strafing (liphyObject* self,
+                           float        value);
+
+float
 liphy_object_get_speed (const liphyObject* self);
 
 void
