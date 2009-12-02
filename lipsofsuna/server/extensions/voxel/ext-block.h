@@ -33,9 +33,8 @@
 
 struct _liextBlock
 {
-	int empty;
 	liextModule* module;
-	liphyObject* object;
+	liphyObject* physics;
 };
 
 liextBlock*

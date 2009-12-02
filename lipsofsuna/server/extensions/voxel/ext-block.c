@@ -39,12 +39,6 @@ liext_block_new (liextModule* module)
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->object = liphy_object_new (module->server->engine->physics, NULL, LIPHY_CONTROL_MODE_STATIC);
-	if (self->object == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
 
 	return self;
 }
@@ -52,8 +46,8 @@ liext_block_new (liextModule* module)
 void
 liext_block_free (liextBlock* self)
 {
-	if (self->object != NULL)
-		liphy_object_free (self->object);
+	if (self->physics != NULL)
+		liphy_object_free (self->physics);
 	lisys_free (self);
 }
 
@@ -72,10 +66,12 @@ liext_block_build (liextBlock*  self,
 	livoxMaterial* material;
 	livoxVoxel* voxel;
 
-	/* Clear old shape. */
-	liphy_object_set_realized (self->object, 0);
-	liphy_object_clear_shape (self->object);
-	self->empty = 1;
+	/* Free old object. */
+	if (self->physics != NULL)
+	{
+		liphy_object_free (self->physics);
+		self->physics = NULL;
+	}
 
 	/* Create new shape. */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
@@ -95,24 +91,27 @@ liext_block_build (liextBlock*  self,
 		if (model == NULL || model->physics == NULL)
 			continue;
 
-		/* Add to render list. */
+		/* Add to physics object. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
 		transform.position = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
-		liphy_object_insert_shape (self->object, model->physics, &transform);
-		self->empty = 0;
+		if (self->physics == NULL)
+			self->physics = liphy_object_new (self->module->server->engine->physics, NULL, LIPHY_CONTROL_MODE_STATIC);
+		if (self->physics != NULL)
+			liphy_object_insert_shape (self->physics, model->physics, &transform);
 	}
 
-	if (!self->empty)
+	/* Realize if not empty. */
+	if (self->physics != NULL)
 	{
-		liphy_object_set_collision_group (self->object, LIPHY_GROUP_TILES);
-		liphy_object_set_collision_mask (self->object, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
+		liphy_object_set_collision_group (self->physics, LIPHY_GROUP_TILES);
+		liphy_object_set_collision_mask (self->physics, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
 		transform = limat_convert_vector_to_transform (*offset);
-		liphy_object_set_transform (self->object, &transform);
-		liphy_object_set_realized (self->object, 1);
+		liphy_object_set_transform (self->physics, &transform);
+		liphy_object_set_realized (self->physics, 1);
 	}
 
-	return !self->empty;
+	return self->physics != NULL;
 }
 
 /** @} */

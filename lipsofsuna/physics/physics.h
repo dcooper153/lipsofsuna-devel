@@ -45,6 +45,17 @@ liphy_physics_cast_ray (const liphyPhysics* self,
                         limatVector*        normal);
 
 int
+liphy_physics_cast_shape (const liphyPhysics*   self,
+                          const limatTransform* start,
+                          const limatTransform* end,
+                          const liphyShape*     shape,
+                          int                   group,
+                          int                   mask,
+                          liphyObject**         ignore_array,
+                          int                   ignore_count,
+                          liphyCollision*       result);
+
+int
 liphy_physics_cast_sphere (const liphyPhysics* self,
                            const limatVector*  start,
                            const limatVector*  end,

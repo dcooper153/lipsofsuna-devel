@@ -127,6 +127,41 @@ licli_module_init_callbacks_binding (licliModule* self)
 /*****************************************************************************/
 /* Miscellaneous. */
 
+static void
+private_camera_clip (licliModule* module)
+{
+	int hit;
+	float frac;
+	limatAabb aabb;
+	limatTransform start;
+	limatTransform end;
+	limatVector diff;
+	liphyCollision tmp;
+	liphyShape* shape;
+
+	/* Create sweep shape. */
+	/* FIXME: Could use a more accurate shape. */
+	lialg_camera_get_bounds (module->camera, &aabb);
+	shape = liphy_shape_new_aabb (module->engine->physics, &aabb);
+	if (shape == NULL)
+		return;
+
+	/* Sweep the shape. */
+	lialg_camera_get_center (module->camera, &start);
+	lialg_camera_get_transform (module->camera, &end);
+	diff = limat_vector_subtract (end.position, start.position);
+	hit = liphy_physics_cast_shape (module->engine->physics, &start, &end, shape,
+		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
+	liphy_shape_free (shape);
+
+	/* Clip the camera. */
+	if (hit)
+	{
+		frac = tmp.fraction * limat_vector_get_length (diff);
+		lialg_camera_clip (module->camera, frac);
+	}
+}
+
 static int
 private_miscellaneous_event (licliModule* module,
                              SDL_Event*   event)
@@ -198,6 +233,8 @@ private_miscellaneous_tick (licliModule* module,
 		}
 		lialg_camera_set_center (module->camera, &transform);
 		lialg_camera_update (module->camera, secs);
+		if (lialg_camera_get_driver (module->camera) != LIALG_CAMERA_FIRSTPERSON)
+			private_camera_clip (module);
 	}
 
 	return 1;

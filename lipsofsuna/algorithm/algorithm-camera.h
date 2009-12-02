@@ -70,6 +70,10 @@ void
 lialg_camera_free (lialgCamera* self);
 
 void
+lialg_camera_clip (lialgCamera* self,
+                   float        dist);
+
+void
 lialg_camera_move (lialgCamera* self,
                    float        value);
 
@@ -105,6 +109,10 @@ lialg_camera_zoom (lialgCamera* self,
 void
 lialg_camera_get_bounds (const lialgCamera* self,
                          limatAabb*         aabb);
+
+void
+lialg_camera_get_center (lialgCamera*    self,
+                         limatTransform* result);
 
 void
 lialg_camera_set_center (lialgCamera*          self,

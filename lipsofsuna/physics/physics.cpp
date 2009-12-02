@@ -181,6 +181,80 @@ liphy_physics_cast_ray (const liphyPhysics* self,
 }
 
 /**
+ * \brief Casts a shape to the scene.
+ *
+ * If the shape hits no obstacle, result is set to the cast end point, normal is
+ * set to cast direction, and zero is returned. Otherwise, nonzero is returned
+ * and result and normal hold information on the collision point.
+ *
+ * \param self Physics simulation.
+ * \param start Cast start transform.
+ * \param end Cast end transform.
+ * \param shape Cast shape.
+ * \param group Collision group.
+ * \param mask Collision mask.
+ * \param ignore_array Array of ignored objects.
+ * \param ignore_count Number of ignore objects.
+ * \param result Return location for collision data.
+ * \return Nonzero if a collision occurred.
+ */
+int
+liphy_physics_cast_shape (const liphyPhysics*   self,
+                          const limatTransform* start,
+                          const limatTransform* end,
+                          const liphyShape*     shape,
+                          int                   group,
+                          int                   mask,
+                          liphyObject**         ignore_array,
+                          int                   ignore_count,
+                          liphyCollision*       result)
+{
+	float best;
+	btCollisionWorld* collision;
+	btConvexShape* btshape;
+	ConvexTestIgnore test (ignore_array, ignore_count);
+	btTransform btstart (
+		btQuaternion (start->rotation.x, start->rotation.y, start->rotation.z, start->rotation.w),
+		btVector3 (start->position.x, start->position.y, start->position.z));
+	btTransform btend (
+		btQuaternion (end->rotation.x, end->rotation.y, end->rotation.z, end->rotation.w),
+		btVector3 (end->position.x, end->position.y, end->position.z));
+
+	/* Initialize sweep. */
+	test.m_closestHitFraction = 1.0f;
+	test.m_collisionFilterGroup = group;
+	test.m_collisionFilterMask = mask;
+	collision = self->dynamics->getCollisionWorld ();
+	result->fraction = best = 1.0f;
+
+	/* Sweep the shape. */
+	/* TODO: Compound shape support when the shape class supports them. */
+/*	for (i = 0 ; i < shape->shape->getNumChildShapes () ; i++)
+	{
+		btshape = (btConvexShape*) shape->shape->getChildShape (i); */
+		btshape = shape->shape;
+		collision->convexSweepTest (btshape, btstart, btend, test);
+		if (test.m_closestHitFraction <= best)
+		{
+			best = test.m_closestHitFraction;
+			result->fraction = test.m_closestHitFraction;
+			result->normal.x = test.m_hitNormalWorld[0];
+			result->normal.y = test.m_hitNormalWorld[1];
+			result->normal.z = test.m_hitNormalWorld[2];
+			result->point.x = test.m_hitPointWorld[0];
+			result->point.y = test.m_hitPointWorld[1];
+			result->point.z = test.m_hitPointWorld[2];
+			if (test.m_hitCollisionObject != NULL)
+				result->object = (liphyObject*) test.m_hitCollisionObject->getUserPointer ();
+			else
+				result->object = NULL;
+		}
+/*	}*/
+
+	return result->fraction < 1.0f;
+}
+
+/**
  * \brief Casts a sphere to the scene.
  *
  * If the sphere hits no obstacle, result is set to the cast end point, normal is
@@ -205,8 +279,6 @@ liphy_physics_cast_sphere (const liphyPhysics* self,
                            int                 ignore_count,
                            liphyCollision*     result)
 {
-	btTransform src;
-	btTransform dst;
 	btCollisionWorld* collision;
 	btTransform btstart (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (start->x, start->y, start->z));
 	btTransform btend (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (end->x, end->y, end->z));

@@ -52,6 +52,8 @@ liext_block_free (liextBlock* self)
 {
 	if (self->group != NULL)
 		lirnd_group_free (self->group);
+	if (self->physics != NULL)
+		liphy_object_free (self->physics);
 	lisys_free (self);
 }
 
@@ -66,7 +68,7 @@ liext_block_build (liextBlock*     self,
 	int x;
 	int y;
 	int z;
-	liengModel* emdl;
+	liengModel* engmdl;
 	limatTransform transform;
 	limatVector vector;
 	limatVector offset;
@@ -90,18 +92,16 @@ liext_block_build (liextBlock*     self,
 		LINE, LINE, LINE, voxels);
 
 	/* Free old objects. */
-	if (self->group == NULL)
+	if (self->group != NULL)
 	{
-		self->group = lirnd_group_new (self->module->scene);
-		if (self->group == NULL)
-		{
-			lisys_free (self);
-			return 0;
-		}
-		lirnd_group_set_realized (self->group, 1);
+		lirnd_group_free (self->group);
+		self->group = NULL;
 	}
-	else
-		lirnd_group_clear (self->group);
+	if (self->physics != NULL)
+	{
+		liphy_object_free (self->physics);
+		self->physics = NULL;
+	}
 
 	/* Create new objects. */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
@@ -124,31 +124,49 @@ liext_block_build (liextBlock*     self,
 		material = livox_manager_find_material (module->voxels, voxel->type);
 		if (material == NULL)
 			continue;
+		engmdl = lieng_engine_find_model_by_name (module->module->engine, material->model);
+		if (engmdl == NULL)
+			continue;
 		model = lirnd_render_find_model (module->module->render, material->model);
 		if (model == NULL)
 		{
-			emdl = lieng_engine_find_model_by_name (module->module->engine, material->model);
-			if (emdl == NULL)
-				continue;
-			lirnd_render_load_model (module->module->render, emdl->name, emdl->model);
+			lirnd_render_load_model (module->module->render, engmdl->name, engmdl->model);
 			model = lirnd_render_find_model (module->module->render, material->model);
 			if (model == NULL)
 				continue;
 		}
 
-		/* Add to render list. */
+		/* Add to render group. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		transform.position = limat_vector_add (vector, offset);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
-		lirnd_group_insert_model (self->group, model, &transform);
+		if (self->group == NULL)
+			self->group = lirnd_group_new (self->module->scene);
+		if (self->group != NULL)
+			lirnd_group_insert_model (self->group, model, &transform);
+
+		/* Add to physics object. */
+		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
+		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
+		transform.position = vector;
+		livox_voxel_get_quaternion (voxel, &transform.rotation);
+		if (self->physics == NULL)
+			self->physics = liphy_object_new (self->module->engine->physics, NULL, LIPHY_CONTROL_MODE_STATIC);
+		if (self->physics != NULL)
+			liphy_object_insert_shape (self->physics, engmdl->physics, &transform);
 	}
 
-	/* Clear if empty. */
-	if (self->group->objects == NULL)
+	/* Realize if not empty. */
+	if (self->group != NULL)
+		lirnd_group_set_realized (self->group, 1);
+	if (self->physics != NULL)
 	{
-		lirnd_group_free (self->group);
-		self->group = NULL;
+		liphy_object_set_collision_group (self->physics, LIPHY_GROUP_TILES);
+		liphy_object_set_collision_mask (self->physics, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
+		transform = limat_convert_vector_to_transform (offset);
+		liphy_object_set_transform (self->physics, &transform);
+		liphy_object_set_realized (self->physics, 1);
 	}
 
 	return 1;

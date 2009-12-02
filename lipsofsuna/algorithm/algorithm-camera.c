@@ -39,12 +39,11 @@
 #define LIALG_CAMERA_SENSITIVITY_ZOOM 1.0f
 
 static void
-private_update_1st_person (lialgCamera* self,
-                           float        secs);
+private_update_1st_person (lialgCamera* self);
 
 static void
 private_update_3rd_person (lialgCamera* self,
-                           float        secs);
+                           float        dist);
 
 static void
 private_update_modelview (lialgCamera* self);
@@ -99,6 +98,33 @@ void
 lialg_camera_free (lialgCamera* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Clips the camera.
+ *
+ * When in third person mode, ensures that the distance from the camera to the
+ * target is at most the value given. The camera transformation will reset to
+ * the unclipped value the next time update is called.
+ *
+ * \param self Camera.
+ * \param dist Maximum distance to the target.
+ */
+void
+lialg_camera_clip (lialgCamera* self,
+                   float        dist)
+{
+	limatVector dir;
+	limatVector pos;
+
+	if (self->config.driver != LIALG_CAMERA_THIRDPERSON || dist >= self->config.distance)
+		return;
+	dir = limat_vector_subtract (self->transform.current.position, self->transform.center.position);
+	dir = limat_vector_normalize (dir);
+	dir = limat_vector_multiply (dir, dist);
+	pos = limat_vector_add (self->transform.center.position, dir);
+	self->transform.current.position = pos;
+	private_update_modelview (self);
 }
 
 /**
@@ -246,10 +272,14 @@ lialg_camera_update (lialgCamera* self,
 	switch (self->config.driver)
 	{
 		case LIALG_CAMERA_FIRSTPERSON:
-			private_update_1st_person (self, secs);
+			private_update_1st_person (self);
+			private_update_orientation (self, secs);
+			private_update_modelview (self);
 			break;
 		case LIALG_CAMERA_THIRDPERSON:
-			private_update_3rd_person (self, secs);
+			private_update_3rd_person (self, self->config.distance);
+			private_update_orientation (self, secs);
+			private_update_modelview (self);
 			break;
 		default:
 			private_update_orientation (self, secs);
@@ -269,10 +299,12 @@ lialg_camera_warp (lialgCamera* self)
 	switch (self->config.driver)
 	{
 		case LIALG_CAMERA_FIRSTPERSON:
-			private_update_1st_person (self, 1.0f);
+			private_update_1st_person (self);
+			private_update_orientation (self, 1.0f);
 			break;
 		case LIALG_CAMERA_THIRDPERSON:
-			private_update_3rd_person (self, 1.0f);
+			private_update_3rd_person (self, self->config.distance);
+			private_update_orientation (self, 1.0f);
 			break;
 		default:
 			break;
@@ -325,6 +357,19 @@ lialg_camera_get_bounds (const lialgCamera* self,
 	size = limat_vector_init (max, max, max);
 	zero = limat_vector_init (0.0f, 0.0f, 0.0f);
 	limat_aabb_init_from_center (aabb, &zero, &size);
+}
+
+/**
+ * \brief Gets the point of interest for automatic camera modes.
+ *
+ * \param self Camera.
+ * \param result Return location for transformation.
+ */
+void
+lialg_camera_get_center (lialgCamera*    self,
+                         limatTransform* result)
+{
+	*result = self->transform.center;
 }
 
 /**
@@ -528,8 +573,7 @@ lialg_camera_set_viewport (lialgCamera* self,
 /*****************************************************************************/
 
 static void
-private_update_1st_person (lialgCamera* self,
-                           float        secs)
+private_update_1st_person (lialgCamera* self)
 {
 	/* Copy center position and rotation. */
 	self->transform.target = self->transform.center;
@@ -538,15 +582,11 @@ private_update_1st_person (lialgCamera* self,
 	/* Apply local rotation. */
 	self->transform.target = limat_transform_multiply (self->transform.target, self->transform.local);
 	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
-
-	/* Standard updates. */
-	private_update_orientation (self, secs);
-	private_update_modelview (self);
 }
 
 static void
 private_update_3rd_person (lialgCamera* self,
-                           float        secs)
+                           float        dist)
 {
 	limatTransform transform;
 
@@ -559,14 +599,10 @@ private_update_3rd_person (lialgCamera* self,
 
 	/* Project backwards. */
 	transform = limat_transform_init (
-		limat_vector_init (0.0f, 0.0f, self->config.distance),
+		limat_vector_init (0.0f, 0.0f, dist),
 		limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
 	self->transform.target = limat_transform_multiply (self->transform.target, transform);
 	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
-
-	/* Standard updates. */
-	private_update_orientation (self, secs);
-	private_update_modelview (self);
 }
 
 static void
