@@ -133,8 +133,6 @@ liphy_object_impulse (liphyObject*       self,
 	btVector3 v0 (impulse->x, impulse->y, impulse->z);
 	btVector3 v1 (point->x, point->y, point->z);
 
-	if (self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
-		self->config.character_force = limat_vector_add (self->config.character_force, *impulse);
 	if (self->control != NULL)
 		self->control->apply_impulse (v0, v1);
 }
@@ -209,13 +207,7 @@ liphy_object_insert_wheel (liphyObject*       self,
 /**
  * \brief Causes the object to jump.
  *
- * Adds the walking velocity vector of the character to its rigid body
- * velocity and then does the same as #liphy_object_impulse. This causes
- * the character to automatically jump to its walking direction.
- *
- * If the object is not a character, the character specific operations are
- * skipped and the function behaves the same way as #liphy_object_impulse
- * with point of impulse set to origin in body space.
+ * Does the same as #liphy_object_impulse with origin as the position vector.
  *
  * \param self Object.
  * \param impulse Jump force.
@@ -224,14 +216,9 @@ void
 liphy_object_jump (liphyObject*       self,
                    const limatVector* impulse)
 {
-	limatVector v;
+	limatVector o = { 0.0f, 0.0f, 0.0f };
 
-	if (self->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
-	{
-		v = self->config.velocity;
-		v = limat_vector_add (v, limat_vector_multiply (*impulse, 1.0f / self->config.mass));
-		self->config.velocity = v;
-	}
+	liphy_object_impulse (self, &o, impulse);
 }
 
 /**
@@ -809,7 +796,15 @@ void
 liphy_object_get_velocity (liphyObject* self,
                            limatVector* value)
 {
-	*value = self->config.velocity;
+	btVector3 velocity;
+
+	if (self->control != NULL)
+	{
+		self->control->get_velocity (&velocity);
+		*value = limat_vector_init (velocity[0], velocity[1], velocity[2]);
+	}
+	else
+		*value = self->config.velocity;
 }
 
 /**
@@ -965,9 +960,6 @@ private_update_state (liphyObject* self)
 			case LIPHY_CONTROL_MODE_NONE:
 				break;
 			case LIPHY_CONTROL_MODE_CHARACTER:
-				#warning Character controller does not support compound shapes.
-				if (self->shape->getNumChildShapes ())
-					shape = self->shape->getChildShape (0);
 				self->control = new liphyCharacterControl (self, shape);
 				break;
 			case LIPHY_CONTROL_MODE_RIGID:

@@ -84,7 +84,6 @@ struct _liphyObject
 		limatTransform transform;
 		limatVector angular;
 		limatVector velocity;
-		limatVector character_force; /* FIXME */
 		liphyCallback custom_call;
 		liphyContactCall contact_call;
 	} config;
@@ -119,13 +118,14 @@ public:
 	btTransform previous;
 };
 
-class liphyCharacterController : public btKinematicCharacterController
+class liphyCharacterController : public btActionInterface
 {
 public:
-	liphyCharacterController (liphyObject* object, btPairCachingGhostObject* ghost, btConvexShape* shape);
-	virtual bool onGround () const;
+	liphyCharacterController (liphyObject* object);
 	virtual void updateAction (btCollisionWorld* world, btScalar delta);
+	virtual void debugDraw (btIDebugDraw* debug);
 public:
+	int ground;
 	liphyObject* object;
 };
 
@@ -148,27 +148,11 @@ public:
 	virtual bool get_ground ();
 	virtual void set_mass (float value, const btVector3& inertia);
 	virtual btCollisionObject* get_object ();
+	virtual void get_velocity (btVector3* value);
 	virtual void set_velocity (const btVector3& value);
 public:
 	liphyObject* object;
 	liphyContactController* contact_controller;
-};
-
-class liphyCharacterControl : public liphyControl
-{
-public:
-	liphyCharacterControl (liphyObject* object, btCollisionShape* shape);
-	virtual ~liphyCharacterControl ();
-public:
-	virtual void transform (const btTransform& value);
-	virtual void set_collision_group (int mask);
-	virtual void set_collision_mask (int mask);
-	virtual void set_contacts (bool value);
-	virtual bool get_ground ();
-	virtual btCollisionObject* get_object ();
-public:
-	btPairCachingGhostObject ghost;
-	liphyCharacterController controller;
 };
 
 class liphyRigidControl : public liphyControl
@@ -189,9 +173,21 @@ public:
 	virtual void set_gravity (const btVector3& value);
 	virtual void set_mass (float value, const btVector3& inertia);
 	virtual btCollisionObject* get_object ();
+	virtual void get_velocity (btVector3* value);
 	virtual void set_velocity (const btVector3& value);
 public:
 	btRigidBody body;
+};
+
+class liphyCharacterControl : public liphyRigidControl
+{
+public:
+	liphyCharacterControl (liphyObject* object, btCollisionShape* shape);
+	virtual ~liphyCharacterControl ();
+public:
+	virtual bool get_ground ();
+public:
+	liphyCharacterController controller;
 };
 
 class liphyStaticControl : public liphyControl

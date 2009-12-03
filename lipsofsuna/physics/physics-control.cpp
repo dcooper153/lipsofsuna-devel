@@ -109,6 +109,12 @@ liphyControl::get_object ()
 }
 
 void
+liphyControl::get_velocity (btVector3* value)
+{
+	*value = btVector3 (0.0, 0.0, 0.0);
+}
+
+void
 liphyControl::set_velocity (const btVector3& value)
 {
 }
@@ -116,76 +122,21 @@ liphyControl::set_velocity (const btVector3& value)
 /*****************************************************************************/
 
 liphyCharacterControl::liphyCharacterControl (liphyObject* object, btCollisionShape* shape) :
-	liphyControl (object, shape),
-	controller (object, &ghost, (btConvexShape*) shape)
+	liphyRigidControl (object, shape), controller (object)
 {
-	this->ghost.setUserPointer (object);
-	this->ghost.setWorldTransform (this->object->motion->current);
-	this->ghost.setCollisionShape (shape);
-	this->ghost.setCollisionFlags (btCollisionObject::CF_CHARACTER_OBJECT);
-	this->object->physics->dynamics->addCollisionObject (&this->ghost,
-		this->object->config.collision_group,
-		this->object->config.collision_mask);
-	this->object->physics->dynamics->addAction (&this->controller);
+	object->physics->dynamics->addAction (&this->controller);
+	this->body.setActivationState (DISABLE_DEACTIVATION);
 }
 
 liphyCharacterControl::~liphyCharacterControl ()
 {
-	this->object->physics->dynamics->removeAction (&this->controller);
-	this->object->physics->dynamics->removeCollisionObject (&this->ghost);
-}
-
-void
-liphyCharacterControl::transform (const btTransform& value)
-{
-	this->ghost.setWorldTransform (value);
-}
-
-void
-liphyCharacterControl::set_collision_group (int mask)
-{
-	btBroadphaseProxy* proxy;
-
-	proxy = this->ghost.getBroadphaseHandle ();
-	if (proxy != NULL)
-		proxy->m_collisionFilterGroup = mask;
-}
-
-void
-liphyCharacterControl::set_collision_mask (int mask)
-{
-	btBroadphaseProxy* proxy;
-
-	proxy = this->ghost.getBroadphaseHandle ();
-	if (proxy != NULL)
-		proxy->m_collisionFilterMask = mask;
-}
-
-void
-liphyCharacterControl::set_contacts (bool value)
-{
-	if (value)
-	{
-		this->ghost.setCollisionFlags (this->ghost.getCollisionFlags() |
-			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-	else
-	{
-		this->ghost.setCollisionFlags (this->ghost.getCollisionFlags() &
-			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
+	object->physics->dynamics->removeAction (&this->controller);
 }
 
 bool
 liphyCharacterControl::get_ground ()
 {
-	return this->controller.onGround ();
-}
-
-btCollisionObject*
-liphyCharacterControl::get_object ()
-{
-	return &this->ghost;
+	return this->controller.ground;
 }
 
 /*****************************************************************************/
@@ -203,6 +154,7 @@ liphyRigidControl::liphyRigidControl (liphyObject* object, btCollisionShape* sha
 	this->body.setUserPointer (object);
 	this->body.setLinearVelocity (velocity);
 	this->body.setAngularVelocity (angular);
+	this->body.setAngularFactor (0.0f);
 	this->body.setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);
 	this->object->physics->dynamics->addRigidBody (&this->body,
 		this->object->config.collision_group,
@@ -303,6 +255,12 @@ btCollisionObject*
 liphyRigidControl::get_object ()
 {
 	return &this->body;
+}
+
+void
+liphyRigidControl::get_velocity (btVector3* value)
+{
+	*value = this->body.getLinearVelocity ();
 }
 
 void

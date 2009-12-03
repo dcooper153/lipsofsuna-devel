@@ -25,6 +25,10 @@
 #include "physics-object.h"
 #include "physics-private.h"
 
+#define LIPHY_CHARACTER_FLIGHT_FACTOR 0.3f
+#define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
+#define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
+
 liphyMotionState::liphyMotionState (liphyObject*       object,
                                     const btTransform& transform)
 {
@@ -64,56 +68,69 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 
 /*****************************************************************************/
 
-liphyCharacterController::liphyCharacterController (liphyObject* object, btPairCachingGhostObject* ghost, btConvexShape* shape) :
-	btKinematicCharacterController (ghost, shape, object->config.character_step)
+liphyCharacterController::liphyCharacterController (liphyObject* object)
 {
 	this->object = object;
+	this->ground = 0;
 }
 
-bool
-liphyCharacterController::onGround () const
+void liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
 {
-	limatVector down = { 0.0f, -0.1f, 0.0f };
-
-	return liphy_object_sweep (this->object, &down) < 1.0f;
-}
-
-void
-liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
-{
-	float s;
-	limatVector* f;
-	limatVector* v;
-	btTransform transform = m_ghostObject->getWorldTransform ();
-	btVector3 dir;
+	int ground;
+	float damp0;
+	float damp1;
+	float speed;
+	btCollisionObject* object = this->object->control->get_object ();
+	btTransform transform = object->getWorldTransform ();
 	btVector3 pos = transform * btVector3 (0.0f, 0.0f, 0.0f);
 	btVector3 down = transform * btVector3 (0.0f, -1.0f, 0.0f) - pos;
 	btVector3 right = transform * btVector3 (1.0f, 0.0f, 0.0f) - pos;
 	btVector3 forward = transform * btVector3 (0.0f, 0.0f, -1.0f) - pos;
 
-	dir = forward * this->object->config.movement * this->object->config.speed * delta;
-	dir += right * this->object->config.strafing * this->object->config.speed * delta;
-	if (this->object->control_mode == LIPHY_CONTROL_MODE_CHARACTER)
-	{
-		/* v = v0+at = v0+tF/m */
-		s = delta / LI_MAX (0.1f, this->object->config.mass);
-		f = &this->object->config.character_force;
-		v = &this->object->config.velocity;
-		*v = limat_vector_add (this->object->config.velocity, limat_vector_multiply (*f, s));
-		/* x = vt */
-		dir += delta * btVector3 (v->x, v->y, v->z);
-		/* FIXME: Hardcoded decay. */
-		*v = limat_vector_multiply (*v, 0.95f);
-		*f = limat_vector_multiply (*f, 0.95f);
-	}
+	/* Check for ground. */
+	limatVector check = { 0.0f, -0.2f, 0.0f };
+	ground = liphy_object_sweep (this->object, &check) < 1.0f;
+	this->ground = ground;
 
-	//dir = dir + btVector3 (0.0, 40.0 * delta, 0.0);
-	setWalkDirection (dir);
+	/* Get velocity components. */
+	btVector3 vel = ((btRigidBody*) object)->getLinearVelocity ();
+	float dotx = vel.dot (right);
+	float doty = vel.dot (-down);
+	float dotz = vel.dot (-forward);
+	btVector3 velx = dotx * right;
+	btVector3 vely = doty * -down;
+	btVector3 velz = dotz * -forward;
 
-	btKinematicCharacterController::updateAction (world, delta);
+	/* Damp when moving upwards too fast. */
+	/* Without this the player would shoot upwards from any slopes. */
+	/* FIXME: Doesn't work for non-vertical gravity. */
+	damp0 = 1.0f - LI_CLAMP (vel[1], 0.0f, LIPHY_CHARACTER_RISING_LIMIT) /
+		LIPHY_CHARACTER_RISING_LIMIT;
 
-	transform = m_ghostObject->getWorldTransform ();
-	this->object->motion->setWorldTransform (transform);
+	/* Damp when not moving. */
+	/* Without this the character would slide a lot after releasing controls. */
+	damp1 = (1.0f - LIPHY_CHARACTER_GROUND_DAMPING) * delta;
+
+	/* Walking. */
+	speed = this->object->config.movement * this->object->config.speed;
+	if (speed != 0.0f)
+		velz = forward * speed * damp0;
+	else if (ground)
+		velz *= damp1;
+
+	/* Strafing. */
+	speed = this->object->config.strafing * this->object->config.speed;
+	if (speed != 0.0f)
+		velx = right * speed * damp0;
+	else if (ground)
+		velx *= damp1;
+
+	/* Sum modified component velocities. */
+	((btRigidBody*) object)->setLinearVelocity (velx + vely + velz);
+}
+
+void liphyCharacterController::debugDraw (btIDebugDraw* debug)
+{
 }
 
 /** @} */
