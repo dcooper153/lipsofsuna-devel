@@ -216,6 +216,7 @@ liext_preview_clear (liextPreview* self)
 	LI_FOREACH_PTRDIC (iter, self->objects)
 		lirnd_object_free (iter.value);
 	lialg_ptrdic_clear (self->objects);
+	printf ("CLEAR\n");
 
 	return 1;
 }
@@ -251,22 +252,31 @@ liext_preview_insert_object (liextPreview*         self,
                              const char*           model)
 {
 	limatTransform t;
+	limatVector v;
 	liengModel* emodel;
 	lirndModel* rmodel;
 	lirndObject* object;
 
 	/* Find model. */
-	emodel = lieng_engine_find_model_by_name (self->module->engine, model);
 	rmodel = lirnd_render_find_model (self->module->render, model);
 	if (rmodel == NULL)
-		return 0;
+	{
+		emodel = lieng_engine_find_model_by_name (self->module->engine, model);
+		if (emodel == NULL)
+			return 0;
+		lirnd_render_load_model (self->module->render, model, emodel->model);
+		rmodel = lirnd_render_find_model (self->module->render, model);
+		if (rmodel == NULL)
+			return 0;
+	}
 
 	/* Create object. */
 	object = lirnd_object_new (self->scene, self->objects->size);
 	if (object == NULL)
 		return 0;
-	t = limat_convert_vector_to_transform (limat_vector_init (
-		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER));
+	v = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
+	v = limat_vector_multiply (v, LIVOX_TILE_WIDTH);
+	t = limat_convert_vector_to_transform (v);
 	t = limat_transform_multiply (t, *transform);
 	lirnd_object_set_transform (object, &t);
 	lirnd_object_set_model (object, rmodel);
