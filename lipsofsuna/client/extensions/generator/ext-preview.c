@@ -216,7 +216,6 @@ liext_preview_clear (liextPreview* self)
 	LI_FOREACH_PTRDIC (iter, self->objects)
 		lirnd_object_free (iter.value);
 	lialg_ptrdic_clear (self->objects);
-	printf ("CLEAR\n");
 
 	return 1;
 }

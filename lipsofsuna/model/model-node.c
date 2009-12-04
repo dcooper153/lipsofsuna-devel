@@ -421,20 +421,14 @@ private_calculate_world_transform (limdlNode* self)
 		t = limat_transform_multiply (t, self->transform.local);
 		self->transform.global = t;
 		if (self->type == LIMDL_NODE_BONE)
-		{
-			self->transform.global = t;
 			self->bone.tail = limat_transform_transform (t, self->bone.length);
-		}
 	}
 	else
 	{
 		t = limat_transform_multiply (self->transform.rest, self->transform.local);
 		self->transform.global = t;
 		if (self->type == LIMDL_NODE_BONE)
-		{
-			self->transform.global = t;
 			self->bone.tail = limat_transform_transform (t, self->bone.length);
-		}
 	}
 }
 

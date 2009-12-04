@@ -54,7 +54,7 @@ def BoneLocalMatrix(restbone, posebone):
 		posematrix = bonematp * parentmatp.invert()
 	else:
 		posematrix = posebone.poseMatrix
-		restmatrix = restbone.matrix['ARMATURESPACE']
+		restmatrix = restbone.matrix['ARMATURESPACE'].copy()
 	return posematrix * restmatrix.invert()
 
 def MaterialDiffuse(bmat):
@@ -433,7 +433,6 @@ class LipsAnimations:
 		for animation in self.animations:
 
 			# Clear user rotation of all bones.
-			# FIXME: Does this work?
 			for bone in self.posebones.values():
 				bone.loc = Vector(0, 0, 0)
 				bone.quat = Quaternion(1, 0, 0, 0)
@@ -441,8 +440,6 @@ class LipsAnimations:
 			# Bind the animation.
 			for armature in self.armatures:
 				animation.action.setActive(armature[0])
-				#pose = armature[0].getPose()
-				#pose.update()
 
 			# Writer header.
 			writer.WriteString(animation.name)
@@ -458,7 +455,6 @@ class LipsAnimations:
 				Blender.Set('curframe', frame)
 				for armature in self.armatures:
 					armature[0].evaluatePose(frame)
-					armature[0].makeDisplayList()
 					Blender.Redraw()
 
 				# Write channels.
@@ -475,6 +471,11 @@ class LipsAnimations:
 					writer.WriteFloat(rot.y)
 					writer.WriteFloat(rot.z)
 					writer.WriteFloat(rot.w)
+
+		# Clear user rotation of all bones.
+		for bone in self.posebones.values():
+			bone.loc = Vector(0, 0, 0)
+			bone.quat = Quaternion(1, 0, 0, 0)
 
 #############################################################################
 # Mesh.

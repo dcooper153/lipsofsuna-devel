@@ -1342,6 +1342,9 @@ private_resize_brush (liextBrushes* self)
 	x = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizex));
 	y = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizey));
 	z = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizez));
+	x = LI_MAX (1, x);
+	y = LI_MAX (1, y);
+	z = LI_MAX (1, z);
 	ligen_brush_set_size (data->brush, x, y, z);
 
 	/* Rebuild preview. */
