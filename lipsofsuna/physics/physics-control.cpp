@@ -126,11 +126,13 @@ liphyCharacterControl::liphyCharacterControl (liphyObject* object, btCollisionSh
 {
 	object->physics->dynamics->addAction (&this->controller);
 	this->body.setActivationState (DISABLE_DEACTIVATION);
+	this->body.setAngularFactor (0.0f);
 }
 
 liphyCharacterControl::~liphyCharacterControl ()
 {
 	object->physics->dynamics->removeAction (&this->controller);
+	this->body.setAngularFactor (1.0f);
 }
 
 bool
@@ -154,7 +156,6 @@ liphyRigidControl::liphyRigidControl (liphyObject* object, btCollisionShape* sha
 	this->body.setUserPointer (object);
 	this->body.setLinearVelocity (velocity);
 	this->body.setAngularVelocity (angular);
-	this->body.setAngularFactor (0.0f);
 	this->body.setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);
 	this->object->physics->dynamics->addRigidBody (&this->body,
 		this->object->config.collision_group,
