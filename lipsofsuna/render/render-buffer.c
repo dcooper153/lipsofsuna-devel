@@ -67,7 +67,8 @@ lirnd_buffer_free (lirndBuffer* self)
 }
 
 void*
-lirnd_buffer_lock (lirndBuffer* self)
+lirnd_buffer_lock (lirndBuffer* self,
+                   int          write)
 {
 	int size;
 	void* ret;
@@ -76,7 +77,10 @@ lirnd_buffer_lock (lirndBuffer* self)
 	if (self->buffer != 0)
 	{
 		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
-		ret = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB);
+		if (write)
+			ret = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB);
+		else
+			ret = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_READ_ONLY_ARB);
 		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
 		return ret;
 	}

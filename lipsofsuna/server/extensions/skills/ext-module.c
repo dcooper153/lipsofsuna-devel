@@ -97,6 +97,13 @@ liext_module_free (liextModule* self)
 	lisys_free (self);
 }
 
+liextSkills*
+liext_module_find_skills (liextModule* self,
+                          liengObject* owner)
+{
+	return lialg_ptrdic_find (self->dictionary, owner);
+}
+
 int
 liext_module_insert_skills (liextModule* self,
                             liengObject* key,

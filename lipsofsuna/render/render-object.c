@@ -126,7 +126,7 @@ lirnd_object_deform (lirndObject* self)
 	for (i = 0 ; i < self->instance->buffers.count ; i++)
 	{
 		buffer = self->instance->buffers.array + i;
-		vertices = lirnd_buffer_lock (buffer);
+		vertices = lirnd_buffer_lock (buffer, 1);
 		if (vertices != NULL)
 		{
 			limdl_pose_transform_group (self->pose, i, vertices);

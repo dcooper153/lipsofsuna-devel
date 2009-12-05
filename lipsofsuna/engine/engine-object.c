@@ -27,8 +27,7 @@
 #include "engine-object.h"
 #include "engine-selection.h"
 
-#define LIENG_OBJECT_VERSION 0
-#define LIENG_OBJECT_APPROACH_TOLERANCE 1.0f
+#define LIENG_OBJECT_APPROACH_TOLERANCE 1.5f
 
 static int
 private_warp (liengObject*       self,

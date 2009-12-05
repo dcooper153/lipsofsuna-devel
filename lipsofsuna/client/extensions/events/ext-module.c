@@ -27,6 +27,15 @@
 #include "ext-module.h"
 
 static int
+private_object_model (liextModule* self,
+                      liengObject* object,
+                      liengModel*  model);
+
+static int
+private_object_new (liextModule* self,
+                    liengObject* object);
+
+static int
 private_packet (liextModule* self,
                 int          type,
                 liarcReader* reader);
@@ -62,12 +71,16 @@ liext_module_new (licliModule* module)
 	self->module = module;
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 1,
-	     	private_packet, self, self->calls + 0) ||
+	if (!lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_MODEL, 2,
+	     	private_object_model, self, self->calls + 0) ||
+	    !lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_NEW, 2,
+	     	private_object_new, self, self->calls + 1) ||
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 1,
+	     	private_packet, self, self->calls + 2) ||
 	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_SELECT, 0,
-	     	private_select, self, self->calls + 1) ||
+	     	private_select, self, self->calls + 3) ||
 	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 2))
+	     	private_tick, self, self->calls + 4))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -177,6 +190,34 @@ liext_module_event (liextModule* self,
 }
 
 /*****************************************************************************/
+
+static int
+private_object_model (liextModule* self,
+                      liengObject* object,
+                      liengModel*  model)
+{
+	if (object->script != NULL && model != NULL)
+	{
+		liext_module_event (self, LIEXT_EVENT_OBJECT_MODEL,
+			"object", LICOM_SCRIPT_OBJECT, object->script,
+			"model", LISCR_TYPE_STRING, model->name, NULL);
+	}
+
+	return 1;
+}
+
+static int
+private_object_new (liextModule* self,
+                    liengObject* object)
+{
+	if (object->script != NULL)
+	{
+		liext_module_event (self, LIEXT_EVENT_OBJECT_NEW,
+			"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
+	}
+
+	return 1;
+}
 
 static int
 private_packet (liextModule* self,

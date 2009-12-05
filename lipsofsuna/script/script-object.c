@@ -65,6 +65,7 @@ Object_approach (lua_State* lua)
  * --
  * -- @param self Object.
  * -- @param name Node name.
+ * -- @return Position and rotation, or nil if not found.
  * function Object.find_node(self, name)
  */
 static int

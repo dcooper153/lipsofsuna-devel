@@ -52,6 +52,10 @@ liext_module_new (lisrvServer* server);
 void
 liext_module_free (liextModule* self);
 
+liextSkills*
+liext_module_find_skills (liextModule* self,
+                          liengObject* owner);
+
 int
 liext_module_insert_skills (liextModule* self,
                             liengObject* key,

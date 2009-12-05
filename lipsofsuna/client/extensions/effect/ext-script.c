@@ -70,6 +70,185 @@ Effect_particle (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Creates random particles.
+ * --
+ * -- The following values are recognized in the argument table:
+ * --
+ * -- angle: Maximum cone angle in degrees.
+ * -- axis: Axis of rotation.
+ * -- accel: Acceleration vector.
+ * -- color: Particle color.
+ * -- count: Number of particles.
+ * -- fade: Fade start time in seconds.
+ * -- life: Particle lifetime in seconds.
+ * -- random: Velocity error value.
+ * -- spread: Maximum particle distance from the center.
+ * -- velocity: Average particle velocity.
+ * --
+ * -- @param self Effect class.
+ * -- @param pos Position vector.
+ * -- @param num Number of particles.
+ * -- @param args Optional table of arguments.
+ * function Effect.random(self, args)
+ */
+static int
+Effect_random (lua_State* lua)
+{
+	int i;
+	int count;
+	float angle;
+	float color[3];
+	float fade;
+	float life;
+	float random;
+	float spread;
+	float velocity;
+	liextModule* module;
+	limatQuaternion rot0;
+	limatQuaternion rot1;
+	limatVector tmp;
+	limatVector axis;
+	limatVector accel;
+	limatVector position;
+	limatVector partpos;
+	limatVector partvel;
+	liparPoint* particle;
+	liscrData* vector;
+
+	/* Mandatory arguments. */
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EFFECT);
+	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	position = *((limatVector*) vector->data);
+
+	/* Default values. */
+	axis = limat_vector_init (0.0f, 1.0f, 0.0f);
+	accel = limat_vector_init (0.0f, -9.8f, 0.0f);
+	angle = M_PI;
+	color[0] = 1.0f;
+	color[1] = 1.0f;
+	color[2] = 1.0f;
+	count = 10;
+	fade = 1.0f;
+	life = 2.0f;
+	random = 0.0f;
+	spread = 0.0f;
+	velocity = 10.0f;
+
+	/* Optional arguments. */
+	if (lua_type (lua, 3) == LUA_TTABLE)
+	{
+		/* "angle" */
+		lua_getfield (lua, 3, "angle");
+		if (lua_isnumber (lua, -1))
+			angle = lua_tonumber (lua, -1) / 180.0f * M_PI;
+		lua_pop (lua, 1);
+
+		/* "axis" */
+		lua_getfield (lua, 3, "axis");
+		vector = liscr_isdata (lua, -1, LICOM_SCRIPT_VECTOR);
+		if (vector != NULL)
+		{
+			axis = *((limatVector*) vector->data);
+			axis = limat_vector_normalize (axis);
+		}
+		lua_pop (lua, 1);
+
+		/* "accel" */
+		lua_getfield (lua, 3, "accel");
+		vector = liscr_isdata (lua, -1, LICOM_SCRIPT_VECTOR);
+		if (vector != NULL)
+			accel = *((limatVector*) vector->data);
+		lua_pop (lua, 1);
+
+		/* "color" */
+		lua_getfield (lua, 3, "color");
+		if (lua_type (lua, -1) == LUA_TTABLE)
+		{
+			lua_pushnumber (lua, 1);
+			lua_gettable (lua, -2);
+			if (lua_isnumber (lua, -1))
+				color[0] = lua_tonumber (lua, -1);
+			lua_pop (lua, 1);
+
+			lua_pushnumber (lua, 2);
+			lua_gettable (lua, -2);
+			if (lua_isnumber (lua, -1))
+				color[1] = lua_tonumber (lua, -1);
+			lua_pop (lua, 1);
+
+			lua_pushnumber (lua, 3);
+			lua_gettable (lua, -2);
+			if (lua_isnumber (lua, -1))
+				color[2] = lua_tonumber (lua, -1);
+			lua_pop (lua, 1);
+		}
+		lua_pop (lua, 1);
+
+		/* "count" */
+		lua_getfield (lua, 3, "count");
+		if (lua_isnumber (lua, -1))
+			count = lua_tointeger (lua, -1);
+		lua_pop (lua, 1);
+
+		/* "life" */
+		lua_getfield (lua, 3, "life");
+		if (lua_isnumber (lua, -1))
+		{
+			life = lua_tonumber (lua, -1);
+			fade = 0.5f * life;
+		}
+		lua_pop (lua, 1);
+
+		/* "fade" */
+		lua_getfield (lua, 3, "fade");
+		if (lua_isnumber (lua, -1))
+			fade = lua_tonumber (lua, -1);
+		lua_pop (lua, 1);
+
+		/* "random" */
+		lua_getfield (lua, 3, "random");
+		if (lua_isnumber (lua, -1))
+			random = lua_tonumber (lua, -1);
+		lua_pop (lua, 1);
+
+		/* "velocity" */
+		lua_getfield (lua, 3, "velocity");
+		if (lua_isnumber (lua, -1))
+			velocity = lua_tonumber (lua, -1);
+		lua_pop (lua, 1);
+	}
+
+	/* Create particles. */
+	for (i = 0 ; i < count ; i++)
+	{
+		tmp = limat_vector_cross (axis, limat_vector_init (1.0f, 0.0f, 0.0f));
+		if (limat_vector_get_length (tmp) < 0.1f)
+			tmp = limat_vector_cross (axis, limat_vector_init (0.0f, 1.0f, 0.0f));
+		rot0 = limat_quaternion_rotation ((2.0f * rand () / RAND_MAX - 1.0f) * angle, tmp);
+		rot1 = limat_quaternion_rotation ((2.0f * rand () / RAND_MAX - 1.0f) * M_PI, axis);
+		tmp = limat_quaternion_transform (rot0, axis);
+		tmp = limat_quaternion_transform (rot1, tmp);
+		partpos = limat_vector_multiply (tmp, spread * (1.0f * rand () / RAND_MAX));
+		partpos = limat_vector_add (partpos, position);
+		partvel = limat_vector_multiply (tmp, velocity + velocity * random *
+			(2.0f * rand () / RAND_MAX - 1.0f));
+		particle = lirnd_scene_insert_particle (module->module->scene, &partpos, &partvel);
+		if (particle != NULL)
+		{
+			particle->color[0] = color[0];
+			particle->color[1] = color[1];
+			particle->color[2] = color[2];
+			particle->time_fade = fade;
+			particle->time_life = life;
+			particle->acceleration = accel;
+		}
+	}
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new ray effect.
  * --
  * -- @param self Effect class.
@@ -158,6 +337,7 @@ liextEffectScript (liscrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EFFECT, data);
 	liscr_class_insert_func (self, "particle", Effect_particle);
+	liscr_class_insert_func (self, "random", Effect_random);
 	liscr_class_insert_func (self, "ray", Effect_ray);
 	liscr_class_insert_func (self, "system", Effect_system);
 }

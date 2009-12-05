@@ -242,6 +242,70 @@ Skills___newindex (lua_State* lua)
 	return liscr_class_default___newindex (lua);
 }
 
+/*
+ * ---
+ * -- @brief Check if the object has enough skill.
+ * -- @param self Skills class.
+ * -- @param object Object whose skills to check.
+ * -- @param skill Skill name.
+ * -- @param value Required value.
+ * -- @return True if the user had enough skill.
+ * function Skills.check(self, object, skill, value)
+ */
+static int
+Skills_check (lua_State* lua)
+{
+	float value;
+	const char* name;
+	liextModule* module;
+	liextSkill* skill;
+	liextSkills* skills;
+	liscrData* object;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+	name = luaL_checkstring (lua, 3);
+	value = luaL_checknumber (lua, 4);
+
+	skills = liext_module_find_skills (module, object->data);
+	if (skills == NULL)
+		return 0;
+	skill = liext_skills_find_skill (skills, name);
+	if (skill == NULL)
+		return 0;
+	if (skill->value < value)
+		return 0;
+	lua_pushboolean (lua, 1);
+
+	return 1;
+}
+
+/*
+ * ---
+ * -- @brief Finds the skills for an object.
+ * -- @param self Skills class.
+ * -- @param object Object whose skills to find.
+ * -- @return Skills or nil.
+ * function Skills.find(self, object)
+ */
+static int
+Skills_find (lua_State* lua)
+{
+	liextModule* module;
+	liextSkills* skills;
+	liscrData* object;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+
+	skills = liext_module_find_skills (module, object->data);
+	if (skills == NULL)
+		return 0;
+	liscr_pushdata (lua, skills->data);
+
+	return 1;
+}
+
 /* @luadoc
  * ---
  * -- Creates a new skills list.
@@ -320,6 +384,45 @@ Skills_register (lua_State* lua)
 	return 0;
 }
 
+/*
+ * ---
+ * -- @brief Tries to subtract a value from the specified skill.
+ * -- @param self Skills class.
+ * -- @param object Object whose skills to modify.
+ * -- @param skill Skill name.
+ * -- @param value Value to subtract.
+ * -- @return True if the user had enough skill.
+ * function Skills.subtract(self, object, skill, value)
+ */
+static int
+Skills_subtract (lua_State* lua)
+{
+	float value;
+	const char* name;
+	liextModule* module;
+	liextSkill* skill;
+	liextSkills* skills;
+	liscrData* object;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+	name = luaL_checkstring (lua, 3);
+	value = luaL_checknumber (lua, 4);
+
+	skills = liext_module_find_skills (module, object->data);
+	if (skills == NULL)
+		return 0;
+	skill = liext_skills_find_skill (skills, name);
+	if (skill == NULL)
+		return 0;
+	if (skill->value < value)
+		return 0;
+	liext_skill_set_value (skill, skill->value - value);
+	lua_pushboolean (lua, 1);
+
+	return 1;
+}
+
 /* @luadoc
  * ---
  * -- Owner object.
@@ -381,8 +484,11 @@ liextSkillsScript (liscrClass* self,
 	liscr_class_insert_func (self, "__gc", Skills___gc);
 	liscr_class_insert_func (self, "__index", Skills___index);
 	liscr_class_insert_func (self, "__newindex", Skills___newindex);
+	liscr_class_insert_func (self, "check", Skills_check);
+	liscr_class_insert_func (self, "find", Skills_find);
 	liscr_class_insert_func (self, "new", Skills_new);
 	liscr_class_insert_func (self, "register", Skills_register);
+	liscr_class_insert_func (self, "subtract", Skills_subtract);
 	liscr_class_insert_getter (self, "owner", Skills_getter_owner);
 	liscr_class_insert_setter (self, "owner", Skills_setter_owner);
 }

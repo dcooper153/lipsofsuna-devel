@@ -53,7 +53,8 @@ void
 lirnd_buffer_free (lirndBuffer* self);
 
 void*
-lirnd_buffer_lock (lirndBuffer* self);
+lirnd_buffer_lock (lirndBuffer* self,
+                   int          write);
 
 void
 lirnd_buffer_unlock (lirndBuffer* self,

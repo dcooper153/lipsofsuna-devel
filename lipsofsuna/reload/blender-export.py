@@ -216,14 +216,15 @@ def NodeChildren(file, object, bone, parent):
 	return nodes
 
 def ObjectFile(object):
-	name = os.path.splitext(Blender.Get("filename"))[0]
+	path,name = os.path.split(Blender.Get("filename"))
+	name = os.path.splitext(name)[0]
 	prop = ObjectProperty(object, "file")
 	if prop:
-		name = name.replace("-000", "") # FIXME
+		name = name.rpartition('-')[0]
 		name = prop.data.replace('$', name)
 	elif object.type == "Lamp":
 		return None
-	return name + ".lmdl"
+	return os.path.join(path, name + ".lmdl")
 
 def ObjectHairs(lips, object):
 	global lips_correction_matrix

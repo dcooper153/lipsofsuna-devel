@@ -273,7 +273,7 @@ lirnd_scene_render (lirndScene*    self,
 	{
 		glPushAttrib (GL_VIEWPORT_BIT);
 		glViewport (0, 0, framebuffer->width, framebuffer->height);
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->fbo);
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->deferred_fbo);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
@@ -311,22 +311,59 @@ lirnd_scene_render (lirndScene*    self,
 		self->render->profiling.faces, self->render->profiling.vertices);
 #endif
 
+	/* Deferred lighting. */
+	if (framebuffer != NULL)
+	{
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
+		glClear (GL_COLOR_BUFFER_BIT);
+		private_lighting_render (self, &context, framebuffer);
+	}
+	lirnd_check_errors ();
+
 	/* Render particles. */
 	glDisable (GL_COLOR_MATERIAL);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_BLEND);
+	glEnable (GL_DEPTH_TEST);
 	glDepthMask (GL_FALSE);
 	private_particle_render (self);
 	private_render (self, &context, lirnd_draw_debug, NULL);
 	lirnd_check_errors ();
 	glDepthMask (GL_TRUE);
 
-	/* Deferred lighting. */
+	/* Copy scene to screen. */
 	if (framebuffer != NULL)
 	{
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+		glUseProgramObjectARB (0);
+		glClear (GL_COLOR_BUFFER_BIT);
+		glDisable (GL_BLEND);
+		glDisable (GL_LIGHTING);
+		glDisable (GL_CULL_FACE);
+		glDisable (GL_DEPTH_TEST);
+		glColor3f (1.0f, 1.0f, 1.0f);
+		glEnable (GL_TEXTURE_2D);
+		glBindTexture (GL_TEXTURE_2D, framebuffer->target_texture);
+		glMatrixMode (GL_MODELVIEW);
+		glLoadIdentity ();
+		glPushMatrix ();
+		glMatrixMode (GL_PROJECTION);
+		glLoadIdentity ();
+		glPushMatrix ();
+		glBegin (GL_QUADS);
+		glTexCoord2i (0, 0);
+		glVertex2i (-1, -1);
+		glTexCoord2i (0, 1);
+		glVertex2i (-1, 1);
+		glTexCoord2i (1, 1);
+		glVertex2i (1, 1);
+		glTexCoord2i (1, 0);
+		glVertex2i (1, -1);
+		glEnd ();
+		glPopMatrix ();
+		glMatrixMode (GL_MODELVIEW);
+		glPopMatrix ();
 		glPopAttrib ();
-		private_lighting_render (self, &context, framebuffer);
 	}
 	lirnd_check_errors ();
 
@@ -602,7 +639,7 @@ private_particle_render (lirndScene* self)
 	glEnable (GL_BLEND);
 
 	/* Set point particle rendering mode. */
-	glBlendFunc (GL_ONE, GL_ONE);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 	glDisable (GL_LIGHTING);
 	if (GLEW_ARB_point_sprite)
 	{

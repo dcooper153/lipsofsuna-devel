@@ -32,11 +32,13 @@ struct _lirndDeferred
 {
 	int width;
 	int height;
-	GLuint fbo;
+	GLuint deferred_fbo;
+	GLuint target_fbo;
 	GLuint depth_texture;
 	GLuint diffuse_texture;
 	GLuint specular_texture;
 	GLuint normal_texture;
+	GLuint target_texture;
 	lirndRender* render;
 };
 

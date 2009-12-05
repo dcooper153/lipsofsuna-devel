@@ -37,6 +37,8 @@ enum
 	LIEXT_EVENT_ACTION = LICLI_EVENT_TYPE_ACTION,
 	LIEXT_EVENT_ASSIGN,
 	LIEXT_EVENT_PACKET,
+	LIEXT_EVENT_OBJECT_MODEL,
+	LIEXT_EVENT_OBJECT_NEW,
 	LIEXT_EVENT_SELECT,
 	LIEXT_EVENT_TICK,
 	LIEXT_EVENT_MAX
@@ -45,7 +47,7 @@ enum
 typedef struct _liextModule liextModule;
 struct _liextModule
 {
-	licalHandle calls[3];
+	licalHandle calls[5];
 	licliModule* module;
 };
 

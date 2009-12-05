@@ -26,6 +26,9 @@
 #include "render-deferred.h"
 
 static int
+private_check (lirndDeferred* self);
+
+static int
 private_rebuild (lirndDeferred* self,
                  int            width,
                  int            height);
@@ -86,11 +89,13 @@ lirnd_deferred_new (lirndRender* render,
 void
 lirnd_deferred_free (lirndDeferred* self)
 {
-	glDeleteFramebuffersEXT (1, &self->fbo);
+	glDeleteFramebuffersEXT (1, &self->deferred_fbo);
+	glDeleteFramebuffersEXT (1, &self->target_fbo);
 	glDeleteTextures (1, &self->depth_texture);
 	glDeleteTextures (1, &self->normal_texture);
 	glDeleteTextures (1, &self->diffuse_texture);
 	glDeleteTextures (1, &self->specular_texture);
+	glDeleteTextures (1, &self->target_texture);
 	lisys_free (self);
 }
 
@@ -162,16 +167,61 @@ lirnd_deferred_read_pixel (lirndDeferred* self,
 /*****************************************************************************/
 
 static int
+private_check (lirndDeferred* self)
+{
+	int ret;
+
+	ret = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+	if (ret != GL_FRAMEBUFFER_COMPLETE_EXT)
+	{
+		switch (ret)
+		{
+			case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+				lisys_error_set (ENOTSUP, "framebuffer object unsupported");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+				lisys_error_set (ENOTSUP, "incomplete framebuffer attachment");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+				lisys_error_set (ENOTSUP, "incomplete framebuffer draw buffer");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+				lisys_error_set (ENOTSUP, "incomplete framebuffer dimensions");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+				lisys_error_set (ENOTSUP, "incomplete framebuffer formats");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+				lisys_error_set (ENOTSUP, "missing framebuffer attachment");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT:
+				lisys_error_set (ENOTSUP, "incomplete framebuffer multisample");
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+				lisys_error_set (ENOTSUP, "incomplete framebuffer read buffer");
+				break;
+			default:
+				lisys_error_set (ENOTSUP, "unknown framebuffer creation error");
+				break;
+		}
+		return 0;
+	}
+
+	return 1;
+}
+
+static int
 private_rebuild (lirndDeferred* self,
                  int            width,
                  int            height)
 {
-	int ret;
-	GLuint fbo;
+	GLuint deferred_fbo;
+	GLuint target_fbo;
 	GLuint depth_texture;
 	GLuint normal_texture;
 	GLuint diffuse_texture;
 	GLuint specular_texture;
+	GLuint target_texture;
 	static const GLenum fragdata[] =
 	{
 		GL_COLOR_ATTACHMENT0_EXT,
@@ -216,9 +266,18 @@ private_rebuild (lirndDeferred* self,
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	/* Create framebuffer object. */
-	glGenFramebuffersEXT (1, &fbo);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, fbo);
+	/* Create target texture. */
+	glGenTextures (1, &target_texture);
+	glBindTexture (GL_TEXTURE_2D, target_texture);
+	glTexImage2D (GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+	/* Create deferred framebuffer object. */
+	glGenFramebuffersEXT (1, &deferred_fbo);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, deferred_fbo);
 	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
 		GL_TEXTURE_2D, depth_texture, 0);
 	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
@@ -227,62 +286,58 @@ private_rebuild (lirndDeferred* self,
 		GL_TEXTURE_2D, specular_texture, 0);
 	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT,
 		GL_TEXTURE_2D, normal_texture, 0);
-	ret = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
-	if (ret != GL_FRAMEBUFFER_COMPLETE_EXT)
+	if (!private_check (self))
 	{
-		switch (ret)
-		{
-			case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-				lisys_error_set (ENOTSUP, "framebuffer object unsupported");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer attachment");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer draw buffer");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer dimensions");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer formats");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-				lisys_error_set (ENOTSUP, "missing framebuffer attachment");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer multisample");
-				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer read buffer");
-				break;
-			default:
-				lisys_error_set (ENOTSUP, "unknown framebuffer creation error");
-				break;
-		}
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 		glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
-		glDeleteFramebuffersEXT (1, &fbo);
+		glDeleteFramebuffersEXT (1, &deferred_fbo);
 		glDeleteTextures (1, &depth_texture);
 		glDeleteTextures (1, &normal_texture);
 		glDeleteTextures (1, &diffuse_texture);
 		glDeleteTextures (1, &specular_texture);
+		glDeleteTextures (1, &target_texture);
 		return 0;
 	}
 	glDrawBuffers (sizeof (fragdata) / sizeof (GLenum), fragdata);
 
+	/* Create target framebuffer object. */
+	glGenFramebuffersEXT (1, &target_fbo);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, target_fbo);
+	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+		GL_TEXTURE_2D, depth_texture, 0);
+	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+		GL_TEXTURE_2D, target_texture, 0);
+	if (!private_check (self))
+	{
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+		glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
+		glDeleteFramebuffersEXT (1, &deferred_fbo);
+		glDeleteFramebuffersEXT (1, &target_fbo);
+		glDeleteTextures (1, &depth_texture);
+		glDeleteTextures (1, &normal_texture);
+		glDeleteTextures (1, &diffuse_texture);
+		glDeleteTextures (1, &specular_texture);
+		glDeleteTextures (1, &target_texture);
+		return 0;
+	}
+	glDrawBuffers (1, fragdata);
+
 	/* Accept successful rebuild. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-	glDeleteFramebuffersEXT (1, &self->fbo);
+	glDeleteFramebuffersEXT (1, &self->deferred_fbo);
+	glDeleteFramebuffersEXT (1, &self->target_fbo);
 	glDeleteTextures (1, &self->depth_texture);
 	glDeleteTextures (1, &self->normal_texture);
 	glDeleteTextures (1, &self->diffuse_texture);
 	glDeleteTextures (1, &self->specular_texture);
-	self->fbo = fbo;
+	glDeleteTextures (1, &self->target_texture);
+	self->deferred_fbo = deferred_fbo;
+	self->target_fbo = target_fbo;
 	self->depth_texture = depth_texture;
 	self->normal_texture = normal_texture;
 	self->diffuse_texture = diffuse_texture;
 	self->specular_texture = specular_texture;
+	self->target_texture = target_texture;
 
 	return 1;
 }

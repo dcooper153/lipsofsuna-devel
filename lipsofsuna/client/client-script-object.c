@@ -44,17 +44,19 @@
 static int
 Object_emit_particles (lua_State* lua)
 {
-#warning Object_emit_particles is disabled
-#if 0
 	liscrData* object;
+	licliModule* module;
 	liengObject* data;
+	lirndObject* render;
 
 	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
 	data = LIENG_OBJECT (object->data);
+	module = lieng_engine_get_userdata (data->engine, LIENG_DATA_CLIENT);
 
-	if (data->render != NULL)
-		lirnd_object_emit_particles (data->render);
-#endif
+	render = lirnd_scene_find_object (module->scene, data->id);
+	if (render != NULL)
+		lirnd_object_emit_particles (render);
+
 	return 0;
 }
 
