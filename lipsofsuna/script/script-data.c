@@ -40,12 +40,14 @@
  * \param script Script.
  * \param data Wrapped data.
  * \param meta Name of the metatable.
+ * \param free Free function called by garbage collector.
  * \return New script userdata or NULL.
  */
 liscrData*
 liscr_data_new (liscrScript* script,
                 void*        data,
-                const char*  meta)
+                const char*  meta,
+                liscrGCFunc  free)
 {
 	liscrClass* clss;
 	liscrData* object;
@@ -70,6 +72,7 @@ liscr_data_new (liscrScript* script,
 	object->clss = clss;
 	object->script = script;
 	object->data = data;
+	object->free = free;
 	luaL_getmetatable (script->lua, meta);
 	lua_setmetatable (script->lua, -2);
 
@@ -114,7 +117,7 @@ liscr_data_new_alloc (liscrScript* script,
 	data = lisys_calloc (1, size);
 	if (data == NULL)
 		return NULL;
-	self = liscr_data_new (script, data, meta);
+	self = liscr_data_new (script, data, meta, lisys_free);
 	if (self == NULL)
 	{
 		lisys_free (data);
@@ -139,6 +142,10 @@ void
 liscr_data_free (liscrData* object)
 {
 	liscrScript* script = object->script;
+
+	/* Call free function. */
+	if (object->free != NULL)
+		object->free (object->data, object);
 
 	/* Remove from lookup table. */
 	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);

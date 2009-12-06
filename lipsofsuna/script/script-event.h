@@ -40,19 +40,19 @@ licom_event_newva (liscrScript* script,
                                 ...);
 
 void
-licom_event_set (liscrData*   self,
-                              ...);
+licom_event_set (liscrData* self,
+                            ...);
 
 void
-licom_event_setv (liscrData*   self,
-                  va_list      args);
+licom_event_setv (liscrData* self,
+                  va_list    args);
 
 int
 licom_event_get_type (const liscrData* self);
 
 void
-licom_event_set_type (liscrData*   self,
-                      int          type);
+licom_event_set_type (liscrData* self,
+                      int        type);
 
 #endif
 

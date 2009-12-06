@@ -78,7 +78,7 @@ Generator_new (lua_State* lua)
 	/* Allocate userdata. */
 	if (module->script == NULL)
 	{
-		module->script = liscr_data_new (script, module->editor, LIEXT_SCRIPT_GENERATOR);
+		module->script = liscr_data_new (script, module->editor, LIEXT_SCRIPT_GENERATOR, licli_script_widget_free);
 		if (module->script == NULL)
 			return 0;
 		if (!lua_isnoneornil (lua, 2))

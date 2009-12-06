@@ -37,18 +37,6 @@
  * -- @class table
  */
 
-static int
-Npc___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LIEXT_SCRIPT_NPC);
-
-	liext_npc_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new non-player character logic.
@@ -75,7 +63,7 @@ Npc_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	self = liscr_data_new (script, logic, LIEXT_SCRIPT_NPC);
+	self = liscr_data_new (script, logic, LIEXT_SCRIPT_NPC, liext_npc_free);
 	if (self == NULL)
 	{
 		liext_npc_free (logic);
@@ -291,7 +279,6 @@ liextNpcScript (liscrClass* self,
                 void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);
-	liscr_class_insert_func (self, "__gc", Npc___gc);
 	liscr_class_insert_func (self, "new", Npc_new);
 	liscr_class_insert_getter (self, "alert", Npc_getter_alert);
 	liscr_class_insert_getter (self, "object", Npc_getter_object);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,18 +29,20 @@
 
 struct _libndAction
 {
-	libndAction* prev;
-	libndAction* next;
 	int enabled;
 	char* identifier;
 	char* name;
 	char* description;
-	libndCallback callback;
 	void* data;
+	libndAction* prev;
+	libndAction* next;
+	libndCallback callback;
+	libndManager* manager;
 };
 
 libndAction*
-libnd_action_new (const char*   identifier,
+libnd_action_new (libndManager* manager,
+                  const char*   identifier,
                   const char*   name,
                   const char*   description,
                   libndCallback callback,

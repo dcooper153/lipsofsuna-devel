@@ -101,20 +101,6 @@ private_read (liscrPacket* data,
  * -- @class table
  */
 
-static int
-Packet___gc (lua_State* lua)
-{
-	liscrData* self;
-	liscrPacket* data;
-
-	self = liscr_isdata (lua, 1, LICOM_SCRIPT_PACKET);
-	data = self->data;
-
-	liscr_packet_free (data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new packet.
@@ -352,7 +338,6 @@ licomPacketScript (liscrClass* self,
 	liscr_class_insert_enum (self, "UINT8", LISCR_PACKET_FORMAT_UINT8);
 	liscr_class_insert_enum (self, "UINT16", LISCR_PACKET_FORMAT_UINT16);
 	liscr_class_insert_enum (self, "UINT32", LISCR_PACKET_FORMAT_UINT32);
-	liscr_class_insert_func (self, "__gc", Packet___gc);
 	liscr_class_insert_func (self, "new", Packet_new);
 	liscr_class_insert_func (self, "read", Packet_read);
 	liscr_class_insert_func (self, "resume", Packet_resume);
@@ -390,7 +375,7 @@ liscr_packet_new_readable (liscrScript*       script,
 	memcpy (self->buffer, reader->buffer, reader->length);
 
 	/* Allocate script data. */
-	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET);
+	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_reader_free (self->reader);
@@ -422,7 +407,7 @@ liscr_packet_new_writable (liscrScript* script,
 	}
 
 	/* Allocate script data. */
-	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET);
+	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_writer_free (self->writer);

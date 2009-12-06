@@ -65,18 +65,6 @@ Quaternion___add (lua_State* lua)
 	return 1;
 }
 
-static int
-Quaternion___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICOM_SCRIPT_QUATERNION);
-
-	lisys_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Multiplies the quaternion with another value.
@@ -511,7 +499,6 @@ licomQuaternionScript (liscrClass* self,
                        void*       data)
 {
 	liscr_class_insert_func (self, "__add", Quaternion___add);
-	liscr_class_insert_func (self, "__gc", Quaternion___gc);
 	liscr_class_insert_func (self, "__mul", Quaternion___mul);
 	liscr_class_insert_func (self, "__sub", Quaternion___sub);
 	liscr_class_insert_func (self, "new", Quaternion_new);
@@ -543,19 +530,12 @@ liscrData*
 liscr_quaternion_new (liscrScript*           script,
                       const limatQuaternion* quaternion)
 {
-	limatQuaternion* tmp;
 	liscrData* self;
 
-	tmp = lisys_malloc (sizeof (limatQuaternion));
-	if (tmp == NULL)
-		return NULL;
-	*tmp = *quaternion;
-	self = liscr_data_new (script, tmp, LICOM_SCRIPT_QUATERNION);
+	self = liscr_data_new_alloc (script, sizeof (limatQuaternion), LICOM_SCRIPT_QUATERNION);
 	if (self == NULL)
-	{
-		lisys_free (tmp);
 		return NULL;
-	}
+	*((limatQuaternion*) self->data) = *quaternion;
 
 	return self;
 }

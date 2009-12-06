@@ -48,7 +48,6 @@ struct _liextSkill
 	float regen;
 	liextSkills* skills;
 	liextSkillType type;
-	liscrData* script;
 };
 
 liextSkill*

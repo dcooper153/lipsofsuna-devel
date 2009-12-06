@@ -65,18 +65,6 @@ Vector___add (lua_State* lua)
 	return 1;
 }
 
-static int
-Vector___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICOM_SCRIPT_VECTOR);
-
-	lisys_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Multiplies the vector with a scalar.
@@ -326,7 +314,6 @@ licomVectorScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_insert_func (self, "__add", Vector___add);
-	liscr_class_insert_func (self, "__gc", Vector___gc);
 	liscr_class_insert_func (self, "__mul", Vector___mul);
 	liscr_class_insert_func (self, "__sub", Vector___sub);
 	liscr_class_insert_func (self, "cross", Vector_cross);
@@ -353,19 +340,12 @@ liscrData*
 liscr_vector_new (liscrScript*       script,
                   const limatVector* vector)
 {
-	limatVector* tmp;
 	liscrData* self;
 
-	tmp = lisys_malloc (sizeof (limatVector));
-	if (tmp == NULL)
-		return NULL;
-	*tmp = *vector;
-	self = liscr_data_new (script, tmp, LICOM_SCRIPT_VECTOR);
+	self = liscr_data_new_alloc (script, sizeof (limatVector), LICOM_SCRIPT_VECTOR);
 	if (self == NULL)
-	{
-		lisys_free (tmp);
 		return NULL;
-	}
+	*((limatVector*) self->data) = *vector;
 
 	return self;
 }

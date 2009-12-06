@@ -68,7 +68,7 @@ licli_object_new (licliModule* module,
 	}
 
 	/* Allocate script data. */
-	self->script = liscr_data_new (script, self, LICOM_SCRIPT_OBJECT);
+	self->script = liscr_data_new (script, self, LICOM_SCRIPT_OBJECT, lieng_object_free);
 	if (self->script == NULL)
 		goto error;
 

@@ -117,9 +117,6 @@ lisrv_object_set_transform (liengObject*          self,
                             const limatTransform* transform);
 
 int
-lisrv_object_get_valid (const liengObject* self);
-
-int
 lisrv_object_set_velocity (liengObject*       self,
                            const limatVector* value);
 

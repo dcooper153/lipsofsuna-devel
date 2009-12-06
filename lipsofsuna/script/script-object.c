@@ -34,18 +34,6 @@
  */
 
 static int
-Object___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lieng_object_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
-static int
 Object_approach (lua_State* lua)
 {
 	liscrData* object;
@@ -702,27 +690,6 @@ Object_setter_strafing (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Validity flag.
- * --
- * -- Evaluates to true if the object hasn't been destroyed. This is
- * -- the only operation that can be performed to destroyed objects.
- * --
- * -- @name Object.valid
- * -- @class table
- */
-static int
-Object_getter_valid (lua_State* lua)
-{
-	liscrData* object;
-
-	object = liscr_isdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushboolean (lua, !object->invalid);
-	return 1;
-}
-
-/* @luadoc
- * ---
  * -- Linear velocity.
  * --
  * -- @name Object.velocity
@@ -768,7 +735,6 @@ void
 licomObjectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_insert_func (self, "__gc", Object___gc);
 	liscr_class_insert_func (self, "approach", Object_approach);
 	liscr_class_insert_func (self, "find_node", Object_find_node);
 	liscr_class_insert_func (self, "impulse", Object_impulse);
@@ -789,7 +755,6 @@ licomObjectScript (liscrClass* self,
 	liscr_class_insert_getter (self, "selected", Object_getter_selected);
 	liscr_class_insert_getter (self, "speed", Object_getter_speed);
 	liscr_class_insert_getter (self, "strafing", Object_getter_strafing);
-	liscr_class_insert_getter (self, "valid", Object_getter_valid);
 	liscr_class_insert_getter (self, "velocity", Object_getter_velocity);
 	liscr_class_insert_setter (self, "angular_momentum", Object_setter_angular_momentum);
 	liscr_class_insert_setter (self, "class", Object_setter_class);

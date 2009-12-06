@@ -30,7 +30,8 @@
 liscrData*
 liscr_data_new (liscrScript* script,
                 void*        data,
-                const char*  meta);
+                const char*  meta,
+                liscrGCFunc  free);
 
 liscrData*
 liscr_data_new_alloc (liscrScript* script,

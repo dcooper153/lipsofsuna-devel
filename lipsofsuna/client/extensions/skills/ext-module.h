@@ -29,6 +29,8 @@
 
 #include <algorithm/lips-algorithm.h>
 
+#define LIEXT_SCRIPT_SKILL "Lips.Skill"
+#define LIEXT_SCRIPT_SKILLS "Lips.Skills"
 #define LIEXT_SCRIPT_SKILL_WIDGET "Lips.SkillWidget"
 
 typedef struct _liextModule liextModule;
@@ -53,6 +55,10 @@ liext_module_find_skills (liextModule* self,
                           uint32_t     id);
 
 /*****************************************************************************/
+
+void
+liextSkillsScript (liscrClass* self,
+                   void*       data);
 
 void
 liextSkillWidgetScript (liscrClass* self,

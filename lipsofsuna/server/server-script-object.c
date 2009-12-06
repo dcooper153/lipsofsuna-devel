@@ -351,7 +351,7 @@ Object_solve_path (lua_State* lua)
 	}
 
 	/* Create path object. */
-	path = liscr_data_new (script, tmp, LICOM_SCRIPT_PATH);
+	path = liscr_data_new (script, tmp, LICOM_SCRIPT_PATH, liai_path_free);
 	if (path == NULL)
 	{
 		liai_path_free (tmp);

@@ -100,18 +100,6 @@ Material_getter_name (lua_State* lua)
 
 /*****************************************************************************/
 
-static int
-Tile___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LIEXT_SCRIPT_TILE);
-
-	lisys_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new tile.
@@ -310,7 +298,9 @@ Voxel_find_material (lua_State* lua)
 	if (material == NULL)
 		return 0;
 	script = liscr_script (lua);
-	data = liscr_data_new (script, material, LIEXT_SCRIPT_MATERIAL);
+#warning FIXME: Storing pointer to script data without referencing.
+#warning FIXME: Potential memory violations when removing terrain materials.
+	data = liscr_data_new (script, material, LIEXT_SCRIPT_MATERIAL, NULL);
 	if (data == NULL)
 		return 0;
 
@@ -501,7 +491,6 @@ liextTileScript (liscrClass* self,
                  void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
-	liscr_class_insert_func (self, "__gc", Tile___gc);
 	liscr_class_insert_func (self, "new", Tile_new);
 	liscr_class_insert_getter (self, "damage", Tile_getter_damage);
 	liscr_class_insert_getter (self, "rotation", Tile_getter_rotation);

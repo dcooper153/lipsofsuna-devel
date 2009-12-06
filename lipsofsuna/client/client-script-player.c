@@ -158,6 +158,30 @@ Player_setter_move (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Player object or nil if no object is present.
+ * -- @name Player.object
+ * -- @class table
+ */
+static int
+Player_getter_object (lua_State* lua)
+{
+	licliModule* module;
+	liengObject* object;
+
+	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
+
+	if (module->network == NULL)
+		return 0;
+	object = lieng_engine_find_object (module->engine, module->network->id);
+	if (object == NULL)
+		return 0;
+	liscr_pushdata (lua, object->script);
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Current rotation quaternion of the player.
  * -- @name Player.rotation
  * -- @class table
@@ -282,6 +306,7 @@ licliPlayerScript (liscrClass* self,
 	liscr_class_insert_func (self, "turn", Player_turn);
 	liscr_class_insert_getter (self, "analog", Player_getter_analog);
 	liscr_class_insert_getter (self, "move", Player_getter_move);
+	liscr_class_insert_getter (self, "object", Player_getter_object);
 	liscr_class_insert_getter (self, "rotation", Player_getter_rotation);
 	liscr_class_insert_getter (self, "tilt_rate", Player_getter_tilt_rate);
 	liscr_class_insert_getter (self, "turn_rate", Player_getter_turn_rate);

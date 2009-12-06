@@ -71,20 +71,6 @@
  * -- @class table
  */
 
-static int
-Binding___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICLI_SCRIPT_BINDING);
-	if (self->data != NULL)
-	{
-		if (self->invalid)
-			libnd_binding_free (self->data);
-	}
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Removes the binding.
@@ -96,14 +82,10 @@ static int
 Binding_free (lua_State* lua)
 {
 	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-	licliModule* module = liscr_script_get_userdata (script);
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_BINDING);
-	
-	libnd_manager_remove_binding (module->bindings, self->data);
+
 	liscr_data_unref (self, NULL);
-	self->invalid = 1;
 	return 0;
 }
 
@@ -148,23 +130,19 @@ Binding_new (lua_State* lua)
 	luaL_argcheck (lua, type >= 0 && type < LIBND_TYPE_MAX, 2, "invalid binding type");
 
 	/* Allocate userdata. */
-	binding = libnd_binding_new (type, action->data, params, code, mods, mult);
+	binding = libnd_binding_new (module->bindings, type, action->data, params, code, mods, mult);
 	if (binding == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	self = liscr_data_new (script, binding, LICLI_SCRIPT_BINDING);
+		return 0;
+	self = liscr_data_new (script, binding, LICLI_SCRIPT_BINDING, libnd_binding_free);
 	if (self == NULL)
 	{
 		libnd_binding_free (binding);
-		lua_pushnil (lua);
-		return 1;
+		return 0;
 	}
 	libnd_binding_set_userdata (binding, self);
-	libnd_manager_insert_binding (module->bindings, binding);
-
+	liscr_data_ref (action, self);
 	liscr_pushdata (lua, self);
+
 	return 1;
 }
 
@@ -174,7 +152,6 @@ void
 licliBindingScript (liscrClass* self,
                     void*       data)
 {
-	liscr_class_insert_func (self, "__gc", Binding___gc);
 	liscr_class_insert_func (self, "new", Binding_new);
 	liscr_class_insert_func (self, "free", Binding_free);
 	liscr_class_insert_enum (self, "KEYBOARD", LIBND_TYPE_KEYBOARD);

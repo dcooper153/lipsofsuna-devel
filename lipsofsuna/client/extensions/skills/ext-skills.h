@@ -33,12 +33,14 @@ struct _liextSkill
 {
 	float value;
 	float maximum;
+	liscrData* script;
 };
 
 struct _liextSkills
 {
 	lialgStrdic* skills;
 	liextModule* module;
+	liscrData* script;
 };
 
 liextSkills*
@@ -46,6 +48,9 @@ liext_skills_new (liextModule* module);
 
 void
 liext_skills_free (liextSkills* self);
+
+void
+liext_skills_unref (liextSkills* self);
 
 void
 liext_skills_clear (liextSkills* self);

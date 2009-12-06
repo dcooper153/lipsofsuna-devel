@@ -28,8 +28,8 @@
 #include <system/lips-system.h>
 #include "binding.h"
 #include "binding-action.h"
+#include "binding-types.h"
 
-typedef struct _libndManager libndManager;
 struct _libndManager
 {
 	libndAction* actions;
@@ -52,22 +52,6 @@ libnd_manager_event (libndManager* self,
 libndAction*
 libnd_manager_find_action (libndManager* self,
                            const char*   id);
-
-void
-libnd_manager_insert_action (libndManager* self,
-                             libndAction*  action);
-
-void
-libnd_manager_remove_action (libndManager* self,
-                             libndAction*  action);
-
-void
-libnd_manager_insert_binding (libndManager* self,
-                              libndBinding* binding);
-
-void
-libnd_manager_remove_binding (libndManager* self,
-                              libndBinding* binding);
 
 #endif
 

@@ -130,7 +130,7 @@ lisrv_object_new (liengEngine*     engine,
 	liphy_object_set_userdata (self->physics, self);
 
 	/* Allocate script data. */
-	self->script = liscr_data_new (server->script, self, LICOM_SCRIPT_OBJECT);
+	self->script = liscr_data_new (server->script, self, LICOM_SCRIPT_OBJECT, lieng_object_free);
 	if (self->script == NULL)
 		goto error;
 	liscr_data_unref (self->script, NULL);
@@ -866,12 +866,6 @@ lisrv_object_set_realized (liengObject* self,
 	}
 
 	return 1;
-}
-
-int
-lisrv_object_get_valid (const liengObject* self)
-{
-	return !self->script->invalid;
 }
 
 /**

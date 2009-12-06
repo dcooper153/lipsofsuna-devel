@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,10 +25,12 @@
 #include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "binding.h"
+#include "binding-manager.h"
 
 /**
  * \brief Creates a new binding action.
  *
+ * \param manager Binding manager.
  * \param identifier Internal name for the action.
  * \param name Short name for the action.
  * \param description Description of the action.
@@ -37,7 +39,8 @@
  * \return New binding action or NULL.
  */
 libndAction*
-libnd_action_new (const char*   identifier,
+libnd_action_new (libndManager* manager,
+                  const char*   identifier,
                   const char*   name,
                   const char*   description,
                   libndCallback callback,
@@ -48,6 +51,7 @@ libnd_action_new (const char*   identifier,
 	self = lisys_calloc (1, sizeof (libndAction));
 	if (self == NULL)
 		return NULL;
+	self->manager = manager;
 	self->enabled = 1;
 	self->identifier = listr_dup (identifier);
 	self->name = listr_dup (name);
@@ -62,6 +66,13 @@ libnd_action_new (const char*   identifier,
 		return NULL;
 	}
 
+	/* Add to manager. */
+	if (manager->actions != NULL)
+		manager->actions->prev = self;
+	self->next = manager->actions;
+	self->prev = NULL;
+	manager->actions = self;
+
 	return self;
 }
 
@@ -73,6 +84,15 @@ libnd_action_new (const char*   identifier,
 void
 libnd_action_free (libndAction* self)
 {
+	/* Remove from manager. */
+	if (self->prev != NULL)
+		self->prev->next = self->next;
+	else
+		self->manager->actions = self->next;
+	if (self->next != NULL)
+		self->next->prev = self->prev;
+
+	/* Free self. */
 	lisys_free (self->identifier);
 	lisys_free (self->name);
 	lisys_free (self->description);

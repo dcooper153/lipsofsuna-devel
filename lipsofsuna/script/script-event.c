@@ -42,20 +42,6 @@ struct _licomEvent
  * -- @class table
  */
 
-static int
-Event___gc (lua_State* lua)
-{
-	licomEvent* event;
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICOM_SCRIPT_EVENT);
-	event = self->data;
-
-	lisys_free (event);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new event.
@@ -128,7 +114,6 @@ void
 licomEventScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_insert_func (self, "__gc", Event___gc);
 	liscr_class_insert_func (self, "new", Event_new);
 	liscr_class_insert_getter (self, "type", Event_getter_type);
 	liscr_class_insert_setter (self, "type", Event_setter_type);
@@ -146,18 +131,11 @@ liscrData*
 licom_event_new (liscrScript* script)
 {
 	liscrData* self;
-	licomEvent* event;
 
-	event = lisys_calloc (1, sizeof (licomEvent));
-	if (event == NULL)
-		return NULL;
-	self = liscr_data_new (script, event, LICOM_SCRIPT_EVENT);
+	self = liscr_data_new_alloc (script, sizeof (licomEvent), LICOM_SCRIPT_EVENT);
 	if (self == NULL)
-	{
-		lisys_free (event);
 		return NULL;
-	}
-	event->data = self;
+	((licomEvent*) self->data)->data = self;
 
 	return self;
 }

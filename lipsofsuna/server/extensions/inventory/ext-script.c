@@ -38,18 +38,6 @@
  */
 
 static int
-Inventory___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LIEXT_SCRIPT_INVENTORY);
-
-	liext_inventory_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
-static int
 Inventory___index (lua_State* lua)
 {
 	int slot;
@@ -157,7 +145,7 @@ Inventory_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	self = liscr_data_new (script, inventory, LIEXT_SCRIPT_INVENTORY);
+	self = liscr_data_new (script, inventory, LIEXT_SCRIPT_INVENTORY, liext_inventory_free);
 	if (self == NULL)
 	{
 		liext_inventory_free (inventory);
@@ -373,7 +361,6 @@ liextInventoryScript (liscrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY, data);
-	liscr_class_insert_func (self, "__gc", Inventory___gc);
 	liscr_class_insert_func (self, "__index", Inventory___index);
 	liscr_class_insert_func (self, "__newindex", Inventory___newindex);
 	liscr_class_insert_func (self, "find", Inventory_find);

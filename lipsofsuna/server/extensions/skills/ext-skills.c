@@ -45,6 +45,7 @@ liext_skills_new (liextModule* module)
 {
 	liextSkills* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liextSkills));
 	if (self == NULL)
 		return NULL;
@@ -55,6 +56,15 @@ liext_skills_new (liextModule* module)
 	{
 		lisys_free (self);
 		return NULL;
+	}
+
+	/* Allocate script. */
+	self->script = liscr_data_new (module->server->script, self, LIEXT_SCRIPT_SKILLS, liext_skills_free);
+	if (self == NULL)
+	{
+		lialg_strdic_free (self->skills);
+		lisys_free (self);
+		return 0;
 	}
 
 	return self;

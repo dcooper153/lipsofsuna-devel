@@ -54,6 +54,12 @@ typedef int (*libndCallback)(libndAction*  action,
                              void*         data);
 
 /** @} */
+/**
+ * \addtogroup libndManager Manager
+ * @{
+ */
+
+typedef struct _libndManager libndManager;
 
 #endif
 

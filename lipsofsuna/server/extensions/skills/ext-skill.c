@@ -32,7 +32,6 @@ liext_skill_new (liextSkills*   skills,
                  const char*    name)
 {
 	liextSkill* self;
-	liscrScript* script = skills->server->script;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liextSkill));
@@ -47,23 +46,12 @@ liext_skill_new (liextSkills*   skills,
 		return NULL;
 	}
 
-	/* Allocate script. */
-	self->script = liscr_data_new (script, self, LIEXT_SCRIPT_SKILL);
-	if (self->script == NULL)
-	{
-		lisys_free (self->name);
-		lisys_free (self);
-		return NULL;
-	}
-
 	return self;
 }
 
 void
 liext_skill_free (liextSkill* self)
 {
-	self->script->invalid = 1;
-	liscr_data_unref (self->script, NULL);
 	lisys_free (self);
 }
 

@@ -37,8 +37,8 @@ struct _liextSkills
 {
 	lialgStrdic* skills;
 	liextModule* module;
+	liscrData* script;
 	lisrvServer* server;
-	liscrData* data;
 	liengObject* owner;
 };
 

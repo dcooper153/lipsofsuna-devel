@@ -34,22 +34,6 @@
  * -- @class table
  */
 
-static int
-Light___gc (lua_State* lua)
-{
-	lirndLight* light;
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	light = self->data;
-
-	lirnd_lighting_remove_light (light->scene->lighting, light);
-	lirnd_light_free (light);
-	liscr_data_free (self);
-
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new light source.
@@ -81,7 +65,7 @@ Light_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, light, LICLI_SCRIPT_LIGHT);
+	self = liscr_data_new (script, light, LICLI_SCRIPT_LIGHT, lirnd_light_free);
 	if (self == NULL)
 	{
 		lirnd_light_free (light);
@@ -345,7 +329,6 @@ licliLightScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
-	liscr_class_insert_func (self, "__gc", Light___gc);
 	liscr_class_insert_func (self, "new", Light_new);
 	liscr_class_insert_getter (self, "ambient", Light_getter_ambient);
 	liscr_class_insert_getter (self, "color", Light_getter_color);

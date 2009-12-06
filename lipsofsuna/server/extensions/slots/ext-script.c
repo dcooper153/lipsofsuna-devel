@@ -59,18 +59,6 @@
  */
 
 static int
-Slots___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-
-	liext_slots_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
-static int
 Slots___index (lua_State* lua)
 {
 	const char* slot;
@@ -198,7 +186,7 @@ Slots_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	self = liscr_data_new (script, slots, LIEXT_SCRIPT_SLOTS);
+	self = liscr_data_new (script, slots, LIEXT_SCRIPT_SLOTS, liext_slots_free);
 	if (self == NULL)
 	{
 		liext_slots_free (slots);
@@ -304,7 +292,6 @@ liextSlotsScript (liscrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SLOTS, data);
 	liscr_class_insert_enum (self, "PRIVATE", LIEXT_SLOT_TYPE_PRIVATE);
 	liscr_class_insert_enum (self, "PUBLIC", LIEXT_SLOT_TYPE_PUBLIC);
-	liscr_class_insert_func (self, "__gc", Slots___gc);
 	liscr_class_insert_func (self, "__index", Slots___index);
 	liscr_class_insert_func (self, "__newindex", Slots___newindex);
 	liscr_class_insert_func (self, "get_slot", Slots_get_slot);

@@ -173,7 +173,7 @@ Button_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_BUTTON);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_BUTTON, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -258,7 +258,7 @@ Entry_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_ENTRY);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_ENTRY, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -361,7 +361,7 @@ Image_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_IMAGE);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_IMAGE, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -446,7 +446,7 @@ Label_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_LABEL);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_LABEL, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -531,7 +531,7 @@ Menu_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_MENU);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_MENU, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -672,19 +672,6 @@ Menu_setter_orientation (lua_State* lua)
  * -- @class table
  */
 
-static int
-MenuGroup___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENUGROUP);
-
-	if (self->data != NULL)
-		liwdg_menu_group_free (self->data);
-
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new menu group.
@@ -718,7 +705,7 @@ MenuGroup_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, group, LIEXT_SCRIPT_MENUGROUP);
+	self = liscr_data_new (script, group, LIEXT_SCRIPT_MENUGROUP, liwdg_menu_group_free);
 	if (self == NULL)
 	{
 		liwdg_menu_group_free (group);
@@ -780,7 +767,7 @@ Scroll_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SCROLL);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SCROLL, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -892,7 +879,7 @@ Spin_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SPIN);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SPIN, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -1031,7 +1018,7 @@ Tree_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_TREE);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_TREE, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -1199,7 +1186,7 @@ View_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_VIEW);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_VIEW, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
@@ -1424,7 +1411,6 @@ liextMenuGroupScript (liscrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENUGROUP, data);
-	liscr_class_insert_func (self, "__gc", MenuGroup___gc);
 	liscr_class_insert_func (self, "new", MenuGroup_new);
 }
 

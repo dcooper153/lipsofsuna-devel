@@ -86,6 +86,10 @@ licliWindowScript (liscrClass* self,
 /*****************************************************************************/
 
 void
+licli_script_widget_free (liwdgWidget* self,
+                          liscrData*   data);
+
+void
 licli_script_widget_detach (liscrData* self);
 
 void

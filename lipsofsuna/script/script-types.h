@@ -30,17 +30,18 @@
 typedef struct _liscrClass liscrClass;
 typedef struct _liscrData liscrData;
 typedef struct _liscrScript liscrScript;
-typedef void (*liscrClassInit)(liscrClass*, void* data);
+typedef void (*liscrClassInit)(liscrClass*, void*);
 typedef int (*liscrClassFunc)(lua_State*);
+typedef void (*liscrGCFunc)();
 
 /* FIXME */
 struct _liscrData
 {
 	liscrClass* clss;
 	liscrScript* script;
+	liscrGCFunc free;
 	void* data;
 	int refcount;
-	int invalid;
 };
 
 /* FIXME */

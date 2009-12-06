@@ -118,7 +118,8 @@ liscr_class_new_full (liscrScript* script,
 	lua_setmetatable (self->script->lua, -2);
 	lua_pop (self->script->lua, -1);
 
-	/* Default indexers. */
+	/* Default meta functions. */
+	liscr_class_insert_func (self, "__gc", liscr_class_default___gc);
 	liscr_class_insert_func (self, "__index", liscr_class_default___index);
 	liscr_class_insert_func (self, "__newindex", liscr_class_default___newindex);
 
@@ -416,6 +417,23 @@ liscr_class_set_userdata (liscrClass* self,
 /*****************************************************************************/
 
 /**
+ * \brief Default garbage collection function.
+ *
+ * \param lua Lua state.
+ * \return Zero.
+ */
+int
+liscr_class_default___gc (lua_State* lua)
+{
+	liscrData* self;
+
+	self = liscr_checkanydata (lua, 1);
+	liscr_data_free (self);
+
+	return 0;
+}
+
+/**
  * \brief Default getter function.
  *
  * \param lua Lua state.
@@ -438,10 +456,7 @@ liscr_class_default___index (lua_State* lua)
 	{
 		self = liscr_isanydata (lua, 1);
 		if (self == NULL)
-		{
-			lua_pushnil (lua);
-			return 1;
-		}
+			return 0;
 		clss = liscr_data_get_class (self);
 	}
 	else
@@ -463,10 +478,7 @@ liscr_class_default___index (lua_State* lua)
 			func = bsearch (&tmp, ptr->getters.getters, ptr->getters.count,
 				sizeof (liscrClassMemb), private_member_compare);
 			if (func != NULL)
-			{
-				func->call (lua);
-				return 1;
-			}
+				return func->call (lua);
 		}
 	}
 
@@ -498,9 +510,7 @@ liscr_class_default___index (lua_State* lua)
 	}
 
 	/* None found. */
-	lua_pushnil (lua);
-
-	return 1;
+	return 0;
 }
 
 /**

@@ -33,18 +33,6 @@
  * -- @class table
  */
 
-static int
-Path___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICOM_SCRIPT_PATH);
-
-	liai_path_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Pops a position vector from the beginning of the path.
@@ -106,7 +94,6 @@ void
 licomPathScript (liscrClass* self,
                  void*       data)
 {
-	liscr_class_insert_func (self, "__gc", Path___gc);
 	liscr_class_insert_func (self, "pop", Path_pop);
 	liscr_class_insert_getter (self, "length", Path_getter_length);
 }

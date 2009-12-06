@@ -262,12 +262,6 @@ private_spawn (liextSpawner* self,
 		lua_pop (script->lua, 1);
 		return 0;
 	}
-	if (object->invalid)
-	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "spawn function returned an invalid object");
-		lua_pop (script->lua, 1);
-		return 0;
-	}
 
 	/* Populate the slot. */
 	liscr_data_ref (object, self->script);

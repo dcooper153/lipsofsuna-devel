@@ -81,23 +81,6 @@ private_action_callback (libndAction*  action,
  * -- @class table
  */
 
-static int
-Action___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LICLI_SCRIPT_ACTION);
-
-	if (self->data != NULL)
-	{
-		if (self->invalid)
-			libnd_action_free (self->data);
-	}
-	liscr_data_free (self);
-
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Removes the action.
@@ -111,15 +94,10 @@ static int
 Action_free (lua_State* lua)
 {
 	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-	licliModule* module = liscr_script_get_userdata (script);
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_ACTION);
-	/* FIXME: Make sure not in use. */
 
-	libnd_manager_remove_action (module->bindings, self->data);
 	liscr_data_unref (self, NULL);
-	self->invalid = 1;
 	return 0;
 }
 
@@ -154,23 +132,18 @@ Action_new (lua_State* lua)
 	desc = luaL_checkstring (lua, 4);
 
 	/* Allocate userdata. */
-	action = libnd_action_new (id, name, desc, private_action_callback, NULL);
+	action = libnd_action_new (module->bindings, id, name, desc, private_action_callback, NULL);
 	if (action == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	self = liscr_data_new (script, action, LICLI_SCRIPT_ACTION);
+		return 0;
+	self = liscr_data_new (script, action, LICLI_SCRIPT_ACTION, libnd_action_free);
 	if (self == NULL)
 	{
 		libnd_action_free (action);
-		lua_pushnil (lua);
-		return 1;
+		return 0;
 	}
 	libnd_action_set_userdata (action, self);
-	libnd_manager_insert_action (module->bindings, action);
-
 	liscr_pushdata (lua, self);
+
 	return 1;
 }
 
@@ -211,7 +184,6 @@ licliActionScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_ACTION, data);
-	liscr_class_insert_func (self, "__gc", Action___gc);
 	liscr_class_insert_func (self, "new", Action_new);
 	liscr_class_insert_func (self, "free", Action_free);
 	liscr_class_insert_getter (self, "enabled", Action_getter_enabled);

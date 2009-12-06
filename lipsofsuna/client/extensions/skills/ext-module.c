@@ -83,6 +83,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register classes. */
+	liscr_script_create_class (module->script, "Skills", liextSkillsScript, self);
 	liscr_script_create_class (module->script, "SkillWidget", liextSkillWidgetScript, self);
 
 	return self;
@@ -150,7 +151,7 @@ private_packet_diff (liextModule* self,
 			return 0;
 		if (!lialg_u32dic_insert (self->dictionary, id, skills))
 		{
-			liext_skills_free (skills);
+			liext_skills_unref (skills);
 			return 0;
 		}
 	}
@@ -193,7 +194,7 @@ private_packet_reset (liextModule* self,
 			return 0;
 		if (!lialg_u32dic_insert (self->dictionary, id, skills))
 		{
-			liext_skills_free (skills);
+			liext_skills_unref (skills);
 			return 0;
 		}
 	}
@@ -231,7 +232,7 @@ private_visibility (liextModule* self,
 		if (skills != NULL)
 		{
 			lialg_u32dic_remove (self->dictionary, object->id);
-			liext_skills_free (skills);
+			liext_skills_unref (skills);
 		}
 	}
 

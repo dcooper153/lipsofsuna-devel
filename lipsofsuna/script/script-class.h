@@ -89,6 +89,9 @@ liscr_class_set_userdata (liscrClass* self,
 /* Lua specific. */
 
 int
+liscr_class_default___gc (lua_State* lua);
+
+int
 liscr_class_default___index (lua_State* lua);
 
 int

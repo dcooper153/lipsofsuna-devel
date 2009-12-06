@@ -143,7 +143,7 @@ Scene_new (lua_State* lua)
 	LIWDG_RENDER (widget)->custom_render_data = module;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LICLI_SCRIPT_SCENE);
+	self = liscr_data_new (script, widget, LICLI_SCRIPT_SCENE, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);

@@ -65,7 +65,7 @@ ChatHistory_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_CHAT_HISTORY);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_CHAT_HISTORY, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);

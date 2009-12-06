@@ -31,7 +31,6 @@
 #include <script/lips-script.h>
 #include <server/lips-server.h>
 
-#define LIEXT_SCRIPT_SKILL "Lips.Skill"
 #define LIEXT_SCRIPT_SKILLS "Lips.Skills"
 
 typedef enum _liextSkillType liextSkillType;
@@ -67,10 +66,6 @@ liext_module_remove_skills (liextModule* self,
                             liextSkills* value);
 
 /*****************************************************************************/
-
-void
-liextSkillScript (liscrClass* self,
-                  void*       data);
 
 void
 liextSkillsScript (liscrClass* self,

@@ -169,11 +169,6 @@ liscr_checkanydata (lua_State* lua,
 		snprintf (msg, 255, "expected wrapped userdata");
 		luaL_argcheck (lua, 0, arg, msg);
 	}
-	if (object->invalid)
-	{
-		snprintf (msg, 255, "invalid %s", object->clss->meta);
-		luaL_argcheck (lua, 0, arg, msg);
-	}
 
 	return object;
 }
@@ -236,11 +231,6 @@ liscr_checkdata (lua_State*  lua,
 	if (object == NULL)
 	{
 		snprintf (msg, 255, "expected interface %s", meta);
-		luaL_argcheck (lua, 0, arg, msg);
-	}
-	if (object->invalid)
-	{
-		snprintf (msg, 255, "invalid interface %s", meta);
 		luaL_argcheck (lua, 0, arg, msg);
 	}
 

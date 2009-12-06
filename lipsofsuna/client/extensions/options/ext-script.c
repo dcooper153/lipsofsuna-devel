@@ -66,7 +66,7 @@ Options_new (lua_State* lua)
 	}
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_OPTIONS);
+	self = liscr_data_new (script, widget, LIEXT_SCRIPT_OPTIONS, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);

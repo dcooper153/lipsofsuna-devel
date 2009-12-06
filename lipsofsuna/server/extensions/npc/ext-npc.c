@@ -190,8 +190,7 @@ private_tick (liextNpc* self,
 	if (self->target != NULL)
 	{
 		/* FIXME: Might also want to give up if too far away. */
-		if (self->target->sector == NULL ||
-		    self->target->script->invalid)
+		if (self->target->sector == NULL || !lieng_object_get_realized (self->target))
 			liext_npc_set_target (self, NULL);
 	}
 

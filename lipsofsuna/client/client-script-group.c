@@ -281,7 +281,7 @@ Group_new (lua_State* lua)
 			return 1;
 		}
 	}
-	self = liscr_data_new (script, widget, LICLI_SCRIPT_GROUP);
+	self = liscr_data_new (script, widget, LICLI_SCRIPT_GROUP, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);

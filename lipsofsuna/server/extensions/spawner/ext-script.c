@@ -37,18 +37,6 @@
  * -- @class table
  */
 
-static int
-Spawner___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_isdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-
-	liext_spawner_free (self->data);
-	liscr_data_free (self);
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Creates a new spawner logic.
@@ -75,7 +63,7 @@ Spawner_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	self = liscr_data_new (script, logic, LIEXT_SCRIPT_SPAWNER);
+	self = liscr_data_new (script, logic, LIEXT_SCRIPT_SPAWNER, liext_spawner_free);
 	if (self == NULL)
 	{
 		liext_spawner_free (logic);
@@ -224,7 +212,6 @@ liextSpawnerScript (liscrClass* self,
                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPAWNER, data);
-	liscr_class_insert_func (self, "__gc", Spawner___gc);
 	liscr_class_insert_func (self, "new", Spawner_new);
 	liscr_class_insert_getter (self, "delay", Spawner_getter_delay);
 	liscr_class_insert_getter (self, "limit", Spawner_getter_limit);

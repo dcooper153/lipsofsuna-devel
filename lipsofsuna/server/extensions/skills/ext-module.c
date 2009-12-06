@@ -81,7 +81,6 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Skill", liextSkillScript, self);
 	liscr_script_create_class (server->script, "Skills", liextSkillsScript, self);
 
 	return self;

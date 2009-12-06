@@ -184,6 +184,7 @@ void lirnd_light_free (lirndLight* self)
 	if (GLEW_EXT_framebuffer_object)
 		glDeleteFramebuffersEXT (1, &self->shadow.fbo);
 	glDeleteTextures (1, &self->shadow.map);
+	lirnd_lighting_remove_light (self->scene->lighting, self);
 	lisys_free (self);
 }
 

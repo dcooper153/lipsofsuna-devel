@@ -71,7 +71,7 @@ Window_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	self = liscr_data_new (script, window, LICLI_SCRIPT_WINDOW);
+	self = liscr_data_new (script, window, LICLI_SCRIPT_WINDOW, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (window);

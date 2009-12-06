@@ -47,23 +47,6 @@ private_detach_child (liwdgWidget* parent,
  * -- @class table
  */
 
-static int
-Widget___gc (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-	if (self->data != NULL)
-	{
-		licli_script_widget_detach_children (self);
-		licli_script_widget_detach (self);
-		liwdg_widget_free (self->data);
-	}
-	liscr_data_free (self);
-
-	return 0;
-}
-
 /* @luadoc
  * ---
  * -- Popup below the parent rectangle.
@@ -292,6 +275,25 @@ Widget_getter_y (lua_State* lua)
 /*****************************************************************************/
 
 /**
+ * \brief Frees the widget without freeing its children.
+ *
+ * Detaches the children of the widget, leaking them if their memory isn't
+ * managed externally in some way, detaches itself from the parent container,
+ * and then only frees its own memory.
+ *
+ * \param self Widget.
+ * \param data Script data.
+ */
+void
+licli_script_widget_free (liwdgWidget* self,
+                          liscrData*   data)
+{
+	licli_script_widget_detach_children (data);
+	licli_script_widget_detach (data);
+	liwdg_widget_free (self);
+}
+
+/**
  * \brief Detaches the widget from the user interface.
  *
  * Used for unparenting the widget before certain widget operations, most
@@ -341,7 +343,6 @@ licliWidgetScript (liscrClass* self,
 	liscr_class_insert_enum (self, "POPUP_LEFT", POPUP_LEFT);
 	liscr_class_insert_enum (self, "POPUP_RIGHT", POPUP_RIGHT);
 	liscr_class_insert_enum (self, "POPUP_UP", POPUP_UP);
-	liscr_class_insert_func (self, "__gc", Widget___gc);
 	liscr_class_insert_func (self, "popup", Widget_popup);
 	liscr_class_insert_func (self, "set_request", Widget_set_request);
 	liscr_class_insert_getter (self, "visible", Widget_getter_visible);
