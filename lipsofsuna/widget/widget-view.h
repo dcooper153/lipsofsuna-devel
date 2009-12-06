@@ -54,9 +54,15 @@ void
 liwdg_view_set_child (liwdgView*   self,
                       liwdgWidget* widget);
 
+int
+liwdg_view_get_hscroll (liwdgView* self);
+
 void
 liwdg_view_set_hscroll (liwdgView* self,
                         int        value);
+
+int
+liwdg_view_get_vscroll (liwdgView* self);
 
 void
 liwdg_view_set_vscroll (liwdgView* self,

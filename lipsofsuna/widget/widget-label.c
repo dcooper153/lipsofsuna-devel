@@ -189,8 +189,14 @@ static void
 private_rebuild (liwdgLabel* self)
 {
 	int h = 0;
+	int limit;
 
 	lifnt_layout_clear (self->text);
+	limit = LIWDG_WIDGET (self)->userrequest.width;
+	if (limit >= 0)
+		lifnt_layout_set_width_limit (self->text, limit);
+	else
+		lifnt_layout_set_width_limit (self->text, 0);
 	if (self->font != NULL)
 	{
 		h = lifnt_font_get_height (self->font);

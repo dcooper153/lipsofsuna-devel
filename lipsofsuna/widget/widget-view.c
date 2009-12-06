@@ -95,6 +95,12 @@ liwdg_view_get_child (liwdgView* self)
 	return self->child;
 }
 
+int
+liwdg_view_get_hscroll (liwdgView* self)
+{
+	return self->hscroll;
+}
+
 void
 liwdg_view_set_child (liwdgView*   self,
                       liwdgWidget* widget)
@@ -117,6 +123,12 @@ liwdg_view_set_hscroll (liwdgView* self,
 {
 	self->hscroll = value;
 	private_rebuild (self);
+}
+
+int
+liwdg_view_get_vscroll (liwdgView* self)
+{
+	return self->vscroll;
 }
 
 void
@@ -270,6 +282,7 @@ private_detach_child (liwdgView*   self,
 	assert (self->child == child);
 
 	self->child = NULL;
+	child->parent = NULL;
 	private_rebuild (self);
 }
 

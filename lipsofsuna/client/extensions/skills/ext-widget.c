@@ -113,8 +113,9 @@ private_init (liextSkillWidget* self,
 	self->value = widgets[(i = 0)];
 
 	/* Pack widgets. */
-	liwdg_widget_set_request (self->value, 100, -1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->value);
+	liwdg_group_set_col_expand (LIWDG_GROUP (self), 0, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 
 	return 1;
 

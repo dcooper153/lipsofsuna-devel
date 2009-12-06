@@ -552,8 +552,7 @@ liwdg_widget_set_grab (liwdgWidget* self,
 /**
  * \brief Gets the size request of the widget.
  *
- * If the size request is overridden by the user, returns the user request.
- * Otherwise, returns the real minimum acceptable size for the widget.
+ * Returns the larger of the user and hard size requests.
  *
  * \param self Widget.
  * \param request Return location for the size.
@@ -562,14 +561,12 @@ void
 liwdg_widget_get_request (liwdgWidget* self,
                           liwdgSize*   request)
 {
+	request->width = self->hardrequest.width;
+	request->height = self->hardrequest.height;
 	if (self->userrequest.width != -1)
-		request->width = self->userrequest.width;
-	else
-		request->width = self->hardrequest.width;
+		request->width = LI_MAX (request->width, self->userrequest.width);
 	if (self->userrequest.height != -1)
-		request->height = self->userrequest.height;
-	else
-		request->height = self->hardrequest.height;
+		request->height = LI_MAX (request->height, self->userrequest.height);
 }
 
 /**

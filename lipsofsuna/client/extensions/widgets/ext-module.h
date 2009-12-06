@@ -35,7 +35,10 @@
 #define LIEXT_SCRIPT_LABEL "Lips.Label"
 #define LIEXT_SCRIPT_MENU "Lips.Menu"
 #define LIEXT_SCRIPT_MENUGROUP "Lips.MenuGroup"
+#define LIEXT_SCRIPT_SCROLL "Lips.Scroll"
 #define LIEXT_SCRIPT_SPIN "Lips.Spin"
+#define LIEXT_SCRIPT_TREE "Lips.Tree"
+#define LIEXT_SCRIPT_VIEW "Lips.View"
 
 typedef struct _liextModule liextModule;
 struct _liextModule
@@ -76,7 +79,19 @@ liextMenuGroupScript (liscrClass* self,
                       void*       data);
 
 void
+liextScrollScript (liscrClass* self,
+                   void*       data);
+
+void
 liextSpinScript (liscrClass* self,
+                 void*       data);
+
+void
+liextTreeScript (liscrClass* self,
+                 void*       data);
+
+void
+liextViewScript (liscrClass* self,
                  void*       data);
 
 #endif

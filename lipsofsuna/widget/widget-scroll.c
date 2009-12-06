@@ -125,7 +125,9 @@ private_event (liwdgScroll*  self,
 {
 	int w;
 	int h;
+	float v;
 	liwdgRect rect;
+	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -138,11 +140,26 @@ private_event (liwdgScroll*  self,
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
+			v = self->max - self->min;
+			if (v >= LI_MATH_EPSILON)
+				v = (self->value - self->min) / v;
+			else
+				v = 0.0f;
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "scroll-horz");
 			/* Draw base. */
 			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "scroll-horz", &rect);
 			liwdg_widget_paint (LIWDG_WIDGET (self), "scroll-horz", NULL);
+			/* Draw bar. */
+			glBindTexture (GL_TEXTURE_2D, 0);
+			glColor4fv (style->selection);
+			glBegin (GL_QUADS);
+			glVertex2f (rect.x, rect.y);
+			glVertex2f (rect.x + v * rect.width, rect.y);
+			glVertex2f (rect.x + v * rect.width, rect.y + rect.height);
+			glVertex2f (rect.x, rect.y + rect.height);
+			glEnd ();
 			/* Draw label. */
-			glColor3f (0.8f, 0.8f, 0.8f);
+			glColor4fv (style->color);
 			lifnt_layout_render (self->text,
 				rect.x + (rect.width - w) / 2,
 				rect.y + (rect.height - h) / 2);
@@ -167,7 +184,7 @@ private_rebuild (liwdgScroll* self)
 	}
 	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LI_MAX (
-		lifnt_layout_get_height (self->text), h), "scroll");
+		lifnt_layout_get_height (self->text), h), "scroll-horz");
 }
 
 /** @} */

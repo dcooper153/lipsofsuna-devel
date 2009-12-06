@@ -186,6 +186,34 @@ Widget_popup (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Sets the user size request of widget.
+ * --
+ * -- @param self Widget.
+ * -- @param width Width in pixels or -1 to unset.
+ * -- @param height Height in pixels or -1 to unset.
+ * function Widget.set_request(self, width, height)
+ */
+static int
+Widget_set_request (lua_State* lua)
+{
+	liscrData* self;
+	liwdgSize size;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
+	size.width = luaL_checknumber (lua, 2);
+	size.height = luaL_checknumber (lua, 3);
+	if (size.width < 0)
+		size.width = -1;
+	if (size.height < 0)
+		size.height = -1;
+
+	liwdg_widget_set_request (self->data, size.width, size.height);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Visibility flag.
  * -- @name Widget.visible
  * -- @class table
@@ -315,6 +343,7 @@ licliWidgetScript (liscrClass* self,
 	liscr_class_insert_enum (self, "POPUP_UP", POPUP_UP);
 	liscr_class_insert_func (self, "__gc", Widget___gc);
 	liscr_class_insert_func (self, "popup", Widget_popup);
+	liscr_class_insert_func (self, "set_request", Widget_set_request);
 	liscr_class_insert_getter (self, "visible", Widget_getter_visible);
 	liscr_class_insert_getter (self, "x", Widget_getter_x);
 	liscr_class_insert_getter (self, "y", Widget_getter_y);
