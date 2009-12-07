@@ -35,6 +35,31 @@
 
 /* @luadoc
  * ---
+ * -- Checks if an object is an instance of a class.
+ * --
+ * -- @param self Class class.
+ * -- @param data Object or any type.
+ * -- @param name Class name.
+ * -- @return Boolean.
+ * function Class.check(self, data, name)
+ */
+static int
+Class_check (lua_State* lua)
+{
+	const char* name;
+	liscrData* data;
+
+	liscr_checkclassdata (lua, 1, LICOM_SCRIPT_CLASS);
+	data = liscr_checkanydata (lua, 2);
+	name = luaL_checkstring (lua, 3);
+
+	lua_pushboolean (lua, !strcmp (data->clss->name, name));
+
+	return 1;
+}
+
+/* @luadoc
+ * ---
  * -- Inherits a class from another.
  * --
  * -- @param self Class class.
@@ -79,6 +104,7 @@ licomClassScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LICOM_SCRIPT_CLASS, data);
+	liscr_class_insert_func (self, "check", Class_check);
 	liscr_class_insert_func (self, "new", Class_new);
 }
 
