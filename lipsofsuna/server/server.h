@@ -106,6 +106,9 @@ lisrv_server_get_banned (lisrvServer* self,
 double
 lisrv_server_get_time (const lisrvServer* self);
 
+uint32_t
+lisrv_server_get_unique_object (const lisrvServer* self);
+
 #endif
 
 /** @} */

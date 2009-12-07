@@ -26,9 +26,16 @@
 #include <system/lips-system.h>
 #include "engine-sector.h"
 
+/**
+ * \brief Creates a new sector.
+ *
+ * \param engine Engine.
+ * \param id Sector number.
+ * \return New sector or NULL.
+ */
 liengSector*
-lieng_sector_default_new (liengEngine* engine,
-                          uint32_t     id)
+lieng_sector_new (liengEngine* engine,
+                  uint32_t     id)
 {
 	liengSector* self;
 
@@ -63,20 +70,6 @@ lieng_sector_default_new (liengEngine* engine,
 	lieng_engine_call (engine, LIENG_CALLBACK_SECTOR_LOAD, self);
 
 	return self;
-}
-
-/**
- * \brief Creates a new sector.
- *
- * \param engine Engine.
- * \param id Sector number.
- * \return New sector or NULL.
- */
-liengSector*
-lieng_sector_new (liengEngine* engine,
-                  uint32_t     id)
-{
-	return engine->calls.lieng_sector_new (engine, id);
 }
 
 /**

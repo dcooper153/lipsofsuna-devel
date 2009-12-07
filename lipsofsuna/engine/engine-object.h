@@ -63,9 +63,8 @@ struct _liengObject
 liengObject*
 lieng_object_new (liengEngine*     engine,
                   liengModel*      model,
-                  liphyControlMode control_mode,
-                  uint32_t         id,
-                  void*            data);
+                  liphyControlMode control,
+                  uint32_t         id);
 
 void
 lieng_object_free (liengObject* self);
@@ -91,6 +90,9 @@ lieng_object_impulse (liengObject*       self,
 void
 lieng_object_jump (liengObject*       self,
                    const limatVector* impulse);
+
+int
+lieng_object_moved (liengObject* self);
 
 void
 lieng_object_update (liengObject* self,

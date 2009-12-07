@@ -235,7 +235,8 @@ Object_new (lua_State* lua)
 	lisrvServer* server = liscr_script_get_userdata (script);
 
 	/* Allocate object. */
-	object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
+	object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 
+		lisrv_server_get_unique_object (server));
 	if (object == NULL)
 	{
 		lua_pushnil (lua);

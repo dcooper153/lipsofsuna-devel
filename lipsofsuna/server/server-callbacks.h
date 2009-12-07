@@ -40,7 +40,6 @@ enum
 	LISRV_CALLBACK_OBJECT_ANIMATION, /* (data, object, animation) */
 	LISRV_CALLBACK_OBJECT_CLIENT, /* (data, object) */
 	LISRV_CALLBACK_OBJECT_SAMPLE, /* (data, object, sample, flags) */
-	LISRV_CALLBACK_OBJECT_MOTION, /* (data, object) */
 	LISRV_CALLBACK_TICK, /* (data, secs) */
 	LISRV_CALLBACK_VISION_HIDE, /* (data, object, object) */
 	LISRV_CALLBACK_VISION_SHOW, /* (data, object, object) */

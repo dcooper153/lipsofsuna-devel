@@ -223,7 +223,7 @@ private_callbacks_setup (lisrvClient* self,
 	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_object_animation, self, self->calls + 0);
 	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_object_sample, self, self->calls + 1);
 	lieng_engine_insert_call (engine, LIENG_CALLBACK_OBJECT_MODEL, 0, private_object_model, self, self->calls + 2);
-	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self, self->calls + 3);
+	lieng_engine_insert_call (engine, LIENG_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self, self->calls + 3);
 	lieng_engine_insert_call (engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 0, private_object_visibility, self, self->calls + 4);
 }
 

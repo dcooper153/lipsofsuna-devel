@@ -59,7 +59,7 @@ liext_slot_new (licliModule* module,
 		lisys_error_set (LI_ERROR_UNKNOWN, "cannot find model `%d'", model);
 		goto error;
 	}
-	self->object = licli_object_new (self->module, 0, LINET_OBJECT_FLAG_DYNAMIC);
+	self->object = lieng_object_new (self->module->engine, NULL, LIPHY_CONTROL_MODE_STATIC, 0);
 	lieng_object_set_smoothing (self->object, 0.0f, 0.0f);
 	if (self->object == NULL)
 	{

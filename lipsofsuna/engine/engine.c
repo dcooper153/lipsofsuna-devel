@@ -55,7 +55,6 @@ lieng_engine_new (const char* path)
 		return NULL;
 	self->range.start = 0;
 	self->range.size = 0xFFFFFFFF;
-	self->calls = lieng_default_calls;
 	self->config.radius = 1;
 	self->config.dir = listr_dup (path);
 	if (self->config.dir == NULL)
@@ -501,12 +500,6 @@ lieng_engine_update (liengEngine* self,
 	}
 }
 
-liengCalls*
-lieng_engine_get_calls (liengEngine* self)
-{
-	return &self->calls;
-}
-
 /**
  * \brief Gets the engine flags.
  *
@@ -592,6 +585,7 @@ private_init (liengEngine* self)
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_NEW, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_FREE, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
+	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_TRANSFORM, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_VISIBILITY, lical_marshal_DATA_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_LOAD, lical_marshal_DATA_PTR_PTR) ||
@@ -635,7 +629,7 @@ private_physics_transform (liphyObject* object)
 	obj = liphy_object_get_userdata (object);
 	if (obj == NULL || obj->sector == NULL)
 		return;
-	obj->engine->calls.lieng_object_moved (obj);
+	lieng_object_moved (obj);
 }
 
 /** @} */

@@ -59,10 +59,6 @@ private_init_sql (lisrvServer* self);
 static int
 private_init_time (lisrvServer* self);
 
-static liengSector*
-private_sector_new (liengEngine* engine,
-                    uint32_t     id);
-
 /****************************************************************************/
 
 /**
@@ -417,6 +413,64 @@ lisrv_server_get_time (const lisrvServer* self)
 	return (double) t.tv_sec + (double) t.tv_usec * 0.000001;
 }
 
+/**
+ * \brief Returns a unique object ID.
+ *
+ * \param self Server.
+ * \return Unique object ID or zero on error.
+ */
+uint32_t
+lisrv_server_get_unique_object (const lisrvServer* self)
+{
+	int ret;
+	uint32_t id;
+	const char* query;
+	sqlite3_stmt* statement;
+
+	for (id = 0 ; !id ; )
+	{
+		/* Choose random number. */
+		id = self->engine->range.start + lisys_randi (self->engine->range.size - 1);
+		if (!id)
+			continue;
+
+		/* Reject numbers of loaded objects. */
+		if (lialg_u32dic_find (self->engine->objects, id))
+		{
+			id = 0;
+			continue;
+		}
+
+		/* Reject numbers of database objects. */
+		query = "SELECT id FROM objects WHERE id=?;";
+		if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
+			return 0;
+		}
+		if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		ret = sqlite3_step (statement);
+		if (ret != SQLITE_DONE)
+		{
+			if (ret != SQLITE_ROW)
+			{
+				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->sql));
+				sqlite3_finalize (statement);
+				return 0;
+			}
+			id = 0;
+		}
+		sqlite3_finalize (statement);
+	}
+
+	return id;
+}
+
 /****************************************************************************/
 
 static int
@@ -450,7 +504,6 @@ private_init_engine (lisrvServer* self)
 {
 	int i;
 	liengAnimation* anim;
-	liengCalls* calls;
 	liengModel* model;
 	liengSample* sample;
 
@@ -462,11 +515,6 @@ private_init_engine (lisrvServer* self)
 	lieng_engine_set_userdata (self->engine, LIENG_DATA_SERVER, self);
 
 	/* Initialize callbacks. */
-	calls = lieng_engine_get_calls (self->engine);
-	calls->lieng_object_new = lisrv_object_new;
-	calls->lieng_object_free = lisrv_object_free;
-	calls->lieng_object_moved = lisrv_object_moved;
-	calls->lieng_sector_new = private_sector_new;
 	if (!lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_CONTROL, lical_marshal_DATA_PTR_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGIN, lical_marshal_DATA_PTR_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGOUT, lical_marshal_DATA_PTR) ||
@@ -475,7 +523,6 @@ private_init_engine (lisrvServer* self)
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_CLIENT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_ANIMATION, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SAMPLE, lical_marshal_DATA_PTR_PTR_INT) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_HIDE, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_SHOW, lical_marshal_DATA_PTR_PTR))
 		return 0;
@@ -666,65 +713,6 @@ private_init_time (lisrvServer* self)
 {
 	gettimeofday (&self->time.start, NULL);
 	return 1;
-}
-
-static liengSector*
-private_sector_new (liengEngine* engine,
-                    uint32_t     id)
-{
-	int ret;
-	const char* query;
-	liengObject* object;
-	liengSector* self;
-	lisrvServer* server;
-	sqlite3_stmt* statement;
-
-	/* Create sector. */
-	server = lieng_engine_get_userdata (engine, LIENG_DATA_SERVER);
-	self = lieng_default_calls.lieng_sector_new (engine, id);
-	if (self == NULL)
-		return NULL;
-
-	/* Prepare statement. */
-	query = "SELECT id FROM objects WHERE sector=?;";
-	if (sqlite3_prepare_v2 (server->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (server->sql));
-		lieng_sector_free (self);
-		return NULL;
-	}
-	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (server->sql));
-		sqlite3_finalize (statement);
-		lieng_sector_free (self);
-		return NULL;
-	}
-
-	/* Execute statement. */
-	while (1)
-	{
-		ret = sqlite3_step (statement);
-		if (ret == SQLITE_DONE)
-		{
-			sqlite3_finalize (statement);
-			return self;
-		}
-		if (ret != SQLITE_ROW)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (server->sql));
-			sqlite3_finalize (statement);
-			lieng_sector_free (self);
-			return NULL;
-		}
-		id = sqlite3_column_int (statement, 0);
-		object = lieng_object_new (engine, NULL, LIPHY_CONTROL_MODE_RIGID, id, NULL);
-		if (object != NULL)
-		{
-			if (lisrv_object_serialize (object, 0))
-				lieng_object_set_realized (object, 1);
-		}
-	}
 }
 
 /** @} */

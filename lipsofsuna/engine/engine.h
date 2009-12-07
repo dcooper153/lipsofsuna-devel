@@ -40,22 +40,6 @@
 
 /*****************************************************************************/
 
-typedef struct _liengCalls liengCalls;
-struct _liengCalls
-{
-	liengObject* (*lieng_object_new)(liengEngine*, liengModel*, liphyControlMode, uint32_t, void*);
-	void (*lieng_object_free)(liengObject*);
-	int (*lieng_object_moved)(liengObject*);
-	void (*lieng_object_update)(liengObject*, float);
-	int (*lieng_object_set_model)(liengObject*, liengModel* model);;
-	int (*lieng_object_set_realized)(liengObject*, int);
-	int (*lieng_object_set_transform)(liengObject*, const limatTransform*);
-	int (*lieng_object_set_velocity)(liengObject*, const limatVector*);
-	liengSector* (*lieng_sector_new)(liengEngine*, uint32_t);
-};
-
-extern const liengCalls lieng_default_calls;
-
 struct _liengEngine
 {
 	void* userdata[LIENG_DATA_MAX];
@@ -63,7 +47,6 @@ struct _liengEngine
 	lialgU32dic* sectors;
 	lialgPtrdic* selection;
 	licalCallbacks* callbacks;
-	liengCalls calls;
 	liengConstraint* constraints;
 	liengResources* resources;
 	liphyPhysics* physics;
@@ -162,9 +145,6 @@ lieng_engine_remove_constraint (liengEngine*     self,
 void
 lieng_engine_update (liengEngine* self,
                      float        secs);
-
-liengCalls*
-lieng_engine_get_calls (liengEngine* self);
 
 int
 lieng_engine_get_flags (const liengEngine* self);

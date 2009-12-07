@@ -35,19 +35,8 @@
 
 #define LICLI_IS_CLIENT_OBJECT(o) (lieng_object_get_userdata (o, LIENG_DATA_CLIENT) != NULL)
 
-typedef struct _licliControls licliControls;
-struct _licliControls
-{
-	int flags;
-	float tilt;
-	float turn;
-	float move;
-};
-
-liengObject*
-licli_object_new (licliModule* module,
-                  uint32_t     id,
-                  int          flags);
+#define LICLI_OBJECT_POSITION_SMOOTHING 0.5f
+#define LICLI_OBJECT_ROTATION_SMOOTHING 0.5f
 
 void
 licli_object_set_animation (liengObject* self,
@@ -55,6 +44,10 @@ licli_object_set_animation (liengObject* self,
                             int          channel,
                             int          permanent,
                             float        priority);
+
+void
+licli_object_set_flags (liengObject* self,
+                        int          value);
 
 #endif
 

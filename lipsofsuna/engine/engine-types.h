@@ -40,6 +40,7 @@ enum
 	LIENG_CALLBACK_OBJECT_NEW, /* (data, object) */
 	LIENG_CALLBACK_OBJECT_FREE, /* (data, object) */
 	LIENG_CALLBACK_OBJECT_MODEL, /* (data, object, model) */
+	LIENG_CALLBACK_OBJECT_MOTION, /* (data, object) */
 	LIENG_CALLBACK_OBJECT_TRANSFORM, /* (data, object, transform) */
 	LIENG_CALLBACK_OBJECT_VISIBILITY, /* (data, object, boolean) */
 	LIENG_CALLBACK_SECTOR_LOAD, /* (data, sector) */

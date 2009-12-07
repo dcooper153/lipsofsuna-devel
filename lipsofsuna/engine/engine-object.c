@@ -35,14 +35,83 @@ private_warp (liengObject*       self,
 
 /*****************************************************************************/
 
+/**
+ * \brief Creates a new engine object.
+ *
+ * \param engine Engine.
+ * \param model Model or NULL.
+ * \param control Control mode for the physics object.
+ * \param id Object ID or 0 for unique.
+ * \return Engine object or NULL.
+ */
 liengObject*
 lieng_object_new (liengEngine*     engine,
                   liengModel*      model,
-                  liphyControlMode control_mode,
-                  uint32_t         id,
-                  void*            data)
+                  liphyControlMode control,
+                  uint32_t         id)
 {
-	return engine->calls.lieng_object_new (engine, model, control_mode, id, data);
+	double rnd;
+	liengObject* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (liengObject));
+	if (self == NULL)
+		return NULL;
+	self->id = id;
+	self->engine = engine;
+	self->flags = LIENG_OBJECT_FLAG_SAVE;
+
+	/* Choose object number. */
+	while (!self->id)
+	{
+		rnd = lisys_randf ();
+		self->id = engine->range.start + (uint32_t)(engine->range.size * rnd);
+		if (!self->id)
+			continue;
+		if (lialg_u32dic_find (engine->objects, self->id))
+			self->id = 0;
+	}
+
+	/* Insert to object list. */
+	if (!lialg_u32dic_insert (engine->objects, self->id, self))
+	{
+		lisys_free (self);
+		return 0;
+	}
+
+	/* Initialize physics. */
+	if (model != NULL)
+		self->physics = liphy_object_new (engine->physics, model->physics, control);
+	else
+		self->physics = liphy_object_new (engine->physics, NULL, control);
+	if (self->physics == NULL)
+		goto error;
+
+	/* Allocate pose buffer. */
+	self->pose = limdl_pose_new ();
+	if (self->pose == NULL)
+		goto error;
+
+	/* Set model. */
+	if (model != NULL)
+	{
+		lieng_object_set_model (self, model);
+		lieng_object_set_animation (self, 0, "idle", -1, 0.0f);
+	}
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, self);
+
+	return self;
+
+error:
+	if (self->pose != NULL)
+		limdl_pose_free (self->pose);
+	if (self->physics != NULL)
+		liphy_object_free (self->physics);
+	lialg_u32dic_remove (engine->objects, self->id);
+	lisys_free (self);
+	return NULL;
 }
 
 /**
@@ -53,7 +122,44 @@ lieng_object_new (liengEngine*     engine,
 void
 lieng_object_free (liengObject* self)
 {
-	self->engine->calls.lieng_object_free (self);
+	liengConstraint* constraint;
+	liengConstraint* constraint_next;
+
+	/* Unrealize. */
+	lieng_object_set_realized (self, 0);
+	lieng_object_set_selected (self, 0);
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, self);
+
+	/* Free constraints. */
+	/* FIXME: Would be better to have objects remember their own constraints. */
+	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint_next)
+	{
+		constraint_next = constraint->next;
+		if (constraint->objects[0] == self ||
+		    constraint->objects[1] == self)
+		{
+			if (constraint->prev != NULL)
+				constraint->prev->next = constraint->next;
+			else
+				self->engine->constraints = constraint->next;
+			if (constraint->next != NULL)
+				constraint->next->prev = constraint->prev;
+			lisys_free (constraint);
+		}
+	}
+
+	/* Remove from engine. */
+	lialg_u32dic_remove (self->engine->objects, self->id);
+
+	/* Free pose. */
+	if (self->pose != NULL)
+		limdl_pose_free (self->pose);
+
+	/* Free all memory. */
+	liphy_object_free (self->physics);
+	lisys_free (self);
 }
 
 /**
@@ -187,6 +293,52 @@ lieng_object_jump (liengObject*       self,
 }
 
 /**
+ * \brief Called when the object has moved.
+ *
+ * \param self Object.
+ */
+int
+lieng_object_moved (liengObject* self)
+{
+	uint32_t id;
+	liengSector* dst;
+	liengSector* src;
+	limatTransform transform;
+
+	/* Get source sector. */
+	lieng_object_get_transform (self, &transform);
+	id = LIENG_SECTOR_INDEX_FROM_POINT (transform.position);
+	src = self->sector;
+
+	/* Get destination sector. */
+	dst = lieng_engine_find_sector (self->engine, id);
+	if (dst == NULL)
+	{
+		dst = lieng_sector_new (self->engine, id);
+		if (dst == NULL)
+			return 0;
+	}
+
+	/* Update current sector. */
+	if (src != dst)
+	{
+		if (!lieng_sector_insert_object (dst, self))
+			return 0;
+		if (src != NULL)
+			lieng_sector_remove_object (src, self);
+		self->sector = dst;
+	}
+
+	/* Physics defeat smoothing. */
+	self->smoothing.target = transform;
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MOTION, self);
+
+	return 1;
+}
+
+/**
  * \brief Updates the state of the object.
  * 
  * \param self Object.
@@ -196,7 +348,38 @@ void
 lieng_object_update (liengObject* self,
                      float        secs)
 {
-	self->engine->calls.lieng_object_update (self, secs);
+	limatTransform transform;
+	limatTransform transform0;
+	limatTransform transform1;
+
+	/* Animations. */
+	if (self->pose != NULL)
+		limdl_pose_update (self->pose, secs);
+
+	/* Smoothing. */
+	if (self->smoothing.rot != 0.0f || self->smoothing.pos != 0.0f)
+	{
+		if (lieng_object_get_realized (self))
+		{
+			/* Calculate new position. */
+			liphy_object_get_transform (self->physics, &transform0);
+			transform1 = self->smoothing.target;
+			transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
+			transform.position = limat_vector_lerp (
+				transform1.position, transform0.position,
+				0.5f * self->smoothing.pos);
+			transform.rotation = limat_quaternion_nlerp (
+				transform1.rotation, transform0.rotation,
+				0.5f * self->smoothing.rot);
+
+			/* Set new position. */
+			liphy_object_set_transform (self->physics, &transform);
+			private_warp (self, &transform.position);
+
+			/* Invoke callbacks. */
+			lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, &transform);
+		}
+	}
 }
 
 /**
@@ -457,6 +640,10 @@ lieng_object_set_mass (liengObject* self,
 /**
  * \brief Replaces the current model of the object.
  *
+ * \warning This function is also called by #lieng_engine_load_model when a
+ * model has been reloaded so we must not early exit even if the model is the
+ * same.
+ *
  * \param self Object.
  * \param model Model or NULL.
  * \return Nonzero on success.
@@ -465,7 +652,34 @@ int
 lieng_object_set_model (liengObject* self,
                         liengModel*  model)
 {
-	return self->engine->calls.lieng_object_set_model (self, model);
+	liengConstraint* constraint;
+
+	/* Switch model. */
+	if (model != NULL)
+	{
+		limdl_pose_set_model (self->pose, model->model);
+		liphy_object_set_shape (self->physics, model->physics);
+	}
+	else
+	{
+		limdl_pose_set_model (self->pose, NULL);
+		liphy_object_set_shape (self->physics, NULL);
+	}
+	self->model = model;
+
+	/* Rebuild constraints. */
+	/* TODO: Looping through all constraints in the engine is wasteful. */
+	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint->next)
+	{
+		if (constraint->objects[0] == self ||
+		    constraint->objects[1] == self)
+			lieng_constraint_rebuild (constraint);
+	}
+
+	/* Invoke callbacks. */
+	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, self, model);
+
+	return 1;
 }
 
 int
@@ -561,7 +775,47 @@ int
 lieng_object_set_realized (liengObject* self,
                            int          value)
 {
-	return self->engine->calls.lieng_object_set_realized (self, value);
+	limatTransform transform;
+
+	if (value == lieng_object_get_realized (self))
+		return 1;
+	if (value)
+	{
+		/* Activate physics. */
+		if (!liphy_object_set_realized (self->physics, 1))
+			return 0;
+
+		/* Link to map. */
+		lieng_object_get_transform (self, &transform);
+		if (!private_warp (self, &transform.position))
+		{
+			liphy_object_set_realized (self->physics, 0);
+			return 0;
+		}
+
+		/* Invoke callbacks. */
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 1);
+
+		/* Protect from deletion. */
+		lieng_object_ref (self, 1);
+	}
+	else
+	{
+		/* Invoke callbacks. */
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 0);
+
+		/* Deactivate physics. */
+		liphy_object_set_realized (self->physics, 0);
+
+		/* Remove from map. */
+		lieng_sector_remove_object (self->sector, self);
+		self->sector = NULL;
+
+		/* Remove protection. */
+		lieng_object_ref (self, -1);
+	}
+
+	return 1;
 }
 
 liengSector*
@@ -738,7 +992,22 @@ int
 lieng_object_set_transform (liengObject*          self,
                             const limatTransform* value)
 {
-	return self->engine->calls.lieng_object_set_transform (self, value);
+	int realized;
+
+	realized = lieng_object_get_realized (self);
+	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
+	{
+		/* Transform immediately. */
+		liphy_object_set_transform (self->physics, value);
+		if (realized)
+			private_warp (self, &value->position);
+
+		/* Invoke callbacks. */
+		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, value);
+	}
+	self->smoothing.target = *value;
+
+	return 1;
 }
 
 void*
@@ -780,330 +1049,9 @@ int
 lieng_object_set_velocity (liengObject*       self,
                            const limatVector* value)
 {
-	return self->engine->calls.lieng_object_set_velocity (self, value);
-}
-
-/*****************************************************************************/
-
-static liengObject*
-private_callback_new (liengEngine*     engine,
-                      liengModel*      model,
-                      liphyControlMode control_mode,
-                      uint32_t         id,
-                      void*            data)
-{
-	double rnd;
-	liengObject* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liengObject));
-	if (self == NULL)
-		return NULL;
-	self->id = id;
-	self->engine = engine;
-	self->flags = LIENG_OBJECT_FLAG_SAVE;
-
-	/* Choose object number. */
-	while (!self->id)
-	{
-		rnd = lisys_randf ();
-		self->id = engine->range.start + (uint32_t)(engine->range.size * rnd);
-		if (!self->id)
-			continue;
-		if (lialg_u32dic_find (engine->objects, self->id))
-			self->id = 0;
-	}
-
-	/* Insert to object list. */
-	if (!lialg_u32dic_insert (engine->objects, self->id, self))
-	{
-		lisys_free (self);
-		return 0;
-	}
-
-	/* Initialize physics. */
-	if (model != NULL)
-		self->physics = liphy_object_new (engine->physics, model->physics, control_mode);
-	else
-		self->physics = liphy_object_new (engine->physics, NULL, control_mode);
-	if (self->physics == NULL)
-		goto error;
-
-	/* Allocate pose buffer. */
-	self->pose = limdl_pose_new ();
-	if (self->pose == NULL)
-		goto error;
-
-	/* Set model. */
-	if (model != NULL)
-	{
-		lieng_object_set_model (self, model);
-		lieng_object_set_animation (self, 0, "idle", -1, 0.0f);
-	}
-
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, self);
-
-	return self;
-
-error:
-	if (self->pose != NULL)
-		limdl_pose_free (self->pose);
-	if (self->physics != NULL)
-		liphy_object_free (self->physics);
-	lialg_u32dic_remove (engine->objects, self->id);
-	lisys_free (self);
-	return NULL;
-}
-
-static void
-private_callback_free (liengObject* self)
-{
-	liengConstraint* constraint;
-	liengConstraint* constraint_next;
-
-	/* Unrealize. */
-	lieng_object_set_realized (self, 0);
-	lieng_object_set_selected (self, 0);
-
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, self);
-
-	/* Free constraints. */
-	/* FIXME: Would be better to have objects remember their own constraints. */
-	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint_next)
-	{
-		constraint_next = constraint->next;
-		if (constraint->objects[0] == self ||
-		    constraint->objects[1] == self)
-		{
-			if (constraint->prev != NULL)
-				constraint->prev->next = constraint->next;
-			else
-				self->engine->constraints = constraint->next;
-			if (constraint->next != NULL)
-				constraint->next->prev = constraint->prev;
-			lisys_free (constraint);
-		}
-	}
-
-	/* Remove from engine. */
-	lialg_u32dic_remove (self->engine->objects, self->id);
-
-	/* Free pose. */
-	if (self->pose != NULL)
-		limdl_pose_free (self->pose);
-
-	/* Free all memory. */
-	liphy_object_free (self->physics);
-	lisys_free (self);
-}
-
-static int
-private_callback_moved (liengObject* self)
-{
-	uint32_t id;
-	liengSector* dst;
-	liengSector* src;
-	limatTransform transform;
-
-	/* Get source sector. */
-	lieng_object_get_transform (self, &transform);
-	id = LIENG_SECTOR_INDEX_FROM_POINT (transform.position);
-	src = self->sector;
-
-	/* Get destination sector. */
-	dst = lieng_engine_find_sector (self->engine, id);
-	if (dst == NULL)
-	{
-		dst = lieng_sector_new (self->engine, id);
-		if (dst == NULL)
-			return 0;
-	}
-
-	/* Update current sector. */
-	if (src != dst)
-	{
-		if (!lieng_sector_insert_object (dst, self))
-			return 0;
-		if (src != NULL)
-			lieng_sector_remove_object (src, self);
-		self->sector = dst;
-	}
-
-	/* Physics defeat smoothing. */
-	self->smoothing.target = transform;
-
-	return 1;
-}
-
-static void
-private_callback_update (liengObject* self,
-                         float        secs)
-{
-	limatTransform transform;
-	limatTransform transform0;
-	limatTransform transform1;
-
-	/* Animations. */
-	if (self->pose != NULL)
-		limdl_pose_update (self->pose, secs);
-
-	/* Smoothing. */
-	if (self->smoothing.rot != 0.0f || self->smoothing.pos != 0.0f)
-	{
-		if (lieng_object_get_realized (self))
-		{
-			liphy_object_get_transform (self->physics, &transform0);
-			transform1 = self->smoothing.target;
-			transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
-			transform.position = limat_vector_lerp (
-				transform1.position, transform0.position,
-				0.5f * self->smoothing.pos);
-			transform.rotation = limat_quaternion_nlerp (
-				transform1.rotation, transform0.rotation,
-				0.5f * self->smoothing.rot);
-			liphy_object_set_transform (self->physics, &transform);
-			private_warp (self, &transform.position);
-			lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, &transform);
-		}
-	}
-}
-
-/**
- * \brief Sets the model of the object.
- *
- * \warning This function is also called by #lieng_engine_load_model when a
- * model has been reloaded so we must not early exit even if the model is the
- * same.
- *
- * \param self Object.
- * \param model Model.
- * \return Nonzero on success.
- */
-static int
-private_callback_set_model (liengObject* self,
-                            liengModel*  model)
-{
-	liengConstraint* constraint;
-
-	/* Switch model. */
-	if (model != NULL)
-	{
-		limdl_pose_set_model (self->pose, model->model);
-		liphy_object_set_shape (self->physics, model->physics);
-	}
-	else
-	{
-		limdl_pose_set_model (self->pose, NULL);
-		liphy_object_set_shape (self->physics, NULL);
-	}
-	self->model = model;
-
-	/* Rebuild constraints. */
-	/* TODO: Looping through all constraints in the engine is wasteful. */
-	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint->next)
-	{
-		if (constraint->objects[0] == self ||
-		    constraint->objects[1] == self)
-			lieng_constraint_rebuild (constraint);
-	}
-
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, self, model);
-
-	return 1;
-}
-
-static int
-private_callback_set_realized (liengObject* self,
-                               int          value)
-{
-	limatTransform transform;
-
-	if (value == lieng_object_get_realized (self))
-		return 1;
-	if (value)
-	{
-		/* Activate physics. */
-		if (!liphy_object_set_realized (self->physics, 1))
-			return 0;
-
-		/* Link to map. */
-		lieng_object_get_transform (self, &transform);
-		if (!private_warp (self, &transform.position))
-		{
-			liphy_object_set_realized (self->physics, 0);
-			return 0;
-		}
-
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 1);
-
-		/* Protect from deletion. */
-		lieng_object_ref (self, 1);
-	}
-	else
-	{
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 0);
-
-		/* Deactivate physics. */
-		liphy_object_set_realized (self->physics, 0);
-
-		/* Remove from map. */
-		lieng_sector_remove_object (self->sector, self);
-		self->sector = NULL;
-
-		/* Remove protection. */
-		lieng_object_ref (self, -1);
-	}
-
-	return 1;
-}
-
-static int
-private_callback_set_transform (liengObject*          self,
-                                const limatTransform* value)
-{
-	int realized;
-
-	realized = lieng_object_get_realized (self);
-	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
-	{
-		/* Transform immediately. */
-		liphy_object_set_transform (self->physics, value);
-		if (realized)
-			private_warp (self, &value->position);
-
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, value);
-	}
-	self->smoothing.target = *value;
-
-	return 1;
-}
-
-int
-private_callback_set_velocity (liengObject*       self,
-                               const limatVector* value)
-{
 	liphy_object_set_velocity (self->physics, value);
 	return 1;
 }
-
-const liengCalls lieng_default_calls =
-{
-	private_callback_new,
-	private_callback_free,
-	private_callback_moved,
-	private_callback_update,
-	private_callback_set_model,
-	private_callback_set_realized,
-	private_callback_set_transform,
-	private_callback_set_velocity,
-	lieng_sector_default_new
-};
 
 /*****************************************************************************/
 

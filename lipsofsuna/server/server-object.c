@@ -32,8 +32,6 @@
 #include "server-observer.h"
 #include "server-script.h"
 
-#define LISRV_OBJECT_VERSION 0
-
 static int
 private_delete_animations (liengObject* self);
 
@@ -44,134 +42,6 @@ static int
 private_write_animations (liengObject* self);
 
 /*****************************************************************************/
-
-/**
- * \brief Creates a new server object.
- *
- * \param engine Engine.
- * \param model Model or NULL.
- * \param control_mode Interaction type.
- * \param id Object number or zero.
- * \param ptr Data passed to engine.
- * \return New object or NULL.
- */
-liengObject*
-lisrv_object_new (liengEngine*     engine,
-                  liengModel*      model,
-                  liphyControlMode control_mode,
-                  uint32_t         id,
-                  void*            ptr)
-{
-	int ret;
-	const char* query;
-	liengObject* self;
-	lisrvObject* data;
-	lisrvServer* server = lieng_engine_get_userdata (engine, LIENG_DATA_SERVER);
-	sqlite3_stmt* statement;
-
-	/* Choose unique object number. */
-	while (!id)
-	{
-		/* Choose random number. */
-		id = engine->range.start + lisys_randi (engine->range.size - 1);
-		if (!id)
-			continue;
-
-		/* Reject numbers of loaded objects. */
-		if (lialg_u32dic_find (engine->objects, id))
-		{
-			id = 0;
-			continue;
-		}
-
-		/* Reject numbers of database objects. */
-		query = "SELECT id FROM objects WHERE id=?;";
-		if (sqlite3_prepare_v2 (server->sql, query, -1, &statement, NULL) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (server->sql));
-			return 0;
-		}
-		if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (server->sql));
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		ret = sqlite3_step (statement);
-		if (ret != SQLITE_DONE)
-		{
-			if (ret != SQLITE_ROW)
-			{
-				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (server->sql));
-				sqlite3_finalize (statement);
-				return 0;
-			}
-			id = 0;
-		}
-		sqlite3_finalize (statement);
-	}
-
-	/* Allocate engine data. */
-	self = lieng_default_calls.lieng_object_new (engine, model, control_mode, id, ptr);
-	if (self == NULL)
-		return NULL;
-
-	/* Allocate server data. */
-	data = lisys_calloc (1, sizeof (lisrvObject));
-	if (data == NULL)
-		goto error;
-	data->server = server;
-	data->animations = lialg_u32dic_new ();
-	if (data->animations == NULL)
-		goto error;
-
-	/* Extend engine object. */
-	lieng_object_set_userdata (self, LIENG_DATA_SERVER, data);
-	liphy_object_set_userdata (self->physics, self);
-
-	/* Allocate script data. */
-	self->script = liscr_data_new (server->script, self, LICOM_SCRIPT_OBJECT, lieng_object_free);
-	if (self->script == NULL)
-		goto error;
-	liscr_data_unref (self->script, NULL);
-
-	return self;
-
-error:
-	lieng_object_free (self);
-	return NULL;
-}
-
-/**
- * \brief Marks the object as deleted.
- *
- * \param self Object.
- */
-void
-lisrv_object_free (liengObject* self)
-{
-	lialgU32dicIter iter;
-	lisrvObject* data = LISRV_OBJECT (self);
-
-	/* Free client. */
-	lisrv_object_disconnect (self);
-
-	/* Unrealize before server data is freed. */
-	lieng_object_set_realized (self, 0);
-
-	/* Free server data. */
-	if (data != NULL)
-	{
-		LI_FOREACH_U32DIC (iter, data->animations)
-			lisys_free (iter.value);
-		lialg_u32dic_free (data->animations);
-		lisys_free (data->name);
-		lisys_free (data);
-	}
-
-	/* Free engine data. */
-	lieng_default_calls.lieng_object_free (self);
-}
 
 /**
  * \brief Plays back an animation.
@@ -307,24 +177,6 @@ lisrv_object_effect (liengObject* self,
 
 	/* Invoke callbacks. */
 	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_SAMPLE, self, sample, flags);
-}
-
-/**
- * \brief Called by the engine every time the object moves.
- *
- * \param self Object.
- */
-int
-lisrv_object_moved (liengObject* self)
-{
-	/* Call base. */
-	if (!lieng_default_calls.lieng_object_moved (self))
-		return 0;
-
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_MOTION, self);
-
-	return 1;
 }
 
 /**

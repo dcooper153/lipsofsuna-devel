@@ -75,11 +75,11 @@ liext_module_new (licliModule* module)
 	     	private_object_model, self, self->calls + 0) ||
 	    !lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_NEW, 2,
 	     	private_object_new, self, self->calls + 1) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 1,
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 2,
 	     	private_packet, self, self->calls + 2) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_SELECT, 0,
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_SELECT, 2,
 	     	private_select, self, self->calls + 3) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
+	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 2,
 	     	private_tick, self, self->calls + 4))
 	{
 		liext_module_free (self);
@@ -212,8 +212,14 @@ private_object_new (liextModule* self,
 {
 	if (object->script != NULL)
 	{
+		/* Emit object creation event. */
 		liext_module_event (self, LIEXT_EVENT_OBJECT_NEW,
 			"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
+
+		/* Emit assign event if player object. */
+		if (self->module->network != NULL &&
+		    self->module->network->id == object->id)
+			liext_module_event (self, LIEXT_EVENT_ASSIGN, NULL);
 	}
 
 	return 1;
@@ -233,9 +239,6 @@ private_packet (liextModule* self,
 		"packet", LICOM_SCRIPT_PACKET, data0, NULL);
 	if (data0 != NULL)
 		liscr_data_unref (data0, NULL);
-
-	if (type == LINET_SERVER_PACKET_ASSIGN)
-		liext_module_event (self, LIEXT_EVENT_ASSIGN, NULL);
 
 	return 1;
 }

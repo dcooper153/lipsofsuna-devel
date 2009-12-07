@@ -104,9 +104,9 @@ liext_module_new (lisrvServer* server)
 	     	private_login, self, self->calls + 2) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGOUT, 0,
 	     	private_logout, self, self->calls + 3) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 0,
+	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_MOTION, 0,
 	     	private_motion, self, self->calls + 4) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0,
+	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 5,
 	     	private_packet, self, self->calls + 5) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0,
 	     	private_sample, self, self->calls + 6) ||

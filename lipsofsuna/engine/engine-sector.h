@@ -50,10 +50,6 @@ struct _liengSector
 };
 
 liengSector*
-lieng_sector_default_new (liengEngine* engine,
-                          uint32_t     id);
-
-liengSector*
 lieng_sector_new (liengEngine* engine,
                   uint32_t     id);
 

@@ -299,7 +299,8 @@ private_connect (lisrvNetwork*    self,
 	pthread_mutex_unlock (&self->mutex);
 
 	/* Create object. */
-	object = lieng_object_new (self->server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0, NULL);
+	object = lieng_object_new (self->server->engine, NULL, LIPHY_CONTROL_MODE_RIGID,
+		lisrv_server_get_unique_object (self->server));
 	if (object == NULL)
 	{
 		lisys_free (pass);
@@ -314,13 +315,11 @@ private_connect (lisrvNetwork*    self,
 	if (client == NULL)
 	{
 		grapple_server_disconnect_client (self->socket, message->NEW_USER.id);
-		lisrv_object_free (object);
 		lisys_free (pass);
 		return 0;
 	}
 	if (!lialg_u32dic_insert (self->clients, message->NEW_USER.id, client))
 	{
-		lisrv_object_free (object);
 		lisrv_client_free (client);
 		lisys_free (pass);
 		return 0;
@@ -333,7 +332,6 @@ private_connect (lisrvNetwork*    self,
 	if (!lisrv_object_set_client (object, client))
 	{
 		lisrv_client_free (client);
-		lisrv_object_free (object);
 		lisys_free (pass);
 		return 0;
 	}

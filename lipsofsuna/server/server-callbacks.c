@@ -176,12 +176,128 @@ private_client_vision_show (lisrvServer* server,
 	return 1;
 }
 
-int lisrv_server_init_callbacks_client (lisrvServer* server)
+static int
+private_object_free (lisrvServer* server,
+                     liengObject* object)
+{
+	lialgU32dicIter iter;
+	lisrvObject* data = LISRV_OBJECT (object);
+
+	/* Free client. */
+	lisrv_object_disconnect (object);
+
+	/* Unrealize before server data is freed. */
+	lieng_object_set_realized (object, 0);
+
+	/* Free server data. */
+	if (data != NULL)
+	{
+		LI_FOREACH_U32DIC (iter, data->animations)
+			lisys_free (iter.value);
+		lialg_u32dic_free (data->animations);
+		lisys_free (data->name);
+		lisys_free (data);
+	}
+
+	return 1;
+}
+
+static int
+private_object_new (lisrvServer* server,
+                    liengObject* object)
+{
+	lisrvObject* data;
+
+	/* Allocate server data. */
+	data = lisys_calloc (1, sizeof (lisrvObject));
+	if (data == NULL)
+		return 0;
+	data->server = server;
+	data->animations = lialg_u32dic_new ();
+	if (data->animations == NULL)
+	{
+		lisys_free (data);
+		return 0;
+	}
+
+	/* Allocate script data. */
+	object->script = liscr_data_new (server->script, object, LICOM_SCRIPT_OBJECT, lieng_object_free);
+	if (object->script == NULL)
+	{
+		lialg_u32dic_free (data->animations);
+		lisys_free (data);
+		return 0;
+	}
+	liscr_data_unref (object->script, NULL);
+
+	/* Extend engine object. */
+	lieng_object_set_userdata (object, LIENG_DATA_SERVER, data);
+	liphy_object_set_userdata (object->physics, object);
+
+	return 1;
+}
+
+static int
+private_sector_load (lisrvServer* server,
+                     liengSector* sector)
+{
+	int id;
+	int ret;
+	const char* query;
+	liengObject* object;
+	sqlite3_stmt* statement;
+
+	id = LIENG_SECTOR_INDEX (sector->x, sector->y, sector->z);
+
+	/* Prepare statement. */
+	query = "SELECT id FROM objects WHERE sector=?;";
+	if (sqlite3_prepare_v2 (server->sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (server->sql));
+		return 1;
+	}
+	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (server->sql));
+		sqlite3_finalize (statement);
+		return 1;
+	}
+
+	/* Execute statement. */
+	while (1)
+	{
+		ret = sqlite3_step (statement);
+		if (ret == SQLITE_DONE)
+		{
+			sqlite3_finalize (statement);
+			return 1;
+		}
+		if (ret != SQLITE_ROW)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (server->sql));
+			sqlite3_finalize (statement);
+			return 1;
+		}
+		id = sqlite3_column_int (statement, 0);
+		object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
+		if (object != NULL)
+		{
+			if (lisrv_object_serialize (object, 0))
+				lieng_object_set_realized (object, 1);
+		}
+	}
+}
+
+int
+lisrv_server_init_callbacks_client (lisrvServer* server)
 {
 	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 0, private_client_client_login, server, NULL);
 	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_client_client_packet, server, NULL);
 	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_HIDE, 0, private_client_vision_hide, server, NULL);
 	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_SHOW, 0, private_client_vision_show, server, NULL);
+	lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_FREE, 65535, private_object_free, server, NULL);
+	lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_NEW, -65535, private_object_new, server, NULL);
+	lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, -65535, private_sector_load, server, NULL);
 	return 1;
 }
 

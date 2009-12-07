@@ -185,6 +185,22 @@ private_miscellaneous_event (licliModule* module,
 }
 
 static int
+private_miscellaneous_object_new (licliModule* module,
+                                  liengObject* object)
+{
+	/* Set object mode. */
+	lieng_object_set_smoothing (object, LICLI_OBJECT_POSITION_SMOOTHING, LICLI_OBJECT_ROTATION_SMOOTHING);
+	lieng_object_set_userdata (object, LIENG_DATA_CLIENT, (void*) -1);
+
+	/* Allocate script data. */
+	object->script = liscr_data_new (module->script, object, LICOM_SCRIPT_OBJECT, lieng_object_free);
+	if (object->script == NULL)
+		return 0;
+
+	return 1;
+}
+
+static int
 private_miscellaneous_tick (licliModule* module,
                             float        secs)
 {
@@ -245,6 +261,7 @@ licli_module_init_callbacks_misc (licliModule* self)
 {
 	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_EVENT, -5, private_miscellaneous_event, self, NULL);
 	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_PACKET, 0, licli_module_handle_packet, self, NULL);
+	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, -65535, private_miscellaneous_object_new, self, NULL);
 	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_TICK, 0, private_miscellaneous_tick, self, NULL);
 	return 1;
 }

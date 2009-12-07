@@ -193,9 +193,10 @@ private_object_create (licliModule* module,
 	object = lieng_engine_find_object (module->engine, id);
 	if (object == NULL)
 	{
-		object = licli_object_new (module, id, flags);
+		object = lieng_object_new (module->engine, NULL, LIPHY_CONTROL_MODE_STATIC, id);
 		if (object == NULL)
 			return 0;
+		licli_object_set_flags (object, flags);
 	}
 	lieng_object_set_model_code (object, graphic);
 

@@ -43,16 +43,6 @@ struct _lisrvObject
 	lisrvServer* server;
 };
 
-liengObject*
-lisrv_object_new (liengEngine*     engine,
-                  liengModel*      model,
-                  liphyControlMode control_mode,
-                  uint32_t         id,
-                  void*            ptr);
-
-void
-lisrv_object_free (liengObject* self);
-
 int
 lisrv_object_animate (liengObject* self,
                       const char*  name,
