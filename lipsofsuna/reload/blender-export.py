@@ -261,7 +261,7 @@ def ObjectProperty(object, name):
 
 def VertexCoord(object, mesh, face, index):
 	global lips_correction_matrix
-	matrix = object.matrix * lips_correction_matrix
+	matrix = object.matrix.rotationPart().resize4x4() * lips_correction_matrix
 	coord = face.v[index].co.copy().resize4D() * matrix
 	return coord
 
