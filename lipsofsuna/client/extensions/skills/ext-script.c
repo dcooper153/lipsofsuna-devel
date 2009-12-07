@@ -100,6 +100,37 @@ Skills_get_maximum (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- @brief Gets a list of skill names.
+ * -- @param self Skills.
+ * -- @return Table, count.
+ * function Skills.get_names(self)
+ */
+static int
+Skills_get_names (lua_State* lua)
+{
+	int i;
+	lialgStrdicIter iter;
+	liextSkills* skills;
+	liscrData* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
+	skills = self->data;
+
+	i = 1;
+	lua_newtable (lua);
+	LI_FOREACH_STRDIC (iter, skills->skills)
+	{
+		lua_pushnumber (lua, i);
+		lua_pushstring (lua, iter.key);
+		lua_settable (lua, -3);
+	}
+	lua_pushnumber (lua, i - 1);
+
+	return 2;
+}
+
+/* @luadoc
+ * ---
  * -- @brief Gets the value of a skill.
  * -- @param self Skills.
  * -- @param skill Skill name.
@@ -239,6 +270,7 @@ liextSkillsScript (liscrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILLS, data);
 	liscr_class_insert_func (self, "find", Skills_find);
 	liscr_class_insert_func (self, "get_maximum", Skills_get_maximum);
+	liscr_class_insert_func (self, "get_names", Skills_get_names);
 	liscr_class_insert_func (self, "get_value", Skills_get_value);
 	liscr_class_insert_func (self, "has_skill", Skills_has_skill);
 }
