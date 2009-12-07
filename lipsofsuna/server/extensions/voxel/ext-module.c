@@ -142,7 +142,7 @@ liext_module_new (lisrvServer* server)
 	     	private_object_client, self, self->calls + 1) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_MOTION, 1,
 	     	private_object_motion, self, self->calls + 2) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 1,
+	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 1,
 	     	private_object_visibility, self, self->calls + 3) ||
 	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, 0,
 	     	private_sector_load, self, self->calls + 4) ||

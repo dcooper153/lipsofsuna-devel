@@ -112,7 +112,7 @@ liext_module_new (lisrvServer* server)
 	     	private_sample, self, self->calls + 6) ||
 	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
 	     	private_tick, self, self->calls + 7) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, 0,
+	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 0,
 	     	private_visibility, self, self->calls + 8))
 	{
 		liext_module_free (self);

@@ -744,38 +744,6 @@ lisrv_object_set_client (liengObject* self,
 }
 
 /**
- * \brief Gets the model number of the object.
- *
- * \param self An object.
- * \return Model number.
- */
-uint32_t
-lisrv_object_get_model (const liengObject* self)
-{
-	return lieng_object_get_model_code (self);
-}
-
-/**
- * \brief Sets the model of an object.
- *
- * \param self Object.
- * \param value Model.
- * \return Nonzero on success.
- */
-int
-lisrv_object_set_model (liengObject* self,
-                        liengModel*  value)
-{
-	if (!lieng_default_calls.lieng_object_set_model (self, value))
-		return 0;
-
-	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_MODEL, self, value);
-
-	return 1;
-}
-
-/**
  * \brief Gets the name of the object.
  *
  * \param self Object.
@@ -810,78 +778,6 @@ lisrv_object_set_name (liengObject* self,
 		return 0;
 	lisys_free (data->name);
 	data->name = tmp;
-
-	return 1;
-}
-
-/**
- * \brief Sets the world transformation of the object.
- *
- * This function takes care of moving the object between map sectors and
- * sending events. If you want to modify to the position of an object,
- * this function is basically the only valid way of doing it.
- *
- * If the object is not realized, the position is set but nothing else
- * happens. However, if the object is later realized, the position set
- * with this function will be used as its world position.
- *
- * \param self Object.
- * \param value Transformation.
- * \return Nonzero on success.
- */
-int
-lisrv_object_set_transform (liengObject*          self,
-                            const limatTransform* value)
-{
-	/* Call base. */
-	if (!lieng_default_calls.lieng_object_set_transform (self, value))
-		return 0;
-
-	return 1;
-}
-
-int
-lisrv_object_set_realized (liengObject* self,
-                           int          value)
-{
-	if (value == lieng_object_get_realized (self))
-		return 1;
-	if (value)
-	{
-		/* Call base. */
-		if (!lieng_default_calls.lieng_object_set_realized (self, 1))
-			return 0;
-
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, self, 1);
-	}
-	else
-	{
-		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_VISIBILITY, self, 0);
-
-		/* Call base. */
-		if (!lieng_default_calls.lieng_object_set_realized (self, 0))
-			return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Set the velocity vector of the object.
- *
- * \param self object
- * \param value Vector.
- * \return Nonzero on success.
- */
-int
-lisrv_object_set_velocity (liengObject*       self,
-                           const limatVector* value)
-{
-	/* Call base. */
-	if (!lieng_default_calls.lieng_object_set_velocity (self, value))
-		return 0;
 
 	return 1;
 }

@@ -466,10 +466,6 @@ private_init_engine (lisrvServer* self)
 	calls->lieng_object_new = lisrv_object_new;
 	calls->lieng_object_free = lisrv_object_free;
 	calls->lieng_object_moved = lisrv_object_moved;
-	calls->lieng_object_set_model = lisrv_object_set_model;
-	calls->lieng_object_set_realized = lisrv_object_set_realized;
-	calls->lieng_object_set_transform = lisrv_object_set_transform;
-	calls->lieng_object_set_velocity = lisrv_object_set_velocity;
 	calls->lieng_sector_new = private_sector_new;
 	if (!lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_CONTROL, lical_marshal_DATA_PTR_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGIN, lical_marshal_DATA_PTR_PTR_PTR) ||
@@ -479,9 +475,7 @@ private_init_engine (lisrvServer* self)
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_CLIENT, lical_marshal_DATA_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_ANIMATION, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SAMPLE, lical_marshal_DATA_PTR_PTR_INT) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_VISIBILITY, lical_marshal_DATA_PTR_INT) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_HIDE, lical_marshal_DATA_PTR_PTR) ||
 	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_SHOW, lical_marshal_DATA_PTR_PTR))
 		return 0;
@@ -728,7 +722,7 @@ private_sector_new (liengEngine* engine,
 		if (object != NULL)
 		{
 			if (lisrv_object_serialize (object, 0))
-				lisrv_object_set_realized (object, 1);
+				lieng_object_set_realized (object, 1);
 		}
 	}
 }

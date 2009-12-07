@@ -94,31 +94,12 @@ int
 lisrv_object_set_client (liengObject* self,
                          lisrvClient* value);
 
-uint32_t
-lisrv_object_get_model (const liengObject* self);
-
-int
-lisrv_object_set_model (liengObject* self,
-                        liengModel*  value);
-
 const char*
 lisrv_object_get_name (const liengObject* self);
 
 int
 lisrv_object_set_name (liengObject* self,
                        const char*  value);
-
-int
-lisrv_object_set_realized (liengObject* self,
-                           int          value);
-
-int
-lisrv_object_set_transform (liengObject*          self,
-                            const limatTransform* transform);
-
-int
-lisrv_object_set_velocity (liengObject*       self,
-                           const limatVector* value);
 
 #endif
 
