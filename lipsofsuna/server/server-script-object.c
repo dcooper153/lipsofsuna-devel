@@ -68,7 +68,10 @@ private_contact_callback (liphyObject*  object,
 	/* Convert point. */
 	data = liscr_vector_new (script, &contact->point);
 	if (data != NULL)
+	{
 		liscr_pushdata (script->lua, data);
+		liscr_data_unref (data, NULL);
+	}
 	else
 		lua_pushnil (script->lua);
 	lua_setfield (script->lua, -2, "point");
@@ -76,7 +79,10 @@ private_contact_callback (liphyObject*  object,
 	/* Convert normal. */
 	data = liscr_vector_new (script, &contact->normal);
 	if (data != NULL)
+	{
 		liscr_pushdata (script->lua, data);
+		liscr_data_unref (data, NULL);
+	}
 	else
 		lua_pushnil (script->lua);
 	lua_setfield (script->lua, -2, "normal");

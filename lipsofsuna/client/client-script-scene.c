@@ -203,7 +203,10 @@ Scene_pick (lua_State* lua)
 		liscr_pushdata (lua, object->script);
 	vector = liscr_vector_new (module->script, &result.point);
 	if (vector != NULL)
+	{
 		liscr_pushdata (lua, vector);
+		liscr_data_unref (vector, NULL);
+	}
 
 	return 2;
 }
