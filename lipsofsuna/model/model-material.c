@@ -119,6 +119,43 @@ limdl_material_clear_textures (limdlMaterial* self)
 }
 
 /**
+ * \brief Compares two materials.
+ *
+ * \param self Material.
+ * \param material Material.
+ * \return Nonzero if the materials are identical.
+ */
+int
+limdl_material_compare (const limdlMaterial* self,
+                        const limdlMaterial* material)
+{
+	int i;
+
+	if (self->flags != material->flags ||
+	    self->emission != material->emission ||
+	    self->shininess != material->shininess ||
+	    self->diffuse[0] != material->diffuse[0] ||
+	    self->diffuse[1] != material->diffuse[1] ||
+	    self->diffuse[2] != material->diffuse[2] ||
+	    self->diffuse[3] != material->diffuse[3] ||
+	    self->specular[0] != material->specular[0] ||
+	    self->specular[1] != material->specular[1] ||
+	    self->specular[2] != material->specular[2] ||
+	    self->specular[3] != material->specular[3] ||
+	    self->textures.count != material->textures.count)
+		return 0;
+	if (strcmp (self->shader, material->shader))
+		return 0;
+	for (i = 0 ; i < self->textures.count ; i++)
+	{
+		if (!limdl_texture_compare (self->textures.array + i, material->textures.array + i))
+			return 0;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Deserializes the material from a stream.
  *
  * \param self Material.

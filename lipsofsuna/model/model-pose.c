@@ -397,7 +397,7 @@ limdl_pose_set_channel_animation (limdlPose*  self,
 
 	if (self->model == NULL)
 		return;
-	anim = limdl_model_get_animation (self->model, animation);
+	anim = limdl_model_find_animation (self->model, animation);
 	if (anim == NULL)
 	{
 		limdl_pose_destroy_channel (self, channel);
@@ -583,7 +583,7 @@ limdl_pose_set_model (limdlPose*  self,
 	{
 		chan = iter.value;
 		if (model != NULL && chan->animation_name != NULL)
-			anim = limdl_model_get_animation (model, chan->animation_name);
+			anim = limdl_model_find_animation (model, chan->animation_name);
 		else
 			anim = NULL;
 		if (anim == NULL)
@@ -602,7 +602,7 @@ limdl_pose_set_model (limdlPose*  self,
 	{
 		fade_next = fade->next;
 		if (model != NULL && fade->animation_name != NULL)
-			anim = limdl_model_get_animation (model, fade->animation_name);
+			anim = limdl_model_find_animation (model, fade->animation_name);
 		else
 			anim = NULL;
 		if (anim == NULL)

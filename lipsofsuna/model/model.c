@@ -333,6 +333,50 @@ limdl_model_calculate_bounds (limdlModel* self)
 }
 
 /**
+ * \brief Finds an animation by name.
+ *
+ * \param self Model.
+ * \param name Animation name.
+ * \return Animation or NULL.
+ */
+limdlAnimation*
+limdl_model_find_animation (limdlModel* self,
+                            const char* name)
+{
+	int i;
+
+	for (i = 0 ; i < self->animations.count ; i++)
+	{
+		if (!strcmp (self->animations.array[i].name, name))
+			return self->animations.array + i;
+	}
+
+	return NULL;
+}
+
+/**
+ * \brief Finds a face group.
+ *
+ * \param self Model.
+ * \param material Material index.
+ * \return Face group index or -1.
+ */
+int
+limdl_model_find_facegroup (limdlModel* self,
+                            int         material)
+{
+	int i;
+
+	for (i = 0 ; i < self->facegroups.count ; i++)
+	{
+		if (self->facegroups.array[i].material == material)
+			return i;
+	}
+
+	return -1;
+}
+
+/**
  * \brief Finds the material index of the material.
  *
  * Finds the first material that matches the passed material.
@@ -348,35 +392,11 @@ limdl_model_find_material (const limdlModel*    self,
                            const limdlMaterial* material)
 {
 	int i;
-	int j;
-	const limdlMaterial* m;
 
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
-		m = self->materials.array + i;
-		if (m->flags == material->flags &&
-		    m->shininess == material->shininess &&
-		    m->diffuse[0] == material->diffuse[0] &&
-		    m->diffuse[1] == material->diffuse[1] &&
-		    m->diffuse[2] == material->diffuse[2] &&
-		    m->diffuse[3] == material->diffuse[3] &&
-		    m->specular[0] == material->specular[0] &&
-		    m->specular[1] == material->specular[1] &&
-		    m->specular[2] == material->specular[2] &&
-		    m->specular[3] == material->specular[3] &&
-		    m->textures.count == material->textures.count)
-		{
-			if (!strcmp (m->shader, material->shader))
-			{
-				for (j = 0 ; j < m->textures.count ; j++)
-				{
-					if (limdl_texture_compare (m->textures.array + j, material->textures.array + j))
-						break;
-				}
-				if (j == m->textures.count)
-					return i;
-			}
-		}
+		if (limdl_material_compare (self->materials.array + i, material))
+			return i;
 	}
 
 	return -1;
@@ -405,6 +425,193 @@ limdl_model_find_node (const limdlModel* self,
 	}
 
 	return NULL;
+}
+
+/**
+ * \brief Finds the index of a matching vertex.
+ *
+ * \param self Model.
+ * \param vertex Vertex.
+ * \return Index in vertex array or -1 if not found.
+ */
+int
+limdl_model_find_vertex (limdlModel*        self,
+                         const limdlVertex* vertex)
+{
+	int i;
+
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		if (limdl_vertex_compare (self->vertices.array + i, vertex) == 0)
+			return i;
+	}
+
+	return -1;
+}
+
+/**
+ * \brief Inserts a triangle to the model.
+ *
+ * Inserts vertices, vertex weights, and indices to the model, merging the
+ * new vertex with existing vertices, if possible.
+ *
+ * \param self Model.
+ * \param group Face group index.
+ * \param vertices Array of three vertices.
+ * \param weights Array of three weights or NULL.
+ * \return Nonzero on success.
+ */
+int
+limdl_model_insert_face (limdlModel*         self,
+                         int                 group,
+                         const limdlVertex*  vertices,
+                         const limdlWeights* weights)
+{
+	int i;
+	int tmp;
+	uint32_t index;
+	limdlFaces* group_;
+
+	group_ = self->facegroups.array + group;
+	tmp = group_->indices.count;
+
+	/* Insert vertices and indices. */
+	for (i = 0 ; i < 3 ; i++)
+	{
+		/* Insert vertex. */
+		index = limdl_model_find_vertex (self, vertices + i);
+		if (index == -1)
+		{
+			index = self->vertices.count;
+			if (!limdl_model_insert_vertex (self, vertices + i, (weights != NULL)? weights + i : NULL))
+				goto error;
+		}
+
+		/* Insert index. */
+		if (!lialg_array_append (&group_->indices, &index))
+			goto error;
+	}
+
+	return 1;
+
+error:
+	group_->indices.count = tmp;
+	return 0;
+}
+
+/**
+ * \brief Inserts a face group to the model.
+ *
+ * \param self Model.
+ * \param material Material index.
+ * \return Nonzero on success.
+ */
+int
+limdl_model_insert_facegroup (limdlModel* self,
+                              int         material)
+{
+	int count;
+	limdlFaces* tmp;
+
+	assert (material >= 0);
+	assert (material < self->materials.count);
+
+	/* Resize buffer. */
+	count = self->facegroups.count + 1;
+	tmp = lisys_realloc (self->facegroups.array, count * sizeof (limdlFaces));
+	if (tmp == NULL)
+		return 0;
+	self->facegroups.array = tmp;
+	tmp += self->facegroups.count;
+	self->facegroups.count++;
+
+	/* Initialize group. */
+	memset (tmp, 0, sizeof (limdlFaces));
+	tmp->material = material;
+
+	return 1;
+}
+
+/**
+ * \brief Inserts a material to the model.
+ *
+ * \param self Model.
+ * \param material Material.
+ * \return Nonzero on success.
+ */
+int
+limdl_model_insert_material (limdlModel*          self,
+                             const limdlMaterial* material)
+{
+	int count;
+	limdlMaterial* tmp;
+
+	/* Resize buffer. */
+	count = self->materials.count + 1;
+	tmp = lisys_realloc (self->materials.array, count * sizeof (limdlMaterial));
+	if (tmp == NULL)
+		return 0;
+	self->materials.array = tmp;
+	tmp += self->materials.count;
+
+	/* Copy material. */
+	if (!limdl_material_init_copy (tmp, material))
+		return 0;
+	self->materials.count++;
+
+	return 1;
+}
+
+/**
+ * \brief Inserts a vertex to the model.
+ *
+ * \param self Model.
+ * \param vertex Vertex.
+ * \param weights Vertex weights or NULL.
+ * \return Nonzero on success.
+ */
+int
+limdl_model_insert_vertex (limdlModel*         self,
+                           const limdlVertex*  vertex,
+                           const limdlWeights* weights)
+{
+	int count;
+	void* tmp;
+	limdlWeights* w;
+
+	/* Resize buffers. */
+	count = self->vertices.count + 1;
+	tmp = lisys_realloc (self->vertices.array, count * sizeof (limdlVertex));
+	if (tmp == NULL)
+		return 0;
+	self->vertices.array = tmp;
+	tmp = lisys_realloc (self->weights.array, count * sizeof (limdlWeights));
+	if (tmp == NULL)
+		return 0;
+	self->weights.array = tmp;
+
+	/* Append weights. */
+	if (weights != NULL && weights->count)
+	{
+		w = self->weights.array + count - 1;
+		w->weights = lisys_malloc (weights->count * sizeof (limdlWeight));
+		if (w->weights == NULL)
+			return 0;
+		memcpy (w->weights, weights->weights, weights->count * sizeof (limdlWeight));
+		w->count = weights->count;
+	}
+	else
+	{
+		w = self->weights.array + count - 1;
+		memset (w, 0, sizeof (limdlWeights));
+	}
+
+	/* Append vertex. */
+	self->vertices.array[count - 1] = *vertex;
+	self->vertices.count++;
+	self->weights.count++;
+
+	return 1;
 }
 
 int
@@ -439,27 +646,6 @@ limdl_model_write_file (const limdlModel* self,
 	liarc_writer_free (writer);
 
 	return 1;
-}
-
-/**
- * \brief Gets an animation by name.
- *
- * \param self A model.
- * \param name The name of the animation.
- * \return An animation or NULL.
- */
-limdlAnimation*
-limdl_model_get_animation (limdlModel* self,
-                           const char* name)
-{
-	uint32_t i;
-
-	for (i = 0 ; i < self->animations.count ; i++)
-	{
-		if (!strcmp (self->animations.array[i].name, name))
-			return self->animations.array + i;
-	}
-	return NULL;
 }
 
 int

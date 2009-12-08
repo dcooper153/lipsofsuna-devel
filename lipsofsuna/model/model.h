@@ -108,6 +108,14 @@ limdl_model_calculate_bounds (limdlModel* self);
 void
 limdl_model_free (limdlModel* self);
 
+limdlAnimation*
+limdl_model_find_animation (limdlModel* self,
+                            const char* name);
+
+int
+limdl_model_find_facegroup (limdlModel* self,
+                            int         material);
+
 int
 limdl_model_find_material (const limdlModel*    self,
                            const limdlMaterial* material);
@@ -117,16 +125,35 @@ limdl_model_find_node (const limdlModel* self,
                        const char*       name);
 
 int
+limdl_model_find_vertex (limdlModel*        self,
+                         const limdlVertex* vertex);
+
+int
+limdl_model_insert_face (limdlModel*         self,
+                         int                 group,
+                         const limdlVertex*  vertices,
+                         const limdlWeights* weights);
+
+int
+limdl_model_insert_facegroup (limdlModel* self,
+                              int         material);
+
+int
+limdl_model_insert_material (limdlModel*          self,
+                             const limdlMaterial* material);
+
+int
+limdl_model_insert_vertex (limdlModel*         self,
+                           const limdlVertex*  vertex,
+                           const limdlWeights* weights);
+
+int
 limdl_model_write (const limdlModel* self,
                    liarcWriter*      writer);
 
 int
 limdl_model_write_file (const limdlModel* self,
                         const char*       path);
-
-limdlAnimation*
-limdl_model_get_animation (limdlModel* self,
-                           const char* name);
 
 int
 limdl_model_get_index_count (const limdlModel* self);

@@ -36,6 +36,8 @@ struct _liextBlock
 {
 	licliModule* module;
 	liphyObject* physics;
+	limdlModel* mmodel;
+	lirndModel* rmodel;
 	lirndGroup* group;
 };
 

@@ -63,6 +63,10 @@ void
 limdl_material_clear_textures (limdlMaterial* self);
 
 int
+limdl_material_compare (const limdlMaterial* self,
+                        const limdlMaterial* material);
+
+int
 limdl_material_read (limdlMaterial* self,
                      liarcReader*   reader);
 
