@@ -84,9 +84,9 @@ struct _limdlModel
 	struct { int count; limdlMaterial* array; } materials;
 	struct { int count; limdlNode** array; } nodes;
 	struct { int count; limdlShape* array; } shapes;
-	struct { int count; limdlVertex* array; } vertices;
+	struct { int count; limdlVertex* array; int capacity; } vertices;
 	struct { int count; limdlWeightGroup* array; } weightgroups;
-	struct { int count; limdlWeights* array; } weights;
+	struct { int count; limdlWeights* array; int capacity; } weights;
 };
 
 #ifdef __cplusplus
@@ -137,6 +137,12 @@ limdl_model_insert_face (limdlModel*         self,
 int
 limdl_model_insert_facegroup (limdlModel* self,
                               int         material);
+
+int
+limdl_model_insert_indices (limdlModel* self,
+                            int         group,
+                            uint32_t*   indices,
+                            int         count);
 
 int
 limdl_model_insert_material (limdlModel*          self,

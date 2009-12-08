@@ -37,6 +37,7 @@ struct _limdlFaces
 	{
 		int count;
 		uint32_t* array;
+		int capacity;
 	} indices;
 };
 

@@ -468,12 +468,25 @@ limdl_model_insert_face (limdlModel*         self,
                          const limdlWeights* weights)
 {
 	int i;
-	int tmp;
 	uint32_t index;
+	uint32_t* indices;
 	limdlFaces* group_;
 
 	group_ = self->facegroups.array + group;
-	tmp = group_->indices.count;
+
+	/* Allocate space. */
+	if (group_->indices.capacity < group_->indices.count + 3)
+	{
+		if (group_->indices.capacity)
+			i = group_->indices.capacity << 1;
+		else
+			i = 64;
+		indices = lisys_realloc (group_->indices.array, i * sizeof (uint32_t));
+		if (indices == NULL)
+			return 0;
+		group_->indices.array = indices;
+		group_->indices.capacity = i;
+	}
 
 	/* Insert vertices and indices. */
 	for (i = 0 ; i < 3 ; i++)
@@ -484,19 +497,15 @@ limdl_model_insert_face (limdlModel*         self,
 		{
 			index = self->vertices.count;
 			if (!limdl_model_insert_vertex (self, vertices + i, (weights != NULL)? weights + i : NULL))
-				goto error;
+				return 0;
 		}
 
 		/* Insert index. */
-		if (!lialg_array_append (&group_->indices, &index))
-			goto error;
+		group_->indices.array[group_->indices.count] = index;
+		group_->indices.count++;
 	}
 
 	return 1;
-
-error:
-	group_->indices.count = tmp;
-	return 0;
 }
 
 /**
@@ -528,6 +537,50 @@ limdl_model_insert_facegroup (limdlModel* self,
 	/* Initialize group. */
 	memset (tmp, 0, sizeof (limdlFaces));
 	tmp->material = material;
+
+	return 1;
+}
+
+/**
+ * \brief Inserts indices to the model.
+ *
+ * \param self Model.
+ * \param group Face group index.
+ * \param indices Array of indices.
+ * \param count Number of indices.
+ * \return Nonzero on success.
+ */
+int
+limdl_model_insert_indices (limdlModel* self,
+                            int         group,
+                            uint32_t*   indices,
+                            int         count)
+{
+	int i;
+	uint32_t* tmp;
+	limdlFaces* group_;
+
+	group_ = self->facegroups.array + group;
+
+	/* Allocate space. */
+	if (group_->indices.capacity < group_->indices.count + count)
+	{
+		if (group_->indices.capacity)
+			i = group_->indices.capacity;
+		else
+			i = 64;
+		while (i < group_->indices.count + count)
+			i <<= 1;
+		tmp = lisys_realloc (group_->indices.array, i * sizeof (uint32_t));
+		if (tmp == NULL)
+			return 0;
+		group_->indices.array = tmp;
+		group_->indices.capacity = i;
+	}
+
+	/* Insert indices. */
+	memcpy (group_->indices.array + group_->indices.count, indices, count * sizeof (uint32_t));
+	group_->indices.count += count;
 
 	return 1;
 }
@@ -575,25 +628,43 @@ limdl_model_insert_vertex (limdlModel*         self,
                            const limdlVertex*  vertex,
                            const limdlWeights* weights)
 {
+	int i;
 	int count;
 	void* tmp;
 	limdlWeights* w;
 
 	/* Resize buffers. */
-	count = self->vertices.count + 1;
-	tmp = lisys_realloc (self->vertices.array, count * sizeof (limdlVertex));
-	if (tmp == NULL)
-		return 0;
-	self->vertices.array = tmp;
-	tmp = lisys_realloc (self->weights.array, count * sizeof (limdlWeights));
-	if (tmp == NULL)
-		return 0;
-	self->weights.array = tmp;
+	if (self->vertices.capacity < self->vertices.count + 1)
+	{
+		if (self->vertices.capacity)
+			i = self->vertices.capacity << 1;
+		else
+			i = 32;
+		tmp = lisys_realloc (self->vertices.array, i * sizeof (limdlVertex));
+		if (tmp == NULL)
+			return 0;
+		self->vertices.array = tmp;
+		self->vertices.capacity = i;
+	}
+	if (self->weights.capacity < self->weights.count + 1)
+	{
+		if (self->weights.capacity)
+			i = self->weights.capacity << 1;
+		else
+			i = 32;
+		tmp = lisys_realloc (self->weights.array, i * sizeof (limdlWeights));
+		if (tmp == NULL)
+			return 0;
+		self->weights.array = tmp;
+		self->weights.capacity = i;
+	}
+	count = self->vertices.count;
+	assert (self->vertices.count == self->weights.count);
 
 	/* Append weights. */
 	if (weights != NULL && weights->count)
 	{
-		w = self->weights.array + count - 1;
+		w = self->weights.array + count;
 		w->weights = lisys_malloc (weights->count * sizeof (limdlWeight));
 		if (w->weights == NULL)
 			return 0;
@@ -602,12 +673,12 @@ limdl_model_insert_vertex (limdlModel*         self,
 	}
 	else
 	{
-		w = self->weights.array + count - 1;
+		w = self->weights.array + count;
 		memset (w, 0, sizeof (limdlWeights));
 	}
 
 	/* Append vertex. */
-	self->vertices.array[count - 1] = *vertex;
+	self->vertices.array[count] = *vertex;
 	self->vertices.count++;
 	self->weights.count++;
 
@@ -998,6 +1069,7 @@ private_read_vertices (limdlModel*  self,
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->vertices.count = tmp;
+	self->vertices.capacity = tmp;
 
 	/* Read vertices. */
 	if (tmp)
@@ -1077,6 +1149,7 @@ private_read_weights (limdlModel*  self,
 		if (self->weights.array == NULL)
 			return 0;
 		self->weights.count = tmp[1];
+		self->weights.capacity = tmp[1];
 		for (i = 0 ; i < self->weights.count ; i++)
 		{
 			if (!private_read_vertex_weights (self, self->weights.array + i, reader))

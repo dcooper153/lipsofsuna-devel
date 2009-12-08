@@ -327,9 +327,16 @@ private_merge_model (liextBlock* self,
 	int j;
 	int k;
 	int m;
+	void* ptr;
+	uint32_t indices[3];
+	lialgMemdic* accel;
 	limdlFaces* faces;
 	limdlMaterial* material;
 	limdlVertex verts[3];
+
+	accel = lialg_memdic_new ();
+	if (accel == NULL)
+		return;
 
 	/* Add each face group. */
 	for (i = 0 ; i < model->facegroups.count ; i++)
@@ -401,10 +408,32 @@ private_merge_model (liextBlock* self,
 				verts[k].normal = limat_quaternion_transform (voxel->transform.rotation, verts[k].normal);
 			}
 
-			/* Add to model. */
-			limdl_model_insert_face (self->mmodel, g, verts, NULL);
+			/* Insert vertices to model. */
+			for (k = 0 ; k < 3 ; k++)
+			{
+				ptr = lialg_memdic_find (accel, verts + k, sizeof (limdlVertex));
+				if (ptr == NULL)
+				{
+					/* Add to model. */
+					indices[k] = self->mmodel->vertices.count;
+					if (!limdl_model_insert_vertex (self->mmodel, verts + k, NULL))
+						continue;
+
+					/* Add to lookup. */
+					ptr = (void*)(intptr_t) indices[k];
+					if (!lialg_memdic_insert (accel, verts + k, sizeof (limdlVertex), ptr));
+						continue;
+				}
+				else
+					indices[k] = (int)(intptr_t) ptr;
+			}
+
+			/* Insert indices to model. */
+			limdl_model_insert_indices (self->mmodel, g, indices, 3);
 		}
 	}
+
+	lialg_memdic_free (accel);
 }
 
 /** @} */

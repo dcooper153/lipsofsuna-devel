@@ -51,6 +51,7 @@ limdl_faces_read (limdlFaces*  self,
 		if (self->indices.array == NULL)
 			return 0;
 		self->indices.count = count;
+		self->indices.capacity = count;
 		for (i = 0 ; i < count ; i++)
 		{
 			if (!liarc_reader_get_uint32 (reader, self->indices.array + i))

@@ -25,6 +25,7 @@
 #ifndef __MODEL_VERTEX_H__
 #define __MODEL_VERTEX_H__
 
+#include <string.h>
 #include <math/lips-math.h>
 
 typedef struct _limdlVertex limdlVertex;
@@ -56,31 +57,7 @@ static inline int
 limdl_vertex_compare (const limdlVertex* self,
                       const limdlVertex* vertex)
 {
-	if (self->texcoord[0] < vertex->texcoord[0]) return -1;
-	if (self->texcoord[0] > vertex->texcoord[0]) return 1;
-	if (self->texcoord[1] < vertex->texcoord[1]) return -1;
-	if (self->texcoord[1] > vertex->texcoord[1]) return 1;
-	if (self->texcoord[2] < vertex->texcoord[2]) return -1;
-	if (self->texcoord[2] > vertex->texcoord[2]) return 1;
-	if (self->texcoord[3] < vertex->texcoord[3]) return -1;
-	if (self->texcoord[3] > vertex->texcoord[3]) return 1;
-	if (self->texcoord[4] < vertex->texcoord[4]) return -1;
-	if (self->texcoord[4] > vertex->texcoord[4]) return 1;
-	if (self->texcoord[5] < vertex->texcoord[5]) return -1;
-	if (self->texcoord[5] > vertex->texcoord[5]) return 1;
-	if (self->normal.x < vertex->normal.x) return -1;
-	if (self->normal.x > vertex->normal.x) return 1;
-	if (self->normal.y < vertex->normal.y) return -1;
-	if (self->normal.y > vertex->normal.y) return 1;
-	if (self->normal.z < vertex->normal.z) return -1;
-	if (self->normal.z > vertex->normal.z) return 1;
-	if (self->coord.x < vertex->coord.x) return -1;
-	if (self->coord.x > vertex->coord.x) return 1;
-	if (self->coord.y < vertex->coord.y) return -1;
-	if (self->coord.y > vertex->coord.y) return 1;
-	if (self->coord.z < vertex->coord.z) return -1;
-	if (self->coord.z > vertex->coord.z) return 1;
-	return 0;
+	return memcmp (self, vertex, sizeof (limdlVertex));
 }
 
 #endif
