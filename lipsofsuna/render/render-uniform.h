@@ -125,7 +125,7 @@ lirnd_uniform_get_sampler (lirndUniform* self)
 	if (self->value >= LIRND_UNIFORM_DIFFUSETEXTURE0 &&
 	    self->value <= LIRND_UNIFORM_DIFFUSETEXTURE9)
 		return 1;
-	if (self->value >= LIRND_UNIFORM_NOISETEXTURE)
+	if (self->value == LIRND_UNIFORM_NOISETEXTURE)
 		return 1;
 	if (self->value >= LIRND_UNIFORM_SHADOWTEXTURE0 &&
 	    self->value <= LIRND_UNIFORM_SHADOWTEXTURE9)
