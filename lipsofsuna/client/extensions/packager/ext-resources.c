@@ -209,9 +209,9 @@ private_read_animations (liextResources*   self,
 	int count;
 	const limdlAnimation* animation;
 
-	for (i = 0 ; i < model->animation.count ; i++)
+	for (i = 0 ; i < model->animations.count ; i++)
 	{
-		animation = model->animation.animations + i;
+		animation = model->animations.array + i;
 		count = self->animations.count;
 
 		/* Check for duplicate. */

@@ -581,9 +581,9 @@ private_insert_model (liengResources*   self,
 	}
 
 	/* Cache animations. */
-	for (i = 0 ; i < model->animation.count ; i++)
+	for (i = 0 ; i < model->animations.count ; i++)
 	{
-		manim = model->animation.animations + i;
+		manim = model->animations.array + i;
 		count = self->animations.count;
 
 		/* Check for duplicates. */

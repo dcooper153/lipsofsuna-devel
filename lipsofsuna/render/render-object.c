@@ -117,21 +117,17 @@ lirnd_object_free (lirndObject* self)
 void
 lirnd_object_deform (lirndObject* self)
 {
-	int i;
 	void* vertices;
 	lirndBuffer* buffer;
 
 	if (self->instance == NULL)
 		return;
-	for (i = 0 ; i < self->instance->buffers.count ; i++)
+	buffer = self->instance->vertices;
+	vertices = lirnd_buffer_lock (buffer, 1);
+	if (vertices != NULL)
 	{
-		buffer = self->instance->buffers.array + i;
-		vertices = lirnd_buffer_lock (buffer, 1);
-		if (vertices != NULL)
-		{
-			limdl_pose_transform_group (self->pose, i, vertices);
-			lirnd_buffer_unlock (buffer, vertices);
-		}
+		limdl_pose_transform (self->pose, vertices);
+		lirnd_buffer_unlock (buffer, vertices);
 	}
 	private_update_lights (self);
 }

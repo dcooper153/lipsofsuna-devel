@@ -75,22 +75,47 @@ void
 lirnd_context_bind (lirndContext* self);
 
 void
+lirnd_context_render_array (lirndContext* self,
+                            lirndBuffer*  vertex);
+
+void
+lirnd_context_render_indexed (lirndContext* self,
+                              lirndBuffer*  vertex,
+                              lirndBuffer*  index);
+
+void
 lirnd_context_render (lirndContext* self,
                       lirndBuffer*  buffer);
 
 void
-lirnd_context_render_vbo (lirndContext*      self,
-                          int                vertex0,
-                          int                vertex1,
-                          const lirndFormat* format,
-                          GLuint             vertices);
+lirnd_context_render_vbo_array (lirndContext*      self,
+                                const lirndFormat* format,
+                                GLuint             vertices,
+                                int                vertex0,
+                                int                vertex1);
 
 void
-lirnd_context_render_vtx (lirndContext*      self,
-                          int                vertex0,
-                          int                vertex1,
-                          const lirndFormat* format,
-                          const void*        vertices);
+lirnd_context_render_vtx_array (lirndContext*      self,
+                                const lirndFormat* format,
+                                const void*        vertices,
+                                int                vertex0,
+                                int                vertex1);
+
+void
+lirnd_context_render_vbo_indexed (lirndContext*      self,
+                                  const lirndFormat* format,
+                                  GLuint             vertices,
+                                  GLuint             indices,
+                                  int                index0,
+                                  int                index1);
+
+void
+lirnd_context_render_vtx_indexed (lirndContext*      self,
+                                  const lirndFormat* format,
+                                  const void*        vertices,
+                                  const void*        indices,
+                                  int                index0,
+                                  int                index1);
 
 void
 lirnd_context_unbind (lirndContext* self);

@@ -287,9 +287,8 @@ limdl_pose_update (limdlPose* self,
 }
 
 void
-limdl_pose_transform_group (limdlPose*   self,
-                            int          group,
-                            limdlVertex* vertices)
+limdl_pose_transform (limdlPose*   self,
+                      limdlVertex* vertices)
 {
 	int i;
 	int j;
@@ -301,7 +300,6 @@ limdl_pose_transform_group (limdlPose*   self,
 	limatVector pose_vertex;
 	limatVector rest_normal;
 	limatVector pose_normal;
-	limdlFaces* group_;
 	limdlNode* restbone;
 	limdlNode* posebone;
 	limdlWeight* weight;
@@ -311,19 +309,15 @@ limdl_pose_transform_group (limdlPose*   self,
 	if (model == NULL)
 		return;
 
-	assert (group >= 0);
-	assert (group < model->facegroups.count);
-	group_ = model->facegroups.array + group;
-
 	/* Transform each vertex. */
-	for (i = 0 ; i < group_->vertices.count ; i++)
+	for (i = 0 ; i < model->vertices.count ; i++)
 	{
 		count = 0;
-		weights = group_->weights.array + i;
+		weights = model->weights.array + i;
 
 		/* Get the rest pose state. */
-		rest_vertex = group_->vertices.array[i].coord;
-		rest_normal = group_->vertices.array[i].normal;
+		rest_vertex = model->vertices.array[i].coord;
+		rest_normal = model->vertices.array[i].normal;
 		rest_normal = limat_vector_add (rest_normal, rest_vertex);
 		pose_vertex = limat_vector_init (0.0f, 0.0f, 0.0f);
 		pose_normal = limat_vector_init (0.0f, 0.0f, 0.0f);
@@ -337,7 +331,7 @@ limdl_pose_transform_group (limdlPose*   self,
 				continue;
 
 			/* Get transformed bone. */
-			restbone = model->weightgroups.weightgroups[weight->group].node;
+			restbone = model->weightgroups.array[weight->group].node;
 			posebone = self->groups.array[weight->group].node;
 			if (restbone == NULL || posebone == NULL)
 				continue;
@@ -781,8 +775,8 @@ private_init_pose (limdlPose*  self,
 			return 0;
 		for (i = 0 ; i < self->groups.count ; i++)
 		{
-			self->groups.array[i].name = listr_dup (model->weightgroups.weightgroups[i].name);
-			self->groups.array[i].bone = listr_dup (model->weightgroups.weightgroups[i].bone);
+			self->groups.array[i].name = listr_dup (model->weightgroups.array[i].name);
+			self->groups.array[i].bone = listr_dup (model->weightgroups.array[i].bone);
 			self->groups.array[i].node = limdl_pose_find_node (self, self->groups.array[i].bone);
 			if (self->groups.array[i].name == NULL ||
 				self->groups.array[i].bone == NULL)

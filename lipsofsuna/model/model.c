@@ -62,6 +62,10 @@ private_read_shapes (limdlModel*  self,
                      liarcReader* reader);
 
 static int
+private_read_vertices (limdlModel*  self,
+                       liarcReader* reader);
+
+static int
 private_read_weights (limdlModel*  self,
                       liarcReader* reader);
 
@@ -69,6 +73,11 @@ static int
 private_read_animation (limdlModel*     self,
                         limdlAnimation* animation,
                         liarcReader*    reader);
+
+static int
+private_read_vertex_weights (limdlModel*   self,
+                             limdlWeights* weights,
+                             liarcReader*  reader);
 
 static int
 private_write (const limdlModel* self,
@@ -97,6 +106,10 @@ private_write_nodes (const limdlModel* self,
 static int
 private_write_shapes (const limdlModel* self,
                       liarcWriter*      writer);
+
+static int
+private_write_vertices (const limdlModel* self,
+                        liarcWriter*      writer);
 
 static int
 private_write_weights (const limdlModel* self,
@@ -223,15 +236,21 @@ limdl_model_free (limdlModel* self)
 	}
 
 	/* Free weight groups. */
-	if (self->weightgroups.weightgroups != NULL)
+	if (self->weightgroups.array != NULL)
 	{
 		for (i = 0 ; i < self->weightgroups.count ; i++)
 		{
-			lisys_free (self->weightgroups.weightgroups[i].name);
-			lisys_free (self->weightgroups.weightgroups[i].bone);
+			lisys_free (self->weightgroups.array[i].name);
+			lisys_free (self->weightgroups.array[i].bone);
 		}
-		lisys_free (self->weightgroups.weightgroups);
+		lisys_free (self->weightgroups.array);
 	}
+	lisys_free (self->vertices.array);
+
+	/* Free vertex weights. */
+	for (i = 0 ; i < self->weights.count ; i++)
+		lisys_free (self->weights.array[i].weights);
+	lisys_free (self->weights.array);
 
 	/* Free nodes. */
 	if (self->nodes.array != NULL)
@@ -245,11 +264,11 @@ limdl_model_free (limdlModel* self)
 	}
 
 	/* Free animations. */
-	if (self->animation.animations != NULL)
+	if (self->animations.array != NULL)
 	{
-		for (i = 0 ; i < self->animation.count ; i++)
-			private_free_animation (self, self->animation.animations + i);
-		lisys_free (self->animation.animations);
+		for (i = 0 ; i < self->animations.count ; i++)
+			private_free_animation (self, self->animations.array + i);
+		lisys_free (self->animations.array);
 	}
 
 	/* Free particles. */
@@ -285,32 +304,26 @@ limdl_model_free (limdlModel* self)
 void
 limdl_model_calculate_bounds (limdlModel* self)
 {
-	int i;
 	int j;
 	limatVector v;
-	limdlFaces* group;
 
 	self->bounds.min = limat_vector_init (-2.0E10, -2.0E10, -2.0E10);
 	self->bounds.max = limat_vector_init (2.0E10, 2.0E10, 2.0E10);
-	for (i = 0 ; i < self->facegroups.count ; i++)
+	for (j = 0 ; j < self->vertices.count ; j++)
 	{
-		group = self->facegroups.array + i;
-		for (j = 0 ; j < group->vertices.count ; j++)
-		{
-			v = group->vertices.array[j].coord;
-			if (self->bounds.min.x > v.x)
-				self->bounds.min.x = v.x;
-			if (self->bounds.min.y > v.y)
-				self->bounds.min.y = v.y;
-			if (self->bounds.min.z > v.z)
-				self->bounds.min.z = v.z;
-			if (self->bounds.max.x < v.x)
-				self->bounds.max.x = v.x;
-			if (self->bounds.max.y < v.y)
-				self->bounds.max.y = v.y;
-			if (self->bounds.max.z < v.z)
-				self->bounds.max.z = v.z;
-		}
+		v = self->vertices.array[j].coord;
+		if (self->bounds.min.x > v.x)
+			self->bounds.min.x = v.x;
+		if (self->bounds.min.y > v.y)
+			self->bounds.min.y = v.y;
+		if (self->bounds.min.z > v.z)
+			self->bounds.min.z = v.z;
+		if (self->bounds.max.x < v.x)
+			self->bounds.max.x = v.x;
+		if (self->bounds.max.y < v.y)
+			self->bounds.max.y = v.y;
+		if (self->bounds.max.z < v.z)
+			self->bounds.max.z = v.z;
 	}
 	if (self->bounds.min.x > self->bounds.max.x)
 	{
@@ -394,195 +407,6 @@ limdl_model_find_node (const limdlModel* self,
 	return NULL;
 }
 
-/**
- * \brief Inserts a face group to the model.
- *
- * \param self Model.
- * \param material Material index.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_group (limdlModel* self,
-                          int         material)
-{
-	int count;
-	limdlFaces* tmp;
-
-	assert (material >= 0);
-	assert (material < self->materials.count);
-
-	/* Resize buffer. */
-	count = self->facegroups.count + 1;
-	tmp = lisys_realloc (self->facegroups.array, count * sizeof (limdlFaces));
-	if (tmp == NULL)
-		return 0;
-	self->facegroups.array = tmp;
-	tmp += self->facegroups.count;
-	self->facegroups.count++;
-
-	/* Initialize group. */
-	memset (tmp, 0, sizeof (limdlFaces));
-	tmp->material = material;
-
-	return 1;
-}
-
-/**
- * \brief Inserts a material to the model.
- *
- * \param self Model.
- * \param material Material.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_material (limdlModel*          self,
-                             const limdlMaterial* material)
-{
-	int i;
-	int count;
-	limdlMaterial* tmp;
-
-	assert (material->shader != NULL);
-
-	/* Resize buffer. */
-	count = self->materials.count + 1;
-	tmp = lisys_realloc (self->materials.array, count * sizeof (limdlMaterial));
-	if (tmp == NULL)
-		return 0;
-	self->materials.array = tmp;
-	tmp += self->materials.count;
-
-	/* Copy attributes. */
-	tmp->shader = listr_dup (material->shader);
-	if (tmp->shader == NULL)
-		return 0;
-	tmp->flags = material->flags;
-	tmp->shininess = material->shininess;
-	tmp->diffuse[0] = material->diffuse[0];
-	tmp->diffuse[1] = material->diffuse[1];
-	tmp->diffuse[2] = material->diffuse[2];
-	tmp->diffuse[3] = material->diffuse[3];
-	tmp->specular[0] = material->specular[0];
-	tmp->specular[1] = material->specular[1];
-	tmp->specular[2] = material->specular[2];
-	tmp->specular[3] = material->specular[3];
-
-	/* Copy textures. */
-	tmp->textures.count = material->textures.count;
-	if (tmp->textures.count)
-		tmp->textures.array = lisys_calloc (tmp->textures.count, sizeof (limdlTexture));
-	else
-		tmp->textures.array = NULL;
-	for (i = 0 ; i < tmp->textures.count ; i++)
-	{
-		tmp->textures.array[i] = material->textures.array[i];
-		tmp->textures.array[i].string = listr_dup (material->textures.array[i].string);
-		if (tmp->textures.array[i].string == NULL)
-		{
-			while (i)
-				lisys_free (tmp->textures.array[i--].string);
-			lisys_free (tmp->textures.array);
-			lisys_free (tmp->shader);
-			return 0;
-		}
-	}
-
-	self->materials.count++;
-	return 1;
-}
-
-/**
- * \brief Inserts a node to the model.
- *
- * The ownership of the node is given to the model on success.
- *
- * \param self Model.
- * \param node Node.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_node (limdlModel* self,
-                         limdlNode*  node)
-{
-	if (!lialg_array_append (&self->nodes, &node))
-		return 0;
-	node->parent = NULL;
-	return 1;
-}
-
-/**
- * \brief Inserts a face to the model.
- *
- * Inserts vertices and their weights to the material group requested.
- *
- * \param self Model.
- * \param group Face group.
- * \param vertices Array of three vertices.
- * \param weights Array of three weights or NULL.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_triangle (limdlModel*         self,
-                             int                 group,
-                             const limdlVertex*  vertices,
-                             const limdlWeights* weights)
-{
-	int i;
-	int count;
-	int offset;
-	limdlFaces* group_;
-	limdlVertex* vertex;
-	limdlWeights* weight;
-	limdlWeights weightbuf[3] = { { 0, NULL }, { 0, NULL }, { 0, NULL } };
-
-	assert (group >= 0);
-	assert (group < self->facegroups.count);
-	group_ = self->facegroups.array + group;
-
-	/* Duplicate weights. */
-	if (weights != NULL)
-	{
-		for (i = 0 ; i < 3 ; i++)
-		{
-			if (!weights[0].count)
-				continue;
-			weightbuf[i].weights = lisys_malloc (weights[i].count * sizeof (limdlWeight));
-			if (weightbuf[i].weights == NULL)
-				goto error;
-			memcpy (weightbuf[i].weights, weights[i].weights, weights[i].count * sizeof (limdlWeight));
-			weightbuf[i].count = weights[i].count;
-		}
-	}
-
-	/* Resize vertex buffer. */
-	count = group_->vertices.count + 3;
-	vertex = lisys_realloc (group_->vertices.array, count * sizeof (limdlVertex));
-	if (vertex == NULL)
-		goto error;
-	group_->vertices.array = vertex;
-
-	/* Resize weight buffer. */
-	weight = lisys_realloc (group_->weights.array, count * sizeof (limdlWeights));
-	if (weight == NULL)
-		goto error;
-	group_->weights.array = weight;
-
-	/* Insert vertices. */
-	offset = group_->vertices.count;
-	memcpy (vertex + offset, vertices, 3 * sizeof (limdlVertex));
-	memcpy (weight + offset, weightbuf, 3 * sizeof (limdlWeights));
-	group_->vertices.count += 3;
-	group_->weights.count += 3;
-
-	return 1;
-
-error:
-	lisys_free (weightbuf[0].weights);
-	lisys_free (weightbuf[1].weights);
-	lisys_free (weightbuf[2].weights);
-	return 0;
-}
-
 int
 limdl_model_write (const limdlModel* self,
                    liarcWriter*      writer)
@@ -630,41 +454,12 @@ limdl_model_get_animation (limdlModel* self,
 {
 	uint32_t i;
 
-	for (i = 0 ; i < self->animation.count ; i++)
+	for (i = 0 ; i < self->animations.count ; i++)
 	{
-		if (!strcmp (self->animation.animations[i].name, name))
-			return self->animation.animations + i;
+		if (!strcmp (self->animations.array[i].name, name))
+			return self->animations.array + i;
 	}
 	return NULL;
-}
-
-/**
- * \brief Finds a vertex that matches the passed vertex exactly.
- *
- * \param self Model.
- * \param vertex Vertex to match against.
- * \param group Face group from which to search.
- * \return A vertex index or -1.
- */
-int
-limdl_model_get_index (const limdlModel*  self,
-                       const limdlVertex* vertex,
-                       int                group)
-{
-	uint32_t i;
-	limdlFaces* group_;
-
-	assert (group >= 0);
-	assert (group < self->facegroups.count);
-	group_ = self->facegroups.array + group;
-
-	for (i = 0 ; i < group_->vertices.count ; i++)
-	{
-		if (!limdl_vertex_compare (vertex, group_->vertices.array + i))
-			return i;
-	}
-
-	return -1;
 }
 
 int
@@ -674,7 +469,7 @@ limdl_model_get_index_count (const limdlModel* self)
 	int c;
 
 	for (i = c = 0 ; i < self->facegroups.count ; i++)
-		c += self->facegroups.array[i].vertices.count;
+		c += self->facegroups.array[i].indices.count;
 
 	return c;
 }
@@ -691,7 +486,7 @@ private_build (limdlModel* self)
 	/* Resolve node references. */
 	for (i = 0 ; i < self->weightgroups.count ; i++)
 	{
-		group = self->weightgroups.weightgroups + i;
+		group = self->weightgroups.array + i;
 		group->node = limdl_model_find_node (self, group->bone);
 	}
 
@@ -725,7 +520,6 @@ private_read (limdlModel*  self,
 {
 	int i;
 	int j;
-	int k;
 	uint32_t tmp;
 	uint32_t version;
 	limatVector min;
@@ -762,6 +556,7 @@ private_read (limdlModel*  self,
 
 	/* Read chunks. */
 	if (!private_read_materials (self, reader) ||
+	    !private_read_vertices (self, reader) ||
 	    !private_read_faces (self, reader) ||
 	    !private_read_weights (self, reader) ||
 	    !private_read_nodes (self, reader) ||
@@ -779,15 +574,15 @@ private_read (limdlModel*  self,
 			lisys_error_set (EINVAL, "material index out of bounds");
 			return 0;
 		}
-		for (j = 0 ; j < group->weights.count ; j++)
+	}
+	for (i = 0 ; i < self->weights.count ; i++)
+	{
+		for (j = 0 ; j < self->weights.array[i].count ; j++)
 		{
-			for (k = 0 ; k < group->weights.array[j].count ; k++)
+			if (self->weights.array[i].weights[j].group >= self->weightgroups.count)
 			{
-				if (group->weights.array[j].weights[k].group >= self->weightgroups.count)
-				{
-					lisys_error_set (EINVAL, "weight group index out of bounds");
-					return 0;
-				}
+				lisys_error_set (EINVAL, "weight group index out of bounds");
+				return 0;
 			}
 		}
 	}
@@ -811,17 +606,17 @@ private_read_animations (limdlModel*  self,
 	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
-	self->animation.count = tmp;
+	self->animations.count = tmp;
 
 	/* Read animations. */
-	if (self->animation.count)
+	if (self->animations.count)
 	{
-		self->animation.animations = lisys_calloc (self->animation.count, sizeof (limdlAnimation));
-		if (self->animation.animations == NULL)
+		self->animations.array = lisys_calloc (self->animations.count, sizeof (limdlAnimation));
+		if (self->animations.array == NULL)
 			return 0;
-		for (i = 0 ; i < self->animation.count ; i++)
+		for (i = 0 ; i < self->animations.count ; i++)
 		{
-			animation = self->animation.animations + i;
+			animation = self->animations.array + i;
 			if (!private_read_animation (self, animation, reader))
 				return 0;
 		}
@@ -1001,11 +796,58 @@ private_read_shapes (limdlModel*  self,
 }
 
 static int
+private_read_vertices (limdlModel*  self,
+                       liarcReader* reader)
+{
+	int i;
+	uint32_t tmp;
+	limdlVertex* vertex;
+
+	/* Read header. */
+	if (!liarc_reader_check_text (reader, "ver", ""))
+	{
+		lisys_error_set (EINVAL, "invalid vertex block header");
+		return 0;
+	}
+	if (!liarc_reader_get_uint32 (reader, &tmp))
+		return 0;
+	self->vertices.count = tmp;
+
+	/* Read vertices. */
+	if (tmp)
+	{
+		self->vertices.array = lisys_calloc (tmp, sizeof (limdlVertex));
+		if (self->vertices.array == NULL)
+			return 0;
+		self->vertices.count = tmp;
+		for (i = 0 ; i < self->vertices.count ; i++)
+		{
+			vertex = self->vertices.array + i;
+			if (!liarc_reader_get_float (reader, vertex->texcoord + 0) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 1) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 2) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 3) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 4) ||
+				!liarc_reader_get_float (reader, vertex->texcoord + 5) ||
+				!liarc_reader_get_float (reader, &vertex->normal.x) ||
+				!liarc_reader_get_float (reader, &vertex->normal.y) ||
+				!liarc_reader_get_float (reader, &vertex->normal.z) ||
+				!liarc_reader_get_float (reader, &vertex->coord.x) ||
+				!liarc_reader_get_float (reader, &vertex->coord.y) ||
+				!liarc_reader_get_float (reader, &vertex->coord.z))
+				return 0;
+		}
+	}
+
+	return 1;
+}
+
+static int
 private_read_weights (limdlModel*  self,
                       liarcReader* reader)
 {
 	int i;
-	uint32_t tmp;
+	uint32_t tmp[2];
 	limdlWeightGroup* group;
 
 	/* Read header. */
@@ -1014,21 +856,44 @@ private_read_weights (limdlModel*  self,
 		lisys_error_set (EINVAL, "invalid weight block header");
 		return 0;
 	}
-	if (!liarc_reader_get_uint32 (reader, &tmp))
+	if (!liarc_reader_get_uint32 (reader, tmp + 0))
 		return 0;
-	self->weightgroups.count = tmp;
 
 	/* Read weight groups. */
-	if (self->weightgroups.count)
+	if (tmp[0])
 	{
-		self->weightgroups.weightgroups = lisys_calloc (self->weightgroups.count, sizeof (limdlWeightGroup));
-		if (self->weightgroups.weightgroups == NULL)
+		self->weightgroups.array = lisys_calloc (tmp[0], sizeof (limdlWeightGroup));
+		if (self->weightgroups.array == NULL)
 			return 0;
+		self->weightgroups.count = tmp[0];
 		for (i = 0 ; i < self->weightgroups.count ; i++)
 		{
-			group = self->weightgroups.weightgroups + i;
+			group = self->weightgroups.array + i;
 			if (!liarc_reader_get_text (reader, "", &group->name) ||
 				!liarc_reader_get_text (reader, "", &group->bone))
+				return 0;
+		}
+	}
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, tmp + 1))
+		return 0;
+	if (tmp[1] != self->vertices.count)
+	{
+		lisys_error_set (EINVAL, "vertex and weight counts must be equal");
+		return 0;
+	}
+
+	/* Read vertex weights. */
+	if (tmp[1])
+	{
+		self->weights.array = lisys_calloc (tmp[1], sizeof (limdlWeights));
+		if (self->weights.array == NULL)
+			return 0;
+		self->weights.count = tmp[1];
+		for (i = 0 ; i < self->weights.count ; i++)
+		{
+			if (!private_read_vertex_weights (self, self->weights.array + i, reader))
 				return 0;
 		}
 	}
@@ -1096,6 +961,37 @@ private_read_animation (limdlModel*     self,
 }
 
 static int
+private_read_vertex_weights (limdlModel*   self,
+                             limdlWeights* weights,
+                             liarcReader*  reader)
+{
+	uint32_t i;
+	uint32_t count;
+	uint32_t group;
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, &count))
+		return 0;
+
+	/* Allocate weights. */
+	weights->count = count;
+	weights->weights = lisys_calloc (count, sizeof (limdlWeight));
+	if (weights->weights == NULL)
+		return 0;
+
+	/* Read weights. */
+	for (i = 0 ; i < count ; i++)
+	{
+		if (!liarc_reader_get_uint32 (reader, &group) ||
+		    !liarc_reader_get_float (reader, &weights->weights[i].weight))
+			return 0;
+		weights->weights[i].group = group;
+	}
+
+	return 1;
+}
+
+static int
 private_write (const limdlModel* self,
                liarcWriter*      writer)
 {
@@ -1109,6 +1005,7 @@ private_write (const limdlModel* self,
 	    !liarc_writer_append_float (writer, self->bounds.max.z))
 		return 0;
 	if (!private_write_materials (self, writer) ||
+	    !private_write_vertices (self, writer) ||
 	    !private_write_faces (self, writer) ||
 	    !private_write_weights (self, writer) ||
 	    !private_write_nodes (self, writer) ||
@@ -1131,11 +1028,11 @@ private_write_animations (const limdlModel* self,
 	/* Write animations. */
 	if (!liarc_writer_append_string (writer, "ani") ||
 	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->animation.count))
+	    !liarc_writer_append_uint32 (writer, self->animations.count))
 		return 0;
-	for (i = 0 ; i < self->animation.count ; i++)
+	for (i = 0 ; i < self->animations.count ; i++)
 	{
-		animation = self->animation.animations + i;
+		animation = self->animations.array + i;
 		if (!liarc_writer_append_string (writer, animation->name) ||
 		    !liarc_writer_append_nul (writer) ||
 		    !liarc_writer_append_uint32 (writer, animation->channels.count) ||
@@ -1271,23 +1168,81 @@ private_write_shapes (const limdlModel* self,
 }
 
 static int
+private_write_vertices (const limdlModel* self,
+                        liarcWriter*      writer)
+{
+	int i;
+	limdlVertex* vertex;
+
+	/* Write header. */
+	if (!liarc_writer_append_string (writer, "ver") ||
+	    !liarc_writer_append_nul (writer) ||
+	    !liarc_writer_append_uint32 (writer, self->vertices.count))
+		return 0;
+
+	/* Write vertices. */
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		vertex = self->vertices.array + i;
+		if (!liarc_writer_append_float (writer, vertex->texcoord[0]) ||
+		    !liarc_writer_append_float (writer, vertex->texcoord[1]) ||
+		    !liarc_writer_append_float (writer, vertex->texcoord[2]) ||
+		    !liarc_writer_append_float (writer, vertex->texcoord[3]) ||
+		    !liarc_writer_append_float (writer, vertex->texcoord[4]) ||
+		    !liarc_writer_append_float (writer, vertex->texcoord[5]) ||
+		    !liarc_writer_append_float (writer, vertex->normal.x) ||
+		    !liarc_writer_append_float (writer, vertex->normal.y) ||
+		    !liarc_writer_append_float (writer, vertex->normal.z) ||
+		    !liarc_writer_append_float (writer, vertex->coord.x) ||
+		    !liarc_writer_append_float (writer, vertex->coord.y) ||
+		    !liarc_writer_append_float (writer, vertex->coord.z))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int
 private_write_weights (const limdlModel* self,
                        liarcWriter*      writer)
 {
 	int i;
+	int j;
 	limdlWeightGroup* group;
+	limdlWeights* weights;
 
+	/* Write header. */
 	if (!liarc_writer_append_string (writer, "wei") ||
 	    !liarc_writer_append_nul (writer) ||
 	    !liarc_writer_append_uint32 (writer, self->weightgroups.count))
 		return 0;
+
+	/* Write weight groups. */
 	for (i = 0 ; i < self->weightgroups.count ; i++)
 	{
-		group = self->weightgroups.weightgroups + i;
+		group = self->weightgroups.array + i;
 		liarc_writer_append_string (writer, group->name);
 		liarc_writer_append_nul (writer);
 		liarc_writer_append_string (writer, group->bone);
 		liarc_writer_append_nul (writer);
+	}
+
+	/* Write header. */
+	if (!liarc_writer_append_uint32 (writer, self->weights.count))
+		return 0;
+
+	/* Write vertex weights. */
+	for (i = 0 ; i < self->weights.count ; i++)
+	{
+		weights = self->weights.array + i;
+		if (!liarc_writer_append_uint32 (writer, weights->count))
+			return 0;
+		for (j = 0 ; j < weights->count ; j++)
+		{
+			if (!liarc_writer_append_uint32 (writer, weights->weights[j].group) ||
+			    !liarc_writer_append_float (writer, weights->weights[j].weight))
+				return 0;
+		}
 	}
 
 	return !writer->error;

@@ -28,21 +28,6 @@
 #include <archive/lips-archive.h>
 #include <string/lips-string.h>
 #include "model-types.h"
-#include "model-vertex.h"
-
-typedef struct _limdlWeight limdlWeight;
-struct _limdlWeight
-{
-	int group;
-	float weight;
-};
-
-typedef struct _limdlWeights limdlWeights;
-struct _limdlWeights
-{
-	int count;
-	limdlWeight* weights;
-};
 
 typedef struct _limdlFaces limdlFaces;
 struct _limdlFaces
@@ -51,13 +36,8 @@ struct _limdlFaces
 	struct
 	{
 		int count;
-		limdlVertex* array;
-	} vertices;
-	struct
-	{
-		int count;
-		limdlWeights* array;
-	} weights;
+		uint32_t* array;
+	} indices;
 };
 
 void

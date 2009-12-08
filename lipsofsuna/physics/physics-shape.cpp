@@ -274,11 +274,8 @@ private_init_model (liphyShape*       self,
                     const limdlModel* model)
 {
 	int i;
-	int j;
-	int k;
 	int ret;
 	int count;
-	limdlFaces* group;
 	limatVector* vertices;
 
 	/* FIXME: One model can have multiple shapes. */
@@ -293,7 +290,7 @@ private_init_model (liphyShape*       self,
 	else
 	{
 		/* Count vertices. */
-		count = limdl_model_get_index_count (model);
+		count = model->vertices.count;
 		if (!count)
 			return 1;
 
@@ -301,12 +298,8 @@ private_init_model (liphyShape*       self,
 		vertices = (limatVector*) lisys_calloc (count, sizeof (limatVector));
 		if (vertices == NULL)
 			return 0;
-		for (i = j = 0 ; j < model->facegroups.count ; j++)
-		{
-			group = model->facegroups.array + j;
-			for (k = 0 ; k < group->vertices.count ; k++)
-				vertices[i++] = group->vertices.array[k].coord;
-		}
+		for (i = 0 ; i < model->vertices.count ; i++)
+			vertices[i] = model->vertices.array[i].coord;
 
 		/* Create shape. */
 		ret = private_init_convex (self, vertices, count);

@@ -33,21 +33,25 @@
 struct _lirndBuffer
 {
 	GLuint buffer;
+	GLenum target;
 	lirndFormat format;
-	lirndMaterial* material;
 	struct
 	{
 		int count;
 		void* array;
-	} vertices;
+	} elements;
 };
 
 int
-lirnd_buffer_init (lirndBuffer*   self,
-                   lirndMaterial* material,
-                   lirndFormat*   format,
-                   void*          data,
-                   int            count);
+lirnd_buffer_init_index (lirndBuffer* self,
+                         const void*  data,
+                         int          count);
+
+int
+lirnd_buffer_init_vertex (lirndBuffer*       self,
+                          const lirndFormat* format,
+                          const void*        data,
+                          int                count);
 
 void
 lirnd_buffer_free (lirndBuffer* self);

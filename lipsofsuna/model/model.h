@@ -39,7 +39,7 @@
 #include "model-types.h"
 #include "model-vertex.h"
 
-#define LIMDL_FORMAT_VERSION 0xFFFFFFF7
+#define LIMDL_FORMAT_VERSION 0xFFFFFFF6
 
 typedef int limdlModelFlags;
 
@@ -51,58 +51,42 @@ enum
 	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
 };
 
+typedef struct _limdlWeight limdlWeight;
+struct _limdlWeight
+{
+	int group;
+	float weight;
+};
+
+typedef struct _limdlWeights limdlWeights;
+struct _limdlWeights
+{
+	int count;
+	limdlWeight* weights;
+};
+
+struct _limdlWeightGroup
+{
+	char* name;
+	char* bone;
+	limdlNode* node;
+};
+
 /*****************************************************************************/
 
 struct _limdlModel
 {
-	/* Animation. */
-	struct
-	{
-		int count;
-		limdlAnimation* animations;
-	} animation;
-
-	/* Materials. */
-	struct
-	{
-		int count;
-		limdlMaterial* array;
-	} materials;
-
-	/* Mesh. */
 	int flags;
 	limatAabb bounds;
-	struct
-	{
-		int count;
-		limdlFaces* array;
-	} facegroups;
-	struct
-	{
-		int count;
-		limdlWeightGroup* weightgroups;
-	} weightgroups;
-
-	/* Hierarchy. */
-	struct
-	{
-		int count;
-		limdlNode** array;
-	} nodes;
-
-	/* Particle. */
-	struct
-	{
-		int count;
-		limdlHairs* array;
-	} hairs;
-
-	/* Shapes. */
-	struct
-	{
-		int count;
-		limdlShape* array;
-	} shapes;
+	struct { int count; limdlAnimation* array; } animations;
+	struct { int count; limdlHairs* array; } hairs;
+	struct { int count; limdlFaces* array; } facegroups;
+	struct { int count; limdlMaterial* array; } materials;
+	struct { int count; limdlNode** array; } nodes;
+	struct { int count; limdlShape* array; } shapes;
+	struct { int count; limdlVertex* array; } vertices;
+	struct { int count; limdlWeightGroup* array; } weightgroups;
+	struct { int count; limdlWeights* array; } weights;
 };
 
 #ifdef __cplusplus
@@ -133,24 +117,6 @@ limdl_model_find_node (const limdlModel* self,
                        const char*       name);
 
 int
-limdl_model_insert_group (limdlModel* self,
-                          int         material);
-
-int
-limdl_model_insert_material (limdlModel*          self,
-                             const limdlMaterial* material);
-
-int
-limdl_model_insert_node (limdlModel* self,
-                         limdlNode*  node);
-
-int
-limdl_model_insert_triangle (limdlModel*         self,
-                             int                 group,
-                             const limdlVertex*  vertices,
-                             const limdlWeights* weights);
-
-int
 limdl_model_write (const limdlModel* self,
                    liarcWriter*      writer);
 
@@ -163,25 +129,11 @@ limdl_model_get_animation (limdlModel* self,
                            const char* name);
 
 int
-limdl_model_get_index (const limdlModel*  self,
-                       const limdlVertex* vertex,
-                       int                group);
-
-int
 limdl_model_get_index_count (const limdlModel* self);
 
 #ifdef __cplusplus
 }
 #endif
-
-/*****************************************************************************/
-
-struct _limdlWeightGroup
-{
-	char* name;
-	char* bone;
-	limdlNode* node;
-};
 
 #endif
 

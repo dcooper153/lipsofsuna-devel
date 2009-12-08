@@ -24,38 +24,39 @@
 
 #include "render-buffer.h"
 
+static int
+private_init (lirndBuffer*       self,
+              GLenum             target,
+              const lirndFormat* format,
+              const void*        data,
+              int                count);
+
+/*****************************************************************************/
+
 int
-lirnd_buffer_init (lirndBuffer*   self,
-                   lirndMaterial* material,
-                   lirndFormat*   format,
-                   void*          data,
-                   int            count)
+lirnd_buffer_init_index (lirndBuffer* self,
+                         const void*  data,
+                         int          count)
 {
-	int size;
-
-	self->material = material;
-	self->format = *format;
-	if (count)
+	static const lirndFormat format =
 	{
-		size = count * format->size;
-		if (GLEW_ARB_vertex_buffer_object)
-		{
-			glGenBuffersARB (1, &self->buffer);
-			glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
-			glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, data, GL_STREAM_DRAW_ARB);
-			glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-		}
-		else
-		{
-			self->vertices.array = lisys_malloc (count * format->size);
-			if (self->vertices.array == NULL)
-				return 0;
-			memcpy (self->vertices.array, data, size);
-		}
-		self->vertices.count = count;
-	}
+		sizeof (uint32_t), 0,
+		{ GL_FLOAT, GL_FLOAT, GL_FLOAT },
+		{ 0, 0, 0 }, 
+		GL_FLOAT, 0,
+		GL_FLOAT, 0
+	};
 
-	return 1;
+	return private_init (self, GL_ELEMENT_ARRAY_BUFFER_ARB, &format, data, count);
+}
+
+int
+lirnd_buffer_init_vertex (lirndBuffer*       self,
+                          const lirndFormat* format,
+                          const void*        data,
+                          int                count)
+{
+	return private_init (self, GL_ARRAY_BUFFER_ARB, format, data, count);
 }
 
 void
@@ -63,7 +64,7 @@ lirnd_buffer_free (lirndBuffer* self)
 {
 	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
-	lisys_free (self->vertices.array);
+	lisys_free (self->elements.array);
 }
 
 void*
@@ -73,19 +74,19 @@ lirnd_buffer_lock (lirndBuffer* self,
 	int size;
 	void* ret;
 
-	size = self->vertices.count * self->format.size;
+	size = self->elements.count * self->format.size;
 	if (self->buffer != 0)
 	{
-		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
+		glBindBufferARB (self->target, self->buffer);
 		if (write)
-			ret = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB);
+			ret = glMapBufferARB (self->target, GL_READ_WRITE_ARB);
 		else
-			ret = glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_READ_ONLY_ARB);
-		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+			ret = glMapBufferARB (self->target, GL_READ_ONLY_ARB);
+		glBindBufferARB (self->target, 0);
 		return ret;
 	}
 	else
-		return self->vertices.array;
+		return self->elements.array;
 }
 
 void
@@ -94,10 +95,46 @@ lirnd_buffer_unlock (lirndBuffer* self,
 {
 	if (self->buffer != 0)
 	{
-		glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->buffer);
-		glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
-		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+		glBindBufferARB (self->target, self->buffer);
+		glUnmapBufferARB (self->target);
+		glBindBufferARB (self->target, 0);
 	}
+}
+
+/*****************************************************************************/
+
+static int
+private_init (lirndBuffer*       self,
+              GLenum             target,
+              const lirndFormat* format,
+              const void*        data,
+              int                count)
+{
+	int size;
+
+	self->target = target;
+	self->format = *format;
+	if (count)
+	{
+		size = count * format->size;
+		if (GLEW_ARB_vertex_buffer_object)
+		{
+			glGenBuffersARB (1, &self->buffer);
+			glBindBufferARB (target, self->buffer);
+			glBufferDataARB (target, size, data, GL_STREAM_DRAW_ARB);
+			glBindBufferARB (target, 0);
+		}
+		else
+		{
+			self->elements.array = lisys_malloc (count * format->size);
+			if (self->elements.array == NULL)
+				return 0;
+			memcpy (self->elements.array, data, size);
+		}
+		self->elements.count = count;
+	}
+
+	return 1;
 }
 
 /** @} */

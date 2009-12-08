@@ -28,6 +28,7 @@
 #include <image/lips-image.h>
 #include <model/lips-model.h>
 #include "render.h"
+#include "render-buffer.h"
 #include "render-material.h"
 #include "render-types.h"
 
@@ -37,6 +38,7 @@ struct _lirndModel
 	int refs;
 	limatAabb aabb;
 	limdlModel* model;
+	lirndBuffer* vertices;
 	lirndRender* render;
 	struct
 	{

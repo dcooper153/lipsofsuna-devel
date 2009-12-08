@@ -47,9 +47,18 @@ private_bind_uniform (lirndContext* self,
                       lirndUniform* uniform);
 
 static void
+private_bind_vertices (lirndContext*      self,
+                       const lirndFormat* format,
+                       const void*        base);
+
+static void
 private_enable_light (lirndContext* self,
                       int           i,
                       lirndLight*   light);
+
+static void
+private_unbind_vertices (lirndContext*      self,
+                         const lirndFormat* format);
 
 /*****************************************************************************/
 
@@ -119,75 +128,75 @@ lirnd_context_bind (lirndContext* self)
 }
 
 /**
- * \brief Renders triangles.
+ * \brief Renders non-indexed triangles.
  *
  * \param self Rendering context.
- * \param buffer Render buffer.
+ * \param vertex Vertex buffer.
  */
 void
-lirnd_context_render (lirndContext* self,
-                      lirndBuffer*  buffer)
+lirnd_context_render_array (lirndContext* self,
+                            lirndBuffer*  vertex)
 {
-	if (buffer->buffer)
-		lirnd_context_render_vbo (self, 0, buffer->vertices.count, &buffer->format, buffer->buffer);
+	if (vertex->buffer)
+	{
+		lirnd_context_render_vbo_array (self, &vertex->format,
+			vertex->buffer, 0, vertex->elements.count);
+	}
 	else
-		lirnd_context_render_vtx (self, 0, buffer->vertices.count, &buffer->format, buffer->vertices.array);
+	{
+		lirnd_context_render_vtx_array (self, &vertex->format,
+			vertex->elements.array, 0, vertex->elements.count);
+	}
+}
+
+/**
+ * \brief Renders indexed triangles.
+ *
+ * \param self Rendering context.
+ * \param vertex Vertex buffer.
+ * \param index Index buffer.
+ */
+void
+lirnd_context_render_indexed (lirndContext* self,
+                              lirndBuffer*  vertex,
+                              lirndBuffer*  index)
+{
+	if (vertex->buffer)
+	{
+		lirnd_context_render_vbo_indexed (self, &vertex->format,
+			vertex->buffer, index->buffer, 0, index->elements.count);
+	}
+	else
+	{
+		lirnd_context_render_vtx_indexed (self, &vertex->format,
+			vertex->elements.array, index->elements.array, 0, index->elements.count);
+	}
 }
 
 /**
  * \brief Renders triangles.
  *
  * \param self Rendering context.
- * \param vertex0 Vertex from which to begin rendering.
- * \param vertex1 Vertex to which to end rendering.
  * \param format Vertex format.
  * \param vertices Vertex array.
+ * \param vertex0 Vertex from which to begin rendering.
+ * \param vertex1 Vertex to which to end rendering.
  */
 void
-lirnd_context_render_vbo (lirndContext*      self,
-                          int                vertex0,
-                          int                vertex1,
-                          const lirndFormat* format,
-                          GLuint             vertices)
+lirnd_context_render_vbo_array (lirndContext*      self,
+                                const lirndFormat* format,
+                                GLuint             vertices,
+                                int                vertex0,
+                                int                vertex1)
 {
-	int i;
-	int count;
-
 	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
+
 	glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertices);
-
-	/* Bind buffer. */
-	count = vertex1 - vertex0;
-	for (i = 0 ; i < format->tex_count ; i++)
-	{
-		glClientActiveTextureARB (GL_TEXTURE0 + i);
-		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointerEXT (2, format->tex_formats[i], format->size, count,
-			NULL + format->tex_offsets[i]);
-	}
-	if (format->tex_count)
-		glClientActiveTextureARB (GL_TEXTURE0);
-	glEnableClientState (GL_NORMAL_ARRAY);
-	glNormalPointerEXT (format->nml_format, format->size, 0, NULL + format->nml_offset);
-	glEnableClientState (GL_VERTEX_ARRAY);
-	glVertexPointerEXT (3, format->vtx_format, format->size, 0, NULL + format->vtx_offset);
-
-	/* Render buffer. */
-	glDrawArraysEXT (GL_TRIANGLES, vertex0, count);
-
-	/* Unbind buffer. */
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-	for (i = 0 ; i < format->tex_count ; i++)
-	{
-		glClientActiveTextureARB (GL_TEXTURE0 + i);
-		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-	}
-	if (format->tex_count)
-		glClientActiveTextureARB (GL_TEXTURE0);
-	glDisableClientState (GL_NORMAL_ARRAY);
-	glDisableClientState (GL_VERTEX_ARRAY);
+	private_bind_vertices (self, format, NULL);
+	glDrawArraysEXT (GL_TRIANGLES, vertex0, vertex1 - vertex0);
+	private_unbind_vertices (self, format);
 
 	glPopMatrix ();
 
@@ -202,53 +211,98 @@ lirnd_context_render_vbo (lirndContext*      self,
  * \brief Renders triangles.
  *
  * \param self Rendering context.
- * \param vertex0 Vertex from which to begin rendering.
- * \param vertex1 Vertex to which to end rendering.
  * \param format Vertex format.
  * \param vertices Vertex array.
+ * \param vertex0 Vertex from which to begin rendering.
+ * \param vertex1 Vertex to which to end rendering.
  */
 void
-lirnd_context_render_vtx (lirndContext*      self,
-                          int                vertex0,
-                          int                vertex1,
-                          const lirndFormat* format,
-                          const void*        vertices)
+lirnd_context_render_vtx_array (lirndContext*      self,
+                                const lirndFormat* format,
+                                const void*        vertices,
+                                int                vertex0,
+                                int                vertex1)
 {
-	int i;
-	int count;
-
 	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
-	/* Bind array. */
-	count = vertex1 - vertex0;
-	for (i = 0 ; i < format->tex_count ; i++)
-	{
-		glClientActiveTextureARB (GL_TEXTURE0 + i);
-		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointerEXT (2, format->tex_formats[i], format->size, count, vertices + format->tex_offsets[i]);
-	}
-	if (format->tex_count)
-		glClientActiveTextureARB (GL_TEXTURE0);
-	glEnableClientState (GL_NORMAL_ARRAY);
-	glNormalPointerEXT (format->nml_format, format->size, 0, vertices + format->nml_offset);
-	glEnableClientState (GL_VERTEX_ARRAY);
-	glVertexPointerEXT (3, format->vtx_format, format->size, 0, vertices + format->vtx_offset);
+	private_bind_vertices (self, format, vertices);
+	glDrawArraysEXT (GL_TRIANGLES, vertex0, vertex1 - vertex0);
+	private_unbind_vertices (self, format);
 
-	/* Render array. */
-	glDrawArraysEXT (GL_TRIANGLES, vertex0, count);
+	glPopMatrix ();
 
-	/* Unbind array. */
-	for (i = 0 ; i < format->tex_count ; i++)
-	{
-		glClientActiveTextureARB (GL_TEXTURE0 + i);
-		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-	}
-	if (format->tex_count)
-		glClientActiveTextureARB (GL_TEXTURE0);
-	glDisableClientState (GL_NORMAL_ARRAY);
-	glDisableClientState (GL_VERTEX_ARRAY);
+#ifdef LIRND_ENABLE_PROFILING
+	self->render->profiling.materials++;
+	self->render->profiling.faces += vertex1 - vertex0;
+	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
+#endif
+}
+
+/**
+ * \brief Renders indexed triangles.
+ *
+ * \param self Rendering context.
+ * \param format Vertex format.
+ * \param vertices Vertex buffer.
+ * \param indices Index buffer.
+ * \param index0 Index from which to begin rendering.
+ * \param index1 Index to which to end rendering.
+ */
+void
+lirnd_context_render_vbo_indexed (lirndContext*      self,
+                                  const lirndFormat* format,
+                                  GLuint             vertices,
+                                  GLuint             indices,
+                                  int                index0,
+                                  int                index1)
+{
+	glColor3f (1.0f, 1.0f, 1.0f);
+	glPushMatrix ();
+	glMultMatrixf (self->matrix.m);
+
+	glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertices);
+	glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, indices);
+	private_bind_vertices (self, format, NULL);
+	glDrawElements (GL_TRIANGLES, index1 - index0, GL_UNSIGNED_INT, NULL + 4 * index0);
+	private_unbind_vertices (self, format);
+	glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+
+	glPopMatrix ();
+
+#ifdef LIRND_ENABLE_PROFILING
+	self->render->profiling.materials++;
+	self->render->profiling.faces += vertex1 - vertex0;
+	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
+#endif
+}
+
+/**
+ * \brief Renders indexed triangles.
+ *
+ * \param self Rendering context.
+ * \param format Vertex format.
+ * \param vertices Vertex array.
+ * \param indices Index array.
+ * \param index0 Index from which to begin rendering.
+ * \param index1 Index to which to end rendering.
+ */
+void
+lirnd_context_render_vtx_indexed (lirndContext*      self,
+                                  const lirndFormat* format,
+                                  const void*        vertices,
+                                  const void*        indices,
+                                  int                index0,
+                                  int                index1)
+{
+	glColor3f (1.0f, 1.0f, 1.0f);
+	glPushMatrix ();
+	glMultMatrixf (self->matrix.m);
+
+	private_bind_vertices (self, format, vertices);
+	glDrawElements (GL_TRIANGLES, index1 - index0, GL_UNSIGNED_INT, indices + 4 * index0);
+	private_unbind_vertices (self, format);
 
 	glPopMatrix ();
 
@@ -639,6 +693,27 @@ private_bind_uniform (lirndContext* self,
 }
 
 static void
+private_bind_vertices (lirndContext*      self,
+                       const lirndFormat* format,
+                       const void*        base)
+{
+	int i;
+
+	for (i = 0 ; i < format->tex_count ; i++)
+	{
+		glClientActiveTextureARB (GL_TEXTURE0 + i);
+		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer (2, format->tex_formats[i], format->size, base + format->tex_offsets[i]);
+	}
+	if (format->tex_count)
+		glClientActiveTextureARB (GL_TEXTURE0);
+	glEnableClientState (GL_NORMAL_ARRAY);
+	glNormalPointerEXT (format->nml_format, format->size, 0, base + format->nml_offset);
+	glEnableClientState (GL_VERTEX_ARRAY);
+	glVertexPointerEXT (3, format->vtx_format, format->size, 0, base + format->vtx_offset);
+}
+
+static void
 private_enable_light (lirndContext* self,
                       int           i,
                       lirndLight*   light)
@@ -680,6 +755,23 @@ private_enable_light (lirndContext* self,
 	glLightf (GL_LIGHT0 + i, GL_CONSTANT_ATTENUATION, light->equation[0]);
 	glLightf (GL_LIGHT0 + i, GL_LINEAR_ATTENUATION, light->equation[1]);
 	glLightf (GL_LIGHT0 + i, GL_QUADRATIC_ATTENUATION, light->equation[2]);
+}
+
+static void
+private_unbind_vertices (lirndContext*      self,
+                         const lirndFormat* format)
+{
+	int i;
+
+	for (i = 0 ; i < format->tex_count ; i++)
+	{
+		glClientActiveTextureARB (GL_TEXTURE0 + i);
+		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+	}
+	if (format->tex_count)
+		glClientActiveTextureARB (GL_TEXTURE0);
+	glDisableClientState (GL_NORMAL_ARRAY);
+	glDisableClientState (GL_VERTEX_ARRAY);
 }
 
 /** @} */

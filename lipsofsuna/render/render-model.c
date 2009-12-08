@@ -130,7 +130,7 @@ lirnd_model_get_bounds (lirndModel* self,
 int
 lirnd_model_get_static (lirndModel* self)
 {
-	return !self->model->animation.count;
+	return !self->model->animations.count;
 }
 
 /*****************************************************************************/
@@ -157,6 +157,12 @@ private_clear_model (lirndModel* self)
 
 	for (i = 0 ; i < self->buffers.count ; i++)
 		lirnd_buffer_free (self->buffers.array + i);
+	if (self->vertices != NULL)
+	{
+		lirnd_buffer_free (self->vertices);
+		lisys_free (self->vertices);
+		self->vertices = NULL;
+	}
 	lisys_free (self->buffers.array);
 	self->buffers.array = NULL;
 	self->buffers.count = 0;
@@ -205,21 +211,30 @@ private_init_model (lirndModel* self)
 		GL_FLOAT, 9 * sizeof (float)
 	};
 
-	/* Allocate buffer list. */
+	/* Allocate vertex buffer. */
+	self->vertices = lisys_calloc (1, sizeof (lirndBuffer));
+	if (self->vertices == NULL)
+		return 0;
+
+	/* Allocate vertex buffer data. */
+	if (!lirnd_buffer_init_vertex (self->vertices, &format,
+	     self->model->vertices.array, self->model->vertices.count))
+		return 0;
+
+	/* Allocate index buffer list. */
 	self->buffers.array = lisys_calloc (self->model->facegroups.count, sizeof (lirndBuffer));
 	if (self->buffers.array == NULL)
 		return 0;
 	self->buffers.count = self->model->facegroups.count;
 
-	/* Allocate buffer data. */
+	/* Allocate index buffer data. */
 	for (i = 0 ; i < self->buffers.count ; i++)
 	{
 		group = self->model->facegroups.array + i;
 		assert (group->material >= 0);
 		assert (group->material < self->materials.count);
-		if (!lirnd_buffer_init (self->buffers.array + i,
-		                        self->materials.array[group->material], &format,
-		                        group->vertices.array, group->vertices.count))
+		if (!lirnd_buffer_init_index (self->buffers.array + i,
+		     group->indices.array, group->indices.count))
 			return 0;
 	}
 

@@ -153,14 +153,14 @@ lirnd_draw_exclude (lirndContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = model->buffers.array[i].material;
+		material = model->materials.array[i];
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_shader (context, material->shader);
 		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, model->buffers.array + i);
+		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 
 #ifdef LIRND_ENABLE_PROFILING
@@ -312,7 +312,7 @@ lirnd_draw_opaque (lirndContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = model->buffers.array[i].material;
+		material = model->materials.array[i];
 		if (!(material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			lirnd_context_set_flags (context, flags);
@@ -321,7 +321,7 @@ lirnd_draw_opaque (lirndContext* context,
 			lirnd_context_set_shader (context, material->shader);
 			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 			lirnd_context_bind (context);
-			lirnd_context_render (context, model->buffers.array + i);
+			lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
 		}
 	}
 
@@ -354,11 +354,11 @@ lirnd_draw_picking (lirndContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = model->buffers.array[i].material;
+		material = model->materials.array[i];
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, model->buffers.array + i);
+		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 }
 
@@ -386,14 +386,14 @@ lirnd_draw_shadeless (lirndContext* context,
 	matrix = limat_matrix_identity ();
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = model->buffers.array[i].material;
+		material = model->materials.array[i];
 		lirnd_context_set_flags (context, flags);
 		lirnd_context_set_material (context, material);
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_shader (context, material->shader);
 		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, model->buffers.array + i);
+		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 
 #ifdef LIRND_ENABLE_PROFILING
@@ -423,7 +423,7 @@ lirnd_draw_shadowmap (lirndContext* context,
 		lirnd_context_set_matrix (context, &matrix);
 		lirnd_context_set_shader (context, context->render->shader.shadowmap);
 		lirnd_context_bind (context);
-		lirnd_context_render (context, model->buffers.array + i);
+		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 
 #ifdef LIRND_ENABLE_PROFILING
@@ -458,7 +458,7 @@ lirnd_draw_transparent (lirndContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		material = model->buffers.array[i].material;
+		material = model->materials.array[i];
 		if (material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY)
 		{
 			lirnd_context_set_flags (context, flags);
@@ -467,7 +467,7 @@ lirnd_draw_transparent (lirndContext* context,
 			lirnd_context_set_shader (context, material->shader);
 			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
 			lirnd_context_bind (context);
-			lirnd_context_render (context, model->buffers.array + i);
+			lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
 		}
 	}
 

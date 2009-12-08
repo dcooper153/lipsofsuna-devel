@@ -34,7 +34,7 @@ class LipsEnumTexTypes:
 		self.IMAGE = 2
 Lips = LipsEnum()
 
-lips_format_version = 0xFFFFFFF7
+lips_format_version = 0xFFFFFFF6
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
 lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
@@ -610,19 +610,36 @@ class LipsFaces:
 	# \param self Face manager.
 	def __init__(self):
 		self.groups = {}
+		self.vertexlist = []
+		self.vertexdict = {}
 
-	# Adds a new face.
+	# \brief Adds a new face.
 	#
 	# \param self Face manager.
 	# \param mat Material index.
 	# \param verts Array of vertices.
 	def AddFace(self, mat, verts):
+		idx = [self.AddVertex(verts[0]), self.AddVertex(verts[1]), self.AddVertex(verts[2])]
 		if mat in self.groups:
-			self.groups[mat].append(verts[0])
-			self.groups[mat].append(verts[1])
-			self.groups[mat].append(verts[2])
+			self.groups[mat].append(idx[0])
+			self.groups[mat].append(idx[1])
+			self.groups[mat].append(idx[2])
 		else:
-			self.groups[mat] = [verts[0], verts[1], verts[2]]
+			self.groups[mat] = [idx[0], idx[1], idx[2]]
+
+	# \brief Adds a vertex, merging any duplicates.
+	#
+	# \param self Face manager.
+	# \param vert Vertex.
+	# \return Index.
+	def AddVertex(self, vert):
+		key = vert.GetKey()
+		if key in self.vertexdict:
+			return self.vertexdict[key]
+		idx = len(self.vertexlist)
+		self.vertexdict[key] = idx
+		self.vertexlist.append(vert)
+		return idx
 
 	# \brief Gets the bounding box of the mesh.
 	#
@@ -631,29 +648,28 @@ class LipsFaces:
 		first = 1
 		bounds = [0, 0, 0, 0, 0, 0]
 		# Calculate box size.
-		for group in self.groups.values():
-			for vertex in group:
-				if first:
-					first = 0
+		for vertex in self.vertexlist:
+			if first:
+				first = 0
+				bounds[0] = vertex.values[9]
+				bounds[1] = vertex.values[10]
+				bounds[2] = vertex.values[11]
+				bounds[3] = vertex.values[9]
+				bounds[4] = vertex.values[10]
+				bounds[5] = vertex.values[11]
+			else:
+				if bounds[0] > vertex.values[9]:
 					bounds[0] = vertex.values[9]
+				if bounds[1] > vertex.values[10]:
 					bounds[1] = vertex.values[10]
+				if bounds[2] > vertex.values[11]:
 					bounds[2] = vertex.values[11]
+				if bounds[3] < vertex.values[9]:
 					bounds[3] = vertex.values[9]
+				if bounds[4] < vertex.values[10]:
 					bounds[4] = vertex.values[10]
+				if bounds[5] < vertex.values[11]:
 					bounds[5] = vertex.values[11]
-				else:
-					if bounds[0] > vertex.values[9]:
-						bounds[0] = vertex.values[9]
-					if bounds[1] > vertex.values[10]:
-						bounds[1] = vertex.values[10]
-					if bounds[2] > vertex.values[11]:
-						bounds[2] = vertex.values[11]
-					if bounds[3] < vertex.values[9]:
-						bounds[3] = vertex.values[9]
-					if bounds[4] < vertex.values[10]:
-						bounds[4] = vertex.values[10]
-					if bounds[5] < vertex.values[11]:
-						bounds[5] = vertex.values[11]
 		# Enforce minimum size.
 		for i in range(3):
 			if abs(bounds[i+3] - bounds[i+0]) < lips_minimum_box_size:
@@ -662,21 +678,37 @@ class LipsFaces:
 				bounds[i+3] = tmp + 0.5 * lips_minimum_box_size
 		return bounds
 
-	# Saves all face groups.
+	# \brief Saves all face groups.
 	#
 	# \param self Face manager.
 	# \param writer Writer.
-	def Write(self, writer):
+	def WriteIndices(self, writer):
 		keys = self.groups.keys()
 		writer.WriteInt(len(keys))
 		for mat in keys:
-			verts = self.groups[mat]
+			indices = self.groups[mat]
 			writer.WriteInt(mat)
-			writer.WriteInt(len(verts))
-			for vertex in verts:
-				vertex.WriteCoords(writer)
-			for vertex in verts:
-				vertex.WriteWeights(writer)
+			writer.WriteInt(len(indices))
+			for index in indices:
+				writer.WriteInt(index)
+
+	# \brief Saves all vertices.
+	#
+	# \param self Face manager.
+	# \param writer Writer.
+	def WriteVertices(self, writer):
+		writer.WriteInt(len(self.vertexlist))
+		for vertex in self.vertexlist:
+			vertex.WriteCoords(writer)
+
+	# \brief Saves all vertex weights.
+	#
+	# \param self Face manager.
+	# \param writer Writer.
+	def WriteWeights(self, writer):
+		writer.WriteInt(len(self.vertexlist))
+		for vertex in self.vertexlist:
+			vertex.WriteWeights(writer)
 
 
 class LipsMaterial:
@@ -765,6 +797,15 @@ class LipsVertex:
 		for weight in self.weights:
 			writer.WriteInt(weight[0])
 			writer.WriteFloat(weight[1])
+
+	def GetKey(self):
+		key = "%f %f %f %f %f %f %f %f %f " % (\
+			self.values[0], self.values[1], self.values[2],
+			self.values[3], self.values[4], self.values[5],
+			self.values[9], self.values[10], self.values[11])
+		for w in self.weights:
+			key += "%d %f" % (w[0], w[1])
+		return key
 
 
 class LipsWeightGroup:
@@ -1176,15 +1217,19 @@ class LipsFile:
 		writer.WriteInt(len(materials))
 		for material in materials:
 			material.Write(writer)
-		# Faces.
+		# Vertices.
+		writer.WriteString("ver")
+		self.faces.WriteVertices(writer)
+		# Face groups.
 		writer.WriteString("fac")
-		self.faces.Write(writer)
+		self.faces.WriteIndices(writer)
 		# Weights.
 		writer.WriteString("wei")
 		writer.WriteInt(len(self.weightnames))
 		for name in self.weightnames:
 			writer.WriteString(name)
 			writer.WriteString(name)
+		self.faces.WriteWeights(writer)
 		# Nodes.
 		writer.WriteString("nod")
 		writer.WriteInt(1)
