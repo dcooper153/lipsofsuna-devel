@@ -52,6 +52,21 @@ liext_module_new (licliModule* module);
 void
 liext_module_free (liextModule* self);
 
+int
+liext_module_build_all (liextModule* self);
+
+int
+liext_module_build_block (liextModule* self,
+                          int          sx,
+                          int          sy,
+                          int          sz,
+                          int          bx,
+                          int          by,
+                          int          bz);
+
+void
+liext_module_clear_all (liextModule* self);
+
 /*****************************************************************************/
 
 void

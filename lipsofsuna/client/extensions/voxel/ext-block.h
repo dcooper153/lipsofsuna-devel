@@ -53,6 +53,9 @@ liext_block_build (liextBlock*     self,
                    livoxBlock*     block,
                    livoxBlockAddr* addr);
 
+void
+liext_block_clear (liextBlock* self);
+
 #endif
 
 /** @} */

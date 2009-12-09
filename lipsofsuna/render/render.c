@@ -34,10 +34,6 @@ private_init_resources (lirndRender* self,
 static int
 private_init_shaders (lirndRender* self);
 
-static liimgTexture*
-private_load_image (lirndRender* self,
-                    lirndImage*  texture);
-
 /*****************************************************************************/
 
 lirndRender*
@@ -74,17 +70,63 @@ error:
 void
 lirnd_render_free (lirndRender* self)
 {
+	lialgPtrdicIter iter0;
+	lialgStrdicIter iter1;
+	lirndImage* image;
+	lirndModel* model;
+	lirndShader* shader;
+
 	/* Free resources. */
-	if (self->resources != NULL)
-		lirnd_resources_free (self->resources);
 	glDeleteTextures (1, &self->helpers.noise);
 	glDeleteTextures (1, &self->helpers.depth_texture_max);
 
 	/* Free shaders. */
+	if (self->shaders != NULL)
+	{
+		LI_FOREACH_STRDIC (iter1, self->shaders)
+		{
+			shader = iter1.value;
+			lirnd_shader_free (shader);
+		}
+		lialg_strdic_free (self->shaders);
+	}
+
+	/* Free internal shaders. */
 	if (self->shader.fixed != NULL)
 		lirnd_shader_free (self->shader.fixed);
 	if (self->shader.shadowmap != NULL)
 		lirnd_shader_free (self->shader.shadowmap);
+
+	/* Free models. */
+	if (self->models_inst != NULL)
+	{
+		LI_FOREACH_PTRDIC (iter0, self->models_inst)
+		{
+			model = iter0.value;
+			lirnd_model_free (model);
+		}
+		lialg_ptrdic_free (self->models_inst);
+	}
+	if (self->models != NULL)
+	{
+		LI_FOREACH_STRDIC (iter1, self->models)
+		{
+			model = iter1.value;
+			lirnd_model_free (model);
+		}
+		lialg_strdic_free (self->models);
+	}
+
+	/* Free images. */
+	if (self->images != NULL)
+	{
+		LI_FOREACH_STRDIC (iter1, self->images)
+		{
+			image = iter1.value;
+			lirnd_image_free (image);
+		}
+		lialg_strdic_free (self->images);
+	}
 
 	/* Free scenes. */
 	if (self->scenes != NULL)
@@ -110,11 +152,41 @@ lirndShader*
 lirnd_render_find_shader (lirndRender* self,
                           const char*  name)
 {
+	char* path;
 	lirndShader* shader;
 
-	shader = lirnd_resources_find_shader (self->resources, name);
+	/* Try existing. */
+	shader = lialg_strdic_find (self->shaders, name);
+	if (shader != NULL)
+		return shader;
+
+	/* Try loading. */
+	path = lisys_path_format (self->config.dir,
+		LISYS_PATH_SEPARATOR, "shaders",
+		LISYS_PATH_SEPARATOR, name, NULL);
+	if (path == NULL)
+		return self->shader.fixed;
+	shader = lirnd_shader_new_from_file (self, path);
+	lisys_free (path);
+
+	/* Try fallback. */
+	if (shader == NULL)
+		shader = lirnd_shader_new (self);
 	if (shader == NULL)
 		return self->shader.fixed;
+
+	/* Insert to dictionary. */
+	shader->name = listr_dup (name);
+	if (shader->name == NULL)
+	{
+		lirnd_shader_free (shader);
+		return self->shader.fixed;
+	}
+	if (!lialg_strdic_insert (self->shaders, name, shader))
+	{
+		lirnd_shader_free (shader);
+		return self->shader.fixed;
+	}
 
 	return shader;
 }
@@ -123,8 +195,7 @@ lirnd_render_find_shader (lirndRender* self,
  * \brief Finds a texture by name.
  *
  * Searches for a texture from the texture cache and returns the match, if any.
- * If no match is found, the texture is loaded from a file, added to the cache,
- * and returned. NULL is returned if loading the texture fails.
+ * If no match is found, NULL is returned.
  *
  * \param self Renderer.
  * \param name Name of the texture.
@@ -134,26 +205,7 @@ lirndImage*
 lirnd_render_find_image (lirndRender* self,
                          const char*  name)
 {
-	lirndImage* image;
-
-	image = lirnd_resources_find_image (self->resources, name);
-	if (image == NULL)
-		image = lirnd_resources_insert_image (self->resources, name);
-	if (image == NULL || image->invalid)
-		return NULL;
-	if (image->texture == NULL)
-	{
-		image->texture = private_load_image (self, image);
-		if (image->texture == NULL)
-		{
-			image->invalid = 1;
-			lisys_error_report ();
-		}
-	}
-	if (image->invalid)
-		return NULL;
-
-	return image;
+	return lialg_strdic_find (self->images, name);
 }
 
 /**
@@ -167,7 +219,7 @@ lirndModel*
 lirnd_render_find_model (lirndRender* self,
                          const char*  name)
 {
-	return lirnd_resources_find_model (self->resources, name);
+	return lialg_strdic_find (self->models, name);
 }
 
 /**
@@ -186,49 +238,41 @@ lirnd_render_load_image (lirndRender* self,
                          const char*  name)
 {
 	lialgPtrdicIter iter0;
-	lialgU32dicIter iter1;
-	lialgStrdicIter iter2;
-	liimgTexture* imgtexture;
-	lirndImage* rndimage;
+	lialgStrdicIter iter1;
+	lirndImage* image;
 	lirndModel* model;
-	lirndObject* object;
-	lirndScene* scene;
 
-	/* Find image info. */
-	rndimage = lirnd_resources_find_image (self->resources, name);
-	if (rndimage == NULL)
-		rndimage = lirnd_resources_insert_image (self->resources, name);
-	if (rndimage == NULL)
-		return 0;
-	if (rndimage->texture == NULL)
-		return 1;
-
-	/* Reload image. */
-	imgtexture = private_load_image (self, rndimage);
-	if (imgtexture == NULL)
-		return 0;
-	if (rndimage->texture != NULL)
-		liimg_texture_free (rndimage->texture);
-	rndimage->texture = imgtexture;
-
-	/* Replace in all instances. */
-	LI_FOREACH_PTRDIC (iter0, self->scenes)
+	/* Just create new image if no old one. */
+	image = lialg_strdic_find (self->images, name);
+	if (image == NULL)
 	{
-		scene = iter0.value;
-		LI_FOREACH_U32DIC (iter1, scene->objects)
+		image = lirnd_image_new_from_file (self, name);
+		if (image == NULL)
 		{
-			object = iter1.value;
-			if (object->instance == NULL)
-				continue;
-			lirnd_model_replace_image (object->instance, rndimage);
+			lisys_error_report ();
+			image = lirnd_image_new (self, name);
+			if (image == NULL)
+				return 0;
 		}
+		return 1;
 	}
 
-	/* Replace in all models. */
-	LI_FOREACH_STRDIC (iter2, self->resources->models)
+	/* Reload existing image. */
+	if (!lirnd_image_load (image))
+		return 0;
+
+	/* Replace in all named models. */
+	LI_FOREACH_STRDIC (iter1, self->models)
 	{
-		model = iter2.value;
-		lirnd_model_replace_image (model, rndimage);
+		model = iter1.value;
+		lirnd_model_replace_image (model, image);
+	}
+
+	/* Replace in all instance models. */
+	LI_FOREACH_PTRDIC (iter0, self->models_inst)
+	{
+		model = iter0.value;
+		lirnd_model_replace_image (model, image);
 	}
 
 	return 1;
@@ -261,21 +305,14 @@ lirnd_render_load_model (lirndRender* self,
 	lialgPtrdicIter iter2;
 
 	/* Create new model. */
-	model1 = lirnd_model_new (self, model);
+	model0 = lialg_strdic_find (self->models, name);
+	model1 = lirnd_model_new (self, model, name);
 	if (model1 == NULL)
-		return 1;
+		return 0;
 
 	/* Early exit if not reloading. */
-	model0 = lirnd_resources_find_model (self->resources, name);
 	if (model0 == NULL)
-	{
-		if (!lirnd_resources_insert_model (self->resources, name, model1))
-		{
-			lirnd_model_free (model1);
-			return 0;
-		}
 		return 1;
-	}
 
 	/* Replace in all instances. */
 	LI_FOREACH_PTRDIC (iter0, self->scenes)
@@ -304,10 +341,8 @@ lirnd_render_load_model (lirndRender* self,
 		}
 	}
 
-	/* Replace in resource manager. */
-	/* FIXME: Leaves the manager to a broken state if fails to allocate memory. */
-	lirnd_resources_remove_model (self->resources, name);
-	lirnd_resources_insert_model (self->resources, name, model1);
+	/* Free old model. */
+	lirnd_model_free (model0);
 
 	return 1;
 }
@@ -441,9 +476,22 @@ private_init_resources (lirndRender* self,
 		236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
 
-	/* Initialize resource list. */
-	self->resources = lirnd_resources_new (self);
-	if (self->resources == NULL)
+	/* Initialize image dictionary. */
+	self->images = lialg_strdic_new ();
+	if (self->images == NULL)
+		return 0;
+
+	/* Initialize model dicrionaries. */
+	self->models = lialg_strdic_new ();
+	if (self->models == NULL)
+		return 0;
+	self->models_inst = lialg_ptrdic_new ();
+	if (self->models_inst == NULL)
+		return 0;
+
+	/* Initialize shader dictionary. */
+	self->shaders = lialg_strdic_new ();
+	if (self->shaders == NULL)
 		return 0;
 
 	/* Initialize default depth texture. */
@@ -510,24 +558,6 @@ private_init_shaders (lirndRender* self)
 	}
 
 	return 1;
-}
-
-static liimgTexture*
-private_load_image (lirndRender* self,
-                    lirndImage*  image)
-{
-	char* path;
-	liimgTexture* result;
-
-	path = lisys_path_format (self->config.dir,
-		LISYS_PATH_SEPARATOR, "graphics",
-		LISYS_PATH_SEPARATOR, image->name, ".dds", NULL);
-	if (path == NULL)
-		return NULL;
-	result = liimg_texture_new_from_file (path);
-	lisys_free (path);
-
-	return result;
 }
 
 /** @} */

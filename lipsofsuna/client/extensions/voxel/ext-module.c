@@ -142,6 +142,26 @@ liext_module_free (liextModule* self)
 }
 
 int
+liext_module_build_all (liextModule* self)
+{
+	int ret = 1;
+	lialgMemdicIter iter;
+	liextBlock* block;
+	livoxBlockAddr* addr;
+
+	LI_FOREACH_MEMDIC (iter, self->blocks)
+	{
+		addr = iter.key;
+		block = iter.value;
+		ret &= liext_module_build_block (self,
+			addr->sector[0], addr->sector[1], addr->sector[2],
+			addr->block[0], addr->block[1], addr->block[2]);
+	}
+
+	return ret;
+}
+
+int
 liext_module_build_block (liextModule* self,
                           int          sx,
                           int          sy,
@@ -190,6 +210,19 @@ liext_module_build_block (liextModule* self,
 	}
 
 	return 1;
+}
+
+void
+liext_module_clear_all (liextModule* self)
+{
+	lialgMemdicIter iter;
+	liextBlock* block;
+
+	LI_FOREACH_MEMDIC (iter, self->blocks)
+	{
+		block = iter.value;
+		liext_block_clear (block);
+	}
 }
 
 /*****************************************************************************/

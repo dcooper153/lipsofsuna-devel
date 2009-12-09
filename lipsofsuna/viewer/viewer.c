@@ -293,7 +293,7 @@ private_init_model (livieViewer* self,
 		lisys_error_report ();
 		return 1;
 	}
-	self->model = lirnd_model_new (self->render, mdl);
+	self->model = lirnd_model_new (self->render, mdl, model);
 	if (self->model == NULL)
 	{
 		limdl_model_free (mdl);

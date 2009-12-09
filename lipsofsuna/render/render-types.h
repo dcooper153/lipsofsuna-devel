@@ -18,6 +18,7 @@
 #ifndef __RENDER_TYPES_H__
 #define __RENDER_TYPES_H__
 
+#include <math/lips-math.h>
 #include <video/lips-video.h>
 
 enum _lirndFlags

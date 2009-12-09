@@ -174,9 +174,9 @@ am__objects_18 = reload/reload.lo reload/reload-blender.lo \
 am__objects_19 = render/render.lo render/render-buffer.lo \
 	render/render-context.lo render/render-deferred.lo \
 	render/render-draw.lo render/render-group.lo \
-	render/render-light.lo render/render-lighting.lo \
-	render/render-material.lo render/render-model.lo \
-	render/render-object.lo render/render-resources.lo \
+	render/render-image.lo render/render-light.lo \
+	render/render-lighting.lo render/render-material.lo \
+	render/render-model.lo render/render-object.lo \
 	render/render-scene.lo render/render-shader.lo \
 	render/render-texture.lo
 am__objects_20 = script/script.lo script/script-class.lo \
@@ -968,7 +968,6 @@ rnd_HEADERS = \
 	render/render-lighting.h \
 	render/render-material.h \
 	render/render-object.h \
-	render/render-resources.h \
 	render/render-scene.h \
 	render/render-shader.h \
 	render/render-texture.h \
@@ -982,13 +981,13 @@ rndsrc = \
 	render/render-deferred.c \
 	render/render-draw.c \
 	render/render-group.c \
+	render/render-image.c \
 	render/render-light.c \
 	render/render-lighting.c \
 	render/render-material.c \
 	render/render-model.c \
 	render/render-model.h \
 	render/render-object.c \
-	render/render-resources.c \
 	render/render-scene.c \
 	render/render-shader.c \
 	render/render-texture.c
@@ -1630,6 +1629,8 @@ render/render-draw.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
 render/render-group.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
+render/render-image.lo: render/$(am__dirstamp) \
+	render/$(DEPDIR)/$(am__dirstamp)
 render/render-light.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
 render/render-lighting.lo: render/$(am__dirstamp) \
@@ -1639,8 +1640,6 @@ render/render-material.lo: render/$(am__dirstamp) \
 render/render-model.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
 render/render-object.lo: render/$(am__dirstamp) \
-	render/$(DEPDIR)/$(am__dirstamp)
-render/render-resources.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
 render/render-scene.lo: render/$(am__dirstamp) \
 	render/$(DEPDIR)/$(am__dirstamp)
@@ -2184,6 +2183,8 @@ mostlyclean-compile:
 	-rm -f render/render-draw.lo
 	-rm -f render/render-group.$(OBJEXT)
 	-rm -f render/render-group.lo
+	-rm -f render/render-image.$(OBJEXT)
+	-rm -f render/render-image.lo
 	-rm -f render/render-light.$(OBJEXT)
 	-rm -f render/render-light.lo
 	-rm -f render/render-lighting.$(OBJEXT)
@@ -2194,8 +2195,6 @@ mostlyclean-compile:
 	-rm -f render/render-model.lo
 	-rm -f render/render-object.$(OBJEXT)
 	-rm -f render/render-object.lo
-	-rm -f render/render-resources.$(OBJEXT)
-	-rm -f render/render-resources.lo
 	-rm -f render/render-scene.$(OBJEXT)
 	-rm -f render/render-scene.lo
 	-rm -f render/render-shader.$(OBJEXT)
@@ -2452,12 +2451,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-deferred.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-draw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-group.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-light.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-lighting.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-resources.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-scene.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-shader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-texture.Plo@am__quote@

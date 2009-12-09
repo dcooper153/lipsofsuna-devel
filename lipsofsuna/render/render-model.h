@@ -34,8 +34,8 @@
 
 struct _lirndModel
 {
-	int id;
-	int refs;
+	int added;
+	char* name;
 	limatAabb aabb;
 	limdlModel* model;
 	lirndBuffer* vertices;
@@ -54,7 +54,8 @@ struct _lirndModel
 
 lirndModel*
 lirnd_model_new (lirndRender* render,
-                 limdlModel*  model);
+                 limdlModel*  model,
+                 const char*  name);
 
 lirndModel*
 lirnd_model_new_instance (lirndModel* model);

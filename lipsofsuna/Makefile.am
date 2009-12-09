@@ -333,7 +333,6 @@ rnd_HEADERS = \
 	render/render-lighting.h \
 	render/render-material.h \
 	render/render-object.h \
-	render/render-resources.h \
 	render/render-scene.h \
 	render/render-shader.h \
 	render/render-texture.h \
@@ -346,13 +345,13 @@ rndsrc = \
 	render/render-deferred.c \
 	render/render-draw.c \
 	render/render-group.c \
+	render/render-image.c \
 	render/render-light.c \
 	render/render-lighting.c \
 	render/render-material.c \
 	render/render-model.c \
 	render/render-model.h \
 	render/render-object.c \
-	render/render-resources.c \
 	render/render-scene.c \
 	render/render-shader.c \
 	render/render-texture.c

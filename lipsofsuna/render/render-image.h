@@ -25,14 +25,32 @@
 #ifndef __RENDER_IMAGE_H__
 #define __RENDER_IMAGE_H__
 
+#include <image/lips-image.h>
+#include "render-types.h"
+
 typedef struct _lirndImage lirndImage;
 struct _lirndImage
 {
-	int invalid;
+	int added;
 	char* name;
 	char* path;
 	liimgTexture* texture;
+	lirndRender* render;
 };
+
+lirndImage*
+lirnd_image_new (lirndRender* render,
+                 const char*  name);
+
+lirndImage*
+lirnd_image_new_from_file (lirndRender* render,
+                           const char*  name);
+
+void
+lirnd_image_free (lirndImage* self);
+
+int
+lirnd_image_load (lirndImage* self);
 
 #endif
 

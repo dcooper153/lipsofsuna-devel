@@ -48,6 +48,7 @@ lirnd_material_new_from_model (lirndRender*         render,
                                const limdlMaterial* material)
 {
 	int j;
+	const char* name;
 	limdlTexture* texture;
 	lirndImage* image;
 	lirndMaterial* self;
@@ -86,10 +87,22 @@ lirnd_material_new_from_model (lirndRender*         render,
 	for (j = 0 ; j < material->textures.count ; j++)
 	{
 		texture = material->textures.array + j;
+
+		/* Get texture name. */
 		if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
-			image = lirnd_render_find_image (render, texture->string);
+			name = texture->string;
 		else
-			image = lirnd_render_find_image (render, "empty");
+			name = "empty";
+
+		/* Find or load. */
+		image = lirnd_render_find_image (render, texture->string);
+		if (image == NULL)
+		{
+			lirnd_render_load_image (render, texture->string);
+			image = lirnd_render_find_image (render, texture->string);
+		}
+
+		/* Set texture. */
 		lirnd_material_set_texture (self, j, texture, image);
 	}
 

@@ -29,11 +29,11 @@
 #include <config/lips-config.h>
 #include <image/lips-image.h>
 #include <system/lips-system.h>
+#include "render-image.h"
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-material.h"
 #include "render-object.h"
-#include "render-resources.h"
 #include "render-shader.h"
 #include "render-types.h"
 
@@ -42,7 +42,10 @@
 struct _lirndRender
 {
 	lialgPtrdic* scenes;
-	lirndResources* resources;
+	lialgStrdic* shaders;
+	lialgStrdic* images;
+	lialgStrdic* models;
+	lialgPtrdic* models_inst;
 	struct
 	{
 		char* dir;

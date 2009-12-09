@@ -47,12 +47,15 @@ private_init_model (lirndModel* self);
  *
  * \param render Renderer.
  * \param model Model description.
+ * \param name Unique model name or NULL.
  * \return New model or NULL.
  */
 lirndModel*
 lirnd_model_new (lirndRender* render,
-                 limdlModel*  model)
+                 limdlModel*  model,
+                 const char*  name)
 {
+	lialgStrdicNode* node;
 	lirndModel* self;
 
 	/* Allocate self. */
@@ -61,15 +64,60 @@ lirnd_model_new (lirndRender* render,
 		return NULL;
 	self->render = render;
 	self->model = model;
+
+	/* Set name. */
 	self->aabb = model->bounds;
+	if (name != NULL)
+	{
+		self->name = strdup (name);
+		if (self->name == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
 
 	/* Initialize static mesh. */
 	if (!private_init_materials (self) ||
 	    !private_init_model (self))
 	{
+		lisys_free (self->name);
 		lisys_free (self);
 		return NULL;
 	}
+
+	/* Add to dictionary. */
+	if (name != NULL)
+	{
+		node = lialg_strdic_find_node (render->models, name);
+		if (node == NULL)
+		{
+			if (!lialg_strdic_insert (render->models, name, self))
+			{
+				private_clear_materials (self);
+				private_clear_model (self);
+				lisys_free (self->name);
+				lisys_free (self);
+				return NULL;
+			}
+		}
+		else
+		{
+			((lirndModel*) node->value)->added = 0;
+			node->value = self;
+		}
+	}
+	else
+	{
+		if (!lialg_ptrdic_insert (render->models_inst, self, self))
+		{
+			private_clear_materials (self);
+			private_clear_model (self);
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	self->added = 1;
 
 	return self;
 }
@@ -77,7 +125,7 @@ lirnd_model_new (lirndRender* render,
 lirndModel*
 lirnd_model_new_instance (lirndModel* model)
 {
-	return lirnd_model_new (model->render, model->model);
+	return lirnd_model_new (model->render, model->model, NULL);
 }
 
 /**
@@ -88,8 +136,19 @@ lirnd_model_new_instance (lirndModel* model)
 void
 lirnd_model_free (lirndModel* self)
 {
+	/* Remove from dictionary. */
+	if (self->added)
+	{
+		if (self->name != NULL)
+			lialg_strdic_remove (self->render->models, self->name);
+		else
+			lialg_ptrdic_remove (self->render->models_inst, self);
+	}
+
+	/* Free self. */
 	private_clear_materials (self);
 	private_clear_model (self);
+	lisys_free (self->name);
 	lisys_free (self);
 }
 

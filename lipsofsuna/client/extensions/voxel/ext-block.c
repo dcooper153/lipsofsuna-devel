@@ -89,6 +89,31 @@ liext_block_free (liextBlock* self)
 	lisys_free (self);
 }
 
+void
+liext_block_clear (liextBlock* self)
+{
+	if (self->group != NULL)
+	{
+		lirnd_group_free (self->group);
+		self->group = NULL;
+	}
+	if (self->rmodel != NULL)
+	{
+		lirnd_model_free (self->rmodel);
+		self->rmodel = NULL;
+	}
+	if (self->mmodel != NULL)
+	{
+		limdl_model_free (self->mmodel);
+		self->mmodel = NULL;
+	}
+	if (self->physics != NULL)
+	{
+		liphy_object_free (self->physics);
+		self->physics = NULL;
+	}
+}
+
 int
 liext_block_build (liextBlock*     self,
                    liextModule*    module,
@@ -169,26 +194,7 @@ liext_block_build (liextBlock*     self,
 	}
 
 	/* Free old objects. */
-	if (self->group != NULL)
-	{
-		lirnd_group_free (self->group);
-		self->group = NULL;
-	}
-	if (self->rmodel != NULL)
-	{
-		lirnd_model_free (self->rmodel);
-		self->rmodel = NULL;
-	}
-	if (self->mmodel != NULL)
-	{
-		limdl_model_free (self->mmodel);
-		self->mmodel = NULL;
-	}
-	if (self->physics != NULL)
-	{
-		liphy_object_free (self->physics);
-		self->physics = NULL;
-	}
+	liext_block_clear (self);
 
 	/* Build new objects. */
 	private_build_physics (self, module, info);
@@ -198,7 +204,7 @@ liext_block_build (liextBlock*     self,
 	/* Create render model if not empty. */
 	if (self->mmodel != NULL)
 	{
-		self->rmodel = lirnd_model_new (self->module->render, self->mmodel);
+		self->rmodel = lirnd_model_new (self->module->render, self->mmodel, NULL);
 		if (self->rmodel != NULL)
 		{
 			self->group = lirnd_group_new (self->module->scene);
