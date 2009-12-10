@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -59,7 +59,7 @@ liai_path_free (liaiPath* self)
  * \return Nonzero on success.
  */
 int
-liai_path_append_point (liaiPath*       self,
+liai_path_append_point (liaiPath*          self,
                         const limatVector* point)
 {
 	limatVector* tmp;
@@ -86,7 +86,7 @@ liai_path_append_point (liaiPath*       self,
 void
 liai_path_get_point (const liaiPath* self,
                      int             index,
-                     limatVector*       value)
+                     limatVector*    value)
 {
 	assert (index >= 0);
 	assert (index < self->points.count);

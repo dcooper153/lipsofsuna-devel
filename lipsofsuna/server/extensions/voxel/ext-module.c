@@ -213,6 +213,23 @@ liext_module_write (liextModule* self,
 	return livox_manager_write (self->voxels);
 }
 
+/**
+ * \brief Gets the voxel manager of the module.
+ *
+ * This function is used by other modules, such as the NPC module, to interact
+ * with the voxel terrain.
+ *
+ * \warning Accessing the terrain from a different thread isn't safe.
+ *
+ * \param self Module.
+ * \return Voxel manager.
+ */
+livoxManager*
+liext_module_get_voxels (liextModule* self)
+{
+	return self->voxels;
+}
+
 /*****************************************************************************/
 
 static int

@@ -27,7 +27,6 @@
 
 #include <pthread.h>
 #include <sys/time.h>
-#include <ai/lips-ai.h>
 #include <algorithm/lips-algorithm.h>
 #include <config/lips-config.h>
 #include <engine/lips-engine.h>
@@ -55,7 +54,6 @@ struct _lisrvServer
 	} config;
 	struct
 	{
-		liaiPathSolver* path_solver;
 		liarcWriter* resources;
 	} helper;
 	struct
@@ -74,13 +72,17 @@ lisrv_server_new (lipthPaths* paths);
 void
 lisrv_server_free (lisrvServer* self);
 
-int
-lisrv_server_load_extension (lisrvServer* self,
+lisrvExtension*
+lisrv_server_find_extension (lisrvServer* self,
                              const char*  name);
 
 int
 lisrv_server_insert_ban (lisrvServer* self,
                          const char*  ip);
+
+int
+lisrv_server_load_extension (lisrvServer* self,
+                             const char*  name);
 
 int
 lisrv_server_main (lisrvServer* self);

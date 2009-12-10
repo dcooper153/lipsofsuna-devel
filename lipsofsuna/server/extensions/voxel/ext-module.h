@@ -84,6 +84,9 @@ int
 liext_module_write (liextModule* self,
                     liarcSql*    sql);
 
+livoxManager*
+liext_module_get_voxels (liextModule* self);
+
 /*****************************************************************************/
 
 void

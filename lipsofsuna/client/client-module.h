@@ -82,6 +82,10 @@ licli_module_connect (licliModule* self,
                       const char*  name,
                       const char*  pass);
 
+licliExtension*
+licli_module_find_extension (licliModule* self,
+                             const char*  name);
+
 liengObject*
 licli_module_find_object (licliModule* self,
                           uint32_t     id);

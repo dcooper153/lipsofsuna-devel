@@ -26,124 +26,61 @@
 #include "ai-sector.h"
 
 /**
- * \brief Creates a new AI data sector.
+ * \brief Creates a new AI sector.
  *
+ * \param manager AI manager.
+ * \param x Sector offset.
+ * \param y Sector offset.
+ * \param z Sector offset.
+ * \param voxels Voxel sector or NULL.
  * \return New sector or NULL.
  */
 liaiSector*
-liai_sector_new ()
+liai_sector_new (liaiManager* manager,
+                 int          x,
+                 int          y,
+                 int          z,
+                 livoxSector* voxels)
 {
+	int i;
+	int j;
+	int k;
+	int l;
 	liaiSector* self;
+	liaiWaypoint* wp;
+	limatVector offset;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liaiSector));
 	if (self == NULL)
 		return NULL;
+	self->x = x;
+	self->y = y;
+	self->z = z;
+	self->manager = manager;
 
-	return self;
-}
+	/* Calculate offset. */
+	offset = limat_vector_init (x, y, z);
+	offset = limat_vector_multiply (offset, LIAI_SECTOR_WIDTH);
 
-/**
- * \brief Loads an AI data sector from data.
- *
- * \param reader Reader.
- * \return New sector or NULL.
- */
-liaiSector*
-liai_sector_new_from_data (liarcReader* reader)
-{
-	uint32_t i;
-	uint32_t j;
-	uint32_t count;
-	uint32_t link;
-	uint16_t links;
-	limatVector position;
-	liaiSector* self;
-	liaiWaypoint** points;
-
-	/* Read header. */
-	if (!liarc_reader_check_text (reader, "lips/pth", ""))
+	/* Set waypoint positions. */
+	for (k = l = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++)
+	for (j = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++)
+	for (i = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++, l++)
 	{
-		lisys_error_set (EINVAL, "incorrect file type");
-		return NULL;
-	}
-	if (!liarc_reader_get_uint32 (reader, &count))
-		return NULL;
-
-	/* Allocate points. */
-	points = lisys_calloc (count, sizeof (liaiWaypoint*));
-	if (points == NULL)
-		return NULL;
-	position = limat_vector_init (0.0f, 0.0f, 0.0f);
-	for (i = 0 ; i < count ; i++)
-	{
-		points[i] = liai_waypoint_new (&position);
-		if (points[i] == NULL)
-			goto error;
+		wp = self->points + l;
+		wp->x = i;
+		wp->y = j;
+		wp->z = k;
+		wp->sector = self;
+		wp->position = limat_vector_init (i, j, k);
+		wp->position = limat_vector_multiply (wp->position, LIAI_WAYPOINT_WIDTH);
+		wp->position = limat_vector_add (wp->position, offset);
 	}
 
-	/* Read points. */
-	for (i = 0 ; i < count ; i++)
-	{
-		if (!liarc_reader_get_float (reader, &(points[i]->position.x)) ||
-		    !liarc_reader_get_float (reader, &(points[i]->position.y)) ||
-		    !liarc_reader_get_float (reader, &(points[i]->position.z)) ||
-		    !liarc_reader_get_uint16 (reader, &links))
-			goto error;
-		for (j = 0 ; j < links ; j++)
-		{
-			if (!liarc_reader_get_uint32 (reader, &link))
-				goto error;
-			if (link >= count)
-			{
-				lisys_error_set (EINVAL, "link index out of bounds");
-				goto error;
-			}
-			if (!liai_waypoint_insert_link (points[i], points[link]))
-				goto error;
-		}
-	}
-
-	/* Create sector. */
-	self = liai_sector_new ();
-	if (self == NULL)
-		goto error;
-	for (i = 0 ; i < count ; i++)
-	{
-		if (!liai_sector_insert_waypoint (self, points[i]))
-			goto error;
-		points[i] = NULL;
-	}
-	lisys_free (points);
-
-	return self;
-
-error:
-	for (i = 0 ; i < count ; i++)
-	{
-		if (points[i] != NULL)
-			liai_waypoint_free (points[i]);
-	}
-	lisys_free (points);
-	return NULL;
-}
-
-/**
- * \brief Loads an AI data sector from a file.
- *
- * \param path Path to the file to load.
- * \return New sector or NULL.
- */
-liaiSector*
-liai_sector_new_from_file (const char* path)
-{
-	liarcReader* reader;
-	liaiSector* self;
-
-	reader = liarc_reader_new_from_file (path);
-	if (reader == NULL)
-		return NULL;
-	self = liai_sector_new_from_data (reader);
-	liarc_reader_free (reader);
+	/* Build waypoints. */
+	liai_sector_build_area (self, voxels, 0, 0, 0, LIAI_WAYPOINTS_PER_LINE,
+		LIAI_WAYPOINTS_PER_LINE, LIAI_WAYPOINTS_PER_LINE);
 
 	return self;
 }
@@ -156,150 +93,79 @@ liai_sector_new_from_file (const char* path)
 void
 liai_sector_free (liaiSector* self)
 {
-	lialgList* ptr;
-
-	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
-		liai_waypoint_free (ptr->data);
-	lialg_list_free (self->waypoints);
 	lisys_free (self);
 }
 
 /**
- * \brief Finds a waypoint by position.
+ * \brief Rebuilds the waypoints for the given area.
  *
  * \param self Sector.
- * \param point Position vector.
- * \return Waypoint or NULL.
- */
-liaiWaypoint*
-liai_sector_find_waypoint (liaiSector*     self,
-                           const limatVector* point)
-{
-	float d;
-	float dist;
-	lialgList* ptr;
-	liaiWaypoint* best;
-	liaiWaypoint* tmp;
-
-	dist = LI_MATH_INFINITE;
-	best = NULL;
-
-	/* FIXME: Slow! */
-	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
-	{
-		tmp = ptr->data;
-		d = limat_vector_get_length (limat_vector_subtract (*point, tmp->position));
-		if (d < dist)
-		{
-			best = tmp;
-			dist = d;
-		}
-	}
-
-	return best;
-}
-
-/**
- * \brief Inserts a waypoint to the sector.
- *
- * The ownership of the waypoint is given to the sector.
- *
- * \param self Sector.
- * \param waypoint Waypoint to insert.
- */
-int
-liai_sector_insert_waypoint (liaiSector*   self,
-                             liaiWaypoint* waypoint)
-{
-	return lialg_list_prepend (&self->waypoints, waypoint);
-}
-
-/**
- * \brief Removes the waypoint from the sector.
- *
- * The ownership of the waypoint is given to the user.
- *
- * \param self Sector.
- * \param waypoint Waypoint to remove.
+ * \param voxels Voxel sector or NULL.
+ * \param x Start waypoint.
+ * \param y Start waypoint.
+ * \param z Start waypoint.
+ * \param xs Waypoint count.
+ * \param ys Waypoint count.
+ * \param zs Waypoint count.
  */
 void
-liai_sector_remove_waypoint (liaiSector*   self,
-                             liaiWaypoint* waypoint)
+liai_sector_build_area (liaiSector*  self,
+                        livoxSector* voxels,
+                        int          x,
+                        int          y,
+                        int          z,
+                        int          xs,
+                        int          ys,
+                        int          zs)
 {
-	lialgList* ptr;
+	int i;
+	int j;
+	int k;
+	liaiWaypoint* wp;
+	livoxVoxel* voxel;
 
-	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
+	if (voxels != NULL)
 	{
-		if (ptr->data == waypoint)
-			lialg_list_remove (&self->waypoints, ptr);
+		for (k = x ; k < zs ; k++)
+		for (j = y ; k < ys ; k++)
+		for (i = z ; k < xs ; k++)
+		{
+			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
+			voxel = livox_sector_get_voxel (voxels, i, j, k);
+			if (voxel->type)
+				wp->flags = 1;
+			else
+				wp->flags = 0;
+		}
+	}
+	else
+	{
+		for (k = x ; k < zs ; k++)
+		for (j = y ; k < ys ; k++)
+		for (i = z ; k < xs ; k++)
+		{
+			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
+			wp->flags = 0;
+		}
 	}
 }
 
 /**
- * \brief Writes the sector to a file.
+ * \brief Gets a waypoint be offset.
  *
  * \param self Sector.
- * \param path Path to the file.
- * \return Nonzero on success.
+ * \param x Waypoint offset.
+ * \param y Waypoint offset.
+ * \param z Waypoint offset.
+ * \return Waypoint.
  */
-int
-liai_sector_save (const liaiSector* self,
-                  const char*       path)
+liaiWaypoint*
+liai_sector_get_waypoint (liaiSector* self,
+                          int         x,
+                          int         y,
+                          int         z)
 {
-	int count;
-	void* tmp;
-	liaiWaypoint* point;
-	lialgList* ptr;
-	lialgPtrdic* lookup;
-	liarcWriter* writer;
-
-	/* Create link lookup. */
-	count = 0;
-	lookup = lialg_ptrdic_new ();
-	if (lookup == NULL)
-		return 0;
-	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
-	{
-		point = ptr->data;
-		if (!lialg_ptrdic_insert (lookup, point, (void*)(intptr_t)(++count)))
-		{
-			lialg_ptrdic_free (lookup);
-			return 0;
-		}
-	}
-
-	/* Create writer. */
-	writer = liarc_writer_new_file (path);
-	if (writer == NULL)
-	{
-		lialg_ptrdic_free (lookup);
-		return 0;
-	}
-
-	/* Write header. */
-	liarc_writer_append_string (writer, "lips/pth");
-	liarc_writer_append_nul (writer);
-	liarc_writer_append_uint32 (writer, count);
-
-	/* Write waypoints. */
-	for (ptr = self->waypoints ; ptr != NULL ; ptr = ptr->next)
-	{
-		point = ptr->data;
-		liarc_writer_append_float (writer, point->position.x);
-		liarc_writer_append_float (writer, point->position.y);
-		liarc_writer_append_float (writer, point->position.z);
-		liarc_writer_append_uint16 (writer, point->links.count);
-		for (count = 0 ; count < point->links.count ; count++)
-		{
-			tmp = lialg_ptrdic_find (lookup, point->links.links[count].target);
-			liarc_writer_append_uint32 (writer, ((int)(intptr_t) tmp) - 1);
-		}
-	}
-
-	lialg_ptrdic_free (lookup);
-	liarc_writer_free (writer);
-
-	return 1;
+	return self->points + LIAI_WAYPOINT_INDEX (x, y, z);
 }
 
 /** @} */

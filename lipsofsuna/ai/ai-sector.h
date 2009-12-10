@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,43 +25,46 @@
 #ifndef __AI_SECTOR_H__
 #define __AI_SECTOR_H__
 
-#include <math/lips-math.h>
 #include <algorithm/lips-algorithm.h>
+#include <math/lips-math.h>
+#include <voxel/lips-voxel.h>
 #include "ai-waypoint.h"
+#include "ai-types.h"
 
-typedef struct _liaiSector liaiSector;
 struct _liaiSector
 {
-	lialgList* waypoints; // FIXME: Slow, use an octree.
+	int x;
+	int y;
+	int z;
+	liaiManager* manager;
+	liaiWaypoint points[LIAI_WAYPOINTS_PER_SECTOR];
 };
 
 liaiSector*
-liai_sector_new ();
-
-liaiSector*
-liai_sector_new_from_data (liarcReader* reader);
-
-liaiSector*
-liai_sector_new_from_file (const char* path);
+liai_sector_new (liaiManager* manager,
+                 int          x,
+                 int          y,
+                 int          z,
+                 livoxSector* voxels);
 
 void
 liai_sector_free (liaiSector* self);
 
-liaiWaypoint*
-liai_sector_find_waypoint (liaiSector*     self,
-                           const limatVector* point);
-
-int
-liai_sector_insert_waypoint (liaiSector*   self,
-                             liaiWaypoint* waypoint);
-
 void
-liai_sector_remove_waypoint (liaiSector*   self,
-                             liaiWaypoint* waypoint);
+liai_sector_build_area (liaiSector*  self,
+                        livoxSector* voxels,
+                        int          x,
+                        int          y,
+                        int          z,
+                        int          xs,
+                        int          ys,
+                        int          zs);
 
-int
-liai_sector_save (const liaiSector* self,
-                  const char*       path);
+liaiWaypoint*
+liai_sector_get_waypoint (liaiSector* self,
+                          int         x,
+                          int         y,
+                          int         z);
 
 #endif
 

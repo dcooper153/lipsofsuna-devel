@@ -42,11 +42,11 @@ private_rescan (liextNpc* self);
 /**
  * \brief Creates a new non-player character logic.
  *
- * \param server Server.
+ * \param module Module.
  * \return Non-player character logic or NULL.
  */
 liextNpc*
-liext_npc_new (lisrvServer* server)
+liext_npc_new (liextModule* module)
 {
 	liextNpc* self;
 
@@ -56,7 +56,7 @@ liext_npc_new (lisrvServer* server)
 	self->alert = 1;
 	self->radius = 30.0f;
 	self->refresh = 5.0f;
-	self->server = server;
+	self->module = module;
 	liext_npc_set_active (self, 1);
 
 	return self;
@@ -72,7 +72,7 @@ liext_npc_free (liextNpc* self)
 {
 	if (self->active)
 	{
-		lieng_engine_remove_calls (self->server->engine, self->calls,
+		lieng_engine_remove_calls (self->module->server->engine, self->calls,
 			sizeof (self->calls) / sizeof (licalHandle));
 	}
 	lisys_free (self);
@@ -92,12 +92,12 @@ liext_npc_set_active (liextNpc* self,
 		return 1;
 	if (value)
 	{
-		lieng_engine_insert_call (self->server->engine,
+		lieng_engine_insert_call (self->module->server->engine,
 			LISRV_CALLBACK_TICK, 0, private_tick, self, self->calls + 0);
 	}
 	else
 	{
-		lieng_engine_remove_calls (self->server->engine, self->calls,
+		lieng_engine_remove_calls (self->module->server->engine, self->calls,
 			sizeof (self->calls) / sizeof (licalHandle));
 	}
 	self->active = value;
@@ -224,7 +224,7 @@ private_tick (liextNpc* self,
 static void
 private_attack (liextNpc* self)
 {
-	liscrScript* script = self->server->script;
+	liscrScript* script = self->module->server->script;
 
 	/* Check for spawn function. */
 	lua_getfield (script->lua, LUA_GLOBALSINDEX, "Npc");

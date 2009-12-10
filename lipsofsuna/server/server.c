@@ -36,9 +36,6 @@
 #define LI_SERVER_SLEEP
 
 static int
-private_init_ai (lisrvServer* self);
-
-static int
 private_init_bans (lisrvServer* self);
 
 static int
@@ -83,7 +80,6 @@ lisrv_server_new (lipthPaths* paths)
 
 	/* Initialize subsystems. */
 	if (!private_init_sql (self) ||
-	    !private_init_ai (self) ||
 	    !private_init_host (self) ||
 	    !private_init_bans (self) ||
 	    !private_init_extensions (self) ||
@@ -148,12 +144,43 @@ lisrv_server_free (lisrvServer* self)
 		licfg_host_free (self->config.host);
 
 	/* Free helpers. */
-	if (self->helper.path_solver != NULL)
-		liai_path_solver_free (self->helper.path_solver);
 	if (self->helper.resources != NULL)
 		liarc_writer_free (self->helper.resources);
 
 	lisys_free (self);
+}
+
+/**
+ * \brief Finds an extension by name.
+ *
+ * \param self Server.
+ * \param name Extension name.
+ * \return Extension or NULL.
+ */
+lisrvExtension*
+lisrv_server_find_extension (lisrvServer* self,
+                             const char*  name)
+{
+	return lialg_strdic_find (self->extensions, name);
+}
+
+/**
+ * \brief Inserts a ban rule.
+ *
+ * \param self Server.
+ * \param ip Address to ban.
+ * \return Nonzero on success.
+ */
+int
+lisrv_server_insert_ban (lisrvServer* self,
+                         const char*  ip)
+{
+	int ret;
+
+	pthread_mutex_lock (&self->mutexes.bans);
+	ret = licfg_bans_insert_ban (self->config.bans, ip);
+	pthread_mutex_unlock (&self->mutexes.bans);
+	return ret;
 }
 
 /**
@@ -244,25 +271,6 @@ lisrv_server_load_extension (lisrvServer* self,
 error:
 	lisys_error_append ("cannot initialize module `%s'", name);
 	return 0;
-}
-
-/**
- * \brief Inserts a ban rule.
- *
- * \param self Server.
- * \param ip Address to ban.
- * \return Nonzero on success.
- */
-int
-lisrv_server_insert_ban (lisrvServer* self,
-                         const char*  ip)
-{
-	int ret;
-
-	pthread_mutex_lock (&self->mutexes.bans);
-	ret = licfg_bans_insert_ban (self->config.bans, ip);
-	pthread_mutex_unlock (&self->mutexes.bans);
-	return ret;
 }
 
 /**
@@ -472,15 +480,6 @@ lisrv_server_get_unique_object (const lisrvServer* self)
 }
 
 /****************************************************************************/
-
-static int
-private_init_ai (lisrvServer* self)
-{
-	self->helper.path_solver = liai_path_solver_new ();
-	if (self->helper.path_solver == NULL)
-		return 0;
-	return 1;
-}
 
 static int
 private_init_bans (lisrvServer* self)

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,7 +25,7 @@
 #ifndef __AI_PATH_H__
 #define __AI_PATH_H__
 
-#include "ai-waypoint.h"
+#include <math/lips-math.h>
 
 typedef struct _liaiPath liaiPath;
 struct _liaiPath
@@ -45,13 +45,13 @@ void
 liai_path_free (liaiPath* self);
 
 int
-liai_path_append_point (liaiPath*       self,
+liai_path_append_point (liaiPath*          self,
                         const limatVector* point);
 
 void
 liai_path_get_point (const liaiPath* self,
                      int             index,
-                     limatVector*       value);
+                     limatVector*    value);
 
 int
 liai_path_get_length (const liaiPath* self);

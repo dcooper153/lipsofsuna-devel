@@ -44,15 +44,15 @@ endif
 aidir = $(includedir)/lipsofsuna/ai
 ai_HEADERS = \
 	ai/lips-ai.h \
+	ai/ai-manager.h \
 	ai/ai-path.h \
-	ai/ai-path-solver.h \
+	ai/ai-sector.h \
+	ai/ai-types.h \
 	ai/ai-waypoint.h
 aisrc = \
+	ai/ai-manager.c \
 	ai/ai-path.c \
-	ai/ai-path-solver.c \
-	ai/ai-sector.c \
-	ai/ai-sector.h \
-	ai/ai-waypoint.c
+	ai/ai-sector.c
 
 algdir = $(includedir)/lipsofsuna/algorithm
 alg_HEADERS = \

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,9 +18,10 @@
 #ifndef __LIPS_AI_H__
 #define __LIPS_AI_H__
 
+#include "ai-manager.h"
 #include "ai-path.h"
-#include "ai-path-solver.h"
 #include "ai-sector.h"
+#include "ai-types.h"
 #include "ai-waypoint.h"
 
 #endif

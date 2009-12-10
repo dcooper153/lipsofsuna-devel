@@ -331,48 +331,6 @@ Object_send (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- FIXME
- * --
- * -- @param self Object.
- * -- @param vector Vector.
- * function Object.resolve_path(self, path)
- */
-static int
-Object_solve_path (lua_State* lua)
-{
-	liaiPath* tmp;
-	liscrData* path;
-	liscrData* object;
-	liscrData* vector;
-	liscrScript* script = liscr_script (lua);
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-
-	/* Solve path. */
-	tmp = lisrv_object_solve_path (object->data, vector->data);
-	if (tmp == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-
-	/* Create path object. */
-	path = liscr_data_new (script, tmp, LICOM_SCRIPT_PATH, liai_path_free);
-	if (path == NULL)
-	{
-		liai_path_free (tmp);
-		lua_pushnil (lua);
-		return 1;
-	}
-
-	liscr_pushdata (lua, path);
-	liscr_data_unref (path, NULL);
-	return 1;
-}
-
-/* @luadoc
- * ---
  * -- Swaps the clients of the objects.
  * --
  * -- Switches the clients of the passed objects so that the client of the first
@@ -590,7 +548,6 @@ lisrvObjectScript (liscrClass* self,
 	liscr_class_insert_func (self, "new", Object_new);
 	liscr_class_insert_func (self, "purge", Object_purge);
 	liscr_class_insert_func (self, "send", Object_send);
-	liscr_class_insert_func (self, "solve_path", Object_solve_path);
 	liscr_class_insert_func (self, "swap_clients", Object_swap_clients);
 	liscr_class_insert_func (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_getter (self, "client", Object_getter_client);

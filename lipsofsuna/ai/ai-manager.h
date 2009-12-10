@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,33 +18,46 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiPathSolver Path Solver
+ * \addtogroup liaiPath Path
  * @{
  */
 
-#ifndef __AI_PATH_SOLVER_H__
-#define __AI_PATH_SOLVER_H__
+#ifndef __AI_MANAGER_H__
+#define __AI_MANAGER_H__
 
 #include <algorithm/lips-algorithm.h>
+#include <math/lips-math.h>
+#include <voxel/lips-voxel.h>
 #include "ai-path.h"
-#include "ai-waypoint.h"
+#include "ai-types.h"
 
-typedef struct _liaiPathSolver liaiPathSolver;
-struct _liaiPathSolver
+struct _liaiManager
 {
 	lialgAstar* astar;
+	lialgU32dic* sectors;
+	livoxManager* voxels;
 };
 
-liaiPathSolver*
-liai_path_solver_new ();
+liaiManager*
+liai_manager_new (livoxManager* voxels);
 
 void
-liai_path_solver_free (liaiPathSolver* self);
+liai_manager_free (liaiManager* self);
+
+liaiSector*
+liai_manager_find_sector (liaiManager* self,
+                          int          sx,
+                          int          sy,
+                          int          sz);
+
+liaiWaypoint*
+liai_manager_find_waypoint (liaiManager*       self,
+                            const limatVector* point);
 
 liaiPath*
-liai_path_solver_solve (liaiPathSolver* self,
-                        liaiWaypoint*   start,
-                        liaiWaypoint*   end);
+liai_manager_solve_path (liaiManager*       self,
+                         const limatVector* start,
+                         const limatVector* end);
 
 #endif
 

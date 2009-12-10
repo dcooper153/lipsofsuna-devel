@@ -25,7 +25,6 @@
 #ifndef __SERVER_OBJECT_H__
 #define __SERVER_OBJECT_H__
 
-#include <ai/lips-ai.h>
 #include <archive/lips-archive.h>
 #include <engine/lips-engine.h>
 #include <script/lips-script.h>
@@ -71,10 +70,6 @@ lisrv_object_sees (const liengObject* self,
 int
 lisrv_object_serialize (liengObject* self,
                         int          save);
-
-liaiPath*
-lisrv_object_solve_path (const liengObject* self,
-                         const limatVector* target);
 
 void
 lisrv_object_swap (liengObject* self,

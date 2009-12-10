@@ -32,7 +32,7 @@
 /* @luadoc
  * module "Extension.Server.Npc"
  * ---
- * -- Create non-player characters.
+ * -- Create intelligent non-player characters.
  * -- @name Inventory
  * -- @class table
  */
@@ -57,7 +57,7 @@ Npc_new (lua_State* lua)
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_NPC);
 
 	/* Allocate self. */
-	logic = liext_npc_new (module->server);
+	logic = liext_npc_new (module);
 	if (logic == NULL)
 	{
 		lua_pushnil (lua);
@@ -78,6 +78,49 @@ Npc_new (lua_State* lua)
 
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);
+	return 1;
+}
+
+/* @luadoc
+ * ---
+ * -- Solves the path to a point for the NPC logic.
+ * --
+ * -- @paran self Npc.
+ * -- @param vector Vector.
+ * -- @return Path or nil.
+ * function Npc.solve_path(self, vector)
+ */
+static int
+Npc_solve_path (lua_State* lua)
+{
+	liaiPath* tmp;
+	liscrData* self;
+	liscrData* path;
+	liscrData* vector;
+	liscrScript* script = liscr_script (lua);
+	liextNpc* data;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
+	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	data = self->data;
+
+	/* Solve path. */
+	if (data->object == NULL)
+		return 0;
+	tmp = liext_module_solve_path (data->module, data->object, vector->data);
+	if (tmp == NULL)
+		return 0;
+
+	/* Create path object. */
+	path = liscr_data_new (script, tmp, LICOM_SCRIPT_PATH, liai_path_free);
+	if (path == NULL)
+	{
+		liai_path_free (tmp);
+		return 0;
+	}
+
+	liscr_pushdata (lua, path);
+	liscr_data_unref (path, NULL);
 	return 1;
 }
 
@@ -280,6 +323,7 @@ liextNpcScript (liscrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);
 	liscr_class_insert_func (self, "new", Npc_new);
+	liscr_class_insert_func (self, "solve_path", Npc_solve_path);
 	liscr_class_insert_getter (self, "alert", Npc_getter_alert);
 	liscr_class_insert_getter (self, "object", Npc_getter_object);
 	liscr_class_insert_getter (self, "radius", Npc_getter_radius);

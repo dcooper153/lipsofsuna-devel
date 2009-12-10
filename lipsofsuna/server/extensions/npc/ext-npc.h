@@ -29,15 +29,15 @@
 
 #include <server/lips-server.h>
 #include <system/lips-system.h>
+#include "ext-module.h"
 
-typedef struct _liextNpc liextNpc;
 struct _liextNpc
 {
 	licalHandle calls[1];
 	liengObject* object;
 	liengObject* target;
+	liextModule* module;
 	liscrData* data;
-	lisrvServer* server;
 	int active;
 	int alert;
 	float radius;
@@ -46,7 +46,7 @@ struct _liextNpc
 };
 
 liextNpc*
-liext_npc_new (lisrvServer* server);
+liext_npc_new (liextModule* module);
 
 void
 liext_npc_free (liextNpc* self);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,14 +27,20 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
+#include <ai/lips-ai.h>
 #include <script/lips-script.h>
+#include <voxel/lips-voxel.h>
 
 #define LIEXT_SCRIPT_NPC "Lips.Npc"
 
 typedef struct _liextModule liextModule;
+typedef struct _liextNpc liextNpc;
+
 struct _liextModule
 {
+	liaiManager* ai;
 	lisrvServer* server;
+	livoxManager* voxels;
 };
 
 liextModule*
@@ -42,6 +48,11 @@ liext_module_new (lisrvServer* server);
 
 void
 liext_module_free (liextModule* self);
+
+liaiPath*
+liext_module_solve_path (liextModule*       self,
+                         const liengObject* object,
+                         const limatVector* target);
 
 /*****************************************************************************/
 

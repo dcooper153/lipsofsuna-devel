@@ -196,6 +196,20 @@ licli_module_connect (licliModule* self,
 }
 
 /**
+ * \brief Finds an extension by name.
+ *
+ * \param self Module.
+ * \param name Extension name.
+ * \return Extension or NULL.
+ */
+licliExtension*
+licli_module_find_extension (licliModule* self,
+                             const char*  name)
+{
+	return lialg_strdic_find (self->extensions, name);
+}
+
+/**
  * \brief Finds and object by object number.
  *
  * If the module isn't networked, NULL is returned.

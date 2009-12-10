@@ -124,8 +124,7 @@ liblipsofsunaclient_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ai/ai-path.lo ai/ai-path-solver.lo ai/ai-sector.lo \
-	ai/ai-waypoint.lo
+am__objects_1 = ai/ai-manager.lo ai/ai-path.lo ai/ai-sector.lo
 am__objects_2 = algorithm/algorithm-astar.lo \
 	algorithm/algorithm-bst.lo algorithm/algorithm-camera.lo \
 	algorithm/algorithm-octree.lo
@@ -661,16 +660,16 @@ lib_LTLIBRARIES = $(am__append_4) $(am__append_6) $(am__append_8) \
 aidir = $(includedir)/lipsofsuna/ai
 ai_HEADERS = \
 	ai/lips-ai.h \
+	ai/ai-manager.h \
 	ai/ai-path.h \
-	ai/ai-path-solver.h \
+	ai/ai-sector.h \
+	ai/ai-types.h \
 	ai/ai-waypoint.h
 
 aisrc = \
+	ai/ai-manager.c \
 	ai/ai-path.c \
-	ai/ai-path-solver.c \
-	ai/ai-sector.c \
-	ai/ai-sector.h \
-	ai/ai-waypoint.c
+	ai/ai-sector.c
 
 algdir = $(includedir)/lipsofsuna/algorithm
 alg_HEADERS = \
@@ -1354,10 +1353,9 @@ ai/$(am__dirstamp):
 ai/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ai/$(DEPDIR)
 	@: > ai/$(DEPDIR)/$(am__dirstamp)
+ai/ai-manager.lo: ai/$(am__dirstamp) ai/$(DEPDIR)/$(am__dirstamp)
 ai/ai-path.lo: ai/$(am__dirstamp) ai/$(DEPDIR)/$(am__dirstamp)
-ai/ai-path-solver.lo: ai/$(am__dirstamp) ai/$(DEPDIR)/$(am__dirstamp)
 ai/ai-sector.lo: ai/$(am__dirstamp) ai/$(DEPDIR)/$(am__dirstamp)
-ai/ai-waypoint.lo: ai/$(am__dirstamp) ai/$(DEPDIR)/$(am__dirstamp)
 algorithm/$(am__dirstamp):
 	@$(MKDIR_P) algorithm
 	@: > algorithm/$(am__dirstamp)
@@ -2005,14 +2003,12 @@ lipsofsuna-viewer$(EXEEXT): $(lipsofsuna_viewer_OBJECTS) $(lipsofsuna_viewer_DEP
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f ai/ai-path-solver.$(OBJEXT)
-	-rm -f ai/ai-path-solver.lo
+	-rm -f ai/ai-manager.$(OBJEXT)
+	-rm -f ai/ai-manager.lo
 	-rm -f ai/ai-path.$(OBJEXT)
 	-rm -f ai/ai-path.lo
 	-rm -f ai/ai-sector.$(OBJEXT)
 	-rm -f ai/ai-sector.lo
-	-rm -f ai/ai-waypoint.$(OBJEXT)
-	-rm -f ai/ai-waypoint.lo
 	-rm -f algorithm/algorithm-astar.$(OBJEXT)
 	-rm -f algorithm/algorithm-astar.lo
 	-rm -f algorithm/algorithm-bst.$(OBJEXT)
@@ -2360,10 +2356,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@ai/$(DEPDIR)/ai-path-solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@ai/$(DEPDIR)/ai-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ai/$(DEPDIR)/ai-path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ai/$(DEPDIR)/ai-sector.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@ai/$(DEPDIR)/ai-waypoint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-astar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-bst.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-camera.Plo@am__quote@

@@ -516,38 +516,6 @@ lisrv_object_sees (const liengObject* self,
 }
 
 /**
- * \brief Solves path to the requested point.
- *
- * \param self Object.
- * \param target Target position vector.
- * \return New path or NULL if couldn't solve.
- */
-liaiPath*
-lisrv_object_solve_path (const liengObject* self,
-                         const limatVector*    target)
-{
-#warning Path solving is disabled.
-#if 0
-	liaiWaypoint* start;
-	liaiWaypoint* end;
-	limatVector position;
-	lisrvObject* data = LISRV_OBJECT (self);
-
-	if (self->sector == NULL || self->sector->aisector == NULL)
-		return NULL;
-
-	lisrv_object_get_position (self, &position);
-	start = liai_sector_find_waypoint (self->sector->aisector, &position);
-	end = liai_sector_find_waypoint (self->sector->aisector, target);
-	if (start == NULL || end == NULL)
-		return NULL;
-
-	return liai_path_solver_solve (server->helper.path_solver, start, end);
-#endif
-	return NULL;
-}
-
-/**
  * \brief Swaps the clients of the objects.
  *
  * \param self Object.
