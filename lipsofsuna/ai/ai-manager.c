@@ -27,28 +27,32 @@
 #include "ai-sector.h"
 
 static float
-private_astar_cost (void*         world,
+private_astar_cost (liaiManager*  self,
                     void*         object,
                     liaiWaypoint* start,
                     liaiWaypoint* end);
 
 static float
-private_astar_heuristic (void*         world,
+private_astar_heuristic (liaiManager*  self,
                          void*         object,
                          liaiWaypoint* start,
                          liaiWaypoint* end);
 
 static int
-private_astar_passable (void*         world,
+private_astar_passable (liaiManager*  self,
                         void*         object,
                         liaiWaypoint* start,
                         liaiWaypoint* end);
 
 static void*
-private_astar_successor (void*         world,
+private_astar_successor (liaiManager*  self,
                          void*         object,
                          liaiWaypoint* node,
                          int           index);
+
+static int
+private_block_load (liaiManager*      self,
+                    livoxUpdateEvent* event);
 
 static liaiPath*
 private_solve_path (liaiManager*  self,
@@ -95,6 +99,13 @@ liai_manager_new (livoxManager* voxels)
 		return NULL;
 	}
 
+	/* Register callbacks. */
+	if (self->voxels != NULL)
+	{
+		lical_callbacks_insert_callback (self->voxels->callbacks,
+			LIVOX_CALLBACK_LOAD_BLOCK, 1, private_block_load, self, self->calls + 0);
+	}
+
 	return self;
 }
 
@@ -107,6 +118,13 @@ void
 liai_manager_free (liaiManager* self)
 {
 	lialgU32dicIter iter;
+
+	/* Unregister callbacks. */
+	if (self->voxels != NULL)
+	{
+		lical_callbacks_remove_callbacks (self->voxels->callbacks,
+			self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	}
 
 	/* Free sectors. */
 	if (self->sectors != NULL)
@@ -150,12 +168,53 @@ liai_manager_find_waypoint (liaiManager*       self,
 	sx = x / LIAI_WAYPOINTS_PER_LINE;
 	sy = y / LIAI_WAYPOINTS_PER_LINE;
 	sz = z / LIAI_WAYPOINTS_PER_LINE;
+	x %= LIAI_WAYPOINTS_PER_LINE;
+	y %= LIAI_WAYPOINTS_PER_LINE;
+	z %= LIAI_WAYPOINTS_PER_LINE;
 
 	sector = lialg_u32dic_find (self->sectors, LIAI_SECTOR_INDEX (sx, sy, sz));
 	if (sector == NULL)
 		return NULL;
 
 	return liai_sector_get_waypoint (sector, x, y, z);
+}
+
+int
+liai_manager_load_sector (liaiManager* self,
+                          int          sx,
+                          int          sy,
+                          int          sz)
+{
+	liaiSector* sector;
+	livoxSector* voxels;
+
+	/* Get terrain data. */
+	if (self->voxels != NULL)
+		voxels = livox_manager_find_sector (self->voxels, LIVOX_SECTOR_INDEX (sx, sy, sz));
+	else
+		voxels = NULL;
+
+	/* Check for existing. */
+	sector = liai_manager_find_sector (self, sx, sy, sz);
+	if (sector != NULL)
+	{
+		liai_sector_build (sector, voxels);
+		return 1;
+	}
+
+	/* Create new sector. */
+	sector = liai_sector_new (self, sx, sy, sz, voxels);
+	if (sector == NULL)
+		return 0;
+
+	/* Add to dictionary. */
+	if (!lialg_u32dic_insert (self->sectors, LIAI_SECTOR_INDEX (sx, sy, sz), sector))
+	{
+		liai_sector_free (sector);
+		return 0;
+	}
+
+	return 1;
 }
 
 /**
@@ -185,7 +244,7 @@ liai_manager_solve_path (liaiManager*       self,
 /*****************************************************************************/
 
 static float
-private_astar_cost (void*         world,
+private_astar_cost (liaiManager*  self,
                     void*         object,
                     liaiWaypoint* start,
                     liaiWaypoint* end)
@@ -195,7 +254,7 @@ private_astar_cost (void*         world,
 }
 
 static float
-private_astar_heuristic (void*         world,
+private_astar_heuristic (liaiManager*  self,
                          void*         object,
                          liaiWaypoint* start,
                          liaiWaypoint* end)
@@ -206,7 +265,7 @@ private_astar_heuristic (void*         world,
 }
 
 static int
-private_astar_passable (void*         world,
+private_astar_passable (liaiManager*  self,
                         void*         object,
                         liaiWaypoint* start,
                         liaiWaypoint* end)
@@ -216,7 +275,7 @@ private_astar_passable (void*         world,
 }
 
 static void*
-private_astar_successor (void*         world,
+private_astar_successor (liaiManager*  self,
                          void*         object,
                          liaiWaypoint* node,
                          int           index)
@@ -228,6 +287,7 @@ private_astar_successor (void*         world,
 	int sx;
 	int sy;
 	int sz;
+	int pos;
 	liaiWaypoint* wp;
 	liaiSector* sector;
 	static const int rel[27][3] =
@@ -236,7 +296,6 @@ private_astar_successor (void*         world,
 		{  0,  0, -1 },
 		{  1,  0, -1 },
 		{ -1,  0,  0 },
-		{  0,  0,  0 },
 		{  1,  0,  0 },
 		{ -1,  0,  1 },
 		{  0,  0,  1 },
@@ -261,7 +320,7 @@ private_astar_successor (void*         world,
 		{  1,  1,  1 }
 	};
 
-	for (i = index ; i < 27 ; i++)
+	for (i = pos = 0 ; i < 27 ; i++)
 	{
 		/* Find next node. */
 		x = node->x + rel[index][0];
@@ -288,11 +347,52 @@ private_astar_successor (void*         world,
 
 		/* Get next node. */
 		wp = liai_sector_get_waypoint (sector, x, y, z);
-		if (!(wp->flags & 1))
-			return wp;
+#warning Walkability flags are broken so path solving assumes all monsters can fly.
+		if (!(wp->flags))
+		/*if ((wp->flags & LIAI_WAYPOINT_FLAG_WALKABLE) || (!wp->flags && y < 0))*/
+		{
+			if (++pos == index + 1)
+				return wp;
+		}
 	}
 
 	return NULL;
+}
+
+static int
+private_block_load (liaiManager*      self,
+                    livoxUpdateEvent* event)
+{
+	uint32_t id;
+	liaiSector* asector;
+	livoxSector* vsector;
+
+	/* Find voxel sector. */
+	id = LIAI_SECTOR_INDEX (event->sector[0], event->sector[1], event->sector[2]);
+	vsector = livox_manager_find_sector (self->voxels, id);
+	if (vsector == NULL)
+		return 1;
+
+	/* Find or create AI sector. */
+	asector = lialg_u32dic_find (self->sectors, id);
+	if (asector == NULL)
+	{
+		asector = liai_sector_new (self, event->sector[0], event->sector[1], event->sector[2], vsector);
+		if (asector == NULL)
+			return 1;
+		if (!lialg_u32dic_insert (self->sectors, id, asector))
+		{
+			liai_sector_free (asector);
+			return 1;
+		}
+	}
+
+	/* Build block. */
+	liai_sector_build_area (asector, vsector,
+		event->block[0], event->block[1], event->block[2],
+		LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE);
+
+	return 1;
 }
 
 /**
@@ -314,7 +414,7 @@ private_solve_path (liaiManager*  self,
 	lialgAstarResult* result;
 
 	/* Solve path, */
-	result = lialg_astar_solve (self->astar, NULL, NULL, start, end);
+	result = lialg_astar_solve (self->astar, self, NULL, start, end);
 	if (result == NULL)
 		return NULL;
 

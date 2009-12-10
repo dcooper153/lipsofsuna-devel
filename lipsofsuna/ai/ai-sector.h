@@ -51,6 +51,10 @@ void
 liai_sector_free (liaiSector* self);
 
 void
+liai_sector_build (liaiSector*  self,
+                   livoxSector* voxels);
+
+void
 liai_sector_build_area (liaiSector*  self,
                         livoxSector* voxels,
                         int          x,

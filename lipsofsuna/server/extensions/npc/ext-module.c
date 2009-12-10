@@ -65,7 +65,7 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	}
 
-	/* Register clases. */
+	/* Register classes. */
 	liscr_script_create_class (server->script, "Npc", liextNpcScript, self);
 
 	return self;

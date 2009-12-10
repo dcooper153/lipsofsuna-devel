@@ -65,22 +65,21 @@ liai_sector_new (liaiManager* manager,
 
 	/* Set waypoint positions. */
 	for (k = l = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++)
-	for (j = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++)
-	for (i = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++, l++)
+	for (j = 0 ; j < LIAI_WAYPOINTS_PER_LINE ; j++)
+	for (i = 0 ; i < LIAI_WAYPOINTS_PER_LINE ; i++, l++)
 	{
 		wp = self->points + l;
 		wp->x = i;
 		wp->y = j;
 		wp->z = k;
 		wp->sector = self;
-		wp->position = limat_vector_init (i, j, k);
+		wp->position = limat_vector_init (i + 0.5f, j + 0.5f, k + 0.5f);
 		wp->position = limat_vector_multiply (wp->position, LIAI_WAYPOINT_WIDTH);
 		wp->position = limat_vector_add (wp->position, offset);
 	}
 
 	/* Build waypoints. */
-	liai_sector_build_area (self, voxels, 0, 0, 0, LIAI_WAYPOINTS_PER_LINE,
-		LIAI_WAYPOINTS_PER_LINE, LIAI_WAYPOINTS_PER_LINE);
+	liai_sector_build (self, voxels);
 
 	return self;
 }
@@ -94,6 +93,22 @@ void
 liai_sector_free (liaiSector* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Rebuilds the waypoints for the sector.
+ *
+ * \param self Sector.
+ * \param voxels Voxel sector or NULL.
+ */
+void
+liai_sector_build (liaiSector*  self,
+                   livoxSector* voxels)
+{
+	liai_sector_build_area (self, voxels, 0, 0, 0,
+		LIAI_WAYPOINTS_PER_LINE,
+		LIAI_WAYPOINTS_PER_LINE,
+		LIAI_WAYPOINTS_PER_LINE);
 }
 
 /**
@@ -122,27 +137,41 @@ liai_sector_build_area (liaiSector*  self,
 	int j;
 	int k;
 	liaiWaypoint* wp;
+	liaiWaypoint* wp1;
 	livoxVoxel* voxel;
 
 	if (voxels != NULL)
 	{
+		/* Mark ground. */
 		for (k = x ; k < zs ; k++)
-		for (j = y ; k < ys ; k++)
-		for (i = z ; k < xs ; k++)
+		for (j = y ; j < ys ; j++)
+		for (i = z ; i < xs ; i++)
 		{
 			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
 			voxel = livox_sector_get_voxel (voxels, i, j, k);
 			if (voxel->type)
-				wp->flags = 1;
+				wp->flags = LIAI_WAYPOINT_FLAG_GROUND;
 			else
 				wp->flags = 0;
+		}
+
+		/* Mark walkable . */
+#warning Walkability flags are broken for the bottommost plane of the updated area
+		for (k = x ; k < zs ; k++)
+		for (j = y ; j < ys - 1 ; j++)
+		for (i = z ; i < xs ; i++)
+		{
+			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
+			wp1 = self->points + LIAI_WAYPOINT_INDEX (i, j + 1, k);
+			if (wp1->flags & LIAI_WAYPOINT_FLAG_GROUND)
+				wp->flags = LIAI_WAYPOINT_FLAG_WALKABLE;
 		}
 	}
 	else
 	{
 		for (k = x ; k < zs ; k++)
-		for (j = y ; k < ys ; k++)
-		for (i = z ; k < xs ; k++)
+		for (j = y ; j < ys ; j++)
+		for (i = z ; i < xs ; i++)
 		{
 			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
 			wp->flags = 0;

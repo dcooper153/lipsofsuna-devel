@@ -35,6 +35,7 @@ struct _liaiManager
 {
 	lialgAstar* astar;
 	lialgU32dic* sectors;
+	licalHandle calls[1];
 	livoxManager* voxels;
 };
 
@@ -53,6 +54,12 @@ liai_manager_find_sector (liaiManager* self,
 liaiWaypoint*
 liai_manager_find_waypoint (liaiManager*       self,
                             const limatVector* point);
+
+int
+liai_manager_load_sector (liaiManager* self,
+                          int          sx,
+                          int          sy,
+                          int          sz);
 
 liaiPath*
 liai_manager_solve_path (liaiManager*       self,
