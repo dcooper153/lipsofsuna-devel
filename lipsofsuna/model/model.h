@@ -149,6 +149,10 @@ limdl_model_insert_material (limdlModel*          self,
                              const limdlMaterial* material);
 
 int
+limdl_model_insert_node (limdlModel*      self,
+                         const limdlNode* node);
+
+int
 limdl_model_insert_vertex (limdlModel*         self,
                            const limdlVertex*  vertex,
                            const limdlWeights* weights);

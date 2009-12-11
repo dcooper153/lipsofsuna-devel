@@ -336,13 +336,36 @@ private_merge_model (liextBlock* self,
 	void* ptr;
 	uint32_t indices[3];
 	lialgMemdic* accel;
+	limatTransform transform;
 	limdlFaces* faces;
 	limdlMaterial* material;
+	limdlNode* node;
 	limdlVertex verts[3];
 
 	accel = lialg_memdic_new ();
 	if (accel == NULL)
 		return;
+
+	/* Add each light source. */
+	for (i = 0 ; i < model->nodes.count ; i++)
+	{
+		for (j = 0 ; j < model->nodes.array[i]->nodes.count ; j++)
+		{
+			node = model->nodes.array[i]->nodes.array[j];
+			if (node->type == LIMDL_NODE_LIGHT)
+			{
+				if (limdl_model_insert_node (self->mmodel, node))
+				{
+					node = self->mmodel->nodes.array[self->mmodel->nodes.count - 1];
+					limdl_node_get_world_transform (node, &transform);
+					transform = limat_transform_multiply (transform, voxel->transform);
+					node->transform.rest = limat_transform_identity ();
+					node->transform.local = transform;
+					node->transform.global = transform;
+				}
+			}
+		}
+	}
 
 	/* Add each face group. */
 	for (i = 0 ; i < model->facegroups.count ; i++)

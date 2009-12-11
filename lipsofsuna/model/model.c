@@ -616,6 +616,33 @@ limdl_model_insert_material (limdlModel*          self,
 }
 
 /**
+ * \brief Inserts a node to the model.
+ *
+ * \param self Model.
+ * \param node Node.
+ * \return Nonzero on success.
+ */
+int
+limdl_model_insert_node (limdlModel*      self,
+                         const limdlNode* node)
+{
+	limdlNode** tmp;
+
+	tmp = realloc (self->nodes.array, (self->nodes.count + 1) * sizeof (limdlNode*));
+	if (tmp == NULL)
+		return 0;
+	self->nodes.array = tmp;
+	tmp += self->nodes.count;
+
+	*tmp = limdl_node_copy (node);
+	if (*tmp == NULL)
+		return 0;
+	self->nodes.count++;
+
+	return 1;
+}
+
+/**
  * \brief Inserts a vertex to the model.
  *
  * \param self Model.
