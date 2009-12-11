@@ -37,7 +37,8 @@ struct _liextNpc
 	liengObject* object;
 	liengObject* target;
 	liextModule* module;
-	liscrData* data;
+	liscrData* path;
+	liscrData* script;
 	int active;
 	int alert;
 	float radius;
@@ -61,6 +62,10 @@ liext_npc_set_active (liextNpc* self,
 int
 liext_npc_set_object (liextNpc*    self,
                       liengObject* object);
+
+void
+liext_npc_set_path (liextNpc*  self,
+                    liscrData* path);
 
 void
 liext_npc_set_target (liextNpc*    self,

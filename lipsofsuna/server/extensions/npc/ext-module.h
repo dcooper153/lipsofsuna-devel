@@ -28,6 +28,7 @@
 #define __EXT_MODULE_H__
 
 #include <ai/lips-ai.h>
+#include <algorithm/lips-algorithm.h>
 #include <script/lips-script.h>
 #include <voxel/lips-voxel.h>
 
@@ -39,6 +40,7 @@ typedef struct _liextNpc liextNpc;
 struct _liextModule
 {
 	liaiManager* ai;
+	lialgPtrdic* dictionary;
 	lisrvServer* server;
 	livoxManager* voxels;
 };
@@ -48,6 +50,10 @@ liext_module_new (lisrvServer* server);
 
 void
 liext_module_free (liextModule* self);
+
+liextNpc*
+liext_module_find_npc (liextModule* self,
+                       liengObject* owner);
 
 liaiPath*
 liext_module_solve_path (liextModule*       self,

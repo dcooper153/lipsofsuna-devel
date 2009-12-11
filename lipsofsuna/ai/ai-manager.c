@@ -249,8 +249,12 @@ private_astar_cost (liaiManager*  self,
                     liaiWaypoint* start,
                     liaiWaypoint* end)
 {
-	return limat_vector_get_length (
-		limat_vector_subtract (start->position, end->position));
+	limatVector diff;
+
+	diff = limat_vector_subtract (start->position, end->position);
+
+	/* FIXME: Gives lots of penalty for climbing. */
+	return limat_vector_get_length (diff) + 50.0f * LI_MAX (0, diff.y);
 }
 
 static float
@@ -290,7 +294,7 @@ private_astar_successor (liaiManager*  self,
 	int pos;
 	liaiWaypoint* wp;
 	liaiSector* sector;
-	static const int rel[27][3] =
+	static const int rel[26][3] =
 	{
 		{ -1,  0, -1 },
 		{  0,  0, -1 },
@@ -320,12 +324,12 @@ private_astar_successor (liaiManager*  self,
 		{  1,  1,  1 }
 	};
 
-	for (i = pos = 0 ; i < 27 ; i++)
+	for (i = pos = 0 ; i < 26 ; i++)
 	{
 		/* Find next node. */
-		x = node->x + rel[index][0];
-		y = node->y + rel[index][1];
-		z = node->z + rel[index][2];
+		x = node->x + rel[i][0];
+		y = node->y + rel[i][1];
+		z = node->z + rel[i][2];
 		sx = node->sector->x;
 		sy = node->sector->y;
 		sz = node->sector->z;
@@ -346,12 +350,14 @@ private_astar_successor (liaiManager*  self,
 		}
 
 		/* Get next node. */
+		/* FIXME: No support for flying monsters. */
 		wp = liai_sector_get_waypoint (sector, x, y, z);
 #warning Walkability flags are broken so path solving assumes all monsters can fly.
-		if (!(wp->flags))
-		/*if ((wp->flags & LIAI_WAYPOINT_FLAG_WALKABLE) || (!wp->flags && y < 0))*/
+		if (wp->flags & LIAI_WAYPOINT_FLAG_FLYABLE)
+/*		if ((wp->flags & LIAI_WAYPOINT_FLAG_WALKABLE) ||
+		   ((wp->flags & LIAI_WAYPOINT_FLAG_FLYABLE) && y < 0))*/
 		{
-			if (++pos == index + 1)
+			if (pos++ == index)
 				return wp;
 		}
 	}

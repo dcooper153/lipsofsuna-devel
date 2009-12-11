@@ -48,6 +48,14 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	self->server = server;
 
+	/* Allocate dictionary. */
+	self->dictionary = lialg_ptrdic_new ();
+	if (self->dictionary == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+
 	/* Check for voxel terrain. */
 	ext = lisrv_server_find_extension (server, "voxel");
 	if (ext != NULL)
@@ -61,7 +69,7 @@ liext_module_new (lisrvServer* server)
 	self->ai = liai_manager_new (self->voxels);
 	if (self->ai == NULL)
 	{
-		lisys_free (self);
+		liext_module_free (self);
 		return NULL;
 	}
 
@@ -74,9 +82,18 @@ liext_module_new (lisrvServer* server)
 void
 liext_module_free (liextModule* self)
 {
+	if (self->dictionary != NULL)
+		lialg_ptrdic_free (self->dictionary);
 	if (self->ai != NULL)
 		liai_manager_free (self->ai);
 	lisys_free (self);
+}
+
+liextNpc*
+liext_module_find_npc (liextModule* self,
+                       liengObject* owner)
+{
+	return lialg_ptrdic_find (self->dictionary, owner);
 }
 
 /**
@@ -95,6 +112,7 @@ liext_module_solve_path (liextModule*       self,
 	limatTransform transform;
 
 	lieng_object_get_transform (object, &transform);
+	transform.position.y += 0.5f;
 
 	return liai_manager_solve_path (self->ai, &transform.position, target);
 }

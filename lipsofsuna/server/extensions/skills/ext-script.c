@@ -487,13 +487,21 @@ Skills_getter_owner (lua_State* lua)
 static int
 Skills_setter_owner (lua_State* lua)
 {
-	liscrData* object;
-	liscrData* self;
+	liengObject* object;
+	liextSkills* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS)->data;
+	if (!lua_isnoneornil (lua, 3))
+	{
+		object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT)->data;
+		luaL_argcheck (lua,
+			lialg_ptrdic_find (self->module->dictionary, object) == NULL,
+			3, "object already has a skills attached");
+	}
+	else
+		object = NULL;
 
-	liext_skills_set_owner (self->data, object->data);
+	liext_skills_set_owner (self, object);
 	return 0;
 }
 

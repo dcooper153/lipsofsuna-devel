@@ -33,9 +33,36 @@
  * module "Extension.Server.Npc"
  * ---
  * -- Create intelligent non-player characters.
- * -- @name Inventory
+ * -- @name Npc
  * -- @class table
  */
+
+/* @luadoc
+ * ---
+ * -- @brief Finds the NPC logic for an object.
+ * -- @param self Npc class.
+ * -- @param object Object whose logic to find.
+ * -- @return Npc or nil.
+ * function Npc.find(self, object)
+ */
+static int
+Npc_find (lua_State* lua)
+{
+	liextModule* module;
+	liextNpc* npc;
+	liscrData* object;
+
+	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_NPC);
+	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
+
+	/* Find logic. */
+	npc = liext_module_find_npc (module, object->data);
+	if (npc == NULL)
+		return 0;
+	liscr_pushdata (lua, npc->script);
+
+	return 1;
+}
 
 /* @luadoc
  * ---
@@ -70,7 +97,7 @@ Npc_new (lua_State* lua)
 		lua_pushnil (lua);
 		return 1;
 	}
-	logic->data = self;
+	logic->script = self;
 
 	/* Copy attributes. */
 	if (!lua_isnoneornil (lua, 2))
@@ -94,20 +121,18 @@ static int
 Npc_solve_path (lua_State* lua)
 {
 	liaiPath* tmp;
-	liscrData* self;
+	liextNpc* self;
 	liscrData* path;
 	liscrData* vector;
 	liscrScript* script = liscr_script (lua);
-	liextNpc* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	data = self->data;
 
 	/* Solve path. */
-	if (data->object == NULL)
+	if (self->object == NULL)
 		return 0;
-	tmp = liext_module_solve_path (data->module, data->object, vector->data);
+	tmp = liext_module_solve_path (self->module, self->object, vector->data);
 	if (tmp == NULL)
 		return 0;
 
@@ -121,6 +146,7 @@ Npc_solve_path (lua_State* lua)
 
 	liscr_pushdata (lua, path);
 	liscr_data_unref (path, NULL);
+
 	return 1;
 }
 
@@ -133,27 +159,25 @@ Npc_solve_path (lua_State* lua)
 static int
 Npc_getter_alert (lua_State* lua)
 {
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 
-	lua_pushboolean (lua, data->alert);
+	lua_pushboolean (lua, self->alert);
+
 	return 1;
 }
 static int
 Npc_setter_alert (lua_State* lua)
 {
 	int value;
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 	value = lua_toboolean (lua, 3);
 
-	data->alert = (value != 0);
+	self->alert = (value != 0);
+
 	return 0;
 }
 
@@ -170,41 +194,77 @@ Npc_setter_alert (lua_State* lua)
 /* @luadoc
  * ---
  * -- Controlled object.
- * -- @name Npc.object
+ * -- @name Npc.owner
  * -- @class table
  */
 static int
-Npc_getter_object (lua_State* lua)
+Npc_getter_owner (lua_State* lua)
 {
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 
-	if (data->object != NULL && data->object->script != NULL)
-		liscr_pushdata (lua, data->object->script);
-	else
-		lua_pushnil (lua);
+	if (self->object == NULL || self->object->script == NULL)
+		return 0;
+	liscr_pushdata (lua, self->object->script);
+
 	return 1;
 }
 static int
-Npc_setter_object (lua_State* lua)
+Npc_setter_owner (lua_State* lua)
 {
-	liscrData* self;
-	liscrData* tmp;
 	liengObject* object;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	if (!lua_isnil (lua, 3))
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
+	if (!lua_isnoneornil (lua, 3))
 	{
-		tmp = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-		object = tmp->data;
+		object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT)->data;
+		luaL_argcheck (lua,
+			lialg_ptrdic_find (self->module->dictionary, object) == NULL,
+			3, "object already has a logic attached");
 	}
 	else
 		object = NULL;
 
-	liext_npc_set_object (self->data, object);
+	liext_npc_set_object (self, object);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Sets the path for the object to traverse.
+ * -- @name Npc.path
+ * -- @class table
+ */
+static int
+Npc_getter_path (lua_State* lua)
+{
+	liextNpc* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
+
+	if (self->path == NULL)
+		return 0;
+	liscr_pushdata (lua, self->path);
+
+	return 1;
+}
+static int
+Npc_setter_path (lua_State* lua)
+{
+	liextNpc* self;
+	liscrData* path;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
+	if (!lua_isnoneornil (lua, 3))
+		path = liscr_checkdata (lua, 3, LICOM_SCRIPT_PATH);
+	else
+		path = NULL;
+
+	liext_npc_set_path (self, path);
+
 	return 0;
 }
 
@@ -217,28 +277,26 @@ Npc_setter_object (lua_State* lua)
 static int
 Npc_getter_radius (lua_State* lua)
 {
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 
-	lua_pushnumber (lua, data->radius);
+	lua_pushnumber (lua, self->radius);
+
 	return 1;
 }
 static int
 Npc_setter_radius (lua_State* lua)
 {
 	float value;
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 	value = luaL_checknumber (lua, 3);
 	luaL_argcheck (lua, value >= 0.0f, 3, "negative radius");
 
-	data->radius = value;
+	self->radius = value;
+
 	return 0;
 }
 
@@ -251,28 +309,26 @@ Npc_setter_radius (lua_State* lua)
 static int
 Npc_getter_refresh (lua_State* lua)
 {
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 
-	lua_pushnumber (lua, data->refresh);
+	lua_pushnumber (lua, self->refresh);
+
 	return 1;
 }
 static int
 Npc_setter_refresh (lua_State* lua)
 {
 	float value;
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 	value = luaL_checknumber (lua, 3);
 	luaL_argcheck (lua, value >= 0.0f, 3, "negative refresh");
 
-	data->refresh = value;
+	self->refresh = value;
+
 	return 0;
 }
 
@@ -285,33 +341,34 @@ Npc_setter_refresh (lua_State* lua)
 static int
 Npc_getter_target (lua_State* lua)
 {
-	liscrData* self;
-	liextNpc* data;
+	liextNpc* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
 
-	if (data->target != NULL)
-		liscr_pushdata (lua, data->target->script);
-	else
-		lua_pushnil (lua);
+	if (self->target == NULL)
+		return 0;
+
+	liscr_pushdata (lua, self->target->script);
+
 	return 1;
 }
 static int
 Npc_setter_target (lua_State* lua)
 {
-	liscrData* self;
-	liscrData* object;
-	liextNpc* data;
-	liengObject* tmp;
+	liextNpc* self;
+	liengObject* object;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC);
-	data = self->data;
-	object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-	tmp = object->data;
-	luaL_argcheck (lua, tmp->sector != NULL, 3, "object not in any sector");
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_NPC)->data;
+	if (!lua_isnoneornil (lua, 3))
+	{
+		object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT)->data;
+		luaL_argcheck (lua, lieng_object_get_realized (object), 3, "object is not realized");
+	}
+	else
+		object = NULL;
 
-	liext_npc_set_target (data, tmp);
+	liext_npc_set_target (self, object);
+
 	return 0;
 }
 
@@ -322,15 +379,18 @@ liextNpcScript (liscrClass* self,
                 void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);
+	liscr_class_insert_func (self, "find", Npc_find);
 	liscr_class_insert_func (self, "new", Npc_new);
 	liscr_class_insert_func (self, "solve_path", Npc_solve_path);
 	liscr_class_insert_getter (self, "alert", Npc_getter_alert);
-	liscr_class_insert_getter (self, "object", Npc_getter_object);
+	liscr_class_insert_getter (self, "owner", Npc_getter_owner);
+	liscr_class_insert_getter (self, "path", Npc_getter_path);
 	liscr_class_insert_getter (self, "radius", Npc_getter_radius);
 	liscr_class_insert_getter (self, "refresh", Npc_getter_refresh);
 	liscr_class_insert_getter (self, "target", Npc_getter_target);
 	liscr_class_insert_setter (self, "alert", Npc_setter_alert);
-	liscr_class_insert_setter (self, "object", Npc_setter_object);
+	liscr_class_insert_setter (self, "owner", Npc_setter_owner);
+	liscr_class_insert_setter (self, "path", Npc_setter_path);
 	liscr_class_insert_setter (self, "radius", Npc_setter_radius);
 	liscr_class_insert_setter (self, "refresh", Npc_setter_refresh);
 	liscr_class_insert_setter (self, "target", Npc_setter_target);

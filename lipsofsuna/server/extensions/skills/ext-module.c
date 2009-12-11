@@ -61,6 +61,8 @@ liext_module_new (lisrvServer* server)
 	if (self == NULL)
 		return NULL;
 	self->server = server;
+
+	/* Allocate dictionary. */
 	self->dictionary = lialg_ptrdic_new ();
 	if (self->dictionary == NULL)
 	{
@@ -89,8 +91,8 @@ liext_module_new (lisrvServer* server)
 void
 liext_module_free (liextModule* self)
 {
-	/* FIXME: Remove the class here. */
-	lialg_ptrdic_free (self->dictionary);
+	if (self->dictionary != NULL)
+		lialg_ptrdic_free (self->dictionary);
 	lieng_engine_remove_calls (self->server->engine, self->calls,
 		sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);

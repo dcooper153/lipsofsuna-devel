@@ -50,6 +50,7 @@ liext_npc_new (liextModule* module)
 {
 	liextNpc* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liextNpc));
 	if (self == NULL)
 		return NULL;
@@ -75,6 +76,7 @@ liext_npc_free (liextNpc* self)
 		lieng_engine_remove_calls (self->module->server->engine, self->calls,
 			sizeof (self->calls) / sizeof (licalHandle));
 	}
+	lialg_ptrdic_remove (self->module->dictionary, self->object);
 	lisys_free (self);
 }
 
@@ -123,24 +125,54 @@ liext_npc_set_object (liextNpc*    self,
 	/* Discard old target. */
 	liext_npc_set_target (self, NULL);
 
+	/* Maintain dictionary. */
+	if (object != NULL && self->object == NULL)
+	{
+		assert (lialg_ptrdic_find (self->module->dictionary, object) == NULL);
+		lialg_ptrdic_insert (self->module->dictionary, object, self);
+	}
+	else if (object == NULL && self->object != NULL)
+		lialg_ptrdic_remove (self->module->dictionary, self->object);
+
 	/* Set new owner. */
 	if (self->object != NULL)
 	{
+		/* Reset control mode. */
 		flags = lieng_object_get_flags (self->object);
 		liphy_object_set_control_mode (self->object->physics, LIPHY_CONTROL_MODE_RIGID);
 		lieng_object_set_flags (self->object, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
-		liscr_data_unref (self->object->script, self->data);
+		liscr_data_unref (self->object->script, self->script);
 	}
 	if (object != NULL)
 	{
+		/* Set control mode. */
 		flags = lieng_object_get_flags (object);
 		liphy_object_set_control_mode (object->physics, LIPHY_CONTROL_MODE_CHARACTER);
 		lieng_object_set_flags (object, flags | LIENG_OBJECT_FLAG_DYNAMIC);
-		liscr_data_ref (object->script, self->data);
+		liscr_data_ref (object->script, self->script);
 	}
 	self->object = object;
 
 	return 1;
+}
+
+/**
+ * \brief Sets the path for the NPC to traverse.
+ *
+ * \param self Npc.
+ * \param path Script path data or NULL.
+ */
+void
+liext_npc_set_path (liextNpc*  self,
+                    liscrData* path)
+{
+	if (self->path == path)
+		return;
+	if (self->path != NULL)
+		liscr_data_unref (self->path, self->script);
+	if (path != NULL)
+		liscr_data_ref (path, self->script);
+	self->path = path;
 }
 
 /**
@@ -156,10 +188,10 @@ liext_npc_set_target (liextNpc*    self,
                       liengObject* object)
 {
 	if (self->target != NULL)
-		liscr_data_unref (self->target->script, self->data);
+		liscr_data_unref (self->target->script, self->script);
 	self->target = object;
 	if (object != NULL)
-		liscr_data_ref (object->script, self->data);
+		liscr_data_ref (object->script, self->script);
 }
 
 /*****************************************************************************/
@@ -168,8 +200,13 @@ static int
 private_tick (liextNpc* self,
               float     secs)
 {
+	liaiPath* path;
 	liengObject* object;
 	limatTransform transform;
+	limatVector diff;
+	limatVector impulse;
+	limatVector vector;
+	liscrData* tmp;
 	liphyObject* physics;
 
 	/* Get object data. */
@@ -198,8 +235,78 @@ private_tick (liextNpc* self,
 	self->timer += secs;
 	if (self->timer >= self->refresh)
 	{
+		/* Get new target. */
 		self->timer = 0.0f;
 		liext_npc_set_target (self, private_rescan (self));
+
+		/* Solve path. */
+		if (self->object != NULL && self->target != NULL)
+		{
+			lieng_object_get_transform (self->target, &transform);
+			transform.position.y += 0.5f;
+			path = liext_module_solve_path (self->module, self->object, &transform.position);
+			if (path != NULL)
+			{
+				tmp = liscr_data_new (self->script->script, path, LICOM_SCRIPT_PATH, liai_path_free);
+				if (tmp != NULL)
+				{
+					liext_npc_set_path (self, tmp);
+					liscr_data_unref (tmp, NULL);
+				}
+				else
+					liai_path_free (path);
+			}
+		}
+	}
+
+	/* Traverse path if set. */
+	/* TODO: Give up if can't reach. */
+	if (self->path != NULL)
+	{
+		path = self->path->data;
+		if (path->position < path->points.count)
+		{
+			/* Get distance to waypoint. */
+			lieng_object_get_transform (object, &transform);
+			liai_path_get_point (path, path->position, &vector);
+			diff = limat_vector_subtract (transform.position, vector);
+			diff = limat_vector_multiply (diff, 1.0f / LIAI_WAYPOINT_WIDTH);
+
+			/* Check if reached it. */
+#warning These path traversal tolerance values are sketchy
+			if (-0.9f < diff.x && diff.x < 0.9f &&
+			    -2.5f < diff.y && diff.y < 0.9f &&
+			    -0.9f < diff.z && diff.z < 0.9f)
+			{
+				/* Next waypoint. */
+				path->position++;
+				if (path->position == path->points.count)
+					return 1;
+
+				/* Get distance to waypoint. */
+				lieng_object_get_transform (object, &transform);
+				liai_path_get_point (path, path->position, &vector);
+				diff = limat_vector_subtract (transform.position, vector);
+
+				/* Jump if too high for walking. */
+				/* FIXME: Check for walkable slopes first. */
+				/* FIXME: This fails most of the time because of the wall being too close. */
+				if (diff.y > 0.5f)
+				{
+					impulse = limat_vector_init (0.0f, 100.0f, 0.0f);
+					lieng_object_jump (object, &impulse);
+				}
+			}
+
+			/* Move towards waypoint. */
+			lieng_object_approach (object, &vector, 1.0f);
+			return 1;
+		}
+		else
+		{
+			/* TODO: Emit path traversed event. */
+			liext_npc_set_path (self, NULL);
+		}
 	}
 
 	/* Check for target. */
@@ -242,7 +349,7 @@ private_attack (liextNpc* self)
 	lua_remove (script->lua, -2);
 
 	/* Call the spawn function. */
-	liscr_pushdata (script->lua, self->data);
+	liscr_pushdata (script->lua, self->script);
 	liscr_pushdata (script->lua, self->object->script);
 	liscr_pushdata (script->lua, self->target->script);
 	if (lua_pcall (script->lua, 3, 0, 0) != 0)
@@ -284,7 +391,7 @@ private_rescan (liextNpc* self)
 		{
 			assert (iter1.value);
 			tmp = iter1.value;
-			if (LISRV_OBJECT (tmp)->client == NULL) /* FIXME: Check for alignment. */
+			if (LISRV_OBJECT (tmp)->client == NULL) /* FIXME: Check for alignment flags instead. */
 				continue;
 			d = lieng_object_get_distance (object, tmp);
 			if (dist < d)

@@ -143,35 +143,37 @@ liai_sector_build_area (liaiSector*  self,
 	if (voxels != NULL)
 	{
 		/* Mark ground. */
-		for (k = x ; k < zs ; k++)
-		for (j = y ; j < ys ; j++)
-		for (i = z ; i < xs ; i++)
+		for (k = z ; k < z + zs ; k++)
+		for (j = y ; j < y + ys ; j++)
+		for (i = x ; i < x + xs ; i++)
 		{
 			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
 			voxel = livox_sector_get_voxel (voxels, i, j, k);
 			if (voxel->type)
-				wp->flags = LIAI_WAYPOINT_FLAG_GROUND;
-			else
 				wp->flags = 0;
+			else
+				wp->flags = LIAI_WAYPOINT_FLAG_FLYABLE;
 		}
 
 		/* Mark walkable . */
-#warning Walkability flags are broken for the bottommost plane of the updated area
-		for (k = x ; k < zs ; k++)
-		for (j = y ; j < ys - 1 ; j++)
-		for (i = z ; i < xs ; i++)
+#warning Walkability flags are broken for the bottommost plane of the sector
+#warning Walkability flags are broken for the topmost plane of previously built blocks
+		for (k = z ; k < z + zs ; k++)
+		for (j = LI_MAX (y, 1) ; j < y + ys ; j++)
+		for (i = x ; i < x + xs ; i++)
 		{
 			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
 			wp1 = self->points + LIAI_WAYPOINT_INDEX (i, j + 1, k);
-			if (wp1->flags & LIAI_WAYPOINT_FLAG_GROUND)
-				wp->flags = LIAI_WAYPOINT_FLAG_WALKABLE;
+			if ((wp ->flags & LIAI_WAYPOINT_FLAG_FLYABLE) &&
+			   !(wp1->flags & LIAI_WAYPOINT_FLAG_FLYABLE))
+				wp->flags |= LIAI_WAYPOINT_FLAG_WALKABLE;
 		}
 	}
 	else
 	{
-		for (k = x ; k < zs ; k++)
-		for (j = y ; j < ys ; j++)
-		for (i = z ; i < xs ; i++)
+		for (k = z ; k < z + zs ; k++)
+		for (j = y ; j < y + ys ; j++)
+		for (i = x ; i < x + xs ; i++)
 		{
 			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);
 			wp->flags = 0;
