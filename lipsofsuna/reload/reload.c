@@ -34,24 +34,29 @@ private_async_reload (lithrAsyncCall* call,
 static int
 private_convert_models (lithrAsyncCall* call,
                         lirelReload*    self,
-                        const char*     path);
+                        const char*     srcdir,
+                        const char*     dstdir);
 
 static int
 private_convert_textures (lithrAsyncCall* call,
                           lirelReload*    self,
-                          const char*     path);
+                          const char*     srcdir,
+                          const char*     dstdir);
 
 static int
-private_filter_blend_modified (const char* dir,
-                               const char* name);
+private_filter_blend_modified (const char* srcdir,
+                               const char* name,
+                               void*       dstdir);
 
 static int
-private_filter_img_modified (const char* dir,
-                             const char* name);
+private_filter_img_modified (const char* srcdir,
+                             const char* name,
+                             void*       dstdir);
 
 static int
-private_filter_xcf_modified (const char* dir,
-                             const char* name);
+private_filter_xcf_modified (const char* srcdir,
+                             const char* name,
+                             void*       dstdir);
 
 /*****************************************************************************/
 
@@ -239,7 +244,8 @@ int
 lirel_reload_set_enabled (lirelReload* self,
                           int          value)
 {
-	char* path;
+	char* srcdir;
+	char* dstdir;
 
 	if ((value != 0) == (self->notify != NULL))
 		return 1;
@@ -248,20 +254,26 @@ lirel_reload_set_enabled (lirelReload* self,
 		self->notify = lisys_notify_new ();
 		if (self->notify == NULL)
 			return 0;
-		path = lisys_path_concat (self->paths->module_data, "graphics", NULL);
-		if (path == NULL)
+		srcdir = lisys_path_concat (self->paths->module_data, "import", NULL);
+		dstdir = lisys_path_concat (self->paths->module_data, "graphics", NULL);
+		if (srcdir == NULL || dstdir == NULL)
 		{
 			lisys_notify_free (self->notify);
+			lisys_free (srcdir);
+			lisys_free (dstdir);
 			self->notify = NULL;
 			return 0;
 		}
-		if (!lisys_notify_add (self->notify, path, LISYS_NOTIFY_CLOSEW))
+		if (!lisys_notify_add (self->notify, srcdir, LISYS_NOTIFY_CLOSEW) ||
+		    !lisys_notify_add (self->notify, dstdir, LISYS_NOTIFY_CLOSEW))
 		{
 			lisys_notify_free (self->notify);
 			self->notify = NULL;
-			lisys_free (path);
+			lisys_free (srcdir);
+			lisys_free (dstdir);
 		}
-		lisys_free (path);
+		lisys_free (srcdir);
+		lisys_free (dstdir);
 	}
 	else
 	{
@@ -304,40 +316,40 @@ static void
 private_async_reload (lithrAsyncCall* call,
                       void*           data)
 {
-	char* path;
+	char* srcdir;
+	char* dstdir;
 	lirelReload* self = data;
 
 	/* Convert textures. */
-	path = lisys_path_concat (self->paths->module_data, "graphics", NULL);
-	if (path == NULL)
+	srcdir = lisys_path_concat (self->paths->module_data, "import", NULL);
+	dstdir = lisys_path_concat (self->paths->module_data, "graphics", NULL);
+	if (srcdir == NULL || dstdir == NULL)
 		goto error;
-	if (!private_convert_textures (call, self, path))
+	if (!private_convert_textures (call, self, srcdir, dstdir))
 		goto error;
 	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* Convert models. */
-	if (path == NULL)
-		goto error;
-	if (!private_convert_models (call, self, path))
+	if (!private_convert_models (call, self, srcdir, dstdir))
 		goto error;
 	if (lithr_async_call_get_stop (call))
 		goto stop;
 
 	/* The rest is done in the free callback. */
 	lithr_async_call_set_result (call, 1);
-stop:
-	lisys_free (path);
-	return;
 
+stop:
 error:
-	lisys_free (path);
+	lisys_free (srcdir);
+	lisys_free (dstdir);
 }
 
 static int
 private_convert_models (lithrAsyncCall* call,
                         lirelReload*    self,
-                        const char*     path)
+                        const char*     srcdir,
+                        const char*     dstdir)
 {
 	int i;
 	int count;
@@ -346,13 +358,16 @@ private_convert_models (lithrAsyncCall* call,
 	lisysDir* directory = NULL;
 
 	/* Find all modified model sources. */
-	directory = lisys_dir_open (path);
+	directory = lisys_dir_open (srcdir);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_blend_modified);
+	lisys_dir_set_filter (directory, private_filter_blend_modified, (void*) dstdir);
 	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 	if (!lisys_dir_scan (directory))
-		goto error;
+	{
+		lisys_dir_free (directory);
+		return 0;
+	}
 	count = lisys_dir_get_count (directory);
 
 	/* Convert modified models. */
@@ -361,10 +376,17 @@ private_convert_models (lithrAsyncCall* call,
 		lithr_async_call_set_progress (call, (float) i / count);
 		if (lithr_async_call_get_stop (call))
 			break;
-		src = lisys_dir_get_path (directory, i);
-		dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
+		src = lisys_path_format (srcdir,
+			LISYS_PATH_SEPARATOR, lisys_dir_get_name (directory, i), NULL);
+		dst = lisys_path_format (dstdir,
+			LISYS_PATH_SEPARATOR, lisys_dir_get_name (directory, i),
+			LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
 		if (src == NULL || dst == NULL)
-			goto error;
+		{
+			lisys_dir_free (directory);
+			lisys_free (src);
+			lisys_free (dst);
+		}
 		if (!lirel_reload_blender (self, src, dst))
 			lisys_error_report ();
 		lisys_free (src);
@@ -373,18 +395,13 @@ private_convert_models (lithrAsyncCall* call,
 	lisys_dir_free (directory);
 
 	return 1;
-
-error:
-	lisys_dir_free (directory);
-	lisys_free (src);
-	lisys_free (dst);
-	return 0;
 }
 
 static int
 private_convert_textures (lithrAsyncCall* call,
                           lirelReload*    self,
-                          const char*     path)
+                          const char*     srcdir,
+                          const char*     dstdir)
 {
 	int i;
 	int j;
@@ -394,7 +411,7 @@ private_convert_textures (lithrAsyncCall* call,
 	lisysDir* directory = NULL;
 	const struct
 	{
-		int (*filter)(const char*, const char*);
+		int (*filter)(const char*, const char*, void*);
 		int (*convert)(lirelReload*, const char*, const char*);
 	}
 	converters[] =
@@ -408,23 +425,33 @@ private_convert_textures (lithrAsyncCall* call,
 	{
 		src = NULL;
 		dst = NULL;
-		directory = lisys_dir_open (path);
+		directory = lisys_dir_open (srcdir);
 		if (directory == NULL)
 			return 0;
-		lisys_dir_set_filter (directory, converters[j].filter);
+		lisys_dir_set_filter (directory, converters[j].filter, (void*) dstdir);
 		lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 		if (!lisys_dir_scan (directory))
-			goto error;
+		{
+			lisys_dir_free (directory);
+			return 0;
+		}
 		count = lisys_dir_get_count (directory);
 		for (i = 0 ; i < count ; i++)
 		{
 			lithr_async_call_set_progress (call, (float) i / count);
 			if (lithr_async_call_get_stop (call))
 				break;
-			src = lisys_dir_get_path (directory, i);
-			dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
+			src = lisys_path_format (srcdir,
+				LISYS_PATH_SEPARATOR, lisys_dir_get_name (directory, i), NULL);
+			dst = lisys_path_format (dstdir,
+				LISYS_PATH_SEPARATOR, lisys_dir_get_name (directory, i),
+				LISYS_PATH_STRIPEXTS, ".dds", NULL);
 			if (src == NULL || dst == NULL)
-				goto error;
+			{
+				lisys_dir_free (directory);
+				lisys_free (src);
+				lisys_free (dst);
+			}
 			if (!converters[j].convert (self, src, dst))
 				lisys_error_report ();
 			lisys_free (src);
@@ -434,17 +461,12 @@ private_convert_textures (lithrAsyncCall* call,
 	}
 
 	return 1;
-
-error:
-	lisys_dir_free (directory);
-	lisys_free (src);
-	lisys_free (dst);
-	return 0;
 }
 
 static int
-private_filter_blend_modified (const char* dir,
-                               const char* name)
+private_filter_blend_modified (const char* srcdir,
+                               const char* name,
+                               void*       dstdir)
 {
 	int ret;
 	char* src;
@@ -458,10 +480,10 @@ private_filter_blend_modified (const char* dir,
 		return 0;
 
 	/* Construct file names. */
-	src = lisys_path_concat (dir, name, NULL);
+	src = lisys_path_concat (srcdir, name, NULL);
 	if (src == NULL)
 		return 1;
-	dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
+	dst = lisys_path_format (dstdir, LISYS_PATH_SEPARATOR, name, LISYS_PATH_STRIPEXTS, ".lmdl", NULL);
 	if (dst == NULL)
 	{
 		lisys_free (src);
@@ -482,8 +504,9 @@ private_filter_blend_modified (const char* dir,
 }
 
 static int
-private_filter_img_modified (const char* dir,
-                             const char* name)
+private_filter_img_modified (const char* srcdir,
+                             const char* name,
+                             void*       dstdir)
 {
 	int ret;
 	char* src;
@@ -497,10 +520,10 @@ private_filter_img_modified (const char* dir,
 		return 0;
 
 	/* Construct file names. */
-	src = lisys_path_concat (dir, name, NULL);
+	src = lisys_path_concat (srcdir, name, NULL);
 	if (src == NULL)
 		return 1;
-	dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
+	dst = lisys_path_format (dstdir, LISYS_PATH_SEPARATOR, name, LISYS_PATH_STRIPEXTS, ".dds", NULL);
 	if (dst == NULL)
 	{
 		lisys_free (src);
@@ -521,8 +544,9 @@ private_filter_img_modified (const char* dir,
 }
 
 static int
-private_filter_xcf_modified (const char* dir,
-                             const char* name)
+private_filter_xcf_modified (const char* srcdir,
+                             const char* name,
+                             void*       dstdir)
 {
 	int ret;
 	char* src;
@@ -536,10 +560,10 @@ private_filter_xcf_modified (const char* dir,
 		return 0;
 
 	/* Construct file names. */
-	src = lisys_path_concat (dir, name, NULL);
+	src = lisys_path_concat (srcdir, name, NULL);
 	if (src == NULL)
 		return 1;
-	dst = lisys_path_format (src, LISYS_PATH_STRIPEXTS, ".dds", NULL);
+	dst = lisys_path_format (dstdir, LISYS_PATH_SEPARATOR, name, LISYS_PATH_STRIPEXTS, ".dds", NULL);
 	if (dst == NULL)
 	{
 		lisys_free (src);

@@ -217,6 +217,7 @@ def NodeChildren(file, object, bone, parent):
 
 def ObjectFile(object):
 	path,name = os.path.split(Blender.Get("filename"))
+	path = os.path.join(os.path.split(path)[0], "graphics")
 	name = os.path.splitext(name)[0]
 	prop = ObjectProperty(object, "file")
 	if prop:

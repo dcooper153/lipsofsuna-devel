@@ -40,11 +40,13 @@ private_compare_samples (const void* a,
 
 static inline int
 private_filter_models (const char* dir,
-                       const char* name);
+                       const char* name,
+                       void*       data);
 
 static inline int
 private_filter_samples (const char* dir,
-                        const char* name);
+                        const char* name,
+                        void*       data);
 
 static int
 private_insert_model (liengResources*   self,
@@ -283,7 +285,7 @@ lieng_resources_load_from_dir (liengResources* self,
 	lisys_free (tmp);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_models);
+	lisys_dir_set_filter (directory, private_filter_models, NULL);
 	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 	if (!lisys_dir_scan (directory))
 	{
@@ -327,7 +329,7 @@ lieng_resources_load_from_dir (liengResources* self,
 	lisys_free (tmp);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_samples);
+	lisys_dir_set_filter (directory, private_filter_samples, NULL);
 	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 	if (!lisys_dir_scan (directory))
 	{
@@ -531,7 +533,8 @@ private_compare_samples (const void* a,
 
 static inline int
 private_filter_models (const char* dir,
-                       const char* name)
+                       const char* name,
+                       void*       data)
 {
 	const char* ptr;
 
@@ -545,7 +548,8 @@ private_filter_models (const char* dir,
 
 static inline int
 private_filter_samples (const char* dir,
-                        const char* name)
+                        const char* name,
+                        void*       data)
 {
 	const char* ptr;
 

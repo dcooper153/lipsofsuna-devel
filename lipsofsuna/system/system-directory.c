@@ -49,6 +49,7 @@ struct _lisysDir
 	{
 		lisysDirFilter filter;
 		lisysDirSorter sorter;
+		void* filter_data;
 	} calls;
 	struct
 	{
@@ -156,7 +157,7 @@ lisys_dir_scan (lisysDir* self)
 		/* Filter. */
 		if (self->calls.filter != NULL)
 		{
-			if (!self->calls.filter (self->path, ent->d_name))
+			if (!self->calls.filter (self->path, ent->d_name, self->calls.filter_data))
 				continue;
 		}
 
@@ -266,13 +267,16 @@ lisys_dir_get_path (const lisysDir* self,
  * \brief Set the current filter rule.
  *
  * \param self Directory.
- * \param filter Fiulter function or NULL.
+ * \param filter Filter function or NULL.
+ * \param data Userdata to be passed to the filter function.
  */
 void
 lisys_dir_set_filter (lisysDir*      self,
-                      lisysDirFilter filter)
+                      lisysDirFilter filter,
+                      void*          data)
 {
 	self->calls.filter = filter;
+	self->calls.filter_data = data;
 }
 
 /**
@@ -295,7 +299,8 @@ lisys_dir_set_sorter (lisysDir*      self,
  */
 int
 LISYS_DIR_FILTER_FILES (const char* dir,
-                        const char* name)
+                        const char* name,
+                        void*       data)
 {
 	char* path;
 	struct stat st;
@@ -323,7 +328,8 @@ LISYS_DIR_FILTER_FILES (const char* dir,
  */
 int
 LISYS_DIR_FILTER_DIRS (const char* dir,
-                       const char* name)
+                       const char* name,
+                       void*       data)
 {
 	char* path;
 	struct stat st;
@@ -351,7 +357,8 @@ LISYS_DIR_FILTER_DIRS (const char* dir,
  */
 int
 LISYS_DIR_FILTER_HIDDEN (const char* dir,
-                         const char* name)
+                         const char* name,
+                         void*       data)
 {
 	if (name[0] == '.')
 		return 1;
@@ -363,7 +370,8 @@ LISYS_DIR_FILTER_HIDDEN (const char* dir,
  */
 int
 LISYS_DIR_FILTER_VISIBLE (const char* dir,
-                          const char* name)
+                          const char* name,
+                          void*       data)
 {
 	if (name[0] == '.')
 		return 0;

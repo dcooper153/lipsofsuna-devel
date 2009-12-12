@@ -47,11 +47,13 @@ private_async_save (lithrAsyncCall* call,
 
 static inline int
 private_filter_models (const char* dir,
-                       const char* name);
+                       const char* name,
+                       void*       data);
 
 static inline int
 private_filter_samples (const char* dir,
-                        const char* name);
+                        const char* name,
+                        void*       data);
 
 static int
 private_insert_directory (liextPackagerData* self,
@@ -386,7 +388,8 @@ error:
 
 static inline int
 private_filter_models (const char* dir,
-                       const char* name)
+                       const char* name,
+                       void*       data)
 {
 	const char* ptr;
 
@@ -400,7 +403,8 @@ private_filter_models (const char* dir,
 
 static inline int
 private_filter_samples (const char* dir,
-                        const char* name)
+                        const char* name,
+                        void*       data)
 {
 	const char* ptr;
 
@@ -431,7 +435,7 @@ private_insert_directory (liextPackagerData* self,
 	lisys_free (src);
 	if (dir == NULL)
 		return 0;
-	lisys_dir_set_filter (dir, LISYS_DIR_FILTER_VISIBLE);
+	lisys_dir_set_filter (dir, LISYS_DIR_FILTER_VISIBLE, NULL);
 	if (!lisys_dir_scan (dir))
 		return 0;
 	for (i = 0 ; i < lisys_dir_get_count (dir) ; i++)
@@ -542,7 +546,7 @@ private_insert_models (lithrAsyncCall*    call,
 	directory = lisys_dir_open (path);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_models);
+	lisys_dir_set_filter (directory, private_filter_models, NULL);
 	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 	if (!lisys_dir_scan (directory))
 		goto error;
@@ -606,7 +610,7 @@ private_insert_samples (lithrAsyncCall*    call,
 	directory = lisys_dir_open (path);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_samples);
+	lisys_dir_set_filter (directory, private_filter_samples, NULL);
 	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
 	if (!lisys_dir_scan (directory))
 		goto error;

@@ -40,7 +40,8 @@ private_login (liwdgLogin* self);
 
 static int
 private_filter_servers (const char* dir,
-                        const char* name);
+                        const char* name,
+                        void*       data);
 
 const liwdgClass liwdgLoginType =
 {
@@ -316,8 +317,9 @@ private_login (liwdgLogin* self)
 
 static int
 private_filter_servers (const char* dir,
-                        const char* name)
+                        const char* name,
+                        void*       data)
 {
-	return LISYS_DIR_FILTER_VISIBLE (dir, name) &&
-	       LISYS_DIR_FILTER_DIRS (dir, name);
+	return LISYS_DIR_FILTER_VISIBLE (dir, name, NULL) &&
+	       LISYS_DIR_FILTER_DIRS (dir, name, NULL);
 }

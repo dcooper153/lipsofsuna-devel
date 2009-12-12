@@ -25,7 +25,7 @@
 #ifndef __SYSTEM_DIRECTORY_H__
 #define __SYSTEM_DIRECTORY_H__
 
-typedef int (*lisysDirFilter)(const char* dir, const char* name);
+typedef int (*lisysDirFilter)(const char* dir, const char* name, void* data);
 typedef int (*lisysDirSorter)(const char** name0, const char** name1);
 typedef struct _lisysDir lisysDir;
 struct _lisysDir;
@@ -56,7 +56,8 @@ lisys_dir_get_path (const lisysDir* self,
 
 void
 lisys_dir_set_filter (lisysDir*      self,
-                      lisysDirFilter filter);
+                      lisysDirFilter filter,
+                      void*          data);
 
 void
 lisys_dir_set_sorter (lisysDir*      self,
@@ -64,19 +65,23 @@ lisys_dir_set_sorter (lisysDir*      self,
 
 int
 LISYS_DIR_FILTER_FILES (const char* dir,
-                        const char* name);
+                        const char* name,
+                        void*       data);
 
 int
 LISYS_DIR_FILTER_DIRS (const char* dir,
-                       const char* name);
+                       const char* name,
+                       void*       data);
 
 int
 LISYS_DIR_FILTER_HIDDEN (const char* dir,
-                         const char* name);
+                         const char* name,
+                         void*       data);
 
 int
 LISYS_DIR_FILTER_VISIBLE (const char* dir,
-                          const char* name);
+                          const char* name,
+                          void*       data);
 
 int
 LISYS_DIR_SORTER_ALPHA (const char** name0,
