@@ -195,6 +195,7 @@ Quaternion_new (lua_State* lua)
 	liscrData* self;
 	liscrScript* script = liscr_script (lua);
 
+	/* Arguments. */
 	liscr_checkclass (lua, 1, LICOM_SCRIPT_QUATERNION);
 	if (!lua_isnoneornil (lua, 2))
 		quat.x = luaL_checknumber (lua, 2);
@@ -209,15 +210,17 @@ Quaternion_new (lua_State* lua)
 	else
 		quat.z = 0.0f;
 	if (!lua_isnoneornil (lua, 5))
-		quat.z = luaL_checknumber (lua, 5);
+		quat.w = luaL_checknumber (lua, 5);
 	else
-		quat.z = 1.0f;
+		quat.w = 1.0f;
+
+	/* Allocate quaternion. */
 	self = liscr_quaternion_new (script, &quat);
 	if (self == NULL)
 		return 0;
-
 	liscr_pushdata (lua, self);
 	liscr_data_unref (self, NULL);
+
 	return 1;
 }
 

@@ -88,6 +88,28 @@ Camera_move (lua_State* lua)
 
 /* @luadoc
  * ---
+ * -- Resets the look spring transformation of the camera.
+ * --
+ * -- @param self Camera class.
+ * function Camera.reset(self)
+ */
+static int
+Camera_reset (lua_State* lua)
+{
+	liextModule* self;
+	limatTransform transform;
+
+	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
+
+	transform = limat_transform_identity ();
+	self->module->camera->transform.local = transform;
+	lialg_camera_warp (self->module->camera);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
  * -- Sets the tilting rate of the camera.
  * --
  * -- @param self Camera class.
@@ -304,6 +326,7 @@ liextCameraScript (liscrClass* self,
 	liscr_class_insert_enum (self, "THIRDPERSON", LIALG_CAMERA_THIRDPERSON);
 	liscr_class_insert_enum (self, "MANUAL", LIALG_CAMERA_MANUAL);
 	liscr_class_insert_func (self, "move", Camera_move);
+	liscr_class_insert_func (self, "reset", Camera_reset);
 	liscr_class_insert_func (self, "tilt", Camera_tilt);
 	liscr_class_insert_func (self, "turn", Camera_turn);
 	liscr_class_insert_func (self, "zoom", Camera_zoom);
