@@ -170,7 +170,8 @@ private_event (liwdgTabs*  self,
 			(liwdgContainerChildRequestFunc) private_child_request,
 			(liwdgContainerCycleFocusFunc) private_cycle_focus,
 			(liwdgContainerDetachChildFunc) private_detach_child,
-			(liwdgContainerForeachChildFunc) private_foreach_child
+			(liwdgContainerForeachChildFunc) private_foreach_child,
+			(liwdgContainerTranslateCoordsFunc) NULL
 		};
 		event->probe.result = &iface;
 		return 0;

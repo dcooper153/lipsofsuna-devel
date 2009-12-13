@@ -312,6 +312,20 @@ liwdg_manager_event (liwdgManager* self,
 	liwdgRect rect;
 	liwdgWidget* widget;
 
+	/* Maintain pointer position. */
+	switch (event->type)
+	{
+		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
+		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
+			self->pointer.x = event->button.x;
+			self->pointer.y = event->button.y;
+			break;
+		case LIWDG_EVENT_TYPE_MOTION:
+			self->pointer.x = event->motion.x;
+			self->pointer.y = event->motion.y;
+			break;
+	}
+
 	/* Handle grabs. */
 	if (self->widgets.grab != NULL)
 	{

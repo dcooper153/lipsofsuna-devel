@@ -477,12 +477,34 @@ private_treerow_render (liwdgTreerow* self,
 	int h;
 	int x;
 	int y0;
+	int pointer[2];
+	liwdgManager* manager;
 
 	/* Calculate offset. */
 	h = private_treerow_get_height (self);
 	y += h;
 	y0 = y;
 	x = rect->x + self->depth * LIWDG_TREE_NEST;
+
+	/* Get relative pointer position. */
+	manager = LIWDG_WIDGET (self->tree)->manager;
+	liwdg_widget_translate_coords (LIWDG_WIDGET (self->tree),
+		manager->pointer.x, manager->pointer.y, pointer + 0, pointer + 1);
+
+	/* Render hover. */
+	if (pointer[0] >= rect->x && pointer[0] < rect->x + rect->width &&
+	    pointer[1] >= rect->y + rect->height - y - 1 &&
+	    pointer[1] < rect->y + rect->height - y + h - 1)
+	{
+		glColor4fv (style->hover);
+		glBindTexture (GL_TEXTURE_2D, 0);
+		glBegin (GL_TRIANGLE_STRIP);
+		glVertex2i (rect->x, rect->y + rect->height - y - 1);
+		glVertex2i (rect->x + rect->width, rect->y + rect->height - y - 1);
+		glVertex2i (rect->x, rect->y + rect->height - y + h - 1);
+		glVertex2i (rect->x + rect->width, rect->y + rect->height - y + h - 1);
+		glEnd ();
+	}
 
 	/* Render selection. */
 	if (self->highlight)

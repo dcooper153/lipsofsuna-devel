@@ -52,6 +52,11 @@ struct _liwdgManager
 	} focus;
 	struct
 	{
+		int x;
+		int y;
+	} pointer;
+	struct
+	{
 		liwdgWidget* iter;
 		liwdgWidget* root;
 		liwdgWidget* grab;

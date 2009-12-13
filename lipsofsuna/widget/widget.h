@@ -98,6 +98,13 @@ liwdg_widget_remove_callback (liwdgWidget* self,
 void
 liwdg_widget_render (liwdgWidget* self);
 
+void
+liwdg_widget_translate_coords (liwdgWidget* self,
+                               int          screenx,
+                               int          screeny,
+                               int*         widgetx,
+                               int*         widgety);
+
 int
 liwdg_widget_typeis (const liwdgWidget* self,
                      const liwdgClass*  clss);

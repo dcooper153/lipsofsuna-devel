@@ -40,6 +40,12 @@ static int
 private_event (liwdgMenu*  self,
                liwdgEvent* event);
 
+static void
+private_render_horizontal (liwdgMenu* self);
+
+static void
+private_render_vertical (liwdgMenu* self);
+
 static liwdgMenuProxy*
 private_proxy_new (liwdgMenu*      self,
                    liwdgMenuGroup* group,
@@ -226,8 +232,6 @@ private_event (liwdgMenu*  self,
 	lialgList* ptr;
 	liwdgMenuItem* item;
 	liwdgMenuProxy* proxy;
-	liwdgRect rect;
-	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -248,34 +252,89 @@ private_event (liwdgMenu*  self,
 				liwdg_widget_paint (LIWDG_WIDGET (self), private_style (self), NULL);
 			if (self->font != NULL)
 			{
-				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "menu");
-				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
 				if (self->vertical)
-				{
-					for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
-					{
-						proxy = ptr->data;
-						glColor4fv (style->color);
-						lifnt_layout_render (proxy->label, rect.x, rect.y);
-						rect.y += lifnt_font_get_height (self->font) + SPACINGY;
-					}
-				}
+					private_render_vertical (self);
 				else
-				{
-					for (ptr = self->proxies ; ptr->next != NULL ; ptr = ptr->next) {}
-					for ( ; ptr != NULL ; ptr = ptr->prev)
-					{
-						proxy = ptr->data;
-						glColor4fv (style->color);
-						lifnt_layout_render (proxy->label, rect.x, rect.y);
-						rect.x += lifnt_layout_get_width (proxy->label) + SPACINGX;
-					}
-				}
+					private_render_horizontal (self);
 			}
 			break;
 	}
 
 	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+}
+
+static void
+private_render_horizontal (liwdgMenu*  self)
+{
+	lialgList* ptr;
+	liwdgManager* manager;
+	liwdgMenuProxy* proxy;
+	liwdgRect rect;
+	liwdgStyle* style;
+
+	/* Get style allocation. */
+	manager = LIWDG_WIDGET (self)->manager;
+	style = liwdg_widget_get_style (LIWDG_WIDGET (self), private_style (self));
+	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+
+	/* Render each item. */
+	for (ptr = self->proxies ; ptr->next != NULL ; ptr = ptr->next) {}
+	for ( ; ptr != NULL ; ptr = ptr->prev)
+	{
+		proxy = ptr->data;
+		glColor4fv (style->color);
+		lifnt_layout_render (proxy->label, rect.x, rect.y);
+		rect.x += lifnt_layout_get_width (proxy->label) + SPACINGX;
+	}
+}
+
+static void
+private_render_vertical (liwdgMenu*  self)
+{
+	int lineh;
+	int pointer[2];
+	lialgList* ptr;
+	liwdgManager* manager;
+	liwdgMenuProxy* proxy;
+	liwdgRect rect;
+	liwdgStyle* style;
+
+	/* Get style allocation. */
+	style = liwdg_widget_get_style (LIWDG_WIDGET (self), private_style (self));
+	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+	lineh = lifnt_font_get_height (self->font) + SPACINGY;
+
+	/* Get relative pointer position. */
+	manager = LIWDG_WIDGET (self)->manager;
+	liwdg_widget_translate_coords (LIWDG_WIDGET (self),
+		manager->pointer.x, manager->pointer.y, pointer + 0, pointer + 1);
+
+	/* Render each item. */
+	for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+	{
+		proxy = ptr->data;
+		if (ptr->next == NULL)
+			lineh -= SPACINGY;
+
+		/* Render hover. */
+		if (pointer[0] >= rect.x && pointer[0] < rect.x + rect.width &&
+		    pointer[1] >= rect.y && pointer[1] < rect.y + lineh)
+		{
+			glColor4fv (style->hover);
+			glBindTexture (GL_TEXTURE_2D, 0);
+			glBegin (GL_QUADS);
+			glVertex2i (rect.x, rect.y);
+			glVertex2i (rect.x + rect.width, rect.y);
+			glVertex2i (rect.x + rect.width, rect.y + lineh);
+			glVertex2i (rect.x, rect.y + lineh);
+			glEnd ();
+		}
+
+		/* Render text. */
+		glColor4fv (style->color);
+		lifnt_layout_render (proxy->label, rect.x, rect.y);
+		rect.y += lineh;
+	}
 }
 
 static liwdgMenuProxy*

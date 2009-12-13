@@ -102,6 +102,10 @@ liwdg_styles_new (liwdgManager* manager,
 	self->fallback.color[1] = 0.0f;
 	self->fallback.color[2] = 0.0f;
 	self->fallback.color[3] = 1.0f;
+	self->fallback.hover[0] = 0.0f;
+	self->fallback.hover[1] = 0.0f;
+	self->fallback.hover[2] = 0.0f;
+	self->fallback.hover[3] = 0.0f;
 	self->fallback.selection[0] = 0.5f;
 	self->fallback.selection[1] = 0.5f;
 	self->fallback.selection[2] = 0.5f;
@@ -484,6 +488,10 @@ private_read_widget_attr (liwdgStyles* self,
 	else if (!strcmp (key, "padding"))
 	{
 		sscanf (value, "%d %d %d %d", widget->pad + 0, widget->pad + 1, widget->pad + 2, widget->pad + 3);
+	}
+	else if (!strcmp (key, "hover-color"))
+	{
+		sscanf (value, "%f %f %f %f", widget->hover + 0, widget->hover + 1, widget->hover + 2, widget->hover + 3);
 	}
 	else if (!strcmp (key, "selection-color"))
 	{

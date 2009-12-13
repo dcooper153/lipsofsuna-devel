@@ -36,6 +36,7 @@ struct _liwdgStyle
 	int h[3];
 	int pad[4];
 	float color[4];
+	float hover[4];
 	float selection[4];
 };
 

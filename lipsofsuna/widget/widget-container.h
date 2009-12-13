@@ -37,6 +37,7 @@ typedef void (*liwdgContainerChildRequestFunc)(liwdgContainer*, liwdgWidget*);
 typedef liwdgWidget* (*liwdgContainerCycleFocusFunc)(liwdgContainer*, liwdgWidget*, int);
 typedef void (*liwdgContainerDetachChildFunc)(liwdgContainer*, liwdgWidget*);
 typedef void (*liwdgContainerForeachChildFunc)(liwdgContainer*, void (*)(), void*);
+typedef void (*liwdgContainerTranslateCoordsFunc)(liwdgContainer*, int, int, int*, int*);
 
 struct _liwdgContainer
 {
@@ -50,6 +51,7 @@ struct _liwdgContainerIface
 	liwdgContainerCycleFocusFunc cycle_focus;
 	liwdgContainerDetachChildFunc detach_child;
 	liwdgContainerForeachChildFunc foreach_child;
+	liwdgContainerTranslateCoordsFunc translate_coords;
 };
 
 extern const liwdgClass liwdgContainerType;
@@ -76,6 +78,13 @@ void
 liwdg_container_foreach_child (liwdgContainer* self,
                                void          (*call)(),
                                void*           data);
+
+void
+liwdg_container_translate_coords (liwdgContainer* self,
+                                  int             containerx,
+                                  int             containery,
+                                  int*            childx,
+                                  int*            childy);
 
 #endif
 

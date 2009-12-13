@@ -189,6 +189,46 @@ liwdg_container_foreach_child (liwdgContainer* self,
 		iface->foreach_child (self, call, data);
 }
 
+/**
+ * \brief Translates coordinates from container widget space to child widget space.
+ *
+ * Coordinate translation is needed when widgets are inside a scrollable viewport.
+ *
+ * \param self Container.
+ * \param containerx Coordinates in container space.
+ * \param containery Coordinates in container space.
+ * \param childx Coordinates in child widget space.
+ * \param childy Coordinates in child widget space.
+ */
+void
+liwdg_container_translate_coords (liwdgContainer* self,
+                                  int             containerx,
+                                  int             containery,
+                                  int*            childx,
+                                  int*            childy)
+{
+	liwdgEvent event;
+	liwdgContainerIface* iface;
+
+	/* Probe interface. */
+	event.type = LIWDG_EVENT_TYPE_PROBE;
+	event.probe.clss = &liwdgContainerType;
+	event.probe.result = NULL;
+	liwdg_widget_event (LIWDG_WIDGET (self), &event);
+	iface = event.probe.result;
+	assert (iface != NULL);
+	if (iface == NULL)
+		return;
+
+	/* Default translation. */
+	*childx = containerx;
+	*childy = containery;
+
+	/* Call interface. */
+	if (iface->translate_coords != NULL)
+		iface->translate_coords (self, containerx, containery, childx, childy);
+}
+
 /*****************************************************************************/
 
 static int
@@ -221,7 +261,8 @@ private_event (liwdgContainer* self,
 			(liwdgContainerChildRequestFunc) NULL,
 			(liwdgContainerCycleFocusFunc) NULL,
 			(liwdgContainerDetachChildFunc) NULL,
-			(liwdgContainerForeachChildFunc) NULL
+			(liwdgContainerForeachChildFunc) NULL,
+			(liwdgContainerTranslateCoordsFunc) NULL
 		};
 		event->probe.result = &iface;
 		return 0;
@@ -241,6 +282,22 @@ private_event (liwdgContainer* self,
 			break;
 		default:
 			return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	}
+
+	/* Translate coordinates. */
+	switch (event->type)
+	{
+		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
+		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
+			liwdg_container_translate_coords (self,
+				event->button.x, event->button.y,
+				&event->button.x, &event->button.y);
+			break;
+		case LIWDG_EVENT_TYPE_MOTION:
+			liwdg_container_translate_coords (self,
+				event->motion.x, event->motion.y,
+				&event->motion.x, &event->motion.y);
+			break;
 	}
 
 	/* Propagate event to child. */

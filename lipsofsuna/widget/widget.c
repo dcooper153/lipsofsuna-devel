@@ -392,6 +392,35 @@ liwdg_widget_render (liwdgWidget* self)
 }
 
 /**
+ * \brief Translates coordinates from screen space to widget space.
+ *
+ * Coordinate translation is needed when widgets are inside a scrollable viewport.
+ * For example, if a widget wishes to check if screen space pointer coordinates
+ * are inside a specific area of the widget, it needs to translate the coordinates
+ * first with this function.
+ *
+ * \param self Widget.
+ * \param screenx Coordinates in screen space.
+ * \param screeny Coordinates in screen space.
+ * \param widgetx Coordinates in widget space.
+ * \param widgety Coordinates in widget space.
+ */
+void
+liwdg_widget_translate_coords (liwdgWidget* self,
+                               int          screenx,
+                               int          screeny,
+                               int*         widgetx,
+                               int*         widgety)
+{
+	*widgetx = screenx;
+	*widgety = screeny;
+	if (self->parent != NULL)
+		liwdg_widget_translate_coords (self->parent, screenx, screeny, widgetx, widgety);
+	if (liwdg_widget_typeis (self, &liwdgContainerType))
+		liwdg_container_translate_coords (LIWDG_CONTAINER (self), screenx, screeny, widgetx, widgety);
+}
+
+/**
  * \brief Checks if the widget implements the given class.
  *
  * \param self Widget.

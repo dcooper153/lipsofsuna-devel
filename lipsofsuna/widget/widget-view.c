@@ -66,6 +66,13 @@ private_scroll (liwdgView* self,
                 int        x,
                 int        y);
 
+void
+private_translate_coords (liwdgView* self,
+                          int        containerx,
+                          int        containery,
+                          int*       childx,
+                          int*       childy);
+
 /*****************************************************************************/
 
 const liwdgClass liwdgViewType =
@@ -171,7 +178,8 @@ private_event (liwdgView*  self,
 			(liwdgContainerChildRequestFunc) private_child_request,
 			(liwdgContainerCycleFocusFunc) private_cycle_focus,
 			(liwdgContainerDetachChildFunc) private_detach_child,
-			(liwdgContainerForeachChildFunc) private_foreach_child
+			(liwdgContainerForeachChildFunc) private_foreach_child,
+			(liwdgContainerTranslateCoordsFunc) private_translate_coords
 		};
 		event->probe.result = &iface;
 		return 0;
@@ -179,7 +187,6 @@ private_event (liwdgView*  self,
 
 	switch (event->type)
 	{
-		/* Mouse coordinates need translation. */
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			if (event->button.button == 4)
 			{
@@ -191,21 +198,7 @@ private_event (liwdgView*  self,
 				private_scroll (self, 0, -32);
 				return 0;
 			}
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
-			event->button.x -= rect.x - self->hscrollpos;
-			event->button.y -= rect.y - self->vscrollpos;
 			break;
-		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
-			event->button.x -= rect.x - self->hscrollpos;
-			event->button.y -= rect.y - self->vscrollpos;
-			break;
-		case LIWDG_EVENT_TYPE_MOTION:
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
-			event->motion.x -= rect.x - self->hscrollpos;
-			event->motion.y -= rect.y - self->vscrollpos;
-			break;
-
 		case LIWDG_EVENT_TYPE_ALLOCATION:
 			private_rebuild (self);
 			break;
@@ -353,6 +346,20 @@ private_scroll (liwdgView* self,
 		self->vscrollpos = 0;
 		self->hscrollpos = 0;
 	}
+}
+
+void
+private_translate_coords (liwdgView* self,
+                          int        containerx,
+                          int        containery,
+                          int*       childx,
+                          int*       childy)
+{
+	liwdgRect rect;
+
+	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
+	*childx = containerx - (rect.x - self->hscrollpos);
+	*childy = containery - (rect.y - self->vscrollpos);
 }
 
 /** @} */
