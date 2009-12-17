@@ -209,12 +209,11 @@ am__objects_28 = widget/widget.lo widget/widget-busy.lo \
 	widget/widget-container.lo widget/widget-entry.lo \
 	widget/widget-group.lo widget/widget-image.lo \
 	widget/widget-label.lo widget/widget-manager.lo \
-	widget/widget-menu.lo widget/widget-menugroup.lo \
-	widget/widget-progress.lo widget/widget-render.lo \
-	widget/widget-scroll.lo widget/widget-spin.lo \
-	widget/widget-style.lo widget/widget-tabs.lo \
-	widget/widget-tree.lo widget/widget-view.lo \
-	widget/widget-window.lo
+	widget/widget-menu.lo widget/widget-progress.lo \
+	widget/widget-render.lo widget/widget-scroll.lo \
+	widget/widget-spin.lo widget/widget-style.lo \
+	widget/widget-tabs.lo widget/widget-tree.lo \
+	widget/widget-view.lo widget/widget-window.lo
 am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
@@ -1160,7 +1159,6 @@ wdg_HEADERS = \
 	widget/widget-label.h \
 	widget/widget-manager.h \
 	widget/widget-menu.h \
-	widget/widget-menugroup.h \
 	widget/widget-progress.h \
 	widget/widget-render.h \
 	widget/widget-scroll.h \
@@ -1184,7 +1182,6 @@ wdgsrc = \
 	widget/widget-label.c \
 	widget/widget-manager.c \
 	widget/widget-menu.c \
-	widget/widget-menugroup.c \
 	widget/widget-private.h \
 	widget/widget-progress.c \
 	widget/widget-render.c \
@@ -1814,8 +1811,6 @@ widget/widget-manager.lo: widget/$(am__dirstamp) \
 	widget/$(DEPDIR)/$(am__dirstamp)
 widget/widget-menu.lo: widget/$(am__dirstamp) \
 	widget/$(DEPDIR)/$(am__dirstamp)
-widget/widget-menugroup.lo: widget/$(am__dirstamp) \
-	widget/$(DEPDIR)/$(am__dirstamp)
 widget/widget-progress.lo: widget/$(am__dirstamp) \
 	widget/$(DEPDIR)/$(am__dirstamp)
 widget/widget-render.lo: widget/$(am__dirstamp) \
@@ -2330,8 +2325,6 @@ mostlyclean-compile:
 	-rm -f widget/widget-manager.lo
 	-rm -f widget/widget-menu.$(OBJEXT)
 	-rm -f widget/widget-menu.lo
-	-rm -f widget/widget-menugroup.$(OBJEXT)
-	-rm -f widget/widget-menugroup.lo
 	-rm -f widget/widget-progress.$(OBJEXT)
 	-rm -f widget/widget-progress.lo
 	-rm -f widget/widget-render.$(OBJEXT)
@@ -2529,7 +2522,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-label.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-menu.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-menugroup.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-progress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@widget/$(DEPDIR)/widget-scroll.Plo@am__quote@

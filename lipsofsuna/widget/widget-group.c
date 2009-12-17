@@ -346,8 +346,9 @@ liwdg_group_get_cell_rect (liwdgGroup* self,
                            int         y,
                            liwdgRect*  rect)
 {
-	rect->x = LIWDG_WIDGET (self)->allocation.x + self->cols[x].start;
-	rect->y = LIWDG_WIDGET (self)->allocation.y + self->rows[y].start;
+	liwdg_widget_get_content (LIWDG_WIDGET (self), rect);
+	rect->x += self->cols[x].start;
+	rect->y += self->rows[y].start;
 	rect->width = self->cols[x].allocation;
 	rect->height = self->rows[y].allocation;
 }
@@ -756,7 +757,6 @@ static int
 private_init (liwdgGroup*   self,
               liwdgManager* manager)
 {
-	/* Allocate memory. */
 	self->cols = NULL;
 	self->rows = NULL;
 	self->cells = NULL;
@@ -770,6 +770,8 @@ private_init (liwdgGroup*   self,
 	self->margin_right = 0;
 	self->margin_top = 0;
 	self->margin_bottom = 0;
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "group");
+
 	return 1;
 }
 
@@ -784,7 +786,7 @@ private_free (liwdgGroup* self)
 	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
 	LIWDG_WIDGET (self)->visible = i;
 
-	/* Free childrem. */
+	/* Free children. */
 	for (i = 0 ; i < self->width * self->height ; i++)
 	{
 		if (self->cells[i].child != NULL)
@@ -826,6 +828,7 @@ private_event (liwdgGroup* self,
 			private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			for (i = 0 ; i < self->width * self->height ; i++)
 			{
 				child = self->cells[i].child;
@@ -853,9 +856,11 @@ private_child_at (liwdgGroup* self,
 {
 	int x;
 	int y;
+	liwdgRect rect;
 
-	pixx -= LIWDG_WIDGET (self)->allocation.x;
-	pixy -= LIWDG_WIDGET (self)->allocation.y;
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+	pixx -= rect.x;
+	pixy -= rect.y;
 
 	/* Get column. */
 	for (x = 0 ; x < self->width ; x++)
@@ -1179,6 +1184,12 @@ private_rebuild (liwdgGroup* self,
 	int start;
 	int expand;
 	liwdgWidget* child;
+	liwdgRect rect;
+	liwdgSize size;
+
+	if (self->rebuilding)
+		return;
+	self->rebuilding = 1;
 
 	if (self->homogeneous)
 	{
@@ -1215,17 +1226,22 @@ private_rebuild (liwdgGroup* self,
 			hreq = hpad + hmax * self->height;
 
 			/* Set the size request. */
-			LIWDG_WIDGET (self)->allocation.width = LI_MAX (wreq, LIWDG_WIDGET (self)->allocation.width);
-			LIWDG_WIDGET (self)->allocation.height = LI_MAX (hreq, LIWDG_WIDGET (self)->allocation.height);
-			liwdg_widget_set_style_request (LIWDG_WIDGET (self), wreq, hreq, "group");
+			liwdg_widget_set_request_internal (LIWDG_WIDGET (self), wreq, hreq);
+			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_get_request (LIWDG_WIDGET (self), &size);
+			rect.width = LI_MAX (size.width, rect.width);
+			rect.height = LI_MAX (size.height, rect.height);
+			liwdg_widget_set_allocation (LIWDG_WIDGET (self), rect.x, rect.y, rect.width, rect.height);
 		}
+
+		liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 
 		if (flags & PRIVATE_REBUILD_HORZ)
 		{
 			/* Get horizontal expansion. */
 			if (self->col_expand > 0)
 			{
-				expand = LIWDG_WIDGET (self)->allocation.width - wreq;
+				expand = rect.width - wreq;
 				assert (expand >= 0);
 				expand /= self->width;
 			}
@@ -1249,7 +1265,7 @@ private_rebuild (liwdgGroup* self,
 			/* Get vertical expansion. */
 			if (self->row_expand > 0)
 			{
-				expand = LIWDG_WIDGET (self)->allocation.height - hreq;
+				expand = rect.height - hreq;
 				assert (expand >= 0);
 				expand /= self->height;
 			}
@@ -1297,17 +1313,22 @@ private_rebuild (liwdgGroup* self,
 			}
 
 			/* Set the size request. */
-			LIWDG_WIDGET (self)->allocation.width = LI_MAX (wreq, LIWDG_WIDGET (self)->allocation.width);
-			LIWDG_WIDGET (self)->allocation.height = LI_MAX (hreq, LIWDG_WIDGET (self)->allocation.height);
-			liwdg_widget_set_style_request (LIWDG_WIDGET (self), wreq, hreq, "group");
+			liwdg_widget_set_request_internal (LIWDG_WIDGET (self), wreq, hreq);
+			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_get_request (LIWDG_WIDGET (self), &size);
+			rect.width = LI_MAX (size.width, rect.width);
+			rect.height = LI_MAX (size.height, rect.height);
+			liwdg_widget_set_allocation (LIWDG_WIDGET (self), rect.x, rect.y, rect.width, rect.height);
 		}
+
+		liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 
 		if (flags & PRIVATE_REBUILD_HORZ)
 		{
 			/* Get horizontal expansion. */
 			if (self->col_expand > 0)
 			{
-				expand = LIWDG_WIDGET (self)->allocation.width - self->margin_left - self->margin_right;
+				expand = rect.width - self->margin_left - self->margin_right;
 				assert (expand >= 0);
 				for (x = 0 ; x < self->width ; x++)
 				{
@@ -1343,7 +1364,7 @@ private_rebuild (liwdgGroup* self,
 			/* Get vertical expansion. */
 			if (self->row_expand > 0)
 			{
-				expand = LIWDG_WIDGET (self)->allocation.height - self->margin_top - self->margin_bottom;
+				expand = rect.height - self->margin_top - self->margin_bottom;
 				assert (expand >= 0);
 				for (y = 0 ; y < self->height ; y++)
 				{
@@ -1377,6 +1398,8 @@ private_rebuild (liwdgGroup* self,
 
 	if (flags & PRIVATE_REBUILD_CHILDREN)
 	{
+		liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+
 		/* Set positions of widgets. */
 		for (x = 0 ; x < self->width ; x++)
 		{
@@ -1386,14 +1409,16 @@ private_rebuild (liwdgGroup* self,
 				if (child != NULL)
 				{
 					liwdg_widget_set_allocation (child,
-						LIWDG_WIDGET (self)->allocation.x + self->cols[x].start,
-						LIWDG_WIDGET (self)->allocation.y + self->rows[y].start,
+						rect.x + self->cols[x].start,
+						rect.y + self->rows[y].start,
 						self->cols[x].allocation,
 						self->rows[y].allocation);
 				}
 			}
 		}
 	}
+
+	self->rebuilding = 0;
 }
 
 /** @} */

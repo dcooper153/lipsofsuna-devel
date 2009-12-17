@@ -319,12 +319,12 @@ private_init (liextBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_copy, LIWDG_CALLBACK_PRESSED, 0, private_copy, self, NULL);
 	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
-	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 3, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 3, self->widgets.view);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_remove);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_copy);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.view);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_add);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_remove);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 3, self->widgets.button_copy);
 
 	/* View. */
 	liwdg_check_set_text (LIWDG_CHECK (self->widgets.check_required), "Required");
@@ -342,21 +342,21 @@ private_init (liextBrushes* self,
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 1, 0, self->widgets.spin_sizey);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_size), 2, 0, self->widgets.spin_sizez);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_attr), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 5, self->widgets.check_required);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 4, self->widgets.label_type);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 4, self->widgets.entry_name);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 3, self->widgets.label_size);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 3, self->widgets.group_size);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 2, self->widgets.label_objtype);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 2, self->widgets.entry_objtype);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 1, self->widgets.label_objextra);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 1, self->widgets.entry_objextra);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 0, self->widgets.label_objprob);
-	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 0, self->widgets.scroll_objprob);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 0, self->widgets.check_required);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 1, self->widgets.label_type);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 1, self->widgets.entry_name);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 2, self->widgets.label_size);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 2, self->widgets.group_size);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 3, self->widgets.label_objtype);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 3, self->widgets.entry_objtype);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 4, self->widgets.label_objextra);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 4, self->widgets.entry_objextra);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 0, 5, self->widgets.label_objprob);
+	liwdg_group_set_child (LIWDG_GROUP (group_attr), 1, 5, self->widgets.scroll_objprob);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_view), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 2, self->widgets.group_paint);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, group_attr);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, self->widgets.group_paint);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 2, group_attr);
 	liwdg_widget_set_visible (self->widgets.label_size, 0);
 	liwdg_widget_set_visible (self->widgets.group_size, 0);
 

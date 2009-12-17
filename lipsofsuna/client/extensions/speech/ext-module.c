@@ -197,6 +197,7 @@ private_render_2d (liextModule* self,
 
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
+	glDisable (GL_CULL_FACE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
@@ -215,10 +216,14 @@ private_render_2d (liextModule* self,
 			speech = ptr->data;
 			win.y += lifnt_layout_get_height (speech->text);
 			width = lifnt_layout_get_width (speech->text) / 2;
+			glPushMatrix ();
+			glTranslatef (win.x - width, win.y, 0.0f);
+			glScalef (1.0f, -1.0f, 1.0f);
 			glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
-			lifnt_layout_render (speech->text, win.x - width + 1, win.y + 1);
+			lifnt_layout_render (speech->text, 1, -1);
 			glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
-			lifnt_layout_render (speech->text, win.x - width, win.y);
+			lifnt_layout_render (speech->text, 0, 0);
+			glPopMatrix ();
 		}
 	}
 

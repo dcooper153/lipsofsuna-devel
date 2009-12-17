@@ -109,6 +109,7 @@ private_init (liwdgButton*  self,
 		lisys_free (self->string);
 		return 0;
 	}
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "button");
 	private_rebuild (self);
 
 	return 1;
@@ -147,27 +148,20 @@ private_event (liwdgButton* self,
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
+			glColor4fv (style->color);
+			lifnt_layout_render (self->text,
+				rect.x + (rect.width - w) / 2,
+				rect.y + (rect.height - h) / 2);
+			break;
+		case LIWDG_EVENT_TYPE_UPDATE:
 			if (liwdg_widget_get_focus_mouse (LIWDG_WIDGET (self)) ||
 			    liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
-			{
-				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "button-focus");
-				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "button-focus", &rect);
-				liwdg_widget_paint (LIWDG_WIDGET (self), "button-focus", NULL);
-				glColor4fv (style->color);
-				lifnt_layout_render (self->text,
-					rect.x + (rect.width - w) / 2 + 2,
-					rect.y + (rect.height - h) / 2 - 2);
-			}
+				liwdg_widget_set_state (LIWDG_WIDGET (self), "focus");
 			else
-			{
-				style = liwdg_widget_get_style (LIWDG_WIDGET (self), "button");
-				liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "button", &rect);
-				liwdg_widget_paint (LIWDG_WIDGET (self), "button", NULL);
-				glColor4fv (style->color);
-				lifnt_layout_render (self->text,
-					rect.x + (rect.width - w) / 2,
-					rect.y + (rect.height - h) / 2);
-			}
+				liwdg_widget_set_state (LIWDG_WIDGET (self), NULL);
 			break;
 	}
 
@@ -185,9 +179,9 @@ private_rebuild (liwdgButton* self)
 		h = lifnt_font_get_height (self->font);
 		lifnt_layout_append_string (self->text, self->font, self->string);
 	}
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LI_MAX (
-		lifnt_layout_get_height (self->text), h), "button");
+		lifnt_layout_get_height (self->text), h));
 }
 
 /** @} */

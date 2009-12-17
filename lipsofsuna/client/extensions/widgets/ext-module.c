@@ -49,7 +49,6 @@ liext_module_new (licliModule* module)
 	liscr_script_create_class (module->script, "Image", liextImageScript, self);
 	liscr_script_create_class (module->script, "Label", liextLabelScript, self);
 	liscr_script_create_class (module->script, "Menu", liextMenuScript, self);
-	liscr_script_create_class (module->script, "MenuGroup", liextMenuGroupScript, self);
 	liscr_script_create_class (module->script, "Scroll", liextScrollScript, self);
 	liscr_script_create_class (module->script, "Spin", liextSpinScript, self);
 	liscr_script_create_class (module->script, "Tree", liextTreeScript, self);

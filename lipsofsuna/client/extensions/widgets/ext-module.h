@@ -34,7 +34,6 @@
 #define LIEXT_SCRIPT_IMAGE "Lips.Image"
 #define LIEXT_SCRIPT_LABEL "Lips.Label"
 #define LIEXT_SCRIPT_MENU "Lips.Menu"
-#define LIEXT_SCRIPT_MENUGROUP "Lips.MenuGroup"
 #define LIEXT_SCRIPT_SCROLL "Lips.Scroll"
 #define LIEXT_SCRIPT_SPIN "Lips.Spin"
 #define LIEXT_SCRIPT_TREE "Lips.Tree"
@@ -73,10 +72,6 @@ liextLabelScript (liscrClass* self,
 void
 liextMenuScript (liscrClass* self,
                  void*       data);
-
-void
-liextMenuGroupScript (liscrClass* self,
-                      void*       data);
 
 void
 liextScrollScript (liscrClass* self,

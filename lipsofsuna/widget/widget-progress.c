@@ -106,8 +106,8 @@ liwdg_progress_set_value (liwdgProgress* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgProgress*   self,
-              liwdgManager* manager)
+private_init (liwdgProgress* self,
+              liwdgManager*  manager)
 {
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
@@ -119,6 +119,7 @@ private_init (liwdgProgress*   self,
 		lisys_free (self->string);
 		return 0;
 	}
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "progress");
 	private_rebuild (self);
 	return 1;
 }
@@ -144,10 +145,10 @@ private_event (liwdgProgress* self,
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "progress");
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			/* Draw base. */
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "progress", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "progress", NULL);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw progress. */
 			glBindTexture (GL_TEXTURE_2D, 0);
 			glColor4fv (style->selection);
@@ -179,9 +180,9 @@ private_rebuild (liwdgProgress* self)
 		h = lifnt_font_get_height (self->font);
 		lifnt_layout_append_string (self->text, self->font, self->string);
 	}
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LI_MAX (
-		lifnt_layout_get_height (self->text), h), "progress");
+		lifnt_layout_get_height (self->text), h));
 }
 
 /** @} */

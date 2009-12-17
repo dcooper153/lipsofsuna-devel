@@ -71,14 +71,28 @@ liwdg_window_new (liwdgManager* manager,
 const char*
 liwdg_window_get_title (const liwdgWindow* self)
 {
-	return LIWDG_LABEL (self->label_title)->string;
+	return self->title;
 }
 
-void
+int
 liwdg_window_set_title (liwdgWindow* self,
                         const char*  title)
 {
-	liwdg_label_set_text (LIWDG_LABEL (self->label_title), title);
+	char* tmp;
+
+	/* Set string. */
+	tmp = listr_dup (title);
+	if (tmp == NULL)
+		return 0;
+	lisys_free (self->title);
+	self->title = tmp;
+
+	/* Rebuild label. */
+	lifnt_layout_clear (self->text);
+	if (self->font != NULL)
+		lifnt_layout_append_string (self->text, self->font, title);
+
+	return 1;
 }
 
 /*****************************************************************************/
@@ -87,9 +101,11 @@ static int
 private_init (liwdgWindow*  self,
               liwdgManager* manager)
 {
-	self->label_title = liwdg_label_new (manager);
-	if (self->label_title == NULL)
+	self->font = liwdg_manager_find_font (manager, "default");
+	self->text = lifnt_layout_new ();
+	if (self->text == NULL)
 		return 0;
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "window");
 	liwdg_group_set_margins (LIWDG_GROUP (self),
 		LIWDG_WINDOW_DEFAULT_MARGIN, LIWDG_WINDOW_DEFAULT_MARGIN,
 		LIWDG_WINDOW_DEFAULT_MARGIN, LIWDG_WINDOW_DEFAULT_MARGIN);
@@ -106,35 +122,16 @@ private_event (liwdgWindow* self,
                liwdgEvent*  event)
 {
 	liwdgRect rect;
-	liwdgRect frame;
-	liwdgSize size;
-	liwdgStyle* style;
 
 	if (event->type == LIWDG_EVENT_TYPE_RENDER)
 	{
 		/* Render frame. */
 		if (!LIWDG_WIDGET (self)->transparent)
 		{
-			liwdg_widget_get_style_request (LIWDG_WIDGET (self), "window", &size);
 			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-			frame = rect;
-			frame.width = size.width;
-			frame.height = size.height;
-			style = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, "window");
-			if (style != NULL)
-			{
-				frame.x -= style->pad[1];
-				frame.y -= style->pad[3];
-				liwdg_widget_paint (LIWDG_WIDGET (self), "window", &frame);
-				glColor3f (1.0f, 1.0f, 1.0f);
-				liwdg_widget_get_request (LIWDG_WIDGET (self->label_title), &size);
-				liwdg_widget_set_allocation (self->label_title,
-					frame.x + 2,
-					frame.y + frame.height - style->pad[0] - 2,
-					size.width,
-					size.height);
-				liwdg_widget_render (self->label_title);
-			}
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
+			glColor4fv (LIWDG_WIDGET (self)->style->color);
+			lifnt_layout_render (self->text, rect.x + 4, rect.y + 4); /* FIXME: Hardcoded. */
 		}
 	}
 

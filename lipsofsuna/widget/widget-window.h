@@ -34,7 +34,9 @@ typedef struct _liwdgWindow liwdgWindow;
 struct _liwdgWindow
 {
 	liwdgGroup base;
-	liwdgWidget* label_title;
+	lifntFont* font;
+	lifntLayout* text;
+	char* title;
 };
 
 extern const liwdgClass liwdgWindowType;
@@ -47,7 +49,7 @@ liwdg_window_new (liwdgManager* manager,
 const char*
 liwdg_window_get_title (const liwdgWindow* self);
 
-void
+int
 liwdg_window_set_title (liwdgWindow* self,
                         const char*  title);
 

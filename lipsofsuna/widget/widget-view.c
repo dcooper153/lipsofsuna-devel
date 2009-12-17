@@ -152,6 +152,7 @@ static int
 private_init (liwdgView*    self,
               liwdgManager* manager)
 {
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "view");
 	return 1;
 }
 
@@ -167,6 +168,7 @@ private_event (liwdgView*  self,
                liwdgEvent* event)
 {
 	liwdgRect rect;
+	liwdgManager* manager;
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
@@ -190,12 +192,12 @@ private_event (liwdgView*  self,
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			if (event->button.button == 4)
 			{
-				private_scroll (self, 0, 32);
+				private_scroll (self, 0, -32);
 				return 0;
 			}
 			else if (event->button.button == 5)
 			{
-				private_scroll (self, 0, -32);
+				private_scroll (self, 0, 32);
 				return 0;
 			}
 			break;
@@ -204,18 +206,20 @@ private_event (liwdgView*  self,
 			break;
 		case LIWDG_EVENT_TYPE_RENDER:
 			/* Draw base. */
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "view", NULL);
+			manager = LIWDG_WIDGET (self)->manager;
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw child. */
 			if (self->child != NULL)
 			{
-				glScissor (rect.x, rect.y, rect.width, rect.height);
+				glPushAttrib (GL_SCISSOR_BIT);
+				glScissor (rect.x, manager->height - rect.y - rect.height, rect.width, rect.height);
 				glEnable (GL_SCISSOR_TEST);
 				glPushMatrix ();
 				glTranslatef (rect.x - self->hscrollpos, rect.y - self->vscrollpos, 0.0f);
 				liwdg_widget_render (self->child);
 				glPopMatrix ();
-				glDisable (GL_SCISSOR_TEST);
+				glPopAttrib ();
 			}
 			return 0;
 		case LIWDG_EVENT_TYPE_UPDATE:
@@ -305,12 +309,12 @@ private_rebuild (liwdgView* self)
 	}
 	if (self->hscroll) size1.width = 0;
 	if (self->vscroll) size1.height = 0;
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self), size1.width, size1.height, "view");
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), size1.width, size1.height);
 
 	/* Allocate virtual rectangle for child. */
 	if (self->child != NULL)
 	{
-		liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
+		liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 		rect.width = LI_MAX (size.width, rect.width);
 		rect.height = LI_MAX (size.height, rect.height);
 		liwdg_widget_set_allocation (self->child, 0, 0, rect.width, rect.height);
@@ -327,7 +331,7 @@ private_scroll (liwdgView* self,
 {
 	liwdgRect rect;
 
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	self->hscrollpos += x;
 	self->vscrollpos += y;
 	if (self->child != NULL)
@@ -357,7 +361,7 @@ private_translate_coords (liwdgView* self,
 {
 	liwdgRect rect;
 
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "view", &rect);
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	*childx = containerx - (rect.x - self->hscrollpos);
 	*childy = containery - (rect.y - self->vscrollpos);
 }

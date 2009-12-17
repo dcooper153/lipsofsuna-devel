@@ -110,12 +110,6 @@ liwdg_styles_new (liwdgManager* manager,
 	self->fallback.selection[1] = 0.5f;
 	self->fallback.selection[2] = 0.5f;
 	self->fallback.selection[3] = 1.0f;
-	self->fallback.texture = liimg_texture_new_from_rgba (2, 2, tmp);
-	if (self->fallback.texture == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
 
 	/* Allocate resource lists. */
 	self->fonts = lialg_strdic_new ();
@@ -483,7 +477,7 @@ private_read_widget_attr (liwdgStyles* self,
 	}
 	else if (!strcmp (key, "height"))
 	{
-		sscanf (value, "%d %d %d", widget->h + 2, widget->h + 1, widget->h + 0);
+		sscanf (value, "%d %d %d", widget->h + 0, widget->h + 1, widget->h + 2);
 	}
 	else if (!strcmp (key, "padding"))
 	{

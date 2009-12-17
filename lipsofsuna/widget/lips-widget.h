@@ -31,7 +31,6 @@
 #include "widget-label.h"
 #include "widget-manager.h"
 #include "widget-menu.h"
-#include "widget-menugroup.h"
 #include "widget-progress.h"
 #include "widget-render.h"
 #include "widget-scroll.h"

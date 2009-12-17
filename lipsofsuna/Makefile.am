@@ -516,7 +516,6 @@ wdg_HEADERS = \
 	widget/widget-label.h \
 	widget/widget-manager.h \
 	widget/widget-menu.h \
-	widget/widget-menugroup.h \
 	widget/widget-progress.h \
 	widget/widget-render.h \
 	widget/widget-scroll.h \
@@ -539,7 +538,6 @@ wdgsrc = \
 	widget/widget-label.c \
 	widget/widget-manager.c \
 	widget/widget-menu.c \
-	widget/widget-menugroup.c \
 	widget/widget-private.h \
 	widget/widget-progress.c \
 	widget/widget-render.c \

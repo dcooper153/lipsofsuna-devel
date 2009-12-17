@@ -217,6 +217,8 @@ private_layout (lifntLayout* self)
 	{
 		x = 0;
 		w = private_get_line_width (self, start, &end);
+		assert (end < self->n_glyphs);
+		y += private_get_line_height (self, start, end);
 		for (i = start ; i <= end ; i++)
 		{
 			glyph = self->glyphs + i;
@@ -229,18 +231,10 @@ private_layout (lifntLayout* self)
 			self->ascent = private_get_line_ascent (self, start, end);
 		if (self->width < x)
 			self->width = x;
-		y -= private_get_line_height (self, start, end);
 		if (start)
 			h += private_get_line_height (self, start, end);
 	}
-	self->height = -y;
-
-	/* Position the lines. */
-	for (i = 0 ; i < self->n_glyphs ; i++)
-	{
-		glyph = self->glyphs + i;
-		glyph->y += h;
-	}
+	self->height = y;
 }
 
 static int
@@ -268,6 +262,7 @@ private_get_line_ascent (lifntLayout* self,
 	int asctmp;
 	int ascmax = 0;
 
+	assert (end < self->n_glyphs);
 	for (i = start ; i <= end ; i++)
 	{
 		asctmp = self->glyphs[i].font->font_ascent;
@@ -286,6 +281,7 @@ private_get_line_height (lifntLayout* self,
 	int htmp;
 	int hmax = 0;
 
+	assert (end < self->n_glyphs);
 	for (i = start ; i <= end ; i++)
 	{
 		htmp = lifnt_font_get_height (self->glyphs[i].font);
@@ -316,13 +312,12 @@ private_get_line_width (lifntLayout* self,
 		if (glyph->glyph == L'\n')
 			break;
 	}
-	if (i == self->n_glyphs - 1)
+	if (!self->limit_width || x < self->limit_width)
 	{
-		*end = i;
+		if (i >= self->n_glyphs - 1)
+			*end = self->n_glyphs - 1;
 		return x;
 	}
-	if (!self->limit_width || x < self->limit_width)
-		return x;
 
 	/* End of word? */
 	for (x = w = 0, i = start ; i < self->n_glyphs ; i++)
@@ -335,7 +330,7 @@ private_get_line_width (lifntLayout* self,
 			w = x;
 		}
 		/* FIXME: No kerning. */
-		if (x + glyph->advance > self->limit_width)
+		if (x + glyph->advance >= self->limit_width)
 			break;
 		x += glyph->advance;
 	}
@@ -347,10 +342,15 @@ private_get_line_width (lifntLayout* self,
 	{
 		glyph = self->glyphs + i;
 		/* FIXME: No kerning. */
-		if (x + glyph->advance > self->limit_width)
+		if (x + glyph->advance >= self->limit_width)
+		{
+			if (i > 0)
+				i--;
 			break;
+		}
 		x += glyph->advance;
 	}
+	assert (i < self->n_glyphs);
 	*end = i;
 
 	return x;

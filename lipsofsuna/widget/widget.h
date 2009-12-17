@@ -45,8 +45,11 @@ struct _liwdgWidget
 	liwdgRect allocation;
 	liwdgSize hardrequest;
 	liwdgSize userrequest;
+	liwdgStyle* style;
 	liwdgWidgetState state;
 	void* userdata;
+	char* state_name;
+	char* style_name;
 	unsigned int focusable : 1;
 	unsigned int transparent : 1;
 	unsigned int visible : 1;
@@ -83,7 +86,6 @@ liwdg_widget_move (liwdgWidget* self,
 
 void
 liwdg_widget_paint (liwdgWidget* self,
-                    const char*  style,
                     liwdgRect*   rect);
 
 int
@@ -124,6 +126,10 @@ liwdg_widget_set_allocation (liwdgWidget* self,
                              int          w,
                              int          h);
 
+void
+liwdg_widget_get_content (liwdgWidget* self,
+                          liwdgRect*   allocation);
+
 int
 liwdg_widget_get_grab (const liwdgWidget* self);
 
@@ -159,28 +165,24 @@ liwdg_widget_set_request (liwdgWidget* self,
                           int          w,
                           int          h);
 
+void
+liwdg_widget_set_request_internal (liwdgWidget* self,
+                                   int          w,
+                                   int          h);
+
 liwdgWidget*
 liwdg_widget_get_root (liwdgWidget* self);
 
+void
+liwdg_widget_set_state (liwdgWidget* self,
+                        const char*  state);
+
 liwdgStyle*
-liwdg_widget_get_style (liwdgWidget* self,
+liwdg_widget_get_style (liwdgWidget* self);
+
+void
+liwdg_widget_set_style (liwdgWidget* self,
                         const char*  style);
-
-void
-liwdg_widget_get_style_allocation (liwdgWidget* self,
-                                   const char*  style,
-                                   liwdgRect*   allocation);
-
-void
-liwdg_widget_get_style_request (liwdgWidget* self,
-                                const char*  style,
-                                liwdgSize*   size);
-
-void
-liwdg_widget_set_style_request (liwdgWidget* self,
-                                int          w,
-                                int          h,
-                                const char*  style);
 
 void*
 liwdg_widget_get_userdata (liwdgWidget* self);

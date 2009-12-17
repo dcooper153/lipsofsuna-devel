@@ -131,6 +131,7 @@ static int
 private_init (liwdgTabs*    self,
               liwdgManager* manager)
 {
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "tabs");
 	return 1;
 }
 
@@ -181,7 +182,7 @@ private_event (liwdgTabs*  self,
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "tabs", &rect);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 			if (event->button.y >= rect.y + rect.height)
 			{
 				for (i = 0 ; i < self->tabs.count ; i++)
@@ -202,9 +203,9 @@ private_event (liwdgTabs*  self,
 			break;
 		case LIWDG_EVENT_TYPE_RENDER:
 			/* Draw base. */
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "tabs");
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "tabs", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "tabs", NULL);
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw tabs. */
 			for (i = 0 ; i < self->tabs.count ; i++)
 			{
@@ -351,10 +352,10 @@ private_rebuild (liwdgTabs* self)
 		size.width = LI_MAX (size.width, size1.width);
 		size.height = LI_MAX (size.height, size1.height);
 	}
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self), size.width, size.height, "tabs");
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), size.width, size.height);
 
 	/* Position tabs. */
-	style = liwdg_widget_get_style (LIWDG_WIDGET (self), "tabs");
+	style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 	rect.x += style->w[0];
 	rect.y += rect.height - style->h[2];
@@ -384,7 +385,7 @@ private_rebuild (liwdgTabs* self)
 		return;
 
 	/* Allocate active widget. */
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "tabs", &rect);
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	liwdg_widget_set_allocation (child, rect.x, rect.y, rect.width, rect.height);
 }
 

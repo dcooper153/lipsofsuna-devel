@@ -125,6 +125,7 @@ private_init (liextChatHistory* self,
 	self->lines.array = lisys_calloc (1, self->lines.count * sizeof (char*));
 	if (self->lines.array == NULL)
 		return 0;
+	liwdg_label_set_valign (LIWDG_LABEL (self), 1.0f);
 
 	/* Format text. */
 	private_rebuild (self);

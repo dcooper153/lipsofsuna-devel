@@ -335,6 +335,7 @@ private_init (liwdgTree*    self,
 	self->root.depth = 0;
 	self->root.expand = 1;
 	self->root.text = NULL;
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "tree");
 	return 1;
 }
 
@@ -357,7 +358,7 @@ private_event (liwdgTree*  self,
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-			y = rect.y + rect.height;
+			y = rect.y;
 			row = private_treerow_find_clicked (&self->root, &rect, &y, event->button.x, event->button.y);
 			if (row == NULL)
 				return 0;
@@ -370,10 +371,10 @@ private_event (liwdgTree*  self,
 			else
 				return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self, row);
 		case LIWDG_EVENT_TYPE_RENDER:
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "tree");
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			/* Draw base. */
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "tree", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "tree", NULL);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw rows. */
 			private_treerow_render (&self->root, &rect, style, 0);
 			return 1;
@@ -403,7 +404,7 @@ private_rebuild (liwdgTree* self)
 	liwdgSize size;
 
 	private_treerow_get_request (&self->root, &size.width, &size.height);
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self), size.width, size.height, "tree");
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), size.width, size.height);
 }
 
 static liwdgTreerow*
@@ -438,9 +439,9 @@ private_treerow_find_clicked (liwdgTreerow* self,
 	if (self->layout != NULL)
 	{
 		h = private_treerow_get_height (self);
-		*rowy -= h;
 		if (*rowy <= y && y < *rowy + h)
 			return self;
+		*rowy += h;
 	}
 
 	if (self->expand)
@@ -476,15 +477,18 @@ private_treerow_render (liwdgTreerow* self,
 	int i;
 	int h;
 	int x;
-	int y0;
 	int pointer[2];
 	liwdgManager* manager;
+	liwdgRect r;
 
 	/* Calculate offset. */
 	h = private_treerow_get_height (self);
-	y += h;
-	y0 = y;
 	x = rect->x + self->depth * LIWDG_TREE_NEST;
+	r.x = rect->x;
+	r.y = rect->y + y;
+	r.height = h;
+	r.width = rect->width;
+	y += h;
 
 	/* Get relative pointer position. */
 	manager = LIWDG_WIDGET (self->tree)->manager;
@@ -492,17 +496,16 @@ private_treerow_render (liwdgTreerow* self,
 		manager->pointer.x, manager->pointer.y, pointer + 0, pointer + 1);
 
 	/* Render hover. */
-	if (pointer[0] >= rect->x && pointer[0] < rect->x + rect->width &&
-	    pointer[1] >= rect->y + rect->height - y - 1 &&
-	    pointer[1] < rect->y + rect->height - y + h - 1)
+	if (pointer[0] >= r.x && pointer[0] < r.x + r.width &&
+	    pointer[1] >= r.y && pointer[1] < r.y + r.height)
 	{
 		glColor4fv (style->hover);
 		glBindTexture (GL_TEXTURE_2D, 0);
 		glBegin (GL_TRIANGLE_STRIP);
-		glVertex2i (rect->x, rect->y + rect->height - y - 1);
-		glVertex2i (rect->x + rect->width, rect->y + rect->height - y - 1);
-		glVertex2i (rect->x, rect->y + rect->height - y + h - 1);
-		glVertex2i (rect->x + rect->width, rect->y + rect->height - y + h - 1);
+		glVertex2i (r.x, r.y);
+		glVertex2i (r.x + r.width, r.y);
+		glVertex2i (r.x, r.y + r.height);
+		glVertex2i (r.x + r.width, r.y + r.height);
 		glEnd ();
 	}
 
@@ -512,10 +515,10 @@ private_treerow_render (liwdgTreerow* self,
 		glColor4fv (style->selection);
 		glBindTexture (GL_TEXTURE_2D, 0);
 		glBegin (GL_TRIANGLE_STRIP);
-		glVertex2i (rect->x, rect->y + rect->height - y - 1);
-		glVertex2i (rect->x + rect->width, rect->y + rect->height - y - 1);
-		glVertex2i (rect->x, rect->y + rect->height - y + h - 1);
-		glVertex2i (rect->x + rect->width, rect->y + rect->height - y + h - 1);
+		glVertex2i (r.x, r.y);
+		glVertex2i (r.x + r.width, r.y);
+		glVertex2i (r.x, r.y + r.height);
+		glVertex2i (r.x + r.width, r.y + r.height);
 		glEnd ();
 	}
 
@@ -523,7 +526,7 @@ private_treerow_render (liwdgTreerow* self,
 	if (self->layout != NULL)
 	{
 		glColor4fv (style->color);
-		lifnt_layout_render (self->layout, x, rect->y + rect->height - y - 1);
+		lifnt_layout_render (self->layout, x, r.y);
 	}
 
 	/* Render children. */
@@ -540,17 +543,17 @@ private_treerow_render (liwdgTreerow* self,
 		glColor3f (0.8f, 0.8f, 0.8f);
 		glBindTexture (GL_TEXTURE_2D, 0);
 		glBegin (GL_LINES);
-		glVertex2f (x - 0.5f * LIWDG_TREE_NEST, rect->y + rect->height - y0 + 0.5f * h - 1);
-		glVertex2f (x, rect->y + rect->height - y0 + 0.5f * h - 1);
+		glVertex2f (x - 0.5f * LIWDG_TREE_NEST, r.y + 0.5f * r.height);
+		glVertex2f (x, r.y + 0.5f * r.height);
 		if (self != self->parent->rows.array[self->parent->rows.count - 1])
 		{
-			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, rect->y + rect->height - y0 + h - 1);
-			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, rect->y + rect->height - y - 1);
+			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, r.y);
+			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, rect->y + y);
 		}
 		else
 		{
-			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, rect->y + rect->height - y0 + 1.0f * h - 1);
-			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, rect->y + rect->height - y0 + 0.5f * h - 1);
+			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, r.y);
+			glVertex2f (x - 0.5f * LIWDG_TREE_NEST, r.y + 0.5f * r.height);
 		}
 		glEnd ();
 	}

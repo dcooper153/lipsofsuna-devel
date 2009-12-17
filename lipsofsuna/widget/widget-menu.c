@@ -46,25 +46,22 @@ private_render_horizontal (liwdgMenu* self);
 static void
 private_render_vertical (liwdgMenu* self);
 
-static liwdgMenuProxy*
-private_proxy_new (liwdgMenu*      self,
-                   liwdgMenuGroup* group,
-                   liwdgMenuItem*  item);
+static liwdgMenuItem*
+private_item_create (liwdgMenu*     self,
+                     liwdgMenuItem* parent,
+                     const char*    text);
 
 static void
-private_proxy_free (liwdgMenu*      self,
-                    liwdgMenuProxy* proxy);
+private_item_free (liwdgMenu*     self,
+                   liwdgMenuItem* item);
 
-static liwdgMenuProxy*
-private_proxy_find (liwdgMenu* self,
-                    int        x,
-                    int        y);
+static liwdgMenuItem*
+private_item_find (liwdgMenu* self,
+                   int        x,
+                   int        y);
 
 static void
 private_rebuild (liwdgMenu* self);
-
-static const char*
-private_style (const liwdgMenu* self);
 
 const liwdgClass liwdgMenuType =
 {
@@ -89,46 +86,59 @@ liwdg_menu_new (liwdgManager* manager)
 }
 
 /**
- * \brief Inserts a group to the menu.
+ * \brief Inserts a menu item to the menu.
  *
  * \param self Menu.
- * \param group Menu group.
+ * \param label Label.
+ * \param icon Icon name or NULL.
+ * \param call Callback.
+ * \param data Userdata.
  * \return Nonzero on success.
  */
 int
-liwdg_menu_insert_group (liwdgMenu*      self,
-                         liwdgMenuGroup* group)
+liwdg_menu_insert_item (liwdgMenu*   self,
+                        const char*  label,
+                        const char*  icon,
+                        liwdgHandler call,
+                        void*        data)
 {
-	int i;
-	liwdgMenuProxy* proxy;
+	liwdgMenuItem* item;
 
-	if (!lialg_list_prepend (&self->groups, group))
+#warning Menu icons not implemented
+	item = private_item_create (self, NULL, label);
+	if (item == NULL)
 		return 0;
-	for (i = 0 ; i < group->items.count ; i++)
-	{
-#warning No menu merging.
-		proxy = private_proxy_new (self, group, group->items.array[i]);
-		if (proxy == NULL)
-			continue;
-		if (!lialg_list_prepend (&self->proxies, proxy))
-			private_proxy_free (self, proxy);
-	}
+	item->callback.call = call;
+	item->callback.data = data;
 	private_rebuild (self);
 
 	return 1;
 }
 
-/**
- * \brief Removes a group from the menu.
- *
- * \param self Menu.
- * \param group Menu group.
- */
-void
-liwdg_menu_remove_group (liwdgMenu*      self,
-                         liwdgMenuGroup* group)
+int
+liwdg_menu_get_autohide (const liwdgMenu* self)
 {
-	private_rebuild (self);
+	return self->autohide;
+}
+
+void
+liwdg_menu_set_autohide (liwdgMenu* self,
+                         int        value)
+{
+	self->autohide = value;
+}
+
+liwdgMenuItem*
+liwdg_menu_get_item (const liwdgMenu* self,
+                     int              index)
+{
+	return self->items.array[index];
+}
+
+int
+liwdg_menu_get_item_count (const liwdgMenu* self)
+{
+	return self->items.count;
 }
 
 /**
@@ -144,20 +154,18 @@ liwdg_menu_get_item_rect (const liwdgMenu* self,
                           const char*      name,
                           liwdgRect*       value)
 {
-	lialgList* ptr;
+	int i;
 	liwdgMenuItem* item;
-	liwdgMenuProxy* proxy;
 	liwdgRect rect;
 
 	if (self->font == NULL)
 		return 0;
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	if (self->vertical)
 	{
-		for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+		for (i = 0 ; i < self->items.count ; i++)
 		{
-			proxy = ptr->data;
-			item = proxy->items->data;
+			item = self->items.array[i];
 			if (!strcmp (name, item->text))
 			{
 				*value = rect;
@@ -168,17 +176,15 @@ liwdg_menu_get_item_rect (const liwdgMenu* self,
 	}
 	else
 	{
-		for (ptr = self->proxies ; ptr->next != NULL ; ptr = ptr->next) {}
-		for ( ; ptr != NULL ; ptr = ptr->prev)
+		for (i = self->items.count - 1 ; i >= 0 ; i--)
 		{
-			proxy = ptr->data;
-			item = proxy->items->data;
+			item = self->items.array[i];
 			if (!strcmp (name, item->text))
 			{
 				*value = rect;
 				return 1;
 			}
-			rect.x += lifnt_layout_get_width (proxy->label) + SPACINGX;
+			rect.x += lifnt_layout_get_width (item->label) + SPACINGX;
 		}
 	}
 
@@ -217,39 +223,34 @@ private_init (liwdgMenu*    self,
 static void
 private_free (liwdgMenu* self)
 {
-	lialgList* ptr;
+	int i;
 
-	for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
-		private_proxy_free (self, ptr->data);
-	lialg_list_free (self->groups);
-	lialg_list_free (self->proxies);
+	for (i = 0 ; i < self->items.count ; i++)
+		private_item_free (self, self->items.array[i]);
+	lisys_free (self->items.array);
 }
 
 static int
 private_event (liwdgMenu*  self,
                liwdgEvent* event)
 {
-	lialgList* ptr;
 	liwdgMenuItem* item;
-	liwdgMenuProxy* proxy;
 
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			proxy = private_proxy_find (self, event->button.x, event->button.y);
-			if (proxy != NULL)
+			item = private_item_find (self, event->button.x, event->button.y);
+			if (item != NULL)
 			{
-				for (ptr = proxy->items ; ptr != NULL ; ptr = ptr->next)
-				{
-					item = ptr->data;
-					if (item->group->callback.call != NULL)
-						item->group->callback.call (item->group->callback.data, item->id);
-				}
+				if (item->callback.call != NULL)
+					item->callback.call (item->callback.data, item);
+				if (self->autohide)
+					liwdg_widget_set_visible (LIWDG_WIDGET (self), 0);
 			}
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
 			if (!LIWDG_WIDGET (self)->transparent)
-				liwdg_widget_paint (LIWDG_WIDGET (self), private_style (self), NULL);
+				liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			if (self->font != NULL)
 			{
 				if (self->vertical)
@@ -266,42 +267,41 @@ private_event (liwdgMenu*  self,
 static void
 private_render_horizontal (liwdgMenu*  self)
 {
-	lialgList* ptr;
+	int i;
 	liwdgManager* manager;
-	liwdgMenuProxy* proxy;
+	liwdgMenuItem* item;
 	liwdgRect rect;
 	liwdgStyle* style;
 
 	/* Get style allocation. */
 	manager = LIWDG_WIDGET (self)->manager;
-	style = liwdg_widget_get_style (LIWDG_WIDGET (self), private_style (self));
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+	style = liwdg_widget_get_style (LIWDG_WIDGET (self));
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 
 	/* Render each item. */
-	for (ptr = self->proxies ; ptr->next != NULL ; ptr = ptr->next) {}
-	for ( ; ptr != NULL ; ptr = ptr->prev)
+	for (i = self->items.count - 1 ; i >= 0 ; i--)
 	{
-		proxy = ptr->data;
+		item = self->items.array[i];
 		glColor4fv (style->color);
-		lifnt_layout_render (proxy->label, rect.x, rect.y);
-		rect.x += lifnt_layout_get_width (proxy->label) + SPACINGX;
+		lifnt_layout_render (item->label, rect.x, rect.y);
+		rect.x += lifnt_layout_get_width (item->label) + SPACINGX;
 	}
 }
 
 static void
 private_render_vertical (liwdgMenu*  self)
 {
+	int i;
 	int lineh;
 	int pointer[2];
-	lialgList* ptr;
 	liwdgManager* manager;
-	liwdgMenuProxy* proxy;
+	liwdgMenuItem* item;
 	liwdgRect rect;
 	liwdgStyle* style;
 
 	/* Get style allocation. */
-	style = liwdg_widget_get_style (LIWDG_WIDGET (self), private_style (self));
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+	style = liwdg_widget_get_style (LIWDG_WIDGET (self));
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	lineh = lifnt_font_get_height (self->font) + SPACINGY;
 
 	/* Get relative pointer position. */
@@ -310,11 +310,9 @@ private_render_vertical (liwdgMenu*  self)
 		manager->pointer.x, manager->pointer.y, pointer + 0, pointer + 1);
 
 	/* Render each item. */
-	for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+	for (i = 0 ; i < self->items.count ; i++)
 	{
-		proxy = ptr->data;
-		if (ptr->next == NULL)
-			lineh -= SPACINGY;
+		item = self->items.array[i];
 
 		/* Render hover. */
 		if (pointer[0] >= rect.x && pointer[0] < rect.x + rect.width &&
@@ -332,87 +330,111 @@ private_render_vertical (liwdgMenu*  self)
 
 		/* Render text. */
 		glColor4fv (style->color);
-		lifnt_layout_render (proxy->label, rect.x, rect.y);
+		lifnt_layout_render (item->label, rect.x, rect.y + SPACINGY / 2);
 		rect.y += lineh;
 	}
 }
 
-static liwdgMenuProxy*
-private_proxy_new (liwdgMenu*      self,
-                   liwdgMenuGroup* group,
-                   liwdgMenuItem*  item)
+static liwdgMenuItem*
+private_item_create (liwdgMenu*     self,
+                     liwdgMenuItem* parent,
+                     const char*    text)
 {
-	liwdgMenuProxy* proxy;
+	liwdgMenuItem* item;
 
-	/* Allocate proxy. */
-	proxy = lisys_calloc (1, sizeof (liwdgMenuProxy));
-	if (proxy == NULL)
+	/* Allocate item. */
+	item = lisys_calloc (1, sizeof (liwdgMenuItem));
+	if (item == NULL)
 		return NULL;
+	item->id = -1;
+	item->text = listr_dup (text);
+	if (item->text == NULL)
+	{
+		lisys_free (item);
+		return NULL;
+	}
 
 	/* Allocate label. */
-	proxy->label = lifnt_layout_new ();
-	if (proxy->label == NULL)
+	item->label = lifnt_layout_new ();
+	if (item->label == NULL)
 	{
-		lisys_free (proxy);
+		lisys_free (item->text);
+		lisys_free (item);
 		return NULL;
 	}
 	if (self->font != NULL)
-		lifnt_layout_append_string (proxy->label, self->font, item->text);
+		lifnt_layout_append_string (item->label, self->font, item->text);
 
-	/* Store item reference. */
-	if (!lialg_list_prepend (&proxy->items, item))
+	/* Append to item list. */
+	if (parent != NULL)
 	{
-		lifnt_layout_free (proxy->label);
-		lisys_free (proxy);
-		return NULL;
+		if (!lialg_array_append (&parent->items, &item))
+		{
+			lisys_free (item->text);
+			lisys_free (item);
+			return NULL;
+		}
+	}
+	else
+	{
+		if (!lialg_array_append (&self->items, &item))
+		{
+			lisys_free (item->text);
+			lisys_free (item);
+			return NULL;
+		}
 	}
 
-	return proxy;
+	return item;
 }
 
 static void
-private_proxy_free (liwdgMenu*      self,
-                    liwdgMenuProxy* proxy)
+private_item_free (liwdgMenu*     self,
+                   liwdgMenuItem* item)
 {
-	lialg_list_free (proxy->items);
-	lialg_list_free (proxy->proxies);
-	lifnt_layout_free (proxy->label);
-	lisys_free (proxy);
+	int i;
+
+	lifnt_layout_free (item->label);
+	for (i = 0 ; i < item->items.count ; i++)
+		private_item_free (self, item->items.array[i]);
+	lisys_free (item->items.array);
+	lisys_free (item->icon);
+	lisys_free (item->text);
+	lisys_free (item);
 }
 
-static liwdgMenuProxy*
-private_proxy_find (liwdgMenu* self,
-                    int        x,
-                    int        y)
+static liwdgMenuItem*
+private_item_find (liwdgMenu* self,
+                   int        x,
+                   int        y)
 {
+	int i;
 	int size;
-	lialgList* ptr;
-	liwdgMenuProxy* proxy;
+	liwdgMenuItem* item;
 	liwdgRect rect;
 
-	if (self->font == NULL || self->proxies == NULL)
+	if (self->font == NULL)
 		return NULL;
-	liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), private_style (self), &rect);
+	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	if (self->vertical)
 	{
 		size = lifnt_font_get_height (self->font);
-		for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+		for (i = 0 ; i < self->items.count ; i++)
 		{
-			proxy = ptr->data;
+			item = self->items.array[i];
 			if (rect.y <= y && y < rect.y + size)
-				return proxy;
+				return item;
 			rect.y += size + SPACINGY;
 		}
 	}
 	else
 	{
-		for (ptr = self->proxies ; ptr->next != NULL ; ptr = ptr->next) {}
-		for ( ; ptr != NULL ; ptr = ptr->prev)
+		for (i = self->items.count - 1 ; i >= 0 ; i--)
 		{
-			proxy = ptr->data;
-			size = lifnt_layout_get_width (proxy->label);
+			item = self->items.array[i];
+			size = lifnt_layout_get_width (item->label);
 			if (rect.x <= x && x < rect.x + size)
-				return proxy;
+				return item;
 			rect.x += size + SPACINGX;
 		}
 	}
@@ -423,8 +445,8 @@ private_proxy_find (liwdgMenu* self,
 static void
 private_rebuild (liwdgMenu* self)
 {
-	lialgList* ptr;
-	liwdgMenuProxy* proxy;
+	int i;
+	liwdgMenuItem* item;
 	liwdgSize size;
 
 	size.width = 0;
@@ -433,37 +455,27 @@ private_rebuild (liwdgMenu* self)
 	{
 		if (self->vertical)
 		{
-			for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+			for (i = 0 ; i < self->items.count ; i++)
 			{
-				proxy = ptr->data;
-				size.width = LI_MAX (size.width, lifnt_layout_get_width (proxy->label));
+				item = self->items.array[i];
+				size.width = LI_MAX (size.width, lifnt_layout_get_width (item->label));
 				size.height += lifnt_font_get_height (self->font);
-				if (ptr->next != NULL)
-					size.height += SPACINGY;
+				size.height += SPACINGY;
 			}
 		}
 		else
 		{
 			size.height = lifnt_font_get_height (self->font);
-			for (ptr = self->proxies ; ptr != NULL ; ptr = ptr->next)
+			for (i = 0 ; i < self->items.count ; i++)
 			{
-				proxy = ptr->data;
-				size.width += lifnt_layout_get_width (proxy->label);
-				if (ptr->next != NULL)
-					size.width += SPACINGX;
+				item = self->items.array[i];
+				size.width += lifnt_layout_get_width (item->label);
+				size.width += SPACINGX;
 			}
 		}
 	}
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self), size.width, size.height, private_style (self));
-}
-
-static const char*
-private_style (const liwdgMenu* self)
-{
-	if (self->vertical)
-		return "menu";
-	else
-		return "menu-top";
+	liwdg_widget_set_style (LIWDG_WIDGET (self), self->vertical? "menu" : "menu-top");
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), size.width, size.height);
 }
 
 /** @} */

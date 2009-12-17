@@ -143,7 +143,8 @@ private_init (liwdgRender*  self,
 {
 	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
 		return 0;
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self), 128, 128, "render");
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "render");
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), 128, 128);
 	self->modelview = limat_matrix_identity ();
 	self->projection = limat_matrix_perspective (45.0f, 1.0f, 1.0f, 100.0f);
 
@@ -159,9 +160,12 @@ static int
 private_event (liwdgRender* self,
                liwdgEvent*  event)
 {
+	int i;
 	limatFrustum frustum;
+	liwdgManager* manager;
 	liwdgRect rect;
 	liwdgStyle* style;
+	liwdgWidget* child;
 
 	switch (event->type)
 	{
@@ -181,17 +185,18 @@ private_event (liwdgRender* self,
 			break;
 		case LIWDG_EVENT_TYPE_RENDER:
 			/* Draw base. */
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "render");
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "render", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "render", NULL);
+			manager = LIWDG_WIDGET (self)->manager;
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw scene. */
 			glMatrixMode (GL_PROJECTION);
 			glPushMatrix ();
 			glMatrixMode (GL_MODELVIEW);
 			glPushMatrix ();
 			glPushAttrib (GL_VIEWPORT_BIT | GL_ENABLE_BIT);
-			glViewport (rect.x, rect.y, rect.width, rect.height);
-			glScissor (rect.x, rect.y, rect.width, rect.height);
+			glViewport (rect.x, manager->height - rect.y - rect.height, rect.width, rect.height);
+			glScissor (rect.x, manager->height - rect.y - rect.height, rect.width, rect.height);
 			glEnable (GL_SCISSOR_TEST);
 			glDepthMask (GL_TRUE);
 			glClear (GL_DEPTH_BUFFER_BIT);
@@ -221,7 +226,14 @@ private_event (liwdgRender* self,
 			glDisable (GL_LIGHTING);
 			glDisable (GL_DEPTH_TEST);
 			glDepthMask (GL_FALSE);
-			break;
+			/* Draw children. */
+			for (i = 0 ; i < LIWDG_GROUP (self)->width * LIWDG_GROUP (self)->height ; i++)
+			{
+				child = LIWDG_GROUP (self)->cells[i].child;
+				if (child != NULL)
+					liwdg_widget_render (child);
+			}
+			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
 			if (self->custom_update_func != NULL)
 				self->custom_update_func (self, self->custom_update_data);

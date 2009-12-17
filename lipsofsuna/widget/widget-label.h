@@ -37,6 +37,8 @@ struct _liwdgLabel
 	lifntFont* font;
 	lifntLayout* text;
 	int highlight;
+	float halign;
+	float valign;
 	char* string;
 };
 
@@ -56,6 +58,13 @@ void
 liwdg_label_set_font (liwdgLabel* self,
                       lifntFont*  font);
 
+float
+liwdg_label_get_halign (const liwdgLabel* self);
+
+void
+liwdg_label_set_halign (liwdgLabel* self,
+                        float       value);
+
 int
 liwdg_label_get_highlight (const liwdgLabel* self);
 
@@ -69,6 +78,13 @@ liwdg_label_set_text (liwdgLabel* self,
 
 const char*
 liwdg_label_get_text (liwdgLabel* self);
+
+float
+liwdg_label_get_valign (const liwdgLabel* self);
+
+void
+liwdg_label_set_valign (liwdgLabel* self,
+                        float       value);
 
 #endif
 

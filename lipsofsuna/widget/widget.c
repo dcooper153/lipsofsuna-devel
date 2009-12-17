@@ -43,16 +43,8 @@ static int
 private_event (liwdgWidget* self,
                liwdgEvent*  event);
 
-void
-private_paint_row (liwdgWidget* self,
-                   float        px,
-                   float        py,
-                   float*       tx,
-                   float*       ty,
-                   float*       w,
-                   float        h,
-                   float        wreq,
-                   int          repeat);
+static void
+private_rebuild_style (liwdgWidget* self);
 
 const liwdgClass liwdgWidgetType =
 {
@@ -206,12 +198,10 @@ liwdg_widget_move (liwdgWidget* self,
  * \brief Paints widget graphics.
  *
  * \param self Widget.
- * \param style Style identifier.
  * \param rect Rectangle or NULL for the allocation of the widget.
  */
 void
 liwdg_widget_paint (liwdgWidget* self,
-                    const char*  style,
                     liwdgRect*   rect)
 {
 	int px;
@@ -229,8 +219,8 @@ liwdg_widget_paint (liwdgWidget* self,
 	/* Get style. */
 	if (rect == NULL)
 		rect = &self->allocation;
-	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
-	if (style_ == NULL)
+	style_ = self->style;
+	if (style_->texture == NULL)
 		return;
 
 	/* Calculate repeat counts. */
@@ -246,10 +236,10 @@ liwdg_widget_paint (liwdgWidget* self,
 	tx[1] = (float)(style_->x + style_->w[0]) / style_->texture->width;
 	tx[2] = (float)(style_->x + style_->w[0] + style_->w[1]) / style_->texture->width;
 	tx[3] = (float)(style_->x + style_->w[0] + style_->w[1] + style_->w[2]) / style_->texture->width;
-	ty[3] = (float)(style_->y) / style_->texture->height;
-	ty[2] = (float)(style_->y + style_->h[2]) / style_->texture->height;
-	ty[1] = (float)(style_->y + style_->h[2] + style_->h[1]) / style_->texture->height;
-	ty[0] = (float)(style_->y + style_->h[2] + style_->h[1] + style_->h[0]) / style_->texture->height;
+	ty[0] = (float)(style_->y) / style_->texture->height;
+	ty[1] = (float)(style_->y + style_->h[0]) / style_->texture->height;
+	ty[2] = (float)(style_->y + style_->h[0] + style_->h[1]) / style_->texture->height;
+	ty[3] = (float)(style_->y + style_->h[0] + style_->h[1] + style_->h[2]) / style_->texture->height;
 
 	/* Bind texture. */
 	glBindTexture (GL_TEXTURE_2D, style_->texture->texture);
@@ -490,6 +480,24 @@ liwdg_widget_set_allocation (liwdgWidget* self,
 }
 
 /**
+ * \brief Gets the rectangle of the contents of the widget.
+ *
+ * The content rectangle is the allocation of the widget minus style paddings.
+ *
+ * \param self Widget.
+ * \param allocation Return location for a rectangle.
+ */
+void
+liwdg_widget_get_content (liwdgWidget* self,
+                          liwdgRect*   allocation)
+{
+	allocation->x = self->allocation.x + self->style->pad[1];
+	allocation->y = self->allocation.y + self->style->pad[0];
+	allocation->width = self->allocation.width - self->style->pad[1] - self->style->pad[2];
+	allocation->height = self->allocation.height - self->style->pad[0] - self->style->pad[3];
+}
+
+/**
  * \brief Gets the mouse focus state of the widget.
  *
  * \param self Widget.
@@ -579,9 +587,10 @@ liwdg_widget_set_grab (liwdgWidget* self,
 }
 
 /**
- * \brief Gets the size request of the widget.
+ * \brief Gets the full size request of the widget.
  *
- * Returns the larger of the user and hard size requests.
+ * Returns the larger of the user and hard size requests, combined with the
+ * style paddings of the widget.
  *
  * \param self Widget.
  * \param request Return location for the size.
@@ -590,12 +599,17 @@ void
 liwdg_widget_get_request (liwdgWidget* self,
                           liwdgSize*   request)
 {
+	/* Get ordinary request. */
 	request->width = self->hardrequest.width;
 	request->height = self->hardrequest.height;
 	if (self->userrequest.width != -1)
 		request->width = LI_MAX (request->width, self->userrequest.width);
 	if (self->userrequest.height != -1)
 		request->height = LI_MAX (request->height, self->userrequest.height);
+
+	/* Add style paddings. */
+	request->width += self->style->pad[1] + self->style->pad[2];
+	request->height += self->style->pad[0] + self->style->pad[3];
 }
 
 /**
@@ -620,6 +634,28 @@ liwdg_widget_set_request (liwdgWidget* self,
 	}
 }
 
+/**
+ * \brief Sets the internal size request of the widget.
+ *
+ * \param self Widget.
+ * \param w Width.
+ * \param h Height.
+ */
+void
+liwdg_widget_set_request_internal (liwdgWidget* self,
+                                   int          w,
+                                   int          h)
+{
+	if (self->hardrequest.width != w ||
+	    self->hardrequest.height != h)
+	{
+		self->hardrequest.width = w;
+		self->hardrequest.height = h;
+		if (self->parent != NULL)
+			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+	}
+}
+
 liwdgWidget*
 liwdg_widget_get_root (liwdgWidget* self)
 {
@@ -629,81 +665,72 @@ liwdg_widget_get_root (liwdgWidget* self)
 	return widget;
 }
 
+void
+liwdg_widget_set_state (liwdgWidget* self,
+                        const char*  state)
+{
+	char* tmp;
+
+	/* Early exit. */
+	if ((self->state_name == NULL && state == NULL) ||
+	    (self->state_name != NULL && state != NULL && !strcmp (state, self->state_name)))
+		return;
+
+	/* Store state name. */
+	if (state != NULL)
+	{
+		tmp = listr_dup (state);
+		if (tmp != NULL)
+		{
+			lisys_free (self->state_name);
+			self->state_name = tmp;
+		}
+	}
+	else
+	{
+		lisys_free (self->state_name);
+		self->state_name = NULL;
+	}
+
+	/* Rebuild style. */
+	private_rebuild_style (self);
+}
+
 liwdgStyle*
-liwdg_widget_get_style (liwdgWidget* self,
+liwdg_widget_get_style (liwdgWidget* self)
+{
+	return self->style;
+}
+
+void
+liwdg_widget_set_style (liwdgWidget* self,
                         const char*  style)
 {
-	liwdgStyle* style_;
+	char* tmp;
 
-	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
-	if (style_ == NULL)
-		return &self->manager->styles->fallback;
-
-	return style_;
-}
-
-void
-liwdg_widget_get_style_allocation (liwdgWidget* self,
-                                   const char*  style,
-                                   liwdgRect*   allocation)
-{
-	liwdgStyle* style_;
-
-	/* Get widget style_image. */
-	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
-	if (style_ == NULL)
-	{
-		*allocation = self->allocation;
+	/* Early exit. */
+	if ((self->style_name == NULL && style == NULL) ||
+	    (self->style_name != NULL && style != NULL && !strcmp (style, self->style_name)))
 		return;
-	}
 
-	/* Subtract paddings from the allocation. */
-	allocation->x = self->allocation.x + style_->pad[1];
-	allocation->y = self->allocation.y + style_->pad[3];
-	allocation->width = self->allocation.width - style_->pad[1] - style_->pad[2];
-	allocation->height = self->allocation.height - style_->pad[3] - style_->pad[0];
-}
-
-void
-liwdg_widget_get_style_request (liwdgWidget* self,
-                                const char*  style,
-                                liwdgSize*   size)
-{
-	liwdgStyle* style_;
-
-	/* Get ordinary request. */
-	liwdg_widget_get_request (self, size);
-
-	/* Add paddings. */
-	style_ = lialg_strdic_find (self->manager->styles->subimgs, style);
-	if (style_ != NULL)
+	/* Store style name. */
+	if (style != NULL)
 	{
-		size->width += style_->pad[1] + style_->pad[2];
-		size->height += style_->pad[0] + style_->pad[3];
+		tmp = listr_dup (style);
+		if (tmp != NULL)
+		{
+			lisys_free (self->style_name);
+			self->style_name = tmp;
+		}
 	}
-}
-
-void
-liwdg_widget_set_style_request (liwdgWidget* self,
-                                int          w,
-                                int          h,
-                                const char*  style)
-{
-	liwdgSize old;
-	liwdgSize size;
-
-	/* Set suitable hard request. */
-	old = self->hardrequest;
-	self->hardrequest.width = w;
-	self->hardrequest.height = h;
-	liwdg_widget_get_style_request (self, style, &size);
-	self->hardrequest.width = size.width;
-	self->hardrequest.height = size.height;
-	if (old.width != size.width || old.height != size.height)
+	else
 	{
-		if (self->parent != NULL)
-			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+		lisys_free (self->style_name);
+		self->style_name = NULL;
 	}
+
+	/* Rebuild style. */
+	private_rebuild_style (self);
 }
 
 void*
@@ -777,6 +804,7 @@ static int
 private_init (liwdgWidget*  self,
               liwdgManager* manager)
 {
+	self->style = &self->manager->styles->fallback;
 	self->userrequest.width = -1;
 	self->userrequest.height = -1;
 	self->manager = manager;
@@ -792,6 +820,8 @@ private_free (liwdgWidget* self)
 {
 	if (self->callbacks != NULL)
 		lical_callbacks_free (self->callbacks);
+	lisys_free (self->style_name);
+	lisys_free (self->state_name);
 }
 
 static int
@@ -808,47 +838,44 @@ private_event (liwdgWidget* self,
 	return 1;
 }
 
-void
-private_paint_row (liwdgWidget* self,
-                   float        px,
-                   float        py,
-                   float*       tx,
-                   float*       ty,
-                   float*       w,
-                   float        h,
-                   float        wreq,
-                   int          repeat)
+static void
+private_rebuild_style (liwdgWidget* self)
 {
-	int x;
+	int len0;
+	int len1;
+	char* full;
+	liwdgStyle* style = NULL;
 
-	/* Draw left border. */
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[0], ty[0]); glVertex2f (px, py);
-	glTexCoord2f (tx[1], ty[0]); glVertex2f (px + w[0], py);
-	glTexCoord2f (tx[0], ty[1]); glVertex2f (px, py + h);
-	glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py + h);
-	glEnd ();
-	px += w[0];
-
-	/* Draw fill. */
-	for (x = 0 ; x <= repeat ; x++)
+	/* Find style. */
+	if (self->style_name != NULL)
 	{
-		glBegin (GL_TRIANGLE_STRIP);
-		glTexCoord2f (tx[1], ty[0]); glVertex2f (px, py);
-		glTexCoord2f (tx[2], ty[0]); glVertex2f (px + w[1], py);
-		glTexCoord2f (tx[1], ty[1]); glVertex2f (px, py + h);
-		glTexCoord2f (tx[2], ty[1]); glVertex2f (px + w[1], py + h);
-		glEnd ();
-		px += w[1];
+		if (self->state_name != NULL)
+		{
+			len0 = strlen (self->style_name);
+			len1 = strlen (self->state_name);
+			full = lisys_calloc (len0 + len1 + 2, sizeof (char));
+			if (full != NULL)
+			{
+				strcpy (full, self->style_name);
+				strcpy (full + len0 + 1, self->state_name);
+				full[len0] = ':';
+				style = lialg_strdic_find (self->manager->styles->subimgs, full);
+				lisys_free (full);
+			}
+		}
+		else
+			style = lialg_strdic_find (self->manager->styles->subimgs, self->style_name);
 	}
+	if (style == NULL)
+		style = &self->manager->styles->fallback;
 
-	/* Draw right border. */
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[2], ty[0]); glVertex2f (px, py);
-	glTexCoord2f (tx[3], ty[0]); glVertex2f (px + w[2], py);
-	glTexCoord2f (tx[2], ty[1]); glVertex2f (px, py + h);
-	glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py + h);
-	glEnd ();
+	/* Set new style and request. */
+	if (self->style != style)
+	{
+		self->style = style;
+		if (self->parent != NULL)
+			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+	}
 }
 
 /** @} */

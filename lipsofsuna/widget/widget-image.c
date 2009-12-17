@@ -72,6 +72,7 @@ liwdg_image_set_image (liwdgImage* self,
 		return 0;
 	lisys_free (self->image);
 	self->image = tmp;
+	liwdg_widget_set_style (LIWDG_WIDGET (self), value);
 	private_rebuild (self);
 
 	return 1;
@@ -112,7 +113,7 @@ private_event (liwdgImage* self,
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
 		case LIWDG_EVENT_TYPE_RENDER:
-			liwdg_widget_paint (LIWDG_WIDGET (self), self->image, NULL);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			return 1;
 	}
 
@@ -122,7 +123,7 @@ private_event (liwdgImage* self,
 static void
 private_rebuild (liwdgImage* self)
 {
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self), 1, 1, self->image);
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), 1, 1);
 }
 
 /** @} */

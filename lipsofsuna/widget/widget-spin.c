@@ -95,6 +95,7 @@ private_init (liwdgSpin*    self,
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 		return 0;
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "spin");
 	private_rebuild (self);
 	return 1;
 }
@@ -128,10 +129,10 @@ private_event (liwdgSpin*  self,
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "spin");
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			/* Draw base. */
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "spin", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "spin", NULL);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw label. */
 			glColor4fv (style->color);
 			lifnt_layout_render (self->text,
@@ -156,9 +157,9 @@ private_rebuild (liwdgSpin* self)
 		snprintf (buf, 256, "%.0f", self->value);
 		lifnt_layout_append_string (self->text, self->font, buf);
 	}
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LI_MAX (
-		lifnt_layout_get_height (self->text), h), "spin");
+		lifnt_layout_get_height (self->text), h));
 }
 
 /** @} */

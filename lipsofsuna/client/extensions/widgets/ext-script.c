@@ -53,19 +53,22 @@ private_callback_activated (liscrData* data)
 }
 
 static int
-private_callback_menu (liscrData* data,
-                       int        id)
+private_callback_menu (liscrData*     data,
+                       liwdgMenuItem* item)
 {
 	liscrScript* script = liscr_data_get_script (data);
 
+	/* Get callback function. */
 	liscr_pushdata (script->lua, data);
-	lua_getfield (script->lua, -1, "callback");
+	lua_pushlightuserdata (script->lua, item);
+	lua_gettable (script->lua, -2);
+	lua_remove (script->lua, -2);
+
+	/* Call the callback. */
 	if (lua_type (script->lua, -1) == LUA_TFUNCTION)
 	{
-		lua_pushvalue (script->lua, -3);
-		lua_pushnumber (script->lua, id);
-		lua_remove (script->lua, -4);
-		if (lua_pcall (script->lua, 2, 0, 0) != 0)
+		liscr_pushdata (script->lua, data);
+		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
 			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
@@ -74,7 +77,8 @@ private_callback_menu (liscrData* data,
 		return 0;
 	}
 	else
-		lua_pop (script->lua, 2);
+		lua_pop (script->lua, 1);
+
 	return 1;
 }
 
@@ -525,18 +529,14 @@ Menu_new (lua_State* lua)
 	/* Allocate widget. */
 	widget = liwdg_menu_new (module->module->widgets);
 	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+		return 0;
 
 	/* Allocate userdata. */
 	self = liscr_data_new (script, widget, LIEXT_SCRIPT_MENU, licli_script_widget_free);
 	if (self == NULL)
 	{
 		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		return 0;
 	}
 
 	/* Copy attributes. */
@@ -586,7 +586,7 @@ Menu_get_item_rect (lua_State* lua)
 
 /* @luadoc
  * ---
- * -- Inserts a menu group to the menu.
+ * -- Inserts a menu item to the menu.
  * --
  * -- @param self Menu.
  * -- @param group Menu group.
@@ -595,14 +595,69 @@ Menu_get_item_rect (lua_State* lua)
 static int
 Menu_insert (lua_State* lua)
 {
+	const char* label;
+	const char* icon;
 	liscrData* self;
-	liscrData* group;
+	liwdgMenuItem* item;
 
 	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-	group = liscr_checkdata (lua, 2, LIEXT_SCRIPT_MENUGROUP);
+	luaL_checktype (lua, 2, LUA_TTABLE);
+	label = "";
+	icon = "";
 
-	if (liwdg_menu_insert_group (self->data, group->data))
-		liscr_data_ref (group, self);
+	/* Label. */
+	lua_getfield (lua, 2, "label");
+	if (lua_type (lua, -1) == LUA_TSTRING)
+		label = lua_tostring (lua, -1);
+	lua_pop (lua, 1);
+
+	/* Icon. */
+	lua_getfield (lua, 2, "icon");
+	if (lua_type (lua, -1) == LUA_TSTRING)
+		icon = lua_tostring (lua, -1);
+	lua_pop (lua, 1);
+
+	/* Create item. */
+	if (!liwdg_menu_insert_item (self->data, label, icon, private_callback_menu, self))
+		return 0;
+	item = liwdg_menu_get_item (self->data, liwdg_menu_get_item_count (self->data) - 1);
+
+	/* Callback. */
+	lua_pushlightuserdata (lua, item);
+	lua_getfield (lua, 2, "pressed");
+	lua_settable (lua, 1);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- When set to true, the menu is hidden automatically after clicked.
+ * -- @name Menu.autohide
+ * -- @class table
+ */
+static int
+Menu_getter_autohide (lua_State* lua)
+{
+	liwdgMenu* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU)->data;
+
+	lua_pushboolean (lua, liwdg_menu_get_autohide (self));
+
+	return 1;
+}
+static int
+Menu_setter_autohide (lua_State* lua)
+{
+	int value;
+	liwdgMenu* self;
+
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU)->data;
+	value = lua_toboolean (lua, 3);
+
+	liwdg_menu_set_autohide (self, value);
+
 	return 0;
 }
 
@@ -664,72 +719,6 @@ Menu_setter_orientation (lua_State* lua)
 	liwdg_menu_set_vertical (LIWDG_MENU (self->data), value);
 	return 0;
 }
-
-/* @luadoc
- * ---
- * -- Add menu items and handle menu clicks.
- * -- @name MenuGroup
- * -- @class table
- */
-
-/* @luadoc
- * ---
- * -- Creates a new menu group.
- * --
- * -- @param self Menu group class.
- * -- @param markup Menu markup.
- * -- @param table Optional table of parameters.
- * -- @return New menu group.
- * function MenuGroup.new(self, markup, table)
- */
-static int
-MenuGroup_new (lua_State* lua)
-{
-	const char* markup;
-	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgMenuGroup* group;
-
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_MENUGROUP);
-	markup = luaL_checkstring (lua, 2);
-
-	/* Allocate widget. */
-	group = liwdg_menu_group_new (markup);
-	if (group == NULL)
-	{
-		lisys_error_report ();
-		lua_pushnil (lua);
-		return 1;
-	}
-
-	/* Allocate userdata. */
-	self = liscr_data_new (script, group, LIEXT_SCRIPT_MENUGROUP, liwdg_menu_group_free);
-	if (self == NULL)
-	{
-		liwdg_menu_group_free (group);
-		lua_pushnil (lua);
-		return 1;
-	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 3))
-		liscr_copyargs (lua, self, 3);
-
-	liwdg_menu_group_set_callback (group, LIWDG_HANDLER (private_callback_menu), self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
-}
-
-/* @luadoc
- * ---
- * -- Menu click callback.
- * -- @name MenuGroup.callback
- * -- @class table
- */
 
 /* @luadoc
  * ---
@@ -1400,18 +1389,12 @@ liextMenuScript (liscrClass* self,
 	liscr_class_insert_func (self, "get_item_rect", Menu_get_item_rect);
 	liscr_class_insert_func (self, "insert", Menu_insert);
 	liscr_class_insert_func (self, "new", Menu_new);
+	liscr_class_insert_getter (self, "autohide", Menu_getter_autohide);
 	liscr_class_insert_getter (self, "font", Menu_getter_font);
 	liscr_class_insert_getter (self, "orientation", Menu_getter_orientation);
+	liscr_class_insert_setter (self, "autohide", Menu_setter_autohide);
 	liscr_class_insert_setter (self, "font", Menu_setter_font);
 	liscr_class_insert_setter (self, "orientation", Menu_setter_orientation);
-}
-
-void
-liextMenuGroupScript (liscrClass* self,
-                      void*       data)
-{
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENUGROUP, data);
-	liscr_class_insert_func (self, "new", MenuGroup_new);
 }
 
 void

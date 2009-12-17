@@ -22,31 +22,18 @@
 #include "widget-group.h"
 #include "widget-types.h"
 
-typedef struct _liwdgMenuItem liwdgMenuItem;
-typedef struct _liwdgMenuProxy liwdgMenuProxy;
-
-struct _liwdgMenuGroup
+struct _liwdgMenu
 {
+	liwdgGroup base;
+	lifntFont* font;
 	void* userdata;
-	struct
-	{
-		void (*call)(void*, int);
-		void* data;
-	} callback;
+	unsigned int autohide : 1;
+	unsigned int vertical : 1;
 	struct
 	{
 		int count;
 		liwdgMenuItem** array;
 	} items;
-};
-
-struct _liwdgMenu
-{
-	liwdgGroup base;
-	lialgList* groups;
-	lialgList* proxies;
-	lifntFont* font;
-	unsigned int vertical : 1;
 };
 
 struct _liwdgMenuItem
@@ -54,20 +41,17 @@ struct _liwdgMenuItem
 	int id;
 	char* icon;
 	char* text;
-	liwdgMenuGroup* group;
+	lifntLayout* label;
+	struct
+	{
+		liwdgHandler call;
+		void* data;
+	} callback;
 	struct
 	{
 		int count;
 		liwdgMenuItem** array;
 	} items;
-};
-
-struct _liwdgMenuProxy
-{
-	/*char* icon;*/
-	lifntLayout* label;
-	lialgList* items;
-	lialgList* proxies;
 };
 
 #endif

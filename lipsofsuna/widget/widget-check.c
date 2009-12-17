@@ -65,7 +65,11 @@ void
 liwdg_check_set_active (liwdgCheck* self,
                         int         active)
 {
-	self->active = active;
+	if (self->active != active)
+	{
+		self->active = active;
+		private_rebuild (self);
+	}
 }
 
 lifntFont*
@@ -122,6 +126,7 @@ private_init (liwdgCheck*   self,
 		lisys_free (self->string);
 		return 0;
 	}
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "check");
 	private_rebuild (self);
 
 	return 1;
@@ -139,9 +144,7 @@ private_event (liwdgCheck* self,
                liwdgEvent* event)
 {
 	int h;
-	const char* mode;
 	liwdgRect rect;
-	liwdgStyle* style;
 
 	switch (event->type)
 	{
@@ -149,25 +152,18 @@ private_event (liwdgCheck* self,
 			if (event->key.keycode != SDLK_RETURN)
 				return 1;
 			self->active = !self->active;
+			private_rebuild (self);
 			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
 			return 0;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			self->active = !self->active;
+			private_rebuild (self);
 			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
-			if (liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)) && self->active)
-				mode = "check-active-focus";
-			else if (liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
-				mode = "check-focus";
-			else if (self->active)
-				mode = "check-active";
-			else
-				mode = "check";
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), mode);
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), mode, &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), mode, NULL);
-			glColor4fv (style->color);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
+			glColor4fv (LIWDG_WIDGET (self)->style->color);
 			h = lifnt_layout_get_height (self->text);
 			lifnt_layout_render (self->text, rect.x, rect.y + (rect.height - h) / 2 - 2);
 			return 1;
@@ -181,15 +177,21 @@ private_rebuild (liwdgCheck* self)
 {
 	int h = 0;
 
+	/* Rebuild layout. */
 	lifnt_layout_clear (self->text);
 	if (self->font != NULL)
 	{
 		h = lifnt_font_get_height (self->font);
 		lifnt_layout_append_string (self->text, self->font, self->string);
 	}
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
+
+	/* Select state graphics. */
+	liwdg_widget_set_state (LIWDG_WIDGET (self), self->active? "active" : NULL);
+
+	/* Rebuild request. */
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LI_MAX (
-		lifnt_layout_get_height (self->text), h), "check");
+		lifnt_layout_get_height (self->text), h));
 }
 
 /** @} */

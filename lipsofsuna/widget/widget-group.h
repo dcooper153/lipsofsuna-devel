@@ -72,6 +72,7 @@ struct _liwdgGroup
 	int margin_right;
 	int margin_top;
 	int margin_bottom;
+	int rebuilding;
 	liwdgGroupRow* rows;
 	liwdgGroupCol* cols;
 	liwdgGroupCell* cells;

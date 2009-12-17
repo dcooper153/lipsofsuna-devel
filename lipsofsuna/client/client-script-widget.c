@@ -139,8 +139,8 @@ Widget_popup (lua_State* lua)
 		{
 			case POPUP_LEFT: rect.x -= size.width; break;
 			case POPUP_RIGHT: rect.x += rect.width; break;
-			case POPUP_UP: rect.y += rect.height; break;
-			case POPUP_DOWN: rect.y -= size.height; break;
+			case POPUP_UP: rect.y -= size.height; break;
+			case POPUP_DOWN: rect.y += rect.height; break;
 			default:
 				assert (0);
 				break;
@@ -191,6 +191,42 @@ Widget_set_request (lua_State* lua)
 		size.height = -1;
 
 	liwdg_widget_set_request (self->data, size.width, size.height);
+
+	return 0;
+}
+
+/* @luadoc
+ * ---
+ * -- Style name of the widget.
+ * -- @name Widget.style
+ * -- @class table
+ */
+static int
+Widget_getter_style (lua_State* lua)
+{
+	liwdgWidget* self;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET)->data;
+
+	if (self->style_name == NULL)
+		return 0;
+	lua_pushstring (lua, self->style_name);
+
+	return 1;
+}
+static int
+Widget_setter_style (lua_State* lua)
+{
+	const char* value;
+	liwdgWidget* self;
+
+	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET)->data;
+	if (!lua_isnoneornil (lua, 3))
+		value = lua_tostring (lua, 3);
+	else
+		value = NULL;
+
+	liwdg_widget_set_style (self, value);
 
 	return 0;
 }
@@ -345,9 +381,11 @@ licliWidgetScript (liscrClass* self,
 	liscr_class_insert_enum (self, "POPUP_UP", POPUP_UP);
 	liscr_class_insert_func (self, "popup", Widget_popup);
 	liscr_class_insert_func (self, "set_request", Widget_set_request);
+	liscr_class_insert_getter (self, "style", Widget_getter_style);
 	liscr_class_insert_getter (self, "visible", Widget_getter_visible);
 	liscr_class_insert_getter (self, "x", Widget_getter_x);
 	liscr_class_insert_getter (self, "y", Widget_getter_y);
+	liscr_class_insert_setter (self, "style", Widget_setter_style);
 	liscr_class_insert_setter (self, "visible", Widget_setter_visible);
 }
 

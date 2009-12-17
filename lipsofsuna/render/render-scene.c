@@ -316,7 +316,9 @@ lirnd_scene_render (lirndScene*    self,
 	{
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
 		glClear (GL_COLOR_BUFFER_BIT);
+		glPushAttrib (GL_SCISSOR_BIT);
 		private_lighting_render (self, &context, framebuffer);
+		glPopAttrib ();
 	}
 	lirnd_check_errors ();
 

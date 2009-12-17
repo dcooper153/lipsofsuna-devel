@@ -111,7 +111,7 @@ liext_materials_new (liwdgManager* manager,
 		return NULL;
 	}
 	liwdg_widget_set_request (data->widgets.preview, 128, 128);
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 2, data->widgets.preview);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
 
 	/* Populate list. */
@@ -203,18 +203,18 @@ private_init (liextMaterials* self,
 	liwdg_view_set_child (LIWDG_VIEW (self->widgets.view), self->widgets.tree);
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_add);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_remove);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.view);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.view);
 
 	/* Preview. */
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_attr), 1, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 2, self->widgets.label_name);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 2, self->widgets.entry_name);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 0, self->widgets.label_name);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 0, self->widgets.entry_name);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 1, self->widgets.label_model);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 1, self->widgets.entry_model);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 0, self->widgets.label_friction);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 0, self->widgets.scroll_friction);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 0, 2, self->widgets.label_friction);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_attr), 1, 2, self->widgets.scroll_friction);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_view), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_view), 0, 0, self->widgets.group_attr);
 	liwdg_widget_set_visible (self->widgets.group_attr, 0);
@@ -222,9 +222,9 @@ private_init (liextMaterials* self,
 	/* Pack self. */
 	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self), 1, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 1, group_tree);
-	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->widgets.group_view);
+	liwdg_group_set_child (LIWDG_GROUP (self), 0, 2, self->widgets.group_view);
 
 	return 1;
 }

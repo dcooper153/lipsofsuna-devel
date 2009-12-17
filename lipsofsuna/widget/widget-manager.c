@@ -27,8 +27,8 @@
 #include "widget-group.h"
 #include "widget-manager.h"
 
-#define BORDERW 10 // FIXME
-#define BORDERH 10 // FIXME
+#define BORDERW 3 // FIXME
+#define BORDERH 3 // FIXME
 #define TITLEBARH 16 // FIXME
 
 enum
@@ -460,10 +460,7 @@ int
 liwdg_manager_event_sdl (liwdgManager* self,
                          SDL_Event*    event)
 {
-	int h;
 	liwdgEvent evt;
-
-	h = self->video.SDL_GetVideoSurface()->h - 1;
 
 	switch (event->type)
 	{
@@ -482,19 +479,19 @@ liwdg_manager_event_sdl (liwdgManager* self,
 		case SDL_MOUSEBUTTONDOWN:
 			evt.type = LIWDG_EVENT_TYPE_BUTTON_PRESS;
 			evt.button.x = event->button.x;
-			evt.button.y = h - event->button.y;
+			evt.button.y = event->button.y;
 			evt.button.button = event->button.button;
 			break;
 		case SDL_MOUSEBUTTONUP:
 			evt.type = LIWDG_EVENT_TYPE_BUTTON_RELEASE;
 			evt.button.x = event->button.x;
-			evt.button.y = h - event->button.y;
+			evt.button.y = event->button.y;
 			evt.button.button = event->button.button;
 			break;
 		case SDL_MOUSEMOTION:
 			evt.type = LIWDG_EVENT_TYPE_MOTION;
 			evt.motion.x = event->motion.x;
-			evt.motion.y = h - event->motion.y;
+			evt.motion.y = event->motion.y;
 			evt.motion.dx = event->motion.xrel;
 			evt.motion.dy = -event->motion.yrel;
 			evt.motion.buttons = event->motion.state;
@@ -615,7 +612,7 @@ liwdg_manager_render (liwdgManager* self)
 	glViewport (0, 0, self->width, self->height);
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho (0, self->width, 0, self->height, -100.0f, 100.0f);
+	glOrtho (0, self->width, self->height, 0, -100.0f, 100.0f);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 
@@ -880,9 +877,9 @@ private_find_window (liwdgManager* self,
 		{
 			if (!liwdg_widget_get_visible (widget))
 				continue;
-			liwdg_widget_get_allocation (widget, &rect);
 
-			/* Check if inside frame. */
+			/* Check if inside content frame. */
+			liwdg_widget_get_content (widget, &rect);
 			if (rect.x <= x && x < rect.x + rect.width &&
 				rect.y <= y && y < rect.y + rect.height)
 			{
@@ -890,61 +887,59 @@ private_find_window (liwdgManager* self,
 				return widget;
 			}
 
+			/* Check if inside at all. */
+			liwdg_widget_get_allocation (widget, &rect);
+			if (x < rect.x || rect.x + rect.width <= x ||
+				y < rect.y || rect.y + rect.height <= y)
+				continue;
+
 			/* Check if inside titlebar. */
-			if (rect.x <= x && x < rect.x + rect.width &&
-				rect.y + rect.height <= y && y < rect.y + rect.height + TITLEBARH)
+			if (rect.x + BORDERW <= x && x < rect.x + rect.width - BORDERW &&
+				rect.y + BORDERH <= y && y < rect.y + BORDERH + TITLEBARH)
 			{
 				*match = LIWDG_MATCH_TITLEBAR;
 				return widget;
 			}
 
 			/* Check if on corners. */
-			if (rect.x - BORDERW <= x && x < rect.x &&
-				rect.y + rect.height + TITLEBARH <= y && y < rect.y + rect.height + TITLEBARH + BORDERH)
+			if (x < rect.x + BORDERW && y < rect.y + BORDERH)
 			{
 				*match = LIWDG_MATCH_TOPLEFT;
 				return widget;
 			}
-			if (rect.x + rect.width <= x && x < rect.x + rect.width + BORDERW &&
-				rect.y + rect.height + TITLEBARH <= y && y < rect.y + rect.height + TITLEBARH + BORDERH)
+			if (x >= rect.x + rect.width - BORDERW && y < rect.y + BORDERH)
 			{
 				*match = LIWDG_MATCH_TOPRIGHT;
 				return widget;
 			}
-			if (rect.x - BORDERW <= x && x < rect.x &&
-				rect.y - BORDERH <= y && y < rect.y)
+			if (x < rect.x + BORDERW && y >= rect.y + rect.height - BORDERH)
 			{
 				*match = LIWDG_MATCH_BOTTOMLEFT;
 				return widget;
 			}
-			if (rect.x + rect.width <= x && x < rect.x + rect.width + BORDERW &&
-				rect.y - BORDERH <= y && y < rect.y)
+			if (x >= rect.x + rect.width - BORDERW && y >= rect.y + rect.height - BORDERH)
 			{
 				*match = LIWDG_MATCH_BOTTOMRIGHT;
 				return widget;
 			}
 
 			/* Check if on borders. */
-			if (rect.x <= x && x < rect.x + rect.width &&
-				rect.y + rect.height + TITLEBARH <= y && y < rect.y + rect.height + TITLEBARH + BORDERH)
+			if (y < rect.y + BORDERH)
 			{
 				*match = LIWDG_MATCH_TOP;
 				return widget;
 			}
-			if (rect.x <= x && x < rect.x + rect.width &&
-				rect.y - BORDERH <= y && y < rect.y)
+			if (y >= rect.y + rect.height - BORDERH)
 			{
 				*match = LIWDG_MATCH_BOTTOM;
 				return widget;
 			}
-			if (rect.x - BORDERW <= x && x < rect.x &&
-				rect.y <= y && y < rect.y + rect.height + TITLEBARH)
+			if (x < rect.x + BORDERW)
 			{
 				*match = LIWDG_MATCH_LEFT;
 				return widget;
 			}
-			if (rect.x + rect.width <= x && x < rect.x + rect.width + BORDERW &&
-				rect.y <= y && y < rect.y + rect.height + TITLEBARH)
+			if (x >= rect.x + rect.width - BORDERW)
 			{
 				*match = LIWDG_MATCH_RIGHT;
 				return widget;

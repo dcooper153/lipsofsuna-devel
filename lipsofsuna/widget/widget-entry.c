@@ -154,6 +154,7 @@ private_init (liwdgEntry*   self,
 		lisys_free (self->string);
 		return 0;
 	}
+	liwdg_widget_set_style (LIWDG_WIDGET (self), "entry");
 	private_rebuild (self);
 
 	return 1;
@@ -173,6 +174,7 @@ private_event (liwdgEntry* self,
 	int len;
 	char* str;
 	char* tmp;
+	liwdgManager* manager;
 	liwdgStyle* style;
 	liwdgRect rect;
 
@@ -238,15 +240,17 @@ private_event (liwdgEntry* self,
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
 			/* Draw base. */
-			liwdg_widget_get_style_allocation (LIWDG_WIDGET (self), "entry", &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), "entry", NULL);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw text. */
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self), "entry");
-			glScissor (rect.x, rect.y, rect.width, rect.height);
+			manager = LIWDG_WIDGET (self)->manager;
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
+			glPushAttrib (GL_SCISSOR_BIT);
+			glScissor (rect.x, manager->height - rect.y - rect.height, rect.width, rect.height);
 			glEnable (GL_SCISSOR_TEST);
 			glColor4fv (style->color);
 			lifnt_layout_render (self->text, rect.x, rect.y);
-			glDisable (GL_SCISSOR_TEST);
+			glPopAttrib ();
 			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
 			return 1;
@@ -317,8 +321,8 @@ private_rebuild (liwdgEntry* self)
 	}
 
 	/* Request size. */
-	liwdg_widget_set_style_request (LIWDG_WIDGET (self),
-		LI_MAX (32, lifnt_layout_get_width (self->text)), h, "entry");
+	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
+		LI_MAX (32, lifnt_layout_get_width (self->text)), h);
 }
 
 /** @} */

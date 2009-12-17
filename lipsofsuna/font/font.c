@@ -149,16 +149,16 @@ lifnt_font_render (lifntFont* self,
 	glBegin (GL_TRIANGLE_STRIP);
 	glTexCoord2f (tex_x, tex_y);
 	glVertex2f (x + cached->bearing_x,
-	            y + cached->bearing_y);
+	            y - cached->bearing_y);
 	glTexCoord2f (tex_x + tex_w, tex_y);
 	glVertex2f (x + cached->bearing_x + cached->width,
-	            y + cached->bearing_y);
+	            y - cached->bearing_y);
 	glTexCoord2f (tex_x, tex_y + tex_h);
 	glVertex2f (x + cached->bearing_x,
-	            y + cached->bearing_y - cached->height);
+	            y - cached->bearing_y + cached->height);
 	glTexCoord2f (tex_x + tex_w, tex_y + tex_h);
 	glVertex2f (x + cached->bearing_x + cached->width,
-	            y + cached->bearing_y - cached->height);
+	            y - cached->bearing_y + cached->height);
 	glEnd ();
 }
 

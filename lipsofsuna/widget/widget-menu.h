@@ -26,11 +26,11 @@
 #define __WIDGET_MENU_H__
 
 #include "widget.h"
-#include "widget-menugroup.h"
 
 #define LIWDG_MENU(o) ((liwdgMenu*)(o))
 
 typedef struct _liwdgMenu liwdgMenu;
+typedef struct _liwdgMenuItem liwdgMenuItem;
 
 extern const liwdgClass liwdgMenuType;
 
@@ -38,12 +38,25 @@ liwdgWidget*
 liwdg_menu_new (liwdgManager* manager);
 
 int
-liwdg_menu_insert_group (liwdgMenu*      self,
-                         liwdgMenuGroup* group);
+liwdg_menu_insert_item (liwdgMenu*   self,
+                        const char*  label,
+                        const char*  icon,
+                        liwdgHandler call,
+                        void*        data);
+
+int
+liwdg_menu_get_autohide (const liwdgMenu* self);
 
 void
-liwdg_menu_remove_group (liwdgMenu*      self,
-                         liwdgMenuGroup* group);
+liwdg_menu_set_autohide (liwdgMenu* self,
+                         int        value);
+
+liwdgMenuItem*
+liwdg_menu_get_item (const liwdgMenu* self,
+                     int              index);
+
+int
+liwdg_menu_get_item_count (const liwdgMenu* self);
 
 int
 liwdg_menu_get_item_rect (const liwdgMenu* self,
