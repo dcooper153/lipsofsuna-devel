@@ -38,69 +38,68 @@
  * ---
  * -- Cycles widget focus.
  * --
+ * -- Arguments:
+ * -- @param backward: True if should cycle backward.
+ * --
  * -- @param self Module class.
- * -- @param back True for backward, false for forward cycling.
- * function Module.cycle_focus(self, back)
+ * -- @param args Arguments.
+ * function Module.cycle_focus(self, args)
  */
-static int
-Module_cycle_focus (lua_State* lua)
+static void Module_cycle_focus (liscrArgs* args)
 {
-	int prev;
+	int prev = 0;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	prev = lua_toboolean (lua, 2);
-
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	liscr_args_gets_bool (args, "backward", &prev);
 	liwdg_manager_cycle_focus (module->widgets, !prev);
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Cycles window focus.
  * --
+ * -- Arguments:
+ * -- @param backward: True if should cycle backward.
+ * --
  * -- @param self Module class.
- * -- @param back True for backward, false for forward cycling.
- * function Module.cycle_focus(self, back)
+ * -- @param args Arguments.
+ * function Module.cycle_focus(self, args)
  */
-static int
-Module_cycle_window_focus (lua_State* lua)
+static void Module_cycle_window_focus (liscrArgs* args)
 {
-	int prev;
+	int prev = 0;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	prev = lua_toboolean (lua, 2);
-
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	liscr_args_gets_bool (args, "backward", &prev);
 	liwdg_manager_cycle_window_focus (module->widgets, !prev);
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Finds an object by ID.
  * --
+ * -- Arguments:
+ * -- id: Object ID.
+ * --
  * -- @param self Module class.
- * -- @param id Object ID.
+ * -- @param args Arguments.
  * -- @return Object or nil.
- * function Module.find_object(self, id)
+ * function Module.find_object(self, args)
  */
-static int
-Module_find_object (lua_State* lua)
+static void Module_find_object (liscrArgs* args)
 {
-	uint32_t id;
+	int id;
 	liengObject* object;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	id = (uint32_t) luaL_checknumber (lua, 2);
-
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	if (!liscr_args_gets_int (args, "id", &id))
+		return;
 	object = lieng_engine_find_object (module->engine, id);
 	if (object != NULL)
-		liscr_pushdata (lua, object->script);
-	else
-		lua_pushnil (lua);
-	return 1;
+		liscr_args_seti_data (args, object->script);
 }
 
 /* @luadoc
@@ -109,97 +108,99 @@ Module_find_object (lua_State* lua)
  * --
  * -- If a server has already been launched, it is terminated.
  * --
+ * -- Arguments:
+ * -- login: Login name.
+ * -- password: Password.
+ * --
  * -- @param self Module class.
- * -- @param login Optional login name.
- * -- @param password Optional password.
+ * -- @param args Arguments.
  * -- @return True on success.
- * function Module.host(self, login, password)
+ * function Module.host(self, args)
  */
-static int
-Module_host (lua_State* lua)
+static void Module_host (liscrArgs* args)
 {
 	const char* name = NULL;
 	const char* pass = NULL;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	if (lua_gettop (lua) >= 2)
-		name = luaL_checkstring (lua, 2);
-	if (lua_gettop (lua) >= 3)
-		pass = luaL_checkstring (lua, 3);
-
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	liscr_args_gets_string (args, "login", &name);
+	liscr_args_gets_string (args, "password", &pass);
 	if (!licli_module_host (module))
 	{
 		lisys_error_report ();
-		lua_pushboolean (lua, 0);
-		return 1;
+		return;
 	}
 	if (!licli_module_connect (module, name, pass))
 	{
 		lisys_error_report ();
-		lua_pushboolean (lua, 0);
-		return 1;
+		return;
 	}
-	lua_pushboolean (lua, 1);
-	return 1;
+	liscr_args_seti_bool (args, 1);
 }
 
 /* @luadoc
  * ---
  * -- Joins a server.
  * --
+ * -- Arguments:
+ * -- login: Login name.
+ * -- password: Password.
+ * --
  * -- @param self Module class.
- * -- @param login Optional login name.
- * -- @param password Optional password.
+ * -- @param args Arguments.
  * -- @return True on success.
- * function Module.join(self, login, password)
+ * function Module.join(self, args)
  */
-static int
-Module_join (lua_State* lua)
+static void Module_join (liscrArgs* args)
 {
 	const char* name = NULL;
 	const char* pass = NULL;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	if (lua_gettop (lua) >= 2)
-		name = luaL_checkstring (lua, 2);
-	if (lua_gettop (lua) >= 3)
-		pass = luaL_checkstring (lua, 3);
-
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	liscr_args_gets_string (args, "login", &name);
+	liscr_args_gets_string (args, "password", &pass);
 	if (!licli_module_connect (module, name, pass))
 	{
 		lisys_error_report ();
-		lua_pushboolean (lua, 0);
-		return 1;
+		return;
 	}
-	lua_pushboolean (lua, 1);
-	return 1;
+	liscr_args_seti_bool (args, 1);
 }
 
 /* @luadoc
  * ---
  * -- Sends a network packet to the server.
  * --
+ * -- Arguments:
+ * -- packet: Packet.
+ * -- reliable: True for reliable.
+ * --
  * -- @param self Module class.
- * -- @param packet Network packet.
- * function Module.send(self, packet)
+ * -- @param args Arguments.
+ * function Module.send(self, args)
  */
-static int
-Module_send (lua_State* lua)
+static void Module_send (liscrArgs* args)
 {
+	int reliable = 1;
 	licliModule* module;
-	liscrData* packet;
-	liscrPacket* data;
+	liscrData* data;
+	liscrPacket* packet;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	packet = liscr_checkdata (lua, 2, LICOM_SCRIPT_PACKET);
-	data = packet->data;
-	luaL_argcheck (lua, data->writer != NULL, 2, "packet is not writable");
-	/* TODO: Send flags. */
-
-	licli_module_send (module, data->writer, GRAPPLE_RELIABLE);
-	return 0;
+	if (liscr_args_gets_data (args, "packet", LICOM_SCRIPT_PACKET, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+		packet = data->data;
+		if (packet->writer != NULL)
+		{
+			liscr_args_gets_bool (args, "reliable", &reliable);
+			if (reliable)
+				licli_module_send (module, packet->writer, GRAPPLE_RELIABLE);
+			else
+				licli_module_send (module, packet->writer, 0);
+		}
+	}
 }
 
 /* @luadoc
@@ -208,26 +209,17 @@ Module_send (lua_State* lua)
  * -- @name Module.cursor_pos
  * -- @class table
  */
-static int
-Module_getter_cursor_pos (lua_State* lua)
+static void Module_getter_cursor_pos (liscrArgs* args)
 {
 	int x;
 	int y;
 	licliModule* module;
 	limatVector tmp;
-	liscrData* data;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
 	module->client->video.SDL_GetMouseState (&x, &y);
 	tmp = limat_vector_init (x, module->widgets->height - y - 1, 0.0f);
-	data = liscr_vector_new (module->script, &tmp);
-	if (data == NULL)
-		return 0;
-	liscr_pushdata (lua, data);
-	liscr_data_unref (data, NULL);
-
-	return 1;
+	liscr_args_seti_vector (args, &tmp);
 }
 
 /* @luadoc
@@ -236,28 +228,23 @@ Module_getter_cursor_pos (lua_State* lua)
  * -- @name Module.moving
  * -- @class table
  */
-static int
-Module_getter_moving (lua_State* lua)
+static void Module_getter_moving (liscrArgs* args)
 {
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	liscr_checkclass (lua, 1, LICLI_SCRIPT_MODULE);
-
-	lua_pushboolean (lua, licli_module_get_moving (module));
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	liscr_args_seti_bool (args, licli_module_get_moving (module));
 }
-static int
-Module_setter_moving (lua_State* lua)
+static void Module_setter_moving (liscrArgs* args)
 {
 	int value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	value = lua_toboolean (lua, 3);
-
-	licli_module_set_moving (module, value);
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+		licli_module_set_moving (module, value);
+	}
 }
 
 /* @luadoc
@@ -266,69 +253,31 @@ Module_setter_moving (lua_State* lua)
  * -- @name Module.root
  * -- @class table
  */
-static int
-Module_setter_root (lua_State* lua)
+static void Module_setter_root (liscrArgs* args)
 {
 	licliModule* module;
-	liscrData* window;
-	liwdgWidget* data;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	if (!lua_isnil (lua, 3))
-	{
-		window = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
-		data = window->data;
-		luaL_argcheck (lua, data->parent == NULL, 3, "widget already in use");
-		luaL_argcheck (lua, data->state == LIWDG_WIDGET_STATE_DETACHED, 3, "widget already in use");
-	}
-	else
-		window = NULL;
+	liscrData* data;
+	liwdgWidget* window;
 
 	/* Detach old root widget. */
-	data = liwdg_manager_get_root (module->widgets);
-	if (data != NULL)
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+	window = liwdg_manager_get_root (module->widgets);
+	if (window != NULL)
 	{
-		if (liwdg_widget_get_userdata (data))
-			liscr_data_unref (liwdg_widget_get_userdata (data), NULL);
-		if (!liwdg_manager_remove_window (module->widgets, data))
-			return 0;
-		liwdg_widget_set_visible (data, 0);
+		liscr_data_unref (liwdg_widget_get_userdata (window), NULL);
+		liwdg_widget_set_visible (window, 0);
 	}
 	liwdg_manager_set_root (module->widgets, NULL);
 
 	/* Set new root window. */
-	if (window != NULL)
+	if (liscr_args_geti_data (args, 0, LICLI_SCRIPT_WIDGET, &data))
 	{
-		liscr_data_ref (window, NULL);
-		liwdg_manager_set_root (module->widgets, window->data);
+		window = data->data;
+		if (window->parent != NULL || window->state != LIWDG_WIDGET_STATE_DETACHED)
+			return;
+		liwdg_manager_set_root (module->widgets, data->data);
+		liscr_data_ref (data, NULL);
 	}
-
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Skybox model.
- * -- @name Module.sky
- * -- @class table
- */
-static int
-Module_setter_sky (lua_State* lua)
-{
-#warning Skybox is disabled.
-#if 0
-	const char* name;
-	licliModule* module;
-	lirndModel* model;
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	name = lua_tostring (lua, 3);
-
-	model = lirnd_render_find_model_by_name (module->render, name);
-	if (model != NULL)
-		lirnd_render_set_sky (module->render, model);
-#endif
-	return 0;
 }
 
 /* @luadoc
@@ -337,17 +286,16 @@ Module_setter_sky (lua_State* lua)
  * -- @name Module.title
  * -- @class table
  */
-static int
-Module_setter_title (lua_State* lua)
+static void Module_setter_title (liscrArgs* args)
 {
 	const char* value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_MODULE);
-	value = luaL_checkstring (lua, 3);
-
-	module->client->video.SDL_WM_SetCaption (value, value);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_MODULE);
+		module->client->video.SDL_WM_SetCaption (value, value);
+	}
 }
 
 /*****************************************************************************/
@@ -357,18 +305,16 @@ licliModuleScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_MODULE, data);
-	liscr_class_insert_func (self, "cycle_focus", Module_cycle_focus);
-	liscr_class_insert_func (self, "cycle_window_focus", Module_cycle_window_focus);
-	liscr_class_insert_func (self, "find_object", Module_find_object);
-	liscr_class_insert_func (self, "host", Module_host);
-	liscr_class_insert_func (self, "join", Module_join);
-	liscr_class_insert_func (self, "send", Module_send);
-	liscr_class_insert_getter (self, "cursor_pos", Module_getter_cursor_pos);
-	liscr_class_insert_getter (self, "moving", Module_getter_moving);
-	liscr_class_insert_setter (self, "moving", Module_setter_moving);
-	liscr_class_insert_setter (self, "root", Module_setter_root);
-	liscr_class_insert_setter (self, "sky", Module_setter_sky);
-	liscr_class_insert_setter (self, "title", Module_setter_title);
+	liscr_class_insert_cfunc (self, "cycle_focus", Module_cycle_focus);
+	liscr_class_insert_cfunc (self, "cycle_window_focus", Module_cycle_window_focus);
+	liscr_class_insert_cfunc (self, "find_object", Module_find_object);
+	liscr_class_insert_cfunc (self, "host", Module_host);
+	liscr_class_insert_cfunc (self, "join", Module_join);
+	liscr_class_insert_cfunc (self, "send", Module_send);
+	liscr_class_insert_mvar (self, "cursor_pos", Module_getter_cursor_pos, NULL);
+	liscr_class_insert_mvar (self, "moving", Module_getter_moving, Module_setter_moving);
+	liscr_class_insert_mvar (self, "root", NULL, Module_setter_root);
+	liscr_class_insert_mvar (self, "title", NULL, Module_setter_title);
 }
 
 /** @} */

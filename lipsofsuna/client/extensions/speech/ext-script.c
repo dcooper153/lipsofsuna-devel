@@ -38,33 +38,30 @@
  * ---
  * -- Displays a message above the object.
  * --
+ * -- Arguments:
+ * -- id: Object id.
+ * -- object: Object.
+ * -- message: Speech string. (required)
+ * --
  * -- @param self Speech class.
- * -- @param object Object or object id.
- * -- @param message Message.
- * function Speech.add(self, object, message)
+ * -- @param args Arguments.
+ * function Speech.add(self, args)
  */
-static int
-Speech_add (lua_State* lua)
+static void Speech_add (liscrArgs* args)
 {
-	uint32_t id;
+	int id;
 	const char* msg;
-	liscrData* data;
-	liengObject* object;
+	liscrData* object;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SPEECH);
-	data = liscr_isdata (lua, 2, LICOM_SCRIPT_OBJECT);
-	if (data != NULL)
-	{
-		object = data->data;
-		id = object->id;
-	}
-	else
-		id = luaL_checknumber (lua, 2);
-	msg = luaL_checkstring (lua, 3);
-
+	if (!liscr_args_gets_string (args, "message", &msg))
+		return;
+	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &object))
+		id = ((liengObject*) object->data)->id;
+	else if (!liscr_args_gets_int (args, "id", &id))
+		return;
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
 	liext_module_set_speech (module, id, msg);
-	return 0;
 }
 
 /*****************************************************************************/
@@ -74,7 +71,7 @@ liextSpeechScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);
-	liscr_class_insert_func (self, "add", Speech_add);
+	liscr_class_insert_cfunc (self, "add", Speech_add);
 }
 
 /** @} */

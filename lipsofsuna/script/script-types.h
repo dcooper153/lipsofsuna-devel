@@ -27,12 +27,14 @@
 #define LISCR_TYPE_INT ((void*) -3)
 #define LISCR_TYPE_STRING ((void*) -4)
 
+typedef struct _liscrArgs liscrArgs;
 typedef struct _liscrClass liscrClass;
 typedef struct _liscrData liscrData;
 typedef struct _liscrScript liscrScript;
 typedef void (*liscrClassInit)(liscrClass*, void*);
-typedef int (*liscrClassFunc)(lua_State*);
 typedef void (*liscrGCFunc)();
+typedef int (*liscrMarshal)(lua_State*);
+typedef void (*liscrArgsFunc)(liscrArgs*);
 
 /* FIXME */
 struct _liscrData

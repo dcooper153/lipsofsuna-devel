@@ -34,7 +34,6 @@
 /**
  * \brief Per object spawner logic.
  */
-typedef struct _liextSpawner liextSpawner;
 struct _liextSpawner
 {
 	int active;
@@ -42,7 +41,7 @@ struct _liextSpawner
 	float delay;
 	float timer;
 	licalHandle calls[1];
-	liengObject* object;
+	liengObject* owner;
 	liextModule* module;
 	liscrData* script;
 	lisrvServer* server;
@@ -68,8 +67,8 @@ liext_spawner_set_active (liextSpawner* self,
                           int           value);
 
 int
-liext_spawner_set_object (liextSpawner* self,
-                          liengObject*  object);
+liext_spawner_set_owner (liextSpawner* self,
+                         liengObject*  value);
 
 int
 liext_spawner_set_limit (liextSpawner* self,

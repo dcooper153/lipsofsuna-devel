@@ -49,16 +49,6 @@ liext_module_new (lisrvServer* server);
 void
 liext_module_free (liextModule* self);
 
-int
-liext_module_insert_slots (liextModule* self,
-                           liengObject* key,
-                           liextSlots*  value);
-
-void
-liext_module_remove_slots (liextModule* self,
-                           liengObject* key,
-                           liextSlots*  value);
-
 /*****************************************************************************/
 
 void

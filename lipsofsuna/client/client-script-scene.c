@@ -115,100 +115,71 @@ private_update (liwdgRender* self,
  * -- Creates a new scene widget.
  * --
  * -- @param self Scene class.
- * -- @param table Optional table of parameters.
+ * -- @param args Optional arguments.
  * -- @return New scene widget.
- * function Scene.new(self, table)
+ * function Scene.new(self, args)
  */
-static int
-Scene_new (lua_State* lua)
+static void Scene_new (liscrArgs* args)
 {
 	licliModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_SCENE);
-
-	/* Allocate widget. */
-	widget = liwdg_render_new (module->widgets, module->scene);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	LIWDG_RENDER (widget)->custom_update_func = private_update;
-	LIWDG_RENDER (widget)->custom_update_data = module;
-	LIWDG_RENDER (widget)->custom_render_func = private_render;
-	LIWDG_RENDER (widget)->custom_render_data = module;
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_SCENE);
+	self = liwdg_render_new (module->widgets, module->scene);
+	if (self == NULL)
+		return;
+	LIWDG_RENDER (self)->custom_update_func = private_update;
+	LIWDG_RENDER (self)->custom_update_data = module;
+	LIWDG_RENDER (self)->custom_render_func = private_render;
+	LIWDG_RENDER (self)->custom_render_data = module;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LICLI_SCRIPT_SCENE, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_SCENE, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Pick an object from the scene.
  * --
+ * -- Arguments:
+ * -- x: X coordinate.
+ * -- y: Y coordinate.
+ * --
  * -- @param self Scene.
- * -- @param x Optional X coordinate, default is cursor position.
- * -- @param y Optional Y coordinate, default is cursor position.
- * -- @return Object or nil, vector or nil.
- * function Scene.pick(self, x, y)
+ * -- @param args Arguments.
+ * -- @return Vector and object, or vector and nil when hit terrain.
+ * function Scene.pick(self, args)
  */
-static int
-Scene_pick (lua_State* lua)
+static void Scene_pick (liscrArgs* args)
 {
 	int x;
 	int y;
 	licliModule* module;
 	liengObject* object;
 	lirndSelection result;
-	liscrData* self;
-	liscrData* vector;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_SCENE);
-	module = LIWDG_RENDER (self->data)->custom_render_data;
+	module = LIWDG_RENDER (args->self)->custom_render_data;
 	module->client->video.SDL_GetMouseState (&x, &y);
-	if (lua_gettop (lua) >= 2)
-		x = luaL_checknumber (lua, 2);
-	if (lua_gettop (lua) >= 3)
-		y = luaL_checknumber (lua, 3);
+	liscr_args_gets_int (args, "x", &x);
+	liscr_args_gets_int (args, "y", &y);
 
-	/* Pick objects from the scene. */
-	if (!liwdg_render_pick (self->data, &result, x, module->window->mode.height - y - 1))
-		return 0;
-
-	/* Find the picked object. */
+	/* Pick object from scene. */
+	if (!liwdg_render_pick (args->self, &result, x, module->window->mode.height - y - 1))
+		return;
 	object = lieng_engine_find_object (module->engine, result.object);
-	if (object == NULL || object->script == NULL)
-		lua_pushnil (lua);
-	else
-		liscr_pushdata (lua, object->script);
-	vector = liscr_vector_new (module->script, &result.point);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-
-	return 2;
+	liscr_args_seti_vector (args, &result.point);
+	liscr_args_seti_data (args, (object != NULL)? object->script : NULL);
 }
 
 /*****************************************************************************/
@@ -219,8 +190,8 @@ licliSceneScript (liscrClass* self,
 {
 	liscr_class_inherit (self, licliGroupScript, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_SCENE, data);
-	liscr_class_insert_func (self, "new", Scene_new);
-	liscr_class_insert_func (self, "pick", Scene_pick);
+	liscr_class_insert_cfunc (self, "new", Scene_new);
+	liscr_class_insert_mfunc (self, "pick", Scene_pick);
 }
 
 /** @} */

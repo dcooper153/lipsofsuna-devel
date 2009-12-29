@@ -45,29 +45,41 @@ liscr_class_inherit (liscrClass*    self,
                      liscrClassInit init,
                      void*          data);
 
+int
+liscr_class_insert_cfunc (liscrClass*   self,
+                          const char*   name,
+                          liscrArgsFunc func);
+
+int
+liscr_class_insert_cvar (liscrClass*   self,
+                         const char*   name,
+                         liscrArgsFunc getter,
+                         liscrArgsFunc setter);
+
 void
 liscr_class_insert_enum (liscrClass* self,
                          const char* name,
                          int         value);
 
 void
-liscr_class_insert_func (liscrClass*    self,
-                         const char*    name,
-                         liscrClassFunc value);
-
-int
-liscr_class_insert_getter (liscrClass*    self,
-                           const char*    name,
-                           liscrClassFunc value);
+liscr_class_insert_func (liscrClass*  self,
+                         const char*  name,
+                         liscrMarshal value);
 
 int
 liscr_class_insert_interface (liscrClass* self,
                               const char* name);
 
 int
-liscr_class_insert_setter (liscrClass*    self,
-                           const char*    name,
-                           liscrClassFunc value);
+liscr_class_insert_mfunc (liscrClass*   self,
+                          const char*   name,
+                          liscrArgsFunc func);
+
+int
+liscr_class_insert_mvar (liscrClass*   self,
+                         const char*   name,
+                         liscrArgsFunc getter,
+                         liscrArgsFunc setter);
 
 int
 liscr_class_get_interface (const liscrClass* self,
@@ -87,6 +99,9 @@ liscr_class_set_userdata (liscrClass* self,
 
 /*****************************************************************************/
 /* Lua specific. */
+
+int
+liscr_class_default___call (lua_State* lua);
 
 int
 liscr_class_default___gc (lua_State* lua);

@@ -360,6 +360,7 @@ scrdir = $(includedir)/lipsofsuna/script
 scr_HEADERS = \
 	script/lips-script.h \
 	script/script.h \
+	script/script-args.h \
 	script/script-class.h \
 	script/script-data.h \
 	script/script-event.h \
@@ -369,6 +370,7 @@ scr_HEADERS = \
 	script/script-util.h
 scrsrc = \
 	script/script.c \
+	script/script-args.c \
 	script/script-class.c \
 	script/script-data.c \
 	script/script-event.c \

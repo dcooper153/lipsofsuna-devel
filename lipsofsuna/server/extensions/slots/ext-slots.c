@@ -200,30 +200,45 @@ int
 liext_slots_set_owner (liextSlots*  self,
                        liengObject* value)
 {
+	liextSlots* old;
+
 	if (self->owner == value)
 		return 1;
 
-	/* Inform clients. */
+	/* Clear old client. */
 	if (self->owner != NULL)
 	{
 		if (!private_send_clear (self))
 			return 0;
 	}
 
+	/* Clear old slots. */
+	if (value != NULL)
+	{
+		old = lialg_ptrdic_find (self->module->dictionary, value);
+		if (old != NULL)
+		{
+			private_send_clear (old);
+			liscr_data_unref (old->owner->script, old->script);
+			lialg_ptrdic_remove (self->module->dictionary, value);
+			old->owner = NULL;
+		}
+	}
+
 	/* Set new owner. */
 	if (self->owner != NULL)
 	{
-		liext_module_remove_slots (self->module, self->owner, self);
 		liscr_data_unref (self->owner->script, self->script);
+		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
-	self->owner = value;
-	if (self->owner != NULL)
+	if (value != NULL)
 	{
-		liscr_data_ref (self->owner->script, self->script);
-		liext_module_insert_slots (self->module, self->owner, self);
+		liscr_data_ref (value->script, self->script);
+		lialg_ptrdic_insert (self->module->dictionary, value, self);
 	}
 
-	/* Inform clients. */
+	/* Set new client. */
+	self->owner = value;
 	if (self->owner != NULL)
 	{
 		if (!private_send_reset (self))

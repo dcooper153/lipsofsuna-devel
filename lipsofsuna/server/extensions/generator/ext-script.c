@@ -44,16 +44,12 @@
  * -- @param self Generator class.
  * Generator.save(self)
  */
-static int
-Generator_save (lua_State* lua)
+static void Generator_save (liscrArgs* args)
 {
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
 	lisrv_server_save (module->server);
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -63,7 +59,7 @@ liextGeneratorScript (liscrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
-	liscr_class_insert_func (self, "save", Generator_save);
+	liscr_class_insert_cfunc (self, "save", Generator_save);
 }
 
 /** @} */

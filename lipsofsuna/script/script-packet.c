@@ -284,20 +284,15 @@ Packet_write (lua_State* lua)
  * -- @name Packet.size
  * -- @class table
  */
-static int
-Packet_getter_size (lua_State* lua)
+static void Packet_getter_size (liscrArgs* args)
 {
-	liscrData* self;
-	liscrPacket* data;
+	liscrPacket* self;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
-	data = self->data;
-
-	if (data->reader != NULL)
-		lua_pushnumber (lua, data->reader->length);
+	self = args->self;
+	if (self->reader != NULL)
+		liscr_args_seti_int (args, self->reader->length);
 	else
-		lua_pushnumber (lua, liarc_writer_get_length (data->writer));
-	return 1;
+		liscr_args_seti_int (args, liarc_writer_get_length (self->writer));
 }
 
 /* @luadoc
@@ -306,20 +301,15 @@ Packet_getter_size (lua_State* lua)
  * -- @name Packet.type
  * -- @class table
  */
-static int
-Packet_getter_type (lua_State* lua)
+static void Packet_getter_type (liscrArgs* args)
 {
-	liscrData* self;
-	liscrPacket* data;
+	liscrPacket* self;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
-	data = self->data;
-
-	if (data->reader != NULL)
-		lua_pushnumber (lua, ((uint8_t*) data->reader->buffer)[0]);
+	self = args->self;
+	if (self->reader != NULL)
+		liscr_args_seti_int (args, ((uint8_t*) self->reader->buffer)[0]);
 	else
-		lua_pushnumber (lua, ((uint8_t*) liarc_writer_get_buffer (data->writer))[0]);
-	return 1;
+		liscr_args_seti_int (args, ((uint8_t*) liarc_writer_get_buffer (self->writer))[0]);
 }
 
 /*****************************************************************************/
@@ -342,8 +332,8 @@ licomPacketScript (liscrClass* self,
 	liscr_class_insert_func (self, "read", Packet_read);
 	liscr_class_insert_func (self, "resume", Packet_resume);
 	liscr_class_insert_func (self, "write", Packet_write);
-	liscr_class_insert_getter (self, "size", Packet_getter_size);
-	liscr_class_insert_getter (self, "type", Packet_getter_type);
+	liscr_class_insert_mvar (self, "size", Packet_getter_size, NULL);
+	liscr_class_insert_mvar (self, "type", Packet_getter_type, NULL);
 }
 
 liscrData*

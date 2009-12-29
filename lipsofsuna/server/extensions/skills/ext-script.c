@@ -68,209 +68,189 @@
 /* @luadoc
  * ---
  * -- @brief Check if the object has enough skill.
+ * --
+ * -- Arguments:
+ * -- object: Object. (required)
+ * -- skill: Skill name.
+ * -- min: Minimum required value.
+ * --
  * -- @param self Skills class.
- * -- @param object Object whose skills to check.
- * -- @param skill Skill name.
- * -- @param value Required value.
+ * -- @param args Arguments.
  * -- @return True if the user had enough skill.
- * function Skills.check(self, object, skill, value)
+ * function Skills.check(self, args)
  */
-static int
-Skills_check (lua_State* lua)
+static void Skills_check (liscrArgs* args)
 {
 	float value;
 	const char* name;
 	liextModule* module;
 	liextSkill* skill;
 	liextSkills* skills;
-	liscrData* object;
+	liscrData* data;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
-	name = luaL_checkstring (lua, 3);
-	value = luaL_checknumber (lua, 4);
-
-	skills = liext_module_find_skills (module, object->data);
-	if (skills == NULL)
-		return 0;
-	skill = liext_skills_find_skill (skills, name);
-	if (skill == NULL)
-		return 0;
-	if (skill->value < value)
-		return 0;
-	lua_pushboolean (lua, 1);
-
-	return 1;
+	if (!liscr_args_gets_string (args, "skill", &name) ||
+	    !liscr_args_gets_float (args, "min", &value))
+	{
+		liscr_args_seti_bool (args, 1);
+		return;
+	}
+	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
+		skills = liext_module_find_skills (module, data->data);
+		if (skills == NULL)
+			return;
+		skill = liext_skills_find_skill (skills, name);
+		if (skill == NULL)
+			return;
+		if (skill->value >= value)
+			liscr_args_seti_bool (args, 1);
+	}
 }
 
 /* @luadoc
  * ---
  * -- @brief Finds the skills for an object.
+ * --
+ * -- Arguments:
+ * -- object: Object. (required)
+ * --
  * -- @param self Skills class.
- * -- @param object Object whose skills to find.
+ * -- @param args Arguments.
  * -- @return Skills or nil.
- * function Skills.find(self, object)
+ * function Skills.find(self, args)
  */
-static int
-Skills_find (lua_State* lua)
+static void Skills_find (liscrArgs* args)
 {
 	liextModule* module;
 	liextSkills* skills;
-	liscrData* object;
+	liscrData* data;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
-
-	/* Find skills. */
-	skills = liext_module_find_skills (module, object->data);
-	if (skills == NULL)
-		return 0;
-	liscr_pushdata (lua, skills->script);
-
-	return 1;
+	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
+		skills = liext_module_find_skills (module, data->data);
+		if (skills != NULL)
+			liscr_args_seti_data (args, skills->script);
+	}
 }
 
 /* @luadoc
  * ---
  * -- @brief Gets the maximum value of a skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * --
  * -- @param self Skills.
  * -- @param skill Skill name.
  * -- @return Number or nil.
  * function Skills.get_maximum(self, skill)
  */
-static int
-Skills_get_maximum (lua_State* lua)
+static void Skills_get_maximum (liscrArgs* args)
 {
 	const char* name;
 	liextSkill* skill;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
+	if (liscr_args_gets_string (args, "skill", &name))
 	{
-		lua_pushnumber (lua, skill->maximum);
-		return 1;
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liscr_args_seti_float (args, skill->maximum);
 	}
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- @brief Gets a list of skill names.
  * -- @param self Skills.
- * -- @return Table, count.
+ * -- @return List of skill names.
  * function Skills.get_names(self)
  */
-static int
-Skills_get_names (lua_State* lua)
+static void Skills_get_names (liscrArgs* args)
 {
-	int i;
 	lialgStrdicIter iter;
 	liextSkills* skills;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	skills = self->data;
-
-	i = 1;
-	lua_newtable (lua);
+	skills = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 	LI_FOREACH_STRDIC (iter, skills->skills)
-	{
-		lua_pushnumber (lua, i);
-		lua_pushstring (lua, iter.key);
-		lua_settable (lua, -3);
-	}
-	lua_pushnumber (lua, i - 1);
-
-	return 2;
+		liscr_args_seti_string (args, iter.key);
 }
 
 /* @luadoc
  * ---
  * -- @brief Gets the regenreation speed of a skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * --
  * -- @param self Skills.
- * -- @param skill Skill name.
+ * -- @param args Arguments.
  * -- @return Number or nil.
- * function Skills.get_regen(self, skill)
+ * function Skills.get_regen(self, args)
  */
-static int
-Skills_get_regen (lua_State* lua)
+static void Skills_get_regen (liscrArgs* args)
 {
 	const char* name;
 	liextSkill* skill;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
+	if (liscr_args_gets_string (args, "skill", &name))
 	{
-		lua_pushnumber (lua, skill->regen);
-		return 1;
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liscr_args_seti_float (args, skill->regen);
 	}
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- @brief Gets the value of a skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * --
  * -- @param self Skills.
- * -- @param skill Skill name.
+ * -- @param args Arguments.
  * -- @return Number or nil.
- * function Skills.get_value(self, skill)
+ * function Skills.get_value(self, args)
  */
-static int
-Skills_get_value (lua_State* lua)
+static void Skills_get_value (liscrArgs* args)
 {
 	const char* name;
 	liextSkill* skill;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
+	if (liscr_args_gets_string (args, "skill", &name))
 	{
-		lua_pushnumber (lua, skill->value);
-		return 1;
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liscr_args_seti_float (args, skill->value);
 	}
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- @brief Checks if a skill is present.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * --
  * -- @param self Skills.
- * -- @param skill Skill name.
+ * -- @param args Arguments.
  * -- @return Boolean.
- * function Skills.has_skill(self, skill)
+ * function Skills.has_skill(self, args)
  */
-static int
-Skills_has_skill (lua_State* lua)
+static void Skills_has_skill (liscrArgs* args)
 {
 	const char* name;
-	liscrData* self;
 	liextSkill* skill;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
+	if (liscr_args_gets_string (args, "skill", &name))
 	{
-		lua_pushboolean (lua, 1);
-		return 1;
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liscr_args_seti_bool (args, 1);
 	}
-
-	return 0;
 }
 
 /* @luadoc
@@ -278,189 +258,201 @@ Skills_has_skill (lua_State* lua)
  * -- Creates a new skills list.
  * --
  * -- @param self Skills class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New skills.
- * function Skills.new(self, table)
+ * function Skills.new(self, args)
  */
-static int
-Skills_new (lua_State* lua)
+static void Skills_new (liscrArgs* args)
 {
 	liextModule* module;
-	liextSkills* skills;
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
+	liextSkills* self;
 
 	/* Allocate self. */
-	skills = liext_skills_new (module);
-	if (skills == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
+	self = liext_skills_new (module);
+	if (self == NULL)
+		return;
 
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, skills->script, 2);
-
-	/* Return data. */
-	liscr_pushdata (lua, skills->script);
-	liscr_data_unref (skills->script, NULL);
-
-	return 1;
+	/* Configure userdata. */
+	liscr_args_call_setters (args, self->script);
+	liscr_args_seti_data (args, self->script);
+	liscr_data_unref (self->script, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Registers a skill.
  * --
+ * -- Arguments:
+ * -- skill: Skill name. (required)
+ * -- prot: Protection type. ("public"/"private"/"internal")
+ * -- maximum: Maximum value.
+ * -- value: Initial value.
+ * -- regen: Regeneration rate.
+ * --
  * -- @param self Skills.
  * -- @param type Skill protection type.
  * -- @param name Skill name.
  * function Skills.register(self, type, name)
  */
-static int
-Skills_register (lua_State* lua)
+static void Skills_register (liscrArgs* args)
 {
 	int type;
+	float value;
 	const char* name;
-	liscrData* self;
+	const char* prot;
 	liextSkill* skill;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	type = (int) luaL_checknumber (lua, 2);
-	name = luaL_checkstring (lua, 3);
-	luaL_argcheck (lua, type >= 0 && type <= LIEXT_SKILL_TYPE_MAX, 2, "invalid skill type");
+	if (!liscr_args_gets_string (args, "skill", &name))
+		return;
 
-	/* Check for existing skill. */
+	/* Create skill. */
 	/* TODO: Override type if different and inform clients? */
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
-		return 0;
+	skill = liext_skills_find_skill (args->self, name);
+	if (skill == NULL)
+	{
+		type = LIEXT_SKILL_TYPE_PRIVATE;
+		if (liscr_args_gets_string (args, "prot", &prot))
+		{
+			if (!strcmp (prot, "public"))
+				type = LIEXT_SKILL_TYPE_PUBLIC;
+			else if (!strcmp (prot, "internal"))
+				type = LIEXT_SKILL_TYPE_INTERNAL;
+		}
+		liext_skills_insert_skill (args->self, type, name);
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill == NULL)
+			return;
+	}
 
-	/* Create the slot. */
-	liext_skills_insert_skill (self->data, type, name);
-
-	return 0;
+	/* Set optiona values. */
+	if (liscr_args_gets_float (args, "maximum", &value))
+		liext_skill_set_maximum (skill, value);
+	if (liscr_args_gets_float (args, "regen", &value))
+		liext_skill_set_regen (skill, value);
+	if (liscr_args_gets_float (args, "value", &value))
+		liext_skill_set_value (skill, value);
 }
 
 /* @luadoc
  * ---
  * -- @brief Sets the maximum value of a skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * -- value: Number.
+ * --
  * -- @param self Skills.
- * -- @param skill Skill name.
- * -- @param value Number.
- * function Skills.set_maximum(self, skill, value)
+ * -- @param args Arguments.
+ * function Skills.set_maximum(self, args)
  */
-static int
-Skills_set_maximum (lua_State* lua)
+static void Skills_set_maximum (liscrArgs* args)
 {
 	float value;
 	const char* name;
 	liextSkill* skill;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-	value = luaL_checknumber (lua, 3);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
-		liext_skill_set_maximum (skill, value);
-
-	return 0;
+	if (liscr_args_gets_string (args, "skill", &name) &&
+	    liscr_args_gets_float (args, "value", &value))
+	{
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liext_skill_set_maximum (skill, value);
+	}
 }
 
 /* @luadoc
  * ---
  * -- @brief Sets the regeneration speed of a skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * -- value: Number.
+ * --
  * -- @param self Skills.
- * -- @param skill Skill name.
- * -- @param value Number.
- * function Skills.set_regen(self, skill, value)
+ * -- @param args Arguments.
+ * function Skills.set_regen(self, args)
  */
-static int
-Skills_set_regen (lua_State* lua)
+static void Skills_set_regen (liscrArgs* args)
 {
 	float value;
 	const char* name;
 	liextSkill* skill;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-	value = luaL_checknumber (lua, 3);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
-		liext_skill_set_regen (skill, value);
-
-	return 0;
+	if (liscr_args_gets_string (args, "skill", &name) &&
+	    liscr_args_gets_float (args, "value", &value))
+	{
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liext_skill_set_regen (skill, value);
+	}
 }
 
 /* @luadoc
  * ---
  * -- @brief Sets the value of a skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * -- value: Number.
+ * --
  * -- @param self Skills.
- * -- @param skill Skill name.
- * -- @param value Number.
- * function Skills.set_value(self, skill, value)
+ * -- @param args Arguments.
+ * function Skills.set_value(self, args)
  */
-static int
-Skills_set_value (lua_State* lua)
+static void Skills_set_value (liscrArgs* args)
 {
 	float value;
 	const char* name;
 	liextSkill* skill;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	name = luaL_checkstring (lua, 2);
-	value = luaL_checknumber (lua, 3);
-
-	skill = liext_skills_find_skill (self->data, name);
-	if (skill != NULL)
-		liext_skill_set_value (skill, value);
-
-	return 0;
+	if (liscr_args_gets_string (args, "skill", &name) &&
+	    liscr_args_gets_float (args, "value", &value))
+	{
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+			liext_skill_set_value (skill, value);
+	}
 }
 
 /* @luadoc
  * ---
  * -- @brief Tries to subtract a value from the specified skill.
+ * --
+ * -- Arguments:
+ * -- object: Object.
+ * -- skill: Skill name.
+ * -- value: Value to subtract.
+ * --
  * -- @param self Skills class.
- * -- @param object Object whose skills to modify.
- * -- @param skill Skill name.
- * -- @param value Value to subtract.
+ * -- @param args Arguments.
  * -- @return True if the user had enough skill.
- * function Skills.subtract(self, object, skill, value)
+ * function Skills.subtract(self, args)
  */
-static int
-Skills_subtract (lua_State* lua)
+static void Skills_subtract (liscrArgs* args)
 {
 	float value;
 	const char* name;
 	liextModule* module;
 	liextSkill* skill;
 	liextSkills* skills;
-	liscrData* object;
+	liscrData* data;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-	object = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
-	name = luaL_checkstring (lua, 3);
-	value = luaL_checknumber (lua, 4);
-
-	skills = liext_module_find_skills (module, object->data);
-	if (skills == NULL)
-		return 0;
-	skill = liext_skills_find_skill (skills, name);
-	if (skill == NULL)
-		return 0;
-	if (skill->value < value)
-		return 0;
-	liext_skill_set_value (skill, skill->value - value);
-	lua_pushboolean (lua, 1);
-
-	return 1;
+	if (!liscr_args_gets_string (args, "skill", &name) &&
+	    !liscr_args_gets_float (args, "value", &value))
+		return;
+	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
+		skills = liext_module_find_skills (module, data->data);
+		if (skills == NULL)
+			return;
+		skill = liext_skills_find_skill (skills, name);
+		if (skill == NULL || skill->value < value)
+			return;
+		liext_skill_set_value (skill, skill->value - value);
+		liscr_args_seti_bool (args, 1);
+	}
 }
 
 /* @luadoc
@@ -469,40 +461,22 @@ Skills_subtract (lua_State* lua)
  * -- @name Skills.owner
  * -- @class table
  */
-static int
-Skills_getter_owner (lua_State* lua)
+static void Skills_getter_owner (liscrArgs* args)
 {
 	liengObject* object;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS);
-
-	object = liext_skills_get_owner (self->data);
-	if (object != NULL && object->script != NULL)
-		liscr_pushdata (lua, object->script);
-	else
-		lua_pushnil (lua);
-	return 1;
+	object = liext_skills_get_owner (args->self);
+	if (object != NULL)
+		liscr_args_seti_data (args, object->script);
 }
-static int
-Skills_setter_owner (lua_State* lua)
+static void Skills_setter_owner (liscrArgs* args)
 {
-	liengObject* object;
-	liextSkills* self;
+	liscrData* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SKILLS)->data;
-	if (!lua_isnoneornil (lua, 3))
-	{
-		object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT)->data;
-		luaL_argcheck (lua,
-			lialg_ptrdic_find (self->module->dictionary, object) == NULL,
-			3, "object already has a skills attached");
-	}
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &data))
+		liext_skills_set_owner (args->self, data->data);
 	else
-		object = NULL;
-
-	liext_skills_set_owner (self, object);
-	return 0;
+		liext_skills_set_owner (args->self, NULL);
 }
 
 /*****************************************************************************/
@@ -515,21 +489,20 @@ liextSkillsScript (liscrClass* self,
 	liscr_class_insert_enum (self, "INTERNAL", LIEXT_SKILL_TYPE_INTERNAL);
 	liscr_class_insert_enum (self, "PRIVATE", LIEXT_SKILL_TYPE_PRIVATE);
 	liscr_class_insert_enum (self, "PUBLIC", LIEXT_SKILL_TYPE_PUBLIC);
-	liscr_class_insert_func (self, "check", Skills_check);
-	liscr_class_insert_func (self, "find", Skills_find);
-	liscr_class_insert_func (self, "get_maximum", Skills_get_maximum);
-	liscr_class_insert_func (self, "get_names", Skills_get_names);
-	liscr_class_insert_func (self, "get_regen", Skills_get_regen);
-	liscr_class_insert_func (self, "get_value", Skills_get_value);
-	liscr_class_insert_func (self, "has_skill", Skills_has_skill);
-	liscr_class_insert_func (self, "new", Skills_new);
-	liscr_class_insert_func (self, "register", Skills_register);
-	liscr_class_insert_func (self, "set_maximum", Skills_set_maximum);
-	liscr_class_insert_func (self, "set_regen", Skills_set_regen);
-	liscr_class_insert_func (self, "set_value", Skills_set_value);
-	liscr_class_insert_func (self, "subtract", Skills_subtract);
-	liscr_class_insert_getter (self, "owner", Skills_getter_owner);
-	liscr_class_insert_setter (self, "owner", Skills_setter_owner);
+	liscr_class_insert_cfunc (self, "check", Skills_check);
+	liscr_class_insert_cfunc (self, "find", Skills_find);
+	liscr_class_insert_mfunc (self, "get_maximum", Skills_get_maximum);
+	liscr_class_insert_mfunc (self, "get_names", Skills_get_names);
+	liscr_class_insert_mfunc (self, "get_regen", Skills_get_regen);
+	liscr_class_insert_mfunc (self, "get_value", Skills_get_value);
+	liscr_class_insert_mfunc (self, "has_skill", Skills_has_skill);
+	liscr_class_insert_cfunc (self, "new", Skills_new);
+	liscr_class_insert_mfunc (self, "register", Skills_register);
+	liscr_class_insert_mfunc (self, "set_maximum", Skills_set_maximum);
+	liscr_class_insert_mfunc (self, "set_regen", Skills_set_regen);
+	liscr_class_insert_mfunc (self, "set_value", Skills_set_value);
+	liscr_class_insert_mfunc (self, "subtract", Skills_subtract);
+	liscr_class_insert_mvar (self, "owner", Skills_getter_owner, Skills_setter_owner);
 }
 
 /** @} */

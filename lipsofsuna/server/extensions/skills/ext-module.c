@@ -105,24 +105,6 @@ liext_module_find_skills (liextModule* self,
 	return lialg_ptrdic_find (self->dictionary, owner);
 }
 
-int
-liext_module_insert_skills (liextModule* self,
-                            liengObject* key,
-                            liextSkills* value)
-{
-	if (lialg_ptrdic_insert (self->dictionary, key, value))
-		return 1;
-	return 0;
-}
-
-void
-liext_module_remove_skills (liextModule* self,
-                            liengObject* key,
-                            liextSkills* value)
-{
-	lialg_ptrdic_remove (self->dictionary, key);
-}
-
 /*****************************************************************************/
 
 static int

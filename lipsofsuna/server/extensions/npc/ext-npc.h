@@ -34,7 +34,7 @@
 struct _liextNpc
 {
 	licalHandle calls[1];
-	liengObject* object;
+	liengObject* owner;
 	liengObject* target;
 	liextModule* module;
 	liscrData* path;
@@ -60,8 +60,8 @@ liext_npc_set_active (liextNpc* self,
                       int       value);
 
 int
-liext_npc_set_object (liextNpc*    self,
-                      liengObject* object);
+liext_npc_set_owner (liextNpc*    self,
+                     liengObject* value);
 
 void
 liext_npc_set_path (liextNpc*  self,

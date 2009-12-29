@@ -24,15 +24,6 @@
 
 #include "lips-client.h"
 
-enum
-{
-	POPUP_LEFT,
-	POPUP_RIGHT,
-	POPUP_UP,
-	POPUP_DOWN,
-	POPUP_MAX
-};
-
 static void
 private_detach_child (liwdgWidget* parent,
                       liwdgWidget* child);
@@ -49,150 +40,76 @@ private_detach_child (liwdgWidget* parent,
 
 /* @luadoc
  * ---
- * -- Popup below the parent rectangle.
- * -- @name Widget.POPUP_DOWN
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Popup to the left from the parent rectangle.
- * -- @name Widget.POPUP_LEFT
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Popup to the right from the parent rectangle.
- * -- @name Widget.POPUP_RIGHT
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Popup above the parent rectangle.
- * -- @name Widget.POPUP_UP
- * -- @class table
- */
-
-/* @luadoc
- * ---
  * -- Pops up the widget.
  * --
+ * -- Arguments:
+ * -- x: X coordinate.
+ * -- y: Y coordinate.
+ * -- width: Width allocation.
+ * -- height: Height allocation.
+ * -- dir: Popup direction. ("left"/"right"/"up"/"down")
+ * --
  * -- @param self Widget.
- * -- @param rect Optional rectangle.
- * -- @param dir Optional popup direction from the rectangle.
- * function Widget.popup(self, rect, dir)
+ * -- @param args Arguments.
+ * function Widget.popup(self, args)
  */
-static int
-Widget_popup (lua_State* lua)
+static void Widget_popup (liscrArgs* args)
 {
-	int dir;
-	liscrData* self;
+	const char* dir;
 	liwdgRect rect;
 	liwdgSize screen;
 	liwdgSize size;
 	liwdgWidget* widget;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-	widget = self->data;
-	luaL_argcheck (lua, widget->state == LIWDG_WIDGET_STATE_DETACHED, 1, "widget already in use");
-	luaL_argcheck (lua, widget->parent == NULL, 1, "widget already in use");
+	widget = args->self;
+	if (widget->state != LIWDG_WIDGET_STATE_DETACHED || widget->parent != NULL)
+		return;
 
 	/* Calculate position. */
+	liwdg_manager_get_size (widget->manager, &screen.width, &screen.height);
 	liwdg_widget_get_request (widget, &size);
-	if (!lua_isnoneornil (lua, 2))
+	rect.x = (screen.width - size.width) / 2;
+	rect.y = (screen.height - size.height) / 2;
+	rect.width = size.width;
+	rect.height = size.height;
+	liscr_args_gets_int (args, "x", &rect.x);
+	liscr_args_gets_int (args, "y", &rect.y);
+	liscr_args_gets_int (args, "width", &rect.width);
+	liscr_args_gets_int (args, "height", &rect.height);
+	if (liscr_args_gets_string (args, "dir", &dir))
 	{
-		/* Get arguments. */
-		luaL_checktype (lua, 2, LUA_TTABLE);
-		if (!lua_isnoneornil (lua, 3))
-		{
-			dir = luaL_checkinteger (lua, 3);
-			luaL_argcheck (lua, 0 <= dir && dir < POPUP_MAX, 3, "invalid popup direction");
-		}
-		else
-			dir = POPUP_DOWN;
-		lua_getfield (lua, 2, "x");
-		if (lua_type (lua, -1) == LUA_TNUMBER)
-			rect.x = lua_tonumber (lua, -1);
-		else
-			rect.x = 0;
-		lua_pop (lua, 1);
-		lua_getfield (lua, 2, "y");
-		if (lua_type (lua, -1) == LUA_TNUMBER)
-			rect.y = lua_tonumber (lua, -1);
-		else
-			rect.y = 0;
-		lua_pop (lua, 1);
-		lua_getfield (lua, 2, "width");
-		if (lua_type (lua, -1) == LUA_TNUMBER)
-			rect.width = lua_tonumber (lua, -1);
-		else
-			rect.width = 0;
-		lua_pop (lua, 1);
-		lua_getfield (lua, 2, "height");
-		if (lua_type (lua, -1) == LUA_TNUMBER)
-			rect.height = lua_tonumber (lua, -1);
-		else
-			rect.height = 0;
-		lua_pop (lua, 1);
-
-		/* Calculate relative offset. */
-		switch (dir)
-		{
-			case POPUP_LEFT: rect.x -= size.width; break;
-			case POPUP_RIGHT: rect.x += rect.width; break;
-			case POPUP_UP: rect.y -= size.height; break;
-			case POPUP_DOWN: rect.y += rect.height; break;
-			default:
-				assert (0);
-				break;
-		}
-		rect.width = size.width;
-		rect.height = size.height;
-	}
-	else
-	{
-		/* Place at center. */
-		liwdg_manager_get_size (widget->manager, &screen.width, &screen.height);
-		rect.x = (screen.width - size.width) / 2;
-		rect.y = (screen.height - size.height) / 2;
-		rect.width = size.width;
-		rect.height = size.height;
+		if (!strcmp (dir, "left")) rect.x -= size.width;
+		else if (!strcmp (dir, "right")) rect.x += rect.width;
+		else if (!strcmp (dir, "up")) rect.y -= size.height;
+		else if (!strcmp (dir, "down")) rect.y += rect.height;
 	}
 
 	/* Popup the widget. */
 	liwdg_widget_set_visible (widget, 1);
-	liwdg_manager_insert_popup (widget->manager, self->data);
+	liwdg_manager_insert_popup (widget->manager, widget);
 	liwdg_widget_set_allocation (widget, rect.x, rect.y, rect.width, rect.height);
-	liscr_data_ref (self, NULL);
-
-	return 0;
+	liscr_data_ref (args->data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Sets the user size request of widget.
  * --
+ * -- Arguments:
+ * -- width: Width request.
+ * -- height: Height request.
+ * --
  * -- @param self Widget.
- * -- @param width Width in pixels or -1 to unset.
- * -- @param height Height in pixels or -1 to unset.
- * function Widget.set_request(self, width, height)
+ * -- @param args Arguments.
+ * function Widget.set_request(self, args)
  */
-static int
-Widget_set_request (lua_State* lua)
+static void Widget_set_request (liscrArgs* args)
 {
-	liscrData* self;
-	liwdgSize size;
+	liwdgSize size = { -1, -1 };
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-	size.width = luaL_checknumber (lua, 2);
-	size.height = luaL_checknumber (lua, 3);
-	if (size.width < 0)
-		size.width = -1;
-	if (size.height < 0)
-		size.height = -1;
-
-	liwdg_widget_set_request (self->data, size.width, size.height);
-
-	return 0;
+	liscr_args_gets_int (args, "width", &size.width);
+	liscr_args_gets_int (args, "height", &size.height);
+	liwdg_widget_set_request (args->self, size.width, size.height);
 }
 
 /* @luadoc
@@ -201,34 +118,18 @@ Widget_set_request (lua_State* lua)
  * -- @name Widget.style
  * -- @class table
  */
-static int
-Widget_getter_style (lua_State* lua)
+static void Widget_getter_style (liscrArgs* args)
 {
-	liwdgWidget* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET)->data;
-
-	if (self->style_name == NULL)
-		return 0;
-	lua_pushstring (lua, self->style_name);
-
-	return 1;
+	liscr_args_seti_string (args, LIWDG_WIDGET (args->self)->style_name);
 }
-static int
-Widget_setter_style (lua_State* lua)
+static void Widget_setter_style (liscrArgs* args)
 {
 	const char* value;
-	liwdgWidget* self;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET)->data;
-	if (!lua_isnoneornil (lua, 3))
-		value = lua_tostring (lua, 3);
+	if (liscr_args_geti_string (args, 0, &value))
+		liwdg_widget_set_style (args->self, value);
 	else
-		value = NULL;
-
-	liwdg_widget_set_style (self, value);
-
-	return 0;
+		liwdg_widget_set_style (args->self, NULL);
 }
 
 /* @luadoc
@@ -237,35 +138,20 @@ Widget_setter_style (lua_State* lua)
  * -- @name Widget.visible
  * -- @class table
  */
-static int
-Widget_getter_visible (lua_State* lua)
+static void Widget_getter_visible (liscrArgs* args)
 {
-	int value;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-
-	value = liwdg_widget_get_visible (self->data);
-	lua_pushboolean (lua, value);
-
-	return 1;
+	liscr_args_seti_bool (args, liwdg_widget_get_visible (args->self));
 }
-static int
-Widget_setter_visible (lua_State* lua)
+static void Widget_setter_visible (liscrArgs* args)
 {
 	int value;
-	liscrData* self;
-	liwdgWidget* widget;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-	value = lua_toboolean (lua, 3);
-	widget = self->data;
-
-	if (widget->state == LIWDG_WIDGET_STATE_POPUP)
-		liscr_data_unref (self, NULL);
-	liwdg_widget_set_visible (widget, value);
-
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		if (LIWDG_WIDGET (args->self)->state == LIWDG_WIDGET_STATE_POPUP)
+			liscr_data_unref (args->data, NULL);
+		liwdg_widget_set_visible (args->self, value);
+	}
 }
 
 /* @luadoc
@@ -274,18 +160,12 @@ Widget_setter_visible (lua_State* lua)
  * -- @name Widget.x
  * -- @class table
  */
-static int
-Widget_getter_x (lua_State* lua)
+static void Widget_getter_x (liscrArgs* args)
 {
-	liscrData* self;
 	liwdgRect rect;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-
-	liwdg_widget_get_allocation (self->data, &rect);
-	lua_pushnumber (lua, rect.x);
-
-	return 1;
+	liwdg_widget_get_allocation (args->self, &rect);
+	liscr_args_seti_float (args, rect.x);
 }
 
 /* @luadoc
@@ -294,18 +174,12 @@ Widget_getter_x (lua_State* lua)
  * -- @name Widget.y
  * -- @class table
  */
-static int
-Widget_getter_y (lua_State* lua)
+static void Widget_getter_y (liscrArgs* args)
 {
-	liscrData* self;
 	liwdgRect rect;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WIDGET);
-
-	liwdg_widget_get_allocation (self->data, &rect);
-	lua_pushnumber (lua, rect.y);
-
-	return 1;
+	liwdg_widget_get_allocation (args->self, &rect);
+	liscr_args_seti_float (args, rect.y);
 }
 
 /*****************************************************************************/
@@ -375,18 +249,12 @@ licliWidgetScript (liscrClass* self,
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
-	liscr_class_insert_enum (self, "POPUP_DOWN", POPUP_DOWN);
-	liscr_class_insert_enum (self, "POPUP_LEFT", POPUP_LEFT);
-	liscr_class_insert_enum (self, "POPUP_RIGHT", POPUP_RIGHT);
-	liscr_class_insert_enum (self, "POPUP_UP", POPUP_UP);
-	liscr_class_insert_func (self, "popup", Widget_popup);
-	liscr_class_insert_func (self, "set_request", Widget_set_request);
-	liscr_class_insert_getter (self, "style", Widget_getter_style);
-	liscr_class_insert_getter (self, "visible", Widget_getter_visible);
-	liscr_class_insert_getter (self, "x", Widget_getter_x);
-	liscr_class_insert_getter (self, "y", Widget_getter_y);
-	liscr_class_insert_setter (self, "style", Widget_setter_style);
-	liscr_class_insert_setter (self, "visible", Widget_setter_visible);
+	liscr_class_insert_mfunc (self, "popup", Widget_popup);
+	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);
+	liscr_class_insert_mvar (self, "style", Widget_getter_style, Widget_setter_style);
+	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
+	liscr_class_insert_mvar (self, "x", Widget_getter_x, NULL);
+	liscr_class_insert_mvar (self, "y", Widget_getter_y, NULL);
 }
 
 /*****************************************************************************/

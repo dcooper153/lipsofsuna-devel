@@ -32,8 +32,7 @@ typedef struct _liscrClassMemb liscrClassMemb;
 
 enum
 {
-	LISCR_CLASS_FLAG_SORT_GETTERS = 0x1,
-	LISCR_CLASS_FLAG_SORT_SETTERS = 0x2
+	LISCR_CLASS_FLAG_SORT_VARS = 0x1,
 };
 
 struct _liscrClass
@@ -52,19 +51,16 @@ struct _liscrClass
 	struct
 	{
 		int count;
-		liscrClassMemb* getters;
-	} getters;
-	struct
-	{
-		int count;
-		liscrClassMemb* setters;
-	} setters;
+		liscrClassMemb* array;
+	} vars;
 };
 
 struct _liscrClassMemb
 {
 	char* name;
-	int (*call)(lua_State*);
+	int member;
+	liscrArgsFunc getter;
+	liscrArgsFunc setter;
 };
 
 #endif

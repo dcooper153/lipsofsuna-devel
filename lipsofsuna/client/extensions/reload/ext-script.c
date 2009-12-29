@@ -44,16 +44,12 @@
  * -- @param self Reload class.
  * function Reload.cancel(self)
  */
-static int
-Reload_cancel (lua_State* lua)
+static void Reload_cancel (liscrArgs* args)
 {
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_RELOAD);
-
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
 	liext_reload_cancel (self->reload);
-
-	return 0;
 }
 
 /* @luadoc
@@ -63,16 +59,12 @@ Reload_cancel (lua_State* lua)
  * -- @param self Reload class.
  * function Reload.reload(self)
  */
-static int
-Reload_reload (lua_State* lua)
+static void Reload_reload (liscrArgs* args)
 {
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_RELOAD);
-
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
 	liext_reload_run (self->reload);
-
-	return 0;
 }
 
 /* @luadoc
@@ -84,27 +76,23 @@ Reload_reload (lua_State* lua)
  * -- @name Reload.enabled
  * -- @class table
  */
-static int
-Reload_getter_enabled (lua_State* lua)
+static void Reload_getter_enabled (liscrArgs* args)
 {
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_RELOAD);
-
-	lua_pushboolean (lua, liext_reload_get_enabled (self->reload));
-	return 1;
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
+	liscr_args_seti_bool (args, liext_reload_get_enabled (self->reload));
 }
-static int
-Reload_setter_enabled (lua_State* lua)
+static void Reload_setter_enabled (liscrArgs* args)
 {
 	int value;
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_RELOAD);
-	value = lua_toboolean (lua, 3);
-
-	liext_reload_set_enabled (self->reload, value);
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
+		liext_reload_set_enabled (self->reload, value);
+	}
 }
 
 /*****************************************************************************/
@@ -114,10 +102,9 @@ liextReloadScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RELOAD, data);
-	liscr_class_insert_func (self, "cancel", Reload_cancel);
-	liscr_class_insert_func (self, "reload", Reload_reload);
-	liscr_class_insert_getter (self, "enabled", Reload_getter_enabled);
-	liscr_class_insert_setter (self, "enabled", Reload_setter_enabled);
+	liscr_class_insert_cfunc (self, "cancel", Reload_cancel);
+	liscr_class_insert_cfunc (self, "reload", Reload_reload);
+	liscr_class_insert_cvar (self, "enabled", Reload_getter_enabled, Reload_setter_enabled);
 }
 
 /** @} */

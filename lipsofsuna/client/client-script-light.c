@@ -39,46 +39,34 @@
  * -- Creates a new light source.
  * --
  * -- @param self Light class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New light source.
  * function Light.new(self, table)
  */
-static int
-Light_new (lua_State* lua)
+static void Light_new (liscrArgs* args)
 {
 	licliModule* module;
-	lirndLight* light;
-	liscrData* self;
-	liscrScript* script;
+	lirndLight* self;
+	liscrData* data;
 	const float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 1.0f, 1.0f };
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_LIGHT);
-
-	/* Allocate light. */
-	light = lirnd_light_new (module->scene, color, equation, M_PI, 0.0f, 0);
-	if (light == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_LIGHT);
+	self = lirnd_light_new (module->scene, color, equation, M_PI, 0.0f, 0);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, light, LICLI_SCRIPT_LIGHT, lirnd_light_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_LIGHT, lirnd_light_free);
+	if (data == NULL)
 	{
-		lirnd_light_free (light);
-		lua_pushnil (lua);
-		return 1;
+		lirnd_light_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liscr_pushdata (lua, self);
-	return 1;
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -87,49 +75,27 @@ Light_new (lua_State* lua)
  * -- @name Light.ambient
  * -- @class table
  */
-static int
-Light_getter_ambient (lua_State* lua)
+static void Light_getter_ambient (liscrArgs* args)
 {
-	int i;
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	light = data->data;
-
-	lua_newtable (lua);
-	for (i = 0 ; i < 4 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_pushnumber (lua, light->ambient[i]);
-		lua_settable (lua, -3);
-	}
-
-	return 1;
+	light = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_seti_float (args, light->ambient[0]);
+	liscr_args_seti_float (args, light->ambient[1]);
+	liscr_args_seti_float (args, light->ambient[2]);
+	liscr_args_seti_float (args, light->ambient[3]);
 }
-static int
-Light_setter_ambient (lua_State* lua)
+static void Light_setter_ambient (liscrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	luaL_checktype (lua, 3, LUA_TTABLE);
-	light = data->data;
-
+	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_gettable (lua, 3);
-		if (lua_isnumber (lua, -1))
-			value[i] = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-	}
-
+		liscr_args_geti_float (args, i, value + i);
 	memcpy (light->ambient, value, 4 * sizeof (float));
-	return 0;
 }
 
 /* @luadoc
@@ -138,49 +104,27 @@ Light_setter_ambient (lua_State* lua)
  * -- @name Light.color
  * -- @class table
  */
-static int
-Light_getter_color (lua_State* lua)
+static void Light_getter_color (liscrArgs* args)
 {
-	int i;
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	light = data->data;
-
-	lua_newtable (lua);
-	for (i = 0 ; i < 4 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_pushnumber (lua, light->diffuse[i]);
-		lua_settable (lua, -3);
-	}
-
-	return 1;
+	light = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_seti_float (args, light->diffuse[0]);
+	liscr_args_seti_float (args, light->diffuse[1]);
+	liscr_args_seti_float (args, light->diffuse[2]);
+	liscr_args_seti_float (args, light->diffuse[3]);
 }
-static int
-Light_setter_color (lua_State* lua)
+static void Light_setter_color (liscrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	luaL_checktype (lua, 3, LUA_TTABLE);
-	light = data->data;
-
+	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_gettable (lua, 3);
-		if (lua_isnumber (lua, -1))
-			value[i] = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-	}
-
+		liscr_args_geti_float (args, i, value + i);
 	memcpy (light->diffuse, value, 4 * sizeof (float));
-	return 0;
 }
 
 /* @luadoc
@@ -190,37 +134,23 @@ Light_setter_color (lua_State* lua)
  * -- @name Light.enabled
  * -- @class table
  */
-static int
-Light_getter_enabled (lua_State* lua)
+static void Light_getter_enabled (liscrArgs* args)
 {
-	lirndLight* light;
-	liscrData* data;
-
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	light = data->data;
-
-	lua_pushboolean (lua, lirnd_light_get_enabled (light));
-	return 1;
+	liscr_args_seti_bool (args, lirnd_light_get_enabled (args->self));
 }
-static int
-Light_setter_enabled (lua_State* lua)
+static void Light_setter_enabled (liscrArgs* args)
 {
 	int value;
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	value = lua_toboolean (lua, 3);
-	light = data->data;
-
-	if (value != lirnd_light_get_enabled (light))
+	light = args->self;
+	if (liscr_args_geti_bool (args, 0, &value) && value != lirnd_light_get_enabled (light))
 	{
 		if (value)
 			lirnd_lighting_insert_light (light->scene->lighting, light);
 		else
 			lirnd_lighting_remove_light (light->scene->lighting, light);
 	}
-	return 0;
 }
 
 /* @luadoc
@@ -229,49 +159,26 @@ Light_setter_enabled (lua_State* lua)
  * -- @name Light.equation
  * -- @class table
  */
-static int
-Light_getter_equation (lua_State* lua)
+static void Light_getter_equation (liscrArgs* args)
 {
-	int i;
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	light = data->data;
-
-	lua_newtable (lua);
-	for (i = 0 ; i < 3 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_pushnumber (lua, light->equation[i]);
-		lua_settable (lua, -3);
-	}
-
-	return 1;
+	light = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_seti_float (args, light->equation[0]);
+	liscr_args_seti_float (args, light->equation[1]);
+	liscr_args_seti_float (args, light->equation[2]);
 }
-static int
-Light_setter_equation (lua_State* lua)
+static void Light_setter_equation (liscrArgs* args)
 {
 	int i;
-	float value[4] = { 1.0f, 0.0f, 0.0f };
+	float value[3] = { 1.0f, 0.0f, 0.0f };
 	lirndLight* light;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	luaL_checktype (lua, 3, LUA_TTABLE);
-	light = data->data;
-
+	light = args->self;
 	for (i = 0 ; i < 3 ; i++)
-	{
-		lua_pushnumber (lua, i + 1);
-		lua_gettable (lua, 3);
-		if (lua_isnumber (lua, -1))
-			value[i] = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-	}
-
+		liscr_args_geti_float (args, i, value + i);
 	memcpy (light->equation, value, 3 * sizeof (float));
-	return 0;
 }
 
 /* @luadoc
@@ -281,45 +188,24 @@ Light_setter_equation (lua_State* lua)
  * -- @name Light.position
  * -- @class table
  */
-static int
-Light_getter_position (lua_State* lua)
+static void Light_getter_position (liscrArgs* args)
 {
 	limatTransform transform;
-	lirndLight* light;
-	liscrData* data;
-	liscrData* vector;
-	liscrScript* script = liscr_script (lua);
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	light = data->data;
-
-	lirnd_light_get_transform (light, &transform);
-	vector = liscr_vector_new (script, &transform.position);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	lirnd_light_get_transform (args->self, &transform);
+	liscr_args_seti_vector (args, &transform.position);
 }
-static int
-Light_setter_position (lua_State* lua)
+static void Light_setter_position (liscrArgs* args)
 {
 	limatTransform transform;
-	lirndLight* light;
-	liscrData* data;
-	liscrData* vector;
+	limatVector vector;
 
-	data = liscr_checkdata (lua, 1, LICLI_SCRIPT_LIGHT);
-	vector = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-	light = data->data;
-
-	lirnd_light_get_transform (light, &transform);
-	transform.position = *((limatVector*) vector->data);
-	lirnd_light_set_transform (light, &transform);
-	return 0;
+	if (liscr_args_geti_vector (args, 0, &vector))
+	{
+		lirnd_light_get_transform (args->self, &transform);
+		transform.position = vector;
+		lirnd_light_set_transform (args->self, &transform);
+	}
 }
 
 /*****************************************************************************/
@@ -329,17 +215,12 @@ licliLightScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
-	liscr_class_insert_func (self, "new", Light_new);
-	liscr_class_insert_getter (self, "ambient", Light_getter_ambient);
-	liscr_class_insert_getter (self, "color", Light_getter_color);
-	liscr_class_insert_getter (self, "enabled", Light_getter_enabled);
-	liscr_class_insert_getter (self, "equation", Light_getter_equation);
-	liscr_class_insert_getter (self, "position", Light_getter_position);
-	liscr_class_insert_setter (self, "ambient", Light_setter_ambient);
-	liscr_class_insert_setter (self, "color", Light_setter_color);
-	liscr_class_insert_setter (self, "enabled", Light_setter_enabled);
-	liscr_class_insert_setter (self, "equation", Light_setter_equation);
-	liscr_class_insert_setter (self, "position", Light_setter_position);
+	liscr_class_insert_cfunc (self, "new", Light_new);
+	liscr_class_insert_mvar (self, "ambient", Light_getter_ambient, Light_setter_ambient);
+	liscr_class_insert_mvar (self, "color", Light_getter_color, Light_setter_color);
+	liscr_class_insert_mvar (self, "enabled", Light_getter_enabled, Light_setter_enabled);
+	liscr_class_insert_mvar (self, "equation", Light_getter_equation, Light_setter_equation);
+	liscr_class_insert_mvar (self, "position", Light_getter_position, Light_setter_position);
 }
 
 /** @} */

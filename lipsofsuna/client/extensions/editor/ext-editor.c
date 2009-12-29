@@ -223,24 +223,6 @@ liext_editor_rotate (liextEditor*           self,
 }
 
 /**
- * \brief Sends a map save request to the server.
- *
- * \param self Editor.
- */
-void
-liext_editor_save (liextEditor* self)
-{
-	liarcWriter* writer;
-
-	writer = liarc_writer_new_packet (LINET_EXT_CLIENT_PACKET_EDITOR);
-	if (writer == NULL)
-		return;
-	liarc_writer_append_uint8 (writer, LINET_EXT_EDITOR_PACKET_SAVE);
-	licli_module_send (self->module, writer, GRAPPLE_RELIABLE);
-	liarc_writer_free (writer);
-}
-
-/**
  * \brief Sends a snap selection request to the server.
  *
  * \param self Editor.

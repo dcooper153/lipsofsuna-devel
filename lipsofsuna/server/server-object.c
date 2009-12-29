@@ -563,45 +563,6 @@ lisrv_object_set_client (liengObject* self,
 	}
 }
 
-/**
- * \brief Gets the name of the object.
- *
- * \param self Object.
- * \return String guaranteed to not be NULL.
- */
-const char*
-lisrv_object_get_name (const liengObject* self)
-{
-	lisrvObject* data = LISRV_OBJECT (self);
-
-	if (data->name == NULL)
-		return "";
-	return data->name;
-}
-
-/**
- * \brief Sets the name of the object.
- *
- * \param self Object.
- * \param value String.
- * \return Nonzero if successsful.
- */
-int
-lisrv_object_set_name (liengObject* self,
-                       const char*  value)
-{
-	char* tmp;
-	lisrvObject* data = LISRV_OBJECT (self);
-
-	tmp = listr_dup (value);
-	if (tmp == NULL)
-		return 0;
-	lisys_free (data->name);
-	data->name = tmp;
-
-	return 1;
-}
-
 /*****************************************************************************/
 
 static int

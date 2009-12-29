@@ -76,7 +76,7 @@ liext_npc_free (liextNpc* self)
 		lieng_engine_remove_calls (self->module->server->engine, self->calls,
 			sizeof (self->calls) / sizeof (licalHandle));
 	}
-	lialg_ptrdic_remove (self->module->dictionary, self->object);
+	lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	lisys_free (self);
 }
 
@@ -113,45 +113,52 @@ liext_npc_set_active (liextNpc* self,
  * References to objects are maintained automatically.
  *
  * \param self Npc logic.
- * \param object Object.
+ * \param value Object.
  * \return Nonzero on success.
  */
 int
-liext_npc_set_object (liextNpc*    self,
-                      liengObject* object)
+liext_npc_set_owner (liextNpc*    self,
+                     liengObject* value)
 {
 	int flags;
+	liextNpc* old;
 
 	/* Discard old target. */
 	liext_npc_set_target (self, NULL);
 
-	/* Maintain dictionary. */
-	if (object != NULL && self->object == NULL)
+	/* Clear old logic. */
+	if (value != NULL)
 	{
-		assert (lialg_ptrdic_find (self->module->dictionary, object) == NULL);
-		lialg_ptrdic_insert (self->module->dictionary, object, self);
+		old = lialg_ptrdic_find (self->module->dictionary, value);
+		if (old != NULL)
+		{
+			liext_npc_set_target (old, NULL);
+			flags = lieng_object_get_flags (old->owner);
+			liphy_object_set_control_mode (old->owner->physics, LIPHY_CONTROL_MODE_RIGID);
+			lieng_object_set_flags (old->owner, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
+			liscr_data_unref (old->owner->script, self->script);
+			old->owner = NULL;
+		}
 	}
-	else if (object == NULL && self->object != NULL)
-		lialg_ptrdic_remove (self->module->dictionary, self->object);
 
 	/* Set new owner. */
-	if (self->object != NULL)
+	if (self->owner != NULL)
 	{
-		/* Reset control mode. */
-		flags = lieng_object_get_flags (self->object);
-		liphy_object_set_control_mode (self->object->physics, LIPHY_CONTROL_MODE_RIGID);
-		lieng_object_set_flags (self->object, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
-		liscr_data_unref (self->object->script, self->script);
+		flags = lieng_object_get_flags (self->owner);
+		liphy_object_set_control_mode (self->owner->physics, LIPHY_CONTROL_MODE_RIGID);
+		lieng_object_set_flags (self->owner, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
+		liscr_data_unref (self->owner->script, self->script);
+		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
-	if (object != NULL)
+	if (value != NULL)
 	{
-		/* Set control mode. */
-		flags = lieng_object_get_flags (object);
-		liphy_object_set_control_mode (object->physics, LIPHY_CONTROL_MODE_CHARACTER);
-		lieng_object_set_flags (object, flags | LIENG_OBJECT_FLAG_DYNAMIC);
-		liscr_data_ref (object->script, self->script);
+		flags = lieng_object_get_flags (value);
+		liphy_object_set_control_mode (value->physics, LIPHY_CONTROL_MODE_CHARACTER);
+		lieng_object_set_flags (value, flags | LIENG_OBJECT_FLAG_DYNAMIC);
+		liscr_data_ref (value->script, self->script);
+		lialg_ptrdic_insert (self->module->dictionary, value, self);
 	}
-	self->object = object;
+	self->owner = value;
 
 	return 1;
 }
@@ -210,7 +217,7 @@ private_tick (liextNpc* self,
 	liphyObject* physics;
 
 	/* Get object data. */
-	object = self->object;
+	object = self->owner;
 	if (object == NULL)
 		return 1;
 	physics = object->physics;
@@ -240,11 +247,11 @@ private_tick (liextNpc* self,
 		liext_npc_set_target (self, private_rescan (self));
 
 		/* Solve path. */
-		if (self->object != NULL && self->target != NULL)
+		if (self->owner != NULL && self->target != NULL)
 		{
 			lieng_object_get_transform (self->target, &transform);
 			transform.position.y += 0.5f;
-			path = liext_module_solve_path (self->module, self->object, &transform.position);
+			path = liext_module_solve_path (self->module, self->owner, &transform.position);
 			if (path != NULL)
 			{
 				tmp = liscr_data_new (self->script->script, path, LICOM_SCRIPT_PATH, liai_path_free);
@@ -350,7 +357,7 @@ private_attack (liextNpc* self)
 
 	/* Call the spawn function. */
 	liscr_pushdata (script->lua, self->script);
-	liscr_pushdata (script->lua, self->object->script);
+	liscr_pushdata (script->lua, self->owner->script);
 	liscr_pushdata (script->lua, self->target->script);
 	if (lua_pcall (script->lua, 3, 0, 0) != 0)
 	{
@@ -375,7 +382,7 @@ private_rescan (liextNpc* self)
 
 	dist = self->radius;
 	target = NULL;
-	object = self->object;
+	object = self->owner;
 	sector = object->sector;
 	assert (object->sector != NULL);
 	range = lialg_range_new_from_center (sector->x, sector->y, sector->z, 1);

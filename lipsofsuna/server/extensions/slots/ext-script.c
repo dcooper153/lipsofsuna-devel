@@ -39,125 +39,61 @@
 
 /* @luadoc
  * ---
- * -- Slot type for private slots.
+ * -- Gets an object in a slot.
  * --
- * -- Objects stored to private slots are only transmitted to the client
- * -- who is the owner of the slots.
+ * -- Arguments:
+ * -- slot: Slot name.
  * --
- * -- @name Skills.PRIVATE
- * -- @class table
+ * -- @param self Slots.
+ * -- @param args Arguments.
+ * -- @return Object or nil.
+ * function Slots.get_object(self, args)
  */
-/* @luadoc
- * ---
- * -- Slot type for public slots.
- * --
- * -- Objects stored to public slots are transmitted to all clients who
- * -- can see the owner of the slots.
- * --
- * -- @name Skills.PUBLIC
- * -- @class table
- */
-
-static int
-Slots___index (lua_State* lua)
+static void Slots_get_object (liscrArgs* args)
 {
-	const char* slot;
-	liscrData* self;
-	liengObject* object;
+	const char* name;
+	liextSlot* slot;
 
-	/* Try slots first. */
-	if (lua_isstring (lua, 2))
-	{
-		self = liscr_isdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-		if (self != NULL)
-		{
-			slot = lua_tostring (lua, 2);
-			if (liext_slots_get_object (self->data, slot, &object))
-			{
-				if (object != NULL)
-					liscr_pushdata (lua, object->script);
-				else
-					lua_pushnil (lua);
-				return 1;
-			}
-		}
-	}
-
-	return liscr_class_default___index (lua);
-}
-
-static int
-Slots___newindex (lua_State* lua)
-{
-	const char* slot;
-	liscrData* data;
-	liscrData* self;
-	liextSlot* slot_;
-
-	/* Try slots first. */
-	if (lua_isstring (lua, 2))
-	{
-		self = liscr_isdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-		if (self != NULL)
-		{
-			slot = lua_tostring (lua, 2);
-			slot_ = liext_slots_find_slot (self->data, slot);
-			if (slot_ != NULL)
-			{
-				if (!lua_isnil (lua, 3))
-				{
-					data = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-					liext_slots_set_object (self->data, slot, data->data);
-				}
-				else
-					liext_slots_set_object (self->data, slot, NULL);
-				return 1;
-			}
-		}
-	}
-
-	return liscr_class_default___newindex (lua);
+	if (!liscr_args_gets_string (args, "slot", &name))
+		return;
+	slot = liext_slots_find_slot (args->self, name);
+	if (slot == NULL)
+		return;
+	if (slot->object != NULL)
+		liscr_args_seti_data (args, slot->object->script);
 }
 
 /* @luadoc
  * ---
  * -- Gets information on a slot.
  * --
+ * -- Arguments:
+ * -- slot: Slot name.
+ * --
  * -- @param self Slots.
- * -- @param name Slot name.
- * -- @return Table of slot information.
- * function Slots.get_slot(self, name)
+ * -- @param args Arguments.
+ * -- @return Slot information or nil.
+ * function Slots.get_slot(self, args)
  */
-static int
-Slots_get_slot (lua_State* lua)
+static void Slots_get_slot (liscrArgs* args)
 {
 	const char* name;
-	liscrData* self;
 	liextSlot* slot;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-	name = luaL_checkstring (lua, 2);
-
 	/* Find slot. */
-	slot = liext_slots_find_slot (self->data, name);
+	if (!liscr_args_gets_string (args, "slot", &name))
+		return;
+	slot = liext_slots_find_slot (args->self, name);
 	if (slot == NULL)
-		return 0;
+		return;
 
 	/* Collect information. */
-	lua_newtable (lua);
-	lua_pushstring (lua, slot->name);
-	lua_setfield (lua, -2, "name");
-	lua_pushstring (lua, slot->node);
-	lua_setfield (lua, -2, "node");
-	lua_pushnumber (lua, slot->type);
-	lua_setfield (lua, -2, "type");
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_string (args, "name", slot->name);
+	liscr_args_sets_string (args, "node", slot->node);
+	liscr_args_sets_string (args, "type", (slot->type == LIEXT_SLOT_TYPE_PRIVATE)? "private" : "public");
 	if (slot->object != NULL)
-	{
-		liscr_pushdata (lua, slot->object->script);
-		lua_setfield (lua, -2, "object");
-	}
-
-	return 1;
+		liscr_args_sets_data (args, "object", slot->object->script);
 }
 
 /* @luadoc
@@ -165,80 +101,110 @@ Slots_get_slot (lua_State* lua)
  * -- Creates a new slots object.
  * --
  * -- @param self Slots class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New slots.
- * function Slots.new(self, table)
+ * function Slots.new(self, args)
  */
-static int
-Slots_new (lua_State* lua)
+static void Slots_new (liscrArgs* args)
 {
 	liextModule* module;
-	liextSlots* slots;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SLOTS);
+	liextSlots* self;
+	liscrData* data;
 
 	/* Allocate self. */
-	slots = liext_slots_new (module);
-	if (slots == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	self = liscr_data_new (script, slots, LIEXT_SCRIPT_SLOTS, liext_slots_free);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SLOTS);
+	self = liext_slots_new (module);
 	if (self == NULL)
+		return;
+
+	/* Allocate userdata. */
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SLOTS, liext_slots_free);
+	if (data == NULL)
 	{
-		liext_slots_free (slots);
-		lua_pushnil (lua);
-		return 1;
+		liext_slots_free (self);
+		return;
 	}
-	slots->script = self;
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-	return 1;
+	self->script = data;
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Registers a slot.
  * --
+ * -- Arguments:
+ * -- node: Armature node name. (required)
+ * -- object: Object to store.
+ * -- slot: Slot name.
+ * -- type: Protection type ("public"/"private")
+ * --
  * -- @param self Slots.
- * -- @param type Slot protection type.
- * -- @param name Slot name.
- * -- @param node Model node attachment hint for client.
- * function Slots.register(self, type, name, node)
+ * -- @param args Arguments.
+ * function Slots.register(self, args)
  */
-static int
-Slots_register (lua_State* lua)
+static void Slots_register (liscrArgs* args)
 {
 	int type;
 	const char* name;
-	const char* node;
-	liscrData* self;
+	const char* prot = "private";
+	const char* node = "#root";
 	liextSlot* slot;
+	liscrData* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-	type = (int) luaL_checknumber (lua, 2);
-	name = luaL_checkstring (lua, 3);
-	node = luaL_checkstring (lua, 4);
-	luaL_argcheck (lua, type >= 0 && type <= LIEXT_SLOT_TYPE_MAX, 2, "invalid slot type");
+	if (!liscr_args_gets_string (args, "slot", &name))
+		return;
+	liscr_args_gets_string (args, "prot", &prot);
+	liscr_args_gets_string (args, "node", &node);
+	liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data);
 
 	/* Check for existing slot. */
 	/* TODO: Override type if different and inform clients? */
-	slot = liext_slots_find_slot (self->data, name);
+	slot = liext_slots_find_slot (args->self, name);
 	if (slot != NULL)
-		return 0;
+		return;
 
 	/* Create the slot. */
-	liext_slots_insert_slot (self->data, type, name, node);
+	if (!strcmp (prot, "public"))
+		type = LIEXT_SLOT_TYPE_PUBLIC;
+	else
+		type = LIEXT_SLOT_TYPE_PRIVATE;
+	liext_slots_insert_slot (args->self, type, name, node);
 
-	return 0;
+	/* Insert the object. */
+	if (data != NULL)
+		liext_slots_set_object (args->self, name, data->data);
+}
+
+/* @luadoc
+ * ---
+ * -- Sets the object in a slot.
+ * --
+ * -- Arguments:
+ * -- slot: Slot name.
+ * -- object: Object.
+ * --
+ * -- @param self Slots.
+ * -- @param args Arguments.
+ * function Slots.set_object(self, args)
+ */
+static void Slots_set_object (liscrArgs* args)
+{
+	const char* name;
+	liextSlot* slot;
+	liscrData* data;
+
+	if (!liscr_args_gets_string (args, "slot", &name))
+		return;
+	slot = liext_slots_find_slot (args->self, name);
+	if (slot == NULL)
+		return;
+	liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data);
+	if (data != NULL)
+		liext_slots_set_object (args->self, name, data->data);
+	else
+		liext_slots_set_object (args->self, name, NULL);
 }
 
 /* @luadoc
@@ -247,40 +213,22 @@ Slots_register (lua_State* lua)
  * -- @name Slots.owner
  * -- @class table
  */
-static int
-Slots_getter_owner (lua_State* lua)
+static void Slots_getter_owner (liscrArgs* args)
 {
 	liengObject* object;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-
-	object = liext_slots_get_owner (self->data);
-	if (object != NULL && object->script != NULL)
-		liscr_pushdata (lua, object->script);
-	else
-		lua_pushnil (lua);
-	return 1;
+	object = liext_slots_get_owner (args->self);
+	if (object != NULL)
+		liscr_args_seti_data (args, object->script);
 }
-static int
-Slots_setter_owner (lua_State* lua)
+static void Slots_setter_owner (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* self;
-	liengObject* value;
+	liscrData* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SLOTS);
-	if (!lua_isnil (lua, 3))
-	{
-		object = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-		value = object->data;
-	}
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &data))
+		liext_slots_set_owner (args->self, data->data);
 	else
-		value = NULL;
-#warning Should check that the object is not added to another slot already.
-
-	liext_slots_set_owner (self->data, value);
-	return 0;
+		liext_slots_set_owner (args->self, NULL);
 }
 
 /*****************************************************************************/
@@ -290,15 +238,12 @@ liextSlotsScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SLOTS, data);
-	liscr_class_insert_enum (self, "PRIVATE", LIEXT_SLOT_TYPE_PRIVATE);
-	liscr_class_insert_enum (self, "PUBLIC", LIEXT_SLOT_TYPE_PUBLIC);
-	liscr_class_insert_func (self, "__index", Slots___index);
-	liscr_class_insert_func (self, "__newindex", Slots___newindex);
-	liscr_class_insert_func (self, "get_slot", Slots_get_slot);
-	liscr_class_insert_func (self, "new", Slots_new);
-	liscr_class_insert_func (self, "register", Slots_register);
-	liscr_class_insert_getter (self, "owner", Slots_getter_owner);
-	liscr_class_insert_setter (self, "owner", Slots_setter_owner);
+	liscr_class_insert_mfunc (self, "get_object", Slots_get_object);
+	liscr_class_insert_mfunc (self, "get_slot", Slots_get_slot);
+	liscr_class_insert_cfunc (self, "new", Slots_new);
+	liscr_class_insert_mfunc (self, "register", Slots_register);
+	liscr_class_insert_mfunc (self, "set_object", Slots_set_object);
+	liscr_class_insert_mvar (self, "owner", Slots_getter_owner, Slots_setter_owner);
 }
 
 /** @} */

@@ -41,33 +41,33 @@
  * ---
  * -- Creates an object.
  * --
+ * -- Arguments:
+ * -- model: Model name. (required)
+ * -- position: Position vector. (required)
+ * -- rotation: Quaternion.
+ * --
  * -- @param self Editor class.
- * -- @param table position Position vector.
- * -- @param table model Model string.
- * function Editor.create(position, model)
+ * -- @param args Arguments.
+ * function Editor.create(self, args)
  */
-static int
-Editor_create (lua_State* lua)
+static void Editor_create (liscrArgs* args)
 {
 	const char* name;
 	liengModel* model;
 	liextModule* module;
 	limatTransform transform;
-	liscrData* vector;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	name = luaL_checkstring (lua, 3);
-
-	model = lieng_engine_find_model_by_name (module->editor->module->engine, name);
-	if (model == NULL)
-		return 0;
-	transform = limat_transform_init (
-		*((limatVector*) vector->data),
-		limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
-	liext_editor_create (module->editor, model->id, &transform);
-
-	return 0;
+	if (liscr_args_gets_vector (args, "position", &transform.position) &&
+	    liscr_args_gets_string (args, "model", &name))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
+		model = lieng_engine_find_model_by_name (module->editor->module->engine, name);
+		if (model == NULL)
+			return;
+		if (!liscr_args_gets_quaternion (args, "rotation", &transform.rotation))
+			transform.rotation = limat_quaternion_identity ();
+		liext_editor_create (module->editor, model->id, &transform);
+	}
 }
 
 /* @luadoc
@@ -77,68 +77,39 @@ Editor_create (lua_State* lua)
  * -- @param self Editor class.
  * function Editor.rotate(self)
  */
-static int
-Editor_rotate (lua_State* lua)
+static void Editor_rotate (liscrArgs* args)
 {
 	int x;
 	int y;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	module->module->client->video.SDL_GetMouseState (&x, &y);
 	liext_editor_begin_rotate (module->editor, x, y);
-
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Sends a map save request to the server.
- * --
- * -- @param self Editor class.
- * function Editor.save(self)
- */
-static int
-Editor_save (lua_State* lua)
-{
-	liextModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-	liext_editor_save (module->editor);
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Snaps selected objects to grid.
  * --
+ * -- Arguments:
+ * -- grid: Grid spacing.
+ * -- angle: Rotation step size in degrees.
+ * --
  * -- @param self Editor class.
- * -- @param [grid] Grid spacing.
- * -- @param [angle] Rotation step size in degrees.
- * function Editor.snap(self, grid)
+ * -- @param args Arguments.
+ * function Editor.snap(self, args)
  */
-static int
-Editor_snap (lua_State* lua)
+static void Editor_snap (liscrArgs* args)
 {
-	float angle;
-	float grid;
+	float angle = 0.0f;
+	float grid = 1.0f;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-	if (lua_isnumber (lua, 2))
-		grid = luaL_checknumber (lua, 2);
-	else
-		grid = 1.0f;
-	if (lua_isnumber (lua, 3))
-		angle = luaL_checknumber (lua, 3) / 180.0f * M_PI;
-	else
-		angle = 0.0f;
-
-	liext_editor_snap (module->editor, grid, angle);
-
-	return 0;
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
+	liscr_args_gets_float (args, "angle", &angle);
+	liscr_args_gets_float (args, "grid", &grid);
+	liext_editor_snap (module->editor, grid, angle / 180.0f * M_PI);
 }
 
 /* @luadoc
@@ -148,19 +119,15 @@ Editor_snap (lua_State* lua)
  * -- @param self Editor class.
  * function Editor.translate(self)
  */
-static int
-Editor_translate (lua_State* lua)
+static void Editor_translate (liscrArgs* args)
 {
 	int x;
 	int y;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	module->module->client->video.SDL_GetMouseState (&x, &y);
 	liext_editor_begin_translate (module->editor, x, y);
-
-	return 0;
 }
 
 /* @luadoc
@@ -169,27 +136,23 @@ Editor_translate (lua_State* lua)
  * -- @name Editor.visible
  * -- @class table
  */
-static int
-Editor_getter_visible (lua_State* lua)
+static void Editor_getter_visible (liscrArgs* args)
 {
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-
-	lua_pushboolean (lua, liwdg_widget_get_visible (module->dialog));
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
+	liscr_args_seti_bool (args, liwdg_widget_get_visible (module->dialog));
 }
-static int
-Editor_setter_visible (lua_State* lua)
+static void Editor_setter_visible (liscrArgs* args)
 {
 	int value;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-	value = lua_toboolean (lua, 3);
-
-	liwdg_widget_set_visible (module->dialog, value);
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
+		liwdg_widget_set_visible (module->dialog, value);
+	}
 }
 
 /*****************************************************************************/
@@ -199,13 +162,11 @@ liextEditorScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
-	liscr_class_insert_func (self, "create", Editor_create);
-	liscr_class_insert_func (self, "rotate", Editor_rotate);
-	liscr_class_insert_func (self, "save", Editor_save);
-	liscr_class_insert_func (self, "snap", Editor_snap);
-	liscr_class_insert_func (self, "translate", Editor_translate);
-	liscr_class_insert_getter (self, "visible", Editor_getter_visible);
-	liscr_class_insert_setter (self, "visible", Editor_setter_visible);
+	liscr_class_insert_cfunc (self, "create", Editor_create);
+	liscr_class_insert_cfunc (self, "rotate", Editor_rotate);
+	liscr_class_insert_cfunc (self, "snap", Editor_snap);
+	liscr_class_insert_cfunc (self, "translate", Editor_translate);
+	liscr_class_insert_cvar (self, "visible", Editor_getter_visible, Editor_setter_visible);
 }
 
 /** @} */

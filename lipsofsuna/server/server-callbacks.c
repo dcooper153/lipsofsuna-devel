@@ -195,7 +195,6 @@ private_object_free (lisrvServer* server,
 		LI_FOREACH_U32DIC (iter, data->animations)
 			lisys_free (iter.value);
 		lialg_u32dic_free (data->animations);
-		lisys_free (data->name);
 		lisys_free (data);
 	}
 

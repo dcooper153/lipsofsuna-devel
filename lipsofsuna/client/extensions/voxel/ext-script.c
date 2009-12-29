@@ -43,26 +43,19 @@
  * -- @param self Voxel class.
  * Voxel.test(self)
  */
-static int
-Voxel_test (lua_State* lua)
+static void Voxel_test (liscrArgs* args)
 {
-	liextModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VOXEL);
-
 	printf ("Voxel.test\n");
-
-	return 0;
 }
 
 /*****************************************************************************/
 
 void
 liextVoxelScript (liscrClass* self,
-                     void*       data)
+                  void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
-	liscr_class_insert_func (self, "test", Voxel_test);
+	liscr_class_insert_cfunc (self, "test", Voxel_test);
 }
 
 /** @} */

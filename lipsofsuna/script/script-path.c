@@ -41,34 +41,18 @@
  * -- @return New vector.
  * function Path.pop(self)
  */
-static int
-Path_pop (lua_State* lua)
+static void Path_pop (liscrArgs* args)
 {
 	int index;
 	limatVector tmp;
-	liscrData* self;
-	liscrData* vector;
-	liscrScript* script = liscr_script (lua);
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PATH);
-
-	index = liai_path_get_position (self->data);
-	if (index == liai_path_get_length (self->data))
+	index = liai_path_get_position (args->self);
+	if (index < liai_path_get_length (args->self))
 	{
-		lua_pushnil (lua);
-		return 1;
+		liai_path_get_point (args->self, index, &tmp);
+		liai_path_set_position (args->self, index + 1);
+		liscr_args_seti_vector (args, &tmp);
 	}
-	liai_path_get_point (self->data, index, &tmp);
-	liai_path_set_position (self->data, index + 1);
-	vector = liscr_vector_new (script, &tmp);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
 }
 
 /* @luadoc
@@ -77,15 +61,11 @@ Path_pop (lua_State* lua)
  * -- @name Path.length
  * -- @class table
  */
-static int
-Path_getter_length (lua_State* lua)
+static void Path_getter_length (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PATH);
-
-	lua_pushnumber (lua, liai_path_get_length (self->data) - liai_path_get_position (self->data));
-	return 1;
+	liscr_args_seti_int (args,
+		liai_path_get_length (args->self) -
+		liai_path_get_position (args->self));
 }
 
 /*****************************************************************************/
@@ -94,8 +74,8 @@ void
 licomPathScript (liscrClass* self,
                  void*       data)
 {
-	liscr_class_insert_func (self, "pop", Path_pop);
-	liscr_class_insert_getter (self, "length", Path_getter_length);
+	liscr_class_insert_mfunc (self, "pop", Path_pop);
+	liscr_class_insert_mvar (self, "length", Path_getter_length, NULL);
 }
 
 /** @} */

@@ -44,43 +44,38 @@
  * -- @param self Packager class.
  * function Packager.cancel(self)
  */
-static int
-Packager_cancel (lua_State* lua)
+static void Packager_cancel (liscrArgs* args)
 {
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_PACKAGER);
-
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
 	liext_packager_cancel (self->packager);
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Creates data package.
  * --
+ * -- Arguments:
+ * -- dir: Directory name.
+ * -- file: File name.
+ * --
  * -- @param self Packager class.
- * -- @param name File name.
- * function Packager.save(self, name)
+ * -- @param args Arguments.
+ * -- @return True on success.
+ * function Packager.save(self, args)
  */
-static int
-Packager_save (lua_State* lua)
+static void Packager_save (liscrArgs* args)
 {
-	const char* name;
-	const char* dir;
+	const char* dir = "./";
+	const char* name = "data.tar.gz";
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_PACKAGER);
-	name = luaL_checkstring (lua, 2);
-	dir = luaL_checkstring (lua, 3);
-
-	if (!liext_packager_save (self->packager, name, dir))
-		lua_pushboolean (lua, 0);
-	else
-		lua_pushboolean (lua, 1);
-
-	return 1;
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
+	liscr_args_gets_string (args, "dir", &dir);
+	liscr_args_gets_string (args, "file", &name);
+	liscr_args_seti_bool (args, liext_packager_save (self->packager, name, dir));
+	liext_packager_cancel (self->packager);
 }
 
 /* @luadoc
@@ -89,29 +84,23 @@ Packager_save (lua_State* lua)
  * -- @name Packager.verbose
  * -- @class table
  */
-static int
-Packager_getter_verbose (lua_State* lua)
+static void Packager_getter_verbose (liscrArgs* args)
 {
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_PACKAGER);
-
-	lua_pushboolean (lua, liext_packager_get_verbose (self->packager));
-
-	return 0;
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
+	liscr_args_seti_bool (args, liext_packager_get_verbose (self->packager));
 }
-static int
-Packager_setter_verbose (lua_State* lua)
+static void Packager_setter_verbose (liscrArgs* args)
 {
 	int value;
 	liextModule* self;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_PACKAGER);
-	value = lua_toboolean (lua, 3);
-
-	liext_packager_set_verbose (self->packager, value);
-
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
+		liext_packager_set_verbose (self->packager, value);
+	}
 }
 
 /*****************************************************************************/
@@ -121,10 +110,9 @@ liextPackagerScript (liscrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PACKAGER, data);
-	liscr_class_insert_func (self, "cancel", Packager_cancel);
-	liscr_class_insert_func (self, "save", Packager_save);
-	liscr_class_insert_getter (self, "verbose", Packager_getter_verbose);
-	liscr_class_insert_setter (self, "verbose", Packager_setter_verbose);
+	liscr_class_insert_cfunc (self, "cancel", Packager_cancel);
+	liscr_class_insert_cfunc (self, "save", Packager_save);
+	liscr_class_insert_mvar (self, "verbose", Packager_getter_verbose, Packager_setter_verbose);
 }
 
 /** @} */

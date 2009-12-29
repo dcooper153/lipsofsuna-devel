@@ -44,16 +44,9 @@
  * -- @param self Skeleton class.
  * Skeleton.test(self)
  */
-static int
-Skeleton_test (lua_State* lua)
+static void Skeleton_test (liscrArgs* args)
 {
-	liextModule* module;
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SKELETON);
-
 	printf ("Skeleton.test\n");
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -63,7 +56,7 @@ liextSkeletonScript (liscrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);
-	liscr_class_insert_func (self, "test", Skeleton_test);
+	liscr_class_insert_cfunc (self, "test", Skeleton_test);
 }
 
 /** @} */

@@ -44,17 +44,9 @@
  * -- @param self Generator class.
  * function Generator.load(self)
  */
-static int
-Generator_load (lua_State* lua)
+static void Generator_load (liscrArgs* args)
 {
-	liscrData* data;
-	liwdgWidget* widget;
-
-	data = liscr_checkdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
-	widget = data->data;
 #warning FIXME: Generator_load not implemented
-
-	return 0;
 }
 
 /* @luadoc
@@ -62,32 +54,29 @@ Generator_load (lua_State* lua)
  * -- Creates a new generator widget.
  * --
  * -- @param self Generator class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New generator widget.
- * function Generator.new(self, table)
+ * function Generator.new(self, args)
  */
-static int
-Generator_new (lua_State* lua)
+static void Generator_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrScript* script;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
-	script = liscr_script (lua);
-
-	/* Allocate userdata. */
-	if (module->script == NULL)
+	/* Only supports one widget currently. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (module->script != NULL)
 	{
-		module->script = liscr_data_new (script, module->editor, LIEXT_SCRIPT_GENERATOR, licli_script_widget_free);
-		if (module->script == NULL)
-			return 0;
-		if (!lua_isnoneornil (lua, 2))
-			liscr_copyargs (lua, module->script, 2);
-		liwdg_widget_set_userdata (module->editor, module->script);
+		liscr_args_seti_data (args, module->script);
+		return;
 	}
 
-	liscr_pushdata (lua, module->script);
-	return 1;
+	/* Allocate userdata. */
+	module->script = liscr_data_new (args->script, module->editor, LIEXT_SCRIPT_GENERATOR, licli_script_widget_free);
+	if (module->script == NULL)
+		return;
+	liwdg_widget_set_userdata (module->editor, module->script);
+	liscr_args_call_setters (args, module->script);
+	liscr_args_seti_data (args, module->script);
 }
 
 /* @luadoc
@@ -97,19 +86,10 @@ Generator_new (lua_State* lua)
  * -- @param self Generator class.
  * function Generator.save(self)
  */
-static int
-Generator_save (lua_State* lua)
+static void Generator_save (liscrArgs* args)
 {
-	liscrData* data;
-	liwdgWidget* widget;
-
-	data = liscr_checkdata (lua, 1, LIEXT_SCRIPT_GENERATOR);
-	widget = data->data;
-
-	if (!liext_editor_save (LIEXT_EDITOR (widget)))
+	if (!liext_editor_save (args->self))
 		lisys_error_report ();
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -122,9 +102,9 @@ liextGeneratorScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "load", Generator_load);
-	liscr_class_insert_func (self, "new", Generator_new);
-	liscr_class_insert_func (self, "save", Generator_save);
+	liscr_class_insert_cfunc (self, "load", Generator_load);
+	liscr_class_insert_cfunc (self, "new", Generator_new);
+	liscr_class_insert_cfunc (self, "save", Generator_save);
 }
 
 /** @} */

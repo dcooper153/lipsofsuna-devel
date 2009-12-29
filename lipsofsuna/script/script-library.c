@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <ai/lips-ai.h>
 #include <script/lips-script.h>
 
 /* @luadoc
@@ -37,64 +36,65 @@
  * ---
  * -- Checks if an object is an instance of a class.
  * --
+ * -- Arguments:
+ * -- data: Userdata.
+ * -- name: Class name.
+ * --
  * -- @param self Class class.
- * -- @param data Object or any type.
- * -- @param name Class name.
+ * -- @param args Arguments.
  * -- @return Boolean.
- * function Class.check(self, data, name)
+ * function Class.check(self, args)
  */
-static int
-Class_check (lua_State* lua)
+static void Class_check (liscrArgs* args)
 {
 	const char* name;
 	liscrData* data;
 
-	liscr_checkclassdata (lua, 1, LICOM_SCRIPT_CLASS);
-	data = liscr_checkanydata (lua, 2);
-	name = luaL_checkstring (lua, 3);
-
-	lua_pushboolean (lua, !strcmp (data->clss->name, name));
-
-	return 1;
+	if (liscr_args_gets_data (args, "data", NULL, &data) &&
+	    liscr_args_gets_string (args, "name", &name))
+		liscr_args_seti_bool (args, !strcmp (data->clss->name, name));
 }
 
 /* @luadoc
  * ---
  * -- Inherits a class from another.
  * --
+ * -- Arguments:
+ * -- base: Base class.
+ * -- name: Class name.
+ * --
  * -- @param self Class class.
- * -- @param base Base class.
- * -- @param name Class name used for serialization.
+ * -- @param args Arguments.
  * -- @return New class.
  * function Class.new(self, base, name)
  */
-static int
-Class_new (lua_State* lua)
+static void Class_new (liscrArgs* args)
 {
 	const char* name;
 	liscrClass* base;
-	liscrClass* self;
-	liscrScript* script;
+	liscrClass* clss;
 
-	script = liscr_checkclassdata (lua, 1, LICOM_SCRIPT_CLASS);
-	base = liscr_checkanyclass (lua, 2);
-	name = luaL_checkstring (lua, 3);
-
-	self = liscr_script_find_class (script, name);
-	if (self != NULL)
-		luaL_argerror (lua, 3, "duplicate class name");
-
-	self = liscr_class_new_full (script, base, name, 0);
-	if (self == NULL)
-		return 0;
-	if (!liscr_script_insert_class (script, self))
+	if (liscr_args_gets_class (args, "base", NULL, &base) &&
+	    liscr_args_gets_string (args, "name", &name))
 	{
-		liscr_class_free (self);
-		return 0;
-	}
-	liscr_pushclass (lua, self);
+		/* Check for duplicates. */
+		clss = liscr_script_find_class (args->script, name);
+		if (clss != NULL)
+			return;
 
-	return 1;
+		/* Create a new class. */
+		clss = liscr_class_new_full (args->script, base, name, 0);
+		if (clss == NULL)
+			return;
+		if (!liscr_script_insert_class (args->script, clss))
+		{
+			liscr_class_free (clss);
+			return;
+		}
+
+		/* Return class. */
+		liscr_args_seti_class (args, clss);
+	}
 }
 
 /*****************************************************************************/
@@ -104,8 +104,8 @@ licomClassScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LICOM_SCRIPT_CLASS, data);
-	liscr_class_insert_func (self, "check", Class_check);
-	liscr_class_insert_func (self, "new", Class_new);
+	liscr_class_insert_cfunc (self, "check", Class_check);
+	liscr_class_insert_cfunc (self, "new", Class_new);
 }
 
 /** @} */

@@ -46,31 +46,20 @@ struct _licomEvent
  * ---
  * -- Creates a new event.
  * -- @param self Event class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New event.
- * function Event.new(self, table)
+ * function Event.new(self, args)
  */
-static int
-Event_new (lua_State* lua)
+static void Event_new (liscrArgs* args)
 {
-	liscrData* event;
-	liscrScript* script = liscr_script (lua);
+	liscrData* data;
 
-	/* Allocate self. */
-	event = licom_event_new (script);
-	if (event == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, event, 2);
-
-	liscr_pushdata (lua, event);
-	liscr_data_unref (event, NULL);
-	return 1;
+	data = licom_event_new (args->script);
+	if (data == NULL)
+		return;
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -79,27 +68,16 @@ Event_new (lua_State* lua)
  * -- @name Event.type
  * -- @class table
  */
-static int
-Event_getter_type (lua_State* lua)
+static void Event_getter_type (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_EVENT);
-
-	lua_pushnumber (lua, ((licomEvent*) self)->type);
-	return 1;
+	liscr_args_seti_int (args, ((licomEvent*) args->self)->type);
 }
-static int
-Event_setter_type (lua_State* lua)
+static void Event_setter_type (liscrArgs* args)
 {
 	int value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_EVENT);
-	value = luaL_checknumber (lua, 3);
-
-	((licomEvent*) self)->type = value;
-	return 0;
+	if (liscr_args_geti_int (args, 0, &value))
+		((licomEvent*) args->self)->type = value;
 }
 
 /*****************************************************************************/
@@ -114,9 +92,8 @@ void
 licomEventScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_insert_func (self, "new", Event_new);
-	liscr_class_insert_getter (self, "type", Event_getter_type);
-	liscr_class_insert_setter (self, "type", Event_setter_type);
+	liscr_class_insert_cfunc (self, "new", Event_new);
+	liscr_class_insert_mvar (self, "type", Event_getter_type, Event_setter_type);
 }
 
 /**

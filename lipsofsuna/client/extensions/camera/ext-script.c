@@ -60,30 +60,31 @@
 
 /* @luadoc
  * ---
- * -- Moves the zoom of the camera.
+ * -- Moves the camera forward or backward.
+ * --
+ * -- Arguments:
+ * -- rate: Movement rate.
+ * -- keep: True if should keep moving.
  * --
  * -- @param self Camera class.
- * -- @param value Movement value.
- * -- @param [keep] True if should keep moving, false if instantaneous.
- * function Camera.move(self, value, keep)
+ * -- @param args Arguments.
+ * function Camera.move(self, args)
  */
-static int
-Camera_move (lua_State* lua)
+static void Camera_move (liscrArgs* args)
 {
-	int keep;
+	int keep = 0;
 	float value;
-	liextModule* self;
+	liextModule* module;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checknumber (lua, 2);
-	keep = lua_toboolean (lua, 3);
-
-	if (keep)
-		self->move = value;
-	else
-		lialg_camera_move (self->module->camera, value);
-
-	return 0;
+	if (liscr_args_gets_float (args, "rate", &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		liscr_args_gets_bool (args, "keep", &keep);
+		if (keep)
+			module->move = value;
+		else
+			lialg_camera_move (module->module->camera, -value);
+	}
 }
 
 /* @luadoc
@@ -93,103 +94,102 @@ Camera_move (lua_State* lua)
  * -- @param self Camera class.
  * function Camera.reset(self)
  */
-static int
-Camera_reset (lua_State* lua)
+static void Camera_reset (liscrArgs* args)
 {
-	liextModule* self;
+	liextModule* module;
 	limatTransform transform;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	transform = limat_transform_identity ();
-	self->module->camera->transform.local = transform;
-	lialg_camera_warp (self->module->camera);
-
-	return 0;
+	module->module->camera->transform.local = transform;
+	lialg_camera_warp (module->module->camera);
 }
 
 /* @luadoc
  * ---
  * -- Sets the tilting rate of the camera.
  * --
+ * -- Arguments:
+ * -- rate: Tilting rate.
+ * -- keep: True if should keep tilting.
+ * --
  * -- @param self Camera class.
- * -- @param value Tilting rate.
- * -- @param [keep] True if should keep tilting, false if instantaneous.
- * function Camera.tilt(self, value, keep)
+ * -- @param args Arguments.
+ * function Camera.tilt(self, args)
  */
-static int
-Camera_tilt (lua_State* lua)
+static void Camera_tilt (liscrArgs* args)
 {
-	int keep;
+	int keep = 0;
 	float value;
-	liextModule* self;
+	liextModule* module;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checknumber (lua, 2);
-	keep = lua_toboolean (lua, 3);
-
-	if (keep)
-		self->tilt = value;
-	else
-		lialg_camera_tilt (self->module->camera, -value);
-
-	return 0;
+	if (liscr_args_gets_float (args, "rate", &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		liscr_args_gets_bool (args, "keep", &keep);
+		if (keep)
+			module->tilt = value;
+		else
+			lialg_camera_tilt (module->module->camera, -value);
+	}
 }
 
 /* @luadoc
  * ---
  * -- Sets the turning rate of the camera.
  * --
+ * -- Arguments:
+ * -- rate: Turning rate.
+ * -- keep: True if should keep turning.
+ * --
  * -- @param self Camera class.
- * -- @param value Turning rate.
- * -- @param [keep] True if should keep turning, false if instantaneous.
- * function Camera.turn(self, value, keep)
+ * -- @param args Arguments.
+ * function Camera.turn(self, args)
  */
-static int
-Camera_turn (lua_State* lua)
+static void Camera_turn (liscrArgs* args)
 {
-	int keep;
+	int keep = 0;
 	float value;
-	liextModule* self;
+	liextModule* module;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checknumber (lua, 2);
-	keep = lua_toboolean (lua, 3);
-
-	if (keep)
-		self->turn = value;
-	else
-		lialg_camera_turn (self->module->camera, value);
-
-	return 0;
+	if (liscr_args_gets_float (args, "rate", &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		liscr_args_gets_bool (args, "keep", &keep);
+		if (keep)
+			module->turn = value;
+		else
+			lialg_camera_tilt (module->module->camera, value);
+	}
 }
 
 /* @luadoc
  * ---
  * -- Adjusts the zoom of the camera.
  * --
+ * -- Arguments:
+ * -- rate: Zooming rate.
+ * -- keep: True if should keep zooming.
+ * --
  * -- @param self Camera class.
- * -- @param value Zooming rate.
- * -- @param [keep] True if should keep zooming, false if instantaneous.
- * function Camera.zoom(self, value, keep)
+ * -- @param args Arguments.
+ * function Camera.zoom(self, args)
  */
-static int
-Camera_zoom (lua_State* lua)
+static void Camera_zoom (liscrArgs* args)
 {
-	int keep;
+	int keep = 0;
 	float value;
-	liextModule* self;
+	liextModule* module;
 
-	self = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checknumber (lua, 2);
-	keep = lua_toboolean (lua, 3);
-
-	if (keep)
-		self->zoom = value;
-	else
-		lialg_camera_zoom (self->module->camera, value);
-
-	return 0;
+	if (liscr_args_gets_float (args, "rate", &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		liscr_args_gets_bool (args, "keep", &keep);
+		if (keep)
+			module->zoom = value;
+		else
+			lialg_camera_zoom (module->module->camera, value);
+	}
 }
 
 /* @luadoc
@@ -198,17 +198,16 @@ Camera_zoom (lua_State* lua)
  * -- @name Camera.far
  * -- @class table
  */
-static int
-Camera_setter_far (lua_State* lua)
+static void Camera_setter_far (liscrArgs* args)
 {
 	float value;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checknumber (lua, 3);
-
-	lialg_camera_set_far (module->module->camera, value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value) && value > 0.0f)
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		lialg_camera_set_far (module->module->camera, value);
+	}
 }
 
 /* @luadoc
@@ -217,27 +216,23 @@ Camera_setter_far (lua_State* lua)
  * -- @name Camera.mode
  * -- @class table
  */
-static int
-Camera_getter_mode (lua_State* lua)
+static void Camera_getter_mode (liscrArgs* args)
 {
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-
-	lua_pushnumber (lua, lialg_camera_get_driver (module->module->camera));
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+	liscr_args_seti_int (args, lialg_camera_get_driver (module->module->camera));
 }
-static int
-Camera_setter_mode (lua_State* lua)
+static void Camera_setter_mode (liscrArgs* args)
 {
 	int value;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checkint (lua, 3);
-
-	lialg_camera_set_driver (module->module->camera, value);
-	return 0;
+	if (liscr_args_geti_int (args, 0, &value) && value >= 0 && value < LIALG_CAMERA_MAX)
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		lialg_camera_set_driver (module->module->camera, value);
+	}
 }
 
 /* @luadoc
@@ -246,17 +241,16 @@ Camera_setter_mode (lua_State* lua)
  * -- @name Camera.far
  * -- @class table
  */
-static int
-Camera_setter_near (lua_State* lua)
+static void Camera_setter_near (liscrArgs* args)
 {
 	float value;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-	value = luaL_checknumber (lua, 3);
-
-	lialg_camera_set_near (module->module->camera, value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value) && value > 0.0f)
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		lialg_camera_set_near (module->module->camera, value);
+	}
 }
 
 /* @luadoc
@@ -265,26 +259,14 @@ Camera_setter_near (lua_State* lua)
  * -- @name Camera.position
  * -- @class table
  */
-static int
-Camera_getter_position (lua_State* lua)
+static void Camera_getter_position (liscrArgs* args)
 {
 	liextModule* module;
 	limatTransform transform;
-	liscrData* vector;
-	liscrScript* script = liscr_script (lua);
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	lialg_camera_get_transform (module->module->camera, &transform);
-	vector = liscr_vector_new (script, &transform.position);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	liscr_args_seti_vector (args, &transform.position);
 }
 
 /* @luadoc
@@ -293,26 +275,14 @@ Camera_getter_position (lua_State* lua)
  * -- @name Camera.rotation
  * -- @class table
  */
-static int
-Camera_getter_rotation (lua_State* lua)
+static void Camera_getter_rotation (liscrArgs* args)
 {
 	liextModule* module;
 	limatTransform transform;
-	liscrData* quat;
-	liscrScript* script = liscr_script (lua);
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CAMERA);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	lialg_camera_get_transform (module->module->camera, &transform);
-	quat = liscr_quaternion_new (script, &transform.rotation);
-	if (quat != NULL)
-	{
-		liscr_pushdata (lua, quat);
-		liscr_data_unref (quat, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 
 /*****************************************************************************/
@@ -325,17 +295,16 @@ liextCameraScript (liscrClass* self,
 	liscr_class_insert_enum (self, "FIRSTPERSON", LIALG_CAMERA_FIRSTPERSON);
 	liscr_class_insert_enum (self, "THIRDPERSON", LIALG_CAMERA_THIRDPERSON);
 	liscr_class_insert_enum (self, "MANUAL", LIALG_CAMERA_MANUAL);
-	liscr_class_insert_func (self, "move", Camera_move);
-	liscr_class_insert_func (self, "reset", Camera_reset);
-	liscr_class_insert_func (self, "tilt", Camera_tilt);
-	liscr_class_insert_func (self, "turn", Camera_turn);
-	liscr_class_insert_func (self, "zoom", Camera_zoom);
-	liscr_class_insert_getter (self, "mode", Camera_getter_mode);
-	liscr_class_insert_getter (self, "position", Camera_getter_position);
-	liscr_class_insert_getter (self, "rotation", Camera_getter_rotation);
-	liscr_class_insert_setter (self, "far", Camera_setter_far);
-	liscr_class_insert_setter (self, "mode", Camera_setter_mode);
-	liscr_class_insert_setter (self, "near", Camera_setter_near);
+	liscr_class_insert_cfunc (self, "move", Camera_move);
+	liscr_class_insert_cfunc (self, "reset", Camera_reset);
+	liscr_class_insert_cfunc (self, "tilt", Camera_tilt);
+	liscr_class_insert_cfunc (self, "turn", Camera_turn);
+	liscr_class_insert_cfunc (self, "zoom", Camera_zoom);
+	liscr_class_insert_cvar (self, "far", NULL, Camera_setter_far);
+	liscr_class_insert_cvar (self, "mode", Camera_getter_mode, Camera_setter_mode);
+	liscr_class_insert_cvar (self, "near", NULL, Camera_setter_near);
+	liscr_class_insert_cvar (self, "position", Camera_getter_position, NULL);
+	liscr_class_insert_cvar (self, "rotation", Camera_getter_rotation, NULL);
 }
 
 /** @} */

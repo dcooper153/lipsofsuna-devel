@@ -27,6 +27,7 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
+#include <algorithm/lips-algorithm.h>
 #include <engine/lips-engine.h>
 #include <script/lips-script.h>
 #include <server/lips-server.h>
@@ -54,16 +55,6 @@ liext_module_free (liextModule* self);
 liextSkills*
 liext_module_find_skills (liextModule* self,
                           liengObject* owner);
-
-int
-liext_module_insert_skills (liextModule* self,
-                            liengObject* key,
-                            liextSkills* value);
-
-void
-liext_module_remove_skills (liextModule* self,
-                            liengObject* key,
-                            liextSkills* value);
 
 /*****************************************************************************/
 

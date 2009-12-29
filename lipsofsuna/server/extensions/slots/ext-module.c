@@ -84,24 +84,6 @@ liext_module_free (liextModule* self)
 	lisys_free (self);
 }
 
-int
-liext_module_insert_slots (liextModule* self,
-                           liengObject* key,
-                           liextSlots*  value)
-{
-	if (lialg_ptrdic_insert (self->dictionary, key, value))
-		return 1;
-	return 0;
-}
-
-void
-liext_module_remove_slots (liextModule* self,
-                           liengObject* key,
-                           liextSlots*  value)
-{
-	lialg_ptrdic_remove (self->dictionary, key);
-}
-
 /*****************************************************************************/
 
 static int

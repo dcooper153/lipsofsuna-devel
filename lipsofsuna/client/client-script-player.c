@@ -37,50 +37,52 @@
  * ---
  * -- Sets the tilting rate of the player.
  * --
+ * -- Arguments:
+ * -- rate: Tilting rate. (required)
+ * -- keep: True if should keep tilting.
+ * --
  * -- @param self Module class.
- * -- @param value Tilting rate.
- * -- @param [keep] True if should keep tilting, false if instantaneous.
- * function Module.tilt(self, value, keep)
+ * -- @param args Arguments.
+ * function Module.tilt(self, args)
  */
-static int
-Player_tilt (lua_State* lua)
+static void Player_tilt (liscrArgs* args)
 {
 	int keep;
 	float value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	value = luaL_checknumber (lua, 2);
-	keep = lua_toboolean (lua, 3);
-
-	if (module->network != NULL)
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_gets_float (args, "rate", &value) && module->network == NULL)
+	{
+		liscr_args_gets_bool (args, "keep", &keep);
 		licli_network_tilt (module->network, value, keep);
-	return 0;
+	}
 }
 
 /* @luadoc
  * ---
  * -- Sets the turning rate of the player.
  * --
+ * -- Arguments:
+ * -- rate: Turning rate. (required)
+ * -- keep: True if should keep turning.
+ * --
  * -- @param self Module class.
- * -- @param value Turning rate.
- * -- @param [keep] True if should keep turning, false if instantaneous.
- * function Module.turn(self, value, keep)
+ * -- @param args Arguments.
+ * function Module.turn(self, args)
  */
-static int
-Player_turn (lua_State* lua)
+static void Player_turn (liscrArgs* args)
 {
 	int keep;
 	float value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	value = luaL_checknumber (lua, 2);
-	keep = lua_toboolean (lua, 3);
-
-	if (module->network != NULL)
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_gets_float (args, "rate", &value) && module->network == NULL)
+	{
+		liscr_args_gets_bool (args, "keep", &keep);
 		licli_network_turn (module->network, value, keep);
-	return 0;
+	}
 }
 
 /* @luadoc
@@ -89,35 +91,22 @@ Player_turn (lua_State* lua)
  * -- @name Player.analog
  * -- @class table
  */
-static int
-Player_getter_analog (lua_State* lua)
+static void Player_getter_analog (liscrArgs* args)
 {
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-
-	if (module->network == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	lua_pushboolean (lua, module->network->analog);
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (module->network != NULL)
+		liscr_args_seti_float (args, module->network->analog);
 }
-static int
-Player_setter_analog (lua_State* lua)
+static void Player_setter_analog (liscrArgs* args)
 {
 	int value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	luaL_checkany (lua, 2);
-	value = lua_toboolean (lua, 2);
-
-	if (module->network == NULL)
-		return 0;
-	module->network->analog = value;
-	return 0;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_geti_bool (args, 0, &value) && module->network != NULL)
+		module->network->analog = value;
 }
 
 /* @luadoc
@@ -126,34 +115,22 @@ Player_setter_analog (lua_State* lua)
  * -- @name Player.move
  * -- @class table
  */
-static int
-Player_getter_move (lua_State* lua)
+static void Player_getter_move (liscrArgs* args)
 {
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-
-	if (module->network == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	lua_pushnumber (lua, module->network->curr.controls.move);
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (module->network != NULL)
+		liscr_args_seti_float (args, module->network->curr.controls.move);
 }
-static int
-Player_setter_move (lua_State* lua)
+static void Player_setter_move (liscrArgs* args)
 {
 	float value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	value = luaL_checknumber (lua, 3);
-
-	if (module->network == NULL)
-		return 0;
-	module->network->curr.controls.move = value;
-	return 0;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_geti_float (args, 0, &value) && module->network != NULL)
+		module->network->curr.controls.move = value;
 }
 
 /* @luadoc
@@ -162,22 +139,18 @@ Player_setter_move (lua_State* lua)
  * -- @name Player.object
  * -- @class table
  */
-static int
-Player_getter_object (lua_State* lua)
+static void Player_getter_object (liscrArgs* args)
 {
 	licliModule* module;
 	liengObject* object;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-
-	if (module->network == NULL)
-		return 0;
-	object = lieng_engine_find_object (module->engine, module->network->id);
-	if (object == NULL)
-		return 0;
-	liscr_pushdata (lua, object->script);
-
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (module->network != NULL)
+	{
+		object = lieng_engine_find_object (module->engine, module->network->id);
+		if (object != NULL)
+			liscr_args_seti_data (args, object->script);
+	}
 }
 
 /* @luadoc
@@ -186,41 +159,26 @@ Player_getter_object (lua_State* lua)
  * -- @name Player.rotation
  * -- @class table
  */
-static int
-Player_getter_rotation (lua_State* lua)
+static void Player_getter_rotation (liscrArgs* args)
 {
 	licliModule* module;
 	limatQuaternion tmp;
-	liscrData* quat;
-	liscrScript* script = liscr_script (lua);
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-
-	if (module->network == NULL)
-		return 0;
-	licli_network_get_rotation (module->network, &tmp);
-	quat = liscr_quaternion_new (script, &tmp);
-	if (quat == NULL)
-		return 0;
-	liscr_pushdata (lua, quat);
-	liscr_data_unref (quat, NULL);
-
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (module->network != NULL)
+	{
+		licli_network_get_rotation (module->network, &tmp);
+		liscr_args_seti_quaternion (args, &tmp);
+	}
 }
-static int
-Player_setter_rotation (lua_State* lua)
+static void Player_setter_rotation (liscrArgs* args)
 {
 	licliModule* module;
-	liscrData* quat;
+	liscrData* data;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	quat = liscr_checkdata (lua, 3, LICOM_SCRIPT_QUATERNION);
-
-	if (module->network == NULL)
-		return 0;
-	licli_network_set_rotation (module->network, quat->data);
-
-	return 0;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_QUATERNION, &data) && module->network != NULL)
+		licli_network_set_rotation (module->network, data->data);
 }
 
 /* @luadoc
@@ -229,34 +187,22 @@ Player_setter_rotation (lua_State* lua)
  * -- @name Player.tilt_rate
  * -- @class table
  */
-static int
-Player_getter_tilt_rate (lua_State* lua)
+static void Player_getter_tilt_rate (liscrArgs* args)
 {
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-
-	if (module->network == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	lua_pushnumber (lua, module->network->curr.controls.tilt);
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (module->network != NULL)
+		liscr_args_seti_float (args, module->network->curr.controls.tilt);
 }
-static int
-Player_setter_tilt_rate (lua_State* lua)
+static void Player_setter_tilt_rate (liscrArgs* args)
 {
 	float value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	value = luaL_checknumber (lua, 3);
-
-	if (module->network == NULL)
-		return 0;
-	module->network->curr.controls.tilt = value;
-	return 0;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_geti_float (args, 0, &value))
+		module->network->curr.controls.tilt = value;
 }
 
 /* @luadoc
@@ -265,34 +211,22 @@ Player_setter_tilt_rate (lua_State* lua)
  * -- @name Player.turn_rate
  * -- @class table
  */
-static int
-Player_getter_turn_rate (lua_State* lua)
+static void Player_getter_turn_rate (liscrArgs* args)
 {
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-
-	if (module->network == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	lua_pushnumber (lua, module->network->curr.controls.turn);
-	return 1;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (module->network != NULL)
+		liscr_args_seti_float (args, module->network->curr.controls.turn);
 }
-static int
-Player_setter_turn_rate (lua_State* lua)
+static void Player_setter_turn_rate (liscrArgs* args)
 {
 	float value;
 	licliModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_PLAYER);
-	value = luaL_checknumber (lua, 3);
-
-	if (module->network == NULL)
-		return 0;
-	module->network->curr.controls.turn = value;
-	return 0;
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
+	if (liscr_args_geti_float (args, 0, &value) && module->network != NULL)
+		module->network->curr.controls.turn = value;
 }
 
 /*****************************************************************************/
@@ -302,19 +236,14 @@ licliPlayerScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_PLAYER, data);
-	liscr_class_insert_func (self, "tilt", Player_tilt);
-	liscr_class_insert_func (self, "turn", Player_turn);
-	liscr_class_insert_getter (self, "analog", Player_getter_analog);
-	liscr_class_insert_getter (self, "move", Player_getter_move);
-	liscr_class_insert_getter (self, "object", Player_getter_object);
-	liscr_class_insert_getter (self, "rotation", Player_getter_rotation);
-	liscr_class_insert_getter (self, "tilt_rate", Player_getter_tilt_rate);
-	liscr_class_insert_getter (self, "turn_rate", Player_getter_turn_rate);
-	liscr_class_insert_setter (self, "analog", Player_setter_analog);
-	liscr_class_insert_setter (self, "move", Player_setter_move);
-	liscr_class_insert_setter (self, "rotation", Player_setter_rotation);
-	liscr_class_insert_setter (self, "tilt_rate", Player_setter_tilt_rate);
-	liscr_class_insert_setter (self, "turn_rate", Player_setter_turn_rate);
+	liscr_class_insert_cfunc (self, "tilt", Player_tilt);
+	liscr_class_insert_cfunc (self, "turn", Player_turn);
+	liscr_class_insert_cvar (self, "analog", Player_getter_analog, Player_setter_analog);
+	liscr_class_insert_cvar (self, "move", Player_getter_move, Player_setter_move);
+	liscr_class_insert_cvar (self, "object", Player_getter_object, NULL);
+	liscr_class_insert_cvar (self, "rotation", Player_getter_rotation, Player_setter_rotation);
+	liscr_class_insert_cvar (self, "tilt_rate", Player_getter_tilt_rate, Player_setter_tilt_rate);
+	liscr_class_insert_cvar (self, "turn_rate", Player_getter_turn_rate, Player_setter_turn_rate);
 }
 
 /** @} */

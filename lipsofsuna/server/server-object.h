@@ -35,7 +35,6 @@
 
 struct _lisrvObject
 {
-	char* name;
 	uint8_t flags;
 	lialgU32dic* animations;
 	lisrvClient* client;
@@ -78,13 +77,6 @@ lisrv_object_swap (liengObject* self,
 int
 lisrv_object_set_client (liengObject* self,
                          lisrvClient* value);
-
-const char*
-lisrv_object_get_name (const liengObject* self);
-
-int
-lisrv_object_set_name (liengObject* self,
-                       const char*  value);
 
 #endif
 

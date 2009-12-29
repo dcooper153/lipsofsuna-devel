@@ -33,113 +33,97 @@
  * -- @class table
  */
 
-static int
-Object_approach (lua_State* lua)
+/* @luadoc
+ * ---
+ * -- Instructs the object to approach a point.
+ * --
+ * -- Arguments:
+ * -- point: Point vector in world space. (required)
+ * -- speed: Movement speed multiplier.
+ * --
+ * -- @param self Object.
+ * -- @param args Arguments.
+ * function Object.approach(self, args)
+ */
+static void Object_approach (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* vector;
+	float speed = 1.0f;
+	limatVector vector;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-
-	/* FIXME: Speed not supported. */
-	lieng_object_approach (object->data, vector->data, 1.0f);
-	return 0;
+	if (liscr_args_gets_vector (args, "point", &vector))
+	{
+		liscr_args_gets_float (args, "speed", &speed);
+		lieng_object_approach (args->self, &vector, speed);
+	}
 }
 
 /* @luadoc
  * ---
  * -- Finds a bone or an anchor by name.
  * --
+ * -- Arguments:
+ * -- name: Node name. (required)
+ * --
  * -- @param self Object.
- * -- @param name Node name.
+ * -- @param args Arguments.
  * -- @return Position and rotation, or nil if not found.
- * function Object.find_node(self, name)
+ * function Object.find_node(self, args)
  */
-static int
-Object_find_node (lua_State* lua)
+static void Object_find_node (liscrArgs* args)
 {
 	const char* name;
 	limatTransform transform;
 	limdlNode* node;
-	liscrData* tmp;
-	liscrData* object;
-	liscrScript* script;
 
-	script = liscr_script (lua);
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	name = luaL_checkstring (lua, 2);
-
-	/* Find node. */
-	node = limdl_pose_find_node (LIENG_OBJECT (object->data)->pose, name);
+	if (!liscr_args_gets_string (args, "name", &name))
+		return;
+	node = limdl_pose_find_node (LIENG_OBJECT (args->self)->pose, name);
 	if (node == NULL)
-		return 0;
-
-	/* Return transform. */
+		return;
 	limdl_node_get_world_transform (node, &transform);
-	tmp = liscr_vector_new (script, &transform.position);
-	if (tmp != NULL)
-	{
-		liscr_pushdata (lua, tmp);
-		liscr_data_unref (tmp, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	tmp = liscr_quaternion_new (script, &transform.rotation);
-	if (tmp != NULL)
-	{
-		liscr_pushdata (lua, tmp);
-		liscr_data_unref (tmp, NULL);
-	}
-	else
-		lua_pushnil (lua);
-
-	return 2;
+	liscr_args_seti_vector (args, &transform.position);
+	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 
 /* @luadoc
  * ---
  * -- Lets an impulse force affect the object.
  * --
+ * -- Arguments:
+ * -- point: Point of impulse. (required)
+ * -- impulse: Force of impulse. (required)
+ * --
  * -- @param self Object.
- * -- @param point Point of impulse.
- * -- @param impulse Force of impulse.
- * function Object.impulse(self, point, impulse)
+ * -- @param args Arguments.
+ * function Object.impulse(self, args)
  */
-static int
-Object_impulse (lua_State* lua)
+static void Object_impulse (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* point;
-	liscrData* impulse;
+	limatVector impulse;
+	limatVector point;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	point = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	impulse = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-
-	lieng_object_impulse (object->data, point->data, impulse->data);
-	return 0;
+	if (liscr_args_gets_vector (args, "impulse", &impulse) &&
+	    liscr_args_gets_vector (args, "point", &point))
+		lieng_object_impulse (args->self, &point, &impulse);
 }
 
 /* @luadoc
  * ---
  * -- Causes the object to jump.
  * --
+ * -- Arguments:
+ * -- impulse: Force of impulse. (required)
+ * --
  * -- @param self Object.
- * -- @param impulse Jump force.
+ * -- @param args Arguments.
  * function Object.jump(self, impulse)
  */
-static int
-Object_jump (lua_State* lua)
+static void Object_jump (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* impulse;
+	limatVector impulse;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	impulse = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-
-	lieng_object_jump (object->data, impulse->data);
-	return 0;
+	if (liscr_args_gets_vector (args, "impulse", &impulse))
+		lieng_object_jump (args->self, &impulse);
 }
 
 /* @luadoc
@@ -156,38 +140,19 @@ Object_jump (lua_State* lua)
  * -- @name Object.angular_momentum
  * -- @class table
  */
-static int
-Object_getter_angular_momentum (lua_State* lua)
+static void Object_getter_angular_momentum (liscrArgs* args)
 {
 	limatVector tmp;
-	liscrData* vector;
-	liscrData* object;
-	liscrScript* script = liscr_script (lua);
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lieng_object_get_angular_momentum (object->data, &tmp);
-	vector = liscr_vector_new (script, &tmp);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	lieng_object_get_angular_momentum (args->self, &tmp);
+	liscr_args_seti_vector (args, &tmp);
 }
-static int
-Object_setter_angular_momentum (lua_State* lua)
+static void Object_setter_angular_momentum (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* vector;
+	limatVector vector;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	vector = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-
-	lieng_object_set_angular_momentum (object->data, vector->data);
-	return 0;
+	if (liscr_args_geti_vector (args, 0, &vector))
+		lieng_object_set_angular_momentum (args->self, &vector);
 }
 
 /* @luadoc
@@ -197,28 +162,16 @@ Object_setter_angular_momentum (lua_State* lua)
  * -- @name Object.class
  * -- @class table
  */
-static int
-Object_getter_class (lua_State* lua)
+static void Object_getter_class (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	liscr_pushclass (lua, object->clss);
-	return 1;
+	liscr_args_seti_class (args, args->data->clss);
 }
-static int
-Object_setter_class (lua_State* lua)
+static void Object_setter_class (liscrArgs* args)
 {
-	liscrData* object;
 	liscrClass* clss;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	clss = liscr_checkanyclass (lua, 3);
-
-	if (!liscr_data_set_class (object, clss))
-		luaL_argerror (lua, 3, "incompatible class");
-	return 0;
+	if (liscr_args_geti_class (args, 0, NULL, &clss))
+		liscr_data_set_class (args->data, clss);
 }
 
 /* @luadoc
@@ -228,27 +181,16 @@ Object_setter_class (lua_State* lua)
  * -- @name Object.collision_group
  * -- @class table
  */
-static int
-Object_getter_collision_group (lua_State* lua)
+static void Object_getter_collision_group (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, lieng_object_get_collision_group (object->data));
-	return 1;
+	liscr_args_seti_int (args, lieng_object_get_collision_group (args->self));
 }
-static int
-Object_setter_collision_group (lua_State* lua)
+static void Object_setter_collision_group (liscrArgs* args)
 {
-	int mask;
-	liscrData* object;
+	int value;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	mask = luaL_checkinteger (lua, 3);
-
-	lieng_object_set_collision_group (object->data, mask);
-	return 0;
+	if (liscr_args_geti_int (args, 0, &value))
+		lieng_object_set_collision_group (args->self, value);
 }
 
 /* @luadoc
@@ -258,27 +200,16 @@ Object_setter_collision_group (lua_State* lua)
  * -- @name Object.collision_mask
  * -- @class table
  */
-static int
-Object_getter_collision_mask (lua_State* lua)
+static void Object_getter_collision_mask (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, lieng_object_get_collision_mask (object->data));
-	return 1;
+	liscr_args_seti_int (args, lieng_object_get_collision_mask (args->self));
 }
-static int
-Object_setter_collision_mask (lua_State* lua)
+static void Object_setter_collision_mask (liscrArgs* args)
 {
-	int mask;
-	liscrData* object;
+	int value;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	mask = luaL_checkinteger (lua, 3);
-
-	lieng_object_set_collision_mask (object->data, mask);
-	return 0;
+	if (liscr_args_geti_int (args, 0, &value))
+		lieng_object_set_collision_mask (args->self, value);
 }
 
 /* @luadoc
@@ -288,38 +219,19 @@ Object_setter_collision_mask (lua_State* lua)
  * -- @name Object.gravity
  * -- @class table
  */
-static int
-Object_getter_gravity (lua_State* lua)
+static void Object_getter_gravity (liscrArgs* args)
 {
 	limatVector tmp;
-	liscrData* vector;
-	liscrData* object;
-	liscrScript* script = liscr_script (lua);
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	liphy_object_get_gravity (LIENG_OBJECT (object->data)->physics, &tmp);
-	vector = liscr_vector_new (script, &tmp);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	liphy_object_get_gravity (LIENG_OBJECT (args->self)->physics, &tmp);
+	liscr_args_seti_vector (args, &tmp);
 }
-static int
-Object_setter_gravity (lua_State* lua)
+static void Object_setter_gravity (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* vector;
+	limatVector vector;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	vector = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-
-	liphy_object_set_gravity (LIENG_OBJECT (object->data)->physics, vector->data);
-	return 0;
+	if (liscr_args_geti_vector (args, 0, &vector))
+		liphy_object_set_gravity (LIENG_OBJECT (args->self)->physics, &vector);
 }
 
 /* @luadoc
@@ -331,17 +243,9 @@ Object_setter_gravity (lua_State* lua)
  * -- @name Object.ground
  * -- @class table
  */
-static int
-Object_getter_ground (lua_State* lua)
+static void Object_getter_ground (liscrArgs* args)
 {
-	int tmp;
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	tmp = lieng_object_get_ground (object->data);
-	lua_pushboolean (lua, tmp);
-	return 1;
+	liscr_args_seti_bool (args, lieng_object_get_ground (args->self));
 }
 
 /* @luadoc
@@ -351,15 +255,9 @@ Object_getter_ground (lua_State* lua)
  * -- @name Object.id
  * -- @class table
  */
-static int
-Object_getter_id (lua_State* lua)
+static void Object_getter_id (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, LIENG_OBJECT (object->data)->id);
-	return 1;
+	liscr_args_seti_int (args, LIENG_OBJECT (args->self)->id);
 }
 
 /* @luadoc
@@ -369,28 +267,16 @@ Object_getter_id (lua_State* lua)
  * -- @name Object.mass
  * -- @class table
  */
-static int
-Object_getter_mass (lua_State* lua)
+static void Object_getter_mass (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, lieng_object_get_mass (object->data));
-	return 1;
+	liscr_args_seti_float (args, lieng_object_get_mass (args->self));
 }
-static int
-Object_setter_mass (lua_State* lua)
+static void Object_setter_mass (liscrArgs* args)
 {
 	float value;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = (int) luaL_checknumber (lua, 3);
-	luaL_argcheck (lua, value >= 0.0f, 3, "invalid mass");
-
-	lieng_object_set_mass (object->data, value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
+		lieng_object_set_mass (args->self, value);
 }
 
 /* @luadoc
@@ -399,36 +285,22 @@ Object_setter_mass (lua_State* lua)
  * -- @name Object.model
  * -- @class table
  */
-static int
-Object_getter_model (lua_State* lua)
+static void Object_getter_model (liscrArgs* args)
 {
 	int id;
 	liengModel* model;
-	liengObject* data;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	data = object->data;
-
-	id = lieng_object_get_model_code (object->data);
-	model = lieng_engine_find_model_by_code (data->engine, id);
+	id = lieng_object_get_model_code (args->self);
+	model = lieng_engine_find_model_by_code (args->self, id);
 	if (model != NULL)
-		lua_pushstring (lua, model->name);
-	else
-		lua_pushstring (lua, "");
-	return 1;
+		liscr_args_seti_string (args, model->name);
 }
-static int
-Object_setter_model (lua_State* lua)
+static void Object_setter_model (liscrArgs* args)
 {
-	const char* name;
-	liscrData* object;
+	const char* value;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	name = luaL_checkstring (lua, 3);
-
-	lieng_object_set_model_name (object->data, name);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+		lieng_object_set_model_name (args->self, value);
 }
 
 /* @luadoc
@@ -438,41 +310,24 @@ Object_setter_model (lua_State* lua)
  * -- @name Object.position
  * -- @class table
  */
-static int
-Object_getter_position (lua_State* lua)
+static void Object_getter_position (liscrArgs* args)
 {
 	limatTransform tmp;
-	liscrData* vector;
-	liscrData* object;
-	liscrScript* script = liscr_script (lua);
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lieng_object_get_transform (object->data, &tmp);
-	vector = liscr_vector_new (script, &tmp.position);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	lieng_object_get_transform (args->self, &tmp);
+	liscr_args_seti_vector (args, &tmp.position);
 }
-static int
-Object_setter_position (lua_State* lua)
+static void Object_setter_position (liscrArgs* args)
 {
 	limatTransform transform;
-	liscrData* object;
-	liscrData* vector;
+	limatVector vector;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	vector = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-
-	lieng_object_get_transform (object->data, &transform);
-	transform.position = *((limatVector*) vector->data);
-	lieng_object_set_transform (object->data, &transform);
-	return 0;
+	if (liscr_args_geti_vector (args, 0, &vector))
+	{
+		lieng_object_get_transform (args->self, &transform);
+		transform.position = vector;
+		lieng_object_set_transform (args->self, &transform);
+	}
 }
 
 /* @luadoc
@@ -482,28 +337,16 @@ Object_setter_position (lua_State* lua)
  * -- @name Object.realized
  * -- @class table
  */
-static int
-Object_getter_realized (lua_State* lua)
+static void Object_getter_realized (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushboolean (lua, lieng_object_get_realized (object->data));
-	return 1;
+	liscr_args_seti_bool (args, lieng_object_get_realized (args->self));
 }
-static int
-Object_setter_realized (lua_State* lua)
+static void Object_setter_realized (liscrArgs* args)
 {
 	int value;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = lua_toboolean (lua, 3);
-
-	if (!lieng_object_set_realized (object->data, value))
-		return 0;
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+		lieng_object_set_realized (args->self, value);
 }
 
 /* @luadoc
@@ -513,44 +356,24 @@ Object_setter_realized (lua_State* lua)
  * -- @name Object.rotation
  * -- @class table
  */
-static int
-Object_getter_rotation (lua_State* lua)
+static void Object_getter_rotation (liscrArgs* args)
 {
-	limatTransform transform;
-	liscrData* quat;
-	liscrData* object;
-	liscrScript* script = liscr_script (lua);
+	limatTransform tmp;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lieng_object_get_transform (object->data, &transform);
-	quat = liscr_quaternion_new (script, &transform.rotation);
-	if (quat != NULL)
-	{
-		liscr_pushdata (lua, quat);
-		liscr_data_unref (quat, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	lieng_object_get_transform (args->self, &tmp);
+	liscr_args_seti_quaternion (args, &tmp.rotation);
 }
-static int
-Object_setter_rotation (lua_State* lua)
+static void Object_setter_rotation (liscrArgs* args)
 {
-	limatQuaternion tmp;
 	limatTransform transform;
-	liscrData* object;
 	liscrData* quat;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	quat = liscr_checkdata (lua, 3, LICOM_SCRIPT_QUATERNION);
-
-	tmp = *((limatQuaternion*) quat->data);
-	lieng_object_get_transform (object->data, &transform);
-	transform.rotation = tmp;
-	lieng_object_set_transform (object->data, &transform);
-
-	return 0;
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_QUATERNION, &quat))
+	{
+		lieng_object_get_transform (args->self, &transform);
+		transform.rotation = *((limatQuaternion*) quat->data);
+		lieng_object_set_transform (args->self, &transform);
+	}
 }
 
 /* @luadoc
@@ -560,35 +383,27 @@ Object_setter_rotation (lua_State* lua)
  * -- @name Object.save
  * -- @class table
  */
-static int
-Object_getter_save (lua_State* lua)
+static void Object_getter_save (liscrArgs* args)
 {
 	int flags;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	flags = lieng_object_get_flags (object->data);
-	lua_pushboolean (lua, (flags & (LIENG_OBJECT_FLAG_SAVE)) != 0);
-	return 1;
+	flags = lieng_object_get_flags (args->self);
+	liscr_args_seti_bool (args, (flags & (LIENG_OBJECT_FLAG_SAVE)) != 0);
 }
-static int
-Object_setter_save (lua_State* lua)
+static void Object_setter_save (liscrArgs* args)
 {
 	int flags;
 	int value;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = lua_toboolean (lua, 3);
-
-	flags = lieng_object_get_flags (object->data);
-	if (value)
-		flags |= LIENG_OBJECT_FLAG_SAVE;
-	else
-		flags &= ~LIENG_OBJECT_FLAG_SAVE;
-	lieng_object_set_flags (object->data, flags);
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		flags = lieng_object_get_flags (args->self);
+		if (value)
+			flags |= LIENG_OBJECT_FLAG_SAVE;
+		else
+			flags &= ~LIENG_OBJECT_FLAG_SAVE;
+		lieng_object_set_flags (args->self, flags);
+	}
 }
 
 /* @luadoc
@@ -598,27 +413,16 @@ Object_setter_save (lua_State* lua)
  * -- @name Object.selected
  * -- @class table
  */
-static int
-Object_getter_selected (lua_State* lua)
+static void Object_getter_selected (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushboolean (lua, lieng_object_get_selected (object->data));
-	return 1;
+	liscr_args_seti_bool (args, lieng_object_get_selected (args->self));
 }
-static int
-Object_setter_selected (lua_State* lua)
+static void Object_setter_selected (liscrArgs* args)
 {
 	int value;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = lua_toboolean (lua, 3);
-
-	lieng_object_set_selected (object->data, value);
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+		lieng_object_set_selected (args->self, value);
 }
 
 /* @luadoc
@@ -630,28 +434,16 @@ Object_setter_selected (lua_State* lua)
  * -- @name Object.speed
  * -- @class table
  */
-static int
-Object_getter_speed (lua_State* lua)
+static void Object_getter_speed (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, lieng_object_get_speed (object->data));
-	return 1;
+	liscr_args_seti_float (args, lieng_object_get_speed (args->self));
 }
-static int
-Object_setter_speed (lua_State* lua)
+static void Object_setter_speed (liscrArgs* args)
 {
 	float value;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = luaL_checknumber (lua, 3);
-	luaL_argcheck (lua, value >= 0.0f, 3, "invalid speed");
-
-	lieng_object_set_speed (object->data, value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
+		lieng_object_set_speed (args->self, value);
 }
 
 /* @luadoc
@@ -665,27 +457,16 @@ Object_setter_speed (lua_State* lua)
  * -- @name Object.strafing
  * -- @class table
  */
-static int
-Object_getter_strafing (lua_State* lua)
+static void Object_getter_strafing (liscrArgs* args)
 {
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushnumber (lua, liphy_object_get_strafing (LIENG_OBJECT (object->data)->physics));
-	return 1;
+	liscr_args_seti_float (args, liphy_object_get_strafing (LIENG_OBJECT (args->self)->physics));
 }
-static int
-Object_setter_strafing (lua_State* lua)
+static void Object_setter_strafing (liscrArgs* args)
 {
 	float value;
-	liscrData* object;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = luaL_checknumber (lua, 3);
-
-	liphy_object_set_strafing (LIENG_OBJECT (object->data)->physics, value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value))
+		liphy_object_set_strafing (LIENG_OBJECT (args->self)->physics, value);
 }
 
 /* @luadoc
@@ -695,38 +476,19 @@ Object_setter_strafing (lua_State* lua)
  * -- @name Object.velocity
  * -- @class table
  */
-static int
-Object_getter_velocity (lua_State* lua)
+static void Object_getter_velocity (liscrArgs* args)
 {
 	limatVector tmp;
-	liscrData* vector;
-	liscrData* object;
-	liscrScript* script = liscr_script (lua);
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lieng_object_get_velocity (object->data, &tmp);
-	vector = liscr_vector_new (script, &tmp);
-	if (vector != NULL)
-	{
-		liscr_pushdata (lua, vector);
-		liscr_data_unref (vector, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
+	lieng_object_get_velocity (args->self, &tmp);
+	liscr_args_seti_vector (args, &tmp);
 }
-static int
-Object_setter_velocity (lua_State* lua)
+static void Object_setter_velocity (liscrArgs* args)
 {
-	liscrData* object;
-	liscrData* vector;
+	limatVector vector;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	vector = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-
-	lieng_object_set_velocity (object->data, vector->data);
-	return 0;
+	if (liscr_args_geti_vector (args, 0, &vector))
+		lieng_object_set_velocity (args->self, &vector);
 }
 
 /*****************************************************************************/
@@ -735,42 +497,27 @@ void
 licomObjectScript (liscrClass* self,
                    void*       data)
 {
-	liscr_class_insert_func (self, "approach", Object_approach);
-	liscr_class_insert_func (self, "find_node", Object_find_node);
-	liscr_class_insert_func (self, "impulse", Object_impulse);
-	liscr_class_insert_func (self, "jump", Object_jump);
-	liscr_class_insert_getter (self, "angular_momentum", Object_getter_angular_momentum);
-	liscr_class_insert_getter (self, "class", Object_getter_class);
-	liscr_class_insert_getter (self, "collision_group", Object_getter_collision_group);
-	liscr_class_insert_getter (self, "collision_mask", Object_getter_collision_mask);
-	liscr_class_insert_getter (self, "gravity", Object_getter_gravity);
-	liscr_class_insert_getter (self, "ground", Object_getter_ground);
-	liscr_class_insert_getter (self, "id", Object_getter_id);
-	liscr_class_insert_getter (self, "mass", Object_getter_mass);
-	liscr_class_insert_getter (self, "model", Object_getter_model);
-	liscr_class_insert_getter (self, "position", Object_getter_position);
-	liscr_class_insert_getter (self, "realized", Object_getter_realized);
-	liscr_class_insert_getter (self, "rotation", Object_getter_rotation);
-	liscr_class_insert_getter (self, "save", Object_getter_save);
-	liscr_class_insert_getter (self, "selected", Object_getter_selected);
-	liscr_class_insert_getter (self, "speed", Object_getter_speed);
-	liscr_class_insert_getter (self, "strafing", Object_getter_strafing);
-	liscr_class_insert_getter (self, "velocity", Object_getter_velocity);
-	liscr_class_insert_setter (self, "angular_momentum", Object_setter_angular_momentum);
-	liscr_class_insert_setter (self, "class", Object_setter_class);
-	liscr_class_insert_setter (self, "collision_group", Object_setter_collision_group);
-	liscr_class_insert_setter (self, "collision_mask", Object_setter_collision_mask);
-	liscr_class_insert_setter (self, "gravity", Object_setter_gravity);
-	liscr_class_insert_setter (self, "mass", Object_setter_mass);
-	liscr_class_insert_setter (self, "model", Object_setter_model);
-	liscr_class_insert_setter (self, "position", Object_setter_position);
-	liscr_class_insert_setter (self, "realized", Object_setter_realized);
-	liscr_class_insert_setter (self, "rotation", Object_setter_rotation);
-	liscr_class_insert_setter (self, "save", Object_setter_save);
-	liscr_class_insert_setter (self, "selected", Object_setter_selected);
-	liscr_class_insert_setter (self, "speed", Object_setter_speed);
-	liscr_class_insert_setter (self, "strafing", Object_setter_strafing);
-	liscr_class_insert_setter (self, "velocity", Object_setter_velocity);
+	liscr_class_insert_mfunc (self, "approach", Object_approach);
+	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
+	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
+	liscr_class_insert_mfunc (self, "jump", Object_jump);
+	liscr_class_insert_mvar (self, "angular_momentum", Object_getter_angular_momentum, Object_setter_angular_momentum);
+	liscr_class_insert_mvar (self, "class", Object_getter_class, Object_setter_class);
+	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);
+	liscr_class_insert_mvar (self, "collision_mask", Object_getter_collision_mask, Object_setter_collision_mask);
+	liscr_class_insert_mvar (self, "gravity", Object_getter_gravity, Object_setter_gravity);
+	liscr_class_insert_mvar (self, "ground", Object_getter_ground, NULL);
+	liscr_class_insert_mvar (self, "id", Object_getter_id, NULL);
+	liscr_class_insert_mvar (self, "mass", Object_getter_mass, Object_setter_mass);
+	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);
+	liscr_class_insert_mvar (self, "position", Object_getter_position, Object_setter_position);
+	liscr_class_insert_mvar (self, "realized", Object_getter_realized, Object_setter_realized);
+	liscr_class_insert_mvar (self, "rotation", Object_getter_rotation, Object_setter_rotation);
+	liscr_class_insert_mvar (self, "save", Object_getter_save, Object_setter_save);
+	liscr_class_insert_mvar (self, "selected", Object_getter_selected, Object_setter_selected);
+	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);
+	liscr_class_insert_mvar (self, "strafing", Object_getter_strafing, Object_setter_strafing);
+	liscr_class_insert_mvar (self, "velocity", Object_getter_velocity, Object_setter_velocity);
 }
 
 /** @} */

@@ -153,48 +153,34 @@ private_callback_pressed_tree (liscrData*    data,
  * -- Creates a new button widget.
  * --
  * -- @param self Button class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New button widget.
  * function Button.new(self, table)
  */
-static int
-Button_new (lua_State* lua)
+static void Button_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_BUTTON);
-
-	/* Allocate widget. */
-	widget = liwdg_button_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_BUTTON);
+	self = liwdg_button_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_BUTTON, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_BUTTON, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -203,27 +189,16 @@ Button_new (lua_State* lua)
  * -- @name Button.text
  * -- @class table
  */
-static int
-Button_getter_text (lua_State* lua)
+static void Button_getter_text (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_BUTTON);
-
-	lua_pushstring (lua, liwdg_button_get_text (LIWDG_BUTTON (self->data)));
-	return 1;
+	liscr_args_seti_string (args, liwdg_button_get_text (args->self));
 }
-static int
-Button_setter_text (lua_State* lua)
+static void Button_setter_text (liscrArgs* args)
 {
-	const char* text;
-	liscrData* self;
+	const char* value;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_BUTTON);
-	text = luaL_checkstring (lua, 3);
-
-	liwdg_button_set_text (LIWDG_BUTTON (self->data), text);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+		liwdg_button_set_text (args->self, value);
 }
 
 /* @luadoc
@@ -238,48 +213,34 @@ Button_setter_text (lua_State* lua)
  * -- Creates a new text entry widget.
  * --
  * -- @param self Entry class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New entry widget.
  * function Entry.new(self, table)
  */
-static int
-Entry_new (lua_State* lua)
+static void Entry_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_ENTRY);
-
-	/* Allocate widget. */
-	widget = liwdg_entry_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_ENTRY);
+	self = liwdg_entry_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_ENTRY, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_ENTRY, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_ACTIVATED, 0, private_callback_activated, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_ACTIVATED, 0, private_callback_activated, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -289,15 +250,9 @@ Entry_new (lua_State* lua)
  * -- @param self Entry.
  * function Entry.clear(self)
  */
-static int
-Entry_clear (lua_State* lua)
+static void Entry_clear (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_ENTRY);
-
-	liwdg_entry_clear (LIWDG_ENTRY (self->data));
-	return 0;
+	liwdg_entry_clear (args->self);
 }
 
 /* @luadoc
@@ -306,27 +261,16 @@ Entry_clear (lua_State* lua)
  * -- @name Label.text
  * -- @class table
  */
-static int
-Entry_getter_text (lua_State* lua)
+static void Entry_getter_text (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_ENTRY);
-
-	lua_pushstring (lua, liwdg_entry_get_text (LIWDG_ENTRY (self->data)));
-	return 1;
+	liscr_args_seti_string (args, liwdg_entry_get_text (args->self));
 }
-static int
-Entry_setter_text (lua_State* lua)
+static void Entry_setter_text (liscrArgs* args)
 {
-	const char* text;
-	liscrData* self;
+	const char* value;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_ENTRY);
-	text = luaL_checkstring (lua, 3);
-
-	liwdg_entry_set_text (LIWDG_ENTRY (self->data), text);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+		liwdg_entry_set_text (args->self, value);
 }
 
 /* @luadoc
@@ -341,48 +285,34 @@ Entry_setter_text (lua_State* lua)
  * -- Creates a new image widget.
  * --
  * -- @param self Image class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New image widget.
  * function Image.new(self, table)
  */
-static int
-Image_new (lua_State* lua)
+static void Image_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_IMAGE);
-
-	/* Allocate widget. */
-	widget = liwdg_image_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_IMAGE);
+	self = liwdg_image_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_IMAGE, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_IMAGE, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -391,27 +321,16 @@ Image_new (lua_State* lua)
  * -- @name Image.image
  * -- @class table
  */
-static int
-Image_getter_image (lua_State* lua)
+static void Image_getter_image (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_IMAGE);
-
-	lua_pushstring (lua, liwdg_image_get_image (LIWDG_IMAGE (self->data)));
-	return 1;
+	liscr_args_seti_string (args, liwdg_image_get_image (args->self));
 }
-static int
-Image_setter_image (lua_State* lua)
+static void Image_setter_image (liscrArgs* args)
 {
-	const char* image;
-	liscrData* self;
+	const char* value;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_IMAGE);
-	image = luaL_checkstring (lua, 3);
-
-	liwdg_image_set_image (LIWDG_IMAGE (self->data), image);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+		liwdg_image_set_image (args->self, value);
 }
 
 /* @luadoc
@@ -426,48 +345,34 @@ Image_setter_image (lua_State* lua)
  * -- Creates a new label widget.
  * --
  * -- @param self Label class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New label widget.
  * function Label.new(self, table)
  */
-static int
-Label_new (lua_State* lua)
+static void Label_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_LABEL);
-
-	/* Allocate widget. */
-	widget = liwdg_label_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_LABEL);
+	self = liwdg_label_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_LABEL, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_LABEL, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -476,27 +381,16 @@ Label_new (lua_State* lua)
  * -- @name Label.text
  * -- @class table
  */
-static int
-Label_getter_text (lua_State* lua)
+static void Label_getter_text (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_LABEL);
-
-	lua_pushstring (lua, liwdg_label_get_text (LIWDG_LABEL (self->data)));
-	return 1;
+	liscr_args_seti_string (args, liwdg_label_get_text (args->self));
 }
-static int
-Label_setter_text (lua_State* lua)
+static void Label_setter_text (liscrArgs* args)
 {
-	const char* text;
-	liscrData* self;
+	const char* value;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_LABEL);
-	text = luaL_checkstring (lua, 3);
-
-	liwdg_label_set_text (LIWDG_LABEL (self->data), text);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+		liwdg_label_set_text (args->self, value);
 }
 
 /* @luadoc
@@ -511,123 +405,98 @@ Label_setter_text (lua_State* lua)
  * -- Creates a new menu widget.
  * --
  * -- @param self Menu class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New menu widget.
  * function Menu.new(self, table)
  */
-static int
-Menu_new (lua_State* lua)
+static void Menu_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_MENU);
-
-	/* Allocate widget. */
-	widget = liwdg_menu_new (module->module->widgets);
-	if (widget == NULL)
-		return 0;
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_MENU);
+	self = liwdg_menu_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_MENU, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_MENU, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		return 0;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Gets the allocation rectangle of a menu item.
  * --
+ * -- Arguments:
+ * -- label: Item text.
+ * --
  * -- @param self Menu.
- * -- @param name Item text.
+ * -- @param args Arguments.
  * -- @return Rectangle or nil.
- * function Menu.get_item_rect(self, name)
+ * function Menu.get_item_rect(self, args)
  */
-static int
-Menu_get_item_rect (lua_State* lua)
+static void Menu_get_item_rect (liscrArgs* args)
 {
 	const char* name;
-	liscrData* self;
 	liwdgRect rect;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-	name = luaL_checkstring (lua, 2);
-
-	if (!liwdg_menu_get_item_rect (self->data, name, &rect))
-		return 0;
-	lua_newtable (lua);
-	lua_pushnumber (lua, rect.x);
-	lua_setfield (lua, -2, "x");
-	lua_pushnumber (lua, rect.y);
-	lua_setfield (lua, -2, "y");
-	lua_pushnumber (lua, rect.width);
-	lua_setfield (lua, -2, "width");
-	lua_pushnumber (lua, rect.height);
-	lua_setfield (lua, -2, "height");
-
-	return 1;
+	if (!liscr_args_gets_string (args, "label", &name))
+		return;
+	if (!liwdg_menu_get_item_rect (args->self, name, &rect))
+		return;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_float (args, "x", rect.x);
+	liscr_args_sets_float (args, "y", rect.y);
+	liscr_args_sets_float (args, "width", rect.width);
+	liscr_args_sets_float (args, "height", rect.height);
 }
 
 /* @luadoc
  * ---
  * -- Inserts a menu item to the menu.
  * --
+ * -- Arguments:
+ * -- label: Item label.
+ * -- icon: Icon name.
+ * -- pressed: Pressed callback.
+ * --
  * -- @param self Menu.
- * -- @param group Menu group.
- * function Menu.insert(self, group)
+ * -- @param args Arguments.
+ * function Menu.insert(self, args)
  */
-static int
-Menu_insert (lua_State* lua)
+static void Menu_insert (liscrArgs* args)
 {
-	const char* label;
-	const char* icon;
-	liscrData* self;
+	const char* label = "";
+	const char* icon = "";
 	liwdgMenuItem* item;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-	luaL_checktype (lua, 2, LUA_TTABLE);
-	label = "";
-	icon = "";
-
-	/* Label. */
-	lua_getfield (lua, 2, "label");
-	if (lua_type (lua, -1) == LUA_TSTRING)
-		label = lua_tostring (lua, -1);
-	lua_pop (lua, 1);
-
-	/* Icon. */
-	lua_getfield (lua, 2, "icon");
-	if (lua_type (lua, -1) == LUA_TSTRING)
-		icon = lua_tostring (lua, -1);
-	lua_pop (lua, 1);
-
 	/* Create item. */
-	if (!liwdg_menu_insert_item (self->data, label, icon, private_callback_menu, self))
-		return 0;
-	item = liwdg_menu_get_item (self->data, liwdg_menu_get_item_count (self->data) - 1);
+	liscr_args_gets_string (args, "label", &label);
+	liscr_args_gets_string (args, "icon", &icon);
+	if (!liwdg_menu_insert_item (args->self, label, icon, private_callback_menu, args->data))
+		return;
+	item = liwdg_menu_get_item (args->self, liwdg_menu_get_item_count (args->self) - 1);
 
 	/* Callback. */
-	lua_pushlightuserdata (lua, item);
-	lua_getfield (lua, 2, "pressed");
-	lua_settable (lua, 1);
-
-	return 0;
+	if (args->input_table)
+	{
+		liscr_pushdata (args->lua, args->data);
+		lua_pushlightuserdata (args->lua, item);
+		lua_getfield (args->lua, args->input_table, "pressed");
+		lua_settable (args->lua, -3);
+		lua_pop (args->lua, 1);
+	}
 }
 
 /* @luadoc
@@ -636,88 +505,39 @@ Menu_insert (lua_State* lua)
  * -- @name Menu.autohide
  * -- @class table
  */
-static int
-Menu_getter_autohide (lua_State* lua)
+static void Menu_getter_autohide (liscrArgs* args)
 {
-	liwdgMenu* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU)->data;
-
-	lua_pushboolean (lua, liwdg_menu_get_autohide (self));
-
-	return 1;
+	liscr_args_seti_bool (args, liwdg_menu_get_autohide (args->self));
 }
-static int
-Menu_setter_autohide (lua_State* lua)
+static void Menu_setter_autohide (liscrArgs* args)
 {
 	int value;
-	liwdgMenu* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU)->data;
-	value = lua_toboolean (lua, 3);
-
-	liwdg_menu_set_autohide (self, value);
-
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_menu_set_autohide (args->self, value);
 }
 
 /* @luadoc
  * ---
- * -- Font.
- * -- @name Menu.font
- * -- @class table
- */
-static int
-Menu_getter_font (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-
-//	lua_pushstring (lua, liwdg_menu_get_font (LIWDG_MENU (self->data)));
-	lua_pushstring (lua, "FIXME");
-	return 1;
-}
-static int
-Menu_setter_font (lua_State* lua)
-{
-	const char* text;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-	text = luaL_checkstring (lua, 3);
-
-//	liwdg_menu_set_font (LIWDG_MENU (self->data), text);
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Displayed orientation.
+ * -- Displayed orientation, either "horz" or "vert".
  * -- @name Menu.orientation
  * -- @class table
  */
-static int
-Menu_getter_orientation (lua_State* lua)
+static void Menu_getter_orientation (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-
-	lua_pushnumber (lua, liwdg_menu_get_vertical (LIWDG_MENU (self->data)));
-	return 1;
+	if (liwdg_menu_get_vertical (args->self))
+		liscr_args_seti_string (args, "vert");
+	else
+		liscr_args_seti_string (args, "horz");
 }
-static int
-Menu_setter_orientation (lua_State* lua)
+static void Menu_setter_orientation (liscrArgs* args)
 {
-	int value;
-	liscrData* self;
+	const char* value;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_MENU);
-	value = luaL_checkinteger (lua, 3);
-
-	liwdg_menu_set_vertical (LIWDG_MENU (self->data), value);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value) && !strcmp (value, "horz"))
+		liwdg_menu_set_vertical (args->self, 0);
+	else
+		liwdg_menu_set_vertical (args->self, 1);
 }
 
 /* @luadoc
@@ -732,75 +552,58 @@ Menu_setter_orientation (lua_State* lua)
  * -- Creates a new scroll bar widget.
  * --
  * -- @param self Scroll class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New scroll widget.
  * function Scroll.new(self, table)
  */
-static int
-Scroll_new (lua_State* lua)
+static void Scroll_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SCROLL);
-
-	/* Allocate widget. */
-	widget = liwdg_scroll_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCROLL);
+	self = liwdg_scroll_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SCROLL, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCROLL, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Sets the scroll range.
  * --
+ * -- Arguments:
+ * -- min: Minimum value.
+ * -- max: Maximum value.
+ * --
  * -- @param self Scroll widget.
- * -- @param min Minimum value.
- * -- @param max Maximum value.
- * function Scroll.set_range(self, min, max)
+ * -- @param args Arguments.
+ * function Scroll.set_range(self, agrs)
  */
-static int
-Scroll_set_range (lua_State* lua)
+static void Scroll_set_range (liscrArgs* args)
 {
-	float min;
-	float max;
-	liscrData* self;
+	float min = 0.0f;
+	float max = 1.0f;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SCROLL);
-	min = luaL_checknumber (lua, 2);
-	max = luaL_checknumber (lua, 3);
+	liscr_args_gets_float (args, "min", &min);
+	liscr_args_gets_float (args, "max", &max);
 	if (max < min)
 		max = min;
-
-	liwdg_scroll_set_range (LIWDG_SCROLL (self->data), min, max);
-
-	return 0;
+	liwdg_scroll_set_range (args->self, min, max);
 }
 
 /* @luadoc
@@ -809,27 +612,16 @@ Scroll_set_range (lua_State* lua)
  * -- @name Scroll.value
  * -- @class table
  */
-static int
-Scroll_getter_value (lua_State* lua)
+static void Scroll_getter_value (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SCROLL);
-
-	lua_pushnumber (lua, liwdg_scroll_get_value (LIWDG_SCROLL (self->data)));
-	return 1;
+	liscr_args_seti_float (args, liwdg_scroll_get_value (args->self));
 }
-static int
-Scroll_setter_value (lua_State* lua)
+static void Scroll_setter_value (liscrArgs* args)
 {
 	float value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SCROLL);
-	value = luaL_checknumber (lua, 3);
-
-	liwdg_scroll_set_value (LIWDG_SCROLL (self->data), value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value))
+		liwdg_scroll_set_value (args->self, value);
 }
 
 /* @luadoc
@@ -844,48 +636,34 @@ Scroll_setter_value (lua_State* lua)
  * -- Creates a new spin widget.
  * --
  * -- @param self Spin class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New spin widget.
  * function Spin.new(self, table)
  */
-static int
-Spin_new (lua_State* lua)
+static void Spin_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SPIN);
-
-	/* Allocate widget. */
-	widget = liwdg_spin_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPIN);
+	self = liwdg_spin_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_SPIN, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SPIN, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -894,27 +672,16 @@ Spin_new (lua_State* lua)
  * -- @name Spin.value
  * -- @class table
  */
-static int
-Spin_getter_value (lua_State* lua)
+static void Spin_getter_value (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPIN);
-
-	lua_pushnumber (lua, liwdg_spin_get_value (LIWDG_SPIN (self->data)));
-	return 1;
+	liscr_args_seti_float (args, liwdg_spin_get_value (args->self));
 }
-static int
-Spin_setter_value (lua_State* lua)
+static void Spin_setter_value (liscrArgs* args)
 {
 	float value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPIN);
-	value = luaL_checknumber (lua, 3);
-
-	liwdg_spin_set_value (LIWDG_SPIN (self->data), value);
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value))
+		liwdg_spin_set_value (args->self, value);
 }
 
 /* @luadoc
@@ -928,54 +695,50 @@ Spin_setter_value (lua_State* lua)
  * ---
  * -- Appends an item to the tree.
  * --
+ * -- Arguments:
+ * -- text: Text.
+ * --
  * -- @param self Tree.
- * -- @param text Text.
- * function Tree.append(self, text)
+ * -- @param args Arguments.
+ * function Tree.append(self, args)
  */
-static int
-Tree_append (lua_State* lua)
+static void Tree_append (liscrArgs* args)
 {
-	const char* text;
-	liscrData* self;
+	const char* text = "";
 	liwdgTreerow* row;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TREE);
-	text = luaL_checkstring (lua, 2);
-
-	row = liwdg_tree_get_root (self->data);
+	liscr_args_gets_string (args, "text", &text);
+	row = liwdg_tree_get_root (args->self);
 	liwdg_treerow_append_row (row, text, NULL);
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Gets a row from the tree.
  * --
+ * -- Arguments:
+ * -- row: Row index.
+ * --
  * -- @param self Tree.
- * -- @param index Row index.
- * -- @return String.
- * function Tree.get_row(self, index)
+ * -- @param args Arguments.
+ * -- @return String or nil.
+ * function Tree.get_row(self, args)
  */
-static int
-Tree_get_row (lua_State* lua)
+static void Tree_get_row (liscrArgs* args)
 {
-	int index;
+	int index = 1;
 	int count;
-	liscrData* self;
 	liwdgTreerow* root;
 	liwdgTreerow* row;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TREE);
-	root = liwdg_tree_get_root (self->data);
-	index = luaL_checknumber (lua, 2) - 1;
+	liscr_args_gets_int (args, "row", &index);
+	root = liwdg_tree_get_root (args->self);
 	count = liwdg_treerow_get_row_count (root);
-	luaL_argcheck (lua, index >= 0 && index < count, 2, "tree row out of bounds");
-
-	row = liwdg_treerow_get_row (root, index);
-	lua_pushstring (lua, liwdg_treerow_get_text (row));
-
-	return 1;
+	if (index >= 1 && index <= count)
+	{
+		row = liwdg_treerow_get_row (root, index - 1);
+		liscr_args_seti_string (args, liwdg_treerow_get_text (row));
+	}
 }
 
 /* @luadoc
@@ -983,75 +746,59 @@ Tree_get_row (lua_State* lua)
  * -- Creates a new tree widget.
  * --
  * -- @param self Tree class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New tree widget.
  * function Tree.new(self, table)
  */
-static int
-Tree_new (lua_State* lua)
+static void Tree_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_TREE);
-
-	/* Allocate widget. */
-	widget = liwdg_tree_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_TREE);
+	self = liwdg_tree_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_TREE, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_TREE, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_insert_callback (widget, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed_tree, self, NULL);
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed_tree, data, NULL);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Removes a row from the tree.
  * --
+ * -- Arguments:
+ * -- row: Row index.
+ * --
  * -- @param self Tree.
- * -- @param index Row index.
- * function Tree.remove(self, index)
+ * -- @param args Arguments.
+ * function Tree.remove(self, args)
  */
-static int
-Tree_remove (lua_State* lua)
+static void
+Tree_remove (liscrArgs* args)
 {
-	int index;
+	int index = 1;
 	int count;
-	liscrData* self;
 	liwdgTreerow* root;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TREE);
-	root = liwdg_tree_get_root (self->data);
-	index = luaL_checknumber (lua, 2) - 1;
+	liscr_args_gets_int (args, "row", &index);
+	root = liwdg_tree_get_root (args->self);
 	count = liwdg_treerow_get_row_count (root);
-	luaL_argcheck (lua, index >= 0 && index < count, 2, "tree row out of bounds");
-
-	liwdg_treerow_remove_row (root, index);
-
-	return 0;
+	if (index >= 1 && index <= count)
+		liwdg_treerow_remove_row (root, index - 1);
 }
 
 /* @luadoc
@@ -1060,52 +807,37 @@ Tree_remove (lua_State* lua)
  * -- @name Tree.size
  * -- @class table
  */
-static int
-Tree_getter_selection (lua_State* lua)
+static void Tree_getter_selection (liscrArgs* args)
 {
 	int i;
 	int count;
-	liscrData* self;
 	liwdgTreerow* root;
 	liwdgTreerow* row;
 
-	/* Argument checks. */
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TREE);
-
-	/* Find highlighted row. */
-	root = liwdg_tree_get_root (self->data);
+	root = liwdg_tree_get_root (args->self);
 	count = liwdg_treerow_get_row_count (root);
 	for (i = 0 ; i < count ; i++)
 	{
 		row = liwdg_treerow_get_row (root, i);
 		if (liwdg_treerow_get_highlighted (row))
 		{
-			lua_pushnumber (lua, i + 1);
-			return 1;
+			liscr_args_seti_int (args, i + 1);
+			break;
 		}
 	}
-
-	return 0;
 }
-static int
-Tree_setter_selection (lua_State* lua)
+static void Tree_setter_selection (liscrArgs* args)
 {
 	int i;
 	int count;
 	int index;
-	liscrData* self;
 	liwdgTreerow* root;
 	liwdgTreerow* row;
 
-	/* Argument checks. */
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TREE);
-	root = liwdg_tree_get_root (self->data);
+	root = liwdg_tree_get_root (args->self);
 	count = liwdg_treerow_get_row_count (root);
-	if (!lua_isnoneornil (lua, 3))
-	{
-		index = luaL_checkinteger (lua, 3) - 1;
-		luaL_argcheck (lua, index >= 0 && index < count, 3, "tree row out of bounds");
-	}
+	if (liscr_args_geti_int (args, 0, &index) && index >= 1 && index <= count)
+		index--;
 	else
 		index = -1;
 
@@ -1115,8 +847,6 @@ Tree_setter_selection (lua_State* lua)
 		row = liwdg_treerow_get_row (root, i);
 		liwdg_treerow_set_highlighted (row, i == index);
 	}
-
-	return 0;
 }
 
 /* @luadoc
@@ -1125,18 +855,12 @@ Tree_setter_selection (lua_State* lua)
  * -- @name Tree.size
  * -- @class table
  */
-static int
-Tree_getter_size (lua_State* lua)
+static void Tree_getter_size (liscrArgs* args)
 {
-	liscrData* self;
 	liwdgTreerow* row;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_TREE);
-
-	row = liwdg_tree_get_root (self->data);
-	lua_pushnumber (lua, liwdg_treerow_get_row_count (row));
-
-	return 1;
+	row = liwdg_tree_get_root (args->self);
+	liscr_args_seti_int (args, liwdg_treerow_get_row_count (row));
 }
 
 /* @luadoc
@@ -1151,47 +875,34 @@ Tree_getter_size (lua_State* lua)
  * -- Creates a new view widget.
  * --
  * -- @param self View class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New view widget.
  * function View.new(self, table)
  */
-static int
-View_new (lua_State* lua)
+static void
+View_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_VIEW);
-
-	/* Allocate widget. */
-	widget = liwdg_view_new (module->module->widgets);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VIEW);
+	self = liwdg_view_new (module->module->widgets);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_VIEW, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VIEW, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liwdg_widget_set_userdata (widget, self);
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);	
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -1200,65 +911,49 @@ View_new (lua_State* lua)
  * -- @name View.child
  * -- @class table
  */
-static int
-View_getter_child (lua_State* lua)
+static void View_getter_child (liscrArgs* args)
 {
-	liscrData* data;
-	liscrData* self;
 	liwdgWidget* child;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_VIEW);
-
-	child = liwdg_view_get_child (self->data);
-	if (child == NULL)
-		return 0;
-	data = liwdg_widget_get_userdata (child);
-	if (data == NULL)
-		return 0;
-	liscr_pushdata (lua, data);
-
-	return 1;
+	child = liwdg_view_get_child (args->self);
+	if (child != NULL)
+		liscr_args_seti_data (args, liwdg_widget_get_userdata (child));
 }
-static int
-View_setter_child (lua_State* lua)
+static void View_setter_child (liscrArgs* args)
 {
 	liscrData* data;
-	liscrData* self;
 	liscrData* child;
 	liwdgWidget* oldwidget;
 	liwdgWidget* newwidget;
 
 	/* Argument checks. */
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_VIEW);
-	if (!lua_isnoneornil (lua, 3))
+	if (liscr_args_geti_data (args, 0, LICLI_SCRIPT_WIDGET, &child))
 	{
-		child = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
 		newwidget = child->data;
-		luaL_argcheck (lua, newwidget->state == LIWDG_WIDGET_STATE_DETACHED, 3, "widget already in use");
-		luaL_argcheck (lua, newwidget->parent == NULL, 3, "widget already in use");
+		if (newwidget->state != LIWDG_WIDGET_STATE_DETACHED)
+			return;
+		if (newwidget->parent != NULL)
+			return;
 	}
 	else
 		child = NULL;
 
 	/* Detach old child. */
-	oldwidget = liwdg_view_get_child (self->data);
+	oldwidget = liwdg_view_get_child (args->self);
 	if (oldwidget != NULL)
 	{
 		data = liwdg_widget_get_userdata (oldwidget);
-		luaL_argcheck (lua, data != NULL, 3, "view reserved by native widget");
-		liscr_data_unref (data, self);
+		liscr_data_unref (data, args->data);
 	}
 
 	/* Attach new child. */
 	if (child != NULL)
 	{
-		liscr_data_ref (child, self);
-		liwdg_view_set_child (self->data, child->data);
+		liscr_data_ref (child, args->data);
+		liwdg_view_set_child (args->self, child->data);
 	}
 	else
-		liwdg_view_set_child (self->data, NULL);
-
-	return 0;
+		liwdg_view_set_child (args->self, NULL);
 }
 
 /* @luadoc
@@ -1267,28 +962,16 @@ View_setter_child (lua_State* lua)
  * -- @name View.hscroll
  * -- @class table
  */
-static int
-View_getter_hscroll (lua_State* lua)
+static void View_getter_hscroll (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_VIEW);
-
-	lua_pushboolean (lua, liwdg_view_get_hscroll (self->data));
-	return 1;
+	liscr_args_seti_bool (args, liwdg_view_get_hscroll (args->self));
 }
-static int
-View_setter_hscroll (lua_State* lua)
+static void View_setter_hscroll (liscrArgs* args)
 {
 	int value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_VIEW);
-	value = lua_toboolean (lua, 3);
-
-	liwdg_view_set_hscroll (self->data, value);
-
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_view_set_hscroll (args->self, value);
 }
 
 /* @luadoc
@@ -1297,28 +980,16 @@ View_setter_hscroll (lua_State* lua)
  * -- @name View.vscroll
  * -- @class table
  */
-static int
-View_getter_vscroll (lua_State* lua)
+static void View_getter_vscroll (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_VIEW);
-
-	lua_pushboolean (lua, liwdg_view_get_vscroll (self->data));
-	return 1;
+	liscr_args_seti_bool (args, liwdg_view_get_hscroll (args->self));
 }
-static int
-View_setter_vscroll (lua_State* lua)
+static void View_setter_vscroll (liscrArgs* args)
 {
 	int value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_VIEW);
-	value = lua_toboolean (lua, 3);
-
-	liwdg_view_set_vscroll (self->data, value);
-
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_view_set_vscroll (args->self, value);
 }
 
 /*****************************************************************************/
@@ -1331,9 +1002,8 @@ liextButtonScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_BUTTON, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Button_new);
-	liscr_class_insert_getter (self, "text", Button_getter_text);
-	liscr_class_insert_setter (self, "text", Button_setter_text);
+	liscr_class_insert_cfunc (self, "new", Button_new);
+	liscr_class_insert_mvar (self, "text", Button_getter_text, Button_setter_text);
 }
 
 void
@@ -1344,10 +1014,9 @@ liextEntryScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_ENTRY, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Entry_new);
-	liscr_class_insert_func (self, "clear", Entry_clear);
-	liscr_class_insert_getter (self, "text", Entry_getter_text);
-	liscr_class_insert_setter (self, "text", Entry_setter_text);
+	liscr_class_insert_cfunc (self, "new", Entry_new);
+	liscr_class_insert_mfunc (self, "clear", Entry_clear);
+	liscr_class_insert_mvar (self, "text", Entry_getter_text, Entry_setter_text);
 }
 
 void
@@ -1358,9 +1027,8 @@ liextImageScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_IMAGE, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Image_new);
-	liscr_class_insert_getter (self, "image", Image_getter_image);
-	liscr_class_insert_setter (self, "image", Image_setter_image);
+	liscr_class_insert_cfunc (self, "new", Image_new);
+	liscr_class_insert_mvar (self, "image", Image_getter_image, Image_setter_image);
 }
 
 void
@@ -1371,9 +1039,8 @@ liextLabelScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_LABEL, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Label_new);
-	liscr_class_insert_getter (self, "text", Label_getter_text);
-	liscr_class_insert_setter (self, "text", Label_setter_text);
+	liscr_class_insert_cfunc (self, "new", Label_new);
+	liscr_class_insert_mvar (self, "text", Label_getter_text, Label_setter_text);
 }
 
 void
@@ -1384,17 +1051,11 @@ liextMenuScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENU, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_enum (self, "HORIZONTAL", 0);
-	liscr_class_insert_enum (self, "VERTICAL", 1);
-	liscr_class_insert_func (self, "get_item_rect", Menu_get_item_rect);
-	liscr_class_insert_func (self, "insert", Menu_insert);
-	liscr_class_insert_func (self, "new", Menu_new);
-	liscr_class_insert_getter (self, "autohide", Menu_getter_autohide);
-	liscr_class_insert_getter (self, "font", Menu_getter_font);
-	liscr_class_insert_getter (self, "orientation", Menu_getter_orientation);
-	liscr_class_insert_setter (self, "autohide", Menu_setter_autohide);
-	liscr_class_insert_setter (self, "font", Menu_setter_font);
-	liscr_class_insert_setter (self, "orientation", Menu_setter_orientation);
+	liscr_class_insert_mfunc (self, "get_item_rect", Menu_get_item_rect);
+	liscr_class_insert_mfunc (self, "insert", Menu_insert);
+	liscr_class_insert_cfunc (self, "new", Menu_new);
+	liscr_class_insert_mvar (self, "autohide", Menu_getter_autohide, Menu_setter_autohide);
+	liscr_class_insert_mvar (self, "orientation", Menu_getter_orientation, Menu_setter_orientation);
 }
 
 void
@@ -1405,10 +1066,9 @@ liextScrollScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SCROLL, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Scroll_new);
-	liscr_class_insert_func (self, "set_range", Scroll_set_range);
-	liscr_class_insert_getter (self, "value", Scroll_getter_value);
-	liscr_class_insert_setter (self, "value", Scroll_setter_value);
+	liscr_class_insert_cfunc (self, "new", Scroll_new);
+	liscr_class_insert_mfunc (self, "set_range", Scroll_set_range);
+	liscr_class_insert_mvar (self, "value", Scroll_getter_value, Scroll_setter_value);
 }
 
 void
@@ -1419,9 +1079,8 @@ liextSpinScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPIN, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Spin_new);
-	liscr_class_insert_getter (self, "value", Spin_getter_value);
-	liscr_class_insert_setter (self, "value", Spin_setter_value);
+	liscr_class_insert_cfunc (self, "new", Spin_new);
+	liscr_class_insert_mvar (self, "value", Spin_getter_value, Spin_setter_value);
 }
 
 void
@@ -1432,13 +1091,12 @@ liextTreeScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TREE, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "append", Tree_append);
-	liscr_class_insert_func (self, "get_row", Tree_get_row);
-	liscr_class_insert_func (self, "new", Tree_new);
-	liscr_class_insert_func (self, "remove", Tree_remove);
-	liscr_class_insert_getter (self, "size", Tree_getter_size);
-	liscr_class_insert_getter (self, "selection", Tree_getter_selection);
-	liscr_class_insert_setter (self, "selection", Tree_setter_selection);
+	liscr_class_insert_mfunc (self, "append", Tree_append);
+	liscr_class_insert_mfunc (self, "get_row", Tree_get_row);
+	liscr_class_insert_cfunc (self, "new", Tree_new);
+	liscr_class_insert_mfunc (self, "remove", Tree_remove);
+	liscr_class_insert_mvar (self, "size", Tree_getter_size, NULL);
+	liscr_class_insert_mvar (self, "selection", Tree_getter_selection, Tree_setter_selection);
 }
 
 void
@@ -1449,13 +1107,10 @@ liextViewScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VIEW, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", View_new);
-	liscr_class_insert_getter (self, "child", View_getter_child);
-	liscr_class_insert_getter (self, "hscroll", View_getter_hscroll);
-	liscr_class_insert_getter (self, "vscroll", View_getter_vscroll);
-	liscr_class_insert_setter (self, "child", View_setter_child);
-	liscr_class_insert_setter (self, "hscroll", View_setter_hscroll);
-	liscr_class_insert_setter (self, "vscroll", View_setter_vscroll);
+	liscr_class_insert_cfunc (self, "new", View_new);
+	liscr_class_insert_mvar (self, "child", View_getter_child, View_setter_child);
+	liscr_class_insert_mvar (self, "hscroll", View_getter_hscroll, View_setter_hscroll);
+	liscr_class_insert_mvar (self, "vscroll", View_getter_vscroll, View_setter_vscroll);
 }
 
 /** @} */

@@ -37,56 +37,37 @@
  * -- Creates a new window.
  * --
  * -- @param self Window class.
- * -- @param width Optional number of columns to create.
- * -- @param height Optional number of rows to create.
+ * -- @param args Arguments.
  * -- @return New window.
- * function Window.new(self, width, height)
+ * function Window.new(self)
  */
-static int
-Window_new (lua_State* lua)
+static void Window_new (liscrArgs* args)
 {
-	int width;
-	int height;
-	liwdgWidget* window;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-	licliModule* module = liscr_script_get_userdata (script);
+	licliModule* module;
+	liscrData* data;
+	liwdgWidget* self;
 
-	/* Check arguments. */
-	if (!lua_isnoneornil (lua, 2))
-		width = luaL_checkint (lua, 2);
-	else
-		width = 0;
-	if (!lua_isnoneornil (lua, 3))
-		height = luaL_checkint (lua, 3);
-	else
-		height = 0;
-	luaL_argcheck (lua, width >= 0, 2, "invalid size");
-	luaL_argcheck (lua, height >= 0, 3, "invalid size");
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
+	self = liwdg_window_new (module->widgets, 0, 0);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	window = liwdg_window_new (module->widgets, width, height);
-	if (window == NULL)
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_WINDOW, licli_script_widget_free);
+	if (data == NULL)
 	{
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-	self = liscr_data_new (script, window, LICLI_SCRIPT_WINDOW, licli_script_widget_free);
-	if (self == NULL)
+	if (!liwdg_manager_insert_window (module->widgets, self))
 	{
-		liwdg_widget_free (window);
-		lua_pushnil (lua);
-		return 1;
+		liscr_data_unref (data, NULL);
+		return;
 	}
-	if (!liwdg_manager_insert_window (module->widgets, window))
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	liwdg_widget_set_userdata (window, self);
-
-	liscr_pushdata (lua, self);
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
 }
 
 /* @luadoc
@@ -95,27 +76,16 @@ Window_new (lua_State* lua)
  * -- @name Window.title
  * -- @class table
  */
-static int
-Window_getter_title (lua_State* lua)
+static void Window_getter_title (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WINDOW);
-
-	lua_pushstring (lua, liwdg_window_get_title (self->data));
-	return 1;
+	liscr_args_seti_string (args, liwdg_window_get_title (args->self));
 }
-static int
-Window_setter_title (lua_State* lua)
+static void Window_setter_title (liscrArgs* args)
 {
 	const char* value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WINDOW);
-	value = luaL_checkstring (lua, 3);
-
-	liwdg_window_set_title (self->data, value);
-	return 0;
+	if (liscr_args_geti_string (args, 0, &value))
+		liwdg_window_set_title (args->self, value);
 }
 
 /* @luadoc
@@ -128,49 +98,34 @@ Window_setter_title (lua_State* lua)
  * -- @name Window.visible
  * -- @class table
  */
-static int
-Window_getter_visible (lua_State* lua)
+static void Window_getter_visible (liscrArgs* args)
 {
-	int value;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WINDOW);
-
-	value = liwdg_widget_get_visible (self->data);
-	lua_pushboolean (lua, value);
-
-	return 1;
+	liscr_args_seti_bool (args, liwdg_widget_get_visible (args->self));
 }
-static int
-Window_setter_visible (lua_State* lua)
+static void Window_setter_visible (liscrArgs* args)
 {
 	int value;
 	licliModule* module;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_WINDOW);
-	value = lua_toboolean (lua, 3);
-	module = liscr_class_get_userdata (self->clss, LICLI_SCRIPT_WINDOW);
-
-	if (liwdg_widget_get_visible (self->data) == value)
-		return 0;
-	liwdg_widget_set_visible (self->data, value);
-	if (value)
+	if (liscr_args_geti_bool (args, 0, &value))
 	{
-		if (!liwdg_manager_insert_window (module->widgets, self->data))
+		module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
+		if (liwdg_widget_get_visible (args->self) == value)
+			return;
+		liwdg_widget_set_visible (args->self, value);
+		if (value)
 		{
-			liwdg_widget_set_visible (self->data, 0);
-			return 0;
+			if (!liwdg_manager_insert_window (module->widgets, args->self))
+				liwdg_widget_set_visible (args->self, 0);
+			else
+				liscr_data_ref (args->data, NULL);
 		}
-		liscr_data_ref (self, NULL);
+		else
+		{
+			liwdg_widget_detach (args->self);
+			liscr_data_unref (args->data, NULL);
+		}
 	}
-	else
-	{
-		liwdg_widget_detach (self->data);
-		liscr_data_unref (self, NULL);
-	}
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -181,11 +136,9 @@ licliWindowScript (liscrClass* self,
 {
 	liscr_class_inherit (self, licliGroupScript, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WINDOW, data);
-	liscr_class_insert_func (self, "new", Window_new);
-	liscr_class_insert_getter (self, "title", Window_getter_title);
-	liscr_class_insert_getter (self, "visible", Window_getter_visible);
-	liscr_class_insert_setter (self, "title", Window_setter_title);
-	liscr_class_insert_setter (self, "visible", Window_setter_visible);
+	liscr_class_insert_cfunc (self, "new", Window_new);
+	liscr_class_insert_mvar (self, "title", Window_getter_title, Window_setter_title);
+	liscr_class_insert_mvar (self, "visible", Window_getter_visible, Window_setter_visible);
 }
 
 /** @} */

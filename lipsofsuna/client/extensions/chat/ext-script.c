@@ -41,66 +41,52 @@
  * -- Creates a new chat history widget.
  * --
  * -- @param self Chat history class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New chat history widget.
- * function ChatHistory.new(self, table)
+ * function ChatHistory.new(self, args)
  */
-static int
-ChatHistory_new (lua_State* lua)
+static void ChatHistory_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CHAT_HISTORY);
-
-	/* Allocate widget. */
-	widget = liext_chat_history_new (module->module->widgets, module->module);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CHAT_HISTORY);
+	self = liext_chat_history_new (module->module->widgets, module->module);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_CHAT_HISTORY, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CHAT_HISTORY, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-	liwdg_widget_set_userdata (widget, self);
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liscr_pushdata (lua, self);
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Appends a message to the chat history widget.
  * --
+ * -- Arguments:
+ * -- text: String.
+ * --
  * -- @param self Chat history widget.
- * -- @param message Message.
- * function ChatHistory.append(self, message)
+ * -- @param args Arguments.
+ * function ChatHistory.append(self, args)
  */
-static int
-ChatHistory_append (lua_State* lua)
+static void ChatHistory_append (liscrArgs* args)
 {
 	const char* str;
-	liscrData* data;
 
-	data = liscr_checkdata (lua, 1, LIEXT_SCRIPT_CHAT_HISTORY);
-	str = luaL_checkstring (lua, 2);
-
-	liext_chat_history_append (data->data, str);
-	return 0;
+	if (liscr_args_gets_string (args, "text", &str))
+		liext_chat_history_append (args->self, str);
 }
 
 /*****************************************************************************/
@@ -113,8 +99,8 @@ liextChatHistoryScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CHAT_HISTORY, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", ChatHistory_new);
-	liscr_class_insert_func (self, "append", ChatHistory_append);
+	liscr_class_insert_cfunc (self, "new", ChatHistory_new);
+	liscr_class_insert_mfunc (self, "append", ChatHistory_append);
 }
 
 /** @} */

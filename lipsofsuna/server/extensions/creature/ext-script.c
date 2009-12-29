@@ -42,43 +42,31 @@
  * -- Creates a new creature logic.
  * --
  * -- @param self Creature class.
- * -- @param table Optional table of arguments.
+ * -- @param args Optional arguments.
  * -- @return New creature logic.
- * function Creature.new(self, table)
+ * function Creature.new(self, args)
  */
-static int
-Creature_new (lua_State* lua)
+static void Creature_new (liscrArgs* args)
 {
-	liextCreature* logic;
+	liextCreature* self;
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_CREATURE);
 
 	/* Allocate self. */
-	logic = liext_creature_new (module->server);
-	if (logic == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	self = liscr_data_new (script, logic, LIEXT_SCRIPT_CREATURE, liext_creature_free);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CREATURE);
+	self = liext_creature_new (module->server);
 	if (self == NULL)
+		return;
+
+	/* Allocate userdata. */
+	self->data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CREATURE, liext_creature_free);
+	if (self->data == NULL)
 	{
-		liext_creature_free (logic);
-		lua_pushnil (lua);
-		return 1;
+		liext_creature_free (self);
+		return;
 	}
-	logic->data = self;
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-	return 1;
+	liscr_args_call_setters (args, self->data);
+	liscr_args_seti_data (args, self->data);
+	liscr_data_unref (self->data, NULL);
 }
 
 /* @luadoc
@@ -87,31 +75,16 @@ Creature_new (lua_State* lua)
  * -- @name Creature.controls
  * -- @class table
  */
-static int
-Creature_getter_controls (lua_State* lua)
+static void Creature_getter_controls (liscrArgs* args)
 {
-	liscrData* self;
-	liextCreature* data;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_CREATURE);
-	data = self->data;
-
-	lua_pushnumber (lua, data->controls);
-	return 1;
+	liscr_args_seti_int (args, ((liextCreature*) args->self)->controls);
 }
-static int
-Creature_setter_controls (lua_State* lua)
+static void Creature_setter_controls (liscrArgs* args)
 {
 	int value;
-	liscrData* self;
-	liextCreature* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_CREATURE);
-	data = self->data;
-	value = (int) luaL_checknumber (lua, 3);
-
-	data->controls = value;
-	return 0;
+	if (liscr_args_geti_int (args, 0, &value))
+		((liextCreature*) args->self)->controls = value;
 }
 
 /* @luadoc
@@ -120,39 +93,19 @@ Creature_setter_controls (lua_State* lua)
  * -- @name Creature.object
  * -- @class table
  */
-static int
-Creature_getter_object (lua_State* lua)
+static void Creature_getter_object (liscrArgs* args)
 {
-	liscrData* self;
-	liextCreature* data;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_CREATURE);
-	data = self->data;
-
-	if (data->object != NULL && data->object->script != NULL)
-		liscr_pushdata (lua, data->object->script);
-	else
-		lua_pushnil (lua);
-	return 1;
+	if (((liextCreature*) args->self)->object != NULL)
+		liscr_args_seti_data (args, ((liextCreature*) args->self)->object->script);
 }
-static int
-Creature_setter_object (lua_State* lua)
+static void Creature_setter_object (liscrArgs* args)
 {
-	liscrData* self;
-	liscrData* tmp;
-	liengObject* object;
+	liscrData* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_CREATURE);
-	if (!lua_isnil (lua, 3))
-	{
-		tmp = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-		object = tmp->data;
-	}
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &data))
+		liext_creature_set_object (args->self, data->data);
 	else
-		object = NULL;
-
-	liext_creature_set_object (self->data, object);
-	return 0;
+		liext_creature_set_object (args->self, NULL);
 }
 
 /*****************************************************************************/
@@ -162,11 +115,9 @@ liextCreatureScript (liscrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CREATURE, data);
-	liscr_class_insert_func (self, "new", Creature_new);
-	liscr_class_insert_getter (self, "controls", Creature_getter_controls);
-	liscr_class_insert_getter (self, "object", Creature_getter_object);
-	liscr_class_insert_setter (self, "controls", Creature_setter_controls);
-	liscr_class_insert_setter (self, "object", Creature_setter_object);
+	liscr_class_insert_cfunc (self, "new", Creature_new);
+	liscr_class_insert_mvar (self, "controls", Creature_getter_controls, Creature_setter_controls);
+	liscr_class_insert_mvar (self, "object", Creature_getter_object, Creature_setter_object);
 }
 
 /** @} */

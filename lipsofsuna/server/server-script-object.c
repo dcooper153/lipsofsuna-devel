@@ -110,40 +110,30 @@ private_contact_callback (liphyObject*  object,
  * ---
  * -- Sets or clears an animation.
  * --
+ * -- Arguments:
+ * -- channel: Channel number.
+ * -- name: Animation name.
+ * -- priority: Priority.
+ * -- permanent: True if should keep repeating.
+ * --
  * -- @param self Object.
- * -- @param name Animation name or nil.
- * -- @param channel Animation channel or nil for any channel.
- * -- @param priority Animation priority.
- * -- @param permanent Boolean indicating whether the animation is permanent or temporary.
- * function Object.animate(self, name, channel, priority, permanent)
+ * -- @param args Arguments.
+ * function Object.animate(self, args)
  */
-static int
-Object_animate (lua_State* lua)
+static void Object_animate (liscrArgs* args)
 {
+	int repeat = 0;
 	int channel = -1;
-	int permanent = 0;
-	float priority = 1.0f;
-	const char* name = NULL;
-	liscrData* object;
+	float weight = 1.0f;
+	const char* animation = NULL;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	if (!lua_isnil (lua, 2))
-		name = luaL_checkstring (lua, 2);
-	if (!lua_isnoneornil (lua, 3))
-	{
-		channel = luaL_checkinteger (lua, 3);
-		luaL_argcheck (lua, channel >= 0 && channel < 254, 3, "invalid animation channel");
-	}
-	if (!lua_isnoneornil (lua, 4))
-	{
-		priority = luaL_checknumber (lua, 4);
-		luaL_argcheck (lua, priority >= 0.0f, 4, "invalid animation priority");
-	}
-	if (!lua_isnoneornil (lua, 5))
-		permanent = lua_toboolean (lua, 5);
-
-	lisrv_object_animate (object->data, name, channel, priority, permanent);
-	return 0;
+	liscr_args_gets_string (args, "animation", &animation);
+	liscr_args_gets_int (args, "channel", &channel);
+	liscr_args_gets_float (args, "weight", &weight);
+	liscr_args_gets_bool (args, "permanent", &repeat);
+	if (channel < 0 || channel > 254)
+		channel = -1;
+	lisrv_object_animate (args->self, animation, channel, weight, repeat);
 }
 
 /* @luadoc
@@ -153,73 +143,66 @@ Object_animate (lua_State* lua)
  * -- @param self Object.
  * function Object.disconnect(self)
  */
-static int
-Object_disconnect (lua_State* lua)
+static void Object_disconnect (liscrArgs* args)
 {
-	liscrData* self;
 	lisrvObject* object;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	object = LISRV_OBJECT (self->data);
-
+	object = LISRV_OBJECT (args->self);
 	if (object->client != NULL)
 	{
 		lisrv_client_free (object->client);
 		object->client = NULL;
 	}
-	return 0;
 }
 
 /* @luadoc
  * ---
- * -- FIXME
+ * -- Causes the object to emit a sound effect.
+ * --
+ * -- Arguments:
+ * -- effect: Effect name. (required)
+ * -- flags: Flags.
  * --
  * -- @param self Object.
- * -- @param name String.
- * function Object.effect(self, name)
+ * -- @param args Arguments.
+ * function Object.effect(self, args)
  */
-static int
-Object_effect (lua_State* lua)
+static void Object_effect (liscrArgs* args)
 {
-	int flags;
-	const char* text;
-	liscrData* object;
+	int flags = LI_EFFECT_DEFAULT;
+	const char* name;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	text = luaL_checkstring (lua, 2);
-
-	if (lua_isnumber (lua, 3))
-		flags = lua_tointeger (lua, 3);
-	else
-		flags = LI_EFFECT_DEFAULT;
-	lisrv_object_effect (object->data, text, flags);
-	return 0;
+	if (liscr_args_gets_string (args, "effect", &name))
+	{
+		liscr_args_gets_int (args, "flags", &flags);
+		lisrv_object_effect (args->self, name, flags);
+	}
 }
 
 /* @luadoc
  * ---
- * -- FIXME
+ * -- Creates a hinge constraint.
+ * --
+ * -- Arguments:
+ * -- position: Position vector.
+ * -- axis: Axis of rotation.
  * --
  * -- @param self Object.
- * -- @param pos Vector.
- * -- @param axis Vector.
- * function Object.insert_hinge_constraint(self, name)
+ * -- @param args Arguments.
+ * function Object.insert_hinge_constraint(self, args)
  */
-static int
-Object_insert_hinge_constraint (lua_State* lua)
+static void Object_insert_hinge_constraint (liscrArgs* args)
 {
-	liengObject* data;
-	liscrData* object;
-	liscrData* pos;
-	liscrData* axis;
+	liengObject* self;
+	limatVector pos;
+	limatVector axis = { 0.0f, 1.0f, 0.0f };
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	pos = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	axis = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-	data = object->data;
-
-	liphy_constraint_new_hinge (data->engine->physics, data->physics, pos->data, axis->data, 0, 0.0f, 0.0f);
-	return 0;
+	if (liscr_args_gets_vector (args, "position", &pos))
+	{
+		liscr_args_gets_vector (args, "axis", &axis);
+		self = args->self;
+		liphy_constraint_new_hinge (self->engine->physics, self->physics, &pos, &axis, 0, 0.0f, 0.0f);
+	}
 }
 
 /* @luadoc
@@ -227,61 +210,28 @@ Object_insert_hinge_constraint (lua_State* lua)
  * -- Creates a new object.
  * --
  * -- @param self Object class.
- * -- @param table Optional table of parameters.
+ * -- @param args Arguments.
  * -- @return New object.
- * function Object.new(self, table)
+ * function Object.new(self, args)
  */
-static int
-Object_new (lua_State* lua)
+static void Object_new (liscrArgs* args)
 {
-	int realized = 0;
-	const char* name;
-	liengObject* object;
-	liscrScript* script = liscr_script (lua);
-	lisrvServer* server = liscr_script_get_userdata (script);
+	int realize = 0;
+	liengObject* self;
+	lisrvServer* server;
 
-	/* Allocate object. */
-	object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 
+	/* Allocate self. */
+	server = liscr_class_get_userdata (args->clss, LISRV_SCRIPT_OBJECT);
+	self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 
 		lisrv_server_get_unique_object (server));
-	if (object == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	liscr_pushdata (lua, object->script);
+	if (self == NULL)
+		return;
 
-	/* Copy attributes. */
-	if (lua_istable (lua, 2))
-	{
-		lua_pushnil (lua);
-		while (lua_next (lua, 2) != 0)
-		{
-			if (lua_isstring (lua, -2))
-			{
-				name = lua_tostring (lua, -2);
-				if (!strcmp (name, "realized"))
-				{
-					realized = lua_toboolean (lua, -2);
-					lua_pop (lua, 1);
-					continue;
-				}
-			}
-			lua_pushvalue (lua, -2);
-			lua_pushvalue (lua, -2);
-			lua_settable (lua, -5);
-			lua_pop (lua, 1);
-		}
-	}
-
-	/* Realize the object. */
-	if (realized && !lieng_object_set_realized (object, 1))
-	{
-		lua_pop (lua, 1);
-		lua_pushnil (lua);
-		return 1;
-	}
-
-	return 1;
+	/* Initialize userdata. */
+	liscr_args_call_setters_except (args, self->script, "realized");
+	liscr_args_gets_bool (args, "realized", &realize);
+	liscr_args_seti_data (args, self->script);
+	lieng_object_set_realized (self, realize);
 }
 
 /* @luadoc
@@ -291,42 +241,43 @@ Object_new (lua_State* lua)
  * -- @param self Object.
  * function Object.purge(self)
  */
-static int
-Object_purge (lua_State* lua)
+static void Object_purge (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lisrv_object_purge (self->data);
-	return 0;
+	lisrv_object_purge (args->self);
 }
 
 /* @luadoc
  * ---
  * -- Sends a network packet to the client controlling the object.
  * --
+ * -- Arguments:
+ * -- packet: Packet. (required)
+ * -- reliable: Boolean.
+ * --
  * -- @param self Object.
- * -- @param packet Packet.
- * function Object.send(self, packet)
+ * -- @param args Arguments.
+ * function Object.send(self, args)
  */
-static int
-Object_send (lua_State* lua)
+static void Object_send (liscrArgs* args)
 {
-	liscrData* object;
+	int reliable = 1;
 	liscrData* packet;
 	liscrPacket* data;
 	lisrvClient* client;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	packet = liscr_checkdata (lua, 2, LICOM_SCRIPT_PACKET);
-	client = LISRV_OBJECT (object->data)->client;
-	data = packet->data;
-	luaL_argcheck (lua, data->writer != NULL, 2, "packet is not writable");
-
-	if (client != NULL)
-		lisrv_client_send (client, data->writer, GRAPPLE_RELIABLE);
-	return 0;
+	if (liscr_args_gets_data (args, "packet", LICOM_SCRIPT_PACKET, &packet))
+	{
+		liscr_args_gets_bool (args, "reliable", &reliable);
+		client = LISRV_OBJECT (args->self)->client;
+		data = packet->data;
+		if (client != NULL && data->writer != NULL)
+		{
+			if (reliable)
+				lisrv_client_send (client, data->writer, GRAPPLE_RELIABLE);
+			else
+				lisrv_client_send (client, data->writer, 0);
+		}
+	}
 }
 
 /* @luadoc
@@ -337,83 +288,62 @@ Object_send (lua_State* lua)
  * -- object controls the second object and vice versa. This is typically used when
  * -- you need to destroy the object of a player without disconnecting the client.
  * --
+ * -- Argumens:
+ * -- object: Object.
+ * --
  * -- @param self Object.
- * -- @param object Object.
- * function Object.swap_clients(self, packet)
+ * -- @param args Arguments.
+ * function Object.swap_clients(self, args)
  */
-static int
-Object_swap_clients (lua_State* lua)
+static void Object_swap_clients (liscrArgs* args)
 {
-	liscrData* object0;
-	liscrData* object1;
+	liscrData* object;
 
-	object0 = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	object1 = liscr_checkdata (lua, 2, LICOM_SCRIPT_OBJECT);
-
-	lisrv_object_swap (object0->data, object1->data);
-	return 0;
+	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &object))
+		lisrv_object_swap (args->self, object->data);
 }
 
 /* @luadoc
  * ---
- * -- FIXME
+ * -- Sweeps a sphere relative to the object.
+ * --
+ * -- Arguments:
+ * -- start: Start point vector. (required)
+ * -- end: End point vector. (required)
+ * -- radius: Sphere radius.
  * --
  * -- @param self Object.
- * -- @param start Vector.
- * -- @param end Vector.
- * -- @param radius Number.
- * function Object.sweep_sphere(self, start, end, radius)
+ * -- @param args Arguments.
+ * -- @return Table with point, normal, and object. Nil if not found.
+ * function Object.sweep_sphere(self, args)
  */
-static int
-Object_sweep_sphere (lua_State* lua)
+static void Object_sweep_sphere (liscrArgs* args)
 {
-	float radius;
-	liengObject* eobj;
-	liscrData* object;
-	liscrData* start;
-	liscrData* end;
-	liscrData* tmp;
+	float radius = 0.5f;
+	liengObject* object;
+	limatVector start;
+	limatVector end;
 	liphyCollision result;
-	liscrScript* script = liscr_script (lua);
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	start = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	end = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-	radius = luaL_checknumber (lua, 4);
+	if (!liscr_args_gets_vector (args, "start", &start) ||
+	    !liscr_args_gets_vector (args, "end", &end))
+		return;
+	liscr_args_gets_float (args, "radius", &radius);
+	object = args->self;
 
-	if (liphy_object_sweep_sphere (LIENG_OBJECT (object->data)->physics, start->data, end->data, radius, &result))
+	if (liphy_object_sweep_sphere (object->physics, &start, &end, radius, &result))
 	{
-		lua_newtable (lua);
-		lua_pushnumber (lua, result.fraction);
-		lua_setfield (lua, -2, "fraction");
-		tmp = liscr_vector_new (script, &result.point);
-		if (tmp != NULL)
-		{
-			liscr_pushdata (lua, tmp);
-			liscr_data_unref (tmp, NULL);
-			lua_setfield (lua, -2, "point");
-		}
-		tmp = liscr_vector_new (script, &result.normal);
-		if (tmp != NULL)
-		{
-			liscr_pushdata (lua, tmp);
-			liscr_data_unref (tmp, NULL);
-			lua_setfield (lua, -2, "normal");
-		}
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+		liscr_args_sets_float (args, "fraction", result.fraction);
+		liscr_args_sets_vector (args, "point", &result.point);
+		liscr_args_sets_vector (args, "normal", &result.normal);
 		if (result.object != NULL)
 		{
-			eobj = liphy_object_get_userdata (result.object);
-			if (eobj != NULL && eobj->script != NULL)
-			{
-				liscr_pushdata (lua, eobj->script);
-				lua_setfield (lua, -2, "object");
-			}
+			object = liphy_object_get_userdata (result.object);
+			if (object != NULL && object->script != NULL)
+				liscr_args_sets_data (args, "object", object->script);
 		}
 	}
-	else
-		lua_pushnil (lua);
-
-	return 1;
 }
 
 /* @luadoc
@@ -422,42 +352,30 @@ Object_sweep_sphere (lua_State* lua)
  * -- @name Object.contact_callback
  * -- @class table
  */
-static int
-Object_getter_contact_callback (lua_State* lua)
+static void Object_getter_contact_callback (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushlightuserdata (lua, MAGICPTR_CONTACT_CALLBACK);
-	lua_gettable (lua, 1);
-	return 1;
+	lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
+	lua_gettable (args->lua, 1);
+	liscr_args_seti_stack (args);
 }
-static int
-Object_setter_contact_callback (lua_State* lua)
+static void Object_setter_contact_callback (liscrArgs* args)
 {
-	liscrData* object;
-	liengObject* self;
+	liengObject* self = args->self;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	self = object->data;
-	if (!lua_isnoneornil (lua, 3))
+	if (lua_type (args->lua, 3) == LUA_TFUNCTION)
 	{
-		luaL_checktype (lua, 3, LUA_TFUNCTION);
 		liphy_object_set_contact_call (self->physics, private_contact_callback);
-		lua_pushlightuserdata (lua, MAGICPTR_CONTACT_CALLBACK);
-		lua_pushvalue (lua, 3);
-		lua_settable (lua, 1);
+		lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
+		lua_pushvalue (args->lua, 3);
+		lua_settable (args->lua, 1);
 	}
 	else
 	{
 		liphy_object_set_contact_call (self->physics, NULL);
-		lua_pushlightuserdata (lua, MAGICPTR_CONTACT_CALLBACK);
-		lua_pushnil (lua);
-		lua_settable (lua, 1);
+		lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
+		lua_pushnil (args->lua);
+		lua_settable (args->lua, 1);
 	}
-
-	return 0;
 }
 
 /* @luadoc
@@ -466,46 +384,9 @@ Object_setter_contact_callback (lua_State* lua)
  * -- @name Object.client
  * -- @class table
  */
-static int
-Object_getter_client (lua_State* lua)
+static void Object_getter_client (liscrArgs* args)
 {
-	lisrvClient* tmp;
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	tmp = LISRV_OBJECT (object->data)->client;
-	lua_pushboolean (lua, tmp != NULL);
-	return 1;
-}
-
-/* @luadoc
- * ---
- * -- Name.
- * -- @name Object.name
- * -- @class table
- */
-static int
-Object_getter_name (lua_State* lua)
-{
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-
-	lua_pushstring (lua, lisrv_object_get_name (self->data));
-	return 1;
-}
-static int
-Object_setter_name (lua_State* lua)
-{
-	const char* value;
-	liscrData* object;
-
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	value = luaL_checkstring (lua, 3);
-
-	lisrv_object_set_name (object->data, value);
-	return 0;
+	liscr_args_seti_bool (args, LISRV_OBJECT (args->self)->client != NULL);
 }
 
 /* @luadoc
@@ -541,20 +422,17 @@ lisrvObjectScript (liscrClass* self,
 	liscr_class_inherit (self, licomObjectScript, NULL);
 	liscr_class_set_userdata (self, LISRV_SCRIPT_OBJECT, data);
 	liscr_class_insert_interface (self, LISRV_SCRIPT_OBJECT);
-	liscr_class_insert_func (self, "animate", Object_animate);
-	liscr_class_insert_func (self, "disconnect", Object_disconnect);
-	liscr_class_insert_func (self, "effect", Object_effect);
-	liscr_class_insert_func (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
-	liscr_class_insert_func (self, "new", Object_new);
-	liscr_class_insert_func (self, "purge", Object_purge);
-	liscr_class_insert_func (self, "send", Object_send);
-	liscr_class_insert_func (self, "swap_clients", Object_swap_clients);
-	liscr_class_insert_func (self, "sweep_sphere", Object_sweep_sphere);
-	liscr_class_insert_getter (self, "client", Object_getter_client);
-	liscr_class_insert_getter (self, "contact_callback", Object_getter_contact_callback);
-	liscr_class_insert_getter (self, "name", Object_getter_name);
-	liscr_class_insert_setter (self, "contact_callback", Object_setter_contact_callback);
-	liscr_class_insert_setter (self, "name", Object_setter_name);
+	liscr_class_insert_mfunc (self, "animate", Object_animate);
+	liscr_class_insert_mfunc (self, "disconnect", Object_disconnect);
+	liscr_class_insert_mfunc (self, "effect", Object_effect);
+	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
+	liscr_class_insert_cfunc (self, "new", Object_new);
+	liscr_class_insert_mfunc (self, "purge", Object_purge);
+	liscr_class_insert_mfunc (self, "send", Object_send);
+	liscr_class_insert_mfunc (self, "swap_clients", Object_swap_clients);
+	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
+	liscr_class_insert_mvar (self, "client", Object_getter_client, NULL);
+	liscr_class_insert_mvar (self, "contact_callback", Object_getter_contact_callback, Object_setter_contact_callback);
 }
 
 /** @} */

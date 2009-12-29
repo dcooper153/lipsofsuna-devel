@@ -40,20 +40,18 @@
  * -- @name Sound.music
  * -- @class table
  */
-static int
-Sound_setter_music (lua_State* lua)
+static void Sound_setter_music (liscrArgs* args)
 {
+#ifndef LI_DISABLE_SOUND
 	const char* value;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SOUND);
-	value = luaL_checkstring (lua, 3);
-
-#ifndef LI_DISABLE_SOUND
-	liext_module_set_music (module, value);
+	if (liscr_args_geti_string (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		liext_module_set_music (module, value);
+	}
 #endif
-
-	return 0;
 }
 
 /* @luadoc
@@ -62,20 +60,18 @@ Sound_setter_music (lua_State* lua)
  * -- @name Sound.music_volume
  * -- @class table
  */
-static int
-Sound_setter_music_volume (lua_State* lua)
+static void Sound_setter_music_volume (liscrArgs* args)
 {
+#ifndef LI_DISABLE_SOUND
 	float value;
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SOUND);
-	value = luaL_checknumber (lua, 3);
-
-#ifndef LI_DISABLE_SOUND
-	liext_module_set_music_volume (module, value);
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		liext_module_set_music_volume (module, value);
+	}
 #endif
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -85,8 +81,8 @@ liextSoundScript (liscrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
-	liscr_class_insert_setter (self, "music", Sound_setter_music);
-	liscr_class_insert_setter (self, "music_volume", Sound_setter_music_volume);
+	liscr_class_insert_cvar (self, "music", NULL, Sound_setter_music);
+	liscr_class_insert_cvar (self, "music_volume", NULL, Sound_setter_music_volume);
 }
 
 /** @} */

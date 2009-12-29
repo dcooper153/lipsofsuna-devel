@@ -88,9 +88,6 @@ liext_editor_rotate (liextEditor*           self,
                      const limatQuaternion* rotation);
 
 void
-liext_editor_save (liextEditor* self);
-
-void
 liext_editor_snap (liextEditor* self,
                    float        grid,
                    float        rad);

@@ -40,32 +40,53 @@
  * ---
  * -- Creates a new particle.
  * --
+ * -- Arguments:
+ * -- accel: Acceleration vector.
+ * -- color: Particle color.
+ * -- fade: Fade start time in seconds.
+ * -- life: Particle lifetime in seconds.
+ * -- position: Position vector. (required)
+ * -- velocity: Average particle velocity.
+ * --
  * -- @param self Effect class.
- * -- @param pos Position vector.
- * -- @param vel Velocity vector.
- * function Effect.particle(self, pos, vel)
+ * -- @param args Arguments.
+ * function Effect.particle(self, args)
  */
-static int
-Effect_particle (lua_State* lua)
+static void Effect_particle (liscrArgs* args)
 {
+	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float fade = 0.5f;
+	float life = 1.0f;
 	liextModule* module;
-	liparPoint* point;
-	liscrData* pos;
-	liscrData* vel;
-	liscrScript* script;
+	limatVector position;
+	limatVector accel = { 0.0f, -9.8f, 0.0f };
+	limatVector velocity = { 0.0f, 0.0f, 0.0f };
+	liparPoint* particle;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EFFECT);
-	pos = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	vel = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
+	/* Mandatory arguments. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
+	if (!liscr_args_gets_vector (args, "position", &position))
+		return;
 
-	point = lirnd_scene_insert_particle (module->module->scene, pos->data, vel->data);
-	if (point != NULL)
+	/* Optional arguments. */
+	liscr_args_gets_vector (args, "accel", &accel);
+	liscr_args_gets_vector (args, "velocity", &velocity);
+	liscr_args_gets_floatv (args, "color", 4, color);
+	if (liscr_args_gets_float (args, "life", &life))
+		fade = 0.5f * life;
+	liscr_args_gets_float (args, "fade", &fade);
+
+	/* Create particle. */
+	particle = lirnd_scene_insert_particle (module->module->scene, &position, &velocity);
+	if (particle != NULL)
 	{
-		point->time_fade = 0.0f;
-		point->time_life = 1.0f;
+		particle->color[0] = color[0];
+		particle->color[1] = color[1];
+		particle->color[2] = color[2];
+		particle->time_fade = fade;
+		particle->time_life = life;
+		particle->acceleration = accel;
 	}
-	return 0;
 }
 
 /* @luadoc
@@ -74,30 +95,29 @@ Effect_particle (lua_State* lua)
  * --
  * -- The following values are recognized in the argument table:
  * --
+ * -- Arguments:
+ * -- accel: Acceleration vector.
  * -- angle: Maximum cone angle in degrees.
  * -- axis: Axis of rotation.
- * -- accel: Acceleration vector.
  * -- color: Particle color.
  * -- count: Number of particles.
  * -- fade: Fade start time in seconds.
  * -- life: Particle lifetime in seconds.
+ * -- position: Position vector. (required)
  * -- random: Velocity error value.
  * -- spread: Maximum particle distance from the center.
  * -- velocity: Average particle velocity.
  * --
  * -- @param self Effect class.
- * -- @param pos Position vector.
- * -- @param num Number of particles.
- * -- @param args Optional table of arguments.
+ * -- @param args Arguments.
  * function Effect.random(self, args)
  */
-static int
-Effect_random (lua_State* lua)
+static void Effect_random (liscrArgs* args)
 {
 	int i;
 	int count;
 	float angle;
-	float color[3];
+	float color[4];
 	float fade;
 	float life;
 	float random;
@@ -113,12 +133,11 @@ Effect_random (lua_State* lua)
 	limatVector partpos;
 	limatVector partvel;
 	liparPoint* particle;
-	liscrData* vector;
 
 	/* Mandatory arguments. */
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EFFECT);
-	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	position = *((limatVector*) vector->data);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
+	if (!liscr_args_gets_vector (args, "position", &position))
+		return;
 
 	/* Default values. */
 	axis = limat_vector_init (0.0f, 1.0f, 0.0f);
@@ -127,6 +146,7 @@ Effect_random (lua_State* lua)
 	color[0] = 1.0f;
 	color[1] = 1.0f;
 	color[2] = 1.0f;
+	color[3] = 1.0f;
 	count = 10;
 	fade = 1.0f;
 	life = 2.0f;
@@ -135,88 +155,18 @@ Effect_random (lua_State* lua)
 	velocity = 10.0f;
 
 	/* Optional arguments. */
-	if (lua_type (lua, 3) == LUA_TTABLE)
-	{
-		/* "angle" */
-		lua_getfield (lua, 3, "angle");
-		if (lua_isnumber (lua, -1))
-			angle = lua_tonumber (lua, -1) / 180.0f * M_PI;
-		lua_pop (lua, 1);
-
-		/* "axis" */
-		lua_getfield (lua, 3, "axis");
-		vector = liscr_isdata (lua, -1, LICOM_SCRIPT_VECTOR);
-		if (vector != NULL)
-		{
-			axis = *((limatVector*) vector->data);
-			axis = limat_vector_normalize (axis);
-		}
-		lua_pop (lua, 1);
-
-		/* "accel" */
-		lua_getfield (lua, 3, "accel");
-		vector = liscr_isdata (lua, -1, LICOM_SCRIPT_VECTOR);
-		if (vector != NULL)
-			accel = *((limatVector*) vector->data);
-		lua_pop (lua, 1);
-
-		/* "color" */
-		lua_getfield (lua, 3, "color");
-		if (lua_type (lua, -1) == LUA_TTABLE)
-		{
-			lua_pushnumber (lua, 1);
-			lua_gettable (lua, -2);
-			if (lua_isnumber (lua, -1))
-				color[0] = lua_tonumber (lua, -1);
-			lua_pop (lua, 1);
-
-			lua_pushnumber (lua, 2);
-			lua_gettable (lua, -2);
-			if (lua_isnumber (lua, -1))
-				color[1] = lua_tonumber (lua, -1);
-			lua_pop (lua, 1);
-
-			lua_pushnumber (lua, 3);
-			lua_gettable (lua, -2);
-			if (lua_isnumber (lua, -1))
-				color[2] = lua_tonumber (lua, -1);
-			lua_pop (lua, 1);
-		}
-		lua_pop (lua, 1);
-
-		/* "count" */
-		lua_getfield (lua, 3, "count");
-		if (lua_isnumber (lua, -1))
-			count = lua_tointeger (lua, -1);
-		lua_pop (lua, 1);
-
-		/* "life" */
-		lua_getfield (lua, 3, "life");
-		if (lua_isnumber (lua, -1))
-		{
-			life = lua_tonumber (lua, -1);
-			fade = 0.5f * life;
-		}
-		lua_pop (lua, 1);
-
-		/* "fade" */
-		lua_getfield (lua, 3, "fade");
-		if (lua_isnumber (lua, -1))
-			fade = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-
-		/* "random" */
-		lua_getfield (lua, 3, "random");
-		if (lua_isnumber (lua, -1))
-			random = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-
-		/* "velocity" */
-		lua_getfield (lua, 3, "velocity");
-		if (lua_isnumber (lua, -1))
-			velocity = lua_tonumber (lua, -1);
-		lua_pop (lua, 1);
-	}
+	liscr_args_gets_vector (args, "accel", &accel);
+	if (liscr_args_gets_float (args, "angle", &angle))
+		angle = angle / 180.0f * M_PI;
+	if (liscr_args_gets_vector (args, "axis", &axis))
+		axis = limat_vector_normalize (axis);
+	liscr_args_gets_floatv (args, "color", 4, color);
+	liscr_args_gets_int (args, "count", &count);
+	if (liscr_args_gets_float (args, "life", &life))
+		fade = 0.5f * life;
+	liscr_args_gets_float (args, "fade", &fade);
+	liscr_args_gets_float (args, "random", &random);
+	liscr_args_gets_float (args, "velocity", &velocity);
 
 	/* Create particles. */
 	for (i = 0 ; i < count ; i++)
@@ -243,76 +193,76 @@ Effect_random (lua_State* lua)
 			particle->acceleration = accel;
 		}
 	}
-
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Creates a new ray effect.
  * --
+ * -- dst: Destination position vector. (required)
+ * -- fade: Fade start time in seconds.
+ * -- life: Particle lifetime in seconds.
+ * -- src: Source position vector. (required)
+ * --
  * -- @param self Effect class.
- * -- @param src Source position vector.
- * -- @param dst Destination position vector.
- * -- @param life Ray life time.
- * function Effect.ray(self, src, dst, life)
+ * -- @param args Arguments.
+ * function Effect.ray(self, args)
  */
-static int
-Effect_ray (lua_State* lua)
+static void Effect_ray (liscrArgs* args)
 {
-	float life;
+	float fade = 0.5f;
+	float life = 1.0f;
 	liextModule* module;
+	limatVector dst;
+	limatVector src;
 	limatVector tmp;
 	liparLine* line;
-	liscrData* src;
-	liscrData* dst;
-	liscrScript* script;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EFFECT);
-	src = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	dst = liscr_checkdata (lua, 3, LICOM_SCRIPT_VECTOR);
-	life = luaL_checknumber (lua, 4);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
+	if (!liscr_args_gets_vector (args, "dst", &dst) ||
+	    !liscr_args_gets_vector (args, "src", &src) )
+		return;
+	if (liscr_args_gets_float (args, "life", &life))
+		fade = 0.5f * life;
+	liscr_args_gets_float (args, "fade", &fade);
 
 	/* FIXME */
 	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-	line = lipar_manager_insert_line (module->module->scene->particles, src->data, dst->data, &tmp, &tmp);
+	line = lipar_manager_insert_line (module->module->scene->particles, &src, &dst, &tmp, &tmp);
 	if (line != NULL)
 	{
-		line->time_fade[0] = line->time_fade[1] = 0.0f;
+		line->time_fade[0] = line->time_fade[1] = fade;
 		line->time_life[0] = line->time_life[1] = life;
 	}
-	return 0;
 }
 
 /* @luadoc
  * ---
  * -- Creates a particle system.
  * --
+ * -- Arguments:
+ * -- position: Position vector.
+ * --
  * -- @param self Effect class.
- * -- @param pos Position vector.
- * -- @param name Effect name.
- * function Effect.system(self, pos, name)
+ * -- @param args Arguments.
+ * function Effect.system(self, args)
  */
-static int
-Effect_system (lua_State* lua)
+static void Effect_system (liscrArgs* args)
 {
 	int i;
-	const char* effect;
 	liextModule* module;
 	limatVector position;
 	limatVector velocity;
 	liparPoint* particle;
-	liscrData* vector;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EFFECT);
-	vector = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-	effect = luaL_checkstring (lua, 3);
+	/* Mandatory arguments. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
+	if (!liscr_args_gets_vector (args, "position", &position))
+		return;
 
 #warning Effect_system is not implemented properly yet.
 	for (i = 0 ; i < 100 ; i++)
 	{
-		position = *((limatVector*) vector->data);;
 		velocity = limat_vector_init (
 			0.1*(rand()/(0.5*RAND_MAX)-1.0),
 			0.1*(rand()/(3.0*RAND_MAX)+3.0),
@@ -325,8 +275,6 @@ Effect_system (lua_State* lua)
 			particle->acceleration = limat_vector_init (0.0, -10.0, 0.5);
 		}
 	}
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -336,10 +284,10 @@ liextEffectScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EFFECT, data);
-	liscr_class_insert_func (self, "particle", Effect_particle);
-	liscr_class_insert_func (self, "random", Effect_random);
-	liscr_class_insert_func (self, "ray", Effect_ray);
-	liscr_class_insert_func (self, "system", Effect_system);
+	liscr_class_insert_cfunc (self, "particle", Effect_particle);
+	liscr_class_insert_cfunc (self, "random", Effect_random);
+	liscr_class_insert_cfunc (self, "ray", Effect_ray);
+	liscr_class_insert_cfunc (self, "system", Effect_system);
 }
 
 /** @} */

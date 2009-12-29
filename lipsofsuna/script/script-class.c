@@ -23,10 +23,28 @@
  */
 
 #include <system/lips-system.h>
+#include "script-args.h"
 #include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
 #include "script-util.h"
+
+liscrClassMemb*
+private_find_var (liscrClass* self,
+                  const char* name);
+
+static int
+private_insert_func (liscrClass*   self,
+                     int           member,
+                     const char*   name,
+                     liscrArgsFunc func);
+
+static int
+private_insert_var (liscrClass*     self,
+                    int             member,
+                    const char*     name,
+                    liscrArgsFunc args,
+                    liscrArgsFunc setter);
 
 static int
 private_member_compare (const void* a,
@@ -119,6 +137,7 @@ liscr_class_new_full (liscrScript* script,
 	lua_pop (self->script->lua, -1);
 
 	/* Default meta functions. */
+	liscr_class_insert_func (self, "__call", liscr_class_default___call);
 	liscr_class_insert_func (self, "__gc", liscr_class_default___gc);
 	liscr_class_insert_func (self, "__index", liscr_class_default___index);
 	liscr_class_insert_func (self, "__newindex", liscr_class_default___newindex);
@@ -136,20 +155,12 @@ liscr_class_free (liscrClass* self)
 {
 	int i;
 
-	/* Free getters. */
-	if (self->getters.getters != NULL)
+	/* Free accessors. */
+	if (self->vars.array != NULL)
 	{
-		for (i = 0 ; i < self->getters.count ; i++)
-			lisys_free (self->getters.getters[i].name);
-		lisys_free (self->getters.getters);
-	}
-
-	/* Free setters. */
-	if (self->setters.setters != NULL)
-	{
-		for (i = 0 ; i < self->setters.count ; i++)
-			lisys_free (self->setters.setters[i].name);
-		lisys_free (self->setters.setters);
+		for (i = 0 ; i < self->vars.count ; i++)
+			lisys_free (self->vars.array[i].name);
+		lisys_free (self->vars.array);
 	}
 
 	/* Free interfaces. */
@@ -192,6 +203,39 @@ liscr_class_inherit (liscrClass*    self,
 }
 
 /**
+ * \brief Inserts a class function to the class.
+ *
+ * \param self Class.
+ * \param name Function name.
+ * \param func Function pointer.
+ */
+int
+liscr_class_insert_cfunc (liscrClass*   self,
+                          const char*   name,
+                          liscrArgsFunc func)
+{
+	return private_insert_func (self, 0, name, func);
+}
+
+/**
+ * \brief Inserts a class variable accessor to the class.
+ *
+ * \param self Class.
+ * \param name Name for the accessor.
+ * \param getter Function pointer or NULL.
+ * \param setter Function pointer or NULL.
+ * \return Nonzero on success.
+ */
+int
+liscr_class_insert_cvar (liscrClass*   self,
+                         const char*   name,
+                         liscrArgsFunc getter,
+                         liscrArgsFunc setter)
+{
+	return private_insert_var (self, 0, name, getter, setter);
+}
+
+/**
  * \brief Inserts an enumeration value to the class.
  *
  * \param self Class.
@@ -218,58 +262,16 @@ liscr_class_insert_enum (liscrClass* self,
  * \param value Function pointer.
  */
 void
-liscr_class_insert_func (liscrClass*    self,
-                         const char*    name,
-                         liscrClassFunc value)
+liscr_class_insert_func (liscrClass*  self,
+                         const char*  name,
+                         liscrMarshal value)
 {
 	luaL_getmetatable (self->script->lua, self->meta);
 	lua_pushstring (self->script->lua, name);
-	lua_pushcfunction (self->script->lua, value);
+	lua_pushlightuserdata (self->script->lua, self);
+	lua_pushcclosure (self->script->lua, value, 1);
 	lua_rawset (self->script->lua, -3);
 	lua_pop (self->script->lua, 1);
-}
-
-/**
- * \brief Inserts a read accessor to the class.
- *
- * \param self Class.
- * \param name Name for the accessor.
- * \param value Function pointer.
- * \return Nonzero on success.
- */
-int
-liscr_class_insert_getter (liscrClass*    self,
-                           const char*    name,
-                           liscrClassFunc value)
-{
-	int i;
-	liscrClassMemb* tmp;
-
-	/* Overwrite existing. */
-	for (i = 0 ; i < self->getters.count ; i++)
-	{
-		tmp = self->getters.getters + i;
-		if (!strcmp (tmp->name, name))
-		{
-			tmp->call = value;
-			return 1;
-		}
-	}
-
-	/* Create new. */
-	tmp = lisys_realloc (self->getters.getters, (self->getters.count + 1) * sizeof (liscrClassMemb));
-	if (tmp == NULL)
-		return 0;
-	self->getters.getters = tmp;
-	tmp += self->getters.count;
-	tmp->call = value;
-	tmp->name = listr_dup (name);
-	if (tmp->name == NULL)
-		return 0;
-	self->getters.count++;
-	self->flags |= LISCR_CLASS_FLAG_SORT_GETTERS;
-
-	return 1;
 }
 
 /**
@@ -301,46 +303,36 @@ liscr_class_insert_interface (liscrClass* self,
 }
 
 /**
- * \brief Inserts a write accessor to the class.
+ * \brief Inserts a member function to the class.
+ *
+ * \param self Class.
+ * \param name Function name.
+ * \param func Function pointer.
+ */
+int
+liscr_class_insert_mfunc (liscrClass*   self,
+                          const char*   name,
+                          liscrArgsFunc func)
+{
+	return private_insert_func (self, 1, name, func);
+}
+
+/**
+ * \brief Inserts a member variable accessor to the class.
  *
  * \param self Class.
  * \param name Name for the accessor.
- * \param value Function pointer.
+ * \param getter Function pointer or NULL.
+ * \param setter Function pointer or NULL.
  * \return Nonzero on success.
  */
 int
-liscr_class_insert_setter (liscrClass*    self,
-                           const char*    name,
-                           liscrClassFunc value)
+liscr_class_insert_mvar (liscrClass*  self,
+                        const char*   name,
+                        liscrArgsFunc getter,
+                        liscrArgsFunc setter)
 {
-	int i;
-	liscrClassMemb* tmp;
-
-	/* Overwrite existing. */
-	for (i = 0 ; i < self->setters.count ; i++)
-	{
-		tmp = self->setters.setters + i;
-		if (!strcmp (tmp->name, name))
-		{
-			tmp->call = value;
-			return 1;
-		}
-	}
-
-	/* Create new. */
-	tmp = lisys_realloc (self->setters.setters, (self->setters.count + 1) * sizeof (liscrClassMemb));
-	if (tmp == NULL)
-		return 0;
-	self->setters.setters = tmp;
-	tmp += self->setters.count;
-	tmp->call = value;
-	tmp->name = listr_dup (name);
-	if (tmp->name == NULL)
-		return 0;
-	self->setters.count++;
-	self->flags |= LISCR_CLASS_FLAG_SORT_SETTERS;
-
-	return 1;
+	return private_insert_var (self, 1, name, getter, setter);
 }
 
 /**
@@ -417,6 +409,38 @@ liscr_class_set_userdata (liscrClass* self,
 /*****************************************************************************/
 
 /**
+ * \brief Default call function.
+ *
+ * \param lua Lua state.
+ * \return Zero.
+ */
+int
+liscr_class_default___call (lua_State* lua)
+{
+	liscrClass* clss;
+	liscrClass* clss1;
+
+	/* Get class data. */
+	clss = liscr_isanyclass (lua, 1);
+	if (clss == NULL)
+		return 0;
+
+	/* Check for class. */
+	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
+	if (!liscr_class_get_interface (clss, clss1->meta))
+		return 0;
+
+	/* Call new. */
+	lua_getfield (lua, 1, "new");
+	if (lua_type (lua, -1) != LUA_TFUNCTION)
+		return 0;
+	lua_insert (lua, 1);
+	lua_call (lua, lua_gettop (lua) - 1, 10);
+
+	return lua_gettop (lua);
+}
+
+/**
  * \brief Default garbage collection function.
  *
  * \param lua Lua state.
@@ -444,9 +468,10 @@ liscr_class_default___index (lua_State* lua)
 {
 	liscrClass* ptr;
 	liscrClass* clss;
-	liscrClassMemb tmp;
+	liscrClass* clss1;
 	liscrClassMemb* func;
 	liscrData* self;
+	liscrArgs args;
 	liscrScript* script;
 
 	/* Get class data. */
@@ -463,22 +488,27 @@ liscr_class_default___index (lua_State* lua)
 		self = NULL;
 	luaL_checkany (lua, 2);
 
+	/* Check for class. */
+	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
+	if (!liscr_class_get_interface (clss, clss1->meta))
+		return 0;
+
 	/* Getters. */
 	if (lua_isstring (lua, 2))
 	{
-		for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
+		func = private_find_var (clss, lua_tostring (lua, 2));
+		if (func != NULL)
 		{
-			if (ptr->flags & LISCR_CLASS_FLAG_SORT_GETTERS)
-			{
-				ptr->flags &= ~LISCR_CLASS_FLAG_SORT_GETTERS;
-				qsort (ptr->getters.getters, ptr->getters.count,
-					sizeof (liscrClassMemb), private_member_compare);
-			}
-			tmp.name = (char*) lua_tostring (lua, 2);
-			func = bsearch (&tmp, ptr->getters.getters, ptr->getters.count,
-				sizeof (liscrClassMemb), private_member_compare);
-			if (func != NULL)
-				return func->call (lua);
+			if (func->getter == NULL)
+				return 0;
+			if (func->member && self == NULL)
+				return 0;
+			liscr_args_init_getter (&args, lua, clss, self);
+			func->getter (&args);
+			if (!args.output_table)
+				return args.ret;
+			else
+				return 1;
 		}
 	}
 
@@ -522,11 +552,11 @@ liscr_class_default___index (lua_State* lua)
 int
 liscr_class_default___newindex (lua_State* lua)
 {
-	liscrClass* ptr;
 	liscrClass* clss;
-	liscrClassMemb tmp;
+	liscrClass* clss1;
 	liscrClassMemb* func;
 	liscrData* self;
+	liscrArgs args;
 	liscrScript* script;
 
 	/* Get class data. */
@@ -544,40 +574,24 @@ liscr_class_default___newindex (lua_State* lua)
 	luaL_checkany (lua, 2);
 	luaL_checkany (lua, 3);
 
+	/* Check for class. */
+	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
+	if (!liscr_class_get_interface (clss, clss1->meta))
+		return 0;
+
 	/* Setters. */
 	if (lua_isstring (lua, 2))
 	{
-		for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
+		func = private_find_var (clss, lua_tostring (lua, 2));
+		if (func != NULL)
 		{
-			if (ptr->flags & LISCR_CLASS_FLAG_SORT_SETTERS)
-			{
-				ptr->flags &= ~LISCR_CLASS_FLAG_SORT_SETTERS;
-				qsort (ptr->setters.setters, ptr->setters.count,
-					sizeof (liscrClassMemb), private_member_compare);
-			}
-			tmp.name = (char*) lua_tostring (lua, 2);
-			func = bsearch (&tmp, ptr->setters.setters, ptr->setters.count,
-				sizeof (liscrClassMemb), private_member_compare);
-			if (func != NULL)
-			{
-				func->call (lua);
+			if (func->setter == NULL)
 				return 0;
-			}
-		}
-	}
-
-	/* Protect reserved names. */
-	if (lua_isstring (lua, 2))
-	{
-		tmp.name = (char*) lua_tostring (lua, 2);
-		if (!strncmp (tmp.name, "__", 2))
+			if (func->member && self == NULL)
+				return 0;
+			liscr_args_init_setter (&args, lua, clss, self);
+			func->setter (&args);
 			return 0;
-		for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
-		{
-			func = bsearch (&tmp, ptr->getters.getters, ptr->getters.count,
-				sizeof (liscrClassMemb), private_member_compare);
-			if (func != NULL)
-				return 0;
 		}
 	}
 
@@ -604,6 +618,93 @@ liscr_class_default___newindex (lua_State* lua)
 }
 
 /*****************************************************************************/
+
+liscrClassMemb*
+private_find_var (liscrClass* self,
+                  const char* name)
+{
+	liscrClass* ptr;
+	liscrClassMemb tmp;
+	liscrClassMemb* func;
+
+	tmp.name = (char*) name;
+	for (ptr = self ; ptr != NULL ; ptr = ptr->base)
+	{
+		if (ptr->flags & LISCR_CLASS_FLAG_SORT_VARS)
+		{
+			ptr->flags &= ~LISCR_CLASS_FLAG_SORT_VARS;
+			qsort (ptr->vars.array, ptr->vars.count,
+				sizeof (liscrClassMemb), private_member_compare);
+		}
+		func = bsearch (&tmp, ptr->vars.array, ptr->vars.count,
+			sizeof (liscrClassMemb), private_member_compare);
+		if (func != NULL)
+			return func;
+	}
+
+	return NULL;
+}
+
+static int
+private_insert_func (liscrClass*   self,
+                     int           member,
+                     const char*   name,
+                     liscrArgsFunc func)
+{
+	luaL_getmetatable (self->script->lua, self->meta);
+	lua_pushstring (self->script->lua, name);
+	lua_pushlightuserdata (self->script->lua, self);
+	lua_pushlightuserdata (self->script->lua, func);
+	if (member)
+		lua_pushcclosure (self->script->lua, liscr_marshal_DATA, 2);
+	else
+		lua_pushcclosure (self->script->lua, liscr_marshal_CLASS, 2);
+	lua_rawset (self->script->lua, -3);
+	lua_pop (self->script->lua, 1);
+
+	return 1;
+}
+
+static int
+private_insert_var (liscrClass*   self,
+                    int           member,
+                    const char*   name,
+                    liscrArgsFunc getter,
+                    liscrArgsFunc setter)
+{
+	int i;
+	liscrClassMemb* tmp;
+
+	/* Overwrite existing. */
+	for (i = 0 ; i < self->vars.count ; i++)
+	{
+		tmp = self->vars.array + i;
+		if (!strcmp (tmp->name, name))
+		{
+			tmp->member = member;
+			tmp->getter = getter;
+			tmp->setter = setter;
+			return 1;
+		}
+	}
+
+	/* Create new. */
+	tmp = lisys_realloc (self->vars.array, (self->vars.count + 1) * sizeof (liscrClassMemb));
+	if (tmp == NULL)
+		return 0;
+	self->vars.array = tmp;
+	tmp += self->vars.count;
+	tmp->member = member;
+	tmp->getter = getter;
+	tmp->setter = setter;
+	tmp->name = listr_dup (name);
+	if (tmp->name == NULL)
+		return 0;
+	self->vars.count++;
+	self->flags |= LISCR_CLASS_FLAG_SORT_VARS;
+
+	return 1;
+}
 
 static int
 private_member_compare (const void* a,

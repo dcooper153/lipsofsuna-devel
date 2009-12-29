@@ -147,22 +147,41 @@ liext_spawner_set_limit (liextSpawner* self,
 }
 
 int
-liext_spawner_set_object (liextSpawner* self,
-                          liengObject*  object)
+liext_spawner_set_owner (liextSpawner* self,
+                         liengObject*  value)
 {
-	if (self->object == object)
+	liextSpawner* old;
+
+	if (self->owner == value)
 		return 1;
-	if (self->object != NULL)
+
+	/* Clear old spawner. */
+	if (value != NULL)
 	{
-		liphy_object_set_control_mode (self->object->physics, LIPHY_CONTROL_MODE_RIGID);
-		liscr_data_unref (self->object->script, self->script);
+		old = lialg_ptrdic_find (self->module->dictionary, value);
+		if (old != NULL)
+		{
+			liphy_object_set_control_mode (old->owner->physics, LIPHY_CONTROL_MODE_RIGID);
+			liscr_data_unref (old->owner->script, old->script);
+			lialg_ptrdic_remove (old->module->dictionary, value);
+			old->owner = NULL;
+		}
 	}
-	if (object != NULL)
+
+	/* Set new owner. */
+	if (self->owner != NULL)
 	{
-		liphy_object_set_control_mode (object->physics, LIPHY_CONTROL_MODE_STATIC);
-		liscr_data_ref (object->script, self->script);
+		liphy_object_set_control_mode (self->owner->physics, LIPHY_CONTROL_MODE_RIGID);
+		liscr_data_unref (self->owner->script, self->script);
+		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
-	self->object = object;
+	if (value != NULL)
+	{
+		liphy_object_set_control_mode (value->physics, LIPHY_CONTROL_MODE_STATIC);
+		liscr_data_ref (value->script, self->script);
+		lialg_ptrdic_insert (self->module->dictionary, value, self);
+	}
+	self->owner = value;
 
 	return 1;
 }
@@ -194,9 +213,9 @@ private_tick (liextSpawner* self,
 	}
 
 	/* Don't spawn if not realized. */
-	if (self->object == NULL)
+	if (self->owner == NULL)
 		return 1;
-	if (!lieng_object_get_realized (self->object))
+	if (!lieng_object_get_realized (self->owner))
 		return 1;
 
 	/* Find an empty slot. */
@@ -239,7 +258,7 @@ private_spawn (liextSpawner* self,
 	lua_remove (script->lua, -2);
 
 	/* Call the spawn function. */
-	liscr_pushdata (script->lua, self->object->script);
+	liscr_pushdata (script->lua, self->owner->script);
 	if (lua_pcall (script->lua, 1, 1, 0) != 0)
 	{
 		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));

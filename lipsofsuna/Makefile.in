@@ -178,12 +178,12 @@ am__objects_19 = render/render.lo render/render-buffer.lo \
 	render/render-model.lo render/render-object.lo \
 	render/render-scene.lo render/render-shader.lo \
 	render/render-texture.lo
-am__objects_20 = script/script.lo script/script-class.lo \
-	script/script-data.lo script/script-event.lo \
-	script/script-library.lo script/script-object.lo \
-	script/script-packet.lo script/script-path.lo \
-	script/script-quaternion.lo script/script-util.lo \
-	script/script-vector.lo
+am__objects_20 = script/script.lo script/script-args.lo \
+	script/script-class.lo script/script-data.lo \
+	script/script-event.lo script/script-library.lo \
+	script/script-object.lo script/script-packet.lo \
+	script/script-path.lo script/script-quaternion.lo \
+	script/script-util.lo script/script-vector.lo
 am__objects_21 = string/string-generic.lo
 am__objects_22 = sound/sound-manager.lo sound/sound-sample.lo \
 	sound/sound-source.lo sound/sound-system.lo
@@ -994,6 +994,7 @@ scrdir = $(includedir)/lipsofsuna/script
 scr_HEADERS = \
 	script/lips-script.h \
 	script/script.h \
+	script/script-args.h \
 	script/script-class.h \
 	script/script-data.h \
 	script/script-event.h \
@@ -1004,6 +1005,7 @@ scr_HEADERS = \
 
 scrsrc = \
 	script/script.c \
+	script/script-args.c \
 	script/script-class.c \
 	script/script-data.c \
 	script/script-event.c \
@@ -1650,6 +1652,8 @@ script/$(DEPDIR)/$(am__dirstamp):
 	@: > script/$(DEPDIR)/$(am__dirstamp)
 script/script.lo: script/$(am__dirstamp) \
 	script/$(DEPDIR)/$(am__dirstamp)
+script/script-args.lo: script/$(am__dirstamp) \
+	script/$(DEPDIR)/$(am__dirstamp)
 script/script-class.lo: script/$(am__dirstamp) \
 	script/$(DEPDIR)/$(am__dirstamp)
 script/script-data.lo: script/$(am__dirstamp) \
@@ -2194,6 +2198,8 @@ mostlyclean-compile:
 	-rm -f render/render-texture.lo
 	-rm -f render/render.$(OBJEXT)
 	-rm -f render/render.lo
+	-rm -f script/script-args.$(OBJEXT)
+	-rm -f script/script-args.lo
 	-rm -f script/script-class.$(OBJEXT)
 	-rm -f script/script-class.lo
 	-rm -f script/script-data.$(OBJEXT)
@@ -2449,6 +2455,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-shader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@render/$(DEPDIR)/render.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-args.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-class.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@script/$(DEPDIR)/script-event.Plo@am__quote@

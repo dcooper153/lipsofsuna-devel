@@ -62,7 +62,21 @@ liscr_script_new ()
 	}
 
 	/* Load libraries. */
-	luaL_openlibs (self->lua);
+    lua_pushcfunction (self->lua, luaopen_base);
+    lua_pushstring (self->lua, "");
+    lua_call (self->lua, 1, 0);
+    lua_pushcfunction (self->lua, luaopen_package);
+    lua_pushstring (self->lua, LUA_LOADLIBNAME);
+    lua_call (self->lua, 1, 0);
+    lua_pushcfunction (self->lua, luaopen_table);
+    lua_pushstring (self->lua, LUA_TABLIBNAME);
+    lua_call (self->lua, 1, 0);
+    lua_pushcfunction (self->lua, luaopen_string);
+    lua_pushstring (self->lua, LUA_STRLIBNAME);
+    lua_call (self->lua, 1, 0);
+    lua_pushcfunction (self->lua, luaopen_math);
+    lua_pushstring (self->lua, LUA_MATHLIBNAME);
+    lua_call (self->lua, 1, 0);
 
 	/* Create shortcut to self. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_SELF);
@@ -167,7 +181,8 @@ liscr_script_load (liscrScript* self,
 	char* inc;
 
 	/* Set include path. */
-	inc = lisys_path_format (LISYS_PATH_PATHNAME, path, LISYS_PATH_SEPARATOR, "?.lua", NULL);
+	inc = lisys_path_format (LISYS_PATH_PATHNAME, path,
+		LISYS_PATH_STRIPLAST, LISYS_PATH_SEPARATOR, "?.lua", NULL);
 	if (inc == NULL)
 		return 0;
 	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");

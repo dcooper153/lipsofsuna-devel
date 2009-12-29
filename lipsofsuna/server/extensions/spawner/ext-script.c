@@ -39,46 +39,63 @@
 
 /* @luadoc
  * ---
+ * -- @brief Finds the spawner logic for an object.
+ * --
+ * -- Arguments:
+ * -- object: Object.
+ * --
+ * -- @param self Spawner class.
+ * -- @param args Arguments.
+ * -- @return Spawner or nil.
+ * function Spawner.find(self, args)
+ */
+static void Spawner_find (liscrArgs* args)
+{
+	liextModule* module;
+	liextSpawner* spawner;
+	liscrData* object;
+
+	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &object))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPAWNER);
+		spawner = liext_module_find_spawner (module, object->data);
+		if (spawner != NULL)
+			liscr_args_seti_data (args, spawner->script);
+	}
+}
+
+/* @luadoc
+ * ---
  * -- Creates a new spawner logic.
  * --
  * -- @param self Spawner class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New spawner.
- * function Spawner.new(self, table)
+ * function Spawner.new(self, args)
  */
-static int
-Spawner_new (lua_State* lua)
+static void Spawner_new (liscrArgs* args)
 {
 	liextModule* module;
-	liextSpawner* logic;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
+	liextSpawner* self;
+	liscrData* data;
 
 	/* Allocate self. */
-	logic = liext_spawner_new (module);
-	if (logic == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
-	self = liscr_data_new (script, logic, LIEXT_SCRIPT_SPAWNER, liext_spawner_free);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPAWNER);
+	self = liext_spawner_new (module);
+	if (self == NULL)
+		return;
+
+	/* Allocate userdata. */
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SPAWNER, liext_spawner_free);
 	if (self == NULL)
 	{
-		liext_spawner_free (logic);
-		lua_pushnil (lua);
-		return 1;
+		liext_spawner_free (self);
+		return;
 	}
-	logic->script = self;
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-	return 1;
+	self->script = data;
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /* @luadoc
@@ -87,32 +104,16 @@ Spawner_new (lua_State* lua)
  * -- @name Spawner.delay
  * -- @class table
  */
-static int
-Spawner_getter_delay (lua_State* lua)
+static void Spawner_getter_delay (liscrArgs* args)
 {
-	liscrData* self;
-	liextSpawner* data;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-	data = self->data;
-
-	lua_pushnumber (lua, data->delay);
-	return 1;
+	liscr_args_seti_float (args, ((liextSpawner*) args->self)->delay);
 }
-static int
-Spawner_setter_delay (lua_State* lua)
+static void Spawner_setter_delay (liscrArgs* args)
 {
 	float value;
-	liscrData* self;
-	liextSpawner* data;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-	data = self->data;
-	value = lua_tonumber (lua, 3);
-	luaL_argcheck (lua, value >= 0.0, 3, "negative delay");
-
-	data->delay = value;
-	return 0;
+	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
+		((liextSpawner*) args->self)->delay = value;
 }
 
 /* @luadoc
@@ -126,30 +127,16 @@ Spawner_setter_delay (lua_State* lua)
  * -- @name Spawner.limit
  * -- @class table
  */
-static int
-Spawner_getter_limit (lua_State* lua)
+static void Spawner_getter_limit (liscrArgs* args)
 {
-	liscrData* self;
-	liextSpawner* data;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-	data = self->data;
-
-	lua_pushnumber (lua, data->limit);
-	return 1;
+	liscr_args_seti_int (args, ((liextSpawner*) args->self)->limit);
 }
-static int
-Spawner_setter_limit (lua_State* lua)
+static void Spawner_setter_limit (liscrArgs* args)
 {
 	int value;
-	liscrData* self;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-	value = (int) luaL_checknumber (lua, 3);
-	luaL_argcheck (lua, value >= 0, 3, "negative limit");
-
-	liext_spawner_set_limit (self->data, value);
-	return 0;
+	if (liscr_args_geti_int (args, 0, &value) && value >= 0)
+		liext_spawner_set_limit (args->self, value);
 }
 
 /* @luadoc
@@ -158,39 +145,19 @@ Spawner_setter_limit (lua_State* lua)
  * -- @name Spawner.object
  * -- @class table
  */
-static int
-Spawner_getter_object (lua_State* lua)
+static void Spawner_getter_owner (liscrArgs* args)
 {
-	liscrData* self;
-	liextSpawner* data;
-
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-	data = self->data;
-
-	if (data->object != NULL && data->object->script != NULL)
-		liscr_pushdata (lua, data->object->script);
-	else
-		lua_pushnil (lua);
-	return 1;
+	if (((liextSpawner*) args->self)->owner != NULL)
+		liscr_args_seti_data (args, ((liextSpawner*) args->self)->owner->script);
 }
-static int
-Spawner_setter_object (lua_State* lua)
+static void Spawner_setter_owner (liscrArgs* args)
 {
-	liscrData* self;
-	liscrData* tmp;
-	liengObject* object;
+	liscrData* object;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_SPAWNER);
-	if (!lua_isnil (lua, 3))
-	{
-		tmp = liscr_checkdata (lua, 3, LICOM_SCRIPT_OBJECT);
-		object = tmp->data;
-	}
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &object))
+		liext_spawner_set_owner (args->self, object->data);
 	else
-		object = NULL;
-
-	liext_spawner_set_object (self->data, object);
-	return 0;
+		liext_spawner_set_owner (args->self, NULL);
 }
 
 /* @luadoc
@@ -212,13 +179,11 @@ liextSpawnerScript (liscrClass* self,
                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPAWNER, data);
-	liscr_class_insert_func (self, "new", Spawner_new);
-	liscr_class_insert_getter (self, "delay", Spawner_getter_delay);
-	liscr_class_insert_getter (self, "limit", Spawner_getter_limit);
-	liscr_class_insert_getter (self, "object", Spawner_getter_object);
-	liscr_class_insert_setter (self, "delay", Spawner_setter_delay);
-	liscr_class_insert_setter (self, "limit", Spawner_setter_limit);
-	liscr_class_insert_setter (self, "object", Spawner_setter_object);
+	liscr_class_insert_cfunc (self, "find", Spawner_find);
+	liscr_class_insert_cfunc (self, "new", Spawner_new);
+	liscr_class_insert_mvar (self, "delay", Spawner_getter_delay, Spawner_setter_delay);
+	liscr_class_insert_mvar (self, "limit", Spawner_getter_limit, Spawner_setter_limit);
+	liscr_class_insert_mvar (self, "owner", Spawner_getter_owner, Spawner_setter_owner);
 }
 
 /** @} */

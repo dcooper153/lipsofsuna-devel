@@ -44,16 +44,12 @@
  * -- @param self Editor class.
  * function Editor.save(self)
  */
-static int
-Editor_save (lua_State* lua)
+static void Editor_save (liscrArgs* args)
 {
 	liextModule* module;
 
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EDITOR);
-
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	lisrv_server_save (module->server);
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -63,7 +59,7 @@ liextEditorScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
-	liscr_class_insert_func (self, "save", Editor_save);
+	liscr_class_insert_cfunc (self, "save", Editor_save);
 }
 
 /** @} */

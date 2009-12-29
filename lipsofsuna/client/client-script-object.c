@@ -41,23 +41,17 @@
  * -- @param self Object.
  * function Object.emit_particles(self)
  */
-static int
-Object_emit_particles (lua_State* lua)
+static void Object_emit_particles (liscrArgs* args)
 {
-	liscrData* object;
 	licliModule* module;
-	liengObject* data;
+	liengObject* object;
 	lirndObject* render;
 
-	object = liscr_checkdata (lua, 1, LICOM_SCRIPT_OBJECT);
-	data = LIENG_OBJECT (object->data);
-	module = lieng_engine_get_userdata (data->engine, LIENG_DATA_CLIENT);
-
-	render = lirnd_scene_find_object (module->scene, data->id);
+	object = LIENG_OBJECT (args->self);
+	module = lieng_engine_get_userdata (object->engine, LIENG_DATA_CLIENT);
+	render = lirnd_scene_find_object (module->scene, object->id);
 	if (render != NULL)
 		lirnd_object_emit_particles (render);
-
-	return 0;
 }
 
 /*****************************************************************************/
@@ -67,7 +61,7 @@ licliObjectScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_inherit (self, licomObjectScript, NULL);
-	liscr_class_insert_func (self, "emit_particles", Object_emit_particles);
+	liscr_class_insert_mfunc (self, "emit_particles", Object_emit_particles);
 }
 
 /** @} */

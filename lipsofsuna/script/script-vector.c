@@ -142,32 +142,17 @@ Vector___sub (lua_State* lua)
  * -- @return New vector.
  * function Vector.new(self, x, y, z)
  */
-static int
-Vector_new (lua_State* lua)
+static void Vector_new (liscrArgs* args)
 {
 	limatVector vec;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
 
-	if (!lua_isnoneornil (lua, 2))
-		vec.x = luaL_checknumber (lua, 2);
-	else
-		vec.x = 0.0f;
-	if (!lua_isnoneornil (lua, 3))
-		vec.y = luaL_checknumber (lua, 3);
-	else
-		vec.y = 0.0f;
-	if (!lua_isnoneornil (lua, 4))
-		vec.z = luaL_checknumber (lua, 4);
-	else
-		vec.z = 0.0f;
-	self = liscr_vector_new (script, &vec);
-	if (self == NULL)
-		return 0;
-
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-	return 1;
+	if (!liscr_args_gets_float (args, "x", &vec.x))
+		liscr_args_geti_float (args, 0, &vec.x);
+	if (!liscr_args_gets_float (args, "y", &vec.y))
+		liscr_args_geti_float (args, 0, &vec.y);
+	if (!liscr_args_gets_float (args, "z", &vec.z))
+		liscr_args_geti_float (args, 0, &vec.z);
+	liscr_args_seti_vector (args, &vec);
 }
 
 /* @luadoc
@@ -179,28 +164,16 @@ Vector_new (lua_State* lua)
  * -- @return New vector.
  * function Vector.cross(self, vector)
  */
-static int
-Vector_cross (lua_State* lua)
+static void Vector_cross (liscrArgs* args)
 {
 	limatVector tmp;
-	liscrData* a;
-	liscrData* b;
-	liscrData* c;
-	liscrScript* script = liscr_script (lua);
+	liscrData* data;
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-	b = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
-
-	tmp = limat_vector_cross (*((limatVector*) a->data), *((limatVector*) b->data));
-	c = liscr_vector_new (script, &tmp);
-	if (c != NULL)
+	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_VECTOR, &data))
 	{
-		liscr_pushdata (lua, c);
-		liscr_data_unref (c, NULL);
+		tmp = limat_vector_cross (*((limatVector*) args->self), *((limatVector*) data->data));
+		liscr_args_seti_vector (args, &tmp);
 	}
-	else
-		lua_pushnil (lua);
-	return 1;
 }
 
 /* @luadoc
@@ -209,15 +182,9 @@ Vector_cross (lua_State* lua)
  * -- @name Vector.length
  * -- @class table
  */
-static int
-Vector_getter_length (lua_State* lua)
+static void Vector_getter_length (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-
-	lua_pushnumber (lua, limat_vector_get_length (*((limatVector*) self->data)));
-	return 1;
+	liscr_args_seti_float (args, limat_vector_get_length (*((limatVector*) args->self)));
 }
 
 /* @luadoc
@@ -226,27 +193,13 @@ Vector_getter_length (lua_State* lua)
  * -- @name Vector.x
  * -- @class table
  */
-static int
-Vector_getter_x (lua_State* lua)
+static void Vector_getter_x (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-
-	lua_pushnumber (lua, ((limatVector*) self->data)->x);
-	return 1;
+	liscr_args_seti_float (args, ((limatVector*) args->self)->x);
 }
-static int
-Vector_setter_x (lua_State* lua)
+static void Vector_setter_x (liscrArgs* args)
 {
-	float value;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-	value = luaL_checknumber (lua, 3);
-
-	((limatVector*) self->data)->x = value;
-	return 0;
+	liscr_args_geti_float (args, 0, &((limatVector*) args->self)->x);
 }
 
 /* @luadoc
@@ -255,27 +208,13 @@ Vector_setter_x (lua_State* lua)
  * -- @name Vector.y
  * -- @class table
  */
-static int
-Vector_getter_y (lua_State* lua)
+static void Vector_getter_y (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-
-	lua_pushnumber (lua, ((limatVector*) self->data)->y);
-	return 1;
+	liscr_args_seti_float (args, ((limatVector*) args->self)->y);
 }
-static int
-Vector_setter_y (lua_State* lua)
+static void Vector_setter_y (liscrArgs* args)
 {
-	float value;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-	value = luaL_checknumber (lua, 3);
-
-	((limatVector*) self->data)->y = value;
-	return 0;
+	liscr_args_geti_float (args, 0, &((limatVector*) args->self)->y);
 }
 
 /* @luadoc
@@ -284,27 +223,13 @@ Vector_setter_y (lua_State* lua)
  * -- @name Vector.z
  * -- @class table
  */
-static int
-Vector_getter_z (lua_State* lua)
+static void Vector_getter_z (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-
-	lua_pushnumber (lua, ((limatVector*) self->data)->z);
-	return 1;
+	liscr_args_seti_float (args, ((limatVector*) args->self)->z);
 }
-static int
-Vector_setter_z (lua_State* lua)
+static void Vector_setter_z (liscrArgs* args)
 {
-	float value;
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-	value = luaL_checknumber (lua, 3);
-
-	((limatVector*) self->data)->z = value;
-	return 0;
+	liscr_args_geti_float (args, 0, &((limatVector*) args->self)->z);
 }
 
 /*****************************************************************************/
@@ -316,15 +241,12 @@ licomVectorScript (liscrClass* self,
 	liscr_class_insert_func (self, "__add", Vector___add);
 	liscr_class_insert_func (self, "__mul", Vector___mul);
 	liscr_class_insert_func (self, "__sub", Vector___sub);
-	liscr_class_insert_func (self, "cross", Vector_cross);
-	liscr_class_insert_func (self, "new", Vector_new);
-	liscr_class_insert_getter (self, "length", Vector_getter_length);
-	liscr_class_insert_getter (self, "x", Vector_getter_x);
-	liscr_class_insert_getter (self, "y", Vector_getter_y);
-	liscr_class_insert_getter (self, "z", Vector_getter_z);
-	liscr_class_insert_setter (self, "x", Vector_setter_x);
-	liscr_class_insert_setter (self, "y", Vector_setter_y);
-	liscr_class_insert_setter (self, "z", Vector_setter_z);
+	liscr_class_insert_mfunc (self, "cross", Vector_cross);
+	liscr_class_insert_cfunc (self, "new", Vector_new);
+	liscr_class_insert_mvar (self, "length", Vector_getter_length, NULL);
+	liscr_class_insert_mvar (self, "x", Vector_getter_x, Vector_setter_x);
+	liscr_class_insert_mvar (self, "y", Vector_getter_y, Vector_setter_y);
+	liscr_class_insert_mvar (self, "z", Vector_getter_z, Vector_setter_z);
 }
 
 /**

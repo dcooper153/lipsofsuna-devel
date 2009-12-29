@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -40,11 +40,21 @@ liext_module_new (lisrvServer* server)
 {
 	liextModule* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 
+	/* Allocate dictionary. */
+	self->dictionary = lialg_ptrdic_new ();
+	if (self->dictionary == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
 	liscr_script_create_class (server->script, "Spawner", liextSpawnerScript, self);
 
 	return self;
@@ -53,8 +63,16 @@ liext_module_new (lisrvServer* server)
 void
 liext_module_free (liextModule* self)
 {
-	/* FIXME: Remove the class here. */
+	if (self->dictionary != NULL)
+		lialg_ptrdic_free (self->dictionary);
 	lisys_free (self);
+}
+
+liextSpawner*
+liext_module_find_spawner (liextModule* self,
+                           liengObject* owner)
+{
+	return lialg_ptrdic_find (self->dictionary, owner);
 }
 
 /** @} */

@@ -85,66 +85,61 @@ private_action_callback (libndAction*  action,
  * ---
  * -- Removes the action.
  * --
- * -- It is an error to free an action still used by bindings.
- * --
  * -- @param self Action.
  * function Action.free(self)
  */
-static int
-Action_free (lua_State* lua)
+static void Action_free (liscrArgs* args)
 {
-	liscrData* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_ACTION);
-
-	liscr_data_unref (self, NULL);
-	return 0;
+	if (args->data->refcount)
+		liscr_data_unref (args->data, NULL);
 }
 
 /* @luadoc
  * ---
  * -- Creates a new action.
  * --
+ * -- Arguments:
+ * -- id Identifier string to be used internally.
+ * -- name Human readable short name.
+ * -- desc Human readable long description.
+ * -- func Callback function.
+ * --
  * -- @param self Action class.
- * -- @param id Identifier string to be used internally.
- * -- @param name Human readable short name.
- * -- @param desc Human readable long description.
- * -- @param func Callback function.
+ * -- @param args Arguments.
  * -- @return New action.
- * function Action.new(id, name, desc, func)
+ * function Action.new(self, args)
  */
-static int
-Action_new (lua_State* lua)
+static void Action_new (liscrArgs* args)
 {
 	const char* id;
-	const char* name;
-	const char* desc;
-	libndAction* action;
+	const char* name = "";
+	const char* desc = "";
+	libndAction* self;
 	licliModule* module;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
-
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_ACTION);
+	liscrData* data;
 
 	/* Check arguments. */
-	id = luaL_checkstring (lua, 2);
-	name = luaL_checkstring (lua, 3);
-	desc = luaL_checkstring (lua, 4);
+	if (!liscr_args_gets_string (args, "id", &id))
+		return;
+	liscr_args_gets_string (args, "name", &name);
+	liscr_args_gets_string (args, "desc", &desc);
+
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_ACTION);
+	self = libnd_action_new (module->bindings, id, name, desc, private_action_callback, NULL);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	action = libnd_action_new (module->bindings, id, name, desc, private_action_callback, NULL);
-	if (action == NULL)
-		return 0;
-	self = liscr_data_new (script, action, LICLI_SCRIPT_ACTION, libnd_action_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_ACTION, libnd_action_free);
+	if (data == NULL)
 	{
-		libnd_action_free (action);
-		return 0;
+		libnd_action_free (self);
+		return;
 	}
-	libnd_action_set_userdata (action, self);
-	liscr_pushdata (lua, self);
-
-	return 1;
+	libnd_action_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
 }
 
 /* @luadoc
@@ -154,27 +149,16 @@ Action_new (lua_State* lua)
  * -- @name Action.enabled
  * -- @class table
  */
-static int
-Action_getter_enabled (lua_State* lua)
+static void Action_getter_enabled (liscrArgs* args)
 {
-	liscrData* action;
-
-	action = liscr_checkdata (lua, 1, LICLI_SCRIPT_ACTION);
-
-	lua_pushboolean (lua, libnd_action_get_enabled (action->data));
-	return 1;
+	liscr_args_seti_bool (args, libnd_action_get_enabled (args->self));
 }
-static int
-Action_setter_enabled (lua_State* lua)
+static void Action_setter_enabled (liscrArgs* args)
 {
 	int value;
-	liscrData* action;
 
-	action = liscr_checkdata (lua, 1, LICLI_SCRIPT_ACTION);
-	value = lua_toboolean (lua, 3);
-
-	libnd_action_set_enabled (action->data, value);
-	return 0;
+	if (liscr_args_geti_bool (args, 0, &value))
+		libnd_action_set_enabled (args->self, value);
 }
 
 /*****************************************************************************/
@@ -184,10 +168,9 @@ licliActionScript (liscrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_ACTION, data);
-	liscr_class_insert_func (self, "new", Action_new);
-	liscr_class_insert_func (self, "free", Action_free);
-	liscr_class_insert_getter (self, "enabled", Action_getter_enabled);
-	liscr_class_insert_setter (self, "enabled", Action_setter_enabled);
+	liscr_class_insert_cfunc (self, "new", Action_new);
+	liscr_class_insert_mfunc (self, "free", Action_free);
+	liscr_class_insert_mvar (self, "enabled", Action_getter_enabled, Action_setter_enabled);
 }
 
 /** @} */

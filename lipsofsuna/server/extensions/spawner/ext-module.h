@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,13 +27,17 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
+#include <algorithm/lips-algorithm.h>
 #include <script/lips-script.h>
 
 #define LIEXT_SCRIPT_SPAWNER "Lips.Spawner"
 
+typedef struct _liextSpawner liextSpawner;
 typedef struct _liextModule liextModule;
+
 struct _liextModule
 {
+	lialgPtrdic* dictionary;
 	lisrvServer* server;
 };
 
@@ -42,6 +46,10 @@ liext_module_new (lisrvServer* server);
 
 void
 liext_module_free (liextModule* self);
+
+liextSpawner*
+liext_module_find_spawner (liextModule* self,
+                           liengObject* owner);
 
 /*****************************************************************************/
 

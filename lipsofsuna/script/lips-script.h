@@ -19,6 +19,7 @@
 #define __LIPS_SCRIPT_H__
 
 #include "script.h"
+#include "script-args.h"
 #include "script-class.h"
 #include "script-data.h"
 #include "script-library.h"

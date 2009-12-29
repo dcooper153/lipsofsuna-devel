@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2009 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -261,7 +261,10 @@ lisys_path_format (lisysPathFormat format,
 					;
 				if (tmp > self)
 				{
-					last = '/';
+					if (pos > 0)
+						last = self[pos - 1];
+					else
+						last = '\0';
 					if (tmp == self + pos - 1)
 					{
 						pos--;

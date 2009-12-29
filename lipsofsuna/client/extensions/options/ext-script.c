@@ -42,47 +42,33 @@
  * -- Creates a new options widget.
  * --
  * -- @param self Options class.
- * -- @param table Optional table of arguments.
+ * -- @param args Arguments.
  * -- @return New options widget.
  * function Options.new(self, table)
  */
-static int
-Options_new (lua_State* lua)
+static void Options_new (liscrArgs* args)
 {
 	liextModule* module;
-	liscrData* self;
-	liscrScript* script;
-	liwdgWidget* widget;
+	liscrData* data;
+	liwdgWidget* self;
 
-	script = liscr_script (lua);
-	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_OPTIONS);
-
-	/* Allocate widget. */
-	widget = liext_options_new (module->module);
-	if (widget == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_OPTIONS);
+	self = liext_options_new (module->module);
+	if (self == NULL)
+		return;
 
 	/* Allocate userdata. */
-	self = liscr_data_new (script, widget, LIEXT_SCRIPT_OPTIONS, licli_script_widget_free);
-	if (self == NULL)
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_OPTIONS, licli_script_widget_free);
+	if (data == NULL)
 	{
-		liwdg_widget_free (widget);
-		lua_pushnil (lua);
-		return 1;
+		liwdg_widget_free (self);
+		return;
 	}
-	liwdg_widget_set_userdata (widget, self);
-
-	/* Copy attributes. */
-	if (!lua_isnoneornil (lua, 2))
-		liscr_copyargs (lua, self, 2);
-
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-
-	return 1;
+	liwdg_widget_set_userdata (self, data);
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
 }
 
 /*****************************************************************************/
@@ -95,7 +81,7 @@ liextOptionsScript (liscrClass* self,
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_OPTIONS, data);
 	liscr_class_inherit (self, licliWidgetScript, module->module);
-	liscr_class_insert_func (self, "new", Options_new);
+	liscr_class_insert_cfunc (self, "new", Options_new);
 }
 
 /** @} */
