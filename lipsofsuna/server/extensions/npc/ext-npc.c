@@ -71,11 +71,7 @@ liext_npc_new (liextModule* module)
 void
 liext_npc_free (liextNpc* self)
 {
-	if (self->active)
-	{
-		lieng_engine_remove_calls (self->module->server->engine, self->calls,
-			sizeof (self->calls) / sizeof (licalHandle));
-	}
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	lisys_free (self);
 }
@@ -93,15 +89,9 @@ liext_npc_set_active (liextNpc* self,
 	if (self->active == value)
 		return 1;
 	if (value)
-	{
-		lieng_engine_insert_call (self->module->server->engine,
-			LISRV_CALLBACK_TICK, 0, private_tick, self, self->calls + 0);
-	}
+		lical_callbacks_insert (self->module->server->callbacks, self->module->server->engine, "tick", 0, private_tick, self, self->calls + 0);
 	else
-	{
-		lieng_engine_remove_calls (self->module->server->engine, self->calls,
-			sizeof (self->calls) / sizeof (licalHandle));
-	}
+		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	self->active = value;
 
 	return 1;

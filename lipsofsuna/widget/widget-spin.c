@@ -89,8 +89,6 @@ static int
 private_init (liwdgSpin*    self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
-		return 0;
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
@@ -124,7 +122,7 @@ private_event (liwdgSpin*  self,
 			else
 				self->value += 1.0f;
 			private_rebuild (self);
-			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self);
+			lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);

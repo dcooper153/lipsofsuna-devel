@@ -191,12 +191,12 @@ private_init (liextMaterials* self,
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_friction), "Friction:");
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_model), "Model:");
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_name), "Name:");
-	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.entry_model, LIWDG_CALLBACK_EDITED, 0, private_changed_model, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_changed_name, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.tree, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.scroll_friction, LIWDG_CALLBACK_PRESSED, 0, private_changed_friction, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_add, "pressed", private_add, self);
+	liwdg_widget_insert_callback (self->widgets.button_remove, "pressed", private_remove, self);
+	liwdg_widget_insert_callback (self->widgets.entry_model, "edited", private_changed_model, self);
+	liwdg_widget_insert_callback (self->widgets.entry_name, "edited", private_changed_name, self);
+	liwdg_widget_insert_callback (self->widgets.tree, "pressed", private_selected, self);
+	liwdg_widget_insert_callback (self->widgets.scroll_friction, "pressed", private_changed_friction, self);
 
 	/* Tree. */
 	liwdg_view_set_vscroll (LIWDG_VIEW (self->widgets.view), 1);

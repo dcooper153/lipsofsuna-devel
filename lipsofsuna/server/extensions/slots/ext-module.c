@@ -61,8 +61,7 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_SHOW, 0,
-	     	private_vision_show, self, self->calls + 0))
+	if (!lical_callbacks_insert (server->callbacks, server->engine, "vision-show", 0, private_vision_show, self, self->calls + 0))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -77,10 +76,8 @@ liext_module_new (lisrvServer* server)
 void
 liext_module_free (liextModule* self)
 {
-	/* FIXME: Remove the class here. */
 	lialg_ptrdic_free (self->dictionary);
-	lieng_engine_remove_calls (self->server->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

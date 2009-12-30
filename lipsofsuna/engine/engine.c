@@ -42,17 +42,20 @@ private_physics_transform (liphyObject* object);
 /**
  * \brief Creates a new game engine.
  *
+ * \param calls Callback manager.
  * \param path Module directory.
  * \return New engine or NULL.
  */
 liengEngine*
-lieng_engine_new (const char* path)
+lieng_engine_new (licalCallbacks* calls,
+                  const char*     path)
 {
 	liengEngine* self;
 
 	self = lisys_calloc (1, sizeof (liengEngine));
 	if (self == NULL)
 		return NULL;
+	self->callbacks = calls;
 	self->range.start = 0;
 	self->range.size = 0xFFFFFFFF;
 	self->config.radius = 1;
@@ -114,11 +117,7 @@ lieng_engine_free (liengEngine* self)
 		lieng_resources_clear (self->resources);
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self, LIENG_CALLBACK_FREE, self);
-
-	/* Free callbacks. */
-	if (self->callbacks != NULL)
-		lical_callbacks_free (self->callbacks);
+	lical_callbacks_call (self->callbacks, self, "free", lical_marshal_DATA_PTR, self);
 
 	/* Free subsystems. */
 	if (self->physics != NULL)
@@ -134,21 +133,6 @@ lieng_engine_free (liengEngine* self)
 		lialg_ptrdic_free (self->selection);
 	lisys_free (self->config.dir);
 	lisys_free (self);
-}
-
-int
-lieng_engine_call (liengEngine* self,
-                   licalType    type,
-                                ...)
-{
-	int ret;
-	va_list args;
-
-	va_start (args, type);
-	ret = lical_callbacks_callva (self->callbacks, type, args);
-	va_end (args);
-
-	return ret;
 }
 
 /**
@@ -268,28 +252,6 @@ lieng_engine_find_sector (liengEngine* self,
 }
 
 /**
- * \brief Inserts an event handler callback.
- *
- * \param self Engine.
- * \param type Callback type.
- * \param priority Callback priority, smaller means called earlier.
- * \param call Function to be called.
- * \param data User data passed to the function.
- * \param result Return location for the callback data.
- * \return Nonzero on success.
- */
-int
-lieng_engine_insert_call (liengEngine* self,
-                          licalType    type,
-                          int          priority,
-                          void*        call,
-                          void*        data,
-                          licalHandle* result)
-{
-	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data, result);
-}
-
-/**
  * \brief Register a constraint.
  *
  * \param self Engine.
@@ -403,37 +365,6 @@ lieng_engine_load_sector (liengEngine* self,
 	sector = lieng_sector_new (self, id);
 
 	return sector;
-}
-
-/**
- * \brief Removes an event handler callback.
- *
- * \param self Engine.
- * \param handle Callback handle.
- */
-void
-lieng_engine_remove_call (liengEngine* self,
-                          licalHandle* handle)
-{
-	lical_callbacks_remove_callback (self->callbacks, handle);
-}
-
-/**
- * \brief Removes event handler callbacks.
- *
- * \param self Engine.
- * \param handles Callback handles.
- * \param count Number of handles.
- */
-void
-lieng_engine_remove_calls (liengEngine* self,
-                           licalHandle* handles,
-                           int          count)
-{
-	int i;
-
-	for (i = 0 ; i < count ; i++)
-		lical_callbacks_remove_callback (self->callbacks, handles + i);
 }
 
 /**
@@ -575,23 +506,6 @@ private_clear_sectors (liengEngine* self)
 static int
 private_init (liengEngine* self)
 {
-	/* Callbacks. */
-	self->callbacks = lical_callbacks_new ();
-	if (self->callbacks == NULL)
-		return 0;
-	if (!lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_FREE, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_MODEL_NEW, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_MODEL_FREE, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_NEW, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_FREE, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_MODEL, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_MOTION, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_TRANSFORM, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_OBJECT_VISIBILITY, lical_marshal_DATA_PTR_INT) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_LOAD, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIENG_CALLBACK_SECTOR_UNLOAD, lical_marshal_DATA_PTR_PTR))
-		return 0;
-
 	/* Objects. */
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)

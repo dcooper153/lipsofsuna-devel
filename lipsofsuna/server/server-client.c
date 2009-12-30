@@ -220,19 +220,18 @@ static void
 private_callbacks_setup (lisrvClient* self,
                          liengEngine* engine)
 {
-	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0, private_object_animation, self, self->calls + 0);
-	lieng_engine_insert_call (engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0, private_object_sample, self, self->calls + 1);
-	lieng_engine_insert_call (engine, LIENG_CALLBACK_OBJECT_MODEL, 0, private_object_model, self, self->calls + 2);
-	lieng_engine_insert_call (engine, LIENG_CALLBACK_OBJECT_MOTION, 0, private_object_motion, self, self->calls + 3);
-	lieng_engine_insert_call (engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 0, private_object_visibility, self, self->calls + 4);
+	lical_callbacks_insert (engine->callbacks, engine, "object-animation", 0, private_object_animation, self, self->calls + 0);
+	lical_callbacks_insert (engine->callbacks, engine, "object-effect", 0, private_object_sample, self, self->calls + 1);
+	lical_callbacks_insert (engine->callbacks, engine, "object-model", 0, private_object_model, self, self->calls + 2);
+	lical_callbacks_insert (engine->callbacks, engine, "object-motion", 0, private_object_motion, self, self->calls + 3);
+	lical_callbacks_insert (engine->callbacks, engine, "object-visibility", 0, private_object_visibility, self, self->calls + 4);
 }
 
 static void
 private_callbacks_clear (lisrvClient* self,
                          liengEngine* engine)
 {
-	lieng_engine_remove_calls (engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 }
 
 /*****************************************************************************/
@@ -431,7 +430,7 @@ private_vision_insert (lisrvClient* self,
 	}
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->server->engine, LISRV_CALLBACK_VISION_SHOW, self->object, object);
+	lical_callbacks_call (self->server->callbacks, self->server, "vision-show", lical_marshal_DATA_PTR_PTR, self->object, object);
 }
 
 static void
@@ -442,7 +441,7 @@ private_vision_remove (lisrvClient* self,
 	lialg_u32dic_remove (self->vision, object->id);
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->server->engine, LISRV_CALLBACK_VISION_HIDE, self->object, object);
+	lical_callbacks_call (self->server->callbacks, self->server, "vision-hide", lical_marshal_DATA_PTR_PTR, self->object, object);
 }
 
 static void

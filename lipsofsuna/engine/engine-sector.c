@@ -67,7 +67,7 @@ lieng_sector_new (liengEngine* engine,
 	}
 
 	/* Invoke callbacks. */
-	lieng_engine_call (engine, LIENG_CALLBACK_SECTOR_LOAD, self);
+	lical_callbacks_call (engine->callbacks, engine, "sector-load", lical_marshal_DATA_PTR, self);
 
 	return self;
 }

@@ -337,7 +337,7 @@ private_connect (lisrvNetwork*    self,
 	}
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->server->engine, LISRV_CALLBACK_CLIENT_LOGIN, object, message->NEW_USER.name, pass);
+	lical_callbacks_call (self->server->callbacks, self->server->engine, "client-login", lical_marshal_DATA_PTR_PTR_PTR, object, message->NEW_USER.name, pass);
 	lisys_free (pass);
 
 	return 1;
@@ -380,7 +380,7 @@ private_message (lisrvNetwork*    self,
 	reader->pos = 1;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->server->engine, LISRV_CALLBACK_CLIENT_PACKET, client, reader);
+	lical_callbacks_call (self->server->callbacks, self->server->engine, "client-packet", lical_marshal_DATA_PTR_PTR, client, reader);
 	liarc_reader_free (reader);
 
 	return 1;

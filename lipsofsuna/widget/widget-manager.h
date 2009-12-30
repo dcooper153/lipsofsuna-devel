@@ -26,6 +26,7 @@
 #define __WIDGET_MANAGER_H__
 
 #include <algorithm/lips-algorithm.h>
+#include <callback/lips-callback.h>
 #include <font/lips-font.h>
 #include <image/lips-image.h>
 #include "widget.h"
@@ -37,6 +38,7 @@ struct _liwdgManager
 	int width;
 	int height;
 	liwdgStyles* styles;
+	licalCallbacks* callbacks;
 	limatMatrix projection;
 	lividCalls video;
 	struct
@@ -67,8 +69,9 @@ struct _liwdgManager
 };
 
 liwdgManager*
-liwdg_manager_new (lividCalls* video,
-                   const char* path);
+liwdg_manager_new (lividCalls*     video,
+                   licalCallbacks* callbacks,
+                   const char*     path);
 
 void
 liwdg_manager_free (liwdgManager* self);

@@ -120,8 +120,8 @@ private_object_transform (licliModule*    self,
 }
 
 static int
-private_tick (licliModule* self,
-              float        secs)
+private_engine_tick (licliModule* self,
+                     float        secs)
 {
 	lirnd_render_update (self->render, secs);
 	lirnd_scene_update (self->scene, secs);
@@ -134,12 +134,12 @@ private_tick (licliModule* self,
 int
 licli_render_init (licliModule* self)
 {
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_FREE, 1, private_engine_free, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, 1, private_object_new, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, 1, private_object_free, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, 1, private_object_model, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 1, private_object_realize, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, 1, private_object_transform, self, NULL);
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_TICK, 1, private_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "engine-free", 1, private_engine_free, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "engine-tick", 1, private_engine_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "object-new", 1, private_object_new, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "object-free", 1, private_object_free, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "object-model", 1, private_object_model, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "object-visibility", 1, private_object_realize, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "object-transform", 1, private_object_transform, self, NULL);
 	return 1;
 }

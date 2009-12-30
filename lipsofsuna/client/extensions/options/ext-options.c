@@ -116,13 +116,13 @@ private_init (liextOptions* self,
 
 	/* Pack admin group. */
 	liwdg_check_set_text (LIWDG_CHECK (self->check_fsaa), "Anti-aliasing.");
-	liwdg_widget_insert_callback (self->check_fsaa, LIWDG_CALLBACK_PRESSED, 0, private_fsaa, self, NULL);
 	liwdg_check_set_text (LIWDG_CHECK (self->check_shaders), "Per-pixel lighting.");
-	liwdg_widget_insert_callback (self->check_shaders, LIWDG_CALLBACK_PRESSED, 0, private_shaders, self, NULL);
 	liwdg_check_set_text (LIWDG_CHECK (self->check_global_shadows), "Shadows for sunlight.");
-	liwdg_widget_insert_callback (self->check_global_shadows, LIWDG_CALLBACK_PRESSED, 0, private_global_shadows, self, NULL);
 	liwdg_check_set_text (LIWDG_CHECK (self->check_local_shadows), "Shadows for lamps.");
-	liwdg_widget_insert_callback (self->check_local_shadows, LIWDG_CALLBACK_PRESSED, 0, private_local_shadows, self, NULL);
+	liwdg_widget_insert_callback (self->check_fsaa, "pressed", private_fsaa, self);
+	liwdg_widget_insert_callback (self->check_shaders, "pressed", private_shaders, self);
+	liwdg_widget_insert_callback (self->check_global_shadows, "pressed", private_global_shadows, self);
+	liwdg_widget_insert_callback (self->check_local_shadows, "pressed", private_local_shadows, self);
 	liwdg_group_set_child (LIWDG_GROUP (self->group), 0, 0, self->check_fsaa);
 	liwdg_group_set_child (LIWDG_GROUP (self->group), 0, 1, self->check_shaders);
 	liwdg_group_set_child (LIWDG_GROUP (self->group), 0, 2, self->check_local_shadows);

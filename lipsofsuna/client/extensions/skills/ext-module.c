@@ -73,10 +73,8 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 0,
-	     	private_packet, self, self->calls + 0) ||
-	    !lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 0,
-	     	private_visibility, self, self->calls + 1))
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 0, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "object-visibility", 0, private_visibility, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -97,8 +95,7 @@ liext_module_free (liextModule* self)
 	LI_FOREACH_U32DIC (iter, self->dictionary)
 		liext_skills_free (iter.value);
 	lialg_u32dic_free (self->dictionary);
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

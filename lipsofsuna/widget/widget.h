@@ -26,7 +26,6 @@
 #define __WIDGET_H__
 
 #include <SDL.h>
-#include <callback/lips-callback.h>
 #include "widget-class.h"
 #include "widget-event.h"
 #include "widget-manager.h"
@@ -37,7 +36,6 @@
 struct _liwdgWidget
 {
 	const liwdgClass* type;
-	licalCallbacks* callbacks;
 	liwdgManager* manager;
 	liwdgWidget* parent;
 	liwdgWidget* prev;
@@ -65,6 +63,13 @@ void
 liwdg_widget_free (liwdgWidget* self);
 
 int
+liwdg_widget_connect (liwdgWidget* self,
+                      const char*  type,
+                      void*        func,
+                      void*        data,
+                      licalHandle* handle);
+
+int
 liwdg_widget_detach (liwdgWidget* self);
 
 int
@@ -73,11 +78,17 @@ liwdg_widget_event (liwdgWidget* self,
 
 int
 liwdg_widget_insert_callback (liwdgWidget* self,
-                              licalType    type,
-                              int          priority,
-                              void*        call,
-                              void*        data,
-                              licalHandle* result);
+                              const char*  type,
+                              void*        func,
+                              void*        data);
+
+int
+liwdg_widget_insert_callback_full (liwdgWidget* self,
+                                   const char*  type,
+                                   int          priority,
+                                   void*        func,
+                                   void*        data,
+                                   licalHandle* handle);
 
 void
 liwdg_widget_move (liwdgWidget* self,
@@ -87,15 +98,6 @@ liwdg_widget_move (liwdgWidget* self,
 void
 liwdg_widget_paint (liwdgWidget* self,
                     liwdgRect*   rect);
-
-int
-liwdg_widget_register_callback (liwdgWidget* self,
-                                licalType    type,
-                                licalMarshal marshal);
-
-void
-liwdg_widget_remove_callback (liwdgWidget* self,
-                              licalHandle* handle);
 
 void
 liwdg_widget_render (liwdgWidget* self);

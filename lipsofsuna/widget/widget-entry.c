@@ -139,9 +139,6 @@ static int
 private_init (liwdgEntry*   self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_ACTIVATED, lical_marshal_DATA) ||
-	    !liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_EDITED, lical_marshal_DATA))
-		return 0;
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->editable = 1;
 	self->string = lisys_calloc (1, sizeof (char));
@@ -203,7 +200,7 @@ private_event (liwdgEntry* self,
 					private_backspace (self);
 					return 0;
 				case SDLK_RETURN:
-					lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_ACTIVATED);
+					lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "activated", lical_marshal_DATA_PTR, self);
 					return 1;
 				default:
 					break;
@@ -222,7 +219,7 @@ private_event (liwdgEntry* self,
 					}
 					lisys_free (str);
 					private_rebuild (self);
-					lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_EDITED);
+					lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "edited", lical_marshal_DATA_PTR, self);
 				}
 			}
 			return 0;
@@ -291,7 +288,8 @@ private_backspace (liwdgEntry* self)
 	/* Discard the last character. */
 	self->string[len0 - len1] = '\0';
 	private_rebuild (self);
-	lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_EDITED);
+	lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self,
+		"edited", lical_marshal_DATA_PTR, self);
 }
 
 static void

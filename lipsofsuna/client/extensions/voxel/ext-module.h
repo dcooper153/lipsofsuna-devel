@@ -40,8 +40,7 @@ typedef struct _liextModule liextModule;
 struct _liextModule
 {
 	lialgMemdic* blocks;
-	licalHandle calls[2];
-	licalHandle calls1[2];
+	licalHandle calls[4];
 	licliModule* module;
 	livoxManager* voxels;
 };

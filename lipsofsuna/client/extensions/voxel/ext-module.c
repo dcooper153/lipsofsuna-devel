@@ -88,21 +88,11 @@ liext_module_new (licliModule* module)
 		return NULL;
 	}
 
-	/* Register module callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 1,
-	     	private_packet, self, self->calls + 0) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 1,
-	     	private_tick, self, self->calls + 1))
-	{
-		liext_module_free (self);
-		return NULL;
-	}
-
-	/* Register voxel callbacks. */
-	if (!lical_callbacks_insert_callback (self->voxels->callbacks, LIVOX_CALLBACK_FREE_BLOCK, 1,
-	     	private_block_free, self, self->calls1 + 0) ||
-	    !lical_callbacks_insert_callback (self->voxels->callbacks, LIVOX_CALLBACK_LOAD_BLOCK, 1,
-	     	private_block_load, self, self->calls1 + 1))
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 1, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 1, private_tick, self, self->calls + 1) ||
+	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-free", 1, private_block_free, self, self->calls + 2) ||
+	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 1, private_block_load, self, self->calls + 3))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -119,13 +109,8 @@ liext_module_free (liextModule* self)
 {
 	lialgMemdicIter iter;
 
-	/* FIXME: Remove the class here. */
-
 	/* Free callbacks. */
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
-	lical_callbacks_remove_callbacks (self->voxels->callbacks, self->calls1,
-		sizeof (self->calls1) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 
 	/* Free blocks. */
 	if (self->blocks != NULL)

@@ -184,8 +184,8 @@ liext_brushes_new (liwdgManager* manager,
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	liwdg_widget_insert_callback (data->widgets.preview, LIEXT_CALLBACK_PRESSED, 0, private_paint_terrain, self, NULL);
-	liwdg_widget_insert_callback (data->widgets.preview, LIEXT_CALLBACK_TRANSFORM, 0, private_transform, self, NULL);
+	liwdg_widget_insert_callback (data->widgets.preview, "pressed", private_paint_terrain, self);
+	liwdg_widget_insert_callback (data->widgets.preview, "transform", private_transform, self);
 	liwdg_widget_set_request (data->widgets.preview, 440, 240);
 	liwdg_group_set_child (LIWDG_GROUP (data->widgets.group_view), 0, 1, data->widgets.preview);
 	data->generator = LIEXT_PREVIEW (data->widgets.preview)->generator;
@@ -280,11 +280,11 @@ private_init (liextBrushes* self,
 
 	/* Configure widgets. */
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_size), "Size:");
-	liwdg_widget_insert_callback (self->widgets.entry_name, LIWDG_CALLBACK_EDITED, 0, private_rename, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.tree, LIWDG_CALLBACK_PRESSED, 0, private_selected, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.spin_sizex, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.spin_sizey, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.spin_sizez, LIWDG_CALLBACK_PRESSED, 0, private_resize_brush, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.entry_name, "edited", private_rename, self);
+	liwdg_widget_insert_callback (self->widgets.tree, "pressed", private_selected, self);
+	liwdg_widget_insert_callback (self->widgets.spin_sizex, "pressed", private_resize_brush, self);
+	liwdg_widget_insert_callback (self->widgets.spin_sizey, "pressed", private_resize_brush, self);
+	liwdg_widget_insert_callback (self->widgets.spin_sizez, "pressed", private_resize_brush, self);
 
 	/* Paint. */
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Copy");
@@ -294,12 +294,12 @@ private_init (liextBrushes* self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[4]), "Replace");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[5]), "Rotate");
 	liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_axis), 1);
-	liwdg_widget_insert_callback (self->widgets.button_paint[0], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[1], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[2], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[3], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[4], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_paint[5], LIWDG_CALLBACK_PRESSED, 0, private_paint_select, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_paint[0], "pressed", private_paint_select, self);
+	liwdg_widget_insert_callback (self->widgets.button_paint[1], "pressed", private_paint_select, self);
+	liwdg_widget_insert_callback (self->widgets.button_paint[2], "pressed", private_paint_select, self);
+	liwdg_widget_insert_callback (self->widgets.button_paint[3], "pressed", private_paint_select, self);
+	liwdg_widget_insert_callback (self->widgets.button_paint[4], "pressed", private_paint_select, self);
+	liwdg_widget_insert_callback (self->widgets.button_paint[5], "pressed", private_paint_select, self);
 	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_paint), 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 0, self->widgets.button_paint[0]);
@@ -316,9 +316,9 @@ private_init (liextBrushes* self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_add), "Add");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_copy), "Copy");
 	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_remove), "Remove");
-	liwdg_widget_insert_callback (self->widgets.button_add, LIWDG_CALLBACK_PRESSED, 0, private_add, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_copy, LIWDG_CALLBACK_PRESSED, 0, private_copy, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.button_remove, LIWDG_CALLBACK_PRESSED, 0, private_remove, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.button_add, "pressed", private_add, self);
+	liwdg_widget_insert_callback (self->widgets.button_copy, "pressed", private_copy, self);
+	liwdg_widget_insert_callback (self->widgets.button_remove, "pressed", private_remove, self);
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.view);
@@ -331,10 +331,10 @@ private_init (liextBrushes* self,
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_objextra), "Extra:");
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_objprob), "Probability:");
 	liwdg_label_set_text (LIWDG_LABEL (self->widgets.label_objtype), "Type:");
-	liwdg_widget_insert_callback (self->widgets.check_required, LIWDG_CALLBACK_PRESSED, 0, private_stroke_flags, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.entry_objextra, LIWDG_CALLBACK_EDITED, 0, private_object_info, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.entry_objtype, LIWDG_CALLBACK_EDITED, 0, private_object_info, self, NULL);
-	liwdg_widget_insert_callback (self->widgets.scroll_objprob, LIWDG_CALLBACK_PRESSED, 0, private_object_info, self, NULL);
+	liwdg_widget_insert_callback (self->widgets.check_required, "pressed", private_stroke_flags, self);
+	liwdg_widget_insert_callback (self->widgets.entry_objextra, "edited", private_object_info, self);
+	liwdg_widget_insert_callback (self->widgets.entry_objtype, "edited", private_object_info, self);
+	liwdg_widget_insert_callback (self->widgets.scroll_objprob, "pressed", private_object_info, self);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_size), 0, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self->widgets.group_size), 0, 1);
 	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_size), 1);

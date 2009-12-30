@@ -69,8 +69,7 @@ liext_reload_new (licliModule* module)
 	lirel_reload_set_model_callback (self->reload, private_reload_model, self);
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
-	     	private_callback_tick, self, self->calls + 0))
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "tick", 0, private_callback_tick, self, self->calls + 0))
 	{
 		liext_reload_free (self);
 		return NULL;
@@ -87,8 +86,7 @@ liext_reload_free (liextReload* self)
 		liext_reload_cancel (self);
 		lirel_reload_free (self->reload);
 	}
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

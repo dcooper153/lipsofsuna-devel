@@ -100,7 +100,7 @@ lieng_object_new (liengEngine*     engine,
 	}
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-new", lical_marshal_DATA_PTR, self);
 
 	return self;
 
@@ -130,7 +130,7 @@ lieng_object_free (liengObject* self)
 	lieng_object_set_selected (self, 0);
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_FREE, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-free", lical_marshal_DATA_PTR, self);
 
 	/* Free constraints. */
 	/* FIXME: Would be better to have objects remember their own constraints. */
@@ -333,7 +333,7 @@ lieng_object_moved (liengObject* self)
 	self->smoothing.target = transform;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MOTION, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-motion", lical_marshal_DATA_PTR, self);
 
 	return 1;
 }
@@ -377,7 +377,7 @@ lieng_object_update (liengObject* self,
 			private_warp (self, &transform.position);
 
 			/* Invoke callbacks. */
-			lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, &transform);
+			lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, &transform);
 		}
 	}
 }
@@ -677,7 +677,7 @@ lieng_object_set_model (liengObject* self,
 	}
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_MODEL, self, model);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, &model);
 
 	return 1;
 }
@@ -794,7 +794,7 @@ lieng_object_set_realized (liengObject* self,
 		}
 
 		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 1);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
 
 		/* Protect from deletion. */
 		lieng_object_ref (self, 1);
@@ -802,7 +802,7 @@ lieng_object_set_realized (liengObject* self,
 	else
 	{
 		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, self, 0);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
 
 		/* Deactivate physics. */
 		liphy_object_set_realized (self->physics, 0);
@@ -1003,7 +1003,7 @@ lieng_object_set_transform (liengObject*          self,
 			private_warp (self, &value->position);
 
 		/* Invoke callbacks. */
-		lieng_engine_call (self->engine, LIENG_CALLBACK_OBJECT_TRANSFORM, self, value);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
 	}
 	self->smoothing.target = *value;
 

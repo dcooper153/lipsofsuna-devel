@@ -162,26 +162,24 @@ liwdg_widget_event (liwdgWidget* self,
 	return self->type->event (self, event);
 }
 
-/**
- * \brief Adds a callback handler.
- *
- * \param self Widget.
- * \param type Callback type.
- * \param priority Callback priority, smaller means called earlier.
- * \param call Function to be called.
- * \param data User data passed to the function.
- * \param result Return location for the callback data.
- * \return Nonzero on success.
- */
 int
 liwdg_widget_insert_callback (liwdgWidget* self,
-                              licalType    type,
-                              int          priority,
-                              void*        call,
-                              void*        data,
-                              licalHandle* result)
+                              const char*  type,
+                              void*        func,
+                              void*        data)
 {
-	return lical_callbacks_insert_callback (self->callbacks, type, priority, call, data, result);
+	return lical_callbacks_insert (self->manager->callbacks, self, type, 0, func, data, NULL);
+}
+
+int
+liwdg_widget_insert_callback_full (liwdgWidget* self,
+                                   const char*  type,
+                                   int          priority,
+                                   void*        func,
+                                   void*        data,
+                                   licalHandle* handle)
+{
+	return lical_callbacks_insert (self->manager->callbacks, self, type, priority, func, data, handle);
 }
 
 void
@@ -335,38 +333,6 @@ liwdg_widget_paint (liwdgWidget* self,
 		glTexCoord2f (fu   , fv   ); glVertex2f (px + fw, py + fh);
 		glEnd ();
 	}
-}
-
-/**
- * \brief Registers a callback type.
- *
- * This is usually called in the class constructor to add type specific
- * callbacks to inherited widget classes.
- *
- * \param self Widget.
- * \param type Callback type.
- * \param marshal Callback parameter convention.
- * \return Nonzero on success.
- */
-int
-liwdg_widget_register_callback (liwdgWidget* self,
-                                licalType    type,
-                                licalMarshal marshal)
-{
-	return lical_callbacks_insert_type (self->callbacks, type, marshal);
-}
-
-/**
- * \brief Removes a callback handler.
- *
- * \param self Widget.
- * \param handle Callback handle.
- */
-void
-liwdg_widget_remove_callback (liwdgWidget* self,
-                              licalHandle* handle)
-{
-	lical_callbacks_remove_callback (self->callbacks, handle);
 }
 
 void
@@ -809,17 +775,12 @@ private_init (liwdgWidget*  self,
 	self->userrequest.height = -1;
 	self->manager = manager;
 	self->visible = 1;
-	self->callbacks = lical_callbacks_new ();
-	if (self->callbacks == NULL)
-		return 0;
 	return 1;
 }
 
 static void
 private_free (liwdgWidget* self)
 {
-	if (self->callbacks != NULL)
-		lical_callbacks_free (self->callbacks);
 	lisys_free (self->style_name);
 	lisys_free (self->state_name);
 }

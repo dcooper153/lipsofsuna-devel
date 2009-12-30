@@ -143,6 +143,10 @@ lisrv_server_free (lisrvServer* self)
 	if (self->config.host != NULL)
 		licfg_host_free (self->config.host);
 
+	/* Free callbacks. */
+        if (self->callbacks != NULL)
+                lical_callbacks_free (self->callbacks);
+
 	/* Free helpers. */
 	if (self->helper.resources != NULL)
 		liarc_writer_free (self->helper.resources);
@@ -379,7 +383,7 @@ lisrv_server_update (lisrvServer* self,
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
 	lisrv_network_update (self->network, secs);
-	lieng_engine_call (self->engine, LISRV_CALLBACK_TICK, secs);
+	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
 
 	return !self->quit;
 }
@@ -506,24 +510,20 @@ private_init_engine (lisrvServer* self)
 	liengModel* model;
 	liengSample* sample;
 
+	/* Initialize callbacks. */
+	self->callbacks = lical_callbacks_new ();
+	if (self->callbacks == NULL)
+		return 0;
+
 	/* Create engine. */
-	self->engine = lieng_engine_new (self->paths->module_data);
+	self->engine = lieng_engine_new (self->callbacks, self->paths->module_data);
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
 	lieng_engine_set_userdata (self->engine, LIENG_DATA_SERVER, self);
 
-	/* Initialize callbacks. */
-	if (!lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_CONTROL, lical_marshal_DATA_PTR_PTR_INT) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGIN, lical_marshal_DATA_PTR_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_LOGOUT, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_CLIENT_PACKET, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_TICK, lical_marshal_DATA_FLT) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_CLIENT, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_ANIMATION, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_OBJECT_SAMPLE, lical_marshal_DATA_PTR_PTR_INT) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_HIDE, lical_marshal_DATA_PTR_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LISRV_CALLBACK_VISION_SHOW, lical_marshal_DATA_PTR_PTR))
+	/* Connect callbacks. */
+	if (!lisrv_server_init_callbacks_client (self))
 		return 0;
 
 	/* Load resources. */
@@ -616,8 +616,6 @@ private_init_script (lisrvServer* self)
 	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
 	    !liscr_script_create_class (self->script, "Server", lisrvServerScript, self) ||
 	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script))
-		return 0;
-	if (!lisrv_server_init_callbacks_client (self))
 		return 0;
 
 	/* Load the script. */

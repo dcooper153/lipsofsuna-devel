@@ -62,7 +62,7 @@ void
 lieng_model_free (liengModel* self)
 {
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_MODEL_FREE, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
 	/* Free data. */
 	if (self->physics != NULL)
@@ -94,7 +94,7 @@ lieng_model_load (liengModel* self)
 		goto error;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_MODEL_NEW, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
 
 	return 1;
 
@@ -111,7 +111,7 @@ lieng_model_unload (liengModel* self)
 		return;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LIENG_CALLBACK_MODEL_FREE, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
 	if (self->physics != NULL)
 	{

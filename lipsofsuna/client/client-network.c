@@ -340,7 +340,7 @@ private_message (licliNetwork*    self,
 	reader->pos = 1;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->module->engine, LICLI_CALLBACK_PACKET, data[0], reader);
+	lical_callbacks_call (self->module->callbacks, self->module->engine, "packet", lical_marshal_DATA_INT_PTR, (int) data[0], reader);
 	liarc_reader_free (reader);
 
 	return 1;

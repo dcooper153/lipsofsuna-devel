@@ -113,8 +113,6 @@ static int
 private_init (liwdgCheck*   self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA))
-		return 0;
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
@@ -153,12 +151,12 @@ private_event (liwdgCheck* self,
 				return 1;
 			self->active = !self->active;
 			private_rebuild (self);
-			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
+			lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 			return 0;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 			self->active = !self->active;
 			private_rebuild (self);
-			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
+			lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
 			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);

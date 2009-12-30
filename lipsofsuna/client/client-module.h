@@ -26,6 +26,7 @@
 #define __CLIENT_MODULE_H__
 
 #include <algorithm/lips-algorithm.h>
+#include <callback/lips-callback.h>
 #include <binding/lips-binding.h>
 #include <engine/lips-engine.h>
 #include <paths/lips-paths.h>
@@ -54,6 +55,7 @@ struct _licliModule
 	lialgCamera* camera;
 	lialgStrdic* extensions;
 	libndManager* bindings;
+	licalCallbacks* callbacks;
 	licliClient* client;
 	licliNetwork* network;
 	licliWindow* window;

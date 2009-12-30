@@ -47,8 +47,7 @@ liext_skeleton_new (lisrvServer* server)
 	self->server = server;
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 1,
-	     	private_client_packet, self, self->calls + 0))
+	if (!lical_callbacks_insert (server->callbacks, server->engine, "client-packet", 1, private_client_packet, self, self->calls + 0))
 	{
 		liext_skeleton_free (self);
 		return NULL;
@@ -60,8 +59,7 @@ liext_skeleton_new (lisrvServer* server)
 void
 liext_skeleton_free (liextSkeleton* self)
 {
-	lieng_engine_remove_calls (self->server->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

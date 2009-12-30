@@ -96,24 +96,15 @@ liext_module_new (lisrvServer* server)
 	liscr_script_create_class (script, "Events", liextEventsScript, self);
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_ANIMATION, 0,
-	     	private_animation, self, self->calls + 0) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_CONTROL, 0,
-	     	private_control, self, self->calls + 1) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 0,
-	     	private_login, self, self->calls + 2) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGOUT, 0,
-	     	private_logout, self, self->calls + 3) ||
-	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_MOTION, 0,
-	     	private_motion, self, self->calls + 4) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 5,
-	     	private_packet, self, self->calls + 5) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_SAMPLE, 0,
-	     	private_sample, self, self->calls + 6) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 7) ||
-	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 0,
-	     	private_visibility, self, self->calls + 8))
+	if (!lical_callbacks_insert (server->callbacks, server->engine, "object-animation", 0, private_animation, self, self->calls + 0) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "client-control", 0, private_control, self, self->calls + 1) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "client-login", 0, private_login, self, self->calls + 2) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "client-logout", 0, private_logout, self, self->calls + 3) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "object-motion", 0, private_motion, self, self->calls + 4) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "client-packet", 5, private_packet, self, self->calls + 5) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "object-effect", 0, private_sample, self, self->calls + 6) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 7) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "object-visibility", 0, private_visibility, self, self->calls + 8))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -138,11 +129,7 @@ liext_module_new (lisrvServer* server)
 void
 liext_module_free (liextModule* self)
 {
-	/* Remove callbacks. */
-	lieng_engine_remove_calls (self->server->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
-
-	/* FIXME: Remove the class here. */
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

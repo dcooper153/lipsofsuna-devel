@@ -96,8 +96,6 @@ static int
 private_init (liwdgButton*  self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
-		return 0;
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
@@ -136,13 +134,13 @@ private_event (liwdgButton* self,
 		case LIWDG_EVENT_TYPE_KEY_PRESS:
 			if (event->key.keycode != SDLK_RETURN)
 				return 1;
-			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 		case LIWDG_EVENT_TYPE_KEY_RELEASE:
 			if (event->key.keycode != SDLK_RETURN)
 				return 1;
 			return 0;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:

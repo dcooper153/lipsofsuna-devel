@@ -177,7 +177,7 @@ static void Button_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);
@@ -237,7 +237,7 @@ static void Entry_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_ACTIVATED, 0, private_callback_activated, data, NULL);
+	liwdg_widget_insert_callback (self, "activated", private_callback_activated, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);
@@ -309,7 +309,7 @@ static void Image_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);
@@ -369,7 +369,7 @@ static void Label_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);
@@ -576,7 +576,7 @@ static void Scroll_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);
@@ -660,7 +660,7 @@ static void Spin_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed, data, NULL);
+	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);
@@ -770,7 +770,7 @@ static void Tree_new (liscrArgs* args)
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
-	liwdg_widget_insert_callback (self, LIWDG_CALLBACK_PRESSED, 0, private_callback_pressed_tree, data, NULL);
+	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed_tree, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);	
 	liscr_data_unref (data, NULL);

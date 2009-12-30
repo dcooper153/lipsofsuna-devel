@@ -101,8 +101,6 @@ static int
 private_init (liwdgScroll*    self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
-		return 0;
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
 	self->min = 0.0f;
@@ -136,7 +134,7 @@ private_event (liwdgScroll*  self,
 			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 			self->value = self->min + (self->max - self->min) * (event->button.x - rect.x) / rect.width;
 			private_rebuild (self);
-			lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self);
+			lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);

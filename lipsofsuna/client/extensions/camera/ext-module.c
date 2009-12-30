@@ -52,8 +52,7 @@ liext_module_new (licliModule* module)
 	self->module = module;
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 0))
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "tick", 0, private_tick, self, self->calls + 0))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -68,9 +67,7 @@ liext_module_new (licliModule* module)
 void
 liext_module_free (liextModule* self)
 {
-	/* FIXME: Remove the class here. */
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

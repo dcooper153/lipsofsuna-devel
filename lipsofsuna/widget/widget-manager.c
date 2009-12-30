@@ -68,12 +68,14 @@ private_load_config (liwdgManager* self,
  * \brief Creates a new widget manager.
  *
  * \param video Video callbacks.
+ * \param callbacks Callback manager.
  * \param root Client data directory root.
  * \return New widget manager or NULL.
  */
 liwdgManager*
-liwdg_manager_new (lividCalls* video,
-                   const char* root)
+liwdg_manager_new (lividCalls*     video,
+                   licalCallbacks* callbacks,
+                   const char*     root)
 {
 	liwdgManager* self;
 
@@ -81,6 +83,7 @@ liwdg_manager_new (lividCalls* video,
 	self = lisys_calloc (1, sizeof (liwdgManager));
 	if (self == NULL)
 		return NULL;
+	self->callbacks = callbacks;
 	self->width = 640;
 	self->height = 480;
 	self->video = *video;

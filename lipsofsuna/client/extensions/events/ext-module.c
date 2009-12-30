@@ -71,16 +71,11 @@ liext_module_new (licliModule* module)
 	self->module = module;
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_MODEL, 2,
-	     	private_object_model, self, self->calls + 0) ||
-	    !lieng_engine_insert_call (module->engine, LIENG_CALLBACK_OBJECT_NEW, 2,
-	     	private_object_new, self, self->calls + 1) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 2,
-	     	private_packet, self, self->calls + 2) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_SELECT, 2,
-	     	private_select, self, self->calls + 3) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 2,
-	     	private_tick, self, self->calls + 4))
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "object-model", 2, private_object_model, self, self->calls + 0) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "object-new", 2, private_object_new, self, self->calls + 1) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "packet", 2, private_packet, self, self->calls + 2) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "select", 2, private_select, self, self->calls + 3) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 2, private_tick, self, self->calls + 4))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -109,11 +104,7 @@ liext_module_new (licliModule* module)
 void
 liext_module_free (liextModule* self)
 {
-	/* Remove callbacks. */
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
-
-	/* FIXME: Remove the class here. */
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

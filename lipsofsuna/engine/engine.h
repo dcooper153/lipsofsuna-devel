@@ -64,15 +64,11 @@ struct _liengEngine
 };
 
 liengEngine*
-lieng_engine_new (const char* path);
+lieng_engine_new (licalCallbacks* calls,
+                  const char*     path);
 
 void
 lieng_engine_free (liengEngine* self);
-
-int
-lieng_engine_call (liengEngine* self,
-                   licalType    type,
-                                ...);
 
 void
 lieng_engine_clear_selection (liengEngine* self);
@@ -105,14 +101,6 @@ liengSector*
 lieng_engine_find_sector (liengEngine* self,
                           uint32_t     id);
 
-int
-lieng_engine_insert_call (liengEngine* self,
-                          licalType    type,
-                          int          priority,
-                          void*        call,
-                          void*        data,
-                          licalHandle* result);
-
 void
 lieng_engine_insert_constraint (liengEngine*     self,
                                 liengConstraint* constraint);
@@ -128,15 +116,6 @@ lieng_engine_load_resources (liengEngine* self,
 liengSector*
 lieng_engine_load_sector (liengEngine* self,
                           uint32_t     id);
-
-void
-lieng_engine_remove_call (liengEngine* self,
-                          licalHandle* handle);
-
-void
-lieng_engine_remove_calls (liengEngine* self,
-                           licalHandle* handles,
-                           int          count);
 
 void
 lieng_engine_remove_constraint (liengEngine*     self,

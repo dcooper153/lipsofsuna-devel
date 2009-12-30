@@ -164,6 +164,8 @@ licli_module_free (licliModule* self)
 		lithr_thread_free (self->server_thread);
 	}
 	assert (self->server == NULL);
+	if (self->callbacks != NULL)
+		lical_callbacks_free (self->callbacks);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
 	lisys_free (self->camera_node);
@@ -458,10 +460,10 @@ licli_module_update (licliModule* self,
 
 	/* Invoke input callbacks. */
 	while (self->client->video.SDL_PollEvent (&event))
-		lieng_engine_call (self->engine, LICLI_CALLBACK_EVENT, &event);
+		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
 
 	/* Invoke tick callbacks. */
-	lieng_engine_call (self->engine, LICLI_CALLBACK_TICK, secs);
+	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
 
 	return 1;
 }
@@ -567,8 +569,13 @@ private_init_engine (licliModule* self)
 {
 	int flags;
 
+	/* Initialize callbacks. */
+	self->callbacks = lical_callbacks_new ();
+	if (self->callbacks == NULL)
+		return 0;
+
 	/* Initialize engine. */
-	self->engine = lieng_engine_new (self->paths->module_data);
+	self->engine = lieng_engine_new (self->callbacks, self->paths->module_data);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);
@@ -576,14 +583,7 @@ private_init_engine (licliModule* self)
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
 	lieng_engine_set_userdata (self->engine, LIENG_DATA_CLIENT, self);
 
-	/* Initialize callbacks. */
-	if (!lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_EVENT, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_PACKET, lical_marshal_DATA_INT_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_SELECT, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_RENDER_2D, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_RENDER_3D, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->engine->callbacks, LICLI_CALLBACK_TICK, lical_marshal_DATA_FLT))
-		return 0;
+	/* Connect callbacks. */
 	if (!licli_module_init_callbacks_binding (self) ||
 	    !licli_module_init_callbacks_misc (self) ||
 	    !licli_module_init_callbacks_widget (self) ||
@@ -670,7 +670,7 @@ private_init_script (licliModule* self)
 static int
 private_init_widgets (licliModule* self)
 {
-	self->widgets = liwdg_manager_new (&self->client->video, self->path);
+	self->widgets = liwdg_manager_new (&self->client->video, self->callbacks, self->path);
 	if (self->widgets == NULL)
 		return 0;
 	liwdg_manager_set_size (self->widgets, self->window->mode.width, self->window->mode.height);

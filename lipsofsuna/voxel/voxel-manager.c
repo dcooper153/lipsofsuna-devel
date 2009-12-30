@@ -80,12 +80,6 @@ livox_manager_new ()
 		livox_manager_free (self);
 		return NULL;
 	}
-	if (!lical_callbacks_insert_type (self->callbacks, LIVOX_CALLBACK_FREE_BLOCK, lical_marshal_DATA_PTR) ||
-	    !lical_callbacks_insert_type (self->callbacks, LIVOX_CALLBACK_LOAD_BLOCK, lical_marshal_DATA_PTR))
-	{
-		livox_manager_free (self);
-		return NULL;
-	}
 
 	return self;
 }
@@ -103,8 +97,6 @@ livox_manager_free (livoxManager* self)
 		private_clear_sectors (self);
 		lialg_u32dic_free (self->sectors);
 	}
-	if (self->callbacks != NULL)
-		lical_callbacks_free (self->callbacks);
 	lisys_free (self);
 }
 

@@ -97,7 +97,7 @@ private_client_client_packet (lisrvServer* server,
 			!liarc_reader_check_end (reader))
 			return 1;
 		tmp = limat_quaternion_init (x / 127.0f, y / 127.0f, z / 127.0f, w / 127.0f);
-		lieng_engine_call (server->engine, LISRV_CALLBACK_CLIENT_CONTROL, client->object, &tmp, flags);
+		lical_callbacks_call (server->callbacks, server->engine, "client-control", lical_marshal_DATA_PTR_PTR_INT, client->object, &tmp, flags);
 	}
 
 	return 1;
@@ -290,13 +290,13 @@ private_sector_load (lisrvServer* server,
 int
 lisrv_server_init_callbacks_client (lisrvServer* server)
 {
-	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 0, private_client_client_login, server, NULL);
-	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 0, private_client_client_packet, server, NULL);
-	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_HIDE, 0, private_client_vision_hide, server, NULL);
-	lieng_engine_insert_call (server->engine, LISRV_CALLBACK_VISION_SHOW, 0, private_client_vision_show, server, NULL);
-	lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_FREE, 65535, private_object_free, server, NULL);
-	lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_NEW, -65535, private_object_new, server, NULL);
-	lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, -65535, private_sector_load, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "client-login", 0, private_client_client_login, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "client-packet", 0, private_client_client_packet, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "vision-hide", 0, private_client_vision_hide, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "vision-show", 0, private_client_vision_show, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "object-free", 65535, private_object_free, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "object-new", -65535, private_object_new, server, NULL);
+	lical_callbacks_insert (server->callbacks, server->engine, "sector-load", -65535, private_sector_load, server, NULL);
 	return 1;
 }
 

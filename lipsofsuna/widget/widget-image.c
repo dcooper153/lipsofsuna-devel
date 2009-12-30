@@ -84,8 +84,6 @@ static int
 private_init (liwdgImage*   self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA))
-		return 0;
 	self->image = lisys_calloc (1, 1);
 	if (self->image == NULL)
 		return 0;
@@ -109,9 +107,9 @@ private_event (liwdgImage* self,
 		case LIWDG_EVENT_TYPE_KEY_PRESS:
 			if (event->key.keycode != SDLK_RETURN)
 				return 1;
-			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 		case LIWDG_EVENT_TYPE_RENDER:
 			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			return 1;

@@ -329,8 +329,6 @@ static int
 private_init (liwdgTree*    self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR_PTR))
-		return 0;
 	self->root.tree = self;
 	self->root.depth = 0;
 	self->root.expand = 1;
@@ -368,8 +366,7 @@ private_event (liwdgTree*  self,
 				private_rebuild (self);
 				return 0;
 			}
-			else
-				return lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self, row);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self, row);
 		case LIWDG_EVENT_TYPE_RENDER:
 			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			/* Draw base. */

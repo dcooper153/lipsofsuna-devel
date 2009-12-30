@@ -135,29 +135,15 @@ liext_module_new (lisrvServer* server)
 		}
 	}
 
-	/* Register engine callbacks. */
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_LOGIN, 1,
-	     	private_object_client_login, self, self->calls + 0) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_OBJECT_CLIENT, 1,
-	     	private_object_client, self, self->calls + 1) ||
-	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_MOTION, 1,
-	     	private_object_motion, self, self->calls + 2) ||
-	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_OBJECT_VISIBILITY, 1,
-	     	private_object_visibility, self, self->calls + 3) ||
-	    !lieng_engine_insert_call (server->engine, LIENG_CALLBACK_SECTOR_LOAD, 0,
-	     	private_sector_load, self, self->calls + 4) ||
-	    !lieng_engine_insert_call (server->engine, LISRV_CALLBACK_TICK, 0,
-	     	private_tick, self, self->calls + 5))
-	{
-		liext_module_free (self);
-		return NULL;
-	}
-
-	/* Register voxel callbacks. */
-	if (!lical_callbacks_insert_callback (self->voxels->callbacks, LIVOX_CALLBACK_FREE_BLOCK, 0,
-	     	private_block_free, self, self->calls1 + 0) ||
-	    !lical_callbacks_insert_callback (self->voxels->callbacks, LIVOX_CALLBACK_LOAD_BLOCK, 0,
-	     	private_block_load, self, self->calls1 + 1))
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (server->callbacks, server->engine, "client-login", 1, private_object_client_login, self, self->calls + 0) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "object-client", 1, private_object_client, self, self->calls + 1) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "object-motion", 1, private_object_motion, self, self->calls + 2) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "object-visibility", 1, private_object_visibility, self, self->calls + 3) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "sector-load", 0, private_sector_load, self, self->calls + 4) ||
+	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 5) ||
+	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-free", 0, private_block_free, self, self->calls + 6) ||
+	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 0, private_block_load, self, self->calls + 7))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -177,8 +163,6 @@ liext_module_free (liextModule* self)
 	lialgMemdicIter iter0;
 	lialgPtrdicIter iter1;
 
-	/* FIXME: Remove the class here. */
-
 	if (self->blocks != NULL)
 	{
 		LI_FOREACH_MEMDIC (iter0, self->blocks)
@@ -191,17 +175,11 @@ liext_module_free (liextModule* self)
 			liext_listener_free (iter1.value);
 		lialg_ptrdic_free (self->listeners);
 	}
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	if (self->voxels != NULL)
-	{
-		lical_callbacks_remove_callbacks (self->voxels->callbacks, self->calls1,
-			sizeof (self->calls1) / sizeof (licalHandle));
 		livox_manager_free (self->voxels);
-	}
 	if (self->assign_packet != NULL)
 		liarc_writer_free (self->assign_packet);
-
-	lieng_engine_remove_calls (self->server->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
 
 	lisys_free (self);
 }

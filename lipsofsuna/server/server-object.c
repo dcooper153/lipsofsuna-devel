@@ -128,7 +128,7 @@ lisrv_object_animate (liengObject* self,
 		tmp.channel = channel;
 		tmp.permanent = permanent;
 		tmp.priority = priority;
-		lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_ANIMATION, self, &tmp);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "object-animation", lical_marshal_DATA_PTR_PTR, self, &tmp);
 	}
 
 	return 1;
@@ -146,7 +146,7 @@ lisrv_object_disconnect (liengObject* self)
 
 	if (data->client != NULL)
 	{
-		lieng_engine_call (self->engine, LISRV_CALLBACK_CLIENT_LOGOUT, self);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "client-logout", lical_marshal_DATA_PTR, self);
 		lisrv_client_free (data->client);
 		data->client = NULL;
 		lieng_object_ref (self, -1);
@@ -176,7 +176,7 @@ lisrv_object_effect (liengObject* self,
 		return;
 
 	/* Invoke callbacks. */
-	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_SAMPLE, self, sample, flags);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-effect", lical_marshal_DATA_PTR_PTR_INT, self, sample, flags);
 }
 
 /**
@@ -550,7 +550,7 @@ lisrv_object_set_client (liengObject* self,
 	if (data->client == value)
 		return 1;
 	data->client = value;
-	lieng_engine_call (self->engine, LISRV_CALLBACK_OBJECT_CLIENT, self);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-client", lical_marshal_DATA_PTR, self);
 	if (value != NULL)
 	{
 		lieng_object_ref (self, 1);

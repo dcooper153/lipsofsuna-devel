@@ -77,10 +77,8 @@ liext_module_new (licliModule* module)
 		printf ("WARNING: cannot initialize sound\n");
 
 	/* Register callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_PACKET, 1,
-	     	private_packet, self, self->calls + 0) ||
-	    !lieng_engine_insert_call (module->engine, LICLI_CALLBACK_TICK, 1,
-	     	private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 1, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 1, private_tick, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -100,8 +98,7 @@ liext_module_free (liextModule* self)
 	lialgU32dicIter iter;
 
 	/* Remove callbacks. */
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 
 	/* Free objects. */
 	if (self->objects != NULL)
@@ -120,7 +117,6 @@ liext_module_free (liextModule* self)
 		lisnd_system_free (self->system);
 #endif
 
-	/* FIXME: Remove the class here. */
 	lisys_free (self);
 }
 

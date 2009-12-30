@@ -52,8 +52,7 @@ struct _liextModule
 	lialgPtrdic* listeners;
 	lialgMemdic* blocks;
 	liarcWriter* assign_packet;
-	licalHandle calls[6];
-	licalHandle calls1[2];
+	licalHandle calls[8];
 	lisrvServer* server;
 	livoxManager* voxels;
 };

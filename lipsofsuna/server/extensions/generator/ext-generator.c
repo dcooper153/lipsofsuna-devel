@@ -44,8 +44,7 @@ liext_generator_new (lisrvServer* server)
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	if (!lieng_engine_insert_call (server->engine, LISRV_CALLBACK_CLIENT_PACKET, 1,
-	     	private_client_packet, self, self->calls + 0))
+	if (!lical_callbacks_insert (server->callbacks, server->engine, "client-packet", 1, private_client_packet, self, self->calls + 0))
 	{
 		lisys_free (self);
 		return NULL;
@@ -57,8 +56,7 @@ liext_generator_new (lisrvServer* server)
 void
 liext_generator_free (liextGenerator* self)
 {
-	lieng_engine_remove_calls (self->server->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

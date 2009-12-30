@@ -119,8 +119,8 @@ private_binding_tick (licliModule* module,
 int
 licli_module_init_callbacks_binding (licliModule* self)
 {
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_EVENT, 0, private_binding_event, self, NULL);
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_TICK, 0, private_binding_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "event", 0, private_binding_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "tick", 0, private_binding_tick, self, NULL);
 	return 1;
 }
 
@@ -259,10 +259,10 @@ private_miscellaneous_tick (licliModule* module,
 int
 licli_module_init_callbacks_misc (licliModule* self)
 {
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_EVENT, -5, private_miscellaneous_event, self, NULL);
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_PACKET, 0, licli_module_handle_packet, self, NULL);
-	lieng_engine_insert_call (self->engine, LIENG_CALLBACK_OBJECT_NEW, -65535, private_miscellaneous_object_new, self, NULL);
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_TICK, 0, private_miscellaneous_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "event", -5, private_miscellaneous_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "packet", 0, licli_module_handle_packet, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "object-new", -65535, private_miscellaneous_object_new, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "tick", 0, private_miscellaneous_tick, self, NULL);
 	return 1;
 }
 
@@ -291,8 +291,8 @@ private_widget_tick (licliModule* module,
 int
 licli_module_init_callbacks_widget (licliModule* self)
 {
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_EVENT, -10, private_widget_event, self, NULL);
-	lieng_engine_insert_call (self->engine, LICLI_CALLBACK_TICK, 1, private_widget_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "event", -10, private_widget_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self, "tick", 1, private_widget_tick, self, NULL);
 	return 1;
 }
 

@@ -58,7 +58,7 @@ liwdg_busy_set_cancel (liwdgBusy*   self,
                        liwdgHandler handler,
                        void*        data)
 {
-	liwdg_widget_insert_callback (self->button, LIWDG_CALLBACK_PRESSED, 0, handler, data, NULL);
+	liwdg_widget_insert_callback (self->button, "pressed", handler, data);
 	liwdg_widget_set_visible (self->button, (handler != NULL));
 }
 

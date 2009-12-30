@@ -101,10 +101,7 @@ liai_manager_new (livoxManager* voxels)
 
 	/* Register callbacks. */
 	if (self->voxels != NULL)
-	{
-		lical_callbacks_insert_callback (self->voxels->callbacks,
-			LIVOX_CALLBACK_LOAD_BLOCK, 1, private_block_load, self, self->calls + 0);
-	}
+		lical_callbacks_insert (self->voxels->callbacks, self->voxels, "load-block", 1, private_block_load, self, self->calls + 0);
 
 	return self;
 }
@@ -120,11 +117,7 @@ liai_manager_free (liaiManager* self)
 	lialgU32dicIter iter;
 
 	/* Unregister callbacks. */
-	if (self->voxels != NULL)
-	{
-		lical_callbacks_remove_callbacks (self->voxels->callbacks,
-			self->calls, sizeof (self->calls) / sizeof (licalHandle));
-	}
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 
 	/* Free sectors. */
 	if (self->sectors != NULL)

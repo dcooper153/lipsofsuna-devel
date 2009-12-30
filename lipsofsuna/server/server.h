@@ -28,6 +28,7 @@
 #include <pthread.h>
 #include <sys/time.h>
 #include <algorithm/lips-algorithm.h>
+#include <callback/lips-callback.h>
 #include <config/lips-config.h>
 #include <engine/lips-engine.h>
 #include <paths/lips-paths.h>
@@ -43,6 +44,7 @@ struct _lisrvServer
 	int quit;
 	lialgStrdic* extensions;
 	liarcSql* sql;
+	licalCallbacks* callbacks;
 	liengEngine* engine;
 	lipthPaths* paths;
 	liscrScript* script;

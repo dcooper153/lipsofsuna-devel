@@ -59,8 +59,7 @@ liext_editor_new (licliModule* module)
 	self->module = module;
 
 	/* Allocate callbacks. */
-	if (!lieng_engine_insert_call (module->engine, LICLI_CALLBACK_EVENT, -15,
-	     	private_event, self, self->calls + 0))
+	if (!lical_callbacks_insert (module->callbacks, module->engine, "event", -15, private_event, self, self->calls + 0))
 	{
 		liext_editor_free (self);
 		return NULL;
@@ -72,8 +71,7 @@ liext_editor_new (licliModule* module)
 void
 liext_editor_free (liextEditor* self)
 {
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self);
 }
 

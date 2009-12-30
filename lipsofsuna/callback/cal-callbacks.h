@@ -28,9 +28,10 @@
 #include <algorithm/lips-algorithm.h>
 #include "cal-marshal.h"
 
-typedef int licalType;
-
 typedef struct _licalCallfunc licalCallfunc;
+typedef struct _licalCallbacks licalCallbacks;
+typedef struct _licalHandle licalHandle;
+
 struct _licalCallfunc
 {
 	int prio;
@@ -41,17 +42,17 @@ struct _licalCallfunc
 	licalCallfunc* next;
 };
 
-typedef struct _licalHandle licalHandle;
 struct _licalHandle
 {
-	licalType type;
+	licalCallbacks* calls;
+	void* object;
+	char type[32];
 	licalCallfunc* func;
 };
 
-typedef struct _licalCallbacks licalCallbacks;
 struct _licalCallbacks
 {
-	lialgU32dic* types;
+	lialgMemdic* types;
 	licalCallfunc* removed;
 };
 
@@ -63,42 +64,36 @@ lical_callbacks_free (licalCallbacks* self);
 
 int
 lical_callbacks_call (licalCallbacks* self,
-                      licalType       type,
+                      void*           object,
+                      const char*     type,
+                      licalMarshal    marshal,
                                       ...);
 
 int
 lical_callbacks_callva (licalCallbacks* self,
-                        licalType       type,
+                        void*           object,
+                        const char*     type,
+                        licalMarshal    marshal,
                         va_list         args);
 
 int
-lical_callbacks_insert_type (licalCallbacks* self,
-                             licalType       type,
-                             licalMarshal    marshal);
+lical_callbacks_insert (licalCallbacks* self,
+                        void*           object,
+                        const char*     type,
+                        int             priority,
+                        void*           call,
+                        void*           data,
+                        licalHandle*    result);
 
 void
 lical_callbacks_update (licalCallbacks* self);
 
 void
-lical_callbacks_remove_type (licalCallbacks* self,
-                             licalType       type);
-
-int
-lical_callbacks_insert_callback (licalCallbacks* self,
-                                 licalType       type,
-                                 int             priority,
-                                 void*           call,
-                                 void*           data,
-                                 licalHandle*    result);
+lical_handle_release (licalHandle* self);
 
 void
-lical_callbacks_remove_callback (licalCallbacks* self,
-                                 licalHandle*    handle);
-
-void
-lical_callbacks_remove_callbacks (licalCallbacks* self,
-                                  licalHandle*    handles,
-                                  int             count);
+lical_handle_releasev (licalHandle* self,
+                       int          count);
 
 #endif
 

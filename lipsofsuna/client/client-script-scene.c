@@ -69,7 +69,7 @@ private_render (liwdgRender* self,
 	}
 
 	/* Render custom 3D scene. */
-	lieng_engine_call (module->engine, LICLI_CALLBACK_RENDER_3D, self);
+	lical_callbacks_call (module->callbacks, module->engine, "render-3d", lical_marshal_DATA_PTR, self);
 
 	/* Set 2D mode. */
 	glMatrixMode (GL_PROJECTION);
@@ -79,7 +79,7 @@ private_render (liwdgRender* self,
 	glLoadIdentity ();
 
 	/* Render custom 2D scene. */
-	lieng_engine_call (module->engine, LICLI_CALLBACK_RENDER_2D, self);
+	lical_callbacks_call (module->callbacks, module->engine, "render-2d", lical_marshal_DATA_PTR, self);
 }
 
 static void

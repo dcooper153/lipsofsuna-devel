@@ -141,8 +141,6 @@ static int
 private_init (liwdgRender*  self,
               liwdgManager* manager)
 {
-	if (!liwdg_widget_register_callback (LIWDG_WIDGET (self), LIWDG_CALLBACK_PRESSED, lical_marshal_DATA_PTR))
-		return 0;
 	liwdg_widget_set_style (LIWDG_WIDGET (self), "render");
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), 128, 128);
 	self->modelview = limat_matrix_identity ();
@@ -178,7 +176,7 @@ private_event (liwdgRender* self,
 			}
 			break;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			if (!lical_callbacks_call (LIWDG_WIDGET (self)->callbacks, LIWDG_CALLBACK_PRESSED, self))
+			if (!lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self))
 				return 0;
 			break;
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:

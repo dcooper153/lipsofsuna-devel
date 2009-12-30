@@ -59,11 +59,7 @@ liext_module_new (licliModule* module)
 void
 liext_module_free (liextModule* self)
 {
-	/* Remove callbacks. */
-	lieng_engine_remove_calls (self->module->engine, self->calls,
-		sizeof (self->calls) / sizeof (licalHandle));
-
-	/* FIXME: Remove the class here. */
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	liext_reload_free (self->reload);
 	lisys_free (self);
 }

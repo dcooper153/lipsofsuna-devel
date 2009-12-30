@@ -24,10 +24,16 @@
 
 #include "cal-callbacks.h"
 
+typedef struct _licalCalladdr licalCalladdr;
+struct _licalCalladdr
+{
+	void* object;
+	char type[32];
+};
+
 typedef struct _licalCalltype licalCalltype;
 struct _licalCalltype
 {
-	licalMarshal marshal;
 	licalCallfunc* funcs;
 };
 
@@ -35,7 +41,12 @@ static void
 private_cleanup (licalCallbacks* self);
 
 static void
-private_free_type (licalCalltype* type);
+private_addr_type (licalCalladdr* self,
+                   void*          object,
+                   const char*    type);
+
+static void
+private_free_type (licalCalltype* self);
 
 /*****************************************************************************/
 
@@ -47,7 +58,7 @@ lical_callbacks_new ()
 	self = lisys_calloc (1, sizeof (licalCallbacks));
 	if (self == NULL)
 		return NULL;
-	self->types = lialg_u32dic_new ();
+	self->types = lialg_memdic_new ();
 	if (self->types == NULL)
 	{
 		lisys_free (self);
@@ -60,56 +71,48 @@ lical_callbacks_new ()
 void
 lical_callbacks_free (licalCallbacks* self)
 {
-	lialgU32dicIter iter;
+	lialgMemdicIter iter;
 
 	private_cleanup (self);
-	LI_FOREACH_U32DIC (iter, self->types)
+	LI_FOREACH_MEMDIC (iter, self->types)
 		private_free_type (iter.value);
-	lialg_u32dic_free (self->types);
+	lialg_memdic_free (self->types);
 	lisys_free (self);
 }
 
 int
 lical_callbacks_call (licalCallbacks* self,
-                      licalType       type,
+                      void*           object,
+                      const char*     type,
+                      licalMarshal    marshal,
                                       ...)
 {
 	int ret;
 	va_list args;
-	licalCalltype* typ;
-	licalCallfunc* func;
-	licalCallfunc* func_next;
 
-	typ = lialg_u32dic_find (self->types, type);
-	if (typ == NULL)
-		return 0;
-	for (func = typ->funcs ; func != NULL ; func = func_next)
-	{
-		func_next = func->next;
-		if (func->removed)
-			continue;
-		va_start (args, type);
-		ret = typ->marshal (func->call, func->data, args);
-		va_end (args);
-		if (!ret)
-			return 0;
-	}
+	va_start (args, marshal);
+	ret = lical_callbacks_callva (self, object, type, marshal, args);
+	va_end (args);
 
-	return 1;
+	return ret;
 }
 
 int
 lical_callbacks_callva (licalCallbacks* self,
-                        licalType       type,
+                        void*           object,
+                        const char*     type,
+                        licalMarshal    marshal,
                         va_list         args)
 {
 	int ret;
 	va_list copy;
+	licalCalladdr addr;
 	licalCalltype* typ;
 	licalCallfunc* func;
 	licalCallfunc* func_next;
 
-	typ = lialg_u32dic_find (self->types, type);
+	private_addr_type (&addr, object, type);
+	typ = lialg_memdic_find (self->types, &addr, sizeof (addr));
 	if (typ == NULL)
 		return 0;
 	for (func = typ->funcs ; func != NULL ; func = func_next)
@@ -118,7 +121,7 @@ lical_callbacks_callva (licalCallbacks* self,
 		if (func->removed)
 			continue;
 		va_copy (copy, args);
-		ret = typ->marshal (func->call, func->data, copy);
+		ret = marshal (func->call, func->data, copy);
 		va_end (copy);
 		if (!ret)
 			return 0;
@@ -128,70 +131,36 @@ lical_callbacks_callva (licalCallbacks* self,
 }
 
 int
-lical_callbacks_insert_type (licalCallbacks* self,
-                             licalType       type,
-                             licalMarshal    marshal)
+lical_callbacks_insert (licalCallbacks* self,
+                        void*           object,
+                        const char*     type,
+                        int             priority,
+                        void*           call,
+                        void*           data,
+                        licalHandle*    result)
 {
-	licalCalltype* typ;
-
-	typ = lisys_calloc (1, sizeof (licalCalltype));
-	if (typ == NULL)
-		return 0;
-	typ->marshal = marshal;
-	if (!lialg_u32dic_insert (self->types, type, typ))
-	{
-		lisys_error_set (ENOMEM, NULL);
-		lisys_free (typ);
-		return 0;
-	}
-
-	return 1;
-}
-
-void
-lical_callbacks_update (licalCallbacks* self)
-{
-	private_cleanup (self);
-}
-
-void
-lical_callbacks_remove_type (licalCallbacks* self,
-                             licalType       type)
-{
-	licalCalltype* typ;
-
-	typ = lialg_u32dic_find (self->types, type);
-	if (typ == NULL)
-		return;
-	private_free_type (typ);
-	lialg_u32dic_remove (self->types, type);
-}
-
-int
-lical_callbacks_insert_callback (licalCallbacks* self,
-                                 licalType       type,
-                                 int             priority,
-                                 void*           call,
-                                 void*           data,
-                                 licalHandle*    result)
-{
+	licalCalladdr addr;
 	licalCalltype* typ;
 	licalCallfunc* ptr;
 	licalCallfunc* func;
 
 	/* Clear handle. */
 	if (result != NULL)
-	{
-		result->type = 0;
-		result->func = NULL;
-	}
+		memset (result, 0, sizeof (licalHandle));
 
-	/* Find type. */
-	typ = lialg_u32dic_find (self->types, type);
+	/* Find or create type. */
+	private_addr_type (&addr, object, type);
+	typ = lialg_memdic_find (self->types, &addr, sizeof (addr));
 	if (typ == NULL)
 	{
-		lisys_error_set (EINVAL, "invalid call type %d", type);
-		return 0;
+		typ = lisys_calloc (1, sizeof (licalCalltype));
+		if (typ == NULL)
+			return 0;
+		if (!lialg_memdic_insert (self->types, &addr, sizeof (addr), typ))
+		{
+			lisys_free (typ);
+			return 0;
+		}
 	}
 
 	/* Allocate function. */
@@ -205,8 +174,10 @@ lical_callbacks_insert_callback (licalCallbacks* self,
 	/* Set handle. */
 	if (result != NULL)
 	{
-		result->type = type;
+		result->calls = self;
+		result->object = object;
 		result->func = func;
+		strncpy (result->type, type, sizeof (result->type) - 1);
 	}
 
 	/* Insertion sort by priority. */
@@ -237,20 +208,34 @@ lical_callbacks_insert_callback (licalCallbacks* self,
 }
 
 void
-lical_callbacks_remove_callback (licalCallbacks* self,
-                                 licalHandle*    handle)
+lical_callbacks_update (licalCallbacks* self)
 {
+	private_cleanup (self);
+}
+
+/*****************************************************************************/
+
+/**
+ * \brief Releases an event handler callback.
+ *
+ * \param self Handle.
+ */
+void
+lical_handle_release (licalHandle* self)
+{
+	licalCalladdr addr;
 	licalCalltype* typ;
 	licalCallfunc* func;
 
-	if (handle->func == NULL)
+	if (self->func == NULL)
 		return;
-	typ = lialg_u32dic_find (self->types, handle->type);
+	private_addr_type (&addr, self->object, self->type);
+	typ = lialg_memdic_find (self->calls->types, &addr, sizeof (addr));
 	if (typ == NULL)
 		return;
 	for (func = typ->funcs ; func != NULL ; func = func->next)
 	{
-		if (func == handle->func)
+		if (func == self->func)
 		{
 			/* Remove from type. */
 			if (func->prev == NULL)
@@ -260,33 +245,37 @@ lical_callbacks_remove_callback (licalCallbacks* self,
 			if (func->next != NULL)
 				func->next->prev = func->prev;
 
+			/* Remove empty types. */
+			if (typ->funcs == NULL)
+			{
+				lialg_memdic_remove (self->calls->types, &addr, sizeof (addr));
+				private_free_type (typ);
+			}
+
 			/* Queue for removal. */
-			func->prev = self->removed;
+			func->prev = self->calls->removed;
 			func->removed = 1;
-			self->removed = func;
+			self->calls->removed = func;
 			break;
 		}
 	}
-	handle->type = 0;
-	handle->func = NULL;
+	memset (self, 0, sizeof (licalHandle));
 }
 
 /**
- * \brief Removes event handler callbacks.
+ * \brief Releases event handler callbacks.
  *
- * \param self Callbacks.
- * \param handles Array of callback handles.
+ * \param self Array of handles.
  * \param count Number of handles.
  */
 void
-lical_callbacks_remove_callbacks (licalCallbacks* self,
-                                  licalHandle*    handles,
-                                  int             count)
+lical_handle_releasev (licalHandle* self,
+                       int          count)
 {
 	int i;
 
 	for (i = 0 ; i < count ; i++)
-		lical_callbacks_remove_callback (self, handles + i);
+		lical_handle_release (self + i);
 }
 
 /*****************************************************************************/
@@ -306,17 +295,27 @@ private_cleanup (licalCallbacks* self)
 }
 
 static void
-private_free_type (licalCalltype* type)
+private_addr_type (licalCalladdr* self,
+                   void*          object,
+                   const char*    type)
+{
+	memset (self, 0, sizeof (licalCalltype));
+	self->object = object;
+	strncpy (self->type, type, sizeof (self->type) - 1);
+}
+
+static void
+private_free_type (licalCalltype* self)
 {
 	licalCallfunc* func;
 	licalCallfunc* func_next;
 
-	for (func = type->funcs ; func != NULL ; func = func_next)
+	for (func = self->funcs ; func != NULL ; func = func_next)
 	{
 		func_next = func->next;
 		lisys_free (func);
 	}
-	lisys_free (type);
+	lisys_free (self);
 }
 
 /** @} */
