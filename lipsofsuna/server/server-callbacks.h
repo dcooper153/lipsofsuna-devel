@@ -31,20 +31,6 @@
 #include "server-object.h"
 #include "server-types.h"
 
-enum
-{
-	LISRV_CALLBACK_CLIENT_CONTROL = LIENG_CALLBACK_LAST, /* (data, object, quat, flags) */
-	LISRV_CALLBACK_CLIENT_LOGIN, /* (data, object, name, pass) */
-	LISRV_CALLBACK_CLIENT_LOGOUT, /* (data, object) */
-	LISRV_CALLBACK_CLIENT_PACKET, /* (data, client, packet) */
-	LISRV_CALLBACK_OBJECT_ANIMATION, /* (data, object, animation) */
-	LISRV_CALLBACK_OBJECT_CLIENT, /* (data, object) */
-	LISRV_CALLBACK_OBJECT_SAMPLE, /* (data, object, sample, flags) */
-	LISRV_CALLBACK_TICK, /* (data, secs) */
-	LISRV_CALLBACK_VISION_HIDE, /* (data, object, object) */
-	LISRV_CALLBACK_VISION_SHOW, /* (data, object, object) */
-};
-
 int lisrv_server_init_callbacks_client (lisrvServer* server);
 
 #endif

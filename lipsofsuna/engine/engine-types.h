@@ -32,22 +32,6 @@ enum
 	LIENG_FLAG_REMOTE_SECTORS = 0x01
 };
 
-enum
-{
-	LIENG_CALLBACK_FREE, /* (data, engine) */
-	LIENG_CALLBACK_MODEL_NEW, /* (data, model) */
-	LIENG_CALLBACK_MODEL_FREE, /* (data, model) */
-	LIENG_CALLBACK_OBJECT_NEW, /* (data, object) */
-	LIENG_CALLBACK_OBJECT_FREE, /* (data, object) */
-	LIENG_CALLBACK_OBJECT_MODEL, /* (data, object, model) */
-	LIENG_CALLBACK_OBJECT_MOTION, /* (data, object) */
-	LIENG_CALLBACK_OBJECT_TRANSFORM, /* (data, object, transform) */
-	LIENG_CALLBACK_OBJECT_VISIBILITY, /* (data, object, boolean) */
-	LIENG_CALLBACK_SECTOR_LOAD, /* (data, sector) */
-	LIENG_CALLBACK_SECTOR_UNLOAD, /* (data, sector) */
-	LIENG_CALLBACK_LAST
-};
-
 enum _liengMatrix
 {
 	LIENG_MATRIX_LOCAL,

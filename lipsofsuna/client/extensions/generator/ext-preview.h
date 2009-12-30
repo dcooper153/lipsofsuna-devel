@@ -34,9 +34,6 @@
 
 #define LIEXT_PREVIEW(o) ((liextPreview*)(o))
 
-#define LIEXT_CALLBACK_PRESSED 100
-#define LIEXT_CALLBACK_TRANSFORM 101
-
 enum
 {
 	LIEXT_PREVIEW_COPY_VOXEL,

@@ -40,12 +40,6 @@ enum
 	LIVOX_FIND_ALL   = 0xFF
 };
 
-enum
-{
-	LIVOX_CALLBACK_FREE_BLOCK,
-	LIVOX_CALLBACK_LOAD_BLOCK
-};
-
 typedef struct _livoxUpdateEvent livoxUpdateEvent;
 struct _livoxUpdateEvent
 {
