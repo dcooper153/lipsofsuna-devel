@@ -190,7 +190,7 @@ private_miscellaneous_object_new (licliModule* module,
 {
 	/* Set object mode. */
 	lieng_object_set_smoothing (object, LICLI_OBJECT_POSITION_SMOOTHING, LICLI_OBJECT_ROTATION_SMOOTHING);
-	lieng_object_set_userdata (object, LIENG_DATA_CLIENT, (void*) -1);
+	lieng_object_set_userdata (object, module);
 
 	/* Allocate script data. */
 	object->script = liscr_data_new (module->script, object, LICOM_SCRIPT_OBJECT, lieng_object_free);

@@ -1011,18 +1011,16 @@ lieng_object_set_transform (liengObject*          self,
 }
 
 void*
-lieng_object_get_userdata (liengObject* self,
-                           int          type)
+lieng_object_get_userdata (liengObject* self)
 {
-	return self->userdata[type];
+	return self->userdata;
 }
 
 void
 lieng_object_set_userdata (liengObject* self,
-                           int          type,
                            void*        data)
 {
-	self->userdata[type] = data;
+	self->userdata = data;
 }
 
 /**

@@ -41,9 +41,9 @@
 struct _liengObject
 {
 	int refs;
+	void* userdata;
 	uint32_t id;
 	uint16_t flags;
-	void* userdata[LIENG_DATA_MAX];
 	liengEngine* engine;
 	liengModel* model;
 	liengSector* sector;
@@ -227,12 +227,10 @@ lieng_object_set_transform (liengObject*          self,
                             const limatTransform* value);
 
 void*
-lieng_object_get_userdata (liengObject* self,
-                           int          type);
+lieng_object_get_userdata (liengObject* self);
 
 void
 lieng_object_set_userdata (liengObject* self,
-                           int          type,
                            void*        data);
 
 void

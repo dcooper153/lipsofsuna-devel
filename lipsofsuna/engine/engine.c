@@ -473,18 +473,16 @@ lieng_engine_set_local_range (liengEngine* self,
 }
 
 void*
-lieng_engine_get_userdata (liengEngine* self,
-                           int          type)
+lieng_engine_get_userdata (liengEngine* self)
 {
-	return self->userdata[type];
+	return self->userdata;
 }
 
 void
 lieng_engine_set_userdata (liengEngine* self,
-                           int          type,
-                           void*        data)
+                           void*        value)
 {
-	self->userdata[type] = data;
+	self->userdata = value;
 }
 
 /*****************************************************************************/

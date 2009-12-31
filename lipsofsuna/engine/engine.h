@@ -42,7 +42,7 @@
 
 struct _liengEngine
 {
-	void* userdata[LIENG_DATA_MAX];
+	void* userdata;
 	lialgU32dic* objects;
 	lialgU32dic* sectors;
 	lialgPtrdic* selection;
@@ -138,13 +138,11 @@ lieng_engine_set_local_range (liengEngine* self,
                               uint32_t     end);
 
 void*
-lieng_engine_get_userdata (liengEngine* self,
-                           int          type);
+lieng_engine_get_userdata (liengEngine* self);
 
 void
 lieng_engine_set_userdata (liengEngine* self,
-                           int          type,
-                           void*        data);
+                           void*        value);
 
 #endif
 

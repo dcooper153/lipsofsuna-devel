@@ -230,7 +230,7 @@ private_object_new (lisrvServer* server,
 	liscr_data_unref (object->script, NULL);
 
 	/* Extend engine object. */
-	lieng_object_set_userdata (object, LIENG_DATA_SERVER, data);
+	lieng_object_set_userdata (object, data);
 	liphy_object_set_userdata (object->physics, object);
 
 	return 1;

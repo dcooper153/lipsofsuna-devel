@@ -33,7 +33,7 @@
 #include <system/lips-system.h>
 #include "client-types.h"
 
-#define LICLI_IS_CLIENT_OBJECT(o) (lieng_object_get_userdata (o, LIENG_DATA_CLIENT) != NULL)
+#define LICLI_IS_CLIENT_OBJECT(o) (lieng_object_get_userdata (o) != NULL)
 
 #define LICLI_OBJECT_POSITION_SMOOTHING 0.5f
 #define LICLI_OBJECT_ROTATION_SMOOTHING 0.5f

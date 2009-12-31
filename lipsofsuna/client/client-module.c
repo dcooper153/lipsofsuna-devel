@@ -581,7 +581,7 @@ private_init_engine (licliModule* self)
 	flags = lieng_engine_get_flags (self->engine);
 	lieng_engine_set_flags (self->engine, flags | LIENG_FLAG_REMOTE_SECTORS);
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
-	lieng_engine_set_userdata (self->engine, LIENG_DATA_CLIENT, self);
+	lieng_engine_set_userdata (self->engine, self);
 
 	/* Connect callbacks. */
 	if (!licli_module_init_callbacks_binding (self) ||

@@ -36,7 +36,7 @@ private_contact_callback (liphyObject*  object,
 {
 	liscrData* data;
 	liengObject* engobj = liphy_object_get_userdata (object);
-	lisrvServer* server = lieng_engine_get_userdata (engobj->engine, LIENG_DATA_SERVER);
+	lisrvServer* server = lieng_engine_get_userdata (engobj->engine);
 	liscrScript* script = server->script;
 
 	/* Push callback. */

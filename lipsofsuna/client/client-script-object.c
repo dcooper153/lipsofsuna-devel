@@ -48,7 +48,7 @@ static void Object_emit_particles (liscrArgs* args)
 	lirndObject* render;
 
 	object = LIENG_OBJECT (args->self);
-	module = lieng_engine_get_userdata (object->engine, LIENG_DATA_CLIENT);
+	module = lieng_engine_get_userdata (object->engine);
 	render = lirnd_scene_find_object (module->scene, object->id);
 	if (render != NULL)
 		lirnd_object_emit_particles (render);

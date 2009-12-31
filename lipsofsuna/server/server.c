@@ -520,7 +520,7 @@ private_init_engine (lisrvServer* self)
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
-	lieng_engine_set_userdata (self->engine, LIENG_DATA_SERVER, self);
+	lieng_engine_set_userdata (self->engine, self);
 
 	/* Connect callbacks. */
 	if (!lisrv_server_init_callbacks_client (self))
