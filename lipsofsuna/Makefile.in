@@ -132,7 +132,8 @@ am__objects_3 = archive/archive-reader.lo archive/archive-sql.lo \
 	archive/archive-tar.lo archive/archive-writer.lo
 am__objects_4 = binding/binding.lo binding/binding-action.lo \
 	binding/binding-manager.lo
-am__objects_5 = callback/cal-callbacks.lo callback/cal-marshal.lo
+am__objects_5 = callback/cal-callbacks.lo callback/cal-handle.lo \
+	callback/cal-marshal.lo
 am__objects_6 = config/config-account.lo config/config-bans.lo \
 	config/config-host.lo
 am__objects_7 = client/client.lo client/client-callbacks.lo \
@@ -724,10 +725,12 @@ caldir = $(includedir)/lipsofsuna/callback
 cal_HEADERS = \
 	callback/lips-callback.h \
 	callback/cal-callbacks.h \
+	callback/cal-handle.h \
 	callback/cal-marshal.h
 
 calsrc = \
 	callback/cal-callbacks.c \
+	callback/cal-handle.c \
 	callback/cal-marshal.c
 
 clidir = $(includedir)/lipsofsuna/client
@@ -1403,6 +1406,8 @@ callback/$(DEPDIR)/$(am__dirstamp):
 	@: > callback/$(DEPDIR)/$(am__dirstamp)
 callback/cal-callbacks.lo: callback/$(am__dirstamp) \
 	callback/$(DEPDIR)/$(am__dirstamp)
+callback/cal-handle.lo: callback/$(am__dirstamp) \
+	callback/$(DEPDIR)/$(am__dirstamp)
 callback/cal-marshal.lo: callback/$(am__dirstamp) \
 	callback/$(DEPDIR)/$(am__dirstamp)
 config/$(am__dirstamp):
@@ -2032,6 +2037,8 @@ mostlyclean-compile:
 	-rm -f binding/binding.lo
 	-rm -f callback/cal-callbacks.$(OBJEXT)
 	-rm -f callback/cal-callbacks.lo
+	-rm -f callback/cal-handle.$(OBJEXT)
+	-rm -f callback/cal-handle.lo
 	-rm -f callback/cal-marshal.$(OBJEXT)
 	-rm -f callback/cal-marshal.lo
 	-rm -f client/client-callbacks.$(OBJEXT)
@@ -2370,6 +2377,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@binding/$(DEPDIR)/binding-manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@binding/$(DEPDIR)/binding.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@callback/$(DEPDIR)/cal-callbacks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@callback/$(DEPDIR)/cal-handle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@callback/$(DEPDIR)/cal-marshal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-callbacks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-command.Plo@am__quote@

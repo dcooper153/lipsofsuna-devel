@@ -35,7 +35,8 @@ static void
 private_clear_sectors (liengEngine* self);
 
 static void
-private_physics_transform (liphyObject* object);
+private_physics_transform (liengEngine* self,
+                           liphyObject* object);
 
 /*****************************************************************************/
 
@@ -131,6 +132,7 @@ lieng_engine_free (liengEngine* self)
 		lialg_u32dic_free (self->objects);
 	if (self->selection != NULL)
 		lialg_ptrdic_free (self->selection);
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 	lisys_free (self->config.dir);
 	lisys_free (self);
 }
@@ -515,10 +517,10 @@ private_init (liengEngine* self)
 		return 0;
 
 	/* Physics. */
-	self->physics = liphy_physics_new ();
+	self->physics = liphy_physics_new (self->callbacks);
 	if (self->physics == NULL)
 		return 0;
-	liphy_physics_set_transform_callback (self->physics, private_physics_transform);
+	lical_callbacks_insert (self->callbacks, self->physics, "object-transform", 0, private_physics_transform, self, self->calls + 0);
 
 	/* Resources. */
 	self->resources = lieng_resources_new (self);
@@ -534,7 +536,8 @@ private_init (liengEngine* self)
 }
 
 static void
-private_physics_transform (liphyObject* object)
+private_physics_transform (liengEngine* self,
+                           liphyObject* object)
 {
 	liengObject* obj;
 

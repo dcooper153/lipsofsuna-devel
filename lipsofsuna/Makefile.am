@@ -105,9 +105,11 @@ caldir = $(includedir)/lipsofsuna/callback
 cal_HEADERS = \
 	callback/lips-callback.h \
 	callback/cal-callbacks.h \
+	callback/cal-handle.h \
 	callback/cal-marshal.h
 calsrc = \
 	callback/cal-callbacks.c \
+	callback/cal-handle.c \
 	callback/cal-marshal.c
 
 clidir = $(includedir)/lipsofsuna/client

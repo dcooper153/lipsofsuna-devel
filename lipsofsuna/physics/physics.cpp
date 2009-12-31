@@ -69,10 +69,11 @@ private_internal_tick (btDynamicsWorld* dynamics,
 /**
  * \brief Creates a new physics simulation.
  *
+ * \param callbacks Callback manager.
  * \return New physics simulation or NULL.
  */
 liphyPhysics*
-liphy_physics_new ()
+liphy_physics_new (licalCallbacks* callbacks)
 {
 	liphyPhysics* self;
 	btVector3 min (-65535, -65535, -65535);
@@ -82,6 +83,7 @@ liphy_physics_new ()
 	self = (liphyPhysics*) lisys_calloc (1, sizeof (liphyPhysics));
 	if (self == NULL)
 		return NULL;
+	self->callbacks = callbacks;
 
 	/* Allocation dictionary. */
 	self->objects = lialg_u32dic_new ();
@@ -419,21 +421,6 @@ liphy_physics_update (liphyPhysics* self,
 		lisys_free (record);
 	}
 	self->contacts_iter = NULL;
-}
-
-/**
- * \brief Sets the object transformation callback.
- *
- * The callback will be called every time an object is moved.
- *
- * \param self Physics simulation.
- * \param value Transformation callback function.
- */
-void
-liphy_physics_set_transform_callback (liphyPhysics*      self,
-                                      liphyTransformCall value)
-{
-	self->transform_callback = value;
 }
 
 /**

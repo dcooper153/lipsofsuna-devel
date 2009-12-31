@@ -61,8 +61,7 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 		this->previous = this->current;
 		if (this->object->control != NULL)
 			this->object->control->update ();
-		if (this->object->physics->transform_callback != NULL)
-			this->object->physics->transform_callback (this->object);
+		lical_callbacks_call (this->object->physics->callbacks, this->object->physics, "object-transform", lical_marshal_DATA_PTR, this->object);
 	}
 }
 

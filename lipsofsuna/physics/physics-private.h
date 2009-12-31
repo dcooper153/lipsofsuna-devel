@@ -38,6 +38,7 @@ class liphyMotionState;
 
 struct _liphyPhysics
 {
+	void* userdata;
 #ifdef LIPHY_BROADPHASE_DBVT
 	btDbvtBroadphase* broadphase;
 #else
@@ -53,8 +54,7 @@ struct _liphyPhysics
 	lialgList* contacts_iter;
 	lialgList* controllers;
 	lialgU32dic* objects;
-	liphyTransformCall transform_callback;
-	void* userdata;
+	licalCallbacks* callbacks;
 };
 
 struct _liphyShape

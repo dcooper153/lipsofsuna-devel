@@ -25,6 +25,7 @@
 #ifndef __PHYSICS_H__
 #define __PHYSICS_H__
 
+#include <callback/lips-callback.h>
 #include <math/lips-math.h>
 #include <system/lips-system.h>
 #include "physics-types.h"
@@ -32,7 +33,7 @@
 LI_BEGIN_DECLS
 
 liphyPhysics*
-liphy_physics_new ();
+liphy_physics_new (licalCallbacks* callbacks);
 
 void
 liphy_physics_free (liphyPhysics* self);
@@ -75,10 +76,6 @@ liphy_physics_clear_contacts (liphyPhysics* self,
 void
 liphy_physics_update (liphyPhysics* self,
                       float         secs);
-
-void
-liphy_physics_set_transform_callback (liphyPhysics*      self,
-                                      liphyTransformCall value);
 
 void*
 liphy_physics_get_userdata (liphyPhysics* self);

@@ -26,11 +26,8 @@
 #define __CAL_CALLBACKS_H__
 
 #include <algorithm/lips-algorithm.h>
+#include "cal-handle.h"
 #include "cal-marshal.h"
-
-typedef struct _licalCallfunc licalCallfunc;
-typedef struct _licalCallbacks licalCallbacks;
-typedef struct _licalHandle licalHandle;
 
 struct _licalCallfunc
 {
@@ -42,19 +39,15 @@ struct _licalCallfunc
 	licalCallfunc* next;
 };
 
-struct _licalHandle
-{
-	licalCallbacks* calls;
-	void* object;
-	char type[32];
-	licalCallfunc* func;
-};
-
 struct _licalCallbacks
 {
 	lialgMemdic* types;
 	licalCallfunc* removed;
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 licalCallbacks*
 lical_callbacks_new ();
@@ -88,12 +81,9 @@ lical_callbacks_insert (licalCallbacks* self,
 void
 lical_callbacks_update (licalCallbacks* self);
 
-void
-lical_handle_release (licalHandle* self);
-
-void
-lical_handle_releasev (licalHandle* self,
-                       int          count);
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

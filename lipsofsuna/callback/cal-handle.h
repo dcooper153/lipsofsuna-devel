@@ -18,31 +18,37 @@
 /**
  * \addtogroup lical Callback
  * @{
- * \addtogroup licalMarshal Marshal
+ * \addtogroup licalHandle Handle
  * @{
  */
 
-#ifndef __CAL_MARSHAL_H__
-#define __CAL_MARSHAL_H__
+#ifndef __CAL_HANDLE_H__
+#define __CAL_HANDLE_H__
 
-#include <stdarg.h>
+#include "cal-marshal.h"
 
-typedef int (*licalMarshal)(void*, void*, va_list);
+typedef struct _licalCallfunc licalCallfunc;
+typedef struct _licalCallbacks licalCallbacks;
+typedef struct _licalHandle licalHandle;
+
+struct _licalHandle
+{
+	licalCallbacks* calls;
+	void* object;
+	char type[32];
+	licalCallfunc* func;
+};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int lical_marshal_DATA (void* call, void* data, va_list args);
-int lical_marshal_DATA_FLT (void* call, void* data, va_list args);
-int lical_marshal_DATA_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_INT_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_INT_PTR (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_PTR (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_PTR_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_PTR_PTR (void* call, void* data, va_list args);
+void
+lical_handle_release (licalHandle* self);
+
+void
+lical_handle_releasev (licalHandle* self,
+                       int          count);
 
 #ifdef __cplusplus
 }

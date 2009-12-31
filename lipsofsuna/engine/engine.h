@@ -47,6 +47,7 @@ struct _liengEngine
 	lialgU32dic* sectors;
 	lialgPtrdic* selection;
 	licalCallbacks* callbacks;
+	licalHandle calls[1];
 	liengConstraint* constraints;
 	liengResources* resources;
 	liphyPhysics* physics;
