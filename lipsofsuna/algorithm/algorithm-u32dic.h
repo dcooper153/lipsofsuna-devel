@@ -22,10 +22,9 @@
  * @{
  */
 
-#ifndef __ALGORITHM_U32dic_H__
-#define __ALGORITHM_U32dic_H__
+#ifndef __ALGORITHM_U32DIC_H__
+#define __ALGORITHM_U32DIC_H__
 
-#include <string/lips-string.h>
 #include <system/lips-system.h>
 #include "algorithm-bst.h"
 
@@ -62,7 +61,7 @@ struct _lialgU32dicIter
 
 static inline int
 lialg_u32dic_node_compare (const lialgU32dicNode* self,
-                             const lialgU32dicNode* node)
+                           const lialgU32dicNode* node)
 {
 	if (self->key < node->key) return -1;
 	if (self->key > node->key) return 1;

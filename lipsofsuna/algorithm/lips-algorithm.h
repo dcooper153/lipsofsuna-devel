@@ -31,5 +31,7 @@
 #include "algorithm-priority-queue.h"
 #include "algorithm-range.h"
 #include "algorithm-range-iter.h"
+#include "algorithm-sectors.h"
+#include "algorithm-sectors-iter.h"
 
 #endif

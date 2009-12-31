@@ -68,13 +68,16 @@ alg_HEADERS = \
 	algorithm/algorithm-ptrdic.h \
 	algorithm/algorithm-range.h \
 	algorithm/algorithm-range-iter.h \
+	algorithm/algorithm-sectors.h \
+	algorithm/algorithm-sectors-iter.h \
 	algorithm/algorithm-strdic.h \
 	algorithm/algorithm-u32dic.h
 algsrc = \
 	algorithm/algorithm-astar.c \
 	algorithm/algorithm-bst.c \
 	algorithm/algorithm-camera.c \
-	algorithm/algorithm-octree.c
+	algorithm/algorithm-octree.c \
+	algorithm/algorithm-sectors.c
 
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \

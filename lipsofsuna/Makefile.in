@@ -127,7 +127,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = ai/ai-manager.lo ai/ai-path.lo ai/ai-sector.lo
 am__objects_2 = algorithm/algorithm-astar.lo \
 	algorithm/algorithm-bst.lo algorithm/algorithm-camera.lo \
-	algorithm/algorithm-octree.lo
+	algorithm/algorithm-octree.lo algorithm/algorithm-sectors.lo
 am__objects_3 = archive/archive-reader.lo archive/archive-sql.lo \
 	archive/archive-tar.lo archive/archive-writer.lo
 am__objects_4 = binding/binding.lo binding/binding-action.lo \
@@ -685,6 +685,8 @@ alg_HEADERS = \
 	algorithm/algorithm-ptrdic.h \
 	algorithm/algorithm-range.h \
 	algorithm/algorithm-range-iter.h \
+	algorithm/algorithm-sectors.h \
+	algorithm/algorithm-sectors-iter.h \
 	algorithm/algorithm-strdic.h \
 	algorithm/algorithm-u32dic.h
 
@@ -692,7 +694,8 @@ algsrc = \
 	algorithm/algorithm-astar.c \
 	algorithm/algorithm-bst.c \
 	algorithm/algorithm-camera.c \
-	algorithm/algorithm-octree.c
+	algorithm/algorithm-octree.c \
+	algorithm/algorithm-sectors.c
 
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \
@@ -1372,6 +1375,8 @@ algorithm/algorithm-camera.lo: algorithm/$(am__dirstamp) \
 	algorithm/$(DEPDIR)/$(am__dirstamp)
 algorithm/algorithm-octree.lo: algorithm/$(am__dirstamp) \
 	algorithm/$(DEPDIR)/$(am__dirstamp)
+algorithm/algorithm-sectors.lo: algorithm/$(am__dirstamp) \
+	algorithm/$(DEPDIR)/$(am__dirstamp)
 archive/$(am__dirstamp):
 	@$(MKDIR_P) archive
 	@: > archive/$(am__dirstamp)
@@ -2021,6 +2026,8 @@ mostlyclean-compile:
 	-rm -f algorithm/algorithm-camera.lo
 	-rm -f algorithm/algorithm-octree.$(OBJEXT)
 	-rm -f algorithm/algorithm-octree.lo
+	-rm -f algorithm/algorithm-sectors.$(OBJEXT)
+	-rm -f algorithm/algorithm-sectors.lo
 	-rm -f archive/archive-reader.$(OBJEXT)
 	-rm -f archive/archive-reader.lo
 	-rm -f archive/archive-sql.$(OBJEXT)
@@ -2369,6 +2376,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-bst.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-camera.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-octree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@algorithm/$(DEPDIR)/algorithm-sectors.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-reader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@archive/$(DEPDIR)/archive-tar.Plo@am__quote@
