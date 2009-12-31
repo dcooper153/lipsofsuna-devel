@@ -81,9 +81,9 @@ lieng_object_new (liengEngine*     engine,
 
 	/* Initialize physics. */
 	if (model != NULL)
-		self->physics = liphy_object_new (engine->physics, model->physics, control);
+		self->physics = liphy_object_new (engine->physics, self->id, model->physics, control);
 	else
-		self->physics = liphy_object_new (engine->physics, NULL, control);
+		self->physics = liphy_object_new (engine->physics, self->id, NULL, control);
 	if (self->physics == NULL)
 		goto error;
 

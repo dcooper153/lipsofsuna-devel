@@ -78,9 +78,20 @@ liphy_physics_new ()
 	btVector3 min (-65535, -65535, -65535);
 	btVector3 max ( 65535,  65535,  65535);
 
+	/* Allocate self. */
 	self = (liphyPhysics*) lisys_calloc (1, sizeof (liphyPhysics));
 	if (self == NULL)
 		return NULL;
+
+	/* Allocation dictionary. */
+	self->objects = lialg_u32dic_new ();
+	if (self->objects == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+
+	/* Create simulation. */
 	try
 	{
 		self->ghostcallback = new btGhostPairCallback ();
@@ -119,6 +130,7 @@ liphy_physics_free (liphyPhysics* self)
 {
 	assert (self->contacts == NULL);
 	assert (self->constraints == NULL);
+	assert (self->objects->size == 0);
 
 	delete self->dynamics;
 	delete self->solver;
@@ -126,6 +138,7 @@ liphy_physics_free (liphyPhysics* self)
 	delete self->dispatcher;
 	delete self->broadphase;
 	delete self->ghostcallback;
+	lialg_u32dic_free (self->objects);
 	lialg_list_free (self->controllers);
 	lisys_free (self);
 }

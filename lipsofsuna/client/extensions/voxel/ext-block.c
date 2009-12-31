@@ -317,7 +317,7 @@ private_build_physics (liextBlock*  self,
 
 		/* Add to physics object. */
 		if (self->physics == NULL)
-			self->physics = liphy_object_new (self->module->engine->physics, NULL, LIPHY_CONTROL_MODE_STATIC);
+			self->physics = liphy_object_new (self->module->engine->physics, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
 		if (self->physics != NULL)
 			liphy_object_insert_shape (self->physics, voxels[i].model->physics, &voxels[i].transform);
 	}

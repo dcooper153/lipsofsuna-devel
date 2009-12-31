@@ -49,12 +49,14 @@ private_update_state (liphyObject* self);
  * \brief Creates a new physics object.
  *
  * \param physics Physics system.
+ * \param id Object ID.
  * \param shape Collision shape or NULL.
  * \param control_mode Simulation mode.
  * \return New object or NULL.
  */
 liphyObject*
 liphy_object_new (liphyPhysics*    physics,
+                  uint32_t         id,
                   liphyShape*      shape,
                   liphyControlMode control_mode)
 {
@@ -66,6 +68,7 @@ liphy_object_new (liphyPhysics*    physics,
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
+	self->id = id;
 	self->control_mode = control_mode;
 	self->config.mass = 10.0f;
 	self->config.speed = LIPHY_DEFAULT_SPEED;
@@ -84,6 +87,17 @@ liphy_object_new (liphyPhysics*    physics,
 	}
 	liphy_object_set_shape (self, shape);
 
+	/* Add to dictionary. */
+	if (self->id)
+	{
+		assert (!lialg_u32dic_find (physics->objects, id));
+		if (!lialg_u32dic_insert (physics->objects, id, self))
+		{
+			liphy_object_free (self);
+			return NULL;
+		}
+	}
+
 	return self;
 }
 
@@ -97,6 +111,10 @@ liphy_object_free (liphyObject* self)
 {
 	/* Cancel all contact callbacks involving us. */
 	liphy_physics_clear_contacts (self->physics, self);
+
+	/* Remove from dictionary. */
+	if (self->id)
+		lialg_u32dic_remove (self->physics->objects, self->id);
 
 	/* Free self. */
 	self->flags &= ~PRIVATE_REALIZED;

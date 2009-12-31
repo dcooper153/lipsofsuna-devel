@@ -52,6 +52,7 @@ struct _liphyPhysics
 	lialgList* contacts;
 	lialgList* contacts_iter;
 	lialgList* controllers;
+	lialgU32dic* objects;
 	liphyTransformCall transform_callback;
 	void* userdata;
 };
@@ -65,12 +66,13 @@ struct _liphyShape
 
 struct _liphyObject
 {
+	int flags;
+	uint32_t id;
 	liphyControlMode control_mode;
 	liphyControl* control;
 	liphyMotionState* motion;
 	liphyPhysics* physics;
 	btCompoundShape* shape;
-	int flags;
 	struct
 	{
 		int collision_group;

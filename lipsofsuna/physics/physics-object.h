@@ -35,6 +35,7 @@ LI_BEGIN_DECLS
 
 liphyObject*
 liphy_object_new (liphyPhysics*    physics,
+                  uint32_t         id,
                   liphyShape*      shape,
                   liphyControlMode control_mode);
 
