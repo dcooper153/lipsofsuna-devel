@@ -42,13 +42,11 @@ private_build_block (livoxSector* self,
 /**
  * \brief Creates a new sector.
  *
- * \param manager Voxel manager.
- * \param id Sector number.
+ * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
 livoxSector*
-livox_sector_new (livoxManager* manager,
-                  uint32_t      id)
+livox_sector_new (lialgSector* sector)
 {
 	livoxSector* self;
 
@@ -56,20 +54,12 @@ livox_sector_new (livoxManager* manager,
 	self = lisys_calloc (1, sizeof (livoxSector));
 	if (self == NULL)
 		return NULL;
-	self->manager = manager;
-	self->x = id % LIVOX_SECTORS_PER_LINE;
-	self->y = id / LIVOX_SECTORS_PER_LINE % LIVOX_SECTORS_PER_LINE;
-	self->z = id / LIVOX_SECTORS_PER_LINE / LIVOX_SECTORS_PER_LINE;
-	self->origin.x = LIVOX_SECTOR_WIDTH * self->x;
-	self->origin.y = LIVOX_SECTOR_WIDTH * self->y;
-	self->origin.z = LIVOX_SECTOR_WIDTH * self->z;
+	self->manager = lialg_sectors_get_userdata (sector->manager, "voxel");
+	self->sector = sector;
 
-	/* Insert to manager. */
-	if (!lialg_u32dic_insert (manager->sectors, id, self))
-	{
-		lisys_free (self);
-		return NULL;
-	}
+	/* Load data. */
+	if (self->manager->sql != NULL)
+		livox_sector_read (self, self->manager->sql);
 
 	return self;
 }
@@ -155,7 +145,7 @@ livox_sector_read (livoxSector* self,
 	sqlite3_stmt* statement;
 
 	/* Prepare statement. */
-	id = LIVOX_SECTOR_INDEX (self->x, self->y, self->z);
+	id = self->sector->index;
 	query = "SELECT data FROM voxel_sectors WHERE id=?;";
 	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
@@ -250,7 +240,7 @@ livox_sector_write (livoxSector* self,
 	liarcWriter* writer;
 	livoxVoxel* tmp;
 
-	id = LIVOX_SECTOR_INDEX (self->x, self->y, self->z);
+	id = self->sector->index;
 
 	/* Don't save empty sectors. */
 	if (livox_sector_get_empty (self))
@@ -354,7 +344,7 @@ livox_sector_get_bounds (const livoxSector* self,
 	limatVector min;
 	limatVector max;
 
-	min = self->origin;
+	min = self->sector->position;
 	max = limat_vector_init (LIVOX_SECTOR_WIDTH, LIVOX_SECTOR_WIDTH, LIVOX_SECTOR_WIDTH);
 	max = limat_vector_add (min, max);
 	limat_aabb_init_from_points (result, &min, &max);
@@ -419,9 +409,9 @@ livox_sector_get_offset (const livoxSector* self,
                          int*               y,
                          int*               z)
 {
-	*x = self->x;
-	*y = self->y;
-	*z = self->z;
+	*x = self->sector->x;
+	*y = self->sector->y;
+	*z = self->sector->z;
 }
 
 /**
@@ -434,7 +424,7 @@ void
 livox_sector_get_origin (const livoxSector* self,
                          limatVector*       result)
 {
-	*result = self->origin;
+	*result = self->sector->position;
 }
 
 /**
@@ -521,9 +511,9 @@ private_build_block (livoxSector* self,
 	livoxUpdateEvent event;
 
 	/* Invoke callbacks. */
-	event.sector[0] = self->x;
-	event.sector[1] = self->y;
-	event.sector[2] = self->z;
+	event.sector[0] = self->sector->x;
+	event.sector[1] = self->sector->y;
+	event.sector[2] = self->sector->z;
 	event.block[0] = x;
 	event.block[1] = y;
 	event.block[2] = z;

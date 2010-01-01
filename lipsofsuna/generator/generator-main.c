@@ -29,6 +29,8 @@
 int
 main (int argc, char** argv)
 {
+	lialgSectors* sectors;
+	licalCallbacks* callbacks;
 	ligenGenerator* self;
 	lipthPaths* paths;
 
@@ -40,12 +42,34 @@ main (int argc, char** argv)
 		return 1;
 	}
 
+	/* Allocate callbacks. */
+	callbacks = lical_callbacks_new ();
+	if (callbacks == NULL)
+	{
+		lisys_error_report ();
+		lipth_paths_free (paths);
+		return 1;
+	}
+
+	/* Allocate sectors. */
+#warning Hardcoded sector size
+	sectors = lialg_sectors_new (256, 64.0f);
+	if (sectors == NULL)
+	{
+		lisys_error_report ();
+		lical_callbacks_free (callbacks);
+		lipth_paths_free (paths);
+		return 1;
+	}
+
 	/* Execute program. */
 	srand (time (NULL));
-	self = ligen_generator_new (paths);
+	self = ligen_generator_new (paths, callbacks, sectors);
 	if (self == NULL)
 	{
 		lisys_error_report ();
+		lialg_sectors_free (sectors);
+		lical_callbacks_free (callbacks);
 		lipth_paths_free (paths);
 		return 1;
 	}
@@ -53,6 +77,8 @@ main (int argc, char** argv)
 	if (!ligen_generator_main (self))
 		lisys_error_report ();
 	ligen_generator_free (self);
+	lialg_sectors_free (sectors);
+	lical_callbacks_free (callbacks);
 	lipth_paths_free (paths);
 
 	return 0;

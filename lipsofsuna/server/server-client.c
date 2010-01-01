@@ -289,21 +289,13 @@ private_object_motion (lisrvClient* self,
                        liengObject* object)
 {
 	float dist;
-	lialgRange range;
-	lialgRangeIter iter;
 	limatTransform transform;
 
-	/* Make sure nearby sectors are loaded when self moved. */
+	/* Load sectors when moving. */
 	if (object == self->object)
 	{
 		lieng_object_get_transform (self->object, &transform);
-		range = lialg_range_new_from_sphere (&transform.position, 
-			LISRV_CLIENT_LOAD_RADIUS, LIENG_SECTOR_WIDTH);
-		range = lialg_range_clamp (range, 0, 255);
-		LIALG_RANGE_FOREACH (iter, range)
-		{
-			lieng_engine_load_sector (self->server->engine, iter.index);
-		}
+		lialg_sectors_refresh_point (self->object->engine->sectors, &transform.position, self->radius);
 	}
 
 	/* Maintain vision data. */
@@ -478,39 +470,29 @@ private_vision_update (lisrvClient* self)
 {
 	float dist;
 	lialgU32dicIter obj_iter;
-	lialgRange range;
-	lialgRangeIter rangeiter;
-	liengSector* sector;
-	liengObject* object = self->object;
+	liengObjectIter eng_iter;
+	limatTransform transform;
 
-	if (object->sector == NULL)
+	if (self->object->sector == NULL)
 		return;
-	sector = object->sector;
-	range = lialg_range_new_from_center (sector->x, sector->y, sector->z, 1);
-	range = lialg_range_clamp (range, 0, 255);
+	lieng_object_get_transform (self->object, &transform);
 
 	/* Remove from vision. */
 	LI_FOREACH_U32DIC (obj_iter, self->vision)
 	{
-		dist = lieng_object_get_distance (object, obj_iter.value);
+		dist = lieng_object_get_distance (self->object, obj_iter.value);
 		if (dist > self->radius)
 			private_vision_remove (self, obj_iter.value);
 	}
 
 	/* Add to vision. */
-	LIALG_RANGE_FOREACH (rangeiter, range)
+	LIENG_FOREACH_OBJECT (eng_iter, self->object->engine, &transform.position, self->radius)
 	{
-		sector = lieng_engine_find_sector (object->engine, rangeiter.index);
-		if (sector == NULL)
-			continue;
-		LI_FOREACH_U32DIC (obj_iter, sector->objects)
+		dist = lieng_object_get_distance (self->object, eng_iter.object);
+		if (dist <= self->radius)
 		{
-			dist = lieng_object_get_distance (object, obj_iter.value);
-			if (dist <= self->radius)
-			{
-				if (!private_vision_contains (self, obj_iter.value))
-					private_vision_insert (self, obj_iter.value);
-			}
+			if (!private_vision_contains (self, obj_iter.value))
+				private_vision_insert (self, obj_iter.value);
 		}
 	}
 }

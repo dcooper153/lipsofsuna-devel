@@ -49,7 +49,9 @@ struct _liextPreview
 {
 	liwdgRender base;
 	lialgCamera* camera;
+	lialgSectors* sectors;
 	lialgPtrdic* objects;
+	licalCallbacks* callbacks;
 	licalHandle calls[2];
 	licliModule* module;
 	ligenGenerator* generator;

@@ -18,6 +18,8 @@
 #ifndef __ALGORITHM_RANGE_H__
 #define __ALGORITHM_RANGE_H__
 
+#include <math/lips-math.h>
+
 /**
  * \addtogroup lialg Algorithm
  * @{

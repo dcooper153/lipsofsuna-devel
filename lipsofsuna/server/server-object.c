@@ -372,7 +372,7 @@ lisrv_object_serialize (liengObject* self,
 		{
 			/* Collect values. */
 			flags = LISRV_OBJECT (self)->flags;
-			sector = LIENG_SECTOR_INDEX (self->sector->x, self->sector->y, self->sector->z);
+			sector = self->sector->sector->index;
 			model = (self->model != NULL)? self->model->name : NULL;
 			mass = lieng_object_get_mass (self);
 			movement = liphy_object_get_movement (self->physics);

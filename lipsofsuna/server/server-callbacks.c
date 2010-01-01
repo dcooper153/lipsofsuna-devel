@@ -246,7 +246,7 @@ private_sector_load (lisrvServer* server,
 	liengObject* object;
 	sqlite3_stmt* statement;
 
-	id = LIENG_SECTOR_INDEX (sector->x, sector->y, sector->z);
+	id = sector->sector->index;
 
 	/* Prepare statement. */
 	query = "SELECT id FROM objects WHERE sector=?;";

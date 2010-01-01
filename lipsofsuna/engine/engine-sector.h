@@ -31,27 +31,19 @@
 #include "engine.h"
 #include "engine-types.h"
 
-#define LIENG_SECTOR_INDEX_FROM_POINT(p) LIENG_SECTOR_INDEX((int)((p).x / LIENG_SECTOR_WIDTH), (int)((p).y / LIENG_SECTOR_WIDTH), (int)((p).z / LIENG_SECTOR_WIDTH))
-#define LIENG_SECTOR_INDEX(x, y, z) ((x) + LIENG_SECTORS_PER_LINE * (y) + LIENG_SECTORS_PER_PLANE * (z))
 #define LIENG_SECTOR_WIDTH 64.0f
 #define LIENG_SECTORS_PER_LINE 256
-#define LIENG_SECTORS_PER_PLANE (LIENG_SECTORS_PER_LINE * LIENG_SECTORS_PER_LINE)
-#define LIENG_SECTORS_PER_WORLD (LIENG_SECTORS_PER_LINE * LIENG_SECTORS_PER_LINE * LIENG_SECTORS_PER_LINE)
 
 struct _liengSector
 {
-	uint8_t x;
-	uint8_t y;
-	uint8_t z;
 	uint8_t dirty;
+	lialgSector* sector;
 	lialgU32dic* objects;
 	liengEngine* engine;
-	limatVector origin;
 };
 
 liengSector*
-lieng_sector_new (liengEngine* engine,
-                  uint32_t     id);
+lieng_sector_new (lialgSector* sector);
 
 void
 lieng_sector_free (liengSector* self);

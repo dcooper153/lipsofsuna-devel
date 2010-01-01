@@ -66,7 +66,7 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Allocate AI manager. */
-	self->ai = liai_manager_new (self->voxels);
+	self->ai = liai_manager_new (server->callbacks, server->sectors, self->voxels);
 	if (self->ai == NULL)
 	{
 		liext_module_free (self);

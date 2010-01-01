@@ -44,9 +44,11 @@ struct _ligenStroke
 struct _ligenGenerator
 {
 	int fill;
+	lialgSectors* sectors;
 	lialgU32dic* brushes;
 	liarcSql* gensql;
 	liarcSql* srvsql;
+	licalCallbacks* callbacks;
 	lipthPaths* paths;
 	livoxManager* voxels;
 	struct
@@ -57,7 +59,9 @@ struct _ligenGenerator
 };
 
 ligenGenerator*
-ligen_generator_new (lipthPaths*  paths);
+ligen_generator_new (lipthPaths*     paths,
+                     licalCallbacks* callbacks,
+                     lialgSectors*   sectors);
 
 void
 ligen_generator_free (ligenGenerator* self);

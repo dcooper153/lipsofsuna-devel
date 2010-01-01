@@ -515,8 +515,14 @@ private_init_engine (lisrvServer* self)
 	if (self->callbacks == NULL)
 		return 0;
 
+	/* Initialize sector. */
+#warning Hardcoded sector size
+	self->sectors = lialg_sectors_new (256, 64.0f);
+	if (self->sectors == NULL)
+		return 0;
+
 	/* Create engine. */
-	self->engine = lieng_engine_new (self->callbacks, self->paths->module_data);
+	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths->module_data);
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);

@@ -105,7 +105,7 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Create voxel manager. */
-	self->voxels = livox_manager_new ();
+	self->voxels = livox_manager_new (server->callbacks, server->sectors);
 	if (self->voxels == NULL)
 	{
 		liext_module_free (self);
@@ -229,8 +229,7 @@ private_block_load (liextModule*      self,
 	livoxSector* sector;
 
 	/* Find the sector. */
-	sector = livox_manager_find_sector (self->voxels, LIVOX_SECTOR_INDEX (
-		event->sector[0], event->sector[1], event->sector[2]));
+	sector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", event->sector[0], event->sector[1], event->sector[2], 1);
 	if (sector == NULL)
 		return 1;
 
@@ -241,8 +240,7 @@ private_block_load (liextModule*      self,
 	addr.block[0] = event->block[0];
 	addr.block[1] = event->block[1];
 	addr.block[2] = event->block[2];
-	vblock = livox_sector_get_block (sector, LIVOX_BLOCK_INDEX (
-		event->block[0], event->block[1], event->block[2]));
+	vblock = livox_sector_get_block (sector, LIVOX_BLOCK_INDEX (event->block[0], event->block[1], event->block[2]));
 	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (livoxBlockAddr));
 	if (eblock == NULL)
 	{
@@ -363,11 +361,6 @@ static int
 private_sector_load (liextModule* self,
                      liengSector* sector)
 {
-	uint32_t index;
-
-	index = LIVOX_SECTOR_INDEX (sector->x, sector->y, sector->z);
-	livox_manager_load_sector (self->voxels, index);
-
 	return 1;
 }
 

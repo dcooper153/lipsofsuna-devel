@@ -27,7 +27,6 @@
 
 struct _livoxBlock
 {
-	uint8_t type;
 	uint8_t dirty;
 	uint16_t stamp;
 	livoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
@@ -35,13 +34,10 @@ struct _livoxBlock
 
 struct _livoxSector
 {
-	uint8_t x;
-	uint8_t y;
-	uint8_t z;
 	uint8_t dirty;
+	lialgSector* sector;
 	livoxBlock blocks[LIVOX_BLOCKS_PER_SECTOR];
 	livoxManager* manager;
-	limatVector origin;
 };
 
 #endif

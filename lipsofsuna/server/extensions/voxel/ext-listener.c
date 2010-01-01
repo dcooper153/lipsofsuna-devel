@@ -173,7 +173,7 @@ liext_listener_update (liextListener* self,
 	LIALG_RANGE_FOREACH (iter0, sectors)
 	{
 		/* Get dirty sector. */
-		sector = livox_manager_find_sector (self->module->voxels, iter0.index);
+		sector = lialg_sectors_data_index (self->module->voxels->sectors, "voxel", iter0.index, 0);
 		if (sector == NULL)
 			continue;
 		if (!self->moved && !livox_sector_get_dirty (sector))

@@ -29,81 +29,10 @@
 #include "engine-sector.h"
 #include "engine-selection.h"
 
-typedef struct _liengSectorIter liengSectorIter;
-struct _liengSectorIter
-{
-	lialgRangeIter range;
-	liengEngine* engine;
-	liengSector* sector;
-};
-
-/**
- * \brief Iterates through a range of loaded sectors.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Sector iterator.
- * \param engine Engine.
- * \param x Center sector.
- * \param y Center sector.
- * \param z Center sector.
- * \param radius Search radius in sectors.
- */
-#define LIENG_FOREACH_SECTOR(iter, engine, x, y, z, radius) \
-	for (lieng_sector_iter_first (&iter, engine, x, y, z, radius) ; iter.sector != NULL ; \
-	     lieng_sector_iter_next (&iter))
-
-static inline int
-lieng_sector_iter_first (liengSectorIter* self,
-                         liengEngine*     engine,
-                         int              x,
-                         int              y,
-                         int              z,
-                         int              radius)
-{
-	lialgRange range;
-
-	/* Initialize self. */
-	memset (self, 0, sizeof (liengSectorIter));
-	self->engine = engine;
-	range = lialg_range_new_from_center (x, y, z, radius);
-	range = lialg_range_clamp (range, 0, 255);
-	if (!lialg_range_iter_first (&self->range, &range))
-		return 0;
-
-	/* Find first non-empty sector. */
-	while (self->range.more)
-	{
-		self->sector = lieng_engine_find_sector (engine, self->range.index);
-		lialg_range_iter_next (&self->range);
-		if (self->sector != NULL)
-			return 1;
-	}
-
-	return 0;
-}
-
-static inline int
-lieng_sector_iter_next (liengSectorIter* self)
-{
-	/* Find next non-empty sector. */
-	while (self->range.more)
-	{
-		self->sector = lieng_engine_find_sector (self->engine, self->range.index);
-		lialg_range_iter_next (&self->range);
-		if (self->sector != NULL)
-			return 1;
-	}
-
-	return 0;
-}
-
-/*****************************************************************************/
-
 typedef struct _liengObjectIter liengObjectIter;
 struct _liengObjectIter
 {
-	liengSectorIter sectors;
+	lialgSectorsIter sectors;
 	lialgU32dicIter objects;
 	liengObject* object;
 };
@@ -115,38 +44,40 @@ struct _liengObjectIter
  *
  * \param iter Object iterator.
  * \param engine Engine.
- * \param x Center sector.
- * \param y Center sector.
- * \param z Center sector.
- * \param radius Search radius in sectors.
+ * \param point Search center in world coordinates.
+ * \param radius Search radius in world units.
  */
-#define LIENG_FOREACH_OBJECT(iter, engine, x, y, z, radius) \
-	for (lieng_object_iter_first (&iter, engine, x, y, z, radius) ; iter.object != NULL ; \
+#define LIENG_FOREACH_OBJECT(iter, engine, point, radius) \
+	for (lieng_object_iter_first (&iter, engine, point, radius) ; iter.object != NULL ; \
 	     lieng_object_iter_next (&iter))
 
 static inline int
-lieng_object_iter_first (liengObjectIter* self,
-                         liengEngine*     engine,
-                         int              x,
-                         int              y,
-                         int              z,
-                         int              radius)
+lieng_object_iter_first (liengObjectIter*   self,
+                         liengEngine*       engine,
+                         const limatVector* point,
+                         int                radius)
 {
+	liengSector* sector;
+
 	/* Initialize self. */
 	memset (self, 0, sizeof (liengObjectIter));
-	if (!lieng_sector_iter_first (&self->sectors, engine, x, y, z, radius))
+	if (!lialg_sectors_iter_first_point (&self->sectors, engine->sectors, point, radius))
 		return 0;
 
 	/* Find first object. */
 	while (self->sectors.sector != NULL)
 	{
-		lialg_u32dic_iter_start (&self->objects, self->sectors.sector->objects);
-		if (self->objects.value != NULL)
+		sector = lialg_strdic_find (self->sectors.sector->content, "engine");
+		if (sector != NULL)
 		{
-			self->object = self->objects.value;
-			return 1;
+			lialg_u32dic_iter_start (&self->objects, sector->objects);
+			if (self->objects.value != NULL)
+			{
+				self->object = self->objects.value;
+				return 1;
+			}
 		}
-		if (!lieng_sector_iter_next (&self->sectors))
+		if (!lialg_sectors_iter_next (&self->sectors))
 			break;
 	}
 
@@ -156,6 +87,8 @@ lieng_object_iter_first (liengObjectIter* self,
 static inline int
 lieng_object_iter_next (liengObjectIter* self)
 {
+	liengSector* sector;
+
 	self->object = NULL;
 
 	/* Find next object in sector. */
@@ -169,13 +102,17 @@ lieng_object_iter_next (liengObjectIter* self)
 	}
 
 	/* Find next object in another sector. */
-	while (lieng_sector_iter_next (&self->sectors))
+	while (lialg_sectors_iter_next (&self->sectors))
 	{
-		lialg_u32dic_iter_start (&self->objects, self->sectors.sector->objects);
-		if (self->objects.value != NULL)
+		sector = lialg_strdic_find (self->sectors.sector->content, "engine");
+		if (sector != NULL)
 		{
-			self->object = self->objects.value;
-			return 1;
+			lialg_u32dic_iter_start (&self->objects, sector->objects);
+			if (self->objects.value != NULL)
+			{
+				self->object = self->objects.value;
+				return 1;
+			}
 		}
 	}
 

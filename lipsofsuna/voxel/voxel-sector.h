@@ -33,8 +33,7 @@
 #include "voxel-types.h"
 
 livoxSector*
-livox_sector_new (livoxManager* manager,
-                  uint32_t      id);
+livox_sector_new (lialgSector* sector);
 
 void
 livox_sector_free (livoxSector* self);

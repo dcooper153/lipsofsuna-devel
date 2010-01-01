@@ -73,7 +73,7 @@ liext_module_new (licliModule* module)
 	self->module = module;
 
 	/* Allocate voxel manager. */
-	self->voxels = livox_manager_new ();
+	self->voxels = livox_manager_new (module->callbacks, module->sectors);
 	if (self->voxels == NULL)
 	{
 		liext_module_free (self);
@@ -161,7 +161,7 @@ liext_module_build_block (liextModule* self,
 	livoxSector* vsector;
 
 	/* Find sector. */
-	vsector = livox_manager_find_sector (self->voxels, LIVOX_SECTOR_INDEX (sx, sy, sz));
+	vsector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", sx, sy, sz, 0);
 	if (vsector == NULL)
 		return 1;
 
@@ -349,14 +349,13 @@ private_voxel_diff (liextModule* self,
 		if (blockid >= LIVOX_BLOCKS_PER_SECTOR)
 			return 0;
 
-		/* Find block. */
-		sector = livox_manager_create_sector (self->voxels,
-			LIENG_SECTOR_INDEX (sectorx, sectory, sectorz));
+		/* Find or create sector. */
+		sector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", sectorx, sectory, sectorz, 1);
 		if (sector == NULL)
 			return 0;
-		block = livox_sector_get_block (sector, blockid);
 
 		/* Read block data. */
+		block = livox_sector_get_block (sector, blockid);
 		if (!livox_block_read (block, self->voxels, reader))
 			return 0;
 		if (livox_block_get_dirty (block))

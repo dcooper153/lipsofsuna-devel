@@ -34,22 +34,19 @@
 struct _liaiManager
 {
 	lialgAstar* astar;
-	lialgU32dic* sectors;
+	lialgSectors* sectors;
+	licalCallbacks* callbacks;
 	licalHandle calls[1];
 	livoxManager* voxels;
 };
 
 liaiManager*
-liai_manager_new (livoxManager* voxels);
+liai_manager_new (licalCallbacks* callbacks,
+                  lialgSectors*   sectors,
+                  livoxManager*   voxels);
 
 void
 liai_manager_free (liaiManager* self);
-
-liaiSector*
-liai_manager_find_sector (liaiManager* self,
-                          int          sx,
-                          int          sy,
-                          int          sz);
 
 liaiWaypoint*
 liai_manager_find_waypoint (liaiManager*       self,

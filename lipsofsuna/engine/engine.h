@@ -43,9 +43,9 @@
 struct _liengEngine
 {
 	void* userdata;
-	lialgU32dic* objects;
-	lialgU32dic* sectors;
 	lialgPtrdic* selection;
+	lialgSectors* sectors;
+	lialgU32dic* objects;
 	licalCallbacks* callbacks;
 	licalHandle calls[1];
 	liengConstraint* constraints;
@@ -66,6 +66,7 @@ struct _liengEngine
 
 liengEngine*
 lieng_engine_new (licalCallbacks* calls,
+                  lialgSectors*   sectors,
                   const char*     path);
 
 void
@@ -73,10 +74,6 @@ lieng_engine_free (liengEngine* self);
 
 void
 lieng_engine_clear_selection (liengEngine* self);
-
-liengSector*
-lieng_engine_create_sector (liengEngine* self,
-                            uint32_t     id);
 
 liengAnimation*
 lieng_engine_find_animation_by_code (liengEngine* self,
@@ -98,10 +95,6 @@ liengObject*
 lieng_engine_find_object (liengEngine* self,
                           uint32_t     id);
 
-liengSector*
-lieng_engine_find_sector (liengEngine* self,
-                          uint32_t     id);
-
 void
 lieng_engine_insert_constraint (liengEngine*     self,
                                 liengConstraint* constraint);
@@ -113,10 +106,6 @@ lieng_engine_load_model (liengEngine* self,
 int
 lieng_engine_load_resources (liengEngine* self,
                              liarcReader* reader);
-
-liengSector*
-lieng_engine_load_sector (liengEngine* self,
-                          uint32_t     id);
 
 void
 lieng_engine_remove_constraint (liengEngine*     self,

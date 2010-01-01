@@ -36,7 +36,7 @@ typedef struct _livoxBlockIter livoxBlockIter;
 struct _livoxBlockIter
 {
 	int blocks;
-	lialgU32dicIter sectors;
+	lialgSectorsIter sectors;
 	livoxBlock* block;
 	int (*filter)(livoxBlock*);
 };
@@ -57,17 +57,19 @@ struct _livoxBlockIter
 static inline int
 livox_block_iter_next (livoxBlockIter* self)
 {
+	lialgSector* sector;
 	livoxBlock* block;
-	livoxSector* sector;
+	livoxSector* voxsec;
 
 	/* Find next block. */
-	for (sector = self->sectors.value ; sector != NULL ; sector = self->sectors.value)
+	for (sector = self->sectors.sector ; sector != NULL ; sector = self->sectors.sector)
 	{
-		if (self->blocks < LIVOX_BLOCKS_PER_SECTOR)
+		voxsec = lialg_strdic_find (sector->content, "voxel");
+		if (voxsec != NULL && self->blocks < LIVOX_BLOCKS_PER_SECTOR)
 		{
 			while (++self->blocks < LIVOX_BLOCKS_PER_SECTOR)
 			{
-				block = livox_sector_get_block (sector, self->blocks);
+				block = livox_sector_get_block (voxsec, self->blocks);
 				if (self->filter == NULL || self->filter (block))
 				{
 					self->block = block;
@@ -75,7 +77,7 @@ livox_block_iter_next (livoxBlockIter* self)
 				}
 			}
 		}
-		lialg_u32dic_iter_next (&self->sectors);
+		lialg_sectors_iter_next (&self->sectors);
 		self->blocks = 0;
 	}
 
@@ -94,8 +96,8 @@ livox_block_iter_first (livoxBlockIter* self,
 	self->blocks = -1;
 
 	/* Find first sector. */
-	lialg_u32dic_iter_start (&self->sectors, manager->sectors);
-	if (self->sectors.value == NULL)
+	lialg_sectors_iter_first_all (&self->sectors, manager->sectors);
+	if (self->sectors.sector == NULL)
 	{
 		self->block = NULL;
 		return 0;
@@ -165,10 +167,7 @@ livox_voxel_iter_first (livoxVoxelIter* self,
 		goto empty;
 	while (1)
 	{
-		if (self->load)
-			self->sector = livox_manager_load_sector (self->voxels, self->rangei0.index);
-		else
-			self->sector = livox_manager_find_sector (self->voxels, self->rangei0.index);
+		self->sector = lialg_sectors_data_index (self->voxels->sectors, "voxel", self->rangei0.index, self->load);
 		if (self->sector != NULL)
 			break;
 		if (!lialg_range_iter_next (&self->rangei0))
@@ -231,10 +230,7 @@ livox_voxel_iter_next (livoxVoxelIter* self)
 			self->sector = NULL;
 			return 0;
 		}
-		if (self->load)
-			self->sector = livox_manager_load_sector (self->voxels, self->rangei0.index);
-		else
-			self->sector = livox_manager_find_sector (self->voxels, self->rangei0.index);
+		self->sector = lialg_sectors_data_index (self->voxels->sectors, "voxel", self->rangei0.index, self->load);
 		if (self->sector != NULL)
 			break;
 	}

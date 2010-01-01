@@ -27,6 +27,9 @@
 #include "engine-object.h"
 #include "engine-selection.h"
 
+#warning Engine object refresh radius is hardcoded.
+#define REFRESH_RADIUS 10.0f
+
 #define LIENG_OBJECT_APPROACH_TOLERANCE 1.5f
 
 static int
@@ -300,26 +303,19 @@ lieng_object_jump (liengObject*       self,
 int
 lieng_object_moved (liengObject* self)
 {
-	uint32_t id;
 	liengSector* dst;
 	liengSector* src;
 	limatTransform transform;
 
-	/* Get source sector. */
+	/* Refresh sector list. */
 	lieng_object_get_transform (self, &transform);
-	id = LIENG_SECTOR_INDEX_FROM_POINT (transform.position);
+	lialg_sectors_refresh_point (self->engine->sectors, &transform.position, REFRESH_RADIUS);
+
+	/* Move between sectors. */
 	src = self->sector;
-
-	/* Get destination sector. */
-	dst = lieng_engine_find_sector (self->engine, id);
+	dst = lialg_sectors_data_point (self->engine->sectors, "engine", &transform.position, 1);
 	if (dst == NULL)
-	{
-		dst = lieng_sector_new (self->engine, id);
-		if (dst == NULL)
-			return 0;
-	}
-
-	/* Update current sector. */
+		return 0;
 	if (src != dst)
 	{
 		if (!lieng_sector_insert_object (dst, self))
@@ -1057,36 +1053,25 @@ static int
 private_warp (liengObject*       self,
               const limatVector* position)
 {
-	uint32_t id;
-	uint32_t id1;
 	liengSector* dst;
-	liengSector* src = self->sector;
+	liengSector* src;
 
-	/* Check for changes. */
-	id = LIENG_SECTOR_INDEX_FROM_POINT (*position);
-	if (src != NULL)
-	{
-		id1 = LIENG_SECTOR_INDEX (src->x, src->y, src->z);
-		if (id == id1)
-			return 1;
-	}
+	/* Refresh sector list. */
+	lialg_sectors_refresh_point (self->engine->sectors, position, REFRESH_RADIUS);
 
-	/* Find or create new sector. */
-	dst = lieng_engine_find_sector (self->engine, id);
+	/* Move between sectors. */
+	src = self->sector;
+	dst = lialg_sectors_data_point (self->engine->sectors, "engine", position, 1);
 	if (dst == NULL)
-	{
-		dst = lieng_sector_new (self->engine, id);
-		if (dst == NULL)
-			return 0;
-	}
-
-	/* Update current sector. */
-	assert (src != dst);
-	if (!lieng_sector_insert_object (dst, self))
 		return 0;
-	if (src != NULL)
-		lieng_sector_remove_object (src, self);
-	self->sector = dst;
+	if (src != dst)
+	{
+		if (!lieng_sector_insert_object (dst, self))
+			return 0;
+		if (src != NULL)
+			lieng_sector_remove_object (src, self);
+		self->sector = dst;
+	}
 
 	return 1;
 }

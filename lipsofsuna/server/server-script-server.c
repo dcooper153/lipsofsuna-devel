@@ -78,10 +78,6 @@ static void Server_find_object (liscrArgs* args)
  */
 static void Server_nearby_objects (liscrArgs* args)
 {
-	int r;
-	int x;
-	int y;
-	int z;
 	int onlyclients = 0;
 	float radius = 32.0f;
 	const char* tmp;
@@ -101,15 +97,10 @@ static void Server_nearby_objects (liscrArgs* args)
 		if (!strcmp (tmp, "clients"))
 			onlyclients = 1;
 	}
-	radius *= radius;
-	x = (int)(center.x / LIENG_SECTOR_WIDTH);
-	y = (int)(center.y / LIENG_SECTOR_WIDTH);
-	z = (int)(center.z / LIENG_SECTOR_WIDTH);
-	r = (int)(radius / LIENG_SECTOR_WIDTH + 2.25f);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 
 	/* Find objects. */
-	LIENG_FOREACH_OBJECT (iter, server->engine, x, y, z, r)
+	LIENG_FOREACH_OBJECT (iter, server->engine, &center, radius)
 	{
 		if (onlyclients && LISRV_OBJECT (iter.object)->client == NULL)
 			continue;

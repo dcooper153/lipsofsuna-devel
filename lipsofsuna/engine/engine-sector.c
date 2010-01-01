@@ -29,13 +29,11 @@
 /**
  * \brief Creates a new sector.
  *
- * \param engine Engine.
- * \param id Sector number.
+ * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
 liengSector*
-lieng_sector_new (liengEngine* engine,
-                  uint32_t     id)
+lieng_sector_new (lialgSector* sector)
 {
 	liengSector* self;
 
@@ -43,20 +41,8 @@ lieng_sector_new (liengEngine* engine,
 	self = lisys_calloc (1, sizeof (liengSector));
 	if (self == NULL)
 		return NULL;
-	self->x = id % LIENG_SECTORS_PER_LINE;
-	self->y = id / LIENG_SECTORS_PER_LINE % LIENG_SECTORS_PER_LINE;
-	self->z = id / LIENG_SECTORS_PER_LINE / LIENG_SECTORS_PER_LINE;
-	self->engine = engine;
-	self->origin.x = LIENG_SECTOR_WIDTH * self->x;
-	self->origin.y = LIENG_SECTOR_WIDTH * self->y;
-	self->origin.z = LIENG_SECTOR_WIDTH * self->z;
-
-	/* Insert to engine. */
-	if (!lialg_u32dic_insert (engine->sectors, id, self))
-	{
-		lisys_free (self);
-		return NULL;
-	}
+	self->engine = lialg_sectors_get_userdata (sector->manager, "engine");
+	self->sector = sector;
 
 	/* Allocate tree. */
 	self->objects = lialg_u32dic_new ();
@@ -67,7 +53,8 @@ lieng_sector_new (liengEngine* engine,
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (engine->callbacks, engine, "sector-load", lical_marshal_DATA_PTR, self);
+#warning The reverse sector link is not set yet so anything that tries to use it, will crash...
+	lical_callbacks_call (self->engine->callbacks, self->engine, "sector-load", lical_marshal_DATA_PTR, self);
 
 	return self;
 }
@@ -144,7 +131,7 @@ lieng_sector_get_bounds (const liengSector* self,
 	limatVector min;
 	limatVector max;
 
-	min = self->origin;
+	min = self->sector->position;
 	max = limat_vector_init (LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH);
 	max = limat_vector_add (min, max);
 	limat_aabb_init_from_points (result, &min, &max);

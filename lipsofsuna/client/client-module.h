@@ -53,6 +53,7 @@ struct _licliModule
 	char* password;
 	char* camera_node;
 	lialgCamera* camera;
+	lialgSectors* sectors;
 	lialgStrdic* extensions;
 	libndManager* bindings;
 	licalCallbacks* callbacks;

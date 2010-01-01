@@ -42,6 +42,7 @@ struct _lisrvServer
 {
 	uint32_t debug;
 	int quit;
+	lialgSectors* sectors;
 	lialgStrdic* extensions;
 	liarcSql* sql;
 	licalCallbacks* callbacks;

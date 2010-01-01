@@ -362,40 +362,26 @@ private_rescan (liextNpc* self)
 {
 	float d;
 	float dist;
-	lialgRange range;
-	lialgRangeIter rangeiter;
-	lialgU32dicIter iter1;
-	liengObject* tmp;
 	liengObject* object;
 	liengObject* target;
-	liengSector* sector;
+	liengObjectIter iter;
+	limatTransform transform;
 
 	dist = self->radius;
 	target = NULL;
-	object = self->owner;
-	sector = object->sector;
-	assert (object->sector != NULL);
-	range = lialg_range_new_from_center (sector->x, sector->y, sector->z, 1);
-	range = lialg_range_clamp (range, 0, 255);
+	lieng_object_get_transform (self->owner, &transform);
 
 	/* Search for target. */
-	LIALG_RANGE_FOREACH (rangeiter, range)
+	LIENG_FOREACH_OBJECT (iter, self->owner->engine, &transform.position, self->radius)
 	{
-		sector = lieng_engine_find_sector (object->engine, rangeiter.index);
-		if (sector == NULL)
+		object = iter.object;
+		if (LISRV_OBJECT (object)->client == NULL) /* FIXME: Check for alignment flags instead. */
 			continue;
-		LI_FOREACH_U32DIC (iter1, sector->objects)
-		{
-			assert (iter1.value);
-			tmp = iter1.value;
-			if (LISRV_OBJECT (tmp)->client == NULL) /* FIXME: Check for alignment flags instead. */
-				continue;
-			d = lieng_object_get_distance (object, tmp);
-			if (dist < d)
-				continue;
-			dist = d;
-			target = tmp;
-		}
+		d = lieng_object_get_distance (self->owner, object);
+		if (dist < d)
+			continue;
+		dist = d;
+		target = object;
 	}
 
 	return target;

@@ -33,9 +33,6 @@
 static void
 private_clear_materials (livoxManager* self);
 
-static void
-private_clear_sectors (livoxManager* self);
-
 static int
 private_ensure_materials (livoxManager* self);
 
@@ -52,14 +49,19 @@ private_mark_block (livoxManager* self,
 /*****************************************************************************/
 
 livoxManager*
-livox_manager_new ()
+livox_manager_new (licalCallbacks* callbacks,
+                   lialgSectors*   sectors)
 {
 	livoxManager* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (livoxManager));
 	if (self == NULL)
 		return NULL;
+	self->callbacks = callbacks;
+	self->sectors = sectors;
 
+	/* Allocate materials. */
 	self->materials = lialg_u32dic_new ();
 	if (self->materials == NULL)
 	{
@@ -67,15 +69,10 @@ livox_manager_new ()
 		return NULL;
 	}
 
-	self->sectors = lialg_u32dic_new ();
-	if (self->sectors == NULL)
-	{
-		livox_manager_free (self);
-		return NULL;
-	}
-
-	self->callbacks = lical_callbacks_new ();
-	if (self->callbacks == NULL)
+	/* Allocate sector data. */
+	if (!lialg_sectors_insert_content (self->sectors, "voxel", self,
+	     	(lialgSectorFreeFunc) livox_sector_free,
+	     	(lialgSectorLoadFunc) livox_sector_new))
 	{
 		livox_manager_free (self);
 		return NULL;
@@ -87,16 +84,17 @@ livox_manager_new ()
 void
 livox_manager_free (livoxManager* self)
 {
+	/* Free materials. */
 	if (self->materials != NULL)
 	{
 		private_clear_materials (self);
 		lialg_u32dic_free (self->materials);
 	}
+
+	/* Free sector data. */
 	if (self->sectors != NULL)
-	{
-		private_clear_sectors (self);
-		lialg_u32dic_free (self->sectors);
-	}
+		lialg_sectors_remove_content (self->sectors, "voxel");
+
 	lisys_free (self);
 }
 
@@ -120,17 +118,6 @@ livox_manager_check_occluder (const livoxManager* self,
 		return 0;
 
 	return (material->flags & LIVOX_MATERIAL_FLAG_OCCLUDER) != 0;
-}
-
-/**
- * \brief Removes all the sectors.
- *
- * \param self Voxel manager.
- */
-void
-livox_manager_clear (livoxManager* self)
-{
-	private_clear_sectors (self);
 }
 
 /**
@@ -173,7 +160,6 @@ livox_manager_copy_voxels (livoxManager* self,
 	int sx;
 	int sy;
 	int sz;
-	int idx;
 	livoxSector* sec;
 
 	/* FIXME: Avoid excessive sector lookups. */
@@ -184,8 +170,7 @@ livox_manager_copy_voxels (livoxManager* self,
 		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		idx = LIVOX_SECTOR_INDEX (sx, sy, sz);
-		sec = livox_manager_load_sector (self, idx);
+		sec = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
 		if (sec != NULL)
 		{
 			result[i] = *livox_sector_get_voxel (sec,
@@ -196,28 +181,6 @@ livox_manager_copy_voxels (livoxManager* self,
 		else
 			livox_voxel_init (result + i, 1);
 	}
-}
-
-/**
- * \brief Creates an empty sector.
- *
- * If a sector with the same number already exists, it is returned instead of
- * creating a new one.
- *
- * \param self Voxel manager.
- * \param id Sector index.
- * \return Sector owned by the manager or NULL.
- */
-livoxSector*
-livox_manager_create_sector (livoxManager* self,
-                             uint32_t      id)
-{
-	livoxSector* sector;
-
-	sector = livox_manager_find_sector (self, id);
-	if (sector != NULL)
-		return sector;
-	return livox_sector_new (self, id);
 }
 
 int
@@ -279,13 +242,6 @@ livox_manager_find_material (livoxManager* self,
                              uint32_t      id)
 {
 	return lialg_u32dic_find (self->materials, id);
-}
-
-livoxSector*
-livox_manager_find_sector (livoxManager* self,
-                           uint32_t      id)
-{
-	return lialg_u32dic_find (self->sectors, id);
 }
 
 /**
@@ -501,35 +457,6 @@ livox_manager_load_materials (livoxManager* self)
 	return 1;
 }
 
-/**
- * \brief Loads a sector from the SQL database.
- *
- * If a sector with the same number already exists, no loading takes place.
- * If a sector with the requested ID cannot be found from the database,
- * an empty sector is created.
- *
- * \param self Voxel manager.
- * \param id Sector index.
- * \return Sector owned by the manager or NULL.
- */
-livoxSector*
-livox_manager_load_sector (livoxManager* self,
-                           uint32_t      id)
-{
-	livoxSector* sector;
-
-	sector = livox_manager_find_sector (self, id);
-	if (sector != NULL)
-		return sector;
-	sector = livox_sector_new (self, id);
-	if (sector == NULL)
-		return NULL;
-	if (self->sql != NULL)
-		livox_sector_read (sector, self->sql);
-
-	return sector;
-}
-
 void
 livox_manager_mark_updates (livoxManager* self)
 {
@@ -538,7 +465,7 @@ livox_manager_mark_updates (livoxManager* self)
 	int x;
 	int y;
 	int z;
-	lialgU32dicIter iter;
+	lialgSectorsIter iter;
 	livoxSector* sector;
 	struct
 	{
@@ -578,10 +505,10 @@ livox_manager_mark_updates (livoxManager* self)
 	};
 
 	/* Update block boundaries. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_SECTORS_FOREACH (iter, self->sectors)
 	{
-		sector = iter.value;
-		if (!sector->dirty)
+		sector = lialg_strdic_find (iter.sector->content, "voxel");
+		if (sector == NULL || !sector->dirty)
 			continue;
 		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
 		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
@@ -629,7 +556,6 @@ livox_manager_paste_voxels (livoxManager* self,
 	int sx;
 	int sy;
 	int sz;
-	int idx;
 	livoxSector* sec;
 
 	/* FIXME: Avoid excessive sector lookups. */
@@ -640,8 +566,7 @@ livox_manager_paste_voxels (livoxManager* self,
 		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		idx = LIVOX_SECTOR_INDEX (sx, sy, sz);
-		sec = livox_manager_load_sector (self, idx);
+		sec = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
 		if (sec != NULL)
 		{
 			livox_sector_set_voxel (sec,
@@ -790,14 +715,14 @@ livox_manager_update_marked (livoxManager* self)
 	int x;
 	int y;
 	int z;
-	lialgU32dicIter iter;
+	lialgSectorsIter iter;
 	livoxSector* sector;
 
 	/* Rebuild modified terrain. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_SECTORS_FOREACH (iter, self->sectors)
 	{
-		sector = iter.value;
-		if (!sector->dirty)
+		sector = lialg_strdic_find (iter.sector->content, "voxel");
+		if (sector == NULL || !sector->dirty)
 			continue;
 		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
 		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
@@ -821,7 +746,8 @@ livox_manager_update_marked (livoxManager* self)
 int
 livox_manager_write (livoxManager* self)
 {
-	lialgU32dicIter iter;
+	lialgSectorsIter iter;
+	livoxSector* sector;
 
 	if (self->sql == NULL)
 	{
@@ -830,9 +756,12 @@ livox_manager_write (livoxManager* self)
 	}
 
 	/* Save terrain. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_SECTORS_FOREACH (iter, self->sectors)
 	{
-		if (!livox_sector_write (iter.value, self->sql))
+		sector = lialg_strdic_find (iter.sector->content, "voxel");
+		if (sector == NULL)
+			continue;
+		if (!livox_sector_write (sector, self->sql))
 			return 0;
 	}
 
@@ -897,7 +826,7 @@ livox_manager_get_voxel (livoxManager* self,
 	sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sector = livox_manager_load_sector (self, LIVOX_SECTOR_INDEX (sx, sy, sz));
+	sector = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
 	if (sector == NULL)
 	{
 		livox_voxel_init (value, 0);
@@ -924,7 +853,7 @@ livox_manager_set_voxel (livoxManager*     self,
 	sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sector = livox_manager_load_sector (self, LIVOX_SECTOR_INDEX (sx, sy, sz));
+	sector = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
 	if (sector == NULL)
 		return 0;
 	sx = x % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
@@ -948,20 +877,6 @@ private_clear_materials (livoxManager* self)
 		livox_material_free (material);
 	}
 	lialg_u32dic_clear (self->materials);
-}
-
-static void
-private_clear_sectors (livoxManager* self)
-{
-	lialgU32dicIter iter;
-	livoxSector* sector;
-
-	LI_FOREACH_U32DIC (iter, self->sectors)
-	{
-		sector = iter.value;
-		livox_sector_free (sector);
-	}
-	lialg_u32dic_clear (self->sectors);
 }
 
 static int
@@ -1025,13 +940,12 @@ private_mark_block (livoxManager* self,
 	int sx;
 	int sy;
 	int sz;
-	uint32_t id;
 	livoxSector* sector1;
 
 	/* Find affected sector. */
-	sx = sector->x;
-	sy = sector->y;
-	sz = sector->z;
+	sx = sector->sector->x;
+	sy = sector->sector->y;
+	sz = sector->sector->z;
 	if (x < 0)
 	{
 		x = LIVOX_BLOCKS_PER_LINE - 1;
@@ -1062,10 +976,9 @@ private_mark_block (livoxManager* self,
 		z = 0;
 		sz++;
 	}
-	id = LIVOX_SECTOR_INDEX (sx, sy, sz);
 
 	/* Mark block as dirty. */
-	sector1 = livox_manager_find_sector (self, id);
+	sector1 = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 0);
 	if (sector1 == NULL)
 		return;
 	sector1->blocks[LIVOX_BLOCK_INDEX (x, y, z)].dirty |= 0x80;

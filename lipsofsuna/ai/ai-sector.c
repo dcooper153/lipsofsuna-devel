@@ -23,24 +23,17 @@
  */
 
 #include <system/lips-system.h>
+#include "ai-manager.h"
 #include "ai-sector.h"
 
 /**
  * \brief Creates a new AI sector.
  *
- * \param manager AI manager.
- * \param x Sector offset.
- * \param y Sector offset.
- * \param z Sector offset.
- * \param voxels Voxel sector or NULL.
+ * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
 liaiSector*
-liai_sector_new (liaiManager* manager,
-                 int          x,
-                 int          y,
-                 int          z,
-                 livoxSector* voxels)
+liai_sector_new (lialgSector* sector)
 {
 	int i;
 	int j;
@@ -48,20 +41,13 @@ liai_sector_new (liaiManager* manager,
 	int l;
 	liaiSector* self;
 	liaiWaypoint* wp;
-	limatVector offset;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liaiSector));
 	if (self == NULL)
 		return NULL;
-	self->x = x;
-	self->y = y;
-	self->z = z;
-	self->manager = manager;
-
-	/* Calculate offset. */
-	offset = limat_vector_init (x, y, z);
-	offset = limat_vector_multiply (offset, LIAI_SECTOR_WIDTH);
+	self->manager = lialg_sectors_get_userdata (sector->manager, "ai");
+	self->sector = sector;
 
 	/* Set waypoint positions. */
 	for (k = l = 0 ; k < LIAI_WAYPOINTS_PER_LINE ; k++)
@@ -74,12 +60,9 @@ liai_sector_new (liaiManager* manager,
 		wp->z = k;
 		wp->sector = self;
 		wp->position = limat_vector_init (i + 0.5f, j + 0.5f, k + 0.5f);
-		wp->position = limat_vector_multiply (wp->position, LIAI_WAYPOINT_WIDTH);
-		wp->position = limat_vector_add (wp->position, offset);
+		wp->position = limat_vector_multiply (wp->position, self->manager->sectors->width);
+		wp->position = limat_vector_add (wp->position, sector->position);
 	}
-
-	/* Build waypoints. */
-	liai_sector_build (self, voxels);
 
 	return self;
 }

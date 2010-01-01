@@ -132,7 +132,14 @@ liext_preview_new (liwdgManager* manager,
 	}
 
 	/* Allocate generator. */
-	data->generator = ligen_generator_new (module->paths);
+	data->callbacks = lical_callbacks_new ();
+	data->sectors = lialg_sectors_new (module->sectors->count, module->sectors->width);
+	if (data->callbacks == NULL || data->sectors == NULL)
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+	data->generator = ligen_generator_new (module->paths, data->callbacks, data->sectors);
 	if (data->generator == NULL)
 	{
 		liwdg_widget_free (self);
@@ -196,7 +203,7 @@ liext_preview_build_tile (liextPreview* self,
 	livoxVoxel voxel;
 
 	livox_voxel_init (&voxel, material);
-	livox_manager_clear (self->generator->voxels);
+	lialg_sectors_clear (self->generator->voxels->sectors);
 	livox_manager_set_voxel (self->generator->voxels,
 		LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, &voxel);
 	livox_manager_update (self->generator->voxels, 1.0f);
@@ -471,6 +478,10 @@ private_free (liextPreview* self)
 		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 		ligen_generator_free (self->generator);
 	}
+	if (self->sectors != NULL)
+		lialg_sectors_free (self->sectors);
+	if (self->callbacks != NULL)
+		lical_callbacks_free (self->callbacks);
 	if (self->scene != NULL)
 		lirnd_scene_free (self->scene);
 }
@@ -670,8 +681,7 @@ private_block_load (liextPreview*     self,
 	livoxSector* vsector;
 
 	/* Find sector. */
-	vsector = livox_manager_find_sector (self->generator->voxels, LIVOX_SECTOR_INDEX (
-		event->sector[0], event->sector[1], event->sector[2]));
+	vsector = lialg_sectors_data_offset (self->generator->voxels->sectors, "voxel", event->sector[0], event->sector[1], event->sector[2], 0);
 	if (vsector == NULL)
 		return 1;
 

@@ -32,9 +32,6 @@ static int
 private_init (liengEngine* self);
 
 static void
-private_clear_sectors (liengEngine* self);
-
-static void
 private_physics_transform (liengEngine* self,
                            liphyObject* object);
 
@@ -44,11 +41,13 @@ private_physics_transform (liengEngine* self,
  * \brief Creates a new game engine.
  *
  * \param calls Callback manager.
+ * \param sectors Sector manager.
  * \param path Module directory.
  * \return New engine or NULL.
  */
 liengEngine*
 lieng_engine_new (licalCallbacks* calls,
+                  lialgSectors*   sectors,
                   const char*     path)
 {
 	liengEngine* self;
@@ -57,6 +56,7 @@ lieng_engine_new (licalCallbacks* calls,
 	if (self == NULL)
 		return NULL;
 	self->callbacks = calls;
+	self->sectors = sectors;
 	self->range.start = 0;
 	self->range.size = 0xFFFFFFFF;
 	self->config.radius = 1;
@@ -109,10 +109,6 @@ lieng_engine_free (liengEngine* self)
 	if (self->selection != NULL)
 		lieng_engine_clear_selection (self);
 
-	/* Clear sectors. */
-	if (self->sectors != NULL)
-		private_clear_sectors (self);
-
 	/* Clear resources. */
 	if (self->resources != NULL)
 		lieng_resources_clear (self->resources);
@@ -120,14 +116,16 @@ lieng_engine_free (liengEngine* self)
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->callbacks, self, "free", lical_marshal_DATA_PTR, self);
 
+	/* Clear sectors. */
+	if (self->sectors != NULL)
+		lialg_sectors_remove_content (self->sectors, "engine");
+
 	/* Free subsystems. */
 	if (self->physics != NULL)
 		liphy_physics_free (self->physics);
 
 	if (self->resources != NULL)
 		lieng_resources_free (self->resources);
-	if (self->sectors != NULL)
-		lialg_u32dic_free (self->sectors);
 	if (self->objects != NULL)
 		lialg_u32dic_free (self->objects);
 	if (self->selection != NULL)
@@ -154,31 +152,6 @@ lieng_engine_clear_selection (liengEngine* self)
 		lieng_selection_free (selection);
 	}
 	lialg_ptrdic_clear (self->selection);
-}
-
-/**
- * \brief Finds or creates a sector.
- *
- * Finds an existing sector or creates an empty one on demand. This is used by
- * various map editing facilities of the server to ensure that edited sectors
- * aren't swapped out.
- *
- * \param self Engine.
- * \param id Sector number.
- * \return Sector or NULL.
- */
-liengSector*
-lieng_engine_create_sector (liengEngine* self,
-                            uint32_t     id)
-{
-	liengSector* sector;
-
-	sector = lialg_u32dic_find (self->sectors, id);
-	if (sector != NULL)
-		return sector;
-	sector = lieng_sector_new (self, id);
-
-	return sector;
 }
 
 liengAnimation*
@@ -237,20 +210,6 @@ lieng_engine_find_object (liengEngine* self,
                           uint32_t     id)
 {
 	return lialg_u32dic_find (self->objects, id);
-}
-
-/**
- * \brief Gets a sector by id.
- *
- * \param self Engine.
- * \param id Sector number.
- * \return Sector or NULL.
- */
-liengSector*
-lieng_engine_find_sector (liengEngine* self,
-                          uint32_t     id)
-{
-	return lialg_u32dic_find (self->sectors, id);
 }
 
 /**
@@ -345,31 +304,6 @@ lieng_engine_load_resources (liengEngine* self,
 }
 
 /**
- * \brief Finds or loads a sector.
- *
- * Finds an existing sector or loads one from the disk on demand. This is used
- * by various map editing facilities of the server to ensure that edited sectors
- * aren't swapped out.
- *
- * \param self Engine.
- * \param id Sector number.
- * \return Sector or NULL.
- */
-liengSector*
-lieng_engine_load_sector (liengEngine* self,
-                          uint32_t     id)
-{
-	liengSector* sector;
-
-	sector = lialg_u32dic_find (self->sectors, id);
-	if (sector != NULL)
-		return sector;
-	sector = lieng_sector_new (self, id);
-
-	return sector;
-}
-
-/**
  * \brief Unregister a constraint.
  *
  * \param self Engine.
@@ -399,16 +333,18 @@ void
 lieng_engine_update (liengEngine* self,
                      float        secs)
 {
+	lialgSectorsIter siter;
 	lialgU32dicIter iter;
 	liengConstraint* constraint;
 	liengObject* object;
 	liengSector* sector;
 
 	/* Update sectors. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_SECTORS_FOREACH (siter, self->sectors)
 	{
-		sector = iter.value;
-		lieng_sector_update (sector, secs);
+		sector = lialg_strdic_find (siter.sector->content, "engine");
+		if (sector != NULL)
+			lieng_sector_update (sector, secs);
 	}
 
 	/* Update objects. */
@@ -489,20 +425,6 @@ lieng_engine_set_userdata (liengEngine* self,
 
 /*****************************************************************************/
 
-static void
-private_clear_sectors (liengEngine* self)
-{
-	lialgU32dicIter iter;
-	liengSector* sector;
-
-	LI_FOREACH_U32DIC (iter, self->sectors)
-	{
-		sector = iter.value;
-		lieng_sector_free (sector);
-	}
-	lialg_u32dic_clear (self->sectors);
-}
-
 static int
 private_init (liengEngine* self)
 {
@@ -528,8 +450,9 @@ private_init (liengEngine* self)
 		return 0;
 
 	/* Sectors. */
-	self->sectors = lialg_u32dic_new ();
-	if (self->sectors == NULL)
+	if (!lialg_sectors_insert_content (self->sectors, "engine", self,
+	     	(lialgSectorFreeFunc) lieng_sector_free,
+	     	(lialgSectorLoadFunc) lieng_sector_new))
 		return 0;
 
 	return 1;

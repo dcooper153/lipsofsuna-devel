@@ -33,19 +33,13 @@
 
 struct _liaiSector
 {
-	int x;
-	int y;
-	int z;
 	liaiManager* manager;
 	liaiWaypoint points[LIAI_WAYPOINTS_PER_SECTOR];
+	lialgSector* sector;
 };
 
 liaiSector*
-liai_sector_new (liaiManager* manager,
-                 int          x,
-                 int          y,
-                 int          z,
-                 livoxSector* voxels);
+liai_sector_new (lialgSector* sector);
 
 void
 liai_sector_free (liaiSector* self);

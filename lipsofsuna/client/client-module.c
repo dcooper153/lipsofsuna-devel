@@ -164,6 +164,8 @@ licli_module_free (licliModule* self)
 		lithr_thread_free (self->server_thread);
 	}
 	assert (self->server == NULL);
+	if (self->sectors != NULL)
+		lialg_sectors_free (self->sectors);
 	if (self->callbacks != NULL)
 		lical_callbacks_free (self->callbacks);
 	if (self->paths != NULL)
@@ -574,8 +576,14 @@ private_init_engine (licliModule* self)
 	if (self->callbacks == NULL)
 		return 0;
 
+	/* Initialize sectors. */
+#warning Hardcoded sector size
+	self->sectors = lialg_sectors_new (256, 64.0f);
+	if (self->sectors == NULL)
+		return 0;
+
 	/* Initialize engine. */
-	self->engine = lieng_engine_new (self->callbacks, self->paths->module_data);
+	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths->module_data);
 	if (self->engine == NULL)
 		return 0;
 	flags = lieng_engine_get_flags (self->engine);

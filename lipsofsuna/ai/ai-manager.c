@@ -64,11 +64,15 @@ private_solve_path (liaiManager*  self,
 /**
  * \brief Creates a new AI manager.
  *
+ * \param callbacks Callbacks.
+ * \param sectors Sector manager.
  * \param voxels Voxel manager or NULL.
  * \return New AI manager or NULL.
  */
 liaiManager*
-liai_manager_new (livoxManager* voxels)
+liai_manager_new (licalCallbacks* callbacks,
+                  lialgSectors*   sectors,
+                  livoxManager*   voxels)
 {
 	liaiManager* self;
 
@@ -76,11 +80,14 @@ liai_manager_new (livoxManager* voxels)
 	self = lisys_calloc (1, sizeof (liaiManager));
 	if (self == NULL)
 		return NULL;
+	self->callbacks = callbacks;
+	self->sectors = sectors;
 	self->voxels = voxels;
 
-	/* Allocate sector dictionary. */
-	self->sectors = lialg_u32dic_new ();
-	if (self->sectors == NULL)
+	/* Register sector content. */
+	if (!lialg_sectors_insert_content (self->sectors, "ai", self,
+		(lialgSectorFreeFunc) liai_sector_free,
+		(lialgSectorLoadFunc) liai_sector_new))
 	{
 		lisys_free (self);
 		return NULL;
@@ -94,7 +101,7 @@ liai_manager_new (livoxManager* voxels)
 		(lialgAstarSuccessor) private_astar_successor);
 	if (self->astar == NULL)
 	{
-		lialg_u32dic_free (self->sectors);
+		lialg_sectors_remove_content (self->sectors, "ai");
 		lisys_free (self);
 		return NULL;
 	}
@@ -114,33 +121,18 @@ liai_manager_new (livoxManager* voxels)
 void
 liai_manager_free (liaiManager* self)
 {
-	lialgU32dicIter iter;
-
 	/* Unregister callbacks. */
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
 
-	/* Free sectors. */
+	/* unregister sector content. */
 	if (self->sectors != NULL)
-	{
-		LI_FOREACH_U32DIC (iter, self->sectors)
-			liai_sector_free (iter.value);
-		lialg_u32dic_free (self->sectors);
-	}
+		lialg_sectors_remove_content (self->sectors, "ai");
 
 	/* Free path solver. */
 	if (self->astar != NULL)
 		lialg_astar_free (self->astar);
 
 	lisys_free (self);
-}
-
-liaiSector*
-liai_manager_find_sector (liaiManager* self,
-                          int          sx,
-                          int          sy,
-                          int          sz)
-{
-	return lialg_u32dic_find (self->sectors, LIAI_SECTOR_INDEX (sx, sy, sz));
 }
 
 liaiWaypoint*
@@ -165,49 +157,11 @@ liai_manager_find_waypoint (liaiManager*       self,
 	y %= LIAI_WAYPOINTS_PER_LINE;
 	z %= LIAI_WAYPOINTS_PER_LINE;
 
-	sector = lialg_u32dic_find (self->sectors, LIAI_SECTOR_INDEX (sx, sy, sz));
+	sector = lialg_sectors_data_offset (self->sectors, "ai", sx, sy, sz, 0);
 	if (sector == NULL)
 		return NULL;
 
 	return liai_sector_get_waypoint (sector, x, y, z);
-}
-
-int
-liai_manager_load_sector (liaiManager* self,
-                          int          sx,
-                          int          sy,
-                          int          sz)
-{
-	liaiSector* sector;
-	livoxSector* voxels;
-
-	/* Get terrain data. */
-	if (self->voxels != NULL)
-		voxels = livox_manager_find_sector (self->voxels, LIVOX_SECTOR_INDEX (sx, sy, sz));
-	else
-		voxels = NULL;
-
-	/* Check for existing. */
-	sector = liai_manager_find_sector (self, sx, sy, sz);
-	if (sector != NULL)
-	{
-		liai_sector_build (sector, voxels);
-		return 1;
-	}
-
-	/* Create new sector. */
-	sector = liai_sector_new (self, sx, sy, sz, voxels);
-	if (sector == NULL)
-		return 0;
-
-	/* Add to dictionary. */
-	if (!lialg_u32dic_insert (self->sectors, LIAI_SECTOR_INDEX (sx, sy, sz), sector))
-	{
-		liai_sector_free (sector);
-		return 0;
-	}
-
-	return 1;
 }
 
 /**
@@ -323,9 +277,9 @@ private_astar_successor (liaiManager*  self,
 		x = node->x + rel[i][0];
 		y = node->y + rel[i][1];
 		z = node->z + rel[i][2];
-		sx = node->sector->x;
-		sy = node->sector->y;
-		sz = node->sector->z;
+		sx = node->sector->sector->x;
+		sy = node->sector->sector->y;
+		sz = node->sector->sector->z;
 		if (x < 0) { x += LIAI_WAYPOINTS_PER_LINE; sx--; }
 		if (y < 0) { y += LIAI_WAYPOINTS_PER_LINE; sy--; }
 		if (z < 0) { z += LIAI_WAYPOINTS_PER_LINE; sz--; }
@@ -335,9 +289,9 @@ private_astar_successor (liaiManager*  self,
 
 		/* Find next sector. */
 		sector = node->sector;
-		if (sx != sector->x || sy != sector->y || sz != sector->z)
+		if (sx != sector->sector->x || sy != sector->sector->y || sz != sector->sector->z)
 		{
-			sector = liai_manager_find_sector (sector->manager, sx, sy, sz);
+			sector = lialg_sectors_data_offset (sector->sector->manager, "ai", sx, sy, sz, 0);
 			if (sector == NULL)
 				continue;
 		}
@@ -362,33 +316,21 @@ static int
 private_block_load (liaiManager*      self,
                     livoxUpdateEvent* event)
 {
-	uint32_t id;
-	liaiSector* asector;
-	livoxSector* vsector;
+	liaiSector* ai;
+	lialgSector* sector;
+	livoxSector* voxel;
 
-	/* Find voxel sector. */
-	id = LIAI_SECTOR_INDEX (event->sector[0], event->sector[1], event->sector[2]);
-	vsector = livox_manager_find_sector (self->voxels, id);
-	if (vsector == NULL)
+	/* Find or create sector. */
+	sector = lialg_sectors_sector_offset (self->sectors, event->sector[0], event->sector[1], event->sector[2], 1);
+	if (sector == NULL)
+		return 1;
+	ai = lialg_strdic_find (sector->content, "ai");
+	voxel = lialg_strdic_find (sector->content, "voxel");
+	if (ai == NULL || voxel == NULL)
 		return 1;
 
-	/* Find or create AI sector. */
-	asector = lialg_u32dic_find (self->sectors, id);
-	if (asector == NULL)
-	{
-		asector = liai_sector_new (self, event->sector[0], event->sector[1], event->sector[2], vsector);
-		if (asector == NULL)
-			return 1;
-		if (!lialg_u32dic_insert (self->sectors, id, asector))
-		{
-			liai_sector_free (asector);
-			return 1;
-		}
-	}
-
-	/* Build block. */
-	liai_sector_build_area (asector, vsector,
-		event->block[0], event->block[1], event->block[2],
+	/* Build waypoints. */
+	liai_sector_build_area (ai, voxel, event->block[0], event->block[1], event->block[2],
 		LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE);
 
 	return 1;

@@ -43,31 +43,27 @@ struct _lisrvObserverIter
  * This is a macro that works in the same way with a for loop.
  *
  * \param iter Observer iterator.
- * \param subject Pointer to an object.
- * \param radius Search radius in sectors.
+ * \param object_ Object whose observers to find.
+ * \param radius Maximum search radius in world units.
  */
-#define LISRV_FOREACH_OBSERVER(iter, subject, radius) \
-	for (lisrv_observer_iter_first (&iter, subject, radius) ; iter.object != NULL ; \
+#define LISRV_FOREACH_OBSERVER(iter, object_, radius) \
+	for (lisrv_observer_iter_first (&iter, object_, radius) ; iter.object != NULL ; \
 	     lisrv_observer_iter_next (&iter))
 
 static inline int
 lisrv_observer_iter_first (lisrvObserverIter* self,
-                           liengObject*       subject,
-                           int                radius)
+                           liengObject*       object,
+                           float              radius)
 {
-	int x;
-	int y;
-	int z;
+	limatTransform transform;
 
 	/* Initialize self. */
 	memset (self, 0, sizeof (lisrvObserverIter));
-	if (subject->sector == NULL)
+	if (object->sector == NULL)
 		return 0;
-	x = subject->sector->x;
-	y = subject->sector->y;
-	z = subject->sector->z;
-	self->subject = subject;
-	if (!lieng_object_iter_first (&self->objects, subject->engine, x, y, z, radius))
+	lieng_object_get_transform (object, &transform);
+	self->subject = object;
+	if (!lieng_object_iter_first (&self->objects, object->engine, &transform.position, radius))
 		return 0;
 
 	/* Find first observer. */

@@ -67,10 +67,14 @@ private_stroke_paint (ligenGenerator* self,
  * \brief Creates a new generator module.
  *
  * \param paths Path information.
+ * \param callbacks Callbacks.
+ * \param sector Sector manager.
  * \return New generator or NULL.
  */
 ligenGenerator*
-ligen_generator_new (lipthPaths* paths)
+ligen_generator_new (lipthPaths*     paths,
+                     licalCallbacks* callbacks,
+                     lialgSectors*   sectors)
 {
 	ligenGenerator* self;
 
@@ -82,10 +86,12 @@ ligen_generator_new (lipthPaths* paths)
 		return NULL;
 	}
 	self->paths = paths;
+	self->callbacks = callbacks;
+	self->sectors = sectors;
 	ligen_generator_set_fill (self, 1);
 
 	/* Allocate terrain structures. */
-	self->voxels = livox_manager_new ();
+	self->voxels = livox_manager_new (callbacks, sectors);
 	if (self->voxels == NULL)
 		goto error;
 
@@ -142,7 +148,7 @@ ligen_generator_clear_scene (ligenGenerator* self)
 	self->strokes.count = 0;
 
 	/* Clear scene. */
-	livox_manager_clear (self->voxels);
+	lialg_sectors_clear (self->sectors);
 	livox_manager_update (self->voxels, 1.0f);
 }
 
@@ -296,7 +302,7 @@ ligen_generator_rebuild_scene (ligenGenerator* self)
 	ligenStroke* stroke;
 
 	/* Clear sectors. */
-	livox_manager_clear (self->voxels);
+	lialg_sectors_clear (self->sectors);
 
 	/* Paint strokes. */
 	for (i = 0 ; i < self->strokes.count ; i++)
@@ -509,10 +515,7 @@ ligen_generator_write (ligenGenerator* self)
 			transform.position.x += LIVOX_TILE_WIDTH * stroke->pos[0];
 			transform.position.y += LIVOX_TILE_WIDTH * stroke->pos[1];
 			transform.position.z += LIVOX_TILE_WIDTH * stroke->pos[2];
-			sector = LIENG_SECTOR_INDEX (
-				(int)(transform.position.x / LIENG_SECTOR_WIDTH),
-				(int)(transform.position.y / LIENG_SECTOR_WIDTH),
-				(int)(transform.position.z / LIENG_SECTOR_WIDTH));
+			sector = lialg_sectors_point_to_index (self->sectors, &transform.position);
 
 			/* Write values. */
 			if (!liarc_sql_replace (self->srvsql, "objects",
@@ -972,7 +975,6 @@ private_stroke_paint (ligenGenerator* self,
                       ligenStroke*    stroke)
 {
 	int i;
-	int index;
 	int min[3];
 	int max[3];
 	int off[3];
@@ -981,7 +983,6 @@ private_stroke_paint (ligenGenerator* self,
 	int dst[3];
 	ligenBrush* brush;
 	livoxSector* sector;
-	livoxVoxel voxel;
 
 	/* Determine affected sectors. */
 	brush = lialg_u32dic_find (self->brushes, stroke->brush);
@@ -999,17 +1000,9 @@ private_stroke_paint (ligenGenerator* self,
 	for (sec[0] = min[0] ; sec[0] <= max[0] ; sec[0]++)
 	{
 		/* Find or create sector. */
-		index = LIVOX_SECTOR_INDEX (sec[0], sec[1], sec[2]);
-		sector = livox_manager_find_sector (self->voxels, index);
+		sector = lialg_sectors_data_offset (self->sectors, "voxel", sec[0], sec[1], sec[2], 1);
 		if (sector == NULL)
-		{
-			sector = livox_manager_create_sector (self->voxels, index);
-			if (self->fill != 0)
-			{
-				livox_voxel_init (&voxel, self->fill);
-				livox_sector_fill (sector, &voxel);
-			}
-		}
+			return 0;
 
 		/* Calculate paint offset. */
 		off[0] = stroke->pos[0] - sec[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);

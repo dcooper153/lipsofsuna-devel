@@ -49,14 +49,15 @@ struct _livoxUpdateEvent
 
 struct _livoxManager
 {
+	lialgSectors* sectors;
 	lialgU32dic* materials;
-	lialgU32dic* sectors;
 	liarcSql* sql;
 	licalCallbacks* callbacks;
 };
 
 livoxManager*
-livox_manager_new ();
+livox_manager_new (licalCallbacks* callbacks,
+                   lialgSectors*   sectors);
 
 void
 livox_manager_free (livoxManager* self);
@@ -64,9 +65,6 @@ livox_manager_free (livoxManager* self);
 int
 livox_manager_check_occluder (const livoxManager* self,
                               const livoxVoxel*   voxel);
-
-void
-livox_manager_clear (livoxManager* self);
 
 void
 livox_manager_clear_materials (livoxManager* self);
@@ -81,10 +79,6 @@ livox_manager_copy_voxels (livoxManager* self,
                            int           zsize,
                            livoxVoxel*   result);
 
-livoxSector*
-livox_manager_create_sector (livoxManager* self,
-                             uint32_t      id);
-
 int
 livox_manager_erase_voxel (livoxManager*      self,
                            const limatVector* point);
@@ -92,10 +86,6 @@ livox_manager_erase_voxel (livoxManager*      self,
 livoxMaterial*
 livox_manager_find_material (livoxManager* self,
                              uint32_t      id);
-
-livoxSector*
-livox_manager_find_sector (livoxManager* self,
-                           uint32_t      id);
 
 livoxVoxel*
 livox_manager_find_voxel (livoxManager*      self,
@@ -114,10 +104,6 @@ livox_manager_insert_voxel (livoxManager*      self,
 
 int
 livox_manager_load_materials (livoxManager* self);
-
-livoxSector*
-livox_manager_load_sector (livoxManager* self,
-                           uint32_t      id);
 
 void
 livox_manager_mark_updates (livoxManager* self);
