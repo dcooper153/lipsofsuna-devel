@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,7 +39,9 @@ enum
 #define ENOTSUP 1024
 #endif
 
-LI_BEGIN_DECLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void
 lisys_error_append (const char* format,
@@ -62,7 +64,9 @@ lisys_error_set (int         type,
                  const char* format,
                              ...);
 
-LI_END_DECLS
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

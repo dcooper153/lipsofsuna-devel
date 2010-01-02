@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,7 +31,9 @@
 #include "physics-shape.h"
 #include "physics-types.h"
 
-LI_BEGIN_DECLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 liphyObject*
 liphy_object_new (liphyPhysics*    physics,
@@ -199,7 +201,9 @@ void
 liphy_object_set_velocity (liphyObject*       self,
                            const limatVector* value);
 
-LI_END_DECLS
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
