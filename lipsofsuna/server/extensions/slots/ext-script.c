@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -157,7 +157,7 @@ static void Slots_register (liscrArgs* args)
 		return;
 	liscr_args_gets_string (args, "prot", &prot);
 	liscr_args_gets_string (args, "node", &node);
-	liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data);
+	liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data);
 
 	/* Check for existing slot. */
 	/* TODO: Override type if different and inform clients? */
@@ -200,7 +200,7 @@ static void Slots_set_object (liscrArgs* args)
 	slot = liext_slots_find_slot (args->self, name);
 	if (slot == NULL)
 		return;
-	liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data);
+	liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data);
 	if (data != NULL)
 		liext_slots_set_object (args->self, name, data->data);
 	else
@@ -225,7 +225,7 @@ static void Slots_setter_owner (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_slots_set_owner (args->self, data->data);
 	else
 		liext_slots_set_owner (args->self, NULL);

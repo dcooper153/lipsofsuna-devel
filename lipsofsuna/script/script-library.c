@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -103,7 +103,7 @@ void
 licomClassScript (liscrClass* self,
                   void*       data)
 {
-	liscr_class_set_userdata (self, LICOM_SCRIPT_CLASS, data);
+	liscr_class_set_userdata (self, LISCR_SCRIPT_CLASS, data);
 	liscr_class_insert_cfunc (self, "check", Class_check);
 	liscr_class_insert_cfunc (self, "new", Class_new);
 }

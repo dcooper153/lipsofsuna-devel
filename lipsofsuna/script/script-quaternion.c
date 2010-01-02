@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -50,8 +50,8 @@ Quaternion___add (lua_State* lua)
 	liscrData* c;
 	liscrScript* script = liscr_script (lua);
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_QUATERNION);
-	b = liscr_checkdata (lua, 2, LICOM_SCRIPT_QUATERNION);
+	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_QUATERNION);
+	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_QUATERNION);
 
 	tmp = limat_quaternion_add (*((limatQuaternion*) a->data), *((limatQuaternion*) b->data));
 	c = liscr_quaternion_new (script, &tmp);
@@ -90,7 +90,7 @@ Quaternion___mul (lua_State* lua)
 	liscrData* c;
 	liscrScript* script = liscr_script (lua);
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_QUATERNION);
+	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_QUATERNION);
 	if (lua_isnumber (lua, 2))
 	{
 		/* Multiply by scalar. */
@@ -109,10 +109,10 @@ Quaternion___mul (lua_State* lua)
 		else
 			lua_pushnil (lua);
 	}
-	else if (liscr_isdata (lua, 2, LICOM_SCRIPT_VECTOR))
+	else if (liscr_isdata (lua, 2, LISCR_SCRIPT_VECTOR))
 	{
 		/* Transform vector. */
-		b = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+		b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
 		v = limat_quaternion_transform (*((limatQuaternion*) a->data), *((limatVector*) b->data));
 		c = liscr_vector_new (script, &v);
 		if (c != NULL)
@@ -123,10 +123,10 @@ Quaternion___mul (lua_State* lua)
 		else
 			lua_pushnil (lua);
 	}
-	else if (liscr_isdata (lua, 2, LICOM_SCRIPT_QUATERNION))
+	else if (liscr_isdata (lua, 2, LISCR_SCRIPT_QUATERNION))
 	{
 		/* Concatenate rotations. */
-		b = liscr_checkdata (lua, 2, LICOM_SCRIPT_QUATERNION);
+		b = liscr_checkdata (lua, 2, LISCR_SCRIPT_QUATERNION);
 		q = limat_quaternion_multiply (*((limatQuaternion*) a->data), *((limatQuaternion*) b->data));
 		c = liscr_quaternion_new (script, &q);
 		if (c != NULL)
@@ -161,8 +161,8 @@ Quaternion___sub (lua_State* lua)
 	liscrData* c;
 	liscrScript* script = liscr_script (lua);
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_QUATERNION);
-	b = liscr_checkdata (lua, 2, LICOM_SCRIPT_QUATERNION);
+	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_QUATERNION);
+	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_QUATERNION);
 
 	tmp = limat_quaternion_subtract (*((limatQuaternion*) a->data), *((limatQuaternion*) b->data));
 	c = liscr_quaternion_new (script, &tmp);
@@ -240,7 +240,7 @@ static void Quaternion_nlerp (liscrArgs* args)
 	limatQuaternion tmp;
 	liscrData* data;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_QUATERNION, &data) &&
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &data) &&
 	    liscr_args_geti_float (args, 1, &val))
 	{
 		tmp = limat_quaternion_nlerp (*((limatQuaternion*) args->self), *((limatQuaternion*) data->data), val);
@@ -390,7 +390,7 @@ liscr_quaternion_new (liscrScript*           script,
 {
 	liscrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (limatQuaternion), LICOM_SCRIPT_QUATERNION);
+	self = liscr_data_new_alloc (script, sizeof (limatQuaternion), LISCR_SCRIPT_QUATERNION);
 	if (self == NULL)
 		return NULL;
 	*((limatQuaternion*) self->data) = *quaternion;

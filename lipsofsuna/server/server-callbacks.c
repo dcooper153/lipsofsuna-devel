@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -220,7 +220,7 @@ private_object_new (lisrvServer* server,
 	}
 
 	/* Allocate script data. */
-	object->script = liscr_data_new (server->script, object, LICOM_SCRIPT_OBJECT, lieng_object_free);
+	object->script = liscr_data_new (server->script, object, LISCR_SCRIPT_OBJECT, lieng_object_free);
 	if (object->script == NULL)
 	{
 		lialg_u32dic_free (data->animations);

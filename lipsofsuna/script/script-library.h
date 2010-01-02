@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,13 +21,13 @@
 #include <math/lips-math.h>
 #include <script/lips-script.h>
 
-#define LICOM_SCRIPT_CLASS "Lips.Class"
-#define LICOM_SCRIPT_EVENT "Lips.Event"
-#define LICOM_SCRIPT_OBJECT "Lips.Object"
-#define LICOM_SCRIPT_PACKET "Lips.Packet"
-#define LICOM_SCRIPT_PATH "Lips.Path"
-#define LICOM_SCRIPT_QUATERNION "Lips.Quaternion"
-#define LICOM_SCRIPT_VECTOR "Lips.Vector"
+#define LISCR_SCRIPT_CLASS "Lips.Class"
+#define LISCR_SCRIPT_EVENT "Lips.Event"
+#define LISCR_SCRIPT_OBJECT "Lips.Object"
+#define LISCR_SCRIPT_PACKET "Lips.Packet"
+#define LISCR_SCRIPT_PATH "Lips.Path"
+#define LISCR_SCRIPT_QUATERNION "Lips.Quaternion"
+#define LISCR_SCRIPT_VECTOR "Lips.Vector"
 
 void
 licomClassScript (liscrClass* clss,

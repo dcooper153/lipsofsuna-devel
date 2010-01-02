@@ -56,7 +56,7 @@ static void Skills_find (liscrArgs* args)
 	liextSkills* skills;
 	liscrData* data;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, LIENG_OBJECT (data->data)->id);

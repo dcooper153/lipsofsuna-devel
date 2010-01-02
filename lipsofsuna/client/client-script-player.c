@@ -177,7 +177,7 @@ static void Player_setter_rotation (liscrArgs* args)
 	liscrData* data;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_QUATERNION, &data) && client->network != NULL)
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &data) && client->network != NULL)
 		licli_network_set_rotation (client->network, data->data);
 }
 

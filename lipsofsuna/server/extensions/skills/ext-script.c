@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -94,7 +94,7 @@ static void Skills_check (liscrArgs* args)
 		liscr_args_seti_bool (args, 1);
 		return;
 	}
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, data->data);
@@ -126,7 +126,7 @@ static void Skills_find (liscrArgs* args)
 	liextSkills* skills;
 	liscrData* data;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, data->data);
@@ -441,7 +441,7 @@ static void Skills_subtract (liscrArgs* args)
 	if (!liscr_args_gets_string (args, "skill", &name) &&
 	    !liscr_args_gets_float (args, "value", &value))
 		return;
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, data->data);
@@ -473,7 +473,7 @@ static void Skills_setter_owner (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_skills_set_owner (args->self, data->data);
 	else
 		liext_skills_set_owner (args->self, NULL);

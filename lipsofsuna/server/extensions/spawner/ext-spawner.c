@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -264,7 +264,7 @@ private_spawn (liextSpawner* self,
 	}
 
 	/* Check if return value is valid. */
-	object = liscr_isdata (script->lua, -1, LICOM_SCRIPT_OBJECT);
+	object = liscr_isdata (script->lua, -1, LISCR_SCRIPT_OBJECT);
 	if (object == NULL)
 	{
 		lisys_error_set (LI_ERROR_UNKNOWN, "spawn function did not return an object");

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -50,8 +50,8 @@ Vector___add (lua_State* lua)
 	liscrData* c;
 	liscrScript* script = liscr_script (lua);
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-	b = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
+	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
 
 	tmp = limat_vector_add (*((limatVector*) a->data), *((limatVector*) b->data));
 	c = liscr_vector_new (script, &tmp);
@@ -83,7 +83,7 @@ Vector___mul (lua_State* lua)
 	liscrData* c;
 	liscrScript* script = liscr_script (lua);
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
+	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
 	s = luaL_checknumber (lua, 2);
 
 	tmp = limat_vector_multiply (*((limatVector*) a->data), s);
@@ -116,8 +116,8 @@ Vector___sub (lua_State* lua)
 	liscrData* c;
 	liscrScript* script = liscr_script (lua);
 
-	a = liscr_checkdata (lua, 1, LICOM_SCRIPT_VECTOR);
-	b = liscr_checkdata (lua, 2, LICOM_SCRIPT_VECTOR);
+	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
+	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
 
 	tmp = limat_vector_subtract (*((limatVector*) a->data), *((limatVector*) b->data));
 	c = liscr_vector_new (script, &tmp);
@@ -169,7 +169,7 @@ static void Vector_cross (liscrArgs* args)
 	limatVector tmp;
 	liscrData* data;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_VECTOR, &data))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
 	{
 		tmp = limat_vector_cross (*((limatVector*) args->self), *((limatVector*) data->data));
 		liscr_args_seti_vector (args, &tmp);
@@ -264,7 +264,7 @@ liscr_vector_new (liscrScript*       script,
 {
 	liscrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (limatVector), LICOM_SCRIPT_VECTOR);
+	self = liscr_data_new_alloc (script, sizeof (limatVector), LISCR_SCRIPT_VECTOR);
 	if (self == NULL)
 		return NULL;
 	*((limatVector*) self->data) = *vector;

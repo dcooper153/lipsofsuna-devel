@@ -190,7 +190,7 @@ private_object_model (liextModule* self,
 	if (object->script != NULL && model != NULL)
 	{
 		liext_module_event (self, LIEXT_EVENT_OBJECT_MODEL,
-			"object", LICOM_SCRIPT_OBJECT, object->script,
+			"object", LISCR_SCRIPT_OBJECT, object->script,
 			"model", LISCR_TYPE_STRING, model->name, NULL);
 	}
 
@@ -205,7 +205,7 @@ private_object_new (liextModule* self,
 	{
 		/* Emit object creation event. */
 		liext_module_event (self, LIEXT_EVENT_OBJECT_NEW,
-			"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
+			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 
 		/* Emit assign event if player object. */
 		if (self->client->network != NULL &&
@@ -227,7 +227,7 @@ private_packet (liextModule* self,
 	data0 = liscr_packet_new_readable (self->client->script, reader);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
 		"message", LISCR_TYPE_INT, type,
-		"packet", LICOM_SCRIPT_PACKET, data0, NULL);
+		"packet", LISCR_SCRIPT_PACKET, data0, NULL);
 	if (data0 != NULL)
 		liscr_data_unref (data0, NULL);
 
@@ -246,7 +246,7 @@ private_select (liextModule*    self,
 		if (object != NULL && object->script != NULL)
 		{
 			liext_module_event (self, LIEXT_EVENT_SELECT,
-				"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
+				"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 			return 1;
 		}
 	}

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -215,7 +215,7 @@ private_animation (liextModule*   self,
 #warning animation events disabled.
 #if 0
 	liext_module_event (self, LIEXT_EVENT_OBJECT_ANIMATION,
-		"object", LICOM_SCRIPT_OBJECT, object->script,
+		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"animation", LISCR_TYPE_STRING, animation->name, NULL);
 #endif
 	return 1;
@@ -231,8 +231,8 @@ private_control (liextModule*     self,
 
 	data0 = liscr_quaternion_new (self->server->script, rotation);
 	liext_module_event (self, LIEXT_EVENT_CONTROL,
-		"object", LICOM_SCRIPT_OBJECT, object->script,
-		"rotation", LICOM_SCRIPT_QUATERNION, data0,
+		"object", LISCR_SCRIPT_OBJECT, object->script,
+		"rotation", LISCR_SCRIPT_QUATERNION, data0,
 		"controls", LISCR_TYPE_INT, flags, NULL);
 	if (data0 != NULL)
 		liscr_data_unref (data0, NULL);
@@ -247,7 +247,7 @@ private_login (liextModule* self,
                const char*  pass)
 {
 	liext_module_event (self, LIEXT_EVENT_LOGIN,
-		"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
+		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
 
@@ -256,7 +256,7 @@ private_logout (liextModule* self,
                 liengObject* object)
 {
 	liext_module_event (self, LIEXT_EVENT_LOGOUT,
-		"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
+		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
 
@@ -265,7 +265,7 @@ private_motion (liextModule* self,
                 liengObject* object)
 {
 	liext_module_event (self, LIEXT_EVENT_SIMULATE,
-		"object", LICOM_SCRIPT_OBJECT, object, NULL);
+		"object", LISCR_SCRIPT_OBJECT, object, NULL);
 	return 1;
 }
 
@@ -280,9 +280,9 @@ private_packet (liextModule* self,
 	type = ((uint8_t*) packet->buffer)[0];
 	data0 = liscr_packet_new_readable (self->server->script, packet);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
-		"object", LICOM_SCRIPT_OBJECT, client->object->script,
+		"object", LISCR_SCRIPT_OBJECT, client->object->script,
 		"message", LISCR_TYPE_INT, type,
-		"packet", LICOM_SCRIPT_PACKET, data0, NULL);
+		"packet", LISCR_SCRIPT_PACKET, data0, NULL);
 	if (data0 != NULL)
 		liscr_data_unref (data0, NULL);
 
@@ -296,7 +296,7 @@ private_sample (liextModule* self,
                 int          flags)
 {
 	liext_module_event (self, LIEXT_EVENT_EFFECT,
-		"object", LICOM_SCRIPT_OBJECT, object->script,
+		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"effect", LISCR_TYPE_STRING, sample->name,
 		"flags", LISCR_TYPE_INT, flags, NULL);
 	return 1;
@@ -317,7 +317,7 @@ private_visibility (liextModule* self,
                     int          visible)
 {
 	liext_module_event (self, LIEXT_EVENT_VISIBILITY,
-		"object", LICOM_SCRIPT_OBJECT, object->script,
+		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
 	return 1;
 }

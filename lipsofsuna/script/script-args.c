@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -317,7 +317,7 @@ liscr_args_geti_quaternion (liscrArgs*       self,
 	{
 		lua_pushnumber (self->lua, index + 1);
 		lua_gettable (self->lua, self->input_table);
-		tmp = liscr_isdata (self->lua, -1, LICOM_SCRIPT_QUATERNION);
+		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
 			*result = *((limatQuaternion*) tmp);
@@ -327,7 +327,7 @@ liscr_args_geti_quaternion (liscrArgs*       self,
 		if (index < 0 || index >= self->args_count)
 			return 0;
 		index += self->args_start;
-		tmp = liscr_isdata (self->lua, index, LICOM_SCRIPT_QUATERNION);
+		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_QUATERNION);
 		if (tmp != NULL)
 			*result = *((limatQuaternion*) tmp);
 	}
@@ -375,7 +375,7 @@ liscr_args_geti_vector (liscrArgs*   self,
 	{
 		lua_pushnumber (self->lua, index + 1);
 		lua_gettable (self->lua, self->input_table);
-		tmp = liscr_isdata (self->lua, -1, LICOM_SCRIPT_VECTOR);
+		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
 			*result = *((limatVector*) tmp);
@@ -385,7 +385,7 @@ liscr_args_geti_vector (liscrArgs*   self,
 		if (index < 0 || index >= self->args_count)
 			return 0;
 		index += self->args_start;
-		tmp = liscr_isdata (self->lua, index, LICOM_SCRIPT_VECTOR);
+		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_VECTOR);
 		if (tmp != NULL)
 			*result = *((limatVector*) tmp);
 	}
@@ -546,7 +546,7 @@ liscr_args_gets_quaternion (liscrArgs*       self,
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
 		lua_getfield (self->lua, self->input_table, name);
-		tmp = liscr_isdata (self->lua, -1, LICOM_SCRIPT_QUATERNION);
+		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
 			*result = *((limatQuaternion*) tmp);
@@ -584,7 +584,7 @@ liscr_args_gets_vector (liscrArgs*   self,
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
 		lua_getfield (self->lua, self->input_table, name);
-		tmp = liscr_isdata (self->lua, -1, LICOM_SCRIPT_VECTOR);
+		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
 			*result = *((limatVector*) tmp);

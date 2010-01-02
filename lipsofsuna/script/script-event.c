@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -109,7 +109,7 @@ licom_event_new (liscrScript* script)
 {
 	liscrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (licomEvent), LICOM_SCRIPT_EVENT);
+	self = liscr_data_new_alloc (script, sizeof (licomEvent), LISCR_SCRIPT_EVENT);
 	if (self == NULL)
 		return NULL;
 	((licomEvent*) self->data)->data = self;

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -87,7 +87,7 @@ static void Inventory_set_object (liscrArgs* args)
 		size = liext_inventory_get_size (args->self);
 		if (slot >= 0 && slot <= size)
 		{
-			liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data);
+			liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data);
 			if (data != NULL)
 			{
 				liext_inventory_set_object (args->self, slot - 1, data->data);
@@ -173,7 +173,7 @@ static void Inventory_subscribe (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 		liext_inventory_insert_listener (args->self, data->data);
 }
 
@@ -193,7 +193,7 @@ static void Inventory_subscribed (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		liscr_args_seti_bool (args, liext_inventory_find_listener (
 			args->self, LIENG_OBJECT (data->data)->id) != NULL);
@@ -215,7 +215,7 @@ static void Inventory_unsubscribe (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 		liext_inventory_remove_listener (args->self, data->data);
 }
 

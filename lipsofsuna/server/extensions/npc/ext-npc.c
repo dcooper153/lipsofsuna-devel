@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -244,7 +244,7 @@ private_tick (liextNpc* self,
 			path = liext_module_solve_path (self->module, self->owner, &transform.position);
 			if (path != NULL)
 			{
-				tmp = liscr_data_new (self->script->script, path, LICOM_SCRIPT_PATH, liai_path_free);
+				tmp = liscr_data_new (self->script->script, path, LISCR_SCRIPT_PATH, liai_path_free);
 				if (tmp != NULL)
 				{
 					liext_npc_set_path (self, tmp);

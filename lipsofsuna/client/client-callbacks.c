@@ -193,7 +193,7 @@ private_miscellaneous_object_new (licliClient* client,
 	lieng_object_set_userdata (object, client);
 
 	/* Allocate script data. */
-	object->script = liscr_data_new (client->script, object, LICOM_SCRIPT_OBJECT, lieng_object_free);
+	object->script = liscr_data_new (client->script, object, LISCR_SCRIPT_OBJECT, lieng_object_free);
 	if (object->script == NULL)
 		return 0;
 

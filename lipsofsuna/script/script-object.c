@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -368,7 +368,7 @@ static void Object_setter_rotation (liscrArgs* args)
 	limatTransform transform;
 	liscrData* quat;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_QUATERNION, &quat))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &quat))
 	{
 		lieng_object_get_transform (args->self, &transform);
 		transform.rotation = *((limatQuaternion*) quat->data);

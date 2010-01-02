@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -55,7 +55,7 @@ static void Spawner_find (liscrArgs* args)
 	liextSpawner* spawner;
 	liscrData* object;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &object))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPAWNER);
 		spawner = liext_module_find_spawner (module, object->data);
@@ -154,7 +154,7 @@ static void Spawner_setter_owner (liscrArgs* args)
 {
 	liscrData* object;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &object))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &object))
 		liext_spawner_set_owner (args->self, object->data);
 	else
 		liext_spawner_set_owner (args->self, NULL);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -119,7 +119,7 @@ Packet_new (lua_State* lua)
 	liscrData* self;
 	liscrScript* script = liscr_script (lua);
 
-	liscr_checkclass (lua, 1, LICOM_SCRIPT_PACKET);
+	liscr_checkclass (lua, 1, LISCR_SCRIPT_PACKET);
 	type = luaL_checkinteger (lua, 2);
 
 	/* Allocate packet. */
@@ -165,7 +165,7 @@ Packet_read (lua_State* lua)
 	liscrData* self;
 	liscrPacket* data;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
+	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
 	data = self->data;
 	luaL_argcheck (lua, data->reader != NULL, 1, "packet is not readable");
 	data->reader->pos = 1;
@@ -188,7 +188,7 @@ Packet_resume (lua_State* lua)
 	liscrData* self;
 	liscrPacket* data;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
+	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
 	data = self->data;
 	luaL_argcheck (lua, data->reader != NULL, 1, "packet is not readable");
 
@@ -222,7 +222,7 @@ Packet_write (lua_State* lua)
 		const char* str;
 	} tmp;
 
-	self = liscr_checkdata (lua, 1, LICOM_SCRIPT_PACKET);
+	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
 	data = self->data;
 	luaL_argcheck (lua, data->writer != NULL, 1, "packet is not writable");
 
@@ -365,7 +365,7 @@ liscr_packet_new_readable (liscrScript*       script,
 	memcpy (self->buffer, reader->buffer, reader->length);
 
 	/* Allocate script data. */
-	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET, liscr_packet_free);
+	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_reader_free (self->reader);
@@ -397,7 +397,7 @@ liscr_packet_new_writable (liscrScript* script,
 	}
 
 	/* Allocate script data. */
-	data = liscr_data_new (script, self, LICOM_SCRIPT_PACKET, liscr_packet_free);
+	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_writer_free (self->writer);

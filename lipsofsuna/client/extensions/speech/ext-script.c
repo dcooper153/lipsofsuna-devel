@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -56,7 +56,7 @@ static void Speech_add (liscrArgs* args)
 
 	if (!liscr_args_gets_string (args, "message", &msg))
 		return;
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &object))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
 		id = ((liengObject*) object->data)->id;
 	else if (!liscr_args_gets_int (args, "id", &id))
 		return;

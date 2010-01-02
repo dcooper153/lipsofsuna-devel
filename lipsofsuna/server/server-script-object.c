@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -265,7 +265,7 @@ static void Object_send (liscrArgs* args)
 	liscrPacket* data;
 	lisrvClient* client;
 
-	if (liscr_args_gets_data (args, "packet", LICOM_SCRIPT_PACKET, &packet))
+	if (liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &packet))
 	{
 		liscr_args_gets_bool (args, "reliable", &reliable);
 		client = LISRV_OBJECT (args->self)->client;
@@ -299,7 +299,7 @@ static void Object_swap_clients (liscrArgs* args)
 {
 	liscrData* object;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &object))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
 		lisrv_object_swap (args->self, object->data);
 }
 

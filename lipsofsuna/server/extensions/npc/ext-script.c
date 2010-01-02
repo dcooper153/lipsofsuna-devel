@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -55,7 +55,7 @@ static void Npc_find (liscrArgs* args)
 	liextNpc* npc;
 	liscrData* data;
 
-	if (liscr_args_gets_data (args, "object", LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NPC);
 		npc = liext_module_find_npc (module, data->data);
@@ -129,7 +129,7 @@ static void Npc_solve_path (liscrArgs* args)
 		return;
 
 	/* Create path object. */
-	path = liscr_data_new (args->script, tmp, LICOM_SCRIPT_PATH, liai_path_free);
+	path = liscr_data_new (args->script, tmp, LISCR_SCRIPT_PATH, liai_path_free);
 	if (path != NULL)
 	{
 		liscr_args_seti_data (args, path);
@@ -202,7 +202,7 @@ static void Npc_setter_path (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_PATH, &data))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_PATH, &data))
 		liext_npc_set_path (args->self, data);
 	else
 		liext_npc_set_path (args->self, NULL);
@@ -259,7 +259,7 @@ static void Npc_setter_target (liscrArgs* args)
 {
 	liscrData* data;
 
-	if (liscr_args_geti_data (args, 0, LICOM_SCRIPT_OBJECT, &data))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_npc_set_target (args->self, data->data);
 	else
 		liext_npc_set_target (args->self, NULL);
