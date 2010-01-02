@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -104,7 +104,7 @@ liext_materials_new (liwdgManager* manager,
 	data->module = module;
 
 	/* Initialize scene preview. */
-	data->widgets.preview = liext_preview_new (manager, module->module);
+	data->widgets.preview = liext_preview_new (manager, module->client);
 	if (data->widgets.preview == NULL)
 	{
 		liwdg_widget_free (self);

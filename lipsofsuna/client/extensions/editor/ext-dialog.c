@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -73,7 +73,7 @@ liext_dialog_new (liwdgManager* manager,
 	if (self == NULL)
 		return NULL;
 	LIEXT_DIALOG (self)->editor = editor;
-	LIEXT_DIALOG (self)->module = editor->module;
+	LIEXT_DIALOG (self)->client = editor->client;
 
 	return self;
 }
@@ -85,7 +85,7 @@ liext_dialog_get_model (liextDialog* self)
 	liengModel* model;
 
 	str = liwdg_entry_get_text (LIWDG_ENTRY (self->entry_model));
-	model = lieng_engine_find_model_by_name (self->module->engine, str);
+	model = lieng_engine_find_model_by_name (self->client->engine, str);
 
 	return model;
 }
@@ -199,7 +199,7 @@ private_edit (liextDialog* self)
 
 	/* Get source file name. */
 	tmp = liwdg_entry_get_text (LIWDG_ENTRY (self->entry_model));
-	name = lisys_path_format (self->module->path,
+	name = lisys_path_format (self->client->path,
 		LISYS_PATH_SEPARATOR, "graphics",
 		LISYS_PATH_SEPARATOR, tmp, ".blend", NULL);
 	if (name == NULL)
@@ -230,7 +230,7 @@ private_insert (liextDialog* self)
 	model = liext_dialog_get_model (self);
 	if (model == NULL)
 		return 0;
-	lialg_camera_get_transform (self->module->camera, &transform);
+	lialg_camera_get_transform (self->client->camera, &transform);
 	position = limat_vector_init (0.0f, 3.0f, -15.0f);
 	position = limat_transform_transform (transform, position);
 	rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);

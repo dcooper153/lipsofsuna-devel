@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -47,7 +47,7 @@ lisrvExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
@@ -55,7 +55,7 @@ liext_module_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 #ifndef LI_DISABLE_SOUND
 	/* Allocate objects. */
@@ -77,8 +77,8 @@ liext_module_new (licliModule* module)
 		printf ("WARNING: cannot initialize sound\n");
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 1, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 1, private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 1, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 1, private_tick, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -86,7 +86,7 @@ liext_module_new (licliModule* module)
 #endif
 
 	/* Register classes. */
-	liscr_script_create_class (module->script, "Sound", liextSoundScript, self);
+	liscr_script_create_class (client->script, "Sound", liextSoundScript, self);
 
 	return self;
 }
@@ -135,7 +135,7 @@ liext_module_find_sample_by_id (liextModule* self,
 	liengSample* sample;
 
 	/* Find sample. */
-	sample = lieng_resources_find_sample_by_code (self->module->engine->resources, id);
+	sample = lieng_resources_find_sample_by_code (self->client->engine->resources, id);
 	if (sample == NULL || sample->invalid)
 		return NULL;
 	if (sample->data != NULL)
@@ -167,7 +167,7 @@ liext_module_find_sample_by_name (liextModule* self,
 	liengSample* sample;
 
 	/* Find sample. */
-	sample = lieng_resources_find_sample_by_name (self->module->engine->resources, name);
+	sample = lieng_resources_find_sample_by_name (self->client->engine->resources, name);
 	if (sample == NULL || sample->invalid)
 		return NULL;
 	if (sample->data != NULL)
@@ -208,7 +208,7 @@ liext_module_set_effect (liextModule* self,
 
 	/* Find engine object. */
 	create = 0;
-	engobj = lieng_engine_find_object (self->module->engine, object);
+	engobj = lieng_engine_find_object (self->client->engine, object);
 	if (engobj == NULL)
 		return 0;
 
@@ -362,8 +362,8 @@ private_tick (liextModule* self,
 	lisndSource* source;
 
 	/* Update listener position. */
-	engobj = licli_module_get_player (self->module);
-	if (engobj != NULL && self->module->network != NULL)
+	engobj = licli_client_get_player (self->client);
+	if (engobj != NULL && self->client->network != NULL)
 	{
 		lieng_object_get_transform (engobj, &transform);
 		lieng_object_get_velocity (engobj, &velocity);
@@ -376,7 +376,7 @@ private_tick (liextModule* self,
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		extobj = iter.value;
-		engobj = lieng_engine_find_object (self->module->engine, iter.key);
+		engobj = lieng_engine_find_object (self->client->engine, iter.key);
 		if (engobj != NULL)
 		{
 			for (ptr = extobj->sounds ; ptr != NULL ; ptr = next)

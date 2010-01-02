@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -115,7 +115,7 @@ static void Action_new (liscrArgs* args)
 	const char* name = "";
 	const char* desc = "";
 	libndAction* self;
-	licliModule* module;
+	licliClient* client;
 	liscrData* data;
 
 	/* Check arguments. */
@@ -125,8 +125,8 @@ static void Action_new (liscrArgs* args)
 	liscr_args_gets_string (args, "desc", &desc);
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_ACTION);
-	self = libnd_action_new (module->bindings, id, name, desc, private_action_callback, NULL);
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_ACTION);
+	self = libnd_action_new (client->bindings, id, name, desc, private_action_callback, NULL);
 	if (self == NULL)
 		return;
 

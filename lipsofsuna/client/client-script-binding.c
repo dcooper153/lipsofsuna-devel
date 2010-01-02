@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -115,7 +115,7 @@ Binding_new (lua_State* lua)
 	liscrData* self;
 	liscrData* action;
 	liscrScript* script = liscr_script (lua);
-	licliModule* module = liscr_script_get_userdata (script);
+	licliClient* client = liscr_script_get_userdata (script);
 
 	/* Check arguments. */
 	type = luaL_checkint (lua, 2);
@@ -130,7 +130,7 @@ Binding_new (lua_State* lua)
 	luaL_argcheck (lua, type >= 0 && type < LIBND_TYPE_MAX, 2, "invalid binding type");
 
 	/* Allocate userdata. */
-	binding = libnd_binding_new (module->bindings, type, action->data, params, code, mods, mult);
+	binding = libnd_binding_new (client->bindings, type, action->data, params, code, mods, mult);
 	if (binding == NULL)
 		return 0;
 	self = liscr_data_new (script, binding, LICLI_SCRIPT_BINDING, libnd_binding_free);

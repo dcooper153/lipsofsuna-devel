@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,7 +25,7 @@
 #include "client.h"
 
 static int
-private_engine_free (licliModule* self,
+private_engine_free (licliClient* self,
                      liengEngine* engine)
 {
 	if (self->scene != NULL)
@@ -37,7 +37,7 @@ private_engine_free (licliModule* self,
 }
 
 static int
-private_object_new (licliModule* self,
+private_object_new (licliClient* self,
                     liengObject* object)
 {
 	lirnd_object_new (self->scene, object->id);
@@ -46,7 +46,7 @@ private_object_new (licliModule* self,
 }
 
 static int
-private_object_free (licliModule* self,
+private_object_free (licliClient* self,
                      liengObject* object)
 {
 	lirndObject* object_;
@@ -59,7 +59,7 @@ private_object_free (licliModule* self,
 }
 
 static int
-private_object_model (licliModule* self,
+private_object_model (licliClient* self,
                       liengObject* object,
                       liengModel*  model)
 {
@@ -92,7 +92,7 @@ private_object_model (licliModule* self,
 }
 
 static int
-private_object_realize (licliModule* self,
+private_object_realize (licliClient* self,
                         liengObject* object,
                         int          value)
 {
@@ -106,7 +106,7 @@ private_object_realize (licliModule* self,
 }
 
 static int
-private_object_transform (licliModule*    self,
+private_object_transform (licliClient*    self,
                           liengObject*    object,
                           limatTransform* value)
 {
@@ -120,7 +120,7 @@ private_object_transform (licliModule*    self,
 }
 
 static int
-private_engine_tick (licliModule* self,
+private_engine_tick (licliClient* self,
                      float        secs)
 {
 	lirnd_render_update (self->render, secs);
@@ -132,7 +132,7 @@ private_engine_tick (licliModule* self,
 /*****************************************************************************/
 
 int
-licli_render_init (licliModule* self)
+licli_render_init (licliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self->engine, "engine-free", 1, private_engine_free, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "engine-tick", 1, private_engine_tick, self, NULL);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,7 +43,7 @@ licliExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
@@ -51,10 +51,10 @@ liext_module_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Create dialog. */
-	self->editor = liext_editor_new (module->widgets, self);
+	self->editor = liext_editor_new (client->widgets, self);
 	if (self->editor == NULL)
 	{
 		lisys_free (self);
@@ -62,7 +62,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 100, private_packet, self, self->calls + 0))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 100, private_packet, self, self->calls + 0))
 	{
 		liwdg_widget_free (self->editor);
 		lisys_free (self);
@@ -70,7 +70,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register scripts. */
-	liscr_script_create_class (module->script, "Generator", liextGeneratorScript, self);
+	liscr_script_create_class (client->script, "Generator", liextGeneratorScript, self);
 
 	return self;
 }

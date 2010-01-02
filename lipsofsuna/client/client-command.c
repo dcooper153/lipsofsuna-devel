@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,31 +26,31 @@
 #include "client.h"
 
 static int
-private_assign (licliModule* module,
+private_assign (licliClient* client,
                 liarcReader* reader);
 
 static int
-private_object_animation (licliModule* module,
+private_object_animation (licliClient* client,
                           liarcReader* reader);
 
 static int
-private_object_create (licliModule* module,
+private_object_create (licliClient* client,
                        liarcReader* reader);
 
 static int
-private_object_destroy (licliModule* module,
+private_object_destroy (licliClient* client,
                         liarcReader* reader);
 
 static int
-private_object_graphic (licliModule* module,
+private_object_graphic (licliClient* client,
                         liarcReader* reader);
 
 static int
-private_object_simulate (licliModule* module,
+private_object_simulate (licliClient* client,
                          liarcReader* reader);
 
 static int
-private_resources (licliModule* module,
+private_resources (licliClient* client,
                    liarcReader* reader);
 
 /*****************************************************************************/
@@ -58,13 +58,13 @@ private_resources (licliModule* module,
 /**
  * \brief Handles a core network packet.
  *
- * \param self Module.
+ * \param self Client.
  * \param type Packet type.
  * \param reader Packet reader.
  * \return Zero if handled, nonzero if should be passed to other packet handlers.
  */
 int
-licli_module_handle_packet (licliModule* self,
+licli_client_handle_packet (licliClient* self,
                             int          type,
                             liarcReader* reader)
 {
@@ -101,18 +101,18 @@ licli_module_handle_packet (licliModule* self,
 /*****************************************************************************/
 
 static int
-private_assign (licliModule* module,
+private_assign (licliClient* client,
                 liarcReader* reader)
 {
 	lialgU32dicIter iter;
 
-	if (!liarc_reader_get_uint32 (reader, &module->network->id) ||
-	    !liarc_reader_get_uint32 (reader, &module->network->features) ||
+	if (!liarc_reader_get_uint32 (reader, &client->network->id) ||
+	    !liarc_reader_get_uint32 (reader, &client->network->features) ||
 	    !liarc_reader_check_end (reader))
 		return 0;
 
 	/* Clear scene. */
-	LI_FOREACH_U32DIC (iter, module->engine->objects)
+	LI_FOREACH_U32DIC (iter, client->engine->objects)
 	{
 		if (LICLI_IS_CLIENT_OBJECT (iter.value))
 			lieng_object_set_realized (iter.value, 0);
@@ -122,7 +122,7 @@ private_assign (licliModule* module,
 }
 
 static int
-private_object_animation (licliModule* module,
+private_object_animation (licliClient* client,
                           liarcReader* reader)
 {
 	float priority;
@@ -142,7 +142,7 @@ private_object_animation (licliModule* module,
 		return 0;
 
 	/* Change the animations of the object. */
-	object = licli_module_find_object (module, id);
+	object = licli_client_find_object (client, id);
 	if (object == NULL)
 		return 1;
 	licli_object_set_animation (object, animation, channel, permanent, priority);
@@ -151,7 +151,7 @@ private_object_animation (licliModule* module,
 }
 
 static int
-private_object_create (licliModule* module,
+private_object_create (licliClient* client,
                        liarcReader* reader)
 {
 	int i;
@@ -190,10 +190,10 @@ private_object_create (licliModule* module,
 		return 0;
 
 	/* Create an object. */
-	object = lieng_engine_find_object (module->engine, id);
+	object = lieng_engine_find_object (client->engine, id);
 	if (object == NULL)
 	{
-		object = lieng_object_new (module->engine, NULL, LIPHY_CONTROL_MODE_STATIC, id);
+		object = lieng_object_new (client->engine, NULL, LIPHY_CONTROL_MODE_STATIC, id);
 		if (object == NULL)
 			return 0;
 		licli_object_set_flags (object, flags);
@@ -224,7 +224,7 @@ private_object_create (licliModule* module,
 }
 
 static int
-private_object_destroy (licliModule* module,
+private_object_destroy (licliClient* client,
                         liarcReader* reader)
 {
 	uint32_t id;
@@ -236,7 +236,7 @@ private_object_destroy (licliModule* module,
 		return 0;
 
 	/* Destroy the object. */
-	object = lieng_engine_find_object (module->engine, id);
+	object = lieng_engine_find_object (client->engine, id);
 	if (object == NULL)
 		return 1;
 	lieng_object_set_selected (object, 0);
@@ -246,7 +246,7 @@ private_object_destroy (licliModule* module,
 }
 
 static int
-private_object_graphic (licliModule* module,
+private_object_graphic (licliClient* client,
                         liarcReader* reader)
 {
 	uint32_t id;
@@ -260,7 +260,7 @@ private_object_graphic (licliModule* module,
 		return 0;
 
 	/* Change the graphics of the object. */
-	object = licli_module_find_object (module, id);
+	object = licli_client_find_object (client, id);
 	if (object == NULL)
 		return 1;
 	lieng_object_set_model_code (object, graphic);
@@ -269,7 +269,7 @@ private_object_graphic (licliModule* module,
 }
 
 static int
-private_object_simulate (licliModule* module,
+private_object_simulate (licliClient* client,
                          liarcReader* reader)
 {
 	int8_t x;
@@ -309,10 +309,10 @@ private_object_simulate (licliModule* module,
 		controls.move -= 1.0f;
 
 	/* Change the simulation of the object. */
-	object = licli_module_find_object (module, id);
+	object = licli_client_find_object (client, id);
 	if (object == NULL)
 		return 1;
-	if (id == module->network->id)
+	if (id == client->network->id)
 	{
 		lieng_object_get_transform (object, &transform);
 		rotation = transform.rotation;
@@ -327,10 +327,10 @@ private_object_simulate (licliModule* module,
 }
 
 static int
-private_resources (licliModule* module,
+private_resources (licliClient* client,
                    liarcReader* reader)
 {
-	lieng_engine_load_resources (module->engine, reader);
+	lieng_engine_load_resources (client->engine, reader);
 
 	return 1;
 }

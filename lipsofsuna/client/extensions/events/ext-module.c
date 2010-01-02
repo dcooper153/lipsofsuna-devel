@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -58,24 +58,24 @@ lisrvExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	int i;
 	liextModule* self;
-	liscrScript* script = module->script;
+	liscrScript* script = client->script;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "object-model", 2, private_object_model, self, self->calls + 0) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "object-new", 2, private_object_new, self, self->calls + 1) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "packet", 2, private_packet, self, self->calls + 2) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "select", 2, private_select, self, self->calls + 3) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 2, private_tick, self, self->calls + 4))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "object-model", 2, private_object_model, self, self->calls + 0) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "object-new", 2, private_object_new, self, self->calls + 1) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "packet", 2, private_packet, self, self->calls + 2) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "select", 2, private_select, self, self->calls + 3) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 2, private_tick, self, self->calls + 4))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -122,7 +122,7 @@ liext_module_event (liextModule* self,
 {
 	va_list args;
 	liscrData* event = NULL;
-	liscrScript* script = self->module->script;
+	liscrScript* script = self->client->script;
 
 	/* Get event table. */
 	lua_pushlightuserdata (script->lua, self);
@@ -208,8 +208,8 @@ private_object_new (liextModule* self,
 			"object", LICOM_SCRIPT_OBJECT, object->script, NULL);
 
 		/* Emit assign event if player object. */
-		if (self->module->network != NULL &&
-		    self->module->network->id == object->id)
+		if (self->client->network != NULL &&
+		    self->client->network->id == object->id)
 			liext_module_event (self, LIEXT_EVENT_ASSIGN, NULL);
 	}
 
@@ -224,7 +224,7 @@ private_packet (liextModule* self,
 	liscrData* data0;
 
 	reader->pos = 1;
-	data0 = liscr_packet_new_readable (self->module->script, reader);
+	data0 = liscr_packet_new_readable (self->client->script, reader);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
 		"message", LISCR_TYPE_INT, type,
 		"packet", LICOM_SCRIPT_PACKET, data0, NULL);
@@ -242,7 +242,7 @@ private_select (liextModule*    self,
 
 	if (selection != NULL)
 	{
-		object = lieng_engine_find_object (self->module->engine, selection->object);
+		object = lieng_engine_find_object (self->client->engine, selection->object);
 		if (object != NULL && object->script != NULL)
 		{
 			liext_module_event (self, LIEXT_EVENT_SELECT,

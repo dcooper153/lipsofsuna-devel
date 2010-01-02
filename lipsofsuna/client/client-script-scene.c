@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@ static void
 private_render (liwdgRender* self,
                 void*        data)
 {
-	licliModule* module;
+	licliClient* client;
 	liengSelectionIter iter;
 	limatFrustum frustum;
 	limatMatrix modelview;
@@ -39,19 +39,19 @@ private_render (liwdgRender* self,
 	liwdgRect rect;
 
 	/* Set 3D mode. */
-	module = data;
+	client = data;
 	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
-	lialg_camera_set_viewport (module->camera, rect.x, rect.y, rect.width, rect.height);
-	lialg_camera_get_frustum (module->camera, &frustum);
-	lialg_camera_get_modelview (module->camera, &modelview);
-	lialg_camera_get_projection (module->camera, &projection);
-	lirnd_context_init (&context, module->scene);
+	lialg_camera_set_viewport (client->camera, rect.x, rect.y, rect.width, rect.height);
+	lialg_camera_get_frustum (client->camera, &frustum);
+	lialg_camera_get_modelview (client->camera, &modelview);
+	lialg_camera_get_projection (client->camera, &projection);
+	lirnd_context_init (&context, client->scene);
 	lirnd_context_set_modelview (&context, &modelview);
 	lirnd_context_set_projection (&context, &projection);
 	lirnd_context_set_frustum (&context, &frustum);
 
 	/* Draw selection. */
-	if (module->network != NULL)
+	if (client->network != NULL)
 	{
 		glDisable (GL_LIGHTING);
 		glDisable (GL_DEPTH_TEST);
@@ -59,9 +59,9 @@ private_render (liwdgRender* self,
 		glDisable (GL_TEXTURE_2D);
 		glDepthMask (GL_FALSE);
 		glColor3f (1.0f, 0.0f, 0.0f);
-		LIENG_FOREACH_SELECTION (iter, module->engine)
+		LIENG_FOREACH_SELECTION (iter, client->engine)
 		{
-			object = lirnd_scene_find_object (module->scene, iter.object->id);
+			object = lirnd_scene_find_object (client->scene, iter.object->id);
 			if (object != NULL)
 				lirnd_draw_bounds (&context, object, NULL);
 		}
@@ -69,7 +69,7 @@ private_render (liwdgRender* self,
 	}
 
 	/* Render custom 3D scene. */
-	lical_callbacks_call (module->callbacks, module->engine, "render-3d", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (client->callbacks, client->engine, "render-3d", lical_marshal_DATA_PTR, self);
 
 	/* Set 2D mode. */
 	glMatrixMode (GL_PROJECTION);
@@ -79,22 +79,22 @@ private_render (liwdgRender* self,
 	glLoadIdentity ();
 
 	/* Render custom 2D scene. */
-	lical_callbacks_call (module->callbacks, module->engine, "render-2d", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (client->callbacks, client->engine, "render-2d", lical_marshal_DATA_PTR, self);
 }
 
 static void
 private_update (liwdgRender* self,
                 void*        data)
 {
-	licliModule* module;
+	licliClient* client;
 	limatMatrix modelview;
 	limatMatrix projection;
 
-	module = data;
-	if (module->network != NULL)
+	client = data;
+	if (client->network != NULL)
 	{
-		lialg_camera_get_modelview (module->camera, &modelview);
-		lialg_camera_get_projection (module->camera, &projection);
+		lialg_camera_get_modelview (client->camera, &modelview);
+		lialg_camera_get_projection (client->camera, &projection);
 		liwdg_render_set_modelview (LIWDG_RENDER (self), &modelview);
 		liwdg_render_set_projection (LIWDG_RENDER (self), &projection);
 	}
@@ -121,19 +121,19 @@ private_update (liwdgRender* self,
  */
 static void Scene_new (liscrArgs* args)
 {
-	licliModule* module;
+	licliClient* client;
 	liscrData* data;
 	liwdgWidget* self;
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_SCENE);
-	self = liwdg_render_new (module->widgets, module->scene);
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_SCENE);
+	self = liwdg_render_new (client->widgets, client->scene);
 	if (self == NULL)
 		return;
 	LIWDG_RENDER (self)->custom_update_func = private_update;
-	LIWDG_RENDER (self)->custom_update_data = module;
+	LIWDG_RENDER (self)->custom_update_data = client;
 	LIWDG_RENDER (self)->custom_render_func = private_render;
-	LIWDG_RENDER (self)->custom_render_data = module;
+	LIWDG_RENDER (self)->custom_render_data = client;
 
 	/* Allocate userdata. */
 	data = liscr_data_new (args->script, self, LICLI_SCRIPT_SCENE, licli_script_widget_free);
@@ -165,19 +165,19 @@ static void Scene_pick (liscrArgs* args)
 {
 	int x;
 	int y;
-	licliModule* module;
+	licliClient* client;
 	liengObject* object;
 	lirndSelection result;
 
-	module = LIWDG_RENDER (args->self)->custom_render_data;
-	module->client->video.SDL_GetMouseState (&x, &y);
+	client = LIWDG_RENDER (args->self)->custom_render_data;
+	client->video.SDL_GetMouseState (&x, &y);
 	liscr_args_gets_int (args, "x", &x);
 	liscr_args_gets_int (args, "y", &y);
 
 	/* Pick object from scene. */
-	if (!liwdg_render_pick (args->self, &result, x, module->window->mode.height - y - 1))
+	if (!liwdg_render_pick (args->self, &result, x, client->window->mode.height - y - 1))
 		return;
-	object = lieng_engine_find_object (module->engine, result.object);
+	object = lieng_engine_find_object (client->engine, result.object);
 	liscr_args_seti_vector (args, &result.point);
 	liscr_args_seti_data (args, (object != NULL)? object->script : NULL);
 }

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -89,7 +89,7 @@ const liwdgClass liextPreviewType =
 
 liwdgWidget*
 liext_preview_new (liwdgManager* manager,
-                   licliModule*  module)
+                   licliClient*  client)
 {
 	const float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 0.0f, 0.001f };
@@ -102,8 +102,8 @@ liext_preview_new (liwdgManager* manager,
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_PREVIEW (self);
-	data->module = module;
-	data->render = module->render;
+	data->client = client;
+	data->render = client->render;
 
 	/* Allocate scene. */
 	data->scene = lirnd_scene_new (data->render);
@@ -133,13 +133,13 @@ liext_preview_new (liwdgManager* manager,
 
 	/* Allocate generator. */
 	data->callbacks = lical_callbacks_new ();
-	data->sectors = lialg_sectors_new (module->sectors->count, module->sectors->width);
+	data->sectors = lialg_sectors_new (client->sectors->count, client->sectors->width);
 	if (data->callbacks == NULL || data->sectors == NULL)
 	{
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	data->generator = ligen_generator_new (module->paths, data->callbacks, data->sectors);
+	data->generator = ligen_generator_new (client->paths, data->callbacks, data->sectors);
 	if (data->generator == NULL)
 	{
 		liwdg_widget_free (self);
@@ -159,7 +159,7 @@ liext_preview_new (liwdgManager* manager,
 	}
 
 	/* Create camera. */
-	data->camera = lialg_camera_new (module->engine);
+	data->camera = lialg_camera_new (client->engine);
 	if (data->camera == NULL)
 	{
 		liwdg_widget_free (self);
@@ -262,14 +262,14 @@ liext_preview_insert_object (liextPreview*         self,
 	lirndObject* object;
 
 	/* Find model. */
-	rmodel = lirnd_render_find_model (self->module->render, model);
+	rmodel = lirnd_render_find_model (self->client->render, model);
 	if (rmodel == NULL)
 	{
-		emodel = lieng_engine_find_model_by_name (self->module->engine, model);
+		emodel = lieng_engine_find_model_by_name (self->client->engine, model);
 		if (emodel == NULL)
 			return 0;
-		lirnd_render_load_model (self->module->render, model, emodel->model);
-		rmodel = lirnd_render_find_model (self->module->render, model);
+		lirnd_render_load_model (self->client->render, model, emodel->model);
+		rmodel = lirnd_render_find_model (self->client->render, model);
 		if (rmodel == NULL)
 			return 0;
 	}
@@ -641,14 +641,14 @@ private_block_build (liextPreview* self,
 		material = livox_manager_find_material (self->generator->voxels, voxel->type);
 		if (material == NULL)
 			continue;
-		model = lirnd_render_find_model (self->module->render, material->model);
+		model = lirnd_render_find_model (self->client->render, material->model);
 		if (model == NULL)
 		{
-			emdl = lieng_engine_find_model_by_name (self->module->engine, material->model);
+			emdl = lieng_engine_find_model_by_name (self->client->engine, material->model);
 			if (emdl == NULL)
 				continue;
-			lirnd_render_load_model (self->module->render, material->model, emdl->model);
-			model = lirnd_render_find_model (self->module->render, material->model);
+			lirnd_render_load_model (self->client->render, material->model, emdl->model);
+			model = lirnd_render_find_model (self->client->render, material->model);
 			if (model == NULL)
 				continue;
 		}

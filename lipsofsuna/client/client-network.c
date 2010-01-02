@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -42,13 +42,13 @@ private_refused (licliNetwork*    self,
 /**
  * \brief Creates a new client network interface.
  *
- * \param module Module.
+ * \param client Client.
  * \param name Login name.
  * \param pass Login password.
  * \return Network interface.
  */
 licliNetwork*
-licli_network_new (licliModule* module,
+licli_network_new (licliClient* client,
                    const char*  name,
                    const char*  pass)
 {
@@ -59,28 +59,28 @@ licli_network_new (licliModule* module,
 	self = lisys_calloc (1, sizeof (licliNetwork));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Read configuration. */
-	self->host = licfg_host_new (module->path);
+	self->host = licfg_host_new (client->path);
 	if (self->host == NULL)
 		goto error;
 
 	/* Connect to the host. */
-	self->client = grapple_client_init ("Lips of Suna", LINET_PROTOCOL_VERSION);
-	if (self->client == 0)
+	self->socket = grapple_client_init ("Lips of Suna", LINET_PROTOCOL_VERSION);
+	if (self->socket == 0)
 		goto error;
-	grapple_client_address_set (self->client, self->host->host);
-	grapple_client_port_set (self->client, self->host->port);
+	grapple_client_address_set (self->socket, self->host->host);
+	grapple_client_port_set (self->socket, self->host->port);
 	if (self->host->udp)
-		grapple_client_protocol_set (self->client, GRAPPLE_PROTOCOL_UDP);
+		grapple_client_protocol_set (self->socket, GRAPPLE_PROTOCOL_UDP);
 	else
-		grapple_client_protocol_set (self->client, GRAPPLE_PROTOCOL_TCP);
-	grapple_client_name_set (self->client, name);
-	grapple_client_password_set (self->client, pass);
-	if (grapple_client_start (self->client, 0) != GRAPPLE_OK)
+		grapple_client_protocol_set (self->socket, GRAPPLE_PROTOCOL_TCP);
+	grapple_client_name_set (self->socket, name);
+	grapple_client_password_set (self->socket, pass);
+	if (grapple_client_start (self->socket, 0) != GRAPPLE_OK)
 	{
-		error = grapple_client_error_get (self->client);
+		error = grapple_client_error_get (self->socket);
 		lisys_error_set (EINVAL, "connect: %s", grapple_error_text (error));
 		goto error;
 	}
@@ -103,8 +103,8 @@ licli_network_free (licliNetwork* self)
 {
 	if (self->host != NULL)
 		licfg_host_free (self->host);
-	if (self->client)
-		grapple_client_destroy (self->client);
+	if (self->socket)
+		grapple_client_destroy (self->socket);
 	lisys_free (self);
 }
 
@@ -181,13 +181,13 @@ licli_network_update (licliNetwork* self,
 	limatQuaternion quat;
 	grapple_message* message;
 
-	if (!self->client)
+	if (!self->socket)
 		return 0;
 
 	/* Read packets. */
-	while (grapple_client_messages_waiting (self->client))
+	while (grapple_client_messages_waiting (self->socket))
 	{
-		message = grapple_client_message_pull (self->client);
+		message = grapple_client_message_pull (self->socket);
 		switch (message->type)
 		{
 			case GRAPPLE_MSG_NEW_USER_ME:
@@ -212,8 +212,8 @@ licli_network_update (licliNetwork* self,
 		grapple_message_dispose (message);
 		if (!ret)
 		{
-			grapple_client_destroy (self->client);
-			self->client = 0;
+			grapple_client_destroy (self->socket);
+			self->socket = 0;
 			return 0;
 		}
 	}
@@ -232,7 +232,7 @@ licli_network_update (licliNetwork* self,
 	/* Synchronize controls. */
 	if (licli_network_get_dirty (self))
 	{
-		self->delta.tick = self->module->client->video.SDL_GetTicks ();
+		self->delta.tick = self->client->video.SDL_GetTicks ();
 		self->delta.movement = 0.0f;
 		self->delta.rotation = 0.0f;
 		self->prev.controls = self->curr.controls;
@@ -249,7 +249,7 @@ licli_network_update (licliNetwork* self,
 			liarc_writer_append_int8 (writer, (int8_t)(127 * self->curr.direction.y));
 			liarc_writer_append_int8 (writer, (int8_t)(127 * self->curr.direction.z));
 			liarc_writer_append_int8 (writer, (int8_t)(127 * self->curr.direction.w));
-			licli_module_send (self->module, writer, 0);
+			licli_client_send (self->client, writer, 0);
 			liarc_writer_free (writer);
 		}
 	}
@@ -266,7 +266,7 @@ licli_network_update (licliNetwork* self,
 int
 licli_network_get_connected (const licliNetwork* self)
 {
-	return self->client != 0;
+	return self->socket != 0;
 }
 
 /**
@@ -278,7 +278,7 @@ licli_network_get_connected (const licliNetwork* self)
 int
 licli_network_get_dirty (const licliNetwork* self)
 {
-	Uint32 ticks = self->module->client->video.SDL_GetTicks ();
+	Uint32 ticks = self->client->video.SDL_GetTicks ();
 
 	if (ticks - self->delta.tick < LICLI_NETWORK_INPUT_LATENCY)
 		return 0;
@@ -340,7 +340,7 @@ private_message (licliNetwork*    self,
 	reader->pos = 1;
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->module->callbacks, self->module->engine, "packet", lical_marshal_DATA_INT_PTR, (int) data[0], reader);
+	lical_callbacks_call (self->client->callbacks, self->client->engine, "packet", lical_marshal_DATA_INT_PTR, (int) data[0], reader);
 	liarc_reader_free (reader);
 
 	return 1;

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -83,7 +83,7 @@ static void Camera_move (liscrArgs* args)
 		if (keep)
 			module->move = value;
 		else
-			lialg_camera_move (module->module->camera, -value);
+			lialg_camera_move (module->client->camera, -value);
 	}
 }
 
@@ -101,8 +101,8 @@ static void Camera_reset (liscrArgs* args)
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	transform = limat_transform_identity ();
-	module->module->camera->transform.local = transform;
-	lialg_camera_warp (module->module->camera);
+	module->client->camera->transform.local = transform;
+	lialg_camera_warp (module->client->camera);
 }
 
 /* @luadoc
@@ -130,7 +130,7 @@ static void Camera_tilt (liscrArgs* args)
 		if (keep)
 			module->tilt = value;
 		else
-			lialg_camera_tilt (module->module->camera, -value);
+			lialg_camera_tilt (module->client->camera, -value);
 	}
 }
 
@@ -159,7 +159,7 @@ static void Camera_turn (liscrArgs* args)
 		if (keep)
 			module->turn = value;
 		else
-			lialg_camera_tilt (module->module->camera, value);
+			lialg_camera_tilt (module->client->camera, value);
 	}
 }
 
@@ -188,7 +188,7 @@ static void Camera_zoom (liscrArgs* args)
 		if (keep)
 			module->zoom = value;
 		else
-			lialg_camera_zoom (module->module->camera, value);
+			lialg_camera_zoom (module->client->camera, value);
 	}
 }
 
@@ -206,7 +206,7 @@ static void Camera_setter_far (liscrArgs* args)
 	if (liscr_args_geti_float (args, 0, &value) && value > 0.0f)
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-		lialg_camera_set_far (module->module->camera, value);
+		lialg_camera_set_far (module->client->camera, value);
 	}
 }
 
@@ -221,7 +221,7 @@ static void Camera_getter_mode (liscrArgs* args)
 	liextModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-	liscr_args_seti_int (args, lialg_camera_get_driver (module->module->camera));
+	liscr_args_seti_int (args, lialg_camera_get_driver (module->client->camera));
 }
 static void Camera_setter_mode (liscrArgs* args)
 {
@@ -231,7 +231,7 @@ static void Camera_setter_mode (liscrArgs* args)
 	if (liscr_args_geti_int (args, 0, &value) && value >= 0 && value < LIALG_CAMERA_MAX)
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-		lialg_camera_set_driver (module->module->camera, value);
+		lialg_camera_set_driver (module->client->camera, value);
 	}
 }
 
@@ -249,7 +249,7 @@ static void Camera_setter_near (liscrArgs* args)
 	if (liscr_args_geti_float (args, 0, &value) && value > 0.0f)
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-		lialg_camera_set_near (module->module->camera, value);
+		lialg_camera_set_near (module->client->camera, value);
 	}
 }
 
@@ -265,7 +265,7 @@ static void Camera_getter_position (liscrArgs* args)
 	limatTransform transform;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-	lialg_camera_get_transform (module->module->camera, &transform);
+	lialg_camera_get_transform (module->client->camera, &transform);
 	liscr_args_seti_vector (args, &transform.position);
 }
 
@@ -281,7 +281,7 @@ static void Camera_getter_rotation (liscrArgs* args)
 	limatTransform transform;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-	lialg_camera_get_transform (module->module->camera, &transform);
+	lialg_camera_get_transform (module->client->camera, &transform);
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -54,7 +54,7 @@ static void Options_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_OPTIONS);
-	self = liext_options_new (module->module);
+	self = liext_options_new (module->client);
 	if (self == NULL)
 		return;
 
@@ -80,7 +80,7 @@ liextOptionsScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_OPTIONS, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Options_new);
 }
 

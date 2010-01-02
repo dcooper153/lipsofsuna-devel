@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,7 +35,7 @@ typedef struct _liextOptions liextOptions;
 struct _liextOptions
 {
 	liwdgGroup base;
-	licliModule* module;
+	licliClient* client;
 	liwdgWidget* group;
 	liwdgWidget* check_fsaa;
 	liwdgWidget* check_global_shadows;
@@ -44,7 +44,7 @@ struct _liextOptions
 };
 
 liwdgWidget*
-liext_options_new (licliModule* module);
+liext_options_new (licliClient* client);
 
 #endif
 

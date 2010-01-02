@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -205,13 +205,13 @@ Group_insert_row (lua_State* lua)
  */
 static void Group_new (liscrArgs* args)
 {
-	licliModule* module;
+	licliClient* client;
 	liscrData* data;
 	liwdgWidget* self;
 
 	/* Allocate userdata. */
-	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_GROUP);
-	self = liwdg_group_new (module->widgets);
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_GROUP);
+	self = liwdg_group_new (client->widgets);
 	if (self == NULL)
 		return;
 

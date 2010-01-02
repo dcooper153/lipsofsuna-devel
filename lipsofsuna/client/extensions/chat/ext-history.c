@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -60,12 +60,12 @@ const liwdgClass liextChatHistoryType =
  * \brief Creates a new chat history widget.
  *
  * \param manager Widget manager.
- * \param module Client module.
+ * \param client Client.
  * \return New widget or NULL.
  */
 liwdgWidget*
 liext_chat_history_new (liwdgManager* manager,
-                        licliModule*  module)
+                        licliClient*  client)
 {
 	liwdgWidget* self;
 
@@ -73,7 +73,7 @@ liext_chat_history_new (liwdgManager* manager,
 	self = liwdg_widget_new (manager, &liextChatHistoryType);
 	if (self == NULL)
 		return NULL;
-	LIEXT_WIDGET_CHAT_HISTORY (self)->module = module;
+	LIEXT_WIDGET_CHAT_HISTORY (self)->client = client;
 
 	return self;
 }

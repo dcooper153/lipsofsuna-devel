@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,22 +36,22 @@ licliExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
-	self->reload = liext_reload_new (module);
+	self->client = client;
+	self->reload = liext_reload_new (client);
 	if (self->reload == NULL)
 	{
 		lisys_free (self);
 		return NULL;
 	}
 
-	liscr_script_create_class (module->script, "Reload", liextReloadScript, self);
+	liscr_script_create_class (client->script, "Reload", liextReloadScript, self);
 
 	return self;
 }

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -37,7 +37,7 @@ private_block_load (liextModule*      self,
 
 static int
 private_packet (liextModule* self,
-                licliModule* module,
+                licliClient* client,
                 liarcReader* reader);
 
 static int
@@ -62,7 +62,7 @@ licliExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
@@ -70,10 +70,10 @@ liext_module_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Allocate voxel manager. */
-	self->voxels = livox_manager_new (module->callbacks, module->sectors);
+	self->voxels = livox_manager_new (client->callbacks, client->sectors);
 	if (self->voxels == NULL)
 	{
 		liext_module_free (self);
@@ -89,8 +89,8 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 1, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 1, private_tick, self, self->calls + 1) ||
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 1, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 1, private_tick, self, self->calls + 1) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-free", 1, private_block_free, self, self->calls + 2) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 1, private_block_load, self, self->calls + 3))
 	{
@@ -99,7 +99,7 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register class. */
-	liscr_script_create_class (module->script, "Voxel", liextVoxelScript, self);
+	liscr_script_create_class (client->script, "Voxel", liextVoxelScript, self);
 
 	return self;
 }
@@ -176,7 +176,7 @@ liext_module_build_block (liextModule* self,
 	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
 	if (eblock == NULL)
 	{
-		eblock = liext_block_new (self->module);
+		eblock = liext_block_new (self->client);
 		if (eblock == NULL)
 			return 0;
 		if (!lialg_memdic_insert (self->blocks, &addr, sizeof (addr), eblock))
@@ -279,7 +279,7 @@ private_block_load (liextModule*      self,
 
 static int
 private_packet (liextModule* self,
-                licliModule* module,
+                licliClient* client,
                 liarcReader* reader)
 {
 	uint8_t type;

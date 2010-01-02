@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -37,27 +37,27 @@ licliExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
-	self->editor = liext_editor_new (module);
+	self->client = client;
+	self->editor = liext_editor_new (client);
 	if (self->editor == NULL)
 		return NULL;
-	self->dialog = liext_dialog_new (module->widgets, self->editor);
+	self->dialog = liext_dialog_new (client->widgets, self->editor);
 	if (self->dialog == NULL)
 	{
 		liext_editor_free (self->editor);
 		return NULL;
 	}
-	liwdg_manager_insert_window (module->widgets, self->dialog);
+	liwdg_manager_insert_window (client->widgets, self->dialog);
 	liwdg_widget_set_visible (self->dialog, 0);
 
-	liscr_script_create_class (module->script, "Editor", liextEditorScript, self);
+	liscr_script_create_class (client->script, "Editor", liextEditorScript, self);
 
 	return self;
 }
@@ -66,7 +66,7 @@ void
 liext_module_free (liextModule* self)
 {
 	/* FIXME: Remove the class here. */
-	liwdg_manager_remove_window (self->module->widgets, self->dialog);
+	liwdg_manager_remove_window (self->client->widgets, self->dialog);
 	liwdg_widget_free (self->dialog);
 	liext_editor_free (self->editor);
 	lisys_free (self);

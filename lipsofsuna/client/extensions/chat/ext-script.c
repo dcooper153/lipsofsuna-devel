@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -53,7 +53,7 @@ static void ChatHistory_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CHAT_HISTORY);
-	self = liext_chat_history_new (module->module->widgets, module->module);
+	self = liext_chat_history_new (module->client->widgets, module->client);
 	if (self == NULL)
 		return;
 
@@ -98,7 +98,7 @@ liextChatHistoryScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CHAT_HISTORY, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", ChatHistory_new);
 	liscr_class_insert_mfunc (self, "append", ChatHistory_append);
 }

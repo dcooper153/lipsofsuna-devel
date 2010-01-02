@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,13 +26,12 @@
 #define __CLIENT_CALLBACKS_H__
 
 #include <render/lips-render.h>
-#include "client-module.h"
 #include "client-types.h"
 
-int licli_module_init_callbacks_binding (licliModule* self);
-int licli_module_init_callbacks_misc (licliModule* self);
-int licli_module_init_callbacks_widget (licliModule* self);
-int licli_render_init (licliModule* self);
+int licli_client_init_callbacks_binding (licliClient* self);
+int licli_client_init_callbacks_misc (licliClient* self);
+int licli_client_init_callbacks_widget (licliClient* self);
+int licli_render_init (licliClient* self);
 
 #endif
 

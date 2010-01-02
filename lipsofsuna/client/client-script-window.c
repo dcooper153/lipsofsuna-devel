@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,13 +43,13 @@
  */
 static void Window_new (liscrArgs* args)
 {
-	licliModule* module;
+	licliClient* client;
 	liscrData* data;
 	liwdgWidget* self;
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
-	self = liwdg_window_new (module->widgets, 0, 0);
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
+	self = liwdg_window_new (client->widgets, 0, 0);
 	if (self == NULL)
 		return;
 
@@ -60,7 +60,7 @@ static void Window_new (liscrArgs* args)
 		liwdg_widget_free (self);
 		return;
 	}
-	if (!liwdg_manager_insert_window (module->widgets, self))
+	if (!liwdg_manager_insert_window (client->widgets, self))
 	{
 		liscr_data_unref (data, NULL);
 		return;
@@ -105,17 +105,17 @@ static void Window_getter_visible (liscrArgs* args)
 static void Window_setter_visible (liscrArgs* args)
 {
 	int value;
-	licliModule* module;
+	licliClient* client;
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
-		module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
+		client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
 		if (liwdg_widget_get_visible (args->self) == value)
 			return;
 		liwdg_widget_set_visible (args->self, value);
 		if (value)
 		{
-			if (!liwdg_manager_insert_window (module->widgets, args->self))
+			if (!liwdg_manager_insert_window (client->widgets, args->self))
 				liwdg_widget_set_visible (args->self, 0);
 			else
 				liscr_data_ref (args->data, NULL);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -48,7 +48,7 @@ private_reload_model (liextReload* self,
 /*****************************************************************************/
 
 liextReload*
-liext_reload_new (licliModule* module)
+liext_reload_new (licliClient* client)
 {
 	liextReload* self;
 
@@ -56,10 +56,10 @@ liext_reload_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextReload));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Allocate reloader. */
-	self->reload = lirel_reload_new (module->paths);
+	self->reload = lirel_reload_new (client->paths);
 	if (self->reload == NULL)
 	{
 		liext_reload_free (self);
@@ -69,7 +69,7 @@ liext_reload_new (licliModule* module)
 	lirel_reload_set_model_callback (self->reload, private_reload_model, self);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "tick", 0, private_callback_tick, self, self->calls + 0))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "tick", 0, private_callback_tick, self, self->calls + 0))
 	{
 		liext_reload_free (self);
 		return NULL;
@@ -146,7 +146,7 @@ private_callback_tick (liextReload* self,
 	{
 		if (self->progress != NULL)
 		{
-			liwdg_manager_remove_window (self->module->widgets, LIWDG_WIDGET (self->progress));
+			liwdg_manager_remove_window (self->client->widgets, LIWDG_WIDGET (self->progress));
 			liwdg_widget_free (self->progress);
 			self->progress = NULL;
 		}
@@ -156,7 +156,7 @@ private_callback_tick (liextReload* self,
 	/* Create progress dialog on demand. */
 	if (self->progress == NULL)
 	{
-		self->progress = liwdg_busy_new (self->module->widgets);
+		self->progress = liwdg_busy_new (self->client->widgets);
 		if (self->progress == NULL)
 		{
 			lirel_reload_cancel (self->reload);
@@ -165,7 +165,7 @@ private_callback_tick (liextReload* self,
 		liwdg_busy_set_cancel (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_cancel), self);
 		liwdg_busy_set_text (LIWDG_BUSY (self->progress), "Loading...");
 		liwdg_widget_set_visible (LIWDG_WIDGET (self->progress), 1);
-		liwdg_manager_insert_window (self->module->widgets, LIWDG_WIDGET (self->progress));
+		liwdg_manager_insert_window (self->client->widgets, LIWDG_WIDGET (self->progress));
 	}
 
 	/* Update progress. */
@@ -193,7 +193,7 @@ private_reload_image (liextReload* self,
                       const char*  name)
 {
 	printf ("Reloading texture `%s'\n", name);
-	lirnd_render_load_image (self->module->render, name);
+	lirnd_render_load_image (self->client->render, name);
 }
 
 static void
@@ -203,10 +203,10 @@ private_reload_model (liextReload* self,
 	liengModel* model;
 
 	printf ("Reloading model `%s'\n", name);
-	lieng_engine_load_model (self->module->engine, name);
-	model = lieng_engine_find_model_by_name (self->module->engine, name);
+	lieng_engine_load_model (self->client->engine, name);
+	model = lieng_engine_find_model_by_name (self->client->engine, name);
 	if (model != NULL)
-		lirnd_render_load_model (self->module->render, name, model->model);
+		lirnd_render_load_model (self->client->render, name, model->model);
 }
 
 /** @} */

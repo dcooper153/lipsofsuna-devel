@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -60,7 +60,7 @@ licliExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
@@ -68,7 +68,7 @@ liext_module_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
@@ -77,9 +77,9 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "packet", 0, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 0, private_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "object-visibility", 0, private_visibility, self, self->calls + 2))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 0, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 0, private_tick, self, self->calls + 1) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "object-visibility", 0, private_visibility, self, self->calls + 2))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -138,7 +138,7 @@ private_packet_diff (liextModule* self,
 	slots = lialg_u32dic_find (self->dictionary, id);
 	if (slots == NULL)
 	{
-		object = licli_module_find_object (self->module, id);
+		object = licli_client_find_object (self->client, id);
 		if (object == NULL)
 			return 0;
 		slots = liext_slots_new (self, object);
@@ -187,7 +187,7 @@ private_packet_reset (liextModule* self,
 	slots = lialg_u32dic_find (self->dictionary, id);
 	if (slots == NULL)
 	{
-		object = licli_module_find_object (self->module, id);
+		object = licli_client_find_object (self->client, id);
 		if (object == NULL)
 			return 0;
 		slots = liext_slots_new (self, object);

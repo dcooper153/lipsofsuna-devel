@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -45,7 +45,7 @@ lisrvExtensionInfo liextInfo =
 };
 
 liextModule*
-liext_module_new (licliModule* module)
+liext_module_new (licliClient* client)
 {
 	liextModule* self;
 
@@ -53,7 +53,7 @@ liext_module_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextModule));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Allocate objects. */
 	self->objects = lialg_u32dic_new ();
@@ -64,15 +64,15 @@ liext_module_new (licliModule* module)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "render-2d", 1, private_render_2d, self, self->calls + 0) ||
-	    !lical_callbacks_insert (module->callbacks, module->engine, "tick", 1, private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "render-2d", 1, private_render_2d, self, self->calls + 0) ||
+	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 1, private_tick, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (module->script, "Speech", liextSpeechScript, self);
+	liscr_script_create_class (client->script, "Speech", liextSpeechScript, self);
 
 	return self;
 }
@@ -115,7 +115,7 @@ liext_module_set_speech (liextModule* self,
 
 	/* Find engine object. */
 	create = 0;
-	engobj = lieng_engine_find_object (self->module->engine, object);
+	engobj = lieng_engine_find_object (self->client->engine, object);
 	if (engobj == NULL)
 		return 0;
 
@@ -135,7 +135,7 @@ liext_module_set_speech (liextModule* self,
 	}
 
 	/* Allocate new speech. */
-	speech = liext_speech_new (self->module, message);
+	speech = liext_speech_new (self->client, message);
 	if (speech == NULL)
 	{
 		if (create)
@@ -200,7 +200,7 @@ private_render_2d (liextModule* self,
 		object = iter.value;
 
 		/* Project start offset. */
-		if (!lialg_camera_project (self->module->camera, &object->position, &win))
+		if (!lialg_camera_project (self->client->camera, &object->position, &win))
 			continue;
 		if (win.z < 0.0f)
 			continue;
@@ -244,7 +244,7 @@ private_tick (liextModule* self,
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		extobj = iter.value;
-		engobj = lieng_engine_find_object (self->module->engine, iter.key);
+		engobj = lieng_engine_find_object (self->client->engine, iter.key);
 		if (engobj != NULL)
 		{
 			/* Update speech offset. */

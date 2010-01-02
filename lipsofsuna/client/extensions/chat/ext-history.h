@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,7 +36,7 @@ typedef struct _liextChatHistory liextChatHistory;
 struct _liextChatHistory
 {
 	liwdgLabel base;
-	licliModule* module;
+	licliClient* client;
 	struct
 	{
 		int count;
@@ -46,7 +46,7 @@ struct _liextChatHistory
 
 liwdgWidget*
 liext_chat_history_new (liwdgManager* manager,
-                        licliModule*  module);
+                        licliClient*  client);
 
 int
 liext_chat_history_append (liextChatHistory* self,

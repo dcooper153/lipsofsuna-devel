@@ -137,16 +137,15 @@ am__objects_5 = callback/cal-callbacks.lo callback/cal-handle.lo \
 am__objects_6 = config/config-account.lo config/config-bans.lo \
 	config/config-host.lo
 am__objects_7 = client/client.lo client/client-callbacks.lo \
-	client/client-command.lo client/client-module.lo \
-	client/client-network.lo client/client-object.lo \
-	client/client-render.lo client/client-script-action.lo \
-	client/client-script-binding.lo client/client-script-group.lo \
+	client/client-command.lo client/client-network.lo \
+	client/client-object.lo client/client-render.lo \
+	client/client-script-action.lo client/client-script-binding.lo \
+	client/client-script-client.lo client/client-script-group.lo \
 	client/client-script-extension.lo \
-	client/client-script-light.lo client/client-script-module.lo \
-	client/client-script-object.lo client/client-script-player.lo \
-	client/client-script-scene.lo client/client-script-widget.lo \
-	client/client-script-window.lo client/client-window.lo \
-	client/widget-login.lo
+	client/client-script-light.lo client/client-script-object.lo \
+	client/client-script-player.lo client/client-script-scene.lo \
+	client/client-script-widget.lo client/client-script-window.lo \
+	client/client-window.lo client/widget-login.lo
 am__objects_8 = font/font.lo font/font-layout.lo
 am__objects_9 = generator/generator.lo generator/generator-brush.lo \
 	generator/generator-rule.lo
@@ -742,7 +741,6 @@ cli_HEADERS = \
 	client/client.h \
 	client/client-callbacks.h \
 	client/client-extension.h \
-	client/client-module.h \
 	client/client-network.h \
 	client/client-object.h \
 	client/client-script.h \
@@ -754,16 +752,15 @@ clisrc = \
 	client/client.c \
 	client/client-callbacks.c \
 	client/client-command.c \
-	client/client-module.c \
 	client/client-network.c \
 	client/client-object.c \
 	client/client-render.c \
 	client/client-script-action.c \
 	client/client-script-binding.c \
+	client/client-script-client.c \
 	client/client-script-group.c \
 	client/client-script-extension.c \
 	client/client-script-light.c \
-	client/client-script-module.c \
 	client/client-script-object.c \
 	client/client-script-player.c \
 	client/client-script-scene.c \
@@ -1439,8 +1436,6 @@ client/client-callbacks.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
 client/client-command.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
-client/client-module.lo: client/$(am__dirstamp) \
-	client/$(DEPDIR)/$(am__dirstamp)
 client/client-network.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
 client/client-object.lo: client/$(am__dirstamp) \
@@ -1451,13 +1446,13 @@ client/client-script-action.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
 client/client-script-binding.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
+client/client-script-client.lo: client/$(am__dirstamp) \
+	client/$(DEPDIR)/$(am__dirstamp)
 client/client-script-group.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
 client/client-script-extension.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
 client/client-script-light.lo: client/$(am__dirstamp) \
-	client/$(DEPDIR)/$(am__dirstamp)
-client/client-script-module.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
 client/client-script-object.lo: client/$(am__dirstamp) \
 	client/$(DEPDIR)/$(am__dirstamp)
@@ -2053,8 +2048,6 @@ mostlyclean-compile:
 	-rm -f client/client-command.$(OBJEXT)
 	-rm -f client/client-command.lo
 	-rm -f client/client-main.$(OBJEXT)
-	-rm -f client/client-module.$(OBJEXT)
-	-rm -f client/client-module.lo
 	-rm -f client/client-network.$(OBJEXT)
 	-rm -f client/client-network.lo
 	-rm -f client/client-object.$(OBJEXT)
@@ -2065,14 +2058,14 @@ mostlyclean-compile:
 	-rm -f client/client-script-action.lo
 	-rm -f client/client-script-binding.$(OBJEXT)
 	-rm -f client/client-script-binding.lo
+	-rm -f client/client-script-client.$(OBJEXT)
+	-rm -f client/client-script-client.lo
 	-rm -f client/client-script-extension.$(OBJEXT)
 	-rm -f client/client-script-extension.lo
 	-rm -f client/client-script-group.$(OBJEXT)
 	-rm -f client/client-script-group.lo
 	-rm -f client/client-script-light.$(OBJEXT)
 	-rm -f client/client-script-light.lo
-	-rm -f client/client-script-module.$(OBJEXT)
-	-rm -f client/client-script-module.lo
 	-rm -f client/client-script-object.$(OBJEXT)
 	-rm -f client/client-script-object.lo
 	-rm -f client/client-script-player.$(OBJEXT)
@@ -2390,16 +2383,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-callbacks.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-command.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-render.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-action.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-binding.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-extension.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-group.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-light.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-player.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@client/$(DEPDIR)/client-script-scene.Plo@am__quote@

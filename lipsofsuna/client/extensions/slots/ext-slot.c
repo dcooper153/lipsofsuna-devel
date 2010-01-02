@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@
 /**
  * \brief Creates a new equipment slot.
  *
- * \param module Module.
+ * \param client Client.
  * \param object Parent object.
  * \param node0 Node name in parent model.
  * \param node1 Node name in equipment model.
@@ -37,7 +37,7 @@
  * \return New slot or NULL.
  */
 liextSlot*
-liext_slot_new (licliModule* module,
+liext_slot_new (licliClient* client,
                 liengObject* object,
                 const char*  node0,
                 const char*  node1,
@@ -50,7 +50,7 @@ liext_slot_new (licliModule* module,
 	self = lisys_calloc (1, sizeof (liextSlot));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Allocate object. */
 	mdl = lieng_engine_find_model_by_code (object->engine, model);
@@ -59,7 +59,7 @@ liext_slot_new (licliModule* module,
 		lisys_error_set (LI_ERROR_UNKNOWN, "cannot find model `%d'", model);
 		goto error;
 	}
-	self->object = lieng_object_new (self->module->engine, NULL, LIPHY_CONTROL_MODE_STATIC, 0);
+	self->object = lieng_object_new (self->client->engine, NULL, LIPHY_CONTROL_MODE_STATIC, 0);
 	lieng_object_set_smoothing (self->object, 0.0f, 0.0f);
 	if (self->object == NULL)
 	{
@@ -108,7 +108,7 @@ liext_slot_free (liextSlot* self)
 	/* Free constraint. */
 	if (tmp.constraint != NULL)
 	{
-		lieng_engine_remove_constraint (self->module->engine, tmp.constraint);
+		lieng_engine_remove_constraint (self->client->engine, tmp.constraint);
 		lieng_constraint_free (tmp.constraint);
 	}
 

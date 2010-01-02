@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -61,7 +61,7 @@ static void Editor_create (liscrArgs* args)
 	    liscr_args_gets_string (args, "model", &name))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-		model = lieng_engine_find_model_by_name (module->editor->module->engine, name);
+		model = lieng_engine_find_model_by_name (module->editor->client->engine, name);
 		if (model == NULL)
 			return;
 		if (!liscr_args_gets_quaternion (args, "rotation", &transform.rotation))
@@ -84,7 +84,7 @@ static void Editor_rotate (liscrArgs* args)
 	liextModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-	module->module->client->video.SDL_GetMouseState (&x, &y);
+	module->client->video.SDL_GetMouseState (&x, &y);
 	liext_editor_begin_rotate (module->editor, x, y);
 }
 
@@ -126,7 +126,7 @@ static void Editor_translate (liscrArgs* args)
 	liextModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-	module->module->client->video.SDL_GetMouseState (&x, &y);
+	module->client->video.SDL_GetMouseState (&x, &y);
 	liext_editor_begin_translate (module->editor, x, y);
 }
 

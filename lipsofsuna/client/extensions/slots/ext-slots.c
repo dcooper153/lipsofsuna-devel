@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -107,7 +107,7 @@ liext_slots_set_slot (liextSlots* self,
 	/* Create new slot. */
 	if (model != LINET_INVALID_MODEL)
 	{
-		slot_ = liext_slot_new (self->module->module, self->object, node, "#root", model);
+		slot_ = liext_slot_new (self->module->client, self->object, node, "#root", model);
 		if (slot_ == NULL)
 			return 0;
 		if (!lialg_strdic_insert (self->slots, slot, slot_))

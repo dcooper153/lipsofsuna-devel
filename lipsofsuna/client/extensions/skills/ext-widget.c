@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -57,7 +57,7 @@ liext_skill_widget_new (liextModule* module)
 {
 	liwdgWidget* self;
 
-	self = liwdg_widget_new (module->module->widgets, &liextSkillWidgetType);
+	self = liwdg_widget_new (module->client->widgets, &liextSkillWidgetType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_SKILL_WIDGET (self)->module = module;
@@ -150,13 +150,13 @@ private_event (liextSkillWidget* self,
 		liwdgGroupType.event (LIWDG_WIDGET (self), event);
 		if (!self->object || self->skill == NULL)
 		{
-			if (self->module->module->network == NULL)
+			if (self->module->client->network == NULL)
 				goto disable;
-			id = self->module->module->network->id;
+			id = self->module->client->network->id;
 		}
 		else
 			id = self->object;
-		object = lieng_engine_find_object (self->module->module->engine, id);
+		object = lieng_engine_find_object (self->module->client->engine, id);
 		if (object == NULL)
 			goto disable;
 		skills = liext_module_find_skills (self->module, id);

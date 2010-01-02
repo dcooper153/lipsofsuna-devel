@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,10 +30,10 @@
 
 #define LICLI_SCRIPT_ACTION "Lips.Action"
 #define LICLI_SCRIPT_BINDING "Lips.Binding"
+#define LICLI_SCRIPT_CLIENT "Lips.Client"
 #define LICLI_SCRIPT_EXTENSION "Lips.Extension"
 #define LICLI_SCRIPT_GROUP "Lips.Group"
 #define LICLI_SCRIPT_LIGHT "Lips.Light"
-#define LICLI_SCRIPT_MODULE "Lips.Module"
 #define LICLI_SCRIPT_PLAYER "Lips.Player"
 #define LICLI_SCRIPT_SCENE "Lips.Scene"
 #define LICLI_SCRIPT_WIDGET "Lips.Widget"
@@ -48,6 +48,10 @@ licliBindingScript (liscrClass* self,
                     void*       data);
 
 void
+licliClientScript (liscrClass* self,
+                   void*       data);
+
+void
 licliExtensionScript (liscrClass* self,
                       void*       data);
 
@@ -58,10 +62,6 @@ licliGroupScript (liscrClass* self,
 void
 licliLightScript (liscrClass* self,
                   void*       data);
-
-void
-licliModuleScript (liscrClass* self,
-                   void*       data);
 
 void
 licliObjectScript (liscrClass* self,

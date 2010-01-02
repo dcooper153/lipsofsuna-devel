@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -62,7 +62,7 @@ private_merge_model (liextBlock* self,
 /*****************************************************************************/
 
 liextBlock*
-liext_block_new (licliModule* module)
+liext_block_new (licliClient* client)
 {
 	liextBlock* self;
 
@@ -70,7 +70,7 @@ liext_block_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextBlock));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	return self;
 }
@@ -181,7 +181,7 @@ liext_block_build (liextBlock*     self,
 		material = livox_manager_find_material (module->voxels, voxel->type);
 		if (material == NULL)
 			continue;
-		model = lieng_engine_find_model_by_name (module->module->engine, material->model);
+		model = lieng_engine_find_model_by_name (module->client->engine, material->model);
 		if (model == NULL)
 			continue;
 		info[i].model = model;
@@ -204,10 +204,10 @@ liext_block_build (liextBlock*     self,
 	/* Create render model if not empty. */
 	if (self->mmodel != NULL)
 	{
-		self->rmodel = lirnd_model_new (self->module->render, self->mmodel, NULL);
+		self->rmodel = lirnd_model_new (self->client->render, self->mmodel, NULL);
 		if (self->rmodel != NULL)
 		{
-			self->group = lirnd_group_new (self->module->scene);
+			self->group = lirnd_group_new (self->client->scene);
 			if (self->group != NULL)
 				lirnd_group_insert_model (self->group, self->rmodel, &transform);
 		}
@@ -248,18 +248,18 @@ private_build_quickly (liextBlock*  self,
 			continue;
 
 		/* Get render model. */
-		model = lirnd_render_find_model (module->module->render, voxels[i].model->name);
+		model = lirnd_render_find_model (module->client->render, voxels[i].model->name);
 		if (model == NULL)
 		{
-			lirnd_render_load_model (module->module->render, voxels[i].model->name, voxels[i].model->model);
-			model = lirnd_render_find_model (module->module->render, voxels[i].model->name);
+			lirnd_render_load_model (module->client->render, voxels[i].model->name, voxels[i].model->model);
+			model = lirnd_render_find_model (module->client->render, voxels[i].model->name);
 			if (model == NULL)
 				continue;
 		}
 
 		/* Add to render group. */
 		if (self->group == NULL)
-			self->group = lirnd_group_new (self->module->scene);
+			self->group = lirnd_group_new (self->client->scene);
 		if (self->group != NULL)
 			lirnd_group_insert_model (self->group, model, &voxels[i].transform);
 	}
@@ -317,7 +317,7 @@ private_build_physics (liextBlock*  self,
 
 		/* Add to physics object. */
 		if (self->physics == NULL)
-			self->physics = liphy_object_new (self->module->engine->physics, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
+			self->physics = liphy_object_new (self->client->engine->physics, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
 		if (self->physics != NULL)
 			liphy_object_insert_shape (self->physics, voxels[i].model->physics, &voxels[i].transform);
 	}

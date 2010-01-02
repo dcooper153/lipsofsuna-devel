@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -165,7 +165,7 @@ static void Button_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_BUTTON);
-	self = liwdg_button_new (module->module->widgets);
+	self = liwdg_button_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -225,7 +225,7 @@ static void Entry_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_ENTRY);
-	self = liwdg_entry_new (module->module->widgets);
+	self = liwdg_entry_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -297,7 +297,7 @@ static void Image_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_IMAGE);
-	self = liwdg_image_new (module->module->widgets);
+	self = liwdg_image_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -357,7 +357,7 @@ static void Label_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_LABEL);
-	self = liwdg_label_new (module->module->widgets);
+	self = liwdg_label_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -417,7 +417,7 @@ static void Menu_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_MENU);
-	self = liwdg_menu_new (module->module->widgets);
+	self = liwdg_menu_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -564,7 +564,7 @@ static void Scroll_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCROLL);
-	self = liwdg_scroll_new (module->module->widgets);
+	self = liwdg_scroll_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -648,7 +648,7 @@ static void Spin_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPIN);
-	self = liwdg_spin_new (module->module->widgets);
+	self = liwdg_spin_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -758,7 +758,7 @@ static void Tree_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_TREE);
-	self = liwdg_tree_new (module->module->widgets);
+	self = liwdg_tree_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -888,7 +888,7 @@ View_new (liscrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VIEW);
-	self = liwdg_view_new (module->module->widgets);
+	self = liwdg_view_new (module->client->widgets);
 	if (self == NULL)
 		return;
 
@@ -1001,7 +1001,7 @@ liextButtonScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_BUTTON, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Button_new);
 	liscr_class_insert_mvar (self, "text", Button_getter_text, Button_setter_text);
 }
@@ -1013,7 +1013,7 @@ liextEntryScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_ENTRY, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Entry_new);
 	liscr_class_insert_mfunc (self, "clear", Entry_clear);
 	liscr_class_insert_mvar (self, "text", Entry_getter_text, Entry_setter_text);
@@ -1026,7 +1026,7 @@ liextImageScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_IMAGE, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Image_new);
 	liscr_class_insert_mvar (self, "image", Image_getter_image, Image_setter_image);
 }
@@ -1038,7 +1038,7 @@ liextLabelScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_LABEL, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Label_new);
 	liscr_class_insert_mvar (self, "text", Label_getter_text, Label_setter_text);
 }
@@ -1050,7 +1050,7 @@ liextMenuScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENU, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_mfunc (self, "get_item_rect", Menu_get_item_rect);
 	liscr_class_insert_mfunc (self, "insert", Menu_insert);
 	liscr_class_insert_cfunc (self, "new", Menu_new);
@@ -1065,7 +1065,7 @@ liextScrollScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SCROLL, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Scroll_new);
 	liscr_class_insert_mfunc (self, "set_range", Scroll_set_range);
 	liscr_class_insert_mvar (self, "value", Scroll_getter_value, Scroll_setter_value);
@@ -1078,7 +1078,7 @@ liextSpinScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPIN, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", Spin_new);
 	liscr_class_insert_mvar (self, "value", Spin_getter_value, Spin_setter_value);
 }
@@ -1090,7 +1090,7 @@ liextTreeScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TREE, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_mfunc (self, "append", Tree_append);
 	liscr_class_insert_mfunc (self, "get_row", Tree_get_row);
 	liscr_class_insert_cfunc (self, "new", Tree_new);
@@ -1106,7 +1106,7 @@ liextViewScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VIEW, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "new", View_new);
 	liscr_class_insert_mvar (self, "child", View_getter_child, View_setter_child);
 	liscr_class_insert_mvar (self, "hscroll", View_getter_hscroll, View_setter_hscroll);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -33,13 +33,13 @@
 typedef struct _liextSlot liextSlot;
 struct _liextSlot
 {
-	licliModule* module;
+	licliClient* client;
 	liengObject* object;
 	liengConstraint* constraint;
 };
 
 liextSlot*
-liext_slot_new (licliModule* module,
+liext_slot_new (licliClient* client,
                 liengObject* object,
                 const char*  node0,
                 const char*  node1,

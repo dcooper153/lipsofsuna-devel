@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -48,12 +48,12 @@ Extension_new (lua_State* lua)
 {
 	int ret;
 	const char* name;
-	licliModule* module;
+	licliClient* client;
 
-	module = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_EXTENSION);
+	client = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_EXTENSION);
 	name = luaL_checkstring (lua, 2);
 
-	ret = licli_module_load_extension (module, name);
+	ret = licli_client_load_extension (client, name);
 	lua_pushboolean (lua, ret);
 	return 1;
 }

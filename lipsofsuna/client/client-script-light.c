@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -45,15 +45,15 @@
  */
 static void Light_new (liscrArgs* args)
 {
-	licliModule* module;
+	licliClient* client;
 	lirndLight* self;
 	liscrData* data;
 	const float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 1.0f, 1.0f };
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_LIGHT);
-	self = lirnd_light_new (module->scene, color, equation, M_PI, 0.0f, 0);
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_LIGHT);
+	self = lirnd_light_new (client->scene, color, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return;
 

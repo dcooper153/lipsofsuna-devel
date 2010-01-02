@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -48,7 +48,7 @@ private_mouse_motion (liextEditor*          self,
 /*****************************************************************************/
 
 liextEditor*
-liext_editor_new (licliModule* module)
+liext_editor_new (licliClient* client)
 {
 	liextEditor* self;
 
@@ -56,10 +56,10 @@ liext_editor_new (licliModule* module)
 	self = lisys_calloc (1, sizeof (liextEditor));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	/* Allocate callbacks. */
-	if (!lical_callbacks_insert (module->callbacks, module->engine, "event", -15, private_event, self, self->calls + 0))
+	if (!lical_callbacks_insert (client->callbacks, client->engine, "event", -15, private_event, self, self->calls + 0))
 	{
 		liext_editor_free (self);
 		return NULL;
@@ -128,7 +128,7 @@ liext_editor_create (liextEditor*          self,
 	liarc_writer_append_float (writer, transform->rotation.y);
 	liarc_writer_append_float (writer, transform->rotation.z);
 	liarc_writer_append_float (writer, transform->rotation.w);
-	licli_module_send (self->module, writer, GRAPPLE_RELIABLE);
+	licli_client_send (self->client, writer, GRAPPLE_RELIABLE);
 	liarc_writer_free (writer);
 
 	return 1;
@@ -147,7 +147,7 @@ liext_editor_destroy (liextEditor* self)
 	lialgPtrdicIter iter;
 	liengSelection* selection;
 
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		writer = liarc_writer_new_packet (LINET_EXT_CLIENT_PACKET_EDITOR);
@@ -155,7 +155,7 @@ liext_editor_destroy (liextEditor* self)
 			return 0;
 		liarc_writer_append_uint8 (writer, LINET_EXT_EDITOR_PACKET_DESTROY);
 		liarc_writer_append_uint32 (writer, selection->object->id);
-		licli_module_send (self->module, writer, GRAPPLE_RELIABLE);
+		licli_client_send (self->client, writer, GRAPPLE_RELIABLE);
 		liarc_writer_free (writer);
 	}
 
@@ -181,7 +181,7 @@ liext_editor_duplicate (liextEditor* self)
 	liengSelection* selection;
 	limatTransform transform;
 
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		code = lieng_object_get_model_code (selection->object);
@@ -208,7 +208,7 @@ liext_editor_rotate (liextEditor*           self,
 	liext_editor_get_center (self, &center);
 
 	/* Rotate each element. */
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		position = limat_vector_subtract (selection->transform.position, center);
@@ -241,7 +241,7 @@ liext_editor_snap (liextEditor* self,
 	limatVector position;
 
 	/* Snap each element. */
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		position = selection->transform.position;
@@ -282,7 +282,7 @@ liext_editor_translate (liextEditor*       self,
 	limatTransform transform;
 	limatVector position;
 
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		lieng_object_get_transform (selection->object, &transform);
@@ -306,7 +306,7 @@ liext_editor_transform_apply (liextEditor* self)
 	liengSelection* selection;
 	limatTransform transform;
 
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		/* Get target. */
 		selection = iter.value;
@@ -326,7 +326,7 @@ liext_editor_transform_apply (liextEditor* self)
 		liarc_writer_append_float (writer, transform.rotation.y);
 		liarc_writer_append_float (writer, transform.rotation.z);
 		liarc_writer_append_float (writer, transform.rotation.w);
-		licli_module_send (self->module, writer, GRAPPLE_RELIABLE);
+		licli_client_send (self->client, writer, GRAPPLE_RELIABLE);
 		liarc_writer_free (writer);
 	}
 }
@@ -343,7 +343,7 @@ liext_editor_transform_cancel (liextEditor* self)
 	liengSelection* selection;
 	limatTransform transform;
 
-	LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		transform = selection->transform;
@@ -359,14 +359,14 @@ liext_editor_get_center (liextEditor* self,
 	liengSelection* selection;
 
 	*value = limat_vector_init (0.0f, 0.0f, 0.0f);
-	if (self->module->engine->selection->size)
+	if (self->client->engine->selection->size)
 	{
-		LI_FOREACH_PTRDIC (iter, self->module->engine->selection)
+		LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 		{
 			selection = iter.value;
 			*value = limat_vector_add (*value, selection->transform.position);
 		}
-		*value = limat_vector_multiply (*value, 1.0f / self->module->engine->selection->size);
+		*value = limat_vector_multiply (*value, 1.0f / self->client->engine->selection->size);
 	}
 }
 
@@ -401,7 +401,7 @@ private_key_press (liextEditor*       self,
 	switch (event->keysym.sym)
 	{
 		case 'x':
-			self->module->client->video.SDL_GetMouseState (&x, &y);
+			self->client->video.SDL_GetMouseState (&x, &y);
 			if (self->drag.mode >= LIEXT_DRAG_ROTATE && self->drag.mode <= LIEXT_DRAG_ROTATEZ)
 				self->drag.mode = LIEXT_DRAG_ROTATEX;
 			else
@@ -409,7 +409,7 @@ private_key_press (liextEditor*       self,
 			self->drag.start = limat_vector_init (x, y, 0.0f);
 			break;
 		case 'y':
-			self->module->client->video.SDL_GetMouseState (&x, &y);
+			self->client->video.SDL_GetMouseState (&x, &y);
 			if (self->drag.mode >= LIEXT_DRAG_ROTATE && self->drag.mode <= LIEXT_DRAG_ROTATEZ)
 				self->drag.mode = LIEXT_DRAG_ROTATEY;
 			else
@@ -417,7 +417,7 @@ private_key_press (liextEditor*       self,
 			self->drag.start = limat_vector_init (x, y, 0.0f);
 			break;
 		case 'z':
-			self->module->client->video.SDL_GetMouseState (&x, &y);
+			self->client->video.SDL_GetMouseState (&x, &y);
 			if (self->drag.mode >= LIEXT_DRAG_ROTATE && self->drag.mode <= LIEXT_DRAG_ROTATEZ)
 				self->drag.mode = LIEXT_DRAG_ROTATEZ;
 			else
@@ -476,11 +476,11 @@ private_mouse_motion (liextEditor*          self,
 	if (self->drag.mode == LIEXT_DRAG_ROTATE)
 	{
 		liext_editor_get_center (self, &world);
-		lialg_camera_get_transform (self->module->camera, &transform);
+		lialg_camera_get_transform (self->client->camera, &transform);
 		axis = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 0.0f, 1.0f));
-		if (lialg_camera_project (self->module->camera, &world, &center))
+		if (lialg_camera_project (self->client->camera, &world, &center))
 		{
-			licli_window_get_size (self->module->window, NULL, &h);
+			licli_window_get_size (self->client->window, NULL, &h);
 			center.y = h - center.y;
 			amount = atan2 (self->drag.start.y - center.y, self->drag.start.x - center.x);
 			amount -= atan2 (event->y - center.y, event->x - center.x);
@@ -508,7 +508,7 @@ private_mouse_motion (liextEditor*          self,
 	}
 	else if (self->drag.mode == LIEXT_DRAG_TRANSLATE)
 	{
-		lialg_camera_get_transform (self->module->camera, &transform);
+		lialg_camera_get_transform (self->client->camera, &transform);
 		vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
 		vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, -1.0f, 0.0f));
 		vx = limat_vector_multiply (vx, 0.05f * (event->x - self->drag.start.x));

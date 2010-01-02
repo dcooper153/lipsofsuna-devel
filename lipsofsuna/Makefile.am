@@ -121,7 +121,6 @@ cli_HEADERS = \
 	client/client.h \
 	client/client-callbacks.h \
 	client/client-extension.h \
-	client/client-module.h \
 	client/client-network.h \
 	client/client-object.h \
 	client/client-script.h \
@@ -132,16 +131,15 @@ clisrc = \
 	client/client.c \
 	client/client-callbacks.c \
 	client/client-command.c \
-	client/client-module.c \
 	client/client-network.c \
 	client/client-object.c \
 	client/client-render.c \
 	client/client-script-action.c \
 	client/client-script-binding.c \
+	client/client-script-client.c \
 	client/client-script-group.c \
 	client/client-script-extension.c \
 	client/client-script-light.c \
-	client/client-script-module.c \
 	client/client-script-object.c \
 	client/client-script-player.c \
 	client/client-script-scene.c \

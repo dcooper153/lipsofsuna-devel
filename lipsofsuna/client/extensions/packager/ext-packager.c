@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -98,14 +98,14 @@ private_write_directory (liextPackagerData* self,
 /*****************************************************************************/
 
 liextPackager*
-liext_packager_new (licliModule* module)
+liext_packager_new (licliClient* client)
 {
 	liextPackager* self;
 
 	self = lisys_calloc (1, sizeof (liextPackager));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->client = client;
 
 	return self;
 }
@@ -162,7 +162,7 @@ liext_packager_save (liextPackager* self,
 	if (data == NULL)
 		return 0;
 	data->packager = self;
-	data->module = self->module;
+	data->client = self->client;
 	data->target = listr_dup (name);
 	if (data->target == NULL)
 	{
@@ -188,7 +188,7 @@ liext_packager_save (liextPackager* self,
 	}
 
 	/* Create progress dialog. */
-	self->progress = liwdg_busy_new (self->module->widgets);
+	self->progress = liwdg_busy_new (self->client->widgets);
 	if (self->progress == NULL)
 	{
 		lithr_async_call_stop (self->worker);
@@ -201,7 +201,7 @@ liext_packager_save (liextPackager* self,
 	liwdg_busy_set_update (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_update), self);
 	liwdg_busy_set_text (LIWDG_BUSY (self->progress), "Packaging...");
 	liwdg_widget_set_visible (LIWDG_WIDGET (self->progress), 1);
-	liwdg_manager_insert_window (self->module->widgets, LIWDG_WIDGET (self->progress));
+	liwdg_manager_insert_window (self->client->widgets, LIWDG_WIDGET (self->progress));
 
 	return 1;
 }
@@ -277,7 +277,7 @@ private_async_save (lithrAsyncCall* call,
 	self->resources = liext_resources_new ();
 	if (self->resources == NULL)
 		goto error;
-	path = lisys_path_concat (self->module->path, "graphics", NULL);
+	path = lisys_path_concat (self->client->path, "graphics", NULL);
 	if (path == NULL)
 		goto error;
 	if (!private_insert_models (call, self, path) ||
@@ -319,7 +319,7 @@ private_async_save (lithrAsyncCall* call,
 	}
 
 	/* Collect sound effects. */
-	path = lisys_path_concat (self->module->path, "sounds", NULL);
+	path = lisys_path_concat (self->client->path, "sounds", NULL);
 	if (path == NULL)
 		goto error;
 	if (!private_insert_samples (call, self, path))
@@ -428,7 +428,7 @@ private_insert_directory (liextPackagerData* self,
 	liextPackagerFile tmp;
 	lisysDir* dir;
 
-	src = lisys_path_concat (self->module->path, path, name, NULL);
+	src = lisys_path_concat (self->client->path, path, name, NULL);
 	if (src == NULL)
 		return 0;
 	dir = lisys_dir_open (src);
@@ -467,7 +467,7 @@ private_insert_extra (lithrAsyncCall*    call,
 	liarcReader* reader;
 
 	/* Open extra texture list. */
-	path = lisys_path_concat (self->module->path, "graphics", "textures.cfg", NULL);
+	path = lisys_path_concat (self->client->path, "graphics", "textures.cfg", NULL);
 	if (path == NULL)
 		return 0;
 	reader = liarc_reader_new_from_file (path);
@@ -509,7 +509,7 @@ private_insert_file (liextPackagerData* self,
 	int ret;
 	liextPackagerFile tmp;
 
-	tmp.src = lisys_path_format (self->module->path,
+	tmp.src = lisys_path_format (self->client->path,
 		LISYS_PATH_SEPARATOR, dir,
 		LISYS_PATH_SEPARATOR, name, ext, NULL);
 	tmp.dst = lisys_path_format (self->directory,
@@ -663,7 +663,7 @@ private_progress_update (liextPackager* self)
 		return;
 	if (lithr_async_call_get_done (self->worker))
 	{
-		liwdg_manager_remove_window (self->module->widgets, self->progress);
+		liwdg_manager_remove_window (self->client->widgets, self->progress);
 		lithr_async_call_free (self->worker);
 		self->progress = NULL;
 		self->worker = NULL;

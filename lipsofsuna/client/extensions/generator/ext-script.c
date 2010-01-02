@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -101,7 +101,7 @@ liextGeneratorScript (liscrClass* self,
 	liextModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
-	liscr_class_inherit (self, licliWidgetScript, module->module);
+	liscr_class_inherit (self, licliWidgetScript, module->client);
 	liscr_class_insert_cfunc (self, "load", Generator_load);
 	liscr_class_insert_cfunc (self, "new", Generator_new);
 	liscr_class_insert_cfunc (self, "save", Generator_save);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -38,13 +38,13 @@ struct _liextReload
 {
 	int queued;
 	licalHandle calls[1];
-	licliModule* module;
+	licliClient* client;
 	lirelReload* reload;
 	liwdgWidget* progress;
 };
 
 liextReload*
-liext_reload_new (licliModule* module);
+liext_reload_new (licliClient* client);
 
 void
 liext_reload_free (liextReload* self);

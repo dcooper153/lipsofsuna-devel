@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,7 +24,6 @@
 typedef struct _licliClient licliClient;
 typedef struct _licliExtension licliExtension;
 typedef struct _licliExtensionInfo licliExtensionInfo;
-typedef struct _licliModule licliModule;
 typedef struct _licliNetwork licliNetwork;
 typedef struct _licliObject licliObject;
 typedef struct _licliWindow licliWindow;

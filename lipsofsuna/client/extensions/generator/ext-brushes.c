@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -178,7 +178,7 @@ liext_brushes_new (liwdgManager* manager,
 	data->module = module;
 
 	/* Initialize scene preview. */
-	data->widgets.preview = liext_preview_new (manager, module->module);
+	data->widgets.preview = liext_preview_new (manager, module->client);
 	if (data->widgets.preview == NULL)
 	{
 		liwdg_widget_free (self);
@@ -1375,9 +1375,9 @@ private_rebuild_brush (liextBrushes* self)
 	brush = data->brush;
 
 	/* Find the player. */
-	if (self->module->module->network == NULL)
+	if (self->module->client->network == NULL)
 		return;
-	player = licli_module_get_player (self->module->module);
+	player = licli_client_get_player (self->module->client);
 	if (player == NULL)
 		return;
 
@@ -1391,7 +1391,7 @@ private_rebuild_brush (liextBrushes* self)
 	z = (int)(round (transform.position.z / LIVOX_TILE_WIDTH));
 #warning Brush rebuilding is broken.
 #if 0
-	livox_manager_copy_voxels (self->module->module->voxels, x, y, z,
+	livox_manager_copy_voxels (self->module->client->voxels, x, y, z,
 		brush->size[0], brush->size[1], brush->size[2], brush->voxels.array);
 #endif
 

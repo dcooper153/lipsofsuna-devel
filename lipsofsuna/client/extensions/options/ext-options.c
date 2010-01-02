@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -64,14 +64,14 @@ const liwdgClass liextOptionsType =
 };
 
 liwdgWidget*
-liext_options_new (licliModule* module)
+liext_options_new (licliClient* client)
 {
 	liwdgWidget* self;
 
-	self = liwdg_widget_new (module->widgets, &liextOptionsType);
+	self = liwdg_widget_new (client->widgets, &liextOptionsType);
 	if (self == NULL)
 		return NULL;
-	LIEXT_WIDGET_OPTIONS (self)->module = module;
+	LIEXT_WIDGET_OPTIONS (self)->client = client;
 
 	return self;
 }
@@ -155,31 +155,31 @@ private_event (liextOptions* self,
 static void
 private_fsaa (liextOptions* self)
 {
-	licli_window_set_fsaa (self->module->window, livid_features_get_max_samples () *
+	licli_window_set_fsaa (self->client->window, livid_features_get_max_samples () *
 		liwdg_check_get_active (LIWDG_CHECK (self->check_fsaa)));
 }
 
 static void
 private_global_shadows (liextOptions* self)
 {
-	lirnd_render_set_global_shadows (self->module->render,
+	lirnd_render_set_global_shadows (self->client->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_global_shadows)));
 }
 
 static void
 private_local_shadows (liextOptions* self)
 {
-	lirnd_render_set_local_shadows (self->module->render,
+	lirnd_render_set_local_shadows (self->client->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_local_shadows)));
 }
 
 static void
 private_shaders (liextOptions* self)
 {
-	lirnd_render_set_shaders_enabled (self->module->render,
+	lirnd_render_set_shaders_enabled (self->client->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_shaders)));
 	liwdg_check_set_active (LIWDG_CHECK (self->check_shaders),
-		lirnd_render_get_shaders_enabled (self->module->render));
+		lirnd_render_get_shaders_enabled (self->client->render));
 }
 
 /** @} */

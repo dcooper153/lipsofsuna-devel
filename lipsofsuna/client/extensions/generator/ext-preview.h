@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -53,7 +53,7 @@ struct _liextPreview
 	lialgPtrdic* objects;
 	licalCallbacks* callbacks;
 	licalHandle calls[2];
-	licliModule* module;
+	licliClient* client;
 	ligenGenerator* generator;
 	limatVector drag;
 	limatTransform transform;
@@ -69,7 +69,7 @@ extern const liwdgClass liextPreviewType;
 
 liwdgWidget*
 liext_preview_new (liwdgManager* manager,
-                   licliModule*  module);
+                   licliClient*  client);
 
 void
 liext_preview_build (liextPreview* self);

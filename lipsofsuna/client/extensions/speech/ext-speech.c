@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,7 +27,7 @@
 #include "ext-speech.h"
 
 liextSpeech*
-liext_speech_new (licliModule* module,
+liext_speech_new (licliClient* client,
                   const char*  text)
 {
 	liextSpeech* self;
@@ -45,7 +45,7 @@ liext_speech_new (licliModule* module,
 		return NULL;
 	}
 	lifnt_layout_set_width_limit (self->text, 150);
-	font = liwdg_manager_find_font (module->widgets, "default");
+	font = liwdg_manager_find_font (client->widgets, "default");
 	if (font != NULL)
 		lifnt_layout_append_string (self->text, font, text);
 

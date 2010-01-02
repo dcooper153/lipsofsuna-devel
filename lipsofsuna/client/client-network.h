@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,7 +28,7 @@
 #include <grapple/grapple.h>
 #include <config/lips-config.h>
 #include <algorithm/lips-algorithm.h>
-#include "client-module.h"
+#include "client.h"
 #include "client-types.h"
 #include "client-object.h"
 
@@ -47,8 +47,8 @@ struct _licliNetwork
 	uint32_t id;
 	uint32_t features;
 	licfgHost* host;
-	licliModule* module;
-	grapple_client client;
+	licliClient* client;
+	grapple_client socket;
 	struct
 	{
 		Uint32 tick;
@@ -63,7 +63,7 @@ struct _licliNetwork
 };
 
 licliNetwork*
-licli_network_new (licliModule* module,
+licli_network_new (licliClient* client,
                    const char*  name,
                    const char*  pass);
 

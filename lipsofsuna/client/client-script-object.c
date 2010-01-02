@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,13 +43,13 @@
  */
 static void Object_emit_particles (liscrArgs* args)
 {
-	licliModule* module;
+	licliClient* client;
 	liengObject* object;
 	lirndObject* render;
 
 	object = LIENG_OBJECT (args->self);
-	module = lieng_engine_get_userdata (object->engine);
-	render = lirnd_scene_find_object (module->scene, object->id);
+	client = lieng_engine_get_userdata (object->engine);
+	render = lirnd_scene_find_object (client->scene, object->id);
 	if (render != NULL)
 		lirnd_object_emit_particles (render);
 }
