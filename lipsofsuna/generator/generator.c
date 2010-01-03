@@ -68,7 +68,7 @@ private_stroke_paint (LIGenGenerator* self,
  *
  * \param paths Path information.
  * \param callbacks Callbacks.
- * \param sector Sector manager.
+ * \param sectors Sector manager.
  * \return New generator or NULL.
  */
 LIGenGenerator*

@@ -18,7 +18,7 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup LIAlgCamera Camerai
+ * \addtogroup LIAlgCamera Camera
  * @{
  */
 

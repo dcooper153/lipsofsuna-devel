@@ -66,7 +66,7 @@ private_scroll (LIWdgView* self,
                 int        x,
                 int        y);
 
-void
+static void
 private_translate_coords (LIWdgView* self,
                           int        containerx,
                           int        containery,
@@ -352,7 +352,7 @@ private_scroll (LIWdgView* self,
 	}
 }
 
-void
+static void
 private_translate_coords (LIWdgView* self,
                           int        containerx,
                           int        containery,

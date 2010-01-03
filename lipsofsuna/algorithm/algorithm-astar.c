@@ -46,7 +46,7 @@ private_build_path (LIAlgAstar*     self,
 static void
 private_clear (LIAlgAstar* self);
 
-LIAlgAstarNode*
+static LIAlgAstarNode*
 private_next_open (LIAlgAstar*     self,
                    LIAlgAstarNode* current);
 
@@ -290,7 +290,7 @@ private_clear (LIAlgAstar* self)
 	lialg_priority_queue_clear (self->priority);
 }
 
-LIAlgAstarNode*
+static LIAlgAstarNode*
 private_next_open (LIAlgAstar*     self,
                    LIAlgAstarNode* current)
 {

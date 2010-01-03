@@ -35,7 +35,7 @@
  * the constraint.
  *
  * \param physics Physics simulation.
- * \param self Object to constrain.
+ * \param object Object to constrain.
  * \param point Pivot point in object space.
  * \param axis Axis of rotation in object space.
  * \param limit Nonzero if should use rotation limit.

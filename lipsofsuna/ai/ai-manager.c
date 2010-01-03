@@ -18,7 +18,7 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup LIAiPath Path
+ * \addtogroup LIAiManager Manager
  * @{
  */
 

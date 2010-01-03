@@ -65,7 +65,7 @@ private_event (LIWdgTree*  self,
 static void
 private_rebuild (LIWdgTree* self);
 
-void
+static void
 private_treerow_free (LIWdgTreerow* self);
 
 static LIWdgTreerow*
@@ -78,11 +78,11 @@ private_treerow_find_clicked (LIWdgTreerow* self,
                               int           x,
                               int           y);
 
-void
+static void
 private_treerow_foreach (LIWdgTreerow* self,
                          void        (*call)());
 
-int
+static int
 private_treerow_render (LIWdgTreerow* self,
                         LIWdgRect*    rect,
                         LIWdgStyle*   style,
@@ -380,7 +380,7 @@ private_event (LIWdgTree*  self,
 	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
-void
+static void
 private_treerow_free (LIWdgTreerow* self)
 {
 	int i;
@@ -454,7 +454,7 @@ private_treerow_find_clicked (LIWdgTreerow* self,
 	return NULL;
 }
 
-void
+static void
 private_treerow_foreach (LIWdgTreerow* self,
                          void        (*call)())
 {
@@ -465,7 +465,7 @@ private_treerow_foreach (LIWdgTreerow* self,
 		private_treerow_foreach (self->rows.array[i], call);
 }
 
-int
+static int
 private_treerow_render (LIWdgTreerow* self,
                         LIWdgRect*    rect,
                         LIWdgStyle*   style,

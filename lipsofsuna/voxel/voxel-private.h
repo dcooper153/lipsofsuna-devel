@@ -41,3 +41,7 @@ struct _LIVoxSector
 };
 
 #endif
+
+/** @} */
+/** @} */
+

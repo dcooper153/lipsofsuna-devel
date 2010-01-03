@@ -29,7 +29,7 @@
 #include "script-private.h"
 #include "script-util.h"
 
-LIScrClassMemb*
+static LIScrClassMemb*
 private_find_var (LIScrClass* self,
                   const char* name);
 
@@ -619,7 +619,7 @@ liscr_class_default___newindex (lua_State* lua)
 
 /*****************************************************************************/
 
-LIScrClassMemb*
+static LIScrClassMemb*
 private_find_var (LIScrClass* self,
                   const char* name)
 {

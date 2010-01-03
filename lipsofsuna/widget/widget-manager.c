@@ -45,7 +45,7 @@ enum
 	LIWDG_MATCH_TOPRIGHT,
 };
 
-LIWdgWidget*
+static LIWdgWidget*
 private_find_window (LIWdgManager* self,
                      int           x,
                      int           y,
@@ -865,7 +865,7 @@ liwdg_manager_set_size (LIWdgManager* self,
 
 /*****************************************************************************/
 
-LIWdgWidget*
+static LIWdgWidget*
 private_find_window (LIWdgManager* self,
                      int           x,
                      int           y,
