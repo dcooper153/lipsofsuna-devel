@@ -18,7 +18,7 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrArgs Args
+ * \addtogroup LIScrArgs Args
  * @{
  */
 
@@ -27,12 +27,12 @@
 #include "script-util.h"
 
 void
-liscr_args_init_func (liscrArgs*  self,
+liscr_args_init_func (LIScrArgs*  self,
                       lua_State*  lua,
-                      liscrClass* clss,
-                      liscrData*  data)
+                      LIScrClass* clss,
+                      LIScrData*  data)
 {
-	memset (self, 0, sizeof (liscrArgs));
+	memset (self, 0, sizeof (LIScrArgs));
 	self->lua = lua;
 	self->script = clss->script;
 	self->clss = clss;
@@ -49,12 +49,12 @@ liscr_args_init_func (liscrArgs*  self,
 }
 
 void
-liscr_args_init_getter (liscrArgs*  self,
+liscr_args_init_getter (LIScrArgs*  self,
                         lua_State*  lua,
-                        liscrClass* clss,
-                        liscrData*  data)
+                        LIScrClass* clss,
+                        LIScrData*  data)
 {
-	memset (self, 0, sizeof (liscrArgs));
+	memset (self, 0, sizeof (LIScrArgs));
 	self->lua = lua;
 	self->script = clss->script;
 	self->clss = clss;
@@ -66,12 +66,12 @@ liscr_args_init_getter (liscrArgs*  self,
 }
 
 void
-liscr_args_init_setter (liscrArgs*  self,
+liscr_args_init_setter (LIScrArgs*  self,
                         lua_State*  lua,
-                        liscrClass* clss,
-                        liscrData*  data)
+                        LIScrClass* clss,
+                        LIScrData*  data)
 {
-	memset (self, 0, sizeof (liscrArgs));
+	memset (self, 0, sizeof (LIScrArgs));
 	self->lua = lua;
 	self->script = clss->script;
 	self->clss = clss;
@@ -83,16 +83,16 @@ liscr_args_init_setter (liscrArgs*  self,
 }
 
 void
-liscr_args_call_setters (liscrArgs* self,
-                         liscrData* data)
+liscr_args_call_setters (LIScrArgs* self,
+                         LIScrData* data)
 {
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 		liscr_copyargs (self->lua, data, self->input_table);
 }
 
 void
-liscr_args_call_setters_except (liscrArgs*  self,
-                                liscrData*  data,
+liscr_args_call_setters_except (LIScrArgs*  self,
+                                LIScrData*  data,
                                 const char* except)
 {
 	const char* tmp;
@@ -136,7 +136,7 @@ liscr_args_call_setters_except (liscrArgs*  self,
 }
 
 int
-liscr_args_geti_bool (liscrArgs*  self,
+liscr_args_geti_bool (LIScrArgs*  self,
                       int         index,
                       int*        result)
 {
@@ -169,12 +169,12 @@ liscr_args_geti_bool (liscrArgs*  self,
 }
 
 int
-liscr_args_geti_class (liscrArgs*   self,
+liscr_args_geti_class (LIScrArgs*   self,
                        int          index,
                        const char*  type,
-                       liscrClass** result)
+                       LIScrClass** result)
 {
-	liscrClass* tmp;
+	LIScrClass* tmp;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -205,12 +205,12 @@ liscr_args_geti_class (liscrArgs*   self,
 }
 
 int
-liscr_args_geti_data (liscrArgs*  self,
+liscr_args_geti_data (LIScrArgs*  self,
                       int         index,
                       const char* type,
-                      liscrData** result)
+                      LIScrData** result)
 {
-	liscrData* tmp = NULL;
+	LIScrData* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -241,7 +241,7 @@ liscr_args_geti_data (liscrArgs*  self,
 }
 
 int
-liscr_args_geti_float (liscrArgs*  self,
+liscr_args_geti_float (LIScrArgs*  self,
                        int         index,
                        float*      result)
 {
@@ -274,7 +274,7 @@ liscr_args_geti_float (liscrArgs*  self,
 }
 
 int
-liscr_args_geti_int (liscrArgs*  self,
+liscr_args_geti_int (LIScrArgs*  self,
                      int         index,
                      int*        result)
 {
@@ -307,11 +307,11 @@ liscr_args_geti_int (liscrArgs*  self,
 }
 
 int
-liscr_args_geti_quaternion (liscrArgs*       self,
+liscr_args_geti_quaternion (LIScrArgs*       self,
                             int              index,
-                            limatQuaternion* result)
+                            LIMatQuaternion* result)
 {
-	liscrData* tmp = NULL;
+	LIScrData* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -320,7 +320,7 @@ liscr_args_geti_quaternion (liscrArgs*       self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((limatQuaternion*) tmp);
+			*result = *((LIMatQuaternion*) tmp);
 	}
 	else
 	{
@@ -329,14 +329,14 @@ liscr_args_geti_quaternion (liscrArgs*       self,
 		index += self->args_start;
 		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_QUATERNION);
 		if (tmp != NULL)
-			*result = *((limatQuaternion*) tmp);
+			*result = *((LIMatQuaternion*) tmp);
 	}
 
 	return tmp != NULL;
 }
 
 int
-liscr_args_geti_string (liscrArgs*   self,
+liscr_args_geti_string (LIScrArgs*   self,
                         int          index,
                         const char** result)
 {
@@ -365,11 +365,11 @@ liscr_args_geti_string (liscrArgs*   self,
 }
 
 int
-liscr_args_geti_vector (liscrArgs*   self,
+liscr_args_geti_vector (LIScrArgs*   self,
                         int          index,
-                        limatVector* result)
+                        LIMatVector* result)
 {
-	liscrData* tmp = NULL;
+	LIScrData* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -378,7 +378,7 @@ liscr_args_geti_vector (liscrArgs*   self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((limatVector*) tmp);
+			*result = *((LIMatVector*) tmp);
 	}
 	else
 	{
@@ -387,14 +387,14 @@ liscr_args_geti_vector (liscrArgs*   self,
 		index += self->args_start;
 		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_VECTOR);
 		if (tmp != NULL)
-			*result = *((limatVector*) tmp);
+			*result = *((LIMatVector*) tmp);
 	}
 
 	return tmp != NULL;
 }
 
 int
-liscr_args_gets_bool (liscrArgs*  self,
+liscr_args_gets_bool (LIScrArgs*  self,
                       const char* name,
                       int*        result)
 {
@@ -415,12 +415,12 @@ liscr_args_gets_bool (liscrArgs*  self,
 }
 
 int
-liscr_args_gets_class (liscrArgs*   self,
+liscr_args_gets_class (LIScrArgs*   self,
                        const char*  name,
                        const char*  type,
-                       liscrClass** result)
+                       LIScrClass** result)
 {
-	liscrClass* tmp;
+	LIScrClass* tmp;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -438,12 +438,12 @@ liscr_args_gets_class (liscrArgs*   self,
 }
 
 int
-liscr_args_gets_data (liscrArgs*  self,
+liscr_args_gets_data (LIScrArgs*  self,
                       const char* name,
                       const char* type,
-                      liscrData** result)
+                      LIScrData** result)
 {
-	liscrData* tmp = NULL;
+	LIScrData* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -461,7 +461,7 @@ liscr_args_gets_data (liscrArgs*  self,
 }
 
 int
-liscr_args_gets_float (liscrArgs*  self,
+liscr_args_gets_float (LIScrArgs*  self,
                        const char* name,
                        float*      result)
 {
@@ -482,7 +482,7 @@ liscr_args_gets_float (liscrArgs*  self,
 }
 
 int
-liscr_args_gets_floatv (liscrArgs*  self,
+liscr_args_gets_floatv (LIScrArgs*  self,
                         const char* name,
                         int         count,
                         float*      result)
@@ -516,7 +516,7 @@ liscr_args_gets_floatv (liscrArgs*  self,
 }
 
 int
-liscr_args_gets_int (liscrArgs*  self,
+liscr_args_gets_int (LIScrArgs*  self,
                      const char* name,
                      int*        result)
 {
@@ -537,11 +537,11 @@ liscr_args_gets_int (liscrArgs*  self,
 }
 
 int
-liscr_args_gets_quaternion (liscrArgs*       self,
+liscr_args_gets_quaternion (LIScrArgs*       self,
                             const char*      name,
-                            limatQuaternion* result)
+                            LIMatQuaternion* result)
 {
-	liscrData* tmp = NULL;
+	LIScrData* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -549,14 +549,14 @@ liscr_args_gets_quaternion (liscrArgs*       self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((limatQuaternion*) tmp);
+			*result = *((LIMatQuaternion*) tmp);
 	}
 
 	return tmp != NULL;
 }
 
 int
-liscr_args_gets_string (liscrArgs*   self,
+liscr_args_gets_string (LIScrArgs*   self,
                         const char*  name,
                         const char** result)
 {
@@ -575,11 +575,11 @@ liscr_args_gets_string (liscrArgs*   self,
 }
 
 int
-liscr_args_gets_vector (liscrArgs*   self,
+liscr_args_gets_vector (LIScrArgs*   self,
                         const char*  name,
-                        limatVector* result)
+                        LIMatVector* result)
 {
-	liscrData* tmp = NULL;
+	LIScrData* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
@@ -587,14 +587,14 @@ liscr_args_gets_vector (liscrArgs*   self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((limatVector*) tmp);
+			*result = *((LIMatVector*) tmp);
 	}
 
 	return tmp != NULL;
 }
 
 void
-liscr_args_set_output (liscrArgs* self,
+liscr_args_set_output (LIScrArgs* self,
                        int        value)
 {
 	assert (self->ret == 0);
@@ -602,7 +602,7 @@ liscr_args_set_output (liscrArgs* self,
 }
 
 void
-liscr_args_seti_bool (liscrArgs* self,
+liscr_args_seti_bool (LIScrArgs* self,
                       int        value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
@@ -624,8 +624,8 @@ liscr_args_seti_bool (liscrArgs* self,
 }
 
 void
-liscr_args_seti_class (liscrArgs*  self,
-                       liscrClass* value)
+liscr_args_seti_class (LIScrArgs*  self,
+                       LIScrClass* value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -646,8 +646,8 @@ liscr_args_seti_class (liscrArgs*  self,
 }
 
 void
-liscr_args_seti_data (liscrArgs* self,
-                      liscrData* value)
+liscr_args_seti_data (LIScrArgs* self,
+                      LIScrData* value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -674,7 +674,7 @@ liscr_args_seti_data (liscrArgs* self,
 }
 
 void
-liscr_args_seti_float (liscrArgs* self,
+liscr_args_seti_float (LIScrArgs* self,
                        float      value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
@@ -696,7 +696,7 @@ liscr_args_seti_float (liscrArgs* self,
 }
 
 void
-liscr_args_seti_int (liscrArgs* self,
+liscr_args_seti_int (LIScrArgs* self,
                      int        value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
@@ -718,10 +718,10 @@ liscr_args_seti_int (liscrArgs* self,
 }
 
 void
-liscr_args_seti_quaternion (liscrArgs*             self,
-                            const limatQuaternion* value)
+liscr_args_seti_quaternion (LIScrArgs*             self,
+                            const LIMatQuaternion* value)
 {
-	liscrData* quat;
+	LIScrData* quat;
 
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -752,7 +752,7 @@ liscr_args_seti_quaternion (liscrArgs*             self,
 }
 
 void
-liscr_args_seti_stack (liscrArgs* self)
+liscr_args_seti_stack (LIScrArgs* self)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -780,7 +780,7 @@ liscr_args_seti_stack (liscrArgs* self)
 }
 
 void
-liscr_args_seti_string (liscrArgs*  self,
+liscr_args_seti_string (LIScrArgs*  self,
                         const char* value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
@@ -808,10 +808,10 @@ liscr_args_seti_string (liscrArgs*  self,
 }
 
 void
-liscr_args_seti_vector (liscrArgs*         self,
-                        const limatVector* value)
+liscr_args_seti_vector (LIScrArgs*         self,
+                        const LIMatVector* value)
 {
-	liscrData* vector;
+	LIScrData* vector;
 
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -842,7 +842,7 @@ liscr_args_seti_vector (liscrArgs*         self,
 }
 
 void
-liscr_args_sets_bool (liscrArgs*  self,
+liscr_args_sets_bool (LIScrArgs*  self,
                       const char* name,
                       int         value)
 {
@@ -859,9 +859,9 @@ liscr_args_sets_bool (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_class (liscrArgs*  self,
+liscr_args_sets_class (LIScrArgs*  self,
                        const char* name,
-                       liscrClass* value)
+                       LIScrClass* value)
 {
 	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -879,9 +879,9 @@ liscr_args_sets_class (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_data (liscrArgs*  self,
+liscr_args_sets_data (LIScrArgs*  self,
                       const char* name,
-                      liscrData*  value)
+                      LIScrData*  value)
 {
 	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -899,7 +899,7 @@ liscr_args_sets_data (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_float (liscrArgs*  self,
+liscr_args_sets_float (LIScrArgs*  self,
                        const char* name,
                        float       value)
 {
@@ -916,7 +916,7 @@ liscr_args_sets_float (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_int (liscrArgs*  self,
+liscr_args_sets_int (LIScrArgs*  self,
                      const char* name,
                      int         value)
 {
@@ -933,11 +933,11 @@ liscr_args_sets_int (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_quaternion (liscrArgs*             self,
+liscr_args_sets_quaternion (LIScrArgs*             self,
                             const char*            name,
-                            const limatQuaternion* value)
+                            const LIMatQuaternion* value)
 {
-	liscrData* quat;
+	LIScrData* quat;
 
 	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -957,7 +957,7 @@ liscr_args_sets_quaternion (liscrArgs*             self,
 }
 
 void
-liscr_args_sets_stack (liscrArgs*  self,
+liscr_args_sets_stack (LIScrArgs*  self,
                        const char* name)
 {
 	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
@@ -974,7 +974,7 @@ liscr_args_sets_stack (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_string (liscrArgs*  self,
+liscr_args_sets_string (LIScrArgs*  self,
                         const char* name,
                         const char* value)
 {
@@ -991,11 +991,11 @@ liscr_args_sets_string (liscrArgs*  self,
 }
 
 void
-liscr_args_sets_vector (liscrArgs*         self,
+liscr_args_sets_vector (LIScrArgs*         self,
                         const char*        name,
-                        const limatVector* value)
+                        const LIMatVector* value)
 {
-	liscrData* vector;
+	LIScrData* vector;
 
 	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
 	{
@@ -1019,9 +1019,9 @@ liscr_args_sets_vector (liscrArgs*         self,
 int
 liscr_marshal_CLASS (lua_State* lua)
 {
-	liscrArgs args;
-	liscrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	void (*func)(liscrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrArgs args;
+	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
+	void (*func)(LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 
 	if (!liscr_isclass (lua, 1, clss->meta))
 		return 0;
@@ -1037,10 +1037,10 @@ liscr_marshal_CLASS (lua_State* lua)
 int
 liscr_marshal_DATA (lua_State* lua)
 {
-	liscrArgs args;
-	liscrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	void (*func)(liscrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
-	liscrData* data;
+	LIScrArgs args;
+	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
+	void (*func)(LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrData* data;
 
 	data = liscr_isdata (lua, 1, clss->meta);
 	if (data == NULL)
@@ -1057,9 +1057,9 @@ liscr_marshal_DATA (lua_State* lua)
 int
 liscr_marshal_BOOL__CLASS_ARGS (lua_State* lua)
 {
-	liscrArgs args;
-	liscrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	int (*func)(liscrClass*, liscrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrArgs args;
+	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
+	int (*func)(LIScrClass*, LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 
 	if (!liscr_isclass (lua, 1, clss->meta))
 		return 0;
@@ -1072,9 +1072,9 @@ liscr_marshal_BOOL__CLASS_ARGS (lua_State* lua)
 int
 liscr_marshal_CLASS__CLASS_ARGS (lua_State* lua)
 {
-	liscrArgs args;
-	liscrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	liscrClass* (*func)(liscrClass*, liscrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrArgs args;
+	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
+	LIScrClass* (*func)(LIScrClass*, LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 
 	if (!liscr_isclass (lua, 1, clss->meta))
 		return 0;
@@ -1090,9 +1090,9 @@ liscr_marshal_CLASS__CLASS_ARGS (lua_State* lua)
 int
 liscr_marshal_VOID__CLASS_ARGS (lua_State* lua)
 {
-	liscrArgs args;
-	liscrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	void (*func)(liscrClass*, liscrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrArgs args;
+	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
+	void (*func)(LIScrClass*, LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 
 	if (!liscr_isclass (lua, 1, clss->meta))
 		return 0;
@@ -1105,10 +1105,10 @@ liscr_marshal_VOID__CLASS_ARGS (lua_State* lua)
 int
 liscr_marshal_VOID__DATA_ARGS (lua_State* lua)
 {
-	liscrArgs args;
-	liscrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	void (*func)(liscrData*, liscrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
-	liscrData* data;
+	LIScrArgs args;
+	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
+	void (*func)(LIScrData*, LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrData* data;
 
 	data = liscr_isdata (lua, 1, clss->meta);
 	if (data == NULL)

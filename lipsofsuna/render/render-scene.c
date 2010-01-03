@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,56 +16,56 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndRender Render
+ * \addtogroup LIRenRender Render
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-draw.h"
 #include "render-group.h"
 
-#define LIRND_LIGHT_MAXIMUM_RATING 100.0f
-#define LIRND_PARTICLE_MAXIMUM_COUNT 1000
+#define LIREN_LIGHT_MAXIMUM_RATING 100.0f
+#define LIREN_PARTICLE_MAXIMUM_COUNT 1000
 
 static int
-private_init_lights (lirndScene* self);
+private_init_lights (LIRenScene* self);
 
 static int
-private_init_particles (lirndScene* self);
+private_init_particles (LIRenScene* self);
 
 static int
-private_light_bounds (lirndScene*   self,
-                      lirndLight*   light,
-                      lirndContext* context,
+private_light_bounds (LIRenScene*   self,
+                      LIRenLight*   light,
+                      LIRenContext* context,
                       int*          viewport,
                       float*        result);
 
 static void
-private_lighting_render (lirndScene*    self,
-                         lirndContext*  context,
-                         lirndDeferred* framebuffer);
+private_lighting_render (LIRenScene*    self,
+                         LIRenContext*  context,
+                         LIRenDeferred* framebuffer);
 
 static void
-private_particle_render (lirndScene* self);
+private_particle_render (LIRenScene* self);
 
 static void
-private_render (lirndScene*   self,
-                lirndContext* context,
-                lirndCallback call,
+private_render (LIRenScene*   self,
+                LIRenContext* context,
+                lirenCallback call,
                 void*         data);
 
 /*****************************************************************************/
 
-lirndScene*
-lirnd_scene_new (lirndRender* render)
+LIRenScene*
+liren_scene_new (LIRenRender* render)
 {
-	lirndScene* self;
+	LIRenScene* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndScene));
+	self = lisys_calloc (1, sizeof (LIRenScene));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -90,20 +90,20 @@ lirnd_scene_new (lirndRender* render)
 	return self;
 
 error:
-	lirnd_scene_free (self);
+	liren_scene_free (self);
 	return NULL;
 }
 
 void
-lirnd_scene_free (lirndScene* self)
+liren_scene_free (LIRenScene* self)
 {
 	/* Free sky. */
 	if (self->sky.model != NULL)
-		lirnd_object_free (self->sky.model);
+		liren_object_free (self->sky.model);
 
 	/* Free lights. */
 	if (self->lighting != NULL)
-		lirnd_lighting_free (self->lighting);
+		liren_lighting_free (self->lighting);
 
 	/* Free particles. */
 	if (self->particles != NULL)
@@ -127,8 +127,8 @@ lirnd_scene_free (lirndScene* self)
 	lisys_free (self);
 }
 
-lirndObject*
-lirnd_scene_find_object (lirndScene* self,
+LIRenObject*
+liren_scene_find_object (LIRenScene* self,
                          int         id)
 {
 	return lialg_u32dic_find (self->objects, id);
@@ -142,10 +142,10 @@ lirnd_scene_find_object (lirndScene* self,
  * \param velocity Velocity of the particle.
  * \return Particle owned by the scene or NULL.
  */
-liparPoint*
-lirnd_scene_insert_particle (lirndScene*        self,
-                             const limatVector* position,
-                             const limatVector* velocity)
+LIParPoint*
+liren_scene_insert_particle (LIRenScene*        self,
+                             const LIMatVector* position,
+                             const LIMatVector* velocity)
 {
 	return lipar_manager_insert_point (self->particles, position, velocity);
 }
@@ -165,38 +165,38 @@ lirnd_scene_insert_particle (lirndScene*        self,
  * \return Nonzero if something was picked.
  */
 int
-lirnd_scene_pick (lirndScene*     self,
-                  limatMatrix*    modelview,
-                  limatMatrix*    projection,
-                  limatFrustum*   frustum,
+liren_scene_pick (LIRenScene*     self,
+                  LIMatMatrix*    modelview,
+                  LIMatMatrix*    projection,
+                  LIMatFrustum*   frustum,
                   const int*      viewport,
                   int             x,
                   int             y,
                   int             size,
-                  lirndSelection* result)
+                  LIRenSelection* result)
 {
 	int i;
 	int count;
 	GLuint id;
 	GLuint dist;
 	GLuint selection[256];
-	limatMatrix pick;
-	limatVector window;
-	lirndContext context;
+	LIMatMatrix pick;
+	LIMatVector window;
+	LIRenContext context;
 
 	pick = limat_matrix_pick (x, y, size, size, viewport);
 	pick = limat_matrix_multiply (pick, *projection);
-	lirnd_context_init (&context, self);
-	lirnd_context_set_modelview (&context, modelview);
-	lirnd_context_set_projection (&context, &pick);
-	lirnd_context_set_frustum (&context, frustum);
+	liren_context_init (&context, self);
+	liren_context_set_modelview (&context, modelview);
+	liren_context_set_projection (&context, &pick);
+	liren_context_set_frustum (&context, frustum);
 
 	/* Pick scene. */
 	glSelectBuffer (256, selection);
 	glRenderMode (GL_SELECT);
 	glInitNames ();
 	glPushName (0);
-	private_render (self, &context, lirnd_draw_picking, NULL);
+	private_render (self, &context, liren_draw_picking, NULL);
 	count = glRenderMode (GL_RENDER);
 	if (count <= 0)
 		return 0;
@@ -216,7 +216,7 @@ lirnd_scene_pick (lirndScene*     self,
 	/* Find hit. */
 	if (id != 0)
 	{
-		result->type = LIRND_SELECT_OBJECT;
+		result->type = LIREN_SELECT_OBJECT;
 		result->depth = dist / 4294967295.0f;
 		result->object = id;
 		window = limat_vector_init (x, y, result->depth);
@@ -225,7 +225,7 @@ lirnd_scene_pick (lirndScene*     self,
 	}
 	else
 	{
-		result->type = LIRND_SELECT_SECTOR;
+		result->type = LIREN_SELECT_SECTOR;
 		result->depth = dist / 4294967295.0f;
 		result->object = 0;
 		window = limat_vector_init (x, y, result->depth);
@@ -246,25 +246,25 @@ lirnd_scene_pick (lirndScene*     self,
  * \param frustum Frustum used for culling.
  */
 void
-lirnd_scene_render (lirndScene*    self,
-                    lirndDeferred* framebuffer,
-                    limatMatrix*   modelview,
-                    limatMatrix*   projection,
-                    limatFrustum*  frustum)
+liren_scene_render (LIRenScene*    self,
+                    LIRenDeferred* framebuffer,
+                    LIMatMatrix*   modelview,
+                    LIMatMatrix*   projection,
+                    LIMatFrustum*  frustum)
 {
 	int i;
-	lirndContext context;
+	LIRenContext context;
 	GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	assert (modelview != NULL);
 	assert (projection != NULL);
 	assert (frustum != NULL);
 
-	lirnd_check_errors ();
-	lirnd_context_init (&context, self);
-	lirnd_context_set_modelview (&context, modelview);
-	lirnd_context_set_projection (&context, projection);
-	lirnd_context_set_frustum (&context, frustum);
+	liren_check_errors ();
+	liren_context_init (&context, self);
+	liren_context_set_modelview (&context, modelview);
+	liren_context_set_projection (&context, projection);
+	liren_context_set_frustum (&context, frustum);
 
 	/* Bind framebuffer. */
 	if (!self->render->shader.enabled)
@@ -295,17 +295,17 @@ lirnd_scene_render (lirndScene*    self,
 	glLightModelfv (GL_LIGHT_MODEL_AMBIENT, none);
 
 	/* Render scene. */
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.objects = 0;
 	self->render->profiling.materials = 0;
 	self->render->profiling.faces = 0;
 	self->render->profiling.vertices = 0;
 #endif
-	private_render (self, &context, lirnd_draw_opaque, NULL);
-	private_render (self, &context, lirnd_draw_hair, NULL);
-	private_render (self, &context, lirnd_draw_transparent, NULL);
-	lirnd_check_errors ();
-#ifdef LIRND_ENABLE_PROFILING
+	private_render (self, &context, liren_draw_opaque, NULL);
+	private_render (self, &context, liren_draw_hair, NULL);
+	private_render (self, &context, liren_draw_transparent, NULL);
+	liren_check_errors ();
+#ifdef LIREN_ENABLE_PROFILING
 	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",
 		self->render->profiling.objects, self->render->profiling.materials,
 		self->render->profiling.faces, self->render->profiling.vertices);
@@ -320,7 +320,7 @@ lirnd_scene_render (lirndScene*    self,
 		private_lighting_render (self, &context, framebuffer);
 		glPopAttrib ();
 	}
-	lirnd_check_errors ();
+	liren_check_errors ();
 
 	/* Render particles. */
 	glDisable (GL_COLOR_MATERIAL);
@@ -329,8 +329,8 @@ lirnd_scene_render (lirndScene*    self,
 	glEnable (GL_DEPTH_TEST);
 	glDepthMask (GL_FALSE);
 	private_particle_render (self);
-	private_render (self, &context, lirnd_draw_debug, NULL);
-	lirnd_check_errors ();
+	private_render (self, &context, liren_draw_debug, NULL);
+	liren_check_errors ();
 	glDepthMask (GL_TRUE);
 
 	/* Copy scene to screen. */
@@ -367,7 +367,7 @@ lirnd_scene_render (lirndScene*    self,
 		glPopMatrix ();
 		glPopAttrib ();
 	}
-	lirnd_check_errors ();
+	liren_check_errors ();
 
 	/* Restore state. */
 	if (self->render->shader.enabled)
@@ -380,7 +380,7 @@ lirnd_scene_render (lirndScene*    self,
 		glDisable (GL_TEXTURE_2D);
 	}
 	glMatrixMode (GL_MODELVIEW);
-	lirnd_check_errors ();
+	liren_check_errors ();
 }
 
 /**
@@ -390,21 +390,21 @@ lirnd_scene_render (lirndScene*    self,
  * \param secs Number of seconds since the last update.
  */
 void
-lirnd_scene_update (lirndScene* self,
+liren_scene_update (LIRenScene* self,
                     float       secs)
 {
-	lialgU32dicIter iter;
-	lirndObject* object;
+	LIAlgU32dicIter iter;
+	LIRenObject* object;
 
 	/* Update objects. */
 	LI_FOREACH_U32DIC (iter, self->objects)
 	{
 		object = iter.value;
-		lirnd_object_update (object, secs);
+		liren_object_update (object, secs);
 	}
 
 	/* Update lights. */
-	lirnd_lighting_update (self->lighting);
+	liren_lighting_update (self->lighting);
 
 	/* Update particles. */
 	lipar_manager_update (self->particles, secs);
@@ -417,26 +417,26 @@ lirnd_scene_update (lirndScene* self,
  * \param model Model or NULL to unset.
  */
 int
-lirnd_scene_set_sky (lirndScene* self,
-                     lirndModel* model)
+liren_scene_set_sky (LIRenScene* self,
+                     LIRenModel* model)
 {
 #warning Skybox is disabled.
 #if 0
-	lirndObject* inst;
+	LIRenObject* inst;
 
 	if (model != NULL)
 	{
-		inst = lirnd_object_new (model, 0);
+		inst = liren_object_new (model, 0);
 		if (inst == NULL)
 			return 0;
 		if (self->sky.model != NULL)
-			lirnd_object_free (self->sky.model);
+			liren_object_free (self->sky.model);
 		self->sky.model = inst;
 	}
 	else
 	{
 		if (self->sky.model != NULL)
-			lirnd_object_free (self->sky.model);
+			liren_object_free (self->sky.model);
 		self->sky.model = NULL;
 	}
 #endif
@@ -446,38 +446,38 @@ lirnd_scene_set_sky (lirndScene* self,
 /*****************************************************************************/
 
 static int
-private_init_lights (lirndScene* self)
+private_init_lights (LIRenScene* self)
 {
-	self->lighting = lirnd_lighting_new (self->render);
+	self->lighting = liren_lighting_new (self->render);
 	if (self->lighting == NULL)
 		return 0;
 	return 1;
 }
 
 static int
-private_init_particles (lirndScene* self)
+private_init_particles (LIRenScene* self)
 {
-	self->particles = lipar_manager_new (LIRND_PARTICLE_MAXIMUM_COUNT, LIRND_PARTICLE_MAXIMUM_COUNT);
+	self->particles = lipar_manager_new (LIREN_PARTICLE_MAXIMUM_COUNT, LIREN_PARTICLE_MAXIMUM_COUNT);
 	if (self->particles == NULL)
 		return 0;
 	return 1;
 }
 
 static int
-private_light_bounds (lirndScene*   self,
-                      lirndLight*   light,
-                      lirndContext* context,
+private_light_bounds (LIRenScene*   self,
+                      LIRenLight*   light,
+                      LIRenContext* context,
                       int*          viewport,
                       float*        result)
 {
 	int i;
-	limatAabb bounds;
-	limatVector min;
-	limatVector max;
-	limatVector tmp;
-	limatVector p[8];
+	LIMatAabb bounds;
+	LIMatVector min;
+	LIMatVector max;
+	LIMatVector tmp;
+	LIMatVector p[8];
 
-	if (!lirnd_light_get_bounds (light, &bounds))
+	if (!liren_light_get_bounds (light, &bounds))
 		return 0;
 	p[0] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.min.z);
 	p[1] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.max.z);
@@ -508,20 +508,20 @@ private_light_bounds (lirndScene*   self,
 }
 
 static void
-private_lighting_render (lirndScene*    self,
-                         lirndContext*  context,
-                         lirndDeferred* framebuffer)
+private_lighting_render (LIRenScene*    self,
+                         LIRenContext*  context,
+                         LIRenDeferred* framebuffer)
 {
 	int index = 0;
 	int viewport[4];
 	float bounds[4];
-	lialgPtrdicIter iter;
-	limatMatrix matrix;
-	lirndLight* light;
-	lirndShader* shader;
-	lirndTexture textures[4];
+	LIAlgPtrdicIter iter;
+	LIMatMatrix matrix;
+	LIRenLight* light;
+	LIRenShader* shader;
+	LIRenTexture textures[4];
 
-	shader = lirnd_render_find_shader (self->render, "deferred");
+	shader = liren_render_find_shader (self->render, "deferred");
 	if (shader == NULL)
 		return;
 
@@ -550,18 +550,18 @@ private_lighting_render (lirndScene*    self,
 	textures[3].params.minfilter = GL_NEAREST;
 	textures[3].params.wraps = GL_CLAMP_TO_EDGE;
 	textures[3].params.wrapt = GL_CLAMP_TO_EDGE;
-	lirnd_context_set_flags (context, LIRND_FLAG_LIGHTING | LIRND_FLAG_TEXTURING);
-	lirnd_context_set_matrix (context, &matrix);
-	lirnd_context_set_shader (context, shader);
-	lirnd_context_set_lights (context, NULL, 0);
-	lirnd_context_set_textures (context, textures, 4);
+	liren_context_set_flags (context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
+	liren_context_set_matrix (context, &matrix);
+	liren_context_set_shader (context, shader);
+	liren_context_set_lights (context, NULL, 0);
+	liren_context_set_textures (context, textures, 4);
 
 	/* Let each light lit the scene. */
 	LI_FOREACH_PTRDIC (iter, self->lighting->lights)
 	{
 		light = iter.value;
-		lirnd_context_set_lights (context, &light, 1);
-		lirnd_context_bind (context);
+		liren_context_set_lights (context, &light, 1);
+		liren_context_bind (context);
 
 		/* FIXME: It should be possible to avoid these state changes. */
 		glDisable (GL_CULL_FACE);
@@ -593,12 +593,12 @@ private_lighting_render (lirndScene*    self,
 		glEnd ();
 	}
 
-	lirnd_context_unbind (context);
+	liren_context_unbind (context);
 	glDisable (GL_SCISSOR_TEST);
 
 #ifdef DEBUG_LIGHT_BOUNDS
 	matrix = limat_matrix_ortho (0.0, framebuffer->width, framebuffer->height, 0.0f, -1.0f, 1.0f);
-	lirnd_context_unbind (context);
+	liren_context_unbind (context);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 	glMatrixMode (GL_PROJECTION);
@@ -622,17 +622,17 @@ private_lighting_render (lirndScene*    self,
 }
 
 static void
-private_particle_render (lirndScene* self)
+private_particle_render (LIRenScene* self)
 {
 	float color0[4];
 	float color1[4];
 	float attenuation[] = { 1.0f, 0.0f, 0.02f };
-	lirndImage* image;
-	liparLine* line;
-	liparPoint* particle;
+	LIRenImage* image;
+	LIParLine* line;
+	LIParPoint* particle;
 
 	/* Set particle graphics. */
-	image = lirnd_render_find_image (self->render, "particle-000");
+	image = liren_render_find_image (self->render, "particle-000");
 	if (image != NULL)
 		glBindTexture (GL_TEXTURE_2D, image->texture->texture);
 	if (livid_features.shader_model >= 3)
@@ -686,25 +686,25 @@ private_particle_render (lirndScene* self)
 }
 
 static void
-private_render (lirndScene*   self,
-                lirndContext* context,
-                lirndCallback call,
+private_render (LIRenScene*   self,
+                LIRenContext* context,
+                lirenCallback call,
                 void*         data)
 {
-	lialgU32dicIter iter0;
-	lialgPtrdicIter iter1;
-	limatAabb aabb;
-	lirndGroup* group;
-	lirndObject tmpobj;
-	lirndObject* rndobj;
-	lirndGroupObject* grpobj;
+	LIAlgU32dicIter iter0;
+	LIAlgPtrdicIter iter1;
+	LIMatAabb aabb;
+	LIRenGroup* group;
+	LIRenObject tmpobj;
+	LIRenObject* rndobj;
+	LIRenGroupObject* grpobj;
 
 	LI_FOREACH_U32DIC (iter0, self->objects)
 	{
 		rndobj = iter0.value;
-		if (!lirnd_object_get_realized (rndobj))
+		if (!liren_object_get_realized (rndobj))
 			continue;
-		lirnd_object_get_bounds (rndobj, &aabb);
+		liren_object_get_bounds (rndobj, &aabb);
 		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
 			continue;
 		call (context, rndobj, data);
@@ -712,14 +712,14 @@ private_render (lirndScene*   self,
 	LI_FOREACH_PTRDIC (iter1, self->groups)
 	{
 		group = iter1.value;
-		if (!lirnd_group_get_realized (group))
+		if (!liren_group_get_realized (group))
 			continue;
-		lirnd_group_get_bounds (group, &aabb);
+		liren_group_get_bounds (group, &aabb);
 		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
 			continue;
 		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
 		{
-			memset (&tmpobj, 0, sizeof (lirndObject));
+			memset (&tmpobj, 0, sizeof (LIRenObject));
 			tmpobj.transform = grpobj->transform;
 			tmpobj.scene = self;
 			tmpobj.model = grpobj->model;

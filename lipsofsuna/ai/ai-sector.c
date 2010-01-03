@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiSector Sector
+ * \addtogroup LIAiSector Sector
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "ai-manager.h"
 #include "ai-sector.h"
 
@@ -32,18 +32,18 @@
  * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
-liaiSector*
-liai_sector_new (lialgSector* sector)
+LIAiSector*
+liai_sector_new (LIAlgSector* sector)
 {
 	int i;
 	int j;
 	int k;
 	int l;
-	liaiSector* self;
-	liaiWaypoint* wp;
+	LIAiSector* self;
+	LIAiWaypoint* wp;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liaiSector));
+	self = lisys_calloc (1, sizeof (LIAiSector));
 	if (self == NULL)
 		return NULL;
 	self->manager = lialg_sectors_get_userdata (sector->manager, "ai");
@@ -73,7 +73,7 @@ liai_sector_new (lialgSector* sector)
  * \param self Sector.
  */
 void
-liai_sector_free (liaiSector* self)
+liai_sector_free (LIAiSector* self)
 {
 	lisys_free (self);
 }
@@ -85,8 +85,8 @@ liai_sector_free (liaiSector* self)
  * \param voxels Voxel sector or NULL.
  */
 void
-liai_sector_build (liaiSector*  self,
-                   livoxSector* voxels)
+liai_sector_build (LIAiSector*  self,
+                   LIVoxSector* voxels)
 {
 	liai_sector_build_area (self, voxels, 0, 0, 0,
 		LIAI_WAYPOINTS_PER_LINE,
@@ -107,8 +107,8 @@ liai_sector_build (liaiSector*  self,
  * \param zs Waypoint count.
  */
 void
-liai_sector_build_area (liaiSector*  self,
-                        livoxSector* voxels,
+liai_sector_build_area (LIAiSector*  self,
+                        LIVoxSector* voxels,
                         int          x,
                         int          y,
                         int          z,
@@ -119,9 +119,9 @@ liai_sector_build_area (liaiSector*  self,
 	int i;
 	int j;
 	int k;
-	liaiWaypoint* wp;
-	liaiWaypoint* wp1;
-	livoxVoxel* voxel;
+	LIAiWaypoint* wp;
+	LIAiWaypoint* wp1;
+	LIVoxVoxel* voxel;
 
 	if (voxels != NULL)
 	{
@@ -173,8 +173,8 @@ liai_sector_build_area (liaiSector*  self,
  * \param z Waypoint offset.
  * \return Waypoint.
  */
-liaiWaypoint*
-liai_sector_get_waypoint (liaiSector* self,
+LIAiWaypoint*
+liai_sector_get_waypoint (LIAiSector* self,
                           int         x,
                           int         y,
                           int         z)

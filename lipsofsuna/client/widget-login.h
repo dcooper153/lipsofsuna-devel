@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,31 +18,31 @@
 #ifndef __WIDGET_LOGIN_H__
 #define __WIDGET_LOGIN_H__
 
-#include <widget/lips-widget.h>
+#include <lipsofsuna/widget.h>
 
-#define LIWDG_LOGIN(o) ((liwdgLogin*)(o))
+#define LIWDG_LOGIN(o) ((LIWdgLogin*)(o))
 
-typedef struct _liwdgLogin liwdgLogin;
-struct _liwdgLogin
+typedef struct _LIWdgLogin LIWdgLogin;
+struct _LIWdgLogin
 {
-	liwdgGroup base;
+	LIWdgGroup base;
 	int n_servers;
 	char** servers;
-	liwdgWidget* group_entries;
-	liwdgWidget* group_buttons;
-	liwdgWidget* label_host;
-	liwdgWidget* label_name;
-	liwdgWidget* label_pass;
-	liwdgWidget* entry_host;
-	liwdgWidget* entry_name;
-	liwdgWidget* entry_pass;
-	liwdgWidget* button_login;
-	liwdgWidget* button_import;
+	LIWdgWidget* group_entries;
+	LIWdgWidget* group_buttons;
+	LIWdgWidget* label_host;
+	LIWdgWidget* label_name;
+	LIWdgWidget* label_pass;
+	LIWdgWidget* entry_host;
+	LIWdgWidget* entry_name;
+	LIWdgWidget* entry_pass;
+	LIWdgWidget* button_login;
+	LIWdgWidget* button_import;
 };
 
-extern const liwdgClass liwdgLoginType;
+extern const LIWdgClass licli_widget_login;
 
-liwdgWidget*
-liwdg_login_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_login_new (LIWdgManager* manager);
 
 #endif

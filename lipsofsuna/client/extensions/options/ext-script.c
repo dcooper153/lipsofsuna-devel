@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 #include "ext-options.h"
 
@@ -46,11 +46,11 @@
  * -- @return New options widget.
  * function Options.new(self, table)
  */
-static void Options_new (liscrArgs* args)
+static void Options_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_OPTIONS);
@@ -74,13 +74,13 @@ static void Options_new (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextOptionsScript (liscrClass* self,
+liext_script_options (LIScrClass* self,
                     void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_OPTIONS, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Options_new);
 }
 

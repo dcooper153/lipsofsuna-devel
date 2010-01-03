@@ -15,14 +15,9 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_CLIENT_H__
-#define __LIPS_CLIENT_H__
+#ifndef __LIPS_STRING_H__
+#define __LIPS_STRING_H__
 
-#include "client.h"
-#include "client-callbacks.h"
-#include "client-extension.h"
-#include "client-script.h"
-#include "client-types.h"
-#include "client-window.h"
+#include "string/string-generic.h"
 
 #endif

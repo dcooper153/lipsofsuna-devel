@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -47,7 +47,7 @@ static int
 Events_insert (lua_State* lua)
 {
 	int type;
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EVENTS);
 	type = luaL_checkinteger (lua, 2);
@@ -95,7 +95,7 @@ static int
 Events_remove (lua_State* lua)
 {
 	int type;
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_checkclassdata (lua, 1, LIEXT_SCRIPT_EVENTS);
 	type = luaL_checkinteger (lua, 2);
@@ -133,7 +133,7 @@ Events_remove (lua_State* lua)
 /*****************************************************************************/
 
 void
-liextEventsScript (liscrClass* self,
+liext_script_events (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EVENTS, data);

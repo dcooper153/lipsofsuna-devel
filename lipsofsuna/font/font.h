@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lifnt Font
  * @{
- * \addtogroup lifntFont Font
+ * \addtogroup LIFntFont Font
  * @{
  */
 
@@ -26,14 +26,14 @@
 #define __FONT_H__
 
 #include <wchar.h>
-#include <algorithm/lips-algorithm.h>
-#include <video/lips-video.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/video.h>
 
 #define LIFNT_CACHE_WIDTH 512
 #define LIFNT_CACHE_HEIGHT 512
 
-typedef struct _lifntFontGlyph lifntFontGlyph;
-struct _lifntFontGlyph
+typedef struct _LIFntFontGlyph LIFntFontGlyph;
+struct _LIFntFontGlyph
 {
 	wchar_t glyph;
 	int table_index;
@@ -46,8 +46,8 @@ struct _lifntFontGlyph
 	int advance;
 };
 
-typedef struct _lifntFont lifntFont;
-struct _lifntFont
+typedef struct _LIFntFont LIFntFont;
+struct _LIFntFont
 {
 	int font_size;
 	int font_height;
@@ -60,32 +60,32 @@ struct _lifntFont
 	int table_glyph_width;
 	int table_glyph_height;
 	GLuint texture;
-	lialgU32dic* index;
-	lifntFontGlyph** table;
-	lividCalls video;
+	LIAlgU32dic* index;
+	LIFntFontGlyph** table;
+	LIVidCalls video;
 	TTF_Font* font;
 };
 
-lifntFont*
-lifnt_font_new (lividCalls* video,
+LIFntFont*
+lifnt_font_new (LIVidCalls* video,
                 const char* path,
                 int         size);
 
 void
-lifnt_font_free (lifntFont* self);
+lifnt_font_free (LIFntFont* self);
 
 void
-lifnt_font_render (lifntFont* self,
+lifnt_font_render (LIFntFont* self,
                    int        x,
                    int        y,
                    wchar_t    glyph);
 
 int
-lifnt_font_get_advance (lifntFont* self,
+lifnt_font_get_advance (LIFntFont* self,
                         wchar_t    glyph);
 
 int
-lifnt_font_get_height (const lifntFont* self);
+lifnt_font_get_height (const LIFntFont* self);
 
 #endif
 

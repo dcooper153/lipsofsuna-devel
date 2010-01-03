@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,20 +27,20 @@
 #ifndef __EXT_EDITOR_H__
 #define __EXT_EDITOR_H__
 
-#include <server/lips-server.h>
+#include <lipsofsuna/server.h>
 
-typedef struct _liextEditor liextEditor;
-struct _liextEditor
+typedef struct _LIExtEditor LIExtEditor;
+struct _LIExtEditor
 {
-	lisrvServer* server;
-	licalHandle calls[1];
+	LISerServer* server;
+	LICalHandle calls[1];
 };
 
-liextEditor*
-liext_editor_new (lisrvServer* server);
+LIExtEditor*
+liext_editor_new (LISerServer* server);
 
 void
-liext_editor_free (liextEditor* self);
+liext_editor_free (LIExtEditor* self);
 
 #endif
 

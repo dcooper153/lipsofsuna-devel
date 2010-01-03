@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,14 +18,14 @@
 #ifndef __ENGINE_TYPES_H__
 #define __ENGINE_TYPES_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
 enum
 {
 	LIENG_FLAG_REMOTE_SECTORS = 0x01
 };
 
-enum _liengMatrix
+enum _LIEngMatrix
 {
 	LIENG_MATRIX_LOCAL,
 	LIENG_MATRIX_WORLD,
@@ -40,16 +40,16 @@ enum
 	LIENG_OBJECT_FLAG_RELOAD = 0x8000
 };
 
-typedef struct _liengAnimation liengAnimation;
-typedef struct _liengConstraint liengConstraint;
-typedef struct _liengEngine liengEngine;
-typedef enum _liengMatrix liengMatrix;
-typedef struct _liengModel liengModel;
-typedef struct _liengObject liengObject;
-typedef struct _liengRender liengRender;
-typedef struct _liengResources liengResources;
-typedef struct _liengSample liengSample;
-typedef struct _liengSector liengSector;
-typedef struct _liengSelection liengSelection;
+typedef struct _LIEngAnimation LIEngAnimation;
+typedef struct _LIEngConstraint LIEngConstraint;
+typedef struct _LIEngEngine LIEngEngine;
+typedef enum _LIEngMatrix LIEngMatrix;
+typedef struct _LIEngModel LIEngModel;
+typedef struct _LIEngObject LIEngObject;
+typedef struct _LIEngRender LIEngRender;
+typedef struct _LIEngResources LIEngResources;
+typedef struct _LIEngSample LIEngSample;
+typedef struct _LIEngSector LIEngSector;
+typedef struct _LIEngSelection LIEngSelection;
 
 #endif

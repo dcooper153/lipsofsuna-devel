@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlTexture Texture
+ * \addtogroup LIMdlTexture Texture
  * @{
  */
 
-#include <string/lips-string.h>
+#include <lipsofsuna/string.h>
 #include "model-texture.h"
 
 int
-limdl_texture_compare (const limdlTexture* self,
-                       const limdlTexture* texture)
+limdl_texture_compare (const LIMdlTexture* self,
+                       const LIMdlTexture* texture)
 {
 	if (self->type != texture->type ||
 	    self->flags != texture->flags ||
@@ -41,7 +41,7 @@ limdl_texture_compare (const limdlTexture* self,
 }
 
 int
-limdl_texture_set_string (limdlTexture* self,
+limdl_texture_set_string (LIMdlTexture* self,
                           const char*   value)
 {
 	char* tmp;

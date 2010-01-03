@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup ligen Generator
  * @{
- * \addtogroup ligenRule Rule
+ * \addtogroup LIGenRule Rule
  * @{
  */
 
-#include <algorithm/lips-algorithm.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/system.h>
 #include "generator-rule.h"
 
 /**
@@ -31,13 +31,13 @@
  *
  * \return New rule or NULL.
  */
-ligenRule*
+LIGenRule*
 ligen_rule_new ()
 {
-	ligenRule* self;
+	LIGenRule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (ligenRule));
+	self = lisys_calloc (1, sizeof (LIGenRule));
 	if (self == NULL)
 		return NULL;
 
@@ -58,13 +58,13 @@ ligen_rule_new ()
  * \param rule Rule to clone.
  * \return New rule or NULL.
  */
-ligenRule*
-ligen_rule_new_copy (ligenRule* rule)
+LIGenRule*
+ligen_rule_new_copy (LIGenRule* rule)
 {
-	ligenRule* self;
+	LIGenRule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (ligenRule));
+	self = lisys_calloc (1, sizeof (LIGenRule));
 	if (self == NULL)
 		return NULL;
 	self->flags = rule->flags;
@@ -80,14 +80,14 @@ ligen_rule_new_copy (ligenRule* rule)
 	/* Copy strokes. */
 	if (rule->strokes.count)
 	{
-		self->strokes.array = lisys_calloc (1, rule->strokes.count * sizeof (ligenRulestroke));
+		self->strokes.array = lisys_calloc (1, rule->strokes.count * sizeof (LIGenRulestroke));
 		if (self->strokes.array == NULL)
 		{
 			lisys_free (self->name);
 			lisys_free (self);
 			return NULL;
 		}
-		memcpy (self->strokes.array, rule->strokes.array, rule->strokes.count * sizeof (ligenRulestroke));
+		memcpy (self->strokes.array, rule->strokes.array, rule->strokes.count * sizeof (LIGenRulestroke));
 		self->strokes.count = rule->strokes.count;
 	}
 
@@ -100,7 +100,7 @@ ligen_rule_new_copy (ligenRule* rule)
  * \param self Rule.
  */
 void
-ligen_rule_free (ligenRule* self)
+ligen_rule_free (LIGenRule* self)
 {
 	lisys_free (self->strokes.array);
 	lisys_free (self);
@@ -118,14 +118,14 @@ ligen_rule_free (ligenRule* self)
  * \return Nonzero on success.
  */
 int
-ligen_rule_insert_stroke (ligenRule* self,
+ligen_rule_insert_stroke (LIGenRule* self,
                           int        x,
                           int        y,
                           int        z,
                           int        flags,
                           int        brush)
 {
-	ligenRulestroke tmp;
+	LIGenRulestroke tmp;
 
 	tmp.pos[0] = x;
 	tmp.pos[1] = y;
@@ -145,7 +145,7 @@ ligen_rule_insert_stroke (ligenRule* self,
  * \param index Stroke index.
  */
 void
-ligen_rule_remove_stroke (ligenRule* self,
+ligen_rule_remove_stroke (LIGenRule* self,
                           int        index)
 {
 	assert (index >= 0);
@@ -155,7 +155,7 @@ ligen_rule_remove_stroke (ligenRule* self,
 }
 
 int
-ligen_rule_set_name (ligenRule*  self,
+ligen_rule_set_name (LIGenRule*  self,
                      const char* value)
 {
 	char* tmp;

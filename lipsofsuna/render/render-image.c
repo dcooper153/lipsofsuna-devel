@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndImage Image
+ * \addtogroup LIRenImage Image
  * @{
  */
 
@@ -32,19 +32,19 @@ static const uint8_t missing_image[16] =
 };
 
 static int
-private_init (lirndImage* self,
+private_init (LIRenImage* self,
               const char* name);
 
 /*****************************************************************************/
 
-lirndImage*
-lirnd_image_new (lirndRender* render,
+LIRenImage*
+liren_image_new (LIRenRender* render,
                  const char*  name)
 {
-	lirndImage* self;
+	LIRenImage* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndImage));
+	self = lisys_calloc (1, sizeof (LIRenImage));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -52,7 +52,7 @@ lirnd_image_new (lirndRender* render,
 	/* Set name and path. */
 	if (!private_init (self, name))
 	{
-		lirnd_image_free (self);
+		liren_image_free (self);
 		return NULL;
 	}
 
@@ -60,21 +60,21 @@ lirnd_image_new (lirndRender* render,
 	self->texture = liimg_texture_new_from_rgba (2, 2, missing_image);
 	if (self->texture == NULL)
 	{
-		lirnd_image_free (self);
+		liren_image_free (self);
 		return NULL;
 	}
 
 	return self;
 }
 
-lirndImage*
-lirnd_image_new_from_file (lirndRender* render,
+LIRenImage*
+liren_image_new_from_file (LIRenRender* render,
                            const char*  name)
 {
-	lirndImage* self;
+	LIRenImage* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndImage));
+	self = lisys_calloc (1, sizeof (LIRenImage));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -82,14 +82,14 @@ lirnd_image_new_from_file (lirndRender* render,
 	/* Set name and path. */
 	if (!private_init (self, name))
 	{
-		lirnd_image_free (self);
+		liren_image_free (self);
 		return NULL;
 	}
 
 	/* Load texture. */
-	if (!lirnd_image_load (self))
+	if (!liren_image_load (self))
 	{
-		lirnd_image_free (self);
+		liren_image_free (self);
 		return NULL;
 	}
 
@@ -97,7 +97,7 @@ lirnd_image_new_from_file (lirndRender* render,
 }
 
 void
-lirnd_image_free (lirndImage* self)
+liren_image_free (LIRenImage* self)
 {
 	/* Remove from dictionary. */
 	if (self->added)
@@ -110,9 +110,9 @@ lirnd_image_free (lirndImage* self)
 }
 
 int
-lirnd_image_load (lirndImage* self)
+liren_image_load (LIRenImage* self)
 {
-	liimgTexture* texture;
+	LIImgTexture* texture;
 
 	texture = liimg_texture_new_from_file (self->path);
 	if (texture == NULL)
@@ -127,10 +127,10 @@ lirnd_image_load (lirndImage* self)
 /*****************************************************************************/
 
 static int
-private_init (lirndImage* self,
+private_init (LIRenImage* self,
               const char* name)
 {
-	lialgStrdicNode* node;
+	LIAlgStrdicNode* node;
 
 	/* Allocate name. */
 	self->name = listr_dup (name);
@@ -153,7 +153,7 @@ private_init (lirndImage* self,
 	}
 	else
 	{
-		((lirndImage*) node->value)->added = 0;
+		((LIRenImage*) node->value)->added = 0;
 		node->value = self;
 	}
 	self->added = 1;

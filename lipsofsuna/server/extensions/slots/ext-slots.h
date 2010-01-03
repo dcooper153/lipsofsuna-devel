@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,72 +27,72 @@
 #ifndef __EXT_SLOTS_H__
 #define __EXT_SLOTS_H__
 
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
-#define LIEXT_SLOTS(o) ((liextSlots*)(o))
+#define LIEXT_SLOTS(o) ((LIExtSlots*)(o))
 
-enum _liextSlotType
+enum _LIExtSlotType
 {
 	LIEXT_SLOT_TYPE_PUBLIC,
 	LIEXT_SLOT_TYPE_PRIVATE,
 	LIEXT_SLOT_TYPE_MAX
 };
 
-struct _liextSlot
+struct _LIExtSlot
 {
 	char* name;
 	char* node; /* FIXME: Should be an index to node list. */
-	liextSlotType type;
-	liengObject* object;
+	LIExtSlotType type;
+	LIEngObject* object;
 };
 
-struct _liextSlots
+struct _LIExtSlots
 {
-	liengObject* owner;
-	liextModule* module;
-	liscrData* script;
-	lisrvServer* server;
+	LIEngObject* owner;
+	LIExtModule* module;
+	LIScrData* script;
+	LISerServer* server;
 	struct
 	{
 		int count;
-		liextSlot* array;
+		LIExtSlot* array;
 	} slots;
 };
 
-liextSlots*
-liext_slots_new (liextModule* module);
+LIExtSlots*
+liext_slots_new (LIExtModule* module);
 
 void
-liext_slots_free (liextSlots* self);
+liext_slots_free (LIExtSlots* self);
 
-liextSlot*
-liext_slots_find_slot (liextSlots* self,
+LIExtSlot*
+liext_slots_find_slot (LIExtSlots* self,
                        const char* name);
 
 int
-liext_slots_insert_slot (liextSlots*   self,
-                         liextSlotType type,
+liext_slots_insert_slot (LIExtSlots*   self,
+                         LIExtSlotType type,
                          const char*   name,
                          const char*   node);
 
 int
-liext_slots_get_object (liextSlots*   self,
+liext_slots_get_object (LIExtSlots*   self,
                         const char*   slot,
-                        liengObject** object);
+                        LIEngObject** object);
 
 int
-liext_slots_set_object (liextSlots*  self,
+liext_slots_set_object (LIExtSlots*  self,
                         const char*  slot,
-                        liengObject* object);
+                        LIEngObject* object);
 
-liengObject*
-liext_slots_get_owner (liextSlots* self);
+LIEngObject*
+liext_slots_get_owner (LIExtSlots* self);
 
 int
-liext_slots_set_owner (liextSlots*  self,
-                       liengObject* value);
+liext_slots_set_owner (LIExtSlots*  self,
+                       LIEngObject* value);
 
 #endif
 

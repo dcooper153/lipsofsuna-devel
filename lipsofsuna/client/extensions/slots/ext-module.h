@@ -27,23 +27,23 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <callback/lips-callback.h>
-#include <client/lips-client.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/callback.h>
+#include <lipsofsuna/client.h>
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	lialgU32dic* dictionary;
-	licalHandle calls[3];
-	licliClient* client;
+	LIAlgU32dic* dictionary;
+	LICalHandle calls[3];
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 #endif
 

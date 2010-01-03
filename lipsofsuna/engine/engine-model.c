@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,22 +18,22 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengModel Model
+ * \addtogroup LIEngModel Model
  * @{
  */
 
 #include "engine-model.h"
 
-liengModel*
-lieng_model_new (liengEngine* engine,
+LIEngModel*
+lieng_model_new (LIEngEngine* engine,
                  int          id,
                  const char*  dir,
                  const char*  name)
 {
-	liengModel* self;
+	LIEngModel* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liengModel));
+	self = lisys_calloc (1, sizeof (LIEngModel));
 	if (self == NULL)
 		return NULL;
 	self->id = id;
@@ -59,7 +59,7 @@ error:
 }
 
 void
-lieng_model_free (liengModel* self)
+lieng_model_free (LIEngModel* self)
 {
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
@@ -75,7 +75,7 @@ lieng_model_free (liengModel* self)
 }
 
 int
-lieng_model_load (liengModel* self)
+lieng_model_load (LIEngModel* self)
 {
 	if (self->invalid)
 		return 1;
@@ -105,7 +105,7 @@ error:
 }
 
 void
-lieng_model_unload (liengModel* self)
+lieng_model_unload (LIEngModel* self)
 {
 	if (self->invalid)
 		return;
@@ -132,8 +132,8 @@ lieng_model_unload (liengModel* self)
  * \param result Return location for the bounds.
  */
 void
-lieng_model_get_bounds (const liengModel* self,
-                        limatAabb*        result)
+lieng_model_get_bounds (const LIEngModel* self,
+                        LIMatAabb*        result)
 {
 	*result = self->bounds;
 }
@@ -146,14 +146,14 @@ lieng_model_get_bounds (const liengModel* self,
  * \param result Return location for the bounds.
  */
 void
-lieng_model_get_bounds_transform (const liengModel*     self,
-                                  const limatTransform* transform,
-                                  limatAabb*               result)
+lieng_model_get_bounds_transform (const LIEngModel*     self,
+                                  const LIMatTransform* transform,
+                                  LIMatAabb*               result)
 {
 	int i;
-	limatVector v[7];
-	limatVector min;
-	limatVector max;
+	LIMatVector v[7];
+	LIMatVector min;
+	LIMatVector max;
 
 	/* Initialize vertices. */
 	v[0] = limat_vector_init (self->bounds.min.x, self->bounds.min.y, self->bounds.max.z);

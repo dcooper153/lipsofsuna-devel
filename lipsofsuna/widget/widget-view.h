@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgView View
+ * \addtogroup LIWdgView View
  * @{
  */
 
@@ -29,43 +29,43 @@
 #include "widget-container.h"
 #include "widget-types.h"
 
-#define LIWDG_VIEW(o) ((liwdgView*)(o))
+#define LIWDG_VIEW(o) ((LIWdgView*)(o))
 
-typedef struct _liwdgView liwdgView;
-struct _liwdgView
+typedef struct _LIWdgView LIWdgView;
+struct _LIWdgView
 {
-	liwdgContainer base;
-	liwdgWidget* child;
+	LIWdgContainer base;
+	LIWdgWidget* child;
 	int hscroll;
 	int hscrollpos;
 	int vscroll;
 	int vscrollpos;
 };
 
-extern const liwdgClass liwdgViewType;
+extern const LIWdgClass liwdg_widget_view;
 
-liwdgWidget*
-liwdg_view_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_view_new (LIWdgManager* manager);
 
-liwdgWidget*
-liwdg_view_get_child (liwdgView* self);
+LIWdgWidget*
+liwdg_view_get_child (LIWdgView* self);
 
 void
-liwdg_view_set_child (liwdgView*   self,
-                      liwdgWidget* widget);
+liwdg_view_set_child (LIWdgView*   self,
+                      LIWdgWidget* widget);
 
 int
-liwdg_view_get_hscroll (liwdgView* self);
+liwdg_view_get_hscroll (LIWdgView* self);
 
 void
-liwdg_view_set_hscroll (liwdgView* self,
+liwdg_view_set_hscroll (LIWdgView* self,
                         int        value);
 
 int
-liwdg_view_get_vscroll (liwdgView* self);
+liwdg_view_get_vscroll (LIWdgView* self);
 
 void
-liwdg_view_set_vscroll (liwdgView* self,
+liwdg_view_set_vscroll (LIWdgView* self,
                         int        value);
 
 #endif

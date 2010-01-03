@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,48 +18,48 @@
 /**
  * \addtogroup ligen Generator
  * @{
- * \addtogroup ligenGenerator Generator
+ * \addtogroup LIGenGenerator Generator
  * @{
  */
 
-#include <engine/lips-engine.h>
-#include <network/lips-network.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/system.h>
 #include "generator.h"
 
 static int
-private_init_brushes (ligenGenerator* self);
+private_init_brushes (LIGenGenerator* self);
 
 static int
-private_init_sql (ligenGenerator* self);
+private_init_sql (LIGenGenerator* self);
 
 static int
-private_init_tables (ligenGenerator* self);
+private_init_tables (LIGenGenerator* self);
 
 static int
-private_brush_exists (ligenGenerator*  self,
-                      ligenStroke*     stroke,
-                      ligenRulestroke* rstroke);
+private_brush_exists (LIGenGenerator*  self,
+                      LIGenStroke*     stroke,
+                      LIGenRulestroke* rstroke);
 
 static int
-private_brush_intersects (ligenGenerator*  self,
-                          ligenStroke*     stroke,
-                          ligenRulestroke* rstroke);
+private_brush_intersects (LIGenGenerator*  self,
+                          LIGenStroke*     stroke,
+                          LIGenRulestroke* rstroke);
 
 static int
-private_rule_apply (ligenGenerator* self,
-                    ligenStroke*    stroke,
-                    ligenRule*      rule,
-                    ligenBrush*     brush);
+private_rule_apply (LIGenGenerator* self,
+                    LIGenStroke*    stroke,
+                    LIGenRule*      rule,
+                    LIGenBrush*     brush);
 
 static int
-private_rule_test (ligenGenerator* self,
-                   ligenStroke*    stroke,
-                   ligenRule*      rule);
+private_rule_test (LIGenGenerator* self,
+                   LIGenStroke*    stroke,
+                   LIGenRule*      rule);
 
 static int
-private_stroke_paint (ligenGenerator* self,
-                      ligenStroke*    stroke);
+private_stroke_paint (LIGenGenerator* self,
+                      LIGenStroke*    stroke);
 
 /*****************************************************************************/
 
@@ -71,15 +71,15 @@ private_stroke_paint (ligenGenerator* self,
  * \param sector Sector manager.
  * \return New generator or NULL.
  */
-ligenGenerator*
-ligen_generator_new (lipthPaths*     paths,
-                     licalCallbacks* callbacks,
-                     lialgSectors*   sectors)
+LIGenGenerator*
+ligen_generator_new (LIPthPaths*     paths,
+                     LICalCallbacks* callbacks,
+                     LIAlgSectors*   sectors)
 {
-	ligenGenerator* self;
+	LIGenGenerator* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (ligenGenerator));
+	self = lisys_calloc (1, sizeof (LIGenGenerator));
 	if (self == NULL)
 	{
 		lisys_error_report ();
@@ -114,9 +114,9 @@ error:
  * \param self Generator.
  */
 void
-ligen_generator_free (ligenGenerator* self)
+ligen_generator_free (LIGenGenerator* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	if (self->brushes != NULL)
 	{
@@ -140,7 +140,7 @@ ligen_generator_free (ligenGenerator* self)
  * \param self Generator.
  */
 void
-ligen_generator_clear_scene (ligenGenerator* self)
+ligen_generator_clear_scene (LIGenGenerator* self)
 {
 	/* Free strokes. */
 	lisys_free (self->strokes.array);
@@ -159,8 +159,8 @@ ligen_generator_clear_scene (ligenGenerator* self)
  * \param id Brush number.
  * \return Brush or NULL.
  */
-ligenBrush*
-ligen_generator_find_brush (ligenGenerator* self,
+LIGenBrush*
+ligen_generator_find_brush (LIGenGenerator* self,
                             int             id)
 {
 	return lialg_u32dic_find (self->brushes, id);
@@ -176,8 +176,8 @@ ligen_generator_find_brush (ligenGenerator* self,
  * \return Nonzero on success.
  */
 int
-ligen_generator_insert_brush (ligenGenerator* self,
-                              ligenBrush*     brush)
+ligen_generator_insert_brush (LIGenGenerator* self,
+                              LIGenBrush*     brush)
 {
 	int i;
 
@@ -214,14 +214,14 @@ ligen_generator_insert_brush (ligenGenerator* self,
  * \return Nonzero on success.
  */
 int
-ligen_generator_insert_stroke (ligenGenerator* self,
+ligen_generator_insert_stroke (LIGenGenerator* self,
                                int             brush,
                                int             x,
                                int             y,
                                int             z)
 {
-	ligenBrush* brush_;
-	ligenStroke stroke;
+	LIGenBrush* brush_;
+	LIGenStroke stroke;
 
 	brush_ = lialg_u32dic_find (self->brushes, brush);
 	assert (brush_ != NULL);
@@ -239,7 +239,7 @@ ligen_generator_insert_stroke (ligenGenerator* self,
 }
 
 int
-ligen_generator_load_materials (ligenGenerator* self)
+ligen_generator_load_materials (LIGenGenerator* self)
 {
 	return livox_manager_load_materials (self->voxels);
 }
@@ -251,11 +251,11 @@ ligen_generator_load_materials (ligenGenerator* self)
  * \return Nonzero on success.
  */
 int
-ligen_generator_main (ligenGenerator* self)
+ligen_generator_main (LIGenGenerator* self)
 {
 	int i;
-	ligenBrush* brush;
-	ligenStroke stroke;
+	LIGenBrush* brush;
+	LIGenStroke stroke;
 
 	/* FIXME: This should be configurable. */
 	brush = lialg_u32dic_find (self->brushes, 3);
@@ -296,10 +296,10 @@ ligen_generator_main (ligenGenerator* self)
  * \return Nonzero on success.
  */
 int
-ligen_generator_rebuild_scene (ligenGenerator* self)
+ligen_generator_rebuild_scene (LIGenGenerator* self)
 {
 	int i;
-	ligenStroke* stroke;
+	LIGenStroke* stroke;
 
 	/* Clear sectors. */
 	lialg_sectors_clear (self->sectors);
@@ -326,11 +326,11 @@ ligen_generator_rebuild_scene (ligenGenerator* self)
  * \param id Brush number.
  */
 void
-ligen_generator_remove_brush (ligenGenerator* self,
+ligen_generator_remove_brush (LIGenGenerator* self,
                               int             id)
 {
-	lialgU32dicIter iter;
-	ligenBrush* brush;
+	LIAlgU32dicIter iter;
+	LIGenBrush* brush;
 
 	/* Find brush. */
 	brush = lialg_u32dic_find (self->brushes, id);
@@ -353,7 +353,7 @@ ligen_generator_remove_brush (ligenGenerator* self,
  * \return Nonzero on success.
  */
 int
-ligen_generator_step (ligenGenerator* self)
+ligen_generator_step (LIGenGenerator* self)
 {
 	int i;
 	int j;
@@ -361,9 +361,9 @@ ligen_generator_step (ligenGenerator* self)
 	int tmp;
 	int* rnd;
 	int* rnd1;
-	ligenBrush* brush;
-	ligenRule* rule;
-	ligenStroke stroke;
+	LIGenBrush* brush;
+	LIGenRule* rule;
+	LIGenStroke stroke;
 
 	/* Randomize stroke order. */
 	for (i = 0 ; i < self->strokes.count ; i++)
@@ -429,7 +429,7 @@ ligen_generator_step (ligenGenerator* self)
  * \return Nonzero on success.
  */
 int
-ligen_generator_write (ligenGenerator* self)
+ligen_generator_write (LIGenGenerator* self)
 {
 	int i;
 	int j;
@@ -439,10 +439,10 @@ ligen_generator_write (ligenGenerator* self)
 	uint32_t id;
 	uint32_t sector;
 	const char* query;
-	ligenBrush* brush;
-	ligenBrushobject* object;
-	ligenStroke* stroke;
-	limatTransform transform;
+	LIGenBrush* brush;
+	LIGenBrushobject* object;
+	LIGenStroke* stroke;
+	LIMatTransform transform;
 	sqlite3_stmt* statement;
 
 	/* Remove old terrain. */
@@ -556,9 +556,9 @@ ligen_generator_write (ligenGenerator* self)
  * \return Nonzero on success.
  */
 int
-ligen_generator_write_brushes (ligenGenerator* self)
+ligen_generator_write_brushes (LIGenGenerator* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	/* Remove old brushes. */
 	if (!liarc_sql_delete (self->gensql, "generator_brushes") ||
@@ -578,7 +578,7 @@ ligen_generator_write_brushes (ligenGenerator* self)
 }
 
 void
-ligen_generator_set_fill (ligenGenerator* self,
+ligen_generator_set_fill (LIGenGenerator* self,
                           int             fill)
 {
 	if (fill < 0)
@@ -590,7 +590,7 @@ ligen_generator_set_fill (ligenGenerator* self,
 /*****************************************************************************/
 
 static int
-private_init_brushes (ligenGenerator* self)
+private_init_brushes (LIGenGenerator* self)
 {
 	int i;
 	int id;
@@ -602,10 +602,10 @@ private_init_brushes (ligenGenerator* self)
 	char* name;
 	const char* query;
 	const void* bytes;
-	lialgU32dicIter iter;
-	liarcReader* reader;
-	liarcSql* sql;
-	ligenBrush* brush;
+	LIAlgU32dicIter iter;
+	LIArcReader* reader;
+	LIArcSql* sql;
+	LIGenBrush* brush;
 	sqlite3_stmt* statement;
 
 	sql = self->gensql;
@@ -708,7 +708,7 @@ private_init_brushes (ligenGenerator* self)
 }
 
 static int
-private_init_sql (ligenGenerator* self)
+private_init_sql (LIGenGenerator* self)
 {
 	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
 	char* path;
@@ -750,7 +750,7 @@ private_init_sql (ligenGenerator* self)
 }
 
 static int
-private_init_tables (ligenGenerator* self)
+private_init_tables (LIGenGenerator* self)
 {
 	const char* query;
 	sqlite3_stmt* statement;
@@ -834,13 +834,13 @@ private_init_tables (ligenGenerator* self)
 }
 
 static int
-private_brush_exists (ligenGenerator*  self,
-                      ligenStroke*     stroke,
-                      ligenRulestroke* rstroke)
+private_brush_exists (LIGenGenerator*  self,
+                      LIGenStroke*     stroke,
+                      LIGenRulestroke* rstroke)
 {
 	int i;
 	int pos[3];
-	ligenStroke* stroke1;
+	LIGenStroke* stroke1;
 
 	/* Calculate world position. */
 	pos[0] = stroke->pos[0] + rstroke->pos[0];
@@ -863,17 +863,17 @@ private_brush_exists (ligenGenerator*  self,
 }
 
 static int
-private_brush_intersects (ligenGenerator*  self,
-                          ligenStroke*     stroke,
-                          ligenRulestroke* rstroke)
+private_brush_intersects (LIGenGenerator*  self,
+                          LIGenStroke*     stroke,
+                          LIGenRulestroke* rstroke)
 {
 	int i;
 	int min0[3];
 	int min1[3];
 	int max0[3];
 	int max1[3];
-	ligenBrush* brush;
-	ligenStroke* stroke1;
+	LIGenBrush* brush;
+	LIGenStroke* stroke1;
 
 	/* Calculate world position. */
 	brush = lialg_u32dic_find (self->brushes, rstroke->brush);
@@ -907,16 +907,16 @@ private_brush_intersects (ligenGenerator*  self,
 }
 
 static int
-private_rule_apply (ligenGenerator* self,
-                    ligenStroke*    stroke,
-                    ligenRule*      rule,
-                    ligenBrush*     brush)
+private_rule_apply (LIGenGenerator* self,
+                    LIGenStroke*    stroke,
+                    LIGenRule*      rule,
+                    LIGenBrush*     brush)
 {
 	int i;
 	int orig;
-	ligenBrush* brush1;
-	ligenStroke stroke1;
-	ligenRulestroke* rstroke;
+	LIGenBrush* brush1;
+	LIGenStroke stroke1;
+	LIGenRulestroke* rstroke;
 
 	printf ("BRUSH %s RULE %s\n", brush->name, rule->name);
 
@@ -945,12 +945,12 @@ private_rule_apply (ligenGenerator* self,
 }
 
 static int
-private_rule_test (ligenGenerator* self,
-                   ligenStroke*    stroke,
-                   ligenRule*      rule)
+private_rule_test (LIGenGenerator* self,
+                   LIGenStroke*    stroke,
+                   LIGenRule*      rule)
 {
 	int i;
-	ligenRulestroke* rstroke;
+	LIGenRulestroke* rstroke;
 
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
@@ -971,8 +971,8 @@ private_rule_test (ligenGenerator* self,
 }
 
 static int
-private_stroke_paint (ligenGenerator* self,
-                      ligenStroke*    stroke)
+private_stroke_paint (LIGenGenerator* self,
+                      LIGenStroke*    stroke)
 {
 	int i;
 	int min[3];
@@ -981,8 +981,8 @@ private_stroke_paint (ligenGenerator* self,
 	int sec[3];
 	int src[3];
 	int dst[3];
-	ligenBrush* brush;
-	livoxSector* sector;
+	LIGenBrush* brush;
+	LIVoxSector* sector;
 
 	/* Determine affected sectors. */
 	brush = lialg_u32dic_find (self->brushes, stroke->brush);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgCheck Check
+ * \addtogroup LIWdgCheck Check
  * @{
  */
 
@@ -26,43 +26,43 @@
 #include "widget-manager.h"
 
 static int
-private_init (liwdgCheck*   self,
-              liwdgManager* manager);
+private_init (LIWdgCheck*   self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgCheck* self);
+private_free (LIWdgCheck* self);
 
 static int
-private_event (liwdgCheck* self,
+private_event (LIWdgCheck* self,
                liwdgEvent* event);
 
 static void
-private_rebuild (liwdgCheck* self);
+private_rebuild (LIWdgCheck* self);
 
-const liwdgClass liwdgCheckType =
+const LIWdgClass liwdg_widget_check =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Check", sizeof (liwdgCheck),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Check", sizeof (LIWdgCheck),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_check_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_check_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgCheckType);
+	return liwdg_widget_new (manager, &liwdg_widget_check);
 }
 
 int
-liwdg_check_get_active (liwdgCheck* self)
+liwdg_check_get_active (LIWdgCheck* self)
 {
 	return self->active;
 }
 
 void
-liwdg_check_set_active (liwdgCheck* self,
+liwdg_check_set_active (LIWdgCheck* self,
                         int         active)
 {
 	if (self->active != active)
@@ -72,28 +72,28 @@ liwdg_check_set_active (liwdgCheck* self,
 	}
 }
 
-lifntFont*
-liwdg_check_get_font (liwdgCheck* self)
+LIFntFont*
+liwdg_check_get_font (LIWdgCheck* self)
 {
 	return self->font;
 }
 
 void
-liwdg_check_set_font (liwdgCheck* self,
-                      lifntFont*  font)
+liwdg_check_set_font (LIWdgCheck* self,
+                      LIFntFont*  font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 const char*
-liwdg_check_get_text (liwdgCheck* self)
+liwdg_check_get_text (LIWdgCheck* self)
 {
 	return self->string;
 }
 
 int
-liwdg_check_set_text (liwdgCheck* self,
+liwdg_check_set_text (LIWdgCheck* self,
                       const char* text)
 {
 	char* tmp;
@@ -110,8 +110,8 @@ liwdg_check_set_text (liwdgCheck* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgCheck*   self,
-              liwdgManager* manager)
+private_init (LIWdgCheck*   self,
+              LIWdgManager* manager)
 {
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->string = lisys_calloc (1, 1);
@@ -131,18 +131,18 @@ private_init (liwdgCheck*   self,
 }
 
 static void
-private_free (liwdgCheck* self)
+private_free (LIWdgCheck* self)
 {
 	lifnt_layout_free (self->text);
 	lisys_free (self->string);
 }
 
 static int
-private_event (liwdgCheck* self,
+private_event (LIWdgCheck* self,
                liwdgEvent* event)
 {
 	int h;
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	switch (event->type)
 	{
@@ -167,11 +167,11 @@ private_event (liwdgCheck* self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgCheck* self)
+private_rebuild (LIWdgCheck* self)
 {
 	int h = 0;
 

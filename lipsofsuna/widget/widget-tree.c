@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,100 +18,100 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgTree Tree
+ * \addtogroup LIWdgTree Tree
  * @{
  */
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "widget-tree.h"
 
 #define LIWDG_TREE_NEST 10
 
-struct _liwdgTreerow
+struct _LIWdgTreerow
 {
 	int depth;
 	int expand;
 	int highlight;
 	char* text;
 	void* data;
-	lifntFont* font;
-	lifntLayout* layout;
-	liwdgTree* tree;
-	liwdgTreerow* parent;
+	LIFntFont* font;
+	LIFntLayout* layout;
+	LIWdgTree* tree;
+	LIWdgTreerow* parent;
 	struct
 	{
 		int count;
-		liwdgTreerow** array;
+		LIWdgTreerow** array;
 	} rows;
 };
 
-struct _liwdgTree
+struct _LIWdgTree
 {
-	liwdgWidget base;
-	liwdgTreerow root;
+	LIWdgWidget base;
+	LIWdgTreerow root;
 };
 
 static int
-private_init (liwdgTree*    self,
-              liwdgManager* manager);
+private_init (LIWdgTree*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgTree* self);
+private_free (LIWdgTree* self);
 
 static int
-private_event (liwdgTree*  self,
+private_event (LIWdgTree*  self,
                liwdgEvent* event);
 
 static void
-private_rebuild (liwdgTree* self);
+private_rebuild (LIWdgTree* self);
 
 void
-private_treerow_free (liwdgTreerow* self);
+private_treerow_free (LIWdgTreerow* self);
 
-static liwdgTreerow*
-private_treerow_find_active (liwdgTreerow* self);
+static LIWdgTreerow*
+private_treerow_find_active (LIWdgTreerow* self);
 
-static liwdgTreerow*
-private_treerow_find_clicked (liwdgTreerow* self,
-                              liwdgRect*    rect,
+static LIWdgTreerow*
+private_treerow_find_clicked (LIWdgTreerow* self,
+                              LIWdgRect*    rect,
                               int*          rowy,
                               int           x,
                               int           y);
 
 void
-private_treerow_foreach (liwdgTreerow* self,
+private_treerow_foreach (LIWdgTreerow* self,
                          void        (*call)());
 
 int
-private_treerow_render (liwdgTreerow* self,
-                        liwdgRect*    rect,
-                        liwdgStyle*   style,
+private_treerow_render (LIWdgTreerow* self,
+                        LIWdgRect*    rect,
+                        LIWdgStyle*   style,
                         int           y);
 
 static int
-private_treerow_get_height (liwdgTreerow* self);
+private_treerow_get_height (LIWdgTreerow* self);
 
 static void
-private_treerow_get_request (liwdgTreerow* self,
+private_treerow_get_request (LIWdgTreerow* self,
                              int*          w,
                              int*          h);
 
 /****************************************************************************/
 
-const liwdgClass liwdgTreeType =
+const LIWdgClass liwdg_widget_tree =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Tree", sizeof (liwdgTree),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Tree", sizeof (LIWdgTree),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liwdg_tree_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_tree_new (LIWdgManager* manager)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgTreeType);
+	self = liwdg_widget_new (manager, &liwdg_widget_tree);
 	if (self == NULL)
 		return NULL;
 
@@ -119,7 +119,7 @@ liwdg_tree_new (liwdgManager* manager)
 }
 
 void
-liwdg_tree_clear (liwdgTree* self)
+liwdg_tree_clear (LIWdgTree* self)
 {
 	private_treerow_free (&self->root);
 	self->root.rows.array = NULL;
@@ -128,34 +128,34 @@ liwdg_tree_clear (liwdgTree* self)
 }
 
 void
-liwdg_tree_foreach (liwdgTree* self,
+liwdg_tree_foreach (LIWdgTree* self,
                     void     (*call)())
 {
 	private_treerow_foreach (&self->root, call);
 }
 
-liwdgTreerow*
-liwdg_tree_get_active (liwdgTree* self)
+LIWdgTreerow*
+liwdg_tree_get_active (LIWdgTree* self)
 {
 	return private_treerow_find_active (&self->root);
 }
 
-liwdgTreerow*
-liwdg_tree_get_root (liwdgTree* self)
+LIWdgTreerow*
+liwdg_tree_get_root (LIWdgTree* self)
 {
 	return &self->root;
 }
 
-liwdgTreerow*
-liwdg_treerow_append_row (liwdgTreerow* self,
+LIWdgTreerow*
+liwdg_treerow_append_row (LIWdgTreerow* self,
                           const char*   text,
                           void*         data)
 {
 	int h;
-	liwdgTreerow* tmp;
+	LIWdgTreerow* tmp;
 
 	/* Format row. */
-	tmp = lisys_calloc (1, sizeof (liwdgTreerow));
+	tmp = lisys_calloc (1, sizeof (LIWdgTreerow));
 	if (tmp == NULL)
 		return NULL;
 	tmp->parent = self;
@@ -198,7 +198,7 @@ liwdg_treerow_append_row (liwdgTreerow* self,
 }
 
 void
-liwdg_treerow_remove_row (liwdgTreerow* self,
+liwdg_treerow_remove_row (LIWdgTreerow* self,
                           int           index)
 {
 	assert (index >= 0);
@@ -210,26 +210,26 @@ liwdg_treerow_remove_row (liwdgTreerow* self,
 }
 
 void*
-liwdg_treerow_get_data (liwdgTreerow* self)
+liwdg_treerow_get_data (LIWdgTreerow* self)
 {
 	return self->data;
 }
 
 void
-liwdg_treerow_set_data (liwdgTreerow* self,
+liwdg_treerow_set_data (LIWdgTreerow* self,
                         void*         value)
 {
 	self->data = value;
 }
 
 int
-liwdg_treerow_get_expanded (liwdgTreerow* self)
+liwdg_treerow_get_expanded (LIWdgTreerow* self)
 {
 	return self->expand;
 }
 
 void
-liwdg_treerow_set_expanded (liwdgTreerow* self,
+liwdg_treerow_set_expanded (LIWdgTreerow* self,
                             int           value)
 {
 	self->expand = value;
@@ -237,20 +237,20 @@ liwdg_treerow_set_expanded (liwdgTreerow* self,
 }
 
 int
-liwdg_treerow_get_highlighted (liwdgTreerow* self)
+liwdg_treerow_get_highlighted (LIWdgTreerow* self)
 {
 	return self->highlight;
 }
 
 void
-liwdg_treerow_set_highlighted (liwdgTreerow* self,
+liwdg_treerow_set_highlighted (LIWdgTreerow* self,
                                int           value)
 {
 	self->highlight = value;
 }
 
 int
-liwdg_treerow_get_index (liwdgTreerow* self)
+liwdg_treerow_get_index (LIWdgTreerow* self)
 {
 	int i;
 
@@ -265,14 +265,14 @@ liwdg_treerow_get_index (liwdgTreerow* self)
 	return 0;
 }
 
-liwdgTreerow*
-liwdg_treerow_get_parent (liwdgTreerow* self)
+LIWdgTreerow*
+liwdg_treerow_get_parent (LIWdgTreerow* self)
 {
 	return self->parent;
 }
 
-liwdgTreerow*
-liwdg_treerow_get_row (liwdgTreerow* self,
+LIWdgTreerow*
+liwdg_treerow_get_row (LIWdgTreerow* self,
                        int           index)
 {
 	assert (index >= 0);
@@ -282,19 +282,19 @@ liwdg_treerow_get_row (liwdgTreerow* self,
 }
 
 int
-liwdg_treerow_get_row_count (liwdgTreerow* self)
+liwdg_treerow_get_row_count (LIWdgTreerow* self)
 {
 	return self->rows.count;
 }
 
 const char*
-liwdg_treerow_get_text (liwdgTreerow* self)
+liwdg_treerow_get_text (LIWdgTreerow* self)
 {
 	return self->text;
 }
 
 int
-liwdg_treerow_set_text (liwdgTreerow* self,
+liwdg_treerow_set_text (LIWdgTreerow* self,
                         const char*   value)
 {
 	int h;
@@ -326,8 +326,8 @@ liwdg_treerow_set_text (liwdgTreerow* self,
 /*****************************************************************************/
 
 static int
-private_init (liwdgTree*    self,
-              liwdgManager* manager)
+private_init (LIWdgTree*    self,
+              LIWdgManager* manager)
 {
 	self->root.tree = self;
 	self->root.depth = 0;
@@ -338,19 +338,19 @@ private_init (liwdgTree*    self,
 }
 
 static void
-private_free (liwdgTree* self)
+private_free (LIWdgTree* self)
 {
 	private_treerow_free (&self->root);
 }
 
 static int
-private_event (liwdgTree*  self,
+private_event (LIWdgTree*  self,
                liwdgEvent* event)
 {
 	int y;
-	liwdgRect rect;
-	liwdgTreerow* row;
-	liwdgStyle* style;
+	LIWdgRect rect;
+	LIWdgTreerow* row;
+	LIWdgStyle* style;
 
 	switch (event->type)
 	{
@@ -377,11 +377,11 @@ private_event (liwdgTree*  self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 void
-private_treerow_free (liwdgTreerow* self)
+private_treerow_free (LIWdgTreerow* self)
 {
 	int i;
 
@@ -396,19 +396,19 @@ private_treerow_free (liwdgTreerow* self)
 }
 
 static void
-private_rebuild (liwdgTree* self)
+private_rebuild (LIWdgTree* self)
 {
-	liwdgSize size;
+	LIWdgSize size;
 
 	private_treerow_get_request (&self->root, &size.width, &size.height);
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), size.width, size.height);
 }
 
-static liwdgTreerow*
-private_treerow_find_active (liwdgTreerow* self)
+static LIWdgTreerow*
+private_treerow_find_active (LIWdgTreerow* self)
 {
 	int i;
-	liwdgTreerow* ret;
+	LIWdgTreerow* ret;
 
 	if (self->highlight)
 		return self;
@@ -422,16 +422,16 @@ private_treerow_find_active (liwdgTreerow* self)
 	return NULL;
 }
 
-static liwdgTreerow*
-private_treerow_find_clicked (liwdgTreerow* self,
-                              liwdgRect*    rect,
+static LIWdgTreerow*
+private_treerow_find_clicked (LIWdgTreerow* self,
+                              LIWdgRect*    rect,
                               int*          rowy,
                               int           x,
                               int           y)
 {
 	int h;
 	int i;
-	liwdgTreerow* ret;
+	LIWdgTreerow* ret;
 
 	if (self->layout != NULL)
 	{
@@ -455,7 +455,7 @@ private_treerow_find_clicked (liwdgTreerow* self,
 }
 
 void
-private_treerow_foreach (liwdgTreerow* self,
+private_treerow_foreach (LIWdgTreerow* self,
                          void        (*call)())
 {
 	int i;
@@ -466,17 +466,17 @@ private_treerow_foreach (liwdgTreerow* self,
 }
 
 int
-private_treerow_render (liwdgTreerow* self,
-                        liwdgRect*    rect,
-                        liwdgStyle*   style,
+private_treerow_render (LIWdgTreerow* self,
+                        LIWdgRect*    rect,
+                        LIWdgStyle*   style,
                         int           y)
 {
 	int i;
 	int h;
 	int x;
 	int pointer[2];
-	liwdgManager* manager;
-	liwdgRect r;
+	LIWdgManager* manager;
+	LIWdgRect r;
 
 	/* Calculate offset. */
 	h = private_treerow_get_height (self);
@@ -559,7 +559,7 @@ private_treerow_render (liwdgTreerow* self,
 }
 
 static int
-private_treerow_get_height (liwdgTreerow* self)
+private_treerow_get_height (LIWdgTreerow* self)
 {
 	int h0;
 	int h1;
@@ -579,7 +579,7 @@ private_treerow_get_height (liwdgTreerow* self)
 }
 
 static void
-private_treerow_get_request (liwdgTreerow* self,
+private_treerow_get_request (LIWdgTreerow* self,
                              int*          w,
                              int*          h)
 {

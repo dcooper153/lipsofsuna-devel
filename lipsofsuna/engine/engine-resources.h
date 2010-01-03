@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengResources Resources
+ * \addtogroup LIEngResources Resources
  * @{
  */
 
@@ -28,14 +28,14 @@
 #include "engine-model.h"
 #include "engine-types.h"
 
-struct _liengAnimation
+struct _LIEngAnimation
 {
 	int id;
 	char* name;
 	void* data;
 };
 
-struct _liengSample
+struct _LIEngSample
 {
 	int id;
 	int invalid;
@@ -44,72 +44,72 @@ struct _liengSample
 	void* data;
 };
 
-struct _liengResources
+struct _LIEngResources
 {
-	liengEngine* engine;
+	LIEngEngine* engine;
 	struct
 	{
 		int count;
-		liengAnimation* array;
+		LIEngAnimation* array;
 	} animations;
 	struct
 	{
 		int count;
-		liengModel** array;
+		LIEngModel** array;
 	} models;
 	struct
 	{
 		int count;
-		liengSample* array;
+		LIEngSample* array;
 	} samples;
 };
 
-liengResources*
-lieng_resources_new (liengEngine* engine);
+LIEngResources*
+lieng_resources_new (LIEngEngine* engine);
 
 void
-lieng_resources_free (liengResources* self);
+lieng_resources_free (LIEngResources* self);
 
 void
-lieng_resources_clear (liengResources* self);
+lieng_resources_clear (LIEngResources* self);
 
-liengAnimation*
-lieng_resources_find_animation_by_code (liengResources* self,
+LIEngAnimation*
+lieng_resources_find_animation_by_code (LIEngResources* self,
                                         int             id);
 
-liengAnimation*
-lieng_resources_find_animation_by_name (liengResources* self,
+LIEngAnimation*
+lieng_resources_find_animation_by_name (LIEngResources* self,
                                         const char*     name);
 
-liengModel*
-lieng_resources_find_model_by_code (liengResources* self,
+LIEngModel*
+lieng_resources_find_model_by_code (LIEngResources* self,
                                     int             id);
 
-liengModel*
-lieng_resources_find_model_by_name (liengResources* self,
+LIEngModel*
+lieng_resources_find_model_by_name (LIEngResources* self,
                                     const char*     name);
 
-liengSample*
-lieng_resources_find_sample_by_code (liengResources* self,
+LIEngSample*
+lieng_resources_find_sample_by_code (LIEngResources* self,
                                      int             id);
 
-liengSample*
-lieng_resources_find_sample_by_name (liengResources* self,
+LIEngSample*
+lieng_resources_find_sample_by_name (LIEngResources* self,
                                      const char*     name);
 
 int
-lieng_resources_load_from_dir (liengResources* self,
+lieng_resources_load_from_dir (LIEngResources* self,
                                const char*     path);
 
 int
-lieng_resources_load_from_stream (liengResources* self,
-                                  liarcReader*    reader);
+lieng_resources_load_from_stream (LIEngResources* self,
+                                  LIArcReader*    reader);
 
 int
-lieng_resources_get_animation_count (liengResources* self);
+lieng_resources_get_animation_count (LIEngResources* self);
 
 int
-lieng_resources_get_model_count (liengResources* self);
+lieng_resources_get_model_count (LIEngResources* self);
 
 #endif
 

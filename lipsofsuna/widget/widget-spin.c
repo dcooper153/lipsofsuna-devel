@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgSpin Spin
+ * \addtogroup LIWdgSpin Spin
  * @{
  */
 
@@ -26,57 +26,57 @@
 #include "widget-spin.h"
 
 static int
-private_init (liwdgSpin* self,
-              liwdgManager*  manager);
+private_init (LIWdgSpin* self,
+              LIWdgManager*  manager);
 
 static void
-private_free (liwdgSpin* self);
+private_free (LIWdgSpin* self);
 
 static int
-private_event (liwdgSpin* self,
+private_event (LIWdgSpin* self,
                liwdgEvent*    event);
 
 static void
-private_rebuild (liwdgSpin* self);
+private_rebuild (LIWdgSpin* self);
 
-const liwdgClass liwdgSpinType =
+const LIWdgClass liwdg_widget_spin =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Spin", sizeof (liwdgSpin),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Spin", sizeof (LIWdgSpin),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_spin_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_spin_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgSpinType);
+	return liwdg_widget_new (manager, &liwdg_widget_spin);
 }
 
-lifntFont*
-liwdg_spin_get_font (liwdgSpin* self)
+LIFntFont*
+liwdg_spin_get_font (LIWdgSpin* self)
 {
 	return self->font;
 }
 
 void
-liwdg_spin_set_font (liwdgSpin* self,
-                     lifntFont* font)
+liwdg_spin_set_font (LIWdgSpin* self,
+                     LIFntFont* font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 float
-liwdg_spin_get_value (liwdgSpin* self)
+liwdg_spin_get_value (LIWdgSpin* self)
 {
 	return self->value;
 }
 
 void
-liwdg_spin_set_value (liwdgSpin* self,
+liwdg_spin_set_value (LIWdgSpin* self,
                       float      value)
 {
 	self->value = value;
@@ -86,8 +86,8 @@ liwdg_spin_set_value (liwdgSpin* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgSpin*    self,
-              liwdgManager* manager)
+private_init (LIWdgSpin*    self,
+              LIWdgManager* manager)
 {
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
@@ -99,19 +99,19 @@ private_init (liwdgSpin*    self,
 }
 
 static void
-private_free (liwdgSpin* self)
+private_free (LIWdgSpin* self)
 {
 	lifnt_layout_free (self->text);
 }
 
 static int
-private_event (liwdgSpin*  self,
+private_event (LIWdgSpin*  self,
                liwdgEvent* event)
 {
 	int w;
 	int h;
-	liwdgRect rect;
-	liwdgStyle* style;
+	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	switch (event->type)
 	{
@@ -139,11 +139,11 @@ private_event (liwdgSpin*  self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgSpin* self)
+private_rebuild (LIWdgSpin* self)
 {
 	int h = 0;
 	char buf[256];

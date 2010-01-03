@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup libnd Binding
  * @{
- * \addtogroup libndAction Action
+ * \addtogroup LIBndAction Action
  * @{
  */
 
@@ -27,21 +27,21 @@
 
 #include "binding-types.h"
 
-struct _libndAction
+struct _LIBndAction
 {
 	int enabled;
 	char* identifier;
 	char* name;
 	char* description;
 	void* data;
-	libndAction* prev;
-	libndAction* next;
+	LIBndAction* prev;
+	LIBndAction* next;
 	libndCallback callback;
-	libndManager* manager;
+	LIBndManager* manager;
 };
 
-libndAction*
-libnd_action_new (libndManager* manager,
+LIBndAction*
+libnd_action_new (LIBndManager* manager,
                   const char*   identifier,
                   const char*   name,
                   const char*   description,
@@ -49,20 +49,20 @@ libnd_action_new (libndManager* manager,
                   void*         data);
 
 void
-libnd_action_free (libndAction* self);
+libnd_action_free (LIBndAction* self);
 
 int
-libnd_action_get_enabled (libndAction* self);
+libnd_action_get_enabled (LIBndAction* self);
 
 void
-libnd_action_set_enabled (libndAction* self,
+libnd_action_set_enabled (LIBndAction* self,
                           int          value);
 
 void*
-libnd_action_get_userdata (libndAction* self);
+libnd_action_get_userdata (LIBndAction* self);
 
 void
-libnd_action_set_userdata (libndAction* self,
+libnd_action_set_userdata (LIBndAction* self,
                            void*        value);
 
 #endif

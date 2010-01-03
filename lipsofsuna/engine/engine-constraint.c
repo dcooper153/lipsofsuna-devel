@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,22 +18,22 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengConstraint Constraint
+ * \addtogroup LIEngConstraint Constraint
  * @{
  */
 
 #include "engine-constraint.h"
 #include "engine-object.h"
 
-liengConstraint*
-lieng_constraint_new (liengObject* first_object,
+LIEngConstraint*
+lieng_constraint_new (LIEngObject* first_object,
                       const char*  first_anchor,
-                      liengObject* second_object,
+                      LIEngObject* second_object,
                       const char*  second_anchor)
 {
-	liengConstraint* self;
+	LIEngConstraint* self;
 
-	self = lisys_calloc (1, sizeof (liengConstraint));
+	self = lisys_calloc (1, sizeof (LIEngConstraint));
 	if (self == NULL)
 		return NULL;
 	self->objects[0] = first_object;
@@ -47,7 +47,7 @@ lieng_constraint_new (liengObject* first_object,
 }
 
 void
-lieng_constraint_free (liengConstraint* self)
+lieng_constraint_free (LIEngConstraint* self)
 {
 	assert (self->next == NULL);
 	assert (self->prev == NULL);
@@ -62,7 +62,7 @@ lieng_constraint_free (liengConstraint* self)
  * \param self Constraint.
  */
 void
-lieng_constraint_rebuild (liengConstraint* self)
+lieng_constraint_rebuild (LIEngConstraint* self)
 {
 	if (self->node_names[0] != NULL)
 		self->nodes[0] = lieng_object_find_node (self->objects[0], self->node_names[0]);
@@ -83,12 +83,12 @@ lieng_constraint_rebuild (liengConstraint* self)
  * \param secs Tick duration in seconds.
  */
 void
-lieng_constraint_update (liengConstraint* self,
+lieng_constraint_update (LIEngConstraint* self,
                          float            secs)
 {
-	limatTransform child;
-	limatTransform object;
-	limatTransform parent;
+	LIMatTransform child;
+	LIMatTransform object;
+	LIMatTransform parent;
 
 	/* FIXME: Bad physics: always corrects the second object. */
 	lieng_constraint_get_transform (self, 0, LIENG_MATRIX_WORLD, &parent);
@@ -106,13 +106,13 @@ lieng_constraint_update (liengConstraint* self,
  * \param value Return location for the transformation.
  */
 void
-lieng_constraint_get_transform (liengConstraint* self,
+lieng_constraint_get_transform (LIEngConstraint* self,
                                 int              index,
-                                liengMatrix      type,
-                                limatTransform*  value)
+                                LIEngMatrix      type,
+                                LIMatTransform*  value)
 {
-	limatTransform t0;
-	limatTransform t1;
+	LIMatTransform t0;
+	LIMatTransform t1;
 
 	assert (index >= 0);
 	assert (index < 2);

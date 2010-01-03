@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliObject Object
+ * \addtogroup LICliObject Object
  * @{
  */
 
@@ -27,15 +27,15 @@
 #include "client-window.h"
 
 void
-licli_object_set_animation (liengObject* self,
+licli_object_set_animation (LIEngObject* self,
                             int          value,
                             int          channel,
                             int          permanent,
                             float        priority)
 {
 	int chan;
-	liengAnimation* animation;
-	limdlPose* pose;
+	LIEngAnimation* animation;
+	LIMdlPose* pose;
 
 	pose = self->pose;
 	chan = channel + 65536;
@@ -58,7 +58,7 @@ licli_object_set_animation (liengObject* self,
 }
 
 void
-licli_object_set_flags (liengObject* self,
+licli_object_set_flags (LIEngObject* self,
                         int          value)
 {
 	if (value & LINET_OBJECT_FLAG_DYNAMIC)

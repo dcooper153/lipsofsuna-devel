@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,20 +18,20 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlBone Bone
+ * \addtogroup LIMdlBone Bone
  * @{
  */
 
 #ifndef __MODEL_TYPES_H__
 #define __MODEL_TYPES_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _limdlBone limdlBone;
+typedef struct _LIMdlBone LIMdlBone;
 
 /**
  * @}
- * \addtogroup limdlLight Light
+ * \addtogroup LIMdlLight Light
  * @{
  */
 
@@ -40,54 +40,54 @@ enum
 	LIMDL_LIGHT_FLAG_SHADOW = 0x01
 };
 
-typedef struct _limdlLight limdlLight;
+typedef struct _LIMdlLight LIMdlLight;
 
 /**
  * @}
- * \addtogroup limdlModel Model
+ * \addtogroup LIMdlModel Model
  * @{
  */
 
-typedef struct _limdlModel limdlModel;
-typedef struct _limdlWeightGroup limdlWeightGroup;
+typedef struct _LIMdlModel LIMdlModel;
+typedef struct _LIMdlWeightGroup LIMdlWeightGroup;
 
 /**
  * @}
- * \addtogroup limdlNode Node
+ * \addtogroup LIMdlNode Node
  * @{
  */
 
-enum _limdlNodeType
+enum _LIMdlNodeType
 {
 	LIMDL_NODE_BONE,
 	LIMDL_NODE_EMPTY,
 	LIMDL_NODE_LIGHT,
 };
 
-typedef enum _limdlNodeType limdlNodeType;
-typedef struct _limdlNode limdlNode;
-typedef void (*limdlNodeTransformFunc)(void*, limdlNode*, limatTransform*);
+typedef enum _LIMdlNodeType LIMdlNodeType;
+typedef struct _LIMdlNode LIMdlNode;
+typedef void (*LIMdlNodeTransformFunc)(void*, LIMdlNode*, LIMatTransform*);
 
 /**
  * @}
- * \addtogroup limdlPose Pose
+ * \addtogroup LIMdlPose Pose
  * @{
  */
 
-typedef int limdlPoseChannelState;
-typedef struct _limdlPoseChannel limdlPoseChannel;
-typedef struct _limdlPoseFade limdlPoseFade;
-typedef struct _limdlPose limdlPose;
+typedef int LIMdlPoseChannelState;
+typedef struct _LIMdlPoseChannel LIMdlPoseChannel;
+typedef struct _LIMdlPoseFade LIMdlPoseFade;
+typedef struct _LIMdlPose LIMdlPose;
 
 /**
  * @}
- * \addtogroup limdlHair Hair
+ * \addtogroup LIMdlHair Hair
  * @{
  */
 
-typedef struct _limdlHair limdlHair;
-typedef struct _limdlHairNode limdlHairNode;
-typedef struct _limdlHairs limdlHairs;
+typedef struct _LIMdlHair LIMdlHair;
+typedef struct _LIMdlHairNode LIMdlHairNode;
+typedef struct _LIMdlHairs LIMdlHairs;
 
 #endif
 

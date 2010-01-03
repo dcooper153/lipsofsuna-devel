@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-npc.h"
 
@@ -49,11 +49,11 @@
  * -- @return Npc or nil.
  * function Npc.find(self, args)
  */
-static void Npc_find (liscrArgs* args)
+static void Npc_find (LIScrArgs* args)
 {
-	liextModule* module;
-	liextNpc* npc;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtNpc* npc;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
@@ -73,11 +73,11 @@ static void Npc_find (liscrArgs* args)
  * -- @return New NPC.
  * function Npc.new(self, args)
  */
-static void Npc_new (liscrArgs* args)
+static void Npc_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liextNpc* self;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtNpc* self;
+	LIScrData* data;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NPC);
@@ -110,12 +110,12 @@ static void Npc_new (liscrArgs* args)
  * -- @return Path or nil.
  * function Npc.solve_path(self, args)
  */
-static void Npc_solve_path (liscrArgs* args)
+static void Npc_solve_path (LIScrArgs* args)
 {
-	liaiPath* tmp;
-	liextNpc* self;
-	limatVector vector;
-	liscrData* path;
+	LIAiPath* tmp;
+	LIExtNpc* self;
+	LIMatVector vector;
+	LIScrData* path;
 
 	if (!liscr_args_gets_vector (args, "point", &vector))
 		return;
@@ -144,16 +144,16 @@ static void Npc_solve_path (liscrArgs* args)
  * -- @name Npc.alert
  * -- @class table
  */
-static void Npc_getter_alert (liscrArgs* args)
+static void Npc_getter_alert (LIScrArgs* args)
 {
-	liscr_args_seti_bool (args, ((liextNpc*) args->self)->alert);
+	liscr_args_seti_bool (args, ((LIExtNpc*) args->self)->alert);
 }
-static void Npc_setter_alert (liscrArgs* args)
+static void Npc_setter_alert (LIScrArgs* args)
 {
 	int value;
 
 	if (liscr_args_geti_bool (args, 0, &value))
-		((liextNpc*) args->self)->alert = value;
+		((LIExtNpc*) args->self)->alert = value;
 }
 
 /* @luadoc
@@ -172,14 +172,14 @@ static void Npc_setter_alert (liscrArgs* args)
  * -- @name Npc.owner
  * -- @class table
  */
-static void Npc_getter_owner (liscrArgs* args)
+static void Npc_getter_owner (LIScrArgs* args)
 {
-	if (((liextNpc*) args->self)->owner != NULL)
-		liscr_args_seti_data (args, ((liextNpc*) args->self)->owner->script);
+	if (((LIExtNpc*) args->self)->owner != NULL)
+		liscr_args_seti_data (args, ((LIExtNpc*) args->self)->owner->script);
 }
-static void Npc_setter_owner (liscrArgs* args)
+static void Npc_setter_owner (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_NPC, &data))
 		liext_npc_set_owner (args->self, data->data);
@@ -193,14 +193,14 @@ static void Npc_setter_owner (liscrArgs* args)
  * -- @name Npc.path
  * -- @class table
  */
-static void Npc_getter_path (liscrArgs* args)
+static void Npc_getter_path (LIScrArgs* args)
 {
-	if (((liextNpc*) args->self)->path != NULL)
-		liscr_args_seti_data (args, ((liextNpc*) args->self)->path);
+	if (((LIExtNpc*) args->self)->path != NULL)
+		liscr_args_seti_data (args, ((LIExtNpc*) args->self)->path);
 }
-static void Npc_setter_path (liscrArgs* args)
+static void Npc_setter_path (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_PATH, &data))
 		liext_npc_set_path (args->self, data);
@@ -214,16 +214,16 @@ static void Npc_setter_path (liscrArgs* args)
  * -- @name Npc.radius
  * -- @class table
  */
-static void Npc_getter_radius (liscrArgs* args)
+static void Npc_getter_radius (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((liextNpc*) args->self)->radius);
+	liscr_args_seti_float (args, ((LIExtNpc*) args->self)->radius);
 }
-static void Npc_setter_radius (liscrArgs* args)
+static void Npc_setter_radius (LIScrArgs* args)
 {
 	float value;
 
 	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
-		((liextNpc*) args->self)->radius = value;
+		((LIExtNpc*) args->self)->radius = value;
 }
 
 /* @luadoc
@@ -232,16 +232,16 @@ static void Npc_setter_radius (liscrArgs* args)
  * -- @name Npc.refresh
  * -- @class table
  */
-static void Npc_getter_refresh (liscrArgs* args)
+static void Npc_getter_refresh (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((liextNpc*) args->self)->refresh);
+	liscr_args_seti_float (args, ((LIExtNpc*) args->self)->refresh);
 }
-static void Npc_setter_refresh (liscrArgs* args)
+static void Npc_setter_refresh (LIScrArgs* args)
 {
 	float value;
 
 	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
-		((liextNpc*) args->self)->refresh = value;
+		((LIExtNpc*) args->self)->refresh = value;
 }
 
 /* @luadoc
@@ -250,14 +250,14 @@ static void Npc_setter_refresh (liscrArgs* args)
  * -- @name Npc.target
  * -- @class table
  */
-static void Npc_getter_target (liscrArgs* args)
+static void Npc_getter_target (LIScrArgs* args)
 {
-	if (((liextNpc*) args->self)->target != NULL)
-		liscr_args_seti_data (args, ((liextNpc*) args->self)->target->script);
+	if (((LIExtNpc*) args->self)->target != NULL)
+		liscr_args_seti_data (args, ((LIExtNpc*) args->self)->target->script);
 }
-static void Npc_setter_target (liscrArgs* args)
+static void Npc_setter_target (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_npc_set_target (args->self, data->data);
@@ -268,7 +268,7 @@ static void Npc_setter_target (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextNpcScript (liscrClass* self,
+liext_script_npc (LIScrClass* self,
                 void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);

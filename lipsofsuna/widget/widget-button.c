@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgButton Button
+ * \addtogroup LIWdgButton Button
  * @{
  */
 
@@ -26,57 +26,57 @@
 #include "widget-manager.h"
 
 static int
-private_init (liwdgButton*  self,
-              liwdgManager* manager);
+private_init (LIWdgButton*  self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgButton* self);
+private_free (LIWdgButton* self);
 
 static int
-private_event (liwdgButton* self,
+private_event (LIWdgButton* self,
                liwdgEvent*  event);
 
 static void
-private_rebuild (liwdgButton* self);
+private_rebuild (LIWdgButton* self);
 
-const liwdgClass liwdgButtonType =
+const LIWdgClass liwdg_widget_button =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Button", sizeof (liwdgButton),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event,
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Button", sizeof (LIWdgButton),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event,
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_button_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_button_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgButtonType);
+	return liwdg_widget_new (manager, &liwdg_widget_button);
 }
 
-lifntFont*
-liwdg_button_get_font (liwdgButton* self)
+LIFntFont*
+liwdg_button_get_font (LIWdgButton* self)
 {
 	return self->font;
 }
 
 void
-liwdg_button_set_font (liwdgButton* self,
-                       lifntFont*   font)
+liwdg_button_set_font (LIWdgButton* self,
+                       LIFntFont*   font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 const char*
-liwdg_button_get_text (liwdgButton* self)
+liwdg_button_get_text (LIWdgButton* self)
 {
 	return self->string;
 }
 
 int
-liwdg_button_set_text (liwdgButton* self,
+liwdg_button_set_text (LIWdgButton* self,
                        const char*  text)
 {
 	char* tmp;
@@ -93,8 +93,8 @@ liwdg_button_set_text (liwdgButton* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgButton*  self,
-              liwdgManager* manager)
+private_init (LIWdgButton*  self,
+              LIWdgManager* manager)
 {
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->string = lisys_calloc (1, 1);
@@ -114,20 +114,20 @@ private_init (liwdgButton*  self,
 }
 
 static void
-private_free (liwdgButton* self)
+private_free (LIWdgButton* self)
 {
 	lifnt_layout_free (self->text);
 	lisys_free (self->string);
 }
 
 static int
-private_event (liwdgButton* self,
+private_event (LIWdgButton* self,
                liwdgEvent*  event)
 {
 	int w;
 	int h;
-	liwdgRect rect;
-	liwdgStyle* style;
+	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	switch (event->type)
 	{
@@ -163,11 +163,11 @@ private_event (liwdgButton* self,
 			break;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgButton* self)
+private_rebuild (LIWdgButton* self)
 {
 	int h = 0;
 

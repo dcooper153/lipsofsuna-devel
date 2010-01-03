@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,13 @@
 /**
  * \addtogroup licfg Config 
  * @{
- * \addtogroup licfgBans Bans
+ * \addtogroup LICfgBans Bans
  * @{
  */
 
-#include <archive/lips-archive.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "config-bans.h"
 
 /**
@@ -32,13 +32,13 @@
  *
  * \return New ban list or NULL.
  */
-licfgBans*
+LICfgBans*
 licfg_bans_new ()
 {
-	licfgBans* self;
+	LICfgBans* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licfgBans));
+	self = lisys_calloc (1, sizeof (LICfgBans));
 	if (self == NULL)
 		return NULL;
 	self->bans = lialg_strdic_new ();
@@ -57,16 +57,16 @@ licfg_bans_new ()
  * \param dir Directory containing bans.def.
  * \return New ban list or NULL.
  */
-licfgBans*
+LICfgBans*
 licfg_bans_new_from_file (const char* dir)
 {
 	char* name;
 	char* path;
-	liarcReader* reader = NULL;
-	licfgBans* self;
+	LIArcReader* reader = NULL;
+	LICfgBans* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licfgBans));
+	self = lisys_calloc (1, sizeof (LICfgBans));
 	if (self == NULL)
 		return NULL;
 	self->bans = lialg_strdic_new ();
@@ -114,7 +114,7 @@ error:
  * \param self Ban list.
  */
 void
-licfg_bans_free (licfgBans* self)
+licfg_bans_free (LICfgBans* self)
 {
 	if (self->bans != NULL)
 		lialg_strdic_free (self->bans);
@@ -129,7 +129,7 @@ licfg_bans_free (licfgBans* self)
  * \return Nonzero on success.
  */
 int
-licfg_bans_insert_ban (licfgBans*  self,
+licfg_bans_insert_ban (LICfgBans*  self,
                        const char* ip)
 {
 	if (!lialg_strdic_insert (self->bans, ip, (void*) 1))
@@ -145,7 +145,7 @@ licfg_bans_insert_ban (licfgBans*  self,
  * \return Nonzero on success.
  */
 int
-licfg_bans_remove_ban (licfgBans*  self,
+licfg_bans_remove_ban (LICfgBans*  self,
                        const char* ip)
 {
 	return lialg_strdic_remove (self->bans, ip);
@@ -159,7 +159,7 @@ licfg_bans_remove_ban (licfgBans*  self,
  * \return Nonzero if banned.
  */
 int
-licfg_bans_get_banned (licfgBans*  self,
+licfg_bans_get_banned (LICfgBans*  self,
                        const char* ip)
 {
 	return (lialg_strdic_find (self->bans, ip) != NULL);
@@ -172,7 +172,7 @@ licfg_bans_get_banned (licfgBans*  self,
  * \return Number of rules.
  */
 int
-licfg_bans_get_count (licfgBans* self)
+licfg_bans_get_count (LICfgBans* self)
 {
 	return self->bans->size;
 }

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgStyle Style
+ * \addtogroup LIWdgStyle Style
  * @{
  */
 
-#include <font/lips-font.h>
-#include <image/lips-image.h>
+#include <lipsofsuna/font.h>
+#include <lipsofsuna/image.h>
 #include "widget-manager.h"
 #include "widget-style.h"
 
@@ -34,32 +34,32 @@ struct _PrivateFont
 	char* file;
 };
 
-static lifntFont*
-private_load_font (liwdgStyles* self,
+static LIFntFont*
+private_load_font (LIWdgStyles* self,
                    const char*  root,
                    const char*  name,
                    const char*  file,
                    int          size);
 
 static int
-private_load_texture (liwdgStyles*   self,
-                      liimgTexture** texture,
+private_load_texture (LIWdgStyles*   self,
+                      LIImgTexture** texture,
                       const char*    root,
                       const char*    name);
 
 static int
-private_read (liwdgStyles* self,
+private_read (LIWdgStyles* self,
               const char*  root,
               const char*  path);
 
 static int
-private_read_font (liwdgStyles* self,
+private_read_font (LIWdgStyles* self,
                    const char*  root,
                    const char*  name,
-                   liarcReader* reader);
+                   LIArcReader* reader);
 
 static int
-private_read_font_attr (liwdgStyles* self,
+private_read_font_attr (LIWdgStyles* self,
                         const char*  root,
                         const char*  name,
                         PrivateFont* font,
@@ -67,31 +67,31 @@ private_read_font_attr (liwdgStyles* self,
                         const char*  value);
 
 static int
-private_read_widget (liwdgStyles* self,
+private_read_widget (LIWdgStyles* self,
                      const char*  root,
                      const char*  name,
-                     liarcReader* reader);
+                     LIArcReader* reader);
 
 static int
-private_read_widget_attr (liwdgStyles* self,
+private_read_widget_attr (LIWdgStyles* self,
                           const char*  root,
                           const char*  name,
-                          liwdgStyle*  widget,
+                          LIWdgStyle*  widget,
                           const char*  key,
                           const char*  value);
 
 /*****************************************************************************/
 
-liwdgStyles*
-liwdg_styles_new (liwdgManager* manager,
+LIWdgStyles*
+liwdg_styles_new (LIWdgManager* manager,
                   const char*   root)
 {
 	char* path;
-	liwdgStyles* self;
+	LIWdgStyles* self;
 	unsigned char tmp[16];
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liwdgStyles));
+	self = lisys_calloc (1, sizeof (LIWdgStyles));
 	if (self == NULL)
 		return NULL;
 	self->manager = manager;
@@ -142,9 +142,9 @@ liwdg_styles_new (liwdgManager* manager,
 }
 
 void
-liwdg_styles_free (liwdgStyles* self)
+liwdg_styles_free (LIWdgStyles* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	if (self->fonts != NULL)
 	{
@@ -171,15 +171,15 @@ liwdg_styles_free (liwdgStyles* self)
 
 /*****************************************************************************/
 
-static lifntFont*
-private_load_font (liwdgStyles* self,
+static LIFntFont*
+private_load_font (LIWdgStyles* self,
                    const char*  root,
                    const char*  name,
                    const char*  file,
                    int          size)
 {
 	char* path;
-	lifntFont* font;
+	LIFntFont* font;
 
 	/* Check for duplicates. */
 	if (lialg_strdic_find (self->fonts, name))
@@ -206,8 +206,8 @@ private_load_font (liwdgStyles* self,
 }
 
 static int
-private_load_texture (liwdgStyles*   self,
-                      liimgTexture** texture,
+private_load_texture (LIWdgStyles*   self,
+                      LIImgTexture** texture,
                       const char*    root,
                       const char*    name)
 {
@@ -225,13 +225,13 @@ private_load_texture (liwdgStyles*   self,
 }
 
 static int
-private_read (liwdgStyles* self,
+private_read (LIWdgStyles* self,
               const char*  root,
               const char*  path)
 {
 	char* name;
 	char* type;
-	liarcReader* reader;
+	LIArcReader* reader;
 
 	/* Open the file. */
 	reader = liarc_reader_new_from_file (path);
@@ -306,10 +306,10 @@ error:
 }
 
 static int
-private_read_font (liwdgStyles* self,
+private_read_font (LIWdgStyles* self,
                    const char*  root,
                    const char*  name,
-                   liarcReader* reader)
+                   LIArcReader* reader)
 {
 	char* line;
 	char* value;
@@ -360,7 +360,7 @@ error:
 }
 
 static int
-private_read_font_attr (liwdgStyles* self,
+private_read_font_attr (LIWdgStyles* self,
                         const char*  root,
                         const char*  name,
                         PrivateFont* font,
@@ -381,17 +381,17 @@ private_read_font_attr (liwdgStyles* self,
 }
 
 static int
-private_read_widget (liwdgStyles* self,
+private_read_widget (LIWdgStyles* self,
                      const char*  root,
                      const char*  name,
-                     liarcReader* reader)
+                     LIArcReader* reader)
 {
 	char* line;
 	char* value;
-	liwdgStyle* widget;
+	LIWdgStyle* widget;
 
 	/* Allocate info. */
-	widget = lisys_calloc (1, sizeof (liwdgStyle));
+	widget = lisys_calloc (1, sizeof (LIWdgStyle));
 	if (widget == NULL)
 		return 0;
 	*widget = self->fallback;
@@ -442,14 +442,14 @@ error:
 }
 
 static int
-private_read_widget_attr (liwdgStyles* self,
+private_read_widget_attr (LIWdgStyles* self,
                           const char*  root,
                           const char*  name,
-                          liwdgStyle*  widget,
+                          LIWdgStyle*  widget,
                           const char*  key,
                           const char*  value)
 {
-	liimgTexture* image;
+	LIImgTexture* image;
 
 	if (!strcmp (key, "file"))
 	{

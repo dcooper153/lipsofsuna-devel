@@ -24,50 +24,50 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-module.h"
 
 static int
-private_block_free (liextModule*      self,
-                    livoxUpdateEvent* event);
+private_block_free (LIExtModule*      self,
+                    LIVoxUpdateEvent* event);
 
 static int
-private_block_load (liextModule*      self,
-                    livoxUpdateEvent* event);
+private_block_load (LIExtModule*      self,
+                    LIVoxUpdateEvent* event);
 
 static int
-private_packet (liextModule* self,
-                licliClient* client,
-                liarcReader* reader);
+private_packet (LIExtModule* self,
+                LICliClient* client,
+                LIArcReader* reader);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 static int
-private_voxel_assign (liextModule* self,
-                      liarcReader* reader);
+private_voxel_assign (LIExtModule* self,
+                      LIArcReader* reader);
 
 static int
-private_voxel_diff (liextModule* self,
-                    liarcReader* reader);
+private_voxel_diff (LIExtModule* self,
+                    LIArcReader* reader);
 
 /*****************************************************************************/
 
-licliExtensionInfo liextInfo =
+LICliExtensionInfo liextInfo =
 {
 	LICLI_EXTENSION_VERSION, "Voxel",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -99,18 +99,18 @@ liext_module_new (licliClient* client)
 	}
 
 	/* Register class. */
-	liscr_script_create_class (client->script, "Voxel", liextVoxelScript, self);
+	liscr_script_create_class (client->script, "Voxel", liext_script_voxel, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
-	lialgMemdicIter iter;
+	LIAlgMemdicIter iter;
 
 	/* Free callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
 	/* Free blocks. */
 	if (self->blocks != NULL)
@@ -127,12 +127,12 @@ liext_module_free (liextModule* self)
 }
 
 int
-liext_module_build_all (liextModule* self)
+liext_module_build_all (LIExtModule* self)
 {
 	int ret = 1;
-	lialgMemdicIter iter;
-	liextBlock* block;
-	livoxBlockAddr* addr;
+	LIAlgMemdicIter iter;
+	LIExtBlock* block;
+	LIVoxBlockAddr* addr;
 
 	LI_FOREACH_MEMDIC (iter, self->blocks)
 	{
@@ -147,7 +147,7 @@ liext_module_build_all (liextModule* self)
 }
 
 int
-liext_module_build_block (liextModule* self,
+liext_module_build_block (LIExtModule* self,
                           int          sx,
                           int          sy,
                           int          sz,
@@ -155,10 +155,10 @@ liext_module_build_block (liextModule* self,
                           int          by,
                           int          bz)
 {
-	liextBlock* eblock;
-	livoxBlock* vblock;
-	livoxBlockAddr addr;
-	livoxSector* vsector;
+	LIExtBlock* eblock;
+	LIVoxBlock* vblock;
+	LIVoxBlockAddr addr;
+	LIVoxSector* vsector;
 
 	/* Find sector. */
 	vsector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", sx, sy, sz, 0);
@@ -198,10 +198,10 @@ liext_module_build_block (liextModule* self,
 }
 
 void
-liext_module_clear_all (liextModule* self)
+liext_module_clear_all (LIExtModule* self)
 {
-	lialgMemdicIter iter;
-	liextBlock* block;
+	LIAlgMemdicIter iter;
+	LIExtBlock* block;
 
 	LI_FOREACH_MEMDIC (iter, self->blocks)
 	{
@@ -213,11 +213,11 @@ liext_module_clear_all (liextModule* self)
 /*****************************************************************************/
 
 static int
-private_block_free (liextModule*      self,
-                    livoxUpdateEvent* event)
+private_block_free (LIExtModule*      self,
+                    LIVoxUpdateEvent* event)
 {
-	liextBlock* eblock;
-	livoxBlockAddr addr;
+	LIExtBlock* eblock;
+	LIVoxBlockAddr addr;
 
 	addr.sector[0] = event->sector[0];
 	addr.sector[1] = event->sector[1];
@@ -236,8 +236,8 @@ private_block_free (liextModule*      self,
 }
 
 static int
-private_block_load (liextModule*      self,
-                    livoxUpdateEvent* event)
+private_block_load (LIExtModule*      self,
+                    LIVoxUpdateEvent* event)
 {
 	int sx = event->sector[0];
 	int sy = event->sector[1];
@@ -278,9 +278,9 @@ private_block_load (liextModule*      self,
 }
 
 static int
-private_packet (liextModule* self,
-                licliClient* client,
-                liarcReader* reader)
+private_packet (LIExtModule* self,
+                LICliClient* client,
+                LIArcReader* reader)
 {
 	uint8_t type;
 
@@ -301,7 +301,7 @@ private_packet (liextModule* self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
 	livox_manager_update (self->voxels, secs);
@@ -310,10 +310,10 @@ private_tick (liextModule* self,
 }
 
 static int
-private_voxel_assign (liextModule* self,
-                      liarcReader* reader)
+private_voxel_assign (LIExtModule* self,
+                      LIArcReader* reader)
 {
-	livoxMaterial* material;
+	LIVoxMaterial* material;
 
 	while (!liarc_reader_check_end (reader))
 	{
@@ -328,15 +328,15 @@ private_voxel_assign (liextModule* self,
 }
 
 static int
-private_voxel_diff (liextModule* self,
-                    liarcReader* reader)
+private_voxel_diff (LIExtModule* self,
+                    LIArcReader* reader)
 {
 	uint8_t sectorx;
 	uint8_t sectory;
 	uint8_t sectorz;
 	uint16_t blockid;
-	livoxBlock* block;
-	livoxSector* sector;
+	LIVoxBlock* block;
+	LIVoxSector* sector;
 
 	while (!liarc_reader_check_end (reader))
 	{

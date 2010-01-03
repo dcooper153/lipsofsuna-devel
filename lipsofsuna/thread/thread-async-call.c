@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,15 +18,15 @@
 /**
  * \addtogroup lithr Thread
  * @{
- * \addtogroup lithrAsyncCall Async Call
+ * \addtogroup LIThrAsyncCall Async Call
  * @{
  */
 
 #include <pthread.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "thread-async-call.h"
 
-struct _lithrAsyncCall
+struct _LIThrAsyncCall
 {
 	pthread_t thread;
 	int done;
@@ -43,14 +43,14 @@ private_thread (void* data);
 
 /*****************************************************************************/
 
-lithrAsyncCall*
+LIThrAsyncCall*
 lithr_async_call_new (lithrAsyncFunc func,
                       lithrAsyncFunc freecb,
                       void*          data)
 {
-	lithrAsyncCall* self;
+	LIThrAsyncCall* self;
 
-	self = lisys_calloc (1, sizeof (lithrAsyncCall));
+	self = lisys_calloc (1, sizeof (LIThrAsyncCall));
 	if (self == NULL)
 		return NULL;
 	self->data = data;
@@ -67,7 +67,7 @@ lithr_async_call_new (lithrAsyncFunc func,
 }
 
 void
-lithr_async_call_free (lithrAsyncCall* self)
+lithr_async_call_free (LIThrAsyncCall* self)
 {
 	lithr_async_call_join (self);
 	if (self->free != NULL)
@@ -76,58 +76,58 @@ lithr_async_call_free (lithrAsyncCall* self)
 }
 
 int
-lithr_async_call_join (lithrAsyncCall* self)
+lithr_async_call_join (LIThrAsyncCall* self)
 {
 	pthread_join (self->thread, NULL);
 	return self->result;
 }
 
 void
-lithr_async_call_stop (lithrAsyncCall* self)
+lithr_async_call_stop (LIThrAsyncCall* self)
 {
 	self->stop = 1;
 }
 
 int
-lithr_async_call_get_done (lithrAsyncCall* self)
+lithr_async_call_get_done (LIThrAsyncCall* self)
 {
 	return self->done;
 }
 
 float
-lithr_async_call_get_progress (lithrAsyncCall* self)
+lithr_async_call_get_progress (LIThrAsyncCall* self)
 {
 	return self->progress;
 }
 
 void
-lithr_async_call_set_progress (lithrAsyncCall* self,
+lithr_async_call_set_progress (LIThrAsyncCall* self,
                                float           value)
 {
 	self->progress = value;
 }
 
 int
-lithr_async_call_get_result (lithrAsyncCall* self)
+lithr_async_call_get_result (LIThrAsyncCall* self)
 {
 	return self->result;
 }
 
 void
-lithr_async_call_set_result (lithrAsyncCall* self,
+lithr_async_call_set_result (LIThrAsyncCall* self,
                              int             value)
 {
 	self->result = value;
 }
 
 int
-lithr_async_call_get_stop (lithrAsyncCall* self)
+lithr_async_call_get_stop (LIThrAsyncCall* self)
 {
 	return self->stop;
 }
 
 void*
-lithr_async_call_get_userdata (lithrAsyncCall* self)
+lithr_async_call_get_userdata (LIThrAsyncCall* self)
 {
 	return self->data;
 }
@@ -137,7 +137,7 @@ lithr_async_call_get_userdata (lithrAsyncCall* self)
 static void*
 private_thread (void* data)
 {
-	lithrAsyncCall* self;
+	LIThrAsyncCall* self;
 
 	self = data;
 	self->func (self, self->data);

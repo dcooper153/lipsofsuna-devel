@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgManager Manager
+ * \addtogroup LIWdgManager Manager
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "widget-group.h"
 #include "widget-manager.h"
 
@@ -45,21 +45,21 @@ enum
 	LIWDG_MATCH_TOPRIGHT,
 };
 
-liwdgWidget*
-private_find_window (liwdgManager* self,
+LIWdgWidget*
+private_find_window (LIWdgManager* self,
                      int           x,
                      int           y,
                      int*          match);
 
 static int
-private_focus_root (liwdgManager* self);
+private_focus_root (LIWdgManager* self);
 
 static int
-private_focus_window (liwdgManager* self,
+private_focus_window (LIWdgManager* self,
                       int           next);
 
 static int
-private_load_config (liwdgManager* self,
+private_load_config (LIWdgManager* self,
                      const char*   root);
 
 /*****************************************************************************/
@@ -72,15 +72,15 @@ private_load_config (liwdgManager* self,
  * \param root Client data directory root.
  * \return New widget manager or NULL.
  */
-liwdgManager*
-liwdg_manager_new (lividCalls*     video,
-                   licalCallbacks* callbacks,
+LIWdgManager*
+liwdg_manager_new (LIVidCalls*     video,
+                   LICalCallbacks* callbacks,
                    const char*     root)
 {
-	liwdgManager* self;
+	LIWdgManager* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liwdgManager));
+	self = lisys_calloc (1, sizeof (LIWdgManager));
 	if (self == NULL)
 		return NULL;
 	self->callbacks = callbacks;
@@ -105,7 +105,7 @@ liwdg_manager_new (lividCalls*     video,
  * \param self Widget manager.
  */
 void
-liwdg_manager_free (liwdgManager* self)
+liwdg_manager_free (LIWdgManager* self)
 {
 	assert (self->widgets.dialogs == NULL);
 	assert (self->widgets.root == NULL);
@@ -123,23 +123,23 @@ liwdg_manager_free (liwdgManager* self)
  * \param ... List of pointer-to-pointer and pointer pairs terminated by NULL.
  */
 int
-liwdg_manager_alloc_widgets (liwdgManager* self,
+liwdg_manager_alloc_widgets (LIWdgManager* self,
                                            ...)
 {
 	int fail;
 	va_list args;
-	liwdgWidget* ptr;
-	liwdgWidget** pptr;
+	LIWdgWidget* ptr;
+	LIWdgWidget** pptr;
 
 	/* Check for errors. */
 	fail = 0;
 	va_start (args, self);
 	while (1)
 	{
-		pptr = va_arg (args, liwdgWidget**);
+		pptr = va_arg (args, LIWdgWidget**);
 		if (pptr == NULL)
 			break;
-		ptr = va_arg (args, liwdgWidget*);
+		ptr = va_arg (args, LIWdgWidget*);
 		if (ptr == NULL)
 		{
 			fail = 1;
@@ -152,10 +152,10 @@ liwdg_manager_alloc_widgets (liwdgManager* self,
 		va_start (args, self);
 		while (1)
 		{
-			pptr = va_arg (args, liwdgWidget**);
+			pptr = va_arg (args, LIWdgWidget**);
 			if (pptr == NULL)
 				break;
-			ptr = va_arg (args, liwdgWidget*);
+			ptr = va_arg (args, LIWdgWidget*);
 			if (ptr != NULL)
 				liwdg_widget_free (ptr);
 		}
@@ -167,10 +167,10 @@ liwdg_manager_alloc_widgets (liwdgManager* self,
 	va_start (args, self);
 	while (1)
 	{
-		pptr = va_arg (args, liwdgWidget**);
+		pptr = va_arg (args, LIWdgWidget**);
 		if (pptr == NULL)
 			break;
-		ptr = va_arg (args, liwdgWidget*);
+		ptr = va_arg (args, LIWdgWidget*);
 		assert (ptr != NULL);
 		*pptr = ptr;
 	}
@@ -180,11 +180,11 @@ liwdg_manager_alloc_widgets (liwdgManager* self,
 }
 
 void
-liwdg_manager_cycle_focus (liwdgManager* self,
+liwdg_manager_cycle_focus (LIWdgManager* self,
                            int           next)
 {
-	liwdgWidget* tmp;
-	liwdgWidget* widget;
+	LIWdgWidget* tmp;
+	LIWdgWidget* widget;
 
 	/* Ensure toplevel focus. */
 	if (self->focus.keyboard == NULL)
@@ -211,7 +211,7 @@ liwdg_manager_cycle_focus (liwdgManager* self,
 }
 
 void
-liwdg_manager_cycle_window_focus (liwdgManager* self,
+liwdg_manager_cycle_window_focus (LIWdgManager* self,
                                   int           next)
 {
 	if (!private_focus_window (self, next))
@@ -221,15 +221,15 @@ liwdg_manager_cycle_window_focus (liwdgManager* self,
 	}
 }
 
-lifntFont*
-liwdg_manager_find_font (liwdgManager* self,
+LIFntFont*
+liwdg_manager_find_font (LIWdgManager* self,
                          const char*   name)
 {
 	return lialg_strdic_find (self->styles->fonts, name);
 }
 
-liwdgStyle*
-liwdg_manager_find_style (liwdgManager* self,
+LIWdgStyle*
+liwdg_manager_find_style (LIWdgManager* self,
                           const char*   name)
 {
 	return lialg_strdic_find (self->styles->subimgs, name);
@@ -246,8 +246,8 @@ liwdg_manager_find_style (liwdgManager* self,
  * \param y Screen Y coordinate.
  * \return Widget or NULL.
  */
-liwdgWidget*
-liwdg_manager_find_window_by_point (liwdgManager* self,
+LIWdgWidget*
+liwdg_manager_find_window_by_point (LIWdgManager* self,
                                     int           x,
                                     int           y)
 {
@@ -262,9 +262,9 @@ liwdg_manager_find_window_by_point (liwdgManager* self,
  * \param self Widget manager.
  */
 void
-liwdg_manager_fix_focus (liwdgManager* self)
+liwdg_manager_fix_focus (LIWdgManager* self)
 {
-	liwdgWidget* widget;
+	LIWdgWidget* widget;
 
 	for (widget = self->widgets.grab ; widget != NULL ; widget = widget->parent)
 	{
@@ -305,15 +305,15 @@ liwdg_manager_fix_focus (liwdgManager* self)
  * \return Nonzero if handled, zero if passed through.
  */
 int
-liwdg_manager_event (liwdgManager* self,
+liwdg_manager_event (LIWdgManager* self,
                      liwdgEvent*   event)
 {
 	int x;
 	int y;
 	int match;
 	liwdgEvent popup;
-	liwdgRect rect;
-	liwdgWidget* widget;
+	LIWdgRect rect;
+	LIWdgWidget* widget;
 
 	/* Maintain pointer position. */
 	switch (event->type)
@@ -460,7 +460,7 @@ liwdg_manager_event (liwdgManager* self,
  * \return Nonzero if handled, zero if passed through.
  */
 int
-liwdg_manager_event_sdl (liwdgManager* self,
+liwdg_manager_event_sdl (LIWdgManager* self,
                          SDL_Event*    event)
 {
 	liwdgEvent evt;
@@ -507,8 +507,8 @@ liwdg_manager_event_sdl (liwdgManager* self,
 }
 
 int
-liwdg_manager_insert_popup (liwdgManager* self,
-                            liwdgWidget*  widget)
+liwdg_manager_insert_popup (LIWdgManager* self,
+                            LIWdgWidget*  widget)
 {
 	assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
 
@@ -523,10 +523,10 @@ liwdg_manager_insert_popup (liwdgManager* self,
 }
 
 int
-liwdg_manager_insert_window (liwdgManager* self,
-                             liwdgWidget*  widget)
+liwdg_manager_insert_window (LIWdgManager* self,
+                             LIWdgWidget*  widget)
 {
-	liwdgSize size;
+	LIWdgSize size;
 
 	assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
 
@@ -552,8 +552,8 @@ liwdg_manager_insert_window (liwdgManager* self,
 }
 
 int
-liwdg_manager_remove_popup (liwdgManager* self,
-                            liwdgWidget*  widget)
+liwdg_manager_remove_popup (LIWdgManager* self,
+                            LIWdgWidget*  widget)
 {
 	assert (widget->prev != NULL || widget == self->widgets.popups);
 	assert (widget->state == LIWDG_WIDGET_STATE_POPUP);
@@ -578,8 +578,8 @@ liwdg_manager_remove_popup (liwdgManager* self,
 }
 
 int
-liwdg_manager_remove_window (liwdgManager* self,
-                             liwdgWidget*  widget)
+liwdg_manager_remove_window (LIWdgManager* self,
+                             LIWdgWidget*  widget)
 {
 	assert (widget->prev != NULL || widget == self->widgets.dialogs);
 	assert (widget->next != NULL || widget == self->widgets.active);
@@ -607,9 +607,9 @@ liwdg_manager_remove_window (liwdgManager* self,
 }
 
 void
-liwdg_manager_render (liwdgManager* self)
+liwdg_manager_render (LIWdgManager* self)
 {
-	liwdgWidget* widget;
+	LIWdgWidget* widget;
 
 	/* Setup viewport. */
 	glViewport (0, 0, self->width, self->height);
@@ -634,22 +634,22 @@ liwdg_manager_render (liwdgManager* self)
 	if (self->widgets.root != NULL)
 	{
 		if (liwdg_widget_get_visible (self->widgets.root))
-			liwdg_widget_render (self->widgets.root);
+			liwdg_widget_draw (self->widgets.root);
 	}
 	for (widget = self->widgets.dialogs ; widget != NULL ; widget = widget->next)
 	{
 		if (liwdg_widget_get_visible (widget))
-			liwdg_widget_render (widget);
+			liwdg_widget_draw (widget);
 	}
 	for (widget = self->widgets.popups ; widget != NULL ; widget = widget->next)
 	{
 		if (liwdg_widget_get_visible (widget))
-			liwdg_widget_render (widget);
+			liwdg_widget_draw (widget);
 	}
 }
 
 void
-liwdg_manager_update (liwdgManager* self,
+liwdg_manager_update (LIWdgManager* self,
                       float         secs)
 {
 	int x;
@@ -658,9 +658,9 @@ liwdg_manager_update (liwdgManager* self,
 	int cy;
 	int buttons;
 	liwdgEvent event;
-	liwdgRect rect;
-	liwdgSize size;
-	liwdgWidget* widget;
+	LIWdgRect rect;
+	LIWdgSize size;
+	LIWdgWidget* widget;
 
 	if (self->widgets.grab != NULL)
 	{
@@ -703,18 +703,18 @@ liwdg_manager_update (liwdgManager* self,
 	}
 }
 
-liwdgWidget*
-liwdg_manager_get_focus_keyboard (liwdgManager* self)
+LIWdgWidget*
+liwdg_manager_get_focus_keyboard (LIWdgManager* self)
 {
 	return self->focus.keyboard;
 }
 
 void
-liwdg_manager_set_focus_keyboard (liwdgManager* self,
-                                  liwdgWidget*  widget)
+liwdg_manager_set_focus_keyboard (LIWdgManager* self,
+                                  LIWdgWidget*  widget)
 {
 	liwdgEvent event;
-	liwdgWidget* focus;
+	LIWdgWidget* focus;
 
 	focus = self->focus.keyboard;
 	if (focus == widget)
@@ -734,18 +734,18 @@ liwdg_manager_set_focus_keyboard (liwdgManager* self,
 	}
 }
 
-liwdgWidget*
-liwdg_manager_get_focus_mouse (liwdgManager* self)
+LIWdgWidget*
+liwdg_manager_get_focus_mouse (LIWdgManager* self)
 {
 	return self->focus.mouse;
 }
 
 void
-liwdg_manager_set_focus_mouse (liwdgManager* self,
-                               liwdgWidget*  widget)
+liwdg_manager_set_focus_mouse (LIWdgManager* self,
+                               LIWdgWidget*  widget)
 {
 	liwdgEvent event;
-	liwdgWidget* focus;
+	LIWdgWidget* focus;
 
 	focus = self->focus.mouse;
 	if (focus == widget)
@@ -772,8 +772,8 @@ liwdg_manager_set_focus_mouse (liwdgManager* self,
  * \param matrix Return location for the projection matrix.
  */
 void
-liwdg_manager_get_projection (liwdgManager* self,
-                              limatMatrix*  matrix)
+liwdg_manager_get_projection (LIWdgManager* self,
+                              LIMatMatrix*  matrix)
 {
 	*matrix = self->projection;
 }
@@ -784,8 +784,8 @@ liwdg_manager_get_projection (liwdgManager* self,
  * \param self Widget manager.
  * \return Widget owned by the widget manager or NULL.
  */
-liwdgWidget*
-liwdg_manager_get_root (liwdgManager* self)
+LIWdgWidget*
+liwdg_manager_get_root (LIWdgManager* self)
 {
 	return self->widgets.root;
 }
@@ -797,8 +797,8 @@ liwdg_manager_get_root (liwdgManager* self)
  * \param widget Widget or NULL.
  */
 void
-liwdg_manager_set_root (liwdgManager* self,
-                        liwdgWidget*  widget)
+liwdg_manager_set_root (LIWdgManager* self,
+                        LIWdgWidget*  widget)
 {
 	if (self->widgets.root == widget)
 		return;
@@ -834,7 +834,7 @@ liwdg_manager_set_root (liwdgManager* self,
  * \param height Return location for the height or NULL.
  */
 void
-liwdg_manager_get_size (liwdgManager* self,
+liwdg_manager_get_size (LIWdgManager* self,
                         int*          width,
                         int*          height)
 {
@@ -852,7 +852,7 @@ liwdg_manager_get_size (liwdgManager* self,
  * \param height Height in pixels.
  */
 void
-liwdg_manager_set_size (liwdgManager* self,
+liwdg_manager_set_size (LIWdgManager* self,
                         int           width,
                         int           height)
 {
@@ -865,14 +865,14 @@ liwdg_manager_set_size (liwdgManager* self,
 
 /*****************************************************************************/
 
-liwdgWidget*
-private_find_window (liwdgManager* self,
+LIWdgWidget*
+private_find_window (LIWdgManager* self,
                      int           x,
                      int           y,
                      int*          match)
 {
-	liwdgRect rect;
-	liwdgWidget* widget;
+	LIWdgRect rect;
+	LIWdgWidget* widget;
 
 	if (self->widgets.dialogs != NULL)
 	{
@@ -962,17 +962,17 @@ private_find_window (liwdgManager* self,
 }
 
 static int
-private_focus_root (liwdgManager* self)
+private_focus_root (LIWdgManager* self)
 {
-	liwdgWidget* tmp;
-	liwdgWidget* widget;
+	LIWdgWidget* tmp;
+	LIWdgWidget* widget;
 
 	widget = self->widgets.root;
 	if (widget == NULL)
 		return 0;
 	if (!liwdg_widget_get_visible (widget))
 		return 0;
-	if (liwdg_widget_typeis (widget, &liwdgContainerType))
+	if (liwdg_widget_typeis (widget, &liwdg_widget_container))
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, 1);
 		if (tmp != NULL)
@@ -991,11 +991,11 @@ private_focus_root (liwdgManager* self)
 }
 
 static int
-private_focus_window (liwdgManager* self,
+private_focus_window (LIWdgManager* self,
                       int           next)
 {
-	liwdgWidget* tmp;
-	liwdgWidget* widget;
+	LIWdgWidget* tmp;
+	LIWdgWidget* widget;
 
 	/* Find current toplevel. */
 	if (self->focus.keyboard != NULL)
@@ -1036,7 +1036,7 @@ private_focus_window (liwdgManager* self,
 	{
 		if (liwdg_widget_get_visible (widget))
 		{
-			if (liwdg_widget_typeis (widget, &liwdgContainerType))
+			if (liwdg_widget_typeis (widget, &liwdg_widget_container))
 			{
 				tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
 				if (tmp != NULL)
@@ -1062,7 +1062,7 @@ private_focus_window (liwdgManager* self,
 }
 
 static int
-private_load_config (liwdgManager* self,
+private_load_config (LIWdgManager* self,
                      const char*   root)
 {
 	self->styles = liwdg_styles_new (self, root);

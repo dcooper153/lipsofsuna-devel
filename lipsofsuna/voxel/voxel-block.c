@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxBlock Block
+ * \addtogroup LIVoxBlock Block
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "voxel.h"
 #include "voxel-block.h"
 #include "voxel-manager.h"
@@ -35,8 +35,8 @@
  * \param manager Voxel manager.
  */
 void
-livox_block_free (livoxBlock*   self,
-                  livoxManager* manager)
+livox_block_free (LIVoxBlock*   self,
+                  LIVoxManager* manager)
 {
 }
 
@@ -48,9 +48,9 @@ livox_block_free (livoxBlock*   self,
  * \param terrain Terrain type.
  */
 void
-livox_block_fill (livoxBlock*   self,
-                  livoxManager* manager,
-                  livoxVoxel*   terrain)
+livox_block_fill (LIVoxBlock*   self,
+                  LIVoxManager* manager,
+                  LIVoxVoxel*   terrain)
 {
 	int i;
 
@@ -66,7 +66,7 @@ livox_block_fill (livoxBlock*   self,
  * \param self Block.
  */
 void
-livox_block_optimize (livoxBlock* self)
+livox_block_optimize (LIVoxBlock* self)
 {
 	/* TODO? */
 }
@@ -80,9 +80,9 @@ livox_block_optimize (livoxBlock* self)
  * \return Nonzero on success.
  */
 int
-livox_block_read (livoxBlock*   self,
-                  livoxManager* manager,
-                  liarcReader*  reader)
+livox_block_read (LIVoxBlock*   self,
+                  LIVoxManager* manager,
+                  LIArcReader*  reader)
 {
 	int x;
 	int y;
@@ -90,7 +90,7 @@ livox_block_read (livoxBlock*   self,
 	uint8_t damage;
 	uint8_t rotation;
 	uint16_t terrain;
-	livoxVoxel tmp;
+	LIVoxVoxel tmp;
 
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
@@ -117,8 +117,8 @@ livox_block_read (livoxBlock*   self,
  * \return Nonzero on success.
  */
 int
-livox_block_write (livoxBlock*  self,
-                   liarcWriter* writer)
+livox_block_write (LIVoxBlock*  self,
+                   LIArcWriter* writer)
 {
 	int i;
 
@@ -140,7 +140,7 @@ livox_block_write (livoxBlock*  self,
  * \return Nonzero if dirty.
  */
 int
-livox_block_get_dirty (const livoxBlock* self)
+livox_block_get_dirty (const LIVoxBlock* self)
 {
 	return self->dirty;
 }
@@ -152,7 +152,7 @@ livox_block_get_dirty (const livoxBlock* self)
  * \param value Zero to clear, nonzero to set.
  */
 void
-livox_block_set_dirty (livoxBlock* self,
+livox_block_set_dirty (LIVoxBlock* self,
                        int         value)
 {
 	self->dirty = value;
@@ -165,7 +165,7 @@ livox_block_set_dirty (livoxBlock* self,
  * \return Boolean.
  */
 int
-livox_block_get_empty (const livoxBlock* self)
+livox_block_get_empty (const LIVoxBlock* self)
 {
 #warning livox_block_get_empty not implemented.
 	return 0;//self->objects.count == 0;
@@ -178,7 +178,7 @@ livox_block_get_empty (const livoxBlock* self)
  * \return Modification stamp.
  */
 int
-livox_block_get_stamp (const livoxBlock* self)
+livox_block_get_stamp (const LIVoxBlock* self)
 {
 	return self->stamp;
 }
@@ -192,8 +192,8 @@ livox_block_get_stamp (const livoxBlock* self)
  * \param z Offset of the voxel within the block.
  * \return Terrain type or zero.
  */
-livoxVoxel*
-livox_block_get_voxel (livoxBlock* self,
+LIVoxVoxel*
+livox_block_get_voxel (LIVoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z)
@@ -214,11 +214,11 @@ livox_block_get_voxel (livoxBlock* self,
  * \return Nonzero if a voxel was modified.
  */
 int
-livox_block_set_voxel (livoxBlock* self,
+livox_block_set_voxel (LIVoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z,
-                       livoxVoxel* voxel)
+                       LIVoxVoxel* voxel)
 {
 	int i;
 

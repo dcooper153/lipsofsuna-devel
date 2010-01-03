@@ -25,106 +25,106 @@
 #include "client.h"
 
 static int
-private_engine_free (licliClient* self,
-                     liengEngine* engine)
+private_engine_free (LICliClient* self,
+                     LIEngEngine* engine)
 {
 	if (self->scene != NULL)
-		lirnd_scene_free (self->scene);
+		liren_scene_free (self->scene);
 	if (self->render != NULL)
-		lirnd_render_free (self->render);
+		liren_render_free (self->render);
 
 	return 1;
 }
 
 static int
-private_object_new (licliClient* self,
-                    liengObject* object)
+private_object_new (LICliClient* self,
+                    LIEngObject* object)
 {
-	lirnd_object_new (self->scene, object->id);
+	liren_object_new (self->scene, object->id);
 
 	return 1;
 }
 
 static int
-private_object_free (licliClient* self,
-                     liengObject* object)
+private_object_free (LICliClient* self,
+                     LIEngObject* object)
 {
-	lirndObject* object_;
+	LIRenObject* object_;
 
-	object_ = lirnd_scene_find_object (self->scene, object->id);
+	object_ = liren_scene_find_object (self->scene, object->id);
 	if (object_ != NULL)
-		lirnd_object_free (object_);
+		liren_object_free (object_);
 
 	return 1;
 }
 
 static int
-private_object_model (licliClient* self,
-                      liengObject* object,
-                      liengModel*  model)
+private_object_model (LICliClient* self,
+                      LIEngObject* object,
+                      LIEngModel*  model)
 {
-	lirndObject* object_;
-	lirndModel* model_;
+	LIRenObject* object_;
+	LIRenModel* model_;
 
-	object_ = lirnd_scene_find_object (self->scene, object->id);
+	object_ = liren_scene_find_object (self->scene, object->id);
 	if (object_ != NULL)
 	{
 		if (model != NULL)
 		{
-			model_ = lirnd_render_find_model (self->render, model->name);
+			model_ = liren_render_find_model (self->render, model->name);
 			if (model_ == NULL)
 			{
-				lirnd_render_load_model (self->render, model->name, model->model);
-				model_ = lirnd_render_find_model (self->render, model->name);
+				liren_render_load_model (self->render, model->name, model->model);
+				model_ = liren_render_find_model (self->render, model->name);
 			}
 			if (model_ != NULL)
 			{
-				lirnd_object_set_pose (object_, object->pose);
-				lirnd_object_set_model (object_, model_);
+				liren_object_set_pose (object_, object->pose);
+				liren_object_set_model (object_, model_);
 				return 1;
 			}
 		}
-		lirnd_object_set_pose (object_, NULL);
-		lirnd_object_set_model (object_, NULL);
+		liren_object_set_pose (object_, NULL);
+		liren_object_set_model (object_, NULL);
 	}
 
 	return 1;
 }
 
 static int
-private_object_realize (licliClient* self,
-                        liengObject* object,
+private_object_realize (LICliClient* self,
+                        LIEngObject* object,
                         int          value)
 {
-	lirndObject* object_;
+	LIRenObject* object_;
 
-	object_ = lirnd_scene_find_object (self->scene, object->id);
+	object_ = liren_scene_find_object (self->scene, object->id);
 	if (object_ != NULL)
-		lirnd_object_set_realized (object_, value);
+		liren_object_set_realized (object_, value);
 
 	return 1;
 }
 
 static int
-private_object_transform (licliClient*    self,
-                          liengObject*    object,
-                          limatTransform* value)
+private_object_transform (LICliClient*    self,
+                          LIEngObject*    object,
+                          LIMatTransform* value)
 {
-	lirndObject* object_;
+	LIRenObject* object_;
 
-	object_ = lirnd_scene_find_object (self->scene, object->id);
+	object_ = liren_scene_find_object (self->scene, object->id);
 	if (object_ != NULL)
-		lirnd_object_set_transform (object_, value);
+		liren_object_set_transform (object_, value);
 
 	return 1;
 }
 
 static int
-private_engine_tick (licliClient* self,
+private_engine_tick (LICliClient* self,
                      float        secs)
 {
-	lirnd_render_update (self->render, secs);
-	lirnd_scene_update (self->scene, secs);
+	liren_render_update (self->render, secs);
+	liren_scene_update (self->scene, secs);
 
 	return 1;
 }
@@ -132,7 +132,7 @@ private_engine_tick (licliClient* self,
 /*****************************************************************************/
 
 int
-licli_render_init (licliClient* self)
+licli_render_init (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self->engine, "engine-free", 1, private_engine_free, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "engine-tick", 1, private_engine_tick, self, NULL);

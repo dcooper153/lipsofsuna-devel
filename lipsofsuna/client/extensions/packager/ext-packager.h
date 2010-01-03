@@ -27,64 +27,64 @@
 #ifndef __EXT_PACKAGER_H__
 #define __EXT_PACKAGER_H__
 
-#include <archive/lips-archive.h>
-#include <client/lips-client.h>
-#include <config/lips-config.h>
-#include <thread/lips-thread.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/config.h>
+#include <lipsofsuna/thread.h>
 #include "ext-resources.h"
 
-typedef struct _liextPackagerFile liextPackagerFile;
-struct _liextPackagerFile
+typedef struct _LIExtPackagerFile LIExtPackagerFile;
+struct _LIExtPackagerFile
 {
 	char* src;
 	char* dst;
 };
 
-typedef struct _liextPackager liextPackager;
-struct _liextPackager
+typedef struct _LIExtPackager LIExtPackager;
+struct _LIExtPackager
 {
 	int verbose;
-	licliClient* client;
-	lithrAsyncCall* worker;
-	liwdgWidget* progress;
+	LICliClient* client;
+	LIThrAsyncCall* worker;
+	LIWdgWidget* progress;
 };
 
-typedef struct _liextPackagerData liextPackagerData;
-struct _liextPackagerData
+typedef struct _LIExtPackagerData LIExtPackagerData;
+struct _LIExtPackagerData
 {
 	char* target;
 	char* directory;
-	liarcTar* tar;
-	liarcWriter* writer;
-	licliClient* client;
-	liextPackager* packager;
-	liextResources* resources;
+	LIArcTar* tar;
+	LIArcWriter* writer;
+	LICliClient* client;
+	LIExtPackager* packager;
+	LIExtResources* resources;
 	struct
 	{
 		int count;
-		liextPackagerFile* array;
+		LIExtPackagerFile* array;
 	} files;
 };
 
-liextPackager*
-liext_packager_new (licliClient* client);
+LIExtPackager*
+liext_packager_new (LICliClient* client);
 
 void
-liext_packager_free (liextPackager* self);
+liext_packager_free (LIExtPackager* self);
 
 void
-liext_packager_cancel (liextPackager* self);
+liext_packager_cancel (LIExtPackager* self);
 
 int
-liext_packager_save (liextPackager* self,
+liext_packager_save (LIExtPackager* self,
                      const char*    name,
                      const char*    dir);
 
 int
-liext_packager_get_verbose (liextPackager* self);
+liext_packager_get_verbose (LIExtPackager* self);
 
 void
-liext_packager_set_verbose (liextPackager* self,
+liext_packager_set_verbose (LIExtPackager* self,
                             int            value);
 
 #endif

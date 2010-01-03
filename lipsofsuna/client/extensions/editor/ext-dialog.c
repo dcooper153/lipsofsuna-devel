@@ -24,52 +24,52 @@
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "ext-dialog.h"
 
 static const void*
 private_base ();
 
 static int
-private_init (liextDialog*    self,
-              liwdgManager* manager);
+private_init (LIExtDialog*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liextDialog* self);
+private_free (LIExtDialog* self);
 
 static int
-private_delete (liextDialog* self);
+private_delete (LIExtDialog* self);
 
 static int
-private_duplicate (liextDialog* self);
+private_duplicate (LIExtDialog* self);
 
 static int
-private_edit (liextDialog* self);
+private_edit (LIExtDialog* self);
 
 static int
-private_event (liextDialog* self,
+private_event (LIExtDialog* self,
                liwdgEvent*  event);
 
 static int
-private_insert (liextDialog* self);
+private_insert (LIExtDialog* self);
 
 /****************************************************************************/
 
-const liwdgClass liextDialogType =
+const LIWdgClass liext_widget_dialog =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "EditorDialog", sizeof (liextDialog),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "EditorDialog", sizeof (LIExtDialog),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_dialog_new (liwdgManager* manager,
-                  liextEditor*  editor)
+LIWdgWidget*
+liext_dialog_new (LIWdgManager* manager,
+                  LIExtEditor*  editor)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liextDialogType);
+	self = liwdg_widget_new (manager, &liext_widget_dialog);
 	if (self == NULL)
 		return NULL;
 	LIEXT_DIALOG (self)->editor = editor;
@@ -78,11 +78,11 @@ liext_dialog_new (liwdgManager* manager,
 	return self;
 }
 
-liengModel*
-liext_dialog_get_model (liextDialog* self)
+LIEngModel*
+liext_dialog_get_model (LIExtDialog* self)
 {
 	const char* str;
-	liengModel* model;
+	LIEngModel* model;
 
 	str = liwdg_entry_get_text (LIWDG_ENTRY (self->entry_model));
 	model = lieng_engine_find_model_by_name (self->client->engine, str);
@@ -95,15 +95,15 @@ liext_dialog_get_model (liextDialog* self)
 static const void*
 private_base ()
 {
-	return &liwdgWindowType;
+	return &liwdg_widget_window;
 }
 
 static int
-private_init (liextDialog*   self,
-              liwdgManager* manager)
+private_init (LIExtDialog*   self,
+              LIWdgManager* manager)
 {
 	int i;
-	liwdgWidget* widgets[] =
+	LIWdgWidget* widgets[] =
 	{
 		liwdg_group_new_with_size (manager, 2, 1),
 		liwdg_label_new (manager),
@@ -117,7 +117,7 @@ private_init (liextDialog*   self,
 	/* Check memory. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 5))
 		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			goto error;
@@ -164,7 +164,7 @@ private_init (liextDialog*   self,
 	return 1;
 
 error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			liwdg_widget_free (widgets[i]);
@@ -173,26 +173,26 @@ error:
 }
 
 static void
-private_free (liextDialog* self)
+private_free (LIExtDialog* self)
 {
 }
 
 static int
-private_delete (liextDialog* self)
+private_delete (LIExtDialog* self)
 {
 	liext_editor_destroy (self->editor);
 	return 0;
 }
 
 static int
-private_duplicate (liextDialog* self)
+private_duplicate (LIExtDialog* self)
 {
 	liext_editor_duplicate (self->editor);
 	return 0;
 }
 
 static int
-private_edit (liextDialog* self)
+private_edit (LIExtDialog* self)
 {
 	char* name;
 	const char* tmp;
@@ -213,19 +213,19 @@ private_edit (liextDialog* self)
 }
 
 static int
-private_event (liextDialog* self,
+private_event (LIExtDialog* self,
                liwdgEvent*  event)
 {
-	return liwdgWindowType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_window.event (LIWDG_WIDGET (self), event);
 }
 
 static int
-private_insert (liextDialog* self)
+private_insert (LIExtDialog* self)
 {
-	liengModel* model;
-	limatVector position;
-	limatQuaternion rotation;
-	limatTransform transform;
+	LIEngModel* model;
+	LIMatVector position;
+	LIMatQuaternion rotation;
+	LIMatTransform transform;
 
 	model = liext_dialog_get_model (self);
 	if (model == NULL)

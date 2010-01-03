@@ -24,41 +24,41 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-module.h"
 
-licliExtensionInfo liextInfo =
+LICliExtensionInfo liextInfo =
 {
 	LICLI_EXTENSION_VERSION, "Widgets",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
+	LIExtModule* self;
 
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
 
-	liscr_script_create_class (client->script, "Button", liextButtonScript, self);
-	liscr_script_create_class (client->script, "Entry", liextEntryScript, self);
-	liscr_script_create_class (client->script, "Image", liextImageScript, self);
-	liscr_script_create_class (client->script, "Label", liextLabelScript, self);
-	liscr_script_create_class (client->script, "Menu", liextMenuScript, self);
-	liscr_script_create_class (client->script, "Scroll", liextScrollScript, self);
-	liscr_script_create_class (client->script, "Spin", liextSpinScript, self);
-	liscr_script_create_class (client->script, "Tree", liextTreeScript, self);
-	liscr_script_create_class (client->script, "View", liextViewScript, self);
+	liscr_script_create_class (client->script, "Button", liext_script_button, self);
+	liscr_script_create_class (client->script, "Entry", liext_script_entry, self);
+	liscr_script_create_class (client->script, "Image", liext_script_image, self);
+	liscr_script_create_class (client->script, "Label", liext_script_label, self);
+	liscr_script_create_class (client->script, "Menu", liext_script_menu, self);
+	liscr_script_create_class (client->script, "Scroll", liext_script_scroll, self);
+	liscr_script_create_class (client->script, "Spin", liext_script_spin, self);
+	liscr_script_create_class (client->script, "Tree", liext_script_tree, self);
+	liscr_script_create_class (client->script, "View", liext_script_view, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	/* FIXME: Remove the class here. */
 	lisys_free (self);

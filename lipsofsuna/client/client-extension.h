@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,26 +18,26 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliExtension Extension
+ * \addtogroup LICliExtension Extension
  * @{
  */
 
 #ifndef __CLIENT_EXTENSION_H__
 #define __CLIENT_EXTENSION_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "client-types.h"
 
 #define LICLI_EXTENSION_VERSION 0xFFFFFFFF
 
-struct _licliExtension
+struct _LICliExtension
 {
-	licliExtensionInfo* info;
-	lisysModule* module;
+	LICliExtensionInfo* info;
+	LISysModule* module;
 	void* object;
 };
 
-struct _licliExtensionInfo
+struct _LICliExtensionInfo
 {
 	int version;
 	const char* name;

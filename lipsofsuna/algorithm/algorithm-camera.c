@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgCamera Camera
+ * \addtogroup LIAlgCamera Camera
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-camera.h"
 
 #define LIALG_CAMERA_DEFAULT_FOV (M_PI / 5.0f)
@@ -39,21 +39,21 @@
 #define LIALG_CAMERA_SENSITIVITY_ZOOM 1.0f
 
 static void
-private_update_1st_person (lialgCamera* self);
+private_update_1st_person (LIAlgCamera* self);
 
 static void
-private_update_3rd_person (lialgCamera* self,
+private_update_3rd_person (LIAlgCamera* self,
                            float        dist);
 
 static void
-private_update_modelview (lialgCamera* self);
+private_update_modelview (LIAlgCamera* self);
 
 static void
-private_update_orientation (lialgCamera* self,
+private_update_orientation (LIAlgCamera* self,
                             float        secs);
 
 static void
-private_update_projection (lialgCamera* self);
+private_update_projection (LIAlgCamera* self);
 
 /*****************************************************************************/
 
@@ -62,13 +62,13 @@ private_update_projection (lialgCamera* self);
  *
  * \return New camera or NULL.
  */
-lialgCamera*
+LIAlgCamera*
 lialg_camera_new ()
 {
-	lialgCamera* self;
+	LIAlgCamera* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lialgCamera));
+	self = lisys_calloc (1, sizeof (LIAlgCamera));
 	if (self == NULL)
 		return NULL;
 	self->config.driver = LIALG_CAMERA_FIRSTPERSON;
@@ -95,7 +95,7 @@ lialg_camera_new ()
  * \param self Camera.
  */
 void
-lialg_camera_free (lialgCamera* self)
+lialg_camera_free (LIAlgCamera* self)
 {
 	lisys_free (self);
 }
@@ -111,11 +111,11 @@ lialg_camera_free (lialgCamera* self)
  * \param dist Maximum distance to the target.
  */
 void
-lialg_camera_clip (lialgCamera* self,
+lialg_camera_clip (LIAlgCamera* self,
                    float        dist)
 {
-	limatVector dir;
-	limatVector pos;
+	LIMatVector dir;
+	LIMatVector pos;
 
 	if (self->config.driver != LIALG_CAMERA_THIRDPERSON || dist >= self->config.distance)
 		return;
@@ -134,13 +134,13 @@ lialg_camera_clip (lialgCamera* self,
  * \param value Movement amount.
  */
 void
-lialg_camera_move (lialgCamera* self,
+lialg_camera_move (LIAlgCamera* self,
                    float        value)
 {
-	limatVector dir;
-	limatVector src;
-	limatVector dst;
-	limatQuaternion rot;
+	LIMatVector dir;
+	LIMatVector src;
+	LIMatVector dst;
+	LIMatQuaternion rot;
 
 	/* Calculate eye position. */
 	rot = limat_quaternion_conjugate (self->transform.current.rotation);
@@ -160,9 +160,9 @@ lialg_camera_move (lialgCamera* self,
  * \return Nonzero on success.
  */
 int
-lialg_camera_project (lialgCamera*       self,
-                      const limatVector* object,
-                      limatVector*       window)
+lialg_camera_project (LIAlgCamera*       self,
+                      const LIMatVector* object,
+                      LIMatVector*       window)
 {
 	return limat_matrix_project (
 		self->view.projection, self->view.modelview,
@@ -176,12 +176,12 @@ lialg_camera_project (lialgCamera*       self,
  * \param value Rotation in radians.
  */
 void
-lialg_camera_tilt (lialgCamera* self,
+lialg_camera_tilt (LIAlgCamera* self,
                    float        value)
 {
-	limatQuaternion rot;
-	limatTransform transform;
-	limatVector axis;
+	LIMatQuaternion rot;
+	LIMatTransform transform;
+	LIMatVector axis;
 
 	axis = limat_vector_init (1.0f, 0.0f, 0.0f);
 	rot = limat_quaternion_rotation (value, axis);
@@ -209,12 +209,12 @@ lialg_camera_tilt (lialgCamera* self,
  * \param value Rotation in radians.
  */
 void
-lialg_camera_turn (lialgCamera* self,
+lialg_camera_turn (LIAlgCamera* self,
                    float        value)
 {
-	limatQuaternion rot;
-	limatTransform transform;
-	limatVector axis;
+	LIMatQuaternion rot;
+	LIMatTransform transform;
+	LIMatVector axis;
 
 	if (self->config.driver == LIALG_CAMERA_MANUAL)
 	{
@@ -250,9 +250,9 @@ lialg_camera_turn (lialgCamera* self,
  * \return Nonzero on success.
  */
 int
-lialg_camera_unproject (lialgCamera*       self,
-                        const limatVector* window,
-                        limatVector*       object)
+lialg_camera_unproject (LIAlgCamera*       self,
+                        const LIMatVector* window,
+                        LIMatVector*       object)
 {
 	return limat_matrix_unproject (
 		self->view.projection, self->view.modelview,
@@ -266,7 +266,7 @@ lialg_camera_unproject (lialgCamera*       self,
  * \param secs Number of seconds since the last update.
  */
 void
-lialg_camera_update (lialgCamera* self,
+lialg_camera_update (LIAlgCamera* self,
                      float        secs)
 {
 	switch (self->config.driver)
@@ -294,7 +294,7 @@ lialg_camera_update (lialgCamera* self,
  * \param self Camera.
  */
 void
-lialg_camera_warp (lialgCamera* self)
+lialg_camera_warp (LIAlgCamera* self)
 {
 	switch (self->config.driver)
 	{
@@ -321,7 +321,7 @@ lialg_camera_warp (lialgCamera* self)
  * \param value Amount and direction of zoom.
  */
 void
-lialg_camera_zoom (lialgCamera* self,
+lialg_camera_zoom (LIAlgCamera* self,
                    float        value)
 {
 	self->config.distance += value * LIALG_CAMERA_SENSITIVITY_ZOOM;
@@ -339,15 +339,15 @@ lialg_camera_zoom (lialgCamera* self,
  * \param aabb Return location for the bounding box.
  */
 void
-lialg_camera_get_bounds (const lialgCamera* self,
-                         limatAabb*         aabb)
+lialg_camera_get_bounds (const LIAlgCamera* self,
+                         LIMatAabb*         aabb)
 {
 	float max;
 	float top;
 	float right;
 	float near;
-	limatVector size;
-	limatVector zero;
+	LIMatVector size;
+	LIMatVector zero;
 
 	near = self->view.near;
 	top = tan (self->view.fov * M_PI / 360.0f) * near;
@@ -366,8 +366,8 @@ lialg_camera_get_bounds (const lialgCamera* self,
  * \param result Return location for transformation.
  */
 void
-lialg_camera_get_center (lialgCamera*    self,
-                         limatTransform* result)
+lialg_camera_get_center (LIAlgCamera*    self,
+                         LIMatTransform* result)
 {
 	*result = self->transform.center;
 }
@@ -379,8 +379,8 @@ lialg_camera_get_center (lialgCamera*    self,
  * \param value Center transformation.
  */
 void
-lialg_camera_set_center (lialgCamera*          self,
-                         const limatTransform* value)
+lialg_camera_set_center (LIAlgCamera*          self,
+                         const LIMatTransform* value)
 {
 	self->transform.center = *value;
 }
@@ -391,8 +391,8 @@ lialg_camera_set_center (lialgCamera*          self,
  * \param self Camera.
  * \return Camera driver type.
  */
-lialgCameraDriver
-lialg_camera_get_driver (lialgCamera* self)
+LIAlgCameraDriver
+lialg_camera_get_driver (LIAlgCamera* self)
 {
 	return self->config.driver;
 }
@@ -404,8 +404,8 @@ lialg_camera_get_driver (lialgCamera* self)
  * \param value Camera driver type.
  */
 void
-lialg_camera_set_driver (lialgCamera*      self,
-                         lialgCameraDriver value)
+lialg_camera_set_driver (LIAlgCamera*      self,
+                         LIAlgCameraDriver value)
 {
 	self->config.driver = value;
 }
@@ -417,7 +417,7 @@ lialg_camera_set_driver (lialgCamera*      self,
  * \param value Far plane distance.
  */
 void
-lialg_camera_set_far (lialgCamera* self,
+lialg_camera_set_far (LIAlgCamera* self,
                       float        value)
 {
 	self->view.far = value;
@@ -431,8 +431,8 @@ lialg_camera_set_far (lialgCamera* self,
  * \param result Return location for frustum.
  */
 void
-lialg_camera_get_frustum (const lialgCamera* self,
-                          limatFrustum*      result)
+lialg_camera_get_frustum (const LIAlgCamera* self,
+                          LIMatFrustum*      result)
 {
 	limat_frustum_init (result,
 		&self->view.modelview,
@@ -446,8 +446,8 @@ lialg_camera_get_frustum (const lialgCamera* self,
  * \param value Return location for the matrix.
  */
 void
-lialg_camera_get_modelview (const lialgCamera* self,
-                            limatMatrix*       value)
+lialg_camera_get_modelview (const LIAlgCamera* self,
+                            LIMatMatrix*       value)
 {
 	*value = self->view.modelview;
 }
@@ -459,7 +459,7 @@ lialg_camera_get_modelview (const lialgCamera* self,
  * \param value Near plane distance.
  */
 void
-lialg_camera_set_near (lialgCamera* self,
+lialg_camera_set_near (LIAlgCamera* self,
                        float        value)
 {
 	self->view.near = value;
@@ -473,8 +473,8 @@ lialg_camera_set_near (lialgCamera* self,
  * \param value Return location for the matrix.
  */
 void
-lialg_camera_get_projection (const lialgCamera* self,
-                             limatMatrix*          value)
+lialg_camera_get_projection (const LIAlgCamera* self,
+                             LIMatMatrix*          value)
 {
 	*value = self->view.projection;
 }
@@ -489,7 +489,7 @@ lialg_camera_get_projection (const lialgCamera* self,
  * \param far Far plane distance.
  */
 void
-lialg_camera_set_projection (lialgCamera* self,
+lialg_camera_set_projection (LIAlgCamera* self,
                              float        fov,
                              float        aspect,
                              float        near,
@@ -509,8 +509,8 @@ lialg_camera_set_projection (lialgCamera* self,
  * \param value Return location for the transformation.
  */
 void
-lialg_camera_get_transform (const lialgCamera* self,
-                            limatTransform*    value)
+lialg_camera_get_transform (const LIAlgCamera* self,
+                            LIMatTransform*    value)
 {
 	*value = limat_transform_init (
 		self->transform.current.position,
@@ -524,8 +524,8 @@ lialg_camera_get_transform (const lialgCamera* self,
  * \param value Transformation.
  */
 void
-lialg_camera_set_transform (lialgCamera*          self,
-                            const limatTransform* value)
+lialg_camera_set_transform (LIAlgCamera*          self,
+                            const LIMatTransform* value)
 {
 	self->transform.target = *value;
 	private_update_modelview (self);
@@ -538,8 +538,8 @@ lialg_camera_set_transform (lialgCamera*          self,
  * \param result Return location for the up vector.
  */
 void
-lialg_camera_get_up (const lialgCamera* self,
-                     limatVector*       result)
+lialg_camera_get_up (const LIAlgCamera* self,
+                     LIMatVector*       result)
 {
 	result->x = self->view.modelview.m[1];
 	result->y = self->view.modelview.m[4];
@@ -556,7 +556,7 @@ lialg_camera_get_up (const lialgCamera* self,
  * \param height Height of the viewport.
  */
 void
-lialg_camera_set_viewport (lialgCamera* self,
+lialg_camera_set_viewport (LIAlgCamera* self,
                            int          x,
                            int          y,
                            int          width,
@@ -573,7 +573,7 @@ lialg_camera_set_viewport (lialgCamera* self,
 /*****************************************************************************/
 
 static void
-private_update_1st_person (lialgCamera* self)
+private_update_1st_person (LIAlgCamera* self)
 {
 	/* Copy center position and rotation. */
 	self->transform.target = self->transform.center;
@@ -585,10 +585,10 @@ private_update_1st_person (lialgCamera* self)
 }
 
 static void
-private_update_3rd_person (lialgCamera* self,
+private_update_3rd_person (LIAlgCamera* self,
                            float        dist)
 {
-	limatTransform transform;
+	LIMatTransform transform;
 
 	/* Copy center position and rotation. */
 	self->transform.target = self->transform.center;
@@ -606,9 +606,9 @@ private_update_3rd_person (lialgCamera* self,
 }
 
 static void
-private_update_modelview (lialgCamera* self)
+private_update_modelview (LIAlgCamera* self)
 {
-	limatTransform t;
+	LIMatTransform t;
 
 	self->transform.current.rotation = limat_quaternion_normalize (self->transform.current.rotation);
 	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
@@ -618,14 +618,14 @@ private_update_modelview (lialgCamera* self)
 }
 
 static void
-private_update_orientation (lialgCamera* self,
+private_update_orientation (LIAlgCamera* self,
                             float        secs)
 {
 	float dist;
-	limatQuaternion q;
-	limatVector dst;
-	limatVector src;
-	limatVector disp;
+	LIMatQuaternion q;
+	LIMatVector dst;
+	LIMatVector src;
+	LIMatVector disp;
 
 	/* Interpolate position. */
 	/* d' = Nd  ->  d = Cde^(Nt) */
@@ -661,7 +661,7 @@ private_update_orientation (lialgCamera* self,
 }
 
 static void
-private_update_projection (lialgCamera* self)
+private_update_projection (LIAlgCamera* self)
 {
 	self->view.projection = limat_matrix_perspective (
 		self->view.fov, self->view.aspect,

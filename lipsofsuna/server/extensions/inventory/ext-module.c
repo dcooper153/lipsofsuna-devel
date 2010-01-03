@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,34 +24,34 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-inventory.h"
 
 static int
-private_object_client (liextModule* self,
-                       liengObject* object);
+private_object_client (LIExtModule* self,
+                       LIEngObject* object);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Inventory",
+	LISER_EXTENSION_VERSION, "Inventory",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (lisrvServer* server)
+LIExtModule*
+liext_module_new (LISerServer* server)
 {
-	liextModule* self;
+	LIExtModule* self;
 
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -68,21 +68,21 @@ liext_module_new (lisrvServer* server)
 		return NULL;
 	}
 
-	liscr_script_create_class (server->script, "Inventory", liextInventoryScript, self);
+	liscr_script_create_class (server->script, "Inventory", liext_script_inventory, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	lialg_u32dic_free (self->dictionary);
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
-liextInventory*
-liext_module_find_inventory (liextModule* self,
+LIExtInventory*
+liext_module_find_inventory (LIExtModule* self,
                              uint32_t     id)
 {
 	return lialg_u32dic_find (self->dictionary, id);
@@ -91,10 +91,10 @@ liext_module_find_inventory (liextModule* self,
 /*****************************************************************************/
 
 static int
-private_object_client (liextModule* self,
-                       liengObject* object)
+private_object_client (LIExtModule* self,
+                       LIEngObject* object)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	LI_FOREACH_U32DIC (iter, self->dictionary)
 		liext_inventory_reset_listener (iter.value, object);
@@ -103,7 +103,7 @@ private_object_client (liextModule* self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
     /* FIXME. */

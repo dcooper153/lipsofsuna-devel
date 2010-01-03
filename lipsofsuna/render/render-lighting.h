@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,43 +16,43 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndLighting Lighting
+ * \addtogroup LIRenLighting Lighting
  * @{
  */
 
 #ifndef __RENDER_LIGHTING_H__
 #define __RENDER_LIGHTING_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <video/lips-video.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/video.h>
 #include "render.h"
 #include "render-light.h"
 #include "render-types.h"
 
-struct _lirndLighting
+struct _LIRenLighting
 {
-	lialgPtrdic* lights;
-	lirndRender* render;
+	LIAlgPtrdic* lights;
+	LIRenRender* render;
 };
 
-lirndLighting*
-lirnd_lighting_new (lirndRender* render);
+LIRenLighting*
+liren_lighting_new (LIRenRender* render);
 
 void
-lirnd_lighting_free (lirndLighting* self);
+liren_lighting_free (LIRenLighting* self);
 
 int
-lirnd_lighting_insert_light (lirndLighting* self,
-                             lirndLight*    light);
+liren_lighting_insert_light (LIRenLighting* self,
+                             LIRenLight*    light);
 
 void
-lirnd_lighting_remove_light (lirndLighting* self,
-                             lirndLight*    light);
+liren_lighting_remove_light (LIRenLighting* self,
+                             LIRenLight*    light);
 
 void
-lirnd_lighting_update (lirndLighting* self);
+liren_lighting_update (LIRenLighting* self);
 
 #endif
 

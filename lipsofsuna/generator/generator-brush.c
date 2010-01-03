@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup ligen Generator
  * @{
- * \addtogroup ligenBrush Brush
+ * \addtogroup LIGenBrush Brush
  * @{
  */
 
@@ -26,29 +26,29 @@
 #include "generator-brush.h"
 
 static int
-private_read_objects (ligenBrush* self,
-                      liarcSql*   sql);
+private_read_objects (LIGenBrush* self,
+                      LIArcSql*   sql);
 
 static int
-private_read_rules (ligenBrush* self,
-                    liarcSql*   sql);
+private_read_rules (LIGenBrush* self,
+                    LIArcSql*   sql);
 
 static int
-private_write_rule (ligenBrush* self,
-                    ligenRule*  rule,
-                    liarcSql*   sql);
+private_write_rule (LIGenBrush* self,
+                    LIGenRule*  rule,
+                    LIArcSql*   sql);
 
 static int
-private_write_object (ligenBrush*       self,
-                      ligenBrushobject* object,
-                      liarcSql*         sql);
+private_write_object (LIGenBrush*       self,
+                      LIGenBrushobject* object,
+                      LIArcSql*         sql);
 
 static int
-private_write_stroke (ligenBrush*      self,
-                      ligenRule*       rule,
-                      ligenRulestroke* stroke,
+private_write_stroke (LIGenBrush*      self,
+                      LIGenRule*       rule,
+                      LIGenRulestroke* stroke,
                       int              id,
-                      liarcSql*        sql);
+                      LIArcSql*        sql);
 
 /*****************************************************************************/
 
@@ -61,16 +61,16 @@ private_write_stroke (ligenBrush*      self,
  * \param depth Depth in voxels.
  * \return New brush or NULL.
  */
-ligenBrush*
-ligen_brush_new (ligenGenerator* generator,
+LIGenBrush*
+ligen_brush_new (LIGenGenerator* generator,
                  int             width,
                  int             height,
                  int             depth)
 {
-	ligenBrush* self;
+	LIGenBrush* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (ligenBrush));
+	self = lisys_calloc (1, sizeof (LIGenBrush));
 	if (self == NULL)
 		return NULL;
 	self->generator = generator;
@@ -88,7 +88,7 @@ ligen_brush_new (ligenGenerator* generator,
 	self->voxels.count = width * height * depth;
 	if (self->voxels.count)
 	{
-		self->voxels.array = lisys_calloc (self->voxels.count, sizeof (livoxVoxel));
+		self->voxels.array = lisys_calloc (self->voxels.count, sizeof (LIVoxVoxel));
 		if (self->voxels.array == NULL)
 		{
 			lisys_free (self->name);
@@ -106,7 +106,7 @@ ligen_brush_new (ligenGenerator* generator,
  * \param self Brush.
  */
 void
-ligen_brush_free (ligenBrush* self)
+ligen_brush_free (LIGenBrush* self)
 {
 	int i;
 
@@ -132,18 +132,18 @@ ligen_brush_free (ligenBrush* self)
  * \return Nonzero on success.
  */
 int
-ligen_brush_insert_object (ligenBrush*           self,
+ligen_brush_insert_object (LIGenBrush*           self,
                            int                   flags,
                            float                 prob,
                            const char*           type,
                            const char*           model,
                            const char*           extra,
-                           const limatTransform* transform)
+                           const LIMatTransform* transform)
 {
-	ligenBrushobject* object;
+	LIGenBrushobject* object;
 
 	/* Allocate object. */
-	object = lisys_calloc (1, sizeof (ligenBrushobject));
+	object = lisys_calloc (1, sizeof (LIGenBrushobject));
 	if (object == NULL)
 		return 0;
 	object->id = self->objects.count;
@@ -180,8 +180,8 @@ error:
  * \return Nonzero on success.
  */
 int
-ligen_brush_insert_rule (ligenBrush* self,
-                         ligenRule*  rule)
+ligen_brush_insert_rule (LIGenBrush* self,
+                         LIGenRule*  rule)
 {
 	if (!lialg_array_append (&self->rules, &rule))
 		return 0;
@@ -197,8 +197,8 @@ ligen_brush_insert_rule (ligenBrush* self,
  * \return Nonzero on success.
  */
 int
-ligen_brush_read_rules (ligenBrush* self,
-                        liarcSql*   sql)
+ligen_brush_read_rules (LIGenBrush* self,
+                        LIArcSql*   sql)
 {
 	return private_read_rules (self, sql) &&
 	       private_read_objects (self, sql);
@@ -213,11 +213,11 @@ ligen_brush_read_rules (ligenBrush* self,
  * \param index Object number.
  */
 void
-ligen_brush_remove_object (ligenBrush* self,
+ligen_brush_remove_object (LIGenBrush* self,
                            int         index)
 {
 	int i;
-	ligenBrushobject* object;
+	LIGenBrushobject* object;
 
 	assert (index >= 0);
 	assert (index < self->objects.count);
@@ -245,11 +245,11 @@ ligen_brush_remove_object (ligenBrush* self,
  * \param index Rule number.
  */
 void
-ligen_brush_remove_rule (ligenBrush* self,
+ligen_brush_remove_rule (LIGenBrush* self,
                          int         index)
 {
 	int i;
-	ligenRule* rule;
+	LIGenRule* rule;
 
 	assert (index >= 0);
 	assert (index < self->rules.count);
@@ -274,12 +274,12 @@ ligen_brush_remove_rule (ligenBrush* self,
  * \param brush Brush number.
  */
 void
-ligen_brush_remove_strokes (ligenBrush* self,
+ligen_brush_remove_strokes (LIGenBrush* self,
                             int         brush)
 {
 	int i;
 	int j;
-	ligenRule* rule;
+	LIGenRule* rule;
 
 	for (i = 0 ; i < self->rules.count ; i++)
 	{
@@ -303,12 +303,12 @@ ligen_brush_remove_strokes (ligenBrush* self,
  * \return Nonzero on success.
  */
 int
-ligen_brush_write (ligenBrush* self,
-                   liarcSql*   sql)
+ligen_brush_write (LIGenBrush* self,
+                   LIArcSql*   sql)
 {
 	int i;
 	int ret;
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	/* Serialize voxels. */
 	writer = liarc_writer_new ();
@@ -355,7 +355,7 @@ ligen_brush_write (ligenBrush* self,
 }
 
 int
-ligen_brush_set_name (ligenBrush* self,
+ligen_brush_set_name (LIGenBrush* self,
                       const char* value)
 {
 	char* tmp;
@@ -370,7 +370,7 @@ ligen_brush_set_name (ligenBrush* self,
 }
 
 int
-ligen_brush_set_size (ligenBrush* self,
+ligen_brush_set_size (LIGenBrush* self,
                       int         x,
                       int         y,
                       int         z)
@@ -378,13 +378,13 @@ ligen_brush_set_size (ligenBrush* self,
 	int i;
 	int j;
 	int k;
-	livoxVoxel* tmp;
+	LIVoxVoxel* tmp;
 
 	assert (x > 0);
 	assert (y > 0);
 	assert (z > 0);
 
-	tmp = lisys_calloc (x * y * z, sizeof (livoxVoxel));
+	tmp = lisys_calloc (x * y * z, sizeof (LIVoxVoxel));
 	if (tmp == NULL)
 		return 0;
 	for (k = 0 ; k < self->size[2] && k < z ; k++)
@@ -405,11 +405,11 @@ ligen_brush_set_size (ligenBrush* self,
 }
 
 void
-ligen_brush_set_voxel (ligenBrush* self,
+ligen_brush_set_voxel (LIGenBrush* self,
                        int         x,
                        int         y,
                        int         z,
-                       livoxVoxel  voxel)
+                       LIVoxVoxel  voxel)
 {
 	int i;
 
@@ -427,21 +427,21 @@ ligen_brush_set_voxel (ligenBrush* self,
 /*****************************************************************************/
 
 static int
-private_read_objects (ligenBrush* self,
-                      liarcSql*   sql)
+private_read_objects (LIGenBrush* self,
+                      LIArcSql*   sql)
 {
 	int i;
 	int col;
 	int ret;
 	int size;
 	const char* query;
-	ligenBrushobject object;
-	ligenBrushobject** tmp;
+	LIGenBrushobject object;
+	LIGenBrushobject** tmp;
 	sqlite3_stmt* statement;
 	struct
 	{
 		int count;
-		ligenBrushobject** array;
+		LIGenBrushobject** array;
 	} objects = { 0, NULL };
 
 	/* Prepare statement. */
@@ -526,7 +526,7 @@ private_read_objects (ligenBrush* self,
 		/* Add to list. */
 		if (object.id >= objects.count)
 		{
-			tmp = realloc (objects.array, (object.id + 1) * sizeof (ligenBrushobject*));
+			tmp = realloc (objects.array, (object.id + 1) * sizeof (LIGenBrushobject*));
 			if (tmp == NULL)
 			{
 				lisys_free (object.type);
@@ -539,7 +539,7 @@ private_read_objects (ligenBrush* self,
 			objects.array = tmp;
 			objects.count = object.id + 1;
 		}
-		objects.array[object.id] = lisys_malloc (sizeof (ligenBrushobject));
+		objects.array[object.id] = lisys_malloc (sizeof (LIGenBrushobject));
 		if (objects.array[object.id] == NULL)
 		{
 			lisys_free (object.type);
@@ -582,8 +582,8 @@ error:
 }
 
 static int
-private_read_rules (ligenBrush* self,
-                    liarcSql*   sql)
+private_read_rules (LIGenBrush* self,
+                    LIArcSql*   sql)
 {
 	int i;
 	int col;
@@ -596,13 +596,13 @@ private_read_rules (ligenBrush* self,
 	int pos[3];
 	char* name;
 	const char* query;
-	ligenRule* rule;
-	ligenRule** tmp;
+	LIGenRule* rule;
+	LIGenRule** tmp;
 	sqlite3_stmt* statement;
 	struct
 	{
 		int count;
-		ligenRule** array;
+		LIGenRule** array;
 	} rules = { 0, NULL };
 
 	/* Prepare statement. */
@@ -663,7 +663,7 @@ private_read_rules (ligenBrush* self,
 		/* Add to list. */
 		if (ruleid >= rules.count)
 		{
-			tmp = realloc (rules.array, (ruleid + 1) * sizeof (ligenRule*));
+			tmp = realloc (rules.array, (ruleid + 1) * sizeof (LIGenRule*));
 			if (tmp == NULL)
 				goto error;
 			for (i = rules.count ; i < ruleid ; i++)
@@ -743,9 +743,9 @@ error:
 }
 
 static int
-private_write_object (ligenBrush*       self,
-                      ligenBrushobject* object,
-                      liarcSql*         sql)
+private_write_object (LIGenBrush*       self,
+                      LIGenBrushobject* object,
+                      LIArcSql*         sql)
 {
 	return liarc_sql_replace (sql, "generator_objects",
 		"id", LIARC_SQL_INT, object->id,
@@ -765,9 +765,9 @@ private_write_object (ligenBrush*       self,
 }
 
 static int
-private_write_rule (ligenBrush* self,
-                    ligenRule*  rule,
-                    liarcSql*   sql)
+private_write_rule (LIGenBrush* self,
+                    LIGenRule*  rule,
+                    LIArcSql*   sql)
 {
 	int i;
 
@@ -790,11 +790,11 @@ private_write_rule (ligenBrush* self,
 }
 
 static int
-private_write_stroke (ligenBrush*      self,
-                      ligenRule*       rule,
-                      ligenRulestroke* stroke,
+private_write_stroke (LIGenBrush*      self,
+                      LIGenRule*       rule,
+                      LIGenRulestroke* stroke,
                       int              id,
-                      liarcSql*        sql)
+                      LIArcSql*        sql)
 {
 	return liarc_sql_replace (sql, "generator_strokes",
 		"id", LIARC_SQL_INT, id,

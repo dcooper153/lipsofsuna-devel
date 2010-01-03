@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,32 +26,32 @@
 #define __SCRIPT_EVENT_H__
 
 #include <stdarg.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
-liscrData*
-licom_event_new (liscrScript* script);
+LIScrData*
+liscr_event_new (LIScrScript* script);
 
-liscrData*
-licom_event_newv (liscrScript* script,
+LIScrData*
+liscr_event_newv (LIScrScript* script,
                   va_list      args);
 
-liscrData*
-licom_event_newva (liscrScript* script,
+LIScrData*
+liscr_event_newva (LIScrScript* script,
                                 ...);
 
 void
-licom_event_set (liscrData* self,
+liscr_event_set (LIScrData* self,
                             ...);
 
 void
-licom_event_setv (liscrData* self,
+liscr_event_setv (LIScrData* self,
                   va_list    args);
 
 int
-licom_event_get_type (const liscrData* self);
+liscr_event_get_type (const LIScrData* self);
 
 void
-licom_event_set_type (liscrData* self,
+liscr_event_set_type (LIScrData* self,
                       int        type);
 
 #endif

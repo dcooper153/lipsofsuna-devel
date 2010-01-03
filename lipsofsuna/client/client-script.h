@@ -25,8 +25,8 @@
 #ifndef __CLIENT_SCRIPT_H__
 #define __CLIENT_SCRIPT_H__
 
-#include <script/lips-script.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/widget.h>
 
 #define LICLI_SCRIPT_ACTION "Lips.Action"
 #define LICLI_SCRIPT_BINDING "Lips.Binding"
@@ -40,60 +40,60 @@
 #define LICLI_SCRIPT_WINDOW "Lips.Window"
 
 void
-licliActionScript (liscrClass* self,
+licli_script_action (LIScrClass* self,
                    void*       data);
 
 void
-licliBindingScript (liscrClass* self,
+licli_script_binding (LIScrClass* self,
                     void*       data);
 
 void
-licliClientScript (liscrClass* self,
+licli_script_client (LIScrClass* self,
                    void*       data);
 
 void
-licliExtensionScript (liscrClass* self,
+licli_script_extension (LIScrClass* self,
                       void*       data);
 
 void
-licliGroupScript (liscrClass* self,
+licli_script_group (LIScrClass* self,
                   void*       data);
 
 void
-licliLightScript (liscrClass* self,
+licli_script_light (LIScrClass* self,
                   void*       data);
 
 void
-licliObjectScript (liscrClass* self,
+licli_script_object (LIScrClass* self,
                    void*       data);
 
 void
-licliPlayerScript (liscrClass* self,
+licli_script_player (LIScrClass* self,
                    void*       data);
 
 void
-licliSceneScript (liscrClass* self,
+licli_script_scene (LIScrClass* self,
                   void*       data);
 
 void
-licliWidgetScript (liscrClass* self,
+licli_script_widget (LIScrClass* self,
                    void*       data);
 
 void
-licliWindowScript (liscrClass* self,
+licli_script_window (LIScrClass* self,
                    void*       data);
 
 /*****************************************************************************/
 
 void
-licli_script_widget_free (liwdgWidget* self,
-                          liscrData*   data);
+licli_script_widget_free (LIWdgWidget* self,
+                          LIScrData*   data);
 
 void
-licli_script_widget_detach (liscrData* self);
+licli_script_widget_detach (LIScrData* self);
 
 void
-licli_script_widget_detach_children (liscrData* self);
+licli_script_widget_detach_children (LIScrData* self);
 
 #endif
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgLabel Label
+ * \addtogroup LIWdgLabel Label
  * @{
  */
 
@@ -26,40 +26,40 @@
 #include "widget-manager.h"
 
 static int
-private_init (liwdgLabel*   self,
-              liwdgManager* manager);
+private_init (LIWdgLabel*   self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgLabel* self);
+private_free (LIWdgLabel* self);
 
 static int
-private_event (liwdgLabel* self,
+private_event (LIWdgLabel* self,
                liwdgEvent* event);
 
 static void
-private_rebuild (liwdgLabel* self);
+private_rebuild (LIWdgLabel* self);
 
-const liwdgClass liwdgLabelType =
+const LIWdgClass liwdg_widget_label =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Label", sizeof (liwdgLabel),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Label", sizeof (LIWdgLabel),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_label_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_label_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgLabelType);
+	return liwdg_widget_new (manager, &liwdg_widget_label);
 }
 
-liwdgWidget*
-liwdg_label_new_with_text (liwdgManager* manager,
+LIWdgWidget*
+liwdg_label_new_with_text (LIWdgManager* manager,
                            const char*   text)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
 	self = liwdg_label_new (manager);
 	if (self == NULL)
@@ -73,54 +73,54 @@ liwdg_label_new_with_text (liwdgManager* manager,
 	return self;
 }
 
-lifntFont*
-liwdg_label_get_font (liwdgLabel* self)
+LIFntFont*
+liwdg_label_get_font (LIWdgLabel* self)
 {
 	return self->font;
 }
 
 void
-liwdg_label_set_font (liwdgLabel* self,
-                      lifntFont*  font)
+liwdg_label_set_font (LIWdgLabel* self,
+                      LIFntFont*  font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 float
-liwdg_label_get_halign (const liwdgLabel* self)
+liwdg_label_get_halign (const LIWdgLabel* self)
 {
 	return self->halign;
 }
 
 void
-liwdg_label_set_halign (liwdgLabel* self,
+liwdg_label_set_halign (LIWdgLabel* self,
                         float       value)
 {
 	self->halign = LI_CLAMP (value, 0.0f, 1.0f);
 }
 
 int
-liwdg_label_get_highlight (const liwdgLabel* self)
+liwdg_label_get_highlight (const LIWdgLabel* self)
 {
 	return self->highlight;
 }
 
 void
-liwdg_label_set_highlight (liwdgLabel* self,
+liwdg_label_set_highlight (LIWdgLabel* self,
                            int         value)
 {
 	self->highlight = value;
 }
 
 const char*
-liwdg_label_get_text (liwdgLabel* self)
+liwdg_label_get_text (LIWdgLabel* self)
 {
 	return self->string;
 }
 
 int
-liwdg_label_set_text (liwdgLabel* self,
+liwdg_label_set_text (LIWdgLabel* self,
                       const char* text)
 {
 	char* tmp;
@@ -135,13 +135,13 @@ liwdg_label_set_text (liwdgLabel* self,
 }
 
 float
-liwdg_label_get_valign (const liwdgLabel* self)
+liwdg_label_get_valign (const LIWdgLabel* self)
 {
 	return self->valign;
 }
 
 void
-liwdg_label_set_valign (liwdgLabel* self,
+liwdg_label_set_valign (LIWdgLabel* self,
                         float       value)
 {
 	self->valign = LI_CLAMP (value, 0.0f, 1.0f);
@@ -150,8 +150,8 @@ liwdg_label_set_valign (liwdgLabel* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgLabel*   self,
-              liwdgManager* manager)
+private_init (LIWdgLabel*   self,
+              LIWdgManager* manager)
 {
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
@@ -169,19 +169,19 @@ private_init (liwdgLabel*   self,
 }
 
 static void
-private_free (liwdgLabel* self)
+private_free (LIWdgLabel* self)
 {
 	lifnt_layout_free (self->text);
 	lisys_free (self->string);
 }
 
 static int
-private_event (liwdgLabel* self,
+private_event (LIWdgLabel* self,
                liwdgEvent* event)
 {
 	int w;
 	int h;
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	switch (event->type)
 	{
@@ -212,11 +212,11 @@ private_event (liwdgLabel* self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgLabel* self)
+private_rebuild (LIWdgLabel* self)
 {
 	int h = 0;
 	int limit;

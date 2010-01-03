@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,13 +24,13 @@
 #define __BINDING_TYPES_H__
 
 /**
- * \addtogroup libndBinding Binding
+ * \addtogroup LIBndBinding Binding
  * @{
  */
 
-typedef struct _libndBinding libndBinding;
-typedef enum _libndType libndType;
-enum _libndType
+typedef struct _LIBndBinding LIBndBinding;
+typedef enum _LIBndType LIBndType;
+enum _LIBndType
 {
 	LIBND_TYPE_KEYBOARD,
 	LIBND_TYPE_MOUSE,
@@ -43,23 +43,23 @@ enum _libndType
 
 /** @} */
 /**
- * \addtogroup libndAction Action
+ * \addtogroup LIBndAction Action
  * @{
  */
 
-typedef struct _libndAction libndAction;
-typedef int (*libndCallback)(libndAction*  action,
-                             libndBinding* binding,
+typedef struct _LIBndAction LIBndAction;
+typedef int (*libndCallback)(LIBndAction*  action,
+                             LIBndBinding* binding,
                              float         value,
                              void*         data);
 
 /** @} */
 /**
- * \addtogroup libndManager Manager
+ * \addtogroup LIBndManager Manager
  * @{
  */
 
-typedef struct _libndManager libndManager;
+typedef struct _LIBndManager LIBndManager;
 
 #endif
 

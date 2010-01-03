@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,51 +18,51 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgScroll Scroll
+ * \addtogroup LIWdgScroll Scroll
  * @{
  */
 
 #ifndef __WIDGET_SCROLL_H__
 #define __WIDGET_SCROLL_H__
 
-#include <font/lips-font.h>
+#include <lipsofsuna/font.h>
 #include "widget.h"
 
-#define LIWDG_SCROLL(o) ((liwdgScroll*)(o))
+#define LIWDG_SCROLL(o) ((LIWdgScroll*)(o))
 
-typedef struct _liwdgScroll liwdgScroll;
-struct _liwdgScroll
+typedef struct _LIWdgScroll LIWdgScroll;
+struct _LIWdgScroll
 {
-	liwdgWidget base;
-	lifntFont* font;
-	lifntLayout* text;
+	LIWdgWidget base;
+	LIFntFont* font;
+	LIFntLayout* text;
 	float min;
 	float max;
 	float value;
 };
 
-extern const liwdgClass liwdgScrollType;
+extern const LIWdgClass liwdg_widget_scroll;
 
-liwdgWidget*
-liwdg_scroll_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_scroll_new (LIWdgManager* manager);
 
-lifntFont*
-liwdg_scroll_get_font (liwdgScroll* self);
-
-void
-liwdg_scroll_set_font (liwdgScroll* self,
-                       lifntFont*   font);
+LIFntFont*
+liwdg_scroll_get_font (LIWdgScroll* self);
 
 void
-liwdg_scroll_set_range (liwdgScroll* self,
+liwdg_scroll_set_font (LIWdgScroll* self,
+                       LIFntFont*   font);
+
+void
+liwdg_scroll_set_range (LIWdgScroll* self,
                         float        min,
                         float        max);
 
 float
-liwdg_scroll_get_value (liwdgScroll* self);
+liwdg_scroll_get_value (LIWdgScroll* self);
 
 void
-liwdg_scroll_set_value (liwdgScroll* self,
+liwdg_scroll_set_value (LIWdgScroll* self,
                         float        value);
 
 #endif

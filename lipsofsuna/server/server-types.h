@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,22 +18,22 @@
 #ifndef __SERVER_TYPES_H__
 #define __SERVER_TYPES_H__
 
-#include <engine/lips-engine.h>
+#include <lipsofsuna/engine.h>
 
-struct _lisrvAniminfo
+struct _LISerAniminfo
 {
-	liengAnimation* animation;
+	LIEngAnimation* animation;
 	int channel;
 	int permanent;
 	float priority;
 };
 
-typedef struct _lisrvAniminfo lisrvAniminfo;
-typedef struct _lisrvClient lisrvClient;
-typedef struct _lisrvExtension lisrvExtension;
-typedef struct _lisrvExtensionInfo lisrvExtensionInfo;
-typedef struct _lisrvNetwork lisrvNetwork;
-typedef struct _lisrvObject lisrvObject;
-typedef struct _lisrvServer lisrvServer;
+typedef struct _LISerAniminfo LISerAniminfo;
+typedef struct _LISerClient LISerClient;
+typedef struct _LISerExtension LISerExtension;
+typedef struct _LISerExtensionInfo LISerExtensionInfo;
+typedef struct _LISerNetwork LISerNetwork;
+typedef struct _LISerObject LISerObject;
+typedef struct _LISerServer LISerServer;
 
 #endif

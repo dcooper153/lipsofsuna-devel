@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysNotify Notify
+ * \addtogroup LISysNotify Notify
  * @{
  */
 
@@ -55,22 +55,22 @@
 
 #ifdef HAVE_INOTIFY
 static int
-private_process (lisysNotify* self);
+private_process (LISysNotify* self);
 
 static int
-private_read (lisysNotify* self);
+private_read (LISysNotify* self);
 #endif
 
 /*****************************************************************************/
 
-lisysNotify*
+LISysNotify*
 lisys_notify_new ()
 {
 #ifdef HAVE_INOTIFY
-	lisysNotify* self;
+	LISysNotify* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisysNotify));
+	self = calloc (1, sizeof (LISysNotify));
 	if (self == NULL)
 	{
 		error_memory ();
@@ -105,7 +105,7 @@ lisys_notify_new ()
 }
 
 void
-lisys_notify_free (lisysNotify* self)
+lisys_notify_free (LISysNotify* self)
 {
 	close (self->fd);
 	free (self->buffer.buffer);
@@ -113,9 +113,9 @@ lisys_notify_free (lisysNotify* self)
 }
 
 int
-lisys_notify_add (lisysNotify*     self,
+lisys_notify_add (LISysNotify*     self,
                   const char*      path,
-                  lisysNotifyFlags flags)
+                  LISysNotifyFlags flags)
 {
 #ifdef HAVE_INOTIFY
 	int f = 0;
@@ -140,14 +140,14 @@ lisys_notify_add (lisysNotify*     self,
 }
 
 void
-lisys_notify_remove (lisysNotify* self,
+lisys_notify_remove (LISysNotify* self,
                      const char*  path)
 {
 	/* FIXME: Not implemented. */
 }
 
 int
-lisys_notify_poll (lisysNotify* self)
+lisys_notify_poll (LISysNotify* self)
 {
 #ifdef HAVE_INOTIFY
 	struct pollfd fds = { self->fd, POLLIN, 0 };
@@ -169,7 +169,7 @@ lisys_notify_poll (lisysNotify* self)
 }
 
 int
-lisys_notify_wait (lisysNotify* self)
+lisys_notify_wait (LISysNotify* self)
 {
 #ifdef HAVE_INOTIFY
 	if (private_process (self))
@@ -190,7 +190,7 @@ lisys_notify_wait (lisysNotify* self)
 
 #ifdef HAVE_INOTIFY
 static int
-private_process (lisysNotify* self)
+private_process (LISysNotify* self)
 {
 	int i;
 	struct inotify_event* event;
@@ -258,7 +258,7 @@ private_process (lisysNotify* self)
 }
 
 static int
-private_read (lisysNotify* self)
+private_read (LISysNotify* self)
 {
 	self->buffer.pos = 0;
 	self->buffer.length = read (self->fd, self->buffer.buffer, self->buffer.capacity);

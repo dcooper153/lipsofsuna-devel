@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 /* @luadoc
  * module "Core.Client.Window"
@@ -41,11 +41,11 @@
  * -- @return New window.
  * function Window.new(self)
  */
-static void Window_new (liscrArgs* args)
+static void Window_new (LIScrArgs* args)
 {
-	licliClient* client;
-	liscrData* data;
-	liwdgWidget* self;
+	LICliClient* client;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_WINDOW);
@@ -76,11 +76,11 @@ static void Window_new (liscrArgs* args)
  * -- @name Window.title
  * -- @class table
  */
-static void Window_getter_title (liscrArgs* args)
+static void Window_getter_title (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, liwdg_window_get_title (args->self));
 }
-static void Window_setter_title (liscrArgs* args)
+static void Window_setter_title (LIScrArgs* args)
 {
 	const char* value;
 
@@ -98,14 +98,14 @@ static void Window_setter_title (liscrArgs* args)
  * -- @name Window.visible
  * -- @class table
  */
-static void Window_getter_visible (liscrArgs* args)
+static void Window_getter_visible (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_visible (args->self));
 }
-static void Window_setter_visible (liscrArgs* args)
+static void Window_setter_visible (LIScrArgs* args)
 {
 	int value;
-	licliClient* client;
+	LICliClient* client;
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
@@ -131,10 +131,10 @@ static void Window_setter_visible (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licliWindowScript (liscrClass* self,
+licli_script_window (LIScrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licliGroupScript, data);
+	liscr_class_inherit (self, licli_script_group, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WINDOW, data);
 	liscr_class_insert_cfunc (self, "new", Window_new);
 	liscr_class_insert_mvar (self, "title", Window_getter_title, Window_setter_title);

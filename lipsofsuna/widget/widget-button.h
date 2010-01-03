@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,48 +18,48 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgButton Button
+ * \addtogroup LIWdgButton Button
  * @{
  */
 
 #ifndef __WIDGET_BUTTON_H__
 #define __WIDGET_BUTTON_H__
 
-#include <font/lips-font.h>
+#include <lipsofsuna/font.h>
 #include "widget.h"
 
-#define LIWDG_BUTTON(o) ((liwdgButton*)(o))
+#define LIWDG_BUTTON(o) ((LIWdgButton*)(o))
 
 /**
  * \brief Button widget.
  */
-typedef struct _liwdgButton liwdgButton;
-struct _liwdgButton
+typedef struct _LIWdgButton LIWdgButton;
+struct _LIWdgButton
 {
-	liwdgWidget base;
-	lifntFont* font;
-	lifntLayout* text;
+	LIWdgWidget base;
+	LIFntFont* font;
+	LIFntLayout* text;
 	char* string;
 };
 
-extern const liwdgClass liwdgButtonType;
+extern const LIWdgClass liwdg_widget_button;
 
-liwdgWidget*
-liwdg_button_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_button_new (LIWdgManager* manager);
 
-lifntFont*
-liwdg_button_get_font (liwdgButton*  self);
+LIFntFont*
+liwdg_button_get_font (LIWdgButton*  self);
 
 void
-liwdg_button_set_font (liwdgButton* self,
-                       lifntFont*   font);
+liwdg_button_set_font (LIWdgButton* self,
+                       LIFntFont*   font);
 
 int
-liwdg_button_set_text (liwdgButton* self,
+liwdg_button_set_text (LIWdgButton* self,
                        const char*  text);
 
 const char*
-liwdg_button_get_text (liwdgButton* self);
+liwdg_button_get_text (LIWdgButton* self);
 
 #endif
 

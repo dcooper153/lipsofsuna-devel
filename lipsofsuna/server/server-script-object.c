@@ -16,28 +16,28 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvscr Script
+ * \addtogroup liserscr Script
  * @{
- * \addtogroup lisrvscrObject Object
+ * \addtogroup liserscrObject Object
  * @{
  */
 
-#include <network/lips-network.h>
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 
 #define MAGICPTR_CONTACT_CALLBACK (NULL + 2)
 
 static void
-private_contact_callback (liphyObject*  object,
-                          liphyContact* contact)
+private_contact_callback (LIPhyObject*  object,
+                          LIPhyContact* contact)
 {
-	liscrData* data;
-	liengObject* engobj = liphy_object_get_userdata (object);
-	lisrvServer* server = lieng_engine_get_userdata (engobj->engine);
-	liscrScript* script = server->script;
+	LIScrData* data;
+	LIEngObject* engobj = liphy_object_get_userdata (object);
+	LISerServer* server = lieng_engine_get_userdata (engobj->engine);
+	LIScrScript* script = server->script;
 
 	/* Push callback. */
 	liscr_pushdata (script->lua, engobj->script);
@@ -120,7 +120,7 @@ private_contact_callback (liphyObject*  object,
  * -- @param args Arguments.
  * function Object.animate(self, args)
  */
-static void Object_animate (liscrArgs* args)
+static void Object_animate (LIScrArgs* args)
 {
 	int repeat = 0;
 	int channel = -1;
@@ -133,7 +133,7 @@ static void Object_animate (liscrArgs* args)
 	liscr_args_gets_bool (args, "permanent", &repeat);
 	if (channel < 0 || channel > 254)
 		channel = -1;
-	lisrv_object_animate (args->self, animation, channel, weight, repeat);
+	liser_object_animate (args->self, animation, channel, weight, repeat);
 }
 
 /* @luadoc
@@ -143,14 +143,14 @@ static void Object_animate (liscrArgs* args)
  * -- @param self Object.
  * function Object.disconnect(self)
  */
-static void Object_disconnect (liscrArgs* args)
+static void Object_disconnect (LIScrArgs* args)
 {
-	lisrvObject* object;
+	LISerObject* object;
 
-	object = LISRV_OBJECT (args->self);
+	object = LISER_OBJECT (args->self);
 	if (object->client != NULL)
 	{
-		lisrv_client_free (object->client);
+		liser_client_free (object->client);
 		object->client = NULL;
 	}
 }
@@ -167,7 +167,7 @@ static void Object_disconnect (liscrArgs* args)
  * -- @param args Arguments.
  * function Object.effect(self, args)
  */
-static void Object_effect (liscrArgs* args)
+static void Object_effect (LIScrArgs* args)
 {
 	int flags = LI_EFFECT_DEFAULT;
 	const char* name;
@@ -175,7 +175,7 @@ static void Object_effect (liscrArgs* args)
 	if (liscr_args_gets_string (args, "effect", &name))
 	{
 		liscr_args_gets_int (args, "flags", &flags);
-		lisrv_object_effect (args->self, name, flags);
+		liser_object_effect (args->self, name, flags);
 	}
 }
 
@@ -191,11 +191,11 @@ static void Object_effect (liscrArgs* args)
  * -- @param args Arguments.
  * function Object.insert_hinge_constraint(self, args)
  */
-static void Object_insert_hinge_constraint (liscrArgs* args)
+static void Object_insert_hinge_constraint (LIScrArgs* args)
 {
-	liengObject* self;
-	limatVector pos;
-	limatVector axis = { 0.0f, 1.0f, 0.0f };
+	LIEngObject* self;
+	LIMatVector pos;
+	LIMatVector axis = { 0.0f, 1.0f, 0.0f };
 
 	if (liscr_args_gets_vector (args, "position", &pos))
 	{
@@ -214,16 +214,16 @@ static void Object_insert_hinge_constraint (liscrArgs* args)
  * -- @return New object.
  * function Object.new(self, args)
  */
-static void Object_new (liscrArgs* args)
+static void Object_new (LIScrArgs* args)
 {
 	int realize = 0;
-	liengObject* self;
-	lisrvServer* server;
+	LIEngObject* self;
+	LISerServer* server;
 
 	/* Allocate self. */
-	server = liscr_class_get_userdata (args->clss, LISRV_SCRIPT_OBJECT);
+	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_OBJECT);
 	self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 
-		lisrv_server_get_unique_object (server));
+		liser_server_get_unique_object (server));
 	if (self == NULL)
 		return;
 
@@ -241,9 +241,9 @@ static void Object_new (liscrArgs* args)
  * -- @param self Object.
  * function Object.purge(self)
  */
-static void Object_purge (liscrArgs* args)
+static void Object_purge (LIScrArgs* args)
 {
-	lisrv_object_purge (args->self);
+	liser_object_purge (args->self);
 }
 
 /* @luadoc
@@ -258,24 +258,24 @@ static void Object_purge (liscrArgs* args)
  * -- @param args Arguments.
  * function Object.send(self, args)
  */
-static void Object_send (liscrArgs* args)
+static void Object_send (LIScrArgs* args)
 {
 	int reliable = 1;
-	liscrData* packet;
-	liscrPacket* data;
-	lisrvClient* client;
+	LIScrData* packet;
+	LIScrPacket* data;
+	LISerClient* client;
 
 	if (liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &packet))
 	{
 		liscr_args_gets_bool (args, "reliable", &reliable);
-		client = LISRV_OBJECT (args->self)->client;
+		client = LISER_OBJECT (args->self)->client;
 		data = packet->data;
 		if (client != NULL && data->writer != NULL)
 		{
 			if (reliable)
-				lisrv_client_send (client, data->writer, GRAPPLE_RELIABLE);
+				liser_client_send (client, data->writer, GRAPPLE_RELIABLE);
 			else
-				lisrv_client_send (client, data->writer, 0);
+				liser_client_send (client, data->writer, 0);
 		}
 	}
 }
@@ -295,12 +295,12 @@ static void Object_send (liscrArgs* args)
  * -- @param args Arguments.
  * function Object.swap_clients(self, args)
  */
-static void Object_swap_clients (liscrArgs* args)
+static void Object_swap_clients (LIScrArgs* args)
 {
-	liscrData* object;
+	LIScrData* object;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
-		lisrv_object_swap (args->self, object->data);
+		liser_object_swap (args->self, object->data);
 }
 
 /* @luadoc
@@ -317,13 +317,13 @@ static void Object_swap_clients (liscrArgs* args)
  * -- @return Table with point, normal, and object. Nil if not found.
  * function Object.sweep_sphere(self, args)
  */
-static void Object_sweep_sphere (liscrArgs* args)
+static void Object_sweep_sphere (LIScrArgs* args)
 {
 	float radius = 0.5f;
-	liengObject* object;
-	limatVector start;
-	limatVector end;
-	liphyCollision result;
+	LIEngObject* object;
+	LIMatVector start;
+	LIMatVector end;
+	LIPhyCollision result;
 
 	if (!liscr_args_gets_vector (args, "start", &start) ||
 	    !liscr_args_gets_vector (args, "end", &end))
@@ -352,15 +352,15 @@ static void Object_sweep_sphere (liscrArgs* args)
  * -- @name Object.contact_callback
  * -- @class table
  */
-static void Object_getter_contact_callback (liscrArgs* args)
+static void Object_getter_contact_callback (LIScrArgs* args)
 {
 	lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
 	lua_gettable (args->lua, 1);
 	liscr_args_seti_stack (args);
 }
-static void Object_setter_contact_callback (liscrArgs* args)
+static void Object_setter_contact_callback (LIScrArgs* args)
 {
-	liengObject* self = args->self;
+	LIEngObject* self = args->self;
 
 	if (lua_type (args->lua, 3) == LUA_TFUNCTION)
 	{
@@ -384,9 +384,9 @@ static void Object_setter_contact_callback (liscrArgs* args)
  * -- @name Object.client
  * -- @class table
  */
-static void Object_getter_client (liscrArgs* args)
+static void Object_getter_client (LIScrArgs* args)
 {
-	liscr_args_seti_bool (args, LISRV_OBJECT (args->self)->client != NULL);
+	liscr_args_seti_bool (args, LISER_OBJECT (args->self)->client != NULL);
 }
 
 /* @luadoc
@@ -416,12 +416,12 @@ static void Object_getter_client (liscrArgs* args)
 /*****************************************************************************/
 
 void
-lisrvObjectScript (liscrClass* self,
+liser_script_objet (LIScrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licomObjectScript, NULL);
-	liscr_class_set_userdata (self, LISRV_SCRIPT_OBJECT, data);
-	liscr_class_insert_interface (self, LISRV_SCRIPT_OBJECT);
+	liscr_class_inherit (self, liscr_script_object, NULL);
+	liscr_class_set_userdata (self, LISER_SCRIPT_OBJECT, data);
+	liscr_class_insert_interface (self, LISER_SCRIPT_OBJECT);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "disconnect", Object_disconnect);
 	liscr_class_insert_mfunc (self, "effect", Object_effect);

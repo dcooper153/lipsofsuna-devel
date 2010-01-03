@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,39 +18,39 @@
 /**
  * \addtogroup liimg Image
  * @{
- * \addtogroup liimgTexture Texture
+ * \addtogroup LIImgTexture Texture
  * @{
  */
 
 #ifndef __IMAGE_TEXTURE_H__
 #define __IMAGE_TEXTURE_H__
 
-#include <video/lips-video.h>
+#include <lipsofsuna/video.h>
 
-typedef struct _liimgTexture liimgTexture;
-struct _liimgTexture
+typedef struct _LIImgTexture LIImgTexture;
+struct _LIImgTexture
 {
 	int width;
 	int height;
 	GLuint texture;
 };
 
-liimgTexture*
+LIImgTexture*
 liimg_texture_new ();
 
-liimgTexture*
+LIImgTexture*
 liimg_texture_new_from_rgba (int         width,
                              int         height,
                              const void* pixels);
 
-liimgTexture*
+LIImgTexture*
 liimg_texture_new_from_file (const char* path);
 
 void
-liimg_texture_free (liimgTexture* self);
+liimg_texture_free (LIImgTexture* self);
 
 int
-liimg_texture_load (liimgTexture* self,
+liimg_texture_load (LIImgTexture* self,
                     const char*   path);
 
 #endif

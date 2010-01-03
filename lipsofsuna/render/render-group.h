@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,75 +16,75 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndObject Object
+ * \addtogroup LIRenObject Object
  * @{
  */
 
 #ifndef __RENDER_GROUP_H__
 #define __RENDER_GROUP_H__
 
-#include <math/lips-math.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/model.h>
 #include "render.h"
 #include "render-object.h"
 #include "render-types.h"
 
-typedef struct _lirndGroupObject lirndGroupObject;
-struct _lirndGroupObject
+typedef struct _LIRenGroupObject LIRenGroupObject;
+struct _LIRenGroupObject
 {
-	limatAabb aabb;
-	limatTransform transform;
-	lirndModel* model;
-	lirndGroupObject* next;
+	LIMatAabb aabb;
+	LIMatTransform transform;
+	LIRenModel* model;
+	LIRenGroupObject* next;
 };
 
-struct _lirndGroup
+struct _LIRenGroup
 {
 	int realized;
-	limatAabb aabb;
-	lirndScene* scene;
-	lirndGroupObject* objects;
+	LIMatAabb aabb;
+	LIRenScene* scene;
+	LIRenGroupObject* objects;
 	struct
 	{
 		int count;
-		lirndLight** array;
+		LIRenLight** array;
 	} lights;
 };
 
-lirndGroup*
-lirnd_group_new (lirndScene* scene);
+LIRenGroup*
+liren_group_new (LIRenScene* scene);
 
 void
-lirnd_group_free (lirndGroup* self);
+liren_group_free (LIRenGroup* self);
 
 void
-lirnd_group_clear (lirndGroup* self);
+liren_group_clear (LIRenGroup* self);
 
 int
-lirnd_group_insert_model (lirndGroup*     self,
-                          lirndModel*     model,
-                          limatTransform* transform);
+liren_group_insert_model (LIRenGroup*     self,
+                          LIRenModel*     model,
+                          LIMatTransform* transform);
 
 void
-lirnd_group_reload_model (lirndGroup* self,
-                          lirndModel* model_old,
-                          lirndModel* model_new);
+liren_group_reload_model (LIRenGroup* self,
+                          LIRenModel* model_old,
+                          LIRenModel* model_new);
 
 void
-lirnd_group_update (lirndGroup* self,
+liren_group_update (LIRenGroup* self,
                     float       secs);
 
 void
-lirnd_group_get_bounds (const lirndGroup* self,
-                        limatAabb*        result);
+liren_group_get_bounds (const LIRenGroup* self,
+                        LIMatAabb*        result);
 
 int
-lirnd_group_get_realized (const lirndGroup* self);
+liren_group_get_realized (const LIRenGroup* self);
 
 int
-lirnd_group_set_realized (lirndGroup* self,
+liren_group_set_realized (LIRenGroup* self,
                           int         value);
 
 #endif

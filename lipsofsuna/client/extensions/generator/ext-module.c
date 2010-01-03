@@ -24,31 +24,31 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-dialog.h"
 #include "ext-module.h"
 
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader);
+                LIArcReader* reader);
 
 /*****************************************************************************/
 
-licliExtensionInfo liextInfo =
+LICliExtensionInfo liextInfo =
 {
 	LICLI_EXTENSION_VERSION, "Generator",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -70,16 +70,16 @@ liext_module_new (licliClient* client)
 	}
 
 	/* Register scripts. */
-	liscr_script_create_class (client->script, "Generator", liextGeneratorScript, self);
+	liscr_script_create_class (client->script, "Generator", liext_script_generator, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	/* Remove callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
 	if (self->script == NULL)
 		liwdg_widget_free (self->editor);
@@ -87,7 +87,7 @@ liext_module_free (liextModule* self)
 }
 
 int
-liext_module_save (liextModule* self)
+liext_module_save (LIExtModule* self)
 {
 	return liext_editor_save (LIEXT_EDITOR (self->editor));
 }
@@ -95,9 +95,9 @@ liext_module_save (liextModule* self)
 /*****************************************************************************/
 
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader)
+                LIArcReader* reader)
 {
 	reader->pos = 1;
 	if (type == LIEXT_VOXEL_PACKET_ASSIGN)

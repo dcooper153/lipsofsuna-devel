@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,73 +18,73 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxBlock Block
+ * \addtogroup LIVoxBlock Block
  * @{
  */
 
 #ifndef __VOXEL_BLOCK_H__
 #define __VOXEL_BLOCK_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include "voxel-types.h"
 
-typedef struct _livoxBlock livoxBlock;
-typedef struct _livoxBlockAddr livoxBlockAddr;
+typedef struct _LIVoxBlock LIVoxBlock;
+typedef struct _LIVoxBlockAddr LIVoxBlockAddr;
 
-struct _livoxBlockAddr
+struct _LIVoxBlockAddr
 {
 	uint8_t sector[3];
 	uint8_t block[3];
 };
 
 void
-livox_block_free (livoxBlock*   self,
-                  livoxManager* manager);
+livox_block_free (LIVoxBlock*   self,
+                  LIVoxManager* manager);
 
 void
-livox_block_fill (livoxBlock*   self,
-                  livoxManager* manager,
-                  livoxVoxel*   terrain);
+livox_block_fill (LIVoxBlock*   self,
+                  LIVoxManager* manager,
+                  LIVoxVoxel*   terrain);
 
 void
-livox_block_optimize (livoxBlock* self);
+livox_block_optimize (LIVoxBlock* self);
 
 int
-livox_block_read (livoxBlock*   self,
-                  livoxManager* manager,
-                  liarcReader*  reader);
+livox_block_read (LIVoxBlock*   self,
+                  LIVoxManager* manager,
+                  LIArcReader*  reader);
 
 int
-livox_block_write (livoxBlock*  self,
-                   liarcWriter* writer);
+livox_block_write (LIVoxBlock*  self,
+                   LIArcWriter* writer);
 
 int
-livox_block_get_dirty (const livoxBlock* self);
+livox_block_get_dirty (const LIVoxBlock* self);
 
 void
-livox_block_set_dirty (livoxBlock* self,
+livox_block_set_dirty (LIVoxBlock* self,
                        int         value);
 
 int
-livox_block_get_empty (const livoxBlock* self);
+livox_block_get_empty (const LIVoxBlock* self);
 
 int
-livox_block_get_stamp (const livoxBlock* self);
+livox_block_get_stamp (const LIVoxBlock* self);
 
-livoxVoxel*
-livox_block_get_voxel (livoxBlock* self,
+LIVoxVoxel*
+livox_block_get_voxel (LIVoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z);
 
 int
-livox_block_set_voxel (livoxBlock* self,
+livox_block_set_voxel (LIVoxBlock* self,
                        uint8_t     x,
                        uint8_t     y,
                        uint8_t     z,
-                       livoxVoxel* voxel);
+                       LIVoxVoxel* voxel);
 
 #endif
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,18 +18,18 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgEntry Entry
+ * \addtogroup LIWdgEntry Entry
  * @{
  */
 
 #ifndef __WIDGET_ENTRY_H__
 #define __WIDGET_ENTRY_H__
 
-#include <font/lips-font.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/font.h>
+#include <lipsofsuna/string.h>
 #include "widget.h"
 
-#define LIWDG_ENTRY(o) ((liwdgEntry*)(o))
+#define LIWDG_ENTRY(o) ((LIWdgEntry*)(o))
 
 /**
  * \brief Text edit widget.
@@ -37,51 +37,51 @@
  * This widget implements a frame in which text can be displayed and edited.
  * Both single and multiple line display are supported.
  */
-typedef struct _liwdgEntry liwdgEntry;
-struct _liwdgEntry
+typedef struct _LIWdgEntry LIWdgEntry;
+struct _LIWdgEntry
 {
-	liwdgWidget base;
-	lifntFont* font;
-	lifntLayout* text;
+	LIWdgWidget base;
+	LIFntFont* font;
+	LIFntLayout* text;
 	char* string;
 	unsigned int editable : 1;
 	unsigned int secret : 1;
 };
 
-extern const liwdgClass liwdgEntryType;
+extern const LIWdgClass liwdg_widget_entry;
 
-liwdgWidget*
-liwdg_entry_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_entry_new (LIWdgManager* manager);
 
 void
-liwdg_entry_clear (liwdgEntry* self);
+liwdg_entry_clear (LIWdgEntry* self);
 
 int
-liwdg_entry_get_editable (liwdgEntry* self);
+liwdg_entry_get_editable (LIWdgEntry* self);
 
 void
-liwdg_entry_set_editable (liwdgEntry* self,
+liwdg_entry_set_editable (LIWdgEntry* self,
                           int         editable);
 
-lifntFont*
-liwdg_entry_get_font (liwdgEntry* self);
+LIFntFont*
+liwdg_entry_get_font (LIWdgEntry* self);
 
 void
-liwdg_entry_set_font (liwdgEntry* self,
-                      lifntFont*  font);
+liwdg_entry_set_font (LIWdgEntry* self,
+                      LIFntFont*  font);
 
 int
-liwdg_entry_get_secret (liwdgEntry* self);
+liwdg_entry_get_secret (LIWdgEntry* self);
 
 void
-liwdg_entry_set_secret (liwdgEntry* self,
+liwdg_entry_set_secret (LIWdgEntry* self,
                         int         secret);
 
 const char*
-liwdg_entry_get_text (liwdgEntry* self);
+liwdg_entry_get_text (LIWdgEntry* self);
 
 int
-liwdg_entry_set_text (liwdgEntry* self,
+liwdg_entry_set_text (LIWdgEntry* self,
                       const char* text);
 
 #endif

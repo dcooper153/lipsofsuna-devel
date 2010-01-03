@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,15 +16,15 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvObject Object
+ * \addtogroup LISerObject Object
  * @{
  */
 
-#include <network/lips-network.h>
-#include <physics/lips-physics.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/physics.h>
+#include <lipsofsuna/system.h>
 #include "server.h"
 #include "server-callbacks.h"
 #include "server-client.h"
@@ -33,13 +33,13 @@
 #include "server-script.h"
 
 static int
-private_delete_animations (liengObject* self);
+private_delete_animations (LIEngObject* self);
 
 static int
-private_read_animations (liengObject* self);
+private_read_animations (LIEngObject* self);
 
 static int
-private_write_animations (liengObject* self);
+private_write_animations (LIEngObject* self);
 
 /*****************************************************************************/
 
@@ -54,16 +54,16 @@ private_write_animations (liengObject* self);
  * \return Nonzero on success.
  */
 int
-lisrv_object_animate (liengObject* self,
+liser_object_animate (LIEngObject* self,
                       const char*  name,
                       int          channel,
                       float        priority,
                       int          permanent)
 {
-	liengAnimation* animation;
-	lisrvAniminfo tmp;
-	lisrvAniminfo* info;
-	lisrvObject* data = LISRV_OBJECT (self);
+	LIEngAnimation* animation;
+	LISerAniminfo tmp;
+	LISerAniminfo* info;
+	LISerObject* data = LISER_OBJECT (self);
 
 	/* Find animation channel. */
 	if (channel == -1)
@@ -104,7 +104,7 @@ lisrv_object_animate (liengObject* self,
 	/* Register channel if permanent. */
 	if (permanent)
 	{
-		info = lisys_calloc (1, sizeof (lisrvAniminfo));
+		info = lisys_calloc (1, sizeof (LISerAniminfo));
 		if (info == NULL)
 			return 0;
 		info->animation = animation;
@@ -140,14 +140,14 @@ lisrv_object_animate (liengObject* self,
  * \param self Object.
  */
 void
-lisrv_object_disconnect (liengObject* self)
+liser_object_disconnect (LIEngObject* self)
 {
-	lisrvObject* data = LISRV_OBJECT (self);
+	LISerObject* data = LISER_OBJECT (self);
 
 	if (data->client != NULL)
 	{
 		lical_callbacks_call (self->engine->callbacks, self->engine, "client-logout", lical_marshal_DATA_PTR, self);
-		lisrv_client_free (data->client);
+		liser_client_free (data->client);
 		data->client = NULL;
 		lieng_object_ref (self, -1);
 	}
@@ -161,12 +161,12 @@ lisrv_object_disconnect (liengObject* self)
  * \param flags Effect flags.
  */
 void
-lisrv_object_effect (liengObject* self,
+liser_object_effect (LIEngObject* self,
                      const char*  value,
                      int          flags)
 {
-	liengSample* sample;
-	lisrvObject* data = LISRV_OBJECT (self);
+	LIEngSample* sample;
+	LISerObject* data = LISER_OBJECT (self);
 
 	/* Find effect. */
 	if (!lieng_object_get_realized (self))
@@ -186,15 +186,15 @@ lisrv_object_effect (liengObject* self,
  * \return Nonzero on success.
  */
 int
-lisrv_object_purge (liengObject* self)
+liser_object_purge (LIEngObject* self)
 {
 	int ret;
 	const char* query;
-	liarcSql* sql;
+	LIArcSql* sql;
 	sqlite3_stmt* statement;
 
 	ret = 1;
-	sql = LISRV_OBJECT (self)->server->sql;
+	sql = LISER_OBJECT (self)->server->sql;
 
 	/* Remove from helper tables. */
 	if (!private_delete_animations (self))
@@ -232,7 +232,7 @@ lisrv_object_purge (liengObject* self)
  * \return Nonzero on success.
  */
 int
-lisrv_object_serialize (liengObject* self,
+liser_object_serialize (LIEngObject* self,
                         int          save)
 {
 	int ret;
@@ -250,13 +250,13 @@ lisrv_object_serialize (liengObject* self,
 	const char* type;
 	const char* extras;
 	const char* query;
-	liarcSql* sql;
-	limatTransform transform;
-	limatVector angular;
-	liscrScript* script;
+	LIArcSql* sql;
+	LIMatTransform transform;
+	LIMatVector angular;
+	LIScrScript* script;
 	sqlite3_stmt* statement;
 
-	sql = LISRV_OBJECT (self)->server->sql;
+	sql = LISER_OBJECT (self)->server->sql;
 
 	if (!save)
 	{
@@ -343,7 +343,7 @@ lisrv_object_serialize (liengObject* self,
 		/* Process script values. */
 		if (self->script != NULL)
 		{
-			script = LISRV_OBJECT (self)->server->script;
+			script = LISER_OBJECT (self)->server->script;
 			liscr_pushdata (script->lua, self->script);
 			lua_pushstring (script->lua, "read_cb");
 			lua_gettable (script->lua, -2);
@@ -371,7 +371,7 @@ lisrv_object_serialize (liengObject* self,
 		if (lieng_object_get_realized (self))
 		{
 			/* Collect values. */
-			flags = LISRV_OBJECT (self)->flags;
+			flags = LISER_OBJECT (self)->flags;
 			sector = self->sector->sector->index;
 			model = (self->model != NULL)? self->model->name : NULL;
 			mass = lieng_object_get_mass (self);
@@ -437,7 +437,7 @@ lisrv_object_serialize (liengObject* self,
 			script = NULL;
 			if (self->script != NULL)
 			{
-				script = LISRV_OBJECT (self)->server->script;
+				script = LISER_OBJECT (self)->server->script;
 				liscr_pushdata (script->lua, self->script);
 				lua_pushstring (script->lua, "write_cb");
 				lua_gettable (script->lua, -2);
@@ -505,10 +505,10 @@ lisrv_object_serialize (liengObject* self,
 }
 
 int
-lisrv_object_sees (const liengObject* self,
-                   const liengObject* target)
+liser_object_sees (const LIEngObject* self,
+                   const LIEngObject* target)
 {
-	lisrvObject* data = LISRV_OBJECT (self);
+	LISerObject* data = LISER_OBJECT (self);
 
 	if (data->client == NULL)
 		return 0;
@@ -522,16 +522,16 @@ lisrv_object_sees (const liengObject* self,
  * \param object Object.
  */
 void
-lisrv_object_swap (liengObject* self,
-                   liengObject* object)
+liser_object_swap (LIEngObject* self,
+                   LIEngObject* object)
 {
-	lisrvClient* tmp;
-	lisrvObject* data = LISRV_OBJECT (self);
-	lisrvObject* data1 = LISRV_OBJECT (object);
+	LISerClient* tmp;
+	LISerObject* data = LISER_OBJECT (self);
+	LISerObject* data1 = LISER_OBJECT (object);
 
 	tmp = data->client;
-	lisrv_object_set_client (self, data1->client);
-	lisrv_object_set_client (object, tmp);
+	liser_object_set_client (self, data1->client);
+	liser_object_set_client (object, tmp);
 }
 
 /**
@@ -542,10 +542,10 @@ lisrv_object_swap (liengObject* self,
  * \return Nonzero on success.
  */
 int
-lisrv_object_set_client (liengObject* self,
-                         lisrvClient* value)
+liser_object_set_client (LIEngObject* self,
+                         LISerClient* value)
 {
-	lisrvObject* data = LISRV_OBJECT (self);
+	LISerObject* data = LISER_OBJECT (self);
 
 	if (data->client == value)
 		return 1;
@@ -554,7 +554,7 @@ lisrv_object_set_client (liengObject* self,
 	if (value != NULL)
 	{
 		lieng_object_ref (self, 1);
-		return lisrv_client_set_object (value, self);
+		return liser_client_set_object (value, self);
 	}
 	else
 	{
@@ -566,13 +566,13 @@ lisrv_object_set_client (liengObject* self,
 /*****************************************************************************/
 
 static int
-private_delete_animations (liengObject* self)
+private_delete_animations (LIEngObject* self)
 {
 	const char* query;
-	liarcSql* sql;
+	LIArcSql* sql;
 	sqlite3_stmt* statement;
 
-	sql = LISRV_OBJECT (self)->server->sql;
+	sql = LISER_OBJECT (self)->server->sql;
 
 	/* Clear animation data. */
 	query = "DELETE from object_anims WHERE id=?;";
@@ -599,17 +599,17 @@ private_delete_animations (liengObject* self)
 }
 
 static int
-private_read_animations (liengObject* self)
+private_read_animations (LIEngObject* self)
 {
 	int ret;
 	int chan;
 	float prio;
 	const char* name;
 	const char* query;
-	liarcSql* sql;
+	LIArcSql* sql;
 	sqlite3_stmt* statement;
 
-	sql = LISRV_OBJECT (self)->server->sql;
+	sql = LISER_OBJECT (self)->server->sql;
 
 	/* Prepare statement. */
 	query = "SELECT name,chan,prio FROM object_anims WHERE id=?;";
@@ -644,25 +644,25 @@ private_read_animations (liengObject* self)
 		chan = sqlite3_column_int (statement, 1);
 		prio = sqlite3_column_double (statement, 2);
 		if (name != NULL && *name != '\0' && chan >= 0 && prio > 0.0f)
-			lisrv_object_animate (self, name, chan, prio, 1);
+			liser_object_animate (self, name, chan, prio, 1);
 	}
 
 	return 1;
 }
 
 static int
-private_write_animations (liengObject* self)
+private_write_animations (LIEngObject* self)
 {
 	const char* query;
-	lialgU32dicIter iter;
-	liarcSql* sql;
-	lisrvAniminfo* info;
+	LIAlgU32dicIter iter;
+	LIArcSql* sql;
+	LISerAniminfo* info;
 	sqlite3_stmt* statement;
 
-	sql = LISRV_OBJECT (self)->server->sql;
+	sql = LISER_OBJECT (self)->server->sql;
 
 	/* Save all permanent animations. */
-	LI_FOREACH_U32DIC (iter, LISRV_OBJECT (self)->animations)
+	LI_FOREACH_U32DIC (iter, LISER_OBJECT (self)->animations)
 	{
 		info = iter.value;
 		if (!info->permanent)

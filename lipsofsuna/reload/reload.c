@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,28 @@
 /**
  * \addtogroup lirel Reload
  * @{
- * \addtogroup lirelReload Reload
+ * \addtogroup LIRelReload Reload
  * @{
  */
 
 #include <sys/stat.h>
-#include <model/lips-model.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/string.h>
 #include "reload.h"
 
 static void
-private_async_reload (lithrAsyncCall* call,
+private_async_reload (LIThrAsyncCall* call,
                       void*           data);
 
 static int
-private_convert_models (lithrAsyncCall* call,
-                        lirelReload*    self,
+private_convert_models (LIThrAsyncCall* call,
+                        LIRelReload*    self,
                         const char*     srcdir,
                         const char*     dstdir);
 
 static int
-private_convert_textures (lithrAsyncCall* call,
-                          lirelReload*    self,
+private_convert_textures (LIThrAsyncCall* call,
+                          LIRelReload*    self,
                           const char*     srcdir,
                           const char*     dstdir);
 
@@ -74,13 +74,13 @@ private_filter_xcf_modified (const char* srcdir,
  * \param paths Path information.
  * \return New reloader or NULL.
  */
-lirelReload*
-lirel_reload_new (lipthPaths* paths)
+LIRelReload*
+lirel_reload_new (LIPthPaths* paths)
 {
-	lirelReload* self;
+	LIRelReload* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirelReload));
+	self = lisys_calloc (1, sizeof (LIRelReload));
 	if (self == NULL)
 		return NULL;
 	self->paths = paths;
@@ -89,7 +89,7 @@ lirel_reload_new (lipthPaths* paths)
 }
 
 void
-lirel_reload_free (lirelReload* self)
+lirel_reload_free (LIRelReload* self)
 {
 	lirel_reload_cancel (self);
 	lisys_free (self);
@@ -101,7 +101,7 @@ lirel_reload_free (lirelReload* self)
  * \param self Reload.
  */
 void
-lirel_reload_cancel (lirelReload* self)
+lirel_reload_cancel (LIRelReload* self)
 {
 	if (self->worker == NULL)
 		return;
@@ -112,7 +112,7 @@ lirel_reload_cancel (lirelReload* self)
 }
 
 int
-lirel_reload_main (lirelReload* self)
+lirel_reload_main (LIRelReload* self)
 {
 	if (!lirel_reload_run (self))
 		return 0;
@@ -132,7 +132,7 @@ lirel_reload_main (lirelReload* self)
  * \return Nonzero on success.
  */
 int
-lirel_reload_run (lirelReload* self)
+lirel_reload_run (LIRelReload* self)
 {
 	/* Make sure not already running. */
 	if (self->worker != NULL)
@@ -156,7 +156,7 @@ lirel_reload_run (lirelReload* self)
  * \return Nonzero on success.
  */
 int
-lirel_reload_update (lirelReload* self)
+lirel_reload_update (LIRelReload* self)
 {
 	char* name;
 
@@ -229,19 +229,19 @@ lirel_reload_update (lirelReload* self)
 }
 
 int
-lirel_reload_get_done (const lirelReload* self)
+lirel_reload_get_done (const LIRelReload* self)
 {
 	return self->worker == NULL;
 }
 
 int
-lirel_reload_get_enabled (const lirelReload* self)
+lirel_reload_get_enabled (const LIRelReload* self)
 {
 	return (self->notify != NULL);
 }
 
 int
-lirel_reload_set_enabled (lirelReload* self,
+lirel_reload_set_enabled (LIRelReload* self,
                           int          value)
 {
 	char* srcdir;
@@ -285,7 +285,7 @@ lirel_reload_set_enabled (lirelReload* self,
 }
 
 void
-lirel_reload_set_image_callback (lirelReload* self,
+lirel_reload_set_image_callback (LIRelReload* self,
                                  void       (*call)(),
                                  void*        data)
 {
@@ -294,7 +294,7 @@ lirel_reload_set_image_callback (lirelReload* self,
 }
 
 void
-lirel_reload_set_model_callback (lirelReload* self,
+lirel_reload_set_model_callback (LIRelReload* self,
                                  void       (*call)(),
                                  void*        data)
 {
@@ -303,7 +303,7 @@ lirel_reload_set_model_callback (lirelReload* self,
 }
 
 float
-lirel_reload_get_progress (const lirelReload* self)
+lirel_reload_get_progress (const LIRelReload* self)
 {
 	if (self->worker == NULL)
 		return 1.0f;
@@ -313,12 +313,12 @@ lirel_reload_get_progress (const lirelReload* self)
 /*****************************************************************************/
 
 static void
-private_async_reload (lithrAsyncCall* call,
+private_async_reload (LIThrAsyncCall* call,
                       void*           data)
 {
 	char* srcdir;
 	char* dstdir;
-	lirelReload* self = data;
+	LIRelReload* self = data;
 
 	/* Convert textures. */
 	srcdir = lisys_path_concat (self->paths->module_data, "import", NULL);
@@ -346,8 +346,8 @@ error:
 }
 
 static int
-private_convert_models (lithrAsyncCall* call,
-                        lirelReload*    self,
+private_convert_models (LIThrAsyncCall* call,
+                        LIRelReload*    self,
                         const char*     srcdir,
                         const char*     dstdir)
 {
@@ -355,7 +355,7 @@ private_convert_models (lithrAsyncCall* call,
 	int count;
 	char* src = NULL;
 	char* dst = NULL;
-	lisysDir* directory = NULL;
+	LISysDir* directory = NULL;
 
 	/* Find all modified model sources. */
 	directory = lisys_dir_open (srcdir);
@@ -398,8 +398,8 @@ private_convert_models (lithrAsyncCall* call,
 }
 
 static int
-private_convert_textures (lithrAsyncCall* call,
-                          lirelReload*    self,
+private_convert_textures (LIThrAsyncCall* call,
+                          LIRelReload*    self,
                           const char*     srcdir,
                           const char*     dstdir)
 {
@@ -408,11 +408,11 @@ private_convert_textures (lithrAsyncCall* call,
 	int count;
 	char* src;
 	char* dst;
-	lisysDir* directory = NULL;
+	LISysDir* directory = NULL;
 	const struct
 	{
 		int (*filter)(const char*, const char*, void*);
-		int (*convert)(lirelReload*, const char*, const char*);
+		int (*convert)(LIRelReload*, const char*, const char*);
 	}
 	converters[] =
 	{

@@ -18,16 +18,16 @@
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyShape Shape
+ * \addtogroup LIPhyShape Shape
  * @{
  */
 
 #ifndef __PHYSICS_SHAPE_H__
 #define __PHYSICS_SHAPE_H__
 
-#include <math/lips-math.h>
-#include <model/lips-model.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "physics.h"
 #include "physics-types.h"
 
@@ -35,26 +35,26 @@
 extern "C" {
 #endif
 
-liphyShape*
-liphy_shape_new (liphyPhysics*     physics,
-                 const limdlModel* model);
+LIPhyShape*
+liphy_shape_new (LIPhyPhysics*     physics,
+                 const LIMdlModel* model);
 
-liphyShape*
-liphy_shape_new_aabb (liphyPhysics*    physics,
-                      const limatAabb* aabb);
+LIPhyShape*
+liphy_shape_new_aabb (LIPhyPhysics*    physics,
+                      const LIMatAabb* aabb);
 
-liphyShape*
-liphy_shape_new_convex (liphyPhysics*      physics,
-                        const limatVector* vertices,
+LIPhyShape*
+liphy_shape_new_convex (LIPhyPhysics*      physics,
+                        const LIMatVector* vertices,
                         int                count);
 
 void
-liphy_shape_free (liphyShape* self);
+liphy_shape_free (LIPhyShape* self);
 
 void
-liphy_shape_get_inertia (const liphyShape* self,
+liphy_shape_get_inertia (const LIPhyShape* self,
                          float             mass,
-                         limatVector*      result);
+                         LIMatVector*      result);
 
 #ifdef __cplusplus
 }

@@ -18,7 +18,7 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliNetwork Network
+ * \addtogroup LICliNetwork Network
  * @{
  */
 
@@ -30,11 +30,11 @@
 #define LICLI_NETWORK_ROTATION_ACCUM 200.0f
 
 static int
-private_message (licliNetwork*    self,
+private_message (LICliNetwork*    self,
                  grapple_message* message);
 
 static int
-private_refused (licliNetwork*    self,
+private_refused (LICliNetwork*    self,
                  grapple_message* message);
 
 /*****************************************************************************/
@@ -47,16 +47,16 @@ private_refused (licliNetwork*    self,
  * \param pass Login password.
  * \return Network interface.
  */
-licliNetwork*
-licli_network_new (licliClient* client,
+LICliNetwork*
+licli_network_new (LICliClient* client,
                    const char*  name,
                    const char*  pass)
 {
 	grapple_error error;
-	licliNetwork* self;
+	LICliNetwork* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licliNetwork));
+	self = lisys_calloc (1, sizeof (LICliNetwork));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -99,7 +99,7 @@ error:
  * \param self Network interface.
  */
 void
-licli_network_free (licliNetwork* self)
+licli_network_free (LICliNetwork* self)
 {
 	if (self->host != NULL)
 		licfg_host_free (self->host);
@@ -116,12 +116,12 @@ licli_network_free (licliNetwork* self)
  * \param keep Nonzero if should keep tilting at this rate.
  */
 void
-licli_network_tilt (licliNetwork* self,
+licli_network_tilt (LICliNetwork* self,
                     float         value,
                     int           keep)
 {
-	limatQuaternion quat;
-	limatVector axis;
+	LIMatQuaternion quat;
+	LIMatVector axis;
 
 	if (!keep)
 	{
@@ -143,12 +143,12 @@ licli_network_tilt (licliNetwork* self,
  * \param keep Nonzero if should keep turning at this rate.
  */
 void
-licli_network_turn (licliNetwork* self,
+licli_network_turn (LICliNetwork* self,
                     float         value,
                     int           keep)
 {
-	limatQuaternion quat;
-	limatVector axis;
+	LIMatQuaternion quat;
+	LIMatVector axis;
 
 	if (!keep)
 	{
@@ -172,13 +172,13 @@ licli_network_turn (licliNetwork* self,
  * \return Nonzero on success.
  */
 int
-licli_network_update (licliNetwork* self,
+licli_network_update (LICliNetwork* self,
                       float         secs)
 {
 	int ret;
 	float diff;
-	liarcWriter* writer;
-	limatQuaternion quat;
+	LIArcWriter* writer;
+	LIMatQuaternion quat;
 	grapple_message* message;
 
 	if (!self->socket)
@@ -264,7 +264,7 @@ licli_network_update (licliNetwork* self,
  * \return Nonzero if connected.
  */
 int
-licli_network_get_connected (const licliNetwork* self)
+licli_network_get_connected (const LICliNetwork* self)
 {
 	return self->socket != 0;
 }
@@ -276,7 +276,7 @@ licli_network_get_connected (const licliNetwork* self)
  * \return Nonzero if synchronization is needed.
  */
 int
-licli_network_get_dirty (const licliNetwork* self)
+licli_network_get_dirty (const LICliNetwork* self)
 {
 	Uint32 ticks = self->client->video.SDL_GetTicks ();
 
@@ -295,8 +295,8 @@ licli_network_get_dirty (const licliNetwork* self)
  * \param value Return location for the quaternion.
  */
 void
-licli_network_get_rotation (const licliNetwork* self,
-                            limatQuaternion*    value)
+licli_network_get_rotation (const LICliNetwork* self,
+                            LIMatQuaternion*    value)
 {
 	*value = self->curr.direction;
 }
@@ -308,8 +308,8 @@ licli_network_get_rotation (const licliNetwork* self,
  * \param value Rotation value.
  */
 void
-licli_network_set_rotation (licliNetwork*          self,
-                            const limatQuaternion* value)
+licli_network_set_rotation (LICliNetwork*          self,
+                            const LIMatQuaternion* value)
 {
 	self->curr.direction = *value;
 }
@@ -317,12 +317,12 @@ licli_network_set_rotation (licliNetwork*          self,
 /*****************************************************************************/
 
 static int
-private_message (licliNetwork*    self,
+private_message (LICliNetwork*    self,
                  grapple_message* message)
 {
 	int len;
 	const uint8_t* data;
-	liarcReader* reader;
+	LIArcReader* reader;
 
 	/* Check for valid length. */
 	len = message->USER_MSG.length;
@@ -347,7 +347,7 @@ private_message (licliNetwork*    self,
 }
 
 static int
-private_refused (licliNetwork*    self,
+private_refused (LICliNetwork*    self,
                  grapple_message* message)
 {
 	switch (message->CONNECTION_REFUSED.reason)

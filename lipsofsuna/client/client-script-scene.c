@@ -22,21 +22,21 @@
  * @{
  */
 
-#include <render/lips-render.h>
-#include "lips-client.h"
+#include <lipsofsuna/render.h>
+#include <lipsofsuna/client.h>
 
 static void
-private_render (liwdgRender* self,
+private_render (LIWdgRender* self,
                 void*        data)
 {
-	licliClient* client;
-	liengSelectionIter iter;
-	limatFrustum frustum;
-	limatMatrix modelview;
-	limatMatrix projection;
-	lirndContext context;
-	lirndObject* object;
-	liwdgRect rect;
+	LICliClient* client;
+	LIEngSelectionIter iter;
+	LIMatFrustum frustum;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
+	LIRenContext context;
+	LIRenObject* object;
+	LIWdgRect rect;
 
 	/* Set 3D mode. */
 	client = data;
@@ -45,10 +45,10 @@ private_render (liwdgRender* self,
 	lialg_camera_get_frustum (client->camera, &frustum);
 	lialg_camera_get_modelview (client->camera, &modelview);
 	lialg_camera_get_projection (client->camera, &projection);
-	lirnd_context_init (&context, client->scene);
-	lirnd_context_set_modelview (&context, &modelview);
-	lirnd_context_set_projection (&context, &projection);
-	lirnd_context_set_frustum (&context, &frustum);
+	liren_context_init (&context, client->scene);
+	liren_context_set_modelview (&context, &modelview);
+	liren_context_set_projection (&context, &projection);
+	liren_context_set_frustum (&context, &frustum);
 
 	/* Draw selection. */
 	if (client->network != NULL)
@@ -61,11 +61,11 @@ private_render (liwdgRender* self,
 		glColor3f (1.0f, 0.0f, 0.0f);
 		LIENG_FOREACH_SELECTION (iter, client->engine)
 		{
-			object = lirnd_scene_find_object (client->scene, iter.object->id);
+			object = liren_scene_find_object (client->scene, iter.object->id);
 			if (object != NULL)
-				lirnd_draw_bounds (&context, object, NULL);
+				liren_draw_bounds (&context, object, NULL);
 		}
-		lirnd_context_unbind (&context);
+		liren_context_unbind (&context);
 	}
 
 	/* Render custom 3D scene. */
@@ -83,12 +83,12 @@ private_render (liwdgRender* self,
 }
 
 static void
-private_update (liwdgRender* self,
+private_update (LIWdgRender* self,
                 void*        data)
 {
-	licliClient* client;
-	limatMatrix modelview;
-	limatMatrix projection;
+	LICliClient* client;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
 
 	client = data;
 	if (client->network != NULL)
@@ -119,11 +119,11 @@ private_update (liwdgRender* self,
  * -- @return New scene widget.
  * function Scene.new(self, args)
  */
-static void Scene_new (liscrArgs* args)
+static void Scene_new (LIScrArgs* args)
 {
-	licliClient* client;
-	liscrData* data;
-	liwdgWidget* self;
+	LICliClient* client;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_SCENE);
@@ -161,13 +161,13 @@ static void Scene_new (liscrArgs* args)
  * -- @return Vector and object, or vector and nil when hit terrain.
  * function Scene.pick(self, args)
  */
-static void Scene_pick (liscrArgs* args)
+static void Scene_pick (LIScrArgs* args)
 {
 	int x;
 	int y;
-	licliClient* client;
-	liengObject* object;
-	lirndSelection result;
+	LICliClient* client;
+	LIEngObject* object;
+	LIRenSelection result;
 
 	client = LIWDG_RENDER (args->self)->custom_render_data;
 	client->video.SDL_GetMouseState (&x, &y);
@@ -185,10 +185,10 @@ static void Scene_pick (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licliSceneScript (liscrClass* self,
+licli_script_scene (LIScrClass* self,
                   void*       data)
 {
-	liscr_class_inherit (self, licliGroupScript, data);
+	liscr_class_inherit (self, licli_script_group, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_SCENE, data);
 	liscr_class_insert_cfunc (self, "new", Scene_new);
 	liscr_class_insert_mfunc (self, "pick", Scene_pick);

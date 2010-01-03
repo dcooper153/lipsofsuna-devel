@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,20 +18,20 @@
 /**
  * \addtogroup ligen Generator
  * @{
- * \addtogroup ligenBrush Brush
+ * \addtogroup LIGenBrush Brush
  * @{
  */
 
 #ifndef __GENERATOR_BRUSH_H__
 #define __GENERATOR_BRUSH_H__
 
-#include <math/lips-math.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/voxel.h>
 #include "generator-rule.h"
 #include "generator-types.h"
 
-typedef struct _ligenBrushobject ligenBrushobject;
-struct _ligenBrushobject
+typedef struct _LIGenBrushobject LIGenBrushobject;
+struct _LIGenBrushobject
 {
 	int id;
 	int flags;
@@ -39,90 +39,90 @@ struct _ligenBrushobject
 	char* type;
 	char* model;
 	char* extra;
-	limatTransform transform;
+	LIMatTransform transform;
 };
 
-struct _ligenBrush
+struct _LIGenBrush
 {
 	int id;
 	int size[3];
 	char* name;
-	ligenGenerator* generator;
+	LIGenGenerator* generator;
 	struct
 	{
 		int count;
-		livoxVoxel* array;
+		LIVoxVoxel* array;
 	} voxels;
 	struct
 	{
 		int count;
-		ligenRule** array;
+		LIGenRule** array;
 	} rules;
 	struct
 	{
 		int count;
-		ligenBrushobject** array;
+		LIGenBrushobject** array;
 	} objects;
 };
 
-ligenBrush*
-ligen_brush_new (ligenGenerator* generator,
+LIGenBrush*
+ligen_brush_new (LIGenGenerator* generator,
                  int             width,
                  int             height,
                  int             depth);
 
 void
-ligen_brush_free (ligenBrush* self);
+ligen_brush_free (LIGenBrush* self);
 
 int
-ligen_brush_insert_object (ligenBrush*           self,
+ligen_brush_insert_object (LIGenBrush*           self,
                            int                   flags,
                            float                 prob,
                            const char*           type,
                            const char*           model,
                            const char*           extra,
-                           const limatTransform* transform);
+                           const LIMatTransform* transform);
 
 int
-ligen_brush_insert_rule (ligenBrush* self,
-                         ligenRule*  rule);
+ligen_brush_insert_rule (LIGenBrush* self,
+                         LIGenRule*  rule);
 
 int
-ligen_brush_read_rules (ligenBrush* self,
-                        liarcSql*   sql);
+ligen_brush_read_rules (LIGenBrush* self,
+                        LIArcSql*   sql);
 
 void
-ligen_brush_remove_object (ligenBrush* self,
+ligen_brush_remove_object (LIGenBrush* self,
                            int         index);
 
 void
-ligen_brush_remove_rule (ligenBrush* self,
+ligen_brush_remove_rule (LIGenBrush* self,
                          int         index);
 
 void
-ligen_brush_remove_strokes (ligenBrush* self,
+ligen_brush_remove_strokes (LIGenBrush* self,
                             int         brush);
 
 int
-ligen_brush_write (ligenBrush* self,
-                   liarcSql*   sql);
+ligen_brush_write (LIGenBrush* self,
+                   LIArcSql*   sql);
 
 int
-ligen_brush_set_name (ligenBrush* self,
+ligen_brush_set_name (LIGenBrush* self,
                       const char* value);
 
 int
-ligen_brush_set_size (ligenBrush* self,
+ligen_brush_set_size (LIGenBrush* self,
                       int         x,
                       int         y,
                       int         z);
 
 void
-ligen_brush_set_voxel (ligenBrush* self,
+ligen_brush_set_voxel (LIGenBrush* self,
                        int         x,
                        int         y,
                        int         z,
-                       livoxVoxel  voxel);
+                       LIVoxVoxel  voxel);
 
 #endif
 

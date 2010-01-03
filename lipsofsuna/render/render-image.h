@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,41 +16,41 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndImage Image
+ * \addtogroup LIRenImage Image
  * @{
  */
 
 #ifndef __RENDER_IMAGE_H__
 #define __RENDER_IMAGE_H__
 
-#include <image/lips-image.h>
+#include <lipsofsuna/image.h>
 #include "render-types.h"
 
-typedef struct _lirndImage lirndImage;
-struct _lirndImage
+typedef struct _LIRenImage LIRenImage;
+struct _LIRenImage
 {
 	int added;
 	char* name;
 	char* path;
-	liimgTexture* texture;
-	lirndRender* render;
+	LIImgTexture* texture;
+	LIRenRender* render;
 };
 
-lirndImage*
-lirnd_image_new (lirndRender* render,
+LIRenImage*
+liren_image_new (LIRenRender* render,
                  const char*  name);
 
-lirndImage*
-lirnd_image_new_from_file (lirndRender* render,
+LIRenImage*
+liren_image_new_from_file (LIRenRender* render,
                            const char*  name);
 
 void
-lirnd_image_free (lirndImage* self);
+liren_image_free (LIRenImage* self);
 
 int
-lirnd_image_load (lirndImage* self);
+liren_image_load (LIRenImage* self);
 
 #endif
 

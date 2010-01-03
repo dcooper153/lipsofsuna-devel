@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvMain Main
+ * \addtogroup liserMain Main
  * @{
  */
 
@@ -28,8 +28,8 @@
 int
 main (int argc, char** argv)
 {
-	lipthPaths* paths;
-	lisrvServer* self;
+	LIPthPaths* paths;
+	LISerServer* self;
 
 	/* Resolve game directory. */
 	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");
@@ -40,16 +40,16 @@ main (int argc, char** argv)
 	}
 
 	/* Execute program. */
-	self = lisrv_server_new (paths);
+	self = liser_server_new (paths);
 	if (self == NULL)
 	{
 		lisys_error_report ();
 		lipth_paths_free (paths);
 		return 1;
 	}
-	if (!lisrv_server_main (self))
+	if (!liser_server_main (self))
 		lisys_error_report ();
-	lisrv_server_free (self);
+	liser_server_free (self);
 	lipth_paths_free (paths);
 
 	return 0;

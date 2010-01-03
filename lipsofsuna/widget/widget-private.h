@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,30 +18,30 @@
 #ifndef __WIDGET_PRIVATE_H__
 #define __WIDGET_PRIVATE_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "widget-group.h"
 #include "widget-types.h"
 
-struct _liwdgMenu
+struct _LIWdgMenu
 {
-	liwdgGroup base;
-	lifntFont* font;
+	LIWdgGroup base;
+	LIFntFont* font;
 	void* userdata;
 	unsigned int autohide : 1;
 	unsigned int vertical : 1;
 	struct
 	{
 		int count;
-		liwdgMenuItem** array;
+		LIWdgMenuItem** array;
 	} items;
 };
 
-struct _liwdgMenuItem
+struct _LIWdgMenuItem
 {
 	int id;
 	char* icon;
 	char* text;
-	lifntLayout* label;
+	LIFntLayout* label;
 	struct
 	{
 		liwdgHandler call;
@@ -50,7 +50,7 @@ struct _liwdgMenuItem
 	struct
 	{
 		int count;
-		liwdgMenuItem** array;
+		LIWdgMenuItem** array;
 	} items;
 };
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,45 +18,45 @@
 #ifndef __RENDER_TYPES_H__
 #define __RENDER_TYPES_H__
 
-#include <math/lips-math.h>
-#include <video/lips-video.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/video.h>
 
-enum _lirndFlags
+enum _LIRenFlags
 {
-	LIRND_FLAG_FIXED     = 0x01, /* Force fixed function. */
-	LIRND_FLAG_SHADOW0   = 0x02, /* Sun casts shadows. */
-	LIRND_FLAG_SHADOW1   = 0x04, /* Lamps cast shadows. */
-	LIRND_FLAG_LIGHTING  = 0x08, /* Render with lighting. */
-	LIRND_FLAG_TEXTURING = 0x10, /* Render with texturing. */
+	LIREN_FLAG_FIXED     = 0x01, /* Force fixed function. */
+	LIREN_FLAG_SHADOW0   = 0x02, /* Sun casts shadows. */
+	LIREN_FLAG_SHADOW1   = 0x04, /* Lamps cast shadows. */
+	LIREN_FLAG_LIGHTING  = 0x08, /* Render with lighting. */
+	LIREN_FLAG_TEXTURING = 0x10, /* Render with texturing. */
 };
 
-enum _lirndSelect
+enum _LIRenSelect
 {
-	LIRND_SELECT_OBJECT,
-	LIRND_SELECT_SECTOR,
+	LIREN_SELECT_OBJECT,
+	LIREN_SELECT_SECTOR,
 };
 
-typedef struct _lirndBuffer lirndBuffer;
-typedef struct _lirndContext lirndContext;
-typedef struct _lirndDeferred lirndDeferred;
-typedef enum _lirndFlags lirndFlags;
-typedef struct _lirndFormat lirndFormat;
-typedef struct _lirndGroup lirndGroup;
-typedef struct _lirndLight lirndLight;
-typedef struct _lirndLighting lirndLighting;
-typedef struct _lirndMaterial lirndMaterial;
-typedef struct _lirndModel lirndModel;
-typedef struct _lirndObject lirndObject;
-typedef struct _lirndRender lirndRender;
-typedef struct _lirndResources lirndResources;
-typedef struct _lirndScene lirndScene;
-typedef enum _lirndSelect lirndSelect;
-typedef struct _lirndSelection lirndSelection;
-typedef struct _lirndShader lirndShader;
-typedef struct _lirndTexture lirndTexture;
-typedef void (*lirndCallback) (lirndContext*, lirndObject*, void*);
+typedef struct _LIRenBuffer LIRenBuffer;
+typedef struct _LIRenContext LIRenContext;
+typedef struct _LIRenDeferred LIRenDeferred;
+typedef enum _LIRenFlags LIRenFlags;
+typedef struct _LIRenFormat LIRenFormat;
+typedef struct _LIRenGroup LIRenGroup;
+typedef struct _LIRenLight LIRenLight;
+typedef struct _LIRenLighting LIRenLighting;
+typedef struct _LIRenMaterial LIRenMaterial;
+typedef struct _LIRenModel LIRenModel;
+typedef struct _LIRenObject LIRenObject;
+typedef struct _LIRenRender LIRenRender;
+typedef struct _LIRenResources LIRenResources;
+typedef struct _LIRenScene LIRenScene;
+typedef enum _LIRenSelect LIRenSelect;
+typedef struct _LIRenSelection LIRenSelection;
+typedef struct _LIRenShader LIRenShader;
+typedef struct _LIRenTexture LIRenTexture;
+typedef void (*lirenCallback) (LIRenContext*, LIRenObject*, void*);
 
-struct _lirndFormat
+struct _LIRenFormat
 {
 	int size;
 	int tex_count;
@@ -68,12 +68,12 @@ struct _lirndFormat
 	int vtx_offset;
 };
 
-struct _lirndSelection
+struct _LIRenSelection
 {
-	lirndSelect type;
+	LIRenSelect type;
 	float depth;
 	uint32_t object;
-	limatVector point;
+	LIMatVector point;
 };
 
 #endif

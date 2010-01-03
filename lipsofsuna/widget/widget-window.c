@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgWindow Window
+ * \addtogroup LIWdgWindow Window
  * @{
  */
 
@@ -29,34 +29,34 @@
 #define LIWDG_WINDOW_TITLEBAR_HEIGHT 10.0f
 
 static int
-private_init (liwdgWindow*  self,
-              liwdgManager* manager);
+private_init (LIWdgWindow*  self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgWindow* self);
+private_free (LIWdgWindow* self);
 
 static int
-private_event (liwdgWindow* self,
+private_event (LIWdgWindow* self,
                liwdgEvent*  event);
 
-const liwdgClass liwdgWindowType =
+const LIWdgClass liwdg_widget_window =
 {
-	LIWDG_BASE_STATIC, &liwdgGroupType, "Window", sizeof (liwdgWindow),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_group, "Window", sizeof (LIWdgWindow),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /*****************************************************************************/
 
-liwdgWidget*
-liwdg_window_new (liwdgManager* manager,
+LIWdgWidget*
+liwdg_window_new (LIWdgManager* manager,
                   int           width,
                   int           height)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgWindowType);
+	self = liwdg_widget_new (manager, &liwdg_widget_window);
 	if (self == NULL)
 		return NULL;
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), width, height))
@@ -69,13 +69,13 @@ liwdg_window_new (liwdgManager* manager,
 }
 
 const char*
-liwdg_window_get_title (const liwdgWindow* self)
+liwdg_window_get_title (const LIWdgWindow* self)
 {
 	return self->title;
 }
 
 int
-liwdg_window_set_title (liwdgWindow* self,
+liwdg_window_set_title (LIWdgWindow* self,
                         const char*  title)
 {
 	char* tmp;
@@ -98,8 +98,8 @@ liwdg_window_set_title (liwdgWindow* self,
 /*****************************************************************************/
 
 static int
-private_init (liwdgWindow*  self,
-              liwdgManager* manager)
+private_init (LIWdgWindow*  self,
+              LIWdgManager* manager)
 {
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
@@ -113,15 +113,15 @@ private_init (liwdgWindow*  self,
 }
 
 static void
-private_free (liwdgWindow* self)
+private_free (LIWdgWindow* self)
 {
 }
 
 static int
-private_event (liwdgWindow* self,
+private_event (LIWdgWindow* self,
                liwdgEvent*  event)
 {
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	if (event->type == LIWDG_EVENT_TYPE_RENDER)
 	{
@@ -136,7 +136,7 @@ private_event (liwdgWindow* self,
 	}
 
 	/* Call base class. */
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

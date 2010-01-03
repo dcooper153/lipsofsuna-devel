@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,19 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_MODEL_H__
-#define __LIPS_MODEL_H__
+#ifndef __LIPS_CONFIG_H__
+#define __LIPS_CONFIG_H__
 
-#include "model.h"
-#include "model-animation.h"
-#include "model-bone.h"
-#include "model-hair.h"
-#include "model-material.h"
-#include "model-node.h"
-#include "model-light.h"
-#include "model-pose.h"
-#include "model-shape.h"
-#include "model-texture.h"
-#include "model-vertex.h"
+#include "lipsofsuna/config/config-account.h"
+#include "lipsofsuna/config/config-bans.h"
+#include "lipsofsuna/config/config-host.h"
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxManager Manager
+ * \addtogroup LIVoxManager Manager
  * @{
  */
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "voxel-iterator.h"
 #include "voxel-manager.h"
 #include "voxel-material.h"
@@ -31,31 +31,31 @@
 #define VOXEL_BORDER_TOLERANCE 0.05f
 
 static void
-private_clear_materials (livoxManager* self);
+private_clear_materials (LIVoxManager* self);
 
 static int
-private_ensure_materials (livoxManager* self);
+private_ensure_materials (LIVoxManager* self);
 
 static int
-private_ensure_sectors (livoxManager* self);
+private_ensure_sectors (LIVoxManager* self);
 
 static void
-private_mark_block (livoxManager* self,
-                    livoxSector*  sector,
+private_mark_block (LIVoxManager* self,
+                    LIVoxSector*  sector,
                     int           x,
                     int           y,
                     int           z);
 
 /*****************************************************************************/
 
-livoxManager*
-livox_manager_new (licalCallbacks* callbacks,
-                   lialgSectors*   sectors)
+LIVoxManager*
+livox_manager_new (LICalCallbacks* callbacks,
+                   LIAlgSectors*   sectors)
 {
-	livoxManager* self;
+	LIVoxManager* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livoxManager));
+	self = lisys_calloc (1, sizeof (LIVoxManager));
 	if (self == NULL)
 		return NULL;
 	self->callbacks = callbacks;
@@ -71,8 +71,8 @@ livox_manager_new (licalCallbacks* callbacks,
 
 	/* Allocate sector data. */
 	if (!lialg_sectors_insert_content (self->sectors, "voxel", self,
-	     	(lialgSectorFreeFunc) livox_sector_free,
-	     	(lialgSectorLoadFunc) livox_sector_new))
+	     	(LIAlgSectorFreeFunc) livox_sector_free,
+	     	(LIAlgSectorLoadFunc) livox_sector_new))
 	{
 		livox_manager_free (self);
 		return NULL;
@@ -82,7 +82,7 @@ livox_manager_new (licalCallbacks* callbacks,
 }
 
 void
-livox_manager_free (livoxManager* self)
+livox_manager_free (LIVoxManager* self)
 {
 	/* Free materials. */
 	if (self->materials != NULL)
@@ -106,14 +106,14 @@ livox_manager_free (livoxManager* self)
  * \return Nonzero if occluder.
  */
 int
-livox_manager_check_occluder (const livoxManager* self,
-                              const livoxVoxel*   voxel)
+livox_manager_check_occluder (const LIVoxManager* self,
+                              const LIVoxVoxel*   voxel)
 {
-	livoxMaterial* material;
+	LIVoxMaterial* material;
 
 	if (!voxel->type)
 		return 0;
-	material = livox_manager_find_material ((livoxManager*) self, voxel->type);
+	material = livox_manager_find_material ((LIVoxManager*) self, voxel->type);
 	if (material == NULL)
 		return 0;
 
@@ -126,7 +126,7 @@ livox_manager_check_occluder (const livoxManager* self,
  * \param self Voxel manager.
  */
 void
-livox_manager_clear_materials (livoxManager* self)
+livox_manager_clear_materials (LIVoxManager* self)
 {
 	private_clear_materials (self);
 }
@@ -144,14 +144,14 @@ livox_manager_clear_materials (livoxManager* self)
  * \param result Buffer with room for xsize*ysize*zsize voxels.
  */
 void
-livox_manager_copy_voxels (livoxManager* self,
+livox_manager_copy_voxels (LIVoxManager* self,
                            int           xstart,
                            int           ystart,
                            int           zstart,
                            int           xsize,
                            int           ysize,
                            int           zsize,
-                           livoxVoxel*   result)
+                           LIVoxVoxel*   result)
 {
 	int i;
 	int x;
@@ -160,7 +160,7 @@ livox_manager_copy_voxels (livoxManager* self,
 	int sx;
 	int sy;
 	int sz;
-	livoxSector* sec;
+	LIVoxSector* sec;
 
 	/* FIXME: Avoid excessive sector lookups. */
 	for (i = 0, z = zstart ; z < zstart + zsize ; z++)
@@ -184,22 +184,22 @@ livox_manager_copy_voxels (livoxManager* self,
 }
 
 int
-livox_manager_erase_voxel (livoxManager*      self,
-                           const limatVector* point)
+livox_manager_erase_voxel (LIVoxManager*      self,
+                           const LIMatVector* point)
 {
 	float d;
-	lialgRange range;
-	limatVector diff;
-	limatVector origin;
-	livoxVoxel voxel;
-	livoxVoxelIter iter;
+	LIAlgRange range;
+	LIMatVector diff;
+	LIMatVector origin;
+	LIVoxVoxel voxel;
+	LIVoxVoxelIter iter;
 	struct
 	{
 		int x;
 		int y;
 		int z;
 		float dist;
-		livoxSector* sector;
+		LIVoxSector* sector;
 	}
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
@@ -237,8 +237,8 @@ livox_manager_erase_voxel (livoxManager*      self,
 	return 0;
 }
 
-livoxMaterial*
-livox_manager_find_material (livoxManager* self,
+LIVoxMaterial*
+livox_manager_find_material (LIVoxManager* self,
                              uint32_t      id)
 {
 	return lialg_u32dic_find (self->materials, id);
@@ -254,27 +254,27 @@ livox_manager_find_material (livoxManager* self,
  *
  * \return Voxel or NULL.
  */
-livoxVoxel*
-livox_manager_find_voxel (livoxManager*      self,
+LIVoxVoxel*
+livox_manager_find_voxel (LIVoxManager*      self,
                           int                flags,
-                          const limatVector* point,
-                          limatVector*       center)
+                          const LIMatVector* point,
+                          LIMatVector*       center)
 {
 	float d;
-	lialgRange range;
-	limatVector tmp;
-	limatVector diff;
-	limatVector origin;
-	livoxVoxel voxel;
-	livoxVoxelIter iter;
+	LIAlgRange range;
+	LIMatVector tmp;
+	LIMatVector diff;
+	LIMatVector origin;
+	LIVoxVoxel voxel;
+	LIVoxVoxelIter iter;
 	struct
 	{
 		int x;
 		int y;
 		int z;
 		float dist;
-		limatVector center;
-		livoxSector* sector;
+		LIMatVector center;
+		LIVoxSector* sector;
 	}
 	best = { 0, 0, 0, 10.0E10f, { 0.0f, 0.0f, 0.0f }, NULL };
 
@@ -327,10 +327,10 @@ livox_manager_find_voxel (livoxManager*      self,
  * \return Nonzeron on success.
  */
 int
-livox_manager_insert_material (livoxManager*  self,
-                               livoxMaterial* material)
+livox_manager_insert_material (LIVoxManager*  self,
+                               LIVoxMaterial* material)
 {
-	livoxMaterial* tmp;
+	LIVoxMaterial* tmp;
 
 	tmp = lialg_u32dic_find (self->materials, material->id);
 	if (tmp != NULL)
@@ -345,23 +345,23 @@ livox_manager_insert_material (livoxManager*  self,
 }
 
 int
-livox_manager_insert_voxel (livoxManager*      self,
-                            const limatVector* point,
-                            const livoxVoxel*  terrain)
+livox_manager_insert_voxel (LIVoxManager*      self,
+                            const LIMatVector* point,
+                            const LIVoxVoxel*  terrain)
 {
 	float d;
-	lialgRange range;
-	limatVector diff;
-	limatVector origin;
-	livoxVoxel* voxel;
-	livoxVoxelIter iter;
+	LIAlgRange range;
+	LIMatVector diff;
+	LIMatVector origin;
+	LIVoxVoxel* voxel;
+	LIVoxVoxelIter iter;
 	struct
 	{
 		int x;
 		int y;
 		int z;
 		float dist;
-		livoxSector* sector;
+		LIVoxSector* sector;
 	}
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
@@ -403,11 +403,11 @@ livox_manager_insert_voxel (livoxManager*      self,
  * \return Nonzero on success.
  */
 int
-livox_manager_load_materials (livoxManager* self)
+livox_manager_load_materials (LIVoxManager* self)
 {
 	int ret;
 	const char* query;
-	livoxMaterial* material;
+	LIVoxMaterial* material;
 	sqlite3_stmt* statement;
 
 	if (self->sql == NULL)
@@ -458,15 +458,15 @@ livox_manager_load_materials (livoxManager* self)
 }
 
 void
-livox_manager_mark_updates (livoxManager* self)
+livox_manager_mark_updates (LIVoxManager* self)
 {
 	int i;
 	int j;
 	int x;
 	int y;
 	int z;
-	lialgSectorsIter iter;
-	livoxSector* sector;
+	LIAlgSectorsIter iter;
+	LIVoxSector* sector;
 	struct
 	{
 		int x;
@@ -540,14 +540,14 @@ livox_manager_mark_updates (livoxManager* self)
  * \param voxels Buffer containing xsize*ysize*zsize voxels.
  */
 void
-livox_manager_paste_voxels (livoxManager* self,
+livox_manager_paste_voxels (LIVoxManager* self,
                             int           xstart,
                             int           ystart,
                             int           zstart,
                             int           xsize,
                             int           ysize,
                             int           zsize,
-                            livoxVoxel*   voxels)
+                            LIVoxVoxel*   voxels)
 {
 	int i;
 	int x;
@@ -556,7 +556,7 @@ livox_manager_paste_voxels (livoxManager* self,
 	int sx;
 	int sy;
 	int sz;
-	livoxSector* sec;
+	LIVoxSector* sec;
 
 	/* FIXME: Avoid excessive sector lookups. */
 	for (i = 0, z = zstart ; z < zstart + zsize ; z++)
@@ -578,10 +578,10 @@ livox_manager_paste_voxels (livoxManager* self,
 }
 
 void
-livox_manager_remove_material (livoxManager* self,
+livox_manager_remove_material (LIVoxManager* self,
                                int           id)
 {
-	livoxMaterial* material;
+	LIVoxMaterial* material;
 
 	material = lialg_u32dic_find (self->materials, id);
 	if (material != NULL)
@@ -592,23 +592,23 @@ livox_manager_remove_material (livoxManager* self,
 }
 
 int
-livox_manager_replace_voxel (livoxManager*      self,
-                             const limatVector* point,
-                             const livoxVoxel*  terrain)
+livox_manager_replace_voxel (LIVoxManager*      self,
+                             const LIMatVector* point,
+                             const LIVoxVoxel*  terrain)
 {
 	float d;
-	lialgRange range;
-	limatVector diff;
-	limatVector origin;
-	livoxVoxel voxel;
-	livoxVoxelIter iter;
+	LIAlgRange range;
+	LIMatVector diff;
+	LIMatVector origin;
+	LIVoxVoxel voxel;
+	LIVoxVoxelIter iter;
 	struct
 	{
 		int x;
 		int y;
 		int z;
 		float dist;
-		livoxSector* sector;
+		LIVoxSector* sector;
 	}
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
@@ -644,24 +644,24 @@ livox_manager_replace_voxel (livoxManager*      self,
 }
 
 int
-livox_manager_rotate_voxel (livoxManager*      self,
-                            const limatVector* point,
+livox_manager_rotate_voxel (LIVoxManager*      self,
+                            const LIMatVector* point,
                             int                axis,
                             int                step)
 {
 	float d;
-	lialgRange range;
-	limatVector diff;
-	limatVector origin;
-	livoxVoxel voxel;
-	livoxVoxelIter iter;
+	LIAlgRange range;
+	LIMatVector diff;
+	LIMatVector origin;
+	LIVoxVoxel voxel;
+	LIVoxVoxelIter iter;
 	struct
 	{
 		int x;
 		int y;
 		int z;
 		float dist;
-		livoxSector* sector;
+		LIVoxSector* sector;
 	}
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
@@ -701,7 +701,7 @@ livox_manager_rotate_voxel (livoxManager*      self,
 }
 
 void
-livox_manager_update (livoxManager* self,
+livox_manager_update (LIVoxManager* self,
                       float         secs)
 {
 	livox_manager_mark_updates (self);
@@ -709,14 +709,14 @@ livox_manager_update (livoxManager* self,
 }
 
 void
-livox_manager_update_marked (livoxManager* self)
+livox_manager_update_marked (LIVoxManager* self)
 {
 	int i;
 	int x;
 	int y;
 	int z;
-	lialgSectorsIter iter;
-	livoxSector* sector;
+	LIAlgSectorsIter iter;
+	LIVoxSector* sector;
 
 	/* Rebuild modified terrain. */
 	LIALG_SECTORS_FOREACH (iter, self->sectors)
@@ -744,10 +744,10 @@ livox_manager_update_marked (livoxManager* self)
  * \return Nonzero on success.
  */
 int
-livox_manager_write (livoxManager* self)
+livox_manager_write (LIVoxManager* self)
 {
-	lialgSectorsIter iter;
-	livoxSector* sector;
+	LIAlgSectorsIter iter;
+	LIVoxSector* sector;
 
 	if (self->sql == NULL)
 	{
@@ -775,9 +775,9 @@ livox_manager_write (livoxManager* self)
  * \return Nonzero on success.
  */
 int
-livox_manager_write_materials (livoxManager* self)
+livox_manager_write_materials (LIVoxManager* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	if (self->sql == NULL)
 	{
@@ -800,8 +800,8 @@ livox_manager_write_materials (livoxManager* self)
 }
 
 void
-livox_manager_set_sql (livoxManager* self,
-                       liarcSql*     sql)
+livox_manager_set_sql (LIVoxManager* self,
+                       LIArcSql*     sql)
 {
 	self->sql = sql;
 	if (sql != NULL)
@@ -812,16 +812,16 @@ livox_manager_set_sql (livoxManager* self,
 }
 
 void
-livox_manager_get_voxel (livoxManager* self,
+livox_manager_get_voxel (LIVoxManager* self,
                          int           x,
                          int           y,
                          int           z,
-                         livoxVoxel*   value)
+                         LIVoxVoxel*   value)
 {
 	int sx;
 	int sy;
 	int sz;
-	livoxSector* sector;
+	LIVoxSector* sector;
 
 	sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
@@ -839,16 +839,16 @@ livox_manager_get_voxel (livoxManager* self,
 }
 
 int
-livox_manager_set_voxel (livoxManager*     self,
+livox_manager_set_voxel (LIVoxManager*     self,
                          int               x,
                          int               y,
                          int               z,
-                         const livoxVoxel* value)
+                         const LIVoxVoxel* value)
 {
 	int sx;
 	int sy;
 	int sz;
-	livoxSector* sector;
+	LIVoxSector* sector;
 
 	sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
@@ -866,10 +866,10 @@ livox_manager_set_voxel (livoxManager*     self,
 /*****************************************************************************/
 
 static void
-private_clear_materials (livoxManager* self)
+private_clear_materials (LIVoxManager* self)
 {
-	lialgU32dicIter iter;
-	livoxMaterial* material;
+	LIAlgU32dicIter iter;
+	LIVoxMaterial* material;
 
 	LI_FOREACH_U32DIC (iter, self->materials)
 	{
@@ -880,7 +880,7 @@ private_clear_materials (livoxManager* self)
 }
 
 static int
-private_ensure_materials (livoxManager* self)
+private_ensure_materials (LIVoxManager* self)
 {
 	const char* query;
 	sqlite3_stmt* statement;
@@ -906,7 +906,7 @@ private_ensure_materials (livoxManager* self)
 }
 
 static int
-private_ensure_sectors (livoxManager* self)
+private_ensure_sectors (LIVoxManager* self)
 {
 	const char* query;
 	sqlite3_stmt* statement;
@@ -931,8 +931,8 @@ private_ensure_sectors (livoxManager* self)
 }
 
 static void
-private_mark_block (livoxManager* self,
-                    livoxSector*  sector,
+private_mark_block (LIVoxManager* self,
+                    LIVoxSector*  sector,
                     int           x,
                     int           y,
                     int           z)
@@ -940,7 +940,7 @@ private_mark_block (livoxManager* self,
 	int sx;
 	int sy;
 	int sz;
-	livoxSector* sector1;
+	LIVoxSector* sector1;
 
 	/* Find affected sector. */
 	sx = sector->sector->x;

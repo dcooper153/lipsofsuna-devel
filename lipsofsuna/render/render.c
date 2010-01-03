@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,33 +16,33 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndRender Render
+ * \addtogroup LIRenRender Render
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-draw.h"
 #include "render-group.h"
 
 static int
-private_init_resources (lirndRender* self,
+private_init_resources (LIRenRender* self,
                         const char*  dir);
 
 static int
-private_init_shaders (lirndRender* self);
+private_init_shaders (LIRenRender* self);
 
 /*****************************************************************************/
 
-lirndRender*
-lirnd_render_new (const char* dir)
+LIRenRender*
+liren_render_new (const char* dir)
 {
-	lirndRender* self;
+	LIRenRender* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndRender));
+	self = lisys_calloc (1, sizeof (LIRenRender));
 	if (self == NULL)
 		return NULL;
 	self->shader.enabled = (livid_features.shader_model >= 3);
@@ -63,18 +63,18 @@ lirnd_render_new (const char* dir)
 	return self;
 
 error:
-	lirnd_render_free (self);
+	liren_render_free (self);
 	return NULL;
 }
 
 void
-lirnd_render_free (lirndRender* self)
+liren_render_free (LIRenRender* self)
 {
-	lialgPtrdicIter iter0;
-	lialgStrdicIter iter1;
-	lirndImage* image;
-	lirndModel* model;
-	lirndShader* shader;
+	LIAlgPtrdicIter iter0;
+	LIAlgStrdicIter iter1;
+	LIRenImage* image;
+	LIRenModel* model;
+	LIRenShader* shader;
 
 	/* Free resources. */
 	glDeleteTextures (1, &self->helpers.noise);
@@ -86,16 +86,16 @@ lirnd_render_free (lirndRender* self)
 		LI_FOREACH_STRDIC (iter1, self->shaders)
 		{
 			shader = iter1.value;
-			lirnd_shader_free (shader);
+			liren_shader_free (shader);
 		}
 		lialg_strdic_free (self->shaders);
 	}
 
 	/* Free internal shaders. */
 	if (self->shader.fixed != NULL)
-		lirnd_shader_free (self->shader.fixed);
+		liren_shader_free (self->shader.fixed);
 	if (self->shader.shadowmap != NULL)
-		lirnd_shader_free (self->shader.shadowmap);
+		liren_shader_free (self->shader.shadowmap);
 
 	/* Free models. */
 	if (self->models_inst != NULL)
@@ -103,7 +103,7 @@ lirnd_render_free (lirndRender* self)
 		LI_FOREACH_PTRDIC (iter0, self->models_inst)
 		{
 			model = iter0.value;
-			lirnd_model_free (model);
+			liren_model_free (model);
 		}
 		lialg_ptrdic_free (self->models_inst);
 	}
@@ -112,7 +112,7 @@ lirnd_render_free (lirndRender* self)
 		LI_FOREACH_STRDIC (iter1, self->models)
 		{
 			model = iter1.value;
-			lirnd_model_free (model);
+			liren_model_free (model);
 		}
 		lialg_strdic_free (self->models);
 	}
@@ -123,7 +123,7 @@ lirnd_render_free (lirndRender* self)
 		LI_FOREACH_STRDIC (iter1, self->images)
 		{
 			image = iter1.value;
-			lirnd_image_free (image);
+			liren_image_free (image);
 		}
 		lialg_strdic_free (self->images);
 	}
@@ -148,12 +148,12 @@ lirnd_render_free (lirndRender* self)
  * \param name Name of the shader.
  * \return Shader.
  */
-lirndShader*
-lirnd_render_find_shader (lirndRender* self,
+LIRenShader*
+liren_render_find_shader (LIRenRender* self,
                           const char*  name)
 {
 	char* path;
-	lirndShader* shader;
+	LIRenShader* shader;
 
 	/* Try existing. */
 	shader = lialg_strdic_find (self->shaders, name);
@@ -166,12 +166,12 @@ lirnd_render_find_shader (lirndRender* self,
 		LISYS_PATH_SEPARATOR, name, NULL);
 	if (path == NULL)
 		return self->shader.fixed;
-	shader = lirnd_shader_new_from_file (self, path);
+	shader = liren_shader_new_from_file (self, path);
 	lisys_free (path);
 
 	/* Try fallback. */
 	if (shader == NULL)
-		shader = lirnd_shader_new (self);
+		shader = liren_shader_new (self);
 	if (shader == NULL)
 		return self->shader.fixed;
 
@@ -179,12 +179,12 @@ lirnd_render_find_shader (lirndRender* self,
 	shader->name = listr_dup (name);
 	if (shader->name == NULL)
 	{
-		lirnd_shader_free (shader);
+		liren_shader_free (shader);
 		return self->shader.fixed;
 	}
 	if (!lialg_strdic_insert (self->shaders, name, shader))
 	{
-		lirnd_shader_free (shader);
+		liren_shader_free (shader);
 		return self->shader.fixed;
 	}
 
@@ -201,8 +201,8 @@ lirnd_render_find_shader (lirndRender* self,
  * \param name Name of the texture.
  * \return Texture or NULL.
  */
-lirndImage*
-lirnd_render_find_image (lirndRender* self,
+LIRenImage*
+liren_render_find_image (LIRenRender* self,
                          const char*  name)
 {
 	return lialg_strdic_find (self->images, name);
@@ -215,8 +215,8 @@ lirnd_render_find_image (lirndRender* self,
  * \param name Model name.
  * \return Model.
  */
-lirndModel*
-lirnd_render_find_model (lirndRender* self,
+LIRenModel*
+liren_render_find_model (LIRenRender* self,
                          const char*  name)
 {
 	return lialg_strdic_find (self->models, name);
@@ -234,23 +234,23 @@ lirnd_render_find_model (lirndRender* self,
  * \return Nonzero on success.
  */
 int
-lirnd_render_load_image (lirndRender* self,
+liren_render_load_image (LIRenRender* self,
                          const char*  name)
 {
-	lialgPtrdicIter iter0;
-	lialgStrdicIter iter1;
-	lirndImage* image;
-	lirndModel* model;
+	LIAlgPtrdicIter iter0;
+	LIAlgStrdicIter iter1;
+	LIRenImage* image;
+	LIRenModel* model;
 
 	/* Just create new image if no old one. */
 	image = lialg_strdic_find (self->images, name);
 	if (image == NULL)
 	{
-		image = lirnd_image_new_from_file (self, name);
+		image = liren_image_new_from_file (self, name);
 		if (image == NULL)
 		{
 			lisys_error_report ();
-			image = lirnd_image_new (self, name);
+			image = liren_image_new (self, name);
 			if (image == NULL)
 				return 0;
 		}
@@ -258,21 +258,21 @@ lirnd_render_load_image (lirndRender* self,
 	}
 
 	/* Reload existing image. */
-	if (!lirnd_image_load (image))
+	if (!liren_image_load (image))
 		return 0;
 
 	/* Replace in all named models. */
 	LI_FOREACH_STRDIC (iter1, self->models)
 	{
 		model = iter1.value;
-		lirnd_model_replace_image (model, image);
+		liren_model_replace_image (model, image);
 	}
 
 	/* Replace in all instance models. */
 	LI_FOREACH_PTRDIC (iter0, self->models_inst)
 	{
 		model = iter0.value;
-		lirnd_model_replace_image (model, image);
+		liren_model_replace_image (model, image);
 	}
 
 	return 1;
@@ -291,22 +291,22 @@ lirnd_render_load_image (lirndRender* self,
  * \return Nonzero on success.
  */
 int
-lirnd_render_load_model (lirndRender* self,
+liren_render_load_model (LIRenRender* self,
                          const char*  name,
-                         limdlModel*  model)
+                         LIMdlModel*  model)
 {
-	lirndGroup* group;
-	lirndModel* model0;
-	lirndModel* model1;
-	lirndObject* object;
-	lirndScene* scene;
-	lialgPtrdicIter iter0;
-	lialgU32dicIter iter1;
-	lialgPtrdicIter iter2;
+	LIRenGroup* group;
+	LIRenModel* model0;
+	LIRenModel* model1;
+	LIRenObject* object;
+	LIRenScene* scene;
+	LIAlgPtrdicIter iter0;
+	LIAlgU32dicIter iter1;
+	LIAlgPtrdicIter iter2;
 
 	/* Create new model. */
 	model0 = lialg_strdic_find (self->models, name);
-	model1 = lirnd_model_new (self, model, name);
+	model1 = liren_model_new (self, model, name);
 	if (model1 == NULL)
 		return 0;
 
@@ -325,10 +325,10 @@ lirnd_render_load_model (lirndRender* self,
 			object = iter1.value;
 			if (object->model == model0)
 			{
-				if (!lirnd_object_set_model (object, model1))
+				if (!liren_object_set_model (object, model1))
 				{
-					lirnd_object_set_model (object, NULL);
-					lirnd_object_set_pose (object, NULL);
+					liren_object_set_model (object, NULL);
+					liren_object_set_pose (object, NULL);
 				}
 			}
 		}
@@ -337,12 +337,12 @@ lirnd_render_load_model (lirndRender* self,
 		LI_FOREACH_PTRDIC (iter2, scene->groups)
 		{
 			group = iter2.value;
-			lirnd_group_reload_model (group, model0, model1);
+			liren_group_reload_model (group, model0, model1);
 		}
 	}
 
 	/* Free old model. */
-	lirnd_model_free (model0);
+	liren_model_free (model0);
 
 	return 1;
 }
@@ -354,7 +354,7 @@ lirnd_render_load_model (lirndRender* self,
  * \param secs Number of seconds since the last update.
  */
 void
-lirnd_render_update (lirndRender* self,
+liren_render_update (LIRenRender* self,
                      float        secs)
 {
 	/* Update time. */
@@ -362,40 +362,40 @@ lirnd_render_update (lirndRender* self,
 }
 
 void
-lirnd_render_set_global_shadows (lirndRender* self,
+liren_render_set_global_shadows (LIRenRender* self,
                                  int          value)
 {
 	self->config.global_shadows = value;
 }
 
 int
-lirnd_render_get_light_count (const lirndRender* self)
+liren_render_get_light_count (const LIRenRender* self)
 {
 	return self->config.light_count;
 }
 
 void
-lirnd_render_set_light_count (lirndRender* self,
+liren_render_set_light_count (LIRenRender* self,
                               int          count)
 {
 	self->config.light_count = LI_MIN (8, count);
 }
 
 void
-lirnd_render_set_local_shadows (lirndRender* self,
+liren_render_set_local_shadows (LIRenRender* self,
                                 int          value)
 {
 	self->config.local_shadows = value;
 }
 
 int
-lirnd_render_get_shaders_enabled (const lirndRender* self)
+liren_render_get_shaders_enabled (const LIRenRender* self)
 {
 	return self->shader.enabled;
 }
 
 void
-lirnd_render_set_shaders_enabled (lirndRender* self,
+liren_render_set_shaders_enabled (LIRenRender* self,
                                   int          value)
 {
 	if (livid_features.shader_model >= 3)
@@ -408,7 +408,7 @@ lirnd_render_set_shaders_enabled (lirndRender* self,
 
 #ifndef NDEBUG
 void
-lirnd_check_errors ()
+liren_check_errors ()
 {
 	switch (glGetError ())
 	{
@@ -443,7 +443,7 @@ lirnd_check_errors ()
 /*****************************************************************************/
 
 static int
-private_init_resources (lirndRender* self,
+private_init_resources (LIRenRender* self,
                         const char*  dir)
 {
 	int x;
@@ -534,12 +534,12 @@ private_init_resources (lirndRender* self,
 }
 
 static int
-private_init_shaders (lirndRender* self)
+private_init_shaders (LIRenRender* self)
 {
 	char* path;
-	liarcReader* reader;
+	LIArcReader* reader;
 
-	self->shader.fixed = lirnd_shader_new (self);
+	self->shader.fixed = liren_shader_new (self);
 	if (self->shader.fixed == NULL)
 		return 0;
 	if (livid_features.shader_model >= 3)
@@ -551,7 +551,7 @@ private_init_shaders (lirndRender* self)
 		lisys_free (path);
 		if (reader == NULL)
 			return 0;
-		self->shader.shadowmap = lirnd_shader_new_from_data (self, reader);
+		self->shader.shadowmap = liren_shader_new_from_data (self, reader);
 		liarc_reader_free (reader);
 		if (self->shader.shadowmap == NULL)
 			return 0;

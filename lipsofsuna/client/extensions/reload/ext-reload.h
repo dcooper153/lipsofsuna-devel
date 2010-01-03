@@ -27,39 +27,39 @@
 #ifndef __EXT_RELOAD_H__
 #define __EXT_RELOAD_H__
 
-#include <client/lips-client.h>
-#include <reload/lips-reload.h>
-#include <system/lips-system.h>
-#include <thread/lips-thread.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/reload.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/thread.h>
+#include <lipsofsuna/widget.h>
 
-typedef struct _liextReload liextReload;
-struct _liextReload
+typedef struct _LIExtReload LIExtReload;
+struct _LIExtReload
 {
 	int queued;
-	licalHandle calls[1];
-	licliClient* client;
-	lirelReload* reload;
-	liwdgWidget* progress;
+	LICalHandle calls[1];
+	LICliClient* client;
+	LIRelReload* reload;
+	LIWdgWidget* progress;
 };
 
-liextReload*
-liext_reload_new (licliClient* client);
+LIExtReload*
+liext_reload_new (LICliClient* client);
 
 void
-liext_reload_free (liextReload* self);
+liext_reload_free (LIExtReload* self);
 
 void
-liext_reload_cancel (liextReload* self);
+liext_reload_cancel (LIExtReload* self);
 
 int
-liext_reload_run (liextReload* self);
+liext_reload_run (LIExtReload* self);
 
 int
-liext_reload_get_enabled (const liextReload* self);
+liext_reload_get_enabled (const LIExtReload* self);
 
 int
-liext_reload_set_enabled (liextReload* self,
+liext_reload_set_enabled (LIExtReload* self,
                           int          value);
 
 #endif

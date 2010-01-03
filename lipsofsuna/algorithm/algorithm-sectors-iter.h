@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgSectorsIter SectorsIter
+ * \addtogroup LIAlgSectorsIter SectorsIter
  * @{
  */
 
@@ -30,14 +30,14 @@
 #include "algorithm-sectors.h"
 #include "algorithm-u32dic.h"
 
-typedef struct _lialgSectorsIter lialgSectorsIter;
-struct _lialgSectorsIter
+typedef struct _LIAlgSectorsIter LIAlgSectorsIter;
+struct _LIAlgSectorsIter
 {
-	lialgU32dicIter all;
-	lialgRangeIter range;
-	lialgSectors* sectors;
-	lialgSector* sector;
-	int (*next)(lialgSectorsIter*);
+	LIAlgU32dicIter all;
+	LIAlgRangeIter range;
+	LIAlgSectors* sectors;
+	LIAlgSector* sector;
+	int (*next)(LIAlgSectorsIter*);
 };
 
 /**
@@ -83,22 +83,22 @@ struct _lialgSectorsIter
 	     lialg_sectors_iter_next (&iter))
 
 static inline int
-lialg_sectors_iter_next (lialgSectorsIter* self)
+lialg_sectors_iter_next (LIAlgSectorsIter* self)
 {
 	return self->next (self);
 }
 
 static inline int
-lialg_sectors_iter_next_all (lialgSectorsIter* self)
+lialg_sectors_iter_next_all (LIAlgSectorsIter* self)
 {
 	lialg_u32dic_iter_next (&self->all);
-	self->sector = (lialgSector*) self->all.value;
+	self->sector = (LIAlgSector*) self->all.value;
 
 	return self->sector != NULL;
 }
 
 static inline int
-lialg_sectors_iter_next_range (lialgSectorsIter* self)
+lialg_sectors_iter_next_range (LIAlgSectorsIter* self)
 {
 	/* Find next non-empty sector. */
 	while (self->range.more)
@@ -113,33 +113,33 @@ lialg_sectors_iter_next_range (lialgSectorsIter* self)
 }
 
 static inline int
-lialg_sectors_iter_first_all (lialgSectorsIter* self,
-                              lialgSectors*     sectors)
+lialg_sectors_iter_first_all (LIAlgSectorsIter* self,
+                              LIAlgSectors*     sectors)
 {
 	/* Initialize self. */
-	memset (self, 0, sizeof (lialgSectorsIter));
+	memset (self, 0, sizeof (LIAlgSectorsIter));
 	self->sectors = sectors;
 	self->next = lialg_sectors_iter_next_all;
 
 	/* Find first sector. */
 	lialg_u32dic_iter_start (&self->all, sectors->sectors);
-	self->sector = (lialgSector*) self->all.value;
+	self->sector = (LIAlgSector*) self->all.value;
 
 	return self->sector != NULL;
 }
 
 static inline int
-lialg_sectors_iter_first_offset (lialgSectorsIter* self,
-                                 lialgSectors*     sectors,
+lialg_sectors_iter_first_offset (LIAlgSectorsIter* self,
+                                 LIAlgSectors*     sectors,
                                  int               x,
                                  int               y,
                                  int               z,
                                  int               radius)
 {
-	lialgRange range;
+	LIAlgRange range;
 
 	/* Initialize self. */
-	memset (self, 0, sizeof (lialgSectorsIter));
+	memset (self, 0, sizeof (LIAlgSectorsIter));
 	self->sectors = sectors;
 	self->next = lialg_sectors_iter_next_range;
 	range = lialg_range_new_from_center (x, y, z, radius);
@@ -160,15 +160,15 @@ lialg_sectors_iter_first_offset (lialgSectorsIter* self,
 }
 
 static inline int
-lialg_sectors_iter_first_point (lialgSectorsIter*  self,
-                                lialgSectors*      sectors,
-                                const limatVector* point,
+lialg_sectors_iter_first_point (LIAlgSectorsIter*  self,
+                                LIAlgSectors*      sectors,
+                                const LIMatVector* point,
                                 float              radius)
 {
-	lialgRange range;
+	LIAlgRange range;
 
 	/* Initialize self. */
-	memset (self, 0, sizeof (lialgSectorsIter));
+	memset (self, 0, sizeof (LIAlgSectorsIter));
 	self->sectors = sectors;
 	self->next = lialg_sectors_iter_next_range;
 	range = lialg_range_new_from_sphere (point, radius, sectors->width);

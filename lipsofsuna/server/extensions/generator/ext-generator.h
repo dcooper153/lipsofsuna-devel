@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,20 +27,20 @@
 #ifndef __EXT_GENERATOR_H__
 #define __EXT_GENERATOR_H__
 
-#include <server/lips-server.h>
+#include <lipsofsuna/server.h>
 
-typedef struct _liextGenerator liextGenerator;
-struct _liextGenerator
+typedef struct _LIExtGenerator LIExtGenerator;
+struct _LIExtGenerator
 {
-	lisrvServer* server;
-	licalHandle calls[1];
+	LISerServer* server;
+	LICalHandle calls[1];
 };
 
-liextGenerator*
-liext_generator_new (lisrvServer* server);
+LIExtGenerator*
+liext_generator_new (LISerServer* server);
 
 void
-liext_generator_free (liextGenerator* self);
+liext_generator_free (LIExtGenerator* self);
 
 #endif
 

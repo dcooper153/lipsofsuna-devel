@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 /*****************************************************************************/
 
@@ -42,12 +42,12 @@
  * -- @param args List of widgets.
  * function Group.append_row(self, args)
  */
-static void Group_append_col (liscrArgs* args)
+static void Group_append_col (LIScrArgs* args)
 {
 	int i;
 	int w;
 	int h;
-	liscrData* data;
+	LIScrData* data;
 
 	/* Append column. */
 	liwdg_group_get_size (args->self, &w, &h);
@@ -71,12 +71,12 @@ static void Group_append_col (liscrArgs* args)
  * -- @param args List of widgets.
  * function Group.append_row(self, args)
  */
-static void Group_append_row (liscrArgs* args)
+static void Group_append_row (LIScrArgs* args)
 {
 	int i;
 	int w;
 	int h;
-	liscrData* data;
+	LIScrData* data;
 
 	/* Append row. */
 	liwdg_group_get_size (args->self, &w, &h);
@@ -107,8 +107,8 @@ Group_insert_col (lua_State* lua)
 	int w;
 	int h;
 	int col;
-	liscrData* self;
-	liscrData* widget;
+	LIScrData* self;
+	LIScrData* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	col = luaL_checkint (lua, 2) - 1;
@@ -158,8 +158,8 @@ Group_insert_row (lua_State* lua)
 	int w;
 	int h;
 	int row;
-	liscrData* self;
-	liscrData* widget;
+	LIScrData* self;
+	LIScrData* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	row = luaL_checkint (lua, 2) - 1;
@@ -203,11 +203,11 @@ Group_insert_row (lua_State* lua)
  * -- @return New group.
  * function Group.new(self, args)
  */
-static void Group_new (liscrArgs* args)
+static void Group_new (LIScrArgs* args)
 {
-	licliClient* client;
-	liscrData* data;
-	liwdgWidget* self;
+	LICliClient* client;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate userdata. */
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_GROUP);
@@ -242,9 +242,9 @@ Group_remove_col (lua_State* lua)
 	int w;
 	int h;
 	int col;
-	liscrData* self;
-	liscrData* data;
-	liwdgWidget* widget;
+	LIScrData* self;
+	LIScrData* data;
+	LIWdgWidget* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	col = luaL_checkint (lua, 2) - 1;
@@ -284,9 +284,9 @@ Group_remove_row (lua_State* lua)
 	int w;
 	int h;
 	int row;
-	liscrData* self;
-	liscrData* data;
-	liwdgWidget* widget;
+	LIScrData* self;
+	LIScrData* data;
+	LIWdgWidget* widget;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
 	row = luaL_checkint (lua, 2) - 1;
@@ -323,13 +323,13 @@ Group_remove_row (lua_State* lua)
  * -- @return Widget or nil.
  * function Group.get_child(self, args)
  */
-static void Group_get_child (liscrArgs* args)
+static void Group_get_child (LIScrArgs* args)
 {
 	int x = 1;
 	int y = 1;
 	int w;
 	int h;
-	liwdgWidget* widget;
+	LIWdgWidget* widget;
 
 	liwdg_group_get_size (args->self, &w, &h);
 	liscr_args_gets_int (args, "col", &x);
@@ -354,14 +354,14 @@ static void Group_get_child (liscrArgs* args)
  * -- @param args Arguments.
  * function Group.set_child(self, args)
  */
-static void Group_set_child (liscrArgs* args)
+static void Group_set_child (LIScrArgs* args)
 {
 	int x = 1;
 	int y = 1;
 	int w;
 	int h;
-	liscrData* data;
-	liwdgWidget* widget;
+	LIScrData* data;
+	LIWdgWidget* widget;
 
 	/* Arguments. */
 	if (!liscr_args_gets_int (args, "col", &x) ||
@@ -401,7 +401,7 @@ static void Group_set_child (liscrArgs* args)
  * -- @param args Arguments.
  * function Group.set_expand(self, args)
  */
-static void Group_set_expand (liscrArgs* args)
+static void Group_set_expand (LIScrArgs* args)
 {
 	int i;
 	int w;
@@ -422,7 +422,7 @@ static void Group_set_expand (liscrArgs* args)
  * -- @name Group.cols
  * -- @class table
  */
-static void Group_getter_cols (liscrArgs* args)
+static void Group_getter_cols (LIScrArgs* args)
 {
 	int w;
 	int h;
@@ -430,14 +430,14 @@ static void Group_getter_cols (liscrArgs* args)
 	liwdg_group_get_size (args->self, &w, &h);
 	liscr_args_seti_int (args, w);
 }
-static void Group_setter_cols (liscrArgs* args)
+static void Group_setter_cols (LIScrArgs* args)
 {
 	int w;
 	int h;
 	int y;
 	int cols;
-	liscrData* data;
-	liwdgWidget* widget;
+	LIScrData* data;
+	LIWdgWidget* widget;
 
 	if (!liscr_args_geti_int (args, 0, &cols) || cols < 0)
 		return;
@@ -468,7 +468,7 @@ static void Group_setter_cols (liscrArgs* args)
  * -- @name Group.rows
  * -- @class table
  */
-static void Group_getter_rows (liscrArgs* args)
+static void Group_getter_rows (LIScrArgs* args)
 {
 	int w;
 	int h;
@@ -476,14 +476,14 @@ static void Group_getter_rows (liscrArgs* args)
 	liwdg_group_get_size (args->self, &w, &h);
 	liscr_args_seti_int (args, h);
 }
-static void Group_setter_rows (liscrArgs* args)
+static void Group_setter_rows (LIScrArgs* args)
 {
 	int w;
 	int h;
 	int x;
 	int rows;
-	liscrData* data;
-	liwdgWidget* widget;
+	LIScrData* data;
+	LIWdgWidget* widget;
 
 	if (!liscr_args_geti_int (args, 0, &rows) || rows < 0)
 		return;
@@ -511,10 +511,10 @@ static void Group_setter_rows (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licliGroupScript (liscrClass* self,
+licli_script_group (LIScrClass* self,
                   void*       data)
 {
-	liscr_class_inherit (self, licliWidgetScript, data);
+	liscr_class_inherit (self, licli_script_widget, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_GROUP, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_GROUP);
 	liscr_class_insert_mfunc (self, "append_col", Group_append_col);

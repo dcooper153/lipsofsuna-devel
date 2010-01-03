@@ -27,7 +27,7 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
 #define LIEXT_SCRIPT_BUTTON "Lips.Button"
 #define LIEXT_SCRIPT_ENTRY "Lips.Entry"
@@ -39,54 +39,54 @@
 #define LIEXT_SCRIPT_TREE "Lips.Tree"
 #define LIEXT_SCRIPT_VIEW "Lips.View"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licliClient* client;
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextButtonScript (liscrClass* self,
+liext_script_button (LIScrClass* self,
                    void*       data);
 
 void
-liextEntryScript (liscrClass* self,
+liext_script_entry (LIScrClass* self,
                   void*       data);
 
 void
-liextImageScript (liscrClass* self,
+liext_script_image (LIScrClass* self,
                   void*       data);
 
 void
-liextLabelScript (liscrClass* self,
+liext_script_label (LIScrClass* self,
                   void*       data);
 
 void
-liextMenuScript (liscrClass* self,
+liext_script_menu (LIScrClass* self,
                  void*       data);
 
 void
-liextScrollScript (liscrClass* self,
+liext_script_scroll (LIScrClass* self,
                    void*       data);
 
 void
-liextSpinScript (liscrClass* self,
+liext_script_spin (LIScrClass* self,
                  void*       data);
 
 void
-liextTreeScript (liscrClass* self,
+liext_script_tree (LIScrClass* self,
                  void*       data);
 
 void
-liextViewScript (liscrClass* self,
+liext_script_view (LIScrClass* self,
                  void*       data);
 
 #endif

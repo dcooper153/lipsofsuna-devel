@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,8 @@
  * @{
  */
 
-#include <ai/lips-ai.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/ai.h>
+#include <lipsofsuna/script.h>
 
 /* @luadoc
  * module "Core.Common.Path"
@@ -41,10 +41,10 @@
  * -- @return New vector.
  * function Path.pop(self)
  */
-static void Path_pop (liscrArgs* args)
+static void Path_pop (LIScrArgs* args)
 {
 	int index;
-	limatVector tmp;
+	LIMatVector tmp;
 
 	index = liai_path_get_position (args->self);
 	if (index < liai_path_get_length (args->self))
@@ -61,7 +61,7 @@ static void Path_pop (liscrArgs* args)
  * -- @name Path.length
  * -- @class table
  */
-static void Path_getter_length (liscrArgs* args)
+static void Path_getter_length (LIScrArgs* args)
 {
 	liscr_args_seti_int (args,
 		liai_path_get_length (args->self) -
@@ -71,7 +71,7 @@ static void Path_getter_length (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licomPathScript (liscrClass* self,
+liscr_script_path (LIScrClass* self,
                  void*       data)
 {
 	liscr_class_insert_mfunc (self, "pop", Path_pop);

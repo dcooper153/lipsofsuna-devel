@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisnd Sound 
  * @{
- * \addtogroup lisndSource Source
+ * \addtogroup LISndSource Source
  * @{
  */
 
@@ -27,53 +27,53 @@
 
 #include "sound-sample.h"
 #include "sound-system.h"
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _lisndSource lisndSource;
-struct _lisndSource
+typedef struct _LISndSource LISndSource;
+struct _LISndSource
 {
 	ALuint source;
 	ALint queued;
 };
 
-lisndSource*
-lisnd_source_new (lisndSystem* system);
+LISndSource*
+lisnd_source_new (LISndSystem* system);
 
-lisndSource*
-lisnd_source_new_with_sample (lisndSystem* system,
-                              lisndSample* sample);
-
-void
-lisnd_source_free (lisndSource* self);
+LISndSource*
+lisnd_source_new_with_sample (LISndSystem* system,
+                              LISndSample* sample);
 
 void
-lisnd_source_queue_sample (lisndSource* self,
-                           lisndSample* sample);
+lisnd_source_free (LISndSource* self);
+
+void
+lisnd_source_queue_sample (LISndSource* self,
+                           LISndSample* sample);
 
 int
-lisnd_source_update (lisndSource* self);
+lisnd_source_update (LISndSource* self);
 
 void
-lisnd_source_set_looping (lisndSource* self,
+lisnd_source_set_looping (LISndSource* self,
                           int          looping);
 
 int
-lisnd_source_get_playing (lisndSource* self);
+lisnd_source_get_playing (LISndSource* self);
 
 void
-lisnd_source_set_playing (lisndSource* self,
+lisnd_source_set_playing (LISndSource* self,
                           int          playing);
 
 void
-lisnd_source_set_position (lisndSource*       self,
-                           const limatVector* value);
+lisnd_source_set_position (LISndSource*       self,
+                           const LIMatVector* value);
 
 void
-lisnd_source_set_velocity (lisndSource*       self,
-                           const limatVector* value);
+lisnd_source_set_velocity (LISndSource*       self,
+                           const LIMatVector* value);
 
 void
-lisnd_source_set_volume (lisndSource* self,
+lisnd_source_set_volume (LISndSource* self,
                          float        value);
 
 #endif

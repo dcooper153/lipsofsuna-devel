@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,37 +18,37 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgSectors Sectors
+ * \addtogroup LIAlgSectors Sectors
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-range.h"
 #include "algorithm-range-iter.h"
 #include "algorithm-sectors.h"
 
-typedef struct _lialgSectorsContent lialgSectorsContent;
-struct _lialgSectorsContent
+typedef struct _LIAlgSectorsContent LIAlgSectorsContent;
+struct _LIAlgSectorsContent
 {
-	lialgSectorFreeFunc free;
-	lialgSectorLoadFunc load;
+	LIAlgSectorFreeFunc free;
+	LIAlgSectorLoadFunc load;
 	void* data;
 };
 
 static void
-private_free_sector (lialgSectors* self,
-                     lialgSector*  sector);
+private_free_sector (LIAlgSectors* self,
+                     LIAlgSector*  sector);
 
 /*****************************************************************************/
 
-lialgSectors*
+LIAlgSectors*
 lialg_sectors_new (int   count,
                    float width)
 {
-	lialgSectors* self;
+	LIAlgSectors* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lialgSectors));
+	self = lisys_calloc (1, sizeof (LIAlgSectors));
 	if (self == NULL)
 		return NULL;
 	self->count = count;
@@ -75,7 +75,7 @@ lialg_sectors_new (int   count,
 }
 
 void
-lialg_sectors_free (lialgSectors* self)
+lialg_sectors_free (LIAlgSectors* self)
 {
 	assert (self->content->size == 0);
 
@@ -86,9 +86,9 @@ lialg_sectors_free (lialgSectors* self)
 }
 
 void
-lialg_sectors_clear (lialgSectors* self)
+lialg_sectors_clear (LIAlgSectors* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	LI_FOREACH_U32DIC (iter, self->sectors)
 		private_free_sector (self, iter.value);
@@ -96,12 +96,12 @@ lialg_sectors_clear (lialgSectors* self)
 }
 
 void*
-lialg_sectors_data_index (lialgSectors* self,
+lialg_sectors_data_index (LIAlgSectors* self,
                           const char*   name,
                           int           index,
                           int           create)
 {
-	lialgSector* sector;
+	LIAlgSector* sector;
 
 	sector = lialg_sectors_sector_index (self, index, create);
 	if (sector == NULL)
@@ -111,14 +111,14 @@ lialg_sectors_data_index (lialgSectors* self,
 }
 
 void*
-lialg_sectors_data_offset (lialgSectors* self,
+lialg_sectors_data_offset (LIAlgSectors* self,
                            const char*   name,
                            int           x,
                            int           y,
                            int           z,
                            int           create)
 {
-	lialgSector* sector;
+	LIAlgSector* sector;
 
 	sector = lialg_sectors_sector_offset (self, x, y, z, create);
 	if (sector == NULL)
@@ -128,12 +128,12 @@ lialg_sectors_data_offset (lialgSectors* self,
 }
 
 void*
-lialg_sectors_data_point (lialgSectors*      self,
+lialg_sectors_data_point (LIAlgSectors*      self,
                           const char*        name,
-                          const limatVector* point,
+                          const LIMatVector* point,
                           int                create)
 {
-	lialgSector* sector;
+	LIAlgSector* sector;
 
 	sector = lialg_sectors_sector_point (self, point, create);
 	if (sector == NULL)
@@ -142,15 +142,15 @@ lialg_sectors_data_point (lialgSectors*      self,
 	return lialg_strdic_find (sector->content, name);
 }
 
-lialgSector*
-lialg_sectors_sector_index (lialgSectors* self,
+LIAlgSector*
+lialg_sectors_sector_index (LIAlgSectors* self,
                             int           index,
                             int           create)
 {
 	void* data;
-	lialgSector* sector;
-	lialgSectorsContent* content;
-	lialgStrdicIter iter;
+	LIAlgSector* sector;
+	LIAlgSectorsContent* content;
+	LIAlgStrdicIter iter;
 
 	/* Try existing. */
 	sector = lialg_u32dic_find (self->sectors, index);
@@ -160,7 +160,7 @@ lialg_sectors_sector_index (lialgSectors* self,
 		return NULL;
 
 	/* Allocate sector. */
-	sector = lisys_calloc (1, sizeof (lialgSector));
+	sector = lisys_calloc (1, sizeof (LIAlgSector));
 	if (sector == NULL)
 		return NULL;
 	sector->index = index;
@@ -200,8 +200,8 @@ lialg_sectors_sector_index (lialgSectors* self,
 	return sector;
 }
 
-lialgSector*
-lialg_sectors_sector_offset (lialgSectors* self,
+LIAlgSector*
+lialg_sectors_sector_offset (LIAlgSectors* self,
                              int           x,
                              int           y,
                              int           z,
@@ -211,9 +211,9 @@ lialg_sectors_sector_offset (lialgSectors* self,
 		lialg_sectors_offset_to_index (self, x, y, z), create);
 }
 
-lialgSector*
-lialg_sectors_sector_point (lialgSectors*      self,
-                            const limatVector* point,
+LIAlgSector*
+lialg_sectors_sector_point (LIAlgSectors*      self,
+                            const LIMatVector* point,
                             int                create)
 {
 	return lialg_sectors_sector_index (self,
@@ -221,7 +221,7 @@ lialg_sectors_sector_point (lialgSectors*      self,
 }
 
 void
-lialg_sectors_index_to_offset (lialgSectors* self,
+lialg_sectors_index_to_offset (LIAlgSectors* self,
                                int           index,
                                int*          x,
                                int*          y,
@@ -245,21 +245,21 @@ lialg_sectors_index_to_offset_static (int  count,
 }
 
 int
-lialg_sectors_insert_content (lialgSectors*       self,
+lialg_sectors_insert_content (LIAlgSectors*       self,
                               const char*         name,
                               void*               data,
-                              lialgSectorFreeFunc free,
-                              lialgSectorLoadFunc load)
+                              LIAlgSectorFreeFunc free,
+                              LIAlgSectorLoadFunc load)
 {
 	void* data_;
-	lialgSector* sector;
-	lialgSectorsContent* content;
-	lialgU32dicIter iter;
+	LIAlgSector* sector;
+	LIAlgSectorsContent* content;
+	LIAlgU32dicIter iter;
 
 	assert (!lialg_strdic_find (self->content, name));
 
 	/* Allocate content. */
-	content = lisys_calloc (1, sizeof (lialgSectorsContent));
+	content = lisys_calloc (1, sizeof (LIAlgSectorsContent));
 	if (content == NULL)
 		return 0;
 	content->data = data;
@@ -289,7 +289,7 @@ lialg_sectors_insert_content (lialgSectors*       self,
 }
 
 int
-lialg_sectors_offset_to_index (lialgSectors* self,
+lialg_sectors_offset_to_index (LIAlgSectors* self,
                                int           x,
                                int           y,
                                int           z)
@@ -307,8 +307,8 @@ lialg_sectors_offset_to_index_static (int count,
 }
 
 int
-lialg_sectors_point_to_index (lialgSectors*      self,
-                              const limatVector* point)
+lialg_sectors_point_to_index (LIAlgSectors*      self,
+                              const LIMatVector* point)
 {
 	int x;
 	int y;
@@ -324,7 +324,7 @@ lialg_sectors_point_to_index (lialgSectors*      self,
 int
 lialg_sectors_point_to_index_static (int                count,
                                      float              width,
-                                     const limatVector* point)
+                                     const LIMatVector* point)
 {
 	int x;
 	int y;
@@ -338,14 +338,14 @@ lialg_sectors_point_to_index_static (int                count,
 }
 
 void
-lialg_sectors_refresh_point (lialgSectors*      self,
-                             const limatVector* point,
+lialg_sectors_refresh_point (LIAlgSectors*      self,
+                             const LIMatVector* point,
                              float              radius)
 {
 	time_t stamp;
-	lialgRange range;
-	lialgRangeIter iter;
-	lialgSector* sector;
+	LIAlgRange range;
+	LIAlgRangeIter iter;
+	LIAlgSector* sector;
 
 	stamp = time (NULL);
 	range = lialg_range_new_from_sphere (point, radius, self->width);
@@ -358,10 +358,10 @@ lialg_sectors_refresh_point (lialgSectors*      self,
 }
 
 void
-lialg_sectors_remove (lialgSectors* self,
+lialg_sectors_remove (LIAlgSectors* self,
                       int           index)
 {
-	lialgSector* sector;
+	LIAlgSector* sector;
 
 	sector = lialg_u32dic_find (self->sectors, index);
 	if (sector != NULL)
@@ -369,13 +369,13 @@ lialg_sectors_remove (lialgSectors* self,
 }
 
 void
-lialg_sectors_remove_content (lialgSectors* self,
+lialg_sectors_remove_content (LIAlgSectors* self,
                               const char*   name)
 {
 	void* data;
-	lialgSector* sector;
-	lialgSectorsContent* content;
-	lialgU32dicIter iter;
+	LIAlgSector* sector;
+	LIAlgSectorsContent* content;
+	LIAlgU32dicIter iter;
 
 	/* Find content. */
 	content = lialg_strdic_find (self->content, name);
@@ -397,10 +397,10 @@ lialg_sectors_remove_content (lialgSectors* self,
 }
 
 void*
-lialg_sectors_get_userdata (lialgSectors* self,
+lialg_sectors_get_userdata (LIAlgSectors* self,
                             const char*   name)
 {
-	lialgSectorsContent* content;
+	LIAlgSectorsContent* content;
 
 	content = lialg_strdic_find (self->content, name);
 	if (content == NULL)
@@ -412,12 +412,12 @@ lialg_sectors_get_userdata (lialgSectors* self,
 /*****************************************************************************/
 
 static void
-private_free_sector (lialgSectors* self,
-                     lialgSector*  sector)
+private_free_sector (LIAlgSectors* self,
+                     LIAlgSector*  sector)
 {
 	void* data;
-	lialgSectorsContent* content;
-	lialgStrdicIter iter;
+	LIAlgSectorsContent* content;
+	LIAlgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->content)
 	{

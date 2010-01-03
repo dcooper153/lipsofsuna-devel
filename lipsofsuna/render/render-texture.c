@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,17 +16,17 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndTexture Texture
+ * \addtogroup LIRenTexture Texture
  * @{
  */
 
 #include "render-texture.h"
 
 void
-lirnd_texture_init (lirndTexture* self,
-                    limdlTexture* texture)
+liren_texture_init (LIRenTexture* self,
+                    LIMdlTexture* texture)
 
 {
 	self->flags = texture->flags;
@@ -74,13 +74,13 @@ lirnd_texture_init (lirndTexture* self,
 }
 
 void
-lirnd_texture_free (lirndTexture* self)
+liren_texture_free (LIRenTexture* self)
 {
 }
 
 void
-lirnd_texture_set_image (lirndTexture* self,
-                         lirndImage*   value)
+liren_texture_set_image (LIRenTexture* self,
+                         LIRenImage*   value)
 {
 	self->image = value;
 	if (value != NULL && value->texture != NULL)

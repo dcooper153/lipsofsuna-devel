@@ -22,36 +22,36 @@
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "client.h"
 
 static int
-private_assign (licliClient* client,
-                liarcReader* reader);
+private_assign (LICliClient* client,
+                LIArcReader* reader);
 
 static int
-private_object_animation (licliClient* client,
-                          liarcReader* reader);
+private_object_animation (LICliClient* client,
+                          LIArcReader* reader);
 
 static int
-private_object_create (licliClient* client,
-                       liarcReader* reader);
+private_object_create (LICliClient* client,
+                       LIArcReader* reader);
 
 static int
-private_object_destroy (licliClient* client,
-                        liarcReader* reader);
+private_object_destroy (LICliClient* client,
+                        LIArcReader* reader);
 
 static int
-private_object_graphic (licliClient* client,
-                        liarcReader* reader);
+private_object_graphic (LICliClient* client,
+                        LIArcReader* reader);
 
 static int
-private_object_simulate (licliClient* client,
-                         liarcReader* reader);
+private_object_simulate (LICliClient* client,
+                         LIArcReader* reader);
 
 static int
-private_resources (licliClient* client,
-                   liarcReader* reader);
+private_resources (LICliClient* client,
+                   LIArcReader* reader);
 
 /*****************************************************************************/
 
@@ -64,9 +64,9 @@ private_resources (licliClient* client,
  * \return Zero if handled, nonzero if should be passed to other packet handlers.
  */
 int
-licli_client_handle_packet (licliClient* self,
+licli_client_handle_packet (LICliClient* self,
                             int          type,
-                            liarcReader* reader)
+                            LIArcReader* reader)
 {
 	reader->pos = 1;
 	switch (type)
@@ -101,10 +101,10 @@ licli_client_handle_packet (licliClient* self,
 /*****************************************************************************/
 
 static int
-private_assign (licliClient* client,
-                liarcReader* reader)
+private_assign (LICliClient* client,
+                LIArcReader* reader)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	if (!liarc_reader_get_uint32 (reader, &client->network->id) ||
 	    !liarc_reader_get_uint32 (reader, &client->network->features) ||
@@ -122,15 +122,15 @@ private_assign (licliClient* client,
 }
 
 static int
-private_object_animation (licliClient* client,
-                          liarcReader* reader)
+private_object_animation (LICliClient* client,
+                          LIArcReader* reader)
 {
 	float priority;
 	uint8_t channel;
 	uint8_t permanent;
 	uint32_t id;
 	uint16_t animation;
-	liengObject* object;
+	LIEngObject* object;
 
 	/* Parse the packet. */
 	if (!liarc_reader_get_uint32 (reader, &id) ||
@@ -151,8 +151,8 @@ private_object_animation (licliClient* client,
 }
 
 static int
-private_object_create (licliClient* client,
-                       liarcReader* reader)
+private_object_create (LICliClient* client,
+                       LIArcReader* reader)
 {
 	int i;
 	float priority;
@@ -166,11 +166,11 @@ private_object_create (licliClient* client,
 	uint16_t anim;
 	uint16_t graphic;
 	uint32_t id;
-	liengObject* object;
-	limatQuaternion rotation;
-	limatTransform transform;
-	limatVector position;
-	limatVector velocity;
+	LIEngObject* object;
+	LIMatQuaternion rotation;
+	LIMatTransform transform;
+	LIMatVector position;
+	LIMatVector velocity;
 
 	/* Parse the packet. */
 	if (!liarc_reader_get_uint32 (reader, &id) ||
@@ -224,11 +224,11 @@ private_object_create (licliClient* client,
 }
 
 static int
-private_object_destroy (licliClient* client,
-                        liarcReader* reader)
+private_object_destroy (LICliClient* client,
+                        LIArcReader* reader)
 {
 	uint32_t id;
-	liengObject* object;
+	LIEngObject* object;
 
 	/* Parse the packet. */
 	if (!liarc_reader_get_uint32 (reader, &id) ||
@@ -246,12 +246,12 @@ private_object_destroy (licliClient* client,
 }
 
 static int
-private_object_graphic (licliClient* client,
-                        liarcReader* reader)
+private_object_graphic (LICliClient* client,
+                        LIArcReader* reader)
 {
 	uint32_t id;
 	uint16_t graphic;
-	liengObject* object;
+	LIEngObject* object;
 
 	/* Parse the packet. */
 	if (!liarc_reader_get_uint32 (reader, &id) ||
@@ -269,8 +269,8 @@ private_object_graphic (licliClient* client,
 }
 
 static int
-private_object_simulate (licliClient* client,
-                         liarcReader* reader)
+private_object_simulate (LICliClient* client,
+                         LIArcReader* reader)
 {
 	int8_t x;
 	int8_t y;
@@ -278,12 +278,12 @@ private_object_simulate (licliClient* client,
 	int8_t w;
 	uint8_t flags;
 	uint32_t id;
-	licliControls controls;
-	liengObject* object;
-	limatQuaternion rotation;
-	limatTransform transform;
-	limatVector position;
-	limatVector velocity;
+	LICliControls controls;
+	LIEngObject* object;
+	LIMatQuaternion rotation;
+	LIMatTransform transform;
+	LIMatVector position;
+	LIMatVector velocity;
 
 	/* Parse the packet. */
 	if (!liarc_reader_get_uint32 (reader, &id) ||
@@ -302,7 +302,7 @@ private_object_simulate (licliClient* client,
 		return 0;
 
 	/* FIXME: No analog. */
-	memset (&controls, 0, sizeof (licliControls));
+	memset (&controls, 0, sizeof (LICliControls));
 	if (flags & LI_CONTROL_MOVE_FRONT)
 		controls.move += 1.0;
 	if (flags & LI_CONTROL_MOVE_BACK)
@@ -327,8 +327,8 @@ private_object_simulate (licliClient* client,
 }
 
 static int
-private_resources (licliClient* client,
-                   liarcReader* reader)
+private_resources (LICliClient* client,
+                   LIArcReader* reader)
 {
 	lieng_engine_load_resources (client->engine, reader);
 

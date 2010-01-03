@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengObject Object
+ * \addtogroup LIEngObject Object
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "engine-constraint.h"
 #include "engine-object.h"
 #include "engine-selection.h"
@@ -33,8 +33,8 @@
 #define LIENG_OBJECT_APPROACH_TOLERANCE 1.5f
 
 static int
-private_warp (liengObject*       self,
-              const limatVector* position);
+private_warp (LIEngObject*       self,
+              const LIMatVector* position);
 
 /*****************************************************************************/
 
@@ -47,17 +47,17 @@ private_warp (liengObject*       self,
  * \param id Object ID or 0 for unique.
  * \return Engine object or NULL.
  */
-liengObject*
-lieng_object_new (liengEngine*     engine,
-                  liengModel*      model,
-                  liphyControlMode control,
+LIEngObject*
+lieng_object_new (LIEngEngine*     engine,
+                  LIEngModel*      model,
+                  LIPhyControlMode control,
                   uint32_t         id)
 {
 	double rnd;
-	liengObject* self;
+	LIEngObject* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liengObject));
+	self = lisys_calloc (1, sizeof (LIEngObject));
 	if (self == NULL)
 		return NULL;
 	self->id = id;
@@ -123,10 +123,10 @@ error:
  * \param self Object.
  */
 void
-lieng_object_free (liengObject* self)
+lieng_object_free (LIEngObject* self)
 {
-	liengConstraint* constraint;
-	liengConstraint* constraint_next;
+	LIEngConstraint* constraint;
+	LIEngConstraint* constraint_next;
 
 	/* Unrealize. */
 	lieng_object_set_realized (self, 0);
@@ -176,7 +176,7 @@ lieng_object_free (liengObject* self)
  * \param count Number of times to reference, negative to unreference.
  */
 void
-lieng_object_ref (liengObject* self,
+lieng_object_ref (LIEngObject* self,
                   int          count)
 {
 #ifndef LIENG_DISABLE_SCRIPTS
@@ -208,13 +208,13 @@ lieng_object_ref (liengObject* self,
  * \param speed Movement speed.
  */
 void
-lieng_object_approach (liengObject*       self,
-                       const limatVector* target,
+lieng_object_approach (LIEngObject*       self,
+                       const LIMatVector* target,
                        float              speed)
 {
-	limatVector tmp;
-	limatQuaternion dir;
-	limatTransform transform;
+	LIMatVector tmp;
+	LIMatQuaternion dir;
+	LIMatTransform transform;
 
 	if (!lieng_object_get_realized (self))
 		return;
@@ -247,8 +247,8 @@ lieng_object_approach (liengObject*       self,
  * \param self Object.
  * \param name Node name or NULL.
  */
-limdlNode*
-lieng_object_find_node (liengObject* self,
+LIMdlNode*
+lieng_object_find_node (LIEngObject* self,
                         const char*  name)
 {
 	if (self->pose != NULL)
@@ -267,9 +267,9 @@ lieng_object_find_node (liengObject* self,
  * \param impulse Impulse force.
  */
 void
-lieng_object_impulse (liengObject*       self,
-                      const limatVector* point,
-                      const limatVector* impulse)
+lieng_object_impulse (LIEngObject*       self,
+                      const LIMatVector* point,
+                      const LIMatVector* impulse)
 {
 	liphy_object_impulse (self->physics, point, impulse);
 }
@@ -289,8 +289,8 @@ lieng_object_impulse (liengObject*       self,
  * \param impulse Jump force.
  */
 void
-lieng_object_jump (liengObject*       self,
-                   const limatVector* impulse)
+lieng_object_jump (LIEngObject*       self,
+                   const LIMatVector* impulse)
 {
 	liphy_object_jump (self->physics, impulse);
 }
@@ -301,11 +301,11 @@ lieng_object_jump (liengObject*       self,
  * \param self Object.
  */
 int
-lieng_object_moved (liengObject* self)
+lieng_object_moved (LIEngObject* self)
 {
-	liengSector* dst;
-	liengSector* src;
-	limatTransform transform;
+	LIEngSector* dst;
+	LIEngSector* src;
+	LIMatTransform transform;
 
 	/* Refresh sector list. */
 	lieng_object_get_transform (self, &transform);
@@ -341,12 +341,12 @@ lieng_object_moved (liengObject* self)
  * \param secs Number of seconds since last tick.
  */
 void
-lieng_object_update (liengObject* self,
+lieng_object_update (LIEngObject* self,
                      float        secs)
 {
-	limatTransform transform;
-	limatTransform transform0;
-	limatTransform transform1;
+	LIMatTransform transform;
+	LIMatTransform transform0;
+	LIMatTransform transform1;
 
 	/* Animations. */
 	if (self->pose != NULL)
@@ -385,8 +385,8 @@ lieng_object_update (liengObject* self,
  * \param value Return location for the angular momentum vector.
  */
 void
-lieng_object_get_angular_momentum (const liengObject* self,
-                                   limatVector*       value)
+lieng_object_get_angular_momentum (const LIEngObject* self,
+                                   LIMatVector*       value)
 {
 	liphy_object_get_angular (self->physics, value);
 }
@@ -398,8 +398,8 @@ lieng_object_get_angular_momentum (const liengObject* self,
  * \param value Angular momentum vector.
  */
 void
-lieng_object_set_angular_momentum (liengObject*       self,
-                                   const limatVector* value)
+lieng_object_set_angular_momentum (LIEngObject*       self,
+                                   const LIMatVector* value)
 {
 	liphy_object_set_angular (self->physics, value);
 }
@@ -415,7 +415,7 @@ lieng_object_set_angular_momentum (liengObject*       self,
  * \return Nonzero on success.
  */
 void
-lieng_object_set_animation (liengObject* self,
+lieng_object_set_animation (LIEngObject* self,
                             int          channel,
                             const char*  animation,
                             int          repeats,
@@ -438,8 +438,8 @@ lieng_object_set_animation (liengObject* self,
  * \param bounds Return location for the bounding box.
  */
 void
-lieng_object_get_bounds (const liengObject* self,
-                         limatAabb*         bounds)
+lieng_object_get_bounds (const LIEngObject* self,
+                         LIMatAabb*         bounds)
 {
 	if (self->model != NULL && self->model->model != NULL)
 		*bounds = self->model->model->bounds;
@@ -454,10 +454,10 @@ lieng_object_get_bounds (const liengObject* self,
  * \param bounds Return location for the bounding box.
  */
 void
-lieng_object_get_bounds_transform (const liengObject* self,
-                                   limatAabb*         bounds)
+lieng_object_get_bounds_transform (const LIEngObject* self,
+                                   LIMatAabb*         bounds)
 {
-	limatTransform t;
+	LIMatTransform t;
 
 	if (self->model != NULL && self->model->model != NULL)
 	{
@@ -475,7 +475,7 @@ lieng_object_get_bounds_transform (const liengObject* self,
  * \return Collision group mask.
  */
 int
-lieng_object_get_collision_group (const liengObject* self)
+lieng_object_get_collision_group (const LIEngObject* self)
 {
 	return liphy_object_get_collision_group (self->physics);
 }
@@ -491,7 +491,7 @@ lieng_object_get_collision_group (const liengObject* self)
  * \param mask Collision group mask.
  */
 void
-lieng_object_set_collision_group (liengObject* self,
+lieng_object_set_collision_group (LIEngObject* self,
                                   int          mask)
 {
 	liphy_object_set_collision_group (self->physics, mask);
@@ -504,7 +504,7 @@ lieng_object_set_collision_group (liengObject* self,
  * \return Collision mask.
  */
 int
-lieng_object_get_collision_mask (const liengObject* self)
+lieng_object_get_collision_mask (const LIEngObject* self)
 {
 	return liphy_object_get_collision_mask (self->physics);
 }
@@ -520,7 +520,7 @@ lieng_object_get_collision_mask (const liengObject* self)
  * \param mask Collision mask.
  */
 void
-lieng_object_set_collision_mask (liengObject* self,
+lieng_object_set_collision_mask (LIEngObject* self,
                                  int          mask)
 {
 	liphy_object_set_collision_mask (self->physics, mask);
@@ -533,7 +533,7 @@ lieng_object_set_collision_mask (liengObject* self,
  * \return Nonzero if synchronization is needed.
  */
 int
-lieng_object_get_dirty (const liengObject* self)
+lieng_object_get_dirty (const LIEngObject* self)
 {
 	if (self->flags & LIENG_OBJECT_FLAG_DIRTY)
 		return 1;
@@ -547,7 +547,7 @@ lieng_object_get_dirty (const liengObject* self)
  * \param value Boolean.
  */
 void
-lieng_object_set_dirty (liengObject* self,
+lieng_object_set_dirty (LIEngObject* self,
                         int          value)
 {
 	if (value)
@@ -566,11 +566,11 @@ lieng_object_set_dirty (liengObject* self,
  * \return The distance.
  */
 float
-lieng_object_get_distance (const liengObject* self,
-                           const liengObject* object)
+lieng_object_get_distance (const LIEngObject* self,
+                           const LIEngObject* object)
 {
-	limatTransform t0;
-	limatTransform t1;
+	LIMatTransform t0;
+	LIMatTransform t1;
 
 	if (!lieng_object_get_realized (self) ||
 	    !lieng_object_get_realized (object))
@@ -590,19 +590,19 @@ lieng_object_get_distance (const liengObject* self,
  * \return Nonzero if standing on ground.
  */
 int
-lieng_object_get_ground (const liengObject* self)
+lieng_object_get_ground (const LIEngObject* self)
 {
 	return liphy_object_get_ground (self->physics);
 }
 
 int
-lieng_object_get_flags (const liengObject* self)
+lieng_object_get_flags (const LIEngObject* self)
 {
 	return self->flags;
 }
 
 void
-lieng_object_set_flags (liengObject* self,
+lieng_object_set_flags (LIEngObject* self,
                         int          flags)
 {
 	self->flags = flags;
@@ -615,7 +615,7 @@ lieng_object_set_flags (liengObject* self,
  * \return Mass.
  */
 float
-lieng_object_get_mass (const liengObject* self)
+lieng_object_get_mass (const LIEngObject* self)
 {
 	return liphy_object_get_mass (self->physics);
 }
@@ -627,7 +627,7 @@ lieng_object_get_mass (const liengObject* self)
  * \param value Mass.
  */
 void
-lieng_object_set_mass (liengObject* self,
+lieng_object_set_mass (LIEngObject* self,
                        float        value)
 {
 	liphy_object_set_mass (self->physics, value);
@@ -645,10 +645,10 @@ lieng_object_set_mass (liengObject* self,
  * \return Nonzero on success.
  */
 int
-lieng_object_set_model (liengObject* self,
-                        liengModel*  model)
+lieng_object_set_model (LIEngObject* self,
+                        LIEngModel*  model)
 {
-	liengConstraint* constraint;
+	LIEngConstraint* constraint;
 
 	/* Switch model. */
 	if (model != NULL)
@@ -679,7 +679,7 @@ lieng_object_set_model (liengObject* self,
 }
 
 int
-lieng_object_get_model_code (const liengObject* self)
+lieng_object_get_model_code (const LIEngObject* self)
 {
 	if (self->model == NULL)
 		return LINET_INVALID_MODEL;
@@ -694,10 +694,10 @@ lieng_object_get_model_code (const liengObject* self)
  * \return Nonzero on success.
  */
 int
-lieng_object_set_model_code (liengObject* self,
+lieng_object_set_model_code (LIEngObject* self,
                              int          value)
 {
-	liengModel* model;
+	LIEngModel* model;
 
 	model = lieng_engine_find_model_by_code (self->engine, value);
 	if (model == NULL)
@@ -708,7 +708,7 @@ lieng_object_set_model_code (liengObject* self,
 }
 
 const char*
-lieng_object_get_model_name (const liengObject* self)
+lieng_object_get_model_name (const LIEngObject* self)
 {
 	if (self->model != NULL)
 		return self->model->name;
@@ -723,10 +723,10 @@ lieng_object_get_model_name (const liengObject* self)
  * \return Nonzero on success.
  */
 int
-lieng_object_set_model_name (liengObject* self,
+lieng_object_set_model_name (LIEngObject* self,
                              const char*  value)
 {
-	liengModel* model;
+	LIEngModel* model;
 
 	model = lieng_engine_find_model_by_name (self->engine, value);
 	if (model == NULL)
@@ -743,7 +743,7 @@ lieng_object_set_model_name (liengObject* self,
  * \return Nonzero if realized.
  */
 int
-lieng_object_get_realized (const liengObject* self)
+lieng_object_get_realized (const LIEngObject* self)
 {
 	if (self->sector == NULL)
 		return 0;
@@ -768,10 +768,10 @@ lieng_object_get_realized (const liengObject* self)
  * \return Nonzero on success.
  */
 int
-lieng_object_set_realized (liengObject* self,
+lieng_object_set_realized (LIEngObject* self,
                            int          value)
 {
-	limatTransform transform;
+	LIMatTransform transform;
 
 	if (value == lieng_object_get_realized (self))
 		return 1;
@@ -814,8 +814,8 @@ lieng_object_set_realized (liengObject* self,
 	return 1;
 }
 
-liengSector*
-lieng_object_get_sector (liengObject* self)
+LIEngSector*
+lieng_object_get_sector (LIEngObject* self)
 {
 	return self->sector;
 }
@@ -827,9 +827,9 @@ lieng_object_get_sector (liengObject* self)
  * \return Nonzero if selected.
  */
 int
-lieng_object_get_selected (const liengObject* self)
+lieng_object_get_selected (const LIEngObject* self)
 {
-	liengSelection* selection;
+	LIEngSelection* selection;
 
 	selection = lialg_ptrdic_find (self->engine->selection, (void*) self);
 	if (selection != NULL)
@@ -845,10 +845,10 @@ lieng_object_get_selected (const liengObject* self)
  * \param select Nonzero if should select.
  */
 int
-lieng_object_set_selected (liengObject* self,
+lieng_object_set_selected (LIEngObject* self,
                            int          select)
 {
-	liengSelection* selection;
+	LIEngSelection* selection;
 
 	if (select)
 	{
@@ -892,8 +892,8 @@ lieng_object_set_selected (liengObject* self,
  * \param shape Collision shape or NULL.
  */
 void
-lieng_object_set_shape (liengObject* self,
-                        liphyShape*  shape)
+lieng_object_set_shape (LIEngObject* self,
+                        LIPhyShape*  shape)
 {
 	if (shape != NULL)
 		liphy_object_set_shape (self->physics, shape);
@@ -914,7 +914,7 @@ lieng_object_set_shape (liengObject* self,
  * \param rot Rotational smoothing.
  */
 void
-lieng_object_set_smoothing (liengObject* self,
+lieng_object_set_smoothing (LIEngObject* self,
                             float        pos,
                             float        rot)
 {
@@ -929,7 +929,7 @@ lieng_object_set_smoothing (liengObject* self,
  * \return Movement speed.
  */
 float
-lieng_object_get_speed (const liengObject* self)
+lieng_object_get_speed (const LIEngObject* self)
 {
 	return liphy_object_get_speed (self->physics);
 }
@@ -941,7 +941,7 @@ lieng_object_get_speed (const liengObject* self)
  * \param value Movement speed.
  */
 void
-lieng_object_set_speed (liengObject* self,
+lieng_object_set_speed (LIEngObject* self,
                         float        value)
 {
 	liphy_object_set_speed (self->physics, value);
@@ -958,8 +958,8 @@ lieng_object_set_speed (liengObject* self,
  * \param value Return location for the transformation.
  */
 void
-lieng_object_get_target (const liengObject* self,
-                         limatTransform*    value)
+lieng_object_get_target (const LIEngObject* self,
+                         LIMatTransform*    value)
 {
 	*value = self->smoothing.target;
 }
@@ -971,8 +971,8 @@ lieng_object_get_target (const liengObject* self,
  * \param value Return location for the transformation.
  */
 void
-lieng_object_get_transform (const liengObject* self,
-                            limatTransform*    value)
+lieng_object_get_transform (const LIEngObject* self,
+                            LIMatTransform*    value)
 {
 	liphy_object_get_transform (self->physics, value);
 }
@@ -985,8 +985,8 @@ lieng_object_get_transform (const liengObject* self,
  * \return Nonzero on success.
  */
 int
-lieng_object_set_transform (liengObject*          self,
-                            const limatTransform* value)
+lieng_object_set_transform (LIEngObject*          self,
+                            const LIMatTransform* value)
 {
 	int realized;
 
@@ -1007,13 +1007,13 @@ lieng_object_set_transform (liengObject*          self,
 }
 
 void*
-lieng_object_get_userdata (liengObject* self)
+lieng_object_get_userdata (LIEngObject* self)
 {
 	return self->userdata;
 }
 
 void
-lieng_object_set_userdata (liengObject* self,
+lieng_object_set_userdata (LIEngObject* self,
                            void*        data)
 {
 	self->userdata = data;
@@ -1026,8 +1026,8 @@ lieng_object_set_userdata (liengObject* self,
  * \param value Return location for the vector.
  */
 void
-lieng_object_get_velocity (const liengObject* self,
-                           limatVector*       value)
+lieng_object_get_velocity (const LIEngObject* self,
+                           LIMatVector*       value)
 {
 	liphy_object_get_velocity (self->physics, value);
 }
@@ -1040,8 +1040,8 @@ lieng_object_get_velocity (const liengObject* self,
  * \return Nonzero on success.
  */
 int
-lieng_object_set_velocity (liengObject*       self,
-                           const limatVector* value)
+lieng_object_set_velocity (LIEngObject*       self,
+                           const LIMatVector* value)
 {
 	liphy_object_set_velocity (self->physics, value);
 	return 1;
@@ -1050,11 +1050,11 @@ lieng_object_set_velocity (liengObject*       self,
 /*****************************************************************************/
 
 static int
-private_warp (liengObject*       self,
-              const limatVector* position)
+private_warp (LIEngObject*       self,
+              const LIMatVector* position)
 {
-	liengSector* dst;
-	liengSector* src;
+	LIEngSector* dst;
+	LIEngSector* src;
 
 	/* Refresh sector list. */
 	lialg_sectors_refresh_point (self->engine->sectors, position, REFRESH_RADIUS);

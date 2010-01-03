@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,27 +24,27 @@
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "ext-module.h"
 #include "ext-inventory.h"
 
 #define LIEXT_INVENTORY_VERSION 0xFF
 
 static int
-private_send_close (liextInventory* self,
-                    liengObject*    listener);
+private_send_close (LIExtInventory* self,
+                    LIEngObject*    listener);
 
 static int
-private_send_open (liextInventory* self,
-                   liengObject*    listener);
+private_send_open (LIExtInventory* self,
+                   LIEngObject*    listener);
 
 static int
-private_send_object (liextInventory* self,
+private_send_object (LIExtInventory* self,
                      int             slot,
-                     liengObject*    object);
+                     LIEngObject*    object);
 
 static int
-private_send_remove (liextInventory* self,
+private_send_remove (LIExtInventory* self,
                      int             slot);
 
 /*****************************************************************************/
@@ -55,13 +55,13 @@ private_send_remove (liextInventory* self,
  * \param module Extension module.
  * \return New inventory or NULL.
  */
-liextInventory*
-liext_inventory_new (liextModule* module)
+LIExtInventory*
+liext_inventory_new (LIExtModule* module)
 {
-	liextInventory* self;
+	LIExtInventory* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextInventory));
+	self = lisys_calloc (1, sizeof (LIExtInventory));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -109,7 +109,7 @@ liext_inventory_new (liextModule* module)
  * \param self Inventory.
  */
 void
-liext_inventory_free (liextInventory* self)
+liext_inventory_free (LIExtInventory* self)
 {
 	lialg_u32dic_remove (self->module->dictionary, self->id);
 	if (self->listeners != NULL)
@@ -125,8 +125,8 @@ liext_inventory_free (liextInventory* self)
  * \param id Listener id.
  * \return Object or NULL.
  */
-liengObject*
-liext_inventory_find_listener (liextInventory* self,
+LIEngObject*
+liext_inventory_find_listener (LIExtInventory* self,
                                int             id)
 {
 	return lialg_u32dic_find (self->listeners, id);
@@ -140,8 +140,8 @@ liext_inventory_find_listener (liextInventory* self,
  * \return Nonzero on success.
  */
 int
-liext_inventory_insert_listener (liextInventory* self,
-                                 liengObject*    value)
+liext_inventory_insert_listener (LIExtInventory* self,
+                                 LIEngObject*    value)
 {
 	if (lialg_u32dic_find (self->listeners, value->id))
 		return 1;
@@ -160,8 +160,8 @@ liext_inventory_insert_listener (liextInventory* self,
  * \param value Listener object.
  */
 void
-liext_inventory_remove_listener (liextInventory* self,
-                                 liengObject*    value)
+liext_inventory_remove_listener (LIExtInventory* self,
+                                 LIEngObject*    value)
 {
 	if (lialg_u32dic_find (self->listeners, value->id))
 	{
@@ -182,8 +182,8 @@ liext_inventory_remove_listener (liextInventory* self,
  * \param value Listener object.
  */
 void
-liext_inventory_reset_listener (liextInventory* self,
-                                liengObject*    value)
+liext_inventory_reset_listener (LIExtInventory* self,
+                                LIEngObject*    value)
 {
 	if (lialg_u32dic_find (self->listeners, value->id))
 	{
@@ -199,8 +199,8 @@ liext_inventory_reset_listener (liextInventory* self,
  * \param slot Slot number.
  * \return Object or NULL.
  */
-liengObject*
-liext_inventory_get_object (liextInventory* self,
+LIEngObject*
+liext_inventory_get_object (LIExtInventory* self,
                             int             slot)
 {
 	if (slot < 0 || slot >= self->slots.count)
@@ -218,9 +218,9 @@ liext_inventory_get_object (liextInventory* self,
  * \return Nonzero on success.
  */
 int
-liext_inventory_set_object (liextInventory* self,
+liext_inventory_set_object (LIExtInventory* self,
                             int             slot,
-                            liengObject*    object)
+                            LIEngObject*    object)
 {
 	if (slot < 0 || slot >= self->slots.count)
 		return 0;
@@ -245,7 +245,7 @@ liext_inventory_set_object (liextInventory* self,
  * \return Integer.
  */
 int
-liext_inventory_get_size (liextInventory* self)
+liext_inventory_get_size (LIExtInventory* self)
 {
 	return self->slots.count;
 }
@@ -258,12 +258,12 @@ liext_inventory_get_size (liextInventory* self)
  * \return Nonzero on success.
  */
 int
-liext_inventory_set_size (liextInventory* self,
+liext_inventory_set_size (LIExtInventory* self,
                           int             value)
 {
 	int i;
-	lialgU32dicIter iter;
-	liengObject** tmp;
+	LIAlgU32dicIter iter;
+	LIEngObject** tmp;
 
 	/* Check for changes. */
 	if (value == self->slots.count)
@@ -272,12 +272,12 @@ liext_inventory_set_size (liextInventory* self,
 	/* Set new size. */
 	if (value > self->slots.count)
 	{
-		tmp = lisys_realloc (self->slots.array, value * sizeof (liengObject*));
+		tmp = lisys_realloc (self->slots.array, value * sizeof (LIEngObject*));
 		if (tmp == NULL)
 			return 0;
 		self->slots.array = tmp;
 		tmp += self->slots.count;
-		memset (tmp, 0, (value - self->slots.count) * sizeof (liengObject*));
+		memset (tmp, 0, (value - self->slots.count) * sizeof (LIEngObject*));
 		self->slots.count = value;
 	}
 	else
@@ -287,7 +287,7 @@ liext_inventory_set_size (liextInventory* self,
 			if (self->slots.array[i] != NULL)
 				liscr_data_unref (self->slots.array[i]->script, self->script);
 		}
-		tmp = lisys_realloc (self->slots.array, value * sizeof (liengObject*));
+		tmp = lisys_realloc (self->slots.array, value * sizeof (LIEngObject*));
 		if (tmp != NULL || !value)
 			self->slots.array = tmp;
 		self->slots.count = value;
@@ -304,7 +304,7 @@ liext_inventory_set_size (liextInventory* self,
 }
 
 int
-liext_inventory_get_id (const liextInventory* self)
+liext_inventory_get_id (const LIExtInventory* self)
 {
 	return self->id;
 }
@@ -312,12 +312,12 @@ liext_inventory_get_id (const liextInventory* self)
 /*****************************************************************************/
 
 static int
-private_send_close (liextInventory* self,
-                    liengObject*    listener)
+private_send_close (LIExtInventory* self,
+                    LIEngObject*    listener)
 {
-	liscrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->server->script;
 
-	if (LISRV_OBJECT (listener)->client == NULL)
+	if (LISER_OBJECT (listener)->client == NULL)
 		return 1;
 
 	/* Check for callback. */
@@ -344,12 +344,12 @@ private_send_close (liextInventory* self,
 }
 
 static int
-private_send_open (liextInventory* self,
-                   liengObject*    listener)
+private_send_open (LIExtInventory* self,
+                   LIEngObject*    listener)
 {
-	liscrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->server->script;
 
-	if (LISRV_OBJECT (listener)->client == NULL)
+	if (LISER_OBJECT (listener)->client == NULL)
 		return 1;
 
 	/* Check for callback. */
@@ -376,16 +376,16 @@ private_send_open (liextInventory* self,
 }
 
 static int
-private_send_object (liextInventory* self,
+private_send_object (LIExtInventory* self,
                      int             slot,
-                     liengObject*    object)
+                     LIEngObject*    object)
 {
-	lialgU32dicIter iter;
-	liscrScript* script = self->module->server->script;
+	LIAlgU32dicIter iter;
+	LIScrScript* script = self->module->server->script;
 
 	LI_FOREACH_U32DIC (iter, self->listeners)
 	{
-		if (LISRV_OBJECT (iter.value)->client == NULL)
+		if (LISER_OBJECT (iter.value)->client == NULL)
 			continue;
 
 		/* Check for callback. */
@@ -415,15 +415,15 @@ private_send_object (liextInventory* self,
 }
 
 static int
-private_send_remove (liextInventory* self,
+private_send_remove (LIExtInventory* self,
                      int             slot)
 {
-	lialgU32dicIter iter;
-	liscrScript* script = self->module->server->script;
+	LIAlgU32dicIter iter;
+	LIScrScript* script = self->module->server->script;
 
 	LI_FOREACH_U32DIC (iter, self->listeners)
 	{
-		if (LISRV_OBJECT (iter.value)->client == NULL)
+		if (LISER_OBJECT (iter.value)->client == NULL)
 			continue;
 
 		/* Check for callback. */

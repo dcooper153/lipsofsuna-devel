@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgRangeIter RangeIter
+ * \addtogroup LIAlgRangeIter RangeIter
  * @{
  */
 
@@ -39,20 +39,20 @@
 	for (lialg_range_iter_first (&iter, &range) ; iter.more ; \
 	     lialg_range_iter_next (&iter))
 
-typedef struct _lialgRangeIter lialgRangeIter;
-struct _lialgRangeIter
+typedef struct _LIAlgRangeIter LIAlgRangeIter;
+struct _LIAlgRangeIter
 {
 	int index;
 	int x;
 	int y;
 	int z;
 	int more;
-	lialgRange range;
+	LIAlgRange range;
 };
 
 static inline int
-lialg_range_iter_first (lialgRangeIter* self,
-                        lialgRange*     range)
+lialg_range_iter_first (LIAlgRangeIter* self,
+                        LIAlgRange*     range)
 {
 	int r = range->max - range->min;
 
@@ -81,7 +81,7 @@ lialg_range_iter_first (lialgRangeIter* self,
 }
 
 static inline int
-lialg_range_iter_next (lialgRangeIter* self)
+lialg_range_iter_next (LIAlgRangeIter* self)
 {
 	int r = self->range.max - self->range.min;
 

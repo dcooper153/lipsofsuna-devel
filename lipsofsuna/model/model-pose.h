@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,14 +18,14 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlPose Pose
+ * \addtogroup LIMdlPose Pose
  * @{
  */
 
 #ifndef __MODEL_POSE_H__
 #define __MODEL_POSE_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "model.h"
 #include "model-animation.h"
 #include "model-bone.h"
@@ -34,14 +34,14 @@
 
 #define LIMDL_POSE_FADE_AUTOMATIC -1.0f
 
-enum _limdlPoseChannelState
+enum _LIMdlPoseChannelState
 {
 	LIMDL_POSE_CHANNEL_STATE_INVALID,
 	LIMDL_POSE_CHANNEL_STATE_PLAYING,
 	LIMDL_POSE_CHANNEL_STATE_PAUSED,
 };
 
-struct _limdlPoseChannel
+struct _LIMdlPoseChannel
 {
 	int state;
 	int repeat;
@@ -49,34 +49,34 @@ struct _limdlPoseChannel
 	float time;
 	float priority;
 	char* animation_name;
-	limdlAnimation* animation;
+	LIMdlAnimation* animation;
 };
 
-struct _limdlPoseFade
+struct _LIMdlPoseFade
 {
 	float rate;
 	float time;
 	float weight;
 	char* animation_name;
-	limdlPoseFade* prev;
-	limdlPoseFade* next;
-	limdlAnimation* animation;
+	LIMdlPoseFade* prev;
+	LIMdlPoseFade* next;
+	LIMdlAnimation* animation;
 };
 
-struct _limdlPose
+struct _LIMdlPose
 {
-	limdlModel* model;
-	lialgU32dic* channels;
-	limdlPoseFade* fades;
+	LIMdlModel* model;
+	LIAlgU32dic* channels;
+	LIMdlPoseFade* fades;
 	struct
 	{
 		int count;
-		limdlWeightGroup* array;
+		LIMdlWeightGroup* array;
 	} groups;
 	struct
 	{
 		int count;
-		limdlNode** array;
+		LIMdlNode** array;
 	} nodes;
 };
 
@@ -84,76 +84,76 @@ struct _limdlPose
 extern "C" {
 #endif
 
-limdlPose*
+LIMdlPose*
 limdl_pose_new ();
 
 void
-limdl_pose_free (limdlPose* self);
+limdl_pose_free (LIMdlPose* self);
 
 void
-limdl_pose_destroy_channel (limdlPose* self,
+limdl_pose_destroy_channel (LIMdlPose* self,
                             int        channel);
 
 void
-limdl_pose_fade_channel (limdlPose* self,
+limdl_pose_fade_channel (LIMdlPose* self,
                          int        channel,
                          float      rate);
 
-limdlNode*
-limdl_pose_find_node (const limdlPose* self,
+LIMdlNode*
+limdl_pose_find_node (const LIMdlPose* self,
                       const char*      name);
 
 void
-limdl_pose_update (limdlPose* self,
+limdl_pose_update (LIMdlPose* self,
                    float      secs);
 
 void
-limdl_pose_transform (limdlPose*   self,
-                      limdlVertex* vertices);
+limdl_pose_transform (LIMdlPose*   self,
+                      LIMdlVertex* vertices);
 
-limdlAnimation*
-limdl_pose_get_channel_animation (const limdlPose* self,
+LIMdlAnimation*
+limdl_pose_get_channel_animation (const LIMdlPose* self,
                                   int              channel);
 
 void
-limdl_pose_set_channel_animation (limdlPose*  self,
+limdl_pose_set_channel_animation (LIMdlPose*  self,
                                   int         channel,
                                   const char* animation);
 
 const char*
-limdl_pose_get_channel_name (const limdlPose* self,
+limdl_pose_get_channel_name (const LIMdlPose* self,
                              int              channel);
 
 float
-limdl_pose_get_channel_position (const limdlPose* self,
+limdl_pose_get_channel_position (const LIMdlPose* self,
                                  int              channel);
 
 void
-limdl_pose_set_channel_priority (limdlPose* self,
+limdl_pose_set_channel_priority (LIMdlPose* self,
                                  int        channel,
                                  float      value);
 
 int
-limdl_pose_get_channel_repeats (const limdlPose* self,
+limdl_pose_get_channel_repeats (const LIMdlPose* self,
                                 int              channel);
 
 void
-limdl_pose_set_channel_repeats (limdlPose* self,
+limdl_pose_set_channel_repeats (LIMdlPose* self,
                                 int        channel,
                                 int        value);
 
-limdlPoseChannelState
-limdl_pose_get_channel_state (const limdlPose* self,
+LIMdlPoseChannelState
+limdl_pose_get_channel_state (const LIMdlPose* self,
                               int              channel);
 
 void
-limdl_pose_set_channel_state (limdlPose*            self,
+limdl_pose_set_channel_state (LIMdlPose*            self,
                               int                   channel,
-                              limdlPoseChannelState value);
+                              LIMdlPoseChannelState value);
 
 int
-limdl_pose_set_model (limdlPose*  self,
-                      limdlModel* model);
+limdl_pose_set_model (LIMdlPose*  self,
+                      LIMdlModel* model);
 
 #ifdef __cplusplus
 }

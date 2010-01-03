@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,28 @@
 /**
  * \addtogroup lithr Thread
  * @{
- * \addtogroup lithrThread Thread
+ * \addtogroup LIThrThread Thread
  * @{
  */
 
 #ifndef __THREAD_H__
 #define __THREAD_H__
 
-typedef struct _lithrThread lithrThread;
-typedef void (*lithrThreadFunc)(lithrThread*, void*);
+typedef struct _LIThrThread LIThrThread;
+typedef void (*LIThrThreadFunc)(LIThrThread*, void*);
 
-lithrThread*
-lithr_thread_new (lithrThreadFunc func,
+LIThrThread*
+lithr_thread_new (LIThrThreadFunc func,
                   void*           data);
 
 void
-lithr_thread_free (lithrThread* self);
+lithr_thread_free (LIThrThread* self);
 
 void
-lithr_thread_join (lithrThread* self);
+lithr_thread_join (LIThrThread* self);
 
 int
-lithr_thread_get_done (lithrThread* self);
+lithr_thread_get_done (LIThrThread* self);
 
 #endif
 

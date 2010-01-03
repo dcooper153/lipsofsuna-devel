@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlTexture Texture
+ * \addtogroup LIMdlTexture Texture
  * @{
  */
 
@@ -26,11 +26,11 @@
 #define __MODEL_TEXTURE_H__
 
 #include <string.h>
-#include <archive/lips-archive.h>
+#include <lipsofsuna/archive.h>
 #include "model-texture.h"
 
-typedef int limdlTextureFlags;
-typedef int limdlTextureType;
+typedef int LIMdlTextureFlags;
+typedef int LIMdlTextureType;
 
 enum
 {
@@ -47,11 +47,11 @@ enum
 	LIMDL_TEXTURE_TYPE_IMAGE
 };
 
-typedef struct _limdlTexture limdlTexture;
-struct _limdlTexture
+typedef struct _LIMdlTexture LIMdlTexture;
+struct _LIMdlTexture
 {
-	limdlTextureType type;
-	limdlTextureFlags flags;
+	LIMdlTextureType type;
+	LIMdlTextureFlags flags;
 	int width;
 	int height;
 	char* string;
@@ -62,11 +62,11 @@ extern "C" {
 #endif
 
 int
-limdl_texture_compare (const limdlTexture* self,
-                       const limdlTexture* texture);
+limdl_texture_compare (const LIMdlTexture* self,
+                       const LIMdlTexture* texture);
 
 int
-limdl_texture_set_string (limdlTexture* self,
+limdl_texture_set_string (LIMdlTexture* self,
                           const char*   value);
 
 #ifdef __cplusplus

@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 
 /* @luadoc
@@ -70,11 +70,11 @@
  * -- @param args Arguments.
  * function Camera.move(self, args)
  */
-static void Camera_move (liscrArgs* args)
+static void Camera_move (LIScrArgs* args)
 {
 	int keep = 0;
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_gets_float (args, "rate", &value))
 	{
@@ -94,10 +94,10 @@ static void Camera_move (liscrArgs* args)
  * -- @param self Camera class.
  * function Camera.reset(self)
  */
-static void Camera_reset (liscrArgs* args)
+static void Camera_reset (LIScrArgs* args)
 {
-	liextModule* module;
-	limatTransform transform;
+	LIExtModule* module;
+	LIMatTransform transform;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	transform = limat_transform_identity ();
@@ -117,11 +117,11 @@ static void Camera_reset (liscrArgs* args)
  * -- @param args Arguments.
  * function Camera.tilt(self, args)
  */
-static void Camera_tilt (liscrArgs* args)
+static void Camera_tilt (LIScrArgs* args)
 {
 	int keep = 0;
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_gets_float (args, "rate", &value))
 	{
@@ -146,11 +146,11 @@ static void Camera_tilt (liscrArgs* args)
  * -- @param args Arguments.
  * function Camera.turn(self, args)
  */
-static void Camera_turn (liscrArgs* args)
+static void Camera_turn (LIScrArgs* args)
 {
 	int keep = 0;
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_gets_float (args, "rate", &value))
 	{
@@ -175,11 +175,11 @@ static void Camera_turn (liscrArgs* args)
  * -- @param args Arguments.
  * function Camera.zoom(self, args)
  */
-static void Camera_zoom (liscrArgs* args)
+static void Camera_zoom (LIScrArgs* args)
 {
 	int keep = 0;
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_gets_float (args, "rate", &value))
 	{
@@ -198,10 +198,10 @@ static void Camera_zoom (liscrArgs* args)
  * -- @name Camera.far
  * -- @class table
  */
-static void Camera_setter_far (liscrArgs* args)
+static void Camera_setter_far (LIScrArgs* args)
 {
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_geti_float (args, 0, &value) && value > 0.0f)
 	{
@@ -216,17 +216,17 @@ static void Camera_setter_far (liscrArgs* args)
  * -- @name Camera.mode
  * -- @class table
  */
-static void Camera_getter_mode (liscrArgs* args)
+static void Camera_getter_mode (LIScrArgs* args)
 {
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	liscr_args_seti_int (args, lialg_camera_get_driver (module->client->camera));
 }
-static void Camera_setter_mode (liscrArgs* args)
+static void Camera_setter_mode (LIScrArgs* args)
 {
 	int value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_geti_int (args, 0, &value) && value >= 0 && value < LIALG_CAMERA_MAX)
 	{
@@ -241,10 +241,10 @@ static void Camera_setter_mode (liscrArgs* args)
  * -- @name Camera.far
  * -- @class table
  */
-static void Camera_setter_near (liscrArgs* args)
+static void Camera_setter_near (LIScrArgs* args)
 {
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_geti_float (args, 0, &value) && value > 0.0f)
 	{
@@ -259,10 +259,10 @@ static void Camera_setter_near (liscrArgs* args)
  * -- @name Camera.position
  * -- @class table
  */
-static void Camera_getter_position (liscrArgs* args)
+static void Camera_getter_position (LIScrArgs* args)
 {
-	liextModule* module;
-	limatTransform transform;
+	LIExtModule* module;
+	LIMatTransform transform;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	lialg_camera_get_transform (module->client->camera, &transform);
@@ -275,10 +275,10 @@ static void Camera_getter_position (liscrArgs* args)
  * -- @name Camera.rotation
  * -- @class table
  */
-static void Camera_getter_rotation (liscrArgs* args)
+static void Camera_getter_rotation (LIScrArgs* args)
 {
-	liextModule* module;
-	limatTransform transform;
+	LIExtModule* module;
+	LIMatTransform transform;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 	lialg_camera_get_transform (module->client->camera, &transform);
@@ -288,7 +288,7 @@ static void Camera_getter_rotation (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextCameraScript (liscrClass* self,
+liext_script_camera (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CAMERA, data);

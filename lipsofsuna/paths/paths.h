@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,15 +18,15 @@
 /**
  * \addtogroup lipth Paths
  * @{
- * \addtogroup lipthPaths Paths
+ * \addtogroup LIPthPaths Paths
  * @{
  */
 
 #ifndef __PATHS_H__
 #define __PATHS_H__
 
-typedef struct _lipthPaths lipthPaths;
-struct _lipthPaths
+typedef struct _LIPthPaths LIPthPaths;
+struct _LIPthPaths
 {
 	char* root;
 	char* global_exts;
@@ -37,39 +37,39 @@ struct _lipthPaths
 	char* module_state;
 };
 
-lipthPaths*
+LIPthPaths*
 lipth_paths_new (const char* path,
                  const char* name);
 
 void
-lipth_paths_free (lipthPaths* self);
+lipth_paths_free (LIPthPaths* self);
 
 char*
-lipth_paths_get_data (const lipthPaths* self,
+lipth_paths_get_data (const LIPthPaths* self,
                       const char*       name);
 
 char*
-lipth_paths_get_font (const lipthPaths* self,
+lipth_paths_get_font (const LIPthPaths* self,
                       const char*       name);
 
 char*
-lipth_paths_get_graphics (const lipthPaths* self,
+lipth_paths_get_graphics (const LIPthPaths* self,
                           const char*       name);
 
 char*
-lipth_paths_get_script (const lipthPaths* self,
+lipth_paths_get_script (const LIPthPaths* self,
                         const char*       name);
 
 char*
-lipth_paths_get_shader (const lipthPaths* self,
+lipth_paths_get_shader (const LIPthPaths* self,
                         const char*       name);
 
 char*
-lipth_paths_get_sound (const lipthPaths* self,
+lipth_paths_get_sound (const LIPthPaths* self,
                        const char*       name);
 
 char*
-lipth_paths_get_sql (const lipthPaths* self,
+lipth_paths_get_sql (const LIPthPaths* self,
                      const char*       name);
 
 char*

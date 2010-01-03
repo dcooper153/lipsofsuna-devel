@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,7 +24,7 @@
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "ext-brushes.h"
 #include "ext-dialog.h"
 #include "ext-materials.h"
@@ -34,35 +34,35 @@ static const void*
 private_base ();
 
 static int
-private_init (liextEditor*    self,
-              liwdgManager* manager);
+private_init (LIExtEditor*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liextEditor* self);
+private_free (LIExtEditor* self);
 
 static int
-private_event (liextEditor* self,
+private_event (LIExtEditor* self,
                liwdgEvent*  event);
 
 /****************************************************************************/
 
-const liwdgClass liextEditorType =
+const LIWdgClass liext_widget_editor =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (liextEditor),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (LIExtEditor),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_editor_new (liwdgManager* manager,
-                  liextModule*  module)
+LIWdgWidget*
+liext_editor_new (LIWdgManager* manager,
+                  LIExtModule*  module)
 {
-	liextEditor* data;
-	liwdgWidget* self;
+	LIExtEditor* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &liextEditorType);
+	self = liwdg_widget_new (manager, &liext_widget_editor);
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_EDITOR (self);
@@ -90,15 +90,15 @@ liext_editor_new (liwdgManager* manager,
 }
 
 int
-liext_editor_save (liextEditor* self)
+liext_editor_save (LIExtEditor* self)
 {
 	return liext_brushes_save (LIEXT_BRUSHES (self->brushes)) &&
 	       liext_materials_save (LIEXT_MATERIALS (self->materials));
 }
 
 void
-liext_editor_reset (liextEditor* self,
-                    liarcReader* reader)
+liext_editor_reset (LIExtEditor* self,
+                    LIArcReader* reader)
 {
 	liext_brushes_reset (LIEXT_BRUSHES (self->brushes), reader);
 	liext_materials_reset (LIEXT_MATERIALS (self->materials), reader);
@@ -109,12 +109,12 @@ liext_editor_reset (liextEditor* self,
 static const void*
 private_base ()
 {
-	return &liwdgGroupType;
+	return &liwdg_widget_group;
 }
 
 static int
-private_init (liextEditor*  self,
-              liwdgManager* manager)
+private_init (LIExtEditor*  self,
+              LIWdgManager* manager)
 {
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 2, 1))
 		return 0;
@@ -128,15 +128,15 @@ private_init (liextEditor*  self,
 }
 
 static void
-private_free (liextEditor* self)
+private_free (LIExtEditor* self)
 {
 }
 
 static int
-private_event (liextEditor* self,
+private_event (LIExtEditor* self,
                liwdgEvent*  event)
 {
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

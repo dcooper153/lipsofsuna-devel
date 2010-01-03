@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,31 +18,31 @@
 /**
  * \addtogroup licfg Config 
  * @{
- * \addtogroup licfgBans Bans
+ * \addtogroup LICfgBans Bans
  * @{
  */
 
 #ifndef __CONFIG_BANS_H__
 #define __CONFIG_BANS_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 
-typedef struct _licfgBans licfgBans;
-struct _licfgBans
+typedef struct _LICfgBans LICfgBans;
+struct _LICfgBans
 {
-	lialgStrdic* bans;
+	LIAlgStrdic* bans;
 };
 
-licfgBans* licfg_bans_new           ();
-licfgBans* licfg_bans_new_from_file (const char* dir);
-void       licfg_bans_free          (licfgBans*  self);
-int        licfg_bans_insert_ban    (licfgBans*  self,
+LICfgBans* licfg_bans_new           ();
+LICfgBans* licfg_bans_new_from_file (const char* dir);
+void       licfg_bans_free          (LICfgBans*  self);
+int        licfg_bans_insert_ban    (LICfgBans*  self,
                                      const char* ip);
-int        licfg_bans_remove_ban    (licfgBans*  self,
+int        licfg_bans_remove_ban    (LICfgBans*  self,
                                      const char* ip);
-int        licfg_bans_get_banned    (licfgBans*  self,
+int        licfg_bans_get_banned    (LICfgBans*  self,
                                      const char* ip);
-int        licfg_bans_get_count     (licfgBans*  self);
+int        licfg_bans_get_count     (LICfgBans*  self);
 
 #endif
 

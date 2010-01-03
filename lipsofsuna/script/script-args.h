@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrArgs Args
+ * \addtogroup LIScrArgs Args
  * @{
  */
 
@@ -39,12 +39,12 @@ enum
 	LISCR_ARGS_OUTPUT_TABLE
 };
 
-struct _liscrArgs
+struct _LIScrArgs
 {
 	lua_State* lua;
-	liscrScript* script;
-	liscrClass* clss;
-	liscrData* data;
+	LIScrScript* script;
+	LIScrClass* clss;
+	LIScrData* data;
 	void* self;
 	int ret;
 	int args_start;
@@ -56,204 +56,204 @@ struct _liscrArgs
 };
 
 void
-liscr_args_init_func (liscrArgs*  self,
+liscr_args_init_func (LIScrArgs*  self,
                       lua_State*  lua,
-                      liscrClass* clss,
-                      liscrData*  data);
+                      LIScrClass* clss,
+                      LIScrData*  data);
 
 void
-liscr_args_init_getter (liscrArgs*  self,
+liscr_args_init_getter (LIScrArgs*  self,
                         lua_State*  lua,
-                        liscrClass* clss,
-                        liscrData*  data);
+                        LIScrClass* clss,
+                        LIScrData*  data);
 
 void
-liscr_args_init_setter (liscrArgs*  self,
+liscr_args_init_setter (LIScrArgs*  self,
                         lua_State*  lua,
-                        liscrClass* clss,
-                        liscrData*  data);
+                        LIScrClass* clss,
+                        LIScrData*  data);
 
 void
-liscr_args_call_setters (liscrArgs* self,
-                         liscrData* data);
+liscr_args_call_setters (LIScrArgs* self,
+                         LIScrData* data);
 
 void
-liscr_args_call_setters_except (liscrArgs*  self,
-                                liscrData*  data,
+liscr_args_call_setters_except (LIScrArgs*  self,
+                                LIScrData*  data,
                                 const char* except);
 
 int
-liscr_args_geti_bool (liscrArgs*  self,
+liscr_args_geti_bool (LIScrArgs*  self,
                       int         index,
                       int*        result);
 
 int
-liscr_args_geti_class (liscrArgs*   self,
+liscr_args_geti_class (LIScrArgs*   self,
                        int          index,
                        const char*  type,
-                       liscrClass** result);
+                       LIScrClass** result);
 
 int
-liscr_args_geti_data (liscrArgs*  self,
+liscr_args_geti_data (LIScrArgs*  self,
                       int         index,
                       const char* type,
-                      liscrData** result);
+                      LIScrData** result);
 
 int
-liscr_args_geti_float (liscrArgs*  self,
+liscr_args_geti_float (LIScrArgs*  self,
                        int         index,
                        float*      result);
 
 int
-liscr_args_geti_int (liscrArgs*  self,
+liscr_args_geti_int (LIScrArgs*  self,
                      int         index,
                      int*        result);
 
 int
-liscr_args_geti_quaternion (liscrArgs*       self,
+liscr_args_geti_quaternion (LIScrArgs*       self,
                             int              index,
-                            limatQuaternion* result);
+                            LIMatQuaternion* result);
 
 int
-liscr_args_geti_string (liscrArgs*   self,
+liscr_args_geti_string (LIScrArgs*   self,
                         int          index,
                         const char** result);
 
 int
-liscr_args_geti_vector (liscrArgs*   self,
+liscr_args_geti_vector (LIScrArgs*   self,
                         int          index,
-                        limatVector* result);
+                        LIMatVector* result);
 
 int
-liscr_args_gets_bool (liscrArgs*  self,
+liscr_args_gets_bool (LIScrArgs*  self,
                       const char* name,
                       int*        result);
 
 int
-liscr_args_gets_class (liscrArgs*   self,
+liscr_args_gets_class (LIScrArgs*   self,
                        const char*  name,
                        const char*  type,
-                       liscrClass** result);
+                       LIScrClass** result);
 
 int
-liscr_args_gets_data (liscrArgs*  self,
+liscr_args_gets_data (LIScrArgs*  self,
                       const char* name,
                       const char* type,
-                      liscrData** result);
+                      LIScrData** result);
 
 int
-liscr_args_gets_float (liscrArgs*  self,
+liscr_args_gets_float (LIScrArgs*  self,
                        const char* name,
                        float*      result);
 
 int
-liscr_args_gets_floatv (liscrArgs*  self,
+liscr_args_gets_floatv (LIScrArgs*  self,
                         const char* name,
                         int         count,
                         float*      result);
 
 int
-liscr_args_gets_int (liscrArgs*  self,
+liscr_args_gets_int (LIScrArgs*  self,
                      const char* name,
                      int*        result);
 
 int
-liscr_args_gets_quaternion (liscrArgs*       self,
+liscr_args_gets_quaternion (LIScrArgs*       self,
                             const char*      name,
-                            limatQuaternion* result);
+                            LIMatQuaternion* result);
 
 int
-liscr_args_gets_string (liscrArgs*   self,
+liscr_args_gets_string (LIScrArgs*   self,
                         const char*  name,
                         const char** result);
 
 int
-liscr_args_gets_vector (liscrArgs*   self,
+liscr_args_gets_vector (LIScrArgs*   self,
                         const char*  name,
-                        limatVector* result);
+                        LIMatVector* result);
 
 void
-liscr_args_set_output (liscrArgs* self,
+liscr_args_set_output (LIScrArgs* self,
                        int        value);
 
 void
-liscr_args_seti_bool (liscrArgs* self,
+liscr_args_seti_bool (LIScrArgs* self,
                       int        value);
 
 void
-liscr_args_seti_class (liscrArgs*  self,
-                       liscrClass* value);
+liscr_args_seti_class (LIScrArgs*  self,
+                       LIScrClass* value);
 
 void
-liscr_args_seti_data (liscrArgs* self,
-                      liscrData* value);
+liscr_args_seti_data (LIScrArgs* self,
+                      LIScrData* value);
 
 void
-liscr_args_seti_float (liscrArgs* self,
+liscr_args_seti_float (LIScrArgs* self,
                        float      value);
 
 void
-liscr_args_seti_int (liscrArgs* self,
+liscr_args_seti_int (LIScrArgs* self,
                      int        value);
 
 void
-liscr_args_seti_quaternion (liscrArgs*             self,
-                            const limatQuaternion* value);
+liscr_args_seti_quaternion (LIScrArgs*             self,
+                            const LIMatQuaternion* value);
 
 void
-liscr_args_seti_stack (liscrArgs* self);
+liscr_args_seti_stack (LIScrArgs* self);
 
 void
-liscr_args_seti_string (liscrArgs*  self,
+liscr_args_seti_string (LIScrArgs*  self,
                         const char* value);
 
 void
-liscr_args_seti_vector (liscrArgs*         self,
-                        const limatVector* value);
+liscr_args_seti_vector (LIScrArgs*         self,
+                        const LIMatVector* value);
 
 void
-liscr_args_sets_bool (liscrArgs*  self,
+liscr_args_sets_bool (LIScrArgs*  self,
                       const char* name,
                       int         value);
 
 void
-liscr_args_sets_class (liscrArgs*  self,
+liscr_args_sets_class (LIScrArgs*  self,
                        const char* name,
-                       liscrClass* value);
+                       LIScrClass* value);
 
 void
-liscr_args_sets_data (liscrArgs*  self,
+liscr_args_sets_data (LIScrArgs*  self,
                       const char* name,
-                      liscrData*  value);
+                      LIScrData*  value);
 
 void
-liscr_args_sets_float (liscrArgs*  self,
+liscr_args_sets_float (LIScrArgs*  self,
                        const char* name,
                        float       value);
 
 void
-liscr_args_sets_int (liscrArgs*  self,
+liscr_args_sets_int (LIScrArgs*  self,
                      const char* name,
                      int         value);
 
 void
-liscr_args_sets_quaternion (liscrArgs*             self,
+liscr_args_sets_quaternion (LIScrArgs*             self,
                             const char*            name,
-                            const limatQuaternion* value);
+                            const LIMatQuaternion* value);
 
 void
-liscr_args_sets_stack (liscrArgs*  self,
+liscr_args_sets_stack (LIScrArgs*  self,
                        const char* name);
 
 void
-liscr_args_sets_string (liscrArgs*  self,
+liscr_args_sets_string (LIScrArgs*  self,
                         const char* name,
                         const char* value);
 
 void
-liscr_args_sets_vector (liscrArgs*         self,
+liscr_args_sets_vector (LIScrArgs*         self,
                         const char*        name,
-                        const limatVector* value);
+                        const LIMatVector* value);
 
 /*****************************************************************************/
 

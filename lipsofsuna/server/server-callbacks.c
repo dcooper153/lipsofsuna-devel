@@ -16,27 +16,27 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvCallbacks Callbacks
+ * \addtogroup liserCallbacks Callbacks
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "server-callbacks.h"
 #include "server-observer.h"
 #include "server-script.h"
 
 static int
-private_client_client_login (lisrvServer* server,
-                             liengObject* object,
+private_client_client_login (LISerServer* server,
+                             LIEngObject* object,
                              const char*  name,
                              const char*  pass)
 {
 #warning No accounts
 #if 0
 	char* path;
-	licfgAccount* account;
+	LICfgAccount* account;
 
 	/* Contruct the account path. */
 	path = lisys_path_concat (self->paths->server_state, "accounts", message->NEW_USER.name, NULL);
@@ -67,25 +67,25 @@ private_client_client_login (lisrvServer* server,
 	}
 
 	/* Set credentials. */
-	lisrv_client_set_account (client, message->NEW_USER.name);
+	liser_client_set_account (client, message->NEW_USER.name);
 	if (pass != NULL)
-		lisrv_client_set_password (client, pass);
+		liser_client_set_password (client, pass);
 #endif
 
 	return 1;
 }
 
 static int
-private_client_client_packet (lisrvServer* server,
-                              lisrvClient* client,
-                              liarcReader* reader)
+private_client_client_packet (LISerServer* server,
+                              LISerClient* client,
+                              LIArcReader* reader)
 {
 	int8_t x;
 	int8_t y;
 	int8_t z;
 	int8_t w;
 	uint8_t flags;
-	limatQuaternion tmp;
+	LIMatQuaternion tmp;
 
 	if (((uint8_t*) reader->buffer)[0] == LINET_CLIENT_PACKET_MOVE)
 	{
@@ -104,17 +104,17 @@ private_client_client_packet (lisrvServer* server,
 }
 
 static int
-private_client_vision_hide (lisrvServer* server,
-                            liengObject* object,
-                            liengObject* target)
+private_client_vision_hide (LISerServer* server,
+                            LIEngObject* object,
+                            LIEngObject* target)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	writer = liarc_writer_new_packet (LINET_SERVER_PACKET_OBJECT_DESTROY);
 	if (writer != NULL)
 	{
 		liarc_writer_append_uint32 (writer, target->id);
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 		liarc_writer_free (writer);
 	}
 
@@ -122,17 +122,17 @@ private_client_vision_hide (lisrvServer* server,
 }
 
 static int
-private_client_vision_show (lisrvServer* server,
-                            liengObject* object,
-                            liengObject* target)
+private_client_vision_show (LISerServer* server,
+                            LIEngObject* object,
+                            LIEngObject* target)
 {
 	int engflags;
 	int netflags;
-	lialgU32dicIter iter;
-	liarcWriter* writer;
-	limatTransform transform;
-	limatVector velocity;
-	lisrvAniminfo* animation;
+	LIAlgU32dicIter iter;
+	LIArcWriter* writer;
+	LIMatTransform transform;
+	LIMatVector velocity;
+	LISerAniminfo* animation;
 
 	/* Create standard vision message. */
 	writer = liarc_writer_new_packet (LINET_SERVER_PACKET_OBJECT_CREATE);
@@ -160,8 +160,8 @@ private_client_vision_show (lisrvServer* server,
 		liarc_writer_append_float (writer, transform.position.x);
 		liarc_writer_append_float (writer, transform.position.y);
 		liarc_writer_append_float (writer, transform.position.z);
-		liarc_writer_append_uint8 (writer, LISRV_OBJECT (target)->animations->size);
-		LI_FOREACH_U32DIC (iter, LISRV_OBJECT (target)->animations)
+		liarc_writer_append_uint8 (writer, LISER_OBJECT (target)->animations->size);
+		LI_FOREACH_U32DIC (iter, LISER_OBJECT (target)->animations)
 		{
 			animation = iter.value;
 			liarc_writer_append_uint16 (writer, animation->animation->id);
@@ -169,7 +169,7 @@ private_client_vision_show (lisrvServer* server,
 			liarc_writer_append_uint8 (writer, animation->permanent);
 			liarc_writer_append_float (writer, animation->priority);
 		}
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 		liarc_writer_free (writer);
 	}
 
@@ -177,14 +177,14 @@ private_client_vision_show (lisrvServer* server,
 }
 
 static int
-private_object_free (lisrvServer* server,
-                     liengObject* object)
+private_object_free (LISerServer* server,
+                     LIEngObject* object)
 {
-	lialgU32dicIter iter;
-	lisrvObject* data = LISRV_OBJECT (object);
+	LIAlgU32dicIter iter;
+	LISerObject* data = LISER_OBJECT (object);
 
 	/* Free client. */
-	lisrv_object_disconnect (object);
+	liser_object_disconnect (object);
 
 	/* Unrealize before server data is freed. */
 	lieng_object_set_realized (object, 0);
@@ -202,13 +202,13 @@ private_object_free (lisrvServer* server,
 }
 
 static int
-private_object_new (lisrvServer* server,
-                    liengObject* object)
+private_object_new (LISerServer* server,
+                    LIEngObject* object)
 {
-	lisrvObject* data;
+	LISerObject* data;
 
 	/* Allocate server data. */
-	data = lisys_calloc (1, sizeof (lisrvObject));
+	data = lisys_calloc (1, sizeof (LISerObject));
 	if (data == NULL)
 		return 0;
 	data->server = server;
@@ -237,13 +237,13 @@ private_object_new (lisrvServer* server,
 }
 
 static int
-private_sector_load (lisrvServer* server,
-                     liengSector* sector)
+private_sector_load (LISerServer* server,
+                     LIEngSector* sector)
 {
 	int id;
 	int ret;
 	const char* query;
-	liengObject* object;
+	LIEngObject* object;
 	sqlite3_stmt* statement;
 
 	id = sector->sector->index;
@@ -281,14 +281,14 @@ private_sector_load (lisrvServer* server,
 		object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
 		if (object != NULL)
 		{
-			if (lisrv_object_serialize (object, 0))
+			if (liser_object_serialize (object, 0))
 				lieng_object_set_realized (object, 1);
 		}
 	}
 }
 
 int
-lisrv_server_init_callbacks_client (lisrvServer* server)
+liser_server_init_callbacks_client (LISerServer* server)
 {
 	lical_callbacks_insert (server->callbacks, server->engine, "client-login", 0, private_client_client_login, server, NULL);
 	lical_callbacks_insert (server->callbacks, server->engine, "client-packet", 0, private_client_client_packet, server, NULL);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,26 +24,26 @@
  * @{
  */
 
-#include <server/lips-server.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-npc.h"
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Npc",
+	LISER_EXTENSION_VERSION, "Npc",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (lisrvServer* server)
+LIExtModule*
+liext_module_new (LISerServer* server)
 {
 	void* fun;
-	liextModule* self;
-	lisrvExtension* ext;
+	LIExtModule* self;
+	LISerExtension* ext;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -57,12 +57,12 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Check for voxel terrain. */
-	ext = lisrv_server_find_extension (server, "voxel");
+	ext = liser_server_find_extension (server, "voxel");
 	if (ext != NULL)
 	{
 		fun = lisys_module_symbol (ext->module, "liext_module_get_voxels");
 		if (fun != NULL)
-			self->voxels = ((livoxManager* (*)(void*)) fun)(ext->object);
+			self->voxels = ((LIVoxManager* (*)(void*)) fun)(ext->object);
 	}
 
 	/* Allocate AI manager. */
@@ -74,13 +74,13 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Npc", liextNpcScript, self);
+	liscr_script_create_class (server->script, "Npc", liext_script_npc, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	if (self->dictionary != NULL)
 		lialg_ptrdic_free (self->dictionary);
@@ -89,9 +89,9 @@ liext_module_free (liextModule* self)
 	lisys_free (self);
 }
 
-liextNpc*
-liext_module_find_npc (liextModule* self,
-                       liengObject* owner)
+LIExtNpc*
+liext_module_find_npc (LIExtModule* self,
+                       LIEngObject* owner)
 {
 	return lialg_ptrdic_find (self->dictionary, owner);
 }
@@ -104,12 +104,12 @@ liext_module_find_npc (liextModule* self,
  * \param target Target position vector.
  * \return New path or NULL if couldn't solve.
  */
-liaiPath*
-liext_module_solve_path (liextModule*       self,
-                         const liengObject* object,
-                         const limatVector* target)
+LIAiPath*
+liext_module_solve_path (LIExtModule*       self,
+                         const LIEngObject* object,
+                         const LIMatVector* target)
 {
-	limatTransform transform;
+	LIMatTransform transform;
 
 	lieng_object_get_transform (object, &transform);
 	transform.position.y += 0.5f;

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,50 +18,50 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiPath Path
+ * \addtogroup LIAiPath Path
  * @{
  */
 
 #ifndef __AI_MANAGER_H__
 #define __AI_MANAGER_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <math/lips-math.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/voxel.h>
 #include "ai-path.h"
 #include "ai-types.h"
 
-struct _liaiManager
+struct _LIAiManager
 {
-	lialgAstar* astar;
-	lialgSectors* sectors;
-	licalCallbacks* callbacks;
-	licalHandle calls[1];
-	livoxManager* voxels;
+	LIAlgAstar* astar;
+	LIAlgSectors* sectors;
+	LICalCallbacks* callbacks;
+	LICalHandle calls[1];
+	LIVoxManager* voxels;
 };
 
-liaiManager*
-liai_manager_new (licalCallbacks* callbacks,
-                  lialgSectors*   sectors,
-                  livoxManager*   voxels);
+LIAiManager*
+liai_manager_new (LICalCallbacks* callbacks,
+                  LIAlgSectors*   sectors,
+                  LIVoxManager*   voxels);
 
 void
-liai_manager_free (liaiManager* self);
+liai_manager_free (LIAiManager* self);
 
-liaiWaypoint*
-liai_manager_find_waypoint (liaiManager*       self,
-                            const limatVector* point);
+LIAiWaypoint*
+liai_manager_find_waypoint (LIAiManager*       self,
+                            const LIMatVector* point);
 
 int
-liai_manager_load_sector (liaiManager* self,
+liai_manager_load_sector (LIAiManager* self,
                           int          sx,
                           int          sy,
                           int          sz);
 
-liaiPath*
-liai_manager_solve_path (liaiManager*       self,
-                         const limatVector* start,
-                         const limatVector* end);
+LIAiPath*
+liai_manager_solve_path (LIAiManager*       self,
+                         const LIMatVector* start,
+                         const LIMatVector* end);
 
 #endif
 

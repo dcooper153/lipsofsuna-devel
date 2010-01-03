@@ -22,8 +22,8 @@
  * @{
  */
 
-#include <engine/lips-engine.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/script.h>
 
 /* @luadoc
  * module "Core.Common.Object"
@@ -45,10 +45,10 @@
  * -- @param args Arguments.
  * function Object.approach(self, args)
  */
-static void Object_approach (liscrArgs* args)
+static void Object_approach (LIScrArgs* args)
 {
 	float speed = 1.0f;
-	limatVector vector;
+	LIMatVector vector;
 
 	if (liscr_args_gets_vector (args, "point", &vector))
 	{
@@ -69,11 +69,11 @@ static void Object_approach (liscrArgs* args)
  * -- @return Position and rotation, or nil if not found.
  * function Object.find_node(self, args)
  */
-static void Object_find_node (liscrArgs* args)
+static void Object_find_node (LIScrArgs* args)
 {
 	const char* name;
-	limatTransform transform;
-	limdlNode* node;
+	LIMatTransform transform;
+	LIMdlNode* node;
 
 	if (!liscr_args_gets_string (args, "name", &name))
 		return;
@@ -97,10 +97,10 @@ static void Object_find_node (liscrArgs* args)
  * -- @param args Arguments.
  * function Object.impulse(self, args)
  */
-static void Object_impulse (liscrArgs* args)
+static void Object_impulse (LIScrArgs* args)
 {
-	limatVector impulse;
-	limatVector point;
+	LIMatVector impulse;
+	LIMatVector point;
 
 	if (liscr_args_gets_vector (args, "impulse", &impulse) &&
 	    liscr_args_gets_vector (args, "point", &point))
@@ -118,9 +118,9 @@ static void Object_impulse (liscrArgs* args)
  * -- @param args Arguments.
  * function Object.jump(self, impulse)
  */
-static void Object_jump (liscrArgs* args)
+static void Object_jump (LIScrArgs* args)
 {
-	limatVector impulse;
+	LIMatVector impulse;
 
 	if (liscr_args_gets_vector (args, "impulse", &impulse))
 		lieng_object_jump (args->self, &impulse);
@@ -140,16 +140,16 @@ static void Object_jump (liscrArgs* args)
  * -- @name Object.angular_momentum
  * -- @class table
  */
-static void Object_getter_angular_momentum (liscrArgs* args)
+static void Object_getter_angular_momentum (LIScrArgs* args)
 {
-	limatVector tmp;
+	LIMatVector tmp;
 
 	lieng_object_get_angular_momentum (args->self, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_angular_momentum (liscrArgs* args)
+static void Object_setter_angular_momentum (LIScrArgs* args)
 {
-	limatVector vector;
+	LIMatVector vector;
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 		lieng_object_set_angular_momentum (args->self, &vector);
@@ -162,13 +162,13 @@ static void Object_setter_angular_momentum (liscrArgs* args)
  * -- @name Object.class
  * -- @class table
  */
-static void Object_getter_class (liscrArgs* args)
+static void Object_getter_class (LIScrArgs* args)
 {
 	liscr_args_seti_class (args, args->data->clss);
 }
-static void Object_setter_class (liscrArgs* args)
+static void Object_setter_class (LIScrArgs* args)
 {
-	liscrClass* clss;
+	LIScrClass* clss;
 
 	if (liscr_args_geti_class (args, 0, NULL, &clss))
 		liscr_data_set_class (args->data, clss);
@@ -181,11 +181,11 @@ static void Object_setter_class (liscrArgs* args)
  * -- @name Object.collision_group
  * -- @class table
  */
-static void Object_getter_collision_group (liscrArgs* args)
+static void Object_getter_collision_group (LIScrArgs* args)
 {
 	liscr_args_seti_int (args, lieng_object_get_collision_group (args->self));
 }
-static void Object_setter_collision_group (liscrArgs* args)
+static void Object_setter_collision_group (LIScrArgs* args)
 {
 	int value;
 
@@ -200,11 +200,11 @@ static void Object_setter_collision_group (liscrArgs* args)
  * -- @name Object.collision_mask
  * -- @class table
  */
-static void Object_getter_collision_mask (liscrArgs* args)
+static void Object_getter_collision_mask (LIScrArgs* args)
 {
 	liscr_args_seti_int (args, lieng_object_get_collision_mask (args->self));
 }
-static void Object_setter_collision_mask (liscrArgs* args)
+static void Object_setter_collision_mask (LIScrArgs* args)
 {
 	int value;
 
@@ -219,16 +219,16 @@ static void Object_setter_collision_mask (liscrArgs* args)
  * -- @name Object.gravity
  * -- @class table
  */
-static void Object_getter_gravity (liscrArgs* args)
+static void Object_getter_gravity (LIScrArgs* args)
 {
-	limatVector tmp;
+	LIMatVector tmp;
 
 	liphy_object_get_gravity (LIENG_OBJECT (args->self)->physics, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_gravity (liscrArgs* args)
+static void Object_setter_gravity (LIScrArgs* args)
 {
-	limatVector vector;
+	LIMatVector vector;
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 		liphy_object_set_gravity (LIENG_OBJECT (args->self)->physics, &vector);
@@ -243,7 +243,7 @@ static void Object_setter_gravity (liscrArgs* args)
  * -- @name Object.ground
  * -- @class table
  */
-static void Object_getter_ground (liscrArgs* args)
+static void Object_getter_ground (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, lieng_object_get_ground (args->self));
 }
@@ -255,7 +255,7 @@ static void Object_getter_ground (liscrArgs* args)
  * -- @name Object.id
  * -- @class table
  */
-static void Object_getter_id (liscrArgs* args)
+static void Object_getter_id (LIScrArgs* args)
 {
 	liscr_args_seti_int (args, LIENG_OBJECT (args->self)->id);
 }
@@ -267,11 +267,11 @@ static void Object_getter_id (liscrArgs* args)
  * -- @name Object.mass
  * -- @class table
  */
-static void Object_getter_mass (liscrArgs* args)
+static void Object_getter_mass (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, lieng_object_get_mass (args->self));
 }
-static void Object_setter_mass (liscrArgs* args)
+static void Object_setter_mass (LIScrArgs* args)
 {
 	float value;
 
@@ -285,17 +285,17 @@ static void Object_setter_mass (liscrArgs* args)
  * -- @name Object.model
  * -- @class table
  */
-static void Object_getter_model (liscrArgs* args)
+static void Object_getter_model (LIScrArgs* args)
 {
 	int id;
-	liengModel* model;
+	LIEngModel* model;
 
 	id = lieng_object_get_model_code (args->self);
 	model = lieng_engine_find_model_by_code (args->self, id);
 	if (model != NULL)
 		liscr_args_seti_string (args, model->name);
 }
-static void Object_setter_model (liscrArgs* args)
+static void Object_setter_model (LIScrArgs* args)
 {
 	const char* value;
 
@@ -310,17 +310,17 @@ static void Object_setter_model (liscrArgs* args)
  * -- @name Object.position
  * -- @class table
  */
-static void Object_getter_position (liscrArgs* args)
+static void Object_getter_position (LIScrArgs* args)
 {
-	limatTransform tmp;
+	LIMatTransform tmp;
 
 	lieng_object_get_transform (args->self, &tmp);
 	liscr_args_seti_vector (args, &tmp.position);
 }
-static void Object_setter_position (liscrArgs* args)
+static void Object_setter_position (LIScrArgs* args)
 {
-	limatTransform transform;
-	limatVector vector;
+	LIMatTransform transform;
+	LIMatVector vector;
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 	{
@@ -337,11 +337,11 @@ static void Object_setter_position (liscrArgs* args)
  * -- @name Object.realized
  * -- @class table
  */
-static void Object_getter_realized (liscrArgs* args)
+static void Object_getter_realized (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, lieng_object_get_realized (args->self));
 }
-static void Object_setter_realized (liscrArgs* args)
+static void Object_setter_realized (LIScrArgs* args)
 {
 	int value;
 
@@ -356,22 +356,22 @@ static void Object_setter_realized (liscrArgs* args)
  * -- @name Object.rotation
  * -- @class table
  */
-static void Object_getter_rotation (liscrArgs* args)
+static void Object_getter_rotation (LIScrArgs* args)
 {
-	limatTransform tmp;
+	LIMatTransform tmp;
 
 	lieng_object_get_transform (args->self, &tmp);
 	liscr_args_seti_quaternion (args, &tmp.rotation);
 }
-static void Object_setter_rotation (liscrArgs* args)
+static void Object_setter_rotation (LIScrArgs* args)
 {
-	limatTransform transform;
-	liscrData* quat;
+	LIMatTransform transform;
+	LIScrData* quat;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &quat))
 	{
 		lieng_object_get_transform (args->self, &transform);
-		transform.rotation = *((limatQuaternion*) quat->data);
+		transform.rotation = *((LIMatQuaternion*) quat->data);
 		lieng_object_set_transform (args->self, &transform);
 	}
 }
@@ -383,14 +383,14 @@ static void Object_setter_rotation (liscrArgs* args)
  * -- @name Object.save
  * -- @class table
  */
-static void Object_getter_save (liscrArgs* args)
+static void Object_getter_save (LIScrArgs* args)
 {
 	int flags;
 
 	flags = lieng_object_get_flags (args->self);
 	liscr_args_seti_bool (args, (flags & (LIENG_OBJECT_FLAG_SAVE)) != 0);
 }
-static void Object_setter_save (liscrArgs* args)
+static void Object_setter_save (LIScrArgs* args)
 {
 	int flags;
 	int value;
@@ -413,11 +413,11 @@ static void Object_setter_save (liscrArgs* args)
  * -- @name Object.selected
  * -- @class table
  */
-static void Object_getter_selected (liscrArgs* args)
+static void Object_getter_selected (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, lieng_object_get_selected (args->self));
 }
-static void Object_setter_selected (liscrArgs* args)
+static void Object_setter_selected (LIScrArgs* args)
 {
 	int value;
 
@@ -434,11 +434,11 @@ static void Object_setter_selected (liscrArgs* args)
  * -- @name Object.speed
  * -- @class table
  */
-static void Object_getter_speed (liscrArgs* args)
+static void Object_getter_speed (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, lieng_object_get_speed (args->self));
 }
-static void Object_setter_speed (liscrArgs* args)
+static void Object_setter_speed (LIScrArgs* args)
 {
 	float value;
 
@@ -457,11 +457,11 @@ static void Object_setter_speed (liscrArgs* args)
  * -- @name Object.strafing
  * -- @class table
  */
-static void Object_getter_strafing (liscrArgs* args)
+static void Object_getter_strafing (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, liphy_object_get_strafing (LIENG_OBJECT (args->self)->physics));
 }
-static void Object_setter_strafing (liscrArgs* args)
+static void Object_setter_strafing (LIScrArgs* args)
 {
 	float value;
 
@@ -476,16 +476,16 @@ static void Object_setter_strafing (liscrArgs* args)
  * -- @name Object.velocity
  * -- @class table
  */
-static void Object_getter_velocity (liscrArgs* args)
+static void Object_getter_velocity (LIScrArgs* args)
 {
-	limatVector tmp;
+	LIMatVector tmp;
 
 	lieng_object_get_velocity (args->self, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_velocity (liscrArgs* args)
+static void Object_setter_velocity (LIScrArgs* args)
 {
-	limatVector vector;
+	LIMatVector vector;
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 		lieng_object_set_velocity (args->self, &vector);
@@ -494,7 +494,7 @@ static void Object_setter_velocity (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licomObjectScript (liscrClass* self,
+liscr_script_object (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_insert_mfunc (self, "approach", Object_approach);

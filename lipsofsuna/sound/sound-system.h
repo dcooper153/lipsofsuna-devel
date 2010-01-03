@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisnd Sound 
  * @{
- * \addtogroup lisndSystem System
+ * \addtogroup LISndSystem System
  * @{
  */
 
@@ -27,27 +27,27 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _lisndSystem lisndSystem;
-struct _lisndSystem
+typedef struct _LISndSystem LISndSystem;
+struct _LISndSystem
 {
 	ALCdevice* device;
 	ALCcontext* context;
 };
 
-lisndSystem*
+LISndSystem*
 lisnd_system_new ();
 
 void
-lisnd_system_free (lisndSystem* self);
+lisnd_system_free (LISndSystem* self);
 
 void
-lisnd_system_set_listener (lisndSystem*       self,
-                           const limatVector* pos,
-                           const limatVector* vel,
-                           const limatVector* dir,
-                           const limatVector* up);
+lisnd_system_set_listener (LISndSystem*       self,
+                           const LIMatVector* pos,
+                           const LIMatVector* vel,
+                           const LIMatVector* dir,
+                           const LIMatVector* up);
 
 #endif
 

@@ -14,6 +14,10 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+
+
+
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -34,10 +38,33 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+@MAYBE_CLIENT_TRUE@am__append_1 = lipsofsuna/client/extensions
+@MAYBE_SERVER_TRUE@am__append_2 = lipsofsuna/server/extensions
+prg_PROGRAMS = lipsofsuna-launch$(EXEEXT)
+bin_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
+	$(am__EXEEXT_4) $(am__EXEEXT_5)
+@MAYBE_CLIENT_TRUE@am__append_3 = lipsofsuna-client
+@MAYBE_CLIENT_TRUE@am__append_4 = liblipsofsunaclient.la
+@MAYBE_GENERATOR_TRUE@am__append_5 = lipsofsuna-generator
+@MAYBE_GENERATOR_TRUE@am__append_6 = liblipsofsunagenerator.la
+@MAYBE_IMPORT_TRUE@am__append_7 = lipsofsuna-import
+@MAYBE_IMPORT_TRUE@am__append_8 = liblipsofsunaimport.la
+@MAYBE_SERVER_TRUE@am__append_9 = lipsofsuna-server
+@MAYBE_SERVER_TRUE@am__append_10 = liblipsofsunaserver.la
+@MAYBE_VIEWER_TRUE@am__append_11 = lipsofsuna-viewer
+@MAYBE_VIEWER_TRUE@am__append_12 = liblipsofsunaviewer.la
 subdir = .
-DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	COPYING.LESSER ChangeLog INSTALL NEWS config.guess config.sub \
+DIST_COMMON = README $(ai_HEADERS) $(alg_HEADERS) \
+	$(am__configure_deps) $(arc_HEADERS) $(bnd_HEADERS) \
+	$(cal_HEADERS) $(cfg_HEADERS) $(cli_HEADERS) $(eng_HEADERS) \
+	$(fnt_HEADERS) $(gen_HEADERS) $(img_HEADERS) $(mat_HEADERS) \
+	$(mdl_HEADERS) $(net_HEADERS) $(par_HEADERS) $(phy_HEADERS) \
+	$(pth_HEADERS) $(rel_HEADERS) $(rnd_HEADERS) $(scr_HEADERS) \
+	$(snd_HEADERS) $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/config.h.in $(srv_HEADERS) $(str_HEADERS) \
+	$(sys_HEADERS) $(thr_HEADERS) $(top_srcdir)/configure \
+	$(vid_HEADERS) $(vie_HEADERS) $(vox_HEADERS) $(wdg_HEADERS) \
+	AUTHORS COPYING COPYING.LESSER INSTALL config.guess config.sub \
 	depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
@@ -51,17 +78,437 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/lipsofsuna/config.h
+CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-AM_V_GEN = $(am__v_GEN_$(V))
-am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
-am__v_GEN_0 = @echo "  GEN   " $@;
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(prgdir)" "$(DESTDIR)$(editordir)" \
+	"$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" \
+	"$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" \
+	"$(DESTDIR)$(caldir)" "$(DESTDIR)$(cfgdir)" \
+	"$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" \
+	"$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" \
+	"$(DESTDIR)$(imgdir)" "$(DESTDIR)$(matdir)" \
+	"$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" \
+	"$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" \
+	"$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" \
+	"$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" \
+	"$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" \
+	"$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" \
+	"$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" \
+	"$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" \
+	"$(DESTDIR)$(wdgdir)"
+LTLIBRARIES = $(lib_LTLIBRARIES)
+am__DEPENDENCIES_1 =
+liblipsofsunaclient_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am__dirstamp = $(am__leading_dot)dirstamp
+am__objects_1 = lipsofsuna/ai/ai-manager.lo lipsofsuna/ai/ai-path.lo \
+	lipsofsuna/ai/ai-sector.lo
+am__objects_2 = lipsofsuna/algorithm/algorithm-astar.lo \
+	lipsofsuna/algorithm/algorithm-bst.lo \
+	lipsofsuna/algorithm/algorithm-camera.lo \
+	lipsofsuna/algorithm/algorithm-octree.lo \
+	lipsofsuna/algorithm/algorithm-sectors.lo
+am__objects_3 = lipsofsuna/archive/archive-reader.lo \
+	lipsofsuna/archive/archive-sql.lo \
+	lipsofsuna/archive/archive-tar.lo \
+	lipsofsuna/archive/archive-writer.lo
+am__objects_4 = lipsofsuna/binding/binding.lo \
+	lipsofsuna/binding/binding-action.lo \
+	lipsofsuna/binding/binding-manager.lo
+am__objects_5 = lipsofsuna/callback/cal-callbacks.lo \
+	lipsofsuna/callback/cal-handle.lo \
+	lipsofsuna/callback/cal-marshal.lo
+am__objects_6 = lipsofsuna/config/config-account.lo \
+	lipsofsuna/config/config-bans.lo \
+	lipsofsuna/config/config-host.lo
+am__objects_7 = lipsofsuna/client/client.lo \
+	lipsofsuna/client/client-callbacks.lo \
+	lipsofsuna/client/client-command.lo \
+	lipsofsuna/client/client-network.lo \
+	lipsofsuna/client/client-object.lo \
+	lipsofsuna/client/client-render.lo \
+	lipsofsuna/client/client-script-action.lo \
+	lipsofsuna/client/client-script-binding.lo \
+	lipsofsuna/client/client-script-client.lo \
+	lipsofsuna/client/client-script-group.lo \
+	lipsofsuna/client/client-script-extension.lo \
+	lipsofsuna/client/client-script-light.lo \
+	lipsofsuna/client/client-script-object.lo \
+	lipsofsuna/client/client-script-player.lo \
+	lipsofsuna/client/client-script-scene.lo \
+	lipsofsuna/client/client-script-widget.lo \
+	lipsofsuna/client/client-script-window.lo \
+	lipsofsuna/client/client-window.lo \
+	lipsofsuna/client/widget-login.lo
+am__objects_8 = lipsofsuna/font/font.lo lipsofsuna/font/font-layout.lo
+am__objects_9 = lipsofsuna/generator/generator.lo \
+	lipsofsuna/generator/generator-brush.lo \
+	lipsofsuna/generator/generator-rule.lo
+am__objects_10 = lipsofsuna/engine/engine.lo \
+	lipsofsuna/engine/engine-constraint.lo \
+	lipsofsuna/engine/engine-model.lo \
+	lipsofsuna/engine/engine-object.lo \
+	lipsofsuna/engine/engine-resources.lo \
+	lipsofsuna/engine/engine-sector.lo \
+	lipsofsuna/engine/engine-selection.lo
+am__objects_11 = lipsofsuna/image/image.lo \
+	lipsofsuna/image/image-compress.lo \
+	lipsofsuna/image/image-texture.lo
+am__objects_12 = lipsofsuna/math/math.lo
+am__objects_13 = lipsofsuna/model/model.lo \
+	lipsofsuna/model/model-animation.lo \
+	lipsofsuna/model/model-bone.lo lipsofsuna/model/model-faces.lo \
+	lipsofsuna/model/model-hair.lo lipsofsuna/model/model-light.lo \
+	lipsofsuna/model/model-material.lo \
+	lipsofsuna/model/model-node.lo lipsofsuna/model/model-pose.lo \
+	lipsofsuna/model/model-shape.lo \
+	lipsofsuna/model/model-texture.lo
+am__objects_14 = lipsofsuna/network/network.lo
+am__objects_15 = lipsofsuna/physics/physics.lo \
+	lipsofsuna/physics/physics-constraint.lo \
+	lipsofsuna/physics/physics-control.lo \
+	lipsofsuna/physics/physics-object.lo \
+	lipsofsuna/physics/physics-private.lo \
+	lipsofsuna/physics/physics-shape.lo
+am__objects_16 = lipsofsuna/particle/particle-line.lo \
+	lipsofsuna/particle/particle-manager.lo \
+	lipsofsuna/particle/particle-point.lo
+am__objects_17 = lipsofsuna/paths/paths.lo
+am__objects_18 = lipsofsuna/reload/reload.lo \
+	lipsofsuna/reload/reload-blender.lo \
+	lipsofsuna/reload/reload-gimp.lo \
+	lipsofsuna/reload/reload-image.lo
+am__objects_19 = lipsofsuna/render/render.lo \
+	lipsofsuna/render/render-buffer.lo \
+	lipsofsuna/render/render-context.lo \
+	lipsofsuna/render/render-deferred.lo \
+	lipsofsuna/render/render-draw.lo \
+	lipsofsuna/render/render-group.lo \
+	lipsofsuna/render/render-image.lo \
+	lipsofsuna/render/render-light.lo \
+	lipsofsuna/render/render-lighting.lo \
+	lipsofsuna/render/render-material.lo \
+	lipsofsuna/render/render-model.lo \
+	lipsofsuna/render/render-object.lo \
+	lipsofsuna/render/render-scene.lo \
+	lipsofsuna/render/render-shader.lo \
+	lipsofsuna/render/render-texture.lo
+am__objects_20 = lipsofsuna/script/script.lo \
+	lipsofsuna/script/script-args.lo \
+	lipsofsuna/script/script-class.lo \
+	lipsofsuna/script/script-data.lo \
+	lipsofsuna/script/script-event.lo \
+	lipsofsuna/script/script-library.lo \
+	lipsofsuna/script/script-object.lo \
+	lipsofsuna/script/script-packet.lo \
+	lipsofsuna/script/script-path.lo \
+	lipsofsuna/script/script-quaternion.lo \
+	lipsofsuna/script/script-util.lo \
+	lipsofsuna/script/script-vector.lo
+am__objects_21 = lipsofsuna/string/string-generic.lo
+am__objects_22 = lipsofsuna/sound/sound-manager.lo \
+	lipsofsuna/sound/sound-sample.lo \
+	lipsofsuna/sound/sound-source.lo \
+	lipsofsuna/sound/sound-system.lo
+am__objects_23 = lipsofsuna/server/server.lo \
+	lipsofsuna/server/server-callbacks.lo \
+	lipsofsuna/server/server-client.lo \
+	lipsofsuna/server/server-network.lo \
+	lipsofsuna/server/server-object.lo \
+	lipsofsuna/server/server-script-effect.lo \
+	lipsofsuna/server/server-script-extension.lo \
+	lipsofsuna/server/server-script-object.lo \
+	lipsofsuna/server/server-script-server.lo
+am__objects_24 = lipsofsuna/system/system.lo \
+	lipsofsuna/system/system-directory.lo \
+	lipsofsuna/system/system-error.lo \
+	lipsofsuna/system/system-file.lo \
+	lipsofsuna/system/system-execute.lo \
+	lipsofsuna/system/system-memory.lo \
+	lipsofsuna/system/system-misc.lo \
+	lipsofsuna/system/system-module.lo \
+	lipsofsuna/system/system-notify.lo \
+	lipsofsuna/system/system-path.lo \
+	lipsofsuna/system/system-relative.lo \
+	lipsofsuna/system/system-types.lo \
+	lipsofsuna/system/system-user.lo
+am__objects_25 = lipsofsuna/thread/thread.lo \
+	lipsofsuna/thread/thread-async-call.lo
+am__objects_26 = lipsofsuna/video/video-calls.lo \
+	lipsofsuna/video/video-features.lo
+am__objects_27 = lipsofsuna/voxel/voxel.lo \
+	lipsofsuna/voxel/voxel-block.lo \
+	lipsofsuna/voxel/voxel-manager.lo \
+	lipsofsuna/voxel/voxel-material.lo \
+	lipsofsuna/voxel/voxel-sector.lo
+am__objects_28 = lipsofsuna/widget/widget.lo \
+	lipsofsuna/widget/widget-busy.lo \
+	lipsofsuna/widget/widget-button.lo \
+	lipsofsuna/widget/widget-check.lo \
+	lipsofsuna/widget/widget-container.lo \
+	lipsofsuna/widget/widget-entry.lo \
+	lipsofsuna/widget/widget-group.lo \
+	lipsofsuna/widget/widget-image.lo \
+	lipsofsuna/widget/widget-label.lo \
+	lipsofsuna/widget/widget-manager.lo \
+	lipsofsuna/widget/widget-menu.lo \
+	lipsofsuna/widget/widget-progress.lo \
+	lipsofsuna/widget/widget-render.lo \
+	lipsofsuna/widget/widget-scroll.lo \
+	lipsofsuna/widget/widget-spin.lo \
+	lipsofsuna/widget/widget-style.lo \
+	lipsofsuna/widget/widget-tabs.lo \
+	lipsofsuna/widget/widget-tree.lo \
+	lipsofsuna/widget/widget-view.lo \
+	lipsofsuna/widget/widget-window.lo
+am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
+	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
+	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
+	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
+	$(am__objects_27) $(am__objects_28)
+liblipsofsunaclient_la_OBJECTS = $(am_liblipsofsunaclient_la_OBJECTS)
+AM_V_lt = $(am__v_lt_$(V))
+am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
+am__v_lt_0 = --silent
+liblipsofsunaclient_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaclient_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@MAYBE_CLIENT_TRUE@am_liblipsofsunaclient_la_rpath = -rpath $(libdir)
+liblipsofsunagenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_liblipsofsunagenerator_la_OBJECTS = $(am__objects_2) \
+	$(am__objects_3) $(am__objects_5) $(am__objects_6) \
+	$(am__objects_9) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_17) $(am__objects_21) $(am__objects_24) \
+	$(am__objects_25) $(am__objects_27)
+liblipsofsunagenerator_la_OBJECTS =  \
+	$(am_liblipsofsunagenerator_la_OBJECTS)
+liblipsofsunagenerator_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(liblipsofsunagenerator_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@MAYBE_GENERATOR_TRUE@am_liblipsofsunagenerator_la_rpath = -rpath \
+@MAYBE_GENERATOR_TRUE@	$(libdir)
+liblipsofsunaimport_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_liblipsofsunaimport_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
+	$(am__objects_6) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_17) $(am__objects_18) $(am__objects_21) \
+	$(am__objects_24) $(am__objects_25) lipsofsuna/image/image.lo \
+	lipsofsuna/image/image-compress.lo
+liblipsofsunaimport_la_OBJECTS = $(am_liblipsofsunaimport_la_OBJECTS)
+liblipsofsunaimport_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaimport_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@MAYBE_IMPORT_TRUE@am_liblipsofsunaimport_la_rpath = -rpath $(libdir)
+liblipsofsunaserver_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_liblipsofsunaserver_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_5) $(am__objects_6) \
+	$(am__objects_10) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_14) $(am__objects_15) $(am__objects_17) \
+	$(am__objects_20) $(am__objects_23) $(am__objects_21) \
+	$(am__objects_24) $(am__objects_25) $(am__objects_27)
+liblipsofsunaserver_la_OBJECTS = $(am_liblipsofsunaserver_la_OBJECTS)
+liblipsofsunaserver_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaserver_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@MAYBE_SERVER_TRUE@am_liblipsofsunaserver_la_rpath = -rpath $(libdir)
+liblipsofsunaviewer_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+am__objects_29 = lipsofsuna/viewer/viewer.lo
+am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
+	$(am__objects_6) $(am__objects_8) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_16) \
+	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
+	$(am__objects_21) $(am__objects_24) $(am__objects_25) \
+	$(am__objects_26) $(am__objects_29)
+liblipsofsunaviewer_la_OBJECTS = $(am_liblipsofsunaviewer_la_OBJECTS)
+liblipsofsunaviewer_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(liblipsofsunaviewer_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@MAYBE_VIEWER_TRUE@am_liblipsofsunaviewer_la_rpath = -rpath $(libdir)
+@MAYBE_CLIENT_TRUE@am__EXEEXT_1 = lipsofsuna-client$(EXEEXT)
+@MAYBE_GENERATOR_TRUE@am__EXEEXT_2 = lipsofsuna-generator$(EXEEXT)
+@MAYBE_IMPORT_TRUE@am__EXEEXT_3 = lipsofsuna-import$(EXEEXT)
+@MAYBE_SERVER_TRUE@am__EXEEXT_4 = lipsofsuna-server$(EXEEXT)
+@MAYBE_VIEWER_TRUE@am__EXEEXT_5 = lipsofsuna-viewer$(EXEEXT)
+PROGRAMS = $(bin_PROGRAMS) $(prg_PROGRAMS)
+am_lipsofsuna_client_OBJECTS =  \
+	lipsofsuna/client/client-main.$(OBJEXT)
+lipsofsuna_client_OBJECTS = $(am_lipsofsuna_client_OBJECTS)
+lipsofsuna_client_DEPENDENCIES = liblipsofsunaclient.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+lipsofsuna_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_client_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am_lipsofsuna_generator_OBJECTS =  \
+	lipsofsuna/generator/generator-main.$(OBJEXT)
+lipsofsuna_generator_OBJECTS = $(am_lipsofsuna_generator_OBJECTS)
+lipsofsuna_generator_DEPENDENCIES = liblipsofsunagenerator.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+lipsofsuna_generator_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_generator_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_lipsofsuna_import_OBJECTS =  \
+	lipsofsuna/reload/reload-main.$(OBJEXT)
+lipsofsuna_import_OBJECTS = $(am_lipsofsuna_import_OBJECTS)
+lipsofsuna_import_DEPENDENCIES = liblipsofsunaimport.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+lipsofsuna_import_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_import_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am__objects_30 = lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT)
+am__objects_31 = lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-file.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-execute.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-memory.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-misc.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-module.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-notify.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-path.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT) \
+	lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT)
+am_lipsofsuna_launch_OBJECTS = $(am__objects_30) $(am__objects_31)
+lipsofsuna_launch_OBJECTS = $(am_lipsofsuna_launch_OBJECTS)
+lipsofsuna_launch_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+lipsofsuna_launch_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(lipsofsuna_launch_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am_lipsofsuna_server_OBJECTS =  \
+	lipsofsuna/server/server-main.$(OBJEXT)
+lipsofsuna_server_OBJECTS = $(am_lipsofsuna_server_OBJECTS)
+lipsofsuna_server_DEPENDENCIES = liblipsofsunaserver.la \
+	$(am__DEPENDENCIES_1)
+lipsofsuna_server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_server_LDFLAGS) $(LDFLAGS) \
+	-o $@
+am_lipsofsuna_viewer_OBJECTS =  \
+	lipsofsuna/viewer/viewer-main.$(OBJEXT)
+lipsofsuna_viewer_OBJECTS = $(am_lipsofsuna_viewer_OBJECTS)
+lipsofsuna_viewer_DEPENDENCIES = liblipsofsunaviewer.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+lipsofsuna_viewer_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_viewer_LDFLAGS) $(LDFLAGS) \
+	-o $@
+DEFAULT_INCLUDES = -I.@am__isrc@
+depcomp = $(SHELL) $(top_srcdir)/depcomp
+am__depfiles_maybe = depfiles
+am__mv = mv -f
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_$(V))
+am__v_CC_ = $(am__v_CC_$(AM_DEFAULT_VERBOSITY))
+am__v_CC_0 = @echo "  CC    " $@;
 AM_V_at = $(am__v_at_$(V))
 am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
-SOURCES =
-DIST_SOURCES =
+CCLD = $(CC)
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_$(V))
+am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
+am__v_CCLD_0 = @echo "  CCLD  " $@;
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
+AM_V_CXX = $(am__v_CXX_$(V))
+am__v_CXX_ = $(am__v_CXX_$(AM_DEFAULT_VERBOSITY))
+am__v_CXX_0 = @echo "  CXX   " $@;
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CXXLD = $(am__v_CXXLD_$(V))
+am__v_CXXLD_ = $(am__v_CXXLD_$(AM_DEFAULT_VERBOSITY))
+am__v_CXXLD_0 = @echo "  CXXLD " $@;
+AM_V_GEN = $(am__v_GEN_$(V))
+am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
+am__v_GEN_0 = @echo "  GEN   " $@;
+SOURCES = $(liblipsofsunaclient_la_SOURCES) \
+	$(liblipsofsunagenerator_la_SOURCES) \
+	$(liblipsofsunaimport_la_SOURCES) \
+	$(liblipsofsunaserver_la_SOURCES) \
+	$(liblipsofsunaviewer_la_SOURCES) $(lipsofsuna_client_SOURCES) \
+	$(lipsofsuna_generator_SOURCES) $(lipsofsuna_import_SOURCES) \
+	$(lipsofsuna_launch_SOURCES) $(lipsofsuna_server_SOURCES) \
+	$(lipsofsuna_viewer_SOURCES)
+DIST_SOURCES = $(liblipsofsunaclient_la_SOURCES) \
+	$(liblipsofsunagenerator_la_SOURCES) \
+	$(liblipsofsunaimport_la_SOURCES) \
+	$(liblipsofsunaserver_la_SOURCES) \
+	$(liblipsofsunaviewer_la_SOURCES) $(lipsofsuna_client_SOURCES) \
+	$(lipsofsuna_generator_SOURCES) $(lipsofsuna_import_SOURCES) \
+	$(lipsofsuna_launch_SOURCES) $(lipsofsuna_server_SOURCES) \
+	$(lipsofsuna_viewer_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -69,6 +516,15 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-pdf-recursive install-ps-recursive install-recursive \
 	installcheck-recursive installdirs-recursive pdf-recursive \
 	ps-recursive uninstall-recursive
+DATA = $(editor_DATA)
+HEADERS = $(ai_HEADERS) $(alg_HEADERS) $(arc_HEADERS) $(bnd_HEADERS) \
+	$(cal_HEADERS) $(cfg_HEADERS) $(cli_HEADERS) $(eng_HEADERS) \
+	$(fnt_HEADERS) $(gen_HEADERS) $(img_HEADERS) $(mat_HEADERS) \
+	$(mdl_HEADERS) $(net_HEADERS) $(par_HEADERS) $(phy_HEADERS) \
+	$(pth_HEADERS) $(rel_HEADERS) $(rnd_HEADERS) $(scr_HEADERS) \
+	$(snd_HEADERS) $(srv_HEADERS) $(str_HEADERS) $(sys_HEADERS) \
+	$(thr_HEADERS) $(vid_HEADERS) $(vie_HEADERS) $(vox_HEADERS) \
+	$(wdg_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -76,7 +532,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = doc . lipsofsuna/client/extensions \
+	lipsofsuna/server/extensions
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -280,12 +737,636 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = doc lipsofsuna
-EXTRA_DIST = COPYING.LESSER
+SUBDIRS = doc . $(am__append_1) $(am__append_2)
 ACLOCAL_AMFLAGS = -I m4
-all: all-recursive
+AM_CFLAGS = $(LICLI_CFLAGS)
+AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
+EXTRA_DIST = \
+	COPYING.LESSER \
+	lipsofsuna/math/unittest.c \
+	reload/blender-export.py
+
+editordir = $(TOOLDIR)
+editor_DATA = lipsofsuna/reload/blender-export.py
+prgdir = $(PROGDIR)
+lib_LTLIBRARIES = $(am__append_4) $(am__append_6) $(am__append_8) \
+	$(am__append_10) $(am__append_12)
+
+##############################################################################
+aidir = $(includedir)/lipsofsuna/ai
+ai_HEADERS = \
+	lipsofsuna/ai.h \
+	lipsofsuna/ai/ai-manager.h \
+	lipsofsuna/ai/ai-path.h \
+	lipsofsuna/ai/ai-sector.h \
+	lipsofsuna/ai/ai-types.h \
+	lipsofsuna/ai/ai-waypoint.h
+
+aisrc = \
+	lipsofsuna/ai/ai-manager.c \
+	lipsofsuna/ai/ai-path.c \
+	lipsofsuna/ai/ai-sector.c
+
+algdir = $(includedir)/lipsofsuna/algorithm
+alg_HEADERS = \
+	lipsofsuna/algorithm.h \
+	lipsofsuna/algorithm/algorithm-array.h \
+	lipsofsuna/algorithm/algorithm-astar.h \
+	lipsofsuna/algorithm/algorithm-bst.h \
+	lipsofsuna/algorithm/algorithm-camera.h \
+	lipsofsuna/algorithm/algorithm-list.h \
+	lipsofsuna/algorithm/algorithm-memdic.h \
+	lipsofsuna/algorithm/algorithm-octree.h \
+	lipsofsuna/algorithm/algorithm-priority-queue.h \
+	lipsofsuna/algorithm/algorithm-ptrdic.h \
+	lipsofsuna/algorithm/algorithm-range.h \
+	lipsofsuna/algorithm/algorithm-range-iter.h \
+	lipsofsuna/algorithm/algorithm-sectors.h \
+	lipsofsuna/algorithm/algorithm-sectors-iter.h \
+	lipsofsuna/algorithm/algorithm-strdic.h \
+	lipsofsuna/algorithm/algorithm-u32dic.h
+
+algsrc = \
+	lipsofsuna/algorithm/algorithm-astar.c \
+	lipsofsuna/algorithm/algorithm-bst.c \
+	lipsofsuna/algorithm/algorithm-camera.c \
+	lipsofsuna/algorithm/algorithm-octree.c \
+	lipsofsuna/algorithm/algorithm-sectors.c
+
+arcdir = $(includedir)/lipsofsuna/archive
+arc_HEADERS = \
+	lipsofsuna/archive.h \
+	lipsofsuna/archive/archive-reader.h \
+	lipsofsuna/archive/archive-sql.h \
+	lipsofsuna/archive/archive-tar.h \
+	lipsofsuna/archive/archive-writer.h
+
+arcsrc = \
+	lipsofsuna/archive/archive-reader.c \
+	lipsofsuna/archive/archive-sql.c \
+	lipsofsuna/archive/archive-tar.c \
+	lipsofsuna/archive/archive-writer.c
+
+bnddir = $(includedir)/lipsofsuna/binding
+bnd_HEADERS = \
+	lipsofsuna/binding.h \
+	lipsofsuna/binding/binding.h \
+	lipsofsuna/binding/binding-action.h \
+	lipsofsuna/binding/binding-manager.h \
+	lipsofsuna/binding/binding-types.h
+
+bndsrc = \
+	lipsofsuna/binding/binding.c \
+	lipsofsuna/binding/binding-action.c \
+	lipsofsuna/binding/binding-manager.c
+
+caldir = $(includedir)/lipsofsuna/callback
+cal_HEADERS = \
+	lipsofsuna/callback.h \
+	lipsofsuna/callback/cal-callbacks.h \
+	lipsofsuna/callback/cal-handle.h \
+	lipsofsuna/callback/cal-marshal.h
+
+calsrc = \
+	lipsofsuna/callback/cal-callbacks.c \
+	lipsofsuna/callback/cal-handle.c \
+	lipsofsuna/callback/cal-marshal.c
+
+cfgdir = $(includedir)/lipsofsuna/config
+cfg_HEADERS = \
+	lipsofsuna/config/config-account.h \
+	lipsofsuna/config/config-bans.h \
+	lipsofsuna/config/config-host.h
+
+cfgsrc = \
+	lipsofsuna/config/config-account.c \
+	lipsofsuna/config/config-bans.c \
+	lipsofsuna/config/config-host.c
+
+clidir = $(includedir)/lipsofsuna/client
+cli_HEADERS = \
+	lipsofsuna/client.h \
+	lipsofsuna/client/client.h \
+	lipsofsuna/client/client-callbacks.h \
+	lipsofsuna/client/client-extension.h \
+	lipsofsuna/client/client-network.h \
+	lipsofsuna/client/client-object.h \
+	lipsofsuna/client/client-script.h \
+	lipsofsuna/client/client-types.h \
+	lipsofsuna/client/client-window.h \
+	lipsofsuna/client/widget-login.h
+
+clisrc = \
+	lipsofsuna/client/client.c \
+	lipsofsuna/client/client-callbacks.c \
+	lipsofsuna/client/client-command.c \
+	lipsofsuna/client/client-network.c \
+	lipsofsuna/client/client-object.c \
+	lipsofsuna/client/client-render.c \
+	lipsofsuna/client/client-script-action.c \
+	lipsofsuna/client/client-script-binding.c \
+	lipsofsuna/client/client-script-client.c \
+	lipsofsuna/client/client-script-group.c \
+	lipsofsuna/client/client-script-extension.c \
+	lipsofsuna/client/client-script-light.c \
+	lipsofsuna/client/client-script-object.c \
+	lipsofsuna/client/client-script-player.c \
+	lipsofsuna/client/client-script-scene.c \
+	lipsofsuna/client/client-script-widget.c \
+	lipsofsuna/client/client-script-window.c \
+	lipsofsuna/client/client-window.c \
+	lipsofsuna/client/widget-login.c
+
+engdir = $(includedir)/lipsofsuna/engine
+eng_HEADERS = \
+	lipsofsuna/engine.h \
+	lipsofsuna/engine/engine.h \
+	lipsofsuna/engine/engine-constraint.h \
+	lipsofsuna/engine/engine-iterator.h \
+	lipsofsuna/engine/engine-model.h \
+	lipsofsuna/engine/engine-object.h \
+	lipsofsuna/engine/engine-resources.h \
+	lipsofsuna/engine/engine-sector.h \
+	lipsofsuna/engine/engine-selection.h \
+	lipsofsuna/engine/engine-types.h
+
+engsrc = \
+	lipsofsuna/engine/engine.c \
+	lipsofsuna/engine/engine-constraint.c \
+	lipsofsuna/engine/engine-model.c \
+	lipsofsuna/engine/engine-object.c \
+	lipsofsuna/engine/engine-resources.c \
+	lipsofsuna/engine/engine-sector.c \
+	lipsofsuna/engine/engine-selection.c
+
+fntdir = $(includedir)/lipsofsuna/font
+fnt_HEADERS = \
+	lipsofsuna/font.h \
+	lipsofsuna/font/font.h \
+	lipsofsuna/font/font-layout.h
+
+fntsrc = \
+	lipsofsuna/font/font.c \
+	lipsofsuna/font/font-layout.c
+
+gendir = $(includedir)/lipsofsuna/generator
+gen_HEADERS = \
+	lipsofsuna/generator.h \
+	lipsofsuna/generator/generator.h \
+	lipsofsuna/generator/generator-brush.h \
+	lipsofsuna/generator/generator-rule.h \
+	lipsofsuna/generator/generator-types.h
+
+gensrc = \
+	lipsofsuna/generator/generator.c \
+	lipsofsuna/generator/generator-brush.c \
+	lipsofsuna/generator/generator-rule.c
+
+imgdir = $(includedir)/lipsofsuna/image
+img_HEADERS = \
+	lipsofsuna/image.h \
+	lipsofsuna/image/image.h \
+	lipsofsuna/image/image-compress.h \
+	lipsofsuna/image/image-dds.h \
+	lipsofsuna/image/image-texture.h
+
+imgsrc = \
+	lipsofsuna/image/image.c \
+	lipsofsuna/image/image-compress.cpp \
+	lipsofsuna/image/image-texture.c
+
+maisrc = \
+	lipsofsuna/main/main.c
+
+matdir = $(includedir)/lipsofsuna/math
+mat_HEADERS = \
+	lipsofsuna/math.h \
+	lipsofsuna/math/math-aabb.h \
+	lipsofsuna/math/math-convert.h \
+	lipsofsuna/math/math-frustum.h  \
+	lipsofsuna/math/math-generic.h \
+	lipsofsuna/math/math-geometry.h \
+	lipsofsuna/math/math-halton.h \
+	lipsofsuna/math/math-intersect.h \
+	lipsofsuna/math/math-matrix.h \
+	lipsofsuna/math/math-plane.h \
+	lipsofsuna/math/math-polygon.h \
+	lipsofsuna/math/math-quadratic.h \
+	lipsofsuna/math/math-quaternion.h \
+	lipsofsuna/math/math-rectangle.h \
+	lipsofsuna/math/math-transform.h \
+	lipsofsuna/math/math-triangle.h \
+	lipsofsuna/math/math-types.h \
+	lipsofsuna/math/math-vector.h \
+	lipsofsuna/math/math-vertex.h
+
+matsrc = \
+	lipsofsuna/math/math.c
+
+mdldir = $(includedir)/lipsofsuna/model
+mdl_HEADERS = \
+	lipsofsuna/model.h \
+	lipsofsuna/model/model.h \
+	lipsofsuna/model/model-animation.h \
+	lipsofsuna/model/model-bone.h \
+	lipsofsuna/model/model-faces.h \
+	lipsofsuna/model/model-hair.h \
+	lipsofsuna/model/model-light.h \
+	lipsofsuna/model/model-material.h \
+	lipsofsuna/model/model-node.h \
+	lipsofsuna/model/model-pose.h \
+	lipsofsuna/model/model-shape.h \
+	lipsofsuna/model/model-texture.h \
+	lipsofsuna/model/model-types.h \
+	lipsofsuna/model/model-vertex.h
+
+mdlsrc = \
+	lipsofsuna/model/model.c \
+	lipsofsuna/model/model-animation.c \
+	lipsofsuna/model/model-bone.c \
+	lipsofsuna/model/model-faces.c \
+	lipsofsuna/model/model-hair.c \
+	lipsofsuna/model/model-light.c \
+	lipsofsuna/model/model-material.c \
+	lipsofsuna/model/model-node.c \
+	lipsofsuna/model/model-pose.c \
+	lipsofsuna/model/model-shape.c \
+	lipsofsuna/model/model-texture.c
+
+netdir = $(includedir)/lipsofsuna/network
+net_HEADERS = \
+	lipsofsuna/network.h \
+	lipsofsuna/network/network-extension.h \
+	lipsofsuna/network/network-protocol.h
+
+netsrc = \
+	lipsofsuna/network/network.c
+
+pardir = $(includedir)/lipsofsuna/particle
+par_HEADERS = \
+	lipsofsuna/particle.h \
+	lipsofsuna/particle/particle-line.h \
+	lipsofsuna/particle/particle-manager.h \
+	lipsofsuna/particle/particle-point.h
+
+parsrc = \
+	lipsofsuna/particle/particle-line.c \
+	lipsofsuna/particle/particle-manager.c \
+	lipsofsuna/particle/particle-point.c
+
+phydir = $(includedir)/lipsofsuna/physics
+phy_HEADERS = \
+	lipsofsuna/physics.h \
+	lipsofsuna/physics/physics.h \
+	lipsofsuna/physics/physics-constraint.h \
+	lipsofsuna/physics/physics-object.h \
+	lipsofsuna/physics/physics-shape.h \
+	lipsofsuna/physics/physics-types.h
+
+physrc = \
+	lipsofsuna/physics/physics.cpp \
+	lipsofsuna/physics/physics-constraint.cpp \
+	lipsofsuna/physics/physics-control.cpp \
+	lipsofsuna/physics/physics-object.cpp \
+	lipsofsuna/physics/physics-private.cpp \
+	lipsofsuna/physics/physics-private.h \
+	lipsofsuna/physics/physics-shape.cpp
+
+pthdir = $(includedir)/lipsofsuna/path
+pth_HEADERS = \
+	lipsofsuna/paths.h \
+	lipsofsuna/paths/paths.h
+
+pthsrc = \
+	lipsofsuna/paths/paths.c
+
+reldir = $(includedir)/lipsofsuna/reload
+rel_HEADERS = \
+	lipsofsuna/reload.h \
+	lipsofsuna/reload/reload.h
+
+relsrc = \
+	lipsofsuna/reload/reload.c \
+	lipsofsuna/reload/reload-blender.c \
+	lipsofsuna/reload/reload-gimp.c \
+	lipsofsuna/reload/reload-image.c
+
+rnddir = $(includedir)/lipsofsuna/render
+rnd_HEADERS = \
+	lipsofsuna/render.h \
+	lipsofsuna/render/render.h \
+	lipsofsuna/render/render-buffer.h \
+	lipsofsuna/render/render-context.h \
+	lipsofsuna/render/render-deferred.h \
+	lipsofsuna/render/render-draw.h \
+	lipsofsuna/render/render-group.h \
+	lipsofsuna/render/render-image.h \
+	lipsofsuna/render/render-light.h \
+	lipsofsuna/render/render-lighting.h \
+	lipsofsuna/render/render-material.h \
+	lipsofsuna/render/render-object.h \
+	lipsofsuna/render/render-scene.h \
+	lipsofsuna/render/render-shader.h \
+	lipsofsuna/render/render-texture.h \
+	lipsofsuna/render/render-types.h \
+	lipsofsuna/render/render-uniform.h
+
+rndsrc = \
+	lipsofsuna/render/render.c \
+	lipsofsuna/render/render-buffer.c \
+	lipsofsuna/render/render-context.c \
+	lipsofsuna/render/render-deferred.c \
+	lipsofsuna/render/render-draw.c \
+	lipsofsuna/render/render-group.c \
+	lipsofsuna/render/render-image.c \
+	lipsofsuna/render/render-light.c \
+	lipsofsuna/render/render-lighting.c \
+	lipsofsuna/render/render-material.c \
+	lipsofsuna/render/render-model.c \
+	lipsofsuna/render/render-model.h \
+	lipsofsuna/render/render-object.c \
+	lipsofsuna/render/render-scene.c \
+	lipsofsuna/render/render-shader.c \
+	lipsofsuna/render/render-texture.c
+
+scrdir = $(includedir)/lipsofsuna/script
+scr_HEADERS = \
+	lipsofsuna/script.h \
+	lipsofsuna/script/script.h \
+	lipsofsuna/script/script-args.h \
+	lipsofsuna/script/script-class.h \
+	lipsofsuna/script/script-data.h \
+	lipsofsuna/script/script-event.h \
+	lipsofsuna/script/script-library.h \
+	lipsofsuna/script/script-packet.h \
+	lipsofsuna/script/script-types.h \
+	lipsofsuna/script/script-util.h
+
+scrsrc = \
+	lipsofsuna/script/script.c \
+	lipsofsuna/script/script-args.c \
+	lipsofsuna/script/script-class.c \
+	lipsofsuna/script/script-data.c \
+	lipsofsuna/script/script-event.c \
+	lipsofsuna/script/script-library.c \
+	lipsofsuna/script/script-object.c \
+	lipsofsuna/script/script-packet.c \
+	lipsofsuna/script/script-path.c \
+	lipsofsuna/script/script-private.h \
+	lipsofsuna/script/script-quaternion.c \
+	lipsofsuna/script/script-util.c \
+	lipsofsuna/script/script-vector.c
+
+snddir = $(includedir)/lipsofsuna/sound
+snd_HEADERS = \
+	lipsofsuna/sound.h \
+	lipsofsuna/sound/sound-manager.h \
+	lipsofsuna/sound/sound-sample.h \
+	lipsofsuna/sound/sound-source.h \
+	lipsofsuna/sound/sound-system.h
+
+sndsrc = \
+	lipsofsuna/sound/sound-manager.c \
+	lipsofsuna/sound/sound-sample.c \
+	lipsofsuna/sound/sound-source.c \
+	lipsofsuna/sound/sound-system.c
+
+srvdir = $(includedir)/lipsofsuna/server
+srv_HEADERS = \
+	lipsofsuna/server.h \
+	lipsofsuna/server/server.h \
+	lipsofsuna/server/server-callbacks.h \
+	lipsofsuna/server/server-client.h \
+	lipsofsuna/server/server-extension.h \
+	lipsofsuna/server/server-network.h \
+	lipsofsuna/server/server-object.h \
+	lipsofsuna/server/server-observer.h \
+	lipsofsuna/server/server-script.h \
+	lipsofsuna/server/server-types.h
+
+srvsrc = \
+	lipsofsuna/server/server.c \
+	lipsofsuna/server/server-callbacks.c \
+	lipsofsuna/server/server-client.c \
+	lipsofsuna/server/server-network.c \
+	lipsofsuna/server/server-object.c \
+	lipsofsuna/server/server-script-effect.c \
+	lipsofsuna/server/server-script-extension.c \
+	lipsofsuna/server/server-script-object.c \
+	lipsofsuna/server/server-script-server.c
+
+strdir = $(includedir)/lipsofsuna/string
+str_HEADERS = \
+	lipsofsuna/string.h \
+	lipsofsuna/string/string-generic.h
+
+strsrc = \
+	lipsofsuna/string/string-generic.c
+
+sysdir = $(includedir)/lipsofsuna/system
+sys_HEADERS = \
+	lipsofsuna/system.h \
+	lipsofsuna/system/system.h \
+	lipsofsuna/system/system-compiler.h \
+	lipsofsuna/system/system-directory.h \
+	lipsofsuna/system/system-endian.h \
+	lipsofsuna/system/system-error.h \
+	lipsofsuna/system/system-file.h \
+	lipsofsuna/system/system-execute.h \
+	lipsofsuna/system/system-memory.h \
+	lipsofsuna/system/system-misc.h \
+	lipsofsuna/system/system-module.h \
+	lipsofsuna/system/system-notify.h \
+	lipsofsuna/system/system-path.h \
+	lipsofsuna/system/system-relative.h \
+	lipsofsuna/system/system-types.h \
+	lipsofsuna/system/system-user.h
+
+syssrc = \
+	lipsofsuna/system/system.c \
+	lipsofsuna/system/system-directory.c \
+	lipsofsuna/system/system-error.c \
+	lipsofsuna/system/system-file.c \
+	lipsofsuna/system/system-execute.c \
+	lipsofsuna/system/system-memory.c \
+	lipsofsuna/system/system-misc.c \
+	lipsofsuna/system/system-module.c \
+	lipsofsuna/system/system-notify.c \
+	lipsofsuna/system/system-path.c \
+	lipsofsuna/system/system-relative.c \
+	lipsofsuna/system/system-types.c \
+	lipsofsuna/system/system-user.c
+
+thrdir = $(includedir)/lipsofsuna/thread
+thr_HEADERS = \
+	lipsofsuna/thread.h \
+	lipsofsuna/thread/thread.h \
+	lipsofsuna/thread/thread-async-call.h
+
+thrsrc = \
+	lipsofsuna/thread/thread.c \
+	lipsofsuna/thread/thread-async-call.c
+
+viddir = $(includedir)/lipsofsuna/video
+vid_HEADERS = \
+	lipsofsuna/video.h \
+	lipsofsuna/video/video-calls.h \
+	lipsofsuna/video/video-features.h \
+	lipsofsuna/video/video-opengl.h
+
+vidsrc = \
+	lipsofsuna/video/video-calls.c \
+	lipsofsuna/video/video-features.c
+
+viedir = $(includedir)/lipsofsuna/viewer
+vie_HEADERS = \
+	lipsofsuna/viewer/viewer.h
+
+viesrc = \
+	lipsofsuna/viewer/viewer.c
+
+voxdir = $(includedir)/lipsofsuna/voxel
+vox_HEADERS = \
+	lipsofsuna/voxel.h \
+	lipsofsuna/voxel/voxel.h \
+	lipsofsuna/voxel/voxel-block.h \
+	lipsofsuna/voxel/voxel-iterator.h \
+	lipsofsuna/voxel/voxel-manager.h \
+	lipsofsuna/voxel/voxel-material.h \
+	lipsofsuna/voxel/voxel-sector.h \
+	lipsofsuna/voxel/voxel-types.h
+
+voxsrc = \
+	lipsofsuna/voxel/voxel.c \
+	lipsofsuna/voxel/voxel-block.c \
+	lipsofsuna/voxel/voxel-manager.c \
+	lipsofsuna/voxel/voxel-material.c \
+	lipsofsuna/voxel/voxel-private.h \
+	lipsofsuna/voxel/voxel-sector.c
+
+wdgdir = $(includedir)/lipsofsuna/widget
+wdg_HEADERS = \
+	lipsofsuna/widget.h \
+	lipsofsuna/widget/widget.h \
+	lipsofsuna/widget/widget-busy.h \
+	lipsofsuna/widget/widget-button.h \
+	lipsofsuna/widget/widget-check.h \
+	lipsofsuna/widget/widget-class.h \
+	lipsofsuna/widget/widget-container.h \
+	lipsofsuna/widget/widget-entry.h \
+	lipsofsuna/widget/widget-event.h \
+	lipsofsuna/widget/widget-group.h \
+	lipsofsuna/widget/widget-image.h \
+	lipsofsuna/widget/widget-label.h \
+	lipsofsuna/widget/widget-manager.h \
+	lipsofsuna/widget/widget-menu.h \
+	lipsofsuna/widget/widget-progress.h \
+	lipsofsuna/widget/widget-render.h \
+	lipsofsuna/widget/widget-scroll.h \
+	lipsofsuna/widget/widget-spin.h \
+	lipsofsuna/widget/widget-style.h \
+	lipsofsuna/widget/widget-tabs.h \
+	lipsofsuna/widget/widget-tree.h \
+	lipsofsuna/widget/widget-types.h \
+	lipsofsuna/widget/widget-view.h \
+	lipsofsuna/widget/widget-window.h
+
+wdgsrc = \
+	lipsofsuna/widget/widget.c \
+	lipsofsuna/widget/widget-busy.c \
+	lipsofsuna/widget/widget-button.c \
+	lipsofsuna/widget/widget-check.c \
+	lipsofsuna/widget/widget-container.c \
+	lipsofsuna/widget/widget-entry.c \
+	lipsofsuna/widget/widget-group.c \
+	lipsofsuna/widget/widget-image.c \
+	lipsofsuna/widget/widget-label.c \
+	lipsofsuna/widget/widget-manager.c \
+	lipsofsuna/widget/widget-menu.c \
+	lipsofsuna/widget/widget-private.h \
+	lipsofsuna/widget/widget-progress.c \
+	lipsofsuna/widget/widget-render.c \
+	lipsofsuna/widget/widget-scroll.c \
+	lipsofsuna/widget/widget-spin.c \
+	lipsofsuna/widget/widget-style.c \
+	lipsofsuna/widget/widget-tabs.c \
+	lipsofsuna/widget/widget-tree.c \
+	lipsofsuna/widget/widget-view.c \
+	lipsofsuna/widget/widget-window.c
+
+
+##############################################################################
+liblipsofsunaclient_la_LDFLAGS = -no-undefined
+liblipsofsunaclient_la_LIBADD = \
+	$(GRAPPLE_LIBS) $(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(GLEW_LIBS) \
+	$(GL_LIBS) $(OPENAL_LIBS) $(VORBIS_LIBS) $(SQUISH_LIBS) $(ZLIB_LIBS) \
+	$(LIPS_LIBS) $(LIBPNG_LIBS) $(PTHREAD_LIBS)
+
+liblipsofsunaclient_la_SOURCES = \
+	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
+	$(fntsrc) $(gensrc) $(engsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
+	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
+	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
+
+liblipsofsunagenerator_la_LDFLAGS = -no-undefined
+liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+liblipsofsunagenerator_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(gensrc) $(matsrc) $(mdlsrc) \
+	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
+
+liblipsofsunaimport_la_LDFLAGS = -no-undefined
+liblipsofsunaimport_la_LIBADD = $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+liblipsofsunaimport_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(cfgsrc) $(matsrc) $(mdlsrc) $(pthsrc) $(relsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) \
+	lipsofsuna/image/image.c \
+	lipsofsuna/image/image.h \
+	lipsofsuna/image/image-compress.cpp \
+	lipsofsuna/image/image-compress.h \
+	lipsofsuna/image/image-dds.h
+
+liblipsofsunaserver_la_LDFLAGS = -no-undefined
+liblipsofsunaserver_la_LIBADD = \
+	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
+	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
+
+liblipsofsunaserver_la_SOURCES = \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
+	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
+	$(syssrc) $(thrsrc) $(voxsrc)
+
+liblipsofsunaviewer_la_LDFLAGS = -no-undefined
+liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
+liblipsofsunaviewer_la_SOURCES = \
+	$(algsrc) $(arcsrc) $(cfgsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
+	$(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(strsrc) $(syssrc) $(thrsrc) \
+	$(vidsrc) $(viesrc)
+
+
+##############################################################################
+lipsofsuna_launch_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_launch_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
+lipsofsuna_launch_SOURCES = $(maisrc) $(syssrc)
+lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)
+lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c
+lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_generator_LDADD = liblipsofsunagenerator.la $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c
+lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_import_LDADD = liblipsofsunaimport.la $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+lipsofsuna_import_SOURCES = lipsofsuna/reload/reload-main.c
+lipsofsuna_server_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_server_LDADD = liblipsofsunaserver.la $(LISRV_LIBS)
+lipsofsuna_server_SOURCES = lipsofsuna/server/server-main.c
+lipsofsuna_viewer_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(SDL_LIBS) -lSDL_ttf $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
+lipsofsuna_viewer_SOURCES = lipsofsuna/viewer/viewer-main.c
+all: config.h
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
+.SUFFIXES: .c .cpp .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -321,14 +1402,2258 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 $(am__aclocal_m4_deps):
 
+config.h: stamp-h1
+	@if test ! -f $@; then \
+	  rm -f stamp-h1; \
+	  $(MAKE) $(AM_MAKEFLAGS) stamp-h1; \
+	else :; fi
+
+stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
+	@rm -f stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status config.h
+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
+	rm -f stamp-h1
+	touch $@
+
+distclean-hdr:
+	-rm -f config.h stamp-h1
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	list2=; for p in $$list; do \
+	  if test -f $$p; then \
+	    list2="$$list2 $$p"; \
+	  else :; fi; \
+	done; \
+	test -z "$$list2" || { \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
+	}
+
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+lipsofsuna/ai/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/ai
+	@: > lipsofsuna/ai/$(am__dirstamp)
+lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/ai/$(DEPDIR)
+	@: > lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/ai/ai-manager.lo: lipsofsuna/ai/$(am__dirstamp) \
+	lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/ai/ai-path.lo: lipsofsuna/ai/$(am__dirstamp) \
+	lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/ai/ai-sector.lo: lipsofsuna/ai/$(am__dirstamp) \
+	lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/algorithm
+	@: > lipsofsuna/algorithm/$(am__dirstamp)
+lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/algorithm/$(DEPDIR)
+	@: > lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-astar.lo:  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-bst.lo:  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-camera.lo:  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-octree.lo:  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-sectors.lo:  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/archive/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/archive
+	@: > lipsofsuna/archive/$(am__dirstamp)
+lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/archive/$(DEPDIR)
+	@: > lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/archive/archive-reader.lo:  \
+	lipsofsuna/archive/$(am__dirstamp) \
+	lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/archive/archive-sql.lo: lipsofsuna/archive/$(am__dirstamp) \
+	lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/archive/archive-tar.lo: lipsofsuna/archive/$(am__dirstamp) \
+	lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/archive/archive-writer.lo:  \
+	lipsofsuna/archive/$(am__dirstamp) \
+	lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/binding/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/binding
+	@: > lipsofsuna/binding/$(am__dirstamp)
+lipsofsuna/binding/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/binding/$(DEPDIR)
+	@: > lipsofsuna/binding/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/binding/binding.lo: lipsofsuna/binding/$(am__dirstamp) \
+	lipsofsuna/binding/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/binding/binding-action.lo:  \
+	lipsofsuna/binding/$(am__dirstamp) \
+	lipsofsuna/binding/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/binding/binding-manager.lo:  \
+	lipsofsuna/binding/$(am__dirstamp) \
+	lipsofsuna/binding/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/callback/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/callback
+	@: > lipsofsuna/callback/$(am__dirstamp)
+lipsofsuna/callback/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/callback/$(DEPDIR)
+	@: > lipsofsuna/callback/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/callback/cal-callbacks.lo:  \
+	lipsofsuna/callback/$(am__dirstamp) \
+	lipsofsuna/callback/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/callback/cal-handle.lo:  \
+	lipsofsuna/callback/$(am__dirstamp) \
+	lipsofsuna/callback/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/callback/cal-marshal.lo:  \
+	lipsofsuna/callback/$(am__dirstamp) \
+	lipsofsuna/callback/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/config/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/config
+	@: > lipsofsuna/config/$(am__dirstamp)
+lipsofsuna/config/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/config/$(DEPDIR)
+	@: > lipsofsuna/config/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/config/config-account.lo:  \
+	lipsofsuna/config/$(am__dirstamp) \
+	lipsofsuna/config/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/config/config-bans.lo: lipsofsuna/config/$(am__dirstamp) \
+	lipsofsuna/config/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/config/config-host.lo: lipsofsuna/config/$(am__dirstamp) \
+	lipsofsuna/config/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/client
+	@: > lipsofsuna/client/$(am__dirstamp)
+lipsofsuna/client/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/client/$(DEPDIR)
+	@: > lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client.lo: lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-callbacks.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-command.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-network.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-object.lo: lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-render.lo: lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-action.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-binding.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-client.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-group.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-extension.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-light.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-object.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-player.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-scene.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-widget.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-script-window.lo:  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/client-window.lo: lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/client/widget-login.lo: lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/font/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/font
+	@: > lipsofsuna/font/$(am__dirstamp)
+lipsofsuna/font/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/font/$(DEPDIR)
+	@: > lipsofsuna/font/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/font/font.lo: lipsofsuna/font/$(am__dirstamp) \
+	lipsofsuna/font/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/font/font-layout.lo: lipsofsuna/font/$(am__dirstamp) \
+	lipsofsuna/font/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/generator/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/generator
+	@: > lipsofsuna/generator/$(am__dirstamp)
+lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/generator/$(DEPDIR)
+	@: > lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/generator/generator.lo:  \
+	lipsofsuna/generator/$(am__dirstamp) \
+	lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/generator/generator-brush.lo:  \
+	lipsofsuna/generator/$(am__dirstamp) \
+	lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/generator/generator-rule.lo:  \
+	lipsofsuna/generator/$(am__dirstamp) \
+	lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/engine
+	@: > lipsofsuna/engine/$(am__dirstamp)
+lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/engine/$(DEPDIR)
+	@: > lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine.lo: lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine-constraint.lo:  \
+	lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine-model.lo: lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine-object.lo: lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine-resources.lo:  \
+	lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine-sector.lo: lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/engine/engine-selection.lo:  \
+	lipsofsuna/engine/$(am__dirstamp) \
+	lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/image/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/image
+	@: > lipsofsuna/image/$(am__dirstamp)
+lipsofsuna/image/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/image/$(DEPDIR)
+	@: > lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/image/image.lo: lipsofsuna/image/$(am__dirstamp) \
+	lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/image/image-compress.lo: lipsofsuna/image/$(am__dirstamp) \
+	lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/image/image-texture.lo: lipsofsuna/image/$(am__dirstamp) \
+	lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/math/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/math
+	@: > lipsofsuna/math/$(am__dirstamp)
+lipsofsuna/math/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/math/$(DEPDIR)
+	@: > lipsofsuna/math/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/math/math.lo: lipsofsuna/math/$(am__dirstamp) \
+	lipsofsuna/math/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/model
+	@: > lipsofsuna/model/$(am__dirstamp)
+lipsofsuna/model/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/model/$(DEPDIR)
+	@: > lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-animation.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-bone.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-faces.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-hair.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-light.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-material.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-node.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-pose.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-shape.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/model/model-texture.lo: lipsofsuna/model/$(am__dirstamp) \
+	lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/network/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/network
+	@: > lipsofsuna/network/$(am__dirstamp)
+lipsofsuna/network/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/network/$(DEPDIR)
+	@: > lipsofsuna/network/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/network/network.lo: lipsofsuna/network/$(am__dirstamp) \
+	lipsofsuna/network/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/physics
+	@: > lipsofsuna/physics/$(am__dirstamp)
+lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/physics/$(DEPDIR)
+	@: > lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/physics.lo: lipsofsuna/physics/$(am__dirstamp) \
+	lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/physics-constraint.lo:  \
+	lipsofsuna/physics/$(am__dirstamp) \
+	lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/physics-control.lo:  \
+	lipsofsuna/physics/$(am__dirstamp) \
+	lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/physics-object.lo:  \
+	lipsofsuna/physics/$(am__dirstamp) \
+	lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/physics-private.lo:  \
+	lipsofsuna/physics/$(am__dirstamp) \
+	lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/physics/physics-shape.lo:  \
+	lipsofsuna/physics/$(am__dirstamp) \
+	lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/particle/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/particle
+	@: > lipsofsuna/particle/$(am__dirstamp)
+lipsofsuna/particle/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/particle/$(DEPDIR)
+	@: > lipsofsuna/particle/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/particle/particle-line.lo:  \
+	lipsofsuna/particle/$(am__dirstamp) \
+	lipsofsuna/particle/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/particle/particle-manager.lo:  \
+	lipsofsuna/particle/$(am__dirstamp) \
+	lipsofsuna/particle/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/particle/particle-point.lo:  \
+	lipsofsuna/particle/$(am__dirstamp) \
+	lipsofsuna/particle/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/paths/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/paths
+	@: > lipsofsuna/paths/$(am__dirstamp)
+lipsofsuna/paths/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/paths/$(DEPDIR)
+	@: > lipsofsuna/paths/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/paths/paths.lo: lipsofsuna/paths/$(am__dirstamp) \
+	lipsofsuna/paths/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/reload/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/reload
+	@: > lipsofsuna/reload/$(am__dirstamp)
+lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/reload/$(DEPDIR)
+	@: > lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/reload/reload.lo: lipsofsuna/reload/$(am__dirstamp) \
+	lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/reload/reload-blender.lo:  \
+	lipsofsuna/reload/$(am__dirstamp) \
+	lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/reload/reload-gimp.lo: lipsofsuna/reload/$(am__dirstamp) \
+	lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/reload/reload-image.lo: lipsofsuna/reload/$(am__dirstamp) \
+	lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/render
+	@: > lipsofsuna/render/$(am__dirstamp)
+lipsofsuna/render/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/render/$(DEPDIR)
+	@: > lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-buffer.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-context.lo:  \
+	lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-deferred.lo:  \
+	lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-draw.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-group.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-image.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-light.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-lighting.lo:  \
+	lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-material.lo:  \
+	lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-model.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-object.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-scene.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-shader.lo: lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/render/render-texture.lo:  \
+	lipsofsuna/render/$(am__dirstamp) \
+	lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/script
+	@: > lipsofsuna/script/$(am__dirstamp)
+lipsofsuna/script/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/script/$(DEPDIR)
+	@: > lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-args.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-class.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-data.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-event.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-library.lo:  \
+	lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-object.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-packet.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-path.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-quaternion.lo:  \
+	lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-util.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-vector.lo: lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/string/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/string
+	@: > lipsofsuna/string/$(am__dirstamp)
+lipsofsuna/string/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/string/$(DEPDIR)
+	@: > lipsofsuna/string/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/string/string-generic.lo:  \
+	lipsofsuna/string/$(am__dirstamp) \
+	lipsofsuna/string/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/sound/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/sound
+	@: > lipsofsuna/sound/$(am__dirstamp)
+lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/sound/$(DEPDIR)
+	@: > lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/sound/sound-manager.lo: lipsofsuna/sound/$(am__dirstamp) \
+	lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/sound/sound-sample.lo: lipsofsuna/sound/$(am__dirstamp) \
+	lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/sound/sound-source.lo: lipsofsuna/sound/$(am__dirstamp) \
+	lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/sound/sound-system.lo: lipsofsuna/sound/$(am__dirstamp) \
+	lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/server
+	@: > lipsofsuna/server/$(am__dirstamp)
+lipsofsuna/server/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/server/$(DEPDIR)
+	@: > lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server.lo: lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-callbacks.lo:  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-client.lo: lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-network.lo:  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-object.lo: lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-script-effect.lo:  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-script-extension.lo:  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-script-object.lo:  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/server/server-script-server.lo:  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/system
+	@: > lipsofsuna/system/$(am__dirstamp)
+lipsofsuna/system/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/system/$(DEPDIR)
+	@: > lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-directory.lo:  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-error.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-file.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-execute.lo:  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-memory.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-misc.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-module.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-notify.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-path.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-relative.lo:  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-types.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/system-user.lo: lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/thread/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/thread
+	@: > lipsofsuna/thread/$(am__dirstamp)
+lipsofsuna/thread/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/thread/$(DEPDIR)
+	@: > lipsofsuna/thread/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/thread/thread.lo: lipsofsuna/thread/$(am__dirstamp) \
+	lipsofsuna/thread/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/thread/thread-async-call.lo:  \
+	lipsofsuna/thread/$(am__dirstamp) \
+	lipsofsuna/thread/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/video/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/video
+	@: > lipsofsuna/video/$(am__dirstamp)
+lipsofsuna/video/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/video/$(DEPDIR)
+	@: > lipsofsuna/video/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/video/video-calls.lo: lipsofsuna/video/$(am__dirstamp) \
+	lipsofsuna/video/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/video/video-features.lo: lipsofsuna/video/$(am__dirstamp) \
+	lipsofsuna/video/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/voxel
+	@: > lipsofsuna/voxel/$(am__dirstamp)
+lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/voxel/$(DEPDIR)
+	@: > lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/voxel.lo: lipsofsuna/voxel/$(am__dirstamp) \
+	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/voxel-block.lo: lipsofsuna/voxel/$(am__dirstamp) \
+	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/voxel-manager.lo: lipsofsuna/voxel/$(am__dirstamp) \
+	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/voxel-material.lo: lipsofsuna/voxel/$(am__dirstamp) \
+	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/voxel-sector.lo: lipsofsuna/voxel/$(am__dirstamp) \
+	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/widget
+	@: > lipsofsuna/widget/$(am__dirstamp)
+lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/widget/$(DEPDIR)
+	@: > lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-busy.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-button.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-check.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-container.lo:  \
+	lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-entry.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-group.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-image.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-label.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-manager.lo:  \
+	lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-menu.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-progress.lo:  \
+	lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-render.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-scroll.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-spin.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-style.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-tabs.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-tree.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-view.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/widget/widget-window.lo: lipsofsuna/widget/$(am__dirstamp) \
+	lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+liblipsofsunaclient.la: $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(liblipsofsunaclient_la_LINK) $(am_liblipsofsunaclient_la_rpath) $(liblipsofsunaclient_la_OBJECTS) $(liblipsofsunaclient_la_LIBADD) $(LIBS)
+liblipsofsunagenerator.la: $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(liblipsofsunagenerator_la_LINK) $(am_liblipsofsunagenerator_la_rpath) $(liblipsofsunagenerator_la_OBJECTS) $(liblipsofsunagenerator_la_LIBADD) $(LIBS)
+liblipsofsunaimport.la: $(liblipsofsunaimport_la_OBJECTS) $(liblipsofsunaimport_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(liblipsofsunaimport_la_LINK) $(am_liblipsofsunaimport_la_rpath) $(liblipsofsunaimport_la_OBJECTS) $(liblipsofsunaimport_la_LIBADD) $(LIBS)
+liblipsofsunaserver.la: $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(liblipsofsunaserver_la_LINK) $(am_liblipsofsunaserver_la_rpath) $(liblipsofsunaserver_la_OBJECTS) $(liblipsofsunaserver_la_LIBADD) $(LIBS)
+lipsofsuna/viewer/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/viewer
+	@: > lipsofsuna/viewer/$(am__dirstamp)
+lipsofsuna/viewer/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/viewer/$(DEPDIR)
+	@: > lipsofsuna/viewer/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/viewer/viewer.lo: lipsofsuna/viewer/$(am__dirstamp) \
+	lipsofsuna/viewer/$(DEPDIR)/$(am__dirstamp)
+liblipsofsunaviewer.la: $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(liblipsofsunaviewer_la_LINK) $(am_liblipsofsunaviewer_la_rpath) $(liblipsofsunaviewer_la_OBJECTS) $(liblipsofsunaviewer_la_LIBADD) $(LIBS)
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bindir)" || $(MKDIR_P) "$(DESTDIR)$(bindir)"
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p || test -f $$p1; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(bindir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(bindir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(bindir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(bindir)" && rm -f $$files
+
+clean-binPROGRAMS:
+	@list='$(bin_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+install-prgPROGRAMS: $(prg_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	test -z "$(prgdir)" || $(MKDIR_P) "$(DESTDIR)$(prgdir)"
+	@list='$(prg_PROGRAMS)'; test -n "$(prgdir)" || list=; \
+	for p in $$list; do echo "$$p $$p"; done | \
+	sed 's/$(EXEEXT)$$//' | \
+	while read p p1; do if test -f $$p || test -f $$p1; \
+	  then echo "$$p"; echo "$$p"; else :; fi; \
+	done | \
+	sed -e 'p;s,.*/,,;n;h' -e 's|.*|.|' \
+	    -e 'p;x;s,.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/' | \
+	sed 'N;N;N;s,\n, ,g' | \
+	$(AWK) 'BEGIN { files["."] = ""; dirs["."] = 1 } \
+	  { d=$$3; if (dirs[d] != 1) { print "d", d; dirs[d] = 1 } \
+	    if ($$2 == $$4) files[d] = files[d] " " $$1; \
+	    else { print "f", $$3 "/" $$4, $$1; } } \
+	  END { for (d in files) print "f", d, files[d] }' | \
+	while read type dir files; do \
+	    if test "$$dir" = .; then dir=; else dir=/$$dir; fi; \
+	    test -z "$$files" || { \
+	    echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files '$(DESTDIR)$(prgdir)$$dir'"; \
+	    $(INSTALL_PROGRAM_ENV) $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $$files "$(DESTDIR)$(prgdir)$$dir" || exit $$?; \
+	    } \
+	; done
+
+uninstall-prgPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(prg_PROGRAMS)'; test -n "$(prgdir)" || list=; \
+	files=`for p in $$list; do echo "$$p"; done | \
+	  sed -e 'h;s,^.*/,,;s/$(EXEEXT)$$//;$(transform)' \
+	      -e 's/$$/$(EXEEXT)/' `; \
+	test -n "$$list" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(prgdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(prgdir)" && rm -f $$files
+
+clean-prgPROGRAMS:
+	@list='$(prg_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+lipsofsuna/client/client-main.$(OBJEXT):  \
+	lipsofsuna/client/$(am__dirstamp) \
+	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna-client$(EXEEXT): $(lipsofsuna_client_OBJECTS) $(lipsofsuna_client_DEPENDENCIES) 
+	@rm -f lipsofsuna-client$(EXEEXT)
+	$(AM_V_CCLD)$(lipsofsuna_client_LINK) $(lipsofsuna_client_OBJECTS) $(lipsofsuna_client_LDADD) $(LIBS)
+lipsofsuna/generator/generator-main.$(OBJEXT):  \
+	lipsofsuna/generator/$(am__dirstamp) \
+	lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna-generator$(EXEEXT): $(lipsofsuna_generator_OBJECTS) $(lipsofsuna_generator_DEPENDENCIES) 
+	@rm -f lipsofsuna-generator$(EXEEXT)
+	$(AM_V_CCLD)$(lipsofsuna_generator_LINK) $(lipsofsuna_generator_OBJECTS) $(lipsofsuna_generator_LDADD) $(LIBS)
+lipsofsuna/reload/reload-main.$(OBJEXT):  \
+	lipsofsuna/reload/$(am__dirstamp) \
+	lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna-import$(EXEEXT): $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_DEPENDENCIES) 
+	@rm -f lipsofsuna-import$(EXEEXT)
+	$(AM_V_CCLD)$(lipsofsuna_import_LINK) $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_LDADD) $(LIBS)
+lipsofsuna/main/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/main
+	@: > lipsofsuna/main/$(am__dirstamp)
+lipsofsuna/main/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/main/$(DEPDIR)
+	@: > lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT):  \
+	lipsofsuna/main/$(am__dirstamp) \
+	lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-file.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-execute.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-memory.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-misc.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-module.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-notify.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-path.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna-launch$(EXEEXT): $(lipsofsuna_launch_OBJECTS) $(lipsofsuna_launch_DEPENDENCIES) 
+	@rm -f lipsofsuna-launch$(EXEEXT)
+	$(AM_V_CCLD)$(lipsofsuna_launch_LINK) $(lipsofsuna_launch_OBJECTS) $(lipsofsuna_launch_LDADD) $(LIBS)
+lipsofsuna/server/server-main.$(OBJEXT):  \
+	lipsofsuna/server/$(am__dirstamp) \
+	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna-server$(EXEEXT): $(lipsofsuna_server_OBJECTS) $(lipsofsuna_server_DEPENDENCIES) 
+	@rm -f lipsofsuna-server$(EXEEXT)
+	$(AM_V_CCLD)$(lipsofsuna_server_LINK) $(lipsofsuna_server_OBJECTS) $(lipsofsuna_server_LDADD) $(LIBS)
+lipsofsuna/viewer/viewer-main.$(OBJEXT):  \
+	lipsofsuna/viewer/$(am__dirstamp) \
+	lipsofsuna/viewer/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna-viewer$(EXEEXT): $(lipsofsuna_viewer_OBJECTS) $(lipsofsuna_viewer_DEPENDENCIES) 
+	@rm -f lipsofsuna-viewer$(EXEEXT)
+	$(AM_V_CCLD)$(lipsofsuna_viewer_LINK) $(lipsofsuna_viewer_OBJECTS) $(lipsofsuna_viewer_LDADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+	-rm -f lipsofsuna/ai/ai-manager.$(OBJEXT)
+	-rm -f lipsofsuna/ai/ai-manager.lo
+	-rm -f lipsofsuna/ai/ai-path.$(OBJEXT)
+	-rm -f lipsofsuna/ai/ai-path.lo
+	-rm -f lipsofsuna/ai/ai-sector.$(OBJEXT)
+	-rm -f lipsofsuna/ai/ai-sector.lo
+	-rm -f lipsofsuna/algorithm/algorithm-astar.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-astar.lo
+	-rm -f lipsofsuna/algorithm/algorithm-bst.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-bst.lo
+	-rm -f lipsofsuna/algorithm/algorithm-camera.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-camera.lo
+	-rm -f lipsofsuna/algorithm/algorithm-octree.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-octree.lo
+	-rm -f lipsofsuna/algorithm/algorithm-sectors.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-sectors.lo
+	-rm -f lipsofsuna/archive/archive-reader.$(OBJEXT)
+	-rm -f lipsofsuna/archive/archive-reader.lo
+	-rm -f lipsofsuna/archive/archive-sql.$(OBJEXT)
+	-rm -f lipsofsuna/archive/archive-sql.lo
+	-rm -f lipsofsuna/archive/archive-tar.$(OBJEXT)
+	-rm -f lipsofsuna/archive/archive-tar.lo
+	-rm -f lipsofsuna/archive/archive-writer.$(OBJEXT)
+	-rm -f lipsofsuna/archive/archive-writer.lo
+	-rm -f lipsofsuna/binding/binding-action.$(OBJEXT)
+	-rm -f lipsofsuna/binding/binding-action.lo
+	-rm -f lipsofsuna/binding/binding-manager.$(OBJEXT)
+	-rm -f lipsofsuna/binding/binding-manager.lo
+	-rm -f lipsofsuna/binding/binding.$(OBJEXT)
+	-rm -f lipsofsuna/binding/binding.lo
+	-rm -f lipsofsuna/callback/cal-callbacks.$(OBJEXT)
+	-rm -f lipsofsuna/callback/cal-callbacks.lo
+	-rm -f lipsofsuna/callback/cal-handle.$(OBJEXT)
+	-rm -f lipsofsuna/callback/cal-handle.lo
+	-rm -f lipsofsuna/callback/cal-marshal.$(OBJEXT)
+	-rm -f lipsofsuna/callback/cal-marshal.lo
+	-rm -f lipsofsuna/client/client-callbacks.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-callbacks.lo
+	-rm -f lipsofsuna/client/client-command.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-command.lo
+	-rm -f lipsofsuna/client/client-main.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-network.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-network.lo
+	-rm -f lipsofsuna/client/client-object.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-object.lo
+	-rm -f lipsofsuna/client/client-render.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-render.lo
+	-rm -f lipsofsuna/client/client-script-action.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-action.lo
+	-rm -f lipsofsuna/client/client-script-binding.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-binding.lo
+	-rm -f lipsofsuna/client/client-script-client.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-client.lo
+	-rm -f lipsofsuna/client/client-script-extension.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-extension.lo
+	-rm -f lipsofsuna/client/client-script-group.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-group.lo
+	-rm -f lipsofsuna/client/client-script-light.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-light.lo
+	-rm -f lipsofsuna/client/client-script-object.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-object.lo
+	-rm -f lipsofsuna/client/client-script-player.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-player.lo
+	-rm -f lipsofsuna/client/client-script-scene.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-scene.lo
+	-rm -f lipsofsuna/client/client-script-widget.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-widget.lo
+	-rm -f lipsofsuna/client/client-script-window.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-script-window.lo
+	-rm -f lipsofsuna/client/client-window.$(OBJEXT)
+	-rm -f lipsofsuna/client/client-window.lo
+	-rm -f lipsofsuna/client/client.$(OBJEXT)
+	-rm -f lipsofsuna/client/client.lo
+	-rm -f lipsofsuna/client/widget-login.$(OBJEXT)
+	-rm -f lipsofsuna/client/widget-login.lo
+	-rm -f lipsofsuna/config/config-account.$(OBJEXT)
+	-rm -f lipsofsuna/config/config-account.lo
+	-rm -f lipsofsuna/config/config-bans.$(OBJEXT)
+	-rm -f lipsofsuna/config/config-bans.lo
+	-rm -f lipsofsuna/config/config-host.$(OBJEXT)
+	-rm -f lipsofsuna/config/config-host.lo
+	-rm -f lipsofsuna/engine/engine-constraint.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine-constraint.lo
+	-rm -f lipsofsuna/engine/engine-model.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine-model.lo
+	-rm -f lipsofsuna/engine/engine-object.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine-object.lo
+	-rm -f lipsofsuna/engine/engine-resources.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine-resources.lo
+	-rm -f lipsofsuna/engine/engine-sector.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine-sector.lo
+	-rm -f lipsofsuna/engine/engine-selection.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine-selection.lo
+	-rm -f lipsofsuna/engine/engine.$(OBJEXT)
+	-rm -f lipsofsuna/engine/engine.lo
+	-rm -f lipsofsuna/font/font-layout.$(OBJEXT)
+	-rm -f lipsofsuna/font/font-layout.lo
+	-rm -f lipsofsuna/font/font.$(OBJEXT)
+	-rm -f lipsofsuna/font/font.lo
+	-rm -f lipsofsuna/generator/generator-brush.$(OBJEXT)
+	-rm -f lipsofsuna/generator/generator-brush.lo
+	-rm -f lipsofsuna/generator/generator-main.$(OBJEXT)
+	-rm -f lipsofsuna/generator/generator-rule.$(OBJEXT)
+	-rm -f lipsofsuna/generator/generator-rule.lo
+	-rm -f lipsofsuna/generator/generator.$(OBJEXT)
+	-rm -f lipsofsuna/generator/generator.lo
+	-rm -f lipsofsuna/image/image-compress.$(OBJEXT)
+	-rm -f lipsofsuna/image/image-compress.lo
+	-rm -f lipsofsuna/image/image-texture.$(OBJEXT)
+	-rm -f lipsofsuna/image/image-texture.lo
+	-rm -f lipsofsuna/image/image.$(OBJEXT)
+	-rm -f lipsofsuna/image/image.lo
+	-rm -f lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT)
+	-rm -f lipsofsuna/math/math.$(OBJEXT)
+	-rm -f lipsofsuna/math/math.lo
+	-rm -f lipsofsuna/model/model-animation.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-animation.lo
+	-rm -f lipsofsuna/model/model-bone.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-bone.lo
+	-rm -f lipsofsuna/model/model-faces.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-faces.lo
+	-rm -f lipsofsuna/model/model-hair.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-hair.lo
+	-rm -f lipsofsuna/model/model-light.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-light.lo
+	-rm -f lipsofsuna/model/model-material.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-material.lo
+	-rm -f lipsofsuna/model/model-node.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-node.lo
+	-rm -f lipsofsuna/model/model-pose.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-pose.lo
+	-rm -f lipsofsuna/model/model-shape.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-shape.lo
+	-rm -f lipsofsuna/model/model-texture.$(OBJEXT)
+	-rm -f lipsofsuna/model/model-texture.lo
+	-rm -f lipsofsuna/model/model.$(OBJEXT)
+	-rm -f lipsofsuna/model/model.lo
+	-rm -f lipsofsuna/network/network.$(OBJEXT)
+	-rm -f lipsofsuna/network/network.lo
+	-rm -f lipsofsuna/particle/particle-line.$(OBJEXT)
+	-rm -f lipsofsuna/particle/particle-line.lo
+	-rm -f lipsofsuna/particle/particle-manager.$(OBJEXT)
+	-rm -f lipsofsuna/particle/particle-manager.lo
+	-rm -f lipsofsuna/particle/particle-point.$(OBJEXT)
+	-rm -f lipsofsuna/particle/particle-point.lo
+	-rm -f lipsofsuna/paths/paths.$(OBJEXT)
+	-rm -f lipsofsuna/paths/paths.lo
+	-rm -f lipsofsuna/physics/physics-constraint.$(OBJEXT)
+	-rm -f lipsofsuna/physics/physics-constraint.lo
+	-rm -f lipsofsuna/physics/physics-control.$(OBJEXT)
+	-rm -f lipsofsuna/physics/physics-control.lo
+	-rm -f lipsofsuna/physics/physics-object.$(OBJEXT)
+	-rm -f lipsofsuna/physics/physics-object.lo
+	-rm -f lipsofsuna/physics/physics-private.$(OBJEXT)
+	-rm -f lipsofsuna/physics/physics-private.lo
+	-rm -f lipsofsuna/physics/physics-shape.$(OBJEXT)
+	-rm -f lipsofsuna/physics/physics-shape.lo
+	-rm -f lipsofsuna/physics/physics.$(OBJEXT)
+	-rm -f lipsofsuna/physics/physics.lo
+	-rm -f lipsofsuna/reload/reload-blender.$(OBJEXT)
+	-rm -f lipsofsuna/reload/reload-blender.lo
+	-rm -f lipsofsuna/reload/reload-gimp.$(OBJEXT)
+	-rm -f lipsofsuna/reload/reload-gimp.lo
+	-rm -f lipsofsuna/reload/reload-image.$(OBJEXT)
+	-rm -f lipsofsuna/reload/reload-image.lo
+	-rm -f lipsofsuna/reload/reload-main.$(OBJEXT)
+	-rm -f lipsofsuna/reload/reload.$(OBJEXT)
+	-rm -f lipsofsuna/reload/reload.lo
+	-rm -f lipsofsuna/render/render-buffer.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-buffer.lo
+	-rm -f lipsofsuna/render/render-context.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-context.lo
+	-rm -f lipsofsuna/render/render-deferred.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-deferred.lo
+	-rm -f lipsofsuna/render/render-draw.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-draw.lo
+	-rm -f lipsofsuna/render/render-group.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-group.lo
+	-rm -f lipsofsuna/render/render-image.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-image.lo
+	-rm -f lipsofsuna/render/render-light.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-light.lo
+	-rm -f lipsofsuna/render/render-lighting.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-lighting.lo
+	-rm -f lipsofsuna/render/render-material.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-material.lo
+	-rm -f lipsofsuna/render/render-model.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-model.lo
+	-rm -f lipsofsuna/render/render-object.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-object.lo
+	-rm -f lipsofsuna/render/render-scene.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-scene.lo
+	-rm -f lipsofsuna/render/render-shader.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-shader.lo
+	-rm -f lipsofsuna/render/render-texture.$(OBJEXT)
+	-rm -f lipsofsuna/render/render-texture.lo
+	-rm -f lipsofsuna/render/render.$(OBJEXT)
+	-rm -f lipsofsuna/render/render.lo
+	-rm -f lipsofsuna/script/script-args.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-args.lo
+	-rm -f lipsofsuna/script/script-class.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-class.lo
+	-rm -f lipsofsuna/script/script-data.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-data.lo
+	-rm -f lipsofsuna/script/script-event.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-event.lo
+	-rm -f lipsofsuna/script/script-library.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-library.lo
+	-rm -f lipsofsuna/script/script-object.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-object.lo
+	-rm -f lipsofsuna/script/script-packet.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-packet.lo
+	-rm -f lipsofsuna/script/script-path.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-path.lo
+	-rm -f lipsofsuna/script/script-quaternion.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-quaternion.lo
+	-rm -f lipsofsuna/script/script-util.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-util.lo
+	-rm -f lipsofsuna/script/script-vector.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-vector.lo
+	-rm -f lipsofsuna/script/script.$(OBJEXT)
+	-rm -f lipsofsuna/script/script.lo
+	-rm -f lipsofsuna/server/server-callbacks.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-callbacks.lo
+	-rm -f lipsofsuna/server/server-client.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-client.lo
+	-rm -f lipsofsuna/server/server-main.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-network.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-network.lo
+	-rm -f lipsofsuna/server/server-object.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-object.lo
+	-rm -f lipsofsuna/server/server-script-effect.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-script-effect.lo
+	-rm -f lipsofsuna/server/server-script-extension.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-script-extension.lo
+	-rm -f lipsofsuna/server/server-script-object.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-script-object.lo
+	-rm -f lipsofsuna/server/server-script-server.$(OBJEXT)
+	-rm -f lipsofsuna/server/server-script-server.lo
+	-rm -f lipsofsuna/server/server.$(OBJEXT)
+	-rm -f lipsofsuna/server/server.lo
+	-rm -f lipsofsuna/sound/sound-manager.$(OBJEXT)
+	-rm -f lipsofsuna/sound/sound-manager.lo
+	-rm -f lipsofsuna/sound/sound-sample.$(OBJEXT)
+	-rm -f lipsofsuna/sound/sound-sample.lo
+	-rm -f lipsofsuna/sound/sound-source.$(OBJEXT)
+	-rm -f lipsofsuna/sound/sound-source.lo
+	-rm -f lipsofsuna/sound/sound-system.$(OBJEXT)
+	-rm -f lipsofsuna/sound/sound-system.lo
+	-rm -f lipsofsuna/string/string-generic.$(OBJEXT)
+	-rm -f lipsofsuna/string/string-generic.lo
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-execute.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-file.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-memory.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-misc.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-module.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-notify.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-path.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT)
+	-rm -f lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-directory.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-directory.lo
+	-rm -f lipsofsuna/system/system-error.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-error.lo
+	-rm -f lipsofsuna/system/system-execute.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-execute.lo
+	-rm -f lipsofsuna/system/system-file.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-file.lo
+	-rm -f lipsofsuna/system/system-memory.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-memory.lo
+	-rm -f lipsofsuna/system/system-misc.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-misc.lo
+	-rm -f lipsofsuna/system/system-module.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-module.lo
+	-rm -f lipsofsuna/system/system-notify.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-notify.lo
+	-rm -f lipsofsuna/system/system-path.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-path.lo
+	-rm -f lipsofsuna/system/system-relative.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-relative.lo
+	-rm -f lipsofsuna/system/system-types.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-types.lo
+	-rm -f lipsofsuna/system/system-user.$(OBJEXT)
+	-rm -f lipsofsuna/system/system-user.lo
+	-rm -f lipsofsuna/system/system.$(OBJEXT)
+	-rm -f lipsofsuna/system/system.lo
+	-rm -f lipsofsuna/thread/thread-async-call.$(OBJEXT)
+	-rm -f lipsofsuna/thread/thread-async-call.lo
+	-rm -f lipsofsuna/thread/thread.$(OBJEXT)
+	-rm -f lipsofsuna/thread/thread.lo
+	-rm -f lipsofsuna/video/video-calls.$(OBJEXT)
+	-rm -f lipsofsuna/video/video-calls.lo
+	-rm -f lipsofsuna/video/video-features.$(OBJEXT)
+	-rm -f lipsofsuna/video/video-features.lo
+	-rm -f lipsofsuna/viewer/viewer-main.$(OBJEXT)
+	-rm -f lipsofsuna/viewer/viewer.$(OBJEXT)
+	-rm -f lipsofsuna/viewer/viewer.lo
+	-rm -f lipsofsuna/voxel/voxel-block.$(OBJEXT)
+	-rm -f lipsofsuna/voxel/voxel-block.lo
+	-rm -f lipsofsuna/voxel/voxel-manager.$(OBJEXT)
+	-rm -f lipsofsuna/voxel/voxel-manager.lo
+	-rm -f lipsofsuna/voxel/voxel-material.$(OBJEXT)
+	-rm -f lipsofsuna/voxel/voxel-material.lo
+	-rm -f lipsofsuna/voxel/voxel-sector.$(OBJEXT)
+	-rm -f lipsofsuna/voxel/voxel-sector.lo
+	-rm -f lipsofsuna/voxel/voxel.$(OBJEXT)
+	-rm -f lipsofsuna/voxel/voxel.lo
+	-rm -f lipsofsuna/widget/widget-busy.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-busy.lo
+	-rm -f lipsofsuna/widget/widget-button.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-button.lo
+	-rm -f lipsofsuna/widget/widget-check.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-check.lo
+	-rm -f lipsofsuna/widget/widget-container.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-container.lo
+	-rm -f lipsofsuna/widget/widget-entry.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-entry.lo
+	-rm -f lipsofsuna/widget/widget-group.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-group.lo
+	-rm -f lipsofsuna/widget/widget-image.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-image.lo
+	-rm -f lipsofsuna/widget/widget-label.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-label.lo
+	-rm -f lipsofsuna/widget/widget-manager.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-manager.lo
+	-rm -f lipsofsuna/widget/widget-menu.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-menu.lo
+	-rm -f lipsofsuna/widget/widget-progress.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-progress.lo
+	-rm -f lipsofsuna/widget/widget-render.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-render.lo
+	-rm -f lipsofsuna/widget/widget-scroll.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-scroll.lo
+	-rm -f lipsofsuna/widget/widget-spin.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-spin.lo
+	-rm -f lipsofsuna/widget/widget-style.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-style.lo
+	-rm -f lipsofsuna/widget/widget-tabs.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-tabs.lo
+	-rm -f lipsofsuna/widget/widget-tree.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-tree.lo
+	-rm -f lipsofsuna/widget/widget-view.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-view.lo
+	-rm -f lipsofsuna/widget/widget-window.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget-window.lo
+	-rm -f lipsofsuna/widget/widget.$(OBJEXT)
+	-rm -f lipsofsuna/widget/widget.lo
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/ai/$(DEPDIR)/ai-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/ai/$(DEPDIR)/ai-path.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/ai/$(DEPDIR)/ai-sector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-astar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-bst.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-camera.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-octree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-sectors.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-reader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-sql.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-tar.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-writer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/binding/$(DEPDIR)/binding-action.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/binding/$(DEPDIR)/binding-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/binding/$(DEPDIR)/binding.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/callback/$(DEPDIR)/cal-callbacks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/callback/$(DEPDIR)/cal-handle.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/callback/$(DEPDIR)/cal-marshal.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-callbacks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-command.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-network.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-render.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-action.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-binding.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-extension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-group.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-light.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-player.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-scene.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-widget.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-script-window.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client-window.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/client/$(DEPDIR)/widget-login.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/config/$(DEPDIR)/config-account.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/config/$(DEPDIR)/config-bans.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/config/$(DEPDIR)/config-host.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine-constraint.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine-model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine-resources.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine-sector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine-selection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/engine/$(DEPDIR)/engine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/font/$(DEPDIR)/font-layout.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/font/$(DEPDIR)/font.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/generator/$(DEPDIR)/generator-brush.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/generator/$(DEPDIR)/generator-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/generator/$(DEPDIR)/generator-rule.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/generator/$(DEPDIR)/generator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image-compress.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image-texture.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/math/$(DEPDIR)/math.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-animation.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-bone.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-faces.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-hair.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-light.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-material.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-node.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-pose.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-shape.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-texture.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/network/$(DEPDIR)/network.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/particle/$(DEPDIR)/particle-line.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/particle/$(DEPDIR)/particle-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/particle/$(DEPDIR)/particle-point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/paths/$(DEPDIR)/paths.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/physics/$(DEPDIR)/physics-constraint.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/physics/$(DEPDIR)/physics-control.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/physics/$(DEPDIR)/physics-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/physics/$(DEPDIR)/physics-private.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/physics/$(DEPDIR)/physics-shape.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/physics/$(DEPDIR)/physics.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/reload/$(DEPDIR)/reload-blender.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/reload/$(DEPDIR)/reload-gimp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/reload/$(DEPDIR)/reload-image.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/reload/$(DEPDIR)/reload-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/reload/$(DEPDIR)/reload.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-buffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-context.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-deferred.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-draw.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-group.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-image.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-light.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-lighting.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-material.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-scene.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-shader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render-texture.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/render/$(DEPDIR)/render.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-args.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-class.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-event.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-library.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-packet.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-path.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-quaternion.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-callbacks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-client.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-network.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-script-effect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-script-extension.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-script-object.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server-script-server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/server/$(DEPDIR)/server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/sound/$(DEPDIR)/sound-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/sound/$(DEPDIR)/sound-sample.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/sound/$(DEPDIR)/sound-source.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/sound/$(DEPDIR)/sound-system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/string/$(DEPDIR)/string-generic.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-directory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-execute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-memory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-misc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-notify.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-path.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-relative.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-types.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-user.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/thread/$(DEPDIR)/thread-async-call.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/thread/$(DEPDIR)/thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/video/$(DEPDIR)/video-calls.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/video/$(DEPDIR)/video-features.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/viewer/$(DEPDIR)/viewer-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/viewer/$(DEPDIR)/viewer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-block.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-material.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-sector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-busy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-button.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-check.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-container.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-entry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-group.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-image.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-label.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-menu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-progress.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-render.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-scroll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-spin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-style.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-tabs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-tree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-view.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget-window.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/widget/$(DEPDIR)/widget.Plo@am__quote@
+
+.c.o:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+
+.c.obj:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.c.lo:
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+lipsofsuna/main/lipsofsuna_launch-main.o: lipsofsuna/main/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/main/lipsofsuna_launch-main.o -MD -MP -MF lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo -c -o lipsofsuna/main/lipsofsuna_launch-main.o `test -f 'lipsofsuna/main/main.c' || echo '$(srcdir)/'`lipsofsuna/main/main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/main/main.c' object='lipsofsuna/main/lipsofsuna_launch-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/main/lipsofsuna_launch-main.o `test -f 'lipsofsuna/main/main.c' || echo '$(srcdir)/'`lipsofsuna/main/main.c
+
+lipsofsuna/main/lipsofsuna_launch-main.obj: lipsofsuna/main/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/main/lipsofsuna_launch-main.obj -MD -MP -MF lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo -c -o lipsofsuna/main/lipsofsuna_launch-main.obj `if test -f 'lipsofsuna/main/main.c'; then $(CYGPATH_W) 'lipsofsuna/main/main.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/main/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/main/main.c' object='lipsofsuna/main/lipsofsuna_launch-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/main/lipsofsuna_launch-main.obj `if test -f 'lipsofsuna/main/main.c'; then $(CYGPATH_W) 'lipsofsuna/main/main.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/main/main.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system.o: lipsofsuna/system/system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system.o `test -f 'lipsofsuna/system/system.c' || echo '$(srcdir)/'`lipsofsuna/system/system.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system.c' object='lipsofsuna/system/lipsofsuna_launch-system.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system.o `test -f 'lipsofsuna/system/system.c' || echo '$(srcdir)/'`lipsofsuna/system/system.c
+
+lipsofsuna/system/lipsofsuna_launch-system.obj: lipsofsuna/system/system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system.obj `if test -f 'lipsofsuna/system/system.c'; then $(CYGPATH_W) 'lipsofsuna/system/system.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system.c' object='lipsofsuna/system/lipsofsuna_launch-system.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system.obj `if test -f 'lipsofsuna/system/system.c'; then $(CYGPATH_W) 'lipsofsuna/system/system.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-directory.o: lipsofsuna/system/system-directory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-directory.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.o `test -f 'lipsofsuna/system/system-directory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-directory.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-directory.c' object='lipsofsuna/system/lipsofsuna_launch-system-directory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.o `test -f 'lipsofsuna/system/system-directory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-directory.c
+
+lipsofsuna/system/lipsofsuna_launch-system-directory.obj: lipsofsuna/system/system-directory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-directory.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.obj `if test -f 'lipsofsuna/system/system-directory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-directory.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-directory.c' object='lipsofsuna/system/lipsofsuna_launch-system-directory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.obj `if test -f 'lipsofsuna/system/system-directory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-directory.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-error.o: lipsofsuna/system/system-error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-error.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-error.o `test -f 'lipsofsuna/system/system-error.c' || echo '$(srcdir)/'`lipsofsuna/system/system-error.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-error.c' object='lipsofsuna/system/lipsofsuna_launch-system-error.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-error.o `test -f 'lipsofsuna/system/system-error.c' || echo '$(srcdir)/'`lipsofsuna/system/system-error.c
+
+lipsofsuna/system/lipsofsuna_launch-system-error.obj: lipsofsuna/system/system-error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-error.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-error.obj `if test -f 'lipsofsuna/system/system-error.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-error.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-error.c' object='lipsofsuna/system/lipsofsuna_launch-system-error.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-error.obj `if test -f 'lipsofsuna/system/system-error.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-error.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-file.o: lipsofsuna/system/system-file.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-file.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-file.o `test -f 'lipsofsuna/system/system-file.c' || echo '$(srcdir)/'`lipsofsuna/system/system-file.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-file.c' object='lipsofsuna/system/lipsofsuna_launch-system-file.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-file.o `test -f 'lipsofsuna/system/system-file.c' || echo '$(srcdir)/'`lipsofsuna/system/system-file.c
+
+lipsofsuna/system/lipsofsuna_launch-system-file.obj: lipsofsuna/system/system-file.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-file.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-file.obj `if test -f 'lipsofsuna/system/system-file.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-file.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-file.c' object='lipsofsuna/system/lipsofsuna_launch-system-file.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-file.obj `if test -f 'lipsofsuna/system/system-file.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-file.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-execute.o: lipsofsuna/system/system-execute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-execute.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.o `test -f 'lipsofsuna/system/system-execute.c' || echo '$(srcdir)/'`lipsofsuna/system/system-execute.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-execute.c' object='lipsofsuna/system/lipsofsuna_launch-system-execute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.o `test -f 'lipsofsuna/system/system-execute.c' || echo '$(srcdir)/'`lipsofsuna/system/system-execute.c
+
+lipsofsuna/system/lipsofsuna_launch-system-execute.obj: lipsofsuna/system/system-execute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-execute.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.obj `if test -f 'lipsofsuna/system/system-execute.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-execute.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-execute.c' object='lipsofsuna/system/lipsofsuna_launch-system-execute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.obj `if test -f 'lipsofsuna/system/system-execute.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-execute.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-memory.o: lipsofsuna/system/system-memory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-memory.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.o `test -f 'lipsofsuna/system/system-memory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-memory.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-memory.c' object='lipsofsuna/system/lipsofsuna_launch-system-memory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.o `test -f 'lipsofsuna/system/system-memory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-memory.c
+
+lipsofsuna/system/lipsofsuna_launch-system-memory.obj: lipsofsuna/system/system-memory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-memory.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.obj `if test -f 'lipsofsuna/system/system-memory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-memory.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-memory.c' object='lipsofsuna/system/lipsofsuna_launch-system-memory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.obj `if test -f 'lipsofsuna/system/system-memory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-memory.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-misc.o: lipsofsuna/system/system-misc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-misc.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.o `test -f 'lipsofsuna/system/system-misc.c' || echo '$(srcdir)/'`lipsofsuna/system/system-misc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-misc.c' object='lipsofsuna/system/lipsofsuna_launch-system-misc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.o `test -f 'lipsofsuna/system/system-misc.c' || echo '$(srcdir)/'`lipsofsuna/system/system-misc.c
+
+lipsofsuna/system/lipsofsuna_launch-system-misc.obj: lipsofsuna/system/system-misc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-misc.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.obj `if test -f 'lipsofsuna/system/system-misc.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-misc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-misc.c' object='lipsofsuna/system/lipsofsuna_launch-system-misc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.obj `if test -f 'lipsofsuna/system/system-misc.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-misc.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-module.o: lipsofsuna/system/system-module.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-module.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-module.o `test -f 'lipsofsuna/system/system-module.c' || echo '$(srcdir)/'`lipsofsuna/system/system-module.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-module.c' object='lipsofsuna/system/lipsofsuna_launch-system-module.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-module.o `test -f 'lipsofsuna/system/system-module.c' || echo '$(srcdir)/'`lipsofsuna/system/system-module.c
+
+lipsofsuna/system/lipsofsuna_launch-system-module.obj: lipsofsuna/system/system-module.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-module.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-module.obj `if test -f 'lipsofsuna/system/system-module.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-module.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-module.c' object='lipsofsuna/system/lipsofsuna_launch-system-module.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-module.obj `if test -f 'lipsofsuna/system/system-module.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-module.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-notify.o: lipsofsuna/system/system-notify.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-notify.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.o `test -f 'lipsofsuna/system/system-notify.c' || echo '$(srcdir)/'`lipsofsuna/system/system-notify.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-notify.c' object='lipsofsuna/system/lipsofsuna_launch-system-notify.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.o `test -f 'lipsofsuna/system/system-notify.c' || echo '$(srcdir)/'`lipsofsuna/system/system-notify.c
+
+lipsofsuna/system/lipsofsuna_launch-system-notify.obj: lipsofsuna/system/system-notify.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-notify.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.obj `if test -f 'lipsofsuna/system/system-notify.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-notify.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-notify.c' object='lipsofsuna/system/lipsofsuna_launch-system-notify.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.obj `if test -f 'lipsofsuna/system/system-notify.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-notify.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-path.o: lipsofsuna/system/system-path.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-path.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-path.o `test -f 'lipsofsuna/system/system-path.c' || echo '$(srcdir)/'`lipsofsuna/system/system-path.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-path.c' object='lipsofsuna/system/lipsofsuna_launch-system-path.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-path.o `test -f 'lipsofsuna/system/system-path.c' || echo '$(srcdir)/'`lipsofsuna/system/system-path.c
+
+lipsofsuna/system/lipsofsuna_launch-system-path.obj: lipsofsuna/system/system-path.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-path.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-path.obj `if test -f 'lipsofsuna/system/system-path.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-path.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-path.c' object='lipsofsuna/system/lipsofsuna_launch-system-path.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-path.obj `if test -f 'lipsofsuna/system/system-path.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-path.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-relative.o: lipsofsuna/system/system-relative.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-relative.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.o `test -f 'lipsofsuna/system/system-relative.c' || echo '$(srcdir)/'`lipsofsuna/system/system-relative.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-relative.c' object='lipsofsuna/system/lipsofsuna_launch-system-relative.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.o `test -f 'lipsofsuna/system/system-relative.c' || echo '$(srcdir)/'`lipsofsuna/system/system-relative.c
+
+lipsofsuna/system/lipsofsuna_launch-system-relative.obj: lipsofsuna/system/system-relative.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-relative.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.obj `if test -f 'lipsofsuna/system/system-relative.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-relative.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-relative.c' object='lipsofsuna/system/lipsofsuna_launch-system-relative.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.obj `if test -f 'lipsofsuna/system/system-relative.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-relative.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-types.o: lipsofsuna/system/system-types.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-types.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-types.o `test -f 'lipsofsuna/system/system-types.c' || echo '$(srcdir)/'`lipsofsuna/system/system-types.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-types.c' object='lipsofsuna/system/lipsofsuna_launch-system-types.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-types.o `test -f 'lipsofsuna/system/system-types.c' || echo '$(srcdir)/'`lipsofsuna/system/system-types.c
+
+lipsofsuna/system/lipsofsuna_launch-system-types.obj: lipsofsuna/system/system-types.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-types.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-types.obj `if test -f 'lipsofsuna/system/system-types.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-types.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-types.c' object='lipsofsuna/system/lipsofsuna_launch-system-types.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-types.obj `if test -f 'lipsofsuna/system/system-types.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-types.c'; fi`
+
+lipsofsuna/system/lipsofsuna_launch-system-user.o: lipsofsuna/system/system-user.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-user.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-user.o `test -f 'lipsofsuna/system/system-user.c' || echo '$(srcdir)/'`lipsofsuna/system/system-user.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-user.c' object='lipsofsuna/system/lipsofsuna_launch-system-user.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-user.o `test -f 'lipsofsuna/system/system-user.c' || echo '$(srcdir)/'`lipsofsuna/system/system-user.c
+
+lipsofsuna/system/lipsofsuna_launch-system-user.obj: lipsofsuna/system/system-user.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-user.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-user.obj `if test -f 'lipsofsuna/system/system-user.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-user.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Po
+@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-user.c' object='lipsofsuna/system/lipsofsuna_launch-system-user.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-user.obj `if test -f 'lipsofsuna/system/system-user.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-user.c'; fi`
+
+.cpp.o:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cpp.lo:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf lipsofsuna/ai/.libs lipsofsuna/ai/_libs
+	-rm -rf lipsofsuna/algorithm/.libs lipsofsuna/algorithm/_libs
+	-rm -rf lipsofsuna/archive/.libs lipsofsuna/archive/_libs
+	-rm -rf lipsofsuna/binding/.libs lipsofsuna/binding/_libs
+	-rm -rf lipsofsuna/callback/.libs lipsofsuna/callback/_libs
+	-rm -rf lipsofsuna/client/.libs lipsofsuna/client/_libs
+	-rm -rf lipsofsuna/config/.libs lipsofsuna/config/_libs
+	-rm -rf lipsofsuna/engine/.libs lipsofsuna/engine/_libs
+	-rm -rf lipsofsuna/font/.libs lipsofsuna/font/_libs
+	-rm -rf lipsofsuna/generator/.libs lipsofsuna/generator/_libs
+	-rm -rf lipsofsuna/image/.libs lipsofsuna/image/_libs
+	-rm -rf lipsofsuna/math/.libs lipsofsuna/math/_libs
+	-rm -rf lipsofsuna/model/.libs lipsofsuna/model/_libs
+	-rm -rf lipsofsuna/network/.libs lipsofsuna/network/_libs
+	-rm -rf lipsofsuna/particle/.libs lipsofsuna/particle/_libs
+	-rm -rf lipsofsuna/paths/.libs lipsofsuna/paths/_libs
+	-rm -rf lipsofsuna/physics/.libs lipsofsuna/physics/_libs
+	-rm -rf lipsofsuna/reload/.libs lipsofsuna/reload/_libs
+	-rm -rf lipsofsuna/render/.libs lipsofsuna/render/_libs
+	-rm -rf lipsofsuna/script/.libs lipsofsuna/script/_libs
+	-rm -rf lipsofsuna/server/.libs lipsofsuna/server/_libs
+	-rm -rf lipsofsuna/sound/.libs lipsofsuna/sound/_libs
+	-rm -rf lipsofsuna/string/.libs lipsofsuna/string/_libs
+	-rm -rf lipsofsuna/system/.libs lipsofsuna/system/_libs
+	-rm -rf lipsofsuna/thread/.libs lipsofsuna/thread/_libs
+	-rm -rf lipsofsuna/video/.libs lipsofsuna/video/_libs
+	-rm -rf lipsofsuna/viewer/.libs lipsofsuna/viewer/_libs
+	-rm -rf lipsofsuna/voxel/.libs lipsofsuna/voxel/_libs
+	-rm -rf lipsofsuna/widget/.libs lipsofsuna/widget/_libs
 
 distclean-libtool:
 	-rm -f libtool config.lt
+install-editorDATA: $(editor_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(editordir)" || $(MKDIR_P) "$(DESTDIR)$(editordir)"
+	@list='$(editor_DATA)'; test -n "$(editordir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(editordir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(editordir)" || exit $$?; \
+	done
+
+uninstall-editorDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(editor_DATA)'; test -n "$(editordir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(editordir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(editordir)" && rm -f $$files
+install-aiHEADERS: $(ai_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(aidir)" || $(MKDIR_P) "$(DESTDIR)$(aidir)"
+	@list='$(ai_HEADERS)'; test -n "$(aidir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(aidir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(aidir)" || exit $$?; \
+	done
+
+uninstall-aiHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(ai_HEADERS)'; test -n "$(aidir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(aidir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(aidir)" && rm -f $$files
+install-algHEADERS: $(alg_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(algdir)" || $(MKDIR_P) "$(DESTDIR)$(algdir)"
+	@list='$(alg_HEADERS)'; test -n "$(algdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(algdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(algdir)" || exit $$?; \
+	done
+
+uninstall-algHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(alg_HEADERS)'; test -n "$(algdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(algdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(algdir)" && rm -f $$files
+install-arcHEADERS: $(arc_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(arcdir)" || $(MKDIR_P) "$(DESTDIR)$(arcdir)"
+	@list='$(arc_HEADERS)'; test -n "$(arcdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(arcdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(arcdir)" || exit $$?; \
+	done
+
+uninstall-arcHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(arc_HEADERS)'; test -n "$(arcdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(arcdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(arcdir)" && rm -f $$files
+install-bndHEADERS: $(bnd_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(bnddir)" || $(MKDIR_P) "$(DESTDIR)$(bnddir)"
+	@list='$(bnd_HEADERS)'; test -n "$(bnddir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(bnddir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(bnddir)" || exit $$?; \
+	done
+
+uninstall-bndHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bnd_HEADERS)'; test -n "$(bnddir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(bnddir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(bnddir)" && rm -f $$files
+install-calHEADERS: $(cal_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(caldir)" || $(MKDIR_P) "$(DESTDIR)$(caldir)"
+	@list='$(cal_HEADERS)'; test -n "$(caldir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(caldir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(caldir)" || exit $$?; \
+	done
+
+uninstall-calHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(cal_HEADERS)'; test -n "$(caldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(caldir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(caldir)" && rm -f $$files
+install-cfgHEADERS: $(cfg_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(cfgdir)" || $(MKDIR_P) "$(DESTDIR)$(cfgdir)"
+	@list='$(cfg_HEADERS)'; test -n "$(cfgdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(cfgdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(cfgdir)" || exit $$?; \
+	done
+
+uninstall-cfgHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(cfg_HEADERS)'; test -n "$(cfgdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(cfgdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(cfgdir)" && rm -f $$files
+install-cliHEADERS: $(cli_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(clidir)" || $(MKDIR_P) "$(DESTDIR)$(clidir)"
+	@list='$(cli_HEADERS)'; test -n "$(clidir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(clidir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(clidir)" || exit $$?; \
+	done
+
+uninstall-cliHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(cli_HEADERS)'; test -n "$(clidir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(clidir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(clidir)" && rm -f $$files
+install-engHEADERS: $(eng_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(engdir)" || $(MKDIR_P) "$(DESTDIR)$(engdir)"
+	@list='$(eng_HEADERS)'; test -n "$(engdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(engdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(engdir)" || exit $$?; \
+	done
+
+uninstall-engHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(eng_HEADERS)'; test -n "$(engdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(engdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(engdir)" && rm -f $$files
+install-fntHEADERS: $(fnt_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(fntdir)" || $(MKDIR_P) "$(DESTDIR)$(fntdir)"
+	@list='$(fnt_HEADERS)'; test -n "$(fntdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(fntdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(fntdir)" || exit $$?; \
+	done
+
+uninstall-fntHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(fnt_HEADERS)'; test -n "$(fntdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(fntdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(fntdir)" && rm -f $$files
+install-genHEADERS: $(gen_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(gendir)" || $(MKDIR_P) "$(DESTDIR)$(gendir)"
+	@list='$(gen_HEADERS)'; test -n "$(gendir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(gendir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(gendir)" || exit $$?; \
+	done
+
+uninstall-genHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(gen_HEADERS)'; test -n "$(gendir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(gendir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(gendir)" && rm -f $$files
+install-imgHEADERS: $(img_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(imgdir)" || $(MKDIR_P) "$(DESTDIR)$(imgdir)"
+	@list='$(img_HEADERS)'; test -n "$(imgdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(imgdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(imgdir)" || exit $$?; \
+	done
+
+uninstall-imgHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(img_HEADERS)'; test -n "$(imgdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(imgdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(imgdir)" && rm -f $$files
+install-matHEADERS: $(mat_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(matdir)" || $(MKDIR_P) "$(DESTDIR)$(matdir)"
+	@list='$(mat_HEADERS)'; test -n "$(matdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(matdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(matdir)" || exit $$?; \
+	done
+
+uninstall-matHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(mat_HEADERS)'; test -n "$(matdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(matdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(matdir)" && rm -f $$files
+install-mdlHEADERS: $(mdl_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(mdldir)" || $(MKDIR_P) "$(DESTDIR)$(mdldir)"
+	@list='$(mdl_HEADERS)'; test -n "$(mdldir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(mdldir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(mdldir)" || exit $$?; \
+	done
+
+uninstall-mdlHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(mdl_HEADERS)'; test -n "$(mdldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(mdldir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(mdldir)" && rm -f $$files
+install-netHEADERS: $(net_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(netdir)" || $(MKDIR_P) "$(DESTDIR)$(netdir)"
+	@list='$(net_HEADERS)'; test -n "$(netdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(netdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(netdir)" || exit $$?; \
+	done
+
+uninstall-netHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(net_HEADERS)'; test -n "$(netdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(netdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(netdir)" && rm -f $$files
+install-parHEADERS: $(par_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(pardir)" || $(MKDIR_P) "$(DESTDIR)$(pardir)"
+	@list='$(par_HEADERS)'; test -n "$(pardir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(pardir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(pardir)" || exit $$?; \
+	done
+
+uninstall-parHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(par_HEADERS)'; test -n "$(pardir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(pardir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(pardir)" && rm -f $$files
+install-phyHEADERS: $(phy_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(phydir)" || $(MKDIR_P) "$(DESTDIR)$(phydir)"
+	@list='$(phy_HEADERS)'; test -n "$(phydir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(phydir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(phydir)" || exit $$?; \
+	done
+
+uninstall-phyHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(phy_HEADERS)'; test -n "$(phydir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(phydir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(phydir)" && rm -f $$files
+install-pthHEADERS: $(pth_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(pthdir)" || $(MKDIR_P) "$(DESTDIR)$(pthdir)"
+	@list='$(pth_HEADERS)'; test -n "$(pthdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(pthdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(pthdir)" || exit $$?; \
+	done
+
+uninstall-pthHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pth_HEADERS)'; test -n "$(pthdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(pthdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(pthdir)" && rm -f $$files
+install-relHEADERS: $(rel_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(reldir)" || $(MKDIR_P) "$(DESTDIR)$(reldir)"
+	@list='$(rel_HEADERS)'; test -n "$(reldir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(reldir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(reldir)" || exit $$?; \
+	done
+
+uninstall-relHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(rel_HEADERS)'; test -n "$(reldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(reldir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(reldir)" && rm -f $$files
+install-rndHEADERS: $(rnd_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(rnddir)" || $(MKDIR_P) "$(DESTDIR)$(rnddir)"
+	@list='$(rnd_HEADERS)'; test -n "$(rnddir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(rnddir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(rnddir)" || exit $$?; \
+	done
+
+uninstall-rndHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(rnd_HEADERS)'; test -n "$(rnddir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(rnddir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(rnddir)" && rm -f $$files
+install-scrHEADERS: $(scr_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(scrdir)" || $(MKDIR_P) "$(DESTDIR)$(scrdir)"
+	@list='$(scr_HEADERS)'; test -n "$(scrdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(scrdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(scrdir)" || exit $$?; \
+	done
+
+uninstall-scrHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(scr_HEADERS)'; test -n "$(scrdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(scrdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(scrdir)" && rm -f $$files
+install-sndHEADERS: $(snd_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(snddir)" || $(MKDIR_P) "$(DESTDIR)$(snddir)"
+	@list='$(snd_HEADERS)'; test -n "$(snddir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(snddir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(snddir)" || exit $$?; \
+	done
+
+uninstall-sndHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(snd_HEADERS)'; test -n "$(snddir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(snddir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(snddir)" && rm -f $$files
+install-srvHEADERS: $(srv_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(srvdir)" || $(MKDIR_P) "$(DESTDIR)$(srvdir)"
+	@list='$(srv_HEADERS)'; test -n "$(srvdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(srvdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(srvdir)" || exit $$?; \
+	done
+
+uninstall-srvHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(srv_HEADERS)'; test -n "$(srvdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(srvdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(srvdir)" && rm -f $$files
+install-strHEADERS: $(str_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(strdir)" || $(MKDIR_P) "$(DESTDIR)$(strdir)"
+	@list='$(str_HEADERS)'; test -n "$(strdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(strdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(strdir)" || exit $$?; \
+	done
+
+uninstall-strHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(str_HEADERS)'; test -n "$(strdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(strdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(strdir)" && rm -f $$files
+install-sysHEADERS: $(sys_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(sysdir)" || $(MKDIR_P) "$(DESTDIR)$(sysdir)"
+	@list='$(sys_HEADERS)'; test -n "$(sysdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(sysdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(sysdir)" || exit $$?; \
+	done
+
+uninstall-sysHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(sys_HEADERS)'; test -n "$(sysdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(sysdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(sysdir)" && rm -f $$files
+install-thrHEADERS: $(thr_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(thrdir)" || $(MKDIR_P) "$(DESTDIR)$(thrdir)"
+	@list='$(thr_HEADERS)'; test -n "$(thrdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(thrdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(thrdir)" || exit $$?; \
+	done
+
+uninstall-thrHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(thr_HEADERS)'; test -n "$(thrdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(thrdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(thrdir)" && rm -f $$files
+install-vidHEADERS: $(vid_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(viddir)" || $(MKDIR_P) "$(DESTDIR)$(viddir)"
+	@list='$(vid_HEADERS)'; test -n "$(viddir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(viddir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(viddir)" || exit $$?; \
+	done
+
+uninstall-vidHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(vid_HEADERS)'; test -n "$(viddir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(viddir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(viddir)" && rm -f $$files
+install-vieHEADERS: $(vie_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(viedir)" || $(MKDIR_P) "$(DESTDIR)$(viedir)"
+	@list='$(vie_HEADERS)'; test -n "$(viedir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(viedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(viedir)" || exit $$?; \
+	done
+
+uninstall-vieHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(vie_HEADERS)'; test -n "$(viedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(viedir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(viedir)" && rm -f $$files
+install-voxHEADERS: $(vox_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(voxdir)" || $(MKDIR_P) "$(DESTDIR)$(voxdir)"
+	@list='$(vox_HEADERS)'; test -n "$(voxdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(voxdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(voxdir)" || exit $$?; \
+	done
+
+uninstall-voxHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(vox_HEADERS)'; test -n "$(voxdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(voxdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(voxdir)" && rm -f $$files
+install-wdgHEADERS: $(wdg_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(wdgdir)" || $(MKDIR_P) "$(DESTDIR)$(wdgdir)"
+	@list='$(wdg_HEADERS)'; test -n "$(wdgdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(wdgdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(wdgdir)" || exit $$?; \
+	done
+
+uninstall-wdgHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(wdg_HEADERS)'; test -n "$(wdgdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(wdgdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(wdgdir)" && rm -f $$files
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -410,7 +3735,7 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	set x; \
 	here=`pwd`; \
@@ -427,7 +3752,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
 	  fi; \
 	done; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -445,9 +3770,9 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	  fi; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -641,9 +3966,15 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS) \
+		config.h
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs: installdirs-recursive
 installdirs-am:
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(editordir)" "$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" "$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" "$(DESTDIR)$(caldir)" "$(DESTDIR)$(cfgdir)" "$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" "$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" "$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" "$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" "$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" "$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" "$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" "$(DESTDIR)$(wdgdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -665,19 +3996,81 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/ai/$(am__dirstamp)
+	-rm -f lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/algorithm/$(am__dirstamp)
+	-rm -f lipsofsuna/archive/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/archive/$(am__dirstamp)
+	-rm -f lipsofsuna/binding/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/binding/$(am__dirstamp)
+	-rm -f lipsofsuna/callback/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/callback/$(am__dirstamp)
+	-rm -f lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/client/$(am__dirstamp)
+	-rm -f lipsofsuna/config/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/config/$(am__dirstamp)
+	-rm -f lipsofsuna/engine/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/engine/$(am__dirstamp)
+	-rm -f lipsofsuna/font/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/font/$(am__dirstamp)
+	-rm -f lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/generator/$(am__dirstamp)
+	-rm -f lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/image/$(am__dirstamp)
+	-rm -f lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/main/$(am__dirstamp)
+	-rm -f lipsofsuna/math/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/math/$(am__dirstamp)
+	-rm -f lipsofsuna/model/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/model/$(am__dirstamp)
+	-rm -f lipsofsuna/network/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/network/$(am__dirstamp)
+	-rm -f lipsofsuna/particle/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/particle/$(am__dirstamp)
+	-rm -f lipsofsuna/paths/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/paths/$(am__dirstamp)
+	-rm -f lipsofsuna/physics/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/physics/$(am__dirstamp)
+	-rm -f lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/reload/$(am__dirstamp)
+	-rm -f lipsofsuna/render/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/render/$(am__dirstamp)
+	-rm -f lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/script/$(am__dirstamp)
+	-rm -f lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/server/$(am__dirstamp)
+	-rm -f lipsofsuna/sound/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/sound/$(am__dirstamp)
+	-rm -f lipsofsuna/string/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/string/$(am__dirstamp)
+	-rm -f lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/system/$(am__dirstamp)
+	-rm -f lipsofsuna/thread/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/thread/$(am__dirstamp)
+	-rm -f lipsofsuna/video/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/video/$(am__dirstamp)
+	-rm -f lipsofsuna/viewer/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/viewer/$(am__dirstamp)
+	-rm -f lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/voxel/$(am__dirstamp)
+	-rm -f lipsofsuna/widget/$(DEPDIR)/$(am__dirstamp)
+	-rm -f lipsofsuna/widget/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool clean-prgPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
+	-rm -rf lipsofsuna/ai/$(DEPDIR) lipsofsuna/algorithm/$(DEPDIR) lipsofsuna/archive/$(DEPDIR) lipsofsuna/binding/$(DEPDIR) lipsofsuna/callback/$(DEPDIR) lipsofsuna/client/$(DEPDIR) lipsofsuna/config/$(DEPDIR) lipsofsuna/engine/$(DEPDIR) lipsofsuna/font/$(DEPDIR) lipsofsuna/generator/$(DEPDIR) lipsofsuna/image/$(DEPDIR) lipsofsuna/main/$(DEPDIR) lipsofsuna/math/$(DEPDIR) lipsofsuna/model/$(DEPDIR) lipsofsuna/network/$(DEPDIR) lipsofsuna/particle/$(DEPDIR) lipsofsuna/paths/$(DEPDIR) lipsofsuna/physics/$(DEPDIR) lipsofsuna/reload/$(DEPDIR) lipsofsuna/render/$(DEPDIR) lipsofsuna/script/$(DEPDIR) lipsofsuna/server/$(DEPDIR) lipsofsuna/sound/$(DEPDIR) lipsofsuna/string/$(DEPDIR) lipsofsuna/system/$(DEPDIR) lipsofsuna/thread/$(DEPDIR) lipsofsuna/video/$(DEPDIR) lipsofsuna/viewer/$(DEPDIR) lipsofsuna/voxel/$(DEPDIR) lipsofsuna/widget/$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-libtool \
-	distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-tags
 
 dvi: dvi-recursive
 
@@ -691,13 +4084,23 @@ info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-aiHEADERS install-algHEADERS \
+	install-arcHEADERS install-bndHEADERS install-calHEADERS \
+	install-cfgHEADERS install-cliHEADERS install-data-local \
+	install-editorDATA install-engHEADERS install-fntHEADERS \
+	install-genHEADERS install-imgHEADERS install-matHEADERS \
+	install-mdlHEADERS install-netHEADERS install-parHEADERS \
+	install-phyHEADERS install-prgPROGRAMS install-pthHEADERS \
+	install-relHEADERS install-rndHEADERS install-scrHEADERS \
+	install-sndHEADERS install-srvHEADERS install-strHEADERS \
+	install-sysHEADERS install-thrHEADERS install-vidHEADERS \
+	install-vieHEADERS install-voxHEADERS install-wdgHEADERS
 
 install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am:
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
 install-html: install-html-recursive
 
@@ -722,12 +4125,14 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
+	-rm -rf lipsofsuna/ai/$(DEPDIR) lipsofsuna/algorithm/$(DEPDIR) lipsofsuna/archive/$(DEPDIR) lipsofsuna/binding/$(DEPDIR) lipsofsuna/callback/$(DEPDIR) lipsofsuna/client/$(DEPDIR) lipsofsuna/config/$(DEPDIR) lipsofsuna/engine/$(DEPDIR) lipsofsuna/font/$(DEPDIR) lipsofsuna/generator/$(DEPDIR) lipsofsuna/image/$(DEPDIR) lipsofsuna/main/$(DEPDIR) lipsofsuna/math/$(DEPDIR) lipsofsuna/model/$(DEPDIR) lipsofsuna/network/$(DEPDIR) lipsofsuna/particle/$(DEPDIR) lipsofsuna/paths/$(DEPDIR) lipsofsuna/physics/$(DEPDIR) lipsofsuna/reload/$(DEPDIR) lipsofsuna/render/$(DEPDIR) lipsofsuna/script/$(DEPDIR) lipsofsuna/server/$(DEPDIR) lipsofsuna/sound/$(DEPDIR) lipsofsuna/string/$(DEPDIR) lipsofsuna/system/$(DEPDIR) lipsofsuna/thread/$(DEPDIR) lipsofsuna/video/$(DEPDIR) lipsofsuna/viewer/$(DEPDIR) lipsofsuna/voxel/$(DEPDIR) lipsofsuna/widget/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -737,27 +4142,72 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
+	uninstall-arcHEADERS uninstall-binPROGRAMS \
+	uninstall-bndHEADERS uninstall-calHEADERS uninstall-cfgHEADERS \
+	uninstall-cliHEADERS uninstall-editorDATA uninstall-engHEADERS \
+	uninstall-fntHEADERS uninstall-genHEADERS uninstall-imgHEADERS \
+	uninstall-libLTLIBRARIES uninstall-matHEADERS \
+	uninstall-mdlHEADERS uninstall-netHEADERS uninstall-parHEADERS \
+	uninstall-phyHEADERS uninstall-prgPROGRAMS \
+	uninstall-pthHEADERS uninstall-relHEADERS uninstall-rndHEADERS \
+	uninstall-scrHEADERS uninstall-sndHEADERS uninstall-srvHEADERS \
+	uninstall-strHEADERS uninstall-sysHEADERS uninstall-thrHEADERS \
+	uninstall-vidHEADERS uninstall-vieHEADERS uninstall-voxHEADERS \
+	uninstall-wdgHEADERS
 
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
-	install-am install-strip tags-recursive
+.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all \
+	ctags-recursive install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am am--refresh check check-am clean clean-generic \
-	clean-libtool ctags ctags-recursive dist dist-all dist-bzip2 \
-	dist-gzip dist-lzma dist-shar dist-tarZ dist-xz dist-zip \
-	distcheck distclean distclean-generic distclean-libtool \
+	all all-am am--refresh check check-am clean clean-binPROGRAMS \
+	clean-generic clean-libLTLIBRARIES clean-libtool \
+	clean-prgPROGRAMS ctags ctags-recursive dist dist-all \
+	dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ dist-xz \
+	dist-zip distcheck distclean distclean-compile \
+	distclean-generic distclean-hdr distclean-libtool \
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
+	dvi-am html html-am info info-am install install-aiHEADERS \
+	install-algHEADERS install-am install-arcHEADERS \
+	install-binPROGRAMS install-bndHEADERS install-calHEADERS \
+	install-cfgHEADERS install-cliHEADERS install-data \
+	install-data-am install-data-local install-dvi install-dvi-am \
+	install-editorDATA install-engHEADERS install-exec \
+	install-exec-am install-fntHEADERS install-genHEADERS \
+	install-html install-html-am install-imgHEADERS install-info \
+	install-info-am install-libLTLIBRARIES install-man \
+	install-matHEADERS install-mdlHEADERS install-netHEADERS \
+	install-parHEADERS install-pdf install-pdf-am \
+	install-phyHEADERS install-prgPROGRAMS install-ps \
+	install-ps-am install-pthHEADERS install-relHEADERS \
+	install-rndHEADERS install-scrHEADERS install-sndHEADERS \
+	install-srvHEADERS install-strHEADERS install-strip \
+	install-sysHEADERS install-thrHEADERS install-vidHEADERS \
+	install-vieHEADERS install-voxHEADERS install-wdgHEADERS \
 	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-recursive uninstall \
+	uninstall-aiHEADERS uninstall-algHEADERS uninstall-am \
+	uninstall-arcHEADERS uninstall-binPROGRAMS \
+	uninstall-bndHEADERS uninstall-calHEADERS uninstall-cfgHEADERS \
+	uninstall-cliHEADERS uninstall-editorDATA uninstall-engHEADERS \
+	uninstall-fntHEADERS uninstall-genHEADERS uninstall-imgHEADERS \
+	uninstall-libLTLIBRARIES uninstall-matHEADERS \
+	uninstall-mdlHEADERS uninstall-netHEADERS uninstall-parHEADERS \
+	uninstall-phyHEADERS uninstall-prgPROGRAMS \
+	uninstall-pthHEADERS uninstall-relHEADERS uninstall-rndHEADERS \
+	uninstall-scrHEADERS uninstall-sndHEADERS uninstall-srvHEADERS \
+	uninstall-strHEADERS uninstall-sysHEADERS uninstall-thrHEADERS \
+	uninstall-vidHEADERS uninstall-vieHEADERS uninstall-voxHEADERS \
+	uninstall-wdgHEADERS
 
+
+##############################################################################
+
+install-data-local:
+	$(mkinstalldirs) $(DATADIR)
+	$(mkinstalldirs) $(SAVEDIR)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

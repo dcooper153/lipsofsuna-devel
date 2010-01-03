@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,36 +27,36 @@
 #ifndef __EXT_CREATURE_H__
 #define __EXT_CREATURE_H__
 
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 
-typedef struct _liextCreature liextCreature;
-struct _liextCreature
+typedef struct _LIExtCreature LIExtCreature;
+struct _LIExtCreature
 {
 	int active;
 	int controls;
-	licalHandle calls[1];
-	liengObject* object;
-	liscrData* data;
-	lisrvServer* server;
+	LICalHandle calls[1];
+	LIEngObject* object;
+	LIScrData* data;
+	LISerServer* server;
 };
 
-liextCreature*
-liext_creature_new (lisrvServer* server);
+LIExtCreature*
+liext_creature_new (LISerServer* server);
 
 void
-liext_creature_free (liextCreature* self);
+liext_creature_free (LIExtCreature* self);
 
 int
-liext_creature_get_active (liextCreature* self);
+liext_creature_get_active (LIExtCreature* self);
 
 int
-liext_creature_set_active (liextCreature* self,
+liext_creature_set_active (LIExtCreature* self,
                            int            value);
 
 int
-liext_creature_set_object (liextCreature* self,
-                           liengObject*   object);
+liext_creature_set_object (LIExtCreature* self,
+                           LIEngObject*   object);
 
 #endif
 

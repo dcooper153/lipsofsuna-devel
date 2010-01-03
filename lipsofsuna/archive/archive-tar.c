@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,13 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcTar Tar
+ * \addtogroup LIArcTar Tar
  * @{
  */
 
 #include <unistd.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "archive-tar.h"
 
 #ifdef SUPPORT_DEVICES
@@ -32,58 +32,58 @@
 #endif
 
 static void
-private_header_init (liarcTar*       self,
-                     liarcTarHeader* header);
+private_header_init (LIArcTar*       self,
+                     LIArcTarHeader* header);
 
 static void
-private_header_set_device (liarcTar*       self,
-                           liarcTarHeader* header,
+private_header_set_device (LIArcTar*       self,
+                           LIArcTarHeader* header,
                            dev_t           dev);
 
 static void
-private_header_set_link (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_link (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          const char*     name);
 
 static void
-private_header_set_name (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_name (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          const char*     name);
 
 static void
-private_header_set_owner (liarcTar*      self,
-                          liarcTarHeader* header,
+private_header_set_owner (LIArcTar*      self,
+                          LIArcTarHeader* header,
                           int             uid,
                           int             gid);
 
 static void
-private_header_set_perm (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_perm (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          int             perm);
 
 static void
-private_header_set_type (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_type (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          char            type,
                          size_t          size);
 
 static void
-private_header_set_sum (liarcTar*       self,
-                        liarcTarHeader* header);
+private_header_set_sum (LIArcTar*       self,
+                        LIArcTarHeader* header);
 
 static void
-private_header_set_time (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_time (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          time_t          time);
 
 /*****************************************************************************/
 
-liarcTar*
-liarc_tar_new (liarcWriter* writer)
+LIArcTar*
+liarc_tar_new (LIArcWriter* writer)
 {
-	liarcTar* self;
+	LIArcTar* self;
 
-	self = lisys_calloc (1, sizeof (liarcTar));
+	self = lisys_calloc (1, sizeof (LIArcTar));
 	if (self == NULL)
 		return NULL;
 	self->writer = writer;
@@ -92,19 +92,19 @@ liarc_tar_new (liarcWriter* writer)
 }
 
 void
-liarc_tar_free (liarcTar* self)
+liarc_tar_free (LIArcTar* self)
 {
 	lisys_free (self);
 }
 
 int
-liarc_tar_write_data (liarcTar*   self,
+liarc_tar_write_data (LIArcTar*   self,
                       const char* name,
                       const void* data,
                       int         length)
 {
 	char block[512];
-	liarcTarHeader header;
+	LIArcTarHeader header;
 
 	/* Write header. */
 	private_header_init (self, &header);
@@ -130,10 +130,10 @@ liarc_tar_write_data (liarcTar*   self,
 }
 
 int
-liarc_tar_write_directory (liarcTar*   self,
+liarc_tar_write_directory (LIArcTar*   self,
                            const char* name)
 {
-	liarcTarHeader header;
+	LIArcTarHeader header;
 
 	private_header_init (self, &header);
 	private_header_set_type (self, &header, LIARC_TAR_DIRECTORY, 0);
@@ -148,7 +148,7 @@ liarc_tar_write_directory (liarcTar*   self,
 }
 
 int
-liarc_tar_write_end (liarcTar* self)
+liarc_tar_write_end (LIArcTar* self)
 {
 	char pad[1024];
 
@@ -157,7 +157,7 @@ liarc_tar_write_end (liarcTar* self)
 }
 
 int
-liarc_tar_write_file (liarcTar*   self,
+liarc_tar_write_file (LIArcTar*   self,
                       const char* src,
                       const char* dst)
 {
@@ -167,8 +167,8 @@ liarc_tar_write_file (liarcTar*   self,
 	char type;
 	char block[512];
 	char* link = NULL;
-	lisysStat st;
-	liarcTarHeader header;
+	LISysStat st;
+	LIArcTarHeader header;
 
 	/* FIXME */
 	int user = 0;
@@ -268,10 +268,10 @@ liarc_tar_write_file (liarcTar*   self,
 /*****************************************************************************/
 
 static void
-private_header_init (liarcTar*       self,
-                     liarcTarHeader* header)
+private_header_init (LIArcTar*       self,
+                     LIArcTarHeader* header)
 {
-	memset (header, 0, sizeof (liarcTarHeader));
+	memset (header, 0, sizeof (LIArcTarHeader));
 	snprintf (header->mode, 8, "%07o", (unsigned int)(0660));
 	//snprintf (header->uid, 8, "%07o", (unsigned int)(0));
 	//snprintf (header->gid, 8, "%07o", (unsigned int)(0));
@@ -283,8 +283,8 @@ private_header_init (liarcTar*       self,
 }
 
 static void
-private_header_set_device (liarcTar*       self,
-                           liarcTarHeader* header,
+private_header_set_device (LIArcTar*       self,
+                           LIArcTarHeader* header,
                            dev_t           dev)
 {
 #ifdef SUPPORT_DEVICES
@@ -294,16 +294,16 @@ private_header_set_device (liarcTar*       self,
 }
 
 static void
-private_header_set_link (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_link (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          const char*     name)
 {
 	strncpy (header->linkname, name, 99);
 }
 
 static void
-private_header_set_name (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_name (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          const char*     name)
 {
 	size_t len;
@@ -334,8 +334,8 @@ private_header_set_name (liarcTar*       self,
 }
 
 static void
-private_header_set_owner (liarcTar*       self,
-                          liarcTarHeader* header,
+private_header_set_owner (LIArcTar*       self,
+                          LIArcTarHeader* header,
                           int             uid,
                           int             gid)
 {
@@ -359,16 +359,16 @@ private_header_set_owner (liarcTar*       self,
 }
 
 static void
-private_header_set_perm (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_perm (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          int             perm)
 {
 	snprintf (header->mode, 8, "%07o", (unsigned int) perm);
 }
 
 static void
-private_header_set_type (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_type (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          char            type,
                          size_t          size)
 {
@@ -379,8 +379,8 @@ private_header_set_type (liarcTar*       self,
 }
 
 static void
-private_header_set_sum (liarcTar*       self,
-                        liarcTarHeader* header)
+private_header_set_sum (LIArcTar*       self,
+                        LIArcTarHeader* header)
 {
 	int i;
 	int sum = 0;
@@ -391,8 +391,8 @@ private_header_set_sum (liarcTar*       self,
 }
 
 static void
-private_header_set_time (liarcTar*       self,
-                         liarcTarHeader* header,
+private_header_set_time (LIArcTar*       self,
+                         LIArcTarHeader* header,
                          time_t          time)
 {
 	snprintf (header->mtime, 12, "%011lo", time);

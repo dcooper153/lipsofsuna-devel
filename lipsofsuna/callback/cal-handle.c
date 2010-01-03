@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,33 +18,33 @@
 /**
  * \addtogroup lical Callback
  * @{
- * \addtogroup licalHandle Handle
+ * \addtogroup LICalHandle Handle
  * @{
  */
 
 #include "cal-callbacks.h"
 #include "cal-handle.h"
 
-typedef struct _licalCalladdr licalCalladdr;
-struct _licalCalladdr
+typedef struct _LICalCalladdr LICalCalladdr;
+struct _LICalCalladdr
 {
 	void* object;
 	char type[32];
 };
 
-typedef struct _licalCalltype licalCalltype;
-struct _licalCalltype
+typedef struct _LICalCalltype LICalCalltype;
+struct _LICalCalltype
 {
-	licalCallfunc* funcs;
+	LICalCallfunc* funcs;
 };
 
 static void
-private_addr_type (licalCalladdr* self,
+private_addr_type (LICalCalladdr* self,
                    void*          object,
                    const char*    type);
 
 static void
-private_free_type (licalCalltype* self);
+private_free_type (LICalCalltype* self);
 
 /*****************************************************************************/
 
@@ -54,11 +54,11 @@ private_free_type (licalCalltype* self);
  * \param self Handle.
  */
 void
-lical_handle_release (licalHandle* self)
+lical_handle_release (LICalHandle* self)
 {
-	licalCalladdr addr;
-	licalCalltype* typ;
-	licalCallfunc* func;
+	LICalCalladdr addr;
+	LICalCalltype* typ;
+	LICalCallfunc* func;
 
 	if (self->func == NULL)
 		return;
@@ -92,7 +92,7 @@ lical_handle_release (licalHandle* self)
 			break;
 		}
 	}
-	memset (self, 0, sizeof (licalHandle));
+	memset (self, 0, sizeof (LICalHandle));
 }
 
 /**
@@ -102,7 +102,7 @@ lical_handle_release (licalHandle* self)
  * \param count Number of handles.
  */
 void
-lical_handle_releasev (licalHandle* self,
+lical_handle_releasev (LICalHandle* self,
                        int          count)
 {
 	int i;
@@ -114,20 +114,20 @@ lical_handle_releasev (licalHandle* self,
 /*****************************************************************************/
 
 static void
-private_addr_type (licalCalladdr* self,
+private_addr_type (LICalCalladdr* self,
                    void*          object,
                    const char*    type)
 {
-	memset (self, 0, sizeof (licalCalltype));
+	memset (self, 0, sizeof (LICalCalltype));
 	self->object = object;
 	strncpy (self->type, type, sizeof (self->type) - 1);
 }
 
 static void
-private_free_type (licalCalltype* self)
+private_free_type (LICalCalltype* self)
 {
-	licalCallfunc* func;
-	licalCallfunc* func_next;
+	LICalCallfunc* func;
+	LICalCallfunc* func_next;
 
 	for (func = self->funcs ; func != NULL ; func = func_next)
 	{

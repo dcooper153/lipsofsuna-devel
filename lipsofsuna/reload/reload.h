@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,70 +18,70 @@
 /**
  * \addtogroup lirel Reload
  * @{
- * \addtogroup lirelReload Reload
+ * \addtogroup LIRelReload Reload
  * @{
  */
 
 #ifndef __RELOAD_H__
 #define __RELOAD_H__
 
-#include <paths/lips-paths.h>
-#include <system/lips-system.h>
-#include <thread/lips-thread.h>
+#include <lipsofsuna/paths.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/thread.h>
 
-typedef struct _lirelReload lirelReload;
-struct _lirelReload
+typedef struct _LIRelReload LIRelReload;
+struct _LIRelReload
 {
 	int queued;
-	lipthPaths* paths;
-	lisysNotify* notify;
-	lithrAsyncCall* worker;
+	LIPthPaths* paths;
+	LISysNotify* notify;
+	LIThrAsyncCall* worker;
 	void (*reload_image_call)(void*, const char*);
 	void* reload_image_data;
 	void (*reload_model_call)(void*, const char*);
 	void* reload_model_data;
 };
 
-lirelReload*
-lirel_reload_new (lipthPaths* paths);
+LIRelReload*
+lirel_reload_new (LIPthPaths* paths);
 
 void
-lirel_reload_free (lirelReload* self);
+lirel_reload_free (LIRelReload* self);
 
 void
-lirel_reload_cancel (lirelReload* self);
+lirel_reload_cancel (LIRelReload* self);
 
 int
-lirel_reload_main (lirelReload* self);
+lirel_reload_main (LIRelReload* self);
 
 int
-lirel_reload_run (lirelReload* self);
+lirel_reload_run (LIRelReload* self);
 
 int
-lirel_reload_update (lirelReload* self);
+lirel_reload_update (LIRelReload* self);
 
 int
-lirel_reload_get_done (const lirelReload* self);
+lirel_reload_get_done (const LIRelReload* self);
 
 int
-lirel_reload_get_enabled (const lirelReload* self);
+lirel_reload_get_enabled (const LIRelReload* self);
 
 int
-lirel_reload_set_enabled (lirelReload* self,
+lirel_reload_set_enabled (LIRelReload* self,
                           int          value);
 
 void
-lirel_reload_set_image_callback (lirelReload* self,
+lirel_reload_set_image_callback (LIRelReload* self,
                                  void       (*call)(),
                                  void*        data);
 
 void
-lirel_reload_set_model_callback (lirelReload* self,
+lirel_reload_set_model_callback (LIRelReload* self,
                                  void       (*call)(),
                                  void*        data);
 
 float
-lirel_reload_get_progress (const lirelReload* self);
+lirel_reload_get_progress (const LIRelReload* self);
 
 /**
  * @}
@@ -90,7 +90,7 @@ lirel_reload_get_progress (const lirelReload* self);
  */
 
 int
-lirel_reload_blender (lirelReload* self,
+lirel_reload_blender (LIRelReload* self,
                       const char*  src,
                       const char*  dst);
 
@@ -101,7 +101,7 @@ lirel_reload_blender (lirelReload* self,
  */
 
 int
-lirel_reload_image (lirelReload* self,
+lirel_reload_image (LIRelReload* self,
                     const char*  src,
                     const char*  dst);
 
@@ -112,7 +112,7 @@ lirel_reload_image (lirelReload* self,
  */
 
 int
-lirel_reload_gimp (lirelReload* self,
+lirel_reload_gimp (LIRelReload* self,
                    const char*  src,
                    const char*  dst);
 

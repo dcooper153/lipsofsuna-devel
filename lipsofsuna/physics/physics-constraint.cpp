@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyConstraint Constraint
+ * \addtogroup LIPhyConstraint Constraint
  * @{
  */
 
@@ -43,16 +43,16 @@
  * \param limit_max Maximum angle in radians.
  * \return New constraint or NULL.
  */
-liphyConstraint*
-liphy_constraint_new_hinge (liphyPhysics*      physics,
-                            liphyObject*       object,
-                            const limatVector* point,
-                            const limatVector* axis,
+LIPhyConstraint*
+liphy_constraint_new_hinge (LIPhyPhysics*      physics,
+                            LIPhyObject*       object,
+                            const LIMatVector* point,
+                            const LIMatVector* axis,
                             int                limit,
                             float              limit_min,
                             float              limit_max)
 {
-	liphyConstraint* self;
+	LIPhyConstraint* self;
 	btCollisionObject* bobject;
 
 	/* Check for collision object. */
@@ -69,7 +69,7 @@ liphy_constraint_new_hinge (liphyPhysics*      physics,
 	}
 
 	/* Allocate self. */
-	self = (liphyConstraint*) lisys_calloc (1, sizeof (liphyConstraint));
+	self = (LIPhyConstraint*) lisys_calloc (1, sizeof (LIPhyConstraint));
 	if (self == NULL)
 		return NULL;
 
@@ -81,7 +81,7 @@ liphy_constraint_new_hinge (liphyPhysics*      physics,
 		constraint->setLimit (limit_min, limit_max);
 
 	/* FIXME: Why do we get divide by zeros if we don't do this? */
-	limatTransform t;
+	LIMatTransform t;
 	liphy_object_get_transform (object, &t);
 	liphy_object_set_transform (object, &t);
 
@@ -101,7 +101,7 @@ liphy_constraint_new_hinge (liphyPhysics*      physics,
 }
 
 void
-liphy_constraint_free (liphyConstraint* self)
+liphy_constraint_free (LIPhyConstraint* self)
 {
 	self->physics->dynamics->removeConstraint (self->constraint);
 	delete self->constraint;

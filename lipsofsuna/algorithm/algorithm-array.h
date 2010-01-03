@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,18 +18,18 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgArray Array
+ * \addtogroup LIAlgArray Array
  * @{
  */
 
 #ifndef __ALGORITHM_ARRAY_H__
 #define __ALGORITHM_ARRAY_H__
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 
-typedef struct _lialgArray lialgArray;
-struct _lialgArray
+typedef struct _LIAlgArray LIAlgArray;
+struct _LIAlgArray
 {
 	int count;
 	void* array;
@@ -73,7 +73,7 @@ lialg_array_append_full (void*  self,
 {
 	int num;
 	void* tmp;
-	lialgArray* array = (lialgArray*) self;
+	LIAlgArray* array = (LIAlgArray*) self;
 
 	assert (count >= 0);
 	assert (size > 0);
@@ -100,7 +100,7 @@ lialg_array_insert_full (void*  self,
 {
 	int num;
 	void* tmp;
-	lialgArray* array = (lialgArray*) self;
+	LIAlgArray* array = (LIAlgArray*) self;
 
 	assert (count >= 0);
 	assert (size > 0);
@@ -129,7 +129,7 @@ lialg_array_prepend_full (void*  self,
 {
 	int num;
 	void* tmp;
-	lialgArray* array = (lialgArray*) self;
+	LIAlgArray* array = (LIAlgArray*) self;
 
 	assert (count >= 0);
 	assert (size > 0);
@@ -156,7 +156,7 @@ lialg_array_remove_full (void*  self,
                          int    index,
                          int    count)
 {
-	lialgArray* array = (lialgArray*) self;
+	LIAlgArray* array = (LIAlgArray*) self;
 
 	assert (size > 0);
 	assert (index >= 0);
@@ -175,7 +175,7 @@ lialg_array_resize_full (void*  self,
                          int    count)
 {
 	void* tmp;
-	lialgArray* array = (lialgArray*) self;
+	LIAlgArray* array = (LIAlgArray*) self;
 
 	assert (size > 0);
 	assert (count >= 0);
@@ -194,7 +194,7 @@ lialg_array_zero_full (void*  self,
                        int    index,
                        int    count)
 {
-	lialgArray* array = (lialgArray*) self;
+	LIAlgArray* array = (LIAlgArray*) self;
 
 	assert (size > 0);
 	assert (index >= 0);

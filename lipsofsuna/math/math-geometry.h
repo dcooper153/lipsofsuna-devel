@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,12 +28,12 @@
 #include "math-types.h"
 #include "math-vector.h"
 
-static inline limatVector
-limat_ellipsoid_map_point (limatVector center,
-                           limatVector size,
-                           limatVector value)
+static inline LIMatVector
+limat_ellipsoid_map_point (LIMatVector center,
+                           LIMatVector size,
+                           LIMatVector value)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = (value.x - center.x) / size.x;
 	result.y = (value.y - center.y) / size.y;
@@ -41,12 +41,12 @@ limat_ellipsoid_map_point (limatVector center,
 	return result;
 }
 
-static inline limatVector
-limat_ellipsoid_map_vector (limatVector center,
-                            limatVector size,
-                            limatVector value)
+static inline LIMatVector
+limat_ellipsoid_map_vector (LIMatVector center,
+                            LIMatVector size,
+                            LIMatVector value)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = value.x / size.x;
 	result.y = value.y / size.y;
@@ -54,12 +54,12 @@ limat_ellipsoid_map_vector (limatVector center,
 	return result;
 }
 
-static inline limatVector
-limat_ellipsoid_unmap_point (limatVector center,
-                             limatVector size,
-                             limatVector value)
+static inline LIMatVector
+limat_ellipsoid_unmap_point (LIMatVector center,
+                             LIMatVector size,
+                             LIMatVector value)
 {
-	limatVector result;
+	LIMatVector result;
 
 /*
 	result.x = (value.x + center.x) * size.x;
@@ -72,12 +72,12 @@ limat_ellipsoid_unmap_point (limatVector center,
 	return result;
 }
 
-static inline limatVector
-limat_ellipsoid_unmap_vector (limatVector center,
-                              limatVector size,
-                              limatVector value)
+static inline LIMatVector
+limat_ellipsoid_unmap_vector (LIMatVector center,
+                              LIMatVector size,
+                              LIMatVector value)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = value.x * size.x;
 	result.y = value.y * size.y;
@@ -95,21 +95,21 @@ limat_ellipsoid_unmap_vector (limatVector center,
  * @{
  */
 
-static inline limatVector
-limat_nearest_plane_to_origin (limatPlane plane)
+static inline LIMatVector
+limat_nearest_plane_to_origin (LIMatPlane plane)
 {
-	limatVector n;
+	LIMatVector n;
 
 	n = limat_vector_init (plane.x, plane.y, plane.z);
 	return limat_vector_multiply (n, plane.w);
 }
 
-static inline limatVector
-limat_nearest_plane_to_point (limatPlane  plane,
-                              limatVector p)
+static inline LIMatVector
+limat_nearest_plane_to_point (LIMatPlane  plane,
+                              LIMatVector p)
 {
 	float d;
-	limatVector n;
+	LIMatVector n;
 
 	/* FIXME: Unsure. */
 	n = limat_vector_init (plane.x, plane.y, plane.z);
@@ -117,12 +117,12 @@ limat_nearest_plane_to_point (limatPlane  plane,
 	return limat_vector_multiply (n, d);
 }
 
-static inline limatVector
-limat_nearest_segment_to_origin (limatVector p0,
-                                 limatVector p1)
+static inline LIMatVector
+limat_nearest_segment_to_origin (LIMatVector p0,
+                                 LIMatVector p1)
 {
 	float t;
-	limatVector v;
+	LIMatVector v;
 
 	v = limat_vector_subtract (p1, p0);
 	t = limat_vector_dot (p0, v);
@@ -131,13 +131,13 @@ limat_nearest_segment_to_origin (limatVector p0,
 	return limat_vector_add (p0, limat_vector_multiply (v, t));
 }
 
-static inline limatVector
-limat_nearest_segment_to_point (limatVector p0,
-                                limatVector p1,
-                                limatVector p)
+static inline LIMatVector
+limat_nearest_segment_to_point (LIMatVector p0,
+                                LIMatVector p1,
+                                LIMatVector p)
 {
 	float t;
-	limatVector v;
+	LIMatVector v;
 
 	v = limat_vector_subtract (p1, p0);
 	t = limat_vector_dot (limat_vector_subtract (p0, p), v);
@@ -146,19 +146,19 @@ limat_nearest_segment_to_point (limatVector p0,
 	return limat_vector_add (p0, limat_vector_multiply (v, t));
 }
 
-static inline limatVector
-limat_nearest_triangle_to_origin (limatPlane  plane,
-                                  limatVector p0,
-                                  limatVector p1,
-                                  limatVector p2)
+static inline LIMatVector
+limat_nearest_triangle_to_origin (LIMatPlane  plane,
+                                  LIMatVector p0,
+                                  LIMatVector p1,
+                                  LIMatVector p2)
 {
 	float d0;
 	float d1;
 	float d2;
-	limatVector i;
-	limatVector i0;
-	limatVector i1;
-	limatVector i2;
+	LIMatVector i;
+	LIMatVector i0;
+	LIMatVector i1;
+	LIMatVector i2;
 
 	i = limat_nearest_plane_to_origin (plane);
 	if (limat_triangle_intersects_point (&i, &p0, &p1, &p2))
@@ -176,20 +176,20 @@ limat_nearest_triangle_to_origin (limatPlane  plane,
 	return i2;
 }
 
-static inline limatVector
-limat_nearest_triangle_to_point (limatPlane  plane,
-                                 limatVector p0,
-                                 limatVector p1,
-                                 limatVector p2,
-                                 limatVector p)
+static inline LIMatVector
+limat_nearest_triangle_to_point (LIMatPlane  plane,
+                                 LIMatVector p0,
+                                 LIMatVector p1,
+                                 LIMatVector p2,
+                                 LIMatVector p)
 {
 	float d0;
 	float d1;
 	float d2;
-	limatVector i;
-	limatVector i0;
-	limatVector i1;
-	limatVector i2;
+	LIMatVector i;
+	LIMatVector i0;
+	LIMatVector i1;
+	LIMatVector i2;
 
 	i = limat_nearest_plane_to_point (plane, p);
 	if (limat_triangle_intersects_point (&i, &p0, &p1, &p2))
@@ -210,15 +210,15 @@ limat_nearest_triangle_to_point (limatPlane  plane,
 	return limat_vector_add (i2, p);
 }
 
-static inline limatVector
-limat_nearest_triangle_to_ellipsoid (limatPlane  plane,
-                                     limatVector p0,
-                                     limatVector p1,
-                                     limatVector p2,
-                                     limatVector center,
-                                     limatVector size)
+static inline LIMatVector
+limat_nearest_triangle_to_ellipsoid (LIMatPlane  plane,
+                                     LIMatVector p0,
+                                     LIMatVector p1,
+                                     LIMatVector p2,
+                                     LIMatVector center,
+                                     LIMatVector size)
 {
-	limatVector p;
+	LIMatVector p;
 
 	p0 = limat_vector_init (p0.x / size.x, p0.y / size.y, p0.z / size.z);
 	p1 = limat_vector_init (p1.x / size.x, p1.y / size.y, p1.z / size.z);
@@ -230,18 +230,18 @@ limat_nearest_triangle_to_ellipsoid (limatPlane  plane,
 	return p;
 }
 
-static inline limatVector
-limat_clamp_point_to_triangle (limatVector p,
-                               limatVector p0,
-                               limatVector p1,
-                               limatVector p2)
+static inline LIMatVector
+limat_clamp_point_to_triangle (LIMatVector p,
+                               LIMatVector p0,
+                               LIMatVector p1,
+                               LIMatVector p2)
 {
 	float d0;
 	float d1;
 	float d2;
-	limatVector i0;
-	limatVector i1;
-	limatVector i2;
+	LIMatVector i0;
+	LIMatVector i1;
+	LIMatVector i2;
 
 	p0 = limat_vector_subtract (p0, p);
 	p1 = limat_vector_subtract (p1, p);

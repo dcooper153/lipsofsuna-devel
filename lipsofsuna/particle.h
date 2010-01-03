@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,23 +15,14 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_SYSTEM_H__
-#define __LIPS_SYSTEM_H__
+#ifndef __LIPS_PARTICLE_H__
+#define __LIPS_PARTICLE_H__
 
-#include "system.h"
-#include "system-compiler.h"
-#include "system-directory.h"
-#include "system-endian.h"
-#include "system-error.h"
-#include "system-execute.h"
-#include "system-file.h"
-#include "system-memory.h"
-#include "system-misc.h"
-#include "system-module.h"
-#include "system-notify.h"
-#include "system-path.h"
-#include "system-relative.h"
-#include "system-types.h"
-#include "system-user.h"
+#include "particle/particle-line.h"
+#include "particle/particle-manager.h"
+#include "particle/particle-point.h"
 
 #endif
+
+/** @} */
+/** @} */

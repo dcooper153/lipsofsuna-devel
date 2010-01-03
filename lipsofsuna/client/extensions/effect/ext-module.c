@@ -24,34 +24,34 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-module.h"
 
-licliExtensionInfo liextInfo =
+LICliExtensionInfo liextInfo =
 {
 	LICLI_EXTENSION_VERSION, "Effect",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
-	liscrClass* clss;
+	LIExtModule* self;
+	LIScrClass* clss;
 
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
 
-	clss = liscr_script_create_class (client->script, "Effect", liextEffectScript, self);
+	clss = liscr_script_create_class (client->script, "Effect", liext_script_effect, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	/* FIXME: Remove the class here. */
 	lisys_free (self);

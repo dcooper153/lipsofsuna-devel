@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgAstar Astar
+ * \addtogroup LIAlgAstar Astar
  * @{
  */
 
@@ -28,54 +28,54 @@
 #include "algorithm-ptrdic.h"
 #include "algorithm-priority-queue.h"
 
-typedef float (*lialgAstarCost)(void* world, void* object, void* start, void* end);
-typedef float (*lialgAstarHeuristic)(void* world, void* object, void* start, void* end);
-typedef int (*lialgAstarPassable)(void* world, void* object, void* start, void* end);
-typedef void* (*lialgAstarSuccessor)(void* world, void* object, void* node, int index);
+typedef float (*LIAlgAstarCost)(void* world, void* object, void* start, void* end);
+typedef float (*LIAlgAstarHeuristic)(void* world, void* object, void* start, void* end);
+typedef int (*LIAlgAstarPassable)(void* world, void* object, void* start, void* end);
+typedef void* (*LIAlgAstarSuccessor)(void* world, void* object, void* node, int index);
 
-typedef struct _lialgAstar lialgAstar;
-struct _lialgAstar
+typedef struct _LIAlgAstar LIAlgAstar;
+struct _LIAlgAstar
 {
 	void* world;
 	void* object;
 	void* target;
-	lialgPtrdic* open;
-	lialgPtrdic* closed;
-	lialgPriorityQueue* priority;
+	LIAlgPtrdic* open;
+	LIAlgPtrdic* closed;
+	LIAlgPriorityQueue* priority;
 	struct
 	{
-		lialgAstarCost cost;
-		lialgAstarHeuristic heuristic;
-		lialgAstarPassable passable;
-		lialgAstarSuccessor successor;
+		LIAlgAstarCost cost;
+		LIAlgAstarHeuristic heuristic;
+		LIAlgAstarPassable passable;
+		LIAlgAstarSuccessor successor;
 	} calls;
 };
 
-typedef struct _lialgAstarResult lialgAstarResult;
-struct _lialgAstarResult
+typedef struct _LIAlgAstarResult LIAlgAstarResult;
+struct _LIAlgAstarResult
 {
 	int length;
 	void** nodes;
 };
 
-lialgAstar*
-lialg_astar_new (lialgAstarCost      cost,
-                 lialgAstarHeuristic heuristic,
-                 lialgAstarPassable  passable,
-                 lialgAstarSuccessor successor);
+LIAlgAstar*
+lialg_astar_new (LIAlgAstarCost      cost,
+                 LIAlgAstarHeuristic heuristic,
+                 LIAlgAstarPassable  passable,
+                 LIAlgAstarSuccessor successor);
 
 void
-lialg_astar_free (lialgAstar* self);
+lialg_astar_free (LIAlgAstar* self);
 
-lialgAstarResult*
-lialg_astar_solve (lialgAstar* self,
+LIAlgAstarResult*
+lialg_astar_solve (LIAlgAstar* self,
                    void*       world,
                    void*       object,
                    void*       start,
                    void*       end);
 
 void
-lialg_astar_result_free (lialgAstarResult* self);
+lialg_astar_result_free (LIAlgAstarResult* self);
 
 #endif
 

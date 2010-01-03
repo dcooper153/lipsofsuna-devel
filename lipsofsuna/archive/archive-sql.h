@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcSql Sql
+ * \addtogroup LIArcSql Sql
  * @{
  */
 
@@ -35,19 +35,19 @@ enum
 	LIARC_SQL_TEXT
 };
 
-typedef sqlite3 liarcSql;
+typedef sqlite3 LIArcSql;
 
 int
-liarc_sql_delete (liarcSql*   self,
+liarc_sql_delete (LIArcSql*   self,
                   const char* table);
 
 int
-liarc_sql_insert (liarcSql*   self,
+liarc_sql_insert (LIArcSql*   self,
                   const char* table,
                               ...);
 
 int
-liarc_sql_replace (liarcSql*   self,
+liarc_sql_replace (LIArcSql*   self,
                    const char* table,
                                ...);
 

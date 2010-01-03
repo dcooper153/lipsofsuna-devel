@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,11 +22,11 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 static void
-private_detach_child (liwdgWidget* parent,
-                      liwdgWidget* child);
+private_detach_child (LIWdgWidget* parent,
+                      LIWdgWidget* child);
 
 /*****************************************************************************/
 
@@ -53,13 +53,13 @@ private_detach_child (liwdgWidget* parent,
  * -- @param args Arguments.
  * function Widget.popup(self, args)
  */
-static void Widget_popup (liscrArgs* args)
+static void Widget_popup (LIScrArgs* args)
 {
 	const char* dir;
-	liwdgRect rect;
-	liwdgSize screen;
-	liwdgSize size;
-	liwdgWidget* widget;
+	LIWdgRect rect;
+	LIWdgSize screen;
+	LIWdgSize size;
+	LIWdgWidget* widget;
 
 	widget = args->self;
 	if (widget->state != LIWDG_WIDGET_STATE_DETACHED || widget->parent != NULL)
@@ -103,9 +103,9 @@ static void Widget_popup (liscrArgs* args)
  * -- @param args Arguments.
  * function Widget.set_request(self, args)
  */
-static void Widget_set_request (liscrArgs* args)
+static void Widget_set_request (LIScrArgs* args)
 {
-	liwdgSize size = { -1, -1 };
+	LIWdgSize size = { -1, -1 };
 
 	liscr_args_gets_int (args, "width", &size.width);
 	liscr_args_gets_int (args, "height", &size.height);
@@ -118,11 +118,11 @@ static void Widget_set_request (liscrArgs* args)
  * -- @name Widget.style
  * -- @class table
  */
-static void Widget_getter_style (liscrArgs* args)
+static void Widget_getter_style (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, LIWDG_WIDGET (args->self)->style_name);
 }
-static void Widget_setter_style (liscrArgs* args)
+static void Widget_setter_style (LIScrArgs* args)
 {
 	const char* value;
 
@@ -138,11 +138,11 @@ static void Widget_setter_style (liscrArgs* args)
  * -- @name Widget.visible
  * -- @class table
  */
-static void Widget_getter_visible (liscrArgs* args)
+static void Widget_getter_visible (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_visible (args->self));
 }
-static void Widget_setter_visible (liscrArgs* args)
+static void Widget_setter_visible (LIScrArgs* args)
 {
 	int value;
 
@@ -160,9 +160,9 @@ static void Widget_setter_visible (liscrArgs* args)
  * -- @name Widget.x
  * -- @class table
  */
-static void Widget_getter_x (liscrArgs* args)
+static void Widget_getter_x (LIScrArgs* args)
 {
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	liwdg_widget_get_allocation (args->self, &rect);
 	liscr_args_seti_float (args, rect.x);
@@ -174,9 +174,9 @@ static void Widget_getter_x (liscrArgs* args)
  * -- @name Widget.y
  * -- @class table
  */
-static void Widget_getter_y (liscrArgs* args)
+static void Widget_getter_y (LIScrArgs* args)
 {
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	liwdg_widget_get_allocation (args->self, &rect);
 	liscr_args_seti_float (args, rect.y);
@@ -195,8 +195,8 @@ static void Widget_getter_y (liscrArgs* args)
  * \param data Script data.
  */
 void
-licli_script_widget_free (liwdgWidget* self,
-                          liscrData*   data)
+licli_script_widget_free (LIWdgWidget* self,
+                          LIScrData*   data)
 {
 	licli_script_widget_detach_children (data);
 	licli_script_widget_detach (data);
@@ -212,9 +212,9 @@ licli_script_widget_free (liwdgWidget* self,
  * \param self Script widget.
  */
 void
-licli_script_widget_detach (liscrData* self)
+licli_script_widget_detach (LIScrData* self)
 {
-	liwdgWidget* widget = self->data;
+	LIWdgWidget* widget = self->data;
 
 	if (widget->parent != NULL)
 	{
@@ -235,16 +235,16 @@ licli_script_widget_detach (liscrData* self)
  * \param self Script widget.
  */
 void
-licli_script_widget_detach_children (liscrData* self)
+licli_script_widget_detach_children (LIScrData* self)
 {
-	liwdgWidget* widget = self->data;
+	LIWdgWidget* widget = self->data;
 
-	if (liwdg_widget_typeis (widget, &liwdgContainerType))
+	if (liwdg_widget_typeis (widget, &liwdg_widget_container))
 		liwdg_container_foreach_child (LIWDG_CONTAINER (widget), private_detach_child, widget);
 }
 
 void
-licliWidgetScript (liscrClass* self,
+licli_script_widget (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
@@ -260,8 +260,8 @@ licliWidgetScript (liscrClass* self,
 /*****************************************************************************/
 
 static void
-private_detach_child (liwdgWidget* parent,
-                      liwdgWidget* child)
+private_detach_child (LIWdgWidget* parent,
+                      LIWdgWidget* child)
 {
 	if (child != NULL && child->userdata != NULL)
 	{

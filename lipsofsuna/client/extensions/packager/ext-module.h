@@ -27,28 +27,28 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 #include "ext-packager.h"
 
 #define LIEXT_SCRIPT_PACKAGER "Lips.Packager"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	liextPackager* packager;
-	licliClient* client;
+	LIExtPackager* packager;
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextPackagerScript (liscrClass* self,
+liext_script_packager (LIScrClass* self,
                      void*       data);
 
 #endif

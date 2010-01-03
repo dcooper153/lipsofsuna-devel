@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,14 +15,17 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_VOXEL_H__
-#define __LIPS_VOXEL_H__
+#ifndef __LIPS_ENGINE_H__
+#define __LIPS_ENGINE_H__
 
-#include "voxel.h"
-#include "voxel-block.h"
-#include "voxel-iterator.h"
-#include "voxel-manager.h"
-#include "voxel-material.h"
-#include "voxel-sector.h"
+#include "engine/engine.h"
+#include "engine/engine-constraint.h"
+#include "engine/engine-iterator.h"
+#include "engine/engine-model.h"
+#include "engine/engine-object.h"
+#include "engine/engine-resources.h"
+#include "engine/engine-sector.h"
+#include "engine/engine-selection.h"
+#include "engine/engine-types.h"
 
 #endif

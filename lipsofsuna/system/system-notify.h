@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,15 +18,15 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysNotify Notify
+ * \addtogroup LISysNotify Notify
  * @{
  */
 
 #ifndef __SYSTEM_NOTIFY_H__
 #define __SYSTEM_NOTIFY_H__
 
-typedef int lisysNotifyFlags;
-enum _lisysNotifyFlags
+typedef int LISysNotifyFlags;
+enum _LISysNotifyFlags
 {
 	LISYS_NOTIFY_CLOSER = 0x01,
 	LISYS_NOTIFY_CLOSEW = 0x02,
@@ -37,8 +37,8 @@ enum _lisysNotifyFlags
 	LISYS_NOTIFY_ALL = 0xFF
 };
 
-typedef struct _lisysNotify lisysNotify;
-struct _lisysNotify
+typedef struct _LISysNotify LISysNotify;
+struct _LISysNotify
 {
 	int fd;
 	struct
@@ -53,30 +53,30 @@ struct _lisysNotify
 		int dir;
 		int write;
 		const char* name;
-		lisysNotifyFlags flags;
+		LISysNotifyFlags flags;
 	} event;
 };
 
-lisysNotify*
+LISysNotify*
 lisys_notify_new ();
 
 void
-lisys_notify_free (lisysNotify* self);
+lisys_notify_free (LISysNotify* self);
 
 int
-lisys_notify_add (lisysNotify*     self,
+lisys_notify_add (LISysNotify*     self,
                   const char*      path,
-                  lisysNotifyFlags flags);
+                  LISysNotifyFlags flags);
 
 void
-lisys_notify_remove (lisysNotify* self,
+lisys_notify_remove (LISysNotify* self,
                      const char*  path);
 
 int
-lisys_notify_poll (lisysNotify* self);
+lisys_notify_poll (LISysNotify* self);
 
 int
-lisys_notify_wait (lisysNotify* self);
+lisys_notify_wait (LISysNotify* self);
 
 #endif
 

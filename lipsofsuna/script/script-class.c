@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,33 +18,33 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrClass Class
+ * \addtogroup LIScrClass Class
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "script-args.h"
 #include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
 #include "script-util.h"
 
-liscrClassMemb*
-private_find_var (liscrClass* self,
+LIScrClassMemb*
+private_find_var (LIScrClass* self,
                   const char* name);
 
 static int
-private_insert_func (liscrClass*   self,
+private_insert_func (LIScrClass*   self,
                      int           member,
                      const char*   name,
-                     liscrArgsFunc func);
+                     LIScrArgsFunc func);
 
 static int
-private_insert_var (liscrClass*     self,
+private_insert_var (LIScrClass*     self,
                     int             member,
                     const char*     name,
-                    liscrArgsFunc args,
-                    liscrArgsFunc setter);
+                    LIScrArgsFunc args,
+                    LIScrArgsFunc setter);
 
 static int
 private_member_compare (const void* a,
@@ -63,8 +63,8 @@ private_string_compare (const void* a,
  * \param name Class name.
  * \return New class or NULL.
  */
-liscrClass*
-liscr_class_new (liscrScript* script,
+LIScrClass*
+liscr_class_new (LIScrScript* script,
                  const char*  name)
 {
 	return liscr_class_new_full (script, NULL, name, 1);
@@ -79,16 +79,16 @@ liscr_class_new (liscrScript* script,
  * \param global Nonzero if a global variables should be allocated as well.
  * \return New class or NULL.
  */
-liscrClass*
-liscr_class_new_full (liscrScript* script,
-                      liscrClass*  base,
+LIScrClass*
+liscr_class_new_full (LIScrScript* script,
+                      LIScrClass*  base,
                       const char*  name,
                       int          global)
 {
-	liscrClass* self;
+	LIScrClass* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liscrClass));
+	self = lisys_calloc (1, sizeof (LIScrClass));
 	if (self == NULL)
 		return NULL;
 	self->script = script;
@@ -151,7 +151,7 @@ liscr_class_new_full (liscrScript* script,
  * \param self Class.
  */
 void
-liscr_class_free (liscrClass* self)
+liscr_class_free (LIScrClass* self)
 {
 	int i;
 
@@ -195,8 +195,8 @@ liscr_class_free (liscrClass* self)
  * \param data Class userdata.
  */
 void
-liscr_class_inherit (liscrClass*    self,
-                     liscrClassInit init,
+liscr_class_inherit (LIScrClass*    self,
+                     LIScrClassInit init,
                      void*          data)
 {
 	init (self, data);
@@ -210,9 +210,9 @@ liscr_class_inherit (liscrClass*    self,
  * \param func Function pointer.
  */
 int
-liscr_class_insert_cfunc (liscrClass*   self,
+liscr_class_insert_cfunc (LIScrClass*   self,
                           const char*   name,
-                          liscrArgsFunc func)
+                          LIScrArgsFunc func)
 {
 	return private_insert_func (self, 0, name, func);
 }
@@ -227,10 +227,10 @@ liscr_class_insert_cfunc (liscrClass*   self,
  * \return Nonzero on success.
  */
 int
-liscr_class_insert_cvar (liscrClass*   self,
+liscr_class_insert_cvar (LIScrClass*   self,
                          const char*   name,
-                         liscrArgsFunc getter,
-                         liscrArgsFunc setter)
+                         LIScrArgsFunc getter,
+                         LIScrArgsFunc setter)
 {
 	return private_insert_var (self, 0, name, getter, setter);
 }
@@ -243,7 +243,7 @@ liscr_class_insert_cvar (liscrClass*   self,
  * \param value Integer value.
  */
 void
-liscr_class_insert_enum (liscrClass* self,
+liscr_class_insert_enum (LIScrClass* self,
                          const char* name,
                          int         value)
 {
@@ -262,7 +262,7 @@ liscr_class_insert_enum (liscrClass* self,
  * \param value Function pointer.
  */
 void
-liscr_class_insert_func (liscrClass*  self,
+liscr_class_insert_func (LIScrClass*  self,
                          const char*  name,
                          liscrMarshal value)
 {
@@ -282,7 +282,7 @@ liscr_class_insert_func (liscrClass*  self,
  * \return Nonzero on success.
  */
 int
-liscr_class_insert_interface (liscrClass* self,
+liscr_class_insert_interface (LIScrClass* self,
                               const char* name)
 {
 	char** tmp;
@@ -310,9 +310,9 @@ liscr_class_insert_interface (liscrClass* self,
  * \param func Function pointer.
  */
 int
-liscr_class_insert_mfunc (liscrClass*   self,
+liscr_class_insert_mfunc (LIScrClass*   self,
                           const char*   name,
-                          liscrArgsFunc func)
+                          LIScrArgsFunc func)
 {
 	return private_insert_func (self, 1, name, func);
 }
@@ -327,10 +327,10 @@ liscr_class_insert_mfunc (liscrClass*   self,
  * \return Nonzero on success.
  */
 int
-liscr_class_insert_mvar (liscrClass*  self,
+liscr_class_insert_mvar (LIScrClass*  self,
                         const char*   name,
-                        liscrArgsFunc getter,
-                        liscrArgsFunc setter)
+                        LIScrArgsFunc getter,
+                        LIScrArgsFunc setter)
 {
 	return private_insert_var (self, 1, name, getter, setter);
 }
@@ -343,7 +343,7 @@ liscr_class_insert_mvar (liscrClass*  self,
  * \return Nonzero if implements.
  */
 int
-liscr_class_get_interface (const liscrClass* self,
+liscr_class_get_interface (const LIScrClass* self,
                            const char*       name)
 {
 	char* ret;
@@ -372,7 +372,7 @@ liscr_class_get_interface (const liscrClass* self,
  * \return Name string.
  */
 const char*
-liscr_class_get_name (const liscrClass* self)
+liscr_class_get_name (const LIScrClass* self)
 {
 	return self->name;
 }
@@ -385,7 +385,7 @@ liscr_class_get_name (const liscrClass* self)
  * \return User pointer.
  */
 void*
-liscr_class_get_userdata (liscrClass* self,
+liscr_class_get_userdata (LIScrClass* self,
                           const char* key)
 {
 	return lialg_strdic_find (self->userdata, key);
@@ -399,7 +399,7 @@ liscr_class_get_userdata (liscrClass* self,
  * \param value Value to assign to the key.
  */
 void
-liscr_class_set_userdata (liscrClass* self,
+liscr_class_set_userdata (LIScrClass* self,
                           const char* key,
                           void*       value)
 {
@@ -417,8 +417,8 @@ liscr_class_set_userdata (liscrClass* self,
 int
 liscr_class_default___call (lua_State* lua)
 {
-	liscrClass* clss;
-	liscrClass* clss1;
+	LIScrClass* clss;
+	LIScrClass* clss1;
 
 	/* Get class data. */
 	clss = liscr_isanyclass (lua, 1);
@@ -449,7 +449,7 @@ liscr_class_default___call (lua_State* lua)
 int
 liscr_class_default___gc (lua_State* lua)
 {
-	liscrData* self;
+	LIScrData* self;
 
 	self = liscr_checkanydata (lua, 1);
 	liscr_data_free (self);
@@ -466,13 +466,13 @@ liscr_class_default___gc (lua_State* lua)
 int
 liscr_class_default___index (lua_State* lua)
 {
-	liscrClass* ptr;
-	liscrClass* clss;
-	liscrClass* clss1;
-	liscrClassMemb* func;
-	liscrData* self;
-	liscrArgs args;
-	liscrScript* script;
+	LIScrClass* ptr;
+	LIScrClass* clss;
+	LIScrClass* clss1;
+	LIScrClassMemb* func;
+	LIScrData* self;
+	LIScrArgs args;
+	LIScrScript* script;
 
 	/* Get class data. */
 	script = liscr_script (lua);
@@ -552,12 +552,12 @@ liscr_class_default___index (lua_State* lua)
 int
 liscr_class_default___newindex (lua_State* lua)
 {
-	liscrClass* clss;
-	liscrClass* clss1;
-	liscrClassMemb* func;
-	liscrData* self;
-	liscrArgs args;
-	liscrScript* script;
+	LIScrClass* clss;
+	LIScrClass* clss1;
+	LIScrClassMemb* func;
+	LIScrData* self;
+	LIScrArgs args;
+	LIScrScript* script;
 
 	/* Get class data. */
 	script = liscr_script (lua);
@@ -619,13 +619,13 @@ liscr_class_default___newindex (lua_State* lua)
 
 /*****************************************************************************/
 
-liscrClassMemb*
-private_find_var (liscrClass* self,
+LIScrClassMemb*
+private_find_var (LIScrClass* self,
                   const char* name)
 {
-	liscrClass* ptr;
-	liscrClassMemb tmp;
-	liscrClassMemb* func;
+	LIScrClass* ptr;
+	LIScrClassMemb tmp;
+	LIScrClassMemb* func;
 
 	tmp.name = (char*) name;
 	for (ptr = self ; ptr != NULL ; ptr = ptr->base)
@@ -634,10 +634,10 @@ private_find_var (liscrClass* self,
 		{
 			ptr->flags &= ~LISCR_CLASS_FLAG_SORT_VARS;
 			qsort (ptr->vars.array, ptr->vars.count,
-				sizeof (liscrClassMemb), private_member_compare);
+				sizeof (LIScrClassMemb), private_member_compare);
 		}
 		func = bsearch (&tmp, ptr->vars.array, ptr->vars.count,
-			sizeof (liscrClassMemb), private_member_compare);
+			sizeof (LIScrClassMemb), private_member_compare);
 		if (func != NULL)
 			return func;
 	}
@@ -646,10 +646,10 @@ private_find_var (liscrClass* self,
 }
 
 static int
-private_insert_func (liscrClass*   self,
+private_insert_func (LIScrClass*   self,
                      int           member,
                      const char*   name,
-                     liscrArgsFunc func)
+                     LIScrArgsFunc func)
 {
 	luaL_getmetatable (self->script->lua, self->meta);
 	lua_pushstring (self->script->lua, name);
@@ -666,14 +666,14 @@ private_insert_func (liscrClass*   self,
 }
 
 static int
-private_insert_var (liscrClass*   self,
+private_insert_var (LIScrClass*   self,
                     int           member,
                     const char*   name,
-                    liscrArgsFunc getter,
-                    liscrArgsFunc setter)
+                    LIScrArgsFunc getter,
+                    LIScrArgsFunc setter)
 {
 	int i;
-	liscrClassMemb* tmp;
+	LIScrClassMemb* tmp;
 
 	/* Overwrite existing. */
 	for (i = 0 ; i < self->vars.count ; i++)
@@ -689,7 +689,7 @@ private_insert_var (liscrClass*   self,
 	}
 
 	/* Create new. */
-	tmp = lisys_realloc (self->vars.array, (self->vars.count + 1) * sizeof (liscrClassMemb));
+	tmp = lisys_realloc (self->vars.array, (self->vars.count + 1) * sizeof (LIScrClassMemb));
 	if (tmp == NULL)
 		return 0;
 	self->vars.array = tmp;
@@ -710,8 +710,8 @@ static int
 private_member_compare (const void* a,
                         const void* b)
 {
-	const liscrClassMemb* aa = a;
-	const liscrClassMemb* bb = b;
+	const LIScrClassMemb* aa = a;
+	const LIScrClassMemb* bb = b;
 
 	return strcmp (aa->name, bb->name);
 }

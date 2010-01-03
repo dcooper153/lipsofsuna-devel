@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,46 +18,46 @@
 /**
  * \addtogroup lisnd Sound 
  * @{
- * \addtogroup lisndManager Manager 
+ * \addtogroup LISndManager Manager 
  * @{
  */
 
 #ifndef __SOUND_MANAGER_H__
 #define __SOUND_MANAGER_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "sound-sample.h"
 #include "sound-system.h"
 
-typedef struct _lisndManager lisndManager;
-struct _lisndManager
+typedef struct _LISndManager LISndManager;
+struct _LISndManager
 {
-	lisndSystem* system;
-	lialgStrdic* samples;
+	LISndSystem* system;
+	LIAlgStrdic* samples;
 };
 
-lisndManager*
-lisnd_manager_new (lisndSystem* system);
+LISndManager*
+lisnd_manager_new (LISndSystem* system);
 
 void
-lisnd_manager_free (lisndManager* self);
+lisnd_manager_free (LISndManager* self);
 
 void
-lisnd_manager_clear (lisndManager* self);
+lisnd_manager_clear (LISndManager* self);
 
 void
-lisnd_manager_set_listener (lisndManager*      self,
-                            const limatVector* pos,
-                            const limatVector* vel,
-                            const limatVector* dir,
-                            const limatVector* up);
+lisnd_manager_set_listener (LISndManager*      self,
+                            const LIMatVector* pos,
+                            const LIMatVector* vel,
+                            const LIMatVector* dir,
+                            const LIMatVector* up);
 
-lisndSample*
-lisnd_manager_get_sample (lisndManager* self,
+LISndSample*
+lisnd_manager_get_sample (LISndManager* self,
                           const char*   name);
 
 int
-lisnd_manager_set_sample (lisndManager* self,
+lisnd_manager_set_sample (LISndManager* self,
                           const char*   name,
                           const char*   path);
 

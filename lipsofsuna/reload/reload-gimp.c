@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,9 +22,9 @@
  * @{
  */
 
-#include <image/lips-image.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "reload.h"
 
 /**
@@ -36,7 +36,7 @@
  * \return Nonzero of success.
  */
 int
-lirel_reload_gimp (lirelReload* self,
+lirel_reload_gimp (LIRelReload* self,
                    const char*  src,
                    const char*  dst)
 {
@@ -45,7 +45,7 @@ lirel_reload_gimp (lirelReload* self,
 	int len1;
 	char* tmp;
 	char* script;
-	liimgImage* image;
+	LIImgImage* image;
 	const char* format =
 		"(let* ((image (car (gimp-file-load 1 \"%s\" \"%s\")))"
 		"(drawable (car (gimp-image-merge-visible-layers image 1))))"

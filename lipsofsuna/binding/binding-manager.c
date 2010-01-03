@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup libnd Binding
  * @{
- * \addtogroup libndManager Manager
+ * \addtogroup LIBndManager Manager
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "binding-manager.h"
 
 /**
@@ -31,12 +31,12 @@
  *
  * \return New binding manager or NULL.
  */
-libndManager*
+LIBndManager*
 libnd_manager_new ()
 {
-	libndManager* self;
+	LIBndManager* self;
 
-	self = lisys_calloc (1, sizeof (libndManager));
+	self = lisys_calloc (1, sizeof (LIBndManager));
 	if (self == NULL)
 		return NULL;
 	return self;
@@ -48,12 +48,12 @@ libnd_manager_new ()
  * \param self Binding manager.
  */
 void
-libnd_manager_free (libndManager* self)
+libnd_manager_free (LIBndManager* self)
 {
-	libndAction* action;
-	libndAction* action_next;
-	libndBinding* binding;
-	libndBinding* binding_next;
+	LIBndAction* action;
+	LIBndAction* action_next;
+	LIBndBinding* binding;
+	LIBndBinding* binding_next;
 
 	for (action = self->actions ; action != NULL ; action = action_next)
 	{
@@ -79,14 +79,14 @@ libnd_manager_free (libndManager* self)
  * \return Nonzero if an action was executed.
  */
 int
-libnd_manager_event (libndManager* self,
-                     libndType     type,
+libnd_manager_event (LIBndManager* self,
+                     LIBndType     type,
                      uint32_t      code,
                      uint32_t      mods,
                      float         value)
 {
-	libndBinding* binding;
-	libndBinding* binding_best = NULL;
+	LIBndBinding* binding;
+	LIBndBinding* binding_best = NULL;
 
 	for (binding = self->bindings ; binding != NULL ; binding = binding->next)
 	{
@@ -119,11 +119,11 @@ libnd_manager_event (libndManager* self,
  * \param id Action identifier.
  * \return Action owned by the manager or NULL.
  */
-libndAction*
-libnd_manager_find_action (libndManager* self,
+LIBndAction*
+libnd_manager_find_action (LIBndManager* self,
                            const char*   id)
 {
-	libndAction* action;
+	LIBndAction* action;
 
 	for (action = self->actions ; action != NULL ; action = action->next)
 	{

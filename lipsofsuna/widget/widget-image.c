@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgImage Image
+ * \addtogroup LIWdgImage Image
  * @{
  */
 
@@ -26,43 +26,43 @@
 #include "widget-manager.h"
 
 static int
-private_init (liwdgImage*  self,
-              liwdgManager* manager);
+private_init (LIWdgImage*  self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgImage* self);
+private_free (LIWdgImage* self);
 
 static int
-private_event (liwdgImage* self,
+private_event (LIWdgImage* self,
                liwdgEvent*  event);
 
 static void
-private_rebuild (liwdgImage* self);
+private_rebuild (LIWdgImage* self);
 
-const liwdgClass liwdgImageType =
+const LIWdgClass liwdg_widget_image =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Image", sizeof (liwdgImage),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Image", sizeof (LIWdgImage),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_image_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_image_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgImageType);
+	return liwdg_widget_new (manager, &liwdg_widget_image);
 }
 
 const char*
-liwdg_image_get_image (liwdgImage* self)
+liwdg_image_get_image (LIWdgImage* self)
 {
 	return self->image;
 }
 
 int
-liwdg_image_set_image (liwdgImage* self,
+liwdg_image_set_image (LIWdgImage* self,
                        const char* value)
 {
 	char* tmp;
@@ -81,8 +81,8 @@ liwdg_image_set_image (liwdgImage* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgImage*   self,
-              liwdgManager* manager)
+private_init (LIWdgImage*   self,
+              LIWdgManager* manager)
 {
 	self->image = lisys_calloc (1, 1);
 	if (self->image == NULL)
@@ -93,13 +93,13 @@ private_init (liwdgImage*   self,
 }
 
 static void
-private_free (liwdgImage* self)
+private_free (LIWdgImage* self)
 {
 	lisys_free (self->image);
 }
 
 static int
-private_event (liwdgImage* self,
+private_event (LIWdgImage* self,
                liwdgEvent* event)
 {
 	switch (event->type)
@@ -115,11 +115,11 @@ private_event (liwdgImage* self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgImage* self)
+private_rebuild (LIWdgImage* self)
 {
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), 1, 1);
 }

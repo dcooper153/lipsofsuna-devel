@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatRectangle Rectangle
+ * \addtogroup LIMatRectangle Rectangle
  * @{
  */
 
@@ -30,8 +30,8 @@
 /**
  * \brief A class respresenting a rectangle.
  */
-typedef struct _limatRectangle limatRectangle;
-struct _limatRectangle
+typedef struct _LIMatRectangle LIMatRectangle;
+struct _LIMatRectangle
 {
 	float x;
 	float y;
@@ -49,7 +49,7 @@ struct _limatRectangle
  * \param height An integer.
  */
 static inline void
-limat_rectangle_set (limatRectangle* self,
+limat_rectangle_set (LIMatRectangle* self,
                      int             x,
                      int             y,
                      int             width,
@@ -70,9 +70,9 @@ limat_rectangle_set (limatRectangle* self,
  * \return Nonzero if the rectangle has an area greater than zero.
  */
 static inline int
-limat_rectangle_union (limatRectangle*       self,
-                       const limatRectangle* rect0,
-                       const limatRectangle* rect1)
+limat_rectangle_union (LIMatRectangle*       self,
+                       const LIMatRectangle* rect0,
+                       const LIMatRectangle* rect1)
 {
 	float x0;
 	float y0;
@@ -100,9 +100,9 @@ limat_rectangle_union (limatRectangle*       self,
  * \return Nonzero if the rectangle has an area greater than zero.
  */
 static inline int
-limat_rectangle_intersection (limatRectangle*       self,
-                              const limatRectangle* rect0,
-                              const limatRectangle* rect1)
+limat_rectangle_intersection (LIMatRectangle*       self,
+                              const LIMatRectangle* rect0,
+                              const LIMatRectangle* rect1)
 {
 	float x0;
 	float y0;
@@ -132,7 +132,7 @@ limat_rectangle_intersection (limatRectangle*       self,
  * \return Zero if the segment was completely eliminated.
  */
 static inline int
-limat_rectangle_clip_segment (const limatRectangle* self,
+limat_rectangle_clip_segment (const LIMatRectangle* self,
                               float*                x0,
                               float*                y0,
                               float*                x1,
@@ -224,7 +224,7 @@ limat_rectangle_clip_segment (const limatRectangle* self,
  * \return Nonzero if intersects.
  */
 static inline int
-limat_rectangle_intersects_segment (const limatRectangle* self,
+limat_rectangle_intersects_segment (const LIMatRectangle* self,
                                     float                 x0,
                                     float                 y0,
                                     float                 x1,

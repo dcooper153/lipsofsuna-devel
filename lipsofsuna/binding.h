@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,10 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_CALLBACK_H__
-#define __LIPS_CALLBACK_H__
+#ifndef __LIPS_BINDING_H__
+#define __LIPS_BINDING_H__
 
-#include "cal-callbacks.h"
-#include "cal-marshal.h"
+#include "binding/binding.h"
+#include "binding/binding-action.h"
+#include "binding/binding-manager.h"
 
 #endif

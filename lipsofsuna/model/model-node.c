@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,24 +18,24 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlNode Node
+ * \addtogroup LIMdlNode Node
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "model-node.h"
 
 static void
-private_calculate_world_transform (limdlNode* self);
+private_calculate_world_transform (LIMdlNode* self);
 
 /*****************************************************************************/
 
-limdlNode*
-limdl_node_new (limdlModel* model)
+LIMdlNode*
+limdl_node_new (LIMdlModel* model)
 {
-	limdlNode* self;
+	LIMdlNode* self;
 
-	self = lisys_calloc (1, sizeof (limdlNode));
+	self = lisys_calloc (1, sizeof (LIMdlNode));
 	if (self == NULL)
 		return NULL;
 	self->model = model;
@@ -46,13 +46,13 @@ limdl_node_new (limdlModel* model)
 	return self;
 }
 
-limdlNode*
-limdl_node_copy (const limdlNode* node)
+LIMdlNode*
+limdl_node_copy (const LIMdlNode* node)
 {
 	int i;
-	limdlNode* self;
+	LIMdlNode* self;
 
-	self = lisys_calloc (1, sizeof (limdlNode));
+	self = lisys_calloc (1, sizeof (LIMdlNode));
 	if (self == NULL)
 		return NULL;
 	self->type = node->type;
@@ -89,7 +89,7 @@ limdl_node_copy (const limdlNode* node)
 	if (node->nodes.count)
 	{
 		self->nodes.count = node->nodes.count;
-		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (limdlNode*));
+		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (LIMdlNode*));
 		if (self->nodes.array == NULL)
 			goto error;
 		for (i = 0 ; i < self->nodes.count ; i++)
@@ -109,7 +109,7 @@ error:
 }
 
 void
-limdl_node_free (limdlNode* self)
+limdl_node_free (LIMdlNode* self)
 {
 	int i;
 
@@ -128,16 +128,16 @@ limdl_node_free (limdlNode* self)
 	lisys_free (self);
 }
 
-limdlNode*
-limdl_node_find_node (const limdlNode* self,
+LIMdlNode*
+limdl_node_find_node (const LIMdlNode* self,
                       const char*      name)
 {
 	int i;
-	limdlNode* tmp;
+	LIMdlNode* tmp;
 
 	/* Test self. */
 	if (self->name != NULL && !strcmp (self->name, name))
-		return (limdlNode*) self;
+		return (LIMdlNode*) self;
 
 	/* Test children. */
 	for (i = 0 ; i < self->nodes.count ; i++)
@@ -154,14 +154,14 @@ limdl_node_find_node (const limdlNode* self,
 }
 
 int
-limdl_node_read (limdlNode*   self,
-                 liarcReader* reader)
+limdl_node_read (LIMdlNode*   self,
+                 LIArcReader* reader)
 {
 	int i;
 	uint32_t count;
 	uint32_t type;
-	limatVector position;
-	limatQuaternion rotation;
+	LIMatVector position;
+	LIMatQuaternion rotation;
 
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, &type) ||
@@ -202,7 +202,7 @@ limdl_node_read (limdlNode*   self,
 	/* Read child nodes. */
 	if (self->nodes.count)
 	{
-		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (limdlNode*));
+		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (LIMdlNode*));
 		if (self->nodes.array == NULL)
 			return 0;
 		for (i = 0 ; i < self->nodes.count ; i++)
@@ -226,7 +226,7 @@ limdl_node_read (limdlNode*   self,
  * \param recursive Nonzero if children should be rebuilt.
  */
 void
-limdl_node_rebuild (limdlNode* self,
+limdl_node_rebuild (LIMdlNode* self,
                     int        recursive)
 {
 	int i;
@@ -240,8 +240,8 @@ limdl_node_rebuild (limdlNode* self,
 }
 
 int
-limdl_node_write (const limdlNode* self,
-                  liarcWriter*     writer)
+limdl_node_write (const LIMdlNode* self,
+                  LIArcWriter*     writer)
 {
 	int i;
 	int count = 0;
@@ -295,8 +295,8 @@ limdl_node_write (const limdlNode* self,
 	return !writer->error;
 }
 
-limdlNode*
-limdl_node_get_child (const limdlNode* self,
+LIMdlNode*
+limdl_node_get_child (const LIMdlNode* self,
                       int              index)
 {
 	return self->nodes.array[index];
@@ -309,7 +309,7 @@ limdl_node_get_child (const limdlNode* self,
  * \return Child count.
  */
 int
-limdl_node_get_child_count (const limdlNode* self)
+limdl_node_get_child_count (const LIMdlNode* self)
 {
 	return self->nodes.count;
 }
@@ -321,10 +321,10 @@ limdl_node_get_child_count (const limdlNode* self)
  * \return Recursive child count.
  */
 int
-limdl_node_get_child_total (const limdlNode* self)
+limdl_node_get_child_total (const LIMdlNode* self)
 {
 	int i;
-	const limdlNode* node;
+	const LIMdlNode* node;
 
 	i = self->nodes.count;
 	for (i = 0 ; i < self->nodes.count ; i++)
@@ -343,7 +343,7 @@ limdl_node_get_child_total (const limdlNode* self)
  * \return Name.
  */
 const char*
-limdl_node_get_name (const limdlNode* self)
+limdl_node_get_name (const LIMdlNode* self)
 {
 	if (self->name != NULL)
 		return self->name;
@@ -359,10 +359,10 @@ limdl_node_get_name (const limdlNode* self)
  * \param z Return location for the Z axis.
  */
 void
-limdl_node_get_pose_axes (const limdlNode* self,
-                          limatVector*     x,
-                          limatVector*     y,
-                          limatVector*     z)
+limdl_node_get_pose_axes (const LIMdlNode* self,
+                          LIMatVector*     x,
+                          LIMatVector*     y,
+                          LIMatVector*     z)
 {
 	*x = limat_quaternion_transform (self->transform.global.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
 	*y = limat_quaternion_transform (self->transform.global.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
@@ -370,15 +370,15 @@ limdl_node_get_pose_axes (const limdlNode* self,
 }
 
 void
-limdl_node_get_rest_transform (const limdlNode* self,
-                               limatTransform*  value)
+limdl_node_get_rest_transform (const LIMdlNode* self,
+                               LIMatTransform*  value)
 {
 	*value = self->transform.rest;
 }
 
 void
-limdl_node_get_world_transform (const limdlNode* self,
-                                limatTransform*  value)
+limdl_node_get_world_transform (const LIMdlNode* self,
+                                LIMatTransform*  value)
 {
 	*value = self->transform.global;
 }
@@ -392,14 +392,14 @@ limdl_node_get_world_transform (const limdlNode* self,
  * \param value Local transformation of the node.
  */
 void
-limdl_node_set_local_transform (limdlNode*            self,
-                                const limatTransform* value)
+limdl_node_set_local_transform (LIMdlNode*            self,
+                                const LIMatTransform* value)
 {
 	self->transform.local = *value;
 }
 
-limdlNodeType
-limdl_node_get_type (const limdlNode* self)
+LIMdlNodeType
+limdl_node_get_type (const LIMdlNode* self)
 {
 	return self->type;
 }
@@ -407,10 +407,10 @@ limdl_node_get_type (const limdlNode* self)
 /*****************************************************************************/
 
 static void
-private_calculate_world_transform (limdlNode* self)
+private_calculate_world_transform (LIMdlNode* self)
 {
-	limatTransform p;
-	limatTransform t;
+	LIMatTransform p;
+	LIMatTransform t;
 
 	if (self->parent != NULL)
 	{

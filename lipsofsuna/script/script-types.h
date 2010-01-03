@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,38 +20,38 @@
 
 #include <lua.h>
 #include <lauxlib.h>
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 
 #define LISCR_TYPE_BOOLEAN ((void*) -1)
 #define LISCR_TYPE_FLOAT ((void*) -2)
 #define LISCR_TYPE_INT ((void*) -3)
 #define LISCR_TYPE_STRING ((void*) -4)
 
-typedef struct _liscrArgs liscrArgs;
-typedef struct _liscrClass liscrClass;
-typedef struct _liscrData liscrData;
-typedef struct _liscrScript liscrScript;
-typedef void (*liscrClassInit)(liscrClass*, void*);
+typedef struct _LIScrArgs LIScrArgs;
+typedef struct _LIScrClass LIScrClass;
+typedef struct _LIScrData LIScrData;
+typedef struct _LIScrScript LIScrScript;
+typedef void (*LIScrClassInit)(LIScrClass*, void*);
 typedef void (*liscrGCFunc)();
 typedef int (*liscrMarshal)(lua_State*);
-typedef void (*liscrArgsFunc)(liscrArgs*);
+typedef void (*LIScrArgsFunc)(LIScrArgs*);
 
 /* FIXME */
-struct _liscrData
+struct _LIScrData
 {
-	liscrClass* clss;
-	liscrScript* script;
+	LIScrClass* clss;
+	LIScrScript* script;
 	liscrGCFunc free;
 	void* data;
 	int refcount;
 };
 
 /* FIXME */
-struct _liscrScript
+struct _LIScrScript
 {
 	void* userpointer;
 	lua_State* lua;
-	lialgStrdic* classes;
+	LIAlgStrdic* classes;
 };
 
 /* FIXME */

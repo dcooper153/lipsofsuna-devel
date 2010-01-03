@@ -31,24 +31,24 @@
 
 #define LIEXT_SCRIPT_RELOAD "Lips.Reload"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licalHandle calls[1];
-	licliClient* client;
-	liextReload* reload;
+	LICalHandle calls[1];
+	LICliClient* client;
+	LIExtReload* reload;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextReloadScript (liscrClass* self,
+liext_script_reload (LIScrClass* self,
                    void*       data);
 
 #endif

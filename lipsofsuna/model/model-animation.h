@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,23 +18,23 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlAnimation Animation
+ * \addtogroup LIMdlAnimation Animation
  * @{
  */
 
 #ifndef __MODEL_ANIMATION_H__
 #define __MODEL_ANIMATION_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _limdlFrame limdlFrame;
-struct _limdlFrame
+typedef struct _LIMdlFrame LIMdlFrame;
+struct _LIMdlFrame
 {
-	limatTransform transform;
+	LIMatTransform transform;
 };
 
-typedef struct _limdlAnimation limdlAnimation;
-struct _limdlAnimation
+typedef struct _LIMdlAnimation LIMdlAnimation;
+struct _LIMdlAnimation
 {
 	int length;
 	char* name;
@@ -43,7 +43,7 @@ struct _limdlAnimation
 	struct
 	{
 		int count;
-		limdlFrame* array;
+		LIMdlFrame* array;
 	} buffer;
 	struct
 	{
@@ -53,20 +53,20 @@ struct _limdlAnimation
 };
 
 int
-limdl_animation_get_channel (limdlAnimation* self,
+limdl_animation_get_channel (LIMdlAnimation* self,
                              const char*     name);
 
 float
-limdl_animation_get_duration (const limdlAnimation* self);
+limdl_animation_get_duration (const LIMdlAnimation* self);
 
 int
-limdl_animation_get_transform (limdlAnimation* self,
+limdl_animation_get_transform (LIMdlAnimation* self,
                                const char*     name,
                                float           secs,
-                               limatTransform* value);
+                               LIMatTransform* value);
 
 float
-limdl_animation_get_weight (const limdlAnimation* self,
+limdl_animation_get_weight (const LIMdlAnimation* self,
                             float                 time,
                             float                 sweight,
                             float                 mweight,

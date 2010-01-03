@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndDeferred Deferred
+ * \addtogroup LIRenDeferred Deferred
  * @{
  */
 
@@ -28,7 +28,7 @@
 #include "render.h"
 #include "render-types.h"
 
-struct _lirndDeferred
+struct _LIRenDeferred
 {
 	int width;
 	int height;
@@ -39,24 +39,24 @@ struct _lirndDeferred
 	GLuint specular_texture;
 	GLuint normal_texture;
 	GLuint target_texture;
-	lirndRender* render;
+	LIRenRender* render;
 };
 
-lirndDeferred*
-lirnd_deferred_new (lirndRender* render,
+LIRenDeferred*
+liren_deferred_new (LIRenRender* render,
                     int          width,
                     int          height);
 
 void
-lirnd_deferred_free (lirndDeferred* self);
+liren_deferred_free (LIRenDeferred* self);
 
 int
-lirnd_deferred_resize (lirndDeferred* self,
+liren_deferred_resize (LIRenDeferred* self,
                        int            width,
                        int            height);
 
 void
-lirnd_deferred_read_pixel (lirndDeferred* self,
+liren_deferred_read_pixel (LIRenDeferred* self,
                            int            x,
                            int            y,
                            int            texture,

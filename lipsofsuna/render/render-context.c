@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndContext Context
+ * \addtogroup LIRenContext Context
  * @{
  */
 
@@ -26,47 +26,47 @@
 #include "render-context.h"
 
 static void
-private_bind_lights_shader (lirndContext* self);
+private_bind_lights_shader (LIRenContext* self);
 
 static void
-private_bind_material (lirndContext* self);
+private_bind_material (LIRenContext* self);
 
 static void
-private_bind_shader (lirndContext* self);
+private_bind_shader (LIRenContext* self);
 
 static void
-private_bind_texture (lirndContext* self,
+private_bind_texture (LIRenContext* self,
                       int           i,
-                      lirndTexture* texture);
+                      LIRenTexture* texture);
 
 static void
-private_bind_textures_fixed (lirndContext* self);
+private_bind_textures_fixed (LIRenContext* self);
 
 static void
-private_bind_uniform (lirndContext* self,
-                      lirndUniform* uniform);
+private_bind_uniform (LIRenContext* self,
+                      LIRenUniform* uniform);
 
 static void
-private_bind_vertices (lirndContext*      self,
-                       const lirndFormat* format,
+private_bind_vertices (LIRenContext*      self,
+                       const LIRenFormat* format,
                        const void*        base);
 
 static void
-private_enable_light (lirndContext* self,
+private_enable_light (LIRenContext* self,
                       int           i,
-                      lirndLight*   light);
+                      LIRenLight*   light);
 
 static void
-private_unbind_vertices (lirndContext*      self,
-                         const lirndFormat* format);
+private_unbind_vertices (LIRenContext*      self,
+                         const LIRenFormat* format);
 
 /*****************************************************************************/
 
 void
-lirnd_context_init (lirndContext* self,
-                    lirndScene*   scene)
+liren_context_init (LIRenContext* self,
+                    LIRenScene*   scene)
 {
-	memset (self, 0, sizeof (lirndContext));
+	memset (self, 0, sizeof (LIRenContext));
 	self->compiled = 1;
 	self->scene = scene;
 	self->render = scene->render;
@@ -81,7 +81,7 @@ lirnd_context_init (lirndContext* self,
 }
 
 void
-lirnd_context_bind (lirndContext* self)
+liren_context_bind (LIRenContext* self)
 {
 	int i;
 
@@ -124,7 +124,7 @@ lirnd_context_bind (lirndContext* self)
 	else
 		glDisable (GL_LIGHTING);
 	glActiveTextureARB (GL_TEXTURE0);
-	lirnd_check_errors ();
+	liren_check_errors ();
 }
 
 /**
@@ -134,17 +134,17 @@ lirnd_context_bind (lirndContext* self)
  * \param vertex Vertex buffer.
  */
 void
-lirnd_context_render_array (lirndContext* self,
-                            lirndBuffer*  vertex)
+liren_context_render_array (LIRenContext* self,
+                            LIRenBuffer*  vertex)
 {
 	if (vertex->buffer)
 	{
-		lirnd_context_render_vbo_array (self, &vertex->format,
+		liren_context_render_vbo_array (self, &vertex->format,
 			vertex->buffer, 0, vertex->elements.count);
 	}
 	else
 	{
-		lirnd_context_render_vtx_array (self, &vertex->format,
+		liren_context_render_vtx_array (self, &vertex->format,
 			vertex->elements.array, 0, vertex->elements.count);
 	}
 }
@@ -157,18 +157,18 @@ lirnd_context_render_array (lirndContext* self,
  * \param index Index buffer.
  */
 void
-lirnd_context_render_indexed (lirndContext* self,
-                              lirndBuffer*  vertex,
-                              lirndBuffer*  index)
+liren_context_render_indexed (LIRenContext* self,
+                              LIRenBuffer*  vertex,
+                              LIRenBuffer*  index)
 {
 	if (vertex->buffer)
 	{
-		lirnd_context_render_vbo_indexed (self, &vertex->format,
+		liren_context_render_vbo_indexed (self, &vertex->format,
 			vertex->buffer, index->buffer, 0, index->elements.count);
 	}
 	else
 	{
-		lirnd_context_render_vtx_indexed (self, &vertex->format,
+		liren_context_render_vtx_indexed (self, &vertex->format,
 			vertex->elements.array, index->elements.array, 0, index->elements.count);
 	}
 }
@@ -183,8 +183,8 @@ lirnd_context_render_indexed (lirndContext* self,
  * \param vertex1 Vertex to which to end rendering.
  */
 void
-lirnd_context_render_vbo_array (lirndContext*      self,
-                                const lirndFormat* format,
+liren_context_render_vbo_array (LIRenContext*      self,
+                                const LIRenFormat* format,
                                 GLuint             vertices,
                                 int                vertex0,
                                 int                vertex1)
@@ -200,7 +200,7 @@ lirnd_context_render_vbo_array (lirndContext*      self,
 
 	glPopMatrix ();
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
 	self->render->profiling.faces += count;
 	self->render->profiling.vertices += 3 * count;
@@ -217,8 +217,8 @@ lirnd_context_render_vbo_array (lirndContext*      self,
  * \param vertex1 Vertex to which to end rendering.
  */
 void
-lirnd_context_render_vtx_array (lirndContext*      self,
-                                const lirndFormat* format,
+liren_context_render_vtx_array (LIRenContext*      self,
+                                const LIRenFormat* format,
                                 const void*        vertices,
                                 int                vertex0,
                                 int                vertex1)
@@ -233,7 +233,7 @@ lirnd_context_render_vtx_array (lirndContext*      self,
 
 	glPopMatrix ();
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
 	self->render->profiling.faces += vertex1 - vertex0;
 	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
@@ -251,8 +251,8 @@ lirnd_context_render_vtx_array (lirndContext*      self,
  * \param index1 Index to which to end rendering.
  */
 void
-lirnd_context_render_vbo_indexed (lirndContext*      self,
-                                  const lirndFormat* format,
+liren_context_render_vbo_indexed (LIRenContext*      self,
+                                  const LIRenFormat* format,
                                   GLuint             vertices,
                                   GLuint             indices,
                                   int                index0,
@@ -271,7 +271,7 @@ lirnd_context_render_vbo_indexed (lirndContext*      self,
 
 	glPopMatrix ();
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
 	self->render->profiling.faces += vertex1 - vertex0;
 	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
@@ -289,8 +289,8 @@ lirnd_context_render_vbo_indexed (lirndContext*      self,
  * \param index1 Index to which to end rendering.
  */
 void
-lirnd_context_render_vtx_indexed (lirndContext*      self,
-                                  const lirndFormat* format,
+liren_context_render_vtx_indexed (LIRenContext*      self,
+                                  const LIRenFormat* format,
                                   const void*        vertices,
                                   const void*        indices,
                                   int                index0,
@@ -306,7 +306,7 @@ lirnd_context_render_vtx_indexed (lirndContext*      self,
 
 	glPopMatrix ();
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
 	self->render->profiling.faces += vertex1 - vertex0;
 	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
@@ -319,7 +319,7 @@ lirnd_context_render_vtx_indexed (lirndContext*      self,
  * \param self Rendering context.
  */
 void
-lirnd_context_unbind (lirndContext* self)
+liren_context_unbind (LIRenContext* self)
 {
 	if (livid_features.shader_model >= 3)
 		glUseProgramObjectARB (0);
@@ -332,25 +332,25 @@ lirnd_context_unbind (lirndContext* self)
 }
 
 void
-lirnd_context_set_flags (lirndContext* self,
+liren_context_set_flags (LIRenContext* self,
                          int           value)
 {
-	self->fixed = ((value & LIRND_FLAG_FIXED) != 0);
-/*	self->lighting = ((value & LIRND_FLAG_LIGHTING) != 0);
-	self->texturing = ((value & LIRND_FLAG_TEXTURING) != 0);*/
-	self->shadows = ((value & LIRND_FLAG_SHADOW1) != 0);
+	self->fixed = ((value & LIREN_FLAG_FIXED) != 0);
+/*	self->lighting = ((value & LIREN_FLAG_LIGHTING) != 0);
+	self->texturing = ((value & LIREN_FLAG_TEXTURING) != 0);*/
+	self->shadows = ((value & LIREN_FLAG_SHADOW1) != 0);
 }
 
 void
-lirnd_context_set_frustum (lirndContext*       self,
-                           const limatFrustum* frustum)
+liren_context_set_frustum (LIRenContext*       self,
+                           const LIMatFrustum* frustum)
 {
 	self->frustum = *frustum;
 }
 
 void
-lirnd_context_set_lights (lirndContext* self,
-                          lirndLight**  value,
+liren_context_set_lights (LIRenContext* self,
+                          LIRenLight**  value,
                           int           count)
 {
 	self->lights.array = value;
@@ -358,8 +358,8 @@ lirnd_context_set_lights (lirndContext* self,
 }
 
 void
-lirnd_context_set_material (lirndContext*        self,
-                            const lirndMaterial* value)
+liren_context_set_material (LIRenContext*        self,
+                            const LIRenMaterial* value)
 {
 	self->material.flags = value->flags;
 	self->material.shininess = value->shininess;
@@ -369,37 +369,37 @@ lirnd_context_set_material (lirndContext*        self,
 }
 
 void
-lirnd_context_set_matrix (lirndContext*      self,
-                          const limatMatrix* value)
+liren_context_set_matrix (LIRenContext*      self,
+                          const LIMatMatrix* value)
 {
 	self->matrix = *value;
 }
 
 void
-lirnd_context_set_modelview (lirndContext*      self,
-                             const limatMatrix* value)
+liren_context_set_modelview (LIRenContext*      self,
+                             const LIMatMatrix* value)
 {
 	self->modelview = *value;
 	self->compiled = 0;
 }
 
 void
-lirnd_context_set_projection (lirndContext*      self,
-                              const limatMatrix* value)
+liren_context_set_projection (LIRenContext*      self,
+                              const LIMatMatrix* value)
 {
 	self->projection = *value;
 }
 
 void
-lirnd_context_set_shader (lirndContext* self,
-                          lirndShader*  value)
+liren_context_set_shader (LIRenContext* self,
+                          LIRenShader*  value)
 {
 	self->shader = value;
 }
 
 void
-lirnd_context_set_textures (lirndContext* self,
-                            lirndTexture* value,
+liren_context_set_textures (LIRenContext* self,
+                            LIRenTexture* value,
                             int           count)
 {
 	self->textures.array = value;
@@ -409,12 +409,12 @@ lirnd_context_set_textures (lirndContext* self,
 /*****************************************************************************/
 
 static void
-private_bind_lights_shader (lirndContext* self)
+private_bind_lights_shader (LIRenContext* self)
 {
 	int i;
 	int count;
 	const GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	lirndLight* light;
+	LIRenLight* light;
 
 	count = LI_MIN (self->lights.count, self->shader->lights.count);
 	for (i = 0 ; i < count ; i++)
@@ -435,17 +435,17 @@ private_bind_lights_shader (lirndContext* self)
 }
 
 static void
-private_bind_material (lirndContext* self)
+private_bind_material (LIRenContext* self)
 {
 	glMaterialf (GL_FRONT, GL_SHININESS, self->material.shininess);
 	glMaterialfv (GL_FRONT, GL_SPECULAR, self->material.specular);
 	glColor4fv (self->material.diffuse);
 	/* TODO: Billboard support. */
-	if (self->material.flags & LIRND_MATERIAL_FLAG_CULLFACE)
+	if (self->material.flags & LIREN_MATERIAL_FLAG_CULLFACE)
 		glEnable (GL_CULL_FACE);
 	else
 		glDisable (GL_CULL_FACE);
-	if (self->material.flags & LIRND_MATERIAL_FLAG_TRANSPARENCY)
+	if (self->material.flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
 	{
 		glEnable (GL_BLEND);
 		glDepthMask (GL_FALSE);
@@ -459,7 +459,7 @@ private_bind_material (lirndContext* self)
 }
 
 static void
-private_bind_shader (lirndContext* self)
+private_bind_shader (LIRenContext* self)
 {
 	if (livid_features.shader_model >= 3)
 	{
@@ -471,9 +471,9 @@ private_bind_shader (lirndContext* self)
 }
 
 static void
-private_bind_texture (lirndContext* self,
+private_bind_texture (LIRenContext* self,
                       int           i,
-                      lirndTexture* texture)
+                      LIRenTexture* texture)
 {
 	glActiveTextureARB (GL_TEXTURE0 + i);
 	glBindTexture (GL_TEXTURE_2D, texture->texture);
@@ -484,7 +484,7 @@ private_bind_texture (lirndContext* self,
 }
 
 static void
-private_bind_textures_fixed (lirndContext* self)
+private_bind_textures_fixed (LIRenContext* self)
 {
 	int i;
 
@@ -498,16 +498,16 @@ private_bind_textures_fixed (lirndContext* self)
 }
 
 static void
-private_bind_uniform (lirndContext* self,
-                      lirndUniform* uniform)
+private_bind_uniform (LIRenContext* self,
+                      LIRenUniform* uniform)
 {
 	int index;
 	int shadow[2];
 	GLint map;
-	lirndLight* light;
-	lirndTexture* texture;
-	limatMatrix matrix;
-	limatMatrix bias =
+	LIRenLight* light;
+	LIRenTexture* texture;
+	LIMatMatrix matrix;
+	LIMatMatrix bias =
 	{{
 		0.5f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.5f, 0.0f, 0.0f,
@@ -517,24 +517,24 @@ private_bind_uniform (lirndContext* self,
 
 	/* Shader settings. */
 	/* FIXME */
-	shadow[0] = 0;//((flags & LIRND_FLAG_SHADOW0) != 0);
+	shadow[0] = 0;//((flags & LIREN_FLAG_SHADOW0) != 0);
 	shadow[1] = self->shadows;
 
 	switch (uniform->value)
 	{
-		case LIRND_UNIFORM_NONE:
+		case LIREN_UNIFORM_NONE:
 			break;
-		case LIRND_UNIFORM_CUBETEXTURE0:
-		case LIRND_UNIFORM_CUBETEXTURE1:
-		case LIRND_UNIFORM_CUBETEXTURE2:
-		case LIRND_UNIFORM_CUBETEXTURE3:
-		case LIRND_UNIFORM_CUBETEXTURE4:
-		case LIRND_UNIFORM_CUBETEXTURE5:
-		case LIRND_UNIFORM_CUBETEXTURE6:
-		case LIRND_UNIFORM_CUBETEXTURE7:
-		case LIRND_UNIFORM_CUBETEXTURE8:
-		case LIRND_UNIFORM_CUBETEXTURE9:
-			index = uniform->value - LIRND_UNIFORM_CUBETEXTURE0;
+		case LIREN_UNIFORM_CUBETEXTURE0:
+		case LIREN_UNIFORM_CUBETEXTURE1:
+		case LIREN_UNIFORM_CUBETEXTURE2:
+		case LIREN_UNIFORM_CUBETEXTURE3:
+		case LIREN_UNIFORM_CUBETEXTURE4:
+		case LIREN_UNIFORM_CUBETEXTURE5:
+		case LIREN_UNIFORM_CUBETEXTURE6:
+		case LIREN_UNIFORM_CUBETEXTURE7:
+		case LIREN_UNIFORM_CUBETEXTURE8:
+		case LIREN_UNIFORM_CUBETEXTURE9:
+			index = uniform->value - LIREN_UNIFORM_CUBETEXTURE0;
 			if (index < self->textures.count)
 			{
 				texture = self->textures.array + index;
@@ -551,17 +551,17 @@ private_bind_uniform (lirndContext* self,
 				glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, 0);
 			}
 			break;
-		case LIRND_UNIFORM_DIFFUSETEXTURE0:
-		case LIRND_UNIFORM_DIFFUSETEXTURE1:
-		case LIRND_UNIFORM_DIFFUSETEXTURE2:
-		case LIRND_UNIFORM_DIFFUSETEXTURE3:
-		case LIRND_UNIFORM_DIFFUSETEXTURE4:
-		case LIRND_UNIFORM_DIFFUSETEXTURE5:
-		case LIRND_UNIFORM_DIFFUSETEXTURE6:
-		case LIRND_UNIFORM_DIFFUSETEXTURE7:
-		case LIRND_UNIFORM_DIFFUSETEXTURE8:
-		case LIRND_UNIFORM_DIFFUSETEXTURE9:
-			index = uniform->value - LIRND_UNIFORM_DIFFUSETEXTURE0;
+		case LIREN_UNIFORM_DIFFUSETEXTURE0:
+		case LIREN_UNIFORM_DIFFUSETEXTURE1:
+		case LIREN_UNIFORM_DIFFUSETEXTURE2:
+		case LIREN_UNIFORM_DIFFUSETEXTURE3:
+		case LIREN_UNIFORM_DIFFUSETEXTURE4:
+		case LIREN_UNIFORM_DIFFUSETEXTURE5:
+		case LIREN_UNIFORM_DIFFUSETEXTURE6:
+		case LIREN_UNIFORM_DIFFUSETEXTURE7:
+		case LIREN_UNIFORM_DIFFUSETEXTURE8:
+		case LIREN_UNIFORM_DIFFUSETEXTURE9:
+			index = uniform->value - LIREN_UNIFORM_DIFFUSETEXTURE0;
 			if (index < self->textures.count)
 			{
 				texture = self->textures.array + index;
@@ -578,43 +578,43 @@ private_bind_uniform (lirndContext* self,
 				glBindTexture (GL_TEXTURE_2D, 0);
 			}
 			break;
-		case LIRND_UNIFORM_LIGHTTYPE0:
-		case LIRND_UNIFORM_LIGHTTYPE1:
-		case LIRND_UNIFORM_LIGHTTYPE2:
-		case LIRND_UNIFORM_LIGHTTYPE3:
-		case LIRND_UNIFORM_LIGHTTYPE4:
-		case LIRND_UNIFORM_LIGHTTYPE5:
-		case LIRND_UNIFORM_LIGHTTYPE6:
-		case LIRND_UNIFORM_LIGHTTYPE7:
-		case LIRND_UNIFORM_LIGHTTYPE8:
-		case LIRND_UNIFORM_LIGHTTYPE9:
-			index = uniform->value - LIRND_UNIFORM_LIGHTTYPE0;
+		case LIREN_UNIFORM_LIGHTTYPE0:
+		case LIREN_UNIFORM_LIGHTTYPE1:
+		case LIREN_UNIFORM_LIGHTTYPE2:
+		case LIREN_UNIFORM_LIGHTTYPE3:
+		case LIREN_UNIFORM_LIGHTTYPE4:
+		case LIREN_UNIFORM_LIGHTTYPE5:
+		case LIREN_UNIFORM_LIGHTTYPE6:
+		case LIREN_UNIFORM_LIGHTTYPE7:
+		case LIREN_UNIFORM_LIGHTTYPE8:
+		case LIREN_UNIFORM_LIGHTTYPE9:
+			index = uniform->value - LIREN_UNIFORM_LIGHTTYPE0;
 			if (index < self->lights.count)
 			{
 				light = self->lights.array[index];
 				if (light->directional)
-					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_DIRECTIONAL);
+					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DIRECTIONAL);
 				else if (LI_ABS (light->cutoff - M_PI) < 0.001)
-					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_POINT);
+					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_POINT);
 				else if (light->shadow.map && shadow[1])
-					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_SPOTSHADOW);
+					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOTSHADOW);
 				else
-					glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_SPOT);
+					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOT);
 			}
 			else
-				glUniform1iARB (uniform->binding, LIRND_UNIFORM_LIGHTTYPE_DISABLED);
+				glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DISABLED);
 			break;
-		case LIRND_UNIFORM_LIGHTMATRIX0:
-		case LIRND_UNIFORM_LIGHTMATRIX1:
-		case LIRND_UNIFORM_LIGHTMATRIX2:
-		case LIRND_UNIFORM_LIGHTMATRIX3:
-		case LIRND_UNIFORM_LIGHTMATRIX4:
-		case LIRND_UNIFORM_LIGHTMATRIX5:
-		case LIRND_UNIFORM_LIGHTMATRIX6:
-		case LIRND_UNIFORM_LIGHTMATRIX7:
-		case LIRND_UNIFORM_LIGHTMATRIX8:
-		case LIRND_UNIFORM_LIGHTMATRIX9:
-			index = uniform->value - LIRND_UNIFORM_LIGHTMATRIX0;
+		case LIREN_UNIFORM_LIGHTMATRIX0:
+		case LIREN_UNIFORM_LIGHTMATRIX1:
+		case LIREN_UNIFORM_LIGHTMATRIX2:
+		case LIREN_UNIFORM_LIGHTMATRIX3:
+		case LIREN_UNIFORM_LIGHTMATRIX4:
+		case LIREN_UNIFORM_LIGHTMATRIX5:
+		case LIREN_UNIFORM_LIGHTMATRIX6:
+		case LIREN_UNIFORM_LIGHTMATRIX7:
+		case LIREN_UNIFORM_LIGHTMATRIX8:
+		case LIREN_UNIFORM_LIGHTMATRIX9:
+			index = uniform->value - LIREN_UNIFORM_LIGHTMATRIX0;
 			if (index < self->lights.count)
 			{
 				light = self->lights.array[index];
@@ -626,17 +626,17 @@ private_bind_uniform (lirndContext* self,
 			else
 				glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, bias.m);
 			break;
-		case LIRND_UNIFORM_LIGHTPOSITION0:
-		case LIRND_UNIFORM_LIGHTPOSITION1:
-		case LIRND_UNIFORM_LIGHTPOSITION2:
-		case LIRND_UNIFORM_LIGHTPOSITION3:
-		case LIRND_UNIFORM_LIGHTPOSITION4:
-		case LIRND_UNIFORM_LIGHTPOSITION5:
-		case LIRND_UNIFORM_LIGHTPOSITION6:
-		case LIRND_UNIFORM_LIGHTPOSITION7:
-		case LIRND_UNIFORM_LIGHTPOSITION8:
-		case LIRND_UNIFORM_LIGHTPOSITION9:
-			index = uniform->value - LIRND_UNIFORM_LIGHTPOSITION0;
+		case LIREN_UNIFORM_LIGHTPOSITION0:
+		case LIREN_UNIFORM_LIGHTPOSITION1:
+		case LIREN_UNIFORM_LIGHTPOSITION2:
+		case LIREN_UNIFORM_LIGHTPOSITION3:
+		case LIREN_UNIFORM_LIGHTPOSITION4:
+		case LIREN_UNIFORM_LIGHTPOSITION5:
+		case LIREN_UNIFORM_LIGHTPOSITION6:
+		case LIREN_UNIFORM_LIGHTPOSITION7:
+		case LIREN_UNIFORM_LIGHTPOSITION8:
+		case LIREN_UNIFORM_LIGHTPOSITION9:
+			index = uniform->value - LIREN_UNIFORM_LIGHTPOSITION0;
 			if (index < self->lights.count)
 			{
 				light = self->lights.array[index];
@@ -648,34 +648,34 @@ private_bind_uniform (lirndContext* self,
 			else
 				glUniform3fARB (uniform->binding, 0.0f, 0.0f, 0.0f);
 			break;
-		case LIRND_UNIFORM_MODELMATRIX:
+		case LIREN_UNIFORM_MODELMATRIX:
 			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->matrix.m);
 			break;
-		case LIRND_UNIFORM_MODELVIEWINVERSE:
+		case LIREN_UNIFORM_MODELVIEWINVERSE:
 			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->modelviewinverse.m);
 			break;
-		case LIRND_UNIFORM_NOISETEXTURE:
+		case LIREN_UNIFORM_NOISETEXTURE:
 			glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 			glBindTexture (GL_TEXTURE_2D, self->render->helpers.noise);
 			break;
-		case LIRND_UNIFORM_PARAM0:
+		case LIREN_UNIFORM_PARAM0:
 			glUniform4fARB (uniform->binding,
 				self->material.parameters[0],
 				self->material.parameters[1],
 				self->material.parameters[2],
 				self->material.parameters[3]);
 			break;
-		case LIRND_UNIFORM_SHADOWTEXTURE0:
-		case LIRND_UNIFORM_SHADOWTEXTURE1:
-		case LIRND_UNIFORM_SHADOWTEXTURE2:
-		case LIRND_UNIFORM_SHADOWTEXTURE3:
-		case LIRND_UNIFORM_SHADOWTEXTURE4:
-		case LIRND_UNIFORM_SHADOWTEXTURE5:
-		case LIRND_UNIFORM_SHADOWTEXTURE6:
-		case LIRND_UNIFORM_SHADOWTEXTURE7:
-		case LIRND_UNIFORM_SHADOWTEXTURE8:
-		case LIRND_UNIFORM_SHADOWTEXTURE9:
-			index = uniform->value - LIRND_UNIFORM_SHADOWTEXTURE0;
+		case LIREN_UNIFORM_SHADOWTEXTURE0:
+		case LIREN_UNIFORM_SHADOWTEXTURE1:
+		case LIREN_UNIFORM_SHADOWTEXTURE2:
+		case LIREN_UNIFORM_SHADOWTEXTURE3:
+		case LIREN_UNIFORM_SHADOWTEXTURE4:
+		case LIREN_UNIFORM_SHADOWTEXTURE5:
+		case LIREN_UNIFORM_SHADOWTEXTURE6:
+		case LIREN_UNIFORM_SHADOWTEXTURE7:
+		case LIREN_UNIFORM_SHADOWTEXTURE8:
+		case LIREN_UNIFORM_SHADOWTEXTURE9:
+			index = uniform->value - LIREN_UNIFORM_SHADOWTEXTURE0;
 			map = self->render->helpers.depth_texture_max;
 			if (index < self->lights.count)
 			{
@@ -686,15 +686,15 @@ private_bind_uniform (lirndContext* self,
 			glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 			glBindTexture (GL_TEXTURE_2D, map);
 			break;
-		case LIRND_UNIFORM_TIME:
+		case LIREN_UNIFORM_TIME:
 			glUniform1fARB (uniform->binding, self->render->helpers.time);
 			break;
 	}
 }
 
 static void
-private_bind_vertices (lirndContext*      self,
-                       const lirndFormat* format,
+private_bind_vertices (LIRenContext*      self,
+                       const LIRenFormat* format,
                        const void*        base)
 {
 	int i;
@@ -714,16 +714,16 @@ private_bind_vertices (lirndContext*      self,
 }
 
 static void
-private_enable_light (lirndContext* self,
+private_enable_light (LIRenContext* self,
                       int           i,
-                      lirndLight*   light)
+                      LIRenLight*   light)
 {
-	limatVector tmp;
+	LIMatVector tmp;
 	GLfloat position[4];
 	GLfloat direction[3];
 
 	/* Calculate orientation. */
-	lirnd_light_get_direction (light, &tmp);
+	liren_light_get_direction (light, &tmp);
 	direction[0] = tmp.x;
 	direction[1] = tmp.y;
 	direction[2] = tmp.z;
@@ -758,8 +758,8 @@ private_enable_light (lirndContext* self,
 }
 
 static void
-private_unbind_vertices (lirndContext*      self,
-                         const lirndFormat* format)
+private_unbind_vertices (LIRenContext*      self,
+                         const LIRenFormat* format)
 {
 	int i;
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,68 +18,68 @@
 /**
  * \addtogroup lical Callback
  * @{
- * \addtogroup licalCallbacks Callbacks
+ * \addtogroup LICalCallbacks Callbacks
  * @{
  */
 
 #ifndef __CAL_CALLBACKS_H__
 #define __CAL_CALLBACKS_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "cal-handle.h"
 #include "cal-marshal.h"
 
-struct _licalCallfunc
+struct _LICalCallfunc
 {
 	int prio;
 	int removed;
 	void* call;
 	void* data;
-	licalCallfunc* prev;
-	licalCallfunc* next;
+	LICalCallfunc* prev;
+	LICalCallfunc* next;
 };
 
-struct _licalCallbacks
+struct _LICalCallbacks
 {
-	lialgMemdic* types;
-	licalCallfunc* removed;
+	LIAlgMemdic* types;
+	LICalCallfunc* removed;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-licalCallbacks*
+LICalCallbacks*
 lical_callbacks_new ();
 
 void
-lical_callbacks_free (licalCallbacks* self);
+lical_callbacks_free (LICalCallbacks* self);
 
 int
-lical_callbacks_call (licalCallbacks* self,
+lical_callbacks_call (LICalCallbacks* self,
                       void*           object,
                       const char*     type,
                       licalMarshal    marshal,
                                       ...);
 
 int
-lical_callbacks_callva (licalCallbacks* self,
+lical_callbacks_callva (LICalCallbacks* self,
                         void*           object,
                         const char*     type,
                         licalMarshal    marshal,
                         va_list         args);
 
 int
-lical_callbacks_insert (licalCallbacks* self,
+lical_callbacks_insert (LICalCallbacks* self,
                         void*           object,
                         const char*     type,
                         int             priority,
                         void*           call,
                         void*           data,
-                        licalHandle*    result);
+                        LICalHandle*    result);
 
 void
-lical_callbacks_update (licalCallbacks* self);
+lical_callbacks_update (LICalCallbacks* self);
 
 #ifdef __cplusplus
 }

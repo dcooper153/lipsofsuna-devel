@@ -27,26 +27,26 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
 #define LIEXT_SCRIPT_CHAT_HISTORY "Lips.ChatHistory"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licliClient* client;
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextChatHistoryScript (liscrClass* self,
+liext_script_chat_history (LIScrClass* self,
                         void*       data);
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,21 +18,21 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcReader Reader
+ * \addtogroup LIArcReader Reader
  * @{
  */
 
 #ifndef __ARCHIVE_READER_H__
 #define __ARCHIVE_READER_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
-typedef struct _liarcReader liarcReader;
-struct _liarcReader
+typedef struct _LIArcReader LIArcReader;
+struct _LIArcReader
 {
 	int pos;
 	int length;
-	lisysMmap* mmap;
+	LISysMmap* mmap;
 	const char* buffer;
 };
 
@@ -40,39 +40,39 @@ struct _liarcReader
 extern "C" {
 #endif
 
-liarcReader*
+LIArcReader*
 liarc_reader_new (const char* buffer, int length);
 
-liarcReader*
+LIArcReader*
 liarc_reader_new_from_file (const char* path);
 
-liarcReader*
+LIArcReader*
 liarc_reader_new_from_string (const char* buffer);
 
-void liarc_reader_free (liarcReader* self);
-int liarc_reader_check_end (liarcReader* self);
-int liarc_reader_check_char (liarcReader* self, char c);
-int liarc_reader_check_data (liarcReader* self, const void* data, int length);
-int liarc_reader_check_text (liarcReader* self, const char* data, const char* list);
-int liarc_reader_check_key_value_pair (liarcReader* self, const char* key, const char* value);
-int liarc_reader_check_uint32 (liarcReader* self, uint32_t value);
-int liarc_reader_get_char (liarcReader* self, char* value);
-int liarc_reader_get_float (liarcReader* self, float* value);
-int liarc_reader_get_int8 (liarcReader* self, int8_t* value);
-int liarc_reader_get_int16 (liarcReader* self, int16_t* value);
-int liarc_reader_get_int32 (liarcReader* self, int32_t* value);
-int liarc_reader_get_offset (liarcReader* self);
-int liarc_reader_set_offset (liarcReader* self, int offset);
-int liarc_reader_get_uint8 (liarcReader* self, uint8_t* value);
-int liarc_reader_get_uint16 (liarcReader* self, uint16_t* value);
-int liarc_reader_get_uint32 (liarcReader* self, uint32_t* value);
-int liarc_reader_get_text (liarcReader* self, const char* list, char** value);
-int liarc_reader_get_text_int (liarcReader* self, int* value);
-int liarc_reader_get_text_uint (liarcReader* self, int* value);
-int liarc_reader_get_text_float (liarcReader* self, float* value);
-int liarc_reader_get_key_value_pair (liarcReader* self, char** key, char** value);
-int liarc_reader_skip_bytes (liarcReader* self, int num);
-int liarc_reader_skip_chars (liarcReader* self, const char* list);
+void liarc_reader_free (LIArcReader* self);
+int liarc_reader_check_end (LIArcReader* self);
+int liarc_reader_check_char (LIArcReader* self, char c);
+int liarc_reader_check_data (LIArcReader* self, const void* data, int length);
+int liarc_reader_check_text (LIArcReader* self, const char* data, const char* list);
+int liarc_reader_check_key_value_pair (LIArcReader* self, const char* key, const char* value);
+int liarc_reader_check_uint32 (LIArcReader* self, uint32_t value);
+int liarc_reader_get_char (LIArcReader* self, char* value);
+int liarc_reader_get_float (LIArcReader* self, float* value);
+int liarc_reader_get_int8 (LIArcReader* self, int8_t* value);
+int liarc_reader_get_int16 (LIArcReader* self, int16_t* value);
+int liarc_reader_get_int32 (LIArcReader* self, int32_t* value);
+int liarc_reader_get_offset (LIArcReader* self);
+int liarc_reader_set_offset (LIArcReader* self, int offset);
+int liarc_reader_get_uint8 (LIArcReader* self, uint8_t* value);
+int liarc_reader_get_uint16 (LIArcReader* self, uint16_t* value);
+int liarc_reader_get_uint32 (LIArcReader* self, uint32_t* value);
+int liarc_reader_get_text (LIArcReader* self, const char* list, char** value);
+int liarc_reader_get_text_int (LIArcReader* self, int* value);
+int liarc_reader_get_text_uint (LIArcReader* self, int* value);
+int liarc_reader_get_text_float (LIArcReader* self, float* value);
+int liarc_reader_get_key_value_pair (LIArcReader* self, char** key, char** value);
+int liarc_reader_skip_bytes (LIArcReader* self, int num);
+int liarc_reader_skip_chars (LIArcReader* self, const char* list);
 
 #ifdef __cplusplus
 }

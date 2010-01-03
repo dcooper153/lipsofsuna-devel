@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,10 +36,10 @@
  * \param matrix Matrix.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_convert_matrix_to_quaternion (limatMatrix matrix)
+static inline LIMatQuaternion
+limat_convert_matrix_to_quaternion (LIMatMatrix matrix)
 {
-	limatQuaternion self;
+	LIMatQuaternion self;
 
 	self.x = 0.5f * sqrt (LI_MAX (0.0f, 1.0f + matrix.m[0] - matrix.m[5] - matrix.m[10]));
 	self.y = 0.5f * sqrt (LI_MAX (0.0f, 1.0f - matrix.m[0] + matrix.m[5] - matrix.m[10]));
@@ -52,11 +52,11 @@ limat_convert_matrix_to_quaternion (limatMatrix matrix)
 	return self;
 }
 
-static inline limatTransform
-limat_convert_matrix_to_transform (limatMatrix matrix)
+static inline LIMatTransform
+limat_convert_matrix_to_transform (LIMatMatrix matrix)
 {
-	limatVector tmp;
-	limatTransform self;
+	LIMatVector tmp;
+	LIMatTransform self;
 
 	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
 	self.position = limat_matrix_transform (matrix, tmp);
@@ -73,10 +73,10 @@ limat_convert_matrix_to_transform (limatMatrix matrix)
  * \param self Quaternion.
  * \return Matrix.
  */
-static inline limatMatrix
-limat_convert_quaternion_to_matrix (limatQuaternion self)
+static inline LIMatMatrix
+limat_convert_quaternion_to_matrix (LIMatQuaternion self)
 {
-	limatMatrix matrix;
+	LIMatMatrix matrix;
 
 	matrix.m[0] = 1.0f - 2.0f * (self.y * self.y + self.z * self.z);
 	matrix.m[1] = 2.0f * (self.x * self.y + self.z * self.w);
@@ -98,11 +98,11 @@ limat_convert_quaternion_to_matrix (limatQuaternion self)
 	return matrix;
 }
 
-static inline limatMatrix
-limat_convert_transform_to_matrix (limatTransform self)
+static inline LIMatMatrix
+limat_convert_transform_to_matrix (LIMatTransform self)
 {
-	limatMatrix result;
-	limatQuaternion quat = self.rotation;
+	LIMatMatrix result;
+	LIMatQuaternion quat = self.rotation;
 
 	result.m[0] = 1.0f - 2.0f * (quat.y * quat.y + quat.z * quat.z);
 	result.m[1] = 2.0f * (quat.x * quat.y + quat.z * quat.w);
@@ -124,10 +124,10 @@ limat_convert_transform_to_matrix (limatTransform self)
 	return result;
 }
 
-static inline limatTransform
-limat_convert_quaternion_to_transform (limatQuaternion rotation)
+static inline LIMatTransform
+limat_convert_quaternion_to_transform (LIMatQuaternion rotation)
 {
-	limatTransform self;
+	LIMatTransform self;
 
 	self.position = limat_vector_init (0.0f, 0.0f, 0.0f);
 	self.rotation = rotation;
@@ -135,10 +135,10 @@ limat_convert_quaternion_to_transform (limatQuaternion rotation)
 	return self;
 }
 
-static inline limatTransform
-limat_convert_vector_to_transform (limatVector position)
+static inline LIMatTransform
+limat_convert_vector_to_transform (LIMatVector position)
 {
-	limatTransform self;
+	LIMatTransform self;
 
 	self.position = position;
 	self.rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);

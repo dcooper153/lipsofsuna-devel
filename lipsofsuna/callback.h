@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,14 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_SCRIPT_H__
-#define __LIPS_SCRIPT_H__
+#ifndef __LIPS_CALLBACK_H__
+#define __LIPS_CALLBACK_H__
 
-#include "script.h"
-#include "script-args.h"
-#include "script-class.h"
-#include "script-data.h"
-#include "script-library.h"
-#include "script-util.h"
+#include "callback/cal-callbacks.h"
+#include "callback/cal-marshal.h"
 
 #endif

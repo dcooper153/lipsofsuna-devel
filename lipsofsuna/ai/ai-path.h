@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,49 +18,49 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiPath Path
+ * \addtogroup LIAiPath Path
  * @{
  */
 
 #ifndef __AI_PATH_H__
 #define __AI_PATH_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _liaiPath liaiPath;
-struct _liaiPath
+typedef struct _LIAiPath LIAiPath;
+struct _LIAiPath
 {
 	int position;
 	struct
 	{
 		int count;
-		limatVector* points;
+		LIMatVector* points;
 	} points;
 };
 
-liaiPath*
+LIAiPath*
 liai_path_new ();
 
 void
-liai_path_free (liaiPath* self);
+liai_path_free (LIAiPath* self);
 
 int
-liai_path_append_point (liaiPath*          self,
-                        const limatVector* point);
+liai_path_append_point (LIAiPath*          self,
+                        const LIMatVector* point);
 
 void
-liai_path_get_point (const liaiPath* self,
+liai_path_get_point (const LIAiPath* self,
                      int             index,
-                     limatVector*    value);
+                     LIMatVector*    value);
 
 int
-liai_path_get_length (const liaiPath* self);
+liai_path_get_length (const LIAiPath* self);
 
 int
-liai_path_get_position (const liaiPath* self);
+liai_path_get_position (const LIAiPath* self);
 
 void
-liai_path_set_position (liaiPath* self,
+liai_path_set_position (LIAiPath* self,
                         int       index);
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatAabb Aabb
+ * \addtogroup LIMatAabb Aabb
  * @{
  */
 
@@ -31,17 +31,17 @@
 #include "math-triangle.h"
 #include "math-vector.h"
 
-typedef struct _limatAabb limatAabb;
-struct _limatAabb
+typedef struct _LIMatAabb LIMatAabb;
+struct _LIMatAabb
 {
-	limatVector min;
-	limatVector max;
+	LIMatVector min;
+	LIMatVector max;
 };
 
 static inline void
-limat_aabb_init (limatAabb* self)
+limat_aabb_init (LIMatAabb* self)
 {
-	memset (self, 0, sizeof (limatAabb));
+	memset (self, 0, sizeof (LIMatAabb));
 }
 
 /**
@@ -52,11 +52,11 @@ limat_aabb_init (limatAabb* self)
  * \param size Size of the bounding box.
  */
 static inline void
-limat_aabb_init_from_center (limatAabb*         self,
-                             const limatVector* center,
-                             const limatVector* size)
+limat_aabb_init_from_center (LIMatAabb*         self,
+                             const LIMatVector* center,
+                             const LIMatVector* size)
 {
-	limatVector tmp;
+	LIMatVector tmp;
 
 	tmp = limat_vector_multiply (*size, 0.5f);
 	self->min = limat_vector_subtract (*center, tmp);
@@ -71,9 +71,9 @@ limat_aabb_init_from_center (limatAabb*         self,
  * \param max Maximum point of the bounding box.
  */
 static inline void
-limat_aabb_init_from_points (limatAabb*         self,
-                             const limatVector* min,
-                             const limatVector* max)
+limat_aabb_init_from_points (LIMatAabb*         self,
+                             const LIMatVector* min,
+                             const LIMatVector* max)
 {
 	self->min = *min;
 	self->max = *max;
@@ -86,15 +86,15 @@ limat_aabb_init_from_points (limatAabb*         self,
  * \param matrix Matrix.
  * \return Axis-aligned bounding box.
  */
-static inline limatAabb
-limat_aabb_transform (const limatAabb    self,
-                      const limatMatrix* matrix)
+static inline LIMatAabb
+limat_aabb_transform (const LIMatAabb    self,
+                      const LIMatMatrix* matrix)
 {
 	int i;
-	limatAabb result;
-	limatVector v[7];
-	limatVector min;
-	limatVector max;
+	LIMatAabb result;
+	LIMatVector v[7];
+	LIMatVector min;
+	LIMatVector max;
 
 	min = max = limat_matrix_transform (*matrix, self.min);
 	v[0] = limat_vector_init (self.min.x, self.min.y, self.max.z);
@@ -136,9 +136,9 @@ limat_aabb_transform (const limatAabb    self,
  * \return Number vertices in the clipped triangle.
  */
 static inline int
-limat_aabb_clip_triangle (const limatAabb*     self,
-                          const limatTriangle* triangle,
-                          limatVector*         result)
+limat_aabb_clip_triangle (const LIMatAabb*     self,
+                          const LIMatTriangle* triangle,
+                          LIMatVector*         result)
 {
 	int curr;
 	int prev;
@@ -147,11 +147,11 @@ limat_aabb_clip_triangle (const limatAabb*     self,
 	int currlen;
 	int prevlen;
 	int plane;
-	limatVector buffer[18];
-	limatVector* tmpbuf;
-	limatVector* prevbuf = buffer + 0;
-	limatVector* currbuf = buffer + 9;
-	limatPlane p[6] =
+	LIMatVector buffer[18];
+	LIMatVector* tmpbuf;
+	LIMatVector* prevbuf = buffer + 0;
+	LIMatVector* currbuf = buffer + 9;
+	LIMatPlane p[6] =
 	{
 		{ 1, 0, 0, self->min.x }, /* Left. */
 		{ -1, 0, 0, -self->max.x }, /* Right. */
@@ -199,7 +199,7 @@ limat_aabb_clip_triangle (const limatAabb*     self,
 		prevlen = currlen;
 	}
 	assert (prevlen <= 9);
-	memcpy (result, prevbuf, prevlen * sizeof (limatVector));
+	memcpy (result, prevbuf, prevlen * sizeof (LIMatVector));
 	return prevlen;
 }
 
@@ -211,8 +211,8 @@ limat_aabb_clip_triangle (const limatAabb*     self,
  * \return Nonzero if the boxes intersect.
  */
 static inline int
-limat_aabb_intersects_aabb (const limatAabb* self,
-                            const limatAabb* aabb)
+limat_aabb_intersects_aabb (const LIMatAabb* self,
+                            const LIMatAabb* aabb)
 {
 	if (self->min.x >= aabb->max.x ||
 	    self->min.y >= aabb->max.y ||
@@ -232,11 +232,11 @@ limat_aabb_intersects_aabb (const limatAabb* self,
  * \param aabb Axis-aligned bounding box.
  * \return Axis-aligned bounding box.
  */
-static inline limatAabb
-limat_aabb_union (const limatAabb self,
-                  const limatAabb aabb)
+static inline LIMatAabb
+limat_aabb_union (const LIMatAabb self,
+                  const LIMatAabb aabb)
 {
-	limatAabb ret;
+	LIMatAabb ret;
 
 	ret.min.x = self.min.x < aabb.min.x? self.min.x : aabb.min.x;
 	ret.min.y = self.min.y < aabb.min.y? self.min.y : aabb.min.y;

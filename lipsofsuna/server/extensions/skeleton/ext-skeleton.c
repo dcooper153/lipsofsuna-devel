@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,24 +24,24 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-skeleton.h"
 
 static int
-private_client_packet (liextSkeleton* self,
-                       lisrvClient*   client,
-                       liarcReader*   packet);
+private_client_packet (LIExtSkeleton* self,
+                       LISerClient*   client,
+                       LIArcReader*   packet);
 
 /*****************************************************************************/
 
-liextSkeleton*
-liext_skeleton_new (lisrvServer* server)
+LIExtSkeleton*
+liext_skeleton_new (LISerServer* server)
 {
-	liextSkeleton* self;
+	LIExtSkeleton* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextSkeleton));
+	self = lisys_calloc (1, sizeof (LIExtSkeleton));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -57,18 +57,18 @@ liext_skeleton_new (lisrvServer* server)
 }
 
 void
-liext_skeleton_free (liextSkeleton* self)
+liext_skeleton_free (LIExtSkeleton* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 /*****************************************************************************/
 
 static int
-private_client_packet (liextSkeleton* self,
-                       lisrvClient*   client,
-                       liarcReader*   packet)
+private_client_packet (LIExtSkeleton* self,
+                       LISerClient*   client,
+                       LIArcReader*   packet)
 {
 #if 0
 	switch (((uint8_t*) packet->buffer)[0])

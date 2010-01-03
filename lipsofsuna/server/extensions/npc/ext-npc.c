@@ -24,18 +24,18 @@
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "ext-npc.h"
 
 static int
-private_tick (liextNpc* self,
+private_tick (LIExtNpc* self,
               float     secs);
 
 static void
-private_attack (liextNpc* self);
+private_attack (LIExtNpc* self);
 
-static liengObject*
-private_rescan (liextNpc* self);
+static LIEngObject*
+private_rescan (LIExtNpc* self);
 
 /*****************************************************************************/
 
@@ -45,13 +45,13 @@ private_rescan (liextNpc* self);
  * \param module Module.
  * \return Non-player character logic or NULL.
  */
-liextNpc*
-liext_npc_new (liextModule* module)
+LIExtNpc*
+liext_npc_new (LIExtModule* module)
 {
-	liextNpc* self;
+	LIExtNpc* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextNpc));
+	self = lisys_calloc (1, sizeof (LIExtNpc));
 	if (self == NULL)
 		return NULL;
 	self->alert = 1;
@@ -69,21 +69,21 @@ liext_npc_new (liextModule* module)
  * \param self Npc logic.
  */
 void
-liext_npc_free (liextNpc* self)
+liext_npc_free (LIExtNpc* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	lisys_free (self);
 }
 
 int
-liext_npc_get_active (liextNpc* self)
+liext_npc_get_active (LIExtNpc* self)
 {
 	return self->active;
 }
 
 int
-liext_npc_set_active (liextNpc* self,
+liext_npc_set_active (LIExtNpc* self,
                       int       value)
 {
 	if (self->active == value)
@@ -91,7 +91,7 @@ liext_npc_set_active (liextNpc* self,
 	if (value)
 		lical_callbacks_insert (self->module->server->callbacks, self->module->server->engine, "tick", 0, private_tick, self, self->calls + 0);
 	else
-		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	self->active = value;
 
 	return 1;
@@ -107,11 +107,11 @@ liext_npc_set_active (liextNpc* self,
  * \return Nonzero on success.
  */
 int
-liext_npc_set_owner (liextNpc*    self,
-                     liengObject* value)
+liext_npc_set_owner (LIExtNpc*    self,
+                     LIEngObject* value)
 {
 	int flags;
-	liextNpc* old;
+	LIExtNpc* old;
 
 	/* Discard old target. */
 	liext_npc_set_target (self, NULL);
@@ -160,8 +160,8 @@ liext_npc_set_owner (liextNpc*    self,
  * \param path Script path data or NULL.
  */
 void
-liext_npc_set_path (liextNpc*  self,
-                    liscrData* path)
+liext_npc_set_path (LIExtNpc*  self,
+                    LIScrData* path)
 {
 	if (self->path == path)
 		return;
@@ -181,8 +181,8 @@ liext_npc_set_path (liextNpc*  self,
  * \param object Object or NULL.
  */
 void
-liext_npc_set_target (liextNpc*    self,
-                      liengObject* object)
+liext_npc_set_target (LIExtNpc*    self,
+                      LIEngObject* object)
 {
 	if (self->target != NULL)
 		liscr_data_unref (self->target->script, self->script);
@@ -194,17 +194,17 @@ liext_npc_set_target (liextNpc*    self,
 /*****************************************************************************/
 
 static int
-private_tick (liextNpc* self,
+private_tick (LIExtNpc* self,
               float     secs)
 {
-	liaiPath* path;
-	liengObject* object;
-	limatTransform transform;
-	limatVector diff;
-	limatVector impulse;
-	limatVector vector;
-	liscrData* tmp;
-	liphyObject* physics;
+	LIAiPath* path;
+	LIEngObject* object;
+	LIMatTransform transform;
+	LIMatVector diff;
+	LIMatVector impulse;
+	LIMatVector vector;
+	LIScrData* tmp;
+	LIPhyObject* physics;
 
 	/* Get object data. */
 	object = self->owner;
@@ -326,9 +326,9 @@ private_tick (liextNpc* self,
 }
 
 static void
-private_attack (liextNpc* self)
+private_attack (LIExtNpc* self)
 {
-	liscrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->server->script;
 
 	/* Check for spawn function. */
 	lua_getfield (script->lua, LUA_GLOBALSINDEX, "Npc");
@@ -357,15 +357,15 @@ private_attack (liextNpc* self)
 	}
 }
 
-static liengObject*
-private_rescan (liextNpc* self)
+static LIEngObject*
+private_rescan (LIExtNpc* self)
 {
 	float d;
 	float dist;
-	liengObject* object;
-	liengObject* target;
-	liengObjectIter iter;
-	limatTransform transform;
+	LIEngObject* object;
+	LIEngObject* target;
+	LIEngObjectIter iter;
+	LIMatTransform transform;
 
 	dist = self->radius;
 	target = NULL;
@@ -375,7 +375,7 @@ private_rescan (liextNpc* self)
 	LIENG_FOREACH_OBJECT (iter, self->owner->engine, &transform.position, self->radius)
 	{
 		object = iter.object;
-		if (LISRV_OBJECT (object)->client == NULL) /* FIXME: Check for alignment flags instead. */
+		if (LISER_OBJECT (object)->client == NULL) /* FIXME: Check for alignment flags instead. */
 			continue;
 		d = lieng_object_get_distance (self->owner, object);
 		if (dist < d)

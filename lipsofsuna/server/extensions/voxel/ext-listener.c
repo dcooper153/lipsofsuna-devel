@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-listener.h"
 
 /**
@@ -36,14 +36,14 @@
  * \param radius Listening radius.
  * \return New listener or NULL.
  */
-liextListener*
-liext_listener_new (liextModule* module,
-                    liengObject* object,
+LIExtListener*
+liext_listener_new (LIExtModule* module,
+                    LIEngObject* object,
                     int          radius)
 {
-	liextListener* self;
+	LIExtListener* self;
 
-	self = lisys_calloc (1, sizeof (liextListener));
+	self = lisys_calloc (1, sizeof (LIExtListener));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -65,9 +65,9 @@ liext_listener_new (liextModule* module,
  * \param self Listener.
  */
 void
-liext_listener_free (liextListener* self)
+liext_listener_free (LIExtListener* self)
 {
-	lialgMemdicIter iter;
+	LIAlgMemdicIter iter;
 
 	if (self->cache != NULL)
 	{
@@ -88,27 +88,27 @@ liext_listener_free (liextListener* self)
  * \return Nonzero on success.
  */
 int
-liext_listener_cache (liextListener* self,
+liext_listener_cache (LIExtListener* self,
                       int            sector,
                       int            block,
                       int            stamp)
 {
-	liextBlockKey key;
-	liextListenerBlock* value;
+	LIExtBlockKey key;
+	LIExtListenerBlock* value;
 
 	key.sector = sector;
 	key.block = block;
-	value = lialg_memdic_find (self->cache, &key, sizeof (liextBlockKey));
+	value = lialg_memdic_find (self->cache, &key, sizeof (LIExtBlockKey));
 	if (value != NULL)
 	{
 		value->stamp = stamp;
 		return 1;
 	}
-	value = lisys_calloc (1, sizeof (liextListenerBlock));
+	value = lisys_calloc (1, sizeof (LIExtListenerBlock));
 	if (value == NULL)
 		return 0;
 	value->stamp = stamp;
-	if (!lialg_memdic_insert (self->cache, &key, sizeof (liextBlockKey), value))
+	if (!lialg_memdic_insert (self->cache, &key, sizeof (LIExtBlockKey), value))
 	{
 		lisys_free (value);
 		return 0;
@@ -129,34 +129,34 @@ liext_listener_cache (liextListener* self,
  * \return Nonzero on success.
  */
 int
-liext_listener_update (liextListener* self,
+liext_listener_update (LIExtListener* self,
                        float          secs)
 {
 	int x;
 	int y;
 	int z;
 	int stamp;
-	lialgRange sectors;
-	lialgRange blocks;
-	lialgRange range;
-	lialgRangeIter iter0;
-	lialgRangeIter iter1;
-	liarcWriter* writer = NULL;
-	liengObject* object;
-	limatTransform transform;
-	limatVector min;
-	limatVector max;
-	limatVector size;
-	lisrvClient* client;
-	livoxBlock* block;
-	livoxSector* sector;
+	LIAlgRange sectors;
+	LIAlgRange blocks;
+	LIAlgRange range;
+	LIAlgRangeIter iter0;
+	LIAlgRangeIter iter1;
+	LIArcWriter* writer = NULL;
+	LIEngObject* object;
+	LIMatTransform transform;
+	LIMatVector min;
+	LIMatVector max;
+	LIMatVector size;
+	LISerClient* client;
+	LIVoxBlock* block;
+	LIVoxSector* sector;
 
 	/* TODO: Early exit if listener has not moved and sectors have not changed. */
 
 	/* Get client. */
 	object = self->object;
 	assert (object != NULL);
-	client = LISRV_OBJECT (object)->client;
+	client = LISER_OBJECT (object)->client;
 	assert (client != NULL);
 
 	/* Calculate sight volume. */
@@ -225,7 +225,7 @@ liext_listener_update (liextListener* self,
 	/* Send packet. */
 	if (writer != NULL)
 	{
-		lisrv_client_send (client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (client, writer, GRAPPLE_RELIABLE);
 		liarc_writer_free (writer);
 	}
 
@@ -242,17 +242,17 @@ liext_listener_update (liextListener* self,
  * \return Nonzero if in cache.
  */
 int
-liext_listener_get_cached (const liextListener* self,
+liext_listener_get_cached (const LIExtListener* self,
                            int                  sector,
                            int                  block,
                            int                  stamp)
 {
-	liextBlockKey key;
-	liextListenerBlock* value;
+	LIExtBlockKey key;
+	LIExtListenerBlock* value;
 
 	key.sector = sector;
 	key.block = block;
-	value = lialg_memdic_find (self->cache, &key, sizeof (liextBlockKey));
+	value = lialg_memdic_find (self->cache, &key, sizeof (LIExtBlockKey));
 	if (value == NULL || value->stamp != stamp)
 		return 0;
 

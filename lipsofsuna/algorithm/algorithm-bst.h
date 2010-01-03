@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,94 +18,94 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgBst Bst
+ * \addtogroup LIAlgBst Bst
  * @{
  */
 
 #ifndef __ALGORITHM_BST_H__
 #define __ALGORITHM_BST_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
-typedef int (*lialgBstCompare)(const void*, const void*);
-typedef void (*lialgBstForeach)(void* a);
-typedef void (*lialgBstFree)(void*);
-typedef void* (*lialgBstMalloc)(size_t);
-typedef int (*lialgBstMatch)(const void*, const void*);
+typedef int (*LIAlgBstCompare)(const void*, const void*);
+typedef void (*LIAlgBstForeach)(void* a);
+typedef void (*LIAlgBstFree)(void*);
+typedef void* (*LIAlgBstMalloc)(size_t);
+typedef int (*LIAlgBstMatch)(const void*, const void*);
 
 /**
  * \brief A binary search tree node.
  */
-typedef struct _lialgBstNode lialgBstNode;
-struct _lialgBstNode
+typedef struct _LIAlgBstNode LIAlgBstNode;
+struct _LIAlgBstNode
 {
 	void* data;
-	lialgBstNode* left;
-	lialgBstNode* right;
-	lialgBstNode* parent;
+	LIAlgBstNode* left;
+	LIAlgBstNode* right;
+	LIAlgBstNode* parent;
 };
 
 /**
  * \brief A self-balancing binary search tree.
  */
-typedef struct _lialgBst lialgBst;
-struct _lialgBst
+typedef struct _LIAlgBst LIAlgBst;
+struct _LIAlgBst
 {
 	int size;
 	int max_size;
-	lialgBstNode* root;
-	lialgBstCompare cmp;
-	lialgBstFree free;
-	lialgBstMalloc malloc;
+	LIAlgBstNode* root;
+	LIAlgBstCompare cmp;
+	LIAlgBstFree free;
+	LIAlgBstMalloc malloc;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-lialgBst*
-lialg_bst_new (lialgBstCompare cmp,
-               lialgBstMalloc  malloc,
-               lialgBstFree    free);
+LIAlgBst*
+lialg_bst_new (LIAlgBstCompare cmp,
+               LIAlgBstMalloc  malloc,
+               LIAlgBstFree    free);
 
 void
-lialg_bst_free (lialgBst* self);
+lialg_bst_free (LIAlgBst* self);
 
 void
-lialg_bst_clear (lialgBst* self);
+lialg_bst_clear (LIAlgBst* self);
 
-lialgBstNode*
-lialg_bst_find (lialgBst*   self,
+LIAlgBstNode*
+lialg_bst_find (LIAlgBst*   self,
                 const void* data);
 
-lialgBstNode*
-lialg_bst_find_by_index (lialgBst* self,
+LIAlgBstNode*
+lialg_bst_find_by_index (LIAlgBst* self,
                          int       index);
 
 void
-lialg_bst_foreach (lialgBst*       self,
-                   lialgBstForeach func);
+lialg_bst_foreach (LIAlgBst*       self,
+                   LIAlgBstForeach func);
 
-lialgBstNode*
-lialg_bst_insert (lialgBst* self,
+LIAlgBstNode*
+lialg_bst_insert (LIAlgBst* self,
                   void*     data);
 
 void
-lialg_bst_link (lialgBst*     self,
-                lialgBstNode* node);
+lialg_bst_link (LIAlgBst*     self,
+                LIAlgBstNode* node);
 
-lialgBstNode*
-lialg_bst_match (lialgBst*     self,
-                 lialgBstMatch func,
+LIAlgBstNode*
+lialg_bst_match (LIAlgBst*     self,
+                 LIAlgBstMatch func,
                  const void*   data);
 
 void
-lialg_bst_remove (lialgBst*     self,
-                  lialgBstNode* node);
+lialg_bst_remove (LIAlgBst*     self,
+                  LIAlgBstNode* node);
 
 void
-lialg_bst_unlink (lialgBst*     self,
-                  lialgBstNode* node);
+lialg_bst_unlink (LIAlgBst*     self,
+                  LIAlgBstNode* node);
 
 #ifdef __cplusplus
 }

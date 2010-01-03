@@ -21,11 +21,11 @@
 #define LICLI_PHYSICS_GROUP_CAMERA 0x0001
 #define LICLI_PHYSICS_GROUP_OBJECTS 0x0002
 
-typedef struct _licliClient licliClient;
-typedef struct _licliExtension licliExtension;
-typedef struct _licliExtensionInfo licliExtensionInfo;
-typedef struct _licliNetwork licliNetwork;
-typedef struct _licliObject licliObject;
-typedef struct _licliWindow licliWindow;
+typedef struct _LICliClient LICliClient;
+typedef struct _LICliExtension LICliExtension;
+typedef struct _LICliExtensionInfo LICliExtensionInfo;
+typedef struct _LICliNetwork LICliNetwork;
+typedef struct _LICliObject LICliObject;
+typedef struct _LICliWindow LICliWindow;
 
 #endif

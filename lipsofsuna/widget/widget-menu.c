@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgMenu Menu
+ * \addtogroup LIWdgMenu Menu
  * @{
  */
 
@@ -30,45 +30,45 @@
 #define SPACINGY 5
 
 static int
-private_init (liwdgMenu*    self,
-              liwdgManager* manager);
+private_init (LIWdgMenu*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgMenu* self);
+private_free (LIWdgMenu* self);
 
 static int
-private_event (liwdgMenu*  self,
+private_event (LIWdgMenu*  self,
                liwdgEvent* event);
 
 static void
-private_render_horizontal (liwdgMenu* self);
+private_render_horizontal (LIWdgMenu* self);
 
 static void
-private_render_vertical (liwdgMenu* self);
+private_render_vertical (LIWdgMenu* self);
 
-static liwdgMenuItem*
-private_item_create (liwdgMenu*     self,
-                     liwdgMenuItem* parent,
+static LIWdgMenuItem*
+private_item_create (LIWdgMenu*     self,
+                     LIWdgMenuItem* parent,
                      const char*    text);
 
 static void
-private_item_free (liwdgMenu*     self,
-                   liwdgMenuItem* item);
+private_item_free (LIWdgMenu*     self,
+                   LIWdgMenuItem* item);
 
-static liwdgMenuItem*
-private_item_find (liwdgMenu* self,
+static LIWdgMenuItem*
+private_item_find (LIWdgMenu* self,
                    int        x,
                    int        y);
 
 static void
-private_rebuild (liwdgMenu* self);
+private_rebuild (LIWdgMenu* self);
 
-const liwdgClass liwdgMenuType =
+const LIWdgClass liwdg_widget_menu =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Menu", sizeof (liwdgMenu),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Menu", sizeof (LIWdgMenu),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
@@ -79,10 +79,10 @@ const liwdgClass liwdgMenuType =
  * \param manager Widget manager.
  * \return New widget or NULL.
  */
-liwdgWidget*
-liwdg_menu_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_menu_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgMenuType);
+	return liwdg_widget_new (manager, &liwdg_widget_menu);
 }
 
 /**
@@ -96,13 +96,13 @@ liwdg_menu_new (liwdgManager* manager)
  * \return Nonzero on success.
  */
 int
-liwdg_menu_insert_item (liwdgMenu*   self,
+liwdg_menu_insert_item (LIWdgMenu*   self,
                         const char*  label,
                         const char*  icon,
                         liwdgHandler call,
                         void*        data)
 {
-	liwdgMenuItem* item;
+	LIWdgMenuItem* item;
 
 #warning Menu icons not implemented
 	item = private_item_create (self, NULL, label);
@@ -116,27 +116,27 @@ liwdg_menu_insert_item (liwdgMenu*   self,
 }
 
 int
-liwdg_menu_get_autohide (const liwdgMenu* self)
+liwdg_menu_get_autohide (const LIWdgMenu* self)
 {
 	return self->autohide;
 }
 
 void
-liwdg_menu_set_autohide (liwdgMenu* self,
+liwdg_menu_set_autohide (LIWdgMenu* self,
                          int        value)
 {
 	self->autohide = value;
 }
 
-liwdgMenuItem*
-liwdg_menu_get_item (const liwdgMenu* self,
+LIWdgMenuItem*
+liwdg_menu_get_item (const LIWdgMenu* self,
                      int              index)
 {
 	return self->items.array[index];
 }
 
 int
-liwdg_menu_get_item_count (const liwdgMenu* self)
+liwdg_menu_get_item_count (const LIWdgMenu* self)
 {
 	return self->items.count;
 }
@@ -150,13 +150,13 @@ liwdg_menu_get_item_count (const liwdgMenu* self)
  * \return Nonzero on success.
  */
 int
-liwdg_menu_get_item_rect (const liwdgMenu* self,
+liwdg_menu_get_item_rect (const LIWdgMenu* self,
                           const char*      name,
-                          liwdgRect*       value)
+                          LIWdgRect*       value)
 {
 	int i;
-	liwdgMenuItem* item;
-	liwdgRect rect;
+	LIWdgMenuItem* item;
+	LIWdgRect rect;
 
 	if (self->font == NULL)
 		return 0;
@@ -192,13 +192,13 @@ liwdg_menu_get_item_rect (const liwdgMenu* self,
 }
 
 int
-liwdg_menu_get_vertical (const liwdgMenu* self)
+liwdg_menu_get_vertical (const LIWdgMenu* self)
 {
 	return self->vertical;
 }
 
 void
-liwdg_menu_set_vertical (liwdgMenu* self,
+liwdg_menu_set_vertical (LIWdgMenu* self,
                          int        value)
 {
 	value = (value != 0);
@@ -212,8 +212,8 @@ liwdg_menu_set_vertical (liwdgMenu* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgMenu*    self,
-              liwdgManager* manager)
+private_init (LIWdgMenu*    self,
+              LIWdgManager* manager)
 {
 	self->font = liwdg_manager_find_font (manager, "default");
 
@@ -221,7 +221,7 @@ private_init (liwdgMenu*    self,
 }
 
 static void
-private_free (liwdgMenu* self)
+private_free (LIWdgMenu* self)
 {
 	int i;
 
@@ -231,10 +231,10 @@ private_free (liwdgMenu* self)
 }
 
 static int
-private_event (liwdgMenu*  self,
+private_event (LIWdgMenu*  self,
                liwdgEvent* event)
 {
-	liwdgMenuItem* item;
+	LIWdgMenuItem* item;
 
 	switch (event->type)
 	{
@@ -261,17 +261,17 @@ private_event (liwdgMenu*  self,
 			break;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_render_horizontal (liwdgMenu*  self)
+private_render_horizontal (LIWdgMenu*  self)
 {
 	int i;
-	liwdgManager* manager;
-	liwdgMenuItem* item;
-	liwdgRect rect;
-	liwdgStyle* style;
+	LIWdgManager* manager;
+	LIWdgMenuItem* item;
+	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	/* Get style allocation. */
 	manager = LIWDG_WIDGET (self)->manager;
@@ -289,15 +289,15 @@ private_render_horizontal (liwdgMenu*  self)
 }
 
 static void
-private_render_vertical (liwdgMenu*  self)
+private_render_vertical (LIWdgMenu*  self)
 {
 	int i;
 	int lineh;
 	int pointer[2];
-	liwdgManager* manager;
-	liwdgMenuItem* item;
-	liwdgRect rect;
-	liwdgStyle* style;
+	LIWdgManager* manager;
+	LIWdgMenuItem* item;
+	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	/* Get style allocation. */
 	style = liwdg_widget_get_style (LIWDG_WIDGET (self));
@@ -335,15 +335,15 @@ private_render_vertical (liwdgMenu*  self)
 	}
 }
 
-static liwdgMenuItem*
-private_item_create (liwdgMenu*     self,
-                     liwdgMenuItem* parent,
+static LIWdgMenuItem*
+private_item_create (LIWdgMenu*     self,
+                     LIWdgMenuItem* parent,
                      const char*    text)
 {
-	liwdgMenuItem* item;
+	LIWdgMenuItem* item;
 
 	/* Allocate item. */
-	item = lisys_calloc (1, sizeof (liwdgMenuItem));
+	item = lisys_calloc (1, sizeof (LIWdgMenuItem));
 	if (item == NULL)
 		return NULL;
 	item->id = -1;
@@ -389,8 +389,8 @@ private_item_create (liwdgMenu*     self,
 }
 
 static void
-private_item_free (liwdgMenu*     self,
-                   liwdgMenuItem* item)
+private_item_free (LIWdgMenu*     self,
+                   LIWdgMenuItem* item)
 {
 	int i;
 
@@ -403,15 +403,15 @@ private_item_free (liwdgMenu*     self,
 	lisys_free (item);
 }
 
-static liwdgMenuItem*
-private_item_find (liwdgMenu* self,
+static LIWdgMenuItem*
+private_item_find (LIWdgMenu* self,
                    int        x,
                    int        y)
 {
 	int i;
 	int size;
-	liwdgMenuItem* item;
-	liwdgRect rect;
+	LIWdgMenuItem* item;
+	LIWdgRect rect;
 
 	if (self->font == NULL)
 		return NULL;
@@ -443,11 +443,11 @@ private_item_find (liwdgMenu* self,
 }
 
 static void
-private_rebuild (liwdgMenu* self)
+private_rebuild (LIWdgMenu* self)
 {
 	int i;
-	liwdgMenuItem* item;
-	liwdgSize size;
+	LIWdgMenuItem* item;
+	LIWdgSize size;
 
 	size.width = 0;
 	size.height = 0;

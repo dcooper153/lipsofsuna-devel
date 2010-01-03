@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,23 +24,23 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-editor.h"
 
 static int
-private_client_packet (liextEditor* self,
-                       lisrvClient* client,
-                       liarcReader* packet);
+private_client_packet (LIExtEditor* self,
+                       LISerClient* client,
+                       LIArcReader* packet);
 
 /*****************************************************************************/
 
-liextEditor*
-liext_editor_new (lisrvServer* server)
+LIExtEditor*
+liext_editor_new (LISerServer* server)
 {
-	liextEditor* self;
+	LIExtEditor* self;
 
-	self = lisys_calloc (1, sizeof (liextEditor));
+	self = lisys_calloc (1, sizeof (LIExtEditor));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -54,26 +54,26 @@ liext_editor_new (lisrvServer* server)
 }
 
 void
-liext_editor_free (liextEditor* self)
+liext_editor_free (LIExtEditor* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 /*****************************************************************************/
 
 static int
-private_client_packet (liextEditor* self,
-                       lisrvClient* client,
-                       liarcReader* packet)
+private_client_packet (LIExtEditor* self,
+                       LISerClient* client,
+                       LIArcReader* packet)
 {
 	uint8_t cmd;
 	uint32_t id;
-	liengModel* model;
-	liengObject* object;
-	limatQuaternion rotation;
-	limatTransform transform;
-	limatVector position;
+	LIEngModel* model;
+	LIEngObject* object;
+	LIMatQuaternion rotation;
+	LIMatTransform transform;
+	LIMatVector position;
 
 	if (((uint8_t*) packet->buffer)[0] != LINET_EXT_CLIENT_PACKET_EDITOR)
 		return 1;
@@ -95,7 +95,7 @@ private_client_packet (liextEditor* self,
 			if (model == NULL)
 				return 1;
 			object = lieng_object_new (self->server->engine, model, LIPHY_CONTROL_MODE_STATIC,
-				lisrv_server_get_unique_object (self->server));
+				liser_server_get_unique_object (self->server));
 			if (object == NULL)
 				return 1;
 			lieng_object_set_collision_group (object, LIPHY_GROUP_STATICS);
@@ -111,10 +111,10 @@ private_client_packet (liextEditor* self,
 			if (object == NULL)
 				return 1;
 			lieng_object_set_realized (object, 0);
-			lisrv_object_purge (object);
+			liser_object_purge (object);
 			break;
 		case LINET_EXT_EDITOR_PACKET_SAVE:
-			lisrv_server_save (self->server);
+			liser_server_save (self->server);
 			break;
 		case LINET_EXT_EDITOR_PACKET_TRANSFORM:
 			if (!liarc_reader_get_uint32 (packet, &id) ||

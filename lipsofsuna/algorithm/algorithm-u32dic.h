@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,50 +18,50 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgU32dic U32dic
+ * \addtogroup LIAlgU32dic U32dic
  * @{
  */
 
 #ifndef __ALGORITHM_U32DIC_H__
 #define __ALGORITHM_U32DIC_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-bst.h"
 
-typedef struct _lialgU32dic lialgU32dic;
-typedef struct _lialgU32dicNode lialgU32dicNode;
-typedef struct _lialgU32dicIter lialgU32dicIter;
+typedef struct _LIAlgU32dic LIAlgU32dic;
+typedef struct _LIAlgU32dicNode LIAlgU32dicNode;
+typedef struct _LIAlgU32dicIter LIAlgU32dicIter;
 
-struct _lialgU32dic
+struct _LIAlgU32dic
 {
 	int size;
-	lialgBst* tree;
-	lialgU32dicNode* list;
+	LIAlgBst* tree;
+	LIAlgU32dicNode* list;
 };
 
-struct _lialgU32dicNode
+struct _LIAlgU32dicNode
 {
 	uint32_t key;
 	void* value;
-	lialgBstNode node;
-	lialgU32dicNode* prev;
-	lialgU32dicNode* next;
+	LIAlgBstNode node;
+	LIAlgU32dicNode* prev;
+	LIAlgU32dicNode* next;
 };
 
-struct _lialgU32dicIter
+struct _LIAlgU32dicIter
 {
-	lialgU32dic* assoc;
+	LIAlgU32dic* assoc;
 	uint32_t key;
 	void* value;
-	lialgU32dicNode* node;
-	lialgU32dicNode* next;
+	LIAlgU32dicNode* node;
+	LIAlgU32dicNode* next;
 };
 
 /*****************************************************************************/
 
 static inline int
-lialg_u32dic_node_compare (const lialgU32dicNode* self,
-                           const lialgU32dicNode* node)
+lialg_u32dic_node_compare (const LIAlgU32dicNode* self,
+                           const LIAlgU32dicNode* node)
 {
 	if (self->key < node->key) return -1;
 	if (self->key > node->key) return 1;
@@ -75,17 +75,17 @@ lialg_u32dic_node_compare (const lialgU32dicNode* self,
  *
  * \return New associative array or NULL.
  */
-static inline lialgU32dic*
+static inline LIAlgU32dic*
 lialg_u32dic_new ()
 {
-	lialgU32dic* self;
+	LIAlgU32dic* self;
 
-	self = (lialgU32dic*) lisys_malloc (sizeof (lialgU32dic));
+	self = (LIAlgU32dic*) lisys_malloc (sizeof (LIAlgU32dic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_u32dic_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) lialg_u32dic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -100,9 +100,9 @@ lialg_u32dic_new ()
  * \param self Associative array.
  */
 static inline void
-lialg_u32dic_free (lialgU32dic* self)
+lialg_u32dic_free (LIAlgU32dic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -114,9 +114,9 @@ lialg_u32dic_free (lialgU32dic* self)
  * \param self Associative array.
  */
 static inline void
-lialg_u32dic_clear (lialgU32dic* self)
+lialg_u32dic_clear (LIAlgU32dic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -131,18 +131,18 @@ lialg_u32dic_clear (lialgU32dic* self)
  * \return Value or NULL.
  */
 static inline void*
-lialg_u32dic_find (lialgU32dic* self,
+lialg_u32dic_find (LIAlgU32dic* self,
                    uint32_t     key)
 {
-	lialgU32dicNode tmp;
-	lialgU32dicNode* anode;
-	lialgBstNode* tnode;
+	LIAlgU32dicNode tmp;
+	LIAlgU32dicNode* anode;
+	LIAlgBstNode* tnode;
 
 	tmp.key = key;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	anode = (lialgU32dicNode*) tnode->data;
+	anode = (LIAlgU32dicNode*) tnode->data;
 	assert (&anode->node == tnode);
 	return anode->value;
 }
@@ -154,19 +154,19 @@ lialg_u32dic_find (lialgU32dic* self,
  * \param key Key of the node.
  * \return Associative array node or NULL.
  */
-static inline lialgU32dicNode*
-lialg_u32dic_find_node (lialgU32dic* self,
+static inline LIAlgU32dicNode*
+lialg_u32dic_find_node (LIAlgU32dic* self,
                         uint32_t     key)
 {
-	lialgU32dicNode tmp;
-	lialgBstNode* tnode;
+	LIAlgU32dicNode tmp;
+	LIAlgBstNode* tnode;
 
 	tmp.key = key;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	assert (&((lialgU32dicNode*) tnode->data)->node == tnode);
-	return (lialgU32dicNode*) tnode->data;
+	assert (&((LIAlgU32dicNode*) tnode->data)->node == tnode);
+	return (LIAlgU32dicNode*) tnode->data;
 }
 
 /**
@@ -177,15 +177,15 @@ lialg_u32dic_find_node (lialgU32dic* self,
  * \param value Value of the inserted node.
  * \return Associative array node or NULL.
  */
-static inline lialgU32dicNode*
-lialg_u32dic_insert (lialgU32dic* self,
+static inline LIAlgU32dicNode*
+lialg_u32dic_insert (LIAlgU32dic* self,
                      uint32_t     key,
                      void*        value)
 {
-	lialgU32dicNode* node;
+	LIAlgU32dicNode* node;
 
 	/* Create node. */
-	node = (lialgU32dicNode*) lisys_malloc (sizeof (lialgU32dicNode));
+	node = (LIAlgU32dicNode*) lisys_malloc (sizeof (LIAlgU32dicNode));
 	if (node == NULL)
 		return NULL;
 	node->key = key;
@@ -213,19 +213,19 @@ lialg_u32dic_insert (lialgU32dic* self,
  * \return Nonzero if a node was removed.
  */
 static inline int
-lialg_u32dic_remove (lialgU32dic* self,
+lialg_u32dic_remove (LIAlgU32dic* self,
                      uint32_t     key)
 {
-	lialgBstNode* tnode;
-	lialgU32dicNode* anode;
-	lialgU32dicNode tmp;
+	LIAlgBstNode* tnode;
+	LIAlgU32dicNode* anode;
+	LIAlgU32dicNode tmp;
 	
 	/* Find node. */
 	tmp.key = key;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return 1;
-	anode = (lialgU32dicNode*) tnode->data;
+	anode = (LIAlgU32dicNode*) tnode->data;
 	assert (&anode->node == tnode);
 
 	/* Unlink from tree. */
@@ -250,8 +250,8 @@ lialg_u32dic_remove (lialgU32dic* self,
  * \param node Node to remove.
  */
 static inline void
-lialg_u32dic_remove_node (lialgU32dic*     self,
-                          lialgU32dicNode* node)
+lialg_u32dic_remove_node (LIAlgU32dic*     self,
+                          LIAlgU32dicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -271,14 +271,14 @@ lialg_u32dic_remove_node (lialgU32dic*     self,
  * \return Unique key.
  */
 static inline uint32_t
-lialg_u32dic_unique_key (const lialgU32dic* self)
+lialg_u32dic_unique_key (const LIAlgU32dic* self)
 {
 	uint32_t key;
 
 	for (key = 0 ; !key ; )
 	{
 		key = lisys_randi (0x7FFFFFFF);
-		if (lialg_u32dic_find ((lialgU32dic*) self, key) != NULL)
+		if (lialg_u32dic_find ((LIAlgU32dic*) self, key) != NULL)
 			key = 0;
 	}
 
@@ -293,8 +293,8 @@ lialg_u32dic_unique_key (const lialgU32dic* self)
 	     lialg_u32dic_iter_next (&iter))
 
 static inline void
-lialg_u32dic_iter_start (lialgU32dicIter* self,
-                         lialgU32dic*     assoc)
+lialg_u32dic_iter_start (LIAlgU32dicIter* self,
+                         LIAlgU32dic*     assoc)
 {
 	self->assoc = assoc;
 	if (assoc->list == NULL)
@@ -314,7 +314,7 @@ lialg_u32dic_iter_start (lialgU32dicIter* self,
 }
 
 static inline int
-lialg_u32dic_iter_next (lialgU32dicIter* self)
+lialg_u32dic_iter_next (LIAlgU32dicIter* self)
 {
 	if (self->next == NULL)
 	{

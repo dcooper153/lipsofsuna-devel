@@ -24,7 +24,7 @@
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "ext-brushes.h"
 #include "ext-dialog.h"
 #include "ext-module.h"
@@ -41,11 +41,11 @@ enum
 	LIEXT_BRUSHES_ROWTYPE_STROKE
 };
 
-typedef struct _liextBrushesTreerow liextBrushesTreerow;
-struct _liextBrushesTreerow
+typedef struct _LIExtBrushesTreerow LIExtBrushesTreerow;
+struct _LIExtBrushesTreerow
 {
-	ligenBrush* brush;
-	ligenRule* rule;
+	LIGenBrush* brush;
+	LIGenRule* rule;
 	int stroke;
 	int object;
 	int type;
@@ -55,123 +55,123 @@ static const void*
 private_base ();
 
 static int
-private_init (liextBrushes* self,
-              liwdgManager* manager);
+private_init (LIExtBrushes* self,
+              LIWdgManager* manager);
 
 static void
-private_free (liextBrushes* self);
+private_free (LIExtBrushes* self);
 
 static int
-private_event (liextBrushes* self,
+private_event (LIExtBrushes* self,
                liwdgEvent*   event);
 
 static int
-private_add (liextBrushes* self,
-             liwdgWidget*  widget);
+private_add (LIExtBrushes* self,
+             LIWdgWidget*  widget);
 
 static int
-private_copy (liextBrushes* self,
-              liwdgWidget*  widget);
+private_copy (LIExtBrushes* self,
+              LIWdgWidget*  widget);
 
 static int
-private_object_info (liextBrushes* self);
+private_object_info (LIExtBrushes* self);
 
 static int
-private_paint_select (liextBrushes* self,
-                      liwdgWidget*  widget);
+private_paint_select (LIExtBrushes* self,
+                      LIWdgWidget*  widget);
 
 static int
-private_paint_terrain (liextBrushes* self,
+private_paint_terrain (LIExtBrushes* self,
                        int           x,
                        int           y);
 
 static int
-private_remove (liextBrushes* self,
-                liwdgWidget*  widget);
+private_remove (LIExtBrushes* self,
+                LIWdgWidget*  widget);
 
 static int
-private_rename (liextBrushes* self,
-                liwdgWidget*  widget);
+private_rename (LIExtBrushes* self,
+                LIWdgWidget*  widget);
 
 static int
-private_selected (liextBrushes* self,
-                  liwdgWidget*  widget,
-                  liwdgTreerow* row);
+private_selected (LIExtBrushes* self,
+                  LIWdgWidget*  widget,
+                  LIWdgTreerow* row);
 
 static int
-private_stroke_flags (liextBrushes* self);
+private_stroke_flags (LIExtBrushes* self);
 
-static liwdgTreerow*
-private_append_brush (liextBrushes* self,
-                      ligenBrush*   brush);
+static LIWdgTreerow*
+private_append_brush (LIExtBrushes* self,
+                      LIGenBrush*   brush);
 
-static liwdgTreerow*
-private_append_object (liextBrushes* self,
-                       liwdgTreerow* row,
+static LIWdgTreerow*
+private_append_object (LIExtBrushes* self,
+                       LIWdgTreerow* row,
                        int           index);
 
-static liwdgTreerow*
-private_append_rule (liextBrushes* self,
-                     liwdgTreerow* row,
-                     ligenRule*    rule);
+static LIWdgTreerow*
+private_append_rule (LIExtBrushes* self,
+                     LIWdgTreerow* row,
+                     LIGenRule*    rule);
 
-static liwdgTreerow*
-private_append_stroke (liextBrushes* self,
-                       liwdgTreerow* row,
+static LIWdgTreerow*
+private_append_stroke (LIExtBrushes* self,
+                       LIWdgTreerow* row,
                        int           index);
 
 static void
-private_remove_strokes (liextBrushes* self,
-                        liwdgTreerow* row,
+private_remove_strokes (LIExtBrushes* self,
+                        LIWdgTreerow* row,
                         int           brush);
 
 static void
-private_rename_strokes (liextBrushes* self,
-                        liwdgTreerow* row,
+private_rename_strokes (LIExtBrushes* self,
+                        LIWdgTreerow* row,
                         int           brush,
                         const char*   text);
 
 static void
-private_populate (liextBrushes* self);
+private_populate (LIExtBrushes* self);
 
 static void
-private_transform (liextBrushes*   self,
-                   limatTransform* transform,
+private_transform (LIExtBrushes*   self,
+                   LIMatTransform* transform,
                    int             finish);
 
 static void
-private_resize_brush (liextBrushes* self);
+private_resize_brush (LIExtBrushes* self);
 
 static void
-private_rebuild_brush (liextBrushes* self);
+private_rebuild_brush (LIExtBrushes* self);
 
 static void
-private_rebuild_preview (liextBrushes* self);
+private_rebuild_preview (LIExtBrushes* self);
 
 static void
-private_rebuild_selection (liextBrushes* self);
+private_rebuild_selection (LIExtBrushes* self);
 
-static liextBrushesTreerow*
-private_get_active (liextBrushes* self);
+static LIExtBrushesTreerow*
+private_get_active (LIExtBrushes* self);
 
 /****************************************************************************/
 
-const liwdgClass liextBrushesType =
+const LIWdgClass liext_widget_brushes =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorBrushes", sizeof (liextBrushes),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "GeneratorBrushes", sizeof (LIExtBrushes),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_brushes_new (liwdgManager* manager,
-                   liextModule*  module)
+LIWdgWidget*
+liext_brushes_new (LIWdgManager* manager,
+                   LIExtModule*  module)
 {
-	liextBrushes* data;
-	liwdgWidget* self;
+	LIExtBrushes* data;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liextBrushesType);
+	self = liwdg_widget_new (manager, &liext_widget_brushes);
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_BRUSHES (self);
@@ -197,8 +197,8 @@ liext_brushes_new (liwdgManager* manager,
 }
 
 int
-liext_brushes_insert_brush (liextBrushes* self,
-                            ligenBrush*   brush)
+liext_brushes_insert_brush (LIExtBrushes* self,
+                            LIGenBrush*   brush)
 {
 	/* Insert brush. */
 	if (!ligen_generator_insert_brush (self->generator, brush))
@@ -213,14 +213,14 @@ liext_brushes_insert_brush (liextBrushes* self,
 }
 
 int
-liext_brushes_save (liextBrushes* self)
+liext_brushes_save (LIExtBrushes* self)
 {
 	return ligen_generator_write_brushes (self->generator);
 }
 
 void
-liext_brushes_reset (liextBrushes* self,
-                     liarcReader*  reader)
+liext_brushes_reset (LIExtBrushes* self,
+                     LIArcReader*  reader)
 {
 	reader->pos = 1;
 	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview), reader);
@@ -232,15 +232,15 @@ liext_brushes_reset (liextBrushes* self,
 static const void*
 private_base ()
 {
-	return &liwdgGroupType;
+	return &liwdg_widget_group;
 }
 
 static int
-private_init (liextBrushes* self,
-              liwdgManager* manager)
+private_init (LIExtBrushes* self,
+              LIWdgManager* manager)
 {
-	liwdgWidget* group_attr;
-	liwdgWidget* group_tree;
+	LIWdgWidget* group_attr;
+	LIWdgWidget* group_tree;
 
 	/* Allocate widgets. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 3, 1))
@@ -375,7 +375,7 @@ private_init (liextBrushes* self,
 }
 
 static void
-private_free (liextBrushes* self)
+private_free (LIExtBrushes* self)
 {
 	if (self->clipboard != NULL)
 		ligen_brush_free (self->clipboard);
@@ -383,21 +383,21 @@ private_free (liextBrushes* self)
 }
 
 static int
-private_event (liextBrushes* self,
+private_event (LIExtBrushes* self,
                liwdgEvent*   event)
 {
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 static int
-private_add (liextBrushes* self,
-             liwdgWidget*  widget)
+private_add (LIExtBrushes* self,
+             LIWdgWidget*  widget)
 {
-	liextBrushesTreerow* data;
-	ligenBrush* brush;
-	ligenRule* rule;
-	limatTransform transform;
-	liwdgTreerow* row;
+	LIExtBrushesTreerow* data;
+	LIGenBrush* brush;
+	LIGenRule* rule;
+	LIMatTransform transform;
+	LIWdgTreerow* row;
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -476,12 +476,12 @@ private_add (liextBrushes* self,
 }
 
 static int
-private_copy (liextBrushes* self,
-              liwdgWidget*  widget)
+private_copy (LIExtBrushes* self,
+              LIWdgWidget*  widget)
 {
-	liextBrushesTreerow* data;
-	ligenRule* rule;
-	liwdgTreerow* row;
+	LIExtBrushesTreerow* data;
+	LIGenRule* rule;
+	LIWdgTreerow* row;
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -525,12 +525,12 @@ private_copy (liextBrushes* self,
 }
 
 static int
-private_object_info (liextBrushes* self)
+private_object_info (LIExtBrushes* self)
 {
 	char* tmp;
-	liextBrushesTreerow* data;
-	ligenBrushobject* object;
-	liwdgTreerow* row;
+	LIExtBrushesTreerow* data;
+	LIGenBrushobject* object;
+	LIWdgTreerow* row;
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -560,12 +560,12 @@ private_object_info (liextBrushes* self)
 }
 
 static int
-private_paint_select (liextBrushes* self,
-                      liwdgWidget*  widget)
+private_paint_select (LIExtBrushes* self,
+                      LIWdgWidget*  widget)
 {
 	int i;
 
-	for (i = 0 ; i < sizeof (self->widgets.button_paint) / sizeof (liwdgWidget*) ; i++)
+	for (i = 0 ; i < sizeof (self->widgets.button_paint) / sizeof (LIWdgWidget*) ; i++)
 	{
 		if (widget == self->widgets.button_paint[i])
 		{
@@ -579,21 +579,21 @@ private_paint_select (liextBrushes* self,
 }
 
 static int
-private_paint_terrain (liextBrushes* self,
+private_paint_terrain (LIExtBrushes* self,
                        int           x,
                        int           y)
 {
 	int i;
 	int tmp;
 	int border;
-	ligenBrush* brush;
-	limatVector line[2];
-	limatVector point[2];
-	liextPreview* preview;
-	liextBrushesTreerow* data;
-	limatAabb aabb;
-	liwdgTreerow* row;
-	lirndSelection result;
+	LIGenBrush* brush;
+	LIMatVector line[2];
+	LIMatVector point[2];
+	LIExtPreview* preview;
+	LIExtBrushesTreerow* data;
+	LIMatAabb aabb;
+	LIWdgTreerow* row;
+	LIRenSelection result;
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -712,14 +712,14 @@ private_paint_terrain (liextBrushes* self,
 }
 
 static int
-private_remove (liextBrushes* self,
-                liwdgWidget*  widget)
+private_remove (LIExtBrushes* self,
+                LIWdgWidget*  widget)
 {
 	int c;
 	int i;
-	liwdgTreerow* row;
-	liwdgTreerow* rows[2];
-	liextBrushesTreerow* data[3];
+	LIWdgTreerow* row;
+	LIWdgTreerow* rows[2];
+	LIExtBrushesTreerow* data[3];
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -787,16 +787,16 @@ private_remove (liextBrushes* self,
 }
 
 static int
-private_rename (liextBrushes* self,
-                liwdgWidget*  widget)
+private_rename (LIExtBrushes* self,
+                LIWdgWidget*  widget)
 {
 	char* tmp;
 	const char* name;
-	lialgU32dicIter iter;
-	ligenBrush* brush;
-	ligenBrushobject* object;
-	liextBrushesTreerow* data;
-	liwdgTreerow* row;
+	LIAlgU32dicIter iter;
+	LIGenBrush* brush;
+	LIGenBrushobject* object;
+	LIExtBrushesTreerow* data;
+	LIWdgTreerow* row;
 
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
 	if (row == NULL)
@@ -853,12 +853,12 @@ private_rename (liextBrushes* self,
 }
 
 static int
-private_selected (liextBrushes* self,
-                  liwdgWidget*  widget,
-                  liwdgTreerow* row)
+private_selected (LIExtBrushes* self,
+                  LIWdgWidget*  widget,
+                  LIWdgTreerow* row)
 {
-	liextBrushesTreerow* data;
-	liwdgTreerow* row0;
+	LIExtBrushesTreerow* data;
+	LIWdgTreerow* row0;
 
 	/* Deselect old. */
 	row0 = liwdg_tree_get_active (LIWDG_TREE (widget));
@@ -877,11 +877,11 @@ private_selected (liextBrushes* self,
 }
 
 static int
-private_stroke_flags (liextBrushes* self)
+private_stroke_flags (LIExtBrushes* self)
 {
-	liwdgTreerow* row;
-	ligenRulestroke* stroke;
-	liextBrushesTreerow* data;
+	LIWdgTreerow* row;
+	LIGenRulestroke* stroke;
+	LIExtBrushesTreerow* data;
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -901,15 +901,15 @@ private_stroke_flags (liextBrushes* self)
 	return 0;
 }
 
-static liwdgTreerow*
-private_append_brush (liextBrushes* self,
-                      ligenBrush*   brush)
+static LIWdgTreerow*
+private_append_brush (LIExtBrushes* self,
+                      LIGenBrush*   brush)
 {
 	int i;
-	ligenBrushobject* object;
-	ligenRule* rule;
-	liwdgTreerow* rows[5] = { NULL, NULL, NULL, NULL, NULL };
-	liextBrushesTreerow* data[5] = { NULL, NULL, NULL, NULL, NULL };
+	LIGenBrushobject* object;
+	LIGenRule* rule;
+	LIWdgTreerow* rows[5] = { NULL, NULL, NULL, NULL, NULL };
+	LIExtBrushesTreerow* data[5] = { NULL, NULL, NULL, NULL, NULL };
 
 	/* Get brushes row. */
 	rows[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
@@ -923,7 +923,7 @@ private_append_brush (liextBrushes* self,
 	assert (data[0]->stroke < 0);
 
 	/* Add brush row. */
-	data[1] = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data[1] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data[1] == NULL)
 		goto error;
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_BRUSH;
@@ -936,7 +936,7 @@ private_append_brush (liextBrushes* self,
 		goto error;
 
 	/* Add objects row. */
-	data[2] = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data[2] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data[2] == NULL)
 		goto error;
 	data[2]->type = LIEXT_BRUSHES_ROWTYPE_OBJECTS;
@@ -949,7 +949,7 @@ private_append_brush (liextBrushes* self,
 		goto error;
 
 	/* Add rules row. */
-	data[3] = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data[3] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data[3] == NULL)
 		goto error;
 	data[3]->type = LIEXT_BRUSHES_ROWTYPE_RULES;
@@ -1023,14 +1023,14 @@ error:
 	return NULL;
 }
 
-static liwdgTreerow*
-private_append_object (liextBrushes* self,
-                       liwdgTreerow* row,
+static LIWdgTreerow*
+private_append_object (LIExtBrushes* self,
+                       LIWdgTreerow* row,
                        int           index)
 {
-	ligenBrushobject* object;
-	liextBrushesTreerow* data[2];
-	liwdgTreerow* rows[2];
+	LIGenBrushobject* object;
+	LIExtBrushesTreerow* data[2];
+	LIWdgTreerow* rows[2];
 
 	/* Get row info. */
 	data[0] = liwdg_treerow_get_data (row);
@@ -1048,7 +1048,7 @@ private_append_object (liextBrushes* self,
 	object = data[0]->brush->objects.array[index];
 
 	/* Add object row. */
-	data[1] = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data[1] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data[1] == NULL)
 		return NULL;
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_OBJECT;
@@ -1074,14 +1074,14 @@ private_append_object (liextBrushes* self,
 	return rows[1];
 }
 
-static liwdgTreerow*
-private_append_rule (liextBrushes* self,
-                     liwdgTreerow* row,
-                     ligenRule*    rule)
+static LIWdgTreerow*
+private_append_rule (LIExtBrushes* self,
+                     LIWdgTreerow* row,
+                     LIGenRule*    rule)
 {
 	int i;
-	liextBrushesTreerow* data[2];
-	liwdgTreerow* rows[3];
+	LIExtBrushesTreerow* data[2];
+	LIWdgTreerow* rows[3];
 
 	/* Get row info. */
 	data[0] = liwdg_treerow_get_data (row);
@@ -1094,7 +1094,7 @@ private_append_rule (liextBrushes* self,
 	rows[0] = row;
 
 	/* Add rule row. */
-	data[1] = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data[1] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data[1] == NULL)
 		return NULL;
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_RULE;
@@ -1139,15 +1139,15 @@ private_append_rule (liextBrushes* self,
 	return rows[1];
 }
 
-static liwdgTreerow*
-private_append_stroke (liextBrushes* self,
-                       liwdgTreerow* row,
+static LIWdgTreerow*
+private_append_stroke (LIExtBrushes* self,
+                       LIWdgTreerow* row,
                        int           index)
 {
-	liextBrushesTreerow* data[2];
-	ligenBrush* brush;
-	ligenRulestroke* stroke;
-	liwdgTreerow* rows[2];
+	LIExtBrushesTreerow* data[2];
+	LIGenBrush* brush;
+	LIGenRulestroke* stroke;
+	LIWdgTreerow* rows[2];
 
 	/* Get row info. */
 	data[0] = liwdg_treerow_get_data (row);
@@ -1167,7 +1167,7 @@ private_append_stroke (liextBrushes* self,
 	assert (brush != NULL);
 
 	/* Add stroke row. */
-	data[1] = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data[1] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data[1] == NULL)
 		return NULL;
 	data[1]->type = LIEXT_BRUSHES_ROWTYPE_STROKE;
@@ -1194,14 +1194,14 @@ private_append_stroke (liextBrushes* self,
 }
 
 static void
-private_remove_strokes (liextBrushes* self,
-                        liwdgTreerow* row,
+private_remove_strokes (LIExtBrushes* self,
+                        LIWdgTreerow* row,
                         int           brush)
 {
 	int c;
 	int i;
-	liextBrushesTreerow* data;
-	liwdgTreerow* row1;
+	LIExtBrushesTreerow* data;
+	LIWdgTreerow* row1;
 
 	c = liwdg_treerow_get_row_count (row);
 	for (i = 0 ; i < c ; i++)
@@ -1222,15 +1222,15 @@ private_remove_strokes (liextBrushes* self,
 }
 
 static void
-private_rename_strokes (liextBrushes* self,
-                        liwdgTreerow* row,
+private_rename_strokes (LIExtBrushes* self,
+                        LIWdgTreerow* row,
                         int           brush,
                         const char*   text)
 {
 	int c;
 	int i;
-	liextBrushesTreerow* data;
-	liwdgTreerow* row1;
+	LIExtBrushesTreerow* data;
+	LIWdgTreerow* row1;
 
 	c = liwdg_treerow_get_row_count (row);
 	for (i = 0 ; i < c ; i++)
@@ -1246,15 +1246,15 @@ private_rename_strokes (liextBrushes* self,
 }
 
 static void
-private_transform (liextBrushes*   self,
-                   limatTransform* transform,
+private_transform (LIExtBrushes*   self,
+                   LIMatTransform* transform,
                    int             finish)
 {
-	ligenBrushobject* object;
-	ligenRulestroke* stroke;
-	liextBrushesTreerow* row;
-	limatQuaternion quat;
-	limatVector pos;
+	LIGenBrushobject* object;
+	LIGenRulestroke* stroke;
+	LIExtBrushesTreerow* row;
+	LIMatQuaternion quat;
+	LIMatVector pos;
 
 	row = private_get_active (self);
 	if (finish)
@@ -1287,12 +1287,12 @@ private_transform (liextBrushes*   self,
 }
 
 static void
-private_populate (liextBrushes* self)
+private_populate (LIExtBrushes* self)
 {
-	lialgU32dicIter iter;
-	liextBrushesTreerow* data;
-	ligenBrush* brush;
-	liwdgTreerow* row;
+	LIAlgU32dicIter iter;
+	LIExtBrushesTreerow* data;
+	LIGenBrush* brush;
+	LIWdgTreerow* row;
 
 	/* Clear tree. */
 	row = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
@@ -1300,7 +1300,7 @@ private_populate (liextBrushes* self)
 	liwdg_tree_clear (LIWDG_TREE (self->widgets.tree));
 
 	/* Add root row. */
-	data = lisys_calloc (1, sizeof (liextBrushesTreerow));
+	data = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
 	if (data == NULL)
 		return;
 	data->type = LIEXT_BRUSHES_ROWTYPE_ROOT;
@@ -1323,13 +1323,13 @@ private_populate (liextBrushes* self)
 }
 
 static void
-private_resize_brush (liextBrushes* self)
+private_resize_brush (LIExtBrushes* self)
 {
 	int x;
 	int y;
 	int z;
-	liextBrushesTreerow* data;
-	liwdgTreerow* row;
+	LIExtBrushesTreerow* data;
+	LIWdgTreerow* row;
 
 	/* Find the brush. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -1352,18 +1352,18 @@ private_resize_brush (liextBrushes* self)
 }
 
 static void
-private_rebuild_brush (liextBrushes* self)
+private_rebuild_brush (LIExtBrushes* self)
 {
 	int x;
 	int y;
 	int z;
-	liengObject* player;
-	liextBrushesTreerow* data;
-	ligenBrush* brush;
-	limatTransform transform;
-	limatTransform transform0;
-	limatTransform transform1;
-	liwdgTreerow* row;
+	LIEngObject* player;
+	LIExtBrushesTreerow* data;
+	LIGenBrush* brush;
+	LIMatTransform transform;
+	LIMatTransform transform0;
+	LIMatTransform transform1;
+	LIWdgTreerow* row;
 
 	/* Find the brush. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -1400,18 +1400,18 @@ private_rebuild_brush (liextBrushes* self)
 }
 
 static void
-private_rebuild_preview (liextBrushes* self)
+private_rebuild_preview (LIExtBrushes* self)
 {
 	int i;
 	int j;
 	int pos[3];
-	liextBrushesTreerow* row;
-	ligenBrush* brush;
-	ligenBrushobject* object;
-	ligenRulestroke* stroke;
-	limatQuaternion quat;
-	limatTransform transform;
-	limatVector vec;
+	LIExtBrushesTreerow* row;
+	LIGenBrush* brush;
+	LIGenBrushobject* object;
+	LIGenRulestroke* stroke;
+	LIMatQuaternion quat;
+	LIMatTransform transform;
+	LIMatVector vec;
 
 	row = private_get_active (self);
 	if (row == NULL || row->brush == NULL)
@@ -1490,14 +1490,14 @@ private_rebuild_preview (liextBrushes* self)
 }
 
 static void
-private_rebuild_selection (liextBrushes* self)
+private_rebuild_selection (LIExtBrushes* self)
 {
 	int show;
-	liextBrushesTreerow* data;
-	ligenBrush* brush;
-	ligenBrushobject* object;
-	ligenRulestroke* stroke;
-	liwdgTreerow* row;
+	LIExtBrushesTreerow* data;
+	LIGenBrush* brush;
+	LIGenBrushobject* object;
+	LIGenRulestroke* stroke;
+	LIWdgTreerow* row;
 
 	/* Get active row. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -1580,10 +1580,10 @@ private_rebuild_selection (liextBrushes* self)
 	private_rebuild_preview (self);
 }
 
-static liextBrushesTreerow*
-private_get_active (liextBrushes* self)
+static LIExtBrushesTreerow*
+private_get_active (LIExtBrushes* self)
 {
-	liwdgTreerow* row;
+	LIWdgTreerow* row;
 
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
 	if (row == NULL)

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrScript Script
+ * \addtogroup LIScrScript Script
  * @{
  */
 
@@ -28,42 +28,42 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "script-types.h"
 
-liscrScript*
+LIScrScript*
 liscr_script_new ();
 
 int
-liscr_script_load (liscrScript* self,
+liscr_script_load (LIScrScript* self,
                    const char*  path);
 
 void
-liscr_script_free (liscrScript* self);
+liscr_script_free (LIScrScript* self);
 
-liscrClass*
-liscr_script_create_class (liscrScript*   self,
+LIScrClass*
+liscr_script_create_class (LIScrScript*   self,
                            const char*    name,
-                           liscrClassInit init,
+                           LIScrClassInit init,
                            void*          data);
 
-liscrClass*
-liscr_script_find_class (liscrScript* self,
+LIScrClass*
+liscr_script_find_class (LIScrScript* self,
                          const char*  name);
 
 int
-liscr_script_insert_class (liscrScript* self,
-                           liscrClass*  clss);
+liscr_script_insert_class (LIScrScript* self,
+                           LIScrClass*  clss);
 
 void
-liscr_script_update (liscrScript* self,
+liscr_script_update (LIScrScript* self,
                      float        secs);
 
 void*
-liscr_script_get_userdata (liscrScript* self);
+liscr_script_get_userdata (LIScrScript* self);
 
 void
-liscr_script_set_userdata (liscrScript* self,
+liscr_script_set_userdata (LIScrScript* self,
                            void*        data);
 
 #endif

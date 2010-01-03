@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,69 +18,69 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgOctree Octree
+ * \addtogroup LIAlgOctree Octree
  * @{
  */
 
 #ifndef __ALGORITHM_OCTREE_H__
 #define __ALGORITHM_OCTREE_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _lialgOcnode lialgOcnode;
-typedef struct _lialgOctree lialgOctree;
-typedef int (*lialgOctreeRead) (void*        data,
+typedef struct _LIAlgOcnode LIAlgOcnode;
+typedef struct _LIAlgOctree LIAlgOctree;
+typedef int (*LIAlgOctreeRead) (void*        data,
                                 void**       value,
-                                limatVector* offset,
-                                liarcReader* reader);
-typedef int (*lialgOctreeWrite)(void*        data,
+                                LIMatVector* offset,
+                                LIArcReader* reader);
+typedef int (*LIAlgOctreeWrite)(void*        data,
                                 void*        value,
-                                limatVector* offset,
-                                liarcWriter* writer);
+                                LIMatVector* offset,
+                                LIArcWriter* writer);
 
-struct _lialgOcnode
+struct _LIAlgOcnode
 {
-	lialgOcnode* children[2][2][2];
+	LIAlgOcnode* children[2][2][2];
 };
 
-struct _lialgOctree
+struct _LIAlgOctree
 {
 	int depth;
-	lialgOcnode* root;
+	LIAlgOcnode* root;
 };
 
-lialgOctree*
+LIAlgOctree*
 lialg_octree_new (int depth);
 
-lialgOctree*
+LIAlgOctree*
 lialg_octree_new_from_file (const char*     path,
-                            lialgOctreeRead callback,
+                            LIAlgOctreeRead callback,
                             void*           data);
-lialgOctree*
-lialg_octree_new_from_data (liarcReader*    reader,
-                            lialgOctreeRead callback,
+LIAlgOctree*
+lialg_octree_new_from_data (LIArcReader*    reader,
+                            LIAlgOctreeRead callback,
                             void*           data);
 void
-lialg_octree_free (lialgOctree* self);
+lialg_octree_free (LIAlgOctree* self);
 
 int
-lialg_octree_write (lialgOctree*     self,
-                    liarcWriter*     writer,
-                    lialgOctreeWrite callback,
+lialg_octree_write (LIAlgOctree*     self,
+                    LIArcWriter*     writer,
+                    LIAlgOctreeWrite callback,
                     void*            data);
 
 void*
-lialg_octree_get_data (lialgOctree*    self,
-                       const limatVector* point);
+lialg_octree_get_data (LIAlgOctree*    self,
+                       const LIMatVector* point);
 
 int
-lialg_octree_set_data (lialgOctree*    self,
-                       const limatVector* point,
+lialg_octree_set_data (LIAlgOctree*    self,
+                       const LIMatVector* point,
                        void*           data);
 
 int
-lialg_octree_get_size (const lialgOctree* self);
+lialg_octree_get_size (const LIAlgOctree* self);
 
 #endif
 

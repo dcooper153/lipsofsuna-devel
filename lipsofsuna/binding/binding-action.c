@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup libnd Binding
  * @{
- * \addtogroup libndAction Action
+ * \addtogroup LIBndAction Action
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "binding.h"
 #include "binding-manager.h"
 
@@ -38,17 +38,17 @@
  * \param data User data passed to the callback.
  * \return New binding action or NULL.
  */
-libndAction*
-libnd_action_new (libndManager* manager,
+LIBndAction*
+libnd_action_new (LIBndManager* manager,
                   const char*   identifier,
                   const char*   name,
                   const char*   description,
                   libndCallback callback,
                   void*         data)
 {
-	libndAction* self;
+	LIBndAction* self;
 
-	self = lisys_calloc (1, sizeof (libndAction));
+	self = lisys_calloc (1, sizeof (LIBndAction));
 	if (self == NULL)
 		return NULL;
 	self->manager = manager;
@@ -82,7 +82,7 @@ libnd_action_new (libndManager* manager,
  * \param self Binding action.
  */
 void
-libnd_action_free (libndAction* self)
+libnd_action_free (LIBndAction* self)
 {
 	/* Remove from manager. */
 	if (self->prev != NULL)
@@ -100,26 +100,26 @@ libnd_action_free (libndAction* self)
 }
 
 int
-libnd_action_get_enabled (libndAction* self)
+libnd_action_get_enabled (LIBndAction* self)
 {
 	return self->enabled;
 }
 
 void
-libnd_action_set_enabled (libndAction* self,
+libnd_action_set_enabled (LIBndAction* self,
                           int          value)
 {
 	self->enabled = value;
 }
 
 void*
-libnd_action_get_userdata (libndAction* self)
+libnd_action_get_userdata (LIBndAction* self)
 {
 	return self->data;
 }
 
 void
-libnd_action_set_userdata (libndAction* self,
+libnd_action_set_userdata (LIBndAction* self,
                            void*        value)
 {
 	self->data = value;

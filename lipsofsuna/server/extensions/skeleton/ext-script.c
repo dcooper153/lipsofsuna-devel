@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-skeleton.h"
 #include "ext-module.h"
 
@@ -44,7 +44,7 @@
  * -- @param self Skeleton class.
  * Skeleton.test(self)
  */
-static void Skeleton_test (liscrArgs* args)
+static void Skeleton_test (LIScrArgs* args)
 {
 	printf ("Skeleton.test\n");
 }
@@ -52,7 +52,7 @@ static void Skeleton_test (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSkeletonScript (liscrClass* self,
+liext_script_skeleton (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);

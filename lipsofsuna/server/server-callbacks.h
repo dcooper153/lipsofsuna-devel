@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,22 +16,22 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvCallbacks Callbacks
+ * \addtogroup liserCallbacks Callbacks
  * @{
  */
 
 #ifndef __SERVER_CALLBACKS_H__
 #define __SERVER_CALLBACKS_H__
 
-#include <engine/lips-engine.h>
+#include <lipsofsuna/engine.h>
 #include "server.h"
 #include "server-client.h"
 #include "server-object.h"
 #include "server-types.h"
 
-int lisrv_server_init_callbacks_client (lisrvServer* server);
+int liser_server_init_callbacks_client (LISerServer* server);
 
 #endif
 

@@ -2,7 +2,7 @@ AC_INIT([Lips of Suna], [0.0.3], [http://lipsofsuna.org], [lipsofsuna])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([silent-rules subdir-objects tar-ustar])
-AM_CONFIG_HEADER([lipsofsuna/config.h])
+AM_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 
@@ -29,9 +29,7 @@ AC_ARG_WITH([dep-prefix],
 		PKG_CONFIG_PATH="$withval/lib/pkgconfig"
 	else
 		PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$withval/lib/pkgconfig"
-	fi
-	dnl No way to avoid this?
-	export PKG_CONFIG_PATH], [])
+	fi], [])
 
 dnl Compiler flags.
 if test "x$want_debug" = xyes; then
@@ -45,6 +43,19 @@ fi
 if test "x$want_mallocdebug" = xyes; then
 	CFLAGS="$CFLAGS -DLI_MALLOC_DEBUG"
 fi
+
+dnl Easy dependencies.
+CFLAGS="$CFLAGS -I$PWD/deps/include"
+CPPFLAGS="$CPPFLAGS -I$PWD/deps/include"
+CXXFLAGS="$CXXFLAGS -I$PWD/deps/include"
+LDFLAGS="$LDFLAGS -L$PWD/deps/lib"
+if test "x$PKG_CONFIG_PATH" = x; then
+	PKG_CONFIG_PATH="$PWD/deps/lib/pkgconfig"
+else
+	PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$PWD/deps/lib/pkgconfig"
+fi
+dnl No way to avoid this?
+export PKG_CONFIG_PATH
 
 dnl Tools, headers, libraries.
 AC_ISC_POSIX
@@ -368,7 +379,6 @@ AC_SUBST([TOOLDIR])
 AC_OUTPUT([
 Makefile
 doc/Makefile
-lipsofsuna/Makefile
 lipsofsuna/client/extensions/Makefile
 lipsofsuna/server/extensions/Makefile
 ])

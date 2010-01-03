@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,34 +24,34 @@
  * @{
  */
 
-#include <server/lips-server.h>
+#include <lipsofsuna/server.h>
 #include "ext-creature.h"
 #include "ext-module.h"
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Creature",
+	LISER_EXTENSION_VERSION, "Creature",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (lisrvServer* server)
+LIExtModule*
+liext_module_new (LISerServer* server)
 {
-	liextModule* self;
+	LIExtModule* self;
 
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 
-	liscr_script_create_class (server->script, "Creature", liextCreatureScript, self);
+	liscr_script_create_class (server->script, "Creature", liext_script_creature, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	/* FIXME: Remove the class here. */
 	lisys_free (self);

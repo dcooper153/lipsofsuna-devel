@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,20 +16,20 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndDeferred Deferred
+ * \addtogroup LIRenDeferred Deferred
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "render-deferred.h"
 
 static int
-private_check (lirndDeferred* self);
+private_check (LIRenDeferred* self);
 
 static int
-private_rebuild (lirndDeferred* self,
+private_rebuild (LIRenDeferred* self,
                  int            width,
                  int            height);
 
@@ -43,12 +43,12 @@ private_rebuild (lirndDeferred* self,
  * \param height Framebuffer height.
  * \return New deferred framebuffer or NULL.
  */
-lirndDeferred*
-lirnd_deferred_new (lirndRender* render,
+LIRenDeferred*
+liren_deferred_new (LIRenRender* render,
                     int          width,
                     int          height)
 {
-	lirndDeferred* self;
+	LIRenDeferred* self;
 
 	/* Check for capabilities. */
 	/* TODO: Check for NPOT */
@@ -64,7 +64,7 @@ lirnd_deferred_new (lirndRender* render,
 	}
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndDeferred));
+	self = lisys_calloc (1, sizeof (LIRenDeferred));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -74,7 +74,7 @@ lirnd_deferred_new (lirndRender* render,
 	/* Create frame buffer object. */
 	if (!private_rebuild (self, width, height))
 	{
-		lirnd_deferred_free (self);
+		liren_deferred_free (self);
 		return NULL;
 	}
 
@@ -87,7 +87,7 @@ lirnd_deferred_new (lirndRender* render,
  * \param self Deferred framebuffer.
  */
 void
-lirnd_deferred_free (lirndDeferred* self)
+liren_deferred_free (LIRenDeferred* self)
 {
 	glDeleteFramebuffersEXT (1, &self->deferred_fbo);
 	glDeleteFramebuffersEXT (1, &self->target_fbo);
@@ -108,7 +108,7 @@ lirnd_deferred_free (lirndDeferred* self)
  * \return Nonzero on success.
  */
 int
-lirnd_deferred_resize (lirndDeferred* self,
+liren_deferred_resize (LIRenDeferred* self,
                        int            width,
                        int            height)
 {
@@ -135,7 +135,7 @@ lirnd_deferred_resize (lirndDeferred* self,
  * \return Nonzero on success.
  */
 void
-lirnd_deferred_read_pixel (lirndDeferred* self,
+liren_deferred_read_pixel (LIRenDeferred* self,
                            int            x,
                            int            y,
                            int            texture,
@@ -167,7 +167,7 @@ lirnd_deferred_read_pixel (lirndDeferred* self,
 /*****************************************************************************/
 
 static int
-private_check (lirndDeferred* self)
+private_check (LIRenDeferred* self)
 {
 	int ret;
 
@@ -211,7 +211,7 @@ private_check (lirndDeferred* self)
 }
 
 static int
-private_rebuild (lirndDeferred* self,
+private_rebuild (LIRenDeferred* self,
                  int            width,
                  int            height)
 {

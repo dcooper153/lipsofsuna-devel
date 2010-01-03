@@ -25,35 +25,35 @@
  */
 
 #include <sys/stat.h>
-#include <client/lips-client.h>
-#include <model/lips-model.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/string.h>
 #include "ext-reload.h"
 
 static int
-private_callback_tick (liextReload* self,
+private_callback_tick (LIExtReload* self,
                        float        secs);
 
 static void
-private_progress_cancel (liextReload* self);
+private_progress_cancel (LIExtReload* self);
 
 static void
-private_reload_image (liextReload* self,
+private_reload_image (LIExtReload* self,
                       const char*  name);
 
 static void
-private_reload_model (liextReload* self,
+private_reload_model (LIExtReload* self,
                       const char*  name);
 
 /*****************************************************************************/
 
-liextReload*
-liext_reload_new (licliClient* client)
+LIExtReload*
+liext_reload_new (LICliClient* client)
 {
-	liextReload* self;
+	LIExtReload* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextReload));
+	self = lisys_calloc (1, sizeof (LIExtReload));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -79,14 +79,14 @@ liext_reload_new (licliClient* client)
 }
 
 void
-liext_reload_free (liextReload* self)
+liext_reload_free (LIExtReload* self)
 {
 	if (self->reload != NULL)
 	{
 		liext_reload_cancel (self);
 		lirel_reload_free (self->reload);
 	}
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
@@ -96,7 +96,7 @@ liext_reload_free (liextReload* self)
  * \param self Reload.
  */
 void
-liext_reload_cancel (liextReload* self)
+liext_reload_cancel (LIExtReload* self)
 {
 	lirel_reload_cancel (self->reload);
 	private_callback_tick (self, 1.0f);
@@ -109,19 +109,19 @@ liext_reload_cancel (liextReload* self)
  * \return Nonzero on success.
  */
 int
-liext_reload_run (liextReload* self)
+liext_reload_run (LIExtReload* self)
 {
 	return lirel_reload_run (self->reload);
 }
 
 int
-liext_reload_get_enabled (const liextReload* self)
+liext_reload_get_enabled (const LIExtReload* self)
 {
 	return lirel_reload_get_enabled (self->reload);
 }
 
 int
-liext_reload_set_enabled (liextReload* self,
+liext_reload_set_enabled (LIExtReload* self,
                           int          value)
 {
 	return lirel_reload_set_enabled (self->reload, value);
@@ -135,7 +135,7 @@ liext_reload_set_enabled (liextReload* self,
  * \param self Reload.
  */
 int
-private_callback_tick (liextReload* self,
+private_callback_tick (LIExtReload* self,
                        float        secs)
 {
 	/* Update reloader state. */
@@ -183,30 +183,30 @@ private_callback_tick (liextReload* self,
  * \param self Reload.
  */
 static void
-private_progress_cancel (liextReload* self)
+private_progress_cancel (LIExtReload* self)
 {
 	lirel_reload_cancel (self->reload);
 }
 
 static void
-private_reload_image (liextReload* self,
+private_reload_image (LIExtReload* self,
                       const char*  name)
 {
 	printf ("Reloading texture `%s'\n", name);
-	lirnd_render_load_image (self->client->render, name);
+	liren_render_load_image (self->client->render, name);
 }
 
 static void
-private_reload_model (liextReload* self,
+private_reload_model (LIExtReload* self,
                       const char*  name)
 {
-	liengModel* model;
+	LIEngModel* model;
 
 	printf ("Reloading model `%s'\n", name);
 	lieng_engine_load_model (self->client->engine, name);
 	model = lieng_engine_find_model_by_name (self->client->engine, name);
 	if (model != NULL)
-		lirnd_render_load_model (self->client->render, name, model->model);
+		liren_render_load_model (self->client->render, name, model->model);
 }
 
 /** @} */

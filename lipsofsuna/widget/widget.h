@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgWidget Widget
+ * \addtogroup LIWdgWidget Widget
  * @{
  */
 
@@ -31,20 +31,20 @@
 #include "widget-manager.h"
 #include "widget-types.h"
 
-#define LIWDG_WIDGET(o) ((liwdgWidget*)(o))
+#define LIWDG_WIDGET(o) ((LIWdgWidget*)(o))
 
-struct _liwdgWidget
+struct _LIWdgWidget
 {
-	const liwdgClass* type;
-	liwdgManager* manager;
-	liwdgWidget* parent;
-	liwdgWidget* prev;
-	liwdgWidget* next;
-	liwdgRect allocation;
-	liwdgSize hardrequest;
-	liwdgSize userrequest;
-	liwdgStyle* style;
-	liwdgWidgetState state;
+	const LIWdgClass* type;
+	LIWdgManager* manager;
+	LIWdgWidget* parent;
+	LIWdgWidget* prev;
+	LIWdgWidget* next;
+	LIWdgRect allocation;
+	LIWdgSize hardrequest;
+	LIWdgSize userrequest;
+	LIWdgStyle* style;
+	LIWdgWidgetState state;
 	void* userdata;
 	char* state_name;
 	char* style_name;
@@ -53,151 +53,151 @@ struct _liwdgWidget
 	unsigned int visible : 1;
 };
 
-extern const liwdgClass liwdgWidgetType;
+extern const LIWdgClass liwdg_widget_widget;
 
-liwdgWidget*
-liwdg_widget_new (liwdgManager*     manager,
-                  const liwdgClass* clss);
+LIWdgWidget*
+liwdg_widget_new (LIWdgManager*     manager,
+                  const LIWdgClass* clss);
 
 void
-liwdg_widget_free (liwdgWidget* self);
+liwdg_widget_free (LIWdgWidget* self);
 
 int
-liwdg_widget_connect (liwdgWidget* self,
+liwdg_widget_connect (LIWdgWidget* self,
                       const char*  type,
                       void*        func,
                       void*        data,
-                      licalHandle* handle);
+                      LICalHandle* handle);
 
 int
-liwdg_widget_detach (liwdgWidget* self);
+liwdg_widget_detach (LIWdgWidget* self);
+
+void
+liwdg_widget_draw (LIWdgWidget* self);
 
 int
-liwdg_widget_event (liwdgWidget* self,
+liwdg_widget_event (LIWdgWidget* self,
                     liwdgEvent*  event);
 
 int
-liwdg_widget_insert_callback (liwdgWidget* self,
+liwdg_widget_insert_callback (LIWdgWidget* self,
                               const char*  type,
                               void*        func,
                               void*        data);
 
 int
-liwdg_widget_insert_callback_full (liwdgWidget* self,
+liwdg_widget_insert_callback_full (LIWdgWidget* self,
                                    const char*  type,
                                    int          priority,
                                    void*        func,
                                    void*        data,
-                                   licalHandle* handle);
+                                   LICalHandle* handle);
 
 void
-liwdg_widget_move (liwdgWidget* self,
+liwdg_widget_move (LIWdgWidget* self,
                    int          x,
                    int          y);
 
 void
-liwdg_widget_paint (liwdgWidget* self,
-                    liwdgRect*   rect);
+liwdg_widget_paint (LIWdgWidget* self,
+                    LIWdgRect*   rect);
 
 void
-liwdg_widget_render (liwdgWidget* self);
-
-void
-liwdg_widget_translate_coords (liwdgWidget* self,
+liwdg_widget_translate_coords (LIWdgWidget* self,
                                int          screenx,
                                int          screeny,
                                int*         widgetx,
                                int*         widgety);
 
 int
-liwdg_widget_typeis (const liwdgWidget* self,
-                     const liwdgClass*  clss);
+liwdg_widget_typeis (const LIWdgWidget* self,
+                     const LIWdgClass*  clss);
 
 void
-liwdg_widget_update (liwdgWidget* self,
+liwdg_widget_update (LIWdgWidget* self,
                      float        secs);
 
 void
-liwdg_widget_get_allocation (liwdgWidget* self,
-                             liwdgRect*   allocation);
+liwdg_widget_get_allocation (LIWdgWidget* self,
+                             LIWdgRect*   allocation);
 
 void
-liwdg_widget_set_allocation (liwdgWidget* self,
+liwdg_widget_set_allocation (LIWdgWidget* self,
                              int          x,
                              int          y,
                              int          w,
                              int          h);
 
 void
-liwdg_widget_get_content (liwdgWidget* self,
-                          liwdgRect*   allocation);
+liwdg_widget_get_content (LIWdgWidget* self,
+                          LIWdgRect*   allocation);
 
 int
-liwdg_widget_get_grab (const liwdgWidget* self);
+liwdg_widget_get_grab (const LIWdgWidget* self);
 
 void
-liwdg_widget_set_grab (liwdgWidget* self,
+liwdg_widget_set_grab (LIWdgWidget* self,
                        int          value);
 
 int
-liwdg_widget_get_focus_mouse (liwdgWidget* self);
+liwdg_widget_get_focus_mouse (LIWdgWidget* self);
 
 void
-liwdg_widget_set_focus_mouse (liwdgWidget* self);
+liwdg_widget_set_focus_mouse (LIWdgWidget* self);
 
 int
-liwdg_widget_get_focus_keyboard (liwdgWidget* self);
+liwdg_widget_get_focus_keyboard (LIWdgWidget* self);
 
 void
-liwdg_widget_set_focus_keyboard (liwdgWidget* self);
+liwdg_widget_set_focus_keyboard (LIWdgWidget* self);
 
 int
-liwdg_widget_get_focusable (liwdgWidget* self);
+liwdg_widget_get_focusable (LIWdgWidget* self);
 
 void
-liwdg_widget_set_focusable (liwdgWidget* self,
+liwdg_widget_set_focusable (LIWdgWidget* self,
                             int          focusable);
 
 void
-liwdg_widget_get_request (liwdgWidget* self,
-                          liwdgSize*   request);
+liwdg_widget_get_request (LIWdgWidget* self,
+                          LIWdgSize*   request);
 
 void
-liwdg_widget_set_request (liwdgWidget* self,
+liwdg_widget_set_request (LIWdgWidget* self,
                           int          w,
                           int          h);
 
 void
-liwdg_widget_set_request_internal (liwdgWidget* self,
+liwdg_widget_set_request_internal (LIWdgWidget* self,
                                    int          w,
                                    int          h);
 
-liwdgWidget*
-liwdg_widget_get_root (liwdgWidget* self);
+LIWdgWidget*
+liwdg_widget_get_root (LIWdgWidget* self);
 
 void
-liwdg_widget_set_state (liwdgWidget* self,
+liwdg_widget_set_state (LIWdgWidget* self,
                         const char*  state);
 
-liwdgStyle*
-liwdg_widget_get_style (liwdgWidget* self);
+LIWdgStyle*
+liwdg_widget_get_style (LIWdgWidget* self);
 
 void
-liwdg_widget_set_style (liwdgWidget* self,
+liwdg_widget_set_style (LIWdgWidget* self,
                         const char*  style);
 
 void*
-liwdg_widget_get_userdata (liwdgWidget* self);
+liwdg_widget_get_userdata (LIWdgWidget* self);
 
 void
-liwdg_widget_set_userdata (liwdgWidget* self,
+liwdg_widget_set_userdata (LIWdgWidget* self,
                            void*        value);
 
 int
-liwdg_widget_get_visible (liwdgWidget* self);
+liwdg_widget_get_visible (LIWdgWidget* self);
 
 void
-liwdg_widget_set_visible (liwdgWidget* self,
+liwdg_widget_set_visible (LIWdgWidget* self,
                           int          visible);
 
 #endif

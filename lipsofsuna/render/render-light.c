@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,20 +16,20 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndLight Light
+ * \addtogroup LIRenLight Light
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "render-draw.h"
 #include "render-light.h"
 
 #define LIGHT_CONTRIBUTION_EPSILON 0.01f
 
 static void
-private_update_shadow (lirndLight* self);
+private_update_shadow (LIRenLight* self);
 
 /*****************************************************************************/
 
@@ -44,18 +44,18 @@ private_update_shadow (lirndLight* self);
  * \param shadows Nonzero if the lamp casts shadows.
  * \return New light source or NULL.
  */
-lirndLight*
-lirnd_light_new (lirndScene*  scene,
+LIRenLight*
+liren_light_new (LIRenScene*  scene,
                  const float* color,
                  const float* equation,
                  float        cutoff,
                  float        exponent,
                  int          shadows)
 {
-	lirndLight* self;
+	LIRenLight* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndLight));
+	self = lisys_calloc (1, sizeof (LIRenLight));
 	if (self == NULL)
 		return NULL;
 	self->scene = scene;
@@ -124,19 +124,19 @@ lirnd_light_new (lirndScene*  scene,
  * \param color Array of 4 floats.
  * \return New light source or NULL.
  */
-lirndLight*
-lirnd_light_new_directional (lirndScene*  scene,
+LIRenLight*
+liren_light_new_directional (LIRenScene*  scene,
                              const float* color)
 {
 	const float equation[3] = { 1.0f, 0.0f, 0.0f };
-	const limatVector direction = { 0.0f, 0.0f, -1.0f };
-	lirndLight* self;
+	const LIMatVector direction = { 0.0f, 0.0f, -1.0f };
+	LIRenLight* self;
 
 	/* Create the sun.  */
-	self = lirnd_light_new (scene, color, equation, M_PI, 0.0f, 0);
+	self = liren_light_new (scene, color, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return NULL;
-	lirnd_light_set_direction (self, &direction);
+	liren_light_set_direction (self, &direction);
 
 	return self;
 }
@@ -148,16 +148,16 @@ lirnd_light_new_directional (lirndScene*  scene,
  * \param light Model light.
  * \return New light or NULL.
  */
-lirndLight*
-lirnd_light_new_from_model (lirndScene*      scene,
-                            const limdlNode* light)
+LIRenLight*
+liren_light_new_from_model (LIRenScene*      scene,
+                            const LIMdlNode* light)
 {
-	limatMatrix projection;
-	limatTransform transform;
-	lirndLight* self;
+	LIMatMatrix projection;
+	LIMatTransform transform;
+	LIRenLight* self;
 
 	/* Allocate self. */
-	self = lirnd_light_new (scene,
+	self = liren_light_new (scene,
 		light->light.color, light->light.equation,
 		light->light.spot.cutoff, light->light.spot.exponent,
 		light->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
@@ -167,9 +167,9 @@ lirnd_light_new_from_model (lirndScene*      scene,
 	/* Set transform. */
 	self->node = light;
 	limdl_node_get_world_transform (light, &transform);
-	lirnd_light_set_transform (self, &transform);
+	liren_light_set_transform (self, &transform);
 	limdl_light_get_projection (light, &projection);
-	lirnd_light_set_projection (self, &projection);
+	liren_light_set_projection (self, &projection);
 
 	return self;
 }
@@ -179,12 +179,12 @@ lirnd_light_new_from_model (lirndScene*      scene,
  *
  * \param self Light source.
  */
-void lirnd_light_free (lirndLight* self)
+void liren_light_free (LIRenLight* self)
 {
 	if (GLEW_EXT_framebuffer_object)
 		glDeleteFramebuffersEXT (1, &self->shadow.fbo);
 	glDeleteTextures (1, &self->shadow.map);
-	lirnd_lighting_remove_light (self->scene->lighting, self);
+	liren_lighting_remove_light (self->scene->lighting, self);
 	lisys_free (self);
 }
 
@@ -201,8 +201,8 @@ void lirnd_light_free (lirndLight* self)
  * \return Integer indicating which light contributes more.
  */
 int
-lirnd_light_compare (const lirndLight* self,
-                     const lirndLight* light)
+liren_light_compare (const LIRenLight* self,
+                     const LIRenLight* light)
 {
 	if (self->rating < light->rating)
 		return -1;
@@ -212,7 +212,7 @@ lirnd_light_compare (const lirndLight* self,
 }
 
 void
-lirnd_light_update (lirndLight* self)
+liren_light_update (LIRenLight* self)
 {
 	if (self->shadow.map)
 	{
@@ -223,7 +223,7 @@ lirnd_light_update (lirndLight* self)
 }
 
 void
-lirnd_light_set_ambient (lirndLight*  self,
+liren_light_set_ambient (LIRenLight*  self,
                          const float* value)
 {
 	memcpy (self->ambient, value, 4 * sizeof (float));
@@ -237,8 +237,8 @@ lirnd_light_set_ambient (lirndLight*  self,
  * \return Nonzero if has bounds.
  */
 int
-lirnd_light_get_bounds (const lirndLight* self,
-                        limatAabb*        result)
+liren_light_get_bounds (const LIRenLight* self,
+                        LIMatAabb*        result)
 {
 	double a;
 	double b;
@@ -280,8 +280,8 @@ lirnd_light_get_bounds (const lirndLight* self,
  * \param value Return location for the direction.
  */
 void
-lirnd_light_get_direction (const lirndLight* self,
-                           limatVector*      value)
+liren_light_get_direction (const LIRenLight* self,
+                           LIMatVector*      value)
 {
 	*value = limat_vector_init (0.0f, 0.0f, -1.0f);
 	*value = limat_quaternion_transform (self->transform.rotation, *value);
@@ -294,16 +294,16 @@ lirnd_light_get_direction (const lirndLight* self,
  * \param value Light direction.
  */
 void
-lirnd_light_set_direction (lirndLight*        self,
-                           const limatVector* value)
+liren_light_set_direction (LIRenLight*        self,
+                           const LIMatVector* value)
 {
 	float a;
 	float b;
-	limatMatrix projection;
-	limatQuaternion rotation;
-	limatTransform transform;
-	limatVector direction;
-	limatVector position;
+	LIMatMatrix projection;
+	LIMatQuaternion rotation;
+	LIMatTransform transform;
+	LIMatVector direction;
+	LIMatVector position;
 
 	/* Calculate temporary position. */
 	/* FIXME: Temporary position not supported. */
@@ -320,9 +320,9 @@ lirnd_light_set_direction (lirndLight*        self,
 
 	/* Set light transformation. */
 	transform = limat_transform_init (position, rotation);
-	lirnd_light_set_transform (self, &transform);
+	liren_light_set_transform (self, &transform);
 	projection = limat_matrix_ortho (200, -200, 200, -200, -1000, 1000);
-	lirnd_light_set_projection (self, &projection);
+	liren_light_set_projection (self, &projection);
 	self->directional = 1;
 }
 
@@ -333,7 +333,7 @@ lirnd_light_set_direction (lirndLight*        self,
  * \param value Nonzero if the light is directional.
  */
 void
-lirnd_light_set_directional (lirndLight* self,
+liren_light_set_directional (LIRenLight* self,
                              int         value)
 {
 	self->directional = (value != 0);
@@ -346,7 +346,7 @@ lirnd_light_set_directional (lirndLight* self,
  * \return Nonzero if registered.
  */
 int
-lirnd_light_get_enabled (const lirndLight* self)
+liren_light_get_enabled (const LIRenLight* self)
 {
 	return self->enabled;
 }
@@ -358,8 +358,8 @@ lirnd_light_get_enabled (const lirndLight* self)
  * \param value Return location for the matrix.
  */
 void
-lirnd_light_get_modelview (const lirndLight* self,
-                           limatMatrix*         value)
+liren_light_get_modelview (const LIRenLight* self,
+                           LIMatMatrix*         value)
 {
 	*value = self->modelview;
 }
@@ -373,8 +373,8 @@ lirnd_light_get_modelview (const lirndLight* self,
  * \param value Return location for the position.
  */
 void
-lirnd_light_get_position (const lirndLight* self,
-                          limatVector*      value)
+liren_light_get_position (const LIRenLight* self,
+                          LIMatVector*      value)
 {
 	*value = self->transform.position;
 }
@@ -386,8 +386,8 @@ lirnd_light_get_position (const lirndLight* self,
  * \param value Return location for the matrix.
  */
 void
-lirnd_light_get_projection (const lirndLight* self,
-                            limatMatrix*         value)
+liren_light_get_projection (const LIRenLight* self,
+                            LIMatMatrix*         value)
 {
 	*value = self->projection;
 }
@@ -399,8 +399,8 @@ lirnd_light_get_projection (const lirndLight* self,
  * \param value Matrix to set.
  */
 void
-lirnd_light_set_projection (lirndLight*     self,
-                            const limatMatrix* value)
+liren_light_set_projection (LIRenLight*     self,
+                            const LIMatMatrix* value)
 {
 	self->projection = *value;
 }
@@ -412,8 +412,8 @@ lirnd_light_set_projection (lirndLight*     self,
  * \param value Return value for the transformation.
  */
 void
-lirnd_light_get_transform (lirndLight*     self,
-                           limatTransform* value)
+liren_light_get_transform (LIRenLight*     self,
+                           LIMatTransform* value)
 {
 	*value = self->transform;
 }
@@ -427,12 +427,12 @@ lirnd_light_get_transform (lirndLight*     self,
  * \param transform Transformation.
  */
 void
-lirnd_light_set_transform (lirndLight*           self,
-                           const limatTransform* transform)
+liren_light_set_transform (LIRenLight*           self,
+                           const LIMatTransform* transform)
 {
-	limatVector dir;
-	limatVector pos;
-	limatVector up;
+	LIMatVector dir;
+	LIMatVector pos;
+	LIMatVector up;
 
 	pos = transform->position;
 	dir = limat_quaternion_transform (transform->rotation, limat_vector_init (0.0f, 0.0f, -1.0f));
@@ -445,11 +445,11 @@ lirnd_light_set_transform (lirndLight*           self,
 /*****************************************************************************/
 
 static void
-private_update_shadow (lirndLight* self)
+private_update_shadow (LIRenLight* self)
 {
-	lialgU32dicIter iter;
-	limatFrustum frustum;
-	lirndContext context;
+	LIAlgU32dicIter iter;
+	LIMatFrustum frustum;
+	LIRenContext context;
 
 	/* Enable depth rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
@@ -464,12 +464,12 @@ private_update_shadow (lirndLight* self)
 
 	/* Render to depth texture. */
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	lirnd_context_init (&context, self->scene);
-	lirnd_context_set_modelview (&context, &self->modelview);
-	lirnd_context_set_projection (&context, &self->projection);
-	lirnd_context_set_frustum (&context, &frustum);
+	liren_context_init (&context, self->scene);
+	liren_context_set_modelview (&context, &self->modelview);
+	liren_context_set_projection (&context, &self->projection);
+	liren_context_set_frustum (&context, &frustum);
 	LI_FOREACH_U32DIC (iter, self->scene->objects)
-		lirnd_draw_shadowmap (&context, iter.value, self);
+		liren_draw_shadowmap (&context, iter.value, self);
 
 	/* Disable depth rendering mode. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);

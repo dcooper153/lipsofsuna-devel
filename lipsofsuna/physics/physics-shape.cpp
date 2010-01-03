@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,38 +18,38 @@
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphySector Sector
+ * \addtogroup LIPhySector Sector
  * @{
  */
 
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "physics-shape.h"
 #include "physics-private.h"
 
 #define VERTEX_WELD_EPSILON 0.05
 
 static btConvexHullShape*
-private_create_convex (liphyShape* self,
+private_create_convex (LIPhyShape* self,
                        btScalar*   vertices,
                        int         count);
 
 static inline int
-private_init_box (liphyShape*      self,
-                  const limatAabb* aabb);
+private_init_box (LIPhyShape*      self,
+                  const LIMatAabb* aabb);
 
 static inline int
-private_init_convex (liphyShape*        self,
-                     const limatVector* vertices,
+private_init_convex (LIPhyShape*        self,
+                     const LIMatVector* vertices,
                      int                count);
 
 static inline int
-private_init_model (liphyShape*       self,
-                    const limdlModel* model);
+private_init_model (LIPhyShape*       self,
+                    const LIMdlModel* model);
 
 static btScalar*
-private_weld_vertices (liphyShape*        self,
-                       const limatVector* vertices,
+private_weld_vertices (LIPhyShape*        self,
+                       const LIMatVector* vertices,
                        int                count_in,
                        int*               count_out);
 
@@ -65,13 +65,13 @@ private_weld_vertices (liphyShape*        self,
  * \param model Referenced model.
  * \return New collision shape or NULL.
  */
-liphyShape*
-liphy_shape_new (liphyPhysics*     physics,
-                 const limdlModel* model)
+LIPhyShape*
+liphy_shape_new (LIPhyPhysics*     physics,
+                 const LIMdlModel* model)
 {
-	liphyShape* self;
+	LIPhyShape* self;
 
-	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
+	self = (LIPhyShape*) lisys_calloc (1, sizeof (LIPhyShape));
 	if (self == NULL)
 		return NULL;
 	self->model = model;
@@ -101,13 +101,13 @@ liphy_shape_new (liphyPhysics*     physics,
  * \param aabb Axis-aligned bounding box.
  * \return New collision shape or NULL.
  */
-liphyShape*
-liphy_shape_new_aabb (liphyPhysics*    physics,
-                      const limatAabb* aabb)
+LIPhyShape*
+liphy_shape_new_aabb (LIPhyPhysics*    physics,
+                      const LIMatAabb* aabb)
 {
-	liphyShape* self;
+	LIPhyShape* self;
 
-	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
+	self = (LIPhyShape*) lisys_calloc (1, sizeof (LIPhyShape));
 	if (self == NULL)
 		return NULL;
 	try
@@ -137,14 +137,14 @@ liphy_shape_new_aabb (liphyPhysics*    physics,
  * \param count Number of vertices.
  * \return New collision shape or NULL.
  */
-liphyShape*
-liphy_shape_new_convex (liphyPhysics*      physics,
-                        const limatVector* vertices,
+LIPhyShape*
+liphy_shape_new_convex (LIPhyPhysics*      physics,
+                        const LIMatVector* vertices,
                         int                count)
 {
-	liphyShape* self;
+	LIPhyShape* self;
 
-	self = (liphyShape*) lisys_calloc (1, sizeof (liphyShape));
+	self = (LIPhyShape*) lisys_calloc (1, sizeof (LIPhyShape));
 	if (self == NULL)
 		return NULL;
 	try
@@ -172,7 +172,7 @@ liphy_shape_new_convex (liphyPhysics*      physics,
  * \param self Collision shape.
  */
 void
-liphy_shape_free (liphyShape* self)
+liphy_shape_free (LIPhyShape* self)
 {
 	if (self->shape != NULL)
 		delete self->shape;
@@ -187,9 +187,9 @@ liphy_shape_free (liphyShape* self)
  * \param result Return location for the inertia vector.
  */
 void
-liphy_shape_get_inertia (const liphyShape* self,
+liphy_shape_get_inertia (const LIPhyShape* self,
                          float             mass,
-                         limatVector*      result)
+                         LIMatVector*      result)
 {
 	btVector3 inertia;
 
@@ -203,7 +203,7 @@ liphy_shape_get_inertia (const liphyShape* self,
 /*****************************************************************************/
 
 static btConvexHullShape*
-private_create_convex (liphyShape* self,
+private_create_convex (LIPhyShape* self,
                        btScalar*   vertices,
                        int         count)
 {
@@ -232,8 +232,8 @@ private_create_convex (liphyShape* self,
 }
 
 static inline int
-private_init_box (liphyShape*      self,
-                  const limatAabb* aabb)
+private_init_box (LIPhyShape*      self,
+                  const LIMatAabb* aabb)
 {
 	btScalar tmp[32] =
 	{
@@ -253,8 +253,8 @@ private_init_box (liphyShape*      self,
 }
 
 static inline int
-private_init_convex (liphyShape*        self,
-                     const limatVector* vertices,
+private_init_convex (LIPhyShape*        self,
+                     const LIMatVector* vertices,
                      int                count)
 {
 	int num;
@@ -270,13 +270,13 @@ private_init_convex (liphyShape*        self,
 }
 
 static inline int
-private_init_model (liphyShape*       self,
-                    const limdlModel* model)
+private_init_model (LIPhyShape*       self,
+                    const LIMdlModel* model)
 {
 	int i;
 	int ret;
 	int count;
-	limatVector* vertices;
+	LIMatVector* vertices;
 
 	/* FIXME: One model can have multiple shapes. */
 	/* FIXME: All shapes should be precalculated. */
@@ -295,7 +295,7 @@ private_init_model (liphyShape*       self,
 			return 1;
 
 		/* Allocate vertices. */
-		vertices = (limatVector*) lisys_calloc (count, sizeof (limatVector));
+		vertices = (LIMatVector*) lisys_calloc (count, sizeof (LIMatVector));
 		if (vertices == NULL)
 			return 0;
 		for (i = 0 ; i < model->vertices.count ; i++)
@@ -310,8 +310,8 @@ private_init_model (liphyShape*       self,
 }
 
 static btScalar*
-private_weld_vertices (liphyShape*        self,
-                       const limatVector* vertices,
+private_weld_vertices (LIPhyShape*        self,
+                       const LIMatVector* vertices,
                        int                count_in,
                        int*               count_out)
 {

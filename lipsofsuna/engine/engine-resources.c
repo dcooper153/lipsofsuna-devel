@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengResources Resources
+ * \addtogroup LIEngResources Resources
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "engine-resources.h"
 
 static int
@@ -49,12 +49,12 @@ private_filter_samples (const char* dir,
                         void*       data);
 
 static int
-private_insert_model (liengResources*   self,
+private_insert_model (LIEngResources*   self,
                       const char*       name,
-                      const limdlModel* model);
+                      const LIMdlModel* model);
 
 static int
-private_insert_sample (liengResources* self,
+private_insert_sample (LIEngResources* self,
                        const char*     name);
 
 /*****************************************************************************/
@@ -68,13 +68,13 @@ private_insert_sample (liengResources* self,
  * \param engine Engine.
  * \return Resource manager or NULL.
  */
-liengResources*
-lieng_resources_new (liengEngine* engine)
+LIEngResources*
+lieng_resources_new (LIEngEngine* engine)
 {
-	liengResources* self;
+	LIEngResources* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liengResources));
+	self = lisys_calloc (1, sizeof (LIEngResources));
 	if (self == NULL)
 		return NULL;
 	self->engine = engine;
@@ -88,7 +88,7 @@ lieng_resources_new (liengEngine* engine)
  * \param self Resources.
  */
 void
-lieng_resources_free (liengResources* self)
+lieng_resources_free (LIEngResources* self)
 {
 	lieng_resources_clear (self);
 	lisys_free (self);
@@ -100,12 +100,12 @@ lieng_resources_free (liengResources* self)
  * \param self Resources.
  */
 void
-lieng_resources_clear (liengResources* self)
+lieng_resources_clear (LIEngResources* self)
 {
 	int i;
-	liengAnimation* animation;
-	liengModel* model;
-	liengSample* sample;
+	LIEngAnimation* animation;
+	LIEngModel* model;
+	LIEngSample* sample;
 
 	/* Free animations. */
 	if (self->animations.array != NULL)
@@ -155,8 +155,8 @@ lieng_resources_clear (liengResources* self)
  * \param id ID.
  * \return Animation or NULL.
  */
-liengAnimation*
-lieng_resources_find_animation_by_code (liengResources* self,
+LIEngAnimation*
+lieng_resources_find_animation_by_code (LIEngResources* self,
                                         int             id)
 {
 	if (id >= self->animations.count)
@@ -171,15 +171,15 @@ lieng_resources_find_animation_by_code (liengResources* self,
  * \param name Name.
  * \return Animation or NULL.
  */
-liengAnimation*
-lieng_resources_find_animation_by_name (liengResources* self,
+LIEngAnimation*
+lieng_resources_find_animation_by_name (LIEngResources* self,
                                         const char*     name)
 {
-	liengAnimation tmp;
+	LIEngAnimation tmp;
 
 	tmp.name = (char*) name;
 	return bsearch (&tmp, self->animations.array, self->animations.count,
-		sizeof (liengAnimation), private_compare_animations);
+		sizeof (LIEngAnimation), private_compare_animations);
 }
 
 /**
@@ -189,8 +189,8 @@ lieng_resources_find_animation_by_name (liengResources* self,
  * \param id ID.
  * \return Model or NULL.
  */
-liengModel*
-lieng_resources_find_model_by_code (liengResources* self,
+LIEngModel*
+lieng_resources_find_model_by_code (LIEngResources* self,
                                     int             id)
 {
 	if (id >= self->models.count)
@@ -205,18 +205,18 @@ lieng_resources_find_model_by_code (liengResources* self,
  * \param name Name.
  * \return Model or NULL.
  */
-liengModel*
-lieng_resources_find_model_by_name (liengResources* self,
+LIEngModel*
+lieng_resources_find_model_by_name (LIEngResources* self,
                                     const char*     name)
 {
-	liengModel tmp;
-	liengModel* ptr;
-	liengModel** ret;
+	LIEngModel tmp;
+	LIEngModel* ptr;
+	LIEngModel** ret;
 
 	tmp.name = (char*) name;
 	ptr = &tmp;
 	ret = bsearch (&ptr, self->models.array, self->models.count,
-		sizeof (liengModel*), private_compare_models);
+		sizeof (LIEngModel*), private_compare_models);
 	if (ret == NULL)
 		return NULL;
 
@@ -230,8 +230,8 @@ lieng_resources_find_model_by_name (liengResources* self,
  * \param id ID.
  * \return Sample or NULL.
  */
-liengSample*
-lieng_resources_find_sample_by_code (liengResources* self,
+LIEngSample*
+lieng_resources_find_sample_by_code (LIEngResources* self,
                                      int             id)
 {
 	if (id >= self->samples.count)
@@ -246,15 +246,15 @@ lieng_resources_find_sample_by_code (liengResources* self,
  * \param name Name.
  * \return Sample or NULL.
  */
-liengSample*
-lieng_resources_find_sample_by_name (liengResources* self,
+LIEngSample*
+lieng_resources_find_sample_by_name (LIEngResources* self,
                                      const char*     name)
 {
-	liengSample tmp;
+	LIEngSample tmp;
 
 	tmp.name = (char*) name;
 	return bsearch (&tmp, self->samples.array, self->samples.count,
-		sizeof (liengSample), private_compare_samples);
+		sizeof (LIEngSample), private_compare_samples);
 }
 
 /**
@@ -265,7 +265,7 @@ lieng_resources_find_sample_by_name (liengResources* self,
  * \return Nonzero on success.
  */
 int
-lieng_resources_load_from_dir (liengResources* self,
+lieng_resources_load_from_dir (LIEngResources* self,
                                const char*     path)
 {
 	int i;
@@ -274,8 +274,8 @@ lieng_resources_load_from_dir (liengResources* self,
 	char* file;
 	char* name;
 	char* tmp;
-	limdlModel* model = NULL;
-	lisysDir* directory = NULL;
+	LIMdlModel* model = NULL;
+	LISysDir* directory = NULL;
 
 	/* Find all models. */
 	tmp = lisys_path_concat (path, "graphics", NULL);
@@ -353,11 +353,11 @@ lieng_resources_load_from_dir (liengResources* self,
 
 	/* Sort loaded data. */
 	qsort (self->animations.array, self->animations.count,
-		sizeof (liengAnimation), private_compare_animations);
+		sizeof (LIEngAnimation), private_compare_animations);
 	qsort (self->models.array, self->models.count,
-		sizeof (liengModel*), private_compare_models);
+		sizeof (LIEngModel*), private_compare_models);
 	qsort (self->samples.array, self->samples.count,
-		sizeof (liengSample), private_compare_samples);
+		sizeof (LIEngSample), private_compare_samples);
 	for (i = 0 ; i < self->animations.count ; i++)
 		self->animations.array[i].id = i;
 	for (i = 0 ; i < self->models.count ; i++)
@@ -382,8 +382,8 @@ error:
  * \return Nonzero on success.
  */
 int
-lieng_resources_load_from_stream (liengResources* self,
-                                  liarcReader*    reader)
+lieng_resources_load_from_stream (LIEngResources* self,
+                                  LIArcReader*    reader)
 {
 	int id;
 	char* name;
@@ -391,9 +391,9 @@ lieng_resources_load_from_stream (liengResources* self,
 	uint32_t n_animations;
 	uint32_t n_models;
 	uint32_t n_samples;
-	liengAnimation* animation;
-	liengModel* model;
-	liengSample* sample;
+	LIEngAnimation* animation;
+	LIEngModel* model;
+	LIEngSample* sample;
 
 	/* Read the header. */
 	if (!liarc_reader_get_uint32 (reader, &n_animations) ||
@@ -408,7 +408,7 @@ lieng_resources_load_from_stream (liengResources* self,
 	if (n_animations)
 	{
 		self->animations.count = n_animations;
-		self->animations.array = lisys_calloc (n_animations, sizeof (liengAnimation));
+		self->animations.array = lisys_calloc (n_animations, sizeof (LIEngAnimation));
 		if (self->animations.array == NULL)
 			goto error;
 		for (id = 0 ; id < n_animations ; id++)
@@ -424,7 +424,7 @@ lieng_resources_load_from_stream (liengResources* self,
 	if (n_models)
 	{
 		self->models.count = n_models;
-		self->models.array = lisys_calloc (n_models, sizeof (liengModel*));
+		self->models.array = lisys_calloc (n_models, sizeof (LIEngModel*));
 		if (self->models.array == NULL)
 			goto error;
 		for (id = 0 ; id < n_models ; id++)
@@ -443,7 +443,7 @@ lieng_resources_load_from_stream (liengResources* self,
 	if (n_samples)
 	{
 		self->samples.count = n_samples;
-		self->samples.array = lisys_calloc (n_samples, sizeof (liengSample));
+		self->samples.array = lisys_calloc (n_samples, sizeof (LIEngSample));
 		if (self->samples.array == NULL)
 			goto error;
 		for (id = 0 ; id < n_samples ; id++)
@@ -482,7 +482,7 @@ error:
  * \return Number of animations.
  */
 int
-lieng_resources_get_animation_count (liengResources* self)
+lieng_resources_get_animation_count (LIEngResources* self)
 {
 	return self->animations.count;
 }
@@ -494,7 +494,7 @@ lieng_resources_get_animation_count (liengResources* self)
  * \return Number of models.
  */
 int
-lieng_resources_get_model_count (liengResources* self)
+lieng_resources_get_model_count (LIEngResources* self)
 {
 	return self->models.count;
 }
@@ -505,8 +505,8 @@ static int
 private_compare_animations (const void* a,
                             const void* b)
 {
-	const liengAnimation* aa = a;
-	const liengAnimation* bb = b;
+	const LIEngAnimation* aa = a;
+	const LIEngAnimation* bb = b;
 
 	return strcmp (aa->name, bb->name);
 }
@@ -515,8 +515,8 @@ static int
 private_compare_models (const void* a,
                         const void* b)
 {
-	const liengModel* const* aa = a;
-	const liengModel* const* bb = b;
+	const LIEngModel* const* aa = a;
+	const LIEngModel* const* bb = b;
 
 	return strcmp ((*aa)->name, (*bb)->name);
 }
@@ -525,8 +525,8 @@ static int
 private_compare_samples (const void* a,
                          const void* b)
 {
-	const liengSample* aa = a;
-	const liengSample* bb = b;
+	const LIEngSample* aa = a;
+	const LIEngSample* bb = b;
 
 	return strcmp (aa->name, bb->name);
 }
@@ -562,16 +562,16 @@ private_filter_samples (const char* dir,
 }
 
 static int
-private_insert_model (liengResources*   self,
+private_insert_model (LIEngResources*   self,
                       const char*       name,
-                      const limdlModel* model)
+                      const LIMdlModel* model)
 {
 	int i;
 	int j;
 	int count;
-	liengModel* tmp;
-	liengAnimation* eanim;
-	limdlAnimation* manim;
+	LIEngModel* tmp;
+	LIEngAnimation* eanim;
+	LIMdlAnimation* manim;
 
 	/* Create new model. */
 	tmp = lieng_model_new (self->engine, 0, self->engine->config.dir, name);
@@ -618,11 +618,11 @@ private_insert_model (liengResources*   self,
 }
 
 static int
-private_insert_sample (liengResources* self,
+private_insert_sample (LIEngResources* self,
                        const char*     name)
 {
 	int j;
-	liengSample sample;
+	LIEngSample sample;
 
 	/* Check for duplicates. */
 	for (j = 0 ; j < self->samples.count ; j++)

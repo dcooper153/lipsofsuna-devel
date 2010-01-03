@@ -27,12 +27,12 @@
 #ifndef __EXT_PREVIEW_H__
 #define __EXT_PREVIEW_H__
 
-#include <client/lips-client.h>
-#include <generator/lips-generator.h>
-#include <engine/lips-engine.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/generator.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/widget.h>
 
-#define LIEXT_PREVIEW(o) ((liextPreview*)(o))
+#define LIEXT_PREVIEW(o) ((LIExtPreview*)(o))
 
 enum
 {
@@ -44,90 +44,90 @@ enum
 	LIEXT_PREVIEW_ROTATE_VOXEL,
 };
 
-typedef struct _liextPreview liextPreview;
-struct _liextPreview
+typedef struct _LIExtPreview LIExtPreview;
+struct _LIExtPreview
 {
-	liwdgRender base;
-	lialgCamera* camera;
-	lialgSectors* sectors;
-	lialgPtrdic* objects;
-	licalCallbacks* callbacks;
-	licalHandle calls[2];
-	licliClient* client;
-	ligenGenerator* generator;
-	limatVector drag;
-	limatTransform transform;
-	lirndLight* light0;
-	lirndLight* light1;
-	lirndGroup* group;
-	lirndRender* render;
-	lirndScene* scene;
+	LIWdgRender base;
+	LIAlgCamera* camera;
+	LIAlgSectors* sectors;
+	LIAlgPtrdic* objects;
+	LICalCallbacks* callbacks;
+	LICalHandle calls[2];
+	LICliClient* client;
+	LIGenGenerator* generator;
+	LIMatVector drag;
+	LIMatTransform transform;
+	LIRenLight* light0;
+	LIRenLight* light1;
+	LIRenGroup* group;
+	LIRenRender* render;
+	LIRenScene* scene;
 	int mode;
 };
 
-extern const liwdgClass liextPreviewType;
+extern const LIWdgClass liext_widget_preview;
 
-liwdgWidget*
-liext_preview_new (liwdgManager* manager,
-                   licliClient*  client);
+LIWdgWidget*
+liext_preview_new (LIWdgManager* manager,
+                   LICliClient*  client);
 
 void
-liext_preview_build (liextPreview* self);
+liext_preview_build (LIExtPreview* self);
 
 int
-liext_preview_build_tile (liextPreview* self,
+liext_preview_build_tile (LIExtPreview* self,
                           int           material);
 
 int
-liext_preview_clear (liextPreview* self);
+liext_preview_clear (LIExtPreview* self);
 
 void
-liext_preview_copy_voxels (liextPreview* self,
+liext_preview_copy_voxels (LIExtPreview* self,
                            int           startx,
                            int           starty,
                            int           startz,
                            int           sizex,
                            int           sizey,
                            int           sizez,
-                           livoxVoxel*   result);
+                           LIVoxVoxel*   result);
 
 int
-liext_preview_insert_object (liextPreview*         self,
-                             const limatTransform* transform,
+liext_preview_insert_object (LIExtPreview*         self,
+                             const LIMatTransform* transform,
                              const char*           model);
 
 int
-liext_preview_insert_stroke (liextPreview* self,
+liext_preview_insert_stroke (LIExtPreview* self,
                              int           x,
                              int           y,
                              int           z,
                              int           brush);
 
 void
-liext_preview_paint_terrain (liextPreview* self,
-                             limatVector*  point,
+liext_preview_paint_terrain (LIExtPreview* self,
+                             LIMatVector*  point,
                              int           mode,
                              int           material,
                              int           axis);
 
 int
-liext_preview_replace_materials (liextPreview* self,
-                                 liarcReader*  reader);
+liext_preview_replace_materials (LIExtPreview* self,
+                                 LIArcReader*  reader);
 
 void
-liext_preview_setup_camera (liextPreview* self,
-                            limatVector*  eye,
-                            limatVector*  ctr,
-                            limatVector*  up,
+liext_preview_setup_camera (LIExtPreview* self,
+                            LIMatVector*  eye,
+                            LIMatVector*  ctr,
+                            LIMatVector*  up,
                             int           driver);
 
 void
-liext_preview_get_bounds (liextPreview* self,
-                          limatAabb*    aabb);
+liext_preview_get_bounds (LIExtPreview* self,
+                          LIMatAabb*    aabb);
 
 void
-liext_preview_get_transform (liextPreview*   self,
-                             limatTransform* value);
+liext_preview_get_transform (LIExtPreview*   self,
+                             LIMatTransform* value);
 
 #endif
 

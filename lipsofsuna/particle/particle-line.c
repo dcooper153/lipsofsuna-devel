@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,18 +18,18 @@
 /**
  * \addtogroup lipar Particle
  * @{
- * \addtogroup liparLine Line
+ * \addtogroup LIParLine Line
  * @{
  */
 
 #include "particle-line.h"
 
 void
-lipar_line_init (liparLine*         self,
-                 const limatVector* position0,
-                 const limatVector* position1,
-                 const limatVector* velocity0,
-                 const limatVector* velocity1)
+lipar_line_init (LIParLine*         self,
+                 const LIMatVector* position0,
+                 const LIMatVector* position1,
+                 const LIMatVector* velocity0,
+                 const LIMatVector* velocity1)
 {
 	self->position[0] = *position0;
 	self->position[1] = *position1;
@@ -45,7 +45,7 @@ lipar_line_init (liparLine*         self,
 }
 
 void
-lipar_line_get_colors (const liparLine* self,
+lipar_line_get_colors (const LIParLine* self,
                        float*           color0,
                        float*           color1)
 {

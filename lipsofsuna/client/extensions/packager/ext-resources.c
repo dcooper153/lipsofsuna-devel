@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,9 +24,9 @@
  * @{
  */
 
-#include <model/lips-model.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "ext-resources.h"
 
 static int
@@ -38,29 +38,29 @@ private_compare_strings (const void* a,
                          const void* b);
 
 static int
-private_read_animations (liextResources*   self,
-                         const limdlModel* model);
+private_read_animations (LIExtResources*   self,
+                         const LIMdlModel* model);
 
 static int
-private_read_shaders (liextResources*   self,
-                      const limdlModel* model);
+private_read_shaders (LIExtResources*   self,
+                      const LIMdlModel* model);
 
 static int
-private_read_textures (liextResources*   self,
-                       const limdlModel* model);
+private_read_textures (LIExtResources*   self,
+                       const LIMdlModel* model);
 
 static void
-private_write (liextResources* self,
-               liarcWriter*    writer);
+private_write (LIExtResources* self,
+               LIArcWriter*    writer);
 
 /*****************************************************************************/
 
-liextResources*
+LIExtResources*
 liext_resources_new ()
 {
-	liextResources* self;
+	LIExtResources* self;
 
-	self = lisys_calloc (1, sizeof (liextResources));
+	self = lisys_calloc (1, sizeof (LIExtResources));
 	if (self == NULL)
 		return 0;
 
@@ -68,7 +68,7 @@ liext_resources_new ()
 }
 
 void
-liext_resources_free (liextResources* self)
+liext_resources_free (LIExtResources* self)
 {
 	int i;
 
@@ -88,7 +88,7 @@ liext_resources_free (liextResources* self)
 }
 
 void
-liext_resources_clear (liextResources* self)
+liext_resources_clear (LIExtResources* self)
 {
 	int i;
 
@@ -104,15 +104,15 @@ liext_resources_clear (liextResources* self)
 	lisys_free (self->models.array);
 	lisys_free (self->shaders.array);
 	lisys_free (self->textures.array);
-	memset (self, 0, sizeof (liextResources));
+	memset (self, 0, sizeof (LIExtResources));
 }
 
 int
-liext_resources_insert_model (liextResources*   self,
+liext_resources_insert_model (LIExtResources*   self,
                               const char*       name,
-                              const limdlModel* model)
+                              const LIMdlModel* model)
 {
-	liextModel tmp;
+	LIExtModel tmp;
 
 	/* Create model. */
 	tmp.name = listr_dup (name);
@@ -137,7 +137,7 @@ liext_resources_insert_model (liextResources*   self,
 }
 
 int
-liext_resources_insert_texture (liextResources* self,
+liext_resources_insert_texture (LIExtResources* self,
                                 const char*     name)
 {
 	int k;
@@ -164,10 +164,10 @@ liext_resources_insert_texture (liextResources* self,
 }
 
 int
-liext_resources_save (liextResources* self,
+liext_resources_save (LIExtResources* self,
                       const char*     name)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	writer = liarc_writer_new_file (name);
 	if (writer == NULL)
@@ -184,8 +184,8 @@ static int
 private_compare_models (const void* a,
                         const void* b)
 {
-	const liextModel* aa = a;
-	const liextModel* bb = b;
+	const LIExtModel* aa = a;
+	const LIExtModel* bb = b;
 
 	return strcmp (aa->name, bb->name);
 }
@@ -201,13 +201,13 @@ private_compare_strings (const void* a,
 }
 
 static int
-private_read_animations (liextResources*   self,
-                         const limdlModel* model)
+private_read_animations (LIExtResources*   self,
+                         const LIMdlModel* model)
 {
 	int i;
 	int j;
 	int count;
-	const limdlAnimation* animation;
+	const LIMdlAnimation* animation;
 
 	for (i = 0 ; i < model->animations.count ; i++)
 	{
@@ -235,13 +235,13 @@ private_read_animations (liextResources*   self,
 }
 
 static int
-private_read_shaders (liextResources*   self,
-                      const limdlModel* model)
+private_read_shaders (LIExtResources*   self,
+                      const LIMdlModel* model)
 {
 	int i;
 	int j;
 	int count;
-	const limdlMaterial* material;
+	const LIMdlMaterial* material;
 
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
@@ -269,15 +269,15 @@ private_read_shaders (liextResources*   self,
 }
 
 static int
-private_read_textures (liextResources*   self,
-                       const limdlModel* model)
+private_read_textures (LIExtResources*   self,
+                       const LIMdlModel* model)
 {
 	int i;
 	int j;
 	int k;
 	int count;
-	const limdlTexture* texture;
-	const limdlMaterial* material;
+	const LIMdlTexture* texture;
+	const LIMdlMaterial* material;
 
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
@@ -313,14 +313,14 @@ private_read_textures (liextResources*   self,
 }
 
 static void
-private_write (liextResources* self,
-               liarcWriter*    writer)
+private_write (LIExtResources* self,
+               LIArcWriter*    writer)
 {
 	int i;
-	liextModel* model;
+	LIExtModel* model;
 
 	/* Sort data. */
-	qsort (self->models.array, self->models.count, sizeof (liextModel), private_compare_models);
+	qsort (self->models.array, self->models.count, sizeof (LIExtModel), private_compare_models);
 	qsort (self->animations.array, self->animations.count, sizeof (char*), private_compare_strings);
 	qsort (self->shaders.array, self->shaders.count, sizeof (char*), private_compare_strings);
 	qsort (self->textures.array, self->textures.count, sizeof (char*), private_compare_strings);

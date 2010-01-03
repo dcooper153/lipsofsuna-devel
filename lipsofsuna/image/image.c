@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup liimg Image
  * @{
- * \addtogroup liimgImage Image
+ * \addtogroup LIImgImage Image
  * @{
  */
 
 #include <png.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "image-compress.h"
 #include "image-dds.h"
 #include "image.h"
@@ -33,12 +33,12 @@
  *
  * \return New image or NULL.
  */
-liimgImage*
+LIImgImage*
 liimg_image_new ()
 {
-	liimgImage* self;
+	LIImgImage* self;
 
-	self = lisys_calloc (1, sizeof (liimgImage));
+	self = lisys_calloc (1, sizeof (LIImgImage));
 	if (self == NULL)
 		return NULL;
 
@@ -51,10 +51,10 @@ liimg_image_new ()
  * \param path Path to the image file.
  * \return New image or NULL.
  */
-liimgImage*
+LIImgImage*
 liimg_image_new_from_file (const char* path)
 {
-	liimgImage* self;
+	LIImgImage* self;
 
 	self = liimg_image_new ();
 	if (self == NULL)
@@ -74,7 +74,7 @@ liimg_image_new_from_file (const char* path)
  * \param self Image.
  */
 void
-liimg_image_free (liimgImage* self)
+liimg_image_free (LIImgImage* self)
 {
 	lisys_free (self->pixels);
 	lisys_free (self);
@@ -88,7 +88,7 @@ liimg_image_free (liimgImage* self)
  * \return Nonzero on success.
  */
 int
-liimg_image_load (liimgImage* self,
+liimg_image_load (LIImgImage* self,
                   const char* path)
 {
 	int x;
@@ -193,13 +193,13 @@ liimg_image_load (liimgImage* self,
  * \return Nonzero on success.
  */
 int
-liimg_image_save_rgba (liimgImage* self,
+liimg_image_save_rgba (LIImgImage* self,
                        const char* path)
 {
 	int w;
 	int h;
 	FILE* file;
-	liimgDDS dds;
+	LIImgDDS dds;
 
 	/* Create a DDS file. */
 	file = fopen (path, "wb");
@@ -239,7 +239,7 @@ liimg_image_save_rgba (liimgImage* self,
  * \return Nonzero on success.
  */
 int
-liimg_image_save_s3tc (liimgImage* self,
+liimg_image_save_s3tc (LIImgImage* self,
                        const char* path)
 {
 	int w;
@@ -248,7 +248,7 @@ liimg_image_save_s3tc (liimgImage* self,
 	int size;
 	FILE* file;
 	char* bytes;
-	liimgDDS dds;
+	LIImgDDS dds;
 
 	/* Allocate buffers. */
 	bytes = lisys_malloc (4 * self->width * self->height);
@@ -301,7 +301,7 @@ liimg_image_save_s3tc (liimgImage* self,
  * \param self Image.
  */
 void
-liimg_image_shrink_half (liimgImage* self)
+liimg_image_shrink_half (LIImgImage* self)
 {
 	int x;
 	int y;

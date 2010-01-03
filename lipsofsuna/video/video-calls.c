@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,15 +18,15 @@
 /**
  * \addtogroup livid Video
  * @{
- * \addtogroup lividCalls Calls
+ * \addtogroup LIVidCalls Calls
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "video-calls.h"
 
 int
-livid_calls_init (lividCalls* self)
+livid_calls_init (LIVidCalls* self)
 {
 	/* SDL calls. */
 #define CALL(name) \

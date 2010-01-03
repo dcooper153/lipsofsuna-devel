@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 #include "ext-skills.h"
 #include "ext-widget.h"
@@ -50,11 +50,11 @@
  * -- @return Skills or nil.
  * function Skills.find(self, args)
  */
-static void Skills_find (liscrArgs* args)
+static void Skills_find (LIScrArgs* args)
 {
-	liextModule* module;
-	liextSkills* skills;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtSkills* skills;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
@@ -77,10 +77,10 @@ static void Skills_find (liscrArgs* args)
  * -- @return Number or nil.
  * function Skills.get_maximum(self, args)
  */
-static void Skills_get_maximum (liscrArgs* args)
+static void Skills_get_maximum (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -97,10 +97,10 @@ static void Skills_get_maximum (liscrArgs* args)
  * -- @return List of skill names.
  * function Skills.get_names(self)
  */
-static void Skills_get_names (liscrArgs* args)
+static void Skills_get_names (LIScrArgs* args)
 {
-	lialgStrdicIter iter;
-	liextSkills* skills;
+	LIAlgStrdicIter iter;
+	LIExtSkills* skills;
 
 	skills = args->self;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
@@ -120,10 +120,10 @@ static void Skills_get_names (liscrArgs* args)
  * -- @return Number or nil.
  * function Skills.get_value(self, argsl)
  */
-static void Skills_get_value (liscrArgs* args)
+static void Skills_get_value (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -145,10 +145,10 @@ static void Skills_get_value (liscrArgs* args)
  * -- @return Boolean.
  * function Skills.has_skill(self, args)
  */
-static void Skills_has_skill (liscrArgs* args)
+static void Skills_has_skill (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -174,11 +174,11 @@ static void Skills_has_skill (liscrArgs* args)
  * -- @return New skill widget.
  * function SkillWidget.new(self, args)
  */
-static void SkillWidget_new (liscrArgs* args)
+static void SkillWidget_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILL_WIDGET);
@@ -205,7 +205,7 @@ static void SkillWidget_new (liscrArgs* args)
  * -- @name SkillWidget.skill
  * -- @class table
  */
-static void SkillWidget_setter_skill (liscrArgs* args)
+static void SkillWidget_setter_skill (LIScrArgs* args)
 {
 	const char* value;
 
@@ -216,7 +216,7 @@ static void SkillWidget_setter_skill (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSkillsScript (liscrClass* self,
+liext_script_skills (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILLS, data);
@@ -228,13 +228,13 @@ liextSkillsScript (liscrClass* self,
 }
 
 void
-liextSkillWidgetScript (liscrClass* self,
+liext_script_skill_widget (LIScrClass* self,
                         void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILL_WIDGET, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", SkillWidget_new);
 	liscr_class_insert_mvar (self, "skill", NULL, SkillWidget_setter_skill);
 }

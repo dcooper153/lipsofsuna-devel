@@ -27,24 +27,24 @@
 #ifndef __EXT_OPTIONS_H__
 #define __EXT_OPTIONS_H__
 
-#include <widget/lips-widget.h>
+#include <lipsofsuna/widget.h>
 
-#define LIEXT_WIDGET_OPTIONS(o) ((liextOptions*)(o))
+#define LIEXT_WIDGET_OPTIONS(o) ((LIExtOptions*)(o))
 
-typedef struct _liextOptions liextOptions;
-struct _liextOptions
+typedef struct _LIExtOptions LIExtOptions;
+struct _LIExtOptions
 {
-	liwdgGroup base;
-	licliClient* client;
-	liwdgWidget* group;
-	liwdgWidget* check_fsaa;
-	liwdgWidget* check_global_shadows;
-	liwdgWidget* check_local_shadows;
-	liwdgWidget* check_shaders;
+	LIWdgGroup base;
+	LICliClient* client;
+	LIWdgWidget* group;
+	LIWdgWidget* check_fsaa;
+	LIWdgWidget* check_global_shadows;
+	LIWdgWidget* check_local_shadows;
+	LIWdgWidget* check_shaders;
 };
 
-liwdgWidget*
-liext_options_new (licliClient* client);
+LIWdgWidget*
+liext_options_new (LICliClient* client);
 
 #endif
 

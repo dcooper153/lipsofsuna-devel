@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,28 +16,28 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndMaterial Material
+ * \addtogroup LIRenMaterial Material
  * @{
  */
 
 #ifndef __RENDER_MATERIAL_H__
 #define __RENDER_MATERIAL_H__
 
-#include <image/lips-image.h>
+#include <lipsofsuna/image.h>
 #include "render-image.h"
 #include "render-shader.h"
 #include "render-types.h"
 
 enum
 {
-	LIRND_MATERIAL_FLAG_BILLBOARD = 0x010000,
-	LIRND_MATERIAL_FLAG_CULLFACE = 0x020000,
-	LIRND_MATERIAL_FLAG_TRANSPARENCY = 0x040000,
+	LIREN_MATERIAL_FLAG_BILLBOARD = 0x010000,
+	LIREN_MATERIAL_FLAG_CULLFACE = 0x020000,
+	LIREN_MATERIAL_FLAG_TRANSPARENCY = 0x040000,
 };
 
-struct _lirndMaterial
+struct _LIRenMaterial
 {
 	int flags;
 	float parameters[4];
@@ -47,40 +47,40 @@ struct _lirndMaterial
 	float strand_start;
 	float strand_end;
 	float strand_shape;
-	lirndShader* shader;
+	LIRenShader* shader;
 	struct
 	{
 		int count;
-		lirndTexture* array;
+		LIRenTexture* array;
 	} textures;
 };
 
-lirndMaterial*
-lirnd_material_new ();
+LIRenMaterial*
+liren_material_new ();
 
-lirndMaterial*
-lirnd_material_new_from_model (lirndRender*         render,
-                               const limdlMaterial* material);
-
-void
-lirnd_material_free (lirndMaterial* self);
+LIRenMaterial*
+liren_material_new_from_model (LIRenRender*         render,
+                               const LIMdlMaterial* material);
 
 void
-lirnd_material_set_flags (lirndMaterial* self,
+liren_material_free (LIRenMaterial* self);
+
+void
+liren_material_set_flags (LIRenMaterial* self,
                           int            flags);
 
 int
-lirnd_material_set_shader (lirndMaterial* self,
-                           lirndShader*   shader);
+liren_material_set_shader (LIRenMaterial* self,
+                           LIRenShader*   shader);
 
 void
-lirnd_material_set_texture (lirndMaterial* self,
+liren_material_set_texture (LIRenMaterial* self,
                             int            index,
-                            limdlTexture*  texture,
-                            lirndImage*    image);
+                            LIMdlTexture*  texture,
+                            LIRenImage*    image);
 
 int
-lirnd_material_set_texture_count (lirndMaterial* self,
+liren_material_set_texture_count (LIRenMaterial* self,
                                   int            value);
 
 #endif

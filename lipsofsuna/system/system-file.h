@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,9 +36,9 @@ enum
 	LISYS_STAT_LINK
 };
 
-typedef struct _lisysMmap lisysMmap;
-typedef struct _lisysStat lisysStat;
-struct _lisysStat
+typedef struct _LISysMmap LISysMmap;
+typedef struct _LISysStat LISysStat;
+struct _LISysStat
 {
 	int uid;
 	int gid;
@@ -53,28 +53,28 @@ struct _lisysStat
 extern "C" {
 #endif
 
-lisysMmap*
+LISysMmap*
 lisys_mmap_open (const char* path);
 
 void
-lisys_mmap_free (lisysMmap* self);
+lisys_mmap_free (LISysMmap* self);
 
 void*
-lisys_mmap_get_buffer (lisysMmap* self);
+lisys_mmap_get_buffer (LISysMmap* self);
 
 int
-lisys_mmap_get_size (lisysMmap* self);
+lisys_mmap_get_size (LISysMmap* self);
 
 char*
 lisys_readlink (const char* path);
 
 int
 lisys_stat (const char* path,
-            lisysStat*  result);
+            LISysStat*  result);
 
 int
 lisys_lstat (const char* path,
-             lisysStat*  result);
+             LISysStat*  result);
 
 #ifdef __cplusplus
 }

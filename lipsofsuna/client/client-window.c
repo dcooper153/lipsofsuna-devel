@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,35 +18,35 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliWindow Window
+ * \addtogroup LICliWindow Window
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "client.h"
 #include "client-window.h"
 
 static int
-private_init_input (licliWindow* self);
+private_init_input (LICliWindow* self);
 
 static int
-private_init_video (licliWindow* self);
+private_init_video (LICliWindow* self);
 
 static int
-private_resize (licliWindow* self,
+private_resize (LICliWindow* self,
                 int          width,
                 int          height,
                 int          fsaa);
 
 /****************************************************************************/
 
-licliWindow*
-licli_window_new (licliClient* client)
+LICliWindow*
+licli_window_new (LICliClient* client)
 {
-	licliWindow* self;
+	LICliWindow* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licliWindow));
+	self = lisys_calloc (1, sizeof (LICliWindow));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -63,7 +63,7 @@ licli_window_new (licliClient* client)
 }
 
 void
-licli_window_free (licliWindow* self)
+licli_window_free (LICliWindow* self)
 {
 	if (self->joystick != NULL)
 		self->client->video.SDL_JoystickClose (self->joystick);
@@ -75,14 +75,14 @@ licli_window_free (licliWindow* self)
 }
 
 void
-licli_window_set_fsaa (licliWindow* self,
+licli_window_set_fsaa (LICliWindow* self,
                        int          samples)
 {
 	private_resize (self, self->mode.width, self->mode.height, samples);
 }
 
 void
-licli_window_get_size (const licliWindow* self,
+licli_window_get_size (const LICliWindow* self,
                        int*               width,
                        int*               height)
 {
@@ -93,7 +93,7 @@ licli_window_get_size (const licliWindow* self,
 }
 
 int
-licli_window_set_size (licliWindow* self,
+licli_window_set_size (LICliWindow* self,
                        int          width,
                        int          height)
 {
@@ -105,7 +105,7 @@ licli_window_set_size (licliWindow* self,
 /****************************************************************************/
 
 static int
-private_init_input (licliWindow* self)
+private_init_input (LICliWindow* self)
 {
 	self->joystick = self->client->video.SDL_JoystickOpen (0);
 	self->client->video.SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -113,7 +113,7 @@ private_init_input (licliWindow* self)
 }
 
 static int
-private_init_video (licliWindow* self)
+private_init_video (LICliWindow* self)
 {
 	/* Create the window. */
 	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
@@ -141,7 +141,7 @@ private_init_video (licliWindow* self)
 }
 
 static int
-private_resize (licliWindow* self,
+private_resize (LICliWindow* self,
                 int          width,
                 int          height,
                 int          fsaa)

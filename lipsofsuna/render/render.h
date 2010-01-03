@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,19 +16,19 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndRender Render
+ * \addtogroup LIRenRender Render
  * @{
  */
 
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <config/lips-config.h>
-#include <image/lips-image.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/config.h>
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/system.h>
 #include "render-image.h"
 #include "render-light.h"
 #include "render-lighting.h"
@@ -37,15 +37,15 @@
 #include "render-shader.h"
 #include "render-types.h"
 
-/* #define LIRND_ENABLE_PROFILING */
+/* #define LIREN_ENABLE_PROFILING */
 
-struct _lirndRender
+struct _LIRenRender
 {
-	lialgPtrdic* scenes;
-	lialgStrdic* shaders;
-	lialgStrdic* images;
-	lialgStrdic* models;
-	lialgPtrdic* models_inst;
+	LIAlgPtrdic* scenes;
+	LIAlgStrdic* shaders;
+	LIAlgStrdic* images;
+	LIAlgStrdic* models;
+	LIAlgPtrdic* models_inst;
 	struct
 	{
 		char* dir;
@@ -62,11 +62,11 @@ struct _lirndRender
 	struct
 	{
 		int enabled;
-		lirndShader* shader;
-		lirndShader* shadowmap;
-		lirndShader* fixed;
+		LIRenShader* shader;
+		LIRenShader* shadowmap;
+		LIRenShader* fixed;
 	} shader;
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	struct
 	{
 		int objects;
@@ -77,64 +77,64 @@ struct _lirndRender
 #endif
 };
 
-lirndRender*
-lirnd_render_new (const char* dir);
+LIRenRender*
+liren_render_new (const char* dir);
 
 void
-lirnd_render_free (lirndRender* self);
+liren_render_free (LIRenRender* self);
 
-lirndShader*
-lirnd_render_find_shader (lirndRender* self,
+LIRenShader*
+liren_render_find_shader (LIRenRender* self,
                           const char*  name);
 
-lirndImage*
-lirnd_render_find_image (lirndRender* self,
+LIRenImage*
+liren_render_find_image (LIRenRender* self,
                          const char*  name);
 
-lirndModel*
-lirnd_render_find_model (lirndRender* self,
-                         const char*  name);
-
-int
-lirnd_render_load_image (lirndRender* self,
+LIRenModel*
+liren_render_find_model (LIRenRender* self,
                          const char*  name);
 
 int
-lirnd_render_load_model (lirndRender* self,
+liren_render_load_image (LIRenRender* self,
+                         const char*  name);
+
+int
+liren_render_load_model (LIRenRender* self,
                          const char*  name,
-                         limdlModel*  model);
+                         LIMdlModel*  model);
 
 void
-lirnd_render_update (lirndRender* self,
+liren_render_update (LIRenRender* self,
                      float        secs);
 
 void
-lirnd_render_set_global_shadows (lirndRender* self,
+liren_render_set_global_shadows (LIRenRender* self,
                                  int          value);
 
 int
-lirnd_render_get_light_count (const lirndRender* self);
+liren_render_get_light_count (const LIRenRender* self);
 
 void
-lirnd_render_set_light_count (lirndRender* self,
+liren_render_set_light_count (LIRenRender* self,
                               int          count);
 
 void
-lirnd_render_set_local_shadows (lirndRender* self,
+liren_render_set_local_shadows (LIRenRender* self,
                                 int          value);
 
 int
-lirnd_render_get_shaders_enabled (const lirndRender* self);
+liren_render_get_shaders_enabled (const LIRenRender* self);
 
 void
-lirnd_render_set_shaders_enabled (lirndRender* self,
+liren_render_set_shaders_enabled (LIRenRender* self,
                                   int          value);
 
 #ifndef NDEBUG
 void
-lirnd_check_errors ();
+liren_check_errors ();
 #else
-#define lirnd_check_errors()
+#define liren_check_errors()
 #endif
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,22 +27,22 @@
 #ifndef __EXT_BRUSHES_H__
 #define __EXT_BRUSHES_H__
 
-#include <client/lips-client.h>
-#include <generator/lips-generator.h>
-#include <engine/lips-engine.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/generator.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/widget.h>
 #include "ext-materials.h"
 #include "ext-module.h"
 
-#define LIEXT_BRUSHES(o) ((liextBrushes*)(o))
+#define LIEXT_BRUSHES(o) ((LIExtBrushes*)(o))
 
-struct _liextBrushes
+struct _LIExtBrushes
 {
-	liwdgGroup base;
-	liextModule* module;
-	ligenGenerator* generator;
-	ligenBrush* clipboard;
-	limatTransform transform;
+	LIWdgGroup base;
+	LIExtModule* module;
+	LIGenGenerator* generator;
+	LIGenBrush* clipboard;
+	LIMatTransform transform;
 	int paint;
 	struct
 	{
@@ -52,49 +52,49 @@ struct _liextBrushes
 	} select;
 	struct
 	{
-		liwdgWidget* check_required;
-		liwdgWidget* group_paint;
-		liwdgWidget* group_view;
-		liwdgWidget* group_size;
-		liwdgWidget* button_add;
-		liwdgWidget* button_copy;
-		liwdgWidget* button_paint[6];
-		liwdgWidget* button_remove;
-		liwdgWidget* entry_name;
-		liwdgWidget* entry_objextra;
-		liwdgWidget* entry_objtype;
-		liwdgWidget* label_size;
-		liwdgWidget* label_type;
-		liwdgWidget* label_objprob;
-		liwdgWidget* label_objtype;
-		liwdgWidget* label_objextra;
-		liwdgWidget* preview;
-		liwdgWidget* scroll_objprob;
-		liwdgWidget* spin_axis;
-		liwdgWidget* spin_sizex;
-		liwdgWidget* spin_sizey;
-		liwdgWidget* spin_sizez;
-		liwdgWidget* tree;
-		liwdgWidget* view;
+		LIWdgWidget* check_required;
+		LIWdgWidget* group_paint;
+		LIWdgWidget* group_view;
+		LIWdgWidget* group_size;
+		LIWdgWidget* button_add;
+		LIWdgWidget* button_copy;
+		LIWdgWidget* button_paint[6];
+		LIWdgWidget* button_remove;
+		LIWdgWidget* entry_name;
+		LIWdgWidget* entry_objextra;
+		LIWdgWidget* entry_objtype;
+		LIWdgWidget* label_size;
+		LIWdgWidget* label_type;
+		LIWdgWidget* label_objprob;
+		LIWdgWidget* label_objtype;
+		LIWdgWidget* label_objextra;
+		LIWdgWidget* preview;
+		LIWdgWidget* scroll_objprob;
+		LIWdgWidget* spin_axis;
+		LIWdgWidget* spin_sizex;
+		LIWdgWidget* spin_sizey;
+		LIWdgWidget* spin_sizez;
+		LIWdgWidget* tree;
+		LIWdgWidget* view;
 	} widgets;
 };
 
-extern const liwdgClass liextBrushesType;
+extern const LIWdgClass liext_widget_brushes;
 
-liwdgWidget*
-liext_brushes_new (liwdgManager* manager,
-                   liextModule*  module);
-
-int
-liext_brushes_insert_brush (liextBrushes* self,
-                            ligenBrush*   brush);
+LIWdgWidget*
+liext_brushes_new (LIWdgManager* manager,
+                   LIExtModule*  module);
 
 int
-liext_brushes_save (liextBrushes* self);
+liext_brushes_insert_brush (LIExtBrushes* self,
+                            LIGenBrush*   brush);
+
+int
+liext_brushes_save (LIExtBrushes* self);
 
 void
-liext_brushes_reset (liextBrushes* self,
-                     liarcReader*  reader);
+liext_brushes_reset (LIExtBrushes* self,
+                     LIArcReader*  reader);
 
 #endif
 

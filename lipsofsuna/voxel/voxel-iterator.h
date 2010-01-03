@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,20 +25,20 @@
 #ifndef __VOXEL_ITERATOR_H__
 #define __VOXEL_ITERATOR_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "voxel.h"
 #include "voxel-block.h"
 #include "voxel-manager.h"
 #include "voxel-sector.h"
 #include "voxel-types.h"
 
-typedef struct _livoxBlockIter livoxBlockIter;
-struct _livoxBlockIter
+typedef struct _LIVoxBlockIter LIVoxBlockIter;
+struct _LIVoxBlockIter
 {
 	int blocks;
-	lialgSectorsIter sectors;
-	livoxBlock* block;
-	int (*filter)(livoxBlock*);
+	LIAlgSectorsIter sectors;
+	LIVoxBlock* block;
+	int (*filter)(LIVoxBlock*);
 };
 
 /**
@@ -55,11 +55,11 @@ struct _livoxBlockIter
 	     livox_block_iter_next (&iter))
 
 static inline int
-livox_block_iter_next (livoxBlockIter* self)
+livox_block_iter_next (LIVoxBlockIter* self)
 {
-	lialgSector* sector;
-	livoxBlock* block;
-	livoxSector* voxsec;
+	LIAlgSector* sector;
+	LIVoxBlock* block;
+	LIVoxSector* voxsec;
 
 	/* Find next block. */
 	for (sector = self->sectors.sector ; sector != NULL ; sector = self->sectors.sector)
@@ -88,8 +88,8 @@ livox_block_iter_next (livoxBlockIter* self)
 }
 
 static inline int
-livox_block_iter_first (livoxBlockIter* self,
-                        livoxManager*   manager,
+livox_block_iter_first (LIVoxBlockIter* self,
+                        LIVoxManager*   manager,
                         void*           filter)
 {
 	self->filter = filter;
@@ -109,18 +109,18 @@ livox_block_iter_first (livoxBlockIter* self,
 
 /*****************************************************************************/
 
-typedef struct _livoxVoxelIter livoxVoxelIter;
-struct _livoxVoxelIter
+typedef struct _LIVoxVoxelIter LIVoxVoxelIter;
+struct _LIVoxVoxelIter
 {
 	int load;
 	int voxel[3];
-	livoxManager* voxels;
-	livoxSector* sector;
-	lialgRange tiles;
-	lialgRange range0;
-	lialgRange range1;
-	lialgRangeIter rangei0;
-	lialgRangeIter rangei1;
+	LIVoxManager* voxels;
+	LIVoxSector* sector;
+	LIAlgRange tiles;
+	LIAlgRange range0;
+	LIAlgRange range1;
+	LIAlgRangeIter rangei0;
+	LIAlgRangeIter rangei1;
 };
 
 /**
@@ -139,9 +139,9 @@ struct _livoxVoxelIter
 	     livox_voxel_iter_next (&iter))
 
 static inline int
-livox_voxel_iter_first (livoxVoxelIter* self,
-                        livoxManager*   voxels,
-                        lialgRange*     tiles,
+livox_voxel_iter_first (LIVoxVoxelIter* self,
+                        LIVoxManager*   voxels,
+                        LIAlgRange*     tiles,
                         int             load)
 {
 	int ret;
@@ -208,7 +208,7 @@ empty:
 }
 
 static inline int
-livox_voxel_iter_next (livoxVoxelIter* self)
+livox_voxel_iter_next (LIVoxVoxelIter* self)
 {
 	int ret;
 	int offset[3];

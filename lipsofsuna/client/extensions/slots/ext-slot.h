@@ -27,26 +27,26 @@
 #ifndef __CLIENT_SLOT_H__
 #define __CLIENT_SLOT_H__
 
-#include <client/lips-client.h>
-#include <render/lips-render.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/render.h>
 
-typedef struct _liextSlot liextSlot;
-struct _liextSlot
+typedef struct _LIExtSlot LIExtSlot;
+struct _LIExtSlot
 {
-	licliClient* client;
-	liengObject* object;
-	liengConstraint* constraint;
+	LICliClient* client;
+	LIEngObject* object;
+	LIEngConstraint* constraint;
 };
 
-liextSlot*
-liext_slot_new (licliClient* client,
-                liengObject* object,
+LIExtSlot*
+liext_slot_new (LICliClient* client,
+                LIEngObject* object,
                 const char*  node0,
                 const char*  node1,
                 int          model);
 
 void
-liext_slot_free (liextSlot* self);
+liext_slot_free (LIExtSlot* self);
 
 #endif
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,16 +25,16 @@
 #ifndef __ENGINE_ITERATOR_H__
 #define __ENGINE_ITERATOR_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "engine-sector.h"
 #include "engine-selection.h"
 
-typedef struct _liengObjectIter liengObjectIter;
-struct _liengObjectIter
+typedef struct _LIEngObjectIter LIEngObjectIter;
+struct _LIEngObjectIter
 {
-	lialgSectorsIter sectors;
-	lialgU32dicIter objects;
-	liengObject* object;
+	LIAlgSectorsIter sectors;
+	LIAlgU32dicIter objects;
+	LIEngObject* object;
 };
 
 /**
@@ -52,15 +52,15 @@ struct _liengObjectIter
 	     lieng_object_iter_next (&iter))
 
 static inline int
-lieng_object_iter_first (liengObjectIter*   self,
-                         liengEngine*       engine,
-                         const limatVector* point,
+lieng_object_iter_first (LIEngObjectIter*   self,
+                         LIEngEngine*       engine,
+                         const LIMatVector* point,
                          int                radius)
 {
-	liengSector* sector;
+	LIEngSector* sector;
 
 	/* Initialize self. */
-	memset (self, 0, sizeof (liengObjectIter));
+	memset (self, 0, sizeof (LIEngObjectIter));
 	if (!lialg_sectors_iter_first_point (&self->sectors, engine->sectors, point, radius))
 		return 0;
 
@@ -85,9 +85,9 @@ lieng_object_iter_first (liengObjectIter*   self,
 }
 
 static inline int
-lieng_object_iter_next (liengObjectIter* self)
+lieng_object_iter_next (LIEngObjectIter* self)
 {
-	liengSector* sector;
+	LIEngSector* sector;
 
 	self->object = NULL;
 
@@ -121,11 +121,11 @@ lieng_object_iter_next (liengObjectIter* self)
 
 /*****************************************************************************/
 
-typedef struct _liengSelectionIter liengSelectionIter;
-struct _liengSelectionIter
+typedef struct _LIEngSelectionIter LIEngSelectionIter;
+struct _LIEngSelectionIter
 {
-	lialgPtrdicIter objects;
-	liengObject* object;
+	LIAlgPtrdicIter objects;
+	LIEngObject* object;
 };
 
 /**
@@ -141,10 +141,10 @@ struct _liengSelectionIter
 	     lieng_selection_iter_next (&iter))
 
 static inline int
-lieng_selection_iter_first (liengSelectionIter* self,
-                            liengEngine*        engine)
+lieng_selection_iter_first (LIEngSelectionIter* self,
+                            LIEngEngine*        engine)
 {
-	liengSelection* selection;
+	LIEngSelection* selection;
 
 	/* Find first object. */
 	lialg_ptrdic_iter_start (&self->objects, engine->selection);
@@ -162,9 +162,9 @@ lieng_selection_iter_first (liengSelectionIter* self,
 }
 
 static inline int
-lieng_selection_iter_next (liengSelectionIter* self)
+lieng_selection_iter_next (LIEngSelectionIter* self)
 {
-	liengSelection* selection;
+	LIEngSelection* selection;
 
 	if (lialg_ptrdic_iter_next (&self->objects))
 	{

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,14 +18,14 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxMaterial Material
+ * \addtogroup LIVoxMaterial Material
  * @{
  */
 
 #ifndef __VOXEL_MATERIAL_H__
 #define __VOXEL_MATERIAL_H__
 
-#include <archive/lips-archive.h>
+#include <lipsofsuna/archive.h>
 #include "voxel-types.h"
 
 enum
@@ -33,7 +33,7 @@ enum
 	LIVOX_MATERIAL_FLAG_OCCLUDER = 0x01
 };
 
-struct _livoxMaterial
+struct _LIVoxMaterial
 {
 	int id;
 	int flags;
@@ -42,36 +42,36 @@ struct _livoxMaterial
 	float friction;
 };
 
-livoxMaterial*
+LIVoxMaterial*
 livox_material_new ();
 
-livoxMaterial*
-livox_material_new_copy (const livoxMaterial* src);
+LIVoxMaterial*
+livox_material_new_copy (const LIVoxMaterial* src);
 
-livoxMaterial*
-livox_material_new_from_sql (liarcSql*     sql,
+LIVoxMaterial*
+livox_material_new_from_sql (LIArcSql*     sql,
                              sqlite3_stmt* stmt);
 
-livoxMaterial*
-livox_material_new_from_stream (liarcReader* reader);
+LIVoxMaterial*
+livox_material_new_from_stream (LIArcReader* reader);
 
 void
-livox_material_free (livoxMaterial* self);
+livox_material_free (LIVoxMaterial* self);
 
 int
-livox_material_write_to_sql (livoxMaterial* self,
-                             liarcSql*      sql);
+livox_material_write_to_sql (LIVoxMaterial* self,
+                             LIArcSql*      sql);
 
 int
-livox_material_write_to_stream (livoxMaterial* self,
-                                liarcWriter*   writer);
+livox_material_write_to_stream (LIVoxMaterial* self,
+                                LIArcWriter*   writer);
 
 int
-livox_material_set_name (livoxMaterial* self,
+livox_material_set_name (LIVoxMaterial* self,
                          const char*    value);
 
 int
-livox_material_set_model (livoxMaterial* self,
+livox_material_set_model (LIVoxMaterial* self,
                           const char*    value);
 
 #endif

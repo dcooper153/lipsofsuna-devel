@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,28 +16,28 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvExtension Extension
+ * \addtogroup LISerExtension Extension
  * @{
  */
 
 #ifndef __SERVER_EXTENSION_H__
 #define __SERVER_EXTENSION_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "server-types.h"
 
-#define LISRV_EXTENSION_VERSION 0xFFFFFFFF
+#define LISER_EXTENSION_VERSION 0xFFFFFFFF
 
-struct _lisrvExtension
+struct _LISerExtension
 {
-	lisrvExtensionInfo* info;
-	lisysModule* module;
+	LISerExtensionInfo* info;
+	LISysModule* module;
 	void* object;
 };
 
-struct _lisrvExtensionInfo
+struct _LISerExtensionInfo
 {
 	int version;
 	const char* name;

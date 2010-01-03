@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,27 +18,27 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlHair Hair
+ * \addtogroup LIMdlHair Hair
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "model-hair.h"
 
 int
-limdl_hair_read (limdlHair*   self,
-                 liarcReader* reader)
+limdl_hair_read (LIMdlHair*   self,
+                 LIArcReader* reader)
 {
 	uint32_t i;
 	uint32_t count;
-	limdlHairNode* node;
+	LIMdlHairNode* node;
 
 	/* Read node count. */
 	if (!liarc_reader_get_uint32 (reader, &count))
 		return 0;
 
 	/* Allocate nodes. */
-	self->nodes = lisys_calloc (count, sizeof (limdlHairNode));
+	self->nodes = lisys_calloc (count, sizeof (LIMdlHairNode));
 	if (self->nodes == NULL)
 		return 0;
 	self->count = count;
@@ -58,11 +58,11 @@ limdl_hair_read (limdlHair*   self,
 }
 
 int
-limdl_hair_write (limdlHair*   self,
-                  liarcWriter* writer)
+limdl_hair_write (LIMdlHair*   self,
+                  LIArcWriter* writer)
 {
 	int i;
-	limdlHairNode* node;
+	LIMdlHairNode* node;
 
 	/* Write node count. */
 	if (!liarc_writer_append_uint32 (writer, self->count))
@@ -85,7 +85,7 @@ limdl_hair_write (limdlHair*   self,
 /*****************************************************************************/
 
 void
-limdl_hairs_free (limdlHairs* self)
+limdl_hairs_free (LIMdlHairs* self)
 {
 	int i;
 
@@ -95,13 +95,13 @@ limdl_hairs_free (limdlHairs* self)
 }
 
 int
-limdl_hairs_read (limdlHairs*  self,
-                  liarcReader* reader)
+limdl_hairs_read (LIMdlHairs*  self,
+                  LIArcReader* reader)
 {
 	uint32_t i;
 	uint32_t mat;
 	uint32_t count;
-	limdlHair* hair;
+	LIMdlHair* hair;
 
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, &mat) ||
@@ -110,7 +110,7 @@ limdl_hairs_read (limdlHairs*  self,
 	self->material = mat;
 
 	/* Allocate hairs. */
-	self->hairs = lisys_calloc (count, sizeof (limdlHair));
+	self->hairs = lisys_calloc (count, sizeof (LIMdlHair));
 	if (self->hairs == NULL)
 		return 0;
 	self->count = count;
@@ -127,11 +127,11 @@ limdl_hairs_read (limdlHairs*  self,
 }
 
 int
-limdl_hairs_write (limdlHairs*  self,
-                   liarcWriter* writer)
+limdl_hairs_write (LIMdlHairs*  self,
+                   LIArcWriter* writer)
 {
 	int i;
-	limdlHair* hair;
+	LIMdlHair* hair;
 
 	/* Write header. */
 	if (!liarc_writer_append_uint32 (writer, self->material) ||

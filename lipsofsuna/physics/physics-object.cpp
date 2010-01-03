@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyObject Object
+ * \addtogroup LIPhyObject Object
  * @{
  */
 
@@ -28,20 +28,20 @@
 #define PRIVATE_REALIZED 0x0200
 
 static float
-private_sweep_shape (const liphyObject* self,
+private_sweep_shape (const LIPhyObject* self,
                      const btTransform& start,
                      const btVector3&   sweep,
                      btVector3*         normal);
 
 static int
-private_sweep_sphere (const liphyObject* self,
+private_sweep_sphere (const LIPhyObject* self,
                       btConvexShape*     shape,
                       const btTransform& start,
                       const btTransform& end,
-                      liphyCollision*    result);
+                      LIPhyCollision*    result);
 
 static void
-private_update_state (liphyObject* self);
+private_update_state (LIPhyObject* self);
 
 /*****************************************************************************/
 
@@ -54,17 +54,17 @@ private_update_state (liphyObject* self);
  * \param control_mode Simulation mode.
  * \return New object or NULL.
  */
-liphyObject*
-liphy_object_new (liphyPhysics*    physics,
+LIPhyObject*
+liphy_object_new (LIPhyPhysics*    physics,
                   uint32_t         id,
-                  liphyShape*      shape,
-                  liphyControlMode control_mode)
+                  LIPhyShape*      shape,
+                  LIPhyControlMode control_mode)
 {
-	liphyObject* self;
+	LIPhyObject* self;
 	btVector3 position (0.0f, 0.0f, 0.0f);
 	btQuaternion orientation (0.0f, 0.0f, 0.0f, 1.0f);
 
-	self = (liphyObject*) lisys_calloc (1, sizeof (liphyObject));
+	self = (LIPhyObject*) lisys_calloc (1, sizeof (LIPhyObject));
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
@@ -107,7 +107,7 @@ liphy_object_new (liphyPhysics*    physics,
  * \param self Object.
  */
 void
-liphy_object_free (liphyObject* self)
+liphy_object_free (LIPhyObject* self)
 {
 	/* Cancel all contact callbacks involving us. */
 	liphy_physics_clear_contacts (self->physics, self);
@@ -130,7 +130,7 @@ liphy_object_free (liphyObject* self)
  * \param self Object.
  */
 void
-liphy_object_clear_shape (liphyObject* self)
+liphy_object_clear_shape (LIPhyObject* self)
 {
 	while (self->shape->getNumChildShapes ())
 		self->shape->removeChildShapeByIndex (0);
@@ -144,9 +144,9 @@ liphy_object_clear_shape (liphyObject* self)
  * \param impulse Impulse force.
  */
 void
-liphy_object_impulse (liphyObject*       self,
-                      const limatVector* point,
-                      const limatVector* impulse)
+liphy_object_impulse (LIPhyObject*       self,
+                      const LIMatVector* point,
+                      const LIMatVector* impulse)
 {
 	btVector3 v0 (impulse->x, impulse->y, impulse->z);
 	btVector3 v1 (point->x, point->y, point->z);
@@ -163,9 +163,9 @@ liphy_object_impulse (liphyObject*       self,
  * \param transform Shape transformation or NULL for identity.
  */
 int
-liphy_object_insert_shape (liphyObject*          self,
-                           liphyShape*           shape,
-                           const limatTransform* transform)
+liphy_object_insert_shape (LIPhyObject*          self,
+                           LIPhyShape*           shape,
+                           const LIMatTransform* transform)
 {
 	btTransform btransform;
 
@@ -197,9 +197,9 @@ liphy_object_insert_shape (liphyObject*          self,
  * \param turning Nonzero if the wheel is controllable.
  */
 void
-liphy_object_insert_wheel (liphyObject*       self,
-                           const limatVector* point,
-                           const limatVector* axle,
+liphy_object_insert_wheel (LIPhyObject*       self,
+                           const LIMatVector* point,
+                           const LIMatVector* axle,
                            float              radius,
                            float              susplen,
                            int                turning)
@@ -231,10 +231,10 @@ liphy_object_insert_wheel (liphyObject*       self,
  * \param impulse Jump force.
  */
 void
-liphy_object_jump (liphyObject*       self,
-                   const limatVector* impulse)
+liphy_object_jump (LIPhyObject*       self,
+                   const LIMatVector* impulse)
 {
-	limatVector o = { 0.0f, 0.0f, 0.0f };
+	LIMatVector o = { 0.0f, 0.0f, 0.0f };
 
 	liphy_object_impulse (self, &o, impulse);
 }
@@ -252,8 +252,8 @@ liphy_object_jump (liphyObject*       self,
  * \return Fraction swept before hitting an obstacle.
  */
 float
-liphy_object_sweep (const liphyObject* self,
-                    const limatVector* sweep)
+liphy_object_sweep (const LIPhyObject* self,
+                    const LIMatVector* sweep)
 {
 	btTransform transform;
 
@@ -276,11 +276,11 @@ liphy_object_sweep (const liphyObject* self,
  * \return Nonzero if hit something.
  */
 int
-liphy_object_sweep_sphere (liphyObject*       self,
-                           const limatVector* relsrc,
-                           const limatVector* reldst,
+liphy_object_sweep_sphere (LIPhyObject*       self,
+                           const LIMatVector* relsrc,
+                           const LIMatVector* reldst,
                            float              radius,
-                           liphyCollision*    result)
+                           LIPhyCollision*    result)
 {
 	int ret;
 	btTransform transform;
@@ -315,8 +315,8 @@ liphy_object_sweep_sphere (liphyObject*       self,
  * \param value Return location for the angular velocity vector.
  */
 void
-liphy_object_get_angular (const liphyObject* self,
-                          limatVector*       value)
+liphy_object_get_angular (const LIPhyObject* self,
+                          LIMatVector*       value)
 {
 	btVector3 velocity;
 
@@ -342,8 +342,8 @@ liphy_object_get_angular (const liphyObject* self,
  * \param value Angular velocity vector.
  */
 void
-liphy_object_set_angular (liphyObject*       self,
-                          const limatVector* value)
+liphy_object_set_angular (LIPhyObject*       self,
+                          const LIMatVector* value)
 {
 	btVector3 velocity (value->x, value->y, value->z);
 
@@ -359,7 +359,7 @@ liphy_object_set_angular (liphyObject*       self,
  * \return Group mask.
  */
 int
-liphy_object_get_collision_group (const liphyObject* self)
+liphy_object_get_collision_group (const LIPhyObject* self)
 {
 	return self->config.collision_group;
 }
@@ -375,7 +375,7 @@ liphy_object_get_collision_group (const liphyObject* self)
  * \param mask Collision group mask.
  */
 void
-liphy_object_set_collision_group (liphyObject* self,
+liphy_object_set_collision_group (LIPhyObject* self,
                                   int          mask)
 {
 	self->config.collision_group = mask;
@@ -390,7 +390,7 @@ liphy_object_set_collision_group (liphyObject* self,
  * \return Collision mask.
  */
 int
-liphy_object_get_collision_mask (const liphyObject* self)
+liphy_object_get_collision_mask (const LIPhyObject* self)
 {
 	return self->config.collision_mask;
 }
@@ -406,7 +406,7 @@ liphy_object_get_collision_mask (const liphyObject* self)
  * \param mask Collision mask.
  */
 void
-liphy_object_set_collision_mask (liphyObject* self,
+liphy_object_set_collision_mask (LIPhyObject* self,
                                  int          mask)
 {
 	self->config.collision_mask = mask;
@@ -424,8 +424,8 @@ liphy_object_set_collision_mask (liphyObject* self,
  * \param value Contact callback.
  */
 void
-liphy_object_set_contact_call (liphyObject*     self,
-                               liphyContactCall value)
+liphy_object_set_contact_call (LIPhyObject*     self,
+                               LIPhyContactCall value)
 {
 	self->config.contact_call = value;
 	if (self->control != NULL)
@@ -438,8 +438,8 @@ liphy_object_set_contact_call (liphyObject*     self,
  * \param self Object.
  * \return Simulation mode.
  */
-liphyControlMode
-liphy_object_get_control_mode (const liphyObject* self)
+LIPhyControlMode
+liphy_object_get_control_mode (const LIPhyObject* self)
 {
 	return self->control_mode;
 }
@@ -451,8 +451,8 @@ liphy_object_get_control_mode (const liphyObject* self)
  * \param value Simulation mode.
  */
 void
-liphy_object_set_control_mode (liphyObject*     self,
-                               liphyControlMode value)
+liphy_object_set_control_mode (LIPhyObject*     self,
+                               LIPhyControlMode value)
 {
 	if (self->control_mode == value)
 		return;
@@ -466,8 +466,8 @@ liphy_object_set_control_mode (liphyObject*     self,
  * \param self Object.
  * \return Physics engine.
  */
-liphyPhysics*
-liphy_object_get_engine (liphyObject* self)
+LIPhyPhysics*
+liphy_object_get_engine (LIPhyObject* self)
 {
 	return self->physics;
 }
@@ -479,8 +479,8 @@ liphy_object_get_engine (liphyObject* self)
  * \param value Return location for the gravity vector.
  */
 void
-liphy_object_get_gravity (const liphyObject* self,
-                          limatVector*       value)
+liphy_object_get_gravity (const LIPhyObject* self,
+                          LIMatVector*       value)
 {
 	btVector3 gravity;
 
@@ -500,8 +500,8 @@ liphy_object_get_gravity (const liphyObject* self,
  * \param value Gravity vector.
  */
 void
-liphy_object_set_gravity (const liphyObject* self,
-                          const limatVector* value)
+liphy_object_set_gravity (const LIPhyObject* self,
+                          const LIMatVector* value)
 {
 	if (self->control != NULL)
 		self->control->set_gravity (btVector3 (value->x, value->y, value->z));
@@ -516,7 +516,7 @@ liphy_object_set_gravity (const liphyObject* self,
  * \return Nonzero if standing on ground.
  */
 int
-liphy_object_get_ground (const liphyObject* self)
+liphy_object_get_ground (const LIPhyObject* self)
 {
 	if (self->control != NULL)
 		return self->control->get_ground ();
@@ -531,8 +531,8 @@ liphy_object_get_ground (const liphyObject* self)
  * \param result Return location for the inertia vector.
  */
 void
-liphy_object_get_inertia (liphyObject* self,
-                          limatVector* result)
+liphy_object_get_inertia (LIPhyObject* self,
+                          LIMatVector* result)
 {
 	btVector3 inertia;
 
@@ -549,7 +549,7 @@ liphy_object_get_inertia (liphyObject* self,
  * \return Mass.
  */
 float
-liphy_object_get_mass (const liphyObject* self)
+liphy_object_get_mass (const LIPhyObject* self)
 {
 	return self->config.mass;
 }
@@ -561,10 +561,10 @@ liphy_object_get_mass (const liphyObject* self)
  * \param value Mass.
  */
 void
-liphy_object_set_mass (liphyObject* self,
+liphy_object_set_mass (LIPhyObject* self,
                        float        value)
 {
-	limatVector v;
+	LIMatVector v;
 	btVector3 inertia(0.0, 0.0, 0.0);
 
 	self->config.mass = value;
@@ -585,7 +585,7 @@ liphy_object_set_mass (liphyObject* self,
  * \return Movement force.
  */
 float
-liphy_object_get_movement (const liphyObject* self)
+liphy_object_get_movement (const LIPhyObject* self)
 {
 	return self->config.movement;
 }
@@ -597,7 +597,7 @@ liphy_object_get_movement (const liphyObject* self)
  * \param value Movement force.
  */
 void
-liphy_object_set_movement (liphyObject* self,
+liphy_object_set_movement (LIPhyObject* self,
                            float        value)
 {
 	int i;
@@ -622,7 +622,7 @@ liphy_object_set_movement (liphyObject* self,
  * \return Nonzero if realized.
  */
 int
-liphy_object_get_realized (const liphyObject* self)
+liphy_object_get_realized (const LIPhyObject* self)
 {
 	return (self->flags & PRIVATE_REALIZED) != 0;
 }
@@ -635,7 +635,7 @@ liphy_object_get_realized (const liphyObject* self)
  * \return Nonzero if realized.
  */
 int
-liphy_object_set_realized (liphyObject* self,
+liphy_object_set_realized (LIPhyObject* self,
                            int          value)
 {
 	if ((value != 0) == ((self->flags & PRIVATE_REALIZED) != 0))
@@ -656,7 +656,7 @@ liphy_object_set_realized (liphyObject* self,
  * \param value Angular factor
  */
 void
-liphy_object_set_rotating (liphyObject* self,
+liphy_object_set_rotating (LIPhyObject* self,
                            float        value)
 {
 #if 0
@@ -675,7 +675,7 @@ liphy_object_set_rotating (liphyObject* self,
  * \return Movement speed.
  */
 float
-liphy_object_get_speed (const liphyObject* self)
+liphy_object_get_speed (const LIPhyObject* self)
 {
 	return self->config.speed;
 }
@@ -687,7 +687,7 @@ liphy_object_get_speed (const liphyObject* self)
  * \param value Movement speed.
  */
 void
-liphy_object_set_speed (liphyObject* self,
+liphy_object_set_speed (LIPhyObject* self,
                         float        value)
 {
 	self->config.speed = value;
@@ -700,8 +700,8 @@ liphy_object_set_speed (liphyObject* self,
  * \param shape Collision shape or NULL.
  */
 void
-liphy_object_set_shape (liphyObject* self,
-                        liphyShape*  shape)
+liphy_object_set_shape (LIPhyObject* self,
+                        LIPhyShape*  shape)
 {
 	liphy_object_clear_shape (self);
 	if (shape != NULL)
@@ -716,7 +716,7 @@ liphy_object_set_shape (liphyObject* self,
  * \return Strafing force.
  */
 float
-liphy_object_get_strafing (const liphyObject* self)
+liphy_object_get_strafing (const LIPhyObject* self)
 {
 	return self->config.strafing;
 }
@@ -728,7 +728,7 @@ liphy_object_get_strafing (const liphyObject* self)
  * \param value Strafing force.
  */
 void
-liphy_object_set_strafing (liphyObject* self,
+liphy_object_set_strafing (LIPhyObject* self,
                            float        value)
 {
 	self->config.strafing = value;
@@ -741,8 +741,8 @@ liphy_object_set_strafing (liphyObject* self,
  * \param value Return location for the transformation.
  */
 void
-liphy_object_get_transform (const liphyObject* self,
-                            limatTransform*    value)
+liphy_object_get_transform (const LIPhyObject* self,
+                            LIMatTransform*    value)
 {
 	btTransform trans;
 	btQuaternion rotation;
@@ -767,8 +767,8 @@ liphy_object_get_transform (const liphyObject* self,
  * \param value Quaternion.
  */
 void
-liphy_object_set_transform (liphyObject*          self,
-                            const limatTransform* value)
+liphy_object_set_transform (LIPhyObject*          self,
+                            const LIMatTransform* value)
 {
 	btVector3 origin (value->position.x, value->position.y, value->position.z);
 	btQuaternion rotation (value->rotation.x, value->rotation.y, value->rotation.z, value->rotation.w);
@@ -786,7 +786,7 @@ liphy_object_set_transform (liphyObject*          self,
  * \return User pointer.
  */
 void*
-liphy_object_get_userdata (liphyObject* self)
+liphy_object_get_userdata (LIPhyObject* self)
 {
 	return self->config.userdata;
 }
@@ -798,7 +798,7 @@ liphy_object_get_userdata (liphyObject* self)
  * \param value User pointer.
  */
 void
-liphy_object_set_userdata (liphyObject* self,
+liphy_object_set_userdata (LIPhyObject* self,
                            void*        value)
 {
 	self->config.userdata = value;
@@ -811,8 +811,8 @@ liphy_object_set_userdata (liphyObject* self,
  * \param value Return location for the velocity.
  */
 void
-liphy_object_get_velocity (liphyObject* self,
-                           limatVector* value)
+liphy_object_get_velocity (LIPhyObject* self,
+                           LIMatVector* value)
 {
 	btVector3 velocity;
 
@@ -832,8 +832,8 @@ liphy_object_get_velocity (liphyObject* self,
  * \param value Linear velocity vector.
  */
 void
-liphy_object_set_velocity (liphyObject*       self,
-                           const limatVector* value)
+liphy_object_set_velocity (LIPhyObject*       self,
+                           const LIMatVector* value)
 {
 	btVector3 velocity (value->x, value->y, value->z);
 
@@ -863,11 +863,11 @@ protected:
 };
 
 static int
-private_sweep_sphere (const liphyObject* self,
+private_sweep_sphere (const LIPhyObject* self,
                       btConvexShape*     shape,
                       const btTransform& start,
                       const btTransform& end,
-                      liphyCollision*    result)
+                      LIPhyCollision*    result)
 {
 	btTransform src;
 	btTransform dst;
@@ -898,7 +898,7 @@ private_sweep_sphere (const liphyObject* self,
 	result->point.y = test.m_hitPointWorld[1];
 	result->point.z = test.m_hitPointWorld[2];
 	if (test.m_hitCollisionObject != NULL)
-		result->object = (liphyObject*) test.m_hitCollisionObject->getUserPointer ();
+		result->object = (LIPhyObject*) test.m_hitCollisionObject->getUserPointer ();
 	else
 		result->object = NULL;
 
@@ -906,7 +906,7 @@ private_sweep_sphere (const liphyObject* self,
 }
 
 static float
-private_sweep_shape (const liphyObject* self,
+private_sweep_shape (const LIPhyObject* self,
                      const btTransform& start,
                      const btVector3&   sweep,
                      btVector3*         normal)
@@ -955,7 +955,7 @@ private_sweep_shape (const liphyObject* self,
 }
 
 static void
-private_update_state (liphyObject* self)
+private_update_state (LIPhyObject* self)
 {
 	btCollisionShape* shape;
 

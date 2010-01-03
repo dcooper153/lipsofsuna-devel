@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,23 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_ALGORITHM_H__
-#define __LIPS_ALGORITHM_H__
+#ifndef __LIPS_FONT_H__
+#define __LIPS_FONT_H__
 
-#include "algorithm-array.h"
-#include "algorithm-camera.h"
-#include "algorithm-memdic.h"
-#include "algorithm-ptrdic.h"
-#include "algorithm-strdic.h"
-#include "algorithm-u32dic.h"
-#include "algorithm-astar.h"
-#include "algorithm-bst.h"
-#include "algorithm-list.h"
-#include "algorithm-octree.h"
-#include "algorithm-priority-queue.h"
-#include "algorithm-range.h"
-#include "algorithm-range-iter.h"
-#include "algorithm-sectors.h"
-#include "algorithm-sectors-iter.h"
+#include "font/font.h"
+#include "font/font-layout.h"
 
 #endif

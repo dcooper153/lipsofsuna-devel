@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,49 +16,49 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndShader Shader
+ * \addtogroup LIRenShader Shader
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "render-shader.h"
 
 static int
-private_check_compile (lirndShader* self,
+private_check_compile (LIRenShader* self,
                        const char*  name,
                        GLint        shader);
 
 static int
-private_check_link (lirndShader* self,
+private_check_link (LIRenShader* self,
                     const char*  name,
                     GLint        program);
 
 static void
-private_init_uniforms (lirndShader* self);
+private_init_uniforms (LIRenShader* self);
 
 static int
-private_read_file (lirndShader* self,
+private_read_file (LIRenShader* self,
                    const char*  path,
                    const char*  name);
 
 static int
-private_read_stream (lirndShader* self,
+private_read_stream (LIRenShader* self,
                      const char*  name,
-                     liarcReader* reader);
+                     LIArcReader* reader);
 
 static int
-private_read_config (lirndShader* self,
-                     liarcReader* reader);
+private_read_config (LIRenShader* self,
+                     LIArcReader* reader);
 
 static int
-private_read_source (lirndShader* self,
-                     liarcReader* reader);
+private_read_source (LIRenShader* self,
+                     LIArcReader* reader);
 
 static int
-private_uniform_value (lirndShader* self,
+private_uniform_value (LIRenShader* self,
                        const char*  value);
 
 /****************************************************************************/
@@ -69,13 +69,13 @@ private_uniform_value (lirndShader* self,
  * \param render Renderer.
  * \return New shader or NULL.
  */
-lirndShader*
-lirnd_shader_new (lirndRender* render)
+LIRenShader*
+liren_shader_new (LIRenRender* render)
 {
-	lirndShader* self;
+	LIRenShader* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndShader));
+	self = lisys_calloc (1, sizeof (LIRenShader));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -90,14 +90,14 @@ lirnd_shader_new (lirndRender* render)
  * \param reader Stream reader.
  * \return New shader or NULL.
  */
-lirndShader*
-lirnd_shader_new_from_data (lirndRender* render,
-                            liarcReader* reader)
+LIRenShader*
+liren_shader_new_from_data (LIRenRender* render,
+                            LIArcReader* reader)
 {
-	lirndShader* self;
+	LIRenShader* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndShader));
+	self = lisys_calloc (1, sizeof (LIRenShader));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -105,7 +105,7 @@ lirnd_shader_new_from_data (lirndRender* render,
 	/* Load the shader. */
 	if (!private_read_stream (self, "<stream>", reader))
 	{
-		lirnd_shader_free (self);
+		liren_shader_free (self);
 		return NULL;
 	}
 
@@ -122,15 +122,15 @@ lirnd_shader_new_from_data (lirndRender* render,
  * \param path Path to the shader file or NULL.
  * \return New shader or NULL.
  */
-lirndShader*
-lirnd_shader_new_from_file (lirndRender* render,
+LIRenShader*
+liren_shader_new_from_file (LIRenRender* render,
                             const char*  path)
 {
 	const char* name;
-	lirndShader* self;
+	LIRenShader* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndShader));
+	self = lisys_calloc (1, sizeof (LIRenShader));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -143,7 +143,7 @@ lirnd_shader_new_from_file (lirndRender* render,
 		name = path;
 	if (!private_read_file (self, path, name))
 	{
-		lirnd_shader_free (self);
+		liren_shader_free (self);
 		return NULL;
 	}
 
@@ -159,7 +159,7 @@ lirnd_shader_new_from_file (lirndRender* render,
  * \param self Shader.
  */
 void
-lirnd_shader_free (lirndShader* self)
+liren_shader_free (LIRenShader* self)
 {
 	int i;
 
@@ -179,7 +179,7 @@ lirnd_shader_free (lirndShader* self)
 /****************************************************************************/
 
 static int
-private_check_compile (lirndShader* self,
+private_check_compile (LIRenShader* self,
                        const char*  name,
                        GLint        shader)
 {
@@ -188,7 +188,7 @@ private_check_compile (lirndShader* self,
 	GLint status;
 	GLchar log[512];
 	GLsizei length;
-	liarcReader* reader;
+	LIArcReader* reader;
 
 	type = (shader == self->vertex)? "vertex" : "fragment";
 	glGetObjectParameterivARB (shader, GL_COMPILE_STATUS, &status);
@@ -221,7 +221,7 @@ private_check_compile (lirndShader* self,
 }
 
 static int
-private_check_link (lirndShader* self,
+private_check_link (LIRenShader* self,
                     const char*  name,
                     GLint        program)
 {
@@ -229,7 +229,7 @@ private_check_link (lirndShader* self,
 	GLint status;
 	GLchar log[512];
 	GLsizei length;
-	liarcReader* reader;
+	LIArcReader* reader;
 
 	glGetObjectParameterivARB (program, GL_LINK_STATUS, &status);
 	glGetInfoLogARB (program, sizeof (log), &length, log);
@@ -261,11 +261,11 @@ private_check_link (lirndShader* self,
 }
 
 static void
-private_init_uniforms (lirndShader* self)
+private_init_uniforms (LIRenShader* self)
 {
 	int i;
 	int sampler = 0;
-	lirndUniform* uniform;
+	LIRenUniform* uniform;
 
 	if (livid_features.shader_model >= 3)
 	{
@@ -273,7 +273,7 @@ private_init_uniforms (lirndShader* self)
 		{
 			uniform = self->uniforms.array + i;
 			uniform->binding = glGetUniformLocationARB (self->program, uniform->name);
-			if (lirnd_uniform_get_sampler (uniform))
+			if (liren_uniform_get_sampler (uniform))
 			{
 				uniform->sampler = sampler++;
 				glUniform1iARB (uniform->binding, uniform->sampler);
@@ -284,12 +284,12 @@ private_init_uniforms (lirndShader* self)
 }
 
 static int
-private_read_file (lirndShader* self,
+private_read_file (LIRenShader* self,
                    const char*  path,
                    const char*  name)
 {
 	int ret;
-	liarcReader* reader;
+	LIArcReader* reader;
 
 	/* Open the file. */
 	reader = liarc_reader_new_from_file (path);
@@ -303,9 +303,9 @@ private_read_file (lirndShader* self,
 }
 
 static int
-private_read_stream (lirndShader* self,
+private_read_stream (LIRenShader* self,
                      const char*  name,
-                     liarcReader* reader)
+                     LIArcReader* reader)
 {
 	if (livid_features.shader_model >= 3)
 	{
@@ -346,14 +346,14 @@ private_read_stream (lirndShader* self,
 }
 
 static int
-private_read_config (lirndShader* self,
-                     liarcReader* reader)
+private_read_config (LIRenShader* self,
+                     LIArcReader* reader)
 {
 	char* line;
 	char* name;
 	char* ptr;
 	char* value;
-	lirndUniform* uniform;
+	LIRenUniform* uniform;
 
 	/* Find start. */
 	while (1)
@@ -410,7 +410,7 @@ private_read_config (lirndShader* self,
 			}
 
 			/* Resize array. */
-			uniform = realloc (self->uniforms.array, (self->uniforms.count + 1) * sizeof (lirndUniform));
+			uniform = realloc (self->uniforms.array, (self->uniforms.count + 1) * sizeof (LIRenUniform));
 			if (uniform == NULL)
 			{
 				lisys_free (line);
@@ -443,8 +443,8 @@ private_read_config (lirndShader* self,
 }
 
 static int
-private_read_source (lirndShader* self,
-                     liarcReader* reader)
+private_read_source (LIRenShader* self,
+                     LIArcReader* reader)
 {
 	GLint length;
 	GLint vert_start;
@@ -486,67 +486,67 @@ private_read_source (lirndShader* self,
 }
 
 static int
-private_uniform_value (lirndShader* self,
+private_uniform_value (LIRenShader* self,
                        const char*  value)
 {
 	int index;
 
 	if (!strcmp (value, "NONE"))
-		return LIRND_UNIFORM_NONE;
+		return LIREN_UNIFORM_NONE;
 	if (!strncmp (value, "CUBETEXTURE", 11))
 	{
 		index = atoi (value + 11);
 		if (index < 0 || index > 9)
-			return LIRND_UNIFORM_NONE;
-		return LIRND_UNIFORM_CUBETEXTURE0 + index;
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_CUBETEXTURE0 + index;
 	}
 	if (!strncmp (value, "DIFFUSETEXTURE", 14))
 	{
 		index = atoi (value + 14);
 		if (index < 0 || index > 9)
-			return LIRND_UNIFORM_NONE;
-		return LIRND_UNIFORM_DIFFUSETEXTURE0 + index;
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_DIFFUSETEXTURE0 + index;
 	}
 	if (!strncmp (value, "LIGHTTYPE", 9))
 	{
 		index = atoi (value + 9);
 		if (index < 0 || index > 9)
-			return LIRND_UNIFORM_NONE;
-		return LIRND_UNIFORM_LIGHTTYPE0 + index;
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTTYPE0 + index;
 	}
 	if (!strncmp (value, "LIGHTMATRIX", 11))
 	{
 		index = atoi (value + 11);
 		if (index < 0 || index > 9)
-			return LIRND_UNIFORM_NONE;
-		return LIRND_UNIFORM_LIGHTMATRIX0 + index;
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTMATRIX0 + index;
 	}
 	if (!strncmp (value, "LIGHTPOSITION", 13))
 	{
 		index = atoi (value + 13);
 		if (index < 0 || index > 9)
-			return LIRND_UNIFORM_NONE;
-		return LIRND_UNIFORM_LIGHTPOSITION0 + index;
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTPOSITION0 + index;
 	}
 	if (!strcmp (value, "MODELMATRIX"))
-		return LIRND_UNIFORM_MODELMATRIX;
+		return LIREN_UNIFORM_MODELMATRIX;
 	if (!strcmp (value, "MODELVIEWINVERSE"))
-		return LIRND_UNIFORM_MODELVIEWINVERSE;
+		return LIREN_UNIFORM_MODELVIEWINVERSE;
 	if (!strcmp (value, "NOISETEXTURE"))
-		return LIRND_UNIFORM_NOISETEXTURE;
+		return LIREN_UNIFORM_NOISETEXTURE;
 	if (!strcmp (value, "PARAM0"))
-		return LIRND_UNIFORM_PARAM0;
+		return LIREN_UNIFORM_PARAM0;
 	if (!strncmp (value, "SHADOWTEXTURE", 13))
 	{
 		index = atoi (value + 13);
 		if (index < 0 || index > 9)
-			return LIRND_UNIFORM_NONE;
-		return LIRND_UNIFORM_SHADOWTEXTURE0 + index;
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_SHADOWTEXTURE0 + index;
 	}
 	if (!strcmp (value, "TIME"))
-		return LIRND_UNIFORM_TIME;
+		return LIREN_UNIFORM_TIME;
 
-	return LIRND_UNIFORM_NONE;
+	return LIREN_UNIFORM_NONE;
 }
 
 /** @} */

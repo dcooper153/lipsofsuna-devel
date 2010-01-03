@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,14 +15,20 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_AI_H__
-#define __LIPS_AI_H__
+/**
+ * \addtogroup ligen Generator
+ * @{
+ */
 
-#include "ai-manager.h"
-#include "ai-path.h"
-#include "ai-sector.h"
-#include "ai-types.h"
-#include "ai-waypoint.h"
+#ifndef __LIPS_GENERATOR_H__
+#define __LIPS_GENERATOR_H__
+
+#include "generator/generator.h"
+#include "generator/generator-brush.h"
+#include "generator/generator-rule.h"
+#include "generator/generator-types.h"
 
 #endif
 
+/** @} */
+/** @} */

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,35 +18,35 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgPriorityQueue Priority Queue
+ * \addtogroup LIAlgPriorityQueue Priority Queue
  * @{
  */
 
 #ifndef __ALGORITHM_PRIORITY_QUEUE_H__
 #define __ALGORITHM_PRIORITY_QUEUE_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-bst.h"
 
-typedef struct _lialgPriorityQueue lialgPriorityQueue;
-struct _lialgPriorityQueue
+typedef struct _LIAlgPriorityQueue LIAlgPriorityQueue;
+struct _LIAlgPriorityQueue
 {
-	lialgBst* tree;
+	LIAlgBst* tree;
 };
 
-typedef struct _lialgPriorityQueueNode lialgPriorityQueueNode;
-struct _lialgPriorityQueueNode
+typedef struct _LIAlgPriorityQueueNode LIAlgPriorityQueueNode;
+struct _LIAlgPriorityQueueNode
 {
 	float priority;
 	void* value;
-	lialgBstNode node;
+	LIAlgBstNode node;
 };
 
 /*****************************************************************************/
 
 static inline int
-lialg_priority_queue_node_compare (const lialgPriorityQueueNode* self,
-                                   const lialgPriorityQueueNode* node)
+lialg_priority_queue_node_compare (const LIAlgPriorityQueueNode* self,
+                                   const LIAlgPriorityQueueNode* node)
 {
 	if (self->priority < node->priority) return -1;
 	if (self->priority > node->priority) return 1;
@@ -60,15 +60,15 @@ lialg_priority_queue_node_compare (const lialgPriorityQueueNode* self,
  *
  * \return New priority queue or NULL.
  */
-static inline lialgPriorityQueue*
+static inline LIAlgPriorityQueue*
 lialg_priority_queue_new ()
 {
-	lialgPriorityQueue* self;
+	LIAlgPriorityQueue* self;
 
-	self = (lialgPriorityQueue*) lisys_malloc (sizeof (lialgPriorityQueue));
+	self = (LIAlgPriorityQueue*) lisys_malloc (sizeof (LIAlgPriorityQueue));
 	if (self == NULL)
 		return NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_priority_queue_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) lialg_priority_queue_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -83,9 +83,9 @@ lialg_priority_queue_new ()
  * \param self Priority queue.
  */
 static inline void
-lialg_priority_queue_free (lialgPriorityQueue* self)
+lialg_priority_queue_free (LIAlgPriorityQueue* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -97,9 +97,9 @@ lialg_priority_queue_free (lialgPriorityQueue* self)
  * \param self Priority queue.
  */
 static inline void
-lialg_priority_queue_clear (lialgPriorityQueue* self)
+lialg_priority_queue_clear (LIAlgPriorityQueue* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
 	self->tree->root = NULL;
 	lialg_bst_clear (self->tree);
 }
@@ -111,17 +111,17 @@ lialg_priority_queue_clear (lialgPriorityQueue* self)
  * \return Value or NULL.
  */
 static inline void*
-lialg_priority_queue_find_highest (lialgPriorityQueue* self)
+lialg_priority_queue_find_highest (LIAlgPriorityQueue* self)
 {
-	lialgBstNode* tnode;
-	lialgPriorityQueueNode* pnode;
+	LIAlgBstNode* tnode;
+	LIAlgPriorityQueueNode* pnode;
 
 	tnode = self->tree->root;
 	if (tnode == NULL)
 		return NULL;
 	while (tnode->right != NULL)
 		tnode = tnode->right;
-	pnode = (lialgPriorityQueueNode*) tnode->data;
+	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	assert (&pnode->node == tnode);
 	return pnode->value;
 }
@@ -132,18 +132,18 @@ lialg_priority_queue_find_highest (lialgPriorityQueue* self)
  * \param self Priority queue.
  * \return Priority queue node or NULL.
  */
-static inline lialgPriorityQueueNode*
-lialg_priority_queue_find_highest_node (lialgPriorityQueue* self)
+static inline LIAlgPriorityQueueNode*
+lialg_priority_queue_find_highest_node (LIAlgPriorityQueue* self)
 {
-	lialgBstNode* tnode;
-	lialgPriorityQueueNode* pnode;
+	LIAlgBstNode* tnode;
+	LIAlgPriorityQueueNode* pnode;
 
 	tnode = self->tree->root;
 	if (tnode == NULL)
 		return NULL;
 	while (tnode->left != NULL)
 		tnode = tnode->left;
-	pnode = (lialgPriorityQueueNode*) tnode->data;
+	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	assert (&pnode->node == tnode);
 	return pnode;
 }
@@ -155,17 +155,17 @@ lialg_priority_queue_find_highest_node (lialgPriorityQueue* self)
  * \return Value or NULL.
  */
 static inline void*
-lialg_priority_queue_find_lowest (lialgPriorityQueue* self)
+lialg_priority_queue_find_lowest (LIAlgPriorityQueue* self)
 {
-	lialgBstNode* tnode;
-	lialgPriorityQueueNode* pnode;
+	LIAlgBstNode* tnode;
+	LIAlgPriorityQueueNode* pnode;
 
 	tnode = self->tree->root;
 	if (tnode == NULL)
 		return NULL;
 	while (tnode->left != NULL)
 		tnode = tnode->left;
-	pnode = (lialgPriorityQueueNode*) tnode->data;
+	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	assert (&pnode->node == tnode);
 	return pnode->value;
 }
@@ -176,18 +176,18 @@ lialg_priority_queue_find_lowest (lialgPriorityQueue* self)
  * \param self Priority queue.
  * \return Priority queue node or NULL.
  */
-static inline lialgPriorityQueueNode*
-lialg_priority_queue_find_lowest_node (lialgPriorityQueue* self)
+static inline LIAlgPriorityQueueNode*
+lialg_priority_queue_find_lowest_node (LIAlgPriorityQueue* self)
 {
-	lialgBstNode* tnode;
-	lialgPriorityQueueNode* pnode;
+	LIAlgBstNode* tnode;
+	LIAlgPriorityQueueNode* pnode;
 
 	tnode = self->tree->root;
 	if (tnode == NULL)
 		return NULL;
 	while (tnode->left != NULL)
 		tnode = tnode->left;
-	pnode = (lialgPriorityQueueNode*) tnode->data;
+	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	assert (&pnode->node == tnode);
 	return pnode;
 }
@@ -200,15 +200,15 @@ lialg_priority_queue_find_lowest_node (lialgPriorityQueue* self)
  * \param value Value of the inserted node.
  * \return Priority queue node or NULL.
  */
-static inline lialgPriorityQueueNode*
-lialg_priority_queue_insert (lialgPriorityQueue* self,
+static inline LIAlgPriorityQueueNode*
+lialg_priority_queue_insert (LIAlgPriorityQueue* self,
                              float               priority,
                              void*               value)
 {
-	lialgPriorityQueueNode* node;
+	LIAlgPriorityQueueNode* node;
 
 	/* Create node. */
-	node = (lialgPriorityQueueNode*) lisys_malloc (sizeof (lialgPriorityQueueNode));
+	node = (LIAlgPriorityQueueNode*) lisys_malloc (sizeof (LIAlgPriorityQueueNode));
 	if (node == NULL)
 		return NULL;
 	node->priority = priority;
@@ -227,18 +227,18 @@ lialg_priority_queue_insert (lialgPriorityQueue* self,
  * \return Value or NULL.
  */
 static inline void*
-lialg_priority_queue_pop_highest (lialgPriorityQueue* self)
+lialg_priority_queue_pop_highest (LIAlgPriorityQueue* self)
 {
 	void* value;
-	lialgBstNode* tnode;
-	lialgPriorityQueueNode* pnode;
+	LIAlgBstNode* tnode;
+	LIAlgPriorityQueueNode* pnode;
 
 	tnode = self->tree->root;
 	if (tnode == NULL)
 		return NULL;
 	while (tnode->right != NULL)
 		tnode = tnode->right;
-	pnode = (lialgPriorityQueueNode*) tnode->data;
+	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	value = pnode->value;
 	assert (&pnode->node == tnode);
 	lialg_bst_unlink (self->tree, tnode);
@@ -253,18 +253,18 @@ lialg_priority_queue_pop_highest (lialgPriorityQueue* self)
  * \return Value or NULL.
  */
 static inline void*
-lialg_priority_queue_pop_lowest (lialgPriorityQueue* self)
+lialg_priority_queue_pop_lowest (LIAlgPriorityQueue* self)
 {
 	void* value;
-	lialgBstNode* tnode;
-	lialgPriorityQueueNode* pnode;
+	LIAlgBstNode* tnode;
+	LIAlgPriorityQueueNode* pnode;
 
 	tnode = self->tree->root;
 	if (tnode == NULL)
 		return NULL;
 	while (tnode->left != NULL)
 		tnode = tnode->left;
-	pnode = (lialgPriorityQueueNode*) tnode->data;
+	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	value = pnode->value;
 	assert (&pnode->node == tnode);
 	lialg_bst_unlink (self->tree, tnode);
@@ -279,8 +279,8 @@ lialg_priority_queue_pop_lowest (lialgPriorityQueue* self)
  * \param node Node to remove.
  */
 static inline void
-lialg_priority_queue_remove_node (lialgPriorityQueue*     self,
-                                  lialgPriorityQueueNode* node)
+lialg_priority_queue_remove_node (LIAlgPriorityQueue*     self,
+                                  LIAlgPriorityQueueNode* node)
 {
 	lialg_bst_unlink (self->tree, &node->node);
 	lisys_free (node);

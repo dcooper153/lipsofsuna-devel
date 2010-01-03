@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,50 +18,50 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysDir Directory
+ * \addtogroup LISysDir Directory
  * @{
  */
 
 #ifndef __SYSTEM_DIRECTORY_H__
 #define __SYSTEM_DIRECTORY_H__
 
-typedef int (*lisysDirFilter)(const char* dir, const char* name, void* data);
-typedef int (*lisysDirSorter)(const char** name0, const char** name1);
-typedef struct _lisysDir lisysDir;
-struct _lisysDir;
+typedef int (*LISysDirFilter)(const char* dir, const char* name, void* data);
+typedef int (*LISysDirSorter)(const char** name0, const char** name1);
+typedef struct _LISysDir LISysDir;
+struct _LISysDir;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-lisysDir*
+LISysDir*
 lisys_dir_open (const char* path);
 
 void
-lisys_dir_free (lisysDir* self);
+lisys_dir_free (LISysDir* self);
 
 int
-lisys_dir_scan (lisysDir* self);
+lisys_dir_scan (LISysDir* self);
 
 int
-lisys_dir_get_count (const lisysDir* self);
+lisys_dir_get_count (const LISysDir* self);
 
 const char*
-lisys_dir_get_name (const lisysDir* self,
+lisys_dir_get_name (const LISysDir* self,
                     int             i);
 
 char*
-lisys_dir_get_path (const lisysDir* self,
+lisys_dir_get_path (const LISysDir* self,
                     int             i);
 
 void
-lisys_dir_set_filter (lisysDir*      self,
-                      lisysDirFilter filter,
+lisys_dir_set_filter (LISysDir*      self,
+                      LISysDirFilter filter,
                       void*          data);
 
 void
-lisys_dir_set_sorter (lisysDir*      self,
-                      lisysDirSorter sorter);
+lisys_dir_set_sorter (LISysDir*      self,
+                      LISysDirSorter sorter);
 
 int
 LISYS_DIR_FILTER_FILES (const char* dir,

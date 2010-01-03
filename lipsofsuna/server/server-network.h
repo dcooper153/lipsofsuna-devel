@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvNetwork Network
+ * \addtogroup LISerNetwork Network
  * @{
  */
 
@@ -26,39 +26,35 @@
 #define __SERVER_NETWORK_H__
 
 #include <pthread.h>
-#ifdef BUILTIN_GRAPPLE
-#include <grapple.h>
-#else
 #include <grapple/grapple.h>
-#endif
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "server.h"
 #include "server-client.h"
 #include "server-types.h"
 
-struct _lisrvNetwork
+struct _LISerNetwork
 {
 	pthread_mutex_t mutex;
 	grapple_server socket;
-	lialgU32dic* clients;
-	lialgStrdic* passwords;
-	lisrvServer* server;
+	LIAlgU32dic* clients;
+	LIAlgStrdic* passwords;
+	LISerServer* server;
 };
 
-lisrvNetwork*
-lisrv_network_new (lisrvServer* server,
+LISerNetwork*
+liser_network_new (LISerServer* server,
                    int          udp,
                    int          port);
 
 void
-lisrv_network_free (lisrvNetwork* self);
+liser_network_free (LISerNetwork* self);
 
 void
-lisrv_network_update (lisrvNetwork* self,
+liser_network_update (LISerNetwork* self,
                       float         secs);
 
-lisrvClient*
-lisrv_network_find_client (lisrvNetwork* self,
+LISerClient*
+liser_network_find_client (LISerNetwork* self,
                            grapple_user  user);
 
 #endif

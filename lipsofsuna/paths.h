@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,10 +15,9 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_STRING_H__
-#define __LIPS_STRING_H__
+#ifndef __LIPS_PATHS_H__
+#define __LIPS_PATHS_H__
 
-#include <string.h>
-#include "string-generic.h"
+#include "paths/paths.h"
 
 #endif

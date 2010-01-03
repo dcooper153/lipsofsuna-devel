@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,17 +16,17 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndObject Object
+ * \addtogroup LIRenObject Object
  * @{
  */
 
 #ifndef __RENDER_OBJECT_H__
 #define __RENDER_OBJECT_H__
 
-#include <math/lips-math.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/model.h>
 #include "render.h"
 #include "render-buffer.h"
 #include "render-context.h"
@@ -34,17 +34,17 @@
 #include "render-model.h"
 #include "render-types.h"
 
-struct _lirndObject
+struct _LIRenObject
 {
 	int id;
 	int realized;
 	void* userdata;
-	limatAabb aabb;
-	limatTransform transform;
-	limdlPose* pose;
-	lirndScene* scene;
-	lirndModel* model;
-	lirndModel* instance;
+	LIMatAabb aabb;
+	LIMatTransform transform;
+	LIMdlPose* pose;
+	LIRenScene* scene;
+	LIRenModel* model;
+	LIRenModel* instance;
 	struct
 	{
 		int width;
@@ -56,68 +56,68 @@ struct _lirndObject
 	struct
 	{
 		int count;
-		lirndLight** array;
+		LIRenLight** array;
 	} lights;
 	struct
 	{
-		limatVector center;
-		limatMatrix matrix;
+		LIMatVector center;
+		LIMatMatrix matrix;
 	} orientation;
 };
 
-lirndObject*
-lirnd_object_new (lirndScene* scene,
+LIRenObject*
+liren_object_new (LIRenScene* scene,
                   int         id);
 
 void
-lirnd_object_free (lirndObject* self);
+liren_object_free (LIRenObject* self);
 
 void
-lirnd_object_deform (lirndObject* self);
+liren_object_deform (LIRenObject* self);
 
 void
-lirnd_object_emit_particles (lirndObject* self);
+liren_object_emit_particles (LIRenObject* self);
 
 void
-lirnd_object_update (lirndObject* self,
+liren_object_update (LIRenObject* self,
                      float        secs);
 
 void
-lirnd_object_get_bounds (const lirndObject* self,
-                         limatAabb*         result);
+liren_object_get_bounds (const LIRenObject* self,
+                         LIMatAabb*         result);
 
 void
-lirnd_object_get_center (const lirndObject* self,
-                         limatVector*       center);
+liren_object_get_center (const LIRenObject* self,
+                         LIMatVector*       center);
 
 int
-lirnd_object_set_model (lirndObject* self,
-                        lirndModel*  model);
+liren_object_set_model (LIRenObject* self,
+                        LIRenModel*  model);
 
 int
-lirnd_object_set_pose (lirndObject* self,
-                       limdlPose*   pose);
+liren_object_set_pose (LIRenObject* self,
+                       LIMdlPose*   pose);
 
 int
-lirnd_object_get_realized (const lirndObject* self);
+liren_object_get_realized (const LIRenObject* self);
 
 int
-lirnd_object_set_realized (lirndObject* self,
+liren_object_set_realized (LIRenObject* self,
                            int          value);
 
 void
-lirnd_object_get_transform (lirndObject*    self,
-                            limatTransform* value);
+liren_object_get_transform (LIRenObject*    self,
+                            LIMatTransform* value);
 
 void
-lirnd_object_set_transform (lirndObject*          self,
-                            const limatTransform* value);
+liren_object_set_transform (LIRenObject*          self,
+                            const LIMatTransform* value);
 
 void*
-lirnd_object_get_userdata (const lirndObject* self);
+liren_object_get_userdata (const LIRenObject* self);
 
 void
-lirnd_object_set_userdata (lirndObject* self,
+liren_object_set_userdata (LIRenObject* self,
                            void*        value);
 
 #endif

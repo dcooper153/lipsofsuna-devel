@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-skills.h"
 
@@ -79,14 +79,14 @@
  * -- @return True if the user had enough skill.
  * function Skills.check(self, args)
  */
-static void Skills_check (liscrArgs* args)
+static void Skills_check (LIScrArgs* args)
 {
 	float value;
 	const char* name;
-	liextModule* module;
-	liextSkill* skill;
-	liextSkills* skills;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtSkill* skill;
+	LIExtSkills* skills;
+	LIScrData* data;
 
 	if (!liscr_args_gets_string (args, "skill", &name) ||
 	    !liscr_args_gets_float (args, "min", &value))
@@ -120,11 +120,11 @@ static void Skills_check (liscrArgs* args)
  * -- @return Skills or nil.
  * function Skills.find(self, args)
  */
-static void Skills_find (liscrArgs* args)
+static void Skills_find (LIScrArgs* args)
 {
-	liextModule* module;
-	liextSkills* skills;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtSkills* skills;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
@@ -147,10 +147,10 @@ static void Skills_find (liscrArgs* args)
  * -- @return Number or nil.
  * function Skills.get_maximum(self, skill)
  */
-static void Skills_get_maximum (liscrArgs* args)
+static void Skills_get_maximum (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -167,10 +167,10 @@ static void Skills_get_maximum (liscrArgs* args)
  * -- @return List of skill names.
  * function Skills.get_names(self)
  */
-static void Skills_get_names (liscrArgs* args)
+static void Skills_get_names (LIScrArgs* args)
 {
-	lialgStrdicIter iter;
-	liextSkills* skills;
+	LIAlgStrdicIter iter;
+	LIExtSkills* skills;
 
 	skills = args->self;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
@@ -190,10 +190,10 @@ static void Skills_get_names (liscrArgs* args)
  * -- @return Number or nil.
  * function Skills.get_regen(self, args)
  */
-static void Skills_get_regen (liscrArgs* args)
+static void Skills_get_regen (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -215,10 +215,10 @@ static void Skills_get_regen (liscrArgs* args)
  * -- @return Number or nil.
  * function Skills.get_value(self, args)
  */
-static void Skills_get_value (liscrArgs* args)
+static void Skills_get_value (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -240,10 +240,10 @@ static void Skills_get_value (liscrArgs* args)
  * -- @return Boolean.
  * function Skills.has_skill(self, args)
  */
-static void Skills_has_skill (liscrArgs* args)
+static void Skills_has_skill (LIScrArgs* args)
 {
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name))
 	{
@@ -262,10 +262,10 @@ static void Skills_has_skill (liscrArgs* args)
  * -- @return New skills.
  * function Skills.new(self, args)
  */
-static void Skills_new (liscrArgs* args)
+static void Skills_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liextSkills* self;
+	LIExtModule* module;
+	LIExtSkills* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
@@ -295,13 +295,13 @@ static void Skills_new (liscrArgs* args)
  * -- @param name Skill name.
  * function Skills.register(self, type, name)
  */
-static void Skills_register (liscrArgs* args)
+static void Skills_register (LIScrArgs* args)
 {
 	int type;
 	float value;
 	const char* name;
 	const char* prot;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (!liscr_args_gets_string (args, "skill", &name))
 		return;
@@ -346,11 +346,11 @@ static void Skills_register (liscrArgs* args)
  * -- @param args Arguments.
  * function Skills.set_maximum(self, args)
  */
-static void Skills_set_maximum (liscrArgs* args)
+static void Skills_set_maximum (LIScrArgs* args)
 {
 	float value;
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name) &&
 	    liscr_args_gets_float (args, "value", &value))
@@ -373,11 +373,11 @@ static void Skills_set_maximum (liscrArgs* args)
  * -- @param args Arguments.
  * function Skills.set_regen(self, args)
  */
-static void Skills_set_regen (liscrArgs* args)
+static void Skills_set_regen (LIScrArgs* args)
 {
 	float value;
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name) &&
 	    liscr_args_gets_float (args, "value", &value))
@@ -400,11 +400,11 @@ static void Skills_set_regen (liscrArgs* args)
  * -- @param args Arguments.
  * function Skills.set_value(self, args)
  */
-static void Skills_set_value (liscrArgs* args)
+static void Skills_set_value (LIScrArgs* args)
 {
 	float value;
 	const char* name;
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	if (liscr_args_gets_string (args, "skill", &name) &&
 	    liscr_args_gets_float (args, "value", &value))
@@ -429,14 +429,14 @@ static void Skills_set_value (liscrArgs* args)
  * -- @return True if the user had enough skill.
  * function Skills.subtract(self, args)
  */
-static void Skills_subtract (liscrArgs* args)
+static void Skills_subtract (LIScrArgs* args)
 {
 	float value;
 	const char* name;
-	liextModule* module;
-	liextSkill* skill;
-	liextSkills* skills;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtSkill* skill;
+	LIExtSkills* skills;
+	LIScrData* data;
 
 	if (!liscr_args_gets_string (args, "skill", &name) &&
 	    !liscr_args_gets_float (args, "value", &value))
@@ -461,17 +461,17 @@ static void Skills_subtract (liscrArgs* args)
  * -- @name Skills.owner
  * -- @class table
  */
-static void Skills_getter_owner (liscrArgs* args)
+static void Skills_getter_owner (LIScrArgs* args)
 {
-	liengObject* object;
+	LIEngObject* object;
 
 	object = liext_skills_get_owner (args->self);
 	if (object != NULL)
 		liscr_args_seti_data (args, object->script);
 }
-static void Skills_setter_owner (liscrArgs* args)
+static void Skills_setter_owner (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_skills_set_owner (args->self, data->data);
@@ -482,7 +482,7 @@ static void Skills_setter_owner (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSkillsScript (liscrClass* self,
+liext_script_skills (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILLS, data);

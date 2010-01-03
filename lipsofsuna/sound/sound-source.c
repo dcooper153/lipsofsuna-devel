@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,13 @@
 /**
  * \addtogroup lisnd Sound
  * @{
- * \addtogroup lisndSource Source
+ * \addtogroup LISndSource Source
  * @{
  */
 
 #ifndef LI_DISABLE_SOUND
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "sound-source.h"
 
 /**
@@ -33,13 +33,13 @@
  * \param system Sound system.
  * \return New sound source or NULL.
  */
-lisndSource*
-lisnd_source_new (lisndSystem* system)
+LISndSource*
+lisnd_source_new (LISndSystem* system)
 {
-	lisndSource* self;
+	LISndSource* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lisndSource));
+	self = lisys_calloc (1, sizeof (LISndSource));
 	if (self == NULL)
 		return NULL;
 
@@ -63,14 +63,14 @@ lisnd_source_new (lisndSystem* system)
  * \param sample Sample to be queued.
  * \return New sound source or NULL.
  */
-lisndSource*
-lisnd_source_new_with_sample (lisndSystem* system,
-                              lisndSample* sample)
+LISndSource*
+lisnd_source_new_with_sample (LISndSystem* system,
+                              LISndSample* sample)
 {
-	lisndSource* self;
+	LISndSource* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lisndSource));
+	self = lisys_calloc (1, sizeof (LISndSource));
 	if (self == NULL)
 		return NULL;
 
@@ -95,7 +95,7 @@ lisnd_source_new_with_sample (lisndSystem* system,
  * \param self Sound source.
  */
 void
-lisnd_source_free (lisndSource* self)
+lisnd_source_free (LISndSource* self)
 {
 	alSourceStop (self->source);
 	alDeleteSources (1, &self->source);
@@ -114,7 +114,7 @@ lisnd_source_free (lisndSource* self)
  * \return The number of samples in the queue.
  */
 int
-lisnd_source_update (lisndSource* self)
+lisnd_source_update (LISndSource* self)
 {
 	ALint num;
 	ALuint buffer;
@@ -133,8 +133,8 @@ lisnd_source_update (lisndSource* self)
  * \param sample Sample.
  */
 void
-lisnd_source_queue_sample (lisndSource* self,
-                           lisndSample* sample)
+lisnd_source_queue_sample (LISndSource* self,
+                           LISndSample* sample)
 {
 	alSourceQueueBuffers (self->source, 1, &sample->buffer);
 	self->queued++;
@@ -147,7 +147,7 @@ lisnd_source_queue_sample (lisndSource* self,
  * \param looping Nonzero if should loop.
  */
 void
-lisnd_source_set_looping (lisndSource* self,
+lisnd_source_set_looping (LISndSource* self,
                           int          looping)
 {
 	alSourcei (self->source, AL_LOOPING, looping);
@@ -159,7 +159,7 @@ lisnd_source_set_looping (lisndSource* self,
  * \param self Sound source.
  */
 int
-lisnd_source_get_playing (lisndSource* self)
+lisnd_source_get_playing (LISndSource* self)
 {
 	ALint state;
 
@@ -174,7 +174,7 @@ lisnd_source_get_playing (lisndSource* self)
  * \param playing Nonzero for playing, zero for stopped.
  */
 void
-lisnd_source_set_playing (lisndSource* self,
+lisnd_source_set_playing (LISndSource* self,
                           int          playing)
 {
 	if (playing)
@@ -190,8 +190,8 @@ lisnd_source_set_playing (lisndSource* self,
  * \param value Vector.
  */
 void
-lisnd_source_set_position (lisndSource*       self,
-                           const limatVector* value)
+lisnd_source_set_position (LISndSource*       self,
+                           const LIMatVector* value)
 {
 	alSource3f (self->source, AL_POSITION, -value->x, value->y, -value->z);
 }
@@ -203,8 +203,8 @@ lisnd_source_set_position (lisndSource*       self,
  * \param value Vector.
  */
 void
-lisnd_source_set_velocity (lisndSource*       self,
-                           const limatVector* value)
+lisnd_source_set_velocity (LISndSource*       self,
+                           const LIMatVector* value)
 {
 	alSource3f (self->source, AL_VELOCITY, value->x, value->y, value->z);
 }
@@ -216,7 +216,7 @@ lisnd_source_set_velocity (lisndSource*       self,
  * \param value Volume.
  */
 void
-lisnd_source_set_volume (lisndSource* self,
+lisnd_source_set_volume (LISndSource* self,
                          float        value)
 {
 	alSourcef (self->source, AL_GAIN, value);

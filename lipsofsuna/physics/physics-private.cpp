@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@
 #define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
 #define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
 
-liphyMotionState::liphyMotionState (liphyObject*       object,
+liphyMotionState::liphyMotionState (LIPhyObject*       object,
                                     const btTransform& transform)
 {
 	this->object = object;
@@ -67,7 +67,7 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 
 /*****************************************************************************/
 
-liphyCharacterController::liphyCharacterController (liphyObject* object)
+liphyCharacterController::liphyCharacterController (LIPhyObject* object)
 {
 	this->object = object;
 	this->ground = 0;
@@ -87,7 +87,7 @@ void liphyCharacterController::updateAction (btCollisionWorld* world, btScalar d
 	btVector3 forward = transform * btVector3 (0.0f, 0.0f, -1.0f) - pos;
 
 	/* Check for ground. */
-	limatVector check = { 0.0f, -0.2f, 0.0f };
+	LIMatVector check = { 0.0f, -0.2f, 0.0f };
 	ground = liphy_object_sweep (this->object, &check) < 1.0f;
 	this->ground = ground;
 

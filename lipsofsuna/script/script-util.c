@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,14 +29,14 @@
 #include "script-private.h"
 #include "script-util.h"
 
-liscrClass*
+LIScrClass*
 liscr_isanyclass (lua_State*  lua,
                   int         arg)
 {
 	int ret;
-	lialgStrdicIter iter;
-	liscrClass* clss;
-	liscrScript* script = liscr_script (lua);
+	LIAlgStrdicIter iter;
+	LIScrClass* clss;
+	LIScrScript* script = liscr_script (lua);
 
 	LI_FOREACH_STRDIC (iter, script->classes)
 	{
@@ -52,15 +52,15 @@ liscr_isanyclass (lua_State*  lua,
 	return NULL;
 }
 
-liscrData*
+LIScrData*
 liscr_isanydata (lua_State* lua,
                  int        arg)
 {
 	int ret;
-	lialgStrdicIter iter;
-	liscrClass* clss;
-	liscrData* object;
-	liscrScript* script = liscr_script (lua);
+	LIAlgStrdicIter iter;
+	LIScrClass* clss;
+	LIScrData* object;
+	LIScrScript* script = liscr_script (lua);
 
 	object = lua_touserdata (lua, arg);
 	if (object == NULL)
@@ -84,15 +84,15 @@ liscr_isanydata (lua_State* lua,
 	return NULL;
 }
 
-liscrClass*
+LIScrClass*
 liscr_isclass (lua_State*  lua,
                int         arg,
                const char* meta)
 {
 	int ret;
-	lialgStrdicIter iter;
-	liscrClass* clss;
-	liscrScript* script = liscr_script (lua);
+	LIAlgStrdicIter iter;
+	LIScrClass* clss;
+	LIScrScript* script = liscr_script (lua);
 
 	lua_pushvalue (lua, arg);
 	lua_getfield (lua, LUA_REGISTRYINDEX, meta);
@@ -123,12 +123,12 @@ liscr_isclass (lua_State*  lua,
  * \param meta Class type.
  * \return Userdata owned by Lua or NULL.
  */
-liscrData*
+LIScrData*
 liscr_isdata (lua_State*  lua,
               int         arg,
               const char* meta)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	data = liscr_isanydata (lua, arg);
 	if (data == NULL)
@@ -139,12 +139,12 @@ liscr_isdata (lua_State*  lua,
 	return data;
 }
 
-liscrClass*
+LIScrClass*
 liscr_checkanyclass (lua_State* lua,
                      int        arg)
 {
 	char msg[256];
-	liscrClass* clss;
+	LIScrClass* clss;
 
 	clss = liscr_isanyclass (lua, arg);
 	if (clss == NULL)
@@ -156,12 +156,12 @@ liscr_checkanyclass (lua_State* lua,
 	return clss;
 }
 
-liscrData*
+LIScrData*
 liscr_checkanydata (lua_State* lua,
                     int        arg)
 {
 	char msg[256];
-	liscrData* object;
+	LIScrData* object;
 
 	object = liscr_isanydata (lua, arg);
 	if (object == NULL)
@@ -173,13 +173,13 @@ liscr_checkanydata (lua_State* lua,
 	return object;
 }
 
-liscrClass*
+LIScrClass*
 liscr_checkclass (lua_State*  lua,
                   int         arg,
                   const char* meta)
 {
 	char msg[256];
-	liscrClass* clss;
+	LIScrClass* clss;
 
 	clss = liscr_isclass (lua, arg, meta);
 	if (clss == NULL)
@@ -197,7 +197,7 @@ liscr_checkclassdata (lua_State*  lua,
                       const char* meta)
 {
 	void* data;
-	liscrClass* clss;
+	LIScrClass* clss;
 
 	clss = liscr_checkclass (lua, arg, meta);
 	data = liscr_class_get_userdata (clss, meta);
@@ -219,13 +219,13 @@ liscr_checkclassdata (lua_State*  lua,
  * \param meta Class type.
  * \return Userdata owned by Lua.
  */
-liscrData*
+LIScrData*
 liscr_checkdata (lua_State*  lua,
                  int         arg,
                  const char* meta)
 {
 	char msg[256];
-	liscrData* object;
+	LIScrData* object;
 
 	object = liscr_isdata (lua, arg, meta);
 	if (object == NULL)
@@ -247,7 +247,7 @@ liscr_checkdata (lua_State*  lua,
  */
 int
 liscr_copyargs (lua_State* lua,
-                liscrData* data,
+                LIScrData* data,
                 int        arg)
 {
 	if (lua_type (lua, arg) != LUA_TTABLE)
@@ -295,7 +295,7 @@ liscr_copyargs (lua_State* lua,
  */
 void
 liscr_pushclass (lua_State*  lua,
-                 liscrClass* clss)
+                 LIScrClass* clss)
 {
 	lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
 	assert (lua_type (lua, -1) == LUA_TTABLE);
@@ -312,7 +312,7 @@ liscr_pushclass (lua_State*  lua,
  */
 void
 liscr_pushdata (lua_State* lua,
-                liscrData* object)
+                LIScrData* object)
 {
 	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP);
 	lua_gettable (lua, LUA_REGISTRYINDEX);
@@ -334,7 +334,7 @@ liscr_pushdata (lua_State* lua,
  */
 void
 liscr_pushpriv (lua_State* lua,
-                liscrData* object)
+                LIScrData* object)
 {
 	liscr_pushdata (lua, object);
 	lua_getfenv (lua, -1);
@@ -348,10 +348,10 @@ liscr_pushpriv (lua_State* lua,
  * \param lua Lua state.
  * \return Script.
  */
-liscrScript*
+LIScrScript*
 liscr_script (lua_State* lua)
 {
-	liscrScript* script;
+	LIScrScript* script;
 
 	lua_pushlightuserdata (lua, LISCR_SCRIPT_SELF);
 	lua_gettable (lua, LUA_REGISTRYINDEX);

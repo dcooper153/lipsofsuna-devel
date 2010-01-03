@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,22 +24,22 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-slots.h"
 
 #define LIEXT_SLOTS_VERSION 0xFF
 
 static int
-private_send_clear (liextSlots* self);
+private_send_clear (LIExtSlots* self);
 
 static int
-private_send_reset (liextSlots* self);
+private_send_reset (LIExtSlots* self);
 
 static int
-private_send_slot (liextSlots* self,
-                   liextSlot*  slot);
+private_send_slot (LIExtSlots* self,
+                   LIExtSlot*  slot);
 
 /*****************************************************************************/
 
@@ -49,12 +49,12 @@ private_send_slot (liextSlots* self,
  * \param module Module.
  * \return New slots type or NULL.
  */
-liextSlots*
-liext_slots_new (liextModule* module)
+LIExtSlots*
+liext_slots_new (LIExtModule* module)
 {
-	liextSlots* self;
+	LIExtSlots* self;
 
-	self = lisys_calloc (1, sizeof (liextSlots));
+	self = lisys_calloc (1, sizeof (LIExtSlots));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -72,7 +72,7 @@ liext_slots_new (liextModule* module)
  * \param self Inventory.
  */
 void
-liext_slots_free (liextSlots* self)
+liext_slots_free (LIExtSlots* self)
 {
 	int i;
 
@@ -85,8 +85,8 @@ liext_slots_free (liextSlots* self)
 	lisys_free (self);
 }
 
-liextSlot*
-liext_slots_find_slot (liextSlots* self,
+LIExtSlot*
+liext_slots_find_slot (LIExtSlots* self,
                        const char* name)
 {
 	int i;
@@ -110,12 +110,12 @@ liext_slots_find_slot (liextSlots* self,
  * \param node Model node name.
  */
 int
-liext_slots_insert_slot (liextSlots*   self,
-                         liextSlotType type,
+liext_slots_insert_slot (LIExtSlots*   self,
+                         LIExtSlotType type,
                          const char*   name,
                          const char*   node)
 {
-	liextSlot tmp;
+	LIExtSlot tmp;
 
 	tmp.type = type;
 	tmp.name = listr_dup (name);
@@ -145,11 +145,11 @@ liext_slots_insert_slot (liextSlots*   self,
 }
 
 int
-liext_slots_get_object (liextSlots*   self,
+liext_slots_get_object (LIExtSlots*   self,
                         const char*   slot,
-                        liengObject** object)
+                        LIEngObject** object)
 {
-	liextSlot* s;
+	LIExtSlot* s;
 
 	s = liext_slots_find_slot (self, slot);
 	if (s == NULL)
@@ -159,11 +159,11 @@ liext_slots_get_object (liextSlots*   self,
 }
 
 int
-liext_slots_set_object (liextSlots*  self,
+liext_slots_set_object (LIExtSlots*  self,
                         const char*  slot,
-                        liengObject* object)
+                        LIEngObject* object)
 {
-	liextSlot* s;
+	LIExtSlot* s;
 
 	/* Store to slot. */
 	s = liext_slots_find_slot (self, slot);
@@ -190,17 +190,17 @@ liext_slots_set_object (liextSlots*  self,
 	return 1;
 }
 
-liengObject*
-liext_slots_get_owner (liextSlots* self)
+LIEngObject*
+liext_slots_get_owner (LIExtSlots* self)
 {
 	return self->owner;
 }
 
 int
-liext_slots_set_owner (liextSlots*  self,
-                       liengObject* value)
+liext_slots_set_owner (LIExtSlots*  self,
+                       LIEngObject* value)
 {
-	liextSlots* old;
+	LIExtSlots* old;
 
 	if (self->owner == value)
 		return 1;
@@ -251,11 +251,11 @@ liext_slots_set_owner (liextSlots*  self,
 /*****************************************************************************/
 
 static int
-private_send_clear (liextSlots* self)
+private_send_clear (LIExtSlots* self)
 {
-	liarcWriter* writer;
-	liengObject* object;
-	lisrvObserverIter iter;
+	LIArcWriter* writer;
+	LIEngObject* object;
+	LISerObserverIter iter;
 
 	/* Create packet. */
 	writer = liarc_writer_new_packet (LIEXT_SLOTS_PACKET_RESET);
@@ -264,23 +264,23 @@ private_send_clear (liextSlots* self)
 	liarc_writer_append_uint32 (writer, self->owner->id);
 
 	/* Send to all observers. */
-	LISRV_FOREACH_OBSERVER (iter, self->owner, 1)
+	LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 	{
 		object = iter.object;
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 	}
 
 	return 1;
 }
 
 static int
-private_send_reset (liextSlots* self)
+private_send_reset (LIExtSlots* self)
 {
 	int i;
-	liarcWriter* writer;
-	liengObject* object;
-	liextSlot* slot;
-	lisrvObserverIter iter;
+	LIArcWriter* writer;
+	LIEngObject* object;
+	LIExtSlot* slot;
+	LISerObserverIter iter;
 
 	/* Create packet. */
 	writer = liarc_writer_new_packet (LIEXT_SLOTS_PACKET_RESET);
@@ -301,22 +301,22 @@ private_send_reset (liextSlots* self)
 	}
 
 	/* Send to all observers. */
-	LISRV_FOREACH_OBSERVER (iter, self->owner, 1)
+	LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 	{
 		object = iter.object;
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 	}
 
 	return 1;
 }
 
 static int
-private_send_slot (liextSlots* self,
-                   liextSlot*  slot)
+private_send_slot (LIExtSlots* self,
+                   LIExtSlot*  slot)
 {
-	liarcWriter* writer;
-	liengObject* object;
-	lisrvObserverIter iter;
+	LIArcWriter* writer;
+	LIEngObject* object;
+	LISerObserverIter iter;
 
 	/* Create packet. */
 	writer = liarc_writer_new_packet (LIEXT_SLOTS_PACKET_DIFF);
@@ -335,15 +335,15 @@ private_send_slot (liextSlots* self,
 	/* Send to all observers. */
 	if (slot->type == LIEXT_SLOT_TYPE_PUBLIC)
 	{
-		LISRV_FOREACH_OBSERVER (iter, self->owner, 1)
+		LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 		{
 			object = iter.object;
-			lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+			liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 		}
 	}
-	else if (LISRV_OBJECT (self->owner)->client != NULL)
+	else if (LISER_OBJECT (self->owner)->client != NULL)
 	{
-		lisrv_client_send (LISRV_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
 	}
 	liarc_writer_free (writer);
 

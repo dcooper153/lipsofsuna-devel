@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,39 +18,39 @@
 /**
  * \addtogroup libnd Binding
  * @{
- * \addtogroup libndManager Manager
+ * \addtogroup LIBndManager Manager
  * @{
  */
 
 #ifndef __BINDING_MANAGER_H__
 #define __BINDING_MANAGER_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "binding.h"
 #include "binding-action.h"
 #include "binding-types.h"
 
-struct _libndManager
+struct _LIBndManager
 {
-	libndAction* actions;
-	libndBinding* bindings;
+	LIBndAction* actions;
+	LIBndBinding* bindings;
 };
 
-libndManager*
+LIBndManager*
 libnd_manager_new ();
 
 void
-libnd_manager_free (libndManager* self);
+libnd_manager_free (LIBndManager* self);
 
 int
-libnd_manager_event (libndManager* self,
-                     libndType     type,
+libnd_manager_event (LIBndManager* self,
+                     LIBndType     type,
                      uint32_t      code,
                      uint32_t      mods,
                      float         value);
 
-libndAction*
-libnd_manager_find_action (libndManager* self,
+LIBndAction*
+libnd_manager_find_action (LIBndManager* self,
                            const char*   id);
 
 #endif

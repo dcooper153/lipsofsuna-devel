@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,26 +18,26 @@
 /**
  * \addtogroup licfg Config
  * @{
- * \addtogroup licfgHost Host
+ * \addtogroup LICfgHost Host
  * @{
  */
 
 #ifndef __CONFIG_HOST_H__
 #define __CONFIG_HOST_H__
 
-typedef struct _licfgHost licfgHost;
-struct _licfgHost
+typedef struct _LICfgHost LICfgHost;
+struct _LICfgHost
 {
 	char* host;
 	int port;
 	int udp;
 };
 
-licfgHost*
+LICfgHost*
 licfg_host_new (const char* dir);
 
 void
-licfg_host_free (licfgHost* self);
+licfg_host_free (LICfgHost* self);
 
 #endif
 

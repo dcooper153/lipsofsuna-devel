@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,67 +16,67 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvObject Object
+ * \addtogroup LISerObject Object
  * @{
  */
 
 #ifndef __SERVER_OBJECT_H__
 #define __SERVER_OBJECT_H__
 
-#include <archive/lips-archive.h>
-#include <engine/lips-engine.h>
-#include <script/lips-script.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/string.h>
 #include "server-types.h"
 
-#define LISRV_OBJECT(o) ((lisrvObject*) lieng_object_get_userdata ((liengObject*)(o)))
+#define LISER_OBJECT(o) ((LISerObject*) lieng_object_get_userdata ((LIEngObject*)(o)))
 
-struct _lisrvObject
+struct _LISerObject
 {
 	uint8_t flags;
-	lialgU32dic* animations;
-	lisrvClient* client;
-	lisrvServer* server;
+	LIAlgU32dic* animations;
+	LISerClient* client;
+	LISerServer* server;
 };
 
 int
-lisrv_object_animate (liengObject* self,
+liser_object_animate (LIEngObject* self,
                       const char*  name,
                       int          channel,
                       float        priority,
                       int          permanent);
 
 void
-lisrv_object_disconnect (liengObject* self);
+liser_object_disconnect (LIEngObject* self);
 
 void
-lisrv_object_effect (liengObject* self,
+liser_object_effect (LIEngObject* self,
                      const char*  value,
                      int          flags);
 
 int
-lisrv_object_moved (liengObject* self);
+liser_object_moved (LIEngObject* self);
 
 int
-lisrv_object_purge (liengObject* self);
+liser_object_purge (LIEngObject* self);
 
 int
-lisrv_object_sees (const liengObject* self,
-                   const liengObject* target);
+liser_object_sees (const LIEngObject* self,
+                   const LIEngObject* target);
 
 int
-lisrv_object_serialize (liengObject* self,
+liser_object_serialize (LIEngObject* self,
                         int          save);
 
 void
-lisrv_object_swap (liengObject* self,
-                   liengObject* object);
+liser_object_swap (LIEngObject* self,
+                   LIEngObject* object);
 
 int
-lisrv_object_set_client (liengObject* self,
-                         lisrvClient* value);
+liser_object_set_client (LIEngObject* self,
+                         LISerClient* value);
 
 #endif
 

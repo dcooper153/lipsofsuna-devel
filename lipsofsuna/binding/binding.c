@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup libnd Binding
  * @{
- * \addtogroup libndBinding Binding
+ * \addtogroup LIBndBinding Binding
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "binding.h"
 #include "binding-manager.h"
 
@@ -39,21 +39,21 @@
  * \param multiplier Value of handled events will be premultiplied by this.
  * \return New binding or NULL.
  */
-libndBinding*
-libnd_binding_new (libndManager* manager,
-                   libndType     type,
-                   libndAction*  action,
+LIBndBinding*
+libnd_binding_new (LIBndManager* manager,
+                   LIBndType     type,
+                   LIBndAction*  action,
                    const char*   params,
                    uint32_t      code,
                    uint32_t      mods,
                    float         multiplier)
 {
 	uint32_t mask;
-	libndBinding* self;
+	LIBndBinding* self;
 
 	assert (action != NULL);
 
-	self = lisys_calloc (1, sizeof (libndBinding));
+	self = lisys_calloc (1, sizeof (LIBndBinding));
 	if (self == NULL)
 		return NULL;
 	if (params == NULL)
@@ -91,7 +91,7 @@ libnd_binding_new (libndManager* manager,
  * \param self Binding.
  */
 void
-libnd_binding_free (libndBinding* self)
+libnd_binding_free (LIBndBinding* self)
 {
 	/* Remove from manager. */
 	if (self->prev != NULL)
@@ -107,13 +107,13 @@ libnd_binding_free (libndBinding* self)
 }
 
 void*
-libnd_binding_get_userdata (libndBinding* self)
+libnd_binding_get_userdata (LIBndBinding* self)
 {
 	return self->userdata;
 }
 
 void
-libnd_binding_set_userdata (libndBinding* self,
+libnd_binding_set_userdata (LIBndBinding* self,
                             void*         value)
 {
 	self->userdata = value;

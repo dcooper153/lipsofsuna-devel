@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,52 +18,52 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgRender Render
+ * \addtogroup LIWdgRender Render
  * @{
  */
 
 #ifndef __WIDGET_RENDER_H__
 #define __WIDGET_RENDER_H__
 
-#include <render/lips-render.h>
+#include <lipsofsuna/render.h>
 #include "widget.h"
 #include "widget-group.h"
 
-#define LIWDG_RENDER(o) ((liwdgRender*)(o))
+#define LIWDG_RENDER(o) ((LIWdgRender*)(o))
 
-typedef struct _liwdgRender liwdgRender;
-struct _liwdgRender
+typedef struct _LIWdgRender LIWdgRender;
+struct _LIWdgRender
 {
-	liwdgGroup base;
-	limatMatrix modelview;
-	limatMatrix projection;
-	lirndDeferred* deferred;
-	lirndScene* scene;
-	void (*custom_render_func)(liwdgRender*, void*);
+	LIWdgGroup base;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
+	LIRenDeferred* deferred;
+	LIRenScene* scene;
+	void (*custom_render_func)(LIWdgRender*, void*);
 	void* custom_render_data;
-	void (*custom_update_func)(liwdgRender*, void*);
+	void (*custom_update_func)(LIWdgRender*, void*);
 	void* custom_update_data;
 };
 
-extern const liwdgClass liwdgRenderType;
+extern const LIWdgClass liwdg_widget_render;
 
-liwdgWidget*
-liwdg_render_new (liwdgManager* manager,
-                  lirndScene*   scene);
+LIWdgWidget*
+liwdg_render_new (LIWdgManager* manager,
+                  LIRenScene*   scene);
 
 int
-liwdg_render_pick (liwdgRender*    self,
-                   lirndSelection* result,
+liwdg_render_pick (LIWdgRender*    self,
+                   LIRenSelection* result,
                    int             x,
                    int             y);
 
 void
-liwdg_render_set_modelview (liwdgRender*       self,
-                            const limatMatrix* value);
+liwdg_render_set_modelview (LIWdgRender*       self,
+                            const LIMatMatrix* value);
 
 void
-liwdg_render_set_projection (liwdgRender*       self,
-                             const limatMatrix* value);
+liwdg_render_set_projection (LIWdgRender*       self,
+                             const LIMatMatrix* value);
 
 #endif
 

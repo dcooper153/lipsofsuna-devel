@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,15 +26,15 @@
 
 #include "ext-skill.h"
 
-liextSkill*
-liext_skill_new (liextSkills*   skills,
-                 liextSkillType type,
+LIExtSkill*
+liext_skill_new (LIExtSkills*   skills,
+                 LIExtSkillType type,
                  const char*    name)
 {
-	liextSkill* self;
+	LIExtSkill* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextSkill));
+	self = lisys_calloc (1, sizeof (LIExtSkill));
 	if (self == NULL)
 		return NULL;
 	self->skills = skills;
@@ -50,13 +50,13 @@ liext_skill_new (liextSkills*   skills,
 }
 
 void
-liext_skill_free (liextSkill* self)
+liext_skill_free (LIExtSkill* self)
 {
 	lisys_free (self);
 }
 
 int
-liext_skill_set_maximum (liextSkill* self,
+liext_skill_set_maximum (LIExtSkill* self,
                          float       value)
 {
 	if (self->maximum == value)
@@ -68,7 +68,7 @@ liext_skill_set_maximum (liextSkill* self,
 }
 
 int
-liext_skill_set_regen (liextSkill* self,
+liext_skill_set_regen (LIExtSkill* self,
                        float       value)
 {
 	if (self->regen == value)
@@ -79,7 +79,7 @@ liext_skill_set_regen (liextSkill* self,
 }
 
 int
-liext_skill_set_value (liextSkill* self,
+liext_skill_set_value (LIExtSkill* self,
                        float       value)
 {
 	if (self->value == value)

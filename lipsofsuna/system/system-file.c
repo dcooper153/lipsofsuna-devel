@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -46,7 +46,7 @@
 #include "system-error.h"
 #include "system-file.h"
 
-struct _lisysMmap
+struct _LISysMmap
 {
 #ifdef HAVE_SYS_MMAN_H
 	int size;
@@ -67,17 +67,17 @@ struct _lisysMmap
  * \param path Path.
  * \return New memory map handle or NULL.
  */
-lisysMmap*
+LISysMmap*
 lisys_mmap_open (const char* path)
 {
 #ifdef HAVE_SYS_MMAN_H
 
 	int fd;
 	struct stat st;
-	lisysMmap* self;
+	LISysMmap* self;
 
 	/* Allocate self. */
-	self = malloc (sizeof (lisysMmap));
+	self = malloc (sizeof (LISysMmap));
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -120,10 +120,10 @@ lisys_mmap_open (const char* path)
 
 #elif defined HAVE_WINDOWS_H
 
-	lisysMmap* self;
+	LISysMmap* self;
 
 	/* Allocate self. */
-	self = malloc (sizeof (lisysMmap));
+	self = malloc (sizeof (LISysMmap));
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -189,7 +189,7 @@ lisys_mmap_open (const char* path)
  * \param self Memory map handle.
  */
 void
-lisys_mmap_free (lisysMmap* self)
+lisys_mmap_free (LISysMmap* self)
 {
 #ifdef HAVE_SYS_MMAN_H
 	if (self->buffer != NULL)
@@ -213,7 +213,7 @@ lisys_mmap_free (lisysMmap* self)
  * \return Memory pointer, may be NULL if the file size was zero.
  */
 void*
-lisys_mmap_get_buffer (lisysMmap* self)
+lisys_mmap_get_buffer (LISysMmap* self)
 {
 	return self->buffer;
 }
@@ -225,7 +225,7 @@ lisys_mmap_get_buffer (lisysMmap* self)
  * \return Size in bytes.
  */
 int
-lisys_mmap_get_size (lisysMmap* self)
+lisys_mmap_get_size (LISysMmap* self)
 {
 	return self->size;
 }
@@ -286,7 +286,7 @@ lisys_readlink (const char* path)
  */
 int
 lisys_stat (const char* path,
-            lisysStat*  result)
+            LISysStat*  result)
 {
 	struct stat st;
 
@@ -324,7 +324,7 @@ lisys_stat (const char* path,
  */
 int
 lisys_lstat (const char* path,
-             lisysStat*  result)
+             LISysStat*  result)
 {
 #ifdef HAVE_LSTAT
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,20 +18,20 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengEngine Engine
+ * \addtogroup LIEngEngine Engine
  * @{
  */
 
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <archive/lips-archive.h>
-#include <callback/lips-callback.h>
-#include <math/lips-math.h>
-#include <model/lips-model.h>
-#include <physics/lips-physics.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/callback.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/physics.h>
+#include <lipsofsuna/system.h>
 #include "engine-model.h"
 #include "engine-object.h"
 #include "engine-resources.h"
@@ -40,17 +40,17 @@
 
 /*****************************************************************************/
 
-struct _liengEngine
+struct _LIEngEngine
 {
 	void* userdata;
-	lialgPtrdic* selection;
-	lialgSectors* sectors;
-	lialgU32dic* objects;
-	licalCallbacks* callbacks;
-	licalHandle calls[1];
-	liengConstraint* constraints;
-	liengResources* resources;
-	liphyPhysics* physics;
+	LIAlgPtrdic* selection;
+	LIAlgSectors* sectors;
+	LIAlgU32dic* objects;
+	LICalCallbacks* callbacks;
+	LICalHandle calls[1];
+	LIEngConstraint* constraints;
+	LIEngResources* resources;
+	LIPhyPhysics* physics;
 	struct
 	{
 		int flags;
@@ -64,74 +64,74 @@ struct _liengEngine
 	} range;
 };
 
-liengEngine*
-lieng_engine_new (licalCallbacks* calls,
-                  lialgSectors*   sectors,
+LIEngEngine*
+lieng_engine_new (LICalCallbacks* calls,
+                  LIAlgSectors*   sectors,
                   const char*     path);
 
 void
-lieng_engine_free (liengEngine* self);
+lieng_engine_free (LIEngEngine* self);
 
 void
-lieng_engine_clear_selection (liengEngine* self);
+lieng_engine_clear_selection (LIEngEngine* self);
 
-liengAnimation*
-lieng_engine_find_animation_by_code (liengEngine* self,
+LIEngAnimation*
+lieng_engine_find_animation_by_code (LIEngEngine* self,
                                      int          id);
 
-liengAnimation*
-lieng_engine_find_animation_by_name (liengEngine* self,
+LIEngAnimation*
+lieng_engine_find_animation_by_name (LIEngEngine* self,
                                      const char*  name);
 
-liengModel*
-lieng_engine_find_model_by_code (liengEngine* self,
+LIEngModel*
+lieng_engine_find_model_by_code (LIEngEngine* self,
                                  uint32_t     id);
 
-liengModel*
-lieng_engine_find_model_by_name (liengEngine* self,
+LIEngModel*
+lieng_engine_find_model_by_name (LIEngEngine* self,
                                  const char*  name);
 
-liengObject*
-lieng_engine_find_object (liengEngine* self,
+LIEngObject*
+lieng_engine_find_object (LIEngEngine* self,
                           uint32_t     id);
 
 void
-lieng_engine_insert_constraint (liengEngine*     self,
-                                liengConstraint* constraint);
+lieng_engine_insert_constraint (LIEngEngine*     self,
+                                LIEngConstraint* constraint);
 
 int
-lieng_engine_load_model (liengEngine* self,
+lieng_engine_load_model (LIEngEngine* self,
                          const char*  name);
 
 int
-lieng_engine_load_resources (liengEngine* self,
-                             liarcReader* reader);
+lieng_engine_load_resources (LIEngEngine* self,
+                             LIArcReader* reader);
 
 void
-lieng_engine_remove_constraint (liengEngine*     self,
-                                liengConstraint* constraint);
+lieng_engine_remove_constraint (LIEngEngine*     self,
+                                LIEngConstraint* constraint);
 
 void
-lieng_engine_update (liengEngine* self,
+lieng_engine_update (LIEngEngine* self,
                      float        secs);
 
 int
-lieng_engine_get_flags (const liengEngine* self);
+lieng_engine_get_flags (const LIEngEngine* self);
 
 void
-lieng_engine_set_flags (liengEngine* self,
+lieng_engine_set_flags (LIEngEngine* self,
                         int          flags);
 
 void
-lieng_engine_set_local_range (liengEngine* self,
+lieng_engine_set_local_range (LIEngEngine* self,
                               uint32_t     start,
                               uint32_t     end);
 
 void*
-lieng_engine_get_userdata (liengEngine* self);
+lieng_engine_get_userdata (LIEngEngine* self);
 
 void
-lieng_engine_set_userdata (liengEngine* self,
+lieng_engine_set_userdata (LIEngEngine* self,
                            void*        value);
 
 #endif

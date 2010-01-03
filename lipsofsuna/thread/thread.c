@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,20 +18,20 @@
 /**
  * \addtogroup lithr Thread
  * @{
- * \addtogroup lithrThread Thread
+ * \addtogroup LIThrThread Thread
  * @{
  */
 
 #include <pthread.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "thread.h"
 
-struct _lithrThread
+struct _LIThrThread
 {
 	pthread_t thread;
 	int done;
 	void* data;
-	lithrThreadFunc func;
+	LIThrThreadFunc func;
 };
 
 static void*
@@ -39,13 +39,13 @@ private_thread (void* data);
 
 /*****************************************************************************/
 
-lithrThread*
-lithr_thread_new (lithrThreadFunc func,
+LIThrThread*
+lithr_thread_new (LIThrThreadFunc func,
                   void*           data)
 {
-	lithrThread* self;
+	LIThrThread* self;
 
-	self = lisys_calloc (1, sizeof (lithrThread));
+	self = lisys_calloc (1, sizeof (LIThrThread));
 	if (self == NULL)
 		return NULL;
 	self->data = data;
@@ -61,20 +61,20 @@ lithr_thread_new (lithrThreadFunc func,
 }
 
 void
-lithr_thread_free (lithrThread* self)
+lithr_thread_free (LIThrThread* self)
 {
 	lithr_thread_join (self);
 	lisys_free (self);
 }
 
 void
-lithr_thread_join (lithrThread* self)
+lithr_thread_join (LIThrThread* self)
 {
 	pthread_join (self->thread, NULL);
 }
 
 int
-lithr_thread_call_get_done (lithrThread* self)
+lithr_thread_call_get_done (LIThrThread* self)
 {
 	return self->done;
 }
@@ -84,7 +84,7 @@ lithr_thread_call_get_done (lithrThread* self)
 static void*
 private_thread (void* data)
 {
-	lithrThread* self;
+	LIThrThread* self;
 
 	self = data;
 	self->func (self, self->data);

@@ -18,11 +18,11 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrClass Class
+ * \addtogroup LIScrClass Class
  * @{
  */
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
 /* @luadoc
  * module "Core.Common.Class"
@@ -45,10 +45,10 @@
  * -- @return Boolean.
  * function Class.check(self, args)
  */
-static void Class_check (liscrArgs* args)
+static void Class_check (LIScrArgs* args)
 {
 	const char* name;
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "data", NULL, &data) &&
 	    liscr_args_gets_string (args, "name", &name))
@@ -68,11 +68,11 @@ static void Class_check (liscrArgs* args)
  * -- @return New class.
  * function Class.new(self, base, name)
  */
-static void Class_new (liscrArgs* args)
+static void Class_new (LIScrArgs* args)
 {
 	const char* name;
-	liscrClass* base;
-	liscrClass* clss;
+	LIScrClass* base;
+	LIScrClass* clss;
 
 	if (liscr_args_gets_class (args, "base", NULL, &base) &&
 	    liscr_args_gets_string (args, "name", &name))
@@ -100,7 +100,7 @@ static void Class_new (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licomClassScript (liscrClass* self,
+liscr_script_class (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_CLASS, data);

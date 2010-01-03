@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,43 +27,43 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <ai/lips-ai.h>
-#include <algorithm/lips-algorithm.h>
-#include <script/lips-script.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/ai.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/voxel.h>
 
 #define LIEXT_SCRIPT_NPC "Lips.Npc"
 
-typedef struct _liextModule liextModule;
-typedef struct _liextNpc liextNpc;
+typedef struct _LIExtModule LIExtModule;
+typedef struct _LIExtNpc LIExtNpc;
 
-struct _liextModule
+struct _LIExtModule
 {
-	liaiManager* ai;
-	lialgPtrdic* dictionary;
-	lisrvServer* server;
-	livoxManager* voxels;
+	LIAiManager* ai;
+	LIAlgPtrdic* dictionary;
+	LISerServer* server;
+	LIVoxManager* voxels;
 };
 
-liextModule*
-liext_module_new (lisrvServer* server);
+LIExtModule*
+liext_module_new (LISerServer* server);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
-liextNpc*
-liext_module_find_npc (liextModule* self,
-                       liengObject* owner);
+LIExtNpc*
+liext_module_find_npc (LIExtModule* self,
+                       LIEngObject* owner);
 
-liaiPath*
-liext_module_solve_path (liextModule*       self,
-                         const liengObject* object,
-                         const limatVector* target);
+LIAiPath*
+liext_module_solve_path (LIExtModule*       self,
+                         const LIEngObject* object,
+                         const LIMatVector* target);
 
 /*****************************************************************************/
 
 void
-liextNpcScript (liscrClass* self,
+liext_script_npc (LIScrClass* self,
                 void*       data);
 
 #endif

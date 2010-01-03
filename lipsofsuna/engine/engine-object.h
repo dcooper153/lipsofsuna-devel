@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,228 +18,228 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengObject Object
+ * \addtogroup LIEngObject Object
  * @{
  */
 
 #ifndef __ENGINE_OBJECT_H__
 #define __ENGINE_OBJECT_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
-#include <physics/lips-physics.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/physics.h>
+#include <lipsofsuna/system.h>
 #include "engine-model.h"
 #include "engine-types.h"
 
 #ifndef LIENG_DISABLE_SCRIPT
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 #endif
 
-#define LIENG_OBJECT(o) ((liengObject*)(o))
+#define LIENG_OBJECT(o) ((LIEngObject*)(o))
 
-struct _liengObject
+struct _LIEngObject
 {
 	int refs;
 	void* userdata;
 	uint32_t id;
 	uint16_t flags;
-	liengEngine* engine;
-	liengModel* model;
-	liengSector* sector;
-	limdlPose* pose;
-	liphyObject* physics;
+	LIEngEngine* engine;
+	LIEngModel* model;
+	LIEngSector* sector;
+	LIMdlPose* pose;
+	LIPhyObject* physics;
 #ifndef LIENG_DISABLE_SCRIPTS
-	liscrData* script;
+	LIScrData* script;
 #endif
 	struct
 	{
 		float pos;
 		float rot;
-		limatTransform target;
+		LIMatTransform target;
 	} smoothing;
 };
 
-liengObject*
-lieng_object_new (liengEngine*     engine,
-                  liengModel*      model,
-                  liphyControlMode control,
+LIEngObject*
+lieng_object_new (LIEngEngine*     engine,
+                  LIEngModel*      model,
+                  LIPhyControlMode control,
                   uint32_t         id);
 
 void
-lieng_object_free (liengObject* self);
+lieng_object_free (LIEngObject* self);
 
 void
-lieng_object_ref (liengObject* self,
+lieng_object_ref (LIEngObject* self,
                   int          count);
 
 void
-lieng_object_approach (liengObject*       self,
-                       const limatVector* target,
+lieng_object_approach (LIEngObject*       self,
+                       const LIMatVector* target,
                        float              speed);
 
-limdlNode*
-lieng_object_find_node (liengObject* self,
+LIMdlNode*
+lieng_object_find_node (LIEngObject* self,
                         const char*  name);
 
 void
-lieng_object_impulse (liengObject*       self,
-                      const limatVector* point,
-                      const limatVector* impulse);
+lieng_object_impulse (LIEngObject*       self,
+                      const LIMatVector* point,
+                      const LIMatVector* impulse);
 
 void
-lieng_object_jump (liengObject*       self,
-                   const limatVector* impulse);
+lieng_object_jump (LIEngObject*       self,
+                   const LIMatVector* impulse);
 
 int
-lieng_object_moved (liengObject* self);
+lieng_object_moved (LIEngObject* self);
 
 void
-lieng_object_update (liengObject* self,
+lieng_object_update (LIEngObject* self,
                      float        secs);
 
 void
-lieng_object_get_angular_momentum (const liengObject* self,
-                                   limatVector*       value);
+lieng_object_get_angular_momentum (const LIEngObject* self,
+                                   LIMatVector*       value);
 
 void
-lieng_object_set_angular_momentum (liengObject*       self,
-                                   const limatVector* value);
+lieng_object_set_angular_momentum (LIEngObject*       self,
+                                   const LIMatVector* value);
 
 void
-lieng_object_set_animation (liengObject* self,
+lieng_object_set_animation (LIEngObject* self,
                             int          channel,
                             const char*  animation,
                             int          repeats,
                             float        priority);
 
 void
-lieng_object_get_bounds (const liengObject* self,
-                         limatAabb*         bounds);
+lieng_object_get_bounds (const LIEngObject* self,
+                         LIMatAabb*         bounds);
 
 void
-lieng_object_get_bounds_transform (const liengObject* self,
-                                   limatAabb*         bounds);
+lieng_object_get_bounds_transform (const LIEngObject* self,
+                                   LIMatAabb*         bounds);
 
 int
-lieng_object_get_collision_group (const liengObject* self);
+lieng_object_get_collision_group (const LIEngObject* self);
 
 void
-lieng_object_set_collision_group (liengObject* self,
+lieng_object_set_collision_group (LIEngObject* self,
                                   int          mask);
 
 int
-lieng_object_get_collision_mask (const liengObject* self);
+lieng_object_get_collision_mask (const LIEngObject* self);
 
 void
-lieng_object_set_collision_mask (liengObject* self,
+lieng_object_set_collision_mask (LIEngObject* self,
                                  int          mask);
 
 int
-lieng_object_get_dirty (const liengObject* self);
+lieng_object_get_dirty (const LIEngObject* self);
 
 void
-lieng_object_set_dirty (liengObject* self,
+lieng_object_set_dirty (LIEngObject* self,
                         int          value);
 
 float
-lieng_object_get_distance (const liengObject* self,
-                           const liengObject* object);
+lieng_object_get_distance (const LIEngObject* self,
+                           const LIEngObject* object);
 
 int
-lieng_object_get_flags (const liengObject* self);
+lieng_object_get_flags (const LIEngObject* self);
 
 void
-lieng_object_set_flags (liengObject* self,
+lieng_object_set_flags (LIEngObject* self,
                         int          flags);
 
 int
-lieng_object_get_ground (const liengObject* self);
+lieng_object_get_ground (const LIEngObject* self);
 
 float
-lieng_object_get_mass (const liengObject* self);
+lieng_object_get_mass (const LIEngObject* self);
 
 void
-lieng_object_set_mass (liengObject* self,
+lieng_object_set_mass (LIEngObject* self,
                        float        value);
 
 int
-lieng_object_set_model (liengObject* self,
-                        liengModel*  model);
+lieng_object_set_model (LIEngObject* self,
+                        LIEngModel*  model);
 
 int
-lieng_object_get_model_code (const liengObject* self);
+lieng_object_get_model_code (const LIEngObject* self);
 
 int
-lieng_object_set_model_code (liengObject* self,
+lieng_object_set_model_code (LIEngObject* self,
                              int          value);
 
 const char*
-lieng_object_get_model_name (const liengObject* self);
+lieng_object_get_model_name (const LIEngObject* self);
 
 int
-lieng_object_set_model_name (liengObject* self,
+lieng_object_set_model_name (LIEngObject* self,
                              const char*  value);
 
 int
-lieng_object_get_realized (const liengObject* self);
+lieng_object_get_realized (const LIEngObject* self);
 
 int
-lieng_object_set_realized (liengObject* self,
+lieng_object_set_realized (LIEngObject* self,
                            int          value);
 
-liengSector*
-lieng_object_get_sector (liengObject* self);
+LIEngSector*
+lieng_object_get_sector (LIEngObject* self);
 
 int
-lieng_object_get_selected (const liengObject* self);
+lieng_object_get_selected (const LIEngObject* self);
 
 int
-lieng_object_set_selected (liengObject* self,
+lieng_object_set_selected (LIEngObject* self,
                            int          select);
 
 void
-lieng_object_set_shape (liengObject* self,
-                        liphyShape*  shape);
+lieng_object_set_shape (LIEngObject* self,
+                        LIPhyShape*  shape);
 
 void
-lieng_object_set_smoothing (liengObject* self,
+lieng_object_set_smoothing (LIEngObject* self,
                             float        pos,
                             float        rot);
 
 float
-lieng_object_get_speed (const liengObject* self);
+lieng_object_get_speed (const LIEngObject* self);
 
 void
-lieng_object_set_speed (liengObject* self,
+lieng_object_set_speed (LIEngObject* self,
                         float        value);
 
 void
-lieng_object_get_target (const liengObject* self,
-                         limatTransform*    value);
+lieng_object_get_target (const LIEngObject* self,
+                         LIMatTransform*    value);
 
 void
-lieng_object_get_transform (const liengObject* self,
-                            limatTransform*    value);
+lieng_object_get_transform (const LIEngObject* self,
+                            LIMatTransform*    value);
 
 int
-lieng_object_set_transform (liengObject*          self,
-                            const limatTransform* value);
+lieng_object_set_transform (LIEngObject*          self,
+                            const LIMatTransform* value);
 
 void*
-lieng_object_get_userdata (liengObject* self);
+lieng_object_get_userdata (LIEngObject* self);
 
 void
-lieng_object_set_userdata (liengObject* self,
+lieng_object_set_userdata (LIEngObject* self,
                            void*        data);
 
 void
-lieng_object_get_velocity (const liengObject* self,
-                           limatVector*       velocity);
+lieng_object_get_velocity (const LIEngObject* self,
+                           LIMatVector*       velocity);
 
 int
-lieng_object_set_velocity (liengObject*       self,
-                           const limatVector* velocity);
+lieng_object_set_velocity (LIEngObject*       self,
+                           const LIMatVector* velocity);
 
 #endif
 

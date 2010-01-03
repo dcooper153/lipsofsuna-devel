@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,17 +27,17 @@
 #include "math-vector.h"
 
 /*
- * \addtogroup limatVtxops Vtxops
+ * \addtogroup LIMatVtxops Vtxops
  * @{
  */
 
-typedef struct _limatVtxops limatVtxops;
-struct _limatVtxops
+typedef struct _LIMatVtxops LIMatVtxops;
+struct _LIMatVtxops
 {
 	size_t size;
 	void (*interpolate)(const void* self, const void* other, float frac, void* result);
-	void (*getcoord)(const void* self, limatVector* result);
-	void (*setcoord)(void* self, const limatVector* value);
+	void (*getcoord)(const void* self, LIMatVector* result);
+	void (*setcoord)(void* self, const LIMatVector* value);
 };
 
 /** @} */
@@ -45,30 +45,30 @@ struct _limatVtxops
 /*****************************************************************************/
 
 /*
- * \addtogroup limatVertexV3 VertexV3
+ * \addtogroup LIMatVertexV3 VertexV3
  * @{
  */
 
-typedef struct _limatVertexV3 limatVertexV3;
-struct _limatVertexV3
+typedef struct _LIMatVertexV3 LIMatVertexV3;
+struct _LIMatVertexV3
 {
-	limatVector coord;
+	LIMatVector coord;
 };
 
 static inline void
 __limat_vtxops_v3_getcoord (const void*  self,
-                            limatVector* result)
+                            LIMatVector* result)
 {
-	const limatVertexV3* data = (limatVertexV3*) self;
+	const LIMatVertexV3* data = (LIMatVertexV3*) self;
 
 	*result = data->coord;
 }
 
 static inline void
 __limat_vtxops_v3_setcoord (void*              self,
-                            const limatVector* value)
+                            const LIMatVector* value)
 {
-	limatVertexV3* data = (limatVertexV3*) self;
+	LIMatVertexV3* data = (LIMatVertexV3*) self;
 
 	data->coord = *value;
 }
@@ -81,9 +81,9 @@ __limat_vtxops_v3_interpolate (const void* self,
 {
 }
 
-static const limatVtxops limat_vtxops_v3 =
+static const LIMatVtxops limat_vtxops_v3 =
 {
-	sizeof (limatVertexV3),
+	sizeof (LIMatVertexV3),
 	__limat_vtxops_v3_interpolate,
 	__limat_vtxops_v3_getcoord,
 	__limat_vtxops_v3_setcoord
@@ -98,28 +98,28 @@ static const limatVtxops limat_vtxops_v3 =
  * @{
  */
 
-typedef struct _limatVertexT2N3V3 limatVertexT2N3V3;
-struct _limatVertexT2N3V3
+typedef struct _LIMatVertexT2N3V3 LIMatVertexT2N3V3;
+struct _LIMatVertexT2N3V3
 {
 	float texcoord[2];
-	limatVector normal;
-	limatVector coord;
+	LIMatVector normal;
+	LIMatVector coord;
 };
 
 static inline void
 __limat_vtxops_t2n3v3_getcoord (const void*  self,
-                                limatVector* result)
+                                LIMatVector* result)
 {
-	const limatVertexT2N3V3* data = (limatVertexT2N3V3*) self;
+	const LIMatVertexT2N3V3* data = (LIMatVertexT2N3V3*) self;
 
 	*result = data->coord;
 }
 
 static inline void
 __limat_vtxops_t2n3v3_setcoord (void*              self,
-                                const limatVector* value)
+                                const LIMatVector* value)
 {
-	limatVertexT2N3V3* data = (limatVertexT2N3V3*) self;
+	LIMatVertexT2N3V3* data = (LIMatVertexT2N3V3*) self;
 
 	data->coord = *value;
 }
@@ -130,9 +130,9 @@ __limat_vtxops_t2n3v3_interpolate (const void* self,
                                    float       blend,
                                    void*       result)
 {
-	const limatVertexT2N3V3* data0 = (limatVertexT2N3V3*) self;
-	const limatVertexT2N3V3* data1 = (limatVertexT2N3V3*) other;
-	limatVertexT2N3V3* data2 = (limatVertexT2N3V3*) result;
+	const LIMatVertexT2N3V3* data0 = (LIMatVertexT2N3V3*) self;
+	const LIMatVertexT2N3V3* data1 = (LIMatVertexT2N3V3*) other;
+	LIMatVertexT2N3V3* data2 = (LIMatVertexT2N3V3*) result;
 
 	data2->normal = limat_vector_normalize (limat_vector_add (
 		limat_vector_multiply (data0->normal, blend),
@@ -141,9 +141,9 @@ __limat_vtxops_t2n3v3_interpolate (const void* self,
 	data2->texcoord[1] = data0->texcoord[1] * blend + data1->texcoord[1] * (1.0f - blend);
 }
 
-static const limatVtxops limat_vtxops_t2n3v3 =
+static const LIMatVtxops limat_vtxops_t2n3v3 =
 {
-	sizeof (limatVertexT2N3V3),
+	sizeof (LIMatVertexT2N3V3),
 	__limat_vtxops_t2n3v3_interpolate,
 	__limat_vtxops_t2n3v3_getcoord,
 	__limat_vtxops_t2n3v3_setcoord
@@ -156,28 +156,28 @@ static const limatVtxops limat_vtxops_t2n3v3 =
  * @{
  */
 
-typedef struct _limatVertexT6N3V3 limatVertexT6N3V3;
-struct _limatVertexT6N3V3
+typedef struct _LIMatVertexT6N3V3 LIMatVertexT6N3V3;
+struct _LIMatVertexT6N3V3
 {
 	float texcoord[6];
-	limatVector normal;
-	limatVector coord;
+	LIMatVector normal;
+	LIMatVector coord;
 };
 
 static inline void
 __limat_vtxops_t6n3v3_getcoord (const void*  self,
-                                limatVector* result)
+                                LIMatVector* result)
 {
-	const limatVertexT6N3V3* data = (limatVertexT6N3V3*) self;
+	const LIMatVertexT6N3V3* data = (LIMatVertexT6N3V3*) self;
 
 	*result = data->coord;
 }
 
 static inline void
 __limat_vtxops_t6n3v3_setcoord (void*              self,
-                                const limatVector* value)
+                                const LIMatVector* value)
 {
-	limatVertexT6N3V3* data = (limatVertexT6N3V3*) self;
+	LIMatVertexT6N3V3* data = (LIMatVertexT6N3V3*) self;
 
 	data->coord = *value;
 }
@@ -188,9 +188,9 @@ __limat_vtxops_t6n3v3_interpolate (const void* self,
                                    float       blend,
                                    void*       result)
 {
-	const limatVertexT6N3V3* data0 = (limatVertexT6N3V3*) self;
-	const limatVertexT6N3V3* data1 = (limatVertexT6N3V3*) other;
-	limatVertexT6N3V3* data2 = (limatVertexT6N3V3*) result;
+	const LIMatVertexT6N3V3* data0 = (LIMatVertexT6N3V3*) self;
+	const LIMatVertexT6N3V3* data1 = (LIMatVertexT6N3V3*) other;
+	LIMatVertexT6N3V3* data2 = (LIMatVertexT6N3V3*) result;
 
 	data2->normal = limat_vector_normalize (limat_vector_add (
 		limat_vector_multiply (data0->normal, blend),
@@ -203,9 +203,9 @@ __limat_vtxops_t6n3v3_interpolate (const void* self,
 	data2->texcoord[5] = data0->texcoord[5] * blend + data1->texcoord[5] * (1.0f - blend);
 }
 
-static const limatVtxops limat_vtxops_t6n3v3 =
+static const LIMatVtxops limat_vtxops_t6n3v3 =
 {
-	sizeof (limatVertexT6N3V3),
+	sizeof (LIMatVertexT6N3V3),
 	__limat_vtxops_t6n3v3_interpolate,
 	__limat_vtxops_t6n3v3_getcoord,
 	__limat_vtxops_t6n3v3_setcoord

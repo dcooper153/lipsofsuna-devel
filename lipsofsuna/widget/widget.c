@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,49 +18,49 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgWidget Widget
+ * \addtogroup LIWdgWidget Widget
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-group.h"
 #include "widget-window.h"
 
 static int
-private_new (liwdgWidget*      self,
-             const liwdgClass* clss,
-             liwdgManager*     manager);
+private_new (LIWdgWidget*      self,
+             const LIWdgClass* clss,
+             LIWdgManager*     manager);
 
 static int
-private_init (liwdgWidget*  self,
-              liwdgManager* manager);
+private_init (LIWdgWidget*  self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgWidget* self);
+private_free (LIWdgWidget* self);
 
 static int
-private_event (liwdgWidget* self,
+private_event (LIWdgWidget* self,
                liwdgEvent*  event);
 
 static void
-private_rebuild_style (liwdgWidget* self);
+private_rebuild_style (LIWdgWidget* self);
 
-const liwdgClass liwdgWidgetType =
+const LIWdgClass liwdg_widget_widget =
 {
-	LIWDG_BASE_STATIC, NULL, "Widget", sizeof (liwdgWidget),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, NULL, "Widget", sizeof (LIWdgWidget),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /*****************************************************************************/
 
-liwdgWidget*
-liwdg_widget_new (liwdgManager*     manager,
-                  const liwdgClass* clss)
+LIWdgWidget*
+liwdg_widget_new (LIWdgManager*     manager,
+                  const LIWdgClass* clss)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
 	self = lisys_calloc (1, clss->size);
 	if (self == NULL)
@@ -81,9 +81,9 @@ liwdg_widget_new (liwdgManager*     manager,
  * \param self Widget.
  */
 void
-liwdg_widget_free (liwdgWidget* self)
+liwdg_widget_free (LIWdgWidget* self)
 {
-	const liwdgClass* ptr;
+	const LIWdgClass* ptr;
 
 	assert (self->manager->focus.keyboard != self);
 	assert (self->manager->focus.mouse != self);
@@ -107,7 +107,7 @@ liwdg_widget_free (liwdgWidget* self)
  * \return Nonzero if was detached from something.
  */
 int
-liwdg_widget_detach (liwdgWidget* self)
+liwdg_widget_detach (LIWdgWidget* self)
 {
 	int changed = 0;
 
@@ -117,7 +117,7 @@ liwdg_widget_detach (liwdgWidget* self)
 		case LIWDG_WIDGET_STATE_DETACHED:
 			if (self->parent != NULL)
 			{
-				assert (liwdg_widget_typeis (self->parent, &liwdgContainerType));
+				assert (liwdg_widget_typeis (self->parent, &liwdg_widget_container));
 				liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
 				changed = 1;
 			}
@@ -148,6 +148,18 @@ liwdg_widget_detach (liwdgWidget* self)
 	return changed;
 }
 
+void
+liwdg_widget_draw (LIWdgWidget* self)
+{
+	liwdgEvent event;
+
+	if (self->visible)
+	{
+		event.type = LIWDG_EVENT_TYPE_RENDER;
+		self->type->event (self, &event);
+	}
+}
+
 /**
  * \brief Handles an event.
  *
@@ -156,14 +168,14 @@ liwdg_widget_detach (liwdgWidget* self)
  * \return Nonzero if passed through unhandled, zero if absorbed by the widget.
  */
 int
-liwdg_widget_event (liwdgWidget* self,
+liwdg_widget_event (LIWdgWidget* self,
                     liwdgEvent*  event)
 {
 	return self->type->event (self, event);
 }
 
 int
-liwdg_widget_insert_callback (liwdgWidget* self,
+liwdg_widget_insert_callback (LIWdgWidget* self,
                               const char*  type,
                               void*        func,
                               void*        data)
@@ -172,18 +184,18 @@ liwdg_widget_insert_callback (liwdgWidget* self,
 }
 
 int
-liwdg_widget_insert_callback_full (liwdgWidget* self,
+liwdg_widget_insert_callback_full (LIWdgWidget* self,
                                    const char*  type,
                                    int          priority,
                                    void*        func,
                                    void*        data,
-                                   licalHandle* handle)
+                                   LICalHandle* handle)
 {
 	return lical_callbacks_insert (self->manager->callbacks, self, type, priority, func, data, handle);
 }
 
 void
-liwdg_widget_move (liwdgWidget* self,
+liwdg_widget_move (LIWdgWidget* self,
                    int          x,
                    int          y)
 {
@@ -199,8 +211,8 @@ liwdg_widget_move (liwdgWidget* self,
  * \param rect Rectangle or NULL for the allocation of the widget.
  */
 void
-liwdg_widget_paint (liwdgWidget* self,
-                    liwdgRect*   rect)
+liwdg_widget_paint (LIWdgWidget* self,
+                    LIWdgRect*   rect)
 {
 	int px;
 	int py;
@@ -212,7 +224,7 @@ liwdg_widget_paint (liwdgWidget* self,
 	float h[3];
 	float tx[4];
 	float ty[4];
-	liwdgStyle* style_;
+	LIWdgStyle* style_;
 
 	/* Get style. */
 	if (rect == NULL)
@@ -335,18 +347,6 @@ liwdg_widget_paint (liwdgWidget* self,
 	}
 }
 
-void
-liwdg_widget_render (liwdgWidget* self)
-{
-	liwdgEvent event;
-
-	if (self->visible)
-	{
-		event.type = LIWDG_EVENT_TYPE_RENDER;
-		self->type->event (self, &event);
-	}
-}
-
 /**
  * \brief Translates coordinates from screen space to widget space.
  *
@@ -362,7 +362,7 @@ liwdg_widget_render (liwdgWidget* self)
  * \param widgety Coordinates in widget space.
  */
 void
-liwdg_widget_translate_coords (liwdgWidget* self,
+liwdg_widget_translate_coords (LIWdgWidget* self,
                                int          screenx,
                                int          screeny,
                                int*         widgetx,
@@ -372,7 +372,7 @@ liwdg_widget_translate_coords (liwdgWidget* self,
 	*widgety = screeny;
 	if (self->parent != NULL)
 		liwdg_widget_translate_coords (self->parent, screenx, screeny, widgetx, widgety);
-	if (liwdg_widget_typeis (self, &liwdgContainerType))
+	if (liwdg_widget_typeis (self, &liwdg_widget_container))
 		liwdg_container_translate_coords (LIWDG_CONTAINER (self), screenx, screeny, widgetx, widgety);
 }
 
@@ -384,10 +384,10 @@ liwdg_widget_translate_coords (liwdgWidget* self,
  * \return Nonzero if implements.
  */
 int
-liwdg_widget_typeis (const liwdgWidget* self,
-                     const liwdgClass*  clss)
+liwdg_widget_typeis (const LIWdgWidget* self,
+                     const LIWdgClass*  clss)
 {
-	const liwdgClass* ptr;
+	const LIWdgClass* ptr;
 
 	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
 	{
@@ -405,7 +405,7 @@ liwdg_widget_typeis (const liwdgWidget* self,
  * \param secs Seconds since last update.
  */
 void
-liwdg_widget_update (liwdgWidget* self,
+liwdg_widget_update (LIWdgWidget* self,
                      float        secs)
 {
 	liwdgEvent event;
@@ -416,14 +416,14 @@ liwdg_widget_update (liwdgWidget* self,
 }
 
 void
-liwdg_widget_get_allocation (liwdgWidget* self,
-                             liwdgRect*   allocation)
+liwdg_widget_get_allocation (LIWdgWidget* self,
+                             LIWdgRect*   allocation)
 {
 	*allocation = self->allocation;
 }
 
 void
-liwdg_widget_set_allocation (liwdgWidget* self,
+liwdg_widget_set_allocation (LIWdgWidget* self,
                              int          x,
                              int          y,
                              int          w,
@@ -454,8 +454,8 @@ liwdg_widget_set_allocation (liwdgWidget* self,
  * \param allocation Return location for a rectangle.
  */
 void
-liwdg_widget_get_content (liwdgWidget* self,
-                          liwdgRect*   allocation)
+liwdg_widget_get_content (LIWdgWidget* self,
+                          LIWdgRect*   allocation)
 {
 	allocation->x = self->allocation.x + self->style->pad[1];
 	allocation->y = self->allocation.y + self->style->pad[0];
@@ -470,7 +470,7 @@ liwdg_widget_get_content (liwdgWidget* self,
  * \return Nonzero if the widget has mouse focus.
  */
 int
-liwdg_widget_get_focus_mouse (liwdgWidget* self)
+liwdg_widget_get_focus_mouse (LIWdgWidget* self)
 {
 	return (liwdg_manager_get_focus_mouse (self->manager) == self);
 }
@@ -481,7 +481,7 @@ liwdg_widget_get_focus_mouse (liwdgWidget* self)
  * \param self Widget.
  */
 void
-liwdg_widget_set_focus_mouse (liwdgWidget* self)
+liwdg_widget_set_focus_mouse (LIWdgWidget* self)
 {
 	liwdg_manager_set_focus_mouse (self->manager, self);
 }
@@ -493,7 +493,7 @@ liwdg_widget_set_focus_mouse (liwdgWidget* self)
  * \return Nonzero if the widget has keyboard focus.
  */
 int
-liwdg_widget_get_focus_keyboard (liwdgWidget* self)
+liwdg_widget_get_focus_keyboard (LIWdgWidget* self)
 {
 	return (liwdg_manager_get_focus_keyboard (self->manager) == self);
 }
@@ -504,32 +504,32 @@ liwdg_widget_get_focus_keyboard (liwdgWidget* self)
  * \param self Widget.
  */
 void
-liwdg_widget_set_focus_keyboard (liwdgWidget* self)
+liwdg_widget_set_focus_keyboard (LIWdgWidget* self)
 {
 	liwdg_manager_set_focus_keyboard (self->manager, self);
 }
 
 int
-liwdg_widget_get_focusable (liwdgWidget* self)
+liwdg_widget_get_focusable (LIWdgWidget* self)
 {
 	return self->focusable;
 }
 
 void
-liwdg_widget_set_focusable (liwdgWidget* self,
+liwdg_widget_set_focusable (LIWdgWidget* self,
                             int          focusable)
 {
 	self->focusable = focusable;
 }
 
 int
-liwdg_widget_get_grab (const liwdgWidget* self)
+liwdg_widget_get_grab (const LIWdgWidget* self)
 {
 	return self->manager->widgets.grab == self;
 }
 
 void
-liwdg_widget_set_grab (liwdgWidget* self,
+liwdg_widget_set_grab (LIWdgWidget* self,
                        int          value)
 {
 	int cx;
@@ -562,8 +562,8 @@ liwdg_widget_set_grab (liwdgWidget* self,
  * \param request Return location for the size.
  */
 void
-liwdg_widget_get_request (liwdgWidget* self,
-                          liwdgSize*   request)
+liwdg_widget_get_request (LIWdgWidget* self,
+                          LIWdgSize*   request)
 {
 	/* Get ordinary request. */
 	request->width = self->hardrequest.width;
@@ -586,7 +586,7 @@ liwdg_widget_get_request (liwdgWidget* self,
  * \param h Height or -1 to unset.
  */
 void
-liwdg_widget_set_request (liwdgWidget* self,
+liwdg_widget_set_request (LIWdgWidget* self,
                           int          w,
                           int          h)
 {
@@ -608,7 +608,7 @@ liwdg_widget_set_request (liwdgWidget* self,
  * \param h Height.
  */
 void
-liwdg_widget_set_request_internal (liwdgWidget* self,
+liwdg_widget_set_request_internal (LIWdgWidget* self,
                                    int          w,
                                    int          h)
 {
@@ -622,17 +622,17 @@ liwdg_widget_set_request_internal (liwdgWidget* self,
 	}
 }
 
-liwdgWidget*
-liwdg_widget_get_root (liwdgWidget* self)
+LIWdgWidget*
+liwdg_widget_get_root (LIWdgWidget* self)
 {
-	liwdgWidget* widget;
+	LIWdgWidget* widget;
 
 	for (widget = self ; widget->parent != NULL ; widget = widget->parent) { }
 	return widget;
 }
 
 void
-liwdg_widget_set_state (liwdgWidget* self,
+liwdg_widget_set_state (LIWdgWidget* self,
                         const char*  state)
 {
 	char* tmp;
@@ -662,14 +662,14 @@ liwdg_widget_set_state (liwdgWidget* self,
 	private_rebuild_style (self);
 }
 
-liwdgStyle*
-liwdg_widget_get_style (liwdgWidget* self)
+LIWdgStyle*
+liwdg_widget_get_style (LIWdgWidget* self)
 {
 	return self->style;
 }
 
 void
-liwdg_widget_set_style (liwdgWidget* self,
+liwdg_widget_set_style (LIWdgWidget* self,
                         const char*  style)
 {
 	char* tmp;
@@ -700,26 +700,26 @@ liwdg_widget_set_style (liwdgWidget* self,
 }
 
 void*
-liwdg_widget_get_userdata (liwdgWidget* self)
+liwdg_widget_get_userdata (LIWdgWidget* self)
 {
 	return self->userdata;
 }
 
 void
-liwdg_widget_set_userdata (liwdgWidget* self,
+liwdg_widget_set_userdata (LIWdgWidget* self,
                            void*        value)
 {
 	self->userdata = value;
 }
 
 int
-liwdg_widget_get_visible (liwdgWidget* self)
+liwdg_widget_get_visible (LIWdgWidget* self)
 {
 	return self->visible;
 }
 
 void
-liwdg_widget_set_visible (liwdgWidget* self,
+liwdg_widget_set_visible (LIWdgWidget* self,
                           int          visible)
 {
 	self->visible = (visible != 0);
@@ -734,11 +734,11 @@ liwdg_widget_set_visible (liwdgWidget* self,
 /*****************************************************************************/
 
 static int
-private_new (liwdgWidget*      self,
-             const liwdgClass* clss,
-             liwdgManager*     manager)
+private_new (LIWdgWidget*      self,
+             const LIWdgClass* clss,
+             LIWdgManager*     manager)
 {
-	const liwdgClass* base;
+	const LIWdgClass* base;
 
 	/* Initialization. */
 	base = liwdg_class_get_base (clss);
@@ -749,7 +749,7 @@ private_new (liwdgWidget*      self,
 	}
 	else
 	{
-		assert (clss == &liwdgWidgetType);
+		assert (clss == &liwdg_widget_widget);
 	}
 	if (clss->init == NULL)
 		return 1;
@@ -760,15 +760,15 @@ private_new (liwdgWidget*      self,
 	if (base != NULL)
 		self->type = base;
 	else
-		self->type = &liwdgWidgetType;
+		self->type = &liwdg_widget_widget;
 	liwdg_widget_free (self);
 
 	return 0;
 }
 
 static int
-private_init (liwdgWidget*  self,
-              liwdgManager* manager)
+private_init (LIWdgWidget*  self,
+              LIWdgManager* manager)
 {
 	self->style = &self->manager->styles->fallback;
 	self->userrequest.width = -1;
@@ -779,14 +779,14 @@ private_init (liwdgWidget*  self,
 }
 
 static void
-private_free (liwdgWidget* self)
+private_free (LIWdgWidget* self)
 {
 	lisys_free (self->style_name);
 	lisys_free (self->state_name);
 }
 
 static int
-private_event (liwdgWidget* self,
+private_event (LIWdgWidget* self,
                liwdgEvent*  event)
 {
 	if (event->type == LIWDG_EVENT_TYPE_CLOSE)
@@ -800,12 +800,12 @@ private_event (liwdgWidget* self,
 }
 
 static void
-private_rebuild_style (liwdgWidget* self)
+private_rebuild_style (LIWdgWidget* self)
 {
 	int len0;
 	int len1;
 	char* full;
-	liwdgStyle* style = NULL;
+	LIWdgStyle* style = NULL;
 
 	/* Find style. */
 	if (self->style_name != NULL)

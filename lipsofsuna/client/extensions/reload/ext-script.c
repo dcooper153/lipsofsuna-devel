@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 #include "ext-reload.h"
 
@@ -44,9 +44,9 @@
  * -- @param self Reload class.
  * function Reload.cancel(self)
  */
-static void Reload_cancel (liscrArgs* args)
+static void Reload_cancel (LIScrArgs* args)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
 	liext_reload_cancel (self->reload);
@@ -59,9 +59,9 @@ static void Reload_cancel (liscrArgs* args)
  * -- @param self Reload class.
  * function Reload.reload(self)
  */
-static void Reload_reload (liscrArgs* args)
+static void Reload_reload (LIScrArgs* args)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
 	liext_reload_run (self->reload);
@@ -76,17 +76,17 @@ static void Reload_reload (liscrArgs* args)
  * -- @name Reload.enabled
  * -- @class table
  */
-static void Reload_getter_enabled (liscrArgs* args)
+static void Reload_getter_enabled (LIScrArgs* args)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
 	liscr_args_seti_bool (args, liext_reload_get_enabled (self->reload));
 }
-static void Reload_setter_enabled (liscrArgs* args)
+static void Reload_setter_enabled (LIScrArgs* args)
 {
 	int value;
-	liextModule* self;
+	LIExtModule* self;
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
@@ -98,7 +98,7 @@ static void Reload_setter_enabled (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextReloadScript (liscrClass* self,
+liext_script_reload (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RELOAD, data);

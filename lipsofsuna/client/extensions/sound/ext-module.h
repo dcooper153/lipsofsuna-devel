@@ -27,77 +27,77 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #ifndef LI_DISABLE_SOUND
-#include <sound/lips-sound.h>
+#include <lipsofsuna/sound.h>
 #endif
 
 #define LIEXT_SCRIPT_SOUND "Lips.Sound"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licliClient* client;
+	LICliClient* client;
 #ifndef LI_DISABLE_SOUND
-	lialgU32dic* objects;
-	licalHandle calls[2];
-	lisndSystem* system;
-	lisndManager* sound;
-	lisndSource* music;
+	LIAlgU32dic* objects;
+	LICalHandle calls[2];
+	LISndSystem* system;
+	LISndManager* sound;
+	LISndSource* music;
 #endif
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 #ifndef LI_DISABLE_SOUND
-lisndSample*
-liext_module_find_sample_by_id (liextModule* self,
+LISndSample*
+liext_module_find_sample_by_id (LIExtModule* self,
                                 int          id);
 
-lisndSample*
-liext_module_find_sample_by_name (liextModule* self,
+LISndSample*
+liext_module_find_sample_by_name (LIExtModule* self,
                                   const char*  name);
 
 int
-liext_module_set_effect (liextModule* self,
+liext_module_set_effect (LIExtModule* self,
                          uint32_t     object,
                          uint32_t     effect,
                          int          flags);
 
 int
-liext_module_set_music (liextModule* self,
+liext_module_set_music (LIExtModule* self,
                         const char*  value);
 
 void
-liext_module_set_music_volume (liextModule* self,
+liext_module_set_music_volume (LIExtModule* self,
                                float        value);
 #endif
 
 /*****************************************************************************/
 
 #ifndef LI_DISABLE_SOUND
-typedef struct _liextObject liextObject;
-struct _liextObject
+typedef struct _LIExtObject LIExtObject;
+struct _LIExtObject
 {
-	lialgList* sounds;
+	LIAlgList* sounds;
 };
 
-liextObject*
+LIExtObject*
 liext_object_new ();
 
 void
-liext_object_free (liextObject* self);
+liext_object_free (LIExtObject* self);
 #endif
 
 /*****************************************************************************/
 
 void
-liextSoundScript (liscrClass* self,
+liext_script_sound (LIScrClass* self,
                   void*       data);
 
 #endif

@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-slots.h"
 
@@ -49,10 +49,10 @@
  * -- @return Object or nil.
  * function Slots.get_object(self, args)
  */
-static void Slots_get_object (liscrArgs* args)
+static void Slots_get_object (LIScrArgs* args)
 {
 	const char* name;
-	liextSlot* slot;
+	LIExtSlot* slot;
 
 	if (!liscr_args_gets_string (args, "slot", &name))
 		return;
@@ -75,10 +75,10 @@ static void Slots_get_object (liscrArgs* args)
  * -- @return Slot information or nil.
  * function Slots.get_slot(self, args)
  */
-static void Slots_get_slot (liscrArgs* args)
+static void Slots_get_slot (LIScrArgs* args)
 {
 	const char* name;
-	liextSlot* slot;
+	LIExtSlot* slot;
 
 	/* Find slot. */
 	if (!liscr_args_gets_string (args, "slot", &name))
@@ -105,11 +105,11 @@ static void Slots_get_slot (liscrArgs* args)
  * -- @return New slots.
  * function Slots.new(self, args)
  */
-static void Slots_new (liscrArgs* args)
+static void Slots_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liextSlots* self;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtSlots* self;
+	LIScrData* data;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SLOTS);
@@ -144,14 +144,14 @@ static void Slots_new (liscrArgs* args)
  * -- @param args Arguments.
  * function Slots.register(self, args)
  */
-static void Slots_register (liscrArgs* args)
+static void Slots_register (LIScrArgs* args)
 {
 	int type;
 	const char* name;
 	const char* prot = "private";
 	const char* node = "#root";
-	liextSlot* slot;
-	liscrData* data;
+	LIExtSlot* slot;
+	LIScrData* data;
 
 	if (!liscr_args_gets_string (args, "slot", &name))
 		return;
@@ -189,11 +189,11 @@ static void Slots_register (liscrArgs* args)
  * -- @param args Arguments.
  * function Slots.set_object(self, args)
  */
-static void Slots_set_object (liscrArgs* args)
+static void Slots_set_object (LIScrArgs* args)
 {
 	const char* name;
-	liextSlot* slot;
-	liscrData* data;
+	LIExtSlot* slot;
+	LIScrData* data;
 
 	if (!liscr_args_gets_string (args, "slot", &name))
 		return;
@@ -213,17 +213,17 @@ static void Slots_set_object (liscrArgs* args)
  * -- @name Slots.owner
  * -- @class table
  */
-static void Slots_getter_owner (liscrArgs* args)
+static void Slots_getter_owner (LIScrArgs* args)
 {
-	liengObject* object;
+	LIEngObject* object;
 
 	object = liext_slots_get_owner (args->self);
 	if (object != NULL)
 		liscr_args_seti_data (args, object->script);
 }
-static void Slots_setter_owner (liscrArgs* args)
+static void Slots_setter_owner (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_slots_set_owner (args->self, data->data);
@@ -234,7 +234,7 @@ static void Slots_setter_owner (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSlotsScript (liscrClass* self,
+liext_script_slots (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SLOTS, data);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,64 +27,64 @@
 #ifndef __EXT_SKILLS_H__
 #define __EXT_SKILLS_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
-struct _liextInventory
+struct _LIExtInventory
 {
 	int id;
-	lialgU32dic* listeners;
-	liextModule* module;
-	liscrData* script;
-	lisrvServer* server;
+	LIAlgU32dic* listeners;
+	LIExtModule* module;
+	LIScrData* script;
+	LISerServer* server;
 	struct
 	{
 		int count;
-		liengObject** array;
+		LIEngObject** array;
 	} slots;
 };
 
-liextInventory*
-liext_inventory_new (liextModule* module);
+LIExtInventory*
+liext_inventory_new (LIExtModule* module);
 
 void
-liext_inventory_free (liextInventory* self);
+liext_inventory_free (LIExtInventory* self);
 
-liengObject*
-liext_inventory_find_listener (liextInventory* self,
+LIEngObject*
+liext_inventory_find_listener (LIExtInventory* self,
                                int             id);
 
 int
-liext_inventory_insert_listener (liextInventory* self,
-                                 liengObject*    value);
+liext_inventory_insert_listener (LIExtInventory* self,
+                                 LIEngObject*    value);
 
 void
-liext_inventory_remove_listener (liextInventory* self,
-                                 liengObject*    value);
+liext_inventory_remove_listener (LIExtInventory* self,
+                                 LIEngObject*    value);
 
 void
-liext_inventory_reset_listener (liextInventory* self,
-                                liengObject*    value);
+liext_inventory_reset_listener (LIExtInventory* self,
+                                LIEngObject*    value);
 
 int
-liext_inventory_get_id (const liextInventory* self);
+liext_inventory_get_id (const LIExtInventory* self);
 
-liengObject*
-liext_inventory_get_object (liextInventory* self,
+LIEngObject*
+liext_inventory_get_object (LIExtInventory* self,
                             int             slot);
 
 int
-liext_inventory_set_object (liextInventory* self,
+liext_inventory_set_object (LIExtInventory* self,
                             int             slot,
-                            liengObject*    object);
+                            LIEngObject*    object);
 
 int
-liext_inventory_get_size (liextInventory* self);
+liext_inventory_get_size (LIExtInventory* self);
 
 int
-liext_inventory_set_size (liextInventory* self,
+liext_inventory_set_size (LIExtInventory* self,
                           int             value);
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgClass Class
+ * \addtogroup LIWdgClass Class
  * @{
  */
 
@@ -28,23 +28,23 @@
 #include "widget-event.h"
 #include "widget-types.h"
 
-#define LIWDG_WIDGET_CLASS(c) ((liwdgWidgetClass*)(c))
+#define LIWDG_WIDGET_CLASS(c) ((LIWdgWidgetClass*)(c))
 
-typedef int  (*liwdgWidgetInitFunc)(liwdgWidget*, liwdgManager*);
-typedef void (*liwdgWidgetFreeFunc)(liwdgWidget*);
-typedef int  (*liwdgWidgetEventFunc)(liwdgWidget*, liwdgEvent*);
-typedef void* (*liwdgWidgetExtendFunc)(liwdgWidget*, liwdgClass* clss);
+typedef int  (*LIWdgWidgetInitFunc)(LIWdgWidget*, LIWdgManager*);
+typedef void (*LIWdgWidgetFreeFunc)(LIWdgWidget*);
+typedef int  (*LIWdgWidgetEventFunc)(LIWdgWidget*, liwdgEvent*);
+typedef void* (*LIWdgWidgetExtendFunc)(LIWdgWidget*, LIWdgClass* clss);
 
-struct _liwdgClass
+struct _LIWdgClass
 {
 	int basetype;
 	const void* base;
 	const char* type;
 	int size;
-	liwdgWidgetInitFunc init;
-	liwdgWidgetFreeFunc free;
-	liwdgWidgetEventFunc event;
-	liwdgWidgetExtendFunc extend;
+	LIWdgWidgetInitFunc init;
+	LIWdgWidgetFreeFunc free;
+	LIWdgWidgetEventFunc event;
+	LIWdgWidgetExtendFunc extend;
 };
 
 /**
@@ -53,8 +53,8 @@ struct _liwdgClass
  * \param self Class.
  * \return Class or NULL.
  */
-static inline const liwdgClass*
-liwdg_class_get_base (const liwdgClass* self)
+static inline const LIWdgClass*
+liwdg_class_get_base (const LIWdgClass* self)
 {
 	const void* (*func)();
 

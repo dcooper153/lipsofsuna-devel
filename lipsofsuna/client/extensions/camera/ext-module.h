@@ -29,27 +29,27 @@
 
 #define LIEXT_SCRIPT_CAMERA "Lips.Camera"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
 	float move;
 	float tilt;
 	float turn;
 	float zoom;
-	licalHandle calls[1];
-	licliClient* client;
+	LICalHandle calls[1];
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextCameraScript (liscrClass* self,
+liext_script_camera (LIScrClass* self,
                    void*       data);
 
 #endif

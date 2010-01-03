@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,29 +16,29 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndBuffer Buffer
+ * \addtogroup LIRenBuffer Buffer
  * @{
  */
 
 #include "render-buffer.h"
 
 static int
-private_init (lirndBuffer*       self,
+private_init (LIRenBuffer*       self,
               GLenum             target,
-              const lirndFormat* format,
+              const LIRenFormat* format,
               const void*        data,
               int                count);
 
 /*****************************************************************************/
 
 int
-lirnd_buffer_init_index (lirndBuffer* self,
+liren_buffer_init_index (LIRenBuffer* self,
                          const void*  data,
                          int          count)
 {
-	static const lirndFormat format =
+	static const LIRenFormat format =
 	{
 		sizeof (uint32_t), 0,
 		{ GL_FLOAT, GL_FLOAT, GL_FLOAT },
@@ -51,8 +51,8 @@ lirnd_buffer_init_index (lirndBuffer* self,
 }
 
 int
-lirnd_buffer_init_vertex (lirndBuffer*       self,
-                          const lirndFormat* format,
+liren_buffer_init_vertex (LIRenBuffer*       self,
+                          const LIRenFormat* format,
                           const void*        data,
                           int                count)
 {
@@ -60,7 +60,7 @@ lirnd_buffer_init_vertex (lirndBuffer*       self,
 }
 
 void
-lirnd_buffer_free (lirndBuffer* self)
+liren_buffer_free (LIRenBuffer* self)
 {
 	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
@@ -68,7 +68,7 @@ lirnd_buffer_free (lirndBuffer* self)
 }
 
 void*
-lirnd_buffer_lock (lirndBuffer* self,
+liren_buffer_lock (LIRenBuffer* self,
                    int          write)
 {
 	int size;
@@ -90,7 +90,7 @@ lirnd_buffer_lock (lirndBuffer* self,
 }
 
 void
-lirnd_buffer_unlock (lirndBuffer* self,
+liren_buffer_unlock (LIRenBuffer* self,
                      void*        data)
 {
 	if (self->buffer != 0)
@@ -104,9 +104,9 @@ lirnd_buffer_unlock (lirndBuffer* self,
 /*****************************************************************************/
 
 static int
-private_init (lirndBuffer*       self,
+private_init (LIRenBuffer*       self,
               GLenum             target,
-              const lirndFormat* format,
+              const LIRenFormat* format,
               const void*        data,
               int                count)
 {

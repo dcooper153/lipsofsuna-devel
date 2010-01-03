@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlAnimation Animation
+ * \addtogroup LIMdlAnimation Animation
  * @{
  */
 
@@ -27,8 +27,8 @@
 
 #define TIMESCALE 0.02f
 
-static limatTransform*
-private_frame_transform (limdlAnimation* self,
+static LIMatTransform*
+private_frame_transform (LIMdlAnimation* self,
                          int             chan,
                          int             frame);
 
@@ -42,7 +42,7 @@ private_frame_transform (limdlAnimation* self,
  * \return Channel index or -1.
  */
 int
-limdl_animation_get_channel (limdlAnimation* self,
+limdl_animation_get_channel (LIMdlAnimation* self,
                              const char*     name)
 {
 	int i;
@@ -63,7 +63,7 @@ limdl_animation_get_channel (limdlAnimation* self,
  * \return Duration in seconds.
  */
 float
-limdl_animation_get_duration (const limdlAnimation* self)
+limdl_animation_get_duration (const LIMdlAnimation* self)
 {
 	return (self->length - 1) * TIMESCALE;
 }
@@ -78,17 +78,17 @@ limdl_animation_get_duration (const limdlAnimation* self)
  * \return Nonzero on success.
  */
 int
-limdl_animation_get_transform (limdlAnimation* self,
+limdl_animation_get_transform (LIMdlAnimation* self,
                                const char*     name,
                                float           secs,
-                               limatTransform* value)
+                               LIMatTransform* value)
 {
 	int chan;
 	int frame;
 	float blend;
 	float frames;
-	limatTransform* t0;
-	limatTransform* t1;
+	LIMatTransform* t0;
+	LIMatTransform* t1;
 
 	chan = limdl_animation_get_channel (self, name);
 	if (chan == -1)
@@ -131,7 +131,7 @@ limdl_animation_get_transform (limdlAnimation* self,
  * \return Value within range from 0.0 to 1.0.
  */
 float
-limdl_animation_get_weight (const limdlAnimation* self,
+limdl_animation_get_weight (const LIMdlAnimation* self,
                             float                 time,
                             float                 sweight,
                             float                 mweight,
@@ -154,8 +154,8 @@ limdl_animation_get_weight (const limdlAnimation* self,
 
 /*****************************************************************************/
 
-static limatTransform*
-private_frame_transform (limdlAnimation* self,
+static LIMatTransform*
+private_frame_transform (LIMdlAnimation* self,
                          int             chan,
                          int             frame)
 {

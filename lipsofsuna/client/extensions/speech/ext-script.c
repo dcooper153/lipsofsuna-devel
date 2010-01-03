@@ -47,17 +47,17 @@
  * -- @param args Arguments.
  * function Speech.add(self, args)
  */
-static void Speech_add (liscrArgs* args)
+static void Speech_add (LIScrArgs* args)
 {
 	int id;
 	const char* msg;
-	liscrData* object;
-	liextModule* module;
+	LIScrData* object;
+	LIExtModule* module;
 
 	if (!liscr_args_gets_string (args, "message", &msg))
 		return;
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
-		id = ((liengObject*) object->data)->id;
+		id = ((LIEngObject*) object->data)->id;
 	else if (!liscr_args_gets_int (args, "id", &id))
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
@@ -67,7 +67,7 @@ static void Speech_add (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSpeechScript (liscrClass* self,
+liext_script_speech (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);

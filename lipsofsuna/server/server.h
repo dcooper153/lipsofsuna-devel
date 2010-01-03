@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvServer Server
+ * \addtogroup LISerServer Server
  * @{
  */
 
@@ -27,37 +27,37 @@
 
 #include <pthread.h>
 #include <sys/time.h>
-#include <algorithm/lips-algorithm.h>
-#include <callback/lips-callback.h>
-#include <config/lips-config.h>
-#include <engine/lips-engine.h>
-#include <paths/lips-paths.h>
-#include <physics/lips-physics.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/callback.h>
+#include <lipsofsuna/config.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/paths.h>
+#include <lipsofsuna/physics.h>
+#include <lipsofsuna/script.h>
 #include "server-network.h"
 #include "server-object.h"
 #include "server-types.h"
 
-struct _lisrvServer
+struct _LISerServer
 {
 	uint32_t debug;
 	int quit;
-	lialgSectors* sectors;
-	lialgStrdic* extensions;
-	liarcSql* sql;
-	licalCallbacks* callbacks;
-	liengEngine* engine;
-	lipthPaths* paths;
-	liscrScript* script;
-	lisrvNetwork* network;
+	LIAlgSectors* sectors;
+	LIAlgStrdic* extensions;
+	LIArcSql* sql;
+	LICalCallbacks* callbacks;
+	LIEngEngine* engine;
+	LIPthPaths* paths;
+	LIScrScript* script;
+	LISerNetwork* network;
 	struct
 	{
-		licfgBans* bans;
-		licfgHost* host;
+		LICfgBans* bans;
+		LICfgHost* host;
 	} config;
 	struct
 	{
-		liarcWriter* resources;
+		LIArcWriter* resources;
 	} helper;
 	struct
 	{
@@ -69,50 +69,50 @@ struct _lisrvServer
 	} time;
 };
 
-lisrvServer*
-lisrv_server_new (lipthPaths* paths);
+LISerServer*
+liser_server_new (LIPthPaths* paths);
 
 void
-lisrv_server_free (lisrvServer* self);
+liser_server_free (LISerServer* self);
 
-lisrvExtension*
-lisrv_server_find_extension (lisrvServer* self,
+LISerExtension*
+liser_server_find_extension (LISerServer* self,
                              const char*  name);
 
 int
-lisrv_server_insert_ban (lisrvServer* self,
+liser_server_insert_ban (LISerServer* self,
                          const char*  ip);
 
 int
-lisrv_server_load_extension (lisrvServer* self,
+liser_server_load_extension (LISerServer* self,
                              const char*  name);
 
 int
-lisrv_server_main (lisrvServer* self);
+liser_server_main (LISerServer* self);
 
 int
-lisrv_server_remove_ban (lisrvServer* self,
+liser_server_remove_ban (LISerServer* self,
                          const char*  ip);
 
 int
-lisrv_server_save (lisrvServer* self);
+liser_server_save (LISerServer* self);
 
 void
-lisrv_server_shutdown (lisrvServer* self);
+liser_server_shutdown (LISerServer* self);
 
 int
-lisrv_server_update (lisrvServer* self,
+liser_server_update (LISerServer* self,
                      float        secs);
 
 int
-lisrv_server_get_banned (lisrvServer* self,
+liser_server_get_banned (LISerServer* self,
                          const char*  address);
 
 double
-lisrv_server_get_time (const lisrvServer* self);
+liser_server_get_time (const LISerServer* self);
 
 uint32_t
-lisrv_server_get_unique_object (const lisrvServer* self);
+liser_server_get_unique_object (const LISerServer* self);
 
 #endif
 

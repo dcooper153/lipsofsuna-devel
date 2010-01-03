@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,9 +24,9 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-listener.h"
 #include "ext-module.h"
 
@@ -45,9 +45,9 @@
  * -- @name Material.friction
  * -- @class table
  */
-static void Material_getter_friction (liscrArgs* args)
+static void Material_getter_friction (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((livoxMaterial*) args->self)->friction);
+	liscr_args_seti_float (args, ((LIVoxMaterial*) args->self)->friction);
 }
 
 /* @luadoc
@@ -57,9 +57,9 @@ static void Material_getter_friction (liscrArgs* args)
  * -- @name Material.model
  * -- @class table
  */
-static void Material_getter_model (liscrArgs* args)
+static void Material_getter_model (LIScrArgs* args)
 {
-	liscr_args_seti_string (args, ((livoxMaterial*) args->self)->model);
+	liscr_args_seti_string (args, ((LIVoxMaterial*) args->self)->model);
 }
 
 /* @luadoc
@@ -69,9 +69,9 @@ static void Material_getter_model (liscrArgs* args)
  * -- @name Material.name
  * -- @class table
  */
-static void Material_getter_name (liscrArgs* args)
+static void Material_getter_name (LIScrArgs* args)
 {
-	liscr_args_seti_string (args, ((livoxMaterial*) args->self)->name);
+	liscr_args_seti_string (args, ((LIVoxMaterial*) args->self)->name);
 }
 
 /*****************************************************************************/
@@ -85,12 +85,12 @@ static void Material_getter_name (liscrArgs* args)
  * -- @return New tile.
  * function Tile.new(self, args)
  */
-static void Tile_new (liscrArgs* args)
+static void Tile_new (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	/* Allocate userdata. */
-	data = liscr_data_new_alloc (args->script, sizeof (livoxVoxel), LIEXT_SCRIPT_TILE);
+	data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
 	if (data == NULL)
 		return;
 	liscr_args_call_setters (args, data);
@@ -105,11 +105,11 @@ static void Tile_new (liscrArgs* args)
  * -- @name Tile.damage
  * -- @class table
  */
-static void Tile_getter_damage (liscrArgs* args)
+static void Tile_getter_damage (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((livoxVoxel*) args->self)->damage);
+	liscr_args_seti_int (args, ((LIVoxVoxel*) args->self)->damage);
 }
-static void Tile_setter_damage (liscrArgs* args)
+static void Tile_setter_damage (LIScrArgs* args)
 {
 	int value;
 
@@ -117,7 +117,7 @@ static void Tile_setter_damage (liscrArgs* args)
 	{
 		if (value < 0x00) value = 0;
 		if (value > 0xFF) value = 0xFF;
-		((livoxVoxel*) args->self)->damage = value;
+		((LIVoxVoxel*) args->self)->damage = value;
 	}
 }
 
@@ -128,11 +128,11 @@ static void Tile_setter_damage (liscrArgs* args)
  * -- @name Tile.rotation
  * -- @class table
  */
-static void Tile_getter_rotation (liscrArgs* args)
+static void Tile_getter_rotation (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((livoxVoxel*) args->self)->rotation);
+	liscr_args_seti_int (args, ((LIVoxVoxel*) args->self)->rotation);
 }
-static void Tile_setter_rotation (liscrArgs* args)
+static void Tile_setter_rotation (LIScrArgs* args)
 {
 	int value;
 
@@ -140,7 +140,7 @@ static void Tile_setter_rotation (liscrArgs* args)
 	{
 		if (value <  0) value = 0;
 		if (value > 24) value = 24;
-		((livoxVoxel*) args->self)->rotation = value;
+		((LIVoxVoxel*) args->self)->rotation = value;
 	}
 }
 
@@ -151,11 +151,11 @@ static void Tile_setter_rotation (liscrArgs* args)
  * -- @name Tile.terrain
  * -- @class table
  */
-static void Tile_getter_terrain (liscrArgs* args)
+static void Tile_getter_terrain (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((livoxVoxel*) args->self)->type);
+	liscr_args_seti_int (args, ((LIVoxVoxel*) args->self)->type);
 }
-static void Tile_setter_terrain (liscrArgs* args)
+static void Tile_setter_terrain (LIScrArgs* args)
 {
 	int value;
 
@@ -163,7 +163,7 @@ static void Tile_setter_terrain (liscrArgs* args)
 	{
 		if (value < 0x0000) value = 0;
 		if (value > 0xFFFF) value = 0xFFFF;
-		((livoxVoxel*) args->self)->type = value;
+		((LIVoxVoxel*) args->self)->type = value;
 	}
 }
 
@@ -181,10 +181,10 @@ static void Tile_setter_terrain (liscrArgs* args)
  * -- @return True if terrain was erased.
  * function Voxel.erase(self, args)
  */
-static void Voxel_erase (liscrArgs* args)
+static void Voxel_erase (LIScrArgs* args)
 {
-	liextModule* module;
-	limatVector point;
+	LIExtModule* module;
+	LIMatVector point;
 
 	if (liscr_args_gets_vector (args, "point", &point))
 	{
@@ -204,12 +204,12 @@ static void Voxel_erase (liscrArgs* args)
  * -- @param args Arguments.
  * -- @return Material or nil.
  */
-static void Voxel_find_material (liscrArgs* args)
+static void Voxel_find_material (LIScrArgs* args)
 {
 	int id;
-	liextModule* module;
-	liscrData* data;
-	livoxMaterial* material;
+	LIExtModule* module;
+	LIScrData* data;
+	LIVoxMaterial* material;
 
 	if (liscr_args_gets_int (args, "id", &id))
 	{
@@ -244,15 +244,15 @@ static void Voxel_find_material (liscrArgs* args)
  * -- @return Tile and vector, or nil.
  * function Voxel.find_voxel(self, args)
  */
-static void Voxel_find_voxel (liscrArgs* args)
+static void Voxel_find_voxel (LIScrArgs* args)
 {
 	int flags = LIVOX_FIND_ALL;
 	const char* tmp;
-	liextModule* module;
-	limatVector point;
-	limatVector result;
-	liscrData* data;
-	livoxVoxel* voxel;
+	LIExtModule* module;
+	LIMatVector point;
+	LIMatVector result;
+	LIScrData* data;
+	LIVoxVoxel* voxel;
 
 	if (liscr_args_gets_vector (args, "point", &point))
 	{
@@ -271,10 +271,10 @@ static void Voxel_find_voxel (liscrArgs* args)
 			return;
 
 		/* Return values. */
-		data = liscr_data_new_alloc (args->script, sizeof (livoxVoxel), LIEXT_SCRIPT_TILE);
+		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
 		if (data == NULL)
 			return;
-		*((livoxVoxel*) data->data) = *voxel;
+		*((LIVoxVoxel*) data->data) = *voxel;
 		liscr_args_seti_data (args, data);
 		liscr_args_seti_vector (args, &result);
 		liscr_data_unref (data, NULL);
@@ -294,11 +294,11 @@ static void Voxel_find_voxel (liscrArgs* args)
  * -- @return True if terrain was filled.
  * function Voxel.insert(self, args)
  */
-static void Voxel_insert (liscrArgs* args)
+static void Voxel_insert (LIScrArgs* args)
 {
-	liextModule* module;
-	limatVector point;
-	liscrData* voxel;
+	LIExtModule* module;
+	LIMatVector point;
+	LIScrData* voxel;
 
 	if (liscr_args_gets_vector (args, "point", &point) &&
 	    liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &voxel))
@@ -321,11 +321,11 @@ static void Voxel_insert (liscrArgs* args)
  * -- @return True if terrain was replaced.
  * function Voxel.replace(self, args)
  */
-static void Voxel_replace (liscrArgs* args)
+static void Voxel_replace (LIScrArgs* args)
 {
-	liextModule* module;
-	limatVector point;
-	liscrData* voxel;
+	LIExtModule* module;
+	LIMatVector point;
+	LIScrData* voxel;
 
 	if (liscr_args_gets_vector (args, "point", &point) &&
 	    liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &voxel))
@@ -350,13 +350,13 @@ static void Voxel_replace (liscrArgs* args)
  * -- @return True if a voxel was rotated.
  * function Voxel.rotate(self, args)
  */
-static void Voxel_rotate (liscrArgs* args)
+static void Voxel_rotate (LIScrArgs* args)
 {
 	int step = 1;
 	int axis = 0;
 	const char* tmp;
-	liextModule* module;
-	limatVector point;
+	LIExtModule* module;
+	LIMatVector point;
 
 	if (liscr_args_gets_vector (args, "point", &point))
 	{
@@ -381,9 +381,9 @@ static void Voxel_rotate (liscrArgs* args)
  * -- @param self Voxel class.
  * function Voxel.save(self)
  */
-static void Voxel_save (liscrArgs* args)
+static void Voxel_save (LIScrArgs* args)
 {
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	if (!liext_module_write (module, module->server->sql))
@@ -393,7 +393,7 @@ static void Voxel_save (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextMaterialScript (liscrClass* self,
+liext_script_material (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
@@ -403,7 +403,7 @@ liextMaterialScript (liscrClass* self,
 }
 
 void
-liextTileScript (liscrClass* self,
+liext_script_tile (LIScrClass* self,
                  void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
@@ -414,7 +414,7 @@ liextTileScript (liscrClass* self,
 }
 
 void
-liextVoxelScript (liscrClass* self,
+liext_script_voxel (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);

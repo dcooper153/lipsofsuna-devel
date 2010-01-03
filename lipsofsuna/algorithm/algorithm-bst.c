@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,12 +21,12 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgBst Bst
+ * \addtogroup LIAlgBst Bst
  * @{
  */
 
 #include <math.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-bst.h"
 
 #define LI_SCAPEGOAT_ALPHA 0.55
@@ -35,33 +35,33 @@ static inline int
 private_halpha (int n);
 
 static inline void
-private_each (lialgBstNode*   node,
-              lialgBstForeach func);
+private_each (LIAlgBstNode*   node,
+              LIAlgBstForeach func);
 
 static inline void
-private_free (lialgBst*     self,
-              lialgBstNode* node);
+private_free (LIAlgBst*     self,
+              LIAlgBstNode* node);
 
-static inline lialgBstNode*
-private_index (lialgBstNode* node,
+static inline LIAlgBstNode*
+private_index (LIAlgBstNode* node,
                int*          counter);
 
 static inline int
-private_size (lialgBstNode* node);
+private_size (LIAlgBstNode* node);
 
-static inline lialgBstNode*
-private_rebalance (lialgBstNode* root,
+static inline LIAlgBstNode*
+private_rebalance (LIAlgBstNode* root,
                    int           size);
 
 static inline void
-private_makelist (lialgBstNode* root);
+private_makelist (LIAlgBstNode* root);
 
 static inline void
-private_maketree (lialgBstNode* root,
+private_maketree (LIAlgBstNode* root,
                   int           size);
 
 static inline void
-private_compress (lialgBstNode* root,
+private_compress (LIAlgBstNode* root,
                   int           count);
 
 /****************************************************************************/
@@ -74,14 +74,14 @@ private_compress (lialgBstNode* root,
  * \param free Free function.
  * \return New binary search tree or NULL.
  */
-lialgBst*
-lialg_bst_new (lialgBstCompare cmp,
-               lialgBstMalloc  malloc,
-               lialgBstFree    free)
+LIAlgBst*
+lialg_bst_new (LIAlgBstCompare cmp,
+               LIAlgBstMalloc  malloc,
+               LIAlgBstFree    free)
 {
-	lialgBst* self;
+	LIAlgBst* self;
 
-	self = lisys_malloc (sizeof (lialgBst));
+	self = lisys_malloc (sizeof (LIAlgBst));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
@@ -100,7 +100,7 @@ lialg_bst_new (lialgBstCompare cmp,
  * \param self Binary search tree.
  */
 void
-lialg_bst_free (lialgBst* self)
+lialg_bst_free (LIAlgBst* self)
 {
 	private_free (self, self->root);
 	self->free (self);
@@ -112,7 +112,7 @@ lialg_bst_free (lialgBst* self)
  * \param self Binary search tree.
  */
 void
-lialg_bst_clear (lialgBst* self)
+lialg_bst_clear (LIAlgBst* self)
 {
 	private_free (self, self->root);
 	self->size = 0;
@@ -127,12 +127,12 @@ lialg_bst_clear (lialgBst* self)
  * \param data Searched data.
  * \return Node or NULL.
  */
-lialgBstNode*
-lialg_bst_find (lialgBst*   self,
+LIAlgBstNode*
+lialg_bst_find (LIAlgBst*   self,
                 const void* data)
 {
 	int cmp;
-	lialgBstNode* node;
+	LIAlgBstNode* node;
 
 	/* Normal binary tree search. */
 	node = self->root;
@@ -161,8 +161,8 @@ lialg_bst_find (lialgBst*   self,
  * \param index Index of the searched data.
  * \return Node or NULL.
  */
-lialgBstNode*
-lialg_bst_find_by_index (lialgBst* self,
+LIAlgBstNode*
+lialg_bst_find_by_index (LIAlgBst* self,
                          int       index)
 {
 	return private_index (self->root, &index);
@@ -181,15 +181,15 @@ lialg_bst_find_by_index (lialgBst* self,
  * \return Nonzero on success.
  */
 void
-lialg_bst_link (lialgBst*     self,
-                lialgBstNode* node)
+lialg_bst_link (LIAlgBst*     self,
+                LIAlgBstNode* node)
 {
 	int i;
 	int size;
 	int depth;
-	lialgBstNode* tmp;
-	lialgBstNode* ptr;
-	lialgBstNode* parent;
+	LIAlgBstNode* tmp;
+	LIAlgBstNode* ptr;
+	LIAlgBstNode* parent;
 
 	node->left = NULL;
 	node->right = NULL;
@@ -285,14 +285,14 @@ lialg_bst_link (lialgBst*     self,
  * \param data Data to store to the inserted node.
  * \return Nonzero on success.
  */
-lialgBstNode*
-lialg_bst_insert (lialgBst* self,
+LIAlgBstNode*
+lialg_bst_insert (LIAlgBst* self,
                   void*     data)
 {
-	lialgBstNode* node;
+	LIAlgBstNode* node;
 
 	/* Create a new node. */
-	node = self->malloc (sizeof (lialgBstNode));
+	node = self->malloc (sizeof (LIAlgBstNode));
 	if (node == NULL)
 		return NULL;
 	node->data = data;
@@ -312,8 +312,8 @@ lialg_bst_insert (lialgBst* self,
  * \param node Node to remove.
  */
 void
-lialg_bst_remove (lialgBst*     self,
-                  lialgBstNode* node)
+lialg_bst_remove (LIAlgBst*     self,
+                  LIAlgBstNode* node)
 {
 	lialg_bst_unlink (self, node);
 	self->free (node);
@@ -329,10 +329,10 @@ lialg_bst_remove (lialgBst*     self,
  * \param node The node to unlink.
  */
 void
-lialg_bst_unlink (lialgBst*     self,
-                  lialgBstNode* node)
+lialg_bst_unlink (LIAlgBst*     self,
+                  LIAlgBstNode* node)
 {
-	lialgBstNode* tmp;
+	LIAlgBstNode* tmp;
 
 	/* Normal binary search tree deletion. */
 	if (node->left == NULL)
@@ -444,8 +444,8 @@ lialg_bst_unlink (lialgBst*     self,
  * \param func Function to call.
  */
 void
-lialg_bst_foreach (lialgBst*       self,
-                   lialgBstForeach func)
+lialg_bst_foreach (LIAlgBst*       self,
+                   LIAlgBstForeach func)
 {
 	/* Recursive inorder traversal. */
 	private_each (self->root, func);
@@ -464,13 +464,13 @@ lialg_bst_foreach (lialgBst*       self,
  * \param data Data passed to the function.
  * \return Matching node or NULL if there was no match.
  */
-lialgBstNode*
-lialg_bst_match (lialgBst*     self,
-                 lialgBstMatch func,
+LIAlgBstNode*
+lialg_bst_match (LIAlgBst*     self,
+                 LIAlgBstMatch func,
                  const void*   data)
 {
 	int ret;
-	lialgBstNode* node;
+	LIAlgBstNode* node;
 
 	node = self->root;
 	while (node != NULL)
@@ -497,10 +497,10 @@ private_halpha (int n)
 }
 
 static inline void
-private_each (lialgBstNode*   node,
-              lialgBstForeach func)
+private_each (LIAlgBstNode*   node,
+              LIAlgBstForeach func)
 {
-	lialgBstNode* tmp;
+	LIAlgBstNode* tmp;
 
 	if (node != NULL)
 	{
@@ -512,8 +512,8 @@ private_each (lialgBstNode*   node,
 }
 
 static inline void
-private_free (lialgBst*     self,
-              lialgBstNode* node)
+private_free (LIAlgBst*     self,
+              LIAlgBstNode* node)
 {
 	if (node == NULL)
 		return;
@@ -522,8 +522,8 @@ private_free (lialgBst*     self,
 	self->free (node);
 }
 
-static inline lialgBstNode*
-private_index (lialgBstNode* node,
+static inline LIAlgBstNode*
+private_index (LIAlgBstNode* node,
                int*          counter)
 {
 	void* tmp;
@@ -546,18 +546,18 @@ private_index (lialgBstNode* node,
 }
 
 static inline int
-private_size (lialgBstNode* node)
+private_size (LIAlgBstNode* node)
 {
 	if (node != NULL)
 		return private_size (node->left) + private_size (node->right) + 1;
 	return 0;
 }
 
-static inline lialgBstNode*
-private_rebalance (lialgBstNode* root,
+static inline LIAlgBstNode*
+private_rebalance (LIAlgBstNode* root,
                    int           size)
 {
-	lialgBstNode tmp;
+	LIAlgBstNode tmp;
 
 	tmp.right = root;
 	private_makelist (&tmp);
@@ -566,11 +566,11 @@ private_rebalance (lialgBstNode* root,
 }
 
 static inline void
-private_makelist (lialgBstNode* root)
+private_makelist (LIAlgBstNode* root)
 {
-	lialgBstNode* tmp;
-	lialgBstNode* prev;
-	lialgBstNode* curr;
+	LIAlgBstNode* tmp;
+	LIAlgBstNode* prev;
+	LIAlgBstNode* curr;
 
 	/* Tree to ordered list. */
 	prev = root;
@@ -596,11 +596,11 @@ private_makelist (lialgBstNode* root)
 }
 
 static inline void
-private_maketree (lialgBstNode* root,
+private_maketree (LIAlgBstNode* root,
                   int           size)
 {
 	int count;
-	lialgBstNode* node;
+	LIAlgBstNode* node;
 
 	/* Ordered list to tree. */
 	count = 1;
@@ -615,12 +615,12 @@ private_maketree (lialgBstNode* root,
 }
 
 static inline void
-private_compress (lialgBstNode* root,
+private_compress (LIAlgBstNode* root,
                   int           count)
 {
-	lialgBstNode* child;
-	lialgBstNode* pivot;
-	lialgBstNode* scanner;
+	LIAlgBstNode* child;
+	LIAlgBstNode* pivot;
+	LIAlgBstNode* scanner;
 
 	scanner = root;
 	while (count--)

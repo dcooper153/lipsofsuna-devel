@@ -24,7 +24,7 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-history.h"
 
 #define LIEXT_CHAT_HISTORY_DEFAULT_LINES 10
@@ -33,27 +33,27 @@ static const void*
 private_base ();
 
 static int
-private_init (liextChatHistory* self,
-              liwdgManager* manager);
+private_init (LIExtChatHistory* self,
+              LIWdgManager* manager);
 
 static void
-private_free (liextChatHistory* self);
+private_free (LIExtChatHistory* self);
 
 static int
-private_event (liextChatHistory* self,
+private_event (LIExtChatHistory* self,
                liwdgEvent*       event);
 
 static void
-private_rebuild (liextChatHistory* self);
+private_rebuild (LIExtChatHistory* self);
 
 /****************************************************************************/
 
-const liwdgClass liextChatHistoryType =
+const LIWdgClass LIExtChatHistoryType =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "ChatHistory", sizeof (liextChatHistory),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "ChatHistory", sizeof (LIExtChatHistory),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /**
@@ -63,14 +63,14 @@ const liwdgClass liextChatHistoryType =
  * \param client Client.
  * \return New widget or NULL.
  */
-liwdgWidget*
-liext_chat_history_new (liwdgManager* manager,
-                        licliClient*  client)
+LIWdgWidget*
+liext_chat_history_new (LIWdgManager* manager,
+                        LICliClient*  client)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &liextChatHistoryType);
+	self = liwdg_widget_new (manager, &LIExtChatHistoryType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_WIDGET_CHAT_HISTORY (self)->client = client;
@@ -86,7 +86,7 @@ liext_chat_history_new (liwdgManager* manager,
  * \return Nonzero on success.
  */
 int
-liext_chat_history_append (liextChatHistory* self,
+liext_chat_history_append (LIExtChatHistory* self,
                            const char*       message)
 {
 	int i;
@@ -113,12 +113,12 @@ liext_chat_history_append (liextChatHistory* self,
 static const void*
 private_base ()
 {
-	return &liwdgLabelType;
+	return &liwdg_widget_label;
 }
 
 static int
-private_init (liextChatHistory* self,
-              liwdgManager*     manager)
+private_init (LIExtChatHistory* self,
+              LIWdgManager*     manager)
 {
 	/* Allocate lines. */
 	self->lines.count = LIEXT_CHAT_HISTORY_DEFAULT_LINES;
@@ -133,7 +133,7 @@ private_init (liextChatHistory* self,
 }
 
 static void
-private_free (liextChatHistory* self)
+private_free (LIExtChatHistory* self)
 {
 	int i;
 
@@ -147,18 +147,18 @@ private_free (liextChatHistory* self)
 }
 
 static int
-private_event (liextChatHistory* self,
+private_event (LIExtChatHistory* self,
                liwdgEvent*       event)
 {
-	return liwdgLabelType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_label.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liextChatHistory* self)
+private_rebuild (LIExtChatHistory* self)
 {
 	int i;
 	const char* line;
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	writer = liarc_writer_new ();
 	if (writer == NULL)

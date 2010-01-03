@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,96 +18,96 @@
 /**
  * \addtogroup ligen Generator
  * @{
- * \addtogroup ligenGenerator Generator
+ * \addtogroup LIGenGenerator Generator
  * @{
  */
 
 #ifndef __GENERATOR_H__
 #define __GENERATOR_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <archive/lips-archive.h>
-#include <paths/lips-paths.h>
-#include <system/lips-system.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/paths.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/voxel.h>
 #include "generator-brush.h"
 #include "generator-types.h"
 
-typedef struct _ligenStroke ligenStroke;
-struct _ligenStroke
+typedef struct _LIGenStroke LIGenStroke;
+struct _LIGenStroke
 {
 	int pos[3];
 	int size[3];
 	int brush;
 };
 
-struct _ligenGenerator
+struct _LIGenGenerator
 {
 	int fill;
-	lialgSectors* sectors;
-	lialgU32dic* brushes;
-	liarcSql* gensql;
-	liarcSql* srvsql;
-	licalCallbacks* callbacks;
-	lipthPaths* paths;
-	livoxManager* voxels;
+	LIAlgSectors* sectors;
+	LIAlgU32dic* brushes;
+	LIArcSql* gensql;
+	LIArcSql* srvsql;
+	LICalCallbacks* callbacks;
+	LIPthPaths* paths;
+	LIVoxManager* voxels;
 	struct
 	{
 		int count;
-		ligenStroke* array;
+		LIGenStroke* array;
 	} strokes;
 };
 
-ligenGenerator*
-ligen_generator_new (lipthPaths*     paths,
-                     licalCallbacks* callbacks,
-                     lialgSectors*   sectors);
+LIGenGenerator*
+ligen_generator_new (LIPthPaths*     paths,
+                     LICalCallbacks* callbacks,
+                     LIAlgSectors*   sectors);
 
 void
-ligen_generator_free (ligenGenerator* self);
+ligen_generator_free (LIGenGenerator* self);
 
 void
-ligen_generator_clear_scene (ligenGenerator* self);
+ligen_generator_clear_scene (LIGenGenerator* self);
 
-ligenBrush*
-ligen_generator_find_brush (ligenGenerator* self,
+LIGenBrush*
+ligen_generator_find_brush (LIGenGenerator* self,
                             int             id);
 
 int
-ligen_generator_insert_brush (ligenGenerator* self,
-                              ligenBrush*     brush);
+ligen_generator_insert_brush (LIGenGenerator* self,
+                              LIGenBrush*     brush);
 
 int
-ligen_generator_insert_stroke (ligenGenerator* self,
+ligen_generator_insert_stroke (LIGenGenerator* self,
                                int             brush,
                                int             x,
                                int             y,
                                int             z);
 
 int
-ligen_generator_load_materials (ligenGenerator* self);
+ligen_generator_load_materials (LIGenGenerator* self);
 
 int
-ligen_generator_main (ligenGenerator* self);
+ligen_generator_main (LIGenGenerator* self);
 
 int
-ligen_generator_rebuild_scene (ligenGenerator* self);
+ligen_generator_rebuild_scene (LIGenGenerator* self);
 
 void
-ligen_generator_remove_brush (ligenGenerator* self,
+ligen_generator_remove_brush (LIGenGenerator* self,
                               int             id);
 
 int
-ligen_generator_step (ligenGenerator* self);
+ligen_generator_step (LIGenGenerator* self);
 
 int
-ligen_generator_write (ligenGenerator* self);
+ligen_generator_write (LIGenGenerator* self);
 
 int
-ligen_generator_write_brushes (ligenGenerator* self);
+ligen_generator_write_brushes (LIGenGenerator* self);
 
 void
-ligen_generator_set_fill (ligenGenerator* self,
+ligen_generator_set_fill (LIGenGenerator* self,
                           int             fill);
 
 #endif

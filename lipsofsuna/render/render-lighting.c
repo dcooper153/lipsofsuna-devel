@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,13 +16,13 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndLighting Lighting
+ * \addtogroup LIRenLighting Lighting
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "render-context.h"
 #include "render-draw.h"
 #include "render-lighting.h"
@@ -33,13 +33,13 @@
  * \param render Renderer.
  * \return New light manager or NULL.
  */
-lirndLighting*
-lirnd_lighting_new (lirndRender* render)
+LIRenLighting*
+liren_lighting_new (LIRenRender* render)
 {
-	lirndLighting* self;
+	LIRenLighting* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndLighting));
+	self = lisys_calloc (1, sizeof (LIRenLighting));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -52,7 +52,7 @@ lirnd_lighting_new (lirndRender* render)
 	return self;
 
 error:
-	lirnd_lighting_free (self);
+	liren_lighting_free (self);
 	return NULL;
 }
 
@@ -62,7 +62,7 @@ error:
  * \param self Light manager.
  */
 void
-lirnd_lighting_free (lirndLighting* self)
+liren_lighting_free (LIRenLighting* self)
 {
 	if (self->lights != NULL)
 	{
@@ -80,8 +80,8 @@ lirnd_lighting_free (lirndLighting* self)
  * \return Nonzero on success.
  */
 int
-lirnd_lighting_insert_light (lirndLighting* self,
-                             lirndLight*    light)
+liren_lighting_insert_light (LIRenLighting* self,
+                             LIRenLight*    light)
 {
 	if (!lialg_ptrdic_insert (self->lights, light, light))
 		return 0;
@@ -96,8 +96,8 @@ lirnd_lighting_insert_light (lirndLighting* self,
  * \param light Light source.
  */
 void
-lirnd_lighting_remove_light (lirndLighting* self,
-                             lirndLight*    light)
+liren_lighting_remove_light (LIRenLighting* self,
+                             LIRenLight*    light)
 {
 	lialg_ptrdic_remove (self->lights, light);
 	light->enabled = 0;
@@ -109,15 +109,15 @@ lirnd_lighting_remove_light (lirndLighting* self,
  * \param self Light manager.
  */
 void
-lirnd_lighting_update (lirndLighting* self)
+liren_lighting_update (LIRenLighting* self)
 {
-	lialgPtrdicIter iter;
-	lirndLight* light;
+	LIAlgPtrdicIter iter;
+	LIRenLight* light;
 
 	LI_FOREACH_PTRDIC (iter, self->lights)
 	{
 		light = iter.value;
-		lirnd_light_update (light);
+		liren_light_update (light);
 	}
 }
 

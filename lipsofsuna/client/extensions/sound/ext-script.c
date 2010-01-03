@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -40,11 +40,11 @@
  * -- @name Sound.music
  * -- @class table
  */
-static void Sound_setter_music (liscrArgs* args)
+static void Sound_setter_music (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
 	const char* value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_geti_string (args, 0, &value))
 	{
@@ -60,11 +60,11 @@ static void Sound_setter_music (liscrArgs* args)
  * -- @name Sound.music_volume
  * -- @class table
  */
-static void Sound_setter_music_volume (liscrArgs* args)
+static void Sound_setter_music_volume (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
 	float value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_geti_float (args, 0, &value))
 	{
@@ -77,7 +77,7 @@ static void Sound_setter_music_volume (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSoundScript (liscrClass* self,
+liext_script_sound (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);

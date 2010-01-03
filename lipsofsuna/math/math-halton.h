@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,28 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatHalton Halton
+ * \addtogroup LIMatHalton Halton
  * @{
  */
 
 #ifndef __MATH_HALTON_H__
 #define __MATH_HALTON_H__
 
-typedef struct _limatHalton limatHalton;
-struct _limatHalton
+typedef struct _LIMatHalton LIMatHalton;
+struct _LIMatHalton
 {
 	int indices[2];
 	float values[2];
 };
 
 static inline void
-limat_halton_init (limatHalton* self);
+limat_halton_init (LIMatHalton* self);
 
 static inline void
-limat_halton_next (limatHalton* self);
+limat_halton_next (LIMatHalton* self);
 
 static inline void
-limat_halton_init (limatHalton* self)
+limat_halton_init (LIMatHalton* self)
 {
 	self->indices[0] = 0;
 	self->indices[1] = 0;
@@ -47,7 +47,7 @@ limat_halton_init (limatHalton* self)
 }
 
 static inline void
-limat_halton_next (limatHalton* self)
+limat_halton_next (LIMatHalton* self)
 {
 	int i;
 	int j;

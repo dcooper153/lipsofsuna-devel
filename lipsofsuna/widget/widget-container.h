@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgContainer Container
+ * \addtogroup LIWdgContainer Container
  * @{
  */
 
@@ -28,59 +28,59 @@
 #include "widget.h"
 #include "widget-types.h"
 
-#define LIWDG_CONTAINER(o) ((liwdgContainer*)(o))
+#define LIWDG_CONTAINER(o) ((LIWdgContainer*)(o))
 
-typedef struct _liwdgContainer liwdgContainer;
-typedef struct _liwdgContainerIface liwdgContainerIface;
-typedef liwdgWidget* (*liwdgContainerChildAtFunc)(liwdgContainer*, int, int);
-typedef void (*liwdgContainerChildRequestFunc)(liwdgContainer*, liwdgWidget*);
-typedef liwdgWidget* (*liwdgContainerCycleFocusFunc)(liwdgContainer*, liwdgWidget*, int);
-typedef void (*liwdgContainerDetachChildFunc)(liwdgContainer*, liwdgWidget*);
-typedef void (*liwdgContainerForeachChildFunc)(liwdgContainer*, void (*)(), void*);
-typedef void (*liwdgContainerTranslateCoordsFunc)(liwdgContainer*, int, int, int*, int*);
+typedef struct _LIWdgContainer LIWdgContainer;
+typedef struct _LIWdgContainerIface LIWdgContainerIface;
+typedef LIWdgWidget* (*LIWdgContainerChildAtFunc)(LIWdgContainer*, int, int);
+typedef void (*LIWdgContainerChildRequestFunc)(LIWdgContainer*, LIWdgWidget*);
+typedef LIWdgWidget* (*LIWdgContainerCycleFocusFunc)(LIWdgContainer*, LIWdgWidget*, int);
+typedef void (*LIWdgContainerDetachChildFunc)(LIWdgContainer*, LIWdgWidget*);
+typedef void (*LIWdgContainerForeachChildFunc)(LIWdgContainer*, void (*)(), void*);
+typedef void (*LIWdgContainerTranslateCoordsFunc)(LIWdgContainer*, int, int, int*, int*);
 
-struct _liwdgContainer
+struct _LIWdgContainer
 {
-	liwdgWidget base;
+	LIWdgWidget base;
 };
 
-struct _liwdgContainerIface
+struct _LIWdgContainerIface
 {
-	liwdgContainerChildAtFunc child_at;
-	liwdgContainerChildRequestFunc child_request;
-	liwdgContainerCycleFocusFunc cycle_focus;
-	liwdgContainerDetachChildFunc detach_child;
-	liwdgContainerForeachChildFunc foreach_child;
-	liwdgContainerTranslateCoordsFunc translate_coords;
+	LIWdgContainerChildAtFunc child_at;
+	LIWdgContainerChildRequestFunc child_request;
+	LIWdgContainerCycleFocusFunc cycle_focus;
+	LIWdgContainerDetachChildFunc detach_child;
+	LIWdgContainerForeachChildFunc foreach_child;
+	LIWdgContainerTranslateCoordsFunc translate_coords;
 };
 
-extern const liwdgClass liwdgContainerType;
+extern const LIWdgClass liwdg_widget_container;
 
-liwdgWidget*
-liwdg_container_child_at (liwdgContainer* self,
+LIWdgWidget*
+liwdg_container_child_at (LIWdgContainer* self,
                           int             x,
                           int             y);
 
 void
-liwdg_container_child_request (liwdgContainer* self,
-                               liwdgWidget*    child);
+liwdg_container_child_request (LIWdgContainer* self,
+                               LIWdgWidget*    child);
 
-liwdgWidget*
-liwdg_container_cycle_focus (liwdgContainer* self,
-                             liwdgWidget*    curr,
+LIWdgWidget*
+liwdg_container_cycle_focus (LIWdgContainer* self,
+                             LIWdgWidget*    curr,
                              int             dir);
 
 void
-liwdg_container_detach_child (liwdgContainer* self,
-                              liwdgWidget*    child);
+liwdg_container_detach_child (LIWdgContainer* self,
+                              LIWdgWidget*    child);
 
 void
-liwdg_container_foreach_child (liwdgContainer* self,
+liwdg_container_foreach_child (LIWdgContainer* self,
                                void          (*call)(),
                                void*           data);
 
 void
-liwdg_container_translate_coords (liwdgContainer* self,
+liwdg_container_translate_coords (LIWdgContainer* self,
                                   int             containerx,
                                   int             containery,
                                   int*            childx,

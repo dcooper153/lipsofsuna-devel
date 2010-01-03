@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,13 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcWriter Writer
+ * \addtogroup LIArcWriter Writer
  * @{
  */
 
 #include <zlib.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "archive-writer.h"
 
 #define FORMAT_BUFFER_SIZE 128
@@ -32,26 +32,26 @@
 #define CLEAR_BUFFER_SIZE 1024
 
 static void
-private_file_close (liarcWriter* self);
+private_file_close (LIArcWriter* self);
 
 static int
-private_file_write (liarcWriter* self,
+private_file_write (LIArcWriter* self,
                     const void*  data,
                     int          size);
 
 static void
-private_gzip_close (liarcWriter* self);
+private_gzip_close (LIArcWriter* self);
 
 static int
-private_gzip_write (liarcWriter* self,
+private_gzip_write (LIArcWriter* self,
                     const void*  data,
                     int          size);
 
 static void
-private_memory_close (liarcWriter* self);
+private_memory_close (LIArcWriter* self);
 
 static int
-private_memory_write (liarcWriter* self,
+private_memory_write (LIArcWriter* self,
                       const void*  data,
                       int          size);
 
@@ -62,12 +62,12 @@ private_memory_write (liarcWriter* self,
  *
  * \return Writer or NULL if ran out of memory.
  */
-liarcWriter*
+LIArcWriter*
 liarc_writer_new ()
 {
-	liarcWriter* self;
+	LIArcWriter* self;
 
-	self = lisys_calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (LIArcWriter));
 	if (self == NULL)
 		return NULL;
 	self->close = private_memory_close;
@@ -84,12 +84,12 @@ liarc_writer_new ()
 	return self;
 }
 
-liarcWriter*
+LIArcWriter*
 liarc_writer_new_file (const char* path)
 {
-	liarcWriter* self;
+	LIArcWriter* self;
 
-	self = lisys_calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (LIArcWriter));
 	if (self == NULL)
 		return NULL;
 	self->close = private_file_close;
@@ -104,12 +104,12 @@ liarc_writer_new_file (const char* path)
 	return self;
 }
 
-liarcWriter*
+LIArcWriter*
 liarc_writer_new_gzip (const char* path)
 {
-	liarcWriter* self;
+	LIArcWriter* self;
 
-	self = lisys_calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (LIArcWriter));
 	if (self == NULL)
 		return NULL;
 	self->close = private_gzip_close;
@@ -130,12 +130,12 @@ liarc_writer_new_gzip (const char* path)
  * \param type The type of the packet.
  * \return Writer or NULL if ran out of memory.
  */
-liarcWriter*
+LIArcWriter*
 liarc_writer_new_packet (int type)
 {
-	liarcWriter* self;
+	LIArcWriter* self;
 
-	self = lisys_calloc (1, sizeof (liarcWriter));
+	self = lisys_calloc (1, sizeof (LIArcWriter));
 	if (self == NULL)
 		return NULL;
 	self->close = private_memory_close;
@@ -159,7 +159,7 @@ liarc_writer_new_packet (int type)
  * \param self Writer.
  */
 void
-liarc_writer_free (liarcWriter* self)
+liarc_writer_free (LIArcWriter* self)
 {
 	self->close (self);
 	lisys_free (self);
@@ -175,7 +175,7 @@ liarc_writer_free (liarcWriter* self)
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_file (liarcWriter* self,
+liarc_writer_append_file (LIArcWriter* self,
                           FILE*        file)
 {
 	int ret;
@@ -212,7 +212,7 @@ liarc_writer_append_file (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_format (liarcWriter* self,
+liarc_writer_append_format (LIArcWriter* self,
                             const char*  format,
                                          ...)
 {
@@ -269,7 +269,7 @@ liarc_writer_append_format (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_formatv (liarcWriter* self,
+liarc_writer_append_formatv (LIArcWriter* self,
                              const char*  format,
                              va_list      args)
 {
@@ -321,7 +321,7 @@ liarc_writer_append_formatv (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_string (liarcWriter* self,
+liarc_writer_append_string (LIArcWriter* self,
                             const char*  string)
 {
 	if (!self->write (self, string, strlen (string)))
@@ -337,7 +337,7 @@ liarc_writer_append_string (liarcWriter* self,
  * \brief Appends a floating point number to the end of the writer.
  */
 int
-liarc_writer_append_float (liarcWriter* self,
+liarc_writer_append_float (LIArcWriter* self,
                            float        value)
 {
 	uint8_t tmp[4];
@@ -372,7 +372,7 @@ liarc_writer_append_float (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_int8 (liarcWriter* self,
+liarc_writer_append_int8 (LIArcWriter* self,
                           int8_t       value)
 {
 	if (!self->write (self, &value, 1))
@@ -394,7 +394,7 @@ liarc_writer_append_int8 (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_int16 (liarcWriter* self,
+liarc_writer_append_int16 (LIArcWriter* self,
                            int16_t      value)
 {
 	value = lisys_htons (value);
@@ -417,7 +417,7 @@ liarc_writer_append_int16 (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_int32 (liarcWriter* self,
+liarc_writer_append_int32 (LIArcWriter* self,
                            int32_t      value)
 {
 	value = lisys_htonl (value);
@@ -439,7 +439,7 @@ liarc_writer_append_int32 (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_nul (liarcWriter* self)
+liarc_writer_append_nul (LIArcWriter* self)
 {
 	uint8_t value = 0;
 
@@ -462,7 +462,7 @@ liarc_writer_append_nul (liarcWriter* self)
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_uint8 (liarcWriter* self,
+liarc_writer_append_uint8 (LIArcWriter* self,
                            uint8_t      value)
 {
 	if (!self->write (self, &value, 1))
@@ -484,7 +484,7 @@ liarc_writer_append_uint8 (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_uint16 (liarcWriter* self,
+liarc_writer_append_uint16 (LIArcWriter* self,
                             uint16_t     value)
 {
 	value = lisys_htons (value);
@@ -506,7 +506,7 @@ liarc_writer_append_uint16 (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_uint32 (liarcWriter* self,
+liarc_writer_append_uint32 (LIArcWriter* self,
                             uint32_t     value)
 {
 	value = lisys_htonl (value);
@@ -530,7 +530,7 @@ liarc_writer_append_uint32 (liarcWriter* self,
  * \return One on success, zero on failure.
  */
 int
-liarc_writer_append_raw (liarcWriter* self,
+liarc_writer_append_raw (LIArcWriter* self,
                          const void*  data,
                          int          size)
 {
@@ -554,7 +554,7 @@ liarc_writer_append_raw (liarcWriter* self,
  * \param self Writer.
  */
 void
-liarc_writer_clear (liarcWriter* self)
+liarc_writer_clear (LIArcWriter* self)
 {
 	char* tmp;
 
@@ -590,7 +590,7 @@ liarc_writer_clear (liarcWriter* self)
  * \return Nonzero if exactly the requested amount was discarded.
  */
 int
-liarc_writer_erase (liarcWriter* self,
+liarc_writer_erase (LIArcWriter* self,
                     int          size)
 {
 	assert (self->write == private_memory_write);
@@ -618,7 +618,7 @@ liarc_writer_erase (liarcWriter* self,
  * \return Write buffer.
  */
 const char*
-liarc_writer_get_buffer (const liarcWriter* self)
+liarc_writer_get_buffer (const LIArcWriter* self)
 {
 	assert (self->write == private_memory_write);
 
@@ -634,7 +634,7 @@ liarc_writer_get_buffer (const liarcWriter* self)
  * \return Buffer length.
  */
 int
-liarc_writer_get_length (const liarcWriter* self)
+liarc_writer_get_length (const LIArcWriter* self)
 {
 	assert (self->write == private_memory_write);
 
@@ -644,13 +644,13 @@ liarc_writer_get_length (const liarcWriter* self)
 /****************************************************************************/
 
 static void
-private_file_close (liarcWriter* self)
+private_file_close (LIArcWriter* self)
 {
 	fclose (self->file.pointer);
 }
 
 static int
-private_file_write (liarcWriter* self,
+private_file_write (LIArcWriter* self,
                     const void*  data,
                     int          size)
 {
@@ -664,13 +664,13 @@ private_file_write (liarcWriter* self,
 }
 
 static void
-private_gzip_close (liarcWriter* self)
+private_gzip_close (LIArcWriter* self)
 {
 	gzclose (self->gzip.pointer);
 }
 
 static int
-private_gzip_write (liarcWriter* self,
+private_gzip_write (LIArcWriter* self,
                     const void*  data,
                     int          size)
 {
@@ -684,13 +684,13 @@ private_gzip_write (liarcWriter* self,
 }
 
 static void
-private_memory_close (liarcWriter* self)
+private_memory_close (LIArcWriter* self)
 {
 	lisys_free (self->memory.buffer);
 }
 
 static int
-private_memory_write (liarcWriter* self,
+private_memory_write (LIArcWriter* self,
                       const void*  data,
                       int          size)
 {

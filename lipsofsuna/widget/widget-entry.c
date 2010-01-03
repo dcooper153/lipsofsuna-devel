@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgEntry Entry
+ * \addtogroup LIWdgEntry Entry
  * @{
  */
 
@@ -26,40 +26,40 @@
 #include "widget-manager.h"
 
 static int
-private_init (liwdgEntry*   self,
-              liwdgManager* manager);
+private_init (LIWdgEntry*   self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgEntry*   self);
+private_free (LIWdgEntry*   self);
 
 static int
-private_event (liwdgEntry* self,
+private_event (LIWdgEntry* self,
                liwdgEvent* event);
 
 static void
-private_backspace (liwdgEntry* self);
+private_backspace (LIWdgEntry* self);
 
 static void
-private_rebuild (liwdgEntry* self);
+private_rebuild (LIWdgEntry* self);
 
-const liwdgClass liwdgEntryType =
+const LIWdgClass liwdg_widget_entry =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Entry", sizeof (liwdgEntry),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Entry", sizeof (LIWdgEntry),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_entry_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_entry_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgEntryType);
+	return liwdg_widget_new (manager, &liwdg_widget_entry);
 }
 
 void
-liwdg_entry_clear (liwdgEntry* self)
+liwdg_entry_clear (LIWdgEntry* self)
 {
 	char* tmp;
 
@@ -71,40 +71,40 @@ liwdg_entry_clear (liwdgEntry* self)
 }
 
 int
-liwdg_entry_get_editable (liwdgEntry* self)
+liwdg_entry_get_editable (LIWdgEntry* self)
 {
 	return self->editable;
 }
 
 void
-liwdg_entry_set_editable (liwdgEntry* self,
+liwdg_entry_set_editable (LIWdgEntry* self,
                           int         editable)
 {
 	self->editable = editable;
 }
 
-lifntFont*
-liwdg_entry_get_font (liwdgEntry* self)
+LIFntFont*
+liwdg_entry_get_font (LIWdgEntry* self)
 {
 	return self->font;
 }
 
 void
-liwdg_entry_set_font (liwdgEntry* self,
-                      lifntFont*  font)
+liwdg_entry_set_font (LIWdgEntry* self,
+                      LIFntFont*  font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 int
-liwdg_entry_get_secret (liwdgEntry* self)
+liwdg_entry_get_secret (LIWdgEntry* self)
 {
 	return self->secret;
 }
 
 void
-liwdg_entry_set_secret (liwdgEntry* self,
+liwdg_entry_set_secret (LIWdgEntry* self,
                         int         secret)
 {
 	self->secret = secret;
@@ -112,13 +112,13 @@ liwdg_entry_set_secret (liwdgEntry* self,
 }
 
 const char*
-liwdg_entry_get_text (liwdgEntry* self)
+liwdg_entry_get_text (LIWdgEntry* self)
 {
 	return self->string;
 }
 
 int
-liwdg_entry_set_text (liwdgEntry* self,
+liwdg_entry_set_text (LIWdgEntry* self,
                       const char* text)
 {
 	char* tmp;
@@ -136,8 +136,8 @@ liwdg_entry_set_text (liwdgEntry* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgEntry*   self,
-              liwdgManager* manager)
+private_init (LIWdgEntry*   self,
+              LIWdgManager* manager)
 {
 	liwdg_widget_set_focusable (LIWDG_WIDGET (self), 1);
 	self->editable = 1;
@@ -158,22 +158,22 @@ private_init (liwdgEntry*   self,
 }
 
 static void
-private_free (liwdgEntry* self)
+private_free (LIWdgEntry* self)
 {
 	lifnt_layout_free (self->text);
 	lisys_free (self->string);
 }
 
 static int
-private_event (liwdgEntry* self,
+private_event (LIWdgEntry* self,
                liwdgEvent* event)
 {
 	int len;
 	char* str;
 	char* tmp;
-	liwdgManager* manager;
-	liwdgStyle* style;
-	liwdgRect rect;
+	LIWdgManager* manager;
+	LIWdgStyle* style;
+	LIWdgRect rect;
 
 	switch (event->type)
 	{
@@ -253,11 +253,11 @@ private_event (liwdgEntry* self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_backspace (liwdgEntry* self)
+private_backspace (LIWdgEntry* self)
 {
 	int len0;
 	int len1;
@@ -293,7 +293,7 @@ private_backspace (liwdgEntry* self)
 }
 
 static void
-private_rebuild (liwdgEntry* self)
+private_rebuild (LIWdgEntry* self)
 {
 	int i;
 	int h = 0;

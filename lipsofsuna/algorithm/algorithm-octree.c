@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,34 +18,34 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgOctree Octree
+ * \addtogroup LIAlgOctree Octree
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-octree.h"
 
 static void
-private_free_node (lialgOctree* self,
-                   lialgOcnode* node,
+private_free_node (LIAlgOctree* self,
+                   LIAlgOcnode* node,
                    int          depth);
 
 static int
-private_read_node (lialgOctree*    self,
-                   lialgOcnode**   node,
+private_read_node (LIAlgOctree*    self,
+                   LIAlgOcnode**   node,
                    int             depth,
-                   limatVector*    offset,
-                   liarcReader*    reader,
-                   lialgOctreeRead callback,
+                   LIMatVector*    offset,
+                   LIArcReader*    reader,
+                   LIAlgOctreeRead callback,
                    void*           data);
 
 static int
-private_write_node (lialgOctree*     self,
-                    lialgOcnode*     node,
+private_write_node (LIAlgOctree*     self,
+                    LIAlgOcnode*     node,
                     int              depth,
-                    limatVector*     offset,
-                    liarcWriter*     writer,
-                    lialgOctreeWrite callback,
+                    LIMatVector*     offset,
+                    LIArcWriter*     writer,
+                    LIAlgOctreeWrite callback,
                     void*            data);
 
 /*****************************************************************************/
@@ -58,26 +58,26 @@ private_write_node (lialgOctree*     self,
  * \param depth The depth of the tree.
  * \return New octree or NULL.
  */
-lialgOctree*
+LIAlgOctree*
 lialg_octree_new (int depth)
 {
-	lialgOctree* self;
+	LIAlgOctree* self;
 
-	self = lisys_calloc (1, sizeof (lialgOctree));
+	self = lisys_calloc (1, sizeof (LIAlgOctree));
 	if (self == NULL)
 		return NULL;
 	self->depth = depth;
 	return self;
 }
 
-lialgOctree*
-lialg_octree_new_from_data (liarcReader*    reader,
-                            lialgOctreeRead callback,
+LIAlgOctree*
+lialg_octree_new_from_data (LIArcReader*    reader,
+                            LIAlgOctreeRead callback,
                             void*           data)
 {
 	uint8_t depth;
-	lialgOctree* self;
-	limatVector offset = { 0.0f, 0.0f, 0.0f };
+	LIAlgOctree* self;
+	LIMatVector offset = { 0.0f, 0.0f, 0.0f };
 
 	/* Read in header. */
 	if (!liarc_reader_get_uint8 (reader, &depth))
@@ -87,7 +87,7 @@ lialg_octree_new_from_data (liarcReader*    reader,
 	}
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lialgOctree));
+	self = lisys_calloc (1, sizeof (LIAlgOctree));
 	if (self == NULL)
 		return NULL;
 	self->depth = depth;
@@ -102,13 +102,13 @@ lialg_octree_new_from_data (liarcReader*    reader,
 	return self;
 }
 
-lialgOctree*
+LIAlgOctree*
 lialg_octree_new_from_file (const char*     path,
-                            lialgOctreeRead callback,
+                            LIAlgOctreeRead callback,
                             void*           data)
 {
-	liarcReader* reader;
-	lialgOctree* self;
+	LIArcReader* reader;
+	LIAlgOctree* self;
 
 	reader = liarc_reader_new_from_file (path);
 	if (reader == NULL)
@@ -127,7 +127,7 @@ lialg_octree_new_from_file (const char*     path,
  * \param self Octree.
  */
 void
-lialg_octree_free (lialgOctree* self)
+lialg_octree_free (LIAlgOctree* self)
 {
 	if (self->root != NULL)
 		private_free_node (self, self->root, 0);
@@ -135,12 +135,12 @@ lialg_octree_free (lialgOctree* self)
 }
 
 int
-lialg_octree_write (lialgOctree*     self,
-                    liarcWriter*     writer,
-                    lialgOctreeWrite callback,
+lialg_octree_write (LIAlgOctree*     self,
+                    LIArcWriter*     writer,
+                    LIAlgOctreeWrite callback,
                     void*            data)
 {
-	limatVector offset = { 0.0f, 0.0f, 0.0f };
+	LIMatVector offset = { 0.0f, 0.0f, 0.0f };
 
 	liarc_writer_append_uint8 (writer, self->depth);
 	if (writer->error)
@@ -149,15 +149,15 @@ lialg_octree_write (lialgOctree*     self,
 }
 
 void*
-lialg_octree_get_data (lialgOctree*    self,
-                       const limatVector* point)
+lialg_octree_get_data (LIAlgOctree*    self,
+                       const LIMatVector* point)
 {
 	int i;
 	int x;
 	int y;
 	int z;
-	limatVector off = *point;
-	lialgOcnode* node = self->root;
+	LIMatVector off = *point;
+	LIAlgOcnode* node = self->root;
 
 	/* Iterate branches. */
 	for (i = 0 ; i < self->depth && node != NULL ; i++)
@@ -176,16 +176,16 @@ lialg_octree_get_data (lialgOctree*    self,
 
 /* FIXME: Setting to NULL doesn't clean nodes. */
 int
-lialg_octree_set_data (lialgOctree*    self,
-                       const limatVector* point,
+lialg_octree_set_data (LIAlgOctree*    self,
+                       const LIMatVector* point,
                        void*           data)
 {
 	int i;
 	int x;
 	int y;
 	int z;
-	limatVector off = *point;
-	lialgOcnode** node = &self->root;
+	LIMatVector off = *point;
+	LIAlgOcnode** node = &self->root;
 
 	/* Create branches. */
 	for (i = 0 ; i < self->depth ; i++)
@@ -195,7 +195,7 @@ lialg_octree_set_data (lialgOctree*    self,
 		z = (off.z >= 0.5f);
 		if (*node == NULL)
 		{
-			*node = lisys_calloc (1, sizeof (lialgOcnode));
+			*node = lisys_calloc (1, sizeof (LIAlgOcnode));
 			if (*node == NULL)
 				return 0;
 		}
@@ -219,7 +219,7 @@ lialg_octree_set_data (lialgOctree*    self,
  * \return Number of elements.
  */
 int
-lialg_octree_get_size (const lialgOctree* self)
+lialg_octree_get_size (const LIAlgOctree* self)
 {
 	return 1 << self->depth;
 }
@@ -227,8 +227,8 @@ lialg_octree_get_size (const lialgOctree* self)
 /*****************************************************************************/
 
 static void
-private_free_node (lialgOctree* self,
-                   lialgOcnode* node,
+private_free_node (LIAlgOctree* self,
+                   LIAlgOcnode* node,
                    int          depth)
 {
 	if (depth++ == self->depth)
@@ -244,12 +244,12 @@ private_free_node (lialgOctree* self,
 }
 
 static int 
-private_read_node (lialgOctree*    self,
-                   lialgOcnode**   node,
+private_read_node (LIAlgOctree*    self,
+                   LIAlgOcnode**   node,
                    int             depth,
-                   limatVector*    offset,
-                   liarcReader*    reader,
-                   lialgOctreeRead callback,
+                   LIMatVector*    offset,
+                   LIArcReader*    reader,
+                   LIAlgOctreeRead callback,
                    void*           data)
 {
 	int x;
@@ -257,7 +257,7 @@ private_read_node (lialgOctree*    self,
 	int z;
 	uint8_t bit = 1;
 	uint8_t mask;
-	limatVector suboff;
+	LIMatVector suboff;
 
 	/* Read leaves. */
 	if (depth++ == self->depth)
@@ -268,7 +268,7 @@ private_read_node (lialgOctree*    self,
 	}
 
 	/* Read branch header. */
-	*node = lisys_calloc (1, sizeof (lialgOcnode));
+	*node = lisys_calloc (1, sizeof (LIAlgOcnode));
 	if (*node == NULL)
 		return 0;
 	if (!liarc_reader_get_uint8 (reader, &mask) || !mask)
@@ -295,19 +295,19 @@ private_read_node (lialgOctree*    self,
 }
 
 static int
-private_write_node (lialgOctree*     self,
-                    lialgOcnode*     node,
+private_write_node (LIAlgOctree*     self,
+                    LIAlgOcnode*     node,
                     int              depth,
-                    limatVector*     offset,
-                    liarcWriter*     writer,
-                    lialgOctreeWrite callback,
+                    LIMatVector*     offset,
+                    LIArcWriter*     writer,
+                    LIAlgOctreeWrite callback,
                     void*            data)
 {
 	int x;
 	int y;
 	int z;
 	uint8_t mask;
-	limatVector suboff;
+	LIMatVector suboff;
 
 	/* Write leaf data. */
 	if (depth++ == self->depth)

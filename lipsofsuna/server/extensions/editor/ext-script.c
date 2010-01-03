@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-editor.h"
 #include "ext-module.h"
 
@@ -44,18 +44,18 @@
  * -- @param self Editor class.
  * function Editor.save(self)
  */
-static void Editor_save (liscrArgs* args)
+static void Editor_save (LIScrArgs* args)
 {
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-	lisrv_server_save (module->server);
+	liser_server_save (module->server);
 }
 
 /*****************************************************************************/
 
 void
-liextEditorScript (liscrClass* self,
+liext_script_editor (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);

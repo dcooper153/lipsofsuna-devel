@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,22 +18,22 @@
 /**
  * \addtogroup livid Video
  * @{
- * \addtogroup lividFeatures Features
+ * \addtogroup LIVidFeatures Features
  * @{
  */
 
 #ifndef __VIDEO_FEATURES_H__
 #define __VIDEO_FEATURES_H__
 
-typedef struct _lividFeatures lividFeatures;
-struct _lividFeatures
+typedef struct _LIVidFeatures LIVidFeatures;
+struct _LIVidFeatures
 {
 	int anisotropic_level;
 	int shader_model;
 	int max_texture_units;
 };
 
-extern lividFeatures livid_features;
+extern LIVidFeatures livid_features;
 
 void
 livid_features_init ();

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,38 +29,38 @@
 
 #include "ext-module.h"
 
-struct _liextSkill
+struct _LIExtSkill
 {
 	float value;
 	float maximum;
-	liscrData* script;
+	LIScrData* script;
 };
 
-struct _liextSkills
+struct _LIExtSkills
 {
-	lialgStrdic* skills;
-	liextModule* module;
-	liscrData* script;
+	LIAlgStrdic* skills;
+	LIExtModule* module;
+	LIScrData* script;
 };
 
-liextSkills*
-liext_skills_new (liextModule* module);
+LIExtSkills*
+liext_skills_new (LIExtModule* module);
 
 void
-liext_skills_free (liextSkills* self);
+liext_skills_free (LIExtSkills* self);
 
 void
-liext_skills_unref (liextSkills* self);
+liext_skills_unref (LIExtSkills* self);
 
 void
-liext_skills_clear (liextSkills* self);
+liext_skills_clear (LIExtSkills* self);
 
-liextSkill*
-liext_skills_find_skill (liextSkills* self,
+LIExtSkill*
+liext_skills_find_skill (LIExtSkills* self,
                          const char*  name);
 
 int
-liext_skills_set_skill (liextSkills* self,
+liext_skills_set_skill (LIExtSkills* self,
                         const char*  name,
                         float        value,
                         float        maximum);

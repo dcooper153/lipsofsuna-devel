@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 /*****************************************************************************/
 
@@ -48,7 +48,7 @@ Extension_new (lua_State* lua)
 {
 	int ret;
 	const char* name;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_EXTENSION);
 	name = luaL_checkstring (lua, 2);
@@ -61,7 +61,7 @@ Extension_new (lua_State* lua)
 /*****************************************************************************/
 
 void
-licliExtensionScript (liscrClass* self,
+licli_script_extension (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_EXTENSION, data);

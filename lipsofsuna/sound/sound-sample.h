@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisnd Sound 
  * @{
- * \addtogroup lisndSample Sample 
+ * \addtogroup LISndSample Sample 
  * @{
  */
 
@@ -27,18 +27,18 @@
 
 #include "sound-system.h"
 
-typedef struct _lisndSample lisndSample;
-struct _lisndSample
+typedef struct _LISndSample LISndSample;
+struct _LISndSample
 {
 	ALuint buffer;
 };
 
-lisndSample*
-lisnd_sample_new (lisndSystem* system,
+LISndSample*
+lisnd_sample_new (LISndSystem* system,
                   const char*  file);
 
 void
-lisnd_sample_free (lisndSample* self);
+lisnd_sample_free (LISndSample* self);
 
 #endif
 

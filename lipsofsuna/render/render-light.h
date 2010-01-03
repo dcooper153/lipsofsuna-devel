@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,24 +16,24 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndLight Light
+ * \addtogroup LIRenLight Light
  * @{
  */
 
 #ifndef __RENDER_LIGHT_H__
 #define __RENDER_LIGHT_H__
 
-#include <math/lips-math.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/model.h>
 #include "render.h"
 #include "render-types.h"
 
 /* FIXME: Should be configurable. */
 #define SHADOWMAPSIZE 512
 
-struct _lirndLight
+struct _LIRenLight
 {
 	int directional;
 	int enabled;
@@ -44,12 +44,12 @@ struct _lirndLight
 	float diffuse[4];
 	float specular[4];
 	float equation[3];
-	limatMatrix projection;
-	limatMatrix modelview;
-	limatMatrix modelview_inverse;
-	limatTransform transform;
-	const limdlNode* node;
-	lirndScene* scene;
+	LIMatMatrix projection;
+	LIMatMatrix modelview;
+	LIMatMatrix modelview_inverse;
+	LIMatTransform transform;
+	const LIMdlNode* node;
+	LIRenScene* scene;
 	struct
 	{
 		GLuint fbo;
@@ -57,74 +57,74 @@ struct _lirndLight
 	} shadow;
 };
 
-lirndLight*
-lirnd_light_new (lirndScene*  scene,
+LIRenLight*
+liren_light_new (LIRenScene*  scene,
                  const float* color,
                  const float* equation,
                  float        cutoff,
                  float        exponent,
                  int          shadow);
 
-lirndLight*
-lirnd_light_new_directional (lirndScene*  scene,
+LIRenLight*
+liren_light_new_directional (LIRenScene*  scene,
                              const float* color);
 
-lirndLight*
-lirnd_light_new_from_model (lirndScene*      scene,
-                            const limdlNode* light);
+LIRenLight*
+liren_light_new_from_model (LIRenScene*      scene,
+                            const LIMdlNode* light);
 
 void
-lirnd_light_free (lirndLight* self);
+liren_light_free (LIRenLight* self);
 
 int
-lirnd_light_compare (const lirndLight* self,
-                     const lirndLight* light);
+liren_light_compare (const LIRenLight* self,
+                     const LIRenLight* light);
 
 void
-lirnd_light_update (lirndLight* self);
+liren_light_update (LIRenLight* self);
 
 void
-lirnd_light_set_ambient (lirndLight*  self,
+liren_light_set_ambient (LIRenLight*  self,
                          const float* value);
 
 int
-lirnd_light_get_bounds (const lirndLight* self,
-                        limatAabb*        result);
+liren_light_get_bounds (const LIRenLight* self,
+                        LIMatAabb*        result);
 
 void
-lirnd_light_get_direction (const lirndLight* self,
-                           limatVector*      value);
+liren_light_get_direction (const LIRenLight* self,
+                           LIMatVector*      value);
 
 void
-lirnd_light_set_direction (lirndLight*        self,
-                           const limatVector* value);
+liren_light_set_direction (LIRenLight*        self,
+                           const LIMatVector* value);
 
 void
-lirnd_light_set_directional (lirndLight* self,
+liren_light_set_directional (LIRenLight* self,
                              int         value);
 
 int
-lirnd_light_get_enabled (const lirndLight* self);
+liren_light_get_enabled (const LIRenLight* self);
 
 void
-lirnd_light_get_modelview (const lirndLight* self,
-                           limatMatrix*      value);
+liren_light_get_modelview (const LIRenLight* self,
+                           LIMatMatrix*      value);
 
 void
-lirnd_light_get_transform (lirndLight*     self,
-                           limatTransform* value);
+liren_light_get_transform (LIRenLight*     self,
+                           LIMatTransform* value);
 
 void
-lirnd_light_set_transform (lirndLight*           self,
-                           const limatTransform* transform);
+liren_light_set_transform (LIRenLight*           self,
+                           const LIMatTransform* transform);
 
 void
-lirnd_light_get_projection (const lirndLight* self,
-                            limatMatrix*      value);
+liren_light_get_projection (const LIRenLight* self,
+                            LIMatMatrix*      value);
 
 void
-lirnd_light_set_projection (lirndLight*        self,
-                            const limatMatrix* value);
+liren_light_set_projection (LIRenLight*        self,
+                            const LIMatMatrix* value);
 
 #endif
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgTree Tree
+ * \addtogroup LIWdgTree Tree
  * @{
  */
 
@@ -27,77 +27,77 @@
 
 #include "widget-manager.h"
 
-#define LIWDG_TREE(o) ((liwdgTree*)(o))
+#define LIWDG_TREE(o) ((LIWdgTree*)(o))
 
-typedef struct _liwdgTree liwdgTree;
-typedef struct _liwdgTreerow liwdgTreerow;
+typedef struct _LIWdgTree LIWdgTree;
+typedef struct _LIWdgTreerow LIWdgTreerow;
 
-extern const liwdgClass liwdgTreeType;
+extern const LIWdgClass liwdg_widget_tree;
 
-liwdgWidget*
-liwdg_tree_new (liwdgManager* manager);
-
-void
-liwdg_tree_clear (liwdgTree* self);
+LIWdgWidget*
+liwdg_tree_new (LIWdgManager* manager);
 
 void
-liwdg_tree_foreach (liwdgTree* self,
+liwdg_tree_clear (LIWdgTree* self);
+
+void
+liwdg_tree_foreach (LIWdgTree* self,
                     void     (*call)());
 
-liwdgTreerow*
-liwdg_tree_get_active (liwdgTree* self);
+LIWdgTreerow*
+liwdg_tree_get_active (LIWdgTree* self);
 
-liwdgTreerow*
-liwdg_tree_get_root (liwdgTree* self);
+LIWdgTreerow*
+liwdg_tree_get_root (LIWdgTree* self);
 
-liwdgTreerow*
-liwdg_treerow_append_row (liwdgTreerow* self,
+LIWdgTreerow*
+liwdg_treerow_append_row (LIWdgTreerow* self,
                           const char*   text,
                           void*         data);
 
 void
-liwdg_treerow_remove_row (liwdgTreerow* self,
+liwdg_treerow_remove_row (LIWdgTreerow* self,
                           int           index);
 
 void*
-liwdg_treerow_get_data (liwdgTreerow* self);
+liwdg_treerow_get_data (LIWdgTreerow* self);
 
 void
-liwdg_treerow_set_data (liwdgTreerow* self,
+liwdg_treerow_set_data (LIWdgTreerow* self,
                         void*         value);
 
 int
-liwdg_treerow_get_expanded (liwdgTreerow* self);
+liwdg_treerow_get_expanded (LIWdgTreerow* self);
 
 void
-liwdg_treerow_set_expanded (liwdgTreerow* self,
+liwdg_treerow_set_expanded (LIWdgTreerow* self,
                             int           value);
 
 int
-liwdg_treerow_get_highlighted (liwdgTreerow* self);
+liwdg_treerow_get_highlighted (LIWdgTreerow* self);
 
 void
-liwdg_treerow_set_highlighted (liwdgTreerow* self,
+liwdg_treerow_set_highlighted (LIWdgTreerow* self,
                                int           value);
 
 int
-liwdg_treerow_get_index (liwdgTreerow* self);
+liwdg_treerow_get_index (LIWdgTreerow* self);
 
-liwdgTreerow*
-liwdg_treerow_get_parent (liwdgTreerow* self);
+LIWdgTreerow*
+liwdg_treerow_get_parent (LIWdgTreerow* self);
 
-liwdgTreerow*
-liwdg_treerow_get_row (liwdgTreerow* self,
+LIWdgTreerow*
+liwdg_treerow_get_row (LIWdgTreerow* self,
                        int           index);
 
 int
-liwdg_treerow_get_row_count (liwdgTreerow* self);
+liwdg_treerow_get_row_count (LIWdgTreerow* self);
 
 const char*
-liwdg_treerow_get_text (liwdgTreerow* self);
+liwdg_treerow_get_text (LIWdgTreerow* self);
 
 int
-liwdg_treerow_set_text (liwdgTreerow* self,
+liwdg_treerow_set_text (LIWdgTreerow* self,
                         const char*   value);
 
 #endif

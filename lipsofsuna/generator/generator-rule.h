@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup ligen Generator
  * @{
- * \addtogroup ligenRule Rule
+ * \addtogroup LIGenRule Rule
  * @{
  */
 
@@ -31,16 +31,16 @@ enum
 	LIGEN_RULE_REQUIRE = 0x01
 };
 
-typedef struct _ligenRulestroke ligenRulestroke;
-struct _ligenRulestroke
+typedef struct _LIGenRulestroke LIGenRulestroke;
+struct _LIGenRulestroke
 {
 	int pos[3];
 	int brush;
 	int flags;
 };
 
-typedef struct _ligenRule ligenRule;
-struct _ligenRule
+typedef struct _LIGenRule LIGenRule;
+struct _LIGenRule
 {
 	int id;
 	int flags;
@@ -48,21 +48,21 @@ struct _ligenRule
 	struct
 	{
 		int count;
-		ligenRulestroke* array;
+		LIGenRulestroke* array;
 	} strokes;
 };
 
-ligenRule*
+LIGenRule*
 ligen_rule_new ();
 
-ligenRule*
-ligen_rule_new_copy (ligenRule* rule);
+LIGenRule*
+ligen_rule_new_copy (LIGenRule* rule);
 
 void
-ligen_rule_free (ligenRule* self);
+ligen_rule_free (LIGenRule* self);
 
 int
-ligen_rule_insert_stroke (ligenRule* self,
+ligen_rule_insert_stroke (LIGenRule* self,
                           int        x,
                           int        y,
                           int        z,
@@ -70,11 +70,11 @@ ligen_rule_insert_stroke (ligenRule* self,
                           int        brush);
 
 void
-ligen_rule_remove_stroke (ligenRule* self,
+ligen_rule_remove_stroke (LIGenRule* self,
                           int        index);
 
 int
-ligen_rule_set_name (ligenRule*  self,
+ligen_rule_set_name (LIGenRule*  self,
                      const char* value);
 
 #endif

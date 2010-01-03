@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,53 +18,53 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengModel Model
+ * \addtogroup LIEngModel Model
  * @{
  */
 
 #ifndef __ENGINE_MODEL_H__
 #define __ENGINE_MODEL_H__
 
-#include <model/lips-model.h>
-#include <physics/lips-physics.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/physics.h>
 #include "engine.h"
 #include "engine-types.h"
 
-struct _liengModel
+struct _LIEngModel
 {
 	int id;
 	int invalid;
 	char* name;
 	char* path;
-	limatAabb bounds;
-	liengEngine* engine;
-	limdlModel* model;
-	liphyShape* physics;
+	LIMatAabb bounds;
+	LIEngEngine* engine;
+	LIMdlModel* model;
+	LIPhyShape* physics;
 };
 
-liengModel*
-lieng_model_new (liengEngine* engine,
+LIEngModel*
+lieng_model_new (LIEngEngine* engine,
                  int          id,
                  const char*  dir,
                  const char*  name);
 
 void
-lieng_model_free (liengModel* self);
+lieng_model_free (LIEngModel* self);
 
 int
-lieng_model_load (liengModel* self);
+lieng_model_load (LIEngModel* self);
 
 void
-lieng_model_unload (liengModel* self);
+lieng_model_unload (LIEngModel* self);
 
 void
-lieng_model_get_bounds (const liengModel* self,
-                        limatAabb*        result);
+lieng_model_get_bounds (const LIEngModel* self,
+                        LIMatAabb*        result);
 
 void
-lieng_model_get_bounds_transform (const liengModel*     self,
-                                  const limatTransform* transform,
-                                  limatAabb*            result);
+lieng_model_get_bounds_transform (const LIEngModel*     self,
+                                  const LIMatTransform* transform,
+                                  LIMatAabb*            result);
 
 #endif
 

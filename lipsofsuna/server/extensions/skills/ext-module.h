@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,39 +27,39 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <engine/lips-engine.h>
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 
 #define LIEXT_SCRIPT_SKILLS "Lips.Skills"
 
-typedef enum _liextSkillType liextSkillType;
-typedef struct _liextSkill liextSkill;
-typedef struct _liextSkills liextSkills;
-typedef struct _liextModule liextModule;
+typedef enum _LIExtSkillType LIExtSkillType;
+typedef struct _LIExtSkill LIExtSkill;
+typedef struct _LIExtSkills LIExtSkills;
+typedef struct _LIExtModule LIExtModule;
 
-struct _liextModule
+struct _LIExtModule
 {
-	lialgPtrdic* dictionary;
-	licalHandle calls[3];
-	lisrvServer* server;
+	LIAlgPtrdic* dictionary;
+	LICalHandle calls[3];
+	LISerServer* server;
 };
 
-liextModule*
-liext_module_new (lisrvServer* server);
+LIExtModule*
+liext_module_new (LISerServer* server);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
-liextSkills*
-liext_module_find_skills (liextModule* self,
-                          liengObject* owner);
+LIExtSkills*
+liext_module_find_skills (LIExtModule* self,
+                          LIEngObject* owner);
 
 /*****************************************************************************/
 
 void
-liextSkillsScript (liscrClass* self,
+liext_script_skills (LIScrClass* self,
                    void*       data);
 
 #endif

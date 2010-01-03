@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlMaterial Material
+ * \addtogroup LIMdlMaterial Material
  * @{
  */
 
-#include <string/lips-string.h>
+#include <lipsofsuna/string.h>
 #include "model-material.h"
 
 /**
@@ -32,7 +32,7 @@
  * \return Nonzero on success.
  */
 int
-limdl_material_init (limdlMaterial* self)
+limdl_material_init (LIMdlMaterial* self)
 {
 	self->shader = listr_dup ("default");
 	if (self->shader == NULL)
@@ -63,8 +63,8 @@ limdl_material_init (limdlMaterial* self)
  * \return Nonzero on success.
  */
 int
-limdl_material_init_copy (limdlMaterial*       self,
-                          const limdlMaterial* src)
+limdl_material_init_copy (LIMdlMaterial*       self,
+                          const LIMdlMaterial* src)
 {
 	int i;
 
@@ -77,13 +77,13 @@ limdl_material_init_copy (limdlMaterial*       self,
 	}
 	if (src->textures.count)
 	{
-		self->textures.array = lisys_calloc (src->textures.count, sizeof (limdlTexture));
+		self->textures.array = lisys_calloc (src->textures.count, sizeof (LIMdlTexture));
 		if (self->textures.array == NULL)
 		{
 			lisys_free (self->shader);
 			return 0;
 		}
-		memcpy (self->textures.array, src->textures.array, src->textures.count * sizeof (limdlTexture));
+		memcpy (self->textures.array, src->textures.array, src->textures.count * sizeof (LIMdlTexture));
 		for (i = 0 ; i < src->textures.count ; i++)
 		{
 			self->textures.array[i].string = listr_dup (src->textures.array[i].string);
@@ -107,7 +107,7 @@ limdl_material_init_copy (limdlMaterial*       self,
  * \param self Material.
  */
 void
-limdl_material_clear_textures (limdlMaterial* self)
+limdl_material_clear_textures (LIMdlMaterial* self)
 {
 	int i;
 
@@ -126,8 +126,8 @@ limdl_material_clear_textures (limdlMaterial* self)
  * \return Nonzero if the materials are identical.
  */
 int
-limdl_material_compare (const limdlMaterial* self,
-                        const limdlMaterial* material)
+limdl_material_compare (const LIMdlMaterial* self,
+                        const LIMdlMaterial* material)
 {
 	int i;
 
@@ -163,8 +163,8 @@ limdl_material_compare (const limdlMaterial* self,
  * \return Nonzero on success.
  */
 int
-limdl_material_read (limdlMaterial* self,
-                     liarcReader*   reader)
+limdl_material_read (LIMdlMaterial* self,
+                     LIArcReader*   reader)
 {
 	int i;
 	uint32_t tmp[4];
@@ -196,7 +196,7 @@ limdl_material_read (limdlMaterial* self,
 	/* Read textures. */
 	if (self->textures.count > 0)
 	{
-		self->textures.array = lisys_calloc (self->textures.count, sizeof (limdlTexture));
+		self->textures.array = lisys_calloc (self->textures.count, sizeof (LIMdlTexture));
 		if (self->textures.array == NULL)
 			return 0;
 		for (i = 0 ; i < self->textures.count ; i++)
@@ -225,11 +225,11 @@ limdl_material_read (limdlMaterial* self,
  * \return Nonzero on success.
  */
 int
-limdl_material_realloc_textures (limdlMaterial* self,
+limdl_material_realloc_textures (LIMdlMaterial* self,
                                  int            count)
 {
 	int i;
-	limdlTexture* tmp;
+	LIMdlTexture* tmp;
 
 	if (count == self->textures.count)
 		return 1;
@@ -242,14 +242,14 @@ limdl_material_realloc_textures (limdlMaterial* self,
 	{
 		for (i = count ; i < self->textures.count ; i++)
 			lisys_free (self->textures.array[i].string);
-		tmp = lisys_realloc (self->textures.array, count * sizeof (limdlTexture));
+		tmp = lisys_realloc (self->textures.array, count * sizeof (LIMdlTexture));
 		if (tmp != NULL)
 			self->textures.array = tmp;
 		self->textures.count = count;
 	}
 	else
 	{
-		tmp = lisys_realloc (self->textures.array, count * sizeof (limdlTexture));
+		tmp = lisys_realloc (self->textures.array, count * sizeof (LIMdlTexture));
 		if (tmp == NULL)
 			return 0;
 		self->textures.array = tmp;
@@ -275,11 +275,11 @@ limdl_material_realloc_textures (limdlMaterial* self,
  * \return Nonzero on success.
  */
 int
-limdl_material_write (limdlMaterial* self,
-                      liarcWriter*   writer)
+limdl_material_write (LIMdlMaterial* self,
+                      LIArcWriter*   writer)
 {
 	int i;
-	limdlTexture* texture;
+	LIMdlTexture* texture;
 
 	if (!liarc_writer_append_uint32 (writer, self->flags) ||
 	    !liarc_writer_append_float (writer, self->emission) ||
@@ -325,7 +325,7 @@ limdl_material_write (limdlMaterial* self,
  * \return Nonzero on success.
  */
 int
-limdl_material_set_texture (limdlMaterial* self,
+limdl_material_set_texture (LIMdlMaterial* self,
                             int            unit,
                             int            type,
                             int            flags,

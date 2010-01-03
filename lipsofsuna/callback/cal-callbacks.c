@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,44 +18,44 @@
 /**
  * \addtogroup lical Callback
  * @{
- * \addtogroup licalCallbacks Callbacks
+ * \addtogroup LICalCallbacks Callbacks
  * @{
  */
 
 #include "cal-callbacks.h"
 
-typedef struct _licalCalladdr licalCalladdr;
-struct _licalCalladdr
+typedef struct _LICalCalladdr LICalCalladdr;
+struct _LICalCalladdr
 {
 	void* object;
 	char type[32];
 };
 
-typedef struct _licalCalltype licalCalltype;
-struct _licalCalltype
+typedef struct _LICalCalltype LICalCalltype;
+struct _LICalCalltype
 {
-	licalCallfunc* funcs;
+	LICalCallfunc* funcs;
 };
 
 static void
-private_cleanup (licalCallbacks* self);
+private_cleanup (LICalCallbacks* self);
 
 static void
-private_addr_type (licalCalladdr* self,
+private_addr_type (LICalCalladdr* self,
                    void*          object,
                    const char*    type);
 
 static void
-private_free_type (licalCalltype* self);
+private_free_type (LICalCalltype* self);
 
 /*****************************************************************************/
 
-licalCallbacks*
+LICalCallbacks*
 lical_callbacks_new ()
 {
-	licalCallbacks* self;
+	LICalCallbacks* self;
 
-	self = lisys_calloc (1, sizeof (licalCallbacks));
+	self = lisys_calloc (1, sizeof (LICalCallbacks));
 	if (self == NULL)
 		return NULL;
 	self->types = lialg_memdic_new ();
@@ -69,9 +69,9 @@ lical_callbacks_new ()
 }
 
 void
-lical_callbacks_free (licalCallbacks* self)
+lical_callbacks_free (LICalCallbacks* self)
 {
-	lialgMemdicIter iter;
+	LIAlgMemdicIter iter;
 
 	private_cleanup (self);
 	LI_FOREACH_MEMDIC (iter, self->types)
@@ -81,7 +81,7 @@ lical_callbacks_free (licalCallbacks* self)
 }
 
 int
-lical_callbacks_call (licalCallbacks* self,
+lical_callbacks_call (LICalCallbacks* self,
                       void*           object,
                       const char*     type,
                       licalMarshal    marshal,
@@ -98,7 +98,7 @@ lical_callbacks_call (licalCallbacks* self,
 }
 
 int
-lical_callbacks_callva (licalCallbacks* self,
+lical_callbacks_callva (LICalCallbacks* self,
                         void*           object,
                         const char*     type,
                         licalMarshal    marshal,
@@ -106,10 +106,10 @@ lical_callbacks_callva (licalCallbacks* self,
 {
 	int ret;
 	va_list copy;
-	licalCalladdr addr;
-	licalCalltype* typ;
-	licalCallfunc* func;
-	licalCallfunc* func_next;
+	LICalCalladdr addr;
+	LICalCalltype* typ;
+	LICalCallfunc* func;
+	LICalCallfunc* func_next;
 
 	private_addr_type (&addr, object, type);
 	typ = lialg_memdic_find (self->types, &addr, sizeof (addr));
@@ -131,29 +131,29 @@ lical_callbacks_callva (licalCallbacks* self,
 }
 
 int
-lical_callbacks_insert (licalCallbacks* self,
+lical_callbacks_insert (LICalCallbacks* self,
                         void*           object,
                         const char*     type,
                         int             priority,
                         void*           call,
                         void*           data,
-                        licalHandle*    result)
+                        LICalHandle*    result)
 {
-	licalCalladdr addr;
-	licalCalltype* typ;
-	licalCallfunc* ptr;
-	licalCallfunc* func;
+	LICalCalladdr addr;
+	LICalCalltype* typ;
+	LICalCallfunc* ptr;
+	LICalCallfunc* func;
 
 	/* Clear handle. */
 	if (result != NULL)
-		memset (result, 0, sizeof (licalHandle));
+		memset (result, 0, sizeof (LICalHandle));
 
 	/* Find or create type. */
 	private_addr_type (&addr, object, type);
 	typ = lialg_memdic_find (self->types, &addr, sizeof (addr));
 	if (typ == NULL)
 	{
-		typ = lisys_calloc (1, sizeof (licalCalltype));
+		typ = lisys_calloc (1, sizeof (LICalCalltype));
 		if (typ == NULL)
 			return 0;
 		if (!lialg_memdic_insert (self->types, &addr, sizeof (addr), typ))
@@ -164,7 +164,7 @@ lical_callbacks_insert (licalCallbacks* self,
 	}
 
 	/* Allocate function. */
-	func = lisys_calloc (1, sizeof (licalCallfunc));
+	func = lisys_calloc (1, sizeof (LICalCallfunc));
 	if (func == NULL)
 		return 0;
 	func->prio = priority;
@@ -208,7 +208,7 @@ lical_callbacks_insert (licalCallbacks* self,
 }
 
 void
-lical_callbacks_update (licalCallbacks* self)
+lical_callbacks_update (LICalCallbacks* self)
 {
 	private_cleanup (self);
 }
@@ -216,10 +216,10 @@ lical_callbacks_update (licalCallbacks* self)
 /*****************************************************************************/
 
 static void
-private_cleanup (licalCallbacks* self)
+private_cleanup (LICalCallbacks* self)
 {
-	licalCallfunc* func;
-	licalCallfunc* prev;
+	LICalCallfunc* func;
+	LICalCallfunc* prev;
 
 	for (func = self->removed ; func != NULL ; func = prev)
 	{
@@ -230,20 +230,20 @@ private_cleanup (licalCallbacks* self)
 }
 
 static void
-private_addr_type (licalCalladdr* self,
+private_addr_type (LICalCalladdr* self,
                    void*          object,
                    const char*    type)
 {
-	memset (self, 0, sizeof (licalCalltype));
+	memset (self, 0, sizeof (LICalCalltype));
 	self->object = object;
 	strncpy (self->type, type, sizeof (self->type) - 1);
 }
 
 static void
-private_free_type (licalCalltype* self)
+private_free_type (LICalCalltype* self)
 {
-	licalCallfunc* func;
-	licalCallfunc* func_next;
+	LICalCallfunc* func;
+	LICalCallfunc* func_next;
 
 	for (func = self->funcs ; func != NULL ; func = func_next)
 	{

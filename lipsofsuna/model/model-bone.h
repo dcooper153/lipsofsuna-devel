@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,39 +18,39 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlBone Bone
+ * \addtogroup LIMdlBone Bone
  * @{
  */
 
 #ifndef __MODEL_BONE_H__
 #define __MODEL_BONE_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/string.h>
 #include "model-types.h"
 
-struct _limdlBone
+struct _LIMdlBone
 {
-	limatVector length;
-	limatVector tail;
+	LIMatVector length;
+	LIMatVector tail;
 };
 
 int
-limdl_bone_read (limdlNode*   self,
-                 liarcReader* reader);
+limdl_bone_read (LIMdlNode*   self,
+                 LIArcReader* reader);
 
 int
-limdl_bone_write (const limdlNode* self,
-                  liarcWriter*     writer);
+limdl_bone_write (const LIMdlNode* self,
+                  LIArcWriter*     writer);
 
 void
-limdl_bone_get_pose_head (const limdlNode* self,
-                          limatVector*     head);
+limdl_bone_get_pose_head (const LIMdlNode* self,
+                          LIMatVector*     head);
 
 void
-limdl_bone_get_pose_tail (const limdlNode* self,
-                          limatVector*     tail);
+limdl_bone_get_pose_tail (const LIMdlNode* self,
+                          LIMatVector*     tail);
 
 #endif
 

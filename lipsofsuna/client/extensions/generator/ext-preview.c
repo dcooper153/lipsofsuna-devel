@@ -46,59 +46,59 @@ static const void*
 private_base ();
 
 static int
-private_init (liextPreview* self,
-              liwdgManager* manager);
+private_init (LIExtPreview* self,
+              LIWdgManager* manager);
 
 static void
-private_free (liextPreview* self);
+private_free (LIExtPreview* self);
 
 static int
-private_event (liextPreview* self,
+private_event (LIExtPreview* self,
                liwdgEvent*   event);
 
 static int
-private_block_build (liextPreview* self,
-                     livoxBlock*   block,
-                     limatVector*  offset);
+private_block_build (LIExtPreview* self,
+                     LIVoxBlock*   block,
+                     LIMatVector*  offset);
 
 static int
-private_block_free (liextPreview*     self,
-                    livoxUpdateEvent* event);
+private_block_free (LIExtPreview*     self,
+                    LIVoxUpdateEvent* event);
 
 static int
-private_block_load (liextPreview*     self,
-                    livoxUpdateEvent* event);
+private_block_load (LIExtPreview*     self,
+                    LIVoxUpdateEvent* event);
 
 static void
-private_motion (liextPreview* self,
+private_motion (LIExtPreview* self,
                 liwdgEvent*   event);
 
 static void
-private_render_preview (liwdgWidget*  widget,
-                        liextPreview* self);
+private_render_preview (LIWdgWidget*  widget,
+                        LIExtPreview* self);
 
 /****************************************************************************/
 
-const liwdgClass liextPreviewType =
+const LIWdgClass liext_widget_preview =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorPreview", sizeof (liextPreview),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "GeneratorPreview", sizeof (LIExtPreview),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_preview_new (liwdgManager* manager,
-                   licliClient*  client)
+LIWdgWidget*
+liext_preview_new (LIWdgManager* manager,
+                   LICliClient*  client)
 {
 	const float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 0.0f, 0.001f };
-	liextPreview* data;
-	limatTransform transform;
-	liwdgWidget* self;
+	LIExtPreview* data;
+	LIMatTransform transform;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &liextPreviewType);
+	self = liwdg_widget_new (manager, &liext_widget_preview);
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_PREVIEW (self);
@@ -106,7 +106,7 @@ liext_preview_new (liwdgManager* manager,
 	data->render = client->render;
 
 	/* Allocate scene. */
-	data->scene = lirnd_scene_new (data->render);
+	data->scene = liren_scene_new (data->render);
 	if (data->scene == NULL)
 	{
 		liwdg_widget_free (self);
@@ -115,13 +115,13 @@ liext_preview_new (liwdgManager* manager,
 	LIWDG_RENDER (self)->scene = data->scene;
 
 	/* Allocate group. */
-	data->group = lirnd_group_new (data->scene);
+	data->group = liren_group_new (data->scene);
 	if (data->group == NULL)
 	{
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	lirnd_group_set_realized (data->group, 1);
+	liren_group_set_realized (data->group, 1);
 
 	/* Allocate objects. */
 	data->objects = lialg_ptrdic_new ();
@@ -177,30 +177,30 @@ liext_preview_new (liwdgManager* manager,
 	lialg_camera_warp (data->camera);
 
 	/* Create lights. */
-	data->light0 = lirnd_light_new (data->scene, diffuse, equation, M_PI, 0.0f, 0);
-	data->light1 = lirnd_light_new (data->scene, diffuse, equation, M_PI, 0.0f, 0);
+	data->light0 = liren_light_new (data->scene, diffuse, equation, M_PI, 0.0f, 0);
+	data->light1 = liren_light_new (data->scene, diffuse, equation, M_PI, 0.0f, 0);
 	if (data->light0 == NULL || data->light1 == NULL)
 	{
 		liwdg_widget_free (self);
 		return NULL;
 	}
-	lirnd_lighting_insert_light (data->scene->lighting, data->light0);
-	lirnd_lighting_insert_light (data->scene->lighting, data->light1);
+	liren_lighting_insert_light (data->scene->lighting, data->light0);
+	liren_lighting_insert_light (data->scene->lighting, data->light1);
 
 	return self;
 }
 
 void
-liext_preview_build (liextPreview* self)
+liext_preview_build (LIExtPreview* self)
 {
 	ligen_generator_rebuild_scene (self->generator);
 }
 
 int
-liext_preview_build_tile (liextPreview* self,
+liext_preview_build_tile (LIExtPreview* self,
                           int           material)
 {
-	livoxVoxel voxel;
+	LIVoxVoxel voxel;
 
 	livox_voxel_init (&voxel, material);
 	lialg_sectors_clear (self->generator->voxels->sectors);
@@ -212,28 +212,28 @@ liext_preview_build_tile (liextPreview* self,
 }
 
 int
-liext_preview_clear (liextPreview* self)
+liext_preview_clear (LIExtPreview* self)
 {
-	lialgPtrdicIter iter;
+	LIAlgPtrdicIter iter;
 
-	lirnd_group_clear (self->group);
+	liren_group_clear (self->group);
 	ligen_generator_clear_scene (self->generator);
 	LI_FOREACH_PTRDIC (iter, self->objects)
-		lirnd_object_free (iter.value);
+		liren_object_free (iter.value);
 	lialg_ptrdic_clear (self->objects);
 
 	return 1;
 }
 
 void
-liext_preview_copy_voxels (liextPreview* self,
+liext_preview_copy_voxels (LIExtPreview* self,
                            int           startx,
                            int           starty,
                            int           startz,
                            int           sizex,
                            int           sizey,
                            int           sizez,
-                           livoxVoxel*   result)
+                           LIVoxVoxel*   result)
 {
 	livox_manager_copy_voxels (self->generator->voxels,
 		LIEXT_PREVIEW_CENTER + startx,
@@ -251,45 +251,45 @@ liext_preview_copy_voxels (liextPreview* self,
  * \return Nonzero on success.
  */
 int
-liext_preview_insert_object (liextPreview*         self,
-                             const limatTransform* transform,
+liext_preview_insert_object (LIExtPreview*         self,
+                             const LIMatTransform* transform,
                              const char*           model)
 {
-	limatTransform t;
-	limatVector v;
-	liengModel* emodel;
-	lirndModel* rmodel;
-	lirndObject* object;
+	LIMatTransform t;
+	LIMatVector v;
+	LIEngModel* emodel;
+	LIRenModel* rmodel;
+	LIRenObject* object;
 
 	/* Find model. */
-	rmodel = lirnd_render_find_model (self->client->render, model);
+	rmodel = liren_render_find_model (self->client->render, model);
 	if (rmodel == NULL)
 	{
 		emodel = lieng_engine_find_model_by_name (self->client->engine, model);
 		if (emodel == NULL)
 			return 0;
-		lirnd_render_load_model (self->client->render, model, emodel->model);
-		rmodel = lirnd_render_find_model (self->client->render, model);
+		liren_render_load_model (self->client->render, model, emodel->model);
+		rmodel = liren_render_find_model (self->client->render, model);
 		if (rmodel == NULL)
 			return 0;
 	}
 
 	/* Create object. */
-	object = lirnd_object_new (self->scene, self->objects->size);
+	object = liren_object_new (self->scene, self->objects->size);
 	if (object == NULL)
 		return 0;
 	v = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
 	v = limat_vector_multiply (v, LIVOX_TILE_WIDTH);
 	t = limat_convert_vector_to_transform (v);
 	t = limat_transform_multiply (t, *transform);
-	lirnd_object_set_transform (object, &t);
-	lirnd_object_set_model (object, rmodel);
-	lirnd_object_set_realized (object, 1);
+	liren_object_set_transform (object, &t);
+	liren_object_set_model (object, rmodel);
+	liren_object_set_realized (object, 1);
 
 	/* Add to dictionary. */
 	if (!lialg_ptrdic_insert (self->objects, object, object))
 	{
-		lirnd_object_free (object);
+		liren_object_free (object);
 		return 0;
 	}
 
@@ -297,7 +297,7 @@ liext_preview_insert_object (liextPreview*         self,
 }
 
 int
-liext_preview_insert_stroke (liextPreview* self,
+liext_preview_insert_stroke (LIExtPreview* self,
                              int           x,
                              int           y,
                              int           z,
@@ -310,13 +310,13 @@ liext_preview_insert_stroke (liextPreview* self,
 }
 
 void
-liext_preview_paint_terrain (liextPreview* self,
-                             limatVector*  point,
+liext_preview_paint_terrain (LIExtPreview* self,
+                             LIMatVector*  point,
                              int           mode,
                              int           material,
                              int           axis)
 {
-	livoxVoxel voxel;
+	LIVoxVoxel voxel;
 
 	switch (mode)
 	{
@@ -346,10 +346,10 @@ liext_preview_paint_terrain (liextPreview* self,
  * \return Nonzero on success.
  */
 int
-liext_preview_replace_materials (liextPreview* self,
-                                 liarcReader*  reader)
+liext_preview_replace_materials (LIExtPreview* self,
+                                 LIArcReader*  reader)
 {
-	livoxMaterial* material;
+	LIVoxMaterial* material;
 
 	livox_manager_clear_materials (self->generator->voxels);
 	while (!liarc_reader_check_end (reader))
@@ -368,14 +368,14 @@ liext_preview_replace_materials (liextPreview* self,
 }
 
 void
-liext_preview_setup_camera (liextPreview* self,
-                            limatVector*  eye,
-                            limatVector*  ctr,
-                            limatVector*  up,
+liext_preview_setup_camera (LIExtPreview* self,
+                            LIMatVector*  eye,
+                            LIMatVector*  ctr,
+                            LIMatVector*  up,
                             int           driver)
 {
-	limatTransform transform0;
-	limatTransform transform1;
+	LIMatTransform transform0;
+	LIMatTransform transform1;
 
 	transform0.rotation = limat_quaternion_identity ();
 	transform0.position = limat_vector_init (
@@ -391,14 +391,14 @@ liext_preview_setup_camera (liextPreview* self,
 }
 
 void
-liext_preview_get_bounds (liextPreview* self,
-                          limatAabb*    aabb)
+liext_preview_get_bounds (LIExtPreview* self,
+                          LIMatAabb*    aabb)
 {
 	int i;
 	int x[2];
 	int y[2];
 	int z[2];
-	ligenStroke* stroke;
+	LIGenStroke* stroke;
 
 	aabb->min = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
 	aabb->min = limat_vector_multiply (aabb->min, LIVOX_TILE_WIDTH);
@@ -422,8 +422,8 @@ liext_preview_get_bounds (liextPreview* self,
 }
 
 void
-liext_preview_get_transform (liextPreview*   self,
-                             limatTransform* value)
+liext_preview_get_transform (LIExtPreview*   self,
+                             LIMatTransform* value)
 {
 	if (self->mode != LIEXT_PREVIEW_MODE_CAMERA)
 		*value = self->transform;
@@ -436,12 +436,12 @@ liext_preview_get_transform (liextPreview*   self,
 static const void*
 private_base ()
 {
-	return &liwdgRenderType;
+	return &liwdg_widget_render;
 }
 
 static int
-private_init (liextPreview* self,
-              liwdgManager* manager)
+private_init (LIExtPreview* self,
+              LIWdgManager* manager)
 {
 	LIWDG_RENDER (self)->custom_render_func = (void*) private_render_preview;
 	LIWDG_RENDER (self)->custom_render_data = self;
@@ -449,33 +449,33 @@ private_init (liextPreview* self,
 }
 
 static void
-private_free (liextPreview* self)
+private_free (LIExtPreview* self)
 {
-	lialgPtrdicIter iter;
+	LIAlgPtrdicIter iter;
 
 	if (self->light0 != NULL)
 	{
-		lirnd_lighting_remove_light (self->scene->lighting, self->light0);
-		lirnd_light_free (self->light0);
+		liren_lighting_remove_light (self->scene->lighting, self->light0);
+		liren_light_free (self->light0);
 	}
 	if (self->light1 != NULL)
 	{
-		lirnd_lighting_remove_light (self->scene->lighting, self->light1);
-		lirnd_light_free (self->light1);
+		liren_lighting_remove_light (self->scene->lighting, self->light1);
+		liren_light_free (self->light1);
 	}
 	if (self->objects != NULL)
 	{
 		LI_FOREACH_PTRDIC (iter, self->objects)
-			lirnd_object_free (iter.value);
+			liren_object_free (iter.value);
 		lialg_ptrdic_free (self->objects);
 	}
 	if (self->group != NULL)
-		lirnd_group_free (self->group);
+		liren_group_free (self->group);
 	if (self->camera != NULL)
 		lialg_camera_free (self->camera);
 	if (self->generator != NULL)
 	{
-		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 		ligen_generator_free (self->generator);
 	}
 	if (self->sectors != NULL)
@@ -483,17 +483,17 @@ private_free (liextPreview* self)
 	if (self->callbacks != NULL)
 		lical_callbacks_free (self->callbacks);
 	if (self->scene != NULL)
-		lirnd_scene_free (self->scene);
+		liren_scene_free (self->scene);
 }
 
 static int
-private_event (liextPreview* self,
+private_event (LIExtPreview* self,
                liwdgEvent*   event)
 {
-	limatMatrix modelview;
-	limatMatrix projection;
-	limatTransform transform;
-	liwdgRect rect;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
+	LIMatTransform transform;
+	LIWdgRect rect;
 
 	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
 	{
@@ -598,34 +598,34 @@ private_event (liextPreview* self,
 		/* Update scene. */
 		liwdg_render_set_modelview (LIWDG_RENDER (self), &modelview);
 		liwdg_render_set_projection (LIWDG_RENDER (self), &projection);
-		lirnd_scene_update (self->scene, event->update.secs);
+		liren_scene_update (self->scene, event->update.secs);
 
 		/* Setup lights. */
 		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
-		lirnd_light_set_transform (self->light0, &transform);
+		liren_light_set_transform (self->light0, &transform);
 		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
-		lirnd_light_set_transform (self->light1, &transform);
+		liren_light_set_transform (self->light1, &transform);
 	}
 
-	return liwdgRenderType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_render.event (LIWDG_WIDGET (self), event);
 }
 
 static int
-private_block_build (liextPreview* self,
-                     livoxBlock*   block,
-                     limatVector*  offset)
+private_block_build (LIExtPreview* self,
+                     LIVoxBlock*   block,
+                     LIMatVector*  offset)
 {
 	int x;
 	int y;
 	int z;
-	liengModel* emdl;
-	limatTransform transform;
-	limatVector vector;
-	lirndModel* model;
-	livoxMaterial* material;
-	livoxVoxel* voxel;
+	LIEngModel* emdl;
+	LIMatTransform transform;
+	LIMatVector vector;
+	LIRenModel* model;
+	LIVoxMaterial* material;
+	LIVoxVoxel* voxel;
 
 	/* Create new objects. */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
@@ -641,14 +641,14 @@ private_block_build (liextPreview* self,
 		material = livox_manager_find_material (self->generator->voxels, voxel->type);
 		if (material == NULL)
 			continue;
-		model = lirnd_render_find_model (self->client->render, material->model);
+		model = liren_render_find_model (self->client->render, material->model);
 		if (model == NULL)
 		{
 			emdl = lieng_engine_find_model_by_name (self->client->engine, material->model);
 			if (emdl == NULL)
 				continue;
-			lirnd_render_load_model (self->client->render, material->model, emdl->model);
-			model = lirnd_render_find_model (self->client->render, material->model);
+			liren_render_load_model (self->client->render, material->model, emdl->model);
+			model = liren_render_find_model (self->client->render, material->model);
 			if (model == NULL)
 				continue;
 		}
@@ -658,27 +658,27 @@ private_block_build (liextPreview* self,
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		transform.position = limat_vector_add (vector, *offset);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
-		lirnd_group_insert_model (self->group, model, &transform);
+		liren_group_insert_model (self->group, model, &transform);
 	}
 
 	return 1;
 }
 
 static int
-private_block_free (liextPreview*     self,
-                    livoxUpdateEvent* event)
+private_block_free (LIExtPreview*     self,
+                    LIVoxUpdateEvent* event)
 {
 	return 1;
 }
 
 static int
-private_block_load (liextPreview*     self,
-                    livoxUpdateEvent* event)
+private_block_load (LIExtPreview*     self,
+                    LIVoxUpdateEvent* event)
 {
-	limatVector offset;
-	limatVector vector;
-	livoxBlock* vblock;
-	livoxSector* vsector;
+	LIMatVector offset;
+	LIMatVector vector;
+	LIVoxBlock* vblock;
+	LIVoxSector* vsector;
 
 	/* Find sector. */
 	vsector = lialg_sectors_data_offset (self->generator->voxels->sectors, "voxel", event->sector[0], event->sector[1], event->sector[2], 0);
@@ -701,17 +701,17 @@ private_block_load (liextPreview*     self,
 }
 
 static void
-private_motion (liextPreview* self,
+private_motion (LIExtPreview* self,
                 liwdgEvent*   event)
 {
 	float amount;
-	limatVector vx;
-	limatVector vy;
-	limatVector axis;
-	limatVector delta;
-	limatQuaternion quat;
-	limatTransform transform;
-	limatTransform transform1;
+	LIMatVector vx;
+	LIMatVector vy;
+	LIMatVector axis;
+	LIMatVector delta;
+	LIMatQuaternion quat;
+	LIMatTransform transform;
+	LIMatTransform transform1;
 
 	self->drag.x += event->motion.dx;
 	self->drag.y += event->motion.dy;
@@ -792,14 +792,14 @@ private_motion (liextPreview* self,
 }
 
 static void
-private_render_preview (liwdgWidget*  widget,
-                        liextPreview* self)
+private_render_preview (LIWdgWidget*  widget,
+                        LIExtPreview* self)
 {
 	int i;
 	int x[2];
 	int y[2];
 	int z[2];
-	ligenStroke* stroke;
+	LIGenStroke* stroke;
 
 	/* Render stroke bounds. */
 	glDisable (GL_DEPTH_TEST);

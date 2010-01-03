@@ -22,9 +22,9 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <system/lips-system.h>
-#include "lips-client.h"
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/client.h>
 
 /* @luadoc
  * module "Core.Client.Client"
@@ -45,10 +45,10 @@
  * -- @param args Arguments.
  * function Client.cycle_focus(self, args)
  */
-static void Client_cycle_focus (liscrArgs* args)
+static void Client_cycle_focus (LIScrArgs* args)
 {
 	int prev = 0;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_gets_bool (args, "backward", &prev);
@@ -66,10 +66,10 @@ static void Client_cycle_focus (liscrArgs* args)
  * -- @param args Arguments.
  * function Client.cycle_focus(self, args)
  */
-static void Client_cycle_window_focus (liscrArgs* args)
+static void Client_cycle_window_focus (LIScrArgs* args)
 {
 	int prev = 0;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_gets_bool (args, "backward", &prev);
@@ -88,11 +88,11 @@ static void Client_cycle_window_focus (liscrArgs* args)
  * -- @return Object or nil.
  * function Client.find_object(self, args)
  */
-static void Client_find_object (liscrArgs* args)
+static void Client_find_object (LIScrArgs* args)
 {
 	int id;
-	liengObject* object;
-	licliClient* client;
+	LIEngObject* object;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	if (!liscr_args_gets_int (args, "id", &id))
@@ -117,11 +117,11 @@ static void Client_find_object (liscrArgs* args)
  * -- @return True on success.
  * function Client.host(self, args)
  */
-static void Client_host (liscrArgs* args)
+static void Client_host (LIScrArgs* args)
 {
 	const char* name = NULL;
 	const char* pass = NULL;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_gets_string (args, "login", &name);
@@ -152,11 +152,11 @@ static void Client_host (liscrArgs* args)
  * -- @return True on success.
  * function Client.join(self, args)
  */
-static void Client_join (liscrArgs* args)
+static void Client_join (LIScrArgs* args)
 {
 	const char* name = NULL;
 	const char* pass = NULL;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_gets_string (args, "login", &name);
@@ -181,12 +181,12 @@ static void Client_join (liscrArgs* args)
  * -- @param args Arguments.
  * function Client.send(self, args)
  */
-static void Client_send (liscrArgs* args)
+static void Client_send (LIScrArgs* args)
 {
 	int reliable = 1;
-	licliClient* client;
-	liscrData* data;
-	liscrPacket* packet;
+	LICliClient* client;
+	LIScrData* data;
+	LIScrPacket* packet;
 
 	if (liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 	{
@@ -209,12 +209,12 @@ static void Client_send (liscrArgs* args)
  * -- @name Client.cursor_pos
  * -- @class table
  */
-static void Client_getter_cursor_pos (liscrArgs* args)
+static void Client_getter_cursor_pos (LIScrArgs* args)
 {
 	int x;
 	int y;
-	licliClient* client;
-	limatVector tmp;
+	LICliClient* client;
+	LIMatVector tmp;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	client->video.SDL_GetMouseState (&x, &y);
@@ -228,17 +228,17 @@ static void Client_getter_cursor_pos (liscrArgs* args)
  * -- @name Client.moving
  * -- @class table
  */
-static void Client_getter_moving (liscrArgs* args)
+static void Client_getter_moving (LIScrArgs* args)
 {
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_seti_bool (args, licli_client_get_moving (client));
 }
-static void Client_setter_moving (liscrArgs* args)
+static void Client_setter_moving (LIScrArgs* args)
 {
 	int value;
-	licliClient* client;
+	LICliClient* client;
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
@@ -253,11 +253,11 @@ static void Client_setter_moving (liscrArgs* args)
  * -- @name Client.root
  * -- @class table
  */
-static void Client_setter_root (liscrArgs* args)
+static void Client_setter_root (LIScrArgs* args)
 {
-	licliClient* client;
-	liscrData* data;
-	liwdgWidget* window;
+	LICliClient* client;
+	LIScrData* data;
+	LIWdgWidget* window;
 
 	/* Detach old root widget. */
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
@@ -286,10 +286,10 @@ static void Client_setter_root (liscrArgs* args)
  * -- @name Client.title
  * -- @class table
  */
-static void Client_setter_title (liscrArgs* args)
+static void Client_setter_title (LIScrArgs* args)
 {
 	const char* value;
-	licliClient* client;
+	LICliClient* client;
 
 	if (liscr_args_geti_string (args, 0, &value))
 	{
@@ -301,7 +301,7 @@ static void Client_setter_title (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licliClientScript (liscrClass* self,
+licli_script_client (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);

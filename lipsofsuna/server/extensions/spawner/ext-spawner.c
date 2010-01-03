@@ -24,18 +24,18 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-spawner.h"
 
 #define LIEXT_SPAWNER_VERSION 0xFF
 
 static int
-private_tick (liextSpawner* self,
+private_tick (LIExtSpawner* self,
               float         secs);
 
 static int
-private_spawn (liextSpawner* self,
+private_spawn (LIExtSpawner* self,
                int           slot);
 
 /*****************************************************************************/
@@ -46,12 +46,12 @@ private_spawn (liextSpawner* self,
  * \param module Module.
  * \return Spawner logic or NULL.
  */
-liextSpawner*
-liext_spawner_new (liextModule* module)
+LIExtSpawner*
+liext_spawner_new (LIExtModule* module)
 {
-	liextSpawner* self;
+	LIExtSpawner* self;
 
-	self = lisys_calloc (1, sizeof (liextSpawner));
+	self = lisys_calloc (1, sizeof (LIExtSpawner));
 	if (self == NULL)
 		return NULL;
 	self->delay = 600.0f;
@@ -64,20 +64,20 @@ liext_spawner_new (liextModule* module)
 }
 
 void
-liext_spawner_free (liextSpawner* self)
+liext_spawner_free (LIExtSpawner* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 int
-liext_spawner_get_active (liextSpawner* self)
+liext_spawner_get_active (LIExtSpawner* self)
 {
 	return self->active;
 }
 
 int
-liext_spawner_set_active (liextSpawner* self,
+liext_spawner_set_active (LIExtSpawner* self,
                           int           value)
 {
 	if (self->active == value)
@@ -85,7 +85,7 @@ liext_spawner_set_active (liextSpawner* self,
 	if (value)
 		lical_callbacks_insert (self->server->callbacks, self->server->engine, "tick", 0, private_tick, self, self->calls + 0);
 	else
-		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	self->active = value;
 
 	return 1;
@@ -98,12 +98,12 @@ liext_spawner_set_active (liextSpawner* self,
  * \param value Spawn limit.
  */
 int
-liext_spawner_set_limit (liextSpawner* self,
+liext_spawner_set_limit (LIExtSpawner* self,
                          int           value)
 {
 	int i;
 	int count = 0;
-	liscrData* spawn;
+	LIScrData* spawn;
 
 	/* Remove all dead objects. */
 	for (i = 0 ; i < self->spawns.count ; i++)
@@ -137,10 +137,10 @@ liext_spawner_set_limit (liextSpawner* self,
 }
 
 int
-liext_spawner_set_owner (liextSpawner* self,
-                         liengObject*  value)
+liext_spawner_set_owner (LIExtSpawner* self,
+                         LIEngObject*  value)
 {
-	liextSpawner* old;
+	LIExtSpawner* old;
 
 	if (self->owner == value)
 		return 1;
@@ -179,11 +179,11 @@ liext_spawner_set_owner (liextSpawner* self,
 /*****************************************************************************/
 
 static int
-private_tick (liextSpawner* self,
+private_tick (LIExtSpawner* self,
               float         secs)
 {
 	int i;
-	liscrData* spawn;
+	LIScrData* spawn;
 
 	/* Wait for next spawn check. */
 	self->timer += secs;
@@ -226,11 +226,11 @@ private_tick (liextSpawner* self,
 }
 
 static int
-private_spawn (liextSpawner* self,
+private_spawn (LIExtSpawner* self,
                int           slot)
 {
-	liscrData* object;
-	liscrScript* script = self->server->script;
+	LIScrData* object;
+	LIScrScript* script = self->server->script;
 
 	/* Check for spawn function. */
 	lua_getfield (script->lua, LUA_GLOBALSINDEX, "Spawner");

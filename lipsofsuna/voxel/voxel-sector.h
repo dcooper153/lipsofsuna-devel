@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,88 +18,88 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxSector Sector
+ * \addtogroup LIVoxSector Sector
  * @{
  */
 
 #ifndef __VOXEL_SECTOR_H__
 #define __VOXEL_SECTOR_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <math/lips-math.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include "voxel.h"
 #include "voxel-block.h"
 #include "voxel-types.h"
 
-livoxSector*
-livox_sector_new (lialgSector* sector);
+LIVoxSector*
+livox_sector_new (LIAlgSector* sector);
 
 void
-livox_sector_free (livoxSector* self);
+livox_sector_free (LIVoxSector* self);
 
 int
-livox_sector_build_block (livoxSector* self,
+livox_sector_build_block (LIVoxSector* self,
                           int          x,
                           int          y,
                           int          z);
 
 void
-livox_sector_fill (livoxSector* self,
-                   livoxVoxel*  terrain);
+livox_sector_fill (LIVoxSector* self,
+                   LIVoxVoxel*  terrain);
 
 int
-livox_sector_read (livoxSector* self,
-                   liarcSql*    sql);
+livox_sector_read (LIVoxSector* self,
+                   LIArcSql*    sql);
 
 void
-livox_sector_update (livoxSector* self,
+livox_sector_update (LIVoxSector* self,
                      float        secs);
 
 int
-livox_sector_write (livoxSector* self,
-                    liarcSql*    sql);
+livox_sector_write (LIVoxSector* self,
+                    LIArcSql*    sql);
 
-livoxBlock*
-livox_sector_get_block (livoxSector* self,
+LIVoxBlock*
+livox_sector_get_block (LIVoxSector* self,
                         int          index);
 
 void
-livox_sector_get_bounds (const livoxSector* self,
-                         limatAabb*         result);
+livox_sector_get_bounds (const LIVoxSector* self,
+                         LIMatAabb*         result);
 
 int
-livox_sector_get_dirty (const livoxSector* self);
+livox_sector_get_dirty (const LIVoxSector* self);
 
 void
-livox_sector_set_dirty (livoxSector* self,
+livox_sector_set_dirty (LIVoxSector* self,
                         int          value);
 
 int
-livox_sector_get_empty (const livoxSector* self);
+livox_sector_get_empty (const LIVoxSector* self);
 
 void
-livox_sector_get_offset (const livoxSector* self,
+livox_sector_get_offset (const LIVoxSector* self,
                          int*               x,
                          int*               y,
                          int*               z);
 
 void
-livox_sector_get_origin (const livoxSector* self,
-                         limatVector*       result);
+livox_sector_get_origin (const LIVoxSector* self,
+                         LIMatVector*       result);
 
-livoxVoxel*
-livox_sector_get_voxel (livoxSector* sector,
+LIVoxVoxel*
+livox_sector_get_voxel (LIVoxSector* sector,
                         int          x,
                         int          y,
                         int          z);
 
 int
-livox_sector_set_voxel (livoxSector* self,
+livox_sector_set_voxel (LIVoxSector* self,
                         int          x,
                         int          y,
                         int          z,
-                        livoxVoxel   terrain);
+                        LIVoxVoxel   terrain);
 
 #endif
 

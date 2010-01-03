@@ -22,13 +22,13 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/system.h>
 
-typedef struct _licomEvent licomEvent;
-struct _licomEvent
+typedef struct _liScrEvent liScrEvent;
+struct _liScrEvent
 {
-	liscrData* data;
+	LIScrData* data;
 	int type;
 };
 
@@ -50,11 +50,11 @@ struct _licomEvent
  * -- @return New event.
  * function Event.new(self, args)
  */
-static void Event_new (liscrArgs* args)
+static void Event_new (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
-	data = licom_event_new (args->script);
+	data = liscr_event_new (args->script);
 	if (data == NULL)
 		return;
 	liscr_args_call_setters (args, data);
@@ -68,16 +68,16 @@ static void Event_new (liscrArgs* args)
  * -- @name Event.type
  * -- @class table
  */
-static void Event_getter_type (liscrArgs* args)
+static void Event_getter_type (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((licomEvent*) args->self)->type);
+	liscr_args_seti_int (args, ((liScrEvent*) args->self)->type);
 }
-static void Event_setter_type (liscrArgs* args)
+static void Event_setter_type (LIScrArgs* args)
 {
 	int value;
 
 	if (liscr_args_geti_int (args, 0, &value))
-		((licomEvent*) args->self)->type = value;
+		((liScrEvent*) args->self)->type = value;
 }
 
 /*****************************************************************************/
@@ -89,7 +89,7 @@ static void Event_setter_type (liscrArgs* args)
  * \param data Pointer to script.
  */
 void
-licomEventScript (liscrClass* self,
+liscr_script_event (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_insert_cfunc (self, "new", Event_new);
@@ -104,15 +104,15 @@ licomEventScript (liscrClass* self,
  * \param script Script.
  * \return New event or NULL.
  */
-liscrData*
-licom_event_new (liscrScript* script)
+LIScrData*
+liscr_event_new (LIScrScript* script)
 {
-	liscrData* self;
+	LIScrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (licomEvent), LISCR_SCRIPT_EVENT);
+	self = liscr_data_new_alloc (script, sizeof (liScrEvent), LISCR_SCRIPT_EVENT);
 	if (self == NULL)
 		return NULL;
-	((licomEvent*) self->data)->data = self;
+	((liScrEvent*) self->data)->data = self;
 
 	return self;
 }
@@ -126,16 +126,16 @@ licom_event_new (liscrScript* script)
  * \param args List of fields to set.
  * \return New event or NULL.
  */
-liscrData*
-licom_event_newv (liscrScript* script,
+LIScrData*
+liscr_event_newv (LIScrScript* script,
                   va_list      args)
 {
-	liscrData* self;
+	LIScrData* self;
 
-	self = licom_event_new (script);
+	self = liscr_event_new (script);
 	if (self == NULL)
 		return NULL;
-	licom_event_setv (self, args);
+	liscr_event_setv (self, args);
 
 	return self;
 }
@@ -149,15 +149,15 @@ licom_event_newv (liscrScript* script,
  * \param ... List of fields to set.
  * \return New script event or NULL.
  */
-liscrData*
-licom_event_newva (liscrScript* script,
+LIScrData*
+liscr_event_newva (LIScrScript* script,
                                 ...)
 {
 	va_list args;
-	liscrData* self;
+	LIScrData* self;
 
 	va_start (args, script);
-	self = licom_event_newv (script, args);
+	self = liscr_event_newv (script, args);
 	va_end (args);
 
 	return self;
@@ -170,13 +170,13 @@ licom_event_newva (liscrScript* script,
  * \param ... List of arguments.
  */
 void
-licom_event_set (liscrData* self,
+liscr_event_set (LIScrData* self,
                             ...)
 {
 	va_list args;
 
 	va_start (args, self);
-	licom_event_setv (self, args);
+	liscr_event_setv (self, args);
 	va_end (args);
 }
 
@@ -187,7 +187,7 @@ licom_event_set (liscrData* self,
  * \param args List of arguments.
  */
 void
-licom_event_setv (liscrData* self,
+liscr_event_setv (LIScrData* self,
                   va_list    args)
 {
 	int pint;
@@ -196,7 +196,7 @@ licom_event_setv (liscrData* self,
 	float pfloat;
 	const char* type;
 	const char* name;
-	liscrScript* script = self->script;
+	LIScrScript* script = self->script;
 
 	liscr_pushpriv (script->lua, self);
 	while (1)
@@ -206,7 +206,7 @@ licom_event_setv (liscrData* self,
 		if (name == NULL)
 			break;
 
-		/* Duplicated from liscrData due to the behavior of varargs
+		/* Duplicated from LIScrData due to the behavior of varargs
 		   being undefined when passed to a function and then reused. */
 		type = va_arg (args, char*);
 		if (type == LISCR_TYPE_BOOLEAN)
@@ -253,9 +253,9 @@ licom_event_setv (liscrData* self,
  * \return Event type.
  */
 int
-licom_event_get_type (const liscrData* self)
+liscr_event_get_type (const LIScrData* self)
 {
-	licomEvent* event = self->data;
+	liScrEvent* event = self->data;
 
 	return event->type;
 }
@@ -267,10 +267,10 @@ licom_event_get_type (const liscrData* self)
  * \param type Event type.
  */
 void
-licom_event_set_type (liscrData* self,
+liscr_event_set_type (LIScrData* self,
                       int        type)
 {
-	licomEvent* event = self->data;
+	liScrEvent* event = self->data;
 
 	event->type = type;
 }

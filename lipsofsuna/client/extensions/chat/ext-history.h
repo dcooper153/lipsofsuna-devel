@@ -27,16 +27,16 @@
 #ifndef __EXT_HISTORY_H__
 #define __EXT_HISTORY_H__
 
-#include <script/lips-script.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/widget.h>
 
-#define LIEXT_WIDGET_CHAT_HISTORY(o) ((liextChatHistory*)(o))
+#define LIEXT_WIDGET_CHAT_HISTORY(o) ((LIExtChatHistory*)(o))
 
-typedef struct _liextChatHistory liextChatHistory;
-struct _liextChatHistory
+typedef struct _LIExtChatHistory LIExtChatHistory;
+struct _LIExtChatHistory
 {
-	liwdgLabel base;
-	licliClient* client;
+	LIWdgLabel base;
+	LICliClient* client;
 	struct
 	{
 		int count;
@@ -44,12 +44,12 @@ struct _liextChatHistory
 	} lines;
 };
 
-liwdgWidget*
-liext_chat_history_new (liwdgManager* manager,
-                        licliClient*  client);
+LIWdgWidget*
+liext_chat_history_new (LIWdgManager* manager,
+                        LICliClient*  client);
 
 int
-liext_chat_history_append (liextChatHistory* self,
+liext_chat_history_append (LIExtChatHistory* self,
                            const char*       message);
 
 #endif

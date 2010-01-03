@@ -27,35 +27,35 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <script/lips-script.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/voxel.h>
 
-typedef struct _liextModule liextModule;
+typedef struct _LIExtModule LIExtModule;
 
 #include "ext-block.h"
 
 #define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
 
-struct _liextModule
+struct _LIExtModule
 {
-	lialgMemdic* blocks;
-	licalHandle calls[4];
-	licliClient* client;
-	livoxManager* voxels;
+	LIAlgMemdic* blocks;
+	LICalHandle calls[4];
+	LICliClient* client;
+	LIVoxManager* voxels;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 int
-liext_module_build_all (liextModule* self);
+liext_module_build_all (LIExtModule* self);
 
 int
-liext_module_build_block (liextModule* self,
+liext_module_build_block (LIExtModule* self,
                           int          sx,
                           int          sy,
                           int          sz,
@@ -64,12 +64,12 @@ liext_module_build_block (liextModule* self,
                           int          bz);
 
 void
-liext_module_clear_all (liextModule* self);
+liext_module_clear_all (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextVoxelScript (liscrClass* self,
+liext_script_voxel (LIScrClass* self,
                   void*       data);
 
 #endif

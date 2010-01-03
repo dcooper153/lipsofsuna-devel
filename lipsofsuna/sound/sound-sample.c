@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisnd Sound 
  * @{
- * \addtogroup lisndSample Sample
+ * \addtogroup LISndSample Sample
  * @{
  */
 
@@ -26,7 +26,7 @@
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "sound-sample.h"
 
 /**
@@ -38,8 +38,8 @@
  * \param file File name.
  * \return New sample or NULL.
  */
-lisndSample*
-lisnd_sample_new (lisndSystem* system,
+LISndSample*
+lisnd_sample_new (LISndSystem* system,
                   const char*  file)
 {
 	int bs = -1;
@@ -49,11 +49,11 @@ lisnd_sample_new (lisndSystem* system,
 	ogg_int64_t pos;
 	ogg_int64_t len;
 	vorbis_info* info;
-	lisndSample* self;
+	LISndSample* self;
 	OggVorbis_File vorbis;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lisndSample));
+	self = lisys_calloc (1, sizeof (LISndSample));
 	if (self == NULL)
 		return NULL;
 
@@ -120,7 +120,7 @@ lisnd_sample_new (lisndSystem* system,
  * \param self Sample.
  */
 void
-lisnd_sample_free (lisndSample* self)
+lisnd_sample_free (LISndSample* self)
 {
 	alDeleteBuffers (1, &self->buffer);
 	lisys_free (self);

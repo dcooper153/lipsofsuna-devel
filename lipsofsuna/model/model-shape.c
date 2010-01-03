@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlShape Shape
+ * \addtogroup LIMdlShape Shape
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "model-shape.h"
 
 int
-limdl_shape_read (limdlShape*  self,
-                  liarcReader* reader)
+limdl_shape_read (LIMdlShape*  self,
+                  LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -41,7 +41,7 @@ limdl_shape_read (limdlShape*  self,
 	if (tmp)
 	{
 		self->vertices.count = tmp;
-		self->vertices.array = lisys_calloc (3 * tmp, sizeof (limatVector));
+		self->vertices.array = lisys_calloc (3 * tmp, sizeof (LIMatVector));
 		if (self->vertices.array == NULL)
 			return 0;
 	}
@@ -59,8 +59,8 @@ limdl_shape_read (limdlShape*  self,
 }
 
 int
-limdl_shape_write (const limdlShape* self,
-                   liarcWriter*      writer)
+limdl_shape_write (const LIMdlShape* self,
+                   LIArcWriter*      writer)
 {
 	int i;
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 
 /* @luadoc
@@ -43,7 +43,7 @@
  * -- @param self Voxel class.
  * Voxel.test(self)
  */
-static void Voxel_test (liscrArgs* args)
+static void Voxel_test (LIScrArgs* args)
 {
 	printf ("Voxel.test\n");
 }
@@ -51,7 +51,7 @@ static void Voxel_test (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextVoxelScript (liscrClass* self,
+liext_script_voxel (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);

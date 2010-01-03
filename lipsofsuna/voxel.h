@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,25 +15,14 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_MATH_H__
-#define __LIPS_MATH_H__
+#ifndef __LIPS_VOXEL_H__
+#define __LIPS_VOXEL_H__
 
-#include "math-aabb.h"
-#include "math-convert.h"
-#include "math-frustum.h"
-#include "math-generic.h"
-#include "math-geometry.h"
-#include "math-halton.h"
-#include "math-intersect.h"
-#include "math-matrix.h"
-#include "math-plane.h"
-#include "math-polygon.h"
-#include "math-quadratic.h"
-#include "math-quaternion.h"
-#include "math-rectangle.h"
-#include "math-transform.h"
-#include "math-triangle.h"
-#include "math-vector.h"
-#include "math-vertex.h"
+#include "voxel/voxel.h"
+#include "voxel/voxel-block.h"
+#include "voxel/voxel-iterator.h"
+#include "voxel/voxel-manager.h"
+#include "voxel/voxel-material.h"
+#include "voxel/voxel-sector.h"
 
 #endif

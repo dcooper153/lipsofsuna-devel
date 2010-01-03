@@ -24,50 +24,50 @@
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "ext-module.h"
 
 #define CULL_EPSILON 0.01f
 #define LINE (LIVOX_TILES_PER_LINE + 2)
 #define INDEX(x, y, z) ((x) + (y) * LINE + (z) * LINE * LINE)
 
-typedef struct _liextVoxel liextVoxel;
-struct _liextVoxel
+typedef struct _LIExtVoxel LIExtVoxel;
+struct _LIExtVoxel
 {
 	int mask;
-	liengModel* model;
-	limatTransform transform;
+	LIEngModel* model;
+	LIMatTransform transform;
 };
 
 static void
-private_build_quickly (liextBlock*  self,
-                       liextModule* module,
-                       liextVoxel*  voxels);
+private_build_quickly (LIExtBlock*  self,
+                       LIExtModule* module,
+                       LIExtVoxel*  voxels);
 
 static void
-private_build_slowly (liextBlock*  self,
-                       liextModule* module,
-                       liextVoxel*  voxels);
+private_build_slowly (LIExtBlock*  self,
+                       LIExtModule* module,
+                       LIExtVoxel*  voxels);
 
 static void
-private_build_physics (liextBlock*  self,
-                       liextModule* module,
-                       liextVoxel*  voxels);
+private_build_physics (LIExtBlock*  self,
+                       LIExtModule* module,
+                       LIExtVoxel*  voxels);
 
 static void
-private_merge_model (liextBlock* self,
-                     liextVoxel* voxel,
-                     limdlModel* model);
+private_merge_model (LIExtBlock* self,
+                     LIExtVoxel* voxel,
+                     LIMdlModel* model);
 
 /*****************************************************************************/
 
-liextBlock*
-liext_block_new (licliClient* client)
+LIExtBlock*
+liext_block_new (LICliClient* client)
 {
-	liextBlock* self;
+	LIExtBlock* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextBlock));
+	self = lisys_calloc (1, sizeof (LIExtBlock));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -76,12 +76,12 @@ liext_block_new (licliClient* client)
 }
 
 void
-liext_block_free (liextBlock* self)
+liext_block_free (LIExtBlock* self)
 {
 	if (self->group != NULL)
-		lirnd_group_free (self->group);
+		liren_group_free (self->group);
 	if (self->rmodel != NULL)
-		lirnd_model_free (self->rmodel);
+		liren_model_free (self->rmodel);
 	if (self->mmodel != NULL)
 		limdl_model_free (self->mmodel);
 	if (self->physics != NULL)
@@ -90,16 +90,16 @@ liext_block_free (liextBlock* self)
 }
 
 void
-liext_block_clear (liextBlock* self)
+liext_block_clear (LIExtBlock* self)
 {
 	if (self->group != NULL)
 	{
-		lirnd_group_free (self->group);
+		liren_group_free (self->group);
 		self->group = NULL;
 	}
 	if (self->rmodel != NULL)
 	{
-		lirnd_model_free (self->rmodel);
+		liren_model_free (self->rmodel);
 		self->rmodel = NULL;
 	}
 	if (self->mmodel != NULL)
@@ -115,24 +115,24 @@ liext_block_clear (liextBlock* self)
 }
 
 int
-liext_block_build (liextBlock*     self,
-                   liextModule*    module,
-                   livoxBlock*     block,
-                   livoxBlockAddr* addr)
+liext_block_build (LIExtBlock*     self,
+                   LIExtModule*    module,
+                   LIVoxBlock*     block,
+                   LIVoxBlockAddr* addr)
 {
 	int i;
 	int x;
 	int y;
 	int z;
 	int occluders[LINE * LINE * LINE];
-	liengModel* model;
-	limatTransform transform;
-	limatVector vector;
-	limatVector offset;
-	livoxMaterial* material;
-	livoxVoxel* voxel;
-	livoxVoxel voxels[LINE * LINE * LINE];
-	liextVoxel info[LIVOX_TILES_PER_BLOCK];
+	LIEngModel* model;
+	LIMatTransform transform;
+	LIMatVector vector;
+	LIMatVector offset;
+	LIVoxMaterial* material;
+	LIVoxVoxel* voxel;
+	LIVoxVoxel voxels[LINE * LINE * LINE];
+	LIExtVoxel info[LIVOX_TILES_PER_BLOCK];
 
 	/* Calculate offset. */
 	vector = limat_vector_init (addr->sector[0], addr->sector[1], addr->sector[2]);
@@ -204,18 +204,18 @@ liext_block_build (liextBlock*     self,
 	/* Create render model if not empty. */
 	if (self->mmodel != NULL)
 	{
-		self->rmodel = lirnd_model_new (self->client->render, self->mmodel, NULL);
+		self->rmodel = liren_model_new (self->client->render, self->mmodel, NULL);
 		if (self->rmodel != NULL)
 		{
-			self->group = lirnd_group_new (self->client->scene);
+			self->group = liren_group_new (self->client->scene);
 			if (self->group != NULL)
-				lirnd_group_insert_model (self->group, self->rmodel, &transform);
+				liren_group_insert_model (self->group, self->rmodel, &transform);
 		}
 	}
 
 	/* Realize if not empty. */
 	if (self->group != NULL)
-		lirnd_group_set_realized (self->group, 1);
+		liren_group_set_realized (self->group, 1);
 	if (self->physics != NULL)
 	{
 		liphy_object_set_collision_group (self->physics, LIPHY_GROUP_TILES);
@@ -229,15 +229,15 @@ liext_block_build (liextBlock*     self,
 /*****************************************************************************/
 
 static void
-private_build_quickly (liextBlock*  self,
-                       liextModule* module,
-                       liextVoxel*  voxels)
+private_build_quickly (LIExtBlock*  self,
+                       LIExtModule* module,
+                       LIExtVoxel*  voxels)
 {
 	int i = 0;
 	int x;
 	int y;
 	int z;
-	lirndModel* model;
+	LIRenModel* model;
 
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
@@ -248,33 +248,33 @@ private_build_quickly (liextBlock*  self,
 			continue;
 
 		/* Get render model. */
-		model = lirnd_render_find_model (module->client->render, voxels[i].model->name);
+		model = liren_render_find_model (module->client->render, voxels[i].model->name);
 		if (model == NULL)
 		{
-			lirnd_render_load_model (module->client->render, voxels[i].model->name, voxels[i].model->model);
-			model = lirnd_render_find_model (module->client->render, voxels[i].model->name);
+			liren_render_load_model (module->client->render, voxels[i].model->name, voxels[i].model->model);
+			model = liren_render_find_model (module->client->render, voxels[i].model->name);
 			if (model == NULL)
 				continue;
 		}
 
 		/* Add to render group. */
 		if (self->group == NULL)
-			self->group = lirnd_group_new (self->client->scene);
+			self->group = liren_group_new (self->client->scene);
 		if (self->group != NULL)
-			lirnd_group_insert_model (self->group, model, &voxels[i].transform);
+			liren_group_insert_model (self->group, model, &voxels[i].transform);
 	}
 }
 
 static void
-private_build_slowly (liextBlock*  self,
-                      liextModule* module,
-                      liextVoxel*  voxels)
+private_build_slowly (LIExtBlock*  self,
+                      LIExtModule* module,
+                      LIExtVoxel*  voxels)
 {
 	int i = 0;
 	int x;
 	int y;
 	int z;
-	limdlModel* model;
+	LIMdlModel* model;
 
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
@@ -298,9 +298,9 @@ private_build_slowly (liextBlock*  self,
 }
 
 static void
-private_build_physics (liextBlock*  self,
-                       liextModule* module,
-                       liextVoxel*  voxels)
+private_build_physics (LIExtBlock*  self,
+                       LIExtModule* module,
+                       LIExtVoxel*  voxels)
 {
 	int i = 0;
 	int x;
@@ -324,9 +324,9 @@ private_build_physics (liextBlock*  self,
 }
 
 static void
-private_merge_model (liextBlock* self,
-                     liextVoxel* voxel,
-                     limdlModel* model)
+private_merge_model (LIExtBlock* self,
+                     LIExtVoxel* voxel,
+                     LIMdlModel* model)
 {
 	int g;
 	int i;
@@ -335,12 +335,12 @@ private_merge_model (liextBlock* self,
 	int m;
 	void* ptr;
 	uint32_t indices[3];
-	lialgMemdic* accel;
-	limatTransform transform;
-	limdlFaces* faces;
-	limdlMaterial* material;
-	limdlNode* node;
-	limdlVertex verts[3];
+	LIAlgMemdic* accel;
+	LIMatTransform transform;
+	LIMdlFaces* faces;
+	LIMdlMaterial* material;
+	LIMdlNode* node;
+	LIMdlVertex verts[3];
 
 	accel = lialg_memdic_new ();
 	if (accel == NULL)
@@ -440,7 +440,7 @@ private_merge_model (liextBlock* self,
 			/* Insert vertices to model. */
 			for (k = 0 ; k < 3 ; k++)
 			{
-				ptr = lialg_memdic_find (accel, verts + k, sizeof (limdlVertex));
+				ptr = lialg_memdic_find (accel, verts + k, sizeof (LIMdlVertex));
 				if (ptr == NULL)
 				{
 					/* Add to model. */
@@ -450,7 +450,7 @@ private_merge_model (liextBlock* self,
 
 					/* Add to lookup. */
 					ptr = (void*)(intptr_t) indices[k];
-					if (!lialg_memdic_insert (accel, verts + k, sizeof (limdlVertex), ptr));
+					if (!lialg_memdic_insert (accel, verts + k, sizeof (LIMdlVertex), ptr));
 						continue;
 				}
 				else

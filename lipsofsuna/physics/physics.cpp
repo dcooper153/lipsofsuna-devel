@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyPhysics Physics
+ * \addtogroup LIPhyPhysics Physics
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "physics.h"
 #include "physics-constraint.h"
 #include "physics-object.h"
@@ -33,7 +33,7 @@
 class ConvexTestIgnore : public btCollisionWorld::ClosestConvexResultCallback
 {
 public:
-	ConvexTestIgnore (liphyObject** ignore_array, int ignore_count) :
+	ConvexTestIgnore (LIPhyObject** ignore_array, int ignore_count) :
 		btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
 	{
 		this->ignore_count = ignore_count;
@@ -42,7 +42,7 @@ public:
 	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
 	{
 		int i;
-		liphyObject* hit = (liphyObject*) result.m_hitCollisionObject->getUserPointer ();
+		LIPhyObject* hit = (LIPhyObject*) result.m_hitCollisionObject->getUserPointer ();
 		for (i = 0 ; i < this->ignore_count ; i++)
 		{
 			if (hit == this->ignore_array[i])
@@ -52,7 +52,7 @@ public:
 	}
 protected:
 	int ignore_count;
-	liphyObject** ignore_array;
+	LIPhyObject** ignore_array;
 };
 
 static bool
@@ -72,15 +72,15 @@ private_internal_tick (btDynamicsWorld* dynamics,
  * \param callbacks Callback manager.
  * \return New physics simulation or NULL.
  */
-liphyPhysics*
-liphy_physics_new (licalCallbacks* callbacks)
+LIPhyPhysics*
+liphy_physics_new (LICalCallbacks* callbacks)
 {
-	liphyPhysics* self;
+	LIPhyPhysics* self;
 	btVector3 min (-65535, -65535, -65535);
 	btVector3 max ( 65535,  65535,  65535);
 
 	/* Allocate self. */
-	self = (liphyPhysics*) lisys_calloc (1, sizeof (liphyPhysics));
+	self = (LIPhyPhysics*) lisys_calloc (1, sizeof (LIPhyPhysics));
 	if (self == NULL)
 		return NULL;
 	self->callbacks = callbacks;
@@ -128,7 +128,7 @@ liphy_physics_new (licalCallbacks* callbacks)
  * \param self Physics simulation.
  */
 void
-liphy_physics_free (liphyPhysics* self)
+liphy_physics_free (LIPhyPhysics* self)
 {
 	assert (self->contacts == NULL);
 	assert (self->constraints == NULL);
@@ -160,11 +160,11 @@ liphy_physics_free (liphyPhysics* self)
  * \return Nonzero if no collision occurred.
  */
 int
-liphy_physics_cast_ray (const liphyPhysics* self,
-                        const limatVector*  start,
-                        const limatVector*  end,
-                        limatVector*        result,
-                        limatVector*        normal)
+liphy_physics_cast_ray (const LIPhyPhysics* self,
+                        const LIMatVector*  start,
+                        const LIMatVector*  end,
+                        LIMatVector*        result,
+                        LIMatVector*        normal)
 {
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
@@ -214,15 +214,15 @@ liphy_physics_cast_ray (const liphyPhysics* self,
  * \return Nonzero if a collision occurred.
  */
 int
-liphy_physics_cast_shape (const liphyPhysics*   self,
-                          const limatTransform* start,
-                          const limatTransform* end,
-                          const liphyShape*     shape,
+liphy_physics_cast_shape (const LIPhyPhysics*   self,
+                          const LIMatTransform* start,
+                          const LIMatTransform* end,
+                          const LIPhyShape*     shape,
                           int                   group,
                           int                   mask,
-                          liphyObject**         ignore_array,
+                          LIPhyObject**         ignore_array,
                           int                   ignore_count,
-                          liphyCollision*       result)
+                          LIPhyCollision*       result)
 {
 	float best;
 	btCollisionWorld* collision;
@@ -260,7 +260,7 @@ liphy_physics_cast_shape (const liphyPhysics*   self,
 			result->point.y = test.m_hitPointWorld[1];
 			result->point.z = test.m_hitPointWorld[2];
 			if (test.m_hitCollisionObject != NULL)
-				result->object = (liphyObject*) test.m_hitCollisionObject->getUserPointer ();
+				result->object = (LIPhyObject*) test.m_hitCollisionObject->getUserPointer ();
 			else
 				result->object = NULL;
 		}
@@ -286,13 +286,13 @@ liphy_physics_cast_shape (const liphyPhysics*   self,
  * \return Nonzero if a collision occurred.
  */
 int
-liphy_physics_cast_sphere (const liphyPhysics* self,
-                           const limatVector*  start,
-                           const limatVector*  end,
+liphy_physics_cast_sphere (const LIPhyPhysics* self,
+                           const LIMatVector*  start,
+                           const LIMatVector*  end,
                            float               radius,
-                           liphyObject**       ignore_array,
+                           LIPhyObject**       ignore_array,
                            int                 ignore_count,
-                           liphyCollision*     result)
+                           LIPhyCollision*     result)
 {
 	btCollisionWorld* collision;
 	btTransform btstart (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (start->x, start->y, start->z));
@@ -316,7 +316,7 @@ liphy_physics_cast_sphere (const liphyPhysics* self,
 	result->point.y = test.m_hitPointWorld[1];
 	result->point.z = test.m_hitPointWorld[2];
 	if (test.m_hitCollisionObject != NULL)
-		result->object = (liphyObject*) test.m_hitCollisionObject->getUserPointer ();
+		result->object = (LIPhyObject*) test.m_hitCollisionObject->getUserPointer ();
 	else
 		result->object = NULL;
 
@@ -332,17 +332,17 @@ liphy_physics_cast_sphere (const liphyPhysics* self,
  * \param object Object.
  */
 void
-liphy_physics_clear_constraints (liphyPhysics* self,
-                                 liphyObject*  object)
+liphy_physics_clear_constraints (LIPhyPhysics* self,
+                                 LIPhyObject*  object)
 {
-	lialgList* ptr;
-	lialgList* next;
-	liphyConstraint* constraint;
+	LIAlgList* ptr;
+	LIAlgList* next;
+	LIPhyConstraint* constraint;
 
 	for (ptr = self->constraints ; ptr != NULL ; ptr = next)
 	{
 		next = ptr->next;
-		constraint = (liphyConstraint*) ptr->data;
+		constraint = (LIPhyConstraint*) ptr->data;
 		if (constraint->object0 == object || constraint->object1 == object)
 		{
 			lialg_list_remove (&self->constraints, ptr);
@@ -361,17 +361,17 @@ liphy_physics_clear_constraints (liphyPhysics* self,
  * \param object Object.
  */
 void
-liphy_physics_clear_contacts (liphyPhysics* self,
-                              liphyObject*  object)
+liphy_physics_clear_contacts (LIPhyPhysics* self,
+                              LIPhyObject*  object)
 {
-	lialgList* ptr;
-	lialgList* next;
-	liphyContactRecord* record;
+	LIAlgList* ptr;
+	LIAlgList* next;
+	LIPhyContactRecord* record;
 
 	for (ptr = self->contacts ; ptr != NULL ; ptr = next)
 	{
 		next = ptr->next;
-		record = (liphyContactRecord*) ptr->data;
+		record = (LIPhyContactRecord*) ptr->data;
 		if (record->object0 == object || record->object1 == object)
 		{
 			if (self->contacts_iter == ptr)
@@ -389,12 +389,12 @@ liphy_physics_clear_contacts (liphyPhysics* self,
  * \param secs Tick length in seconds.
  */
 void
-liphy_physics_update (liphyPhysics* self,
+liphy_physics_update (LIPhyPhysics* self,
                       float         secs)
 {
-	lialgList* ptr;
-	liphyContact contact;
-	liphyContactRecord* record;
+	LIAlgList* ptr;
+	LIPhyContact contact;
+	LIPhyContactRecord* record;
 
 	/* Step simulation. */
 	self->dynamics->stepSimulation (secs, 20);
@@ -403,7 +403,7 @@ liphy_physics_update (liphyPhysics* self,
 	for (ptr = self->contacts ; ptr != NULL ; ptr = self->contacts_iter)
 	{
 		self->contacts_iter = ptr->next;
-		record = (liphyContactRecord*) ptr->data;
+		record = (LIPhyContactRecord*) ptr->data;
 		lialg_list_remove (&self->contacts, ptr);
 		contact.impulse = record->impulse;
 		contact.point = record->point;
@@ -430,7 +430,7 @@ liphy_physics_update (liphyPhysics* self,
  * \return Userdata.
  */
 void*
-liphy_physics_get_userdata (liphyPhysics* self)
+liphy_physics_get_userdata (LIPhyPhysics* self)
 {
 	return self->userdata;
 }
@@ -442,7 +442,7 @@ liphy_physics_get_userdata (liphyPhysics* self)
  * \param data Userdata.
  */
 void
-liphy_physics_set_userdata (liphyPhysics* self,
+liphy_physics_set_userdata (LIPhyPhysics* self,
                             void*         data)
 {
 	self->userdata = data;
@@ -455,15 +455,15 @@ private_contact_processed (btManifoldPoint& point,
                            void*            body0,
                            void*            body1)
 {
-	limatVector momentum0;
-	limatVector momentum1;
-	liphyObject* object;
-	liphyContactRecord contact;
-	liphyContactRecord* tmp;
+	LIMatVector momentum0;
+	LIMatVector momentum1;
+	LIPhyObject* object;
+	LIPhyContactRecord contact;
+	LIPhyContactRecord* tmp;
 
 	/* Get objects. */
-	contact.object0 = (liphyObject*)((btCollisionObject*) body0)->getUserPointer ();
-	contact.object1 = (liphyObject*)((btCollisionObject*) body1)->getUserPointer ();
+	contact.object0 = (LIPhyObject*)((btCollisionObject*) body0)->getUserPointer ();
+	contact.object1 = (LIPhyObject*)((btCollisionObject*) body1)->getUserPointer ();
 	if (contact.object0 != NULL) object = contact.object0;
 	else if (contact.object1 == NULL) object = contact.object1;
 	else return false;
@@ -487,7 +487,7 @@ private_contact_processed (btManifoldPoint& point,
 
 	/* Manipulating the physics state in the contact callback is dangerous
 	   so let's store the contact to a list and process it later. */
-	tmp = (liphyContactRecord*) lisys_calloc (1, sizeof (liphyContactRecord));
+	tmp = (LIPhyContactRecord*) lisys_calloc (1, sizeof (LIPhyContactRecord));
 	if (tmp == NULL)
 		return false;
 	*tmp = contact;

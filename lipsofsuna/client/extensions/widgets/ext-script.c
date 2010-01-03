@@ -24,14 +24,14 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 
 static int
-private_callback_activated (liscrData* data)
+private_callback_activated (LIScrData* data)
 {
-	liscrScript* script = liscr_data_get_script (data);
+	LIScrScript* script = liscr_data_get_script (data);
 
 	liscr_pushdata (script->lua, data);
 	lua_getfield (script->lua, -1, "activated");
@@ -53,10 +53,10 @@ private_callback_activated (liscrData* data)
 }
 
 static int
-private_callback_menu (liscrData*     data,
-                       liwdgMenuItem* item)
+private_callback_menu (LIScrData*     data,
+                       LIWdgMenuItem* item)
 {
-	liscrScript* script = liscr_data_get_script (data);
+	LIScrScript* script = liscr_data_get_script (data);
 
 	/* Get callback function. */
 	liscr_pushdata (script->lua, data);
@@ -83,9 +83,9 @@ private_callback_menu (liscrData*     data,
 }
 
 static int
-private_callback_pressed (liscrData* data)
+private_callback_pressed (LIScrData* data)
 {
-	liscrScript* script = liscr_data_get_script (data);
+	LIScrScript* script = liscr_data_get_script (data);
 
 	liscr_pushdata (script->lua, data);
 	lua_getfield (script->lua, -1, "pressed");
@@ -107,12 +107,12 @@ private_callback_pressed (liscrData* data)
 }
 
 static int
-private_callback_pressed_tree (liscrData*    data,
-                               liwdgWidget*  widget,
-                               liwdgTreerow* row)
+private_callback_pressed_tree (LIScrData*    data,
+                               LIWdgWidget*  widget,
+                               LIWdgTreerow* row)
 {
 	int i;
-	liscrScript* script = liscr_data_get_script (data);
+	LIScrScript* script = liscr_data_get_script (data);
 
 	/* Find row index. */
 	i = liwdg_treerow_get_index (row);
@@ -157,11 +157,11 @@ private_callback_pressed_tree (liscrData*    data,
  * -- @return New button widget.
  * function Button.new(self, table)
  */
-static void Button_new (liscrArgs* args)
+static void Button_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_BUTTON);
@@ -189,11 +189,11 @@ static void Button_new (liscrArgs* args)
  * -- @name Button.text
  * -- @class table
  */
-static void Button_getter_text (liscrArgs* args)
+static void Button_getter_text (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, liwdg_button_get_text (args->self));
 }
-static void Button_setter_text (liscrArgs* args)
+static void Button_setter_text (LIScrArgs* args)
 {
 	const char* value;
 
@@ -217,11 +217,11 @@ static void Button_setter_text (liscrArgs* args)
  * -- @return New entry widget.
  * function Entry.new(self, table)
  */
-static void Entry_new (liscrArgs* args)
+static void Entry_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_ENTRY);
@@ -250,7 +250,7 @@ static void Entry_new (liscrArgs* args)
  * -- @param self Entry.
  * function Entry.clear(self)
  */
-static void Entry_clear (liscrArgs* args)
+static void Entry_clear (LIScrArgs* args)
 {
 	liwdg_entry_clear (args->self);
 }
@@ -261,11 +261,11 @@ static void Entry_clear (liscrArgs* args)
  * -- @name Label.text
  * -- @class table
  */
-static void Entry_getter_text (liscrArgs* args)
+static void Entry_getter_text (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, liwdg_entry_get_text (args->self));
 }
-static void Entry_setter_text (liscrArgs* args)
+static void Entry_setter_text (LIScrArgs* args)
 {
 	const char* value;
 
@@ -289,11 +289,11 @@ static void Entry_setter_text (liscrArgs* args)
  * -- @return New image widget.
  * function Image.new(self, table)
  */
-static void Image_new (liscrArgs* args)
+static void Image_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_IMAGE);
@@ -321,11 +321,11 @@ static void Image_new (liscrArgs* args)
  * -- @name Image.image
  * -- @class table
  */
-static void Image_getter_image (liscrArgs* args)
+static void Image_getter_image (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, liwdg_image_get_image (args->self));
 }
-static void Image_setter_image (liscrArgs* args)
+static void Image_setter_image (LIScrArgs* args)
 {
 	const char* value;
 
@@ -349,11 +349,11 @@ static void Image_setter_image (liscrArgs* args)
  * -- @return New label widget.
  * function Label.new(self, table)
  */
-static void Label_new (liscrArgs* args)
+static void Label_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_LABEL);
@@ -381,11 +381,11 @@ static void Label_new (liscrArgs* args)
  * -- @name Label.text
  * -- @class table
  */
-static void Label_getter_text (liscrArgs* args)
+static void Label_getter_text (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, liwdg_label_get_text (args->self));
 }
-static void Label_setter_text (liscrArgs* args)
+static void Label_setter_text (LIScrArgs* args)
 {
 	const char* value;
 
@@ -409,11 +409,11 @@ static void Label_setter_text (liscrArgs* args)
  * -- @return New menu widget.
  * function Menu.new(self, table)
  */
-static void Menu_new (liscrArgs* args)
+static void Menu_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_MENU);
@@ -446,10 +446,10 @@ static void Menu_new (liscrArgs* args)
  * -- @return Rectangle or nil.
  * function Menu.get_item_rect(self, args)
  */
-static void Menu_get_item_rect (liscrArgs* args)
+static void Menu_get_item_rect (LIScrArgs* args)
 {
 	const char* name;
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	if (!liscr_args_gets_string (args, "label", &name))
 		return;
@@ -475,11 +475,11 @@ static void Menu_get_item_rect (liscrArgs* args)
  * -- @param args Arguments.
  * function Menu.insert(self, args)
  */
-static void Menu_insert (liscrArgs* args)
+static void Menu_insert (LIScrArgs* args)
 {
 	const char* label = "";
 	const char* icon = "";
-	liwdgMenuItem* item;
+	LIWdgMenuItem* item;
 
 	/* Create item. */
 	liscr_args_gets_string (args, "label", &label);
@@ -505,11 +505,11 @@ static void Menu_insert (liscrArgs* args)
  * -- @name Menu.autohide
  * -- @class table
  */
-static void Menu_getter_autohide (liscrArgs* args)
+static void Menu_getter_autohide (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_menu_get_autohide (args->self));
 }
-static void Menu_setter_autohide (liscrArgs* args)
+static void Menu_setter_autohide (LIScrArgs* args)
 {
 	int value;
 
@@ -523,14 +523,14 @@ static void Menu_setter_autohide (liscrArgs* args)
  * -- @name Menu.orientation
  * -- @class table
  */
-static void Menu_getter_orientation (liscrArgs* args)
+static void Menu_getter_orientation (LIScrArgs* args)
 {
 	if (liwdg_menu_get_vertical (args->self))
 		liscr_args_seti_string (args, "vert");
 	else
 		liscr_args_seti_string (args, "horz");
 }
-static void Menu_setter_orientation (liscrArgs* args)
+static void Menu_setter_orientation (LIScrArgs* args)
 {
 	const char* value;
 
@@ -556,11 +556,11 @@ static void Menu_setter_orientation (liscrArgs* args)
  * -- @return New scroll widget.
  * function Scroll.new(self, table)
  */
-static void Scroll_new (liscrArgs* args)
+static void Scroll_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCROLL);
@@ -594,7 +594,7 @@ static void Scroll_new (liscrArgs* args)
  * -- @param args Arguments.
  * function Scroll.set_range(self, agrs)
  */
-static void Scroll_set_range (liscrArgs* args)
+static void Scroll_set_range (LIScrArgs* args)
 {
 	float min = 0.0f;
 	float max = 1.0f;
@@ -612,11 +612,11 @@ static void Scroll_set_range (liscrArgs* args)
  * -- @name Scroll.value
  * -- @class table
  */
-static void Scroll_getter_value (liscrArgs* args)
+static void Scroll_getter_value (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, liwdg_scroll_get_value (args->self));
 }
-static void Scroll_setter_value (liscrArgs* args)
+static void Scroll_setter_value (LIScrArgs* args)
 {
 	float value;
 
@@ -640,11 +640,11 @@ static void Scroll_setter_value (liscrArgs* args)
  * -- @return New spin widget.
  * function Spin.new(self, table)
  */
-static void Spin_new (liscrArgs* args)
+static void Spin_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPIN);
@@ -672,11 +672,11 @@ static void Spin_new (liscrArgs* args)
  * -- @name Spin.value
  * -- @class table
  */
-static void Spin_getter_value (liscrArgs* args)
+static void Spin_getter_value (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, liwdg_spin_get_value (args->self));
 }
-static void Spin_setter_value (liscrArgs* args)
+static void Spin_setter_value (LIScrArgs* args)
 {
 	float value;
 
@@ -702,10 +702,10 @@ static void Spin_setter_value (liscrArgs* args)
  * -- @param args Arguments.
  * function Tree.append(self, args)
  */
-static void Tree_append (liscrArgs* args)
+static void Tree_append (LIScrArgs* args)
 {
 	const char* text = "";
-	liwdgTreerow* row;
+	LIWdgTreerow* row;
 
 	liscr_args_gets_string (args, "text", &text);
 	row = liwdg_tree_get_root (args->self);
@@ -724,12 +724,12 @@ static void Tree_append (liscrArgs* args)
  * -- @return String or nil.
  * function Tree.get_row(self, args)
  */
-static void Tree_get_row (liscrArgs* args)
+static void Tree_get_row (LIScrArgs* args)
 {
 	int index = 1;
 	int count;
-	liwdgTreerow* root;
-	liwdgTreerow* row;
+	LIWdgTreerow* root;
+	LIWdgTreerow* row;
 
 	liscr_args_gets_int (args, "row", &index);
 	root = liwdg_tree_get_root (args->self);
@@ -750,11 +750,11 @@ static void Tree_get_row (liscrArgs* args)
  * -- @return New tree widget.
  * function Tree.new(self, table)
  */
-static void Tree_new (liscrArgs* args)
+static void Tree_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_TREE);
@@ -788,11 +788,11 @@ static void Tree_new (liscrArgs* args)
  * function Tree.remove(self, args)
  */
 static void
-Tree_remove (liscrArgs* args)
+Tree_remove (LIScrArgs* args)
 {
 	int index = 1;
 	int count;
-	liwdgTreerow* root;
+	LIWdgTreerow* root;
 
 	liscr_args_gets_int (args, "row", &index);
 	root = liwdg_tree_get_root (args->self);
@@ -807,12 +807,12 @@ Tree_remove (liscrArgs* args)
  * -- @name Tree.size
  * -- @class table
  */
-static void Tree_getter_selection (liscrArgs* args)
+static void Tree_getter_selection (LIScrArgs* args)
 {
 	int i;
 	int count;
-	liwdgTreerow* root;
-	liwdgTreerow* row;
+	LIWdgTreerow* root;
+	LIWdgTreerow* row;
 
 	root = liwdg_tree_get_root (args->self);
 	count = liwdg_treerow_get_row_count (root);
@@ -826,13 +826,13 @@ static void Tree_getter_selection (liscrArgs* args)
 		}
 	}
 }
-static void Tree_setter_selection (liscrArgs* args)
+static void Tree_setter_selection (LIScrArgs* args)
 {
 	int i;
 	int count;
 	int index;
-	liwdgTreerow* root;
-	liwdgTreerow* row;
+	LIWdgTreerow* root;
+	LIWdgTreerow* row;
 
 	root = liwdg_tree_get_root (args->self);
 	count = liwdg_treerow_get_row_count (root);
@@ -855,9 +855,9 @@ static void Tree_setter_selection (liscrArgs* args)
  * -- @name Tree.size
  * -- @class table
  */
-static void Tree_getter_size (liscrArgs* args)
+static void Tree_getter_size (LIScrArgs* args)
 {
-	liwdgTreerow* row;
+	LIWdgTreerow* row;
 
 	row = liwdg_tree_get_root (args->self);
 	liscr_args_seti_int (args, liwdg_treerow_get_row_count (row));
@@ -880,11 +880,11 @@ static void Tree_getter_size (liscrArgs* args)
  * function View.new(self, table)
  */
 static void
-View_new (liscrArgs* args)
+View_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VIEW);
@@ -911,20 +911,20 @@ View_new (liscrArgs* args)
  * -- @name View.child
  * -- @class table
  */
-static void View_getter_child (liscrArgs* args)
+static void View_getter_child (LIScrArgs* args)
 {
-	liwdgWidget* child;
+	LIWdgWidget* child;
 
 	child = liwdg_view_get_child (args->self);
 	if (child != NULL)
 		liscr_args_seti_data (args, liwdg_widget_get_userdata (child));
 }
-static void View_setter_child (liscrArgs* args)
+static void View_setter_child (LIScrArgs* args)
 {
-	liscrData* data;
-	liscrData* child;
-	liwdgWidget* oldwidget;
-	liwdgWidget* newwidget;
+	LIScrData* data;
+	LIScrData* child;
+	LIWdgWidget* oldwidget;
+	LIWdgWidget* newwidget;
 
 	/* Argument checks. */
 	if (liscr_args_geti_data (args, 0, LICLI_SCRIPT_WIDGET, &child))
@@ -962,11 +962,11 @@ static void View_setter_child (liscrArgs* args)
  * -- @name View.hscroll
  * -- @class table
  */
-static void View_getter_hscroll (liscrArgs* args)
+static void View_getter_hscroll (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_view_get_hscroll (args->self));
 }
-static void View_setter_hscroll (liscrArgs* args)
+static void View_setter_hscroll (LIScrArgs* args)
 {
 	int value;
 
@@ -980,11 +980,11 @@ static void View_setter_hscroll (liscrArgs* args)
  * -- @name View.vscroll
  * -- @class table
  */
-static void View_getter_vscroll (liscrArgs* args)
+static void View_getter_vscroll (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_view_get_hscroll (args->self));
 }
-static void View_setter_vscroll (liscrArgs* args)
+static void View_setter_vscroll (LIScrArgs* args)
 {
 	int value;
 
@@ -995,62 +995,62 @@ static void View_setter_vscroll (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextButtonScript (liscrClass* self,
+liext_script_button (LIScrClass* self,
                    void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_BUTTON, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Button_new);
 	liscr_class_insert_mvar (self, "text", Button_getter_text, Button_setter_text);
 }
 
 void
-liextEntryScript (liscrClass* self,
+liext_script_entry (LIScrClass* self,
                   void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_ENTRY, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Entry_new);
 	liscr_class_insert_mfunc (self, "clear", Entry_clear);
 	liscr_class_insert_mvar (self, "text", Entry_getter_text, Entry_setter_text);
 }
 
 void
-liextImageScript (liscrClass* self,
+liext_script_image (LIScrClass* self,
                   void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_IMAGE, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Image_new);
 	liscr_class_insert_mvar (self, "image", Image_getter_image, Image_setter_image);
 }
 
 void
-liextLabelScript (liscrClass* self,
+liext_script_label (LIScrClass* self,
                   void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_LABEL, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Label_new);
 	liscr_class_insert_mvar (self, "text", Label_getter_text, Label_setter_text);
 }
 
 void
-liextMenuScript (liscrClass* self,
+liext_script_menu (LIScrClass* self,
                  void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MENU, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_mfunc (self, "get_item_rect", Menu_get_item_rect);
 	liscr_class_insert_mfunc (self, "insert", Menu_insert);
 	liscr_class_insert_cfunc (self, "new", Menu_new);
@@ -1059,38 +1059,38 @@ liextMenuScript (liscrClass* self,
 }
 
 void
-liextScrollScript (liscrClass* self,
+liext_script_scroll (LIScrClass* self,
                    void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SCROLL, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Scroll_new);
 	liscr_class_insert_mfunc (self, "set_range", Scroll_set_range);
 	liscr_class_insert_mvar (self, "value", Scroll_getter_value, Scroll_setter_value);
 }
 
 void
-liextSpinScript (liscrClass* self,
+liext_script_spin (LIScrClass* self,
                  void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPIN, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Spin_new);
 	liscr_class_insert_mvar (self, "value", Spin_getter_value, Spin_setter_value);
 }
 
 void
-liextTreeScript (liscrClass* self,
+liext_script_tree (LIScrClass* self,
                  void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TREE, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_mfunc (self, "append", Tree_append);
 	liscr_class_insert_mfunc (self, "get_row", Tree_get_row);
 	liscr_class_insert_cfunc (self, "new", Tree_new);
@@ -1100,13 +1100,13 @@ liextTreeScript (liscrClass* self,
 }
 
 void
-liextViewScript (liscrClass* self,
+liext_script_view (LIScrClass* self,
                  void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VIEW, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", View_new);
 	liscr_class_insert_mvar (self, "child", View_getter_child, View_setter_child);
 	liscr_class_insert_mvar (self, "hscroll", View_getter_hscroll, View_setter_hscroll);

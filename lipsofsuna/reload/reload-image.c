@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,7 +23,7 @@
  */
 
 #include <stdio.h>
-#include <image/lips-image.h>
+#include <lipsofsuna/image.h>
 #include "reload.h"
 
 /**
@@ -35,11 +35,11 @@
  * \return Nonzero of success.
  */
 int
-lirel_reload_image (lirelReload* self,
+lirel_reload_image (LIRelReload* self,
                     const char*  src,
                     const char*  dst)
 {
-	liimgImage* image;
+	LIImgImage* image;
 
 	image = liimg_image_new_from_file (src);
 	if (image == NULL)

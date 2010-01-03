@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,40 +27,40 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <engine/lips-engine.h>
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 
 #define LIEXT_SCRIPT_INVENTORY "Lips.Inventory"
 
-typedef struct _liextInventory liextInventory;
-typedef struct _liextModule liextModule;
+typedef struct _LIExtInventory LIExtInventory;
+typedef struct _LIExtModule LIExtModule;
 
-struct _liextModule
+struct _LIExtModule
 {
-	lialgU32dic* dictionary;
-	licalHandle calls[2];
-	lisrvServer* server;
+	LIAlgU32dic* dictionary;
+	LICalHandle calls[2];
+	LISerServer* server;
 };
 
-liextModule*
-liext_module_new (lisrvServer* server);
+LIExtModule*
+liext_module_new (LISerServer* server);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
-liextInventory*
-liext_module_find_inventory (liextModule* self,
+LIExtInventory*
+liext_module_find_inventory (LIExtModule* self,
                              uint32_t     id);
 
 /*****************************************************************************/
 
 void
-liextSkillScript (liscrClass* self,
+liext_script_skill (LIScrClass* self,
                   void*       data);
 
 void
-liextInventoryScript (liscrClass* self,
+liext_script_inventory (LIScrClass* self,
                       void*       data);
 
 #endif

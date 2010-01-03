@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndDraw Draw
+ * \addtogroup lirenDraw Draw
  * @{
  */
 
@@ -27,7 +27,7 @@
 
 #ifdef LIMDL_DEBUG_ARMATURE
 static void
-private_draw_node (limdlNode* node)
+private_draw_node (LIMdlNode* node)
 {
 	int i;
 
@@ -60,14 +60,14 @@ private_draw_node (limdlNode* node)
 /*****************************************************************************/
 
 void
-lirnd_draw_bounds (lirndContext* context,
-                   lirndObject*  object,
+liren_draw_bounds (LIRenContext* context,
+                   LIRenObject*  object,
                    void*         data)
 {
-	limatAabb aabb;
+	LIMatAabb aabb;
 
 	/* Render bounds. */
-	lirnd_object_get_bounds (object, &aabb);
+	liren_object_get_bounds (object, &aabb);
 	glBegin (GL_LINE_LOOP);
 	glVertex3f (aabb.min.x, aabb.min.y, aabb.min.z);
 	glVertex3f (aabb.max.x, aabb.min.y, aabb.min.z);
@@ -91,14 +91,14 @@ lirnd_draw_bounds (lirndContext* context,
 	glVertex3f (aabb.min.x, aabb.max.y, aabb.max.z);
 	glEnd ();
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }
 
 void
-lirnd_draw_debug (lirndContext* context,
-                  lirndObject*  object,
+liren_draw_debug (LIRenContext* context,
+                  LIRenObject*  object,
                   void*         data)
 {
 #if defined LIMDL_DEBUG_ARMATURE
@@ -123,15 +123,15 @@ lirnd_draw_debug (lirndContext* context,
 }
 
 void
-lirnd_draw_exclude (lirndContext* context,
-                    lirndObject*  object,
+liren_draw_exclude (LIRenContext* context,
+                    LIRenObject*  object,
                     void*         data)
 {
 	int i;
 	int flags;
-	limatMatrix matrix;
-	lirndMaterial* material;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIRenMaterial* material;
+	LIRenModel* model;
 
 	if (object->instance != NULL)
 		model = object->instance;
@@ -139,38 +139,38 @@ lirnd_draw_exclude (lirndContext* context,
 		model = object->model;
 
 	/* Exlude object. */
-	if ((lirndObject*) data == object)
+	if ((LIRenObject*) data == object)
 		return;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
-	flags |= LIRND_FLAG_LIGHTING;
-	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags |= LIREN_FLAG_LIGHTING;
+	flags |= LIREN_FLAG_TEXTURING;
+	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		lirnd_context_set_flags (context, flags);
-		lirnd_context_set_matrix (context, &matrix);
-		lirnd_context_set_material (context, material);
-		lirnd_context_set_shader (context, material->shader);
-		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-		lirnd_context_bind (context);
-		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_set_flags (context, flags);
+		liren_context_set_matrix (context, &matrix);
+		liren_context_set_material (context, material);
+		liren_context_set_shader (context, material->shader);
+		liren_context_set_textures (context, material->textures.array, material->textures.count);
+		liren_context_bind (context);
+		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }
 
 void
-lirnd_draw_hair (lirndContext* context,
-                 lirndObject*  object,
+liren_draw_hair (LIRenContext* context,
+                 LIRenObject*  object,
                  void*         data)
 {
 	int i;
@@ -183,18 +183,18 @@ lirnd_draw_hair (lirndContext* context,
 	float len0;
 	float len1;
 	float blend;
-	limatMatrix matrix;
-	limatVector bbx;
-	limatVector bby;
-	limatVector bbz;
-	limatVector ctr;
-	limatVector dir;
-	limatVector tmp;
-	limatVector coord[4];
-	limdlHair* hair;
-	limdlHairs* hairs;
-	lirndMaterial* material;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIMatVector bbx;
+	LIMatVector bby;
+	LIMatVector bbz;
+	LIMatVector ctr;
+	LIMatVector dir;
+	LIMatVector tmp;
+	LIMatVector coord[4];
+	LIMdlHair* hair;
+	LIMdlHairs* hairs;
+	LIRenMaterial* material;
+	LIRenModel* model;
 
 	/* Check if renderable. */
 	if (object->model == NULL)
@@ -205,14 +205,14 @@ lirnd_draw_hair (lirndContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
-	flags |= LIRND_FLAG_LIGHTING;
-	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags |= LIREN_FLAG_LIGHTING;
+	flags |= LIREN_FLAG_TEXTURING;
+	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 	matrix = object->orientation.matrix;
-	lirnd_context_set_flags (context, flags);
-	lirnd_context_set_matrix (context, &matrix);
+	liren_context_set_flags (context, flags);
+	liren_context_set_matrix (context, &matrix);
 
 	/* Calculate billboard axis. */
 	bbx = limat_vector_init (context->modelview.m[0], context->modelview.m[4], context->modelview.m[8]);
@@ -230,10 +230,10 @@ lirnd_draw_hair (lirndContext* context,
 
 		/* Bind hair group material. */
 		material = model->materials.array[hairs->material];
-		lirnd_context_set_material (context, material);
-		lirnd_context_set_shader (context, material->shader);
-		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-		lirnd_context_bind (context);
+		liren_context_set_material (context, material);
+		liren_context_set_shader (context, material->shader);
+		liren_context_set_textures (context, material->textures.array, material->textures.count);
+		liren_context_bind (context);
 
 		/* Render each hair as billboard. */
 		for (j = 0 ; j < hairs->count ; j++)
@@ -280,21 +280,21 @@ lirnd_draw_hair (lirndContext* context,
 		}
 	}
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }
 
 void
-lirnd_draw_opaque (lirndContext* context,
-                   lirndObject*  object,
+liren_draw_opaque (LIRenContext* context,
+                   LIRenObject*  object,
                    void*         data)
 {
 	int i;
 	int flags;
-	limatMatrix matrix;
-	lirndMaterial* material;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIRenMaterial* material;
+	LIRenModel* model;
 
 	if (object->instance != NULL)
 		model = object->instance;
@@ -302,44 +302,44 @@ lirnd_draw_opaque (lirndContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
-	flags |= LIRND_FLAG_LIGHTING;
-	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags |= LIREN_FLAG_LIGHTING;
+	flags |= LIREN_FLAG_TEXTURING;
+	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		if (!(material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY))
+		if (!(material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
 		{
-			lirnd_context_set_flags (context, flags);
-			lirnd_context_set_material (context, material);
-			lirnd_context_set_matrix (context, &matrix);
-			lirnd_context_set_shader (context, material->shader);
-			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-			lirnd_context_bind (context);
-			lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
+			liren_context_set_flags (context, flags);
+			liren_context_set_material (context, material);
+			liren_context_set_matrix (context, &matrix);
+			liren_context_set_shader (context, material->shader);
+			liren_context_set_textures (context, material->textures.array, material->textures.count);
+			liren_context_bind (context);
+			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 		}
 	}
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }
 
 void
-lirnd_draw_picking (lirndContext* context,
-                    lirndObject*  object,
+liren_draw_picking (LIRenContext* context,
+                    LIRenObject*  object,
                     void*         data)
 {
 	int i;
 	int flags;
-	limatMatrix matrix;
-	lirndMaterial* material;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIRenMaterial* material;
+	LIRenModel* model;
 
 	if (object->instance != NULL)
 		model = object->instance;
@@ -347,7 +347,7 @@ lirnd_draw_picking (lirndContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = LIRND_FLAG_FIXED;
+	flags = LIREN_FLAG_FIXED;
 	glLoadName (object->id);
 
 	/* Render the mesh. */
@@ -355,23 +355,23 @@ lirnd_draw_picking (lirndContext* context,
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		lirnd_context_set_flags (context, flags);
-		lirnd_context_set_matrix (context, &matrix);
-		lirnd_context_bind (context);
-		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_set_flags (context, flags);
+		liren_context_set_matrix (context, &matrix);
+		liren_context_bind (context);
+		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 }
 
 void
-lirnd_draw_shadeless (lirndContext* context,
-                      lirndObject*  object,
+liren_draw_shadeless (LIRenContext* context,
+                      LIRenObject*  object,
                       void*         data)
 {
 	int i;
 	int flags;
-	limatMatrix matrix;
-	lirndMaterial* material;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIRenMaterial* material;
+	LIRenModel* model;
 
 	if (object->instance != NULL)
 		model = object->instance;
@@ -379,36 +379,36 @@ lirnd_draw_shadeless (lirndContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
-	flags |= LIRND_FLAG_TEXTURING;
+	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags |= LIREN_FLAG_TEXTURING;
 
 	/* Render the mesh. */
 	matrix = limat_matrix_identity ();
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		lirnd_context_set_flags (context, flags);
-		lirnd_context_set_material (context, material);
-		lirnd_context_set_matrix (context, &matrix);
-		lirnd_context_set_shader (context, material->shader);
-		lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-		lirnd_context_bind (context);
-		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_set_flags (context, flags);
+		liren_context_set_material (context, material);
+		liren_context_set_matrix (context, &matrix);
+		liren_context_set_shader (context, material->shader);
+		liren_context_set_textures (context, material->textures.array, material->textures.count);
+		liren_context_bind (context);
+		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }
 
 void
-lirnd_draw_shadowmap (lirndContext* context,
-                      lirndObject*  object,
+liren_draw_shadowmap (LIRenContext* context,
+                      LIRenObject*  object,
                       void*         data)
 {
 	int i;
-	limatMatrix matrix;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIRenModel* model;
 
 	if (object->instance != NULL)
 		model = object->instance;
@@ -419,28 +419,28 @@ lirnd_draw_shadowmap (lirndContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		lirnd_context_set_flags (context, LIRND_FLAG_FIXED);
-		lirnd_context_set_matrix (context, &matrix);
-		lirnd_context_set_shader (context, context->render->shader.shadowmap);
-		lirnd_context_bind (context);
-		lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_set_flags (context, LIREN_FLAG_FIXED);
+		liren_context_set_matrix (context, &matrix);
+		liren_context_set_shader (context, context->render->shader.shadowmap);
+		liren_context_bind (context);
+		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }
 
 void
-lirnd_draw_transparent (lirndContext* context,
-                        lirndObject*  object,
+liren_draw_transparent (LIRenContext* context,
+                        LIRenObject*  object,
                         void*         data)
 {
 	int i;
 	int flags;
-	limatMatrix matrix;
-	lirndMaterial* material;
-	lirndModel* model;
+	LIMatMatrix matrix;
+	LIRenMaterial* material;
+	LIRenModel* model;
 
 	if (object->instance != NULL)
 		model = object->instance;
@@ -448,30 +448,30 @@ lirnd_draw_transparent (lirndContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIRND_FLAG_FIXED : 0;
-	flags |= LIRND_FLAG_LIGHTING;
-	flags |= LIRND_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIRND_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIRND_FLAG_SHADOW1 : 0;
+	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags |= LIREN_FLAG_LIGHTING;
+	flags |= LIREN_FLAG_TEXTURING;
+	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		if (material->flags & LIRND_MATERIAL_FLAG_TRANSPARENCY)
+		if (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
 		{
-			lirnd_context_set_flags (context, flags);
-			lirnd_context_set_matrix (context, &matrix);
-			lirnd_context_set_material (context, material);
-			lirnd_context_set_shader (context, material->shader);
-			lirnd_context_set_textures (context, material->textures.array, material->textures.count);
-			lirnd_context_bind (context);
-			lirnd_context_render_indexed (context, model->vertices, model->buffers.array + i);
+			liren_context_set_flags (context, flags);
+			liren_context_set_matrix (context, &matrix);
+			liren_context_set_material (context, material);
+			liren_context_set_shader (context, material->shader);
+			liren_context_set_textures (context, material->textures.array, material->textures.count);
+			liren_context_bind (context);
+			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 		}
 	}
 
-#ifdef LIRND_ENABLE_PROFILING
+#ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
 #endif
 }

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,21 +18,21 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlFaces Faces
+ * \addtogroup LIMdlFaces Faces
  * @{
  */
 
 #include "model-faces.h"
 
 void
-limdl_faces_free (limdlFaces* self)
+limdl_faces_free (LIMdlFaces* self)
 {
 	lisys_free (self->indices.array);
 }
 
 int
-limdl_faces_read (limdlFaces*  self,
-                  liarcReader* reader)
+limdl_faces_read (LIMdlFaces*  self,
+                  LIArcReader* reader)
 {
 	uint32_t i;
 	uint32_t mat;
@@ -63,8 +63,8 @@ limdl_faces_read (limdlFaces*  self,
 }
 
 int
-limdl_faces_write (limdlFaces*  self,
-                   liarcWriter* writer)
+limdl_faces_write (LIMdlFaces*  self,
+                   LIArcWriter* writer)
 {
 	int i;
 

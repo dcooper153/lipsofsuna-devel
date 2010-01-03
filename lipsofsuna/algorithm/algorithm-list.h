@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,35 +18,35 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgList List
+ * \addtogroup LIAlgList List
  * @{
  */
 
 #ifndef __ALGORITHM_LIST_H__
 #define __ALGORITHM_LIST_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
 /**
  * \brief A doubly linked list class.
  */
-typedef struct _lialgList lialgList;
-struct _lialgList
+typedef struct _LIAlgList LIAlgList;
+struct _LIAlgList
 {
-	lialgList* next;
-	lialgList* prev;
+	LIAlgList* next;
+	LIAlgList* prev;
 	void* data;
 };
 
 /**
  * \brief Used for list enumeration.
  */
-typedef void (*lialgListForeach)(void*);
+typedef void (*LIAlgListForeach)(void*);
 
 /**
  * \brief Used for list sorting.
  */
-typedef int (*lialgListCompare)(const void*, const void*);
+typedef int (*LIAlgListCompare)(const void*, const void*);
 
 /**
  * \brief Frees the list.
@@ -54,10 +54,10 @@ typedef int (*lialgListCompare)(const void*, const void*);
  * \param self Linked list.
  */
 static inline void
-lialg_list_free (lialgList* self)
+lialg_list_free (LIAlgList* self)
 {
-	lialgList* tmp;
-	lialgList* next;
+	LIAlgList* tmp;
+	LIAlgList* next;
 
 	for (tmp = self ; tmp != NULL ; tmp = next)
 	{
@@ -73,10 +73,10 @@ lialg_list_free (lialgList* self)
  * \return Length of the list.
  */
 static inline int
-lialg_list_get_length (lialgList* self)
+lialg_list_get_length (LIAlgList* self)
 {
 	int len = 0;
-	lialgList* tmp;
+	LIAlgList* tmp;
 
 	for (tmp = self ; tmp != NULL ; tmp = tmp->next)
 		len++;
@@ -90,10 +90,10 @@ lialg_list_get_length (lialgList* self)
  * \param call Function to call with the data.
  */
 static inline void
-lialg_list_foreach (lialgList**      self,
-                    lialgListForeach call)
+lialg_list_foreach (LIAlgList**      self,
+                    LIAlgListForeach call)
 {
-	lialgList* tmp;
+	LIAlgList* tmp;
 
 	for (tmp = *self ; tmp != NULL ; tmp = tmp->next)
 		call (tmp->data);
@@ -107,13 +107,13 @@ lialg_list_foreach (lialgList**      self,
  * \return Nonzero on success.
  */
 static inline int
-lialg_list_append (lialgList** self,
+lialg_list_append (LIAlgList** self,
                    void*       data)
 {
-	lialgList* tmp;
-	lialgList* last;
+	LIAlgList* tmp;
+	LIAlgList* last;
 
-	tmp = (lialgList*) lisys_malloc (sizeof (lialgList));
+	tmp = (LIAlgList*) lisys_malloc (sizeof (LIAlgList));
 	if (tmp == NULL)
 		return 0;
 	if (*self != NULL)
@@ -145,10 +145,10 @@ lialg_list_append (lialgList** self,
  * \param node Linked list node.
  */
 static inline void
-lialg_list_append_node (lialgList** self,
-                        lialgList*  node)
+lialg_list_append_node (LIAlgList** self,
+                        LIAlgList*  node)
 {
-	lialgList* last;
+	LIAlgList* last;
 
 	if (*self != NULL)
 	{
@@ -173,12 +173,12 @@ lialg_list_append_node (lialgList** self,
  * \return Nonzero on success.
  */
 static inline int
-lialg_list_prepend (lialgList** self,
+lialg_list_prepend (LIAlgList** self,
                     void*       data)
 {
-	lialgList* tmp;
+	LIAlgList* tmp;
 
-	tmp = (lialgList*) lisys_malloc (sizeof (lialgList));
+	tmp = (LIAlgList*) lisys_malloc (sizeof (LIAlgList));
 	if (tmp == NULL)
 		return 0;
 	tmp->prev = NULL;
@@ -201,8 +201,8 @@ lialg_list_prepend (lialgList** self,
  * \param node Linked list node.
  */
 static inline void
-lialg_list_prepend_node (lialgList** self,
-                         lialgList*  node)
+lialg_list_prepend_node (LIAlgList** self,
+                         LIAlgList*  node)
 {
 	node->prev = NULL;
 	node->next = *self;
@@ -220,15 +220,15 @@ lialg_list_prepend_node (lialgList** self,
  * \return Nonzero on success.
  */
 static inline int
-lialg_list_prepend_sorted (lialgList**      self,
+lialg_list_prepend_sorted (LIAlgList**      self,
                            void*            data,
-                           lialgListCompare cmp)
+                           LIAlgListCompare cmp)
 {
-	lialgList* tmp;
-	lialgList* ptr;
+	LIAlgList* tmp;
+	LIAlgList* ptr;
 
 	/* Allocate memory. */
-	tmp = (lialgList*) lisys_malloc (sizeof (lialgList));
+	tmp = (LIAlgList*) lisys_malloc (sizeof (LIAlgList));
 	if (tmp == NULL)
 		return 0;
 	tmp->data = data;
@@ -275,8 +275,8 @@ lialg_list_prepend_sorted (lialgList**      self,
  * \param node Node to detach.
  */
 static inline void
-lialg_list_detach_node (lialgList** self,
-                        lialgList*  node)
+lialg_list_detach_node (LIAlgList** self,
+                        LIAlgList*  node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -293,8 +293,8 @@ lialg_list_detach_node (lialgList** self,
  * \param node Node to remove.
  */
 static inline void
-lialg_list_remove (lialgList** self,
-                   lialgList*  node)
+lialg_list_remove (LIAlgList** self,
+                   LIAlgList*  node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;

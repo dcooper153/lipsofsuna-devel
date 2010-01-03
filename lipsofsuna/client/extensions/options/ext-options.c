@@ -24,51 +24,51 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-options.h"
 
 static const void*
 private_base ();
 
 static int
-private_init (liextOptions* self,
-              liwdgManager* manager);
+private_init (LIExtOptions* self,
+              LIWdgManager* manager);
 
 static void
-private_free (liextOptions* self);
+private_free (LIExtOptions* self);
 
 static int
-private_event (liextOptions* self,
+private_event (LIExtOptions* self,
                liwdgEvent*   event);
 
 static void
-private_fsaa (liextOptions* self);
+private_fsaa (LIExtOptions* self);
 
 static void
-private_global_shadows (liextOptions* self);
+private_global_shadows (LIExtOptions* self);
 
 static void
-private_local_shadows (liextOptions* self);
+private_local_shadows (LIExtOptions* self);
 
 static void
-private_shaders (liextOptions* self);
+private_shaders (LIExtOptions* self);
 
 /****************************************************************************/
 
-const liwdgClass liextOptionsType =
+const LIWdgClass LIExtOptionsType =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "Options", sizeof (liextOptions),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "Options", sizeof (LIExtOptions),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_options_new (licliClient* client)
+LIWdgWidget*
+liext_options_new (LICliClient* client)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (client->widgets, &liextOptionsType);
+	self = liwdg_widget_new (client->widgets, &LIExtOptionsType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_WIDGET_OPTIONS (self)->client = client;
@@ -81,15 +81,15 @@ liext_options_new (licliClient* client)
 static const void*
 private_base ()
 {
-	return &liwdgGroupType;
+	return &liwdg_widget_group;
 }
 
 static int
-private_init (liextOptions* self,
-              liwdgManager* manager)
+private_init (LIExtOptions* self,
+              LIWdgManager* manager)
 {
 	int i;
-	liwdgWidget* widgets[] =
+	LIWdgWidget* widgets[] =
 	{
 		liwdg_group_new_with_size (manager, 1, 4),
 		liwdg_check_new (manager),
@@ -101,7 +101,7 @@ private_init (liextOptions* self,
 	/* Check memory. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 1))
 		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			goto error;
@@ -132,7 +132,7 @@ private_init (liextOptions* self,
 	return 1;
 
 error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			liwdg_widget_free (widgets[i]);
@@ -141,45 +141,45 @@ error:
 }
 
 static void
-private_free (liextOptions* self)
+private_free (LIExtOptions* self)
 {
 }
 
 static int
-private_event (liextOptions* self,
+private_event (LIExtOptions* self,
                liwdgEvent*   event)
 {
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_fsaa (liextOptions* self)
+private_fsaa (LIExtOptions* self)
 {
 	licli_window_set_fsaa (self->client->window, livid_features_get_max_samples () *
 		liwdg_check_get_active (LIWDG_CHECK (self->check_fsaa)));
 }
 
 static void
-private_global_shadows (liextOptions* self)
+private_global_shadows (LIExtOptions* self)
 {
-	lirnd_render_set_global_shadows (self->client->render,
+	liren_render_set_global_shadows (self->client->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_global_shadows)));
 }
 
 static void
-private_local_shadows (liextOptions* self)
+private_local_shadows (LIExtOptions* self)
 {
-	lirnd_render_set_local_shadows (self->client->render,
+	liren_render_set_local_shadows (self->client->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_local_shadows)));
 }
 
 static void
-private_shaders (liextOptions* self)
+private_shaders (LIExtOptions* self)
 {
-	lirnd_render_set_shaders_enabled (self->client->render,
+	liren_render_set_shaders_enabled (self->client->render,
 		liwdg_check_get_active (LIWDG_CHECK (self->check_shaders)));
 	liwdg_check_set_active (LIWDG_CHECK (self->check_shaders),
-		lirnd_render_get_shaders_enabled (self->client->render));
+		liren_render_get_shaders_enabled (self->client->render));
 }
 
 /** @} */

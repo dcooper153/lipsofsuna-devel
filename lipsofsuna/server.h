@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,9 +15,17 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_RELOAD_H__
-#define __LIPS_RELOAD_H__
+#ifndef __LIPS_SERVER_H__
+#define __LIPS_SERVER_H__
 
-#include "reload.h"
+#include "server/server.h"
+#include "server/server-callbacks.h"
+#include "server/server-client.h"
+#include "server/server-extension.h"
+#include "server/server-network.h"
+#include "server/server-object.h"
+#include "server/server-observer.h"
+#include "server/server-script.h"
+#include "server/server-types.h"
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,35 +16,35 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvscr Script
+ * \addtogroup liserscr Script
  * @{
  */
 
 #ifndef __SERVER_SCRIPT_H__
 #define __SERVER_SCRIPT_H__
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
-#define LISRV_SCRIPT_EXTENSION "Lips.Extension"
-#define LISRV_SCRIPT_OBJECT "Lips.Object"
-#define LISRV_SCRIPT_SERVER "Lips.Server"
+#define LISER_SCRIPT_EXTENSION "Lips.Extension"
+#define LISER_SCRIPT_OBJECT "Lips.Object"
+#define LISER_SCRIPT_SERVER "Lips.Server"
 
 void
-lisrvEffectScript (liscrClass* self,
+liser_script_effect (LIScrClass* self,
                    void*       data);
 
 void
-lisrvExtensionScript (liscrClass* self,
+liser_script_extension (LIScrClass* self,
                       void*       data);
 
 void
-lisrvObjectScript (liscrClass* self,
+liser_script_objet (LIScrClass* self,
                    void*       data);
 
 void
-lisrvServerScript (liscrClass* self,
+liser_script_server (LIScrClass* self,
                    void*       data);
 
 #endif

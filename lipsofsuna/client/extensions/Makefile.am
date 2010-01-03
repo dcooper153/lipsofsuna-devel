@@ -1,5 +1,4 @@
-LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la $(LICLI_LIBS)
-INCLUDES = -I$(top_srcdir)/lipsofsuna
+LIBADD = $(top_builddir)/liblipsofsunaclient.la $(LICLI_LIBS)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = $(LICLI_CFLAGS)
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,9 +21,9 @@
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <BulletDynamics/Character/btKinematicCharacterController.h>
-#include <algorithm/lips-algorithm.h>
-#include <math/lips-math.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/model.h>
 #include "physics-types.h"
 
 #define LIPHY_MOTION_TOLERANCE 0.25f
@@ -31,12 +31,12 @@
 #define LIPHY_BROADPHASE_DBVT
 
 class liphyControl;
-class liphyContactController;
+class LIPhyContactController;
 class liphyCharacterController;
-class liphyObjectShape;
+class LIPhyObjectShape;
 class liphyMotionState;
 
-struct _liphyPhysics
+struct _LIPhyPhysics
 {
 	void* userdata;
 #ifdef LIPHY_BROADPHASE_DBVT
@@ -49,29 +49,29 @@ struct _liphyPhysics
 	btConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamics;
 	btGhostPairCallback* ghostcallback;
-	lialgList* constraints;
-	lialgList* contacts;
-	lialgList* contacts_iter;
-	lialgList* controllers;
-	lialgU32dic* objects;
-	licalCallbacks* callbacks;
+	LIAlgList* constraints;
+	LIAlgList* contacts;
+	LIAlgList* contacts_iter;
+	LIAlgList* controllers;
+	LIAlgU32dic* objects;
+	LICalCallbacks* callbacks;
 };
 
-struct _liphyShape
+struct _LIPhyShape
 {
-	liphyPhysics* physics;
-	const limdlModel* model;
+	LIPhyPhysics* physics;
+	const LIMdlModel* model;
 	btConvexShape* shape;
 };
 
-struct _liphyObject
+struct _LIPhyObject
 {
 	int flags;
 	uint32_t id;
-	liphyControlMode control_mode;
+	LIPhyControlMode control_mode;
 	liphyControl* control;
 	liphyMotionState* motion;
-	liphyPhysics* physics;
+	LIPhyPhysics* physics;
 	btCompoundShape* shape;
 	struct
 	{
@@ -83,39 +83,39 @@ struct _liphyObject
 		float strafing;
 		float character_step;
 		void* userdata;
-		limatTransform transform;
-		limatVector angular;
-		limatVector velocity;
+		LIMatTransform transform;
+		LIMatVector angular;
+		LIMatVector velocity;
 		liphyCallback custom_call;
-		liphyContactCall contact_call;
+		LIPhyContactCall contact_call;
 	} config;
 };
 
-struct _liphyConstraint
+struct _LIPhyConstraint
 {
-	liphyPhysics* physics;
-	liphyObject* object0;
-	liphyObject* object1;
+	LIPhyPhysics* physics;
+	LIPhyObject* object0;
+	LIPhyObject* object1;
 	btTypedConstraint* constraint;
 };
 
-struct liphyContactRecord
+struct LIPhyContactRecord
 {
 	float impulse;
-	limatVector point;
-	limatVector normal;
-	liphyObject* object0;
-	liphyObject* object1;
+	LIMatVector point;
+	LIMatVector normal;
+	LIPhyObject* object0;
+	LIPhyObject* object1;
 };
 
 class liphyMotionState : public btMotionState
 {
 public:
-	liphyMotionState (liphyObject* object, const btTransform& transform);
+	liphyMotionState (LIPhyObject* object, const btTransform& transform);
 	virtual void getWorldTransform (btTransform& transform) const;
 	virtual void setWorldTransform (const btTransform& transform);
 public:
-	liphyObject* object;
+	LIPhyObject* object;
 	btTransform current;
 	btTransform previous;
 };
@@ -123,18 +123,18 @@ public:
 class liphyCharacterController : public btActionInterface
 {
 public:
-	liphyCharacterController (liphyObject* object);
+	liphyCharacterController (LIPhyObject* object);
 	virtual void updateAction (btCollisionWorld* world, btScalar delta);
 	virtual void debugDraw (btIDebugDraw* debug);
 public:
 	int ground;
-	liphyObject* object;
+	LIPhyObject* object;
 };
 
 class liphyControl
 {
 public:
-	liphyControl (liphyObject* object, btCollisionShape* shape);
+	liphyControl (LIPhyObject* object, btCollisionShape* shape);
 	virtual ~liphyControl ();
 public:
 	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
@@ -153,14 +153,14 @@ public:
 	virtual void get_velocity (btVector3* value);
 	virtual void set_velocity (const btVector3& value);
 public:
-	liphyObject* object;
-	liphyContactController* contact_controller;
+	LIPhyObject* object;
+	LIPhyContactController* contact_controller;
 };
 
 class liphyRigidControl : public liphyControl
 {
 public:
-	liphyRigidControl (liphyObject* object, btCollisionShape* shape);
+	liphyRigidControl (LIPhyObject* object, btCollisionShape* shape);
 	virtual ~liphyRigidControl ();
 public:
 	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
@@ -184,7 +184,7 @@ public:
 class liphyCharacterControl : public liphyRigidControl
 {
 public:
-	liphyCharacterControl (liphyObject* object, btCollisionShape* shape);
+	liphyCharacterControl (LIPhyObject* object, btCollisionShape* shape);
 	virtual ~liphyCharacterControl ();
 public:
 	virtual bool get_ground ();
@@ -195,7 +195,7 @@ public:
 class liphyStaticControl : public liphyControl
 {
 public:
-	liphyStaticControl (liphyObject* object, btCollisionShape* shape);
+	liphyStaticControl (LIPhyObject* object, btCollisionShape* shape);
 	virtual ~liphyStaticControl ();
 public:
 	virtual void transform (const btTransform& value);
@@ -208,7 +208,7 @@ public:
 class liphyVehicleControl : public liphyControl
 {
 public:
-	liphyVehicleControl (liphyObject* object, btCollisionShape* shape);
+	liphyVehicleControl (LIPhyObject* object, btCollisionShape* shape);
 	virtual ~liphyVehicleControl ();
 public:
 	virtual void transform (const btTransform& value);

@@ -32,24 +32,24 @@
 
 #define LIEXT_SCRIPT_EDITOR "Lips.Editor"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licliClient* client;
-	liextEditor* editor;
-	liwdgWidget* dialog;
+	LICliClient* client;
+	LIExtEditor* editor;
+	LIWdgWidget* dialog;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextEditorScript (liscrClass* self,
+liext_script_editor (LIScrClass* self,
                    void*       data);
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,44 +27,44 @@
 #ifndef __EXT_EDITOR_H__
 #define __EXT_EDITOR_H__
 
-#include <client/lips-client.h>
-#include <generator/lips-generator.h>
-#include <engine/lips-engine.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/generator.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/widget.h>
 #include "ext-materials.h"
 #include "ext-module.h"
 
-#define LIEXT_EDITOR(o) ((liextEditor*)(o))
+#define LIEXT_EDITOR(o) ((LIExtEditor*)(o))
 
-typedef struct _liextEditorTreerow liextEditorTreerow;
-struct _liextEditorTreerow
+typedef struct _LIExtEditorTreerow LIExtEditorTreerow;
+struct _LIExtEditorTreerow
 {
-	ligenBrush* brush;
-	ligenRule* rule;
+	LIGenBrush* brush;
+	LIGenRule* rule;
 	int stroke;
 };
 
-struct _liextEditor
+struct _LIExtEditor
 {
-	liwdgGroup base;
-	liextModule* module;
-	ligenGenerator* generator;
-	liwdgWidget* brushes;
-	liwdgWidget* materials;
+	LIWdgGroup base;
+	LIExtModule* module;
+	LIGenGenerator* generator;
+	LIWdgWidget* brushes;
+	LIWdgWidget* materials;
 };
 
-extern const liwdgClass liextEditorType;
+extern const LIWdgClass liext_widget_editor;
 
-liwdgWidget*
-liext_editor_new (liwdgManager* manager,
-                  liextModule*  module);
+LIWdgWidget*
+liext_editor_new (LIWdgManager* manager,
+                  LIExtModule*  module);
 
 int
-liext_editor_save (liextEditor* self);
+liext_editor_save (LIExtEditor* self);
 
 void
-liext_editor_reset (liextEditor* self,
-                    liarcReader* reader);
+liext_editor_reset (LIExtEditor* self,
+                    LIArcReader* reader);
 
 #endif
 

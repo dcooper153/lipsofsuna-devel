@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysDir Directory
+ * \addtogroup LISysDir Directory
  * @{
  */
 
@@ -41,14 +41,14 @@
 #define error_open(fmt, file)
 #endif
 
-struct _lisysDir
+struct _LISysDir
 {
 	void* dir;
 	char* path;
 	struct
 	{
-		lisysDirFilter filter;
-		lisysDirSorter sorter;
+		LISysDirFilter filter;
+		LISysDirSorter sorter;
 		void* filter_data;
 	} calls;
 	struct
@@ -70,13 +70,13 @@ private_concat_paths (const char* a,
  * \param path Path to directory.
  * \return Directory or NULL.
  */
-lisysDir*
+LISysDir*
 lisys_dir_open (const char* path)
 {
-	lisysDir* self;
+	LISysDir* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisysDir));
+	self = calloc (1, sizeof (LISysDir));
 	if (self == NULL)
 	{
 		error_memory ();
@@ -111,7 +111,7 @@ lisys_dir_open (const char* path)
  * \param self Directory.
  */
 void
-lisys_dir_free (lisysDir* self)
+lisys_dir_free (LISysDir* self)
 {
 	int i;
 
@@ -133,7 +133,7 @@ lisys_dir_free (lisysDir* self)
  * \return Nonzero on success.
  */
 int
-lisys_dir_scan (lisysDir* self)
+lisys_dir_scan (LISysDir* self)
 {
 	int i;
 	int num = 0;
@@ -224,7 +224,7 @@ error:
  * \return Number of files.
  */
 int
-lisys_dir_get_count (const lisysDir* self)
+lisys_dir_get_count (const LISysDir* self)
 {
 	return self->names.count;
 }
@@ -237,7 +237,7 @@ lisys_dir_get_count (const lisysDir* self)
  * \return String owned by the directory.
  */
 const char*
-lisys_dir_get_name (const lisysDir* self,
+lisys_dir_get_name (const LISysDir* self,
                     int             i)
 {
 	assert (i >= 0);
@@ -254,7 +254,7 @@ lisys_dir_get_name (const lisysDir* self,
  * \return New string or NULL.
  */
 char*
-lisys_dir_get_path (const lisysDir* self,
+lisys_dir_get_path (const LISysDir* self,
                     int             i)
 {
 	assert (i >= 0);
@@ -271,8 +271,8 @@ lisys_dir_get_path (const lisysDir* self,
  * \param data Userdata to be passed to the filter function.
  */
 void
-lisys_dir_set_filter (lisysDir*      self,
-                      lisysDirFilter filter,
+lisys_dir_set_filter (LISysDir*      self,
+                      LISysDirFilter filter,
                       void*          data)
 {
 	self->calls.filter = filter;
@@ -286,8 +286,8 @@ lisys_dir_set_filter (lisysDir*      self,
  * \param sorter Sorter function or NULL.
  */
 void
-lisys_dir_set_sorter (lisysDir*      self,
-                      lisysDirSorter sorter)
+lisys_dir_set_sorter (LISysDir*      self,
+                      LISysDirSorter sorter)
 {
 	self->calls.sorter = sorter;
 }

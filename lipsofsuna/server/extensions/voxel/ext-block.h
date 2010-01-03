@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,27 +27,27 @@
 #ifndef __EXT_BLOCK_H__
 #define __EXT_BLOCK_H__
 
-#include <server/lips-server.h>
-#include <system/lips-system.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/voxel.h>
 
-struct _liextBlock
+struct _LIExtBlock
 {
-	liextModule* module;
-	liphyObject* physics;
+	LIExtModule* module;
+	LIPhyObject* physics;
 };
 
-liextBlock*
-liext_block_new (liextModule* module);
+LIExtBlock*
+liext_block_new (LIExtModule* module);
 
 void
-liext_block_free (liextBlock* self);
+liext_block_free (LIExtBlock* self);
 
 int
-liext_block_build (liextBlock*  self,
-                   liextModule* module,
-                   livoxBlock*  block,
-                   limatVector* offset);
+liext_block_build (LIExtBlock*  self,
+                   LIExtModule* module,
+                   LIVoxBlock*  block,
+                   LIMatVector* offset);
 
 #endif
 

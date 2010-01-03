@@ -28,31 +28,31 @@
 
 #ifndef LI_DISABLE_SOUND
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader);
+                LIArcReader* reader);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 #endif
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Sound",
+	LISER_EXTENSION_VERSION, "Sound",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -86,19 +86,19 @@ liext_module_new (licliClient* client)
 #endif
 
 	/* Register classes. */
-	liscr_script_create_class (client->script, "Sound", liextSoundScript, self);
+	liscr_script_create_class (client->script, "Sound", liext_script_sound, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 #ifndef LI_DISABLE_SOUND
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	/* Remove callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
 	/* Free objects. */
 	if (self->objects != NULL)
@@ -128,11 +128,11 @@ liext_module_free (liextModule* self)
  * \param id Effect number.
  * \return Sample owned by the module or NULL.
  */
-lisndSample*
-liext_module_find_sample_by_id (liextModule* self,
+LISndSample*
+liext_module_find_sample_by_id (LIExtModule* self,
                                 int          id)
 {
-	liengSample* sample;
+	LIEngSample* sample;
 
 	/* Find sample. */
 	sample = lieng_resources_find_sample_by_code (self->client->engine->resources, id);
@@ -160,11 +160,11 @@ liext_module_find_sample_by_id (liextModule* self,
  * \param name Name of the sample.
  * \return Sample owned by the module or NULL.
  */
-lisndSample*
-liext_module_find_sample_by_name (liextModule* self,
+LISndSample*
+liext_module_find_sample_by_name (LIExtModule* self,
                                   const char*  name)
 {
-	liengSample* sample;
+	LIEngSample* sample;
 
 	/* Find sample. */
 	sample = lieng_resources_find_sample_by_name (self->client->engine->resources, name);
@@ -186,18 +186,18 @@ liext_module_find_sample_by_name (liextModule* self,
 }
 
 int
-liext_module_set_effect (liextModule* self,
+liext_module_set_effect (LIExtModule* self,
                          uint32_t     object,
                          uint32_t     effect,
                          int          flags)
 {
 	int create;
-	liengObject* engobj;
-	liextObject* extobj;
-	limatTransform transform;
-	limatVector vector;
-	lisndSample* sample;
-	lisndSource* source;
+	LIEngObject* engobj;
+	LIExtObject* extobj;
+	LIMatTransform transform;
+	LIMatVector vector;
+	LISndSample* sample;
+	LISndSource* source;
 
 	/* Find sample. */
 	if (self->sound == NULL)
@@ -262,10 +262,10 @@ liext_module_set_effect (liextModule* self,
 }
 
 int
-liext_module_set_music (liextModule* self,
+liext_module_set_music (LIExtModule* self,
                         const char*  value)
 {
-	lisndSample* sample;
+	LISndSample* sample;
 
 	/* Find sample. */
 	if (self->sound == NULL)
@@ -284,7 +284,7 @@ liext_module_set_music (liextModule* self,
 }
 
 void
-liext_module_set_music_volume (liextModule* self,
+liext_module_set_music_volume (LIExtModule* self,
                                float        value)
 {
 	if (self->sound == NULL)
@@ -301,16 +301,16 @@ liext_module_set_music_volume (liextModule* self,
 /*****************************************************************************/
 
 #ifndef LI_DISABLE_SOUND
-liextObject*
+LIExtObject*
 liext_object_new ()
 {
-	return lisys_calloc (1, sizeof (liextObject));
+	return lisys_calloc (1, sizeof (LIExtObject));
 }
 
 void
-liext_object_free (liextObject* self)
+liext_object_free (LIExtObject* self)
 {
-	lialgList* ptr;
+	LIAlgList* ptr;
 
 	for (ptr = self->sounds ; ptr != NULL ; ptr = ptr->next)
 		lisnd_source_free (ptr->data);
@@ -323,9 +323,9 @@ liext_object_free (liextObject* self)
 
 #ifndef LI_DISABLE_SOUND
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader)
+                LIArcReader* reader)
 {
 	uint32_t id;
 	uint16_t effect;
@@ -346,20 +346,20 @@ private_packet (liextModule* self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
-	lialgU32dicIter iter;
-	lialgList* ptr;
-	lialgList* next;
-	liengObject* engobj;
-	liextObject* extobj;
-	limatTransform transform;
-	limatVector direction;
-	limatVector velocity;
-	limatVector up;
-	limatVector vector;
-	lisndSource* source;
+	LIAlgU32dicIter iter;
+	LIAlgList* ptr;
+	LIAlgList* next;
+	LIEngObject* engobj;
+	LIExtObject* extobj;
+	LIMatTransform transform;
+	LIMatVector direction;
+	LIMatVector velocity;
+	LIMatVector up;
+	LIMatVector vector;
+	LISndSource* source;
 
 	/* Update listener position. */
 	engobj = licli_client_get_player (self->client);

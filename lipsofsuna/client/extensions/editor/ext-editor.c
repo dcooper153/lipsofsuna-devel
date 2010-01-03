@@ -25,35 +25,35 @@
  */
 
 #include <math.h>
-#include <client/lips-client.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/widget.h>
 #include "ext-editor.h"
 
 static int
-private_event (liextEditor* self,
+private_event (LIExtEditor* self,
                SDL_Event*   event);
 
 static int
-private_key_press (liextEditor*       self,
+private_key_press (LIExtEditor*       self,
                    SDL_KeyboardEvent* event);
 
 static int
-private_mouse_press (liextEditor*          self,
+private_mouse_press (LIExtEditor*          self,
                      SDL_MouseButtonEvent* event);
 
 static int
-private_mouse_motion (liextEditor*          self,
+private_mouse_motion (LIExtEditor*          self,
                       SDL_MouseMotionEvent* event);
 
 /*****************************************************************************/
 
-liextEditor*
-liext_editor_new (licliClient* client)
+LIExtEditor*
+liext_editor_new (LICliClient* client)
 {
-	liextEditor* self;
+	LIExtEditor* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextEditor));
+	self = lisys_calloc (1, sizeof (LIExtEditor));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -69,14 +69,14 @@ liext_editor_new (licliClient* client)
 }
 
 void
-liext_editor_free (liextEditor* self)
+liext_editor_free (LIExtEditor* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 void
-liext_editor_begin_rotate (liextEditor* self,
+liext_editor_begin_rotate (LIExtEditor* self,
                            int          x,
                            int          y)
 {
@@ -93,7 +93,7 @@ liext_editor_begin_rotate (liextEditor* self,
 }
 
 void
-liext_editor_begin_translate (liextEditor* self,
+liext_editor_begin_translate (LIExtEditor* self,
                               int          x,
                               int          y)
 {
@@ -110,11 +110,11 @@ liext_editor_begin_translate (liextEditor* self,
 }
 
 int
-liext_editor_create (liextEditor*          self,
+liext_editor_create (LIExtEditor*          self,
                      uint32_t              model,
-                     const limatTransform* transform)
+                     const LIMatTransform* transform)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	writer = liarc_writer_new_packet (LINET_EXT_CLIENT_PACKET_EDITOR);
 	if (writer == NULL)
@@ -141,11 +141,11 @@ liext_editor_create (liextEditor*          self,
  * \return Nonzero on success.
  */
 int
-liext_editor_destroy (liextEditor* self)
+liext_editor_destroy (LIExtEditor* self)
 {
-	liarcWriter* writer;
-	lialgPtrdicIter iter;
-	liengSelection* selection;
+	LIArcWriter* writer;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
 
 	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
@@ -174,12 +174,12 @@ liext_editor_destroy (liextEditor* self)
  * \return Nonzero on success.
  */
 int
-liext_editor_duplicate (liextEditor* self)
+liext_editor_duplicate (LIExtEditor* self)
 {
 	int code;
-	lialgPtrdicIter iter;
-	liengSelection* selection;
-	limatTransform transform;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
+	LIMatTransform transform;
 
 	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
@@ -194,15 +194,15 @@ liext_editor_duplicate (liextEditor* self)
 }
 
 void
-liext_editor_rotate (liextEditor*           self,
-                     const limatQuaternion* rotation)
+liext_editor_rotate (LIExtEditor*           self,
+                     const LIMatQuaternion* rotation)
 {
-	lialgPtrdicIter iter;
-	liengSelection* selection;
-	limatQuaternion newrotat;
-	limatTransform transform;
-	limatVector center;
-	limatVector position;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
+	LIMatQuaternion newrotat;
+	LIMatTransform transform;
+	LIMatVector center;
+	LIMatVector position;
 
 	/* Get rotation center. */
 	liext_editor_get_center (self, &center);
@@ -228,17 +228,17 @@ liext_editor_rotate (liextEditor*           self,
  * \param rad Angle quantization in radians.
  */
 void
-liext_editor_snap (liextEditor* self,
+liext_editor_snap (LIExtEditor* self,
                    float        grid,
                    float        rad)
 {
 	float a;
 	float b;
 	float c;
-	lialgPtrdicIter iter;
-	liengSelection* selection;
-	limatTransform transform;
-	limatVector position;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
+	LIMatTransform transform;
+	LIMatVector position;
 
 	/* Snap each element. */
 	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
@@ -274,13 +274,13 @@ liext_editor_snap (liextEditor* self,
  * \param translation Translation vector relative to the starting point.
  */
 void
-liext_editor_translate (liextEditor*       self,
-                        const limatVector* translation)
+liext_editor_translate (LIExtEditor*       self,
+                        const LIMatVector* translation)
 {
-	lialgPtrdicIter iter;
-	liengSelection* selection;
-	limatTransform transform;
-	limatVector position;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
+	LIMatTransform transform;
+	LIMatVector position;
 
 	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
@@ -299,12 +299,12 @@ liext_editor_translate (liextEditor*       self,
  * \param self Editor.
  */
 void
-liext_editor_transform_apply (liextEditor* self)
+liext_editor_transform_apply (LIExtEditor* self)
 {
-	lialgPtrdicIter iter;
-	liarcWriter* writer;
-	liengSelection* selection;
-	limatTransform transform;
+	LIAlgPtrdicIter iter;
+	LIArcWriter* writer;
+	LIEngSelection* selection;
+	LIMatTransform transform;
 
 	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
@@ -337,11 +337,11 @@ liext_editor_transform_apply (liextEditor* self)
  * \param self Editor.
  */
 void
-liext_editor_transform_cancel (liextEditor* self)
+liext_editor_transform_cancel (LIExtEditor* self)
 {
-	lialgPtrdicIter iter;
-	liengSelection* selection;
-	limatTransform transform;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
+	LIMatTransform transform;
 
 	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
 	{
@@ -352,11 +352,11 @@ liext_editor_transform_cancel (liextEditor* self)
 }
 
 void
-liext_editor_get_center (liextEditor* self,
-                         limatVector* value)
+liext_editor_get_center (LIExtEditor* self,
+                         LIMatVector* value)
 {
-	lialgPtrdicIter iter;
-	liengSelection* selection;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
 
 	*value = limat_vector_init (0.0f, 0.0f, 0.0f);
 	if (self->client->engine->selection->size)
@@ -373,7 +373,7 @@ liext_editor_get_center (liextEditor* self,
 /*****************************************************************************/
 
 static int
-private_event (liextEditor* self,
+private_event (LIExtEditor* self,
 	           SDL_Event*   event)
 {
 	switch (event->type)
@@ -390,7 +390,7 @@ private_event (liextEditor* self,
 }
 
 static int
-private_key_press (liextEditor*       self,
+private_key_press (LIExtEditor*       self,
                    SDL_KeyboardEvent* event)
 {
 	int x;
@@ -432,7 +432,7 @@ private_key_press (liextEditor*       self,
 }
 
 static int
-private_mouse_press (liextEditor*          self,
+private_mouse_press (LIExtEditor*          self,
                      SDL_MouseButtonEvent* event)
 {
 	switch (event->button)
@@ -459,19 +459,19 @@ private_mouse_press (liextEditor*          self,
 }
 
 static int
-private_mouse_motion (liextEditor*          self,
+private_mouse_motion (LIExtEditor*          self,
                       SDL_MouseMotionEvent* event)
 {
 	int h;
 	float amount;
-	limatVector vx;
-	limatVector vy;
-	limatVector axis;
-	limatVector center;
-	limatVector delta;
-	limatVector world;
-	limatQuaternion quat;
-	limatTransform transform;
+	LIMatVector vx;
+	LIMatVector vy;
+	LIMatVector axis;
+	LIMatVector center;
+	LIMatVector delta;
+	LIMatVector world;
+	LIMatQuaternion quat;
+	LIMatTransform transform;
 
 	if (self->drag.mode == LIEXT_DRAG_ROTATE)
 	{

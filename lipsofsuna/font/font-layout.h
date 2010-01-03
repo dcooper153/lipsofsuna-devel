@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lifnt Font
  * @{
- * \addtogroup lifntLayout Layout
+ * \addtogroup LIFntLayout Layout
  * @{
  */
 
@@ -27,18 +27,18 @@
 
 #include "font.h"
 
-typedef struct _lifntLayoutGlyph lifntLayoutGlyph;
-struct _lifntLayoutGlyph
+typedef struct _LIFntLayoutGlyph LIFntLayoutGlyph;
+struct _LIFntLayoutGlyph
 {
-	lifntFont* font;
+	LIFntFont* font;
 	wchar_t glyph;
 	int x;
 	int y;
 	int advance;
 };
 
-typedef struct _lifntLayout lifntLayout;
-struct _lifntLayout
+typedef struct _LIFntLayout LIFntLayout;
+struct _LIFntLayout
 {
 	int dirty;
 	int ascent;
@@ -47,39 +47,39 @@ struct _lifntLayout
 	int limit_width;
 	int n_glyphs;
 	int c_glyphs;
-	lifntLayoutGlyph* glyphs;
+	LIFntLayoutGlyph* glyphs;
 };
 
-lifntLayout*
+LIFntLayout*
 lifnt_layout_new  ();
 
 void
-lifnt_layout_free (lifntLayout* self);
+lifnt_layout_free (LIFntLayout* self);
 
 void
-lifnt_layout_render (lifntLayout* self,
+lifnt_layout_render (LIFntLayout* self,
                      int          x,
                      int          y);
 
 int
-lifnt_layout_append_string (lifntLayout* self,
-                            lifntFont*   font,
+lifnt_layout_append_string (LIFntLayout* self,
+                            LIFntFont*   font,
                             const char*  string);
 
 void
-lifnt_layout_clear (lifntLayout* self);
+lifnt_layout_clear (LIFntLayout* self);
 
 int
-lifnt_layout_get_height (lifntLayout* self);
+lifnt_layout_get_height (LIFntLayout* self);
 
 int
-lifnt_layout_get_width (lifntLayout* self);
+lifnt_layout_get_width (LIFntLayout* self);
 
 int
-lifnt_layout_get_width_limit (const lifntLayout* self);
+lifnt_layout_get_width_limit (const LIFntLayout* self);
 
 void
-lifnt_layout_set_width_limit (lifntLayout* self,
+lifnt_layout_set_width_limit (LIFntLayout* self,
                               int          width);
 
 #endif

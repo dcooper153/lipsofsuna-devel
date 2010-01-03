@@ -27,36 +27,36 @@
 #ifndef __EXT_DIALOG_H__
 #define __EXT_DIALOG_H__
 
-#include <client/lips-client.h>
-#include <engine/lips-engine.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/widget.h>
 #include "ext-editor.h"
 
-#define LIEXT_DIALOG(o) ((liextDialog*)(o))
+#define LIEXT_DIALOG(o) ((LIExtDialog*)(o))
 
-typedef struct _liextDialog liextDialog;
-struct _liextDialog
+typedef struct _LIExtDialog LIExtDialog;
+struct _LIExtDialog
 {
-	liwdgWindow base;
-	licliClient* client;
-	liextEditor* editor;
-	liwdgWidget* group;
-	liwdgWidget* label_model;
-	liwdgWidget* entry_model;
-	liwdgWidget* button_edit;
-	liwdgWidget* button_insert;
-	liwdgWidget* button_delete;
-	liwdgWidget* button_duplicate;
+	LIWdgWindow base;
+	LICliClient* client;
+	LIExtEditor* editor;
+	LIWdgWidget* group;
+	LIWdgWidget* label_model;
+	LIWdgWidget* entry_model;
+	LIWdgWidget* button_edit;
+	LIWdgWidget* button_insert;
+	LIWdgWidget* button_delete;
+	LIWdgWidget* button_duplicate;
 };
 
-extern const liwdgClass liextDialogType;
+extern const LIWdgClass liext_widget_dialog;
 
-liwdgWidget*
-liext_dialog_new (liwdgManager* manager,
-                  liextEditor*  editor);
+LIWdgWidget*
+liext_dialog_new (LIWdgManager* manager,
+                  LIExtEditor*  editor);
 
-liengModel*
-liext_dialog_get_model (liextDialog* self);
+LIEngModel*
+liext_dialog_get_model (LIExtDialog* self);
 
 #endif
 

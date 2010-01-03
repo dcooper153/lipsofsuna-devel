@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysModule Module
+ * \addtogroup LISysModule Module
  * @{
  */
 
@@ -28,17 +28,17 @@ enum
 	LISYS_MODULE_FLAG_LIBDIRS = 0x02
 };
 
-typedef struct _lisysModule lisysModule;
+typedef struct _LISysModule LISysModule;
 
-lisysModule*
+LISysModule*
 lisys_module_new (const char* path,
                   int         flags);
 
 void
-lisys_module_free (lisysModule* self);
+lisys_module_free (LISysModule* self);
 
 void*
-lisys_module_symbol (lisysModule* self,
+lisys_module_symbol (LISysModule* self,
                      const char*  name);
 
 void*

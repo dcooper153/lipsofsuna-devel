@@ -25,13 +25,13 @@
 #ifndef __CLIENT_CALLBACKS_H__
 #define __CLIENT_CALLBACKS_H__
 
-#include <render/lips-render.h>
+#include <lipsofsuna/render.h>
 #include "client-types.h"
 
-int licli_client_init_callbacks_binding (licliClient* self);
-int licli_client_init_callbacks_misc (licliClient* self);
-int licli_client_init_callbacks_widget (licliClient* self);
-int licli_render_init (licliClient* self);
+int licli_client_init_callbacks_binding (LICliClient* self);
+int licli_client_init_callbacks_misc (LICliClient* self);
+int licli_client_init_callbacks_widget (LICliClient* self);
+int licli_render_init (LICliClient* self);
 
 #endif
 

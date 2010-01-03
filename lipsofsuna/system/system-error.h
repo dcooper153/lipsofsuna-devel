@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysError Error
+ * \addtogroup LISysError Error
  * @{
  */
 

@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 /*****************************************************************************/
 
@@ -81,7 +81,7 @@
 static int
 Binding_free (lua_State* lua)
 {
-	liscrData* self;
+	LIScrData* self;
 
 	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_BINDING);
 
@@ -111,11 +111,11 @@ Binding_new (lua_State* lua)
 	int mods;
 	float mult;
 	const char* params;
-	libndBinding* binding;
-	liscrData* self;
-	liscrData* action;
-	liscrScript* script = liscr_script (lua);
-	licliClient* client = liscr_script_get_userdata (script);
+	LIBndBinding* binding;
+	LIScrData* self;
+	LIScrData* action;
+	LIScrScript* script = liscr_script (lua);
+	LICliClient* client = liscr_script_get_userdata (script);
 
 	/* Check arguments. */
 	type = luaL_checkint (lua, 2);
@@ -149,7 +149,7 @@ Binding_new (lua_State* lua)
 /*****************************************************************************/
 
 void
-licliBindingScript (liscrClass* self,
+licli_script_binding (LIScrClass* self,
                     void*       data)
 {
 	liscr_class_insert_func (self, "new", Binding_new);

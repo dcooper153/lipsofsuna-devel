@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,50 +18,50 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgPtrdic Ptrdic
+ * \addtogroup LIAlgPtrdic Ptrdic
  * @{
  */
 
 #ifndef __ALGORITHM_PTRDIC_H__
 #define __ALGORITHM_PTRDIC_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-bst.h"
 
-typedef struct _lialgPtrdic lialgPtrdic;
-typedef struct _lialgPtrdicNode lialgPtrdicNode;
-typedef struct _lialgPtrdicIter lialgPtrdicIter;
+typedef struct _LIAlgPtrdic LIAlgPtrdic;
+typedef struct _LIAlgPtrdicNode LIAlgPtrdicNode;
+typedef struct _LIAlgPtrdicIter LIAlgPtrdicIter;
 
-struct _lialgPtrdic
+struct _LIAlgPtrdic
 {
 	int size;
-	lialgBst* tree;
-	lialgPtrdicNode* list;
+	LIAlgBst* tree;
+	LIAlgPtrdicNode* list;
 };
 
-struct _lialgPtrdicNode
+struct _LIAlgPtrdicNode
 {
 	void* key;
 	void* value;
-	lialgBstNode node;
-	lialgPtrdicNode* prev;
-	lialgPtrdicNode* next;
+	LIAlgBstNode node;
+	LIAlgPtrdicNode* prev;
+	LIAlgPtrdicNode* next;
 };
 
-struct _lialgPtrdicIter
+struct _LIAlgPtrdicIter
 {
-	lialgPtrdic* assoc;
+	LIAlgPtrdic* assoc;
 	void* key;
 	void* value;
-	lialgPtrdicNode* node;
-	lialgPtrdicNode* next;
+	LIAlgPtrdicNode* node;
+	LIAlgPtrdicNode* next;
 };
 
 /*****************************************************************************/
 
 static inline int
-lialg_ptrdic_node_compare (const lialgPtrdicNode* self,
-                              const lialgPtrdicNode* node)
+lialg_ptrdic_node_compare (const LIAlgPtrdicNode* self,
+                              const LIAlgPtrdicNode* node)
 {
 	if (self->key < node->key) return -1;
 	if (self->key > node->key) return 1;
@@ -75,17 +75,17 @@ lialg_ptrdic_node_compare (const lialgPtrdicNode* self,
  *
  * \return New associative array or NULL.
  */
-static inline lialgPtrdic*
+static inline LIAlgPtrdic*
 lialg_ptrdic_new ()
 {
-	lialgPtrdic* self;
+	LIAlgPtrdic* self;
 
-	self = (lialgPtrdic*) lisys_malloc (sizeof (lialgPtrdic));
+	self = (LIAlgPtrdic*) lisys_malloc (sizeof (LIAlgPtrdic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_ptrdic_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) lialg_ptrdic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -100,9 +100,9 @@ lialg_ptrdic_new ()
  * \param self Associative array.
  */
 static inline void
-lialg_ptrdic_free (lialgPtrdic* self)
+lialg_ptrdic_free (LIAlgPtrdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -114,9 +114,9 @@ lialg_ptrdic_free (lialgPtrdic* self)
  * \param self Associative array.
  */
 static inline void
-lialg_ptrdic_clear (lialgPtrdic* self)
+lialg_ptrdic_clear (LIAlgPtrdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -131,18 +131,18 @@ lialg_ptrdic_clear (lialgPtrdic* self)
  * \return Value or NULL.
  */
 static inline void*
-lialg_ptrdic_find (lialgPtrdic* self,
+lialg_ptrdic_find (LIAlgPtrdic* self,
                       void*          key)
 {
-	lialgPtrdicNode tmp;
-	lialgPtrdicNode* anode;
-	lialgBstNode* tnode;
+	LIAlgPtrdicNode tmp;
+	LIAlgPtrdicNode* anode;
+	LIAlgBstNode* tnode;
 
 	tmp.key = key;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	anode = (lialgPtrdicNode*) tnode->data;
+	anode = (LIAlgPtrdicNode*) tnode->data;
 	assert (&anode->node == tnode);
 	return anode->value;
 }
@@ -154,19 +154,19 @@ lialg_ptrdic_find (lialgPtrdic* self,
  * \param key Key of the node.
  * \return Associative array node or NULL.
  */
-static inline lialgPtrdicNode*
-lialg_ptrdic_find_node (lialgPtrdic* self,
+static inline LIAlgPtrdicNode*
+lialg_ptrdic_find_node (LIAlgPtrdic* self,
                            void*          key)
 {
-	lialgPtrdicNode tmp;
-	lialgBstNode* tnode;
+	LIAlgPtrdicNode tmp;
+	LIAlgBstNode* tnode;
 
 	tmp.key = key;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	assert (&((lialgPtrdicNode*) tnode->data)->node == tnode);
-	return (lialgPtrdicNode*) tnode->data;
+	assert (&((LIAlgPtrdicNode*) tnode->data)->node == tnode);
+	return (LIAlgPtrdicNode*) tnode->data;
 }
 
 /**
@@ -177,15 +177,15 @@ lialg_ptrdic_find_node (lialgPtrdic* self,
  * \param value Value of the inserted node.
  * \return Associative array node or NULL.
  */
-static inline lialgPtrdicNode*
-lialg_ptrdic_insert (lialgPtrdic* self,
+static inline LIAlgPtrdicNode*
+lialg_ptrdic_insert (LIAlgPtrdic* self,
                         void*          key,
                         void*          value)
 {
-	lialgPtrdicNode* node;
+	LIAlgPtrdicNode* node;
 
 	/* Create node. */
-	node = (lialgPtrdicNode*) lisys_malloc (sizeof (lialgPtrdicNode));
+	node = (LIAlgPtrdicNode*) lisys_malloc (sizeof (LIAlgPtrdicNode));
 	if (node == NULL)
 		return NULL;
 	node->key = key;
@@ -213,19 +213,19 @@ lialg_ptrdic_insert (lialgPtrdic* self,
  * \return Nonzero if a node was removed.
  */
 static inline int
-lialg_ptrdic_remove (lialgPtrdic* self,
+lialg_ptrdic_remove (LIAlgPtrdic* self,
                         void*          key)
 {
-	lialgBstNode* tnode;
-	lialgPtrdicNode* anode;
-	lialgPtrdicNode tmp;
+	LIAlgBstNode* tnode;
+	LIAlgPtrdicNode* anode;
+	LIAlgPtrdicNode tmp;
 	
 	/* Find node. */
 	tmp.key = key;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return 1;
-	anode = (lialgPtrdicNode*) tnode->data;
+	anode = (LIAlgPtrdicNode*) tnode->data;
 	assert (&anode->node == tnode);
 
 	/* Unlink from tree. */
@@ -250,8 +250,8 @@ lialg_ptrdic_remove (lialgPtrdic* self,
  * \param node Node to remove.
  */
 static inline void
-lialg_ptrdic_remove_node (lialgPtrdic*     self,
-                             lialgPtrdicNode* node)
+lialg_ptrdic_remove_node (LIAlgPtrdic*     self,
+                             LIAlgPtrdicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -272,8 +272,8 @@ lialg_ptrdic_remove_node (lialgPtrdic*     self,
 	     lialg_ptrdic_iter_next (&iter))
 
 static inline void
-lialg_ptrdic_iter_start (lialgPtrdicIter* self,
-                            lialgPtrdic*     assoc)
+lialg_ptrdic_iter_start (LIAlgPtrdicIter* self,
+                            LIAlgPtrdic*     assoc)
 {
 	self->assoc = assoc;
 	if (assoc->list == NULL)
@@ -293,7 +293,7 @@ lialg_ptrdic_iter_start (lialgPtrdicIter* self,
 }
 
 static inline int
-lialg_ptrdic_iter_next (lialgPtrdicIter* self)
+lialg_ptrdic_iter_next (LIAlgPtrdicIter* self)
 {
 	if (self->next == NULL)
 	{

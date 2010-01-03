@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcTar Tar
+ * \addtogroup LIArcTar Tar
  * @{
  */
 
@@ -36,8 +36,8 @@ enum
 	LIARC_TAR_DIRECTORY = '5'
 };
 
-typedef struct _liarcTarHeader liarcTarHeader;
-struct _liarcTarHeader
+typedef struct _LIArcTarHeader LIArcTarHeader;
+struct _LIArcTarHeader
 {
 	char name[100];
 	char mode[8];
@@ -58,33 +58,33 @@ struct _liarcTarHeader
 	char reserved[12];
 };
 
-typedef struct _liarcTar liarcTar;
-struct _liarcTar
+typedef struct _LIArcTar LIArcTar;
+struct _LIArcTar
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 };
 
-liarcTar*
-liarc_tar_new (liarcWriter* writer);
+LIArcTar*
+liarc_tar_new (LIArcWriter* writer);
 
 void
-liarc_tar_free (liarcTar* self);
+liarc_tar_free (LIArcTar* self);
 
 int
-liarc_tar_write_data (liarcTar*   self,
+liarc_tar_write_data (LIArcTar*   self,
                       const char* name,
                       const void* data,
                       int         length);
 
 int
-liarc_tar_write_directory (liarcTar*   self,
+liarc_tar_write_directory (LIArcTar*   self,
                            const char* name);
 
 int
-liarc_tar_write_end (liarcTar* self);
+liarc_tar_write_end (LIArcTar* self);
 
 int
-liarc_tar_write_file (liarcTar*   self,
+liarc_tar_write_file (LIArcTar*   self,
                       const char* src,
                       const char* dst);
 

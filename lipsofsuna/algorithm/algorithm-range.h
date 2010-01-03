@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,19 +18,19 @@
 #ifndef __ALGORITHM_RANGE_H__
 #define __ALGORITHM_RANGE_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgRange Range
+ * \addtogroup LIAlgRange Range
  * @{
  */
 
 #define LIALG_RANGE_DEFAULT_SIZE 1024
 
-typedef struct _lialgRange lialgRange;
-struct _lialgRange
+typedef struct _LIAlgRange LIAlgRange;
+struct _LIAlgRange
 {
 	int min;
 	int max;
@@ -53,7 +53,7 @@ struct _lialgRange
  * \param zmax Maximum bin coordinate.
  * \return Range.
  */
-static inline lialgRange
+static inline LIAlgRange
 lialg_range_new (int xmin,
                  int ymin,
                  int zmin,
@@ -61,7 +61,7 @@ lialg_range_new (int xmin,
                  int ymax,
                  int zmax)
 {
-	lialgRange self;
+	LIAlgRange self;
 
 	self.min = 0;
 	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
@@ -83,12 +83,12 @@ lialg_range_new (int xmin,
  * \param unit Bin side length.
  * \return Range.
  */
-static inline lialgRange
-lialg_range_new_from_aabb (const limatVector* min,
-                           const limatVector* max,
+static inline LIAlgRange
+lialg_range_new_from_aabb (const LIMatVector* min,
+                           const LIMatVector* max,
                            float              unit)
 {
-	lialgRange self;
+	LIAlgRange self;
 
 	self.min = 0;
 	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
@@ -111,13 +111,13 @@ lialg_range_new_from_aabb (const limatVector* min,
  * \param radius Radius of the sphere in bins.
  * \return Range.
  */
-static inline lialgRange
+static inline LIAlgRange
 lialg_range_new_from_center (int x,
                              int y,
                              int z,
                              int radius)
 {
-	lialgRange self;
+	LIAlgRange self;
 
 	self.min = 0;
 	self.max = LIALG_RANGE_DEFAULT_SIZE + 1;
@@ -140,14 +140,14 @@ lialg_range_new_from_center (int x,
  * \param maxi Maximum range coordinate.
  * \return Range.
  */
-static inline lialgRange
+static inline LIAlgRange
 lialg_range_new_from_index (int index,
                             int radius,
                             int mini,
                             int maxi)
 {
 	int size;
-	lialgRange self;
+	LIAlgRange self;
 
 	size = maxi - mini;
 	self.min = mini;
@@ -173,14 +173,14 @@ lialg_range_new_from_index (int index,
  * \param unit Bin side length.
  * \return Range.
  */
-static inline lialgRange
-lialg_range_new_from_sphere (const limatVector* center,
+static inline LIAlgRange
+lialg_range_new_from_sphere (const LIMatVector* center,
                              float              radius,
                              float              unit)
 {
-	limatVector min;
-	limatVector max;
-	lialgRange self;
+	LIMatVector min;
+	LIMatVector max;
+	LIAlgRange self;
 
 	min = limat_vector_subtract (*center, limat_vector_init (radius, radius, radius));
 	max = limat_vector_add (*center, limat_vector_init (radius, radius, radius));
@@ -197,12 +197,12 @@ lialg_range_new_from_sphere (const limatVector* center,
  * \param min Maximum range coordinate.
  * \return New range.
  */
-static inline lialgRange
-lialg_range_clamp (const lialgRange self,
+static inline LIAlgRange
+lialg_range_clamp (const LIAlgRange self,
                    int              min,
                    int              max)
 {
-	lialgRange ret;
+	LIAlgRange ret;
 
 	ret.min = min;
 	ret.max = max + 1;
@@ -225,7 +225,7 @@ lialg_range_clamp (const lialgRange self,
  * \param z Bin coordinate.
  */
 static inline int
-lialg_range_contains (const lialgRange* self,
+lialg_range_contains (const LIAlgRange* self,
                       int               x,
                       int               y,
                       int               z)
@@ -245,7 +245,7 @@ lialg_range_contains (const lialgRange* self,
  * \param index Bin index.
  */
 static inline int
-lialg_range_contains_index (const lialgRange* self,
+lialg_range_contains_index (const LIAlgRange* self,
                             int               index)
 {
 	int x;

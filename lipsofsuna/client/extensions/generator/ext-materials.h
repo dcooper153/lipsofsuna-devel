@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,58 +27,58 @@
 #ifndef __EXT_MATERIALS_H__
 #define __EXT_MATERIALS_H__
 
-#include <client/lips-client.h>
-#include <generator/lips-generator.h>
-#include <engine/lips-engine.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/generator.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/widget.h>
 #include "ext-module.h"
 
-#define LIEXT_MATERIALS(o) ((liextMaterials*)(o))
+#define LIEXT_MATERIALS(o) ((LIExtMaterials*)(o))
 
-typedef struct _liextMaterialsTreerow liextMaterialsTreerow;
-struct _liextMaterialsTreerow
+typedef struct _LIExtMaterialsTreerow LIExtMaterialsTreerow;
+struct _LIExtMaterialsTreerow
 {
-	livoxMaterial* material;
+	LIVoxMaterial* material;
 };
 
-struct _liextMaterials
+struct _LIExtMaterials
 {
-	liwdgGroup base;
-	liextModule* module;
-	ligenGenerator* generator;
+	LIWdgGroup base;
+	LIExtModule* module;
+	LIGenGenerator* generator;
 	struct
 	{
-		liwdgWidget* group_attr;
-		liwdgWidget* group_view;
-		liwdgWidget* button_add;
-		liwdgWidget* button_remove;
-		liwdgWidget* entry_name;
-		liwdgWidget* entry_model;
-		liwdgWidget* label_name;
-		liwdgWidget* label_model;
-		liwdgWidget* label_friction;
-		liwdgWidget* preview;
-		liwdgWidget* scroll_friction;
-		liwdgWidget* tree;
-		liwdgWidget* view;
+		LIWdgWidget* group_attr;
+		LIWdgWidget* group_view;
+		LIWdgWidget* button_add;
+		LIWdgWidget* button_remove;
+		LIWdgWidget* entry_name;
+		LIWdgWidget* entry_model;
+		LIWdgWidget* label_name;
+		LIWdgWidget* label_model;
+		LIWdgWidget* label_friction;
+		LIWdgWidget* preview;
+		LIWdgWidget* scroll_friction;
+		LIWdgWidget* tree;
+		LIWdgWidget* view;
 	} widgets;
 };
 
-extern const liwdgClass liextMaterialsType;
+extern const LIWdgClass liext_widget_materials;
 
-liwdgWidget*
-liext_materials_new (liwdgManager* manager,
-                     liextModule*  module);
+LIWdgWidget*
+liext_materials_new (LIWdgManager* manager,
+                     LIExtModule*  module);
 
 int
-liext_materials_save (liextMaterials* self);
+liext_materials_save (LIExtMaterials* self);
 
 void
-liext_materials_reset (liextMaterials* self,
-                       liarcReader*    reader);
+liext_materials_reset (LIExtMaterials* self,
+                       LIArcReader*    reader);
 
 int
-liext_materials_get_active (liextMaterials* self);
+liext_materials_get_active (LIExtMaterials* self);
 
 #endif
 

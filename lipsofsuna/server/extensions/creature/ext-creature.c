@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,11 +24,11 @@
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "ext-creature.h"
 
 static int
-private_tick (liextCreature* self,
+private_tick (LIExtCreature* self,
               float          secs);
 
 /*****************************************************************************/
@@ -39,12 +39,12 @@ private_tick (liextCreature* self,
  * \param server Server.
  * \return Creature logic or NULL.
  */
-liextCreature*
-liext_creature_new (lisrvServer* server)
+LIExtCreature*
+liext_creature_new (LISerServer* server)
 {
-	liextCreature* self;
+	LIExtCreature* self;
 
-	self = lisys_calloc (1, sizeof (liextCreature));
+	self = lisys_calloc (1, sizeof (LIExtCreature));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -59,21 +59,21 @@ liext_creature_new (lisrvServer* server)
  * \param self Creature logic.
  */
 void
-liext_creature_free (liextCreature* self)
+liext_creature_free (LIExtCreature* self)
 {
 	if (self->active)
-		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 int
-liext_creature_get_active (liextCreature* self)
+liext_creature_get_active (LIExtCreature* self)
 {
 	return self->active;
 }
 
 int
-liext_creature_set_active (liextCreature* self,
+liext_creature_set_active (LIExtCreature* self,
                            int            value)
 {
 	if (self->active == value)
@@ -97,8 +97,8 @@ liext_creature_set_active (liextCreature* self,
  * \return Nonzero on success.
  */
 int
-liext_creature_set_object (liextCreature* self,
-                           liengObject*   object)
+liext_creature_set_object (LIExtCreature* self,
+                           LIEngObject*   object)
 {
 	int flags;
 
@@ -124,11 +124,11 @@ liext_creature_set_object (liextCreature* self,
 /*****************************************************************************/
 
 static int
-private_tick (liextCreature* self,
+private_tick (LIExtCreature* self,
               float          secs)
 {
-	liengObject* object;
-	liphyObject* physics;
+	LIEngObject* object;
+	LIPhyObject* physics;
 
 	/* Get object data. */
 	object = self->object;

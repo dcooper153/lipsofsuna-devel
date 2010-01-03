@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,26 +27,26 @@
 #ifndef __EXT_WIDGET_H__
 #define __EXT_WIDGET_H__
 
-#include <widget/lips-widget.h>
+#include <lipsofsuna/widget.h>
 #include "ext-module.h"
 
-#define LIEXT_SKILL_WIDGET(o) ((liextSkillWidget*)(o))
+#define LIEXT_SKILL_WIDGET(o) ((LIExtSkillWidget*)(o))
 
-typedef struct _liextSkillWidget liextSkillWidget;
-struct _liextSkillWidget
+typedef struct _LIExtSkillWidget LIExtSkillWidget;
+struct _LIExtSkillWidget
 {
-	liwdgGroup base;
+	LIWdgGroup base;
 	char* skill;
 	uint32_t object;
-	liextModule* module;
-	liwdgWidget* value;
+	LIExtModule* module;
+	LIWdgWidget* value;
 };
 
-liwdgWidget*
-liext_skill_widget_new (liextModule* module);
+LIWdgWidget*
+liext_skill_widget_new (LIExtModule* module);
 
 int
-liext_skill_widget_set_skill (liextSkillWidget* self,
+liext_skill_widget_set_skill (LIExtSkillWidget* self,
                               uint32_t          object,
                               const char*       name);
 

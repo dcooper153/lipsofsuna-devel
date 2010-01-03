@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,31 +18,31 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgContainer Container
+ * \addtogroup LIWdgContainer Container
  * @{
  */
 
 #include "widget-container.h"
 
 static int
-private_init (liwdgContainer* self,
-              liwdgManager*   manager);
+private_init (LIWdgContainer* self,
+              LIWdgManager*   manager);
 
 static void
-private_free (liwdgContainer* self);
+private_free (LIWdgContainer* self);
 
 static int
-private_event (liwdgContainer* self,
+private_event (LIWdgContainer* self,
                liwdgEvent*     event);
 
 /*****************************************************************************/
 
-const liwdgClass liwdgContainerType =
+const LIWdgClass liwdg_widget_container =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Container", sizeof (liwdgContainer),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event,
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Container", sizeof (LIWdgContainer),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event,
 };
 
 /**
@@ -53,17 +53,17 @@ const liwdgClass liwdgContainerType =
  * \param y Cursor position in pixels.
  * \return Widget owned by the group or NULL.
  */
-liwdgWidget*
-liwdg_container_child_at (liwdgContainer* self,
+LIWdgWidget*
+liwdg_container_child_at (LIWdgContainer* self,
                           int             x,
                           int             y)
 {
 	liwdgEvent event;
-	liwdgContainerIface* iface;
+	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdgContainerType;
+	event.probe.clss = &liwdg_widget_container;
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -85,15 +85,15 @@ liwdg_container_child_at (liwdgContainer* self,
  * \param child Child widget.
  */
 void
-liwdg_container_child_request (liwdgContainer* self,
-                               liwdgWidget*    child)
+liwdg_container_child_request (LIWdgContainer* self,
+                               LIWdgWidget*    child)
 {
 	liwdgEvent event;
-	liwdgContainerIface* iface;
+	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdgContainerType;
+	event.probe.clss = &liwdg_widget_container;
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -106,17 +106,17 @@ liwdg_container_child_request (liwdgContainer* self,
 		iface->child_request (self, child);
 }
 
-liwdgWidget*
-liwdg_container_cycle_focus (liwdgContainer* self,
-                             liwdgWidget*    curr,
+LIWdgWidget*
+liwdg_container_cycle_focus (LIWdgContainer* self,
+                             LIWdgWidget*    curr,
                              int             dir)
 {
 	liwdgEvent event;
-	liwdgContainerIface* iface;
+	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdgContainerType;
+	event.probe.clss = &liwdg_widget_container;
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -138,15 +138,15 @@ liwdg_container_cycle_focus (liwdgContainer* self,
  * \param child Child widget.
  */
 void
-liwdg_container_detach_child (liwdgContainer* self,
-                              liwdgWidget*    child)
+liwdg_container_detach_child (LIWdgContainer* self,
+                              LIWdgWidget*    child)
 {
 	liwdgEvent event;
-	liwdgContainerIface* iface;
+	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdgContainerType;
+	event.probe.clss = &liwdg_widget_container;
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -167,16 +167,16 @@ liwdg_container_detach_child (liwdgContainer* self,
  * \param data Data to pass to the function.
  */
 void
-liwdg_container_foreach_child (liwdgContainer* self,
+liwdg_container_foreach_child (LIWdgContainer* self,
                                void          (*call)(),
                                void*           data)
 {
 	liwdgEvent event;
-	liwdgContainerIface* iface;
+	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdgContainerType;
+	event.probe.clss = &liwdg_widget_container;
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -201,18 +201,18 @@ liwdg_container_foreach_child (liwdgContainer* self,
  * \param childy Coordinates in child widget space.
  */
 void
-liwdg_container_translate_coords (liwdgContainer* self,
+liwdg_container_translate_coords (LIWdgContainer* self,
                                   int             containerx,
                                   int             containery,
                                   int*            childx,
                                   int*            childy)
 {
 	liwdgEvent event;
-	liwdgContainerIface* iface;
+	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdgContainerType;
+	event.probe.clss = &liwdg_widget_container;
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -232,37 +232,37 @@ liwdg_container_translate_coords (liwdgContainer* self,
 /*****************************************************************************/
 
 static int
-private_init (liwdgContainer* self,
-              liwdgManager*   manager)
+private_init (LIWdgContainer* self,
+              LIWdgManager*   manager)
 {
 	return 1;
 }
 
 static void
-private_free (liwdgContainer* self)
+private_free (LIWdgContainer* self)
 {
 }
 
 static int
-private_event (liwdgContainer* self,
+private_event (LIWdgContainer* self,
                liwdgEvent*     event)
 {
 	int x;
 	int y;
-	liwdgWidget* child;
+	LIWdgWidget* child;
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdgContainerType)
+	    event->probe.clss == &liwdg_widget_container)
 	{
-		static liwdgContainerIface iface =
+		static LIWdgContainerIface iface =
 		{
-			(liwdgContainerChildAtFunc) NULL,
-			(liwdgContainerChildRequestFunc) NULL,
-			(liwdgContainerCycleFocusFunc) NULL,
-			(liwdgContainerDetachChildFunc) NULL,
-			(liwdgContainerForeachChildFunc) NULL,
-			(liwdgContainerTranslateCoordsFunc) NULL
+			(LIWdgContainerChildAtFunc) NULL,
+			(LIWdgContainerChildRequestFunc) NULL,
+			(LIWdgContainerCycleFocusFunc) NULL,
+			(LIWdgContainerDetachChildFunc) NULL,
+			(LIWdgContainerForeachChildFunc) NULL,
+			(LIWdgContainerTranslateCoordsFunc) NULL
 		};
 		event->probe.result = &iface;
 		return 0;
@@ -281,7 +281,7 @@ private_event (liwdgContainer* self,
 			y = event->motion.y;
 			break;
 		default:
-			return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+			return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 	}
 
 	/* Translate coordinates. */
@@ -312,7 +312,7 @@ private_event (liwdgContainer* self,
 		}
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

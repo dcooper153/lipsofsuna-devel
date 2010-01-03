@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,31 +16,31 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvClient Client
+ * \addtogroup LISerClient Client
  * @{
  */
 
 #ifndef __SERVER_CLIENT_H__
 #define __SERVER_CLIENT_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <archive/lips-archive.h>
-#include <config/lips-config.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/config.h>
+#include <lipsofsuna/script.h>
 #include "server-callbacks.h"
 #include "server-object.h"
 #include "server-types.h"
 
-struct _lisrvClient
+struct _LISerClient
 {
-	lialgU32dic* vision;
-	licalHandle calls[5];
-	liengObject* object;
-	lisrvServer* server;
-	lisrvClient* next;
-	lisrvClient* prev;
+	LIAlgU32dic* vision;
+	LICalHandle calls[5];
+	LIEngObject* object;
+	LISerServer* server;
+	LISerClient* next;
+	LISerClient* prev;
 	uint8_t radius;
 	struct
 	{
@@ -48,26 +48,26 @@ struct _lisrvClient
 	} network;
 };
 
-lisrvClient*
-lisrv_client_new (lisrvServer* server,
-                  liengObject* object,
+LISerClient*
+liser_client_new (LISerServer* server,
+                  LIEngObject* object,
                   grapple_user user);
 
 void
-lisrv_client_free (lisrvClient* self);
+liser_client_free (LISerClient* self);
 
 void
-lisrv_client_send (lisrvClient* self,
-                   liarcWriter* writer,
+liser_client_send (LISerClient* self,
+                   LIArcWriter* writer,
                    int          flags);
 
 int
-lisrv_client_get_near (const lisrvClient* self,
-                       const liengObject* object);
+liser_client_get_near (const LISerClient* self,
+                       const LIEngObject* object);
 
 int
-lisrv_client_set_object (lisrvClient* self,
-                         liengObject* value);
+liser_client_set_object (LISerClient* self,
+                         LIEngObject* value);
 
 #endif
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,37 +18,37 @@
 /**
  * \addtogroup livie Viewer
  * @{
- * \addtogroup livieViewer Viewer
+ * \addtogroup LIVieViewer Viewer
  * @{
  */
 
 #ifndef __VIEWER_H__
 #define __VIEWER_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <paths/lips-paths.h>
-#include <reload/lips-reload.h>
-#include <render/lips-render.h>
-#include <system/lips-system.h>
-#include <video/lips-video.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/paths.h>
+#include <lipsofsuna/reload.h>
+#include <lipsofsuna/render.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/video.h>
 
-typedef struct _livieViewer livieViewer;
-struct _livieViewer
+typedef struct _LIVieViewer LIVieViewer;
+struct _LIVieViewer
 {
 	char* file;
-	lialgCamera* camera;
-	lipthPaths* paths;
-	lirelReload* reload;
-	lirndModel* model;
-	lirndObject* object;
-	lirndRender* render;
-	lirndScene* scene;
-	lividCalls video;
+	LIAlgCamera* camera;
+	LIPthPaths* paths;
+	LIRelReload* reload;
+	LIRenModel* model;
+	LIRenObject* object;
+	LIRenRender* render;
+	LIRenScene* scene;
+	LIVidCalls video;
 	SDL_Surface* screen;
 	struct
 	{
-		lirndLight* key;
-		lirndLight* fill;
+		LIRenLight* key;
+		LIRenLight* fill;
 	} lights;
 	struct
 	{
@@ -58,16 +58,16 @@ struct _livieViewer
 	} mode;
 };
 
-livieViewer*
-livie_viewer_new (lividCalls* video,
-                  lipthPaths* paths,
+LIVieViewer*
+livie_viewer_new (LIVidCalls* video,
+                  LIPthPaths* paths,
                   const char* model);
 
 void
-livie_viewer_free (livieViewer* self);
+livie_viewer_free (LIVieViewer* self);
 
 int
-livie_viewer_main (livieViewer* self);
+livie_viewer_main (LIVieViewer* self);
 
 #endif
 

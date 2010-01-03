@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-dialog.h"
 #include "ext-module.h"
 
@@ -44,7 +44,7 @@
  * -- @param self Generator class.
  * function Generator.load(self)
  */
-static void Generator_load (liscrArgs* args)
+static void Generator_load (LIScrArgs* args)
 {
 #warning FIXME: Generator_load not implemented
 }
@@ -58,9 +58,9 @@ static void Generator_load (liscrArgs* args)
  * -- @return New generator widget.
  * function Generator.new(self, args)
  */
-static void Generator_new (liscrArgs* args)
+static void Generator_new (LIScrArgs* args)
 {
-	liextModule* module;
+	LIExtModule* module;
 
 	/* Only supports one widget currently. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
@@ -86,7 +86,7 @@ static void Generator_new (liscrArgs* args)
  * -- @param self Generator class.
  * function Generator.save(self)
  */
-static void Generator_save (liscrArgs* args)
+static void Generator_save (LIScrArgs* args)
 {
 	if (!liext_editor_save (args->self))
 		lisys_error_report ();
@@ -95,13 +95,13 @@ static void Generator_save (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextGeneratorScript (liscrClass* self,
+liext_script_generator (LIScrClass* self,
                       void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "load", Generator_load);
 	liscr_class_insert_cfunc (self, "new", Generator_new);
 	liscr_class_insert_cfunc (self, "save", Generator_save);

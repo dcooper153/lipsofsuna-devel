@@ -26,13 +26,13 @@
 
 #include "ext-slots.h"
 
-liextSlots*
-liext_slots_new (liextModule* module,
-                 liengObject* object)
+LIExtSlots*
+liext_slots_new (LIExtModule* module,
+                 LIEngObject* object)
 {
-	liextSlots* self;
+	LIExtSlots* self;
 
-	self = lisys_calloc (1, sizeof (liextSlots));
+	self = lisys_calloc (1, sizeof (LIExtSlots));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -48,7 +48,7 @@ liext_slots_new (liextModule* module,
 }
 
 void
-liext_slots_free (liextSlots* self)
+liext_slots_free (LIExtSlots* self)
 {
 	if (self->slots != NULL)
 	{
@@ -59,9 +59,9 @@ liext_slots_free (liextSlots* self)
 }
 
 void
-liext_slots_clear (liextSlots* self)
+liext_slots_clear (LIExtSlots* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->slots)
 		liext_slot_free (iter.value);
@@ -69,11 +69,11 @@ liext_slots_clear (liextSlots* self)
 }
 
 void
-liext_slots_clear_object (liextSlots*  self,
-                          liengObject* object)
+liext_slots_clear_object (LIExtSlots*  self,
+                          LIEngObject* object)
 {
-	lialgStrdicIter iter;
-	liextSlot* slot;
+	LIAlgStrdicIter iter;
+	LIExtSlot* slot;
 
 	LI_FOREACH_STRDIC (iter, self->slots)
 	{
@@ -89,12 +89,12 @@ liext_slots_clear_object (liextSlots*  self,
 }
 
 int
-liext_slots_set_slot (liextSlots* self,
+liext_slots_set_slot (LIExtSlots* self,
                       const char* slot,
                       const char* node,
                       int         model)
 {
-	liextSlot* slot_;
+	LIExtSlot* slot_;
 
 	/* Remove old slot. */
 	slot_ = lialg_strdic_find (self->slots, slot);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgScroll Scroll
+ * \addtogroup LIWdgScroll Scroll
  * @{
  */
 
@@ -26,51 +26,51 @@
 #include "widget-scroll.h"
 
 static int
-private_init (liwdgScroll* self,
-              liwdgManager*  manager);
+private_init (LIWdgScroll* self,
+              LIWdgManager*  manager);
 
 static void
-private_free (liwdgScroll* self);
+private_free (LIWdgScroll* self);
 
 static int
-private_event (liwdgScroll* self,
+private_event (LIWdgScroll* self,
                liwdgEvent*    event);
 
 static void
-private_rebuild (liwdgScroll* self);
+private_rebuild (LIWdgScroll* self);
 
-const liwdgClass liwdgScrollType =
+const LIWdgClass liwdg_widget_scroll =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Scroll", sizeof (liwdgScroll),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Scroll", sizeof (LIWdgScroll),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_scroll_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_scroll_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgScrollType);
+	return liwdg_widget_new (manager, &liwdg_widget_scroll);
 }
 
-lifntFont*
-liwdg_scroll_get_font (liwdgScroll* self)
+LIFntFont*
+liwdg_scroll_get_font (LIWdgScroll* self)
 {
 	return self->font;
 }
 
 void
-liwdg_scroll_set_font (liwdgScroll* self,
-                       lifntFont* font)
+liwdg_scroll_set_font (LIWdgScroll* self,
+                       LIFntFont* font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 void
-liwdg_scroll_set_range (liwdgScroll* self,
+liwdg_scroll_set_range (LIWdgScroll* self,
                         float        min,
                         float        max)
 {
@@ -82,13 +82,13 @@ liwdg_scroll_set_range (liwdgScroll* self,
 }
 
 float
-liwdg_scroll_get_value (liwdgScroll* self)
+liwdg_scroll_get_value (LIWdgScroll* self)
 {
 	return self->value;
 }
 
 void
-liwdg_scroll_set_value (liwdgScroll* self,
+liwdg_scroll_set_value (LIWdgScroll* self,
                         float      value)
 {
 	self->value = value;
@@ -98,8 +98,8 @@ liwdg_scroll_set_value (liwdgScroll* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgScroll*    self,
-              liwdgManager* manager)
+private_init (LIWdgScroll*    self,
+              LIWdgManager* manager)
 {
 	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
@@ -113,20 +113,20 @@ private_init (liwdgScroll*    self,
 }
 
 static void
-private_free (liwdgScroll* self)
+private_free (LIWdgScroll* self)
 {
 	lifnt_layout_free (self->text);
 }
 
 static int
-private_event (liwdgScroll*  self,
+private_event (LIWdgScroll*  self,
                liwdgEvent* event)
 {
 	int w;
 	int h;
 	float v;
-	liwdgRect rect;
-	liwdgStyle* style;
+	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	switch (event->type)
 	{
@@ -165,11 +165,11 @@ private_event (liwdgScroll*  self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgScroll* self)
+private_rebuild (LIWdgScroll* self)
 {
 	int h = 0;
 	char buf[256];

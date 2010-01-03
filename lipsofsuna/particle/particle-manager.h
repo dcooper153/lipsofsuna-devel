@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lipar Particle
  * @{
- * \addtogroup liparManager Manager
+ * \addtogroup LIParManager Manager
  * @{
  */
 
@@ -28,58 +28,58 @@
 #include "particle-line.h"
 #include "particle-point.h"
 
-typedef struct _liparManager liparManager;
-struct _liparManager
+typedef struct _LIParManager LIParManager;
+struct _LIParManager
 {
 	struct
 	{
 		int count;
 		int count_used;
 		int count_free;
-		liparLine* all;
-		liparLine* used;
-		liparLine* free;
+		LIParLine* all;
+		LIParLine* used;
+		LIParLine* free;
 	} lines;
 	struct
 	{
 		int count;
 		int count_used;
 		int count_free;
-		liparPoint* all;
-		liparPoint* used;
-		liparPoint* free;
+		LIParPoint* all;
+		LIParPoint* used;
+		LIParPoint* free;
 	} points;
 };
 
-liparManager*
+LIParManager*
 lipar_manager_new (int points,
                    int lines);
 
 void
-lipar_manager_free (liparManager* self);
+lipar_manager_free (LIParManager* self);
 
-liparLine*
-lipar_manager_insert_line (liparManager*      self,
-                           const limatVector* position0,
-                           const limatVector* position1,
-                           const limatVector* velocity0,
-                           const limatVector* velocity1);
+LIParLine*
+lipar_manager_insert_line (LIParManager*      self,
+                           const LIMatVector* position0,
+                           const LIMatVector* position1,
+                           const LIMatVector* velocity0,
+                           const LIMatVector* velocity1);
 
-liparPoint*
-lipar_manager_insert_point (liparManager*      self,
-                            const limatVector* position,
-                            const limatVector* velocity);
-
-void
-lipar_manager_remove_line (liparManager* self,
-                           liparLine*    line);
+LIParPoint*
+lipar_manager_insert_point (LIParManager*      self,
+                            const LIMatVector* position,
+                            const LIMatVector* velocity);
 
 void
-lipar_manager_remove_point (liparManager* self,
-                            liparPoint*   point);
+lipar_manager_remove_line (LIParManager* self,
+                           LIParLine*    line);
 
 void
-lipar_manager_update (liparManager* self,
+lipar_manager_remove_point (LIParManager* self,
+                            LIParPoint*   point);
+
+void
+lipar_manager_update (LIParManager* self,
                       float         secs);
 
 #endif

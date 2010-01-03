@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgBusy Busy
+ * \addtogroup LIWdgBusy Busy
  * @{
  */
 
@@ -27,38 +27,38 @@
 
 #include "widget-window.h"
 
-#define LIWDG_BUSY(o) ((liwdgBusy*)(o))
+#define LIWDG_BUSY(o) ((LIWdgBusy*)(o))
 
-typedef struct _liwdgBusy liwdgBusy;
-struct _liwdgBusy
+typedef struct _LIWdgBusy LIWdgBusy;
+struct _LIWdgBusy
 {
-	liwdgWindow base;
-	liwdgWidget* progress;
-	liwdgWidget* button;
+	LIWdgWindow base;
+	LIWdgWidget* progress;
+	LIWdgWidget* button;
 	liwdgHandler update_func;
 	void* update_data;
 };
 
-extern const liwdgClass liwdgBusyType;
+extern const LIWdgClass liwdg_widget_busy;
 
-liwdgWidget*
-liwdg_busy_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_busy_new (LIWdgManager* manager);
 
 void
-liwdg_busy_set_cancel (liwdgBusy*   self,
+liwdg_busy_set_cancel (LIWdgBusy*   self,
                        liwdgHandler handler,
                        void*        data);
 
 void
-liwdg_busy_set_progress (liwdgBusy* self,
+liwdg_busy_set_progress (LIWdgBusy* self,
                          float      value);
 
 void
-liwdg_busy_set_text (liwdgBusy*  self,
+liwdg_busy_set_text (LIWdgBusy*  self,
                      const char* value);
 
 void
-liwdg_busy_set_update (liwdgBusy*   self,
+liwdg_busy_set_update (LIWdgBusy*   self,
                        liwdgHandler handler,
                        void*        data);
 

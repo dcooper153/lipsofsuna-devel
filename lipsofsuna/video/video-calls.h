@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup livid Video
  * @{
- * \addtogroup lividCalls Calls
+ * \addtogroup LIVidCalls Calls
  * @{
  */
 
@@ -28,13 +28,13 @@
 #include <SDL.h>
 #include <SDL_main.h>
 #include <SDL_ttf.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
-typedef struct _lividCalls lividCalls;
-struct _lividCalls
+typedef struct _LIVidCalls LIVidCalls;
+struct _LIVidCalls
 {
-	lisysModule* libSDL;
-	lisysModule* libSDL_ttf;
+	LISysModule* libSDL;
+	LISysModule* libSDL_ttf;
 	SDL_Surface* (*SDL_ConvertSurface)(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
 	void (*SDL_Delay)(Uint32 ms);
 	int (*SDL_EnableKeyRepeat)(int delay, int interval);
@@ -70,7 +70,7 @@ struct _lividCalls
 };
 
 int
-livid_calls_init (lividCalls* self);
+livid_calls_init (LIVidCalls* self);
 
 #endif
 

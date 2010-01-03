@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,19 +18,19 @@
 #ifndef __PHYSICS_TYPES_H__
 #define __PHYSICS_TYPES_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyObject Object
+ * \addtogroup LIPhyObject Object
  * @{
  */
 
 #define LIPHY_GROUP_STATICS 0x4000
 #define LIPHY_GROUP_TILES 0x8000
 
-enum _liphyControlMode
+enum _LIPhyControlMode
 {
 	LIPHY_CONTROL_MODE_NONE,
 	LIPHY_CONTROL_MODE_CHARACTER,
@@ -40,11 +40,11 @@ enum _liphyControlMode
 	LIPHY_CONTROL_MODE_MAX
 };
 
-typedef struct _liphyContact liphyContact;
-typedef enum _liphyControlMode liphyControlMode;
-typedef struct _liphyObject liphyObject;
-typedef void (*liphyCallback)(liphyObject* self, float secs);
-typedef void (*liphyContactCall)(liphyObject* self, liphyContact* contact);
+typedef struct _LIPhyContact LIPhyContact;
+typedef enum _LIPhyControlMode LIPhyControlMode;
+typedef struct _LIPhyObject LIPhyObject;
+typedef void (*liphyCallback)(LIPhyObject* self, float secs);
+typedef void (*LIPhyContactCall)(LIPhyObject* self, LIPhyContact* contact);
 
 /** @} */
 /** @} */
@@ -52,17 +52,17 @@ typedef void (*liphyContactCall)(liphyObject* self, liphyContact* contact);
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyCollision Collision
+ * \addtogroup LIPhyCollision Collision
  * @{
  */
 
-typedef struct _liphyCollision liphyCollision;
-struct _liphyCollision
+typedef struct _LIPhyCollision LIPhyCollision;
+struct _LIPhyCollision
 {
 	float fraction;
-	limatVector normal;
-	limatVector point;
-	liphyObject* object;
+	LIMatVector normal;
+	LIMatVector point;
+	LIPhyObject* object;
 };
 
 /** @} */
@@ -71,11 +71,11 @@ struct _liphyCollision
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyConstraint Constraint
+ * \addtogroup LIPhyConstraint Constraint
  * @{
  */
 
-typedef struct _liphyConstraint liphyConstraint;
+typedef struct _LIPhyConstraint LIPhyConstraint;
 
 /** @} */
 /** @} */
@@ -83,16 +83,16 @@ typedef struct _liphyConstraint liphyConstraint;
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyContact Contact
+ * \addtogroup LIPhyContact Contact
  * @{
  */
 
-struct _liphyContact
+struct _LIPhyContact
 {
 	float impulse;
-	limatVector point;
-	limatVector normal;
-	liphyObject* object;
+	LIMatVector point;
+	LIMatVector normal;
+	LIPhyObject* object;
 };
 
 /** @} */
@@ -101,7 +101,7 @@ struct _liphyContact
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyPhysics Physics
+ * \addtogroup LIPhyPhysics Physics
  * @{
  */
 
@@ -120,8 +120,8 @@ struct _liphyContact
  */
 #define LIPHY_DEFAULT_COLLISION_MASK 0xFFFF
 
-typedef void (*liphyTransformCall)(liphyObject* object);
-typedef struct _liphyPhysics liphyPhysics;
+typedef void (*liphyTransformCall)(LIPhyObject* object);
+typedef struct _LIPhyPhysics LIPhyPhysics;
 
 /** @} */
 /** @} */
@@ -129,11 +129,11 @@ typedef struct _liphyPhysics liphyPhysics;
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphySector Sector
+ * \addtogroup LIPhySector Sector
  * @{
  */
 
-typedef struct _liphySector liphySector;
+typedef struct _LIPhySector LIPhySector;
 
 /** @} */
 /** @} */
@@ -141,11 +141,11 @@ typedef struct _liphySector liphySector;
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyShape Shape
+ * \addtogroup LIPhyShape Shape
  * @{
  */
 
-typedef struct _liphyShape liphyShape;
+typedef struct _LIPhyShape LIPhyShape;
 
 /** @} */
 /** @} */

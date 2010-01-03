@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,64 +18,64 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgSectors Sectors
+ * \addtogroup LIAlgSectors Sectors
  * @{
  */
 
 #ifndef __ALGORITHM_SECTORS_H__
 #define __ALGORITHM_SECTORS_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 #include "algorithm-strdic.h"
 #include "algorithm-u32dic.h"
 
-typedef struct _lialgSector lialgSector;
-typedef struct _lialgSectors lialgSectors;
-typedef void (*lialgSectorFreeFunc)(void*);
-typedef void* (*lialgSectorLoadFunc)(lialgSector*);
+typedef struct _LIAlgSector LIAlgSector;
+typedef struct _LIAlgSectors LIAlgSectors;
+typedef void (*LIAlgSectorFreeFunc)(void*);
+typedef void* (*LIAlgSectorLoadFunc)(LIAlgSector*);
 
-struct _lialgSector
+struct _LIAlgSector
 {
 	int index;
 	int stamp;
 	int x;
 	int y;
 	int z;
-	limatVector position;
-	lialgSectors* manager;
-	lialgStrdic* content;
+	LIMatVector position;
+	LIAlgSectors* manager;
+	LIAlgStrdic* content;
 };
 
-struct _lialgSectors
+struct _LIAlgSectors
 {
 	int count;
 	float width;
-	lialgU32dic* sectors;
-	lialgStrdic* content;
+	LIAlgU32dic* sectors;
+	LIAlgStrdic* content;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-lialgSectors*
+LIAlgSectors*
 lialg_sectors_new (int   count,
                    float width);
 
 void
-lialg_sectors_free (lialgSectors* self);
+lialg_sectors_free (LIAlgSectors* self);
 
 void
-lialg_sectors_clear (lialgSectors* self);
+lialg_sectors_clear (LIAlgSectors* self);
 
 void*
-lialg_sectors_data_index (lialgSectors* self,
+lialg_sectors_data_index (LIAlgSectors* self,
                           const char*   name,
                           int           index,
                           int           create);
 
 void*
-lialg_sectors_data_offset (lialgSectors* self,
+lialg_sectors_data_offset (LIAlgSectors* self,
                            const char*   name,
                            int           x,
                            int           y,
@@ -83,30 +83,30 @@ lialg_sectors_data_offset (lialgSectors* self,
                            int           create);
 
 void*
-lialg_sectors_data_point (lialgSectors*      self,
+lialg_sectors_data_point (LIAlgSectors*      self,
                           const char*        name,
-                          const limatVector* point,
+                          const LIMatVector* point,
                           int                create);
 
-lialgSector*
-lialg_sectors_sector_index (lialgSectors* self,
+LIAlgSector*
+lialg_sectors_sector_index (LIAlgSectors* self,
                             int           index,
                             int           create);
 
-lialgSector*
-lialg_sectors_sector_offset (lialgSectors* self,
+LIAlgSector*
+lialg_sectors_sector_offset (LIAlgSectors* self,
                              int           x,
                              int           y,
                              int           z,
                              int           create);
 
-lialgSector*
-lialg_sectors_sector_point (lialgSectors*      self,
-                            const limatVector* point,
+LIAlgSector*
+lialg_sectors_sector_point (LIAlgSectors*      self,
+                            const LIMatVector* point,
                             int                create);
 
 void
-lialg_sectors_index_to_offset (lialgSectors* self,
+lialg_sectors_index_to_offset (LIAlgSectors* self,
                                int           index,
                                int*          x,
                                int*          y,
@@ -120,14 +120,14 @@ lialg_sectors_index_to_offset_static (int  count,
                                       int* z);
 
 int
-lialg_sectors_insert_content (lialgSectors*       self,
+lialg_sectors_insert_content (LIAlgSectors*       self,
                               const char*         name,
                               void*               data,
-                              lialgSectorFreeFunc free,
-                              lialgSectorLoadFunc load);
+                              LIAlgSectorFreeFunc free,
+                              LIAlgSectorLoadFunc load);
 
 int
-lialg_sectors_offset_to_index (lialgSectors* self,
+lialg_sectors_offset_to_index (LIAlgSectors* self,
                                int           x,
                                int           y,
                                int           z);
@@ -139,29 +139,29 @@ lialg_sectors_offset_to_index_static (int count,
                                       int z);
 
 int
-lialg_sectors_point_to_index (lialgSectors*      self,
-                              const limatVector* point);
+lialg_sectors_point_to_index (LIAlgSectors*      self,
+                              const LIMatVector* point);
 
 int
 lialg_sectors_point_to_index_static (int                count,
                                      float              width,
-                                     const limatVector* point);
+                                     const LIMatVector* point);
 
 void
-lialg_sectors_refresh_point (lialgSectors*      self,
-                             const limatVector* point,
+lialg_sectors_refresh_point (LIAlgSectors*      self,
+                             const LIMatVector* point,
                              float              radius);
 
 void
-lialg_sectors_remove (lialgSectors* self,
+lialg_sectors_remove (LIAlgSectors* self,
                       int           index);
 
 void
-lialg_sectors_remove_content (lialgSectors* self,
+lialg_sectors_remove_content (LIAlgSectors* self,
                               const char*   name);
 
 void*
-lialg_sectors_get_userdata (lialgSectors* self,
+lialg_sectors_get_userdata (LIAlgSectors* self,
                             const char*   name);
 
 #ifdef __cplusplus

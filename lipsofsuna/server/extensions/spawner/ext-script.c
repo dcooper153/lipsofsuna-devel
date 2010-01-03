@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-spawner.h"
 
@@ -49,11 +49,11 @@
  * -- @return Spawner or nil.
  * function Spawner.find(self, args)
  */
-static void Spawner_find (liscrArgs* args)
+static void Spawner_find (LIScrArgs* args)
 {
-	liextModule* module;
-	liextSpawner* spawner;
-	liscrData* object;
+	LIExtModule* module;
+	LIExtSpawner* spawner;
+	LIScrData* object;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
 	{
@@ -73,11 +73,11 @@ static void Spawner_find (liscrArgs* args)
  * -- @return New spawner.
  * function Spawner.new(self, args)
  */
-static void Spawner_new (liscrArgs* args)
+static void Spawner_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liextSpawner* self;
-	liscrData* data;
+	LIExtModule* module;
+	LIExtSpawner* self;
+	LIScrData* data;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPAWNER);
@@ -104,16 +104,16 @@ static void Spawner_new (liscrArgs* args)
  * -- @name Spawner.delay
  * -- @class table
  */
-static void Spawner_getter_delay (liscrArgs* args)
+static void Spawner_getter_delay (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((liextSpawner*) args->self)->delay);
+	liscr_args_seti_float (args, ((LIExtSpawner*) args->self)->delay);
 }
-static void Spawner_setter_delay (liscrArgs* args)
+static void Spawner_setter_delay (LIScrArgs* args)
 {
 	float value;
 
 	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
-		((liextSpawner*) args->self)->delay = value;
+		((LIExtSpawner*) args->self)->delay = value;
 }
 
 /* @luadoc
@@ -127,11 +127,11 @@ static void Spawner_setter_delay (liscrArgs* args)
  * -- @name Spawner.limit
  * -- @class table
  */
-static void Spawner_getter_limit (liscrArgs* args)
+static void Spawner_getter_limit (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((liextSpawner*) args->self)->limit);
+	liscr_args_seti_int (args, ((LIExtSpawner*) args->self)->limit);
 }
-static void Spawner_setter_limit (liscrArgs* args)
+static void Spawner_setter_limit (LIScrArgs* args)
 {
 	int value;
 
@@ -145,14 +145,14 @@ static void Spawner_setter_limit (liscrArgs* args)
  * -- @name Spawner.object
  * -- @class table
  */
-static void Spawner_getter_owner (liscrArgs* args)
+static void Spawner_getter_owner (LIScrArgs* args)
 {
-	if (((liextSpawner*) args->self)->owner != NULL)
-		liscr_args_seti_data (args, ((liextSpawner*) args->self)->owner->script);
+	if (((LIExtSpawner*) args->self)->owner != NULL)
+		liscr_args_seti_data (args, ((LIExtSpawner*) args->self)->owner->script);
 }
-static void Spawner_setter_owner (liscrArgs* args)
+static void Spawner_setter_owner (LIScrArgs* args)
 {
-	liscrData* object;
+	LIScrData* object;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &object))
 		liext_spawner_set_owner (args->self, object->data);
@@ -175,7 +175,7 @@ static void Spawner_setter_owner (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextSpawnerScript (liscrClass* self,
+liext_script_spawner (LIScrClass* self,
                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPAWNER, data);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysError Error
+ * \addtogroup LISysError Error
  * @{
  */
 
@@ -31,8 +31,8 @@
 
 #define LISYS_ERROR_LENGTH 256
 
-typedef struct _lisysError lisysError;
-struct _lisysError
+typedef struct _LISysError LISysError;
+struct _LISysError
 {
 	int pos;
 	int type;
@@ -49,7 +49,7 @@ private_init ();
 static void
 private_free (void* data);
 
-static lisysError*
+static LISysError*
 private_get ();
 
 /*****************************************************************************/
@@ -66,7 +66,7 @@ lisys_error_append (const char* format,
 {
 	int num;
 	va_list args;
-	lisysError* data;
+	LISysError* data;
 
 	/* Get thread specific data. */
 	data = private_get ();
@@ -95,7 +95,7 @@ lisys_error_append (const char* format,
 int
 lisys_error_peek ()
 {
-	lisysError* data;
+	LISysError* data;
 
 	/* Get thread specific data. */
 	data = private_get ();
@@ -134,7 +134,7 @@ int
 lisys_error_get (const char** text)
 {
 	int type;
-	lisysError* data;
+	LISysError* data;
 
 	/* Get thread specific data. */
 	data = private_get ();
@@ -195,7 +195,7 @@ lisys_error_set (int         type,
 {
 	va_list args;
 	const char* tmp;
-	lisysError* data;
+	LISysError* data;
 
 	/* Get thread specific data. */
 	data = private_get ();
@@ -248,10 +248,10 @@ private_free (void* data)
 	free (data);
 }
 
-static lisysError*
+static LISysError*
 private_get ()
 {
-	lisysError* data;
+	LISysError* data;
 
 	pthread_once (&private_once, private_init);
 	data = pthread_getspecific (private_key);

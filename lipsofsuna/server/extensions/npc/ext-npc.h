@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,18 +27,18 @@
 #ifndef __EXT_NPC_H__
 #define __EXT_NPC_H__
 
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
-struct _liextNpc
+struct _LIExtNpc
 {
-	licalHandle calls[1];
-	liengObject* owner;
-	liengObject* target;
-	liextModule* module;
-	liscrData* path;
-	liscrData* script;
+	LICalHandle calls[1];
+	LIEngObject* owner;
+	LIEngObject* target;
+	LIExtModule* module;
+	LIScrData* path;
+	LIScrData* script;
 	int active;
 	int alert;
 	float radius;
@@ -46,30 +46,30 @@ struct _liextNpc
 	float timer;
 };
 
-liextNpc*
-liext_npc_new (liextModule* module);
+LIExtNpc*
+liext_npc_new (LIExtModule* module);
 
 void
-liext_npc_free (liextNpc* self);
+liext_npc_free (LIExtNpc* self);
 
 int
-liext_npc_get_active (liextNpc* self);
+liext_npc_get_active (LIExtNpc* self);
 
 int
-liext_npc_set_active (liextNpc* self,
+liext_npc_set_active (LIExtNpc* self,
                       int       value);
 
 int
-liext_npc_set_owner (liextNpc*    self,
-                     liengObject* value);
+liext_npc_set_owner (LIExtNpc*    self,
+                     LIEngObject* value);
 
 void
-liext_npc_set_path (liextNpc*  self,
-                    liscrData* path);
+liext_npc_set_path (LIExtNpc*  self,
+                    LIScrData* path);
 
 void
-liext_npc_set_target (liextNpc*    self,
-                      liengObject* object);
+liext_npc_set_target (LIExtNpc*    self,
+                      LIEngObject* object);
 
 #endif
 

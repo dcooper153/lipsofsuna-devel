@@ -24,7 +24,7 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-skills.h"
 #include "ext-widget.h"
 
@@ -32,32 +32,32 @@ static const void*
 private_base ();
 
 static int
-private_init (liextSkillWidget* self,
-              liwdgManager*     manager);
+private_init (LIExtSkillWidget* self,
+              LIWdgManager*     manager);
 
 static void
-private_free (liextSkillWidget* self);
+private_free (LIExtSkillWidget* self);
 
 static int
-private_event (liextSkillWidget* self,
+private_event (LIExtSkillWidget* self,
                liwdgEvent*       event);
 
 /****************************************************************************/
 
-const liwdgClass liextSkillWidgetType =
+const LIWdgClass LIExtSkillWidgetType =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "SkillWidget", sizeof (liextSkillWidget),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "SkillWidget", sizeof (LIExtSkillWidget),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_skill_widget_new (liextModule* module)
+LIWdgWidget*
+liext_skill_widget_new (LIExtModule* module)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (module->client->widgets, &liextSkillWidgetType);
+	self = liwdg_widget_new (module->client->widgets, &LIExtSkillWidgetType);
 	if (self == NULL)
 		return NULL;
 	LIEXT_SKILL_WIDGET (self)->module = module;
@@ -66,7 +66,7 @@ liext_skill_widget_new (liextModule* module)
 }
 
 int
-liext_skill_widget_set_skill (liextSkillWidget* self,
+liext_skill_widget_set_skill (LIExtSkillWidget* self,
                               uint32_t          object,
                               const char*       name)
 {
@@ -87,15 +87,15 @@ liext_skill_widget_set_skill (liextSkillWidget* self,
 static const void*
 private_base ()
 {
-	return &liwdgGroupType;
+	return &liwdg_widget_group;
 }
 
 static int
-private_init (liextSkillWidget* self,
-              liwdgManager*     manager)
+private_init (LIExtSkillWidget* self,
+              LIWdgManager*     manager)
 {
 	int i;
-	liwdgWidget* widgets[] =
+	LIWdgWidget* widgets[] =
 	{
 		liwdg_progress_new (manager)
 	};
@@ -103,7 +103,7 @@ private_init (liextSkillWidget* self,
 	/* Check memory. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 1))
 		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			goto error;
@@ -120,7 +120,7 @@ private_init (liextSkillWidget* self,
 	return 1;
 
 error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			liwdg_widget_free (widgets[i]);
@@ -129,25 +129,25 @@ error:
 }
 
 static void
-private_free (liextSkillWidget* self)
+private_free (LIExtSkillWidget* self)
 {
 	lisys_free (self->skill);
 }
 
 static int
-private_event (liextSkillWidget* self,
+private_event (LIExtSkillWidget* self,
                liwdgEvent*       event)
 {
 	uint32_t id;
 	char buffer[256];
-	liengObject* object;
-	liextSkill* skill;
-	liextSkills* skills;
+	LIEngObject* object;
+	LIExtSkill* skill;
+	LIExtSkills* skills;
 
 	/* Update value. */
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
 	{
-		liwdgGroupType.event (LIWDG_WIDGET (self), event);
+		liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 		if (!self->object || self->skill == NULL)
 		{
 			if (self->module->client->network == NULL)
@@ -171,7 +171,7 @@ private_event (liextSkillWidget* self,
 		return 1;
 	}
 
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 
 disable:
 	liwdg_progress_set_value (LIWDG_PROGRESS (self->value), 0.0f);

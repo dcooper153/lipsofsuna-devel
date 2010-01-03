@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 
 /* @luadoc
@@ -52,16 +52,16 @@
  * -- @param args Arguments.
  * function Effect.particle(self, args)
  */
-static void Effect_particle (liscrArgs* args)
+static void Effect_particle (LIScrArgs* args)
 {
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	float fade = 0.5f;
 	float life = 1.0f;
-	liextModule* module;
-	limatVector position;
-	limatVector accel = { 0.0f, -9.8f, 0.0f };
-	limatVector velocity = { 0.0f, 0.0f, 0.0f };
-	liparPoint* particle;
+	LIExtModule* module;
+	LIMatVector position;
+	LIMatVector accel = { 0.0f, -9.8f, 0.0f };
+	LIMatVector velocity = { 0.0f, 0.0f, 0.0f };
+	LIParPoint* particle;
 
 	/* Mandatory arguments. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
@@ -77,7 +77,7 @@ static void Effect_particle (liscrArgs* args)
 	liscr_args_gets_float (args, "fade", &fade);
 
 	/* Create particle. */
-	particle = lirnd_scene_insert_particle (module->client->scene, &position, &velocity);
+	particle = liren_scene_insert_particle (module->client->scene, &position, &velocity);
 	if (particle != NULL)
 	{
 		particle->color[0] = color[0];
@@ -112,7 +112,7 @@ static void Effect_particle (liscrArgs* args)
  * -- @param args Arguments.
  * function Effect.random(self, args)
  */
-static void Effect_random (liscrArgs* args)
+static void Effect_random (LIScrArgs* args)
 {
 	int i;
 	int count;
@@ -123,16 +123,16 @@ static void Effect_random (liscrArgs* args)
 	float random;
 	float spread;
 	float velocity;
-	liextModule* module;
-	limatQuaternion rot0;
-	limatQuaternion rot1;
-	limatVector tmp;
-	limatVector axis;
-	limatVector accel;
-	limatVector position;
-	limatVector partpos;
-	limatVector partvel;
-	liparPoint* particle;
+	LIExtModule* module;
+	LIMatQuaternion rot0;
+	LIMatQuaternion rot1;
+	LIMatVector tmp;
+	LIMatVector axis;
+	LIMatVector accel;
+	LIMatVector position;
+	LIMatVector partpos;
+	LIMatVector partvel;
+	LIParPoint* particle;
 
 	/* Mandatory arguments. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
@@ -182,7 +182,7 @@ static void Effect_random (liscrArgs* args)
 		partpos = limat_vector_add (partpos, position);
 		partvel = limat_vector_multiply (tmp, velocity + velocity * random *
 			(2.0f * rand () / RAND_MAX - 1.0f));
-		particle = lirnd_scene_insert_particle (module->client->scene, &partpos, &partvel);
+		particle = liren_scene_insert_particle (module->client->scene, &partpos, &partvel);
 		if (particle != NULL)
 		{
 			particle->color[0] = color[0];
@@ -208,15 +208,15 @@ static void Effect_random (liscrArgs* args)
  * -- @param args Arguments.
  * function Effect.ray(self, args)
  */
-static void Effect_ray (liscrArgs* args)
+static void Effect_ray (LIScrArgs* args)
 {
 	float fade = 0.5f;
 	float life = 1.0f;
-	liextModule* module;
-	limatVector dst;
-	limatVector src;
-	limatVector tmp;
-	liparLine* line;
+	LIExtModule* module;
+	LIMatVector dst;
+	LIMatVector src;
+	LIMatVector tmp;
+	LIParLine* line;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
 	if (!liscr_args_gets_vector (args, "dst", &dst) ||
@@ -247,13 +247,13 @@ static void Effect_ray (liscrArgs* args)
  * -- @param args Arguments.
  * function Effect.system(self, args)
  */
-static void Effect_system (liscrArgs* args)
+static void Effect_system (LIScrArgs* args)
 {
 	int i;
-	liextModule* module;
-	limatVector position;
-	limatVector velocity;
-	liparPoint* particle;
+	LIExtModule* module;
+	LIMatVector position;
+	LIMatVector velocity;
+	LIParPoint* particle;
 
 	/* Mandatory arguments. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EFFECT);
@@ -267,7 +267,7 @@ static void Effect_system (liscrArgs* args)
 			0.1*(rand()/(0.5*RAND_MAX)-1.0),
 			0.1*(rand()/(3.0*RAND_MAX)+3.0),
 			0.1*(rand()/(0.5*RAND_MAX)-1.0));
-		particle = lirnd_scene_insert_particle (module->client->scene, &position, &velocity);
+		particle = liren_scene_insert_particle (module->client->scene, &position, &velocity);
 		if (particle != NULL)
 		{
 			particle->time_life = 2.0f;
@@ -280,7 +280,7 @@ static void Effect_system (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextEffectScript (liscrClass* self,
+liext_script_effect (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EFFECT, data);

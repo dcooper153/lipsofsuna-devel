@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,10 +15,12 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_THREAD_H__
-#define __LIPS_THREAD_H__
+#ifndef __LIPS_SOUND_H__
+#define __LIPS_SOUND_H__
 
-#include "thread.h"
-#include "thread-async-call.h"
+#include "sound/sound-manager.h"
+#include "sound/sound-sample.h"
+#include "sound/sound-source.h"
+#include "sound/sound-system.h"
 
 #endif

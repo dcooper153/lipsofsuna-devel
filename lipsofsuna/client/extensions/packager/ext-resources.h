@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,17 +27,17 @@
 #ifndef __EXT_RESOURCES_H__
 #define __EXT_RESOURCES_H__
 
-#include <model/lips-model.h>
+#include <lipsofsuna/model.h>
 
-typedef struct _liextModel liextModel;
-struct _liextModel
+typedef struct _LIExtModel LIExtModel;
+struct _LIExtModel
 {
 	char* name;
-	limatAabb bounds;
+	LIMatAabb bounds;
 };
 
-typedef struct _liextResources liextResources;
-struct _liextResources
+typedef struct _LIExtResources LIExtResources;
+struct _LIExtResources
 {
 	struct
 	{
@@ -47,7 +47,7 @@ struct _liextResources
 	struct
 	{
 		int count;
-		liextModel* array;
+		LIExtModel* array;
 	} models;
 	struct
 	{
@@ -61,26 +61,26 @@ struct _liextResources
 	} textures;
 };
 
-liextResources*
+LIExtResources*
 liext_resources_new ();
 
 void
-liext_resources_free (liextResources* self);
+liext_resources_free (LIExtResources* self);
 
 void
-liext_resources_clear (liextResources* self);
+liext_resources_clear (LIExtResources* self);
 
 int
-liext_resources_insert_model (liextResources*   self,
+liext_resources_insert_model (LIExtResources*   self,
                               const char*       name,
-                              const limdlModel* model);
+                              const LIMdlModel* model);
 
 int
-liext_resources_insert_texture (liextResources* self,
+liext_resources_insert_texture (LIExtResources* self,
                                 const char*     name);
 
 int
-liext_resources_save (liextResources* self,
+liext_resources_save (LIExtResources* self,
                       const char*     name);
 
 #endif

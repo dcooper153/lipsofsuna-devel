@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,19 +22,19 @@
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "reload.h"
 #undef main
 
 static void
-private_reload_image (lirelReload* self,
+private_reload_image (LIRelReload* self,
                       const char*  name)
 {
 	printf ("Imported image `%s'\n", name);
 }
 
 static void
-private_reload_model (lirelReload* self,
+private_reload_model (LIRelReload* self,
                       const char*  name)
 {
 	printf ("Imported model `%s'\n", name);
@@ -43,8 +43,8 @@ private_reload_model (lirelReload* self,
 int
 main (int argc, char** argv)
 {
-	lipthPaths* paths;
-	lirelReload* self;
+	LIPthPaths* paths;
+	LIRelReload* self;
 
 	/* Resolve game directory. */
 	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");

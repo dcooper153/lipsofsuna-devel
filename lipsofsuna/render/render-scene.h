@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,77 +16,77 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndScene Scene
+ * \addtogroup LIRenScene Scene
  * @{
  */
 
 #ifndef __RENDER_SCENE_H__
 #define __RENDER_SCENE_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <particle/lips-particle.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/particle.h>
+#include <lipsofsuna/system.h>
 #include "render-deferred.h"
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-object.h"
 #include "render-types.h"
 
-struct _lirndScene
+struct _LIRenScene
 {
-	lialgPtrdic* groups;
-	lialgU32dic* objects;
-	liparManager* particles;
-	lirndRender* render;
-	lirndLighting* lighting;
+	LIAlgPtrdic* groups;
+	LIAlgU32dic* objects;
+	LIParManager* particles;
+	LIRenRender* render;
+	LIRenLighting* lighting;
 	struct
 	{
-		lirndObject* model;
+		LIRenObject* model;
 	} sky;
 };
 
-lirndScene*
-lirnd_scene_new (lirndRender* render);
+LIRenScene*
+liren_scene_new (LIRenRender* render);
 
 void
-lirnd_scene_free (lirndScene* self);
+liren_scene_free (LIRenScene* self);
 
-lirndObject*
-lirnd_scene_find_object (lirndScene* self,
+LIRenObject*
+liren_scene_find_object (LIRenScene* self,
                          int         id);
 
-liparPoint*
-lirnd_scene_insert_particle (lirndScene*        self,
-                             const limatVector* position,
-                             const limatVector* velocity);
+LIParPoint*
+liren_scene_insert_particle (LIRenScene*        self,
+                             const LIMatVector* position,
+                             const LIMatVector* velocity);
 
 int
-lirnd_scene_pick (lirndScene*     self,
-                  limatMatrix*    modelview,
-                  limatMatrix*    projection,
-                  limatFrustum*   frustum,
+liren_scene_pick (LIRenScene*     self,
+                  LIMatMatrix*    modelview,
+                  LIMatMatrix*    projection,
+                  LIMatFrustum*   frustum,
                   const int*      viewport,
                   int             x,
                   int             y,
                   int             size,
-                  lirndSelection* result);
+                  LIRenSelection* result);
 
 void
-lirnd_scene_render (lirndScene*    self,
-                    lirndDeferred* framebuffer,
-                    limatMatrix*   modelview,
-                    limatMatrix*   projection,
-                    limatFrustum*  frustum);
+liren_scene_render (LIRenScene*    self,
+                    LIRenDeferred* framebuffer,
+                    LIMatMatrix*   modelview,
+                    LIMatMatrix*   projection,
+                    LIMatFrustum*  frustum);
 
 void
-lirnd_scene_update (lirndScene* self,
+liren_scene_update (LIRenScene* self,
                     float       secs);
 
 int
-lirnd_scene_set_sky (lirndScene* self,
-                     lirndModel* model);
+liren_scene_set_sky (LIRenScene* self,
+                     LIRenModel* model);
 
 #endif
 

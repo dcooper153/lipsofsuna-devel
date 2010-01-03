@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,56 +18,56 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgCheck Check
+ * \addtogroup LIWdgCheck Check
  * @{
  */
 
 #ifndef __WIDGET_CHECK_H__
 #define __WIDGET_CHECK_H__
 
-#include <font/lips-font.h>
+#include <lipsofsuna/font.h>
 #include "widget.h"
 
-#define LIWDG_CHECK(o) ((liwdgCheck*)(o))
+#define LIWDG_CHECK(o) ((LIWdgCheck*)(o))
 
 /**
  * \brief Checkbox widget.
  */
-typedef struct _liwdgCheck liwdgCheck;
-struct _liwdgCheck
+typedef struct _LIWdgCheck LIWdgCheck;
+struct _LIWdgCheck
 {
-	liwdgWidget base;
-	lifntFont* font;
-	lifntLayout* text;
+	LIWdgWidget base;
+	LIFntFont* font;
+	LIFntLayout* text;
 	int active;
 	char* string;
 };
 
-extern const liwdgClass liwdgCheckType;
+extern const LIWdgClass liwdg_widget_check;
 
-liwdgWidget*
-liwdg_check_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_check_new (LIWdgManager* manager);
 
 int
-liwdg_check_get_active (liwdgCheck* self);
+liwdg_check_get_active (LIWdgCheck* self);
 
 void
-liwdg_check_set_active (liwdgCheck* self,
+liwdg_check_set_active (LIWdgCheck* self,
                         int         active);
 
-lifntFont*
-liwdg_check_get_font (liwdgCheck* self);
+LIFntFont*
+liwdg_check_get_font (LIWdgCheck* self);
 
 void
-liwdg_check_set_font (liwdgCheck* self,
-                      lifntFont*  font);
+liwdg_check_set_font (LIWdgCheck* self,
+                      LIFntFont*  font);
 
 int
-liwdg_check_set_text (liwdgCheck* self,
+liwdg_check_set_text (LIWdgCheck* self,
                       const char* text);
 
 const char*
-liwdg_check_get_text (liwdgCheck* self);
+liwdg_check_get_text (LIWdgCheck* self);
 
 #endif
 

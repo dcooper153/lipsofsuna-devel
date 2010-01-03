@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,13 @@
 /**
  * \addtogroup licfg Config 
  * @{
- * \addtogroup licfgAccount Account
+ * \addtogroup LICfgAccount Account
  * @{
  */
 
-#include <archive/lips-archive.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "config-account.h"
 
 /**
@@ -33,17 +33,17 @@
  * \param path Full path to the file.
  * \return New account configuration or NULL.
  */
-licfgAccount*
+LICfgAccount*
 licfg_account_new (const char* path)
 {
 	int ok;
 	char* key;
 	char* value;
-	liarcReader* reader = NULL;
-	licfgAccount* self;
+	LIArcReader* reader = NULL;
+	LICfgAccount* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licfgAccount));
+	self = lisys_calloc (1, sizeof (LICfgAccount));
 	if (self == NULL)
 		return NULL;
 
@@ -114,7 +114,7 @@ error:
  * \param self Account configuration.
  */
 void
-licfg_account_free (licfgAccount* self)
+licfg_account_free (LICfgAccount* self)
 {
 	lisys_free (self->password);
 	lisys_free (self);

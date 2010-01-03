@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengEngine Engine
+ * \addtogroup LIEngEngine Engine
  * @{
  */
 
@@ -29,11 +29,11 @@
 #include "engine-selection.h"
 
 static int
-private_init (liengEngine* self);
+private_init (LIEngEngine* self);
 
 static void
-private_physics_transform (liengEngine* self,
-                           liphyObject* object);
+private_physics_transform (LIEngEngine* self,
+                           LIPhyObject* object);
 
 /*****************************************************************************/
 
@@ -45,14 +45,14 @@ private_physics_transform (liengEngine* self,
  * \param path Module directory.
  * \return New engine or NULL.
  */
-liengEngine*
-lieng_engine_new (licalCallbacks* calls,
-                  lialgSectors*   sectors,
+LIEngEngine*
+lieng_engine_new (LICalCallbacks* calls,
+                  LIAlgSectors*   sectors,
                   const char*     path)
 {
-	liengEngine* self;
+	LIEngEngine* self;
 
-	self = lisys_calloc (1, sizeof (liengEngine));
+	self = lisys_calloc (1, sizeof (LIEngEngine));
 	if (self == NULL)
 		return NULL;
 	self->callbacks = calls;
@@ -75,12 +75,12 @@ error:
 }
 
 void
-lieng_engine_free (liengEngine* self)
+lieng_engine_free (LIEngEngine* self)
 {
-	lialgU32dicIter iter;
-	liengConstraint* constraint;
-	liengConstraint* constraint_next;
-	liengObject* object;
+	LIAlgU32dicIter iter;
+	LIEngConstraint* constraint;
+	LIEngConstraint* constraint_next;
+	LIEngObject* object;
 
 	/* Clear constraints. */
 	for (constraint = self->constraints ; constraint != NULL ; constraint = constraint_next)
@@ -130,7 +130,7 @@ lieng_engine_free (liengEngine* self)
 		lialg_u32dic_free (self->objects);
 	if (self->selection != NULL)
 		lialg_ptrdic_free (self->selection);
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self->config.dir);
 	lisys_free (self);
 }
@@ -141,10 +141,10 @@ lieng_engine_free (liengEngine* self)
  * \param self Engine.
  */
 void
-lieng_engine_clear_selection (liengEngine* self)
+lieng_engine_clear_selection (LIEngEngine* self)
 {
-	lialgPtrdicIter iter;
-	liengSelection* selection;
+	LIAlgPtrdicIter iter;
+	LIEngSelection* selection;
 
 	LI_FOREACH_PTRDIC (iter, self->selection)
 	{
@@ -154,25 +154,25 @@ lieng_engine_clear_selection (liengEngine* self)
 	lialg_ptrdic_clear (self->selection);
 }
 
-liengAnimation*
-lieng_engine_find_animation_by_code (liengEngine* self,
+LIEngAnimation*
+lieng_engine_find_animation_by_code (LIEngEngine* self,
                                      int          id)
 {
 	return lieng_resources_find_animation_by_code (self->resources, id);
 }
 
-liengAnimation*
-lieng_engine_find_animation_by_name (liengEngine* self,
+LIEngAnimation*
+lieng_engine_find_animation_by_name (LIEngEngine* self,
                                      const char*  name)
 {
 	return lieng_resources_find_animation_by_name (self->resources, name);
 }
 
-liengModel*
-lieng_engine_find_model_by_code (liengEngine* self,
+LIEngModel*
+lieng_engine_find_model_by_code (LIEngEngine* self,
                                  uint32_t     id)
 {
-	liengModel* model;
+	LIEngModel* model;
 
 	model = lieng_resources_find_model_by_code (self->resources, id);
 	if (model == NULL)
@@ -183,11 +183,11 @@ lieng_engine_find_model_by_code (liengEngine* self,
 	return model;
 }
 
-liengModel*
-lieng_engine_find_model_by_name (liengEngine* self,
+LIEngModel*
+lieng_engine_find_model_by_name (LIEngEngine* self,
                                  const char*  name)
 {
-	liengModel* model;
+	LIEngModel* model;
 
 	model = lieng_resources_find_model_by_name (self->resources, name);
 	if (model == NULL)
@@ -205,8 +205,8 @@ lieng_engine_find_model_by_name (liengEngine* self,
  * \param id Object number.
  * \return Object or NULL.
  */
-liengObject*
-lieng_engine_find_object (liengEngine* self,
+LIEngObject*
+lieng_engine_find_object (LIEngEngine* self,
                           uint32_t     id)
 {
 	return lialg_u32dic_find (self->objects, id);
@@ -219,8 +219,8 @@ lieng_engine_find_object (liengEngine* self,
  * \param constraint Constraint.
  */
 void
-lieng_engine_insert_constraint (liengEngine*     self,
-                                liengConstraint* constraint)
+lieng_engine_insert_constraint (LIEngEngine*     self,
+                                LIEngConstraint* constraint)
 {
 	if (self->constraints != NULL)
 		self->constraints->prev = constraint;
@@ -240,12 +240,12 @@ lieng_engine_insert_constraint (liengEngine*     self,
  * \return Nonzero on success.
  */
 int
-lieng_engine_load_model (liengEngine* self,
+lieng_engine_load_model (LIEngEngine* self,
                          const char*  name)
 {
-	lialgU32dicIter iter;
-	liengModel* model;
-	liengObject* object;
+	LIAlgU32dicIter iter;
+	LIEngModel* model;
+	LIEngObject* object;
 
 	/* Find model. */
 	model = lieng_resources_find_model_by_name (self->resources, name);
@@ -292,8 +292,8 @@ lieng_engine_load_model (liengEngine* self,
  * \return Nonzero on success.
  */
 int
-lieng_engine_load_resources (liengEngine* self,
-                             liarcReader* reader)
+lieng_engine_load_resources (LIEngEngine* self,
+                             LIArcReader* reader)
 {
 #warning Breaks due to old models being lost if called multiple times.
 #warning Should unload and reload models so that the list can change without restarting.
@@ -310,8 +310,8 @@ lieng_engine_load_resources (liengEngine* self,
  * \param constraint Constraint.
  */
 void
-lieng_engine_remove_constraint (liengEngine*     self,
-                                liengConstraint* constraint)
+lieng_engine_remove_constraint (LIEngEngine*     self,
+                                LIEngConstraint* constraint)
 {
 	if (constraint->next != NULL)
 		constraint->next->prev = constraint->prev;
@@ -330,14 +330,14 @@ lieng_engine_remove_constraint (liengEngine*     self,
  * \param secs Number of seconds since the last update.
  */
 void
-lieng_engine_update (liengEngine* self,
+lieng_engine_update (LIEngEngine* self,
                      float        secs)
 {
-	lialgSectorsIter siter;
-	lialgU32dicIter iter;
-	liengConstraint* constraint;
-	liengObject* object;
-	liengSector* sector;
+	LIAlgSectorsIter siter;
+	LIAlgU32dicIter iter;
+	LIEngConstraint* constraint;
+	LIEngObject* object;
+	LIEngSector* sector;
 
 	/* Update sectors. */
 	LIALG_SECTORS_FOREACH (siter, self->sectors)
@@ -376,7 +376,7 @@ lieng_engine_update (liengEngine* self,
  * \return Flags.
  */
 int
-lieng_engine_get_flags (const liengEngine* self)
+lieng_engine_get_flags (const LIEngEngine* self)
 {
 	return self->config.flags;
 }
@@ -388,7 +388,7 @@ lieng_engine_get_flags (const liengEngine* self)
  * \param flags Flags.
  */
 void
-lieng_engine_set_flags (liengEngine* self,
+lieng_engine_set_flags (LIEngEngine* self,
                         int          flags)
 {
 	self->config.flags = flags;
@@ -402,7 +402,7 @@ lieng_engine_set_flags (liengEngine* self,
  * \param end Range end.
  */
 void
-lieng_engine_set_local_range (liengEngine* self,
+lieng_engine_set_local_range (LIEngEngine* self,
                               uint32_t     start,
                               uint32_t     end)
 {
@@ -411,13 +411,13 @@ lieng_engine_set_local_range (liengEngine* self,
 }
 
 void*
-lieng_engine_get_userdata (liengEngine* self)
+lieng_engine_get_userdata (LIEngEngine* self)
 {
 	return self->userdata;
 }
 
 void
-lieng_engine_set_userdata (liengEngine* self,
+lieng_engine_set_userdata (LIEngEngine* self,
                            void*        value)
 {
 	self->userdata = value;
@@ -426,7 +426,7 @@ lieng_engine_set_userdata (liengEngine* self,
 /*****************************************************************************/
 
 static int
-private_init (liengEngine* self)
+private_init (LIEngEngine* self)
 {
 	/* Objects. */
 	self->objects = lialg_u32dic_new ();
@@ -451,18 +451,18 @@ private_init (liengEngine* self)
 
 	/* Sectors. */
 	if (!lialg_sectors_insert_content (self->sectors, "engine", self,
-	     	(lialgSectorFreeFunc) lieng_sector_free,
-	     	(lialgSectorLoadFunc) lieng_sector_new))
+	     	(LIAlgSectorFreeFunc) lieng_sector_free,
+	     	(LIAlgSectorLoadFunc) lieng_sector_new))
 		return 0;
 
 	return 1;
 }
 
 static void
-private_physics_transform (liengEngine* self,
-                           liphyObject* object)
+private_physics_transform (LIEngEngine* self,
+                           LIPhyObject* object)
 {
-	liengObject* obj;
+	LIEngObject* obj;
 
 	obj = liphy_object_get_userdata (object);
 	if (obj == NULL || obj->sector == NULL)

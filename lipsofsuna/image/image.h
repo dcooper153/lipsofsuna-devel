@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,41 +18,41 @@
 /**
  * \addtogroup liimg Image
  * @{
- * \addtogroup liimgImage Image
+ * \addtogroup LIImgImage Image
  * @{
  */
 
-typedef struct _liimgImage liimgImage;
-struct _liimgImage
+typedef struct _LIImgImage LIImgImage;
+struct _LIImgImage
 {
 	int width;
 	int height;
 	void* pixels;
 };
 
-liimgImage*
+LIImgImage*
 liimg_image_new ();
 
-liimgImage*
+LIImgImage*
 liimg_image_new_from_file (const char* path);
 
 void
-liimg_image_free (liimgImage* self);
+liimg_image_free (LIImgImage* self);
 
 int
-liimg_image_load (liimgImage* self,
+liimg_image_load (LIImgImage* self,
                   const char* path);
 
 int
-liimg_image_save_rgba (liimgImage* self,
+liimg_image_save_rgba (LIImgImage* self,
                        const char* path);
 
 int
-liimg_image_save_s3tc (liimgImage* self,
+liimg_image_save_s3tc (LIImgImage* self,
                        const char* path);
 
 void
-liimg_image_shrink_half (liimgImage* self);
+liimg_image_shrink_half (LIImgImage* self);
 
 /** @} */
 /** @} */

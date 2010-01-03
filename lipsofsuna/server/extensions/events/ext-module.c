@@ -27,73 +27,73 @@
 #include "ext-module.h"
 
 static int
-private_animation (liextModule*   self,
-                   liengObject*   object,
-                   lisrvAniminfo* info);
+private_animation (LIExtModule*   self,
+                   LIEngObject*   object,
+                   LISerAniminfo* info);
 
 static int
-private_control (liextModule*     self,
-                 liengObject*     object,
-                 limatQuaternion* rotation,
+private_control (LIExtModule*     self,
+                 LIEngObject*     object,
+                 LIMatQuaternion* rotation,
                  int              flags);
 
 static int
-private_login (liextModule* self,
-               liengObject* object,
+private_login (LIExtModule* self,
+               LIEngObject* object,
                const char*  name,
                const char*  pass);
 
 static int
-private_logout (liextModule* self,
-                liengObject* object);
+private_logout (LIExtModule* self,
+                LIEngObject* object);
 
 static int
-private_motion (liextModule* self,
-                liengObject* object);
+private_motion (LIExtModule* self,
+                LIEngObject* object);
 
 static int
-private_packet (liextModule* self,
-                lisrvClient* client,
-                liarcReader* packet);
+private_packet (LIExtModule* self,
+                LISerClient* client,
+                LIArcReader* packet);
 
 static int
-private_sample (liextModule* self,
-                liengObject* object,
-                liengSample* sample,
+private_sample (LIExtModule* self,
+                LIEngObject* object,
+                LIEngSample* sample,
                 int          flags);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 static int
-private_visibility (liextModule* self,
-                    liengObject* object,
+private_visibility (LIExtModule* self,
+                    LIEngObject* object,
                     int          visible);
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Events",
+	LISER_EXTENSION_VERSION, "Events",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (lisrvServer* server)
+LIExtModule*
+liext_module_new (LISerServer* server)
 {
 	int i;
-	liextModule* self;
-	liscrScript* script = server->script;
+	LIExtModule* self;
+	LIScrScript* script = server->script;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	liscr_script_create_class (script, "Event", licomEventScript, self);
-	liscr_script_create_class (script, "Events", liextEventsScript, self);
+	liscr_script_create_class (script, "Event", liscr_script_event, self);
+	liscr_script_create_class (script, "Events", liext_script_events, self);
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (server->callbacks, server->engine, "object-animation", 0, private_animation, self, self->calls + 0) ||
@@ -127,9 +127,9 @@ liext_module_new (lisrvServer* server)
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
@@ -141,13 +141,13 @@ liext_module_free (liextModule* self)
  * \param ... Event arguments.
  */
 void
-liext_module_event (liextModule* self,
+liext_module_event (LIExtModule* self,
                     int          type,
                                  ...)
 {
 	va_list args;
-	liscrData* event = NULL;
-	liscrScript* script = self->server->script;
+	LIScrData* event = NULL;
+	LIScrScript* script = self->server->script;
 
 	/* Get event table. */
 	lua_pushlightuserdata (script->lua, self);
@@ -178,11 +178,11 @@ liext_module_event (liextModule* self,
 		if (event == NULL)
 		{
 			va_start (args, type);
-			event = licom_event_newv (script, args);
+			event = liscr_event_newv (script, args);
 			va_end (args);
 			if (event == NULL)
 				break;
-			licom_event_set_type (event, type);
+			liscr_event_set_type (event, type);
 		}
 
 		/* Call handler. */
@@ -208,9 +208,9 @@ liext_module_event (liextModule* self,
 /*****************************************************************************/
 
 static int
-private_animation (liextModule*   self,
-                   liengObject*   object,
-                   lisrvAniminfo* info)
+private_animation (LIExtModule*   self,
+                   LIEngObject*   object,
+                   LISerAniminfo* info)
 {
 #warning animation events disabled.
 #if 0
@@ -222,12 +222,12 @@ private_animation (liextModule*   self,
 }
 
 static int
-private_control (liextModule*     self,
-                 liengObject*     object,
-                 limatQuaternion* rotation,
+private_control (LIExtModule*     self,
+                 LIEngObject*     object,
+                 LIMatQuaternion* rotation,
                  int              flags)
 {
-	liscrData* data0;
+	LIScrData* data0;
 
 	data0 = liscr_quaternion_new (self->server->script, rotation);
 	liext_module_event (self, LIEXT_EVENT_CONTROL,
@@ -241,8 +241,8 @@ private_control (liextModule*     self,
 }
 
 static int
-private_login (liextModule* self,
-               liengObject* object,
+private_login (LIExtModule* self,
+               LIEngObject* object,
                const char*  name,
                const char*  pass)
 {
@@ -252,8 +252,8 @@ private_login (liextModule* self,
 }
 
 static int
-private_logout (liextModule* self,
-                liengObject* object)
+private_logout (LIExtModule* self,
+                LIEngObject* object)
 {
 	liext_module_event (self, LIEXT_EVENT_LOGOUT,
 		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
@@ -261,8 +261,8 @@ private_logout (liextModule* self,
 }
 
 static int
-private_motion (liextModule* self,
-                liengObject* object)
+private_motion (LIExtModule* self,
+                LIEngObject* object)
 {
 	liext_module_event (self, LIEXT_EVENT_SIMULATE,
 		"object", LISCR_SCRIPT_OBJECT, object, NULL);
@@ -270,12 +270,12 @@ private_motion (liextModule* self,
 }
 
 static int
-private_packet (liextModule* self,
-                lisrvClient* client,
-                liarcReader* packet)
+private_packet (LIExtModule* self,
+                LISerClient* client,
+                LIArcReader* packet)
 {
 	int type;
-	liscrData* data0;
+	LIScrData* data0;
 
 	type = ((uint8_t*) packet->buffer)[0];
 	data0 = liscr_packet_new_readable (self->server->script, packet);
@@ -290,9 +290,9 @@ private_packet (liextModule* self,
 }
 
 static int
-private_sample (liextModule* self,
-                liengObject* object,
-                liengSample* sample,
+private_sample (LIExtModule* self,
+                LIEngObject* object,
+                LIEngSample* sample,
                 int          flags)
 {
 	liext_module_event (self, LIEXT_EVENT_EFFECT,
@@ -303,7 +303,7 @@ private_sample (liextModule* self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
 	liext_module_event (self, LIEXT_EVENT_TICK,
@@ -312,8 +312,8 @@ private_tick (liextModule* self,
 }
 
 static int
-private_visibility (liextModule* self,
-                    liengObject* object,
+private_visibility (LIExtModule* self,
+                    LIEngObject* object,
                     int          visible)
 {
 	liext_module_event (self, LIEXT_EVENT_VISIBILITY,

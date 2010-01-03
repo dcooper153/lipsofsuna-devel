@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,46 +18,46 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengConstraint Constraint
+ * \addtogroup LIEngConstraint Constraint
  * @{
  */
 
 #ifndef __ENGINE_CONSTRAINT_H__
 #define __ENGINE_CONSTRAINT_H__
 
-#include <model/lips-model.h>
+#include <lipsofsuna/model.h>
 #include "engine-types.h"
 
-struct _liengConstraint
+struct _LIEngConstraint
 {
 	char* node_names[2];
-	liengConstraint* prev;
-	liengConstraint* next;
-	liengObject* objects[2];
-	limdlNode* nodes[2];
+	LIEngConstraint* prev;
+	LIEngConstraint* next;
+	LIEngObject* objects[2];
+	LIMdlNode* nodes[2];
 };
 
-liengConstraint*
-lieng_constraint_new (liengObject* first_object,
+LIEngConstraint*
+lieng_constraint_new (LIEngObject* first_object,
                       const char*  first_anchor,
-                      liengObject* second_object,
+                      LIEngObject* second_object,
                       const char*  second_anchor);
 
 void
-lieng_constraint_free (liengConstraint* self);
+lieng_constraint_free (LIEngConstraint* self);
 
 void
-lieng_constraint_update (liengConstraint* self,
+lieng_constraint_update (LIEngConstraint* self,
                          float            secs);
 
 void
-lieng_constraint_rebuild (liengConstraint* self);
+lieng_constraint_rebuild (LIEngConstraint* self);
 
 void
-lieng_constraint_get_transform (liengConstraint* self,
+lieng_constraint_get_transform (LIEngConstraint* self,
                                 int              index,
-                                liengMatrix      type,
-                                limatTransform*  value);
+                                LIEngMatrix      type,
+                                LIMatTransform*  value);
 
 /** @} */
 /** @} */

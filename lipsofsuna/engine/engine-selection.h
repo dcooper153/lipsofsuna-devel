@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengSelection Selection
+ * \addtogroup LIEngSelection Selection
  * @{
  */
 
@@ -28,17 +28,17 @@
 #include "engine-object.h"
 #include "engine-types.h"
 
-struct _liengSelection
+struct _LIEngSelection
 {
-	liengObject* object;
-	limatTransform transform;
+	LIEngObject* object;
+	LIMatTransform transform;
 };
 
-liengSelection*
-lieng_selection_new (liengObject* element);
+LIEngSelection*
+lieng_selection_new (LIEngObject* element);
 
 void
-lieng_selection_free (liengSelection* self);
+lieng_selection_free (LIEngSelection* self);
 
 #endif
 

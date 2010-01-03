@@ -27,8 +27,8 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 
 #define LIEXT_SCRIPT_EVENTS "Lips.Events"
 
@@ -44,28 +44,28 @@ enum
 	LIEXT_EVENT_MAX
 };
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licalHandle calls[5];
-	licliClient* client;
+	LICalHandle calls[5];
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 void
-liext_module_event (liextModule* self,
+liext_module_event (LIExtModule* self,
                     int          type,
                                  ...) __LI_ATTRIBUTE_SENTINEL;
 
 /*****************************************************************************/
 
 void
-liextEventsScript (liscrClass* self,
+liext_script_events (LIScrClass* self,
                    void*       data);
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,25 +18,25 @@
 /**
  * \addtogroup licfg Config 
  * @{
- * \addtogroup licfgAccount Account
+ * \addtogroup LICfgAccount Account
  * @{
  */
 
 #ifndef __CONFIG_ACCOUNT_H__
 #define __CONFIG_ACCOUNT_H__
 
-typedef struct _licfgAccount licfgAccount;
-struct _licfgAccount
+typedef struct _LICfgAccount LICfgAccount;
+struct _LICfgAccount
 {
 	char* password;
 	unsigned int admin :1;
 };
 
-licfgAccount*
+LICfgAccount*
 licfg_account_new (const char* path);
 
 void
-licfg_account_free (licfgAccount* self);
+licfg_account_free (LICfgAccount* self);
 
 #endif
 

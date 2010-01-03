@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,41 +18,41 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlNode Node
+ * \addtogroup LIMdlNode Node
  * @{
  */
 
 #ifndef __MODEL_NODE_H__
 #define __MODEL_NODE_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/string.h>
 #include "model-bone.h"
 #include "model-light.h"
 #include "model-types.h"
 
-struct _limdlNode
+struct _LIMdlNode
 {
 	int type;
 	char* name;
-	limdlModel* model;
-	limdlNode* parent;
+	LIMdlModel* model;
+	LIMdlNode* parent;
 	struct
 	{
 		int count;
-		limdlNode** array;
+		LIMdlNode** array;
 	} nodes;
 	struct
 	{
-		limatTransform rest;
-		limatTransform local;
-		limatTransform global;
+		LIMatTransform rest;
+		LIMatTransform local;
+		LIMatTransform global;
 	} transform;
 	union
 	{
-		limdlBone bone;
-		limdlLight light;
+		LIMdlBone bone;
+		LIMdlLight light;
 	};
 };
 
@@ -60,64 +60,64 @@ struct _limdlNode
 extern "C" {
 #endif
 
-limdlNode*
-limdl_node_new (limdlModel* model);
+LIMdlNode*
+limdl_node_new (LIMdlModel* model);
 
-limdlNode*
-limdl_node_copy (const limdlNode* node);
+LIMdlNode*
+limdl_node_copy (const LIMdlNode* node);
 
 void
-limdl_node_free (limdlNode* self);
+limdl_node_free (LIMdlNode* self);
 
-limdlNode*
-limdl_node_find_node (const limdlNode* self,
+LIMdlNode*
+limdl_node_find_node (const LIMdlNode* self,
                       const char*      name);
 
 int
-limdl_node_read (limdlNode*   self,
-                 liarcReader* reader);
+limdl_node_read (LIMdlNode*   self,
+                 LIArcReader* reader);
 
 void
-limdl_node_rebuild (limdlNode* self,
+limdl_node_rebuild (LIMdlNode* self,
                     int        recursive);
 
 int
-limdl_node_write (const limdlNode* self,
-                  liarcWriter*     writer);
+limdl_node_write (const LIMdlNode* self,
+                  LIArcWriter*     writer);
 
-limdlNode*
-limdl_node_get_child (const limdlNode* self,
+LIMdlNode*
+limdl_node_get_child (const LIMdlNode* self,
                       int              index);
 
 int
-limdl_node_get_child_count (const limdlNode* self);
+limdl_node_get_child_count (const LIMdlNode* self);
 
 int
-limdl_node_get_child_total (const limdlNode* self);
+limdl_node_get_child_total (const LIMdlNode* self);
 
 const char*
-limdl_node_get_name (const limdlNode* self);
+limdl_node_get_name (const LIMdlNode* self);
 
 void
-limdl_node_get_pose_axes (const limdlNode* self,
-                          limatVector*     x,
-                          limatVector*     y,
-                          limatVector*     z);
+limdl_node_get_pose_axes (const LIMdlNode* self,
+                          LIMatVector*     x,
+                          LIMatVector*     y,
+                          LIMatVector*     z);
 
 void
-limdl_node_set_local_transform (limdlNode*            self,
-                                const limatTransform* value);
+limdl_node_set_local_transform (LIMdlNode*            self,
+                                const LIMatTransform* value);
 
 void
-limdl_node_get_rest_transform (const limdlNode* self,
-                               limatTransform*  value);
+limdl_node_get_rest_transform (const LIMdlNode* self,
+                               LIMatTransform*  value);
 
 void
-limdl_node_get_world_transform (const limdlNode* self,
-                                limatTransform*  value);
+limdl_node_get_world_transform (const LIMdlNode* self,
+                                LIMatTransform*  value);
 
-limdlNodeType
-limdl_node_get_type (const limdlNode* self);
+LIMdlNodeType
+limdl_node_get_type (const LIMdlNode* self);
 
 #ifdef __cplusplus
 }
@@ -131,30 +131,30 @@ limdl_node_get_type (const limdlNode* self);
 	     iter.depth >= 0 ; \
 	     limdl_node_iter_next (&iter))
 
-typedef struct _limdlNodeIterArray limdlNodeIterArray;
-struct _limdlNodeIterArray
+typedef struct _LIMdlNodeIterArray LIMdlNodeIterArray;
+struct _LIMdlNodeIterArray
 {
 	int count;
-	limdlNode** array;
+	LIMdlNode** array;
 };
 
-typedef struct _limdlNodeIterStack limdlNodeIterStack;
-struct _limdlNodeIterStack
+typedef struct _LIMdlNodeIterStack LIMdlNodeIterStack;
+struct _LIMdlNodeIterStack
 {
-	limdlNode* node;
+	LIMdlNode* node;
 	int index;
 };
 
-typedef struct _limdlNodeIter limdlNodeIter;
-struct _limdlNodeIter
+typedef struct _LIMdlNodeIter LIMdlNodeIter;
+struct _LIMdlNodeIter
 {
-	const limdlNodeIterArray* array;
-	limdlNode* value;
+	const LIMdlNodeIterArray* array;
+	LIMdlNode* value;
 	int depth;
 	int index;
 	int root;
-	limdlNodeIterStack* pointer;
-	limdlNodeIterStack stack[LIMDL_ITER_STACK_MAX];
+	LIMdlNodeIterStack* pointer;
+	LIMdlNodeIterStack stack[LIMDL_ITER_STACK_MAX];
 };
 
 #ifdef __cplusplus
@@ -162,12 +162,12 @@ extern "C" {
 #endif
 
 static inline void
-limdl_node_iter_start (limdlNodeIter* self,
+limdl_node_iter_start (LIMdlNodeIter* self,
                        const void*    array)
 {
 	self->root = 0;
 	self->index = 0;
-	self->array = (const limdlNodeIterArray*) array;
+	self->array = (const LIMdlNodeIterArray*) array;
 	self->pointer = self->stack;
 	if (self->array->count)
 	{
@@ -185,7 +185,7 @@ limdl_node_iter_start (limdlNodeIter* self,
 }
 
 static inline int
-limdl_node_iter_next (limdlNodeIter* self)
+limdl_node_iter_next (LIMdlNodeIter* self)
 {
 	/* Descend if found children. */
 	if (self->pointer[-1].node->nodes.count && self->depth < LIMDL_ITER_STACK_MAX)

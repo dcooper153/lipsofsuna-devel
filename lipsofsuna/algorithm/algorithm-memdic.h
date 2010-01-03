@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,60 +18,60 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgMemdic Memdic
+ * \addtogroup LIAlgMemdic Memdic
  * @{
  */
 
 #ifndef __ALGORITHM_MEMDIC_H__
 #define __ALGORITHM_MEMDIC_H__
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-bst.h"
 
-typedef struct _lialgMemdic lialgMemdic;
-typedef struct _lialgMemdicNode lialgMemdicNode;
-typedef struct _lialgMemdicIter lialgMemdicIter;
+typedef struct _LIAlgMemdic LIAlgMemdic;
+typedef struct _LIAlgMemdicNode LIAlgMemdicNode;
+typedef struct _LIAlgMemdicIter LIAlgMemdicIter;
 
-struct _lialgMemdic
+struct _LIAlgMemdic
 {
 	int size;
-	lialgBst* tree;
-	lialgMemdicNode* list;
+	LIAlgBst* tree;
+	LIAlgMemdicNode* list;
 };
 
-struct _lialgMemdicNode
+struct _LIAlgMemdicNode
 {
 	int keysize;
 	void* key;
 	void* value;
-	lialgBstNode node;
-	lialgMemdicNode* prev;
-	lialgMemdicNode* next;
+	LIAlgBstNode node;
+	LIAlgMemdicNode* prev;
+	LIAlgMemdicNode* next;
 };
 
-struct _lialgMemdicIter
+struct _LIAlgMemdicIter
 {
-	lialgMemdic* assoc;
+	LIAlgMemdic* assoc;
 	int keysize;
 	void* key;
 	void* value;
-	lialgMemdicNode* node;
-	lialgMemdicNode* next;
+	LIAlgMemdicNode* node;
+	LIAlgMemdicNode* next;
 };
 
 /*****************************************************************************/
 
 static inline void
-lialg_memdic_node_free (lialgMemdicNode* self)
+lialg_memdic_node_free (LIAlgMemdicNode* self)
 {
 	lisys_free (self->key);
 	lisys_free (self);
 }
 
 static inline int
-lialg_memdic_node_compare (const lialgMemdicNode* self,
-                           const lialgMemdicNode* node)
+lialg_memdic_node_compare (const LIAlgMemdicNode* self,
+                           const LIAlgMemdicNode* node)
 {
 	int ret;
 	int min;
@@ -94,17 +94,17 @@ lialg_memdic_node_compare (const lialgMemdicNode* self,
  *
  * \return New associative array or NULL.
  */
-static inline lialgMemdic*
+static inline LIAlgMemdic*
 lialg_memdic_new ()
 {
-	lialgMemdic* self;
+	LIAlgMemdic* self;
 
-	self = (lialgMemdic*) lisys_malloc (sizeof (lialgMemdic));
+	self = (LIAlgMemdic*) lisys_malloc (sizeof (LIAlgMemdic));
 	if (self == NULL)
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((lialgBstCompare) lialg_memdic_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) lialg_memdic_node_compare, lisys_malloc_func, lisys_free_func);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -119,9 +119,9 @@ lialg_memdic_new ()
  * \param self Associative array.
  */
 static inline void
-lialg_memdic_free (lialgMemdic* self)
+lialg_memdic_free (LIAlgMemdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lialg_memdic_node_free);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lialg_memdic_node_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -133,9 +133,9 @@ lialg_memdic_free (lialgMemdic* self)
  * \param self Associative array.
  */
 static inline void
-lialg_memdic_clear (lialgMemdic* self)
+lialg_memdic_clear (LIAlgMemdic* self)
 {
-	lialg_bst_foreach (self->tree, (lialgBstForeach) lialg_memdic_node_free);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lialg_memdic_node_free);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -151,20 +151,20 @@ lialg_memdic_clear (lialgMemdic* self)
  * \return Value or NULL.
  */
 static inline void*
-lialg_memdic_find (lialgMemdic* self,
+lialg_memdic_find (LIAlgMemdic* self,
                    const void*  key,
                    int          keysize)
 {
-	lialgMemdicNode tmp;
-	lialgMemdicNode* anode;
-	lialgBstNode* tnode;
+	LIAlgMemdicNode tmp;
+	LIAlgMemdicNode* anode;
+	LIAlgBstNode* tnode;
 
 	tmp.key = (void*) key;
 	tmp.keysize = keysize;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	anode = (lialgMemdicNode*) tnode->data;
+	anode = (LIAlgMemdicNode*) tnode->data;
 	assert (&anode->node == tnode);
 	return anode->value;
 }
@@ -177,21 +177,21 @@ lialg_memdic_find (lialgMemdic* self,
  * \param keysize Size of the key.
  * \return Associative array node or NULL.
  */
-static inline lialgMemdicNode*
-lialg_memdic_find_node (lialgMemdic* self,
+static inline LIAlgMemdicNode*
+lialg_memdic_find_node (LIAlgMemdic* self,
                         const void*  key,
                         int          keysize)
 {
-	lialgMemdicNode tmp;
-	lialgBstNode* tnode;
+	LIAlgMemdicNode tmp;
+	LIAlgBstNode* tnode;
 
 	tmp.key = (void*) key;
 	tmp.keysize = keysize;
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	assert (&((lialgMemdicNode*) tnode->data)->node == tnode);
-	return (lialgMemdicNode*) tnode->data;
+	assert (&((LIAlgMemdicNode*) tnode->data)->node == tnode);
+	return (LIAlgMemdicNode*) tnode->data;
 }
 
 /**
@@ -203,16 +203,16 @@ lialg_memdic_find_node (lialgMemdic* self,
  * \param value Value of the inserted node.
  * \return Associative array node or NULL.
  */
-static inline lialgMemdicNode*
-lialg_memdic_insert (lialgMemdic* self,
+static inline LIAlgMemdicNode*
+lialg_memdic_insert (LIAlgMemdic* self,
                      const void*  key,
                      int          keysize,
                      void*        value)
 {
-	lialgMemdicNode* node;
+	LIAlgMemdicNode* node;
 
 	/* Create node. */
-	node = (lialgMemdicNode*) lisys_malloc (sizeof (lialgMemdicNode));
+	node = (LIAlgMemdicNode*) lisys_malloc (sizeof (LIAlgMemdicNode));
 	if (node == NULL)
 		return NULL;
 	node->key = lisys_malloc (keysize? keysize : 1);
@@ -248,13 +248,13 @@ lialg_memdic_insert (lialgMemdic* self,
  * \return Nonzero if a node was removed.
  */
 static inline int
-lialg_memdic_remove (lialgMemdic* self,
+lialg_memdic_remove (LIAlgMemdic* self,
                      const void*  key,
                      int          keysize)
 {
-	lialgBstNode* tnode;
-	lialgMemdicNode* anode;
-	lialgMemdicNode tmp;
+	LIAlgBstNode* tnode;
+	LIAlgMemdicNode* anode;
+	LIAlgMemdicNode tmp;
 	
 	/* Find node. */
 	tmp.key = (void*) key;
@@ -262,7 +262,7 @@ lialg_memdic_remove (lialgMemdic* self,
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return 1;
-	anode = (lialgMemdicNode*) tnode->data;
+	anode = (LIAlgMemdicNode*) tnode->data;
 	assert (&anode->node == tnode);
 
 	/* Unlink from tree. */
@@ -287,8 +287,8 @@ lialg_memdic_remove (lialgMemdic* self,
  * \param node Node to remove.
  */
 static inline void
-lialg_memdic_remove_node (lialgMemdic*     self,
-                          lialgMemdicNode* node)
+lialg_memdic_remove_node (LIAlgMemdic*     self,
+                          LIAlgMemdicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -309,8 +309,8 @@ lialg_memdic_remove_node (lialgMemdic*     self,
 	     lialg_memdic_iter_next (&iter))
 
 static inline void
-lialg_memdic_iter_start (lialgMemdicIter* self,
-                         lialgMemdic*     assoc)
+lialg_memdic_iter_start (LIAlgMemdicIter* self,
+                         LIAlgMemdic*     assoc)
 {
 	self->assoc = assoc;
 	if (assoc->list == NULL)
@@ -332,7 +332,7 @@ lialg_memdic_iter_start (lialgMemdicIter* self,
 }
 
 static inline int
-lialg_memdic_iter_next (lialgMemdicIter* self)
+lialg_memdic_iter_next (LIAlgMemdicIter* self)
 {
 	if (self->next == NULL)
 	{

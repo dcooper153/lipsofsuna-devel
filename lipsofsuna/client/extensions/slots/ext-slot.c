@@ -36,18 +36,18 @@
  * \param model Equipment model.
  * \return New slot or NULL.
  */
-liextSlot*
-liext_slot_new (licliClient* client,
-                liengObject* object,
+LIExtSlot*
+liext_slot_new (LICliClient* client,
+                LIEngObject* object,
                 const char*  node0,
                 const char*  node1,
                 int          model)
 {
-	liengModel* mdl;
-	liextSlot* self;
+	LIEngModel* mdl;
+	LIExtSlot* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextSlot));
+	self = lisys_calloc (1, sizeof (LIExtSlot));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -95,9 +95,9 @@ error:
  * \param self Slot.
  */
 void
-liext_slot_free (liextSlot* self)
+liext_slot_free (LIExtSlot* self)
 {
-	liextSlot tmp;
+	LIExtSlot tmp;
 
 	/* Avoid feedback loops that may lead to double removal of our object in
 	 * its own free callback by clearing the object pointer. */

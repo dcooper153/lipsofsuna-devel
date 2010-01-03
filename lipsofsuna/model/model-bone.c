@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlBone Bone
+ * \addtogroup LIMdlBone Bone
  * @{
  */
 
@@ -27,10 +27,10 @@
 #include "model-node.h"
 
 int
-limdl_bone_read (limdlNode*   self,
-                 liarcReader* reader)
+limdl_bone_read (LIMdlNode*   self,
+                 LIArcReader* reader)
 {
-	limdlBone* bone = &self->bone;
+	LIMdlBone* bone = &self->bone;
 
 	if (!liarc_reader_get_float (reader, &bone->length.x) ||
 		!liarc_reader_get_float (reader, &bone->length.y) ||
@@ -41,10 +41,10 @@ limdl_bone_read (limdlNode*   self,
 }
 
 int
-limdl_bone_write (const limdlNode* self,
-                  liarcWriter*     writer)
+limdl_bone_write (const LIMdlNode* self,
+                  LIArcWriter*     writer)
 {
-	const limdlBone* bone = &self->bone;
+	const LIMdlBone* bone = &self->bone;
 
 	liarc_writer_append_float (writer, bone->length.x);
 	liarc_writer_append_float (writer, bone->length.y);
@@ -61,8 +61,8 @@ limdl_bone_write (const limdlNode* self,
  * \param head Return location for the head.
  */
 void
-limdl_bone_get_pose_head (const limdlNode* self,
-                          limatVector*     head)
+limdl_bone_get_pose_head (const LIMdlNode* self,
+                          LIMatVector*     head)
 {
 	*head = self->transform.global.position;
 }
@@ -74,8 +74,8 @@ limdl_bone_get_pose_head (const limdlNode* self,
  * \param tail Return location for the tail.
  */
 void
-limdl_bone_get_pose_tail (const limdlNode* self,
-                          limatVector*     tail)
+limdl_bone_get_pose_tail (const LIMdlNode* self,
+                          LIMatVector*     tail)
 {
 	*tail = self->bone.tail;
 }

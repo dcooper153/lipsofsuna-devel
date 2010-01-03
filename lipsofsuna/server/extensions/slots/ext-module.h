@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,32 +27,32 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
 #define LIEXT_SCRIPT_SLOTS "Lips.Slots"
 
-typedef enum _liextSlotType liextSlotType;
-typedef struct _liextSlot liextSlot;
-typedef struct _liextSlots liextSlots;
-typedef struct _liextModule liextModule;
+typedef enum _LIExtSlotType LIExtSlotType;
+typedef struct _LIExtSlot LIExtSlot;
+typedef struct _LIExtSlots LIExtSlots;
+typedef struct _LIExtModule LIExtModule;
 
-struct _liextModule
+struct _LIExtModule
 {
-	lialgPtrdic* dictionary;
-	licalHandle calls[1];
-	lisrvServer* server;
+	LIAlgPtrdic* dictionary;
+	LICalHandle calls[1];
+	LISerServer* server;
 };
 
-liextModule*
-liext_module_new (lisrvServer* server);
+LIExtModule*
+liext_module_new (LISerServer* server);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextSlotsScript (liscrClass* self,
+liext_script_slots (LIScrClass* self,
                   void*       data);
 
 #endif

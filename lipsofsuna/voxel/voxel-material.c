@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxMaterial Material
+ * \addtogroup LIVoxMaterial Material
  * @{
  */
 
-#include <string/lips-string.h>
+#include <lipsofsuna/string.h>
 #include "voxel-material.h"
 
 /**
@@ -30,13 +30,13 @@
  *
  * \return New material or NULL.
  */
-livoxMaterial*
+LIVoxMaterial*
 livox_material_new ()
 {
-	livoxMaterial* self;
+	LIVoxMaterial* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (LIVoxMaterial));
 	if (self == NULL)
 		return NULL;
 
@@ -66,13 +66,13 @@ livox_material_new ()
  * \param src Material to copy.
  * \return Soft copy of the material or NULL.
  */
-livoxMaterial*
-livox_material_new_copy (const livoxMaterial* src)
+LIVoxMaterial*
+livox_material_new_copy (const LIVoxMaterial* src)
 {
-	livoxMaterial* self;
+	LIVoxMaterial* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (LIVoxMaterial));
 	if (self == NULL)
 		return NULL;
 
@@ -108,16 +108,16 @@ livox_material_new_copy (const livoxMaterial* src)
  * \param stmt SQL statement;
  * \return New material or NULL.
  */
-livoxMaterial*
-livox_material_new_from_sql (liarcSql*     sql,
+LIVoxMaterial*
+livox_material_new_from_sql (LIArcSql*     sql,
                              sqlite3_stmt* stmt)
 {
 	int col;
 	int size;
-	livoxMaterial* self;
+	LIVoxMaterial* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (LIVoxMaterial));
 	if (self == NULL)
 		return NULL;
 
@@ -163,15 +163,15 @@ livox_material_new_from_sql (liarcSql*     sql,
  * \param reader Stream reader.
  * \return New material or NULL.
  */
-livoxMaterial*
-livox_material_new_from_stream (liarcReader* reader)
+LIVoxMaterial*
+livox_material_new_from_stream (LIArcReader* reader)
 {
 	uint32_t id;
 	uint32_t flags;
-	livoxMaterial* self;
+	LIVoxMaterial* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livoxMaterial));
+	self = lisys_calloc (1, sizeof (LIVoxMaterial));
 	if (self == NULL)
 		return NULL;
 
@@ -199,7 +199,7 @@ livox_material_new_from_stream (liarcReader* reader)
  * \param self Material.
  */
 void
-livox_material_free (livoxMaterial* self)
+livox_material_free (LIVoxMaterial* self)
 {
 	lisys_free (self->model);
 	lisys_free (self->name);
@@ -214,8 +214,8 @@ livox_material_free (livoxMaterial* self)
  * \return Nonzero on success.
  */
 int
-livox_material_write_to_sql (livoxMaterial* self,
-                             liarcSql*      sql)
+livox_material_write_to_sql (LIVoxMaterial* self,
+                             LIArcSql*      sql)
 {
 	if (!liarc_sql_insert (sql, "voxel_materials",
 		"id", LIARC_SQL_INT, self->id,
@@ -236,8 +236,8 @@ livox_material_write_to_sql (livoxMaterial* self,
  * \return Nonzero on success.
  */
 int
-livox_material_write_to_stream (livoxMaterial* self,
-                                liarcWriter*   writer)
+livox_material_write_to_stream (LIVoxMaterial* self,
+                                LIArcWriter*   writer)
 {
 	return liarc_writer_append_uint32 (writer, self->id) &&
 	       liarc_writer_append_uint32 (writer, self->flags) &&
@@ -249,7 +249,7 @@ livox_material_write_to_stream (livoxMaterial* self,
 }
 
 int
-livox_material_set_name (livoxMaterial* self,
+livox_material_set_name (LIVoxMaterial* self,
                          const char*    value)
 {
 	char* tmp;
@@ -264,7 +264,7 @@ livox_material_set_name (livoxMaterial* self,
 }
 
 int
-livox_material_set_model (livoxMaterial* self,
+livox_material_set_model (LIVoxMaterial* self,
                           const char*    value)
 {
 	char* tmp;

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrClass Class
+ * \addtogroup LIScrClass Class
  * @{
  */
 
@@ -27,73 +27,73 @@
 
 #include "script-types.h"
 
-liscrClass*
-liscr_class_new (liscrScript* script,
+LIScrClass*
+liscr_class_new (LIScrScript* script,
                  const char*  name);
 
-liscrClass*
-liscr_class_new_full (liscrScript* script,
-                      liscrClass*  base,
+LIScrClass*
+liscr_class_new_full (LIScrScript* script,
+                      LIScrClass*  base,
                       const char*  name,
                       int          global);
 
 void
-liscr_class_free (liscrClass* self);
+liscr_class_free (LIScrClass* self);
 
 void
-liscr_class_inherit (liscrClass*    self,
-                     liscrClassInit init,
+liscr_class_inherit (LIScrClass*    self,
+                     LIScrClassInit init,
                      void*          data);
 
 int
-liscr_class_insert_cfunc (liscrClass*   self,
+liscr_class_insert_cfunc (LIScrClass*   self,
                           const char*   name,
-                          liscrArgsFunc func);
+                          LIScrArgsFunc func);
 
 int
-liscr_class_insert_cvar (liscrClass*   self,
+liscr_class_insert_cvar (LIScrClass*   self,
                          const char*   name,
-                         liscrArgsFunc getter,
-                         liscrArgsFunc setter);
+                         LIScrArgsFunc getter,
+                         LIScrArgsFunc setter);
 
 void
-liscr_class_insert_enum (liscrClass* self,
+liscr_class_insert_enum (LIScrClass* self,
                          const char* name,
                          int         value);
 
 void
-liscr_class_insert_func (liscrClass*  self,
+liscr_class_insert_func (LIScrClass*  self,
                          const char*  name,
                          liscrMarshal value);
 
 int
-liscr_class_insert_interface (liscrClass* self,
+liscr_class_insert_interface (LIScrClass* self,
                               const char* name);
 
 int
-liscr_class_insert_mfunc (liscrClass*   self,
+liscr_class_insert_mfunc (LIScrClass*   self,
                           const char*   name,
-                          liscrArgsFunc func);
+                          LIScrArgsFunc func);
 
 int
-liscr_class_insert_mvar (liscrClass*   self,
+liscr_class_insert_mvar (LIScrClass*   self,
                          const char*   name,
-                         liscrArgsFunc getter,
-                         liscrArgsFunc setter);
+                         LIScrArgsFunc getter,
+                         LIScrArgsFunc setter);
 
 int
-liscr_class_get_interface (const liscrClass* self,
+liscr_class_get_interface (const LIScrClass* self,
                            const char*       name);
 
 const char*
-liscr_class_get_name (const liscrClass* self);
+liscr_class_get_name (const LIScrClass* self);
 
 void*
-liscr_class_get_userdata (liscrClass* self,
+liscr_class_get_userdata (LIScrClass* self,
                           const char* key);
 
 void
-liscr_class_set_userdata (liscrClass* self,
+liscr_class_set_userdata (LIScrClass* self,
                           const char* key,
                           void*       value);
 

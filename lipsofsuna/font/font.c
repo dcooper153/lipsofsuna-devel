@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,28 @@
 /**
  * \addtogroup lifnt Font
  * @{
- * \addtogroup lifntFont Font
+ * \addtogroup LIFntFont Font
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "font.h"
 
-static lifntFontGlyph*
-private_cache_glyph (lifntFont* self,
+static LIFntFontGlyph*
+private_cache_glyph (LIFntFont* self,
                      wchar_t    glyph);
 
 /*****************************************************************************/
 
-lifntFont*
-lifnt_font_new (lividCalls* video,
+LIFntFont*
+lifnt_font_new (LIVidCalls* video,
                 const char* path,
                 int         size)
 {
-	lifntFont* self;
+	LIFntFont* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lifntFont));
+	self = lisys_calloc (1, sizeof (LIFntFont));
 	if (self == NULL)
 		return NULL;
 	self->video = *video;
@@ -72,7 +72,7 @@ lifnt_font_new (lividCalls* video,
 	self->table_height = LIFNT_CACHE_HEIGHT / self->table_glyph_height;
 	self->table_length = self->table_width * self->table_height;
 	self->table_filled = 0;
-	self->table = lisys_calloc (self->table_length, sizeof (lifntFontGlyph*));
+	self->table = lisys_calloc (self->table_length, sizeof (LIFntFontGlyph*));
 	if (self->table == NULL)
 	{
 		lifnt_font_free (self);
@@ -90,9 +90,9 @@ lifnt_font_new (lividCalls* video,
 }
 
 void
-lifnt_font_free (lifntFont* self)
+lifnt_font_free (LIFntFont* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	if (self->texture != 0)
 		glDeleteTextures (1, &self->texture);
@@ -118,7 +118,7 @@ lifnt_font_free (lifntFont* self)
  * \param glyph A glyph.
  */
 void
-lifnt_font_render (lifntFont* self,
+lifnt_font_render (LIFntFont* self,
                    int        x,
                    int        y,
                    wchar_t    glyph)
@@ -127,7 +127,7 @@ lifnt_font_render (lifntFont* self,
 	float tex_y;
 	float tex_w;
 	float tex_h;
-	lifntFontGlyph* cached;
+	LIFntFontGlyph* cached;
 
 	/* Get tile. */
 	cached = lialg_u32dic_find (self->index, glyph);
@@ -170,10 +170,10 @@ lifnt_font_render (lifntFont* self,
  * \return The advance in pixels.
  */
 int
-lifnt_font_get_advance (lifntFont* self,
+lifnt_font_get_advance (LIFntFont* self,
                         wchar_t    glyph)
 {
-	lifntFontGlyph* cached;
+	LIFntFontGlyph* cached;
 
 	cached = lialg_u32dic_find (self->index, glyph);
 	if (cached == NULL)
@@ -187,22 +187,22 @@ lifnt_font_get_advance (lifntFont* self,
 }
 
 int
-lifnt_font_get_height (const lifntFont* self)
+lifnt_font_get_height (const LIFntFont* self)
 {
 	return self->font_height;
 }
 
 /*****************************************************************************/
 
-static lifntFontGlyph*
-private_cache_glyph (lifntFont* self,
+static LIFntFontGlyph*
+private_cache_glyph (LIFntFont* self,
                      wchar_t    glyph)
 {
 	int index;
 	int advance;
 	int bearing_x;
 	int bearing_y;
-	lifntFontGlyph* cached;
+	LIFntFontGlyph* cached;
 	SDL_Color color = { 0xFF, 0xFF, 0xFF, 0xFF };
 	SDL_Surface* image;
 
@@ -215,7 +215,7 @@ private_cache_glyph (lifntFont* self,
 	if (self->table_filled < self->table_length)
 	{
 		/* Allocate glyph. */
-		cached = lisys_malloc (sizeof (lifntFontGlyph));
+		cached = lisys_malloc (sizeof (LIFntFontGlyph));
 		if (cached == NULL)
 			return NULL;
 		if (!lialg_u32dic_insert (self->index, glyph, cached))

@@ -47,7 +47,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/lipsofsuna/config.h
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -74,8 +74,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(extdir)"
 LTLIBRARIES = $(ext_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 =  \
-	$(top_builddir)/lipsofsuna/liblipsofsunaclient.la \
+am__DEPENDENCIES_2 = $(top_builddir)/liblipsofsunaclient.la \
 	$(am__DEPENDENCIES_1)
 libcamera_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -143,7 +142,7 @@ libwidgets_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libwidgets_cli_la_OBJECTS = widgets/ext-module.lo \
 	widgets/ext-script.lo
 libwidgets_cli_la_OBJECTS = $(am_libwidgets_cli_la_OBJECTS)
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/lipsofsuna
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -355,8 +354,7 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaclient.la $(LICLI_LIBS)
-INCLUDES = -I$(top_srcdir)/lipsofsuna
+LIBADD = $(top_builddir)/liblipsofsunaclient.la $(LICLI_LIBS)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 AM_CFLAGS = $(LICLI_CFLAGS)
 extdir = $(EXTSDIR)

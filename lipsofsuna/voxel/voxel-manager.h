@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxManager Manager
+ * \addtogroup LIVoxManager Manager
  * @{
  */
 
 #ifndef __VOXEL_MANAGER_H__
 #define __VOXEL_MANAGER_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <callback/lips-callback.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/callback.h>
+#include <lipsofsuna/system.h>
 #include "voxel-sector.h"
 #include "voxel-types.h"
 
@@ -40,129 +40,129 @@ enum
 	LIVOX_FIND_ALL   = 0xFF
 };
 
-typedef struct _livoxUpdateEvent livoxUpdateEvent;
-struct _livoxUpdateEvent
+typedef struct _LIVoxUpdateEvent LIVoxUpdateEvent;
+struct _LIVoxUpdateEvent
 {
 	int sector[3];
 	int block[3];
 };
 
-struct _livoxManager
+struct _LIVoxManager
 {
-	lialgSectors* sectors;
-	lialgU32dic* materials;
-	liarcSql* sql;
-	licalCallbacks* callbacks;
+	LIAlgSectors* sectors;
+	LIAlgU32dic* materials;
+	LIArcSql* sql;
+	LICalCallbacks* callbacks;
 };
 
-livoxManager*
-livox_manager_new (licalCallbacks* callbacks,
-                   lialgSectors*   sectors);
+LIVoxManager*
+livox_manager_new (LICalCallbacks* callbacks,
+                   LIAlgSectors*   sectors);
 
 void
-livox_manager_free (livoxManager* self);
+livox_manager_free (LIVoxManager* self);
 
 int
-livox_manager_check_occluder (const livoxManager* self,
-                              const livoxVoxel*   voxel);
+livox_manager_check_occluder (const LIVoxManager* self,
+                              const LIVoxVoxel*   voxel);
 
 void
-livox_manager_clear_materials (livoxManager* self);
+livox_manager_clear_materials (LIVoxManager* self);
 
 void
-livox_manager_copy_voxels (livoxManager* self,
+livox_manager_copy_voxels (LIVoxManager* self,
                            int           xstart,
                            int           ystart,
                            int           zstart,
                            int           xsize,
                            int           ysize,
                            int           zsize,
-                           livoxVoxel*   result);
+                           LIVoxVoxel*   result);
 
 int
-livox_manager_erase_voxel (livoxManager*      self,
-                           const limatVector* point);
+livox_manager_erase_voxel (LIVoxManager*      self,
+                           const LIMatVector* point);
 
-livoxMaterial*
-livox_manager_find_material (livoxManager* self,
+LIVoxMaterial*
+livox_manager_find_material (LIVoxManager* self,
                              uint32_t      id);
 
-livoxVoxel*
-livox_manager_find_voxel (livoxManager*      self,
+LIVoxVoxel*
+livox_manager_find_voxel (LIVoxManager*      self,
                           int                flags,
-                          const limatVector* point,
-                          limatVector*       center);
+                          const LIMatVector* point,
+                          LIMatVector*       center);
 
 int
-livox_manager_insert_material (livoxManager*  self,
-                               livoxMaterial* material);
+livox_manager_insert_material (LIVoxManager*  self,
+                               LIVoxMaterial* material);
 
 int
-livox_manager_insert_voxel (livoxManager*      self,
-                            const limatVector* point,
-                            const livoxVoxel*  terrain);
+livox_manager_insert_voxel (LIVoxManager*      self,
+                            const LIMatVector* point,
+                            const LIVoxVoxel*  terrain);
 
 int
-livox_manager_load_materials (livoxManager* self);
+livox_manager_load_materials (LIVoxManager* self);
 
 void
-livox_manager_mark_updates (livoxManager* self);
+livox_manager_mark_updates (LIVoxManager* self);
 
 void
-livox_manager_paste_voxels (livoxManager* self,
+livox_manager_paste_voxels (LIVoxManager* self,
                             int           xstart,
                             int           ystart,
                             int           zstart,
                             int           xsize,
                             int           ysize,
                             int           zsize,
-                            livoxVoxel*   voxels);
+                            LIVoxVoxel*   voxels);
 
 void
-livox_manager_remove_material (livoxManager* self,
+livox_manager_remove_material (LIVoxManager* self,
                                int           id);
 
 int
-livox_manager_replace_voxel (livoxManager*      self,
-                             const limatVector* point,
-                             const livoxVoxel*  terrain);
+livox_manager_replace_voxel (LIVoxManager*      self,
+                             const LIMatVector* point,
+                             const LIVoxVoxel*  terrain);
 
 int
-livox_manager_rotate_voxel (livoxManager*      self,
-                            const limatVector* point,
+livox_manager_rotate_voxel (LIVoxManager*      self,
+                            const LIMatVector* point,
                             int                axis,
                             int                step);
 
 void
-livox_manager_update (livoxManager* self,
+livox_manager_update (LIVoxManager* self,
                       float         secs);
 
 void
-livox_manager_update_marked (livoxManager* self);
+livox_manager_update_marked (LIVoxManager* self);
 
 int
-livox_manager_write (livoxManager* self);
+livox_manager_write (LIVoxManager* self);
 
 int
-livox_manager_write_materials (livoxManager* self);
+livox_manager_write_materials (LIVoxManager* self);
 
 void
-livox_manager_set_sql (livoxManager* self,
-                       liarcSql*     sql);
+livox_manager_set_sql (LIVoxManager* self,
+                       LIArcSql*     sql);
 
 void
-livox_manager_get_voxel (livoxManager* self,
+livox_manager_get_voxel (LIVoxManager* self,
                          int           x,
                          int           y,
                          int           z,
-                         livoxVoxel*   value);
+                         LIVoxVoxel*   value);
 
 int
-livox_manager_set_voxel (livoxManager*     self,
+livox_manager_set_voxel (LIVoxManager*     self,
                          int               x,
                          int               y,
                          int               z,
-                         const livoxVoxel* value);
+                         const LIVoxVoxel* value);
 
 #endif
 

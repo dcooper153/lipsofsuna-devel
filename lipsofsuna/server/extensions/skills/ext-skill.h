@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,12 +27,12 @@
 #ifndef __EXT_SKILL_H__
 #define __EXT_SKILL_H__
 
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 #include "ext-module.h"
 #include "ext-skills.h"
 
-enum _liextSkillType
+enum _LIExtSkillType
 {
 	LIEXT_SKILL_TYPE_INTERNAL,
 	LIEXT_SKILL_TYPE_PUBLIC,
@@ -40,34 +40,34 @@ enum _liextSkillType
 	LIEXT_SKILL_TYPE_MAX
 };
 
-struct _liextSkill
+struct _LIExtSkill
 {
 	char* name;
 	float value;
 	float maximum;
 	float regen;
-	liextSkills* skills;
-	liextSkillType type;
+	LIExtSkills* skills;
+	LIExtSkillType type;
 };
 
-liextSkill*
-liext_skill_new (liextSkills*   skills,
-                 liextSkillType type,
+LIExtSkill*
+liext_skill_new (LIExtSkills*   skills,
+                 LIExtSkillType type,
                  const char*    name);
 
 void
-liext_skill_free (liextSkill* self);
+liext_skill_free (LIExtSkill* self);
 
 int
-liext_skill_set_maximum (liextSkill* self,
+liext_skill_set_maximum (LIExtSkill* self,
                          float       value);
 
 int
-liext_skill_set_regen (liextSkill* self,
+liext_skill_set_regen (LIExtSkill* self,
                        float       value);
 
 int
-liext_skill_set_value (liextSkill* self,
+liext_skill_set_value (LIExtSkill* self,
                        float       value);
 
 #endif

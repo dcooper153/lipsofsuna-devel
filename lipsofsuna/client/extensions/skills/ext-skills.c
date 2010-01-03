@@ -24,16 +24,16 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-skills.h"
 
-liextSkills*
-liext_skills_new (liextModule* module)
+LIExtSkills*
+liext_skills_new (LIExtModule* module)
 {
-	liextSkills* self;
+	LIExtSkills* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextSkills));
+	self = lisys_calloc (1, sizeof (LIExtSkills));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -57,9 +57,9 @@ liext_skills_new (liextModule* module)
 }
 
 void
-liext_skills_free (liextSkills* self)
+liext_skills_free (LIExtSkills* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->skills)
 		lisys_free (iter.value);
@@ -68,40 +68,40 @@ liext_skills_free (liextSkills* self)
 }
 
 void
-liext_skills_unref (liextSkills* self)
+liext_skills_unref (LIExtSkills* self)
 {
 	liscr_data_unref (self->script, NULL);
 }
 
 void
-liext_skills_clear (liextSkills* self)
+liext_skills_clear (LIExtSkills* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->skills)
 		lisys_free (iter.value);
 	lialg_strdic_clear (self->skills);
 }
 
-liextSkill*
-liext_skills_find_skill (liextSkills* self,
+LIExtSkill*
+liext_skills_find_skill (LIExtSkills* self,
                          const char*  name)
 {
 	return lialg_strdic_find (self->skills, name);
 }
 
 int
-liext_skills_set_skill (liextSkills* self,
+liext_skills_set_skill (LIExtSkills* self,
                         const char*  name,
                         float        value,
                         float        maximum)
 {
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	skill = lialg_strdic_find (self->skills, name);
 	if (skill == NULL)
 	{
-		skill = lisys_calloc (1, sizeof (liextSkill));
+		skill = lisys_calloc (1, sizeof (LIExtSkill));
 		if (skill == NULL)
 			return 0;
 		if (!lialg_strdic_insert (self->skills, name, skill))

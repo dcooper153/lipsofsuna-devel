@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,11 +15,23 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_VIDEO_H__
-#define __LIPS_VIDEO_H__
+#ifndef __LIPS_SYSTEM_H__
+#define __LIPS_SYSTEM_H__
 
-#include "video-calls.h"
-#include "video-features.h"
-#include "video-opengl.h"
+#include "system/system.h"
+#include "system/system-compiler.h"
+#include "system/system-directory.h"
+#include "system/system-endian.h"
+#include "system/system-error.h"
+#include "system/system-execute.h"
+#include "system/system-file.h"
+#include "system/system-memory.h"
+#include "system/system-misc.h"
+#include "system/system-module.h"
+#include "system/system-notify.h"
+#include "system/system-path.h"
+#include "system/system-relative.h"
+#include "system/system-types.h"
+#include "system/system-user.h"
 
 #endif

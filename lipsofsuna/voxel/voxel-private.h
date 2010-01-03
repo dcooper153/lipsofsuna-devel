@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,26 +18,26 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxBlock Block
+ * \addtogroup LIVoxBlock Block
  * @{
  */
 
 #ifndef __VOXEL_PRIVATE_H__
 #define __VOXEL_PRIVATE_H__
 
-struct _livoxBlock
+struct _LIVoxBlock
 {
 	uint8_t dirty;
 	uint16_t stamp;
-	livoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
+	LIVoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
 };
 
-struct _livoxSector
+struct _LIVoxSector
 {
 	uint8_t dirty;
-	lialgSector* sector;
-	livoxBlock blocks[LIVOX_BLOCKS_PER_SECTOR];
-	livoxManager* manager;
+	LIAlgSector* sector;
+	LIVoxBlock blocks[LIVOX_BLOCKS_PER_SECTOR];
+	LIVoxManager* manager;
 };
 
 #endif

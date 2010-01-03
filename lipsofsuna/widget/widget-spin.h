@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,44 +18,44 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgSpin Spin
+ * \addtogroup LIWdgSpin Spin
  * @{
  */
 
 #ifndef __WIDGET_SPIN_H__
 #define __WIDGET_SPIN_H__
 
-#include <font/lips-font.h>
+#include <lipsofsuna/font.h>
 #include "widget.h"
 
-#define LIWDG_SPIN(o) ((liwdgSpin*)(o))
+#define LIWDG_SPIN(o) ((LIWdgSpin*)(o))
 
-typedef struct _liwdgSpin liwdgSpin;
-struct _liwdgSpin
+typedef struct _LIWdgSpin LIWdgSpin;
+struct _LIWdgSpin
 {
-	liwdgWidget base;
-	lifntFont* font;
-	lifntLayout* text;
+	LIWdgWidget base;
+	LIFntFont* font;
+	LIFntLayout* text;
 	float value;
 };
 
-extern const liwdgClass liwdgSpinType;
+extern const LIWdgClass liwdg_widget_spin;
 
-liwdgWidget*
-liwdg_spin_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_spin_new (LIWdgManager* manager);
 
-lifntFont*
-liwdg_spin_get_font (liwdgSpin* self);
+LIFntFont*
+liwdg_spin_get_font (LIWdgSpin* self);
 
 void
-liwdg_spin_set_font (liwdgSpin* self,
-                     lifntFont* font);
+liwdg_spin_set_font (LIWdgSpin* self,
+                     LIFntFont* font);
 
 float
-liwdg_spin_get_value (liwdgSpin* self);
+liwdg_spin_get_value (LIWdgSpin* self);
 
 void
-liwdg_spin_set_value (liwdgSpin* self,
+liwdg_spin_set_value (LIWdgSpin* self,
                       float      value);
 
 #endif

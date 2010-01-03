@@ -27,34 +27,34 @@
 #ifndef __EXT_BLOCK_H__
 #define __EXT_BLOCK_H__
 
-#include <client/lips-client.h>
-#include <system/lips-system.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/voxel.h>
 
-typedef struct _liextBlock liextBlock;
-struct _liextBlock
+typedef struct _LIExtBlock LIExtBlock;
+struct _LIExtBlock
 {
-	licliClient* client;
-	liphyObject* physics;
-	limdlModel* mmodel;
-	lirndModel* rmodel;
-	lirndGroup* group;
+	LICliClient* client;
+	LIPhyObject* physics;
+	LIMdlModel* mmodel;
+	LIRenModel* rmodel;
+	LIRenGroup* group;
 };
 
-liextBlock*
-liext_block_new (licliClient* client);
+LIExtBlock*
+liext_block_new (LICliClient* client);
 
 void
-liext_block_free (liextBlock* self);
+liext_block_free (LIExtBlock* self);
 
 int
-liext_block_build (liextBlock*     self,
-                   liextModule*    module,
-                   livoxBlock*     block,
-                   livoxBlockAddr* addr);
+liext_block_build (LIExtBlock*     self,
+                   LIExtModule*    module,
+                   LIVoxBlock*     block,
+                   LIVoxBlockAddr* addr);
 
 void
-liext_block_clear (liextBlock* self);
+liext_block_clear (LIExtBlock* self);
 
 #endif
 

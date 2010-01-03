@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,28 +27,28 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 #include "ext-skeleton.h"
 
 #define LIEXT_SCRIPT_SKELETON "Lips.Skeleton"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	liextSkeleton* skeleton;
-	lisrvServer* server;
+	LIExtSkeleton* skeleton;
+	LISerServer* server;
 };
 
-liextModule*
-liext_module_new (lisrvServer* server);
+LIExtModule*
+liext_module_new (LISerServer* server);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextSkeletonScript (liscrClass* self,
+liext_script_skeleton (LIScrClass* self,
                      void*       data);
 
 #endif

@@ -18,8 +18,8 @@
 #ifndef __SCRIPT_LIBRARY_H__
 #define __SCRIPT_LIBRARY_H__
 
-#include <math/lips-math.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/script.h>
 
 #define LISCR_SCRIPT_CLASS "Lips.Class"
 #define LISCR_SCRIPT_EVENT "Lips.Event"
@@ -30,42 +30,42 @@
 #define LISCR_SCRIPT_VECTOR "Lips.Vector"
 
 void
-licomClassScript (liscrClass* clss,
+liscr_script_class (LIScrClass* clss,
                   void*       data);
 
 void
-licomEventScript (liscrClass* clss,
+liscr_script_event (LIScrClass* clss,
                   void*       data);
 
 void
-licomObjectScript (liscrClass* self,
+liscr_script_object (LIScrClass* self,
                    void*       data);
 
 void
-licomPacketScript (liscrClass* self,
+liscr_script_packet (LIScrClass* self,
                    void*       data);
 
 void
-licomPathScript (liscrClass* self,
+liscr_script_path (LIScrClass* self,
                  void*       data);
 
 void
-licomQuaternionScript (liscrClass* self,
+liscr_script_quaternion (LIScrClass* self,
                        void*       data);
 
 void
-licomVectorScript (liscrClass* self,
+liscr_script_vector (LIScrClass* self,
                    void*       data);
 
 /*****************************************************************************/
 
-liscrData*
-liscr_quaternion_new (liscrScript*           script,
-                      const limatQuaternion* quat);
+LIScrData*
+liscr_quaternion_new (LIScrScript*           script,
+                      const LIMatQuaternion* quat);
 
-liscrData*
-liscr_vector_new (liscrScript*       script,
-                  const limatVector* vector);
+LIScrData*
+liscr_vector_new (LIScrScript*       script,
+                  const LIMatVector* vector);
 
 /*****************************************************************************/
 

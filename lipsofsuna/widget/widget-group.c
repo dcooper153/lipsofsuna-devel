@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgGroup Group
+ * \addtogroup LIWdgGroup Group
  * @{
  */
 
 #include <assert.h>
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 #include "widget-group.h"
 #include "widget-window.h"
 
@@ -38,62 +38,62 @@ enum
 };
 
 static int
-private_init (liwdgGroup*   self,
-              liwdgManager* manager);
+private_init (LIWdgGroup*   self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgGroup* self);
+private_free (LIWdgGroup* self);
 
 static int
-private_event (liwdgGroup* self,
+private_event (LIWdgGroup* self,
                liwdgEvent* event);
 
-static liwdgWidget*
-private_child_at (liwdgGroup* self,
+static LIWdgWidget*
+private_child_at (LIWdgGroup* self,
                   int         pixx,
                   int         pixy);
 
 static void
-private_child_request (liwdgGroup*  self,
-                       liwdgWidget* child);
+private_child_request (LIWdgGroup*  self,
+                       LIWdgWidget* child);
 
-static liwdgWidget*
-private_cycle_focus (liwdgGroup*  self,
-                     liwdgWidget* curr,
+static LIWdgWidget*
+private_cycle_focus (LIWdgGroup*  self,
+                     LIWdgWidget* curr,
                      int          next);
 
 static void
-private_detach_child (liwdgGroup*  self,
-                      liwdgWidget* child);
+private_detach_child (LIWdgGroup*  self,
+                      LIWdgWidget* child);
 
 static void
-private_foreach_child (liwdgGroup* self,
+private_foreach_child (LIWdgGroup* self,
                        void      (*call)(),
                        void*       data);
 
 static void
-private_cell_changed (liwdgGroup* self,
+private_cell_changed (LIWdgGroup* self,
                       int         x,
                       int         y);
 
 static int
-private_get_col_size (liwdgGroup* self,
+private_get_col_size (LIWdgGroup* self,
                       int         x);
 
 static int
-private_get_row_size (liwdgGroup* self,
+private_get_row_size (LIWdgGroup* self,
                       int         y);
 
 static void
-private_rebuild (liwdgGroup* self,
+private_rebuild (LIWdgGroup* self,
                  int         flags);
 
-const liwdgClass liwdgGroupType =
+const LIWdgClass liwdg_widget_group =
 {
-	LIWDG_BASE_STATIC, &liwdgContainerType, "Group", sizeof (liwdgGroup),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_container, "Group", sizeof (LIWdgGroup),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
@@ -104,12 +104,12 @@ const liwdgClass liwdgGroupType =
  * \param manager Widget manager.
  * \return New group widget or NULL.
  */
-liwdgWidget*
-liwdg_group_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_group_new (LIWdgManager* manager)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgGroupType);
+	self = liwdg_widget_new (manager, &liwdg_widget_group);
 	if (self == NULL)
 		return NULL;
 	private_rebuild (LIWDG_GROUP (self), PRIVATE_REBUILD_REQUEST);
@@ -125,14 +125,14 @@ liwdg_group_new (liwdgManager* manager)
  * \param rows Number of rows.
  * \return New group widget or NULL.
  */
-liwdgWidget*
-liwdg_group_new_with_size (liwdgManager* manager,
+LIWdgWidget*
+liwdg_group_new_with_size (LIWdgManager* manager,
                            int           cols,
                            int           rows)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgGroupType);
+	self = liwdg_widget_new (manager, &liwdg_widget_group);
 	if (self == NULL)
 		return NULL;
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), cols, rows))
@@ -151,7 +151,7 @@ liwdg_group_new_with_size (liwdgManager* manager,
  * \return Nonzero on success.
  */
 int
-liwdg_group_append_col (liwdgGroup* self)
+liwdg_group_append_col (LIWdgGroup* self)
 {
 	return liwdg_group_set_size (self, self->width + 1, self->height);
 }
@@ -163,7 +163,7 @@ liwdg_group_append_col (liwdgGroup* self)
  * \return Nonzero on success.
  */
 int
-liwdg_group_append_row (liwdgGroup* self)
+liwdg_group_append_row (LIWdgGroup* self)
 {
 	return liwdg_group_set_size (self, self->width, self->height + 1);
 }
@@ -176,7 +176,7 @@ liwdg_group_append_row (liwdgGroup* self)
  * \return Nonzero on success.
  */
 int
-liwdg_group_insert_col (liwdgGroup* self,
+liwdg_group_insert_col (LIWdgGroup* self,
                         int         index)
 {
 	int x;
@@ -198,7 +198,7 @@ liwdg_group_insert_col (liwdgGroup* self,
 	}
 
 	/* Clear new column. */
-	memset (self->cols + index, 0, sizeof (liwdgGroupCol));
+	memset (self->cols + index, 0, sizeof (LIWdgGroupCol));
 	for (y = 0 ; y < self->height ; y++)
 		self->cells[index + x * self->width].child = NULL;
 
@@ -216,7 +216,7 @@ liwdg_group_insert_col (liwdgGroup* self,
  * \return Nonzero on success.
  */
 int
-liwdg_group_insert_row (liwdgGroup* self,
+liwdg_group_insert_row (LIWdgGroup* self,
                         int         index)
 {
 	int x;
@@ -238,7 +238,7 @@ liwdg_group_insert_row (liwdgGroup* self,
 	}
 
 	/* Clear new row. */
-	memset (self->rows + index, 0, sizeof (liwdgGroupRow));
+	memset (self->rows + index, 0, sizeof (LIWdgGroupRow));
 	for (x = 0 ; x < self->width ; x++)
 		self->cells[x + index * self->width].child = NULL;
 
@@ -255,7 +255,7 @@ liwdg_group_insert_row (liwdgGroup* self,
  * \param index Column index.
  */
 void
-liwdg_group_remove_col (liwdgGroup* self,
+liwdg_group_remove_col (LIWdgGroup* self,
                         int         index)
 {
 	int x;
@@ -297,7 +297,7 @@ liwdg_group_remove_col (liwdgGroup* self,
  * \param index Row index.
  */
 void
-liwdg_group_remove_row (liwdgGroup* self,
+liwdg_group_remove_row (LIWdgGroup* self,
                         int         index)
 {
 	int x;
@@ -341,10 +341,10 @@ liwdg_group_remove_row (liwdgGroup* self,
  * \param rect Return location for the size.
  */
 void
-liwdg_group_get_cell_rect (liwdgGroup* self,
+liwdg_group_get_cell_rect (LIWdgGroup* self,
                            int         x,
                            int         y,
-                           liwdgRect*  rect)
+                           LIWdgRect*  rect)
 {
 	liwdg_widget_get_content (LIWDG_WIDGET (self), rect);
 	rect->x += self->cols[x].start;
@@ -361,8 +361,8 @@ liwdg_group_get_cell_rect (liwdgGroup* self,
  * \param y Row number.
  * \return Widget owned by the group or NULL.
  */
-liwdgWidget*
-liwdg_group_get_child (liwdgGroup* self,
+LIWdgWidget*
+liwdg_group_get_child (LIWdgGroup* self,
                        int         x,
                        int         y)
 {
@@ -380,12 +380,12 @@ liwdg_group_get_child (liwdgGroup* self,
  * \param child Widget or NULL.
  */
 void
-liwdg_group_set_child (liwdgGroup*  self,
+liwdg_group_set_child (LIWdgGroup*  self,
                        int          x,
                        int          y,
-                       liwdgWidget* child)
+                       LIWdgWidget* child)
 {
-	liwdgGroupCell* cell;
+	LIWdgGroupCell* cell;
 
 	assert (x < self->width);
 	assert (y < self->height);
@@ -423,7 +423,7 @@ liwdg_group_set_child (liwdgGroup*  self,
  * \return Nonzero if the column is set to expand.
  */
 int
-liwdg_group_get_col_expand (liwdgGroup* self,
+liwdg_group_get_col_expand (LIWdgGroup* self,
                             int         x)
 {
 	return self->cols[x].expand;
@@ -437,7 +437,7 @@ liwdg_group_get_col_expand (liwdgGroup* self,
  * \param expand Nonzero if should expand.
  */
 void
-liwdg_group_set_col_expand (liwdgGroup* self,
+liwdg_group_set_col_expand (LIWdgGroup* self,
                             int         x,
                             int         expand) 
 {
@@ -460,7 +460,7 @@ liwdg_group_set_col_expand (liwdgGroup* self,
  * \return Horizontal allocation of the column in pixels.
  */
 int
-liwdg_group_get_col_size (liwdgGroup* self,
+liwdg_group_get_col_size (LIWdgGroup* self,
                           int         x)
 {
 	return self->cols[x].allocation;
@@ -473,7 +473,7 @@ liwdg_group_get_col_size (liwdgGroup* self,
  * \return value Nonzero if homogeneous.
  */
 int
-liwdg_group_get_homogeneous (const liwdgGroup* self)
+liwdg_group_get_homogeneous (const LIWdgGroup* self)
 {
 	return self->homogeneous;
 }
@@ -485,7 +485,7 @@ liwdg_group_get_homogeneous (const liwdgGroup* self)
  * \param value Nonzero if homogeneous.
  */
 void
-liwdg_group_set_homogeneous (liwdgGroup* self,
+liwdg_group_set_homogeneous (LIWdgGroup* self,
                              int         value)
 {
 	self->homogeneous = value;
@@ -502,7 +502,7 @@ liwdg_group_set_homogeneous (liwdgGroup* self,
  * \param bottom Return location for the bottom margin.
  */
 void
-liwdg_group_get_margins (liwdgGroup* self,
+liwdg_group_get_margins (LIWdgGroup* self,
                          int*        left,
                          int*        right,
                          int*        top,
@@ -524,7 +524,7 @@ liwdg_group_get_margins (liwdgGroup* self,
  * \param bottom Bottom margin in pixels.
  */
 void
-liwdg_group_set_margins (liwdgGroup* self,
+liwdg_group_set_margins (LIWdgGroup* self,
                          int         left,
                          int         right,
                          int         top,
@@ -548,7 +548,7 @@ liwdg_group_set_margins (liwdgGroup* self,
  * \return Nonzero if the row is set to expand.
  */
 int
-liwdg_group_get_row_expand (liwdgGroup* self,
+liwdg_group_get_row_expand (LIWdgGroup* self,
                             int         y)
 {
 	return self->rows[y].expand;
@@ -562,7 +562,7 @@ liwdg_group_get_row_expand (liwdgGroup* self,
  * \param expand Nonzero if should expand.
  */
 void
-liwdg_group_set_row_expand (liwdgGroup* self,
+liwdg_group_set_row_expand (LIWdgGroup* self,
                             int         y,
                             int         expand)
 {
@@ -585,7 +585,7 @@ liwdg_group_set_row_expand (liwdgGroup* self,
  * \return Vertical allocation of the row in pixels.
  */
 int
-liwdg_group_get_row_size (liwdgGroup* self,
+liwdg_group_get_row_size (LIWdgGroup* self,
                           int         y)
 {
 	return self->rows[y].allocation;
@@ -599,7 +599,7 @@ liwdg_group_get_row_size (liwdgGroup* self,
  * \param rows Return location for the number of rows.
  */
 void
-liwdg_group_get_size (liwdgGroup* self,
+liwdg_group_get_size (LIWdgGroup* self,
                       int*        cols,
                       int*        rows)
 {
@@ -616,26 +616,26 @@ liwdg_group_get_size (liwdgGroup* self,
  * \return Nonzero on success.
  */
 int
-liwdg_group_set_size (liwdgGroup* self,
+liwdg_group_set_size (LIWdgGroup* self,
                       int         width,
                       int         height)
 {
 	int x;
 	int y;
-	liwdgGroupCol* mem0 = NULL;
-	liwdgGroupRow* mem1 = NULL;
-	liwdgGroupCell* mem2 = NULL;
+	LIWdgGroupCol* mem0 = NULL;
+	LIWdgGroupRow* mem1 = NULL;
+	LIWdgGroupCell* mem2 = NULL;
 
 	/* Allocate memory. */
 	if (width > 0)
 	{
-		mem0 = (liwdgGroupCol*) lisys_calloc (width, sizeof (liwdgGroupCol));
+		mem0 = (LIWdgGroupCol*) lisys_calloc (width, sizeof (LIWdgGroupCol));
 		if (mem0 == NULL)
 			return 0;
 	}
 	if (height > 0)
 	{
-		mem1 = (liwdgGroupRow*) lisys_calloc (height, sizeof (liwdgGroupRow));
+		mem1 = (LIWdgGroupRow*) lisys_calloc (height, sizeof (LIWdgGroupRow));
 		if (mem1 == NULL)
 		{
 			lisys_free (mem0);
@@ -644,7 +644,7 @@ liwdg_group_set_size (liwdgGroup* self,
 	}
 	if (width > 0 && height > 0)
 	{
-		mem2 = (liwdgGroupCell*) lisys_calloc (width * height, sizeof (liwdgGroupCell));
+		mem2 = (LIWdgGroupCell*) lisys_calloc (width * height, sizeof (LIWdgGroupCell));
 		if (mem2 == NULL)
 		{
 			lisys_free (mem0);
@@ -655,17 +655,17 @@ liwdg_group_set_size (liwdgGroup* self,
 
 	/* Copy over the column data. */
 	if (self->width < width)
-		memcpy (mem0, self->cols, self->width * sizeof (liwdgGroupCol));
+		memcpy (mem0, self->cols, self->width * sizeof (LIWdgGroupCol));
 	else
-		memcpy (mem0, self->cols, width * sizeof (liwdgGroupCol));
+		memcpy (mem0, self->cols, width * sizeof (LIWdgGroupCol));
 	lisys_free (self->cols);
 	self->cols = mem0;
 
 	/* Copy over the row data. */
 	if (self->height < height)
-		memcpy (mem1, self->rows, self->height * sizeof (liwdgGroupRow));
+		memcpy (mem1, self->rows, self->height * sizeof (LIWdgGroupRow));
 	else
-		memcpy (mem1, self->rows, height * sizeof (liwdgGroupRow));
+		memcpy (mem1, self->rows, height * sizeof (LIWdgGroupRow));
 	lisys_free (self->rows);
 	self->rows = mem1;
 
@@ -712,7 +712,7 @@ liwdg_group_set_size (liwdgGroup* self,
  * \param row Return location for the row spacing.
  */
 void
-liwdg_group_get_spacings (liwdgGroup* self,
+liwdg_group_get_spacings (LIWdgGroup* self,
                           int*        column,
                           int*        row)
 {
@@ -728,7 +728,7 @@ liwdg_group_get_spacings (liwdgGroup* self,
  * \param row Spacing between rows.
  */
 void
-liwdg_group_set_spacings (liwdgGroup* self,
+liwdg_group_set_spacings (LIWdgGroup* self,
                           int         column,
                           int         row)
 {
@@ -754,8 +754,8 @@ liwdg_group_set_spacings (liwdgGroup* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgGroup*   self,
-              liwdgManager* manager)
+private_init (LIWdgGroup*   self,
+              LIWdgManager* manager)
 {
 	self->cols = NULL;
 	self->rows = NULL;
@@ -776,7 +776,7 @@ private_init (liwdgGroup*   self,
 }
 
 static void
-private_free (liwdgGroup* self)
+private_free (LIWdgGroup* self)
 {
 	int i;
 
@@ -799,24 +799,24 @@ private_free (liwdgGroup* self)
 }
 
 static int
-private_event (liwdgGroup* self,
+private_event (LIWdgGroup* self,
                liwdgEvent* event)
 {
 	int i;
-	liwdgWidget* child;
+	LIWdgWidget* child;
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdgContainerType)
+	    event->probe.clss == &liwdg_widget_container)
 	{
-		static liwdgContainerIface iface =
+		static LIWdgContainerIface iface =
 		{
-			(liwdgContainerChildAtFunc) private_child_at,
-			(liwdgContainerChildRequestFunc) private_child_request,
-			(liwdgContainerCycleFocusFunc) private_cycle_focus,
-			(liwdgContainerDetachChildFunc) private_detach_child,
-			(liwdgContainerForeachChildFunc) private_foreach_child,
-			(liwdgContainerTranslateCoordsFunc) NULL
+			(LIWdgContainerChildAtFunc) private_child_at,
+			(LIWdgContainerChildRequestFunc) private_child_request,
+			(LIWdgContainerCycleFocusFunc) private_cycle_focus,
+			(LIWdgContainerDetachChildFunc) private_detach_child,
+			(LIWdgContainerForeachChildFunc) private_foreach_child,
+			(LIWdgContainerTranslateCoordsFunc) NULL
 		};
 		event->probe.result = &iface;
 		return 0;
@@ -833,7 +833,7 @@ private_event (liwdgGroup* self,
 			{
 				child = self->cells[i].child;
 				if (child != NULL)
-					liwdg_widget_render (child);
+					liwdg_widget_draw (child);
 			}
 			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
@@ -846,17 +846,17 @@ private_event (liwdgGroup* self,
 			return 1;
 	}
 
-	return liwdgContainerType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_container.event (LIWDG_WIDGET (self), event);
 }
 
-static liwdgWidget*
-private_child_at (liwdgGroup* self,
+static LIWdgWidget*
+private_child_at (LIWdgGroup* self,
                   int         pixx,
                   int         pixy)
 {
 	int x;
 	int y;
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	pixx -= rect.x;
@@ -891,13 +891,13 @@ private_child_at (liwdgGroup* self,
 }
 
 static void
-private_child_request (liwdgGroup*  self,
-                       liwdgWidget* child)
+private_child_request (LIWdgGroup*  self,
+                       LIWdgWidget* child)
 {
 	int x;
 	int y;
-	liwdgSize size;
-	liwdgGroupCell* cell;
+	LIWdgSize size;
+	LIWdgGroupCell* cell;
 
 	for (y = 0 ; y < self->height ; y++)
 	{
@@ -927,16 +927,16 @@ private_child_request (liwdgGroup*  self,
  * \param next Nonzero for next, zero for previous.
  * \return Widget or NULL.
  */
-static liwdgWidget*
-private_cycle_focus (liwdgGroup*  self,
-                     liwdgWidget* curr,
+static LIWdgWidget*
+private_cycle_focus (LIWdgGroup*  self,
+                     LIWdgWidget* curr,
                      int          next)
 {
 	int x = 0;
 	int y = 0;
 	int found;
-	liwdgWidget* tmp;
-	liwdgWidget* child;
+	LIWdgWidget* tmp;
+	LIWdgWidget* child;
 
 	/* Find old focused widget. */
 	found = 0;
@@ -978,7 +978,7 @@ private_cycle_focus (liwdgGroup*  self,
 				child = self->cells[x + y * self->width].child;
 				if (child == NULL)
 					continue;
-				if (liwdg_widget_typeis (child, &liwdgContainerType))
+				if (liwdg_widget_typeis (child, &liwdg_widget_container))
 				{
 					tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, 1);
 					if (tmp != NULL)
@@ -1012,7 +1012,7 @@ private_cycle_focus (liwdgGroup*  self,
 				child = self->cells[x + y * self->width].child;
 				if (child == NULL)
 					continue;
-				if (liwdg_widget_typeis (child, &liwdgContainerType))
+				if (liwdg_widget_typeis (child, &liwdg_widget_container))
 				{
 					tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, 0);
 					if (tmp != NULL)
@@ -1033,12 +1033,12 @@ private_cycle_focus (liwdgGroup*  self,
 }
 
 static void
-private_detach_child (liwdgGroup*  self,
-                      liwdgWidget* child)
+private_detach_child (LIWdgGroup*  self,
+                      LIWdgWidget* child)
 {
 	int x;
 	int y;
-	liwdgGroupCell* cell;
+	LIWdgGroupCell* cell;
 
 	for (y = 0 ; y < self->height ; y++)
 	{
@@ -1055,13 +1055,13 @@ private_detach_child (liwdgGroup*  self,
 }
 
 static void
-private_foreach_child (liwdgGroup* self,
+private_foreach_child (LIWdgGroup* self,
                        void      (*call)(),
                        void*       data)
 {
 	int x;
 	int y;
-	liwdgGroupCell* cell;
+	LIWdgGroupCell* cell;
 
 	for (y = 0 ; y < self->height ; y++)
 	{
@@ -1075,12 +1075,12 @@ private_foreach_child (liwdgGroup* self,
 }
 
 static void
-private_cell_changed (liwdgGroup* self,
+private_cell_changed (LIWdgGroup* self,
                       int         x,
                       int         y)
 {
-	liwdgSize size;
-	liwdgWidget* child;
+	LIWdgSize size;
+	LIWdgWidget* child;
 
 	/* Get the row and column size requests. */
 	size.width = private_get_col_size (self, x);
@@ -1124,13 +1124,13 @@ private_cell_changed (liwdgGroup* self,
 }
 
 static int
-private_get_col_size (liwdgGroup* self,
+private_get_col_size (LIWdgGroup* self,
                       int         x)
 {
 	int y;
 	int width;
-	liwdgSize size;
-	liwdgWidget* child;
+	LIWdgSize size;
+	LIWdgWidget* child;
 
 	width = 0;
 	for (y = 0 ; y < self->height ; y++)
@@ -1147,13 +1147,13 @@ private_get_col_size (liwdgGroup* self,
 }
 
 static int
-private_get_row_size (liwdgGroup* self,
+private_get_row_size (LIWdgGroup* self,
                       int         y)
 {
 	int x;
 	int height;
-	liwdgSize size;
-	liwdgWidget* child;
+	LIWdgSize size;
+	LIWdgWidget* child;
 
 	height = 0;
 	for (x = 0 ; x < self->width ; x++)
@@ -1170,7 +1170,7 @@ private_get_row_size (liwdgGroup* self,
 }
 
 static void
-private_rebuild (liwdgGroup* self,
+private_rebuild (LIWdgGroup* self,
                  int         flags)
 {
 	int x;
@@ -1183,9 +1183,9 @@ private_rebuild (liwdgGroup* self,
 	int hreq;
 	int start;
 	int expand;
-	liwdgWidget* child;
-	liwdgRect rect;
-	liwdgSize size;
+	LIWdgWidget* child;
+	LIWdgRect rect;
+	LIWdgSize size;
 
 	if (self->rebuilding)
 		return;

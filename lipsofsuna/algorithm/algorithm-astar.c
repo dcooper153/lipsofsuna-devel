@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,51 +18,51 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgAstar Astar
+ * \addtogroup LIAlgAstar Astar
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "algorithm-astar.h"
 
-typedef struct _lialgAstarNode lialgAstarNode;
-struct _lialgAstarNode
+typedef struct _LIAlgAstarNode LIAlgAstarNode;
+struct _LIAlgAstarNode
 {
-	lialgAstarNode* prev;
+	LIAlgAstarNode* prev;
 	void* node;
 	float cost;
 	float heuristic;
 	struct
 	{
-		lialgPtrdicNode* assoc;
-		lialgPriorityQueueNode* priority;
+		LIAlgPtrdicNode* assoc;
+		LIAlgPriorityQueueNode* priority;
 	} nodes;
 };
 
-static lialgAstarResult*
-private_build_path (lialgAstar*     self,
-                    lialgAstarNode* last);
+static LIAlgAstarResult*
+private_build_path (LIAlgAstar*     self,
+                    LIAlgAstarNode* last);
 
 static void
-private_clear (lialgAstar* self);
+private_clear (LIAlgAstar* self);
 
-lialgAstarNode*
-private_next_open (lialgAstar*     self,
-                   lialgAstarNode* current);
+LIAlgAstarNode*
+private_next_open (LIAlgAstar*     self,
+                   LIAlgAstarNode* current);
 
 static int
-private_node_opened (lialgAstar*     self,
-                     lialgAstarNode* prev,
+private_node_opened (LIAlgAstar*     self,
+                     LIAlgAstarNode* prev,
                      void*               node);
 
 static int
-private_node_closed (lialgAstar*     self,
-                     lialgAstarNode* prev,
+private_node_closed (LIAlgAstar*     self,
+                     LIAlgAstarNode* prev,
                      void*           node);
 
 static int
-private_open_node (lialgAstar*     self,
-                   lialgAstarNode* prev,
+private_open_node (LIAlgAstar*     self,
+                   LIAlgAstarNode* prev,
                    void*           node);
 
 /*****************************************************************************/
@@ -76,16 +76,16 @@ private_open_node (lialgAstar*     self,
  * \param successor Function for retrieving connected nodes.
  * \return New path solver or NULL.
  */
-lialgAstar*
-lialg_astar_new (lialgAstarCost      cost,
-                 lialgAstarHeuristic heuristic,
-                 lialgAstarPassable  passable,
-                 lialgAstarSuccessor successor)
+LIAlgAstar*
+lialg_astar_new (LIAlgAstarCost      cost,
+                 LIAlgAstarHeuristic heuristic,
+                 LIAlgAstarPassable  passable,
+                 LIAlgAstarSuccessor successor)
 {
-	lialgAstar* self;
+	LIAlgAstar* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lialgAstar));
+	self = lisys_calloc (1, sizeof (LIAlgAstar));
 	if (self == NULL)
 		return NULL;
 	self->calls.cost = cost;
@@ -121,7 +121,7 @@ error:
  * \param self Path solver.
  */
 void
-lialg_astar_free (lialgAstar* self)
+lialg_astar_free (LIAlgAstar* self)
 {
 	if (self->open != NULL)
 		lialg_ptrdic_free (self->open);
@@ -145,8 +145,8 @@ lialg_astar_free (lialgAstar* self)
  * \param end Target position.
  * \return List of path nodes or NULL.
  */
-lialgAstarResult*
-lialg_astar_solve (lialgAstar* self,
+LIAlgAstarResult*
+lialg_astar_solve (LIAlgAstar* self,
                    void*       world,
                    void*       object,
                    void*       start,
@@ -155,8 +155,8 @@ lialg_astar_solve (lialgAstar* self,
 	int i;
 	int ret;
 	void* node;
-	lialgAstarResult* result;
-	lialgAstarNode* current;
+	LIAlgAstarResult* result;
+	LIAlgAstarNode* current;
 
 	/* Initialize state. */
 	self->world = world;
@@ -164,7 +164,7 @@ lialg_astar_solve (lialgAstar* self,
 	self->target = end;
 
 	/* Add the start node to the open list. */
-	current = lisys_malloc (sizeof (lialgAstarNode));
+	current = lisys_malloc (sizeof (LIAlgAstarNode));
 	if (current == NULL)
 		return NULL;
 	current->prev = NULL;
@@ -233,7 +233,7 @@ error:
  * \param self Path finder path.
  */
 void
-lialg_astar_result_free (lialgAstarResult* self)
+lialg_astar_result_free (LIAlgAstarResult* self)
 {
 	lisys_free (self->nodes);
 	lisys_free (self);
@@ -241,13 +241,13 @@ lialg_astar_result_free (lialgAstarResult* self)
 
 /*****************************************************************************/
 
-static lialgAstarResult*
-private_build_path (lialgAstar*     self,
-                    lialgAstarNode* last)
+static LIAlgAstarResult*
+private_build_path (LIAlgAstar*     self,
+                    LIAlgAstarNode* last)
 {
 	int count;
-	lialgAstarResult* path;
-	lialgAstarNode* ptr;
+	LIAlgAstarResult* path;
+	LIAlgAstarNode* ptr;
 
 	/* Calculate length. */
 	count = 0;
@@ -258,7 +258,7 @@ private_build_path (lialgAstar*     self,
 	}
 
 	/* Allocate path. */
-	path = lisys_calloc (1, sizeof (lialgAstarResult));
+	path = lisys_calloc (1, sizeof (LIAlgAstarResult));
 	if (path == NULL)
 		return NULL;
 	path->length = count;
@@ -277,9 +277,9 @@ private_build_path (lialgAstar*     self,
 }
 
 static void
-private_clear (lialgAstar* self)
+private_clear (LIAlgAstar* self)
 {
-	lialgPtrdicIter iter;
+	LIAlgPtrdicIter iter;
 
 	LI_FOREACH_PTRDIC (iter, self->open)
 		lisys_free (iter.value);
@@ -290,9 +290,9 @@ private_clear (lialgAstar* self)
 	lialg_priority_queue_clear (self->priority);
 }
 
-lialgAstarNode*
-private_next_open (lialgAstar*     self,
-                   lialgAstarNode* current)
+LIAlgAstarNode*
+private_next_open (LIAlgAstar*     self,
+                   LIAlgAstarNode* current)
 {
 	/* Close previous node. */
 	if (!lialg_ptrdic_insert (self->closed, current->node, current))
@@ -325,12 +325,12 @@ private_next_open (lialgAstar*     self,
  * \return Zero if not in list, one if found and handled, two if an error occurred.
  */
 static int
-private_node_opened (lialgAstar*     self,
-                     lialgAstarNode* prev,
+private_node_opened (LIAlgAstar*     self,
+                     LIAlgAstarNode* prev,
                      void*           node)
 {
 	float cost;
-	lialgAstarNode* successor;
+	LIAlgAstarNode* successor;
 
 	/* Find the node from the open list. */
 	successor = lialg_ptrdic_find (self->open, node);
@@ -373,12 +373,12 @@ private_node_opened (lialgAstar*     self,
  * \return Zero if not in list, one if found and handled, two if an error occurred.
  */
 static int
-private_node_closed (lialgAstar*     self,
-                     lialgAstarNode* prev,
+private_node_closed (LIAlgAstar*     self,
+                     LIAlgAstarNode* prev,
                      void*           node)
 {
 	float cost;
-	lialgAstarNode* successor;
+	LIAlgAstarNode* successor;
 
 	/* Find the node from the closed list. */
 	successor = lialg_ptrdic_find (self->closed, node);
@@ -414,13 +414,13 @@ private_node_closed (lialgAstar*     self,
 }
 
 static int
-private_open_node (lialgAstar*     self,
-                   lialgAstarNode* prev,
+private_open_node (LIAlgAstar*     self,
+                   LIAlgAstarNode* prev,
                    void*           node)
 {
-	lialgAstarNode* successor;
+	LIAlgAstarNode* successor;
 
-	successor = lisys_malloc (sizeof (lialgAstarNode));
+	successor = lisys_malloc (sizeof (LIAlgAstarNode));
 	if (successor == NULL)
 		return 0;
 	successor->node = node;

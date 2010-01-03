@@ -27,49 +27,49 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 
 #define LIEXT_SCRIPT_SPEECH "Lips.Speech"
 
-typedef struct _liextModule liextModule;
-struct _liextModule
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	licliClient* client;
-	lialgU32dic* objects;
-	licalHandle calls[2];
+	LICliClient* client;
+	LIAlgU32dic* objects;
+	LICalHandle calls[2];
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 int
-liext_module_set_speech (liextModule* self,
+liext_module_set_speech (LIExtModule* self,
                          uint32_t     object,
                          const char*  message);
 
 /*****************************************************************************/
 
-typedef struct _liextObject liextObject;
-struct _liextObject
+typedef struct _LIExtObject LIExtObject;
+struct _LIExtObject
 {
-	lialgList* speech;
-	limatVector position;
+	LIAlgList* speech;
+	LIMatVector position;
 };
 
-liextObject*
+LIExtObject*
 liext_object_new ();
 
 void
-liext_object_free (liextObject* self);
+liext_object_free (LIExtObject* self);
 
 /*****************************************************************************/
 
 void
-liextSpeechScript (liscrClass* self,
+liext_script_speech (LIScrClass* self,
                    void*       data);
 
 #endif

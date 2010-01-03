@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgRender Render
+ * \addtogroup LIWdgRender Render
  * @{
  */
 
@@ -26,22 +26,22 @@
 #include "widget-manager.h"
 
 static int
-private_init (liwdgRender*   self,
-              liwdgManager* manager);
+private_init (LIWdgRender*   self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgRender* self);
+private_free (LIWdgRender* self);
 
 static int
-private_event (liwdgRender* self,
+private_event (LIWdgRender* self,
                liwdgEvent* event);
 
-const liwdgClass liwdgRenderType =
+const LIWdgClass liwdg_widget_render =
 {
-	LIWDG_BASE_STATIC, &liwdgGroupType, "Render", sizeof (liwdgRender),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_group, "Render", sizeof (LIWdgRender),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
@@ -53,17 +53,17 @@ const liwdgClass liwdgRenderType =
  * \param scene Scene.
  * \return New widget or NULL.
  */
-liwdgWidget*
-liwdg_render_new (liwdgManager* manager,
-                  lirndScene*   scene)
+LIWdgWidget*
+liwdg_render_new (LIWdgManager* manager,
+                  LIRenScene*   scene)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgRenderType);
+	self = liwdg_widget_new (manager, &liwdg_widget_render);
 	if (self == NULL)
 		return NULL;
 	LIWDG_RENDER (self)->scene = scene;
-	LIWDG_RENDER (self)->deferred = lirnd_deferred_new (scene->render, 32, 32);
+	LIWDG_RENDER (self)->deferred = liren_deferred_new (scene->render, 32, 32);
 	if (LIWDG_RENDER (self)->deferred == NULL)
 		lisys_error_report ();
 
@@ -80,14 +80,14 @@ liwdg_render_new (liwdgManager* manager,
  * \return Nonzero if found something.
  */
 int
-liwdg_render_pick (liwdgRender*    self,
-                   lirndSelection* result,
+liwdg_render_pick (LIWdgRender*    self,
+                   LIRenSelection* result,
                    int             x,
                    int             y)
 {
 	int viewport[4];
-	limatFrustum frustum;
-	liwdgRect rect;
+	LIMatFrustum frustum;
+	LIWdgRect rect;
 
 	/* Check if inside the allocation. */
 	liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
@@ -103,7 +103,7 @@ liwdg_render_pick (liwdgRender*    self,
 	viewport[1] = rect.y;
 	viewport[2] = rect.width;
 	viewport[3] = rect.height;
-	if (!lirnd_scene_pick (self->scene, &self->modelview, &self->projection, &frustum, viewport, x, y, 5, result))
+	if (!liren_scene_pick (self->scene, &self->modelview, &self->projection, &frustum, viewport, x, y, 5, result))
 		return 0;
 
 	return 1;
@@ -116,8 +116,8 @@ liwdg_render_pick (liwdgRender*    self,
  * \param value Matrix.
  */
 void
-liwdg_render_set_modelview (liwdgRender*       self,
-                            const limatMatrix* value)
+liwdg_render_set_modelview (LIWdgRender*       self,
+                            const LIMatMatrix* value)
 {
 	self->modelview = *value;
 }
@@ -129,8 +129,8 @@ liwdg_render_set_modelview (liwdgRender*       self,
  * \param value Matrix.
  */
 void
-liwdg_render_set_projection (liwdgRender*       self,
-                             const limatMatrix* value)
+liwdg_render_set_projection (LIWdgRender*       self,
+                             const LIMatMatrix* value)
 {
 	self->projection = *value;
 }
@@ -138,8 +138,8 @@ liwdg_render_set_projection (liwdgRender*       self,
 /****************************************************************************/
 
 static int
-private_init (liwdgRender*  self,
-              liwdgManager* manager)
+private_init (LIWdgRender*  self,
+              LIWdgManager* manager)
 {
 	liwdg_widget_set_style (LIWDG_WIDGET (self), "render");
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), 128, 128);
@@ -150,27 +150,27 @@ private_init (liwdgRender*  self,
 }
 
 static void
-private_free (liwdgRender* self)
+private_free (LIWdgRender* self)
 {
 }
 
 static int
-private_event (liwdgRender* self,
+private_event (LIWdgRender* self,
                liwdgEvent*  event)
 {
 	int i;
-	limatFrustum frustum;
-	liwdgManager* manager;
-	liwdgRect rect;
-	liwdgStyle* style;
-	liwdgWidget* child;
+	LIMatFrustum frustum;
+	LIWdgManager* manager;
+	LIWdgRect rect;
+	LIWdgStyle* style;
+	LIWdgWidget* child;
 
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_ALLOCATION:
 			if (self->deferred != NULL)
 			{
-				lirnd_deferred_resize (self->deferred,
+				liren_deferred_resize (self->deferred,
 					LIWDG_WIDGET (self)->allocation.width,
 					LIWDG_WIDGET (self)->allocation.height);
 			}
@@ -201,7 +201,7 @@ private_event (liwdgRender* self,
 			if (self->scene != NULL)
 			{
 				limat_frustum_init (&frustum, &self->modelview, &self->projection);
-				lirnd_scene_render (self->scene, self->deferred, &self->modelview, &self->projection, &frustum);
+				liren_scene_render (self->scene, self->deferred, &self->modelview, &self->projection, &frustum);
 			}
 			if (self->custom_render_func != NULL)
 			{
@@ -229,7 +229,7 @@ private_event (liwdgRender* self,
 			{
 				child = LIWDG_GROUP (self)->cells[i].child;
 				if (child != NULL)
-					liwdg_widget_render (child);
+					liwdg_widget_draw (child);
 			}
 			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
@@ -238,7 +238,7 @@ private_event (liwdgRender* self,
 			break;
 	}
 
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,8 +30,8 @@ enum
 	LIAI_WAYPOINT_FLAG_WALKABLE = 0x02
 };
 
-typedef struct _liaiManager liaiManager;
-typedef struct _liaiSector liaiSector;
-typedef struct _liaiWaypoint liaiWaypoint;
+typedef struct _LIAiManager LIAiManager;
+typedef struct _LIAiSector LIAiSector;
+typedef struct _LIAiWaypoint LIAiWaypoint;
 
 #endif

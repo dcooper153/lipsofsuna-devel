@@ -18,7 +18,7 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliClient Client
+ * \addtogroup LICliClient Client
  * @{
  */
 
@@ -26,14 +26,14 @@
 #define __CLIENT_NETWORK_H__
 
 #include <grapple/grapple.h>
-#include <config/lips-config.h>
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/config.h>
+#include <lipsofsuna/algorithm.h>
 #include "client.h"
 #include "client-types.h"
 #include "client-object.h"
 
-typedef struct _licliControls licliControls;
-struct _licliControls
+typedef struct _LICliControls LICliControls;
+struct _LICliControls
 {
 	int flags;
 	float tilt;
@@ -41,13 +41,13 @@ struct _licliControls
 	float move;
 };
 
-struct _licliNetwork
+struct _LICliNetwork
 {
 	int analog;
 	uint32_t id;
 	uint32_t features;
-	licfgHost* host;
-	licliClient* client;
+	LICfgHost* host;
+	LICliClient* client;
 	grapple_client socket;
 	struct
 	{
@@ -57,46 +57,46 @@ struct _licliNetwork
 	} delta;
 	struct
 	{
-		licliControls controls;
-		limatQuaternion direction;
+		LICliControls controls;
+		LIMatQuaternion direction;
 	} prev, curr;
 };
 
-licliNetwork*
-licli_network_new (licliClient* client,
+LICliNetwork*
+licli_network_new (LICliClient* client,
                    const char*  name,
                    const char*  pass);
 
 void
-licli_network_free (licliNetwork* self);
+licli_network_free (LICliNetwork* self);
 
 void
-licli_network_tilt (licliNetwork* self,
+licli_network_tilt (LICliNetwork* self,
                     float         value,
                     int           keep);
 
 void
-licli_network_turn (licliNetwork* self,
+licli_network_turn (LICliNetwork* self,
                     float         value,
                     int           keep);
 
 int
-licli_network_update (licliNetwork* self,
+licli_network_update (LICliNetwork* self,
                       float         secs);
 
 int
-licli_network_get_connected (const licliNetwork* self);
+licli_network_get_connected (const LICliNetwork* self);
 
 int
-licli_network_get_dirty (const licliNetwork* self);
+licli_network_get_dirty (const LICliNetwork* self);
 
 void
-licli_network_get_rotation (const licliNetwork* self,
-                            limatQuaternion*    value);
+licli_network_get_rotation (const LICliNetwork* self,
+                            LIMatQuaternion*    value);
 
 void
-licli_network_set_rotation (licliNetwork*          self,
-                            const limatQuaternion* value);
+licli_network_set_rotation (LICliNetwork*          self,
+                            const LIMatQuaternion* value);
 
 #endif
 

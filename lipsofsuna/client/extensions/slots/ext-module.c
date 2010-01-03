@@ -24,48 +24,48 @@
  * @{
  */
 
-#include <client/lips-client.h>
+#include <lipsofsuna/client.h>
 #include "ext-module.h"
 #include "ext-slots.h"
 
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader);
+                LIArcReader* reader);
 
 static int
-private_packet_diff (liextModule* self,
-                     liarcReader* reader);
+private_packet_diff (LIExtModule* self,
+                     LIArcReader* reader);
 
 static int
-private_packet_reset (liextModule* self,
-                      liarcReader* reader);
+private_packet_reset (LIExtModule* self,
+                      LIArcReader* reader);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 static int
-private_visibility (liextModule* self,
-                    liengObject* object,
+private_visibility (LIExtModule* self,
+                    LIEngObject* object,
                     int          value);
 
 /*****************************************************************************/
 
-licliExtensionInfo liextInfo =
+LICliExtensionInfo liextInfo =
 {
 	LICLI_EXTENSION_VERSION, "Slots",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -89,23 +89,23 @@ liext_module_new (licliClient* client)
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	LI_FOREACH_U32DIC (iter, self->dictionary)
 		liext_slots_free (iter.value);
 	lialg_u32dic_free (self->dictionary);
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 /*****************************************************************************/
 
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader)
+                LIArcReader* reader)
 {
 	reader->pos = 1;
 	switch (type)
@@ -122,15 +122,15 @@ private_packet (liextModule* self,
 }
 
 static int
-private_packet_diff (liextModule* self,
-                     liarcReader* reader)
+private_packet_diff (LIExtModule* self,
+                     LIArcReader* reader)
 {
 	char* slot = NULL;
 	char* node = NULL;
 	uint32_t id;
 	uint16_t model;
-	liengObject* object;
-	liextSlots* slots;
+	LIEngObject* object;
+	LIExtSlots* slots;
 
 	/* Find or create slots block. */
 	if (!liarc_reader_get_uint32 (reader, &id))
@@ -171,15 +171,15 @@ private_packet_diff (liextModule* self,
 }
 
 static int
-private_packet_reset (liextModule* self,
-                      liarcReader* reader)
+private_packet_reset (LIExtModule* self,
+                      LIArcReader* reader)
 {
 	char* slot = NULL;
 	char* node = NULL;
 	uint32_t id;
 	uint16_t model;
-	liengObject* object;
-	liextSlots* slots;
+	LIEngObject* object;
+	LIExtSlots* slots;
 
 	/* Create or clear slots block. */
 	if (!liarc_reader_get_uint32 (reader, &id))
@@ -222,19 +222,19 @@ private_packet_reset (liextModule* self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
 	return 1;
 }
 
 static int
-private_visibility (liextModule* self,
-                    liengObject* object,
+private_visibility (LIExtModule* self,
+                    LIEngObject* object,
                     int          value)
 {
-	lialgU32dicIter iter;
-	liextSlots* slots;
+	LIAlgU32dicIter iter;
+	LIExtSlots* slots;
 
 	if (!value)
 	{

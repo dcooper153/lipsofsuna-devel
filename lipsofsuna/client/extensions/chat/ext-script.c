@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-history.h"
 #include "ext-module.h"
 
@@ -45,11 +45,11 @@
  * -- @return New chat history widget.
  * function ChatHistory.new(self, args)
  */
-static void ChatHistory_new (liscrArgs* args)
+static void ChatHistory_new (LIScrArgs* args)
 {
-	liextModule* module;
-	liscrData* data;
-	liwdgWidget* self;
+	LIExtModule* module;
+	LIScrData* data;
+	LIWdgWidget* self;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CHAT_HISTORY);
@@ -81,7 +81,7 @@ static void ChatHistory_new (liscrArgs* args)
  * -- @param args Arguments.
  * function ChatHistory.append(self, args)
  */
-static void ChatHistory_append (liscrArgs* args)
+static void ChatHistory_append (LIScrArgs* args)
 {
 	const char* str;
 
@@ -92,13 +92,13 @@ static void ChatHistory_append (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextChatHistoryScript (liscrClass* self,
+liext_script_chat_history (LIScrClass* self,
                         void*       data)
 {
-	liextModule* module = data;
+	LIExtModule* module = data;
 
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CHAT_HISTORY, data);
-	liscr_class_inherit (self, licliWidgetScript, module->client);
+	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", ChatHistory_new);
 	liscr_class_insert_mfunc (self, "append", ChatHistory_append);
 }

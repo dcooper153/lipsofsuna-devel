@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,16 +16,16 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvscr Script
+ * \addtogroup liserscr Script
  * @{
- * \addtogroup lisrvscrExtension Extension
+ * \addtogroup liserscrExtension Extension
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 
 /* @luadoc
  * module "Core.Server.Extension"
@@ -49,12 +49,12 @@ Extension_new (lua_State* lua)
 {
 	int ret;
 	const char* name;
-	lisrvServer* server;
+	LISerServer* server;
 
-	server = liscr_checkclassdata (lua, 1, LISRV_SCRIPT_EXTENSION);
+	server = liscr_checkclassdata (lua, 1, LISER_SCRIPT_EXTENSION);
 	name = luaL_checkstring (lua, 2);
 
-	ret = lisrv_server_load_extension (server, name);
+	ret = liser_server_load_extension (server, name);
 	if (!ret)
 		lisys_error_report ();
 	lua_pushboolean (lua, ret);
@@ -64,10 +64,10 @@ Extension_new (lua_State* lua)
 /*****************************************************************************/
 
 void
-lisrvExtensionScript (liscrClass* self,
+liser_script_extension (LIScrClass* self,
                       void*       data)
 {
-	liscr_class_set_userdata (self, LISRV_SCRIPT_EXTENSION, data);
+	liscr_class_set_userdata (self, LISER_SCRIPT_EXTENSION, data);
 	liscr_class_insert_func (self, "new", Extension_new);
 }
 

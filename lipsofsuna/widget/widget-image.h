@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgImage Image
+ * \addtogroup LIWdgImage Image
  * @{
  */
 
@@ -27,29 +27,29 @@
 
 #include "widget.h"
 
-#define LIWDG_IMAGE(o) ((liwdgImage*)(o))
+#define LIWDG_IMAGE(o) ((LIWdgImage*)(o))
 
 /**
  * \brief Image widget.
  */
-typedef struct _liwdgImage liwdgImage;
-struct _liwdgImage
+typedef struct _LIWdgImage LIWdgImage;
+struct _LIWdgImage
 {
-	liwdgWidget base;
+	LIWdgWidget base;
 	char* image;
 };
 
-extern const liwdgClass liwdgImageType;
+extern const LIWdgClass liwdg_widget_image;
 
-liwdgWidget*
-liwdg_image_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_image_new (LIWdgManager* manager);
 
 int
-liwdg_image_set_image (liwdgImage* self,
+liwdg_image_set_image (LIWdgImage* self,
                        const char*  text);
 
 const char*
-liwdg_image_get_image (liwdgImage* self);
+liwdg_image_get_image (LIWdgImage* self);
 
 #endif
 

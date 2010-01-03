@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,55 +16,55 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvNetwork Network
+ * \addtogroup LISerNetwork Network
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "server-network.h"
 
 static int
-private_init (lisrvNetwork* self,
+private_init (LISerNetwork* self,
               int           udp,
               int           port);
 
 static int
 private_accept (grapple_user  user,
-                lisrvNetwork* self);
+                LISerNetwork* self);
 
 static int
 private_login (const char*   login,
                const char*   password,
-               lisrvNetwork* self);
+               LISerNetwork* self);
 
 static int
-private_connect (lisrvNetwork*    self,
+private_connect (LISerNetwork*    self,
                  grapple_message* message);
 
 static int
-private_disconnect (lisrvNetwork*    self,
+private_disconnect (LISerNetwork*    self,
                     grapple_message* message);
 
 static int
-private_message (lisrvNetwork*    self,
+private_message (LISerNetwork*    self,
                  grapple_message* message);
 
 static int
-private_rename (lisrvNetwork*    self,
+private_rename (LISerNetwork*    self,
                 grapple_message* message);
 
 /*****************************************************************************/
 
-lisrvNetwork*
-lisrv_network_new (lisrvServer* server,
+LISerNetwork*
+liser_network_new (LISerServer* server,
                    int          udp,
                    int          port)
 {
-	lisrvNetwork* self;
+	LISerNetwork* self;
 
-	self = lisys_calloc (1, sizeof (lisrvNetwork));
+	self = lisys_calloc (1, sizeof (LISerNetwork));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -72,7 +72,7 @@ lisrv_network_new (lisrvServer* server,
 	pthread_mutex_init (&self->mutex, NULL);
 	if (!private_init (self, udp, port))
 	{
-		lisrv_network_free (self);
+		liser_network_free (self);
 		return NULL;
 	}
 
@@ -80,15 +80,15 @@ lisrv_network_new (lisrvServer* server,
 }
 
 void
-lisrv_network_free (lisrvNetwork* self)
+liser_network_free (LISerNetwork* self)
 {
-	lialgU32dicIter iter0;
-	lialgStrdicIter iter1;
+	LIAlgU32dicIter iter0;
+	LIAlgStrdicIter iter1;
 
 	if (self->clients != NULL)
 	{
 		LI_FOREACH_U32DIC (iter0, self->clients)
-			lisrv_client_free (iter0.value);
+			liser_client_free (iter0.value);
 		lialg_u32dic_free (self->clients);
 	}
 	if (self->passwords != NULL)
@@ -104,7 +104,7 @@ lisrv_network_free (lisrvNetwork* self)
 }
 
 void
-lisrv_network_update (lisrvNetwork* self,
+liser_network_update (LISerNetwork* self,
                       float         secs)
 {
 	grapple_message* message;
@@ -141,8 +141,8 @@ lisrv_network_update (lisrvNetwork* self,
  * \param user Network user.
  * \return Client or NULL.
  */
-lisrvClient*
-lisrv_network_find_client (lisrvNetwork* self,
+LISerClient*
+liser_network_find_client (LISerNetwork* self,
                            grapple_user  user)
 {
 	return lialg_u32dic_find (self->clients, user);
@@ -151,7 +151,7 @@ lisrv_network_find_client (lisrvNetwork* self,
 /*****************************************************************************/
 
 static int
-private_init (lisrvNetwork* self,
+private_init (LISerNetwork* self,
               int           udp,
               int           port)
 {
@@ -197,7 +197,7 @@ private_init (lisrvNetwork* self,
  */
 static int
 private_accept (grapple_user  user,
-                lisrvNetwork* self)
+                LISerNetwork* self)
 {
 	int ret;
 	char* address;
@@ -209,7 +209,7 @@ private_accept (grapple_user  user,
 
 	/* Check if banned. */
 	pthread_mutex_lock (&self->server->mutexes.bans);
-	ret = lisrv_server_get_banned (self->server, address);
+	ret = liser_server_get_banned (self->server, address);
 	pthread_mutex_unlock (&self->server->mutexes.bans);
 	lisys_free (address);
 	return !ret;
@@ -230,12 +230,12 @@ private_accept (grapple_user  user,
 static int
 private_login (const char*   login,
                const char*   password,
-               lisrvNetwork* self)
+               LISerNetwork* self)
 {
 	int ret;
 	char* tmp;
 	char* path;
-	licfgAccount* account;
+	LICfgAccount* account;
 
 	/* Sanity checks. */
 	if (login == NULL || password == NULL || !strlen (login) || !strlen (password))
@@ -283,13 +283,13 @@ private_login (const char*   login,
 }
 
 static int
-private_connect (lisrvNetwork*    self,
+private_connect (LISerNetwork*    self,
                  grapple_message* message)
 {
 	int flags;
 	char* pass;
-	liengObject* object;
-	lisrvClient* client;
+	LIEngObject* object;
+	LISerClient* client;
 
 	/* Get temporarily stored password. */
 	pthread_mutex_lock (&self->mutex);
@@ -300,7 +300,7 @@ private_connect (lisrvNetwork*    self,
 
 	/* Create object. */
 	object = lieng_object_new (self->server->engine, NULL, LIPHY_CONTROL_MODE_RIGID,
-		lisrv_server_get_unique_object (self->server));
+		liser_server_get_unique_object (self->server));
 	if (object == NULL)
 	{
 		lisys_free (pass);
@@ -311,7 +311,7 @@ private_connect (lisrvNetwork*    self,
 	lieng_object_set_flags (object, flags);
 
 	/* Create client. */
-	client = lisrv_client_new (self->server, object, message->NEW_USER.id);
+	client = liser_client_new (self->server, object, message->NEW_USER.id);
 	if (client == NULL)
 	{
 		grapple_server_disconnect_client (self->socket, message->NEW_USER.id);
@@ -320,18 +320,18 @@ private_connect (lisrvNetwork*    self,
 	}
 	if (!lialg_u32dic_insert (self->clients, message->NEW_USER.id, client))
 	{
-		lisrv_client_free (client);
+		liser_client_free (client);
 		lisys_free (pass);
 		return 0;
 	}
 
 	/* Send resource list. */
-	lisrv_client_send (client, self->server->helper.resources, GRAPPLE_RELIABLE);
+	liser_client_send (client, self->server->helper.resources, GRAPPLE_RELIABLE);
 
 	/* Assign client to the object. */
-	if (!lisrv_object_set_client (object, client))
+	if (!liser_object_set_client (object, client))
 	{
-		lisrv_client_free (client);
+		liser_client_free (client);
 		lisys_free (pass);
 		return 0;
 	}
@@ -344,30 +344,30 @@ private_connect (lisrvNetwork*    self,
 }
 
 static int
-private_disconnect (lisrvNetwork*    self,
+private_disconnect (LISerNetwork*    self,
                     grapple_message* message)
 {
-	lisrvClient* client;
+	LISerClient* client;
 
 	/* Get the client. */
-	client = lisrv_network_find_client (self, message->USER_DISCONNECTED.id);
+	client = liser_network_find_client (self, message->USER_DISCONNECTED.id);
 	if (client == NULL)
 		return 0;
 	assert (client->object != NULL);
-	lisrv_object_disconnect (client->object);
+	liser_object_disconnect (client->object);
 
 	return 1;
 }
 
 static int
-private_message (lisrvNetwork*    self,
+private_message (LISerNetwork*    self,
                  grapple_message* message)
 {
-	liarcReader* reader;
-	lisrvClient* client;
+	LIArcReader* reader;
+	LISerClient* client;
 
 	/* Get the client. */
-	client = lisrv_network_find_client (self, message->USER_MSG.id);
+	client = liser_network_find_client (self, message->USER_MSG.id);
 	if (client == NULL)
 		return 0;
 
@@ -387,13 +387,13 @@ private_message (lisrvNetwork*    self,
 }
 
 static int
-private_rename (lisrvNetwork*    self,
+private_rename (LISerNetwork*    self,
                 grapple_message* message)
 {
-	lisrvClient* client;
+	LISerClient* client;
 
 	/* Get the client. */
-	client = lisrv_network_find_client (self, message->USER_NAME.id);
+	client = liser_network_find_client (self, message->USER_NAME.id);
 	if (client == NULL)
 		return 0;
 

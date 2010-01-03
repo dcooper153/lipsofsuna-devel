@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,7 +29,7 @@
 
 /*****************************************************************************/
 
-liphyControl::liphyControl (liphyObject* object, btCollisionShape* shape) :
+liphyControl::liphyControl (LIPhyObject* object, btCollisionShape* shape) :
 	object (object),
 	contact_controller (NULL)
 {
@@ -121,7 +121,7 @@ liphyControl::set_velocity (const btVector3& value)
 
 /*****************************************************************************/
 
-liphyCharacterControl::liphyCharacterControl (liphyObject* object, btCollisionShape* shape) :
+liphyCharacterControl::liphyCharacterControl (LIPhyObject* object, btCollisionShape* shape) :
 	liphyRigidControl (object, shape), controller (object)
 {
 	object->physics->dynamics->addAction (&this->controller);
@@ -143,11 +143,11 @@ liphyCharacterControl::get_ground ()
 
 /*****************************************************************************/
 
-liphyRigidControl::liphyRigidControl (liphyObject* object, btCollisionShape* shape) :
+liphyRigidControl::liphyRigidControl (LIPhyObject* object, btCollisionShape* shape) :
 	liphyControl (object, shape),
 	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
 {
-	limatVector v;
+	LIMatVector v;
 	btVector3 angular (object->config.angular.x, object->config.angular.y, object->config.angular.z);
 	btVector3 velocity (object->config.velocity.x, object->config.velocity.y, object->config.velocity.z);
 
@@ -272,7 +272,7 @@ liphyRigidControl::set_velocity (const btVector3& value)
 
 /*****************************************************************************/
 
-liphyStaticControl::liphyStaticControl (liphyObject* object, btCollisionShape* shape) :
+liphyStaticControl::liphyStaticControl (LIPhyObject* object, btCollisionShape* shape) :
 	liphyControl (object, shape),
 	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
 {
@@ -320,12 +320,12 @@ liphyStaticControl::get_object ()
 
 /*****************************************************************************/
 
-liphyVehicleControl::liphyVehicleControl (liphyObject* object, btCollisionShape* shape) :
+liphyVehicleControl::liphyVehicleControl (LIPhyObject* object, btCollisionShape* shape) :
 	liphyControl (object, shape),
 	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0)),
 	caster (object->physics->dynamics)
 {
-	limatVector v;
+	LIMatVector v;
 	btVector3 angular (object->config.angular.x, object->config.angular.y, object->config.angular.z);
 	btVector3 velocity (object->config.velocity.x, object->config.velocity.y, object->config.velocity.z);
 

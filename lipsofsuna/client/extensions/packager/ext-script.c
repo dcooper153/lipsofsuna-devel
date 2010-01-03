@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
 #include "ext-packager.h"
 
@@ -44,9 +44,9 @@
  * -- @param self Packager class.
  * function Packager.cancel(self)
  */
-static void Packager_cancel (liscrArgs* args)
+static void Packager_cancel (LIScrArgs* args)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
 	liext_packager_cancel (self->packager);
@@ -65,11 +65,11 @@ static void Packager_cancel (liscrArgs* args)
  * -- @return True on success.
  * function Packager.save(self, args)
  */
-static void Packager_save (liscrArgs* args)
+static void Packager_save (LIScrArgs* args)
 {
 	const char* dir = "./";
 	const char* name = "data.tar.gz";
-	liextModule* self;
+	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
 	liscr_args_gets_string (args, "dir", &dir);
@@ -84,17 +84,17 @@ static void Packager_save (liscrArgs* args)
  * -- @name Packager.verbose
  * -- @class table
  */
-static void Packager_getter_verbose (liscrArgs* args)
+static void Packager_getter_verbose (LIScrArgs* args)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
 	liscr_args_seti_bool (args, liext_packager_get_verbose (self->packager));
 }
-static void Packager_setter_verbose (liscrArgs* args)
+static void Packager_setter_verbose (LIScrArgs* args)
 {
 	int value;
-	liextModule* self;
+	LIExtModule* self;
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
@@ -106,7 +106,7 @@ static void Packager_setter_verbose (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextPackagerScript (liscrClass* self,
+liext_script_packager (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PACKAGER, data);

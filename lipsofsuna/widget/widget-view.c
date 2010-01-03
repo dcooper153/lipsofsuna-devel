@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,56 +18,56 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgView View
+ * \addtogroup LIWdgView View
  * @{
  */
 
 #include "widget-view.h"
 
 static int
-private_init (liwdgView*    self,
-              liwdgManager* manager);
+private_init (LIWdgView*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgView* self);
+private_free (LIWdgView* self);
 
 static int
-private_event (liwdgView*  self,
+private_event (LIWdgView*  self,
                liwdgEvent* event);
 
-static liwdgWidget*
-private_child_at (liwdgView* self,
+static LIWdgWidget*
+private_child_at (LIWdgView* self,
                   int        pixx,
                   int        pixy);
 
 static void
-private_child_request (liwdgView*   self,
-                       liwdgWidget* child);
+private_child_request (LIWdgView*   self,
+                       LIWdgWidget* child);
 
-static liwdgWidget*
-private_cycle_focus (liwdgView*   self,
-                     liwdgWidget* curr,
+static LIWdgWidget*
+private_cycle_focus (LIWdgView*   self,
+                     LIWdgWidget* curr,
                      int          next);
 
 static void
-private_detach_child (liwdgView*   self,
-                      liwdgWidget* child);
+private_detach_child (LIWdgView*   self,
+                      LIWdgWidget* child);
 
 static void
-private_foreach_child (liwdgView* self,
+private_foreach_child (LIWdgView* self,
                        void     (*call)(),
                        void*      data);
 
 static void
-private_rebuild (liwdgView* self);
+private_rebuild (LIWdgView* self);
 
 static void
-private_scroll (liwdgView* self,
+private_scroll (LIWdgView* self,
                 int        x,
                 int        y);
 
 void
-private_translate_coords (liwdgView* self,
+private_translate_coords (LIWdgView* self,
                           int        containerx,
                           int        containery,
                           int*       childx,
@@ -75,20 +75,20 @@ private_translate_coords (liwdgView* self,
 
 /*****************************************************************************/
 
-const liwdgClass liwdgViewType =
+const LIWdgClass liwdg_widget_view =
 {
-	LIWDG_BASE_STATIC, &liwdgContainerType, "View", sizeof (liwdgView),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event,
+	LIWDG_BASE_STATIC, &liwdg_widget_container, "View", sizeof (LIWdgView),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event,
 };
 
-liwdgWidget*
-liwdg_view_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_view_new (LIWdgManager* manager)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgViewType);
+	self = liwdg_widget_new (manager, &liwdg_widget_view);
 	if (self == NULL)
 		return NULL;
 	private_rebuild (LIWDG_VIEW (self));
@@ -96,21 +96,21 @@ liwdg_view_new (liwdgManager* manager)
 	return self;
 }
 
-liwdgWidget*
-liwdg_view_get_child (liwdgView* self)
+LIWdgWidget*
+liwdg_view_get_child (LIWdgView* self)
 {
 	return self->child;
 }
 
 int
-liwdg_view_get_hscroll (liwdgView* self)
+liwdg_view_get_hscroll (LIWdgView* self)
 {
 	return self->hscroll;
 }
 
 void
-liwdg_view_set_child (liwdgView*   self,
-                      liwdgWidget* widget)
+liwdg_view_set_child (LIWdgView*   self,
+                      LIWdgWidget* widget)
 {
 	/* Adopt widget. */
 	self->child = widget;
@@ -125,7 +125,7 @@ liwdg_view_set_child (liwdgView*   self,
 
 
 void
-liwdg_view_set_hscroll (liwdgView* self,
+liwdg_view_set_hscroll (LIWdgView* self,
                         int        value)
 {
 	self->hscroll = value;
@@ -133,13 +133,13 @@ liwdg_view_set_hscroll (liwdgView* self,
 }
 
 int
-liwdg_view_get_vscroll (liwdgView* self)
+liwdg_view_get_vscroll (LIWdgView* self)
 {
 	return self->vscroll;
 }
 
 void
-liwdg_view_set_vscroll (liwdgView* self,
+liwdg_view_set_vscroll (LIWdgView* self,
                         int        value)
 {
 	self->vscroll = value;
@@ -149,39 +149,39 @@ liwdg_view_set_vscroll (liwdgView* self,
 /*****************************************************************************/
 
 static int
-private_init (liwdgView*    self,
-              liwdgManager* manager)
+private_init (LIWdgView*    self,
+              LIWdgManager* manager)
 {
 	liwdg_widget_set_style (LIWDG_WIDGET (self), "view");
 	return 1;
 }
 
 static void
-private_free (liwdgView* self)
+private_free (LIWdgView* self)
 {
 	if (self->child != NULL)
 		liwdg_widget_free (self->child);
 }
 
 static int
-private_event (liwdgView*  self,
+private_event (LIWdgView*  self,
                liwdgEvent* event)
 {
-	liwdgRect rect;
-	liwdgManager* manager;
+	LIWdgRect rect;
+	LIWdgManager* manager;
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdgContainerType)
+	    event->probe.clss == &liwdg_widget_container)
 	{
-		static liwdgContainerIface iface =
+		static LIWdgContainerIface iface =
 		{
-			(liwdgContainerChildAtFunc) private_child_at,
-			(liwdgContainerChildRequestFunc) private_child_request,
-			(liwdgContainerCycleFocusFunc) private_cycle_focus,
-			(liwdgContainerDetachChildFunc) private_detach_child,
-			(liwdgContainerForeachChildFunc) private_foreach_child,
-			(liwdgContainerTranslateCoordsFunc) private_translate_coords
+			(LIWdgContainerChildAtFunc) private_child_at,
+			(LIWdgContainerChildRequestFunc) private_child_request,
+			(LIWdgContainerCycleFocusFunc) private_cycle_focus,
+			(LIWdgContainerDetachChildFunc) private_detach_child,
+			(LIWdgContainerForeachChildFunc) private_foreach_child,
+			(LIWdgContainerTranslateCoordsFunc) private_translate_coords
 		};
 		event->probe.result = &iface;
 		return 0;
@@ -217,7 +217,7 @@ private_event (liwdgView*  self,
 				glEnable (GL_SCISSOR_TEST);
 				glPushMatrix ();
 				glTranslatef (rect.x - self->hscrollpos, rect.y - self->vscrollpos, 0.0f);
-				liwdg_widget_render (self->child);
+				liwdg_widget_draw (self->child);
 				glPopMatrix ();
 				glPopAttrib ();
 			}
@@ -228,11 +228,11 @@ private_event (liwdgView*  self,
 			return 1;
 	}
 
-	return liwdgContainerType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_container.event (LIWDG_WIDGET (self), event);
 }
 
-static liwdgWidget*
-private_child_at (liwdgView* self,
+static LIWdgWidget*
+private_child_at (LIWdgView* self,
                   int        pixx,
                   int        pixy)
 {
@@ -243,21 +243,21 @@ private_child_at (liwdgView* self,
 }
 
 static void
-private_child_request (liwdgView*   self,
-                       liwdgWidget* child)
+private_child_request (LIWdgView*   self,
+                       LIWdgWidget* child)
 {
 	private_rebuild (self);
 }
 
-static liwdgWidget*
-private_cycle_focus (liwdgView*   self,
-                     liwdgWidget* curr,
+static LIWdgWidget*
+private_cycle_focus (LIWdgView*   self,
+                     LIWdgWidget* curr,
                      int          next)
 {
-	liwdgWidget* tmp;
+	LIWdgWidget* tmp;
 
 	/* Cycle focus. */
-	if (liwdg_widget_typeis (self->child, &liwdgContainerType))
+	if (liwdg_widget_typeis (self->child, &liwdg_widget_container))
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (self->child), NULL, next);
 		if (tmp != NULL)
@@ -273,8 +273,8 @@ private_cycle_focus (liwdgView*   self,
 }
 
 static void
-private_detach_child (liwdgView*   self,
-                      liwdgWidget* child)
+private_detach_child (LIWdgView*   self,
+                      LIWdgWidget* child)
 {
 	assert (self->child == child);
 
@@ -284,7 +284,7 @@ private_detach_child (liwdgView*   self,
 }
 
 static void
-private_foreach_child (liwdgView* self,
+private_foreach_child (LIWdgView* self,
                        void     (*call)(),
                        void*      data)
 {
@@ -293,11 +293,11 @@ private_foreach_child (liwdgView* self,
 }
 
 static void
-private_rebuild (liwdgView* self)
+private_rebuild (LIWdgView* self)
 {
-	liwdgRect rect;
-	liwdgSize size;
-	liwdgSize size1;
+	LIWdgRect rect;
+	LIWdgSize size;
+	LIWdgSize size1;
 
 	/* Calculate own request. */
 	size.width = size1.width = 0;
@@ -325,11 +325,11 @@ private_rebuild (liwdgView* self)
 }
 
 static void
-private_scroll (liwdgView* self,
+private_scroll (LIWdgView* self,
                 int        x,
                 int        y)
 {
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	self->hscrollpos += x;
@@ -353,13 +353,13 @@ private_scroll (liwdgView* self,
 }
 
 void
-private_translate_coords (liwdgView* self,
+private_translate_coords (LIWdgView* self,
                           int        containerx,
                           int        containery,
                           int*       childx,
                           int*       childy)
 {
-	liwdgRect rect;
+	LIWdgRect rect;
 
 	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 	*childx = containerx - (rect.x - self->hscrollpos);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,19 +18,19 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlLight Light
+ * \addtogroup LIMdlLight Light
  * @{
  */
 
 #ifndef __MODEL_LIGHT_H__
 #define __MODEL_LIGHT_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/string.h>
 #include "model-types.h"
 
-struct _limdlLight
+struct _LIMdlLight
 {
 	int flags;
 	float color[3];
@@ -53,20 +53,20 @@ extern "C" {
 #endif
 
 int
-limdl_light_read (limdlNode*   self,
-                  liarcReader* reader);
+limdl_light_read (LIMdlNode*   self,
+                  LIArcReader* reader);
 
 int
-limdl_light_write (const limdlNode* self,
-                   liarcWriter*     writer);
+limdl_light_write (const LIMdlNode* self,
+                   LIArcWriter*     writer);
 
 void
-limdl_light_get_modelview (const limdlNode* self,
-                           limatMatrix*     value);
+limdl_light_get_modelview (const LIMdlNode* self,
+                           LIMatMatrix*     value);
 
 void
-limdl_light_get_projection (const limdlNode* self,
-                            limatMatrix*     value);
+limdl_light_get_projection (const LIMdlNode* self,
+                            LIMatMatrix*     value);
 
 #ifdef __cplusplus
 }

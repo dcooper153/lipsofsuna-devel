@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrData Data
+ * \addtogroup LIScrData Data
  * @{
  */
 
@@ -43,14 +43,14 @@
  * \param free Free function called by garbage collector.
  * \return New script userdata or NULL.
  */
-liscrData*
-liscr_data_new (liscrScript* script,
+LIScrData*
+liscr_data_new (LIScrScript* script,
                 void*        data,
                 const char*  meta,
                 liscrGCFunc  free)
 {
-	liscrClass* clss;
-	liscrData* object;
+	LIScrClass* clss;
+	LIScrData* object;
 
 	/* Find class. */
 	clss = liscr_script_find_class (script, meta);
@@ -62,13 +62,13 @@ liscr_data_new (liscrScript* script,
 	}
 
 	/* Allocate object. */
-	object = lua_newuserdata (script->lua, sizeof (liscrData));
+	object = lua_newuserdata (script->lua, sizeof (LIScrData));
 	if (object == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
 		return NULL;
 	}
-	memset (object, 0, sizeof (liscrData));
+	memset (object, 0, sizeof (LIScrData));
 	object->clss = clss;
 	object->script = script;
 	object->data = data;
@@ -106,13 +106,13 @@ liscr_data_new (liscrScript* script,
  * \param meta Name of the metatable.
  * \return New script userdata or NULL.
  */
-liscrData*
-liscr_data_new_alloc (liscrScript* script,
+LIScrData*
+liscr_data_new_alloc (LIScrScript* script,
                       size_t       size,
                       const char*  meta)
 {
 	void* data;
-	liscrData* self;
+	LIScrData* self;
 
 	data = lisys_calloc (1, size);
 	if (data == NULL)
@@ -139,9 +139,9 @@ liscr_data_new_alloc (liscrScript* script,
  * \param object Script userdata.
  */
 void
-liscr_data_free (liscrData* object)
+liscr_data_free (LIScrData* object)
 {
-	liscrScript* script = object->script;
+	LIScrScript* script = object->script;
 
 	/* Call free function. */
 	if (object->free != NULL)
@@ -175,11 +175,11 @@ liscr_data_free (liscrData* object)
  * \param referencer Script userdata or NULL.
  */
 void
-liscr_data_ref (liscrData* object,
-                liscrData* referencer)
+liscr_data_ref (LIScrData* object,
+                LIScrData* referencer)
 {
 	int count;
-	liscrScript* script = object->script;
+	LIScrScript* script = object->script;
 
 	if (referencer == NULL)
 	{
@@ -224,11 +224,11 @@ liscr_data_ref (liscrData* object,
  * \param referencer Script userdata or NULL.
  */
 void
-liscr_data_unref (liscrData* object,
-                  liscrData* referencer)
+liscr_data_unref (LIScrData* object,
+                  LIScrData* referencer)
 {
 	int count;
-	liscrScript* script = object->script;
+	LIScrScript* script = object->script;
 
 	if (referencer == NULL)
 	{
@@ -279,8 +279,8 @@ liscr_data_unref (liscrData* object,
  * \param self Script userdata.
  * \return Script class.
  */
-liscrClass*
-liscr_data_get_class (liscrData* self)
+LIScrClass*
+liscr_data_get_class (LIScrData* self)
 {
 	return self->clss;
 }
@@ -293,10 +293,10 @@ liscr_data_get_class (liscrData* self)
  * \return Nonzero if set successfully.
  */
 int
-liscr_data_set_class (liscrData*  self,
-                      liscrClass* clss)
+liscr_data_set_class (LIScrData*  self,
+                      LIScrClass* clss)
 {
-	liscrClass* ptr;
+	LIScrClass* ptr;
 
 	/* Check for compatibility. */
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
@@ -319,8 +319,8 @@ liscr_data_set_class (liscrData*  self,
  * \param self Script userdata.
  * \return Script.
  */
-liscrScript*
-liscr_data_get_script (liscrData* self)
+LIScrScript*
+liscr_data_get_script (LIScrData* self)
 {
 	return self->script;
 }
@@ -337,7 +337,7 @@ liscr_data_get_script (liscrData* self)
  * \return Nonzero if not garbage collected.
  */
 int
-liscr_data_get_valid (liscrData* self)
+liscr_data_get_valid (LIScrData* self)
 {
 	int ret;
 

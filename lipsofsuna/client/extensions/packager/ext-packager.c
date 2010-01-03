@@ -24,25 +24,25 @@
  * @{
  */
 
-#include <archive/lips-archive.h>
-#include <client/lips-client.h>
-#include <model/lips-model.h>
-#include <render/lips-render.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
-#include <thread/lips-thread.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/render.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/thread.h>
+#include <lipsofsuna/widget.h>
 #include "ext-packager.h"
 #include "ext-resources.h"
 
 #define ENABLE_PACKAGE_SERVER
 
 static void
-private_async_free (lithrAsyncCall* call,
+private_async_free (LIThrAsyncCall* call,
                     void*           data);
 
 static void
-private_async_save (lithrAsyncCall* call,
+private_async_save (LIThrAsyncCall* call,
                     void*           data);
 
 static inline int
@@ -56,53 +56,53 @@ private_filter_samples (const char* dir,
                         void*       data);
 
 static int
-private_insert_directory (liextPackagerData* self,
+private_insert_directory (LIExtPackagerData* self,
                           const char*        path,
                           const char*        name);
 
 static int
-private_insert_extra (lithrAsyncCall*    call,
-                      liextPackagerData* self);
+private_insert_extra (LIThrAsyncCall*    call,
+                      LIExtPackagerData* self);
 
 static int
-private_insert_file (liextPackagerData* self,
+private_insert_file (LIExtPackagerData* self,
                      const char*        dir,
                      const char*        name,
                      const char*        ext);
 
 static inline int
-private_insert_models (lithrAsyncCall*    call,
-                       liextPackagerData* self,
+private_insert_models (LIThrAsyncCall*    call,
+                       LIExtPackagerData* self,
                        const char*        path);
 
 static inline int
-private_insert_samples (lithrAsyncCall*    call,
-                        liextPackagerData* self,
+private_insert_samples (LIThrAsyncCall*    call,
+                        LIExtPackagerData* self,
                         const char*        path);
 
 static void
-private_progress_cancel (liextPackager* self);
+private_progress_cancel (LIExtPackager* self);
 
 static void
-private_progress_update (liextPackager* self);
+private_progress_update (LIExtPackager* self);
 
 static void
-private_verbose_model (liextPackagerData* self,
-                       limdlModel*        model,
+private_verbose_model (LIExtPackagerData* self,
+                       LIMdlModel*        model,
                        const char*        name);
 
 static int
-private_write_directory (liextPackagerData* self,
+private_write_directory (LIExtPackagerData* self,
                          const char*        name);
 
 /*****************************************************************************/
 
-liextPackager*
-liext_packager_new (licliClient* client)
+LIExtPackager*
+liext_packager_new (LICliClient* client)
 {
-	liextPackager* self;
+	LIExtPackager* self;
 
-	self = lisys_calloc (1, sizeof (liextPackager));
+	self = lisys_calloc (1, sizeof (LIExtPackager));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -111,7 +111,7 @@ liext_packager_new (licliClient* client)
 }
 
 void
-liext_packager_free (liextPackager* self)
+liext_packager_free (LIExtPackager* self)
 {
 	liext_packager_cancel (self);
 	lisys_free (self);
@@ -123,7 +123,7 @@ liext_packager_free (liextPackager* self)
  * \param self Packager.
  */
 void
-liext_packager_cancel (liextPackager* self)
+liext_packager_cancel (LIExtPackager* self)
 {
 	if (self->worker == NULL)
 		return;
@@ -144,11 +144,11 @@ liext_packager_cancel (liextPackager* self)
  * \return Nonzero on success.
  */
 int
-liext_packager_save (liextPackager* self,
+liext_packager_save (LIExtPackager* self,
                      const char*    name,
                      const char*    dir)
 {
-	liextPackagerData* data;
+	LIExtPackagerData* data;
 
 	/* Make sure not already running. */
 	if (self->worker != NULL)
@@ -158,7 +158,7 @@ liext_packager_save (liextPackager* self,
 	}
 
 	/* Allocate data. */
-	data = lisys_calloc (1, sizeof (liextPackagerData));
+	data = lisys_calloc (1, sizeof (LIExtPackagerData));
 	if (data == NULL)
 		return 0;
 	data->packager = self;
@@ -213,7 +213,7 @@ liext_packager_save (liextPackager* self,
  * \return Nonzero if verbose debug messages are enabled.
  */
 int
-liext_packager_get_verbose (liextPackager* self)
+liext_packager_get_verbose (LIExtPackager* self)
 {
 	return self->verbose;
 }
@@ -225,7 +225,7 @@ liext_packager_get_verbose (liextPackager* self)
  * \param value Boolean.
  */
 void
-liext_packager_set_verbose (liextPackager* self,
+liext_packager_set_verbose (LIExtPackager* self,
                             int            value)
 {
 	self->verbose = value;
@@ -234,11 +234,11 @@ liext_packager_set_verbose (liextPackager* self,
 /*****************************************************************************/
 
 static void
-private_async_free (lithrAsyncCall* call,
+private_async_free (LIThrAsyncCall* call,
                     void*           data)
 {
 	int i;
-	liextPackagerData* self = data;
+	LIExtPackagerData* self = data;
 
 	if (self->resources != NULL)
 		liext_resources_free (self->resources);
@@ -257,13 +257,13 @@ private_async_free (lithrAsyncCall* call,
 }
 
 static void
-private_async_save (lithrAsyncCall* call,
+private_async_save (LIThrAsyncCall* call,
                     void*           data)
 {
 	int i;
 	char* path;
 	const char* name;
-	liextPackagerData* self = data;
+	LIExtPackagerData* self = data;
 
 	/* Allocate writer. */
 	self->writer = liarc_writer_new_gzip (self->target);
@@ -417,7 +417,7 @@ private_filter_samples (const char* dir,
 }
 
 static int
-private_insert_directory (liextPackagerData* self,
+private_insert_directory (LIExtPackagerData* self,
                           const char*        path,
                           const char*        name)
 {
@@ -425,8 +425,8 @@ private_insert_directory (liextPackagerData* self,
 	int ret;
 	char* src;
 	const char* file;
-	liextPackagerFile tmp;
-	lisysDir* dir;
+	LIExtPackagerFile tmp;
+	LISysDir* dir;
 
 	src = lisys_path_concat (self->client->path, path, name, NULL);
 	if (src == NULL)
@@ -459,12 +459,12 @@ private_insert_directory (liextPackagerData* self,
 }
 
 static int
-private_insert_extra (lithrAsyncCall*    call,
-                      liextPackagerData* self)
+private_insert_extra (LIThrAsyncCall*    call,
+                      LIExtPackagerData* self)
 {
 	char* tmp;
 	char* path;
-	liarcReader* reader;
+	LIArcReader* reader;
 
 	/* Open extra texture list. */
 	path = lisys_path_concat (self->client->path, "graphics", "textures.cfg", NULL);
@@ -501,13 +501,13 @@ private_insert_extra (lithrAsyncCall*    call,
 }
 
 static int
-private_insert_file (liextPackagerData* self,
+private_insert_file (LIExtPackagerData* self,
                      const char*        dir,
                      const char*        name,
                      const char*        ext)
 {
 	int ret;
-	liextPackagerFile tmp;
+	LIExtPackagerFile tmp;
 
 	tmp.src = lisys_path_format (self->client->path,
 		LISYS_PATH_SEPARATOR, dir,
@@ -530,8 +530,8 @@ private_insert_file (liextPackagerData* self,
 }
 
 static inline int
-private_insert_models (lithrAsyncCall*    call,
-                       liextPackagerData* self,
+private_insert_models (LIThrAsyncCall*    call,
+                       LIExtPackagerData* self,
                        const char*        path)
 {
 	int i;
@@ -539,8 +539,8 @@ private_insert_models (lithrAsyncCall*    call,
 	int count;
 	char* file;
 	char* name;
-	limdlModel* model = NULL;
-	lisysDir* directory = NULL;
+	LIMdlModel* model = NULL;
+	LISysDir* directory = NULL;
 
 	/* Find all converted models. */
 	directory = lisys_dir_open (path);
@@ -597,14 +597,14 @@ error:
 }
 
 static int
-private_insert_samples (lithrAsyncCall*    call,
-                        liextPackagerData* self,
+private_insert_samples (LIThrAsyncCall*    call,
+                        LIExtPackagerData* self,
                         const char*        path)
 {
 	int i;
 	int count;
 	const char* name;
-	lisysDir* directory = NULL;
+	LISysDir* directory = NULL;
 
 	/* Find all sound and music files. */
 	directory = lisys_dir_open (path);
@@ -643,7 +643,7 @@ error:
  * \param self Module.
  */
 static void
-private_progress_cancel (liextPackager* self)
+private_progress_cancel (LIExtPackager* self)
 {
 	lithr_async_call_stop (self->worker);
 }
@@ -657,7 +657,7 @@ private_progress_cancel (liextPackager* self)
  * \param self Module.
  */
 static void
-private_progress_update (liextPackager* self)
+private_progress_update (LIExtPackager* self)
 {
 	if (self->worker == NULL)
 		return;
@@ -673,13 +673,13 @@ private_progress_update (liextPackager* self)
 }
 
 static void
-private_verbose_model (liextPackagerData* self,
-                       limdlModel*        model,
+private_verbose_model (LIExtPackagerData* self,
+                       LIMdlModel*        model,
                        const char*        name)
 {
 	int i;
 	int j;
-	limdlMaterial* material;
+	LIMdlMaterial* material;
 
 	printf ("Model: %s\n", name);
 	for (i = 0 ; i < model->materials.count ; i++)
@@ -691,7 +691,7 @@ private_verbose_model (liextPackagerData* self,
 }
 
 static int
-private_write_directory (liextPackagerData* self,
+private_write_directory (LIExtPackagerData* self,
                          const char*        name)
 {
 	char* path;

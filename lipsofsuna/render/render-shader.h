@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,28 +16,28 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndShader Shader
+ * \addtogroup LIRenShader Shader
  * @{
  */
 
 #ifndef __RENDER_SHADER_H__
 #define __RENDER_SHADER_H__
 
-#include <image/lips-image.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/model.h>
 #include "render-light.h"
 #include "render-types.h"
 #include "render-uniform.h"
 
-struct _lirndShader
+struct _LIRenShader
 {
 	char* name;
 	GLint program;
 	GLint vertex;
 	GLint fragment;
-	lirndRender* render;
+	LIRenRender* render;
 	struct
 	{
 		int count;
@@ -45,23 +45,23 @@ struct _lirndShader
 	struct
 	{
 		int count;
-		lirndUniform* array;
+		LIRenUniform* array;
 	} uniforms;
 };
 
-lirndShader*
-lirnd_shader_new (lirndRender* render);
+LIRenShader*
+liren_shader_new (LIRenRender* render);
 
-lirndShader*
-lirnd_shader_new_from_data (lirndRender* render,
-                            liarcReader* reader);
+LIRenShader*
+liren_shader_new_from_data (LIRenRender* render,
+                            LIArcReader* reader);
 
-lirndShader*
-lirnd_shader_new_from_file (lirndRender* render,
+LIRenShader*
+liren_shader_new_from_file (LIRenRender* render,
                             const char*  path);
 
 void
-lirnd_shader_free (lirndShader* self);
+liren_shader_free (LIRenShader* self);
 
 #endif
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,25 +16,25 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndObject Object
+ * \addtogroup LIRenObject Object
  * @{
  */
 
-#include <network/lips-network.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/system.h>
 #include "render-group.h"
 #include "render-scene.h"
 
 static void
-private_build_bounds (lirndGroup*       self,
-                      lirndGroupObject* object,
+private_build_bounds (LIRenGroup*       self,
+                      LIRenGroupObject* object,
                       int               first);
 
 static void
-private_build_lights (lirndGroup*       self,
-                      lirndGroupObject* object);
+private_build_lights (LIRenGroup*       self,
+                      LIRenGroupObject* object);
 
 /*****************************************************************************/
 
@@ -44,13 +44,13 @@ private_build_lights (lirndGroup*       self,
  * \param scene Scene.
  * \return New group or NULL.
  */
-lirndGroup*
-lirnd_group_new (lirndScene* scene)
+LIRenGroup*
+liren_group_new (LIRenScene* scene)
 {
-	lirndGroup* self;
+	LIRenGroup* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndGroup));
+	self = lisys_calloc (1, sizeof (LIRenGroup));
 	if (self == NULL)
 		return NULL;
 	self->scene = scene;
@@ -72,11 +72,11 @@ lirnd_group_new (lirndScene* scene)
  * \param self Group.
  */
 void
-lirnd_group_free (lirndGroup* self)
+liren_group_free (LIRenGroup* self)
 {
 	int i;
-	lirndGroupObject* object;
-	lirndGroupObject* next;
+	LIRenGroupObject* object;
+	LIRenGroupObject* next;
 
 	for (object = self->objects ; object != NULL ; object = next)
 	{
@@ -86,8 +86,8 @@ lirnd_group_free (lirndGroup* self)
 	for (i = 0 ; i < self->lights.count ; i++)
 	{
 		if (self->realized)
-			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
-		lirnd_light_free (self->lights.array[i]);
+			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+		liren_light_free (self->lights.array[i]);
 	}
 	lialg_ptrdic_remove (self->scene->groups, self);
 	lisys_free (self->lights.array);
@@ -100,11 +100,11 @@ lirnd_group_free (lirndGroup* self)
  * \param self Group.
  */
 void
-lirnd_group_clear (lirndGroup* self)
+liren_group_clear (LIRenGroup* self)
 {
 	int i;
-	lirndGroupObject* object;
-	lirndGroupObject* next;
+	LIRenGroupObject* object;
+	LIRenGroupObject* next;
 
 	for (object = self->objects ; object != NULL ; object = next)
 	{
@@ -114,8 +114,8 @@ lirnd_group_clear (lirndGroup* self)
 	for (i = 0 ; i < self->lights.count ; i++)
 	{
 		if (self->realized)
-			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
-		lirnd_light_free (self->lights.array[i]);
+			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+		liren_light_free (self->lights.array[i]);
 	}
 	lisys_free (self->lights.array);
 	self->lights.array = NULL;
@@ -133,14 +133,14 @@ lirnd_group_clear (lirndGroup* self)
  * \return Nonzero on success.
  */
 int
-lirnd_group_insert_model (lirndGroup*     self,
-                          lirndModel*     model,
-                          limatTransform* transform)
+liren_group_insert_model (LIRenGroup*     self,
+                          LIRenModel*     model,
+                          LIMatTransform* transform)
 {
-	lirndGroupObject* object;
+	LIRenGroupObject* object;
 
 	/* Allocate object. */
-	object = lisys_calloc (1, sizeof (lirndGroupObject));
+	object = lisys_calloc (1, sizeof (LIRenGroupObject));
 	if (object == NULL)
 		return 0;
 	object->model = model;
@@ -168,13 +168,13 @@ lirnd_group_insert_model (lirndGroup*     self,
  * \param model_new Model that has been loaded as a replacement.
  */
 void
-lirnd_group_reload_model (lirndGroup* self,
-                          lirndModel* model_old,
-                          lirndModel* model_new)
+liren_group_reload_model (LIRenGroup* self,
+                          LIRenModel* model_old,
+                          LIRenModel* model_new)
 {
 	int i;
 	int found = 0;
-	lirndGroupObject* object;
+	LIRenGroupObject* object;
 
 	/* Replace objects. */
 	for (object = self->objects ; object != NULL ; object = object->next)
@@ -196,8 +196,8 @@ lirnd_group_reload_model (lirndGroup* self,
 	for (i = 0 ; i < self->lights.count ; i++)
 	{
 		if (self->realized)
-			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
-		lirnd_light_free (self->lights.array[i]);
+			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+		liren_light_free (self->lights.array[i]);
 	}
 	lisys_free (self->lights.array);
 	self->lights.array = NULL;
@@ -215,7 +215,7 @@ lirnd_group_reload_model (lirndGroup* self,
  * \param secs Number of seconds since the last update.
  */
 void
-lirnd_group_update (lirndGroup* self,
+liren_group_update (LIRenGroup* self,
                     float       secs)
 {
 	/* FIXME: We don't need this currently but someone else might. */
@@ -228,8 +228,8 @@ lirnd_group_update (lirndGroup* self,
  * \param result Return location for the bounding box.
  */
 void
-lirnd_group_get_bounds (const lirndGroup* self,
-                        limatAabb*        result)
+liren_group_get_bounds (const LIRenGroup* self,
+                        LIMatAabb*        result)
 {
 	*result = self->aabb;
 }
@@ -243,7 +243,7 @@ lirnd_group_get_bounds (const lirndGroup* self,
  * \return Nonzero if realized.
  */
 int
-lirnd_group_get_realized (const lirndGroup* self)
+liren_group_get_realized (const LIRenGroup* self)
 {
 	return self->realized && self->objects != NULL;
 }
@@ -256,7 +256,7 @@ lirnd_group_get_realized (const lirndGroup* self)
  * \return Nonzero if succeeded.
  */
 int
-lirnd_group_set_realized (lirndGroup* self,
+liren_group_set_realized (LIRenGroup* self,
                           int         value)
 {
 	int i;
@@ -265,12 +265,12 @@ lirnd_group_set_realized (lirndGroup* self,
 	if (!self->realized && value)
 	{
 		for (i = 0 ; i < self->lights.count ; i++)
-			lirnd_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
+			liren_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
 	}
 	else if (self->realized && !value)
 	{
 		for (i = 0 ; i < self->lights.count ; i++)
-			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
 	}
 
 	/* Set state. */
@@ -282,15 +282,15 @@ lirnd_group_set_realized (lirndGroup* self,
 /*****************************************************************************/
 
 static void
-private_build_bounds (lirndGroup*       self,
-                      lirndGroupObject* object,
+private_build_bounds (LIRenGroup*       self,
+                      LIRenGroupObject* object,
                       int               first)
 {
-	limatAabb aabb;
-	limatMatrix matrix;
+	LIMatAabb aabb;
+	LIMatMatrix matrix;
 
 	matrix = limat_convert_transform_to_matrix (object->transform);
-	lirnd_model_get_bounds (object->model, &aabb);
+	liren_model_get_bounds (object->model, &aabb);
 	aabb = limat_aabb_transform (aabb, &matrix);
 	object->aabb = aabb;
 	if (first)
@@ -300,32 +300,32 @@ private_build_bounds (lirndGroup*       self,
 }
 
 static void
-private_build_lights (lirndGroup*       self,
-                      lirndGroupObject* object)
+private_build_lights (LIRenGroup*       self,
+                      LIRenGroupObject* object)
 {
-	limatTransform tmp;
-	limdlNode* node;
-	limdlNodeIter iter;
-	lirndLight* light;
+	LIMatTransform tmp;
+	LIMdlNode* node;
+	LIMdlNodeIter iter;
+	LIRenLight* light;
 
 	LIMDL_FOREACH_NODE (iter, &object->model->model->nodes)
 	{
 		node = iter.value;
 		if (node->type != LIMDL_NODE_LIGHT)
 			continue;
-		light = lirnd_light_new_from_model (self->scene, node);
+		light = liren_light_new_from_model (self->scene, node);
 		if (light == NULL)
 			continue;
 		if (!lialg_array_append (&self->lights, &light))
 		{
-			lirnd_light_free (light);
+			liren_light_free (light);
 			continue;
 		}
 		tmp = light->transform;
 		tmp = limat_transform_multiply (object->transform, tmp);
-		lirnd_light_set_transform (light, &tmp);
+		liren_light_set_transform (light, &tmp);
 		if (self->realized)
-			lirnd_lighting_insert_light (self->scene->lighting, light);
+			liren_lighting_insert_light (self->scene->lighting, light);
 	}
 }
 

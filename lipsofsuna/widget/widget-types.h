@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,16 +35,16 @@ enum
 };
 
 typedef int (*liwdgHandler)();
-typedef int liwdgWidgetState;
-typedef struct _liwdgClass liwdgClass;
-typedef struct _liwdgManager liwdgManager;
-typedef struct _liwdgWidget liwdgWidget;
-typedef struct _liwdgRect liwdgRect;
-typedef struct _liwdgSize liwdgSize;
-typedef struct _liwdgStyle liwdgStyle;
-typedef struct _liwdgStyles liwdgStyles;
+typedef int LIWdgWidgetState;
+typedef struct _LIWdgClass LIWdgClass;
+typedef struct _LIWdgManager LIWdgManager;
+typedef struct _LIWdgWidget LIWdgWidget;
+typedef struct _LIWdgRect LIWdgRect;
+typedef struct _LIWdgSize LIWdgSize;
+typedef struct _LIWdgStyle LIWdgStyle;
+typedef struct _LIWdgStyles LIWdgStyles;
 
-struct _liwdgRect
+struct _LIWdgRect
 {
 	int x;
 	int y;
@@ -52,7 +52,7 @@ struct _liwdgRect
 	int height;
 };
 
-struct _liwdgSize
+struct _LIWdgSize
 {
 	int width;
 	int height;

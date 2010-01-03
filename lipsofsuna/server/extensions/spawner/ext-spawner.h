@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,51 +27,51 @@
 #ifndef __EXT_SPAWNER_H__
 #define __EXT_SPAWNER_H__
 
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
 /**
  * \brief Per object spawner logic.
  */
-struct _liextSpawner
+struct _LIExtSpawner
 {
 	int active;
 	int limit;
 	float delay;
 	float timer;
-	licalHandle calls[1];
-	liengObject* owner;
-	liextModule* module;
-	liscrData* script;
-	lisrvServer* server;
+	LICalHandle calls[1];
+	LIEngObject* owner;
+	LIExtModule* module;
+	LIScrData* script;
+	LISerServer* server;
 	struct
 	{
 		int count;
-		liscrData** array;
+		LIScrData** array;
 	} spawns;
 };
 
-liextSpawner*
-liext_spawner_new (liextModule* module);
+LIExtSpawner*
+liext_spawner_new (LIExtModule* module);
 
 
 void
-liext_spawner_free (liextSpawner* self);
+liext_spawner_free (LIExtSpawner* self);
 
 int
-liext_spawner_get_active (liextSpawner* self);
+liext_spawner_get_active (LIExtSpawner* self);
 
 int
-liext_spawner_set_active (liextSpawner* self,
+liext_spawner_set_active (LIExtSpawner* self,
                           int           value);
 
 int
-liext_spawner_set_owner (liextSpawner* self,
-                         liengObject*  value);
+liext_spawner_set_owner (LIExtSpawner* self,
+                         LIEngObject*  value);
 
 int
-liext_spawner_set_limit (liextSpawner* self,
+liext_spawner_set_limit (LIExtSpawner* self,
                          int           value);
 
 #endif

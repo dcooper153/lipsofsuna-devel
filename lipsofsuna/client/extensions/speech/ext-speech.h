@@ -27,25 +27,25 @@
 #ifndef __EXT_SPEECH_H__
 #define __EXT_SPEECH_H__
 
-#include <client/lips-client.h>
-#include <font/lips-font.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/font.h>
 
 #define LIEXT_SPEECH_TIMEOUT 10.0f
 
-typedef struct _liextSpeech liextSpeech;
-struct _liextSpeech
+typedef struct _LIExtSpeech LIExtSpeech;
+struct _LIExtSpeech
 {
 	float timer;
 	float alpha;
-	lifntLayout* text;
+	LIFntLayout* text;
 };
 
-liextSpeech*
-liext_speech_new (licliClient* client,
+LIExtSpeech*
+liext_speech_new (LICliClient* client,
                   const char*  text);
 
 void
-liext_speech_free (liextSpeech* self);
+liext_speech_free (LIExtSpeech* self);
 
 #endif
 

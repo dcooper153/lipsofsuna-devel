@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,18 +24,18 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-block.h"
 
-liextBlock*
-liext_block_new (liextModule* module)
+LIExtBlock*
+liext_block_new (LIExtModule* module)
 {
-	liextBlock* self;
+	LIExtBlock* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextBlock));
+	self = lisys_calloc (1, sizeof (LIExtBlock));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -44,7 +44,7 @@ liext_block_new (liextModule* module)
 }
 
 void
-liext_block_free (liextBlock* self)
+liext_block_free (LIExtBlock* self)
 {
 	if (self->physics != NULL)
 		liphy_object_free (self->physics);
@@ -52,19 +52,19 @@ liext_block_free (liextBlock* self)
 }
 
 int
-liext_block_build (liextBlock*  self,
-                   liextModule* module,
-                   livoxBlock*  block,
-                   limatVector* offset)
+liext_block_build (LIExtBlock*  self,
+                   LIExtModule* module,
+                   LIVoxBlock*  block,
+                   LIMatVector* offset)
 {
 	int x;
 	int y;
 	int z;
-	limatTransform transform;
-	limatVector vector;
-	liengModel* model;
-	livoxMaterial* material;
-	livoxVoxel* voxel;
+	LIMatTransform transform;
+	LIMatVector vector;
+	LIEngModel* model;
+	LIVoxMaterial* material;
+	LIVoxVoxel* voxel;
 
 	/* Free old object. */
 	if (self->physics != NULL)

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatQuaternion Quaternion
+ * \addtogroup LIMatQuaternion Quaternion
  * @{
  */
 
@@ -28,8 +28,8 @@
 #include <math.h>
 #include "math-vector.h"
 
-typedef struct _limatQuaternion limatQuaternion;
-struct _limatQuaternion
+typedef struct _LIMatQuaternion LIMatQuaternion;
+struct _LIMatQuaternion
 {
 	float x;
 	float y;
@@ -46,13 +46,13 @@ struct _limatQuaternion
  * \param w Float.
  * \return Quaternion.
  */
-static inline limatQuaternion
+static inline LIMatQuaternion
 limat_quaternion_init (float x,
                        float y,
                        float z,
                        float w)
 {
-	limatQuaternion self;
+	LIMatQuaternion self;
 
 	self.x = x;
 	self.y = y;
@@ -67,10 +67,10 @@ limat_quaternion_init (float x,
  *
  * \return Quaternion.
  */
-static inline limatQuaternion
+static inline LIMatQuaternion
 limat_quaternion_identity ()
 {
-	limatQuaternion self;
+	LIMatQuaternion self;
 
 	self.x = 0.0f;
 	self.y = 0.0f;
@@ -88,7 +88,7 @@ limat_quaternion_identity ()
  * \param psi Rotation around Z-axis.
  * \return Quaternion.
  */
-static inline limatQuaternion
+static inline LIMatQuaternion
 limat_quaternion_euler (float phi,
                         float theta,
                         float psi)
@@ -99,7 +99,7 @@ limat_quaternion_euler (float phi,
 	float s1 = sin (0.5f * phi);
 	float s2 = sin (0.5f * theta);
 	float s3 = sin (0.5f * psi);
-	limatQuaternion self;
+	LIMatQuaternion self;
 
 	self.w = c1 * c2 * c3 - s1 * s2 * s3;
 	self.x = s1 * s2 * c3 + c1 * c2 * s3;
@@ -116,13 +116,13 @@ limat_quaternion_euler (float phi,
  * \param up Up vector.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_look (limatVector dir,
-                       limatVector up)
+static inline LIMatQuaternion
+limat_quaternion_look (LIMatVector dir,
+                       LIMatVector up)
 {
 	float len;
-	limatQuaternion self;
-	limatVector side;
+	LIMatQuaternion self;
+	LIMatVector side;
 
 	/* Normalize direction. */
 	len = sqrt (dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
@@ -174,12 +174,12 @@ limat_quaternion_look (limatVector dir,
  * \param up Up vector.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_lookat (limatVector position,
-                         limatVector center,
-                         limatVector up)
+static inline LIMatQuaternion
+limat_quaternion_lookat (LIMatVector position,
+                         LIMatVector center,
+                         LIMatVector up)
 {
-	limatVector direction;
+	LIMatVector direction;
 
 	direction = limat_vector_subtract (position, center);
 	direction = limat_vector_normalize (direction);
@@ -194,11 +194,11 @@ limat_quaternion_lookat (limatVector position,
  * \param axis Axis of rotation.
  * \return Quaternion.
  */
-static inline limatQuaternion
+static inline LIMatQuaternion
 limat_quaternion_rotation (float       angle,
-                           limatVector axis)
+                           LIMatVector axis)
 {
-	limatQuaternion self;
+	LIMatQuaternion self;
 	float w = cos (angle / 2);
 	float q = sin (angle / 2);
 	float len = sqrtf (axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
@@ -223,10 +223,10 @@ limat_quaternion_rotation (float       angle,
  * \param self Quaternion.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_conjugate (limatQuaternion self)
+static inline LIMatQuaternion
+limat_quaternion_conjugate (LIMatQuaternion self)
 {
-	limatQuaternion result;
+	LIMatQuaternion result;
 
 	result.x = -self.x;
 	result.y = -self.y;
@@ -242,13 +242,13 @@ limat_quaternion_conjugate (limatQuaternion self)
  * \param quat Second quaternion.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_add (limatQuaternion self,
-                      limatQuaternion quat)
+static inline LIMatQuaternion
+limat_quaternion_add (LIMatQuaternion self,
+                      LIMatQuaternion quat)
 {
-	limatQuaternion a = self;
-	limatQuaternion b = quat;
-	limatQuaternion result;
+	LIMatQuaternion a = self;
+	LIMatQuaternion b = quat;
+	LIMatQuaternion result;
 
 	result.x = a.x + b.x;
 	result.y = a.y + b.y;
@@ -264,13 +264,13 @@ limat_quaternion_add (limatQuaternion self,
  * \param quat Second quaternion.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_subtract (limatQuaternion self,
-                           limatQuaternion quat)
+static inline LIMatQuaternion
+limat_quaternion_subtract (LIMatQuaternion self,
+                           LIMatQuaternion quat)
 {
-	limatQuaternion a = self;
-	limatQuaternion b = quat;
-	limatQuaternion result;
+	LIMatQuaternion a = self;
+	LIMatQuaternion b = quat;
+	LIMatQuaternion result;
 
 	result.x = a.x - b.x;
 	result.y = a.y - b.y;
@@ -286,13 +286,13 @@ limat_quaternion_subtract (limatQuaternion self,
  * \param quat Second multiplied quaternion.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_multiply (limatQuaternion self,
-                           limatQuaternion quat)
+static inline LIMatQuaternion
+limat_quaternion_multiply (LIMatQuaternion self,
+                           LIMatQuaternion quat)
 {
-	limatQuaternion a = self;
-	limatQuaternion b = quat;
-	limatQuaternion result;
+	LIMatQuaternion a = self;
+	LIMatQuaternion b = quat;
+	LIMatQuaternion result;
 
 	result.x = (a.w * b.x) + (a.x * b.w) + (a.y * b.z) - (a.z * b.y);
 	result.y = (a.w * b.y) - (a.x * b.z) + (a.y * b.w) + (a.z * b.x);
@@ -309,8 +309,8 @@ limat_quaternion_multiply (limatQuaternion self,
  * \return Scalar.
  */
 static inline float
-limat_quaternion_dot (limatQuaternion self,
-                      limatQuaternion quat)
+limat_quaternion_dot (LIMatQuaternion self,
+                      LIMatQuaternion quat)
 {
 	return self.w * quat.w + self.x * quat.x + self.y * quat.y + self.z * quat.z;
 }
@@ -321,10 +321,10 @@ limat_quaternion_dot (limatQuaternion self,
  * \param self Quaternion.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_normalize (limatQuaternion self)
+static inline LIMatQuaternion
+limat_quaternion_normalize (LIMatQuaternion self)
 {
-	limatQuaternion result;
+	LIMatQuaternion result;
 	float len = sqrt (self.w * self.w +
 	                  self.x * self.x +
 	                  self.y * self.y +
@@ -355,14 +355,14 @@ limat_quaternion_normalize (limatQuaternion self)
  * \param weight Interpolating scalar.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_nlerp (limatQuaternion self,
-                        limatQuaternion quat,
+static inline LIMatQuaternion
+limat_quaternion_nlerp (LIMatQuaternion self,
+                        LIMatQuaternion quat,
                         float           weight)
 {
 	float a = weight;
 	float b = 1.0f - weight;
-	limatQuaternion result;
+	LIMatQuaternion result;
 
 	result.w = a * self.w + b * quat.w;
 	result.x = a * self.x + b * quat.x;
@@ -382,14 +382,14 @@ limat_quaternion_nlerp (limatQuaternion self,
  * \param vector Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_quaternion_transform (limatQuaternion self,
-                            limatVector     vector)
+static inline LIMatVector
+limat_quaternion_transform (LIMatQuaternion self,
+                            LIMatVector     vector)
 {
-	limatVector result;
-	limatQuaternion q1 = self;
-	limatQuaternion q2 = self;
-	limatQuaternion q3 = { vector.x, vector.y, vector.z, 0.0f };
+	LIMatVector result;
+	LIMatQuaternion q1 = self;
+	LIMatQuaternion q2 = self;
+	LIMatQuaternion q3 = { vector.x, vector.y, vector.z, 0.0f };
 
 	q2 = limat_quaternion_conjugate (q2);
 	q3 = limat_quaternion_multiply (q1, q3);
@@ -408,11 +408,11 @@ limat_quaternion_transform (limatQuaternion self,
  * \param basis 0 for X, 1 for Y, 2 for Z.
  * \return Unit length vector.
  */
-static inline limatVector
-limat_quaternion_get_basis (limatQuaternion self,
+static inline LIMatVector
+limat_quaternion_get_basis (LIMatQuaternion self,
                             int             basis)
 {
-	limatVector result;
+	LIMatVector result;
 
 	switch (basis)
 	{
@@ -453,7 +453,7 @@ limat_quaternion_get_basis (limatQuaternion self,
  * \param psy Return location for the rotation around Z-axis.
  */
 static inline void
-limat_quaternion_get_euler (limatQuaternion self,
+limat_quaternion_get_euler (LIMatQuaternion self,
                             float*          phi,
                             float*          theta,
                             float*          psi)
@@ -491,7 +491,7 @@ limat_quaternion_get_euler (limatQuaternion self,
  * \return Float.
  */
 static inline float
-limat_quaternion_get_length (limatQuaternion self)
+limat_quaternion_get_length (LIMatQuaternion self)
 {
 	return sqrt (self.w * self.w +
 	             self.x * self.x +
@@ -511,11 +511,11 @@ limat_quaternion_get_length (limatQuaternion self)
  * \param quat Quaternion.
  * \return Quaternion.
  */
-static inline limatQuaternion
-limat_quaternion_get_nearest (const limatQuaternion self,
-                              const limatQuaternion quat)
+static inline LIMatQuaternion
+limat_quaternion_get_nearest (const LIMatQuaternion self,
+                              const LIMatQuaternion quat)
 {
-	limatQuaternion result = self;
+	LIMatQuaternion result = self;
 
 	if (self.w * quat.w + self.x * quat.x + self.y * quat.y + self.z * quat.z < 0.0f)
 	{
@@ -536,8 +536,8 @@ limat_quaternion_get_nearest (const limatQuaternion self,
  * \return Angle in radians.
  */
 static inline float
-limat_quaternion_get_rotation (const limatQuaternion self,
-                               limatVector*          axis)
+limat_quaternion_get_rotation (const LIMatQuaternion self,
+                               LIMatVector*          axis)
 {
 	if (axis != NULL)
 		*axis = limat_vector_normalize (limat_vector_init (self.x, self.y, self.z));

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,13 +23,13 @@
  */
 
 #include <unistd.h>
-#include <model/lips-model.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "reload.h"
 
 static int
-private_convert (lirelReload* self,
+private_convert (LIRelReload* self,
                  const char*  name);
 
 static void
@@ -47,7 +47,7 @@ private_filter (void* data,
  * \return Nonzero of success.
  */
 int
-lirel_reload_blender (lirelReload* self,
+lirel_reload_blender (LIRelReload* self,
                       const char*  src,
                       const char*  dst)
 {
@@ -65,7 +65,7 @@ lirel_reload_blender (lirelReload* self,
 /*****************************************************************************/
 
 static int
-private_convert (lirelReload* self,
+private_convert (LIRelReload* self,
                  const char*  name)
 {
 	int ret;

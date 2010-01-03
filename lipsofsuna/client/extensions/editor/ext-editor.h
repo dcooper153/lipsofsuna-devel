@@ -27,9 +27,9 @@
 #ifndef __EXT_EDITOR_H__
 #define __EXT_EDITOR_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <client/lips-client.h>
-#include <math/lips-math.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/math.h>
 
 enum
 {
@@ -44,67 +44,67 @@ enum
 	LIEXT_DRAG_TRANSLATEZ,
 };
 
-typedef struct _liextEditor liextEditor;
-struct _liextEditor
+typedef struct _LIExtEditor LIExtEditor;
+struct _LIExtEditor
 {
-	licalHandle calls[1];
-	licliClient* client;
+	LICalHandle calls[1];
+	LICliClient* client;
 	struct
 	{
 		int mode;
-		limatVector start;
+		LIMatVector start;
 	} drag;
 };
 
-liextEditor*
-liext_editor_new (licliClient* client);
+LIExtEditor*
+liext_editor_new (LICliClient* client);
 
 void
-liext_editor_free (liextEditor* self);
+liext_editor_free (LIExtEditor* self);
 
 void
-liext_editor_begin_rotate (liextEditor* self,
+liext_editor_begin_rotate (LIExtEditor* self,
                            int          x,
                            int          y);
 
 void
-liext_editor_begin_translate (liextEditor* self,
+liext_editor_begin_translate (LIExtEditor* self,
                               int          x,
                               int          y);
 
 int
-liext_editor_create (liextEditor*          self,
+liext_editor_create (LIExtEditor*          self,
                      uint32_t              model,
-                     const limatTransform* transform);
+                     const LIMatTransform* transform);
 
 int
-liext_editor_destroy (liextEditor* self);
+liext_editor_destroy (LIExtEditor* self);
 
 int
-liext_editor_duplicate (liextEditor* self);
+liext_editor_duplicate (LIExtEditor* self);
 
 void
-liext_editor_rotate (liextEditor*           self,
-                     const limatQuaternion* rotation);
+liext_editor_rotate (LIExtEditor*           self,
+                     const LIMatQuaternion* rotation);
 
 void
-liext_editor_snap (liextEditor* self,
+liext_editor_snap (LIExtEditor* self,
                    float        grid,
                    float        rad);
 
 void
-liext_editor_translate (liextEditor*       self,
-                        const limatVector* translation);
+liext_editor_translate (LIExtEditor*       self,
+                        const LIMatVector* translation);
 
 void
-liext_editor_transform_apply (liextEditor* self);
+liext_editor_transform_apply (LIExtEditor* self);
 
 void
-liext_editor_transform_cancel (liextEditor* self);
+liext_editor_transform_cancel (LIExtEditor* self);
 
 void
-liext_editor_get_center (liextEditor* self,
-                         limatVector* value);
+liext_editor_get_center (LIExtEditor* self,
+                         LIMatVector* value);
 
 #endif
 

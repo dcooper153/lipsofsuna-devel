@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <script/lips-script.h>
+#include <lipsofsuna/script.h>
 
 /* @luadoc
  * module "Core.Common.Vector"
@@ -44,16 +44,16 @@
 static int
 Vector___add (lua_State* lua)
 {
-	limatVector tmp;
-	liscrData* a;
-	liscrData* b;
-	liscrData* c;
-	liscrScript* script = liscr_script (lua);
+	LIMatVector tmp;
+	LIScrData* a;
+	LIScrData* b;
+	LIScrData* c;
+	LIScrScript* script = liscr_script (lua);
 
 	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
 	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
 
-	tmp = limat_vector_add (*((limatVector*) a->data), *((limatVector*) b->data));
+	tmp = limat_vector_add (*((LIMatVector*) a->data), *((LIMatVector*) b->data));
 	c = liscr_vector_new (script, &tmp);
 	if (c != NULL)
 	{
@@ -78,15 +78,15 @@ static int
 Vector___mul (lua_State* lua)
 {
 	float s;
-	limatVector tmp;
-	liscrData* a;
-	liscrData* c;
-	liscrScript* script = liscr_script (lua);
+	LIMatVector tmp;
+	LIScrData* a;
+	LIScrData* c;
+	LIScrScript* script = liscr_script (lua);
 
 	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
 	s = luaL_checknumber (lua, 2);
 
-	tmp = limat_vector_multiply (*((limatVector*) a->data), s);
+	tmp = limat_vector_multiply (*((LIMatVector*) a->data), s);
 	c = liscr_vector_new (script, &tmp);
 	if (c != NULL)
 	{
@@ -110,16 +110,16 @@ Vector___mul (lua_State* lua)
 static int
 Vector___sub (lua_State* lua)
 {
-	limatVector tmp;
-	liscrData* a;
-	liscrData* b;
-	liscrData* c;
-	liscrScript* script = liscr_script (lua);
+	LIMatVector tmp;
+	LIScrData* a;
+	LIScrData* b;
+	LIScrData* c;
+	LIScrScript* script = liscr_script (lua);
 
 	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
 	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
 
-	tmp = limat_vector_subtract (*((limatVector*) a->data), *((limatVector*) b->data));
+	tmp = limat_vector_subtract (*((LIMatVector*) a->data), *((LIMatVector*) b->data));
 	c = liscr_vector_new (script, &tmp);
 	if (c != NULL)
 	{
@@ -142,9 +142,9 @@ Vector___sub (lua_State* lua)
  * -- @return New vector.
  * function Vector.new(self, x, y, z)
  */
-static void Vector_new (liscrArgs* args)
+static void Vector_new (LIScrArgs* args)
 {
-	limatVector vec;
+	LIMatVector vec;
 
 	if (!liscr_args_gets_float (args, "x", &vec.x))
 		liscr_args_geti_float (args, 0, &vec.x);
@@ -164,14 +164,14 @@ static void Vector_new (liscrArgs* args)
  * -- @return New vector.
  * function Vector.cross(self, vector)
  */
-static void Vector_cross (liscrArgs* args)
+static void Vector_cross (LIScrArgs* args)
 {
-	limatVector tmp;
-	liscrData* data;
+	LIMatVector tmp;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
 	{
-		tmp = limat_vector_cross (*((limatVector*) args->self), *((limatVector*) data->data));
+		tmp = limat_vector_cross (*((LIMatVector*) args->self), *((LIMatVector*) data->data));
 		liscr_args_seti_vector (args, &tmp);
 	}
 }
@@ -182,9 +182,9 @@ static void Vector_cross (liscrArgs* args)
  * -- @name Vector.length
  * -- @class table
  */
-static void Vector_getter_length (liscrArgs* args)
+static void Vector_getter_length (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, limat_vector_get_length (*((limatVector*) args->self)));
+	liscr_args_seti_float (args, limat_vector_get_length (*((LIMatVector*) args->self)));
 }
 
 /* @luadoc
@@ -193,13 +193,13 @@ static void Vector_getter_length (liscrArgs* args)
  * -- @name Vector.x
  * -- @class table
  */
-static void Vector_getter_x (liscrArgs* args)
+static void Vector_getter_x (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((limatVector*) args->self)->x);
+	liscr_args_seti_float (args, ((LIMatVector*) args->self)->x);
 }
-static void Vector_setter_x (liscrArgs* args)
+static void Vector_setter_x (LIScrArgs* args)
 {
-	liscr_args_geti_float (args, 0, &((limatVector*) args->self)->x);
+	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->x);
 }
 
 /* @luadoc
@@ -208,13 +208,13 @@ static void Vector_setter_x (liscrArgs* args)
  * -- @name Vector.y
  * -- @class table
  */
-static void Vector_getter_y (liscrArgs* args)
+static void Vector_getter_y (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((limatVector*) args->self)->y);
+	liscr_args_seti_float (args, ((LIMatVector*) args->self)->y);
 }
-static void Vector_setter_y (liscrArgs* args)
+static void Vector_setter_y (LIScrArgs* args)
 {
-	liscr_args_geti_float (args, 0, &((limatVector*) args->self)->y);
+	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->y);
 }
 
 /* @luadoc
@@ -223,19 +223,19 @@ static void Vector_setter_y (liscrArgs* args)
  * -- @name Vector.z
  * -- @class table
  */
-static void Vector_getter_z (liscrArgs* args)
+static void Vector_getter_z (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((limatVector*) args->self)->z);
+	liscr_args_seti_float (args, ((LIMatVector*) args->self)->z);
 }
-static void Vector_setter_z (liscrArgs* args)
+static void Vector_setter_z (LIScrArgs* args)
 {
-	liscr_args_geti_float (args, 0, &((limatVector*) args->self)->z);
+	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->z);
 }
 
 /*****************************************************************************/
 
 void
-licomVectorScript (liscrClass* self,
+liscr_script_vector (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_insert_func (self, "__add", Vector___add);
@@ -258,16 +258,16 @@ licomVectorScript (liscrClass* self,
  * \param vector Vector.
  * \return New script vector or NULL.
  */
-liscrData*
-liscr_vector_new (liscrScript*       script,
-                  const limatVector* vector)
+LIScrData*
+liscr_vector_new (LIScrScript*       script,
+                  const LIMatVector* vector)
 {
-	liscrData* self;
+	LIScrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (limatVector), LISCR_SCRIPT_VECTOR);
+	self = liscr_data_new_alloc (script, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
 	if (self == NULL)
 		return NULL;
-	*((limatVector*) self->data) = *vector;
+	*((LIMatVector*) self->data) = *vector;
 
 	return self;
 }

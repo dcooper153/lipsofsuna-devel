@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxVoxel Voxel
+ * \addtogroup LIVoxVoxel Voxel
  * @{
  */
 
@@ -31,7 +31,7 @@
  * \param type Terrain type.
  */
 void
-livox_voxel_init (livoxVoxel* self,
+livox_voxel_init (LIVoxVoxel* self,
                   int         type)
 {
 	self->type = type;
@@ -47,7 +47,7 @@ livox_voxel_init (livoxVoxel* self,
  * \param step Number of steps to rotate.
  */
 void
-livox_voxel_rotate (livoxVoxel* self,
+livox_voxel_rotate (LIVoxVoxel* self,
                     int         axis,
                     int         step)
 {
@@ -76,7 +76,7 @@ livox_voxel_rotate (livoxVoxel* self,
  * \return Terrain type.
  */
 int
-livox_voxel_get_type (const livoxVoxel* self)
+livox_voxel_get_type (const LIVoxVoxel* self)
 {
 	return self->type;
 }
@@ -88,10 +88,10 @@ livox_voxel_get_type (const livoxVoxel* self)
  * \param value Return location for the quaternion.
  */
 void
-livox_voxel_get_quaternion (const livoxVoxel* self,
-                            limatQuaternion*  value)
+livox_voxel_get_quaternion (const LIVoxVoxel* self,
+                            LIMatQuaternion*  value)
 {
-	static const limatQuaternion rotations[64] =
+	static const LIMatQuaternion rotations[64] =
 	{
 		{ 0.000000, 0.000000, 0.000000, 1.000000 },
 		{ 0.707107, 0.000000, 0.000000, 0.707107 },

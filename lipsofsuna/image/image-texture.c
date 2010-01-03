@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup liimg Image
  * @{
- * \addtogroup liimgTexture Texture
+ * \addtogroup LIImgTexture Texture
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "image-compress.h"
 #include "image-dds.h"
 #include "image-texture.h"
@@ -32,12 +32,12 @@
  *
  * \return New texture or NULL.
  */
-liimgTexture*
+LIImgTexture*
 liimg_texture_new ()
 {
-	liimgTexture* self;
+	LIImgTexture* self;
 
-	self = lisys_calloc (1, sizeof (liimgTexture));
+	self = lisys_calloc (1, sizeof (LIImgTexture));
 	if (self == NULL)
 		return NULL;
 
@@ -52,14 +52,14 @@ liimg_texture_new ()
  * \param pixels Pixel data.
  * \return New texture or NULL.
  */
-liimgTexture*
+LIImgTexture*
 liimg_texture_new_from_rgba (int         width,
                              int         height,
                              const void* pixels)
 {
-	liimgTexture* self;
+	LIImgTexture* self;
 
-	self = lisys_calloc (1, sizeof (liimgTexture));
+	self = lisys_calloc (1, sizeof (LIImgTexture));
 	if (self == NULL)
 		return NULL;
 	self->width = width;
@@ -80,10 +80,10 @@ liimg_texture_new_from_rgba (int         width,
  * \param path Path to the texture file.
  * \return New texture or NULL.
  */
-liimgTexture*
+LIImgTexture*
 liimg_texture_new_from_file (const char* path)
 {
-	liimgTexture* self;
+	LIImgTexture* self;
 
 	self = liimg_texture_new ();
 	if (self == NULL)
@@ -103,7 +103,7 @@ liimg_texture_new_from_file (const char* path)
  * \param self Texture.
  */
 void
-liimg_texture_free (liimgTexture* self)
+liimg_texture_free (LIImgTexture* self)
 {
 	if (self->texture)
 		glDeleteTextures (1, &self->texture);
@@ -118,12 +118,12 @@ liimg_texture_free (liimgTexture* self)
  * \return Nonzero on success.
  */
 int
-liimg_texture_load (liimgTexture* self,
+liimg_texture_load (LIImgTexture* self,
                     const char*   path)
 {
 	FILE* file;
 	GLuint tex;
-	liimgDDS dds;
+	LIImgDDS dds;
 
 	/* Load the DDS file. */
 	file = fopen (path, "rb");

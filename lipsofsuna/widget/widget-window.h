@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgWindow Window
+ * \addtogroup LIWdgWindow Window
  * @{
  */
 
@@ -28,29 +28,29 @@
 #include "widget.h"
 #include "widget-group.h"
 
-#define LIWDG_WINDOW(o) ((liwdgWindow*)(o))
+#define LIWDG_WINDOW(o) ((LIWdgWindow*)(o))
 
-typedef struct _liwdgWindow liwdgWindow;
-struct _liwdgWindow
+typedef struct _LIWdgWindow LIWdgWindow;
+struct _LIWdgWindow
 {
-	liwdgGroup base;
-	lifntFont* font;
-	lifntLayout* text;
+	LIWdgGroup base;
+	LIFntFont* font;
+	LIFntLayout* text;
 	char* title;
 };
 
-extern const liwdgClass liwdgWindowType;
+extern const LIWdgClass liwdg_widget_window;
 
-liwdgWidget*
-liwdg_window_new (liwdgManager* manager,
+LIWdgWidget*
+liwdg_window_new (LIWdgManager* manager,
                   int           width,
                   int           height);
 
 const char*
-liwdg_window_get_title (const liwdgWindow* self);
+liwdg_window_get_title (const LIWdgWindow* self);
 
 int
-liwdg_window_set_title (liwdgWindow* self,
+liwdg_window_set_title (LIWdgWindow* self,
                         const char*  title);
 
 #endif

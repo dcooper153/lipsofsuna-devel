@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup lipth Paths
  * @{
- * \addtogroup lipthPaths Paths
+ * \addtogroup LIPthPaths Paths
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "paths.h"
 
 /**
@@ -33,14 +33,14 @@
  * \param name Module name.
  * \return Paths or NULL.
  */
-lipthPaths*
+LIPthPaths*
 lipth_paths_new (const char* path,
                  const char* name)
 {
-	lipthPaths* self;
-	lisysStat stat;
+	LIPthPaths* self;
+	LISysStat stat;
 
-	self = lisys_calloc (1, sizeof (lipthPaths));
+	self = lisys_calloc (1, sizeof (LIPthPaths));
 	if (self == NULL)
 		return NULL;
 
@@ -136,7 +136,7 @@ error:
  * \param self Paths object.
  */
 void
-lipth_paths_free (lipthPaths* self)
+lipth_paths_free (LIPthPaths* self)
 {
 #ifdef LI_RELATIVE_PATHS
 	lisys_free (self->global_exts);
@@ -158,7 +158,7 @@ lipth_paths_free (lipthPaths* self)
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_data (const lipthPaths* self,
+lipth_paths_get_data (const LIPthPaths* self,
                       const char*       name)
 {
 	return lisys_path_concat (self->module_data, name, NULL);
@@ -172,7 +172,7 @@ lipth_paths_get_data (const lipthPaths* self,
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_font (const lipthPaths* self,
+lipth_paths_get_font (const LIPthPaths* self,
                       const char*       name)
 {
 	return lisys_path_concat (self->module_data, "fonts", name, NULL);
@@ -186,7 +186,7 @@ lipth_paths_get_font (const lipthPaths* self,
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_graphics (const lipthPaths* self,
+lipth_paths_get_graphics (const LIPthPaths* self,
                           const char*       name)
 {
 	return lisys_path_concat (self->module_data, "graphics", name, NULL);
@@ -200,7 +200,7 @@ lipth_paths_get_graphics (const lipthPaths* self,
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_script (const lipthPaths* self,
+lipth_paths_get_script (const LIPthPaths* self,
                         const char*       name)
 {
 	return lisys_path_concat (self->module_data, "scripts", name, NULL);
@@ -214,7 +214,7 @@ lipth_paths_get_script (const lipthPaths* self,
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_shader (const lipthPaths* self,
+lipth_paths_get_shader (const LIPthPaths* self,
                         const char*       name)
 {
 	return lisys_path_concat (self->module_data, "shaders", name, NULL);
@@ -228,7 +228,7 @@ lipth_paths_get_shader (const lipthPaths* self,
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_sound (const lipthPaths* self,
+lipth_paths_get_sound (const LIPthPaths* self,
                        const char*       name)
 {
 	return lisys_path_concat (self->module_data, "sounds", name, NULL);
@@ -242,7 +242,7 @@ lipth_paths_get_sound (const lipthPaths* self,
  * \return Full path or NULL.
  */
 char*
-lipth_paths_get_sql (const lipthPaths* self,
+lipth_paths_get_sql (const LIPthPaths* self,
                      const char*       name)
 {
 	return lisys_path_concat (self->module_state, name, NULL);

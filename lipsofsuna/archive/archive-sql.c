@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcSql Sql
+ * \addtogroup LIArcSql Sql
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "archive-sql.h"
 
 int
-liarc_sql_delete (liarcSql*   self,
+liarc_sql_delete (LIArcSql*   self,
                   const char* table)
 {
 	int len;
@@ -66,7 +66,7 @@ liarc_sql_delete (liarcSql*   self,
 }
 
 int
-liarc_sql_insert (liarcSql*   self,
+liarc_sql_insert (LIArcSql*   self,
                   const char* table,
                               ...)
 {
@@ -231,7 +231,7 @@ liarc_sql_insert (liarcSql*   self,
 }
 
 int
-liarc_sql_replace (liarcSql*   self,
+liarc_sql_replace (LIArcSql*   self,
                    const char* table,
                                ...)
 {

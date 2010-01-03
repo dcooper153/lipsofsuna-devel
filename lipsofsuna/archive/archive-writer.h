@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liarc Archive
  * @{
- * \addtogroup liarcWriter Writer
+ * \addtogroup LIArcWriter Writer
  * @{
  */
 
@@ -27,14 +27,14 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
-typedef struct _liarcWriter liarcWriter;
-struct _liarcWriter
+typedef struct _LIArcWriter LIArcWriter;
+struct _LIArcWriter
 {
 	int error;
-	void (*close)(liarcWriter*);
-	int (*write)(liarcWriter*, const void*, int);
+	void (*close)(LIArcWriter*);
+	int (*write)(LIArcWriter*, const void*, int);
 	struct
 	{
 		FILE* pointer;
@@ -55,87 +55,87 @@ struct _liarcWriter
 extern "C" {
 #endif
 
-liarcWriter*
+LIArcWriter*
 liarc_writer_new ();
 
-liarcWriter*
+LIArcWriter*
 liarc_writer_new_file (const char* path);
 
-liarcWriter*
+LIArcWriter*
 liarc_writer_new_gzip (const char* path);
 
-liarcWriter*
+LIArcWriter*
 liarc_writer_new_packet (int type);
 
 void
-liarc_writer_free (liarcWriter* self);
+liarc_writer_free (LIArcWriter* self);
 
 int
-liarc_writer_append_file (liarcWriter* self,
+liarc_writer_append_file (LIArcWriter* self,
                           FILE*        file);
 
 int
-liarc_writer_append_format (liarcWriter* self,
+liarc_writer_append_format (LIArcWriter* self,
                             const char*  format,
                                          ...) __LI_ATTRIBUTE_FORMAT(2, 3);
 
 int
-liarc_writer_append_formatv (liarcWriter* self,
+liarc_writer_append_formatv (LIArcWriter* self,
                              const char*  format,
                              va_list      args);
 
 int
-liarc_writer_append_string (liarcWriter* self,
+liarc_writer_append_string (LIArcWriter* self,
                             const char*  string);
 
 int
-liarc_writer_append_float (liarcWriter* self,
+liarc_writer_append_float (LIArcWriter* self,
                            float        value);
 
 int
-liarc_writer_append_int8 (liarcWriter* self,
+liarc_writer_append_int8 (LIArcWriter* self,
                           int8_t       value);
 
 int
-liarc_writer_append_int16 (liarcWriter* self,
+liarc_writer_append_int16 (LIArcWriter* self,
                            int16_t      value);
 
 int
-liarc_writer_append_int32 (liarcWriter* self,
+liarc_writer_append_int32 (LIArcWriter* self,
                            int32_t      value);
 
 int
-liarc_writer_append_nul (liarcWriter* self);
+liarc_writer_append_nul (LIArcWriter* self);
 
 int
-liarc_writer_append_uint8 (liarcWriter* self,
+liarc_writer_append_uint8 (LIArcWriter* self,
                            uint8_t      value);
 
 int
-liarc_writer_append_uint16 (liarcWriter* self,
+liarc_writer_append_uint16 (LIArcWriter* self,
                             uint16_t     value);
 
 int
-liarc_writer_append_uint32 (liarcWriter* self,
+liarc_writer_append_uint32 (LIArcWriter* self,
                             uint32_t     value);
 
 int
-liarc_writer_append_raw (liarcWriter* self,
+liarc_writer_append_raw (LIArcWriter* self,
                          const void*  data,
                          int          size);
 
 void
-liarc_writer_clear (liarcWriter* self);
+liarc_writer_clear (LIArcWriter* self);
 
 int
-liarc_writer_erase (liarcWriter* self,
+liarc_writer_erase (LIArcWriter* self,
                     int          size);
 
 const char*
-liarc_writer_get_buffer (const liarcWriter* self);
+liarc_writer_get_buffer (const LIArcWriter* self);
 
 int
-liarc_writer_get_length (const liarcWriter* self);
+liarc_writer_get_length (const LIArcWriter* self);
 
 #ifdef __cplusplus
 }

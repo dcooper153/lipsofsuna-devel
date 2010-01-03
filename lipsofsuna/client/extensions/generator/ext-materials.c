@@ -24,7 +24,7 @@
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "ext-materials.h"
 #include "ext-preview.h"
 
@@ -32,72 +32,72 @@ static const void*
 private_base ();
 
 static int
-private_init (liextMaterials* self,
-              liwdgManager*   manager);
+private_init (LIExtMaterials* self,
+              LIWdgManager*   manager);
 
 static void
-private_free (liextMaterials* self);
+private_free (LIExtMaterials* self);
 
 static int
-private_event (liextMaterials* self,
+private_event (LIExtMaterials* self,
                liwdgEvent*     event);
 
 static int
-private_add (liextMaterials* self,
-             liwdgWidget*    widget);
+private_add (LIExtMaterials* self,
+             LIWdgWidget*    widget);
 
 static int
-private_remove (liextMaterials* self,
-                liwdgWidget*    widget);
+private_remove (LIExtMaterials* self,
+                LIWdgWidget*    widget);
 
 static int
-private_changed_friction (liextMaterials* self,
-                          liwdgWidget*    widget);
+private_changed_friction (LIExtMaterials* self,
+                          LIWdgWidget*    widget);
 
 static int
-private_changed_model (liextMaterials* self,
-                       liwdgWidget*    widget);
+private_changed_model (LIExtMaterials* self,
+                       LIWdgWidget*    widget);
 
 static int
-private_changed_name (liextMaterials* self,
-                      liwdgWidget*    widget);
+private_changed_name (LIExtMaterials* self,
+                      LIWdgWidget*    widget);
 
 static int
-private_selected (liextMaterials* self,
-                  liwdgWidget*    widget,
-                  liwdgTreerow*   row);
+private_selected (LIExtMaterials* self,
+                  LIWdgWidget*    widget,
+                  LIWdgTreerow*   row);
 
 static void
-private_populate (liextMaterials* self);
+private_populate (LIExtMaterials* self);
 
 static void
-private_rebuild_preview (liextMaterials* self);
+private_rebuild_preview (LIExtMaterials* self);
 
 static void
-private_rebuild_selection (liextMaterials* self,
-                           liwdgTreerow*   row);
+private_rebuild_selection (LIExtMaterials* self,
+                           LIWdgTreerow*   row);
 
-static liextMaterialsTreerow*
-private_get_active (liextMaterials* self);
+static LIExtMaterialsTreerow*
+private_get_active (LIExtMaterials* self);
 
 /****************************************************************************/
 
-const liwdgClass liextMaterialsType =
+const LIWdgClass liext_widget_materials =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorMaterials", sizeof (liextMaterials),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "GeneratorMaterials", sizeof (LIExtMaterials),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
-liwdgWidget*
-liext_materials_new (liwdgManager* manager,
-                     liextModule*  module)
+LIWdgWidget*
+liext_materials_new (LIWdgManager* manager,
+                     LIExtModule*  module)
 {
-	liextMaterials* data;
-	liwdgWidget* self;
+	LIExtMaterials* data;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liextMaterialsType);
+	self = liwdg_widget_new (manager, &liext_widget_materials);
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_MATERIALS (self);
@@ -121,7 +121,7 @@ liext_materials_new (liwdgManager* manager,
 }
 
 int
-liext_materials_save (liextMaterials* self)
+liext_materials_save (LIExtMaterials* self)
 {
 	int ret;
 
@@ -133,8 +133,8 @@ liext_materials_save (liextMaterials* self)
 }
 
 void
-liext_materials_reset (liextMaterials* self,
-                       liarcReader*    reader)
+liext_materials_reset (LIExtMaterials* self,
+                       LIArcReader*    reader)
 {
 	reader->pos = 1;
 	liext_preview_replace_materials (LIEXT_PREVIEW (self->widgets.preview), reader);
@@ -142,9 +142,9 @@ liext_materials_reset (liextMaterials* self,
 }
 
 int
-liext_materials_get_active (liextMaterials* self)
+liext_materials_get_active (LIExtMaterials* self)
 {
-	liextMaterialsTreerow* row;
+	LIExtMaterialsTreerow* row;
 
 	row = private_get_active (self);
 	if (row == NULL)
@@ -157,14 +157,14 @@ liext_materials_get_active (liextMaterials* self)
 static const void*
 private_base ()
 {
-	return &liwdgGroupType;
+	return &liwdg_widget_group;
 }
 
 static int
-private_init (liextMaterials* self,
-              liwdgManager*   manager)
+private_init (LIExtMaterials* self,
+              LIWdgManager*   manager)
 {
-	liwdgWidget* group_tree;
+	LIWdgWidget* group_tree;
 
 	/* Allocate widgets. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 3))
@@ -230,30 +230,30 @@ private_init (liextMaterials* self,
 }
 
 static void
-private_free (liextMaterials* self)
+private_free (LIExtMaterials* self)
 {
 	liwdg_tree_foreach (LIWDG_TREE (self->widgets.tree), free);
 }
 
 static int
-private_event (liextMaterials* self,
+private_event (LIExtMaterials* self,
                liwdgEvent*     event)
 {
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
 	{
 	}
 
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 static int
-private_add (liextMaterials* self,
-             liwdgWidget*    widget)
+private_add (LIExtMaterials* self,
+             LIWdgWidget*    widget)
 {
 	int i;
-	liextMaterialsTreerow* row;
-	livoxMaterial* material;
-	liwdgTreerow* trow[2];
+	LIExtMaterialsTreerow* row;
+	LIVoxMaterial* material;
+	LIWdgTreerow* trow[2];
 
 	/* Allocate material. */
 	material = livox_material_new ();
@@ -276,7 +276,7 @@ private_add (liextMaterials* self,
 	}
 
 	/* Add to tree view. */
-	row = lisys_calloc (1, sizeof (liextMaterialsTreerow));
+	row = lisys_calloc (1, sizeof (LIExtMaterialsTreerow));
 	if (row == NULL)
 		return 0;
 	row->material = material;
@@ -299,11 +299,11 @@ private_add (liextMaterials* self,
 }
 
 static int
-private_remove (liextMaterials* self,
-                liwdgWidget*    widget)
+private_remove (LIExtMaterials* self,
+                LIWdgWidget*    widget)
 {
-	liextMaterialsTreerow* row;
-	liwdgTreerow* trow;
+	LIExtMaterialsTreerow* row;
+	LIWdgTreerow* trow;
 
 	/* Get active item. */
 	row = private_get_active (self);
@@ -326,10 +326,10 @@ private_remove (liextMaterials* self,
 }
 
 static int
-private_changed_friction (liextMaterials* self,
-                          liwdgWidget*    widget)
+private_changed_friction (LIExtMaterials* self,
+                          LIWdgWidget*    widget)
 {
-	liextMaterialsTreerow* row;
+	LIExtMaterialsTreerow* row;
 
 	row = private_get_active (self);
 	assert (row != NULL);
@@ -342,12 +342,12 @@ private_changed_friction (liextMaterials* self,
 }
 
 static int
-private_changed_model (liextMaterials* self,
-                       liwdgWidget*    widget)
+private_changed_model (LIExtMaterials* self,
+                       LIWdgWidget*    widget)
 {
 	const char* model;
-	liextMaterialsTreerow* row;
-	liwdgTreerow* trow;
+	LIExtMaterialsTreerow* row;
+	LIWdgTreerow* trow;
 
 	row = private_get_active (self);
 	trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -363,12 +363,12 @@ private_changed_model (liextMaterials* self,
 }
 
 static int
-private_changed_name (liextMaterials* self,
-                      liwdgWidget*    widget)
+private_changed_name (LIExtMaterials* self,
+                      LIWdgWidget*    widget)
 {
 	const char* name;
-	liextMaterialsTreerow* row;
-	liwdgTreerow* trow;
+	LIExtMaterialsTreerow* row;
+	LIWdgTreerow* trow;
 
 	row = private_get_active (self);
 	trow = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
@@ -384,11 +384,11 @@ private_changed_name (liextMaterials* self,
 }
 
 static int
-private_selected (liextMaterials* self,
-                  liwdgWidget*    widget,
-                  liwdgTreerow*   row)
+private_selected (LIExtMaterials* self,
+                  LIWdgWidget*    widget,
+                  LIWdgTreerow*   row)
 {
-	liwdgTreerow* row0;
+	LIWdgTreerow* row0;
 
 	/* Deselect old. */
 	row0 = liwdg_tree_get_active (LIWDG_TREE (widget));
@@ -403,14 +403,14 @@ private_selected (liextMaterials* self,
 }
 
 static void
-private_populate (liextMaterials* self)
+private_populate (LIExtMaterials* self)
 {
-	lialgU32dicIter iter;
-	liextMaterialsTreerow* tmp;
-	livoxMaterial* material;
-	liwdgTreerow* tree;
-	liwdgTreerow* row0;
-	liwdgTreerow* row1;
+	LIAlgU32dicIter iter;
+	LIExtMaterialsTreerow* tmp;
+	LIVoxMaterial* material;
+	LIWdgTreerow* tree;
+	LIWdgTreerow* row0;
+	LIWdgTreerow* row1;
 
 	/* Clear tree. */
 	tree = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
@@ -418,7 +418,7 @@ private_populate (liextMaterials* self)
 	liwdg_tree_clear (LIWDG_TREE (self->widgets.tree));
 
 	/* Add root info. */
-	tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
+	tmp = lisys_calloc (1, sizeof (LIExtMaterialsTreerow));
 	if (tmp == NULL)
 		return;
 	tmp->material = NULL;
@@ -428,7 +428,7 @@ private_populate (liextMaterials* self)
 	LI_FOREACH_U32DIC (iter, self->generator->voxels->materials)
 	{
 		material = iter.value;
-		tmp = lisys_calloc (1, sizeof (liextMaterialsTreerow));
+		tmp = lisys_calloc (1, sizeof (LIExtMaterialsTreerow));
 		tmp->material = material;
 		row1 = liwdg_treerow_append_row (row0, material->name, tmp);
 		if (row1 == NULL)
@@ -437,12 +437,12 @@ private_populate (liextMaterials* self)
 }
 
 static void
-private_rebuild_preview (liextMaterials* self)
+private_rebuild_preview (LIExtMaterials* self)
 {
-	liextMaterialsTreerow* row;
-	limatVector eye;
-	limatVector ctr;
-	limatVector up;
+	LIExtMaterialsTreerow* row;
+	LIMatVector eye;
+	LIMatVector ctr;
+	LIMatVector up;
 
 	row = private_get_active (self);
 	if (row == NULL || row->material == NULL)
@@ -464,10 +464,10 @@ private_rebuild_preview (liextMaterials* self)
 }
 
 static void
-private_rebuild_selection (liextMaterials* self,
-                           liwdgTreerow*   row)
+private_rebuild_selection (LIExtMaterials* self,
+                           LIWdgTreerow*   row)
 {
-	liextMaterialsTreerow* data;
+	LIExtMaterialsTreerow* data;
 
 	/* Set info. */
 	data = liwdg_treerow_get_data (row);
@@ -488,10 +488,10 @@ private_rebuild_selection (liextMaterials* self,
 	private_rebuild_preview (self);
 }
 
-static liextMaterialsTreerow*
-private_get_active (liextMaterials* self)
+static LIExtMaterialsTreerow*
+private_get_active (LIExtMaterials* self)
 {
-	liwdgTreerow* row;
+	LIWdgTreerow* row;
 
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
 	if (row == NULL)

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup livid Video
  * @{
- * \addtogroup lividFeatures Features
+ * \addtogroup LIVidFeatures Features
  * @{
  */
 
@@ -33,7 +33,7 @@
 /**
  * \brief Global video card feature cache.
  */
-lividFeatures livid_features;
+LIVidFeatures livid_features;
 
 /**
  * \brief Initializes the global video card feature cache.
@@ -44,7 +44,7 @@ livid_features_init ()
 	GLint tmp;
 
 	/* Clear capabilities. */
-	memset (&livid_features, 0, sizeof (lividFeatures));
+	memset (&livid_features, 0, sizeof (LIVidFeatures));
 
 	/* Get capabilities. */
 	if (GLEW_EXT_texture_filter_anisotropic)

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,39 +18,39 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiSector Sector
+ * \addtogroup LIAiSector Sector
  * @{
  */
 
 #ifndef __AI_SECTOR_H__
 #define __AI_SECTOR_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <math/lips-math.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/voxel.h>
 #include "ai-waypoint.h"
 #include "ai-types.h"
 
-struct _liaiSector
+struct _LIAiSector
 {
-	liaiManager* manager;
-	liaiWaypoint points[LIAI_WAYPOINTS_PER_SECTOR];
-	lialgSector* sector;
+	LIAiManager* manager;
+	LIAiWaypoint points[LIAI_WAYPOINTS_PER_SECTOR];
+	LIAlgSector* sector;
 };
 
-liaiSector*
-liai_sector_new (lialgSector* sector);
+LIAiSector*
+liai_sector_new (LIAlgSector* sector);
 
 void
-liai_sector_free (liaiSector* self);
+liai_sector_free (LIAiSector* self);
 
 void
-liai_sector_build (liaiSector*  self,
-                   livoxSector* voxels);
+liai_sector_build (LIAiSector*  self,
+                   LIVoxSector* voxels);
 
 void
-liai_sector_build_area (liaiSector*  self,
-                        livoxSector* voxels,
+liai_sector_build_area (LIAiSector*  self,
+                        LIVoxSector* voxels,
                         int          x,
                         int          y,
                         int          z,
@@ -58,8 +58,8 @@ liai_sector_build_area (liaiSector*  self,
                         int          ys,
                         int          zs);
 
-liaiWaypoint*
-liai_sector_get_waypoint (liaiSector* self,
+LIAiWaypoint*
+liai_sector_get_waypoint (LIAiSector* self,
                           int         x,
                           int         y,
                           int         z);

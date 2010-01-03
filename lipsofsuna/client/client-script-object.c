@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 /*****************************************************************************/
 
@@ -41,26 +41,26 @@
  * -- @param self Object.
  * function Object.emit_particles(self)
  */
-static void Object_emit_particles (liscrArgs* args)
+static void Object_emit_particles (LIScrArgs* args)
 {
-	licliClient* client;
-	liengObject* object;
-	lirndObject* render;
+	LICliClient* client;
+	LIEngObject* object;
+	LIRenObject* render;
 
 	object = LIENG_OBJECT (args->self);
 	client = lieng_engine_get_userdata (object->engine);
-	render = lirnd_scene_find_object (client->scene, object->id);
+	render = liren_scene_find_object (client->scene, object->id);
 	if (render != NULL)
-		lirnd_object_emit_particles (render);
+		liren_object_emit_particles (render);
 }
 
 /*****************************************************************************/
 
 void
-licliObjectScript (liscrClass* self,
+licli_script_object (LIScrClass* self,
                    void*       data)
 {
-	liscr_class_inherit (self, licomObjectScript, NULL);
+	liscr_class_inherit (self, liscr_script_object, NULL);
 	liscr_class_insert_mfunc (self, "emit_particles", Object_emit_particles);
 }
 

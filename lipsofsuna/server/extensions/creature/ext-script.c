@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-creature.h"
 #include "ext-module.h"
 
@@ -46,10 +46,10 @@
  * -- @return New creature logic.
  * function Creature.new(self, args)
  */
-static void Creature_new (liscrArgs* args)
+static void Creature_new (LIScrArgs* args)
 {
-	liextCreature* self;
-	liextModule* module;
+	LIExtCreature* self;
+	LIExtModule* module;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CREATURE);
@@ -75,16 +75,16 @@ static void Creature_new (liscrArgs* args)
  * -- @name Creature.controls
  * -- @class table
  */
-static void Creature_getter_controls (liscrArgs* args)
+static void Creature_getter_controls (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((liextCreature*) args->self)->controls);
+	liscr_args_seti_int (args, ((LIExtCreature*) args->self)->controls);
 }
-static void Creature_setter_controls (liscrArgs* args)
+static void Creature_setter_controls (LIScrArgs* args)
 {
 	int value;
 
 	if (liscr_args_geti_int (args, 0, &value))
-		((liextCreature*) args->self)->controls = value;
+		((LIExtCreature*) args->self)->controls = value;
 }
 
 /* @luadoc
@@ -93,14 +93,14 @@ static void Creature_setter_controls (liscrArgs* args)
  * -- @name Creature.object
  * -- @class table
  */
-static void Creature_getter_object (liscrArgs* args)
+static void Creature_getter_object (LIScrArgs* args)
 {
-	if (((liextCreature*) args->self)->object != NULL)
-		liscr_args_seti_data (args, ((liextCreature*) args->self)->object->script);
+	if (((LIExtCreature*) args->self)->object != NULL)
+		liscr_args_seti_data (args, ((LIExtCreature*) args->self)->object->script);
 }
-static void Creature_setter_object (liscrArgs* args)
+static void Creature_setter_object (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_creature_set_object (args->self, data->data);
@@ -111,7 +111,7 @@ static void Creature_setter_object (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextCreatureScript (liscrClass* self,
+liext_script_creature (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CREATURE, data);

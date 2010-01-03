@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,50 +27,50 @@
 #ifndef __EXT_SKILLS_H__
 #define __EXT_SKILLS_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <server/lips-server.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/system.h>
 #include "ext-module.h"
 #include "ext-skill.h"
 
-struct _liextSkills
+struct _LIExtSkills
 {
-	lialgStrdic* skills;
-	liextModule* module;
-	liscrData* script;
-	lisrvServer* server;
-	liengObject* owner;
+	LIAlgStrdic* skills;
+	LIExtModule* module;
+	LIScrData* script;
+	LISerServer* server;
+	LIEngObject* owner;
 };
 
-liextSkills*
-liext_skills_new (liextModule* module);
+LIExtSkills*
+liext_skills_new (LIExtModule* module);
 
 void
-liext_skills_free (liextSkills* self);
+liext_skills_free (LIExtSkills* self);
 
-liextSkill*
-liext_skills_find_skill (liextSkills* self,
+LIExtSkill*
+liext_skills_find_skill (LIExtSkills* self,
                          const char*  name);
 
 int
-liext_skills_insert_skill (liextSkills*   self,
-                           liextSkillType type,
+liext_skills_insert_skill (LIExtSkills*   self,
+                           LIExtSkillType type,
                            const char*    name);
 
 void
-liext_skills_update (liextSkills* self,
+liext_skills_update (LIExtSkills* self,
                      float        secs);
 
 int
-liext_skills_update_skill (liextSkills* self,
-                           liextSkill*  skill);
+liext_skills_update_skill (LIExtSkills* self,
+                           LIExtSkill*  skill);
 
-liengObject*
-liext_skills_get_owner (liextSkills* self);
+LIEngObject*
+liext_skills_get_owner (LIExtSkills* self);
 
 int
-liext_skills_set_owner (liextSkills* self,
-                        liengObject* value);
+liext_skills_set_owner (LIExtSkills* self,
+                        LIEngObject* value);
 
 #endif
 

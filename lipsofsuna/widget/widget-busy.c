@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgBusy Busy
+ * \addtogroup LIWdgBusy Busy
  * @{
  */
 
@@ -27,34 +27,34 @@
 #include "widget-progress.h"
 
 static int
-private_init (liwdgBusy*    self,
-              liwdgManager* manager);
+private_init (LIWdgBusy*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgBusy* self);
+private_free (LIWdgBusy* self);
 
 static void
-private_event (liwdgBusy*  self,
+private_event (LIWdgBusy*  self,
                liwdgEvent* event);
 
-const liwdgClass liwdgBusyType =
+const LIWdgClass liwdg_widget_busy =
 {
-	LIWDG_BASE_STATIC, &liwdgWindowType, "Busy", sizeof (liwdgBusy),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event,
+	LIWDG_BASE_STATIC, &liwdg_widget_window, "Busy", sizeof (LIWdgBusy),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event,
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_busy_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_busy_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgBusyType);
+	return liwdg_widget_new (manager, &liwdg_widget_busy);
 }
 
 void
-liwdg_busy_set_cancel (liwdgBusy*   self,
+liwdg_busy_set_cancel (LIWdgBusy*   self,
                        liwdgHandler handler,
                        void*        data)
 {
@@ -63,21 +63,21 @@ liwdg_busy_set_cancel (liwdgBusy*   self,
 }
 
 void
-liwdg_busy_set_progress (liwdgBusy* self,
+liwdg_busy_set_progress (LIWdgBusy* self,
                          float      value)
 {
 	liwdg_progress_set_value (LIWDG_PROGRESS (self->progress), value);
 }
 
 void
-liwdg_busy_set_text (liwdgBusy*  self,
+liwdg_busy_set_text (LIWdgBusy*  self,
                      const char* value)
 {
 	liwdg_progress_set_text (LIWDG_PROGRESS (self->progress), value);
 }
 
 void
-liwdg_busy_set_update (liwdgBusy*   self,
+liwdg_busy_set_update (LIWdgBusy*   self,
                        liwdgHandler handler,
                        void*        data)
 {
@@ -88,11 +88,11 @@ liwdg_busy_set_update (liwdgBusy*   self,
 /****************************************************************************/
 
 static int
-private_init (liwdgBusy*   self,
-              liwdgManager* manager)
+private_init (LIWdgBusy*   self,
+              LIWdgManager* manager)
 {
 	int i;
-	liwdgWidget* widgets[] =
+	LIWdgWidget* widgets[] =
 	{
 		liwdg_progress_new (manager),
 		liwdg_button_new (manager),
@@ -101,7 +101,7 @@ private_init (liwdgBusy*   self,
 	/* Check memory. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 2))
 		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			goto error;
@@ -125,7 +125,7 @@ private_init (liwdgBusy*   self,
 	return 1;
 
 error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			liwdg_widget_free (widgets[i]);
@@ -134,12 +134,12 @@ error:
 }
 
 static void
-private_free (liwdgBusy* self)
+private_free (LIWdgBusy* self)
 {
 }
 
 static void
-private_event (liwdgBusy*  self,
+private_event (LIWdgBusy*  self,
                liwdgEvent* event)
 {
 	/* Call update callback. */
@@ -150,7 +150,7 @@ private_event (liwdgBusy*  self,
 	}
 
 	/* Call base class. */
-	liwdgWindowType.event (LIWDG_WIDGET (self), event);
+	liwdg_widget_window.event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

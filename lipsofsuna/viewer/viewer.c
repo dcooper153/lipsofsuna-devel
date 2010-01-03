@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup livie Viewer
  * @{
- * \addtogroup livieViewer Viewer
+ * \addtogroup LIVieViewer Viewer
  * @{
  */
 
@@ -29,41 +29,41 @@
 #define ROTATION_SPEED 0.01f
 
 static int
-private_init (livieViewer* self);
+private_init (LIVieViewer* self);
 
 static int
-private_init_model (livieViewer* self,
+private_init_model (LIVieViewer* self,
                     const char*  model);
 
 static void
-private_clear_model (livieViewer* self);
+private_clear_model (LIVieViewer* self);
 
 static void
-private_reload_image (livieViewer* self,
+private_reload_image (LIVieViewer* self,
                       const char*  name);
 
 static void
-private_reload_model (livieViewer* self,
+private_reload_model (LIVieViewer* self,
                       const char*  name);
 
 static int
-private_resize (livieViewer* self,
+private_resize (LIVieViewer* self,
                 int          width,
                 int          height,
                 int          fsaa);
 
 /*****************************************************************************/
 
-livieViewer*
-livie_viewer_new (lividCalls* video,
-                  lipthPaths* paths,
+LIVieViewer*
+livie_viewer_new (LIVidCalls* video,
+                  LIPthPaths* paths,
                   const char* model)
 {
 	char buf[256];
-	livieViewer* self;
+	LIVieViewer* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livieViewer));
+	self = lisys_calloc (1, sizeof (LIVieViewer));
 	if (self == NULL)
 		return NULL;
 	self->video = *video;
@@ -97,27 +97,27 @@ livie_viewer_new (lividCalls* video,
 }
 
 void
-livie_viewer_free (livieViewer* self)
+livie_viewer_free (LIVieViewer* self)
 {
 	private_clear_model (self);
 	if (self->lights.key != NULL)
 	{
-		lirnd_lighting_remove_light (self->scene->lighting, self->lights.key);
-		lirnd_light_free (self->lights.key);
+		liren_lighting_remove_light (self->scene->lighting, self->lights.key);
+		liren_light_free (self->lights.key);
 	}
 	if (self->lights.fill != NULL)
 	{
-		lirnd_lighting_remove_light (self->scene->lighting, self->lights.fill);
-		lirnd_light_free (self->lights.fill);
+		liren_lighting_remove_light (self->scene->lighting, self->lights.fill);
+		liren_light_free (self->lights.fill);
 	}
 	if (self->reload != NULL)
 		lirel_reload_free (self->reload);
 	if (self->camera != NULL)
 		lialg_camera_free (self->camera);
 	if (self->scene != NULL)
-		lirnd_scene_free (self->scene);
+		liren_scene_free (self->scene);
 	if (self->render != NULL)
-		lirnd_render_free (self->render);
+		liren_render_free (self->render);
 	if (self->screen != NULL)
 		self->video.SDL_FreeSurface (self->screen);
 	self->video.SDL_Quit ();
@@ -126,17 +126,17 @@ livie_viewer_free (livieViewer* self)
 }
 
 int
-livie_viewer_main (livieViewer* self)
+livie_viewer_main (LIVieViewer* self)
 {
 	float secs;
 	struct timeval curr_tick;
 	struct timeval prev_tick;
 	SDL_Event event;
-	limatAabb aabb;
-	limatFrustum frustum;
-	limatMatrix modelview;
-	limatMatrix projection;
-	limatTransform transform;
+	LIMatAabb aabb;
+	LIMatFrustum frustum;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
+	LIMatTransform transform;
 
 	/* Main loop. */
 	gettimeofday (&prev_tick, NULL);
@@ -157,8 +157,8 @@ livie_viewer_main (livieViewer* self)
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_s)
 					{
-						lirnd_render_set_shaders_enabled (self->render,
-							!lirnd_render_get_shaders_enabled (self->render));
+						liren_render_set_shaders_enabled (self->render,
+							!liren_render_get_shaders_enabled (self->render));
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
@@ -186,8 +186,8 @@ livie_viewer_main (livieViewer* self)
 		lirel_reload_update (self->reload);
 
 		/* Update camera. */
-		lirnd_object_get_bounds (self->object, &aabb);
-		lirnd_object_get_transform (self->object, &transform);
+		liren_object_get_bounds (self->object, &aabb);
+		liren_object_get_transform (self->object, &transform);
 		transform.position = limat_vector_add (transform.position,
 			limat_vector_multiply (limat_vector_add (aabb.min, aabb.max), 0.5f));
 		lialg_camera_set_center (self->camera, &transform);
@@ -197,10 +197,10 @@ livie_viewer_main (livieViewer* self)
 		/* Update lights. */
 		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (9, 6, -1));
-		lirnd_light_set_transform (self->lights.key, &transform);
+		liren_light_set_transform (self->lights.key, &transform);
 		lialg_camera_get_transform (self->camera, &transform);
 		transform.position = limat_transform_transform (transform, limat_vector_init (-4, 2, 0));
-		lirnd_light_set_transform (self->lights.fill, &transform);
+		liren_light_set_transform (self->lights.fill, &transform);
 
 		/* Render scene. */
 		glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
@@ -208,7 +208,7 @@ livie_viewer_main (livieViewer* self)
 		lialg_camera_get_frustum (self->camera, &frustum);
 		lialg_camera_get_modelview (self->camera, &modelview);
 		lialg_camera_get_projection (self->camera, &projection);
-		lirnd_scene_render (self->scene, NULL, &modelview, &projection, &frustum);
+		liren_scene_render (self->scene, NULL, &modelview, &projection, &frustum);
 		self->video.SDL_GL_SwapBuffers ();
 		self->video.SDL_Delay (100);
 	}
@@ -219,7 +219,7 @@ livie_viewer_main (livieViewer* self)
 /*****************************************************************************/
 
 static int
-private_init (livieViewer* self)
+private_init (LIVieViewer* self)
 {
 	GLint viewport[4];
 	const float equation[3] = { 1.0f, 0.0f, 0.001f };
@@ -241,22 +241,22 @@ private_init (livieViewer* self)
 	lialg_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
 
 	/* Allocate scene. */
-	self->render = lirnd_render_new (self->paths->module_data);
+	self->render = liren_render_new (self->paths->module_data);
 	if (self->render == NULL)
 		return 0;
-	self->scene = lirnd_scene_new (self->render);
+	self->scene = liren_scene_new (self->render);
 	if (self->scene == NULL)
 		return 0;
 
 	/* Allocate lights. */
-	self->lights.key = lirnd_light_new (self->scene, diffuse0, equation, M_PI, 0.0f, 0);
+	self->lights.key = liren_light_new (self->scene, diffuse0, equation, M_PI, 0.0f, 0);
 	if (self->lights.key == NULL)
 		return 0;
-	lirnd_lighting_insert_light (self->scene->lighting, self->lights.key);
-	self->lights.fill = lirnd_light_new (self->scene, diffuse1, equation, M_PI, 0.0f, 0);
+	liren_lighting_insert_light (self->scene->lighting, self->lights.key);
+	self->lights.fill = liren_light_new (self->scene, diffuse1, equation, M_PI, 0.0f, 0);
 	if (self->lights.fill == NULL)
 		return 0;
-	lirnd_lighting_insert_light (self->scene->lighting, self->lights.fill);
+	liren_lighting_insert_light (self->scene->lighting, self->lights.fill);
 
 	/* Initialize reloading. */
 	self->reload = lirel_reload_new (self->paths);
@@ -271,11 +271,11 @@ private_init (livieViewer* self)
 }
 
 static int
-private_init_model (livieViewer* self,
+private_init_model (LIVieViewer* self,
                     const char*  model)
 {
 	char* path;
-	limdlModel* mdl;
+	LIMdlModel* mdl;
 
 	/* Format path. */
 	path = lisys_path_format (self->paths->module_data,
@@ -293,7 +293,7 @@ private_init_model (livieViewer* self,
 		lisys_error_report ();
 		return 1;
 	}
-	self->model = lirnd_model_new (self->render, mdl, model);
+	self->model = liren_model_new (self->render, mdl, model);
 	if (self->model == NULL)
 	{
 		limdl_model_free (mdl);
@@ -301,46 +301,46 @@ private_init_model (livieViewer* self,
 	}
 
 	/* Create object. */
-	self->object = lirnd_object_new (self->scene, 0);
+	self->object = liren_object_new (self->scene, 0);
 	if (self->object == NULL)
 	{
-		lirnd_model_free (self->model);
+		liren_model_free (self->model);
 		limdl_model_free (mdl);
 		return 0;
 	}
-	lirnd_object_set_model (self->object, self->model);
-	lirnd_object_set_realized (self->object, 1);
+	liren_object_set_model (self->object, self->model);
+	liren_object_set_realized (self->object, 1);
 
 	return 1;
 }
 
 static void
-private_clear_model (livieViewer* self)
+private_clear_model (LIVieViewer* self)
 {
 	if (self->object != NULL)
 	{
-		lirnd_object_free (self->object);
+		liren_object_free (self->object);
 		self->object = NULL;
 	}
 	if (self->model != NULL)
 	{
 		limdl_model_free (self->model->model);
-		lirnd_model_free (self->model);
+		liren_model_free (self->model);
 		self->model = NULL;
 	}
 }
 
 static void
-private_reload_image (livieViewer* self,
+private_reload_image (LIVieViewer* self,
                       const char*  name)
 {
 	printf ("Reloading texture `%s'\n", name);
-	if (lirnd_render_find_image (self->render, name))
-		lirnd_render_load_image (self->render, name);
+	if (liren_render_find_image (self->render, name))
+		liren_render_load_image (self->render, name);
 }
 
 static void
-private_reload_model (livieViewer* self,
+private_reload_model (LIVieViewer* self,
                       const char*  name)
 {
 	printf ("Reloading model `%s'\n", name);
@@ -352,7 +352,7 @@ private_reload_model (livieViewer* self,
 }
 
 static int
-private_resize (livieViewer* self,
+private_resize (LIVieViewer* self,
                 int          width,
                 int          height,
                 int          fsaa)

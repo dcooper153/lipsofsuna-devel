@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,7 +25,7 @@
 #ifndef __WIDGET_EVENT_H__
 #define __WIDGET_EVENT_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "widget-types.h"
 
 enum
@@ -46,20 +46,20 @@ enum
 };
 
 typedef union _liwdgEvent liwdgEvent;
-typedef struct _liwdgEventAllocation liwdgEventAllocation;
-typedef struct _liwdgEventButton liwdgEventButton;
-typedef struct _liwdgEventFocus liwdgEventFocus;
-typedef struct _liwdgEventKey liwdgEventKey;
-typedef struct _liwdgEventMotion liwdgEventMotion;
-typedef struct _liwdgEventProbe liwdgEventProbe;
-typedef struct _liwdgEventUpdate liwdgEventUpdate;
+typedef struct _LIWdgEventAllocation LIWdgEventAllocation;
+typedef struct _LIWdgEventButton LIWdgEventButton;
+typedef struct _LIWdgEventFocus LIWdgEventFocus;
+typedef struct _LIWdgEventKey LIWdgEventKey;
+typedef struct _LIWdgEventMotion LIWdgEventMotion;
+typedef struct _LIWdgEventProbe LIWdgEventProbe;
+typedef struct _LIWdgEventUpdate LIWdgEventUpdate;
 
-struct _liwdgEventAllocation
+struct _LIWdgEventAllocation
 {
 	int type;
 };
 
-struct _liwdgEventButton
+struct _LIWdgEventButton
 {
 	int type;
 	int x;
@@ -67,13 +67,13 @@ struct _liwdgEventButton
 	int button;
 };
 
-struct _liwdgEventFocus
+struct _LIWdgEventFocus
 {
 	int type;
 	int mouse;
 };
 
-struct _liwdgEventKey
+struct _LIWdgEventKey
 {
 	int type;
 	int keycode;
@@ -81,7 +81,7 @@ struct _liwdgEventKey
 	uint32_t modifiers;
 };
 
-struct _liwdgEventMotion
+struct _LIWdgEventMotion
 {
 	int type;
 	int x;
@@ -91,14 +91,14 @@ struct _liwdgEventMotion
 	int buttons;
 };
 
-struct _liwdgEventProbe
+struct _LIWdgEventProbe
 {
 	int type;
-	const liwdgClass* clss;
+	const LIWdgClass* clss;
 	void* result;
 };
 
-struct _liwdgEventUpdate
+struct _LIWdgEventUpdate
 {
 	int type;
 	float secs;
@@ -107,13 +107,13 @@ struct _liwdgEventUpdate
 union _liwdgEvent
 {
 	int type;
-	liwdgEventAllocation allocation;
-	liwdgEventButton button;
-	liwdgEventFocus focus;
-	liwdgEventKey key;
-	liwdgEventMotion motion;
-	liwdgEventProbe probe;
-	liwdgEventUpdate update;
+	LIWdgEventAllocation allocation;
+	LIWdgEventButton button;
+	LIWdgEventFocus focus;
+	LIWdgEventKey key;
+	LIWdgEventMotion motion;
+	LIWdgEventProbe probe;
+	LIWdgEventUpdate update;
 };
 
 #endif

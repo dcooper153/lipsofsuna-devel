@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,47 +18,47 @@
 /**
  * \addtogroup lifnt Font
  * @{
- * \addtogroup lifntLayout Layout
+ * \addtogroup LIFntLayout Layout
  * @{
  */
 
 #include <wctype.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/string.h>
 #include "font-layout.h"
 
 #define LIFNT_TEXT_DEFAULT_CAPACITY 32
 
 static void
-private_layout (lifntLayout* self);
+private_layout (LIFntLayout* self);
 
 static int
-private_get_line_height (lifntLayout* self,
+private_get_line_height (LIFntLayout* self,
                          int          start,
                          int          end);
 
 static int
-private_get_line_ascent (lifntLayout* self,
+private_get_line_ascent (LIFntLayout* self,
                          int          start,
                          int          end);
 
 static int
-private_get_line_width (lifntLayout* self,
+private_get_line_width (LIFntLayout* self,
                         int          start,
                         int*         end);
 
 static int
-private_get_white_length (lifntLayout* self,
+private_get_white_length (LIFntLayout* self,
                           int          start);
 
 /*****************************************************************************/
 
-lifntLayout*
+LIFntLayout*
 lifnt_layout_new ()
 {
-	lifntLayout* self;
+	LIFntLayout* self;
 
 	/* Allocate self. */
-	self = lisys_malloc (sizeof (lifntLayout));
+	self = lisys_malloc (sizeof (LIFntLayout));
 	if (self == NULL)
 		return NULL;
 	self->dirty = 0;
@@ -67,7 +67,7 @@ lifnt_layout_new ()
 	self->c_glyphs = LIFNT_TEXT_DEFAULT_CAPACITY;
 
 	/* Allocate glyphs. */
-	self->glyphs = lisys_malloc (self->c_glyphs * sizeof (lifntLayoutGlyph));
+	self->glyphs = lisys_malloc (self->c_glyphs * sizeof (LIFntLayoutGlyph));
 	if (self->glyphs == NULL)
 	{
 		lisys_free (self);
@@ -78,19 +78,19 @@ lifnt_layout_new ()
 }
 
 void
-lifnt_layout_free (lifntLayout* self)
+lifnt_layout_free (LIFntLayout* self)
 {
 	lisys_free (self->glyphs);
 	lisys_free (self);
 }
 
 void
-lifnt_layout_render (lifntLayout* self,
+lifnt_layout_render (LIFntLayout* self,
                      int          x,
                      int          y)
 {
 	int i;
-	lifntLayoutGlyph* glyph;
+	LIFntLayoutGlyph* glyph;
 
 	/* Layout glyphs. */
 	private_layout (self);
@@ -104,14 +104,14 @@ lifnt_layout_render (lifntLayout* self,
 }
 
 int
-lifnt_layout_append_string (lifntLayout* self,
-                            lifntFont*   font,
+lifnt_layout_append_string (LIFntLayout* self,
+                            LIFntFont*   font,
                             const char*  string)
 {
 	int i;
 	int length;
 	wchar_t* wstr;
-	lifntLayoutGlyph* glyph;
+	LIFntLayoutGlyph* glyph;
 
 	/* Convert to wide characters. */
 	wstr = listr_utf8_to_wchar (string);
@@ -122,7 +122,7 @@ lifnt_layout_append_string (lifntLayout* self,
 	/* Allocate glyphs. */
 	if (self->n_glyphs + length > self->c_glyphs)
 	{
-		glyph = realloc (self->glyphs, (self->n_glyphs + length) * sizeof (lifntLayoutGlyph));
+		glyph = realloc (self->glyphs, (self->n_glyphs + length) * sizeof (LIFntLayoutGlyph));
 		if (glyph == NULL)
 		{
 			lisys_free (wstr);
@@ -149,30 +149,30 @@ lifnt_layout_append_string (lifntLayout* self,
 }
 
 void
-lifnt_layout_clear (lifntLayout* self)
+lifnt_layout_clear (LIFntLayout* self)
 {
 	self->dirty = 1;
-	self->glyphs = realloc (self->glyphs, LIFNT_TEXT_DEFAULT_CAPACITY * sizeof (lifntLayoutGlyph));
+	self->glyphs = realloc (self->glyphs, LIFNT_TEXT_DEFAULT_CAPACITY * sizeof (LIFntLayoutGlyph));
 	self->n_glyphs = 0;
 	self->c_glyphs = LIFNT_TEXT_DEFAULT_CAPACITY;
 }
 
 int
-lifnt_layout_get_height (lifntLayout* self)
+lifnt_layout_get_height (LIFntLayout* self)
 {
 	private_layout (self);
 	return self->height;
 }
 
 int
-lifnt_layout_get_width (lifntLayout* self)
+lifnt_layout_get_width (LIFntLayout* self)
 {
 	private_layout (self);
 	return self->width;
 }
 
 int
-lifnt_layout_get_width_limit (const lifntLayout* self)
+lifnt_layout_get_width_limit (const LIFntLayout* self)
 {
 	return self->limit_width;
 }
@@ -186,7 +186,7 @@ lifnt_layout_get_width_limit (const lifntLayout* self)
  * \param width The new width.
  */
 void
-lifnt_layout_set_width_limit (lifntLayout* self,
+lifnt_layout_set_width_limit (LIFntLayout* self,
                               int          width)
 {
 	self->limit_width = width;
@@ -196,7 +196,7 @@ lifnt_layout_set_width_limit (lifntLayout* self,
 /*****************************************************************************/
 
 static void
-private_layout (lifntLayout* self)
+private_layout (LIFntLayout* self)
 {
 	int i;
 	int w;
@@ -205,7 +205,7 @@ private_layout (lifntLayout* self)
 	int y = 0;
 	int start = 0;
 	int end = 0;
-	lifntLayoutGlyph* glyph;
+	LIFntLayoutGlyph* glyph;
 
 	if (!self->dirty)
 		return;
@@ -238,11 +238,11 @@ private_layout (lifntLayout* self)
 }
 
 static int
-private_get_white_length (lifntLayout* self,
+private_get_white_length (LIFntLayout* self,
                           int          start)
 {
 	int i;
-	lifntLayoutGlyph* glyph;
+	LIFntLayoutGlyph* glyph;
 
 	for (i = 0 ; i < self->n_glyphs ; i++)
 	{
@@ -254,7 +254,7 @@ private_get_white_length (lifntLayout* self,
 }
 
 static int
-private_get_line_ascent (lifntLayout* self,
+private_get_line_ascent (LIFntLayout* self,
                          int          start,
                          int          end)
 {
@@ -273,7 +273,7 @@ private_get_line_ascent (lifntLayout* self,
 }
 
 static int
-private_get_line_height (lifntLayout* self,
+private_get_line_height (LIFntLayout* self,
                          int          start,
                          int          end)
 {
@@ -292,7 +292,7 @@ private_get_line_height (lifntLayout* self,
 }
 
 static int
-private_get_line_width (lifntLayout* self,
+private_get_line_width (LIFntLayout* self,
                         int          start,
                         int*         end)
 {
@@ -300,7 +300,7 @@ private_get_line_width (lifntLayout* self,
 	int w;
 	int x;
 	int found = 0;
-	lifntLayoutGlyph* glyph;
+	LIFntLayoutGlyph* glyph;
 
 	/* End of line? */
 	for (x = 0, i = start ; i < self->n_glyphs ; i++)

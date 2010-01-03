@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,13 @@
 /**
  * \addtogroup licfg Config 
  * @{
- * \addtogroup licfgHost Host 
+ * \addtogroup LICfgHost Host 
  * @{
  */
 
-#include <archive/lips-archive.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "config-host.h"
 
 /**
@@ -33,17 +33,17 @@
  * \param dir The data directory root.
  * \return A new host configuration or NULL.
  */
-licfgHost*
+LICfgHost*
 licfg_host_new (const char* dir)
 {
 	char* path;
 	char* key;
 	char* value;
-	liarcReader* reader;
-	licfgHost* self;
+	LIArcReader* reader;
+	LICfgHost* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licfgHost));
+	self = lisys_calloc (1, sizeof (LICfgHost));
 	if (self == NULL)
 		return NULL;
                                 
@@ -143,7 +143,7 @@ licfg_host_new (const char* dir)
  * \param self A host configuration parser.
  */
 void
-licfg_host_free (licfgHost* self)
+licfg_host_free (LICfgHost* self)
 {
 	lisys_free (self->host);
 	lisys_free (self);

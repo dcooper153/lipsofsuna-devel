@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysModule Module
+ * \addtogroup LISysModule Module
  * @{
  */
 
@@ -40,7 +40,7 @@
 #include "system-error.h"
 #include "system-module.h"
 
-struct _lisysModule
+struct _LISysModule
 {
 #ifdef HAVE_DLFCN_H
 	void* handle;
@@ -58,7 +58,7 @@ struct _lisysModule
  * \param flags Flags.
  * \return New module or NULL.
  */
-lisysModule*
+LISysModule*
 lisys_module_new (const char* path,
                   int         flags)
 {
@@ -66,10 +66,10 @@ lisys_module_new (const char* path,
 
 	int dlflags;
 	char* tmp;
-	lisysModule* self;
+	LISysModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisysModule));
+	self = calloc (1, sizeof (LISysModule));
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -113,10 +113,10 @@ lisys_module_new (const char* path,
 
 #elif defined HAVE_WINDOWS_H
 
-	lisysModule* self;
+	LISysModule* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (lisysModule));
+	self = calloc (1, sizeof (LISysModule));
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -147,7 +147,7 @@ lisys_module_new (const char* path,
  * \param self Module.
  */
 void
-lisys_module_free (lisysModule* self)
+lisys_module_free (LISysModule* self)
 {
 #ifdef HAVE_DLFCN_H
 	dlclose (self->handle);
@@ -169,7 +169,7 @@ lisys_module_free (lisysModule* self)
  * \return Symbol or NULL.
  */
 void*
-lisys_module_symbol (lisysModule* self,
+lisys_module_symbol (LISysModule* self,
                      const char*  name)
 {
 #ifdef HAVE_DLFCN_H

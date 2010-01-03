@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -21,7 +21,7 @@
 /**
  * \addtogroup liimg Image
  * @{
- * \addtogroup liimgDDS DDS
+ * \addtogroup LIImgDDS DDS
  * @{
  */
 
@@ -29,8 +29,8 @@
 #define __IMAGE_DDS_H__
 
 #include <stdio.h>
-#include <system/lips-system.h>
-#include <video/lips-video.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/video.h>
 #define DDS_HEADER_MAGIC 0x20534444
 #define DDS_FLAG_CAPS 0x00000001
 #define DDS_FLAG_HEIGHT 0x00000002
@@ -50,8 +50,8 @@
 #define DDS_CAPS_TEXTURE 0x00001000
 #define DDS_CAPS_MIPMAP 0x00400000
 
-typedef struct _liimgDDSFormat liimgDDSFormat;
-struct _liimgDDSFormat
+typedef struct _LIImgDDSFormat LIImgDDSFormat;
+struct _LIImgDDSFormat
 {
 	int compressed;
 	int bpp;
@@ -60,8 +60,8 @@ struct _liimgDDSFormat
 	GLenum type;
 };
 
-typedef struct _liimgDDSLevel liimgDDSLevel;
-struct _liimgDDSLevel
+typedef struct _LIImgDDSLevel LIImgDDSLevel;
+struct _LIImgDDSLevel
 {
 	int width;
 	int height;
@@ -69,8 +69,8 @@ struct _liimgDDSLevel
 	void* data;
 };
 
-typedef struct _liimgDDS liimgDDS;
-struct _liimgDDS
+typedef struct _LIImgDDS LIImgDDS;
+struct _LIImgDDS
 {
 	/* Loaded from file. */
 	struct
@@ -105,7 +105,7 @@ struct _liimgDDS
 	} caps;
 
 	/* Derived from loaded data. */
-	liimgDDSFormat info;
+	LIImgDDSFormat info;
 };
 
 /**
@@ -117,12 +117,12 @@ struct _liimgDDS
  * \param mipmaps Mipmap count.
  */
 static inline void
-liimg_dds_init_rgba (liimgDDS* self,
+liimg_dds_init_rgba (LIImgDDS* self,
                      int       width,
                      int       height,
                      int       mipmaps)
 {
-	memset (self, 0, sizeof (liimgDDS));
+	memset (self, 0, sizeof (LIImgDDS));
 	self->header.magic = DDS_HEADER_MAGIC;
 	self->header.size = 124;
 	self->header.flags = DDS_FLAG_CAPS | DDS_FLAG_HEIGHT | DDS_FLAG_WIDTH | DDS_FLAG_PIXELFORMAT | DDS_FLAG_PITCH;
@@ -155,13 +155,13 @@ liimg_dds_init_rgba (liimgDDS* self,
  * \param mipmaps Mipmap count.
  */
 static inline void
-liimg_dds_init_s3tc (liimgDDS* self,
+liimg_dds_init_s3tc (LIImgDDS* self,
                      int       width,
                      int       height,
                      int       size,
                      int       mipmaps)
 {
-	memset (self, 0, sizeof (liimgDDS));
+	memset (self, 0, sizeof (LIImgDDS));
 	self->header.magic = DDS_HEADER_MAGIC;
 	self->header.size = 124;
 	self->header.flags = DDS_FLAG_CAPS | DDS_FLAG_HEIGHT | DDS_FLAG_WIDTH | DDS_FLAG_PIXELFORMAT | DDS_FLAG_LINEARSIZE;
@@ -186,7 +186,7 @@ liimg_dds_init_s3tc (liimgDDS* self,
  * \param self DDS.
  */
 static inline void
-liimg_dds_byteswap (liimgDDS* self)
+liimg_dds_byteswap (LIImgDDS* self)
 {
 #if LI_BYTE_ORDER == LI_BIG_ENDIAN
 	#define BYTESWAP(i) ((((i)&&0xFF)<<24) | (((i)&&0xFF00)<<8) | (((i)&&0xFF0000)>>8) | (((i)&&0xFF000000)>>24))
@@ -220,7 +220,7 @@ liimg_dds_byteswap (liimgDDS* self)
  * \return Nonzero on success.
  */
 static inline int
-liimg_dds_read_header (liimgDDS* self,
+liimg_dds_read_header (LIImgDDS* self,
                        FILE*     file)
 {
 	int i;
@@ -233,7 +233,7 @@ liimg_dds_read_header (liimgDDS* self,
 		uint32_t gmask;
 		uint32_t bmask;
 		uint32_t amask;
-		liimgDDSFormat format;
+		LIImgDDSFormat format;
 	}
 	formats[] =
 	{
@@ -338,10 +338,10 @@ liimg_dds_read_header (liimgDDS* self,
  * \return Nonzero on success.
  */
 static inline int
-liimg_dds_read_level (liimgDDS*      self,
+liimg_dds_read_level (LIImgDDS*      self,
                       FILE*          file,
                       int            level,
-                      liimgDDSLevel* result)
+                      LIImgDDSLevel* result)
 {
 	int mult;
 
@@ -385,7 +385,7 @@ liimg_dds_read_level (liimgDDS*      self,
  * \return Nonzero on success.
  */
 static inline int
-liimg_dds_write_header (liimgDDS* self,
+liimg_dds_write_header (LIImgDDS* self,
                         FILE*     file)
 {
 	liimg_dds_byteswap (self);
@@ -426,7 +426,7 @@ liimg_dds_write_header (liimgDDS* self,
  * \return Nonzero on success.
  */
 static inline int
-liimg_dds_write_level (liimgDDS* self,
+liimg_dds_write_level (LIImgDDS* self,
                        FILE*     file,
                        int       level,
                        void*     data,
@@ -449,15 +449,15 @@ liimg_dds_write_level (liimgDDS* self,
  */
 static inline GLuint
 liimg_dds_load_texture (FILE*     file,
-                        liimgDDS* info)
+                        LIImgDDS* info)
 {
 	int i;
 	int type;
 	void* tmp;
 	GLuint texture;
-	liimgDDS dds;
-	liimgDDSFormat fmt;
-	liimgDDSLevel lvl;
+	LIImgDDS dds;
+	LIImgDDSFormat fmt;
+	LIImgDDSLevel lvl;
 
 	/* Read header. */
 	if (!liimg_dds_read_header (&dds, file))

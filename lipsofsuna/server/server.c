@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,17 +16,17 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvServer Server
+ * \addtogroup LISerServer Server
  * @{
  */
 
-#include <config/lips-config.h>
-#include <network/lips-network.h>
-#include <script/lips-script.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/config.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "server.h"
 #include "server-callbacks.h"
 #include "server-client.h"
@@ -36,25 +36,25 @@
 #define LI_SERVER_SLEEP
 
 static int
-private_init_bans (lisrvServer* self);
+private_init_bans (LISerServer* self);
 
 static int
-private_init_engine (lisrvServer* self);
+private_init_engine (LISerServer* self);
 
 static int
-private_init_extensions (lisrvServer* self);
+private_init_extensions (LISerServer* self);
 
 static int
-private_init_host (lisrvServer* self);
+private_init_host (LISerServer* self);
 
 static int
-private_init_script (lisrvServer* self);
+private_init_script (LISerServer* self);
 
 static int
-private_init_sql (lisrvServer* self);
+private_init_sql (LISerServer* self);
 
 static int
-private_init_time (lisrvServer* self);
+private_init_time (LISerServer* self);
 
 /****************************************************************************/
 
@@ -64,13 +64,13 @@ private_init_time (lisrvServer* self);
  * \param paths Path information.
  * \return New server or NULL.
  */
-lisrvServer*
-lisrv_server_new (lipthPaths* paths)
+LISerServer*
+liser_server_new (LIPthPaths* paths)
 {
-	lisrvServer* self;
+	LISerServer* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lisrvServer));
+	self = lisys_calloc (1, sizeof (LISerServer));
 	if (self == NULL)
 		return NULL;
 	self->paths = paths;
@@ -87,7 +87,7 @@ lisrv_server_new (lipthPaths* paths)
 	    !private_init_time (self) ||
 	    !private_init_script (self))
 	{
-		lisrv_server_free (self);
+		liser_server_free (self);
 		return NULL;
 	}
 
@@ -100,10 +100,10 @@ lisrv_server_new (lipthPaths* paths)
  * \param self Server.
  */
 void
-lisrv_server_free (lisrvServer* self)
+liser_server_free (LISerServer* self)
 {
-	lialgStrdicIter iter;
-	lisrvExtension* extension;
+	LIAlgStrdicIter iter;
+	LISerExtension* extension;
 
 	/* Free script. */
 	if (self->script != NULL)
@@ -124,7 +124,7 @@ lisrv_server_free (lisrvServer* self)
 
 	/* Free networking. */
 	if (self->network != NULL)
-		lisrv_network_free (self->network);
+		liser_network_free (self->network);
 
 	/* Free engine. */
 	if (self->engine != NULL)
@@ -161,8 +161,8 @@ lisrv_server_free (lisrvServer* self)
  * \param name Extension name.
  * \return Extension or NULL.
  */
-lisrvExtension*
-lisrv_server_find_extension (lisrvServer* self,
+LISerExtension*
+liser_server_find_extension (LISerServer* self,
                              const char*  name)
 {
 	return lialg_strdic_find (self->extensions, name);
@@ -176,7 +176,7 @@ lisrv_server_find_extension (lisrvServer* self,
  * \return Nonzero on success.
  */
 int
-lisrv_server_insert_ban (lisrvServer* self,
+liser_server_insert_ban (LISerServer* self,
                          const char*  ip)
 {
 	int ret;
@@ -195,13 +195,13 @@ lisrv_server_insert_ban (lisrvServer* self,
  * \return Nonzero on success.
  */
 int
-lisrv_server_load_extension (lisrvServer* self,
+liser_server_load_extension (LISerServer* self,
                              const char*  name)
 {
 	char* path;
-	lisysModule* module;
-	lisrvExtension* extension;
-	lisrvExtensionInfo* info;
+	LISysModule* module;
+	LISerExtension* extension;
+	LISerExtensionInfo* info;
 
 	/* Check if already loaded. */
 	module = lialg_strdic_find (self->extensions, name);
@@ -229,7 +229,7 @@ lisrv_server_load_extension (lisrvServer* self,
 		lisys_module_free (module);
 		goto error;
 	}
-	if (info->version != LISRV_EXTENSION_VERSION)
+	if (info->version != LISER_EXTENSION_VERSION)
 	{
 		lisys_error_set (EINVAL, "invalid module version");
 		lisys_module_free (module);
@@ -243,7 +243,7 @@ lisrv_server_load_extension (lisrvServer* self,
 	}
 
 	/* Insert to extension list. */
-	extension = lisys_calloc (1, sizeof (lisrvExtension));
+	extension = lisys_calloc (1, sizeof (LISerExtension));
 	if (extension == NULL)
 		goto error;
 	extension->info = info;
@@ -261,7 +261,7 @@ lisrv_server_load_extension (lisrvServer* self,
 	}
 
 	/* Call module initializer. */
-	extension->object = ((void* (*)(lisrvServer*)) info->init)(self);
+	extension->object = ((void* (*)(LISerServer*)) info->init)(self);
 	if (extension->object == NULL)
 	{
 		lialg_strdic_remove (self->extensions, name);
@@ -284,7 +284,7 @@ error:
  * \return Nonzero on success.
  */
 int
-lisrv_server_main (lisrvServer* self)
+liser_server_main (LISerServer* self)
 {
 	float secs;
 	struct timeval curr_tick;
@@ -298,7 +298,7 @@ lisrv_server_main (lisrvServer* self)
 		secs = curr_tick.tv_sec - prev_tick.tv_sec +
 			  (curr_tick.tv_usec - prev_tick.tv_usec) * 0.000001;
 		prev_tick = curr_tick;
-		if (!lisrv_server_update (self, secs))
+		if (!liser_server_update (self, secs))
 			break;
 #ifdef LI_SERVER_SLEEP
 		lisys_usleep (5000);
@@ -316,7 +316,7 @@ lisrv_server_main (lisrvServer* self)
  * \return Nonzero on success.
  */
 int
-lisrv_server_remove_ban (lisrvServer* self,
+liser_server_remove_ban (LISerServer* self,
                          const char*  ip)
 {
 	int ret;
@@ -334,11 +334,11 @@ lisrv_server_remove_ban (lisrvServer* self,
  * \return Nonzero on success.
  */
 int
-lisrv_server_save (lisrvServer* self)
+liser_server_save (LISerServer* self)
 {
 	int ret;
-	lialgU32dicIter iter;
-	liengObject* object;
+	LIAlgU32dicIter iter;
+	LIEngObject* object;
 
 	ret = 1;
 	LI_FOREACH_U32DIC (iter, self->engine->objects)
@@ -346,7 +346,7 @@ lisrv_server_save (lisrvServer* self)
 		object = iter.value;
 		if (object->flags & LIENG_OBJECT_FLAG_SAVE)
 		{
-			if (!lisrv_object_serialize (object, 1))
+			if (!liser_object_serialize (object, 1))
 				ret = 0;
 		}
 	}
@@ -361,7 +361,7 @@ lisrv_server_save (lisrvServer* self)
  * \param self Server.
  */
 void
-lisrv_server_shutdown (lisrvServer* self)
+liser_server_shutdown (LISerServer* self)
 {
 	self->quit = 1;
 }
@@ -374,7 +374,7 @@ lisrv_server_shutdown (lisrvServer* self)
  * \return Nonzero if the server is still running.
  */
 int
-lisrv_server_update (lisrvServer* self,
+liser_server_update (LISerServer* self,
                      float        secs)
 {
 	if (self->quit)
@@ -382,7 +382,7 @@ lisrv_server_update (lisrvServer* self,
 
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
-	lisrv_network_update (self->network, secs);
+	liser_network_update (self->network, secs);
 	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
 
 	return !self->quit;
@@ -396,7 +396,7 @@ lisrv_server_update (lisrvServer* self,
  * \return Nonzero if the socket is banned.
  */
 int
-lisrv_server_get_banned (lisrvServer* self,
+liser_server_get_banned (LISerServer* self,
                          const char*  address)
 {
 	return licfg_bans_get_banned (self->config.bans, address);
@@ -409,7 +409,7 @@ lisrv_server_get_banned (lisrvServer* self,
  * \return Time in seconds.
  */
 double
-lisrv_server_get_time (const lisrvServer* self)
+liser_server_get_time (const LISerServer* self)
 {
 	struct timeval t;
 
@@ -432,7 +432,7 @@ lisrv_server_get_time (const lisrvServer* self)
  * \return Unique object ID or zero on error.
  */
 uint32_t
-lisrv_server_get_unique_object (const lisrvServer* self)
+liser_server_get_unique_object (const LISerServer* self)
 {
 	int ret;
 	uint32_t id;
@@ -486,7 +486,7 @@ lisrv_server_get_unique_object (const lisrvServer* self)
 /****************************************************************************/
 
 static int
-private_init_bans (lisrvServer* self)
+private_init_bans (LISerServer* self)
 {
 	self->config.bans = licfg_bans_new_from_file (self->paths->module_state);
 	if (self->config.bans == NULL)
@@ -503,12 +503,12 @@ private_init_bans (lisrvServer* self)
 }
 
 static int
-private_init_engine (lisrvServer* self)
+private_init_engine (LISerServer* self)
 {
 	int i;
-	liengAnimation* anim;
-	liengModel* model;
-	liengSample* sample;
+	LIEngAnimation* anim;
+	LIEngModel* model;
+	LIEngSample* sample;
 
 	/* Initialize callbacks. */
 	self->callbacks = lical_callbacks_new ();
@@ -529,7 +529,7 @@ private_init_engine (lisrvServer* self)
 	lieng_engine_set_userdata (self->engine, self);
 
 	/* Connect callbacks. */
-	if (!lisrv_server_init_callbacks_client (self))
+	if (!liser_server_init_callbacks_client (self))
 		return 0;
 
 	/* Load resources. */
@@ -570,7 +570,7 @@ private_init_engine (lisrvServer* self)
 }
 
 static int
-private_init_extensions (lisrvServer* self)
+private_init_extensions (LISerServer* self)
 {
 	self->extensions = lialg_strdic_new ();
 	if (self->extensions == NULL)
@@ -579,7 +579,7 @@ private_init_extensions (lisrvServer* self)
 }
 
 static int
-private_init_host (lisrvServer* self)
+private_init_host (LISerServer* self)
 {
 	/* Read host configuration. */
 	self->config.host = licfg_host_new (self->paths->module_data);
@@ -587,7 +587,7 @@ private_init_host (lisrvServer* self)
 		return 0;
 
 	/* Initialize networking. */
-	self->network = lisrv_network_new (self, self->config.host->udp, self->config.host->port);
+	self->network = liser_network_new (self, self->config.host->udp, self->config.host->port);
 	if (self->network == NULL)
 		return 0;
 
@@ -601,7 +601,7 @@ private_init_host (lisrvServer* self)
  * \return Nonzero on success.
  */
 static int
-private_init_script (lisrvServer* self)
+private_init_script (LISerServer* self)
 {
 	int ret;
 	char* path;
@@ -613,15 +613,15 @@ private_init_script (lisrvServer* self)
 	liscr_script_set_userdata (self->script, self);
 
 	/* Register classes. */
-	if (!liscr_script_create_class (self->script, "Class", licomClassScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Effect", lisrvEffectScript, self) ||
-	    !liscr_script_create_class (self->script, "Extension", lisrvExtensionScript, self) ||
-	    !liscr_script_create_class (self->script, "Object", lisrvObjectScript, self) ||
-	    !liscr_script_create_class (self->script, "Packet", licomPacketScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Path", licomPathScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Server", lisrvServerScript, self) ||
-	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script))
+	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
+	    !liscr_script_create_class (self->script, "Effect", liser_script_effect, self) ||
+	    !liscr_script_create_class (self->script, "Extension", liser_script_extension, self) ||
+	    !liscr_script_create_class (self->script, "Object", liser_script_objet, self) ||
+	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
+	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
+	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
+	    !liscr_script_create_class (self->script, "Server", liser_script_server, self) ||
+	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
 		return 0;
 
 	/* Load the script. */
@@ -637,7 +637,7 @@ private_init_script (lisrvServer* self)
 }
 
 static int
-private_init_sql (lisrvServer* self)
+private_init_sql (LISerServer* self)
 {
 	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
 	char* path;
@@ -712,7 +712,7 @@ private_init_sql (lisrvServer* self)
 }
 
 static int
-private_init_time (lisrvServer* self)
+private_init_time (LISerServer* self)
 {
 	gettimeofday (&self->time.start, NULL);
 	return 1;

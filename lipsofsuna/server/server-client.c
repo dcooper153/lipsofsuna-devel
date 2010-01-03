@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,102 +16,102 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvClient Client
+ * \addtogroup LISerClient Client
  * @{
  */
 
-#include <network/lips-network.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/system.h>
 #include "server.h"
 #include "server-callbacks.h"
 #include "server-client.h"
 #include "server-script.h"
 
-#define LISRV_CLIENT_DEFAULT_RADIUS 24
-#define LISRV_CLIENT_LOAD_RADIUS 24
+#define LISER_CLIENT_DEFAULT_RADIUS 24
+#define LISER_CLIENT_LOAD_RADIUS 24
 
 static void
-private_callbacks_setup (lisrvClient* self,
-                         liengEngine* engine);
+private_callbacks_setup (LISerClient* self,
+                         LIEngEngine* engine);
 
 static void
-private_callbacks_clear (lisrvClient* self,
-                         liengEngine* engine);
+private_callbacks_clear (LISerClient* self,
+                         LIEngEngine* engine);
 
 static int
-private_object_animation (lisrvClient*   self,
-                          liengObject*   object,
-                          lisrvAniminfo* info);
+private_object_animation (LISerClient*   self,
+                          LIEngObject*   object,
+                          LISerAniminfo* info);
 
 static int
-private_object_model (lisrvClient* self,
-                      liengObject* object,
-                      liengModel*  model);
+private_object_model (LISerClient* self,
+                      LIEngObject* object,
+                      LIEngModel*  model);
 
 static int
-private_object_motion (lisrvClient* self,
-                       liengObject* object);
+private_object_motion (LISerClient* self,
+                       LIEngObject* object);
 
 static int
-private_object_sample (lisrvClient* self,
-                       liengObject* object,
-                       liengSample* sample,
+private_object_sample (LISerClient* self,
+                       LIEngObject* object,
+                       LIEngSample* sample,
                        int          flags);
 
 static int
-private_object_visibility (lisrvClient* self,
-                           liengObject* object,
+private_object_visibility (LISerClient* self,
+                           LIEngObject* object,
                            int          visible);
 
 static void
-private_vision_clear (lisrvClient*  self);
+private_vision_clear (LISerClient*  self);
 
 static int
-private_vision_contains (lisrvClient* self,
-                         liengObject* object);
+private_vision_contains (LISerClient* self,
+                         LIEngObject* object);
 
 static void
-private_vision_insert (lisrvClient* self,
-                       liengObject* object);
+private_vision_insert (LISerClient* self,
+                       LIEngObject* object);
 
 static void
-private_vision_remove (lisrvClient* self,
-                       liengObject* object);
+private_vision_remove (LISerClient* self,
+                       LIEngObject* object);
 
 static void
-private_vision_motion (lisrvClient* self,
-                       liengObject* object);
+private_vision_motion (LISerClient* self,
+                       LIEngObject* object);
 
 static void
-private_vision_update (lisrvClient* self);
+private_vision_update (LISerClient* self);
 
 /*****************************************************************************/
 
 /**
  * \brief Allocates a new client block.
  *
- * Only called by #lisrv_network_update.
+ * Only called by #liser_network_update.
  *
  * \param server Server.
  * \param object Object associated to the client.
  * \param user Network user.
  * \return New client or NULL.
  */
-lisrvClient*
-lisrv_client_new (lisrvServer* server,
-                  liengObject* object,
+LISerClient*
+liser_client_new (LISerServer* server,
+                  LIEngObject* object,
                   grapple_user user)
 {
-	lisrvClient* self;
+	LISerClient* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lisrvClient));
+	self = lisys_calloc (1, sizeof (LISerClient));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
-	self->radius = LISRV_CLIENT_DEFAULT_RADIUS;
+	self->radius = LISER_CLIENT_DEFAULT_RADIUS;
 	self->network.user = user;
 
 	/* Allocate vision. */
@@ -120,7 +120,7 @@ lisrv_client_new (lisrvServer* server,
 		goto error;
 
 	/* Assign object. */
-	if (!lisrv_client_set_object (self, object))
+	if (!liser_client_set_object (self, object))
 		goto error;
 
 	return self;
@@ -135,12 +135,12 @@ error:
 /**
  * \brief Frees the client.
  *
- * Only called by #lisrv_object_disconnect.
+ * Only called by #liser_object_disconnect.
  *
  * \param self Client.
  */
 void
-lisrv_client_free (lisrvClient* self)
+liser_client_free (LISerClient* self)
 {
 	/* Remove from the client list. */
 	if (self->network.user != 0)
@@ -164,15 +164,15 @@ lisrv_client_free (lisrvClient* self)
 /**
  * \brief Sets the object controlled by the client.
  *
- * Only called by #lisrv_object_set_client.
+ * Only called by #liser_object_set_client.
  *
  * \param self Client.
  * \param value Object.
  * \return Nonzero on success.
  */
 int
-lisrv_client_set_object (lisrvClient* self,
-                         liengObject* value)
+liser_client_set_object (LISerClient* self,
+                         LIEngObject* value)
 {
 	assert (value != NULL);
 
@@ -198,8 +198,8 @@ lisrv_client_set_object (lisrvClient* self,
  * \param flags Grapple send flags.
  */
 void
-lisrv_client_send (lisrvClient* self,
-                   liarcWriter* writer,
+liser_client_send (LISerClient* self,
+                   LIArcWriter* writer,
                    int          flags)
 {
 	grapple_server_send (self->server->network->socket, self->network.user, flags,
@@ -208,8 +208,8 @@ lisrv_client_send (lisrvClient* self,
 }
 
 int
-lisrv_client_get_near (const lisrvClient* self,
-                       const liengObject* object)
+liser_client_get_near (const LISerClient* self,
+                       const LIEngObject* object)
 {
 	return lialg_u32dic_find (self->vision, object->id) != NULL;
 }
@@ -217,8 +217,8 @@ lisrv_client_get_near (const lisrvClient* self,
 /*****************************************************************************/
 
 static void
-private_callbacks_setup (lisrvClient* self,
-                         liengEngine* engine)
+private_callbacks_setup (LISerClient* self,
+                         LIEngEngine* engine)
 {
 	lical_callbacks_insert (engine->callbacks, engine, "object-animation", 0, private_object_animation, self, self->calls + 0);
 	lical_callbacks_insert (engine->callbacks, engine, "object-effect", 0, private_object_sample, self, self->calls + 1);
@@ -228,20 +228,20 @@ private_callbacks_setup (lisrvClient* self,
 }
 
 static void
-private_callbacks_clear (lisrvClient* self,
-                         liengEngine* engine)
+private_callbacks_clear (LISerClient* self,
+                         LIEngEngine* engine)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 }
 
 /*****************************************************************************/
 
 static int
-private_object_animation (lisrvClient*   self,
-                          liengObject*   object,
-                          lisrvAniminfo* info)
+private_object_animation (LISerClient*   self,
+                          LIEngObject*   object,
+                          LISerAniminfo* info)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	/* Send to client if seen. */
 	if (!private_vision_contains (self, object))
@@ -257,18 +257,18 @@ private_object_animation (lisrvClient*   self,
 	liarc_writer_append_uint8 (writer, info->channel);
 	liarc_writer_append_uint8 (writer, info->permanent);
 	liarc_writer_append_float (writer, info->priority);
-	lisrv_client_send (self, writer, 0);
+	liser_client_send (self, writer, 0);
 	liarc_writer_free (writer);
 
 	return 1;
 }
 
 static int
-private_object_model (lisrvClient* self,
-                      liengObject* object,
-                      liengModel*  model)
+private_object_model (LISerClient* self,
+                      LIEngObject* object,
+                      LIEngModel*  model)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	/* Send to client if seen. */
 	if (!private_vision_contains (self, object))
@@ -278,18 +278,18 @@ private_object_model (lisrvClient* self,
 		return 1;
 	liarc_writer_append_uint32 (writer, object->id);
 	liarc_writer_append_uint16 (writer, lieng_object_get_model_code (object));
-	lisrv_client_send (self, writer, GRAPPLE_RELIABLE);
+	liser_client_send (self, writer, GRAPPLE_RELIABLE);
 	liarc_writer_free (writer);
 
 	return 1;
 }
 
 static int
-private_object_motion (lisrvClient* self,
-                       liengObject* object)
+private_object_motion (LISerClient* self,
+                       LIEngObject* object)
 {
 	float dist;
-	limatTransform transform;
+	LIMatTransform transform;
 
 	/* Load sectors when moving. */
 	if (object == self->object)
@@ -330,12 +330,12 @@ private_object_motion (lisrvClient* self,
 }
 
 static int
-private_object_sample (lisrvClient* self,
-                       liengObject* object,
-                       liengSample* sample,
+private_object_sample (LISerClient* self,
+                       LIEngObject* object,
+                       LIEngSample* sample,
                        int          flags)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	/* Send to client if seen. */
 	if (!private_vision_contains (self, object))
@@ -346,15 +346,15 @@ private_object_sample (lisrvClient* self,
 	liarc_writer_append_uint32 (writer, object->id);
 	liarc_writer_append_uint16 (writer, sample->id);
 	liarc_writer_append_uint16 (writer, flags);
-	lisrv_client_send (self, writer, 0);
+	liser_client_send (self, writer, 0);
 	liarc_writer_free (writer);
 
 	return 1;
 }
 
 static int
-private_object_visibility (lisrvClient* self,
-                           liengObject* object,
+private_object_visibility (LISerClient* self,
+                           LIEngObject* object,
                            int          visible)
 {
 	float dist;
@@ -381,24 +381,24 @@ private_object_visibility (lisrvClient* self,
 /*****************************************************************************/
 
 static void
-private_vision_clear (lisrvClient* self)
+private_vision_clear (LISerClient* self)
 {
 	// FIXME: Send packet.
 	lialg_u32dic_clear (self->vision);
 }
 
 static int
-private_vision_contains (lisrvClient* self,
-                         liengObject* object)
+private_vision_contains (LISerClient* self,
+                         LIEngObject* object)
 {
 	return lialg_u32dic_find (self->vision, object->id) != NULL;
 }
 
 static void
-private_vision_insert (lisrvClient* self,
-                       liengObject* object)
+private_vision_insert (LISerClient* self,
+                       LIEngObject* object)
 {
-	liarcWriter* writer;
+	LIArcWriter* writer;
 
 	if (object->sector == NULL)
 		return;
@@ -416,7 +416,7 @@ private_vision_insert (lisrvClient* self,
 		{
 			liarc_writer_append_uint32 (writer, object->id);
 			liarc_writer_append_uint32 (writer, 0); /* FIXME: Flags not supported anymore. */
-			lisrv_client_send (self, writer, GRAPPLE_RELIABLE);
+			liser_client_send (self, writer, GRAPPLE_RELIABLE);
 			liarc_writer_free (writer);
 		}
 	}
@@ -426,8 +426,8 @@ private_vision_insert (lisrvClient* self,
 }
 
 static void
-private_vision_remove (lisrvClient* self,
-                       liengObject* object)
+private_vision_remove (LISerClient* self,
+                       LIEngObject* object)
 {
 	/* Remove from vision. */
 	lialg_u32dic_remove (self->vision, object->id);
@@ -437,12 +437,12 @@ private_vision_remove (lisrvClient* self,
 }
 
 static void
-private_vision_motion (lisrvClient* self,
-                       liengObject* object)
+private_vision_motion (LISerClient* self,
+                       LIEngObject* object)
 {
-	liarcWriter* writer;
-	limatTransform transform;
-	limatVector velocity;
+	LIArcWriter* writer;
+	LIMatTransform transform;
+	LIMatVector velocity;
 
 	writer = liarc_writer_new_packet (LINET_SERVER_PACKET_OBJECT_SIMULATE);
 	if (writer == NULL)
@@ -461,17 +461,17 @@ private_vision_motion (lisrvClient* self,
 	liarc_writer_append_float (writer, transform.position.x);
 	liarc_writer_append_float (writer, transform.position.y);
 	liarc_writer_append_float (writer, transform.position.z);
-	lisrv_client_send (self, writer, 0);
+	liser_client_send (self, writer, 0);
 	liarc_writer_free (writer);
 }
 
 static void
-private_vision_update (lisrvClient* self)
+private_vision_update (LISerClient* self)
 {
 	float dist;
-	lialgU32dicIter obj_iter;
-	liengObjectIter eng_iter;
-	limatTransform transform;
+	LIAlgU32dicIter obj_iter;
+	LIEngObjectIter eng_iter;
+	LIMatTransform transform;
 
 	if (self->object->sector == NULL)
 		return;

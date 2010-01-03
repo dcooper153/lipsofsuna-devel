@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrScript Script
+ * \addtogroup LIScrScript Script
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "script.h"
 #include "script-class.h"
 #include "script-data.h"
@@ -33,13 +33,13 @@
  *
  * \return New script or NULL.
  */
-liscrScript*
+LIScrScript*
 liscr_script_new ()
 {
-	liscrScript* self;
+	LIScrScript* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liscrScript));
+	self = lisys_calloc (1, sizeof (LIScrScript));
 	if (self == NULL)
 		return NULL;
 
@@ -101,9 +101,9 @@ liscr_script_new ()
  * \param self Script.
  */
 void
-liscr_script_free (liscrScript* self)
+liscr_script_free (LIScrScript* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	/* Free all objects. */
 	lua_close (self->lua);
@@ -126,13 +126,13 @@ liscr_script_free (liscrScript* self)
  * \param data Data passed to the function.
  * \return Class owned by the script or NULL.
  */
-liscrClass*
-liscr_script_create_class (liscrScript*   self,
+LIScrClass*
+liscr_script_create_class (LIScrScript*   self,
                            const char*    name,
-                           liscrClassInit init,
+                           LIScrClassInit init,
                            void*          data)
 {
-	liscrClass* clss;
+	LIScrClass* clss;
 
 	/* Create class. */
 	clss = liscr_class_new (self, name);
@@ -159,8 +159,8 @@ liscr_script_create_class (liscrScript*   self,
  * \param name Class identifier.
  * \return Class or NULL.
  */
-liscrClass*
-liscr_script_find_class (liscrScript* self,
+LIScrClass*
+liscr_script_find_class (LIScrScript* self,
                          const char*  name)
 {
 	return lialg_strdic_find (self->classes, name);
@@ -174,7 +174,7 @@ liscr_script_find_class (liscrScript* self,
  * \return Nonzero on success.
  */
 int
-liscr_script_load (liscrScript* self,
+liscr_script_load (LIScrScript* self,
                    const char*  path)
 {
 	int ret;
@@ -220,8 +220,8 @@ liscr_script_load (liscrScript* self,
  * \return Nonzero on success.
  */
 int
-liscr_script_insert_class (liscrScript* self,
-                           liscrClass*  clss)
+liscr_script_insert_class (LIScrScript* self,
+                           LIScrClass*  clss)
 {
 	if (!lialg_strdic_insert (self->classes, clss->meta, clss))
 		return 0;
@@ -236,19 +236,19 @@ liscr_script_insert_class (liscrScript* self,
  * \param secs Duration of the tick in seconds.
  */
 void
-liscr_script_update (liscrScript* self,
+liscr_script_update (LIScrScript* self,
                      float        secs)
 {
 }
 
 void*
-liscr_script_get_userdata (liscrScript* self)
+liscr_script_get_userdata (LIScrScript* self)
 {
 	return self->userpointer;
 }
 
 void
-liscr_script_set_userdata (liscrScript* self,
+liscr_script_set_userdata (LIScrScript* self,
                            void*        data)
 {
 	self->userpointer = data;

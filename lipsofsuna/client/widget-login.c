@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,7 +15,7 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "client-window.h"
 #include "widget-login.h"
 
@@ -23,44 +23,44 @@ static const void*
 private_base ();
 
 static int
-private_init (liwdgLogin*   self,
-              liwdgManager* manager);
+private_init (LIWdgLogin*   self,
+              LIWdgManager* manager);
 static void
-private_free (liwdgLogin* self);
+private_free (LIWdgLogin* self);
 
 static int
-private_event (liwdgLogin* self,
+private_event (LIWdgLogin* self,
                liwdgEvent* event);
 
 static void
-private_import (liwdgLogin* self);
+private_import (LIWdgLogin* self);
 
 static void
-private_login (liwdgLogin* self);
+private_login (LIWdgLogin* self);
 
 static int
 private_filter_servers (const char* dir,
                         const char* name,
                         void*       data);
 
-const liwdgClass liwdgLoginType =
+const LIWdgClass licli_widget_login =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "Login", sizeof (liwdgLogin),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_DYNAMIC, private_base, "Login", sizeof (LIWdgLogin),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_login_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_login_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgLoginType);
+	return liwdg_widget_new (manager, &licli_widget_login);
 }
 
 int
-liwdg_login_read_server_list (liwdgLogin* self)
+liwdg_login_read_server_list (LIWdgLogin* self)
 {
 #warning Login widget is broken.
 #if 0
@@ -73,8 +73,8 @@ liwdg_login_read_server_list (liwdgLogin* self)
 	const char* name1;
 	char* path;
 	char** servers = NULL;
-	lisysDir* servers0 = NULL;
-	lisysDir* servers1 = NULL;
+	LISysDir* servers0 = NULL;
+	LISysDir* servers1 = NULL;
 
 	/* Read the system server list. */
 	path = lisys_path_concat (paths.global_data, "server", NULL);
@@ -185,17 +185,17 @@ error:
 static const void*
 private_base ()
 {
-	return &liwdgGroupType;
+	return &liwdg_widget_group;
 }
 
 static int
-private_init (liwdgLogin*   self,
-              liwdgManager* manager)
+private_init (LIWdgLogin*   self,
+              LIWdgManager* manager)
 {
 	int i;
 	int w;
 	int h;
-	liwdgWidget* widgets[] =
+	LIWdgWidget* widgets[] =
 	{
 		liwdg_group_new_with_size (manager, 2, 3),
 		liwdg_group_new_with_size (manager, 2, 1),
@@ -212,7 +212,7 @@ private_init (liwdgLogin*   self,
 	/* Check memory. */
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), 1, 3))
 		goto error;
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			goto error;
@@ -269,7 +269,7 @@ private_init (liwdgLogin*   self,
 	return 1;
 
 error:
-	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (liwdgWidget*)) ; i++)
+	for (i = 0 ; i < (int)(sizeof (widgets) / sizeof (LIWdgWidget*)) ; i++)
 	{
 		if (widgets[i] == NULL)
 			liwdg_widget_free (widgets[i]);
@@ -278,7 +278,7 @@ error:
 }
 
 static void
-private_free (liwdgLogin* self)
+private_free (LIWdgLogin* self)
 {
 	int i;
 
@@ -292,20 +292,20 @@ private_free (liwdgLogin* self)
 }
 
 static int
-private_event (liwdgLogin* self,
+private_event (LIWdgLogin* self,
                liwdgEvent* event)
 {
-	return liwdgGroupType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_import (liwdgLogin* self)
+private_import (LIWdgLogin* self)
 {
 	printf ("FIXME: Import not implemented yet!\n");
 }
 
 static void
-private_login (liwdgLogin* self)
+private_login (LIWdgLogin* self)
 {
 #if 0
 	li_init_game (

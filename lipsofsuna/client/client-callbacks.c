@@ -30,7 +30,7 @@
 /* Bindings. */
 
 static int
-private_binding_event (licliClient* client,
+private_binding_event (LICliClient* client,
                        SDL_Event*   event)
 {
 	switch (event->type)
@@ -84,7 +84,7 @@ private_binding_event (licliClient* client,
 }
 
 static int
-private_binding_tick (licliClient* client,
+private_binding_tick (LICliClient* client,
                       float        secs)
 {
 	int x;
@@ -117,7 +117,7 @@ private_binding_tick (licliClient* client,
 }
 
 int
-licli_client_init_callbacks_binding (licliClient* self)
+licli_client_init_callbacks_binding (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self, "event", 0, private_binding_event, self, NULL);
 	lical_callbacks_insert (self->callbacks, self, "tick", 0, private_binding_tick, self, NULL);
@@ -128,16 +128,16 @@ licli_client_init_callbacks_binding (licliClient* self)
 /* Miscellaneous. */
 
 static void
-private_camera_clip (licliClient* client)
+private_camera_clip (LICliClient* client)
 {
 	int hit;
 	float frac;
-	limatAabb aabb;
-	limatTransform start;
-	limatTransform end;
-	limatVector diff;
-	liphyCollision tmp;
-	liphyShape* shape;
+	LIMatAabb aabb;
+	LIMatTransform start;
+	LIMatTransform end;
+	LIMatVector diff;
+	LIPhyCollision tmp;
+	LIPhyShape* shape;
 
 	/* Create sweep shape. */
 	/* FIXME: Could use a more accurate shape. */
@@ -163,7 +163,7 @@ private_camera_clip (licliClient* client)
 }
 
 static int
-private_miscellaneous_event (licliClient* client,
+private_miscellaneous_event (LICliClient* client,
                              SDL_Event*   event)
 {
 	switch (event->type)
@@ -185,8 +185,8 @@ private_miscellaneous_event (licliClient* client,
 }
 
 static int
-private_miscellaneous_object_new (licliClient* client,
-                                  liengObject* object)
+private_miscellaneous_object_new (LICliClient* client,
+                                  LIEngObject* object)
 {
 	/* Set object mode. */
 	lieng_object_set_smoothing (object, LICLI_OBJECT_POSITION_SMOOTHING, LICLI_OBJECT_ROTATION_SMOOTHING);
@@ -201,14 +201,14 @@ private_miscellaneous_object_new (licliClient* client,
 }
 
 static int
-private_miscellaneous_tick (licliClient* client,
+private_miscellaneous_tick (LICliClient* client,
                             float        secs)
 {
-	liengObject* player;
-	limatAabb bounds;
-	limdlNode* node;
-	limatTransform transform;
-	limatTransform transform0;
+	LIEngObject* player;
+	LIMatAabb bounds;
+	LIMdlNode* node;
+	LIMatTransform transform;
+	LIMatTransform transform0;
 
 	/* Update script. */
 	liscr_script_update (client->script, secs);
@@ -257,7 +257,7 @@ private_miscellaneous_tick (licliClient* client,
 }
 
 int
-licli_client_init_callbacks_misc (licliClient* self)
+licli_client_init_callbacks_misc (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self, "event", -5, private_miscellaneous_event, self, NULL);
 	lical_callbacks_insert (self->callbacks, self, "packet", 0, licli_client_handle_packet, self, NULL);
@@ -270,7 +270,7 @@ licli_client_init_callbacks_misc (licliClient* self)
 /* Widgets. */
 
 static int
-private_widget_event (licliClient* client,
+private_widget_event (LICliClient* client,
                       SDL_Event*   event)
 {
 	if (client->moving)
@@ -281,7 +281,7 @@ private_widget_event (licliClient* client,
 }
 
 static int
-private_widget_tick (licliClient* client,
+private_widget_tick (LICliClient* client,
                      float        secs)
 {
 	liwdg_manager_update (client->widgets, secs);
@@ -289,7 +289,7 @@ private_widget_tick (licliClient* client,
 }
 
 int
-licli_client_init_callbacks_widget (licliClient* self)
+licli_client_init_callbacks_widget (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self, "event", -10, private_widget_event, self, NULL);
 	lical_callbacks_insert (self->callbacks, self, "tick", 1, private_widget_tick, self, NULL);

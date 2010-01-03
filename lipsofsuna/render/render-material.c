@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,13 +16,13 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndMaterial Material
+ * \addtogroup LIRenMaterial Material
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "render-material.h"
 
 /**
@@ -30,12 +30,12 @@
  *
  * \return Material or NULL.
  */
-lirndMaterial*
-lirnd_material_new ()
+LIRenMaterial*
+liren_material_new ()
 {
-	lirndMaterial* self;
+	LIRenMaterial* self;
 
-	self = lisys_calloc (1, sizeof (lirndMaterial));
+	self = lisys_calloc (1, sizeof (LIRenMaterial));
 	if (self == NULL)
 		return NULL;
 	self->shininess = 64;
@@ -43,26 +43,26 @@ lirnd_material_new ()
 	return self;
 }
 
-lirndMaterial*
-lirnd_material_new_from_model (lirndRender*         render,
-                               const limdlMaterial* material)
+LIRenMaterial*
+liren_material_new_from_model (LIRenRender*         render,
+                               const LIMdlMaterial* material)
 {
 	int j;
 	const char* name;
-	limdlTexture* texture;
-	lirndImage* image;
-	lirndMaterial* self;
-	lirndShader* shader;
+	LIMdlTexture* texture;
+	LIRenImage* image;
+	LIRenMaterial* self;
+	LIRenShader* shader;
 
-	self = lisys_calloc (1, sizeof (lirndMaterial));
+	self = lisys_calloc (1, sizeof (LIRenMaterial));
 	if (self == NULL)
 		return NULL;
 	if (material->flags & LIMDL_MATERIAL_FLAG_BILLBOARD)
-		self->flags |= LIRND_MATERIAL_FLAG_BILLBOARD;
+		self->flags |= LIREN_MATERIAL_FLAG_BILLBOARD;
 	if (material->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
-		self->flags |= LIRND_MATERIAL_FLAG_CULLFACE;
+		self->flags |= LIREN_MATERIAL_FLAG_CULLFACE;
 	if (material->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
-		self->flags |= LIRND_MATERIAL_FLAG_TRANSPARENCY;
+		self->flags |= LIREN_MATERIAL_FLAG_TRANSPARENCY;
 	self->parameters[0] = material->emission;
 	self->shininess = material->shininess;
 	self->diffuse[0] = material->diffuse[0];
@@ -76,12 +76,12 @@ lirnd_material_new_from_model (lirndRender*         render,
 	self->strand_start = material->strand_start;
 	self->strand_end = material->strand_end;
 	self->strand_shape = material->strand_shape;
-	shader = lirnd_render_find_shader (render, material->shader);
+	shader = liren_render_find_shader (render, material->shader);
 	if (shader != NULL)
-		lirnd_material_set_shader (self, shader);
-	if (!lirnd_material_set_texture_count (self, material->textures.count))
+		liren_material_set_shader (self, shader);
+	if (!liren_material_set_texture_count (self, material->textures.count))
 	{
-		lirnd_material_free (self);
+		liren_material_free (self);
 		return 0;
 	}
 	for (j = 0 ; j < material->textures.count ; j++)
@@ -95,15 +95,15 @@ lirnd_material_new_from_model (lirndRender*         render,
 			name = "empty";
 
 		/* Find or load. */
-		image = lirnd_render_find_image (render, texture->string);
+		image = liren_render_find_image (render, texture->string);
 		if (image == NULL)
 		{
-			lirnd_render_load_image (render, texture->string);
-			image = lirnd_render_find_image (render, texture->string);
+			liren_render_load_image (render, texture->string);
+			image = liren_render_find_image (render, texture->string);
 		}
 
 		/* Set texture. */
-		lirnd_material_set_texture (self, j, texture, image);
+		liren_material_set_texture (self, j, texture, image);
 	}
 
 	return self;
@@ -115,7 +115,7 @@ lirnd_material_new_from_model (lirndRender*         render,
  * \param self Material.
  */
 void
-lirnd_material_free (lirndMaterial* self)
+liren_material_free (LIRenMaterial* self)
 {
 	lisys_free (self->textures.array);
 	lisys_free (self);
@@ -128,7 +128,7 @@ lirnd_material_free (lirndMaterial* self)
  * \param flags Flags.
  */
 void
-lirnd_material_set_flags (lirndMaterial* self,
+liren_material_set_flags (LIRenMaterial* self,
                           int            flags)
 {
 	self->flags = flags;
@@ -148,8 +148,8 @@ lirnd_material_set_flags (lirndMaterial* self,
  * \param shader Shader.
  */
 int
-lirnd_material_set_shader (lirndMaterial* self,
-                           lirndShader*   shader)
+liren_material_set_shader (LIRenMaterial* self,
+                           LIRenShader*   shader)
 {
 	self->shader = shader;
 
@@ -165,39 +165,39 @@ lirnd_material_set_shader (lirndMaterial* self,
  * \param image Image.
  */
 void
-lirnd_material_set_texture (lirndMaterial* self,
+liren_material_set_texture (LIRenMaterial* self,
                             int            index,
-                            limdlTexture*  texture,
-                            lirndImage*    image)
+                            LIMdlTexture*  texture,
+                            LIRenImage*    image)
 {
 	if (index < 0 || index >= self->textures.count)
 		return;
-	lirnd_texture_init (self->textures.array + index, texture);
-	lirnd_texture_set_image (self->textures.array + index, image);
+	liren_texture_init (self->textures.array + index, texture);
+	liren_texture_set_image (self->textures.array + index, image);
 }
 
 int
-lirnd_material_set_texture_count (lirndMaterial* self,
+liren_material_set_texture_count (LIRenMaterial* self,
                                   int            value)
 {
 	int num;
-	lirndTexture* tmp;
+	LIRenTexture* tmp;
 
 	if (value)
 	{
 		if (value > self->textures.count)
 		{
 			num = value - self->textures.count;
-			tmp = realloc (self->textures.array, value * sizeof (lirndTexture));
+			tmp = realloc (self->textures.array, value * sizeof (LIRenTexture));
 			if (tmp == NULL)
 				return 0;
 			self->textures.array = tmp;
 			self->textures.count = value;
-			memset (tmp + value - num, 0, num * sizeof (lirndTexture));
+			memset (tmp + value - num, 0, num * sizeof (LIRenTexture));
 		}
 		else
 		{
-			tmp = realloc (self->textures.array, value * sizeof (lirndTexture));
+			tmp = realloc (self->textures.array, value * sizeof (LIRenTexture));
 			if (tmp != NULL)
 				self->textures.array = tmp;
 			self->textures.count = value;

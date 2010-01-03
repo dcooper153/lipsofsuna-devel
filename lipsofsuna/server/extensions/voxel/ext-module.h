@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,17 +27,17 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <callback/lips-callback.h>
-#include <script/lips-script.h>
-#include <server/lips-server.h>
-#include <voxel/lips-voxel.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/callback.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/voxel.h>
 
-typedef struct _liextBlock liextBlock;
-typedef struct _liextBlockKey liextBlockKey;
-typedef struct _liextListener liextListener;
-typedef struct _liextListenerBlock liextListenerBlock;
-typedef struct _liextModule liextModule;
+typedef struct _LIExtBlock LIExtBlock;
+typedef struct _LIExtBlockKey LIExtBlockKey;
+typedef struct _LIExtListener LIExtListener;
+typedef struct _LIExtListenerBlock LIExtListenerBlock;
+typedef struct _LIExtModule LIExtModule;
 
 #include "ext-block.h"
 #include "ext-listener.h"
@@ -46,58 +46,58 @@ typedef struct _liextModule liextModule;
 #define LIEXT_SCRIPT_TILE "Lips.Tile"
 #define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
 
-struct _liextModule
+struct _LIExtModule
 {
 	float radius;
-	lialgPtrdic* listeners;
-	lialgMemdic* blocks;
-	liarcWriter* assign_packet;
-	licalHandle calls[8];
-	lisrvServer* server;
-	livoxManager* voxels;
+	LIAlgPtrdic* listeners;
+	LIAlgMemdic* blocks;
+	LIArcWriter* assign_packet;
+	LICalHandle calls[8];
+	LISerServer* server;
+	LIVoxManager* voxels;
 };
 
-liextModule*
-liext_module_new (lisrvServer* server);
+LIExtModule*
+liext_module_new (LISerServer* server);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 int
-liext_module_erase_point (liextModule*       self,
-                          const limatVector* point);
+liext_module_erase_point (LIExtModule*       self,
+                          const LIMatVector* point);
 
 void
-liext_module_fill_box (liextModule*       self,
-                       const limatVector* min,
-                       const limatVector* max,
-                       livoxVoxel         terrain);
+liext_module_fill_box (LIExtModule*       self,
+                       const LIMatVector* min,
+                       const LIMatVector* max,
+                       LIVoxVoxel         terrain);
 
 void
-liext_module_fill_sphere (liextModule*       self,
-                          const limatVector* center,
+liext_module_fill_sphere (LIExtModule*       self,
+                          const LIMatVector* center,
                           float              radius,
-                          livoxVoxel         terrain);
+                          LIVoxVoxel         terrain);
 
 int
-liext_module_write (liextModule* self,
-                    liarcSql*    sql);
+liext_module_write (LIExtModule* self,
+                    LIArcSql*    sql);
 
-livoxManager*
-liext_module_get_voxels (liextModule* self);
+LIVoxManager*
+liext_module_get_voxels (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextMaterialScript (liscrClass* self,
+liext_script_material (LIScrClass* self,
                      void*       data);
 
 void
-liextTileScript (liscrClass* self,
+liext_script_tile (LIScrClass* self,
                  void*       data);
 
 void
-liextVoxelScript (liscrClass* self,
+liext_script_voxel (LIScrClass* self,
                   void*       data);
 
 #endif

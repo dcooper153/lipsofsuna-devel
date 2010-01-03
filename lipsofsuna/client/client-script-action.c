@@ -22,16 +22,16 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 static int
-private_action_callback (libndAction*  action,
-                         libndBinding* binding,
+private_action_callback (LIBndAction*  action,
+                         LIBndBinding* binding,
                          float         value,
                          void*         data)
 {
-	liscrData* event;
-	liscrScript* script = liscr_data_get_script (data);
+	LIScrData* event;
+	LIScrScript* script = liscr_data_get_script (data);
 
 	/* Check for callback. */
 	liscr_pushdata (script->lua, libnd_action_get_userdata (action));
@@ -44,7 +44,7 @@ private_action_callback (libndAction*  action,
 	}
 
 	/* Create event. */
-	event = licom_event_newva (script,
+	event = liscr_event_newva (script,
 		"binding", LICLI_SCRIPT_BINDING, libnd_binding_get_userdata (binding),
 		"action", LICLI_SCRIPT_ACTION, libnd_action_get_userdata (action),
 		"active", LISCR_TYPE_BOOLEAN, value != 0.0f,
@@ -55,7 +55,7 @@ private_action_callback (libndAction*  action,
 		lua_pop (script->lua, 1);
 		return 1;
 	}
-	licom_event_set_type (event, LICLI_EVENT_TYPE_ACTION);
+	liscr_event_set_type (event, LICLI_EVENT_TYPE_ACTION);
 
 	/* Call callback. */
 	liscr_pushdata (script->lua, event);
@@ -88,7 +88,7 @@ private_action_callback (libndAction*  action,
  * -- @param self Action.
  * function Action.free(self)
  */
-static void Action_free (liscrArgs* args)
+static void Action_free (LIScrArgs* args)
 {
 	if (args->data->refcount)
 		liscr_data_unref (args->data, NULL);
@@ -109,14 +109,14 @@ static void Action_free (liscrArgs* args)
  * -- @return New action.
  * function Action.new(self, args)
  */
-static void Action_new (liscrArgs* args)
+static void Action_new (LIScrArgs* args)
 {
 	const char* id;
 	const char* name = "";
 	const char* desc = "";
-	libndAction* self;
-	licliClient* client;
-	liscrData* data;
+	LIBndAction* self;
+	LICliClient* client;
+	LIScrData* data;
 
 	/* Check arguments. */
 	if (!liscr_args_gets_string (args, "id", &id))
@@ -149,11 +149,11 @@ static void Action_new (liscrArgs* args)
  * -- @name Action.enabled
  * -- @class table
  */
-static void Action_getter_enabled (liscrArgs* args)
+static void Action_getter_enabled (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, libnd_action_get_enabled (args->self));
 }
-static void Action_setter_enabled (liscrArgs* args)
+static void Action_setter_enabled (LIScrArgs* args)
 {
 	int value;
 
@@ -164,7 +164,7 @@ static void Action_setter_enabled (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licliActionScript (liscrClass* self,
+licli_script_action (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_ACTION, data);

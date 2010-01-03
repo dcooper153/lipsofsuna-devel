@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,65 +18,65 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgTabs Tabs
+ * \addtogroup LIWdgTabs Tabs
  * @{
  */
 
 #include "widget-tabs.h"
 
 static int
-private_init (liwdgTabs*    self,
-              liwdgManager* manager);
+private_init (LIWdgTabs*    self,
+              LIWdgManager* manager);
 
 static void
-private_free (liwdgTabs* self);
+private_free (LIWdgTabs* self);
 
 static int
-private_event (liwdgTabs*  self,
+private_event (LIWdgTabs*  self,
                liwdgEvent* event);
 
-static liwdgWidget*
-private_child_at (liwdgTabs* self,
+static LIWdgWidget*
+private_child_at (LIWdgTabs* self,
                   int        pixx,
                   int        pixy);
 
 static void
-private_child_request (liwdgTabs*   self,
-                       liwdgWidget* child);
+private_child_request (LIWdgTabs*   self,
+                       LIWdgWidget* child);
 
-static liwdgWidget*
-private_cycle_focus (liwdgTabs*   self,
-                     liwdgWidget* curr,
+static LIWdgWidget*
+private_cycle_focus (LIWdgTabs*   self,
+                     LIWdgWidget* curr,
                      int          next);
 
 static void
-private_detach_child (liwdgTabs*   self,
-                      liwdgWidget* child);
+private_detach_child (LIWdgTabs*   self,
+                      LIWdgWidget* child);
 
 static void
-private_foreach_child (liwdgTabs* self,
+private_foreach_child (LIWdgTabs* self,
                        void     (*call)(),
                        void*      data);
 
 static void
-private_rebuild (liwdgTabs* self);
+private_rebuild (LIWdgTabs* self);
 
 /*****************************************************************************/
 
-const liwdgClass liwdgTabsType =
+const LIWdgClass liwdg_widget_tabs =
 {
-	LIWDG_BASE_STATIC, &liwdgContainerType, "Tabs", sizeof (liwdgTabs),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event,
+	LIWDG_BASE_STATIC, &liwdg_widget_container, "Tabs", sizeof (LIWdgTabs),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event,
 };
 
-liwdgWidget*
-liwdg_tabs_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_tabs_new (LIWdgManager* manager)
 {
-	liwdgWidget* self;
+	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdgTabsType);
+	self = liwdg_widget_new (manager, &liwdg_widget_tabs);
 	if (self == NULL)
 		return NULL;
 	private_rebuild (LIWDG_TABS (self));
@@ -85,14 +85,14 @@ liwdg_tabs_new (liwdgManager* manager)
 }
 
 int
-liwdg_tabs_append_tab (liwdgTabs*  self,
+liwdg_tabs_append_tab (LIWdgTabs*  self,
                       const char*  title,
-                      liwdgWidget* widget)
+                      LIWdgWidget* widget)
 {
-	liwdgTab tmp;
+	LIWdgTab tmp;
 
 	/* Format tab. */
-	memset (&tmp, 0, sizeof (liwdgTab));
+	memset (&tmp, 0, sizeof (LIWdgTab));
 	tmp.text = listr_dup (title);
 	if (tmp.text == NULL)
 		return 0;
@@ -128,15 +128,15 @@ liwdg_tabs_append_tab (liwdgTabs*  self,
 /*****************************************************************************/
 
 static int
-private_init (liwdgTabs*    self,
-              liwdgManager* manager)
+private_init (LIWdgTabs*    self,
+              LIWdgManager* manager)
 {
 	liwdg_widget_set_style (LIWDG_WIDGET (self), "tabs");
 	return 1;
 }
 
 static void
-private_free (liwdgTabs* self)
+private_free (LIWdgTabs* self)
 {
 	int i;
 
@@ -152,27 +152,27 @@ private_free (liwdgTabs* self)
 }
 
 static int
-private_event (liwdgTabs*  self,
+private_event (LIWdgTabs*  self,
                liwdgEvent* event)
 {
 	int i;
-	liwdgRect rect;
-	liwdgStyle* style;
-	liwdgTab* tab;
-	liwdgWidget* child;
+	LIWdgRect rect;
+	LIWdgStyle* style;
+	LIWdgTab* tab;
+	LIWdgWidget* child;
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdgContainerType)
+	    event->probe.clss == &liwdg_widget_container)
 	{
-		static liwdgContainerIface iface =
+		static LIWdgContainerIface iface =
 		{
-			(liwdgContainerChildAtFunc) private_child_at,
-			(liwdgContainerChildRequestFunc) private_child_request,
-			(liwdgContainerCycleFocusFunc) private_cycle_focus,
-			(liwdgContainerDetachChildFunc) private_detach_child,
-			(liwdgContainerForeachChildFunc) private_foreach_child,
-			(liwdgContainerTranslateCoordsFunc) NULL
+			(LIWdgContainerChildAtFunc) private_child_at,
+			(LIWdgContainerChildRequestFunc) private_child_request,
+			(LIWdgContainerCycleFocusFunc) private_cycle_focus,
+			(LIWdgContainerDetachChildFunc) private_detach_child,
+			(LIWdgContainerForeachChildFunc) private_foreach_child,
+			(LIWdgContainerTranslateCoordsFunc) NULL
 		};
 		event->probe.result = &iface;
 		return 0;
@@ -224,7 +224,7 @@ private_event (liwdgTabs*  self,
 				return 0;
 			child = self->tabs.array[self->active].widget;
 			if (child != NULL)
-				liwdg_widget_render (child);
+				liwdg_widget_draw (child);
 			return 0;
 		case LIWDG_EVENT_TYPE_UPDATE:
 			for (i = 0 ; i < self->tabs.count ; i++)
@@ -235,15 +235,15 @@ private_event (liwdgTabs*  self,
 			return 1;
 	}
 
-	return liwdgContainerType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_container.event (LIWDG_WIDGET (self), event);
 }
 
-static liwdgWidget*
-private_child_at (liwdgTabs* self,
+static LIWdgWidget*
+private_child_at (LIWdgTabs* self,
                   int        pixx,
                   int        pixy)
 {
-	liwdgWidget* child;
+	LIWdgWidget* child;
 
 	if (self->tabs.count <= self->active)
 		return NULL;
@@ -257,19 +257,19 @@ private_child_at (liwdgTabs* self,
 }
 
 static void
-private_child_request (liwdgTabs*   self,
-                       liwdgWidget* child)
+private_child_request (LIWdgTabs*   self,
+                       LIWdgWidget* child)
 {
 	private_rebuild (self);
 }
 
-static liwdgWidget*
-private_cycle_focus (liwdgTabs*   self,
-                     liwdgWidget* curr,
+static LIWdgWidget*
+private_cycle_focus (LIWdgTabs*   self,
+                     LIWdgWidget* curr,
                      int          next)
 {
-	liwdgWidget* tmp;
-	liwdgWidget* child;
+	LIWdgWidget* tmp;
+	LIWdgWidget* child;
 
 	/* Find active widget. */
 	if (curr != NULL)
@@ -281,7 +281,7 @@ private_cycle_focus (liwdgTabs*   self,
 		return NULL;
 
 	/* Cycle focus. */
-	if (liwdg_widget_typeis (child, &liwdgContainerType))
+	if (liwdg_widget_typeis (child, &liwdg_widget_container))
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, next);
 		if (tmp != NULL)
@@ -297,8 +297,8 @@ private_cycle_focus (liwdgTabs*   self,
 }
 
 static void
-private_detach_child (liwdgTabs*   self,
-                      liwdgWidget* child)
+private_detach_child (LIWdgTabs*   self,
+                      LIWdgWidget* child)
 {
 	int i;
 
@@ -314,7 +314,7 @@ private_detach_child (liwdgTabs*   self,
 }
 
 static void
-private_foreach_child (liwdgTabs* self,
+private_foreach_child (LIWdgTabs* self,
                        void     (*call)(),
                        void*      data)
 {
@@ -328,15 +328,15 @@ private_foreach_child (liwdgTabs* self,
 }
 
 static void
-private_rebuild (liwdgTabs* self)
+private_rebuild (LIWdgTabs* self)
 {
 	int i;
-	liwdgRect rect;
-	liwdgSize size;
-	liwdgSize size1;
-	liwdgStyle* style;
-	liwdgTab* tab;
-	liwdgWidget* child;
+	LIWdgRect rect;
+	LIWdgSize size;
+	LIWdgSize size1;
+	LIWdgStyle* style;
+	LIWdgTab* tab;
+	LIWdgWidget* child;
 
 	/* Calculate size request. */
 	size.width = 0;

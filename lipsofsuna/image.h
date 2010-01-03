@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,20 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup ligen Generator
- * @{
- */
+#ifndef __LIPS_IMAGE_H__
+#define __LIPS_IMAGE_H__
 
-#ifndef __LIPS_GENERATOR_H__
-#define __LIPS_GENERATOR_H__
-
-#include "generator.h"
-#include "generator-brush.h"
-#include "generator-rule.h"
-#include "generator-types.h"
+#include "image/image.h"
+#include "image/image-texture.h"
 
 #endif
-
-/** @} */
-/** @} */

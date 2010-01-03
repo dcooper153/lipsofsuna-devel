@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,11 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiPath Path
+ * \addtogroup LIAiPath Path
  * @{
  */
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 #include "ai-path.h"
 
 /**
@@ -30,12 +30,12 @@
  *
  * \return New path or NULL.
  */
-liaiPath*
+LIAiPath*
 liai_path_new ()
 {
-	liaiPath* self;
+	LIAiPath* self;
 
-	self = lisys_calloc (1, sizeof (liaiPath));
+	self = lisys_calloc (1, sizeof (LIAiPath));
 	return self;
 }
 
@@ -45,7 +45,7 @@ liai_path_new ()
  * \param self Path.
  */
 void
-liai_path_free (liaiPath* self)
+liai_path_free (LIAiPath* self)
 {
 	lisys_free (self->points.points);
 	lisys_free (self);
@@ -59,13 +59,13 @@ liai_path_free (liaiPath* self)
  * \return Nonzero on success.
  */
 int
-liai_path_append_point (liaiPath*          self,
-                        const limatVector* point)
+liai_path_append_point (LIAiPath*          self,
+                        const LIMatVector* point)
 {
-	limatVector* tmp;
+	LIMatVector* tmp;
 
 	/* Allocate space. */
-	tmp = lisys_realloc (self->points.points, (self->points.count + 1) * sizeof (limatVector));
+	tmp = lisys_realloc (self->points.points, (self->points.count + 1) * sizeof (LIMatVector));
 	if (tmp == NULL)
 		return 0;
 	self->points.points = tmp;
@@ -84,9 +84,9 @@ liai_path_append_point (liaiPath*          self,
  * \param value Return location for the position vector.
  */
 void
-liai_path_get_point (const liaiPath* self,
+liai_path_get_point (const LIAiPath* self,
                      int             index,
-                     limatVector*    value)
+                     LIMatVector*    value)
 {
 	assert (index >= 0);
 	assert (index < self->points.count);
@@ -101,7 +101,7 @@ liai_path_get_point (const liaiPath* self,
  * \return Number of nodes.
  */
 int
-liai_path_get_length (const liaiPath* self)
+liai_path_get_length (const LIAiPath* self)
 {
 	return self->points.count;
 }
@@ -113,7 +113,7 @@ liai_path_get_length (const liaiPath* self)
  * \return Position index.
  */
 int
-liai_path_get_position (const liaiPath* self)
+liai_path_get_position (const LIAiPath* self)
 {
 	return self->position;
 }
@@ -125,7 +125,7 @@ liai_path_get_position (const liaiPath* self)
  * \param index Position index.
  */
 void
-liai_path_set_position (liaiPath* self,
+liai_path_set_position (LIAiPath* self,
                         int       index)
 {
 	assert (index >= 0);

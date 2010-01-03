@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lisnd Sound 
  * @{
- * \addtogroup lisndManager Manager 
+ * \addtogroup LISndManager Manager 
  * @{
  */
 
@@ -32,13 +32,13 @@
  * \param system Sound system.
  * \return New sound manager or NULL.
  */
-lisndManager*
-lisnd_manager_new (lisndSystem* system)
+LISndManager*
+lisnd_manager_new (LISndSystem* system)
 {
-	lisndManager* self;
+	LISndManager* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lisndManager));
+	self = lisys_calloc (1, sizeof (LISndManager));
 	if (self == NULL)
 		return NULL;
 	self->system = system;
@@ -58,9 +58,9 @@ lisnd_manager_new (lisndSystem* system)
  * \param self Sound manager.
  */
 void
-lisnd_manager_free (lisndManager* self)
+lisnd_manager_free (LISndManager* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	if (self->samples != NULL)
 	{
@@ -77,9 +77,9 @@ lisnd_manager_free (lisndManager* self)
  * \param self Sound manager.
  */
 void
-lisnd_manager_clear (lisndManager* self)
+lisnd_manager_clear (LISndManager* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	LI_FOREACH_STRDIC (iter, self->samples)
 		lisnd_sample_free (iter.value);
@@ -93,8 +93,8 @@ lisnd_manager_clear (lisndManager* self)
  * \param name Sample name.
  * \return Sample or NULL.
  */
-lisndSample*
-lisnd_manager_get_sample (lisndManager* self,
+LISndSample*
+lisnd_manager_get_sample (LISndManager* self,
                           const char*   name)
 {
 	return lialg_strdic_find (self->samples, name);
@@ -109,11 +109,11 @@ lisnd_manager_get_sample (lisndManager* self,
  * \return Nonzero if the sample was loaded successfully.
  */
 int
-lisnd_manager_set_sample (lisndManager* self,
+lisnd_manager_set_sample (LISndManager* self,
                           const char*   name,
                           const char*   path)
 {
-	lisndSample* sample;
+	LISndSample* sample;
 
 	/* Only load once. */
 	sample = lialg_strdic_find (self->samples, name);

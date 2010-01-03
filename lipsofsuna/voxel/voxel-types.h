@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 #ifndef __VOXEL_TYPES_H__
 #define __VOXEL_TYPES_H__
 
-#include <system/lips-system.h>
+#include <lipsofsuna/system.h>
 
 #define LIVOX_SECTOR_WIDTH (LIVOX_BLOCKS_PER_LINE * LIVOX_BLOCK_WIDTH)
 #define LIVOX_SECTORS_PER_LINE 256
@@ -33,16 +33,16 @@
 #define LIVOX_TILES_PER_PLANE (LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE)
 #define LIVOX_TILES_PER_BLOCK (LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE * LIVOX_TILES_PER_LINE)
 
-typedef struct _livoxVoxel livoxVoxel;
-struct _livoxVoxel
+typedef struct _LIVoxVoxel LIVoxVoxel;
+struct _LIVoxVoxel
 {
 	uint16_t type;
 	uint8_t damage;
 	uint8_t rotation;
 };
 
-typedef struct _livoxManager livoxManager;
-typedef struct _livoxMaterial livoxMaterial;
-typedef struct _livoxSector livoxSector;
+typedef struct _LIVoxManager LIVoxManager;
+typedef struct _LIVoxMaterial LIVoxMaterial;
+typedef struct _LIVoxSector LIVoxSector;
 
 #endif

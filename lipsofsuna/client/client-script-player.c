@@ -22,8 +22,8 @@
  * @{
  */
 
-#include <system/lips-system.h>
-#include "lips-client.h"
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/client.h>
 
 /* @luadoc
  * module "Core.Client.Player"
@@ -45,11 +45,11 @@
  * -- @param args Arguments.
  * function Module.tilt(self, args)
  */
-static void Player_tilt (liscrArgs* args)
+static void Player_tilt (LIScrArgs* args)
 {
 	int keep;
 	float value;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_gets_float (args, "rate", &value) && client->network == NULL)
@@ -71,11 +71,11 @@ static void Player_tilt (liscrArgs* args)
  * -- @param args Arguments.
  * function Module.turn(self, args)
  */
-static void Player_turn (liscrArgs* args)
+static void Player_turn (LIScrArgs* args)
 {
 	int keep;
 	float value;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_gets_float (args, "rate", &value) && client->network == NULL)
@@ -91,18 +91,18 @@ static void Player_turn (liscrArgs* args)
  * -- @name Player.analog
  * -- @class table
  */
-static void Player_getter_analog (liscrArgs* args)
+static void Player_getter_analog (LIScrArgs* args)
 {
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (client->network != NULL)
 		liscr_args_seti_float (args, client->network->analog);
 }
-static void Player_setter_analog (liscrArgs* args)
+static void Player_setter_analog (LIScrArgs* args)
 {
 	int value;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_geti_bool (args, 0, &value) && client->network != NULL)
@@ -115,18 +115,18 @@ static void Player_setter_analog (liscrArgs* args)
  * -- @name Player.move
  * -- @class table
  */
-static void Player_getter_move (liscrArgs* args)
+static void Player_getter_move (LIScrArgs* args)
 {
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (client->network != NULL)
 		liscr_args_seti_float (args, client->network->curr.controls.move);
 }
-static void Player_setter_move (liscrArgs* args)
+static void Player_setter_move (LIScrArgs* args)
 {
 	float value;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_geti_float (args, 0, &value) && client->network != NULL)
@@ -139,10 +139,10 @@ static void Player_setter_move (liscrArgs* args)
  * -- @name Player.object
  * -- @class table
  */
-static void Player_getter_object (liscrArgs* args)
+static void Player_getter_object (LIScrArgs* args)
 {
-	licliClient* client;
-	liengObject* object;
+	LICliClient* client;
+	LIEngObject* object;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (client->network != NULL)
@@ -159,10 +159,10 @@ static void Player_getter_object (liscrArgs* args)
  * -- @name Player.rotation
  * -- @class table
  */
-static void Player_getter_rotation (liscrArgs* args)
+static void Player_getter_rotation (LIScrArgs* args)
 {
-	licliClient* client;
-	limatQuaternion tmp;
+	LICliClient* client;
+	LIMatQuaternion tmp;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (client->network != NULL)
@@ -171,10 +171,10 @@ static void Player_getter_rotation (liscrArgs* args)
 		liscr_args_seti_quaternion (args, &tmp);
 	}
 }
-static void Player_setter_rotation (liscrArgs* args)
+static void Player_setter_rotation (LIScrArgs* args)
 {
-	licliClient* client;
-	liscrData* data;
+	LICliClient* client;
+	LIScrData* data;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &data) && client->network != NULL)
@@ -187,18 +187,18 @@ static void Player_setter_rotation (liscrArgs* args)
  * -- @name Player.tilt_rate
  * -- @class table
  */
-static void Player_getter_tilt_rate (liscrArgs* args)
+static void Player_getter_tilt_rate (LIScrArgs* args)
 {
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (client->network != NULL)
 		liscr_args_seti_float (args, client->network->curr.controls.tilt);
 }
-static void Player_setter_tilt_rate (liscrArgs* args)
+static void Player_setter_tilt_rate (LIScrArgs* args)
 {
 	float value;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_geti_float (args, 0, &value))
@@ -211,18 +211,18 @@ static void Player_setter_tilt_rate (liscrArgs* args)
  * -- @name Player.turn_rate
  * -- @class table
  */
-static void Player_getter_turn_rate (liscrArgs* args)
+static void Player_getter_turn_rate (LIScrArgs* args)
 {
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (client->network != NULL)
 		liscr_args_seti_float (args, client->network->curr.controls.turn);
 }
-static void Player_setter_turn_rate (liscrArgs* args)
+static void Player_setter_turn_rate (LIScrArgs* args)
 {
 	float value;
-	licliClient* client;
+	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
 	if (liscr_args_geti_float (args, 0, &value) && client->network != NULL)
@@ -232,7 +232,7 @@ static void Player_setter_turn_rate (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licliPlayerScript (liscrClass* self,
+licli_script_player (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_PLAYER, data);

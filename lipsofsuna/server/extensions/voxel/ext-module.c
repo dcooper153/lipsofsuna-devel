@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-listener.h"
 #include "ext-module.h"
 #include "ext-block.h"
@@ -33,56 +33,56 @@
 #define LISTENER_POSITION_EPSILON 3.0f
 
 static int
-private_block_free (liextModule*      self,
-                    livoxUpdateEvent* event);
+private_block_free (LIExtModule*      self,
+                    LIVoxUpdateEvent* event);
 
 static int
-private_block_load (liextModule*      self,
-                    livoxUpdateEvent* event);
+private_block_load (LIExtModule*      self,
+                    LIVoxUpdateEvent* event);
 
 static int
-private_object_client (liextModule* self,
-                       liengObject* object);
+private_object_client (LIExtModule* self,
+                       LIEngObject* object);
 
 static int
-private_object_client_login (liextModule* self,
-                             liengObject* object);
+private_object_client_login (LIExtModule* self,
+                             LIEngObject* object);
 
 static int
-private_object_motion (liextModule* self,
-                       liengObject* object);
+private_object_motion (LIExtModule* self,
+                       LIEngObject* object);
 
 static int
-private_object_visibility (liextModule* self,
-                           liengObject* object,
+private_object_visibility (LIExtModule* self,
+                           LIEngObject* object,
                            int          visible);
 
 static int
-private_sector_load (liextModule* self,
-                     liengSector* sector);
+private_sector_load (LIExtModule* self,
+                     LIEngSector* sector);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Voxel",
+	LISER_EXTENSION_VERSION, "Voxel",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (lisrvServer* server)
+LIExtModule*
+liext_module_new (LISerServer* server)
 {
-	lialgU32dicIter iter;
-	liextModule* self;
-	livoxMaterial* material;
+	LIAlgU32dicIter iter;
+	LIExtModule* self;
+	LIVoxMaterial* material;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->radius = 20.0f;
@@ -150,18 +150,18 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Material", liextMaterialScript, self);
-	liscr_script_create_class (server->script, "Tile", liextTileScript, self);
-	liscr_script_create_class (server->script, "Voxel", liextVoxelScript, self);
+	liscr_script_create_class (server->script, "Material", liext_script_material, self);
+	liscr_script_create_class (server->script, "Tile", liext_script_tile, self);
+	liscr_script_create_class (server->script, "Voxel", liext_script_voxel, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
-	lialgMemdicIter iter0;
-	lialgPtrdicIter iter1;
+	LIAlgMemdicIter iter0;
+	LIAlgPtrdicIter iter1;
 
 	if (self->blocks != NULL)
 	{
@@ -175,7 +175,7 @@ liext_module_free (liextModule* self)
 			liext_listener_free (iter1.value);
 		lialg_ptrdic_free (self->listeners);
 	}
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	if (self->voxels != NULL)
 		livox_manager_free (self->voxels);
 	if (self->assign_packet != NULL)
@@ -185,8 +185,8 @@ liext_module_free (liextModule* self)
 }
 
 int
-liext_module_write (liextModule* self,
-                    liarcSql*    sql)
+liext_module_write (LIExtModule* self,
+                    LIArcSql*    sql)
 {
 	return livox_manager_write (self->voxels);
 }
@@ -202,8 +202,8 @@ liext_module_write (liextModule* self,
  * \param self Module.
  * \return Voxel manager.
  */
-livoxManager*
-liext_module_get_voxels (liextModule* self)
+LIVoxManager*
+liext_module_get_voxels (LIExtModule* self)
 {
 	return self->voxels;
 }
@@ -211,22 +211,22 @@ liext_module_get_voxels (liextModule* self)
 /*****************************************************************************/
 
 static int
-private_block_free (liextModule*      self,
-                    livoxUpdateEvent* event)
+private_block_free (LIExtModule*      self,
+                    LIVoxUpdateEvent* event)
 {
 	return 1;
 }
 
 static int
-private_block_load (liextModule*      self,
-                    livoxUpdateEvent* event)
+private_block_load (LIExtModule*      self,
+                    LIVoxUpdateEvent* event)
 {
-	liextBlock* eblock;
-	livoxBlockAddr addr;
-	limatVector orig;
-	limatVector vector;
-	livoxBlock* vblock;
-	livoxSector* sector;
+	LIExtBlock* eblock;
+	LIVoxBlockAddr addr;
+	LIMatVector orig;
+	LIMatVector vector;
+	LIVoxBlock* vblock;
+	LIVoxSector* sector;
 
 	/* Find the sector. */
 	sector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", event->sector[0], event->sector[1], event->sector[2], 1);
@@ -241,7 +241,7 @@ private_block_load (liextModule*      self,
 	addr.block[1] = event->block[1];
 	addr.block[2] = event->block[2];
 	vblock = livox_sector_get_block (sector, LIVOX_BLOCK_INDEX (event->block[0], event->block[1], event->block[2]));
-	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (livoxBlockAddr));
+	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (LIVoxBlockAddr));
 	if (eblock == NULL)
 	{
 		eblock = liext_block_new (self);
@@ -272,10 +272,10 @@ private_block_load (liextModule*      self,
 }
 
 static int
-private_object_client (liextModule* self,
-                       liengObject* object)
+private_object_client (LIExtModule* self,
+                       LIEngObject* object)
 {
-	liextListener* listener;
+	LIExtListener* listener;
 
 	/* Unsubscribe from terrain updates. */
 	listener = lialg_ptrdic_find (self->listeners, object);
@@ -289,22 +289,22 @@ private_object_client (liextModule* self,
 }
 
 static int
-private_object_client_login (liextModule* self,
-                             liengObject* object)
+private_object_client_login (LIExtModule* self,
+                             LIEngObject* object)
 {
 	/* Send the material database to the client. */
-	lisrv_client_send (LISRV_OBJECT (object)->client, self->assign_packet, GRAPPLE_RELIABLE);
+	liser_client_send (LISER_OBJECT (object)->client, self->assign_packet, GRAPPLE_RELIABLE);
 
 	return 1;
 }
 
 static int
-private_object_motion (liextModule* self,
-                       liengObject* object)
+private_object_motion (LIExtModule* self,
+                       LIEngObject* object)
 {
-	liextListener* listener;
+	LIExtListener* listener;
 
-	if (LISRV_OBJECT (object)->client == NULL)
+	if (LISER_OBJECT (object)->client == NULL)
 		return 1;
 
 	/* Mark listener as moved. */
@@ -316,13 +316,13 @@ private_object_motion (liextModule* self,
 }
 
 static int
-private_object_visibility (liextModule* self,
-                           liengObject* object,
+private_object_visibility (LIExtModule* self,
+                           LIEngObject* object,
                            int          visible)
 {
-	liextListener* listener;
+	LIExtListener* listener;
 
-	if (LISRV_OBJECT (object)->client == NULL)
+	if (LISER_OBJECT (object)->client == NULL)
 		return 1;
 	if (visible)
 	{
@@ -358,17 +358,17 @@ private_object_visibility (liextModule* self,
 }
 
 static int
-private_sector_load (liextModule* self,
-                     liengSector* sector)
+private_sector_load (LIExtModule* self,
+                     LIEngSector* sector)
 {
 	return 1;
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
-	lialgPtrdicIter iter1;
+	LIAlgPtrdicIter iter1;
 
 	livox_manager_mark_updates (self->voxels);
 	LI_FOREACH_PTRDIC (iter1, self->listeners)

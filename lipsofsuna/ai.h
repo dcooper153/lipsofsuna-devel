@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,12 +15,14 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_SOUND_H__
-#define __LIPS_SOUND_H__
+#ifndef __LIPS_AI_H__
+#define __LIPS_AI_H__
 
-#include "sound-manager.h"
-#include "sound-sample.h"
-#include "sound-source.h"
-#include "sound-system.h"
+#include "ai/ai-manager.h"
+#include "ai/ai-path.h"
+#include "ai/ai-sector.h"
+#include "ai/ai-types.h"
+#include "ai/ai-waypoint.h"
 
 #endif
+

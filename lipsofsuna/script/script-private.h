@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,28 +21,28 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <string.h>
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "script.h"
 #include "script-types.h"
 
 #define LISCR_SCRIPT_SELF (NULL + 1)
 #define LISCR_SCRIPT_LOOKUP (NULL + 2)
 
-typedef struct _liscrClassMemb liscrClassMemb;
+typedef struct _LIScrClassMemb LIScrClassMemb;
 
 enum
 {
 	LISCR_CLASS_FLAG_SORT_VARS = 0x1,
 };
 
-struct _liscrClass
+struct _LIScrClass
 {
 	int flags;
 	char* name;
 	char* meta;
-	lialgStrdic* userdata;
-	liscrClass* base;
-	liscrScript* script;
+	LIAlgStrdic* userdata;
+	LIScrClass* base;
+	LIScrScript* script;
 	struct
 	{
 		int count;
@@ -51,16 +51,16 @@ struct _liscrClass
 	struct
 	{
 		int count;
-		liscrClassMemb* array;
+		LIScrClassMemb* array;
 	} vars;
 };
 
-struct _liscrClassMemb
+struct _LIScrClassMemb
 {
 	char* name;
 	int member;
-	liscrArgsFunc getter;
-	liscrArgsFunc setter;
+	LIScrArgsFunc getter;
+	LIScrArgsFunc setter;
 };
 
 #endif

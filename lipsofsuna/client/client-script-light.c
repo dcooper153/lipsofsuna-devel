@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lips-client.h"
+#include <lipsofsuna/client.h>
 
 /*****************************************************************************/
 
@@ -43,25 +43,25 @@
  * -- @return New light source.
  * function Light.new(self, table)
  */
-static void Light_new (liscrArgs* args)
+static void Light_new (LIScrArgs* args)
 {
-	licliClient* client;
-	lirndLight* self;
-	liscrData* data;
+	LICliClient* client;
+	LIRenLight* self;
+	LIScrData* data;
 	const float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 1.0f, 1.0f };
 
 	/* Allocate self. */
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_LIGHT);
-	self = lirnd_light_new (client->scene, color, equation, M_PI, 0.0f, 0);
+	self = liren_light_new (client->scene, color, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_LIGHT, lirnd_light_free);
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_LIGHT, liren_light_free);
 	if (data == NULL)
 	{
-		lirnd_light_free (self);
+		liren_light_free (self);
 		return;
 	}
 	liscr_args_call_setters (args, data);
@@ -75,9 +75,9 @@ static void Light_new (liscrArgs* args)
  * -- @name Light.ambient
  * -- @class table
  */
-static void Light_getter_ambient (liscrArgs* args)
+static void Light_getter_ambient (LIScrArgs* args)
 {
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
@@ -86,11 +86,11 @@ static void Light_getter_ambient (liscrArgs* args)
 	liscr_args_seti_float (args, light->ambient[2]);
 	liscr_args_seti_float (args, light->ambient[3]);
 }
-static void Light_setter_ambient (liscrArgs* args)
+static void Light_setter_ambient (LIScrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
@@ -104,9 +104,9 @@ static void Light_setter_ambient (liscrArgs* args)
  * -- @name Light.color
  * -- @class table
  */
-static void Light_getter_color (liscrArgs* args)
+static void Light_getter_color (LIScrArgs* args)
 {
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
@@ -115,11 +115,11 @@ static void Light_getter_color (liscrArgs* args)
 	liscr_args_seti_float (args, light->diffuse[2]);
 	liscr_args_seti_float (args, light->diffuse[3]);
 }
-static void Light_setter_color (liscrArgs* args)
+static void Light_setter_color (LIScrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
@@ -134,22 +134,22 @@ static void Light_setter_color (liscrArgs* args)
  * -- @name Light.enabled
  * -- @class table
  */
-static void Light_getter_enabled (liscrArgs* args)
+static void Light_getter_enabled (LIScrArgs* args)
 {
-	liscr_args_seti_bool (args, lirnd_light_get_enabled (args->self));
+	liscr_args_seti_bool (args, liren_light_get_enabled (args->self));
 }
-static void Light_setter_enabled (liscrArgs* args)
+static void Light_setter_enabled (LIScrArgs* args)
 {
 	int value;
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
-	if (liscr_args_geti_bool (args, 0, &value) && value != lirnd_light_get_enabled (light))
+	if (liscr_args_geti_bool (args, 0, &value) && value != liren_light_get_enabled (light))
 	{
 		if (value)
-			lirnd_lighting_insert_light (light->scene->lighting, light);
+			liren_lighting_insert_light (light->scene->lighting, light);
 		else
-			lirnd_lighting_remove_light (light->scene->lighting, light);
+			liren_lighting_remove_light (light->scene->lighting, light);
 	}
 }
 
@@ -159,9 +159,9 @@ static void Light_setter_enabled (liscrArgs* args)
  * -- @name Light.equation
  * -- @class table
  */
-static void Light_getter_equation (liscrArgs* args)
+static void Light_getter_equation (LIScrArgs* args)
 {
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
@@ -169,11 +169,11 @@ static void Light_getter_equation (liscrArgs* args)
 	liscr_args_seti_float (args, light->equation[1]);
 	liscr_args_seti_float (args, light->equation[2]);
 }
-static void Light_setter_equation (liscrArgs* args)
+static void Light_setter_equation (LIScrArgs* args)
 {
 	int i;
 	float value[3] = { 1.0f, 0.0f, 0.0f };
-	lirndLight* light;
+	LIRenLight* light;
 
 	light = args->self;
 	for (i = 0 ; i < 3 ; i++)
@@ -188,30 +188,30 @@ static void Light_setter_equation (liscrArgs* args)
  * -- @name Light.position
  * -- @class table
  */
-static void Light_getter_position (liscrArgs* args)
+static void Light_getter_position (LIScrArgs* args)
 {
-	limatTransform transform;
+	LIMatTransform transform;
 
-	lirnd_light_get_transform (args->self, &transform);
+	liren_light_get_transform (args->self, &transform);
 	liscr_args_seti_vector (args, &transform.position);
 }
-static void Light_setter_position (liscrArgs* args)
+static void Light_setter_position (LIScrArgs* args)
 {
-	limatTransform transform;
-	limatVector vector;
+	LIMatTransform transform;
+	LIMatVector vector;
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 	{
-		lirnd_light_get_transform (args->self, &transform);
+		liren_light_get_transform (args->self, &transform);
 		transform.position = vector;
-		lirnd_light_set_transform (args->self, &transform);
+		liren_light_set_transform (args->self, &transform);
 	}
 }
 
 /*****************************************************************************/
 
 void
-licliLightScript (liscrClass* self,
+licli_script_light (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);

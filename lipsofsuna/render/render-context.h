@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,17 +16,17 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndContext Context
+ * \addtogroup LIRenContext Context
  * @{
  */
 
 #ifndef __RENDER_CONTEXT_H__
 #define __RENDER_CONTEXT_H__
 
-#include <image/lips-image.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/model.h>
 #include "render-buffer.h"
 #include "render-light.h"
 #include "render-material.h"
@@ -34,23 +34,23 @@
 #include "render-texture.h"
 #include "render-types.h"
 
-struct _lirndContext
+struct _LIRenContext
 {
 	int compiled;
 	int fixed;
 	int shadows;
-	lirndRender* render;
-	lirndScene* scene;
-	lirndShader* shader;
-	limatFrustum frustum;
-	limatMatrix matrix;
-	limatMatrix modelview;
-	limatMatrix modelviewinverse;
-	limatMatrix projection;
+	LIRenRender* render;
+	LIRenScene* scene;
+	LIRenShader* shader;
+	LIMatFrustum frustum;
+	LIMatMatrix matrix;
+	LIMatMatrix modelview;
+	LIMatMatrix modelviewinverse;
+	LIMatMatrix projection;
 	struct
 	{
 		int count;
-		lirndLight** array;
+		LIRenLight** array;
 	} lights;
 	struct
 	{
@@ -63,99 +63,99 @@ struct _lirndContext
 	struct
 	{
 		int count;
-		lirndTexture* array;
+		LIRenTexture* array;
 	} textures;
 };
 
 void
-lirnd_context_init (lirndContext* self,
-                    lirndScene*   scene);
+liren_context_init (LIRenContext* self,
+                    LIRenScene*   scene);
 
 void
-lirnd_context_bind (lirndContext* self);
+liren_context_bind (LIRenContext* self);
 
 void
-lirnd_context_render_array (lirndContext* self,
-                            lirndBuffer*  vertex);
+liren_context_render_array (LIRenContext* self,
+                            LIRenBuffer*  vertex);
 
 void
-lirnd_context_render_indexed (lirndContext* self,
-                              lirndBuffer*  vertex,
-                              lirndBuffer*  index);
+liren_context_render_indexed (LIRenContext* self,
+                              LIRenBuffer*  vertex,
+                              LIRenBuffer*  index);
 
 void
-lirnd_context_render (lirndContext* self,
-                      lirndBuffer*  buffer);
+liren_context_render (LIRenContext* self,
+                      LIRenBuffer*  buffer);
 
 void
-lirnd_context_render_vbo_array (lirndContext*      self,
-                                const lirndFormat* format,
+liren_context_render_vbo_array (LIRenContext*      self,
+                                const LIRenFormat* format,
                                 GLuint             vertices,
                                 int                vertex0,
                                 int                vertex1);
 
 void
-lirnd_context_render_vtx_array (lirndContext*      self,
-                                const lirndFormat* format,
+liren_context_render_vtx_array (LIRenContext*      self,
+                                const LIRenFormat* format,
                                 const void*        vertices,
                                 int                vertex0,
                                 int                vertex1);
 
 void
-lirnd_context_render_vbo_indexed (lirndContext*      self,
-                                  const lirndFormat* format,
+liren_context_render_vbo_indexed (LIRenContext*      self,
+                                  const LIRenFormat* format,
                                   GLuint             vertices,
                                   GLuint             indices,
                                   int                index0,
                                   int                index1);
 
 void
-lirnd_context_render_vtx_indexed (lirndContext*      self,
-                                  const lirndFormat* format,
+liren_context_render_vtx_indexed (LIRenContext*      self,
+                                  const LIRenFormat* format,
                                   const void*        vertices,
                                   const void*        indices,
                                   int                index0,
                                   int                index1);
 
 void
-lirnd_context_unbind (lirndContext* self);
+liren_context_unbind (LIRenContext* self);
 
 void
-lirnd_context_set_flags (lirndContext* self,
+liren_context_set_flags (LIRenContext* self,
                          int           value);
 
 void
-lirnd_context_set_frustum (lirndContext*       self,
-                           const limatFrustum* frustum);
+liren_context_set_frustum (LIRenContext*       self,
+                           const LIMatFrustum* frustum);
 
 void
-lirnd_context_set_lights (lirndContext* self,
-                          lirndLight**  value,
+liren_context_set_lights (LIRenContext* self,
+                          LIRenLight**  value,
                           int           count);
 
 void
-lirnd_context_set_material (lirndContext*        self,
-                            const lirndMaterial* value);
+liren_context_set_material (LIRenContext*        self,
+                            const LIRenMaterial* value);
 
 void
-lirnd_context_set_matrix (lirndContext*      self,
-                          const limatMatrix* value);
+liren_context_set_matrix (LIRenContext*      self,
+                          const LIMatMatrix* value);
 
 void
-lirnd_context_set_modelview (lirndContext*      self,
-                             const limatMatrix* value);
+liren_context_set_modelview (LIRenContext*      self,
+                             const LIMatMatrix* value);
 
 void
-lirnd_context_set_projection (lirndContext*      self,
-                              const limatMatrix* value);
+liren_context_set_projection (LIRenContext*      self,
+                              const LIMatMatrix* value);
 
 void
-lirnd_context_set_shader (lirndContext* self,
-                          lirndShader*  value);
+liren_context_set_shader (LIRenContext* self,
+                          LIRenShader*  value);
 
 void
-lirnd_context_set_textures (lirndContext* self,
-                            lirndTexture* value,
+liren_context_set_textures (LIRenContext* self,
+                            LIRenTexture* value,
                             int           count);
 
 #endif

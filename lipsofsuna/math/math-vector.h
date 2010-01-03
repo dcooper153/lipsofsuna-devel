@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatVector Vector
+ * \addtogroup LIMatVector Vector
  * @{
  */
 
@@ -32,8 +32,8 @@
 /**
  * \brief A three-dimensional vector type.
  */
-typedef struct _limatVector limatVector;
-struct _limatVector
+typedef struct _LIMatVector LIMatVector;
+struct _LIMatVector
 {
 	float x;
 	float y;
@@ -48,12 +48,12 @@ struct _limatVector
  * \param z Float.
  * \return Vector.
  */
-static inline limatVector
+static inline LIMatVector
 limat_vector_init (float x,
                    float y,
                    float z)
 {
-	limatVector result = { x, y, z };
+	LIMatVector result = { x, y, z };
 	return result;
 }
 
@@ -63,10 +63,10 @@ limat_vector_init (float x,
  * \param self Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_invert (limatVector self)
+static inline LIMatVector
+limat_vector_invert (LIMatVector self)
 {
-	limatVector result = { -self.x, -self.y, -self.z };
+	LIMatVector result = { -self.x, -self.y, -self.z };
 	return result;
 }
 
@@ -77,7 +77,7 @@ limat_vector_invert (limatVector self)
  * \return Float.
  */
 static inline float
-limat_vector_get_length (limatVector self)
+limat_vector_get_length (LIMatVector self)
 {
 	return sqrt (self.x * self.x + self.y * self.y + self.z * self.z);
 }
@@ -89,11 +89,11 @@ limat_vector_get_length (limatVector self)
  * \param vector Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_add (limatVector self,
-                  limatVector vector)
+static inline LIMatVector
+limat_vector_add (LIMatVector self,
+                  LIMatVector vector)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = self.x + vector.x;
 	result.y = self.y + vector.y;
@@ -108,11 +108,11 @@ limat_vector_add (limatVector self,
  * \param vector Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_subtract (limatVector self,
-                       limatVector vector)
+static inline LIMatVector
+limat_vector_subtract (LIMatVector self,
+                       LIMatVector vector)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = self.x - vector.x;
 	result.y = self.y - vector.y;
@@ -127,11 +127,11 @@ limat_vector_subtract (limatVector self,
  * \param scalar Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_multiply (limatVector self,
+static inline LIMatVector
+limat_vector_multiply (LIMatVector self,
                        float       scalar)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = self.x * scalar;
 	result.y = self.y * scalar;
@@ -145,10 +145,10 @@ limat_vector_multiply (limatVector self,
  * \param self Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_normalize (limatVector self)
+static inline LIMatVector
+limat_vector_normalize (LIMatVector self)
 {
-	limatVector result;
+	LIMatVector result;
 	float len = limat_vector_get_length (self);
 
 	if (len < LIMAT_VECTOR_EPSILON)
@@ -174,8 +174,8 @@ limat_vector_normalize (limatVector self)
  * \return Scalar.
  */
 static inline float
-limat_vector_dot (limatVector self,
-                  limatVector vector)
+limat_vector_dot (LIMatVector self,
+                  LIMatVector vector)
 {
 	return self.x * vector.x + self.y * vector.y + self.z * vector.z;
 }
@@ -187,11 +187,11 @@ limat_vector_dot (limatVector self,
  * \param vector Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_cross (limatVector self,
-                    limatVector vector)
+static inline LIMatVector
+limat_vector_cross (LIMatVector self,
+                    LIMatVector vector)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x =  (self.y * vector.z - self.z * vector.y);
 	result.y = -(self.x * vector.z - self.z * vector.x);
@@ -207,14 +207,14 @@ limat_vector_cross (limatVector self,
  * \param weight Interpolating scalar.
  * \return Vector.
  */
-static inline limatVector
-limat_vector_lerp (limatVector self,
-                   limatVector vector,
+static inline LIMatVector
+limat_vector_lerp (LIMatVector self,
+                   LIMatVector vector,
                    float       weight)
 {
 	float a = weight;
 	float b = 1.0f - weight;
-	limatVector result;
+	LIMatVector result;
 
 	result.x = a * self.x + b * vector.x;
 	result.y = a * self.y + b * vector.y;

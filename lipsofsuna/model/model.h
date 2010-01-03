@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlModel Model
+ * \addtogroup LIMdlModel Model
  * @{
  */
 
 #ifndef __MODEL_H__
 #define __MODEL_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <math/lips-math.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/string.h>
 #include "model-animation.h"
 #include "model-bone.h"
 #include "model-faces.h"
@@ -41,7 +41,7 @@
 
 #define LIMDL_FORMAT_VERSION 0xFFFFFFF6
 
-typedef int limdlModelFlags;
+typedef int LIMdlModelFlags;
 
 enum
 {
@@ -51,122 +51,122 @@ enum
 	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
 };
 
-typedef struct _limdlWeight limdlWeight;
-struct _limdlWeight
+typedef struct _LIMdlWeight LIMdlWeight;
+struct _LIMdlWeight
 {
 	int group;
 	float weight;
 };
 
-typedef struct _limdlWeights limdlWeights;
-struct _limdlWeights
+typedef struct _LIMdlWeights LIMdlWeights;
+struct _LIMdlWeights
 {
 	int count;
-	limdlWeight* weights;
+	LIMdlWeight* weights;
 };
 
-struct _limdlWeightGroup
+struct _LIMdlWeightGroup
 {
 	char* name;
 	char* bone;
-	limdlNode* node;
+	LIMdlNode* node;
 };
 
 /*****************************************************************************/
 
-struct _limdlModel
+struct _LIMdlModel
 {
 	int flags;
-	limatAabb bounds;
-	struct { int count; limdlAnimation* array; } animations;
-	struct { int count; limdlHairs* array; } hairs;
-	struct { int count; limdlFaces* array; } facegroups;
-	struct { int count; limdlMaterial* array; } materials;
-	struct { int count; limdlNode** array; } nodes;
-	struct { int count; limdlShape* array; } shapes;
-	struct { int count; limdlVertex* array; int capacity; } vertices;
-	struct { int count; limdlWeightGroup* array; } weightgroups;
-	struct { int count; limdlWeights* array; int capacity; } weights;
+	LIMatAabb bounds;
+	struct { int count; LIMdlAnimation* array; } animations;
+	struct { int count; LIMdlHairs* array; } hairs;
+	struct { int count; LIMdlFaces* array; } facegroups;
+	struct { int count; LIMdlMaterial* array; } materials;
+	struct { int count; LIMdlNode** array; } nodes;
+	struct { int count; LIMdlShape* array; } shapes;
+	struct { int count; LIMdlVertex* array; int capacity; } vertices;
+	struct { int count; LIMdlWeightGroup* array; } weightgroups;
+	struct { int count; LIMdlWeights* array; int capacity; } weights;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-limdlModel*
+LIMdlModel*
 limdl_model_new ();
 
-limdlModel*
-limdl_model_new_from_data (liarcReader* reader);
+LIMdlModel*
+limdl_model_new_from_data (LIArcReader* reader);
 
-limdlModel*
+LIMdlModel*
 limdl_model_new_from_file (const char* path);
 
 void
-limdl_model_calculate_bounds (limdlModel* self);
+limdl_model_calculate_bounds (LIMdlModel* self);
 
 void
-limdl_model_free (limdlModel* self);
+limdl_model_free (LIMdlModel* self);
 
-limdlAnimation*
-limdl_model_find_animation (limdlModel* self,
+LIMdlAnimation*
+limdl_model_find_animation (LIMdlModel* self,
                             const char* name);
 
 int
-limdl_model_find_facegroup (limdlModel* self,
+limdl_model_find_facegroup (LIMdlModel* self,
                             int         material);
 
 int
-limdl_model_find_material (const limdlModel*    self,
-                           const limdlMaterial* material);
+limdl_model_find_material (const LIMdlModel*    self,
+                           const LIMdlMaterial* material);
 
-limdlNode*
-limdl_model_find_node (const limdlModel* self,
+LIMdlNode*
+limdl_model_find_node (const LIMdlModel* self,
                        const char*       name);
 
 int
-limdl_model_find_vertex (limdlModel*        self,
-                         const limdlVertex* vertex);
+limdl_model_find_vertex (LIMdlModel*        self,
+                         const LIMdlVertex* vertex);
 
 int
-limdl_model_insert_face (limdlModel*         self,
+limdl_model_insert_face (LIMdlModel*         self,
                          int                 group,
-                         const limdlVertex*  vertices,
-                         const limdlWeights* weights);
+                         const LIMdlVertex*  vertices,
+                         const LIMdlWeights* weights);
 
 int
-limdl_model_insert_facegroup (limdlModel* self,
+limdl_model_insert_facegroup (LIMdlModel* self,
                               int         material);
 
 int
-limdl_model_insert_indices (limdlModel* self,
+limdl_model_insert_indices (LIMdlModel* self,
                             int         group,
                             uint32_t*   indices,
                             int         count);
 
 int
-limdl_model_insert_material (limdlModel*          self,
-                             const limdlMaterial* material);
+limdl_model_insert_material (LIMdlModel*          self,
+                             const LIMdlMaterial* material);
 
 int
-limdl_model_insert_node (limdlModel*      self,
-                         const limdlNode* node);
+limdl_model_insert_node (LIMdlModel*      self,
+                         const LIMdlNode* node);
 
 int
-limdl_model_insert_vertex (limdlModel*         self,
-                           const limdlVertex*  vertex,
-                           const limdlWeights* weights);
+limdl_model_insert_vertex (LIMdlModel*         self,
+                           const LIMdlVertex*  vertex,
+                           const LIMdlWeights* weights);
 
 int
-limdl_model_write (const limdlModel* self,
-                   liarcWriter*      writer);
+limdl_model_write (const LIMdlModel* self,
+                   LIArcWriter*      writer);
 
 int
-limdl_model_write_file (const limdlModel* self,
+limdl_model_write_file (const LIMdlModel* self,
                         const char*       path);
 
 int
-limdl_model_get_index_count (const limdlModel* self);
+limdl_model_get_index_count (const LIMdlModel* self);
 
 #ifdef __cplusplus
 }

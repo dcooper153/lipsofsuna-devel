@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatMatrix Matrix
+ * \addtogroup LIMatMatrix Matrix
  * @{
  */
 
@@ -29,16 +29,16 @@
 #include <math.h>
 #include "math-vector.h"
 
-typedef struct _limatMatrix limatMatrix;
-struct _limatMatrix
+typedef struct _LIMatMatrix LIMatMatrix;
+struct _LIMatMatrix
 {
 	float m[16];
 };
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_identity ()
 {
-	limatMatrix self;
+	LIMatMatrix self;
 
 	self.m[0] = 1.0f;
 	self.m[1] = 0.0f;
@@ -60,7 +60,7 @@ limat_matrix_identity ()
 	return self;
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_frustum (float left,
                       float right,
                       float bottom,
@@ -68,7 +68,7 @@ limat_matrix_frustum (float left,
                       float nearz,
                       float farz)
 {
-	limatMatrix self;
+	LIMatMatrix self;
 
 	self.m[0] = (2.0f * nearz) / (right - left);
 	self.m[1] = 0.0f;
@@ -90,7 +90,7 @@ limat_matrix_frustum (float left,
 	return self;
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_look (float eyex,
                    float eyey,
                    float eyez,
@@ -105,7 +105,7 @@ limat_matrix_look (float eyex,
 	float sidex;
 	float sidey;
 	float sidez;
-	limatMatrix self;
+	LIMatMatrix self;
 
 	/* Normalize direction. */
 	len = sqrt (dirx * dirx + diry * diry + dirz * dirz);
@@ -152,7 +152,7 @@ limat_matrix_look (float eyex,
 	return self;
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_lookat (float eyex,
                      float eyey,
                      float eyez,
@@ -173,7 +173,7 @@ limat_matrix_lookat (float eyex,
 		upx, upy, upz);
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_ortho (float left,
                     float right,
                     float top,
@@ -181,7 +181,7 @@ limat_matrix_ortho (float left,
                     float nearz,
                     float farz)
 {
-	limatMatrix self;
+	LIMatMatrix self;
 
 	self.m[0] = 2.0f / (right - left);
 	self.m[1] = 0.0f;
@@ -212,7 +212,7 @@ limat_matrix_ortho (float left,
  * \param farz Far plane distance.
  * \return Perspective matrix.
  */
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_perspective (float fov,
                           float aspect,
                           float nearz,
@@ -220,7 +220,7 @@ limat_matrix_perspective (float fov,
 {
 	float d;
 	float f;
-	limatMatrix self;
+	LIMatMatrix self;
 
 	d = nearz - farz;
 	f = 1.0f / tan (0.5f * fov);
@@ -244,13 +244,13 @@ limat_matrix_perspective (float fov,
 	return self;
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_rotation (float radians,
                        float x,
                        float y,
                        float z)
 {
-	limatMatrix self;
+	LIMatMatrix self;
 	float s0 = sin (-radians);
 	float c0 = cos (-radians);
 	float c1 = 1 - c0;
@@ -275,12 +275,12 @@ limat_matrix_rotation (float radians,
 	return self;
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_scale (float x,
                     float y,
                     float z)
 {
-	limatMatrix self;
+	LIMatMatrix self;
 
 	self.m[0] = x;
 	self.m[1] = 0.0f;
@@ -309,11 +309,11 @@ limat_matrix_scale (float x,
  * \param vector Vector.
  * \return Vector.
  */
-static inline limatVector
-limat_matrix_transform (limatMatrix self,
-                        limatVector vector)
+static inline LIMatVector
+limat_matrix_transform (LIMatMatrix self,
+                        LIMatVector vector)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result.x = self.m[0] * vector.x + self.m[4] * vector.y + self.m[8] * vector.z + self.m[12];
 	result.y = self.m[1] * vector.x + self.m[5] * vector.y + self.m[9] * vector.z + self.m[13];
@@ -321,12 +321,12 @@ limat_matrix_transform (limatMatrix self,
 	return result;
 }
 
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_translation (float x,
                           float y,
                           float z)
 {
-	limatMatrix self;
+	LIMatMatrix self;
 
 	self.m[0] = 1.0f;
 	self.m[1] = 0.0f;
@@ -348,8 +348,8 @@ limat_matrix_translation (float x,
 	return self;
 }
 
-static inline limatVector
-limat_matrix_get_basis (const limatMatrix self,
+static inline LIMatVector
+limat_matrix_get_basis (const LIMatMatrix self,
                         int               basis)
 {
 	switch (basis)
@@ -361,10 +361,10 @@ limat_matrix_get_basis (const limatMatrix self,
 	return limat_vector_init (0.0f, 0.0f, 0.0f);
 }
 
-static inline limatMatrix
-limat_matrix_get_rotation (const limatMatrix self)
+static inline LIMatMatrix
+limat_matrix_get_rotation (const LIMatMatrix self)
 {
-	limatMatrix result;
+	LIMatMatrix result;
 
 	result.m[0] = self.m[0];
 	result.m[1] = self.m[1];
@@ -387,7 +387,7 @@ limat_matrix_get_rotation (const limatMatrix self)
 }
 
 static inline int
-limat_matrix_get_singular (const limatMatrix self)
+limat_matrix_get_singular (const LIMatMatrix self)
 {
 	float det;
 
@@ -400,14 +400,14 @@ limat_matrix_get_singular (const limatMatrix self)
 }
 
 /* Stolen from Mesa. */
-static inline limatMatrix
-limat_matrix_invert (const limatMatrix self)
+static inline LIMatMatrix
+limat_matrix_invert (const LIMatMatrix self)
 {
 	int i;
 	float det;
 	float inv[16];
 	const float* m = self.m;
-	limatMatrix ret;
+	LIMatMatrix ret;
 
 	inv[0] =   m[5]*m[10]*m[15] - m[5]*m[11]*m[14] - m[9]*m[6]*m[15]
 	         + m[9]*m[7]*m[14] + m[13]*m[6]*m[11] - m[13]*m[7]*m[10];
@@ -449,11 +449,11 @@ limat_matrix_invert (const limatMatrix self)
 	return ret;
 }
 
-static inline limatMatrix
-limat_matrix_multiply (const limatMatrix self,
-                       const limatMatrix matrix)
+static inline LIMatMatrix
+limat_matrix_multiply (const LIMatMatrix self,
+                       const LIMatMatrix matrix)
 {
-	limatMatrix result;
+	LIMatMatrix result;
 	const float* A = self.m;
 	const float* B = matrix.m;
 
@@ -478,15 +478,15 @@ limat_matrix_multiply (const limatMatrix self,
 }
 
 /* Stolen from Mesa. */
-static inline limatMatrix
+static inline LIMatMatrix
 limat_matrix_pick (float      x,
                    float      y,
                    float      w,
                    float      h,
                    const int* viewport)
 {
-	limatMatrix m0;
-	limatMatrix m1;
+	LIMatMatrix m0;
+	LIMatMatrix m1;
 
 	m0 = limat_matrix_translation (
 		(viewport[2] - 2.0f * (x - viewport[0])) / w,
@@ -508,16 +508,16 @@ limat_matrix_pick (float      x,
  * \return Nonzero on success.
  */
 static inline int
-limat_matrix_project (const limatMatrix  projection,
-                      const limatMatrix  modelview,
+limat_matrix_project (const LIMatMatrix  projection,
+                      const LIMatMatrix  modelview,
                       const int*         viewport,
-                      const limatVector* object,
-                      limatVector*       window)
+                      const LIMatVector* object,
+                      LIMatVector*       window)
 {
 	float w;
-	limatMatrix m;
-	limatVector v;
-	limatVector result;
+	LIMatMatrix m;
+	LIMatVector v;
+	LIMatVector result;
 
 	/* Multiply by modelview matrix. */
 	w = 1.0f;
@@ -560,15 +560,15 @@ limat_matrix_project (const limatMatrix  projection,
  * \return Nonzero on success.
  */
 static inline int
-limat_matrix_unproject (const limatMatrix  projection,
-                        const limatMatrix  modelview,
+limat_matrix_unproject (const LIMatMatrix  projection,
+                        const LIMatMatrix  modelview,
                         const int*         viewport,
-                        const limatVector* window,
-                        limatVector*       object)
+                        const LIMatVector* window,
+                        LIMatVector*       object)
 {
 	float w;
-	limatMatrix m;
-	limatVector v;
+	LIMatMatrix m;
+	LIMatVector v;
 
 	/* Get inverse matrix. */
 	m = limat_matrix_multiply (projection, modelview);

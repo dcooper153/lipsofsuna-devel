@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlMaterial Material
+ * \addtogroup LIMdlMaterial Material
  * @{
  */
 
@@ -26,11 +26,11 @@
 #define __MODEL_MATERIAL_H__
 
 #include <string.h>
-#include <archive/lips-archive.h>
+#include <lipsofsuna/archive.h>
 #include "model-texture.h"
 
-typedef struct _limdlMaterial limdlMaterial;
-struct _limdlMaterial
+typedef struct _LIMdlMaterial LIMdlMaterial;
+struct _LIMdlMaterial
 {
 	int flags;
 	char* shader;
@@ -44,7 +44,7 @@ struct _limdlMaterial
 	struct
 	{
 		int count;
-		limdlTexture* array;
+		LIMdlTexture* array;
 	} textures;
 };
 
@@ -53,33 +53,33 @@ extern "C" {
 #endif
 
 int
-limdl_material_init (limdlMaterial* self);
+limdl_material_init (LIMdlMaterial* self);
 
 int
-limdl_material_init_copy (limdlMaterial*       self,
-                          const limdlMaterial* src);
+limdl_material_init_copy (LIMdlMaterial*       self,
+                          const LIMdlMaterial* src);
 
 void
-limdl_material_clear_textures (limdlMaterial* self);
+limdl_material_clear_textures (LIMdlMaterial* self);
 
 int
-limdl_material_compare (const limdlMaterial* self,
-                        const limdlMaterial* material);
+limdl_material_compare (const LIMdlMaterial* self,
+                        const LIMdlMaterial* material);
 
 int
-limdl_material_read (limdlMaterial* self,
-                     liarcReader*   reader);
+limdl_material_read (LIMdlMaterial* self,
+                     LIArcReader*   reader);
 
 int
-limdl_material_realloc_textures (limdlMaterial* self,
+limdl_material_realloc_textures (LIMdlMaterial* self,
                                  int            count);
 
 int
-limdl_material_write (limdlMaterial* self,
-                      liarcWriter*   writer);
+limdl_material_write (LIMdlMaterial* self,
+                      LIArcWriter*   writer);
 
 int
-limdl_material_set_texture (limdlMaterial* self,
+limdl_material_set_texture (LIMdlMaterial* self,
                             int            unit,
                             int            type,
                             int            flags,

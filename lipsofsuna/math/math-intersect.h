@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -38,15 +38,15 @@
  * \return Number of intersections.
  */
 static inline int
-limat_intersect_aabb_line (const limatAabb*   self,
-                           const limatVector* p0,
-                           const limatVector* p1,
-                           limatVector*       ret)
+limat_intersect_aabb_line (const LIMatAabb*   self,
+                           const LIMatVector* p0,
+                           const LIMatVector* p1,
+                           LIMatVector*       ret)
 {
 	int hits;
 	float d;
-	limatVector dir;
-	limatVector pt;
+	LIMatVector dir;
+	LIMatVector pt;
 
 	hits = 0;
 	dir = limat_vector_subtract (*p1, *p0);
@@ -125,18 +125,18 @@ limat_intersect_aabb_line (const limatAabb*   self,
  * \return Nonzero if found an intersection.
  */
 static inline int
-limat_intersect_aabb_line_far (const limatAabb*   self,
-                               const limatVector* eye,
-                               const limatVector* end,
-                               limatVector*       ret)
+limat_intersect_aabb_line_far (const LIMatAabb*   self,
+                               const LIMatVector* eye,
+                               const LIMatVector* end,
+                               LIMatVector*       ret)
 {
 	int i;
 	int hit;
 	int num;
 	float d;
 	float dist;
-	limatVector dir;
-	limatVector point[6];
+	LIMatVector dir;
+	LIMatVector point[6];
 
 	num = limat_intersect_aabb_line (self, eye, end, point);
 	if (num == 0)
@@ -172,18 +172,18 @@ limat_intersect_aabb_line_far (const limatAabb*   self,
  * \return Nonzero if found an intersection.
  */
 static inline int
-limat_intersect_aabb_line_near (const limatAabb*   self,
-                                const limatVector* eye,
-                                const limatVector* end,
-                                limatVector*       ret)
+limat_intersect_aabb_line_near (const LIMatAabb*   self,
+                                const LIMatVector* eye,
+                                const LIMatVector* end,
+                                LIMatVector*       ret)
 {
 	int i;
 	int hit;
 	int num;
 	float d;
 	float dist;
-	limatVector dir;
-	limatVector point[6];
+	LIMatVector dir;
+	LIMatVector point[6];
 
 	num = limat_intersect_aabb_line (self, eye, end, point);
 	if (num == 0)

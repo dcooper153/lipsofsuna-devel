@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatTriangle Triangle
+ * \addtogroup LIMatTriangle Triangle
  * @{
  */
 
@@ -40,10 +40,10 @@
  * \param vertex2 Vertex.
  */
 static inline void
-limat_triangle_set_from_points (limatTriangle*     self,
-                                const limatVector* vertex0,
-                                const limatVector* vertex1,
-                                const limatVector* vertex2)
+limat_triangle_set_from_points (LIMatTriangle*     self,
+                                const LIMatVector* vertex0,
+                                const LIMatVector* vertex1,
+                                const LIMatVector* vertex2)
 {
 	limat_plane_init_from_points (&self->plane, vertex0, vertex1, vertex2);
 	self->vertices[0] = *vertex0;
@@ -61,14 +61,14 @@ limat_triangle_set_from_points (limatTriangle*     self,
  * \return Nonzero if enclosed.
  */
 static inline int
-limat_triangle_intersects_point (const limatVector* vertex0,
-                                 const limatVector* vertex1,
-                                 const limatVector* vertex2,
-                                 const limatVector* point)
+limat_triangle_intersects_point (const LIMatVector* vertex0,
+                                 const LIMatVector* vertex1,
+                                 const LIMatVector* vertex2,
+                                 const LIMatVector* point)
 {
-	limatVector p;
-	limatVector a;
-	limatVector b;
+	LIMatVector p;
+	LIMatVector a;
+	LIMatVector b;
 
 	/* First edge. */
 	p = limat_vector_subtract (*point, *vertex0);
@@ -110,20 +110,20 @@ limat_triangle_intersects_point (const limatVector* vertex0,
  * \return Nonzero if intersects.
  */
 static inline int
-limat_triangle_intersects_triangle (const limatTriangle* self,
-                                    const limatTriangle* triangle,
-                                    limatVector*         point0,
-                                    limatVector*         point1)
+limat_triangle_intersects_triangle (const LIMatTriangle* self,
+                                    const LIMatTriangle* triangle,
+                                    LIMatVector*         point0,
+                                    LIMatVector*         point1)
 {
 	float t0;
 	float t1;
 	float dot0;
 	float dot1;
-	limatVector ref;
-	limatVector i00;
-	limatVector i01;
-	limatVector i10;
-	limatVector i11;
+	LIMatVector ref;
+	LIMatVector i00;
+	LIMatVector i01;
+	LIMatVector i10;
+	LIMatVector i11;
 
 	/* Get two coinciding intersection line segments. */
 	if (!limat_plane_intersects_triangle (&self->plane, triangle, &i00, &i01) ||
@@ -154,9 +154,9 @@ limat_triangle_intersects_triangle (const limatTriangle* self,
  * \return Nonzero if intersects.
  */
 static inline int
-limat_triangle_intersects_aabb (const limatTriangle* self,
-                                const limatVector*   origin,
-                                const limatVector*   size)
+limat_triangle_intersects_aabb (const LIMatTriangle* self,
+                                const LIMatVector*   origin,
+                                const LIMatVector*   size)
 {
 	float x0 = origin->x;
 	float x1 = origin->x + size->x;
@@ -164,8 +164,8 @@ limat_triangle_intersects_aabb (const limatTriangle* self,
 	float y1 = origin->y + size->y;
 	float z0 = origin->z;
 	float z1 = origin->z + size->z;
-	limatVector l[2];
-	limatPlane p[6] =
+	LIMatVector l[2];
+	LIMatPlane p[6] =
 	{
 		{ 1, 0, 0, x0 }, /* Left. */
 		{ 1, 0, 0, x1 }, /* Right. */
@@ -174,7 +174,7 @@ limat_triangle_intersects_aabb (const limatTriangle* self,
 		{ 0, 0, 1, z0 }, /* Front. */
 		{ 0, 0, 1, z1 }, /* Back. */
 	};
-	limatRectangle r[3] =
+	LIMatRectangle r[3] =
 	{
 		{ y0, z0, size->y, size->z }, /* Left and right. */
 		{ x0, z0, size->x, size->z }, /* Bottom and top. */

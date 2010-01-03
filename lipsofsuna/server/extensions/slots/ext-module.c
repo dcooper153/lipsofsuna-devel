@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,32 +24,32 @@
  * @{
  */
 
-#include <network/lips-network.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-slots.h"
 
 static int
-private_vision_show (liextModule* self,
-                     liengObject* object,
-                     liengObject* observer);
+private_vision_show (LIExtModule* self,
+                     LIEngObject* object,
+                     LIEngObject* observer);
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Slots",
+	LISER_EXTENSION_VERSION, "Slots",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (lisrvServer* server)
+LIExtModule*
+liext_module_new (LISerServer* server)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
@@ -68,31 +68,31 @@ liext_module_new (lisrvServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Slots", liextSlotsScript, self);
+	liscr_script_create_class (server->script, "Slots", liext_script_slots, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
 	lialg_ptrdic_free (self->dictionary);
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 /*****************************************************************************/
 
 static int
-private_vision_show (liextModule* self,
-                     liengObject* object,
-                     liengObject* target)
+private_vision_show (LIExtModule* self,
+                     LIEngObject* object,
+                     LIEngObject* target)
 {
 	int i;
 	int perm;
-	liarcWriter* writer;
-	liextSlot* slot;
-	liextSlots* slots;
+	LIArcWriter* writer;
+	LIExtSlot* slot;
+	LIExtSlots* slots;
 
 	/* Get skills data. */
 	slots = lialg_ptrdic_find (self->dictionary, target);
@@ -121,7 +121,7 @@ private_vision_show (liextModule* self,
 	}
 
 	/* Send to the client. */
-	lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+	liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 	liarc_writer_free (writer);
 
 	return 1;

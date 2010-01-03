@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,29 +24,29 @@
  * @{
  */
 
-#include <network/lips-network.h>
+#include <lipsofsuna/network.h>
 #include "ext-module.h"
 #include "ext-skills.h"
 
 static int
-private_send_clear (liextSkills* self);
+private_send_clear (LIExtSkills* self);
 
 static int
-private_send_reset (liextSkills* self);
+private_send_reset (LIExtSkills* self);
 
 static int
-private_send_skill (liextSkills* self,
-                    liextSkill*  skill);
+private_send_skill (LIExtSkills* self,
+                    LIExtSkill*  skill);
 
 /*****************************************************************************/
 
-liextSkills*
-liext_skills_new (liextModule* module)
+LIExtSkills*
+liext_skills_new (LIExtModule* module)
 {
-	liextSkills* self;
+	LIExtSkills* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextSkills));
+	self = lisys_calloc (1, sizeof (LIExtSkills));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
@@ -71,9 +71,9 @@ liext_skills_new (liextModule* module)
 }
 
 void
-liext_skills_free (liextSkills* self)
+liext_skills_free (LIExtSkills* self)
 {
-	lialgStrdicIter iter;
+	LIAlgStrdicIter iter;
 
 	liext_skills_set_owner (self, NULL);
 	LI_FOREACH_STRDIC (iter, self->skills)
@@ -82,19 +82,19 @@ liext_skills_free (liextSkills* self)
 	lisys_free (self);
 }
 
-liextSkill*
-liext_skills_find_skill (liextSkills* self,
+LIExtSkill*
+liext_skills_find_skill (LIExtSkills* self,
                          const char*  name)
 {
 	return lialg_strdic_find (self->skills, name);
 }
 
 int
-liext_skills_insert_skill (liextSkills*   self,
-                           liextSkillType type,
+liext_skills_insert_skill (LIExtSkills*   self,
+                           LIExtSkillType type,
                            const char*    name)
 {
-	liextSkill* skill;
+	LIExtSkill* skill;
 
 	/* Create skill. */
 	skill = liext_skill_new (self, type, name);
@@ -117,12 +117,12 @@ liext_skills_insert_skill (liextSkills*   self,
 }
 
 void
-liext_skills_update (liextSkills* self,
+liext_skills_update (LIExtSkills* self,
                      float        secs)
 {
 	float value;
-	lialgStrdicIter iter;
-	liextSkill* skill;
+	LIAlgStrdicIter iter;
+	LIExtSkill* skill;
 
 	LI_FOREACH_STRDIC (iter, self->skills)
 	{
@@ -146,8 +146,8 @@ liext_skills_update (liextSkills* self,
 }
 
 int
-liext_skills_update_skill (liextSkills* self,
-                           liextSkill*  skill)
+liext_skills_update_skill (LIExtSkills* self,
+                           LIExtSkill*  skill)
 {
 	assert (skill == liext_skills_find_skill (self, skill->name));
 
@@ -161,17 +161,17 @@ liext_skills_update_skill (liextSkills* self,
 	return 1;
 }
 
-liengObject*
-liext_skills_get_owner (liextSkills* self)
+LIEngObject*
+liext_skills_get_owner (LIExtSkills* self)
 {
 	return self->owner;
 }
 
 int
-liext_skills_set_owner (liextSkills* self,
-                        liengObject* value)
+liext_skills_set_owner (LIExtSkills* self,
+                        LIEngObject* value)
 {
-	liextSkills* old;
+	LIExtSkills* old;
 
 	if (self->owner == value)
 		return 1;
@@ -222,11 +222,11 @@ liext_skills_set_owner (liextSkills* self,
 /*****************************************************************************/
 
 static int
-private_send_clear (liextSkills* self)
+private_send_clear (LIExtSkills* self)
 {
-	liarcWriter* writer;
-	liengObject* object;
-	lisrvObserverIter iter;
+	LIArcWriter* writer;
+	LIEngObject* object;
+	LISerObserverIter iter;
 
 	/* Create packet. */
 	writer = liarc_writer_new_packet (LIEXT_SKILLS_PACKET_RESET);
@@ -235,10 +235,10 @@ private_send_clear (liextSkills* self)
 	liarc_writer_append_uint32 (writer, self->owner->id);
 
 	/* Send to all observers. */
-	LISRV_FOREACH_OBSERVER (iter, self->owner, 1)
+	LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 	{
 		object = iter.object;
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 	}
 
 	liarc_writer_free (writer);
@@ -247,13 +247,13 @@ private_send_clear (liextSkills* self)
 }
 
 static int
-private_send_reset (liextSkills* self)
+private_send_reset (LIExtSkills* self)
 {
-	lialgStrdicIter iter0;
-	liarcWriter* writer;
-	liengObject* object;
-	liextSkill* skill;
-	lisrvObserverIter iter;
+	LIAlgStrdicIter iter0;
+	LIArcWriter* writer;
+	LIEngObject* object;
+	LIExtSkill* skill;
+	LISerObserverIter iter;
 
 	/* Create packet. */
 	writer = liarc_writer_new_packet (LIEXT_SKILLS_PACKET_RESET);
@@ -272,10 +272,10 @@ private_send_reset (liextSkills* self)
 	}
 
 	/* Send to all observers. */
-	LISRV_FOREACH_OBSERVER (iter, self->owner, 1)
+	LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 	{
 		object = iter.object;
-		lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 	}
 
 	liarc_writer_free (writer);
@@ -284,12 +284,12 @@ private_send_reset (liextSkills* self)
 }
 
 static int
-private_send_skill (liextSkills* self,
-                    liextSkill*  skill)
+private_send_skill (LIExtSkills* self,
+                    LIExtSkill*  skill)
 {
-	liarcWriter* writer;
-	liengObject* object;
-	lisrvObserverIter iter;
+	LIArcWriter* writer;
+	LIEngObject* object;
+	LISerObserverIter iter;
 
 	if (skill->type == LIEXT_SKILL_TYPE_INTERNAL)
 		return 1;
@@ -307,15 +307,15 @@ private_send_skill (liextSkills* self,
 	/* Send to all observers. */
 	if (skill->type == LIEXT_SKILL_TYPE_PUBLIC)
 	{
-		LISRV_FOREACH_OBSERVER (iter, self->owner, 1)
+		LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 		{
 			object = iter.object;
-			lisrv_client_send (LISRV_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+			liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 		}
 	}
-	else if (LISRV_OBJECT (self->owner)->client != NULL)
+	else if (LISER_OBJECT (self->owner)->client != NULL)
 	{
-		lisrv_client_send (LISRV_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
+		liser_client_send (LISER_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
 	}
 
 	liarc_writer_free (writer);

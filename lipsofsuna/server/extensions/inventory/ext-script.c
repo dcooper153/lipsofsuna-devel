@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <script/lips-script.h>
-#include <server/lips-server.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
 #include "ext-inventory.h"
 #include "ext-module.h"
 
@@ -47,11 +47,11 @@
  * @param args Arguments.
  * @return Object or nil.
  */
-static void Inventory_get_object (liscrArgs* args)
+static void Inventory_get_object (LIScrArgs* args)
 {
 	int slot;
 	int size;
-	liengObject* object;
+	LIEngObject* object;
 
 	if (liscr_args_gets_int (args, "slot", &slot))
 	{
@@ -76,11 +76,11 @@ static void Inventory_get_object (liscrArgs* args)
  * @param args Arguments.
  * @return Object or nil.
  */
-static void Inventory_set_object (liscrArgs* args)
+static void Inventory_set_object (LIScrArgs* args)
 {
 	int slot;
 	int size;
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_gets_int (args, "slot", &slot))
 	{
@@ -111,10 +111,10 @@ static void Inventory_set_object (liscrArgs* args)
  * -- @return Inventory or nil.
  * function Inventory.find(self, args)
  */
-static void Inventory_find (liscrArgs* args)
+static void Inventory_find (LIScrArgs* args)
 {
 	int id;
-	liextInventory* inventory;
+	LIExtInventory* inventory;
 
 	if (liscr_args_gets_int (args, "id", &id))
 	{
@@ -133,11 +133,11 @@ static void Inventory_find (liscrArgs* args)
  * -- @return New inventory.
  * function Inventory.new(self, args)
  */
-static void Inventory_new (liscrArgs* args)
+static void Inventory_new (LIScrArgs* args)
 {
-	liextInventory* self;
-	liextModule* module;
-	liscrData* data;
+	LIExtInventory* self;
+	LIExtModule* module;
+	LIScrData* data;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_INVENTORY);
@@ -169,9 +169,9 @@ static void Inventory_new (liscrArgs* args)
  * -- @param args Arguments.
  * function Inventory.subscribe(self, args)
  */
-static void Inventory_subscribe (liscrArgs* args)
+static void Inventory_subscribe (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 		liext_inventory_insert_listener (args->self, data->data);
@@ -189,9 +189,9 @@ static void Inventory_subscribe (liscrArgs* args)
  * -- @return True if subscribed.
  * function Inventory.subscribed(self, args)
  */
-static void Inventory_subscribed (liscrArgs* args)
+static void Inventory_subscribed (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
@@ -211,9 +211,9 @@ static void Inventory_subscribed (liscrArgs* args)
  * -- @param args Arguments.
  * function Inventory.unsubscribe(self, args)
  */
-static void Inventory_unsubscribe (liscrArgs* args)
+static void Inventory_unsubscribe (LIScrArgs* args)
 {
-	liscrData* data;
+	LIScrData* data;
 
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 		liext_inventory_remove_listener (args->self, data->data);
@@ -226,12 +226,12 @@ static void Inventory_unsubscribe (liscrArgs* args)
  * -- @name Inventory.first_free_slot
  * -- @class table
  */
-static void Inventory_getter_first_free_slot (liscrArgs* args)
+static void Inventory_getter_first_free_slot (LIScrArgs* args)
 {
 	int i;
 	int size;
-	liscrData* self;
-	liengObject* object;
+	LIScrData* self;
+	LIEngObject* object;
 
 	self = args->self;
 	size = liext_inventory_get_size (self->data);
@@ -253,7 +253,7 @@ static void Inventory_getter_first_free_slot (liscrArgs* args)
  * -- @name Inventory.id
  * -- @class table
  */
-static void Inventory_getter_id (liscrArgs* args)
+static void Inventory_getter_id (LIScrArgs* args)
 {
 	liscr_args_seti_int (args, liext_inventory_get_id (args->self));
 }
@@ -288,11 +288,11 @@ static void Inventory_getter_id (liscrArgs* args)
  * -- @name Inventory.size
  * -- @class table
  */
-static void Inventory_getter_size (liscrArgs* args)
+static void Inventory_getter_size (LIScrArgs* args)
 {
 	liscr_args_seti_int (args, liext_inventory_get_size (args->self));
 }
-static void Inventory_setter_size (liscrArgs* args)
+static void Inventory_setter_size (LIScrArgs* args)
 {
 	int value;
 
@@ -323,7 +323,7 @@ static void Inventory_setter_size (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextInventoryScript (liscrClass* self,
+liext_script_inventory (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY, data);

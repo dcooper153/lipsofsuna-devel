@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup lical Callback
  * @{
- * \addtogroup licalHandle Handle
+ * \addtogroup LICalHandle Handle
  * @{
  */
 
@@ -27,16 +27,16 @@
 
 #include "cal-marshal.h"
 
-typedef struct _licalCallfunc licalCallfunc;
-typedef struct _licalCallbacks licalCallbacks;
-typedef struct _licalHandle licalHandle;
+typedef struct _LICalCallfunc LICalCallfunc;
+typedef struct _LICalCallbacks LICalCallbacks;
+typedef struct _LICalHandle LICalHandle;
 
-struct _licalHandle
+struct _LICalHandle
 {
-	licalCallbacks* calls;
+	LICalCallbacks* calls;
 	void* object;
 	char type[32];
-	licalCallfunc* func;
+	LICalCallfunc* func;
 };
 
 #ifdef __cplusplus
@@ -44,10 +44,10 @@ extern "C" {
 #endif
 
 void
-lical_handle_release (licalHandle* self);
+lical_handle_release (LICalHandle* self);
 
 void
-lical_handle_releasev (licalHandle* self,
+lical_handle_releasev (LICalHandle* self,
                        int          count);
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,8 +23,8 @@
 /**
  * \brief A plane defined by a point and a normal.
  */
-typedef struct _limatPlane limatPlane;
-struct _limatPlane
+typedef struct _LIMatPlane LIMatPlane;
+struct _LIMatPlane
 {
 	float x;
 	float y;
@@ -32,17 +32,17 @@ struct _limatPlane
 	float w;
 };
 
-typedef struct _limatTriangle limatTriangle;
-struct _limatTriangle
+typedef struct _LIMatTriangle LIMatTriangle;
+struct _LIMatTriangle
 {
-	limatPlane plane;
-	limatVector vertices[3];
+	LIMatPlane plane;
+	LIMatVector vertices[3];
 };
 
 static inline void
-limat_triangle_set_from_points (limatTriangle*     self,
-                                const limatVector* vertex0,
-                                const limatVector* vertex1,
-                                const limatVector* vertex2);
+limat_triangle_set_from_points (LIMatTriangle*     self,
+                                const LIMatVector* vertex0,
+                                const LIMatVector* vertex1,
+                                const LIMatVector* vertex2);
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,21 +18,21 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgGroup Group
+ * \addtogroup LIWdgGroup Group
  * @{
  */
 
 #ifndef __WIDGET_GROUP_H__
 #define __WIDGET_GROUP_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 #include "widget.h"
 #include "widget-container.h"
 
-#define LIWDG_GROUP(o) ((liwdgGroup*)(o))
+#define LIWDG_GROUP(o) ((LIWdgGroup*)(o))
 
-typedef struct _liwdgGroupRow liwdgGroupRow;
-struct _liwdgGroupRow
+typedef struct _LIWdgGroupRow LIWdgGroupRow;
+struct _LIWdgGroupRow
 {
 	int start;
 	int expand;
@@ -40,8 +40,8 @@ struct _liwdgGroupRow
 	int allocation;
 };
 
-typedef struct _liwdgGroupCol liwdgGroupCol;
-struct _liwdgGroupCol
+typedef struct _LIWdgGroupCol LIWdgGroupCol;
+struct _LIWdgGroupCol
 {
 	int start;
 	int expand;
@@ -49,18 +49,18 @@ struct _liwdgGroupCol
 	int allocation;
 };
 
-typedef struct _liwdgGroupCell liwdgGroupCell;
-struct _liwdgGroupCell
+typedef struct _LIWdgGroupCell LIWdgGroupCell;
+struct _LIWdgGroupCell
 {
 	int width;
 	int height;
-	liwdgWidget* child;
+	LIWdgWidget* child;
 };
 
-typedef struct _liwdgGroup liwdgGroup;
-struct _liwdgGroup
+typedef struct _LIWdgGroup LIWdgGroup;
+struct _LIWdgGroup
 {
-	liwdgContainer base;
+	LIWdgContainer base;
 	int width;
 	int height;
 	int homogeneous;
@@ -73,124 +73,124 @@ struct _liwdgGroup
 	int margin_top;
 	int margin_bottom;
 	int rebuilding;
-	liwdgGroupRow* rows;
-	liwdgGroupCol* cols;
-	liwdgGroupCell* cells;
+	LIWdgGroupRow* rows;
+	LIWdgGroupCol* cols;
+	LIWdgGroupCell* cells;
 };
 
-extern const liwdgClass liwdgGroupType;
+extern const LIWdgClass liwdg_widget_group;
 
-liwdgWidget*
-liwdg_group_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_group_new (LIWdgManager* manager);
 
-liwdgWidget*
-liwdg_group_new_with_size (liwdgManager* manager,
+LIWdgWidget*
+liwdg_group_new_with_size (LIWdgManager* manager,
                            int           cols,
                            int           rows);
 
 int
-liwdg_group_append_col (liwdgGroup* self);
+liwdg_group_append_col (LIWdgGroup* self);
 
 int
-liwdg_group_append_row (liwdgGroup* self);
+liwdg_group_append_row (LIWdgGroup* self);
 
 int
-liwdg_group_insert_col (liwdgGroup* self,
+liwdg_group_insert_col (LIWdgGroup* self,
                         int         index);
 
 int
-liwdg_group_insert_row (liwdgGroup* self,
+liwdg_group_insert_row (LIWdgGroup* self,
                         int         index);
 
 void
-liwdg_group_remove_col (liwdgGroup* self,
+liwdg_group_remove_col (LIWdgGroup* self,
                         int         index);
 
 void
-liwdg_group_remove_row (liwdgGroup* self,
+liwdg_group_remove_row (LIWdgGroup* self,
                         int         index);
 
 void
-liwdg_group_get_cell_rect (liwdgGroup* self,
+liwdg_group_get_cell_rect (LIWdgGroup* self,
                            int         x,
                            int         y,
-                           liwdgRect*  rect);
+                           LIWdgRect*  rect);
 
-liwdgWidget*
-liwdg_group_get_child (liwdgGroup* self,
+LIWdgWidget*
+liwdg_group_get_child (LIWdgGroup* self,
                        int         x,
                        int         y);
 
 void
-liwdg_group_set_child (liwdgGroup*  self,
+liwdg_group_set_child (LIWdgGroup*  self,
                        int          x,
                        int          y,
-                       liwdgWidget* child);
+                       LIWdgWidget* child);
 
 int
-liwdg_group_get_col_expand (liwdgGroup* self,
+liwdg_group_get_col_expand (LIWdgGroup* self,
                             int         x);
 
 void
-liwdg_group_set_col_expand (liwdgGroup* self,
+liwdg_group_set_col_expand (LIWdgGroup* self,
                             int         x,
                             int         expand); 
 
 int
-liwdg_group_get_col_size (liwdgGroup* self,
+liwdg_group_get_col_size (LIWdgGroup* self,
                           int         x);
 
 int
-liwdg_group_get_homogeneous (const liwdgGroup* self);
+liwdg_group_get_homogeneous (const LIWdgGroup* self);
 
 void
-liwdg_group_set_homogeneous (liwdgGroup* self,
+liwdg_group_set_homogeneous (LIWdgGroup* self,
                              int         value);
 
 void
-liwdg_group_get_margins (liwdgGroup* self,
+liwdg_group_get_margins (LIWdgGroup* self,
                          int*        left,
                          int*        right,
                          int*        top,
                          int*        bottom);
 
 void
-liwdg_group_set_margins (liwdgGroup* self,
+liwdg_group_set_margins (LIWdgGroup* self,
                          int         left,
                          int         right,
                          int         top,
                          int         bottom);
 
 int
-liwdg_group_get_row_expand (liwdgGroup* self,
+liwdg_group_get_row_expand (LIWdgGroup* self,
                             int         y);
 
 void
-liwdg_group_set_row_expand (liwdgGroup* self,
+liwdg_group_set_row_expand (LIWdgGroup* self,
                             int         y,
                             int         expand);
 
 int
-liwdg_group_get_row_size (liwdgGroup* self,
+liwdg_group_get_row_size (LIWdgGroup* self,
                           int         y);
 
 void
-liwdg_group_get_size (liwdgGroup* self,
+liwdg_group_get_size (LIWdgGroup* self,
                       int*        cols,
                       int*        rows);
 
 int
-liwdg_group_set_size (liwdgGroup* self,
+liwdg_group_set_size (LIWdgGroup* self,
                       int         cols,
                       int         rows);
 
 void
-liwdg_group_get_spacings (liwdgGroup* self,
+liwdg_group_get_spacings (LIWdgGroup* self,
                           int*        column,
                           int*        row);
 
 void
-liwdg_group_set_spacings (liwdgGroup* self,
+liwdg_group_set_spacings (LIWdgGroup* self,
                           int         column,
                           int         row);
 

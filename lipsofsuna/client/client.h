@@ -18,24 +18,24 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliClient Client
+ * \addtogroup LICliClient Client
  * @{
  */
 
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <callback/lips-callback.h>
-#include <binding/lips-binding.h>
-#include <engine/lips-engine.h>
-#include <paths/lips-paths.h>
-#include <render/lips-render.h>
-#include <script/lips-script.h>
-#include <server/lips-server.h>
-#include <thread/lips-thread.h>
-#include <video/lips-video.h>
-#include <widget/lips-widget.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/callback.h>
+#include <lipsofsuna/binding.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/paths.h>
+#include <lipsofsuna/render.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/server.h>
+#include <lipsofsuna/thread.h>
+#include <lipsofsuna/video.h>
+#include <lipsofsuna/widget.h>
 #include "client-callbacks.h"
 #include "client-extension.h"
 #include "client-network.h"
@@ -47,17 +47,17 @@
 #define LI_CLIENT_ROTATION_SPEED 1.5f
 #define LI_CLIENT_SELECT_MAXIMUM_COUNT 128
 #define LI_CLIENT_SELECT_RECTANGLE_SIZE 1
-extern const libndAction li_binding_actions[];
-const libndAction* li_binding_action_get (const char* identifier);
+extern const LIBndAction li_binding_actions[];
+const LIBndAction* li_binding_action_get (const char* identifier);
 
 #define LICLI_EVENT_TYPE_ACTION 0
 
-struct _licliClient
+struct _LICliClient
 {
 	/* Persistent. */
 	char* root;
-	licliWindow* window;
-	lividCalls video;
+	LICliWindow* window;
+	LIVidCalls video;
 
 	/* Module specific. */
 	int moving;
@@ -67,82 +67,82 @@ struct _licliClient
 	char* login;
 	char* password;
 	char* camera_node;
-	lialgCamera* camera;
-	lialgSectors* sectors;
-	lialgStrdic* extensions;
-	libndManager* bindings;
-	licalCallbacks* callbacks;
-	licliNetwork* network;
-	liengEngine* engine;
-	lipthPaths* paths;
-	lirndRender* render;
-	lirndScene* scene;
-	liscrScript* script;
-	lisrvServer* server;
-	lithrThread* server_thread;
-	liwdgManager* widgets;
+	LIAlgCamera* camera;
+	LIAlgSectors* sectors;
+	LIAlgStrdic* extensions;
+	LIBndManager* bindings;
+	LICalCallbacks* callbacks;
+	LICliNetwork* network;
+	LIEngEngine* engine;
+	LIPthPaths* paths;
+	LIRenRender* render;
+	LIRenScene* scene;
+	LIScrScript* script;
+	LISerServer* server;
+	LIThrThread* server_thread;
+	LIWdgManager* widgets;
 };
 
-licliClient*
-licli_client_new (lividCalls* video,
+LICliClient*
+licli_client_new (LIVidCalls* video,
                   const char* path,
                   const char* name);
 
 void
-licli_client_free (licliClient* self);
+licli_client_free (LICliClient* self);
 
 int
-licli_client_connect (licliClient* self,
+licli_client_connect (LICliClient* self,
                       const char*  name,
                       const char*  pass);
 
-licliExtension*
-licli_client_find_extension (licliClient* self,
+LICliExtension*
+licli_client_find_extension (LICliClient* self,
                              const char*  name);
 
-liengObject*
-licli_client_find_object (licliClient* self,
+LIEngObject*
+licli_client_find_object (LICliClient* self,
                           uint32_t     id);
 
 int
-licli_client_handle_packet (licliClient* self,
+licli_client_handle_packet (LICliClient* self,
                             int          type,
-                            liarcReader* reader);
+                            LIArcReader* reader);
 
 int
-licli_client_host (licliClient* self);
+licli_client_host (LICliClient* self);
 
 int
-licli_client_load_extension (licliClient* self,
+licli_client_load_extension (LICliClient* self,
                              const char*  name);
 
 int
-licli_client_main (licliClient* self);
+licli_client_main (LICliClient* self);
 
 void
-licli_client_render (licliClient* self);
+licli_client_render (LICliClient* self);
 
 void
-licli_client_send (licliClient* self,
-                   liarcWriter* writer,
+licli_client_send (LICliClient* self,
+                   LIArcWriter* writer,
                    int          flags);
 
 int
-licli_client_update (licliClient* self,
+licli_client_update (LICliClient* self,
                      float        secs);
 
 int
-licli_client_get_moving (licliClient* self);
+licli_client_get_moving (LICliClient* self);
 
 void
-licli_client_set_moving (licliClient* self,
+licli_client_set_moving (LICliClient* self,
                          int          value);
 
-liengObject*
-licli_client_get_player (licliClient* self);
+LIEngObject*
+licli_client_get_player (LICliClient* self);
 
-/*licliClient*
-licli_client_new (licliClient* client,
+/*LICliClient*
+licli_client_new (LICliClient* client,
                   const char*  path,
                   const char*  name,
                   const char*  login,

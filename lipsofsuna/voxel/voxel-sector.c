@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup livox Voxel
  * @{
- * \addtogroup livoxSector Sector
+ * \addtogroup LIVoxSector Sector
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "voxel-manager.h"
 #include "voxel-sector.h"
 #include "voxel-private.h"
@@ -32,7 +32,7 @@
 #define LIVOX_TILES_PER_SECLINE (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE)
 
 static int
-private_build_block (livoxSector* self,
+private_build_block (LIVoxSector* self,
                      int          x,
                      int          y,
                      int          z);
@@ -45,13 +45,13 @@ private_build_block (livoxSector* self,
  * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
-livoxSector*
-livox_sector_new (lialgSector* sector)
+LIVoxSector*
+livox_sector_new (LIAlgSector* sector)
 {
-	livoxSector* self;
+	LIVoxSector* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (livoxSector));
+	self = lisys_calloc (1, sizeof (LIVoxSector));
 	if (self == NULL)
 		return NULL;
 	self->manager = lialg_sectors_get_userdata (sector->manager, "voxel");
@@ -70,7 +70,7 @@ livox_sector_new (lialgSector* sector)
  * \param self Sector.
  */
 void
-livox_sector_free (livoxSector* self)
+livox_sector_free (LIVoxSector* self)
 {
 	int i;
 
@@ -82,7 +82,7 @@ livox_sector_free (livoxSector* self)
 }
 
 int
-livox_sector_build_block (livoxSector* self,
+livox_sector_build_block (LIVoxSector* self,
                           int          x,
                           int          y,
                           int          z)
@@ -97,8 +97,8 @@ livox_sector_build_block (livoxSector* self,
  * \param terrain Terrain type.
  */
 void
-livox_sector_fill (livoxSector* self,
-                   livoxVoxel*  terrain)
+livox_sector_fill (LIVoxSector* self,
+                   LIVoxVoxel*  terrain)
 {
 	int x;
 	int y;
@@ -127,8 +127,8 @@ livox_sector_fill (livoxSector* self,
  * \return Nonzero on success.
  */
 int
-livox_sector_read (livoxSector* self,
-                   liarcSql*    sql)
+livox_sector_read (LIVoxSector* self,
+                   LIArcSql*    sql)
 {
 	int x;
 	int y;
@@ -140,8 +140,8 @@ livox_sector_read (livoxSector* self,
 	uint8_t rotation;
 	const char* query;
 	const void* bytes;
-	liarcReader* reader;
-	livoxVoxel tmp;
+	LIArcReader* reader;
+	LIVoxVoxel tmp;
 	sqlite3_stmt* statement;
 
 	/* Prepare statement. */
@@ -214,7 +214,7 @@ livox_sector_read (livoxSector* self,
  * \param secs Number of seconds since the last update.
  */
 void
-livox_sector_update (livoxSector* self,
+livox_sector_update (LIVoxSector* self,
                      float        secs)
 {
 }
@@ -227,8 +227,8 @@ livox_sector_update (livoxSector* self,
  * \return Nonzero on success.
  */
 int
-livox_sector_write (livoxSector* self,
-                    liarcSql*    sql)
+livox_sector_write (LIVoxSector* self,
+                    LIArcSql*    sql)
 {
 	int x;
 	int y;
@@ -237,8 +237,8 @@ livox_sector_write (livoxSector* self,
 	int col = 1;
 	const char* query;
 	sqlite3_stmt* statement;
-	liarcWriter* writer;
-	livoxVoxel* tmp;
+	LIArcWriter* writer;
+	LIVoxVoxel* tmp;
 
 	id = self->sector->index;
 
@@ -321,8 +321,8 @@ livox_sector_write (livoxSector* self,
  * \param index Block index.
  * \return Block.
  */
-livoxBlock*
-livox_sector_get_block (livoxSector* self,
+LIVoxBlock*
+livox_sector_get_block (LIVoxSector* self,
                         int          index)
 {
 	assert (index >= 0);
@@ -338,11 +338,11 @@ livox_sector_get_block (livoxSector* self,
  * \param result Return location for the bounding box.
  */
 void
-livox_sector_get_bounds (const livoxSector* self,
-                         limatAabb*         result)
+livox_sector_get_bounds (const LIVoxSector* self,
+                         LIMatAabb*         result)
 {
-	limatVector min;
-	limatVector max;
+	LIMatVector min;
+	LIMatVector max;
 
 	min = self->sector->position;
 	max = limat_vector_init (LIVOX_SECTOR_WIDTH, LIVOX_SECTOR_WIDTH, LIVOX_SECTOR_WIDTH);
@@ -357,7 +357,7 @@ livox_sector_get_bounds (const livoxSector* self,
  * \return Nonzero if dirty.
  */
 int
-livox_sector_get_dirty (const livoxSector* self)
+livox_sector_get_dirty (const LIVoxSector* self)
 {
 	return self->dirty;
 }
@@ -369,7 +369,7 @@ livox_sector_get_dirty (const livoxSector* self)
  * \param value Zero to clear, nonzero to set.
  */
 void
-livox_sector_set_dirty (livoxSector* self,
+livox_sector_set_dirty (LIVoxSector* self,
                         int          value)
 {
 	self->dirty = value;
@@ -382,7 +382,7 @@ livox_sector_set_dirty (livoxSector* self,
  * \return Nonzero if the sector is empty.
  */
 int
-livox_sector_get_empty (const livoxSector* self)
+livox_sector_get_empty (const LIVoxSector* self)
 {
 	int i;
 
@@ -404,7 +404,7 @@ livox_sector_get_empty (const livoxSector* self)
  * \param z Return location for the offset.
  */
 void
-livox_sector_get_offset (const livoxSector* self,
+livox_sector_get_offset (const LIVoxSector* self,
                          int*               x,
                          int*               y,
                          int*               z)
@@ -421,8 +421,8 @@ livox_sector_get_offset (const livoxSector* self,
  * \param result Return location for the position vector.
  */
 void
-livox_sector_get_origin (const livoxSector* self,
-                         limatVector*       result)
+livox_sector_get_origin (const LIVoxSector* self,
+                         LIMatVector*       result)
 {
 	*result = self->sector->position;
 }
@@ -436,13 +436,13 @@ livox_sector_get_origin (const livoxSector* self,
  * \param z Offset of the voxel within the sector.
  * \return Terrain type or zero.
  */
-livoxVoxel*
-livox_sector_get_voxel (livoxSector* self,
+LIVoxVoxel*
+livox_sector_get_voxel (LIVoxSector* self,
                         int          x,
                         int          y,
                         int          z)
 {
-	livoxBlock* block;
+	LIVoxBlock* block;
 	int bx = x / LIVOX_TILES_PER_LINE;
 	int by = y / LIVOX_TILES_PER_LINE;
 	int bz = z / LIVOX_TILES_PER_LINE;
@@ -470,11 +470,11 @@ livox_sector_get_voxel (livoxSector* self,
  * \return Nonzero if a voxel was modified.
  */
 int
-livox_sector_set_voxel (livoxSector* self,
+livox_sector_set_voxel (LIVoxSector* self,
                         int          x,
                         int          y,
                         int          z,
-                        livoxVoxel   terrain)
+                        LIVoxVoxel   terrain)
 {
 	int ret;
 	int bx = x / LIVOX_TILES_PER_LINE;
@@ -483,7 +483,7 @@ livox_sector_set_voxel (livoxSector* self,
 	int tx = x % LIVOX_TILES_PER_LINE;
 	int ty = y % LIVOX_TILES_PER_LINE;
 	int tz = z % LIVOX_TILES_PER_LINE;
-	livoxBlock* block;
+	LIVoxBlock* block;
 
 	assert (x >= 0 && y >= 0 && z >= 0);
 	assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
@@ -503,12 +503,12 @@ livox_sector_set_voxel (livoxSector* self,
 /*****************************************************************************/
 
 static int
-private_build_block (livoxSector* self,
+private_build_block (LIVoxSector* self,
                      int          x,
                      int          y,
                      int          z)
 {
-	livoxUpdateEvent event;
+	LIVoxUpdateEvent event;
 
 	/* Invoke callbacks. */
 	event.sector[0] = self->sector->x;

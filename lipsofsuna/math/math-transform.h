@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatTransform Transform
+ * \addtogroup LIMatTransform Transform
  * @{
  */
 
@@ -29,18 +29,18 @@
 #include "math-quaternion.h"
 #include "math-vector.h"
 
-typedef struct _limatTransform limatTransform;
-struct _limatTransform
+typedef struct _LIMatTransform LIMatTransform;
+struct _LIMatTransform
 {
-	limatVector position;
-	limatQuaternion rotation;
+	LIMatVector position;
+	LIMatQuaternion rotation;
 };
 
-static inline limatTransform
-limat_transform_init (limatVector     position,
-                      limatQuaternion rotation)
+static inline LIMatTransform
+limat_transform_init (LIMatVector     position,
+                      LIMatQuaternion rotation)
 {
-	limatTransform self;
+	LIMatTransform self;
 
 	self.position = position;
 	self.rotation = rotation;
@@ -48,10 +48,10 @@ limat_transform_init (limatVector     position,
 	return self;
 }
 
-static inline limatTransform
+static inline LIMatTransform
 limat_transform_identity ()
 {
-	limatTransform self;
+	LIMatTransform self;
 
 	self.position = limat_vector_init (0.0f, 0.0f, 0.0f);
 	self.rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);
@@ -59,12 +59,12 @@ limat_transform_identity ()
 	return self;
 }
 
-static inline limatTransform
-limat_transform_look (limatVector position,
-                      limatVector direction,
-                      limatVector up)
+static inline LIMatTransform
+limat_transform_look (LIMatVector position,
+                      LIMatVector direction,
+                      LIMatVector up)
 {
-	limatTransform self;
+	LIMatTransform self;
 
 	self.rotation = limat_quaternion_look (direction, up);
 	self.position = limat_quaternion_transform (
@@ -73,13 +73,13 @@ limat_transform_look (limatVector position,
 	return self;
 }
 
-static inline limatTransform
-limat_transform_lookat (limatVector position,
-                        limatVector center,
-                        limatVector up)
+static inline LIMatTransform
+limat_transform_lookat (LIMatVector position,
+                        LIMatVector center,
+                        LIMatVector up)
 {
-	limatTransform self;
-	limatVector direction;
+	LIMatTransform self;
+	LIMatVector direction;
 
 	direction = limat_vector_subtract (position, center);
 	direction = limat_vector_normalize (position);
@@ -90,11 +90,11 @@ limat_transform_lookat (limatVector position,
 	return self;
 }
 
-static inline limatTransform
-limat_transform_invert (limatTransform self)
+static inline LIMatTransform
+limat_transform_invert (LIMatTransform self)
 {
-	limatVector tmp;
-	limatTransform result;
+	LIMatVector tmp;
+	LIMatTransform result;
 
 	tmp = limat_vector_invert (self.position);
 	result.rotation = limat_quaternion_conjugate (self.rotation);
@@ -103,10 +103,10 @@ limat_transform_invert (limatTransform self)
 	return result;
 }
 
-static inline limatTransform
-limat_transform_conjugate (limatTransform self)
+static inline LIMatTransform
+limat_transform_conjugate (LIMatTransform self)
 {
-	limatTransform result;
+	LIMatTransform result;
 
 	result.position = self.position;
 	result.rotation = limat_quaternion_conjugate (self.rotation);
@@ -114,11 +114,11 @@ limat_transform_conjugate (limatTransform self)
 	return result;
 }
 
-static inline limatTransform
-limat_transform_multiply (limatTransform self,
-                          limatTransform transform)
+static inline LIMatTransform
+limat_transform_multiply (LIMatTransform self,
+                          LIMatTransform transform)
 {
-	limatTransform result;
+	LIMatTransform result;
 
 	result.position = limat_quaternion_transform (self.rotation, transform.position);
 	result.position = limat_vector_add (self.position, result.position);
@@ -137,13 +137,13 @@ limat_transform_multiply (limatTransform self,
  * \param transform Transformation.
  * \return Transformation.
  */
-static inline limatTransform
-limat_transform_relative (limatTransform self,
-                          limatTransform transform)
+static inline LIMatTransform
+limat_transform_relative (LIMatTransform self,
+                          LIMatTransform transform)
 {
-	limatQuaternion inverse;
-	limatQuaternion rotation;
-	limatVector position;
+	LIMatQuaternion inverse;
+	LIMatQuaternion rotation;
+	LIMatVector position;
 
 	inverse = limat_quaternion_conjugate (self.rotation);
 	position = limat_vector_subtract (transform.position, self.position);
@@ -153,11 +153,11 @@ limat_transform_relative (limatTransform self,
 	return limat_transform_init (position, rotation);
 }
 
-static inline limatVector
-limat_transform_transform (limatTransform self,
-                           limatVector    vector)
+static inline LIMatVector
+limat_transform_transform (LIMatTransform self,
+                           LIMatVector    vector)
 {
-	limatVector result;
+	LIMatVector result;
 
 	result = limat_quaternion_transform (self.rotation, vector);
 	result = limat_vector_add (result, self.position);
@@ -165,12 +165,12 @@ limat_transform_transform (limatTransform self,
 	return result;
 }
 
-static inline limatTransform
-limat_transform_snap (limatTransform self,
-                      limatTransform child)
+static inline LIMatTransform
+limat_transform_snap (LIMatTransform self,
+                      LIMatTransform child)
 {
-	limatTransform result;
-	limatTransform inverse;
+	LIMatTransform result;
+	LIMatTransform inverse;
 
 	inverse = limat_transform_invert (child);
 	result = limat_transform_multiply (self, inverse);
@@ -178,12 +178,12 @@ limat_transform_snap (limatTransform self,
 	return result;
 }
 
-static inline limatMatrix
-limat_transform_get_modelview (limatTransform self)
+static inline LIMatMatrix
+limat_transform_get_modelview (LIMatTransform self)
 {
-	limatVector pos;
-	limatVector dir;
-	limatVector up;
+	LIMatVector pos;
+	LIMatVector dir;
+	LIMatVector up;
 
 	pos = self.position;
 	dir = limat_quaternion_get_basis (self.rotation, 2);

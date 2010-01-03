@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlVertex Vertex
+ * \addtogroup LIMdlVertex Vertex
  * @{
  */
 
@@ -26,20 +26,20 @@
 #define __MODEL_VERTEX_H__
 
 #include <string.h>
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef struct _limdlVertex limdlVertex;
-struct _limdlVertex
+typedef struct _LIMdlVertex LIMdlVertex;
+struct _LIMdlVertex
 {
 	float texcoord[6];
-	limatVector normal;
-	limatVector coord;
+	LIMatVector normal;
+	LIMatVector coord;
 };
 
 static inline void
-limdl_vertex_init (limdlVertex*       self,
-                   const limatVector* coord,
-                   const limatVector* normal,
+limdl_vertex_init (LIMdlVertex*       self,
+                   const LIMatVector* coord,
+                   const LIMatVector* normal,
                    float              u,
                    float              v)
 {
@@ -54,10 +54,10 @@ limdl_vertex_init (limdlVertex*       self,
 }
 
 static inline int
-limdl_vertex_compare (const limdlVertex* self,
-                      const limdlVertex* vertex)
+limdl_vertex_compare (const LIMdlVertex* self,
+                      const LIMdlVertex* vertex)
 {
-	return memcmp (self, vertex, sizeof (limdlVertex));
+	return memcmp (self, vertex, sizeof (LIMdlVertex));
 }
 
 #endif

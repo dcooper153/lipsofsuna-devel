@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,30 +30,30 @@
 #include "ext-module.h"
 #include "ext-slot.h"
 
-typedef struct _liextSlots liextSlots;
-struct _liextSlots
+typedef struct _LIExtSlots LIExtSlots;
+struct _LIExtSlots
 {
-	liextModule* module;
-	lialgStrdic* slots;
-	liengObject* object;
+	LIExtModule* module;
+	LIAlgStrdic* slots;
+	LIEngObject* object;
 };
 
-liextSlots*
-liext_slots_new (liextModule* module,
-                 liengObject* object);
+LIExtSlots*
+liext_slots_new (LIExtModule* module,
+                 LIEngObject* object);
 
 void
-liext_slots_free (liextSlots* self);
+liext_slots_free (LIExtSlots* self);
 
 void
-liext_slots_clear (liextSlots* self);
+liext_slots_clear (LIExtSlots* self);
 
 void
-liext_slots_clear_object (liextSlots*  self,
-                          liengObject* object);
+liext_slots_clear_object (LIExtSlots*  self,
+                          LIEngObject* object);
 
 int
-liext_slots_set_slot (liextSlots* self,
+liext_slots_set_slot (LIExtSlots* self,
                       const char* slot,
                       const char* node,
                       int         model);

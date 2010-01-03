@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <client/lips-client.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/script.h>
 #include "ext-editor.h"
 #include "ext-module.h"
 
@@ -50,12 +50,12 @@
  * -- @param args Arguments.
  * function Editor.create(self, args)
  */
-static void Editor_create (liscrArgs* args)
+static void Editor_create (LIScrArgs* args)
 {
 	const char* name;
-	liengModel* model;
-	liextModule* module;
-	limatTransform transform;
+	LIEngModel* model;
+	LIExtModule* module;
+	LIMatTransform transform;
 
 	if (liscr_args_gets_vector (args, "position", &transform.position) &&
 	    liscr_args_gets_string (args, "model", &name))
@@ -77,11 +77,11 @@ static void Editor_create (liscrArgs* args)
  * -- @param self Editor class.
  * function Editor.rotate(self)
  */
-static void Editor_rotate (liscrArgs* args)
+static void Editor_rotate (LIScrArgs* args)
 {
 	int x;
 	int y;
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	module->client->video.SDL_GetMouseState (&x, &y);
@@ -100,11 +100,11 @@ static void Editor_rotate (liscrArgs* args)
  * -- @param args Arguments.
  * function Editor.snap(self, args)
  */
-static void Editor_snap (liscrArgs* args)
+static void Editor_snap (LIScrArgs* args)
 {
 	float angle = 0.0f;
 	float grid = 1.0f;
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	liscr_args_gets_float (args, "angle", &angle);
@@ -119,11 +119,11 @@ static void Editor_snap (liscrArgs* args)
  * -- @param self Editor class.
  * function Editor.translate(self)
  */
-static void Editor_translate (liscrArgs* args)
+static void Editor_translate (LIScrArgs* args)
 {
 	int x;
 	int y;
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	module->client->video.SDL_GetMouseState (&x, &y);
@@ -136,17 +136,17 @@ static void Editor_translate (liscrArgs* args)
  * -- @name Editor.visible
  * -- @class table
  */
-static void Editor_getter_visible (liscrArgs* args)
+static void Editor_getter_visible (LIScrArgs* args)
 {
-	liextModule* module;
+	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	liscr_args_seti_bool (args, liwdg_widget_get_visible (module->dialog));
 }
-static void Editor_setter_visible (liscrArgs* args)
+static void Editor_setter_visible (LIScrArgs* args)
 {
 	int value;
-	liextModule* module;
+	LIExtModule* module;
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
@@ -158,7 +158,7 @@ static void Editor_setter_visible (liscrArgs* args)
 /*****************************************************************************/
 
 void
-liextEditorScript (liscrClass* self,
+liext_script_editor (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);

@@ -31,32 +31,32 @@
 
 #define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
 
-typedef struct _liextBrushes liextBrushes;
-typedef struct _liextEditor liextEditor;
-typedef struct _liextMaterials liextMaterials;
-typedef struct _liextModule liextModule;
+typedef struct _LIExtBrushes LIExtBrushes;
+typedef struct _LIExtEditor LIExtEditor;
+typedef struct _LIExtMaterials LIExtMaterials;
+typedef struct _LIExtModule LIExtModule;
 
-struct _liextModule
+struct _LIExtModule
 {
-	licalHandle calls[1];
-	licliClient* client;
-	liscrData* script;
-	liwdgWidget* editor;
+	LICalHandle calls[1];
+	LICliClient* client;
+	LIScrData* script;
+	LIWdgWidget* editor;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
 int
-liext_module_save (liextModule* self);
+liext_module_save (LIExtModule* self);
 
 /*****************************************************************************/
 
 void
-liextGeneratorScript (liscrClass* self,
+liext_script_generator (LIScrClass* self,
                       void*       data);
 
 #endif

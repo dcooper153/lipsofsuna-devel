@@ -18,16 +18,16 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrPacket Packet
+ * \addtogroup LIScrPacket Packet
  * @{
  */
 
 #include <string.h>
-#include <network/lips-network.h>
-#include <script/lips-script.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/script.h>
 
 static int
-private_read (liscrPacket* data,
+private_read (LIScrPacket* data,
               lua_State*   lua);
 
 /*****************************************************************************/
@@ -116,8 +116,8 @@ Packet_new (lua_State* lua)
 {
 	int err;
 	int type;
-	liscrData* self;
-	liscrScript* script = liscr_script (lua);
+	LIScrData* self;
+	LIScrScript* script = liscr_script (lua);
 
 	liscr_checkclass (lua, 1, LISCR_SCRIPT_PACKET);
 	type = luaL_checkinteger (lua, 2);
@@ -162,8 +162,8 @@ Packet_new (lua_State* lua)
 static int
 Packet_read (lua_State* lua)
 {
-	liscrData* self;
-	liscrPacket* data;
+	LIScrData* self;
+	LIScrPacket* data;
 
 	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
 	data = self->data;
@@ -185,8 +185,8 @@ Packet_read (lua_State* lua)
 static int
 Packet_resume (lua_State* lua)
 {
-	liscrData* self;
-	liscrPacket* data;
+	LIScrData* self;
+	LIScrPacket* data;
 
 	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
 	data = self->data;
@@ -208,8 +208,8 @@ Packet_write (lua_State* lua)
 {
 	int i;
 	int type;
-	liscrData* self;
-	liscrPacket* data;
+	LIScrData* self;
+	LIScrPacket* data;
 	union
 	{
 		int8_t i8;
@@ -284,9 +284,9 @@ Packet_write (lua_State* lua)
  * -- @name Packet.size
  * -- @class table
  */
-static void Packet_getter_size (liscrArgs* args)
+static void Packet_getter_size (LIScrArgs* args)
 {
-	liscrPacket* self;
+	LIScrPacket* self;
 
 	self = args->self;
 	if (self->reader != NULL)
@@ -301,9 +301,9 @@ static void Packet_getter_size (liscrArgs* args)
  * -- @name Packet.type
  * -- @class table
  */
-static void Packet_getter_type (liscrArgs* args)
+static void Packet_getter_type (LIScrArgs* args)
 {
-	liscrPacket* self;
+	LIScrPacket* self;
 
 	self = args->self;
 	if (self->reader != NULL)
@@ -315,7 +315,7 @@ static void Packet_getter_type (liscrArgs* args)
 /*****************************************************************************/
 
 void
-licomPacketScript (liscrClass* self,
+liscr_script_packet (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_insert_enum (self, "BOOL", LISCR_PACKET_FORMAT_BOOL);
@@ -336,15 +336,15 @@ licomPacketScript (liscrClass* self,
 	liscr_class_insert_mvar (self, "type", Packet_getter_type, NULL);
 }
 
-liscrData*
-liscr_packet_new_readable (liscrScript*       script,
-                           const liarcReader* reader)
+LIScrData*
+liscr_packet_new_readable (LIScrScript*       script,
+                           const LIArcReader* reader)
 {
-	liscrData* data;
-	liscrPacket* self;
+	LIScrData* data;
+	LIScrPacket* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liscrPacket));
+	self = lisys_calloc (1, sizeof (LIScrPacket));
 	if (self == NULL)
 		return NULL;
 	self->buffer = lisys_calloc (reader->length, 1);
@@ -376,15 +376,15 @@ liscr_packet_new_readable (liscrScript*       script,
 	return data;
 }
 
-liscrData*
-liscr_packet_new_writable (liscrScript* script,
+LIScrData*
+liscr_packet_new_writable (LIScrScript* script,
                            int          type)
 {
-	liscrData* data;
-	liscrPacket* self;
+	LIScrData* data;
+	LIScrPacket* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liscrPacket));
+	self = lisys_calloc (1, sizeof (LIScrPacket));
 	if (self == NULL)
 		return NULL;
 
@@ -409,7 +409,7 @@ liscr_packet_new_writable (liscrScript* script,
 }
 
 void
-liscr_packet_free (liscrPacket* self)
+liscr_packet_free (LIScrPacket* self)
 {
 	if (self->writer != NULL)
 		liarc_writer_free (self->writer);
@@ -422,7 +422,7 @@ liscr_packet_free (liscrPacket* self)
 /*****************************************************************************/
 
 static int
-private_read (liscrPacket* data,
+private_read (LIScrPacket* data,
               lua_State*   lua)
 {
 	int i;

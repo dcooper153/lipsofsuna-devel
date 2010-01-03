@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,24 +18,24 @@
 /**
  * \addtogroup liai Ai
  * @{
- * \addtogroup liaiWaypoint Waypoint
+ * \addtogroup LIAiWaypoint Waypoint
  * @{
  */
 
 #ifndef __AI_WAYPOINT_H__
 #define __AI_WAYPOINT_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 #include "ai-types.h"
 
-struct _liaiWaypoint
+struct _LIAiWaypoint
 {
 	int x;
 	int y;
 	int z;
 	int flags;
-	liaiSector* sector;
-	limatVector position;
+	LIAiSector* sector;
+	LIMatVector position;
 };
 
 #endif

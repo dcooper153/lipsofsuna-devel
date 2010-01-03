@@ -28,29 +28,29 @@
 #include "ext-speech.h"
 
 static int
-private_render_2d (liextModule* self,
-                   liwdgRender* widget);
+private_render_2d (LIExtModule* self,
+                   LIWdgRender* widget);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Speech",
+	LISER_EXTENSION_VERSION, "Speech",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
-	liextModule* self;
+	LIExtModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -72,18 +72,18 @@ liext_module_new (licliClient* client)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (client->script, "Speech", liextSpeechScript, self);
+	liscr_script_create_class (client->script, "Speech", liext_script_speech, self);
 
 	return self;
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
-	lialgU32dicIter iter;
+	LIAlgU32dicIter iter;
 
 	/* Remove callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
 	/* Free objects. */
 	if (self->objects != NULL)
@@ -104,14 +104,14 @@ liext_module_free (liextModule* self)
  * \param message String.
  */
 int
-liext_module_set_speech (liextModule* self,
+liext_module_set_speech (LIExtModule* self,
                          uint32_t     object,
                          const char*  message)
 {
 	int create;
-	liengObject* engobj;
-	liextObject* extobj;
-	liextSpeech* speech;
+	LIEngObject* engobj;
+	LIExtObject* extobj;
+	LIExtSpeech* speech;
 
 	/* Find engine object. */
 	create = 0;
@@ -161,16 +161,16 @@ liext_module_set_speech (liextModule* self,
 
 /*****************************************************************************/
 
-liextObject*
+LIExtObject*
 liext_object_new ()
 {
-	return lisys_calloc (1, sizeof (liextObject));
+	return lisys_calloc (1, sizeof (LIExtObject));
 }
 
 void
-liext_object_free (liextObject* self)
+liext_object_free (LIExtObject* self)
 {
-	lialgList* ptr;
+	LIAlgList* ptr;
 
 	for (ptr = self->speech ; ptr != NULL ; ptr = ptr->next)
 		liext_speech_free (ptr->data);
@@ -181,15 +181,15 @@ liext_object_free (liextObject* self)
 /*****************************************************************************/
 
 static int
-private_render_2d (liextModule* self,
-                   liwdgRender* widget)
+private_render_2d (LIExtModule* self,
+                   LIWdgRender* widget)
 {
 	int width;
-	lialgU32dicIter iter;
-	lialgList* ptr;
-	liextObject* object;
-	liextSpeech* speech;
-	limatVector win;
+	LIAlgU32dicIter iter;
+	LIAlgList* ptr;
+	LIExtObject* object;
+	LIExtSpeech* speech;
+	LIMatVector win;
 
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
@@ -227,18 +227,18 @@ private_render_2d (liextModule* self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
 	float t;
-	lialgU32dicIter iter;
-	lialgList* ptr;
-	lialgList* next;
-	liengObject* engobj;
-	liextObject* extobj;
-	liextSpeech* speech;
-	limatAabb bounds;
-	limatTransform transform;
+	LIAlgU32dicIter iter;
+	LIAlgList* ptr;
+	LIAlgList* next;
+	LIEngObject* engobj;
+	LIExtObject* extobj;
+	LIExtSpeech* speech;
+	LIMatAabb bounds;
+	LIMatTransform transform;
 
 	/* Update speech. */
 	LI_FOREACH_U32DIC (iter, self->objects)

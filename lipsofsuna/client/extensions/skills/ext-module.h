@@ -27,41 +27,41 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <algorithm/lips-algorithm.h>
+#include <lipsofsuna/algorithm.h>
 
 #define LIEXT_SCRIPT_SKILL "Lips.Skill"
 #define LIEXT_SCRIPT_SKILLS "Lips.Skills"
 #define LIEXT_SCRIPT_SKILL_WIDGET "Lips.SkillWidget"
 
-typedef struct _liextModule liextModule;
-typedef struct _liextSkill liextSkill;
-typedef struct _liextSkills liextSkills;
+typedef struct _LIExtModule LIExtModule;
+typedef struct _LIExtSkill LIExtSkill;
+typedef struct _LIExtSkills LIExtSkills;
 
-struct _liextModule
+struct _LIExtModule
 {
-	lialgU32dic* dictionary;
-	licalHandle calls[2];
-	licliClient* client;
+	LIAlgU32dic* dictionary;
+	LICalHandle calls[2];
+	LICliClient* client;
 };
 
-liextModule*
-liext_module_new (licliClient* client);
+LIExtModule*
+liext_module_new (LICliClient* client);
 
 void
-liext_module_free (liextModule* self);
+liext_module_free (LIExtModule* self);
 
-liextSkills*
-liext_module_find_skills (liextModule* self,
+LIExtSkills*
+liext_module_find_skills (LIExtModule* self,
                           uint32_t     id);
 
 /*****************************************************************************/
 
 void
-liextSkillsScript (liscrClass* self,
+liext_script_skills (LIScrClass* self,
                    void*       data);
 
 void
-liextSkillWidgetScript (liscrClass* self,
+liext_script_skill_widget (LIScrClass* self,
                         void*       data);
 
 #endif

@@ -26,14 +26,14 @@
 
 #include "ext-speech.h"
 
-liextSpeech*
-liext_speech_new (licliClient* client,
+LIExtSpeech*
+liext_speech_new (LICliClient* client,
                   const char*  text)
 {
-	liextSpeech* self;
-	lifntFont* font;
+	LIExtSpeech* self;
+	LIFntFont* font;
 
-	self = lisys_malloc (sizeof (liextSpeech));
+	self = lisys_malloc (sizeof (LIExtSpeech));
 	if (self == NULL)
 		return NULL;
 	self->alpha = 1.0f;
@@ -53,7 +53,7 @@ liext_speech_new (licliClient* client,
 }
 
 void
-liext_speech_free (liextSpeech* self)
+liext_speech_free (LIExtSpeech* self)
 {
 	lifnt_layout_free (self->text);
 	lisys_free (self);

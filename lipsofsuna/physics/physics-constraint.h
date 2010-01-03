@@ -18,15 +18,15 @@
 /**
  * \addtogroup liphy Physics
  * @{
- * \addtogroup liphyConstraint Constraint
+ * \addtogroup LIPhyConstraint Constraint
  * @{
  */
 
 #ifndef __PHYSICS_CONSTRAINT_H__
 #define __PHYSICS_CONSTRAINT_H__
 
-#include <math/lips-math.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include "physics.h"
 #include "physics-types.h"
 
@@ -34,17 +34,17 @@
 extern "C" {
 #endif
 
-liphyConstraint*
-liphy_constraint_new_hinge (liphyPhysics*      physics,
-                            liphyObject*       object,
-                            const limatVector* point,
-                            const limatVector* axis,
+LIPhyConstraint*
+liphy_constraint_new_hinge (LIPhyPhysics*      physics,
+                            LIPhyObject*       object,
+                            const LIMatVector* point,
+                            const LIMatVector* axis,
                             int                limit,
                             float              limit_min,
                             float              limit_max);
 
 void
-liphy_constraint_free (liphyConstraint* self);
+liphy_constraint_free (LIPhyConstraint* self);
 
 #ifdef __cplusplus
 }

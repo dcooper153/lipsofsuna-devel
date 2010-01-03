@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2008 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup limat Math
  * @{
- * \addtogroup limatFrustum Frustum
+ * \addtogroup LIMatFrustum Frustum
  * @{
  */
 
@@ -30,10 +30,10 @@
 #include "math-matrix.h"
 #include "math-plane.h"
 
-typedef struct _limatFrustum limatFrustum;
-struct _limatFrustum
+typedef struct _LIMatFrustum LIMatFrustum;
+struct _LIMatFrustum
 {
-	limatPlane planes[6];
+	LIMatPlane planes[6];
 };
 
 /**
@@ -44,13 +44,13 @@ struct _limatFrustum
  * \param projection Projection matrix.
  */
 static inline void
-limat_frustum_init (limatFrustum*      self,
-                    const limatMatrix* modelview,
-                    const limatMatrix* projection)
+limat_frustum_init (LIMatFrustum*      self,
+                    const LIMatMatrix* modelview,
+                    const LIMatMatrix* projection)
 {
 	int i;
 	float len;
-	limatMatrix m = limat_matrix_multiply (*projection, *modelview);
+	LIMatMatrix m = limat_matrix_multiply (*projection, *modelview);
 
 	self->planes[0].x = m.m[3] + m.m[0];
 	self->planes[0].y = m.m[7] + m.m[4];
@@ -99,8 +99,8 @@ limat_frustum_init (limatFrustum*      self,
  * \return Nonzero if the point is outside of the frustum.
  */
 static inline int
-limat_frustum_cull_point (const limatFrustum* self,
-                          const limatVector*  point)
+limat_frustum_cull_point (const LIMatFrustum* self,
+                          const LIMatVector*  point)
 {
 	int i;
 	float len;
@@ -134,8 +134,8 @@ limat_frustum_cull_point (const limatFrustum* self,
  * \return Nonzero if all the points are outside of the frustum.
  */
 static inline int
-limat_frustum_cull_points (const limatFrustum* self,
-                           const limatVector*  points,
+limat_frustum_cull_points (const LIMatFrustum* self,
+                           const LIMatVector*  points,
                            int                 count)
 {
 	int i;
@@ -169,8 +169,8 @@ limat_frustum_cull_points (const limatFrustum* self,
  * \return Nonzero if the sphere is outside of the frustum.
  */
 static inline int
-limat_frustum_cull_sphere (const limatFrustum* self,
-                           const limatVector*  point,
+limat_frustum_cull_sphere (const LIMatFrustum* self,
+                           const LIMatVector*  point,
                            float               radius)
 {
 	int i;
@@ -203,12 +203,12 @@ limat_frustum_cull_sphere (const limatFrustum* self,
  * \return Nonzero if the box is outside of the frustum.
  */
 static inline int
-limat_frustum_cull_aabb (const limatFrustum* self,
-                         const limatAabb*    aabb)
+limat_frustum_cull_aabb (const LIMatFrustum* self,
+                         const LIMatAabb*    aabb)
 {
-	limatVector min = aabb->min;
-	limatVector max = aabb->max;
-	limatVector points[8] =
+	LIMatVector min = aabb->min;
+	LIMatVector max = aabb->max;
+	LIMatVector points[8] =
 	{
 		{ min.x, min.y, min.z },
 		{ min.x, min.y, max.z },

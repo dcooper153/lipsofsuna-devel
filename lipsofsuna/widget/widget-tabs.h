@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgTabs Tabs
+ * \addtogroup LIWdgTabs Tabs
  * @{
  */
 
@@ -29,39 +29,39 @@
 #include "widget-container.h"
 #include "widget-types.h"
 
-#define LIWDG_TABS(o) ((liwdgTabs*)(o))
+#define LIWDG_TABS(o) ((LIWdgTabs*)(o))
 
-typedef struct _liwdgTab liwdgTab;
-struct _liwdgTab
+typedef struct _LIWdgTab LIWdgTab;
+struct _LIWdgTab
 {
 	char* text;
-	lifntFont* font;
-	lifntLayout* layout;
-	liwdgRect rect;
-	liwdgWidget* widget;
+	LIFntFont* font;
+	LIFntLayout* layout;
+	LIWdgRect rect;
+	LIWdgWidget* widget;
 };
 
-typedef struct _liwdgTabs liwdgTabs;
-struct _liwdgTabs
+typedef struct _LIWdgTabs LIWdgTabs;
+struct _LIWdgTabs
 {
-	liwdgContainer base;
+	LIWdgContainer base;
 	int active;
 	struct
 	{
 		int count;
-		liwdgTab* array;
+		LIWdgTab* array;
 	} tabs;
 };
 
-extern const liwdgClass liwdgTabsType;
+extern const LIWdgClass liwdg_widget_tabs;
 
-liwdgWidget*
-liwdg_tabs_new (liwdgManager* manager);
+LIWdgWidget*
+liwdg_tabs_new (LIWdgManager* manager);
 
 int
-liwdg_tabs_append_tab (liwdgTabs*   self,
+liwdg_tabs_append_tab (LIWdgTabs*   self,
                        const char*  title,
-                       liwdgWidget* widget);
+                       LIWdgWidget* widget);
 
 #endif
 

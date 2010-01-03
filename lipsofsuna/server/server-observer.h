@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,25 +16,25 @@
  */
 
 /**
- * \addtogroup lisrv Server
+ * \addtogroup liser Server
  * @{
- * \addtogroup lisrvObserver Observer
+ * \addtogroup liserObserver Observer
  * @{
  */
 
 #ifndef __SERVER_OBSERVER_H__
 #define __SERVER_OBSERVER_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <engine/lips-engine.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/engine.h>
 #include "server.h"
 
-typedef struct _lisrvObserverIter lisrvObserverIter;
-struct _lisrvObserverIter
+typedef struct _LISerObserverIter LISerObserverIter;
+struct _LISerObserverIter
 {
-	liengObjectIter objects;
-	liengObject* subject;
-	liengObject* object;
+	LIEngObjectIter objects;
+	LIEngObject* subject;
+	LIEngObject* object;
 };
 
 /**
@@ -46,19 +46,19 @@ struct _lisrvObserverIter
  * \param object_ Object whose observers to find.
  * \param radius Maximum search radius in world units.
  */
-#define LISRV_FOREACH_OBSERVER(iter, object_, radius) \
-	for (lisrv_observer_iter_first (&iter, object_, radius) ; iter.object != NULL ; \
-	     lisrv_observer_iter_next (&iter))
+#define LISER_FOREACH_OBSERVER(iter, object_, radius) \
+	for (liser_observer_iter_first (&iter, object_, radius) ; iter.object != NULL ; \
+	     liser_observer_iter_next (&iter))
 
 static inline int
-lisrv_observer_iter_first (lisrvObserverIter* self,
-                           liengObject*       object,
+liser_observer_iter_first (LISerObserverIter* self,
+                           LIEngObject*       object,
                            float              radius)
 {
-	limatTransform transform;
+	LIMatTransform transform;
 
 	/* Initialize self. */
-	memset (self, 0, sizeof (lisrvObserverIter));
+	memset (self, 0, sizeof (LISerObserverIter));
 	if (object->sector == NULL)
 		return 0;
 	lieng_object_get_transform (object, &transform);
@@ -69,7 +69,7 @@ lisrv_observer_iter_first (lisrvObserverIter* self,
 	/* Find first observer. */
 	while (self->objects.object != NULL)
 	{
-		if (lisrv_object_sees (self->objects.object, self->subject))
+		if (liser_object_sees (self->objects.object, self->subject))
 		{
 			self->object = self->objects.object;
 			return 1;
@@ -82,14 +82,14 @@ lisrv_observer_iter_first (lisrvObserverIter* self,
 }
 
 static inline int
-lisrv_observer_iter_next (lisrvObserverIter* self)
+liser_observer_iter_next (LISerObserverIter* self)
 {
 	/* Find next observer. */
 	while (self->objects.object != NULL)
 	{
 		if (!lieng_object_iter_next (&self->objects))
 			break;
-		if (lisrv_object_sees (self->objects.object, self->subject))
+		if (liser_object_sees (self->objects.object, self->subject))
 		{
 			self->object = self->objects.object;
 			return 1;

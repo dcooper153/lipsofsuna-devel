@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,30 +16,30 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndTexture Texture
+ * \addtogroup LIRenTexture Texture
  * @{
  */
 
 #ifndef __RENDER_TEXTURE_H__
 #define __RENDER_TEXTURE_H__
 
-#include <image/lips-image.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/model.h>
 #include "render.h"
 #include "render-types.h"
 
-struct _lirndTexture
+struct _LIRenTexture
 {
 	int id;
 	int width;
 	int height;
 	char* name;
 	GLuint texture;
-	limdlTextureType type;
-	limdlTextureFlags flags;
-	lirndImage* image;
+	LIMdlTextureType type;
+	LIMdlTextureFlags flags;
+	LIRenImage* image;
 	struct
 	{
 		GLenum magfilter;
@@ -50,15 +50,15 @@ struct _lirndTexture
 };
 
 void
-lirnd_texture_init (lirndTexture* self,
-                    limdlTexture* texture);
+liren_texture_init (LIRenTexture* self,
+                    LIMdlTexture* texture);
 
 void
-lirnd_texture_free (lirndTexture* self);
+liren_texture_free (LIRenTexture* self);
 
 void
-lirnd_texture_set_image (lirndTexture* self,
-                         lirndImage*   value);
+liren_texture_set_image (LIRenTexture* self,
+                         LIRenImage*   value);
 
 #endif
 

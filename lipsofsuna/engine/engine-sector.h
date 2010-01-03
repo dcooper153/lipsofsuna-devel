@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,51 +18,51 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengSector Sector
+ * \addtogroup LIEngSector Sector
  * @{
  */
 
 #ifndef __ENGINE_SECTOR_H__
 #define __ENGINE_SECTOR_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <math/lips-math.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include "engine.h"
 #include "engine-types.h"
 
 #define LIENG_SECTOR_WIDTH 64.0f
 #define LIENG_SECTORS_PER_LINE 256
 
-struct _liengSector
+struct _LIEngSector
 {
 	uint8_t dirty;
-	lialgSector* sector;
-	lialgU32dic* objects;
-	liengEngine* engine;
+	LIAlgSector* sector;
+	LIAlgU32dic* objects;
+	LIEngEngine* engine;
 };
 
-liengSector*
-lieng_sector_new (lialgSector* sector);
+LIEngSector*
+lieng_sector_new (LIAlgSector* sector);
 
 void
-lieng_sector_free (liengSector* self);
+lieng_sector_free (LIEngSector* self);
 
 int
-lieng_sector_insert_object (liengSector* self,
-                            liengObject* object);
+lieng_sector_insert_object (LIEngSector* self,
+                            LIEngObject* object);
 
 void
-lieng_sector_remove_object (liengSector* self,
-                            liengObject* object);
+lieng_sector_remove_object (LIEngSector* self,
+                            LIEngObject* object);
 
 void
-lieng_sector_update (liengSector* self,
+lieng_sector_update (LIEngSector* self,
                      float        secs);
 
 void
-lieng_sector_get_bounds (const liengSector* self,
-                         limatAabb*         result);
+lieng_sector_get_bounds (const LIEngSector* self,
+                         LIMatAabb*         result);
 
 #endif
 

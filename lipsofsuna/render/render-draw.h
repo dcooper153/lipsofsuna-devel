@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndDraw Draw
+ * \addtogroup lirenDraw Draw
  * @{
  */
 
@@ -30,48 +30,48 @@
 #include "render-types.h"
 
 void
-lirnd_draw_bounds (lirndContext* context,
-                   lirndObject*  object,
+liren_draw_bounds (LIRenContext* context,
+                   LIRenObject*  object,
                    void*         data);
 
 void
-lirnd_draw_debug (lirndContext* context,
-                  lirndObject*  object,
+liren_draw_debug (LIRenContext* context,
+                  LIRenObject*  object,
                   void*         data);
 
 void
-lirnd_draw_exclude (lirndContext* context,
-                    lirndObject*  object,
+liren_draw_exclude (LIRenContext* context,
+                    LIRenObject*  object,
                     void*         data);
 
 void
-lirnd_draw_hair (lirndContext* context,
-                 lirndObject*  object,
+liren_draw_hair (LIRenContext* context,
+                 LIRenObject*  object,
                  void*         data);
 
 void
-lirnd_draw_opaque (lirndContext* context,
-                   lirndObject*  object,
+liren_draw_opaque (LIRenContext* context,
+                   LIRenObject*  object,
                    void*         data);
 
 void
-lirnd_draw_picking (lirndContext* context,
-                    lirndObject*  object,
+liren_draw_picking (LIRenContext* context,
+                    LIRenObject*  object,
                     void*         data);
 
 void
-lirnd_draw_shadeless (lirndContext* context,
-                      lirndObject*  object,
+liren_draw_shadeless (LIRenContext* context,
+                      LIRenObject*  object,
                       void*         data);
 
 void
-lirnd_draw_shadowmap (lirndContext* context,
-                      lirndObject*  object,
+liren_draw_shadowmap (LIRenContext* context,
+                      LIRenObject*  object,
                       void*         data);
 
 void
-lirnd_draw_transparent (lirndContext* context,
-                        lirndObject*  object,
+liren_draw_transparent (LIRenContext* context,
+                        LIRenObject*  object,
                         void*         data);
 
 #endif

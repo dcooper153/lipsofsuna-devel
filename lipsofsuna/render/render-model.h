@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,63 +16,63 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndModel Model
+ * \addtogroup LIRenModel Model
  * @{
  */
 
 #ifndef __RENDER_MODEL_H__
 #define __RENDER_MODEL_H__
 
-#include <image/lips-image.h>
-#include <model/lips-model.h>
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/model.h>
 #include "render.h"
 #include "render-buffer.h"
 #include "render-material.h"
 #include "render-types.h"
 
-struct _lirndModel
+struct _LIRenModel
 {
 	int added;
 	char* name;
-	limatAabb aabb;
-	limdlModel* model;
-	lirndBuffer* vertices;
-	lirndRender* render;
+	LIMatAabb aabb;
+	LIMdlModel* model;
+	LIRenBuffer* vertices;
+	LIRenRender* render;
 	struct
 	{
 		int count;
-		lirndBuffer* array;
+		LIRenBuffer* array;
 	} buffers;
 	struct
 	{
 		int count;
-		lirndMaterial** array;
+		LIRenMaterial** array;
 	} materials;
 };
 
-lirndModel*
-lirnd_model_new (lirndRender* render,
-                 limdlModel*  model,
+LIRenModel*
+liren_model_new (LIRenRender* render,
+                 LIMdlModel*  model,
                  const char*  name);
 
-lirndModel*
-lirnd_model_new_instance (lirndModel* model);
+LIRenModel*
+liren_model_new_instance (LIRenModel* model);
 
 void
-lirnd_model_free (lirndModel*  self);
+liren_model_free (LIRenModel*  self);
 
 void
-lirnd_model_replace_image (lirndModel* self,
-                           lirndImage* image);
+liren_model_replace_image (LIRenModel* self,
+                           LIRenImage* image);
 
 void
-lirnd_model_get_bounds (lirndModel* self,
-                        limatAabb*  aabb);
+liren_model_get_bounds (LIRenModel* self,
+                        LIMatAabb*  aabb);
 
 int
-lirnd_model_get_static (lirndModel* self);
+liren_model_get_static (LIRenModel* self);
 
 #endif
 

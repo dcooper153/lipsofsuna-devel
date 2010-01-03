@@ -18,7 +18,7 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliClient Client
+ * \addtogroup LICliClient Client
  * @{
  */
 
@@ -27,66 +27,66 @@
 #include <time.h>
 #include <sys/time.h>
 #include <assert.h>
-#include <network/lips-network.h>
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "client.h"
 #include "client-callbacks.h"
 #include "client-script.h"
 #include "client-window.h"
 
 static void
-private_free_module (licliClient* self);
+private_free_module (LICliClient* self);
 
 static int
-private_load_module (licliClient* self,
+private_load_module (LICliClient* self,
                      const char*  path,
                      const char*  name,
                      const char*  login,
                      const char*  password);
 
 static int
-private_init_bindings (licliClient* self);
+private_init_bindings (LICliClient* self);
 
 static int
-private_init_camera (licliClient* self);
+private_init_camera (LICliClient* self);
 
 static int
-private_init_engine (licliClient* self);
+private_init_engine (LICliClient* self);
 
 static int
-private_init_extensions (licliClient* self);
+private_init_extensions (LICliClient* self);
 
 static int
-private_init_paths (licliClient* self,
+private_init_paths (LICliClient* self,
                     const char*  path,
                     const char*  name);
 
 static int
-private_init_script (licliClient* self);
+private_init_script (LICliClient* self);
 
 static int
-private_init_widgets (licliClient* self);
+private_init_widgets (LICliClient* self);
 
 static void
-private_server_main (lithrThread* thread,
+private_server_main (LIThrThread* thread,
                      void*        data);
 
 /*****************************************************************************/
 
 
-licliClient*
-licli_client_new (lividCalls* video,
+LICliClient*
+licli_client_new (LIVidCalls* video,
                   const char* path,
                   const char* name)
 {
-	licliClient* self;
+	LICliClient* self;
 	/* FIXME: Login name and password not supported. */
 	const char* login = "none";
 	const char* password = "none";
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (licliClient));
+	self = lisys_calloc (1, sizeof (LICliClient));
 	if (self == NULL)
 		return NULL;
 	self->video = *video;
@@ -128,7 +128,7 @@ licli_client_new (lividCalls* video,
 }
 
 void
-licli_client_free (licliClient* self)
+licli_client_free (LICliClient* self)
 {
 	private_free_module (self);
 	if (self->window != NULL)
@@ -147,7 +147,7 @@ licli_client_free (licliClient* self)
  * \return Nonzero on success.
  */
 int
-licli_client_connect (licliClient* self,
+licli_client_connect (LICliClient* self,
                       const char*  name,
                       const char*  pass)
 {
@@ -166,8 +166,8 @@ licli_client_connect (licliClient* self,
  * \param name Extension name.
  * \return Extension or NULL.
  */
-licliExtension*
-licli_client_find_extension (licliClient* self,
+LICliExtension*
+licli_client_find_extension (LICliClient* self,
                              const char*  name)
 {
 	return lialg_strdic_find (self->extensions, name);
@@ -182,8 +182,8 @@ licli_client_find_extension (licliClient* self,
  * \param id Object number.
  * \return Object owned by the module or NULL.
  */
-liengObject*
-licli_client_find_object (licliClient* self,
+LIEngObject*
+licli_client_find_object (LICliClient* self,
                           uint32_t     id)
 {
 	return lieng_engine_find_object (self->engine, id);
@@ -196,7 +196,7 @@ licli_client_find_object (licliClient* self,
  * \return Nonzero on success.
  */
 int
-licli_client_host (licliClient* self)
+licli_client_host (LICliClient* self)
 {
 	/* Kill old thread. */
 	if (self->server_thread != NULL)
@@ -208,7 +208,7 @@ licli_client_host (licliClient* self)
 	}
 
 	/* Create new server. */
-	self->server = lisrv_server_new (self->paths);
+	self->server = liser_server_new (self->paths);
 	if (self->server == NULL)
 		return 0;
 
@@ -216,7 +216,7 @@ licli_client_host (licliClient* self)
 	self->server_thread = lithr_thread_new (private_server_main, self);
 	if (self->server_thread == NULL)
 	{
-		lisrv_server_free (self->server);
+		liser_server_free (self->server);
 		self->server = NULL;
 	}
 
@@ -231,13 +231,13 @@ licli_client_host (licliClient* self)
  * \return Nonzero on success.
  */
 int
-licli_client_load_extension (licliClient* self,
+licli_client_load_extension (LICliClient* self,
                              const char*  name)
 {
 	char* path;
-	lisysModule* module;
-	licliExtension* extension;
-	licliExtensionInfo* info;
+	LISysModule* module;
+	LICliExtension* extension;
+	LICliExtensionInfo* info;
 
 	/* Check if already loaded. */
 	module = lialg_strdic_find (self->extensions, name);
@@ -279,7 +279,7 @@ licli_client_load_extension (licliClient* self,
 	}
 
 	/* Insert to extension list. */
-	extension = lisys_calloc (1, sizeof (licliExtension));
+	extension = lisys_calloc (1, sizeof (LICliExtension));
 	if (extension == NULL)
 	{
 		lisys_module_free (module);
@@ -295,7 +295,7 @@ licli_client_load_extension (licliClient* self,
 	}
 
 	/* Call module initializer. */
-	extension->object = ((void* (*)(licliClient*)) info->init)(self);
+	extension->object = ((void* (*)(LICliClient*)) info->init)(self);
 	if (extension->object == NULL)
 	{
 		lialg_strdic_remove (self->extensions, name);
@@ -313,7 +313,7 @@ error:
 }
 
 int
-licli_client_main (licliClient* self)
+licli_client_main (LICliClient* self)
 {
 	int active = 1;
 	int fps_frames = 0;
@@ -370,7 +370,7 @@ licli_client_main (licliClient* self)
  * \param self Client.
  */
 void
-licli_client_render (licliClient* self)
+licli_client_render (LICliClient* self)
 {
 	int w;
 	int h;
@@ -392,8 +392,8 @@ licli_client_render (licliClient* self)
  * \param flags Grapple send flags.
  */
 void
-licli_client_send (licliClient* self,
-                   liarcWriter* writer,
+licli_client_send (LICliClient* self,
+                   LIArcWriter* writer,
                    int          flags)
 {
 	if (self->network != NULL)
@@ -412,7 +412,7 @@ licli_client_send (licliClient* self,
  * \return Nonzero on success, zero if the module must be terminated.
  */
 int
-licli_client_update (licliClient* self,
+licli_client_update (LICliClient* self,
                      float        secs)
 {
 	SDL_Event event;
@@ -434,7 +434,7 @@ licli_client_update (licliClient* self,
  * \return Boolean.
  */
 int
-licli_client_get_moving (licliClient* self)
+licli_client_get_moving (LICliClient* self)
 {
 	return self->moving;
 }
@@ -449,7 +449,7 @@ licli_client_get_moving (licliClient* self)
  * \param value Nonzero for movement mode, zero for user interface mode
  */
 void
-licli_client_set_moving (licliClient* self,
+licli_client_set_moving (LICliClient* self,
                          int          value)
 {
 	int cx;
@@ -477,8 +477,8 @@ licli_client_set_moving (licliClient* self,
  * \param self Client.
  * \return Object or NULL.
  */
-liengObject*
-licli_client_get_player (licliClient* self)
+LIEngObject*
+licli_client_get_player (LICliClient* self)
 {
 	if (self->network == NULL)
 		return NULL;
@@ -493,10 +493,10 @@ licli_client_get_player (licliClient* self)
  * \param self Client.
  */
 static void
-private_free_module (licliClient* self)
+private_free_module (LICliClient* self)
 {
-	lialgStrdicIter iter;
-	licliExtension* extension;
+	LIAlgStrdicIter iter;
+	LICliExtension* extension;
 
 	/* Free camera. */
 	if (self->camera != NULL)
@@ -595,7 +595,7 @@ private_free_module (licliClient* self)
  * \return Nonzero on success.
  */
 static int
-private_load_module (licliClient* self,
+private_load_module (LICliClient* self,
                      const char*  path,
                      const char*  name,
                      const char*  login,
@@ -630,7 +630,7 @@ private_load_module (licliClient* self,
 }
 
 static int
-private_init_bindings (licliClient* self)
+private_init_bindings (LICliClient* self)
 {
 	self->bindings = libnd_manager_new ();
 	if (self->bindings == NULL)
@@ -639,7 +639,7 @@ private_init_bindings (licliClient* self)
 }	
 
 static int
-private_init_camera (licliClient* self)
+private_init_camera (LICliClient* self)
 {
 	GLint viewport[4];
 
@@ -657,7 +657,7 @@ private_init_camera (licliClient* self)
 }
 
 static int
-private_init_engine (licliClient* self)
+private_init_engine (LICliClient* self)
 {
 	int flags;
 
@@ -689,10 +689,10 @@ private_init_engine (licliClient* self)
 		return 0;
 
 	/* Initialize graphics. */
-	self->render = lirnd_render_new (self->paths->module_data);
+	self->render = liren_render_new (self->paths->module_data);
 	if (self->render == NULL)
 		return 0;
-	self->scene = lirnd_scene_new (self->render);
+	self->scene = liren_scene_new (self->render);
 	if (self->scene == NULL)
 		return 0;
 
@@ -700,7 +700,7 @@ private_init_engine (licliClient* self)
 }
 
 static int
-private_init_extensions (licliClient* self)
+private_init_extensions (LICliClient* self)
 {
 	self->extensions = lialg_strdic_new ();
 	if (self->extensions == NULL)
@@ -709,7 +709,7 @@ private_init_extensions (licliClient* self)
 }
 
 static int
-private_init_paths (licliClient* self,
+private_init_paths (LICliClient* self,
                     const char*  path,
                     const char*  name)
 {
@@ -724,7 +724,7 @@ private_init_paths (licliClient* self,
 }
 
 static int
-private_init_script (licliClient* self)
+private_init_script (LICliClient* self)
 {
 	int ret;
 	char* path;
@@ -736,21 +736,21 @@ private_init_script (licliClient* self)
 	liscr_script_set_userdata (self->script, self);
 
 	/* Register classes. */
-	if (!liscr_script_create_class (self->script, "Action", licliActionScript, self) ||
-	    !liscr_script_create_class (self->script, "Binding", licliBindingScript, self) ||
-	    !liscr_script_create_class (self->script, "Client", licliClientScript, self) ||
-	    !liscr_script_create_class (self->script, "Extension", licliExtensionScript, self) ||
-	    !liscr_script_create_class (self->script, "Group", licliGroupScript, self) ||
-	    !liscr_script_create_class (self->script, "Light", licliLightScript, self) ||
-	    !liscr_script_create_class (self->script, "Object", licliObjectScript, self) ||
-	    !liscr_script_create_class (self->script, "Packet", licomPacketScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Path", licomPathScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Player", licliPlayerScript, self) ||
-	    !liscr_script_create_class (self->script, "Quaternion", licomQuaternionScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Scene", licliSceneScript, self) ||
-	    !liscr_script_create_class (self->script, "Vector", licomVectorScript, self->script) ||
-	    !liscr_script_create_class (self->script, "Widget", licliWidgetScript, self) ||
-	    !liscr_script_create_class (self->script, "Window", licliWindowScript, self))
+	if (!liscr_script_create_class (self->script, "Action", licli_script_action, self) ||
+	    !liscr_script_create_class (self->script, "Binding", licli_script_binding, self) ||
+	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
+	    !liscr_script_create_class (self->script, "Extension", licli_script_extension, self) ||
+	    !liscr_script_create_class (self->script, "Group", licli_script_group, self) ||
+	    !liscr_script_create_class (self->script, "Light", licli_script_light, self) ||
+	    !liscr_script_create_class (self->script, "Object", licli_script_object, self) ||
+	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
+	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
+	    !liscr_script_create_class (self->script, "Player", licli_script_player, self) ||
+	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
+	    !liscr_script_create_class (self->script, "Scene", licli_script_scene, self) ||
+	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
+	    !liscr_script_create_class (self->script, "Widget", licli_script_widget, self) ||
+	    !liscr_script_create_class (self->script, "Window", licli_script_window, self))
 		return 0;
 
 	/* Load script. */
@@ -766,7 +766,7 @@ private_init_script (licliClient* self)
 }
 
 static int
-private_init_widgets (licliClient* self)
+private_init_widgets (LICliClient* self)
 {
 	self->widgets = liwdg_manager_new (&self->video, self->callbacks, self->path);
 	if (self->widgets == NULL)
@@ -777,14 +777,14 @@ private_init_widgets (licliClient* self)
 }
 
 static void
-private_server_main (lithrThread* thread,
+private_server_main (LIThrThread* thread,
                      void*        data)
 {
-	licliClient* self = data;
+	LICliClient* self = data;
 
-	if (!lisrv_server_main (self->server))
+	if (!liser_server_main (self->server))
 		lisys_error_report ();
-	lisrv_server_free (self->server);
+	liser_server_free (self->server);
 	self->server = NULL;
 }
 

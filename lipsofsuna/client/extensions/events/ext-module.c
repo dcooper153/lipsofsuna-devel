@@ -27,45 +27,45 @@
 #include "ext-module.h"
 
 static int
-private_object_model (liextModule* self,
-                      liengObject* object,
-                      liengModel*  model);
+private_object_model (LIExtModule* self,
+                      LIEngObject* object,
+                      LIEngModel*  model);
 
 static int
-private_object_new (liextModule* self,
-                    liengObject* object);
+private_object_new (LIExtModule* self,
+                    LIEngObject* object);
 
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader);
+                LIArcReader* reader);
 
 static int
-private_select (liextModule*    self,
-                lirndSelection* selection);
+private_select (LIExtModule*    self,
+                LIRenSelection* selection);
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs);
 
 /*****************************************************************************/
 
-lisrvExtensionInfo liextInfo =
+LISerExtensionInfo liextInfo =
 {
-	LISRV_EXTENSION_VERSION, "Events",
+	LISER_EXTENSION_VERSION, "Events",
 	liext_module_new,
 	liext_module_free
 };
 
-liextModule*
-liext_module_new (licliClient* client)
+LIExtModule*
+liext_module_new (LICliClient* client)
 {
 	int i;
-	liextModule* self;
-	liscrScript* script = client->script;
+	LIExtModule* self;
+	LIScrScript* script = client->script;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liextModule));
+	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->client = client;
@@ -82,8 +82,8 @@ liext_module_new (licliClient* client)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (script, "Event", licomEventScript, self);
-	liscr_script_create_class (script, "Events", liextEventsScript, self);
+	liscr_script_create_class (script, "Event", liscr_script_event, self);
+	liscr_script_create_class (script, "Events", liext_script_events, self);
 
 	/* Register events. */
 	lua_newtable (script->lua);
@@ -102,9 +102,9 @@ liext_module_new (licliClient* client)
 }
 
 void
-liext_module_free (liextModule* self)
+liext_module_free (LIExtModule* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (licalHandle));
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
@@ -116,13 +116,13 @@ liext_module_free (liextModule* self)
  * \param ... Event arguments.
  */
 void
-liext_module_event (liextModule* self,
+liext_module_event (LIExtModule* self,
                     int          type,
                                  ...)
 {
 	va_list args;
-	liscrData* event = NULL;
-	liscrScript* script = self->client->script;
+	LIScrData* event = NULL;
+	LIScrScript* script = self->client->script;
 
 	/* Get event table. */
 	lua_pushlightuserdata (script->lua, self);
@@ -153,11 +153,11 @@ liext_module_event (liextModule* self,
 		if (event == NULL)
 		{
 			va_start (args, type);
-			event = licom_event_newv (script, args);
+			event = liscr_event_newv (script, args);
 			va_end (args);
 			if (event == NULL)
 				break;
-			licom_event_set_type (event, type);
+			liscr_event_set_type (event, type);
 		}
 
 		/* Call handler. */
@@ -183,9 +183,9 @@ liext_module_event (liextModule* self,
 /*****************************************************************************/
 
 static int
-private_object_model (liextModule* self,
-                      liengObject* object,
-                      liengModel*  model)
+private_object_model (LIExtModule* self,
+                      LIEngObject* object,
+                      LIEngModel*  model)
 {
 	if (object->script != NULL && model != NULL)
 	{
@@ -198,8 +198,8 @@ private_object_model (liextModule* self,
 }
 
 static int
-private_object_new (liextModule* self,
-                    liengObject* object)
+private_object_new (LIExtModule* self,
+                    LIEngObject* object)
 {
 	if (object->script != NULL)
 	{
@@ -217,11 +217,11 @@ private_object_new (liextModule* self,
 }
 
 static int
-private_packet (liextModule* self,
+private_packet (LIExtModule* self,
                 int          type,
-                liarcReader* reader)
+                LIArcReader* reader)
 {
-	liscrData* data0;
+	LIScrData* data0;
 
 	reader->pos = 1;
 	data0 = liscr_packet_new_readable (self->client->script, reader);
@@ -235,10 +235,10 @@ private_packet (liextModule* self,
 }
 
 static int
-private_select (liextModule*    self,
-                lirndSelection* selection)
+private_select (LIExtModule*    self,
+                LIRenSelection* selection)
 {
-	liengObject* object;
+	LIEngObject* object;
 
 	if (selection != NULL)
 	{
@@ -255,7 +255,7 @@ private_select (liextModule*    self,
 }
 
 static int
-private_tick (liextModule* self,
+private_tick (LIExtModule* self,
               float        secs)
 {
 	liext_module_event (self, LIEXT_EVENT_TICK,

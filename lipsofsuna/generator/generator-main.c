@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,10 +29,10 @@
 int
 main (int argc, char** argv)
 {
-	lialgSectors* sectors;
-	licalCallbacks* callbacks;
-	ligenGenerator* self;
-	lipthPaths* paths;
+	LIAlgSectors* sectors;
+	LICalCallbacks* callbacks;
+	LIGenGenerator* self;
+	LIPthPaths* paths;
 
 	/* Resolve game directory. */
 	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");

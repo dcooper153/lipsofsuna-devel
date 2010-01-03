@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,28 @@
 /**
  * \addtogroup limdl Model
  * @{
- * \addtogroup limdlHair Hair
+ * \addtogroup LIMdlHair Hair
  * @{
  */
 
 #ifndef __MODEL_HAIR_H__
 #define __MODEL_HAIR_H__
 
-#include <archive/lips-archive.h>
-#include <math/lips-math.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/string.h>
 #include "model-types.h"
 
-struct _limdlHairNode
+struct _LIMdlHairNode
 {
-	limatVector position;
+	LIMatVector position;
 	float size;
 };
 
-struct _limdlHair
+struct _LIMdlHair
 {
 	int count;
-	limdlHairNode* nodes;
+	LIMdlHairNode* nodes;
 };
 
 #ifdef __cplusplus
@@ -47,22 +47,22 @@ extern "C" {
 #endif
 
 int
-limdl_hair_read (limdlHair*   self,
-                 liarcReader* reader);
+limdl_hair_read (LIMdlHair*   self,
+                 LIArcReader* reader);
 
 int
-limdl_hair_write (limdlHair*   self,
-                  liarcWriter* writer);
+limdl_hair_write (LIMdlHair*   self,
+                  LIArcWriter* writer);
 
 #ifdef __cplusplus
 }
 #endif
 
-struct _limdlHairs
+struct _LIMdlHairs
 {
 	int material;
 	int count;
-	limdlHair* hairs;
+	LIMdlHair* hairs;
 };
 
 #ifdef __cplusplus
@@ -70,15 +70,15 @@ extern "C" {
 #endif
 
 void
-limdl_hairs_free (limdlHairs* self);
+limdl_hairs_free (LIMdlHairs* self);
 
 int
-limdl_hairs_read (limdlHairs*  self,
-                  liarcReader* reader);
+limdl_hairs_read (LIMdlHairs*  self,
+                  LIArcReader* reader);
 
 int
-limdl_hairs_write (limdlHairs*  self,
-                   liarcWriter* writer);
+limdl_hairs_write (LIMdlHairs*  self,
+                   LIArcWriter* writer);
 
 #ifdef __cplusplus
 }

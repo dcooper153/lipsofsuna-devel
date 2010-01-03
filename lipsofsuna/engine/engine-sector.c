@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 /**
  * \addtogroup lieng Engine
  * @{
- * \addtogroup liengSector Sector
+ * \addtogroup LIEngSector Sector
  * @{
  */
 
-#include <string/lips-string.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "engine-sector.h"
 
 /**
@@ -32,13 +32,13 @@
  * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
-liengSector*
-lieng_sector_new (lialgSector* sector)
+LIEngSector*
+lieng_sector_new (LIAlgSector* sector)
 {
-	liengSector* self;
+	LIEngSector* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (liengSector));
+	self = lisys_calloc (1, sizeof (LIEngSector));
 	if (self == NULL)
 		return NULL;
 	self->engine = lialg_sectors_get_userdata (sector->manager, "engine");
@@ -65,7 +65,7 @@ lieng_sector_new (lialgSector* sector)
  * \param self Sector.
  */
 void
-lieng_sector_free (liengSector* self)
+lieng_sector_free (LIEngSector* self)
 {
 	/* Free objects. */
 	if (self->objects != NULL)
@@ -81,8 +81,8 @@ lieng_sector_free (liengSector* self)
  * \param object Object.
  */
 int
-lieng_sector_insert_object (liengSector* self,
-                            liengObject* object)
+lieng_sector_insert_object (LIEngSector* self,
+                            LIEngObject* object)
 {
 	assert (!lialg_u32dic_find (self->objects, object->id));
 
@@ -98,8 +98,8 @@ lieng_sector_insert_object (liengSector* self,
  * \param object Object.
  */
 void
-lieng_sector_remove_object (liengSector* self,
-                            liengObject* object)
+lieng_sector_remove_object (LIEngSector* self,
+                            LIEngObject* object)
 {
 	assert (lialg_u32dic_find (self->objects, object->id));
 
@@ -113,7 +113,7 @@ lieng_sector_remove_object (liengSector* self,
  * \param secs Number of seconds since the last update.
  */
 void
-lieng_sector_update (liengSector* self,
+lieng_sector_update (LIEngSector* self,
                      float        secs)
 {
 }
@@ -125,11 +125,11 @@ lieng_sector_update (liengSector* self,
  * \param result Return location for the bounding box.
  */
 void
-lieng_sector_get_bounds (const liengSector* self,
-                         limatAabb*         result)
+lieng_sector_get_bounds (const LIEngSector* self,
+                         LIMatAabb*         result)
 {
-	limatVector min;
-	limatVector max;
+	LIMatVector min;
+	LIMatVector max;
 
 	min = self->sector->position;
 	max = limat_vector_init (LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH);

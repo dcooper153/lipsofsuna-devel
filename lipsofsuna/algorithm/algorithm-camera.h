@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup lialg Algorithm
  * @{
- * \addtogroup lialgCamera Camerai
+ * \addtogroup LIAlgCamera Camerai
  * @{
  */
 
 #ifndef __ALGORITHM_CAMERA_H__
 #define __ALGORITHM_CAMERA_H__
 
-#include <math/lips-math.h>
+#include <lipsofsuna/math.h>
 
-typedef int lialgCameraDriver;
+typedef int LIAlgCameraDriver;
 enum 
 {
 	LIALG_CAMERA_FIRSTPERSON,
@@ -36,21 +36,21 @@ enum
 	LIALG_CAMERA_MAX
 };
 
-typedef struct _lialgCamera lialgCamera;
-struct _lialgCamera
+typedef struct _LIAlgCamera LIAlgCamera;
+struct _LIAlgCamera
 {
 	struct
 	{
 		float distance;
-		lialgCameraDriver driver;
+		LIAlgCameraDriver driver;
 	} config;
 	struct
 	{
-		limatTransform center;
-		limatTransform current;
-		limatTransform local;
-		limatTransform target;
-		limatTransform inverse;
+		LIMatTransform center;
+		LIMatTransform current;
+		LIMatTransform local;
+		LIMatTransform target;
+		LIMatTransform inverse;
 	} transform;
 	struct
 	{
@@ -59,114 +59,114 @@ struct _lialgCamera
 		float near;
 		float far;
 		int viewport[4];
-		limatMatrix modelview;
-		limatMatrix projection;
+		LIMatMatrix modelview;
+		LIMatMatrix projection;
 	} view;
 };
 
-lialgCamera*
+LIAlgCamera*
 lialg_camera_new ();
 
 void
-lialg_camera_free (lialgCamera* self);
+lialg_camera_free (LIAlgCamera* self);
 
 void
-lialg_camera_clip (lialgCamera* self,
+lialg_camera_clip (LIAlgCamera* self,
                    float        dist);
 
 void
-lialg_camera_move (lialgCamera* self,
+lialg_camera_move (LIAlgCamera* self,
                    float        value);
 
 int
-lialg_camera_project (lialgCamera*       self,
-                      const limatVector* object,
-                      limatVector*       window);
+lialg_camera_project (LIAlgCamera*       self,
+                      const LIMatVector* object,
+                      LIMatVector*       window);
 
 void
-lialg_camera_tilt (lialgCamera* self,
+lialg_camera_tilt (LIAlgCamera* self,
                    float        value);
 
 void
-lialg_camera_turn (lialgCamera* self,
+lialg_camera_turn (LIAlgCamera* self,
                    float        value);
 
 int
-lialg_camera_unproject (lialgCamera*       self,
-                        const limatVector* window,
-                        limatVector*       object);
+lialg_camera_unproject (LIAlgCamera*       self,
+                        const LIMatVector* window,
+                        LIMatVector*       object);
 
 void
-lialg_camera_update (lialgCamera* self,
+lialg_camera_update (LIAlgCamera* self,
                      float        secs);
 
 void
-lialg_camera_warp (lialgCamera* self);
+lialg_camera_warp (LIAlgCamera* self);
 
 void
-lialg_camera_zoom (lialgCamera* self,
+lialg_camera_zoom (LIAlgCamera* self,
                    float        value);
 
 void
-lialg_camera_get_bounds (const lialgCamera* self,
-                         limatAabb*         aabb);
+lialg_camera_get_bounds (const LIAlgCamera* self,
+                         LIMatAabb*         aabb);
 
 void
-lialg_camera_get_center (lialgCamera*    self,
-                         limatTransform* result);
+lialg_camera_get_center (LIAlgCamera*    self,
+                         LIMatTransform* result);
 
 void
-lialg_camera_set_center (lialgCamera*          self,
-                         const limatTransform* value);
+lialg_camera_set_center (LIAlgCamera*          self,
+                         const LIMatTransform* value);
 
-lialgCameraDriver
-lialg_camera_get_driver (lialgCamera* self);
-
-void
-lialg_camera_set_driver (lialgCamera*      self,
-                         lialgCameraDriver value);
+LIAlgCameraDriver
+lialg_camera_get_driver (LIAlgCamera* self);
 
 void
-lialg_camera_set_far (lialgCamera* self,
+lialg_camera_set_driver (LIAlgCamera*      self,
+                         LIAlgCameraDriver value);
+
+void
+lialg_camera_set_far (LIAlgCamera* self,
                       float        value);
 
 void
-lialg_camera_get_frustum (const lialgCamera* self,
-                          limatFrustum*      result);
+lialg_camera_get_frustum (const LIAlgCamera* self,
+                          LIMatFrustum*      result);
 
 void
-lialg_camera_get_modelview (const lialgCamera* self,
-                            limatMatrix*       value);
+lialg_camera_get_modelview (const LIAlgCamera* self,
+                            LIMatMatrix*       value);
 
 void
-lialg_camera_set_near (lialgCamera* self,
+lialg_camera_set_near (LIAlgCamera* self,
                        float        value);
 
 void
-lialg_camera_get_projection (const lialgCamera* self,
-                             limatMatrix*       value);
+lialg_camera_get_projection (const LIAlgCamera* self,
+                             LIMatMatrix*       value);
 
 void
-lialg_camera_set_projection (lialgCamera* self,
+lialg_camera_set_projection (LIAlgCamera* self,
                              float        fov,
                              float        aspect,
                              float        near,
                              float        far);
 
 void
-lialg_camera_get_transform (const lialgCamera* self,
-                            limatTransform*    value);
+lialg_camera_get_transform (const LIAlgCamera* self,
+                            LIMatTransform*    value);
 
 void
-lialg_camera_set_transform (lialgCamera*          self,
-                            const limatTransform* value);
+lialg_camera_set_transform (LIAlgCamera*          self,
+                            const LIMatTransform* value);
 
 void
-lialg_camera_get_up (const lialgCamera* self,
-                     limatVector*       result);
+lialg_camera_get_up (const LIAlgCamera* self,
+                     LIMatVector*       result);
 
 void
-lialg_camera_set_viewport (lialgCamera* self,
+lialg_camera_set_viewport (LIAlgCamera* self,
                            int          x,
                            int          y,
                            int          width,

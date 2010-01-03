@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,16 @@
 /**
  * \addtogroup liscr Script
  * @{
- * \addtogroup liscrPacket Packet
+ * \addtogroup LIScrPacket Packet
  * @{
  */
 
 #ifndef __SCRIPT_PACKET_H__
 #define __SCRIPT_PACKET_H__
 
-#include <archive/lips-archive.h>
-#include <script/lips-script.h>
-#include <string/lips-string.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/script.h>
+#include <lipsofsuna/string.h>
 
 enum
 {
@@ -42,24 +42,24 @@ enum
 	LISCR_PACKET_FORMAT_UINT32,
 };
 
-typedef struct _liscrPacket liscrPacket;
-struct _liscrPacket
+typedef struct _LIScrPacket LIScrPacket;
+struct _LIScrPacket
 {
 	char* buffer;
-	liarcReader* reader;
-	liarcWriter* writer;
+	LIArcReader* reader;
+	LIArcWriter* writer;
 };
 
-liscrData*
-liscr_packet_new_readable (liscrScript*       script,
-                           const liarcReader* reader);
+LIScrData*
+liscr_packet_new_readable (LIScrScript*       script,
+                           const LIArcReader* reader);
 
-liscrData*
-liscr_packet_new_writable (liscrScript* script,
+LIScrData*
+liscr_packet_new_writable (LIScrScript* script,
                            int          type);
 
 void
-liscr_packet_free (liscrPacket* self);
+liscr_packet_free (LIScrPacket* self);
 
 #endif
 

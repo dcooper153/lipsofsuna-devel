@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,24 +15,14 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_RENDER_H__
-#define __LIPS_RENDER_H__
+#ifndef __LIPS_SCRIPT_H__
+#define __LIPS_SCRIPT_H__
 
-#include "render.h"
-#include "render-buffer.h"
-#include "render-context.h"
-#include "render-deferred.h"
-#include "render-draw.h"
-#include "render-group.h"
-#include "render-image.h"
-#include "render-light.h"
-#include "render-lighting.h"
-#include "render-material.h"
-#include "render-model.h"
-#include "render-object.h"
-#include "render-scene.h"
-#include "render-shader.h"
-#include "render-texture.h"
-#include "render-types.h"
+#include "script/script.h"
+#include "script/script-args.h"
+#include "script/script-class.h"
+#include "script/script-data.h"
+#include "script/script-library.h"
+#include "script/script-util.h"
 
 #endif

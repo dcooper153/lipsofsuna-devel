@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,19 +18,19 @@
 /**
  * \addtogroup licli Client
  * @{
- * \addtogroup licliObject Object
+ * \addtogroup LICliObject Object
  * @{
  */
 
 #ifndef __CLIENT_OBJECT_H__
 #define __CLIENT_OBJECT_H__
 
-#include <algorithm/lips-algorithm.h>
-#include <engine/lips-engine.h>
-#include <math/lips-math.h>
-#include <network/lips-network.h>
-#include <render/lips-render.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/engine.h>
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/render.h>
+#include <lipsofsuna/system.h>
 #include "client-types.h"
 
 #define LICLI_IS_CLIENT_OBJECT(o) (lieng_object_get_userdata (o) != NULL)
@@ -39,14 +39,14 @@
 #define LICLI_OBJECT_ROTATION_SMOOTHING 0.5f
 
 void
-licli_object_set_animation (liengObject* self,
+licli_object_set_animation (LIEngObject* self,
                             int          value,
                             int          channel,
                             int          permanent,
                             float        priority);
 
 void
-licli_object_set_flags (liengObject* self,
+licli_object_set_flags (LIEngObject* self,
                         int          value);
 
 #endif

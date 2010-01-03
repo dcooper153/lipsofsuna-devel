@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgProgress Progress
+ * \addtogroup LIWdgProgress Progress
  * @{
  */
 
@@ -26,57 +26,57 @@
 #include "widget-progress.h"
 
 static int
-private_init (liwdgProgress* self,
-              liwdgManager*  manager);
+private_init (LIWdgProgress* self,
+              LIWdgManager*  manager);
 
 static void
-private_free (liwdgProgress* self);
+private_free (LIWdgProgress* self);
 
 static int
-private_event (liwdgProgress* self,
+private_event (LIWdgProgress* self,
                liwdgEvent*    event);
 
 static void
-private_rebuild (liwdgProgress* self);
+private_rebuild (LIWdgProgress* self);
 
-const liwdgClass liwdgProgressType =
+const LIWdgClass liwdg_widget_progress =
 {
-	LIWDG_BASE_STATIC, &liwdgWidgetType, "Progress", sizeof (liwdgProgress),
-	(liwdgWidgetInitFunc) private_init,
-	(liwdgWidgetFreeFunc) private_free,
-	(liwdgWidgetEventFunc) private_event
+	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Progress", sizeof (LIWdgProgress),
+	(LIWdgWidgetInitFunc) private_init,
+	(LIWdgWidgetFreeFunc) private_free,
+	(LIWdgWidgetEventFunc) private_event
 };
 
 /****************************************************************************/
 
-liwdgWidget*
-liwdg_progress_new (liwdgManager* manager)
+LIWdgWidget*
+liwdg_progress_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdgProgressType);
+	return liwdg_widget_new (manager, &liwdg_widget_progress);
 }
 
-lifntFont*
-liwdg_progress_get_font (liwdgProgress* self)
+LIFntFont*
+liwdg_progress_get_font (LIWdgProgress* self)
 {
 	return self->font;
 }
 
 void
-liwdg_progress_set_font (liwdgProgress* self,
-                         lifntFont*     font)
+liwdg_progress_set_font (LIWdgProgress* self,
+                         LIFntFont*     font)
 {
 	self->font = font;
 	private_rebuild (self);
 }
 
 const char*
-liwdg_progress_get_text (liwdgProgress* self)
+liwdg_progress_get_text (LIWdgProgress* self)
 {
 	return self->string;
 }
 
 int
-liwdg_progress_set_text (liwdgProgress* self,
+liwdg_progress_set_text (LIWdgProgress* self,
                          const char*    text)
 {
 	char* tmp;
@@ -91,13 +91,13 @@ liwdg_progress_set_text (liwdgProgress* self,
 }
 
 float
-liwdg_progress_get_value (liwdgProgress* self)
+liwdg_progress_get_value (LIWdgProgress* self)
 {
 	return self->value;
 }
 
 void
-liwdg_progress_set_value (liwdgProgress* self,
+liwdg_progress_set_value (LIWdgProgress* self,
                           float          value)
 {
 	self->value = value;
@@ -106,8 +106,8 @@ liwdg_progress_set_value (liwdgProgress* self,
 /****************************************************************************/
 
 static int
-private_init (liwdgProgress* self,
-              liwdgManager*  manager)
+private_init (LIWdgProgress* self,
+              LIWdgManager*  manager)
 {
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
@@ -125,20 +125,20 @@ private_init (liwdgProgress* self,
 }
 
 static void
-private_free (liwdgProgress* self)
+private_free (LIWdgProgress* self)
 {
 	lifnt_layout_free (self->text);
 	lisys_free (self->string);
 }
 
 static int
-private_event (liwdgProgress* self,
+private_event (LIWdgProgress* self,
                liwdgEvent*    event)
 {
 	int w;
 	int h;
-	liwdgRect rect;
-	liwdgStyle* style;
+	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	switch (event->type)
 	{
@@ -166,11 +166,11 @@ private_event (liwdgProgress* self,
 			return 1;
 	}
 
-	return liwdgWidgetType.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
 }
 
 static void
-private_rebuild (liwdgProgress* self)
+private_rebuild (LIWdgProgress* self)
 {
 	int h = 0;
 

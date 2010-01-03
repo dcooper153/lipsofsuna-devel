@@ -1,5 +1,4 @@
-LIBADD = $(top_builddir)/lipsofsuna/liblipsofsunaserver.la $(LISRV_LIBS)
-INCLUDES = -I$(top_srcdir)/lipsofsuna
+LIBADD = $(top_builddir)/liblipsofsunaserver.la $(LISRV_LIBS)
 AM_CFLAGS = $(LISRV_CFLAGS)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 EXTRA_DIST = skeleton/mkext.sh

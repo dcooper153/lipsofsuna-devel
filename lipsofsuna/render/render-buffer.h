@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,25 +16,25 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndBuffer Buffer
+ * \addtogroup LIRenBuffer Buffer
  * @{
  */
 
 #ifndef __RENDER_BUFFER_H__
 #define __RENDER_BUFFER_H__
 
-#include <model/lips-model.h>
-#include <video/lips-video.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/video.h>
 #include "render-material.h"
 #include "render-types.h"
 
-struct _lirndBuffer
+struct _LIRenBuffer
 {
 	GLuint buffer;
 	GLenum target;
-	lirndFormat format;
+	LIRenFormat format;
 	struct
 	{
 		int count;
@@ -43,25 +43,25 @@ struct _lirndBuffer
 };
 
 int
-lirnd_buffer_init_index (lirndBuffer* self,
+liren_buffer_init_index (LIRenBuffer* self,
                          const void*  data,
                          int          count);
 
 int
-lirnd_buffer_init_vertex (lirndBuffer*       self,
-                          const lirndFormat* format,
+liren_buffer_init_vertex (LIRenBuffer*       self,
+                          const LIRenFormat* format,
                           const void*        data,
                           int                count);
 
 void
-lirnd_buffer_free (lirndBuffer* self);
+liren_buffer_free (LIRenBuffer* self);
 
 void*
-lirnd_buffer_lock (lirndBuffer* self,
+liren_buffer_lock (LIRenBuffer* self,
                    int          write);
 
 void
-lirnd_buffer_unlock (lirndBuffer* self,
+liren_buffer_unlock (LIRenBuffer* self,
                      void*        data);
 
 #endif

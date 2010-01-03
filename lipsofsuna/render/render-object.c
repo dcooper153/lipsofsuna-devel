@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2009 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,35 +16,35 @@
  */
 
 /**
- * \addtogroup lirnd Render
+ * \addtogroup liren Render
  * @{
- * \addtogroup lirndObject Object
+ * \addtogroup LIRenObject Object
  * @{
  */
 
-#include <network/lips-network.h>
-#include <system/lips-system.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/system.h>
 #include "render-draw.h"
 #include "render-object.h"
 
 static void
-private_clear_envmap (lirndObject* self);
+private_clear_envmap (LIRenObject* self);
 
 static void
-private_clear_lights (lirndObject* self);
+private_clear_lights (LIRenObject* self);
 
 static int
-private_init_envmap (lirndObject* self);
+private_init_envmap (LIRenObject* self);
 
 static int
-private_init_lights (lirndObject* self,
-                     limdlPose*   pose);
+private_init_lights (LIRenObject* self,
+                     LIMdlPose*   pose);
 
 static void
-private_update_envmap (lirndObject* self);
+private_update_envmap (LIRenObject* self);
 
 static void
-private_update_lights (lirndObject* self);
+private_update_lights (LIRenObject* self);
 
 /*****************************************************************************/
 
@@ -55,14 +55,14 @@ private_update_lights (lirndObject* self);
  * \param id Unique identifier.
  * \return New object or NULL.
  */
-lirndObject*
-lirnd_object_new (lirndScene* scene,
+LIRenObject*
+liren_object_new (LIRenScene* scene,
                   int         id)
 {
-	lirndObject* self;
+	LIRenObject* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (lirndObject));
+	self = lisys_calloc (1, sizeof (LIRenObject));
 	if (self == NULL)
 		return NULL;
 	self->scene = scene;
@@ -75,11 +75,11 @@ lirnd_object_new (lirndScene* scene,
 	{
 		id = (int)((LINET_RANGE_RENDER_END - LINET_RANGE_RENDER_START) *
 			((float) rand () / RAND_MAX)) + LINET_RANGE_RENDER_START;
-		if (lirnd_scene_find_object (scene, id))
+		if (liren_scene_find_object (scene, id))
 			id = 0;
 	}
 	self->id = id;
-	assert (!lirnd_scene_find_object (scene, id));
+	assert (!liren_scene_find_object (scene, id));
 
 	/* Add to renderer. */
 	if (!lialg_u32dic_insert (scene->objects, id, self))
@@ -99,13 +99,13 @@ lirnd_object_new (lirndScene* scene,
  * \param self Object.
  */
 void
-lirnd_object_free (lirndObject* self)
+liren_object_free (LIRenObject* self)
 {
 	lialg_u32dic_remove (self->scene->objects, self->id);
 	private_clear_envmap (self);
 	private_clear_lights (self);
 	if (self->instance != NULL)
-		lirnd_model_free (self->instance);
+		liren_model_free (self->instance);
 	lisys_free (self);
 }
 
@@ -115,36 +115,36 @@ lirnd_object_free (lirndObject* self)
  * \param self Object.
  */
 void
-lirnd_object_deform (lirndObject* self)
+liren_object_deform (LIRenObject* self)
 {
 	void* vertices;
-	lirndBuffer* buffer;
+	LIRenBuffer* buffer;
 
 	if (self->instance == NULL)
 		return;
 	buffer = self->instance->vertices;
-	vertices = lirnd_buffer_lock (buffer, 1);
+	vertices = liren_buffer_lock (buffer, 1);
 	if (vertices != NULL)
 	{
 		limdl_pose_transform (self->pose, vertices);
-		lirnd_buffer_unlock (buffer, vertices);
+		liren_buffer_unlock (buffer, vertices);
 	}
 	private_update_lights (self);
 }
 
 void
-lirnd_object_emit_particles (lirndObject* self)
+liren_object_emit_particles (LIRenObject* self)
 {
 #warning FIXME: Emitting particles is disabled
 #if 0
 	int i;
-	limatMatrix vtxmat;
-	limatMatrix nmlmat;
-	limatVector position;
-	limatVector velocity;
-	limdlVertex* vertex;
-	limdlVertex* vertices;
-	lirndParticle* particle;
+	LIMatMatrix vtxmat;
+	LIMatMatrix nmlmat;
+	LIMatVector position;
+	LIMatVector velocity;
+	LIMdlVertex* vertex;
+	LIMdlVertex* vertices;
+	lirenParticle* particle;
 
 	if (self->model == NULL)
 		return;
@@ -167,7 +167,7 @@ lirnd_object_emit_particles (lirndObject* self)
 			random()/(3.0*RAND_MAX)+3.0f,
 			random()/(0.5*RAND_MAX)-1.0
 		*/
-		particle = lirnd_scene_insert_particle (self->scene, &position, &velocity);
+		particle = liren_scene_insert_particle (self->scene, &position, &velocity);
 		if (particle != NULL)
 		{
 			particle->time_life = 2.0f;
@@ -185,14 +185,14 @@ lirnd_object_emit_particles (lirndObject* self)
  * \param secs Number of seconds since the last update.
  */
 void
-lirnd_object_update (lirndObject* self,
+liren_object_update (LIRenObject* self,
                      float        secs)
 {
 	if (self->instance != NULL && self->instance->buffers.count)
 	{
 		private_update_envmap (self);
 		if (self->pose != NULL)
-			lirnd_object_deform (self);
+			liren_object_deform (self);
 	}
 }
 
@@ -203,8 +203,8 @@ lirnd_object_update (lirndObject* self,
  * \param result Return location for the bounding box.
  */
 void
-lirnd_object_get_bounds (const lirndObject* self,
-                         limatAabb*         result)
+liren_object_get_bounds (const LIRenObject* self,
+                         LIMatAabb*         result)
 {
 	*result = limat_aabb_transform (self->aabb, &self->orientation.matrix);
 }
@@ -218,8 +218,8 @@ lirnd_object_get_bounds (const lirndObject* self,
  * \param center Return location for the position.
  */
 void
-lirnd_object_get_center (const lirndObject* self,
-                         limatVector*       center)
+liren_object_get_center (const LIRenObject* self,
+                         LIMatVector*       center)
 {
 	*center = self->orientation.center;
 }
@@ -235,17 +235,17 @@ lirnd_object_get_center (const lirndObject* self,
  * \return Nonzero on success.
  */
 int
-lirnd_object_set_model (lirndObject* self,
-                        lirndModel*  model)
+liren_object_set_model (LIRenObject* self,
+                        LIRenModel*  model)
 {
 	/* Replace model. */
 	self->model = model;
 
 	/* Replace instance. */
 	if (self->instance != NULL)
-		lirnd_model_free (self->instance);
+		liren_model_free (self->instance);
 	if (model != NULL && self->pose != NULL)
-		self->instance = lirnd_model_new_instance (model);
+		self->instance = liren_model_new_instance (model);
 	else
 		self->instance = NULL;
 
@@ -272,13 +272,13 @@ lirnd_object_set_model (lirndObject* self,
  * \return Nonzero on success.
  */
 int
-lirnd_object_set_pose (lirndObject* self,
-                       limdlPose*   pose)
+liren_object_set_pose (LIRenObject* self,
+                       LIMdlPose*   pose)
 {
 	if (self->pose != pose)
 	{
 		self->pose = pose;
-		return lirnd_object_set_model (self, self->model);
+		return liren_object_set_model (self, self->model);
 	}
 
 	return 1;
@@ -294,7 +294,7 @@ lirnd_object_set_pose (lirndObject* self,
  * \return Nonzero if realized.
  */
 int
-lirnd_object_get_realized (const lirndObject* self)
+liren_object_get_realized (const LIRenObject* self)
 {
 	return self->realized && (self->model != NULL || self->instance != NULL);
 }
@@ -315,7 +315,7 @@ lirnd_object_get_realized (const lirndObject* self)
  * \return Nonzero if succeeded.
  */
 int
-lirnd_object_set_realized (lirndObject* self,
+liren_object_set_realized (LIRenObject* self,
                            int          value)
 {
 	int i;
@@ -328,7 +328,7 @@ lirnd_object_set_realized (lirndObject* self,
 		for (i = 0 ; i < self->lights.count ; i++)
 		{
 			if (self->lights.array[i] != NULL)
-				lirnd_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
+				liren_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
 		}
 	}
 	else
@@ -336,7 +336,7 @@ lirnd_object_set_realized (lirndObject* self,
 		for (i = 0 ; i < self->lights.count ; i++)
 		{
 			if (self->lights.array[i] != NULL)
-				lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+				liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
 		}
 	}
 
@@ -350,8 +350,8 @@ lirnd_object_set_realized (lirndObject* self,
  * \param value Return location for the transformation.
  */
 void
-lirnd_object_get_transform (lirndObject*    self,
-                            limatTransform* value)
+liren_object_get_transform (LIRenObject*    self,
+                            LIMatTransform* value)
 {
 	*value = self->transform;
 }
@@ -363,11 +363,11 @@ lirnd_object_get_transform (lirndObject*    self,
  * \param value Transformation.
  */
 void
-lirnd_object_set_transform (lirndObject*          self,
-                            const limatTransform* value)
+liren_object_set_transform (LIRenObject*          self,
+                            const LIMatTransform* value)
 {
-	limatVector center;
-	limdlModel* model;
+	LIMatVector center;
+	LIMdlModel* model;
 
 	/* Set transformation. */
 	self->transform = *value;
@@ -388,13 +388,13 @@ lirnd_object_set_transform (lirndObject*          self,
 }
 
 void*
-lirnd_object_get_userdata (const lirndObject* self)
+liren_object_get_userdata (const LIRenObject* self)
 {
 	return self->userdata;
 }
 
 void
-lirnd_object_set_userdata (lirndObject* self,
+liren_object_set_userdata (LIRenObject* self,
                            void*        value)
 {
 	self->userdata = value;
@@ -403,12 +403,12 @@ lirnd_object_set_userdata (lirndObject* self,
 /*****************************************************************************/
 
 static void
-private_clear_envmap (lirndObject* self)
+private_clear_envmap (LIRenObject* self)
 {
 	int i;
 	int j;
-	lirndMaterial* material;
-	lirndTexture* texture;
+	LIRenMaterial* material;
+	LIRenTexture* texture;
 
 	if (self->instance == NULL)
 		return;
@@ -431,7 +431,7 @@ private_clear_envmap (lirndObject* self)
 }
 
 static void
-private_clear_lights (lirndObject* self)
+private_clear_lights (LIRenObject* self)
 {
 	int i;
 
@@ -439,8 +439,8 @@ private_clear_lights (lirndObject* self)
 	{
 		if (self->lights.array[i] != NULL)
 		{
-			lirnd_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
-			lirnd_light_free (self->lights.array[i]);
+			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+			liren_light_free (self->lights.array[i]);
 		}
 	}
 	lisys_free (self->lights.array);
@@ -449,14 +449,14 @@ private_clear_lights (lirndObject* self)
 }
 
 static int
-private_init_envmap (lirndObject* self)
+private_init_envmap (LIRenObject* self)
 {
 	int i;
 	int j;
 	int width = 0;
 	int height = 0;
-	lirndMaterial* material;
-	lirndTexture* texture;
+	LIRenMaterial* material;
+	LIRenTexture* texture;
 
 	/* Check for requirements. */
 	if (!GLEW_ARB_depth_texture ||
@@ -568,13 +568,13 @@ error:
 }
 
 int
-private_init_lights (lirndObject* self,
-                     limdlPose*   pose)
+private_init_lights (LIRenObject* self,
+                     LIMdlPose*   pose)
 {
 	int i;
-	limdlNode* node;
-	limdlNodeIter iter;
-	lirndLight* light;
+	LIMdlNode* node;
+	LIMdlNodeIter iter;
+	LIRenLight* light;
 
 	/* Create light sources. */
 	if (pose != NULL)
@@ -584,12 +584,12 @@ private_init_lights (lirndObject* self,
 			node = iter.value;
 			if (node->type != LIMDL_NODE_LIGHT)
 				continue;
-			light = lirnd_light_new_from_model (self->scene, node);
+			light = liren_light_new_from_model (self->scene, node);
 			if (light == NULL)
 				return 0;
 			if (!lialg_array_append (&self->lights, &light))
 			{
-				lirnd_light_free (light);
+				liren_light_free (light);
 				return 0;
 			}
 		}
@@ -601,12 +601,12 @@ private_init_lights (lirndObject* self,
 		for (i = 0 ; i < self->lights.count ; i++)
 		{
 			light = self->lights.array[i];
-			if (!lirnd_lighting_insert_light (self->scene->lighting, light))
+			if (!liren_lighting_insert_light (self->scene->lighting, light))
 			{
 				while (i--)
 				{
 					light = self->lights.array[i];
-					lirnd_lighting_remove_light (self->scene->lighting, light);
+					liren_lighting_remove_light (self->scene->lighting, light);
 				}
 				return 0;
 			}
@@ -617,16 +617,16 @@ private_init_lights (lirndObject* self,
 }
 
 static void
-private_update_envmap (lirndObject* self)
+private_update_envmap (LIRenObject* self)
 {
 	int i;
-	lialgU32dicIter iter;
-	limatFrustum frustum;
-	limatVector ctr;
-	limatMatrix modelview;
-	limatMatrix projection;
-	lirndContext context;
-	const limatVector dir[6] =
+	LIAlgU32dicIter iter;
+	LIMatFrustum frustum;
+	LIMatVector ctr;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
+	LIRenContext context;
+	const LIMatVector dir[6] =
 	{
 		{ 1.0f, 0.0f, 0.0f }, /* Back. */
 		{ -1.0f, 0.0f, 0.0f }, /* Front. */
@@ -635,7 +635,7 @@ private_update_envmap (lirndObject* self)
 		{ 0.0f, 0.0f, 1.0f }, /* Left. */
 		{ 0.0f, 0.0f, -1.0f } /* Right. */
 	};
-	const limatVector up[6] =
+	const LIMatVector up[6] =
 	{
 		{ 0.0f, -1.0f, 0.0f }, /* Back. */
 		{ 0.0f, -1.0f, 0.0f }, /* Front. */
@@ -649,7 +649,7 @@ private_update_envmap (lirndObject* self)
 		return;
 	modelview = self->orientation.matrix;
 	projection = limat_matrix_perspective (0.5 * M_PI, 1.0f, 1.0f, 100.0f);
-	lirnd_object_get_center (self, &ctr);
+	liren_object_get_center (self, &ctr);
 
 	/* Enable cube map rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
@@ -670,12 +670,12 @@ private_update_envmap (lirndObject* self)
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		limat_frustum_init (&frustum, &modelview, &projection);
-		lirnd_context_init (&context, self->scene);
-		lirnd_context_set_modelview (&context, &modelview);
-		lirnd_context_set_projection (&context, &projection);
-		lirnd_context_set_frustum (&context, &frustum);
+		liren_context_init (&context, self->scene);
+		liren_context_set_modelview (&context, &modelview);
+		liren_context_set_projection (&context, &projection);
+		liren_context_set_frustum (&context, &frustum);
 		LI_FOREACH_U32DIC (iter, self->scene->objects)
-			lirnd_draw_exclude (&context, iter.value, self);
+			liren_draw_exclude (&context, iter.value, self);
 	}
 
 	/* Disable cube map rendering mode. */
@@ -684,11 +684,11 @@ private_update_envmap (lirndObject* self)
 }
 
 static void
-private_update_lights (lirndObject* self)
+private_update_lights (LIRenObject* self)
 {
 	int i;
-	limatTransform transform;
-	lirndLight* light;
+	LIMatTransform transform;
+	LIRenLight* light;
 
 	for (i = 0 ; i < self->lights.count ; i++)
 	{
@@ -697,7 +697,7 @@ private_update_lights (lirndObject* self)
 		{
 			limdl_node_get_world_transform (light->node, &transform);
 			transform = limat_transform_multiply (self->transform, transform);
-			lirnd_light_set_transform (light, &transform);
+			liren_light_set_transform (light, &transform);
 		}
 	}
 }
