@@ -25,6 +25,11 @@
 #include <lipsofsuna/client.h>
 
 static void
+private_widget_attach (LICliClient* client,
+                       LIWdgWidget* widget,
+                       LIWdgWidget* parent);
+
+static void
 private_widget_detach (LICliClient* client,
                        LIWdgWidget* widget,
                        int*         free);
@@ -195,6 +200,7 @@ licli_script_widget (LIScrClass* self,
 {
 	LICliClient* client = data;
 
+	lical_callbacks_insert (client->callbacks, client->widgets, "widget-attach", 5, private_widget_attach, client, NULL);
 	lical_callbacks_insert (client->callbacks, client->widgets, "widget-detach", 5, private_widget_detach, client, NULL);
 	lical_callbacks_insert (client->callbacks, client->widgets, "widget-free", 5, private_widget_free, client, NULL);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
@@ -210,15 +216,33 @@ licli_script_widget (LIScrClass* self,
 /*****************************************************************************/
 
 static void
+private_widget_attach (LICliClient* client,
+                       LIWdgWidget* widget,
+                       LIWdgWidget* parent)
+{
+	if (widget->userdata != NULL)
+	{
+		if (parent != NULL)
+			liscr_data_ref (widget->userdata, parent->userdata);
+		else
+			liscr_data_ref (widget->userdata, NULL);
+	}
+}
+
+static void
 private_widget_detach (LICliClient* client,
                        LIWdgWidget* widget,
                        int*         free)
 {
 	if (widget->userdata != NULL)
 	{
-		if (liscr_data_get_valid (widget->userdata) &&
-		    liscr_data_get_valid (widget->parent->userdata))
-			liscr_data_unref (widget->userdata, widget->parent->userdata);
+		if (liscr_data_get_valid (widget->userdata))
+		{
+			if (widget->parent != NULL)
+				liscr_data_unref (widget->userdata, widget->parent->userdata);
+			else
+				liscr_data_unref (widget->userdata, NULL);
+		}
 		*free = 0;
 	}
 }
@@ -227,7 +251,7 @@ static void
 private_widget_free (LICliClient* client,
                      LIWdgWidget* widget)
 {
-	if (widget->userdata != NULL && widget->parent != NULL)
+	if (widget->userdata != NULL)
 		liwdg_widget_detach (widget);
 }
 

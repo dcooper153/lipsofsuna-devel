@@ -385,6 +385,7 @@ liwdg_group_set_child (LIWdgGroup*  self,
                        LIWdgWidget* child)
 {
 	LIWdgGroupCell* cell;
+	LIWdgManager* manager;
 
 	assert (x < self->width);
 	assert (y < self->height);
@@ -408,7 +409,9 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	{
 		assert (child->parent == NULL);
 		assert (child->state == LIWDG_WIDGET_STATE_DETACHED);
+		manager = LIWDG_WIDGET (self)->manager;
 		child->parent = LIWDG_WIDGET (self);
+		lical_callbacks_call (manager->callbacks, manager, "widget-attach", lical_marshal_DATA_PTR_PTR, child, self);
 	}
 
 	/* Ensure valid focus. */

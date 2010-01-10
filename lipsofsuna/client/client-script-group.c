@@ -58,7 +58,6 @@ static void Group_append_col (LIScrArgs* args)
 	for (i = 0 ; i < h && liscr_args_geti_data (args, i, LICLI_SCRIPT_WIDGET, &data) ; i++)
 	{
 		liwdg_widget_detach (data->data);
-		liscr_data_ref (data, args->data);
 		liwdg_group_set_child (args->self, w, i, data->data);
 	}
 }
@@ -87,7 +86,6 @@ static void Group_append_row (LIScrArgs* args)
 	for (i = 0 ; i < w && liscr_args_geti_data (args, i, LICLI_SCRIPT_WIDGET, &data) ; i++)
 	{
 		liwdg_widget_detach (data->data);
-		liscr_data_ref (data, args->data);
 		liwdg_group_set_child (args->self, i, h, data->data);
 	}
 }
@@ -317,7 +315,6 @@ static void Group_set_child (LIScrArgs* args)
 	if (data != NULL)
 	{
 		liwdg_widget_detach (data->data);
-		liscr_data_ref (data, args->data);
 		liwdg_group_set_child (args->self, x - 1, y - 1, data->data);
 	}
 	else

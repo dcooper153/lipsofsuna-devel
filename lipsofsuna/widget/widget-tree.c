@@ -366,7 +366,7 @@ private_event (LIWdgTree*  self,
 				private_rebuild (self);
 				return 0;
 			}
-			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self, row);
+			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, row);
 		case LIWDG_EVENT_TYPE_RENDER:
 			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			/* Draw base. */

@@ -921,37 +921,15 @@ static void View_getter_child (LIScrArgs* args)
 }
 static void View_setter_child (LIScrArgs* args)
 {
-	LIScrData* data;
-	LIScrData* child;
-	LIWdgWidget* oldwidget;
-	LIWdgWidget* newwidget;
+	LIScrData* child = NULL;
 
 	/* Argument checks. */
 	if (liscr_args_geti_data (args, 0, LICLI_SCRIPT_WIDGET, &child))
-	{
-		newwidget = child->data;
-		if (newwidget->state != LIWDG_WIDGET_STATE_DETACHED)
-			return;
-		if (newwidget->parent != NULL)
-			return;
-	}
-	else
-		child = NULL;
-
-	/* Detach old child. */
-	oldwidget = liwdg_view_get_child (args->self);
-	if (oldwidget != NULL)
-	{
-		data = liwdg_widget_get_userdata (oldwidget);
-		liscr_data_unref (data, args->data);
-	}
+		liwdg_widget_detach (child->data);
 
 	/* Attach new child. */
 	if (child != NULL)
-	{
-		liscr_data_ref (child, args->data);
 		liwdg_view_set_child (args->self, child->data);
-	}
 	else
 		liwdg_view_set_child (args->self, NULL);
 }

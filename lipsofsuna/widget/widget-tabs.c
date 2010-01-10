@@ -94,6 +94,7 @@ liwdg_tabs_append_tab (LIWdgTabs*  self,
                       LIWdgWidget* widget)
 {
 	LIWdgTab tmp;
+	LIWdgManager* manager;
 
 	/* Format tab. */
 	memset (&tmp, 0, sizeof (LIWdgTab));
@@ -121,7 +122,9 @@ liwdg_tabs_append_tab (LIWdgTabs*  self,
 		lisys_free (tmp.text);
 		return 0;
 	}
+	manager = LIWDG_WIDGET (self)->manager;
 	widget->parent = LIWDG_WIDGET (self);
+	lical_callbacks_call (manager->callbacks, manager, "widget-attach", lical_marshal_DATA_PTR_PTR, widget, self);
 
 	/* Rebuild request. */
 	private_rebuild (self);

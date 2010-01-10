@@ -109,6 +109,8 @@ void
 liwdg_view_set_child (LIWdgView*   self,
                       LIWdgWidget* widget)
 {
+	LIWdgManager* manager;
+
 	if (self->child == widget)
 		return;
 
@@ -118,7 +120,11 @@ liwdg_view_set_child (LIWdgView*   self,
 	/* Adopt new widget. */
 	self->child = widget;
 	if (widget != NULL)
+	{
+		manager = LIWDG_WIDGET (self)->manager;
 		widget->parent = LIWDG_WIDGET (self);
+		lical_callbacks_call (manager->callbacks, manager, "widget-attach", lical_marshal_DATA_PTR_PTR, widget, self);
+	}
 
 	/* Rebuild request. */
 	self->hscrollpos = 0;
