@@ -135,23 +135,26 @@ Vector___sub (lua_State* lua)
  * ---
  * -- Creates a new vector.
  * --
+ * -- Arguments:
+ * -- 1,x: X coordinate.
+ * -- 2,y: Y coordinate.
+ * -- 3,z: Z coordinate.
+ * --
  * -- @param self Vector class.
- * -- @param x Optional X value, default is 0.
- * -- @param y Optional Y value, default is 0.
- * -- @param z Optional Z value, default is 0.
+ * -- @param args Arguments.
  * -- @return New vector.
- * function Vector.new(self, x, y, z)
+ * function Vector.new(self, args)
  */
 static void Vector_new (LIScrArgs* args)
 {
-	LIMatVector vec;
+	LIMatVector vec = { 0.0f, 0.0f, 0.0f };
 
 	if (!liscr_args_gets_float (args, "x", &vec.x))
 		liscr_args_geti_float (args, 0, &vec.x);
 	if (!liscr_args_gets_float (args, "y", &vec.y))
-		liscr_args_geti_float (args, 0, &vec.y);
+		liscr_args_geti_float (args, 1, &vec.y);
 	if (!liscr_args_gets_float (args, "z", &vec.z))
-		liscr_args_geti_float (args, 0, &vec.z);
+		liscr_args_geti_float (args, 2, &vec.z);
 	liscr_args_seti_vector (args, &vec);
 }
 

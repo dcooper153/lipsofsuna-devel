@@ -41,59 +41,47 @@
 
 void
 licli_script_action (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 licli_script_binding (LIScrClass* self,
-                    void*       data);
-
-void
-licli_script_client (LIScrClass* self,
-                   void*       data);
-
-void
-licli_script_extension (LIScrClass* self,
                       void*       data);
 
 void
+licli_script_client (LIScrClass* self,
+                     void*       data);
+
+void
+licli_script_extension (LIScrClass* self,
+                        void*       data);
+
+void
 licli_script_group (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 void
 licli_script_light (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 void
 licli_script_object (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 licli_script_player (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 licli_script_scene (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 void
 licli_script_widget (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 licli_script_window (LIScrClass* self,
-                   void*       data);
-
-/*****************************************************************************/
-
-void
-licli_script_widget_free (LIWdgWidget* self,
-                          LIScrData*   data);
-
-void
-licli_script_widget_detach (LIScrData* self);
-
-void
-licli_script_widget_detach_children (LIScrData* self);
+                     void*       data);
 
 #endif
 

@@ -57,7 +57,7 @@ static void Group_append_col (LIScrArgs* args)
 	/* Append rows. */
 	for (i = 0 ; i < h && liscr_args_geti_data (args, i, LICLI_SCRIPT_WIDGET, &data) ; i++)
 	{
-		licli_script_widget_detach (data);
+		liwdg_widget_detach (data->data);
 		liscr_data_ref (data, args->data);
 		liwdg_group_set_child (args->self, w, i, data->data);
 	}
@@ -86,7 +86,7 @@ static void Group_append_row (LIScrArgs* args)
 	/* Append columns. */
 	for (i = 0 ; i < w && liscr_args_geti_data (args, i, LICLI_SCRIPT_WIDGET, &data) ; i++)
 	{
-		licli_script_widget_detach (data);
+		liwdg_widget_detach (data->data);
 		liscr_data_ref (data, args->data);
 		liwdg_group_set_child (args->self, i, h, data->data);
 	}
@@ -216,7 +216,7 @@ static void Group_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_GROUP, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_GROUP, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -229,86 +229,28 @@ static void Group_new (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Removes a column from the widget.
+ * -- Removes a row or a column from the widget.
+ * --
+ * -- Arguments:
+ * -- col: Column index.
+ * -- row: Row index.
  * --
  * -- @param self Group.
- * -- @param col Column index.
- * function Group.remove_col(self, col)
+ * -- @param args Arguments.
+ * function Group.remove(self, args)
  */
-static int
-Group_remove_col (lua_State* lua)
+static void Group_remove (LIScrArgs* args)
 {
-	int y;
 	int w;
 	int h;
 	int col;
-	LIScrData* self;
-	LIScrData* data;
-	LIWdgWidget* widget;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	col = luaL_checkint (lua, 2) - 1;
-	liwdg_group_get_size (self->data, &w, &h);
-	luaL_argcheck (lua, col >= 0 && col < h, 2, "invalid column");
-
-	/* Detach scripted widgets. */
-	for (y = 0 ; y < h ; y++)
-	{
-		widget = liwdg_group_get_child (self->data, col, y);
-		if (widget != NULL)
-		{
-			data = liwdg_widget_get_userdata (widget);
-			if (data != NULL)
-				licli_script_widget_detach (data);
-		}
-	}
-
-	/* Remove column. */
-	liwdg_group_remove_col (self->data, col);
-
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Removes a row from the widget.
- * --
- * -- @param self Group.
- * -- @param row Row index.
- * function Group.remove_row(self, row)
- */
-static int
-Group_remove_row (lua_State* lua)
-{
-	int x;
-	int w;
-	int h;
 	int row;
-	LIScrData* self;
-	LIScrData* data;
-	LIWdgWidget* widget;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
-	row = luaL_checkint (lua, 2) - 1;
-	liwdg_group_get_size (self->data, &w, &h);
-	luaL_argcheck (lua, row >= 0 && row < h, 2, "invalid row");
-
-	/* Detach scripted widgets. */
-	for (x = 0 ; x < w ; x++)
-	{
-		widget = liwdg_group_get_child (self->data, x, row);
-		if (widget != NULL)
-		{
-			data = liwdg_widget_get_userdata (widget);
-			if (data != NULL)
-				licli_script_widget_detach (data);
-		}
-	}
-
-	/* Remove row. */
-	liwdg_group_remove_row (self->data, row);
-
-	return 0;
+	liwdg_group_get_size (args->self, &w, &h);
+	if (liscr_args_gets_int (args, "col", &col) && col >= 1 && col <= w)
+		liwdg_group_remove_col (args->self, col - 1);
+	if (liscr_args_gets_int (args, "row", &row) && row >= 1 && row <= h)
+		liwdg_group_remove_row (args->self, row - 1);
 }
 
 /* @luadoc
@@ -360,8 +302,7 @@ static void Group_set_child (LIScrArgs* args)
 	int y = 1;
 	int w;
 	int h;
-	LIScrData* data;
-	LIWdgWidget* widget;
+	LIScrData* data = NULL;
 
 	/* Arguments. */
 	if (!liscr_args_gets_int (args, "col", &x) ||
@@ -369,18 +310,13 @@ static void Group_set_child (LIScrArgs* args)
 		return;
 	liscr_args_gets_data (args, "widget", LICLI_SCRIPT_WIDGET, &data);
 	liwdg_group_get_size (args->self, &w, &h);
-	if (x <= 0 || x > w || y <= 0 || y > h)
+	if (x < 1 || x > w || y < 1 || y > h)
 		return;
-
-	/* Detach old widget. */
-	widget = liwdg_group_get_child (args->self, x - 1, y - 1);
-	if (widget != NULL)
-		licli_script_widget_detach (liwdg_widget_get_userdata (widget));
 
 	/* Attach new widget. */
 	if (data != NULL)
 	{
-		licli_script_widget_detach (data);
+		liwdg_widget_detach (data->data);
 		liscr_data_ref (data, args->data);
 		liwdg_group_set_child (args->self, x - 1, y - 1, data->data);
 	}
@@ -413,7 +349,7 @@ static void Group_set_expand (LIScrArgs* args)
 	if (liscr_args_gets_int (args, "col", &i) && i >= 1 && i <= w)
 		liwdg_group_set_col_expand (args->self, i - 1, expand);
 	if (liscr_args_gets_int (args, "row", &i) && i >= 1 && i <= h)
-		liwdg_group_set_col_expand (args->self, i - 1, expand);
+		liwdg_group_set_row_expand (args->self, i - 1, expand);
 }
 
 /* @luadoc
@@ -434,32 +370,11 @@ static void Group_setter_cols (LIScrArgs* args)
 {
 	int w;
 	int h;
-	int y;
 	int cols;
-	LIScrData* data;
-	LIWdgWidget* widget;
 
-	if (!liscr_args_geti_int (args, 0, &cols) || cols < 0)
-		return;
-
-	/* Detach scripted widgets. */
 	liwdg_group_get_size (args->self, &w, &h);
-	for (w-- ; w >= cols ; w--)
-	{
-		for (y = 0 ; y < h ; y++)
-		{
-			widget = liwdg_group_get_child (args->self, w, y);
-			if (widget != NULL)
-			{
-				data = liwdg_widget_get_userdata (widget);
-				if (data != NULL)
-					licli_script_widget_detach (data);
-			}
-		}
-	}
-
-	/* Set new size. */
-	liwdg_group_set_size (args->self, cols, h);
+	if (liscr_args_geti_int (args, 0, &cols) && cols >= 0)
+		liwdg_group_set_size (args->self, cols, h);
 }
 
 /* @luadoc
@@ -480,39 +395,18 @@ static void Group_setter_rows (LIScrArgs* args)
 {
 	int w;
 	int h;
-	int x;
 	int rows;
-	LIScrData* data;
-	LIWdgWidget* widget;
 
-	if (!liscr_args_geti_int (args, 0, &rows) || rows < 0)
-		return;
-
-	/* Detach scripted widgets. */
 	liwdg_group_get_size (args->self, &w, &h);
-	for (h-- ; h >= rows ; h--)
-	{
-		for (x = 0 ; x < w ; x++)
-		{
-			widget = liwdg_group_get_child (args->self, x, h);
-			if (widget != NULL)
-			{
-				data = liwdg_widget_get_userdata (widget);
-				if (data != NULL)
-					licli_script_widget_detach (data);
-			}
-		}
-	}
-
-	/* Set new size. */
-	liwdg_group_set_size (args->self, w, rows);
+	if (liscr_args_geti_int (args, 0, &rows) || rows >= 0)
+		liwdg_group_set_size (args->self, w, rows);
 }
 
 /*****************************************************************************/
 
 void
 licli_script_group (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	liscr_class_inherit (self, licli_script_widget, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_GROUP, data);
@@ -522,8 +416,7 @@ licli_script_group (LIScrClass* self,
 	liscr_class_insert_func (self, "insert_col", Group_insert_col);
 	liscr_class_insert_func (self, "insert_row", Group_insert_row);
 	liscr_class_insert_cfunc (self, "new", Group_new);
-	liscr_class_insert_func (self, "remove_col", Group_remove_col);
-	liscr_class_insert_func (self, "remove_row", Group_remove_row);
+	liscr_class_insert_mfunc (self, "remove", Group_remove);
 	liscr_class_insert_mfunc (self, "get_child", Group_get_child);
 	liscr_class_insert_mfunc (self, "set_child", Group_set_child);
 	liscr_class_insert_mfunc (self, "set_expand", Group_set_expand);

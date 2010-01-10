@@ -422,7 +422,7 @@ private_vision_insert (LISerClient* self,
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->server->callbacks, self->server, "vision-show", lical_marshal_DATA_PTR_PTR, self->object, object);
+	lical_callbacks_call (self->server->callbacks, self->server->engine, "vision-show", lical_marshal_DATA_PTR_PTR, self->object, object);
 }
 
 static void
@@ -433,7 +433,7 @@ private_vision_remove (LISerClient* self,
 	lialg_u32dic_remove (self->vision, object->id);
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->server->callbacks, self->server, "vision-hide", lical_marshal_DATA_PTR_PTR, self->object, object);
+	lical_callbacks_call (self->server->callbacks, self->server->engine, "vision-hide", lical_marshal_DATA_PTR_PTR, self->object, object);
 }
 
 static void
@@ -491,8 +491,8 @@ private_vision_update (LISerClient* self)
 		dist = lieng_object_get_distance (self->object, eng_iter.object);
 		if (dist <= self->radius)
 		{
-			if (!private_vision_contains (self, obj_iter.value))
-				private_vision_insert (self, obj_iter.value);
+			if (!private_vision_contains (self, eng_iter.object))
+				private_vision_insert (self, eng_iter.object);
 		}
 	}
 }

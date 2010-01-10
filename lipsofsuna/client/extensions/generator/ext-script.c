@@ -71,7 +71,7 @@ static void Generator_new (LIScrArgs* args)
 	}
 
 	/* Allocate userdata. */
-	module->script = liscr_data_new (args->script, module->editor, LIEXT_SCRIPT_GENERATOR, licli_script_widget_free);
+	module->script = liscr_data_new (args->script, module->editor, LIEXT_SCRIPT_GENERATOR, liwdg_widget_free);
 	if (module->script == NULL)
 		return;
 	liwdg_widget_set_userdata (module->editor, module->script);

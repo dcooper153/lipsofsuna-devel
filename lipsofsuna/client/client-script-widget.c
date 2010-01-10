@@ -25,8 +25,13 @@
 #include <lipsofsuna/client.h>
 
 static void
-private_detach_child (LIWdgWidget* parent,
-                      LIWdgWidget* child);
+private_widget_detach (LICliClient* client,
+                       LIWdgWidget* widget,
+                       int*         free);
+
+static void
+private_widget_free (LICliClient* client,
+                     LIWdgWidget* widget);
 
 /*****************************************************************************/
 
@@ -184,69 +189,14 @@ static void Widget_getter_y (LIScrArgs* args)
 
 /*****************************************************************************/
 
-/**
- * \brief Frees the widget without freeing its children.
- *
- * Detaches the children of the widget, leaking them if their memory isn't
- * managed externally in some way, detaches itself from the parent container,
- * and then only frees its own memory.
- *
- * \param self Widget.
- * \param data Script data.
- */
-void
-licli_script_widget_free (LIWdgWidget* self,
-                          LIScrData*   data)
-{
-	licli_script_widget_detach_children (data);
-	licli_script_widget_detach (data);
-	liwdg_widget_free (self);
-}
-
-/**
- * \brief Detaches the widget from the user interface.
- *
- * Used for unparenting the widget before certain widget operations, most
- * notably the deletion, so that it isn't double removed by the widget manager.
- *
- * \param self Script widget.
- */
-void
-licli_script_widget_detach (LIScrData* self)
-{
-	LIWdgWidget* widget = self->data;
-
-	if (widget->parent != NULL)
-	{
-		assert (widget->parent->userdata != NULL);
-		if (liscr_data_get_valid (widget->parent->userdata))
-			liscr_data_unref (self, widget->parent->userdata);
-	}
-	liwdg_widget_detach (widget);
-}
-
-/**
- * \brief Detaches all scripted child widgets from the widget.
- *
- * Used for unparenting all children managed by scripts before certain widget
- * operations so that they aren't double removed when their garbage collection
- * methods are called.
- *
- * \param self Script widget.
- */
-void
-licli_script_widget_detach_children (LIScrData* self)
-{
-	LIWdgWidget* widget = self->data;
-
-	if (liwdg_widget_typeis (widget, &liwdg_widget_container))
-		liwdg_container_foreach_child (LIWDG_CONTAINER (widget), private_detach_child, widget);
-}
-
 void
 licli_script_widget (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
+	LICliClient* client = data;
+
+	lical_callbacks_insert (client->callbacks, client->widgets, "widget-detach", 5, private_widget_detach, client, NULL);
+	lical_callbacks_insert (client->callbacks, client->widgets, "widget-free", 5, private_widget_free, client, NULL);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
@@ -260,14 +210,25 @@ licli_script_widget (LIScrClass* self,
 /*****************************************************************************/
 
 static void
-private_detach_child (LIWdgWidget* parent,
-                      LIWdgWidget* child)
+private_widget_detach (LICliClient* client,
+                       LIWdgWidget* widget,
+                       int*         free)
 {
-	if (child != NULL && child->userdata != NULL)
+	if (widget->userdata != NULL)
 	{
-		liwdg_container_detach_child (LIWDG_CONTAINER (parent), child);
-		liscr_data_unref (child->userdata, parent->userdata);
+		if (liscr_data_get_valid (widget->userdata) &&
+		    liscr_data_get_valid (widget->parent->userdata))
+			liscr_data_unref (widget->userdata, widget->parent->userdata);
+		*free = 0;
 	}
+}
+
+static void
+private_widget_free (LICliClient* client,
+                     LIWdgWidget* widget)
+{
+	if (widget->userdata != NULL && widget->parent != NULL)
+		liwdg_widget_detach (widget);
 }
 
 /** @} */

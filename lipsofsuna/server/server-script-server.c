@@ -190,8 +190,8 @@ liser_script_server (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "nearby_objects", Server_nearby_objects);
 	liscr_class_insert_cfunc (self, "save", Server_save);
 	liscr_class_insert_cfunc (self, "shutdown", Server_shutdown);
-	liscr_class_insert_mvar (self, "debug", Server_getter_debug, Server_setter_debug);
-	liscr_class_insert_mvar (self, "time", Server_getter_time, NULL);
+	liscr_class_insert_cvar (self, "debug", Server_getter_debug, Server_setter_debug);
+	liscr_class_insert_cvar (self, "time", Server_getter_time, NULL);
 }
 
 /** @} */

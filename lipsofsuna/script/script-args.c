@@ -131,7 +131,7 @@ liscr_args_call_setters_except (LIScrArgs*  self,
 			}
 			lua_pop (self->lua, 1);
 		}
-		lua_pop (self->lua, 3);
+		lua_pop (self->lua, 2);
 	}
 }
 
@@ -320,7 +320,7 @@ liscr_args_geti_quaternion (LIScrArgs*       self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((LIMatQuaternion*) tmp);
+			*result = *((LIMatQuaternion*) tmp->data);
 	}
 	else
 	{
@@ -329,7 +329,7 @@ liscr_args_geti_quaternion (LIScrArgs*       self,
 		index += self->args_start;
 		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_QUATERNION);
 		if (tmp != NULL)
-			*result = *((LIMatQuaternion*) tmp);
+			*result = *((LIMatQuaternion*) tmp->data);
 	}
 
 	return tmp != NULL;
@@ -378,7 +378,7 @@ liscr_args_geti_vector (LIScrArgs*   self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((LIMatVector*) tmp);
+			*result = *((LIMatVector*) tmp->data);
 	}
 	else
 	{
@@ -387,7 +387,7 @@ liscr_args_geti_vector (LIScrArgs*   self,
 		index += self->args_start;
 		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_VECTOR);
 		if (tmp != NULL)
-			*result = *((LIMatVector*) tmp);
+			*result = *((LIMatVector*) tmp->data);
 	}
 
 	return tmp != NULL;
@@ -549,7 +549,7 @@ liscr_args_gets_quaternion (LIScrArgs*       self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((LIMatQuaternion*) tmp);
+			*result = *((LIMatQuaternion*) tmp->data);
 	}
 
 	return tmp != NULL;
@@ -587,7 +587,7 @@ liscr_args_gets_vector (LIScrArgs*   self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
-			*result = *((LIMatVector*) tmp);
+			*result = *((LIMatVector*) tmp->data);
 	}
 
 	return tmp != NULL;

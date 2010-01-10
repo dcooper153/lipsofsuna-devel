@@ -351,7 +351,7 @@ private_attack (LIExtNpc* self)
 	liscr_pushdata (script->lua, self->target->script);
 	if (lua_pcall (script->lua, 3, 0, 0) != 0)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+		lisys_error_set (LI_ERROR_UNKNOWN, "Npc.attack_cb: %s", lua_tostring (script->lua, -1));
 		lisys_error_report ();
 		lua_pop (script->lua, 1);
 	}

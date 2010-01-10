@@ -58,7 +58,7 @@ static void ChatHistory_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CHAT_HISTORY, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CHAT_HISTORY, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);

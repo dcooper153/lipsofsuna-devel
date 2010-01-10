@@ -41,7 +41,7 @@ private_callback_activated (LIScrData* data)
 		lua_remove (script->lua, -3);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (LI_ERROR_UNKNOWN, "Widget.activated: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -70,7 +70,7 @@ private_callback_menu (LIScrData*     data,
 		liscr_pushdata (script->lua, data);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (LI_ERROR_UNKNOWN, "Menu.callback: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -95,7 +95,7 @@ private_callback_pressed (LIScrData* data)
 		lua_remove (script->lua, -3);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (LI_ERROR_UNKNOWN, "Widget.pressed: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -127,7 +127,7 @@ private_callback_pressed_tree (LIScrData*    data,
 		lua_pushnumber (script->lua, i + 1);
 		if (lua_pcall (script->lua, 2, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (LI_ERROR_UNKNOWN, "Tree.pressed: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -170,7 +170,7 @@ static void Button_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_BUTTON, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_BUTTON, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -179,7 +179,7 @@ static void Button_new (LIScrArgs* args)
 	liwdg_widget_set_userdata (self, data);
 	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
 	liscr_args_call_setters (args, data);
-	liscr_args_seti_data (args, data);	
+	liscr_args_seti_data (args, data);
 	liscr_data_unref (data, NULL);
 }
 
@@ -230,7 +230,7 @@ static void Entry_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_ENTRY, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_ENTRY, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -302,7 +302,7 @@ static void Image_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_IMAGE, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_IMAGE, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -362,7 +362,7 @@ static void Label_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_LABEL, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_LABEL, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -422,7 +422,7 @@ static void Menu_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_MENU, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_MENU, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -569,7 +569,7 @@ static void Scroll_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCROLL, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCROLL, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -653,7 +653,7 @@ static void Spin_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SPIN, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SPIN, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -763,7 +763,7 @@ static void Tree_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_TREE, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_TREE, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -893,7 +893,7 @@ View_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VIEW, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VIEW, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -996,7 +996,7 @@ static void View_setter_vscroll (LIScrArgs* args)
 
 void
 liext_script_button (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1008,7 +1008,7 @@ liext_script_button (LIScrClass* self,
 
 void
 liext_script_entry (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1021,7 +1021,7 @@ liext_script_entry (LIScrClass* self,
 
 void
 liext_script_image (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1033,7 +1033,7 @@ liext_script_image (LIScrClass* self,
 
 void
 liext_script_label (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1045,7 +1045,7 @@ liext_script_label (LIScrClass* self,
 
 void
 liext_script_menu (LIScrClass* self,
-                 void*       data)
+                   void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1060,7 +1060,7 @@ liext_script_menu (LIScrClass* self,
 
 void
 liext_script_scroll (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1073,7 +1073,7 @@ liext_script_scroll (LIScrClass* self,
 
 void
 liext_script_spin (LIScrClass* self,
-                 void*       data)
+                   void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1085,7 +1085,7 @@ liext_script_spin (LIScrClass* self,
 
 void
 liext_script_tree (LIScrClass* self,
-                 void*       data)
+                   void*       data)
 {
 	LIExtModule* module = data;
 
@@ -1101,7 +1101,7 @@ liext_script_tree (LIScrClass* self,
 
 void
 liext_script_view (LIScrClass* self,
-                 void*       data)
+                   void*       data)
 {
 	LIExtModule* module = data;
 

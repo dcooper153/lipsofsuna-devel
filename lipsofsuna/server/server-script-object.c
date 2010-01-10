@@ -41,7 +41,7 @@ private_contact_callback (LIPhyObject*  object,
 
 	/* Push callback. */
 	liscr_pushdata (script->lua, engobj->script);
-	lua_getfield (script->lua, -1, "contact_callback");
+	lua_getfield (script->lua, -1, "contact_cb");
 
 	/* Push object. */
 	lua_pushvalue (script->lua, -2);
@@ -90,7 +90,7 @@ private_contact_callback (LIPhyObject*  object,
 	/* Call function. */
 	if (lua_pcall (script->lua, 2, 0, 0) != 0)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "XXXX %s", lua_tostring (script->lua, -1));
+		lisys_error_set (LI_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (script->lua, -1));
 		lisys_error_report ();
 		lua_pop (script->lua, 1);
 	}
@@ -348,17 +348,20 @@ static void Object_sweep_sphere (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Function to be called every time the object collides something.
- * -- @name Object.contact_callback
+ * -- Custom collision response callback.
+ * --
+ * -- Function to be called every time the object collides with something.
+ * --
+ * -- @name Object.contact_cb
  * -- @class table
  */
-static void Object_getter_contact_callback (LIScrArgs* args)
+static void Object_getter_contact_cb (LIScrArgs* args)
 {
 	lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
 	lua_gettable (args->lua, 1);
 	liscr_args_seti_stack (args);
 }
-static void Object_setter_contact_callback (LIScrArgs* args)
+static void Object_setter_contact_cb (LIScrArgs* args)
 {
 	LIEngObject* self = args->self;
 
@@ -432,7 +435,7 @@ liser_script_objet (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "swap_clients", Object_swap_clients);
 	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_mvar (self, "client", Object_getter_client, NULL);
-	liscr_class_insert_mvar (self, "contact_callback", Object_getter_contact_callback, Object_setter_contact_callback);
+	liscr_class_insert_mvar (self, "contact_cb", Object_getter_contact_cb, Object_setter_contact_cb);
 }
 
 /** @} */

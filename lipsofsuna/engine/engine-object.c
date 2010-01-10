@@ -673,7 +673,7 @@ lieng_object_set_model (LIEngObject* self,
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, &model);
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
 
 	return 1;
 }

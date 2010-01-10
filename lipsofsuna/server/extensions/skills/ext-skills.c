@@ -75,7 +75,11 @@ liext_skills_free (LIExtSkills* self)
 {
 	LIAlgStrdicIter iter;
 
-	liext_skills_set_owner (self, NULL);
+	/* No need to unreference the owner here because this is only called from
+	 * the garbage collection function and the owner is collected already. */
+	if (self->owner)
+		lialg_ptrdic_remove (self->module->dictionary, self->owner);
+
 	LI_FOREACH_STRDIC (iter, self->skills)
 		liext_skill_free (iter.value);
 	lialg_strdic_free (self->skills);

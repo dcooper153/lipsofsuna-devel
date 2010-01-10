@@ -135,7 +135,7 @@ int
 licli_render_init (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self->engine, "engine-free", 1, private_engine_free, self, NULL);
-	lical_callbacks_insert (self->callbacks, self->engine, "engine-tick", 1, private_engine_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "tick", 1, private_engine_tick, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "object-new", 1, private_object_new, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "object-free", 1, private_object_free, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "object-model", 1, private_object_model, self, NULL);

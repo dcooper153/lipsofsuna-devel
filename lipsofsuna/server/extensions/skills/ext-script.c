@@ -70,7 +70,7 @@
  * -- @brief Check if the object has enough skill.
  * --
  * -- Arguments:
- * -- object: Object. (required)
+ * -- owner: Object. (required)
  * -- skill: Skill name.
  * -- min: Minimum required value.
  * --
@@ -94,7 +94,7 @@ static void Skills_check (LIScrArgs* args)
 		liscr_args_seti_bool (args, 1);
 		return;
 	}
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, data->data);
@@ -113,7 +113,7 @@ static void Skills_check (LIScrArgs* args)
  * -- @brief Finds the skills for an object.
  * --
  * -- Arguments:
- * -- object: Object. (required)
+ * -- owner: Object. (required)
  * --
  * -- @param self Skills class.
  * -- @param args Arguments.
@@ -126,7 +126,7 @@ static void Skills_find (LIScrArgs* args)
 	LIExtSkills* skills;
 	LIScrData* data;
 
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, data->data);
@@ -420,7 +420,7 @@ static void Skills_set_value (LIScrArgs* args)
  * -- @brief Tries to subtract a value from the specified skill.
  * --
  * -- Arguments:
- * -- object: Object.
+ * -- owner: Object.
  * -- skill: Skill name.
  * -- value: Value to subtract.
  * --
@@ -441,7 +441,7 @@ static void Skills_subtract (LIScrArgs* args)
 	if (!liscr_args_gets_string (args, "skill", &name) &&
 	    !liscr_args_gets_float (args, "value", &value))
 		return;
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
 		skills = liext_module_find_skills (module, data->data);

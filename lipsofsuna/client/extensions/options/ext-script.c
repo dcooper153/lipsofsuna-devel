@@ -59,7 +59,7 @@ static void Options_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_OPTIONS, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_OPTIONS, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -75,7 +75,7 @@ static void Options_new (LIScrArgs* args)
 
 void
 liext_script_options (LIScrClass* self,
-                    void*       data)
+                      void*       data)
 {
 	LIExtModule* module = data;
 

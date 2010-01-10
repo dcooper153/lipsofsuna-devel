@@ -38,28 +38,6 @@
 
 /* @luadoc
  * ---
- * -- First person camera driver.
- * --
- * -- @name Camera.FIRSTPERSON
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Third person camera driver.
- * --
- * -- @name Camera.THIRDPERSON
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Manual camera driver.
- * --
- * -- @name Camera.MANUAL
- * -- @class table
- */
-
-/* @luadoc
- * ---
  * -- Moves the camera forward or backward.
  * --
  * -- Arguments:
@@ -213,6 +191,9 @@ static void Camera_setter_far (LIScrArgs* args)
 /* @luadoc
  * ---
  * -- Camera mode.
+ * --
+ * -- Recognized values: "first-person"/"manual"/"third-person".
+ * --
  * -- @name Camera.mode
  * -- @class table
  */
@@ -221,17 +202,33 @@ static void Camera_getter_mode (LIScrArgs* args)
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-	liscr_args_seti_int (args, lialg_camera_get_driver (module->client->camera));
+	switch (lialg_camera_get_driver (module->client->camera))
+	{
+		case LIALG_CAMERA_FIRSTPERSON:
+			liscr_args_seti_string (args, "first-person");
+			break;
+		case LIALG_CAMERA_MANUAL:
+			liscr_args_seti_string (args, "manual");
+			break;
+		case LIALG_CAMERA_THIRDPERSON:
+			liscr_args_seti_string (args, "third-person");
+			break;
+	}
 }
 static void Camera_setter_mode (LIScrArgs* args)
 {
-	int value;
+	const char* value;
 	LIExtModule* module;
 
-	if (liscr_args_geti_int (args, 0, &value) && value >= 0 && value < LIALG_CAMERA_MAX)
+	if (liscr_args_gets_string (args, 0, &value))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
-		lialg_camera_set_driver (module->client->camera, value);
+		if (!strcmp (value, "first-person"))
+			lialg_camera_set_driver (module->client->camera, LIALG_CAMERA_FIRSTPERSON);
+		else if (!strcmp (value, "manual"))
+			lialg_camera_set_driver (module->client->camera, LIALG_CAMERA_MANUAL);
+		else if (!strcmp (value, "third-person"))
+			lialg_camera_set_driver (module->client->camera, LIALG_CAMERA_THIRDPERSON);
 	}
 }
 
@@ -292,9 +289,6 @@ liext_script_camera (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CAMERA, data);
-	liscr_class_insert_enum (self, "FIRSTPERSON", LIALG_CAMERA_FIRSTPERSON);
-	liscr_class_insert_enum (self, "THIRDPERSON", LIALG_CAMERA_THIRDPERSON);
-	liscr_class_insert_enum (self, "MANUAL", LIALG_CAMERA_MANUAL);
 	liscr_class_insert_cfunc (self, "move", Camera_move);
 	liscr_class_insert_cfunc (self, "reset", Camera_reset);
 	liscr_class_insert_cfunc (self, "tilt", Camera_tilt);

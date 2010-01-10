@@ -35,6 +35,8 @@
 #include "client-script.h"
 #include "client-window.h"
 
+#define FPS_TICKS 32
+
 static void
 private_free_module (LICliClient* self);
 
@@ -315,15 +317,17 @@ error:
 int
 licli_client_main (LICliClient* self)
 {
+	int i;
+	int ticki = 0;
 	int active = 1;
-	int fps_frames = 0;
-	float fps = 1.0f;
-	float fps_secs = 0.0f;
 	float secs;
+	float ticks[FPS_TICKS];
 	struct timeval curr_tick;
 	struct timeval prev_tick;
 
+	memset (ticks, 0, sizeof (ticks));
 	gettimeofday (&prev_tick, NULL);
+
 	while (1)
 	{
 		/* Timing. */
@@ -333,18 +337,14 @@ licli_client_main (LICliClient* self)
 		prev_tick = curr_tick;
 
 		/* Frames per second. */
-		fps_secs += secs;
-		fps_frames++;
-		if (fps_secs >= 1.0f)
-		{
-#if 0
-			if (client != NULL)
-				liwdg_game_set_fps (LIWDG_GAME (client->widgets.game), fps_frames / fps_secs);
-#endif
-			fps = fps_frames / fps_secs;
-			fps_frames = 0;
-			fps_secs = 0.0f;
-		}
+		ticks[ticki++] = secs;
+		if (ticki == FPS_TICKS)
+			ticki = 0;
+		self->tick = 0.0f;
+		for (i = 0 ; i < FPS_TICKS ; i++)
+			self->tick += ticks[i];
+		self->fps = FPS_TICKS / self->tick;
+		self->tick = self->tick / FPS_TICKS;
 
 		/* Update tick. */
 		licli_client_update (self, secs);

@@ -136,7 +136,7 @@ static void Scene_new (LIScrArgs* args)
 	LIWDG_RENDER (self)->custom_render_data = client;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_SCENE, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_SCENE, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);

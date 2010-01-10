@@ -72,6 +72,11 @@ private_foreach_child (LIWdgGroup* self,
                        void*       data);
 
 static void
+private_call_detach (LIWdgGroup* self,
+                     int         x,
+                     int         y);
+
+static void
 private_cell_changed (LIWdgGroup* self,
                       int         x,
                       int         y);
@@ -266,10 +271,7 @@ liwdg_group_remove_col (LIWdgGroup* self,
 
 	/* Delete widgets. */
 	for (y = 0 ; y < self->height ; y++)
-	{
-		if (self->cells[index + y * self->width].child != NULL)
-			liwdg_widget_free (self->cells[index + y * self->width].child);
-	}
+		private_call_detach (self, index, y);
 
 	/* Shift columns. */
 	for (x = index ; x < self->width - 1 ; x++)
@@ -308,10 +310,7 @@ liwdg_group_remove_row (LIWdgGroup* self,
 
 	/* Delete widgets. */
 	for (x = 0 ; x < self->width ; x++)
-	{
-		if (self->cells[x + index * self->width].child != NULL)
-			liwdg_widget_free (self->cells[x + index * self->width].child);
-	}
+		private_call_detach (self, x, index);
 
 	/* Shift rows. */
 	for (y = index ; y < self->height - 1 ; y++)
@@ -390,13 +389,17 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	assert (x < self->width);
 	assert (y < self->height);
 
-	/* Detach the old child. */
+	/* Check for same widget. */
 	cell = self->cells + x + y * self->width;
+	if (cell->child == child)
+		return;
+
+	/* Detach the old child. */
 	if (cell->child != NULL)
 	{
 		assert (cell->child->state == LIWDG_WIDGET_STATE_DETACHED);
 		assert (cell->child->parent == LIWDG_WIDGET (self));
-		cell->child->parent = NULL;
+		private_call_detach (self, x, y);
 	}
 
 	/* Attach the new child. */
@@ -653,6 +656,13 @@ liwdg_group_set_size (LIWdgGroup* self,
 		}
 	}
 
+	/* Free widgets that don't fit. */
+	for (y = height ; y < self->height ; y++)
+	{
+		for (x = width ; x < self->width ; x++)
+			private_call_detach (self, x, y);
+	}
+
 	/* Copy over the column data. */
 	if (self->width < width)
 		memcpy (mem0, self->cols, self->width * sizeof (LIWdgGroupCol));
@@ -778,20 +788,21 @@ private_init (LIWdgGroup*   self,
 static void
 private_free (LIWdgGroup* self)
 {
-	int i;
+	int x;
+	int y;
+	LIWdgManager* manager;
 
 	/* Remove child focus. */
-	i = LIWDG_WIDGET (self)->visible;
+	manager = LIWDG_WIDGET (self)->manager;
+	x = LIWDG_WIDGET (self)->visible;
 	LIWDG_WIDGET (self)->visible = 0;
-	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
-	LIWDG_WIDGET (self)->visible = i;
+	liwdg_manager_fix_focus (manager);
+	LIWDG_WIDGET (self)->visible = x;
 
 	/* Free children. */
-	for (i = 0 ; i < self->width * self->height ; i++)
-	{
-		if (self->cells[i].child != NULL)
-			liwdg_widget_free (self->cells[i].child);
-	}
+	for (y = 0 ; y < self->height ; y++)
+	for (x = 0 ; x < self->width ; x++)
+		private_call_detach (self, x, y);
 
 	lisys_free (self->cols);
 	lisys_free (self->rows);
@@ -1071,6 +1082,28 @@ private_foreach_child (LIWdgGroup* self,
 			if (cell->child != NULL)
 				call (data, cell->child);
 		}
+	}
+}
+
+static void
+private_call_detach (LIWdgGroup* self,
+                     int         x,
+                     int         y)
+{
+	int free = 1;
+	LIWdgManager* manager;
+	LIWdgWidget* child;
+
+	manager = LIWDG_WIDGET (self)->manager;
+	child = self->cells[x + y * self->width].child;
+	if (child != NULL)
+	{
+		lical_callbacks_call (manager->callbacks, manager, "widget-detach", lical_marshal_DATA_PTR_PTR, child, &free);
+		if (free)
+			liwdg_widget_free (child);
+		else
+			child->parent = NULL;
+		self->cells[x + y * self->width].child = NULL;
 	}
 }
 

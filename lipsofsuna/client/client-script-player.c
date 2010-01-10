@@ -47,12 +47,12 @@
  */
 static void Player_tilt (LIScrArgs* args)
 {
-	int keep;
+	int keep = 0;
 	float value;
 	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
-	if (liscr_args_gets_float (args, "rate", &value) && client->network == NULL)
+	if (liscr_args_gets_float (args, "rate", &value) && client->network != NULL)
 	{
 		liscr_args_gets_bool (args, "keep", &keep);
 		licli_network_tilt (client->network, value, keep);
@@ -73,12 +73,12 @@ static void Player_tilt (LIScrArgs* args)
  */
 static void Player_turn (LIScrArgs* args)
 {
-	int keep;
+	int keep = 0;
 	float value;
 	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_PLAYER);
-	if (liscr_args_gets_float (args, "rate", &value) && client->network == NULL)
+	if (liscr_args_gets_float (args, "rate", &value) && client->network != NULL)
 	{
 		liscr_args_gets_bool (args, "keep", &keep);
 		licli_network_turn (client->network, value, keep);

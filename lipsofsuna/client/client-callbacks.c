@@ -119,8 +119,8 @@ private_binding_tick (LICliClient* client,
 int
 licli_client_init_callbacks_binding (LICliClient* self)
 {
-	lical_callbacks_insert (self->callbacks, self, "event", 0, private_binding_event, self, NULL);
-	lical_callbacks_insert (self->callbacks, self, "tick", 0, private_binding_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "event", 0, private_binding_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "tick", 0, private_binding_tick, self, NULL);
 	return 1;
 }
 
@@ -259,10 +259,10 @@ private_miscellaneous_tick (LICliClient* client,
 int
 licli_client_init_callbacks_misc (LICliClient* self)
 {
-	lical_callbacks_insert (self->callbacks, self, "event", -5, private_miscellaneous_event, self, NULL);
-	lical_callbacks_insert (self->callbacks, self, "packet", 0, licli_client_handle_packet, self, NULL);
-	lical_callbacks_insert (self->callbacks, self, "object-new", -65535, private_miscellaneous_object_new, self, NULL);
-	lical_callbacks_insert (self->callbacks, self, "tick", 0, private_miscellaneous_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "event", -5, private_miscellaneous_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "packet", 0, licli_client_handle_packet, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "object-new", -65535, private_miscellaneous_object_new, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "tick", 0, private_miscellaneous_tick, self, NULL);
 	return 1;
 }
 
@@ -291,8 +291,8 @@ private_widget_tick (LICliClient* client,
 int
 licli_client_init_callbacks_widget (LICliClient* self)
 {
-	lical_callbacks_insert (self->callbacks, self, "event", -10, private_widget_event, self, NULL);
-	lical_callbacks_insert (self->callbacks, self, "tick", 1, private_widget_tick, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "event", -10, private_widget_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "tick", 1, private_widget_tick, self, NULL);
 	return 1;
 }
 

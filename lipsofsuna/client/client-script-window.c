@@ -54,7 +54,7 @@ static void Window_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_WINDOW, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_WINDOW, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);

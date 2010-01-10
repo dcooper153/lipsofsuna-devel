@@ -59,6 +59,9 @@ private_foreach_child (LIWdgView* self,
                        void*      data);
 
 static void
+private_call_detach (LIWdgView* self);
+
+static void
 private_rebuild (LIWdgView* self);
 
 static void
@@ -102,17 +105,17 @@ liwdg_view_get_child (LIWdgView* self)
 	return self->child;
 }
 
-int
-liwdg_view_get_hscroll (LIWdgView* self)
-{
-	return self->hscroll;
-}
-
 void
 liwdg_view_set_child (LIWdgView*   self,
                       LIWdgWidget* widget)
 {
-	/* Adopt widget. */
+	if (self->child == widget)
+		return;
+
+	/* Free old widget. */
+	private_call_detach (self);
+
+	/* Adopt new widget. */
 	self->child = widget;
 	if (widget != NULL)
 		widget->parent = LIWDG_WIDGET (self);
@@ -123,6 +126,11 @@ liwdg_view_set_child (LIWdgView*   self,
 	private_rebuild (self);
 }
 
+int
+liwdg_view_get_hscroll (LIWdgView* self)
+{
+	return self->hscroll;
+}
 
 void
 liwdg_view_set_hscroll (LIWdgView* self,
@@ -159,8 +167,7 @@ private_init (LIWdgView*    self,
 static void
 private_free (LIWdgView* self)
 {
-	if (self->child != NULL)
-		liwdg_widget_free (self->child);
+	private_call_detach (self);
 }
 
 static int
@@ -290,6 +297,26 @@ private_foreach_child (LIWdgView* self,
 {
 	if (self->child != NULL)
 		call (data, self->child);
+}
+
+static void
+private_call_detach (LIWdgView* self)
+{
+	int free = 1;
+	LIWdgManager* manager;
+	LIWdgWidget* child;
+
+	manager = LIWDG_WIDGET (self)->manager;
+	child = self->child;
+	if (child != NULL)
+	{
+		lical_callbacks_call (manager->callbacks, manager, "widget-detach", lical_marshal_DATA_PTR_PTR, child, &free);
+		if (free)
+			liwdg_widget_free (child);
+		else
+			child->parent = NULL;
+		self->child = NULL;
+	}
 }
 
 static void

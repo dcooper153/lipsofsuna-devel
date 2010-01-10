@@ -104,12 +104,16 @@ static int
 private_assign (LICliClient* client,
                 LIArcReader* reader)
 {
+	uint32_t id;
+	uint32_t features;
 	LIAlgU32dicIter iter;
 
-	if (!liarc_reader_get_uint32 (reader, &client->network->id) ||
-	    !liarc_reader_get_uint32 (reader, &client->network->features) ||
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint32 (reader, &features) ||
 	    !liarc_reader_check_end (reader))
 		return 0;
+	client->network->id = id;
+	client->network->features = features;
 
 	/* Clear scene. */
 	LI_FOREACH_U32DIC (iter, client->engine->objects)

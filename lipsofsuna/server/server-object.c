@@ -355,7 +355,7 @@ liser_object_serialize (LIEngObject* self,
 				lua_pushstring (script->lua, (extras != NULL)? extras : "");
 				if (lua_pcall (script->lua, 3, 0, 0) != 0)
 				{
-					lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+					lisys_error_set (LI_ERROR_UNKNOWN, "Object.read_cb: %s", lua_tostring (script->lua, -1));
 					lua_pop (script->lua, 1);
 				}
 			}
@@ -447,7 +447,7 @@ liser_object_serialize (LIEngObject* self,
 					lua_remove (script->lua, -3);
 					if (lua_pcall (script->lua, 1, 2, 0) != 0)
 					{
-						lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (script->lua, -1));
+						lisys_error_set (LI_ERROR_UNKNOWN, "Object.write_cb: %s", lua_tostring (script->lua, -1));
 						lua_pop (script->lua, 1);
 						return 0;
 					}

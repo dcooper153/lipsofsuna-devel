@@ -93,12 +93,12 @@ static void Creature_setter_controls (LIScrArgs* args)
  * -- @name Creature.object
  * -- @class table
  */
-static void Creature_getter_object (LIScrArgs* args)
+static void Creature_getter_owner (LIScrArgs* args)
 {
 	if (((LIExtCreature*) args->self)->object != NULL)
 		liscr_args_seti_data (args, ((LIExtCreature*) args->self)->object->script);
 }
-static void Creature_setter_object (LIScrArgs* args)
+static void Creature_setter_owner (LIScrArgs* args)
 {
 	LIScrData* data;
 
@@ -117,7 +117,7 @@ liext_script_creature (LIScrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CREATURE, data);
 	liscr_class_insert_cfunc (self, "new", Creature_new);
 	liscr_class_insert_mvar (self, "controls", Creature_getter_controls, Creature_setter_controls);
-	liscr_class_insert_mvar (self, "object", Creature_getter_object, Creature_setter_object);
+	liscr_class_insert_mvar (self, "owner", Creature_getter_owner, Creature_setter_owner);
 }
 
 /** @} */

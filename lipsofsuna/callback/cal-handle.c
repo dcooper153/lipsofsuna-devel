@@ -118,7 +118,7 @@ private_addr_type (LICalCalladdr* self,
                    void*          object,
                    const char*    type)
 {
-	memset (self, 0, sizeof (LICalCalltype));
+	memset (self, 0, sizeof (LICalCalladdr));
 	self->object = object;
 	strncpy (self->type, type, sizeof (self->type) - 1);
 }

@@ -224,6 +224,21 @@ static void Client_getter_cursor_pos (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Short term average frames per second.
+ * --
+ * -- @name Client.tick
+ * -- @class table
+ */
+static void Client_getter_fps (LIScrArgs* args)
+{
+	LICliClient* client;
+
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	liscr_args_seti_float (args, client->fps);
+}
+
+/* @luadoc
+ * ---
  * -- Movement mode flag.
  * -- @name Client.moving
  * -- @class table
@@ -282,6 +297,21 @@ static void Client_setter_root (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Short term average tick length in seconds.
+ * --
+ * -- @name Client.tick
+ * -- @class table
+ */
+static void Client_getter_tick (LIScrArgs* args)
+{
+	LICliClient* client;
+
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	liscr_args_seti_float (args, client->tick);
+}
+
+/* @luadoc
+ * ---
  * -- Main window title.
  * -- @name Client.title
  * -- @class table
@@ -311,10 +341,12 @@ licli_script_client (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "host", Client_host);
 	liscr_class_insert_cfunc (self, "join", Client_join);
 	liscr_class_insert_cfunc (self, "send", Client_send);
-	liscr_class_insert_mvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
-	liscr_class_insert_mvar (self, "moving", Client_getter_moving, Client_setter_moving);
-	liscr_class_insert_mvar (self, "root", NULL, Client_setter_root);
-	liscr_class_insert_mvar (self, "title", NULL, Client_setter_title);
+	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
+	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
+	liscr_class_insert_cvar (self, "moving", Client_getter_moving, Client_setter_moving);
+	liscr_class_insert_cvar (self, "root", NULL, Client_setter_root);
+	liscr_class_insert_cvar (self, "tick", Client_getter_tick, NULL);
+	liscr_class_insert_cvar (self, "title", NULL, Client_setter_title);
 }
 
 /** @} */

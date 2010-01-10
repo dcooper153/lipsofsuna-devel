@@ -55,6 +55,8 @@ const LIBndAction* li_binding_action_get (const char* identifier);
 struct _LICliClient
 {
 	/* Persistent. */
+	float fps;
+	float tick;
 	char* root;
 	LICliWindow* window;
 	LIVidCalls video;

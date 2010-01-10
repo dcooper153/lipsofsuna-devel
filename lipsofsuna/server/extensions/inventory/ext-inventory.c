@@ -335,7 +335,7 @@ private_send_close (LIExtInventory* self,
 	liscr_pushdata (script->lua, listener->script);
 	if (lua_pcall (script->lua, 2, 0, 0) != 0)
 	{
-		lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+		lisys_error_set (EINVAL, "Inventory.user_removed_cb: %s", lua_tostring (script->lua, -1));
 		lisys_error_report ();
 		lua_pop (script->lua, 1);
 	}
@@ -367,7 +367,7 @@ private_send_open (LIExtInventory* self,
 	liscr_pushdata (script->lua, listener->script);
 	if (lua_pcall (script->lua, 2, 0, 0) != 0)
 	{
-		lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+		lisys_error_set (EINVAL, "Inventory.user_added_cb: %s", lua_tostring (script->lua, -1));
 		lisys_error_report ();
 		lua_pop (script->lua, 1);
 	}
@@ -405,7 +405,7 @@ private_send_object (LIExtInventory* self,
 		liscr_pushdata (script->lua, object->script);
 		if (lua_pcall (script->lua, 4, 0, 0) != 0)
 		{
-			lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (EINVAL, "Inventory.item_added_cb: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -442,7 +442,7 @@ private_send_remove (LIExtInventory* self,
 		lua_pushnumber (script->lua, slot + 1);
 		if (lua_pcall (script->lua, 3, 0, 0) != 0)
 		{
-			lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (EINVAL, "Inventory.item_removed_cb: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}

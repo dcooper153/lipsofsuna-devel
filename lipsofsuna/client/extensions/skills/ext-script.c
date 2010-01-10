@@ -187,7 +187,7 @@ static void SkillWidget_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SKILL_WIDGET, licli_script_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SKILL_WIDGET, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);

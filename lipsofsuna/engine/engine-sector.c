@@ -53,7 +53,7 @@ lieng_sector_new (LIAlgSector* sector)
 	}
 
 	/* Invoke callbacks. */
-#warning The reverse sector link is not set yet so anything that tries to use it, will crash...
+#warning The reverse sector link is not set yet so anything that tries to use it will crash...
 	lical_callbacks_call (self->engine->callbacks, self->engine, "sector-load", lical_marshal_DATA_PTR, self);
 
 	return self;

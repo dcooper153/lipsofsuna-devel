@@ -88,6 +88,7 @@ liwdg_widget_free (LIWdgWidget* self)
 	assert (self->manager->focus.keyboard != self);
 	assert (self->manager->focus.mouse != self);
 
+	lical_callbacks_call (self->manager->callbacks, self->manager, "widget-free", lical_marshal_DATA_PTR, self);
 	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
 	{
 		if (ptr->free != NULL)

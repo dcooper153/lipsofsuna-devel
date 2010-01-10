@@ -59,6 +59,10 @@ private_foreach_child (LIWdgTabs* self,
                        void*      data);
 
 static void
+private_call_detach (LIWdgTabs* self,
+                     int        tab);
+
+static void
 private_rebuild (LIWdgTabs* self);
 
 /*****************************************************************************/
@@ -142,8 +146,10 @@ private_free (LIWdgTabs* self)
 
 	for (i = 0 ; i < self->tabs.count ; i++)
 	{
-		if (self->tabs.array[i].widget != NULL)
-			liwdg_widget_free (self->tabs.array[i].widget);
+		/* Free widget. */
+		private_call_detach (self, i);
+
+		/* Free label. */
 		if (self->tabs.array[i].layout != NULL)
 			lifnt_layout_free (self->tabs.array[i].layout);
 		lisys_free (self->tabs.array[i].text);
@@ -324,6 +330,27 @@ private_foreach_child (LIWdgTabs* self,
 	{
 		if (self->tabs.array[i].widget != NULL)
 			call (data, self->tabs.array[i].widget);
+	}
+}
+
+static void
+private_call_detach (LIWdgTabs* self,
+                     int        tab)
+{
+	int free = 1;
+	LIWdgManager* manager;
+	LIWdgWidget* child;
+
+	manager = LIWDG_WIDGET (self)->manager;
+	child = self->tabs.array[tab].widget;
+	if (child != NULL)
+	{
+		lical_callbacks_call (manager->callbacks, manager, "widget-detach", lical_marshal_DATA_PTR_PTR, child, &free);
+		if (free)
+			liwdg_widget_free (child);
+		else
+			child->parent = NULL;
+		self->tabs.array[tab].widget = NULL;
 	}
 }
 

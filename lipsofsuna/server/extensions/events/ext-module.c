@@ -190,7 +190,7 @@ liext_module_event (LIExtModule* self,
 		liscr_pushdata (script->lua, event);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (EINVAL, "%s", lua_tostring (script->lua, -1));
+			lisys_error_set (EINVAL, "Event handler %d: %s", type, lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}

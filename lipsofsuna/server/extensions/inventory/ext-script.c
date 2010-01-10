@@ -101,10 +101,11 @@ static void Inventory_set_object (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Finds an inventory by ID.
+ * -- Finds an inventory.
  * --
  * -- Arguments:
  * -- id: Inventory number.
+ * -- owner: Owner object.
  * --
  * -- @param self Inventory class.
  * -- @param args Arguments.
@@ -114,13 +115,34 @@ static void Inventory_set_object (LIScrArgs* args)
 static void Inventory_find (LIScrArgs* args)
 {
 	int id;
+	LIAlgU32dicIter iter;
+	LIScrData* data0;
+	LIScrData* data1;
 	LIExtInventory* inventory;
+	LIExtModule* module;
 
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_INVENTORY);
 	if (liscr_args_gets_int (args, "id", &id))
 	{
-		inventory = liext_module_find_inventory (args->self, id);
+		inventory = liext_module_find_inventory (module, id);
 		if (inventory != NULL)
 			liscr_args_seti_data (args, inventory->script);
+	}
+	else if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data0))
+	{
+		LI_FOREACH_U32DIC (iter, module->dictionary)
+		{
+			inventory = iter.value;
+			liscr_pushdata (args->lua, inventory->script);
+			lua_getfield (args->lua, -1, "owner");
+			data1 = liscr_isdata (args->lua, -1, LISCR_SCRIPT_OBJECT);
+			lua_pop (args->lua, 2);
+			if (data0 == data1)
+			{
+				liscr_args_seti_data (args, inventory->script);
+				return;
+			}
+		}
 	}
 }
 
@@ -275,6 +297,16 @@ static void Inventory_getter_id (LIScrArgs* args)
  * -- Arguments passed to the callback: inventory, listener, slot.
  * --
  * -- @name Inventory.item_removed_cb
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- The object that owns the inventory.
+ * --
+ * -- Used by Inventory.find when searching by owner.
+ * --
+ * -- @name Inventory.owner
  * -- @class table
  */
 
