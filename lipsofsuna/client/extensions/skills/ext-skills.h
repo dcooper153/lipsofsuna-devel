@@ -38,13 +38,15 @@ struct _LIExtSkill
 
 struct _LIExtSkills
 {
+	uint32_t id;
 	LIAlgStrdic* skills;
 	LIExtModule* module;
 	LIScrData* script;
 };
 
 LIExtSkills*
-liext_skills_new (LIExtModule* module);
+liext_skills_new (LIExtModule* module,
+                  uint32_t     id);
 
 void
 liext_skills_free (LIExtSkills* self);

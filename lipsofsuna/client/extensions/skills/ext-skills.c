@@ -28,7 +28,8 @@
 #include "ext-skills.h"
 
 LIExtSkills*
-liext_skills_new (LIExtModule* module)
+liext_skills_new (LIExtModule* module,
+                  uint32_t     id)
 {
 	LIExtSkills* self;
 
@@ -36,6 +37,7 @@ liext_skills_new (LIExtModule* module)
 	self = lisys_calloc (1, sizeof (LIExtSkills));
 	if (self == NULL)
 		return NULL;
+	self->id = id;
 	self->module = module;
 	self->skills = lialg_strdic_new ();
 	if (self->skills == NULL)
@@ -59,8 +61,15 @@ liext_skills_new (LIExtModule* module)
 void
 liext_skills_free (LIExtSkills* self)
 {
+	LIExtSkills* tmp;
 	LIAlgStrdicIter iter;
 
+	/* Remove from dictionary. */
+	tmp = lialg_u32dic_find (self->module->dictionary, self->id);
+	if (tmp == self)
+		lialg_u32dic_remove (self->module->dictionary, self->id);
+
+	/* Free data. */
 	LIALG_STRDIC_FOREACH (iter, self->skills)
 		lisys_free (iter.value);
 	lialg_strdic_free (self->skills);
@@ -70,6 +79,7 @@ liext_skills_free (LIExtSkills* self)
 void
 liext_skills_unref (LIExtSkills* self)
 {
+	lialg_u32dic_remove (self->module->dictionary, self->id);
 	liscr_data_unref (self->script, NULL);
 }
 

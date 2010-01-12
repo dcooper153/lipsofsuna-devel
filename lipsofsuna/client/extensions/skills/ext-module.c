@@ -92,6 +92,8 @@ liext_module_free (LIExtModule* self)
 {
 	LIAlgU32dicIter iter;
 
+	assert (self->dictionary->size == 0);
+
 	LIALG_U32DIC_FOREACH (iter, self->dictionary)
 		liext_skills_free (iter.value);
 	lialg_u32dic_free (self->dictionary);
@@ -143,7 +145,7 @@ private_packet_diff (LIExtModule* self,
 	skills = lialg_u32dic_find (self->dictionary, id);
 	if (skills == NULL)
 	{
-		skills = liext_skills_new (self);
+		skills = liext_skills_new (self, id);
 		if (skills == NULL)
 			return 0;
 		if (!lialg_u32dic_insert (self->dictionary, id, skills))
@@ -186,7 +188,7 @@ private_packet_reset (LIExtModule* self,
 	skills = lialg_u32dic_find (self->dictionary, id);
 	if (skills == NULL)
 	{
-		skills = liext_skills_new (self);
+		skills = liext_skills_new (self, id);
 		if (skills == NULL)
 			return 0;
 		if (!lialg_u32dic_insert (self->dictionary, id, skills))
@@ -227,10 +229,7 @@ private_visibility (LIExtModule* self,
 	{
 		skills = lialg_u32dic_find (self->dictionary, object->id);
 		if (skills != NULL)
-		{
-			lialg_u32dic_remove (self->dictionary, object->id);
 			liext_skills_unref (skills);
-		}
 	}
 
 	return 1;
