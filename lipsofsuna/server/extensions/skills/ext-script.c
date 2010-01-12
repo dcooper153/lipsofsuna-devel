@@ -39,34 +39,6 @@
 
 /* @luadoc
  * ---
- * -- Skill type for internal skills.
- * --
- * -- Internal skills are never sent to clients.
- * --
- * -- @name Skills.INTERNAL
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Skill type for private skills.
- * --
- * -- Private skills only visible to the owner of the skills.
- * --
- * -- @name Skills.PRIVATE
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Skill type for public skills.
- * --
- * -- Public skills only visible to all clients.
- * --
- * -- @name Skills.PUBLIC
- * -- @class table
- */
-
-/* @luadoc
- * ---
  * -- @brief Check if the object has enough skill.
  * --
  * -- Arguments:
@@ -133,6 +105,32 @@ static void Skills_find (LIScrArgs* args)
 		if (skills != NULL)
 			liscr_args_seti_data (args, skills->script);
 	}
+}
+
+/* @luadoc
+ * ---
+ * -- Creates a new skills list.
+ * --
+ * -- @param self Skills class.
+ * -- @param args Arguments.
+ * -- @return New skills.
+ * function Skills.new(self, args)
+ */
+static void Skills_new (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIExtSkills* self;
+
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
+	self = liext_skills_new (module);
+	if (self == NULL)
+		return;
+
+	/* Configure userdata. */
+	liscr_args_call_setters (args, self->script);
+	liscr_args_seti_data (args, self->script);
+	liscr_data_unref (self->script, NULL);
 }
 
 /* @luadoc
@@ -255,32 +253,6 @@ static void Skills_has_skill (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Creates a new skills list.
- * --
- * -- @param self Skills class.
- * -- @param args Arguments.
- * -- @return New skills.
- * function Skills.new(self, args)
- */
-static void Skills_new (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIExtSkills* self;
-
-	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
-	self = liext_skills_new (module);
-	if (self == NULL)
-		return;
-
-	/* Configure userdata. */
-	liscr_args_call_setters (args, self->script);
-	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script, NULL);
-}
-
-/* @luadoc
- * ---
  * -- Registers a skill.
  * --
  * -- Arguments:
@@ -303,7 +275,7 @@ static void Skills_register (LIScrArgs* args)
 	const char* prot;
 	LIExtSkill* skill;
 
-	if (!liscr_args_gets_string (args, "skill", &name))
+	if (!liscr_args_gets_string (args, "name", &name))
 		return;
 
 	/* Create skill. */
@@ -325,7 +297,7 @@ static void Skills_register (LIScrArgs* args)
 			return;
 	}
 
-	/* Set optiona values. */
+	/* Set optional values. */
 	if (liscr_args_gets_float (args, "maximum", &value))
 		liext_skill_set_maximum (skill, value);
 	if (liscr_args_gets_float (args, "regen", &value))
@@ -486,17 +458,14 @@ liext_script_skills (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKILLS, data);
-	liscr_class_insert_enum (self, "INTERNAL", LIEXT_SKILL_TYPE_INTERNAL);
-	liscr_class_insert_enum (self, "PRIVATE", LIEXT_SKILL_TYPE_PRIVATE);
-	liscr_class_insert_enum (self, "PUBLIC", LIEXT_SKILL_TYPE_PUBLIC);
 	liscr_class_insert_cfunc (self, "check", Skills_check);
 	liscr_class_insert_cfunc (self, "find", Skills_find);
+	liscr_class_insert_cfunc (self, "new", Skills_new);
 	liscr_class_insert_mfunc (self, "get_maximum", Skills_get_maximum);
 	liscr_class_insert_mfunc (self, "get_names", Skills_get_names);
 	liscr_class_insert_mfunc (self, "get_regen", Skills_get_regen);
 	liscr_class_insert_mfunc (self, "get_value", Skills_get_value);
 	liscr_class_insert_mfunc (self, "has_skill", Skills_has_skill);
-	liscr_class_insert_cfunc (self, "new", Skills_new);
 	liscr_class_insert_mfunc (self, "register", Skills_register);
 	liscr_class_insert_mfunc (self, "set_maximum", Skills_set_maximum);
 	liscr_class_insert_mfunc (self, "set_regen", Skills_set_regen);

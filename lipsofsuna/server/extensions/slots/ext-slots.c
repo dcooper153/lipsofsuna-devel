@@ -29,8 +29,6 @@
 #include "ext-module.h"
 #include "ext-slots.h"
 
-#define LIEXT_SLOTS_VERSION 0xFF
-
 static int
 private_send_clear (LIExtSlots* self);
 
@@ -54,11 +52,20 @@ liext_slots_new (LIExtModule* module)
 {
 	LIExtSlots* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtSlots));
 	if (self == NULL)
 		return NULL;
 	self->module = module;
 	self->server = module->server;
+
+	/* Allocate script. */
+	self->script = liscr_data_new (module->server->script, self, LIEXT_SCRIPT_SLOTS, liext_slots_free);
+	if (self == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -220,6 +227,7 @@ liext_slots_set_owner (LIExtSlots*  self,
 		{
 			private_send_clear (old);
 			liscr_data_unref (old->owner->script, old->script);
+			liscr_data_unref (old->script, old->owner->script);
 			lialg_ptrdic_remove (self->module->dictionary, value);
 			old->owner = NULL;
 		}
@@ -229,11 +237,13 @@ liext_slots_set_owner (LIExtSlots*  self,
 	if (self->owner != NULL)
 	{
 		liscr_data_unref (self->owner->script, self->script);
+		liscr_data_unref (self->script, self->owner->script);
 		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
 	if (value != NULL)
 	{
 		liscr_data_ref (value->script, self->script);
+		liscr_data_ref (self->script, value->script);
 		lialg_ptrdic_insert (self->module->dictionary, value, self);
 	}
 

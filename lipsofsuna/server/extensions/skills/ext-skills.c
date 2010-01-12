@@ -64,7 +64,7 @@ liext_skills_new (LIExtModule* module)
 	{
 		lialg_strdic_free (self->skills);
 		lisys_free (self);
-		return 0;
+		return NULL;
 	}
 
 	return self;
@@ -195,6 +195,7 @@ liext_skills_set_owner (LIExtSkills* self,
 		{
 			private_send_clear (old);
 			liscr_data_unref (old->owner->script, old->script);
+			liscr_data_unref (old->script, old->owner->script);
 			lialg_ptrdic_remove (self->module->dictionary, value);
 			old->owner = NULL;
 		}
@@ -204,11 +205,13 @@ liext_skills_set_owner (LIExtSkills* self,
 	if (self->owner != NULL)
 	{
 		liscr_data_unref (self->owner->script, self->script);
+		liscr_data_unref (self->script, self->owner->script);
 		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
 	if (value != NULL)
 	{
 		liscr_data_ref (value->script, self->script);
+		liscr_data_ref (self->script, value->script);
 		lialg_ptrdic_insert (self->module->dictionary, value, self);
 	}
 
@@ -259,7 +262,7 @@ private_send_reset (LIExtSkills* self)
 	LIExtSkill* skill;
 	LISerObserverIter iter;
 
-	/* Create packet. */
+	/* Create public skill packet. */
 	writer = liarc_writer_new_packet (LIEXT_SKILLS_PACKET_RESET);
 	if (writer == NULL)
 		return 0;
@@ -267,7 +270,7 @@ private_send_reset (LIExtSkills* self)
 	LI_FOREACH_STRDIC (iter0, self->skills)
 	{
 		skill = iter0.value;
-		if (skill->type == LIEXT_SKILL_TYPE_INTERNAL)
+		if (skill->type != LIEXT_SKILL_TYPE_PUBLIC)
 			continue;
 		liarc_writer_append_string (writer, skill->name);
 		liarc_writer_append_nul (writer);
@@ -275,14 +278,32 @@ private_send_reset (LIExtSkills* self)
 		liarc_writer_append_float (writer, skill->maximum);
 	}
 
-	/* Send to all observers. */
+	/* Send to observers. */
 	LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 	{
 		object = iter.object;
-		liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+		if (object != self->owner)
+			liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 	}
 
-	liarc_writer_free (writer);
+	if (LISER_OBJECT (self->owner)->client != NULL)
+	{
+		/* Create private skill packet. */
+		LI_FOREACH_STRDIC (iter0, self->skills)
+		{
+			skill = iter0.value;
+			if (skill->type != LIEXT_SKILL_TYPE_PRIVATE)
+				continue;
+			liarc_writer_append_string (writer, skill->name);
+			liarc_writer_append_nul (writer);
+			liarc_writer_append_float (writer, skill->value);
+			liarc_writer_append_float (writer, skill->maximum);
+		}
+
+		/* Send to owner. */
+		liser_client_send (LISER_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
+		liarc_writer_free (writer);
+	}
 
 	return 1;
 }
@@ -308,21 +329,23 @@ private_send_skill (LIExtSkills* self,
 	liarc_writer_append_float (writer, skill->value);
 	liarc_writer_append_float (writer, skill->maximum);
 
-	/* Send to all observers. */
+	/* Send to observers. */
 	if (skill->type == LIEXT_SKILL_TYPE_PUBLIC)
 	{
 		LISER_FOREACH_OBSERVER (iter, self->owner, 1)
 		{
 			object = iter.object;
-			liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
+			if (object != self->owner)
+				liser_client_send (LISER_OBJECT (object)->client, writer, GRAPPLE_RELIABLE);
 		}
 	}
-	else if (LISER_OBJECT (self->owner)->client != NULL)
+
+	/* Send to owner. */
+	if (LISER_OBJECT (self->owner)->client != NULL)
 	{
 		liser_client_send (LISER_OBJECT (self->owner)->client, writer, GRAPPLE_RELIABLE);
+		liarc_writer_free (writer);
 	}
-
-	liarc_writer_free (writer);
 
 	return 1;
 }

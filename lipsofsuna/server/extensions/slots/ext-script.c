@@ -39,6 +39,59 @@
 
 /* @luadoc
  * ---
+ * -- Finds slots by owner.
+ * --
+ * -- Arguments:
+ * -- owner: Object.
+ * --
+ * -- @param self Slots.
+ * -- @param args Arguments.
+ * -- @return Object or nil.
+ * function Slots.find(self, args)
+ */
+static void Slots_find (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIExtSlots* slots;
+	LIScrData* data;
+
+	if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SLOTS);
+		slots = lialg_ptrdic_find (module->dictionary, data->data);
+		if (slots != NULL)
+			liscr_args_seti_data (args, slots->script);
+	}
+}
+
+/* @luadoc
+ * ---
+ * -- Creates a new slots object.
+ * --
+ * -- @param self Slots class.
+ * -- @param args Arguments.
+ * -- @return New slots.
+ * function Slots.new(self, args)
+ */
+static void Slots_new (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIExtSlots* self;
+
+	/* Allocate self. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SLOTS);
+	self = liext_slots_new (module);
+	if (self == NULL)
+		return;
+
+	/* Configure userdata. */
+	liscr_args_call_setters (args, self->script);
+	liscr_args_seti_data (args, self->script);
+	liscr_data_unref (self->script, NULL);
+}
+
+/* @luadoc
+ * ---
  * -- Gets an object in a slot.
  * --
  * -- Arguments:
@@ -98,46 +151,12 @@ static void Slots_get_slot (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Creates a new slots object.
- * --
- * -- @param self Slots class.
- * -- @param args Arguments.
- * -- @return New slots.
- * function Slots.new(self, args)
- */
-static void Slots_new (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIExtSlots* self;
-	LIScrData* data;
-
-	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SLOTS);
-	self = liext_slots_new (module);
-	if (self == NULL)
-		return;
-
-	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SLOTS, liext_slots_free);
-	if (data == NULL)
-	{
-		liext_slots_free (self);
-		return;
-	}
-	self->script = data;
-	liscr_args_call_setters (args, data);
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
-}
-
-/* @luadoc
- * ---
  * -- Registers a slot.
  * --
  * -- Arguments:
- * -- node: Armature node name. (required)
+ * -- name: Slot name. (required)
+ * -- node: Armature node name.
  * -- object: Object to store.
- * -- slot: Slot name.
  * -- type: Protection type ("public"/"private")
  * --
  * -- @param self Slots.
@@ -153,11 +172,10 @@ static void Slots_register (LIScrArgs* args)
 	LIExtSlot* slot;
 	LIScrData* data;
 
-	if (!liscr_args_gets_string (args, "slot", &name))
+	if (!liscr_args_gets_string (args, "name", &name))
 		return;
 	liscr_args_gets_string (args, "prot", &prot);
 	liscr_args_gets_string (args, "node", &node);
-	liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data);
 
 	/* Check for existing slot. */
 	/* TODO: Override type if different and inform clients? */
@@ -173,7 +191,7 @@ static void Slots_register (LIScrArgs* args)
 	liext_slots_insert_slot (args->self, type, name, node);
 
 	/* Insert the object. */
-	if (data != NULL)
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 		liext_slots_set_object (args->self, name, data->data);
 }
 
@@ -200,8 +218,7 @@ static void Slots_set_object (LIScrArgs* args)
 	slot = liext_slots_find_slot (args->self, name);
 	if (slot == NULL)
 		return;
-	liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data);
-	if (data != NULL)
+	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 		liext_slots_set_object (args->self, name, data->data);
 	else
 		liext_slots_set_object (args->self, name, NULL);
@@ -238,9 +255,10 @@ liext_script_slots (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SLOTS, data);
+	liscr_class_insert_cfunc (self, "find", Slots_find);
+	liscr_class_insert_cfunc (self, "new", Slots_new);
 	liscr_class_insert_mfunc (self, "get_object", Slots_get_object);
 	liscr_class_insert_mfunc (self, "get_slot", Slots_get_slot);
-	liscr_class_insert_cfunc (self, "new", Slots_new);
 	liscr_class_insert_mfunc (self, "register", Slots_register);
 	liscr_class_insert_mfunc (self, "set_object", Slots_set_object);
 	liscr_class_insert_mvar (self, "owner", Slots_getter_owner, Slots_setter_owner);
