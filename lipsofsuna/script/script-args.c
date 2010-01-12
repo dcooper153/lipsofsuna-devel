@@ -599,6 +599,15 @@ liscr_args_set_output (LIScrArgs* self,
 {
 	assert (self->ret == 0);
 	self->output_mode = value;
+
+	if (value == LISCR_ARGS_OUTPUT_TABLE_FORCE)
+	{
+		lua_newtable (self->lua);
+		self->output_table = lua_gettop (self->lua);
+		self->output_mode = LISCR_ARGS_OUTPUT_TABLE;
+	}
+	else
+		self->output_mode = value;
 }
 
 void

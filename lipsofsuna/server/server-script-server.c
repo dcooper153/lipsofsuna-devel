@@ -82,9 +82,7 @@ static void Server_nearby_objects (LIScrArgs* args)
 	float radius = 32.0f;
 	const char* tmp;
 	LIEngObjectIter iter;
-	LIMatTransform transform;
 	LIMatVector center;
-	LIMatVector diff;
 	LISerServer* server;
 
 	/* Check arguments. */
@@ -97,16 +95,12 @@ static void Server_nearby_objects (LIScrArgs* args)
 		if (!strcmp (tmp, "clients"))
 			onlyclients = 1;
 	}
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 
 	/* Find objects. */
 	LIENG_FOREACH_OBJECT (iter, server->engine, &center, radius)
 	{
-		if (onlyclients && LISER_OBJECT (iter.object)->client == NULL)
-			continue;
-		lieng_object_get_transform (iter.object, &transform);
-		diff = limat_vector_subtract (center, transform.position);
-		if (limat_vector_dot (diff, diff) <= radius)
+		if (!onlyclients || LISER_OBJECT (iter.object)->client != NULL)
 			liscr_args_seti_data (args, iter.object->script);
 	}
 }

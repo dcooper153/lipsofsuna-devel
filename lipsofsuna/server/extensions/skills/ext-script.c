@@ -135,6 +135,45 @@ static void Skills_new (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- @brief Tries to subtract a value from the specified skill.
+ * --
+ * -- Arguments:
+ * -- owner: Object. (required)
+ * -- skill: Skill name. (required)
+ * -- value: Value to subtract. (required)
+ * --
+ * -- @param self Skills class.
+ * -- @param args Arguments.
+ * -- @return True if the user had enough skill.
+ * function Skills.subtract(self, args)
+ */
+static void Skills_subtract (LIScrArgs* args)
+{
+	float value;
+	const char* name;
+	LIExtModule* module;
+	LIExtSkill* skill;
+	LIExtSkills* skills;
+	LIScrData* data;
+
+	if (liscr_args_gets_string (args, "skill", &name) &&
+	    liscr_args_gets_float (args, "value", &value) &&
+	    liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
+		skills = liext_module_find_skills (module, data->data);
+		if (skills == NULL)
+			return;
+		skill = liext_skills_find_skill (skills, name);
+		if (skill == NULL || skill->value < value)
+			return;
+		liext_skill_set_value (skill, skill->value - value);
+		liscr_args_seti_bool (args, 1);
+	}
+}
+
+/* @luadoc
+ * ---
  * -- @brief Gets the maximum value of a skill.
  * --
  * -- Arguments:
@@ -389,46 +428,6 @@ static void Skills_set_value (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- @brief Tries to subtract a value from the specified skill.
- * --
- * -- Arguments:
- * -- owner: Object.
- * -- skill: Skill name.
- * -- value: Value to subtract.
- * --
- * -- @param self Skills class.
- * -- @param args Arguments.
- * -- @return True if the user had enough skill.
- * function Skills.subtract(self, args)
- */
-static void Skills_subtract (LIScrArgs* args)
-{
-	float value;
-	const char* name;
-	LIExtModule* module;
-	LIExtSkill* skill;
-	LIExtSkills* skills;
-	LIScrData* data;
-
-	if (!liscr_args_gets_string (args, "skill", &name) &&
-	    !liscr_args_gets_float (args, "value", &value))
-		return;
-	if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SKILLS);
-		skills = liext_module_find_skills (module, data->data);
-		if (skills == NULL)
-			return;
-		skill = liext_skills_find_skill (skills, name);
-		if (skill == NULL || skill->value < value)
-			return;
-		liext_skill_set_value (skill, skill->value - value);
-		liscr_args_seti_bool (args, 1);
-	}
-}
-
-/* @luadoc
- * ---
  * -- Owner object.
  * -- @name Skills.owner
  * -- @class table
@@ -461,6 +460,7 @@ liext_script_skills (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "check", Skills_check);
 	liscr_class_insert_cfunc (self, "find", Skills_find);
 	liscr_class_insert_cfunc (self, "new", Skills_new);
+	liscr_class_insert_cfunc (self, "subtract", Skills_subtract);
 	liscr_class_insert_mfunc (self, "get_maximum", Skills_get_maximum);
 	liscr_class_insert_mfunc (self, "get_names", Skills_get_names);
 	liscr_class_insert_mfunc (self, "get_regen", Skills_get_regen);
@@ -470,7 +470,6 @@ liext_script_skills (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "set_maximum", Skills_set_maximum);
 	liscr_class_insert_mfunc (self, "set_regen", Skills_set_regen);
 	liscr_class_insert_mfunc (self, "set_value", Skills_set_value);
-	liscr_class_insert_mfunc (self, "subtract", Skills_subtract);
 	liscr_class_insert_mvar (self, "owner", Skills_getter_owner, Skills_setter_owner);
 }
 

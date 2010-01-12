@@ -121,7 +121,9 @@ static int
 private_event (LIWdgWindow* self,
                liwdgEvent*  event)
 {
+	int i;
 	LIWdgRect rect;
+	LIWdgWidget* child;
 
 	if (event->type == LIWDG_EVENT_TYPE_RENDER)
 	{
@@ -132,6 +134,13 @@ private_event (LIWdgWindow* self,
 			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			glColor4fv (LIWDG_WIDGET (self)->style->color);
 			lifnt_layout_render (self->text, rect.x + 4, rect.y + 4); /* FIXME: Hardcoded. */
+			for (i = 0 ; i < LIWDG_GROUP (self)->width * LIWDG_GROUP (self)->height ; i++)
+			{
+				child = LIWDG_GROUP (self)->cells[i].child;
+				if (child != NULL)
+					liwdg_widget_draw (child);
+			}
+			return 1;
 		}
 	}
 
