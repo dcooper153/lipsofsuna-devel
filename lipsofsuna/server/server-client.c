@@ -478,7 +478,7 @@ private_vision_update (LISerClient* self)
 	lieng_object_get_transform (self->object, &transform);
 
 	/* Remove from vision. */
-	LI_FOREACH_U32DIC (obj_iter, self->vision)
+	LIALG_U32DIC_FOREACH (obj_iter, self->vision)
 	{
 		dist = lieng_object_get_distance (self->object, obj_iter.value);
 		if (dist > self->radius)

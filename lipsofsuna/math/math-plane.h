@@ -123,7 +123,7 @@ static inline float
 limat_plane_distance_to_point (LIMatPlane*        self,
                                const LIMatVector* point)
 {
-	return LI_ABS (self->x * point->x + self->y * point->y + self->z * point->z - self->w);
+	return LIMAT_ABS (self->x * point->x + self->y * point->y + self->z * point->z - self->w);
 }
 
 /**
@@ -169,7 +169,7 @@ limat_plane_intersects_line (const LIMatPlane*  self,
 
 	/* Check if parallel. */
 	t = self->x * line.x + self->y * line.y + self->z * line.z;
-	if (LI_ABS (t) < LI_MATH_EPSILON)
+	if (LIMAT_ABS (t) < LIMAT_EPSILON)
 		return 0;
 
 	/* Find the intersection. */
@@ -207,7 +207,7 @@ limat_plane_intersects_segment (const LIMatPlane*  self,
 
 	/* Check if parallel. */
 	t = self->x * line.x + self->y * line.y + self->z * line.z;
-	if (LI_ABS (t) <= LI_MATH_EPSILON)
+	if (LIMAT_ABS (t) <= LIMAT_EPSILON)
 		return 0;
 
 	/* Check if intersects. */

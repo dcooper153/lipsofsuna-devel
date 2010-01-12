@@ -74,7 +74,7 @@ lical_callbacks_free (LICalCallbacks* self)
 	LIAlgMemdicIter iter;
 
 	private_cleanup (self);
-	LI_FOREACH_MEMDIC (iter, self->types)
+	LIALG_MEMDIC_FOREACH (iter, self->types)
 		private_free_type (iter.value);
 	lialg_memdic_free (self->types);
 	lisys_free (self);

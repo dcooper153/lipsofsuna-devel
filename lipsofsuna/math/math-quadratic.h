@@ -75,7 +75,7 @@ limat_quadratic_solve_minroot (float a, float b, float c, float* X)
 	det = sqrtf (det);
 	X1 = (-b - det) / (2.0f * a);
 	X2 = (-b + det) / (2.0f * a);
-	*X = LI_MIN (X1, X2);
+	*X = LIMAT_MIN (X1, X2);
 	return 1;
 }
 
@@ -102,7 +102,7 @@ limat_quadratic_solve_maxroot (float a, float b, float c, float* X)
 	det = sqrtf (det);
 	X1 = (-b - det) / (2.0f * a);
 	X2 = (-b + det) / (2.0f * a);
-	*X = LI_MAX (X1, X2);
+	*X = LIMAT_MAX (X1, X2);
 	return 1;
 }
 

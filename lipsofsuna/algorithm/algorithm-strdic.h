@@ -277,7 +277,7 @@ lialg_strdic_remove_node (LIAlgStrdic*     self,
 
 /*****************************************************************************/
 
-#define LI_FOREACH_STRDIC(iter, assoc) \
+#define LIALG_STRDIC_FOREACH(iter, assoc) \
 	for (lialg_strdic_iter_start (&iter, assoc) ; \
 	     iter.node != NULL ; \
 	     lialg_strdic_iter_next (&iter))

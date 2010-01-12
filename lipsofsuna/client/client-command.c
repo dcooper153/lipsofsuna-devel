@@ -116,7 +116,7 @@ private_assign (LICliClient* client,
 	client->network->features = features;
 
 	/* Clear scene. */
-	LI_FOREACH_U32DIC (iter, client->engine->objects)
+	LIALG_U32DIC_FOREACH (iter, client->engine->objects)
 	{
 		if (LICLI_IS_CLIENT_OBJECT (iter.value))
 			lieng_object_set_realized (iter.value, 0);
@@ -307,9 +307,9 @@ private_object_simulate (LICliClient* client,
 
 	/* FIXME: No analog. */
 	memset (&controls, 0, sizeof (LICliControls));
-	if (flags & LI_CONTROL_MOVE_FRONT)
+	if (flags & LINET_CONTROL_MOVE_FRONT)
 		controls.move += 1.0;
-	if (flags & LI_CONTROL_MOVE_BACK)
+	if (flags & LINET_CONTROL_MOVE_BACK)
 		controls.move -= 1.0f;
 
 	/* Change the simulation of the object. */

@@ -27,12 +27,12 @@
 
 #include <math.h>
 
-#define LI_ABS(a) (((a)<0)?-(a):(a))
-#define LI_MIN(a,b) ((a)<(b)?(a):(b))
-#define LI_MAX(a,b) ((a)>(b)?(a):(b))
-#define LI_CLAMP(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):(val))
-#define LI_MATH_EPSILON 1E-20f
-#define LI_MATH_INFINITE (1.0f/0.0f)
+#define LIMAT_ABS(a) (((a)<0)?-(a):(a))
+#define LIMAT_MIN(a,b) ((a)<(b)?(a):(b))
+#define LIMAT_MAX(a,b) ((a)>(b)?(a):(b))
+#define LIMAT_CLAMP(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):(val))
+#define LIMAT_EPSILON 1E-20f
+#define LIMAT_INFINITE (1.0f/0.0f)
 
 static inline float
 limat_quantize (float value,
@@ -40,7 +40,7 @@ limat_quantize (float value,
 {
 	float tmp;
 
-	if (resolution <= LI_MATH_EPSILON)
+	if (resolution <= LIMAT_EPSILON)
 		return value;
 	tmp = fmod (value, resolution);
 	if (tmp >= 0.5f * resolution)

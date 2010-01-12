@@ -76,8 +76,8 @@ liwdg_scroll_set_range (LIWdgScroll* self,
 {
 	self->min = min;
 	self->max = max;
-	self->value = LI_MIN (self->value, self->max);
-	self->value = LI_MAX (self->value, self->min);
+	self->value = LIMAT_MIN (self->value, self->max);
+	self->value = LIMAT_MAX (self->value, self->min);
 	private_rebuild (self);
 }
 
@@ -140,7 +140,7 @@ private_event (LIWdgScroll*  self,
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
 			v = self->max - self->min;
-			if (v >= LI_MATH_EPSILON)
+			if (v >= LIMAT_EPSILON)
 				v = (self->value - self->min) / v;
 			else
 				v = 0.0f;
@@ -182,7 +182,7 @@ private_rebuild (LIWdgScroll* self)
 		lifnt_layout_append_string (self->text, self->font, buf);
 	}
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
-		lifnt_layout_get_width (self->text), LI_MAX (
+		lifnt_layout_get_width (self->text), LIMAT_MAX (
 		lifnt_layout_get_height (self->text), h));
 }
 

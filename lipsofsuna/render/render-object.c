@@ -475,8 +475,8 @@ private_init_envmap (LIRenObject* self)
 			texture = material->textures.array + j;
 			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
 			{
-				width = LI_MAX (width, texture->width);
-				height = LI_MAX (height, texture->height);
+				width = LIMAT_MAX (width, texture->width);
+				height = LIMAT_MAX (height, texture->height);
 			}
 		}
 	}
@@ -674,7 +674,7 @@ private_update_envmap (LIRenObject* self)
 		liren_context_set_modelview (&context, &modelview);
 		liren_context_set_projection (&context, &projection);
 		liren_context_set_frustum (&context, &frustum);
-		LI_FOREACH_U32DIC (iter, self->scene->objects)
+		LIALG_U32DIC_FOREACH (iter, self->scene->objects)
 			liren_draw_exclude (&context, iter.value, self);
 	}
 

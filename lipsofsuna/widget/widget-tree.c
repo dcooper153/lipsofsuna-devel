@@ -570,7 +570,7 @@ private_treerow_get_height (LIWdgTreerow* self)
 		{
 			h0 = lifnt_layout_get_height (self->layout);
 			h1 = lifnt_font_get_height (self->font);
-			return LI_MAX (h0, h1);
+			return LIMAT_MAX (h0, h1);
 		}
 		return lifnt_layout_get_height (self->layout);
 	}
@@ -601,7 +601,7 @@ private_treerow_get_request (LIWdgTreerow* self,
 		for (i = 0 ; i < self->rows.count ; i++)
 		{
 			private_treerow_get_request (self->rows.array[i], &w1, &h1);
-			*w = LI_MAX (*w, w1);
+			*w = LIMAT_MAX (*w, w1);
 			*h += h1;
 		}
 	}

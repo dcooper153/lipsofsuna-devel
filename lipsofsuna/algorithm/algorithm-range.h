@@ -155,12 +155,12 @@ lialg_range_new_from_index (int index,
 	self.minx = index % size;
 	self.miny = index / size % size;
 	self.minz = index / size / size;
-	self.maxx = LI_MIN (self.minx + radius, maxi);
-	self.maxy = LI_MIN (self.miny + radius, maxi);
-	self.maxz = LI_MIN (self.minz + radius, maxi);
-	self.minx = LI_MAX (self.minx - radius, mini);
-	self.miny = LI_MAX (self.miny - radius, mini);
-	self.minz = LI_MAX (self.minz - radius, mini);
+	self.maxx = LIMAT_MIN (self.minx + radius, maxi);
+	self.maxy = LIMAT_MIN (self.miny + radius, maxi);
+	self.maxz = LIMAT_MIN (self.minz + radius, maxi);
+	self.minx = LIMAT_MAX (self.minx - radius, mini);
+	self.miny = LIMAT_MAX (self.miny - radius, mini);
+	self.minz = LIMAT_MAX (self.minz - radius, mini);
 
 	return self;
 }
@@ -206,12 +206,12 @@ lialg_range_clamp (const LIAlgRange self,
 
 	ret.min = min;
 	ret.max = max + 1;
-	ret.minx = LI_MAX (self.minx, min);
-	ret.miny = LI_MAX (self.miny, min);
-	ret.minz = LI_MAX (self.minz, min);
-	ret.maxx = LI_MIN (self.maxx, max);
-	ret.maxy = LI_MIN (self.maxy, max);
-	ret.maxz = LI_MIN (self.maxz, max);
+	ret.minx = LIMAT_MAX (self.minx, min);
+	ret.miny = LIMAT_MAX (self.miny, min);
+	ret.minz = LIMAT_MAX (self.minz, min);
+	ret.maxx = LIMAT_MIN (self.maxx, max);
+	ret.maxy = LIMAT_MIN (self.maxy, max);
+	ret.maxz = LIMAT_MIN (self.maxz, max);
 
 	return ret;
 }

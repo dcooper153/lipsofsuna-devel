@@ -281,9 +281,9 @@ private_clear (LIAlgAstar* self)
 {
 	LIAlgPtrdicIter iter;
 
-	LI_FOREACH_PTRDIC (iter, self->open)
+	LIALG_PTRDIC_FOREACH (iter, self->open)
 		lisys_free (iter.value);
-	LI_FOREACH_PTRDIC (iter, self->closed)
+	LIALG_PTRDIC_FOREACH (iter, self->closed)
 		lisys_free (iter.value);
 	lialg_ptrdic_clear (self->open);
 	lialg_ptrdic_clear (self->closed);

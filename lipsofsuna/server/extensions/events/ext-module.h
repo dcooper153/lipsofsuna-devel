@@ -62,7 +62,7 @@ liext_module_free (LIExtModule* self);
 void
 liext_module_event (LIExtModule* self,
                     int          type,
-                                 ...) __LI_ATTRIBUTE_SENTINEL;
+                                 ...) LISYS_ATTR_SENTINEL;
 
 /*****************************************************************************/
 

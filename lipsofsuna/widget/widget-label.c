@@ -97,7 +97,7 @@ void
 liwdg_label_set_halign (LIWdgLabel* self,
                         float       value)
 {
-	self->halign = LI_CLAMP (value, 0.0f, 1.0f);
+	self->halign = LIMAT_CLAMP (value, 0.0f, 1.0f);
 }
 
 int
@@ -144,7 +144,7 @@ void
 liwdg_label_set_valign (LIWdgLabel* self,
                         float       value)
 {
-	self->valign = LI_CLAMP (value, 0.0f, 1.0f);
+	self->valign = LIMAT_CLAMP (value, 0.0f, 1.0f);
 }
 
 /****************************************************************************/
@@ -233,7 +233,7 @@ private_rebuild (LIWdgLabel* self)
 		lifnt_layout_append_string (self->text, self->font, self->string);
 	}
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
-		lifnt_layout_get_width (self->text), LI_MAX (
+		lifnt_layout_get_width (self->text), LIMAT_MAX (
 		lifnt_layout_get_height (self->text), h));
 }
 

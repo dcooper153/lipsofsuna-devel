@@ -822,7 +822,7 @@ private_read (LIMdlModel*  self,
 		return 0;
 	if (version != LIMDL_FORMAT_VERSION)
 	{
-		lisys_error_set (LI_ERROR_VERSION, "model version mismatch");
+		lisys_error_set (LISYS_ERROR_VERSION, "model version mismatch");
 		return 0;
 	}
 

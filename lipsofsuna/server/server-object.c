@@ -355,7 +355,7 @@ liser_object_serialize (LIEngObject* self,
 				lua_pushstring (script->lua, (extras != NULL)? extras : "");
 				if (lua_pcall (script->lua, 3, 0, 0) != 0)
 				{
-					lisys_error_set (LI_ERROR_UNKNOWN, "Object.read_cb: %s", lua_tostring (script->lua, -1));
+					lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.read_cb: %s", lua_tostring (script->lua, -1));
 					lua_pop (script->lua, 1);
 				}
 			}
@@ -447,7 +447,7 @@ liser_object_serialize (LIEngObject* self,
 					lua_remove (script->lua, -3);
 					if (lua_pcall (script->lua, 1, 2, 0) != 0)
 					{
-						lisys_error_set (LI_ERROR_UNKNOWN, "Object.write_cb: %s", lua_tostring (script->lua, -1));
+						lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.write_cb: %s", lua_tostring (script->lua, -1));
 						lua_pop (script->lua, 1);
 						return 0;
 					}
@@ -662,7 +662,7 @@ private_write_animations (LIEngObject* self)
 	sql = LISER_OBJECT (self)->server->sql;
 
 	/* Save all permanent animations. */
-	LI_FOREACH_U32DIC (iter, LISER_OBJECT (self)->animations)
+	LIALG_U32DIC_FOREACH (iter, LISER_OBJECT (self)->animations)
 	{
 		info = iter.value;
 		if (!info->permanent)

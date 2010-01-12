@@ -515,7 +515,7 @@ private_free_module (LICliClient* self)
 	/* Free extensions. */
 	if (self->extensions != NULL)
 	{
-		LI_FOREACH_STRDIC (iter, self->extensions)
+		LIALG_STRDIC_FOREACH (iter, self->extensions)
 		{
 			extension = iter.value;
 			((void (*)(void*)) extension->info->free) (extension->object);

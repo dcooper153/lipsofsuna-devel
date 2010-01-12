@@ -559,7 +559,7 @@ lieng_object_set_dirty (LIEngObject* self,
 /**
  * \brief Gets the distance between the objects.
  *
- * If either of the objects is in not realized, LI_MATH_INFINITE is returned.
+ * If either of the objects is in not realized, LIMAT_INFINITE is returned.
  *
  * \param self An object.
  * \param object An object.
@@ -574,7 +574,7 @@ lieng_object_get_distance (const LIEngObject* self,
 
 	if (!lieng_object_get_realized (self) ||
 	    !lieng_object_get_realized (object))
-		return LI_MATH_INFINITE;
+		return LIMAT_INFINITE;
 	lieng_object_get_transform (self, &t0);
 	lieng_object_get_transform (object, &t1);
 

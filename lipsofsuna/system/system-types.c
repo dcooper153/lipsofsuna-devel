@@ -40,7 +40,7 @@ lisys_htons (uint16_t value)
 		uint16_t ret;
 	} tmp;
 
-#if LI_BYTE_ORDER == LI_LITTLE_ENDIAN
+#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
 	tmp.val[0] = ((uint8_t*) &value)[1];
 	tmp.val[1] = ((uint8_t*) &value)[0];
 #else
@@ -66,7 +66,7 @@ lisys_htonl (uint32_t value)
 		uint32_t ret;
 	} tmp;
 
-#if LI_BYTE_ORDER == LI_LITTLE_ENDIAN
+#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
 	tmp.val[0] = ((uint8_t*) &value)[3];
 	tmp.val[1] = ((uint8_t*) &value)[2];
 	tmp.val[2] = ((uint8_t*) &value)[1];

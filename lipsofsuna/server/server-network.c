@@ -87,13 +87,13 @@ liser_network_free (LISerNetwork* self)
 
 	if (self->clients != NULL)
 	{
-		LI_FOREACH_U32DIC (iter0, self->clients)
+		LIALG_U32DIC_FOREACH (iter0, self->clients)
 			liser_client_free (iter0.value);
 		lialg_u32dic_free (self->clients);
 	}
 	if (self->passwords != NULL)
 	{
-		LI_FOREACH_STRDIC (iter1, self->passwords)
+		LIALG_STRDIC_FOREACH (iter1, self->passwords)
 			lisys_free (iter1.value);
 		lialg_strdic_free (self->passwords);
 	}

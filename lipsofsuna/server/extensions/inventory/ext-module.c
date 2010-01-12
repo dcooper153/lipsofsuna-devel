@@ -96,7 +96,7 @@ private_object_client (LIExtModule* self,
 {
 	LIAlgU32dicIter iter;
 
-	LI_FOREACH_U32DIC (iter, self->dictionary)
+	LIALG_U32DIC_FOREACH (iter, self->dictionary)
 		liext_inventory_reset_listener (iter.value, object);
 
 	return 1;

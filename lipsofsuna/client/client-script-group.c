@@ -131,7 +131,7 @@ Group_insert_col (lua_State* lua)
 		lua_pushvalue (lua, 3);
 		if (lua_pcall (lua, 4, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
 			lisys_error_report ();
 			lua_pop (lua, 1);
 			return 0;
@@ -182,7 +182,7 @@ Group_insert_row (lua_State* lua)
 		lua_pushvalue (lua, 3);
 		if (lua_pcall (lua, 4, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
 			lisys_error_report ();
 			lua_pop (lua, 1);
 			return 0;

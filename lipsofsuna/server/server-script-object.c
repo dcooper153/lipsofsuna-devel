@@ -90,7 +90,7 @@ private_contact_callback (LIPhyObject*  object,
 	/* Call function. */
 	if (lua_pcall (script->lua, 2, 0, 0) != 0)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (script->lua, -1));
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (script->lua, -1));
 		lisys_error_report ();
 		lua_pop (script->lua, 1);
 	}
@@ -169,7 +169,7 @@ static void Object_disconnect (LIScrArgs* args)
  */
 static void Object_effect (LIScrArgs* args)
 {
-	int flags = LI_EFFECT_DEFAULT;
+	int flags = LINET_EFFECT_DEFAULT;
 	const char* name;
 
 	if (liscr_args_gets_string (args, "effect", &name))

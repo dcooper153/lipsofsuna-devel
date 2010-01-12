@@ -542,8 +542,8 @@ liwdg_manager_insert_window (LIWdgManager* self,
 	static int x=32;// FIXME
 	static int y=32;
 	liwdg_widget_get_request (widget, &size);
-	size.width = LI_MAX (1, self->width - size.width);
-	size.height = LI_MAX (1, self->height - size.height);
+	size.width = LIMAT_MAX (1, self->width - size.width);
+	size.height = LIMAT_MAX (1, self->height - size.height);
 	liwdg_widget_move (widget, x % size.width, y % size.height);
 	x += 64;
 	y += 32;

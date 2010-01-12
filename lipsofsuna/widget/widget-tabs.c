@@ -379,8 +379,8 @@ private_rebuild (LIWdgTabs* self)
 		if (!liwdg_widget_get_visible (child))
 			continue;
 		liwdg_widget_get_request (child, &size1);
-		size.width = LI_MAX (size.width, size1.width);
-		size.height = LI_MAX (size.height, size1.height);
+		size.width = LIMAT_MAX (size.width, size1.width);
+		size.height = LIMAT_MAX (size.height, size1.height);
 	}
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self), size.width, size.height);
 

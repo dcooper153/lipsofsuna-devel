@@ -425,7 +425,7 @@ private_populate (LIExtMaterials* self)
 	row0 = tree;
 
 	/* Add each material. */
-	LI_FOREACH_U32DIC (iter, self->generator->voxels->materials)
+	LIALG_U32DIC_FOREACH (iter, self->generator->voxels->materials)
 	{
 		material = iter.value;
 		tmp = lisys_calloc (1, sizeof (LIExtMaterialsTreerow));

@@ -73,7 +73,7 @@ limat_halton_next (LIMatHalton* self)
 	}
 }
 
-#define LI_FOREACH_HALTON(iter, index) \
+#define LIMAT_HALTON_FOREACH(iter, index) \
 	for (limat_halton_init (&(iter)) ; (iter).indices[0] <= (index) ; limat_halton_next (&(iter)))
 
 #endif

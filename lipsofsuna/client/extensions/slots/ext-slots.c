@@ -63,7 +63,7 @@ liext_slots_clear (LIExtSlots* self)
 {
 	LIAlgStrdicIter iter;
 
-	LI_FOREACH_STRDIC (iter, self->slots)
+	LIALG_STRDIC_FOREACH (iter, self->slots)
 		liext_slot_free (iter.value);
 	lialg_strdic_clear (self->slots);
 }
@@ -75,7 +75,7 @@ liext_slots_clear_object (LIExtSlots*  self,
 	LIAlgStrdicIter iter;
 	LIExtSlot* slot;
 
-	LI_FOREACH_STRDIC (iter, self->slots)
+	LIALG_STRDIC_FOREACH (iter, self->slots)
 	{
 		slot = iter.value;
 		if (slot->object == object)

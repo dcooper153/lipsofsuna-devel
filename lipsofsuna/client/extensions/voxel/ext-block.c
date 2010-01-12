@@ -400,34 +400,34 @@ private_merge_model (LIExtBlock* self,
 
 			/* Occlusion check. */
 			if ((voxel->mask & 0x01) &&
-				LI_ABS (verts[0].coord.x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[1].coord.x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[2].coord.x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+				LIMAT_ABS (verts[0].coord.x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[1].coord.x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[2].coord.x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 			if ((voxel->mask & 0x02) &&
-				LI_ABS (verts[0].coord.x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[1].coord.x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[2].coord.x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+				LIMAT_ABS (verts[0].coord.x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[1].coord.x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[2].coord.x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 			if ((voxel->mask & 0x04) &&
-				LI_ABS (verts[0].coord.y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[1].coord.y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[2].coord.y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+				LIMAT_ABS (verts[0].coord.y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[1].coord.y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[2].coord.y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 			if ((voxel->mask & 0x08) &&
-				LI_ABS (verts[0].coord.y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[1].coord.y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[2].coord.y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+				LIMAT_ABS (verts[0].coord.y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[1].coord.y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[2].coord.y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 			if ((voxel->mask & 0x10) &&
-				LI_ABS (verts[0].coord.z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[1].coord.z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[2].coord.z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+				LIMAT_ABS (verts[0].coord.z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[1].coord.z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[2].coord.z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 			if ((voxel->mask & 0x20) &&
-				LI_ABS (verts[0].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[1].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-				LI_ABS (verts[2].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+				LIMAT_ABS (verts[0].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[1].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
+				LIMAT_ABS (verts[2].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 
 			/* Transform to world space. */

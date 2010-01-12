@@ -46,8 +46,8 @@ lipar_point_get_color (const LIParPoint* self,
 {
 	float fade;
 
-	fade = LI_MAX (self->time_life - self->time_fade, 0.0f);
-	fade = LI_MAX (self->time - fade, 0.0f);
+	fade = LIMAT_MAX (self->time_life - self->time_fade, 0.0f);
+	fade = LIMAT_MAX (self->time - fade, 0.0f);
 	color[0] = self->color[0];
 	color[1] = self->color[1];
 	color[2] = self->color[2];

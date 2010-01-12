@@ -201,7 +201,7 @@ private_astar_cost (LIAiManager*  self,
 	diff = limat_vector_subtract (start->position, end->position);
 
 	/* FIXME: Gives lots of penalty for climbing. */
-	return limat_vector_get_length (diff) + 50.0f * LI_MAX (0, diff.y);
+	return limat_vector_get_length (diff) + 50.0f * LIMAT_MAX (0, diff.y);
 }
 
 static float
@@ -210,9 +210,9 @@ private_astar_heuristic (LIAiManager*  self,
                          LIAiWaypoint* start,
                          LIAiWaypoint* end)
 {
-	return LI_ABS (start->position.x - end->position.x) +
-	       LI_ABS (start->position.y - end->position.y) +
-	       LI_ABS (start->position.z - end->position.z);
+	return LIMAT_ABS (start->position.x - end->position.x) +
+	       LIMAT_ABS (start->position.y - end->position.y) +
+	       LIMAT_ABS (start->position.z - end->position.z);
 }
 
 static int

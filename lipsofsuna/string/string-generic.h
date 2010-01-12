@@ -38,7 +38,7 @@ listr_concat (const char* self,
 
 char*
 listr_format (const char* format,
-                          ...) __LI_ATTRIBUTE_FORMAT(1, 2);
+                          ...) LISYS_ATTR_FORMAT(1, 2);
 
 int
 listr_utf8_get_char (const char* self,

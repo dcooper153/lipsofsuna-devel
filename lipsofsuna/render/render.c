@@ -83,7 +83,7 @@ liren_render_free (LIRenRender* self)
 	/* Free shaders. */
 	if (self->shaders != NULL)
 	{
-		LI_FOREACH_STRDIC (iter1, self->shaders)
+		LIALG_STRDIC_FOREACH (iter1, self->shaders)
 		{
 			shader = iter1.value;
 			liren_shader_free (shader);
@@ -100,7 +100,7 @@ liren_render_free (LIRenRender* self)
 	/* Free models. */
 	if (self->models_inst != NULL)
 	{
-		LI_FOREACH_PTRDIC (iter0, self->models_inst)
+		LIALG_PTRDIC_FOREACH (iter0, self->models_inst)
 		{
 			model = iter0.value;
 			liren_model_free (model);
@@ -109,7 +109,7 @@ liren_render_free (LIRenRender* self)
 	}
 	if (self->models != NULL)
 	{
-		LI_FOREACH_STRDIC (iter1, self->models)
+		LIALG_STRDIC_FOREACH (iter1, self->models)
 		{
 			model = iter1.value;
 			liren_model_free (model);
@@ -120,7 +120,7 @@ liren_render_free (LIRenRender* self)
 	/* Free images. */
 	if (self->images != NULL)
 	{
-		LI_FOREACH_STRDIC (iter1, self->images)
+		LIALG_STRDIC_FOREACH (iter1, self->images)
 		{
 			image = iter1.value;
 			liren_image_free (image);
@@ -262,14 +262,14 @@ liren_render_load_image (LIRenRender* self,
 		return 0;
 
 	/* Replace in all named models. */
-	LI_FOREACH_STRDIC (iter1, self->models)
+	LIALG_STRDIC_FOREACH (iter1, self->models)
 	{
 		model = iter1.value;
 		liren_model_replace_image (model, image);
 	}
 
 	/* Replace in all instance models. */
-	LI_FOREACH_PTRDIC (iter0, self->models_inst)
+	LIALG_PTRDIC_FOREACH (iter0, self->models_inst)
 	{
 		model = iter0.value;
 		liren_model_replace_image (model, image);
@@ -315,12 +315,12 @@ liren_render_load_model (LIRenRender* self,
 		return 1;
 
 	/* Replace in all instances. */
-	LI_FOREACH_PTRDIC (iter0, self->scenes)
+	LIALG_PTRDIC_FOREACH (iter0, self->scenes)
 	{
 		scene = iter0.value;
 
 		/* Replace in all objects. */
-		LI_FOREACH_U32DIC (iter1, scene->objects)
+		LIALG_U32DIC_FOREACH (iter1, scene->objects)
 		{
 			object = iter1.value;
 			if (object->model == model0)
@@ -334,7 +334,7 @@ liren_render_load_model (LIRenRender* self,
 		}
 
 		/* Replace in all groups. */
-		LI_FOREACH_PTRDIC (iter2, scene->groups)
+		LIALG_PTRDIC_FOREACH (iter2, scene->groups)
 		{
 			group = iter2.value;
 			liren_group_reload_model (group, model0, model1);
@@ -378,7 +378,7 @@ void
 liren_render_set_light_count (LIRenRender* self,
                               int          count)
 {
-	self->config.light_count = LI_MIN (8, count);
+	self->config.light_count = LIMAT_MIN (8, count);
 }
 
 void

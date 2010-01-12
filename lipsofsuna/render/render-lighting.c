@@ -114,7 +114,7 @@ liren_lighting_update (LIRenLighting* self)
 	LIAlgPtrdicIter iter;
 	LIRenLight* light;
 
-	LI_FOREACH_PTRDIC (iter, self->lights)
+	LIALG_PTRDIC_FOREACH (iter, self->lights)
 	{
 		light = iter.value;
 		liren_light_update (light);

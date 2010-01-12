@@ -32,7 +32,7 @@ void
 liser_script_effect (LIScrClass* self,
                    void*       data)
 {
-	liscr_class_insert_enum (self, "REPEAT", LI_EFFECT_REPEAT);
+	liscr_class_insert_enum (self, "REPEAT", LINET_EFFECT_REPEAT);
 }
 
 /** @} */

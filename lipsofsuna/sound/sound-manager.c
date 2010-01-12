@@ -64,7 +64,7 @@ lisnd_manager_free (LISndManager* self)
 
 	if (self->samples != NULL)
 	{
-		LI_FOREACH_STRDIC (iter, self->samples)
+		LIALG_STRDIC_FOREACH (iter, self->samples)
 			lisnd_sample_free (iter.value);
 		lialg_strdic_free (self->samples);
 	}
@@ -81,7 +81,7 @@ lisnd_manager_clear (LISndManager* self)
 {
 	LIAlgStrdicIter iter;
 
-	LI_FOREACH_STRDIC (iter, self->samples)
+	LIALG_STRDIC_FOREACH (iter, self->samples)
 		lisnd_sample_free (iter.value);
 	lialg_strdic_clear (self->samples);
 }

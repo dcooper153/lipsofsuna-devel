@@ -112,7 +112,7 @@ liser_server_free (LISerServer* self)
 	/* Free extensions. */
 	if (self->extensions != NULL)
 	{
-		LI_FOREACH_STRDIC (iter, self->extensions)
+		LIALG_STRDIC_FOREACH (iter, self->extensions)
 		{
 			extension = iter.value;
 			((void (*)(void*)) extension->info->free) (extension->object);
@@ -341,7 +341,7 @@ liser_server_save (LISerServer* self)
 	LIEngObject* object;
 
 	ret = 1;
-	LI_FOREACH_U32DIC (iter, self->engine->objects)
+	LIALG_U32DIC_FOREACH (iter, self->engine->objects)
 	{
 		object = iter.value;
 		if (object->flags & LIENG_OBJECT_FLAG_SAVE)

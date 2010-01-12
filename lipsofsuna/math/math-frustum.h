@@ -81,7 +81,7 @@ limat_frustum_init (LIMatFrustum*      self,
 		len = sqrt (self->planes[i].x * self->planes[i].x +
 		            self->planes[i].y * self->planes[i].y +
 		            self->planes[i].z * self->planes[i].z);
-		if (len > LI_MATH_EPSILON)
+		if (len > LIMAT_EPSILON)
 		{
 			self->planes[i].x /= len;
 			self->planes[i].y /= len;

@@ -790,7 +790,7 @@ livox_manager_write_materials (LIVoxManager* self)
 		return 0;
 
 	/* Save materials. */
-	LI_FOREACH_U32DIC (iter, self->materials)
+	LIALG_U32DIC_FOREACH (iter, self->materials)
 	{
 		if (!livox_material_write_to_sql (iter.value, self->sql))
 			return 0;
@@ -871,7 +871,7 @@ private_clear_materials (LIVoxManager* self)
 	LIAlgU32dicIter iter;
 	LIVoxMaterial* material;
 
-	LI_FOREACH_U32DIC (iter, self->materials)
+	LIALG_U32DIC_FOREACH (iter, self->materials)
 	{
 		material = iter.value;
 		livox_material_free (material);

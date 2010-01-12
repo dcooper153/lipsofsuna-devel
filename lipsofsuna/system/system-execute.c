@@ -53,7 +53,7 @@ private_execvp_detach (const char*        prog,
 	pid = fork ();
 	if (pid == -1)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot fork");
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot fork");
 		return 0;
 	}
 	if (pid != 0)
@@ -61,7 +61,7 @@ private_execvp_detach (const char*        prog,
 		waitpid (pid, &status, 0);
 		if (!WIFEXITED (status) || WEXITSTATUS (status))
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "client process did not exit successfully");
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "client process did not exit successfully");
 			return 0;
 		}
 		return 1;
@@ -211,7 +211,7 @@ private_execvp_redir (lisysExecFilter    filter,
 	if (!CreateProcess (prog, cmd, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS,
 		NULL, NULL, &startup_info, &process_info))
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot start child process");
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot start child process");
 		free (cmd);
 		return 0;
 	}

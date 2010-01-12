@@ -41,10 +41,10 @@ limat_convert_matrix_to_quaternion (LIMatMatrix matrix)
 {
 	LIMatQuaternion self;
 
-	self.x = 0.5f * sqrt (LI_MAX (0.0f, 1.0f + matrix.m[0] - matrix.m[5] - matrix.m[10]));
-	self.y = 0.5f * sqrt (LI_MAX (0.0f, 1.0f - matrix.m[0] + matrix.m[5] - matrix.m[10]));
-	self.z = 0.5f * sqrt (LI_MAX (0.0f, 1.0f - matrix.m[0] - matrix.m[5] + matrix.m[10]));
-	self.w = 0.5f * sqrt (LI_MAX (0.0f, 1.0f + matrix.m[0] + matrix.m[5] + matrix.m[10]));
+	self.x = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f + matrix.m[0] - matrix.m[5] - matrix.m[10]));
+	self.y = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f - matrix.m[0] + matrix.m[5] - matrix.m[10]));
+	self.z = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f - matrix.m[0] - matrix.m[5] + matrix.m[10]));
+	self.w = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f + matrix.m[0] + matrix.m[5] + matrix.m[10]));
 	self.x = copysign (self.x, matrix.m[6] - matrix.m[9]);
 	self.y = copysign (self.y, matrix.m[8] - matrix.m[2]);
 	self.z = copysign (self.z, matrix.m[1] - matrix.m[4]);

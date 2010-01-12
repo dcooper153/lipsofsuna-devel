@@ -41,7 +41,7 @@ private_callback_activated (LIScrData* data)
 		lua_remove (script->lua, -3);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "Widget.activated: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.activated: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -70,7 +70,7 @@ private_callback_menu (LIScrData*     data,
 		liscr_pushdata (script->lua, data);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "Menu.callback: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Menu.callback: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -95,7 +95,7 @@ private_callback_pressed (LIScrData* data)
 		lua_remove (script->lua, -3);
 		if (lua_pcall (script->lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "Widget.pressed: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.pressed: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}
@@ -127,7 +127,7 @@ private_callback_pressed_tree (LIScrData*    data,
 		lua_pushnumber (script->lua, i + 1);
 		if (lua_pcall (script->lua, 2, 0, 0) != 0)
 		{
-			lisys_error_set (LI_ERROR_UNKNOWN, "Tree.pressed: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Tree.pressed: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}

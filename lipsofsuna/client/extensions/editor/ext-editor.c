@@ -147,7 +147,7 @@ liext_editor_destroy (LIExtEditor* self)
 	LIAlgPtrdicIter iter;
 	LIEngSelection* selection;
 
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		writer = liarc_writer_new_packet (LINET_EXT_CLIENT_PACKET_EDITOR);
@@ -181,7 +181,7 @@ liext_editor_duplicate (LIExtEditor* self)
 	LIEngSelection* selection;
 	LIMatTransform transform;
 
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		code = lieng_object_get_model_code (selection->object);
@@ -208,7 +208,7 @@ liext_editor_rotate (LIExtEditor*           self,
 	liext_editor_get_center (self, &center);
 
 	/* Rotate each element. */
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		position = limat_vector_subtract (selection->transform.position, center);
@@ -241,7 +241,7 @@ liext_editor_snap (LIExtEditor* self,
 	LIMatVector position;
 
 	/* Snap each element. */
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		position = selection->transform.position;
@@ -282,7 +282,7 @@ liext_editor_translate (LIExtEditor*       self,
 	LIMatTransform transform;
 	LIMatVector position;
 
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		lieng_object_get_transform (selection->object, &transform);
@@ -306,7 +306,7 @@ liext_editor_transform_apply (LIExtEditor* self)
 	LIEngSelection* selection;
 	LIMatTransform transform;
 
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		/* Get target. */
 		selection = iter.value;
@@ -343,7 +343,7 @@ liext_editor_transform_cancel (LIExtEditor* self)
 	LIEngSelection* selection;
 	LIMatTransform transform;
 
-	LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 	{
 		selection = iter.value;
 		transform = selection->transform;
@@ -361,7 +361,7 @@ liext_editor_get_center (LIExtEditor* self,
 	*value = limat_vector_init (0.0f, 0.0f, 0.0f);
 	if (self->client->engine->selection->size)
 	{
-		LI_FOREACH_PTRDIC (iter, self->client->engine->selection)
+		LIALG_PTRDIC_FOREACH (iter, self->client->engine->selection)
 		{
 			selection = iter.value;
 			*value = limat_vector_add (*value, selection->transform.position);

@@ -416,7 +416,7 @@ private_bind_lights_shader (LIRenContext* self)
 	const GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	LIRenLight* light;
 
-	count = LI_MIN (self->lights.count, self->shader->lights.count);
+	count = LIMAT_MIN (self->lights.count, self->shader->lights.count);
 	for (i = 0 ; i < count ; i++)
 	{
 		light = self->lights.array[i];
@@ -594,7 +594,7 @@ private_bind_uniform (LIRenContext* self,
 				light = self->lights.array[index];
 				if (light->directional)
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DIRECTIONAL);
-				else if (LI_ABS (light->cutoff - M_PI) < 0.001)
+				else if (LIMAT_ABS (light->cutoff - M_PI) < 0.001)
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_POINT);
 				else if (light->shadow.map && shadow[1])
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOTSHADOW);

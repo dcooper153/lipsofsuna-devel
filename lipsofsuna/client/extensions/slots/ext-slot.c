@@ -56,7 +56,7 @@ liext_slot_new (LICliClient* client,
 	mdl = lieng_engine_find_model_by_code (object->engine, model);
 	if (mdl == NULL)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot find model `%d'", model);
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot find model `%d'", model);
 		goto error;
 	}
 	self->object = lieng_object_new (self->client->engine, NULL, LIPHY_CONTROL_MODE_STATIC, 0);

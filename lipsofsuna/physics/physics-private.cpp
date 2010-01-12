@@ -103,7 +103,7 @@ void liphyCharacterController::updateAction (btCollisionWorld* world, btScalar d
 	/* Damp when moving upwards too fast. */
 	/* Without this the player would shoot upwards from any slopes. */
 	/* FIXME: Doesn't work for non-vertical gravity. */
-	damp0 = 1.0f - LI_CLAMP (vel[1], 0.0f, LIPHY_CHARACTER_RISING_LIMIT) /
+	damp0 = 1.0f - LIMAT_CLAMP (vel[1], 0.0f, LIPHY_CHARACTER_RISING_LIMIT) /
 		LIPHY_CHARACTER_RISING_LIMIT;
 
 	/* Damp when not moving. */

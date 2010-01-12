@@ -68,11 +68,11 @@ lisys_path_check_ext (const char* path,
 
 char*
 lisys_path_concat (const char* path,
-                               ...) __LI_ATTRIBUTE_SENTINEL;
+                               ...) LISYS_ATTR_SENTINEL;
 
 char*
 lisys_path_format (lisysPathFormat format,
-                                   ...) __LI_ATTRIBUTE_SENTINEL;
+                                   ...) LISYS_ATTR_SENTINEL;
 
 char*
 lisys_path_filename (const char* path);

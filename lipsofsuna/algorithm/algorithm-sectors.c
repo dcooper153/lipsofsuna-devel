@@ -90,7 +90,7 @@ lialg_sectors_clear (LIAlgSectors* self)
 {
 	LIAlgU32dicIter iter;
 
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_U32DIC_FOREACH (iter, self->sectors)
 		private_free_sector (self, iter.value);
 	lialg_u32dic_clear (self->sectors);
 }
@@ -186,7 +186,7 @@ lialg_sectors_sector_index (LIAlgSectors* self,
 	}
 
 	/* Create content. */
-	LI_FOREACH_STRDIC (iter, self->content)
+	LIALG_STRDIC_FOREACH (iter, self->content)
 	{
 		content = iter.value;
 		data = content->load (sector);
@@ -274,7 +274,7 @@ lialg_sectors_insert_content (LIAlgSectors*       self,
 	}
 
 	/* Allocate sector data. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_U32DIC_FOREACH (iter, self->sectors)
 	{
 		sector = iter.value;
 		data_ = content->load (sector);
@@ -314,9 +314,9 @@ lialg_sectors_point_to_index (LIAlgSectors*      self,
 	int y;
 	int z;
 
-	x = LI_CLAMP ((int)(point->x / self->width), 0, self->count - 1);
-	y = LI_CLAMP ((int)(point->y / self->width), 0, self->count - 1);
-	z = LI_CLAMP ((int)(point->z / self->width), 0, self->count - 1);
+	x = LIMAT_CLAMP ((int)(point->x / self->width), 0, self->count - 1);
+	y = LIMAT_CLAMP ((int)(point->y / self->width), 0, self->count - 1);
+	z = LIMAT_CLAMP ((int)(point->z / self->width), 0, self->count - 1);
 
 	return x + (y + z * self->count) * self->count;
 }
@@ -330,9 +330,9 @@ lialg_sectors_point_to_index_static (int                count,
 	int y;
 	int z;
 
-	x = LI_CLAMP ((int)(point->x / width), 0, count - 1);
-	y = LI_CLAMP ((int)(point->y / width), 0, count - 1);
-	z = LI_CLAMP ((int)(point->z / width), 0, count - 1);
+	x = LIMAT_CLAMP ((int)(point->x / width), 0, count - 1);
+	y = LIMAT_CLAMP ((int)(point->y / width), 0, count - 1);
+	z = LIMAT_CLAMP ((int)(point->z / width), 0, count - 1);
 
 	return x + (y + z * count) * count;
 }
@@ -383,7 +383,7 @@ lialg_sectors_remove_content (LIAlgSectors* self,
 		return;
 
 	/* Free sector data. */
-	LI_FOREACH_U32DIC (iter, self->sectors)
+	LIALG_U32DIC_FOREACH (iter, self->sectors)
 	{
 		sector = iter.value;
 		data = lialg_strdic_find (sector->content, name);
@@ -419,7 +419,7 @@ private_free_sector (LIAlgSectors* self,
 	LIAlgSectorsContent* content;
 	LIAlgStrdicIter iter;
 
-	LI_FOREACH_STRDIC (iter, self->content)
+	LIALG_STRDIC_FOREACH (iter, self->content)
 	{
 		content = iter.value;
 		data = lialg_strdic_find (sector->content, iter.key);

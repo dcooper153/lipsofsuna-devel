@@ -88,7 +88,7 @@ liext_module_free (LIExtModule* self)
 	/* Free objects. */
 	if (self->objects != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, self->objects)
+		LIALG_U32DIC_FOREACH (iter, self->objects)
 			liext_object_free (iter.value);
 		lialg_u32dic_free (self->objects);
 	}
@@ -195,7 +195,7 @@ private_render_2d (LIExtModule* self,
 	glEnable (GL_BLEND);
 	glDisable (GL_CULL_FACE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
 
@@ -241,7 +241,7 @@ private_tick (LIExtModule* self,
 	LIMatTransform transform;
 
 	/* Update speech. */
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		extobj = iter.value;
 		engobj = lieng_engine_find_object (self->client->engine, iter.key);

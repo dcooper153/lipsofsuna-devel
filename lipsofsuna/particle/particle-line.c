@@ -51,14 +51,14 @@ lipar_line_get_colors (const LIParLine* self,
 {
 	float fade;
 
-	fade = LI_MAX (self->time_life[0] - self->time_fade[0], 0.0f);
-	fade = LI_MAX (self->time[0] - fade, 0.0f);
+	fade = LIMAT_MAX (self->time_life[0] - self->time_fade[0], 0.0f);
+	fade = LIMAT_MAX (self->time[0] - fade, 0.0f);
 	color0[0] = self->color[0][0];
 	color0[1] = self->color[0][1];
 	color0[2] = self->color[0][2];
 	color0[3] = 1.0f - fade / self->time_fade[0];
-	fade = LI_MAX (self->time_life[1] - self->time_fade[1], 0.0f);
-	fade = LI_MAX (self->time[1] - fade, 0.0f);
+	fade = LIMAT_MAX (self->time_life[1] - self->time_fade[1], 0.0f);
+	fade = LIMAT_MAX (self->time[1] - fade, 0.0f);
 	color1[0] = self->color[1][0];
 	color1[1] = self->color[1][1];
 	color1[2] = self->color[1][2];

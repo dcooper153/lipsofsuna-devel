@@ -89,7 +89,7 @@ private_client_client_packet (LISerServer* server,
 
 	if (((uint8_t*) reader->buffer)[0] == LINET_CLIENT_PACKET_MOVE)
 	{
-		if (!liarc_reader_get_uint8 (reader, &flags) || (flags & ~LI_CONTROL_MASK) ||
+		if (!liarc_reader_get_uint8 (reader, &flags) || (flags & ~LINET_CONTROL_MASK) ||
 			!liarc_reader_get_int8 (reader, &x) ||
 			!liarc_reader_get_int8 (reader, &y) ||
 			!liarc_reader_get_int8 (reader, &z) ||
@@ -161,7 +161,7 @@ private_client_vision_show (LISerServer* server,
 		liarc_writer_append_float (writer, transform.position.y);
 		liarc_writer_append_float (writer, transform.position.z);
 		liarc_writer_append_uint8 (writer, LISER_OBJECT (target)->animations->size);
-		LI_FOREACH_U32DIC (iter, LISER_OBJECT (target)->animations)
+		LIALG_U32DIC_FOREACH (iter, LISER_OBJECT (target)->animations)
 		{
 			animation = iter.value;
 			liarc_writer_append_uint16 (writer, animation->animation->id);
@@ -192,7 +192,7 @@ private_object_free (LISerServer* server,
 	/* Free server data. */
 	if (data != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, data->animations)
+		LIALG_U32DIC_FOREACH (iter, data->animations)
 			lisys_free (iter.value);
 		lialg_u32dic_free (data->animations);
 		lisys_free (data);

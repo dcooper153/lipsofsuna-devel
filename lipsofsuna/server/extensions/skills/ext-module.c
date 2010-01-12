@@ -110,7 +110,7 @@ private_object_client (LIExtModule* self,
 	LIAlgPtrdicIter iter;
 	LIExtSkills* skills;
 
-	LI_FOREACH_PTRDIC (iter, self->dictionary)
+	LIALG_PTRDIC_FOREACH (iter, self->dictionary)
 	{
 		skills = iter.value;
 		if (skills->owner == object)
@@ -130,7 +130,7 @@ private_tick (LIExtModule* self,
 	LIAlgPtrdicIter iter;
 	LIExtSkills* skills;
 
-	LI_FOREACH_PTRDIC (iter, self->dictionary)
+	LIALG_PTRDIC_FOREACH (iter, self->dictionary)
 	{
 		skills = iter.value;
 		liext_skills_update (skills, secs);
@@ -161,7 +161,7 @@ private_vision_show (LIExtModule* self,
 	if (writer == NULL)
 		return 1;
 	liarc_writer_append_uint32 (writer, target->id);
-	LI_FOREACH_STRDIC (iter, skills->skills)
+	LIALG_STRDIC_FOREACH (iter, skills->skills)
 	{
 		skill = iter.value;
 		if (skill->type == LIEXT_SKILL_TYPE_INTERNAL)

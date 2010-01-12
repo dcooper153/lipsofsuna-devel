@@ -342,7 +342,7 @@ liarc_writer_append_float (LIArcWriter* self,
 {
 	uint8_t tmp[4];
 
-#if LI_BYTE_ORDER == LI_LITTLE_ENDIAN
+#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
 	tmp[0] = ((uint8_t*) &value)[3];
 	tmp[1] = ((uint8_t*) &value)[2];
 	tmp[2] = ((uint8_t*) &value)[1];

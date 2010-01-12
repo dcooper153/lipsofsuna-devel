@@ -130,7 +130,7 @@ static void Inventory_find (LIScrArgs* args)
 	}
 	else if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data0))
 	{
-		LI_FOREACH_U32DIC (iter, module->dictionary)
+		LIALG_U32DIC_FOREACH (iter, module->dictionary)
 		{
 			inventory = iter.value;
 			liscr_pushdata (args->lua, inventory->script);

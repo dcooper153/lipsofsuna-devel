@@ -80,16 +80,6 @@ enum
 };
 
 /****************************************************************************/
-/* Assign packet flags. */
-/* FIXME */
-
-enum
-{
-	LI_FEATURE_ADMIN = 0x01,
-	LI_FEATURE_MASK  = 0xFF,
-};
-
-/****************************************************************************/
 /* Object flags. */
 /* FIXME */
 
@@ -104,10 +94,10 @@ enum
 
 enum
 {
-	LI_CONTROL_MOVE_FRONT = 0x01,
-	LI_CONTROL_MOVE_BACK  = 0x02,
-	LI_CONTROL_RUN        = 0x40,
-	LI_CONTROL_MASK       = 0xFF,
+	LINET_CONTROL_MOVE_FRONT = 0x01,
+	LINET_CONTROL_MOVE_BACK  = 0x02,
+	LINET_CONTROL_RUN        = 0x40,
+	LINET_CONTROL_MASK       = 0xFF,
 };
 
 /****************************************************************************/
@@ -116,9 +106,9 @@ enum
 
 enum
 {
-	LI_EFFECT_REPEAT = 0x01,
+	LINET_EFFECT_REPEAT = 0x01,
 
-	LI_EFFECT_DEFAULT = 0x00,
+	LINET_EFFECT_DEFAULT = 0x00,
 };
 
 #endif

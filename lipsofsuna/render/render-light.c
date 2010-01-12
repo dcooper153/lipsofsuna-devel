@@ -248,7 +248,7 @@ liren_light_get_bounds (const LIRenLight* self,
 	double eps;
 
 	/* Choose epsilon. */
-	eps = LI_MAX (LI_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
+	eps = LIMAT_MAX (LIMAT_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
 	eps /= 255.0;
 	if (eps < LIGHT_CONTRIBUTION_EPSILON)
 		eps = LIGHT_CONTRIBUTION_EPSILON;
@@ -313,7 +313,7 @@ liren_light_set_direction (LIRenLight*        self,
 	/* Calculate light rotation. */
 	a = limat_vector_dot (direction, limat_vector_init (0.0f, 1.0f, 0.0f));
 	b = limat_vector_dot (direction, limat_vector_init (0.0f, 0.0f, 1.0f));
-	if (LI_ABS (a) >= LI_ABS (b))
+	if (LIMAT_ABS (a) >= LIMAT_ABS (b))
 		rotation = limat_quaternion_look (direction, limat_vector_init (0.0f, 1.0f, 0.0f));
 	else
 		rotation = limat_quaternion_look (direction, limat_vector_init (0.0f, 0.0f, 1.0f));
@@ -468,7 +468,7 @@ private_update_shadow (LIRenLight* self)
 	liren_context_set_modelview (&context, &self->modelview);
 	liren_context_set_projection (&context, &self->projection);
 	liren_context_set_frustum (&context, &frustum);
-	LI_FOREACH_U32DIC (iter, self->scene->objects)
+	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
 		liren_draw_shadowmap (&context, iter.value, self);
 
 	/* Disable depth rendering mode. */

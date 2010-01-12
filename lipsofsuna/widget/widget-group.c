@@ -1265,8 +1265,8 @@ private_rebuild (LIWdgGroup* self,
 			liwdg_widget_set_request_internal (LIWDG_WIDGET (self), wreq, hreq);
 			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 			liwdg_widget_get_request (LIWDG_WIDGET (self), &size);
-			rect.width = LI_MAX (size.width, rect.width);
-			rect.height = LI_MAX (size.height, rect.height);
+			rect.width = LIMAT_MAX (size.width, rect.width);
+			rect.height = LIMAT_MAX (size.height, rect.height);
 			liwdg_widget_set_allocation (LIWDG_WIDGET (self), rect.x, rect.y, rect.width, rect.height);
 		}
 
@@ -1352,8 +1352,8 @@ private_rebuild (LIWdgGroup* self,
 			liwdg_widget_set_request_internal (LIWDG_WIDGET (self), wreq, hreq);
 			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
 			liwdg_widget_get_request (LIWDG_WIDGET (self), &size);
-			rect.width = LI_MAX (size.width, rect.width);
-			rect.height = LI_MAX (size.height, rect.height);
+			rect.width = LIMAT_MAX (size.width, rect.width);
+			rect.height = LIMAT_MAX (size.height, rect.height);
 			liwdg_widget_set_allocation (LIWDG_WIDGET (self), rect.x, rect.y, rect.width, rect.height);
 		}
 

@@ -134,8 +134,8 @@ limat_triangle_intersects_triangle (const LIMatTriangle* self,
 	ref = limat_vector_subtract (i01, i00);
 	dot0 = limat_vector_dot (ref, limat_vector_subtract (i10, i00));
 	dot1 = limat_vector_dot (ref, limat_vector_subtract (i11, i00));
-	t0 = LI_MAX (0.0f, LI_MIN (1.0f, dot0));
-	t1 = LI_MIN (1.0f, LI_MAX (0.0f, dot1));
+	t0 = LIMAT_MAX (0.0f, LIMAT_MIN (1.0f, dot0));
+	t1 = LIMAT_MIN (1.0f, LIMAT_MAX (0.0f, dot1));
 	if (t0 > t1)
 		return 0;
 	if (point0 != NULL)

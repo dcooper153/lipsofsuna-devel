@@ -80,7 +80,7 @@ liext_skills_free (LIExtSkills* self)
 	if (self->owner)
 		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 
-	LI_FOREACH_STRDIC (iter, self->skills)
+	LIALG_STRDIC_FOREACH (iter, self->skills)
 		liext_skill_free (iter.value);
 	lialg_strdic_free (self->skills);
 	lisys_free (self);
@@ -128,7 +128,7 @@ liext_skills_update (LIExtSkills* self,
 	LIAlgStrdicIter iter;
 	LIExtSkill* skill;
 
-	LI_FOREACH_STRDIC (iter, self->skills)
+	LIALG_STRDIC_FOREACH (iter, self->skills)
 	{
 		skill = iter.value;
 		value = skill->value;
@@ -267,7 +267,7 @@ private_send_reset (LIExtSkills* self)
 	if (writer == NULL)
 		return 0;
 	liarc_writer_append_uint32 (writer, self->owner->id);
-	LI_FOREACH_STRDIC (iter0, self->skills)
+	LIALG_STRDIC_FOREACH (iter0, self->skills)
 	{
 		skill = iter0.value;
 		if (skill->type != LIEXT_SKILL_TYPE_PUBLIC)
@@ -289,7 +289,7 @@ private_send_reset (LIExtSkills* self)
 	if (LISER_OBJECT (self->owner)->client != NULL)
 	{
 		/* Create private skill packet. */
-		LI_FOREACH_STRDIC (iter0, self->skills)
+		LIALG_STRDIC_FOREACH (iter0, self->skills)
 		{
 			skill = iter0.value;
 			if (skill->type != LIEXT_SKILL_TYPE_PRIVATE)

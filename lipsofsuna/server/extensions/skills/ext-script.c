@@ -172,7 +172,7 @@ static void Skills_get_names (LIScrArgs* args)
 
 	skills = args->self;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	LI_FOREACH_STRDIC (iter, skills->skills)
+	LIALG_STRDIC_FOREACH (iter, skills->skills)
 		liscr_args_seti_string (args, iter.key);
 }
 

@@ -353,7 +353,7 @@ lialg_camera_get_bounds (const LIAlgCamera* self,
 	top = tan (self->view.fov * M_PI / 360.0f) * near;
 	right = top * self->view.aspect;
 
-	max = 1.7f * LI_MAX (LI_MAX (top, right), near);
+	max = 1.7f * LIMAT_MAX (LIMAT_MAX (top, right), near);
 	size = limat_vector_init (max, max, max);
 	zero = limat_vector_init (0.0f, 0.0f, 0.0f);
 	limat_aabb_init_from_center (aabb, &zero, &size);
@@ -651,7 +651,7 @@ private_update_orientation (LIAlgCamera* self,
 	self->transform.current.rotation = limat_quaternion_nlerp (
 		self->transform.target.rotation,
 		self->transform.current.rotation,
-		LI_MIN (1.0f, LIALG_CAMERA_DEFAULT_ROTATION * secs));
+		LIMAT_MIN (1.0f, LIALG_CAMERA_DEFAULT_ROTATION * secs));
 	self->transform.current.rotation = limat_quaternion_normalize (self->transform.current.rotation);
 
 	/* Eliminate fluctuation. */

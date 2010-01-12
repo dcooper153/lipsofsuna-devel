@@ -243,7 +243,7 @@ limdl_pose_update (LIMdlPose* self,
 		return;
 
 	/* Update channels. */
-	LI_FOREACH_U32DIC (iter, self->channels)
+	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
 		switch (chan->state)
@@ -579,7 +579,7 @@ limdl_pose_set_model (LIMdlPose*  self,
 	/* Clear invalid animations. */
 	self->channels = backup.channels;
 	backup.channels = NULL;
-	LI_FOREACH_U32DIC (iter, self->channels)
+	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
 		if (model != NULL && chan->animation_name != NULL)
@@ -664,7 +664,7 @@ private_clear_pose (LIMdlPose* self)
 	/* Clear channel tree. */
 	if (self->channels != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, self->channels)
+		LIALG_U32DIC_FOREACH (iter, self->channels)
 			private_channel_free (iter.value);
 		lialg_u32dic_clear (self->channels);
 	}
@@ -797,7 +797,7 @@ private_play_channel (const LIMdlPose*  self,
 
 	/* Skip empty. */
 	duration = limdl_animation_get_duration (channel->animation);
-	if (duration < LI_MATH_EPSILON)
+	if (duration < LIMAT_EPSILON)
 	{
 		channel->time = 0.0f;
 		if (channel->repeats == -1)
@@ -844,7 +844,7 @@ private_transform_node (LIMdlPose* self,
 	rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);
 
 	/* Sum channel weights. */
-	LI_FOREACH_U32DIC (iter, self->channels)
+	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
 		if (limdl_animation_get_channel (chan->animation, node->name) != -1)
@@ -866,10 +866,10 @@ private_transform_node (LIMdlPose* self,
 	}
 
 	/* Apply valid influences. */
-	if (channels && total >= LI_MATH_EPSILON)
+	if (channels && total >= LIMAT_EPSILON)
 	{
 		/* Apply channel influences. */
-		LI_FOREACH_U32DIC (iter, self->channels)
+		LIALG_U32DIC_FOREACH (iter, self->channels)
 		{
 			chan = iter.value;
 			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &transform))

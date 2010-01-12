@@ -218,7 +218,7 @@ liext_preview_clear (LIExtPreview* self)
 
 	liren_group_clear (self->group);
 	ligen_generator_clear_scene (self->generator);
-	LI_FOREACH_PTRDIC (iter, self->objects)
+	LIALG_PTRDIC_FOREACH (iter, self->objects)
 		liren_object_free (iter.value);
 	lialg_ptrdic_clear (self->objects);
 
@@ -465,7 +465,7 @@ private_free (LIExtPreview* self)
 	}
 	if (self->objects != NULL)
 	{
-		LI_FOREACH_PTRDIC (iter, self->objects)
+		LIALG_PTRDIC_FOREACH (iter, self->objects)
 			liren_object_free (iter.value);
 		lialg_ptrdic_free (self->objects);
 	}

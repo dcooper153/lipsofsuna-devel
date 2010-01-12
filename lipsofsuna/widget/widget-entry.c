@@ -320,7 +320,7 @@ private_rebuild (LIWdgEntry* self)
 
 	/* Request size. */
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
-		LI_MAX (32, lifnt_layout_get_width (self->text)), h);
+		LIMAT_MAX (32, lifnt_layout_get_width (self->text)), h);
 }
 
 /** @} */

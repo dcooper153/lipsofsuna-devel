@@ -98,7 +98,7 @@ lifnt_font_free (LIFntFont* self)
 		glDeleteTextures (1, &self->texture);
 	if (self->index != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, self->index)
+		LIALG_U32DIC_FOREACH (iter, self->index)
 			lisys_free (iter.value);
 		lialg_u32dic_free (self->index);
 	}

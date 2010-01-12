@@ -264,7 +264,7 @@ liren_draw_hair (LIRenContext* context,
 				else
 					dir = limat_vector_subtract (hair->nodes[k - 1].position, hair->nodes[k].position);
 				dir = limat_vector_normalize (dir);
-				blend = LI_ABS (limat_vector_dot (dir, bby));
+				blend = LIMAT_ABS (limat_vector_dot (dir, bby));
 				tmp = limat_vector_multiply (bbx, blend);
 				tmp = limat_vector_add (tmp, limat_vector_multiply (bby, 1.0f - blend));
 				tmp = limat_vector_normalize (tmp);

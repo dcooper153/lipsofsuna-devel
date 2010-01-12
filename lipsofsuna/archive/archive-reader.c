@@ -351,7 +351,7 @@ liarc_reader_get_float (LIArcReader* self,
 	}
 
 	/* Read the value. */
-#if LI_BYTE_ORDER == LI_LITTLE_ENDIAN
+#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
 	tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[3];
 	tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[2];
 	tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[1];

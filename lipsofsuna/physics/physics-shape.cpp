@@ -328,9 +328,9 @@ private_weld_vertices (LIPhyShape*        self,
 	{
 		for (j = 0 ; j < num ; j++)
 		{
-			if (LI_ABS (vertices[i].x - ret[4 * j + 0]) < VERTEX_WELD_EPSILON &&
-			    LI_ABS (vertices[i].y - ret[4 * j + 1]) < VERTEX_WELD_EPSILON &&
-			    LI_ABS (vertices[i].z - ret[4 * j + 2]) < VERTEX_WELD_EPSILON)
+			if (LIMAT_ABS (vertices[i].x - ret[4 * j + 0]) < VERTEX_WELD_EPSILON &&
+			    LIMAT_ABS (vertices[i].y - ret[4 * j + 1]) < VERTEX_WELD_EPSILON &&
+			    LIMAT_ABS (vertices[i].z - ret[4 * j + 2]) < VERTEX_WELD_EPSILON)
 				break;
 		}
 		if (j == num)

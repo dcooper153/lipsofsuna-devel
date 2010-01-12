@@ -287,7 +287,7 @@ lialg_u32dic_unique_key (const LIAlgU32dic* self)
 
 /*****************************************************************************/
 
-#define LI_FOREACH_U32DIC(iter, assoc) \
+#define LIALG_U32DIC_FOREACH(iter, assoc) \
 	for (lialg_u32dic_iter_start (&iter, assoc) ; \
 	     iter.node != NULL ; \
 	     lialg_u32dic_iter_next (&iter))

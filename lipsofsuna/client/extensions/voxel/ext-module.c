@@ -115,7 +115,7 @@ liext_module_free (LIExtModule* self)
 	/* Free blocks. */
 	if (self->blocks != NULL)
 	{
-		LI_FOREACH_MEMDIC (iter, self->blocks)
+		LIALG_MEMDIC_FOREACH (iter, self->blocks)
 			liext_block_free (iter.value);
 		lialg_memdic_free (self->blocks);
 	}
@@ -134,7 +134,7 @@ liext_module_build_all (LIExtModule* self)
 	LIExtBlock* block;
 	LIVoxBlockAddr* addr;
 
-	LI_FOREACH_MEMDIC (iter, self->blocks)
+	LIALG_MEMDIC_FOREACH (iter, self->blocks)
 	{
 		addr = iter.key;
 		block = iter.value;
@@ -203,7 +203,7 @@ liext_module_clear_all (LIExtModule* self)
 	LIAlgMemdicIter iter;
 	LIExtBlock* block;
 
-	LI_FOREACH_MEMDIC (iter, self->blocks)
+	LIALG_MEMDIC_FOREACH (iter, self->blocks)
 	{
 		block = iter.value;
 		liext_block_clear (block);

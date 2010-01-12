@@ -26,7 +26,7 @@ check_matrix (LIMatMatrix m0, LIMatMatrix m1)
 
 	for (i = 0 ; i < 15 ; i++)
 	{
-		if (LI_ABS (m0.m[i] - m1.m[i]) > EPSILON)
+		if (LIMAT_ABS (m0.m[i] - m1.m[i]) > EPSILON)
 			return 0;
 	}
 	return 1;
@@ -45,10 +45,10 @@ check_quaternion (LIMatQuaternion q0, LIMatQuaternion q1)
 	   (q1.w == 0.0f && q1.z == 0.0f && q1.y < 0.0f) ||
 	   (q1.w == 0.0f && q1.z == 0.0f && q1.y == 0.0f && q1.x < 0.0f))
 		q1 = limat_quaternion_init (-q1.x, -q1.y, -q1.z, -q1.w);
-	if (LI_ABS (q0.x - q1.x) > EPSILON ||
-	    LI_ABS (q0.y - q1.y) > EPSILON ||
-	    LI_ABS (q0.z - q1.z) > EPSILON ||
-	    LI_ABS (q0.w - q1.w) > EPSILON)
+	if (LIMAT_ABS (q0.x - q1.x) > EPSILON ||
+	    LIMAT_ABS (q0.y - q1.y) > EPSILON ||
+	    LIMAT_ABS (q0.z - q1.z) > EPSILON ||
+	    LIMAT_ABS (q0.w - q1.w) > EPSILON)
 		return 0;
 	return 1;
 }
@@ -56,9 +56,9 @@ check_quaternion (LIMatQuaternion q0, LIMatQuaternion q1)
 static inline int
 check_vector (LIMatVector v0, LIMatVector v1)
 {
-	if (LI_ABS (v0.x - v1.x) > EPSILON ||
-	    LI_ABS (v0.y - v1.y) > EPSILON ||
-	    LI_ABS (v0.z - v1.z) > EPSILON)
+	if (LIMAT_ABS (v0.x - v1.x) > EPSILON ||
+	    LIMAT_ABS (v0.y - v1.y) > EPSILON ||
+	    LIMAT_ABS (v0.z - v1.z) > EPSILON)
 		return 0;
 	return 1;
 }

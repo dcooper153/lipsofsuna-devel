@@ -103,7 +103,7 @@ liext_module_free (LIExtModule* self)
 	/* Free objects. */
 	if (self->objects != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, self->objects)
+		LIALG_U32DIC_FOREACH (iter, self->objects)
 			liext_object_free (iter.value);
 		lialg_u32dic_free (self->objects);
 	}
@@ -254,7 +254,7 @@ liext_module_set_effect (LIExtModule* self,
 	lieng_object_get_velocity (engobj, &vector);
 	lisnd_source_set_position (source, &transform.position);
 	lisnd_source_set_velocity (source, &vector);
-	if (flags & LI_EFFECT_REPEAT)
+	if (flags & LINET_EFFECT_REPEAT)
 		lisnd_source_set_looping (source, 1);
 	lisnd_source_set_playing (source, 1);
 
@@ -373,7 +373,7 @@ private_tick (LIExtModule* self,
 	}
 
 	/* Update sound effects. */
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		extobj = iter.value;
 		engobj = lieng_engine_find_object (self->client->engine, iter.key);

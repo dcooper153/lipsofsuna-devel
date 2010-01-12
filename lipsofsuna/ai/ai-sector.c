@@ -142,7 +142,7 @@ liai_sector_build_area (LIAiSector*  self,
 #warning Walkability flags are broken for the bottommost plane of the sector
 #warning Walkability flags are broken for the topmost plane of previously built blocks
 		for (k = z ; k < z + zs ; k++)
-		for (j = LI_MAX (y, 1) ; j < y + ys ; j++)
+		for (j = LIMAT_MAX (y, 1) ; j < y + ys ; j++)
 		for (i = x ; i < x + xs ; i++)
 		{
 			wp = self->points + LIAI_WAYPOINT_INDEX (i, j, k);

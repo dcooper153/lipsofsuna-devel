@@ -44,9 +44,9 @@
 #include "client-window.h"
 
 // FIXME
-#define LI_CLIENT_ROTATION_SPEED 1.5f
-#define LI_CLIENT_SELECT_MAXIMUM_COUNT 128
-#define LI_CLIENT_SELECT_RECTANGLE_SIZE 1
+#define LICLI_ROTATION_SPEED 1.5f
+#define LICLI_SELECT_MAXIMUM_COUNT 128
+#define LICLI_SELECT_RECTANGLE_SIZE 1
 extern const LIBndAction li_binding_actions[];
 const LIBndAction* li_binding_action_get (const char* identifier);
 

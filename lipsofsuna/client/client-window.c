@@ -122,7 +122,7 @@ private_init_video (LICliWindow* self)
 	livid_features_init ();
 	if (self->client->video.TTF_Init () == -1)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot initialize SDL TTF");
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot initialize SDL TTF");
 		return 0;
 	}
 
@@ -168,7 +168,7 @@ private_resize (LICliWindow* self,
 	}
 	if (self->screen == NULL)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "cannot set video mode");
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot set video mode");
 		return 0;
 	}
 
@@ -176,7 +176,7 @@ private_resize (LICliWindow* self,
 	error = glewInit ();
 	if (error != GLEW_OK)
 	{
-		lisys_error_set (LI_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
 		return 0;
 	}
 

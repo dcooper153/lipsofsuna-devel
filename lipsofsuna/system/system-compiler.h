@@ -32,15 +32,15 @@
 #endif
 
 #if __GNUC__ >= 4
-#define __LI_ATTRIBUTE_CONST __attribute__((const))
-#define __LI_ATTRIBUTE_FORMAT(i, j) __attribute__((format (printf, i, j)))
-#define __LI_ATTRIBUTE_NORETURN __attribute__((noreturn))
-#define __LI_ATTRIBUTE_SENTINEL __attribute__((sentinel))
+#define LISYS_ATTR_CONST __attribute__((const))
+#define LISYS_ATTR_FORMAT(i, j) __attribute__((format (printf, i, j)))
+#define LISYS_ATTR_NORETURN __attribute__((noreturn))
+#define LISYS_ATTR_SENTINEL __attribute__((sentinel))
 #else
-#define __LI_ATTRIBUTE_CONST
-#define __LI_ATTRIBUTE_FORMAT(i, j)
-#define __LI_ATTRIBUTE_NORETURN
-#define __LI_ATTRIBUTE_SENTINEL
+#define LISYS_ATTR_CONST
+#define LISYS_ATTR_FORMAT(i, j)
+#define LISYS_ATTR_NORETURN
+#define LISYS_ATTR_SENTINEL
 #endif
 
 #endif

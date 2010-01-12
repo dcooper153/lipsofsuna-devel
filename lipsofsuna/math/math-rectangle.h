@@ -79,10 +79,10 @@ limat_rectangle_union (LIMatRectangle*       self,
 	float x1;
 	float y1;
 
-	x0 = LI_MIN (rect0->x, rect1->x);
-	y0 = LI_MIN (rect0->y, rect1->y);
-	x1 = LI_MAX (rect0->x + rect0->width, rect1->x + rect1->width);
-	y1 = LI_MAX (rect0->y + rect0->height, rect1->y + rect1->height);
+	x0 = LIMAT_MIN (rect0->x, rect1->x);
+	y0 = LIMAT_MIN (rect0->y, rect1->y);
+	x1 = LIMAT_MAX (rect0->x + rect0->width, rect1->x + rect1->width);
+	y1 = LIMAT_MAX (rect0->y + rect0->height, rect1->y + rect1->height);
 	self->x = x0;
 	self->y = y0;
 	self->width = x1 - x0;
@@ -109,10 +109,10 @@ limat_rectangle_intersection (LIMatRectangle*       self,
 	float x1;
 	float y1;
 
-	x0 = LI_MAX (rect0->x, rect1->x);
-	y0 = LI_MAX (rect0->y, rect1->y);
-	x1 = LI_MIN (rect0->x + rect0->width, rect1->x + rect1->width);
-	y1 = LI_MIN (rect0->y + rect0->height, rect1->y + rect1->height);
+	x0 = LIMAT_MAX (rect0->x, rect1->x);
+	y0 = LIMAT_MAX (rect0->y, rect1->y);
+	x1 = LIMAT_MIN (rect0->x + rect0->width, rect1->x + rect1->width);
+	y1 = LIMAT_MIN (rect0->y + rect0->height, rect1->y + rect1->height);
 	self->x = x0;
 	self->y = y0;
 	self->width = x1 - x0;
@@ -154,7 +154,7 @@ limat_rectangle_clip_segment (const LIMatRectangle* self,
 	t1 = 1.0f;
 	vx = *x1 - *x0;
 	vy = *y1 - *y0;
-	if (LI_ABS (vx) > LI_MATH_EPSILON)
+	if (LIMAT_ABS (vx) > LIMAT_EPSILON)
 	{
 		/* Left edge. */
 		t = (xmin - *x0) / vx;
@@ -162,9 +162,9 @@ limat_rectangle_clip_segment (const LIMatRectangle* self,
 		if (0.0f <= t && t <= 1.0f && ymin <= y && y <= ymax)
 		{
 			if (vx > 0)
-				t0 = LI_MAX (t0, t);
+				t0 = LIMAT_MAX (t0, t);
 			else
-				t1 = LI_MIN (t1, t);
+				t1 = LIMAT_MIN (t1, t);
 		}
 
 		/* Right edge. */
@@ -173,12 +173,12 @@ limat_rectangle_clip_segment (const LIMatRectangle* self,
 		if (0.0f <= t && t <= 1.0f && ymin <= y && y <= ymax)
 		{
 			if (vx < 0)
-				t0 = LI_MAX (t0, t);
+				t0 = LIMAT_MAX (t0, t);
 			else
-				t1 = LI_MIN (t1, t);
+				t1 = LIMAT_MIN (t1, t);
 		}
 	}
-	if (LI_ABS (vy) > LI_MATH_EPSILON)
+	if (LIMAT_ABS (vy) > LIMAT_EPSILON)
 	{
 		/* Bottom edge. */
 		t = (ymin - *y0) / vy;
@@ -186,9 +186,9 @@ limat_rectangle_clip_segment (const LIMatRectangle* self,
 		if (0.0f <= t && t <= 1.0f && xmin <= x && x <= xmax)
 		{
 			if (vy > 0)
-				t0 = LI_MAX (t0, t);
+				t0 = LIMAT_MAX (t0, t);
 			else
-				t1 = LI_MIN (t1, t);
+				t1 = LIMAT_MIN (t1, t);
 		}
 
 		/* Top edge. */
@@ -197,9 +197,9 @@ limat_rectangle_clip_segment (const LIMatRectangle* self,
 		if (0.0f <= t && t <= 1.0f && xmin <= x && x <= xmax)
 		{
 			if (vy < 0)
-				t0 = LI_MAX (t0, t);
+				t0 = LIMAT_MAX (t0, t);
 			else
-				t1 = LI_MIN (t1, t);
+				t1 = LIMAT_MIN (t1, t);
 		}
 	}
 	if (t0 > t1)
@@ -268,7 +268,7 @@ limat_rectangle_intersects_segment (const LIMatRectangle* self,
 	vy = y1 - y0;
 
 	/* Check if edges intersect. */
-	if (LI_ABS (vx) > LI_MATH_EPSILON)
+	if (LIMAT_ABS (vx) > LIMAT_EPSILON)
 	{
 		/* Left edge. */
 		t = (xmin - x0) / vx;
@@ -282,7 +282,7 @@ limat_rectangle_intersects_segment (const LIMatRectangle* self,
 		if (0.0f <= t && t <= 1.0f && ymin <= y && y <= ymax)
 			return 1;
 	}
-	if (LI_ABS (vy) > LI_MATH_EPSILON)
+	if (LIMAT_ABS (vy) > LIMAT_EPSILON)
 	{
 		/* Bottom edge. */
 		t = (ymin - y0) / vy;

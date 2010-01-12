@@ -294,7 +294,7 @@ liext_inventory_set_size (LIExtInventory* self,
 	}
 
 	/* Update all listeners. */
-	LI_FOREACH_U32DIC (iter, self->listeners)
+	LIALG_U32DIC_FOREACH (iter, self->listeners)
 	{
 		private_send_close (self, iter.value);
 		private_send_open (self, iter.value);
@@ -383,7 +383,7 @@ private_send_object (LIExtInventory* self,
 	LIAlgU32dicIter iter;
 	LIScrScript* script = self->module->server->script;
 
-	LI_FOREACH_U32DIC (iter, self->listeners)
+	LIALG_U32DIC_FOREACH (iter, self->listeners)
 	{
 		if (LISER_OBJECT (iter.value)->client == NULL)
 			continue;
@@ -421,7 +421,7 @@ private_send_remove (LIExtInventory* self,
 	LIAlgU32dicIter iter;
 	LIScrScript* script = self->module->server->script;
 
-	LI_FOREACH_U32DIC (iter, self->listeners)
+	LIALG_U32DIC_FOREACH (iter, self->listeners)
 	{
 		if (LISER_OBJECT (iter.value)->client == NULL)
 			continue;

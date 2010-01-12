@@ -93,7 +93,7 @@ lieng_engine_free (LIEngEngine* self)
 	/* Clear objects. */
 	if (self->objects != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, self->objects)
+		LIALG_U32DIC_FOREACH (iter, self->objects)
 		{
 			object = iter.value;
 			lieng_object_set_realized (object, 0);
@@ -146,7 +146,7 @@ lieng_engine_clear_selection (LIEngEngine* self)
 	LIAlgPtrdicIter iter;
 	LIEngSelection* selection;
 
-	LI_FOREACH_PTRDIC (iter, self->selection)
+	LIALG_PTRDIC_FOREACH (iter, self->selection)
 	{
 		selection = iter.value;
 		lieng_selection_free (selection);
@@ -253,7 +253,7 @@ lieng_engine_load_model (LIEngEngine* self,
 		return 0;
 
 	/* Mark affected objects. */
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
 		if (object->model == model)
@@ -267,7 +267,7 @@ lieng_engine_load_model (LIEngEngine* self,
 	/* Rebuild affected objects. */
 	/* TODO: Constraints are currently rebuild by lieng_object_set_model so
 	         this loop can result to a lot of unnecessary rebuilds. */
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
 		if (object->flags & LIENG_OBJECT_FLAG_RELOAD)
@@ -348,7 +348,7 @@ lieng_engine_update (LIEngEngine* self,
 	}
 
 	/* Update objects. */
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
 		lieng_object_update (object, secs);

@@ -138,11 +138,11 @@ private_tick (LIExtCreature* self,
 
 	/* Apply controls. */
 	liphy_object_set_movement (physics, 0.0f);
-	if ((self->controls & LI_CONTROL_MOVE_FRONT) &&
-	   !(self->controls & LI_CONTROL_MOVE_BACK))
+	if ((self->controls & LINET_CONTROL_MOVE_FRONT) &&
+	   !(self->controls & LINET_CONTROL_MOVE_BACK))
 		liphy_object_set_movement (physics, 1.0f);
-	if ((self->controls & LI_CONTROL_MOVE_BACK) &&
-	   !(self->controls & LI_CONTROL_MOVE_FRONT))
+	if ((self->controls & LINET_CONTROL_MOVE_BACK) &&
+	   !(self->controls & LINET_CONTROL_MOVE_FRONT))
 		liphy_object_set_movement (physics, -1.0f);
 
 	return 1;

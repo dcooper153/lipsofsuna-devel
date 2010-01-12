@@ -71,7 +71,7 @@ liext_listener_free (LIExtListener* self)
 
 	if (self->cache != NULL)
 	{
-		LI_FOREACH_MEMDIC (iter, self->cache)
+		LIALG_MEMDIC_FOREACH (iter, self->cache)
 			lisys_free (iter.value);
 		lialg_memdic_free (self->cache);
 	}
@@ -183,12 +183,12 @@ liext_listener_update (LIExtListener* self,
 		livox_sector_get_offset (sector, &x, &y, &z);
 		range.min = 0;
 		range.max = LIVOX_BLOCKS_PER_LINE;
-		range.minx = LI_MAX (blocks.minx - x * LIVOX_BLOCKS_PER_LINE, 0);
-		range.miny = LI_MAX (blocks.miny - y * LIVOX_BLOCKS_PER_LINE, 0);
-		range.minz = LI_MAX (blocks.minz - z * LIVOX_BLOCKS_PER_LINE, 0);
-		range.maxx = LI_MIN (blocks.maxx - x * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
-		range.maxy = LI_MIN (blocks.maxy - y * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
-		range.maxz = LI_MIN (blocks.maxz - z * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
+		range.minx = LIMAT_MAX (blocks.minx - x * LIVOX_BLOCKS_PER_LINE, 0);
+		range.miny = LIMAT_MAX (blocks.miny - y * LIVOX_BLOCKS_PER_LINE, 0);
+		range.minz = LIMAT_MAX (blocks.minz - z * LIVOX_BLOCKS_PER_LINE, 0);
+		range.maxx = LIMAT_MIN (blocks.maxx - x * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
+		range.maxy = LIMAT_MIN (blocks.maxy - y * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
+		range.maxz = LIMAT_MIN (blocks.maxz - z * LIVOX_BLOCKS_PER_LINE, LIVOX_BLOCKS_PER_LINE - 1);
 
 		/* Loop through visible blocks. */
 		LIALG_RANGE_FOREACH (iter1, range)

@@ -222,9 +222,9 @@ lisys_error_set (int         type,
 		case ENOMEM: tmp = "out of memory"; break;
 		case EINVAL: tmp = "invalid syntax"; break;
 		case ENOTSUP: tmp = "not supported"; break;
-		case LI_ERROR_NONE: tmp = "success"; break;
-		case LI_ERROR_UNKNOWN: tmp = "unknown error"; break;
-		case LI_ERROR_VERSION: tmp = "version mismatch"; break;
+		case LISYS_ERROR_NONE: tmp = "success"; break;
+		case LISYS_ERROR_UNKNOWN: tmp = "unknown error"; break;
+		case LISYS_ERROR_VERSION: tmp = "version mismatch"; break;
 		default:
 			tmp = "miscellaneous error";
 			break;

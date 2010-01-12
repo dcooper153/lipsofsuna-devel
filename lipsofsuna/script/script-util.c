@@ -38,7 +38,7 @@ liscr_isanyclass (lua_State*  lua,
 	LIScrClass* clss;
 	LIScrScript* script = liscr_script (lua);
 
-	LI_FOREACH_STRDIC (iter, script->classes)
+	LIALG_STRDIC_FOREACH (iter, script->classes)
 	{
 		clss = iter.value;
 		lua_pushvalue (lua, arg);
@@ -67,7 +67,7 @@ liscr_isanydata (lua_State* lua,
 		return NULL;
 	if (!lua_getmetatable (lua, arg))
 		return NULL;
-	LI_FOREACH_STRDIC (iter, script->classes)
+	LIALG_STRDIC_FOREACH (iter, script->classes)
 	{
 		clss = iter.value;
 		lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
@@ -100,7 +100,7 @@ liscr_isclass (lua_State*  lua,
 	lua_pop (lua, 2);
 	if (!ret)
 		return NULL;
-	LI_FOREACH_STRDIC (iter, script->classes)
+	LIALG_STRDIC_FOREACH (iter, script->classes)
 	{
 		clss = iter.value;
 		if (!strcmp (clss->meta, meta))

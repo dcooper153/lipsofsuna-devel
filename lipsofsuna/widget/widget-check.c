@@ -188,7 +188,7 @@ private_rebuild (LIWdgCheck* self)
 
 	/* Rebuild request. */
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
-		lifnt_layout_get_width (self->text), LI_MAX (
+		lifnt_layout_get_width (self->text), LIMAT_MAX (
 		lifnt_layout_get_height (self->text), h));
 }
 

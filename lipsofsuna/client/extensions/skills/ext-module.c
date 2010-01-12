@@ -92,7 +92,7 @@ liext_module_free (LIExtModule* self)
 {
 	LIAlgU32dicIter iter;
 
-	LI_FOREACH_U32DIC (iter, self->dictionary)
+	LIALG_U32DIC_FOREACH (iter, self->dictionary)
 		liext_skills_free (iter.value);
 	lialg_u32dic_free (self->dictionary);
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));

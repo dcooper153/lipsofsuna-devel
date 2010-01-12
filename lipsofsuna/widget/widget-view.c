@@ -348,8 +348,8 @@ private_rebuild (LIWdgView* self)
 	if (self->child != NULL)
 	{
 		liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
-		rect.width = LI_MAX (size.width, rect.width);
-		rect.height = LI_MAX (size.height, rect.height);
+		rect.width = LIMAT_MAX (size.width, rect.width);
+		rect.height = LIMAT_MAX (size.height, rect.height);
 		liwdg_widget_set_allocation (self->child, 0, 0, rect.width, rect.height);
 	}
 

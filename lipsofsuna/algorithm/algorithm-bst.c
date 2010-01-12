@@ -29,7 +29,7 @@
 #include <lipsofsuna/system.h>
 #include "algorithm-bst.h"
 
-#define LI_SCAPEGOAT_ALPHA 0.55
+#define LIALG_SCAPEGOAT_ALPHA 0.55
 
 static inline int
 private_halpha (int n);
@@ -493,7 +493,7 @@ static inline int
 private_halpha (int n)
 {
 	/* TODO: This could probably be optimized. */
-	return (int) floor (log (n) / log (1 / LI_SCAPEGOAT_ALPHA));
+	return (int) floor (log (n) / log (1 / LIALG_SCAPEGOAT_ALPHA));
 }
 
 static inline void

@@ -125,7 +125,7 @@ liext_module_new (LISerServer* server)
 		liext_module_free (self);
 		return NULL;
 	}
-	LI_FOREACH_U32DIC (iter, self->voxels->materials)
+	LIALG_U32DIC_FOREACH (iter, self->voxels->materials)
 	{
 		material = iter.value;
 		if (!livox_material_write_to_stream (material, self->assign_packet))
@@ -165,13 +165,13 @@ liext_module_free (LIExtModule* self)
 
 	if (self->blocks != NULL)
 	{
-		LI_FOREACH_MEMDIC (iter0, self->blocks)
+		LIALG_MEMDIC_FOREACH (iter0, self->blocks)
 			liext_block_free (iter0.value);
 		lialg_memdic_free (self->blocks);
 	}
 	if (self->listeners != NULL)
 	{
-		LI_FOREACH_PTRDIC (iter1, self->listeners)
+		LIALG_PTRDIC_FOREACH (iter1, self->listeners)
 			liext_listener_free (iter1.value);
 		lialg_ptrdic_free (self->listeners);
 	}
@@ -371,7 +371,7 @@ private_tick (LIExtModule* self,
 	LIAlgPtrdicIter iter1;
 
 	livox_manager_mark_updates (self->voxels);
-	LI_FOREACH_PTRDIC (iter1, self->listeners)
+	LIALG_PTRDIC_FOREACH (iter1, self->listeners)
 		liext_listener_update (iter1.value, secs);
 	livox_manager_update_marked (self->voxels);
 

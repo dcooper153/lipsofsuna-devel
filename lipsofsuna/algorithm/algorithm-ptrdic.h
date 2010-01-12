@@ -266,7 +266,7 @@ lialg_ptrdic_remove_node (LIAlgPtrdic*     self,
 
 /*****************************************************************************/
 
-#define LI_FOREACH_PTRDIC(iter, assoc) \
+#define LIALG_PTRDIC_FOREACH(iter, assoc) \
 	for (lialg_ptrdic_iter_start (&iter, assoc) ; \
 	     iter.node != NULL ; \
 	     lialg_ptrdic_iter_next (&iter))

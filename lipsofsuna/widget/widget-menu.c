@@ -458,7 +458,7 @@ private_rebuild (LIWdgMenu* self)
 			for (i = 0 ; i < self->items.count ; i++)
 			{
 				item = self->items.array[i];
-				size.width = LI_MAX (size.width, lifnt_layout_get_width (item->label));
+				size.width = LIMAT_MAX (size.width, lifnt_layout_get_width (item->label));
 				size.height += lifnt_font_get_height (self->font);
 				size.height += SPACINGY;
 			}

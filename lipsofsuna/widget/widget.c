@@ -236,10 +236,10 @@ liwdg_widget_paint (LIWdgWidget* self,
 
 	/* Calculate repeat counts. */
 	w[0] = style_->w[0];
-	w[1] = LI_MAX (1, style_->w[1]);
+	w[1] = LIMAT_MAX (1, style_->w[1]);
 	w[2] = style_->w[2];
 	h[0] = style_->h[0];
-	h[1] = LI_MAX (1, style_->h[1]);
+	h[1] = LIMAT_MAX (1, style_->h[1]);
 	h[2] = style_->h[2];
 
 	/* Calculate texture coordinates. */
@@ -292,7 +292,7 @@ liwdg_widget_paint (LIWdgWidget* self,
 	/* Paint horizontal borders. */
 	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
 	{
-		fw = LI_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
+		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
 		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
 		py = rect->y;
 		glBegin (GL_TRIANGLE_STRIP);
@@ -313,7 +313,7 @@ liwdg_widget_paint (LIWdgWidget* self,
 	/* Paint vertical borders. */
 	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
 	{
-		fh = LI_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
+		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
 		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
 		px = rect->x;
 		glBegin (GL_TRIANGLE_STRIP);
@@ -335,8 +335,8 @@ liwdg_widget_paint (LIWdgWidget* self,
 	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
 	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
 	{
-		fw = LI_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
-		fh = LI_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
+		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
+		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
 		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
 		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
 		glBegin (GL_TRIANGLE_STRIP);
@@ -570,9 +570,9 @@ liwdg_widget_get_request (LIWdgWidget* self,
 	request->width = self->hardrequest.width;
 	request->height = self->hardrequest.height;
 	if (self->userrequest.width != -1)
-		request->width = LI_MAX (request->width, self->userrequest.width);
+		request->width = LIMAT_MAX (request->width, self->userrequest.width);
 	if (self->userrequest.height != -1)
-		request->height = LI_MAX (request->height, self->userrequest.height);
+		request->height = LIMAT_MAX (request->height, self->userrequest.height);
 
 	/* Add style paddings. */
 	request->width += self->style->pad[1] + self->style->pad[2];

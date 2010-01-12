@@ -219,11 +219,11 @@ licli_network_update (LICliNetwork* self,
 	}
 
 	/* Update controls. */
-	licli_network_turn (self, -self->curr.controls.turn * secs * LI_CLIENT_ROTATION_SPEED, 0);
-	licli_network_tilt (self, -self->curr.controls.tilt * secs * LI_CLIENT_ROTATION_SPEED, 0);
+	licli_network_turn (self, -self->curr.controls.turn * secs * LICLI_ROTATION_SPEED, 0);
+	licli_network_tilt (self, -self->curr.controls.tilt * secs * LICLI_ROTATION_SPEED, 0);
 
 	/* Update cumulative orientation errors. */
-	diff = LI_ABS (self->curr.controls.move - self->prev.controls.move);
+	diff = LIMAT_ABS (self->curr.controls.move - self->prev.controls.move);
 	self->delta.movement += diff * secs * LICLI_NETWORK_MOVEMENT_ACCUM;
 	quat = limat_quaternion_subtract (self->curr.direction, self->prev.direction);
 	diff = limat_quaternion_get_length (quat);
@@ -242,8 +242,8 @@ licli_network_update (LICliNetwork* self,
 		{
 			/* FIXME: No analog support. */
 			uint32_t flags = 0;
-			if (self->curr.controls.move > 0.1f) flags |= LI_CONTROL_MOVE_FRONT;
-			if (self->curr.controls.move < -0.1f) flags |= LI_CONTROL_MOVE_BACK;
+			if (self->curr.controls.move > 0.1f) flags |= LINET_CONTROL_MOVE_FRONT;
+			if (self->curr.controls.move < -0.1f) flags |= LINET_CONTROL_MOVE_BACK;
 			liarc_writer_append_uint8 (writer, flags);
 			liarc_writer_append_int8 (writer, (int8_t)(127 * self->curr.direction.x));
 			liarc_writer_append_int8 (writer, (int8_t)(127 * self->curr.direction.y));
@@ -353,22 +353,22 @@ private_refused (LICliNetwork*    self,
 	switch (message->CONNECTION_REFUSED.reason)
 	{
 		case GRAPPLE_NOCONN_VERSION_MISMATCH:
-			lisys_error_set (LI_ERROR_VERSION, "incompatible server version");
+			lisys_error_set (LISYS_ERROR_VERSION, "incompatible server version");
 			break;
 		case GRAPPLE_NOCONN_SERVER_FULL:
-			lisys_error_set (LI_ERROR_UNKNOWN, "server is full");
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "server is full");
 			break;
 		case GRAPPLE_NOCONN_SERVER_CLOSED:
-			lisys_error_set (LI_ERROR_UNKNOWN, "server is closed");
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "server is closed");
 			break;
 		case GRAPPLE_NOCONN_PASSWORD_MISMATCH:
-			lisys_error_set (LI_ERROR_UNKNOWN, "invalid password");
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "invalid password");
 			break;
 		case GRAPPLE_NOCONN_NAME_NOT_UNIQUE:
-			lisys_error_set (LI_ERROR_UNKNOWN, "account already in use");
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "account already in use");
 			break;
 		default:
-			lisys_error_set (LI_ERROR_UNKNOWN, "unknown error %d", message->CONNECTION_REFUSED.reason);
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "unknown error %d", message->CONNECTION_REFUSED.reason);
 			break;
 	}
 	return 0;

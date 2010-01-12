@@ -120,7 +120,7 @@ ligen_generator_free (LIGenGenerator* self)
 
 	if (self->brushes != NULL)
 	{
-		LI_FOREACH_U32DIC (iter, self->brushes)
+		LIALG_U32DIC_FOREACH (iter, self->brushes)
 			ligen_brush_free (iter.value);
 		lialg_u32dic_free (self->brushes);
 	}
@@ -338,7 +338,7 @@ ligen_generator_remove_brush (LIGenGenerator* self,
 		return;
 
 	/* Clear references. */
-	LI_FOREACH_U32DIC (iter, self->brushes)
+	LIALG_U32DIC_FOREACH (iter, self->brushes)
 		ligen_brush_remove_strokes (iter.value, id);
 
 	/* Free brush. */
@@ -568,7 +568,7 @@ ligen_generator_write_brushes (LIGenGenerator* self)
 		return 0;
 
 	/* Save brushes. */
-	LI_FOREACH_U32DIC (iter, self->brushes)
+	LIALG_U32DIC_FOREACH (iter, self->brushes)
 	{
 		if (!ligen_brush_write (iter.value, self->gensql))
 			return 0;
@@ -640,9 +640,9 @@ private_init_brushes (LIGenGenerator* self)
 		size[0] = sqlite3_column_int (statement, col++);
 		size[1] = sqlite3_column_int (statement, col++);
 		size[2] = sqlite3_column_int (statement, col++);
-		size[0] = LI_MAX (1, size[0]);
-		size[1] = LI_MAX (1, size[1]);
-		size[2] = LI_MAX (1, size[2]);
+		size[0] = LIMAT_MAX (1, size[0]);
+		size[1] = LIMAT_MAX (1, size[1]);
+		size[2] = LIMAT_MAX (1, size[2]);
 
 		/* Create new brush. */
 		brush = ligen_brush_new (self, size[0], size[1], size[2]);
@@ -695,7 +695,7 @@ private_init_brushes (LIGenGenerator* self)
 	sqlite3_finalize (statement);
 
 	/* Read rules. */
-	LI_FOREACH_U32DIC (iter, self->brushes)
+	LIALG_U32DIC_FOREACH (iter, self->brushes)
 	{
 		if (!ligen_brush_read_rules (iter.value, sql))
 		{

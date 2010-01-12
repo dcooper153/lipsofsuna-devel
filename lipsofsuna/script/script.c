@@ -110,7 +110,7 @@ liscr_script_free (LIScrScript* self)
 	self->lua = NULL;
 
 	/* Free classes. */
-	LI_FOREACH_STRDIC (iter, self->classes)
+	LIALG_STRDIC_FOREACH (iter, self->classes)
 		liscr_class_free (iter.value);
 	lialg_strdic_free (self->classes);
 

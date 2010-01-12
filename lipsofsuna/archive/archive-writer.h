@@ -77,7 +77,7 @@ liarc_writer_append_file (LIArcWriter* self,
 int
 liarc_writer_append_format (LIArcWriter* self,
                             const char*  format,
-                                         ...) __LI_ATTRIBUTE_FORMAT(2, 3);
+                                         ...) LISYS_ATTR_FORMAT(2, 3);
 
 int
 liarc_writer_append_formatv (LIArcWriter* self,

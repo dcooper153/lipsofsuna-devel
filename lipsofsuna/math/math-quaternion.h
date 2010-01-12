@@ -151,10 +151,10 @@ limat_quaternion_look (LIMatVector dir,
 	/* Convert to quaternion. */
 	/* FIXME: Copied from math-convert. */
 	/* FIXME: Surely there is a more direct way to do this. */
-	self.x = 0.5f * sqrt (LI_MAX (0.0f, 1.0f + side.x - up.y + dir.z));
-	self.y = 0.5f * sqrt (LI_MAX (0.0f, 1.0f - side.x + up.y + dir.z));
-	self.z = 0.5f * sqrt (LI_MAX (0.0f, 1.0f - side.x - up.y - dir.z));
-	self.w = 0.5f * sqrt (LI_MAX (0.0f, 1.0f + side.x + up.y - dir.z));
+	self.x = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f + side.x - up.y + dir.z));
+	self.y = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f - side.x + up.y + dir.z));
+	self.z = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f - side.x - up.y - dir.z));
+	self.w = 0.5f * sqrt (LIMAT_MAX (0.0f, 1.0f + side.x + up.y - dir.z));
 	self.x = copysign (self.x, -dir.y - up.z);
 	self.y = copysign (self.y, side.z + dir.x);
 	self.z = copysign (self.z, up.x - side.y);
@@ -203,7 +203,7 @@ limat_quaternion_rotation (float       angle,
 	float q = sin (angle / 2);
 	float len = sqrtf (axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
 
-	if (len >= LI_MATH_EPSILON)
+	if (len >= LIMAT_EPSILON)
 	{
 		axis.x /= len;
 		axis.y /= len;
@@ -330,7 +330,7 @@ limat_quaternion_normalize (LIMatQuaternion self)
 	                  self.y * self.y +
 	                  self.z * self.z);
 
-	if (len < LI_MATH_EPSILON)
+	if (len < LIMAT_EPSILON)
 	{
 		result.x = 0.0f;
 		result.y = 0.0f;
@@ -464,13 +464,13 @@ limat_quaternion_get_euler (LIMatQuaternion self,
 	float zz = self.z * self.z;
 
 	tmp = self.x * self.y + self.z * self.w;
-	if (tmp >= 0.5f - LI_MATH_EPSILON)
+	if (tmp >= 0.5f - LIMAT_EPSILON)
 	{
 		*phi = 2 * atan2 (self.x, self.w);
 		*theta = 0.5f * M_PI;
 		*psi = 0.0f;
 	}
-	else if (tmp <= -0.5f + LI_MATH_EPSILON)
+	else if (tmp <= -0.5f + LIMAT_EPSILON)
 	{
 		*phi = -2 * atan2 (self.x, self.w);
 		*theta = -0.5f * M_PI;

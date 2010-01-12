@@ -148,19 +148,19 @@ liwdg_styles_free (LIWdgStyles* self)
 
 	if (self->fonts != NULL)
 	{
-		LI_FOREACH_STRDIC (iter, self->fonts)
+		LIALG_STRDIC_FOREACH (iter, self->fonts)
 			lifnt_font_free (iter.value);
 		lialg_strdic_free (self->fonts);
 	}
 	if (self->images != NULL)
 	{
-		LI_FOREACH_STRDIC (iter, self->images)
+		LIALG_STRDIC_FOREACH (iter, self->images)
 			liimg_texture_free (iter.value);
 		lialg_strdic_free (self->images);
 	}
 	if (self->subimgs != NULL)
 	{
-		LI_FOREACH_STRDIC (iter, self->subimgs)
+		LIALG_STRDIC_FOREACH (iter, self->subimgs)
 			lisys_free (iter.value);
 		lialg_strdic_free (self->subimgs);
 	}

@@ -303,7 +303,7 @@ lialg_memdic_remove_node (LIAlgMemdic*     self,
 
 /*****************************************************************************/
 
-#define LI_FOREACH_MEMDIC(iter, assoc) \
+#define LIALG_MEMDIC_FOREACH(iter, assoc) \
 	for (lialg_memdic_iter_start (&iter, assoc) ; \
 	     iter.node != NULL ; \
 	     lialg_memdic_iter_next (&iter))

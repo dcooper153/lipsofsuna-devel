@@ -616,12 +616,12 @@ private_paint_terrain (LIExtBrushes* self,
 		liext_preview_get_bounds (preview, &aabb);
 		if (!limat_intersect_aabb_line_far (&aabb, line + 0, line + 1, point))
 			return 0;
-		if (LI_ABS (point->x - aabb.min.x) < LI_MATH_EPSILON) point->x += 0.5;
-		if (LI_ABS (point->y - aabb.max.y) < LI_MATH_EPSILON) point->y -= 0.5;
-		if (LI_ABS (point->y - aabb.min.y) < LI_MATH_EPSILON) point->y += 0.5;
-		if (LI_ABS (point->y - aabb.max.y) < LI_MATH_EPSILON) point->y -= 0.5;
-		if (LI_ABS (point->z - aabb.min.z) < LI_MATH_EPSILON) point->z += 0.5;
-		if (LI_ABS (point->z - aabb.max.z) < LI_MATH_EPSILON) point->z -= 0.5;
+		if (LIMAT_ABS (point->x - aabb.min.x) < LIMAT_EPSILON) point->x += 0.5;
+		if (LIMAT_ABS (point->y - aabb.max.y) < LIMAT_EPSILON) point->y -= 0.5;
+		if (LIMAT_ABS (point->y - aabb.min.y) < LIMAT_EPSILON) point->y += 0.5;
+		if (LIMAT_ABS (point->y - aabb.max.y) < LIMAT_EPSILON) point->y -= 0.5;
+		if (LIMAT_ABS (point->z - aabb.min.z) < LIMAT_EPSILON) point->z += 0.5;
+		if (LIMAT_ABS (point->z - aabb.max.z) < LIMAT_EPSILON) point->z -= 0.5;
 		result.point = *point;
 		border = 1;
 	}
@@ -835,7 +835,7 @@ private_rename (LIExtBrushes* self,
 			break;
 		case LIEXT_BRUSHES_ROWTYPE_STROKE:
 			name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
-			LI_FOREACH_U32DIC (iter, self->generator->brushes)
+			LIALG_U32DIC_FOREACH (iter, self->generator->brushes)
 			{
 				brush = iter.value;
 				if (!strcmp (name, brush->name))
@@ -1315,7 +1315,7 @@ private_populate (LIExtBrushes* self)
 	}
 
 	/* Append brushes. */
-	LI_FOREACH_U32DIC (iter, self->generator->brushes)
+	LIALG_U32DIC_FOREACH (iter, self->generator->brushes)
 	{
 		brush = iter.value;
 		private_append_brush (self, brush);
@@ -1342,9 +1342,9 @@ private_resize_brush (LIExtBrushes* self)
 	x = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizex));
 	y = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizey));
 	z = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizez));
-	x = LI_MAX (1, x);
-	y = LI_MAX (1, y);
-	z = LI_MAX (1, z);
+	x = LIMAT_MAX (1, x);
+	y = LIMAT_MAX (1, y);
+	z = LIMAT_MAX (1, z);
 	ligen_brush_set_size (data->brush, x, y, z);
 
 	/* Rebuild preview. */

@@ -397,7 +397,7 @@ liren_scene_update (LIRenScene* self,
 	LIRenObject* object;
 
 	/* Update objects. */
-	LI_FOREACH_U32DIC (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
 		liren_object_update (object, secs);
@@ -557,7 +557,7 @@ private_lighting_render (LIRenScene*    self,
 	liren_context_set_textures (context, textures, 4);
 
 	/* Let each light lit the scene. */
-	LI_FOREACH_PTRDIC (iter, self->lighting->lights)
+	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 	{
 		light = iter.value;
 		liren_context_set_lights (context, &light, 1);
@@ -604,7 +604,7 @@ private_lighting_render (LIRenScene*    self,
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (matrix.m);
 	glDisable (GL_LIGHTING);
-	LI_FOREACH_PTRDIC (iter, self->lighting->lights)
+	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 	{
 		light = iter.value;
 		if (private_light_bounds (self, light, context, viewport, bounds))
@@ -699,7 +699,7 @@ private_render (LIRenScene*   self,
 	LIRenObject* rndobj;
 	LIRenGroupObject* grpobj;
 
-	LI_FOREACH_U32DIC (iter0, self->objects)
+	LIALG_U32DIC_FOREACH (iter0, self->objects)
 	{
 		rndobj = iter0.value;
 		if (!liren_object_get_realized (rndobj))
@@ -709,7 +709,7 @@ private_render (LIRenScene*   self,
 			continue;
 		call (context, rndobj, data);
 	}
-	LI_FOREACH_PTRDIC (iter1, self->groups)
+	LIALG_PTRDIC_FOREACH (iter1, self->groups)
 	{
 		group = iter1.value;
 		if (!liren_group_get_realized (group))

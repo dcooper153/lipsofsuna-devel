@@ -61,7 +61,7 @@ liext_skills_free (LIExtSkills* self)
 {
 	LIAlgStrdicIter iter;
 
-	LI_FOREACH_STRDIC (iter, self->skills)
+	LIALG_STRDIC_FOREACH (iter, self->skills)
 		lisys_free (iter.value);
 	lialg_strdic_free (self->skills);
 	lisys_free (self);
@@ -78,7 +78,7 @@ liext_skills_clear (LIExtSkills* self)
 {
 	LIAlgStrdicIter iter;
 
-	LI_FOREACH_STRDIC (iter, self->skills)
+	LIALG_STRDIC_FOREACH (iter, self->skills)
 		lisys_free (iter.value);
 	lialg_strdic_clear (self->skills);
 }
