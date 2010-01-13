@@ -220,7 +220,7 @@ static void Camera_setter_mode (LIScrArgs* args)
 	const char* value;
 	LIExtModule* module;
 
-	if (liscr_args_gets_string (args, 0, &value))
+	if (liscr_args_geti_string (args, 0, &value))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 		if (!strcmp (value, "first-person"))
@@ -286,7 +286,7 @@ static void Camera_getter_rotation (LIScrArgs* args)
 
 void
 liext_script_camera (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CAMERA, data);
 	liscr_class_insert_cfunc (self, "move", Camera_move);
