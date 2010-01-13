@@ -34,7 +34,7 @@ private_free (LIWdgRender* self);
 
 static int
 private_event (LIWdgRender* self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 const LIWdgClass liwdg_widget_render =
 {
@@ -156,7 +156,7 @@ private_free (LIWdgRender* self)
 
 static int
 private_event (LIWdgRender* self,
-               liwdgEvent*  event)
+               LIWdgEvent*  event)
 {
 	int i;
 	LIMatFrustum frustum;

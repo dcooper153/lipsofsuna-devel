@@ -44,6 +44,7 @@ struct _LIWdgEntry
 	LIFntFont* font;
 	LIFntLayout* text;
 	char* string;
+	unsigned int focused : 1;
 	unsigned int editable : 1;
 	unsigned int secret : 1;
 };

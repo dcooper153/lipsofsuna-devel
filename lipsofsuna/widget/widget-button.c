@@ -34,7 +34,7 @@ private_free (LIWdgButton* self);
 
 static int
 private_event (LIWdgButton* self,
-               liwdgEvent*  event);
+               LIWdgEvent*  event);
 
 static void
 private_rebuild (LIWdgButton* self);
@@ -122,7 +122,7 @@ private_free (LIWdgButton* self)
 
 static int
 private_event (LIWdgButton* self,
-               liwdgEvent*  event)
+               LIWdgEvent*  event)
 {
 	int w;
 	int h;
@@ -155,8 +155,7 @@ private_event (LIWdgButton* self,
 				rect.y + (rect.height - h) / 2);
 			break;
 		case LIWDG_EVENT_TYPE_UPDATE:
-			if (liwdg_widget_get_focus_mouse (LIWDG_WIDGET (self)) ||
-			    liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
+			if (liwdg_widget_get_focused (LIWDG_WIDGET (self)))
 				liwdg_widget_set_state (LIWDG_WIDGET (self), "focus");
 			else
 				liwdg_widget_set_state (LIWDG_WIDGET (self), NULL);

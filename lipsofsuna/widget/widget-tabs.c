@@ -33,7 +33,7 @@ private_free (LIWdgTabs* self);
 
 static int
 private_event (LIWdgTabs*  self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static LIWdgWidget*
 private_child_at (LIWdgTabs* self,
@@ -162,7 +162,7 @@ private_free (LIWdgTabs* self)
 
 static int
 private_event (LIWdgTabs*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int i;
 	LIWdgRect rect;

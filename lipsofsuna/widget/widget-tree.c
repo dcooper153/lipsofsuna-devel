@@ -60,7 +60,7 @@ private_free (LIWdgTree* self);
 
 static int
 private_event (LIWdgTree*  self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static void
 private_rebuild (LIWdgTree* self);
@@ -345,7 +345,7 @@ private_free (LIWdgTree* self)
 
 static int
 private_event (LIWdgTree*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int y;
 	LIWdgRect rect;

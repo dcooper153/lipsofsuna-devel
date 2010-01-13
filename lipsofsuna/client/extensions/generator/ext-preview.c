@@ -54,7 +54,7 @@ private_free (LIExtPreview* self);
 
 static int
 private_event (LIExtPreview* self,
-               liwdgEvent*   event);
+               LIWdgEvent*   event);
 
 static int
 private_block_build (LIExtPreview* self,
@@ -71,7 +71,7 @@ private_block_load (LIExtPreview*     self,
 
 static void
 private_motion (LIExtPreview* self,
-                liwdgEvent*   event);
+                LIWdgEvent*   event);
 
 static void
 private_render_preview (LIWdgWidget*  widget,
@@ -488,7 +488,7 @@ private_free (LIExtPreview* self)
 
 static int
 private_event (LIExtPreview* self,
-               liwdgEvent*   event)
+               LIWdgEvent*   event)
 {
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
@@ -702,7 +702,7 @@ private_block_load (LIExtPreview*     self,
 
 static void
 private_motion (LIExtPreview* self,
-                liwdgEvent*   event)
+                LIWdgEvent*   event)
 {
 	float amount;
 	LIMatVector vx;

@@ -48,7 +48,7 @@ private_edit (LIExtDialog* self);
 
 static int
 private_event (LIExtDialog* self,
-               liwdgEvent*  event);
+               LIWdgEvent*  event);
 
 static int
 private_insert (LIExtDialog* self);
@@ -214,7 +214,7 @@ private_edit (LIExtDialog* self)
 
 static int
 private_event (LIExtDialog* self,
-               liwdgEvent*  event)
+               LIWdgEvent*  event)
 {
 	return liwdg_widget_window.event (LIWDG_WIDGET (self), event);
 }

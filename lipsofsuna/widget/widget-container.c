@@ -33,7 +33,7 @@ private_free (LIWdgContainer* self);
 
 static int
 private_event (LIWdgContainer* self,
-               liwdgEvent*     event);
+               LIWdgEvent*     event);
 
 /*****************************************************************************/
 
@@ -58,7 +58,7 @@ liwdg_container_child_at (LIWdgContainer* self,
                           int             x,
                           int             y)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
@@ -88,7 +88,7 @@ void
 liwdg_container_child_request (LIWdgContainer* self,
                                LIWdgWidget*    child)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
@@ -111,7 +111,7 @@ liwdg_container_cycle_focus (LIWdgContainer* self,
                              LIWdgWidget*    curr,
                              int             dir)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
@@ -141,7 +141,7 @@ void
 liwdg_container_detach_child (LIWdgContainer* self,
                               LIWdgWidget*    child)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
@@ -171,7 +171,7 @@ liwdg_container_foreach_child (LIWdgContainer* self,
                                void          (*call)(),
                                void*           data)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
@@ -207,7 +207,7 @@ liwdg_container_translate_coords (LIWdgContainer* self,
                                   int*            childx,
                                   int*            childy)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgContainerIface* iface;
 
 	/* Probe interface. */
@@ -245,7 +245,7 @@ private_free (LIWdgContainer* self)
 
 static int
 private_event (LIWdgContainer* self,
-               liwdgEvent*     event)
+               LIWdgEvent*     event)
 {
 	int x;
 	int y;
@@ -306,7 +306,6 @@ private_event (LIWdgContainer* self,
 		child = liwdg_container_child_at (self, x, y);
 		if (child != NULL)
 		{
-			liwdg_widget_set_focus_mouse (child);
 			if (!liwdg_widget_event (child, event))
 				return 0;
 		}

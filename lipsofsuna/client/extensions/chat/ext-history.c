@@ -41,7 +41,7 @@ private_free (LIExtChatHistory* self);
 
 static int
 private_event (LIExtChatHistory* self,
-               liwdgEvent*       event);
+               LIWdgEvent*       event);
 
 static void
 private_rebuild (LIExtChatHistory* self);
@@ -148,7 +148,7 @@ private_free (LIExtChatHistory* self)
 
 static int
 private_event (LIExtChatHistory* self,
-               liwdgEvent*       event)
+               LIWdgEvent*       event)
 {
 	return liwdg_widget_label.event (LIWDG_WIDGET (self), event);
 }

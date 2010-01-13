@@ -46,7 +46,7 @@ private_free (LIWdgGroup* self);
 
 static int
 private_event (LIWdgGroup* self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static LIWdgWidget*
 private_child_at (LIWdgGroup* self,
@@ -414,9 +414,6 @@ liwdg_group_set_child (LIWdgGroup*  self,
 		lical_callbacks_call (manager->callbacks, manager, "widget-attach", lical_marshal_DATA_PTR_PTR, child, self);
 	}
 
-	/* Ensure valid focus. */
-	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
-
 	/* Update the size of the cell. */
 	private_cell_changed (self, x, y);
 }
@@ -709,9 +706,6 @@ liwdg_group_set_size (LIWdgGroup* self,
 			self->row_expand++;
 	}
 
-	/* Ensure valid focus. */
-	liwdg_manager_fix_focus (LIWDG_WIDGET (self)->manager);
-
 	/* Update the size request. */
 	private_rebuild (self, PRIVATE_REBUILD_REQUEST);
 	return 1;
@@ -793,14 +787,6 @@ private_free (LIWdgGroup* self)
 {
 	int x;
 	int y;
-	LIWdgManager* manager;
-
-	/* Remove child focus. */
-	manager = LIWDG_WIDGET (self)->manager;
-	x = LIWDG_WIDGET (self)->visible;
-	LIWDG_WIDGET (self)->visible = 0;
-	liwdg_manager_fix_focus (manager);
-	LIWDG_WIDGET (self)->visible = x;
 
 	/* Free children. */
 	for (y = 0 ; y < self->height ; y++)
@@ -814,7 +800,7 @@ private_free (LIWdgGroup* self)
 
 static int
 private_event (LIWdgGroup* self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int i;
 	LIWdgWidget* child;
@@ -980,11 +966,11 @@ private_cycle_focus (LIWdgGroup*  self,
 		if (!found)
 		{
 			x = 0;
-			y = self->height - 1;
+			y = 0;
 		}
 
 		/* Iterate forward. */
-		for ( ; y >= 0 ; y--, x = 0)
+		for ( ; y < self->height ; y++, x = 0)
 		for ( ; x < self->width ; x++)
 		{
 			if (!found)
@@ -1014,11 +1000,11 @@ private_cycle_focus (LIWdgGroup*  self,
 		if (!found)
 		{
 			x = self->width - 1;
-			y = 0;
+			y = self->height - 1;
 		}
 
 		/* Iterate backward. */
-		for ( ; y < self->height ; y++, x = self->width - 1)
+		for ( ; y >= 0 ; y--, x = self->width - 1)
 		for ( ; x >= 0 ; x--)
 		{
 			if (!found)

@@ -18,7 +18,7 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup liwdgEvent Event
+ * \addtogroup LIWdgEvent Event
  * @{
  */
 
@@ -34,8 +34,6 @@ enum
 	LIWDG_EVENT_TYPE_BUTTON_PRESS,
 	LIWDG_EVENT_TYPE_BUTTON_RELEASE,
 	LIWDG_EVENT_TYPE_CLOSE,
-	LIWDG_EVENT_TYPE_FOCUS_GAIN,
-	LIWDG_EVENT_TYPE_FOCUS_LOSE,
 	LIWDG_EVENT_TYPE_KEY_PRESS,
 	LIWDG_EVENT_TYPE_KEY_RELEASE,
 	LIWDG_EVENT_TYPE_MOTION,
@@ -45,10 +43,9 @@ enum
 	LIWDG_EVENT_TYPE_MAX,
 };
 
-typedef union _liwdgEvent liwdgEvent;
+typedef union _LIWdgEvent LIWdgEvent;
 typedef struct _LIWdgEventAllocation LIWdgEventAllocation;
 typedef struct _LIWdgEventButton LIWdgEventButton;
-typedef struct _LIWdgEventFocus LIWdgEventFocus;
 typedef struct _LIWdgEventKey LIWdgEventKey;
 typedef struct _LIWdgEventMotion LIWdgEventMotion;
 typedef struct _LIWdgEventProbe LIWdgEventProbe;
@@ -65,12 +62,6 @@ struct _LIWdgEventButton
 	int x;
 	int y;
 	int button;
-};
-
-struct _LIWdgEventFocus
-{
-	int type;
-	int mouse;
 };
 
 struct _LIWdgEventKey
@@ -104,12 +95,11 @@ struct _LIWdgEventUpdate
 	float secs;
 };
 
-union _liwdgEvent
+union _LIWdgEvent
 {
 	int type;
 	LIWdgEventAllocation allocation;
 	LIWdgEventButton button;
-	LIWdgEventFocus focus;
 	LIWdgEventKey key;
 	LIWdgEventMotion motion;
 	LIWdgEventProbe probe;

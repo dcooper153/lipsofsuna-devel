@@ -32,7 +32,7 @@
 
 typedef int  (*LIWdgWidgetInitFunc)(LIWdgWidget*, LIWdgManager*);
 typedef void (*LIWdgWidgetFreeFunc)(LIWdgWidget*);
-typedef int  (*LIWdgWidgetEventFunc)(LIWdgWidget*, liwdgEvent*);
+typedef int  (*LIWdgWidgetEventFunc)(LIWdgWidget*, LIWdgEvent*);
 typedef void* (*LIWdgWidgetExtendFunc)(LIWdgWidget*, LIWdgClass* clss);
 
 struct _LIWdgClass

@@ -39,7 +39,7 @@ private_free (LIExtOptions* self);
 
 static int
 private_event (LIExtOptions* self,
-               liwdgEvent*   event);
+               LIWdgEvent*   event);
 
 static void
 private_fsaa (LIExtOptions* self);
@@ -147,7 +147,7 @@ private_free (LIExtOptions* self)
 
 static int
 private_event (LIExtOptions* self,
-               liwdgEvent*   event)
+               LIWdgEvent*   event)
 {
 	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }

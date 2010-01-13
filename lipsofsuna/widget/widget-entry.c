@@ -34,7 +34,7 @@ private_free (LIWdgEntry*   self);
 
 static int
 private_event (LIWdgEntry* self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static void
 private_backspace (LIWdgEntry* self);
@@ -166,9 +166,10 @@ private_free (LIWdgEntry* self)
 
 static int
 private_event (LIWdgEntry* self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int len;
+	int focus;
 	char* str;
 	char* tmp;
 	LIWdgManager* manager;
@@ -177,16 +178,10 @@ private_event (LIWdgEntry* self,
 
 	switch (event->type)
 	{
-		case LIWDG_EVENT_TYPE_FOCUS_GAIN:
-		case LIWDG_EVENT_TYPE_FOCUS_LOSE:
-			if (!event->focus.mouse)
-				private_rebuild (self);
-			return 0;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			if (!self->editable)
 				return 1;
-			liwdg_widget_set_focus_keyboard (LIWDG_WIDGET (self));
 			return 0;
 		case LIWDG_EVENT_TYPE_KEY_PRESS:
 			if (!self->editable)
@@ -250,6 +245,12 @@ private_event (LIWdgEntry* self,
 			glPopAttrib ();
 			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
+			focus = liwdg_widget_get_focused (LIWDG_WIDGET (self));
+			if (self->focused != focus)
+			{
+				self->focused = focus;
+				private_rebuild (self);
+			}
 			return 1;
 	}
 
@@ -312,7 +313,7 @@ private_rebuild (LIWdgEntry* self)
 			lifnt_layout_append_string (self->text, self->font, self->string);
 
 		/* Append cursor. */
-		if (liwdg_widget_get_focus_keyboard (LIWDG_WIDGET (self)))
+		if (self->focused)
 			lifnt_layout_append_string (self->text, self->font, "|");
 
 		h = lifnt_font_get_height (self->font);

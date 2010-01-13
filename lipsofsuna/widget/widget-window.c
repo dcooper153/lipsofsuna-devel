@@ -37,7 +37,7 @@ private_free (LIWdgWindow* self);
 
 static int
 private_event (LIWdgWindow* self,
-               liwdgEvent*  event);
+               LIWdgEvent*  event);
 
 const LIWdgClass liwdg_widget_window =
 {
@@ -119,7 +119,7 @@ private_free (LIWdgWindow* self)
 
 static int
 private_event (LIWdgWindow* self,
-               liwdgEvent*  event)
+               LIWdgEvent*  event)
 {
 	int i;
 	LIWdgRect rect;

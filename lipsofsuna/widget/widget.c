@@ -41,7 +41,7 @@ private_free (LIWdgWidget* self);
 
 static int
 private_event (LIWdgWidget* self,
-               liwdgEvent*  event);
+               LIWdgEvent*  event);
 
 static void
 private_rebuild_style (LIWdgWidget* self);
@@ -84,9 +84,6 @@ void
 liwdg_widget_free (LIWdgWidget* self)
 {
 	const LIWdgClass* ptr;
-
-	assert (self->manager->focus.keyboard != self);
-	assert (self->manager->focus.mouse != self);
 
 	lical_callbacks_call (self->manager->callbacks, self->manager, "widget-free", lical_marshal_DATA_PTR, self);
 	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
@@ -144,7 +141,6 @@ liwdg_widget_detach (LIWdgWidget* self)
 			break;
 	}
 	self->state = LIWDG_WIDGET_STATE_DETACHED;
-	liwdg_manager_fix_focus (self->manager);
 
 	return changed;
 }
@@ -152,7 +148,7 @@ liwdg_widget_detach (LIWdgWidget* self)
 void
 liwdg_widget_draw (LIWdgWidget* self)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 
 	if (self->visible)
 	{
@@ -170,7 +166,7 @@ liwdg_widget_draw (LIWdgWidget* self)
  */
 int
 liwdg_widget_event (LIWdgWidget* self,
-                    liwdgEvent*  event)
+                    LIWdgEvent*  event)
 {
 	return self->type->event (self, event);
 }
@@ -409,7 +405,7 @@ void
 liwdg_widget_update (LIWdgWidget* self,
                      float        secs)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 
 	event.type = LIWDG_EVENT_TYPE_UPDATE;
 	event.update.secs = secs;
@@ -430,7 +426,7 @@ liwdg_widget_set_allocation (LIWdgWidget* self,
                              int          w,
                              int          h)
 {
-	liwdgEvent event;
+	LIWdgEvent event;
 
 	if (self->allocation.x != x ||
 	    self->allocation.y != y ||
@@ -464,52 +460,6 @@ liwdg_widget_get_content (LIWdgWidget* self,
 	allocation->height = self->allocation.height - self->style->pad[0] - self->style->pad[3];
 }
 
-/**
- * \brief Gets the mouse focus state of the widget.
- *
- * \param self Widget.
- * \return Nonzero if the widget has mouse focus.
- */
-int
-liwdg_widget_get_focus_mouse (LIWdgWidget* self)
-{
-	return (liwdg_manager_get_focus_mouse (self->manager) == self);
-}
-
-/**
- * \brief Gives mouse focus to the widget.
- *
- * \param self Widget.
- */
-void
-liwdg_widget_set_focus_mouse (LIWdgWidget* self)
-{
-	liwdg_manager_set_focus_mouse (self->manager, self);
-}
-
-/**
- * \brief Gets the keyboard focus state of the widget.
- *
- * \param self Widget.
- * \return Nonzero if the widget has keyboard focus.
- */
-int
-liwdg_widget_get_focus_keyboard (LIWdgWidget* self)
-{
-	return (liwdg_manager_get_focus_keyboard (self->manager) == self);
-}
-
-/**
- * \brief Gives keyboard focus to the widget.
- *
- * \param self Widget.
- */
-void
-liwdg_widget_set_focus_keyboard (LIWdgWidget* self)
-{
-	liwdg_manager_set_focus_keyboard (self->manager, self);
-}
-
 int
 liwdg_widget_get_focusable (LIWdgWidget* self)
 {
@@ -521,6 +471,31 @@ liwdg_widget_set_focusable (LIWdgWidget* self,
                             int          focusable)
 {
 	self->focusable = focusable;
+}
+
+/**
+ * \brief Gets the focus state of the widget.
+ *
+ * \param self Widget.
+ * \return Nonzero if the widget has focus.
+ */
+int
+liwdg_widget_get_focused (LIWdgWidget* self)
+{
+	return (liwdg_manager_get_focus (self->manager) == self);
+}
+
+/**
+ * \brief Gives focus to the widget.
+ *
+ * \param self Widget.
+ */
+void
+liwdg_widget_set_focused (LIWdgWidget* self)
+{
+	if (liwdg_manager_get_focus (self->manager) != self &&
+	    liwdg_widget_get_visible (self))
+		liwdg_manager_set_focus (self->manager, self);
 }
 
 int
@@ -728,8 +703,6 @@ liwdg_widget_set_visible (LIWdgWidget* self,
 		liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
 	if (self->state == LIWDG_WIDGET_STATE_POPUP)
 		liwdg_manager_remove_popup (self->manager, self);
-	if (!visible)
-		liwdg_manager_fix_focus (self->manager);
 }
 
 /*****************************************************************************/
@@ -788,7 +761,7 @@ private_free (LIWdgWidget* self)
 
 static int
 private_event (LIWdgWidget* self,
-               liwdgEvent*  event)
+               LIWdgEvent*  event)
 {
 	if (event->type == LIWDG_EVENT_TYPE_CLOSE)
 	{

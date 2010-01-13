@@ -34,7 +34,7 @@ private_free (LIWdgImage* self);
 
 static int
 private_event (LIWdgImage* self,
-               liwdgEvent*  event);
+               LIWdgEvent*  event);
 
 static void
 private_rebuild (LIWdgImage* self);
@@ -100,7 +100,7 @@ private_free (LIWdgImage* self)
 
 static int
 private_event (LIWdgImage* self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	switch (event->type)
 	{

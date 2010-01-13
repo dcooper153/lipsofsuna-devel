@@ -34,7 +34,7 @@ private_free (LIWdgCheck* self);
 
 static int
 private_event (LIWdgCheck* self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static void
 private_rebuild (LIWdgCheck* self);
@@ -139,7 +139,7 @@ private_free (LIWdgCheck* self)
 
 static int
 private_event (LIWdgCheck* self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int h;
 	LIWdgRect rect;

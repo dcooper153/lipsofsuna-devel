@@ -34,7 +34,7 @@ private_free (LIWdgScroll* self);
 
 static int
 private_event (LIWdgScroll* self,
-               liwdgEvent*    event);
+               LIWdgEvent*    event);
 
 static void
 private_rebuild (LIWdgScroll* self);
@@ -120,7 +120,7 @@ private_free (LIWdgScroll* self)
 
 static int
 private_event (LIWdgScroll*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int w;
 	int h;

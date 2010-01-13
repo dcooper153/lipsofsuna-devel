@@ -42,7 +42,7 @@ private_free (LIExtEditor* self);
 
 static int
 private_event (LIExtEditor* self,
-               liwdgEvent*  event);
+               LIWdgEvent*  event);
 
 /****************************************************************************/
 
@@ -134,7 +134,7 @@ private_free (LIExtEditor* self)
 
 static int
 private_event (LIExtEditor* self,
-               liwdgEvent*  event)
+               LIWdgEvent*  event)
 {
 	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }

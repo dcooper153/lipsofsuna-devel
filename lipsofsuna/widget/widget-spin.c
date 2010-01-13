@@ -34,7 +34,7 @@ private_free (LIWdgSpin* self);
 
 static int
 private_event (LIWdgSpin* self,
-               liwdgEvent*    event);
+               LIWdgEvent*    event);
 
 static void
 private_rebuild (LIWdgSpin* self);
@@ -106,7 +106,7 @@ private_free (LIWdgSpin* self)
 
 static int
 private_event (LIWdgSpin*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int w;
 	int h;

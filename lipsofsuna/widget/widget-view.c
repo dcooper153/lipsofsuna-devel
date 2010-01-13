@@ -33,7 +33,7 @@ private_free (LIWdgView* self);
 
 static int
 private_event (LIWdgView*  self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static LIWdgWidget*
 private_child_at (LIWdgView* self,
@@ -178,7 +178,7 @@ private_free (LIWdgView* self)
 
 static int
 private_event (LIWdgView*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	LIWdgRect rect;
 	LIWdgManager* manager;

@@ -38,7 +38,7 @@ private_free (LIWdgMenu* self);
 
 static int
 private_event (LIWdgMenu*  self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static void
 private_render_horizontal (LIWdgMenu* self);
@@ -232,7 +232,7 @@ private_free (LIWdgMenu* self)
 
 static int
 private_event (LIWdgMenu*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	LIWdgMenuItem* item;
 

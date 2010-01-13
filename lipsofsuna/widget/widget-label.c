@@ -34,7 +34,7 @@ private_free (LIWdgLabel* self);
 
 static int
 private_event (LIWdgLabel* self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static void
 private_rebuild (LIWdgLabel* self);
@@ -177,7 +177,7 @@ private_free (LIWdgLabel* self)
 
 static int
 private_event (LIWdgLabel* self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	int w;
 	int h;

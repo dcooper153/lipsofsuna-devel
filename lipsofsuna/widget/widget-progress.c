@@ -34,7 +34,7 @@ private_free (LIWdgProgress* self);
 
 static int
 private_event (LIWdgProgress* self,
-               liwdgEvent*    event);
+               LIWdgEvent*    event);
 
 static void
 private_rebuild (LIWdgProgress* self);
@@ -133,7 +133,7 @@ private_free (LIWdgProgress* self)
 
 static int
 private_event (LIWdgProgress* self,
-               liwdgEvent*    event)
+               LIWdgEvent*    event)
 {
 	int w;
 	int h;

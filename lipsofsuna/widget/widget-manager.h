@@ -43,15 +43,15 @@ struct _LIWdgManager
 	LIVidCalls video;
 	struct
 	{
+		LIWdgWidget* top;
+		LIWdgWidget* bottom;
+	} dialogs;
+	struct
+	{
 		int active;
 		int startx;
 		int starty;
 	} drag;
-	struct
-	{
-		LIWdgWidget* keyboard;
-		LIWdgWidget* mouse;
-	} focus;
 	struct
 	{
 		int x;
@@ -62,8 +62,6 @@ struct _LIWdgManager
 		LIWdgWidget* iter;
 		LIWdgWidget* root;
 		LIWdgWidget* grab;
-		LIWdgWidget* active;
-		LIWdgWidget* dialogs;
 		LIWdgWidget* popups;
 	} widgets;
 };
@@ -90,7 +88,7 @@ liwdg_manager_cycle_window_focus (LIWdgManager* self,
 
 int
 liwdg_manager_event (LIWdgManager* self,
-                     liwdgEvent*   event);
+                     LIWdgEvent*   event);
 
 int
 liwdg_manager_event_sdl (LIWdgManager* manager,
@@ -105,12 +103,14 @@ liwdg_manager_find_style (LIWdgManager* self,
                           const char*   name);
 
 LIWdgWidget*
-liwdg_manager_find_window_by_point (LIWdgManager* self,
+liwdg_manager_find_widget_by_point (LIWdgManager* self,
                                     int           x,
                                     int           y);
 
-void
-liwdg_manager_fix_focus (LIWdgManager* self);
+LIWdgWidget*
+liwdg_manager_find_window_by_point (LIWdgManager* self,
+                                    int           x,
+                                    int           y);
 
 int
 liwdg_manager_insert_popup (LIWdgManager* self,
@@ -136,18 +136,11 @@ liwdg_manager_update (LIWdgManager* self,
                       float         secs);
 
 LIWdgWidget*
-liwdg_manager_get_focus_keyboard (LIWdgManager* self);
+liwdg_manager_get_focus (LIWdgManager* self);
 
 void
-liwdg_manager_set_focus_keyboard (LIWdgManager* self,
-                                  LIWdgWidget*  widget);
-
-LIWdgWidget*
-liwdg_manager_get_focus_mouse (LIWdgManager* self);
-
-void
-liwdg_manager_set_focus_mouse (LIWdgManager* self,
-                               LIWdgWidget*  widget);
+liwdg_manager_set_focus (LIWdgManager* self,
+                         LIWdgWidget*  widget);
 
 void
 liwdg_manager_get_projection (LIWdgManager* self,

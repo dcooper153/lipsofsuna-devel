@@ -30,7 +30,7 @@ private_free (LIWdgLogin* self);
 
 static int
 private_event (LIWdgLogin* self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 static void
 private_import (LIWdgLogin* self);
@@ -265,7 +265,7 @@ private_init (LIWdgLogin*   self,
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 1, self->group_entries);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->group_buttons);
-	liwdg_manager_set_focus_keyboard (manager, self->entry_name);
+	liwdg_manager_set_focus (manager, self->entry_name);
 	return 1;
 
 error:
@@ -293,7 +293,7 @@ private_free (LIWdgLogin* self)
 
 static int
 private_event (LIWdgLogin* self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }

@@ -77,7 +77,7 @@ liwdg_widget_draw (LIWdgWidget* self);
 
 int
 liwdg_widget_event (LIWdgWidget* self,
-                    liwdgEvent*  event);
+                    LIWdgEvent*  event);
 
 int
 liwdg_widget_insert_callback (LIWdgWidget* self,
@@ -140,23 +140,17 @@ liwdg_widget_set_grab (LIWdgWidget* self,
                        int          value);
 
 int
-liwdg_widget_get_focus_mouse (LIWdgWidget* self);
-
-void
-liwdg_widget_set_focus_mouse (LIWdgWidget* self);
-
-int
-liwdg_widget_get_focus_keyboard (LIWdgWidget* self);
-
-void
-liwdg_widget_set_focus_keyboard (LIWdgWidget* self);
-
-int
 liwdg_widget_get_focusable (LIWdgWidget* self);
 
 void
 liwdg_widget_set_focusable (LIWdgWidget* self,
-                            int          focusable);
+                            int          value);
+
+int
+liwdg_widget_get_focused (LIWdgWidget* self);
+
+void
+liwdg_widget_set_focused (LIWdgWidget* self);
 
 void
 liwdg_widget_get_request (LIWdgWidget* self,

@@ -40,7 +40,7 @@ private_free (LIExtSkillWidget* self);
 
 static int
 private_event (LIExtSkillWidget* self,
-               liwdgEvent*       event);
+               LIWdgEvent*       event);
 
 /****************************************************************************/
 
@@ -136,7 +136,7 @@ private_free (LIExtSkillWidget* self)
 
 static int
 private_event (LIExtSkillWidget* self,
-               liwdgEvent*       event)
+               LIWdgEvent*       event)
 {
 	uint32_t id;
 	char buffer[256];

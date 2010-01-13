@@ -45,6 +45,14 @@ enum
 	LIWDG_MATCH_TOPRIGHT,
 };
 
+static void
+private_attach_window (LIWdgManager* self,
+                       LIWdgWidget*  widget);
+
+static void
+private_detach_window (LIWdgManager* self,
+                       LIWdgWidget*  widget);
+
 static LIWdgWidget*
 private_find_window (LIWdgManager* self,
                      int           x,
@@ -107,9 +115,9 @@ liwdg_manager_new (LIVidCalls*     video,
 void
 liwdg_manager_free (LIWdgManager* self)
 {
-	assert (self->widgets.dialogs == NULL);
+	assert (self->dialogs.bottom == NULL);
+	assert (self->dialogs.top == NULL);
 	assert (self->widgets.root == NULL);
-	assert (self->widgets.active == NULL);
 
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
@@ -185,21 +193,23 @@ liwdg_manager_cycle_focus (LIWdgManager* self,
 {
 	LIWdgWidget* tmp;
 	LIWdgWidget* widget;
+	LIWdgWidget* focus;
 
 	/* Ensure toplevel focus. */
-	if (self->focus.keyboard == NULL)
+	focus = liwdg_manager_get_focus (self);
+	if (focus == NULL)
 	{
 		liwdg_manager_cycle_window_focus (self, next);
 		return;
 	}
 
 	/* Focus next or previous widget. */
-	for (widget = self->focus.keyboard ; widget->parent != NULL ; widget = widget->parent)
+	for (widget = focus ; widget->parent != NULL ; widget = widget->parent)
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget->parent), widget, next);
 		if (tmp != NULL)
 		{
-			liwdg_manager_set_focus_keyboard (self, tmp);
+			liwdg_manager_set_focus (self, tmp);
 			return;
 		}
 	}
@@ -207,18 +217,14 @@ liwdg_manager_cycle_focus (LIWdgManager* self,
 	/* Focus first or last widget. */
 	tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
 	if (tmp != NULL)
-		liwdg_manager_set_focus_keyboard (self, tmp);
+		liwdg_manager_set_focus (self, tmp);
 }
 
 void
 liwdg_manager_cycle_window_focus (LIWdgManager* self,
                                   int           next)
 {
-	if (!private_focus_window (self, next))
-	{
-		self->focus.keyboard = NULL;
-		private_focus_window (self, next);
-	}
+	private_focus_window (self, next);
 }
 
 LIFntFont*
@@ -233,6 +239,40 @@ liwdg_manager_find_style (LIWdgManager* self,
                           const char*   name)
 {
 	return lialg_strdic_find (self->styles->subimgs, name);
+}
+
+/**
+ * \brief Finds a widget by screen position.
+ *
+ * \param self Widget manager.
+ * \param x Screen X coordinate.
+ * \param y Screen Y coordinate.
+ * \return Widget or NULL.
+ */
+LIWdgWidget*
+liwdg_manager_find_widget_by_point (LIWdgManager* self,
+                                    int           x,
+                                    int           y)
+{
+	int match;
+	LIWdgWidget* widget;
+	LIWdgWidget* child;
+
+	/* Find window. */
+	widget = private_find_window (self, x, y, &match);
+	if (widget == NULL)
+		return NULL;
+
+	/* Find widget. */
+	while (liwdg_widget_typeis (widget, &liwdg_widget_container))
+	{
+		child = liwdg_container_child_at (LIWDG_CONTAINER (widget), x, y);
+		if (child == NULL)
+			break;
+		widget = child;
+	}
+
+	return widget;
 }
 
 /**
@@ -257,47 +297,6 @@ liwdg_manager_find_window_by_point (LIWdgManager* self,
 }
 
 /**
- * \brief Makes sure that the focused widgets are visible.
- *
- * \param self Widget manager.
- */
-void
-liwdg_manager_fix_focus (LIWdgManager* self)
-{
-	LIWdgWidget* widget;
-
-	for (widget = self->widgets.grab ; widget != NULL ; widget = widget->parent)
-	{
-		if (!widget->visible)
-		{
-			if (liwdg_widget_get_grab (self->widgets.grab))
-				liwdg_widget_set_grab (self->widgets.grab, 0);
-			break;
-		}
-	}
-	for (widget = self->focus.keyboard ; widget != NULL ; widget = widget->parent)
-	{
-		if (!widget->visible)
-		{
-			liwdg_manager_set_focus_keyboard (self, NULL);
-			break;
-		}
-		if (widget->parent == NULL && widget->state == LIWDG_WIDGET_STATE_DETACHED)
-			liwdg_manager_set_focus_keyboard (self, NULL);
-	}
-	for (widget = self->focus.mouse ; widget != NULL ; widget = widget->parent)
-	{
-		if (!widget->visible)
-		{
-			liwdg_manager_set_focus_mouse (self, NULL);
-			break;
-		}
-		if (widget->parent == NULL && widget->state == LIWDG_WIDGET_STATE_DETACHED)
-			liwdg_manager_set_focus_mouse (self, NULL);
-	}
-}
-
-/**
  * \brief Handles an event.
  *
  * \param self Widget manager.
@@ -306,12 +305,12 @@ liwdg_manager_fix_focus (LIWdgManager* self)
  */
 int
 liwdg_manager_event (LIWdgManager* self,
-                     liwdgEvent*   event)
+                     LIWdgEvent*   event)
 {
 	int x;
 	int y;
 	int match;
-	liwdgEvent popup;
+	LIWdgEvent popup;
 	LIWdgRect rect;
 	LIWdgWidget* widget;
 
@@ -374,15 +373,16 @@ liwdg_manager_event (LIWdgManager* self,
 					self->drag.active = 0;
 				x = event->button.x;
 				y = event->button.y;
+				widget = private_find_window (self, x, y, &match);
 				break;
 			case LIWDG_EVENT_TYPE_MOTION:
 				x = event->motion.x;
 				y = event->motion.y;
+				widget = private_find_window (self, x - event->motion.dx, y - event->motion.dy, &match);
 				break;
 			default:
 				return 1;
 		}
-		widget = self->focus.mouse;
 		if (widget != NULL)
 			liwdg_widget_move (widget, x - self->drag.startx, y - self->drag.starty);
 		else
@@ -395,21 +395,15 @@ liwdg_manager_event (LIWdgManager* self,
 	{
 		case LIWDG_EVENT_TYPE_KEY_PRESS:
 		case LIWDG_EVENT_TYPE_KEY_RELEASE:
-			widget = self->focus.keyboard;
+			widget = liwdg_manager_get_focus (self);
 			match = LIWDG_MATCH_INSIDE;
 			break;
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			widget = private_find_window (self, event->button.x, event->button.y, &match);
-			liwdg_manager_set_focus_mouse (self, widget);
-			if (widget != NULL && liwdg_widget_get_focusable (widget))
-				liwdg_manager_set_focus_keyboard (self, widget);
-			else
-				liwdg_manager_set_focus_keyboard (self, NULL);
 			break;
 		case LIWDG_EVENT_TYPE_MOTION:
 			widget = private_find_window (self, event->motion.x, event->motion.y, &match);
-			liwdg_manager_set_focus_mouse (self, widget);
 			break;
 		default:
 			widget = NULL;
@@ -438,13 +432,8 @@ liwdg_manager_event (LIWdgManager* self,
 			self->drag.active = 1;
 			self->drag.startx = event->button.x - widget->allocation.x;
 			self->drag.starty = event->button.y - widget->allocation.y;
-			return 1;
-		}
-
-		/* Click to focus. */
-		if (liwdg_widget_get_focusable (widget))
-		{
-			liwdg_manager_set_focus_keyboard (self, widget);
+			private_detach_window (self, widget);
+			private_attach_window (self, widget);
 			return 1;
 		}
 	}
@@ -463,7 +452,7 @@ int
 liwdg_manager_event_sdl (LIWdgManager* self,
                          SDL_Event*    event)
 {
-	liwdgEvent evt;
+	LIWdgEvent evt;
 
 	switch (event->type)
 	{
@@ -496,7 +485,7 @@ liwdg_manager_event_sdl (LIWdgManager* self,
 			evt.motion.x = event->motion.x;
 			evt.motion.y = event->motion.y;
 			evt.motion.dx = event->motion.xrel;
-			evt.motion.dy = -event->motion.yrel;
+			evt.motion.dy = event->motion.yrel;
 			evt.motion.buttons = event->motion.state;
 			break;
 		default:
@@ -530,14 +519,8 @@ liwdg_manager_insert_window (LIWdgManager* self,
 
 	assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
 
-	widget->prev = NULL;
-	widget->next = self->widgets.dialogs;
-	if (self->widgets.dialogs != NULL)
-		self->widgets.dialogs->prev = widget;
-	else
-		self->widgets.active = widget;
-	self->widgets.dialogs = widget;
 	widget->state = LIWDG_WIDGET_STATE_WINDOW;
+	private_attach_window (self, widget);
 
 	static int x=32;// FIXME
 	static int y=32;
@@ -557,9 +540,6 @@ liwdg_manager_remove_popup (LIWdgManager* self,
 {
 	assert (widget->prev != NULL || widget == self->widgets.popups);
 	assert (widget->state == LIWDG_WIDGET_STATE_POPUP);
-
-	/* Clear invalid focus. */
-	liwdg_manager_fix_focus (self);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
@@ -581,26 +561,16 @@ int
 liwdg_manager_remove_window (LIWdgManager* self,
                              LIWdgWidget*  widget)
 {
-	assert (widget->prev != NULL || widget == self->widgets.dialogs);
-	assert (widget->next != NULL || widget == self->widgets.active);
 	assert (widget->state == LIWDG_WIDGET_STATE_WINDOW);
-
-	/* Clear invalid focus. */
-	liwdg_manager_fix_focus (self);
+	assert (widget->prev != NULL || widget == self->dialogs.top);
+	assert (widget->next != NULL || widget == self->dialogs.bottom);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
 		self->widgets.iter = widget->next;
 
 	/* Remove from stack. */
-	if (widget->next != NULL)
-		widget->next->prev = widget->prev;
-	else
-		self->widgets.active = widget->prev;
-	if (widget->prev != NULL)
-		widget->prev->next = widget->next;
-	else
-		self->widgets.dialogs = widget->next;
+	private_detach_window (self, widget);
 	widget->state = LIWDG_WIDGET_STATE_DETACHED;
 
 	return 1;
@@ -636,7 +606,7 @@ liwdg_manager_render (LIWdgManager* self)
 		if (liwdg_widget_get_visible (self->widgets.root))
 			liwdg_widget_draw (self->widgets.root);
 	}
-	for (widget = self->widgets.dialogs ; widget != NULL ; widget = widget->next)
+	for (widget = self->dialogs.bottom ; widget != NULL ; widget = widget->prev)
 	{
 		if (liwdg_widget_get_visible (widget))
 			liwdg_widget_draw (widget);
@@ -657,7 +627,7 @@ liwdg_manager_update (LIWdgManager* self,
 	int cx;
 	int cy;
 	int buttons;
-	liwdgEvent event;
+	LIWdgEvent event;
 	LIWdgRect rect;
 	LIWdgSize size;
 	LIWdgWidget* widget;
@@ -683,7 +653,7 @@ liwdg_manager_update (LIWdgManager* self,
 	}
 	if (self->widgets.root != NULL)
 		liwdg_widget_update (self->widgets.root, secs);
-	for (widget = self->widgets.dialogs ; widget != NULL ; widget = self->widgets.iter)
+	for (widget = self->dialogs.top ; widget != NULL ; widget = self->widgets.iter)
 	{
 		self->widgets.iter = widget->next;
 		liwdg_widget_get_allocation (widget, &rect);
@@ -704,64 +674,26 @@ liwdg_manager_update (LIWdgManager* self,
 }
 
 LIWdgWidget*
-liwdg_manager_get_focus_keyboard (LIWdgManager* self)
+liwdg_manager_get_focus (LIWdgManager* self)
 {
-	return self->focus.keyboard;
+	LIWdgWidget* widget;
+
+	widget = liwdg_manager_find_widget_by_point (self, self->pointer.x, self->pointer.y);
+	if (widget != NULL && widget->focusable && widget->visible)
+		return widget;
+
+	return NULL;
 }
 
 void
-liwdg_manager_set_focus_keyboard (LIWdgManager* self,
-                                  LIWdgWidget*  widget)
+liwdg_manager_set_focus (LIWdgManager* self,
+                         LIWdgWidget*  widget)
 {
-	liwdgEvent event;
-	LIWdgWidget* focus;
-
-	focus = self->focus.keyboard;
-	if (focus == widget)
-		return;
-	self->focus.keyboard = widget;
-	if (focus != NULL)
+	if (liwdg_manager_get_focus (self) != widget)
 	{
-		event.type = LIWDG_EVENT_TYPE_FOCUS_LOSE;
-		event.focus.mouse = 0;
-		liwdg_widget_event (focus, &event);
-	}
-	if (self->focus.keyboard != NULL)
-	{
-		event.type = LIWDG_EVENT_TYPE_FOCUS_GAIN;
-		event.focus.mouse = 0;
-		liwdg_widget_event (self->focus.keyboard, &event);
-	}
-}
-
-LIWdgWidget*
-liwdg_manager_get_focus_mouse (LIWdgManager* self)
-{
-	return self->focus.mouse;
-}
-
-void
-liwdg_manager_set_focus_mouse (LIWdgManager* self,
-                               LIWdgWidget*  widget)
-{
-	liwdgEvent event;
-	LIWdgWidget* focus;
-
-	focus = self->focus.mouse;
-	if (focus == widget)
-		return;
-	self->focus.mouse = widget;
-	if (focus != NULL)
-	{
-		event.type = LIWDG_EVENT_TYPE_FOCUS_LOSE;
-		event.focus.mouse = 1;
-		liwdg_widget_event (focus, &event);
-	}
-	if (self->focus.mouse != NULL)
-	{
-		event.type = LIWDG_EVENT_TYPE_FOCUS_GAIN;
-		event.focus.mouse = 1;
-		liwdg_widget_event (self->focus.mouse, &event);
+		self->video.SDL_WarpMouse (
+			widget->allocation.x + widget->allocation.width / 2,
+			widget->allocation.y + widget->allocation.height / 2);
 	}
 }
 
@@ -802,9 +734,6 @@ liwdg_manager_set_root (LIWdgManager* self,
 {
 	if (self->widgets.root == widget)
 		return;
-
-	/* Clear invalid focus. */
-	liwdg_manager_fix_focus (self);
 
 	/* Replace old root. */
 	if (self->widgets.root != NULL)
@@ -865,6 +794,33 @@ liwdg_manager_set_size (LIWdgManager* self,
 
 /*****************************************************************************/
 
+static void
+private_attach_window (LIWdgManager* self,
+                       LIWdgWidget*  widget)
+{
+	widget->prev = NULL;
+	widget->next = self->dialogs.top;
+	if (self->dialogs.top != NULL)
+		self->dialogs.top->prev = widget;
+	else
+		self->dialogs.bottom = widget;
+	self->dialogs.top = widget;
+}
+
+static void
+private_detach_window (LIWdgManager* self,
+                       LIWdgWidget*  widget)
+{
+	if (widget->next != NULL)
+		widget->next->prev = widget->prev;
+	else
+		self->dialogs.bottom = widget->prev;
+	if (widget->prev != NULL)
+		widget->prev->next = widget->next;
+	else
+		self->dialogs.top = widget->next;
+}
+
 static LIWdgWidget*
 private_find_window (LIWdgManager* self,
                      int           x,
@@ -874,9 +830,9 @@ private_find_window (LIWdgManager* self,
 	LIWdgRect rect;
 	LIWdgWidget* widget;
 
-	if (self->widgets.dialogs != NULL)
+	if (self->dialogs.top != NULL)
 	{
-		for (widget = self->widgets.active ; widget != NULL ; widget = widget->prev)
+		for (widget = self->dialogs.top ; widget != NULL ; widget = widget->next)
 		{
 			if (!liwdg_widget_get_visible (widget))
 				continue;
@@ -977,13 +933,13 @@ private_focus_root (LIWdgManager* self)
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, 1);
 		if (tmp != NULL)
 		{
-			liwdg_manager_set_focus_keyboard (self, tmp);
+			liwdg_manager_set_focus (self, tmp);
 			return 1;
 		}
 	}
 	else if (liwdg_widget_get_focusable (widget))
 	{
-		liwdg_manager_set_focus_keyboard (self, widget);
+		liwdg_manager_set_focus (self, widget);
 		return 1;
 	}
 
@@ -995,45 +951,43 @@ private_focus_window (LIWdgManager* self,
                       int           next)
 {
 	LIWdgWidget* tmp;
+	LIWdgWidget* start;
 	LIWdgWidget* widget;
 
-	/* Find current toplevel. */
-	if (self->focus.keyboard != NULL)
+	/* Find focused window. */
+	widget = liwdg_manager_get_focus (self);
+	if (widget != NULL)
 	{
-		widget = self->focus.keyboard;
 		while (widget->parent != NULL)
 			widget = widget->parent;
 	}
-	else
-	{
-		if (private_focus_root (self))
-			return 1;
-		if (self->widgets.dialogs == NULL)
-			return 0;
-		widget = NULL;
-	}
 
-	/* Find next toplevel. */
-	if (widget == NULL || widget == self->widgets.root)
-	{
-		widget = self->widgets.dialogs;
-		if (!next)
-		{
-			while (widget->next != NULL)
-				widget = widget->next;
-		}
-	}
-	else
+	/* Find first window to try. */
+	if (widget != NULL && widget != self->widgets.root)
 	{
 		if (next)
-			widget = widget->next;
+			start = widget->next;
 		else
-			widget = widget->prev;
+			start = widget->prev;
+		if (start == NULL && private_focus_root (self))
+			return 1;
+	}
+	else
+		start = NULL;
+	if (start == NULL)
+	{
+		if (next)
+			start = self->dialogs.top;
+		else
+			start = self->dialogs.bottom;
+		if (start == NULL)
+			return 0;
 	}
 
-	/* Find next or previous window. */
-	while (widget != NULL)
+	/* Search for focusable window. */
+	for (widget = start ;; )
 	{
+		/* Check if this one is it. */
 		if (liwdg_widget_get_visible (widget))
 		{
 			if (liwdg_widget_typeis (widget, &liwdg_widget_container))
@@ -1041,24 +995,40 @@ private_focus_window (LIWdgManager* self,
 				tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
 				if (tmp != NULL)
 				{
-					liwdg_manager_set_focus_keyboard (self, tmp);
+					private_detach_window (self, widget);
+					private_attach_window (self, widget);
+					liwdg_manager_set_focus (self, tmp);
 					return 1;
 				}
 			}
 			else if (liwdg_widget_get_focusable (widget))
 			{
-				liwdg_manager_set_focus_keyboard (self, widget);
+				private_detach_window (self, widget);
+				private_attach_window (self, widget);
+				liwdg_manager_set_focus (self, widget);
 				return 1;
 			}
 		}
+
+		/* Else try next window. */
 		if (next)
 			widget = widget->next;
 		else
 			widget = widget->prev;
-	}
+		if (widget == NULL)
+		{
+			if (private_focus_root (self))
+				return 1;
+			if (next)
+				widget = self->dialogs.top;
+			else
+				widget = self->dialogs.bottom;
+		}
 
-	/* Default to root window. */
-	return private_focus_root (self);
+		/* Give up if search wrapped. */
+		if (widget == start)
+			return 0;
+	}
 }
 
 static int

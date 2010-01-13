@@ -63,7 +63,7 @@ private_free (LIExtBrushes* self);
 
 static int
 private_event (LIExtBrushes* self,
-               liwdgEvent*   event);
+               LIWdgEvent*   event);
 
 static int
 private_add (LIExtBrushes* self,
@@ -384,7 +384,7 @@ private_free (LIExtBrushes* self)
 
 static int
 private_event (LIExtBrushes* self,
-               liwdgEvent*   event)
+               LIWdgEvent*   event)
 {
 	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
 }

@@ -35,7 +35,7 @@ private_free (LIWdgBusy* self);
 
 static void
 private_event (LIWdgBusy*  self,
-               liwdgEvent* event);
+               LIWdgEvent* event);
 
 const LIWdgClass liwdg_widget_busy =
 {
@@ -140,7 +140,7 @@ private_free (LIWdgBusy* self)
 
 static void
 private_event (LIWdgBusy*  self,
-               liwdgEvent* event)
+               LIWdgEvent* event)
 {
 	/* Call update callback. */
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)

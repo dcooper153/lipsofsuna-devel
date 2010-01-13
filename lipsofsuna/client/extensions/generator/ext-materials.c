@@ -40,7 +40,7 @@ private_free (LIExtMaterials* self);
 
 static int
 private_event (LIExtMaterials* self,
-               liwdgEvent*     event);
+               LIWdgEvent*     event);
 
 static int
 private_add (LIExtMaterials* self,
@@ -237,7 +237,7 @@ private_free (LIExtMaterials* self)
 
 static int
 private_event (LIExtMaterials* self,
-               liwdgEvent*     event)
+               LIWdgEvent*     event)
 {
 	if (event->type == LIWDG_EVENT_TYPE_UPDATE)
 	{
