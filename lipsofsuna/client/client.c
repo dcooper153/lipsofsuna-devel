@@ -144,18 +144,24 @@ licli_client_free (LICliClient* self)
  * \brief Connects to a server.
  *
  * \param self Client.
+ * \param addr Server address.
+ * \param port Server port.
+ * \param udp Nonzero to use UDP.
  * \param name Login name or NULL.
  * \param pass Login password or NULL.
  * \return Nonzero on success.
  */
 int
 licli_client_connect (LICliClient* self,
+                      const char*  addr,
+                      int          port,
+                      int          udp,
                       const char*  name,
                       const char*  pass)
 {
 	if (name == NULL) name = self->login;
 	if (pass == NULL) pass = self->password;
-	self->network = licli_network_new (self, name, pass);
+	self->network = licli_network_new (self, addr, port, udp, name, pass);
 	if (self->network == NULL)
 		return 0;
 	return 1;

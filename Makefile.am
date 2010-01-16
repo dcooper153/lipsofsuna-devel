@@ -118,16 +118,6 @@ calsrc = \
 	lipsofsuna/callback/cal-handle.c \
 	lipsofsuna/callback/cal-marshal.c
 
-cfgdir = $(includedir)/lipsofsuna/config
-cfg_HEADERS = \
-	lipsofsuna/config/config-account.h \
-	lipsofsuna/config/config-bans.h \
-	lipsofsuna/config/config-host.h
-cfgsrc = \
-	lipsofsuna/config/config-account.c \
-	lipsofsuna/config/config-bans.c \
-	lipsofsuna/config/config-host.c
-
 clidir = $(includedir)/lipsofsuna/client
 cli_HEADERS = \
 	lipsofsuna/client.h \
@@ -564,7 +554,7 @@ liblipsofsunaclient_la_LIBADD = \
 	$(GL_LIBS) $(OPENAL_LIBS) $(VORBIS_LIBS) $(SQUISH_LIBS) $(ZLIB_LIBS) \
 	$(LIPS_LIBS) $(LIBPNG_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaclient_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(cfgsrc) $(clisrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) \
 	$(fntsrc) $(gensrc) $(engsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
@@ -572,13 +562,13 @@ liblipsofsunaclient_la_SOURCES = \
 liblipsofsunagenerator_la_LDFLAGS = -no-undefined
 liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 liblipsofsunagenerator_la_SOURCES = \
-	$(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(gensrc) $(matsrc) $(mdlsrc) \
+	$(algsrc) $(arcsrc) $(calsrc) $(gensrc) $(matsrc) $(mdlsrc) \
 	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
 liblipsofsunaimport_la_LDFLAGS = -no-undefined
 liblipsofsunaimport_la_LIBADD = $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaimport_la_SOURCES = \
-	$(algsrc) $(arcsrc) $(cfgsrc) $(matsrc) $(mdlsrc) $(pthsrc) $(relsrc) \
+	$(algsrc) $(arcsrc) $(matsrc) $(mdlsrc) $(pthsrc) $(relsrc) \
 	$(strsrc) $(syssrc) $(thrsrc) \
 	lipsofsuna/image/image.c \
 	lipsofsuna/image/image.h \
@@ -591,14 +581,14 @@ liblipsofsunaserver_la_LIBADD = \
 	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
 	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaserver_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(cfgsrc) $(engsrc) $(matsrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
 liblipsofsunaviewer_la_LDFLAGS = -no-undefined
 liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaviewer_la_SOURCES = \
-	$(algsrc) $(arcsrc) $(cfgsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
+	$(algsrc) $(arcsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
 	$(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(strsrc) $(syssrc) $(thrsrc) \
 	$(vidsrc) $(viesrc)
 

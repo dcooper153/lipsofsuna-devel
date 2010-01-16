@@ -104,13 +104,9 @@ static void Client_find_object (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Launches a server and joins it.
+ * -- @brief Launches a server.
  * --
- * -- If a server has already been launched, it is terminated.
- * --
- * -- Arguments:
- * -- login: Login name.
- * -- password: Password.
+ * -- Call Client.join to join the server.
  * --
  * -- @param self Client class.
  * -- @param args Arguments.
@@ -119,19 +115,10 @@ static void Client_find_object (LIScrArgs* args)
  */
 static void Client_host (LIScrArgs* args)
 {
-	const char* name = NULL;
-	const char* pass = NULL;
 	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	liscr_args_gets_string (args, "login", &name);
-	liscr_args_gets_string (args, "password", &pass);
 	if (!licli_client_host (client))
-	{
-		lisys_error_report ();
-		return;
-	}
-	if (!licli_client_connect (client, name, pass))
 	{
 		lisys_error_report ();
 		return;
@@ -146,6 +133,9 @@ static void Client_host (LIScrArgs* args)
  * -- Arguments:
  * -- login: Login name.
  * -- password: Password.
+ * -- port: Server port.
+ * -- server: Server address.
+ * -- udp: True to use UDP.
  * --
  * -- @param self Client class.
  * -- @param args Arguments.
@@ -154,6 +144,9 @@ static void Client_host (LIScrArgs* args)
  */
 static void Client_join (LIScrArgs* args)
 {
+	int port = 10101;
+	int udp = 0;
+	const char* server = "localhost";
 	const char* name = NULL;
 	const char* pass = NULL;
 	LICliClient* client;
@@ -161,7 +154,12 @@ static void Client_join (LIScrArgs* args)
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_gets_string (args, "login", &name);
 	liscr_args_gets_string (args, "password", &pass);
-	if (!licli_client_connect (client, name, pass))
+	liscr_args_gets_string (args, "server", &server);
+	liscr_args_gets_int (args, "port", &port);
+	liscr_args_gets_bool (args, "udp", &udp);
+	port = LIMAT_CLAMP (port, 1025, 32767);
+
+	if (!licli_client_connect (client, server, port, udp, name, pass))
 	{
 		lisys_error_report ();
 		return;

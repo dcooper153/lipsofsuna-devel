@@ -26,7 +26,6 @@
 #define __CLIENT_NETWORK_H__
 
 #include <grapple/grapple.h>
-#include <lipsofsuna/config.h>
 #include <lipsofsuna/algorithm.h>
 #include "client.h"
 #include "client-types.h"
@@ -44,9 +43,11 @@ struct _LICliControls
 struct _LICliNetwork
 {
 	int analog;
+	int port;
+	int udp;
+	char* addr;
 	uint32_t id;
 	uint32_t features;
-	LICfgHost* host;
 	LICliClient* client;
 	grapple_client socket;
 	struct
@@ -64,6 +65,9 @@ struct _LICliNetwork
 
 LICliNetwork*
 licli_network_new (LICliClient* client,
+                   const char*  addr,
+                   int          port,
+                   int          udp,
                    const char*  name,
                    const char*  pass);
 

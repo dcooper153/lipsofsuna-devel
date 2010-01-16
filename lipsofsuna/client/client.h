@@ -95,6 +95,9 @@ licli_client_free (LICliClient* self);
 
 int
 licli_client_connect (LICliClient* self,
+                      const char*  addr,
+                      int          port,
+                      int          udp,
                       const char*  name,
                       const char*  pass);
 

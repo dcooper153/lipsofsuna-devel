@@ -199,7 +199,7 @@ static int
 private_accept (grapple_user  user,
                 LISerNetwork* self)
 {
-	int ret;
+	int ret = 1;
 	char* address;
 
 	/* Get client address. */
@@ -207,12 +207,9 @@ private_accept (grapple_user  user,
 	if (address == NULL)
 		return 0;
 
-	/* Check if banned. */
-	pthread_mutex_lock (&self->server->mutexes.bans);
-	ret = liser_server_get_banned (self->server, address);
-	pthread_mutex_unlock (&self->server->mutexes.bans);
+	/* TODO: Check if banned. */
 	lisys_free (address);
-	return !ret;
+	return ret;
 }
 
 /**
@@ -232,53 +229,14 @@ private_login (const char*   login,
                const char*   password,
                LISerNetwork* self)
 {
-	int ret;
-	char* tmp;
-	char* path;
-	LICfgAccount* account;
+	int ret = 1;
 
 	/* Sanity checks. */
 	if (login == NULL || password == NULL || !strlen (login) || !strlen (password))
 		return 0;
 
-	/* Contruct the account path. */
-	path = lisys_path_concat (self->server->paths->module_state, "accounts", login, NULL);
-	if (path == NULL)
-		return 0;
+	/* TODO: Check for account. */
 
-	/* Parse the account file. */
-#warning FIXME: Accounts should be done in a module.
-	account = licfg_account_new (path);
-	lisys_free (path);
-	if (account == NULL)
-	{
-		if (1/*self->config.server->enable_create_account*/)
-		{
-			if (lisys_error_peek () == EIO)
-			{
-				/* Store the password. */
-				/* It will be retrieved when creating a new account and
-				   used as the password of the account. */
-				tmp = listr_dup (password);
-				if (tmp == NULL)
-					return 0;
-				pthread_mutex_lock (&self->mutex);
-				ret = (lialg_strdic_insert (self->passwords, login, tmp) != NULL);
-				pthread_mutex_unlock (&self->mutex);
-				if (!ret)
-				{
-					lisys_free (tmp);
-					return 0;
-				}
-				return 1;
-			}
-		}
-		return 0;
-	}
-
-	/* Check for valid password. */
-	ret = !strcmp (account->password, password);
-	licfg_account_free (account);
 	return ret;
 }
 

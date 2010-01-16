@@ -85,6 +85,40 @@ static void Server_find_object (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Begins listening for clients.
+ * --
+ * -- Must be called before any other function.
+ * --
+ * -- Arguments:
+ * -- port: Port to listen to.
+ * -- udp: True for UDP.
+ * --
+ * -- @param self Server class.
+ * -- @param args Arguments.
+ * -- @return True on success.
+ * function Server.host(self, args)
+ */
+static void Server_host (LIScrArgs* args)
+{
+	int port = 10101;
+	int udp = 0;
+	LISerServer* server;
+
+	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
+	liscr_args_gets_bool (args, "udp", &udp);
+	liscr_args_gets_int (args, "port", &port);
+	port = LIMAT_CLAMP (port, 1025, 32767);
+
+	if (server->network == NULL)
+	{
+		server->network = liser_network_new (server, udp, port);
+		if (server->network != NULL)
+			return liscr_args_seti_bool (args, 1);
+	}
+}
+
+/* @luadoc
+ * ---
  * -- Finds all objects inside a sphere.
  * --
  * -- Arguments:
@@ -202,6 +236,7 @@ liser_script_server (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LISER_SCRIPT_SERVER, data);
 	liscr_class_insert_cfunc (self, "find_object", Server_find_object);
+	liscr_class_insert_cfunc (self, "host", Server_host);
 	liscr_class_insert_cfunc (self, "nearby_objects", Server_nearby_objects);
 	liscr_class_insert_cfunc (self, "save", Server_save);
 	liscr_class_insert_cfunc (self, "shutdown", Server_shutdown);

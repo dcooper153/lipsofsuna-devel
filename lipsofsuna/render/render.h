@@ -26,7 +26,6 @@
 #define __RENDER_H__
 
 #include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/config.h>
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/system.h>
 #include "render-image.h"

@@ -29,7 +29,6 @@
 
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/client.h>
-#include <lipsofsuna/config.h>
 #include <lipsofsuna/thread.h>
 #include "ext-resources.h"
 

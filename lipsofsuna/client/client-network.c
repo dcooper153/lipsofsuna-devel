@@ -43,12 +43,18 @@ private_refused (LICliNetwork*    self,
  * \brief Creates a new client network interface.
  *
  * \param client Client.
+ * \param addr Server address.
+ * \param port Server port.
+ * \param udp Nonzero to use UDP.
  * \param name Login name.
  * \param pass Login password.
  * \return Network interface.
  */
 LICliNetwork*
 licli_network_new (LICliClient* client,
+                   const char*  addr,
+                   int          port,
+                   int          udp,
                    const char*  name,
                    const char*  pass)
 {
@@ -60,19 +66,22 @@ licli_network_new (LICliClient* client,
 	if (self == NULL)
 		return NULL;
 	self->client = client;
-
-	/* Read configuration. */
-	self->host = licfg_host_new (client->path);
-	if (self->host == NULL)
-		goto error;
+	self->addr = strdup (addr);
+	if (self->addr == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+	self->port = port;
+	self->udp = udp;
 
 	/* Connect to the host. */
 	self->socket = grapple_client_init ("Lips of Suna", LINET_PROTOCOL_VERSION);
 	if (self->socket == 0)
 		goto error;
-	grapple_client_address_set (self->socket, self->host->host);
-	grapple_client_port_set (self->socket, self->host->port);
-	if (self->host->udp)
+	grapple_client_address_set (self->socket, addr);
+	grapple_client_port_set (self->socket, port);
+	if (udp)
 		grapple_client_protocol_set (self->socket, GRAPPLE_PROTOCOL_UDP);
 	else
 		grapple_client_protocol_set (self->socket, GRAPPLE_PROTOCOL_TCP);
@@ -101,10 +110,9 @@ error:
 void
 licli_network_free (LICliNetwork* self)
 {
-	if (self->host != NULL)
-		licfg_host_free (self->host);
 	if (self->socket)
 		grapple_client_destroy (self->socket);
+	lisys_free (self->addr);
 	lisys_free (self);
 }
 

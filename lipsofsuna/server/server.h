@@ -25,11 +25,9 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
-#include <pthread.h>
 #include <sys/time.h>
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/callback.h>
-#include <lipsofsuna/config.h>
 #include <lipsofsuna/engine.h>
 #include <lipsofsuna/paths.h>
 #include <lipsofsuna/physics.h>
@@ -40,8 +38,8 @@
 
 struct _LISerServer
 {
-	uint32_t debug;
 	int quit;
+	uint32_t debug;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* extensions;
 	LIArcSql* sql;
@@ -52,17 +50,8 @@ struct _LISerServer
 	LISerNetwork* network;
 	struct
 	{
-		LICfgBans* bans;
-		LICfgHost* host;
-	} config;
-	struct
-	{
 		LIArcWriter* resources;
 	} helper;
-	struct
-	{
-		pthread_mutex_t bans;
-	} mutexes;
 	struct
 	{
 		struct timeval start;
@@ -80,19 +69,11 @@ liser_server_find_extension (LISerServer* self,
                              const char*  name);
 
 int
-liser_server_insert_ban (LISerServer* self,
-                         const char*  ip);
-
-int
 liser_server_load_extension (LISerServer* self,
                              const char*  name);
 
 int
 liser_server_main (LISerServer* self);
-
-int
-liser_server_remove_ban (LISerServer* self,
-                         const char*  ip);
 
 int
 liser_server_save (LISerServer* self);
@@ -103,10 +84,6 @@ liser_server_shutdown (LISerServer* self);
 int
 liser_server_update (LISerServer* self,
                      float        secs);
-
-int
-liser_server_get_banned (LISerServer* self,
-                         const char*  address);
 
 double
 liser_server_get_time (const LISerServer* self);

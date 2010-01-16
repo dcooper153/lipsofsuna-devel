@@ -27,7 +27,6 @@
 
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/archive.h>
-#include <lipsofsuna/config.h>
 #include <lipsofsuna/script.h>
 #include "server-callbacks.h"
 #include "server-object.h"

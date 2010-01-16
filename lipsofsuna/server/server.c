@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <lipsofsuna/config.h>
 #include <lipsofsuna/network.h>
 #include <lipsofsuna/script.h>
 #include <lipsofsuna/string.h>
@@ -36,16 +35,10 @@
 #define LI_SERVER_SLEEP
 
 static int
-private_init_bans (LISerServer* self);
-
-static int
 private_init_engine (LISerServer* self);
 
 static int
 private_init_extensions (LISerServer* self);
-
-static int
-private_init_host (LISerServer* self);
 
 static int
 private_init_script (LISerServer* self);
@@ -75,13 +68,8 @@ liser_server_new (LIPthPaths* paths)
 		return NULL;
 	self->paths = paths;
 
-	/* Initialize mutexes. */
-	pthread_mutex_init (&self->mutexes.bans, NULL);
-
 	/* Initialize subsystems. */
 	if (!private_init_sql (self) ||
-	    !private_init_host (self) ||
-	    !private_init_bans (self) ||
 	    !private_init_extensions (self) ||
 	    !private_init_engine (self) ||
 	    !private_init_time (self) ||
@@ -134,18 +122,9 @@ liser_server_free (LISerServer* self)
 	if (self->sql != NULL)
 		sqlite3_close (self->sql);
 
-	/* Free mutexes. */
-	pthread_mutex_destroy (&self->mutexes.bans);
-
-	/* Free configuration. */
-	if (self->config.bans != NULL)
-		licfg_bans_free (self->config.bans);
-	if (self->config.host != NULL)
-		licfg_host_free (self->config.host);
-
 	/* Free callbacks. */
-        if (self->callbacks != NULL)
-                lical_callbacks_free (self->callbacks);
+	if (self->callbacks != NULL)
+		lical_callbacks_free (self->callbacks);
 
 	/* Free helpers. */
 	if (self->helper.resources != NULL)
@@ -166,25 +145,6 @@ liser_server_find_extension (LISerServer* self,
                              const char*  name)
 {
 	return lialg_strdic_find (self->extensions, name);
-}
-
-/**
- * \brief Inserts a ban rule.
- *
- * \param self Server.
- * \param ip Address to ban.
- * \return Nonzero on success.
- */
-int
-liser_server_insert_ban (LISerServer* self,
-                         const char*  ip)
-{
-	int ret;
-
-	pthread_mutex_lock (&self->mutexes.bans);
-	ret = licfg_bans_insert_ban (self->config.bans, ip);
-	pthread_mutex_unlock (&self->mutexes.bans);
-	return ret;
 }
 
 /**
@@ -309,25 +269,6 @@ liser_server_main (LISerServer* self)
 }
 
 /**
- * \brief Removes a ban rule.
- *
- * \param self Server.
- * \param ip Address to unban.
- * \return Nonzero on success.
- */
-int
-liser_server_remove_ban (LISerServer* self,
-                         const char*  ip)
-{
-	int ret;
-
-	pthread_mutex_lock (&self->mutexes.bans);
-	ret = licfg_bans_remove_ban (self->config.bans, ip);
-	pthread_mutex_unlock (&self->mutexes.bans);
-	return ret;
-}
-
-/**
  * \brief Saves currently loaded objects.
  *
  * \param self Server.
@@ -382,24 +323,11 @@ liser_server_update (LISerServer* self,
 
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
-	liser_network_update (self->network, secs);
+	if (self->network != NULL)
+		liser_network_update (self->network, secs);
 	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
 
 	return !self->quit;
-}
-
-/**
- * \brief Checks if the address is banned.
- *
- * \param self Server.
- * \param address Address string.
- * \return Nonzero if the socket is banned.
- */
-int
-liser_server_get_banned (LISerServer* self,
-                         const char*  address)
-{
-	return licfg_bans_get_banned (self->config.bans, address);
 }
 
 /**
@@ -486,23 +414,6 @@ liser_server_get_unique_object (const LISerServer* self)
 /****************************************************************************/
 
 static int
-private_init_bans (LISerServer* self)
-{
-	self->config.bans = licfg_bans_new_from_file (self->paths->module_state);
-	if (self->config.bans == NULL)
-	{
-		if (lisys_error_peek () != EIO)
-			return 0;
-		self->config.bans = licfg_bans_new ();
-		if (self->config.bans == NULL)
-			return 0;
-		lisys_error_get (NULL);
-		return 1;
-	}
-	return 1;
-}
-
-static int
 private_init_engine (LISerServer* self)
 {
 	int i;
@@ -575,22 +486,6 @@ private_init_extensions (LISerServer* self)
 	self->extensions = lialg_strdic_new ();
 	if (self->extensions == NULL)
 		return 0;
-	return 1;
-}
-
-static int
-private_init_host (LISerServer* self)
-{
-	/* Read host configuration. */
-	self->config.host = licfg_host_new (self->paths->module_data);
-	if (self->config.host == NULL)
-		return 0;
-
-	/* Initialize networking. */
-	self->network = liser_network_new (self, self->config.host->udp, self->config.host->port);
-	if (self->network == NULL)
-		return 0;
-
 	return 1;
 }
 
