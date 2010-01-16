@@ -55,7 +55,7 @@ static void Npc_find (LIScrArgs* args)
 	LIExtNpc* npc;
 	LIScrData* data;
 
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+	if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NPC);
 		npc = liext_module_find_npc (module, data->data);
@@ -181,7 +181,7 @@ static void Npc_setter_owner (LIScrArgs* args)
 {
 	LIScrData* data;
 
-	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_NPC, &data))
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
 		liext_npc_set_owner (args->self, data->data);
 	else
 		liext_npc_set_owner (args->self, NULL);
@@ -269,7 +269,7 @@ static void Npc_setter_target (LIScrArgs* args)
 
 void
 liext_script_npc (LIScrClass* self,
-                void*       data)
+                  void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);
 	liscr_class_insert_cfunc (self, "find", Npc_find);

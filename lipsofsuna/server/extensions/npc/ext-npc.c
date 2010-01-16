@@ -127,6 +127,7 @@ liext_npc_set_owner (LIExtNpc*    self,
 			liphy_object_set_control_mode (old->owner->physics, LIPHY_CONTROL_MODE_RIGID);
 			lieng_object_set_flags (old->owner, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
 			liscr_data_unref (old->owner->script, self->script);
+			liscr_data_unref (self->script, old->owner->script);
 			old->owner = NULL;
 		}
 	}
@@ -138,6 +139,7 @@ liext_npc_set_owner (LIExtNpc*    self,
 		liphy_object_set_control_mode (self->owner->physics, LIPHY_CONTROL_MODE_RIGID);
 		lieng_object_set_flags (self->owner, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
 		liscr_data_unref (self->owner->script, self->script);
+		liscr_data_unref (self->script, self->owner->script);
 		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
 	if (value != NULL)
@@ -146,6 +148,7 @@ liext_npc_set_owner (LIExtNpc*    self,
 		liphy_object_set_control_mode (value->physics, LIPHY_CONTROL_MODE_CHARACTER);
 		lieng_object_set_flags (value, flags | LIENG_OBJECT_FLAG_DYNAMIC);
 		liscr_data_ref (value->script, self->script);
+		liscr_data_ref (self->script, value->script);
 		lialg_ptrdic_insert (self->module->dictionary, value, self);
 	}
 	self->owner = value;
@@ -330,13 +333,8 @@ private_attack (LIExtNpc* self)
 {
 	LIScrScript* script = self->module->server->script;
 
-	/* Check for spawn function. */
-	lua_getfield (script->lua, LUA_GLOBALSINDEX, "Npc");
-	if (lua_type (script->lua, -1) != LUA_TTABLE)
-	{
-		lua_pop (script->lua, 1);
-		return;
-	}
+	/* Check for attack function. */
+	liscr_pushdata (script->lua, self->script);
 	lua_getfield (script->lua, -1, "attack_cb");
 	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
 	{
@@ -345,7 +343,7 @@ private_attack (LIExtNpc* self)
 	}
 	lua_remove (script->lua, -2);
 
-	/* Call the spawn function. */
+	/* Call the attack function. */
 	liscr_pushdata (script->lua, self->script);
 	liscr_pushdata (script->lua, self->owner->script);
 	liscr_pushdata (script->lua, self->target->script);
