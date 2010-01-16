@@ -36,40 +36,75 @@
 
 /* @luadoc
  * ---
- * -- Trigger when a key is pressed.
- * -- @name Binding.KEYBOARD
- * -- @class table
+ * -- @brief Creates a new binding.
+ * --
+ * -- Arguments:
+ * -- action: Action or valid action name. (required)
+ * -- joystickaxis: Joystick axis number.
+ * -- joystickbutton: Joystick button number.
+ * -- key: Key code.
+ * -- mods: Key modifier mask.
+ * -- mouseaxis: Mouse axis number.
+ * -- mousebutton: Mouse button number.
+ * -- mousedelta: Mouse axis number.
+ * -- mult: Value multiplier.
+ * -- params: Free form string passed to the action handler.
+ * -- 
+ * -- @param self Binding class.
+ * -- @param args Arguments.
+ * -- @return New Binding.
+ * function Binding.new(self, args)
  */
-/* @luadoc
- * ---
- * -- Trigger when a mouse button is pressed.
- * -- @name Binding.MOUSE
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Trigger when mouse is moved.
- * -- @name Binding.MOUSE_AXIS
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Trigger when mouse is moved.
- * -- @name Binding.MOUSE_DELTA
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Trigger when joystick button is pressed.
- * -- @name Binding.JOYSTICK
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Trigger when joystick axis is used.
- * -- @name Binding.JOYSTICK_AXIS
- * -- @class table
- */
+static void Binding_new (LIScrArgs* args)
+{
+	int type;
+	int code;
+	int mods = 0;
+	float mult = 1.0f;
+	const char* name;
+	const char* params = "";
+	LIBndAction* action;
+	LIBndBinding* self;
+	LICliClient* client;
+	LIScrData* data;
+
+	/* Arguments. */
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_BINDING);
+	if (liscr_args_gets_string (args, "action", &name))
+	{
+		action = libnd_manager_find_action (client->bindings, name);
+		if (action == NULL)
+			return;
+	}
+	else if (liscr_args_gets_data (args, "action", LICLI_SCRIPT_ACTION, &data)) 
+		action = data->data;
+	else
+		return;
+	if (liscr_args_gets_int (args, "joystickaxis", &code)) type = LIBND_TYPE_JOYSTICK_AXIS;
+	else if (liscr_args_gets_int (args, "joysticbutton", &code)) type = LIBND_TYPE_JOYSTICK;
+	else if (liscr_args_gets_int (args, "key", &code)) type = LIBND_TYPE_KEYBOARD;
+	else if (liscr_args_gets_int (args, "mouseaxis", &code)) type = LIBND_TYPE_MOUSE_AXIS;
+	else if (liscr_args_gets_int (args, "mousebutton", &code)) type = LIBND_TYPE_MOUSE;
+	else if (liscr_args_gets_int (args, "mousedelta", &code)) type = LIBND_TYPE_MOUSE_DELTA;
+	else
+		return;
+	liscr_args_gets_int (args, "mods", &mods);
+	liscr_args_gets_float (args, "mult", &mult);
+	liscr_args_gets_string (args, "params", &params);
+
+	/* Allocate userdata. */
+	self = libnd_binding_new (client->bindings, type, action, params, code, mods, mult);
+	if (self == NULL)
+		return;
+	data = liscr_data_new (args->script, self, LICLI_SCRIPT_BINDING, libnd_binding_free);
+	if (data == NULL)
+	{
+		libnd_binding_free (self);
+		return;
+	}
+	libnd_binding_set_userdata (self, data);
+	liscr_args_seti_data (args, data);
+}
 
 /* @luadoc
  * ---
@@ -78,88 +113,21 @@
  * -- @param self Binding.
  * function Binding.free(self)
  */
-static int
-Binding_free (lua_State* lua)
+static void Binding_free (LIScrArgs* args)
 {
-	LIScrData* self;
-
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_BINDING);
-
-	liscr_data_unref (self, NULL);
-	return 0;
-}
-
-/* @luadoc
- * ---
- * -- Creates a new binding.
- * --
- * -- @param self Binding class.
- * -- @param type Binding type.
- * -- @param action Bound action.
- * -- @param params Free form string passed to the action handler.
- * -- @param code Key code, mouse button, mouse axis, joystick button, or joystick axis.
- * -- @param mods Modifier mask.
- * -- @param multiplier Values will be premultiplied by this before passing to the handler.
- * -- @return New Binding.
- * function Binding.new(type, action, params, code, mods, multiplier)
- */
-static int
-Binding_new (lua_State* lua)
-{
-	int type;
-	int code;
-	int mods;
-	float mult;
-	const char* params;
-	LIBndBinding* binding;
-	LIScrData* self;
-	LIScrData* action;
-	LIScrScript* script = liscr_script (lua);
-	LICliClient* client = liscr_script_get_userdata (script);
-
-	/* Check arguments. */
-	type = luaL_checkint (lua, 2);
-	action = liscr_checkdata (lua, 3, LICLI_SCRIPT_ACTION);
-	params = luaL_checkstring (lua, 4);
-	code = luaL_checkint (lua, 5);
-	mods = luaL_checkint (lua, 6);
-	if (!lua_isnone (lua, 7))
-		mult = luaL_checknumber (lua, 7);
-	else
-		mult = 1.0f;
-	luaL_argcheck (lua, type >= 0 && type < LIBND_TYPE_MAX, 2, "invalid binding type");
-
-	/* Allocate userdata. */
-	binding = libnd_binding_new (client->bindings, type, action->data, params, code, mods, mult);
-	if (binding == NULL)
-		return 0;
-	self = liscr_data_new (script, binding, LICLI_SCRIPT_BINDING, libnd_binding_free);
-	if (self == NULL)
-	{
-		libnd_binding_free (binding);
-		return 0;
-	}
-	libnd_binding_set_userdata (binding, self);
-	liscr_data_ref (action, self);
-	liscr_pushdata (lua, self);
-
-	return 1;
+#warning Bindings break if freed multiple times.
+	liscr_data_unref (args->self, NULL);
 }
 
 /*****************************************************************************/
 
 void
 licli_script_binding (LIScrClass* self,
-                    void*       data)
+                      void*       data)
 {
-	liscr_class_insert_func (self, "new", Binding_new);
-	liscr_class_insert_func (self, "free", Binding_free);
-	liscr_class_insert_enum (self, "KEYBOARD", LIBND_TYPE_KEYBOARD);
-	liscr_class_insert_enum (self, "MOUSE", LIBND_TYPE_MOUSE);
-	liscr_class_insert_enum (self, "MOUSE_AXIS", LIBND_TYPE_MOUSE_AXIS);
-	liscr_class_insert_enum (self, "MOUSE_DELTA", LIBND_TYPE_MOUSE_DELTA);
-	liscr_class_insert_enum (self, "JOYSTICK", LIBND_TYPE_JOYSTICK);
-	liscr_class_insert_enum (self, "JOYSTICK_AXIS", LIBND_TYPE_JOYSTICK_AXIS);
+	liscr_class_set_userdata (self, LICLI_SCRIPT_BINDING, data);
+	liscr_class_insert_cfunc (self, "new", Binding_new);
+	liscr_class_insert_mfunc (self, "free", Binding_free);
 }
 
 /** @} */
