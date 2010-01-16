@@ -269,6 +269,46 @@ licli_client_init_callbacks_misc (LICliClient* self)
 /*****************************************************************************/
 /* Widgets. */
 
+static void
+private_widget_attach (LICliClient* client,
+                       LIWdgWidget* widget,
+                       LIWdgWidget* parent)
+{
+	if (widget->userdata != NULL)
+	{
+		if (parent != NULL)
+			liscr_data_ref (widget->userdata, parent->userdata);
+		else
+			liscr_data_ref (widget->userdata, NULL);
+	}
+}
+
+static void
+private_widget_detach (LICliClient* client,
+                       LIWdgWidget* widget,
+                       int*         free)
+{
+	if (widget->userdata != NULL)
+	{
+		if (liscr_data_get_valid (widget->userdata))
+		{
+			if (widget->parent != NULL)
+				liscr_data_unref (widget->userdata, widget->parent->userdata);
+			else
+				liscr_data_unref (widget->userdata, NULL);
+		}
+		*free = 0;
+	}
+}
+
+static void
+private_widget_free (LICliClient* client,
+                     LIWdgWidget* widget)
+{
+	if (widget->userdata != NULL)
+		liwdg_widget_detach (widget);
+}
+
 static int
 private_widget_event (LICliClient* client,
                       SDL_Event*   event)
@@ -291,6 +331,9 @@ private_widget_tick (LICliClient* client,
 int
 licli_client_init_callbacks_widget (LICliClient* self)
 {
+	lical_callbacks_insert (self->callbacks, self->widgets, "widget-attach", 5, private_widget_attach, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->widgets, "widget-detach", 5, private_widget_detach, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->widgets, "widget-free", 5, private_widget_free, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "event", -10, private_widget_event, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "tick", 1, private_widget_tick, self, NULL);
 	return 1;

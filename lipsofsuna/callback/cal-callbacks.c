@@ -50,6 +50,11 @@ private_free_type (LICalCalltype* self);
 
 /*****************************************************************************/
 
+/**
+ * \brief Creates a new callback manager.
+ *
+ * \return Callback manager or NULL.
+ */
 LICalCallbacks*
 lical_callbacks_new ()
 {
@@ -68,6 +73,11 @@ lical_callbacks_new ()
 	return self;
 }
 
+/**
+ * \brief Frees the callback manager.
+ *
+ * \param self Callback manager.
+ */
 void
 lical_callbacks_free (LICalCallbacks* self)
 {
@@ -80,6 +90,16 @@ lical_callbacks_free (LICalCallbacks* self)
 	lisys_free (self);
 }
 
+/**
+ * \brief Calls callbacks.
+ *
+ * \param self Callback manager.
+ * \param object Object whose callbacks to call.
+ * \param type Callback type to call.
+ * \param marshal Parameter marshaler.
+ * \param ... Parameters passed to the marshaler.
+ * \return Zero if handled, one if passed through.
+ */
 int
 lical_callbacks_call (LICalCallbacks* self,
                       void*           object,
@@ -97,6 +117,16 @@ lical_callbacks_call (LICalCallbacks* self,
 	return ret;
 }
 
+/**
+ * \brief Calls callbacks.
+ *
+ * \param self Callback manager.
+ * \param object Object whose callbacks to call.
+ * \param type Callback type to call.
+ * \param marshal Parameter marshaler.
+ * \param args Parameters passed to the marshaler.
+ * \return Zero if handled, one if passed through.
+ */
 int
 lical_callbacks_callva (LICalCallbacks* self,
                         void*           object,
@@ -130,6 +160,17 @@ lical_callbacks_callva (LICalCallbacks* self,
 	return 1;
 }
 
+/**
+ * \brief Creates a new callback listener.
+ *
+ * \param self Callback manager.
+ * \param object Object to listen to for callbacks.
+ * \param type Type of callbacks to listen to.
+ * \param priority Handling priority, smaller is earlier.
+ * \param call Callback function.
+ * \param data Userdata to be passed to the callback function.
+ * \param result Return location for a callback handle, or NULL.
+ */
 int
 lical_callbacks_insert (LICalCallbacks* self,
                         void*           object,
@@ -207,6 +248,13 @@ lical_callbacks_insert (LICalCallbacks* self,
 	return 1;
 }
 
+/**
+ * \brief Updates callbacks.
+ *
+ * Removes callbacks without references.
+ *
+ * \param self Callbacks.
+ */
 void
 lical_callbacks_update (LICalCallbacks* self)
 {

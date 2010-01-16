@@ -24,22 +24,6 @@
 
 #include <lipsofsuna/client.h>
 
-static void
-private_widget_attach (LICliClient* client,
-                       LIWdgWidget* widget,
-                       LIWdgWidget* parent);
-
-static void
-private_widget_detach (LICliClient* client,
-                       LIWdgWidget* widget,
-                       int*         free);
-
-static void
-private_widget_free (LICliClient* client,
-                     LIWdgWidget* widget);
-
-/*****************************************************************************/
-
 /* @luadoc
  * module "Core.Client.Widget"
  * ---
@@ -198,11 +182,6 @@ void
 licli_script_widget (LIScrClass* self,
                      void*       data)
 {
-	LICliClient* client = data;
-
-	lical_callbacks_insert (client->callbacks, client->widgets, "widget-attach", 5, private_widget_attach, client, NULL);
-	lical_callbacks_insert (client->callbacks, client->widgets, "widget-detach", 5, private_widget_detach, client, NULL);
-	lical_callbacks_insert (client->callbacks, client->widgets, "widget-free", 5, private_widget_free, client, NULL);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
@@ -211,48 +190,6 @@ licli_script_widget (LIScrClass* self,
 	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
 	liscr_class_insert_mvar (self, "x", Widget_getter_x, NULL);
 	liscr_class_insert_mvar (self, "y", Widget_getter_y, NULL);
-}
-
-/*****************************************************************************/
-
-static void
-private_widget_attach (LICliClient* client,
-                       LIWdgWidget* widget,
-                       LIWdgWidget* parent)
-{
-	if (widget->userdata != NULL)
-	{
-		if (parent != NULL)
-			liscr_data_ref (widget->userdata, parent->userdata);
-		else
-			liscr_data_ref (widget->userdata, NULL);
-	}
-}
-
-static void
-private_widget_detach (LICliClient* client,
-                       LIWdgWidget* widget,
-                       int*         free)
-{
-	if (widget->userdata != NULL)
-	{
-		if (liscr_data_get_valid (widget->userdata))
-		{
-			if (widget->parent != NULL)
-				liscr_data_unref (widget->userdata, widget->parent->userdata);
-			else
-				liscr_data_unref (widget->userdata, NULL);
-		}
-		*free = 0;
-	}
-}
-
-static void
-private_widget_free (LICliClient* client,
-                     LIWdgWidget* widget)
-{
-	if (widget->userdata != NULL)
-		liwdg_widget_detach (widget);
 }
 
 /** @} */

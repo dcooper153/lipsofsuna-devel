@@ -626,6 +626,10 @@ private_load_module (LICliClient* self,
 	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_extensions (self) ||
+	    !licli_render_init (self) ||
+	    !licli_client_init_callbacks_binding (self) ||
+	    !licli_client_init_callbacks_misc (self) ||
+	    !licli_client_init_callbacks_widget (self) ||
 	    !private_init_script (self))
 	{
 		private_free_module (self);
@@ -686,13 +690,6 @@ private_init_engine (LICliClient* self)
 	lieng_engine_set_flags (self->engine, flags | LIENG_FLAG_REMOTE_SECTORS);
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
 	lieng_engine_set_userdata (self->engine, self);
-
-	/* Connect callbacks. */
-	if (!licli_client_init_callbacks_binding (self) ||
-	    !licli_client_init_callbacks_misc (self) ||
-	    !licli_client_init_callbacks_widget (self) ||
-	    !licli_render_init (self))
-		return 0;
 
 	/* Initialize graphics. */
 	self->render = liren_render_new (self->paths->module_data);
