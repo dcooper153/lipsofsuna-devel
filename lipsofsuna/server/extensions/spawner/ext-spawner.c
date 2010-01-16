@@ -233,12 +233,7 @@ private_spawn (LIExtSpawner* self,
 	LIScrScript* script = self->server->script;
 
 	/* Check for spawn function. */
-	lua_getfield (script->lua, LUA_GLOBALSINDEX, "Spawner");
-	if (lua_type (script->lua, -1) != LUA_TTABLE)
-	{
-		lua_pop (script->lua, 1);
-		return 1;
-	}
+	liscr_pushdata (script->lua, self->script);
 	lua_getfield (script->lua, -1, "spawn_cb");
 	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
 	{
@@ -267,7 +262,7 @@ private_spawn (LIExtSpawner* self,
 	object = liscr_isdata (script->lua, -1, LISCR_SCRIPT_OBJECT);
 	if (object == NULL)
 	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "Spawner.spawn_cb did not return an object");
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Spawner.spawn_cb: did not return an object");
 		lua_pop (script->lua, 1);
 		return 0;
 	}

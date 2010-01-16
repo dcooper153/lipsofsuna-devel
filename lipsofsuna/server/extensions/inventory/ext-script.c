@@ -38,68 +38,6 @@
  */
 
 /* @luadoc
- * Gets the object in a slot.
- *
- * Arguments:
- * slot: Slot index.
- *
- * @param self Inventory.
- * @param args Arguments.
- * @return Object or nil.
- */
-static void Inventory_get_object (LIScrArgs* args)
-{
-	int slot;
-	int size;
-	LIEngObject* object;
-
-	if (liscr_args_gets_int (args, "slot", &slot))
-	{
-		size = liext_inventory_get_size (args->self);
-		if (slot >= 0 && slot <= size)
-		{
-			object = liext_inventory_get_object (args->self, slot - 1);
-			if (object != NULL)
-				liscr_args_seti_data (args, object->script);
-		}
-	}
-}
-
-/* @luadoc
- * Sets the object in a slot.
- *
- * Arguments:
- * slot: Slot index.
- * object: Object.
- *
- * @param self Inventory.
- * @param args Arguments.
- * @return Object or nil.
- */
-static void Inventory_set_object (LIScrArgs* args)
-{
-	int slot;
-	int size;
-	LIScrData* data;
-
-	if (liscr_args_gets_int (args, "slot", &slot))
-	{
-		size = liext_inventory_get_size (args->self);
-		if (slot >= 0 && slot <= size)
-		{
-			liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data);
-			if (data != NULL)
-			{
-				liext_inventory_set_object (args->self, slot - 1, data->data);
-				lieng_object_set_realized (data->data, 0);
-			}
-			else
-				liext_inventory_set_object (args->self, slot - 1, NULL);
-		}
-	}
-}
-
-/* @luadoc
  * ---
  * -- Finds an inventory.
  * --
@@ -115,9 +53,7 @@ static void Inventory_set_object (LIScrArgs* args)
 static void Inventory_find (LIScrArgs* args)
 {
 	int id;
-	LIAlgU32dicIter iter;
-	LIScrData* data0;
-	LIScrData* data1;
+	LIScrData* data;
 	LIExtInventory* inventory;
 	LIExtModule* module;
 
@@ -128,21 +64,11 @@ static void Inventory_find (LIScrArgs* args)
 		if (inventory != NULL)
 			liscr_args_seti_data (args, inventory->script);
 	}
-	else if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data0))
+	else if (liscr_args_gets_data (args, "owner", LISCR_SCRIPT_OBJECT, &data))
 	{
-		LIALG_U32DIC_FOREACH (iter, module->dictionary)
-		{
-			inventory = iter.value;
-			liscr_pushdata (args->lua, inventory->script);
-			lua_getfield (args->lua, -1, "owner");
-			data1 = liscr_isdata (args->lua, -1, LISCR_SCRIPT_OBJECT);
-			lua_pop (args->lua, 2);
-			if (data0 == data1)
-			{
-				liscr_args_seti_data (args, inventory->script);
-				return;
-			}
-		}
+		inventory = lialg_ptrdic_find (module->ptrdic, data->data);
+		if (inventory != NULL)
+			liscr_args_seti_data (args, inventory->script);
 	}
 }
 
@@ -178,6 +104,67 @@ static void Inventory_new (LIScrArgs* args)
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data, NULL);
+}
+
+/* @luadoc
+ * Gets the object in a slot.
+ *
+ * Arguments:
+ * slot: Slot index.
+ *
+ * @param self Inventory.
+ * @param args Arguments.
+ * @return Object or nil.
+ */
+static void Inventory_get_object (LIScrArgs* args)
+{
+	int slot;
+	int size;
+	LIEngObject* object;
+
+	if (liscr_args_gets_int (args, "slot", &slot))
+	{
+		size = liext_inventory_get_size (args->self);
+		if (slot >= 0 && slot <= size)
+		{
+			object = liext_inventory_get_object (args->self, slot - 1);
+			if (object != NULL)
+				liscr_args_seti_data (args, object->script);
+		}
+	}
+}
+
+/* @luadoc
+ * Sets the object in a slot.
+ *
+ * Arguments:
+ * slot: Slot index. (required)
+ * object: Object.
+ *
+ * @param self Inventory.
+ * @param args Arguments.
+ * @return Object or nil.
+ */
+static void Inventory_set_object (LIScrArgs* args)
+{
+	int slot;
+	int size;
+	LIScrData* data;
+
+	if (liscr_args_gets_int (args, "slot", &slot))
+	{
+		size = liext_inventory_get_size (args->self);
+		if (slot >= 0 && slot <= size)
+		{
+			if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+			{
+				liext_inventory_set_object (args->self, slot - 1, data->data);
+				lieng_object_set_realized (data->data, 0);
+			}
+			else
+				liext_inventory_set_object (args->self, slot - 1, NULL);
+		}
+	}
 }
 
 /* @luadoc
@@ -309,6 +296,33 @@ static void Inventory_getter_id (LIScrArgs* args)
  * -- @name Inventory.owner
  * -- @class table
  */
+static void Inventory_getter_owner (LIScrArgs* args)
+{
+	LIEngObject* object;
+
+	object = liext_inventory_get_owner (args->self);
+	if (object != NULL)
+		liscr_args_seti_data (args, object->script);
+}
+static void Inventory_setter_owner (LIScrArgs* args)
+{
+	LIScrData* data;
+
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_OBJECT, &data))
+		liext_inventory_set_owner (args->self, data->data);
+	else
+		liext_inventory_set_owner (args->self, NULL);
+}
+
+/* @luadoc
+ * ---
+ * -- Custom callback called when the owner is changed.
+ * --
+ * -- Arguments passed to the callback: inventory, object.
+ * --
+ * -- @name Inventory.owner_changed_cb
+ * -- @class table
+ */
 
 /* @luadoc
  * ---
@@ -359,15 +373,16 @@ liext_script_inventory (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY, data);
-	liscr_class_insert_mfunc (self, "get_object", Inventory_get_object);
-	liscr_class_insert_mfunc (self, "set_object", Inventory_set_object);
 	liscr_class_insert_cfunc (self, "find", Inventory_find);
 	liscr_class_insert_cfunc (self, "new", Inventory_new);
+	liscr_class_insert_mfunc (self, "get_object", Inventory_get_object);
+	liscr_class_insert_mfunc (self, "set_object", Inventory_set_object);
 	liscr_class_insert_mfunc (self, "subscribe", Inventory_subscribe);
 	liscr_class_insert_mfunc (self, "subscribed", Inventory_subscribed);
 	liscr_class_insert_mfunc (self, "unsubscribe", Inventory_unsubscribe);
 	liscr_class_insert_mvar (self, "first_free_slot", Inventory_getter_first_free_slot, NULL);
 	liscr_class_insert_mvar (self, "id", Inventory_getter_id, NULL);
+	liscr_class_insert_mvar (self, "owner", Inventory_getter_owner, Inventory_setter_owner);
 	liscr_class_insert_mvar (self, "size", Inventory_getter_size, Inventory_setter_size);
 }
 

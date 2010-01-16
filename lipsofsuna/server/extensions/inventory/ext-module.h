@@ -38,6 +38,7 @@ typedef struct _LIExtModule LIExtModule;
 
 struct _LIExtModule
 {
+	LIAlgPtrdic* ptrdic;
 	LIAlgU32dic* dictionary;
 	LICalHandle calls[2];
 	LISerServer* server;

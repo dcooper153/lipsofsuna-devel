@@ -40,7 +40,9 @@
  * -- Finds an object by ID.
  * --
  * -- Arguments:
- * -- id: Object ID.
+ * -- id: Object ID. (required)
+ * -- point: Center point for radius check.
+ * -- radius: Maximum distance from center point.
  * --
  * -- @param self Server class.
  * -- @param args Arguments.
@@ -50,15 +52,34 @@
 static void Server_find_object (LIScrArgs* args)
 {
 	int id;
+	float radius;
 	LIEngObject* object;
+	LIMatTransform transform;
+	LIMatVector center;
 	LISerServer* server;
 
 	if (liscr_args_gets_int (args, "id", &id))
 	{
+		/* Find object. */
 		server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
 		object = lieng_engine_find_object (server->engine, id);
-		if (object != NULL)
-			liscr_args_seti_data (args, object->script);
+		if (object == NULL)
+			return;
+
+		/* Optional radius check. */
+		if (liscr_args_gets_vector (args, "point", &center) &&
+		    liscr_args_gets_float (args, "radius", &radius))
+		{
+			if (!lieng_object_get_realized (object))
+				return;
+			lieng_object_get_transform (object, &transform);
+			center = limat_vector_subtract (center, transform.position);
+			if (limat_vector_get_length (center) > radius)
+				return;
+		}
+
+		/* Return object. */
+		liscr_args_seti_data (args, object->script);
 	}
 }
 

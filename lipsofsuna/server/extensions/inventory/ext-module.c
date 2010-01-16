@@ -61,6 +61,12 @@ liext_module_new (LISerServer* server)
 		lisys_free (self);
 		return NULL;
 	}
+	self->ptrdic = lialg_ptrdic_new ();
+	if (self->ptrdic == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 	if (!lical_callbacks_insert (server->callbacks, server->engine, "object-client", 0, private_object_client, self, self->calls + 0) ||
 	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 1))
 	{
@@ -77,6 +83,7 @@ void
 liext_module_free (LIExtModule* self)
 {
 	lialg_u32dic_free (self->dictionary);
+	lialg_ptrdic_free (self->ptrdic);
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }

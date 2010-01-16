@@ -308,8 +308,8 @@ static void Object_swap_clients (LIScrArgs* args)
  * -- Sweeps a sphere relative to the object.
  * --
  * -- Arguments:
- * -- start: Start point vector. (required)
- * -- end: End point vector. (required)
+ * -- src: Start point vector. (required)
+ * -- dst: End point vector. (required)
  * -- radius: Sphere radius.
  * --
  * -- @param self Object.
@@ -325,8 +325,8 @@ static void Object_sweep_sphere (LIScrArgs* args)
 	LIMatVector end;
 	LIPhyCollision result;
 
-	if (!liscr_args_gets_vector (args, "start", &start) ||
-	    !liscr_args_gets_vector (args, "end", &end))
+	if (!liscr_args_gets_vector (args, "src", &start) ||
+	    !liscr_args_gets_vector (args, "dst", &end))
 		return;
 	liscr_args_gets_float (args, "radius", &radius);
 	object = args->self;

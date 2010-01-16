@@ -36,6 +36,7 @@ struct _LIExtInventory
 {
 	int id;
 	LIAlgU32dic* listeners;
+	LIEngObject* owner;
 	LIExtModule* module;
 	LIScrData* script;
 	LISerServer* server;
@@ -79,6 +80,13 @@ int
 liext_inventory_set_object (LIExtInventory* self,
                             int             slot,
                             LIEngObject*    object);
+
+LIEngObject*
+liext_inventory_get_owner (LIExtInventory* self);
+
+int
+liext_inventory_set_owner (LIExtInventory* self,
+                           LIEngObject*    value);
 
 int
 liext_inventory_get_size (LIExtInventory* self);

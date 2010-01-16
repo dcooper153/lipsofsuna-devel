@@ -137,7 +137,7 @@ static void Camera_turn (LIScrArgs* args)
 		if (keep)
 			module->turn = value;
 		else
-			lialg_camera_tilt (module->client->camera, value);
+			lialg_camera_turn (module->client->camera, value);
 	}
 }
 

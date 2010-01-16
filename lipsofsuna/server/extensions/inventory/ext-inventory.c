@@ -44,6 +44,9 @@ private_send_object (LIExtInventory* self,
                      LIEngObject*    object);
 
 static int
+private_send_owner (LIExtInventory* self);
+
+static int
 private_send_remove (LIExtInventory* self,
                      int             slot);
 
@@ -192,6 +195,12 @@ liext_inventory_reset_listener (LIExtInventory* self,
 	}
 }
 
+int
+liext_inventory_get_id (const LIExtInventory* self)
+{
+	return self->id;
+}
+
 /**
  * \brief Gets an object in the specified slot.
  *
@@ -234,6 +243,70 @@ liext_inventory_set_object (LIExtInventory* self,
 	}
 	else
 		private_send_remove (self, slot);
+
+	return 1;
+}
+
+/**
+ * \brief Gets an owner of the inventory.
+ *
+ * \param self Inventory.
+ * \return Object or NULL.
+ */
+LIEngObject*
+liext_inventory_get_owner (LIExtInventory* self)
+{
+	return self->owner;
+}
+
+/**
+ * \brief Sets the ownert of the inventory.
+ *
+ * \param self Inventory.
+ * \param value Object or NULL.
+ * \return Nonzero on success.
+ */
+int
+liext_inventory_set_owner (LIExtInventory* self,
+                           LIEngObject*    value)
+{
+	LIExtInventory* old;
+
+	if (self->owner == value)
+		return 1;
+
+	/* Clear old inventory. */
+	if (value != NULL)
+	{
+		old = lialg_ptrdic_find (self->module->ptrdic, value);
+		if (old != NULL)
+		{
+			lialg_ptrdic_remove (self->module->ptrdic, value);
+			old->owner = NULL;
+			private_send_owner (old);
+			liscr_data_unref (old->owner->script, old->script);
+			liscr_data_unref (old->script, old->owner->script);
+		}
+	}
+
+	/* Set new owner. */
+	if (self->owner != NULL)
+	{
+		liscr_data_unref (self->owner->script, self->script);
+		liscr_data_unref (self->script, self->owner->script);
+		lialg_ptrdic_remove (self->module->ptrdic, self->owner);
+	}
+	if (value != NULL)
+	{
+		liscr_data_ref (value->script, self->script);
+		liscr_data_ref (self->script, value->script);
+		lialg_ptrdic_insert (self->module->ptrdic, value, self);
+	}
+	self->owner = value;
+
+	/* Inform scripts. */
+	if (!private_send_owner (self))
+		return 0;
 
 	return 1;
 }
@@ -301,12 +374,6 @@ liext_inventory_set_size (LIExtInventory* self,
 	}
 
 	return 1;
-}
-
-int
-liext_inventory_get_id (const LIExtInventory* self)
-{
-	return self->id;
 }
 
 /*****************************************************************************/
@@ -406,6 +473,43 @@ private_send_object (LIExtInventory* self,
 		if (lua_pcall (script->lua, 4, 0, 0) != 0)
 		{
 			lisys_error_set (EINVAL, "Inventory.item_added_cb: %s", lua_tostring (script->lua, -1));
+			lisys_error_report ();
+			lua_pop (script->lua, 1);
+		}
+	}
+
+	return 1;
+}
+
+static int
+private_send_owner (LIExtInventory* self)
+{
+	LIAlgU32dicIter iter;
+	LIScrScript* script = self->module->server->script;
+
+	LIALG_U32DIC_FOREACH (iter, self->listeners)
+	{
+		if (LISER_OBJECT (iter.value)->client == NULL)
+			continue;
+
+		/* Check for callback. */
+		liscr_pushdata (script->lua, self->script);
+		lua_getfield (script->lua, -1, "owner_changed_cb");
+		if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+		{
+			lua_pop (script->lua, 2);
+			continue;
+		}
+
+		/* Invoke callback. */
+		lua_pushvalue (script->lua, -2);
+		lua_remove (script->lua, -3);
+		liscr_pushdata (script->lua, LIENG_OBJECT (iter.value)->script);
+		if (self->owner != NULL)
+			liscr_pushdata (script->lua, self->owner->script);
+		if (lua_pcall (script->lua, 4, 0, 0) != 0)
+		{
+			lisys_error_set (EINVAL, "Inventory.owner_changed_cb: %s", lua_tostring (script->lua, -1));
 			lisys_error_report ();
 			lua_pop (script->lua, 1);
 		}

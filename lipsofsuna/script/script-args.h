@@ -263,19 +263,7 @@ liscr_marshal_CLASS (lua_State* lua);
 
 int
 liscr_marshal_DATA (lua_State* lua);
-/*
-int
-liscr_marshal_BOOL__CLASS_ARGS (lua_State* lua);
 
-int
-liscr_marshal_CLASS__CLASS_ARGS (lua_State* lua);
-
-int
-liscr_marshal_VOID__CLASS_ARGS (lua_State* lua);
-
-int
-liscr_marshal_VOID__DATA_ARGS (lua_State* lua);
-*/
 #endif
 
 /** @} */
