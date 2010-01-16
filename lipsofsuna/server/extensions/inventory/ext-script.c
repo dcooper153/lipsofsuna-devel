@@ -239,14 +239,12 @@ static void Inventory_getter_first_free_slot (LIScrArgs* args)
 {
 	int i;
 	int size;
-	LIScrData* self;
 	LIEngObject* object;
 
-	self = args->self;
-	size = liext_inventory_get_size (self->data);
+	size = liext_inventory_get_size (args->self);
 	for (i = 0 ; i < size ; i++)
 	{
-		object = liext_inventory_get_object (self->data, i);
+		object = liext_inventory_get_object (args->self, i);
 		if (object == NULL)
 		{
 			liscr_args_seti_int (args, i + 1);
@@ -370,7 +368,7 @@ static void Inventory_setter_size (LIScrArgs* args)
 
 void
 liext_script_inventory (LIScrClass* self,
-                      void*       data)
+                        void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_INVENTORY, data);
 	liscr_class_insert_cfunc (self, "find", Inventory_find);
