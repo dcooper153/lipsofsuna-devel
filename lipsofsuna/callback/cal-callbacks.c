@@ -144,7 +144,7 @@ lical_callbacks_callva (LICalCallbacks* self,
 	private_addr_type (&addr, object, type);
 	typ = lialg_memdic_find (self->types, &addr, sizeof (addr));
 	if (typ == NULL)
-		return 0;
+		return 1;
 	for (func = typ->funcs ; func != NULL ; func = func_next)
 	{
 		func_next = func->next;
