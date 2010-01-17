@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvGenerator Generator
+ * \addtogroup LIExtGenerator Generator
  * @{
  */
 
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include "ext-generator.h"
 
 #define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
@@ -40,7 +38,7 @@ struct _LIExtModule
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -49,10 +47,9 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_generator (LIScrClass* self,
-                      void*       data);
+                        void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

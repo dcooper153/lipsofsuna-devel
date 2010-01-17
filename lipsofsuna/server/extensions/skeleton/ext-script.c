@@ -16,17 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkeleton Skeleton
+ * \addtogroup LIExtSkeleton Skeleton
  * @{
  */
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/server.h>
-#include "ext-skeleton.h"
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 
 /* @luadoc
@@ -53,12 +49,11 @@ static void Skeleton_test (LIScrArgs* args)
 
 void
 liext_script_skeleton (LIScrClass* self,
-                     void*       data)
+                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);
 	liscr_class_insert_cfunc (self, "test", Skeleton_test);
 }
 
-/** @} */
 /** @} */
 /** @} */

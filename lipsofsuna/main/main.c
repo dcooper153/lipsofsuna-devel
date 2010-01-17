@@ -18,7 +18,7 @@
 /**
  * \addtogroup limai Main
  * @{
- * \addtogroup limaiMain Main
+ * \addtogroup LIMaiMain Main
  * @{
  */
 

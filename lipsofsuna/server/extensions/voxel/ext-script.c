@@ -16,16 +16,14 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup LIExtVoxel Voxel
  * @{
  */
 
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/network.h>
-#include <lipsofsuna/script.h>
 #include <lipsofsuna/server.h>
 #include "ext-listener.h"
 #include "ext-module.h"
@@ -384,17 +382,22 @@ static void Voxel_rotate (LIScrArgs* args)
 static void Voxel_save (LIScrArgs* args)
 {
 	LIExtModule* module;
+	LISerServer* server;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	if (!liext_module_write (module, module->server->sql))
-		lisys_error_report ();
+	server = limai_program_find_component (module->program, "server");
+	if (server != NULL)
+	{
+		if (!liext_module_write (module, server->sql))
+			lisys_error_report ();
+	}
 }
 
 /*****************************************************************************/
 
 void
 liext_script_material (LIScrClass* self,
-                     void*       data)
+                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
 	liscr_class_insert_mvar (self, "friction", Material_getter_friction, NULL);
@@ -427,6 +430,5 @@ liext_script_voxel (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "save", Voxel_save);
 }
 
-/** @} */
 /** @} */
 /** @} */

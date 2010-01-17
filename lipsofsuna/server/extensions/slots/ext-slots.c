@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSlots Slots
+ * \addtogroup LIExtSlots Slots
  * @{
  */
 
@@ -57,10 +55,9 @@ liext_slots_new (LIExtModule* module)
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->server = module->server;
 
 	/* Allocate script. */
-	self->script = liscr_data_new (module->server->script, self, LIEXT_SCRIPT_SLOTS, liext_slots_free);
+	self->script = liscr_data_new (module->program->script, self, LIEXT_SCRIPT_SLOTS, liext_slots_free);
 	if (self == NULL)
 	{
 		lisys_free (self);
@@ -360,6 +357,5 @@ private_send_slot (LIExtSlots* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

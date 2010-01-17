@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server 
- * @{
- * \addtogroup liextsrvSlots Slots
+ * \addtogroup LIExtSlots Slots
  * @{
  */
 
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 
 #define LIEXT_SCRIPT_SLOTS "Lips.Slots"
 
@@ -40,11 +38,11 @@ struct _LIExtModule
 {
 	LIAlgPtrdic* dictionary;
 	LICalHandle calls[1];
-	LISerServer* server;
+	LIMaiProgram* program;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -53,10 +51,9 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_slots (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

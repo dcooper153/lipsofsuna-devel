@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSpawner Spawner
+ * \addtogroup LIExtSpawner Spawner
  * @{
  */
 
@@ -28,7 +26,7 @@
 #define __EXT_MODULE_H__
 
 #include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 
 #define LIEXT_SCRIPT_SPAWNER "Lips.Spawner"
 
@@ -38,11 +36,11 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LIAlgPtrdic* dictionary;
-	LISerServer* server;
+	LIMaiProgram* program;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -55,11 +53,10 @@ liext_module_find_spawner (LIExtModule* self,
 
 void
 liext_script_spawner (LIScrClass* self,
-                    void*       data);
+                      void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */
 

@@ -33,19 +33,19 @@
 
 void
 liser_script_effect (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 liser_script_extension (LIScrClass* self,
-                      void*       data);
+                        void*       data);
 
 void
-liser_script_objet (LIScrClass* self,
-                   void*       data);
+liser_script_object (LIScrClass* self,
+                     void*       data);
 
 void
 liser_script_server (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 

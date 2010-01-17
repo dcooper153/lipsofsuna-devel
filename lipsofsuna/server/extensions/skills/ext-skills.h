@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkills Skills
+ * \addtogroup LIExtSkills Skills
  * @{
  */
 
@@ -36,10 +34,9 @@
 struct _LIExtSkills
 {
 	LIAlgStrdic* skills;
+	LIEngObject* owner;
 	LIExtModule* module;
 	LIScrData* script;
-	LISerServer* server;
-	LIEngObject* owner;
 };
 
 LIExtSkills*
@@ -74,6 +71,5 @@ liext_skills_set_owner (LIExtSkills* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

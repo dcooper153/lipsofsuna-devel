@@ -16,15 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvGenerator Generator
+ * \addtogroup LIExtGenerator Generator
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 #include "ext-generator.h"
 #include "ext-module.h"
@@ -62,6 +60,5 @@ liext_script_generator (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "save", Generator_save);
 }
 
-/** @} */
 /** @} */
 /** @} */

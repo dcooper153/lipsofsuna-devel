@@ -22,27 +22,28 @@
  * @{
  */
 
-#ifndef __SERVER_EXTENSION_H__
-#define __SERVER_EXTENSION_H__
+#ifndef __MAIN_EXTENSION_H__
+#define __MAIN_EXTENSION_H__
 
 #include <lipsofsuna/system.h>
-#include "server-types.h"
 
-#define LISER_EXTENSION_VERSION 0xFFFFFFFF
+#define LIMAI_EXTENSION_VERSION 0xFFFFFFFF
 
-struct _LISerExtension
-{
-	LISerExtensionInfo* info;
-	LISysModule* module;
-	void* object;
-};
-
-struct _LISerExtensionInfo
+typedef struct _LIMaiExtensionInfo LIMaiExtensionInfo;
+struct _LIMaiExtensionInfo
 {
 	int version;
 	const char* name;
 	void* init;
 	void* free;
+};
+
+typedef struct _LIMaiExtension LIMaiExtension;
+struct _LIMaiExtension
+{
+	LIMaiExtensionInfo* info;
+	LISysModule* module;
+	void* object;
 };
 
 #endif

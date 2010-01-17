@@ -16,15 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvInventory Inventory
+ * \addtogroup LIExtInventory Inventory
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 #include "ext-inventory.h"
 #include "ext-module.h"
@@ -384,6 +382,5 @@ liext_script_inventory (LIScrClass* self,
 	liscr_class_insert_mvar (self, "size", Inventory_getter_size, Inventory_setter_size);
 }
 
-/** @} */
 /** @} */
 /** @} */

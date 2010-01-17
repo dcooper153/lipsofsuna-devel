@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvCreature Creature
+ * \addtogroup LIExtCreature Creature
  * @{
  */
 
@@ -40,14 +38,14 @@ private_tick (LIExtCreature* self,
  * \return Creature logic or NULL.
  */
 LIExtCreature*
-liext_creature_new (LISerServer* server)
+liext_creature_new (LIExtModule* module)
 {
 	LIExtCreature* self;
 
 	self = lisys_calloc (1, sizeof (LIExtCreature));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->module = module;
 	liext_creature_set_active (self, 1);
 
 	return self;
@@ -79,7 +77,7 @@ liext_creature_set_active (LIExtCreature* self,
 	if (self->active == value)
 		return 1;
 	if (value)
-		lical_callbacks_insert (self->server->callbacks, self->server->engine, "tick", 0, private_tick, self, self->calls + 0);
+		lical_callbacks_insert (self->module->program->callbacks, self->module->program->engine, "tick", 0, private_tick, self, self->calls + 0);
 	else
 		lical_handle_release (self->calls + 0);
 	self->active = value;
@@ -107,14 +105,14 @@ liext_creature_set_object (LIExtCreature* self,
 		flags = lieng_object_get_flags (self->object);
 		liphy_object_set_control_mode (self->object->physics, LIPHY_CONTROL_MODE_RIGID);
 		lieng_object_set_flags (self->object, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
-		liscr_data_unref (self->object->script, self->data);
+		liscr_data_unref (self->object->script, self->script);
 	}
 	if (object != NULL)
 	{
 		flags = lieng_object_get_flags (object);
 		liphy_object_set_control_mode (object->physics, LIPHY_CONTROL_MODE_CHARACTER);
 		lieng_object_set_flags (object, flags | LIENG_OBJECT_FLAG_DYNAMIC);
-		liscr_data_ref (object->script, self->data);
+		liscr_data_ref (object->script, self->script);
 	}
 	self->object = object;
 
@@ -148,6 +146,5 @@ private_tick (LIExtCreature* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

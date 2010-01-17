@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup LIExtVoxel Voxel
  * @{
  */
 
@@ -67,18 +65,19 @@ private_tick (LIExtModule* self,
 
 /*****************************************************************************/
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Voxel",
+	LIMAI_EXTENSION_VERSION, "Voxel",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIAlgU32dicIter iter;
 	LIExtModule* self;
+	LISerServer* server;
 	LIVoxMaterial* material;
 
 	/* Allocate self. */
@@ -86,7 +85,7 @@ liext_module_new (LISerServer* server)
 	if (self == NULL)
 		return NULL;
 	self->radius = 20.0f;
-	self->server = server;
+	self->program = program;
 
 	/* Allocate listener list. */
 	self->listeners = lialg_ptrdic_new ();
@@ -105,17 +104,21 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Create voxel manager. */
-	self->voxels = livox_manager_new (server->callbacks, server->sectors);
+	self->voxels = livox_manager_new (program->callbacks, program->sectors);
 	if (self->voxels == NULL)
 	{
 		liext_module_free (self);
 		return NULL;
 	}
-	livox_manager_set_sql (self->voxels, server->sql);
-	if (!livox_manager_load_materials (self->voxels))
+	server = limai_program_find_component (program, "server");
+	if (server != NULL)
 	{
-		liext_module_free (self);
-		return NULL;
+		livox_manager_set_sql (self->voxels, server->sql);
+		if (!livox_manager_load_materials (self->voxels))
+		{
+			liext_module_free (self);
+			return NULL;
+		}
 	}
 
 	/* Create assign packet. */
@@ -136,12 +139,12 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (server->callbacks, server->engine, "client-login", 1, private_object_client_login, self, self->calls + 0) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "object-client", 1, private_object_client, self, self->calls + 1) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "object-motion", 1, private_object_motion, self, self->calls + 2) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "object-visibility", 1, private_object_visibility, self, self->calls + 3) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "sector-load", 0, private_sector_load, self, self->calls + 4) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 5) ||
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "client-login", 1, private_object_client_login, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-client", 1, private_object_client, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-motion", 1, private_object_motion, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 1, private_object_visibility, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "sector-load", 0, private_sector_load, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 5) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-free", 0, private_block_free, self, self->calls + 6) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 0, private_block_load, self, self->calls + 7))
 	{
@@ -150,9 +153,9 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Material", liext_script_material, self);
-	liscr_script_create_class (server->script, "Tile", liext_script_tile, self);
-	liscr_script_create_class (server->script, "Voxel", liext_script_voxel, self);
+	liscr_script_create_class (program->script, "Material", liext_script_material, self);
+	liscr_script_create_class (program->script, "Tile", liext_script_tile, self);
+	liscr_script_create_class (program->script, "Voxel", liext_script_voxel, self);
 
 	return self;
 }
@@ -378,6 +381,5 @@ private_tick (LIExtModule* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

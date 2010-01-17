@@ -15,35 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEditor Editor      
- * @{
- */
+#ifndef __LIPS_MAIN_H__
+#define __LIPS_MAIN_H__
 
-#ifndef __EXT_EDITOR_H__
-#define __EXT_EDITOR_H__
-
-#include <lipsofsuna/server.h>
-
-typedef struct _LIExtEditor LIExtEditor;
-struct _LIExtEditor
-{
-	LISerServer* server;
-	LICalHandle calls[1];
-};
-
-LIExtEditor*
-liext_editor_new (LISerServer* server);
-
-void
-liext_editor_free (LIExtEditor* self);
+#include "lipsofsuna/main/main-extension.h"
+#include "lipsofsuna/main/main-program.h"
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

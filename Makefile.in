@@ -57,15 +57,16 @@ subdir = .
 DIST_COMMON = README $(ai_HEADERS) $(alg_HEADERS) \
 	$(am__configure_deps) $(arc_HEADERS) $(bnd_HEADERS) \
 	$(cal_HEADERS) $(cli_HEADERS) $(eng_HEADERS) $(fnt_HEADERS) \
-	$(gen_HEADERS) $(img_HEADERS) $(mat_HEADERS) $(mdl_HEADERS) \
-	$(net_HEADERS) $(par_HEADERS) $(phy_HEADERS) $(pth_HEADERS) \
-	$(rel_HEADERS) $(rnd_HEADERS) $(scr_HEADERS) $(snd_HEADERS) \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(srv_HEADERS) $(str_HEADERS) \
-	$(sys_HEADERS) $(thr_HEADERS) $(top_srcdir)/configure \
-	$(vid_HEADERS) $(vie_HEADERS) $(vox_HEADERS) $(wdg_HEADERS) \
-	AUTHORS COPYING COPYING.LESSER INSTALL config.guess config.sub \
-	depcomp install-sh ltmain.sh missing
+	$(gen_HEADERS) $(img_HEADERS) $(los_HEADERS) $(mai_HEADERS) \
+	$(mat_HEADERS) $(mdl_HEADERS) $(net_HEADERS) $(par_HEADERS) \
+	$(phy_HEADERS) $(pth_HEADERS) $(rel_HEADERS) $(rnd_HEADERS) \
+	$(scr_HEADERS) $(snd_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/config.h.in $(srv_HEADERS) \
+	$(str_HEADERS) $(sys_HEADERS) $(thr_HEADERS) \
+	$(top_srcdir)/configure $(vid_HEADERS) $(vie_HEADERS) \
+	$(vox_HEADERS) $(wdg_HEADERS) AUTHORS COPYING COPYING.LESSER \
+	INSTALL config.guess config.sub depcomp install-sh ltmain.sh \
+	missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
@@ -109,6 +110,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(caldir)" "$(DESTDIR)$(clidir)" \
 	"$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" \
 	"$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" \
+	"$(DESTDIR)$(losdir)" "$(DESTDIR)$(maidir)" \
 	"$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" \
 	"$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" \
 	"$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" \
@@ -178,8 +180,9 @@ am__objects_9 = lipsofsuna/engine/engine.lo \
 am__objects_10 = lipsofsuna/image/image.lo \
 	lipsofsuna/image/image-compress.lo \
 	lipsofsuna/image/image-texture.lo
-am__objects_11 = lipsofsuna/math/math.lo
-am__objects_12 = lipsofsuna/model/model.lo \
+am__objects_11 = lipsofsuna/main/main-program.lo
+am__objects_12 = lipsofsuna/math/math.lo
+am__objects_13 = lipsofsuna/model/model.lo \
 	lipsofsuna/model/model-animation.lo \
 	lipsofsuna/model/model-bone.lo lipsofsuna/model/model-faces.lo \
 	lipsofsuna/model/model-hair.lo lipsofsuna/model/model-light.lo \
@@ -187,22 +190,22 @@ am__objects_12 = lipsofsuna/model/model.lo \
 	lipsofsuna/model/model-node.lo lipsofsuna/model/model-pose.lo \
 	lipsofsuna/model/model-shape.lo \
 	lipsofsuna/model/model-texture.lo
-am__objects_13 = lipsofsuna/network/network.lo
-am__objects_14 = lipsofsuna/physics/physics.lo \
+am__objects_14 = lipsofsuna/network/network.lo
+am__objects_15 = lipsofsuna/physics/physics.lo \
 	lipsofsuna/physics/physics-constraint.lo \
 	lipsofsuna/physics/physics-control.lo \
 	lipsofsuna/physics/physics-object.lo \
 	lipsofsuna/physics/physics-private.lo \
 	lipsofsuna/physics/physics-shape.lo
-am__objects_15 = lipsofsuna/particle/particle-line.lo \
+am__objects_16 = lipsofsuna/particle/particle-line.lo \
 	lipsofsuna/particle/particle-manager.lo \
 	lipsofsuna/particle/particle-point.lo
-am__objects_16 = lipsofsuna/paths/paths.lo
-am__objects_17 = lipsofsuna/reload/reload.lo \
+am__objects_17 = lipsofsuna/paths/paths.lo
+am__objects_18 = lipsofsuna/reload/reload.lo \
 	lipsofsuna/reload/reload-blender.lo \
 	lipsofsuna/reload/reload-gimp.lo \
 	lipsofsuna/reload/reload-image.lo
-am__objects_18 = lipsofsuna/render/render.lo \
+am__objects_19 = lipsofsuna/render/render.lo \
 	lipsofsuna/render/render-buffer.lo \
 	lipsofsuna/render/render-context.lo \
 	lipsofsuna/render/render-deferred.lo \
@@ -217,7 +220,7 @@ am__objects_18 = lipsofsuna/render/render.lo \
 	lipsofsuna/render/render-scene.lo \
 	lipsofsuna/render/render-shader.lo \
 	lipsofsuna/render/render-texture.lo
-am__objects_19 = lipsofsuna/script/script.lo \
+am__objects_20 = lipsofsuna/script/script.lo \
 	lipsofsuna/script/script-args.lo \
 	lipsofsuna/script/script-class.lo \
 	lipsofsuna/script/script-data.lo \
@@ -229,12 +232,12 @@ am__objects_19 = lipsofsuna/script/script.lo \
 	lipsofsuna/script/script-quaternion.lo \
 	lipsofsuna/script/script-util.lo \
 	lipsofsuna/script/script-vector.lo
-am__objects_20 = lipsofsuna/string/string-generic.lo
-am__objects_21 = lipsofsuna/sound/sound-manager.lo \
+am__objects_21 = lipsofsuna/string/string-generic.lo
+am__objects_22 = lipsofsuna/sound/sound-manager.lo \
 	lipsofsuna/sound/sound-sample.lo \
 	lipsofsuna/sound/sound-source.lo \
 	lipsofsuna/sound/sound-system.lo
-am__objects_22 = lipsofsuna/server/server.lo \
+am__objects_23 = lipsofsuna/server/server.lo \
 	lipsofsuna/server/server-callbacks.lo \
 	lipsofsuna/server/server-client.lo \
 	lipsofsuna/server/server-network.lo \
@@ -243,7 +246,7 @@ am__objects_22 = lipsofsuna/server/server.lo \
 	lipsofsuna/server/server-script-extension.lo \
 	lipsofsuna/server/server-script-object.lo \
 	lipsofsuna/server/server-script-server.lo
-am__objects_23 = lipsofsuna/system/system.lo \
+am__objects_24 = lipsofsuna/system/system.lo \
 	lipsofsuna/system/system-directory.lo \
 	lipsofsuna/system/system-error.lo \
 	lipsofsuna/system/system-file.lo \
@@ -256,16 +259,16 @@ am__objects_23 = lipsofsuna/system/system.lo \
 	lipsofsuna/system/system-relative.lo \
 	lipsofsuna/system/system-types.lo \
 	lipsofsuna/system/system-user.lo
-am__objects_24 = lipsofsuna/thread/thread.lo \
+am__objects_25 = lipsofsuna/thread/thread.lo \
 	lipsofsuna/thread/thread-async-call.lo
-am__objects_25 = lipsofsuna/video/video-calls.lo \
+am__objects_26 = lipsofsuna/video/video-calls.lo \
 	lipsofsuna/video/video-features.lo
-am__objects_26 = lipsofsuna/voxel/voxel.lo \
+am__objects_27 = lipsofsuna/voxel/voxel.lo \
 	lipsofsuna/voxel/voxel-block.lo \
 	lipsofsuna/voxel/voxel-manager.lo \
 	lipsofsuna/voxel/voxel-material.lo \
 	lipsofsuna/voxel/voxel-sector.lo
-am__objects_27 = lipsofsuna/widget/widget.lo \
+am__objects_28 = lipsofsuna/widget/widget.lo \
 	lipsofsuna/widget/widget-busy.lo \
 	lipsofsuna/widget/widget-button.lo \
 	lipsofsuna/widget/widget-check.lo \
@@ -294,7 +297,7 @@ am_liblipsofsunaclient_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
 	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
 	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
-	$(am__objects_27)
+	$(am__objects_27) $(am__objects_28)
 liblipsofsunaclient_la_OBJECTS = $(am_liblipsofsunaclient_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -308,9 +311,9 @@ liblipsofsunagenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_liblipsofsunagenerator_la_OBJECTS = $(am__objects_2) \
 	$(am__objects_3) $(am__objects_5) $(am__objects_8) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_16) \
-	$(am__objects_20) $(am__objects_23) $(am__objects_24) \
-	$(am__objects_26)
+	$(am__objects_12) $(am__objects_13) $(am__objects_17) \
+	$(am__objects_21) $(am__objects_24) $(am__objects_25) \
+	$(am__objects_27)
 liblipsofsunagenerator_la_OBJECTS =  \
 	$(am_liblipsofsunagenerator_la_OBJECTS)
 liblipsofsunagenerator_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -323,9 +326,9 @@ liblipsofsunaimport_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_liblipsofsunaimport_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_16) \
-	$(am__objects_17) $(am__objects_20) $(am__objects_23) \
-	$(am__objects_24) lipsofsuna/image/image.lo \
+	$(am__objects_12) $(am__objects_13) $(am__objects_17) \
+	$(am__objects_18) $(am__objects_21) $(am__objects_24) \
+	$(am__objects_25) lipsofsuna/image/image.lo \
 	lipsofsuna/image/image-compress.lo
 liblipsofsunaimport_la_OBJECTS = $(am_liblipsofsunaimport_la_OBJECTS)
 liblipsofsunaimport_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
@@ -340,9 +343,9 @@ liblipsofsunaserver_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 am_liblipsofsunaserver_la_OBJECTS = $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_5) $(am__objects_9) \
 	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_14) $(am__objects_16) $(am__objects_19) \
-	$(am__objects_22) $(am__objects_20) $(am__objects_23) \
-	$(am__objects_24) $(am__objects_26)
+	$(am__objects_14) $(am__objects_15) $(am__objects_17) \
+	$(am__objects_20) $(am__objects_23) $(am__objects_21) \
+	$(am__objects_24) $(am__objects_25) $(am__objects_27)
 liblipsofsunaserver_la_OBJECTS = $(am_liblipsofsunaserver_la_OBJECTS)
 liblipsofsunaserver_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -354,13 +357,13 @@ liblipsofsunaviewer_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-am__objects_28 = lipsofsuna/viewer/viewer.lo
+am__objects_29 = lipsofsuna/viewer/viewer.lo
 am_liblipsofsunaviewer_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
-	$(am__objects_7) $(am__objects_10) $(am__objects_11) \
-	$(am__objects_12) $(am__objects_15) $(am__objects_16) \
-	$(am__objects_17) $(am__objects_18) $(am__objects_20) \
-	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
-	$(am__objects_28)
+	$(am__objects_7) $(am__objects_10) $(am__objects_12) \
+	$(am__objects_13) $(am__objects_16) $(am__objects_17) \
+	$(am__objects_18) $(am__objects_19) $(am__objects_21) \
+	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
+	$(am__objects_29)
 liblipsofsunaviewer_la_OBJECTS = $(am_liblipsofsunaviewer_la_OBJECTS)
 liblipsofsunaviewer_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
@@ -403,7 +406,6 @@ lipsofsuna_import_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_import_LDFLAGS) $(LDFLAGS) \
 	-o $@
-am__objects_29 = lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT)
 am__objects_30 = lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT) \
 	lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT) \
 	lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT) \
@@ -417,7 +419,9 @@ am__objects_30 = lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT) \
 	lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT) \
 	lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT) \
 	lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT)
-am_lipsofsuna_launch_OBJECTS = $(am__objects_29) $(am__objects_30)
+am_lipsofsuna_launch_OBJECTS =  \
+	lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT) \
+	$(am__objects_30)
 lipsofsuna_launch_OBJECTS = $(am_lipsofsuna_launch_OBJECTS)
 lipsofsuna_launch_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
@@ -515,11 +519,12 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 DATA = $(editor_DATA)
 HEADERS = $(ai_HEADERS) $(alg_HEADERS) $(arc_HEADERS) $(bnd_HEADERS) \
 	$(cal_HEADERS) $(cli_HEADERS) $(eng_HEADERS) $(fnt_HEADERS) \
-	$(gen_HEADERS) $(img_HEADERS) $(mat_HEADERS) $(mdl_HEADERS) \
-	$(net_HEADERS) $(par_HEADERS) $(phy_HEADERS) $(pth_HEADERS) \
-	$(rel_HEADERS) $(rnd_HEADERS) $(scr_HEADERS) $(snd_HEADERS) \
-	$(srv_HEADERS) $(str_HEADERS) $(sys_HEADERS) $(thr_HEADERS) \
-	$(vid_HEADERS) $(vie_HEADERS) $(vox_HEADERS) $(wdg_HEADERS)
+	$(gen_HEADERS) $(img_HEADERS) $(los_HEADERS) $(mai_HEADERS) \
+	$(mat_HEADERS) $(mdl_HEADERS) $(net_HEADERS) $(par_HEADERS) \
+	$(phy_HEADERS) $(pth_HEADERS) $(rel_HEADERS) $(rnd_HEADERS) \
+	$(scr_HEADERS) $(snd_HEADERS) $(srv_HEADERS) $(str_HEADERS) \
+	$(sys_HEADERS) $(thr_HEADERS) $(vid_HEADERS) $(vie_HEADERS) \
+	$(vox_HEADERS) $(wdg_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -748,9 +753,38 @@ lib_LTLIBRARIES = $(am__append_4) $(am__append_6) $(am__append_8) \
 	$(am__append_10) $(am__append_12)
 
 ##############################################################################
+losdir = $(includedir)/lipsofsuna
+los_HEADERS = \
+	lipsofsuna/ai.h \
+	lipsofsuna/algorithm.h \
+	lipsofsuna/archive.h \
+	lipsofsuna/binding.h \
+	lipsofsuna/callback.h \
+	lipsofsuna/client.h \
+	lipsofsuna/engine.h \
+	lipsofsuna/font.h \
+	lipsofsuna/generator.h \
+	lipsofsuna/image.h \
+	lipsofsuna/math.h \
+	lipsofsuna/model.h \
+	lipsofsuna/network.h \
+	lipsofsuna/particle.h \
+	lipsofsuna/physics.h \
+	lipsofsuna/paths.h \
+	lipsofsuna/reload.h \
+	lipsofsuna/render.h \
+	lipsofsuna/script.h \
+	lipsofsuna/sound.h \
+	lipsofsuna/server.h \
+	lipsofsuna/string.h \
+	lipsofsuna/system.h \
+	lipsofsuna/thread.h \
+	lipsofsuna/video.h \
+	lipsofsuna/voxel.h \
+	lipsofsuna/widget.h
+
 aidir = $(includedir)/lipsofsuna/ai
 ai_HEADERS = \
-	lipsofsuna/ai.h \
 	lipsofsuna/ai/ai-manager.h \
 	lipsofsuna/ai/ai-path.h \
 	lipsofsuna/ai/ai-sector.h \
@@ -764,7 +798,6 @@ aisrc = \
 
 algdir = $(includedir)/lipsofsuna/algorithm
 alg_HEADERS = \
-	lipsofsuna/algorithm.h \
 	lipsofsuna/algorithm/algorithm-array.h \
 	lipsofsuna/algorithm/algorithm-astar.h \
 	lipsofsuna/algorithm/algorithm-bst.h \
@@ -790,7 +823,6 @@ algsrc = \
 
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \
-	lipsofsuna/archive.h \
 	lipsofsuna/archive/archive-reader.h \
 	lipsofsuna/archive/archive-sql.h \
 	lipsofsuna/archive/archive-tar.h \
@@ -804,7 +836,6 @@ arcsrc = \
 
 bnddir = $(includedir)/lipsofsuna/binding
 bnd_HEADERS = \
-	lipsofsuna/binding.h \
 	lipsofsuna/binding/binding.h \
 	lipsofsuna/binding/binding-action.h \
 	lipsofsuna/binding/binding-manager.h \
@@ -817,7 +848,6 @@ bndsrc = \
 
 caldir = $(includedir)/lipsofsuna/callback
 cal_HEADERS = \
-	lipsofsuna/callback.h \
 	lipsofsuna/callback/cal-callbacks.h \
 	lipsofsuna/callback/cal-handle.h \
 	lipsofsuna/callback/cal-marshal.h
@@ -829,7 +859,6 @@ calsrc = \
 
 clidir = $(includedir)/lipsofsuna/client
 cli_HEADERS = \
-	lipsofsuna/client.h \
 	lipsofsuna/client/client.h \
 	lipsofsuna/client/client-callbacks.h \
 	lipsofsuna/client/client-extension.h \
@@ -863,7 +892,6 @@ clisrc = \
 
 engdir = $(includedir)/lipsofsuna/engine
 eng_HEADERS = \
-	lipsofsuna/engine.h \
 	lipsofsuna/engine/engine.h \
 	lipsofsuna/engine/engine-constraint.h \
 	lipsofsuna/engine/engine-iterator.h \
@@ -885,7 +913,6 @@ engsrc = \
 
 fntdir = $(includedir)/lipsofsuna/font
 fnt_HEADERS = \
-	lipsofsuna/font.h \
 	lipsofsuna/font/font.h \
 	lipsofsuna/font/font-layout.h
 
@@ -895,7 +922,6 @@ fntsrc = \
 
 gendir = $(includedir)/lipsofsuna/generator
 gen_HEADERS = \
-	lipsofsuna/generator.h \
 	lipsofsuna/generator/generator.h \
 	lipsofsuna/generator/generator-brush.h \
 	lipsofsuna/generator/generator-rule.h \
@@ -908,7 +934,6 @@ gensrc = \
 
 imgdir = $(includedir)/lipsofsuna/image
 img_HEADERS = \
-	lipsofsuna/image.h \
 	lipsofsuna/image/image.h \
 	lipsofsuna/image/image-compress.h \
 	lipsofsuna/image/image-dds.h \
@@ -919,12 +944,16 @@ imgsrc = \
 	lipsofsuna/image/image-compress.cpp \
 	lipsofsuna/image/image-texture.c
 
+maidir = $(includedir)/lipsofsuna/main
+mai_HEADERS = \
+	lipsofsuna/main/main-extension.h \
+	lipsofsuna/main/main-program.h
+
 maisrc = \
-	lipsofsuna/main/main.c
+	lipsofsuna/main/main-program.c
 
 matdir = $(includedir)/lipsofsuna/math
 mat_HEADERS = \
-	lipsofsuna/math.h \
 	lipsofsuna/math/math-aabb.h \
 	lipsofsuna/math/math-convert.h \
 	lipsofsuna/math/math-frustum.h  \
@@ -949,7 +978,6 @@ matsrc = \
 
 mdldir = $(includedir)/lipsofsuna/model
 mdl_HEADERS = \
-	lipsofsuna/model.h \
 	lipsofsuna/model/model.h \
 	lipsofsuna/model/model-animation.h \
 	lipsofsuna/model/model-bone.h \
@@ -979,7 +1007,6 @@ mdlsrc = \
 
 netdir = $(includedir)/lipsofsuna/network
 net_HEADERS = \
-	lipsofsuna/network.h \
 	lipsofsuna/network/network-extension.h \
 	lipsofsuna/network/network-protocol.h
 
@@ -988,7 +1015,6 @@ netsrc = \
 
 pardir = $(includedir)/lipsofsuna/particle
 par_HEADERS = \
-	lipsofsuna/particle.h \
 	lipsofsuna/particle/particle-line.h \
 	lipsofsuna/particle/particle-manager.h \
 	lipsofsuna/particle/particle-point.h
@@ -1000,7 +1026,6 @@ parsrc = \
 
 phydir = $(includedir)/lipsofsuna/physics
 phy_HEADERS = \
-	lipsofsuna/physics.h \
 	lipsofsuna/physics/physics.h \
 	lipsofsuna/physics/physics-constraint.h \
 	lipsofsuna/physics/physics-object.h \
@@ -1018,7 +1043,6 @@ physrc = \
 
 pthdir = $(includedir)/lipsofsuna/path
 pth_HEADERS = \
-	lipsofsuna/paths.h \
 	lipsofsuna/paths/paths.h
 
 pthsrc = \
@@ -1026,7 +1050,6 @@ pthsrc = \
 
 reldir = $(includedir)/lipsofsuna/reload
 rel_HEADERS = \
-	lipsofsuna/reload.h \
 	lipsofsuna/reload/reload.h
 
 relsrc = \
@@ -1037,7 +1060,6 @@ relsrc = \
 
 rnddir = $(includedir)/lipsofsuna/render
 rnd_HEADERS = \
-	lipsofsuna/render.h \
 	lipsofsuna/render/render.h \
 	lipsofsuna/render/render-buffer.h \
 	lipsofsuna/render/render-context.h \
@@ -1075,7 +1097,6 @@ rndsrc = \
 
 scrdir = $(includedir)/lipsofsuna/script
 scr_HEADERS = \
-	lipsofsuna/script.h \
 	lipsofsuna/script/script.h \
 	lipsofsuna/script/script-args.h \
 	lipsofsuna/script/script-class.h \
@@ -1103,7 +1124,6 @@ scrsrc = \
 
 snddir = $(includedir)/lipsofsuna/sound
 snd_HEADERS = \
-	lipsofsuna/sound.h \
 	lipsofsuna/sound/sound-manager.h \
 	lipsofsuna/sound/sound-sample.h \
 	lipsofsuna/sound/sound-source.h \
@@ -1117,11 +1137,9 @@ sndsrc = \
 
 srvdir = $(includedir)/lipsofsuna/server
 srv_HEADERS = \
-	lipsofsuna/server.h \
 	lipsofsuna/server/server.h \
 	lipsofsuna/server/server-callbacks.h \
 	lipsofsuna/server/server-client.h \
-	lipsofsuna/server/server-extension.h \
 	lipsofsuna/server/server-network.h \
 	lipsofsuna/server/server-object.h \
 	lipsofsuna/server/server-observer.h \
@@ -1141,7 +1159,6 @@ srvsrc = \
 
 strdir = $(includedir)/lipsofsuna/string
 str_HEADERS = \
-	lipsofsuna/string.h \
 	lipsofsuna/string/string-generic.h
 
 strsrc = \
@@ -1149,7 +1166,6 @@ strsrc = \
 
 sysdir = $(includedir)/lipsofsuna/system
 sys_HEADERS = \
-	lipsofsuna/system.h \
 	lipsofsuna/system/system.h \
 	lipsofsuna/system/system-compiler.h \
 	lipsofsuna/system/system-directory.h \
@@ -1183,7 +1199,6 @@ syssrc = \
 
 thrdir = $(includedir)/lipsofsuna/thread
 thr_HEADERS = \
-	lipsofsuna/thread.h \
 	lipsofsuna/thread/thread.h \
 	lipsofsuna/thread/thread-async-call.h
 
@@ -1193,7 +1208,6 @@ thrsrc = \
 
 viddir = $(includedir)/lipsofsuna/video
 vid_HEADERS = \
-	lipsofsuna/video.h \
 	lipsofsuna/video/video-calls.h \
 	lipsofsuna/video/video-features.h \
 	lipsofsuna/video/video-opengl.h
@@ -1211,7 +1225,6 @@ viesrc = \
 
 voxdir = $(includedir)/lipsofsuna/voxel
 vox_HEADERS = \
-	lipsofsuna/voxel.h \
 	lipsofsuna/voxel/voxel.h \
 	lipsofsuna/voxel/voxel-block.h \
 	lipsofsuna/voxel/voxel-iterator.h \
@@ -1230,7 +1243,6 @@ voxsrc = \
 
 wdgdir = $(includedir)/lipsofsuna/widget
 wdg_HEADERS = \
-	lipsofsuna/widget.h \
 	lipsofsuna/widget/widget.h \
 	lipsofsuna/widget/widget-busy.h \
 	lipsofsuna/widget/widget-button.h \
@@ -1287,8 +1299,8 @@ liblipsofsunaclient_la_LIBADD = \
 	$(LIPS_LIBS) $(LIBPNG_LIBS) $(PTHREAD_LIBS)
 
 liblipsofsunaclient_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) \
-	$(fntsrc) $(gensrc) $(engsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(fntsrc) \
+	$(gensrc) $(engsrc) $(imgsrc) $(maisrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
@@ -1315,7 +1327,7 @@ liblipsofsunaserver_la_LIBADD = \
 	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
 
 liblipsofsunaserver_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(matsrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(maisrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
@@ -1330,7 +1342,7 @@ liblipsofsunaviewer_la_SOURCES = \
 ##############################################################################
 lipsofsuna_launch_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_launch_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
-lipsofsuna_launch_SOURCES = $(maisrc) $(syssrc)
+lipsofsuna_launch_SOURCES = lipsofsuna/main/main.c $(syssrc)
 lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)
 lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c
@@ -1629,6 +1641,14 @@ lipsofsuna/image/image-compress.lo: lipsofsuna/image/$(am__dirstamp) \
 	lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/image/image-texture.lo: lipsofsuna/image/$(am__dirstamp) \
 	lipsofsuna/image/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/main/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/main
+	@: > lipsofsuna/main/$(am__dirstamp)
+lipsofsuna/main/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) lipsofsuna/main/$(DEPDIR)
+	@: > lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/main/main-program.lo: lipsofsuna/main/$(am__dirstamp) \
+	lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/math/$(am__dirstamp):
 	@$(MKDIR_P) lipsofsuna/math
 	@: > lipsofsuna/math/$(am__dirstamp)
@@ -2103,12 +2123,6 @@ lipsofsuna/reload/reload-main.$(OBJEXT):  \
 lipsofsuna-import$(EXEEXT): $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_DEPENDENCIES) 
 	@rm -f lipsofsuna-import$(EXEEXT)
 	$(AM_V_CCLD)$(lipsofsuna_import_LINK) $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_LDADD) $(LIBS)
-lipsofsuna/main/$(am__dirstamp):
-	@$(MKDIR_P) lipsofsuna/main
-	@: > lipsofsuna/main/$(am__dirstamp)
-lipsofsuna/main/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) lipsofsuna/main/$(DEPDIR)
-	@: > lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT):  \
 	lipsofsuna/main/$(am__dirstamp) \
 	lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
@@ -2276,6 +2290,8 @@ mostlyclean-compile:
 	-rm -f lipsofsuna/image/image.$(OBJEXT)
 	-rm -f lipsofsuna/image/image.lo
 	-rm -f lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT)
+	-rm -f lipsofsuna/main/main-program.$(OBJEXT)
+	-rm -f lipsofsuna/main/main-program.lo
 	-rm -f lipsofsuna/math/math.$(OBJEXT)
 	-rm -f lipsofsuna/math/math.lo
 	-rm -f lipsofsuna/model/model-animation.$(OBJEXT)
@@ -2573,6 +2589,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/main/$(DEPDIR)/main-program.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/math/$(DEPDIR)/math.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-animation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-bone.Plo@am__quote@
@@ -2994,6 +3011,7 @@ clean-libtool:
 	-rm -rf lipsofsuna/font/.libs lipsofsuna/font/_libs
 	-rm -rf lipsofsuna/generator/.libs lipsofsuna/generator/_libs
 	-rm -rf lipsofsuna/image/.libs lipsofsuna/image/_libs
+	-rm -rf lipsofsuna/main/.libs lipsofsuna/main/_libs
 	-rm -rf lipsofsuna/math/.libs lipsofsuna/math/_libs
 	-rm -rf lipsofsuna/model/.libs lipsofsuna/model/_libs
 	-rm -rf lipsofsuna/network/.libs lipsofsuna/network/_libs
@@ -3235,6 +3253,46 @@ uninstall-imgHEADERS:
 	test -n "$$files" || exit 0; \
 	echo " ( cd '$(DESTDIR)$(imgdir)' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(imgdir)" && rm -f $$files
+install-losHEADERS: $(los_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(losdir)" || $(MKDIR_P) "$(DESTDIR)$(losdir)"
+	@list='$(los_HEADERS)'; test -n "$(losdir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(losdir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(losdir)" || exit $$?; \
+	done
+
+uninstall-losHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(los_HEADERS)'; test -n "$(losdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(losdir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(losdir)" && rm -f $$files
+install-maiHEADERS: $(mai_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(maidir)" || $(MKDIR_P) "$(DESTDIR)$(maidir)"
+	@list='$(mai_HEADERS)'; test -n "$(maidir)" || list=; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(maidir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(maidir)" || exit $$?; \
+	done
+
+uninstall-maiHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(mai_HEADERS)'; test -n "$(maidir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	test -n "$$files" || exit 0; \
+	echo " ( cd '$(DESTDIR)$(maidir)' && rm -f" $$files ")"; \
+	cd "$(DESTDIR)$(maidir)" && rm -f $$files
 install-matHEADERS: $(mat_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(matdir)" || $(MKDIR_P) "$(DESTDIR)$(matdir)"
@@ -3913,7 +3971,7 @@ install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(editordir)" "$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" "$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" "$(DESTDIR)$(caldir)" "$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" "$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" "$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" "$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" "$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" "$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" "$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" "$(DESTDIR)$(wdgdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(prgdir)" "$(DESTDIR)$(editordir)" "$(DESTDIR)$(aidir)" "$(DESTDIR)$(algdir)" "$(DESTDIR)$(arcdir)" "$(DESTDIR)$(bnddir)" "$(DESTDIR)$(caldir)" "$(DESTDIR)$(clidir)" "$(DESTDIR)$(engdir)" "$(DESTDIR)$(fntdir)" "$(DESTDIR)$(gendir)" "$(DESTDIR)$(imgdir)" "$(DESTDIR)$(losdir)" "$(DESTDIR)$(maidir)" "$(DESTDIR)$(matdir)" "$(DESTDIR)$(mdldir)" "$(DESTDIR)$(netdir)" "$(DESTDIR)$(pardir)" "$(DESTDIR)$(phydir)" "$(DESTDIR)$(pthdir)" "$(DESTDIR)$(reldir)" "$(DESTDIR)$(rnddir)" "$(DESTDIR)$(scrdir)" "$(DESTDIR)$(snddir)" "$(DESTDIR)$(srvdir)" "$(DESTDIR)$(strdir)" "$(DESTDIR)$(sysdir)" "$(DESTDIR)$(thrdir)" "$(DESTDIR)$(viddir)" "$(DESTDIR)$(viedir)" "$(DESTDIR)$(voxdir)" "$(DESTDIR)$(wdgdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -4027,13 +4085,14 @@ install-data-am: install-aiHEADERS install-algHEADERS \
 	install-arcHEADERS install-bndHEADERS install-calHEADERS \
 	install-cliHEADERS install-data-local install-editorDATA \
 	install-engHEADERS install-fntHEADERS install-genHEADERS \
-	install-imgHEADERS install-matHEADERS install-mdlHEADERS \
-	install-netHEADERS install-parHEADERS install-phyHEADERS \
-	install-prgPROGRAMS install-pthHEADERS install-relHEADERS \
-	install-rndHEADERS install-scrHEADERS install-sndHEADERS \
-	install-srvHEADERS install-strHEADERS install-sysHEADERS \
-	install-thrHEADERS install-vidHEADERS install-vieHEADERS \
-	install-voxHEADERS install-wdgHEADERS
+	install-imgHEADERS install-losHEADERS install-maiHEADERS \
+	install-matHEADERS install-mdlHEADERS install-netHEADERS \
+	install-parHEADERS install-phyHEADERS install-prgPROGRAMS \
+	install-pthHEADERS install-relHEADERS install-rndHEADERS \
+	install-scrHEADERS install-sndHEADERS install-srvHEADERS \
+	install-strHEADERS install-sysHEADERS install-thrHEADERS \
+	install-vidHEADERS install-vieHEADERS install-voxHEADERS \
+	install-wdgHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -4086,14 +4145,14 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	uninstall-bndHEADERS uninstall-calHEADERS uninstall-cliHEADERS \
 	uninstall-editorDATA uninstall-engHEADERS uninstall-fntHEADERS \
 	uninstall-genHEADERS uninstall-imgHEADERS \
-	uninstall-libLTLIBRARIES uninstall-matHEADERS \
-	uninstall-mdlHEADERS uninstall-netHEADERS uninstall-parHEADERS \
-	uninstall-phyHEADERS uninstall-prgPROGRAMS \
-	uninstall-pthHEADERS uninstall-relHEADERS uninstall-rndHEADERS \
-	uninstall-scrHEADERS uninstall-sndHEADERS uninstall-srvHEADERS \
-	uninstall-strHEADERS uninstall-sysHEADERS uninstall-thrHEADERS \
-	uninstall-vidHEADERS uninstall-vieHEADERS uninstall-voxHEADERS \
-	uninstall-wdgHEADERS
+	uninstall-libLTLIBRARIES uninstall-losHEADERS \
+	uninstall-maiHEADERS uninstall-matHEADERS uninstall-mdlHEADERS \
+	uninstall-netHEADERS uninstall-parHEADERS uninstall-phyHEADERS \
+	uninstall-prgPROGRAMS uninstall-pthHEADERS \
+	uninstall-relHEADERS uninstall-rndHEADERS uninstall-scrHEADERS \
+	uninstall-sndHEADERS uninstall-srvHEADERS uninstall-strHEADERS \
+	uninstall-sysHEADERS uninstall-thrHEADERS uninstall-vidHEADERS \
+	uninstall-vieHEADERS uninstall-voxHEADERS uninstall-wdgHEADERS
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all \
 	ctags-recursive install-am install-strip tags-recursive
@@ -4114,25 +4173,26 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	install-editorDATA install-engHEADERS install-exec \
 	install-exec-am install-fntHEADERS install-genHEADERS \
 	install-html install-html-am install-imgHEADERS install-info \
-	install-info-am install-libLTLIBRARIES install-man \
-	install-matHEADERS install-mdlHEADERS install-netHEADERS \
-	install-parHEADERS install-pdf install-pdf-am \
-	install-phyHEADERS install-prgPROGRAMS install-ps \
-	install-ps-am install-pthHEADERS install-relHEADERS \
-	install-rndHEADERS install-scrHEADERS install-sndHEADERS \
-	install-srvHEADERS install-strHEADERS install-strip \
-	install-sysHEADERS install-thrHEADERS install-vidHEADERS \
-	install-vieHEADERS install-voxHEADERS install-wdgHEADERS \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags tags-recursive uninstall \
-	uninstall-aiHEADERS uninstall-algHEADERS uninstall-am \
-	uninstall-arcHEADERS uninstall-binPROGRAMS \
-	uninstall-bndHEADERS uninstall-calHEADERS uninstall-cliHEADERS \
-	uninstall-editorDATA uninstall-engHEADERS uninstall-fntHEADERS \
-	uninstall-genHEADERS uninstall-imgHEADERS \
-	uninstall-libLTLIBRARIES uninstall-matHEADERS \
+	install-info-am install-libLTLIBRARIES install-losHEADERS \
+	install-maiHEADERS install-man install-matHEADERS \
+	install-mdlHEADERS install-netHEADERS install-parHEADERS \
+	install-pdf install-pdf-am install-phyHEADERS \
+	install-prgPROGRAMS install-ps install-ps-am \
+	install-pthHEADERS install-relHEADERS install-rndHEADERS \
+	install-scrHEADERS install-sndHEADERS install-srvHEADERS \
+	install-strHEADERS install-strip install-sysHEADERS \
+	install-thrHEADERS install-vidHEADERS install-vieHEADERS \
+	install-voxHEADERS install-wdgHEADERS installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-aiHEADERS \
+	uninstall-algHEADERS uninstall-am uninstall-arcHEADERS \
+	uninstall-binPROGRAMS uninstall-bndHEADERS \
+	uninstall-calHEADERS uninstall-cliHEADERS uninstall-editorDATA \
+	uninstall-engHEADERS uninstall-fntHEADERS uninstall-genHEADERS \
+	uninstall-imgHEADERS uninstall-libLTLIBRARIES \
+	uninstall-losHEADERS uninstall-maiHEADERS uninstall-matHEADERS \
 	uninstall-mdlHEADERS uninstall-netHEADERS uninstall-parHEADERS \
 	uninstall-phyHEADERS uninstall-prgPROGRAMS \
 	uninstall-pthHEADERS uninstall-relHEADERS uninstall-rndHEADERS \

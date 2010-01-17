@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEvents Events
+ * \addtogroup LIExtEvents Events
  * @{
  */
 
@@ -148,6 +146,5 @@ liext_script_events (LIScrClass* self,
 	liscr_class_insert_func (self, "remove", Events_remove);
 }
 
-/** @} */
 /** @} */
 /** @} */

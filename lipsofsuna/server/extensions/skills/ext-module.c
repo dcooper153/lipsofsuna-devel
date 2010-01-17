@@ -16,16 +16,14 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkills Skills
+ * \addtogroup LIExtSkills Skills
  * @{
  */
 
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/network.h>
-#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-skills.h"
 
@@ -44,15 +42,15 @@ private_vision_show (LIExtModule* self,
 
 /*****************************************************************************/
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Skills",
+	LIMAI_EXTENSION_VERSION, "Skills",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -60,7 +58,7 @@ liext_module_new (LISerServer* server)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 
 	/* Allocate dictionary. */
 	self->dictionary = lialg_ptrdic_new ();
@@ -71,16 +69,16 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (server->callbacks, server->engine, "object-client", 0, private_object_client, self, self->calls + 0) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "vision-show", 0, private_vision_show, self, self->calls + 2))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-client", 0, private_object_client, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "vision-show", 0, private_vision_show, self, self->calls + 2))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Skills", liext_script_skills, self);
+	liscr_script_create_class (program->script, "Skills", liext_script_skills, self);
 
 	return self;
 }
@@ -181,6 +179,5 @@ private_vision_show (LIExtModule* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

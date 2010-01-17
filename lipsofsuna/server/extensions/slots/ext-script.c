@@ -16,16 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSlots Slots
+ * \addtogroup LIExtSlots Slots
  * @{
  */
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 #include "ext-slots.h"
 
@@ -264,6 +261,5 @@ liext_script_slots (LIScrClass* self,
 	liscr_class_insert_mvar (self, "owner", Slots_getter_owner, Slots_setter_owner);
 }
 
-/** @} */
 /** @} */
 /** @} */

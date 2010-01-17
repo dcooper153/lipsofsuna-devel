@@ -16,36 +16,34 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvCreature Creature
+ * \addtogroup LIExtCreature Creature
  * @{
  */
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include "ext-creature.h"
 #include "ext-module.h"
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Creature",
+	LIMAI_EXTENSION_VERSION, "Creature",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 
-	liscr_script_create_class (server->script, "Creature", liext_script_creature, self);
+	liscr_script_create_class (program->script, "Creature", liext_script_creature, self);
 
 	return self;
 }
@@ -57,6 +55,5 @@ liext_module_free (LIExtModule* self)
 	lisys_free (self);
 }
 
-/** @} */
 /** @} */
 /** @} */

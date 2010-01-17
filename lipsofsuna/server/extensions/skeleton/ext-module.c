@@ -16,42 +16,33 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkeleton Skeleton
+ * \addtogroup LIExtSkeleton Skeleton
  * @{
  */
 
-#include <lipsofsuna/server.h>
-#include "ext-skeleton.h"
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Skeleton",
+	LIMAI_EXTENSION_VERSION, "Skeleton",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
-	self->skeleton = liext_skeleton_new (server);
-	if (self->skeleton == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
+	self->program = program;
 
-	liscr_script_create_class (server->script, "Skeleton", liext_script_skeleton, self);
+	liscr_script_create_class (program->script, "Skeleton", liext_script_skeleton, self);
 
 	return self;
 }
@@ -59,11 +50,8 @@ liext_module_new (LISerServer* server)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* FIXME: Remove the class here. */
-	liext_skeleton_free (self->skeleton);
 	lisys_free (self);
 }
 
-/** @} */
 /** @} */
 /** @} */

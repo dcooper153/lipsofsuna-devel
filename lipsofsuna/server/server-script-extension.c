@@ -54,7 +54,7 @@ Extension_new (lua_State* lua)
 	server = liscr_checkclassdata (lua, 1, LISER_SCRIPT_EXTENSION);
 	name = luaL_checkstring (lua, 2);
 
-	ret = liser_server_load_extension (server, name);
+	ret = limai_program_insert_extension (server->program, name);
 	if (!ret)
 		lisys_error_report ();
 	lua_pushboolean (lua, ret);
@@ -65,7 +65,7 @@ Extension_new (lua_State* lua)
 
 void
 liser_script_extension (LIScrClass* self,
-                      void*       data)
+                        void*       data)
 {
 	liscr_class_set_userdata (self, LISER_SCRIPT_EXTENSION, data);
 	liscr_class_insert_func (self, "new", Extension_new);

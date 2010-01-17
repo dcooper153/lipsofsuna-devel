@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkills Skills
+ * \addtogroup LIExtSkills Skills
  * @{
  */
 
@@ -72,6 +70,5 @@ liext_skill_set_value (LIExtSkill* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

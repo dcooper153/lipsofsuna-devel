@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvInventory Inventory 
+ * \addtogroup LIExtInventory Inventory 
  * @{
  */
 
@@ -39,22 +37,22 @@ private_tick (LIExtModule* self,
 
 /*****************************************************************************/
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Inventory",
+	LIMAI_EXTENSION_VERSION, "Inventory",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
@@ -67,14 +65,14 @@ liext_module_new (LISerServer* server)
 		lisys_free (self);
 		return NULL;
 	}
-	if (!lical_callbacks_insert (server->callbacks, server->engine, "object-client", 0, private_object_client, self, self->calls + 0) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-client", 0, private_object_client, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
 
-	liscr_script_create_class (server->script, "Inventory", liext_script_inventory, self);
+	liscr_script_create_class (program->script, "Inventory", liext_script_inventory, self);
 
 	return self;
 }
@@ -117,6 +115,5 @@ private_tick (LIExtModule* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSpawner Spawner    
+ * \addtogroup LIExtSpawner Spawner    
  * @{
  */
 
@@ -57,7 +55,6 @@ liext_spawner_new (LIExtModule* module)
 	self->delay = 600.0f;
 	self->limit = 1;
 	self->module = module;
-	self->server = module->server;
 	liext_spawner_set_active (self, 1);
 
 	return self;
@@ -83,7 +80,7 @@ liext_spawner_set_active (LIExtSpawner* self,
 	if (self->active == value)
 		return 1;
 	if (value)
-		lical_callbacks_insert (self->server->callbacks, self->server->engine, "tick", 0, private_tick, self, self->calls + 0);
+		lical_callbacks_insert (self->module->program->callbacks, self->module->program->engine, "tick", 0, private_tick, self, self->calls + 0);
 	else
 		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	self->active = value;
@@ -230,7 +227,7 @@ private_spawn (LIExtSpawner* self,
                int           slot)
 {
 	LIScrData* object;
-	LIScrScript* script = self->server->script;
+	LIScrScript* script = self->module->program->script;
 
 	/* Check for spawn function. */
 	liscr_pushdata (script->lua, self->script);
@@ -275,6 +272,5 @@ private_spawn (LIExtSpawner* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

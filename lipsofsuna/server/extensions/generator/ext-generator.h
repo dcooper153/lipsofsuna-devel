@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvGenerator Generator
+ * \addtogroup LIExtGenerator Generator
  * @{
  */
 
@@ -44,6 +42,5 @@ liext_generator_free (LIExtGenerator* self);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

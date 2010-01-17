@@ -16,16 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvCreature Creature
+ * \addtogroup LIExtCreature Creature
  * @{
  */
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include "ext-creature.h"
 #include "ext-module.h"
 
@@ -53,20 +50,20 @@ static void Creature_new (LIScrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CREATURE);
-	self = liext_creature_new (module->server);
+	self = liext_creature_new (module);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	self->data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CREATURE, liext_creature_free);
-	if (self->data == NULL)
+	self->script = liscr_data_new (args->script, self, LIEXT_SCRIPT_CREATURE, liext_creature_free);
+	if (self->script == NULL)
 	{
 		liext_creature_free (self);
 		return;
 	}
-	liscr_args_call_setters (args, self->data);
-	liscr_args_seti_data (args, self->data);
-	liscr_data_unref (self->data, NULL);
+	liscr_args_call_setters (args, self->script);
+	liscr_args_seti_data (args, self->script);
+	liscr_data_unref (self->script, NULL);
 }
 
 /* @luadoc
@@ -120,6 +117,5 @@ liext_script_creature (LIScrClass* self,
 	liscr_class_insert_mvar (self, "owner", Creature_getter_owner, Creature_setter_owner);
 }
 
-/** @} */
 /** @} */
 /** @} */

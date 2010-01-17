@@ -63,26 +63,28 @@ struct _LICliClient
 
 	/* Module specific. */
 	int moving;
-	int quit;
 	char* name;
 	char* path;
 	char* login;
 	char* password;
 	char* camera_node;
 	LIAlgCamera* camera;
-	LIAlgSectors* sectors;
-	LIAlgStrdic* extensions;
 	LIBndManager* bindings;
-	LICalCallbacks* callbacks;
 	LICliNetwork* network;
-	LIEngEngine* engine;
 	LIPthPaths* paths;
 	LIRenRender* render;
 	LIRenScene* scene;
-	LIScrScript* script;
 	LISerServer* server;
 	LIThrThread* server_thread;
 	LIWdgManager* widgets;
+
+	/* Module specific, shared with server. */
+	int quit;
+	LIAlgSectors* sectors;
+	LIAlgStrdic* extensions;
+	LICalCallbacks* callbacks;
+	LIEngEngine* engine;
+	LIScrScript* script;
 };
 
 LICliClient*

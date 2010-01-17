@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEvents Events
+ * \addtogroup LIExtEvents Events
  * @{
  */
 
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 
 #define LIEXT_SCRIPT_EVENTS "Lips.Events"
@@ -50,11 +48,11 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LICalHandle calls[9];
-	LISerServer* server;
+	LIMaiProgram* program;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -68,10 +66,9 @@ liext_module_event (LIExtModule* self,
 
 void
 liext_script_events (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

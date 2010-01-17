@@ -16,20 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvInventory Inventory 
+ * \addtogroup LIExtInventory Inventory 
  * @{
  */
 
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 
 #define LIEXT_SCRIPT_INVENTORY "Lips.Inventory"
 
@@ -41,11 +37,11 @@ struct _LIExtModule
 	LIAlgPtrdic* ptrdic;
 	LIAlgU32dic* dictionary;
 	LICalHandle calls[2];
-	LISerServer* server;
+	LIMaiProgram* program;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -58,14 +54,13 @@ liext_module_find_inventory (LIExtModule* self,
 
 void
 liext_script_skill (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 void
 liext_script_inventory (LIScrClass* self,
-                      void*       data);
+                        void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

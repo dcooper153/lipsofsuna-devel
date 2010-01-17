@@ -16,15 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkills Skills
+ * \addtogroup LIExtSkills Skills
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-skills.h"
@@ -473,6 +471,5 @@ liext_script_skills (LIScrClass* self,
 	liscr_class_insert_mvar (self, "owner", Skills_getter_owner, Skills_setter_owner);
 }
 
-/** @} */
 /** @} */
 /** @} */

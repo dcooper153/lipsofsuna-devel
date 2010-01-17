@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvGenerator Generator
+ * \addtogroup LIExtGenerator Generator
  * @{
  */
 
@@ -28,30 +26,30 @@
 #include "ext-generator.h"
 #include "ext-module.h"
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Generator",
+	LIMAI_EXTENSION_VERSION, "Generator",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
-	self->generator = liext_generator_new (server);
+	self->server = limai_program_find_component (program, "server");
+	self->generator = liext_generator_new (self->server);
 	if (self->generator == NULL)
 	{
 		lisys_free (self);
 		return NULL;
 	}
 
-	liscr_script_create_class (server->script, "Generator", liext_script_generator, self);
+	liscr_script_create_class (program->script, "Generator", liext_script_generator, self);
 
 	return self;
 }
@@ -59,11 +57,9 @@ liext_module_new (LISerServer* server)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* FIXME: Remove the class here. */
 	liext_generator_free (self->generator);
 	lisys_free (self);
 }
 
-/** @} */
 /** @} */
 /** @} */

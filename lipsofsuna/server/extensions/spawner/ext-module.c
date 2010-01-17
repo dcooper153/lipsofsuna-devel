@@ -16,27 +16,25 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSpawner Spawner    
+ * \addtogroup LIExtSpawner Spawner    
  * @{
  */
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 #include "ext-spawner.h"
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Spawner",
+	LIMAI_EXTENSION_VERSION, "Spawner",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -44,7 +42,7 @@ liext_module_new (LISerServer* server)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 
 	/* Allocate dictionary. */
 	self->dictionary = lialg_ptrdic_new ();
@@ -55,7 +53,7 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Spawner", liext_script_spawner, self);
+	liscr_script_create_class (program->script, "Spawner", liext_script_spawner, self);
 
 	return self;
 }
@@ -75,6 +73,5 @@ liext_module_find_spawner (LIExtModule* self,
 	return lialg_ptrdic_find (self->dictionary, owner);
 }
 
-/** @} */
 /** @} */
 /** @} */

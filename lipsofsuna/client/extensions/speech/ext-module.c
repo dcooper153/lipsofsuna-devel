@@ -37,9 +37,9 @@ private_tick (LIExtModule* self,
 
 /*****************************************************************************/
 
-LISerExtensionInfo liextInfo =
+LICliExtensionInfo liextInfo =
 {
-	LISER_EXTENSION_VERSION, "Speech",
+	LICLI_EXTENSION_VERSION, "Speech",
 	liext_module_new,
 	liext_module_free
 };

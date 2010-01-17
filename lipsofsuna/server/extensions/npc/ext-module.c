@@ -16,37 +16,35 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvNpc Npc      
+ * \addtogroup LIExtNpc Npc      
  * @{
  */
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 #include "ext-npc.h"
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Npc",
+	LIMAI_EXTENSION_VERSION, "Npc",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	void* fun;
 	LIExtModule* self;
-	LISerExtension* ext;
+	LIMaiExtension* ext;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 
 	/* Allocate dictionary. */
 	self->dictionary = lialg_ptrdic_new ();
@@ -57,7 +55,7 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Check for voxel terrain. */
-	ext = liser_server_find_extension (server, "voxel");
+	ext = limai_program_find_extension (program, "voxel");
 	if (ext != NULL)
 	{
 		fun = lisys_module_symbol (ext->module, "liext_module_get_voxels");
@@ -66,7 +64,7 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Allocate AI manager. */
-	self->ai = liai_manager_new (server->callbacks, server->sectors, self->voxels);
+	self->ai = liai_manager_new (program->callbacks, program->sectors, self->voxels);
 	if (self->ai == NULL)
 	{
 		liext_module_free (self);
@@ -74,7 +72,7 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Npc", liext_script_npc, self);
+	liscr_script_create_class (program->script, "Npc", liext_script_npc, self);
 
 	return self;
 }
@@ -117,6 +115,5 @@ liext_module_solve_path (LIExtModule*       self,
 	return liai_manager_solve_path (self->ai, &transform.position, target);
 }
 
-/** @} */
 /** @} */
 /** @} */

@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSkills Skills
+ * \addtogroup LIExtSkills Skills
  * @{
  */
 
@@ -50,7 +48,6 @@ liext_skills_new (LIExtModule* module)
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->server = module->server;
 	self->skills = lialg_strdic_new ();
 	if (self->skills == NULL)
 	{
@@ -59,7 +56,7 @@ liext_skills_new (LIExtModule* module)
 	}
 
 	/* Allocate script. */
-	self->script = liscr_data_new (module->server->script, self, LIEXT_SCRIPT_SKILLS, liext_skills_free);
+	self->script = liscr_data_new (module->program->script, self, LIEXT_SCRIPT_SKILLS, liext_skills_free);
 	if (self == NULL)
 	{
 		lialg_strdic_free (self->skills);
@@ -350,6 +347,5 @@ private_send_skill (LIExtSkills* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup LIExtVoxel Voxel
  * @{
  */
 
@@ -87,7 +85,7 @@ liext_block_build (LIExtBlock*  self,
 		material = livox_manager_find_material (module->voxels, voxel->type);
 		if (material == NULL)
 			continue;
-		model = lieng_engine_find_model_by_name (self->module->server->engine, material->model);
+		model = lieng_engine_find_model_by_name (self->module->program->engine, material->model);
 		if (model == NULL || model->physics == NULL)
 			continue;
 
@@ -96,7 +94,7 @@ liext_block_build (LIExtBlock*  self,
 		transform.position = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		livox_voxel_get_quaternion (voxel, &transform.rotation);
 		if (self->physics == NULL)
-			self->physics = liphy_object_new (self->module->server->engine->physics, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
+			self->physics = liphy_object_new (self->module->program->engine->physics, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
 		if (self->physics != NULL)
 			liphy_object_insert_shape (self->physics, model->physics, &transform);
 	}
@@ -114,6 +112,5 @@ liext_block_build (LIExtBlock*  self,
 	return self->physics != NULL;
 }
 
-/** @} */
 /** @} */
 /** @} */

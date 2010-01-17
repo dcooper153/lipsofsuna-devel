@@ -16,19 +16,18 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvCreature Creature
+ * \addtogroup LIExtCreature Creature
  * @{
  */
 
 #ifndef __EXT_CREATURE_H__
 #define __EXT_CREATURE_H__
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/system.h>
+#include "ext-module.h"
 
 typedef struct _LIExtCreature LIExtCreature;
 struct _LIExtCreature
@@ -37,12 +36,12 @@ struct _LIExtCreature
 	int controls;
 	LICalHandle calls[1];
 	LIEngObject* object;
-	LIScrData* data;
-	LISerServer* server;
+	LIExtModule* module;
+	LIScrData* script;
 };
 
 LIExtCreature*
-liext_creature_new (LISerServer* server);
+liext_creature_new (LIExtModule* module);
 
 void
 liext_creature_free (LIExtCreature* self);
@@ -60,6 +59,5 @@ liext_creature_set_object (LIExtCreature* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

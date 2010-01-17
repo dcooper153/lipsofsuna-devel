@@ -210,7 +210,7 @@ licli_client_host (LICliClient* self)
 	if (self->server_thread != NULL)
 	{
 		assert (self->server != NULL);
-		self->server->quit = 1;
+		limai_program_shutdown (self->server->program);
 		lithr_thread_free (self->server_thread);
 		assert (self->server == NULL);
 	}
@@ -558,7 +558,7 @@ private_free_module (LICliClient* self)
 	}
 	if (self->server_thread != NULL)
 	{
-		self->server->quit = 1;
+		limai_program_shutdown (self->server->program);
 		lithr_thread_free (self->server_thread);
 		self->server_thread = NULL;
 	}

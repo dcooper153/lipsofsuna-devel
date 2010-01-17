@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvNpc Npc
+ * \addtogroup LIExtNpc Npc
  * @{
  */
 
@@ -29,7 +27,7 @@
 
 #include <lipsofsuna/ai.h>
 #include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/voxel.h>
 
 #define LIEXT_SCRIPT_NPC "Lips.Npc"
@@ -41,12 +39,12 @@ struct _LIExtModule
 {
 	LIAiManager* ai;
 	LIAlgPtrdic* dictionary;
-	LISerServer* server;
+	LIMaiProgram* program;
 	LIVoxManager* voxels;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -64,10 +62,9 @@ liext_module_solve_path (LIExtModule*       self,
 
 void
 liext_script_npc (LIScrClass* self,
-                void*       data);
+                  void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

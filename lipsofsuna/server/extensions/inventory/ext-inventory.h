@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvInventory Inventory
+ * \addtogroup LIExtInventory Inventory
  * @{
  */
 
@@ -28,7 +26,7 @@
 #define __EXT_SKILLS_H__
 
 #include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/system.h>
 #include "ext-module.h"
 
@@ -39,7 +37,6 @@ struct _LIExtInventory
 	LIEngObject* owner;
 	LIExtModule* module;
 	LIScrData* script;
-	LISerServer* server;
 	struct
 	{
 		int count;
@@ -97,6 +94,5 @@ liext_inventory_set_size (LIExtInventory* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

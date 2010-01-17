@@ -188,30 +188,7 @@ static void Server_shutdown (LIScrArgs* args)
 	LISerServer* server;
 
 	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
-	liser_server_shutdown (server);
-}
-
-/* @luadoc
- * ---
- * -- Debug flag.
- * -- @name Server.debug
- * -- @class table
- */
-static void Server_getter_debug (LIScrArgs* args)
-{
-	LISerServer* server;
-
-	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
-	liscr_args_seti_int (args, server->debug);
-}
-static void Server_setter_debug (LIScrArgs* args)
-{
-	int value;
-	LISerServer* server;
-
-	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
-	if (liscr_args_geti_int (args, 0, &value))
-		server->debug = value;
+	limai_program_shutdown (server->program);
 }
 
 /* @luadoc
@@ -225,7 +202,7 @@ static void Server_getter_time (LIScrArgs* args)
 	LISerServer* server;
 
 	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
-	liscr_args_seti_float (args, liser_server_get_time (server));
+	liscr_args_seti_float (args, limai_program_get_time (server->program));
 }
 
 /*****************************************************************************/
@@ -240,7 +217,6 @@ liser_script_server (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "nearby_objects", Server_nearby_objects);
 	liscr_class_insert_cfunc (self, "save", Server_save);
 	liscr_class_insert_cfunc (self, "shutdown", Server_shutdown);
-	liscr_class_insert_cvar (self, "debug", Server_getter_debug, Server_setter_debug);
 	liscr_class_insert_cvar (self, "time", Server_getter_time, NULL);
 }
 

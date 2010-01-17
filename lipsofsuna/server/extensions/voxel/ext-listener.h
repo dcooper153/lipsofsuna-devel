@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup LIExtVoxel Voxel
  * @{
  */
 
@@ -76,6 +74,5 @@ liext_listener_get_cached (const LIExtListener* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

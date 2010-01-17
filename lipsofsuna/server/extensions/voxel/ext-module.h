@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvVoxel Voxel
+ * \addtogroup LIExtVoxel Voxel
  * @{
  */
 
@@ -29,7 +27,7 @@
 
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/callback.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 #include <lipsofsuna/voxel.h>
 
@@ -53,12 +51,12 @@ struct _LIExtModule
 	LIAlgMemdic* blocks;
 	LIArcWriter* assign_packet;
 	LICalHandle calls[8];
-	LISerServer* server;
+	LIMaiProgram* program;
 	LIVoxManager* voxels;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -102,6 +100,5 @@ liext_script_voxel (LIScrClass* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

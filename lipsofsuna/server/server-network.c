@@ -55,6 +55,10 @@ static int
 private_rename (LISerNetwork*    self,
                 grapple_message* message);
 
+static int
+private_update (LISerNetwork* self,
+                float         secs);
+
 /*****************************************************************************/
 
 LISerNetwork*
@@ -64,11 +68,20 @@ liser_network_new (LISerServer* server,
 {
 	LISerNetwork* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LISerNetwork));
 	if (self == NULL)
 		return NULL;
 	self->server = server;
 
+	/* Connect callbacks. */
+	if (!lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_update, self, self->calls))
+	{
+		lisys_free (self);
+		return NULL;
+	}
+
+	/* Initialize self. */
 	pthread_mutex_init (&self->mutex, NULL);
 	if (!private_init (self, udp, port))
 	{
@@ -102,6 +115,7 @@ liser_network_free (LISerNetwork* self)
 	if (self->server != 0)
 		grapple_server_destroy (self->socket);
 	pthread_mutex_destroy (&self->mutex);
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
@@ -393,6 +407,15 @@ private_rename (LISerNetwork*    self,
 
 	/* Not allowed. */
 	return 0;
+}
+
+static int
+private_update (LISerNetwork* self,
+                float         secs)
+{
+	liser_network_update (self, secs);
+
+	return 1;
 }
 
 /** @} */

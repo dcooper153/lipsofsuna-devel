@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEvents Events
+ * \addtogroup LIExtEvents Events
  * @{
  */
 
@@ -73,38 +71,38 @@ private_visibility (LIExtModule* self,
 
 /*****************************************************************************/
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Events",
+	LIMAI_EXTENSION_VERSION, "Events",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	int i;
 	LIExtModule* self;
-	LIScrScript* script = server->script;
+	LIScrScript* script = program->script;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 	liscr_script_create_class (script, "Event", liscr_script_event, self);
 	liscr_script_create_class (script, "Events", liext_script_events, self);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (server->callbacks, server->engine, "object-animation", 0, private_animation, self, self->calls + 0) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "client-control", 0, private_control, self, self->calls + 1) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "client-login", 0, private_login, self, self->calls + 2) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "client-logout", 0, private_logout, self, self->calls + 3) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "object-motion", 0, private_motion, self, self->calls + 4) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "client-packet", 5, private_packet, self, self->calls + 5) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "object-effect", 0, private_sample, self, self->calls + 6) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "tick", 0, private_tick, self, self->calls + 7) ||
-	    !lical_callbacks_insert (server->callbacks, server->engine, "object-visibility", 0, private_visibility, self, self->calls + 8))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-animation", 0, private_animation, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "client-control", 0, private_control, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "client-login", 0, private_login, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "client-logout", 0, private_logout, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-motion", 0, private_motion, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "client-packet", 5, private_packet, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-effect", 0, private_sample, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 0, private_visibility, self, self->calls + 8))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -147,7 +145,7 @@ liext_module_event (LIExtModule* self,
 {
 	va_list args;
 	LIScrData* event = NULL;
-	LIScrScript* script = self->server->script;
+	LIScrScript* script = self->program->script;
 
 	/* Get event table. */
 	lua_pushlightuserdata (script->lua, self);
@@ -229,7 +227,7 @@ private_control (LIExtModule*     self,
 {
 	LIScrData* data0;
 
-	data0 = liscr_quaternion_new (self->server->script, rotation);
+	data0 = liscr_quaternion_new (self->program->script, rotation);
 	liext_module_event (self, LIEXT_EVENT_CONTROL,
 		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"rotation", LISCR_SCRIPT_QUATERNION, data0,
@@ -278,7 +276,7 @@ private_packet (LIExtModule* self,
 	LIScrData* data0;
 
 	type = ((uint8_t*) packet->buffer)[0];
-	data0 = liscr_packet_new_readable (self->server->script, packet);
+	data0 = liscr_packet_new_readable (self->program->script, packet);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
 		"object", LISCR_SCRIPT_OBJECT, client->object->script,
 		"message", LISCR_TYPE_INT, type,
@@ -322,6 +320,5 @@ private_visibility (LIExtModule* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

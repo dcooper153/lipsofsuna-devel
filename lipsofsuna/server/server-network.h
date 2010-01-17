@@ -39,6 +39,7 @@ struct _LISerNetwork
 	LIAlgU32dic* clients;
 	LIAlgStrdic* passwords;
 	LIArcWriter* resources;
+	LICalHandle calls[1];
 	LISerServer* server;
 };
 

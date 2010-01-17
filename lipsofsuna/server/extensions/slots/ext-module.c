@@ -16,14 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server 
- * @{
- * \addtogroup liextsrvSlots Slots
+ * \addtogroup LIExtSlots Slots
  * @{
  */
 
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/network.h>
 #include <lipsofsuna/server.h>
 #include "ext-module.h"
@@ -36,15 +35,15 @@ private_vision_show (LIExtModule* self,
 
 /*****************************************************************************/
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Slots",
+	LIMAI_EXTENSION_VERSION, "Slots",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -52,7 +51,7 @@ liext_module_new (LISerServer* server)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
+	self->program = program;
 	self->dictionary = lialg_ptrdic_new ();
 	if (self->dictionary == NULL)
 	{
@@ -61,14 +60,14 @@ liext_module_new (LISerServer* server)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (server->callbacks, server->engine, "vision-show", 0, private_vision_show, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "vision-show", 0, private_vision_show, self, self->calls + 0))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (server->script, "Slots", liext_script_slots, self);
+	liscr_script_create_class (program->script, "Slots", liext_script_slots, self);
 
 	return self;
 }
@@ -127,6 +126,5 @@ private_vision_show (LIExtModule* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

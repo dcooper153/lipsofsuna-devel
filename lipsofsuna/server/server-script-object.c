@@ -36,7 +36,8 @@ private_contact_callback (LIPhyObject*  object,
 {
 	LIScrData* data;
 	LIEngObject* engobj = liphy_object_get_userdata (object);
-	LISerServer* server = lieng_engine_get_userdata (engobj->engine);
+	LIMaiProgram* program = lieng_engine_get_userdata (engobj->engine);
+	LISerServer* server = limai_program_find_component (program, "server");
 	LIScrScript* script = server->script;
 
 	/* Push callback. */
@@ -419,8 +420,8 @@ static void Object_getter_client (LIScrArgs* args)
 /*****************************************************************************/
 
 void
-liser_script_objet (LIScrClass* self,
-                   void*       data)
+liser_script_object (LIScrClass* self,
+                     void*       data)
 {
 	liscr_class_inherit (self, liscr_script_object, NULL);
 	liscr_class_set_userdata (self, LISER_SCRIPT_OBJECT, data);

@@ -16,16 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvNpc Npc
+ * \addtogroup LIExtNpc Npc
  * @{
  */
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 #include "ext-npc.h"
 
@@ -283,6 +280,5 @@ liext_script_npc (LIScrClass* self,
 	liscr_class_insert_mvar (self, "target", Npc_getter_target, Npc_setter_target);
 }
 
-/** @} */
 /** @} */
 /** @} */

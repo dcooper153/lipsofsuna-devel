@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSpawner Spawner    
+ * \addtogroup LIExtSpawner Spawner    
  * @{
  */
 
 #ifndef __EXT_SPAWNER_H__
 #define __EXT_SPAWNER_H__
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/system.h>
 #include "ext-module.h"
 
@@ -44,7 +42,6 @@ struct _LIExtSpawner
 	LIEngObject* owner;
 	LIExtModule* module;
 	LIScrData* script;
-	LISerServer* server;
 	struct
 	{
 		int count;
@@ -76,6 +73,5 @@ liext_spawner_set_limit (LIExtSpawner* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

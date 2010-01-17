@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliVoxel Voxel
+ * \addtogroup LIExtVoxel Voxel
  * @{
  */
 
@@ -51,6 +49,5 @@ liext_block_build (LIExtBlock*  self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

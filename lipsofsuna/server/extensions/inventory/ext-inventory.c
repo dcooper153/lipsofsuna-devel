@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvInventory Inventory 
+ * \addtogroup LIExtInventory Inventory 
  * @{
  */
 
@@ -68,7 +66,6 @@ liext_inventory_new (LIExtModule* module)
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->server = module->server;
 
 	/* Find unique ID. */
 	while (!self->id)
@@ -382,10 +379,7 @@ static int
 private_send_close (LIExtInventory* self,
                     LIEngObject*    listener)
 {
-	LIScrScript* script = self->module->server->script;
-
-	if (LISER_OBJECT (listener)->client == NULL)
-		return 1;
+	LIScrScript* script = self->module->program->script;
 
 	/* Check for callback. */
 	liscr_pushdata (script->lua, self->script);
@@ -414,10 +408,7 @@ static int
 private_send_open (LIExtInventory* self,
                    LIEngObject*    listener)
 {
-	LIScrScript* script = self->module->server->script;
-
-	if (LISER_OBJECT (listener)->client == NULL)
-		return 1;
+	LIScrScript* script = self->module->program->script;
 
 	/* Check for callback. */
 	liscr_pushdata (script->lua, self->script);
@@ -448,13 +439,10 @@ private_send_object (LIExtInventory* self,
                      LIEngObject*    object)
 {
 	LIAlgU32dicIter iter;
-	LIScrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->program->script;
 
 	LIALG_U32DIC_FOREACH (iter, self->listeners)
 	{
-		if (LISER_OBJECT (iter.value)->client == NULL)
-			continue;
-
 		/* Check for callback. */
 		liscr_pushdata (script->lua, self->script);
 		lua_getfield (script->lua, -1, "item_added_cb");
@@ -485,13 +473,10 @@ static int
 private_send_owner (LIExtInventory* self)
 {
 	LIAlgU32dicIter iter;
-	LIScrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->program->script;
 
 	LIALG_U32DIC_FOREACH (iter, self->listeners)
 	{
-		if (LISER_OBJECT (iter.value)->client == NULL)
-			continue;
-
 		/* Check for callback. */
 		liscr_pushdata (script->lua, self->script);
 		lua_getfield (script->lua, -1, "owner_changed_cb");
@@ -523,13 +508,10 @@ private_send_remove (LIExtInventory* self,
                      int             slot)
 {
 	LIAlgU32dicIter iter;
-	LIScrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->program->script;
 
 	LIALG_U32DIC_FOREACH (iter, self->listeners)
 	{
-		if (LISER_OBJECT (iter.value)->client == NULL)
-			continue;
-
 		/* Check for callback. */
 		liscr_pushdata (script->lua, self->script);
 		lua_getfield (script->lua, -1, "item_removed_cb");
@@ -555,6 +537,5 @@ private_send_remove (LIExtInventory* self,
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

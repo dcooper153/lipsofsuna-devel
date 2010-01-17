@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvNpc Npc      
+ * \addtogroup LIExtNpc Npc      
  * @{
  */
 
 #ifndef __EXT_NPC_H__
 #define __EXT_NPC_H__
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/system.h>
 #include "ext-module.h"
 
@@ -73,6 +71,5 @@ liext_npc_set_target (LIExtNpc*    self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

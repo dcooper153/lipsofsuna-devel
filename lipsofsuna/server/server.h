@@ -25,33 +25,25 @@
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
-#include <sys/time.h>
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/paths.h>
-#include <lipsofsuna/physics.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/main.h>
 #include "server-network.h"
 #include "server-object.h"
 #include "server-types.h"
 
 struct _LISerServer
 {
-	int quit;
-	uint32_t debug;
-	LIAlgSectors* sectors;
-	LIAlgStrdic* extensions;
+	/* Server. */
 	LIArcSql* sql;
+	LIMaiProgram* program;
+	LISerNetwork* network;
+
+	/* Program. */
+	LIAlgSectors* sectors;
 	LICalCallbacks* callbacks;
 	LIEngEngine* engine;
 	LIPthPaths* paths;
 	LIScrScript* script;
-	LISerNetwork* network;
-	struct
-	{
-		struct timeval start;
-	} time;
 };
 
 LISerServer*
@@ -60,29 +52,11 @@ liser_server_new (LIPthPaths* paths);
 void
 liser_server_free (LISerServer* self);
 
-LISerExtension*
-liser_server_find_extension (LISerServer* self,
-                             const char*  name);
-
-int
-liser_server_load_extension (LISerServer* self,
-                             const char*  name);
-
 int
 liser_server_main (LISerServer* self);
 
 int
 liser_server_save (LISerServer* self);
-
-void
-liser_server_shutdown (LISerServer* self);
-
-int
-liser_server_update (LISerServer* self,
-                     float        secs);
-
-double
-liser_server_get_time (const LISerServer* self);
 
 uint32_t
 liser_server_get_unique_object (const LISerServer* self);

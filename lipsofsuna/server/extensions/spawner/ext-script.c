@@ -16,15 +16,13 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvSpawner Spawner
+ * \addtogroup LIExtSpawner Spawner
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-spawner.h"
@@ -186,6 +184,5 @@ liext_script_spawner (LIScrClass* self,
 	liscr_class_insert_mvar (self, "owner", Spawner_getter_owner, Spawner_setter_owner);
 }
 
-/** @} */
 /** @} */
 /** @} */

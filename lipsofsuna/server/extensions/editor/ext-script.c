@@ -16,23 +16,20 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEditor Editor
+ * \addtogroup LIExtEditor Editor
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
-#include "ext-editor.h"
 #include "ext-module.h"
 
 /* @luadoc
  * module "Extension.Server.Editor"
  * ---
- * -- Allow dynamic editing of the game.
+ * -- Allows dynamic editing of the game.
  * -- @name Editor
  * -- @class table
  */
@@ -47,21 +44,23 @@
 static void Editor_save (LIScrArgs* args)
 {
 	LIExtModule* module;
+	LISerServer* server;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-	liser_server_save (module->server);
+	server = limai_program_find_component (module->program, "server");
+	if (server != NULL)
+		liser_server_save (server);
 }
 
 /*****************************************************************************/
 
 void
 liext_script_editor (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
 	liscr_class_insert_cfunc (self, "save", Editor_save);
 }
 
-/** @} */
 /** @} */
 /** @} */

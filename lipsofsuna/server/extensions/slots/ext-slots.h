@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server 
- * @{
- * \addtogroup liextsrvSlots Slots
+ * \addtogroup LIExtSlots Slots
  * @{
  */
 
 #ifndef __EXT_SLOTS_H__
 #define __EXT_SLOTS_H__
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/system.h>
 #include "ext-module.h"
 
@@ -53,7 +51,6 @@ struct _LIExtSlots
 	LIEngObject* owner;
 	LIExtModule* module;
 	LIScrData* script;
-	LISerServer* server;
 	struct
 	{
 		int count;
@@ -96,6 +93,5 @@ liext_slots_set_owner (LIExtSlots*  self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

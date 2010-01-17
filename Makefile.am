@@ -44,9 +44,38 @@ endif
 
 ##############################################################################
 
+losdir = $(includedir)/lipsofsuna
+los_HEADERS = \
+	lipsofsuna/ai.h \
+	lipsofsuna/algorithm.h \
+	lipsofsuna/archive.h \
+	lipsofsuna/binding.h \
+	lipsofsuna/callback.h \
+	lipsofsuna/client.h \
+	lipsofsuna/engine.h \
+	lipsofsuna/font.h \
+	lipsofsuna/generator.h \
+	lipsofsuna/image.h \
+	lipsofsuna/math.h \
+	lipsofsuna/model.h \
+	lipsofsuna/network.h \
+	lipsofsuna/particle.h \
+	lipsofsuna/physics.h \
+	lipsofsuna/paths.h \
+	lipsofsuna/reload.h \
+	lipsofsuna/render.h \
+	lipsofsuna/script.h \
+	lipsofsuna/sound.h \
+	lipsofsuna/server.h \
+	lipsofsuna/string.h \
+	lipsofsuna/system.h \
+	lipsofsuna/thread.h \
+	lipsofsuna/video.h \
+	lipsofsuna/voxel.h \
+	lipsofsuna/widget.h
+
 aidir = $(includedir)/lipsofsuna/ai
 ai_HEADERS = \
-	lipsofsuna/ai.h \
 	lipsofsuna/ai/ai-manager.h \
 	lipsofsuna/ai/ai-path.h \
 	lipsofsuna/ai/ai-sector.h \
@@ -59,7 +88,6 @@ aisrc = \
 
 algdir = $(includedir)/lipsofsuna/algorithm
 alg_HEADERS = \
-	lipsofsuna/algorithm.h \
 	lipsofsuna/algorithm/algorithm-array.h \
 	lipsofsuna/algorithm/algorithm-astar.h \
 	lipsofsuna/algorithm/algorithm-bst.h \
@@ -84,7 +112,6 @@ algsrc = \
 
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \
-	lipsofsuna/archive.h \
 	lipsofsuna/archive/archive-reader.h \
 	lipsofsuna/archive/archive-sql.h \
 	lipsofsuna/archive/archive-tar.h \
@@ -97,7 +124,6 @@ arcsrc = \
 
 bnddir = $(includedir)/lipsofsuna/binding
 bnd_HEADERS = \
-	lipsofsuna/binding.h \
 	lipsofsuna/binding/binding.h \
 	lipsofsuna/binding/binding-action.h \
 	lipsofsuna/binding/binding-manager.h \
@@ -109,7 +135,6 @@ bndsrc = \
 
 caldir = $(includedir)/lipsofsuna/callback
 cal_HEADERS = \
-	lipsofsuna/callback.h \
 	lipsofsuna/callback/cal-callbacks.h \
 	lipsofsuna/callback/cal-handle.h \
 	lipsofsuna/callback/cal-marshal.h
@@ -120,7 +145,6 @@ calsrc = \
 
 clidir = $(includedir)/lipsofsuna/client
 cli_HEADERS = \
-	lipsofsuna/client.h \
 	lipsofsuna/client/client.h \
 	lipsofsuna/client/client-callbacks.h \
 	lipsofsuna/client/client-extension.h \
@@ -153,7 +177,6 @@ clisrc = \
 
 engdir = $(includedir)/lipsofsuna/engine
 eng_HEADERS = \
-	lipsofsuna/engine.h \
 	lipsofsuna/engine/engine.h \
 	lipsofsuna/engine/engine-constraint.h \
 	lipsofsuna/engine/engine-iterator.h \
@@ -174,7 +197,6 @@ engsrc = \
 
 fntdir = $(includedir)/lipsofsuna/font
 fnt_HEADERS = \
-	lipsofsuna/font.h \
 	lipsofsuna/font/font.h \
 	lipsofsuna/font/font-layout.h
 fntsrc = \
@@ -183,7 +205,6 @@ fntsrc = \
 
 gendir = $(includedir)/lipsofsuna/generator
 gen_HEADERS = \
-	lipsofsuna/generator.h \
 	lipsofsuna/generator/generator.h \
 	lipsofsuna/generator/generator-brush.h \
 	lipsofsuna/generator/generator-rule.h \
@@ -195,7 +216,6 @@ gensrc = \
 
 imgdir = $(includedir)/lipsofsuna/image
 img_HEADERS = \
-	lipsofsuna/image.h \
 	lipsofsuna/image/image.h \
 	lipsofsuna/image/image-compress.h \
 	lipsofsuna/image/image-dds.h \
@@ -205,12 +225,15 @@ imgsrc = \
 	lipsofsuna/image/image-compress.cpp \
 	lipsofsuna/image/image-texture.c
 
+maidir = $(includedir)/lipsofsuna/main
+mai_HEADERS = \
+	lipsofsuna/main/main-extension.h \
+	lipsofsuna/main/main-program.h
 maisrc = \
-	lipsofsuna/main/main.c
+	lipsofsuna/main/main-program.c
 
 matdir = $(includedir)/lipsofsuna/math
 mat_HEADERS = \
-	lipsofsuna/math.h \
 	lipsofsuna/math/math-aabb.h \
 	lipsofsuna/math/math-convert.h \
 	lipsofsuna/math/math-frustum.h  \
@@ -234,7 +257,6 @@ matsrc = \
 
 mdldir = $(includedir)/lipsofsuna/model
 mdl_HEADERS = \
-	lipsofsuna/model.h \
 	lipsofsuna/model/model.h \
 	lipsofsuna/model/model-animation.h \
 	lipsofsuna/model/model-bone.h \
@@ -263,7 +285,6 @@ mdlsrc = \
 
 netdir = $(includedir)/lipsofsuna/network
 net_HEADERS = \
-	lipsofsuna/network.h \
 	lipsofsuna/network/network-extension.h \
 	lipsofsuna/network/network-protocol.h
 netsrc = \
@@ -271,7 +292,6 @@ netsrc = \
 
 pardir = $(includedir)/lipsofsuna/particle
 par_HEADERS = \
-	lipsofsuna/particle.h \
 	lipsofsuna/particle/particle-line.h \
 	lipsofsuna/particle/particle-manager.h \
 	lipsofsuna/particle/particle-point.h
@@ -282,7 +302,6 @@ parsrc = \
 
 phydir = $(includedir)/lipsofsuna/physics
 phy_HEADERS = \
-	lipsofsuna/physics.h \
 	lipsofsuna/physics/physics.h \
 	lipsofsuna/physics/physics-constraint.h \
 	lipsofsuna/physics/physics-object.h \
@@ -299,14 +318,12 @@ physrc = \
 
 pthdir = $(includedir)/lipsofsuna/path
 pth_HEADERS = \
-	lipsofsuna/paths.h \
 	lipsofsuna/paths/paths.h
 pthsrc = \
 	lipsofsuna/paths/paths.c
 
 reldir = $(includedir)/lipsofsuna/reload
 rel_HEADERS = \
-	lipsofsuna/reload.h \
 	lipsofsuna/reload/reload.h
 relsrc = \
 	lipsofsuna/reload/reload.c \
@@ -316,7 +333,6 @@ relsrc = \
 
 rnddir = $(includedir)/lipsofsuna/render
 rnd_HEADERS = \
-	lipsofsuna/render.h \
 	lipsofsuna/render/render.h \
 	lipsofsuna/render/render-buffer.h \
 	lipsofsuna/render/render-context.h \
@@ -353,7 +369,6 @@ rndsrc = \
 
 scrdir = $(includedir)/lipsofsuna/script
 scr_HEADERS = \
-	lipsofsuna/script.h \
 	lipsofsuna/script/script.h \
 	lipsofsuna/script/script-args.h \
 	lipsofsuna/script/script-class.h \
@@ -380,7 +395,6 @@ scrsrc = \
 
 snddir = $(includedir)/lipsofsuna/sound
 snd_HEADERS = \
-	lipsofsuna/sound.h \
 	lipsofsuna/sound/sound-manager.h \
 	lipsofsuna/sound/sound-sample.h \
 	lipsofsuna/sound/sound-source.h \
@@ -393,11 +407,9 @@ sndsrc = \
 
 srvdir = $(includedir)/lipsofsuna/server
 srv_HEADERS = \
-	lipsofsuna/server.h \
 	lipsofsuna/server/server.h \
 	lipsofsuna/server/server-callbacks.h \
 	lipsofsuna/server/server-client.h \
-	lipsofsuna/server/server-extension.h \
 	lipsofsuna/server/server-network.h \
 	lipsofsuna/server/server-object.h \
 	lipsofsuna/server/server-observer.h \
@@ -416,14 +428,12 @@ srvsrc = \
 
 strdir = $(includedir)/lipsofsuna/string
 str_HEADERS = \
-	lipsofsuna/string.h \
 	lipsofsuna/string/string-generic.h
 strsrc = \
 	lipsofsuna/string/string-generic.c
 
 sysdir = $(includedir)/lipsofsuna/system
 sys_HEADERS = \
-	lipsofsuna/system.h \
 	lipsofsuna/system/system.h \
 	lipsofsuna/system/system-compiler.h \
 	lipsofsuna/system/system-directory.h \
@@ -456,7 +466,6 @@ syssrc = \
 
 thrdir = $(includedir)/lipsofsuna/thread
 thr_HEADERS = \
-	lipsofsuna/thread.h \
 	lipsofsuna/thread/thread.h \
 	lipsofsuna/thread/thread-async-call.h
 thrsrc = \
@@ -465,7 +474,6 @@ thrsrc = \
 
 viddir = $(includedir)/lipsofsuna/video
 vid_HEADERS = \
-	lipsofsuna/video.h \
 	lipsofsuna/video/video-calls.h \
 	lipsofsuna/video/video-features.h \
 	lipsofsuna/video/video-opengl.h
@@ -481,7 +489,6 @@ viesrc = \
 
 voxdir = $(includedir)/lipsofsuna/voxel
 vox_HEADERS = \
-	lipsofsuna/voxel.h \
 	lipsofsuna/voxel/voxel.h \
 	lipsofsuna/voxel/voxel-block.h \
 	lipsofsuna/voxel/voxel-iterator.h \
@@ -499,7 +506,6 @@ voxsrc = \
 
 wdgdir = $(includedir)/lipsofsuna/widget
 wdg_HEADERS = \
-	lipsofsuna/widget.h \
 	lipsofsuna/widget/widget.h \
 	lipsofsuna/widget/widget-busy.h \
 	lipsofsuna/widget/widget-button.h \
@@ -554,8 +560,8 @@ liblipsofsunaclient_la_LIBADD = \
 	$(GL_LIBS) $(OPENAL_LIBS) $(VORBIS_LIBS) $(SQUISH_LIBS) $(ZLIB_LIBS) \
 	$(LIPS_LIBS) $(LIBPNG_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaclient_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) \
-	$(fntsrc) $(gensrc) $(engsrc) $(imgsrc) $(matsrc) $(mdlsrc) $(netsrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(fntsrc) \
+	$(gensrc) $(engsrc) $(imgsrc) $(maisrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
@@ -581,7 +587,7 @@ liblipsofsunaserver_la_LIBADD = \
 	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
 	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
 liblipsofsunaserver_la_SOURCES = \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(matsrc) \
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(maisrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
@@ -596,7 +602,7 @@ liblipsofsunaviewer_la_SOURCES = \
 
 lipsofsuna_launch_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_launch_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
-lipsofsuna_launch_SOURCES = $(maisrc) $(syssrc)
+lipsofsuna_launch_SOURCES = lipsofsuna/main/main.c $(syssrc)
 
 lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)

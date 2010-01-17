@@ -16,31 +16,27 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEditor Editor
+ * \addtogroup LIExtEditor Editor
  * @{
  */
 
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
-#include "ext-editor.h"
+#include <lipsofsuna/main.h>
 
 #define LIEXT_SCRIPT_EDITOR "Lips.Editor"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LIExtEditor* editor;
-	LISerServer* server;
+	LIMaiProgram* program;
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
@@ -49,10 +45,9 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_editor (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

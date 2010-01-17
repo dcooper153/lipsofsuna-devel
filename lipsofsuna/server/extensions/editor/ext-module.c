@@ -16,42 +16,33 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvEditor Editor      
+ * \addtogroup LIExtEditor Editor      
  * @{
  */
 
-#include <lipsofsuna/server.h>
-#include "ext-editor.h"
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 
-LISerExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LISER_EXTENSION_VERSION, "Editor",
+	LIMAI_EXTENSION_VERSION, "Editor",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LISerServer* server)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = server;
-	self->editor = liext_editor_new (server);
-	if (self->editor == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
+	self->program = program;
 
-	liscr_script_create_class (server->script, "Editor", liext_script_editor, self);
+	liscr_script_create_class (program->script, "Editor", liext_script_editor, self);
 
 	return self;
 }
@@ -59,11 +50,8 @@ liext_module_new (LISerServer* server)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* FIXME: Remove the class here. */
-	liext_editor_free (self->editor);
 	lisys_free (self);
 }
 
-/** @} */
 /** @} */
 /** @} */

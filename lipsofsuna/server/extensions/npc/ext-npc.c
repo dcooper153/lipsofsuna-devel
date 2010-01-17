@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextsrv Server
- * @{
- * \addtogroup liextsrvNpc Npc      
+ * \addtogroup LIExtNpc Npc      
  * @{
  */
 
@@ -89,7 +87,7 @@ liext_npc_set_active (LIExtNpc* self,
 	if (self->active == value)
 		return 1;
 	if (value)
-		lical_callbacks_insert (self->module->server->callbacks, self->module->server->engine, "tick", 0, private_tick, self, self->calls + 0);
+		lical_callbacks_insert (self->module->program->callbacks, self->module->program->engine, "tick", 0, private_tick, self, self->calls + 0);
 	else
 		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	self->active = value;
@@ -331,7 +329,7 @@ private_tick (LIExtNpc* self,
 static void
 private_attack (LIExtNpc* self)
 {
-	LIScrScript* script = self->module->server->script;
+	LIScrScript* script = self->module->program->script;
 
 	/* Check for attack function. */
 	liscr_pushdata (script->lua, self->script);
@@ -373,8 +371,7 @@ private_rescan (LIExtNpc* self)
 	LIENG_FOREACH_OBJECT (iter, self->owner->engine, &transform.position, self->radius)
 	{
 		object = iter.object;
-		if (LISER_OBJECT (object)->client == NULL) /* FIXME: Check for alignment flags instead. */
-			continue;
+#warning NPCs chase all objects. Needs a filter here.
 		d = lieng_object_get_distance (self->owner, object);
 		if (dist < d)
 			continue;
@@ -385,6 +382,5 @@ private_rescan (LIExtNpc* self)
 	return target;
 }
 
-/** @} */
 /** @} */
 /** @} */

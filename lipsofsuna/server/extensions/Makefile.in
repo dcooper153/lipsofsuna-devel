@@ -85,8 +85,8 @@ AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 libeditor_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libeditor_ser_la_OBJECTS = editor/ext-editor.lo \
-	editor/ext-module.lo editor/ext-script.lo
+am_libeditor_ser_la_OBJECTS = editor/ext-module.lo \
+	editor/ext-script.lo
 libeditor_ser_la_OBJECTS = $(am_libeditor_ser_la_OBJECTS)
 libevents_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libevents_ser_la_OBJECTS = events/ext-module.lo \
@@ -105,8 +105,8 @@ am_libnpc_ser_la_OBJECTS = npc/ext-module.lo npc/ext-npc.lo \
 	npc/ext-script.lo
 libnpc_ser_la_OBJECTS = $(am_libnpc_ser_la_OBJECTS)
 libskeleton_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libskeleton_ser_la_OBJECTS = skeleton/ext-skeleton.lo \
-	skeleton/ext-module.lo skeleton/ext-script.lo
+am_libskeleton_ser_la_OBJECTS = skeleton/ext-module.lo \
+	skeleton/ext-script.lo
 libskeleton_ser_la_OBJECTS = $(am_libskeleton_ser_la_OBJECTS)
 libskills_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libskills_ser_la_OBJECTS = skills/ext-module.lo skills/ext-skill.lo \
@@ -360,8 +360,6 @@ libcreature_ser_la_SOURCES = \
 
 libeditor_ser_la_LIBADD = $(LIBADD)
 libeditor_ser_la_SOURCES = \
-	editor/ext-editor.c \
-	editor/ext-editor.h \
 	editor/ext-module.c \
 	editor/ext-module.h \
 	editor/ext-script.c
@@ -398,8 +396,6 @@ libnpc_ser_la_SOURCES = \
 
 libskeleton_ser_la_LIBADD = $(LIBADD)
 libskeleton_ser_la_SOURCES = \
-	skeleton/ext-skeleton.c \
-	skeleton/ext-skeleton.h \
 	skeleton/ext-module.c \
 	skeleton/ext-module.h \
 	skeleton/ext-script.c
@@ -525,8 +521,6 @@ editor/$(am__dirstamp):
 editor/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) editor/$(DEPDIR)
 	@: > editor/$(DEPDIR)/$(am__dirstamp)
-editor/ext-editor.lo: editor/$(am__dirstamp) \
-	editor/$(DEPDIR)/$(am__dirstamp)
 editor/ext-module.lo: editor/$(am__dirstamp) \
 	editor/$(DEPDIR)/$(am__dirstamp)
 editor/ext-script.lo: editor/$(am__dirstamp) \
@@ -590,8 +584,6 @@ skeleton/$(am__dirstamp):
 skeleton/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) skeleton/$(DEPDIR)
 	@: > skeleton/$(DEPDIR)/$(am__dirstamp)
-skeleton/ext-skeleton.lo: skeleton/$(am__dirstamp) \
-	skeleton/$(DEPDIR)/$(am__dirstamp)
 skeleton/ext-module.lo: skeleton/$(am__dirstamp) \
 	skeleton/$(DEPDIR)/$(am__dirstamp)
 skeleton/ext-script.lo: skeleton/$(am__dirstamp) \
@@ -667,8 +659,6 @@ mostlyclean-compile:
 	-rm -f creature/ext-module.lo
 	-rm -f creature/ext-script.$(OBJEXT)
 	-rm -f creature/ext-script.lo
-	-rm -f editor/ext-editor.$(OBJEXT)
-	-rm -f editor/ext-editor.lo
 	-rm -f editor/ext-module.$(OBJEXT)
 	-rm -f editor/ext-module.lo
 	-rm -f editor/ext-script.$(OBJEXT)
@@ -699,8 +689,6 @@ mostlyclean-compile:
 	-rm -f skeleton/ext-module.lo
 	-rm -f skeleton/ext-script.$(OBJEXT)
 	-rm -f skeleton/ext-script.lo
-	-rm -f skeleton/ext-skeleton.$(OBJEXT)
-	-rm -f skeleton/ext-skeleton.lo
 	-rm -f skills/ext-module.$(OBJEXT)
 	-rm -f skills/ext-module.lo
 	-rm -f skills/ext-script.$(OBJEXT)
@@ -736,7 +724,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-creature.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-editor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-module.Plo@am__quote@
@@ -752,7 +739,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@npc/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skeleton/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skeleton/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@skeleton/$(DEPDIR)/ext-skeleton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-skill.Plo@am__quote@
