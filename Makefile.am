@@ -7,11 +7,14 @@ EXTRA_DIST = \
 	lipsofsuna/math/unittest.c \
 	reload/blender-export.py
 
+if MAYBE_SERVER
+SUBDIRS += lipsofsuna/extension/common
+endif
 if MAYBE_CLIENT
-SUBDIRS += lipsofsuna/client/extensions
+SUBDIRS += lipsofsuna/extension/client
 endif
 if MAYBE_SERVER
-SUBDIRS += lipsofsuna/server/extensions
+SUBDIRS += lipsofsuna/extension/server
 endif
 
 editordir = $(TOOLDIR)

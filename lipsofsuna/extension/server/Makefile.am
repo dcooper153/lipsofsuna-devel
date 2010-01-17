@@ -5,25 +5,13 @@ EXTRA_DIST = skeleton/mkext.sh
 
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
-	libcreature-ser.la \
 	libeditor-ser.la \
 	libevents-ser.la \
 	libgenerator-ser.la \
 	libinventory-ser.la \
-	libnpc-ser.la \
-	libskeleton-ser.la \
 	libskills-ser.la \
 	libslots-ser.la \
-	libspawner-ser.la \
 	libvoxel-ser.la
-
-libcreature_ser_la_LIBADD = $(LIBADD)
-libcreature_ser_la_SOURCES = \
-	creature/ext-creature.c \
-	creature/ext-creature.h \
-	creature/ext-module.c \
-	creature/ext-module.h \
-	creature/ext-script.c
 
 libeditor_ser_la_LIBADD = $(LIBADD)
 libeditor_ser_la_SOURCES = \
@@ -53,20 +41,6 @@ libinventory_ser_la_SOURCES = \
 	inventory/ext-module.h \
 	inventory/ext-script.c
 
-libnpc_ser_la_LIBADD = $(LIBADD)
-libnpc_ser_la_SOURCES = \
-	npc/ext-module.c \
-	npc/ext-module.h \
-	npc/ext-npc.c \
-	npc/ext-npc.h \
-	npc/ext-script.c
-
-libskeleton_ser_la_LIBADD = $(LIBADD)
-libskeleton_ser_la_SOURCES = \
-	skeleton/ext-module.c \
-	skeleton/ext-module.h \
-	skeleton/ext-script.c
-
 libskills_ser_la_LIBADD = $(LIBADD)
 libskills_ser_la_SOURCES = \
 	skills/ext-module.c \
@@ -84,14 +58,6 @@ libslots_ser_la_SOURCES = \
 	slots/ext-script.c \
 	slots/ext-slots.c \
 	slots/ext-slots.h
-
-libspawner_ser_la_LIBADD = $(LIBADD)
-libspawner_ser_la_SOURCES = \
-	spawner/ext-module.c \
-	spawner/ext-module.h \
-	spawner/ext-spawner.c \
-	spawner/ext-spawner.h \
-	spawner/ext-script.c
 
 libvoxel_ser_la_LIBADD = $(LIBADD)
 libvoxel_ser_la_SOURCES = \

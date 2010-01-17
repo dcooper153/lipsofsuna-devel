@@ -22,8 +22,8 @@
  * @{
  */
 
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/network.h>
-#include <lipsofsuna/server.h>
 #include "ext-spawner.h"
 
 #define LIEXT_SPAWNER_VERSION 0xFF

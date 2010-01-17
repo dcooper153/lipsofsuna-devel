@@ -379,6 +379,7 @@ AC_SUBST([TOOLDIR])
 AC_OUTPUT([
 Makefile
 docs/Makefile
-lipsofsuna/client/extensions/Makefile
-lipsofsuna/server/extensions/Makefile
+lipsofsuna/extension/client/Makefile
+lipsofsuna/extension/common/Makefile
+lipsofsuna/extension/server/Makefile
 ])

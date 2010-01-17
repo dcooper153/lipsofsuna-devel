@@ -44,8 +44,7 @@ cd ../..
 mkdir -p build/lib/extensions
 cd build/lib/extensions
 rm -f *.so
-exts="$(find ../../../lipsofsuna/client/extensions -name lib\*.so) \
-      $(find ../../../lipsofsuna/server/extensions -name lib\*.so)"
+exts="$(find ../../../lipsofsuna/extension -name lib\*.so)"
 for i in $exts; do
 	name=$(echo `basename $i` | sed "s/\.[0-9]\.[0-9]//")
 	echo $i "->" $name

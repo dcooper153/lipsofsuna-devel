@@ -19098,7 +19098,7 @@ LICLI_LIBS="\
 
 
 
-ac_config_files="$ac_config_files Makefile docs/Makefile lipsofsuna/client/extensions/Makefile lipsofsuna/server/extensions/Makefile"
+ac_config_files="$ac_config_files Makefile docs/Makefile lipsofsuna/extension/client/Makefile lipsofsuna/extension/common/Makefile lipsofsuna/extension/server/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20202,8 +20202,9 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "docs/Makefile") CONFIG_FILES="$CONFIG_FILES docs/Makefile" ;;
-    "lipsofsuna/client/extensions/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/client/extensions/Makefile" ;;
-    "lipsofsuna/server/extensions/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/server/extensions/Makefile" ;;
+    "lipsofsuna/extension/client/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/extension/client/Makefile" ;;
+    "lipsofsuna/extension/common/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/extension/common/Makefile" ;;
+    "lipsofsuna/extension/server/Makefile") CONFIG_FILES="$CONFIG_FILES lipsofsuna/extension/server/Makefile" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -38,21 +38,22 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@MAYBE_CLIENT_TRUE@am__append_1 = lipsofsuna/client/extensions
-@MAYBE_SERVER_TRUE@am__append_2 = lipsofsuna/server/extensions
+@MAYBE_SERVER_TRUE@am__append_1 = lipsofsuna/extension/common
+@MAYBE_CLIENT_TRUE@am__append_2 = lipsofsuna/extension/client
+@MAYBE_SERVER_TRUE@am__append_3 = lipsofsuna/extension/server
 prg_PROGRAMS = lipsofsuna-launch$(EXEEXT)
 bin_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
-@MAYBE_CLIENT_TRUE@am__append_3 = lipsofsuna-client
-@MAYBE_CLIENT_TRUE@am__append_4 = liblipsofsunaclient.la
-@MAYBE_GENERATOR_TRUE@am__append_5 = lipsofsuna-generator
-@MAYBE_GENERATOR_TRUE@am__append_6 = liblipsofsunagenerator.la
-@MAYBE_IMPORT_TRUE@am__append_7 = lipsofsuna-import
-@MAYBE_IMPORT_TRUE@am__append_8 = liblipsofsunaimport.la
-@MAYBE_SERVER_TRUE@am__append_9 = lipsofsuna-server
-@MAYBE_SERVER_TRUE@am__append_10 = liblipsofsunaserver.la
-@MAYBE_VIEWER_TRUE@am__append_11 = lipsofsuna-viewer
-@MAYBE_VIEWER_TRUE@am__append_12 = liblipsofsunaviewer.la
+@MAYBE_CLIENT_TRUE@am__append_4 = lipsofsuna-client
+@MAYBE_CLIENT_TRUE@am__append_5 = liblipsofsunaclient.la
+@MAYBE_GENERATOR_TRUE@am__append_6 = lipsofsuna-generator
+@MAYBE_GENERATOR_TRUE@am__append_7 = liblipsofsunagenerator.la
+@MAYBE_IMPORT_TRUE@am__append_8 = lipsofsuna-import
+@MAYBE_IMPORT_TRUE@am__append_9 = liblipsofsunaimport.la
+@MAYBE_SERVER_TRUE@am__append_10 = lipsofsuna-server
+@MAYBE_SERVER_TRUE@am__append_11 = liblipsofsunaserver.la
+@MAYBE_VIEWER_TRUE@am__append_12 = lipsofsuna-viewer
+@MAYBE_VIEWER_TRUE@am__append_13 = liblipsofsunaviewer.la
 subdir = .
 DIST_COMMON = README $(ai_HEADERS) $(alg_HEADERS) \
 	$(am__configure_deps) $(arc_HEADERS) $(bnd_HEADERS) \
@@ -532,8 +533,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = docs . lipsofsuna/client/extensions \
-	lipsofsuna/server/extensions
+DIST_SUBDIRS = docs . lipsofsuna/extension/common \
+	lipsofsuna/extension/client lipsofsuna/extension/server
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -737,7 +738,7 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = docs . $(am__append_1) $(am__append_2)
+SUBDIRS = docs . $(am__append_1) $(am__append_2) $(am__append_3)
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
@@ -749,8 +750,8 @@ EXTRA_DIST = \
 editordir = $(TOOLDIR)
 editor_DATA = lipsofsuna/reload/blender-export.py
 prgdir = $(PROGDIR)
-lib_LTLIBRARIES = $(am__append_4) $(am__append_6) $(am__append_8) \
-	$(am__append_10) $(am__append_12)
+lib_LTLIBRARIES = $(am__append_5) $(am__append_7) $(am__append_9) \
+	$(am__append_11) $(am__append_13)
 
 ##############################################################################
 losdir = $(includedir)/lipsofsuna

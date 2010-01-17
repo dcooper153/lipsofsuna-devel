@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-subdir = lipsofsuna/server/extensions
+subdir = lipsofsuna/extension/client
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_pthread.m4 \
@@ -74,56 +74,74 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(extdir)"
 LTLIBRARIES = $(ext_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(top_builddir)/liblipsofsunaserver.la \
+am__DEPENDENCIES_2 = $(top_builddir)/liblipsofsunaclient.la \
 	$(am__DEPENDENCIES_1)
-libcreature_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+libcamera_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_libcreature_ser_la_OBJECTS = creature/ext-creature.lo \
-	creature/ext-module.lo creature/ext-script.lo
-libcreature_ser_la_OBJECTS = $(am_libcreature_ser_la_OBJECTS)
+am_libcamera_cli_la_OBJECTS = camera/ext-module.lo \
+	camera/ext-script.lo
+libcamera_cli_la_OBJECTS = $(am_libcamera_cli_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-libeditor_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libeditor_ser_la_OBJECTS = editor/ext-module.lo \
-	editor/ext-script.lo
-libeditor_ser_la_OBJECTS = $(am_libeditor_ser_la_OBJECTS)
-libevents_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libevents_ser_la_OBJECTS = events/ext-module.lo \
+libchat_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libchat_cli_la_OBJECTS = chat/ext-history.lo chat/ext-module.lo \
+	chat/ext-script.lo
+libchat_cli_la_OBJECTS = $(am_libchat_cli_la_OBJECTS)
+libeditor_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libeditor_cli_la_OBJECTS = editor/ext-dialog.lo \
+	editor/ext-editor.lo editor/ext-module.lo editor/ext-script.lo
+libeditor_cli_la_OBJECTS = $(am_libeditor_cli_la_OBJECTS)
+libeffect_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libeffect_cli_la_OBJECTS = effect/ext-module.lo \
+	effect/ext-script.lo
+libeffect_cli_la_OBJECTS = $(am_libeffect_cli_la_OBJECTS)
+libevents_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libevents_cli_la_OBJECTS = events/ext-module.lo \
 	events/ext-script.lo
-libevents_ser_la_OBJECTS = $(am_libevents_ser_la_OBJECTS)
-libgenerator_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libgenerator_ser_la_OBJECTS = generator/ext-generator.lo \
-	generator/ext-module.lo generator/ext-script.lo
-libgenerator_ser_la_OBJECTS = $(am_libgenerator_ser_la_OBJECTS)
-libinventory_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libinventory_ser_la_OBJECTS = inventory/ext-inventory.lo \
-	inventory/ext-module.lo inventory/ext-script.lo
-libinventory_ser_la_OBJECTS = $(am_libinventory_ser_la_OBJECTS)
-libnpc_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libnpc_ser_la_OBJECTS = npc/ext-module.lo npc/ext-npc.lo \
-	npc/ext-script.lo
-libnpc_ser_la_OBJECTS = $(am_libnpc_ser_la_OBJECTS)
-libskeleton_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libskeleton_ser_la_OBJECTS = skeleton/ext-module.lo \
-	skeleton/ext-script.lo
-libskeleton_ser_la_OBJECTS = $(am_libskeleton_ser_la_OBJECTS)
-libskills_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libskills_ser_la_OBJECTS = skills/ext-module.lo skills/ext-skill.lo \
-	skills/ext-skills.lo skills/ext-script.lo
-libskills_ser_la_OBJECTS = $(am_libskills_ser_la_OBJECTS)
-libslots_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libslots_ser_la_OBJECTS = slots/ext-module.lo slots/ext-script.lo \
+libevents_cli_la_OBJECTS = $(am_libevents_cli_la_OBJECTS)
+libgenerator_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libgenerator_cli_la_OBJECTS = generator/ext-brushes.lo \
+	generator/ext-dialog.lo generator/ext-materials.lo \
+	generator/ext-module.lo generator/ext-preview.lo \
+	generator/ext-script.lo
+libgenerator_cli_la_OBJECTS = $(am_libgenerator_cli_la_OBJECTS)
+liboptions_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_liboptions_cli_la_OBJECTS = options/ext-module.lo \
+	options/ext-options.lo options/ext-script.lo
+liboptions_cli_la_OBJECTS = $(am_liboptions_cli_la_OBJECTS)
+libpackager_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libpackager_cli_la_OBJECTS = packager/ext-module.lo \
+	packager/ext-packager.lo packager/ext-resources.lo \
+	packager/ext-script.lo
+libpackager_cli_la_OBJECTS = $(am_libpackager_cli_la_OBJECTS)
+libreload_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libreload_cli_la_OBJECTS = reload/ext-module.lo \
+	reload/ext-reload.lo reload/ext-script.lo
+libreload_cli_la_OBJECTS = $(am_libreload_cli_la_OBJECTS)
+libskills_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libskills_cli_la_OBJECTS = skills/ext-module.lo \
+	skills/ext-script.lo skills/ext-skills.lo skills/ext-widget.lo
+libskills_cli_la_OBJECTS = $(am_libskills_cli_la_OBJECTS)
+libslots_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libslots_cli_la_OBJECTS = slots/ext-module.lo slots/ext-slot.lo \
 	slots/ext-slots.lo
-libslots_ser_la_OBJECTS = $(am_libslots_ser_la_OBJECTS)
-libspawner_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libspawner_ser_la_OBJECTS = spawner/ext-module.lo \
-	spawner/ext-spawner.lo spawner/ext-script.lo
-libspawner_ser_la_OBJECTS = $(am_libspawner_ser_la_OBJECTS)
-libvoxel_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libvoxel_ser_la_OBJECTS = voxel/ext-block.lo voxel/ext-listener.lo \
-	voxel/ext-module.lo voxel/ext-script.lo
-libvoxel_ser_la_OBJECTS = $(am_libvoxel_ser_la_OBJECTS)
+libslots_cli_la_OBJECTS = $(am_libslots_cli_la_OBJECTS)
+libsound_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libsound_cli_la_OBJECTS = sound/ext-module.lo sound/ext-script.lo
+libsound_cli_la_OBJECTS = $(am_libsound_cli_la_OBJECTS)
+libspeech_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libspeech_cli_la_OBJECTS = speech/ext-module.lo \
+	speech/ext-script.lo speech/ext-speech.lo
+libspeech_cli_la_OBJECTS = $(am_libspeech_cli_la_OBJECTS)
+libvoxel_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libvoxel_cli_la_OBJECTS = voxel/ext-block.lo voxel/ext-module.lo \
+	voxel/ext-script.lo
+libvoxel_cli_la_OBJECTS = $(am_libvoxel_cli_la_OBJECTS)
+libwidgets_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libwidgets_cli_la_OBJECTS = widgets/ext-module.lo \
+	widgets/ext-script.lo
+libwidgets_cli_la_OBJECTS = $(am_libwidgets_cli_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -150,18 +168,22 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libcreature_ser_la_SOURCES) $(libeditor_ser_la_SOURCES) \
-	$(libevents_ser_la_SOURCES) $(libgenerator_ser_la_SOURCES) \
-	$(libinventory_ser_la_SOURCES) $(libnpc_ser_la_SOURCES) \
-	$(libskeleton_ser_la_SOURCES) $(libskills_ser_la_SOURCES) \
-	$(libslots_ser_la_SOURCES) $(libspawner_ser_la_SOURCES) \
-	$(libvoxel_ser_la_SOURCES)
-DIST_SOURCES = $(libcreature_ser_la_SOURCES) \
-	$(libeditor_ser_la_SOURCES) $(libevents_ser_la_SOURCES) \
-	$(libgenerator_ser_la_SOURCES) $(libinventory_ser_la_SOURCES) \
-	$(libnpc_ser_la_SOURCES) $(libskeleton_ser_la_SOURCES) \
-	$(libskills_ser_la_SOURCES) $(libslots_ser_la_SOURCES) \
-	$(libspawner_ser_la_SOURCES) $(libvoxel_ser_la_SOURCES)
+SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
+	$(libeditor_cli_la_SOURCES) $(libeffect_cli_la_SOURCES) \
+	$(libevents_cli_la_SOURCES) $(libgenerator_cli_la_SOURCES) \
+	$(liboptions_cli_la_SOURCES) $(libpackager_cli_la_SOURCES) \
+	$(libreload_cli_la_SOURCES) $(libskills_cli_la_SOURCES) \
+	$(libslots_cli_la_SOURCES) $(libsound_cli_la_SOURCES) \
+	$(libspeech_cli_la_SOURCES) $(libvoxel_cli_la_SOURCES) \
+	$(libwidgets_cli_la_SOURCES)
+DIST_SOURCES = $(libcamera_cli_la_SOURCES) $(libchat_cli_la_SOURCES) \
+	$(libeditor_cli_la_SOURCES) $(libeffect_cli_la_SOURCES) \
+	$(libevents_cli_la_SOURCES) $(libgenerator_cli_la_SOURCES) \
+	$(liboptions_cli_la_SOURCES) $(libpackager_cli_la_SOURCES) \
+	$(libreload_cli_la_SOURCES) $(libskills_cli_la_SOURCES) \
+	$(libslots_cli_la_SOURCES) $(libsound_cli_la_SOURCES) \
+	$(libspeech_cli_la_SOURCES) $(libvoxel_cli_la_SOURCES) \
+	$(libwidgets_cli_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -332,109 +354,149 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-LIBADD = $(top_builddir)/liblipsofsunaserver.la $(LISRV_LIBS)
-AM_CFLAGS = $(LISRV_CFLAGS)
+LIBADD = $(top_builddir)/liblipsofsunaclient.la $(LICLI_LIBS)
 AM_LDFLAGS = -module -avoid-version -no-undefined
-EXTRA_DIST = skeleton/mkext.sh
+AM_CFLAGS = $(LICLI_CFLAGS)
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
-	libcreature-ser.la \
-	libeditor-ser.la \
-	libevents-ser.la \
-	libgenerator-ser.la \
-	libinventory-ser.la \
-	libnpc-ser.la \
-	libskeleton-ser.la \
-	libskills-ser.la \
-	libslots-ser.la \
-	libspawner-ser.la \
-	libvoxel-ser.la
+	libcamera-cli.la \
+	libchat-cli.la \
+	libeditor-cli.la \
+	libeffect-cli.la \
+	libevents-cli.la \
+	libgenerator-cli.la \
+	liboptions-cli.la \
+	libpackager-cli.la \
+	libreload-cli.la \
+	libskills-cli.la \
+	libslots-cli.la \
+	libsound-cli.la \
+	libspeech-cli.la \
+	libvoxel-cli.la \
+	libwidgets-cli.la
 
-libcreature_ser_la_LIBADD = $(LIBADD)
-libcreature_ser_la_SOURCES = \
-	creature/ext-creature.c \
-	creature/ext-creature.h \
-	creature/ext-module.c \
-	creature/ext-module.h \
-	creature/ext-script.c
+libcamera_cli_la_LIBADD = $(LIBADD)
+libcamera_cli_la_SOURCES = \
+	camera/ext-module.c \
+	camera/ext-module.h \
+	camera/ext-script.c
 
-libeditor_ser_la_LIBADD = $(LIBADD)
-libeditor_ser_la_SOURCES = \
+libchat_cli_la_LIBADD = $(LIBADD)
+libchat_cli_la_SOURCES = \
+	chat/ext-history.c \
+	chat/ext-history.h \
+	chat/ext-module.c \
+	chat/ext-module.h \
+	chat/ext-script.c
+
+libeditor_cli_la_LIBADD = $(LIBADD)
+libeditor_cli_la_SOURCES = \
+	editor/ext-dialog.c \
+	editor/ext-dialog.h \
+	editor/ext-editor.c \
+	editor/ext-editor.h \
 	editor/ext-module.c \
 	editor/ext-module.h \
 	editor/ext-script.c
 
-libevents_ser_la_LIBADD = $(LIBADD)
-libevents_ser_la_SOURCES = \
+libeffect_cli_la_LIBADD = $(LIBADD)
+libeffect_cli_la_SOURCES = \
+	effect/ext-module.c \
+	effect/ext-module.h \
+	effect/ext-script.c
+
+libevents_cli_la_LIBADD = $(LIBADD)
+libevents_cli_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
 
-libgenerator_ser_la_LIBADD = $(LIBADD)
-libgenerator_ser_la_SOURCES = \
-	generator/ext-generator.c \
-	generator/ext-generator.h \
+libgenerator_cli_la_LIBADD = $(LIBADD)
+libgenerator_cli_la_SOURCES = \
+	generator/ext-brushes.c \
+	generator/ext-brushes.h \
+	generator/ext-dialog.c \
+	generator/ext-dialog.h \
+	generator/ext-materials.c \
+	generator/ext-materials.h \
 	generator/ext-module.c \
 	generator/ext-module.h \
+	generator/ext-preview.c \
+	generator/ext-preview.h \
 	generator/ext-script.c
 
-libinventory_ser_la_LIBADD = $(LIBADD)
-libinventory_ser_la_SOURCES = \
-	inventory/ext-inventory.c \
-	inventory/ext-inventory.h \
-	inventory/ext-module.c \
-	inventory/ext-module.h \
-	inventory/ext-script.c
+liboptions_cli_la_LIBADD = $(LIBADD)
+liboptions_cli_la_SOURCES = \
+	options/ext-module.c \
+	options/ext-module.h \
+	options/ext-options.c \
+	options/ext-options.h \
+	options/ext-script.c
 
-libnpc_ser_la_LIBADD = $(LIBADD)
-libnpc_ser_la_SOURCES = \
-	npc/ext-module.c \
-	npc/ext-module.h \
-	npc/ext-npc.c \
-	npc/ext-npc.h \
-	npc/ext-script.c
+libpackager_cli_la_LIBADD = $(LIBADD)
+libpackager_cli_la_SOURCES = \
+	packager/ext-module.c \
+	packager/ext-module.h \
+	packager/ext-packager.c \
+	packager/ext-packager.h \
+	packager/ext-resources.c \
+	packager/ext-resources.h \
+	packager/ext-script.c
 
-libskeleton_ser_la_LIBADD = $(LIBADD)
-libskeleton_ser_la_SOURCES = \
-	skeleton/ext-module.c \
-	skeleton/ext-module.h \
-	skeleton/ext-script.c
+libreload_cli_la_LIBADD = $(LIBADD)
+libreload_cli_la_SOURCES = \
+	reload/ext-module.c \
+	reload/ext-module.h \
+	reload/ext-reload.c \
+	reload/ext-reload.h \
+	reload/ext-script.c
 
-libskills_ser_la_LIBADD = $(LIBADD)
-libskills_ser_la_SOURCES = \
+libskills_cli_la_LIBADD = $(LIBADD)
+libskills_cli_la_SOURCES = \
 	skills/ext-module.c \
 	skills/ext-module.h \
-	skills/ext-skill.c \
-	skills/ext-skill.h \
+	skills/ext-script.c \
 	skills/ext-skills.c \
 	skills/ext-skills.h \
-	skills/ext-script.c
+	skills/ext-widget.c \
+	skills/ext-widget.h
 
-libslots_ser_la_LIBADD = $(LIBADD)
-libslots_ser_la_SOURCES = \
+libslots_cli_la_LIBADD = $(LIBADD)
+libslots_cli_la_SOURCES = \
 	slots/ext-module.c \
 	slots/ext-module.h \
-	slots/ext-script.c \
+	slots/ext-slot.c \
+	slots/ext-slot.h \
 	slots/ext-slots.c \
 	slots/ext-slots.h
 
-libspawner_ser_la_LIBADD = $(LIBADD)
-libspawner_ser_la_SOURCES = \
-	spawner/ext-module.c \
-	spawner/ext-module.h \
-	spawner/ext-spawner.c \
-	spawner/ext-spawner.h \
-	spawner/ext-script.c
+libsound_cli_la_LIBADD = $(LIBADD)
+libsound_cli_la_SOURCES = \
+	sound/ext-module.c \
+	sound/ext-module.h \
+	sound/ext-script.c
 
-libvoxel_ser_la_LIBADD = $(LIBADD)
-libvoxel_ser_la_SOURCES = \
+libspeech_cli_la_LIBADD = $(LIBADD)
+libspeech_cli_la_SOURCES = \
+	speech/ext-module.c \
+	speech/ext-module.h \
+	speech/ext-script.c \
+	speech/ext-speech.h \
+	speech/ext-speech.c
+
+libvoxel_cli_la_LIBADD = $(LIBADD)
+libvoxel_cli_la_SOURCES = \
 	voxel/ext-block.c \
 	voxel/ext-block.h \
-	voxel/ext-listener.c \
-	voxel/ext-listener.h \
 	voxel/ext-module.c \
 	voxel/ext-module.h \
 	voxel/ext-script.c
+
+libwidgets_cli_la_LIBADD = $(LIBADD)
+libwidgets_cli_la_SOURCES = \
+	widgets/ext-module.c \
+	widgets/ext-module.h \
+	widgets/ext-script.c
 
 all: all-am
 
@@ -449,9 +511,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign lipsofsuna/server/extensions/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign lipsofsuna/extension/client/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign lipsofsuna/server/extensions/Makefile
+	  $(AUTOMAKE) --foreign lipsofsuna/extension/client/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -501,32 +563,60 @@ clean-extLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-creature/$(am__dirstamp):
-	@$(MKDIR_P) creature
-	@: > creature/$(am__dirstamp)
-creature/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) creature/$(DEPDIR)
-	@: > creature/$(DEPDIR)/$(am__dirstamp)
-creature/ext-creature.lo: creature/$(am__dirstamp) \
-	creature/$(DEPDIR)/$(am__dirstamp)
-creature/ext-module.lo: creature/$(am__dirstamp) \
-	creature/$(DEPDIR)/$(am__dirstamp)
-creature/ext-script.lo: creature/$(am__dirstamp) \
-	creature/$(DEPDIR)/$(am__dirstamp)
-libcreature-ser.la: $(libcreature_ser_la_OBJECTS) $(libcreature_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libcreature_ser_la_OBJECTS) $(libcreature_ser_la_LIBADD) $(LIBS)
+camera/$(am__dirstamp):
+	@$(MKDIR_P) camera
+	@: > camera/$(am__dirstamp)
+camera/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) camera/$(DEPDIR)
+	@: > camera/$(DEPDIR)/$(am__dirstamp)
+camera/ext-module.lo: camera/$(am__dirstamp) \
+	camera/$(DEPDIR)/$(am__dirstamp)
+camera/ext-script.lo: camera/$(am__dirstamp) \
+	camera/$(DEPDIR)/$(am__dirstamp)
+libcamera-cli.la: $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libcamera_cli_la_OBJECTS) $(libcamera_cli_la_LIBADD) $(LIBS)
+chat/$(am__dirstamp):
+	@$(MKDIR_P) chat
+	@: > chat/$(am__dirstamp)
+chat/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) chat/$(DEPDIR)
+	@: > chat/$(DEPDIR)/$(am__dirstamp)
+chat/ext-history.lo: chat/$(am__dirstamp) \
+	chat/$(DEPDIR)/$(am__dirstamp)
+chat/ext-module.lo: chat/$(am__dirstamp) \
+	chat/$(DEPDIR)/$(am__dirstamp)
+chat/ext-script.lo: chat/$(am__dirstamp) \
+	chat/$(DEPDIR)/$(am__dirstamp)
+libchat-cli.la: $(libchat_cli_la_OBJECTS) $(libchat_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libchat_cli_la_OBJECTS) $(libchat_cli_la_LIBADD) $(LIBS)
 editor/$(am__dirstamp):
 	@$(MKDIR_P) editor
 	@: > editor/$(am__dirstamp)
 editor/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) editor/$(DEPDIR)
 	@: > editor/$(DEPDIR)/$(am__dirstamp)
+editor/ext-dialog.lo: editor/$(am__dirstamp) \
+	editor/$(DEPDIR)/$(am__dirstamp)
+editor/ext-editor.lo: editor/$(am__dirstamp) \
+	editor/$(DEPDIR)/$(am__dirstamp)
 editor/ext-module.lo: editor/$(am__dirstamp) \
 	editor/$(DEPDIR)/$(am__dirstamp)
 editor/ext-script.lo: editor/$(am__dirstamp) \
 	editor/$(DEPDIR)/$(am__dirstamp)
-libeditor-ser.la: $(libeditor_ser_la_OBJECTS) $(libeditor_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libeditor_ser_la_OBJECTS) $(libeditor_ser_la_LIBADD) $(LIBS)
+libeditor-cli.la: $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libeditor_cli_la_OBJECTS) $(libeditor_cli_la_LIBADD) $(LIBS)
+effect/$(am__dirstamp):
+	@$(MKDIR_P) effect
+	@: > effect/$(am__dirstamp)
+effect/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) effect/$(DEPDIR)
+	@: > effect/$(DEPDIR)/$(am__dirstamp)
+effect/ext-module.lo: effect/$(am__dirstamp) \
+	effect/$(DEPDIR)/$(am__dirstamp)
+effect/ext-script.lo: effect/$(am__dirstamp) \
+	effect/$(DEPDIR)/$(am__dirstamp)
+libeffect-cli.la: $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libeffect_cli_la_OBJECTS) $(libeffect_cli_la_LIBADD) $(LIBS)
 events/$(am__dirstamp):
 	@$(MKDIR_P) events
 	@: > events/$(am__dirstamp)
@@ -537,59 +627,72 @@ events/ext-module.lo: events/$(am__dirstamp) \
 	events/$(DEPDIR)/$(am__dirstamp)
 events/ext-script.lo: events/$(am__dirstamp) \
 	events/$(DEPDIR)/$(am__dirstamp)
-libevents-ser.la: $(libevents_ser_la_OBJECTS) $(libevents_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libevents_ser_la_OBJECTS) $(libevents_ser_la_LIBADD) $(LIBS)
+libevents-cli.la: $(libevents_cli_la_OBJECTS) $(libevents_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libevents_cli_la_OBJECTS) $(libevents_cli_la_LIBADD) $(LIBS)
 generator/$(am__dirstamp):
 	@$(MKDIR_P) generator
 	@: > generator/$(am__dirstamp)
 generator/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) generator/$(DEPDIR)
 	@: > generator/$(DEPDIR)/$(am__dirstamp)
-generator/ext-generator.lo: generator/$(am__dirstamp) \
+generator/ext-brushes.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-dialog.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-materials.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
 generator/ext-module.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-preview.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
 generator/ext-script.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
-libgenerator-ser.la: $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_LIBADD) $(LIBS)
-inventory/$(am__dirstamp):
-	@$(MKDIR_P) inventory
-	@: > inventory/$(am__dirstamp)
-inventory/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) inventory/$(DEPDIR)
-	@: > inventory/$(DEPDIR)/$(am__dirstamp)
-inventory/ext-inventory.lo: inventory/$(am__dirstamp) \
-	inventory/$(DEPDIR)/$(am__dirstamp)
-inventory/ext-module.lo: inventory/$(am__dirstamp) \
-	inventory/$(DEPDIR)/$(am__dirstamp)
-inventory/ext-script.lo: inventory/$(am__dirstamp) \
-	inventory/$(DEPDIR)/$(am__dirstamp)
-libinventory-ser.la: $(libinventory_ser_la_OBJECTS) $(libinventory_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libinventory_ser_la_OBJECTS) $(libinventory_ser_la_LIBADD) $(LIBS)
-npc/$(am__dirstamp):
-	@$(MKDIR_P) npc
-	@: > npc/$(am__dirstamp)
-npc/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) npc/$(DEPDIR)
-	@: > npc/$(DEPDIR)/$(am__dirstamp)
-npc/ext-module.lo: npc/$(am__dirstamp) npc/$(DEPDIR)/$(am__dirstamp)
-npc/ext-npc.lo: npc/$(am__dirstamp) npc/$(DEPDIR)/$(am__dirstamp)
-npc/ext-script.lo: npc/$(am__dirstamp) npc/$(DEPDIR)/$(am__dirstamp)
-libnpc-ser.la: $(libnpc_ser_la_OBJECTS) $(libnpc_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libnpc_ser_la_OBJECTS) $(libnpc_ser_la_LIBADD) $(LIBS)
-skeleton/$(am__dirstamp):
-	@$(MKDIR_P) skeleton
-	@: > skeleton/$(am__dirstamp)
-skeleton/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) skeleton/$(DEPDIR)
-	@: > skeleton/$(DEPDIR)/$(am__dirstamp)
-skeleton/ext-module.lo: skeleton/$(am__dirstamp) \
-	skeleton/$(DEPDIR)/$(am__dirstamp)
-skeleton/ext-script.lo: skeleton/$(am__dirstamp) \
-	skeleton/$(DEPDIR)/$(am__dirstamp)
-libskeleton-ser.la: $(libskeleton_ser_la_OBJECTS) $(libskeleton_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libskeleton_ser_la_OBJECTS) $(libskeleton_ser_la_LIBADD) $(LIBS)
+libgenerator-cli.la: $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libgenerator_cli_la_OBJECTS) $(libgenerator_cli_la_LIBADD) $(LIBS)
+options/$(am__dirstamp):
+	@$(MKDIR_P) options
+	@: > options/$(am__dirstamp)
+options/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) options/$(DEPDIR)
+	@: > options/$(DEPDIR)/$(am__dirstamp)
+options/ext-module.lo: options/$(am__dirstamp) \
+	options/$(DEPDIR)/$(am__dirstamp)
+options/ext-options.lo: options/$(am__dirstamp) \
+	options/$(DEPDIR)/$(am__dirstamp)
+options/ext-script.lo: options/$(am__dirstamp) \
+	options/$(DEPDIR)/$(am__dirstamp)
+liboptions-cli.la: $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(liboptions_cli_la_OBJECTS) $(liboptions_cli_la_LIBADD) $(LIBS)
+packager/$(am__dirstamp):
+	@$(MKDIR_P) packager
+	@: > packager/$(am__dirstamp)
+packager/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) packager/$(DEPDIR)
+	@: > packager/$(DEPDIR)/$(am__dirstamp)
+packager/ext-module.lo: packager/$(am__dirstamp) \
+	packager/$(DEPDIR)/$(am__dirstamp)
+packager/ext-packager.lo: packager/$(am__dirstamp) \
+	packager/$(DEPDIR)/$(am__dirstamp)
+packager/ext-resources.lo: packager/$(am__dirstamp) \
+	packager/$(DEPDIR)/$(am__dirstamp)
+packager/ext-script.lo: packager/$(am__dirstamp) \
+	packager/$(DEPDIR)/$(am__dirstamp)
+libpackager-cli.la: $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libpackager_cli_la_OBJECTS) $(libpackager_cli_la_LIBADD) $(LIBS)
+reload/$(am__dirstamp):
+	@$(MKDIR_P) reload
+	@: > reload/$(am__dirstamp)
+reload/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) reload/$(DEPDIR)
+	@: > reload/$(DEPDIR)/$(am__dirstamp)
+reload/ext-module.lo: reload/$(am__dirstamp) \
+	reload/$(DEPDIR)/$(am__dirstamp)
+reload/ext-reload.lo: reload/$(am__dirstamp) \
+	reload/$(DEPDIR)/$(am__dirstamp)
+reload/ext-script.lo: reload/$(am__dirstamp) \
+	reload/$(DEPDIR)/$(am__dirstamp)
+libreload-cli.la: $(libreload_cli_la_OBJECTS) $(libreload_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libreload_cli_la_OBJECTS) $(libreload_cli_la_LIBADD) $(LIBS)
 skills/$(am__dirstamp):
 	@$(MKDIR_P) skills
 	@: > skills/$(am__dirstamp)
@@ -598,14 +701,14 @@ skills/$(DEPDIR)/$(am__dirstamp):
 	@: > skills/$(DEPDIR)/$(am__dirstamp)
 skills/ext-module.lo: skills/$(am__dirstamp) \
 	skills/$(DEPDIR)/$(am__dirstamp)
-skills/ext-skill.lo: skills/$(am__dirstamp) \
+skills/ext-script.lo: skills/$(am__dirstamp) \
 	skills/$(DEPDIR)/$(am__dirstamp)
 skills/ext-skills.lo: skills/$(am__dirstamp) \
 	skills/$(DEPDIR)/$(am__dirstamp)
-skills/ext-script.lo: skills/$(am__dirstamp) \
+skills/ext-widget.lo: skills/$(am__dirstamp) \
 	skills/$(DEPDIR)/$(am__dirstamp)
-libskills-ser.la: $(libskills_ser_la_OBJECTS) $(libskills_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libskills_ser_la_OBJECTS) $(libskills_ser_la_LIBADD) $(LIBS)
+libskills-cli.la: $(libskills_cli_la_OBJECTS) $(libskills_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libskills_cli_la_OBJECTS) $(libskills_cli_la_LIBADD) $(LIBS)
 slots/$(am__dirstamp):
 	@$(MKDIR_P) slots
 	@: > slots/$(am__dirstamp)
@@ -614,26 +717,38 @@ slots/$(DEPDIR)/$(am__dirstamp):
 	@: > slots/$(DEPDIR)/$(am__dirstamp)
 slots/ext-module.lo: slots/$(am__dirstamp) \
 	slots/$(DEPDIR)/$(am__dirstamp)
-slots/ext-script.lo: slots/$(am__dirstamp) \
+slots/ext-slot.lo: slots/$(am__dirstamp) \
 	slots/$(DEPDIR)/$(am__dirstamp)
 slots/ext-slots.lo: slots/$(am__dirstamp) \
 	slots/$(DEPDIR)/$(am__dirstamp)
-libslots-ser.la: $(libslots_ser_la_OBJECTS) $(libslots_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libslots_ser_la_OBJECTS) $(libslots_ser_la_LIBADD) $(LIBS)
-spawner/$(am__dirstamp):
-	@$(MKDIR_P) spawner
-	@: > spawner/$(am__dirstamp)
-spawner/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) spawner/$(DEPDIR)
-	@: > spawner/$(DEPDIR)/$(am__dirstamp)
-spawner/ext-module.lo: spawner/$(am__dirstamp) \
-	spawner/$(DEPDIR)/$(am__dirstamp)
-spawner/ext-spawner.lo: spawner/$(am__dirstamp) \
-	spawner/$(DEPDIR)/$(am__dirstamp)
-spawner/ext-script.lo: spawner/$(am__dirstamp) \
-	spawner/$(DEPDIR)/$(am__dirstamp)
-libspawner-ser.la: $(libspawner_ser_la_OBJECTS) $(libspawner_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libspawner_ser_la_OBJECTS) $(libspawner_ser_la_LIBADD) $(LIBS)
+libslots-cli.la: $(libslots_cli_la_OBJECTS) $(libslots_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libslots_cli_la_OBJECTS) $(libslots_cli_la_LIBADD) $(LIBS)
+sound/$(am__dirstamp):
+	@$(MKDIR_P) sound
+	@: > sound/$(am__dirstamp)
+sound/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) sound/$(DEPDIR)
+	@: > sound/$(DEPDIR)/$(am__dirstamp)
+sound/ext-module.lo: sound/$(am__dirstamp) \
+	sound/$(DEPDIR)/$(am__dirstamp)
+sound/ext-script.lo: sound/$(am__dirstamp) \
+	sound/$(DEPDIR)/$(am__dirstamp)
+libsound-cli.la: $(libsound_cli_la_OBJECTS) $(libsound_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libsound_cli_la_OBJECTS) $(libsound_cli_la_LIBADD) $(LIBS)
+speech/$(am__dirstamp):
+	@$(MKDIR_P) speech
+	@: > speech/$(am__dirstamp)
+speech/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) speech/$(DEPDIR)
+	@: > speech/$(DEPDIR)/$(am__dirstamp)
+speech/ext-module.lo: speech/$(am__dirstamp) \
+	speech/$(DEPDIR)/$(am__dirstamp)
+speech/ext-script.lo: speech/$(am__dirstamp) \
+	speech/$(DEPDIR)/$(am__dirstamp)
+speech/ext-speech.lo: speech/$(am__dirstamp) \
+	speech/$(DEPDIR)/$(am__dirstamp)
+libspeech-cli.la: $(libspeech_cli_la_OBJECTS) $(libspeech_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libspeech_cli_la_OBJECTS) $(libspeech_cli_la_LIBADD) $(LIBS)
 voxel/$(am__dirstamp):
 	@$(MKDIR_P) voxel
 	@: > voxel/$(am__dirstamp)
@@ -642,117 +757,169 @@ voxel/$(DEPDIR)/$(am__dirstamp):
 	@: > voxel/$(DEPDIR)/$(am__dirstamp)
 voxel/ext-block.lo: voxel/$(am__dirstamp) \
 	voxel/$(DEPDIR)/$(am__dirstamp)
-voxel/ext-listener.lo: voxel/$(am__dirstamp) \
-	voxel/$(DEPDIR)/$(am__dirstamp)
 voxel/ext-module.lo: voxel/$(am__dirstamp) \
 	voxel/$(DEPDIR)/$(am__dirstamp)
 voxel/ext-script.lo: voxel/$(am__dirstamp) \
 	voxel/$(DEPDIR)/$(am__dirstamp)
-libvoxel-ser.la: $(libvoxel_ser_la_OBJECTS) $(libvoxel_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libvoxel_ser_la_OBJECTS) $(libvoxel_ser_la_LIBADD) $(LIBS)
+libvoxel-cli.la: $(libvoxel_cli_la_OBJECTS) $(libvoxel_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libvoxel_cli_la_OBJECTS) $(libvoxel_cli_la_LIBADD) $(LIBS)
+widgets/$(am__dirstamp):
+	@$(MKDIR_P) widgets
+	@: > widgets/$(am__dirstamp)
+widgets/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) widgets/$(DEPDIR)
+	@: > widgets/$(DEPDIR)/$(am__dirstamp)
+widgets/ext-module.lo: widgets/$(am__dirstamp) \
+	widgets/$(DEPDIR)/$(am__dirstamp)
+widgets/ext-script.lo: widgets/$(am__dirstamp) \
+	widgets/$(DEPDIR)/$(am__dirstamp)
+libwidgets-cli.la: $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libwidgets_cli_la_OBJECTS) $(libwidgets_cli_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
-	-rm -f creature/ext-creature.$(OBJEXT)
-	-rm -f creature/ext-creature.lo
-	-rm -f creature/ext-module.$(OBJEXT)
-	-rm -f creature/ext-module.lo
-	-rm -f creature/ext-script.$(OBJEXT)
-	-rm -f creature/ext-script.lo
+	-rm -f camera/ext-module.$(OBJEXT)
+	-rm -f camera/ext-module.lo
+	-rm -f camera/ext-script.$(OBJEXT)
+	-rm -f camera/ext-script.lo
+	-rm -f chat/ext-history.$(OBJEXT)
+	-rm -f chat/ext-history.lo
+	-rm -f chat/ext-module.$(OBJEXT)
+	-rm -f chat/ext-module.lo
+	-rm -f chat/ext-script.$(OBJEXT)
+	-rm -f chat/ext-script.lo
+	-rm -f editor/ext-dialog.$(OBJEXT)
+	-rm -f editor/ext-dialog.lo
+	-rm -f editor/ext-editor.$(OBJEXT)
+	-rm -f editor/ext-editor.lo
 	-rm -f editor/ext-module.$(OBJEXT)
 	-rm -f editor/ext-module.lo
 	-rm -f editor/ext-script.$(OBJEXT)
 	-rm -f editor/ext-script.lo
+	-rm -f effect/ext-module.$(OBJEXT)
+	-rm -f effect/ext-module.lo
+	-rm -f effect/ext-script.$(OBJEXT)
+	-rm -f effect/ext-script.lo
 	-rm -f events/ext-module.$(OBJEXT)
 	-rm -f events/ext-module.lo
 	-rm -f events/ext-script.$(OBJEXT)
 	-rm -f events/ext-script.lo
-	-rm -f generator/ext-generator.$(OBJEXT)
-	-rm -f generator/ext-generator.lo
+	-rm -f generator/ext-brushes.$(OBJEXT)
+	-rm -f generator/ext-brushes.lo
+	-rm -f generator/ext-dialog.$(OBJEXT)
+	-rm -f generator/ext-dialog.lo
+	-rm -f generator/ext-materials.$(OBJEXT)
+	-rm -f generator/ext-materials.lo
 	-rm -f generator/ext-module.$(OBJEXT)
 	-rm -f generator/ext-module.lo
+	-rm -f generator/ext-preview.$(OBJEXT)
+	-rm -f generator/ext-preview.lo
 	-rm -f generator/ext-script.$(OBJEXT)
 	-rm -f generator/ext-script.lo
-	-rm -f inventory/ext-inventory.$(OBJEXT)
-	-rm -f inventory/ext-inventory.lo
-	-rm -f inventory/ext-module.$(OBJEXT)
-	-rm -f inventory/ext-module.lo
-	-rm -f inventory/ext-script.$(OBJEXT)
-	-rm -f inventory/ext-script.lo
-	-rm -f npc/ext-module.$(OBJEXT)
-	-rm -f npc/ext-module.lo
-	-rm -f npc/ext-npc.$(OBJEXT)
-	-rm -f npc/ext-npc.lo
-	-rm -f npc/ext-script.$(OBJEXT)
-	-rm -f npc/ext-script.lo
-	-rm -f skeleton/ext-module.$(OBJEXT)
-	-rm -f skeleton/ext-module.lo
-	-rm -f skeleton/ext-script.$(OBJEXT)
-	-rm -f skeleton/ext-script.lo
+	-rm -f options/ext-module.$(OBJEXT)
+	-rm -f options/ext-module.lo
+	-rm -f options/ext-options.$(OBJEXT)
+	-rm -f options/ext-options.lo
+	-rm -f options/ext-script.$(OBJEXT)
+	-rm -f options/ext-script.lo
+	-rm -f packager/ext-module.$(OBJEXT)
+	-rm -f packager/ext-module.lo
+	-rm -f packager/ext-packager.$(OBJEXT)
+	-rm -f packager/ext-packager.lo
+	-rm -f packager/ext-resources.$(OBJEXT)
+	-rm -f packager/ext-resources.lo
+	-rm -f packager/ext-script.$(OBJEXT)
+	-rm -f packager/ext-script.lo
+	-rm -f reload/ext-module.$(OBJEXT)
+	-rm -f reload/ext-module.lo
+	-rm -f reload/ext-reload.$(OBJEXT)
+	-rm -f reload/ext-reload.lo
+	-rm -f reload/ext-script.$(OBJEXT)
+	-rm -f reload/ext-script.lo
 	-rm -f skills/ext-module.$(OBJEXT)
 	-rm -f skills/ext-module.lo
 	-rm -f skills/ext-script.$(OBJEXT)
 	-rm -f skills/ext-script.lo
-	-rm -f skills/ext-skill.$(OBJEXT)
-	-rm -f skills/ext-skill.lo
 	-rm -f skills/ext-skills.$(OBJEXT)
 	-rm -f skills/ext-skills.lo
+	-rm -f skills/ext-widget.$(OBJEXT)
+	-rm -f skills/ext-widget.lo
 	-rm -f slots/ext-module.$(OBJEXT)
 	-rm -f slots/ext-module.lo
-	-rm -f slots/ext-script.$(OBJEXT)
-	-rm -f slots/ext-script.lo
+	-rm -f slots/ext-slot.$(OBJEXT)
+	-rm -f slots/ext-slot.lo
 	-rm -f slots/ext-slots.$(OBJEXT)
 	-rm -f slots/ext-slots.lo
-	-rm -f spawner/ext-module.$(OBJEXT)
-	-rm -f spawner/ext-module.lo
-	-rm -f spawner/ext-script.$(OBJEXT)
-	-rm -f spawner/ext-script.lo
-	-rm -f spawner/ext-spawner.$(OBJEXT)
-	-rm -f spawner/ext-spawner.lo
+	-rm -f sound/ext-module.$(OBJEXT)
+	-rm -f sound/ext-module.lo
+	-rm -f sound/ext-script.$(OBJEXT)
+	-rm -f sound/ext-script.lo
+	-rm -f speech/ext-module.$(OBJEXT)
+	-rm -f speech/ext-module.lo
+	-rm -f speech/ext-script.$(OBJEXT)
+	-rm -f speech/ext-script.lo
+	-rm -f speech/ext-speech.$(OBJEXT)
+	-rm -f speech/ext-speech.lo
 	-rm -f voxel/ext-block.$(OBJEXT)
 	-rm -f voxel/ext-block.lo
-	-rm -f voxel/ext-listener.$(OBJEXT)
-	-rm -f voxel/ext-listener.lo
 	-rm -f voxel/ext-module.$(OBJEXT)
 	-rm -f voxel/ext-module.lo
 	-rm -f voxel/ext-script.$(OBJEXT)
 	-rm -f voxel/ext-script.lo
+	-rm -f widgets/ext-module.$(OBJEXT)
+	-rm -f widgets/ext-module.lo
+	-rm -f widgets/ext-script.$(OBJEXT)
+	-rm -f widgets/ext-script.lo
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-creature.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@camera/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@camera/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@chat/$(DEPDIR)/ext-history.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@chat/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@chat/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-dialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-editor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@effect/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@effect/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-generator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-brushes.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-dialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-materials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-preview.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@inventory/$(DEPDIR)/ext-inventory.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@inventory/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@inventory/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@npc/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@npc/$(DEPDIR)/ext-npc.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@npc/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@skeleton/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@skeleton/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@options/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@options/$(DEPDIR)/ext-options.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@options/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@packager/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@packager/$(DEPDIR)/ext-packager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@packager/$(DEPDIR)/ext-resources.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@packager/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@reload/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@reload/$(DEPDIR)/ext-reload.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@reload/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-skill.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-skills.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@skills/$(DEPDIR)/ext-widget.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-slot.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@slots/$(DEPDIR)/ext-slots.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@spawner/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@spawner/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@spawner/$(DEPDIR)/ext-spawner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sound/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@speech/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@speech/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@speech/$(DEPDIR)/ext-speech.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-block.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@voxel/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@widgets/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@widgets/$(DEPDIR)/ext-script.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -786,17 +953,21 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-	-rm -rf creature/.libs creature/_libs
+	-rm -rf camera/.libs camera/_libs
+	-rm -rf chat/.libs chat/_libs
 	-rm -rf editor/.libs editor/_libs
+	-rm -rf effect/.libs effect/_libs
 	-rm -rf events/.libs events/_libs
 	-rm -rf generator/.libs generator/_libs
-	-rm -rf inventory/.libs inventory/_libs
-	-rm -rf npc/.libs npc/_libs
-	-rm -rf skeleton/.libs skeleton/_libs
+	-rm -rf options/.libs options/_libs
+	-rm -rf packager/.libs packager/_libs
+	-rm -rf reload/.libs reload/_libs
 	-rm -rf skills/.libs skills/_libs
 	-rm -rf slots/.libs slots/_libs
-	-rm -rf spawner/.libs spawner/_libs
+	-rm -rf sound/.libs sound/_libs
+	-rm -rf speech/.libs speech/_libs
 	-rm -rf voxel/.libs voxel/_libs
+	-rm -rf widgets/.libs widgets/_libs
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -908,28 +1079,36 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
-	-rm -f creature/$(DEPDIR)/$(am__dirstamp)
-	-rm -f creature/$(am__dirstamp)
+	-rm -f camera/$(DEPDIR)/$(am__dirstamp)
+	-rm -f camera/$(am__dirstamp)
+	-rm -f chat/$(DEPDIR)/$(am__dirstamp)
+	-rm -f chat/$(am__dirstamp)
 	-rm -f editor/$(DEPDIR)/$(am__dirstamp)
 	-rm -f editor/$(am__dirstamp)
+	-rm -f effect/$(DEPDIR)/$(am__dirstamp)
+	-rm -f effect/$(am__dirstamp)
 	-rm -f events/$(DEPDIR)/$(am__dirstamp)
 	-rm -f events/$(am__dirstamp)
 	-rm -f generator/$(DEPDIR)/$(am__dirstamp)
 	-rm -f generator/$(am__dirstamp)
-	-rm -f inventory/$(DEPDIR)/$(am__dirstamp)
-	-rm -f inventory/$(am__dirstamp)
-	-rm -f npc/$(DEPDIR)/$(am__dirstamp)
-	-rm -f npc/$(am__dirstamp)
-	-rm -f skeleton/$(DEPDIR)/$(am__dirstamp)
-	-rm -f skeleton/$(am__dirstamp)
+	-rm -f options/$(DEPDIR)/$(am__dirstamp)
+	-rm -f options/$(am__dirstamp)
+	-rm -f packager/$(DEPDIR)/$(am__dirstamp)
+	-rm -f packager/$(am__dirstamp)
+	-rm -f reload/$(DEPDIR)/$(am__dirstamp)
+	-rm -f reload/$(am__dirstamp)
 	-rm -f skills/$(DEPDIR)/$(am__dirstamp)
 	-rm -f skills/$(am__dirstamp)
 	-rm -f slots/$(DEPDIR)/$(am__dirstamp)
 	-rm -f slots/$(am__dirstamp)
-	-rm -f spawner/$(DEPDIR)/$(am__dirstamp)
-	-rm -f spawner/$(am__dirstamp)
+	-rm -f sound/$(DEPDIR)/$(am__dirstamp)
+	-rm -f sound/$(am__dirstamp)
+	-rm -f speech/$(DEPDIR)/$(am__dirstamp)
+	-rm -f speech/$(am__dirstamp)
 	-rm -f voxel/$(DEPDIR)/$(am__dirstamp)
 	-rm -f voxel/$(am__dirstamp)
+	-rm -f widgets/$(DEPDIR)/$(am__dirstamp)
+	-rm -f widgets/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -940,7 +1119,7 @@ clean-am: clean-extLTLIBRARIES clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf creature/$(DEPDIR) editor/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) inventory/$(DEPDIR) npc/$(DEPDIR) skeleton/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) spawner/$(DEPDIR) voxel/$(DEPDIR)
+	-rm -rf camera/$(DEPDIR) chat/$(DEPDIR) editor/$(DEPDIR) effect/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) options/$(DEPDIR) packager/$(DEPDIR) reload/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) sound/$(DEPDIR) speech/$(DEPDIR) voxel/$(DEPDIR) widgets/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -986,7 +1165,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf creature/$(DEPDIR) editor/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) inventory/$(DEPDIR) npc/$(DEPDIR) skeleton/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) spawner/$(DEPDIR) voxel/$(DEPDIR)
+	-rm -rf camera/$(DEPDIR) chat/$(DEPDIR) editor/$(DEPDIR) effect/$(DEPDIR) events/$(DEPDIR) generator/$(DEPDIR) options/$(DEPDIR) packager/$(DEPDIR) reload/$(DEPDIR) skills/$(DEPDIR) slots/$(DEPDIR) sound/$(DEPDIR) speech/$(DEPDIR) voxel/$(DEPDIR) widgets/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
