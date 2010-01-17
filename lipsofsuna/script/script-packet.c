@@ -42,62 +42,8 @@ private_read (LIScrPacket* data,
 
 /* @luadoc
  * ---
- * -- Read or write a boolean value.
- * -- @name Packet.BOOL
- * -- @class table
- */
-/* @luadoc
- * ---
  * -- First packet number for custom packets.
  * -- @name Packet.CUSTOM
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write a floating point value.
- * -- @name Packet.FLOAT
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write a signed 8-bit integer.
- * -- @name Packet.INT8
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write a signed 16-bit integer.
- * -- @name Packet.INT16
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write a signed 32-bit integer.
- * -- @name Packet.INT32
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write a NUL terminated string.
- * -- @name Packet.STRING
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write an unsigned 8-bit integer.
- * -- @name Packet.UINT8
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write an unsigned 16-bit integer.
- * -- @name Packet.UINT16
- * -- @class table
- */
-/* @luadoc
- * ---
- * -- Read or write an unsigned 32-bit integer.
- * -- @name Packet.UINT32
  * -- @class table
  */
 
@@ -207,7 +153,7 @@ static int
 Packet_write (lua_State* lua)
 {
 	int i;
-	int type;
+	const char* type;
 	LIScrData* self;
 	LIScrPacket* data;
 	union
@@ -229,50 +175,55 @@ Packet_write (lua_State* lua)
 	/* Write content. */
 	for (i = 2 ; i <= lua_gettop (lua) ; i++)
 	{
-		type = luaL_checkinteger (lua, i++);
-		switch (type)
+		type = luaL_checkstring (lua, i++);
+		if (!strcmp (type, "bool"))
 		{
-			case LISCR_PACKET_FORMAT_BOOL:
-				tmp.u8 = lua_toboolean (lua, i);
-				liarc_writer_append_uint8 (data->writer, tmp.u8);
-				break;
-			case LISCR_PACKET_FORMAT_FLOAT:
-				tmp.flt = luaL_checknumber (lua, i);
-				liarc_writer_append_float (data->writer, tmp.flt);
-				break;
-			case LISCR_PACKET_FORMAT_INT8:
-				tmp.i8 = luaL_checknumber (lua, i);
-				liarc_writer_append_int8 (data->writer, tmp.i8);
-				break;
-			case LISCR_PACKET_FORMAT_INT16:
-				tmp.i16 = luaL_checknumber (lua, i);
-				liarc_writer_append_int16 (data->writer, tmp.i16);
-				break;
-			case LISCR_PACKET_FORMAT_INT32:
-				tmp.i32 = luaL_checknumber (lua, i);
-				liarc_writer_append_int32 (data->writer, tmp.i32);
-				break;
-			case LISCR_PACKET_FORMAT_STRING:
-				tmp.str = luaL_checkstring (lua, i);
-				liarc_writer_append_string (data->writer, tmp.str);
-				liarc_writer_append_nul (data->writer);
-				break;
-			case LISCR_PACKET_FORMAT_UINT8:
-				tmp.u8 = luaL_checknumber (lua, i);
-				liarc_writer_append_uint8 (data->writer, tmp.u8);
-				break;
-			case LISCR_PACKET_FORMAT_UINT16:
-				tmp.u16 = luaL_checknumber (lua, i);
-				liarc_writer_append_uint16 (data->writer, tmp.u16);
-				break;
-			case LISCR_PACKET_FORMAT_UINT32:
-				tmp.u32 = luaL_checknumber (lua, i);
-				liarc_writer_append_uint32 (data->writer, tmp.u32);
-				break;
-			default:
-				luaL_argerror (lua, i - 1, "invalid format");
-				break;
+			tmp.u8 = lua_toboolean (lua, i);
+			liarc_writer_append_uint8 (data->writer, tmp.u8);
 		}
+		else if (!strcmp (type, "float"))
+		{
+			tmp.flt = luaL_checknumber (lua, i);
+			liarc_writer_append_float (data->writer, tmp.flt);
+		}
+		else if (!strcmp (type, "int8"))
+		{
+			tmp.i8 = luaL_checknumber (lua, i);
+			liarc_writer_append_int8 (data->writer, tmp.i8);
+		}
+		else if (!strcmp (type, "int16"))
+		{
+			tmp.i16 = luaL_checknumber (lua, i);
+			liarc_writer_append_int16 (data->writer, tmp.i16);
+		}
+		else if (!strcmp (type, "int32"))
+		{
+			tmp.i32 = luaL_checknumber (lua, i);
+			liarc_writer_append_int32 (data->writer, tmp.i32);
+		}
+		else if (!strcmp (type, "string"))
+		{
+			tmp.str = luaL_checkstring (lua, i);
+			liarc_writer_append_string (data->writer, tmp.str);
+			liarc_writer_append_nul (data->writer);
+		}
+		else if (!strcmp (type, "uint8"))
+		{
+			tmp.u8 = luaL_checknumber (lua, i);
+			liarc_writer_append_uint8 (data->writer, tmp.u8);
+		}
+		else if (!strcmp (type, "uint16"))
+		{
+			tmp.u16 = luaL_checknumber (lua, i);
+			liarc_writer_append_uint16 (data->writer, tmp.u16);
+		}
+		else if (!strcmp (type, "uint32"))
+		{
+			tmp.u32 = luaL_checknumber (lua, i);
+			liarc_writer_append_uint32 (data->writer, tmp.u32);
+		}
+		else
+			luaL_argerror (lua, i - 1, "invalid format");
 	}
 
 	return 0;
@@ -318,16 +269,7 @@ void
 liscr_script_packet (LIScrClass* self,
                    void*       data)
 {
-	liscr_class_insert_enum (self, "BOOL", LISCR_PACKET_FORMAT_BOOL);
 	liscr_class_insert_enum (self, "CUSTOM", LINET_SERVER_PACKET_CUSTOM);
-	liscr_class_insert_enum (self, "FLOAT", LISCR_PACKET_FORMAT_FLOAT);
-	liscr_class_insert_enum (self, "INT8", LISCR_PACKET_FORMAT_INT8);
-	liscr_class_insert_enum (self, "INT16", LISCR_PACKET_FORMAT_INT16);
-	liscr_class_insert_enum (self, "INT32", LISCR_PACKET_FORMAT_INT32);
-	liscr_class_insert_enum (self, "STRING", LISCR_PACKET_FORMAT_STRING);
-	liscr_class_insert_enum (self, "UINT8", LISCR_PACKET_FORMAT_UINT8);
-	liscr_class_insert_enum (self, "UINT16", LISCR_PACKET_FORMAT_UINT16);
-	liscr_class_insert_enum (self, "UINT32", LISCR_PACKET_FORMAT_UINT32);
 	liscr_class_insert_func (self, "new", Packet_new);
 	liscr_class_insert_func (self, "read", Packet_read);
 	liscr_class_insert_func (self, "resume", Packet_resume);
@@ -427,7 +369,7 @@ private_read (LIScrPacket* data,
 {
 	int i;
 	int ok = 1;
-	int type;
+	const char* type;
 	union
 	{
 		int8_t i8;
@@ -443,52 +385,57 @@ private_read (LIScrPacket* data,
 	/* Read content. */
 	for (i = 2 ; i <= lua_gettop (lua) ; i++)
 	{
-		type = luaL_checkinteger (lua, i);
-		switch (type)
+		type = luaL_checkstring (lua, i);
+		if (!strcmp (type, "bool"))
 		{
-			case LISCR_PACKET_FORMAT_BOOL:
-				if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
-				if (ok) lua_pushboolean (lua, tmp.i8);
-				break;
-			case LISCR_PACKET_FORMAT_FLOAT:
-				if (ok) ok &= liarc_reader_get_float (data->reader, &tmp.flt);
-				if (ok) lua_pushnumber (lua, tmp.flt);
-				break;
-			case LISCR_PACKET_FORMAT_INT8:
-				if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
-				if (ok) lua_pushnumber (lua, tmp.i8);
-				break;
-			case LISCR_PACKET_FORMAT_INT16:
-				if (ok) ok &= liarc_reader_get_int16 (data->reader, &tmp.i16);
-				if (ok) lua_pushnumber (lua, tmp.i16);
-				break;
-			case LISCR_PACKET_FORMAT_INT32:
-				if (ok) ok &= liarc_reader_get_int32 (data->reader, &tmp.i32);
-				if (ok) lua_pushnumber (lua, tmp.i32);
-				break;
-			case LISCR_PACKET_FORMAT_STRING:
-				tmp.str = NULL;
-				if (ok) ok &= liarc_reader_get_text (data->reader, "", &tmp.str);
-				if (ok) ok &= listr_utf8_get_valid (tmp.str);
-				if (ok) lua_pushstring (lua, tmp.str);
-				lisys_free (tmp.str);
-				break;
-			case LISCR_PACKET_FORMAT_UINT8:
-				if (ok) ok &= liarc_reader_get_uint8 (data->reader, &tmp.u8);
-				if (ok) lua_pushnumber (lua, tmp.u8);
-				break;
-			case LISCR_PACKET_FORMAT_UINT16:
-				if (ok) ok &= liarc_reader_get_uint16 (data->reader, &tmp.u16);
-				if (ok) lua_pushnumber (lua, tmp.u16);
-				break;
-			case LISCR_PACKET_FORMAT_UINT32:
-				if (ok) ok &= liarc_reader_get_uint32 (data->reader, &tmp.u32);
-				if (ok) lua_pushnumber (lua, tmp.u32);
-				break;
-			default:
-				luaL_argerror (lua, i, "invalid format");
-				break;
+			if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
+			if (ok) lua_pushboolean (lua, tmp.i8);
 		}
+		else if (!strcmp (type, "float"))
+		{
+			if (ok) ok &= liarc_reader_get_float (data->reader, &tmp.flt);
+			if (ok) lua_pushnumber (lua, tmp.flt);
+		}
+		else if (!strcmp (type, "int8"))
+		{
+			if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
+			if (ok) lua_pushnumber (lua, tmp.i8);
+		}
+		else if (!strcmp (type, "int16"))
+		{
+			if (ok) ok &= liarc_reader_get_int16 (data->reader, &tmp.i16);
+			if (ok) lua_pushnumber (lua, tmp.i16);
+		}
+		else if (!strcmp (type, "int32"))
+		{
+			if (ok) ok &= liarc_reader_get_int32 (data->reader, &tmp.i32);
+			if (ok) lua_pushnumber (lua, tmp.i32);
+		}
+		else if (!strcmp (type, "string"))
+		{
+			tmp.str = NULL;
+			if (ok) ok &= liarc_reader_get_text (data->reader, "", &tmp.str);
+			if (ok) ok &= listr_utf8_get_valid (tmp.str);
+			if (ok) lua_pushstring (lua, tmp.str);
+			lisys_free (tmp.str);
+		}
+		else if (!strcmp (type, "uint8"))
+		{
+			if (ok) ok &= liarc_reader_get_uint8 (data->reader, &tmp.u8);
+			if (ok) lua_pushnumber (lua, tmp.u8);
+		}
+		else if (!strcmp (type, "uint16"))
+		{
+			if (ok) ok &= liarc_reader_get_uint16 (data->reader, &tmp.u16);
+			if (ok) lua_pushnumber (lua, tmp.u16);
+		}
+		else if (!strcmp (type, "uint32"))
+		{
+			if (ok) ok &= liarc_reader_get_uint32 (data->reader, &tmp.u32);
+			if (ok) lua_pushnumber (lua, tmp.u32);
+		}
+		else
+			luaL_argerror (lua, i, "invalid format");
 		if (!ok)
 			lua_pushnil (lua);
 		lua_replace (lua, i);
