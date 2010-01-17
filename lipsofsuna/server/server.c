@@ -126,10 +126,6 @@ liser_server_free (LISerServer* self)
 	if (self->callbacks != NULL)
 		lical_callbacks_free (self->callbacks);
 
-	/* Free helpers. */
-	if (self->helper.resources != NULL)
-		liarc_writer_free (self->helper.resources);
-
 	lisys_free (self);
 }
 
@@ -416,11 +412,6 @@ liser_server_get_unique_object (const LISerServer* self)
 static int
 private_init_engine (LISerServer* self)
 {
-	int i;
-	LIEngAnimation* anim;
-	LIEngModel* model;
-	LIEngSample* sample;
-
 	/* Initialize callbacks. */
 	self->callbacks = lical_callbacks_new ();
 	if (self->callbacks == NULL)
@@ -446,36 +437,6 @@ private_init_engine (LISerServer* self)
 	/* Load resources. */
 	if (!lieng_engine_load_resources (self->engine, NULL))
 		return 0;
-
-	/* Build resource packet. */
-	/* TODO: Should use compression. */
-	self->helper.resources = liarc_writer_new_packet (LINET_SERVER_PACKET_RESOURCES);
-	if (self->helper.resources == NULL)
-		return 0;
-	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->animations.count);
-	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->models.count);
-	liarc_writer_append_uint32 (self->helper.resources, self->engine->resources->samples.count);
-	for (i = 0 ; i < self->engine->resources->animations.count ; i++)
-	{
-		anim = lieng_resources_find_animation_by_code (self->engine->resources, i);
-		assert (anim != NULL);
-		liarc_writer_append_string (self->helper.resources, anim->name);
-		liarc_writer_append_nul (self->helper.resources);
-	}
-	for (i = 0 ; i < self->engine->resources->models.count ; i++)
-	{
-		model = lieng_resources_find_model_by_code (self->engine->resources, i);
-		assert (model != NULL);
-		liarc_writer_append_string (self->helper.resources, model->name);
-		liarc_writer_append_nul (self->helper.resources);
-	}
-	for (i = 0 ; i < self->engine->resources->samples.count ; i++)
-	{
-		sample = lieng_resources_find_sample_by_code (self->engine->resources, i);
-		assert (sample != NULL);
-		liarc_writer_append_string (self->helper.resources, sample->name);
-		liarc_writer_append_nul (self->helper.resources);
-	}
 
 	return 1;
 }

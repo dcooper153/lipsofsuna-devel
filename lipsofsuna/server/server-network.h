@@ -38,6 +38,7 @@ struct _LISerNetwork
 	grapple_server socket;
 	LIAlgU32dic* clients;
 	LIAlgStrdic* passwords;
+	LIArcWriter* resources;
 	LISerServer* server;
 };
 

@@ -50,10 +50,6 @@ struct _LISerServer
 	LISerNetwork* network;
 	struct
 	{
-		LIArcWriter* resources;
-	} helper;
-	struct
-	{
 		struct timeval start;
 	} time;
 };

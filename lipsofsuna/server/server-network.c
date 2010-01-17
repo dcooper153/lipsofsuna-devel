@@ -97,6 +97,8 @@ liser_network_free (LISerNetwork* self)
 			lisys_free (iter1.value);
 		lialg_strdic_free (self->passwords);
 	}
+	if (self->resources != NULL)
+		liarc_writer_free (self->resources);
 	if (self->server != 0)
 		grapple_server_destroy (self->socket);
 	pthread_mutex_destroy (&self->mutex);
@@ -155,6 +157,10 @@ private_init (LISerNetwork* self,
               int           udp,
               int           port)
 {
+	int i;
+	LIEngAnimation* anim;
+	LIEngModel* model;
+	LIEngSample* sample;
 	grapple_error error;
 
 	/* Allocate client list. */
@@ -164,6 +170,36 @@ private_init (LISerNetwork* self,
 	self->passwords = lialg_strdic_new ();
 	if (self->passwords == NULL)
 		return 0;
+
+	/* Build resource packet. */
+	/* TODO: Should use compression. */
+	self->resources = liarc_writer_new_packet (LINET_SERVER_PACKET_RESOURCES);
+	if (self->resources == NULL)
+		return 0;
+	liarc_writer_append_uint32 (self->resources, self->server->engine->resources->animations.count);
+	liarc_writer_append_uint32 (self->resources, self->server->engine->resources->models.count);
+	liarc_writer_append_uint32 (self->resources, self->server->engine->resources->samples.count);
+	for (i = 0 ; i < self->server->engine->resources->animations.count ; i++)
+	{
+		anim = lieng_resources_find_animation_by_code (self->server->engine->resources, i);
+		assert (anim != NULL);
+		liarc_writer_append_string (self->resources, anim->name);
+		liarc_writer_append_nul (self->resources);
+	}
+	for (i = 0 ; i < self->server->engine->resources->models.count ; i++)
+	{
+		model = lieng_resources_find_model_by_code (self->server->engine->resources, i);
+		assert (model != NULL);
+		liarc_writer_append_string (self->resources, model->name);
+		liarc_writer_append_nul (self->resources);
+	}
+	for (i = 0 ; i < self->server->engine->resources->samples.count ; i++)
+	{
+		sample = lieng_resources_find_sample_by_code (self->server->engine->resources, i);
+		assert (sample != NULL);
+		liarc_writer_append_string (self->resources, sample->name);
+		liarc_writer_append_nul (self->resources);
+	}
 
 	/* Initialize socket. */
 	self->socket = grapple_server_init ("Lips of Suna", LINET_PROTOCOL_VERSION);
@@ -284,7 +320,7 @@ private_connect (LISerNetwork*    self,
 	}
 
 	/* Send resource list. */
-	liser_client_send (client, self->server->helper.resources, GRAPPLE_RELIABLE);
+	liser_client_send (client, self->resources, GRAPPLE_RELIABLE);
 
 	/* Assign client to the object. */
 	if (!liser_object_set_client (object, client))
