@@ -26,6 +26,8 @@
 #include "client-callbacks.h"
 #include "client-window.h"
 
+#define MOUSE_DELTA_REFRESH 0.05f
+
 /*****************************************************************************/
 /* Bindings. */
 
@@ -91,9 +93,18 @@ private_binding_tick (LICliClient* client,
 	int y;
 	int cx;
 	int cy;
+	static float accum = 0.0f;
 
 	if (!client->moving)
+	{
+		accum = 0.0f;
 		return 1;
+	}
+	accum += secs;
+	if (accum < MOUSE_DELTA_REFRESH)
+		return 1;
+	while (accum > MOUSE_DELTA_REFRESH)
+		accum -= MOUSE_DELTA_REFRESH;
 
 	/* Pointer state. */
 	cx = client->window->mode.width / 2;
@@ -169,11 +180,13 @@ private_miscellaneous_event (LICliClient* client,
 	switch (event->type)
 	{
 		case SDL_QUIT:
-			client->quit = 1;
+			limai_program_shutdown (client->program);
 			break;
 		case SDL_ACTIVEEVENT:
-			/*if (event.active.state & SDL_APPINPUTFOCUS)
-				active = event.active.gain;*/
+			if (event->active.state & SDL_APPINPUTFOCUS)
+				client->program->sleep = 5000;
+			else
+				client->program->sleep = 0;
 			break;
 		case SDL_VIDEORESIZE:
 			if (!licli_window_set_size (client->window, event->resize.w, event->resize.h))
@@ -210,9 +223,6 @@ private_miscellaneous_tick (LICliClient* client,
 	LIMatTransform transform;
 	LIMatTransform transform0;
 
-	/* Update script. */
-	liscr_script_update (client->script, secs);
-
 	/* Update network state. */
 	if (client->network != NULL)
 	{
@@ -228,9 +238,6 @@ private_miscellaneous_tick (LICliClient* client,
 		transform.rotation = client->network->curr.direction;
 		lieng_object_set_transform (player, &transform);
 	}
-
-	/* Update engine state. */
-	lieng_engine_update (client->engine, secs);
 
 	/* Update camera center. */
 	if (player != NULL && client->network != NULL)

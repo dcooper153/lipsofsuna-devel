@@ -28,30 +28,30 @@
 #include "ext-module.h"
 #include "ext-packager.h"
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Packager",
+	LIMAI_EXTENSION_VERSION, "Packager",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
-	self->packager = liext_packager_new (client);
+	self->client = limai_program_find_component (program, "client");
+	self->packager = liext_packager_new (self->client);
 	if (self->packager == NULL)
 	{
 		lisys_free (self);
 		return NULL;
 	}
 
-	liscr_script_create_class (client->script, "Packager", liext_script_packager, self);
+	liscr_script_create_class (program->script, "Packager", liext_script_packager, self);
 
 	return self;
 }
@@ -59,7 +59,6 @@ liext_module_new (LICliClient* client)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* FIXME: Remove the class here. */
 	liext_packager_free (self->packager);
 	lisys_free (self);
 }

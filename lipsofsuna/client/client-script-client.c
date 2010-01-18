@@ -232,7 +232,7 @@ static void Client_getter_fps (LIScrArgs* args)
 	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	liscr_args_seti_float (args, client->fps);
+	liscr_args_seti_float (args, client->program->fps);
 }
 
 /* @luadoc
@@ -305,7 +305,7 @@ static void Client_getter_tick (LIScrArgs* args)
 	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	liscr_args_seti_float (args, client->tick);
+	liscr_args_seti_float (args, client->program->tick);
 }
 
 /* @luadoc

@@ -24,6 +24,8 @@
 
 #include "main-program.h"
 
+#define FPS_TICKS 32
+
 static int
 private_init (LIMaiProgram* self);
 
@@ -278,7 +280,10 @@ limai_program_insert_component (LIMaiProgram* self,
 int
 limai_program_main (LIMaiProgram* self)
 {
+	int i;
+	int ticki = 0;
 	float secs;
+	float ticks[FPS_TICKS];
 	struct timeval curr_tick;
 	struct timeval prev_tick;
 
@@ -286,10 +291,23 @@ limai_program_main (LIMaiProgram* self)
 	gettimeofday (&prev_tick, NULL);
 	while (1)
 	{
+		/* Timing. */
 		gettimeofday (&curr_tick, NULL);
 		secs = curr_tick.tv_sec - prev_tick.tv_sec +
 		      (curr_tick.tv_usec - prev_tick.tv_usec) * 0.000001f;
 		prev_tick = curr_tick;
+
+		/* Frames per second. */
+		ticks[ticki++] = secs;
+		if (ticki == FPS_TICKS)
+			ticki = 0;
+		self->tick = 0.0f;
+		for (i = 0 ; i < FPS_TICKS ; i++)
+			self->tick += ticks[i];
+		self->fps = FPS_TICKS / self->tick;
+		self->tick = self->tick / FPS_TICKS;
+
+		/* Update. */
 		if (!limai_program_update (self, secs))
 			break;
 		if (self->sleep)

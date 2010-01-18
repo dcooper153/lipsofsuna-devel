@@ -20,7 +20,6 @@
 
 #include "client/client.h"
 #include "client/client-callbacks.h"
-#include "client/client-extension.h"
 #include "client/client-script.h"
 #include "client/client-types.h"
 #include "client/client-window.h"

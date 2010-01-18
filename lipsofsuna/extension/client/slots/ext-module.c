@@ -52,15 +52,15 @@ private_visibility (LIExtModule* self,
 
 /*****************************************************************************/
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Slots",
+	LIMAI_EXTENSION_VERSION, "Slots",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -68,7 +68,7 @@ liext_module_new (LICliClient* client)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
@@ -77,9 +77,9 @@ liext_module_new (LICliClient* client)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 0, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 0, private_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "object-visibility", 0, private_visibility, self, self->calls + 2))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 0, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 0, private_visibility, self, self->calls + 2))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -138,7 +138,7 @@ private_packet_diff (LIExtModule* self,
 	slots = lialg_u32dic_find (self->dictionary, id);
 	if (slots == NULL)
 	{
-		object = licli_client_find_object (self->client, id);
+		object = lieng_engine_find_object (self->client->engine, id);
 		if (object == NULL)
 			return 0;
 		slots = liext_slots_new (self, object);
@@ -187,7 +187,7 @@ private_packet_reset (LIExtModule* self,
 	slots = lialg_u32dic_find (self->dictionary, id);
 	if (slots == NULL)
 	{
-		object = licli_client_find_object (self->client, id);
+		object = lieng_engine_find_object (self->client->engine, id);
 		if (object == NULL)
 			return 0;
 		slots = liext_slots_new (self, object);

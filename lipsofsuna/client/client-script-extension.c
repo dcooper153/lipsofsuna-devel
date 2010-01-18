@@ -53,7 +53,9 @@ Extension_new (lua_State* lua)
 	client = liscr_checkclassdata (lua, 1, LICLI_SCRIPT_EXTENSION);
 	name = luaL_checkstring (lua, 2);
 
-	ret = licli_client_load_extension (client, name);
+	ret = limai_program_insert_extension (client->program, name);
+	if (!ret)
+		lisys_error_report ();
 	lua_pushboolean (lua, ret);
 	return 1;
 }

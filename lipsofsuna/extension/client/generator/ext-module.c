@@ -35,15 +35,15 @@ private_packet (LIExtModule* self,
 
 /*****************************************************************************/
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Generator",
+	LIMAI_EXTENSION_VERSION, "Generator",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -51,10 +51,10 @@ liext_module_new (LICliClient* client)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 
 	/* Create dialog. */
-	self->editor = liext_editor_new (client->widgets, self);
+	self->editor = liext_editor_new (self->client->widgets, self);
 	if (self->editor == NULL)
 	{
 		lisys_free (self);
@@ -62,7 +62,7 @@ liext_module_new (LICliClient* client)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 100, private_packet, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 100, private_packet, self, self->calls + 0))
 	{
 		liwdg_widget_free (self->editor);
 		lisys_free (self);
@@ -70,7 +70,7 @@ liext_module_new (LICliClient* client)
 	}
 
 	/* Register scripts. */
-	liscr_script_create_class (client->script, "Generator", liext_script_generator, self);
+	liscr_script_create_class (program->script, "Generator", liext_script_generator, self);
 
 	return self;
 }

@@ -146,7 +146,7 @@ private_object_animation (LICliClient* client,
 		return 0;
 
 	/* Change the animations of the object. */
-	object = licli_client_find_object (client, id);
+	object = lieng_engine_find_object (client->engine, id);
 	if (object == NULL)
 		return 1;
 	licli_object_set_animation (object, animation, channel, permanent, priority);
@@ -264,7 +264,7 @@ private_object_graphic (LICliClient* client,
 		return 0;
 
 	/* Change the graphics of the object. */
-	object = licli_client_find_object (client, id);
+	object = lieng_engine_find_object (client->engine, id);
 	if (object == NULL)
 		return 1;
 	lieng_object_set_model_code (object, graphic);
@@ -313,7 +313,7 @@ private_object_simulate (LICliClient* client,
 		controls.move -= 1.0f;
 
 	/* Change the simulation of the object. */
-	object = licli_client_find_object (client, id);
+	object = lieng_engine_find_object (client->engine, id);
 	if (object == NULL)
 		return 1;
 	if (id == client->network->id)

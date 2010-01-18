@@ -27,32 +27,32 @@
 #include <lipsofsuna/client.h>
 #include "ext-module.h"
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Widgets",
+	LIMAI_EXTENSION_VERSION, "Widgets",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 
-	liscr_script_create_class (client->script, "Button", liext_script_button, self);
-	liscr_script_create_class (client->script, "Entry", liext_script_entry, self);
-	liscr_script_create_class (client->script, "Image", liext_script_image, self);
-	liscr_script_create_class (client->script, "Label", liext_script_label, self);
-	liscr_script_create_class (client->script, "Menu", liext_script_menu, self);
-	liscr_script_create_class (client->script, "Scroll", liext_script_scroll, self);
-	liscr_script_create_class (client->script, "Spin", liext_script_spin, self);
-	liscr_script_create_class (client->script, "Tree", liext_script_tree, self);
-	liscr_script_create_class (client->script, "View", liext_script_view, self);
+	liscr_script_create_class (program->script, "Button", liext_script_button, self);
+	liscr_script_create_class (program->script, "Entry", liext_script_entry, self);
+	liscr_script_create_class (program->script, "Image", liext_script_image, self);
+	liscr_script_create_class (program->script, "Label", liext_script_label, self);
+	liscr_script_create_class (program->script, "Menu", liext_script_menu, self);
+	liscr_script_create_class (program->script, "Scroll", liext_script_scroll, self);
+	liscr_script_create_class (program->script, "Spin", liext_script_spin, self);
+	liscr_script_create_class (program->script, "Tree", liext_script_tree, self);
+	liscr_script_create_class (program->script, "View", liext_script_view, self);
 
 	return self;
 }

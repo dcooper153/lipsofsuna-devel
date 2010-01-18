@@ -29,35 +29,35 @@
 #include "ext-editor.h"
 #include "ext-module.h"
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Editor",
+	LIMAI_EXTENSION_VERSION, "Editor",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
-	self->editor = liext_editor_new (client);
+	self->client = limai_program_find_component (program, "client");
+	self->editor = liext_editor_new (self->client);
 	if (self->editor == NULL)
 		return NULL;
-	self->dialog = liext_dialog_new (client->widgets, self->editor);
+	self->dialog = liext_dialog_new (self->client->widgets, self->editor);
 	if (self->dialog == NULL)
 	{
 		liext_editor_free (self->editor);
 		return NULL;
 	}
-	liwdg_manager_insert_window (client->widgets, self->dialog);
+	liwdg_manager_insert_window (self->client->widgets, self->dialog);
 	liwdg_widget_set_visible (self->dialog, 0);
 
-	liscr_script_create_class (client->script, "Editor", liext_script_editor, self);
+	liscr_script_create_class (program->script, "Editor", liext_script_editor, self);
 
 	return self;
 }
@@ -65,7 +65,6 @@ liext_module_new (LICliClient* client)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* FIXME: Remove the class here. */
 	liwdg_manager_remove_window (self->client->widgets, self->dialog);
 	liwdg_widget_free (self->dialog);
 	liext_editor_free (self->editor);

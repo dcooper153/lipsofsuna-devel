@@ -20,11 +20,6 @@
 
 #include <lipsofsuna/system.h>
 
-enum
-{
-	LIENG_FLAG_REMOTE_SECTORS = 0x01
-};
-
 enum _LIEngMatrix
 {
 	LIENG_MATRIX_LOCAL,

@@ -862,7 +862,6 @@ clidir = $(includedir)/lipsofsuna/client
 cli_HEADERS = \
 	lipsofsuna/client/client.h \
 	lipsofsuna/client/client-callbacks.h \
-	lipsofsuna/client/client-extension.h \
 	lipsofsuna/client/client-network.h \
 	lipsofsuna/client/client-object.h \
 	lipsofsuna/client/client-script.h \

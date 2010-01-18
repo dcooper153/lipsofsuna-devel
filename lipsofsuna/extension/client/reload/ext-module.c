@@ -28,30 +28,30 @@
 #include "ext-module.h"
 #include "ext-reload.h"
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Reload",
+	LIMAI_EXTENSION_VERSION, "Reload",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
-	self->reload = liext_reload_new (client);
+	self->client = limai_program_find_component (program, "client");
+	self->reload = liext_reload_new (self->client);
 	if (self->reload == NULL)
 	{
 		lisys_free (self);
 		return NULL;
 	}
 
-	liscr_script_create_class (client->script, "Reload", liext_script_reload, self);
+	liscr_script_create_class (program->script, "Reload", liext_script_reload, self);
 
 	return self;
 }

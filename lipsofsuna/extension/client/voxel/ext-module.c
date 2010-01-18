@@ -54,15 +54,15 @@ private_voxel_diff (LIExtModule* self,
 
 /*****************************************************************************/
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Voxel",
+	LIMAI_EXTENSION_VERSION, "Voxel",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -70,10 +70,10 @@ liext_module_new (LICliClient* client)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 
 	/* Allocate voxel manager. */
-	self->voxels = livox_manager_new (client->callbacks, client->sectors);
+	self->voxels = livox_manager_new (program->callbacks, program->sectors);
 	if (self->voxels == NULL)
 	{
 		liext_module_free (self);
@@ -89,8 +89,8 @@ liext_module_new (LICliClient* client)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 1, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 1, private_tick, self, self->calls + 1) ||
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 1, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 1) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-free", 1, private_block_free, self, self->calls + 2) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 1, private_block_load, self, self->calls + 3))
 	{
@@ -99,7 +99,7 @@ liext_module_new (LICliClient* client)
 	}
 
 	/* Register class. */
-	liscr_script_create_class (client->script, "Voxel", liext_script_voxel, self);
+	liscr_script_create_class (program->script, "Voxel", liext_script_voxel, self);
 
 	return self;
 }

@@ -48,15 +48,15 @@ private_packet_reset (LIExtModule* module,
 
 /*****************************************************************************/
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Skills",
+	LIMAI_EXTENSION_VERSION, "Skills",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -64,7 +64,7 @@ liext_module_new (LICliClient* client)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 	self->dictionary = lialg_u32dic_new ();
 	if (self->dictionary == NULL)
 	{
@@ -73,16 +73,16 @@ liext_module_new (LICliClient* client)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 0, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "object-visibility", 0, private_visibility, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 0, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 0, private_visibility, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (client->script, "Skills", liext_script_skills, self);
-	liscr_script_create_class (client->script, "SkillWidget", liext_script_skill_widget, self);
+	liscr_script_create_class (program->script, "Skills", liext_script_skills, self);
+	liscr_script_create_class (program->script, "SkillWidget", liext_script_skill_widget, self);
 
 	return self;
 }

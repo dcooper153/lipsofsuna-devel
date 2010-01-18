@@ -50,32 +50,32 @@ private_tick (LIExtModule* self,
 
 /*****************************************************************************/
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Events",
+	LIMAI_EXTENSION_VERSION, "Events",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	int i;
 	LIExtModule* self;
-	LIScrScript* script = client->script;
+	LIScrScript* script = program->script;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (client->callbacks, client->engine, "object-model", 2, private_object_model, self, self->calls + 0) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "object-new", 2, private_object_new, self, self->calls + 1) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "packet", 2, private_packet, self, self->calls + 2) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "select", 2, private_select, self, self->calls + 3) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 2, private_tick, self, self->calls + 4))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-model", 2, private_object_model, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", 2, private_object_new, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "packet", 2, private_packet, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "select", 2, private_select, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 2, private_tick, self, self->calls + 4))
 	{
 		liext_module_free (self);
 		return NULL;

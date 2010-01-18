@@ -29,6 +29,7 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/binding.h>
 #include <lipsofsuna/engine.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/paths.h>
 #include <lipsofsuna/render.h>
 #include <lipsofsuna/script.h>
@@ -37,7 +38,6 @@
 #include <lipsofsuna/video.h>
 #include <lipsofsuna/widget.h>
 #include "client-callbacks.h"
-#include "client-extension.h"
 #include "client-network.h"
 #include "client-object.h"
 #include "client-types.h"
@@ -55,13 +55,18 @@ const LIBndAction* li_binding_action_get (const char* identifier);
 struct _LICliClient
 {
 	/* Persistent. */
-	float fps;
-	float tick;
 	char* root;
 	LICliWindow* window;
 	LIVidCalls video;
 
-	/* Module specific. */
+	/* Program. */
+	LIAlgSectors* sectors;
+	LICalCallbacks* callbacks;
+	LIEngEngine* engine;
+	LIMaiProgram* program;
+	LIScrScript* script;
+
+	/* Module. */
 	int moving;
 	char* name;
 	char* path;
@@ -77,14 +82,6 @@ struct _LICliClient
 	LISerServer* server;
 	LIThrThread* server_thread;
 	LIWdgManager* widgets;
-
-	/* Module specific, shared with server. */
-	int quit;
-	LIAlgSectors* sectors;
-	LIAlgStrdic* extensions;
-	LICalCallbacks* callbacks;
-	LIEngEngine* engine;
-	LIScrScript* script;
 };
 
 LICliClient*
@@ -103,14 +100,6 @@ licli_client_connect (LICliClient* self,
                       const char*  name,
                       const char*  pass);
 
-LICliExtension*
-licli_client_find_extension (LICliClient* self,
-                             const char*  name);
-
-LIEngObject*
-licli_client_find_object (LICliClient* self,
-                          uint32_t     id);
-
 int
 licli_client_handle_packet (LICliClient* self,
                             int          type,
@@ -118,10 +107,6 @@ licli_client_handle_packet (LICliClient* self,
 
 int
 licli_client_host (LICliClient* self);
-
-int
-licli_client_load_extension (LICliClient* self,
-                             const char*  name);
 
 int
 licli_client_main (LICliClient* self);
@@ -135,10 +120,6 @@ licli_client_send (LICliClient* self,
                    int          flags);
 
 int
-licli_client_update (LICliClient* self,
-                     float        secs);
-
-int
 licli_client_get_moving (LICliClient* self);
 
 void
@@ -147,13 +128,6 @@ licli_client_set_moving (LICliClient* self,
 
 LIEngObject*
 licli_client_get_player (LICliClient* self);
-
-/*LICliClient*
-licli_client_new (LICliClient* client,
-                  const char*  path,
-                  const char*  name,
-                  const char*  login,
-                  const char*  password);*/
 
 #endif
 

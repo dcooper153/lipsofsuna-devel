@@ -38,6 +38,8 @@ struct _LIMaiProgram
 {
 	int sleep;
 	int quit;
+	float fps;
+	float tick;
 	struct timeval start;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;

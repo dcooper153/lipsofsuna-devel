@@ -35,8 +35,6 @@
 #include "client-script.h"
 #include "client-window.h"
 
-#define FPS_TICKS 32
-
 static void
 private_free_module (LICliClient* self);
 
@@ -54,15 +52,12 @@ static int
 private_init_camera (LICliClient* self);
 
 static int
-private_init_engine (LICliClient* self);
-
-static int
-private_init_extensions (LICliClient* self);
-
-static int
 private_init_paths (LICliClient* self,
                     const char*  path,
                     const char*  name);
+
+static int
+private_init_render (LICliClient* self);
 
 static int
 private_init_script (LICliClient* self);
@@ -73,6 +68,10 @@ private_init_widgets (LICliClient* self);
 static void
 private_server_main (LIThrThread* thread,
                      void*        data);
+
+static int
+private_update (LICliClient* self,
+                float        secs);
 
 /*****************************************************************************/
 
@@ -168,36 +167,6 @@ licli_client_connect (LICliClient* self,
 }
 
 /**
- * \brief Finds an extension by name.
- *
- * \param self Client.
- * \param name Extension name.
- * \return Extension or NULL.
- */
-LICliExtension*
-licli_client_find_extension (LICliClient* self,
-                             const char*  name)
-{
-	return lialg_strdic_find (self->extensions, name);
-}
-
-/**
- * \brief Finds and object by object number.
- *
- * If the game isn't networked, NULL is returned.
- *
- * \param self Client.
- * \param id Object number.
- * \return Object owned by the module or NULL.
- */
-LIEngObject*
-licli_client_find_object (LICliClient* self,
-                          uint32_t     id)
-{
-	return lieng_engine_find_object (self->engine, id);
-}
-
-/**
  * \brief Starts an embedded server.
  *
  * \param self Client.
@@ -231,161 +200,10 @@ licli_client_host (LICliClient* self)
 	return 1;
 }
 
-/**
- * \brief Loads an extension.
- *
- * \param self Client.
- * \param name Extensions name.
- * \return Nonzero on success.
- */
-int
-licli_client_load_extension (LICliClient* self,
-                             const char*  name)
-{
-	char* path;
-	LISysModule* module;
-	LICliExtension* extension;
-	LICliExtensionInfo* info;
-
-	/* Check if already loaded. */
-	module = lialg_strdic_find (self->extensions, name);
-	if (module != NULL)
-		return 1;
-
-	/* Construct full path. */
-	path = lisys_path_format (
-		self->paths->global_exts, LISYS_PATH_SEPARATOR,
-		"lib", name, "-cli.", LISYS_EXTENSION_DLL, NULL);
-	if (path == NULL)
-		return 0;
-
-	/* Open module file. */
-	module = lisys_module_new (path, 0);
-	lisys_free (path);
-	if (module == NULL)
-		goto error;
-
-	/* Find module info. */
-	info = lisys_module_symbol (module, "liextInfo");
-	if (info == NULL)
-	{
-		lisys_error_set (EINVAL, "no module info");
-		lisys_module_free (module);
-		goto error;
-	}
-	if (info->version != LICLI_EXTENSION_VERSION)
-	{
-		lisys_error_set (EINVAL, "invalid module version");
-		lisys_module_free (module);
-		goto error;
-	}
-	if (info->name == NULL || info->init == NULL || info->free == NULL)
-	{
-		lisys_error_set (EINVAL, "invalid module format");
-		lisys_module_free (module);
-		goto error;
-	}
-
-	/* Insert to extension list. */
-	extension = lisys_calloc (1, sizeof (LICliExtension));
-	if (extension == NULL)
-	{
-		lisys_module_free (module);
-		goto error;
-	}
-	extension->info = info;
-	extension->module = module;
-	if (!lialg_strdic_insert (self->extensions, name, extension))
-	{
-		lisys_module_free (module);
-		lisys_free (extension);
-		goto error;
-	}
-
-	/* Call module initializer. */
-	extension->object = ((void* (*)(LICliClient*)) info->init)(self);
-	if (extension->object == NULL)
-	{
-		lialg_strdic_remove (self->extensions, name);
-		lisys_module_free (module);
-		lisys_free (extension);
-		goto error;
-	}
-
-	return 1;
-
-error:
-	lisys_error_append ("cannot initialize module `%s'", name);
-	lisys_error_report ();
-	return 0;
-}
-
 int
 licli_client_main (LICliClient* self)
 {
-	int i;
-	int ticki = 0;
-	int active = 1;
-	float secs;
-	float ticks[FPS_TICKS];
-	struct timeval curr_tick;
-	struct timeval prev_tick;
-
-	memset (ticks, 0, sizeof (ticks));
-	gettimeofday (&prev_tick, NULL);
-
-	while (1)
-	{
-		/* Timing. */
-		gettimeofday (&curr_tick, NULL);
-		secs = curr_tick.tv_sec - prev_tick.tv_sec +
-			  (curr_tick.tv_usec - prev_tick.tv_usec) * 0.000001;
-		prev_tick = curr_tick;
-
-		/* Frames per second. */
-		ticks[ticki++] = secs;
-		if (ticki == FPS_TICKS)
-			ticki = 0;
-		self->tick = 0.0f;
-		for (i = 0 ; i < FPS_TICKS ; i++)
-			self->tick += ticks[i];
-		self->fps = FPS_TICKS / self->tick;
-		self->tick = self->tick / FPS_TICKS;
-
-		/* Update tick. */
-		licli_client_update (self, secs);
-		if (self->quit)
-			break;
-		licli_client_render (self);
-		if (!active)
-			self->video.SDL_Delay (100);
-
-		/* TODO: Do we want to keep running even when not connected? */
-		if (self->network == NULL || !licli_network_get_connected (self->network))
-			self->quit = 1;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Renders everything.
- *
- * Called once per frame to render everything.
- *
- * \param self Client.
- */
-void
-licli_client_render (LICliClient* self)
-{
-	int w;
-	int h;
-
-	licli_window_get_size (self->window, &w, &h);
-	liwdg_manager_set_size (self->widgets, w, h);
-	lialg_camera_set_viewport (self->camera, 0, 0, w, h);
-	liwdg_manager_render (self->widgets);
-	self->video.SDL_GL_SwapBuffers ();
+	return limai_program_main (self->program);
 }
 
 /**
@@ -408,29 +226,6 @@ licli_client_send (LICliClient* self,
 			liarc_writer_get_buffer (writer),
 			liarc_writer_get_length (writer));
 	}
-}
-
-/**
- * \brief Updates the module state.
- *
- * \param self Client.
- * \param secs Length of the tick in seconds.
- * \return Nonzero on success, zero if the module must be terminated.
- */
-int
-licli_client_update (LICliClient* self,
-                     float        secs)
-{
-	SDL_Event event;
-
-	/* Invoke input callbacks. */
-	while (self->video.SDL_PollEvent (&event))
-		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
-
-	/* Invoke tick callbacks. */
-	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
-
-	return 1;
 }
 
 /**
@@ -501,8 +296,9 @@ licli_client_get_player (LICliClient* self)
 static void
 private_free_module (LICliClient* self)
 {
-	LIAlgStrdicIter iter;
-	LICliExtension* extension;
+	/* Invoke callbacks. */
+	if (self->callbacks != NULL)
+		lical_callbacks_call (self->callbacks, self, "client-free", lical_marshal_DATA);
 
 	/* Free camera. */
 	if (self->camera != NULL)
@@ -511,25 +307,16 @@ private_free_module (LICliClient* self)
 		self->camera = NULL;
 	}
 
-	/* Free script. */
-	if (self->script != NULL)
+	/* Free program. */
+	if (self->program != NULL)
 	{
-		liscr_script_free (self->script);
+		limai_program_remove_component (self->program, "client");
+		limai_program_free (self->program);
+		self->sectors = NULL;
+		self->callbacks = NULL;
+		self->engine = NULL;
+		self->program = NULL;
 		self->script = NULL;
-	}
-
-	/* Free extensions. */
-	if (self->extensions != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter, self->extensions)
-		{
-			extension = iter.value;
-			((void (*)(void*)) extension->info->free) (extension->object);
-			lisys_module_free (extension->module);
-			lisys_free (extension);
-		}
-		lialg_strdic_free (self->extensions);
-		self->extensions = NULL;
 	}
 
 	/* Free network. */
@@ -537,13 +324,6 @@ private_free_module (LICliClient* self)
 	{
 		licli_network_free (self->network);
 		self->network = NULL;
-	}
-
-	/* Free engine. */
-	if (self->engine != NULL)
-	{
-		lieng_engine_free (self->engine);
-		self->engine = NULL;
 	}
 
 	if (self->bindings != NULL)
@@ -563,16 +343,6 @@ private_free_module (LICliClient* self)
 		self->server_thread = NULL;
 	}
 	assert (self->server == NULL);
-	if (self->sectors != NULL)
-	{
-		lialg_sectors_free (self->sectors);
-		self->sectors = NULL;
-	}
-	if (self->callbacks != NULL)
-	{
-		lical_callbacks_free (self->callbacks);
-		self->callbacks = NULL;
-	}
 	if (self->paths != NULL)
 	{
 		lipth_paths_free (self->paths);
@@ -607,7 +377,27 @@ private_load_module (LICliClient* self,
                      const char*  login,
                      const char*  password)
 {
-	/* Allocate self. */
+	/* Initialize paths. */
+	if (!private_init_paths (self, path, name))
+		return 0;
+
+	/* Create program. */
+	self->program = limai_program_new (self->paths);
+	if (self->program == NULL)
+	{
+		lipth_paths_free (self->paths);
+		self->paths = NULL;
+		return 0;
+	}
+	self->sectors = self->program->sectors;
+	self->callbacks = self->program->callbacks;
+	self->engine = self->program->engine;
+	self->paths = self->program->paths;
+	self->script = self->program->script;
+	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
+	lical_callbacks_insert (self->callbacks, self->engine, "tick", -1000, private_update, self, NULL);
+
+	/* Store credentials. */
 	self->name = listr_dup (name);
 	self->login = listr_dup (login);
 	self->password = listr_dup (password);
@@ -619,18 +409,22 @@ private_load_module (LICliClient* self,
 		return 0;
 	}
 
-	/* Initialize subsystems. */
-	if (!private_init_paths (self, path, name) ||
-	    !private_init_bindings (self) ||
-	    !private_init_engine (self) ||
+	/* Initialize client component. */
+	if (!limai_program_insert_component (self->program, "client", self))
+	{
+		private_free_module (self);
+		return 0;
+	}
+	if (!private_init_bindings (self) ||
+	    !private_init_render (self) ||
 	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
-	    !private_init_extensions (self) ||
+	    !private_init_script (self) ||
 	    !licli_render_init (self) ||
 	    !licli_client_init_callbacks_binding (self) ||
 	    !licli_client_init_callbacks_misc (self) ||
 	    !licli_client_init_callbacks_widget (self) ||
-	    !private_init_script (self))
+	    !limai_program_execute_script (self->program, "client/main.lua"))
 	{
 		private_free_module (self);
 		return 0;
@@ -646,7 +440,7 @@ private_init_bindings (LICliClient* self)
 	if (self->bindings == NULL)
 		return 0;
 	return 1;
-}	
+}
 
 static int
 private_init_camera (LICliClient* self)
@@ -667,51 +461,6 @@ private_init_camera (LICliClient* self)
 }
 
 static int
-private_init_engine (LICliClient* self)
-{
-	int flags;
-
-	/* Initialize callbacks. */
-	self->callbacks = lical_callbacks_new ();
-	if (self->callbacks == NULL)
-		return 0;
-
-	/* Initialize sectors. */
-#warning Hardcoded sector size
-	self->sectors = lialg_sectors_new (256, 64.0f);
-	if (self->sectors == NULL)
-		return 0;
-
-	/* Initialize engine. */
-	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths->module_data);
-	if (self->engine == NULL)
-		return 0;
-	flags = lieng_engine_get_flags (self->engine);
-	lieng_engine_set_flags (self->engine, flags | LIENG_FLAG_REMOTE_SECTORS);
-	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
-	lieng_engine_set_userdata (self->engine, self);
-
-	/* Initialize graphics. */
-	self->render = liren_render_new (self->paths->module_data);
-	if (self->render == NULL)
-		return 0;
-	self->scene = liren_scene_new (self->render);
-	if (self->scene == NULL)
-		return 0;
-
-	return 1;
-}
-
-static int
-private_init_extensions (LICliClient* self)
-{
-	self->extensions = lialg_strdic_new ();
-	if (self->extensions == NULL)
-		return 0;
-	return 1;
-}
-
-static int
 private_init_paths (LICliClient* self,
                     const char*  path,
                     const char*  name)
@@ -727,18 +476,21 @@ private_init_paths (LICliClient* self,
 }
 
 static int
+private_init_render (LICliClient* self)
+{
+	self->render = liren_render_new (self->paths->module_data);
+	if (self->render == NULL)
+		return 0;
+	self->scene = liren_scene_new (self->render);
+	if (self->scene == NULL)
+		return 0;
+
+	return 1;
+}
+
+static int
 private_init_script (LICliClient* self)
 {
-	int ret;
-	char* path;
-
-	/* Allocate script. */
-	self->script = liscr_script_new ();
-	if (self->script == NULL)
-		return 0;
-	liscr_script_set_userdata (self->script, self);
-
-	/* Register classes. */
 	if (!liscr_script_create_class (self->script, "Action", licli_script_action, self) ||
 	    !liscr_script_create_class (self->script, "Binding", licli_script_binding, self) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
@@ -754,15 +506,6 @@ private_init_script (LICliClient* self)
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
 	    !liscr_script_create_class (self->script, "Widget", licli_script_widget, self) ||
 	    !liscr_script_create_class (self->script, "Window", licli_script_window, self))
-		return 0;
-
-	/* Load script. */
-	path = lisys_path_concat (self->path, "scripts", "client", "main.lua", NULL);
-	if (path == NULL)
-		return 0;
-	ret = liscr_script_load (self->script, path);
-	lisys_free (path);
-	if (!ret)
 		return 0;
 
 	return 1;
@@ -789,6 +532,32 @@ private_server_main (LIThrThread* thread,
 		lisys_error_report ();
 	liser_server_free (self->server);
 	self->server = NULL;
+}
+
+static int
+private_update (LICliClient* self,
+                float        secs)
+{
+	int w;
+	int h;
+	SDL_Event event;
+
+	/* Invoke input callbacks. */
+	while (self->video.SDL_PollEvent (&event))
+		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
+
+	/* FIXME: We want to keep running even when not connected. */
+	if (self->network == NULL || !licli_network_get_connected (self->network))
+		limai_program_shutdown (self->program);
+
+	/* Render widgets. */
+	licli_window_get_size (self->window, &w, &h);
+	liwdg_manager_set_size (self->widgets, w, h);
+	lialg_camera_set_viewport (self->camera, 0, 0, w, h);
+	liwdg_manager_render (self->widgets);
+	self->video.SDL_GL_SwapBuffers ();
+
+	return 1;
 }
 
 /** @} */

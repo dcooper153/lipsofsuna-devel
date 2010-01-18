@@ -28,15 +28,15 @@
 #include "ext-module.h"
 #include "ext-options.h"
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Options",
+	LIMAI_EXTENSION_VERSION, "Options",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 	LIScrClass* clss;
@@ -44,9 +44,9 @@ liext_module_new (LICliClient* client)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 
-	clss = liscr_script_create_class (client->script, "Options", liext_script_options, self);
+	clss = liscr_script_create_class (program->script, "Options", liext_script_options, self);
 
 	return self;
 }
@@ -54,7 +54,6 @@ liext_module_new (LICliClient* client)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* FIXME: Remove the class here. */
 	lisys_free (self);
 }
 

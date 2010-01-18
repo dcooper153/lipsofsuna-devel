@@ -39,15 +39,15 @@ private_tick (LIExtModule* self,
 
 /*****************************************************************************/
 
-LICliExtensionInfo liextInfo =
+LIMaiExtensionInfo liext_info =
 {
-	LICLI_EXTENSION_VERSION, "Sound",
+	LIMAI_EXTENSION_VERSION, "Sound",
 	liext_module_new,
 	liext_module_free
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client)
+liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -55,7 +55,7 @@ liext_module_new (LICliClient* client)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = client;
+	self->client = limai_program_find_component (program, "client");
 
 #ifndef LI_DISABLE_SOUND
 	/* Allocate objects. */
@@ -77,8 +77,8 @@ liext_module_new (LICliClient* client)
 		printf ("WARNING: cannot initialize sound\n");
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (client->callbacks, client->engine, "packet", 1, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (client->callbacks, client->engine, "tick", 1, private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 1, private_packet, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 1))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -86,7 +86,7 @@ liext_module_new (LICliClient* client)
 #endif
 
 	/* Register classes. */
-	liscr_script_create_class (client->script, "Sound", liext_script_sound, self);
+	liscr_script_create_class (program->script, "Sound", liext_script_sound, self);
 
 	return self;
 }

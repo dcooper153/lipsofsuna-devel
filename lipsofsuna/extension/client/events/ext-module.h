@@ -52,7 +52,7 @@ struct _LIExtModule
 };
 
 LIExtModule*
-liext_module_new (LICliClient* client);
+liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
