@@ -662,16 +662,11 @@ private_particle_render (LIRenScene* self)
 		glVertex3f (particle->position.x, particle->position.y, particle->position.z);
 	}
 	glEnd ();
-
-	/* Set normal rendering mode. */
 	if (GLEW_ARB_point_sprite)
-	{
 		glDisable (GL_POINT_SPRITE_ARB);
-	}
-	glEnable (GL_LIGHTING);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Render line particles. */
+	glBindTexture (GL_TEXTURE_2D, 0);
 	glBegin (GL_LINES);
 	for (line = self->particles->lines.used ; line != NULL ; line = line->next)
 	{
@@ -683,6 +678,9 @@ private_particle_render (LIRenScene* self)
 	}
 	glEnd ();
 
+	/* Set normal rendering mode. */
+	glEnable (GL_LIGHTING);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 static void
