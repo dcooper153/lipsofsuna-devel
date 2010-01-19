@@ -175,7 +175,7 @@ static void Scene_pick (LIScrArgs* args)
 	liscr_args_gets_int (args, "y", &y);
 
 	/* Pick object from scene. */
-	if (!liwdg_render_pick (args->self, &result, x, client->window->mode.height - y - 1))
+	if (!liwdg_render_pick (args->self, &result, x, y))
 		return;
 	object = lieng_engine_find_object (client->engine, result.object);
 	liscr_args_seti_vector (args, &result.point);

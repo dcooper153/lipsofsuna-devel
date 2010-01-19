@@ -103,6 +103,7 @@ liwdg_render_pick (LIWdgRender*    self,
 	viewport[1] = rect.y;
 	viewport[2] = rect.width;
 	viewport[3] = rect.height;
+	y = LIWDG_WIDGET (self)->manager->height - y - 1;
 	if (!liren_scene_pick (self->scene, &self->modelview, &self->projection, &frustum, viewport, x, y, 5, result))
 		return 0;
 
