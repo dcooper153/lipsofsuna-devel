@@ -64,7 +64,6 @@ private_changed_name (LIExtMaterials* self,
 
 static int
 private_selected (LIExtMaterials* self,
-                  LIWdgWidget*    widget,
                   LIWdgTreerow*   row);
 
 static void
@@ -203,9 +202,9 @@ private_init (LIExtMaterials* self,
 	liwdg_view_set_child (LIWDG_VIEW (self->widgets.view), self->widgets.tree);
 	liwdg_group_set_row_expand (LIWDG_GROUP (group_tree), 0, 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (group_tree), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.button_add);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 0, self->widgets.view);
 	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 1, self->widgets.button_remove);
-	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.view);
+	liwdg_group_set_child (LIWDG_GROUP (group_tree), 0, 2, self->widgets.button_add);
 
 	/* Preview. */
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_attr), 1, 1);
@@ -222,7 +221,7 @@ private_init (LIExtMaterials* self,
 	/* Pack self. */
 	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
-	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
+	liwdg_group_set_row_expand (LIWDG_GROUP (self), 1, 1);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 1, group_tree);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 2, self->widgets.group_view);
 
@@ -385,13 +384,12 @@ private_changed_name (LIExtMaterials* self,
 
 static int
 private_selected (LIExtMaterials* self,
-                  LIWdgWidget*    widget,
                   LIWdgTreerow*   row)
 {
 	LIWdgTreerow* row0;
 
 	/* Deselect old. */
-	row0 = liwdg_tree_get_active (LIWDG_TREE (widget));
+	row0 = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
 	if (row0 != NULL)
 		liwdg_treerow_set_highlighted (row0, 0);
 

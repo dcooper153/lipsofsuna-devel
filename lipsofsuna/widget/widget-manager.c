@@ -637,7 +637,8 @@ liwdg_manager_update (LIWdgManager* self,
 		cx = self->width / 2;
 		cy = self->height / 2;
 		buttons = self->video.SDL_GetMouseState (&x, &y);
-		self->video.SDL_WarpMouse (cx, cy);
+		if (x != cx || y != cy)
+			self->video.SDL_WarpMouse (cx, cy);
 
 		/* Cursor delta events. */
 		if (x != cx || y != cy)
@@ -646,7 +647,7 @@ liwdg_manager_update (LIWdgManager* self,
 			event.motion.x = cx;
 			event.motion.y = cy;
 			event.motion.dx = x - cx;
-			event.motion.dy = (self->height - y - 1) - cy;
+			event.motion.dy = y - cy;
 			event.motion.buttons = buttons;
 			liwdg_widget_event (self->widgets.grab, &event);
 		}

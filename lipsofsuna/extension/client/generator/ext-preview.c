@@ -787,7 +787,7 @@ private_motion (LIExtPreview* self,
 	else
 	{
 		lialg_camera_turn (self->camera, -0.01 * event->motion.dx);
-		lialg_camera_tilt (self->camera, 0.01 * event->motion.dy);
+		lialg_camera_tilt (self->camera, -0.01 * event->motion.dy);
 	}
 }
 

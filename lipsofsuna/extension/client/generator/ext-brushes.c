@@ -95,7 +95,6 @@ private_rename (LIExtBrushes* self,
 
 static int
 private_selected (LIExtBrushes* self,
-                  LIWdgWidget*  widget,
                   LIWdgTreerow* row);
 
 static int
@@ -854,23 +853,17 @@ private_rename (LIExtBrushes* self,
 
 static int
 private_selected (LIExtBrushes* self,
-                  LIWdgWidget*  widget,
                   LIWdgTreerow* row)
 {
-	LIExtBrushesTreerow* data;
 	LIWdgTreerow* row0;
 
 	/* Deselect old. */
-	row0 = liwdg_tree_get_active (LIWDG_TREE (widget));
+	row0 = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
 	if (row0 != NULL)
 		liwdg_treerow_set_highlighted (row0, 0);
 
 	/* Select new. */
 	liwdg_treerow_set_highlighted (row, 1);
-	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
-
-	/* Update info. */
 	private_rebuild_selection (self);
 
 	return 0;

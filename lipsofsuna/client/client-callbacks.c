@@ -110,7 +110,8 @@ private_binding_tick (LICliClient* client,
 	cx = client->window->mode.width / 2;
 	cy = client->window->mode.height / 2;
 	client->video.SDL_GetMouseState (&x, &y);
-	client->video.SDL_WarpMouse (cx, cy);
+	if (x != cx || y != cy)
+		client->video.SDL_WarpMouse (cx, cy);
 
 	/* Cursor delta events. */
 	if (x != cx)
