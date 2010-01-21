@@ -243,6 +243,17 @@ static void Npc_setter_refresh (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Called when the logic needs to scan for a target.
+ * --
+ * -- Arguments passed to the callback: npc, object.
+ * -- Returns: An object or nil.
+ * --
+ * -- @name Npc.scan_cb
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
  * -- Targeted object.
  * -- @name Npc.target
  * -- @class table

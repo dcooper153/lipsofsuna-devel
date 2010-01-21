@@ -32,7 +32,7 @@ private_tick (LIExtNpc* self,
 static void
 private_attack (LIExtNpc* self);
 
-static LIEngObject*
+static int
 private_rescan (LIExtNpc* self);
 
 /*****************************************************************************/
@@ -235,7 +235,8 @@ private_tick (LIExtNpc* self,
 	{
 		/* Get new target. */
 		self->timer = 0.0f;
-		liext_npc_set_target (self, private_rescan (self));
+		if (!private_rescan (self))
+			lisys_error_report ();
 
 		/* Solve path. */
 		if (self->owner != NULL && self->target != NULL)
@@ -353,33 +354,53 @@ private_attack (LIExtNpc* self)
 	}
 }
 
-static LIEngObject*
+static int
 private_rescan (LIExtNpc* self)
 {
-	float d;
-	float dist;
-	LIEngObject* object;
-	LIEngObject* target;
-	LIEngObjectIter iter;
-	LIMatTransform transform;
+	LIScrData* object;
+	LIScrScript* script = self->module->program->script;
 
-	dist = self->radius;
-	target = NULL;
-	lieng_object_get_transform (self->owner, &transform);
-
-	/* Search for target. */
-	LIENG_FOREACH_OBJECT (iter, self->owner->engine, &transform.position, self->radius)
+	/* Check for scan function. */
+	liscr_pushdata (script->lua, self->script);
+	lua_getfield (script->lua, -1, "scan_cb");
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
 	{
-		object = iter.object;
-#warning NPCs chase all objects. Needs a filter here.
-		d = lieng_object_get_distance (self->owner, object);
-		if (dist < d)
-			continue;
-		dist = d;
-		target = object;
+		lua_pop (script->lua, 2);
+		return 1;
+	}
+	lua_remove (script->lua, -2);
+
+	/* Call the attack function. */
+	liscr_pushdata (script->lua, self->script);
+	liscr_pushdata (script->lua, self->owner->script);
+	if (lua_pcall (script->lua, 2, 1, 0) != 0)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Npc.scan_cb: %s", lua_tostring (script->lua, -1));
+		lua_pop (script->lua, 1);
+		return 0;
 	}
 
-	return target;
+	/* Check if got a return value. */
+	if (lua_isnil (script->lua, -1))
+	{
+		lua_pop (script->lua, 1);
+		return 1;
+	}
+
+	/* Check if return value is valid. */
+	object = liscr_isdata (script->lua, -1, LISCR_SCRIPT_OBJECT);
+	if (object == NULL)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Npc.scan_cb: did not return an object");
+		lua_pop (script->lua, 1);
+		return 0;
+	}
+
+	/* Populate the slot. */
+	liext_npc_set_target (self, object->data);
+	lua_pop (script->lua, 1);
+
+	return 1;
 }
 
 /** @} */
