@@ -420,7 +420,7 @@ liscr_args_gets_class (LIScrArgs*   self,
                        const char*  type,
                        LIScrClass** result)
 {
-	LIScrClass* tmp;
+	LIScrClass* tmp = NULL;
 
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{

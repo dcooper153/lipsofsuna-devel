@@ -487,10 +487,12 @@ private_light_bounds (LIRenScene*   self,
 	p[5] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.max.z);
 	p[6] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.min.z);
 	p[7] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.max.z);
+	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
 	limat_matrix_project (context->projection, context->modelview, viewport, p, &tmp);
 	min = max = tmp;
 	for (i = 1 ; i < 8 ; i++)
 	{
+		tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
 		limat_matrix_project (context->projection, context->modelview, viewport, p + i, &tmp);
 		if (tmp.x < min.x) min.x = tmp.x;
 		if (tmp.y < min.y) min.y = tmp.y;
