@@ -57,6 +57,7 @@ struct _LIRenRender
 		float time;
 		GLuint noise;
 		GLuint depth_texture_max;
+		LIRenImage* empty_image;
 	} helpers;
 	struct
 	{

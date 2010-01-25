@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliPackager Packager
+ * \addtogroup LIExtPackager Packager
  * @{
  */
 
@@ -45,55 +43,15 @@ static void
 private_async_save (LIThrAsyncCall* call,
                     void*           data);
 
-static inline int
-private_filter_models (const char* dir,
-                       const char* name,
-                       void*       data);
-
-static inline int
-private_filter_samples (const char* dir,
-                        const char* name,
-                        void*       data);
-
 static int
-private_insert_directory (LIExtPackagerData* self,
-                          const char*        path,
-                          const char*        name);
-
-static int
-private_insert_extra (LIThrAsyncCall*    call,
-                      LIExtPackagerData* self);
-
-static int
-private_insert_file (LIExtPackagerData* self,
-                     const char*        dir,
-                     const char*        name,
-                     const char*        ext);
-
-static inline int
-private_insert_models (LIThrAsyncCall*    call,
-                       LIExtPackagerData* self,
-                       const char*        path);
-
-static inline int
-private_insert_samples (LIThrAsyncCall*    call,
-                        LIExtPackagerData* self,
-                        const char*        path);
+private_ignore (LIExtPackagerData* self,
+                const char*        name);
 
 static void
 private_progress_cancel (LIExtPackager* self);
 
 static void
 private_progress_update (LIExtPackager* self);
-
-static void
-private_verbose_model (LIExtPackagerData* self,
-                       LIMdlModel*        model,
-                       const char*        name);
-
-static int
-private_write_directory (LIExtPackagerData* self,
-                         const char*        name);
 
 /*****************************************************************************/
 
@@ -237,7 +195,6 @@ static void
 private_async_free (LIThrAsyncCall* call,
                     void*           data)
 {
-	int i;
 	LIExtPackagerData* self = data;
 
 	if (self->resources != NULL)
@@ -246,12 +203,6 @@ private_async_free (LIThrAsyncCall* call,
 		liarc_tar_free (self->tar);
 	if (self->writer != NULL)
 		liarc_writer_free (self->writer);
-	for (i = 0 ; i < self->files.count ; i++)
-	{
-		lisys_free (self->files.array[i].src);
-		lisys_free (self->files.array[i].dst);
-	}
-	lisys_free (self->files.array);
 	lisys_free (self->target);
 	lisys_free (self->directory);
 }
@@ -261,8 +212,10 @@ private_async_save (LIThrAsyncCall* call,
                     void*           data)
 {
 	int i;
-	char* path;
-	const char* name;
+	int j;
+	int total;
+	const char* src;
+	const char* dst;
 	LIExtPackagerData* self = data;
 
 	/* Allocate writer. */
@@ -277,98 +230,51 @@ private_async_save (LIThrAsyncCall* call,
 	self->resources = liext_resources_new ();
 	if (self->resources == NULL)
 		goto error;
-	path = lisys_path_concat (self->client->path, "graphics", NULL);
-	if (path == NULL)
-		goto error;
-	if (!private_insert_models (call, self, path) ||
-	    !private_insert_extra (call, self))
-	{
-		lisys_free (path);
-		goto error;
-	}
-	lisys_free (path);
-	if (lithr_async_call_get_stop (call))
-		goto stop;
 
-	/* Collect graphics. */
-	for (i = 0 ; i < self->resources->models.count ; i++)
-	{
-		name = self->resources->models.array[i].name;
-		if (!private_insert_file (self, "graphics", name, ".lmdl"))
-			goto error;
-		if (lithr_async_call_get_stop (call))
-			goto stop;
-	}
-#if 0
-	for (i = 0 ; i < self->resources->shaders.count ; i++)
-	{
-		name = self->resources->shaders.array[i];
-		if (!private_insert_file (self, "shaders", name, ""))
-			goto error;
-		if (lithr_async_call_get_stop (call))
-			goto stop;
-	}
-#endif
-	for (i = 0 ; i < self->resources->textures.count ; i++)
-	{
-		name = self->resources->textures.array[i];
-		if (!private_insert_file (self, "graphics", name, ".dds"))
-			goto error;
-		if (lithr_async_call_get_stop (call))
-			goto stop;
-	}
-
-	/* Collect sound effects. */
-	path = lisys_path_concat (self->client->path, "sounds", NULL);
-	if (path == NULL)
+	/* Setup ignores. */
+	if (!private_ignore (self, "import") ||
+	    !private_ignore (self, "concept") ||
+	    !private_ignore (self, "Assets.xml") ||
+	    !private_ignore (self, "Damfile"))
 		goto error;
-	if (!private_insert_samples (call, self, path))
-	{
-		lisys_free (path);
-		goto error;
-	}
-	lisys_free (path);
-	if (lithr_async_call_get_stop (call))
-		goto stop;
 
-	/* Collect miscellaneous. */
-	if (!private_insert_directory (self, "", "about") ||
-	    !private_insert_directory (self, "", "config") ||
-	    !private_insert_directory (self, "", "fonts") ||
-	    !private_insert_directory (self, "", "shaders") ||
-	    !private_insert_directory (self, "scripts", "client") ||
-#ifdef ENABLE_PACKAGE_SERVER
-	    !private_insert_directory (self, "scripts", "server") ||
-	    !private_insert_directory (self, "", "save")
-#endif
-       )
+	/* Collect files and directories. */
+	if (!liext_resources_insert_directory (self->resources, self->client->path, self->directory))
 		goto error;
 	if (lithr_async_call_get_stop (call))
 		goto stop;
-
-	/* Create archive. */
-	if (!liarc_tar_write_directory (self->tar, self->directory) ||
-	    !private_write_directory (self, "data/") ||
-	    !private_write_directory (self, "data/about/") ||
-	    !private_write_directory (self, "data/config/") ||
-	    !private_write_directory (self, "data/graphics/") ||
-	    !private_write_directory (self, "data/scripts/") ||
-	    !private_write_directory (self, "data/scripts/client/") ||
-	    !private_write_directory (self, "data/scripts/server/") ||
-	    !private_write_directory (self, "data/shaders/") ||
-	    !private_write_directory (self, "data/sounds/") ||
-#ifdef ENABLE_PACKAGE_SERVER
-	    !private_write_directory (self, "data/save/")
-#endif
-	   )
-		goto error;
-	for (i = 0 ; i < self->files.count ; i++)
+	total = self->resources->directories.count + self->resources->files.count;
+	if (self->packager->verbose)
 	{
-		lithr_async_call_set_progress (call, (float) i / self->files.count);
+		printf ("Packager: found %d directories\n", self->resources->directories.count);
+		printf ("Packager: found %d files\n", self->resources->files.count);
+	}
+
+	/* Write directories. */
+	for (i = j = 0 ; i < self->resources->directories.count ; i++, j++)
+	{
+		dst = self->resources->directories.array[i];
+		lithr_async_call_set_progress (call, (float) j / total);
+		if (self->packager->verbose)
+			printf ("Packager: mkdir %s\n", dst);
+		if (!liarc_tar_write_directory (self->tar, dst))
+			goto error;
 		if (lithr_async_call_get_stop (call))
 			goto stop;
-		if (!liarc_tar_write_file (self->tar, self->files.array[i].src, self->files.array[i].dst))
+	}
+
+	/* Write files. */
+	for (i = 0 ; i < self->resources->files.count ; i++, j++)
+	{
+		src = self->resources->files.array[i]->src;
+		dst = self->resources->files.array[i]->dst;
+		lithr_async_call_set_progress (call, (float) j / total);
+		if (self->packager->verbose)
+			printf ("Packager: cp %s %s\n", src, dst);
+		if (!liarc_tar_write_file (self->tar, src, dst))
 			goto error;
+		if (lithr_async_call_get_stop (call))
+			goto stop;
 	}
 
 	/* Write to disk. */
@@ -386,253 +292,23 @@ error:
 	lisys_error_report ();
 }
 
-static inline int
-private_filter_models (const char* dir,
-                       const char* name,
-                       void*       data)
-{
-	const char* ptr;
-
-	ptr = strstr (name, ".lmdl");
-	if (ptr == NULL)
-		return 0;
-	if (strcmp (ptr, ".lmdl"))
-		return 0;
-	return 1;
-}
-
-static inline int
-private_filter_samples (const char* dir,
-                        const char* name,
-                        void*       data)
-{
-	const char* ptr;
-
-	ptr = strstr (name, ".ogg");
-	if (ptr == NULL)
-		return 0;
-	if (strcmp (ptr, ".ogg"))
-		return 0;
-	return 1;
-}
-
 static int
-private_insert_directory (LIExtPackagerData* self,
-                          const char*        path,
-                          const char*        name)
-{
-	int i;
-	int ret;
-	char* src;
-	const char* file;
-	LIExtPackagerFile tmp;
-	LISysDir* dir;
-
-	src = lisys_path_concat (self->client->path, path, name, NULL);
-	if (src == NULL)
-		return 0;
-	dir = lisys_dir_open (src);
-	lisys_free (src);
-	if (dir == NULL)
-		return 0;
-	lisys_dir_set_filter (dir, LISYS_DIR_FILTER_VISIBLE, NULL);
-	if (!lisys_dir_scan (dir))
-		return 0;
-	for (i = 0 ; i < lisys_dir_get_count (dir) ; i++)
-	{
-		file = lisys_dir_get_name (dir, i);
-		tmp.src = lisys_dir_get_path (dir, i);
-		tmp.dst = lisys_path_concat (self->directory, "data", path, name, file, NULL);
-		if (tmp.src != NULL && tmp.dst != NULL)
-			ret = lialg_array_append (&self->files, &tmp);
-		else
-			ret = 0;
-		if (!ret)
-		{
-			lisys_free (tmp.src);
-			lisys_free (tmp.dst);
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-static int
-private_insert_extra (LIThrAsyncCall*    call,
-                      LIExtPackagerData* self)
+private_ignore (LIExtPackagerData* self,
+                const char*        name)
 {
 	char* tmp;
-	char* path;
-	LIArcReader* reader;
 
-	/* Open extra texture list. */
-	path = lisys_path_concat (self->client->path, "graphics", "textures.cfg", NULL);
-	if (path == NULL)
+	tmp = lisys_path_concat (self->directory, name, NULL);
+	if (tmp == NULL)
 		return 0;
-	reader = liarc_reader_new_from_file (path);
-	lisys_free (path);
-	if (reader == NULL)
+	if (!liext_resources_insert_ignore (self->resources, tmp))
 	{
-		if (lisys_error_peek () != EIO)
-			return 0;
-		lisys_error_get (NULL);
-		return 1;
-	}
-
-	/* Read texture lines. */
-	while (!liarc_reader_check_end (reader))
-	{
-		if (!liarc_reader_get_text (reader, "\n", &tmp))
-		{
-			liarc_reader_free (reader);
-			return 0;
-		}
-		if (!liext_resources_insert_texture (self->resources, tmp))
-		{
-			lisys_free (tmp);
-			return 0;
-		}
 		lisys_free (tmp);
-	}
-	liarc_reader_free (reader);
-
-	return 1;
-}
-
-static int
-private_insert_file (LIExtPackagerData* self,
-                     const char*        dir,
-                     const char*        name,
-                     const char*        ext)
-{
-	int ret;
-	LIExtPackagerFile tmp;
-
-	tmp.src = lisys_path_format (self->client->path,
-		LISYS_PATH_SEPARATOR, dir,
-		LISYS_PATH_SEPARATOR, name, ext, NULL);
-	tmp.dst = lisys_path_format (self->directory,
-		LISYS_PATH_SEPARATOR, "data",
-		LISYS_PATH_SEPARATOR, dir,
-		LISYS_PATH_SEPARATOR, name, ext, NULL);
-	if (tmp.src != NULL && tmp.dst != NULL)
-		ret = lialg_array_append (&self->files, &tmp);
-	else
-		ret = 0;
-	if (!ret)
-	{
-		lisys_free (tmp.src);
-		lisys_free (tmp.dst);
-	}
-
-	return ret;
-}
-
-static inline int
-private_insert_models (LIThrAsyncCall*    call,
-                       LIExtPackagerData* self,
-                       const char*        path)
-{
-	int i;
-	int ret;
-	int count;
-	char* file;
-	char* name;
-	LIMdlModel* model = NULL;
-	LISysDir* directory = NULL;
-
-	/* Find all converted models. */
-	directory = lisys_dir_open (path);
-	if (directory == NULL)
 		return 0;
-	lisys_dir_set_filter (directory, private_filter_models, NULL);
-	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
-	if (!lisys_dir_scan (directory))
-		goto error;
-	count = lisys_dir_get_count (directory);
-
-	/* Load model and node information. */
-	/* FIXME: Use cache unless some models were rebuilt above. */
-	for (i = 0 ; i < count ; i++)
-	{
-		lithr_async_call_set_progress (call, (float) i / count);
-		if (lithr_async_call_get_stop (call))
-			break;
-
-		/* Open model file. */
-		file = lisys_dir_get_path (directory, i);
-		if (file == NULL)
-			goto error;
-		model = limdl_model_new_from_file (file);
-		lisys_free (file);
-		if (model == NULL)
-			goto error;
-
-		/* Verbose messages. */
-		if (self->packager->verbose)
-			private_verbose_model (self, model, lisys_dir_get_name (directory, i));
-
-		/* Add to resource list. */
-		name = lisys_path_format (lisys_dir_get_name (directory, i), LISYS_PATH_STRIPEXT, NULL);
-		if (name == NULL)
-			goto error;
-		ret = liext_resources_insert_model (self->resources, name, model);
-		lisys_free (name);
-		if (!ret)
-			goto error;
-
-		/* Free the model. */
-		limdl_model_free (model);
 	}
-	lisys_dir_free (directory);
+	lisys_free (tmp);
 
 	return 1;
-
-error:
-	if (model != NULL)
-		limdl_model_free (model);
-	lisys_dir_free (directory);
-	return 0;
-}
-
-static int
-private_insert_samples (LIThrAsyncCall*    call,
-                        LIExtPackagerData* self,
-                        const char*        path)
-{
-	int i;
-	int count;
-	const char* name;
-	LISysDir* directory = NULL;
-
-	/* Find all sound and music files. */
-	directory = lisys_dir_open (path);
-	if (directory == NULL)
-		return 0;
-	lisys_dir_set_filter (directory, private_filter_samples, NULL);
-	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
-	if (!lisys_dir_scan (directory))
-		goto error;
-	count = lisys_dir_get_count (directory);
-
-	/* Insert found files. */
-	for (i = 0 ; i < count ; i++)
-	{
-		lithr_async_call_set_progress (call, (float) i / count);
-		if (lithr_async_call_get_stop (call))
-			break;
-		name = lisys_dir_get_name (directory, i);
-		if (!private_insert_file (self, "sounds", name, ""))
-			goto error;
-	}
-	lisys_dir_free (directory);
-
-	return 1;
-
-error:
-	lisys_dir_free (directory);
-	return 0;
 }
 
 /**
@@ -672,42 +348,5 @@ private_progress_update (LIExtPackager* self)
 		liwdg_busy_set_progress (LIWDG_BUSY (self->progress), lithr_async_call_get_progress (self->worker));
 }
 
-static void
-private_verbose_model (LIExtPackagerData* self,
-                       LIMdlModel*        model,
-                       const char*        name)
-{
-	int i;
-	int j;
-	LIMdlMaterial* material;
-
-	printf ("Model: %s\n", name);
-	for (i = 0 ; i < model->materials.count ; i++)
-	{
-		material = model->materials.array + i;
-		for (j = 0 ; j < material->textures.count ; j++)
-			printf ("    %s\n", material->textures.array[j].string);
-	}
-}
-
-static int
-private_write_directory (LIExtPackagerData* self,
-                         const char*        name)
-{
-	char* path;
-
-	path = lisys_path_concat (self->directory, name, NULL);
-	if (path == NULL)
-		return 0;
-	if (!liarc_tar_write_directory (self->tar, path))
-	{
-		lisys_free (path);
-		return 0;
-	}
-
-	return 1;
-}
-
-/** @} */
 /** @} */
 /** @} */

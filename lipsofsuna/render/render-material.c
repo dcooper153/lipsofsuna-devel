@@ -48,7 +48,6 @@ liren_material_new_from_model (LIRenRender*         render,
                                const LIMdlMaterial* material)
 {
 	int j;
-	const char* name;
 	LIMdlTexture* texture;
 	LIRenImage* image;
 	LIRenMaterial* self;
@@ -88,19 +87,18 @@ liren_material_new_from_model (LIRenRender*         render,
 	{
 		texture = material->textures.array + j;
 
-		/* Get texture name. */
-		if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
-			name = texture->string;
-		else
-			name = "empty";
-
 		/* Find or load. */
-		image = liren_render_find_image (render, texture->string);
-		if (image == NULL)
+		if (texture->type == LIMDL_TEXTURE_TYPE_IMAGE)
 		{
-			liren_render_load_image (render, texture->string);
 			image = liren_render_find_image (render, texture->string);
+			if (image == NULL)
+			{
+				liren_render_load_image (render, texture->string);
+				image = liren_render_find_image (render, texture->string);
+			}
 		}
+		else
+			image = render->helpers.empty_image;
 
 		/* Set texture. */
 		liren_material_set_texture (self, j, texture, image);

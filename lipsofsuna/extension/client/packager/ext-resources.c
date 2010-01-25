@@ -18,51 +18,31 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliPackager Packager
+ * \addtogroup LIExtPackager Packager
  * @{
  */
 
-#include <lipsofsuna/model.h>
 #include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
 #include "ext-resources.h"
-
-static int
-private_compare_models (const void* a,
-                        const void* b);
-
-static int
-private_compare_strings (const void* a,
-                         const void* b);
-
-static int
-private_read_animations (LIExtResources*   self,
-                         const LIMdlModel* model);
-
-static int
-private_read_shaders (LIExtResources*   self,
-                      const LIMdlModel* model);
-
-static int
-private_read_textures (LIExtResources*   self,
-                       const LIMdlModel* model);
-
-static void
-private_write (LIExtResources* self,
-               LIArcWriter*    writer);
-
-/*****************************************************************************/
 
 LIExtResources*
 liext_resources_new ()
 {
 	LIExtResources* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtResources));
 	if (self == NULL)
-		return 0;
+		return NULL;
+
+	/* Allocate ignores. */
+	self->ignore = lialg_strdic_new ();
+	if (self->ignore == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -72,18 +52,17 @@ liext_resources_free (LIExtResources* self)
 {
 	int i;
 
-	for (i = 0 ; i < self->animations.count ; i++)
-		lisys_free (self->animations.array[i]);
-	for (i = 0 ; i < self->models.count ; i++)
-		lisys_free (self->models.array[i].name);
-	for (i = 0 ; i < self->shaders.count ; i++)
-		lisys_free (self->shaders.array[i]);
-	for (i = 0 ; i < self->textures.count ; i++)
-		lisys_free (self->textures.array[i]);
-	lisys_free (self->animations.array);
-	lisys_free (self->models.array);
-	lisys_free (self->shaders.array);
-	lisys_free (self->textures.array);
+	for (i = 0 ; i < self->directories.count ; i++)
+		lisys_free (self->directories.array[i]);
+	for (i = 0 ; i < self->files.count ; i++)
+	{
+		lisys_free (self->files.array[i]->src);
+		lisys_free (self->files.array[i]->dst);
+		lisys_free (self->files.array[i]);
+	}
+	lisys_free (self->directories.array);
+	lisys_free (self->files.array);
+	lialg_strdic_free (self->ignore);
 	lisys_free (self);
 }
 
@@ -92,275 +71,133 @@ liext_resources_clear (LIExtResources* self)
 {
 	int i;
 
-	for (i = 0 ; i < self->animations.count ; i++)
-		lisys_free (self->animations.array[i]);
-	for (i = 0 ; i < self->models.count ; i++)
-		lisys_free (self->models.array[i].name);
-	for (i = 0 ; i < self->shaders.count ; i++)
-		lisys_free (self->shaders.array[i]);
-	for (i = 0 ; i < self->textures.count ; i++)
-		lisys_free (self->textures.array[i]);
-	lisys_free (self->animations.array);
-	lisys_free (self->models.array);
-	lisys_free (self->shaders.array);
-	lisys_free (self->textures.array);
-	memset (self, 0, sizeof (LIExtResources));
-}
-
-int
-liext_resources_insert_model (LIExtResources*   self,
-                              const char*       name,
-                              const LIMdlModel* model)
-{
-	LIExtModel tmp;
-
-	/* Create model. */
-	tmp.name = listr_dup (name);
-	tmp.bounds = model->bounds;
-	if (tmp.name == NULL)
-		return 0;
-
-	/* Append model. */
-	if (!lialg_array_append (&self->models, &tmp))
+	for (i = 0 ; i < self->directories.count ; i++)
+		lisys_free (self->directories.array[i]);
+	for (i = 0 ; i < self->files.count ; i++)
 	{
-		lisys_free (tmp.name);
-		return 0;
+		lisys_free (self->files.array[i]->src);
+		lisys_free (self->files.array[i]->dst);
+		lisys_free (self->files.array[i]);
 	}
-
-	/* Append animations and materials. */
-	if (!private_read_animations (self, model) ||
-	    !private_read_shaders (self, model) ||
-	    !private_read_textures (self, model))
-		return 0;
-
-	return 1;
+	lisys_free (self->directories.array);
+	lisys_free (self->files.array);
+	self->directories.array = NULL;
+	self->directories.count = 0;
+	self->files.array = NULL;
+	self->files.count = 0;
+	lialg_strdic_clear (self->ignore);
 }
 
 int
-liext_resources_insert_texture (LIExtResources* self,
-                                const char*     name)
-{
-	int k;
-	int count;
-
-	count = self->textures.count;
-	printf ("EXTRATEXT %s\n", name);
-
-	/* Check for duplicate. */
-	for (k = 0 ; k < count ; k++)
-	{
-		if (!strcmp (name, self->textures.array[k]))
-			return 1;
-	}
-
-	/* Append texture. */
-	if (!lialg_array_resize (&self->textures, count + 1))
-		return 0;
-	self->textures.array[count] = listr_dup (name);
-	if (self->textures.array[count] == NULL)
-		return 0;
-
-	return 1;
-}
-
-int
-liext_resources_save (LIExtResources* self,
-                      const char*     name)
-{
-	LIArcWriter* writer;
-
-	writer = liarc_writer_new_file (name);
-	if (writer == NULL)
-		return 0;
-	private_write (self, writer);
-	liarc_writer_free (writer);
-
-	return 1;
-}
-
-/*****************************************************************************/
-
-static int
-private_compare_models (const void* a,
-                        const void* b)
-{
-	const LIExtModel* aa = a;
-	const LIExtModel* bb = b;
-
-	return strcmp (aa->name, bb->name);
-}
-
-static int
-private_compare_strings (const void* a,
-                         const void* b)
-{
-	const char* const* aa = a;
-	const char* const* bb = b;
-
-	return strcmp (*aa, *bb);
-}
-
-static int
-private_read_animations (LIExtResources*   self,
-                         const LIMdlModel* model)
+liext_resources_insert_directory (LIExtResources* self,
+                                  const char*     src,
+                                  const char*     dst)
 {
 	int i;
-	int j;
 	int count;
-	const LIMdlAnimation* animation;
+	char* src1 = NULL;
+	char* dst1 = NULL;
+	const char* name;
+	LISysDir* directory;
+	LISysStat result;
 
-	for (i = 0 ; i < model->animations.count ; i++)
+	/* Add to directory list. */
+	dst1 = listr_dup (dst);
+	if (dst1 == NULL)
+		return 0;
+	if (!lialg_array_append (&self->directories, &dst1))
 	{
-		animation = model->animations.array + i;
-		count = self->animations.count;
+		lisys_free (dst1);
+		return 0;
+	}
+	dst1 = NULL;
 
-		/* Check for duplicate. */
-		for (j = 0 ; j < count ; j++)
-		{
-			if (!strcmp (animation->name, self->animations.array[j]))
-				break;
-		}
-		if (j != count)
+	/* Find all files. */
+	directory = lisys_dir_open (src);
+	if (directory == NULL)
+		return 0;
+	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
+	if (!lisys_dir_scan (directory))
+	{
+		lisys_dir_free (directory);
+		return 0;
+	}
+	count = lisys_dir_get_count (directory);
+
+	/* Insert files and directories recursively. */
+	for (i = 0 ; i < count ; i++)
+	{
+		name = lisys_dir_get_name (directory, i);
+		if (name[0] == '.')
 			continue;
-
-		/* Append animation. */
-		if (!lialg_array_resize (&self->animations, count + 1))
-			return 0;
-		self->animations.array[count] = listr_dup (animation->name);
-		if (self->animations.array[count] == NULL)
-			return 0;
-	}
-
-	return 1;
-}
-
-static int
-private_read_shaders (LIExtResources*   self,
-                      const LIMdlModel* model)
-{
-	int i;
-	int j;
-	int count;
-	const LIMdlMaterial* material;
-
-	for (i = 0 ; i < model->materials.count ; i++)
-	{
-		material = model->materials.array + i;
-		count = self->shaders.count;
-
-		/* Check for duplicate. */
-		for (j = 0 ; j < count ; j++)
+		src1 = lisys_dir_get_path (directory, i);
+		dst1 = lisys_path_concat (dst, name, NULL);
+		if (src1 == NULL || dst1 == NULL)
+			goto error;
+		if (!lialg_strdic_find (self->ignore, dst1))
 		{
-			if (!strcmp (material->shader, self->shaders.array[j]))
-				break;
-		}
-		if (j != count)
-			continue;
-
-		/* Append shader. */
-		if (!lialg_array_resize (&self->shaders, count + 1))
-			return 0;
-		self->shaders.array[count] = listr_dup (material->shader);
-		if (self->shaders.array[count] == NULL)
-			return 0;
-	}
-
-	return 1;
-}
-
-static int
-private_read_textures (LIExtResources*   self,
-                       const LIMdlModel* model)
-{
-	int i;
-	int j;
-	int k;
-	int count;
-	const LIMdlTexture* texture;
-	const LIMdlMaterial* material;
-
-	for (i = 0 ; i < model->materials.count ; i++)
-	{
-		material = model->materials.array + i;
-		for (j = 0 ; j < material->textures.count ; j++)
-		{
-			texture = material->textures.array + j;
-			count = self->textures.count;
-
-			/* Only interested in images. */
-			if (texture->type != LIMDL_TEXTURE_TYPE_IMAGE)
-				continue;
-
-			/* Check for duplicate. */
-			for (k = 0 ; k < count ; k++)
+			if (!lisys_stat (src1, &result))
+				goto error;
+			if (result.type == LISYS_STAT_DIRECTORY)
 			{
-				if (!strcmp (texture->string, self->textures.array[k]))
-					break;
+				if (!liext_resources_insert_directory (self, src1, dst1))
+					goto error;
 			}
-			if (k != count)
-				continue;
-
-			/* Append to texture list. */
-			if (!lialg_array_resize (&self->textures, count + 1))
-				return 0;
-			self->textures.array[count] = listr_dup (texture->string);
-			if (self->textures.array[count] == NULL)
-				return 0;
+			else if (result.type == LISYS_STAT_FILE)
+			{
+				if (!liext_resources_insert_file (self, src1, dst1))
+					goto error;
+			}
 		}
+		lisys_free (src1);
+		lisys_free (dst1);
+		src1 = NULL;
+		dst1 = NULL;
+	}
+	lisys_dir_free (directory);
+
+	return 1;
+
+error:
+	lisys_dir_free (directory);
+	lisys_free (src1);
+	lisys_free (dst1);
+	return 0;
+}
+
+int
+liext_resources_insert_file (LIExtResources* self,
+                             const char*     src,
+                             const char*     dst)
+{
+	LIExtFile* file;
+
+	/* Create file info. */
+	file = lisys_calloc (1, sizeof (LIExtFile));
+	if (file == NULL)
+		return 0;
+	file->src = listr_dup (src);
+	file->dst = listr_dup (dst);
+	if (file->src == NULL || file->dst == NULL || !lialg_array_append (&self->files, &file))
+	{
+		lisys_free (file->src);
+		lisys_free (file->dst);
+		lisys_free (file);
+		return 0;
 	}
 
 	return 1;
 }
 
-static void
-private_write (LIExtResources* self,
-               LIArcWriter*    writer)
+int
+liext_resources_insert_ignore (LIExtResources* self,
+                               const char*     dst)
 {
-	int i;
-	LIExtModel* model;
+	if (!lialg_strdic_insert (self->ignore, dst, (void*) -1))
+		return 0;
 
-	/* Sort data. */
-	qsort (self->models.array, self->models.count, sizeof (LIExtModel), private_compare_models);
-	qsort (self->animations.array, self->animations.count, sizeof (char*), private_compare_strings);
-	qsort (self->shaders.array, self->shaders.count, sizeof (char*), private_compare_strings);
-	qsort (self->textures.array, self->textures.count, sizeof (char*), private_compare_strings);
-
-	/* Write header. */
-	liarc_writer_append_uint32 (writer, self->animations.count);
-	liarc_writer_append_uint32 (writer, self->models.count);
-	liarc_writer_append_uint32 (writer, self->shaders.count);
-	liarc_writer_append_uint32 (writer, self->textures.count);
-
-	/* Write animations. */
-	for (i = 0 ; i < self->animations.count ; i++)
-	{
-		liarc_writer_append_string (writer, self->animations.array[i]);
-		liarc_writer_append_nul (writer);
-	}
-
-	/* Write models. */
-	for (i = 0 ; i < self->models.count ; i++)
-	{
-		model = self->models.array + i;
-		liarc_writer_append_string (writer, model->name);
-		liarc_writer_append_nul (writer);
-	}
-
-	/* Write shaders. */
-	for (i = 0 ; i < self->shaders.count ; i++)
-	{
-		liarc_writer_append_string (writer, self->shaders.array[i]);
-		liarc_writer_append_nul (writer);
-	}
-
-	/* Write textures. */
-	for (i = 0 ; i < self->textures.count ; i++)
-	{
-		liarc_writer_append_string (writer, self->textures.array[i]);
-		liarc_writer_append_nul (writer);
-	}
+	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

@@ -18,47 +18,37 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliPackager Packager
+ * \addtogroup LIExtPackager Packager
  * @{
  */
 
 #ifndef __EXT_RESOURCES_H__
 #define __EXT_RESOURCES_H__
 
+#include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/model.h>
 
-typedef struct _LIExtModel LIExtModel;
-struct _LIExtModel
+typedef struct _LIExtFile LIExtFile;
+struct _LIExtFile
 {
-	char* name;
-	LIMatAabb bounds;
+	char* src;
+	char* dst;
 };
 
 typedef struct _LIExtResources LIExtResources;
 struct _LIExtResources
 {
+	LIAlgStrdic* ignore;
 	struct
 	{
 		int count;
 		char** array;
-	} animations;
+	} directories;
 	struct
 	{
 		int count;
-		LIExtModel* array;
-	} models;
-	struct
-	{
-		int count;
-		char** array;
-	} shaders;
-	struct
-	{
-		int count;
-		char** array;
-	} textures;
+		LIExtFile** array;
+	} files;
 };
 
 LIExtResources*
@@ -71,20 +61,20 @@ void
 liext_resources_clear (LIExtResources* self);
 
 int
-liext_resources_insert_model (LIExtResources*   self,
-                              const char*       name,
-                              const LIMdlModel* model);
+liext_resources_insert_directory (LIExtResources* self,
+                                  const char*     src,
+                                  const char*     dst);
 
 int
-liext_resources_insert_texture (LIExtResources* self,
-                                const char*     name);
+liext_resources_insert_file (LIExtResources* self,
+                             const char*     src,
+                             const char*     dst);
 
 int
-liext_resources_save (LIExtResources* self,
-                      const char*     name);
+liext_resources_insert_ignore (LIExtResources* self,
+                               const char*     dst);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

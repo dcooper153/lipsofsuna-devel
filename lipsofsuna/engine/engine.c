@@ -263,6 +263,7 @@ lieng_engine_load_model (LIEngEngine* self,
 	/* Reload model. */
 	lieng_model_unload (model);
 	lieng_model_load (model);
+	lical_callbacks_call (self->callbacks, self, "model-reload", lical_marshal_DATA_PTR_PTR, name, model);
 
 	/* Rebuild affected objects. */
 	/* TODO: Constraints are currently rebuild by lieng_object_set_model so

@@ -76,9 +76,11 @@ liren_render_free (LIRenRender* self)
 	LIRenModel* model;
 	LIRenShader* shader;
 
-	/* Free resources. */
+	/* Free helper resources. */
 	glDeleteTextures (1, &self->helpers.noise);
 	glDeleteTextures (1, &self->helpers.depth_texture_max);
+	if (self->helpers.empty_image != NULL)
+		liren_image_free (self->helpers.empty_image);
 
 	/* Free shaders. */
 	if (self->shaders != NULL)
@@ -479,6 +481,11 @@ private_init_resources (LIRenRender* self,
 	/* Initialize image dictionary. */
 	self->images = lialg_strdic_new ();
 	if (self->images == NULL)
+		return 0;
+
+	/* Initialize empty image. */
+	self->helpers.empty_image = liren_image_new (self, "empty");
+	if (self->helpers.empty_image == NULL)
 		return 0;
 
 	/* Initialize model dicrionaries. */

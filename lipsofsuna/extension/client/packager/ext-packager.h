@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliPackager Packager
+ * \addtogroup LIExtPackager Packager
  * @{
  */
 
@@ -31,13 +29,6 @@
 #include <lipsofsuna/client.h>
 #include <lipsofsuna/thread.h>
 #include "ext-resources.h"
-
-typedef struct _LIExtPackagerFile LIExtPackagerFile;
-struct _LIExtPackagerFile
-{
-	char* src;
-	char* dst;
-};
 
 typedef struct _LIExtPackager LIExtPackager;
 struct _LIExtPackager
@@ -58,11 +49,6 @@ struct _LIExtPackagerData
 	LICliClient* client;
 	LIExtPackager* packager;
 	LIExtResources* resources;
-	struct
-	{
-		int count;
-		LIExtPackagerFile* array;
-	} files;
 };
 
 LIExtPackager*
@@ -88,6 +74,5 @@ liext_packager_set_verbose (LIExtPackager* self,
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

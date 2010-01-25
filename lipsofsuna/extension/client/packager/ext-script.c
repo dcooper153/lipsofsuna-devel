@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliPackager Packager
+ * \addtogroup LIExtPackager Packager
  * @{
  */
 
@@ -67,15 +65,14 @@ static void Packager_cancel (LIScrArgs* args)
  */
 static void Packager_save (LIScrArgs* args)
 {
-	const char* dir = "./";
-	const char* name = "data.tar.gz";
+	const char* dir = "lipsofsuna-data";
+	const char* name = "lipsofsuna-data.tar.gz";
 	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PACKAGER);
 	liscr_args_gets_string (args, "dir", &dir);
 	liscr_args_gets_string (args, "file", &name);
 	liscr_args_seti_bool (args, liext_packager_save (self->packager, name, dir));
-	liext_packager_cancel (self->packager);
 }
 
 /* @luadoc
@@ -112,9 +109,8 @@ liext_script_packager (LIScrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PACKAGER, data);
 	liscr_class_insert_cfunc (self, "cancel", Packager_cancel);
 	liscr_class_insert_cfunc (self, "save", Packager_save);
-	liscr_class_insert_mvar (self, "verbose", Packager_getter_verbose, Packager_setter_verbose);
+	liscr_class_insert_cvar (self, "verbose", Packager_getter_verbose, Packager_setter_verbose);
 }
 
-/** @} */
 /** @} */
 /** @} */
