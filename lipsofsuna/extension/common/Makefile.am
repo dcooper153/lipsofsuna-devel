@@ -1,5 +1,5 @@
 LIBADD = $(top_builddir)/liblipsofsunaserver.la $(LISRV_LIBS)
-AM_CFLAGS = $(LISRV_CFLAGS)
+AM_CFLAGS = $(LISRV_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 EXTRA_DIST = skeleton/mkext.sh
 
@@ -39,3 +39,12 @@ libspawner_la_SOURCES = \
 	spawner/ext-spawner.c \
 	spawner/ext-spawner.h \
 	spawner/ext-script.c
+
+all-local:
+	@if test "x$(RELPATH)" = "xyes"; then \
+		mkdir -p ../../../build/lib/extensions; \
+		for i in $(ext_LTLIBRARIES); do \
+			name=`echo $$i | sed s/la$$/so/`; \
+			if test -e .libs/$$name; then cp .libs/$$name ../../../build/lib/extensions; fi; \
+		done; \
+	fi

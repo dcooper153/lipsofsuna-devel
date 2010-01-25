@@ -61,7 +61,10 @@ dnl Tools, headers, libraries.
 AC_ISC_POSIX
 AC_PROG_CC
 AC_PROG_CXX
-AM_PROG_LIBTOOL
+AC_DISABLE_STATIC
+AC_LIBTOOL_WIN32_DLL
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
 AM_PROG_CC_STDC
 PKG_PROG_PKG_CONFIG
 AC_HEADER_STDC
@@ -302,6 +305,7 @@ if test "$want_relative" = yes; then
 	PROGDIR="${prefix}"
 	TOOLDIR="${prefix}/tool"
 	SAVEDIR="${prefix}/save"
+	RELPATH="yes"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_RELATIVE_PATHS"
 	LDFLAGS="-Wl,-rpath -Wl,\\\$\$ORIGIN/../lib $LDFLAGS"
 else
@@ -312,6 +316,7 @@ else
 	PROGDIR="${bindir}"
 	TOOLDIR="${datadir}/${PACKAGE}/tool"
 	SAVEDIR="${localstatedir}/${PACKAGE}"
+	RELPATH="no"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIEXTSDIR=\\\"\"${libdir}/${PACKAGE}/extensions/$EXTSVER\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIPROGDIR=\\\"\"${bindir}\"\\\""
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLIDATADIR=\\\"\"${datadir}/${PACKAGE}\"\\\""
@@ -375,6 +380,7 @@ AC_SUBST([MODSDIR])
 AC_SUBST([PROGDIR])
 AC_SUBST([SAVEDIR])
 AC_SUBST([TOOLDIR])
+AC_SUBST([RELPATH])
 
 AC_OUTPUT([
 Makefile

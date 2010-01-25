@@ -1,6 +1,6 @@
 LIBADD = $(top_builddir)/liblipsofsunaclient.la $(LICLI_LIBS)
+AM_CFLAGS = $(LICLI_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = -module -avoid-version -no-undefined
-AM_CFLAGS = $(LICLI_CFLAGS)
 
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
@@ -142,3 +142,12 @@ libwidgets_cli_la_SOURCES = \
 	widgets/ext-module.c \
 	widgets/ext-module.h \
 	widgets/ext-script.c
+
+all-local:
+	@if test "x$(RELPATH)" = "xyes"; then \
+		mkdir -p ../../../build/lib/extensions; \
+		for i in $(ext_LTLIBRARIES); do \
+			name=`echo $$i | sed s/la$$/so/`; \
+			if test -e .libs/$$name; then cp .libs/$$name ../../../build/lib/extensions; fi; \
+		done; \
+	fi

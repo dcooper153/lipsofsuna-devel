@@ -1,4 +1,4 @@
-SUBDIRS = docs .
+SUBDIRS = docs
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
@@ -16,12 +16,13 @@ endif
 if MAYBE_SERVER
 SUBDIRS += lipsofsuna/extension/server
 endif
+SUBDIRS += .
 
 editordir = $(TOOLDIR)
 editor_DATA = lipsofsuna/reload/blender-export.py
 
 prgdir = $(PROGDIR)
-prg_PROGRAMS = lipsofsuna-launch
+prg_PROGRAMS = build/lipsofsuna
 bin_PROGRAMS =
 lib_LTLIBRARIES =
 if MAYBE_CLIENT
@@ -602,9 +603,9 @@ liblipsofsunaviewer_la_SOURCES = \
 
 ##############################################################################
 
-lipsofsuna_launch_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_launch_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
-lipsofsuna_launch_SOURCES = lipsofsuna/main/main.c $(syssrc)
+build_lipsofsuna_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+build_lipsofsuna_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
+build_lipsofsuna_SOURCES = lipsofsuna/main/main.c $(syssrc)
 
 lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)
@@ -627,6 +628,31 @@ lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(SDL_LIBS) -lSDL_ttf $(GLEW_LI
 lipsofsuna_viewer_SOURCES = lipsofsuna/viewer/viewer-main.c
 
 ##############################################################################
+
+all-local:
+	@if test "x$(RELPATH)" = "xyes"; then \
+		mkdir -p build/bin build/lib build/tool; \
+		for i in $(bin_PROGRAMS); do \
+			if test -e .libs/$$i; then cp .libs/$$i build/bin; fi; \
+		done; \
+		for i in $(lib_LTLIBRARIES); do \
+			name=`echo $$i | sed s/la$$/so.0/`; \
+			if test -e .libs/$$name; then cp .libs/$$name build/lib; fi; \
+		done; \
+		for i in $(editor_DATA); do \
+			cp $$i build/tool; \
+		done; \
+		if test -d deps/lib; then \
+			for i in `ls deps/lib/*.so.[0-9]`; do cp $$i build/lib; done; \
+		fi; \
+		if test ! -e build/data; then \
+			echo -e "\\n *** Install data files to build/data"; \
+		fi; \
+		echo -e "\\n *** Play by typing build/lipsofsuna\\n"; \
+	fi
+
+clean-local:
+	rm -Rf build/bin build/lib build/tool
 
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)

@@ -41,7 +41,7 @@ target_triplet = @target@
 @MAYBE_SERVER_TRUE@am__append_1 = lipsofsuna/extension/common
 @MAYBE_CLIENT_TRUE@am__append_2 = lipsofsuna/extension/client
 @MAYBE_SERVER_TRUE@am__append_3 = lipsofsuna/extension/server
-prg_PROGRAMS = lipsofsuna-launch$(EXEEXT)
+prg_PROGRAMS = build/lipsofsuna$(EXEEXT)
 bin_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
 @MAYBE_CLIENT_TRUE@am__append_4 = lipsofsuna-client
@@ -377,6 +377,29 @@ liblipsofsunaviewer_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @MAYBE_SERVER_TRUE@am__EXEEXT_4 = lipsofsuna-server$(EXEEXT)
 @MAYBE_VIEWER_TRUE@am__EXEEXT_5 = lipsofsuna-viewer$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(prg_PROGRAMS)
+am__objects_30 = lipsofsuna/system/build_lipsofsuna-system.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-directory.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-error.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-file.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-execute.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-memory.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-misc.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-module.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-notify.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-path.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-relative.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-types.$(OBJEXT) \
+	lipsofsuna/system/build_lipsofsuna-system-user.$(OBJEXT)
+am_build_lipsofsuna_OBJECTS =  \
+	lipsofsuna/main/build_lipsofsuna-main.$(OBJEXT) \
+	$(am__objects_30)
+build_lipsofsuna_OBJECTS = $(am_build_lipsofsuna_OBJECTS)
+build_lipsofsuna_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
+build_lipsofsuna_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(build_lipsofsuna_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
+	-o $@
 am_lipsofsuna_client_OBJECTS =  \
 	lipsofsuna/client/client-main.$(OBJEXT)
 lipsofsuna_client_OBJECTS = $(am_lipsofsuna_client_OBJECTS)
@@ -406,29 +429,6 @@ lipsofsuna_import_DEPENDENCIES = liblipsofsunaimport.la \
 lipsofsuna_import_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(lipsofsuna_import_LDFLAGS) $(LDFLAGS) \
-	-o $@
-am__objects_30 = lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-file.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-execute.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-memory.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-misc.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-module.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-notify.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-path.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT) \
-	lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT)
-am_lipsofsuna_launch_OBJECTS =  \
-	lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT) \
-	$(am__objects_30)
-lipsofsuna_launch_OBJECTS = $(am_lipsofsuna_launch_OBJECTS)
-lipsofsuna_launch_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-lipsofsuna_launch_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(lipsofsuna_launch_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am_lipsofsuna_server_OBJECTS =  \
 	lipsofsuna/server/server-main.$(OBJEXT)
@@ -498,17 +498,17 @@ SOURCES = $(liblipsofsunaclient_la_SOURCES) \
 	$(liblipsofsunagenerator_la_SOURCES) \
 	$(liblipsofsunaimport_la_SOURCES) \
 	$(liblipsofsunaserver_la_SOURCES) \
-	$(liblipsofsunaviewer_la_SOURCES) $(lipsofsuna_client_SOURCES) \
-	$(lipsofsuna_generator_SOURCES) $(lipsofsuna_import_SOURCES) \
-	$(lipsofsuna_launch_SOURCES) $(lipsofsuna_server_SOURCES) \
+	$(liblipsofsunaviewer_la_SOURCES) $(build_lipsofsuna_SOURCES) \
+	$(lipsofsuna_client_SOURCES) $(lipsofsuna_generator_SOURCES) \
+	$(lipsofsuna_import_SOURCES) $(lipsofsuna_server_SOURCES) \
 	$(lipsofsuna_viewer_SOURCES)
 DIST_SOURCES = $(liblipsofsunaclient_la_SOURCES) \
 	$(liblipsofsunagenerator_la_SOURCES) \
 	$(liblipsofsunaimport_la_SOURCES) \
 	$(liblipsofsunaserver_la_SOURCES) \
-	$(liblipsofsunaviewer_la_SOURCES) $(lipsofsuna_client_SOURCES) \
-	$(lipsofsuna_generator_SOURCES) $(lipsofsuna_import_SOURCES) \
-	$(lipsofsuna_launch_SOURCES) $(lipsofsuna_server_SOURCES) \
+	$(liblipsofsunaviewer_la_SOURCES) $(build_lipsofsuna_SOURCES) \
+	$(lipsofsuna_client_SOURCES) $(lipsofsuna_generator_SOURCES) \
+	$(lipsofsuna_import_SOURCES) $(lipsofsuna_server_SOURCES) \
 	$(lipsofsuna_viewer_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -533,8 +533,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = docs . lipsofsuna/extension/common \
-	lipsofsuna/extension/client lipsofsuna/extension/server
+DIST_SUBDIRS = docs lipsofsuna/extension/common \
+	lipsofsuna/extension/client lipsofsuna/extension/server .
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -575,6 +575,7 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
+AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -594,6 +595,7 @@ CYGPATH_W = @CYGPATH_W@
 DATADIR = @DATADIR@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -661,6 +663,7 @@ PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
+RELPATH = @RELPATH@
 SAVEDIR = @SAVEDIR@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_CONFIG = @SDL_CONFIG@
@@ -738,7 +741,7 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = docs . $(am__append_1) $(am__append_2) $(am__append_3)
+SUBDIRS = docs $(am__append_1) $(am__append_2) $(am__append_3) .
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
@@ -1340,9 +1343,9 @@ liblipsofsunaviewer_la_SOURCES = \
 
 
 ##############################################################################
-lipsofsuna_launch_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_launch_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
-lipsofsuna_launch_SOURCES = lipsofsuna/main/main.c $(syssrc)
+build_lipsofsuna_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+build_lipsofsuna_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
+build_lipsofsuna_SOURCES = lipsofsuna/main/main.c $(syssrc)
 lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)
 lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c
@@ -2105,6 +2108,54 @@ clean-prgPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+lipsofsuna/main/build_lipsofsuna-main.$(OBJEXT):  \
+	lipsofsuna/main/$(am__dirstamp) \
+	lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-directory.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-error.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-file.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-execute.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-memory.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-misc.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-module.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-notify.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-path.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-relative.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-types.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/system/build_lipsofsuna-system-user.$(OBJEXT):  \
+	lipsofsuna/system/$(am__dirstamp) \
+	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
+build/$(am__dirstamp):
+	@$(MKDIR_P) build
+	@: > build/$(am__dirstamp)
+build/lipsofsuna$(EXEEXT): $(build_lipsofsuna_OBJECTS) $(build_lipsofsuna_DEPENDENCIES) build/$(am__dirstamp)
+	@rm -f build/lipsofsuna$(EXEEXT)
+	$(AM_V_CCLD)$(build_lipsofsuna_LINK) $(build_lipsofsuna_OBJECTS) $(build_lipsofsuna_LDADD) $(LIBS)
 lipsofsuna/client/client-main.$(OBJEXT):  \
 	lipsofsuna/client/$(am__dirstamp) \
 	lipsofsuna/client/$(DEPDIR)/$(am__dirstamp)
@@ -2123,51 +2174,6 @@ lipsofsuna/reload/reload-main.$(OBJEXT):  \
 lipsofsuna-import$(EXEEXT): $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_DEPENDENCIES) 
 	@rm -f lipsofsuna-import$(EXEEXT)
 	$(AM_V_CCLD)$(lipsofsuna_import_LINK) $(lipsofsuna_import_OBJECTS) $(lipsofsuna_import_LDADD) $(LIBS)
-lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT):  \
-	lipsofsuna/main/$(am__dirstamp) \
-	lipsofsuna/main/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-file.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-execute.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-memory.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-misc.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-module.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-notify.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-path.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT):  \
-	lipsofsuna/system/$(am__dirstamp) \
-	lipsofsuna/system/$(DEPDIR)/$(am__dirstamp)
-lipsofsuna-launch$(EXEEXT): $(lipsofsuna_launch_OBJECTS) $(lipsofsuna_launch_DEPENDENCIES) 
-	@rm -f lipsofsuna-launch$(EXEEXT)
-	$(AM_V_CCLD)$(lipsofsuna_launch_LINK) $(lipsofsuna_launch_OBJECTS) $(lipsofsuna_launch_LDADD) $(LIBS)
 lipsofsuna/server/server-main.$(OBJEXT):  \
 	lipsofsuna/server/$(am__dirstamp) \
 	lipsofsuna/server/$(DEPDIR)/$(am__dirstamp)
@@ -2289,7 +2295,7 @@ mostlyclean-compile:
 	-rm -f lipsofsuna/image/image-texture.lo
 	-rm -f lipsofsuna/image/image.$(OBJEXT)
 	-rm -f lipsofsuna/image/image.lo
-	-rm -f lipsofsuna/main/lipsofsuna_launch-main.$(OBJEXT)
+	-rm -f lipsofsuna/main/build_lipsofsuna-main.$(OBJEXT)
 	-rm -f lipsofsuna/main/main-program.$(OBJEXT)
 	-rm -f lipsofsuna/main/main-program.lo
 	-rm -f lipsofsuna/math/math.$(OBJEXT)
@@ -2430,19 +2436,19 @@ mostlyclean-compile:
 	-rm -f lipsofsuna/sound/sound-system.lo
 	-rm -f lipsofsuna/string/string-generic.$(OBJEXT)
 	-rm -f lipsofsuna/string/string-generic.lo
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-directory.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-error.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-execute.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-file.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-memory.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-misc.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-module.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-notify.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-path.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-relative.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-types.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system-user.$(OBJEXT)
-	-rm -f lipsofsuna/system/lipsofsuna_launch-system.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-directory.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-error.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-execute.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-file.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-memory.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-misc.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-module.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-notify.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-path.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-relative.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-types.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system-user.$(OBJEXT)
+	-rm -f lipsofsuna/system/build_lipsofsuna-system.$(OBJEXT)
 	-rm -f lipsofsuna/system/system-directory.$(OBJEXT)
 	-rm -f lipsofsuna/system/system-directory.lo
 	-rm -f lipsofsuna/system/system-error.$(OBJEXT)
@@ -2588,7 +2594,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image-compress.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image-texture.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/image/$(DEPDIR)/image.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/main/$(DEPDIR)/main-program.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/math/$(DEPDIR)/math.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/model/$(DEPDIR)/model-animation.Plo@am__quote@
@@ -2660,19 +2666,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/sound/$(DEPDIR)/sound-source.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/sound/$(DEPDIR)/sound-system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/string/$(DEPDIR)/string-generic.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-directory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-error.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/system/$(DEPDIR)/system-execute.Plo@am__quote@
@@ -2745,229 +2751,229 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-lipsofsuna/main/lipsofsuna_launch-main.o: lipsofsuna/main/main.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/main/lipsofsuna_launch-main.o -MD -MP -MF lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo -c -o lipsofsuna/main/lipsofsuna_launch-main.o `test -f 'lipsofsuna/main/main.c' || echo '$(srcdir)/'`lipsofsuna/main/main.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po
+lipsofsuna/main/build_lipsofsuna-main.o: lipsofsuna/main/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/main/build_lipsofsuna-main.o -MD -MP -MF lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Tpo -c -o lipsofsuna/main/build_lipsofsuna-main.o `test -f 'lipsofsuna/main/main.c' || echo '$(srcdir)/'`lipsofsuna/main/main.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Tpo lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/main/main.c' object='lipsofsuna/main/lipsofsuna_launch-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/main/main.c' object='lipsofsuna/main/build_lipsofsuna-main.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/main/lipsofsuna_launch-main.o `test -f 'lipsofsuna/main/main.c' || echo '$(srcdir)/'`lipsofsuna/main/main.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/main/build_lipsofsuna-main.o `test -f 'lipsofsuna/main/main.c' || echo '$(srcdir)/'`lipsofsuna/main/main.c
 
-lipsofsuna/main/lipsofsuna_launch-main.obj: lipsofsuna/main/main.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/main/lipsofsuna_launch-main.obj -MD -MP -MF lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo -c -o lipsofsuna/main/lipsofsuna_launch-main.obj `if test -f 'lipsofsuna/main/main.c'; then $(CYGPATH_W) 'lipsofsuna/main/main.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/main/main.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Tpo lipsofsuna/main/$(DEPDIR)/lipsofsuna_launch-main.Po
+lipsofsuna/main/build_lipsofsuna-main.obj: lipsofsuna/main/main.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/main/build_lipsofsuna-main.obj -MD -MP -MF lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Tpo -c -o lipsofsuna/main/build_lipsofsuna-main.obj `if test -f 'lipsofsuna/main/main.c'; then $(CYGPATH_W) 'lipsofsuna/main/main.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/main/main.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Tpo lipsofsuna/main/$(DEPDIR)/build_lipsofsuna-main.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/main/main.c' object='lipsofsuna/main/lipsofsuna_launch-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/main/main.c' object='lipsofsuna/main/build_lipsofsuna-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/main/lipsofsuna_launch-main.obj `if test -f 'lipsofsuna/main/main.c'; then $(CYGPATH_W) 'lipsofsuna/main/main.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/main/main.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/main/build_lipsofsuna-main.obj `if test -f 'lipsofsuna/main/main.c'; then $(CYGPATH_W) 'lipsofsuna/main/main.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/main/main.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system.o: lipsofsuna/system/system.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system.o `test -f 'lipsofsuna/system/system.c' || echo '$(srcdir)/'`lipsofsuna/system/system.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Po
+lipsofsuna/system/build_lipsofsuna-system.o: lipsofsuna/system/system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system.o `test -f 'lipsofsuna/system/system.c' || echo '$(srcdir)/'`lipsofsuna/system/system.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system.c' object='lipsofsuna/system/lipsofsuna_launch-system.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system.c' object='lipsofsuna/system/build_lipsofsuna-system.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system.o `test -f 'lipsofsuna/system/system.c' || echo '$(srcdir)/'`lipsofsuna/system/system.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system.o `test -f 'lipsofsuna/system/system.c' || echo '$(srcdir)/'`lipsofsuna/system/system.c
 
-lipsofsuna/system/lipsofsuna_launch-system.obj: lipsofsuna/system/system.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system.obj `if test -f 'lipsofsuna/system/system.c'; then $(CYGPATH_W) 'lipsofsuna/system/system.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system.Po
+lipsofsuna/system/build_lipsofsuna-system.obj: lipsofsuna/system/system.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system.obj `if test -f 'lipsofsuna/system/system.c'; then $(CYGPATH_W) 'lipsofsuna/system/system.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system.c' object='lipsofsuna/system/lipsofsuna_launch-system.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system.c' object='lipsofsuna/system/build_lipsofsuna-system.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system.obj `if test -f 'lipsofsuna/system/system.c'; then $(CYGPATH_W) 'lipsofsuna/system/system.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system.obj `if test -f 'lipsofsuna/system/system.c'; then $(CYGPATH_W) 'lipsofsuna/system/system.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-directory.o: lipsofsuna/system/system-directory.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-directory.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.o `test -f 'lipsofsuna/system/system-directory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-directory.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Po
+lipsofsuna/system/build_lipsofsuna-system-directory.o: lipsofsuna/system/system-directory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-directory.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-directory.o `test -f 'lipsofsuna/system/system-directory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-directory.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-directory.c' object='lipsofsuna/system/lipsofsuna_launch-system-directory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-directory.c' object='lipsofsuna/system/build_lipsofsuna-system-directory.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.o `test -f 'lipsofsuna/system/system-directory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-directory.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-directory.o `test -f 'lipsofsuna/system/system-directory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-directory.c
 
-lipsofsuna/system/lipsofsuna_launch-system-directory.obj: lipsofsuna/system/system-directory.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-directory.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.obj `if test -f 'lipsofsuna/system/system-directory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-directory.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-directory.Po
+lipsofsuna/system/build_lipsofsuna-system-directory.obj: lipsofsuna/system/system-directory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-directory.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-directory.obj `if test -f 'lipsofsuna/system/system-directory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-directory.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-directory.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-directory.c' object='lipsofsuna/system/lipsofsuna_launch-system-directory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-directory.c' object='lipsofsuna/system/build_lipsofsuna-system-directory.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-directory.obj `if test -f 'lipsofsuna/system/system-directory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-directory.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-directory.obj `if test -f 'lipsofsuna/system/system-directory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-directory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-directory.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-error.o: lipsofsuna/system/system-error.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-error.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-error.o `test -f 'lipsofsuna/system/system-error.c' || echo '$(srcdir)/'`lipsofsuna/system/system-error.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Po
+lipsofsuna/system/build_lipsofsuna-system-error.o: lipsofsuna/system/system-error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-error.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-error.o `test -f 'lipsofsuna/system/system-error.c' || echo '$(srcdir)/'`lipsofsuna/system/system-error.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-error.c' object='lipsofsuna/system/lipsofsuna_launch-system-error.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-error.c' object='lipsofsuna/system/build_lipsofsuna-system-error.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-error.o `test -f 'lipsofsuna/system/system-error.c' || echo '$(srcdir)/'`lipsofsuna/system/system-error.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-error.o `test -f 'lipsofsuna/system/system-error.c' || echo '$(srcdir)/'`lipsofsuna/system/system-error.c
 
-lipsofsuna/system/lipsofsuna_launch-system-error.obj: lipsofsuna/system/system-error.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-error.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-error.obj `if test -f 'lipsofsuna/system/system-error.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-error.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-error.Po
+lipsofsuna/system/build_lipsofsuna-system-error.obj: lipsofsuna/system/system-error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-error.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-error.obj `if test -f 'lipsofsuna/system/system-error.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-error.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-error.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-error.c' object='lipsofsuna/system/lipsofsuna_launch-system-error.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-error.c' object='lipsofsuna/system/build_lipsofsuna-system-error.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-error.obj `if test -f 'lipsofsuna/system/system-error.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-error.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-error.obj `if test -f 'lipsofsuna/system/system-error.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-error.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-error.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-file.o: lipsofsuna/system/system-file.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-file.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-file.o `test -f 'lipsofsuna/system/system-file.c' || echo '$(srcdir)/'`lipsofsuna/system/system-file.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Po
+lipsofsuna/system/build_lipsofsuna-system-file.o: lipsofsuna/system/system-file.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-file.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-file.o `test -f 'lipsofsuna/system/system-file.c' || echo '$(srcdir)/'`lipsofsuna/system/system-file.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-file.c' object='lipsofsuna/system/lipsofsuna_launch-system-file.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-file.c' object='lipsofsuna/system/build_lipsofsuna-system-file.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-file.o `test -f 'lipsofsuna/system/system-file.c' || echo '$(srcdir)/'`lipsofsuna/system/system-file.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-file.o `test -f 'lipsofsuna/system/system-file.c' || echo '$(srcdir)/'`lipsofsuna/system/system-file.c
 
-lipsofsuna/system/lipsofsuna_launch-system-file.obj: lipsofsuna/system/system-file.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-file.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-file.obj `if test -f 'lipsofsuna/system/system-file.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-file.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-file.Po
+lipsofsuna/system/build_lipsofsuna-system-file.obj: lipsofsuna/system/system-file.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-file.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-file.obj `if test -f 'lipsofsuna/system/system-file.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-file.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-file.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-file.c' object='lipsofsuna/system/lipsofsuna_launch-system-file.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-file.c' object='lipsofsuna/system/build_lipsofsuna-system-file.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-file.obj `if test -f 'lipsofsuna/system/system-file.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-file.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-file.obj `if test -f 'lipsofsuna/system/system-file.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-file.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-file.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-execute.o: lipsofsuna/system/system-execute.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-execute.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.o `test -f 'lipsofsuna/system/system-execute.c' || echo '$(srcdir)/'`lipsofsuna/system/system-execute.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Po
+lipsofsuna/system/build_lipsofsuna-system-execute.o: lipsofsuna/system/system-execute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-execute.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-execute.o `test -f 'lipsofsuna/system/system-execute.c' || echo '$(srcdir)/'`lipsofsuna/system/system-execute.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-execute.c' object='lipsofsuna/system/lipsofsuna_launch-system-execute.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-execute.c' object='lipsofsuna/system/build_lipsofsuna-system-execute.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.o `test -f 'lipsofsuna/system/system-execute.c' || echo '$(srcdir)/'`lipsofsuna/system/system-execute.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-execute.o `test -f 'lipsofsuna/system/system-execute.c' || echo '$(srcdir)/'`lipsofsuna/system/system-execute.c
 
-lipsofsuna/system/lipsofsuna_launch-system-execute.obj: lipsofsuna/system/system-execute.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-execute.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.obj `if test -f 'lipsofsuna/system/system-execute.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-execute.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-execute.Po
+lipsofsuna/system/build_lipsofsuna-system-execute.obj: lipsofsuna/system/system-execute.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-execute.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-execute.obj `if test -f 'lipsofsuna/system/system-execute.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-execute.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-execute.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-execute.c' object='lipsofsuna/system/lipsofsuna_launch-system-execute.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-execute.c' object='lipsofsuna/system/build_lipsofsuna-system-execute.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-execute.obj `if test -f 'lipsofsuna/system/system-execute.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-execute.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-execute.obj `if test -f 'lipsofsuna/system/system-execute.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-execute.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-execute.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-memory.o: lipsofsuna/system/system-memory.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-memory.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.o `test -f 'lipsofsuna/system/system-memory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-memory.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Po
+lipsofsuna/system/build_lipsofsuna-system-memory.o: lipsofsuna/system/system-memory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-memory.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-memory.o `test -f 'lipsofsuna/system/system-memory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-memory.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-memory.c' object='lipsofsuna/system/lipsofsuna_launch-system-memory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-memory.c' object='lipsofsuna/system/build_lipsofsuna-system-memory.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.o `test -f 'lipsofsuna/system/system-memory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-memory.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-memory.o `test -f 'lipsofsuna/system/system-memory.c' || echo '$(srcdir)/'`lipsofsuna/system/system-memory.c
 
-lipsofsuna/system/lipsofsuna_launch-system-memory.obj: lipsofsuna/system/system-memory.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-memory.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.obj `if test -f 'lipsofsuna/system/system-memory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-memory.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-memory.Po
+lipsofsuna/system/build_lipsofsuna-system-memory.obj: lipsofsuna/system/system-memory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-memory.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-memory.obj `if test -f 'lipsofsuna/system/system-memory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-memory.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-memory.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-memory.c' object='lipsofsuna/system/lipsofsuna_launch-system-memory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-memory.c' object='lipsofsuna/system/build_lipsofsuna-system-memory.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-memory.obj `if test -f 'lipsofsuna/system/system-memory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-memory.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-memory.obj `if test -f 'lipsofsuna/system/system-memory.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-memory.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-memory.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-misc.o: lipsofsuna/system/system-misc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-misc.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.o `test -f 'lipsofsuna/system/system-misc.c' || echo '$(srcdir)/'`lipsofsuna/system/system-misc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Po
+lipsofsuna/system/build_lipsofsuna-system-misc.o: lipsofsuna/system/system-misc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-misc.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-misc.o `test -f 'lipsofsuna/system/system-misc.c' || echo '$(srcdir)/'`lipsofsuna/system/system-misc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-misc.c' object='lipsofsuna/system/lipsofsuna_launch-system-misc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-misc.c' object='lipsofsuna/system/build_lipsofsuna-system-misc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.o `test -f 'lipsofsuna/system/system-misc.c' || echo '$(srcdir)/'`lipsofsuna/system/system-misc.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-misc.o `test -f 'lipsofsuna/system/system-misc.c' || echo '$(srcdir)/'`lipsofsuna/system/system-misc.c
 
-lipsofsuna/system/lipsofsuna_launch-system-misc.obj: lipsofsuna/system/system-misc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-misc.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.obj `if test -f 'lipsofsuna/system/system-misc.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-misc.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-misc.Po
+lipsofsuna/system/build_lipsofsuna-system-misc.obj: lipsofsuna/system/system-misc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-misc.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-misc.obj `if test -f 'lipsofsuna/system/system-misc.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-misc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-misc.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-misc.c' object='lipsofsuna/system/lipsofsuna_launch-system-misc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-misc.c' object='lipsofsuna/system/build_lipsofsuna-system-misc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-misc.obj `if test -f 'lipsofsuna/system/system-misc.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-misc.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-misc.obj `if test -f 'lipsofsuna/system/system-misc.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-misc.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-misc.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-module.o: lipsofsuna/system/system-module.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-module.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-module.o `test -f 'lipsofsuna/system/system-module.c' || echo '$(srcdir)/'`lipsofsuna/system/system-module.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Po
+lipsofsuna/system/build_lipsofsuna-system-module.o: lipsofsuna/system/system-module.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-module.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-module.o `test -f 'lipsofsuna/system/system-module.c' || echo '$(srcdir)/'`lipsofsuna/system/system-module.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-module.c' object='lipsofsuna/system/lipsofsuna_launch-system-module.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-module.c' object='lipsofsuna/system/build_lipsofsuna-system-module.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-module.o `test -f 'lipsofsuna/system/system-module.c' || echo '$(srcdir)/'`lipsofsuna/system/system-module.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-module.o `test -f 'lipsofsuna/system/system-module.c' || echo '$(srcdir)/'`lipsofsuna/system/system-module.c
 
-lipsofsuna/system/lipsofsuna_launch-system-module.obj: lipsofsuna/system/system-module.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-module.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-module.obj `if test -f 'lipsofsuna/system/system-module.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-module.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-module.Po
+lipsofsuna/system/build_lipsofsuna-system-module.obj: lipsofsuna/system/system-module.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-module.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-module.obj `if test -f 'lipsofsuna/system/system-module.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-module.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-module.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-module.c' object='lipsofsuna/system/lipsofsuna_launch-system-module.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-module.c' object='lipsofsuna/system/build_lipsofsuna-system-module.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-module.obj `if test -f 'lipsofsuna/system/system-module.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-module.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-module.obj `if test -f 'lipsofsuna/system/system-module.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-module.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-module.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-notify.o: lipsofsuna/system/system-notify.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-notify.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.o `test -f 'lipsofsuna/system/system-notify.c' || echo '$(srcdir)/'`lipsofsuna/system/system-notify.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Po
+lipsofsuna/system/build_lipsofsuna-system-notify.o: lipsofsuna/system/system-notify.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-notify.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-notify.o `test -f 'lipsofsuna/system/system-notify.c' || echo '$(srcdir)/'`lipsofsuna/system/system-notify.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-notify.c' object='lipsofsuna/system/lipsofsuna_launch-system-notify.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-notify.c' object='lipsofsuna/system/build_lipsofsuna-system-notify.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.o `test -f 'lipsofsuna/system/system-notify.c' || echo '$(srcdir)/'`lipsofsuna/system/system-notify.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-notify.o `test -f 'lipsofsuna/system/system-notify.c' || echo '$(srcdir)/'`lipsofsuna/system/system-notify.c
 
-lipsofsuna/system/lipsofsuna_launch-system-notify.obj: lipsofsuna/system/system-notify.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-notify.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.obj `if test -f 'lipsofsuna/system/system-notify.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-notify.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-notify.Po
+lipsofsuna/system/build_lipsofsuna-system-notify.obj: lipsofsuna/system/system-notify.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-notify.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-notify.obj `if test -f 'lipsofsuna/system/system-notify.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-notify.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-notify.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-notify.c' object='lipsofsuna/system/lipsofsuna_launch-system-notify.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-notify.c' object='lipsofsuna/system/build_lipsofsuna-system-notify.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-notify.obj `if test -f 'lipsofsuna/system/system-notify.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-notify.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-notify.obj `if test -f 'lipsofsuna/system/system-notify.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-notify.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-notify.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-path.o: lipsofsuna/system/system-path.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-path.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-path.o `test -f 'lipsofsuna/system/system-path.c' || echo '$(srcdir)/'`lipsofsuna/system/system-path.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Po
+lipsofsuna/system/build_lipsofsuna-system-path.o: lipsofsuna/system/system-path.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-path.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-path.o `test -f 'lipsofsuna/system/system-path.c' || echo '$(srcdir)/'`lipsofsuna/system/system-path.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-path.c' object='lipsofsuna/system/lipsofsuna_launch-system-path.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-path.c' object='lipsofsuna/system/build_lipsofsuna-system-path.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-path.o `test -f 'lipsofsuna/system/system-path.c' || echo '$(srcdir)/'`lipsofsuna/system/system-path.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-path.o `test -f 'lipsofsuna/system/system-path.c' || echo '$(srcdir)/'`lipsofsuna/system/system-path.c
 
-lipsofsuna/system/lipsofsuna_launch-system-path.obj: lipsofsuna/system/system-path.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-path.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-path.obj `if test -f 'lipsofsuna/system/system-path.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-path.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-path.Po
+lipsofsuna/system/build_lipsofsuna-system-path.obj: lipsofsuna/system/system-path.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-path.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-path.obj `if test -f 'lipsofsuna/system/system-path.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-path.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-path.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-path.c' object='lipsofsuna/system/lipsofsuna_launch-system-path.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-path.c' object='lipsofsuna/system/build_lipsofsuna-system-path.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-path.obj `if test -f 'lipsofsuna/system/system-path.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-path.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-path.obj `if test -f 'lipsofsuna/system/system-path.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-path.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-path.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-relative.o: lipsofsuna/system/system-relative.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-relative.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.o `test -f 'lipsofsuna/system/system-relative.c' || echo '$(srcdir)/'`lipsofsuna/system/system-relative.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Po
+lipsofsuna/system/build_lipsofsuna-system-relative.o: lipsofsuna/system/system-relative.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-relative.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-relative.o `test -f 'lipsofsuna/system/system-relative.c' || echo '$(srcdir)/'`lipsofsuna/system/system-relative.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-relative.c' object='lipsofsuna/system/lipsofsuna_launch-system-relative.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-relative.c' object='lipsofsuna/system/build_lipsofsuna-system-relative.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.o `test -f 'lipsofsuna/system/system-relative.c' || echo '$(srcdir)/'`lipsofsuna/system/system-relative.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-relative.o `test -f 'lipsofsuna/system/system-relative.c' || echo '$(srcdir)/'`lipsofsuna/system/system-relative.c
 
-lipsofsuna/system/lipsofsuna_launch-system-relative.obj: lipsofsuna/system/system-relative.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-relative.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.obj `if test -f 'lipsofsuna/system/system-relative.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-relative.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-relative.Po
+lipsofsuna/system/build_lipsofsuna-system-relative.obj: lipsofsuna/system/system-relative.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-relative.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-relative.obj `if test -f 'lipsofsuna/system/system-relative.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-relative.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-relative.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-relative.c' object='lipsofsuna/system/lipsofsuna_launch-system-relative.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-relative.c' object='lipsofsuna/system/build_lipsofsuna-system-relative.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-relative.obj `if test -f 'lipsofsuna/system/system-relative.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-relative.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-relative.obj `if test -f 'lipsofsuna/system/system-relative.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-relative.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-relative.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-types.o: lipsofsuna/system/system-types.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-types.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-types.o `test -f 'lipsofsuna/system/system-types.c' || echo '$(srcdir)/'`lipsofsuna/system/system-types.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Po
+lipsofsuna/system/build_lipsofsuna-system-types.o: lipsofsuna/system/system-types.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-types.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-types.o `test -f 'lipsofsuna/system/system-types.c' || echo '$(srcdir)/'`lipsofsuna/system/system-types.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-types.c' object='lipsofsuna/system/lipsofsuna_launch-system-types.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-types.c' object='lipsofsuna/system/build_lipsofsuna-system-types.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-types.o `test -f 'lipsofsuna/system/system-types.c' || echo '$(srcdir)/'`lipsofsuna/system/system-types.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-types.o `test -f 'lipsofsuna/system/system-types.c' || echo '$(srcdir)/'`lipsofsuna/system/system-types.c
 
-lipsofsuna/system/lipsofsuna_launch-system-types.obj: lipsofsuna/system/system-types.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-types.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-types.obj `if test -f 'lipsofsuna/system/system-types.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-types.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-types.Po
+lipsofsuna/system/build_lipsofsuna-system-types.obj: lipsofsuna/system/system-types.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-types.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-types.obj `if test -f 'lipsofsuna/system/system-types.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-types.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-types.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-types.c' object='lipsofsuna/system/lipsofsuna_launch-system-types.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-types.c' object='lipsofsuna/system/build_lipsofsuna-system-types.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-types.obj `if test -f 'lipsofsuna/system/system-types.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-types.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-types.obj `if test -f 'lipsofsuna/system/system-types.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-types.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-types.c'; fi`
 
-lipsofsuna/system/lipsofsuna_launch-system-user.o: lipsofsuna/system/system-user.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-user.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-user.o `test -f 'lipsofsuna/system/system-user.c' || echo '$(srcdir)/'`lipsofsuna/system/system-user.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Po
+lipsofsuna/system/build_lipsofsuna-system-user.o: lipsofsuna/system/system-user.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-user.o -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-user.o `test -f 'lipsofsuna/system/system-user.c' || echo '$(srcdir)/'`lipsofsuna/system/system-user.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-user.c' object='lipsofsuna/system/lipsofsuna_launch-system-user.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-user.c' object='lipsofsuna/system/build_lipsofsuna-system-user.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-user.o `test -f 'lipsofsuna/system/system-user.c' || echo '$(srcdir)/'`lipsofsuna/system/system-user.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-user.o `test -f 'lipsofsuna/system/system-user.c' || echo '$(srcdir)/'`lipsofsuna/system/system-user.c
 
-lipsofsuna/system/lipsofsuna_launch-system-user.obj: lipsofsuna/system/system-user.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/lipsofsuna_launch-system-user.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo -c -o lipsofsuna/system/lipsofsuna_launch-system-user.obj `if test -f 'lipsofsuna/system/system-user.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-user.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Tpo lipsofsuna/system/$(DEPDIR)/lipsofsuna_launch-system-user.Po
+lipsofsuna/system/build_lipsofsuna-system-user.obj: lipsofsuna/system/system-user.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -MT lipsofsuna/system/build_lipsofsuna-system-user.obj -MD -MP -MF lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Tpo -c -o lipsofsuna/system/build_lipsofsuna-system-user.obj `if test -f 'lipsofsuna/system/system-user.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-user.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Tpo lipsofsuna/system/$(DEPDIR)/build_lipsofsuna-system-user.Po
 @am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-user.c' object='lipsofsuna/system/lipsofsuna_launch-system-user.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='lipsofsuna/system/system-user.c' object='lipsofsuna/system/build_lipsofsuna-system-user.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lipsofsuna_launch_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/lipsofsuna_launch-system-user.obj `if test -f 'lipsofsuna/system/system-user.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-user.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(build_lipsofsuna_CFLAGS) $(CFLAGS) -c -o lipsofsuna/system/build_lipsofsuna-system-user.obj `if test -f 'lipsofsuna/system/system-user.c'; then $(CYGPATH_W) 'lipsofsuna/system/system-user.c'; else $(CYGPATH_W) '$(srcdir)/lipsofsuna/system/system-user.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -3001,6 +3007,7 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf build/.libs build/_libs
 	-rm -rf lipsofsuna/ai/.libs lipsofsuna/ai/_libs
 	-rm -rf lipsofsuna/algorithm/.libs lipsofsuna/algorithm/_libs
 	-rm -rf lipsofsuna/archive/.libs lipsofsuna/archive/_libs
@@ -3966,7 +3973,7 @@ distcleancheck: distclean
 check-am: all-am
 check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA) $(HEADERS) \
-		config.h
+		config.h all-local
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
@@ -3995,6 +4002,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f build/$(am__dirstamp)
 	-rm -f lipsofsuna/ai/$(DEPDIR)/$(am__dirstamp)
 	-rm -f lipsofsuna/ai/$(am__dirstamp)
 	-rm -f lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
@@ -4060,7 +4068,7 @@ maintainer-clean-generic:
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool clean-prgPROGRAMS mostlyclean-am
+	clean-libtool clean-local clean-prgPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -4158,18 +4166,18 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	ctags-recursive install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am am--refresh check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool \
-	clean-prgPROGRAMS ctags ctags-recursive dist dist-all \
-	dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ dist-xz \
-	dist-zip distcheck distclean distclean-compile \
-	distclean-generic distclean-hdr distclean-libtool \
-	distclean-tags distcleancheck distdir distuninstallcheck dvi \
-	dvi-am html html-am info info-am install install-aiHEADERS \
-	install-algHEADERS install-am install-arcHEADERS \
-	install-binPROGRAMS install-bndHEADERS install-calHEADERS \
-	install-cliHEADERS install-data install-data-am \
-	install-data-local install-dvi install-dvi-am \
+	all all-am all-local am--refresh check check-am clean \
+	clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool clean-local clean-prgPROGRAMS ctags \
+	ctags-recursive dist dist-all dist-bzip2 dist-gzip dist-lzma \
+	dist-shar dist-tarZ dist-xz dist-zip distcheck distclean \
+	distclean-compile distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distcleancheck distdir \
+	distuninstallcheck dvi dvi-am html html-am info info-am \
+	install install-aiHEADERS install-algHEADERS install-am \
+	install-arcHEADERS install-binPROGRAMS install-bndHEADERS \
+	install-calHEADERS install-cliHEADERS install-data \
+	install-data-am install-data-local install-dvi install-dvi-am \
 	install-editorDATA install-engHEADERS install-exec \
 	install-exec-am install-fntHEADERS install-genHEADERS \
 	install-html install-html-am install-imgHEADERS install-info \
@@ -4203,6 +4211,31 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 
 
 ##############################################################################
+
+all-local:
+	@if test "x$(RELPATH)" = "xyes"; then \
+		mkdir -p build/bin build/lib build/tool; \
+		for i in $(bin_PROGRAMS); do \
+			if test -e .libs/$$i; then cp .libs/$$i build/bin; fi; \
+		done; \
+		for i in $(lib_LTLIBRARIES); do \
+			name=`echo $$i | sed s/la$$/so.0/`; \
+			if test -e .libs/$$name; then cp .libs/$$name build/lib; fi; \
+		done; \
+		for i in $(editor_DATA); do \
+			cp $$i build/tool; \
+		done; \
+		if test -d deps/lib; then \
+			for i in `ls deps/lib/*.so.[0-9]`; do cp $$i build/lib; done; \
+		fi; \
+		if test ! -e build/data; then \
+			echo -e "\\n *** Install data files to build/data"; \
+		fi; \
+		echo -e "\\n *** Play by typing build/lipsofsuna\\n"; \
+	fi
+
+clean-local:
+	rm -Rf build/bin build/lib build/tool
 
 install-data-local:
 	$(mkinstalldirs) $(DATADIR)

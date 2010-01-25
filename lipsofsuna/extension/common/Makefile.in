@@ -133,6 +133,7 @@ ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
+AS = @AS@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -152,6 +153,7 @@ CYGPATH_W = @CYGPATH_W@
 DATADIR = @DATADIR@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DLLTOOL = @DLLTOOL@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -219,6 +221,7 @@ PTHREAD_CC = @PTHREAD_CC@
 PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
+RELPATH = @RELPATH@
 SAVEDIR = @SAVEDIR@
 SDL_CFLAGS = @SDL_CFLAGS@
 SDL_CONFIG = @SDL_CONFIG@
@@ -297,7 +300,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 LIBADD = $(top_builddir)/liblipsofsunaserver.la $(LISRV_LIBS)
-AM_CFLAGS = $(LISRV_CFLAGS)
+AM_CFLAGS = $(LISRV_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 EXTRA_DIST = skeleton/mkext.sh
 extdir = $(EXTSDIR)
@@ -615,7 +618,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES)
+all-am: Makefile $(LTLIBRARIES) all-local
 installdirs:
 	for dir in "$(DESTDIR)$(extdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -726,7 +729,7 @@ uninstall-am: uninstall-extLTLIBRARIES
 
 .MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean \
+.PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
 	clean-extLTLIBRARIES clean-generic clean-libtool ctags \
 	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
@@ -741,6 +744,15 @@ uninstall-am: uninstall-extLTLIBRARIES
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-extLTLIBRARIES
 
+
+all-local:
+	@if test "x$(RELPATH)" = "xyes"; then \
+		mkdir -p ../../../build/lib/extensions; \
+		for i in $(ext_LTLIBRARIES); do \
+			name=`echo $$i | sed s/la$$/so/`; \
+			if test -e .libs/$$name; then cp .libs/$$name ../../../build/lib/extensions; fi; \
+		done; \
+	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
