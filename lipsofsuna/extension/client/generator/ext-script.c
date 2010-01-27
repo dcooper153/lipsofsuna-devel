@@ -104,7 +104,7 @@ liext_script_generator (LIScrClass* self,
 	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "load", Generator_load);
 	liscr_class_insert_cfunc (self, "new", Generator_new);
-	liscr_class_insert_cfunc (self, "save", Generator_save);
+	liscr_class_insert_mfunc (self, "save", Generator_save);
 }
 
 /** @} */
