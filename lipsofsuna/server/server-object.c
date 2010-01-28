@@ -246,9 +246,9 @@ liser_object_serialize (LIEngObject* self,
 	float movement;
 	float speed;
 	float step;
+	const char* extra;
 	const char* model;
 	const char* type;
-	const char* extras;
 	const char* query;
 	LIArcSql* sql;
 	LIMatTransform transform;
@@ -320,9 +320,9 @@ liser_object_serialize (LIEngObject* self,
 		else
 			type = NULL;
 		if (sqlite3_column_type (statement, col) == SQLITE_TEXT)
-			extras = (char*) sqlite3_column_text (statement, col++);
+			extra = (char*) sqlite3_column_text (statement, col++);
 		else
-			extras = NULL;
+			extra = NULL;
 
 		/* Set state. */
 		lieng_object_set_angular_momentum (self, &angular);
@@ -345,18 +345,18 @@ liser_object_serialize (LIEngObject* self,
 		{
 			script = LISER_OBJECT (self)->server->script;
 			liscr_pushdata (script->lua, self->script);
-			lua_pushstring (script->lua, "read_cb");
-			lua_gettable (script->lua, -2);
+			lua_getfield (script->lua, -1, "read_cb");
 			if (lua_type (script->lua, -1) == LUA_TFUNCTION)
 			{
 				lua_pushvalue (script->lua, -2);
 				lua_remove (script->lua, -3);
 				lua_pushstring (script->lua, (type != NULL)? type : "");
-				lua_pushstring (script->lua, (extras != NULL)? extras : "");
+				lua_pushstring (script->lua, (extra != NULL)? extra : "");
 				if (lua_pcall (script->lua, 3, 0, 0) != 0)
 				{
 					lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.read_cb: %s", lua_tostring (script->lua, -1));
 					lua_pop (script->lua, 1);
+					lisys_error_report ();
 				}
 			}
 			else
@@ -384,13 +384,13 @@ liser_object_serialize (LIEngObject* self,
 			lieng_object_get_transform (self, &transform);
 			lieng_object_get_angular_momentum (self, &angular);
 			type = NULL;
-			extras = NULL;
+			extra = NULL;
 
 			/* Prepare statement. */
 			query = "INSERT OR REPLACE INTO objects "
 				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
 				"mass,move,speed,step,colgrp,colmsk,control,model,type,extra) VALUES "
-				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 			if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
 			{
 				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
@@ -439,8 +439,7 @@ liser_object_serialize (LIEngObject* self,
 			{
 				script = LISER_OBJECT (self)->server->script;
 				liscr_pushdata (script->lua, self->script);
-				lua_pushstring (script->lua, "write_cb");
-				lua_gettable (script->lua, -2);
+				lua_getfield (script->lua, -1, "write_cb");
 				if (lua_type (script->lua, -1) == LUA_TFUNCTION)
 				{
 					lua_pushvalue (script->lua, -2);
@@ -456,7 +455,7 @@ liser_object_serialize (LIEngObject* self,
 					else
 						lua_remove (script->lua, -2);
 					if (lua_type (script->lua, -1) == LUA_TSTRING)
-						model = lua_tostring (script->lua, -1);
+						extra = lua_tostring (script->lua, -1);
 					else
 						lua_remove (script->lua, -1);
 				}
@@ -471,10 +470,10 @@ liser_object_serialize (LIEngObject* self,
 			}
 			else
 				ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
-			if (model != NULL)
+			if (extra != NULL)
 			{
 				assert (script != NULL);
-				ret = (ret || sqlite3_bind_text (statement, col++, model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+				ret = (ret || sqlite3_bind_text (statement, col++, extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
 				lua_pop (script->lua, 1);
 			}
 			else

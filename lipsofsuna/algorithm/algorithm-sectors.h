@@ -31,8 +31,15 @@
 
 typedef struct _LIAlgSector LIAlgSector;
 typedef struct _LIAlgSectors LIAlgSectors;
+typedef struct _LIAlgSectorsCallback LIAlgSectorsCallback;
 typedef void (*LIAlgSectorFreeFunc)(void*);
 typedef void* (*LIAlgSectorLoadFunc)(LIAlgSector*);
+
+struct _LIAlgSectorsCallback
+{
+	void (*callback)(void*, LIAlgSector*);
+	void* userdata;
+};
 
 struct _LIAlgSector
 {
@@ -52,6 +59,8 @@ struct _LIAlgSectors
 	float width;
 	LIAlgU32dic* sectors;
 	LIAlgStrdic* content;
+	LIAlgSectorsCallback sector_free_callback;
+	LIAlgSectorsCallback sector_load_callback;
 };
 
 #ifdef __cplusplus

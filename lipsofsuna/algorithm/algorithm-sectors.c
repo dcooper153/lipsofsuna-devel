@@ -197,6 +197,10 @@ lialg_sectors_sector_index (LIAlgSectors* self,
 		}
 	}
 
+	/* Invoke callbacks. */
+	if (self->sector_load_callback.callback != NULL)
+		self->sector_load_callback.callback (self->sector_load_callback.userdata, sector);
+
 	return sector;
 }
 
@@ -419,6 +423,11 @@ private_free_sector (LIAlgSectors* self,
 	LIAlgSectorsContent* content;
 	LIAlgStrdicIter iter;
 
+	/* Invoke callbacks. */
+	if (self->sector_free_callback.callback != NULL)
+		self->sector_free_callback.callback (self->sector_load_callback.userdata, sector);
+
+	/* Free sector data. */
 	LIALG_STRDIC_FOREACH (iter, self->content)
 	{
 		content = iter.value;

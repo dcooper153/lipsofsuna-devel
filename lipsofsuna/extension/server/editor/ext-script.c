@@ -49,7 +49,10 @@ static void Editor_save (LIScrArgs* args)
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
 	server = limai_program_find_component (module->program, "server");
 	if (server != NULL)
-		liser_server_save (server);
+	{
+		if (!liser_server_save (server))
+			lisys_error_report ();
+	}
 }
 
 /*****************************************************************************/

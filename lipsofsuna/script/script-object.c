@@ -289,9 +289,10 @@ static void Object_getter_model (LIScrArgs* args)
 {
 	int id;
 	LIEngModel* model;
+	LIEngObject* self = args->self;
 
 	id = lieng_object_get_model_code (args->self);
-	model = lieng_engine_find_model_by_code (args->self, id);
+	model = lieng_engine_find_model_by_code (self->engine, id);
 	if (model != NULL)
 		liscr_args_seti_string (args, model->name);
 }
