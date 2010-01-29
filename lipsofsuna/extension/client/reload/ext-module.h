@@ -29,7 +29,7 @@
 
 #include "ext-reload.h"
 
-#define LIEXT_SCRIPT_RELOAD "Lips.Reload"
+#define LIEXT_SCRIPT_RELOAD "Reload"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

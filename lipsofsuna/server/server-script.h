@@ -27,9 +27,9 @@
 
 #include <lipsofsuna/script.h>
 
-#define LISER_SCRIPT_EXTENSION "Lips.Extension"
-#define LISER_SCRIPT_OBJECT "Lips.Object"
-#define LISER_SCRIPT_SERVER "Lips.Server"
+#define LISER_SCRIPT_EXTENSION "Extension"
+#define LISER_SCRIPT_OBJECT "Object"
+#define LISER_SCRIPT_SERVER "Server"
 
 void
 liser_script_effect (LIScrClass* self,

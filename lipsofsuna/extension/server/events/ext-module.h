@@ -28,7 +28,7 @@
 #include <lipsofsuna/main.h>
 #include <lipsofsuna/server.h>
 
-#define LIEXT_SCRIPT_EVENTS "Lips.Events"
+#define LIEXT_SCRIPT_EVENTS "Events"
 
 enum
 {

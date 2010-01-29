@@ -28,16 +28,16 @@
 #include <lipsofsuna/script.h>
 #include <lipsofsuna/widget.h>
 
-#define LICLI_SCRIPT_ACTION "Lips.Action"
-#define LICLI_SCRIPT_BINDING "Lips.Binding"
-#define LICLI_SCRIPT_CLIENT "Lips.Client"
-#define LICLI_SCRIPT_EXTENSION "Lips.Extension"
-#define LICLI_SCRIPT_GROUP "Lips.Group"
-#define LICLI_SCRIPT_LIGHT "Lips.Light"
-#define LICLI_SCRIPT_PLAYER "Lips.Player"
-#define LICLI_SCRIPT_SCENE "Lips.Scene"
-#define LICLI_SCRIPT_WIDGET "Lips.Widget"
-#define LICLI_SCRIPT_WINDOW "Lips.Window"
+#define LICLI_SCRIPT_ACTION "Action"
+#define LICLI_SCRIPT_BINDING "Binding"
+#define LICLI_SCRIPT_CLIENT "Client"
+#define LICLI_SCRIPT_EXTENSION "Extension"
+#define LICLI_SCRIPT_GROUP "Group"
+#define LICLI_SCRIPT_LIGHT "Light"
+#define LICLI_SCRIPT_PLAYER "Player"
+#define LICLI_SCRIPT_SCENE "Scene"
+#define LICLI_SCRIPT_WIDGET "Widget"
+#define LICLI_SCRIPT_WINDOW "Window"
 
 void
 licli_script_action (LIScrClass* self,

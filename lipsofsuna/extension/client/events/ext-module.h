@@ -30,7 +30,7 @@
 #include <lipsofsuna/client.h>
 #include <lipsofsuna/script.h>
 
-#define LIEXT_SCRIPT_EVENTS "Lips.Events"
+#define LIEXT_SCRIPT_EVENTS "Events"
 
 enum
 {

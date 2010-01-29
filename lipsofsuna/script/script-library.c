@@ -60,8 +60,8 @@ static void Class_check (LIScrArgs* args)
  * -- Inherits a class from another.
  * --
  * -- Arguments:
- * -- base: Base class.
- * -- name: Class name.
+ * -- 1,name: Class name. (required)
+ * -- 2,base: Base class.
  * --
  * -- @param self Class class.
  * -- @param args Arguments.
@@ -74,8 +74,18 @@ static void Class_new (LIScrArgs* args)
 	LIScrClass* base;
 	LIScrClass* clss;
 
-	if (liscr_args_gets_class (args, "base", NULL, &base) &&
-	    liscr_args_gets_string (args, "name", &name))
+	name = NULL;
+	liscr_args_gets_string (args, "name", &name);
+
+	if (!liscr_args_gets_class (args, "base", NULL, &base) &&
+	    !liscr_args_geti_class (args, 1, NULL, &base))
+	{
+		base = liscr_script_find_class (args->script, "Data");
+		if (base == NULL)
+			return;
+	}
+	if (liscr_args_gets_string (args, "name", &name) ||
+	    liscr_args_geti_string (args, 0, &name))
 	{
 		/* Check for duplicates. */
 		clss = liscr_script_find_class (args->script, name);
@@ -97,15 +107,75 @@ static void Class_new (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * ---
+ * -- Name of the class.
+ * --
+ * -- @name Class.name
+ * -- @class table
+ */
+static void Class_getter_name (LIScrArgs* args)
+{
+	liscr_args_seti_string (args, liscr_class_get_name (args->self));
+}
+
+/*****************************************************************************/
+
+/* @luadoc
+ * module "Core.Common.Data"
+ * ---
+ * -- Default base class.
+ * -- @name Data
+ * -- @class table
+ */
+
+/* @luadoc
+ * ---
+ * -- Creates an instance of the default base class.
+ * --
+ * -- @param self Data class.
+ * -- @param args Arguments.
+ * -- @return New data.
+ * function Class.new(self, args)
+ */
+static void Data_new (LIScrArgs* args)
+{
+	LIScrData* data;
+	LIScrClass* clss;
+
+	/* Get real class. */
+	clss = liscr_isanyclass (args->lua, 1);
+	if (clss == NULL)
+		return;
+
+	/* Allocate userdata. */
+	data = liscr_data_new_alloc (args->script, 1, clss->meta);
+	if (data == NULL)
+		return;
+
+	/* Initialize userdata. */
+	liscr_args_call_setters (args, data);
+	liscr_args_seti_data (args, data);
+}
+
 /*****************************************************************************/
 
 void
 liscr_script_class (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_CLASS, data);
 	liscr_class_insert_cfunc (self, "check", Class_check);
 	liscr_class_insert_cfunc (self, "new", Class_new);
+	liscr_class_insert_mvar (self, "name", Class_getter_name, NULL);
+}
+
+void
+liscr_script_data (LIScrClass* self,
+                   void*       data)
+{
+	liscr_class_set_userdata (self, LISCR_SCRIPT_DATA, data);
+	liscr_class_insert_cfunc (self, "new", Data_new);
 }
 
 /** @} */

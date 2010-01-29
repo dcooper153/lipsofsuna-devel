@@ -29,15 +29,15 @@
 
 #include <lipsofsuna/script.h>
 
-#define LIEXT_SCRIPT_BUTTON "Lips.Button"
-#define LIEXT_SCRIPT_ENTRY "Lips.Entry"
-#define LIEXT_SCRIPT_IMAGE "Lips.Image"
-#define LIEXT_SCRIPT_LABEL "Lips.Label"
-#define LIEXT_SCRIPT_MENU "Lips.Menu"
-#define LIEXT_SCRIPT_SCROLL "Lips.Scroll"
-#define LIEXT_SCRIPT_SPIN "Lips.Spin"
-#define LIEXT_SCRIPT_TREE "Lips.Tree"
-#define LIEXT_SCRIPT_VIEW "Lips.View"
+#define LIEXT_SCRIPT_BUTTON "Button"
+#define LIEXT_SCRIPT_ENTRY "Entry"
+#define LIEXT_SCRIPT_IMAGE "Image"
+#define LIEXT_SCRIPT_LABEL "Label"
+#define LIEXT_SCRIPT_MENU "Menu"
+#define LIEXT_SCRIPT_SCROLL "Scroll"
+#define LIEXT_SCRIPT_SPIN "Spin"
+#define LIEXT_SCRIPT_TREE "Tree"
+#define LIEXT_SCRIPT_VIEW "View"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

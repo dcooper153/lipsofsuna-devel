@@ -29,7 +29,7 @@
 
 #include <lipsofsuna/script.h>
 
-#define LIEXT_SCRIPT_EFFECT "Lips.Effect"
+#define LIEXT_SCRIPT_EFFECT "Effect"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

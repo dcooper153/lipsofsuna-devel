@@ -35,7 +35,7 @@ typedef struct _LIExtModule LIExtModule;
 
 #include "ext-block.h"
 
-#define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
+#define LIEXT_SCRIPT_VOXEL "Voxel"
 
 struct _LIExtModule
 {

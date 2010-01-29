@@ -21,41 +21,46 @@
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/script.h>
 
-#define LISCR_SCRIPT_CLASS "Lips.Class"
-#define LISCR_SCRIPT_EVENT "Lips.Event"
-#define LISCR_SCRIPT_OBJECT "Lips.Object"
-#define LISCR_SCRIPT_PACKET "Lips.Packet"
-#define LISCR_SCRIPT_PATH "Lips.Path"
-#define LISCR_SCRIPT_QUATERNION "Lips.Quaternion"
-#define LISCR_SCRIPT_VECTOR "Lips.Vector"
+#define LISCR_SCRIPT_CLASS "Class"
+#define LISCR_SCRIPT_DATA "Data"
+#define LISCR_SCRIPT_EVENT "Event"
+#define LISCR_SCRIPT_OBJECT "Object"
+#define LISCR_SCRIPT_PACKET "Packet"
+#define LISCR_SCRIPT_PATH "Path"
+#define LISCR_SCRIPT_QUATERNION "Quaternion"
+#define LISCR_SCRIPT_VECTOR "Vector"
 
 void
 liscr_script_class (LIScrClass* clss,
-                  void*       data);
+                    void*       data);
+
+void
+liscr_script_data (LIScrClass* clss,
+                   void*       data);
 
 void
 liscr_script_event (LIScrClass* clss,
-                  void*       data);
+                    void*       data);
 
 void
 liscr_script_object (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 liscr_script_packet (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 void
 liscr_script_path (LIScrClass* self,
-                 void*       data);
+                   void*       data);
 
 void
 liscr_script_quaternion (LIScrClass* self,
-                       void*       data);
+                         void*       data);
 
 void
 liscr_script_vector (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 /*****************************************************************************/
 

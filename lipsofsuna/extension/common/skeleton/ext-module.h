@@ -27,7 +27,7 @@
 
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_SKELETON "Lips.Skeleton"
+#define LIEXT_SCRIPT_SKELETON "Skeleton"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

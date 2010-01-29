@@ -29,7 +29,7 @@
 
 #include <lipsofsuna/script.h>
 
-#define LIEXT_SCRIPT_OPTIONS "Lips.Options"
+#define LIEXT_SCRIPT_OPTIONS "Options"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

@@ -28,7 +28,7 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_SKILLS "Lips.Skills"
+#define LIEXT_SCRIPT_SKILLS "Skills"
 
 typedef enum _LIExtSkillType LIExtSkillType;
 typedef struct _LIExtSkill LIExtSkill;

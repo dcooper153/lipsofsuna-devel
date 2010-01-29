@@ -28,7 +28,7 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_SPAWNER "Lips.Spawner"
+#define LIEXT_SCRIPT_SPAWNER "Spawner"
 
 typedef struct _LIExtSpawner LIExtSpawner;
 typedef struct _LIExtModule LIExtModule;

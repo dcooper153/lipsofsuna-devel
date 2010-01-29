@@ -40,9 +40,9 @@ private_insert_func (LIScrClass*   self,
                      LIScrArgsFunc func);
 
 static int
-private_insert_var (LIScrClass*     self,
-                    int             member,
-                    const char*     name,
+private_insert_var (LIScrClass*   self,
+                    int           member,
+                    const char*   name,
                     LIScrArgsFunc args,
                     LIScrArgsFunc setter);
 
@@ -103,15 +103,13 @@ liscr_class_new_full (LIScrScript* script,
 	}
 
 	/* Allocate metatable name. */
-	self->meta = lisys_malloc (strlen (name) + 6);
+	self->meta = listr_dup (name);
 	if (self->meta == NULL)
 	{
 		lisys_free (self->name);
 		lisys_free (self);
 		return NULL;
 	}
-	strcpy (self->meta, "Lips.");
-	strcat (self->meta, name);
 
 	/* Allocate userdata. */
 	self->userdata = lialg_strdic_new ();

@@ -30,7 +30,7 @@
 #include <lipsofsuna/client.h>
 #include <lipsofsuna/script.h>
 
-#define LIEXT_SCRIPT_SPEECH "Lips.Speech"
+#define LIEXT_SCRIPT_SPEECH "Speech"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

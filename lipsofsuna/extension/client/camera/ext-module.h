@@ -27,7 +27,7 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#define LIEXT_SCRIPT_CAMERA "Lips.Camera"
+#define LIEXT_SCRIPT_CAMERA "Camera"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

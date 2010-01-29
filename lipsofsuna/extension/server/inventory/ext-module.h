@@ -27,7 +27,7 @@
 
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_INVENTORY "Lips.Inventory"
+#define LIEXT_SCRIPT_INVENTORY "Inventory"
 
 typedef struct _LIExtInventory LIExtInventory;
 typedef struct _LIExtModule LIExtModule;

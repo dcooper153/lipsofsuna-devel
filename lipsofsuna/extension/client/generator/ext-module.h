@@ -29,7 +29,7 @@
 
 #include "ext-module.h"
 
-#define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
+#define LIEXT_SCRIPT_GENERATOR "Generator"
 
 typedef struct _LIExtBrushes LIExtBrushes;
 typedef struct _LIExtEditor LIExtEditor;

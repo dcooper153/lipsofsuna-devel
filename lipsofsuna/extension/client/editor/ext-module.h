@@ -30,7 +30,7 @@
 #include "ext-editor.h"
 #include "ext-dialog.h"
 
-#define LIEXT_SCRIPT_EDITOR "Lips.Editor"
+#define LIEXT_SCRIPT_EDITOR "Editor"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

@@ -29,9 +29,9 @@
 
 #include <lipsofsuna/algorithm.h>
 
-#define LIEXT_SCRIPT_SKILL "Lips.Skill"
-#define LIEXT_SCRIPT_SKILLS "Lips.Skills"
-#define LIEXT_SCRIPT_SKILL_WIDGET "Lips.SkillWidget"
+#define LIEXT_SCRIPT_SKILL "Skill"
+#define LIEXT_SCRIPT_SKILLS "Skills"
+#define LIEXT_SCRIPT_SKILL_WIDGET "SkillWidget"
 
 typedef struct _LIExtModule LIExtModule;
 typedef struct _LIExtSkill LIExtSkill;

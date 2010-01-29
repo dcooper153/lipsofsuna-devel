@@ -76,6 +76,7 @@ liser_server_new (LIPthPaths* paths)
 	if (!private_init_sql (self) ||
 	    !liser_server_init_callbacks_client (self) ||
 	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
+	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
 	    !liscr_script_create_class (self->script, "Effect", liser_script_effect, self) ||
 	    !liscr_script_create_class (self->script, "Extension", liser_script_extension, self) ||
 	    !liscr_script_create_class (self->script, "Object", liser_script_object, self) ||

@@ -94,17 +94,19 @@ liscr_isclass (lua_State*  lua,
 	LIScrClass* clss;
 	LIScrScript* script = liscr_script (lua);
 
-	lua_pushvalue (lua, arg);
-	lua_getfield (lua, LUA_REGISTRYINDEX, meta);
-	ret = lua_rawequal (lua, -1, -2);
-	lua_pop (lua, 2);
-	if (!ret)
-		return NULL;
 	LIALG_STRDIC_FOREACH (iter, script->classes)
 	{
 		clss = iter.value;
-		if (!strcmp (clss->meta, meta))
-			return clss;
+		lua_pushvalue (lua, arg);
+		lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
+		ret = lua_rawequal (lua, -1, -2);
+		lua_pop (lua, 2);
+		if (ret)
+		{
+			if (liscr_class_get_interface (clss, meta))
+				return clss;
+			break;
+		}
 	}
 
 	return NULL;

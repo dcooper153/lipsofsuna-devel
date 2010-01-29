@@ -30,7 +30,7 @@
 #include <lipsofsuna/script.h>
 #include "ext-packager.h"
 
-#define LIEXT_SCRIPT_PACKAGER "Lips.Packager"
+#define LIEXT_SCRIPT_PACKAGER "Packager"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

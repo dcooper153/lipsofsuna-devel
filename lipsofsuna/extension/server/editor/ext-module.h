@@ -27,7 +27,7 @@
 
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_EDITOR "Lips.Editor"
+#define LIEXT_SCRIPT_EDITOR "Editor"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

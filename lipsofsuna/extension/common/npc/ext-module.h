@@ -30,7 +30,7 @@
 #include <lipsofsuna/main.h>
 #include <lipsofsuna/voxel.h>
 
-#define LIEXT_SCRIPT_NPC "Lips.Npc"
+#define LIEXT_SCRIPT_NPC "Npc"
 
 typedef struct _LIExtModule LIExtModule;
 typedef struct _LIExtNpc LIExtNpc;

@@ -27,7 +27,7 @@
 
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_CREATURE "Lips.Creature"
+#define LIEXT_SCRIPT_CREATURE "Creature"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

@@ -29,7 +29,7 @@
 
 #include <lipsofsuna/script.h>
 
-#define LIEXT_SCRIPT_CHAT_HISTORY "Lips.ChatHistory"
+#define LIEXT_SCRIPT_CHAT_HISTORY "ChatHistory"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

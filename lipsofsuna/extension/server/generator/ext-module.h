@@ -28,7 +28,7 @@
 #include <lipsofsuna/main.h>
 #include "ext-generator.h"
 
-#define LIEXT_SCRIPT_GENERATOR "Lips.Generator"
+#define LIEXT_SCRIPT_GENERATOR "Generator"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

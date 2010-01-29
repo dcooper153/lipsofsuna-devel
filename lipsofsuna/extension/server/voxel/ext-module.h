@@ -40,9 +40,9 @@ typedef struct _LIExtModule LIExtModule;
 #include "ext-block.h"
 #include "ext-listener.h"
 
-#define LIEXT_SCRIPT_MATERIAL "Lips.Material"
-#define LIEXT_SCRIPT_TILE "Lips.Tile"
-#define LIEXT_SCRIPT_VOXEL "Lips.Voxel"
+#define LIEXT_SCRIPT_MATERIAL "Material"
+#define LIEXT_SCRIPT_TILE "Tile"
+#define LIEXT_SCRIPT_VOXEL "Voxel"
 
 struct _LIExtModule
 {

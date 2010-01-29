@@ -33,7 +33,7 @@
 #include <lipsofsuna/sound.h>
 #endif
 
-#define LIEXT_SCRIPT_SOUND "Lips.Sound"
+#define LIEXT_SCRIPT_SOUND "Sound"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

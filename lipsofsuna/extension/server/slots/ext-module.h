@@ -27,7 +27,7 @@
 
 #include <lipsofsuna/main.h>
 
-#define LIEXT_SCRIPT_SLOTS "Lips.Slots"
+#define LIEXT_SCRIPT_SLOTS "Slots"
 
 typedef enum _LIExtSlotType LIExtSlotType;
 typedef struct _LIExtSlot LIExtSlot;

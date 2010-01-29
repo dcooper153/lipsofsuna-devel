@@ -208,9 +208,47 @@ static void Skills_get_names (LIScrArgs* args)
 	LIExtSkills* skills;
 
 	skills = args->self;
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	LIALG_STRDIC_FOREACH (iter, skills->skills)
 		liscr_args_seti_string (args, iter.key);
+}
+
+/* @luadoc
+ * ---
+ * -- @brief Gets the protection type of the skill.
+ * --
+ * -- Arguments:
+ * -- skill: Skill name.
+ * --
+ * -- @param self Skills.
+ * -- @param args Arguments.
+ * -- @return Number or nil.
+ * function Skills.get_protect(self, args)
+ */
+static void Skills_get_protect (LIScrArgs* args)
+{
+	const char* name;
+	LIExtSkill* skill;
+
+	if (liscr_args_gets_string (args, "skill", &name))
+	{
+		skill = liext_skills_find_skill (args->self, name);
+		if (skill != NULL)
+		{
+			switch (skill->type)
+			{
+				case LIEXT_SKILL_TYPE_INTERNAL:
+					liscr_args_seti_string (args, "internal");
+					break;
+				case LIEXT_SKILL_TYPE_PUBLIC:
+					liscr_args_seti_string (args, "public");
+					break;
+				default:
+					liscr_args_seti_string (args, "private");
+					break;
+			}
+		}
+	}
 }
 
 /* @luadoc
@@ -461,6 +499,7 @@ liext_script_skills (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "subtract", Skills_subtract);
 	liscr_class_insert_mfunc (self, "get_maximum", Skills_get_maximum);
 	liscr_class_insert_mfunc (self, "get_names", Skills_get_names);
+	liscr_class_insert_mfunc (self, "get_protect", Skills_get_protect);
 	liscr_class_insert_mfunc (self, "get_regen", Skills_get_regen);
 	liscr_class_insert_mfunc (self, "get_value", Skills_get_value);
 	liscr_class_insert_mfunc (self, "has_skill", Skills_has_skill);
