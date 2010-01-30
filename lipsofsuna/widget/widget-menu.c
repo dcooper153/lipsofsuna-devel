@@ -176,7 +176,7 @@ liwdg_menu_get_item_rect (const LIWdgMenu* self,
 	}
 	else
 	{
-		for (i = self->items.count - 1 ; i >= 0 ; i--)
+		for (i = 0 ; i < self->items.count ; i++)
 		{
 			item = self->items.array[i];
 			if (!strcmp (name, item->text))
@@ -279,7 +279,7 @@ private_render_horizontal (LIWdgMenu*  self)
 	liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 
 	/* Render each item. */
-	for (i = self->items.count - 1 ; i >= 0 ; i--)
+	for (i = 0 ; i < self->items.count ; i++)
 	{
 		item = self->items.array[i];
 		glColor4fv (style->color);
@@ -429,7 +429,7 @@ private_item_find (LIWdgMenu* self,
 	}
 	else
 	{
-		for (i = self->items.count - 1 ; i >= 0 ; i--)
+		for (i = 0 ; i < self->items.count ; i++)
 		{
 			item = self->items.array[i];
 			size = lifnt_layout_get_width (item->label);
