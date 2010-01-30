@@ -26,7 +26,7 @@
 #include "render-draw.h"
 #include "render-light.h"
 
-#define LIGHT_CONTRIBUTION_EPSILON 0.01f
+#define LIGHT_CONTRIBUTION_EPSILON 0.001f
 
 static void
 private_update_shadow (LIRenLight* self);
@@ -249,20 +249,21 @@ liren_light_get_bounds (const LIRenLight* self,
 
 	/* Choose epsilon. */
 	eps = LIMAT_MAX (LIMAT_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
-	eps /= 255.0;
+	eps /= 256.0;
 	if (eps < LIGHT_CONTRIBUTION_EPSILON)
 		eps = LIGHT_CONTRIBUTION_EPSILON;
-	eps *= 0.5;
 
 	/* Solve radius. */
-	/* (e0 * r^2) + (e1 * r) + (e2 - 1 / EPSILON) < 0 */
-	a = self->equation[0];
-	b = self->equation[1];
-	c = self->equation[2] - 1.0 / eps;
+	/* 1 / (A * r^2 + B * r + C) = E */
+	/* (EA) * r^2 + (EB) * r + (Ec-1) = 0 */
+	a = eps * self->equation[0];
+	b = eps * self->equation[1];
+	c = eps * self->equation[2] - 1.0;
 	det = b * b - 4 * a * c;
 	if (det < 0.0)
 		return 0;
-	r = (-b + sqrt (det)) / (4 * a);
+	r = (-b + sqrt (det)) / (2.0 * a);
+	r = r + 0.5;
 
 	/* Create bounding box. */
 	result->min = limat_vector_subtract (self->transform.position, limat_vector_init (r, r, r));

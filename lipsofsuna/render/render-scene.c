@@ -606,6 +606,7 @@ private_lighting_render (LIRenScene*    self,
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (matrix.m);
 	glDisable (GL_LIGHTING);
+	glDisable (GL_TEXTURE_2D);
 	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 	{
 		light = iter.value;
