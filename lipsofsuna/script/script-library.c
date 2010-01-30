@@ -74,9 +74,6 @@ static void Class_new (LIScrArgs* args)
 	LIScrClass* base;
 	LIScrClass* clss;
 
-	name = NULL;
-	liscr_args_gets_string (args, "name", &name);
-
 	if (!liscr_args_gets_class (args, "base", NULL, &base) &&
 	    !liscr_args_geti_class (args, 1, NULL, &base))
 	{
@@ -105,18 +102,6 @@ static void Class_new (LIScrArgs* args)
 		/* Return class. */
 		liscr_args_seti_class (args, clss);
 	}
-}
-
-/* @luadoc
- * ---
- * -- Name of the class.
- * --
- * -- @name Class.name
- * -- @class table
- */
-static void Class_getter_name (LIScrArgs* args)
-{
-	liscr_args_seti_string (args, liscr_class_get_name (args->self));
 }
 
 /*****************************************************************************/
@@ -158,6 +143,30 @@ static void Data_new (LIScrArgs* args)
 	liscr_args_seti_data (args, data);
 }
 
+/* @luadoc
+ * ---
+ * -- Class of the type.
+ * --
+ * -- @name Data.class
+ * -- @class table
+ */
+static void Data_getter_class (LIScrArgs* args)
+{
+	liscr_args_seti_class (args, args->clss);
+}
+
+/* @luadoc
+ * ---
+ * -- Class name of the type.
+ * --
+ * -- @name Data.class_name
+ * -- @class table
+ */
+static void Data_getter_class_name (LIScrArgs* args)
+{
+	liscr_args_seti_string (args, liscr_class_get_name (args->clss));
+}
+
 /*****************************************************************************/
 
 void
@@ -167,7 +176,6 @@ liscr_script_class (LIScrClass* self,
 	liscr_class_set_userdata (self, LISCR_SCRIPT_CLASS, data);
 	liscr_class_insert_cfunc (self, "check", Class_check);
 	liscr_class_insert_cfunc (self, "new", Class_new);
-	liscr_class_insert_mvar (self, "name", Class_getter_name, NULL);
 }
 
 void
@@ -176,6 +184,8 @@ liscr_script_data (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_DATA, data);
 	liscr_class_insert_cfunc (self, "new", Data_new);
+	liscr_class_insert_cvar (self, "class", Data_getter_class, NULL);
+	liscr_class_insert_cvar (self, "class_name", Data_getter_class_name, NULL);
 }
 
 /** @} */

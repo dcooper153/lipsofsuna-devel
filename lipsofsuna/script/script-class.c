@@ -501,6 +501,12 @@ liscr_class_default___index (lua_State* lua)
 				return 0;
 			if (func->member && self == NULL)
 				return 0;
+			if (!func->member && self != NULL)
+			{
+				liscr_pushclass (lua, clss);
+				lua_replace (lua, 1);
+				self = NULL;
+			}
 			liscr_args_init_getter (&args, lua, clss, self);
 			func->getter (&args);
 			if (!args.output_table)
@@ -587,6 +593,12 @@ liscr_class_default___newindex (lua_State* lua)
 				return 0;
 			if (func->member && self == NULL)
 				return 0;
+			if (!func->member && self != NULL)
+			{
+				liscr_pushclass (lua, clss);
+				lua_replace (lua, 1);
+				self = NULL;
+			}
 			liscr_args_init_setter (&args, lua, clss, self);
 			func->setter (&args);
 			return 0;

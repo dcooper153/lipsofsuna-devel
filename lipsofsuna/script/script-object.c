@@ -176,6 +176,18 @@ static void Object_setter_class (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Class name of the object.
+ * --
+ * -- @name Object.class_name
+ * -- @class table
+ */
+static void Object_getter_class_name (LIScrArgs* args)
+{
+	liscr_args_seti_string (args, liscr_class_get_name (args->clss));
+}
+
+/* @luadoc
+ * ---
  * -- Collision group bitmask.
  * --
  * -- @name Object.collision_group
@@ -504,6 +516,7 @@ liscr_script_object (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "jump", Object_jump);
 	liscr_class_insert_mvar (self, "angular_momentum", Object_getter_angular_momentum, Object_setter_angular_momentum);
 	liscr_class_insert_mvar (self, "class", Object_getter_class, Object_setter_class);
+	liscr_class_insert_cvar (self, "class_name", Object_getter_class_name, NULL);
 	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);
 	liscr_class_insert_mvar (self, "collision_mask", Object_getter_collision_mask, Object_setter_collision_mask);
 	liscr_class_insert_mvar (self, "gravity", Object_getter_gravity, Object_setter_gravity);
