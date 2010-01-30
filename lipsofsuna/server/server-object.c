@@ -368,136 +368,137 @@ liser_object_serialize (LIEngObject* self,
 	{
 		if (!private_delete_animations (self))
 			return 0;
+
+		/* Collect values. */
+		flags = LISER_OBJECT (self)->flags;
 		if (lieng_object_get_realized (self))
-		{
-			/* Collect values. */
-			flags = LISER_OBJECT (self)->flags;
 			sector = self->sector->sector->index;
-			model = (self->model != NULL)? self->model->name : NULL;
-			mass = lieng_object_get_mass (self);
-			movement = liphy_object_get_movement (self->physics);
-			speed = lieng_object_get_speed (self);
-			step = 0.0f;
-			colgroup = lieng_object_get_collision_group (self);
-			colmask = lieng_object_get_collision_mask (self);
-			control = liphy_object_get_control_mode (self->physics);
-			lieng_object_get_transform (self, &transform);
-			lieng_object_get_angular_momentum (self, &angular);
-			type = NULL;
-			extra = NULL;
+		else
+			sector = -1;
+		model = (self->model != NULL)? self->model->name : NULL;
+		mass = lieng_object_get_mass (self);
+		movement = liphy_object_get_movement (self->physics);
+		speed = lieng_object_get_speed (self);
+		step = 0.0f;
+		colgroup = lieng_object_get_collision_group (self);
+		colmask = lieng_object_get_collision_mask (self);
+		control = liphy_object_get_control_mode (self->physics);
+		lieng_object_get_transform (self, &transform);
+		lieng_object_get_angular_momentum (self, &angular);
+		type = NULL;
+		extra = NULL;
 
-			/* Prepare statement. */
-			query = "INSERT OR REPLACE INTO objects "
-				"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
-				"mass,move,speed,step,colgrp,colmsk,control,model,type,extra) VALUES "
-				"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-			if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-			{
-				lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-				return 0;
-			}
+		/* Prepare statement. */
+		query = "INSERT OR REPLACE INTO objects "
+			"(id,sector,flags,angx,angy,angz,posx,posy,posz,rotx,roty,rotz,rotw,"
+			"mass,move,speed,step,colgrp,colmsk,control,model,type,extra) VALUES "
+			"(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+		if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
+		{
+			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
+			return 0;
+		}
 
-			/* Bind values. */
-			col = 1;
-			ret = (sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, sector) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, flags) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, angular.x) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, angular.y) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, angular.x) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.position.x) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.position.y) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.position.z) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.x) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.y) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.z) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, transform.rotation.w) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, mass) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, movement) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, speed) != SQLITE_OK ||
-				sqlite3_bind_double (statement, col++, step) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, colgroup) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, colmask) != SQLITE_OK ||
-				sqlite3_bind_int (statement, col++, control) != SQLITE_OK);
-			if (!ret)
-			{
-				if (model != NULL)
-					ret = (sqlite3_bind_text (statement, col++, model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
-				else
-					ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
-			}
-			if (ret)
-			{
-				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-				sqlite3_finalize (statement);
-				return 0;
-			}
-
-			/* Bind script values. */
-			script = NULL;
-			if (self->script != NULL)
-			{
-				script = LISER_OBJECT (self)->server->script;
-				liscr_pushdata (script->lua, self->script);
-				lua_getfield (script->lua, -1, "write_cb");
-				if (lua_type (script->lua, -1) == LUA_TFUNCTION)
-				{
-					lua_pushvalue (script->lua, -2);
-					lua_remove (script->lua, -3);
-					if (lua_pcall (script->lua, 1, 2, 0) != 0)
-					{
-						lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.write_cb: %s", lua_tostring (script->lua, -1));
-						lua_pop (script->lua, 1);
-						return 0;
-					}
-					if (lua_type (script->lua, -2) == LUA_TSTRING)
-						type = lua_tostring (script->lua, -2);
-					else
-						lua_remove (script->lua, -2);
-					if (lua_type (script->lua, -1) == LUA_TSTRING)
-						extra = lua_tostring (script->lua, -1);
-					else
-						lua_remove (script->lua, -1);
-				}
-				else
-					lua_pop (script->lua, 2);
-			}
-			if (type != NULL)
-			{
-				assert (script != NULL);
-				ret = (sqlite3_bind_text (statement, col++, type, -1, SQLITE_TRANSIENT) != SQLITE_OK);
-				lua_pop (script->lua, 1);
-			}
+		/* Bind values. */
+		col = 1;
+		ret = (sqlite3_bind_int (statement, col++, self->id) != SQLITE_OK ||
+			sqlite3_bind_int (statement, col++, sector) != SQLITE_OK ||
+			sqlite3_bind_int (statement, col++, flags) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, angular.x) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, angular.y) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, angular.x) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.position.x) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.position.y) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.position.z) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.rotation.x) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.rotation.y) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.rotation.z) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, transform.rotation.w) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, mass) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, movement) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, speed) != SQLITE_OK ||
+			sqlite3_bind_double (statement, col++, step) != SQLITE_OK ||
+			sqlite3_bind_int (statement, col++, colgroup) != SQLITE_OK ||
+			sqlite3_bind_int (statement, col++, colmask) != SQLITE_OK ||
+			sqlite3_bind_int (statement, col++, control) != SQLITE_OK);
+		if (!ret)
+		{
+			if (model != NULL)
+				ret = (sqlite3_bind_text (statement, col++, model, -1, SQLITE_TRANSIENT) != SQLITE_OK);
 			else
 				ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
-			if (extra != NULL)
+		}
+		if (ret)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Bind script values. */
+		script = NULL;
+		if (self->script != NULL)
+		{
+			script = LISER_OBJECT (self)->server->script;
+			liscr_pushdata (script->lua, self->script);
+			lua_getfield (script->lua, -1, "write_cb");
+			if (lua_type (script->lua, -1) == LUA_TFUNCTION)
 			{
-				assert (script != NULL);
-				ret = (ret || sqlite3_bind_text (statement, col++, extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
-				lua_pop (script->lua, 1);
+				lua_pushvalue (script->lua, -2);
+				lua_remove (script->lua, -3);
+				if (lua_pcall (script->lua, 1, 2, 0) != 0)
+				{
+					lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.write_cb: %s", lua_tostring (script->lua, -1));
+					lua_pop (script->lua, 1);
+					return 0;
+				}
+				if (lua_type (script->lua, -2) == LUA_TSTRING)
+					type = lua_tostring (script->lua, -2);
+				else
+					lua_remove (script->lua, -2);
+				if (lua_type (script->lua, -1) == LUA_TSTRING)
+					extra = lua_tostring (script->lua, -1);
+				else
+					lua_remove (script->lua, -1);
 			}
 			else
-				ret = (ret || sqlite3_bind_null (statement, col++) != SQLITE_OK);
-			if (ret)
-			{
-				lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
-				sqlite3_finalize (statement);
-				return 0;
-			}
-
-			/* Write values. */
-			if (sqlite3_step (statement) != SQLITE_DONE)
-			{
-				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-				sqlite3_finalize (statement);
-				return 0;
-			}
-			sqlite3_finalize (statement);
-
-			/* Write animation data. */
-			if (self->script != NULL)
-				private_write_animations (self);
+				lua_pop (script->lua, 2);
 		}
+		if (type != NULL)
+		{
+			assert (script != NULL);
+			ret = (sqlite3_bind_text (statement, col++, type, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+			lua_pop (script->lua, 1);
+		}
+		else
+			ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
+		if (extra != NULL)
+		{
+			assert (script != NULL);
+			ret = (ret || sqlite3_bind_text (statement, col++, extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
+			lua_pop (script->lua, 1);
+		}
+		else
+			ret = (ret || sqlite3_bind_null (statement, col++) != SQLITE_OK);
+		if (ret)
+		{
+			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Write values. */
+		if (sqlite3_step (statement) != SQLITE_DONE)
+		{
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
+			sqlite3_finalize (statement);
+			return 0;
+		}
+		sqlite3_finalize (statement);
+
+		/* Write animation data. */
+		if (self->script != NULL)
+			private_write_animations (self);
 	}
 
 	return 1;

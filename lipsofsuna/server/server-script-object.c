@@ -210,6 +210,10 @@ static void Object_insert_hinge_constraint (LIScrArgs* args)
  * ---
  * -- Creates a new object.
  * --
+ * -- Arguments:
+ * -- id: Load the object with this ID from the database.
+ * -- purge: Remove from the database after loading.
+ * --
  * -- @param self Object class.
  * -- @param args Arguments.
  * -- @return New object.
@@ -217,12 +221,33 @@ static void Object_insert_hinge_constraint (LIScrArgs* args)
  */
 static void Object_new (LIScrArgs* args)
 {
+	int id;
+	int purge;
 	int realize = 0;
 	LIEngObject* self;
 	LISerServer* server;
 
-	/* Allocate self. */
+	/* Handle loading. */
 	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_OBJECT);
+	if (liscr_args_gets_int (args, "id", &id))
+	{
+		self = lieng_engine_find_object (server->engine, id);
+		if (self == NULL)
+		{
+			self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
+			if (self == NULL)
+				return;
+			if (liser_object_serialize (self, 0))
+				liscr_args_seti_data (args, self->script);
+		}
+		else
+			liscr_args_seti_data (args, self->script);
+		if (liscr_args_gets_bool (args, "purge", &purge) && purge)
+			liser_object_purge (self);
+		return;
+	}
+
+	/* Allocate self. */
 	self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 
 		liser_server_get_unique_object (server));
 	if (self == NULL)
@@ -349,6 +374,19 @@ static void Object_sweep_sphere (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Writes the object to the database.
+ * --
+ * -- @param self Object.
+ * function Object.write(self)
+ */
+static void Object_write (LIScrArgs* args)
+{
+	if (!liser_object_serialize (args->self, 1))
+		lisys_error_report ();
+}
+
+/* @luadoc
+ * ---
  * -- Custom collision response callback.
  * --
  * -- Function to be called every time the object collides with something.
@@ -435,6 +473,7 @@ liser_script_object (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "send", Object_send);
 	liscr_class_insert_mfunc (self, "swap_clients", Object_swap_clients);
 	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
+	liscr_class_insert_mfunc (self, "write", Object_write);
 	liscr_class_insert_mvar (self, "client", Object_getter_client, NULL);
 	liscr_class_insert_mvar (self, "contact_cb", Object_getter_contact_cb, Object_setter_contact_cb);
 }
