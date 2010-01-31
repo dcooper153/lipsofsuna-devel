@@ -28,77 +28,6 @@
 #include <lipsofsuna/script.h>
 #include <lipsofsuna/server.h>
 
-#define MAGICPTR_CONTACT_CALLBACK (NULL + 2)
-
-static void
-private_contact_callback (LIPhyObject*  object,
-                          LIPhyContact* contact)
-{
-	LIScrData* data;
-	LIEngObject* engobj = liphy_object_get_userdata (object);
-	LIMaiProgram* program = lieng_engine_get_userdata (engobj->engine);
-	LISerServer* server = limai_program_find_component (program, "server");
-	LIScrScript* script = server->script;
-
-	/* Push callback. */
-	liscr_pushdata (script->lua, engobj->script);
-	lua_getfield (script->lua, -1, "contact_cb");
-
-	/* Push object. */
-	lua_pushvalue (script->lua, -2);
-	lua_remove (script->lua, -3);
-
-	/* Push contact. */
-	lua_newtable (script->lua);
-
-	/* Convert impulse. */
-	lua_pushnumber (script->lua, contact->impulse);
-	lua_setfield (script->lua, -2, "impulse");
-
-	/* Convert object. */
-	if (contact->object != NULL)
-	{
-		engobj = liphy_object_get_userdata (contact->object);
-		if (engobj != NULL && engobj->script != NULL)
-		{
-			liscr_pushdata (script->lua, engobj->script);
-			lua_setfield (script->lua, -2, "object");
-		}
-	}
-
-	/* Convert point. */
-	data = liscr_vector_new (script, &contact->point);
-	if (data != NULL)
-	{
-		liscr_pushdata (script->lua, data);
-		liscr_data_unref (data, NULL);
-	}
-	else
-		lua_pushnil (script->lua);
-	lua_setfield (script->lua, -2, "point");
-
-	/* Convert normal. */
-	data = liscr_vector_new (script, &contact->normal);
-	if (data != NULL)
-	{
-		liscr_pushdata (script->lua, data);
-		liscr_data_unref (data, NULL);
-	}
-	else
-		lua_pushnil (script->lua);
-	lua_setfield (script->lua, -2, "normal");
-
-	/* Call function. */
-	if (lua_pcall (script->lua, 2, 0, 0) != 0)
-	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (script->lua, -1));
-		lisys_error_report ();
-		lua_pop (script->lua, 1);
-	}
-}
-
-/*****************************************************************************/
-
 /* @luadoc
  * module "Core.Server.Object"
  * ---
@@ -387,41 +316,6 @@ static void Object_write (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Custom collision response callback.
- * --
- * -- Function to be called every time the object collides with something.
- * --
- * -- @name Object.contact_cb
- * -- @class table
- */
-static void Object_getter_contact_cb (LIScrArgs* args)
-{
-	lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
-	lua_gettable (args->lua, 1);
-	liscr_args_seti_stack (args);
-}
-static void Object_setter_contact_cb (LIScrArgs* args)
-{
-	LIEngObject* self = args->self;
-
-	if (lua_type (args->lua, 3) == LUA_TFUNCTION)
-	{
-		liphy_object_set_contact_call (self->physics, private_contact_callback);
-		lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
-		lua_pushvalue (args->lua, 3);
-		lua_settable (args->lua, 1);
-	}
-	else
-	{
-		liphy_object_set_contact_call (self->physics, NULL);
-		lua_pushlightuserdata (args->lua, MAGICPTR_CONTACT_CALLBACK);
-		lua_pushnil (args->lua);
-		lua_settable (args->lua, 1);
-	}
-}
-
-/* @luadoc
- * ---
  * -- Client attached flag.
  * -- @name Object.client
  * -- @class table
@@ -430,6 +324,16 @@ static void Object_getter_client (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, LISER_OBJECT (args->self)->client != NULL);
 }
+
+/* @luadoc
+ * ---
+ * -- Custom collision response callback.
+ * --
+ * -- Function to be called every time the object collides with something.
+ * --
+ * -- @name Object.contact_cb
+ * -- @class table
+ */
 
 /* @luadoc
  * ---
@@ -475,7 +379,6 @@ liser_script_object (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_mfunc (self, "write", Object_write);
 	liscr_class_insert_mvar (self, "client", Object_getter_client, NULL);
-	liscr_class_insert_mvar (self, "contact_cb", Object_getter_contact_cb, Object_setter_contact_cb);
 }
 
 /** @} */

@@ -176,6 +176,78 @@ private_client_vision_show (LISerServer* server,
 	return 1;
 }
 
+static void
+private_contact_callback (LIPhyObject*  object,
+                          LIPhyContact* contact)
+{
+	LIScrData* data;
+	LIEngObject* engobj = liphy_object_get_userdata (object);
+	LIMaiProgram* program = lieng_engine_get_userdata (engobj->engine);
+	LISerServer* server = limai_program_find_component (program, "server");
+	LIScrScript* script = server->script;
+
+	/* Push callback. */
+	liscr_pushdata (script->lua, engobj->script);
+	lua_getfield (script->lua, -1, "contact_cb");
+	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+	{
+		lua_pop (script->lua, 2);
+		return;
+	}
+
+	/* Push object. */
+	lua_pushvalue (script->lua, -2);
+	lua_remove (script->lua, -3);
+
+	/* Push contact. */
+	lua_newtable (script->lua);
+
+	/* Convert impulse. */
+	lua_pushnumber (script->lua, contact->impulse);
+	lua_setfield (script->lua, -2, "impulse");
+
+	/* Convert object. */
+	if (contact->object != NULL)
+	{
+		engobj = liphy_object_get_userdata (contact->object);
+		if (engobj != NULL && engobj->script != NULL)
+		{
+			liscr_pushdata (script->lua, engobj->script);
+			lua_setfield (script->lua, -2, "object");
+		}
+	}
+
+	/* Convert point. */
+	data = liscr_vector_new (script, &contact->point);
+	if (data != NULL)
+	{
+		liscr_pushdata (script->lua, data);
+		liscr_data_unref (data, NULL);
+	}
+	else
+		lua_pushnil (script->lua);
+	lua_setfield (script->lua, -2, "point");
+
+	/* Convert normal. */
+	data = liscr_vector_new (script, &contact->normal);
+	if (data != NULL)
+	{
+		liscr_pushdata (script->lua, data);
+		liscr_data_unref (data, NULL);
+	}
+	else
+		lua_pushnil (script->lua);
+	lua_setfield (script->lua, -2, "normal");
+
+	/* Call function. */
+	if (lua_pcall (script->lua, 2, 0, 0) != 0)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (script->lua, -1));
+		lisys_error_report ();
+		lua_pop (script->lua, 1);
+	}
+}
+
 static int
 private_object_free (LISerServer* server,
                      LIEngObject* object)
@@ -232,6 +304,7 @@ private_object_new (LISerServer* server,
 	/* Extend engine object. */
 	lieng_object_set_userdata (object, data);
 	liphy_object_set_userdata (object->physics, object);
+	liphy_object_set_contact_call (object->physics, private_contact_callback);
 
 	return 1;
 }
