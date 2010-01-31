@@ -394,9 +394,12 @@ private_merge_model (LIExtBlock* self,
 		/* Add each face. */
 		for (j = 0 ; j < faces->indices.count ; j += 3)
 		{
-			/* Get vertices. */
+			/* Get rotated vertices. */
 			for (k = 0 ; k < 3 ; k++)
+			{
 				verts[k] = model->vertices.array[faces->indices.array[j + k]];
+				verts[k].coord = limat_quaternion_transform (voxel->transform.rotation, verts[k].coord);
+			}
 
 			/* Occlusion check. */
 			if ((voxel->mask & 0x01) &&
@@ -430,9 +433,10 @@ private_merge_model (LIExtBlock* self,
 				LIMAT_ABS (verts[2].coord.z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 				continue;
 
-			/* Transform to world space. */
+			/* Get vertices in world space. */
 			for (k = 0 ; k < 3 ; k++)
 			{
+				verts[k] = model->vertices.array[faces->indices.array[j + k]];
 				verts[k].coord = limat_transform_transform (voxel->transform, verts[k].coord);
 				verts[k].normal = limat_quaternion_transform (voxel->transform.rotation, verts[k].normal);
 			}
