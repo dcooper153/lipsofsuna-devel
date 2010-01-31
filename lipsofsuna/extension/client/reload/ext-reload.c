@@ -28,6 +28,7 @@
 #include <lipsofsuna/client.h>
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/voxel.h>
 #include "ext-reload.h"
 
 static int
@@ -200,8 +201,15 @@ static void
 private_reload_model (LIExtReload* self,
                       const char*  name)
 {
+	LIVoxManager* voxels;
+
 	printf ("Reloading model `%s'\n", name);
 	lieng_engine_load_model (self->client->engine, name);
+
+	/* Rebuild voxel terrain. */
+	voxels = limai_program_find_component (self->client->program, "voxel");
+	if (voxels != NULL)
+		livox_manager_reload_model (voxels, name);
 }
 
 /** @} */

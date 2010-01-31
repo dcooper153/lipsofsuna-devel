@@ -119,6 +119,10 @@ livox_manager_paste_voxels (LIVoxManager* self,
                             LIVoxVoxel*   voxels);
 
 void
+livox_manager_reload_model (LIVoxManager* self,
+                            const char*   name);
+
+void
 livox_manager_remove_material (LIVoxManager* self,
                                int           id);
 

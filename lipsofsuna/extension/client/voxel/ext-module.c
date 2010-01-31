@@ -80,6 +80,13 @@ liext_module_new (LIMaiProgram* program)
 		return NULL;
 	}
 
+	/* Register voxel component. */
+	if (!limai_program_insert_component (program, "voxel", self->voxels))
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
 	/* Allocate blocks. */
 	self->blocks = lialg_memdic_new ();
 	if (self->blocks == NULL)
@@ -119,6 +126,10 @@ liext_module_free (LIExtModule* self)
 			liext_block_free (iter.value);
 		lialg_memdic_free (self->blocks);
 	}
+
+	/* Unregister voxel component. */
+	if (self->voxels != NULL)
+		limai_program_remove_component (self->client->program, "voxel");
 
 	/* Free resources. */
 	if (self->voxels != NULL)

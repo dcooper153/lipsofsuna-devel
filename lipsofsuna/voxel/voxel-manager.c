@@ -578,6 +578,47 @@ livox_manager_paste_voxels (LIVoxManager* self,
 }
 
 void
+livox_manager_reload_model (LIVoxManager* self,
+                            const char*   name)
+{
+	int x;
+	int y;
+	int z;
+	int found = 0;
+	LIAlgU32dicIter iter;
+	LIVoxSector* sector;
+	LIVoxMaterial* material;
+
+	/* Check if any materials were affected. */
+	LIALG_U32DIC_FOREACH (iter, self->materials)
+	{
+		material = iter.value;
+		if (!strcmp (material->model, name))
+		{
+			found = 1;
+			break;
+		}
+	}
+	if (!found)
+		return;
+
+	/* Rebuild affected sectors. */
+	/* FIXME: Just rebuilds everything. */
+	LIALG_U32DIC_FOREACH (iter, self->sectors->sectors)
+	{
+		sector = lialg_sectors_data_index (self->sectors, "voxel", iter.key, 0);
+		if (sector == NULL)
+			continue;
+		for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
+		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
+		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++)
+		{
+			livox_sector_build_block (sector, x, y, z);
+		}
+	}
+}
+
+void
 livox_manager_remove_material (LIVoxManager* self,
                                int           id)
 {
