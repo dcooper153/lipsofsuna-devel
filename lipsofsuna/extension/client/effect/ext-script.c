@@ -104,6 +104,7 @@ static void Effect_particle (LIScrArgs* args)
  * -- fade: Fade start time in seconds.
  * -- life: Particle lifetime in seconds.
  * -- position: Position vector. (required)
+ * -- radius: Maximum variation of position.
  * -- random: Velocity error value.
  * -- spread: Maximum particle distance from the center.
  * -- velocity: Average particle velocity.
@@ -120,6 +121,7 @@ static void Effect_random (LIScrArgs* args)
 	float color[4];
 	float fade;
 	float life;
+	float radius;
 	float random;
 	float spread;
 	float velocity;
@@ -127,6 +129,7 @@ static void Effect_random (LIScrArgs* args)
 	LIMatQuaternion rot0;
 	LIMatQuaternion rot1;
 	LIMatVector tmp;
+	LIMatVector tmp1;
 	LIMatVector axis;
 	LIMatVector accel;
 	LIMatVector position;
@@ -151,6 +154,7 @@ static void Effect_random (LIScrArgs* args)
 	fade = 1.0f;
 	life = 2.0f;
 	random = 0.0f;
+	radius = 0.0f;
 	spread = 0.0f;
 	velocity = 10.0f;
 
@@ -166,6 +170,7 @@ static void Effect_random (LIScrArgs* args)
 		fade = 0.5f * life;
 	liscr_args_gets_float (args, "fade", &fade);
 	liscr_args_gets_float (args, "random", &random);
+	liscr_args_gets_float (args, "random", &radius);
 	liscr_args_gets_float (args, "velocity", &velocity);
 
 	/* Create particles. */
@@ -178,7 +183,13 @@ static void Effect_random (LIScrArgs* args)
 		rot1 = limat_quaternion_rotation ((2.0f * rand () / RAND_MAX - 1.0f) * M_PI, axis);
 		tmp = limat_quaternion_transform (rot0, axis);
 		tmp = limat_quaternion_transform (rot1, tmp);
+		tmp1 = limat_vector_normalize (limat_vector_init (
+			1.0f - (2.0f * rand () / RAND_MAX),
+			1.0f - (2.0f * rand () / RAND_MAX),
+			1.0f - (2.0f * rand () / RAND_MAX)));
+		tmp1 = limat_vector_multiply (tmp1, radius);
 		partpos = limat_vector_multiply (tmp, spread * (1.0f * rand () / RAND_MAX));
+		partpos = limat_vector_add (partpos, tmp1);
 		partpos = limat_vector_add (partpos, position);
 		partvel = limat_vector_multiply (tmp, velocity + velocity * random *
 			(2.0f * rand () / RAND_MAX - 1.0f));
