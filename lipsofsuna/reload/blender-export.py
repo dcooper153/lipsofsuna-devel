@@ -195,7 +195,7 @@ def NodeChild(file, object, bone, child):
 			return 0
 	elif bone:
 		return 0
-	if child and file.file != ObjectFile(child):
+	if child and not ObjectFilesContain(child, file.file):
 		return 0
 	return 1
 
@@ -215,7 +215,21 @@ def NodeChildren(file, object, bone, parent):
 				nodes.append(LipsNode(LipsNodeType.LIGHT, file, o, None, parent))
 	return nodes
 
-def ObjectFile(object):
+def ObjectFiles(object):
+	files = ObjectFilesExplicit(object)
+	if not files:
+		files = ObjectFilesImplicit(object)
+	if files:
+		return files
+	return []
+
+def ObjectFilesContain(object, file):
+	files = ObjectFilesExplicit(object)
+	if files:
+		return file in files
+	return object.type != "Lamp"
+
+def ObjectFilesExplicit(object):
 	path,name = os.path.split(Blender.Get("filename"))
 	path = os.path.join(os.path.split(path)[0], "graphics")
 	name = os.path.splitext(name)[0]
@@ -223,9 +237,22 @@ def ObjectFile(object):
 	if prop:
 		name = name.rpartition('-')[0]
 		name = prop.data.replace('$', name)
-	elif object.type == "Lamp":
-		return None
-	return os.path.join(path, name + ".lmdl")
+		list = name.split(',')
+		result = []
+		for item in list:
+			if item != '':
+				result.append(os.path.join(path, item + ".lmdl"))
+		if len(result):
+			return result
+	return None
+
+def ObjectFilesImplicit(object):
+	path,name = os.path.split(Blender.Get("filename"))
+	path = os.path.join(os.path.split(path)[0], "graphics")
+	name = os.path.splitext(name)[0]
+	if object.type != "Lamp":
+		return [os.path.join(path, name + ".lmdl")]
+	return None
 
 def ObjectHairs(lips, object):
 	global lips_correction_matrix
@@ -1122,9 +1149,10 @@ class LipsFile:
 		self.weightnames = []
 		self.AddNode(LipsNode(LipsNodeType.EMPTY, self, None, None, None))
 		for obj in scene.objects:
-			if ObjectFile(obj) == file:
+			if ObjectFilesContain(obj, file):
 				if obj.parent == None:
 					if obj.type == "Armature":
+						print("ADDARMATURE", file, obj.name)
 						self.animations.AddArmature(obj, obj.getData())
 					if obj.type == "Mesh":
 						self.AddMesh(obj)
@@ -1250,9 +1278,10 @@ class LipsStorage:
 	def __init__(self, scene):
 		self.files = {}
 		for obj in scene.objects:
-			file = ObjectFile(obj)
-			if file not in self.files:
-				self.files[file] = LipsFile(scene, file)
+			files = ObjectFiles(obj)
+			for file in files:
+				if file not in self.files:
+					self.files[file] = LipsFile(scene, file)
 		for file in self.files:
 			if len(self.files[file].faces.groups):
 				writer = LipsWriter(file)
