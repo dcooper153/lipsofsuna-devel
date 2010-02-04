@@ -2,6 +2,7 @@
 
 import Blender
 from Blender.Mathutils import *
+from Blender import *
 import array, math, os, struct, sys, zlib, StringIO
 
 def PowerOfTwo(value):
@@ -288,26 +289,17 @@ def ObjectProperty(object, name):
 		return None
 
 def VertexCoord(object, mesh, face, index):
-	global lips_correction_matrix
-	matrix = object.matrix.rotationPart().resize4x4() * lips_correction_matrix
-	coord = face.v[index].co.copy().resize4D() * matrix
-	return coord
+	return face.v[index].co.copy().resize4D()
 
 def VertexNormal(object, mesh, face, index, conn):
-	global lips_correction_matrix
-	matrix = object.matrix * lips_correction_matrix
-	matrix = matrix.rotationPart()
 	if not face.smooth:
-		normal = face.no * matrix
-		normal.normalize()
-		return normal
-	if not conn.edgesplit:
-		normal = face.v[index].no * matrix
-		normal.normalize()
-		return normal
-	normal = conn.CalculateNormal(face.index, face.v[index].index) * matrix
-	normal.normalize()
-	return normal
+		no = face.no
+	elif not conn.edgesplit:
+		no = face.v[index].no
+	else:
+		no = conn.CalculateNormal(face.index, face.v[index].index)
+	no.normalize()
+	return no
 
 def VertexTexcoords(object, mesh, face, index):
 	number = 0
@@ -636,7 +628,9 @@ class LipsFaces:
 	# Initializes a new face manager.
 	#
 	# \param self Face manager.
-	def __init__(self):
+	# \param file File.
+	def __init__(self, file):
+		self.file = file
 		self.groups = {}
 		self.vertexlist = []
 		self.vertexdict = {}
@@ -645,15 +639,35 @@ class LipsFaces:
 	#
 	# \param self Face manager.
 	# \param mat Material index.
+	# \param matrix Object matrix.
+	# \param mirror Mirror modifier or None.
 	# \param verts Array of vertices.
-	def AddFace(self, mat, verts):
-		idx = [self.AddVertex(verts[0]), self.AddVertex(verts[1]), self.AddVertex(verts[2])]
-		if mat in self.groups:
-			self.groups[mat].append(idx[0])
-			self.groups[mat].append(idx[1])
-			self.groups[mat].append(idx[2])
-		else:
-			self.groups[mat] = [idx[0], idx[1], idx[2]]
+	def AddFace(self, mat, matrix, mirror, verts):
+		idx = [0, 0, 0]
+		if mat not in self.groups:
+			self.groups[mat] = []
+		if 1:
+			idx[0] = self.AddVertex(verts[0] * matrix)
+			idx[1] = self.AddVertex(verts[1] * matrix)
+			idx[2] = self.AddVertex(verts[2] * matrix)
+			self.groups[mat].extend(idx)
+		if mirror:
+			idy = [0, 0, 0]
+			if mirror[Modifier.Settings.AXIS_X]:
+				idy[0] = self.AddVertex(verts[0].Copy(1) * matrix)
+				idy[2] = self.AddVertex(verts[1].Copy(1) * matrix)
+				idy[1] = self.AddVertex(verts[2].Copy(1) * matrix)
+				self.groups[mat].extend(idy)
+			if mirror[Modifier.Settings.AXIS_Y]:
+				idy[0] = self.AddVertex(verts[0].Copy(2) * matrix)
+				idy[2] = self.AddVertex(verts[1].Copy(2) * matrix)
+				idy[1] = self.AddVertex(verts[2].Copy(2) * matrix)
+				self.groups[mat].extend(idy)
+			if mirror[Modifier.Settings.AXIS_Z]:
+				idy[0] = self.AddVertex(verts[0].Copy(3) * matrix)
+				idy[2] = self.AddVertex(verts[1].Copy(3) * matrix)
+				idy[1] = self.AddVertex(verts[2].Copy(3) * matrix)
+				self.groups[mat].extend(idy)
 
 	# \brief Adds a vertex, merging any duplicates.
 	#
@@ -679,25 +693,25 @@ class LipsFaces:
 		for vertex in self.vertexlist:
 			if first:
 				first = 0
-				bounds[0] = vertex.values[9]
-				bounds[1] = vertex.values[10]
-				bounds[2] = vertex.values[11]
-				bounds[3] = vertex.values[9]
-				bounds[4] = vertex.values[10]
-				bounds[5] = vertex.values[11]
+				bounds[0] = vertex.co.x
+				bounds[1] = vertex.co.y
+				bounds[2] = vertex.co.z
+				bounds[3] = vertex.co.x
+				bounds[4] = vertex.co.y
+				bounds[5] = vertex.co.z
 			else:
-				if bounds[0] > vertex.values[9]:
-					bounds[0] = vertex.values[9]
-				if bounds[1] > vertex.values[10]:
-					bounds[1] = vertex.values[10]
-				if bounds[2] > vertex.values[11]:
-					bounds[2] = vertex.values[11]
-				if bounds[3] < vertex.values[9]:
-					bounds[3] = vertex.values[9]
-				if bounds[4] < vertex.values[10]:
-					bounds[4] = vertex.values[10]
-				if bounds[5] < vertex.values[11]:
-					bounds[5] = vertex.values[11]
+				if bounds[0] > vertex.co.x:
+					bounds[0] = vertex.co.x
+				if bounds[1] > vertex.co.y:
+					bounds[1] = vertex.co.y
+				if bounds[2] > vertex.co.z:
+					bounds[2] = vertex.co.z
+				if bounds[3] < vertex.co.x:
+					bounds[3] = vertex.co.x
+				if bounds[4] < vertex.co.y:
+					bounds[4] = vertex.co.y
+				if bounds[5] < vertex.co.z:
+					bounds[5] = vertex.co.z
 		# Enforce minimum size.
 		for i in range(3):
 			if abs(bounds[i+3] - bounds[i+0]) < lips_minimum_box_size:
@@ -796,29 +810,73 @@ class LipsTexture:
 class LipsVertex:
 
 	# \param mesh Blender mesh.
+	# \param file File.
 	# \param co Vertex coordinates.
 	# \param no Vertex normal.
 	# \param te List of six texture coordinates.
 	# \param we List of bone weights of type [index, influence].
-	def __init__(self, co, no, te, we):
+	def __init__(self, file, co, no, te, we):
+		self.file = file
 		self.weights = we
-		self.values = array.array('f', [
-			te[0], te[1], te[2], te[3], te[4], te[5],
-			no.x, no.y, no.z, co.x, co.y, co.z])
+		self.co = co
+		self.no = no
+		self.te = te
+
+	def __mul__(self, matrix):
+		co = self.co * matrix
+		no = self.no * matrix.rotationPart()
+		te = self.te
+		we = []
+		for w in self.weights:
+			we.append([w[0], w[1]])
+		return LipsVertex(self.file, co, no, self.te, we)
+
+	# \brief Creates a copy of the vertex, optionally mirroring it.
+	# \param self Vertex.
+	# \param mirror Mirror axis number or None.
+	# \return New vertex.
+	def Copy(self, mirror):
+		co = self.co.copy()
+		no = self.no.copy()
+		te = self.te
+		we = []
+		for w in self.weights:
+			we.append([w[0], w[1]])
+		if mirror:
+			if mirror == 1:
+				co.x *= -1.0
+				no.x *= -1.0
+			elif mirror == 2:
+				co.y *= -1.0
+				no.y *= -1.0
+			elif mirror == 3:
+				co.z *= -1.0
+				no.z *= -1.0
+			for w in we:
+				ogroup = self.file.weightnames[w[0]]
+				ngroup = ogroup.replace('.R', '.L')
+				if ngroup == ogroup:
+					ngroup = ogroup.replace('.L', '.R')
+				if ngroup != ogroup:
+					try:
+						w[0] = self.file.weightdict[ngroup]
+					except:
+						w[0] = w[0]
+		return LipsVertex(self.file, co, no, self.te, we)
 
 	def WriteCoords(self, writer):
-		writer.WriteFloat(self.values[0])
-		writer.WriteFloat(self.values[1])
-		writer.WriteFloat(self.values[2])
-		writer.WriteFloat(self.values[3])
-		writer.WriteFloat(self.values[4])
-		writer.WriteFloat(self.values[5])
-		writer.WriteFloat(self.values[6])
-		writer.WriteFloat(self.values[7])
-		writer.WriteFloat(self.values[8])
-		writer.WriteFloat(self.values[9])
-		writer.WriteFloat(self.values[10])
-		writer.WriteFloat(self.values[11])
+		writer.WriteFloat(self.te[0])
+		writer.WriteFloat(self.te[1])
+		writer.WriteFloat(self.te[2])
+		writer.WriteFloat(self.te[3])
+		writer.WriteFloat(self.te[4])
+		writer.WriteFloat(self.te[5])
+		writer.WriteFloat(self.no.x)
+		writer.WriteFloat(self.no.y)
+		writer.WriteFloat(self.no.z)
+		writer.WriteFloat(self.co.x)
+		writer.WriteFloat(self.co.y)
+		writer.WriteFloat(self.co.z)
 
 	def WriteWeights(self, writer):
 		writer.WriteInt(len(self.weights))
@@ -827,10 +885,10 @@ class LipsVertex:
 			writer.WriteFloat(weight[1])
 
 	def GetKey(self):
-		key = "%f %f %f %f %f %f %f %f %f " % (\
-			self.values[0], self.values[1], self.values[2],
-			self.values[3], self.values[4], self.values[5],
-			self.values[9], self.values[10], self.values[11])
+		key = "%f %f %f %f %f %f %f %f " % (\
+			self.te[0], self.te[1],
+			self.no.x, self.no.y, self.no.z,
+			self.co.x, self.co.y, self.co.z)
 		for w in self.weights:
 			key += "%d %f" % (w[0], w[1])
 		return key
@@ -1142,17 +1200,17 @@ class LipsFile:
 		self.file = file
 		self.animations = LipsAnimations(scene)
 		self.hairs = LipsHairs()
-		self.faces = LipsFaces()
+		self.faces = LipsFaces(self)
 		self.materials = {}
 		self.node = None
 		self.shapes = LipsShapes(scene)
 		self.weightnames = []
+		self.weightdict = {}
 		self.AddNode(LipsNode(LipsNodeType.EMPTY, self, None, None, None))
 		for obj in scene.objects:
 			if ObjectFilesContain(obj, file):
 				if obj.parent == None:
 					if obj.type == "Armature":
-						print("ADDARMATURE", file, obj.name)
 						self.animations.AddArmature(obj, obj.getData())
 					if obj.type == "Mesh":
 						self.AddMesh(obj)
@@ -1197,15 +1255,26 @@ class LipsFile:
 		bmesh = bobj.getData(0, 1)
 		if MeshVisible(bobj, bmesh):
 			conn = LipsConnectivity(bobj, bmesh)
+
+			# Check for mirror modifiers.
+			mirror = None
+			for mod in bobj.modifiers:
+				if mod.type == Modifier.Types.MIRROR:
+					mirror = mod
+					break
+
 			for name in bmesh.getVertGroupNames():
 				if name not in self.weightnames:
 					self.weightnames.append(name)
+					self.weightdict[name] = len(self.weightnames) - 1
+
 			for bface in bmesh.faces:
 				# Choose material.
 				bmat = None
 				if bmesh.materials:
 					bmat = bmesh.materials[bface.mat]
 				mat = self.AddMaterial(bmat, bmesh, bface)
+
 				# Create vertices.
 				v = []
 				for i in range(len(bface.v)):
@@ -1213,13 +1282,16 @@ class LipsFile:
 					no = VertexNormal(bobj, bmesh, bface, i, conn)
 					te = VertexTexcoords(bobj, bmesh, bface, i)
 					we = VertexWeights(bobj, bmesh, bface, i, self.weightnames)
-					v.append(LipsVertex(co, no, te, we))
+					v.append(LipsVertex(self, co, no, te, we))
+
 				# Insert faces.
+				global lips_correction_matrix
+				matrix = bobj.matrix.rotationPart().resize4x4() * lips_correction_matrix
 				if len(v) == 3:
-					self.faces.AddFace(mat.index, v)
+					self.faces.AddFace(mat.index, matrix, mirror, v)
 				elif len(v) == 4:
-					self.faces.AddFace(mat.index, [v[0], v[1], v[2]])
-					self.faces.AddFace(mat.index, [v[0], v[2], v[3]])
+					self.faces.AddFace(mat.index, matrix, mirror, [v[0], v[1], v[2]])
+					self.faces.AddFace(mat.index, matrix, mirror, [v[0], v[2], v[3]])
 
 	def AddNode(self, node):
 		self.node = node
