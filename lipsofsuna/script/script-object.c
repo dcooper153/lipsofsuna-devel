@@ -484,6 +484,34 @@ static void Object_setter_strafing (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- True if the object is static, false if it is a dynamic rigid body.
+ * --
+ * -- @name Object.static
+ * -- @class table
+ */
+static void Object_getter_static (LIScrArgs* args)
+{
+	int value;
+
+	value = liphy_object_get_control_mode (LIENG_OBJECT (args->self)->physics);
+	liscr_args_seti_bool (args, value == LIPHY_CONTROL_MODE_STATIC);
+}
+static void Object_setter_static (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		if (value)
+			value = LIPHY_CONTROL_MODE_STATIC;
+		else
+			value = LIPHY_CONTROL_MODE_RIGID;
+		liphy_object_set_control_mode (LIENG_OBJECT (args->self)->physics, value);
+	}
+}
+
+/* @luadoc
+ * ---
  * -- Linear velocity.
  * --
  * -- @name Object.velocity
@@ -530,6 +558,7 @@ liscr_script_object (LIScrClass* self,
 	liscr_class_insert_mvar (self, "save", Object_getter_save, Object_setter_save);
 	liscr_class_insert_mvar (self, "selected", Object_getter_selected, Object_setter_selected);
 	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);
+	liscr_class_insert_mvar (self, "static", Object_getter_static, Object_setter_static);
 	liscr_class_insert_mvar (self, "strafing", Object_getter_strafing, Object_setter_strafing);
 	liscr_class_insert_mvar (self, "velocity", Object_getter_velocity, Object_setter_velocity);
 }
