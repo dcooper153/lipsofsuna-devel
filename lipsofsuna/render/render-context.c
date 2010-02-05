@@ -445,6 +445,8 @@ private_bind_material (LIRenContext* self)
 		glEnable (GL_CULL_FACE);
 	else
 		glDisable (GL_CULL_FACE);
+#warning We should support proper transparency.
+#if 0
 	if (self->material.flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
 	{
 		glEnable (GL_BLEND);
@@ -452,6 +454,7 @@ private_bind_material (LIRenContext* self)
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else
+#endif
 	{
 		glDisable (GL_BLEND);
 		glDepthMask (GL_TRUE);

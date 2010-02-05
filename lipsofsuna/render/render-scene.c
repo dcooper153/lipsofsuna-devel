@@ -294,6 +294,11 @@ liren_scene_render (LIRenScene*    self,
 	glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, none);
 	glLightModelfv (GL_LIGHT_MODEL_AMBIENT, none);
 
+#warning We should support proper transparency.
+	glEnable (GL_ALPHA_TEST);
+	glDisable (GL_BLEND);
+	glAlphaFunc (GL_GEQUAL, 0.9f);
+
 	/* Render scene. */
 #ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.objects = 0;
@@ -310,6 +315,9 @@ liren_scene_render (LIRenScene*    self,
 		self->render->profiling.objects, self->render->profiling.materials,
 		self->render->profiling.faces, self->render->profiling.vertices);
 #endif
+
+#warning We should support proper transparency.
+	glDisable (GL_ALPHA_TEST);
 
 	/* Deferred lighting. */
 	if (framebuffer != NULL)
