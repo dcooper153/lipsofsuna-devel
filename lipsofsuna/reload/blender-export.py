@@ -1150,8 +1150,10 @@ class LipsShapes:
 	# Initializes a new collision shape manager.
 	#
 	# \param self Shape manager.
-	def __init__(self, scene):
+	# \param file File.
+	def __init__(self, file):
 		self.shapes = {}
+		self.file = file
 
 	def AddMesh(self, obj):
 		mesh = obj.getData(0, 1)
@@ -1178,7 +1180,7 @@ class LipsShape:
 		global lips_correction_matrix
 		self.name = name
 		self.vertices = []
-		matrix = bobj.matrix * lips_correction_matrix
+		matrix = bobj.matrix.rotationPart().resize4x4() * lips_correction_matrix
 		for v in bmesh.verts:
 			self.vertices.append(v.co.copy().resize4D() * matrix)
 
@@ -1203,7 +1205,7 @@ class LipsFile:
 		self.faces = LipsFaces(self)
 		self.materials = {}
 		self.node = None
-		self.shapes = LipsShapes(scene)
+		self.shapes = LipsShapes(self)
 		self.weightnames = []
 		self.weightdict = {}
 		self.AddNode(LipsNode(LipsNodeType.EMPTY, self, None, None, None))
