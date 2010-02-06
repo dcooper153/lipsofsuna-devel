@@ -89,8 +89,8 @@ am_libchat_cli_la_OBJECTS = chat/ext-history.lo chat/ext-module.lo \
 	chat/ext-script.lo
 libchat_cli_la_OBJECTS = $(am_libchat_cli_la_OBJECTS)
 libeditor_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libeditor_cli_la_OBJECTS = editor/ext-dialog.lo \
-	editor/ext-editor.lo editor/ext-module.lo editor/ext-script.lo
+am_libeditor_cli_la_OBJECTS = editor/ext-editor.lo \
+	editor/ext-module.lo editor/ext-script.lo
 libeditor_cli_la_OBJECTS = $(am_libeditor_cli_la_OBJECTS)
 libeffect_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libeffect_cli_la_OBJECTS = effect/ext-module.lo \
@@ -394,8 +394,6 @@ libchat_cli_la_SOURCES = \
 
 libeditor_cli_la_LIBADD = $(LIBADD)
 libeditor_cli_la_SOURCES = \
-	editor/ext-dialog.c \
-	editor/ext-dialog.h \
 	editor/ext-editor.c \
 	editor/ext-editor.h \
 	editor/ext-module.c \
@@ -598,8 +596,6 @@ editor/$(am__dirstamp):
 editor/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) editor/$(DEPDIR)
 	@: > editor/$(DEPDIR)/$(am__dirstamp)
-editor/ext-dialog.lo: editor/$(am__dirstamp) \
-	editor/$(DEPDIR)/$(am__dirstamp)
 editor/ext-editor.lo: editor/$(am__dirstamp) \
 	editor/$(DEPDIR)/$(am__dirstamp)
 editor/ext-module.lo: editor/$(am__dirstamp) \
@@ -791,8 +787,6 @@ mostlyclean-compile:
 	-rm -f chat/ext-module.lo
 	-rm -f chat/ext-script.$(OBJEXT)
 	-rm -f chat/ext-script.lo
-	-rm -f editor/ext-dialog.$(OBJEXT)
-	-rm -f editor/ext-dialog.lo
 	-rm -f editor/ext-editor.$(OBJEXT)
 	-rm -f editor/ext-editor.lo
 	-rm -f editor/ext-module.$(OBJEXT)
@@ -882,7 +876,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@chat/$(DEPDIR)/ext-history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@chat/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@chat/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-dialog.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-editor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@editor/$(DEPDIR)/ext-script.Plo@am__quote@

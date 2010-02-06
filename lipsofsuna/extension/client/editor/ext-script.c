@@ -72,6 +72,36 @@ static void Editor_create (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Deletes selected objects.
+ * --
+ * -- @param self Editor class.
+ * function Editor.delete(self)
+ */
+static void Editor_delete (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
+	liext_editor_destroy (module->editor);
+}
+
+/* @luadoc
+ * ---
+ * -- Duplicates selected objects.
+ * --
+ * -- @param self Editor class.
+ * function Editor.duplicate(self)
+ */
+static void Editor_duplicate (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
+	liext_editor_duplicate (module->editor);
+}
+
+/* @luadoc
+ * ---
  * -- Begins a rotation drag.
  * --
  * -- @param self Editor class.
@@ -130,43 +160,19 @@ static void Editor_translate (LIScrArgs* args)
 	liext_editor_begin_translate (module->editor, x, y);
 }
 
-/* @luadoc
- * ---
- * -- Visibility of the editor window.
- * -- @name Editor.visible
- * -- @class table
- */
-static void Editor_getter_visible (LIScrArgs* args)
-{
-	LIExtModule* module;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-	liscr_args_seti_bool (args, liwdg_widget_get_visible (module->dialog));
-}
-static void Editor_setter_visible (LIScrArgs* args)
-{
-	int value;
-	LIExtModule* module;
-
-	if (liscr_args_geti_bool (args, 0, &value))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_EDITOR);
-		liwdg_widget_set_visible (module->dialog, value);
-	}
-}
-
 /*****************************************************************************/
 
 void
 liext_script_editor (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EDITOR, data);
 	liscr_class_insert_cfunc (self, "create", Editor_create);
+	liscr_class_insert_cfunc (self, "delete", Editor_delete);
+	liscr_class_insert_cfunc (self, "duplicate", Editor_duplicate);
 	liscr_class_insert_cfunc (self, "rotate", Editor_rotate);
 	liscr_class_insert_cfunc (self, "snap", Editor_snap);
 	liscr_class_insert_cfunc (self, "translate", Editor_translate);
-	liscr_class_insert_cvar (self, "visible", Editor_getter_visible, Editor_setter_visible);
 }
 
 /** @} */

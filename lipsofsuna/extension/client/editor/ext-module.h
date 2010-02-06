@@ -28,7 +28,6 @@
 #define __EXT_MODULE_H__
 
 #include "ext-editor.h"
-#include "ext-dialog.h"
 
 #define LIEXT_SCRIPT_EDITOR "Editor"
 
@@ -37,7 +36,6 @@ struct _LIExtModule
 {
 	LICliClient* client;
 	LIExtEditor* editor;
-	LIWdgWidget* dialog;
 };
 
 LIExtModule*

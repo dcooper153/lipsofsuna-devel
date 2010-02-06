@@ -25,7 +25,6 @@
  */
 
 #include <lipsofsuna/client.h>
-#include "ext-dialog.h"
 #include "ext-editor.h"
 #include "ext-module.h"
 
@@ -48,14 +47,6 @@ liext_module_new (LIMaiProgram* program)
 	self->editor = liext_editor_new (self->client);
 	if (self->editor == NULL)
 		return NULL;
-	self->dialog = liext_dialog_new (self->client->widgets, self->editor);
-	if (self->dialog == NULL)
-	{
-		liext_editor_free (self->editor);
-		return NULL;
-	}
-	liwdg_manager_insert_window (self->client->widgets, self->dialog);
-	liwdg_widget_set_visible (self->dialog, 0);
 
 	liscr_script_create_class (program->script, "Editor", liext_script_editor, self);
 
@@ -65,8 +56,6 @@ liext_module_new (LIMaiProgram* program)
 void
 liext_module_free (LIExtModule* self)
 {
-	liwdg_manager_remove_window (self->client->widgets, self->dialog);
-	liwdg_widget_free (self->dialog);
 	liext_editor_free (self->editor);
 	lisys_free (self);
 }

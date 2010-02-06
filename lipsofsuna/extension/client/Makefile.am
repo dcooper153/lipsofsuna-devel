@@ -36,8 +36,6 @@ libchat_cli_la_SOURCES = \
 
 libeditor_cli_la_LIBADD = $(LIBADD)
 libeditor_cli_la_SOURCES = \
-	editor/ext-dialog.c \
-	editor/ext-dialog.h \
 	editor/ext-editor.c \
 	editor/ext-editor.h \
 	editor/ext-module.c \
