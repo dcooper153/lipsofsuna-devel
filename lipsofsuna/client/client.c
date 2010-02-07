@@ -497,7 +497,7 @@ private_init_script (LICliClient* self)
 	    !liscr_script_create_class (self->script, "Extension", licli_script_extension, self) ||
 	    !liscr_script_create_class (self->script, "Group", licli_script_group, self) ||
 	    !liscr_script_create_class (self->script, "Light", licli_script_light, self) ||
-	    !liscr_script_create_class (self->script, "Object", licli_script_object, self) ||
+	    !liscr_script_create_class (self->script, "Object", licli_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
 	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
 	    !liscr_script_create_class (self->script, "Player", licli_script_player, self) ||

@@ -154,10 +154,12 @@ static void Object_new (LIScrArgs* args)
 	int purge;
 	int realize = 0;
 	LIEngObject* self;
+	LIMaiProgram* program;
 	LISerServer* server;
 
 	/* Handle loading. */
-	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_OBJECT);
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	server = limai_program_find_component (program, "server");
 	if (liscr_args_gets_int (args, "id", &id))
 	{
 		self = lieng_engine_find_object (server->engine, id);
@@ -365,9 +367,7 @@ void
 liser_script_object (LIScrClass* self,
                      void*       data)
 {
-	liscr_class_inherit (self, liscr_script_object, NULL);
-	liscr_class_set_userdata (self, LISER_SCRIPT_OBJECT, data);
-	liscr_class_insert_interface (self, LISER_SCRIPT_OBJECT);
+	liscr_class_inherit (self, liscr_script_object, data);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "disconnect", Object_disconnect);
 	liscr_class_insert_mfunc (self, "effect", Object_effect);

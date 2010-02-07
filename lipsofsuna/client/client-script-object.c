@@ -58,9 +58,9 @@ static void Object_emit_particles (LIScrArgs* args)
 
 void
 licli_script_object (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
-	liscr_class_inherit (self, liscr_script_object, NULL);
+	liscr_class_inherit (self, liscr_script_object, data);
 	liscr_class_insert_mfunc (self, "emit_particles", Object_emit_particles);
 }
 

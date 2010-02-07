@@ -23,6 +23,7 @@
  */
 
 #include <lipsofsuna/engine.h>
+#include <lipsofsuna/main.h>
 #include <lipsofsuna/script.h>
 
 /* @luadoc
@@ -440,6 +441,44 @@ static void Object_setter_selected (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- List of selected objects.
+ * --
+ * -- @name Object.selected_objects
+ * -- @class table
+ */
+static void Object_getter_selected_objects (LIScrArgs* args)
+{
+	LIEngSelectionIter iter;
+	LIMaiProgram* program;
+
+	/* Create empty table. */
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+
+	/* Pack selected objects. */
+	LIENG_FOREACH_SELECTION (iter, program->engine)
+		liscr_args_seti_data (args, iter.object->script);
+}
+static void Object_setter_selected_objects (LIScrArgs* args)
+{
+	int i;
+	LIEngSelectionIter iter;
+	LIMaiProgram* program;
+	LIScrData* data;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+
+	/* Unselect all. */
+	LIENG_FOREACH_SELECTION (iter, program->engine)
+		lieng_object_set_selected (iter.object, 0);
+
+	/* Select listed. */
+	for (i = 0 ; liscr_args_geti_data (args, i, LISCR_SCRIPT_OBJECT, &data) ; i++)
+		lieng_object_set_selected (data->data, 1);
+}
+
+/* @luadoc
+ * ---
  * -- Movement speed.
  * --
  * -- Only used by creature objects.
@@ -536,8 +575,9 @@ static void Object_setter_velocity (LIScrArgs* args)
 
 void
 liscr_script_object (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
+	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
 	liscr_class_insert_mfunc (self, "approach", Object_approach);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
 	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
@@ -557,6 +597,7 @@ liscr_script_object (LIScrClass* self,
 	liscr_class_insert_mvar (self, "rotation", Object_getter_rotation, Object_setter_rotation);
 	liscr_class_insert_mvar (self, "save", Object_getter_save, Object_setter_save);
 	liscr_class_insert_mvar (self, "selected", Object_getter_selected, Object_setter_selected);
+	liscr_class_insert_cvar (self, "selected_objects", Object_getter_selected_objects, Object_setter_selected_objects);
 	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);
 	liscr_class_insert_mvar (self, "static", Object_getter_static, Object_setter_static);
 	liscr_class_insert_mvar (self, "strafing", Object_getter_strafing, Object_setter_strafing);

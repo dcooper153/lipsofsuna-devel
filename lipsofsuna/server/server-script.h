@@ -28,7 +28,6 @@
 #include <lipsofsuna/script.h>
 
 #define LISER_SCRIPT_EXTENSION "Extension"
-#define LISER_SCRIPT_OBJECT "Object"
 #define LISER_SCRIPT_SERVER "Server"
 
 void
