@@ -38,6 +38,7 @@ Lips = LipsEnum()
 lips_format_version = 0xFFFFFFF6
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
+lips_mirror_snap = 0.01
 lips_correction_matrix = Euler(-90, 0, 0).toMatrix().resize4x4()
 lips_correction_quat = Euler(-90, 0, 0).toQuat()
 
@@ -646,6 +647,20 @@ class LipsFaces:
 		idx = [0, 0, 0]
 		if mat not in self.groups:
 			self.groups[mat] = []
+		if mirror:
+			limit = mirror[Modifier.Settings.LIMIT]
+			if mirror[Modifier.Settings.AXIS_X]:
+				verts[0].SmoothNormal(1, limit)
+				verts[1].SmoothNormal(1, limit)
+				verts[2].SmoothNormal(1, limit)
+			elif mirror[Modifier.Settings.AXIS_Y]:
+				verts[0].SmoothNormal(2, limit)
+				verts[1].SmoothNormal(2, limit)
+				verts[2].SmoothNormal(2, limit)
+			elif mirror[Modifier.Settings.AXIS_Z]:
+				verts[0].SmoothNormal(3, limit)
+				verts[1].SmoothNormal(3, limit)
+				verts[2].SmoothNormal(3, limit)
 		if 1:
 			idx[0] = self.AddVertex(verts[0] * matrix)
 			idx[1] = self.AddVertex(verts[1] * matrix)
@@ -654,19 +669,19 @@ class LipsFaces:
 		if mirror:
 			idy = [0, 0, 0]
 			if mirror[Modifier.Settings.AXIS_X]:
-				idy[0] = self.AddVertex(verts[0].Copy(1) * matrix)
-				idy[2] = self.AddVertex(verts[1].Copy(1) * matrix)
-				idy[1] = self.AddVertex(verts[2].Copy(1) * matrix)
+				idy[0] = self.AddVertex(verts[0].Copy().Mirror(1) * matrix)
+				idy[2] = self.AddVertex(verts[1].Copy().Mirror(1) * matrix)
+				idy[1] = self.AddVertex(verts[2].Copy().Mirror(1) * matrix)
 				self.groups[mat].extend(idy)
 			if mirror[Modifier.Settings.AXIS_Y]:
-				idy[0] = self.AddVertex(verts[0].Copy(2) * matrix)
-				idy[2] = self.AddVertex(verts[1].Copy(2) * matrix)
-				idy[1] = self.AddVertex(verts[2].Copy(2) * matrix)
+				idy[0] = self.AddVertex(verts[0].Copy().Mirror(2) * matrix)
+				idy[2] = self.AddVertex(verts[1].Copy().Mirror(2) * matrix)
+				idy[1] = self.AddVertex(verts[2].Copy().Mirror(2) * matrix)
 				self.groups[mat].extend(idy)
 			if mirror[Modifier.Settings.AXIS_Z]:
-				idy[0] = self.AddVertex(verts[0].Copy(3) * matrix)
-				idy[2] = self.AddVertex(verts[1].Copy(3) * matrix)
-				idy[1] = self.AddVertex(verts[2].Copy(3) * matrix)
+				idy[0] = self.AddVertex(verts[0].Copy().Mirror(3) * matrix)
+				idy[2] = self.AddVertex(verts[1].Copy().Mirror(3) * matrix)
+				idy[1] = self.AddVertex(verts[2].Copy().Mirror(3) * matrix)
 				self.groups[mat].extend(idy)
 
 	# \brief Adds a vertex, merging any duplicates.
@@ -831,38 +846,55 @@ class LipsVertex:
 			we.append([w[0], w[1]])
 		return LipsVertex(self.file, co, no, self.te, we)
 
-	# \brief Creates a copy of the vertex, optionally mirroring it.
+	# \brief Creates a copy of the vertex.
 	# \param self Vertex.
-	# \param mirror Mirror axis number or None.
 	# \return New vertex.
-	def Copy(self, mirror):
+	def Copy(self):
 		co = self.co.copy()
 		no = self.no.copy()
 		te = self.te
 		we = []
 		for w in self.weights:
 			we.append([w[0], w[1]])
-		if mirror:
-			if mirror == 1:
-				co.x *= -1.0
-				no.x *= -1.0
-			elif mirror == 2:
-				co.y *= -1.0
-				no.y *= -1.0
-			elif mirror == 3:
-				co.z *= -1.0
-				no.z *= -1.0
-			for w in we:
-				ogroup = self.file.weightnames[w[0]]
-				ngroup = ogroup.replace('.R', '.L')
-				if ngroup == ogroup:
-					ngroup = ogroup.replace('.L', '.R')
-				if ngroup != ogroup:
-					try:
-						w[0] = self.file.weightdict[ngroup]
-					except:
-						w[0] = w[0]
 		return LipsVertex(self.file, co, no, self.te, we)
+
+	# \brief Mirrors the vertex in place.
+	# \param self Vertex.
+	# \param mirror Mirror axis number.
+	# \return New vertex.
+	def Mirror(self, mirror):
+		if mirror == 1:
+			self.co.x *= -1.0
+			self.no.x *= -1.0
+		elif mirror == 2:
+			self.co.y *= -1.0
+			self.no.y *= -1.0
+		elif mirror == 3:
+			self.co.z *= -1.0
+			self.no.z *= -1.0
+		for w in self.weights:
+			ogroup = self.file.weightnames[w[0]]
+			ngroup = ogroup.replace('.R', '.L')
+			if ngroup == ogroup:
+				ngroup = ogroup.replace('.L', '.R')
+			if ngroup != ogroup:
+				try:
+					w[0] = self.file.weightdict[ngroup]
+				except:
+					w[0] = w[0]
+		return self
+
+	def SmoothNormal(self, mirror, snap):
+		if mirror == 1:
+			if abs(self.co.x) < snap:
+				self.no.x = 0.0
+		elif mirror == 2:
+			if abs(self.co.y) < snap:
+				self.no.y = 0.0
+		elif mirror == 3:
+			if abs(self.co.z) < snap:
+				self.no.z = 0.0
+		self.no = self.no.normalize()
 
 	def WriteCoords(self, writer):
 		writer.WriteFloat(self.te[0])
