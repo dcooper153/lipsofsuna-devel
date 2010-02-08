@@ -239,6 +239,8 @@ private_tick (LIExtNpc* self,
 			lisys_error_report ();
 
 		/* Solve path. */
+#warning Path solving is disabled for now due to bugs
+#if 0
 		if (self->owner != NULL && self->target != NULL)
 		{
 			lieng_object_get_transform (self->target, &transform);
@@ -256,6 +258,7 @@ private_tick (LIExtNpc* self,
 					liai_path_free (path);
 			}
 		}
+#endif
 	}
 
 	/* Traverse path if set. */
