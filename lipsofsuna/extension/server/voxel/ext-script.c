@@ -371,7 +371,6 @@ static void Voxel_rotate (LIScrArgs* args)
 	}
 }
 
-
 /* @luadoc
  * ---
  * -- Saves the terrain of the currently loaded sectors.
@@ -391,6 +390,41 @@ static void Voxel_save (LIScrArgs* args)
 		if (!liext_module_write (module, server->sql))
 			lisys_error_report ();
 	}
+}
+
+/* @luadoc
+ * ---
+ * -- Fill type for empty sectors.
+ * -- @name Server.time
+ * -- @class table
+ */
+static void Voxel_getter_fill (LIScrArgs* args)
+{
+	LIExtModule* self;
+	LIScrData* voxel;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (self->voxels->fill)
+	{
+		voxel = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
+		if (voxel != NULL)
+		{
+			livox_voxel_init (voxel->data, self->voxels->fill);
+			liscr_args_seti_data (args, voxel);
+			liscr_data_unref (voxel, NULL);
+		}
+	}
+}
+static void Voxel_setter_fill (LIScrArgs* args)
+{
+	LIExtModule* self;
+	LIScrData* voxel;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_TILE, &voxel))
+		livox_manager_set_fill (self->voxels, ((LIVoxVoxel*) voxel->data)->type);
+	else
+		livox_manager_set_fill (self->voxels, 0);
 }
 
 /*****************************************************************************/
@@ -428,6 +462,7 @@ liext_script_voxel (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "replace", Voxel_replace);
 	liscr_class_insert_cfunc (self, "rotate", Voxel_rotate);
 	liscr_class_insert_cfunc (self, "save", Voxel_save);
+	liscr_class_insert_cvar (self, "fill", Voxel_getter_fill, Voxel_setter_fill);
 }
 
 /** @} */

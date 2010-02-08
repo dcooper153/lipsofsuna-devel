@@ -49,6 +49,8 @@ struct _LIVoxUpdateEvent
 
 struct _LIVoxManager
 {
+	int fill;
+	int load;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* materials;
 	LIArcSql* sql;
@@ -149,6 +151,14 @@ livox_manager_write (LIVoxManager* self);
 
 int
 livox_manager_write_materials (LIVoxManager* self);
+
+void
+livox_manager_set_fill (LIVoxManager* self,
+                        int           fill);
+
+void
+livox_manager_set_load (LIVoxManager* self,
+                        int           value);
 
 void
 livox_manager_set_sql (LIVoxManager* self,

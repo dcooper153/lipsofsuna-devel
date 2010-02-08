@@ -88,12 +88,12 @@ ligen_generator_new (LIPthPaths*     paths,
 	self->paths = paths;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
-	ligen_generator_set_fill (self, 1);
 
 	/* Allocate terrain structures. */
 	self->voxels = livox_manager_new (callbacks, sectors);
 	if (self->voxels == NULL)
 		goto error;
+	ligen_generator_set_fill (self, 1);
 
 	/* Load databases. */
 	if (!private_init_sql (self) ||
@@ -585,6 +585,7 @@ ligen_generator_set_fill (LIGenGenerator* self,
 		self->fill = 0;
 	else
 		self->fill = fill;
+	livox_manager_set_fill (self->voxels, self->fill);
 }
 
 /*****************************************************************************/
@@ -730,6 +731,7 @@ private_init_sql (LIGenGenerator* self)
 
 	/* Use for loading and saving voxel data. */
 	livox_manager_set_sql (self->voxels, self->srvsql);
+	livox_manager_set_load (self->voxels, 0);
 
 	/* Format path. */
 	path = lipth_paths_get_sql (self->paths, "generator.db");

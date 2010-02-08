@@ -48,7 +48,9 @@ private_build_block (LIVoxSector* self,
 LIVoxSector*
 livox_sector_new (LIAlgSector* sector)
 {
+	int empty;
 	LIVoxSector* self;
+	LIVoxVoxel tmp;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIVoxSector));
@@ -58,8 +60,15 @@ livox_sector_new (LIAlgSector* sector)
 	self->sector = sector;
 
 	/* Load data. */
-	if (self->manager->sql != NULL)
-		livox_sector_read (self, self->manager->sql);
+	if (self->manager->load && self->manager->sql != NULL)
+		empty = !livox_sector_read (self, self->manager->sql);
+	else
+		empty = 1;
+	if (empty && self->manager->fill)
+	{
+		livox_voxel_init (&tmp, self->manager->fill);
+		livox_sector_fill (self, &tmp);
+	}
 
 	return self;
 }

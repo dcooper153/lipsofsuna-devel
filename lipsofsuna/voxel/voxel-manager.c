@@ -58,6 +58,7 @@ livox_manager_new (LICalCallbacks* callbacks,
 	self = lisys_calloc (1, sizeof (LIVoxManager));
 	if (self == NULL)
 		return NULL;
+	self->load = 1;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
 
@@ -838,6 +839,32 @@ livox_manager_write_materials (LIVoxManager* self)
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Sets the default fill tile type for empty sectors.
+ *
+ * \param self Voxel manager.
+ * \param type Terrain type, zero for empty.
+ */
+void
+livox_manager_set_fill (LIVoxManager* self,
+                        int           type)
+{
+	self->fill = type;
+}
+
+/**
+ * \brief Enables or disables loading of sector data from the database.
+ *
+ * \param self Voxel manager.
+ * \param value Nonzero for loading, zero for no loading.
+ */
+void
+livox_manager_set_load (LIVoxManager* self,
+                        int           value)
+{
+	self->load = value;
 }
 
 void
