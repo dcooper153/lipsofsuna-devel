@@ -140,7 +140,13 @@ fi
 if test "x$want_client" = xyes || test "x$want_import" = xyes || test "x$want_viewer" = xyes; then
 	PKG_CHECK_MODULES([LIBPNG], [libpng12 >= 1.2.0], [found=yes], [found=no])
 	if test "x$found" = xno; then
-		AC_CHECK_LIB([png], [spng_create_read_struct], [founda=yes], [founda=no])
+		PKG_CHECK_MODULES([LIBPNG], [libpng14 >= 1.4.0], [found=yes], [found=no])
+		if test "x$found" = xno; then
+			PKG_CHECK_MODULES([LIBPNG], [libpng >= 1.2.0], [found=yes], [found=no])
+		fi
+	fi
+	if test "x$found" = xno; then
+		AC_CHECK_LIB([png], [png_create_read_struct], [founda=yes], [founda=no])
 		AC_CHECK_HEADER([png.h], [foundb=yes], [foundb=no])
 		if test "x$founda" = xno || test "x$foundb" = xno; then
 			AC_MSG_ERROR([
