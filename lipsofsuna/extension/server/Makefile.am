@@ -1,4 +1,4 @@
-LIBADD = $(top_builddir)/liblipsofsunaserver.la $(LISRV_LIBS)
+LIBADD = $(LISRV_LIBS)
 AM_CFLAGS = $(LISRV_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 EXTRA_DIST = skeleton/mkext.sh

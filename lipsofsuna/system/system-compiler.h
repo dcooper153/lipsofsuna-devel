@@ -25,10 +25,24 @@
 #ifndef __SYSTEM_COMPILER_H__
 #define __SYSTEM_COMPILER_H__
 
-#if defined WIN32 && defined DLL_EXPORT
-#define LIAPICALL __declspec(dllexport)
+#ifdef WIN32
+#define LIAPIEXPORT(ret, name, args) __declspec(dllexport) ret name args; typedef ret (*name##_pfn) args
+#define LIAPIIMPORT(ret, name, args) __declspec(dllimport) ret name args; typedef ret (*name##_pfn) args
 #else
-#define LIAPICALL
+#define LIAPIEXPORT(ret, name, args) ret name args
+#define LIAPIIMPORT(ret, name, args) ret name args
+#endif
+#ifdef DLL_EXPORT
+#define LIAPICALL(ret, name, args) LIAPIIMPORT(ret, name, args)
+#else
+#define LIAPICALL(ret, name, args) LIAPIEXPORT(ret, name, args)
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+#define LISYS_MODULE_EXESYM(name) ((name##_pfn) GetProcAddress (GetModuleHandle (NULL), #name))
+#else
+#define LISYS_MODULE_EXESYM(name) name
 #endif
 
 #if __GNUC__ >= 4

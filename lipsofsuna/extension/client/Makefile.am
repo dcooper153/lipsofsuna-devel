@@ -1,4 +1,4 @@
-LIBADD = $(top_builddir)/liblipsofsunaclient.la $(LICLI_LIBS)
+LIBADD = $(LICLI_LIBS)
 AM_CFLAGS = $(LICLI_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = -module -avoid-version -no-undefined
 

@@ -24,26 +24,20 @@ editor_DATA = lipsofsuna/reload/blender-export.py
 prgdir = $(PROGDIR)
 prg_PROGRAMS = build/lipsofsuna
 bin_PROGRAMS =
-lib_LTLIBRARIES =
 if MAYBE_CLIENT
-bin_PROGRAMS += lipsofsuna-client
-lib_LTLIBRARIES += liblipsofsunaclient.la
+bin_PROGRAMS += build/bin/lipsofsuna-client
 endif
 if MAYBE_GENERATOR
-bin_PROGRAMS += lipsofsuna-generator
-lib_LTLIBRARIES += liblipsofsunagenerator.la
+bin_PROGRAMS += build/bin/lipsofsuna-generator
 endif
 if MAYBE_IMPORT
-bin_PROGRAMS += lipsofsuna-import
-lib_LTLIBRARIES += liblipsofsunaimport.la
+bin_PROGRAMS += build/bin/lipsofsuna-import
 endif
 if MAYBE_SERVER
-bin_PROGRAMS += lipsofsuna-server
-lib_LTLIBRARIES += liblipsofsunaserver.la
+bin_PROGRAMS += build/bin/lipsofsuna-server
 endif
 if MAYBE_VIEWER
-bin_PROGRAMS += lipsofsuna-viewer
-lib_LTLIBRARIES += liblipsofsunaviewer.la
+bin_PROGRAMS += build/bin/lipsofsuna-viewer
 endif
 
 ##############################################################################
@@ -557,26 +551,29 @@ wdgsrc = \
 
 ##############################################################################
 
-liblipsofsunaclient_la_LDFLAGS = -no-undefined
-liblipsofsunaclient_la_LIBADD = \
-	$(GRAPPLE_LIBS) $(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(GLEW_LIBS) \
-	$(GL_LIBS) $(OPENAL_LIBS) $(VORBIS_LIBS) $(SQUISH_LIBS) $(ZLIB_LIBS) \
-	$(LIPS_LIBS) $(LIBPNG_LIBS) $(PTHREAD_LIBS)
-liblipsofsunaclient_la_SOURCES = \
+build_lipsofsuna_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
+build_lipsofsuna_SOURCES = lipsofsuna/main/main.c $(syssrc)
+
+build_bin_lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS) -export-dynamic
+build_bin_lipsofsuna_client_LDADD = \
+	$(SDL_LIBS) -lSDL_ttf $(GLEW_LIBS) $(GL_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) \
+	$(SQUISH_LIBS) $(GRAPPLE_LIBS) $(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
+	$(OPENAL_LIBS) $(VORBIS_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS) $(LICLI_LIBS)
+build_bin_lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c \
 	$(aisrc) $(algsrc) $(arcsrc) $(bndsrc) $(calsrc) $(clisrc) $(fntsrc) \
 	$(gensrc) $(engsrc) $(imgsrc) $(maisrc) $(matsrc) $(mdlsrc) $(netsrc) \
 	$(physrc) $(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(scrsrc) $(strsrc) \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
-liblipsofsunagenerator_la_LDFLAGS = -no-undefined
-liblipsofsunagenerator_la_LIBADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
-liblipsofsunagenerator_la_SOURCES = \
+build_bin_lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+build_bin_lipsofsuna_generator_LDADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+build_bin_lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c \
 	$(algsrc) $(arcsrc) $(calsrc) $(gensrc) $(matsrc) $(mdlsrc) \
 	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunaimport_la_LDFLAGS = -no-undefined
-liblipsofsunaimport_la_LIBADD = $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
-liblipsofsunaimport_la_SOURCES = \
+build_bin_lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+build_bin_lipsofsuna_import_LDADD = $(SQUISH_LIBS) $(LIBPNG_LIBS) $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+build_bin_lipsofsuna_import_SOURCES = lipsofsuna/reload/reload-main.c \
 	$(algsrc) $(arcsrc) $(matsrc) $(mdlsrc) $(pthsrc) $(relsrc) \
 	$(strsrc) $(syssrc) $(thrsrc) \
 	lipsofsuna/image/image.c \
@@ -585,60 +582,29 @@ liblipsofsunaimport_la_SOURCES = \
 	lipsofsuna/image/image-compress.h \
 	lipsofsuna/image/image-dds.h
 
-liblipsofsunaserver_la_LDFLAGS = -no-undefined
-liblipsofsunaserver_la_LIBADD = \
+build_bin_lipsofsuna_server_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS) -export-dynamic
+build_bin_lipsofsuna_server_LDADD = \
 	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
-	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
-liblipsofsunaserver_la_SOURCES = \
+	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS) $(LISRV_LIBS)
+build_bin_lipsofsuna_server_SOURCES = lipsofsuna/server/server-main.c \
 	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(maisrc) $(matsrc) \
 	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
 	$(syssrc) $(thrsrc) $(voxsrc)
 
-liblipsofsunaviewer_la_LDFLAGS = -no-undefined
-liblipsofsunaviewer_la_LIBADD = $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
-liblipsofsunaviewer_la_SOURCES = \
+build_bin_lipsofsuna_viewer_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
+build_bin_lipsofsuna_viewer_LDADD = \
+	$(SDL_LIBS) -lSDL_ttf $(GLEW_LIBS) $(GL_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) \
+	$(SQLITE_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
+build_bin_lipsofsuna_viewer_SOURCES = lipsofsuna/viewer/viewer-main.c \
 	$(algsrc) $(arcsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
 	$(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(strsrc) $(syssrc) $(thrsrc) \
 	$(vidsrc) $(viesrc)
 
 ##############################################################################
 
-build_lipsofsuna_CFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-build_lipsofsuna_LDADD = $(PTHREAD_LIBS) $(LIPS_LIBS)
-build_lipsofsuna_SOURCES = lipsofsuna/main/main.c $(syssrc)
-
-lipsofsuna_client_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_client_LDADD = liblipsofsunaclient.la $(SDL_LIBS) -lSDL_ttf $(LICLI_LIBS)
-lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c
-
-lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_generator_LDADD = liblipsofsunagenerator.la $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
-lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c
-
-lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_import_LDADD = liblipsofsunaimport.la $(SQUISH_LIBS) $(SQLITE_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
-lipsofsuna_import_SOURCES = lipsofsuna/reload/reload-main.c
-
-lipsofsuna_server_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_server_LDADD = liblipsofsunaserver.la $(LISRV_LIBS)
-lipsofsuna_server_SOURCES = lipsofsuna/server/server-main.c
-
-lipsofsuna_viewer_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-lipsofsuna_viewer_LDADD = liblipsofsunaviewer.la $(SDL_LIBS) -lSDL_ttf $(GLEW_LIBS) $(GL_LIBS) $(SQLITE_LIBS) $(SQUISH_LIBS) $(LIBPNG_LIBS) $(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS)
-lipsofsuna_viewer_SOURCES = lipsofsuna/viewer/viewer-main.c
-
-##############################################################################
-
 all-local:
 	@if test "x$(RELPATH)" = "xyes"; then \
 		mkdir -p build/bin build/lib build/tool; \
-		for i in $(bin_PROGRAMS); do \
-			if test -e .libs/$$i; then cp .libs/$$i build/bin; fi; \
-		done; \
-		for i in $(lib_LTLIBRARIES); do \
-			name=`echo $$i | sed s/la$$/so.0/`; \
-			if test -e .libs/$$name; then cp .libs/$$name build/lib; fi; \
-		done; \
 		for i in $(editor_DATA); do \
 			cp $$i build/tool; \
 		done; \
