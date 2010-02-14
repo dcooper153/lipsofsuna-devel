@@ -39,6 +39,7 @@
  * -- Instructs the object to approach a point.
  * --
  * -- Arguments:
+ * -- dist: Distance how close to target to get.
  * -- point: Point vector in world space. (required)
  * -- speed: Movement speed multiplier.
  * --
@@ -48,13 +49,15 @@
  */
 static void Object_approach (LIScrArgs* args)
 {
+	float dist = 0.0f;
 	float speed = 1.0f;
 	LIMatVector vector;
 
 	if (liscr_args_gets_vector (args, "point", &vector))
 	{
+		liscr_args_gets_float (args, "dist", &dist);
 		liscr_args_gets_float (args, "speed", &speed);
-		lieng_object_approach (args->self, &vector, speed);
+		lieng_object_approach (args->self, &vector, speed, dist);
 	}
 }
 

@@ -30,8 +30,6 @@
 #warning Engine object refresh radius is hardcoded.
 #define REFRESH_RADIUS 10.0f
 
-#define LIENG_OBJECT_APPROACH_TOLERANCE 1.5f
-
 static int
 private_warp (LIEngObject*       self,
               const LIMatVector* position);
@@ -206,36 +204,46 @@ lieng_object_ref (LIEngObject* self,
  * \param self Object.
  * \param target Target position vector.
  * \param speed Movement speed.
+ * \param dist Tolerance in position for the goal check.
+ * \return Nonzero if reached the goal.
  */
-void
+int
 lieng_object_approach (LIEngObject*       self,
                        const LIMatVector* target,
-                       float              speed)
+                       float              speed,
+                       float              dist)
 {
+	float len;
 	LIMatVector tmp;
 	LIMatQuaternion dir;
 	LIMatTransform transform;
 
 	if (!lieng_object_get_realized (self))
-		return;
+		return 1;
 
 	/* Get direction to target. */
 	lieng_object_get_transform (self, &transform);
 	tmp = limat_vector_subtract (*target, transform.position);
 	tmp.y = 0.0f;
-	if (limat_vector_get_length (tmp) < LIENG_OBJECT_APPROACH_TOLERANCE)
-	{
-		liphy_object_set_movement (self->physics, 0.0f);
-		return;
-	}
+	len = limat_vector_get_length (tmp);
 
 	/* Set look direction. */
-	dir = limat_quaternion_look (tmp, limat_vector_init (0.0f, 1.0f, 0.0f));
-	transform.rotation = limat_quaternion_conjugate (dir);
-	lieng_object_set_transform (self, &transform);
+	if (len > 0.1f)
+	{
+		dir = limat_quaternion_look (tmp, limat_vector_init (0.0f, 1.0f, 0.0f));
+		transform.rotation = limat_quaternion_conjugate (dir);
+		lieng_object_set_transform (self, &transform);
+	}
 
 	/* Move towards target. */
-	liphy_object_set_movement (self->physics, speed);
+	if (len > dist)
+	{
+		liphy_object_set_movement (self->physics, speed);
+		return 0;
+	}
+	liphy_object_set_movement (self->physics, 0.0f);
+
+	return 1;
 }
 
 /**

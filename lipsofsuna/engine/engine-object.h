@@ -73,10 +73,11 @@ void
 lieng_object_ref (LIEngObject* self,
                   int          count);
 
-void
+int
 lieng_object_approach (LIEngObject*       self,
                        const LIMatVector* target,
-                       float              speed);
+                       float              speed,
+                       float              dist);
 
 LIMdlNode*
 lieng_object_find_node (LIEngObject* self,

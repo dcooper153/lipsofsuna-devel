@@ -201,7 +201,10 @@ private_tick (LIExtNpc* self,
 	LIAiPath* path;
 	LIEngObject* object;
 	LIMatTransform transform;
+	LIMatAabb bounds0;
+	LIMatAabb bounds1;
 	LIMatVector diff;
+	LIMatVector dist;
 	LIMatVector impulse;
 	LIMatVector vector;
 	LIScrData* tmp;
@@ -301,7 +304,7 @@ private_tick (LIExtNpc* self,
 			}
 
 			/* Move towards waypoint. */
-			lieng_object_approach (object, &vector, 1.0f);
+			lieng_object_approach (object, &vector, 1.0f, 0.0f);
 			return 1;
 		}
 		else
@@ -318,13 +321,19 @@ private_tick (LIExtNpc* self,
 		return 1;
 	}
 
+	/* Calculate desired distance to target. */
+	lieng_object_get_bounds (object, &bounds0);
+	lieng_object_get_bounds (self->target, &bounds1);
+	dist.x = 0.5f * LIMAT_MAX (LIMAT_ABS (bounds0.min.x), LIMAT_ABS (bounds0.max.x)) +
+	         0.5f * LIMAT_MAX (LIMAT_ABS (bounds1.min.x), LIMAT_ABS (bounds1.max.x));
+	dist.y = 0.5f * LIMAT_MAX (LIMAT_ABS (bounds0.min.z), LIMAT_ABS (bounds0.max.z)) +
+	         0.5f * LIMAT_MAX (LIMAT_ABS (bounds1.min.z), LIMAT_ABS (bounds1.max.z));
+	dist.z = 0.5f * dist.x + 0.5f * dist.y;
+
 	/* Move towards target. */
 	/* FIXME: Speed not supported. */
 	lieng_object_get_transform (self->target, &transform);
-	lieng_object_approach (object, &transform.position, 1.0f);
-
-	/* Attack if near enough. */
-	if (lieng_object_get_distance (object, self->target) <= 3.0)
+	if (lieng_object_approach (object, &transform.position, 1.0f, dist.z))
 		private_attack (self);
 
 	return 1;
@@ -386,6 +395,7 @@ private_rescan (LIExtNpc* self)
 	/* Check if got a return value. */
 	if (lua_isnil (script->lua, -1))
 	{
+		liext_npc_set_target (self, NULL);
 		lua_pop (script->lua, 1);
 		return 1;
 	}
