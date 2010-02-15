@@ -351,13 +351,22 @@ lialg_sectors_refresh_point (LIAlgSectors*      self,
 	LIAlgRangeIter iter;
 	LIAlgSector* sector;
 
-	stamp = time (NULL);
-	range = lialg_range_new_from_sphere (point, radius, self->width);
-	range = lialg_range_clamp (range, 0, self->count - 1);
-	LIALG_RANGE_FOREACH (iter, range)
+	/* Block recursion here or the newly loaded sectors may try to load more
+	 * sectors when creating objects. That could lead to ugly conflicts due
+	 * to the incomplete sector loads in progress in earlier recursion levels.
+	 */
+	if (!self->loading)
 	{
-		sector = lialg_sectors_sector_index (self, iter.index, 1);
-		sector->stamp = stamp;
+		self->loading = 1;
+		stamp = time (NULL);
+		range = lialg_range_new_from_sphere (point, radius, self->width);
+		range = lialg_range_clamp (range, 0, self->count - 1);
+		LIALG_RANGE_FOREACH (iter, range)
+		{
+			sector = lialg_sectors_sector_index (self, iter.index, 1);
+			sector->stamp = stamp;
+		}
+		self->loading = 0;
 	}
 }
 

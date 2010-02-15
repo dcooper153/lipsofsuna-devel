@@ -279,10 +279,10 @@ liext_inventory_set_owner (LIExtInventory* self,
 		if (old != NULL)
 		{
 			lialg_ptrdic_remove (self->module->ptrdic, value);
-			old->owner = NULL;
-			private_send_owner (old);
 			liscr_data_unref (old->owner->script, old->script);
 			liscr_data_unref (old->script, old->owner->script);
+			old->owner = NULL;
+			private_send_owner (old);
 		}
 	}
 

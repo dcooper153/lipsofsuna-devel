@@ -56,6 +56,7 @@ struct _LIAlgSector
 struct _LIAlgSectors
 {
 	int count;
+	int loading;
 	float width;
 	LIAlgU32dic* sectors;
 	LIAlgStrdic* content;

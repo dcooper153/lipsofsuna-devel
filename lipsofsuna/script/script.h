@@ -59,6 +59,10 @@ void
 liscr_script_update (LIScrScript* self,
                      float        secs);
 
+void
+liscr_script_set_gc (LIScrScript* self,
+                     int          value);
+
 void*
 liscr_script_get_userdata (LIScrScript* self);
 

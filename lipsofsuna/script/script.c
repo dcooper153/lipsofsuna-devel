@@ -241,6 +241,22 @@ liscr_script_update (LIScrScript* self,
 {
 }
 
+/**
+ * \brief Enables or disables garbage collection.
+ *
+ * \param self Script.
+ * \param value Nonzero to enable.
+ */
+void
+liscr_script_set_gc (LIScrScript* self,
+                     int          value)
+{
+	if (value)
+		lua_gc (self->lua, LUA_GCRESTART, 0);
+	else
+		lua_gc (self->lua, LUA_GCSTOP, 0);
+}
+
 void*
 liscr_script_get_userdata (LIScrScript* self)
 {

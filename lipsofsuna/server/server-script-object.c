@@ -179,16 +179,21 @@ static void Object_new (LIScrArgs* args)
 	}
 
 	/* Allocate self. */
-	self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 
-		liser_server_get_unique_object (server));
+	liscr_script_set_gc (server->script, 0);
+	id = liser_server_get_unique_object (server);
+	self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
 	if (self == NULL)
+	{
+		liscr_script_set_gc (server->script, 1);
 		return;
+	}
 
 	/* Initialize userdata. */
 	liscr_args_call_setters_except (args, self->script, "realized");
 	liscr_args_gets_bool (args, "realized", &realize);
 	liscr_args_seti_data (args, self->script);
 	lieng_object_set_realized (self, realize);
+	liscr_script_set_gc (server->script, 1);
 }
 
 /* @luadoc

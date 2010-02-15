@@ -299,12 +299,12 @@ private_object_new (LISerServer* server,
 		lisys_free (data);
 		return 0;
 	}
-	liscr_data_unref (object->script, NULL);
 
 	/* Extend engine object. */
 	lieng_object_set_userdata (object, data);
 	liphy_object_set_userdata (object->physics, object);
 	liphy_object_set_contact_call (object->physics, private_contact_callback);
+	liscr_data_unref (object->script, NULL);
 
 	return 1;
 }
@@ -351,12 +351,14 @@ private_sector_load (LISerServer* server,
 			return 1;
 		}
 		id = sqlite3_column_int (statement, 0);
+		liscr_script_set_gc (server->script, 0);
 		object = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
 		if (object != NULL)
 		{
 			if (liser_object_serialize (object, 0))
 				lieng_object_set_realized (object, 1);
 		}
+		liscr_script_set_gc (server->script, 1);
 	}
 }
 

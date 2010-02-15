@@ -307,10 +307,12 @@ private_connect (LISerNetwork*    self,
 	pthread_mutex_unlock (&self->mutex);
 
 	/* Create object. */
+	liscr_script_set_gc (self->server->script, 0);
 	object = lieng_object_new (self->server->engine, NULL, LIPHY_CONTROL_MODE_RIGID,
 		liser_server_get_unique_object (self->server));
 	if (object == NULL)
 	{
+		liscr_script_set_gc (self->server->script, 1);
 		lisys_free (pass);
 		return 0;
 	}
@@ -323,12 +325,14 @@ private_connect (LISerNetwork*    self,
 	if (client == NULL)
 	{
 		grapple_server_disconnect_client (self->socket, message->NEW_USER.id);
+		liscr_script_set_gc (self->server->script, 1);
 		lisys_free (pass);
 		return 0;
 	}
 	if (!lialg_u32dic_insert (self->clients, message->NEW_USER.id, client))
 	{
 		liser_client_free (client);
+		liscr_script_set_gc (self->server->script, 1);
 		lisys_free (pass);
 		return 0;
 	}
@@ -340,6 +344,7 @@ private_connect (LISerNetwork*    self,
 	if (!liser_object_set_client (object, client))
 	{
 		liser_client_free (client);
+		liscr_script_set_gc (self->server->script, 1);
 		lisys_free (pass);
 		return 0;
 	}
@@ -347,6 +352,7 @@ private_connect (LISerNetwork*    self,
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->server->callbacks, self->server->engine, "client-login", lical_marshal_DATA_PTR_PTR_PTR, object, message->NEW_USER.name, pass);
 	lisys_free (pass);
+	liscr_script_set_gc (self->server->script, 1);
 
 	return 1;
 }
