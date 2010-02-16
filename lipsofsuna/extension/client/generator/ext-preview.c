@@ -835,7 +835,7 @@ private_motion (LIExtPreview* self,
 		case LIEXT_PREVIEW_MODE_TRANSLATE:
 			lialg_camera_get_transform (self->camera, &transform);
 			vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
-			vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
+			vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, -1.0f, 0.0f));
 			vx = limat_vector_multiply (vx, 0.05f * self->drag.x);
 			vy = limat_vector_multiply (vy, 0.05f * self->drag.y);
 			delta = limat_vector_add (vx, vy);
