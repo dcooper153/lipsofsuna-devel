@@ -346,7 +346,8 @@ liscr_args_geti_string (LIScrArgs*   self,
 	{
 		lua_pushnumber (self->lua, index + 1);
 		lua_gettable (self->lua, self->input_table);
-		tmp = lua_tostring (self->lua, -1);
+		if (lua_type (self->lua, -1) == LUA_TSTRING)
+			tmp = lua_tostring (self->lua, -1);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
 			*result = tmp;
@@ -356,7 +357,8 @@ liscr_args_geti_string (LIScrArgs*   self,
 		if (index < 0 || index >= self->args_count)
 			return 0;
 		index += self->args_start;
-		tmp = lua_tostring (self->lua, index);
+		if (lua_type (self->lua, -1) == LUA_TSTRING)
+			tmp = lua_tostring (self->lua, index);
 		if (tmp != NULL)
 			*result = tmp;
 	}
@@ -565,7 +567,8 @@ liscr_args_gets_string (LIScrArgs*   self,
 	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
 	{
 		lua_getfield (self->lua, self->input_table, name);
-		tmp = lua_tostring (self->lua, -1);
+		if (lua_type (self->lua, -1) == LUA_TSTRING)
+			tmp = lua_tostring (self->lua, -1);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
 			*result = tmp;

@@ -339,7 +339,7 @@ static void Voxel_replace (LIScrArgs* args)
  * -- Rotates a voxel near the given point.
  * --
  * -- Arguments:
- * -- axis: Axis of rotation ("x"/"y"/"z")
+ * -- axis: Axis of rotation ("x"/"y"/"z" or 1/2/3)
  * -- point: Position vector. (required)
  * -- step: Number of steps to rotate.
  * --
@@ -366,6 +366,10 @@ static void Voxel_rotate (LIScrArgs* args)
 			if (!strcmp (tmp, "x")) axis = 0;
 			else if (!strcmp (tmp, "y")) axis = 1;
 			else if (!strcmp (tmp, "z")) axis = 2;
+		}
+		else if (liscr_args_gets_int (args, "axis", &axis))
+		{
+			axis = LIMAT_CLAMP (axis - 1, 0, 2);
 		}
 		liscr_args_seti_bool (args, livox_manager_rotate_voxel (module->voxels, &point, axis, step));
 	}

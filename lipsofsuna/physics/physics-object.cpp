@@ -167,21 +167,19 @@ liphy_object_insert_shape (LIPhyObject*          self,
                            LIPhyShape*           shape,
                            const LIMatTransform* transform)
 {
-	btTransform btransform;
-
 	if (transform != NULL)
 	{
-		btransform.setOrigin (btVector3 (transform->position.x,
-			transform->position.y, transform->position.z));
-		btransform.setRotation (btQuaternion (transform->rotation.x,
-			transform->rotation.y, transform->rotation.z, transform->rotation.w));
+		btTransform btransform(
+			btQuaternion (transform->rotation.x, transform->rotation.y,
+			              transform->rotation.z, transform->rotation.w),
+			btVector3 (transform->position.x, transform->position.y, transform->position.z));
+		self->shape->addChildShape (btransform, shape->shape);
 	}
 	else
 	{
-		btransform.setOrigin (btVector3 (0.0f, 0.0f, 0.0f));
-		btransform.setRotation (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
+		btTransform btransform (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
+		self->shape->addChildShape (btransform, shape->shape);
 	}
-	self->shape->addChildShape (btransform, shape->shape);
 
 	return 1;
 }
