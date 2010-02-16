@@ -42,10 +42,10 @@ void
 liext_block_free (LIExtBlock* self);
 
 int
-liext_block_build (LIExtBlock*  self,
-                   LIExtModule* module,
-                   LIVoxBlock*  block,
-                   LIMatVector* offset);
+liext_block_build (LIExtBlock*     self,
+                   LIExtModule*    module,
+                   LIVoxBlock*     block,
+                   LIVoxBlockAddr* addr);
 
 #endif
 

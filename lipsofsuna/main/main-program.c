@@ -310,8 +310,10 @@ limai_program_main (LIMaiProgram* self)
 		/* Update. */
 		if (!limai_program_update (self, secs))
 			break;
-		if (self->sleep)
-			lisys_usleep (self->sleep);
+
+		/* Sleep until end of frame. */
+		if (self->sleep > (int)(1000000 * secs))
+			lisys_usleep (self->sleep - (int)(1000000 * secs));
 	}
 
 	return 1;

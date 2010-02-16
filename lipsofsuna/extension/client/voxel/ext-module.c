@@ -259,32 +259,6 @@ private_block_load (LIExtModule*      self,
 
 	liext_module_build_block (self, sx, sy, sz, bx, by, bz);
 
-	if (bx)
-		liext_module_build_block (self, sx, sy, sz, bx - 1, by, bz);
-	else
-		liext_module_build_block (self, sx - 1, sy, sz, LIVOX_BLOCKS_PER_LINE - 1, by, bz);
-	if (by)
-		liext_module_build_block (self, sx, sy, sz, bx, by - 1, bz);
-	else
-		liext_module_build_block (self, sx, sy - 1, sz, bx, LIVOX_BLOCKS_PER_LINE - 1, bz);
-	if (bz)
-		liext_module_build_block (self, sx, sy, sz, bx, by, bz - 1);
-	else
-		liext_module_build_block (self, sx, sy, sz - 1, bx, by, LIVOX_BLOCKS_PER_LINE - 1);
-
-	if (bx < LIVOX_BLOCKS_PER_LINE - 1)
-		liext_module_build_block (self, sx, sy, sz, bx + 1, by, bz);
-	else
-		liext_module_build_block (self, sx + 1, sy, sz, 0, by, bz);
-	if (by < LIVOX_BLOCKS_PER_LINE - 1)
-		liext_module_build_block (self, sx, sy, sz, bx, by + 1, bz);
-	else
-		liext_module_build_block (self, sx, sy + 1, sz, bx, 0, bz);
-	if (bz < LIVOX_BLOCKS_PER_LINE - 1)
-		liext_module_build_block (self, sx, sy, sz, bx, by, bz + 1);
-	else
-		liext_module_build_block (self, sx, sy, sz + 1, bx, by, 0);
-
 	return 1;
 }
 

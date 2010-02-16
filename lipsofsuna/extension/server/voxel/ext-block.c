@@ -27,6 +27,8 @@
 #include "ext-module.h"
 #include "ext-block.h"
 
+#define LINE (LIVOX_TILES_PER_LINE + 2)
+
 LIExtBlock*
 liext_block_new (LIExtModule* module)
 {
@@ -50,19 +52,24 @@ liext_block_free (LIExtBlock* self)
 }
 
 int
-liext_block_build (LIExtBlock*  self,
-                   LIExtModule* module,
-                   LIVoxBlock*  block,
-                   LIMatVector* offset)
+liext_block_build (LIExtBlock*     self,
+                   LIExtModule*    module,
+                   LIVoxBlock*     block,
+                   LIVoxBlockAddr* addr)
 {
+	int i;
 	int x;
 	int y;
 	int z;
+	int index;
+	int occlusion[LINE * LINE * LINE];
 	LIMatTransform transform;
+	LIMatVector offset;
 	LIMatVector vector;
 	LIEngModel* model;
 	LIVoxMaterial* material;
 	LIVoxVoxel* voxel;
+	LIVoxVoxel voxels[LINE * LINE * LINE];
 
 	/* Free old object. */
 	if (self->physics != NULL)
@@ -71,14 +78,31 @@ liext_block_build (LIExtBlock*  self,
 		self->physics = NULL;
 	}
 
+	/* Fetch voxel data. */
+	livox_manager_copy_voxels (module->voxels,
+		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[0] + addr->block[0]) - 1,
+		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[1] + addr->block[1]) - 1,
+		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[2] + addr->block[2]) - 1,
+		LINE, LINE, LINE, voxels);
+
+	/* Calculate occlusion. */
+	i = livox_manager_solve_occlusion (module->voxels, LINE, LINE, LINE, voxels, occlusion);
+	if (i == LIVOX_TILES_PER_BLOCK)
+		return 0;
+
 	/* Create new shape. */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
 	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
 	{
 		/* Type check. */
-		voxel = livox_block_get_voxel (block, x, y, z);
+		index = (x + 1) + (y + 1) * LINE + (z + 1) * LINE * LINE;
+		voxel = voxels + index;
 		if (!voxel->type)
+			continue;
+
+		/* Occlusion check. */
+		if (occlusion[index] & LIVOX_OCCLUDE_OCCLUDED)
 			continue;
 
 		/* Get model. */
@@ -99,12 +123,20 @@ liext_block_build (LIExtBlock*  self,
 			liphy_object_insert_shape (self->physics, model->physics, &transform);
 	}
 
+	/* Calculate offset. */
+	vector = limat_vector_init (addr->sector[0], addr->sector[1], addr->sector[2]);
+	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
+	offset = limat_vector_init (addr->block[0], addr->block[1], addr->block[2]);
+	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
+	offset = limat_vector_add (offset, vector);
+	transform = limat_transform_identity ();
+
 	/* Realize if not empty. */
 	if (self->physics != NULL)
 	{
 		liphy_object_set_collision_group (self->physics, LIPHY_GROUP_TILES);
 		liphy_object_set_collision_mask (self->physics, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
-		transform = limat_convert_vector_to_transform (*offset);
+		transform = limat_convert_vector_to_transform (offset);
 		liphy_object_set_transform (self->physics, &transform);
 		liphy_object_set_realized (self->physics, 1);
 	}

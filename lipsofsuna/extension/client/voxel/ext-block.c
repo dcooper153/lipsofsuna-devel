@@ -29,7 +29,6 @@
 
 #define CULL_EPSILON 0.01f
 #define LINE (LIVOX_TILES_PER_LINE + 2)
-#define INDEX(x, y, z) ((x) + (y) * LINE + (z) * LINE * LINE)
 
 typedef struct _LIExtVoxel LIExtVoxel;
 struct _LIExtVoxel
@@ -124,7 +123,9 @@ liext_block_build (LIExtBlock*     self,
 	int x;
 	int y;
 	int z;
-	int occluders[LINE * LINE * LINE];
+	int index;
+	int count;
+	int occlusion[LINE * LINE * LINE];
 	LIEngModel* model;
 	LIMatTransform transform;
 	LIMatVector vector;
@@ -134,13 +135,8 @@ liext_block_build (LIExtBlock*     self,
 	LIVoxVoxel voxels[LINE * LINE * LINE];
 	LIExtVoxel info[LIVOX_TILES_PER_BLOCK];
 
-	/* Calculate offset. */
-	vector = limat_vector_init (addr->sector[0], addr->sector[1], addr->sector[2]);
-	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
-	offset = limat_vector_init (addr->block[0], addr->block[1], addr->block[2]);
-	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
-	offset = limat_vector_add (offset, vector);
-	transform = limat_transform_identity ();
+	/* Free old objects. */
+	liext_block_clear (self);
 
 	/* Fetch voxel data. */
 	livox_manager_copy_voxels (module->voxels,
@@ -149,13 +145,23 @@ liext_block_build (LIExtBlock*     self,
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[2] + addr->block[2]) - 1,
 		LINE, LINE, LINE, voxels);
 
-	/* Prebuild occlusion data. */
-	for (i = 0 ; i < LINE * LINE * LINE ; i++)
-		occluders[i] = livox_manager_check_occluder (module->voxels, voxels + i);
+	/* Calculate occlusion. */
+	i = livox_manager_solve_occlusion (module->voxels, LINE, LINE, LINE, voxels, occlusion);
+	if (i == LIVOX_TILES_PER_BLOCK)
+		return 1;
+
+	/* Calculate offset. */
+	vector = limat_vector_init (addr->sector[0], addr->sector[1], addr->sector[2]);
+	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
+	offset = limat_vector_init (addr->block[0], addr->block[1], addr->block[2]);
+	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
+	offset = limat_vector_add (offset, vector);
+	transform = limat_transform_identity ();
 
 	/* Clear object data. */
 	memset (info, 0, sizeof (info));
 	i = 0;
+	count = 0;
 
 	/* Prebuild object data. */
 	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
@@ -163,18 +169,13 @@ liext_block_build (LIExtBlock*     self,
 	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++, i++)
 	{
 		/* Type check. */
-		voxel = voxels + INDEX (x + 1, y + 1, z + 1);
+		index = (x + 1) + (y + 1) * LINE + (z + 1) * LINE * LINE;
+		voxel = voxels + index;
 		if (!voxel->type)
 			continue;
 
 		/* Occlusion check. */
-		if (occluders[INDEX (x    , y + 1, z + 1)]) info[i].mask |= 0x01;
-		if (occluders[INDEX (x + 2, y + 1, z + 1)]) info[i].mask |= 0x02;
-		if (occluders[INDEX (x + 1, y    , z + 1)]) info[i].mask |= 0x04;
-		if (occluders[INDEX (x + 1, y + 2, z + 1)]) info[i].mask |= 0x08;
-		if (occluders[INDEX (x + 1, y + 1, z    )]) info[i].mask |= 0x10;
-		if (occluders[INDEX (x + 1, y + 1, z + 2)]) info[i].mask |= 0x20;
-		if (info[i].mask == 0x3F)
+		if (occlusion[index] & LIVOX_OCCLUDE_OCCLUDED)
 			continue;
 
 		/* Engine model. */
@@ -191,10 +192,10 @@ liext_block_build (LIExtBlock*     self,
 		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
 		info[i].transform.position = limat_vector_add (vector, offset);
 		livox_voxel_get_quaternion (voxel, &info[i].transform.rotation);
+		count++;
 	}
-
-	/* Free old objects. */
-	liext_block_clear (self);
+	if (!count)
+		return 1;
 
 	/* Build new objects. */
 	private_build_physics (self, module, info);

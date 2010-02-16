@@ -161,6 +161,9 @@ livox_manager_copy_voxels (LIVoxManager* self,
 	int sx;
 	int sy;
 	int sz;
+	int tx;
+	int ty;
+	int tz;
 	LIVoxSector* sec;
 
 	/* FIXME: Avoid excessive sector lookups. */
@@ -171,14 +174,19 @@ livox_manager_copy_voxels (LIVoxManager* self,
 		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		sec = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
-		if (sec != NULL)
+		tx = x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		ty = y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		tz = z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		if (sx < 0 || sx >= LIVOX_SECTORS_PER_LINE || tx < 0 ||
+		    sy < 0 || sy >= LIVOX_SECTORS_PER_LINE || ty < 0 ||
+		    sz < 0 || sz >= LIVOX_SECTORS_PER_LINE || tz < 0)
 		{
-			result[i] = *livox_sector_get_voxel (sec,
-				x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-				y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-				z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
+			livox_voxel_init (result + i, 1);
+			continue;
 		}
+		sec = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 0);
+		if (sec != NULL)
+			result[i] = *livox_sector_get_voxel (sec, tx, ty, tz);
 		else
 			livox_voxel_init (result + i, 1);
 	}
@@ -740,6 +748,68 @@ livox_manager_rotate_voxel (LIVoxManager*      self,
 	}
 
 	return 0;
+}
+
+/**
+ * \brief Solves occlusion masks for a volume of voxels.
+ *
+ * \param self Voxel manager.
+ * \param xsize Number of voxels.
+ * \param ysize Number of voxels.
+ * \param zsize Number of voxels.
+ * \param result Buffer with room for xsize*ysize*zsize integers.
+ * \return Number of completely occluded voxels.
+ */
+int
+livox_manager_solve_occlusion (LIVoxManager* self,
+                               int           xsize,
+                               int           ysize,
+                               int           zsize,
+                               LIVoxVoxel*   voxels,
+                               int*          result)
+{
+	int i;
+	int x;
+	int y;
+	int z;
+	int count = 0;
+
+	/* Solve occluders. */
+	for (i = 0 ; i < xsize * ysize * zsize ; i++)
+	{
+		if (livox_manager_check_occluder (self, voxels + i))
+			result[i] = LIVOX_OCCLUDE_OCCLUDER;
+		else
+			result[i] = 0;
+	}
+
+	/* Solve occlusion. */
+	for (z = 1 ; z < zsize - 1 ; z++)
+	for (y = 1 ; y < ysize - 1 ; y++)
+	for (x = 1 ; x < xsize - 1 ; x++)
+	{
+		/* Check for occlusion from each side. */
+		i = x + y * ysize + z * ysize * zsize;
+		if (result[i - 1] & LIVOX_OCCLUDE_OCCLUDER)
+			result[i] |= LIVOX_OCCLUDE_XNEG;
+		if (result[i + 1] & LIVOX_OCCLUDE_OCCLUDER)
+			result[i] |= LIVOX_OCCLUDE_XPOS;
+		if (result[i - ysize] & LIVOX_OCCLUDE_OCCLUDER)
+			result[i] |= LIVOX_OCCLUDE_YNEG;
+		if (result[i + ysize] & LIVOX_OCCLUDE_OCCLUDER)
+			result[i] |= LIVOX_OCCLUDE_YPOS;
+		if (result[i - ysize * zsize] & LIVOX_OCCLUDE_OCCLUDER)
+			result[i] |= LIVOX_OCCLUDE_ZNEG;
+		if (result[i + ysize * zsize] & LIVOX_OCCLUDE_OCCLUDER)
+			result[i] |= LIVOX_OCCLUDE_ZPOS;
+		if ((result[i] & LIVOX_OCCLUDE_ALL) == LIVOX_OCCLUDE_ALL)
+		{
+			result[i] |= LIVOX_OCCLUDE_OCCLUDED;
+			count++;
+		}
+	}
+
+	return count;
 }
 
 void

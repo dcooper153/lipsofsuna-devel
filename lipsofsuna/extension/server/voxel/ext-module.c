@@ -265,7 +265,7 @@ private_block_load (LIExtModule*      self,
 	orig = limat_vector_add (orig, vector);
 
 	/* Build the block. */
-	if (!liext_block_build (eblock, self, vblock, &orig))
+	if (!liext_block_build (eblock, self, vblock, &addr))
 	{
 		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
 		liext_block_free (eblock);

@@ -139,6 +139,14 @@ livox_manager_rotate_voxel (LIVoxManager*      self,
                             int                axis,
                             int                step);
 
+int
+livox_manager_solve_occlusion (LIVoxManager* self,
+                               int           xsize,
+                               int           ysize,
+                               int           zsize,
+                               LIVoxVoxel*   voxels,
+                               int*          result);
+
 void
 livox_manager_update (LIVoxManager* self,
                       float         secs);
