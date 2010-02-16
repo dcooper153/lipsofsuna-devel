@@ -75,6 +75,17 @@ void
 liext_preview_build (LIExtPreview* self);
 
 int
+liext_preview_build_brush (LIExtPreview* self,
+                           LIGenBrush*   brush,
+                           int           object);
+
+int
+liext_preview_build_rule (LIExtPreview* self,
+                          LIGenBrush*   brush,
+                          LIGenRule*    rule,
+                          int           stroke);
+
+int
 liext_preview_build_tile (LIExtPreview* self,
                           int           material);
 
@@ -124,6 +135,10 @@ liext_preview_setup_camera (LIExtPreview* self,
 void
 liext_preview_get_bounds (LIExtPreview* self,
                           LIMatAabb*    aabb);
+
+void
+liext_preview_get_camera_transform (LIExtPreview*   self,
+                                    LIMatTransform* value);
 
 void
 liext_preview_get_transform (LIExtPreview*   self,

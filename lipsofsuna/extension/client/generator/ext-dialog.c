@@ -121,7 +121,6 @@ private_init (LIExtEditor*  self,
 
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 0, 0);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self), 0, 1);
-	liwdg_group_set_col_expand (LIWDG_GROUP (self), 1, 1);
 	liwdg_group_set_row_expand (LIWDG_GROUP (self), 0, 1);
 
 	return 1;

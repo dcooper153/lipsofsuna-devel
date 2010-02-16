@@ -197,6 +197,109 @@ liext_preview_build (LIExtPreview* self)
 }
 
 int
+liext_preview_build_brush (LIExtPreview* self,
+                           LIGenBrush*   brush,
+                           int           object)
+{
+	int i;
+	LIGenBrushobject* object_;
+	LIMatQuaternion quat;
+	LIMatTransform transform;
+	LIMatVector vec;
+
+	/* Create terrain. */
+	liext_preview_clear (self);
+	liext_preview_insert_stroke (self, 0, 0, 0, brush->id);
+
+	/* Create objects. */
+	for (i = 0 ; i < brush->objects.count ; i++)
+	{
+		object_ = brush->objects.array[i];
+		if (object == i)
+		{
+			liext_preview_get_transform (self, &transform);
+			vec = limat_vector_add (transform.position, object_->transform.position);
+			quat = limat_quaternion_multiply (transform.rotation, object_->transform.rotation);
+			transform = limat_transform_init (vec, quat);
+		}
+		else
+			transform = object_->transform;
+		liext_preview_insert_object (self, &transform, object_->model);
+	}
+
+	/* Rebuild. */
+	liext_preview_build (self);
+
+	return 1;
+}
+
+int
+liext_preview_build_rule (LIExtPreview* self,
+                          LIGenBrush*   brush,
+                          LIGenRule*    rule,
+                          int           stroke)
+{
+	int i;
+	int j;
+	int pos[3];
+	LIGenBrushobject* object;
+	LIGenBrush* brush_;
+	LIGenRulestroke* stroke_;
+	LIMatTransform transform;
+	LIMatVector offset;
+
+	/* Create rules. */
+	liext_preview_clear (self);
+	for (i = 0 ; i < rule->strokes.count ; i++)
+	{
+		stroke_ = rule->strokes.array + i;
+		brush_ = ligen_generator_find_brush (self->generator, stroke_->brush);
+		if (brush_ == NULL)
+			continue;
+
+		/* Create terrain. */
+		pos[0] = stroke_->pos[0];
+		pos[1] = stroke_->pos[1];
+		pos[2] = stroke_->pos[2];
+		if (stroke == i)
+		{
+			liext_preview_get_transform (self, &transform);
+			pos[0] += (int)(round (transform.position.x / LIVOX_TILE_WIDTH));
+			pos[1] += (int)(round (transform.position.y / LIVOX_TILE_WIDTH));
+			pos[2] += (int)(round (transform.position.z / LIVOX_TILE_WIDTH));
+		}
+		liext_preview_insert_stroke (self, pos[0], pos[1], pos[2], stroke_->brush);
+
+		/* Create objects. */
+		for (j = 0 ; j < brush_->objects.count ; j++)
+		{
+			object = brush_->objects.array[j];
+			offset = limat_vector_init (pos[0], pos[1], pos[2]);
+			offset = limat_vector_multiply (offset, LIVOX_TILE_WIDTH);
+			transform = limat_convert_vector_to_transform (offset);
+			transform = limat_transform_multiply (transform, object->transform);
+			liext_preview_insert_object (self, &transform, object->model);
+		}
+	}
+
+	/* Create main terrain. */
+	liext_preview_insert_stroke (self, 0, 0, 0, brush->id);
+
+	/* Create main objects. */
+	for (j = 0 ; j < brush->objects.count ; j++)
+	{
+		object = brush->objects.array[j];
+		transform = object->transform;
+		liext_preview_insert_object (self, &transform, object->model);
+	}
+
+	/* Rebuild. */
+	liext_preview_build (self);
+
+	return 1;
+}
+
+int
 liext_preview_build_tile (LIExtPreview* self,
                           int           material)
 {
@@ -419,6 +522,18 @@ liext_preview_get_bounds (LIExtPreview* self,
 		if (aabb->max.y < y[1]) aabb->max.y = y[1];
 		if (aabb->max.z < z[1]) aabb->max.z = z[1];
 	}
+}
+
+void
+liext_preview_get_camera_transform (LIExtPreview*   self,
+                                    LIMatTransform* value)
+{
+	LIMatVector center;
+
+	center = limat_vector_init (LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER, LIEXT_PREVIEW_CENTER);
+	center = limat_vector_multiply (center, LIVOX_TILE_WIDTH);
+	lialg_camera_get_transform (self->camera, value);
+	value->position = limat_vector_subtract (value->position, center);
 }
 
 void
@@ -777,7 +892,7 @@ private_motion (LIExtPreview* self,
 	{
 		lialg_camera_get_transform (self->camera, &transform);
 		vx = limat_quaternion_transform (transform.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
-		vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
+		vy = limat_quaternion_transform (transform.rotation, limat_vector_init (0.0f, -1.0f, 0.0f));
 		vx = limat_vector_multiply (vx, LIEXT_PREVIEW_PAN * event->motion.dx);
 		vy = limat_vector_multiply (vy, LIEXT_PREVIEW_PAN * event->motion.dy);
 		transform1 = limat_convert_vector_to_transform (limat_vector_add (vx, vy));

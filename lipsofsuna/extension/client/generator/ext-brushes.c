@@ -433,9 +433,7 @@ private_add (LIExtBrushes* self,
 			assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
 			/* Fall through. */
 		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
-			transform = limat_transform_init (
-				limat_vector_init (0.0f, 0.0f, 0.0f),
-				limat_quaternion_identity ());
+			liext_preview_get_camera_transform (LIEXT_PREVIEW (self->widgets.preview), &transform);
 			if (!ligen_brush_insert_object (data->brush, 0, 1.0f, "", "", "", &transform))
 				return 0;
 			if (!private_append_object (self, row, data->brush->objects.count - 1))
@@ -608,8 +606,8 @@ private_paint_terrain (LIExtBrushes* self,
 	if (!liwdg_render_pick (LIWDG_RENDER (self->widgets.preview), &result, x, y))
 	{
 		preview = LIEXT_PREVIEW (self->widgets.preview);
-		point[0] = limat_vector_init (x, y, 0.0f);
-		point[1] = limat_vector_init (x, y, 0.5f);
+		point[0] = limat_vector_init (x, LIWDG_WIDGET (self)->manager->height - y - 1, 0.0f);
+		point[1] = limat_vector_init (x, LIWDG_WIDGET (self)->manager->height - y - 1, 0.5f);
 		lialg_camera_unproject (preview->camera, point + 0, line + 0);
 		lialg_camera_unproject (preview->camera, point + 1, line + 1);
 		liext_preview_get_bounds (preview, &aabb);
@@ -1395,16 +1393,7 @@ private_rebuild_brush (LIExtBrushes* self)
 static void
 private_rebuild_preview (LIExtBrushes* self)
 {
-	int i;
-	int j;
-	int pos[3];
 	LIExtBrushesTreerow* row;
-	LIGenBrush* brush;
-	LIGenBrushobject* object;
-	LIGenRulestroke* stroke;
-	LIMatQuaternion quat;
-	LIMatTransform transform;
-	LIMatVector vec;
 
 	row = private_get_active (self);
 	if (row == NULL || row->brush == NULL)
@@ -1414,72 +1403,10 @@ private_rebuild_preview (LIExtBrushes* self)
 		return;
 	}
 
-	/* Brush? */
 	if (row->rule == NULL)
-	{
-		liext_preview_clear (LIEXT_PREVIEW (self->widgets.preview));
-		liext_preview_insert_stroke (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0, row->brush->id);
-		for (j = 0 ; j < row->brush->objects.count ; j++)
-		{
-			object = row->brush->objects.array[j];
-			if (row->object == j)
-			{
-				liext_preview_get_transform (LIEXT_PREVIEW (self->widgets.preview), &transform);
-				vec = limat_vector_add (transform.position, object->transform.position);
-				quat = limat_quaternion_multiply (transform.rotation, object->transform.rotation);
-				transform = limat_transform_init (vec, quat);
-			}
-			else
-				transform = object->transform;
-			liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
-		}
-		liext_preview_build (LIEXT_PREVIEW (self->widgets.preview));
-	}
-
-	/* Rule? */
+		liext_preview_build_brush (LIEXT_PREVIEW (self->widgets.preview), row->brush, row->object);
 	else
-	{
-		liext_preview_clear (LIEXT_PREVIEW (self->widgets.preview));
-		for (i = 0 ; i < row->rule->strokes.count ; i++)
-		{
-			stroke = row->rule->strokes.array + i;
-			pos[0] = stroke->pos[0];
-			pos[1] = stroke->pos[1];
-			pos[2] = stroke->pos[2];
-			if (row->stroke == i)
-			{
-				liext_preview_get_transform (LIEXT_PREVIEW (self->widgets.preview), &transform);
-				pos[0] += (int)(round (transform.position.x / LIVOX_TILE_WIDTH));
-				pos[1] += (int)(round (transform.position.y / LIVOX_TILE_WIDTH));
-				pos[2] += (int)(round (transform.position.z / LIVOX_TILE_WIDTH));
-			}
-			liext_preview_insert_stroke (LIEXT_PREVIEW (self->widgets.preview),
-				pos[0], pos[1], pos[2], stroke->brush);
-		}
-		liext_preview_insert_stroke (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0, row->brush->id);
-		for (i = 0 ; i < row->rule->strokes.count ; i++)
-		{
-			stroke = row->rule->strokes.array + i;
-			brush = ligen_generator_find_brush (self->generator, stroke->brush);
-			if (brush == NULL)
-				continue;
-			for (j = 0 ; j < brush->objects.count ; j++)
-			{
-				object = brush->objects.array[j];
-				transform = limat_convert_vector_to_transform (limat_vector_init (
-					stroke->pos[0], stroke->pos[1], stroke->pos[2]));
-				transform = limat_transform_multiply (object->transform, transform);
-				liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
-			}
-		}
-		for (j = 0 ; j < row->brush->objects.count ; j++)
-		{
-			object = row->brush->objects.array[j];
-			transform = object->transform;
-			liext_preview_insert_object (LIEXT_PREVIEW (self->widgets.preview), &transform, object->model);
-		}
-		liext_preview_build (LIEXT_PREVIEW (self->widgets.preview));
-	}
+		liext_preview_build_rule (LIEXT_PREVIEW (self->widgets.preview), row->brush, row->rule, row->stroke);
 }
 
 static void
