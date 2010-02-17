@@ -1,4 +1,3 @@
-SUBDIRS = docs
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
@@ -7,7 +6,7 @@ EXTRA_DIST = \
 	lipsofsuna/math/unittest.c \
 	reload/blender-export.py
 
-SUBDIRS += .
+SUBDIRS = .
 if MAYBE_SERVER
 SUBDIRS += lipsofsuna/extension/common
 endif
@@ -17,6 +16,7 @@ endif
 if MAYBE_SERVER
 SUBDIRS += lipsofsuna/extension/server
 endif
+SUBDIRS += docs
 
 editordir = $(TOOLDIR)
 editor_DATA = lipsofsuna/reload/blender-export.py
@@ -611,10 +611,6 @@ all-local:
 		if test -d deps/lib; then \
 			for i in `ls deps/lib/*.so.[0-9]`; do cp $$i build/lib; done; \
 		fi; \
-		if test ! -e build/data; then \
-			echo -e "\\n *** Install data files to build/data"; \
-		fi; \
-		echo -e "\\n *** Play by typing build/lipsofsuna\\n"; \
 	fi
 
 clean-local:

@@ -470,8 +470,8 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = docs . lipsofsuna/extension/common \
-	lipsofsuna/extension/client lipsofsuna/extension/server
+DIST_SUBDIRS = . lipsofsuna/extension/common \
+	lipsofsuna/extension/client lipsofsuna/extension/server docs
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -678,7 +678,6 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = docs . $(am__append_1) $(am__append_2) $(am__append_3)
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(LICLI_CFLAGS)
 AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
@@ -687,6 +686,7 @@ EXTRA_DIST = \
 	lipsofsuna/math/unittest.c \
 	reload/blender-export.py
 
+SUBDIRS = . $(am__append_1) $(am__append_2) $(am__append_3) docs
 editordir = $(TOOLDIR)
 editor_DATA = lipsofsuna/reload/blender-export.py
 prgdir = $(PROGDIR)
@@ -3699,10 +3699,6 @@ all-local:
 		if test -d deps/lib; then \
 			for i in `ls deps/lib/*.so.[0-9]`; do cp $$i build/lib; done; \
 		fi; \
-		if test ! -e build/data; then \
-			echo -e "\\n *** Install data files to build/data"; \
-		fi; \
-		echo -e "\\n *** Play by typing build/lipsofsuna\\n"; \
 	fi
 
 clean-local:

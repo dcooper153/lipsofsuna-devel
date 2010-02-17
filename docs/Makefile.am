@@ -1,5 +1,13 @@
 EXTRA_DIST = Doxyfile makedoc.rb
 
+all-local:
+	@if test "x$(RELPATH)" = "xyes"; then \
+		if test ! -e ../build/data; then \
+			echo -e "\\n *** Install data files to build/data"; \
+		fi; \
+		echo -e "\\n *** Play by typing build/lipsofsuna\\n"; \
+	fi
+
 clean-local:
 	rm -Rf html
 	rm -Rf tmp
