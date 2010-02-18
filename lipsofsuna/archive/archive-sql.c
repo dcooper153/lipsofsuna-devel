@@ -26,6 +26,12 @@
 #include <lipsofsuna/system.h>
 #include "archive-sql.h"
 
+#if 0
+#define SQLDEBUG(f, q) printf (f, q);
+#else
+#define SQLDEBUG(f, q)
+#endif
+
 int
 liarc_sql_delete (LIArcSql*   self,
                   const char* table)
@@ -46,7 +52,46 @@ liarc_sql_delete (LIArcSql*   self,
 	pos += len;
 	query[pos++] = ';';
 	query[pos] = '\0';
-	printf ("SQL DEBUG: %s\n", query);
+	SQLDEBUG ("SQL DEBUG: %s\n", query);
+
+	/* Execute statement. */
+	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self));
+		return 0;
+	}
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
+}
+
+int
+liarc_sql_drop (LIArcSql*   self,
+                const char* table)
+{
+	int len;
+	int pos;
+	char* query;
+	sqlite3_stmt* statement;
+
+	/* Format query. */
+	len = strlen (table);
+	query = lisys_calloc (len + 23, sizeof (char));
+	if (query == NULL)
+		return 0;
+	strcpy (query, "DROP TABLE IF EXISTS ");
+	pos = 21;
+	strcpy (query + pos, table);
+	pos += len;
+	query[pos++] = ';';
+	query[pos] = '\0';
+	SQLDEBUG ("SQL DEBUG: %s\n", query);
 
 	/* Execute statement. */
 	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)
@@ -156,7 +201,7 @@ liarc_sql_insert (LIArcSql*   self,
 	}
 	query[pos++] = ';';
 	query[pos] = '\0';
-	printf ("SQL DEBUG: %s\n", query);
+	SQLDEBUG ("SQL DEBUG: %s\n", query);
 
 	/* Prepare statement. */
 	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)
@@ -219,6 +264,29 @@ liarc_sql_insert (LIArcSql*   self,
 	va_end (args);
 
 	/* Write values. */
+	if (sqlite3_step (statement) != SQLITE_DONE)
+	{
+		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	sqlite3_finalize (statement);
+
+	return 1;
+}
+
+int
+liarc_sql_query (LIArcSql*   self,
+                 const char* query)
+{
+	sqlite3_stmt* statement;
+
+	SQLDEBUG ("SQL DEBUG: %s\n", query);
+	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self));
+		return 0;
+	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
 		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self));
@@ -321,7 +389,7 @@ liarc_sql_replace (LIArcSql*   self,
 	}
 	query[pos++] = ';';
 	query[pos] = '\0';
-	printf ("SQL DEBUG: %s\n", query);
+	SQLDEBUG ("SQL DEBUG: %s\n", query);
 
 	/* Prepare statement. */
 	if (sqlite3_prepare_v2 (self, query, -1, &statement, NULL) != SQLITE_OK)

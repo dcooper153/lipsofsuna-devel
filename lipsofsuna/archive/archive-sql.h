@@ -42,9 +42,17 @@ liarc_sql_delete (LIArcSql*   self,
                   const char* table);
 
 int
+liarc_sql_drop (LIArcSql*   self,
+                const char* table);
+
+int
 liarc_sql_insert (LIArcSql*   self,
                   const char* table,
                               ...);
+
+int
+liarc_sql_query (LIArcSql*   self,
+                 const char* query);
 
 int
 liarc_sql_replace (LIArcSql*   self,

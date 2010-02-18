@@ -146,7 +146,6 @@ liext_preview_new (LIWdgManager* manager,
 		return NULL;
 	}
 	ligen_generator_set_fill (data->generator, -1);
-	livox_manager_set_sql (data->generator->voxels, NULL);
 
 	/* Register voxel callbacks. */
 	if (!lical_callbacks_insert (data->generator->voxels->callbacks, data->generator->voxels,

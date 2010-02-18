@@ -126,10 +126,8 @@ ligen_generator_free (LIGenGenerator* self)
 	}
 	if (self->voxels != NULL)
 		livox_manager_free (self->voxels);
-	if (self->gensql != NULL)
-		sqlite3_close (self->gensql);
-	if (self->srvsql != NULL)
-		sqlite3_close (self->srvsql);
+	if (self->sql != NULL)
+		sqlite3_close (self->sql);
 	lisys_free (self->strokes.array);
 	lisys_free (self);
 }
@@ -435,28 +433,65 @@ ligen_generator_write (LIGenGenerator* self)
 	int j;
 	int ret;
 	int flags;
+	char* path;
 	double rnd;
 	uint32_t id;
 	uint32_t sector;
 	const char* query;
+	LIArcSql* server;
 	LIGenBrush* brush;
 	LIGenBrushobject* object;
 	LIGenStroke* stroke;
 	LIMatTransform transform;
 	sqlite3_stmt* statement;
 
-	/* Remove old terrain. */
-	liarc_sql_delete (self->srvsql, "voxel_sectors");
+	/* Format path. */
+	path = lipth_paths_get_sql (self->paths, "server.db");
+	if (path == NULL)
+		return 0;
 
-	/* FIXME: Side effects? */
-	livox_manager_set_sql (self->voxels, self->srvsql);
+	/* Open server database. */
+	flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
+	if (sqlite3_open_v2 (path, &server, flags, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (server));
+		sqlite3_close (server);
+		lisys_free (path);
+		return 0;
+	}
+	lisys_free (path);
+
+	/* Drop old tables. */
+	liarc_sql_drop (server, "objects");
+	liarc_sql_drop (server, "object_anims");
+	liarc_sql_drop (server, "voxel_sectors");
+	liarc_sql_drop (server, "voxel_materials");
 
 	/* Save terrain. */
+	livox_manager_set_sql (self->voxels, server);
 	if (!livox_manager_write (self->voxels))
 		lisys_error_report ();
+	livox_manager_set_sql (self->voxels, self->sql);
 
-	/* Remove old objects. */
-	liarc_sql_delete (self->srvsql, "objects");
+	/* Create object tables. */
+	query = "CREATE TABLE IF NOT EXISTS objects "
+		"(id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,model TEXT,"
+		"flags UNSIGNED INTEGER,angx REAL,angy REAL,angz REAL,posx REAL,"
+		"posy REAL,posz REAL,rotx REAL,roty REAL,rotz REAL,rotw REAL,"
+		"mass REAL,move REAL,speed REAL,step REAL,colgrp UNSIGNED INTEGER,"
+		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,type TEXT,extra TEXT);";
+	if (!liarc_sql_query (server, query))
+	{
+		sqlite3_close (server);
+		return 0;
+	}
+	query = "CREATE TABLE IF NOT EXISTS object_anims "
+		"(id UNSIGNED INTEGER REFERENCES objects(id),name TEXT,chan REAL,prio REAL);";
+	if (!liarc_sql_query (server, query))
+	{
+		sqlite3_close (server);
+		return 0;
+	}
 
 	/* Save new objects. */
 	for (i = 0 ; i < self->strokes.count ; i++)
@@ -484,15 +519,17 @@ ligen_generator_write (LIGenGenerator* self)
 
 				/* Reject numbers of database objects. */
 				query = "SELECT id FROM objects WHERE id=?;";
-				if (sqlite3_prepare_v2 (self->srvsql, query, -1, &statement, NULL) != SQLITE_OK)
+				if (sqlite3_prepare_v2 (server, query, -1, &statement, NULL) != SQLITE_OK)
 				{
-					lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->srvsql));
+					lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (server));
+					sqlite3_close (server);
 					return 0;
 				}
 				if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
 				{
-					lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->srvsql));
+					lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (server));
 					sqlite3_finalize (statement);
+					sqlite3_close (server);
 					return 0;
 				}
 				ret = sqlite3_step (statement);
@@ -500,8 +537,9 @@ ligen_generator_write (LIGenGenerator* self)
 				{
 					if (ret != SQLITE_ROW)
 					{
-						lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->srvsql));
+						lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (server));
 						sqlite3_finalize (statement);
+						sqlite3_close (server);
 						return 0;
 					}
 					id = 0;
@@ -518,7 +556,7 @@ ligen_generator_write (LIGenGenerator* self)
 			sector = lialg_sectors_point_to_index (self->sectors, &transform.position);
 
 			/* Write values. */
-			if (!liarc_sql_replace (self->srvsql, "objects",
+			if (!liarc_sql_replace (server, "objects",
 				"id", LIARC_SQL_INT, id,
 				"sector", LIARC_SQL_INT, sector,
 				"flags", LIARC_SQL_INT, flags,
@@ -542,9 +580,14 @@ ligen_generator_write (LIGenGenerator* self)
 				"model", LIARC_SQL_TEXT, object->model,
 				"type", LIARC_SQL_TEXT, object->type,
 				"extra", LIARC_SQL_TEXT, object->extra, NULL))
+			{
+				sqlite3_close (server);
 				return 0;
+			}
 		}
 	}
+
+	sqlite3_close (server);
 
 	return 1;
 }
@@ -561,20 +604,32 @@ ligen_generator_write_brushes (LIGenGenerator* self)
 	LIAlgU32dicIter iter;
 
 	/* Remove old brushes. */
-	if (!liarc_sql_delete (self->gensql, "generator_brushes") ||
-	    !liarc_sql_delete (self->gensql, "generator_rules") ||
-	    !liarc_sql_delete (self->gensql, "generator_strokes") ||
-	    !liarc_sql_delete (self->gensql, "generator_objects"))
+	if (!liarc_sql_delete (self->sql, "generator_brushes") ||
+	    !liarc_sql_delete (self->sql, "generator_rules") ||
+	    !liarc_sql_delete (self->sql, "generator_strokes") ||
+	    !liarc_sql_delete (self->sql, "generator_objects"))
 		return 0;
 
 	/* Save brushes. */
 	LIALG_U32DIC_FOREACH (iter, self->brushes)
 	{
-		if (!ligen_brush_write (iter.value, self->gensql))
+		if (!ligen_brush_write (iter.value, self->sql))
 			return 0;
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Saves materials to the generator database.
+ *
+ * \param self Generator.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_write_materials (LIGenGenerator* self)
+{
+	return livox_manager_write_materials (self->voxels);
 }
 
 void
@@ -609,7 +664,7 @@ private_init_brushes (LIGenGenerator* self)
 	LIGenBrush* brush;
 	sqlite3_stmt* statement;
 
-	sql = self->gensql;
+	sql = self->sql;
 
 	/* Allocate dictionary. */
 	self->brushes = lialg_u32dic_new ();
@@ -715,38 +770,24 @@ private_init_sql (LIGenGenerator* self)
 	char* path;
 
 	/* Format path. */
-	path = lipth_paths_get_sql (self->paths, "server.db");
-	if (path == NULL)
-		return 0;
-
-	/* Open database. */
-	if (sqlite3_open_v2 (path, &self->srvsql, flags, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->srvsql));
-		sqlite3_close (self->srvsql);
-		lisys_free (path);
-		return 0;
-	}
-	lisys_free (path);
-
-	/* Use for loading and saving voxel data. */
-	livox_manager_set_sql (self->voxels, self->srvsql);
-	livox_manager_set_load (self->voxels, 0);
-
-	/* Format path. */
 	path = lipth_paths_get_sql (self->paths, "generator.db");
 	if (path == NULL)
 		return 0;
 
 	/* Open database. */
-	if (sqlite3_open_v2 (path, &self->gensql, flags, NULL) != SQLITE_OK)
+	if (sqlite3_open_v2 (path, &self->sql, flags, NULL) != SQLITE_OK)
 	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_close (self->gensql);
+		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
+		sqlite3_close (self->sql);
 		lisys_free (path);
 		return 0;
 	}
 	lisys_free (path);
+
+	/* Load materials from it. */
+	livox_manager_set_sql (self->voxels, self->sql);
+	livox_manager_set_load (self->voxels, 0);
+	livox_manager_load_materials (self->voxels);
 
 	return 1;
 }
@@ -755,24 +796,13 @@ static int
 private_init_tables (LIGenGenerator* self)
 {
 	const char* query;
-	sqlite3_stmt* statement;
 
 	/* Create brush table. */
 	query = "CREATE TABLE IF NOT EXISTS generator_brushes "
 		"(id INTEGER PRIMARY KEY,name TEXT,sizx UNSIGNED INTEGER,"
 		"sizy UNSIGNED INTEGER,sizz UNSIGNED INTEGER,voxels BLOB);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+	if (!liarc_sql_query (self->sql, query))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Create object table. */
 	query = "CREATE TABLE IF NOT EXISTS generator_objects "
@@ -780,36 +810,16 @@ private_init_tables (LIGenGenerator* self)
 		"brush INTEGER REFERENCES generator_brushes(id),"
 		"flags UNSIGNED INTEGER,prob REAL,posx REAL,posy REAL,posz REAL,"
 		"rotx REAL,roty REAL,rotz REAL,rotw REAL,type TEXT,model TEXT,extra TEXT);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+	if (!liarc_sql_query (self->sql, query))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Create rule table. */
 	query = "CREATE TABLE IF NOT EXISTS generator_rules "
 		"(id INTEGER,"
 		"brush INTEGER REFERENCES generator_brushes(id),"
 		"name TEXT,flags UNSIGNED INTEGER);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+	if (!liarc_sql_query (self->sql, query))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	/* Create stroke table. */
 	query = "CREATE TABLE IF NOT EXISTS generator_strokes "
@@ -819,18 +829,8 @@ private_init_tables (LIGenGenerator* self)
 		"paint INTEGER REFERENCES generator_brushes(id),"
 		"x UNSIGNED INTEGER,y UNSIGNED INTEGER,z UNSIGNED INTEGER,"
 		"flags UNSIGNED INTEGER);";
-	if (sqlite3_prepare_v2 (self->gensql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
+	if (!liarc_sql_query (self->sql, query))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->gensql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	return 1;
 }

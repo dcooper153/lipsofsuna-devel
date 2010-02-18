@@ -122,13 +122,7 @@ liext_materials_new (LIWdgManager* manager,
 int
 liext_materials_save (LIExtMaterials* self)
 {
-	int ret;
-
-	livox_manager_set_sql (self->generator->voxels, self->generator->srvsql);
-	ret = livox_manager_write_materials (self->generator->voxels);
-	livox_manager_set_sql (self->generator->voxels, NULL);
-
-	return ret;
+	return ligen_generator_write_materials (self->generator);
 }
 
 void

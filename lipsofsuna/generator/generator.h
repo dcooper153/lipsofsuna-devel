@@ -46,8 +46,7 @@ struct _LIGenGenerator
 	int fill;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* brushes;
-	LIArcSql* gensql;
-	LIArcSql* srvsql;
+	LIArcSql* sql;
 	LICalCallbacks* callbacks;
 	LIPthPaths* paths;
 	LIVoxManager* voxels;
@@ -105,6 +104,9 @@ ligen_generator_write (LIGenGenerator* self);
 
 int
 ligen_generator_write_brushes (LIGenGenerator* self);
+
+int
+ligen_generator_write_materials (LIGenGenerator* self);
 
 void
 ligen_generator_set_fill (LIGenGenerator* self,

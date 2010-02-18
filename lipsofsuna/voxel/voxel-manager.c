@@ -867,6 +867,9 @@ livox_manager_write (LIVoxManager* self)
 		return 0;
 	}
 
+	if (!private_ensure_sectors (self))
+		return 0;
+
 	/* Save terrain. */
 	LIALG_SECTORS_FOREACH (iter, self->sectors)
 	{
@@ -898,7 +901,8 @@ livox_manager_write_materials (LIVoxManager* self)
 	}
 
 	/* Remove old materials. */
-	if (!liarc_sql_delete (self->sql, "voxel_materials"))
+	if (!liarc_sql_drop (self->sql, "voxel_materials") ||
+	    !private_ensure_materials (self))
 		return 0;
 
 	/* Save materials. */
@@ -942,11 +946,6 @@ livox_manager_set_sql (LIVoxManager* self,
                        LIArcSql*     sql)
 {
 	self->sql = sql;
-	if (sql != NULL)
-	{
-		private_ensure_materials (self);
-		private_ensure_sectors (self);
-	}
 }
 
 void
@@ -1021,24 +1020,13 @@ static int
 private_ensure_materials (LIVoxManager* self)
 {
 	const char* query;
-	sqlite3_stmt* statement;
 
 	/* Create material table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
 		"(id INTEGER PRIMARY KEY,flags UNSIGNED INTEGER,"
 		"fric REAL,name TEXT,model TEXT);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+	if (!liarc_sql_query (self->sql, query))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	return 1;
 }
@@ -1047,23 +1035,12 @@ static int
 private_ensure_sectors (LIVoxManager* self)
 {
 	const char* query;
-	sqlite3_stmt* statement;
 
 	/* Create sector table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
 		"(id INTEGER PRIMARY KEY,data BLOB);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
+	if (!liarc_sql_query (self->sql, query))
 		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "SQL: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
 
 	return 1;
 }
