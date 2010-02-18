@@ -7,16 +7,15 @@ AM_MAINTAINER_MODE
 AM_SILENT_RULES([yes])
 
 dnl Arguments.
-AC_ARG_ENABLE([easy], AC_HELP_STRING([--enable-easy], [Compile a relative binary and install it to ./build]), [want_easy=yes], [want_easy=no])
 AC_ARG_ENABLE([debug], AC_HELP_STRING([--disable-debug], [Do not compile with debugging symbols]), [want_debug=no], [want_debug=yes])
-AC_ARG_ENABLE([optimization], AC_HELP_STRING([--disable-optimization], [Do not compile with optimization]), [want_optimization=no], [want_optimization=yes])
+AC_ARG_ENABLE([optimization], AC_HELP_STRING([--enable-optimization], [Compile with optimization]), [want_optimization=yes], [want_optimization=no])
 AC_ARG_ENABLE([client], AC_HELP_STRING([--disable-client], [Do not compile the client]), [want_client=no], [want_client=yes])
 AC_ARG_ENABLE([generator], AC_HELP_STRING([--disable-generator], [Do not compile the generator]), [want_generator=no], [want_generator=yes])
 AC_ARG_ENABLE([import], AC_HELP_STRING([--disable-import], [Do not compile the data file importer]), [want_import=no], [want_import=yes])
 AC_ARG_ENABLE([server], AC_HELP_STRING([--disable-server], [Do not compile the server]), [want_server=no], [want_server=yes])
 AC_ARG_ENABLE([sound], AC_HELP_STRING([--disable-sound], [Do not compile with sound support]), [want_sound=no], [want_sound=yes])
 AC_ARG_ENABLE([viewer], AC_HELP_STRING([--disable-viewer], [Do not compile the model viewer]), [want_viewer=no], [want_viewer=yes])
-AC_ARG_ENABLE([relpath], AC_HELP_STRING([--enable-relpath], [Install everything under a single directory]), [want_relative=yes], [want_relative=no])
+AC_ARG_ENABLE([relpath], AC_HELP_STRING([--disable-relpath], [Build a normal binary with hardcoded data directory paths]), [want_relpath=no], [want_relpath=yes])
 AC_ARG_ENABLE([malloc-debug], AC_HELP_STRING([--enable-malloc-debug], [Compile with logging memory management functions]), [want_mallocdebug=yes], [want_mallocdebug=no])
 AC_ARG_WITH([sdl-config], AC_HELP_STRING([--with-sdl-config=PTH], [Path to sdl-config (optional)]), [SDL_CONFIG="$withval"], [])
 AC_ARG_WITH([dep-prefix],
@@ -105,9 +104,8 @@ AC_ARG_VAR([SQUISH_LIBS], [linker flags for squish [-lsquish]])
 AC_ARG_VAR([ZLIB_CFLAGS], [C compiler flags for zlib])
 AC_ARG_VAR([ZLIB_LIBS], [linker flags for zlib [-lz]])
 
-dnl Compilation options.
-if test "x$want_easy" = xyes; then
-	want_relative=yes
+dnl Override prefix.
+if test "x$want_relpath" = xyes; then
 	prefix="$PWD/build"
 fi
 
@@ -304,13 +302,13 @@ ZLIB_CFLAGS and ZLIB_LIBS to bypass this test.])
 fi
 
 dnl Relative paths.
-if test "$want_relative" = yes; then
+if test "x$want_relpath" = xyes; then
 	EXTSDIR="${prefix}/lib/extensions"
 	DATADIR="${prefix}/data"
 	MODSDIR="${prefix}/mods"
 	PROGDIR="${prefix}"
 	TOOLDIR="${prefix}/tool"
-	SAVEDIR="${prefix}/save"
+	SAVEDIR="${prefix}/data/save"
 	RELPATH="yes"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_RELATIVE_PATHS"
 	LDFLAGS="-Wl,-rpath -Wl,\\\$\$ORIGIN/../lib $LDFLAGS"
@@ -387,6 +385,24 @@ AC_SUBST([PROGDIR])
 AC_SUBST([SAVEDIR])
 AC_SUBST([TOOLDIR])
 AC_SUBST([RELPATH])
+
+dnl Help output.
+if test "x$want_relpath" = xyes; then
+	echo -e "\\n *** Configuration: Relative build, no installation.";
+	echo -e " *** Build with: make";
+	echo -e " *** Execute with: build/lipsofsuna\\n";
+else
+	echo -e "\\n *** Configuration: GNU style build.";
+	echo -e " *** Build with: make";
+	echo -e " *** Install with: make install";
+	if test ! "x${exec_prefix}" = xNONE; then
+		echo -e " *** Execute with: ${exec_prefix}/lipsofsuna\\n";
+	elif test ! "x${prefix}" = xNONE; then
+		echo -e " *** Execute with: ${prefix}/bin/lipsofsuna\\n";
+	else
+		echo -e " *** Execute with: /usr/local/bin/lipsofsuna\\n";
+	fi
+fi
 
 AC_OUTPUT([
 Makefile

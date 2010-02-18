@@ -4,7 +4,7 @@ AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
 EXTRA_DIST = \
 	COPYING.LESSER \
 	lipsofsuna/math/unittest.c \
-	reload/blender-export.py
+	lipsofsuna/reload/blender-export.py
 
 SUBDIRS = .
 if MAYBE_SERVER
@@ -54,6 +54,7 @@ los_HEADERS = \
 	lipsofsuna/font.h \
 	lipsofsuna/generator.h \
 	lipsofsuna/image.h \
+	lipsofsuna/main.h \
 	lipsofsuna/math.h \
 	lipsofsuna/model.h \
 	lipsofsuna/network.h \
@@ -602,6 +603,16 @@ build_bin_lipsofsuna_viewer_SOURCES = lipsofsuna/viewer/viewer-main.c \
 
 ##############################################################################
 
+distdatadirs = \
+	build/data/about \
+	build/data/config \
+	build/data/fonts \
+	build/data/graphics \
+	build/data/save \
+	build/data/scripts \
+	build/data/shaders \
+	build/data/sounds
+
 all-local:
 	@if test "x$(RELPATH)" = "xyes"; then \
 		mkdir -p build/bin build/lib build/tool; \
@@ -616,6 +627,16 @@ all-local:
 clean-local:
 	rm -Rf build/bin build/lib build/tool
 
+dist-hook:
+	mkdir -p $(distdir)/deps/include;
+	mkdir -p $(distdir)/deps/lib;
+	if test -d $(srcdir)/build/data; then \
+		mkdir -p $(distdir)/build/data; \
+		for i in $(distdatadirs); do cp -R $(srcdir)/$$i $(distdir)/$$i; done; \
+	fi
+
 install-data-local:
-	$(mkinstalldirs) $(DATADIR)
-	$(mkinstalldirs) $(SAVEDIR)
+	@if test "x$(RELPATH)" = "xno"; then \
+		$(mkinstalldirs) $(DATADIR); \
+		$(mkinstalldirs) $(SAVEDIR)/data; \
+	fi

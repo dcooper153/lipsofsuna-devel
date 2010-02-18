@@ -927,7 +927,6 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_maintainer_mode
-enable_easy
 enable_debug
 enable_optimization
 enable_client
@@ -1620,16 +1619,16 @@ Optional Features:
   --disable-silent-rules         verbose build output (undo: `make V=0')
   --enable-maintainer-mode  enable make rules and dependencies not useful
 			  (and sometimes confusing) to the casual installer
-  --enable-easy           Compile a relative binary and install it to ./build
   --disable-debug         Do not compile with debugging symbols
-  --disable-optimization  Do not compile with optimization
+  --enable-optimization   Compile with optimization
   --disable-client        Do not compile the client
   --disable-generator     Do not compile the generator
   --disable-import        Do not compile the data file importer
   --disable-server        Do not compile the server
   --disable-sound         Do not compile with sound support
   --disable-viewer        Do not compile the model viewer
-  --enable-relpath        Install everything under a single directory
+  --disable-relpath       Build a normal binary with hardcoded data directory
+                          paths
   --enable-malloc-debug   Compile with logging memory management functions
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
@@ -3442,13 +3441,6 @@ esac
 AM_BACKSLASH='\'
 
 
-# Check whether --enable-easy was given.
-if test "${enable_easy+set}" = set; then :
-  enableval=$enable_easy; want_easy=yes
-else
-  want_easy=no
-fi
-
 # Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then :
   enableval=$enable_debug; want_debug=no
@@ -3458,9 +3450,9 @@ fi
 
 # Check whether --enable-optimization was given.
 if test "${enable_optimization+set}" = set; then :
-  enableval=$enable_optimization; want_optimization=no
+  enableval=$enable_optimization; want_optimization=yes
 else
-  want_optimization=yes
+  want_optimization=no
 fi
 
 # Check whether --enable-client was given.
@@ -3507,9 +3499,9 @@ fi
 
 # Check whether --enable-relpath was given.
 if test "${enable_relpath+set}" = set; then :
-  enableval=$enable_relpath; want_relative=yes
+  enableval=$enable_relpath; want_relpath=no
 else
-  want_relative=no
+  want_relpath=yes
 fi
 
 # Check whether --enable-malloc-debug was given.
@@ -6575,13 +6567,13 @@ if test "${lt_cv_nm_interface+set}" = set; then :
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:6578: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:6570: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6581: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:6573: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:6584: output\"" >&5)
+  (eval echo "\"\$as_me:6576: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -7783,7 +7775,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 7786 "configure"' > conftest.$ac_ext
+  echo '#line 7778 "configure"' > conftest.$ac_ext
   if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -9806,11 +9798,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9809: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:9801: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:9813: \$? = $ac_status" >&5
+   echo "$as_me:9805: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10145,11 +10137,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10148: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10140: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:10152: \$? = $ac_status" >&5
+   echo "$as_me:10144: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -10250,11 +10242,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10253: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10245: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10257: \$? = $ac_status" >&5
+   echo "$as_me:10249: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10305,11 +10297,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:10308: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:10300: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:10312: \$? = $ac_status" >&5
+   echo "$as_me:10304: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12688,7 +12680,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12691 "configure"
+#line 12683 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12784,7 +12776,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12787 "configure"
+#line 12779 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14740,11 +14732,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14743: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14735: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:14747: \$? = $ac_status" >&5
+   echo "$as_me:14739: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -14839,11 +14831,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14842: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14834: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14846: \$? = $ac_status" >&5
+   echo "$as_me:14838: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14891,11 +14883,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:14894: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:14886: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:14898: \$? = $ac_status" >&5
+   echo "$as_me:14890: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -17590,8 +17582,7 @@ LIPS_LIBS="$LIBS"
 
 
 
-if test "x$want_easy" = xyes; then
-	want_relative=yes
+if test "x$want_relpath" = xyes; then
 	prefix="$PWD/build"
 fi
 
@@ -19434,13 +19425,13 @@ ZLIB_CFLAGS and ZLIB_LIBS to bypass this test." "$LINENO" 5
 	fi
 fi
 
-if test "$want_relative" = yes; then
+if test "x$want_relpath" = xyes; then
 	EXTSDIR="${prefix}/lib/extensions"
 	DATADIR="${prefix}/data"
 	MODSDIR="${prefix}/mods"
 	PROGDIR="${prefix}"
 	TOOLDIR="${prefix}/tool"
-	SAVEDIR="${prefix}/save"
+	SAVEDIR="${prefix}/data/save"
 	RELPATH="yes"
 	LIPS_CFLAGS="$LIPS_CFLAGS -DLI_RELATIVE_PATHS"
 	LDFLAGS="-Wl,-rpath -Wl,\\\$\$ORIGIN/../lib $LDFLAGS"
@@ -19550,6 +19541,23 @@ LICLI_LIBS="\
 
 
 
+
+if test "x$want_relpath" = xyes; then
+	echo -e "\\n *** Configuration: Relative build, no installation.";
+	echo -e " *** Build with: make";
+	echo -e " *** Execute with: build/lipsofsuna\\n";
+else
+	echo -e "\\n *** Configuration: GNU style build.";
+	echo -e " *** Build with: make";
+	echo -e " *** Install with: make install";
+	if test ! "x${exec_prefix}" = xNONE; then
+		echo -e " *** Execute with: ${exec_prefix}/lipsofsuna\\n";
+	elif test ! "x${prefix}" = xNONE; then
+		echo -e " *** Execute with: ${prefix}/bin/lipsofsuna\\n";
+	else
+		echo -e " *** Execute with: /usr/local/bin/lipsofsuna\\n";
+	fi
+fi
 
 ac_config_files="$ac_config_files Makefile docs/Makefile lipsofsuna/extension/client/Makefile lipsofsuna/extension/common/Makefile lipsofsuna/extension/server/Makefile"
 

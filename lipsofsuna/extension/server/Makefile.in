@@ -317,7 +317,6 @@ top_srcdir = @top_srcdir@
 LIBADD = $(LISRV_LIBS)
 AM_CFLAGS = $(LISRV_CFLAGS) -I$(top_srcdir)
 AM_LDFLAGS = -module -avoid-version -no-undefined
-EXTRA_DIST = skeleton/mkext.sh
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
 	libeditor-ser.la \

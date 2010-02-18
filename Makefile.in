@@ -684,7 +684,7 @@ AM_CXXFLAGS = $(CXXFLAGS) $(LICLI_CFLAGS)
 EXTRA_DIST = \
 	COPYING.LESSER \
 	lipsofsuna/math/unittest.c \
-	reload/blender-export.py
+	lipsofsuna/reload/blender-export.py
 
 SUBDIRS = . $(am__append_1) $(am__append_2) $(am__append_3) docs
 editordir = $(TOOLDIR)
@@ -704,6 +704,7 @@ los_HEADERS = \
 	lipsofsuna/font.h \
 	lipsofsuna/generator.h \
 	lipsofsuna/image.h \
+	lipsofsuna/main.h \
 	lipsofsuna/math.h \
 	lipsofsuna/model.h \
 	lipsofsuna/network.h \
@@ -1280,6 +1281,18 @@ build_bin_lipsofsuna_viewer_SOURCES = lipsofsuna/viewer/viewer-main.c \
 	$(algsrc) $(arcsrc) $(fntsrc) $(imgsrc) $(matsrc) $(mdlsrc) \
 	$(parsrc) $(pthsrc) $(relsrc) $(rndsrc) $(strsrc) $(syssrc) $(thrsrc) \
 	$(vidsrc) $(viesrc)
+
+
+##############################################################################
+distdatadirs = \
+	build/data/about \
+	build/data/config \
+	build/data/fonts \
+	build/data/graphics \
+	build/data/save \
+	build/data/scripts \
+	build/data/shaders \
+	build/data/sounds
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -3339,6 +3352,9 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
+	  dist-hook
 	-test -n "$(am__skip_mode_fix)" \
 	|| find "$(distdir)" -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
 	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
@@ -3649,8 +3665,8 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	all all-am all-local am--refresh check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libtool clean-local \
 	clean-prgPROGRAMS ctags ctags-recursive dist dist-all \
-	dist-bzip2 dist-gzip dist-lzma dist-shar dist-tarZ dist-xz \
-	dist-zip distcheck distclean distclean-compile \
+	dist-bzip2 dist-gzip dist-hook dist-lzma dist-shar dist-tarZ \
+	dist-xz dist-zip distcheck distclean distclean-compile \
 	distclean-generic distclean-hdr distclean-libtool \
 	distclean-tags distcleancheck distdir distuninstallcheck dvi \
 	dvi-am html html-am info info-am install install-aiHEADERS \
@@ -3688,8 +3704,6 @@ uninstall-am: uninstall-aiHEADERS uninstall-algHEADERS \
 	uninstall-vieHEADERS uninstall-voxHEADERS uninstall-wdgHEADERS
 
 
-##############################################################################
-
 all-local:
 	@if test "x$(RELPATH)" = "xyes"; then \
 		mkdir -p build/bin build/lib build/tool; \
@@ -3704,9 +3718,19 @@ all-local:
 clean-local:
 	rm -Rf build/bin build/lib build/tool
 
+dist-hook:
+	mkdir -p $(distdir)/deps/include;
+	mkdir -p $(distdir)/deps/lib;
+	if test -d $(srcdir)/build/data; then \
+		mkdir -p $(distdir)/build/data; \
+		for i in $(distdatadirs); do cp -R $(srcdir)/$$i $(distdir)/$$i; done; \
+	fi
+
 install-data-local:
-	$(mkinstalldirs) $(DATADIR)
-	$(mkinstalldirs) $(SAVEDIR)
+	@if test "x$(RELPATH)" = "xno"; then \
+		$(mkinstalldirs) $(DATADIR); \
+		$(mkinstalldirs) $(SAVEDIR)/data; \
+	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
