@@ -277,9 +277,9 @@ private_header_init (LIArcTar*       self,
 	//snprintf (header->gid, 8, "%07o", (unsigned int)(0));
 	snprintf (header->size, 12, "%011lo", (unsigned long)(0));
 	//snprintf (header->mtime, 12, "%011lo", (unsigned long)(0));
-	strncpy (header->chksum, "        ", 8);
-	strncpy (header->magic, "ustar", 5);
-	strncpy (header->version, "00", 2);
+	(void) strncpy (header->chksum, "        ", 8);
+	(void) strncpy (header->magic, "ustar", 5);
+	(void) strncpy (header->version, "00", 2);
 }
 
 static void

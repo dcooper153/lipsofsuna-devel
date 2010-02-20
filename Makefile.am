@@ -106,8 +106,13 @@ algsrc = \
 	lipsofsuna/algorithm/algorithm-astar.c \
 	lipsofsuna/algorithm/algorithm-bst.c \
 	lipsofsuna/algorithm/algorithm-camera.c \
+	lipsofsuna/algorithm/algorithm-memdic.c \
+	lipsofsuna/algorithm/algorithm-priority-queue.c \
+	lipsofsuna/algorithm/algorithm-ptrdic.c \
 	lipsofsuna/algorithm/algorithm-octree.c \
-	lipsofsuna/algorithm/algorithm-sectors.c
+	lipsofsuna/algorithm/algorithm-sectors.c \
+	lipsofsuna/algorithm/algorithm-strdic.c \
+	lipsofsuna/algorithm/algorithm-u32dic.c
 
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \

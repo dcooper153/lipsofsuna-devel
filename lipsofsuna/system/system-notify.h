@@ -37,25 +37,16 @@ enum _LISysNotifyFlags
 	LISYS_NOTIFY_ALL = 0xFF
 };
 
-typedef struct _LISysNotify LISysNotify;
-struct _LISysNotify
+typedef struct _LISysNotifyEvent LISysNotifyEvent;
+struct _LISysNotifyEvent
 {
-	int fd;
-	struct
-	{
-		int pos;
-		int length;
-		int capacity;
-		void* buffer;
-	} buffer;
-	struct
-	{
-		int dir;
-		int write;
-		const char* name;
-		LISysNotifyFlags flags;
-	} event;
+	int dir;
+	int write;
+	const char* name;
+	LISysNotifyFlags flags;
 };
+
+typedef struct _LISysNotify LISysNotify;
 
 LISysNotify*
 lisys_notify_new ();
@@ -72,10 +63,10 @@ void
 lisys_notify_remove (LISysNotify* self,
                      const char*  path);
 
-int
+LISysNotifyEvent*
 lisys_notify_poll (LISysNotify* self);
 
-int
+LISysNotifyEvent*
 lisys_notify_wait (LISysNotify* self);
 
 #endif

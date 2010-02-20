@@ -28,13 +28,10 @@
 #include <SDL.h>
 #include <SDL_main.h>
 #include <SDL_ttf.h>
-#include <lipsofsuna/system.h>
 
 typedef struct _LIVidCalls LIVidCalls;
 struct _LIVidCalls
 {
-	LISysModule* libSDL;
-	LISysModule* libSDL_ttf;
 	SDL_Surface* (*SDL_ConvertSurface)(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
 	void (*SDL_Delay)(Uint32 ms);
 	int (*SDL_EnableKeyRepeat)(int delay, int interval);

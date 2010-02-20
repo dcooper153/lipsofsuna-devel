@@ -29,16 +29,7 @@ int
 livid_calls_init (LIVidCalls* self)
 {
 	/* SDL calls. */
-#define CALL(name) \
-	self->name = lisys_module_symbol (self->libSDL, #name); \
-	if (self->name == NULL) \
-	{ \
-		lisys_error_set (EINVAL, "cannot find function `%s'", #name); \
-		return 0; \
-	}
-	self->libSDL = lisys_module_new ("SDL", LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
-	if (self->libSDL == NULL)
-		return 0;
+#define CALL(name) self->name = name;
 	CALL (SDL_ConvertSurface);
 	CALL (SDL_Delay);
 	CALL (SDL_EnableKeyRepeat);
@@ -63,16 +54,7 @@ livid_calls_init (LIVidCalls* self)
 #undef CALL
 
 	/* SDL_ttf calls. */
-#define CALL(name) \
-	self->name = lisys_module_symbol (self->libSDL_ttf, #name); \
-	if (self->name == NULL) \
-	{ \
-		lisys_error_set (EINVAL, "cannot find function `%s'", #name); \
-		return 0; \
-	}
-	self->libSDL_ttf = lisys_module_new ("SDL_ttf", LISYS_MODULE_FLAG_GLOBAL | LISYS_MODULE_FLAG_LIBDIRS);
-	if (self->libSDL_ttf == NULL)
-		return 0;
+#define CALL(name) self->name = name;
 	CALL (TTF_CloseFont);
 	CALL (TTF_FontLineSkip);
 	CALL (TTF_FontAscent);

@@ -37,7 +37,7 @@ struct _LIAlgSectorsIter
 	LIAlgRangeIter range;
 	LIAlgSectors* sectors;
 	LIAlgSector* sector;
-	int (*next)(LIAlgSectorsIter*);
+	int next;
 };
 
 /**
@@ -83,12 +83,6 @@ struct _LIAlgSectorsIter
 	     lialg_sectors_iter_next (&iter))
 
 static inline int
-lialg_sectors_iter_next (LIAlgSectorsIter* self)
-{
-	return self->next (self);
-}
-
-static inline int
 lialg_sectors_iter_next_all (LIAlgSectorsIter* self)
 {
 	lialg_u32dic_iter_next (&self->all);
@@ -113,13 +107,24 @@ lialg_sectors_iter_next_range (LIAlgSectorsIter* self)
 }
 
 static inline int
+lialg_sectors_iter_next (LIAlgSectorsIter* self)
+{
+	switch (self->next)
+	{
+		case 0: return lialg_sectors_iter_next_all (self);
+		case 1: return lialg_sectors_iter_next_range (self);
+	}
+	return 0;
+}
+
+static inline int
 lialg_sectors_iter_first_all (LIAlgSectorsIter* self,
                               LIAlgSectors*     sectors)
 {
 	/* Initialize self. */
 	memset (self, 0, sizeof (LIAlgSectorsIter));
 	self->sectors = sectors;
-	self->next = lialg_sectors_iter_next_all;
+	self->next = 0;
 
 	/* Find first sector. */
 	lialg_u32dic_iter_start (&self->all, sectors->sectors);
@@ -141,7 +146,7 @@ lialg_sectors_iter_first_offset (LIAlgSectorsIter* self,
 	/* Initialize self. */
 	memset (self, 0, sizeof (LIAlgSectorsIter));
 	self->sectors = sectors;
-	self->next = lialg_sectors_iter_next_range;
+	self->next = 1;
 	range = lialg_range_new_from_center (x, y, z, radius);
 	range = lialg_range_clamp (range, 0, sectors->count - 1);
 	if (!lialg_range_iter_first (&self->range, &range))
@@ -170,7 +175,7 @@ lialg_sectors_iter_first_point (LIAlgSectorsIter*  self,
 	/* Initialize self. */
 	memset (self, 0, sizeof (LIAlgSectorsIter));
 	self->sectors = sectors;
-	self->next = lialg_sectors_iter_next_range;
+	self->next = 1;
 	range = lialg_range_new_from_sphere (point, radius, sectors->width);
 	range = lialg_range_clamp (range, 0, sectors->count - 1);
 	if (!lialg_range_iter_first (&self->range, &range))

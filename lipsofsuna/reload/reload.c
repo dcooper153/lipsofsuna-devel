@@ -159,6 +159,7 @@ int
 lirel_reload_update (LIRelReload* self)
 {
 	char* name;
+	LISysNotifyEvent* event;
 
 	/* Terminate finished jobs. */
 	if (self->worker != NULL && lithr_async_call_get_done (self->worker))
@@ -170,18 +171,18 @@ lirel_reload_update (LIRelReload* self)
 	/* Wait for monitor events. */
 	if (self->notify == NULL)
 		return 1;
-	if (!lisys_notify_poll (self->notify))
+	event = lisys_notify_poll (self->notify);
+	if (event == NULL)
 		return 1;
-	if (!(self->notify->event.flags & LISYS_NOTIFY_CLOSEW))
+	if (!(event->flags & LISYS_NOTIFY_CLOSEW))
 		return 1;
 
 	/* Reload changed models. */
-	if (lisys_path_check_ext (self->notify->event.name, "lmdl"))
+	if (lisys_path_check_ext (event->name, "lmdl"))
 	{
 		if (self->reload_model_call != NULL)
 		{
-			name = lisys_path_format (LISYS_PATH_BASENAME,
-				self->notify->event.name, LISYS_PATH_STRIPEXTS, NULL);
+			name = lisys_path_format (LISYS_PATH_BASENAME, event->name, LISYS_PATH_STRIPEXTS, NULL);
 			if (name != NULL)
 			{
 				self->reload_model_call (self->reload_model_data, name);
@@ -191,12 +192,12 @@ lirel_reload_update (LIRelReload* self)
 	}
 
 	/* Reload changed DDS textures. */
-	if (lisys_path_check_ext (self->notify->event.name, "dds"))
+	if (lisys_path_check_ext (event->name, "dds"))
 	{
 		if (self->reload_image_call != NULL)
 		{
 			name = lisys_path_format (LISYS_PATH_BASENAME,
-				self->notify->event.name, LISYS_PATH_STRIPEXTS, NULL);
+				event->name, LISYS_PATH_STRIPEXTS, NULL);
 			if (name != NULL)
 			{
 				self->reload_image_call (self->reload_image_data, name);
@@ -206,15 +207,15 @@ lirel_reload_update (LIRelReload* self)
 	}
 
 	/* Initiate conversion if an original has changed. */
-	if (lisys_path_check_ext (self->notify->event.name, "blend") ||
-	    lisys_path_check_ext (self->notify->event.name, "blend.gz") ||
-	    lisys_path_check_ext (self->notify->event.name, "jpg") ||
-	    lisys_path_check_ext (self->notify->event.name, "png") ||
-	    lisys_path_check_ext (self->notify->event.name, "xcf") ||
-	    lisys_path_check_ext (self->notify->event.name, "xcf.bz2") ||
-	    lisys_path_check_ext (self->notify->event.name, "xcf.gz") ||
-	    lisys_path_check_ext (self->notify->event.name, "xcfbz2") ||
-	    lisys_path_check_ext (self->notify->event.name, "xcfgz"))
+	if (lisys_path_check_ext (event->name, "blend") ||
+	    lisys_path_check_ext (event->name, "blend.gz") ||
+	    lisys_path_check_ext (event->name, "jpg") ||
+	    lisys_path_check_ext (event->name, "png") ||
+	    lisys_path_check_ext (event->name, "xcf") ||
+	    lisys_path_check_ext (event->name, "xcf.bz2") ||
+	    lisys_path_check_ext (event->name, "xcf.gz") ||
+	    lisys_path_check_ext (event->name, "xcfbz2") ||
+	    lisys_path_check_ext (event->name, "xcfgz"))
 	{
 		printf ("Reloading originals...\n");
 		self->queued = 1;

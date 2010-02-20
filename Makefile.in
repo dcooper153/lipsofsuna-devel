@@ -112,8 +112,13 @@ am__objects_1 = lipsofsuna/ai/ai-manager.$(OBJEXT) \
 am__objects_2 = lipsofsuna/algorithm/algorithm-astar.$(OBJEXT) \
 	lipsofsuna/algorithm/algorithm-bst.$(OBJEXT) \
 	lipsofsuna/algorithm/algorithm-camera.$(OBJEXT) \
+	lipsofsuna/algorithm/algorithm-memdic.$(OBJEXT) \
+	lipsofsuna/algorithm/algorithm-priority-queue.$(OBJEXT) \
+	lipsofsuna/algorithm/algorithm-ptrdic.$(OBJEXT) \
 	lipsofsuna/algorithm/algorithm-octree.$(OBJEXT) \
-	lipsofsuna/algorithm/algorithm-sectors.$(OBJEXT)
+	lipsofsuna/algorithm/algorithm-sectors.$(OBJEXT) \
+	lipsofsuna/algorithm/algorithm-strdic.$(OBJEXT) \
+	lipsofsuna/algorithm/algorithm-u32dic.$(OBJEXT)
 am__objects_3 = lipsofsuna/archive/archive-reader.$(OBJEXT) \
 	lipsofsuna/archive/archive-sql.$(OBJEXT) \
 	lipsofsuna/archive/archive-tar.$(OBJEXT) \
@@ -758,8 +763,13 @@ algsrc = \
 	lipsofsuna/algorithm/algorithm-astar.c \
 	lipsofsuna/algorithm/algorithm-bst.c \
 	lipsofsuna/algorithm/algorithm-camera.c \
+	lipsofsuna/algorithm/algorithm-memdic.c \
+	lipsofsuna/algorithm/algorithm-priority-queue.c \
+	lipsofsuna/algorithm/algorithm-ptrdic.c \
 	lipsofsuna/algorithm/algorithm-octree.c \
-	lipsofsuna/algorithm/algorithm-sectors.c
+	lipsofsuna/algorithm/algorithm-sectors.c \
+	lipsofsuna/algorithm/algorithm-strdic.c \
+	lipsofsuna/algorithm/algorithm-u32dic.c
 
 arcdir = $(includedir)/lipsofsuna/archive
 arc_HEADERS = \
@@ -1472,10 +1482,25 @@ lipsofsuna/algorithm/algorithm-bst.$(OBJEXT):  \
 lipsofsuna/algorithm/algorithm-camera.$(OBJEXT):  \
 	lipsofsuna/algorithm/$(am__dirstamp) \
 	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-memdic.$(OBJEXT):  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-priority-queue.$(OBJEXT):  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-ptrdic.$(OBJEXT):  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/algorithm/algorithm-octree.$(OBJEXT):  \
 	lipsofsuna/algorithm/$(am__dirstamp) \
 	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/algorithm/algorithm-sectors.$(OBJEXT):  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-strdic.$(OBJEXT):  \
+	lipsofsuna/algorithm/$(am__dirstamp) \
+	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/algorithm/algorithm-u32dic.$(OBJEXT):  \
 	lipsofsuna/algorithm/$(am__dirstamp) \
 	lipsofsuna/algorithm/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/archive/$(am__dirstamp):
@@ -2133,8 +2158,13 @@ mostlyclean-compile:
 	-rm -f lipsofsuna/algorithm/algorithm-astar.$(OBJEXT)
 	-rm -f lipsofsuna/algorithm/algorithm-bst.$(OBJEXT)
 	-rm -f lipsofsuna/algorithm/algorithm-camera.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-memdic.$(OBJEXT)
 	-rm -f lipsofsuna/algorithm/algorithm-octree.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-priority-queue.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-ptrdic.$(OBJEXT)
 	-rm -f lipsofsuna/algorithm/algorithm-sectors.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-strdic.$(OBJEXT)
+	-rm -f lipsofsuna/algorithm/algorithm-u32dic.$(OBJEXT)
 	-rm -f lipsofsuna/archive/archive-reader.$(OBJEXT)
 	-rm -f lipsofsuna/archive/archive-sql.$(OBJEXT)
 	-rm -f lipsofsuna/archive/archive-tar.$(OBJEXT)
@@ -2307,8 +2337,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-astar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-bst.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-camera.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-memdic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-octree.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-priority-queue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-ptrdic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-sectors.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-strdic.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/algorithm/$(DEPDIR)/algorithm-u32dic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-reader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-sql.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/archive/$(DEPDIR)/archive-tar.Po@am__quote@

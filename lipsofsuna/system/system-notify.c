@@ -40,7 +40,9 @@
 #include <inotifytools/inotify.h>
 #define HAVE_INOTIFY
 #endif
+#include "system-module.h"
 #include "system-notify.h"
+#include "system-types.h"
 
 #ifdef LI_ENABLE_ERROR
 #include "system-error.h"
@@ -52,6 +54,27 @@
 #define error_open()
 #define error_support()
 #endif
+
+struct _LISysNotify
+{
+	int fd;
+#ifdef HAVE_INOTIFY
+	struct
+	{
+		int (*inotify_init)();
+		int (*inotify_add_watch)(int, const char*, uint32_t);
+		int (*inotify_rm_watch)(int, int);
+	} calls;
+#endif
+	struct
+	{
+		int pos;
+		int length;
+		int capacity;
+		void* buffer;
+	} buffer;
+	LISysNotifyEvent event;
+};
 
 #ifdef HAVE_INOTIFY
 static int
@@ -77,6 +100,19 @@ lisys_notify_new ()
 		return NULL;
 	}
 
+	/* Find symbols. */
+	self->calls.inotify_init = lisys_module_global_symbol ("c", "inotify_init");
+	self->calls.inotify_add_watch = lisys_module_global_symbol ("c", "inotify_add_watch");
+	self->calls.inotify_rm_watch = lisys_module_global_symbol ("c", "inotify_rm_watch");
+	if (self->calls.inotify_init == NULL ||
+	    self->calls.inotify_add_watch == NULL ||
+	    self->calls.inotify_rm_watch == NULL)
+	{
+		error_support ();
+		free (self);
+		return NULL;
+	}
+
 	/* Allocate buffer. */
 	self->buffer.capacity = sizeof (struct inotify_event) + 1024;
 	self->buffer.buffer = malloc (self->buffer.capacity);
@@ -88,7 +124,7 @@ lisys_notify_new ()
 	}
 
 	/* Initialize monitor. */
-	self->fd = inotify_init ();
+	self->fd = self->calls.inotify_init ();
 	if (self->fd == -1)
 	{
 		error_open ();
@@ -130,7 +166,7 @@ lisys_notify_add (LISysNotify*     self,
 		f |= IN_DELETE;
 	if (flags & LISYS_NOTIFY_MODIFY)
 		f |= IN_MODIFY;
-	inotify_add_watch (self->fd, path, f);
+	self->calls.inotify_add_watch (self->fd, path, f);
 	/* FIXME: No error check. */
 
 	return 1;
@@ -146,43 +182,43 @@ lisys_notify_remove (LISysNotify* self,
 	/* FIXME: Not implemented. */
 }
 
-int
+LISysNotifyEvent*
 lisys_notify_poll (LISysNotify* self)
 {
 #ifdef HAVE_INOTIFY
 	struct pollfd fds = { self->fd, POLLIN, 0 };
 
 	if (private_process (self))
-		return 1;
+		return &self->event;
 	while (1)
 	{
 		if (poll (&fds, 1, 0) <= 0)
-			return 0;
+			return NULL;
 		if (!private_read (self))
-			return 0;
+			return NULL;
 		if (private_process (self))
-			return 1;
+			return &self->event;
 	}
 #else
-	return 0;
+	return NULL;
 #endif
 }
 
-int
+LISysNotifyEvent*
 lisys_notify_wait (LISysNotify* self)
 {
 #ifdef HAVE_INOTIFY
 	if (private_process (self))
-		return 1;
+		return &self->event;
 	while (1)
 	{
 		if (!private_read (self))
-			return 0;
+			return NULL;
 		if (private_process (self))
-			return 1;
+			return &self->event;
 	}
 #else
-	return 0;
+	return NULL;
 #endif
 }
 

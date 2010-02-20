@@ -224,7 +224,7 @@ liimg_dds_read_header (LIImgDDS* self,
                        FILE*     file)
 {
 	int i;
-	int alpha;
+	int alpha = 0;
 	static const struct
 	{
 		int alpha;
