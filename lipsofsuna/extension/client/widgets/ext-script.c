@@ -108,7 +108,6 @@ private_callback_pressed (LIScrData* data)
 
 static int
 private_callback_pressed_tree (LIScrData*    data,
-                               LIWdgWidget*  widget,
                                LIWdgTreerow* row)
 {
 	int i;
