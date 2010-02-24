@@ -83,6 +83,10 @@ livox_sector_free (LIVoxSector* self)
 {
 	int i;
 
+	/* Save data. */
+	if (self->manager->load && self->manager->sql != NULL)
+		livox_sector_write (self, self->manager->sql);
+
 	/* Free blocks. */
 	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
 		livox_block_free (self->blocks + i, self->manager);

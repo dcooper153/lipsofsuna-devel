@@ -36,6 +36,10 @@ private_physics_transform (LIEngEngine* self,
                            LIPhyObject* object);
 
 static void
+private_sector_free (void*        self,
+                     LIAlgSector* sector);
+
+static void
 private_sector_load (void*        self,
                      LIAlgSector* sector);
 
@@ -61,6 +65,8 @@ lieng_engine_new (LICalCallbacks* calls,
 		return NULL;
 	self->callbacks = calls;
 	self->sectors = sectors;
+	self->sectors->sector_free_callback.callback = private_sector_free;
+	self->sectors->sector_free_callback.userdata = self;
 	self->sectors->sector_load_callback.callback = private_sector_load;
 	self->sectors->sector_load_callback.userdata = self;
 	self->range.start = 0;
@@ -475,6 +481,19 @@ private_physics_transform (LIEngEngine* self,
 	if (obj == NULL || obj->sector == NULL)
 		return;
 	lieng_object_moved (obj);
+}
+
+static void
+private_sector_free (void*        self,
+                     LIAlgSector* sector)
+{
+	LIEngEngine* engine = self;
+	LIEngSector* sector_;
+
+	/* Invoke callbacks. */
+	sector_ = lialg_strdic_find (sector->content, "engine");
+	assert (sector_ != NULL);
+	lical_callbacks_call (engine->callbacks, self, "sector-free", lical_marshal_DATA_PTR, sector_);
 }
 
 static void

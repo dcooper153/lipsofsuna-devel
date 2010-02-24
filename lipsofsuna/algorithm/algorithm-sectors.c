@@ -53,6 +53,7 @@ lialg_sectors_new (int   count,
 		return NULL;
 	self->count = count;
 	self->width = width;
+	self->unload = 0.0f;
 
 	/* Allocate sectors. */
 	self->sectors = lialg_u32dic_new ();
@@ -378,7 +379,10 @@ lialg_sectors_remove (LIAlgSectors* self,
 
 	sector = lialg_u32dic_find (self->sectors, index);
 	if (sector != NULL)
+	{
 		private_free_sector (self, sector);
+		lialg_u32dic_remove (self->sectors, index);
+	}
 }
 
 void
@@ -407,6 +411,54 @@ lialg_sectors_remove_content (LIAlgSectors* self,
 	/* Free content. */
 	lialg_strdic_remove (self->content, name);
 	lisys_free (content);
+}
+
+void
+lialg_sectors_update (LIAlgSectors* self,
+                      float         secs)
+{
+	int now;
+	int delay;
+	LIAlgSector* sector;
+	LIAlgU32dicIter iter;
+
+	/* Unload inactive sectors. */
+	if (self->unload > 0.0f)
+	{
+		now = time (NULL);
+		delay = LIMAT_MAX (1, (int) self->unload);
+		LIALG_U32DIC_FOREACH (iter, self->sectors)
+		{
+			sector = iter.value;
+			if (sector->stamp + delay < now)
+				lialg_sectors_remove (self, sector->index);
+		}
+	}
+}
+
+/**
+ * \brief Gets the unload delay of sectors.
+ *
+ * \param self Sector manager.
+ * \return Delay in seconds.
+ */
+float
+lialg_sectors_get_unload (const LIAlgSectors* self)
+{
+	return self->unload;
+}
+
+/**
+ * \brief Gets the unload delay of sectors.
+ *
+ * \param self Sector manager.
+ * \param value Delay in seconds, zero to disable.
+ */
+void
+lialg_sectors_set_unload (LIAlgSectors* self,
+                          float         value)
+{
+	self->unload = value;
 }
 
 void*

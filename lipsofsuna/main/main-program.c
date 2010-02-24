@@ -358,6 +358,7 @@ limai_program_update (LIMaiProgram* self,
 	if (self->quit)
 		return 0;
 
+	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
 	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);

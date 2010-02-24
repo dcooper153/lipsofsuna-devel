@@ -343,6 +343,29 @@ lieng_object_moved (LIEngObject* self)
 }
 
 /**
+ * \brief Refreshes map around the object.
+ *
+ * Calling this function prevents the map sectors near the object from
+ * unloading. One important use case for this is preventing clients from
+ * being swapped out when they stand still.
+ *
+ * \param self Object.
+ * \param radius Refresh radius.
+ */
+void
+lieng_object_refresh (LIEngObject* self,
+                      float        radius)
+{
+	LIMatTransform transform;
+
+	if (lieng_object_get_realized (self))
+	{
+		lieng_object_get_transform (self, &transform);
+		lialg_sectors_refresh_point (self->engine->sectors, &transform.position, radius);
+	}
+}
+
+/**
  * \brief Updates the state of the object.
  * 
  * \param self Object.

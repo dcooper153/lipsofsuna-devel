@@ -96,6 +96,10 @@ int
 lieng_object_moved (LIEngObject* self);
 
 void
+lieng_object_refresh (LIEngObject* self,
+                      float        radius);
+
+void
 lieng_object_update (LIEngObject* self,
                      float        secs);
 

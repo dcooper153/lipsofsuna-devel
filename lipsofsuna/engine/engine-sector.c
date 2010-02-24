@@ -63,9 +63,19 @@ lieng_sector_new (LIAlgSector* sector)
 void
 lieng_sector_free (LIEngSector* self)
 {
-	/* Free objects. */
+	LIAlgU32dicIter iter;
+	LIEngObject* object;
+
+	/* Remove objects. */
 	if (self->objects != NULL)
+	{
+		LIALG_U32DIC_FOREACH (iter, self->objects)
+		{
+			object = iter.value;
+			lieng_object_set_realized (object, 0);
+		}
 		lialg_u32dic_free (self->objects);
+	}
 
 	lisys_free (self);
 }

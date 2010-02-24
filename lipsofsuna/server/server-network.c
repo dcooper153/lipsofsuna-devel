@@ -123,8 +123,11 @@ void
 liser_network_update (LISerNetwork* self,
                       float         secs)
 {
+	LIAlgU32dicIter iter;
+	LISerClient* client;
 	grapple_message* message;
 
+	/* Handle messages. */
 	if (grapple_server_messages_waiting (self->socket))
 	{
 		message = grapple_server_message_pull (self->socket);
@@ -147,6 +150,14 @@ liser_network_update (LISerNetwork* self,
 				break;
 		}
 		grapple_message_dispose (message);
+	}
+
+	/* Prevent sectors from unloading. */
+	LIALG_U32DIC_FOREACH (iter, self->clients)
+	{
+		client = iter.value;
+		if (client->object != NULL)
+			lieng_object_refresh (client->object, client->radius + 1.0f);
 	}
 }
 

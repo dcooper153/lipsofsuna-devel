@@ -66,6 +66,7 @@ liser_server_new (LIPthPaths* paths)
 	self->paths = self->program->paths;
 	self->script = self->program->script;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
+	lialg_sectors_set_unload (self->sectors, 20.0f);
 
 	/* Initialize server component. */
 	if (!limai_program_insert_component (self->program, "server", self))
