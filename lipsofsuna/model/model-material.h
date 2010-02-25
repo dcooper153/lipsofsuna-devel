@@ -60,6 +60,15 @@ limdl_material_init_copy (LIMdlMaterial*       self,
                           const LIMdlMaterial* src);
 
 void
+limdl_material_free (LIMdlMaterial* self);
+
+int
+limdl_material_append_texture (LIMdlMaterial* self,
+                               int            type,
+                               int            flags,
+                               const char*    name);
+
+void
 limdl_material_clear_textures (LIMdlMaterial* self);
 
 int
@@ -77,6 +86,10 @@ limdl_material_realloc_textures (LIMdlMaterial* self,
 int
 limdl_material_write (LIMdlMaterial* self,
                       LIArcWriter*   writer);
+
+int
+limdl_material_set_shader (LIMdlMaterial* self,
+                           const char*    value);
 
 int
 limdl_material_set_texture (LIMdlMaterial* self,

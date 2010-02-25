@@ -118,7 +118,16 @@ livox_manager_check_occluder (const LIVoxManager* self,
 	if (material == NULL)
 		return 0;
 
-	return (material->flags & LIVOX_MATERIAL_FLAG_OCCLUDER) != 0;
+	if (!(material->flags & LIVOX_MATERIAL_FLAG_OCCLUDER))
+		return 0;
+	if (material->type == LIVOX_MATERIAL_TYPE_HEIGHT)
+	{
+#warning Occlusion probably does not work correctly for heightmap tiles.
+		if (voxel->damage != 255)
+			return 0;
+	}
+
+	return 1;
 }
 
 /**
@@ -414,8 +423,14 @@ livox_manager_insert_voxel (LIVoxManager*      self,
 int
 livox_manager_load_materials (LIVoxManager* self)
 {
+	int id;
+	int col;
+	int fmt;
 	int ret;
+	int size;
 	const char* query;
+	const void* bytes;
+	LIArcReader* reader;
 	LIVoxMaterial* material;
 	sqlite3_stmt* statement;
 
@@ -426,7 +441,7 @@ livox_manager_load_materials (LIVoxManager* self)
 	}
 
 	/* Prepare statement. */
-	query = "SELECT id,flags,fric,name,model FROM voxel_materials;";
+	query = "SELECT id,fmt,data FROM voxel_materials;";
 	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
@@ -444,10 +459,40 @@ livox_manager_load_materials (LIVoxManager* self)
 			return 0;
 		}
 
-		/* Read material. */
-		material = livox_material_new_from_sql (self->sql, statement);
+		/* Read id and format. */
+		col = 0;
+		id = sqlite3_column_int (statement, col++);
+		fmt = sqlite3_column_int (statement, col++);
+		if (fmt != LIVOX_MATERIAL_FORMAT)
+		{
+			lisys_error_set (EINVAL, "invalid voxel material format %d", fmt);
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Read binary blob. */
+		bytes = sqlite3_column_blob (statement, col);
+		size = sqlite3_column_bytes (statement, col);
+		reader = liarc_reader_new (bytes, size);
+		if (reader == NULL)
+		{
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Deserialize material. */
+		material = livox_material_new_from_stream (reader);
+		liarc_reader_free (reader);
 		if (material == NULL)
 		{
+			sqlite3_finalize (statement);
+			return 0;
+		}
+
+		/* Sanity checks. */
+		if (id != material->id)
+		{
+			lisys_error_set (EINVAL, "voxel material id mismatch");
 			sqlite3_finalize (statement);
 			return 0;
 		}
@@ -750,68 +795,6 @@ livox_manager_rotate_voxel (LIVoxManager*      self,
 	return 0;
 }
 
-/**
- * \brief Solves occlusion masks for a volume of voxels.
- *
- * \param self Voxel manager.
- * \param xsize Number of voxels.
- * \param ysize Number of voxels.
- * \param zsize Number of voxels.
- * \param result Buffer with room for xsize*ysize*zsize integers.
- * \return Number of completely occluded voxels.
- */
-int
-livox_manager_solve_occlusion (LIVoxManager* self,
-                               int           xsize,
-                               int           ysize,
-                               int           zsize,
-                               LIVoxVoxel*   voxels,
-                               int*          result)
-{
-	int i;
-	int x;
-	int y;
-	int z;
-	int count = 0;
-
-	/* Solve occluders. */
-	for (i = 0 ; i < xsize * ysize * zsize ; i++)
-	{
-		if (livox_manager_check_occluder (self, voxels + i))
-			result[i] = LIVOX_OCCLUDE_OCCLUDER;
-		else
-			result[i] = 0;
-	}
-
-	/* Solve occlusion. */
-	for (z = 1 ; z < zsize - 1 ; z++)
-	for (y = 1 ; y < ysize - 1 ; y++)
-	for (x = 1 ; x < xsize - 1 ; x++)
-	{
-		/* Check for occlusion from each side. */
-		i = x + y * ysize + z * ysize * zsize;
-		if (result[i - 1] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_XNEG;
-		if (result[i + 1] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_XPOS;
-		if (result[i - ysize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_YNEG;
-		if (result[i + ysize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_YPOS;
-		if (result[i - ysize * zsize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_ZNEG;
-		if (result[i + ysize * zsize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_ZPOS;
-		if ((result[i] & LIVOX_OCCLUDE_ALL) == LIVOX_OCCLUDE_ALL)
-		{
-			result[i] |= LIVOX_OCCLUDE_OCCLUDED;
-			count++;
-		}
-	}
-
-	return count;
-}
-
 void
 livox_manager_update (LIVoxManager* self,
                       float         secs)
@@ -893,6 +876,8 @@ int
 livox_manager_write_materials (LIVoxManager* self)
 {
 	LIAlgU32dicIter iter;
+	LIArcWriter* writer;
+	LIVoxMaterial* material;
 
 	if (self->sql == NULL)
 	{
@@ -908,8 +893,27 @@ livox_manager_write_materials (LIVoxManager* self)
 	/* Save materials. */
 	LIALG_U32DIC_FOREACH (iter, self->materials)
 	{
-		if (!livox_material_write_to_sql (iter.value, self->sql))
+		/* Serialize material. */
+		material = iter.value;
+		writer = liarc_writer_new ();
+		if (writer == NULL)
 			return 0;
+		if (!livox_material_write (iter.value, writer))
+		{
+			liarc_writer_free (writer);
+			return 0;
+		}
+
+		/* Write to database. */
+		if (!liarc_sql_insert (self->sql, "voxel_materials",
+			"id", LIARC_SQL_INT, material->id,
+			"fmt", LIARC_SQL_INT, LIVOX_MATERIAL_FORMAT,
+			"data", LIARC_SQL_BLOB, liarc_writer_get_buffer (writer), liarc_writer_get_length (writer), NULL))
+		{
+			liarc_writer_free (writer);
+			return 0;
+		}
+		liarc_writer_free (writer);
 	}
 
 	return 1;
@@ -1023,8 +1027,7 @@ private_ensure_materials (LIVoxManager* self)
 
 	/* Create material table. */
 	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
-		"(id INTEGER PRIMARY KEY,flags UNSIGNED INTEGER,"
-		"fric REAL,name TEXT,model TEXT);";
+		"(id INTEGER PRIMARY KEY,fmt INTEGER,data BLOB);";
 	if (!liarc_sql_query (self->sql, query))
 		return 0;
 

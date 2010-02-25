@@ -64,9 +64,14 @@ lieng_model_free (LIEngModel* self)
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
-	/* Free data. */
+	/* Unreference and free shape. */
 	if (self->physics != NULL)
+	{
 		liphy_shape_free (self->physics);
+		liphy_shape_free (self->physics);
+	}
+
+	/* Free data. */
 	if (self->model != NULL)
 		limdl_model_free (self->model);
 	lisys_free (self->path);
@@ -92,6 +97,7 @@ lieng_model_load (LIEngModel* self)
 	self->physics = liphy_shape_new (self->engine->physics, self->model);
 	if (self->physics == NULL)
 		goto error;
+	liphy_shape_ref (self->physics);
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);

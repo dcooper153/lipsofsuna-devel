@@ -24,55 +24,59 @@
  * @{
  */
 
-#ifndef __EXT_MATERIALS_H__
-#define __EXT_MATERIALS_H__
+#ifndef __EXT_MATERIAL_H__
+#define __EXT_MATERIAL_H__
 
 #include <lipsofsuna/client.h>
 #include <lipsofsuna/generator.h>
 #include <lipsofsuna/engine.h>
 #include <lipsofsuna/widget.h>
 #include "ext-module.h"
+#include "ext-preview.h"
 
-#define LIEXT_MATERIALS(o) ((LIExtMaterials*)(o))
+#define LIEXT_MATERIAL(o) ((LIExtMaterial*)(o))
 
-typedef struct _LIExtMaterialsTreerow LIExtMaterialsTreerow;
-struct _LIExtMaterialsTreerow
-{
-	LIVoxMaterial* material;
-};
-
-struct _LIExtMaterials
+struct _LIExtMaterial
 {
 	LIWdgGroup base;
 	LIExtModule* module;
-	LIGenGenerator* generator;
+	LIExtPreview* preview;
+	LIVoxMaterial* material;
+	LIWdgTreerow* treerow;
 	struct
 	{
-		LIWdgWidget* group_view;
-		LIWdgWidget* button_add;
-		LIWdgWidget* button_remove;
-		LIWdgWidget* material;
-		LIWdgWidget* preview;
-		LIWdgWidget* tree;
-		LIWdgWidget* view;
+		LIWdgWidget* button_type;
+		LIWdgWidget* check_occlude;
+		LIWdgWidget* entry_name;
+		LIWdgWidget* entry_model;
+		LIWdgWidget* entry_shader1;
+		LIWdgWidget* entry_shader2;
+		LIWdgWidget* entry_texture1;
+		LIWdgWidget* entry_texture2;
+		LIWdgWidget* label_friction;
+		LIWdgWidget* label_name;
+		LIWdgWidget* label_model;
+		LIWdgWidget* label_occlude;
+		LIWdgWidget* label_shader1;
+		LIWdgWidget* label_shader2;
+		LIWdgWidget* label_texture1;
+		LIWdgWidget* label_texture2;
+		LIWdgWidget* label_type;
+		LIWdgWidget* scroll_friction;
 	} widgets;
 };
 
-extern const LIWdgClass liext_widget_materials;
+extern const LIWdgClass liext_widget_material;
 
 LIWdgWidget*
-liext_materials_new (LIWdgManager* manager,
-                     LIExtModule*  module);
-
-int
-liext_materials_save (LIExtMaterials* self);
+liext_material_new (LIWdgManager* manager,
+                    LIExtModule*  module,
+                    LIExtPreview* preview);
 
 void
-liext_materials_reset (LIExtMaterials* self,
-                       LIArcReader*    reader);
-
-int
-liext_materials_get_active (LIExtMaterials* self);
+liext_material_set_material (LIExtMaterial* self,
+                             LIVoxMaterial* material,
+                             LIWdgTreerow*  treerow);
 
 #endif
 

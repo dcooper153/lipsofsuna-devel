@@ -56,10 +56,14 @@ libevents_cli_la_SOURCES = \
 
 libgenerator_cli_la_LIBADD = $(LIBADD)
 libgenerator_cli_la_SOURCES = \
+	generator/ext-block.c \
+	generator/ext-block.h \
 	generator/ext-brushes.c \
 	generator/ext-brushes.h \
 	generator/ext-dialog.c \
 	generator/ext-dialog.h \
+	generator/ext-material.c \
+	generator/ext-material.h \
 	generator/ext-materials.c \
 	generator/ext-materials.h \
 	generator/ext-module.c \

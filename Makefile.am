@@ -494,6 +494,7 @@ voxdir = $(includedir)/lipsofsuna/voxel
 vox_HEADERS = \
 	lipsofsuna/voxel/voxel.h \
 	lipsofsuna/voxel/voxel-block.h \
+	lipsofsuna/voxel/voxel-build.h \
 	lipsofsuna/voxel/voxel-iterator.h \
 	lipsofsuna/voxel/voxel-manager.h \
 	lipsofsuna/voxel/voxel-material.h \
@@ -502,6 +503,7 @@ vox_HEADERS = \
 voxsrc = \
 	lipsofsuna/voxel/voxel.c \
 	lipsofsuna/voxel/voxel-block.c \
+	lipsofsuna/voxel/voxel-build.c \
 	lipsofsuna/voxel/voxel-manager.c \
 	lipsofsuna/voxel/voxel-material.c \
 	lipsofsuna/voxel/voxel-private.h \
@@ -572,10 +574,12 @@ build_bin_lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 build_bin_lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-build_bin_lipsofsuna_generator_LDADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+build_bin_lipsofsuna_generator_LDADD = \
+	$(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 build_bin_lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c \
-	$(algsrc) $(arcsrc) $(calsrc) $(gensrc) $(matsrc) $(mdlsrc) \
-	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(matsrc) \
+	$(mdlsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) $(thrsrc) \
+	$(voxsrc)
 
 build_bin_lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_import_LDADD = $(SQUISH_LIBS) $(LIBPNG_LIBS) $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)

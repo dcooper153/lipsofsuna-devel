@@ -100,8 +100,9 @@ am_libevents_cli_la_OBJECTS = events/ext-module.lo \
 	events/ext-script.lo
 libevents_cli_la_OBJECTS = $(am_libevents_cli_la_OBJECTS)
 libgenerator_cli_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libgenerator_cli_la_OBJECTS = generator/ext-brushes.lo \
-	generator/ext-dialog.lo generator/ext-materials.lo \
+am_libgenerator_cli_la_OBJECTS = generator/ext-block.lo \
+	generator/ext-brushes.lo generator/ext-dialog.lo \
+	generator/ext-material.lo generator/ext-materials.lo \
 	generator/ext-module.lo generator/ext-preview.lo \
 	generator/ext-script.lo
 libgenerator_cli_la_OBJECTS = $(am_libgenerator_cli_la_OBJECTS)
@@ -413,10 +414,14 @@ libevents_cli_la_SOURCES = \
 
 libgenerator_cli_la_LIBADD = $(LIBADD)
 libgenerator_cli_la_SOURCES = \
+	generator/ext-block.c \
+	generator/ext-block.h \
 	generator/ext-brushes.c \
 	generator/ext-brushes.h \
 	generator/ext-dialog.c \
 	generator/ext-dialog.h \
+	generator/ext-material.c \
+	generator/ext-material.h \
 	generator/ext-materials.c \
 	generator/ext-materials.h \
 	generator/ext-module.c \
@@ -633,9 +638,13 @@ generator/$(am__dirstamp):
 generator/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) generator/$(DEPDIR)
 	@: > generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-block.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
 generator/ext-brushes.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
 generator/ext-dialog.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-material.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
 generator/ext-materials.lo: generator/$(am__dirstamp) \
 	generator/$(DEPDIR)/$(am__dirstamp)
@@ -800,10 +809,14 @@ mostlyclean-compile:
 	-rm -f events/ext-module.lo
 	-rm -f events/ext-script.$(OBJEXT)
 	-rm -f events/ext-script.lo
+	-rm -f generator/ext-block.$(OBJEXT)
+	-rm -f generator/ext-block.lo
 	-rm -f generator/ext-brushes.$(OBJEXT)
 	-rm -f generator/ext-brushes.lo
 	-rm -f generator/ext-dialog.$(OBJEXT)
 	-rm -f generator/ext-dialog.lo
+	-rm -f generator/ext-material.$(OBJEXT)
+	-rm -f generator/ext-material.lo
 	-rm -f generator/ext-materials.$(OBJEXT)
 	-rm -f generator/ext-materials.lo
 	-rm -f generator/ext-module.$(OBJEXT)
@@ -882,8 +895,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@effect/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-block.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-brushes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-dialog.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-material.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-materials.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-preview.Plo@am__quote@

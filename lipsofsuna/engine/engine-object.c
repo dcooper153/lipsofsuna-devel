@@ -685,12 +685,13 @@ lieng_object_set_model (LIEngObject* self,
 	if (model != NULL)
 	{
 		limdl_pose_set_model (self->pose, model->model);
-		liphy_object_set_shape (self->physics, model->physics);
+		liphy_object_clear_shape (self->physics);
+		liphy_object_insert_shape (self->physics, model->physics, NULL);
 	}
 	else
 	{
 		limdl_pose_set_model (self->pose, NULL);
-		liphy_object_set_shape (self->physics, NULL);
+		liphy_object_clear_shape (self->physics);
 	}
 	self->model = model;
 
@@ -926,10 +927,9 @@ void
 lieng_object_set_shape (LIEngObject* self,
                         LIPhyShape*  shape)
 {
+	liphy_object_clear_shape (self->physics);
 	if (shape != NULL)
-		liphy_object_set_shape (self->physics, shape);
-	else
-		liphy_object_set_shape (self->physics, NULL);
+		liphy_object_insert_shape (self->physics, shape, NULL);
 }
 
 /**

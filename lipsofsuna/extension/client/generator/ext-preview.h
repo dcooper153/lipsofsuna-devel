@@ -38,10 +38,12 @@ enum
 {
 	LIEXT_PREVIEW_COPY_VOXEL,
 	LIEXT_PREVIEW_PASTE_VOXEL,
+	LIEXT_PREVIEW_DAMAGE_VOXEL,
 	LIEXT_PREVIEW_ERASE_VOXEL,
 	LIEXT_PREVIEW_INSERT_VOXEL,
 	LIEXT_PREVIEW_REPLACE_VOXEL,
 	LIEXT_PREVIEW_ROTATE_VOXEL,
+	LIEXT_PREVIEW_MAX
 };
 
 typedef struct _LIExtPreview LIExtPreview;
@@ -50,6 +52,7 @@ struct _LIExtPreview
 	LIWdgRender base;
 	LIAlgCamera* camera;
 	LIAlgSectors* sectors;
+	LIAlgMemdic* blocks;
 	LIAlgPtrdic* objects;
 	LICalCallbacks* callbacks;
 	LICalHandle calls[2];
@@ -73,6 +76,10 @@ liext_preview_new (LIWdgManager* manager,
 
 void
 liext_preview_build (LIExtPreview* self);
+
+int
+liext_preview_build_block (LIExtPreview*   self,
+                           LIVoxBlockAddr* addr);
 
 int
 liext_preview_build_brush (LIExtPreview* self,

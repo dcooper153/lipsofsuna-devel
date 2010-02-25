@@ -20,6 +20,7 @@
 
 #include "voxel/voxel.h"
 #include "voxel/voxel-block.h"
+#include "voxel/voxel-build.h"
 #include "voxel/voxel-iterator.h"
 #include "voxel/voxel-manager.h"
 #include "voxel/voxel-material.h"

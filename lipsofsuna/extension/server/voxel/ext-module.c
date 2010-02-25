@@ -131,7 +131,7 @@ liext_module_new (LIMaiProgram* program)
 	LIALG_U32DIC_FOREACH (iter, self->voxels->materials)
 	{
 		material = iter.value;
-		if (!livox_material_write_to_stream (material, self->assign_packet))
+		if (!livox_material_write (material, self->assign_packet))
 		{
 			liext_module_free (self);
 			return NULL;
@@ -188,6 +188,37 @@ liext_module_free (LIExtModule* self)
 }
 
 int
+liext_module_build_block (LIExtModule*    self,
+                          LIVoxBlockAddr* addr)
+{
+	LIExtBlock* block;
+
+	/* Find the block. */
+	block = lialg_memdic_find (self->blocks, addr, sizeof (LIVoxBlockAddr));
+	if (block == NULL)
+	{
+		block = liext_block_new (self);
+		if (block == NULL)
+			return 0;
+		if (!lialg_memdic_insert (self->blocks, addr, sizeof (LIVoxBlockAddr), block))
+		{
+			liext_block_free (block);
+			return 0;
+		}
+	}
+
+	/* Build the block. */
+	if (!liext_block_build (block, addr))
+	{
+		lialg_memdic_remove (self->blocks, addr, sizeof (LIVoxBlockAddr));
+		liext_block_free (block);
+		return 0;
+	}
+
+	return 1;
+}
+
+int
 liext_module_write (LIExtModule* self,
                     LIArcSql*    sql)
 {
@@ -224,52 +255,15 @@ static int
 private_block_load (LIExtModule*      self,
                     LIVoxUpdateEvent* event)
 {
-	LIExtBlock* eblock;
 	LIVoxBlockAddr addr;
-	LIMatVector orig;
-	LIMatVector vector;
-	LIVoxBlock* vblock;
-	LIVoxSector* sector;
 
-	/* Find the sector. */
-	sector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", event->sector[0], event->sector[1], event->sector[2], 1);
-	if (sector == NULL)
-		return 1;
-
-	/* Find the block. */
 	addr.sector[0] = event->sector[0];
 	addr.sector[1] = event->sector[1];
 	addr.sector[2] = event->sector[2];
 	addr.block[0] = event->block[0];
 	addr.block[1] = event->block[1];
 	addr.block[2] = event->block[2];
-	vblock = livox_sector_get_block (sector, LIVOX_BLOCK_INDEX (event->block[0], event->block[1], event->block[2]));
-	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (LIVoxBlockAddr));
-	if (eblock == NULL)
-	{
-		eblock = liext_block_new (self);
-		if (eblock == NULL)
-			return 1;
-		if (!lialg_memdic_insert (self->blocks, &addr, sizeof (addr), eblock))
-		{
-			liext_block_free (eblock);
-			return 1;
-		}
-	}
-
-	/* Calculate world position. */
-	vector = limat_vector_init (event->sector[0], event->sector[1], event->sector[2]);
-	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
-	orig = limat_vector_init (event->block[0], event->block[1], event->block[2]);
-	orig = limat_vector_multiply (orig, LIVOX_BLOCK_WIDTH);
-	orig = limat_vector_add (orig, vector);
-
-	/* Build the block. */
-	if (!liext_block_build (eblock, self, vblock, &addr))
-	{
-		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
-		liext_block_free (eblock);
-	}
+	liext_module_build_block (self, &addr);
 
 	return 1;
 }

@@ -149,59 +149,37 @@ liext_module_build_all (LIExtModule* self)
 	{
 		addr = iter.key;
 		block = iter.value;
-		ret &= liext_module_build_block (self,
-			addr->sector[0], addr->sector[1], addr->sector[2],
-			addr->block[0], addr->block[1], addr->block[2]);
+		ret &= liext_module_build_block (self, addr);
 	}
 
 	return ret;
 }
 
 int
-liext_module_build_block (LIExtModule* self,
-                          int          sx,
-                          int          sy,
-                          int          sz,
-                          int          bx,
-                          int          by,
-                          int          bz)
+liext_module_build_block (LIExtModule*    self,
+                          LIVoxBlockAddr* addr)
 {
-	LIExtBlock* eblock;
-	LIVoxBlock* vblock;
-	LIVoxBlockAddr addr;
-	LIVoxSector* vsector;
+	LIExtBlock* block;
 
-	/* Find sector. */
-	vsector = lialg_sectors_data_offset (self->voxels->sectors, "voxel", sx, sy, sz, 0);
-	if (vsector == NULL)
-		return 1;
-
-	/* Find block. */
-	vblock = livox_sector_get_block (vsector, LIVOX_BLOCK_INDEX (bx, by, bz));
-	addr.sector[0] = sx;
-	addr.sector[1] = sy;
-	addr.sector[2] = sz;
-	addr.block[0] = bx;
-	addr.block[1] = by;
-	addr.block[2] = bz;
-	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
-	if (eblock == NULL)
+	/* Find the block. */
+	block = lialg_memdic_find (self->blocks, addr, sizeof (LIVoxBlockAddr));
+	if (block == NULL)
 	{
-		eblock = liext_block_new (self->client);
-		if (eblock == NULL)
+		block = liext_block_new (self);
+		if (block == NULL)
 			return 0;
-		if (!lialg_memdic_insert (self->blocks, &addr, sizeof (addr), eblock))
+		if (!lialg_memdic_insert (self->blocks, addr, sizeof (LIVoxBlockAddr), block))
 		{
-			liext_block_free (eblock);
+			liext_block_free (block);
 			return 0;
 		}
 	}
 
-	/* Build block. */
-	if (!liext_block_build (eblock, self, vblock, &addr))
+	/* Build the block. */
+	if (!liext_block_build (block, addr))
 	{
-		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
-		liext_block_free (eblock);
+		lialg_memdic_remove (self->blocks, addr, sizeof (LIVoxBlockAddr));
+		liext_block_free (block);
 		return 0;
 	}
 
@@ -227,7 +205,7 @@ static int
 private_block_free (LIExtModule*      self,
                     LIVoxUpdateEvent* event)
 {
-	LIExtBlock* eblock;
+	LIExtBlock* block;
 	LIVoxBlockAddr addr;
 
 	addr.sector[0] = event->sector[0];
@@ -236,11 +214,11 @@ private_block_free (LIExtModule*      self,
 	addr.block[0] = event->block[0];
 	addr.block[1] = event->block[1];
 	addr.block[2] = event->block[2];
-	eblock = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
-	if (eblock != NULL)
+	block = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
+	if (block != NULL)
 	{
 		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
-		liext_block_free (eblock);
+		liext_block_free (block);
 	}
 
 	return 1;
@@ -250,14 +228,16 @@ static int
 private_block_load (LIExtModule*      self,
                     LIVoxUpdateEvent* event)
 {
-	int sx = event->sector[0];
-	int sy = event->sector[1];
-	int sz = event->sector[2];
-	int bx = event->block[0];
-	int by = event->block[1];
-	int bz = event->block[2];
+	LIVoxBlockAddr addr;
 
-	liext_module_build_block (self, sx, sy, sz, bx, by, bz);
+	addr.sector[0] = event->sector[0];
+	addr.sector[1] = event->sector[1];
+	addr.sector[2] = event->sector[2];
+	addr.block[0] = event->block[0];
+	addr.block[1] = event->block[1];
+	addr.block[2] = event->block[2];
+	if (!liext_module_build_block (self, &addr))
+		lisys_error_report ();
 
 	return 1;
 }

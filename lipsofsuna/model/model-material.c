@@ -51,6 +51,8 @@ limdl_material_init (LIMdlMaterial* self)
 	self->strand_start = 0.1f;
 	self->strand_end = 0.0f;
 	self->strand_shape = 0.5f;
+	self->textures.count = 0;
+	self->textures.array = NULL;
 
 	return 1;
 }
@@ -96,6 +98,35 @@ limdl_material_init_copy (LIMdlMaterial*       self,
 				return 0;
 			}
 		}
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Frees the material.
+ *
+ * \param self Material.
+ */
+void
+limdl_material_free (LIMdlMaterial* self)
+{
+	limdl_material_clear_textures (self);
+	free (self->shader);
+}
+
+int
+limdl_material_append_texture (LIMdlMaterial* self,
+                               int            type,
+                               int            flags,
+                               const char*    name)
+{
+	if (!limdl_material_realloc_textures (self, self->textures.count + 1))
+		return 0;
+	if (!limdl_material_set_texture (self, self->textures.count - 1, type, flags, name))
+	{
+		self->textures.count--;
+		return 0;
 	}
 
 	return 1;
@@ -158,6 +189,9 @@ limdl_material_compare (const LIMdlMaterial* self,
 /**
  * \brief Deserializes the material from a stream.
  *
+ * The contents of the material are replaced with data read from the stream.
+ * If the read fails, the function returns without modifying the material.
+ *
  * \param self Material.
  * \param reader Stream reader.
  * \return Nonzero on success.
@@ -168,51 +202,65 @@ limdl_material_read (LIMdlMaterial* self,
 {
 	int i;
 	uint32_t tmp[4];
+	LIMdlMaterial tmpmat;
 
-	/* Read header. */
+	/* Initialize temporaries. */
+	memset (&tmpmat, 0, sizeof (LIMdlMaterial));
+
+	/* Read header to temporary. */
 	if (!liarc_reader_get_uint32 (reader, tmp + 0) ||
-		!liarc_reader_get_float (reader, &self->emission) ||
-		!liarc_reader_get_float (reader, &self->shininess) ||
-		!liarc_reader_get_float (reader, self->diffuse + 0) ||
-		!liarc_reader_get_float (reader, self->diffuse + 1) ||
-		!liarc_reader_get_float (reader, self->diffuse + 2) ||
-		!liarc_reader_get_float (reader, self->diffuse + 3) ||
-		!liarc_reader_get_float (reader, self->specular + 0) ||
-		!liarc_reader_get_float (reader, self->specular + 1) ||
-		!liarc_reader_get_float (reader, self->specular + 2) ||
-		!liarc_reader_get_float (reader, self->specular + 3) ||
-		!liarc_reader_get_float (reader, &self->strand_start) ||
-		!liarc_reader_get_float (reader, &self->strand_end) ||
-		!liarc_reader_get_float (reader, &self->strand_shape) ||
+		!liarc_reader_get_float (reader, &tmpmat.emission) ||
+		!liarc_reader_get_float (reader, &tmpmat.shininess) ||
+		!liarc_reader_get_float (reader, tmpmat.diffuse + 0) ||
+		!liarc_reader_get_float (reader, tmpmat.diffuse + 1) ||
+		!liarc_reader_get_float (reader, tmpmat.diffuse + 2) ||
+		!liarc_reader_get_float (reader, tmpmat.diffuse + 3) ||
+		!liarc_reader_get_float (reader, tmpmat.specular + 0) ||
+		!liarc_reader_get_float (reader, tmpmat.specular + 1) ||
+		!liarc_reader_get_float (reader, tmpmat.specular + 2) ||
+		!liarc_reader_get_float (reader, tmpmat.specular + 3) ||
+		!liarc_reader_get_float (reader, &tmpmat.strand_start) ||
+		!liarc_reader_get_float (reader, &tmpmat.strand_end) ||
+		!liarc_reader_get_float (reader, &tmpmat.strand_shape) ||
 		!liarc_reader_get_uint32 (reader, tmp + 1))
 		return 0;
-	self->flags = tmp[0];
-	self->textures.count = tmp[1];
+	tmpmat.flags = tmp[0];
+	tmpmat.textures.count = tmp[1];
 
-	/* Read shader. */
-	if (!liarc_reader_get_text (reader, "", &self->shader))
+	/* Read shader to temporary. */
+	if (!liarc_reader_get_text (reader, "", &tmpmat.shader))
 		return 0;
 
-	/* Read textures. */
-	if (self->textures.count > 0)
+	/* Read textures to temporary. */
+	if (tmpmat.textures.count > 0)
 	{
-		self->textures.array = lisys_calloc (self->textures.count, sizeof (LIMdlTexture));
-		if (self->textures.array == NULL)
+		tmpmat.textures.array = lisys_calloc (tmpmat.textures.count, sizeof (LIMdlTexture));
+		if (tmpmat.textures.array == NULL)
+		{
+			limdl_material_free (&tmpmat);
 			return 0;
-		for (i = 0 ; i < self->textures.count ; i++)
+		}
+		for (i = 0 ; i < tmpmat.textures.count ; i++)
 		{
 			if (!liarc_reader_get_uint32 (reader, tmp + 0) ||
 			    !liarc_reader_get_uint32 (reader, tmp + 1) ||
 			    !liarc_reader_get_uint32 (reader, tmp + 2) ||
 			    !liarc_reader_get_uint32 (reader, tmp + 3) ||
-			    !liarc_reader_get_text (reader, "", &self->textures.array[i].string))
+			    !liarc_reader_get_text (reader, "", &tmpmat.textures.array[i].string))
+			{
+				limdl_material_free (&tmpmat);
 				return 0;
-			self->textures.array[i].type = tmp[0];
-			self->textures.array[i].flags = tmp[1];
-			self->textures.array[i].width = tmp[2];
-			self->textures.array[i].height = tmp[3];
+			}
+			tmpmat.textures.array[i].type = tmp[0];
+			tmpmat.textures.array[i].flags = tmp[1];
+			tmpmat.textures.array[i].width = tmp[2];
+			tmpmat.textures.array[i].height = tmp[3];
 		}
 	}
+
+	/* Succeeded so free old and copy over. */
+	limdl_material_free (self);
+	*self = tmpmat;
 
 	return 1;
 }
@@ -310,6 +358,28 @@ limdl_material_write (LIMdlMaterial* self,
 		    !liarc_writer_append_nul (writer))
 			return 0;
 	}
+
+	return 1;
+}
+
+/**
+ * \brief Sets the shader of the material.
+ *
+ * \param self Material.
+ * \param value Shader name.
+ * \return Nonzero on success.
+ */
+int
+limdl_material_set_shader (LIMdlMaterial* self,
+                           const char*    value)
+{
+	char* tmp;
+
+	tmp = listr_dup (value);
+	if (tmp == NULL)
+		return 0;
+	lisys_free (self->shader);
+	self->shader = tmp;
 
 	return 1;
 }

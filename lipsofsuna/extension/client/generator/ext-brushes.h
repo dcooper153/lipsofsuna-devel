@@ -58,7 +58,7 @@ struct _LIExtBrushes
 		LIWdgWidget* group_size;
 		LIWdgWidget* button_add;
 		LIWdgWidget* button_copy;
-		LIWdgWidget* button_paint[6];
+		LIWdgWidget* button_paint;
 		LIWdgWidget* button_remove;
 		LIWdgWidget* entry_name;
 		LIWdgWidget* entry_objextra;

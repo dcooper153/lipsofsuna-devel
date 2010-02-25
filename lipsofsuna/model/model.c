@@ -221,8 +221,7 @@ limdl_model_free (LIMdlModel* self)
 		for (i = 0 ; i < self->materials.count ; i++)
 		{
 			material = self->materials.array + i;
-			limdl_material_clear_textures (material);
-			lisys_free (material->shader);
+			limdl_material_free (material);
 		}
 		lisys_free (self->materials.array);
 	}

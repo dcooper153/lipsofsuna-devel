@@ -20,14 +20,15 @@
  * @{
  * \addtogroup liextcli Client
  * @{
- * \addtogroup liextcliVoxel Voxel
+ * \addtogroup liextcliGenerator Generator
  * @{
  */
 
 #include "ext-module.h"
+#include "ext-block.h"
 
 LIExtBlock*
-liext_block_new (LIExtModule* module)
+liext_block_new (LIExtPreview* preview)
 {
 	LIExtBlock* self;
 
@@ -35,7 +36,8 @@ liext_block_new (LIExtModule* module)
 	self = lisys_calloc (1, sizeof (LIExtBlock));
 	if (self == NULL)
 		return NULL;
-	self->module = module;
+	self->preview = preview;
+	self->client = preview->client;
 
 	return self;
 }
@@ -49,8 +51,6 @@ liext_block_free (LIExtBlock* self)
 		liren_model_free (self->rmodel);
 	if (self->mmodel != NULL)
 		limdl_model_free (self->mmodel);
-	if (self->physics != NULL)
-		liphy_object_free (self->physics);
 	lisys_free (self);
 }
 
@@ -72,11 +72,6 @@ liext_block_clear (LIExtBlock* self)
 		limdl_model_free (self->mmodel);
 		self->mmodel = NULL;
 	}
-	if (self->physics != NULL)
-	{
-		liphy_object_free (self->physics);
-		self->physics = NULL;
-	}
 }
 
 int
@@ -89,16 +84,16 @@ liext_block_build (LIExtBlock*     self,
 	liext_block_clear (self);
 
 	/* Build new objects. */
-	if (!livox_build_block (self->module->voxels, self->module->client->engine, addr, &self->mmodel, &self->physics))
+	if (!livox_build_block (self->preview->generator->voxels, self->client->engine, addr, &self->mmodel, NULL))
 		return 0;
 
 	/* Create render model if not empty. */
 	if (self->mmodel != NULL)
 	{
-		self->rmodel = liren_model_new (self->module->client->render, self->mmodel, NULL);
+		self->rmodel = liren_model_new (self->preview->render, self->mmodel, NULL);
 		if (self->rmodel != NULL)
 		{
-			self->group = liren_group_new (self->module->client->scene);
+			self->group = liren_group_new (self->preview->scene);
 			if (self->group != NULL)
 			{
 				transform = limat_transform_identity ();
@@ -110,8 +105,6 @@ liext_block_build (LIExtBlock*     self,
 	/* Realize if not empty. */
 	if (self->group != NULL)
 		liren_group_set_realized (self->group, 1);
-	if (self->physics != NULL)
-		liphy_object_set_realized (self->physics, 1);
 
 	return 1;
 }

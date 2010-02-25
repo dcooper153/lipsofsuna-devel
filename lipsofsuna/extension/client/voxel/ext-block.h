@@ -34,23 +34,21 @@
 typedef struct _LIExtBlock LIExtBlock;
 struct _LIExtBlock
 {
-	LICliClient* client;
-	LIPhyObject* physics;
+	LIExtModule* module;
 	LIMdlModel* mmodel;
+	LIPhyObject* physics;
 	LIRenModel* rmodel;
 	LIRenGroup* group;
 };
 
 LIExtBlock*
-liext_block_new (LICliClient* client);
+liext_block_new (LIExtModule* module);
 
 void
 liext_block_free (LIExtBlock* self);
 
 int
 liext_block_build (LIExtBlock*     self,
-                   LIExtModule*    module,
-                   LIVoxBlock*     block,
                    LIVoxBlockAddr* addr);
 
 void

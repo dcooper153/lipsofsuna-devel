@@ -168,10 +168,6 @@ liphy_object_set_speed (LIPhyObject* self,
                         float        value);
 
 void
-liphy_object_set_shape (LIPhyObject* self,
-                        LIPhyShape*  shape);
-
-void
 liphy_object_get_transform (const LIPhyObject* self,
                             LIMatTransform*    value);
 

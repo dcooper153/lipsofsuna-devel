@@ -248,17 +248,12 @@ private_init (LIExtBrushes* self,
 		&self->widgets.check_required, liwdg_check_new (manager),
 		&group_attr, liwdg_group_new_with_size (manager, 2, 6),
 		&group_tree, liwdg_group_new_with_size (manager, 1, 4),
-		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 7, 1),
+		&self->widgets.group_paint, liwdg_group_new_with_size (manager, 2, 1),
 		&self->widgets.group_size, liwdg_group_new_with_size (manager, 3, 1),
 		&self->widgets.group_view, liwdg_group_new_with_size (manager, 1, 3),
 		&self->widgets.button_add, liwdg_button_new (manager),
 		&self->widgets.button_copy, liwdg_button_new (manager),
-		&self->widgets.button_paint[0], liwdg_button_new (manager),
-		&self->widgets.button_paint[1], liwdg_button_new (manager),
-		&self->widgets.button_paint[2], liwdg_button_new (manager),
-		&self->widgets.button_paint[3], liwdg_button_new (manager),
-		&self->widgets.button_paint[4], liwdg_button_new (manager),
-		&self->widgets.button_paint[5], liwdg_button_new (manager),
+		&self->widgets.button_paint, liwdg_button_new (manager),
 		&self->widgets.button_remove, liwdg_button_new (manager),
 		&self->widgets.entry_name, liwdg_entry_new (manager),
 		&self->widgets.entry_objtype, liwdg_entry_new (manager),
@@ -286,28 +281,13 @@ private_init (LIExtBrushes* self,
 	liwdg_widget_insert_callback (self->widgets.spin_sizez, "pressed", private_resize_brush, self);
 
 	/* Paint. */
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[0]), "Copy");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[1]), "Paste");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[2]), "Erase");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[3]), "Insert");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[4]), "Replace");
-	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint[5]), "Rotate");
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint), "Insert");
 	liwdg_spin_set_value (LIWDG_SPIN (self->widgets.spin_axis), 1);
-	liwdg_widget_insert_callback (self->widgets.button_paint[0], "pressed", private_paint_select, self);
-	liwdg_widget_insert_callback (self->widgets.button_paint[1], "pressed", private_paint_select, self);
-	liwdg_widget_insert_callback (self->widgets.button_paint[2], "pressed", private_paint_select, self);
-	liwdg_widget_insert_callback (self->widgets.button_paint[3], "pressed", private_paint_select, self);
-	liwdg_widget_insert_callback (self->widgets.button_paint[4], "pressed", private_paint_select, self);
-	liwdg_widget_insert_callback (self->widgets.button_paint[5], "pressed", private_paint_select, self);
+	liwdg_widget_insert_callback (self->widgets.button_paint, "pressed", private_paint_select, self);
 	liwdg_group_set_homogeneous (LIWDG_GROUP (self->widgets.group_paint), 1);
 	liwdg_group_set_col_expand (LIWDG_GROUP (self->widgets.group_paint), 0, 1);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 0, self->widgets.button_paint[0]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 1, 0, self->widgets.button_paint[1]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 2, 0, self->widgets.button_paint[2]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 3, 0, self->widgets.button_paint[3]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 4, 0, self->widgets.button_paint[4]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 5, 0, self->widgets.button_paint[5]);
-	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 6, 0, self->widgets.spin_axis);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 0, 0, self->widgets.button_paint);
+	liwdg_group_set_child (LIWDG_GROUP (self->widgets.group_paint), 1, 0, self->widgets.spin_axis);
 
 	/* Tree. */
 	liwdg_view_set_vscroll (LIWDG_VIEW (self->widgets.view), 1);
@@ -560,16 +540,13 @@ static int
 private_paint_select (LIExtBrushes* self,
                       LIWdgWidget*  widget)
 {
-	int i;
-
-	for (i = 0 ; i < sizeof (self->widgets.button_paint) / sizeof (LIWdgWidget*) ; i++)
+	static const char* const modes[] =
 	{
-		if (widget == self->widgets.button_paint[i])
-		{
-			self->paint = i;
-			break;
-		}
-	}
+		"Copy", "Paste", "Damage", "Erase", "Insert", "Replace", "Rotate"
+	};
+
+	self->paint = (self->paint + 1) % LIEXT_PREVIEW_MAX;
+	liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_paint), modes[self->paint]);
 	self->select.index = 0;
 
 	return 0;
@@ -1393,7 +1370,22 @@ private_rebuild_brush (LIExtBrushes* self)
 static void
 private_rebuild_preview (LIExtBrushes* self)
 {
+	LIAlgU32dicIter iter;
 	LIExtBrushesTreerow* row;
+	LIVoxManager* source;
+	LIVoxMaterial* material;
+
+	/* Copy materials from material preview. */
+	source = LIEXT_EDITOR (self->module->editor)->generator->voxels;
+	livox_manager_clear_materials (self->generator->voxels);
+	LIALG_U32DIC_FOREACH (iter, source->materials)
+	{
+		material = livox_material_new_copy (iter.value);
+		if (material == NULL)
+			continue;
+		if (!livox_manager_insert_material (self->generator->voxels, material))
+			livox_material_free (material);
+	}
 
 	row = private_get_active (self);
 	if (row == NULL || row->brush == NULL)

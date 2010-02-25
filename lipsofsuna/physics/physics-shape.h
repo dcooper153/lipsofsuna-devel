@@ -52,6 +52,9 @@ void
 liphy_shape_free (LIPhyShape* self);
 
 void
+liphy_shape_ref (LIPhyShape* self);
+
+void
 liphy_shape_get_inertia (const LIPhyShape* self,
                          float             mass,
                          LIMatVector*      result);

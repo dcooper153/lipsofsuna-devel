@@ -85,7 +85,8 @@ liphy_object_new (LIPhyPhysics*    physics,
 		liphy_object_free (self);
 		return NULL;
 	}
-	liphy_object_set_shape (self, shape);
+	if (shape != NULL)
+		liphy_object_insert_shape (self, shape, NULL);
 
 	/* Add to dictionary. */
 	if (self->id)
@@ -116,10 +117,16 @@ liphy_object_free (LIPhyObject* self)
 	if (self->id)
 		lialg_u32dic_remove (self->physics->objects, self->id);
 
-	/* Free self. */
+	/* Unrealize. */
 	self->flags &= ~PRIVATE_REALIZED;
 	private_update_state (self);
+
+	/* Free shape. */
+	if (self->shape != NULL)
+		liphy_object_clear_shape (self);
 	delete self->shape;
+
+	/* Free self. */
 	delete self->motion;
 	lisys_free (self);
 }
@@ -132,8 +139,14 @@ liphy_object_free (LIPhyObject* self)
 void
 liphy_object_clear_shape (LIPhyObject* self)
 {
+	LIPhyShape* shape;
+
 	while (self->shape->getNumChildShapes ())
+	{
+		shape = (LIPhyShape*) self->shape->getChildShape (0)->getUserPointer ();
 		self->shape->removeChildShapeByIndex (0);
+		liphy_shape_free (shape);
+	}
 }
 
 /**
@@ -158,6 +171,9 @@ liphy_object_impulse (LIPhyObject*       self,
 /**
  * \brief Adds a collision shape to the object.
  *
+ * The reference count of the collision shape is increased by one when calling
+ * this so the caller should free the shape if it doesn't need it.
+ *
  * \param self Object.
  * \param shape Collision shape.
  * \param transform Shape transformation or NULL for identity.
@@ -167,6 +183,7 @@ liphy_object_insert_shape (LIPhyObject*          self,
                            LIPhyShape*           shape,
                            const LIMatTransform* transform)
 {
+	liphy_shape_ref (shape);
 	if (transform != NULL)
 	{
 		btTransform btransform(
@@ -689,22 +706,6 @@ liphy_object_set_speed (LIPhyObject* self,
                         float        value)
 {
 	self->config.speed = value;
-}
-
-/**
- * \brief Sets the collision shape of the object.
- *
- * \param self Object.
- * \param shape Collision shape or NULL.
- */
-void
-liphy_object_set_shape (LIPhyObject* self,
-                        LIPhyShape*  shape)
-{
-	liphy_object_clear_shape (self);
-	if (shape != NULL)
-		liphy_object_insert_shape (self, shape, NULL);
-	private_update_state (self);
 }
 
 /**

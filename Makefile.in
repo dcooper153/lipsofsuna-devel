@@ -251,6 +251,7 @@ am__objects_26 = lipsofsuna/video/video-calls.$(OBJEXT) \
 	lipsofsuna/video/video-features.$(OBJEXT)
 am__objects_27 = lipsofsuna/voxel/voxel.$(OBJEXT) \
 	lipsofsuna/voxel/voxel-block.$(OBJEXT) \
+	lipsofsuna/voxel/voxel-build.$(OBJEXT) \
 	lipsofsuna/voxel/voxel-manager.$(OBJEXT) \
 	lipsofsuna/voxel/voxel-material.$(OBJEXT) \
 	lipsofsuna/voxel/voxel-sector.$(OBJEXT)
@@ -305,18 +306,20 @@ build_bin_lipsofsuna_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(build_bin_lipsofsuna_client_LDFLAGS) $(LDFLAGS) -o $@
 am_build_bin_lipsofsuna_generator_OBJECTS =  \
-	lipsofsuna/generator/generator-main.$(OBJEXT) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_5) $(am__objects_8) \
-	$(am__objects_12) $(am__objects_13) $(am__objects_17) \
-	$(am__objects_21) $(am__objects_24) $(am__objects_25) \
-	$(am__objects_27)
+	lipsofsuna/generator/generator-main.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_5) \
+	$(am__objects_9) $(am__objects_8) $(am__objects_12) \
+	$(am__objects_13) $(am__objects_15) $(am__objects_17) \
+	$(am__objects_20) $(am__objects_21) $(am__objects_24) \
+	$(am__objects_25) $(am__objects_27)
 build_bin_lipsofsuna_generator_OBJECTS =  \
 	$(am_build_bin_lipsofsuna_generator_OBJECTS)
 build_bin_lipsofsuna_generator_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-build_bin_lipsofsuna_generator_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) \
+build_bin_lipsofsuna_generator_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(build_bin_lipsofsuna_generator_LDFLAGS) $(LDFLAGS) -o $@
 am_build_bin_lipsofsuna_import_OBJECTS =  \
 	lipsofsuna/reload/reload-main.$(OBJEXT) $(am__objects_2) \
@@ -1176,6 +1179,7 @@ voxdir = $(includedir)/lipsofsuna/voxel
 vox_HEADERS = \
 	lipsofsuna/voxel/voxel.h \
 	lipsofsuna/voxel/voxel-block.h \
+	lipsofsuna/voxel/voxel-build.h \
 	lipsofsuna/voxel/voxel-iterator.h \
 	lipsofsuna/voxel/voxel-manager.h \
 	lipsofsuna/voxel/voxel-material.h \
@@ -1185,6 +1189,7 @@ vox_HEADERS = \
 voxsrc = \
 	lipsofsuna/voxel/voxel.c \
 	lipsofsuna/voxel/voxel-block.c \
+	lipsofsuna/voxel/voxel-build.c \
 	lipsofsuna/voxel/voxel-manager.c \
 	lipsofsuna/voxel/voxel-material.c \
 	lipsofsuna/voxel/voxel-private.h \
@@ -1256,10 +1261,13 @@ build_bin_lipsofsuna_client_SOURCES = lipsofsuna/client/client-main.c \
 	$(sndsrc) $(srvsrc) $(syssrc) $(thrsrc) $(vidsrc) $(voxsrc) $(wdgsrc)
 
 build_bin_lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
-build_bin_lipsofsuna_generator_LDADD = $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+build_bin_lipsofsuna_generator_LDADD = \
+	$(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
+
 build_bin_lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c \
-	$(algsrc) $(arcsrc) $(calsrc) $(gensrc) $(matsrc) $(mdlsrc) \
-	$(pthsrc) $(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(matsrc) \
+	$(mdlsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) $(thrsrc) \
+	$(voxsrc)
 
 build_bin_lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_import_LDADD = $(SQUISH_LIBS) $(LIBPNG_LIBS) $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
@@ -2029,6 +2037,9 @@ lipsofsuna/voxel/voxel.$(OBJEXT): lipsofsuna/voxel/$(am__dirstamp) \
 lipsofsuna/voxel/voxel-block.$(OBJEXT):  \
 	lipsofsuna/voxel/$(am__dirstamp) \
 	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/voxel/voxel-build.$(OBJEXT):  \
+	lipsofsuna/voxel/$(am__dirstamp) \
+	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/voxel/voxel-manager.$(OBJEXT):  \
 	lipsofsuna/voxel/$(am__dirstamp) \
 	lipsofsuna/voxel/$(DEPDIR)/$(am__dirstamp)
@@ -2114,7 +2125,7 @@ lipsofsuna/generator/generator-main.$(OBJEXT):  \
 	lipsofsuna/generator/$(DEPDIR)/$(am__dirstamp)
 build/bin/lipsofsuna-generator$(EXEEXT): $(build_bin_lipsofsuna_generator_OBJECTS) $(build_bin_lipsofsuna_generator_DEPENDENCIES) build/bin/$(am__dirstamp)
 	@rm -f build/bin/lipsofsuna-generator$(EXEEXT)
-	$(AM_V_CCLD)$(build_bin_lipsofsuna_generator_LINK) $(build_bin_lipsofsuna_generator_OBJECTS) $(build_bin_lipsofsuna_generator_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(build_bin_lipsofsuna_generator_LINK) $(build_bin_lipsofsuna_generator_OBJECTS) $(build_bin_lipsofsuna_generator_LDADD) $(LIBS)
 lipsofsuna/reload/reload-main.$(OBJEXT):  \
 	lipsofsuna/reload/$(am__dirstamp) \
 	lipsofsuna/reload/$(DEPDIR)/$(am__dirstamp)
@@ -2303,6 +2314,7 @@ mostlyclean-compile:
 	-rm -f lipsofsuna/viewer/viewer-main.$(OBJEXT)
 	-rm -f lipsofsuna/viewer/viewer.$(OBJEXT)
 	-rm -f lipsofsuna/voxel/voxel-block.$(OBJEXT)
+	-rm -f lipsofsuna/voxel/voxel-build.$(OBJEXT)
 	-rm -f lipsofsuna/voxel/voxel-manager.$(OBJEXT)
 	-rm -f lipsofsuna/voxel/voxel-material.$(OBJEXT)
 	-rm -f lipsofsuna/voxel/voxel-sector.$(OBJEXT)
@@ -2482,6 +2494,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/viewer/$(DEPDIR)/viewer-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/viewer/$(DEPDIR)/viewer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-block.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-build.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-manager.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-material.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/voxel/$(DEPDIR)/voxel-sector.Po@am__quote@

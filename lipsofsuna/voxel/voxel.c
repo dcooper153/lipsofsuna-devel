@@ -70,6 +70,22 @@ livox_voxel_rotate (LIVoxVoxel* self,
 }
 
 /**
+ * \brief Gets the height of the voxel.
+ *
+ * This assumes that the voxel is a heightmap tile. If it is not, the returned
+ * value is undefined. Otherwise, the value is within range [-1,1].
+ *
+ * \param self Voxel.
+ * \return Height.
+ */
+float
+livox_voxel_get_height (const LIVoxVoxel* self)
+{
+	/* FIXME: Should use `rotation' too. */
+	return 1.0f - 2.0f * (self->damage / 255.0f);
+}
+
+/**
  * \brief Gets the terrain type of the voxel.
  *
  * \param self Voxel.

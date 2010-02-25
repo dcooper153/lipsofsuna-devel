@@ -26,20 +26,34 @@
 #define __VOXEL_MATERIAL_H__
 
 #include <lipsofsuna/archive.h>
+#include <lipsofsuna/model.h>
 #include "voxel-types.h"
+
+#define LIVOX_MATERIAL_FORMAT 0
 
 enum
 {
 	LIVOX_MATERIAL_FLAG_OCCLUDER = 0x01
 };
 
+enum
+{
+	LIVOX_MATERIAL_TYPE_CORNER,
+	LIVOX_MATERIAL_TYPE_HEIGHT,
+	LIVOX_MATERIAL_TYPE_TILE,
+	LIVOX_MATERIAL_TYPE_MAX
+};
+
 struct _LIVoxMaterial
 {
 	int id;
 	int flags;
+	int type;
 	char* name;
 	char* model;
 	float friction;
+	LIMdlMaterial mat_side;
+	LIMdlMaterial mat_top;
 };
 
 LIVoxMaterial*
@@ -49,22 +63,18 @@ LIVoxMaterial*
 livox_material_new_copy (const LIVoxMaterial* src);
 
 LIVoxMaterial*
-livox_material_new_from_sql (LIArcSql*     sql,
-                             sqlite3_stmt* stmt);
-
-LIVoxMaterial*
 livox_material_new_from_stream (LIArcReader* reader);
 
 void
 livox_material_free (LIVoxMaterial* self);
 
 int
-livox_material_write_to_sql (LIVoxMaterial* self,
-                             LIArcSql*      sql);
+livox_material_read (LIVoxMaterial* self,
+                     LIArcReader*   reader);
 
 int
-livox_material_write_to_stream (LIVoxMaterial* self,
-                                LIArcWriter*   writer);
+livox_material_write (LIVoxMaterial* self,
+                      LIArcWriter*   writer);
 
 int
 livox_material_set_name (LIVoxMaterial* self,

@@ -33,18 +33,20 @@
 LIVoxMaterial*
 livox_material_new ()
 {
+	int flags;
 	LIVoxMaterial* self;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIVoxMaterial));
 	if (self == NULL)
 		return NULL;
+	self->type = LIVOX_MATERIAL_TYPE_TILE;
 
 	/* Allocate name. */
 	self->name = listr_dup ("");
 	if (self->name == NULL)
 	{
-		lisys_free (self);
+		livox_material_free (self);
 		return NULL;
 	}
 
@@ -52,10 +54,24 @@ livox_material_new ()
 	self->model = listr_dup ("");
 	if (self->model == NULL)
 	{
-		lisys_free (self->name);
-		lisys_free (self);
+		livox_material_free (self);
 		return NULL;
 	}
+
+	/* Allocate materials. */
+	flags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
+	if (!limdl_material_init (&self->mat_side) ||
+	    !limdl_material_init (&self->mat_top) ||
+	    !limdl_material_append_texture (&self->mat_side, LIMDL_TEXTURE_TYPE_IMAGE, flags, "stone-000") ||
+	    !limdl_material_append_texture (&self->mat_top, LIMDL_TEXTURE_TYPE_IMAGE, flags, "grass-000"))
+	{
+		livox_material_free (self);
+		return NULL;
+	}
+
+	/* FIXME: Abusing for texture scaling... */
+	self->mat_side.emission = 0.9f;
+	self->mat_top.emission = 0.9f;
 
 	return self;
 }
@@ -79,13 +95,14 @@ livox_material_new_copy (const LIVoxMaterial* src)
 	/* Copy values. */
 	self->id = src->id;
 	self->flags = src->flags;
+	self->type = src->type;
 	self->friction = src->friction;
 
 	/* Copy name. */
 	self->name = listr_dup (src->name);
 	if (self->name == NULL)
 	{
-		lisys_free (self);
+		livox_material_free (self);
 		return NULL;
 	}
 
@@ -93,64 +110,15 @@ livox_material_new_copy (const LIVoxMaterial* src)
 	self->model = listr_dup (src->model);
 	if (self->model == NULL)
 	{
-		lisys_free (self->name);
-		lisys_free (self);
+		livox_material_free (self);
 		return NULL;
 	}
 
-	return self;
-}
-
-/**
- * \brief Deserializes a material from an SQL statement.
- *
- * \param sql SQL database.
- * \param stmt SQL statement;
- * \return New material or NULL.
- */
-LIVoxMaterial*
-livox_material_new_from_sql (LIArcSql*     sql,
-                             sqlite3_stmt* stmt)
-{
-	int col;
-	int size;
-	LIVoxMaterial* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIVoxMaterial));
-	if (self == NULL)
-		return NULL;
-
-	/* Read numeric values. */
-	col = 0;
-	self->id = sqlite3_column_int (stmt, col++);
-	self->flags = sqlite3_column_int (stmt, col++);
-	self->friction = sqlite3_column_double (stmt, col++);
-
-	/* Read name column. */
-	self->name = (char*) sqlite3_column_text (stmt, col);
-	size = sqlite3_column_bytes (stmt, col++);
-	if (size > 0 && self->name != NULL)
-		self->name = listr_dup (self->name);
-	else
-		self->name = listr_dup ("");
-	if (self->name == NULL)
+	/* Copy materials. */
+	if (!limdl_material_init_copy (&self->mat_side, &src->mat_side) ||
+	    !limdl_material_init_copy (&self->mat_top, &src->mat_top))
 	{
-		lisys_free (self);
-		return NULL;
-	}
-
-	/* Read model column. */
-	self->model = (char*) sqlite3_column_text (stmt, col);
-	size = sqlite3_column_bytes (stmt, col++);
-	if (size > 0 && self->model != NULL)
-		self->model = listr_dup (self->model);
-	else
-		self->model = listr_dup ("");
-	if (self->model == NULL)
-	{
-		lisys_free (self->name);
-		lisys_free (self);
+		livox_material_free (self);
 		return NULL;
 	}
 
@@ -166,8 +134,6 @@ livox_material_new_from_sql (LIArcSql*     sql,
 LIVoxMaterial*
 livox_material_new_from_stream (LIArcReader* reader)
 {
-	uint32_t id;
-	uint32_t flags;
 	LIVoxMaterial* self;
 
 	/* Allocate self. */
@@ -175,20 +141,12 @@ livox_material_new_from_stream (LIArcReader* reader)
 	if (self == NULL)
 		return NULL;
 
-	/* Read values. */
-	if (!liarc_reader_get_uint32 (reader, &id) ||
-	    !liarc_reader_get_uint32 (reader, &flags) ||
-	    !liarc_reader_get_float (reader, &self->friction) ||
-	    !liarc_reader_get_text (reader, "", &self->name) ||
-	    !liarc_reader_get_text (reader, "", &self->model))
+	/* Read from stream. */
+	if (!livox_material_read (self, reader))
 	{
-		lisys_free (self->model);
-		lisys_free (self->name);
-		lisys_free (self);
+		livox_material_free (self);
 		return NULL;
 	}
-	self->id = id;
-	self->flags = flags;
 
 	return self;
 }
@@ -201,29 +159,72 @@ livox_material_new_from_stream (LIArcReader* reader)
 void
 livox_material_free (LIVoxMaterial* self)
 {
+	limdl_material_free (&self->mat_side);
+	limdl_material_free (&self->mat_top);
 	lisys_free (self->model);
 	lisys_free (self->name);
 	lisys_free (self);
 }
 
 /**
- * \brief Serializes the material to a database.
+ * \brief Deserializes the material from a stream.
+ *
+ * The contents of the material are replaced with data read from the stream.
+ * If the read fails, the function returns without modifying the material.
  *
  * \param self Material.
- * \param sql Database.
+ * \param reader Stream reader.
  * \return Nonzero on success.
  */
 int
-livox_material_write_to_sql (LIVoxMaterial* self,
-                             LIArcSql*      sql)
+livox_material_read (LIVoxMaterial* self,
+                     LIArcReader*   reader)
 {
-	if (!liarc_sql_insert (sql, "voxel_materials",
-		"id", LIARC_SQL_INT, self->id,
-		"flags", LIARC_SQL_INT, self->flags,
-		"fric", LIARC_SQL_FLOAT, self->friction,
-		"name", LIARC_SQL_TEXT, self->name,
-		"model", LIARC_SQL_TEXT, self->model, NULL))
+	float friction;
+	char* model;
+	char* name;
+	uint32_t id;
+	uint32_t flags;
+	uint32_t type;
+	LIMdlMaterial tmpmat[2];
+
+	/* Initialize temporaries. */
+	model = NULL;
+	name = NULL;
+	memset (tmpmat + 0, 0, sizeof (LIMdlMaterial));
+	memset (tmpmat + 1, 0, sizeof (LIMdlMaterial));
+
+	/* Read into temporaries. */
+	if (!liarc_reader_get_uint32 (reader, &id) ||
+	    !liarc_reader_get_uint32 (reader, &flags) ||
+	    !liarc_reader_get_uint32 (reader, &type) ||
+	    !liarc_reader_get_float (reader, &friction) ||
+	    !liarc_reader_get_text (reader, "", &model) ||
+	    !liarc_reader_get_text (reader, "", &name) ||
+	    !limdl_material_read (tmpmat + 0, reader) ||
+	    !limdl_material_read (tmpmat + 1, reader))
+	{
+		limdl_material_free (tmpmat + 0);
+		limdl_material_free (tmpmat + 1);
+		lisys_free (model);
+		lisys_free (name);
+		livox_material_free (self);
 		return 0;
+	}
+
+	/* Succeeded so free old data and copy over. */
+	lisys_free (self->model);
+	lisys_free (self->name);
+	limdl_material_free (&self->mat_side);
+	limdl_material_free (&self->mat_top);
+	self->id = id;
+	self->flags = flags;
+	self->type = type;
+	self->friction = friction;
+	self->model = model;
+	self->name = name;
+	self->mat_side = tmpmat[0];
+	self->mat_top = tmpmat[1];
 
 	return 1;
 }
@@ -236,16 +237,19 @@ livox_material_write_to_sql (LIVoxMaterial* self,
  * \return Nonzero on success.
  */
 int
-livox_material_write_to_stream (LIVoxMaterial* self,
-                                LIArcWriter*   writer)
+livox_material_write (LIVoxMaterial* self,
+                      LIArcWriter*   writer)
 {
 	return liarc_writer_append_uint32 (writer, self->id) &&
 	       liarc_writer_append_uint32 (writer, self->flags) &&
+	       liarc_writer_append_uint32 (writer, self->type) &&
 	       liarc_writer_append_float (writer, self->friction) &&
+	       liarc_writer_append_string (writer, self->model) &&
+	       liarc_writer_append_nul (writer) &&
 	       liarc_writer_append_string (writer, self->name) &&
 	       liarc_writer_append_nul (writer) &&
-	       liarc_writer_append_string (writer, self->model) &&
-	       liarc_writer_append_nul (writer);
+	       limdl_material_write (&self->mat_side, writer) &&
+	       limdl_material_write (&self->mat_top, writer);
 }
 
 int

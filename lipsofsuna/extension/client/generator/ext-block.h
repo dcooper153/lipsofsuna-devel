@@ -20,52 +20,40 @@
  * @{
  * \addtogroup liextcli Client
  * @{
- * \addtogroup liextcliVoxel Voxel
+ * \addtogroup liextcliGenerator Generator
  * @{
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_BLOCK_H__
+#define __EXT_BLOCK_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/voxel.h>
+#include "ext-preview.h"
 
-typedef struct _LIExtModule LIExtModule;
-
-#include "ext-block.h"
-
-#define LIEXT_SCRIPT_VOXEL "Voxel"
-
-struct _LIExtModule
+typedef struct _LIExtBlock LIExtBlock;
+struct _LIExtBlock
 {
-	LIAlgMemdic* blocks;
-	LICalHandle calls[4];
 	LICliClient* client;
-	LIVoxManager* voxels;
+	LIExtPreview* preview;
+	LIMdlModel* mmodel;
+	LIRenModel* rmodel;
+	LIRenGroup* group;
 };
 
-LIExtModule*
-liext_module_new (LIMaiProgram* program);
+LIExtBlock*
+liext_block_new (LIExtPreview* preview);
 
 void
-liext_module_free (LIExtModule* self);
+liext_block_free (LIExtBlock* self);
 
 int
-liext_module_build_all (LIExtModule* self);
-
-int
-liext_module_build_block (LIExtModule*    self,
-                          LIVoxBlockAddr* addr);
+liext_block_build (LIExtBlock*     self,
+                   LIVoxBlockAddr* addr);
 
 void
-liext_module_clear_all (LIExtModule* self);
-
-/*****************************************************************************/
-
-void
-liext_script_voxel (LIScrClass* self,
-                  void*       data);
+liext_block_clear (LIExtBlock* self);
 
 #endif
 

@@ -74,7 +74,6 @@ liphy_shape_new (LIPhyPhysics*     physics,
 	self = (LIPhyShape*) lisys_calloc (1, sizeof (LIPhyShape));
 	if (self == NULL)
 		return NULL;
-	self->model = model;
 	try
 	{
 		self->physics = physics;
@@ -90,6 +89,7 @@ liphy_shape_new (LIPhyPhysics*     physics,
 		liphy_shape_free (self);
 		return NULL;
 	}
+	self->shape->setUserPointer (self);
 
 	return self;
 }
@@ -125,6 +125,7 @@ liphy_shape_new_aabb (LIPhyPhysics*    physics,
 		liphy_shape_free (self);
 		return NULL;
 	}
+	self->shape->setUserPointer (self);
 
 	return self;
 }
@@ -162,21 +163,38 @@ liphy_shape_new_convex (LIPhyPhysics*      physics,
 		liphy_shape_free (self);
 		return NULL;
 	}
+	self->shape->setUserPointer (self);
 
 	return self;
 }
 
 /**
- * \brief Frees the collision shape.
+ * \brief Frees or unreferences the collision shape.
  *
  * \param self Collision shape.
  */
 void
 liphy_shape_free (LIPhyShape* self)
 {
-	if (self->shape != NULL)
-		delete self->shape;
-	lisys_free (self);
+	if (!self->refs)
+	{
+		if (self->shape != NULL)
+			delete self->shape;
+		lisys_free (self);
+	}
+	else
+		self->refs--;
+}
+
+/**
+ * \brief Increments the reference count of the shape.
+ *
+ * \param self Collision shape.
+ */
+void
+liphy_shape_ref (LIPhyShape* self)
+{
+	self->refs++;
 }
 
 /**

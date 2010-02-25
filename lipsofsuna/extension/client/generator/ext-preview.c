@@ -25,6 +25,7 @@
  */
 
 #include "ext-preview.h"
+#include "ext-block.h"
 
 #define LIEXT_PREVIEW_CENTER 8160
 #define LIEXT_PREVIEW_PAN 0.3f
@@ -55,11 +56,6 @@ private_free (LIExtPreview* self);
 static int
 private_event (LIExtPreview* self,
                LIWdgEvent*   event);
-
-static int
-private_block_build (LIExtPreview* self,
-                     LIVoxBlock*   block,
-                     LIMatVector*  offset);
 
 static int
 private_block_free (LIExtPreview*     self,
@@ -131,6 +127,14 @@ liext_preview_new (LIWdgManager* manager,
 		return NULL;
 	}
 
+	/* Allocate terrain. */
+	data->blocks = lialg_memdic_new ();
+	if (data->blocks == NULL)
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
+
 	/* Allocate generator. */
 	data->callbacks = lical_callbacks_new ();
 	data->sectors = lialg_sectors_new (client->sectors->count, client->sectors->width);
@@ -193,6 +197,37 @@ void
 liext_preview_build (LIExtPreview* self)
 {
 	ligen_generator_rebuild_scene (self->generator);
+}
+
+int
+liext_preview_build_block (LIExtPreview*   self,
+                           LIVoxBlockAddr* addr)
+{
+	LIExtBlock* block;
+
+	/* Find the block. */
+	block = lialg_memdic_find (self->blocks, addr, sizeof (LIVoxBlockAddr));
+	if (block == NULL)
+	{
+		block = liext_block_new (self);
+		if (block == NULL)
+			return 0;
+		if (!lialg_memdic_insert (self->blocks, addr, sizeof (LIVoxBlockAddr), block))
+		{
+			liext_block_free (block);
+			return 0;
+		}
+	}
+
+	/* Build the block. */
+	if (!liext_block_build (block, addr))
+	{
+		lialg_memdic_remove (self->blocks, addr, sizeof (LIVoxBlockAddr));
+		liext_block_free (block);
+		return 0;
+	}
+
+	return 1;
 }
 
 int
@@ -317,12 +352,16 @@ int
 liext_preview_clear (LIExtPreview* self)
 {
 	LIAlgPtrdicIter iter;
+	LIAlgMemdicIter iter1;
 
 	liren_group_clear (self->group);
 	ligen_generator_clear_scene (self->generator);
 	LIALG_PTRDIC_FOREACH (iter, self->objects)
 		liren_object_free (iter.value);
 	lialg_ptrdic_clear (self->objects);
+	LIALG_MEMDIC_FOREACH (iter1, self->blocks)
+		liext_block_free (iter1.value);
+	lialg_memdic_clear (self->blocks);
 
 	return 1;
 }
@@ -418,10 +457,24 @@ liext_preview_paint_terrain (LIExtPreview* self,
                              int           material,
                              int           axis)
 {
+	LIMatVector center;
 	LIVoxVoxel voxel;
+	LIVoxVoxel* voxel1;
 
 	switch (mode)
 	{
+		case LIEXT_PREVIEW_DAMAGE_VOXEL:
+			voxel1 = livox_manager_find_voxel (self->generator->voxels, LIVOX_FIND_FULL, point, &center);
+			if (voxel1 != NULL)
+			{
+				voxel = *voxel1;
+				if (voxel.damage > 64)
+					voxel.damage -= 64;
+				else
+					voxel.damage = 255;
+				livox_manager_replace_voxel (self->generator->voxels, &center, &voxel);
+			}
+			break;
 		case LIEXT_PREVIEW_ERASE_VOXEL:
 			livox_manager_erase_voxel (self->generator->voxels, point);
 			break;
@@ -441,7 +494,7 @@ liext_preview_paint_terrain (LIExtPreview* self,
 }
 
 /**
- * \brief Replaces the materials of the preview with those of the passed voxel manager.
+ * \brief Replaces the materials of the preview with those in the passed stream reader.
  *
  * \param self Preview.
  * \param reader Stream reader.
@@ -566,6 +619,7 @@ static void
 private_free (LIExtPreview* self)
 {
 	LIAlgPtrdicIter iter;
+	LIAlgMemdicIter iter1;
 
 	if (self->light0 != NULL)
 	{
@@ -582,6 +636,12 @@ private_free (LIExtPreview* self)
 		LIALG_PTRDIC_FOREACH (iter, self->objects)
 			liren_object_free (iter.value);
 		lialg_ptrdic_free (self->objects);
+	}
+	if (self->blocks != NULL)
+	{
+		LIALG_MEMDIC_FOREACH (iter1, self->blocks)
+			liext_block_free (iter1.value);
+		lialg_memdic_free (self->blocks);
 	}
 	if (self->group != NULL)
 		liren_group_free (self->group);
@@ -727,61 +787,25 @@ private_event (LIExtPreview* self,
 }
 
 static int
-private_block_build (LIExtPreview* self,
-                     LIVoxBlock*   block,
-                     LIMatVector*  offset)
-{
-	int x;
-	int y;
-	int z;
-	LIEngModel* emdl;
-	LIMatTransform transform;
-	LIMatVector vector;
-	LIRenModel* model;
-	LIVoxMaterial* material;
-	LIVoxVoxel* voxel;
-
-	/* Create new objects. */
-	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-	{
-		/* Type check. */
-		voxel = livox_block_get_voxel (block, x, y, z);
-		if (!voxel->type)
-			continue;
-
-		/* Get render model. */
-		material = livox_manager_find_material (self->generator->voxels, voxel->type);
-		if (material == NULL)
-			continue;
-		model = liren_render_find_model (self->client->render, material->model);
-		if (model == NULL)
-		{
-			emdl = lieng_engine_find_model_by_name (self->client->engine, material->model);
-			if (emdl == NULL)
-				continue;
-			liren_render_load_model (self->client->render, material->model, emdl->model);
-			model = liren_render_find_model (self->client->render, material->model);
-			if (model == NULL)
-				continue;
-		}
-
-		/* Add to render list. */
-		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
-		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
-		transform.position = limat_vector_add (vector, *offset);
-		livox_voxel_get_quaternion (voxel, &transform.rotation);
-		liren_group_insert_model (self->group, model, &transform);
-	}
-
-	return 1;
-}
-
-static int
 private_block_free (LIExtPreview*     self,
                     LIVoxUpdateEvent* event)
 {
+	LIExtBlock* block;
+	LIVoxBlockAddr addr;
+
+	addr.sector[0] = event->sector[0];
+	addr.sector[1] = event->sector[1];
+	addr.sector[2] = event->sector[2];
+	addr.block[0] = event->block[0];
+	addr.block[1] = event->block[1];
+	addr.block[2] = event->block[2];
+	block = lialg_memdic_find (self->blocks, &addr, sizeof (addr));
+	if (block != NULL)
+	{
+		lialg_memdic_remove (self->blocks, &addr, sizeof (addr));
+		liext_block_free (block);
+	}
+
 	return 1;
 }
 
@@ -789,27 +813,15 @@ static int
 private_block_load (LIExtPreview*     self,
                     LIVoxUpdateEvent* event)
 {
-	LIMatVector offset;
-	LIMatVector vector;
-	LIVoxBlock* vblock;
-	LIVoxSector* vsector;
+	LIVoxBlockAddr addr;
 
-	/* Find sector. */
-	vsector = lialg_sectors_data_offset (self->generator->voxels->sectors, "voxel", event->sector[0], event->sector[1], event->sector[2], 0);
-	if (vsector == NULL)
-		return 1;
-
-	/* Find block. */
-	vblock = livox_sector_get_block (vsector, LIVOX_BLOCK_INDEX (
-		event->block[0], event->block[1], event->block[2]));
-
-	/* Build block. */
-	vector = limat_vector_init (event->sector[0], event->sector[1], event->sector[2]);
-	vector = limat_vector_multiply (vector, LIVOX_SECTOR_WIDTH);
-	offset = limat_vector_init (event->block[0], event->block[1], event->block[2]);
-	offset = limat_vector_multiply (offset, LIVOX_BLOCK_WIDTH);
-	offset = limat_vector_add (offset, vector);
-	private_block_build (self, vblock, &offset);
+	addr.sector[0] = event->sector[0];
+	addr.sector[1] = event->sector[1];
+	addr.sector[2] = event->sector[2];
+	addr.block[0] = event->block[0];
+	addr.block[1] = event->block[1];
+	addr.block[2] = event->block[2];
+	liext_preview_build_block (self, &addr);
 
 	return 1;
 }

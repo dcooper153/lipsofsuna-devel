@@ -85,6 +85,7 @@ liext_editor_new (LIWdgManager* manager,
 		return NULL;
 	}
 	liwdg_group_set_child (LIWDG_GROUP (self), 1, 0, data->materials);
+	data->generator = LIEXT_MATERIALS (data->materials)->generator;
 
 	return self;
 }

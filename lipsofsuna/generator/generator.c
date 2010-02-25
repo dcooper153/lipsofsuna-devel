@@ -252,24 +252,39 @@ int
 ligen_generator_main (LIGenGenerator* self)
 {
 	int i;
-	LIGenBrush* brush;
+	int found = 0;
+	LIAlgU32dicIter iter;
+	LIGenBrush* brush = NULL;
 	LIGenStroke stroke;
 
-	/* FIXME: This should be configurable. */
-	brush = lialg_u32dic_find (self->brushes, 3);
-	if (brush != NULL)
+	/* Find root brush. */
+	/* TODO: Dictionary would be faster. */
+	LIALG_U32DIC_FOREACH (iter, self->brushes)
 	{
-		i = LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE * 255 / 2;
-		stroke.pos[0] = i - brush->size[0] / 2;
-		stroke.pos[1] = i - brush->size[1] / 2;
-		stroke.pos[2] = i - brush->size[2] / 2;
-		stroke.size[0] = brush->size[0];
-		stroke.size[1] = brush->size[1];
-		stroke.size[2] = brush->size[2];
-		stroke.brush = brush->id;
-		if (!lialg_array_append (&self->strokes, &stroke))
-			return 0;
+		brush = iter.value;
+		if (!strcmp (brush->name, "root"))
+		{
+			found = 1;
+			break;
+		}
 	}
+	if (!found)
+	{
+		lisys_error_set (EINVAL, "cannot find `root' brush");
+		return 0;
+	}
+
+	/* Create root stroke. */
+	i = LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE * 255 / 2;
+	stroke.pos[0] = i - brush->size[0] / 2;
+	stroke.pos[1] = i - brush->size[1] / 2;
+	stroke.pos[2] = i - brush->size[2] / 2;
+	stroke.size[0] = brush->size[0];
+	stroke.size[1] = brush->size[1];
+	stroke.size[2] = brush->size[2];
+	stroke.brush = brush->id;
+	if (!lialg_array_append (&self->strokes, &stroke))
+		return 0;
 
 	/* Generate areas. */
 	/* FIXME */

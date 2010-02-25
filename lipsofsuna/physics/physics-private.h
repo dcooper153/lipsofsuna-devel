@@ -59,8 +59,8 @@ struct _LIPhyPhysics
 
 struct _LIPhyShape
 {
+	int refs;
 	LIPhyPhysics* physics;
-	const LIMdlModel* model;
 	btConvexShape* shape;
 };
 

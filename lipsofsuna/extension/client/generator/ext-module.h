@@ -27,12 +27,13 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include "ext-module.h"
+#include <lipsofsuna/client.h>
 
 #define LIEXT_SCRIPT_GENERATOR "Generator"
 
 typedef struct _LIExtBrushes LIExtBrushes;
 typedef struct _LIExtEditor LIExtEditor;
+typedef struct _LIExtMaterial LIExtMaterial;
 typedef struct _LIExtMaterials LIExtMaterials;
 typedef struct _LIExtModule LIExtModule;
 

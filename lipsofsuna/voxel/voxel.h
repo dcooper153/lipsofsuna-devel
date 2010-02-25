@@ -37,6 +37,9 @@ livox_voxel_rotate (LIVoxVoxel* self,
                     int         axis,
                     int         step);
 
+float
+livox_voxel_get_height (const LIVoxVoxel* self);
+
 int
 livox_voxel_get_type (const LIVoxVoxel* self);
 

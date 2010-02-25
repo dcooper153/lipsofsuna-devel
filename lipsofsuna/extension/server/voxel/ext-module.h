@@ -62,20 +62,8 @@ void
 liext_module_free (LIExtModule* self);
 
 int
-liext_module_erase_point (LIExtModule*       self,
-                          const LIMatVector* point);
-
-void
-liext_module_fill_box (LIExtModule*       self,
-                       const LIMatVector* min,
-                       const LIMatVector* max,
-                       LIVoxVoxel         terrain);
-
-void
-liext_module_fill_sphere (LIExtModule*       self,
-                          const LIMatVector* center,
-                          float              radius,
-                          LIVoxVoxel         terrain);
+liext_module_build_block (LIExtModule*    self,
+                          LIVoxBlockAddr* addr);
 
 int
 liext_module_write (LIExtModule* self,
