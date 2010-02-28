@@ -355,7 +355,7 @@ private_event (LIWdgTree*  self,
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &rect);
+			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 			y = rect.y;
 			row = private_treerow_find_clicked (&self->root, &rect, &y, event->button.x, event->button.y);
 			if (row == NULL)
