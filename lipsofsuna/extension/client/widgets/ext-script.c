@@ -802,6 +802,38 @@ Tree_remove (LIScrArgs* args)
 
 /* @luadoc
  * ---
+ * -- Sets a row of the tree.
+ * --
+ * -- Arguments:
+ * -- row: Row index.
+ * -- text: String.
+ * --
+ * -- @param self Tree.
+ * -- @param args Arguments.
+ * -- @return String or nil.
+ * function Tree.get_row(self, args)
+ */
+static void Tree_set_row (LIScrArgs* args)
+{
+	int index = 1;
+	int count;
+	const char* text = "";
+	LIWdgTreerow* root;
+	LIWdgTreerow* row;
+
+	liscr_args_gets_int (args, "row", &index);
+	root = liwdg_tree_get_root (args->self);
+	count = liwdg_treerow_get_row_count (root);
+	if (index >= 1 && index <= count)
+	{
+		row = liwdg_treerow_get_row (root, index - 1);
+		liscr_args_gets_string (args, "text", &text);
+		liwdg_treerow_set_text (row, text);
+	}
+}
+
+/* @luadoc
+ * ---
  * -- Index of the selected item or nil for no selection.
  * -- @name Tree.size
  * -- @class table
@@ -860,6 +892,29 @@ static void Tree_getter_size (LIScrArgs* args)
 
 	row = liwdg_tree_get_root (args->self);
 	liscr_args_seti_int (args, liwdg_treerow_get_row_count (row));
+}
+static void Tree_setter_size (LIScrArgs* args)
+{
+	int oldsize;
+	int newsize;
+	LIWdgTreerow* row;
+
+	row = liwdg_tree_get_root (args->self);
+	if (liscr_args_geti_int (args, 0, &newsize))
+	{
+		oldsize = liwdg_treerow_get_row_count (row);
+		while (oldsize < newsize)
+		{
+			if (!liwdg_treerow_append_row (row, "", NULL))
+				return;
+			oldsize++;
+		}
+		while (oldsize > newsize)
+		{
+			liwdg_treerow_remove_row (row, oldsize - 1);
+			oldsize--;
+		}
+	}
 }
 
 /* @luadoc
@@ -1072,7 +1127,8 @@ liext_script_tree (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "get_row", Tree_get_row);
 	liscr_class_insert_cfunc (self, "new", Tree_new);
 	liscr_class_insert_mfunc (self, "remove", Tree_remove);
-	liscr_class_insert_mvar (self, "size", Tree_getter_size, NULL);
+	liscr_class_insert_mfunc (self, "set_row", Tree_set_row);
+	liscr_class_insert_mvar (self, "size", Tree_getter_size, Tree_setter_size);
 	liscr_class_insert_mvar (self, "selection", Tree_getter_selection, Tree_setter_selection);
 }
 
