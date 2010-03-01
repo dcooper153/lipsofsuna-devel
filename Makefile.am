@@ -151,7 +151,6 @@ clidir = $(includedir)/lipsofsuna/client
 cli_HEADERS = \
 	lipsofsuna/client/client.h \
 	lipsofsuna/client/client-callbacks.h \
-	lipsofsuna/client/client-network.h \
 	lipsofsuna/client/client-object.h \
 	lipsofsuna/client/client-script.h \
 	lipsofsuna/client/client-types.h \
@@ -160,8 +159,6 @@ cli_HEADERS = \
 clisrc = \
 	lipsofsuna/client/client.c \
 	lipsofsuna/client/client-callbacks.c \
-	lipsofsuna/client/client-command.c \
-	lipsofsuna/client/client-network.c \
 	lipsofsuna/client/client-object.c \
 	lipsofsuna/client/client-render.c \
 	lipsofsuna/client/client-script-action.c \
@@ -171,7 +168,6 @@ clisrc = \
 	lipsofsuna/client/client-script-extension.c \
 	lipsofsuna/client/client-script-light.c \
 	lipsofsuna/client/client-script-object.c \
-	lipsofsuna/client/client-script-player.c \
 	lipsofsuna/client/client-script-scene.c \
 	lipsofsuna/client/client-script-widget.c \
 	lipsofsuna/client/client-script-window.c \
@@ -412,8 +408,6 @@ srvdir = $(includedir)/lipsofsuna/server
 srv_HEADERS = \
 	lipsofsuna/server/server.h \
 	lipsofsuna/server/server-callbacks.h \
-	lipsofsuna/server/server-client.h \
-	lipsofsuna/server/server-network.h \
 	lipsofsuna/server/server-object.h \
 	lipsofsuna/server/server-observer.h \
 	lipsofsuna/server/server-script.h \
@@ -421,8 +415,6 @@ srv_HEADERS = \
 srvsrc = \
 	lipsofsuna/server/server.c \
 	lipsofsuna/server/server-callbacks.c \
-	lipsofsuna/server/server-client.c \
-	lipsofsuna/server/server-network.c \
 	lipsofsuna/server/server-object.c \
 	lipsofsuna/server/server-script-effect.c \
 	lipsofsuna/server/server-script-extension.c \

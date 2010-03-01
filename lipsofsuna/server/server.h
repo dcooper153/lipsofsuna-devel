@@ -27,7 +27,6 @@
 
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/main.h>
-#include "server-network.h"
 #include "server-object.h"
 #include "server-types.h"
 
@@ -36,7 +35,6 @@ struct _LISerServer
 	/* Server. */
 	LIArcSql* sql;
 	LIMaiProgram* program;
-	LISerNetwork* network;
 
 	/* Program. */
 	LIAlgSectors* sectors;
@@ -53,13 +51,14 @@ void
 liser_server_free (LISerServer* self);
 
 int
+liser_server_check_unique_object (const LISerServer* self,
+                                  uint32_t           id);
+
+int
 liser_server_main (LISerServer* self);
 
 int
 liser_server_save (LISerServer* self);
-
-uint32_t
-liser_server_get_unique_object (const LISerServer* self);
 
 #endif
 

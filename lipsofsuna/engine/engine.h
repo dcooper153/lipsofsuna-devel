@@ -56,6 +56,8 @@ struct _LIEngEngine
 		int flags;
 		int radius;
 		char* dir;
+		void* unique_data;
+		int (*unique_call)(void*, uint32_t);
 	} config;
 	struct
 	{
@@ -71,6 +73,10 @@ lieng_engine_new (LICalCallbacks* calls,
 
 void
 lieng_engine_free (LIEngEngine* self);
+
+int
+lieng_engine_check_unique (LIEngEngine* self,
+                           uint32_t     id);
 
 void
 lieng_engine_clear_selection (LIEngEngine* self);
@@ -126,6 +132,11 @@ void
 lieng_engine_set_local_range (LIEngEngine* self,
                               uint32_t     start,
                               uint32_t     end);
+
+void
+lieng_engine_set_unique_object_call (LIEngEngine* self,
+                                     void*        call,
+                                     void*        data);
 
 void*
 lieng_engine_get_userdata (LIEngEngine* self);

@@ -78,32 +78,6 @@ static void Client_cycle_window_focus (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Finds an object by ID.
- * --
- * -- Arguments:
- * -- id: Object ID.
- * --
- * -- @param self Client class.
- * -- @param args Arguments.
- * -- @return Object or nil.
- * function Client.find_object(self, args)
- */
-static void Client_find_object (LIScrArgs* args)
-{
-	int id;
-	LIEngObject* object;
-	LICliClient* client;
-
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	if (!liscr_args_gets_int (args, "id", &id))
-		return;
-	object = lieng_engine_find_object (client->engine, id);
-	if (object != NULL)
-		liscr_args_seti_data (args, object->script);
-}
-
-/* @luadoc
- * ---
  * -- @brief Launches a server.
  * --
  * -- Call Client.join to join the server.
@@ -124,81 +98,6 @@ static void Client_host (LIScrArgs* args)
 		return;
 	}
 	liscr_args_seti_bool (args, 1);
-}
-
-/* @luadoc
- * ---
- * -- Joins a server.
- * --
- * -- Arguments:
- * -- login: Login name.
- * -- password: Password.
- * -- port: Server port.
- * -- server: Server address.
- * -- udp: True to use UDP.
- * --
- * -- @param self Client class.
- * -- @param args Arguments.
- * -- @return True on success.
- * function Client.join(self, args)
- */
-static void Client_join (LIScrArgs* args)
-{
-	int port = 10101;
-	int udp = 0;
-	const char* server = "localhost";
-	const char* name = NULL;
-	const char* pass = NULL;
-	LICliClient* client;
-
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	liscr_args_gets_string (args, "login", &name);
-	liscr_args_gets_string (args, "password", &pass);
-	liscr_args_gets_string (args, "server", &server);
-	liscr_args_gets_int (args, "port", &port);
-	liscr_args_gets_bool (args, "udp", &udp);
-	port = LIMAT_CLAMP (port, 1025, 32767);
-
-	if (!licli_client_connect (client, server, port, udp, name, pass))
-	{
-		lisys_error_report ();
-		return;
-	}
-	liscr_args_seti_bool (args, 1);
-}
-
-/* @luadoc
- * ---
- * -- Sends a network packet to the server.
- * --
- * -- Arguments:
- * -- packet: Packet.
- * -- reliable: True for reliable.
- * --
- * -- @param self Client class.
- * -- @param args Arguments.
- * function Client.send(self, args)
- */
-static void Client_send (LIScrArgs* args)
-{
-	int reliable = 1;
-	LICliClient* client;
-	LIScrData* data;
-	LIScrPacket* packet;
-
-	if (liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
-	{
-		client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-		packet = data->data;
-		if (packet->writer != NULL)
-		{
-			liscr_args_gets_bool (args, "reliable", &reliable);
-			if (reliable)
-				licli_client_send (client, packet->writer, GRAPPLE_RELIABLE);
-			else
-				licli_client_send (client, packet->writer, 0);
-		}
-	}
 }
 
 /* @luadoc
@@ -330,15 +229,12 @@ static void Client_setter_title (LIScrArgs* args)
 
 void
 licli_script_client (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
 	liscr_class_insert_cfunc (self, "cycle_focus", Client_cycle_focus);
 	liscr_class_insert_cfunc (self, "cycle_window_focus", Client_cycle_window_focus);
-	liscr_class_insert_cfunc (self, "find_object", Client_find_object);
 	liscr_class_insert_cfunc (self, "host", Client_host);
-	liscr_class_insert_cfunc (self, "join", Client_join);
-	liscr_class_insert_cfunc (self, "send", Client_send);
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
 	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
 	liscr_class_insert_cvar (self, "moving", Client_getter_moving, Client_setter_moving);

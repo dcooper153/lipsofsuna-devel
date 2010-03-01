@@ -38,79 +38,6 @@
 
 /* @luadoc
  * ---
- * -- Sets or clears an animation.
- * --
- * -- Arguments:
- * -- channel: Channel number.
- * -- name: Animation name.
- * -- priority: Priority.
- * -- permanent: True if should keep repeating.
- * --
- * -- @param self Object.
- * -- @param args Arguments.
- * function Object.animate(self, args)
- */
-static void Object_animate (LIScrArgs* args)
-{
-	int repeat = 0;
-	int channel = -1;
-	float weight = 1.0f;
-	const char* animation = NULL;
-
-	liscr_args_gets_string (args, "animation", &animation);
-	liscr_args_gets_int (args, "channel", &channel);
-	liscr_args_gets_float (args, "weight", &weight);
-	liscr_args_gets_bool (args, "permanent", &repeat);
-	if (channel < 0 || channel > 254)
-		channel = -1;
-	liser_object_animate (args->self, animation, channel, weight, repeat);
-}
-
-/* @luadoc
- * ---
- * -- Disconnects any client controlling the object.
- * --
- * -- @param self Object.
- * function Object.disconnect(self)
- */
-static void Object_disconnect (LIScrArgs* args)
-{
-	LISerObject* object;
-
-	object = LISER_OBJECT (args->self);
-	if (object->client != NULL)
-	{
-		liser_client_free (object->client);
-		object->client = NULL;
-	}
-}
-
-/* @luadoc
- * ---
- * -- Causes the object to emit a sound effect.
- * --
- * -- Arguments:
- * -- effect: Effect name. (required)
- * -- flags: Flags.
- * --
- * -- @param self Object.
- * -- @param args Arguments.
- * function Object.effect(self, args)
- */
-static void Object_effect (LIScrArgs* args)
-{
-	int flags = LINET_EFFECT_DEFAULT;
-	const char* name;
-
-	if (liscr_args_gets_string (args, "effect", &name))
-	{
-		liscr_args_gets_int (args, "flags", &flags);
-		liser_object_effect (args->self, name, flags);
-	}
-}
-
-/* @luadoc
- * ---
  * -- Creates a hinge constraint.
  * --
  * -- Arguments:
@@ -162,29 +89,28 @@ static void Object_new (LIScrArgs* args)
 	server = limai_program_find_component (program, "server");
 	if (liscr_args_gets_int (args, "id", &id))
 	{
-		self = lieng_engine_find_object (server->engine, id);
+		self = lieng_engine_find_object (program->engine, id);
 		if (self == NULL)
 		{
-			self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
+			self = lieng_object_new (program->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
 			if (self == NULL)
 				return;
-			if (liser_object_serialize (self, 0))
+			if (liser_object_serialize (self, server, 0))
 				liscr_args_seti_data (args, self->script);
 		}
 		else
 			liscr_args_seti_data (args, self->script);
 		if (liscr_args_gets_bool (args, "purge", &purge) && purge)
-			liser_object_purge (self);
+			liser_object_purge (self, server);
 		return;
 	}
 
 	/* Allocate self. */
-	liscr_script_set_gc (server->script, 0);
-	id = liser_server_get_unique_object (server);
-	self = lieng_object_new (server->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
+	liscr_script_set_gc (program->script, 0);
+	self = lieng_object_new (program->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0);
 	if (self == NULL)
 	{
-		liscr_script_set_gc (server->script, 1);
+		liscr_script_set_gc (program->script, 1);
 		return;
 	}
 
@@ -193,7 +119,7 @@ static void Object_new (LIScrArgs* args)
 	liscr_args_gets_bool (args, "realized", &realize);
 	liscr_args_seti_data (args, self->script);
 	lieng_object_set_realized (self, realize);
-	liscr_script_set_gc (server->script, 1);
+	liscr_script_set_gc (program->script, 1);
 }
 
 /* @luadoc
@@ -205,64 +131,12 @@ static void Object_new (LIScrArgs* args)
  */
 static void Object_purge (LIScrArgs* args)
 {
-	liser_object_purge (args->self);
-}
+	LIMaiProgram* program;
+	LISerServer* server;
 
-/* @luadoc
- * ---
- * -- Sends a network packet to the client controlling the object.
- * --
- * -- Arguments:
- * -- packet: Packet. (required)
- * -- reliable: Boolean.
- * --
- * -- @param self Object.
- * -- @param args Arguments.
- * function Object.send(self, args)
- */
-static void Object_send (LIScrArgs* args)
-{
-	int reliable = 1;
-	LIScrData* packet;
-	LIScrPacket* data;
-	LISerClient* client;
-
-	if (liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &packet))
-	{
-		liscr_args_gets_bool (args, "reliable", &reliable);
-		client = LISER_OBJECT (args->self)->client;
-		data = packet->data;
-		if (client != NULL && data->writer != NULL)
-		{
-			if (reliable)
-				liser_client_send (client, data->writer, GRAPPLE_RELIABLE);
-			else
-				liser_client_send (client, data->writer, 0);
-		}
-	}
-}
-
-/* @luadoc
- * ---
- * -- Swaps the clients of the objects.
- * --
- * -- Switches the clients of the passed objects so that the client of the first
- * -- object controls the second object and vice versa. This is typically used when
- * -- you need to destroy the object of a player without disconnecting the client.
- * --
- * -- Argumens:
- * -- object: Object.
- * --
- * -- @param self Object.
- * -- @param args Arguments.
- * function Object.swap_clients(self, args)
- */
-static void Object_swap_clients (LIScrArgs* args)
-{
-	LIScrData* object;
-
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
-		liser_object_swap (args->self, object->data);
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	server = limai_program_find_component (program, "server");
+	liser_object_purge (args->self, server);
 }
 
 /* @luadoc
@@ -317,19 +191,13 @@ static void Object_sweep_sphere (LIScrArgs* args)
  */
 static void Object_write (LIScrArgs* args)
 {
-	if (!liser_object_serialize (args->self, 1))
-		lisys_error_report ();
-}
+	LIMaiProgram* program;
+	LISerServer* server;
 
-/* @luadoc
- * ---
- * -- Client attached flag.
- * -- @name Object.client
- * -- @class table
- */
-static void Object_getter_client (LIScrArgs* args)
-{
-	liscr_args_seti_bool (args, LISER_OBJECT (args->self)->client != NULL);
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	server = limai_program_find_component (program, "server");
+	if (!liser_object_serialize (args->self, server, 1))
+		lisys_error_report ();
 }
 
 /* @luadoc
@@ -373,17 +241,11 @@ liser_script_object (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_inherit (self, liscr_script_object, data);
-	liscr_class_insert_mfunc (self, "animate", Object_animate);
-	liscr_class_insert_mfunc (self, "disconnect", Object_disconnect);
-	liscr_class_insert_mfunc (self, "effect", Object_effect);
 	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
 	liscr_class_insert_cfunc (self, "new", Object_new);
 	liscr_class_insert_mfunc (self, "purge", Object_purge);
-	liscr_class_insert_mfunc (self, "send", Object_send);
-	liscr_class_insert_mfunc (self, "swap_clients", Object_swap_clients);
 	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_mfunc (self, "write", Object_write);
-	liscr_class_insert_mvar (self, "client", Object_getter_client, NULL);
 }
 
 /** @} */

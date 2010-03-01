@@ -206,11 +206,6 @@ private_object_new (LIExtModule* self,
 		/* Emit object creation event. */
 		liext_module_event (self, LIEXT_EVENT_OBJECT_NEW,
 			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
-
-		/* Emit assign event if player object. */
-		if (self->client->network != NULL &&
-		    self->client->network->id == object->id)
-			liext_module_event (self, LIEXT_EVENT_ASSIGN, NULL);
 	}
 
 	return 1;

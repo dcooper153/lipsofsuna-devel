@@ -31,52 +31,17 @@
 #include <lipsofsuna/string.h>
 #include "server-types.h"
 
-#define LISER_OBJECT(o) ((LISerObject*) lieng_object_get_userdata ((LIEngObject*)(o)))
-
-struct _LISerObject
-{
-	uint8_t flags;
-	LIAlgU32dic* animations;
-	LISerClient* client;
-	LISerServer* server;
-};
-
-int
-liser_object_animate (LIEngObject* self,
-                      const char*  name,
-                      int          channel,
-                      float        priority,
-                      int          permanent);
-
-void
-liser_object_disconnect (LIEngObject* self);
-
-void
-liser_object_effect (LIEngObject* self,
-                     const char*  value,
-                     int          flags);
-
 int
 liser_object_moved (LIEngObject* self);
 
 int
-liser_object_purge (LIEngObject* self);
-
-int
-liser_object_sees (const LIEngObject* self,
-                   const LIEngObject* target);
+liser_object_purge (LIEngObject* self,
+                    LISerServer* server);
 
 int
 liser_object_serialize (LIEngObject* self,
+                        LISerServer* server,
                         int          save);
-
-void
-liser_object_swap (LIEngObject* self,
-                   LIEngObject* object);
-
-int
-liser_object_set_client (LIEngObject* self,
-                         LISerClient* value);
 
 #endif
 

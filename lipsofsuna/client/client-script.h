@@ -34,7 +34,6 @@
 #define LICLI_SCRIPT_EXTENSION "Extension"
 #define LICLI_SCRIPT_GROUP "Group"
 #define LICLI_SCRIPT_LIGHT "Light"
-#define LICLI_SCRIPT_PLAYER "Player"
 #define LICLI_SCRIPT_SCENE "Scene"
 #define LICLI_SCRIPT_WIDGET "Widget"
 #define LICLI_SCRIPT_WINDOW "Window"
@@ -65,10 +64,6 @@ licli_script_light (LIScrClass* self,
 
 void
 licli_script_object (LIScrClass* self,
-                     void*       data);
-
-void
-licli_script_player (LIScrClass* self,
                      void*       data);
 
 void

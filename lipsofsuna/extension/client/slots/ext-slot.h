@@ -43,7 +43,7 @@ liext_slot_new (LICliClient* client,
                 LIEngObject* object,
                 const char*  node0,
                 const char*  node1,
-                int          model);
+                LIEngModel*  model);
 
 void
 liext_slot_free (LIExtSlot* self);

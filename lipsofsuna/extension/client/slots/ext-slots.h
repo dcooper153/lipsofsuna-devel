@@ -56,7 +56,7 @@ int
 liext_slots_set_slot (LIExtSlots* self,
                       const char* slot,
                       const char* node,
-                      int         model);
+                      LIEngModel* model);
 
 #endif
 

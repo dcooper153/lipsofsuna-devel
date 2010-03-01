@@ -614,6 +614,63 @@ liscr_args_set_output (LIScrArgs* self,
 }
 
 void
+liscr_args_setf_data (LIScrArgs* self,
+                      double     name,
+                      LIScrData* value)
+{
+	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
+	{
+		if (!self->output_table)
+		{
+			lua_newtable (self->lua);
+			self->output_table = lua_gettop (self->lua);
+		}
+		if (value != NULL)
+		{
+			lua_pushnumber (self->lua, name);
+			liscr_pushdata (self->lua, value);
+			lua_settable (self->lua, self->output_table);
+		}
+	}
+}
+
+void
+liscr_args_setf_float (LIScrArgs* self,
+                       double     name,
+                       double     value)
+{
+	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
+	{
+		if (!self->output_table)
+		{
+			lua_newtable (self->lua);
+			self->output_table = lua_gettop (self->lua);
+		}
+		lua_pushnumber (self->lua, name);
+		lua_pushnumber (self->lua, value);
+		lua_settable (self->lua, self->output_table);
+	}
+}
+
+void
+liscr_args_setf_string (LIScrArgs*  self,
+                        double      name,
+                        const char* value)
+{
+	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
+	{
+		if (!self->output_table)
+		{
+			lua_newtable (self->lua);
+			self->output_table = lua_gettop (self->lua);
+		}
+		lua_pushnumber (self->lua, name);
+		lua_pushstring (self->lua, value);
+		lua_settable (self->lua, self->output_table);
+	}
+}
+
+void
 liscr_args_seti_bool (LIScrArgs* self,
                       int        value)
 {

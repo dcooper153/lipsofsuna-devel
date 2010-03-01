@@ -51,22 +51,22 @@ private_render (LIWdgRender* self,
 	liren_context_set_frustum (&context, &frustum);
 
 	/* Draw selection. */
-	if (client->network != NULL)
+	glDisable (GL_LIGHTING);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_TEXTURE_2D);
+	glDepthMask (GL_FALSE);
+	glColor3f (1.0f, 0.0f, 0.0f);
+	LIENG_FOREACH_SELECTION (iter, client->engine)
 	{
-		glDisable (GL_LIGHTING);
-		glDisable (GL_DEPTH_TEST);
-		glDisable (GL_CULL_FACE);
-		glDisable (GL_TEXTURE_2D);
-		glDepthMask (GL_FALSE);
-		glColor3f (1.0f, 0.0f, 0.0f);
-		LIENG_FOREACH_SELECTION (iter, client->engine)
+		if (lieng_object_get_realized (iter.object))
 		{
 			object = liren_scene_find_object (client->scene, iter.object->id);
 			if (object != NULL)
 				liren_draw_bounds (&context, object, NULL);
 		}
-		liren_context_unbind (&context);
 	}
+	liren_context_unbind (&context);
 
 	/* Render custom 3D scene. */
 	lical_callbacks_call (client->callbacks, client->engine, "render-3d", lical_marshal_DATA_PTR, self);
@@ -91,13 +91,10 @@ private_update (LIWdgRender* self,
 	LIMatMatrix projection;
 
 	client = data;
-	if (client->network != NULL)
-	{
-		lialg_camera_get_modelview (client->camera, &modelview);
-		lialg_camera_get_projection (client->camera, &projection);
-		liwdg_render_set_modelview (LIWDG_RENDER (self), &modelview);
-		liwdg_render_set_projection (LIWDG_RENDER (self), &projection);
-	}
+	lialg_camera_get_modelview (client->camera, &modelview);
+	lialg_camera_get_projection (client->camera, &projection);
+	liwdg_render_set_modelview (LIWDG_RENDER (self), &modelview);
+	liwdg_render_set_projection (LIWDG_RENDER (self), &projection);
 }
 
 /*****************************************************************************/

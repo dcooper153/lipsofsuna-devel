@@ -20,8 +20,6 @@
 
 #include "server/server.h"
 #include "server/server-callbacks.h"
-#include "server/server-client.h"
-#include "server/server-network.h"
 #include "server/server-object.h"
 #include "server/server-observer.h"
 #include "server/server-script.h"

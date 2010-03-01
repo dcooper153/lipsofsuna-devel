@@ -28,13 +28,6 @@
 #include "ext-dialog.h"
 #include "ext-module.h"
 
-static int
-private_packet (LIExtModule* self,
-                int          type,
-                LIArcReader* reader);
-
-/*****************************************************************************/
-
 LIMaiExtensionInfo liext_info =
 {
 	LIMAI_EXTENSION_VERSION, "Generator",
@@ -61,14 +54,6 @@ liext_module_new (LIMaiProgram* program)
 		return NULL;
 	}
 
-	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 100, private_packet, self, self->calls + 0))
-	{
-		liwdg_widget_free (self->editor);
-		lisys_free (self);
-		return NULL;
-	}
-
 	/* Register scripts. */
 	liscr_script_create_class (program->script, "Generator", liext_script_generator, self);
 
@@ -78,9 +63,6 @@ liext_module_new (LIMaiProgram* program)
 void
 liext_module_free (LIExtModule* self)
 {
-	/* Remove callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-
 	if (self->script == NULL)
 		liwdg_widget_free (self->editor);
 	lisys_free (self);
@@ -90,20 +72,6 @@ int
 liext_module_save (LIExtModule* self)
 {
 	return liext_editor_save (LIEXT_EDITOR (self->editor));
-}
-
-/*****************************************************************************/
-
-static int
-private_packet (LIExtModule* self,
-                int          type,
-                LIArcReader* reader)
-{
-	reader->pos = 1;
-	if (type == LIEXT_VOXEL_PACKET_ASSIGN)
-		liext_editor_reset (LIEXT_EDITOR (self->editor), reader);
-
-	return 1;
 }
 
 /** @} */

@@ -436,6 +436,21 @@ limdl_pose_get_channel_position (const LIMdlPose* self,
 	return chan->time;
 }
 
+void
+limdl_pose_set_channel_position (LIMdlPose* self,
+                                 int        channel,
+                                 float      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->time = value;
+	if (chan->time > limdl_animation_get_duration (chan->animation))
+		chan->time = limdl_animation_get_duration (chan->animation);
+}
+
 float
 limdl_pose_get_channel_priority (const LIMdlPose* self,
                                  int              channel)
@@ -525,7 +540,6 @@ limdl_pose_set_channel_state (LIMdlPose*            self,
 	switch (value)
 	{
 		case LIMDL_POSE_CHANNEL_STATE_PLAYING:
-			chan->time = 0.0f;
 			chan->state = value;
 			break;
 		case LIMDL_POSE_CHANNEL_STATE_PAUSED:

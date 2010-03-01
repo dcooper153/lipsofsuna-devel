@@ -74,6 +74,14 @@ lieng_object_ref (LIEngObject* self,
                   int          count);
 
 int
+lieng_object_animate (LIEngObject* self,
+                      int          channel,
+                      const char*  animation,
+                      int          permanent,
+                      float        priority,
+                      float        time);
+
+int
 lieng_object_approach (LIEngObject*       self,
                        const LIMatVector* target,
                        float              speed,
@@ -104,19 +112,12 @@ lieng_object_update (LIEngObject* self,
                      float        secs);
 
 void
-lieng_object_get_angular_momentum (const LIEngObject* self,
-                                   LIMatVector*       value);
+lieng_object_get_angular (const LIEngObject* self,
+                          LIMatVector*       value);
 
 void
-lieng_object_set_angular_momentum (LIEngObject*       self,
-                                   const LIMatVector* value);
-
-void
-lieng_object_set_animation (LIEngObject* self,
-                            int          channel,
-                            const char*  animation,
-                            int          repeats,
-                            float        priority);
+lieng_object_set_angular (LIEngObject*       self,
+                          const LIMatVector* value);
 
 void
 lieng_object_get_bounds (const LIEngObject* self,

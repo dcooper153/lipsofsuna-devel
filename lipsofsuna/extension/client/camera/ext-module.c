@@ -31,6 +31,9 @@ static int
 private_tick (LIExtModule* self,
               float        secs);
 
+static void
+private_camera_clip (LIExtModule* self);
+
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_info =
@@ -82,7 +85,46 @@ private_tick (LIExtModule* self,
 	lialg_camera_turn (self->client->camera, secs * self->turn);
 	lialg_camera_zoom (self->client->camera, secs * self->zoom);
 
+	lialg_camera_update (self->client->camera, secs);
+	if (lialg_camera_get_driver (self->client->camera) != LIALG_CAMERA_FIRSTPERSON)
+		private_camera_clip (self);
+
 	return 1;
+}
+
+static void
+private_camera_clip (LIExtModule* self)
+{
+	int hit;
+	float frac;
+	LIMatAabb aabb;
+	LIMatTransform start;
+	LIMatTransform end;
+	LIMatVector diff;
+	LIPhyCollision tmp;
+	LIPhyShape* shape;
+
+	/* Create sweep shape. */
+	/* FIXME: Could use a more accurate shape. */
+	lialg_camera_get_bounds (self->client->camera, &aabb);
+	shape = liphy_shape_new_aabb (self->client->engine->physics, &aabb);
+	if (shape == NULL)
+		return;
+
+	/* Sweep the shape. */
+	lialg_camera_get_center (self->client->camera, &start);
+	lialg_camera_get_transform (self->client->camera, &end);
+	diff = limat_vector_subtract (end.position, start.position);
+	hit = liphy_physics_cast_shape (self->client->engine->physics, &start, &end, shape,
+		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
+	liphy_shape_free (shape);
+
+	/* Clip the camera. */
+	if (hit)
+	{
+		frac = tmp.fraction * limat_vector_get_length (diff);
+		lialg_camera_clip (self->client->camera, frac);
+	}
 }
 
 /** @} */

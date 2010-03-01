@@ -43,6 +43,11 @@ liext_slots_new (LIExtModule* module,
 		lisys_free (self);
 		return NULL;
 	}
+	if (!lialg_u32dic_insert (module->dictionary, object->id, self))
+	{
+		liext_slots_free (self);
+		return 0;
+	}
 
 	return self;
 }
@@ -92,7 +97,7 @@ int
 liext_slots_set_slot (LIExtSlots* self,
                       const char* slot,
                       const char* node,
-                      int         model)
+                      LIEngModel* model)
 {
 	LIExtSlot* slot_;
 
@@ -105,7 +110,7 @@ liext_slots_set_slot (LIExtSlots* self,
 	}
 
 	/* Create new slot. */
-	if (model != LINET_INVALID_MODEL)
+	if (model != NULL)
 	{
 		slot_ = liext_slot_new (self->module->client, self->object, node, "#root", model);
 		if (slot_ == NULL)

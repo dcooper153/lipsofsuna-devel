@@ -41,7 +41,7 @@ struct _LIExtModule
 	LICliClient* client;
 #ifndef LI_DISABLE_SOUND
 	LIAlgU32dic* objects;
-	LICalHandle calls[2];
+	LICalHandle calls[1];
 	LISndSystem* system;
 	LISndManager* sound;
 	LISndSource* music;

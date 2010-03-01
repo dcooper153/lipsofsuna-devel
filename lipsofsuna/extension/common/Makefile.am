@@ -6,6 +6,7 @@ EXTRA_DIST = skeleton/mkext.sh
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
 	libcreature.la \
+	libnetwork.la \
 	libnpc.la \
 	libskeleton.la \
 	libspawner.la
@@ -17,6 +18,14 @@ libcreature_la_SOURCES = \
 	creature/ext-module.c \
 	creature/ext-module.h \
 	creature/ext-script.c
+
+libnetwork_la_LIBADD = $(LIBADD)
+libnetwork_la_SOURCES = \
+	network/ext-module.c \
+	network/ext-module.h \
+	network/ext-client.c \
+	network/ext-client.h \
+	network/ext-script.c
 
 libnpc_la_LIBADD = $(LIBADD)
 libnpc_la_SOURCES = \

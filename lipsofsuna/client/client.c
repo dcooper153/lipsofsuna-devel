@@ -140,33 +140,6 @@ licli_client_free (LICliClient* self)
 }
 
 /**
- * \brief Connects to a server.
- *
- * \param self Client.
- * \param addr Server address.
- * \param port Server port.
- * \param udp Nonzero to use UDP.
- * \param name Login name or NULL.
- * \param pass Login password or NULL.
- * \return Nonzero on success.
- */
-int
-licli_client_connect (LICliClient* self,
-                      const char*  addr,
-                      int          port,
-                      int          udp,
-                      const char*  name,
-                      const char*  pass)
-{
-	if (name == NULL) name = self->login;
-	if (pass == NULL) pass = self->password;
-	self->network = licli_network_new (self, addr, port, udp, name, pass);
-	if (self->network == NULL)
-		return 0;
-	return 1;
-}
-
-/**
  * \brief Starts an embedded server.
  *
  * \param self Client.
@@ -204,28 +177,6 @@ int
 licli_client_main (LICliClient* self)
 {
 	return limai_program_main (self->program);
-}
-
-/**
- * \brief Sends a network package to the server.
- *
- * If the game isn't networked, nothing is done.
- *
- * \param self Client.
- * \param writer Network package.
- * \param flags Grapple send flags.
- */
-void
-licli_client_send (LICliClient* self,
-                   LIArcWriter* writer,
-                   int          flags)
-{
-	if (self->network != NULL)
-	{
-		grapple_client_send (self->network->socket, GRAPPLE_SERVER, flags,
-			liarc_writer_get_buffer (writer),
-			liarc_writer_get_length (writer));
-	}
 }
 
 /**
@@ -272,20 +223,6 @@ licli_client_set_moving (LICliClient* self,
 	}
 }
 
-/**
- * \brief Gets the current player object.
- *
- * \param self Client.
- * \return Object or NULL.
- */
-LIEngObject*
-licli_client_get_player (LICliClient* self)
-{
-	if (self->network == NULL)
-		return NULL;
-	return lieng_engine_find_object (self->engine, self->network->id);
-}
-
 /*****************************************************************************/
 
 /**
@@ -317,13 +254,6 @@ private_free_module (LICliClient* self)
 		self->engine = NULL;
 		self->program = NULL;
 		self->script = NULL;
-	}
-
-	/* Free network. */
-	if (self->network != NULL)
-	{
-		licli_network_free (self->network);
-		self->network = NULL;
 	}
 
 	if (self->bindings != NULL)
@@ -493,6 +423,8 @@ private_init_script (LICliClient* self)
 {
 	if (!liscr_script_create_class (self->script, "Action", licli_script_action, self) ||
 	    !liscr_script_create_class (self->script, "Binding", licli_script_binding, self) ||
+	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
+	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
 	    !liscr_script_create_class (self->script, "Extension", licli_script_extension, self) ||
 	    !liscr_script_create_class (self->script, "Group", licli_script_group, self) ||
@@ -500,7 +432,6 @@ private_init_script (LICliClient* self)
 	    !liscr_script_create_class (self->script, "Object", licli_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
 	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
-	    !liscr_script_create_class (self->script, "Player", licli_script_player, self) ||
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
 	    !liscr_script_create_class (self->script, "Scene", licli_script_scene, self) ||
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
@@ -545,10 +476,6 @@ private_update (LICliClient* self,
 	/* Invoke input callbacks. */
 	while (self->video.SDL_PollEvent (&event))
 		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
-
-	/* FIXME: We want to keep running even when not connected. */
-	if (self->network == NULL || !licli_network_get_connected (self->network))
-		limai_program_shutdown (self->program);
 
 	/* Render widgets. */
 	licli_window_get_size (self->window, &w, &h);

@@ -27,7 +27,6 @@
 
 #include <lipsofsuna/engine.h>
 #include "server.h"
-#include "server-client.h"
 #include "server-object.h"
 #include "server-types.h"
 

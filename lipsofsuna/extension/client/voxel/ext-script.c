@@ -38,24 +38,129 @@
 
 /* @luadoc
  * ---
- * -- FIXME
+ * -- Sets the contents of a voxel block.
+ * --
+ * -- Arguments:
+ * -- packet: Packet reader.
  * --
  * -- @param self Voxel class.
- * Voxel.test(self)
+ * -- @param args Arguments.
+ * -- @return True on success.
+ * Voxel.set_block(self, args)
  */
-static void Voxel_test (LIScrArgs* args)
+static void Voxel_set_block (LIScrArgs* args)
 {
-	printf ("Voxel.test\n");
+	uint8_t skip;
+	uint32_t index;
+	uint32_t tmp;
+	LIExtModule* module;
+	LIVoxBlock* block;
+	LIVoxBlockAddr addr;
+	LIVoxSector* sector;
+	LIScrData* data;
+	LIScrPacket* packet;
+
+	/* Get packet. */
+	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
+		return;
+	packet = data->data;
+	if (!packet->reader)
+		return;
+
+	/* Skip type. */
+	if (!packet->reader->pos && !liarc_reader_get_uint8 (packet->reader, &skip))
+		return;
+
+	/* Read block offset. */
+	if (!liarc_reader_get_uint32 (packet->reader, &index))
+		return;
+	tmp = index;
+	addr.block[0] = tmp % LIVOX_BLOCKS_PER_LINE;
+	addr.sector[0] = tmp / LIVOX_BLOCKS_PER_LINE % LIVOX_SECTORS_PER_LINE;
+	tmp /= LIVOX_BLOCKS_PER_LINE * LIVOX_SECTORS_PER_LINE;
+	addr.block[1] = tmp % LIVOX_BLOCKS_PER_LINE;
+	addr.sector[1] = tmp / LIVOX_BLOCKS_PER_LINE % LIVOX_SECTORS_PER_LINE;
+	tmp /= LIVOX_BLOCKS_PER_LINE * LIVOX_SECTORS_PER_LINE;
+	addr.block[2] = tmp % LIVOX_BLOCKS_PER_LINE;
+	addr.sector[2] = tmp / LIVOX_BLOCKS_PER_LINE % LIVOX_SECTORS_PER_LINE;
+
+	/* Find or create sector. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	sector = lialg_sectors_data_offset (module->voxels->sectors, "voxel",
+		addr.sector[0], addr.sector[1], addr.sector[2], 1);
+	if (sector == NULL)
+		return;
+
+	/* Read block data. */
+	index = LIVOX_BLOCK_INDEX (addr.block[0], addr.block[1], addr.block[2]);
+	block = livox_sector_get_block (sector, index);
+	if (!livox_block_read (block, module->voxels, packet->reader))
+		return;
+	if (livox_block_get_dirty (block))
+		livox_sector_set_dirty (sector, 1);
+
+	/* Indicate success. */
+	liscr_args_seti_bool (args, 1);
+}
+
+/* @luadoc
+ * ---
+ * -- Sets the materials used by the voxel system.
+ * --
+ * -- Arguments:
+ * -- packet: Packet reader.
+ * --
+ * -- @param self Voxel class.
+ * -- @param args Arguments.
+ * -- @return True on success.
+ * Voxel.set_materials(self, args)
+ */
+static void Voxel_set_materials (LIScrArgs* args)
+{
+	uint8_t skip;
+	LIExtModule* module;
+	LIVoxMaterial* material;
+	LIScrData* data;
+	LIScrPacket* packet;
+
+	/* Get packet. */
+	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
+		return;
+	packet = data->data;
+	if (!packet->reader)
+		return;
+
+	/* Skip type. */
+	if (!packet->reader->pos && !liarc_reader_get_uint8 (packet->reader, &skip))
+		return;
+
+	/* Clear old materials. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	livox_manager_clear_materials (module->voxels);
+
+	/* Read materials. */
+	while (!liarc_reader_check_end (packet->reader))
+	{
+		material = livox_material_new_from_stream (packet->reader);
+		if (material == NULL)
+			return;
+		if (!livox_manager_insert_material (module->voxels, material))
+			livox_material_free (material);
+	}
+
+	/* Indicate success. */
+	liscr_args_seti_bool (args, 1);
 }
 
 /*****************************************************************************/
 
 void
 liext_script_voxel (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
-	liscr_class_insert_cfunc (self, "test", Voxel_test);
+	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
+	liscr_class_insert_cfunc (self, "set_materials", Voxel_set_materials);
 }
 
 /** @} */

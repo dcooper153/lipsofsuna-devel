@@ -35,6 +35,7 @@ struct _LISerObserverIter
 	LIEngObjectIter objects;
 	LIEngObject* subject;
 	LIEngObject* object;
+	LISerServer* server;
 };
 
 /**
@@ -55,11 +56,16 @@ liser_observer_iter_first (LISerObserverIter* self,
                            LIEngObject*       object,
                            float              radius)
 {
+	LIMaiProgram* program;
 	LIMatTransform transform;
 
 	/* Initialize self. */
 	memset (self, 0, sizeof (LISerObserverIter));
 	if (object->sector == NULL)
+		return 0;
+	program = lieng_engine_get_userdata (object->engine);
+	self->server = limai_program_find_component (program, "server");
+	if (self->server == NULL)
 		return 0;
 	lieng_object_get_transform (object, &transform);
 	self->subject = object;
@@ -69,11 +75,13 @@ liser_observer_iter_first (LISerObserverIter* self,
 	/* Find first observer. */
 	while (self->objects.object != NULL)
 	{
-		if (liser_object_sees (self->objects.object, self->subject))
+#if 0
+		if (liser_network_sees (self->server->network, self->objects.object, self->subject))
 		{
 			self->object = self->objects.object;
 			return 1;
 		}
+#endif
 		if (!lieng_object_iter_next (&self->objects))
 			return 0;
 	}
@@ -89,11 +97,13 @@ liser_observer_iter_next (LISerObserverIter* self)
 	{
 		if (!lieng_object_iter_next (&self->objects))
 			break;
-		if (liser_object_sees (self->objects.object, self->subject))
+#if 0
+		if (liser_network_sees (self->server->network, self->objects.object, self->subject))
 		{
 			self->object = self->objects.object;
 			return 1;
 		}
+#endif
 	}
 	self->object = NULL;
 

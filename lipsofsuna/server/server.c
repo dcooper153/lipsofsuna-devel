@@ -28,7 +28,6 @@
 #include <lipsofsuna/system.h>
 #include "server.h"
 #include "server-callbacks.h"
-#include "server-client.h"
 #include "server-script.h"
 
 static int
@@ -66,6 +65,7 @@ liser_server_new (LIPthPaths* paths)
 	self->paths = self->program->paths;
 	self->script = self->program->script;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
+	lieng_engine_set_unique_object_call (self->engine, liser_server_check_unique_object, self);
 	lialg_sectors_set_unload (self->sectors, 20.0f);
 
 	/* Initialize server component. */
@@ -123,6 +123,49 @@ liser_server_free (LISerServer* self)
 }
 
 /**
+ * \brief Returns a unique object ID.
+ *
+ * \param self Server.
+ * \return Unique object ID or zero on error.
+ */
+int
+liser_server_check_unique_object (const LISerServer* self,
+                                  uint32_t           id)
+{
+	int ret;
+	const char* query;
+	sqlite3_stmt* statement;
+
+	/* Query the ID from database. */
+	query = "SELECT id FROM objects WHERE id=?;";
+	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
+		return 0;
+	}
+	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
+	{
+		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->sql));
+		sqlite3_finalize (statement);
+		return 0;
+	}
+
+	/* Reject if found. */
+	ret = sqlite3_step (statement);
+	if (ret != SQLITE_DONE)
+	{
+		if (ret != SQLITE_ROW)
+			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->sql));
+		ret = 0;
+	}
+	else
+		ret = 1;
+	sqlite3_finalize (statement);
+
+	return ret;
+}
+
+/**
  * \brief Runs the server in a loop until it exits.
  *
  * \param self Server.
@@ -153,70 +196,12 @@ liser_server_save (LISerServer* self)
 		object = iter.value;
 		if (object->flags & LIENG_OBJECT_FLAG_SAVE)
 		{
-			if (!liser_object_serialize (object, 1))
+			if (!liser_object_serialize (object, self, 1))
 				ret = 0;
 		}
 	}
 
 	return ret;
-}
-
-/**
- * \brief Returns a unique object ID.
- *
- * \param self Server.
- * \return Unique object ID or zero on error.
- */
-uint32_t
-liser_server_get_unique_object (const LISerServer* self)
-{
-	int ret;
-	uint32_t id;
-	const char* query;
-	sqlite3_stmt* statement;
-
-	for (id = 0 ; !id ; )
-	{
-		/* Choose random number. */
-		id = self->engine->range.start + lisys_randi (self->engine->range.size - 1);
-		if (!id)
-			continue;
-
-		/* Reject numbers of loaded objects. */
-		if (lialg_u32dic_find (self->engine->objects, id))
-		{
-			id = 0;
-			continue;
-		}
-
-		/* Reject numbers of database objects. */
-		query = "SELECT id FROM objects WHERE id=?;";
-		if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
-			return 0;
-		}
-		if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
-		{
-			lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->sql));
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		ret = sqlite3_step (statement);
-		if (ret != SQLITE_DONE)
-		{
-			if (ret != SQLITE_ROW)
-			{
-				lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->sql));
-				sqlite3_finalize (statement);
-				return 0;
-			}
-			id = 0;
-		}
-		sqlite3_finalize (statement);
-	}
-
-	return id;
 }
 
 /****************************************************************************/
@@ -272,22 +257,6 @@ private_init_sql (LISerServer* self)
 	}
 	if (sqlite3_step (statement) != SQLITE_DONE)
 	{
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Create object animation table. */
-	query = "CREATE TABLE IF NOT EXISTS object_anims "
-		"(id UNSIGNED INTEGER REFERENCES objects(id),name TEXT,chan REAL,prio REAL);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
 		sqlite3_finalize (statement);
 		return 0;
 	}

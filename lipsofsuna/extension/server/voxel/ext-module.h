@@ -28,17 +28,12 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/main.h>
-#include <lipsofsuna/server.h>
 #include <lipsofsuna/voxel.h>
 
 typedef struct _LIExtBlock LIExtBlock;
-typedef struct _LIExtBlockKey LIExtBlockKey;
-typedef struct _LIExtListener LIExtListener;
-typedef struct _LIExtListenerBlock LIExtListenerBlock;
 typedef struct _LIExtModule LIExtModule;
 
 #include "ext-block.h"
-#include "ext-listener.h"
 
 #define LIEXT_SCRIPT_MATERIAL "Material"
 #define LIEXT_SCRIPT_TILE "Tile"
@@ -46,11 +41,9 @@ typedef struct _LIExtModule LIExtModule;
 
 struct _LIExtModule
 {
-	float radius;
-	LIAlgPtrdic* listeners;
 	LIAlgMemdic* blocks;
 	LIArcWriter* assign_packet;
-	LICalHandle calls[8];
+	LICalHandle calls[3];
 	LIMaiProgram* program;
 	LIVoxManager* voxels;
 };
@@ -76,15 +69,15 @@ liext_module_get_voxels (LIExtModule* self);
 
 void
 liext_script_material (LIScrClass* self,
-                     void*       data);
+                       void*       data);
 
 void
 liext_script_tile (LIScrClass* self,
-                 void*       data);
+                   void*       data);
 
 void
 liext_script_voxel (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 #endif
 

@@ -139,41 +139,6 @@ licli_client_init_callbacks_binding (LICliClient* self)
 /*****************************************************************************/
 /* Miscellaneous. */
 
-static void
-private_camera_clip (LICliClient* client)
-{
-	int hit;
-	float frac;
-	LIMatAabb aabb;
-	LIMatTransform start;
-	LIMatTransform end;
-	LIMatVector diff;
-	LIPhyCollision tmp;
-	LIPhyShape* shape;
-
-	/* Create sweep shape. */
-	/* FIXME: Could use a more accurate shape. */
-	lialg_camera_get_bounds (client->camera, &aabb);
-	shape = liphy_shape_new_aabb (client->engine->physics, &aabb);
-	if (shape == NULL)
-		return;
-
-	/* Sweep the shape. */
-	lialg_camera_get_center (client->camera, &start);
-	lialg_camera_get_transform (client->camera, &end);
-	diff = limat_vector_subtract (end.position, start.position);
-	hit = liphy_physics_cast_shape (client->engine->physics, &start, &end, shape,
-		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
-	liphy_shape_free (shape);
-
-	/* Clip the camera. */
-	if (hit)
-	{
-		frac = tmp.fraction * limat_vector_get_length (diff);
-		lialg_camera_clip (client->camera, frac);
-	}
-}
-
 static int
 private_miscellaneous_event (LICliClient* client,
                              SDL_Event*   event)
@@ -214,63 +179,11 @@ private_miscellaneous_object_new (LICliClient* client,
 	return 1;
 }
 
-static int
-private_miscellaneous_tick (LICliClient* client,
-                            float        secs)
-{
-	LIEngObject* player;
-	LIMatAabb bounds;
-	LIMdlNode* node;
-	LIMatTransform transform;
-	LIMatTransform transform0;
-
-	/* Update network state. */
-	if (client->network != NULL)
-	{
-		if (!licli_network_update (client->network, secs))
-			return 0;
-	}
-
-	/* Update player transformation. */
-	player = licli_client_get_player (client);
-	if (player != NULL && client->network != NULL)
-	{
-		lieng_object_get_target (player, &transform);
-		transform.rotation = client->network->curr.direction;
-		lieng_object_set_transform (player, &transform);
-	}
-
-	/* Update camera center. */
-	if (player != NULL && client->network != NULL)
-	{
-		lieng_object_get_transform (player, &transform);
-		node = lieng_object_find_node (player, client->camera_node);
-		if (node != NULL && lialg_camera_get_driver (client->camera) == LIALG_CAMERA_FIRSTPERSON)
-		{
-			limdl_node_get_world_transform (node, &transform0);
-			transform = limat_transform_multiply (transform, transform0);
-		}
-		else
-		{
-			lieng_object_get_bounds (player, &bounds);
-			transform.position.y += bounds.max.y;
-		}
-		lialg_camera_set_center (client->camera, &transform);
-		lialg_camera_update (client->camera, secs);
-		if (lialg_camera_get_driver (client->camera) != LIALG_CAMERA_FIRSTPERSON)
-			private_camera_clip (client);
-	}
-
-	return 1;
-}
-
 int
 licli_client_init_callbacks_misc (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self->engine, "event", -5, private_miscellaneous_event, self, NULL);
-	lical_callbacks_insert (self->callbacks, self->engine, "packet", 0, licli_client_handle_packet, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "object-new", -65535, private_miscellaneous_object_new, self, NULL);
-	lical_callbacks_insert (self->callbacks, self->engine, "tick", 0, private_miscellaneous_tick, self, NULL);
 	return 1;
 }
 

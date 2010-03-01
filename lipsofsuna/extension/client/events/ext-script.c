@@ -138,7 +138,6 @@ liext_script_events (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EVENTS, data);
 	liscr_class_insert_enum (self, "ACTION", LIEXT_EVENT_ACTION);
-	liscr_class_insert_enum (self, "ASSIGN", LIEXT_EVENT_ASSIGN);
 	liscr_class_insert_enum (self, "OBJECT_MODEL", LIEXT_EVENT_OBJECT_MODEL);
 	liscr_class_insert_enum (self, "OBJECT_NEW", LIEXT_EVENT_OBJECT_NEW);
 	liscr_class_insert_enum (self, "PACKET", LIEXT_EVENT_PACKET);

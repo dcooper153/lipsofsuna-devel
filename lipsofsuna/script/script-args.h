@@ -178,6 +178,21 @@ liscr_args_set_output (LIScrArgs* self,
                        int        value);
 
 void
+liscr_args_setf_data (LIScrArgs* self,
+                      double     name,
+                      LIScrData* value);
+
+void
+liscr_args_setf_float (LIScrArgs* self,
+                       double     name,
+                       double     value);
+
+void
+liscr_args_setf_string (LIScrArgs*  self,
+                        double      name,
+                        const char* value);
+
+void
 liscr_args_seti_bool (LIScrArgs* self,
                       int        value);
 

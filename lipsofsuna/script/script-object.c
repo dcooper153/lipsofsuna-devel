@@ -36,6 +36,42 @@
 
 /* @luadoc
  * ---
+ * -- Sets or clears an animation.
+ * --
+ * -- Arguments:
+ * -- animation: Animation name.
+ * -- channel: Channel number.
+ * -- weight: Blending weight.
+ * -- time: Starting time.
+ * -- permanent: True if should keep repeating.
+ * --
+ * -- @param self Object.
+ * -- @param args Arguments.
+ * -- @return True if started a new animation.
+ * function Object.animate(self, args)
+ */
+static void Object_animate (LIScrArgs* args)
+{
+	int ret;
+	int repeat = 0;
+	int channel = -1;
+	float weight = 1.0f;
+	float time = 0.0f;
+	const char* animation = NULL;
+
+	liscr_args_gets_string (args, "animation", &animation);
+	liscr_args_gets_int (args, "channel", &channel);
+	liscr_args_gets_float (args, "weight", &weight);
+	liscr_args_gets_float (args, "time", &time);
+	liscr_args_gets_bool (args, "permanent", &repeat);
+	if (channel < 0 || channel > 254)
+		channel = -1;
+	ret = lieng_object_animate (args->self, channel, animation, repeat, weight, time);
+	liscr_args_seti_bool (args, ret);
+}
+
+/* @luadoc
+ * ---
  * -- Instructs the object to approach a point.
  * --
  * -- Arguments:
@@ -58,6 +94,54 @@ static void Object_approach (LIScrArgs* args)
 		liscr_args_gets_float (args, "dist", &dist);
 		liscr_args_gets_float (args, "speed", &speed);
 		lieng_object_approach (args->self, &vector, speed, dist);
+	}
+}
+
+/* @luadoc
+ * ---
+ * -- Finds an object by ID.
+ * --
+ * -- Arguments:
+ * -- id: Object ID. (required)
+ * -- point: Center point for radius check.
+ * -- radius: Maximum distance from center point.
+ * --
+ * -- @param self Object class.
+ * -- @param args Arguments.
+ * -- @return Object or nil.
+ * function Object.find(self, args)
+ */
+static void Object_find (LIScrArgs* args)
+{
+	int id;
+	float radius;
+	LIEngObject* object;
+	LIMaiProgram* program;
+	LIMatTransform transform;
+	LIMatVector center;
+
+	if (liscr_args_gets_int (args, "id", &id))
+	{
+		/* Find object. */
+		program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+		object = lieng_engine_find_object (program->engine, id);
+		if (object == NULL)
+			return;
+
+		/* Optional radius check. */
+		if (liscr_args_gets_vector (args, "point", &center) &&
+		    liscr_args_gets_float (args, "radius", &radius))
+		{
+			if (!lieng_object_get_realized (object))
+				return;
+			lieng_object_get_transform (object, &transform);
+			center = limat_vector_subtract (center, transform.position);
+			if (limat_vector_get_length (center) > radius)
+				return;
+		}
+
+		/* Return object. */
+		liscr_args_seti_data (args, object->script);
 	}
 }
 
@@ -87,6 +171,72 @@ static void Object_find_node (LIScrArgs* args)
 	limdl_node_get_world_transform (node, &transform);
 	liscr_args_seti_vector (args, &transform.position);
 	liscr_args_seti_quaternion (args, &transform.rotation);
+}
+
+/* @luadoc
+ * ---
+ * -- Finds all objects inside a sphere.
+ * --
+ * -- Arguments:
+ * -- point: Center point. (required)
+ * -- radius: Search radius.
+ * --
+ * -- @param self Server class.
+ * -- @param args Arguments.
+ * -- @return Table of matching objects and their IDs.
+ * function Object.find_objects(self, args)
+ */
+static void Object_find_objects (LIScrArgs* args)
+{
+	float radius = 32.0f;
+	LIEngObjectIter iter;
+	LIMatVector center;
+	LIMaiProgram* program;
+
+	/* Check arguments. */
+	if (!liscr_args_gets_vector (args, "point", &center))
+		return;
+	liscr_args_gets_float (args, "radius", &radius);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+
+	/* Find objects. */
+	LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
+		liscr_args_setf_data (args, iter.object->id, iter.object->script);
+}
+
+/* @luadoc
+ * ---
+ * -- Gets animation information for the given animation channel.
+ * --
+ * -- If an animation is looping in the channel, a table containing the fields
+ * -- animation, time, and weight is returned.
+ * --
+ * -- Arguments:
+ * -- channel: Channel number. (required)
+ * --
+ * -- @param self Server class.
+ * -- @param args Arguments.
+ * -- @return Animation info table or nil.
+ * function Object.get_animation(self, args)
+ */
+static void Object_get_animation (LIScrArgs* args)
+{
+	int chan;
+	LIEngObject* object;
+	LIMdlAnimation* anim;
+
+	/* Check arguments. */
+	if (!liscr_args_gets_int (args, "channel", &chan))
+		return;
+	object = args->self;
+	anim = limdl_pose_get_channel_animation (object->pose, chan);
+	if (anim == NULL)
+		return;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_string (args, "animation", anim->name);
+	liscr_args_sets_float (args, "time", limdl_pose_get_channel_position (object->pose, chan));
+	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority (object->pose, chan));
 }
 
 /* @luadoc
@@ -144,19 +294,43 @@ static void Object_jump (LIScrArgs* args)
  * -- @name Object.angular_momentum
  * -- @class table
  */
-static void Object_getter_angular_momentum (LIScrArgs* args)
+static void Object_getter_angular (LIScrArgs* args)
 {
 	LIMatVector tmp;
 
-	lieng_object_get_angular_momentum (args->self, &tmp);
+	lieng_object_get_angular (args->self, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_angular_momentum (LIScrArgs* args)
+static void Object_setter_angular (LIScrArgs* args)
 {
 	LIMatVector vector;
 
 	if (liscr_args_geti_vector (args, 0, &vector))
-		lieng_object_set_angular_momentum (args->self, &vector);
+		lieng_object_set_angular (args->self, &vector);
+}
+
+/* @luadoc
+ * ---
+ * -- Table of channel numbers and animation names.
+ * --
+ * -- A list of permanent animations the object is playing back.
+ * --
+ * -- @name Object.animations
+ */
+static void Object_getter_animations (LIScrArgs* args)
+{
+	LIAlgU32dicIter iter;
+	LIEngObject* object;
+	LIMdlPoseChannel* channel;
+
+	object = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	LIALG_U32DIC_FOREACH (iter, object->pose->channels)
+	{
+		channel = iter.value;
+		if (channel->repeats == -1)
+			liscr_args_setf_string (args, iter.key, channel->animation_name);
+	}
 }
 
 /* @luadoc
@@ -341,7 +515,7 @@ static void Object_setter_position (LIScrArgs* args)
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 	{
-		lieng_object_get_transform (args->self, &transform);
+		lieng_object_get_target (args->self, &transform);
 		transform.position = vector;
 		lieng_object_set_transform (args->self, &transform);
 	}
@@ -387,7 +561,7 @@ static void Object_setter_rotation (LIScrArgs* args)
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &quat))
 	{
-		lieng_object_get_transform (args->self, &transform);
+		lieng_object_get_target (args->self, &transform);
 		transform.rotation = *((LIMatQuaternion*) quat->data);
 		lieng_object_set_transform (args->self, &transform);
 	}
@@ -460,7 +634,10 @@ static void Object_getter_selected_objects (LIScrArgs* args)
 
 	/* Pack selected objects. */
 	LIENG_FOREACH_SELECTION (iter, program->engine)
-		liscr_args_seti_data (args, iter.object->script);
+	{
+		if (lieng_object_get_realized (iter.object))
+			liscr_args_seti_data (args, iter.object->script);
+	}
 }
 static void Object_setter_selected_objects (LIScrArgs* args)
 {
@@ -581,11 +758,16 @@ liscr_script_object (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
+	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "approach", Object_approach);
+	liscr_class_insert_cfunc (self, "find", Object_find);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
+	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);
+	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
 	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
 	liscr_class_insert_mfunc (self, "jump", Object_jump);
-	liscr_class_insert_mvar (self, "angular_momentum", Object_getter_angular_momentum, Object_setter_angular_momentum);
+	liscr_class_insert_mvar (self, "angular", Object_getter_angular, Object_setter_angular);
+	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 	liscr_class_insert_mvar (self, "class", Object_getter_class, Object_setter_class);
 	liscr_class_insert_cvar (self, "class_name", Object_getter_class_name, NULL);
 	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);

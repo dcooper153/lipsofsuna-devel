@@ -29,23 +29,6 @@
 #include "ext-slots.h"
 
 static int
-private_packet (LIExtModule* self,
-                int          type,
-                LIArcReader* reader);
-
-static int
-private_packet_diff (LIExtModule* self,
-                     LIArcReader* reader);
-
-static int
-private_packet_reset (LIExtModule* self,
-                      LIArcReader* reader);
-
-static int
-private_tick (LIExtModule* self,
-              float        secs);
-
-static int
 private_visibility (LIExtModule* self,
                     LIEngObject* object,
                     int          value);
@@ -77,13 +60,14 @@ liext_module_new (LIMaiProgram* program)
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 0, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 0, private_visibility, self, self->calls + 2))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 0, private_visibility, self, self->calls + 0))
 	{
 		liext_module_free (self);
 		return NULL;
 	}
+
+	/* Register classes. */
+	liscr_script_create_class (program->script, "Slots", liext_script_slots, self);
 
 	return self;
 }
@@ -100,133 +84,59 @@ liext_module_free (LIExtModule* self)
 	lisys_free (self);
 }
 
-/*****************************************************************************/
-
-static int
-private_packet (LIExtModule* self,
-                int          type,
-                LIArcReader* reader)
+void
+liext_module_clear_slots (LIExtModule* self,
+                          LIEngObject* owner)
 {
-	reader->pos = 1;
-	switch (type)
-	{
-		case LIEXT_SLOTS_PACKET_RESET:
-			private_packet_reset (self, reader);
-			break;
-		case LIEXT_SLOTS_PACKET_DIFF:
-			private_packet_diff (self, reader);
-			break;
-	}
-
-	return 1;
-}
-
-static int
-private_packet_diff (LIExtModule* self,
-                     LIArcReader* reader)
-{
-	char* slot = NULL;
-	char* node = NULL;
-	uint32_t id;
-	uint16_t model;
-	LIEngObject* object;
 	LIExtSlots* slots;
 
-	/* Find or create slots block. */
-	if (!liarc_reader_get_uint32 (reader, &id))
-		return 0;
-	slots = lialg_u32dic_find (self->dictionary, id);
-	if (slots == NULL)
+	slots = lialg_u32dic_find (self->dictionary, owner->id);
+	if (slots != NULL)
 	{
-		object = lieng_engine_find_object (self->client->engine, id);
-		if (object == NULL)
-			return 0;
-		slots = liext_slots_new (self, object);
-		if (slots == NULL)
-			return 0;
-		if (!lialg_u32dic_insert (self->dictionary, id, slots))
-		{
-			liext_slots_free (slots);
-			return 0;
-		}
+		lialg_u32dic_remove (self->dictionary, owner->id);
+		liext_slots_free (slots);
 	}
-
-	/* Insert models to slots. */
-	while (!liarc_reader_check_end (reader))
-	{
-		if (!liarc_reader_get_text (reader, "", &slot) ||
-		    !liarc_reader_get_text (reader, "", &node) ||
-		    !liarc_reader_get_uint16 (reader, &model))
-		{
-			lisys_free (slot);
-			lisys_free (node);
-			return 0;
-		}
-		liext_slots_set_slot (slots, slot, node, model);
-		lisys_free (slot);
-		lisys_free (node);
-	}
-
-	return 1;
 }
 
-static int
-private_packet_reset (LIExtModule* self,
-                      LIArcReader* reader)
+int
+liext_module_set_slots (LIExtModule* self,
+                        LIEngObject* owner,
+                        const char*  node,
+                        const char*  model)
 {
-	char* slot = NULL;
-	char* node = NULL;
-	uint32_t id;
-	uint16_t model;
-	LIEngObject* object;
+	int ret;
+	LIEngModel* engmdl;
 	LIExtSlots* slots;
 
-	/* Create or clear slots block. */
-	if (!liarc_reader_get_uint32 (reader, &id))
-		return 0;
-	slots = lialg_u32dic_find (self->dictionary, id);
-	if (slots == NULL)
-	{
-		object = lieng_engine_find_object (self->client->engine, id);
-		if (object == NULL)
-			return 0;
-		slots = liext_slots_new (self, object);
-		if (slots == NULL)
-			return 0;
-		if (!lialg_u32dic_insert (self->dictionary, id, slots))
-		{
-			liext_slots_free (slots);
-			return 0;
-		}
-	}
+	/* Find model. */
+	if (model != NULL)
+		engmdl = lieng_engine_find_model_by_name (self->client->engine, model);
 	else
-		liext_slots_clear (slots);
+		engmdl = NULL;
 
-	/* Insert models to slots. */
-	while (!liarc_reader_check_end (reader))
+	/* Find or create slots. */
+	slots = lialg_u32dic_find (self->dictionary, owner->id);
+	if (slots == NULL)
 	{
-		if (!liarc_reader_get_text (reader, "", &slot) ||
-		    !liarc_reader_get_text (reader, "", &node) ||
-		    !liarc_reader_get_uint16 (reader, &model))
+		if (engmdl == NULL)
 		{
-			lisys_free (slot);
-			lisys_free (node);
+			lisys_error_set (EINVAL, "no such model");
 			return 0;
 		}
-		liext_slots_set_slot (slots, slot, node, model);
-		lisys_free (slot);
-		lisys_free (node);
+		slots = liext_slots_new (self, owner);
+		if (slots == NULL)
+			return 0;
 	}
 
-	return 1;
+	/* Set slot object. */
+	ret = liext_slots_set_slot (slots, node, node, engmdl);
+	if (!slots->slots->size)
+		liext_module_clear_slots (self, owner);
+
+	return ret;
 }
 
-static int
-private_tick (LIExtModule* self,
-              float        secs)
-{
-	return 1;
-}
+/*****************************************************************************/
 
 static int
 private_visibility (LIExtModule* self,
@@ -239,12 +149,7 @@ private_visibility (LIExtModule* self,
 	if (!value)
 	{
 		/* Free slots block. */
-		slots = lialg_u32dic_find (self->dictionary, object->id);
-		if (slots != NULL)
-		{
-			lialg_u32dic_remove (self->dictionary, object->id);
-			liext_slots_free (slots);
-		}
+		liext_module_clear_slots (self, object);
 
 		/* Disown slot objects. */
 		LIALG_U32DIC_FOREACH (iter, self->dictionary)

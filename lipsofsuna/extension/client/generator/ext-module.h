@@ -39,7 +39,6 @@ typedef struct _LIExtModule LIExtModule;
 
 struct _LIExtModule
 {
-	LICalHandle calls[1];
 	LICliClient* client;
 	LIScrData* script;
 	LIWdgWidget* editor;

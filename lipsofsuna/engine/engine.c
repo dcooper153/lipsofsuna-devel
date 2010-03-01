@@ -147,6 +147,18 @@ lieng_engine_free (LIEngEngine* self)
 	lisys_free (self);
 }
 
+int
+lieng_engine_check_unique (LIEngEngine* self,
+                           uint32_t     id)
+{
+	if (lialg_u32dic_find (self->objects, id) != NULL)
+		return 0;
+	if (self->config.unique_call != NULL)
+		return self->config.unique_call (self->config.unique_data, id);
+
+	return 1;
+}
+
 /**
  * \brief Clears the current selection.
  *
@@ -421,6 +433,15 @@ lieng_engine_set_local_range (LIEngEngine* self,
 {
 	self->range.start = start;
 	self->range.size = end - start;
+}
+
+void
+lieng_engine_set_unique_object_call (LIEngEngine* self,
+                                     void*        call,
+                                     void*        data)
+{
+	self->config.unique_call = call;
+	self->config.unique_data = data;
 }
 
 void*

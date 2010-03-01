@@ -31,11 +31,13 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/client.h>
 
+#define LIEXT_SCRIPT_SLOTS "Slots"
+
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LIAlgU32dic* dictionary;
-	LICalHandle calls[3];
+	LICalHandle calls[1];
 	LICliClient* client;
 };
 
@@ -44,6 +46,22 @@ liext_module_new (LIMaiProgram* program);
 
 void
 liext_module_free (LIExtModule* self);
+
+void
+liext_module_clear_slots (LIExtModule* self,
+                          LIEngObject* owner);
+
+int
+liext_module_set_slots (LIExtModule* self,
+                        LIEngObject* owner,
+                        const char*  node,
+                        const char*  model);
+
+/*****************************************************************************/
+
+void
+liext_script_slots (LIScrClass* self,
+                    void*       data);
 
 #endif
 

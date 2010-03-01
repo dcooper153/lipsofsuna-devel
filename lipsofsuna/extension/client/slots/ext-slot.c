@@ -41,9 +41,8 @@ liext_slot_new (LICliClient* client,
                 LIEngObject* object,
                 const char*  node0,
                 const char*  node1,
-                int          model)
+                LIEngModel*  model)
 {
-	LIEngModel* mdl;
 	LIExtSlot* self;
 
 	/* Allocate self. */
@@ -53,20 +52,14 @@ liext_slot_new (LICliClient* client,
 	self->client = client;
 
 	/* Allocate object. */
-	mdl = lieng_engine_find_model_by_code (object->engine, model);
-	if (mdl == NULL)
-	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot find model `%d'", model);
-		goto error;
-	}
 	self->object = lieng_object_new (self->client->engine, NULL, LIPHY_CONTROL_MODE_STATIC, 0);
-	lieng_object_set_smoothing (self->object, 0.0f, 0.0f);
 	if (self->object == NULL)
 	{
 		lisys_error_append ("cannot create object");
 		goto error;
 	}
-	lieng_object_set_model (self->object, mdl);
+	lieng_object_set_smoothing (self->object, 0.0f, 0.0f);
+	lieng_object_set_model (self->object, model);
 	liphy_object_set_collision_group (self->object->physics, LICLI_PHYSICS_GROUP_OBJECTS);
 
 	/* Allocate constraint. */

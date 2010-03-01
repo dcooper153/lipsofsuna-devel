@@ -129,6 +129,15 @@ limdl_pose_get_channel_position (const LIMdlPose* self,
                                  int              channel);
 
 void
+limdl_pose_set_channel_position (LIMdlPose* self,
+                                 int        channel,
+                                 float      value);
+
+float
+limdl_pose_get_channel_priority (const LIMdlPose* self,
+                                 int              channel);
+
+void
 limdl_pose_set_channel_priority (LIMdlPose* self,
                                  int        channel,
                                  float      value);

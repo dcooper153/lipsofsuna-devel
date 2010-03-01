@@ -478,7 +478,6 @@ ligen_generator_write (LIGenGenerator* self)
 
 	/* Drop old tables. */
 	liarc_sql_drop (server, "objects");
-	liarc_sql_drop (server, "object_anims");
 	liarc_sql_drop (server, "voxel_sectors");
 	liarc_sql_drop (server, "voxel_materials");
 
@@ -488,20 +487,13 @@ ligen_generator_write (LIGenGenerator* self)
 		lisys_error_report ();
 	livox_manager_set_sql (self->voxels, self->sql);
 
-	/* Create object tables. */
+	/* Create object table. */
 	query = "CREATE TABLE IF NOT EXISTS objects "
 		"(id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,model TEXT,"
 		"flags UNSIGNED INTEGER,angx REAL,angy REAL,angz REAL,posx REAL,"
 		"posy REAL,posz REAL,rotx REAL,roty REAL,rotz REAL,rotw REAL,"
 		"mass REAL,move REAL,speed REAL,step REAL,colgrp UNSIGNED INTEGER,"
 		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,type TEXT,extra TEXT);";
-	if (!liarc_sql_query (server, query))
-	{
-		sqlite3_close (server);
-		return 0;
-	}
-	query = "CREATE TABLE IF NOT EXISTS object_anims "
-		"(id UNSIGNED INTEGER REFERENCES objects(id),name TEXT,chan REAL,prio REAL);";
 	if (!liarc_sql_query (server, query))
 	{
 		sqlite3_close (server);

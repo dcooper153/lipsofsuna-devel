@@ -69,7 +69,7 @@ lieng_object_new (LIEngEngine*     engine,
 		self->id = engine->range.start + (uint32_t)(engine->range.size * rnd);
 		if (!self->id)
 			continue;
-		if (lialg_u32dic_find (engine->objects, self->id))
+		if (!lieng_engine_check_unique (engine, self->id))
 			self->id = 0;
 	}
 
@@ -97,7 +97,7 @@ lieng_object_new (LIEngEngine*     engine,
 	if (model != NULL)
 	{
 		lieng_object_set_model (self, model);
-		lieng_object_set_animation (self, 0, "idle", -1, 0.0f);
+		lieng_object_animate (self, 0, "idle", 1, 0.0f, 0.0f);
 	}
 
 	/* Invoke callbacks. */
@@ -193,6 +193,63 @@ lieng_object_ref (LIEngObject* self,
 	assert (self->refs >= 0);
 	if (self->refs <= 0)
 		lieng_object_free (self);
+}
+
+/**
+ * \brief Sets the current animation of a specified channel.
+ *
+ * \param self Object.
+ * \param channel Channel index.
+ * \param animation Animation name or NULL.
+ * \param permanent Nonzero if should repeat infinitely.
+ * \param priority Blending priority.
+ * \param time Starting time.
+ * \return Nonzero if an animation was started or stopped.
+ */
+int
+lieng_object_animate (LIEngObject* self,
+                      int          channel,
+                      const char*  animation,
+                      int          permanent,
+                      float        priority,
+                      float        time)
+{
+	const char* name;
+
+	/* Avoid restarts in simple cases. */
+	if (permanent && channel != -1 && animation != NULL)
+	{
+		if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
+		    limdl_pose_get_channel_repeats (self->pose, channel) == -1)
+		{
+			name = limdl_pose_get_channel_name (self->pose, channel);
+			if (!strcmp (name, animation))
+				return 0;
+		}
+	}
+
+	/* Automatic channel assignment. */
+	if (channel == -1)
+	{
+		for (channel = 254 ; channel > 0 ; channel--)
+		{
+			if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
+				break;
+		}
+	}
+
+	/* Clear and set channel. */
+	limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+	if (animation != NULL)
+	{
+		limdl_pose_set_channel_animation (self->pose, channel, animation);
+		limdl_pose_set_channel_repeats (self->pose, channel, permanent? -1 : 1);
+		limdl_pose_set_channel_priority (self->pose, channel, priority);
+		limdl_pose_set_channel_position (self->pose, channel, time);
+		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+	}
+
+	return 1;
 }
 
 /**
@@ -410,56 +467,29 @@ lieng_object_update (LIEngObject* self,
 }
 
 /**
- * \brief Gets the angular momentum of the object.
+ * \brief Gets the angular velocity of the object.
  *
  * \param self Object.
- * \param value Return location for the angular momentum vector.
+ * \param value Return location for a vector.
  */
 void
-lieng_object_get_angular_momentum (const LIEngObject* self,
-                                   LIMatVector*       value)
+lieng_object_get_angular (const LIEngObject* self,
+                          LIMatVector*       value)
 {
 	liphy_object_get_angular (self->physics, value);
 }
 
 /**
- * \brief Sets the angular momentum of the object.
+ * \brief Sets the angular velocity of the object.
  *
  * \param self Object.
- * \param value Angular momentum vector.
+ * \param value Angular velocity vector.
  */
 void
-lieng_object_set_angular_momentum (LIEngObject*       self,
-                                   const LIMatVector* value)
+lieng_object_set_angular (LIEngObject*       self,
+                          const LIMatVector* value)
 {
 	liphy_object_set_angular (self->physics, value);
-}
-
-/**
- * \brief Sets the current animation of a specified channel.
- *
- * \param self Object.
- * \param channel Channel index.
- * \param animation Animation name or NULL.
- * \param repeats Number of time to repeats, -1 for infinite.
- * \param priority Blending priority.
- * \return Nonzero on success.
- */
-void
-lieng_object_set_animation (LIEngObject* self,
-                            int          channel,
-                            const char*  animation,
-                            int          repeats,
-                            float        priority)
-{
-	limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
-	if (animation != NULL)
-	{
-		limdl_pose_set_channel_animation (self->pose, channel, animation);
-		limdl_pose_set_channel_repeats (self->pose, channel, repeats);
-		limdl_pose_set_channel_priority (self->pose, channel, priority);
-		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
-	}
 }
 
 /**
@@ -992,7 +1022,13 @@ void
 lieng_object_get_target (const LIEngObject* self,
                          LIMatTransform*    value)
 {
-	*value = self->smoothing.target;
+	int realized;
+
+	realized = lieng_object_get_realized (self);
+	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
+		liphy_object_get_transform (self->physics, value);
+	else
+		*value = self->smoothing.target;
 }
 
 /**

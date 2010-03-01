@@ -29,10 +29,6 @@ struct _LISerAniminfo
 };
 
 typedef struct _LISerAniminfo LISerAniminfo;
-typedef struct _LISerClient LISerClient;
-typedef struct _LISerExtension LISerExtension;
-typedef struct _LISerExtensionInfo LISerExtensionInfo;
-typedef struct _LISerNetwork LISerNetwork;
 typedef struct _LISerObject LISerObject;
 typedef struct _LISerServer LISerServer;
 

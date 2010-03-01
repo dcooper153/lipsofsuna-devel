@@ -16,59 +16,52 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSkills Skills
+ * \addtogroup LIExtNetwork Network
  * @{
  */
 
-#ifndef __EXT_SKILLS_H__
-#define __EXT_SKILLS_H__
+#ifndef __EXT_CLIENT_H__
+#define __EXT_CLIENT_H__
 
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/script.h>
 #include "ext-module.h"
+#include "ext-client.h"
 
-struct _LIExtSkill
+struct _LIExtClient
 {
-	float value;
-	float maximum;
-	LIScrData* script;
-};
-
-struct _LIExtSkills
-{
-	uint32_t id;
-	LIAlgStrdic* skills;
+	grapple_user net;
+	LIEngObject* object;
+	LIExtClient* next;
+	LIExtClient* prev;
 	LIExtModule* module;
-	LIScrData* script;
 };
 
-LIExtSkills*
-liext_skills_new (LIExtModule* module,
-                  uint32_t     id);
+LIExtClient*
+liext_client_new (LIExtModule* module,
+                  LIEngObject* object,
+                  grapple_user user);
 
 void
-liext_skills_free (LIExtSkills* self);
+liext_client_free (LIExtClient* self);
 
 void
-liext_skills_unref (LIExtSkills* self);
+liext_client_send (LIExtClient* self,
+                   LIArcWriter* writer,
+                   int          flags);
 
 void
-liext_skills_clear (LIExtSkills* self);
-
-LIExtSkill*
-liext_skills_find_skill (LIExtSkills* self,
-                         const char*  name);
+liext_client_swap (LIExtClient* self,
+                   LIExtClient* client);
 
 int
-liext_skills_set_skill (LIExtSkills* self,
-                        const char*  name,
-                        float        value,
-                        float        maximum);
+liext_client_set_object (LIExtClient* self,
+                         LIEngObject* value);
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

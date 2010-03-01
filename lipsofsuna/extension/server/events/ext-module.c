@@ -51,7 +51,7 @@ private_motion (LIExtModule* self,
 
 static int
 private_packet (LIExtModule* self,
-                LISerClient* client,
+                LIEngObject* object,
                 LIArcReader* packet);
 
 static int
@@ -263,13 +263,13 @@ private_motion (LIExtModule* self,
                 LIEngObject* object)
 {
 	liext_module_event (self, LIEXT_EVENT_SIMULATE,
-		"object", LISCR_SCRIPT_OBJECT, object, NULL);
+		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
 
 static int
 private_packet (LIExtModule* self,
-                LISerClient* client,
+                LIEngObject* object,
                 LIArcReader* packet)
 {
 	int type;
@@ -278,7 +278,7 @@ private_packet (LIExtModule* self,
 	type = ((uint8_t*) packet->buffer)[0];
 	data0 = liscr_packet_new_readable (self->program->script, packet);
 	liext_module_event (self, LIEXT_EVENT_PACKET,
-		"object", LISCR_SCRIPT_OBJECT, client->object->script,
+		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"message", LISCR_TYPE_INT, type,
 		"packet", LISCR_SCRIPT_PACKET, data0, NULL);
 	if (data0 != NULL)

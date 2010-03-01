@@ -39,13 +39,6 @@
 #define LICLI_OBJECT_ROTATION_SMOOTHING 0.5f
 
 void
-licli_object_set_animation (LIEngObject* self,
-                            int          value,
-                            int          channel,
-                            int          permanent,
-                            float        priority);
-
-void
 licli_object_set_flags (LIEngObject* self,
                         int          value);
 

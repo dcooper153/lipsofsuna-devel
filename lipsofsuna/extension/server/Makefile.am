@@ -4,19 +4,10 @@ AM_LDFLAGS = -module -avoid-version -no-undefined
 
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
-	libeditor-ser.la \
 	libevents-ser.la \
 	libgenerator-ser.la \
 	libinventory-ser.la \
-	libskills-ser.la \
-	libslots-ser.la \
 	libvoxel-ser.la
-
-libeditor_ser_la_LIBADD = $(LIBADD)
-libeditor_ser_la_SOURCES = \
-	editor/ext-module.c \
-	editor/ext-module.h \
-	editor/ext-script.c
 
 libevents_ser_la_LIBADD = $(LIBADD)
 libevents_ser_la_SOURCES = \
@@ -40,30 +31,10 @@ libinventory_ser_la_SOURCES = \
 	inventory/ext-module.h \
 	inventory/ext-script.c
 
-libskills_ser_la_LIBADD = $(LIBADD)
-libskills_ser_la_SOURCES = \
-	skills/ext-module.c \
-	skills/ext-module.h \
-	skills/ext-skill.c \
-	skills/ext-skill.h \
-	skills/ext-skills.c \
-	skills/ext-skills.h \
-	skills/ext-script.c
-
-libslots_ser_la_LIBADD = $(LIBADD)
-libslots_ser_la_SOURCES = \
-	slots/ext-module.c \
-	slots/ext-module.h \
-	slots/ext-script.c \
-	slots/ext-slots.c \
-	slots/ext-slots.h
-
 libvoxel_ser_la_LIBADD = $(LIBADD)
 libvoxel_ser_la_SOURCES = \
 	voxel/ext-block.c \
 	voxel/ext-block.h \
-	voxel/ext-listener.c \
-	voxel/ext-listener.h \
 	voxel/ext-module.c \
 	voxel/ext-module.h \
 	voxel/ext-script.c

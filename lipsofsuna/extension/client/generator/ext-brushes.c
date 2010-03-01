@@ -142,9 +142,6 @@ static void
 private_resize_brush (LIExtBrushes* self);
 
 static void
-private_rebuild_brush (LIExtBrushes* self);
-
-static void
 private_rebuild_preview (LIExtBrushes* self);
 
 static void
@@ -1247,7 +1244,7 @@ private_transform (LIExtBrushes*   self,
 	}
 	else if (row->type == LIEXT_BRUSHES_ROWTYPE_BRUSH)
 	{
-		private_rebuild_brush (self);
+#warning Transforming brush contents not implemented
 		return;
 	}
 	private_rebuild_preview (self);
@@ -1313,54 +1310,6 @@ private_resize_brush (LIExtBrushes* self)
 	y = LIMAT_MAX (1, y);
 	z = LIMAT_MAX (1, z);
 	ligen_brush_set_size (data->brush, x, y, z);
-
-	/* Rebuild preview. */
-	private_rebuild_preview (self);
-}
-
-static void
-private_rebuild_brush (LIExtBrushes* self)
-{
-	int x;
-	int y;
-	int z;
-	LIEngObject* player;
-	LIExtBrushesTreerow* data;
-	LIGenBrush* brush;
-	LIMatTransform transform;
-	LIMatTransform transform0;
-	LIMatTransform transform1;
-	LIWdgTreerow* row;
-
-	/* Find the brush. */
-	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-	if (row == NULL)
-		return;
-	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
-	assert (data->brush != NULL); 
-	brush = data->brush;
-
-	/* Find the player. */
-	if (self->module->client->network == NULL)
-		return;
-	player = licli_client_get_player (self->module->client);
-	if (player == NULL)
-		return;
-
-	/* Copy voxels from the scene. */
-	lieng_object_get_transform (player, &transform0);
-	liext_preview_get_transform (LIEXT_PREVIEW (self->widgets.preview), &transform1);
-	transform = limat_transform_multiply (transform1, transform0);
-	transform = limat_transform_multiply (transform, self->transform);
-	x = (int)(round (transform.position.x / LIVOX_TILE_WIDTH));
-	y = (int)(round (transform.position.y / LIVOX_TILE_WIDTH));
-	z = (int)(round (transform.position.z / LIVOX_TILE_WIDTH));
-#warning Brush rebuilding is broken.
-#if 0
-	livox_manager_copy_voxels (self->module->client->voxels, x, y, z,
-		brush->size[0], brush->size[1], brush->size[2], brush->voxels.array);
-#endif
 
 	/* Rebuild preview. */
 	private_rebuild_preview (self);

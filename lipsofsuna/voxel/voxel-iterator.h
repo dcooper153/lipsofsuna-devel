@@ -50,7 +50,7 @@ struct _LIVoxBlockIter
  * \param manager Voxel manager.
  */
 #define LIVOX_FOREACH_BLOCK(iter, manager) \
-	for (livox_block_iter_first (&iter, manager, NULL, NULL) ; \
+	for (livox_block_iter_first (&iter, manager, NULL) ; \
 	     iter.block != NULL ; \
 	     livox_block_iter_next (&iter))
 

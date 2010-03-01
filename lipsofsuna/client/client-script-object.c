@@ -54,6 +54,51 @@ static void Object_emit_particles (LIScrArgs* args)
 		liren_object_emit_particles (render);
 }
 
+/* @luadoc
+ * ---
+ * -- Creates a new object.
+ * --
+ * -- Arguments:
+ * -- id: Create with an explicit ID.
+ * --
+ * -- @param self Object class.
+ * -- @param args Arguments.
+ * -- @return New object.
+ * function Object.new(self, args)
+ */
+static void Object_new (LIScrArgs* args)
+{
+	int id;
+	int realize = 0;
+	LIEngObject* self;
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	liscr_script_set_gc (program->script, 0);
+
+	/* Allocate self. */
+	if (liscr_args_gets_int (args, "id", &id))
+	{
+		self = lieng_engine_find_object (program->engine, id);
+		if (self == NULL)
+			self = lieng_object_new (program->engine, NULL, LIPHY_CONTROL_MODE_STATIC, id);
+	}
+	else
+		self = lieng_object_new (program->engine, NULL, LIPHY_CONTROL_MODE_STATIC, 0);
+	if (self == NULL)
+	{
+		liscr_script_set_gc (program->script, 1);
+		return;
+	}
+
+	/* Initialize userdata. */
+	liscr_args_call_setters_except (args, self->script, "realized");
+	liscr_args_gets_bool (args, "realized", &realize);
+	liscr_args_seti_data (args, self->script);
+	lieng_object_set_realized (self, realize);
+	liscr_script_set_gc (program->script, 1);
+}
+
 /*****************************************************************************/
 
 void
@@ -61,6 +106,7 @@ licli_script_object (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_inherit (self, liscr_script_object, data);
+	liscr_class_insert_cfunc (self, "new", Object_new);
 	liscr_class_insert_mfunc (self, "emit_particles", Object_emit_particles);
 }
 

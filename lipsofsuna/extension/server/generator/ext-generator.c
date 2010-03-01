@@ -28,7 +28,7 @@
 
 static int
 private_client_packet (LIExtGenerator* self,
-                       LISerClient*    client,
+                       LIEngObject*    client,
                        LIArcReader*    packet);
 
 /*****************************************************************************/
@@ -62,8 +62,8 @@ liext_generator_free (LIExtGenerator* self)
 
 static int
 private_client_packet (LIExtGenerator* self,
-	                   LISerClient*    client,
-	                   LIArcReader*    packet)
+                       LIEngObject*    client,
+                       LIArcReader*    packet)
 {
 	uint8_t cmd;
 	uint32_t id;
@@ -92,8 +92,7 @@ private_client_packet (LIExtGenerator* self,
 			model = lieng_engine_find_model_by_code (self->server->engine, id);
 			if (model == NULL)
 				return 1;
-			object = lieng_object_new (self->server->engine, model, LIPHY_CONTROL_MODE_STATIC,
-				liser_server_get_unique_object (self->server));
+			object = lieng_object_new (self->server->engine, model, LIPHY_CONTROL_MODE_STATIC, 0);
 			if (object == NULL)
 				return 1;
 			lieng_object_set_collision_group (object, LIPHY_GROUP_STATICS);

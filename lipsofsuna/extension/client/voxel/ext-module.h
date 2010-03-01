@@ -40,7 +40,7 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LIAlgMemdic* blocks;
-	LICalHandle calls[4];
+	LICalHandle calls[3];
 	LICliClient* client;
 	LIVoxManager* voxels;
 };
@@ -65,7 +65,7 @@ liext_module_clear_all (LIExtModule* self);
 
 void
 liext_script_voxel (LIScrClass* self,
-                  void*       data);
+                    void*       data);
 
 #endif
 

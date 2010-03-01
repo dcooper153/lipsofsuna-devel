@@ -36,6 +36,39 @@
 
 /* @luadoc
  * ---
+ * -- Plays a sound effect.
+ * --
+ * -- Arguments.
+ * -- effect: Sample string. (required)
+ * -- object: Object. (required)
+ * --
+ * -- @param self Sound class.
+ * -- @param args Arguments.
+ */
+static void Sound_effect (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	int flags = 0;
+	const char* effect;
+	LIEngObject* object;
+	LIEngSample* sample;
+	LIExtModule* module;
+	LIScrData* data;
+
+	if (liscr_args_gets_string (args, "effect", &effect) &&
+	    liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+	{
+		object = data->data;
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		sample = lieng_resources_find_sample_by_name (module->client->engine->resources, effect);
+		if (sample != NULL)
+			liext_module_set_effect (module, object->id, sample->id, flags);
+	}
+#endif
+}
+
+/* @luadoc
+ * ---
  * -- Music track name.
  * -- @name Sound.music
  * -- @class table
@@ -81,6 +114,7 @@ liext_script_sound (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
+	liscr_class_insert_cfunc (self, "effect", Sound_effect);
 	liscr_class_insert_cvar (self, "music", NULL, Sound_setter_music);
 	liscr_class_insert_cvar (self, "music_volume", NULL, Sound_setter_music_volume);
 }

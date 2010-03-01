@@ -6,14 +6,12 @@ extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
 	libcamera-cli.la \
 	libchat-cli.la \
-	libeditor-cli.la \
 	libeffect-cli.la \
 	libevents-cli.la \
 	libgenerator-cli.la \
 	liboptions-cli.la \
 	libpackager-cli.la \
 	libreload-cli.la \
-	libskills-cli.la \
 	libslots-cli.la \
 	libsound-cli.la \
 	libspeech-cli.la \
@@ -98,20 +96,11 @@ libreload_cli_la_SOURCES = \
 	reload/ext-reload.h \
 	reload/ext-script.c
 
-libskills_cli_la_LIBADD = $(LIBADD)
-libskills_cli_la_SOURCES = \
-	skills/ext-module.c \
-	skills/ext-module.h \
-	skills/ext-script.c \
-	skills/ext-skills.c \
-	skills/ext-skills.h \
-	skills/ext-widget.c \
-	skills/ext-widget.h
-
 libslots_cli_la_LIBADD = $(LIBADD)
 libslots_cli_la_SOURCES = \
 	slots/ext-module.c \
 	slots/ext-module.h \
+	slots/ext-script.c \
 	slots/ext-slot.c \
 	slots/ext-slot.h \
 	slots/ext-slots.c \

@@ -28,11 +28,6 @@
 
 #ifndef LI_DISABLE_SOUND
 static int
-private_packet (LIExtModule* self,
-                int          type,
-                LIArcReader* reader);
-
-static int
 private_tick (LIExtModule* self,
               float        secs);
 #endif
@@ -77,8 +72,7 @@ liext_module_new (LIMaiProgram* program)
 		printf ("WARNING: cannot initialize sound\n");
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "packet", 1, private_packet, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 0))
 	{
 		liext_module_free (self);
 		return NULL;
@@ -323,29 +317,6 @@ liext_object_free (LIExtObject* self)
 
 #ifndef LI_DISABLE_SOUND
 static int
-private_packet (LIExtModule* self,
-                int          type,
-                LIArcReader* reader)
-{
-	uint32_t id;
-	uint16_t effect;
-	uint16_t flags;
-
-	reader->pos = 1;
-	if (type == LINET_SERVER_PACKET_OBJECT_EFFECT)
-	{
-		if (!liarc_reader_get_uint32 (reader, &id) ||
-			!liarc_reader_get_uint16 (reader, &effect) ||
-			!liarc_reader_get_uint16 (reader, &flags) ||
-			!liarc_reader_check_end (reader))
-			return 1;
-		liext_module_set_effect (self, id, effect, flags);
-	}
-
-	return 1;
-}
-
-static int
 private_tick (LIExtModule* self,
               float        secs)
 {
@@ -362,15 +333,12 @@ private_tick (LIExtModule* self,
 	LISndSource* source;
 
 	/* Update listener position. */
-	engobj = licli_client_get_player (self->client);
-	if (engobj != NULL && self->client->network != NULL)
-	{
-		lieng_object_get_transform (engobj, &transform);
-		lieng_object_get_velocity (engobj, &velocity);
-		direction = limat_quaternion_get_basis (transform.rotation, 2);
-		up = limat_quaternion_get_basis (transform.rotation, 1);
-		lisnd_system_set_listener (self->system, &transform.position, &velocity, &direction, &up);
-	}
+	lialg_camera_get_transform (self->client->camera, &transform);
+#warning Camera velocity is needed by doppler effects
+	velocity = limat_vector_init (0.0f, 0.0f, 0.0f);
+	direction = limat_quaternion_get_basis (transform.rotation, 2);
+	up = limat_quaternion_get_basis (transform.rotation, 1);
+	lisnd_system_set_listener (self->system, &transform.position, &velocity, &direction, &up);
 
 	/* Update sound effects. */
 	LIALG_U32DIC_FOREACH (iter, self->objects)

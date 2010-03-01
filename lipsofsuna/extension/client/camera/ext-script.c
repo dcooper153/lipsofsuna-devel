@@ -282,6 +282,60 @@ static void Camera_getter_rotation (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 
+/* @luadoc
+ * ---
+ * -- The position of the target of third person camera.
+ * -- @name Camera.center
+ * -- @class table
+ */
+static void Camera_setter_target_position (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatTransform transform;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+	transform = limat_transform_identity ();
+	lialg_camera_get_center (module->client->camera, &transform);
+	liscr_args_geti_vector (args, 0, &transform.position);
+	lialg_camera_set_center (module->client->camera, &transform);
+}
+static void Camera_getter_target_position (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatTransform transform;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+	lialg_camera_get_center (module->client->camera, &transform);
+	liscr_args_seti_vector (args, &transform.position);
+}
+
+/* @luadoc
+ * ---
+ * -- The rotation of the target of third person camera.
+ * -- @name Camera.center
+ * -- @class table
+ */
+static void Camera_setter_target_rotation (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatTransform transform;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+	transform = limat_transform_identity ();
+	lialg_camera_get_center (module->client->camera, &transform);
+	liscr_args_geti_quaternion (args, 0, &transform.rotation);
+	lialg_camera_set_center (module->client->camera, &transform);
+}
+static void Camera_getter_target_rotation (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatTransform transform;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+	lialg_camera_get_center (module->client->camera, &transform);
+	liscr_args_seti_quaternion (args, &transform.rotation);
+}
+
 /*****************************************************************************/
 
 void
@@ -299,6 +353,8 @@ liext_script_camera (LIScrClass* self,
 	liscr_class_insert_cvar (self, "near", NULL, Camera_setter_near);
 	liscr_class_insert_cvar (self, "position", Camera_getter_position, NULL);
 	liscr_class_insert_cvar (self, "rotation", Camera_getter_rotation, NULL);
+	liscr_class_insert_cvar (self, "target_position", Camera_getter_target_position, Camera_setter_target_position);
+	liscr_class_insert_cvar (self, "target_rotation", Camera_getter_target_rotation, Camera_setter_target_rotation);
 }
 
 /** @} */
