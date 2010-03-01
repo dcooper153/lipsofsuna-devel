@@ -679,7 +679,6 @@ private_paint_terrain (LIExtBrushes* self,
 		liext_preview_copy_voxels (LIEXT_PREVIEW (self->widgets.preview), 0, 0, 0,
 			data->brush->size[0], data->brush->size[1], data->brush->size[2],
 			data->brush->voxels.array);
-		private_rebuild_preview (self);
 	}
 
 	return 0;
