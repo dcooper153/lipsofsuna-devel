@@ -53,7 +53,7 @@ main (int argc, char** argv)
 
 	/* Allocate sectors. */
 #warning Hardcoded sector size
-	sectors = lialg_sectors_new (256, 64.0f);
+	sectors = lialg_sectors_new (128, 32.0f);
 	if (sectors == NULL)
 	{
 		lisys_error_report ();

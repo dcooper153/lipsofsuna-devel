@@ -275,7 +275,7 @@ ligen_generator_main (LIGenGenerator* self)
 	}
 
 	/* Create root stroke. */
-	i = LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE * 255 / 2;
+	i = LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE * self->sectors->count / 2;
 	stroke.pos[0] = i - brush->size[0] / 2;
 	stroke.pos[1] = i - brush->size[1] / 2;
 	stroke.pos[2] = i - brush->size[2] / 2;

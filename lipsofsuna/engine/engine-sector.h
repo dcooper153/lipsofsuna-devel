@@ -31,9 +31,6 @@
 #include "engine.h"
 #include "engine-types.h"
 
-#define LIENG_SECTOR_WIDTH 64.0f
-#define LIENG_SECTORS_PER_LINE 256
-
 struct _LIEngSector
 {
 	uint8_t dirty;

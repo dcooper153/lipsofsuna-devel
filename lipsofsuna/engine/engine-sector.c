@@ -134,11 +134,13 @@ void
 lieng_sector_get_bounds (const LIEngSector* self,
                          LIMatAabb*         result)
 {
+	float size;
 	LIMatVector min;
 	LIMatVector max;
 
+	size = self->sector->manager->width;
 	min = self->sector->position;
-	max = limat_vector_init (LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH, LIENG_SECTOR_WIDTH);
+	max = limat_vector_init (size, size, size);
 	max = limat_vector_add (min, max);
 	limat_aabb_init_from_points (result, &min, &max);
 }

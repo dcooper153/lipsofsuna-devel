@@ -160,7 +160,7 @@ livox_voxel_iter_first (LIVoxVoxelIter* self,
 		tiles->maxx / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
 		tiles->maxy / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
 		tiles->maxz / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
-	self->range0 = lialg_range_clamp (self->range0, 0, 255);
+	self->range0 = lialg_range_clamp (self->range0, 0, voxels->sectors->count - 1);
 
 	/* Find first valid sector. */
 	if (!lialg_range_iter_first (&self->rangei0, &self->range0))

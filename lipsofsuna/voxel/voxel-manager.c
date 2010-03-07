@@ -186,9 +186,9 @@ livox_manager_copy_voxels (LIVoxManager* self,
 		tx = x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		ty = y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 		tz = z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		if (sx < 0 || sx >= LIVOX_SECTORS_PER_LINE || tx < 0 ||
-		    sy < 0 || sy >= LIVOX_SECTORS_PER_LINE || ty < 0 ||
-		    sz < 0 || sz >= LIVOX_SECTORS_PER_LINE || tz < 0)
+		if (sx < 0 || sx >= self->sectors->count || tx < 0 ||
+		    sy < 0 || sy >= self->sectors->count || ty < 0 ||
+		    sz < 0 || sz >= self->sectors->count || tz < 0)
 		{
 			livox_voxel_init (result + i, 1);
 			continue;

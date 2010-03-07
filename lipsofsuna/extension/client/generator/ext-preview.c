@@ -27,7 +27,7 @@
 #include "ext-preview.h"
 #include "ext-block.h"
 
-#define LIEXT_PREVIEW_CENTER 8160
+#define LIEXT_PREVIEW_CENTER 1024
 #define LIEXT_PREVIEW_PAN 0.3f
 
 enum
