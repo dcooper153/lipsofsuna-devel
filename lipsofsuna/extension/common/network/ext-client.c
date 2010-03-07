@@ -71,6 +71,7 @@ liext_client_free (LIExtClient* self)
 	if (self->object != NULL)
 	{
 		lical_callbacks_call (self->module->program->engine->callbacks, self->module->program->engine, "client-logout", lical_marshal_DATA_PTR, self->object);
+		lialg_u32dic_remove (self->module->objects, self->object->id);
 		lieng_object_ref (self->object, -1);
 	}
 

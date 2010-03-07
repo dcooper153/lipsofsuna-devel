@@ -65,6 +65,10 @@ private_rename (LIExtModule*     self,
                 grapple_message* message);
 
 static int
+private_object_free (LIExtModule* self,
+                     LIEngObject* object);
+
+static int
 private_update (LIExtModule* self,
                 float        secs);
 
@@ -89,9 +93,10 @@ liext_module_new (LIMaiProgram* program)
 	self->program = program;
 
 	/* Connect callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_update, self, self->calls))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-free", 0, private_object_free, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_update, self, self->calls + 1))
 	{
-		lisys_free (self);
+		liext_module_free (self);
 		return NULL;
 	}
 
@@ -689,6 +694,30 @@ private_rename (LIExtModule*     self,
 		return 0;
 
 	/* Not allowed. */
+	return 0;
+}
+
+static int
+private_object_free (LIExtModule* self,
+                     LIEngObject* object)
+{
+	LIExtClient* client;
+
+	/* Get the client. */
+	client = liext_module_find_client_by_object (self, object->id);
+	if (client == NULL)
+		return 0;
+
+	/* Avoid freeing the object again. */
+	if (client->object != NULL)
+	{
+		lialg_u32dic_remove (self->objects, client->object->id);
+		client->object = NULL;
+	}
+
+	/* Free client info. */
+	liext_client_free (client);
+
 	return 0;
 }
 
