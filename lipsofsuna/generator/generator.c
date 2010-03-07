@@ -165,6 +165,32 @@ ligen_generator_find_brush (LIGenGenerator* self,
 }
 
 /**
+ * \brief Finds a brush by name.
+ *
+ * \param self Generator.
+ * \param name Brush name.
+ * \return Brush or NULL.
+ */
+LIGenBrush*
+ligen_generator_find_brush_by_name (LIGenGenerator* self,
+                                    const char*     name)
+{
+	LIAlgU32dicIter iter;
+	LIGenBrush* brush;
+
+	/* Find root brush. */
+	/* TODO: Dictionary would be faster. */
+	LIALG_U32DIC_FOREACH (iter, self->brushes)
+	{
+		brush = iter.value;
+		if (!strcmp (brush->name, name))
+			return brush;
+	}
+
+	return NULL;
+}
+
+/**
  * \brief Inserts a brush to the generator.
  *
  * The ownership of the brush is transferred to the generator if successful.
@@ -252,23 +278,12 @@ int
 ligen_generator_main (LIGenGenerator* self)
 {
 	int i;
-	int found = 0;
-	LIAlgU32dicIter iter;
-	LIGenBrush* brush = NULL;
+	LIGenBrush* brush;
 	LIGenStroke stroke;
 
 	/* Find root brush. */
-	/* TODO: Dictionary would be faster. */
-	LIALG_U32DIC_FOREACH (iter, self->brushes)
-	{
-		brush = iter.value;
-		if (!strcmp (brush->name, "root"))
-		{
-			found = 1;
-			break;
-		}
-	}
-	if (!found)
+	brush = ligen_generator_find_brush_by_name (self, "root");
+	if (brush == NULL)
 	{
 		lisys_error_set (EINVAL, "cannot find `root' brush");
 		return 0;

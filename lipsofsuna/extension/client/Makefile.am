@@ -32,14 +32,6 @@ libchat_cli_la_SOURCES = \
 	chat/ext-module.h \
 	chat/ext-script.c
 
-libeditor_cli_la_LIBADD = $(LIBADD)
-libeditor_cli_la_SOURCES = \
-	editor/ext-editor.c \
-	editor/ext-editor.h \
-	editor/ext-module.c \
-	editor/ext-module.h \
-	editor/ext-script.c
-
 libeffect_cli_la_LIBADD = $(LIBADD)
 libeffect_cli_la_SOURCES = \
 	effect/ext-module.c \

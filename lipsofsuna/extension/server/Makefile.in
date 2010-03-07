@@ -83,10 +83,6 @@ libevents_ser_la_OBJECTS = $(am_libevents_ser_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-libgenerator_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
-am_libgenerator_ser_la_OBJECTS = generator/ext-generator.lo \
-	generator/ext-module.lo generator/ext-script.lo
-libgenerator_ser_la_OBJECTS = $(am_libgenerator_ser_la_OBJECTS)
 libinventory_ser_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libinventory_ser_la_OBJECTS = inventory/ext-inventory.lo \
 	inventory/ext-module.lo inventory/ext-script.lo
@@ -121,11 +117,10 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libevents_ser_la_SOURCES) $(libgenerator_ser_la_SOURCES) \
-	$(libinventory_ser_la_SOURCES) $(libvoxel_ser_la_SOURCES)
-DIST_SOURCES = $(libevents_ser_la_SOURCES) \
-	$(libgenerator_ser_la_SOURCES) $(libinventory_ser_la_SOURCES) \
+SOURCES = $(libevents_ser_la_SOURCES) $(libinventory_ser_la_SOURCES) \
 	$(libvoxel_ser_la_SOURCES)
+DIST_SOURCES = $(libevents_ser_la_SOURCES) \
+	$(libinventory_ser_la_SOURCES) $(libvoxel_ser_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -305,7 +300,6 @@ AM_LDFLAGS = -module -avoid-version -no-undefined
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
 	libevents-ser.la \
-	libgenerator-ser.la \
 	libinventory-ser.la \
 	libvoxel-ser.la
 
@@ -314,14 +308,6 @@ libevents_ser_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
-
-libgenerator_ser_la_LIBADD = $(LIBADD)
-libgenerator_ser_la_SOURCES = \
-	generator/ext-generator.c \
-	generator/ext-generator.h \
-	generator/ext-module.c \
-	generator/ext-module.h \
-	generator/ext-script.c
 
 libinventory_ser_la_LIBADD = $(LIBADD)
 libinventory_ser_la_SOURCES = \
@@ -416,20 +402,6 @@ events/ext-script.lo: events/$(am__dirstamp) \
 	events/$(DEPDIR)/$(am__dirstamp)
 libevents-ser.la: $(libevents_ser_la_OBJECTS) $(libevents_ser_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libevents_ser_la_OBJECTS) $(libevents_ser_la_LIBADD) $(LIBS)
-generator/$(am__dirstamp):
-	@$(MKDIR_P) generator
-	@: > generator/$(am__dirstamp)
-generator/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) generator/$(DEPDIR)
-	@: > generator/$(DEPDIR)/$(am__dirstamp)
-generator/ext-generator.lo: generator/$(am__dirstamp) \
-	generator/$(DEPDIR)/$(am__dirstamp)
-generator/ext-module.lo: generator/$(am__dirstamp) \
-	generator/$(DEPDIR)/$(am__dirstamp)
-generator/ext-script.lo: generator/$(am__dirstamp) \
-	generator/$(DEPDIR)/$(am__dirstamp)
-libgenerator-ser.la: $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libgenerator_ser_la_OBJECTS) $(libgenerator_ser_la_LIBADD) $(LIBS)
 inventory/$(am__dirstamp):
 	@$(MKDIR_P) inventory
 	@: > inventory/$(am__dirstamp)
@@ -465,12 +437,6 @@ mostlyclean-compile:
 	-rm -f events/ext-module.lo
 	-rm -f events/ext-script.$(OBJEXT)
 	-rm -f events/ext-script.lo
-	-rm -f generator/ext-generator.$(OBJEXT)
-	-rm -f generator/ext-generator.lo
-	-rm -f generator/ext-module.$(OBJEXT)
-	-rm -f generator/ext-module.lo
-	-rm -f generator/ext-script.$(OBJEXT)
-	-rm -f generator/ext-script.lo
 	-rm -f inventory/ext-inventory.$(OBJEXT)
 	-rm -f inventory/ext-inventory.lo
 	-rm -f inventory/ext-module.$(OBJEXT)
@@ -489,9 +455,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@events/$(DEPDIR)/ext-script.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-generator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@inventory/$(DEPDIR)/ext-inventory.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@inventory/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@inventory/$(DEPDIR)/ext-script.Plo@am__quote@
@@ -532,7 +495,6 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf events/.libs events/_libs
-	-rm -rf generator/.libs generator/_libs
 	-rm -rf inventory/.libs inventory/_libs
 	-rm -rf voxel/.libs voxel/_libs
 
@@ -648,8 +610,6 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f events/$(DEPDIR)/$(am__dirstamp)
 	-rm -f events/$(am__dirstamp)
-	-rm -f generator/$(DEPDIR)/$(am__dirstamp)
-	-rm -f generator/$(am__dirstamp)
 	-rm -f inventory/$(DEPDIR)/$(am__dirstamp)
 	-rm -f inventory/$(am__dirstamp)
 	-rm -f voxel/$(DEPDIR)/$(am__dirstamp)
@@ -664,7 +624,7 @@ clean-am: clean-extLTLIBRARIES clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf events/$(DEPDIR) generator/$(DEPDIR) inventory/$(DEPDIR) voxel/$(DEPDIR)
+	-rm -rf events/$(DEPDIR) inventory/$(DEPDIR) voxel/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -710,7 +670,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf events/$(DEPDIR) generator/$(DEPDIR) inventory/$(DEPDIR) voxel/$(DEPDIR)
+	-rm -rf events/$(DEPDIR) inventory/$(DEPDIR) voxel/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

@@ -83,6 +83,10 @@ libcreature_la_OBJECTS = $(am_libcreature_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+libgenerator_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
+am_libgenerator_la_OBJECTS = generator/ext-module.lo \
+	generator/ext-script.lo
+libgenerator_la_OBJECTS = $(am_libgenerator_la_OBJECTS)
 libnetwork_la_DEPENDENCIES = $(am__DEPENDENCIES_2)
 am_libnetwork_la_OBJECTS = network/ext-module.lo network/ext-client.lo \
 	network/ext-script.lo
@@ -125,12 +129,12 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libcreature_la_SOURCES) $(libnetwork_la_SOURCES) \
-	$(libnpc_la_SOURCES) $(libskeleton_la_SOURCES) \
-	$(libspawner_la_SOURCES)
-DIST_SOURCES = $(libcreature_la_SOURCES) $(libnetwork_la_SOURCES) \
-	$(libnpc_la_SOURCES) $(libskeleton_la_SOURCES) \
-	$(libspawner_la_SOURCES)
+SOURCES = $(libcreature_la_SOURCES) $(libgenerator_la_SOURCES) \
+	$(libnetwork_la_SOURCES) $(libnpc_la_SOURCES) \
+	$(libskeleton_la_SOURCES) $(libspawner_la_SOURCES)
+DIST_SOURCES = $(libcreature_la_SOURCES) $(libgenerator_la_SOURCES) \
+	$(libnetwork_la_SOURCES) $(libnpc_la_SOURCES) \
+	$(libskeleton_la_SOURCES) $(libspawner_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -311,6 +315,7 @@ EXTRA_DIST = skeleton/mkext.sh
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
 	libcreature.la \
+	libgenerator.la \
 	libnetwork.la \
 	libnpc.la \
 	libskeleton.la \
@@ -323,6 +328,12 @@ libcreature_la_SOURCES = \
 	creature/ext-module.c \
 	creature/ext-module.h \
 	creature/ext-script.c
+
+libgenerator_la_LIBADD = $(LIBADD)
+libgenerator_la_SOURCES = \
+	generator/ext-module.c \
+	generator/ext-module.h \
+	generator/ext-script.c
 
 libnetwork_la_LIBADD = $(LIBADD)
 libnetwork_la_SOURCES = \
@@ -433,6 +444,18 @@ creature/ext-script.lo: creature/$(am__dirstamp) \
 	creature/$(DEPDIR)/$(am__dirstamp)
 libcreature.la: $(libcreature_la_OBJECTS) $(libcreature_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libcreature_la_OBJECTS) $(libcreature_la_LIBADD) $(LIBS)
+generator/$(am__dirstamp):
+	@$(MKDIR_P) generator
+	@: > generator/$(am__dirstamp)
+generator/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) generator/$(DEPDIR)
+	@: > generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-module.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
+generator/ext-script.lo: generator/$(am__dirstamp) \
+	generator/$(DEPDIR)/$(am__dirstamp)
+libgenerator.la: $(libgenerator_la_OBJECTS) $(libgenerator_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(LINK) -rpath $(extdir) $(libgenerator_la_OBJECTS) $(libgenerator_la_LIBADD) $(LIBS)
 network/$(am__dirstamp):
 	@$(MKDIR_P) network
 	@: > network/$(am__dirstamp)
@@ -493,6 +516,10 @@ mostlyclean-compile:
 	-rm -f creature/ext-module.lo
 	-rm -f creature/ext-script.$(OBJEXT)
 	-rm -f creature/ext-script.lo
+	-rm -f generator/ext-module.$(OBJEXT)
+	-rm -f generator/ext-module.lo
+	-rm -f generator/ext-script.$(OBJEXT)
+	-rm -f generator/ext-script.lo
 	-rm -f network/ext-client.$(OBJEXT)
 	-rm -f network/ext-client.lo
 	-rm -f network/ext-module.$(OBJEXT)
@@ -522,6 +549,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-creature.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@creature/$(DEPDIR)/ext-script.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@generator/$(DEPDIR)/ext-script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@network/$(DEPDIR)/ext-client.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@network/$(DEPDIR)/ext-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@network/$(DEPDIR)/ext-script.Plo@am__quote@
@@ -567,6 +596,7 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf creature/.libs creature/_libs
+	-rm -rf generator/.libs generator/_libs
 	-rm -rf network/.libs network/_libs
 	-rm -rf npc/.libs npc/_libs
 	-rm -rf skeleton/.libs skeleton/_libs
@@ -684,6 +714,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f creature/$(DEPDIR)/$(am__dirstamp)
 	-rm -f creature/$(am__dirstamp)
+	-rm -f generator/$(DEPDIR)/$(am__dirstamp)
+	-rm -f generator/$(am__dirstamp)
 	-rm -f network/$(DEPDIR)/$(am__dirstamp)
 	-rm -f network/$(am__dirstamp)
 	-rm -f npc/$(DEPDIR)/$(am__dirstamp)
@@ -702,7 +734,7 @@ clean-am: clean-extLTLIBRARIES clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf creature/$(DEPDIR) network/$(DEPDIR) npc/$(DEPDIR) skeleton/$(DEPDIR) spawner/$(DEPDIR)
+	-rm -rf creature/$(DEPDIR) generator/$(DEPDIR) network/$(DEPDIR) npc/$(DEPDIR) skeleton/$(DEPDIR) spawner/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -748,7 +780,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf creature/$(DEPDIR) network/$(DEPDIR) npc/$(DEPDIR) skeleton/$(DEPDIR) spawner/$(DEPDIR)
+	-rm -rf creature/$(DEPDIR) generator/$(DEPDIR) network/$(DEPDIR) npc/$(DEPDIR) skeleton/$(DEPDIR) spawner/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

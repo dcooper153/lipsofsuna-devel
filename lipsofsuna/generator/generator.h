@@ -72,6 +72,10 @@ LIGenBrush*
 ligen_generator_find_brush (LIGenGenerator* self,
                             int             id);
 
+LIGenBrush*
+ligen_generator_find_brush_by_name (LIGenGenerator* self,
+                                    const char*     name);
+
 int
 ligen_generator_insert_brush (LIGenGenerator* self,
                               LIGenBrush*     brush);

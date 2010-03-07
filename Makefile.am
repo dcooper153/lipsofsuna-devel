@@ -589,9 +589,9 @@ build_bin_lipsofsuna_server_LDADD = \
 	$(LUA_LIBS) $(GRAPPLE_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) \
 	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS) $(LISRV_LIBS)
 build_bin_lipsofsuna_server_SOURCES = lipsofsuna/server/server-main.c \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(maisrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(voxsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(maisrc) \
+	$(matsrc) $(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
 build_bin_lipsofsuna_viewer_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_viewer_LDADD = \

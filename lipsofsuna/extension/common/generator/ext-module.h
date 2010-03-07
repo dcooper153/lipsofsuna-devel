@@ -22,23 +22,34 @@
  * @{
  */
 
-#ifndef __EXT_GENERATOR_H__
-#define __EXT_GENERATOR_H__
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/main.h>
+#include <lipsofsuna/generator.h>
 
-typedef struct _LIExtGenerator LIExtGenerator;
-struct _LIExtGenerator
+#define LIEXT_SCRIPT_GENERATOR "Generator"
+
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	LISerServer* server;
-	LICalHandle calls[1];
+	LIAlgSectors* sectors;
+	LICalCallbacks* callbacks;
+	LIGenGenerator* generator;
+	LIMaiProgram* program;
 };
 
-LIExtGenerator*
-liext_generator_new (LISerServer* server);
+LIExtModule*
+liext_module_new (LIMaiProgram* program);
 
 void
-liext_generator_free (LIExtGenerator* self);
+liext_module_free (LIExtModule* self);
+
+/*****************************************************************************/
+
+void
+liext_script_generator (LIScrClass* self,
+                        void*       data);
 
 #endif
 

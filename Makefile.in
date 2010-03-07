@@ -335,11 +335,11 @@ build_bin_lipsofsuna_import_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am_build_bin_lipsofsuna_server_OBJECTS =  \
 	lipsofsuna/server/server-main.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_5) \
-	$(am__objects_9) $(am__objects_11) $(am__objects_12) \
-	$(am__objects_13) $(am__objects_14) $(am__objects_15) \
-	$(am__objects_17) $(am__objects_20) $(am__objects_23) \
-	$(am__objects_21) $(am__objects_24) $(am__objects_25) \
-	$(am__objects_27)
+	$(am__objects_9) $(am__objects_8) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15) $(am__objects_17) $(am__objects_20) \
+	$(am__objects_23) $(am__objects_21) $(am__objects_24) \
+	$(am__objects_25) $(am__objects_27)
 build_bin_lipsofsuna_server_OBJECTS =  \
 	$(am_build_bin_lipsofsuna_server_OBJECTS)
 build_bin_lipsofsuna_server_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -1273,9 +1273,9 @@ build_bin_lipsofsuna_server_LDADD = \
 	$(ZLIB_LIBS) $(LIPS_LIBS) $(PTHREAD_LIBS) $(LISRV_LIBS)
 
 build_bin_lipsofsuna_server_SOURCES = lipsofsuna/server/server-main.c \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(maisrc) $(matsrc) \
-	$(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) $(strsrc) \
-	$(syssrc) $(thrsrc) $(voxsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(maisrc) \
+	$(matsrc) $(mdlsrc) $(netsrc) $(physrc) $(pthsrc) $(scrsrc) $(srvsrc) \
+	$(strsrc) $(syssrc) $(thrsrc) $(voxsrc)
 
 build_bin_lipsofsuna_viewer_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_viewer_LDADD = \

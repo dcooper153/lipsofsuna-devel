@@ -5,7 +5,6 @@ AM_LDFLAGS = -module -avoid-version -no-undefined
 extdir = $(EXTSDIR)
 ext_LTLIBRARIES = \
 	libevents-ser.la \
-	libgenerator-ser.la \
 	libinventory-ser.la \
 	libvoxel-ser.la
 
@@ -14,14 +13,6 @@ libevents_ser_la_SOURCES = \
 	events/ext-module.c \
 	events/ext-module.h \
 	events/ext-script.c
-
-libgenerator_ser_la_LIBADD = $(LIBADD)
-libgenerator_ser_la_SOURCES = \
-	generator/ext-generator.c \
-	generator/ext-generator.h \
-	generator/ext-module.c \
-	generator/ext-module.h \
-	generator/ext-script.c
 
 libinventory_ser_la_LIBADD = $(LIBADD)
 libinventory_ser_la_SOURCES = \

@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/server.h>
-#include "ext-generator.h"
+#include <lipsofsuna/main.h>
 #include "ext-module.h"
 
 LIMaiExtensionInfo liext_info =
@@ -38,17 +37,37 @@ liext_module_new (LIMaiProgram* program)
 {
 	LIExtModule* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->server = limai_program_find_component (program, "server");
-	self->generator = liext_generator_new (self->server);
-	if (self->generator == NULL)
+	self->program = program;
+
+	/* Allocate callbacks. */
+	self->callbacks = lical_callbacks_new ();
+	if (self->callbacks == NULL)
 	{
-		lisys_free (self);
+		liext_module_free (self);
 		return NULL;
 	}
 
+	/* Allocate sectors. */
+	self->sectors = lialg_sectors_new (self->program->sectors->count, self->program->sectors->width);
+	if (self->sectors == NULL)
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Allocate generator. */
+	self->generator = ligen_generator_new (program->paths, self->callbacks, self->sectors);
+	if (self->generator == NULL)
+	{
+		liext_module_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
 	liscr_script_create_class (program->script, "Generator", liext_script_generator, self);
 
 	return self;
@@ -57,7 +76,12 @@ liext_module_new (LIMaiProgram* program)
 void
 liext_module_free (LIExtModule* self)
 {
-	liext_generator_free (self->generator);
+	if (self->generator != NULL)
+		ligen_generator_free (self->generator);
+	if (self->sectors != NULL)
+		lialg_sectors_free (self->sectors);
+	if (self->callbacks != NULL)
+		lical_callbacks_free (self->callbacks);
 	lisys_free (self);
 }
 
