@@ -1,0 +1,43 @@
+About Lips of Suna
+==================
+
+Lips of Suna is an online dungeon crawl game.
+
+Website: http://lipsofsuna.org/
+Forums: http://forum.freegamedev.net/viewforum.php?f=25
+Wiki: http://sourceforge.net/apps/trac/lipsofsuna/wiki/
+
+
+
+Installing the engine
+=====================
+
+To build the game, you need to have Python and the Waf build system installed,
+as well as a number of dependencies listed on the project wiki. Once you have
+all the requirements installed, build the game with the command:
+
+waf configure build install
+
+
+
+Installing the data files
+=========================
+
+If you downloaded a file release, you can skip this section. The data files are
+already in their right place and you can run the game right away.
+
+Otherwise, you need to download the data file originals from the data repository
+and import the files to the engine. Do this by running the following two commands
+in the directory where you compiled the game:
+
+git clone git://lipsofsuna.git.sourceforge.net/gitroot/lipsofsuna/data install/data
+install/lipsofsuna -i
+
+
+
+Running the game
+================
+
+To run the game, type:
+
+install/lipsofsuna
