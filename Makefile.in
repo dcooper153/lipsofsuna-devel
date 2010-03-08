@@ -212,6 +212,7 @@ am__objects_20 = lipsofsuna/script/script.$(OBJEXT) \
 	lipsofsuna/script/script-object.$(OBJEXT) \
 	lipsofsuna/script/script-packet.$(OBJEXT) \
 	lipsofsuna/script/script-path.$(OBJEXT) \
+	lipsofsuna/script/script-program.$(OBJEXT) \
 	lipsofsuna/script/script-quaternion.$(OBJEXT) \
 	lipsofsuna/script/script-util.$(OBJEXT) \
 	lipsofsuna/script/script-vector.$(OBJEXT)
@@ -303,10 +304,10 @@ build_bin_lipsofsuna_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am_build_bin_lipsofsuna_generator_OBJECTS =  \
 	lipsofsuna/generator/generator-main.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_5) \
-	$(am__objects_9) $(am__objects_8) $(am__objects_12) \
-	$(am__objects_13) $(am__objects_15) $(am__objects_17) \
-	$(am__objects_20) $(am__objects_21) $(am__objects_24) \
-	$(am__objects_25) $(am__objects_27)
+	$(am__objects_9) $(am__objects_8) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_15) \
+	$(am__objects_17) $(am__objects_20) $(am__objects_21) \
+	$(am__objects_24) $(am__objects_25) $(am__objects_27)
 build_bin_lipsofsuna_generator_OBJECTS =  \
 	$(am_build_bin_lipsofsuna_generator_OBJECTS)
 build_bin_lipsofsuna_generator_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -1061,6 +1062,7 @@ scrsrc = \
 	lipsofsuna/script/script-packet.c \
 	lipsofsuna/script/script-path.c \
 	lipsofsuna/script/script-private.h \
+	lipsofsuna/script/script-program.c \
 	lipsofsuna/script/script-quaternion.c \
 	lipsofsuna/script/script-util.c \
 	lipsofsuna/script/script-vector.c
@@ -1252,9 +1254,9 @@ build_bin_lipsofsuna_generator_LDADD = \
 	$(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 
 build_bin_lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(matsrc) \
-	$(mdlsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) $(thrsrc) \
-	$(voxsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(maisrc) \
+	$(matsrc) $(mdlsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) \
+	$(thrsrc) $(voxsrc)
 
 build_bin_lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_import_LDADD = $(SQUISH_LIBS) $(LIBPNG_LIBS) $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
@@ -1869,6 +1871,9 @@ lipsofsuna/script/script-packet.$(OBJEXT):  \
 lipsofsuna/script/script-path.$(OBJEXT):  \
 	lipsofsuna/script/$(am__dirstamp) \
 	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
+lipsofsuna/script/script-program.$(OBJEXT):  \
+	lipsofsuna/script/$(am__dirstamp) \
+	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
 lipsofsuna/script/script-quaternion.$(OBJEXT):  \
 	lipsofsuna/script/$(am__dirstamp) \
 	lipsofsuna/script/$(DEPDIR)/$(am__dirstamp)
@@ -2244,6 +2249,7 @@ mostlyclean-compile:
 	-rm -f lipsofsuna/script/script-object.$(OBJEXT)
 	-rm -f lipsofsuna/script/script-packet.$(OBJEXT)
 	-rm -f lipsofsuna/script/script-path.$(OBJEXT)
+	-rm -f lipsofsuna/script/script-program.$(OBJEXT)
 	-rm -f lipsofsuna/script/script-quaternion.$(OBJEXT)
 	-rm -f lipsofsuna/script/script-util.$(OBJEXT)
 	-rm -f lipsofsuna/script/script-vector.$(OBJEXT)
@@ -2419,6 +2425,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-object.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-packet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-program.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-quaternion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@lipsofsuna/script/$(DEPDIR)/script-vector.Po@am__quote@

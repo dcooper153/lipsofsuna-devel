@@ -27,6 +27,7 @@
 #define LISCR_SCRIPT_OBJECT "Object"
 #define LISCR_SCRIPT_PACKET "Packet"
 #define LISCR_SCRIPT_PATH "Path"
+#define LISCR_SCRIPT_PROGRAM "Program"
 #define LISCR_SCRIPT_QUATERNION "Quaternion"
 #define LISCR_SCRIPT_VECTOR "Vector"
 
@@ -53,6 +54,10 @@ liscr_script_packet (LIScrClass* self,
 void
 liscr_script_path (LIScrClass* self,
                    void*       data);
+
+void
+liscr_script_program (LIScrClass* self,
+                      void*       data);
 
 void
 liscr_script_quaternion (LIScrClass* self,

@@ -389,6 +389,22 @@ liext_module_shutdown (LIExtModule* self)
 }
 
 int
+liext_module_get_closed (LIExtModule* self)
+{
+	if (self->server_socket)
+		return grapple_server_closed_get (self->server_socket);
+	return 1;
+}
+
+void
+liext_module_set_closed (LIExtModule* self,
+                         int          value)
+{
+	if (self->server_socket)
+		grapple_server_closed_set (self->server_socket, value);
+}
+
+int
 liext_module_get_connected (LIExtModule* self)
 {
 	return self->client_socket != 0 || self->server_socket != 0;

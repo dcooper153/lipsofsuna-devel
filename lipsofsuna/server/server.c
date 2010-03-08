@@ -83,6 +83,7 @@ liser_server_new (LIPthPaths* paths)
 	    !liscr_script_create_class (self->script, "Object", liser_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
 	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
+	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self->program) ||
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
 	    !liscr_script_create_class (self->script, "Server", liser_script_server, self) ||
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||

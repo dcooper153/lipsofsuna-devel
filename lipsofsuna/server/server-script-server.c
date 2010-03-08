@@ -51,45 +51,14 @@ static void Server_save (LIScrArgs* args)
 		lisys_error_report ();
 }
 
-/* @luadoc
- * ---
- * -- Request server shutdown.
- * --
- * -- @param self Server class.
- * function Server.shutdown(self)
- */
-static void Server_shutdown (LIScrArgs* args)
-{
-	LISerServer* server;
-
-	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
-	limai_program_shutdown (server->program);
-}
-
-/* @luadoc
- * ---
- * -- Number of seconds the server has been running.
- * -- @name Server.time
- * -- @class table
- */
-static void Server_getter_time (LIScrArgs* args)
-{
-	LISerServer* server;
-
-	server = liscr_class_get_userdata (args->clss, LISER_SCRIPT_SERVER);
-	liscr_args_seti_float (args, limai_program_get_time (server->program));
-}
-
 /*****************************************************************************/
 
 void
 liser_script_server (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LISER_SCRIPT_SERVER, data);
 	liscr_class_insert_cfunc (self, "save", Server_save);
-	liscr_class_insert_cfunc (self, "shutdown", Server_shutdown);
-	liscr_class_insert_cvar (self, "time", Server_getter_time, NULL);
 }
 
 /** @} */

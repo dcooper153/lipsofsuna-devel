@@ -50,9 +50,12 @@ static void Network_disconnect (LIScrArgs* args)
 	LIEngObject* object;
 	LIExtClient* client;
 	LIExtModule* module;
+	LIScrData* data;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
-	object = LIENG_OBJECT (args->self);
+	if (!liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+		return;
+	object = data->data;
 	client = liext_module_find_client_by_object (module, object->id);
 	if (client != NULL)
 		liext_client_free (client);
@@ -252,6 +255,68 @@ static void Network_swap_clients (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * ---
+ * -- Gets the list of connected clients.
+ * --
+ * -- @name Network.clients
+ * -- @class table
+ */
+static void Network_getter_clients (LIScrArgs* args)
+{
+	LIAlgU32dicIter iter;
+	LIExtClient* client;
+	LIExtModule* module;
+
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
+	LIALG_U32DIC_FOREACH (iter, module->clients)
+	{
+		client = iter.value;
+		if (client->object != NULL)
+			liscr_args_seti_data (args, client->object->script);
+	}
+}
+
+/* @luadoc
+ * ---
+ * -- Controls whether clients can connect to the server.
+ * --
+ * -- @name Network.closed
+ * -- @class table
+ */
+static void Network_getter_closed (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
+	liscr_args_seti_bool (args, liext_module_get_closed (module));
+}
+static void Network_setter_closed (LIScrArgs* args)
+{
+	int value;
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
+	if (liscr_args_geti_bool (args, 0, &value))
+		liext_module_set_closed (module, value);
+}
+
+/* @luadoc
+ * ---
+ * -- Gets whether the game connected to network.
+ * --
+ * -- @name Network.connected
+ * -- @class table
+ */
+static void Network_getter_connected (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
+	liscr_args_seti_bool (args, liext_module_get_connected (module));
+}
+
 void
 liext_script_network (LIScrClass* self,
                       void*       data)
@@ -264,6 +329,9 @@ liext_script_network (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "send", Network_send);
 	liscr_class_insert_cfunc (self, "shutdown", Network_shutdown);
 	liscr_class_insert_cfunc (self, "swap_clients", Network_swap_clients);
+	liscr_class_insert_cvar (self, "clients", Network_getter_clients, NULL);
+	liscr_class_insert_cvar (self, "closed", Network_getter_closed, Network_setter_closed);
+	liscr_class_insert_cvar (self, "connected", Network_getter_connected, NULL);
 }
 
 /** @} */

@@ -89,6 +89,13 @@ void
 liext_module_shutdown (LIExtModule* self);
 
 int
+liext_module_get_closed (LIExtModule* self);
+
+void
+liext_module_set_closed (LIExtModule* self,
+                         int          value);
+
+int
 liext_module_get_connected (LIExtModule* self);
 
 /*****************************************************************************/

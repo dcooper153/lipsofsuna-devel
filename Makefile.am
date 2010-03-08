@@ -388,6 +388,7 @@ scrsrc = \
 	lipsofsuna/script/script-packet.c \
 	lipsofsuna/script/script-path.c \
 	lipsofsuna/script/script-private.h \
+	lipsofsuna/script/script-program.c \
 	lipsofsuna/script/script-quaternion.c \
 	lipsofsuna/script/script-util.c \
 	lipsofsuna/script/script-vector.c
@@ -569,9 +570,9 @@ build_bin_lipsofsuna_generator_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_generator_LDADD = \
 	$(LUA_LIBS) $(SQLITE_LIBS) $(BULLET_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
 build_bin_lipsofsuna_generator_SOURCES = lipsofsuna/generator/generator-main.c \
-	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(matsrc) \
-	$(mdlsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) $(thrsrc) \
-	$(voxsrc)
+	$(aisrc) $(algsrc) $(arcsrc) $(calsrc) $(engsrc) $(gensrc) $(maisrc) \
+	$(matsrc) $(mdlsrc) $(physrc) $(pthsrc) $(scrsrc) $(strsrc) $(syssrc) \
+	$(thrsrc) $(voxsrc)
 
 build_bin_lipsofsuna_import_LDFLAGS = $(PTHREAD_CFLAGS) $(LIPS_CFLAGS)
 build_bin_lipsofsuna_import_LDADD = $(SQUISH_LIBS) $(LIBPNG_LIBS) $(SQLITE_LIBS) $(ZLIB_LIBS) $(PTHREAD_LIBS)
