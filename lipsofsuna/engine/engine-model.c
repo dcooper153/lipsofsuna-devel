@@ -26,7 +26,6 @@
 
 LIEngModel*
 lieng_model_new (LIEngEngine* engine,
-                 int          id,
                  const char*  dir,
                  const char*  name)
 {
@@ -36,7 +35,6 @@ lieng_model_new (LIEngEngine* engine,
 	self = lisys_calloc (1, sizeof (LIEngModel));
 	if (self == NULL)
 		return NULL;
-	self->id = id;
 	self->engine = engine;
 
 	/* Allocate name. */
@@ -82,42 +80,42 @@ lieng_model_free (LIEngModel* self)
 int
 lieng_model_load (LIEngModel* self)
 {
-	if (self->invalid)
-		return 1;
+	LIMdlModel* tmpmdl;
+	LIPhyShape* tmpphy;
+
 	if (self->model != NULL)
 		return 1;
 
 	/* Load model geometry. */
-	self->model = limdl_model_new_from_file (self->path);
-	if (self->model == NULL)
-		goto error;
-	self->bounds = self->model->bounds;
+	tmpmdl = limdl_model_new_from_file (self->path);
+	if (tmpmdl == NULL)
+		return 0;
 
 	/* Create collision shape. */
-	self->physics = liphy_shape_new (self->engine->physics, self->model);
-	if (self->physics == NULL)
-		goto error;
-	liphy_shape_ref (self->physics);
+	tmpphy = liphy_shape_new (self->engine->physics, tmpmdl);
+	if (tmpphy == NULL)
+	{
+		limdl_model_free (tmpmdl);
+		return 0;
+	}
+	liphy_shape_ref (tmpphy);
 
 	/* Invoke callbacks. */
+	lieng_model_unload (self);
+	self->bounds = tmpmdl->bounds;
+	self->model = tmpmdl;
+	self->physics = tmpphy;
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
 
 	return 1;
-
-error:
-	lieng_model_unload (self);
-	self->invalid = 1;
-	return 0;
 }
 
 void
 lieng_model_unload (LIEngModel* self)
 {
-	if (self->invalid)
-		return;
-
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
+	if (self->model != NULL && self->physics != NULL)
+		lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
 	if (self->physics != NULL)
 	{
@@ -154,7 +152,7 @@ lieng_model_get_bounds (const LIEngModel* self,
 void
 lieng_model_get_bounds_transform (const LIEngModel*     self,
                                   const LIMatTransform* transform,
-                                  LIMatAabb*               result)
+                                  LIMatAabb*            result)
 {
 	int i;
 	LIMatVector v[7];

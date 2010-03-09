@@ -25,17 +25,6 @@
 #include "ext-module.h"
 
 static int
-private_animation (LIExtModule*   self,
-                   LIEngObject*   object,
-                   LISerAniminfo* info);
-
-static int
-private_control (LIExtModule*     self,
-                 LIEngObject*     object,
-                 LIMatQuaternion* rotation,
-                 int              flags);
-
-static int
 private_login (LIExtModule* self,
                LIEngObject* object,
                const char*  name,
@@ -53,12 +42,6 @@ static int
 private_packet (LIExtModule* self,
                 LIEngObject* object,
                 LIArcReader* packet);
-
-static int
-private_sample (LIExtModule* self,
-                LIEngObject* object,
-                LIEngSample* sample,
-                int          flags);
 
 static int
 private_tick (LIExtModule* self,
@@ -94,13 +77,10 @@ liext_module_new (LIMaiProgram* program)
 	liscr_script_create_class (script, "Events", liext_script_events, self);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-animation", 0, private_animation, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "client-control", 0, private_control, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "client-login", 0, private_login, self, self->calls + 2) ||
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "client-login", 0, private_login, self, self->calls + 2) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "client-logout", 0, private_logout, self, self->calls + 3) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "object-motion", 0, private_motion, self, self->calls + 4) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "client-packet", 5, private_packet, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-effect", 0, private_sample, self, self->calls + 6) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 7) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 0, private_visibility, self, self->calls + 8))
 	{
@@ -206,39 +186,6 @@ liext_module_event (LIExtModule* self,
 /*****************************************************************************/
 
 static int
-private_animation (LIExtModule*   self,
-                   LIEngObject*   object,
-                   LISerAniminfo* info)
-{
-#warning animation events disabled.
-#if 0
-	liext_module_event (self, LIEXT_EVENT_OBJECT_ANIMATION,
-		"object", LISCR_SCRIPT_OBJECT, object->script,
-		"animation", LISCR_TYPE_STRING, animation->name, NULL);
-#endif
-	return 1;
-}
-
-static int
-private_control (LIExtModule*     self,
-                 LIEngObject*     object,
-                 LIMatQuaternion* rotation,
-                 int              flags)
-{
-	LIScrData* data0;
-
-	data0 = liscr_quaternion_new (self->program->script, rotation);
-	liext_module_event (self, LIEXT_EVENT_CONTROL,
-		"object", LISCR_SCRIPT_OBJECT, object->script,
-		"rotation", LISCR_SCRIPT_QUATERNION, data0,
-		"controls", LISCR_TYPE_INT, flags, NULL);
-	if (data0 != NULL)
-		liscr_data_unref (data0, NULL);
-
-	return 1;
-}
-
-static int
 private_login (LIExtModule* self,
                LIEngObject* object,
                const char*  name,
@@ -284,19 +231,6 @@ private_packet (LIExtModule* self,
 	if (data0 != NULL)
 		liscr_data_unref (data0, NULL);
 
-	return 1;
-}
-
-static int
-private_sample (LIExtModule* self,
-                LIEngObject* object,
-                LIEngSample* sample,
-                int          flags)
-{
-	liext_module_event (self, LIEXT_EVENT_EFFECT,
-		"object", LISCR_SCRIPT_OBJECT, object->script,
-		"effect", LISCR_TYPE_STRING, sample->name,
-		"flags", LISCR_TYPE_INT, flags, NULL);
 	return 1;
 }
 

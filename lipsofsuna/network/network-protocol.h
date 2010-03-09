@@ -44,29 +44,8 @@
 
 enum
 {
-	/* Core. */
-	LINET_SERVER_PACKET_RESOURCES,
-
-	/* Extensions. */
-	LIEXT_SKILLS_PACKET_RESET,
-	LIEXT_SKILLS_PACKET_DIFF,
-	LIEXT_SLOTS_PACKET_RESET,
-	LIEXT_SLOTS_PACKET_DIFF,
-
-	/* Custom. */
 	LINET_SERVER_PACKET_CUSTOM = 128,
-
 	LINET_SERVER_PACKET_MAX
-};
-
-enum
-{
-	LINET_CLIENT_PACKET_MOVE,
-
-	LINET_EXT_CLIENT_PACKET_GENERATOR = 64,
-	LINET_EXT_CLIENT_PACKET_EDITOR,
-
-	LINET_CLIENT_PACKET_MAX
 };
 
 /****************************************************************************/

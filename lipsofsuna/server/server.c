@@ -78,7 +78,6 @@ liser_server_new (LIPthPaths* paths)
 	    !liser_server_init_callbacks_client (self) ||
 	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
 	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
-	    !liscr_script_create_class (self->script, "Effect", liser_script_effect, self) ||
 	    !liscr_script_create_class (self->script, "Extension", liser_script_extension, self) ||
 	    !liscr_script_create_class (self->script, "Object", liser_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
@@ -87,7 +86,6 @@ liser_server_new (LIPthPaths* paths)
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
 	    !liscr_script_create_class (self->script, "Server", liser_script_server, self) ||
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
-	    !lieng_engine_load_resources (self->engine, NULL) ||
 	    !limai_program_execute_script (self->program, "server/main.lua"))
 	{
 		liser_server_free (self);

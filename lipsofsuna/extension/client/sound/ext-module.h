@@ -56,17 +56,13 @@ liext_module_free (LIExtModule* self);
 
 #ifndef LI_DISABLE_SOUND
 LISndSample*
-liext_module_find_sample_by_id (LIExtModule* self,
-                                int          id);
-
-LISndSample*
-liext_module_find_sample_by_name (LIExtModule* self,
-                                  const char*  name);
+liext_module_find_sample (LIExtModule* self,
+                          const char*  name);
 
 int
 liext_module_set_effect (LIExtModule* self,
                          uint32_t     object,
-                         uint32_t     effect,
+                         const char*  effect,
                          int          flags);
 
 int

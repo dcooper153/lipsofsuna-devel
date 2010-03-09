@@ -51,7 +51,6 @@ static void Sound_effect (LIScrArgs* args)
 	int flags = 0;
 	const char* effect;
 	LIEngObject* object;
-	LIEngSample* sample;
 	LIExtModule* module;
 	LIScrData* data;
 
@@ -60,9 +59,7 @@ static void Sound_effect (LIScrArgs* args)
 	{
 		object = data->data;
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
-		sample = lieng_resources_find_sample_by_name (module->client->engine->resources, effect);
-		if (sample != NULL)
-			liext_module_set_effect (module, object->id, sample->id, flags);
+		liext_module_set_effect (module, object->id, effect, flags);
 	}
 #endif
 }

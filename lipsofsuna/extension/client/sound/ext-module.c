@@ -57,7 +57,7 @@ liext_module_new (LIMaiProgram* program)
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
 	{
-		lisys_free (self);
+		liext_module_free (self);
 		return NULL;
 	}
 
@@ -116,38 +116,6 @@ liext_module_free (LIExtModule* self)
 
 #ifndef LI_DISABLE_SOUND
 /**
- * \brief Finds a sound sample by effect number.
- *
- * \param self Module.
- * \param id Effect number.
- * \return Sample owned by the module or NULL.
- */
-LISndSample*
-liext_module_find_sample_by_id (LIExtModule* self,
-                                int          id)
-{
-	LIEngSample* sample;
-
-	/* Find sample. */
-	sample = lieng_resources_find_sample_by_code (self->client->engine->resources, id);
-	if (sample == NULL || sample->invalid)
-		return NULL;
-	if (sample->data != NULL)
-		return sample->data;
-
-	/* Load sample. */
-	if (!lisnd_manager_set_sample (self->sound, sample->name, sample->path))
-	{
-		lisys_error_report ();
-		sample->invalid = 1;
-		return NULL;
-	}
-	sample->data = lisnd_manager_get_sample (self->sound, sample->name);
-
-	return sample->data;
-}
-
-/**
  * \brief Finds a sound sample by name.
  *
  * \param self Module.
@@ -155,34 +123,38 @@ liext_module_find_sample_by_id (LIExtModule* self,
  * \return Sample owned by the module or NULL.
  */
 LISndSample*
-liext_module_find_sample_by_name (LIExtModule* self,
-                                  const char*  name)
+liext_module_find_sample (LIExtModule* self,
+                          const char*  name)
 {
-	LIEngSample* sample;
+	int ret;
+	char* path;
+	LISndSample* sample;
 
-	/* Find sample. */
-	sample = lieng_resources_find_sample_by_name (self->client->engine->resources, name);
-	if (sample == NULL || sample->invalid)
+	/* Check for existing. */
+	sample = lisnd_manager_get_sample (self->sound, name);
+	if (sample != NULL)
+		return sample;
+
+	/* Format path. */
+	path = lisys_path_format (self->client->paths->module_data,
+		LISYS_PATH_SEPARATOR, "sounds",
+		LISYS_PATH_SEPARATOR, name, ".ogg", NULL);
+	if (path == NULL)
 		return NULL;
-	if (sample->data != NULL)
-		return sample->data;
 
-	/* Load sample. */
-	if (!lisnd_manager_set_sample (self->sound, sample->name, sample->path))
-	{
-		lisys_error_report ();
-		sample->invalid = 1;
+	/* Load new sample. */
+	ret = lisnd_manager_set_sample (self->sound, name, path);
+	lisys_free (path);
+	if (!ret)
 		return NULL;
-	}
-	sample->data = lisnd_manager_get_sample (self->sound, sample->name);
 
-	return sample->data;
+	return lisnd_manager_get_sample (self->sound, name);
 }
 
 int
 liext_module_set_effect (LIExtModule* self,
                          uint32_t     object,
-                         uint32_t     effect,
+                         const char*  effect,
                          int          flags)
 {
 	int create;
@@ -196,7 +168,7 @@ liext_module_set_effect (LIExtModule* self,
 	/* Find sample. */
 	if (self->sound == NULL)
 		return 1;
-	sample = liext_module_find_sample_by_id (self, effect);
+	sample = liext_module_find_sample (self, effect);
 	if (sample == NULL)
 		return 0;
 
@@ -264,7 +236,7 @@ liext_module_set_music (LIExtModule* self,
 	/* Find sample. */
 	if (self->sound == NULL)
 		return 1;
-	sample = liext_module_find_sample_by_name (self, value);
+	sample = liext_module_find_sample (self, value);
 	if (sample == NULL)
 		return 0;
 

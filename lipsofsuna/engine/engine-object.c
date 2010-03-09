@@ -740,35 +740,6 @@ lieng_object_set_model (LIEngObject* self,
 	return 1;
 }
 
-int
-lieng_object_get_model_code (const LIEngObject* self)
-{
-	if (self->model == NULL)
-		return LINET_INVALID_MODEL;
-	return self->model->id;
-}
-
-/**
- * \brief Replaces the current model of the object.
- *
- * \param self Object.
- * \param value Model number.
- * \return Nonzero on success.
- */
-int
-lieng_object_set_model_code (LIEngObject* self,
-                             int          value)
-{
-	LIEngModel* model;
-
-	model = lieng_engine_find_model_by_code (self->engine, value);
-	if (model == NULL)
-		return 0;
-	lieng_object_set_model (self, model);
-
-	return 1;
-}
-
 const char*
 lieng_object_get_model_name (const LIEngObject* self)
 {

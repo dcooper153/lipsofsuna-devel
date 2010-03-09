@@ -18,18 +18,6 @@
 #ifndef __SERVER_TYPES_H__
 #define __SERVER_TYPES_H__
 
-#include <lipsofsuna/engine.h>
-
-struct _LISerAniminfo
-{
-	LIEngAnimation* animation;
-	int channel;
-	int permanent;
-	float priority;
-};
-
-typedef struct _LISerAniminfo LISerAniminfo;
-typedef struct _LISerObject LISerObject;
 typedef struct _LISerServer LISerServer;
 
 #endif

@@ -178,42 +178,13 @@ lieng_engine_clear_selection (LIEngEngine* self)
 	lialg_ptrdic_clear (self->selection);
 }
 
-LIEngAnimation*
-lieng_engine_find_animation_by_code (LIEngEngine* self,
-                                     int          id)
-{
-	return lieng_resources_find_animation_by_code (self->resources, id);
-}
-
-LIEngAnimation*
-lieng_engine_find_animation_by_name (LIEngEngine* self,
-                                     const char*  name)
-{
-	return lieng_resources_find_animation_by_name (self->resources, name);
-}
-
-LIEngModel*
-lieng_engine_find_model_by_code (LIEngEngine* self,
-                                 uint32_t     id)
-{
-	LIEngModel* model;
-
-	model = lieng_resources_find_model_by_code (self->resources, id);
-	if (model == NULL)
-		return NULL;
-	if (!lieng_model_load (model))
-		lisys_error_report ();
-
-	return model;
-}
-
 LIEngModel*
 lieng_engine_find_model_by_name (LIEngEngine* self,
                                  const char*  name)
 {
 	LIEngModel* model;
 
-	model = lieng_resources_find_model_by_name (self->resources, name);
+	model = lieng_resources_find_model (self->resources, name);
 	if (model == NULL)
 		return NULL;
 	if (!lieng_model_load (model))
@@ -272,7 +243,7 @@ lieng_engine_load_model (LIEngEngine* self,
 	LIEngObject* object;
 
 	/* Find model. */
-	model = lieng_resources_find_model_by_name (self->resources, name);
+	model = lieng_resources_find_model (self->resources, name);
 	if (model == NULL)
 		return 0;
 
@@ -303,29 +274,6 @@ lieng_engine_load_model (LIEngEngine* self,
 	}
 
 	return 1;
-}
-
-/**
- * \brief Loads the resource list of the engine.
- *
- * If a stream reader is provided, the resource list is loaded from that.
- * Otherwise, the list is constructed by iterating through files in the
- * currently set data directory.
- *
- * \param self Engine.
- * \param reader Reader or NULL.
- * \return Nonzero on success.
- */
-int
-lieng_engine_load_resources (LIEngEngine* self,
-                             LIArcReader* reader)
-{
-#warning Breaks due to old models being lost if called multiple times.
-#warning Should unload and reload models so that the list can change without restarting.
-	if (reader != NULL)
-		return lieng_resources_load_from_stream (self->resources, reader);
-	else
-		return lieng_resources_load_from_dir (self->resources, self->config.dir);
 }
 
 /**

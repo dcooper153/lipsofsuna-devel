@@ -173,13 +173,6 @@ int
 lieng_object_set_model (LIEngObject* self,
                         LIEngModel*  model);
 
-int
-lieng_object_get_model_code (const LIEngObject* self);
-
-int
-lieng_object_set_model_code (LIEngObject* self,
-                             int          value);
-
 const char*
 lieng_object_get_model_name (const LIEngObject* self);
 

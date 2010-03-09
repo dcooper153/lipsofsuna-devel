@@ -419,10 +419,6 @@ private_init (LIMaiProgram* self)
 		return 0;
 	lieng_engine_set_userdata (self->engine, self);
 
-	/* Load resources. */
-	if (!lieng_engine_load_resources (self->engine, NULL))
-		return 0;
-
 	/* Allocate the script. */
 	self->script = liscr_script_new ();
 	if (self->script == NULL)

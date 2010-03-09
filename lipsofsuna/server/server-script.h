@@ -31,10 +31,6 @@
 #define LISER_SCRIPT_SERVER "Server"
 
 void
-liser_script_effect (LIScrClass* self,
-                     void*       data);
-
-void
 liser_script_extension (LIScrClass* self,
                         void*       data);
 

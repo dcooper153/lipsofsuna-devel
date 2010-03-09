@@ -68,20 +68,20 @@ static void Creature_new (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Control state.
- * -- @name Creature.controls
+ * -- Movement speed.
+ * -- @name Creature.move
  * -- @class table
  */
-static void Creature_getter_controls (LIScrArgs* args)
+static void Creature_getter_move (LIScrArgs* args)
 {
-	liscr_args_seti_int (args, ((LIExtCreature*) args->self)->controls);
+	liscr_args_seti_float (args, ((LIExtCreature*) args->self)->move);
 }
-static void Creature_setter_controls (LIScrArgs* args)
+static void Creature_setter_move (LIScrArgs* args)
 {
-	int value;
+	float value;
 
-	if (liscr_args_geti_int (args, 0, &value))
-		((LIExtCreature*) args->self)->controls = value;
+	if (liscr_args_geti_float (args, 0, &value))
+		((LIExtCreature*) args->self)->move = value;
 }
 
 /* @luadoc
@@ -109,11 +109,11 @@ static void Creature_setter_owner (LIScrArgs* args)
 
 void
 liext_script_creature (LIScrClass* self,
-                     void*       data)
+                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CREATURE, data);
 	liscr_class_insert_cfunc (self, "new", Creature_new);
-	liscr_class_insert_mvar (self, "controls", Creature_getter_controls, Creature_setter_controls);
+	liscr_class_insert_mvar (self, "move", Creature_getter_move, Creature_setter_move);
 	liscr_class_insert_mvar (self, "owner", Creature_getter_owner, Creature_setter_owner);
 }
 

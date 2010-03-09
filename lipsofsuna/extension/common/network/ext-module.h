@@ -43,7 +43,6 @@ struct _LIExtModule
 	LIAlgU32dic* clients;
 	LIAlgU32dic* objects;
 	LIAlgStrdic* passwords;
-	LIArcWriter* resources;
 	LICalHandle calls[2];
 	LIMaiProgram* program;
 };

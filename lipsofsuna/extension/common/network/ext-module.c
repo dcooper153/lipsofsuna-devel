@@ -130,8 +130,6 @@ liext_module_free (LIExtModule* self)
 			lisys_free (iter1.value);
 		lialg_strdic_free (self->passwords);
 	}
-	if (self->resources != NULL)
-		liarc_writer_free (self->resources);
 	if (self->client_socket != 0)
 		grapple_client_destroy (self->client_socket);
 	if (self->server_socket != 0)
@@ -415,11 +413,6 @@ liext_module_get_connected (LIExtModule* self)
 static int
 private_init (LIExtModule* self)
 {
-	int i;
-	LIEngAnimation* anim;
-	LIEngModel* model;
-	LIEngSample* sample;
-
 	pthread_mutex_init (&self->mutex, NULL);
 
 	/* Allocate client list. */
@@ -432,36 +425,6 @@ private_init (LIExtModule* self)
 	self->passwords = lialg_strdic_new ();
 	if (self->passwords == NULL)
 		return 0;
-
-	/* Build resource packet. */
-	/* TODO: Should use compression. */
-	self->resources = liarc_writer_new_packet (LINET_SERVER_PACKET_RESOURCES);
-	if (self->resources == NULL)
-		return 0;
-	liarc_writer_append_uint32 (self->resources, self->program->engine->resources->animations.count);
-	liarc_writer_append_uint32 (self->resources, self->program->engine->resources->models.count);
-	liarc_writer_append_uint32 (self->resources, self->program->engine->resources->samples.count);
-	for (i = 0 ; i < self->program->engine->resources->animations.count ; i++)
-	{
-		anim = lieng_resources_find_animation_by_code (self->program->engine->resources, i);
-		assert (anim != NULL);
-		liarc_writer_append_string (self->resources, anim->name);
-		liarc_writer_append_nul (self->resources);
-	}
-	for (i = 0 ; i < self->program->engine->resources->models.count ; i++)
-	{
-		model = lieng_resources_find_model_by_code (self->program->engine->resources, i);
-		assert (model != NULL);
-		liarc_writer_append_string (self->resources, model->name);
-		liarc_writer_append_nul (self->resources);
-	}
-	for (i = 0 ; i < self->program->engine->resources->samples.count ; i++)
-	{
-		sample = lieng_resources_find_sample_by_code (self->program->engine->resources, i);
-		assert (sample != NULL);
-		liarc_writer_append_string (self->resources, sample->name);
-		liarc_writer_append_nul (self->resources);
-	}
 
 	/* Register classes. */
 	liscr_script_create_class (self->program->script, "Network", liext_script_network, self);
@@ -571,9 +534,6 @@ private_connect (LIExtModule*     self,
 		return 0;
 	}
 
-	/* Send resource list. */
-	liext_client_send (client, self->resources, GRAPPLE_RELIABLE);
-
 	/* Assign client to the object. */
 	if (!liext_client_set_object (client, object))
 	{
@@ -629,11 +589,6 @@ private_message_client (LIExtModule*     self,
 	if (reader == NULL)
 		return 0;
 	reader->pos = 1;
-
-	/* Handle resource list. */
-	/* FIXME: This shouldn't be hardcoded either. */
-	if (data[0] == LINET_SERVER_PACKET_RESOURCES)
-		lieng_engine_load_resources (self->program->engine, reader);
 
 	/* Invoke callbacks. */
 	/* FIXME: Would be better if this was consistent with the server equivalent. */

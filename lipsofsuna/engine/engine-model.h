@@ -32,8 +32,6 @@
 
 struct _LIEngModel
 {
-	int id;
-	int invalid;
 	char* name;
 	char* path;
 	LIMatAabb bounds;
@@ -44,7 +42,6 @@ struct _LIEngModel
 
 LIEngModel*
 lieng_model_new (LIEngEngine* engine,
-                 int          id,
                  const char*  dir,
                  const char*  name);
 

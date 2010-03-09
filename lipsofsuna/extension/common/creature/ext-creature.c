@@ -125,23 +125,9 @@ static int
 private_tick (LIExtCreature* self,
               float          secs)
 {
-	LIEngObject* object;
-	LIPhyObject* physics;
-
-	/* Get object data. */
-	object = self->object;
-	if (object == NULL)
-		return 1;
-	physics = object->physics;
-
 	/* Apply controls. */
-	liphy_object_set_movement (physics, 0.0f);
-	if ((self->controls & LINET_CONTROL_MOVE_FRONT) &&
-	   !(self->controls & LINET_CONTROL_MOVE_BACK))
-		liphy_object_set_movement (physics, 1.0f);
-	if ((self->controls & LINET_CONTROL_MOVE_BACK) &&
-	   !(self->controls & LINET_CONTROL_MOVE_FRONT))
-		liphy_object_set_movement (physics, -1.0f);
+	if (self->object != NULL)
+		liphy_object_set_movement (self->object->physics, self->move);
 
 	return 1;
 }

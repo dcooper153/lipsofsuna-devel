@@ -81,18 +81,6 @@ lieng_engine_check_unique (LIEngEngine* self,
 void
 lieng_engine_clear_selection (LIEngEngine* self);
 
-LIEngAnimation*
-lieng_engine_find_animation_by_code (LIEngEngine* self,
-                                     int          id);
-
-LIEngAnimation*
-lieng_engine_find_animation_by_name (LIEngEngine* self,
-                                     const char*  name);
-
-LIEngModel*
-lieng_engine_find_model_by_code (LIEngEngine* self,
-                                 uint32_t     id);
-
 LIEngModel*
 lieng_engine_find_model_by_name (LIEngEngine* self,
                                  const char*  name);
@@ -108,10 +96,6 @@ lieng_engine_insert_constraint (LIEngEngine*     self,
 int
 lieng_engine_load_model (LIEngEngine* self,
                          const char*  name);
-
-int
-lieng_engine_load_resources (LIEngEngine* self,
-                             LIArcReader* reader);
 
 void
 lieng_engine_remove_constraint (LIEngEngine*     self,

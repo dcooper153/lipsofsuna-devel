@@ -56,15 +56,42 @@ static void Reload_cancel (LIScrArgs* args)
  * ---
  * -- Reloads all modified data files.
  * --
+ * -- Arguments:
+ * -- block: If true, lock up the game until done.
+ * --
  * -- @param self Reload class.
- * function Reload.reload(self)
+ * -- @param args Arguments.
+ * function Reload.reload(self, args)
  */
 static void Reload_reload (LIScrArgs* args)
+{
+	int block = 0;
+	LIExtModule* self;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
+	liscr_args_gets_bool (args, "block", &block);
+	liext_reload_run (self->reload);
+
+	if (block)
+	{
+		while (!liext_reload_get_done (self->reload))
+			liext_reload_update (self->reload);
+	}
+}
+
+/* @luadoc
+ * ---
+ * -- True if the reloader is currently idle.
+ * --
+ * -- @name Reload.done
+ * -- @class table
+ */
+static void Reload_getter_done (LIScrArgs* args)
 {
 	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
-	liext_reload_run (self->reload);
+	liscr_args_seti_bool (args, liext_reload_get_done (self->reload));
 }
 
 /* @luadoc
@@ -99,11 +126,12 @@ static void Reload_setter_enabled (LIScrArgs* args)
 
 void
 liext_script_reload (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RELOAD, data);
 	liscr_class_insert_cfunc (self, "cancel", Reload_cancel);
 	liscr_class_insert_cfunc (self, "reload", Reload_reload);
+	liscr_class_insert_cvar (self, "done", Reload_getter_done, NULL);
 	liscr_class_insert_cvar (self, "enabled", Reload_getter_enabled, Reload_setter_enabled);
 }
 

@@ -33,7 +33,7 @@ typedef struct _LIExtCreature LIExtCreature;
 struct _LIExtCreature
 {
 	int active;
-	int controls;
+	float move;
 	LICalHandle calls[1];
 	LIEngObject* object;
 	LIExtModule* module;

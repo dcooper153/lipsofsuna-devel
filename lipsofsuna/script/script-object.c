@@ -477,14 +477,10 @@ static void Object_setter_mass (LIScrArgs* args)
  */
 static void Object_getter_model (LIScrArgs* args)
 {
-	int id;
-	LIEngModel* model;
 	LIEngObject* self = args->self;
 
-	id = lieng_object_get_model_code (args->self);
-	model = lieng_engine_find_model_by_code (self->engine, id);
-	if (model != NULL)
-		liscr_args_seti_string (args, model->name);
+	if (self->model != NULL)
+		liscr_args_seti_string (args, self->model->name);
 }
 static void Object_setter_model (LIScrArgs* args)
 {

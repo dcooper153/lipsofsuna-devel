@@ -115,6 +115,54 @@ liext_reload_run (LIExtReload* self)
 	return lirel_reload_run (self->reload);
 }
 
+/**
+ * \brief Updates the status of the reloader.
+ *
+ * \param self Reload.
+ */
+void
+liext_reload_update (LIExtReload* self)
+{
+	/* Update reloader state. */
+	lirel_reload_update (self->reload);
+
+	/* Delete progress dialog on demand. */
+	if (lirel_reload_get_done (self->reload))
+	{
+		if (self->progress != NULL)
+		{
+			liwdg_manager_remove_window (self->client->widgets, LIWDG_WIDGET (self->progress));
+			liwdg_widget_free (self->progress);
+			self->progress = NULL;
+		}
+		return;
+	}
+
+	/* Create progress dialog on demand. */
+	if (self->progress == NULL)
+	{
+		self->progress = liwdg_busy_new (self->client->widgets);
+		if (self->progress == NULL)
+			return;
+		liwdg_busy_set_cancel (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_cancel), self);
+		liwdg_busy_set_text (LIWDG_BUSY (self->progress), "Loading...");
+		liwdg_widget_set_visible (LIWDG_WIDGET (self->progress), 1);
+		liwdg_manager_insert_window (self->client->widgets, LIWDG_WIDGET (self->progress));
+	}
+
+	/* Update progress. */
+	liwdg_busy_set_progress (LIWDG_BUSY (self->progress),
+		lirel_reload_get_progress (self->reload));
+}
+
+int
+liext_reload_get_done (const LIExtReload* self)
+{
+	if (self->reload == NULL)
+		return 1;
+	return lirel_reload_get_done (self->reload);
+}
+
 int
 liext_reload_get_enabled (const LIExtReload* self)
 {
@@ -139,39 +187,7 @@ int
 private_callback_tick (LIExtReload* self,
                        float        secs)
 {
-	/* Update reloader state. */
-	lirel_reload_update (self->reload);
-
-	/* Delete progress dialog on demand. */
-	if (lirel_reload_get_done (self->reload))
-	{
-		if (self->progress != NULL)
-		{
-			liwdg_manager_remove_window (self->client->widgets, LIWDG_WIDGET (self->progress));
-			liwdg_widget_free (self->progress);
-			self->progress = NULL;
-		}
-		return 1;
-	}
-
-	/* Create progress dialog on demand. */
-	if (self->progress == NULL)
-	{
-		self->progress = liwdg_busy_new (self->client->widgets);
-		if (self->progress == NULL)
-		{
-			lirel_reload_cancel (self->reload);
-			return 1;
-		}
-		liwdg_busy_set_cancel (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_cancel), self);
-		liwdg_busy_set_text (LIWDG_BUSY (self->progress), "Loading...");
-		liwdg_widget_set_visible (LIWDG_WIDGET (self->progress), 1);
-		liwdg_manager_insert_window (self->client->widgets, LIWDG_WIDGET (self->progress));
-	}
-
-	/* Update progress. */
-	liwdg_busy_set_progress (LIWDG_BUSY (self->progress),
-		lirel_reload_get_progress (self->reload));
+	liext_reload_update (self);
 
 	return 1;
 }
