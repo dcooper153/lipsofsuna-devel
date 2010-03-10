@@ -578,7 +578,7 @@ private_bind_uniform (LIRenContext* self,
 			else
 			{
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
-				glBindTexture (GL_TEXTURE_2D, 0);
+				glBindTexture (GL_TEXTURE_2D, self->render->helpers.empty_image->texture->texture);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTTYPE0:
