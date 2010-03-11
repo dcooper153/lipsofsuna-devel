@@ -33,6 +33,18 @@
 #include "system-path.h"
 
 /**
+ * \brief Gets the current time.
+ *
+ * \param t Return location for the time or NULL.
+ * \return Time.
+ */
+time_t
+lisys_time (time_t* t)
+{
+	return time (t);
+}
+
+/**
  * \brief Gets the home directory.
  *
  * If no home directory is specified, the current

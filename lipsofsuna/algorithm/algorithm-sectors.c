@@ -165,7 +165,7 @@ lialg_sectors_sector_index (LIAlgSectors* self,
 	if (sector == NULL)
 		return NULL;
 	sector->index = index;
-	sector->stamp = time (NULL);
+	sector->stamp = lisys_time (NULL);
 	sector->manager = self;
 	sector->content = lialg_strdic_new ();
 	if (sector->content == NULL)

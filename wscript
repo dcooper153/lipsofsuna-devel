@@ -38,19 +38,22 @@ def configure(ctx):
 	ctx.env.SERVER = Options.options.server != "false"
 	ctx.env.SOUND = Options.options.sound != "false"
 	ctx.env.VIEWER = Options.options.viewer != "false"
-	ctx.check_tool('compiler_cc')
-	ctx.check_tool('compiler_cxx')
 	# Directories
 	ctx.env.CPPPATH_CORE = ['.']
 	ctx.env.CPPFLAGS_CORE = ['-g', '-Wall', '-O2', '-DHAVE_CONFIG_H']
 	ctx.env.LIBPATH_CORE = []
 	ctx.env.LINKFLAGS_CORE = ['-g', '-export-dynamic']
 	if Options.options.adddeps:
+		binpaths = []
 		pkgpaths = []
 		for dep in string.split(Options.options.adddeps, ':'):
 			ctx.env.CPPPATH_CORE.append(os.path.join(dep, 'include'))
 			ctx.env.LIBPATH_CORE.append(os.path.join(dep, 'lib'))
+			binpaths.append(os.path.join(dep, 'bin'))
 			pkgpaths.append(os.path.join(dep, 'lib', 'pkgconfig'))
+		if 'PATH' in os.environ and os.environ['PATH'] != '':
+			binpaths.append(os.environ['PATH'])
+		os.environ['PATH'] = string.join(binpaths, ':')
 		if 'PKG_CONFIG_PATH' in os.environ and os.environ['PKG_CONFIG_PATH'] != '':
 			pkgpaths.append(os.environ['PKG_CONFIG_PATH'])
 		os.environ['PKG_CONFIG_PATH'] = string.join(pkgpaths, ':')
@@ -60,6 +63,9 @@ def configure(ctx):
 	ctx.env.LINKFLAGS_EXTENSION = ['-g']
 	ctx.env.CPPPATH_TEST = []
 	ctx.env.LIBPATH_TEST = []
+	# Tools
+	ctx.check_tool('compiler_cc')
+	ctx.check_tool('compiler_cxx')
 	# Dependencies
 	ctx.check(header_name='arpa/inet.h', define_name='HAVE_ARPA_INET_H')
 	ctx.check(header_name='dlfcn.h', define_name='HAVE_DLFCN_H')
@@ -82,8 +88,8 @@ def configure(ctx):
 	ctx.check(header_name='unistd.h', define_name='HAVE_UNISTD_H')
 	ctx.check(header_name='windows.h', define_name='HAVE_WINDOWS_H')
 	ctx.check(header_name='GL/glx.h', define_name='HAVE_GL_GLX_H')
-	ctx.check_cc(msg='Checking for function fork', header_name='unistd.h', func_name='fork', define_name='HAVE_FORK')
-	ctx.check_cc(msg='Checking for function usleep', header_name='unistd.h', func_name='usleep', define_name='HAVE_USLEEP')
+	ctx.check_cc(msg='Checking for function fork', header_name='unistd.h', function_name='fork', define_name='HAVE_FORK')
+	ctx.check_cc(msg='Checking for function usleep', header_name='unistd.h', function_name='usleep', define_name='HAVE_USLEEP')
 	ctx.check_cc(lib='dl', uselib_store='CORE')
 	ctx.check_cc(lib='m', uselib_store='CORE')
 	ctx.check_cc(lib='pthread', uselib_store='THREAD')
@@ -123,8 +129,8 @@ def configure(ctx):
 			ctx.check_cxx(header_name='SDL.h', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
 			ctx.check_cxx(lib='SDL', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
 		# SDL_ttf
-		ctx.check_cc(header_name='SDL_ttf.h', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
 		ctx.check_cc(lib='SDL_ttf', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
+		ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
 		# GL
 		ctx.check_cc(header_name='GL/gl.h', mandatory=True, uselib='CORE TEST', uselib_store='GL')
 		ctx.check_cc(lib='GL', mandatory=True, uselib='CORE TEST', uselib_store='GL')

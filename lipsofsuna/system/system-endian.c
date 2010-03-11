@@ -18,35 +18,40 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysSystem System
+ * \addtogroup lisysEndian Endian
  * @{
  */
 
-#ifndef __SYSTEM_H__
-#define __SYSTEM_H__
+#include "system-endian.h"
+#include "system-types.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
+/**
+ * \brief Returns nonzero if the system is big endian.
+ *
+ * \return Nonzero if the system is big endian.
+ */
+int
+lisys_endian_big ()
+{
+	union { uint16_t a; uint8_t b[2]; } tmp;
+	tmp.b[0] = 0x12;
+	tmp.b[1] = 0x34;
+	return (tmp.a == LISYS_ENDIAN_BIG);
+}
 
-#ifdef _WIN32
-#define LISYS_EXTENSION_DLL "dll"
-#define LISYS_EXTENSION_EXE ".exe"
-#else
-#define LISYS_EXTENSION_DLL "so"
-#define LISYS_EXTENSION_EXE ""
-#endif
-
-time_t lisys_time (time_t* t);
-char* lisys_system_get_path_home ();
-char* lisys_system_get_path_data_home ();
-char* lisys_system_get_path_config_home ();
-char* lisys_system_get_path_cache_home ();
-
-#endif
+/**
+ * \brief Returns the byte order of the system.
+ *
+ * \return LISYS_ENDIAN_BIG or LISYS_ENDIAN_LITTLE.
+ */
+int
+lisys_endian_get ()
+{
+	union { uint16_t a; uint8_t b[2]; } tmp;
+	tmp.b[0] = 0x12;
+	tmp.b[1] = 0x34;
+	return tmp.a;
+}
 
 /** @} */
 /** @} */

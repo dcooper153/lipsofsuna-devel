@@ -79,8 +79,8 @@ lialg_camera_new ()
 	self->transform.target = limat_transform_identity ();
 	self->transform.inverse = limat_transform_identity ();
 	self->view.fov = LIALG_CAMERA_DEFAULT_FOV;
-	self->view.near = LIALG_CAMERA_DEFAULT_NEAR;
-	self->view.far = LIALG_CAMERA_DEFAULT_FAR;
+	self->view.nearplane = LIALG_CAMERA_DEFAULT_NEAR;
+	self->view.farplane = LIALG_CAMERA_DEFAULT_FAR;
 	self->view.aspect = 1.0f;
 
 	private_update_modelview (self);
@@ -345,15 +345,15 @@ lialg_camera_get_bounds (const LIAlgCamera* self,
 	float max;
 	float top;
 	float right;
-	float near;
+	float nearplane;
 	LIMatVector size;
 	LIMatVector zero;
 
-	near = self->view.near;
-	top = tan (self->view.fov * M_PI / 360.0f) * near;
+	nearplane = self->view.nearplane;
+	top = tan (self->view.fov * M_PI / 360.0f) * nearplane;
 	right = top * self->view.aspect;
 
-	max = 1.7f * LIMAT_MAX (LIMAT_MAX (top, right), near);
+	max = 1.7f * LIMAT_MAX (LIMAT_MAX (top, right), nearplane);
 	size = limat_vector_init (max, max, max);
 	zero = limat_vector_init (0.0f, 0.0f, 0.0f);
 	limat_aabb_init_from_center (aabb, &zero, &size);
@@ -420,7 +420,7 @@ void
 lialg_camera_set_far (LIAlgCamera* self,
                       float        value)
 {
-	self->view.far = value;
+	self->view.farplane = value;
 	private_update_projection (self);
 }
 
@@ -462,7 +462,7 @@ void
 lialg_camera_set_near (LIAlgCamera* self,
                        float        value)
 {
-	self->view.near = value;
+	self->view.nearplane = value;
 	private_update_projection (self);
 }
 
@@ -485,20 +485,20 @@ lialg_camera_get_projection (const LIAlgCamera* self,
  * \param self Camera.
  * \param fov Field of view.
  * \param aspect Ascpect ratio of the viewport.
- * \param near Near plane distance.
- * \param far Far plane distance.
+ * \param nearplane Near plane distance.
+ * \param farplane Far plane distance.
  */
 void
 lialg_camera_set_projection (LIAlgCamera* self,
                              float        fov,
                              float        aspect,
-                             float        near,
-                             float        far)
+                             float        nearplane,
+                             float        farplane)
 {
 	self->view.fov = fov;
 	self->view.aspect = aspect;
-	self->view.near = near;
-	self->view.far = far;
+	self->view.nearplane = nearplane;
+	self->view.farplane = farplane;
 	private_update_projection (self);
 }
 
@@ -665,7 +665,7 @@ private_update_projection (LIAlgCamera* self)
 {
 	self->view.projection = limat_matrix_perspective (
 		self->view.fov, self->view.aspect,
-		self->view.near, self->view.far);
+		self->view.nearplane, self->view.farplane);
 }
 
 /** @} */

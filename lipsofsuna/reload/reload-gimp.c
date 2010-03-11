@@ -53,7 +53,7 @@ lirel_reload_gimp (LIRelReload* self,
 		"(gimp-quit 1)";
 
 	/* Check if source file is missing for sure. */
-	if (access (src, R_OK) == -1)
+	if (!lisys_access (src, LISYS_ACCESS_READ))
 		return 0;
 
 	/* Choose temporary file. */

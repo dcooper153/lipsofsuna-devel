@@ -111,7 +111,7 @@ liarc_tar_write_data (LIArcTar*   self,
 	private_header_set_type (self, &header, LIARC_TAR_FILE, length);
 	private_header_set_name (self, &header, name);
 	private_header_set_perm (self, &header, 0660);
-	private_header_set_time (self, &header, time (NULL));
+	private_header_set_time (self, &header, lisys_time (NULL));
 	private_header_set_sum (self, &header);
 	if (!liarc_writer_append_raw (self->writer, &header, 512))
 		return 0;

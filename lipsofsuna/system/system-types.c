@@ -40,13 +40,16 @@ lisys_htons (uint16_t value)
 		uint16_t ret;
 	} tmp;
 
-#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
-	tmp.val[0] = ((uint8_t*) &value)[1];
-	tmp.val[1] = ((uint8_t*) &value)[0];
-#else
-	tmp.val[0] = ((uint8_t*) &value)[0];
-	tmp.val[1] = ((uint8_t*) &value)[1];
-#endif
+	if (lisys_endian_big ())
+	{
+		tmp.val[0] = ((uint8_t*) &value)[0];
+		tmp.val[1] = ((uint8_t*) &value)[1];
+	}
+	else
+	{
+		tmp.val[0] = ((uint8_t*) &value)[1];
+		tmp.val[1] = ((uint8_t*) &value)[0];
+	}
 
 	return tmp.ret;
 }
@@ -66,17 +69,20 @@ lisys_htonl (uint32_t value)
 		uint32_t ret;
 	} tmp;
 
-#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
-	tmp.val[0] = ((uint8_t*) &value)[3];
-	tmp.val[1] = ((uint8_t*) &value)[2];
-	tmp.val[2] = ((uint8_t*) &value)[1];
-	tmp.val[3] = ((uint8_t*) &value)[0];
-#else
-	tmp.val[0] = ((uint8_t*) &value)[0];
-	tmp.val[1] = ((uint8_t*) &value)[1];
-	tmp.val[2] = ((uint8_t*) &value)[2];
-	tmp.val[3] = ((uint8_t*) &value)[3];
-#endif
+	if (lisys_endian_big ())
+	{
+		tmp.val[0] = ((uint8_t*) &value)[0];
+		tmp.val[1] = ((uint8_t*) &value)[1];
+		tmp.val[2] = ((uint8_t*) &value)[2];
+		tmp.val[3] = ((uint8_t*) &value)[3];
+	}
+	else
+	{
+		tmp.val[0] = ((uint8_t*) &value)[3];
+		tmp.val[1] = ((uint8_t*) &value)[2];
+		tmp.val[2] = ((uint8_t*) &value)[1];
+		tmp.val[3] = ((uint8_t*) &value)[0];
+	}
 
 	return tmp.ret;
 }

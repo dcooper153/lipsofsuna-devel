@@ -25,46 +25,14 @@
 #ifndef __SYSTEM_ENDIAN_H__
 #define __SYSTEM_ENDIAN_H__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#define LISYS_ENDIAN_BIG 0x1234
+#define LISYS_ENDIAN_LITTLE 0x3412
 
-#if defined HAVE_ENDIAN_H
+int
+lisys_endian_big ();
 
-#include <endian.h>
-#define LISYS_BYTE_ORDER __BYTE_ORDER
-#define LISYS_LITTLE_ENDIAN __LITTLE_ENDIAN
-#define LISYS_BIG_ENDIAN __BIG_ENDIAN
-
-#elif defined HAVE_RPCNDR_H
-
-#define LISYS_BIG_ENDIAN 4321
-#define LISYS_LITTLE_ENDIAN 1234
-#define LISYS_BYTE_ORDER LISYS_LITTLE_ENDIAN
-/*
-#include <windows.h>
-#include <rpcndr.h>
-#define LISYS_LITTLE_ENDIAN NDR_LITTLE_ENDIAN
-#define LISYS_BIG_ENDIAN NDR_BIG_ENDIAN
-#define LISYS_BYTE_ORDER NDR_LOCAL_ENDIAN
-*/
-
-#elif defined HAVE_SYS_BYTEORDER_H
-
-#include <sys/byteorder.h>
-#define LISYS_BIG_ENDIAN 4321
-#define LISYS_LITTLE_ENDIAN 1234
-#ifdef _BIG_ENDIAN
-#define LISYS_BYTE_ORDER LISYS_BIG_ENDIAN
-#else
-#define LISYS_BYTE_ORDER LISYS_LITTLE_ENDIAN
-#endif
-
-#else
-
-#error "Cannot determine byte order"
-
-#endif
+int
+lisys_endian_get ();
 
 #endif
 

@@ -56,8 +56,8 @@ struct _LIAlgCamera
 	{
 		float aspect;
 		float fov;
-		float near;
-		float far;
+		float nearplane;
+		float farplane;
 		int viewport[4];
 		LIMatMatrix modelview;
 		LIMatMatrix projection;
@@ -150,8 +150,8 @@ void
 lialg_camera_set_projection (LIAlgCamera* self,
                              float        fov,
                              float        aspect,
-                             float        near,
-                             float        far);
+                             float        nearplane,
+                             float        farplane);
 
 void
 lialg_camera_get_transform (const LIAlgCamera* self,

@@ -29,6 +29,14 @@
 
 enum
 {
+	LISYS_ACCESS_EXISTS = 0x08,
+	LISYS_ACCESS_READ = 0x01,
+	LISYS_ACCESS_WRITE = 0x02,
+	LISYS_ACCESS_EXEC = 0x04,
+};
+
+enum
+{
 	LISYS_STAT_BLOCK,
 	LISYS_STAT_CHAR,
 	LISYS_STAT_DIRECTORY,
@@ -52,6 +60,10 @@ struct _LISysStat
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+int
+lisys_access (const char* path,
+              int         mode);
 
 LISysMmap*
 lisys_mmap_open (const char* path);

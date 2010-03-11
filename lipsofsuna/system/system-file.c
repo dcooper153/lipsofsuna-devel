@@ -231,6 +231,27 @@ lisys_mmap_get_size (LISysMmap* self)
 }
 
 /**
+ * \brief Checks if the file is accessible.
+ *
+ * \param path Path to the file.
+ * \param mode Access mode.
+ * \return Nonzero on success.
+ */
+int
+lisys_access (const char* path,
+              int         mode)
+{
+	int m = 0;
+
+	if (mode & LISYS_ACCESS_EXISTS) m |= F_OK;
+	if (mode & LISYS_ACCESS_READ) m |= R_OK;
+	if (mode & LISYS_ACCESS_WRITE) m |= W_OK;
+	if (mode & LISYS_ACCESS_EXEC) m |= X_OK;
+
+	return !access (path, m);
+}
+
+/**
  * \brief Reads the target of a symbolic link.
  *
  * \param path Path to the link.

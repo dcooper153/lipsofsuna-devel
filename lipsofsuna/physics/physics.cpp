@@ -76,8 +76,8 @@ LIPhyPhysics*
 liphy_physics_new (LICalCallbacks* callbacks)
 {
 	LIPhyPhysics* self;
-	btVector3 min (-65535, -65535, -65535);
-	btVector3 max ( 65535,  65535,  65535);
+	btVector3 vmin (-65535, -65535, -65535);
+	btVector3 vmax ( 65535,  65535,  65535);
 
 	/* Allocate self. */
 	self = (LIPhyPhysics*) lisys_calloc (1, sizeof (LIPhyPhysics));
@@ -100,7 +100,7 @@ liphy_physics_new (LICalCallbacks* callbacks)
 #ifdef LIPHY_BROADPHASE_DBVT
 		self->broadphase = new btDbvtBroadphase ();
 #else
-		self->broadphase = new bt32BitAxisSweep3 (min, max, MAXPROXIES);
+		self->broadphase = new bt32BitAxisSweep3 (vmin, vmax, MAXPROXIES);
 #endif
 		self->broadphase->getOverlappingPairCache ()->setInternalGhostPairCallback (self->ghostcallback);
 		self->configuration = new btDefaultCollisionConfiguration ();

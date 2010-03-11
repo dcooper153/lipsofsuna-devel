@@ -342,17 +342,20 @@ liarc_writer_append_float (LIArcWriter* self,
 {
 	uint8_t tmp[4];
 
-#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
-	tmp[0] = ((uint8_t*) &value)[3];
-	tmp[1] = ((uint8_t*) &value)[2];
-	tmp[2] = ((uint8_t*) &value)[1];
-	tmp[3] = ((uint8_t*) &value)[0];
-#else
-	tmp[0] = ((uint8_t*) &value)[0];
-	tmp[1] = ((uint8_t*) &value)[1];
-	tmp[2] = ((uint8_t*) &value)[2];
-	tmp[3] = ((uint8_t*) &value)[3];
-#endif
+	if (lisys_endian_big ())
+	{
+		tmp[0] = ((uint8_t*) &value)[0];
+		tmp[1] = ((uint8_t*) &value)[1];
+		tmp[2] = ((uint8_t*) &value)[2];
+		tmp[3] = ((uint8_t*) &value)[3];
+	}
+	else
+	{
+		tmp[0] = ((uint8_t*) &value)[3];
+		tmp[1] = ((uint8_t*) &value)[2];
+		tmp[2] = ((uint8_t*) &value)[1];
+		tmp[3] = ((uint8_t*) &value)[0];
+	}
 	if (!self->write (self, tmp, 4))
 	{
 		self->error = 1;

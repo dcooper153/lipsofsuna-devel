@@ -188,7 +188,8 @@ liimg_dds_init_s3tc (LIImgDDS* self,
 static inline void
 liimg_dds_byteswap (LIImgDDS* self)
 {
-#if LISYS_BYTE_ORDER == LISYS_BIG_ENDIAN
+	if (lisys_endian_big ())
+	{
 	#define BYTESWAP(i) ((((i)&&0xFF)<<24) | (((i)&&0xFF00)<<8) | (((i)&&0xFF0000)>>8) | (((i)&&0xFF000000)>>24))
 	self->header.magic = BYTESWAP (self->header.magic);
 	self->header.flags = BYTESWAP (self->header.flags);
@@ -209,7 +210,7 @@ liimg_dds_byteswap (LIImgDDS* self)
 	self->caps.caps2 = BYTESWAP (self->caps.caps2);
 	self->caps.ddsx = BYTESWAP (self->caps.ddsx);
 	#undef BYTESWAP
-#endif
+	}
 }
 
 /**

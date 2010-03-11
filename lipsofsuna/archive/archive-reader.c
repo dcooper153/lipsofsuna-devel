@@ -351,17 +351,20 @@ liarc_reader_get_float (LIArcReader* self,
 	}
 
 	/* Read the value. */
-#if LISYS_BYTE_ORDER == LISYS_LITTLE_ENDIAN
-	tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[3];
-	tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[2];
-	tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[1];
-	tmp.b[3] = ((uint8_t*)(self->buffer + self->pos))[0];
-#else
-	tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[0];
-	tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[1];
-	tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[2];
-	tmp.b[3] = ((uint8_t*)(self->buffer + self->pos))[3];
-#endif
+	if (lisys_endian_big ())
+	{
+		tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[0];
+		tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[1];
+		tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[2];
+		tmp.b[3] = ((uint8_t*)(self->buffer + self->pos))[3];
+	}
+	else
+	{
+		tmp.b[0] = ((uint8_t*)(self->buffer + self->pos))[3];
+		tmp.b[1] = ((uint8_t*)(self->buffer + self->pos))[2];
+		tmp.b[2] = ((uint8_t*)(self->buffer + self->pos))[1];
+		tmp.b[3] = ((uint8_t*)(self->buffer + self->pos))[0];
+	}
 	*value = tmp.f;
 	self->pos += 4;
 	return 1;
