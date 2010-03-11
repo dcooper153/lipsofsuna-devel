@@ -46,6 +46,7 @@ struct _LIGenBrush
 {
 	int id;
 	int size[3];
+	int disabled;
 	char* name;
 	LIGenGenerator* generator;
 	struct

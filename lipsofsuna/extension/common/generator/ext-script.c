@@ -36,6 +36,66 @@
 
 /* @luadoc
  * ---
+ * -- @brief Disables a brush type.
+ * --
+ * -- You can use this function to temporarily disable certain brush types so
+ * -- that they'll never appear in the map. This is typically used to control
+ * -- where special rooms should appear in the map.
+ * --
+ * -- Arguments:
+ * -- name: Brush name.
+ * --
+ * -- @param self generator class.
+ * -- @param args Arguments.
+ * Generator.disable_brush(self, args)
+ */
+static void Generator_disable_brush (LIScrArgs* args)
+{
+	const char* name;
+	LIExtModule* module;
+	LIGenBrush* brush;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_string (args, "name", &name))
+	{
+		brush = ligen_generator_find_brush_by_name (module->generator, name);
+		if (brush == NULL)
+			return;
+		brush->disabled = 1;
+	}
+}
+
+/* @luadoc
+ * ---
+ * -- @brief Enables a brush type.
+ * --
+ * -- Enables a previously disabled brush type.
+ * --
+ * -- Arguments:
+ * -- name: Brush name.
+ * --
+ * -- @param self generator class.
+ * -- @param args Arguments.
+ * Generator.enable_brush(self, args)
+ */
+static void Generator_enable_brush (LIScrArgs* args)
+{
+	const char* name;
+	LIExtModule* module;
+	LIGenBrush* brush;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_string (args, "name", &name))
+	{
+		brush = ligen_generator_find_brush_by_name (module->generator, name);
+		if (brush == NULL)
+			return;
+		brush->disabled = 0;
+	}
+}
+
+/* @luadoc
+ * ---
  * -- Creates the root node of the map.
  * --
  * -- Arguments:
@@ -125,6 +185,27 @@ static void Generator_save (LIScrArgs* args)
 	ligen_generator_write (module->generator);
 }
 
+/* @luadoc
+ * ---
+ * -- List of brush names.
+ * -- @name Generator.brushes
+ * -- @class table
+ */
+static void Generator_getter_brushes (LIScrArgs* args)
+{
+	LIAlgU32dicIter iter;
+	LIExtModule* module;
+	LIGenBrush* brush;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	LIALG_U32DIC_FOREACH (iter, module->generator->brushes)
+	{
+		brush = iter.value;
+		liscr_args_sets_int (args, brush->name, brush->id);
+	}
+}
+
 /*****************************************************************************/
 
 void
@@ -132,9 +213,12 @@ liext_script_generator (LIScrClass* self,
                         void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
+	liscr_class_insert_cfunc (self, "disable_brush", Generator_disable_brush);
+	liscr_class_insert_cfunc (self, "enable_brush", Generator_enable_brush);
 	liscr_class_insert_cfunc (self, "expand", Generator_expand);
 	liscr_class_insert_cfunc (self, "format", Generator_format);
 	liscr_class_insert_cfunc (self, "save", Generator_save);
+	liscr_class_insert_cvar (self, "brushes", Generator_getter_brushes, NULL);
 }
 
 /** @} */

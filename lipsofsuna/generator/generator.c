@@ -37,6 +37,11 @@ static int
 private_init_tables (LIGenGenerator* self);
 
 static int
+private_brush_disabled (LIGenGenerator*  self,
+                        LIGenStroke*     stroke,
+                        LIGenRulestroke* rstroke);
+
+static int
 private_brush_exists (LIGenGenerator*  self,
                       LIGenStroke*     stroke,
                       LIGenRulestroke* rstroke);
@@ -858,6 +863,19 @@ private_init_tables (LIGenGenerator* self)
 }
 
 static int
+private_brush_disabled (LIGenGenerator*  self,
+                        LIGenStroke*     stroke,
+                        LIGenRulestroke* rstroke)
+{
+	LIGenBrush* brush;
+
+	brush = lialg_u32dic_find (self->brushes, rstroke->brush);
+	assert (brush != NULL);
+
+	return brush->disabled;
+}
+
+static int
 private_brush_exists (LIGenGenerator*  self,
                       LIGenStroke*     stroke,
                       LIGenRulestroke* rstroke)
@@ -986,7 +1004,8 @@ private_rule_test (LIGenGenerator* self,
 		}
 		else
 		{
-			if (private_brush_intersects (self, stroke, rstroke))
+			if (private_brush_disabled (self, stroke, rstroke) ||
+			    private_brush_intersects (self, stroke, rstroke))
 				return 0;
 		}
 	}
