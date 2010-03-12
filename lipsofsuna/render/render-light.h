@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-types.h"
 
@@ -57,74 +58,74 @@ struct _LIRenLight
 	} shadow;
 };
 
-LIRenLight*
-liren_light_new (LIRenScene*  scene,
-                 const float* color,
-                 const float* equation,
-                 float        cutoff,
-                 float        exponent,
-                 int          shadow);
+LIAPICALL (LIRenLight*, liren_light_new, (
+	LIRenScene*  scene,
+	const float* color,
+	const float* equation,
+	float        cutoff,
+	float        exponent,
+	int          shadow));
 
-LIRenLight*
-liren_light_new_directional (LIRenScene*  scene,
-                             const float* color);
+LIAPICALL (LIRenLight*, liren_light_new_directional, (
+	LIRenScene*  scene,
+	const float* color));
 
-LIRenLight*
-liren_light_new_from_model (LIRenScene*      scene,
-                            const LIMdlNode* light);
+LIAPICALL (LIRenLight*, liren_light_new_from_model, (
+	LIRenScene*      scene,
+	const LIMdlNode* light));
 
-void
-liren_light_free (LIRenLight* self);
+LIAPICALL (void, liren_light_free, (
+	LIRenLight* self));
 
-int
-liren_light_compare (const LIRenLight* self,
-                     const LIRenLight* light);
+LIAPICALL (int, liren_light_compare, (
+	const LIRenLight* self,
+	const LIRenLight* light));
 
-void
-liren_light_update (LIRenLight* self);
+LIAPICALL (void, liren_light_update, (
+	LIRenLight* self));
 
-void
-liren_light_set_ambient (LIRenLight*  self,
-                         const float* value);
+LIAPICALL (void, liren_light_set_ambient, (
+	LIRenLight*  self,
+	const float* value));
 
-int
-liren_light_get_bounds (const LIRenLight* self,
-                        LIMatAabb*        result);
+LIAPICALL (int, liren_light_get_bounds, (
+	const LIRenLight* self,
+	LIMatAabb*        result));
 
-void
-liren_light_get_direction (const LIRenLight* self,
-                           LIMatVector*      value);
+LIAPICALL (void, liren_light_get_direction, (
+	const LIRenLight* self,
+	LIMatVector*      value));
 
-void
-liren_light_set_direction (LIRenLight*        self,
-                           const LIMatVector* value);
+LIAPICALL (void, liren_light_set_direction, (
+	LIRenLight*        self,
+	const LIMatVector* value));
 
-void
-liren_light_set_directional (LIRenLight* self,
-                             int         value);
+LIAPICALL (void, liren_light_set_directional, (
+	LIRenLight* self,
+	int         value));
 
-int
-liren_light_get_enabled (const LIRenLight* self);
+LIAPICALL (int, liren_light_get_enabled, (
+	const LIRenLight* self));
 
-void
-liren_light_get_modelview (const LIRenLight* self,
-                           LIMatMatrix*      value);
+LIAPICALL (void, liren_light_get_modelview, (
+	const LIRenLight* self,
+	LIMatMatrix*      value));
 
-void
-liren_light_get_transform (LIRenLight*     self,
-                           LIMatTransform* value);
+LIAPICALL (void, liren_light_get_transform, (
+	LIRenLight*     self,
+	LIMatTransform* value));
 
-void
-liren_light_set_transform (LIRenLight*           self,
-                           const LIMatTransform* transform);
+LIAPICALL (void, liren_light_set_transform, (
+	LIRenLight*           self,
+	const LIMatTransform* transform));
 
-void
-liren_light_get_projection (const LIRenLight* self,
-                            LIMatMatrix*      value);
+LIAPICALL (void, liren_light_get_projection, (
+	const LIRenLight* self,
+	LIMatMatrix*      value));
 
-void
-liren_light_set_projection (LIRenLight*        self,
-                            const LIMatMatrix* value);
+LIAPICALL (void, liren_light_set_projection, (
+	LIRenLight*        self,
+	const LIMatMatrix* value));
 
 #endif
 

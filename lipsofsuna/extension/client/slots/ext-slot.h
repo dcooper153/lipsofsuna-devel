@@ -27,8 +27,7 @@
 #ifndef __CLIENT_SLOT_H__
 #define __CLIENT_SLOT_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/render.h>
+#include "ext-module.h"
 
 typedef struct _LIExtSlot LIExtSlot;
 struct _LIExtSlot

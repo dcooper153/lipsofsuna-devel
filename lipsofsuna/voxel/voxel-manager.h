@@ -57,134 +57,134 @@ struct _LIVoxManager
 	LICalCallbacks* callbacks;
 };
 
-LIVoxManager*
-livox_manager_new (LICalCallbacks* callbacks,
-                   LIAlgSectors*   sectors);
+LIAPICALL (LIVoxManager*, livox_manager_new, (
+	LICalCallbacks* callbacks,
+	LIAlgSectors*   sectors));
 
-void
-livox_manager_free (LIVoxManager* self);
+LIAPICALL (void, livox_manager_free, (
+	LIVoxManager* self));
 
-int
-livox_manager_check_occluder (const LIVoxManager* self,
-                              const LIVoxVoxel*   voxel);
+LIAPICALL (int, livox_manager_check_occluder, (
+	const LIVoxManager* self,
+	const LIVoxVoxel*   voxel));
 
-void
-livox_manager_clear_materials (LIVoxManager* self);
+LIAPICALL (void, livox_manager_clear_materials, (
+	LIVoxManager* self));
 
-void
-livox_manager_copy_voxels (LIVoxManager* self,
-                           int           xstart,
-                           int           ystart,
-                           int           zstart,
-                           int           xsize,
-                           int           ysize,
-                           int           zsize,
-                           LIVoxVoxel*   result);
+LIAPICALL (void, livox_manager_copy_voxels, (
+	LIVoxManager* self,
+	int           xstart,
+	int           ystart,
+	int           zstart,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   result));
 
-int
-livox_manager_erase_voxel (LIVoxManager*      self,
-                           const LIMatVector* point);
+LIAPICALL (int, livox_manager_erase_voxel, (
+	LIVoxManager*      self,
+	const LIMatVector* point));
 
-LIVoxMaterial*
-livox_manager_find_material (LIVoxManager* self,
-                             uint32_t      id);
+LIAPICALL (LIVoxMaterial*, livox_manager_find_material, (
+	LIVoxManager* self,
+	uint32_t      id));
 
-LIVoxVoxel*
-livox_manager_find_voxel (LIVoxManager*      self,
-                          int                flags,
-                          const LIMatVector* point,
-                          LIMatVector*       center);
+LIAPICALL (LIVoxVoxel*, livox_manager_find_voxel, (
+	LIVoxManager*      self,
+	int                flags,
+	const LIMatVector* point,
+	LIMatVector*       center));
 
-int
-livox_manager_insert_material (LIVoxManager*  self,
-                               LIVoxMaterial* material);
+LIAPICALL (int, livox_manager_insert_material, (
+	LIVoxManager*  self,
+	LIVoxMaterial* material));
 
-int
-livox_manager_insert_voxel (LIVoxManager*      self,
-                            const LIMatVector* point,
-                            const LIVoxVoxel*  terrain);
+LIAPICALL (int, livox_manager_insert_voxel, (
+	LIVoxManager*      self,
+	const LIMatVector* point,
+	const LIVoxVoxel*  terrain));
 
-int
-livox_manager_load_materials (LIVoxManager* self);
+LIAPICALL (int, livox_manager_load_materials, (
+	LIVoxManager* self));
 
-void
-livox_manager_mark_updates (LIVoxManager* self);
+LIAPICALL (void, livox_manager_mark_updates, (
+	LIVoxManager* self));
 
-void
-livox_manager_paste_voxels (LIVoxManager* self,
-                            int           xstart,
-                            int           ystart,
-                            int           zstart,
-                            int           xsize,
-                            int           ysize,
-                            int           zsize,
-                            LIVoxVoxel*   voxels);
+LIAPICALL (void, livox_manager_paste_voxels, (
+	LIVoxManager* self,
+	int           xstart,
+	int           ystart,
+	int           zstart,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   voxels));
 
-void
-livox_manager_reload_model (LIVoxManager* self,
-                            const char*   name);
+LIAPICALL (void, livox_manager_reload_model, (
+	LIVoxManager* self,
+	const char*   name));
 
-void
-livox_manager_remove_material (LIVoxManager* self,
-                               int           id);
+LIAPICALL (void, livox_manager_remove_material, (
+	LIVoxManager* self,
+	int           id));
 
-int
-livox_manager_replace_voxel (LIVoxManager*      self,
-                             const LIMatVector* point,
-                             const LIVoxVoxel*  terrain);
+LIAPICALL (int, livox_manager_replace_voxel, (
+	LIVoxManager*      self,
+	const LIMatVector* point,
+	const LIVoxVoxel*  terrain));
 
-int
-livox_manager_rotate_voxel (LIVoxManager*      self,
-                            const LIMatVector* point,
-                            int                axis,
-                            int                step);
+LIAPICALL (int, livox_manager_rotate_voxel, (
+	LIVoxManager*      self,
+	const LIMatVector* point,
+	int                axis,
+	int                step));
 
-int
-livox_manager_solve_occlusion (LIVoxManager* self,
-                               int           xsize,
-                               int           ysize,
-                               int           zsize,
-                               LIVoxVoxel*   voxels,
-                               int*          result);
+LIAPICALL (int, livox_manager_solve_occlusion, (
+	LIVoxManager* self,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   voxels,
+	int*          result));
 
-void
-livox_manager_update (LIVoxManager* self,
-                      float         secs);
+LIAPICALL (void, livox_manager_update, (
+	LIVoxManager* self,
+	float         secs));
 
-void
-livox_manager_update_marked (LIVoxManager* self);
+LIAPICALL (void, livox_manager_update_marked, (
+	LIVoxManager* self));
 
-int
-livox_manager_write (LIVoxManager* self);
+LIAPICALL (int, livox_manager_write, (
+	LIVoxManager* self));
 
-int
-livox_manager_write_materials (LIVoxManager* self);
+LIAPICALL (int, livox_manager_write_materials, (
+	LIVoxManager* self));
 
-void
-livox_manager_set_fill (LIVoxManager* self,
-                        int           fill);
+LIAPICALL (void, livox_manager_set_fill, (
+	LIVoxManager* self,
+	int           fill));
 
-void
-livox_manager_set_load (LIVoxManager* self,
-                        int           value);
+LIAPICALL (void, livox_manager_set_load, (
+	LIVoxManager* self,
+	int           value));
 
-void
-livox_manager_set_sql (LIVoxManager* self,
-                       LIArcSql*     sql);
+LIAPICALL (void, livox_manager_set_sql, (
+	LIVoxManager* self,
+	LIArcSql*     sql));
 
-void
-livox_manager_get_voxel (LIVoxManager* self,
-                         int           x,
-                         int           y,
-                         int           z,
-                         LIVoxVoxel*   value);
+LIAPICALL (void, livox_manager_get_voxel, (
+	LIVoxManager* self,
+	int           x,
+	int           y,
+	int           z,
+	LIVoxVoxel*   value));
 
-int
-livox_manager_set_voxel (LIVoxManager*     self,
-                         int               x,
-                         int               y,
-                         int               z,
-                         const LIVoxVoxel* value);
+LIAPICALL (int, livox_manager_set_voxel, (
+	LIVoxManager*     self,
+	int               x,
+	int               y,
+	int               z,
+	const LIVoxVoxel* value));
 
 #endif
 

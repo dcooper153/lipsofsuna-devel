@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/font.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_ENTRY(o) ((LIWdgEntry*)(o))
@@ -49,41 +50,41 @@ struct _LIWdgEntry
 	unsigned int secret : 1;
 };
 
-extern const LIWdgClass liwdg_widget_entry;
+LIAPICALL (const LIWdgClass*, liwdg_widget_entry, ());
 
-LIWdgWidget*
-liwdg_entry_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_entry_new, (
+	LIWdgManager* manager));
 
-void
-liwdg_entry_clear (LIWdgEntry* self);
+LIAPICALL (void, liwdg_entry_clear, (
+	LIWdgEntry* self));
 
-int
-liwdg_entry_get_editable (LIWdgEntry* self);
+LIAPICALL (int, liwdg_entry_get_editable, (
+	LIWdgEntry* self));
 
-void
-liwdg_entry_set_editable (LIWdgEntry* self,
-                          int         editable);
+LIAPICALL (void, liwdg_entry_set_editable, (
+	LIWdgEntry* self,
+	int         editable));
 
-LIFntFont*
-liwdg_entry_get_font (LIWdgEntry* self);
+LIAPICALL (LIFntFont*, liwdg_entry_get_font, (
+	LIWdgEntry* self));
 
-void
-liwdg_entry_set_font (LIWdgEntry* self,
-                      LIFntFont*  font);
+LIAPICALL (void, liwdg_entry_set_font, (
+	LIWdgEntry* self,
+	LIFntFont*  font));
 
-int
-liwdg_entry_get_secret (LIWdgEntry* self);
+LIAPICALL (int, liwdg_entry_get_secret, (
+	LIWdgEntry* self));
 
-void
-liwdg_entry_set_secret (LIWdgEntry* self,
-                        int         secret);
+LIAPICALL (void, liwdg_entry_set_secret, (
+	LIWdgEntry* self,
+	int         secret));
 
-const char*
-liwdg_entry_get_text (LIWdgEntry* self);
+LIAPICALL (const char*, liwdg_entry_get_text, (
+	LIWdgEntry* self));
 
-int
-liwdg_entry_set_text (LIWdgEntry* self,
-                      const char* text);
+LIAPICALL (int, liwdg_entry_set_text, (
+	LIWdgEntry* self,
+	const char* text));
 
 #endif
 

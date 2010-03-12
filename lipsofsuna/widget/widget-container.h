@@ -25,6 +25,7 @@
 #ifndef __WIDGET_CONTAINER_H__
 #define __WIDGET_CONTAINER_H__
 
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-types.h"
 
@@ -54,37 +55,37 @@ struct _LIWdgContainerIface
 	LIWdgContainerTranslateCoordsFunc translate_coords;
 };
 
-extern const LIWdgClass liwdg_widget_container;
+LIAPICALL (const LIWdgClass*, liwdg_widget_container, ());
 
-LIWdgWidget*
-liwdg_container_child_at (LIWdgContainer* self,
-                          int             x,
-                          int             y);
+LIAPICALL (LIWdgWidget*, liwdg_container_child_at, (
+	LIWdgContainer* self,
+	int             x,
+	int             y));
 
-void
-liwdg_container_child_request (LIWdgContainer* self,
-                               LIWdgWidget*    child);
+LIAPICALL (void, liwdg_container_child_request, (
+	LIWdgContainer* self,
+	LIWdgWidget*    child));
 
-LIWdgWidget*
-liwdg_container_cycle_focus (LIWdgContainer* self,
-                             LIWdgWidget*    curr,
-                             int             dir);
+LIAPICALL (LIWdgWidget*, liwdg_container_cycle_focus, (
+	LIWdgContainer* self,
+	LIWdgWidget*    curr,
+	int             dir));
 
-void
-liwdg_container_detach_child (LIWdgContainer* self,
-                              LIWdgWidget*    child);
+LIAPICALL (void, liwdg_container_detach_child, (
+	LIWdgContainer* self,
+	LIWdgWidget*    child));
 
-void
-liwdg_container_foreach_child (LIWdgContainer* self,
-                               void          (*call)(),
-                               void*           data);
+LIAPICALL (void, liwdg_container_foreach_child, (
+	LIWdgContainer* self,
+	void          (*call)(),
+	void*           data));
 
-void
-liwdg_container_translate_coords (LIWdgContainer* self,
-                                  int             containerx,
-                                  int             containery,
-                                  int*            childx,
-                                  int*            childy);
+LIAPICALL (void, liwdg_container_translate_coords, (
+	LIWdgContainer* self,
+	int             containerx,
+	int             containery,
+	int*            childx,
+	int*            childy));
 
 #endif
 

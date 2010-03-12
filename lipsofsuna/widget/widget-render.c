@@ -36,15 +36,20 @@ static int
 private_event (LIWdgRender* self,
                LIWdgEvent* event);
 
-const LIWdgClass liwdg_widget_render =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_group, "Render", sizeof (LIWdgRender),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_render ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_group, "Render", sizeof (LIWdgRender),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 /**
  * \brief Creates a new scene renderer widget.
@@ -59,7 +64,7 @@ liwdg_render_new (LIWdgManager* manager,
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_render);
+	self = liwdg_widget_new (manager, liwdg_widget_render ());
 	if (self == NULL)
 		return NULL;
 	LIWDG_RENDER (self)->scene = scene;
@@ -239,7 +244,7 @@ private_event (LIWdgRender* self,
 			break;
 	}
 
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

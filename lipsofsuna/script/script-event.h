@@ -27,32 +27,33 @@
 
 #include <stdarg.h>
 #include <lipsofsuna/script.h>
+#include <lipsofsuna/system.h>
 
-LIScrData*
-liscr_event_new (LIScrScript* script);
+LIAPICALL (LIScrData*, liscr_event_new, (
+	LIScrScript* script));
 
-LIScrData*
-liscr_event_newv (LIScrScript* script,
-                  va_list      args);
+LIAPICALL (LIScrData*, liscr_event_newv, (
+	LIScrScript* script,
+	va_list      args));
 
-LIScrData*
-liscr_event_newva (LIScrScript* script,
-                                ...);
+LIAPICALL (LIScrData*, liscr_event_newva, (
+	LIScrScript* script,
+	             ...));
 
-void
-liscr_event_set (LIScrData* self,
-                            ...);
+LIAPICALL (void, liscr_event_set, (
+	LIScrData* self,
+	           ...));
 
-void
-liscr_event_setv (LIScrData* self,
-                  va_list    args);
+LIAPICALL (void, liscr_event_setv, (
+	LIScrData* self,
+	va_list    args));
 
-int
-liscr_event_get_type (const LIScrData* self);
+LIAPICALL (int, liscr_event_get_type, (
+	const LIScrData* self));
 
-void
-liscr_event_set_type (LIScrData* self,
-                      int        type);
+LIAPICALL (void, liscr_event_set_type, (
+	LIScrData* self,
+	int        type));
 
 #endif
 

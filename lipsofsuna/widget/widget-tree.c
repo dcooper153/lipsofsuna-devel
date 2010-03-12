@@ -98,20 +98,25 @@ private_treerow_get_request (LIWdgTreerow* self,
 
 /****************************************************************************/
 
-const LIWdgClass liwdg_widget_tree =
+const LIWdgClass*
+liwdg_widget_tree ()
 {
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Tree", sizeof (LIWdgTree),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Tree", sizeof (LIWdgTree),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_tree_new (LIWdgManager* manager)
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_tree);
+	self = liwdg_widget_new (manager, liwdg_widget_tree ());
 	if (self == NULL)
 		return NULL;
 
@@ -377,7 +382,7 @@ private_event (LIWdgTree*  self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

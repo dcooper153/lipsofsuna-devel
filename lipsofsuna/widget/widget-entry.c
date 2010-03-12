@@ -42,20 +42,25 @@ private_backspace (LIWdgEntry* self);
 static void
 private_rebuild (LIWdgEntry* self);
 
-const LIWdgClass liwdg_widget_entry =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Entry", sizeof (LIWdgEntry),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_entry ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Entry", sizeof (LIWdgEntry),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_entry_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_entry);
+	return liwdg_widget_new (manager, liwdg_widget_entry ());
 }
 
 void
@@ -254,7 +259,7 @@ private_event (LIWdgEntry* self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

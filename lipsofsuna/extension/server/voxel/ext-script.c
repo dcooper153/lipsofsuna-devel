@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/network.h>
 #include "ext-module.h"
+#include "ext-block.h"
 
 /* @luadoc
  * module "Extension.Server.Voxel"

@@ -37,13 +37,18 @@ private_event (LIWdgContainer* self,
 
 /*****************************************************************************/
 
-const LIWdgClass liwdg_widget_container =
+const LIWdgClass*
+liwdg_widget_container ()
 {
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Container", sizeof (LIWdgContainer),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event,
-};
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Container", sizeof (LIWdgContainer),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event,
+	};
+	return &clss;
+}
 
 /**
  * \brief Gets a child widget under the cursor position.
@@ -63,7 +68,7 @@ liwdg_container_child_at (LIWdgContainer* self,
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdg_widget_container;
+	event.probe.clss = liwdg_widget_container ();
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -93,7 +98,7 @@ liwdg_container_child_request (LIWdgContainer* self,
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdg_widget_container;
+	event.probe.clss = liwdg_widget_container ();
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -116,7 +121,7 @@ liwdg_container_cycle_focus (LIWdgContainer* self,
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdg_widget_container;
+	event.probe.clss = liwdg_widget_container ();
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -146,7 +151,7 @@ liwdg_container_detach_child (LIWdgContainer* self,
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdg_widget_container;
+	event.probe.clss = liwdg_widget_container ();
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -176,7 +181,7 @@ liwdg_container_foreach_child (LIWdgContainer* self,
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdg_widget_container;
+	event.probe.clss = liwdg_widget_container ();
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -212,7 +217,7 @@ liwdg_container_translate_coords (LIWdgContainer* self,
 
 	/* Probe interface. */
 	event.type = LIWDG_EVENT_TYPE_PROBE;
-	event.probe.clss = &liwdg_widget_container;
+	event.probe.clss = liwdg_widget_container ();
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
@@ -253,7 +258,7 @@ private_event (LIWdgContainer* self,
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdg_widget_container)
+	    event->probe.clss == liwdg_widget_container ())
 	{
 		static LIWdgContainerIface iface =
 		{
@@ -281,7 +286,7 @@ private_event (LIWdgContainer* self,
 			y = event->motion.y;
 			break;
 		default:
-			return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+			return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 	}
 
 	/* Translate coordinates. */
@@ -311,7 +316,7 @@ private_event (LIWdgContainer* self,
 		}
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

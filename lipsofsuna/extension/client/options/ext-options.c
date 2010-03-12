@@ -24,11 +24,8 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
+#include "ext-module.h"
 #include "ext-options.h"
-
-static const void*
-private_base ();
 
 static int
 private_init (LIExtOptions* self,
@@ -55,20 +52,26 @@ private_shaders (LIExtOptions* self);
 
 /****************************************************************************/
 
-const LIWdgClass LIExtOptionsType =
+const LIWdgClass*
+liext_widget_options ()
 {
-	LIWDG_BASE_DYNAMIC, private_base, "Options", sizeof (LIExtOptions),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static LIWdgClass clss =
+	{
+		NULL, "Options", sizeof (LIExtOptions),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	clss.base = liwdg_widget_group;
+	return &clss;
+}
 
 LIWdgWidget*
 liext_options_new (LICliClient* client)
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (client->widgets, &LIExtOptionsType);
+	self = liwdg_widget_new (client->widgets, liext_widget_options ());
 	if (self == NULL)
 		return NULL;
 	LIEXT_WIDGET_OPTIONS (self)->client = client;
@@ -77,12 +80,6 @@ liext_options_new (LICliClient* client)
 }
 
 /****************************************************************************/
-
-static const void*
-private_base ()
-{
-	return &liwdg_widget_group;
-}
 
 static int
 private_init (LIExtOptions* self,
@@ -149,7 +146,7 @@ static int
 private_event (LIExtOptions* self,
                LIWdgEvent*   event)
 {
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

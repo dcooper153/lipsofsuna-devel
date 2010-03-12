@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "voxel-types.h"
 
 #define LIVOX_MATERIAL_FORMAT 0
@@ -56,33 +57,32 @@ struct _LIVoxMaterial
 	LIMdlMaterial mat_top;
 };
 
-LIVoxMaterial*
-livox_material_new ();
+LIAPICALL (LIVoxMaterial*, livox_material_new, ());
 
-LIVoxMaterial*
-livox_material_new_copy (const LIVoxMaterial* src);
+LIAPICALL (LIVoxMaterial*, livox_material_new_copy, (
+	const LIVoxMaterial* src));
 
-LIVoxMaterial*
-livox_material_new_from_stream (LIArcReader* reader);
+LIAPICALL (LIVoxMaterial*, livox_material_new_from_stream, (
+	LIArcReader* reader));
 
-void
-livox_material_free (LIVoxMaterial* self);
+LIAPICALL (void, livox_material_free, (
+	LIVoxMaterial* self));
 
-int
-livox_material_read (LIVoxMaterial* self,
-                     LIArcReader*   reader);
+LIAPICALL (int, livox_material_read, (
+	LIVoxMaterial* self,
+	LIArcReader*   reader));
 
-int
-livox_material_write (LIVoxMaterial* self,
-                      LIArcWriter*   writer);
+LIAPICALL (int, livox_material_write, (
+	LIVoxMaterial* self,
+	LIArcWriter*   writer));
 
-int
-livox_material_set_name (LIVoxMaterial* self,
-                         const char*    value);
+LIAPICALL (int, livox_material_set_name, (
+	LIVoxMaterial* self,
+	const char*    value));
 
-int
-livox_material_set_model (LIVoxMaterial* self,
-                          const char*    value);
+LIAPICALL (int, livox_material_set_model, (
+	LIVoxMaterial* self,
+	const char*    value));
 
 #endif
 

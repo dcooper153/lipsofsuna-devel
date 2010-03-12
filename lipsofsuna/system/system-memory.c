@@ -25,8 +25,8 @@
 #include "system-memory.h"
 
 void*
-lisys_calloc_func (size_t num,
-                   size_t size)
+lisys_calloc (size_t num,
+              size_t size)
 {
 	void* mem;
 
@@ -38,7 +38,7 @@ lisys_calloc_func (size_t num,
 }
 
 void*
-lisys_malloc_func (size_t size)
+lisys_malloc (size_t size)
 {
 	void* mem;
 
@@ -50,8 +50,8 @@ lisys_malloc_func (size_t size)
 }
 
 void*
-lisys_realloc_func (void*  mem,
-                    size_t size)
+lisys_realloc (void*  mem,
+               size_t size)
 {
 	void* mem1;
 
@@ -63,94 +63,7 @@ lisys_realloc_func (void*  mem,
 }
 
 void
-lisys_free_func (void* mem)
+lisys_free (void* mem)
 {
 	free (mem);
 }
-
-#ifdef LI_MALLOC_DEBUG
-
-static FILE* log = NULL;
-
-void*
-lisys_calloc_log (size_t      num,
-                  size_t      size,
-                  const char* fmt,
-                              ...)
-{
-	void* mem;
-	va_list args;
-
-	if (log == NULL)
-		log = fopen ("MALLOC.LOG", "w");
-	va_start (args, fmt);
-	vfprintf (log, fmt, args);
-	va_end (args);
-
-	mem = calloc (num, size);
-	if (mem == NULL)
-		lisys_error_set (ENOMEM, NULL);
-
-	return mem;
-}
-
-void*
-lisys_malloc_log (size_t      size,
-                  const char* fmt,
-                              ...)
-{
-	void* mem;
-	va_list args;
-
-	if (log == NULL)
-		log = fopen ("MALLOC.LOG", "w");
-	va_start (args, fmt);
-	vfprintf (log, fmt, args);
-	va_end (args);
-
-	mem = malloc (size);
-	if (mem == NULL)
-		lisys_error_set (ENOMEM, NULL);
-
-	return mem;
-}
-
-void*
-lisys_realloc_log (void*       mem,
-                   size_t      size,
-                   const char* fmt,
-                               ...)
-{
-	void* mem1;
-	va_list args;
-
-	if (log == NULL)
-		log = fopen ("MALLOC.LOG", "w");
-	va_start (args, fmt);
-	vfprintf (log, fmt, args);
-	va_end (args);
-
-	mem1 = realloc (mem, size);
-	if (mem1 == NULL && size)
-		lisys_error_set (ENOMEM, NULL);
-
-	return mem1;
-}
-
-void
-lisys_free_log (void*       mem,
-                const char* fmt,
-                            ...)
-{
-	va_list args;
-
-	if (log == NULL)
-		log = fopen ("MALLOC.LOG", "w");
-	va_start (args, fmt);
-	vfprintf (log, fmt, args);
-	va_end (args);
-
-	free (mem);
-}
-
-#endif

@@ -59,29 +59,29 @@
 
 typedef const char* lisysPathFormat;
 
-char*
-lisys_path_basename (const char* path);
+LIAPICALL (char*, lisys_path_basename, (
+	const char* path));
 
-int
-lisys_path_check_ext (const char* path,
-                      const char* ext);
+LIAPICALL (int, lisys_path_check_ext, (
+	const char* path,
+	const char* ext));
 
-char*
-lisys_path_concat (const char* path,
-                               ...) LISYS_ATTR_SENTINEL;
+LIAPICALL (char*, lisys_path_concat, (
+	const char* path,
+	            ...)) LISYS_ATTR_SENTINEL;
 
-char*
-lisys_path_format (lisysPathFormat format,
-                                   ...) LISYS_ATTR_SENTINEL;
+LIAPICALL (char*, lisys_path_format, (
+	lisysPathFormat format,
+	                ...)) LISYS_ATTR_SENTINEL;
 
-char*
-lisys_path_filename (const char* path);
+LIAPICALL (char*, lisys_path_filename, (
+	const char* path));
 
-char*
-lisys_path_fileext (const char* path);
+LIAPICALL (char*, lisys_path_fileext, (
+	const char* path));
 
-char*
-lisys_path_pathname (const char* path);
+LIAPICALL (char*, lisys_path_pathname, (
+	const char* path));
 
 #endif
 

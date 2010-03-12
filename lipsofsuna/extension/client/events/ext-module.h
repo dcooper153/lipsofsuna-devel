@@ -28,7 +28,7 @@
 #define __EXT_MODULE_H__
 
 #include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_EVENTS "Events"
 

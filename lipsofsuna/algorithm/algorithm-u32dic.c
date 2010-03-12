@@ -46,7 +46,7 @@ lialg_u32dic_new ()
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc, lisys_free);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -63,7 +63,7 @@ lialg_u32dic_new ()
 void
 lialg_u32dic_free (LIAlgU32dic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -77,7 +77,7 @@ lialg_u32dic_free (LIAlgU32dic* self)
 void
 lialg_u32dic_clear (LIAlgU32dic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;

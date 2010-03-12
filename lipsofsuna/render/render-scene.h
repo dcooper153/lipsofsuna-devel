@@ -47,46 +47,46 @@ struct _LIRenScene
 	} sky;
 };
 
-LIRenScene*
-liren_scene_new (LIRenRender* render);
+LIAPICALL (LIRenScene*, liren_scene_new, (
+	LIRenRender* render));
 
-void
-liren_scene_free (LIRenScene* self);
+LIAPICALL (void, liren_scene_free, (
+	LIRenScene* self));
 
-LIRenObject*
-liren_scene_find_object (LIRenScene* self,
-                         int         id);
+LIAPICALL (LIRenObject*, liren_scene_find_object, (
+	LIRenScene* self,
+	int         id));
 
-LIParPoint*
-liren_scene_insert_particle (LIRenScene*        self,
-                             const LIMatVector* position,
-                             const LIMatVector* velocity);
+LIAPICALL (LIParPoint*, liren_scene_insert_particle, (
+	LIRenScene*        self,
+	const LIMatVector* position,
+	const LIMatVector* velocity));
 
-int
-liren_scene_pick (LIRenScene*     self,
-                  LIMatMatrix*    modelview,
-                  LIMatMatrix*    projection,
-                  LIMatFrustum*   frustum,
-                  const int*      viewport,
-                  int             x,
-                  int             y,
-                  int             size,
-                  LIRenSelection* result);
+LIAPICALL (int, liren_scene_pick, (
+	LIRenScene*     self,
+	LIMatMatrix*    modelview,
+	LIMatMatrix*    projection,
+	LIMatFrustum*   frustum,
+	const int*      viewport,
+	int             x,
+	int             y,
+	int             size,
+	LIRenSelection* result));
 
-void
-liren_scene_render (LIRenScene*    self,
-                    LIRenDeferred* framebuffer,
-                    LIMatMatrix*   modelview,
-                    LIMatMatrix*   projection,
-                    LIMatFrustum*  frustum);
+LIAPICALL (void, liren_scene_render, (
+	LIRenScene*    self,
+	LIRenDeferred* framebuffer,
+	LIMatMatrix*   modelview,
+	LIMatMatrix*   projection,
+	LIMatFrustum*  frustum));
 
-void
-liren_scene_update (LIRenScene* self,
-                    float       secs);
+LIAPICALL (void, liren_scene_update, (
+	LIRenScene* self,
+	float       secs));
 
-int
-liren_scene_set_sky (LIRenScene* self,
-                     LIRenModel* model);
+LIAPICALL (int, liren_scene_set_sky, (
+	LIRenScene* self,
+	LIRenModel* model));
 
 #endif
 

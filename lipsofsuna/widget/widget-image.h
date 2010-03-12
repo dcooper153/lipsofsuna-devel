@@ -25,6 +25,7 @@
 #ifndef __WIDGET_IMAGE_H__
 #define __WIDGET_IMAGE_H__
 
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_IMAGE(o) ((LIWdgImage*)(o))
@@ -39,17 +40,17 @@ struct _LIWdgImage
 	char* image;
 };
 
-extern const LIWdgClass liwdg_widget_image;
+LIAPICALL (const LIWdgClass*, liwdg_widget_image, ());
 
-LIWdgWidget*
-liwdg_image_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_image_new, (
+	LIWdgManager* manager));
 
-int
-liwdg_image_set_image (LIWdgImage* self,
-                       const char*  text);
+LIAPICALL (int, liwdg_image_set_image, (
+	LIWdgImage* self,
+	const char*  text));
 
-const char*
-liwdg_image_get_image (LIWdgImage* self);
+LIAPICALL (const char*, liwdg_image_get_image, (
+	LIWdgImage* self));
 
 #endif
 

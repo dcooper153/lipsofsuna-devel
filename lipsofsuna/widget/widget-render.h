@@ -26,6 +26,7 @@
 #define __WIDGET_RENDER_H__
 
 #include <lipsofsuna/render.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-group.h"
 
@@ -45,25 +46,25 @@ struct _LIWdgRender
 	void* custom_update_data;
 };
 
-extern const LIWdgClass liwdg_widget_render;
+LIAPICALL (const LIWdgClass*, liwdg_widget_render, ());
 
-LIWdgWidget*
-liwdg_render_new (LIWdgManager* manager,
-                  LIRenScene*   scene);
+LIAPICALL (LIWdgWidget*, liwdg_render_new, (
+	LIWdgManager* manager,
+	LIRenScene*   scene));
 
-int
-liwdg_render_pick (LIWdgRender*    self,
-                   LIRenSelection* result,
-                   int             x,
-                   int             y);
+LIAPICALL (int, liwdg_render_pick, (
+	LIWdgRender*    self,
+	LIRenSelection* result,
+	int             x,
+	int             y));
 
-void
-liwdg_render_set_modelview (LIWdgRender*       self,
-                            const LIMatMatrix* value);
+LIAPICALL (void, liwdg_render_set_modelview, (
+	LIWdgRender*       self,
+	const LIMatMatrix* value));
 
-void
-liwdg_render_set_projection (LIWdgRender*       self,
-                             const LIMatMatrix* value);
+LIAPICALL (void, liwdg_render_set_projection, (
+	LIWdgRender*       self,
+	const LIMatMatrix* value));
 
 #endif
 

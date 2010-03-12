@@ -25,6 +25,7 @@
 #ifndef __CLIENT_WINDOW_H__
 #define __CLIENT_WINDOW_H__
 
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
 #include "client-types.h"
 
@@ -41,25 +42,25 @@ struct _LICliWindow
 	} mode;
 };
 
-LICliWindow*
-licli_window_new (LICliClient* client);
+LIAPICALL (LICliWindow*, licli_window_new, (
+	LICliClient* client));
 
-void
-licli_window_free (LICliWindow* self);
+LIAPICALL (void, licli_window_free, (
+	LICliWindow* self));
 
-void
-licli_window_set_fsaa (LICliWindow* self,
-                       int          samples);
+LIAPICALL (void, licli_window_set_fsaa, (
+	LICliWindow* self,
+	int          samples));
 
-void
-licli_window_get_size (const LICliWindow* self,
-                       int*               width,
-                       int*               height);
+LIAPICALL (void, licli_window_get_size, (
+	const LICliWindow* self,
+	int*               width,
+	int*               height));
 
-int
-licli_window_set_size (LICliWindow* self,
-                       int          width,
-                       int          height);
+LIAPICALL (int, licli_window_set_size, (
+	LICliWindow* self,
+	int          width,
+	int          height));
 
 #endif
 

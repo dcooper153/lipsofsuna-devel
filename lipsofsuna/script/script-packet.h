@@ -28,6 +28,7 @@
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/script.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 
 enum
 {
@@ -50,16 +51,16 @@ struct _LIScrPacket
 	LIArcWriter* writer;
 };
 
-LIScrData*
-liscr_packet_new_readable (LIScrScript*       script,
-                           const LIArcReader* reader);
+LIAPICALL (LIScrData*, liscr_packet_new_readable, (
+	LIScrScript*       script,
+	const LIArcReader* reader));
 
-LIScrData*
-liscr_packet_new_writable (LIScrScript* script,
-                           int          type);
+LIAPICALL (LIScrData*, liscr_packet_new_writable, (
+	LIScrScript* script,
+	int          type));
 
-void
-liscr_packet_free (LIScrPacket* self);
+LIAPICALL (void, liscr_packet_free, (
+	LIScrPacket* self));
 
 #endif
 

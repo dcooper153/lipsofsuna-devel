@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-buffer.h"
 #include "render-context.h"
@@ -65,60 +66,60 @@ struct _LIRenObject
 	} orientation;
 };
 
-LIRenObject*
-liren_object_new (LIRenScene* scene,
-                  int         id);
+LIAPICALL (LIRenObject*, liren_object_new, (
+	LIRenScene* scene,
+	int         id));
 
-void
-liren_object_free (LIRenObject* self);
+LIAPICALL (void, liren_object_free, (
+	LIRenObject* self));
 
-void
-liren_object_deform (LIRenObject* self);
+LIAPICALL (void, liren_object_deform, (
+	LIRenObject* self));
 
-void
-liren_object_emit_particles (LIRenObject* self);
+LIAPICALL (void, liren_object_emit_particles, (
+	LIRenObject* self));
 
-void
-liren_object_update (LIRenObject* self,
-                     float        secs);
+LIAPICALL (void, liren_object_update, (
+	LIRenObject* self,
+	float        secs));
 
-void
-liren_object_get_bounds (const LIRenObject* self,
-                         LIMatAabb*         result);
+LIAPICALL (void, liren_object_get_bounds, (
+	const LIRenObject* self,
+	LIMatAabb*         result));
 
-void
-liren_object_get_center (const LIRenObject* self,
-                         LIMatVector*       center);
+LIAPICALL (void, liren_object_get_center, (
+	const LIRenObject* self,
+	LIMatVector*       center));
 
-int
-liren_object_set_model (LIRenObject* self,
-                        LIRenModel*  model);
+LIAPICALL (int, liren_object_set_model, (
+	LIRenObject* self,
+	LIRenModel*  model));
 
-int
-liren_object_set_pose (LIRenObject* self,
-                       LIMdlPose*   pose);
+LIAPICALL (int, liren_object_set_pose, (
+	LIRenObject* self,
+	LIMdlPose*   pose));
 
-int
-liren_object_get_realized (const LIRenObject* self);
+LIAPICALL (int, liren_object_get_realized, (
+	const LIRenObject* self));
 
-int
-liren_object_set_realized (LIRenObject* self,
-                           int          value);
+LIAPICALL (int, liren_object_set_realized, (
+	LIRenObject* self,
+	int          value));
 
-void
-liren_object_get_transform (LIRenObject*    self,
-                            LIMatTransform* value);
+LIAPICALL (void, liren_object_get_transform, (
+	LIRenObject*    self,
+	LIMatTransform* value));
 
-void
-liren_object_set_transform (LIRenObject*          self,
-                            const LIMatTransform* value);
+LIAPICALL (void, liren_object_set_transform, (
+	LIRenObject*          self,
+	const LIMatTransform* value));
 
-void*
-liren_object_get_userdata (const LIRenObject* self);
+LIAPICALL (void*, liren_object_get_userdata, (
+	const LIRenObject* self));
 
-void
-liren_object_set_userdata (LIRenObject* self,
-                           void*        value);
+LIAPICALL (void, liren_object_set_userdata, (
+	LIRenObject* self,
+	void*        value));
 
 #endif
 

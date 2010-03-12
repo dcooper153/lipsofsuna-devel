@@ -43,12 +43,12 @@ struct _LICalHandle
 extern "C" {
 #endif
 
-void
-lical_handle_release (LICalHandle* self);
+LIAPICALL (void, lical_handle_release, (
+	LICalHandle* self));
 
-void
-lical_handle_releasev (LICalHandle* self,
-                       int          count);
+LIAPICALL (void, lical_handle_releasev, (
+	LICalHandle* self,
+	int          count));
 
 #ifdef __cplusplus
 }

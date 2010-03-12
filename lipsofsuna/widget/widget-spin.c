@@ -39,20 +39,25 @@ private_event (LIWdgSpin* self,
 static void
 private_rebuild (LIWdgSpin* self);
 
-const LIWdgClass liwdg_widget_spin =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Spin", sizeof (LIWdgSpin),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_spin ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Spin", sizeof (LIWdgSpin),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_spin_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_spin);
+	return liwdg_widget_new (manager, liwdg_widget_spin ());
 }
 
 LIFntFont*
@@ -139,7 +144,7 @@ private_event (LIWdgSpin*  self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

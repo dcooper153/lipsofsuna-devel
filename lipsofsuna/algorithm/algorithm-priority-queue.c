@@ -44,7 +44,7 @@ lialg_priority_queue_new ()
 	self = (LIAlgPriorityQueue*) lisys_malloc (sizeof (LIAlgPriorityQueue));
 	if (self == NULL)
 		return NULL;
-	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc, lisys_free);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -61,7 +61,7 @@ lialg_priority_queue_new ()
 void
 lialg_priority_queue_free (LIAlgPriorityQueue* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -75,7 +75,7 @@ lialg_priority_queue_free (LIAlgPriorityQueue* self)
 void
 lialg_priority_queue_clear (LIAlgPriorityQueue* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free);
 	self->tree->root = NULL;
 	lialg_bst_clear (self->tree);
 }

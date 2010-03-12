@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <lipsofsuna/server.h>
 #include "ext-module.h"
 #include "ext-block.h"
 

@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
+#include "ext-module.h"
 #include "ext-npc.h"
 
 static int

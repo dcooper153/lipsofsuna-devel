@@ -28,6 +28,7 @@
 #include <SDL.h>
 #include <SDL_main.h>
 #include <SDL_ttf.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LIVidCalls LIVidCalls;
 struct _LIVidCalls
@@ -66,8 +67,7 @@ struct _LIVidCalls
 	int (*TTF_WasInit)(void);
 };
 
-int
-livid_calls_init (LIVidCalls* self);
+LIAPICALL (int, livid_calls_init, (LIVidCalls* self));
 
 #endif
 

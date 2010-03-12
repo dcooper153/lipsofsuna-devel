@@ -25,6 +25,7 @@
 #ifndef __WIDGET_TABS_H__
 #define __WIDGET_TABS_H__
 
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-container.h"
 #include "widget-types.h"
@@ -53,15 +54,15 @@ struct _LIWdgTabs
 	} tabs;
 };
 
-extern const LIWdgClass liwdg_widget_tabs;
+LIAPICALL (const LIWdgClass*, liwdg_widget_tabs, ());
 
-LIWdgWidget*
-liwdg_tabs_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_tabs_new, (
+	LIWdgManager* manager));
 
-int
-liwdg_tabs_append_tab (LIWdgTabs*   self,
-                       const char*  title,
-                       LIWdgWidget* widget);
+LIAPICALL (int, liwdg_tabs_append_tab, (
+	LIWdgTabs*   self,
+	const char*  title,
+	LIWdgWidget* widget));
 
 #endif
 

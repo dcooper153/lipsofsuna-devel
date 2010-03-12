@@ -26,6 +26,7 @@
 #define __SOUND_MANAGER_H__
 
 #include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/system.h>
 #include "sound-sample.h"
 #include "sound-system.h"
 
@@ -36,30 +37,30 @@ struct _LISndManager
 	LIAlgStrdic* samples;
 };
 
-LISndManager*
-lisnd_manager_new (LISndSystem* system);
+LIAPICALL (LISndManager*, lisnd_manager_new, (
+	LISndSystem* system));
 
-void
-lisnd_manager_free (LISndManager* self);
+LIAPICALL (void, lisnd_manager_free, (
+	LISndManager* self));
 
-void
-lisnd_manager_clear (LISndManager* self);
+LIAPICALL (void, lisnd_manager_clear, (
+	LISndManager* self));
 
-void
-lisnd_manager_set_listener (LISndManager*      self,
-                            const LIMatVector* pos,
-                            const LIMatVector* vel,
-                            const LIMatVector* dir,
-                            const LIMatVector* up);
+LIAPICALL (void, lisnd_manager_set_listener, (
+	LISndManager*      self,
+	const LIMatVector* pos,
+	const LIMatVector* vel,
+	const LIMatVector* dir,
+	const LIMatVector* up));
 
-LISndSample*
-lisnd_manager_get_sample (LISndManager* self,
-                          const char*   name);
+LIAPICALL (LISndSample*, lisnd_manager_get_sample, (
+	LISndManager* self,
+	const char*   name));
 
-int
-lisnd_manager_set_sample (LISndManager* self,
-                          const char*   name,
-                          const char*   path);
+LIAPICALL (int, lisnd_manager_set_sample, (
+	LISndManager* self,
+	const char*   name,
+	const char*   path));
 
 #endif
 

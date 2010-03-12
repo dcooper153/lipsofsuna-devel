@@ -28,10 +28,10 @@
 #define __EXT_MODULE_H__
 
 #include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
 #ifndef LI_DISABLE_SOUND
 #include <lipsofsuna/sound.h>
 #endif
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_SOUND "Sound"
 

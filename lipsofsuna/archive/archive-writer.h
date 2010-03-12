@@ -55,87 +55,86 @@ struct _LIArcWriter
 extern "C" {
 #endif
 
-LIArcWriter*
-liarc_writer_new ();
+LIAPICALL (LIArcWriter*, liarc_writer_new, ());
 
-LIArcWriter*
-liarc_writer_new_file (const char* path);
+LIAPICALL (LIArcWriter*, liarc_writer_new_file, (
+	const char* path));
 
-LIArcWriter*
-liarc_writer_new_gzip (const char* path);
+LIAPICALL (LIArcWriter*, liarc_writer_new_gzip, (
+	const char* path));
 
-LIArcWriter*
-liarc_writer_new_packet (int type);
+LIAPICALL (LIArcWriter*, liarc_writer_new_packet, (
+	int type));
 
-void
-liarc_writer_free (LIArcWriter* self);
+LIAPICALL (void, liarc_writer_free, (
+	LIArcWriter* self));
 
-int
-liarc_writer_append_file (LIArcWriter* self,
-                          FILE*        file);
+LIAPICALL (int, liarc_writer_append_file, (
+	LIArcWriter* self,
+	FILE*        file));
 
-int
-liarc_writer_append_format (LIArcWriter* self,
-                            const char*  format,
-                                         ...) LISYS_ATTR_FORMAT(2, 3);
+LIAPICALL (int, liarc_writer_append_format, (
+	LIArcWriter* self,
+	const char*  format,
+	             ...)) LISYS_ATTR_FORMAT(2, 3);
 
-int
-liarc_writer_append_formatv (LIArcWriter* self,
-                             const char*  format,
-                             va_list      args);
+LIAPICALL (int, liarc_writer_append_formatv, (
+	LIArcWriter* self,
+	const char*  format,
+	va_list      args));
 
-int
-liarc_writer_append_string (LIArcWriter* self,
-                            const char*  string);
+LIAPICALL (int, liarc_writer_append_string, (
+	LIArcWriter* self,
+	const char*  string));
 
-int
-liarc_writer_append_float (LIArcWriter* self,
-                           float        value);
+LIAPICALL (int, liarc_writer_append_float, (
+	LIArcWriter* self,
+	float        value));
 
-int
-liarc_writer_append_int8 (LIArcWriter* self,
-                          int8_t       value);
+LIAPICALL (int, liarc_writer_append_int8, (
+	LIArcWriter* self,
+	int8_t       value));
 
-int
-liarc_writer_append_int16 (LIArcWriter* self,
-                           int16_t      value);
+LIAPICALL (int, liarc_writer_append_int16, (
+	LIArcWriter* self,
+	int16_t      value));
 
-int
-liarc_writer_append_int32 (LIArcWriter* self,
-                           int32_t      value);
+LIAPICALL (int, liarc_writer_append_int32, (
+	LIArcWriter* self,
+	int32_t      value));
 
-int
-liarc_writer_append_nul (LIArcWriter* self);
+LIAPICALL (int, liarc_writer_append_nul, (
+	LIArcWriter* self));
 
-int
-liarc_writer_append_uint8 (LIArcWriter* self,
-                           uint8_t      value);
+LIAPICALL (int, liarc_writer_append_uint8, (
+	LIArcWriter* self,
+	uint8_t      value));
 
-int
-liarc_writer_append_uint16 (LIArcWriter* self,
-                            uint16_t     value);
+LIAPICALL (int, liarc_writer_append_uint16, (
+	LIArcWriter* self,
+	uint16_t     value));
 
-int
-liarc_writer_append_uint32 (LIArcWriter* self,
-                            uint32_t     value);
+LIAPICALL (int, liarc_writer_append_uint32, (
+	LIArcWriter* self,
+	uint32_t     value));
 
-int
-liarc_writer_append_raw (LIArcWriter* self,
-                         const void*  data,
-                         int          size);
+LIAPICALL (int, liarc_writer_append_raw, (
+	LIArcWriter* self,
+	const void*  data,
+	int          size));
 
-void
-liarc_writer_clear (LIArcWriter* self);
+LIAPICALL (void, liarc_writer_clear, (
+	LIArcWriter* self));
 
-int
-liarc_writer_erase (LIArcWriter* self,
-                    int          size);
+LIAPICALL (int, liarc_writer_erase, (
+	LIArcWriter* self,
+	int          size));
 
-const char*
-liarc_writer_get_buffer (const LIArcWriter* self);
+LIAPICALL (const char*, liarc_writer_get_buffer, (
+	const LIArcWriter* self));
 
-int
-liarc_writer_get_length (const LIArcWriter* self);
+LIAPICALL (int, liarc_writer_get_length, (
+	const LIArcWriter* self));
 
 #ifdef __cplusplus
 }

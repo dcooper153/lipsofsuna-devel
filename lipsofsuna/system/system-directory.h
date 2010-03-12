@@ -25,6 +25,8 @@
 #ifndef __SYSTEM_DIRECTORY_H__
 #define __SYSTEM_DIRECTORY_H__
 
+#include "system-compiler.h"
+
 typedef int (*LISysDirFilter)(const char* dir, const char* name, void* data);
 typedef int (*LISysDirSorter)(const char** name0, const char** name1);
 typedef struct _LISysDir LISysDir;
@@ -34,58 +36,58 @@ struct _LISysDir;
 extern "C" {
 #endif
 
-LISysDir*
-lisys_dir_open (const char* path);
+LIAPICALL (LISysDir*, lisys_dir_open, (
+	const char* path));
 
-void
-lisys_dir_free (LISysDir* self);
+LIAPICALL (void, lisys_dir_free, (
+	LISysDir* self));
 
-int
-lisys_dir_scan (LISysDir* self);
+LIAPICALL (int, lisys_dir_scan, (
+	LISysDir* self));
 
-int
-lisys_dir_get_count (const LISysDir* self);
+LIAPICALL (int, lisys_dir_get_count, (
+	const LISysDir* self));
 
-const char*
-lisys_dir_get_name (const LISysDir* self,
-                    int             i);
+LIAPICALL (const char*, lisys_dir_get_name, (
+	const LISysDir* self,
+	int             i));
 
-char*
-lisys_dir_get_path (const LISysDir* self,
-                    int             i);
+LIAPICALL (char*, lisys_dir_get_path, (
+	const LISysDir* self,
+	int             i));
 
-void
-lisys_dir_set_filter (LISysDir*      self,
-                      LISysDirFilter filter,
-                      void*          data);
+LIAPICALL (void, lisys_dir_set_filter, (
+	LISysDir*      self,
+	LISysDirFilter filter,
+	void*          data));
 
-void
-lisys_dir_set_sorter (LISysDir*      self,
-                      LISysDirSorter sorter);
+LIAPICALL (void, lisys_dir_set_sorter, (
+	LISysDir*      self,
+	LISysDirSorter sorter));
 
-int
-LISYS_DIR_FILTER_FILES (const char* dir,
-                        const char* name,
-                        void*       data);
+LIAPICALL (int, lisys_dir_filter_files, (
+	const char* dir,
+	const char* name,
+	void*       data));
 
-int
-LISYS_DIR_FILTER_DIRS (const char* dir,
-                       const char* name,
-                       void*       data);
+LIAPICALL (int, lisys_dir_filter_dirs, (
+	const char* dir,
+	const char* name,
+	void*       data));
 
-int
-LISYS_DIR_FILTER_HIDDEN (const char* dir,
-                         const char* name,
-                         void*       data);
+LIAPICALL (int, lisys_dir_filter_hidden, (
+	const char* dir,
+	const char* name,
+	void*       data));
 
-int
-LISYS_DIR_FILTER_VISIBLE (const char* dir,
-                          const char* name,
-                          void*       data);
+LIAPICALL (int, lisys_dir_filter_visible, (
+	const char* dir,
+	const char* name,
+	void*       data));
 
-int
-LISYS_DIR_SORTER_ALPHA (const char** name0,
-                        const char** name1);
+LIAPICALL (int, lisys_dir_sorter_alpha, (
+	const char** name0,
+	const char** name1));
 
 #ifdef __cplusplus
 }

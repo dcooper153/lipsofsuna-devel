@@ -61,35 +61,34 @@ struct _LIAlgPtrdicIter
 extern "C" {
 #endif
 
-LIAlgPtrdic*
-lialg_ptrdic_new ();
+LIAPICALL (LIAlgPtrdic*, lialg_ptrdic_new, ());
 
-void
-lialg_ptrdic_free (LIAlgPtrdic* self);
+LIAPICALL (void, lialg_ptrdic_free, (
+	LIAlgPtrdic* self));
 
-void
-lialg_ptrdic_clear (LIAlgPtrdic* self);
+LIAPICALL (void, lialg_ptrdic_clear, (
+	LIAlgPtrdic* self));
 
-void*
-lialg_ptrdic_find (LIAlgPtrdic* self,
-                   void*        key);
+LIAPICALL (void*, lialg_ptrdic_find, (
+	LIAlgPtrdic* self,
+	void*        key));
 
-LIAlgPtrdicNode*
-lialg_ptrdic_find_node (LIAlgPtrdic* self,
-                        void*        key);
+LIAPICALL (LIAlgPtrdicNode*, lialg_ptrdic_find_node, (
+	LIAlgPtrdic* self,
+	void*        key));
 
-LIAlgPtrdicNode*
-lialg_ptrdic_insert (LIAlgPtrdic* self,
-                     void*        key,
-                     void*        value);
+LIAPICALL (LIAlgPtrdicNode*, lialg_ptrdic_insert, (
+	LIAlgPtrdic* self,
+	void*        key,
+	void*        value));
 
-int
-lialg_ptrdic_remove (LIAlgPtrdic* self,
-                     void*        key);
+LIAPICALL (int, lialg_ptrdic_remove, (
+	LIAlgPtrdic* self,
+	void*        key));
 
-void
-lialg_ptrdic_remove_node (LIAlgPtrdic*     self,
-                          LIAlgPtrdicNode* node);
+LIAPICALL (void, lialg_ptrdic_remove_node, (
+	LIAlgPtrdic*     self,
+	LIAlgPtrdicNode* node));
 
 #ifdef __cplusplus
 }

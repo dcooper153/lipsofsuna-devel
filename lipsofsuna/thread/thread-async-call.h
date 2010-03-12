@@ -25,45 +25,47 @@
 #ifndef __THREAD_ASYNC_CALL_H__
 #define __THREAD_ASYNC_CALL_H__
 
+#include <lipsofsuna/system.h>
+
 typedef struct _LIThrAsyncCall LIThrAsyncCall;
 typedef void (*lithrAsyncFunc)(LIThrAsyncCall*, void*);
 
-LIThrAsyncCall*
-lithr_async_call_new (lithrAsyncFunc func,
-                      lithrAsyncFunc freecb,
-                      void*          data);
+LIAPICALL (LIThrAsyncCall*, lithr_async_call_new, (
+	lithrAsyncFunc func,
+	lithrAsyncFunc freecb,
+	void*          data));
 
-void
-lithr_async_call_free (LIThrAsyncCall* self);
+LIAPICALL (void, lithr_async_call_free, (
+	LIThrAsyncCall* self));
 
-int
-lithr_async_call_join (LIThrAsyncCall* self);
+LIAPICALL (int, lithr_async_call_join, (
+	LIThrAsyncCall* self));
 
-void
-lithr_async_call_stop (LIThrAsyncCall* self);
+LIAPICALL (void, lithr_async_call_stop, (
+	LIThrAsyncCall* self));
 
-int
-lithr_async_call_get_done (LIThrAsyncCall* self);
+LIAPICALL (int, lithr_async_call_get_done, (
+	LIThrAsyncCall* self));
 
-float
-lithr_async_call_get_progress (LIThrAsyncCall* self);
+LIAPICALL (float, lithr_async_call_get_progress, (
+	LIThrAsyncCall* self));
 
-void
-lithr_async_call_set_progress (LIThrAsyncCall* self,
-                               float           value);
+LIAPICALL (void, lithr_async_call_set_progress, (
+	LIThrAsyncCall* self,
+	float           value));
 
-int
-lithr_async_call_get_result (LIThrAsyncCall* self);
+LIAPICALL (int, lithr_async_call_get_result, (
+	LIThrAsyncCall* self));
 
-void
-lithr_async_call_set_result (LIThrAsyncCall* self,
-                             int             value);
+LIAPICALL (void, lithr_async_call_set_result, (
+	LIThrAsyncCall* self,
+	int             value));
 
-int
-lithr_async_call_get_stop (LIThrAsyncCall* self);
+LIAPICALL (int, lithr_async_call_get_stop, (
+	LIThrAsyncCall* self));
 
-void*
-lithr_async_call_get_userdata (LIThrAsyncCall* self);
+LIAPICALL (void*, lithr_async_call_get_userdata, (
+	LIThrAsyncCall* self));
 
 #endif
 

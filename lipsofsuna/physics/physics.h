@@ -34,57 +34,57 @@
 extern "C" {
 #endif
 
-LIPhyPhysics*
-liphy_physics_new (LICalCallbacks* callbacks);
+LIAPICALL (LIPhyPhysics*, liphy_physics_new, (
+	LICalCallbacks* callbacks));
 
-void
-liphy_physics_free (LIPhyPhysics* self);
+LIAPICALL (void, liphy_physics_free, (
+	LIPhyPhysics* self));
 
-int
-liphy_physics_cast_ray (const LIPhyPhysics* self,
-                        const LIMatVector*  start,
-                        const LIMatVector*  end,
-                        LIMatVector*        result,
-                        LIMatVector*        normal);
+LIAPICALL (int, liphy_physics_cast_ray, (
+	const LIPhyPhysics* self,
+	const LIMatVector*  start,
+	const LIMatVector*  end,
+	LIMatVector*        result,
+	LIMatVector*        normal));
 
-int
-liphy_physics_cast_shape (const LIPhyPhysics*   self,
-                          const LIMatTransform* start,
-                          const LIMatTransform* end,
-                          const LIPhyShape*     shape,
-                          int                   group,
-                          int                   mask,
-                          LIPhyObject**         ignore_array,
-                          int                   ignore_count,
-                          LIPhyCollision*       result);
+LIAPICALL (int, liphy_physics_cast_shape, (
+	const LIPhyPhysics*   self,
+	const LIMatTransform* start,
+	const LIMatTransform* end,
+	const LIPhyShape*     shape,
+	int                   group,
+	int                   mask,
+	LIPhyObject**         ignore_array,
+	int                   ignore_count,
+	LIPhyCollision*       result));
 
-int
-liphy_physics_cast_sphere (const LIPhyPhysics* self,
-                           const LIMatVector*  start,
-                           const LIMatVector*  end,
-                           float               radius,
-                           LIPhyObject**       ignore_array,
-                           int                 ignore_count,
-                           LIPhyCollision*     result);
+LIAPICALL (int, liphy_physics_cast_sphere, (
+	const LIPhyPhysics* self,
+	const LIMatVector*  start,
+	const LIMatVector*  end,
+	float               radius,
+	LIPhyObject**       ignore_array,
+	int                 ignore_count,
+	LIPhyCollision*     result));
 
-void
-liphy_physics_clear_constraints (LIPhyPhysics* self,
-                                 LIPhyObject*  object);
+LIAPICALL (void, liphy_physics_clear_constraints, (
+	LIPhyPhysics* self,
+	LIPhyObject*  object));
 
-void
-liphy_physics_clear_contacts (LIPhyPhysics* self,
-                              LIPhyObject*  object);
+LIAPICALL (void, liphy_physics_clear_contacts, (
+	LIPhyPhysics* self,
+	LIPhyObject*  object));
 
-void
-liphy_physics_update (LIPhyPhysics* self,
-                      float         secs);
+LIAPICALL (void, liphy_physics_update, (
+	LIPhyPhysics* self,
+	float         secs));
 
-void*
-liphy_physics_get_userdata (LIPhyPhysics* self);
+LIAPICALL (void*, liphy_physics_get_userdata, (
+	LIPhyPhysics* self));
 
-void
-liphy_physics_set_userdata (LIPhyPhysics* self,
-                            void*         data);
+LIAPICALL (void, liphy_physics_set_userdata, (
+	LIPhyPhysics* self,
+	void*         data));
 
 #ifdef __cplusplus
 }

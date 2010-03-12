@@ -26,6 +26,7 @@
 #define __PARTICLE_LINE_H__
 
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LIParLine LIParLine;
 struct _LIParLine
@@ -41,17 +42,17 @@ struct _LIParLine
 	LIParLine* next;
 };
 
-void
-lipar_line_init (LIParLine*         self,
-                 const LIMatVector* position0,
-                 const LIMatVector* position1,
-                 const LIMatVector* velocity0,
-                 const LIMatVector* velocity1);
+LIAPICALL (void, lipar_line_init, (
+	LIParLine*         self,
+	const LIMatVector* position0,
+	const LIMatVector* position1,
+	const LIMatVector* velocity0,
+	const LIMatVector* velocity1));
 
-void
-lipar_line_get_colors (const LIParLine* self,
-                       float*           color0,
-                       float*           color1);
+LIAPICALL (void, lipar_line_get_colors, (
+	const LIParLine* self,
+	float*           color0,
+	float*           color1));
 
 #endif
 

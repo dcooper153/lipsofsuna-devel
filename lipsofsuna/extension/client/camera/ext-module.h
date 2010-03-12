@@ -27,6 +27,9 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/extension.h>
+
 #define LIEXT_SCRIPT_CAMERA "Camera"
 
 typedef struct _LIExtModule LIExtModule;
@@ -50,7 +53,7 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_camera (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 

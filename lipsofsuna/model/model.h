@@ -28,6 +28,7 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "model-animation.h"
 #include "model-bone.h"
 #include "model-faces.h"
@@ -93,80 +94,79 @@ struct _LIMdlModel
 extern "C" {
 #endif
 
-LIMdlModel*
-limdl_model_new ();
+LIAPICALL (LIMdlModel*, limdl_model_new, ());
 
-LIMdlModel*
-limdl_model_new_from_data (LIArcReader* reader);
+LIAPICALL (LIMdlModel*, limdl_model_new_from_data, (
+	LIArcReader* reader));
 
-LIMdlModel*
-limdl_model_new_from_file (const char* path);
+LIAPICALL (LIMdlModel*, limdl_model_new_from_file, (
+	const char* path));
 
-void
-limdl_model_calculate_bounds (LIMdlModel* self);
+LIAPICALL (void, limdl_model_calculate_bounds, (
+	LIMdlModel* self));
 
-void
-limdl_model_free (LIMdlModel* self);
+LIAPICALL (void, limdl_model_free, (
+	LIMdlModel* self));
 
-LIMdlAnimation*
-limdl_model_find_animation (LIMdlModel* self,
-                            const char* name);
+LIAPICALL (LIMdlAnimation*, limdl_model_find_animation, (
+	LIMdlModel* self,
+	const char* name));
 
-int
-limdl_model_find_facegroup (LIMdlModel* self,
-                            int         material);
+LIAPICALL (int, limdl_model_find_facegroup, (
+	LIMdlModel* self,
+	int         material));
 
-int
-limdl_model_find_material (const LIMdlModel*    self,
-                           const LIMdlMaterial* material);
+LIAPICALL (int, limdl_model_find_material, (
+	const LIMdlModel*    self,
+	const LIMdlMaterial* material));
 
-LIMdlNode*
-limdl_model_find_node (const LIMdlModel* self,
-                       const char*       name);
+LIAPICALL (LIMdlNode*, limdl_model_find_node, (
+	const LIMdlModel* self,
+	const char*       name));
 
-int
-limdl_model_find_vertex (LIMdlModel*        self,
-                         const LIMdlVertex* vertex);
+LIAPICALL (int, limdl_model_find_vertex, (
+	LIMdlModel*        self,
+	const LIMdlVertex* vertex));
 
-int
-limdl_model_insert_face (LIMdlModel*         self,
-                         int                 group,
-                         const LIMdlVertex*  vertices,
-                         const LIMdlWeights* weights);
+LIAPICALL (int, limdl_model_insert_face, (
+	LIMdlModel*         self,
+	int                 group,
+	const LIMdlVertex*  vertices,
+	const LIMdlWeights* weights));
 
-int
-limdl_model_insert_facegroup (LIMdlModel* self,
-                              int         material);
+LIAPICALL (int, limdl_model_insert_facegroup, (
+	LIMdlModel* self,
+	int         material));
 
-int
-limdl_model_insert_indices (LIMdlModel* self,
-                            int         group,
-                            uint32_t*   indices,
-                            int         count);
+LIAPICALL (int, limdl_model_insert_indices, (
+	LIMdlModel* self,
+	int         group,
+	uint32_t*   indices,
+	int         count));
 
-int
-limdl_model_insert_material (LIMdlModel*          self,
-                             const LIMdlMaterial* material);
+LIAPICALL (int, limdl_model_insert_material, (
+	LIMdlModel*          self,
+	const LIMdlMaterial* material));
 
-int
-limdl_model_insert_node (LIMdlModel*      self,
-                         const LIMdlNode* node);
+LIAPICALL (int, limdl_model_insert_node, (
+	LIMdlModel*      self,
+	const LIMdlNode* node));
 
-int
-limdl_model_insert_vertex (LIMdlModel*         self,
-                           const LIMdlVertex*  vertex,
-                           const LIMdlWeights* weights);
+LIAPICALL (int, limdl_model_insert_vertex, (
+	LIMdlModel*         self,
+	const LIMdlVertex*  vertex,
+	const LIMdlWeights* weights));
 
-int
-limdl_model_write (const LIMdlModel* self,
-                   LIArcWriter*      writer);
+LIAPICALL (int, limdl_model_write, (
+	const LIMdlModel* self,
+	LIArcWriter*      writer));
 
-int
-limdl_model_write_file (const LIMdlModel* self,
-                        const char*       path);
+LIAPICALL (int, limdl_model_write_file, (
+	const LIMdlModel* self,
+	const char*       path));
 
-int
-limdl_model_get_index_count (const LIMdlModel* self);
+LIAPICALL (int, limdl_model_get_index_count, (
+	const LIMdlModel* self));
 
 #ifdef __cplusplus
 }

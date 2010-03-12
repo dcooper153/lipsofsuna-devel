@@ -50,49 +50,49 @@ struct _LIMaiProgram
 	LIScrScript* script;
 };
 
-LIMaiProgram*
-limai_program_new (LIPthPaths* paths);
+LIAPICALL (LIMaiProgram*, limai_program_new, (
+	LIPthPaths* paths));
 
-void
-limai_program_free (LIMaiProgram* self);
+LIAPICALL (void, limai_program_free, (
+	LIMaiProgram* self));
 
-int
-limai_program_execute_script (LIMaiProgram* self,
-                              const char*   file);
+LIAPICALL (int, limai_program_execute_script, (
+	LIMaiProgram* self,
+	const char*   file));
 
-void*
-limai_program_find_component (LIMaiProgram* self,
-                              const char*   name);
+LIAPICALL (void*, limai_program_find_component, (
+	LIMaiProgram* self,
+	const char*   name));
 
-LIMaiExtension*
-limai_program_find_extension (LIMaiProgram* self,
-                              const char*   name);
+LIAPICALL (LIMaiExtension*, limai_program_find_extension, (
+	LIMaiProgram* self,
+	const char*   name));
 
-int
-limai_program_insert_component (LIMaiProgram* self,
-                                const char*   name,
-                                void*         value);
+LIAPICALL (int, limai_program_insert_component, (
+	LIMaiProgram* self,
+	const char*   name,
+	void*         value));
 
-int
-limai_program_insert_extension (LIMaiProgram* self,
-                                const char*   name);
+LIAPICALL (int, limai_program_insert_extension, (
+	LIMaiProgram* self,
+	const char*   name));
 
-int
-limai_program_main (LIMaiProgram* self);
+LIAPICALL (int, limai_program_main, (
+	LIMaiProgram* self));
 
-void
-limai_program_remove_component (LIMaiProgram* self,
-                                const char*   name);
+LIAPICALL (void, limai_program_remove_component, (
+	LIMaiProgram* self,
+	const char*   name));
 
-void
-limai_program_shutdown (LIMaiProgram* self);
+LIAPICALL (void, limai_program_shutdown, (
+	LIMaiProgram* self));
 
-int
-limai_program_update (LIMaiProgram* self,
-                      float         secs);
+LIAPICALL (int, limai_program_update, (
+	LIMaiProgram* self,
+	float         secs));
 
-double
-limai_program_get_time (const LIMaiProgram* self);
+LIAPICALL (double, limai_program_get_time, (
+	const LIMaiProgram* self));
 
 #endif
 

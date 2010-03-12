@@ -27,7 +27,8 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_EFFECT "Effect"
 
@@ -47,7 +48,7 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_effect (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 

@@ -28,6 +28,7 @@
 #include "sound-sample.h"
 #include "sound-system.h"
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LISndSource LISndSource;
 struct _LISndSource
@@ -36,45 +37,45 @@ struct _LISndSource
 	ALint queued;
 };
 
-LISndSource*
-lisnd_source_new (LISndSystem* system);
+LIAPICALL (LISndSource*, lisnd_source_new, (
+	LISndSystem* system));
 
-LISndSource*
-lisnd_source_new_with_sample (LISndSystem* system,
-                              LISndSample* sample);
+LIAPICALL (LISndSource*, lisnd_source_new_with_sample, (
+	LISndSystem* system,
+	LISndSample* sample));
 
-void
-lisnd_source_free (LISndSource* self);
+LIAPICALL (void, lisnd_source_free, (
+	LISndSource* self));
 
-void
-lisnd_source_queue_sample (LISndSource* self,
-                           LISndSample* sample);
+LIAPICALL (void, lisnd_source_queue_sample, (
+	LISndSource* self,
+	LISndSample* sample));
 
-int
-lisnd_source_update (LISndSource* self);
+LIAPICALL (int, lisnd_source_update, (
+	LISndSource* self));
 
-void
-lisnd_source_set_looping (LISndSource* self,
-                          int          looping);
+LIAPICALL (void, lisnd_source_set_looping, (
+	LISndSource* self,
+	int          looping));
 
-int
-lisnd_source_get_playing (LISndSource* self);
+LIAPICALL (int, lisnd_source_get_playing, (
+	LISndSource* self));
 
-void
-lisnd_source_set_playing (LISndSource* self,
-                          int          playing);
+LIAPICALL (void, lisnd_source_set_playing, (
+	LISndSource* self,
+	int          playing));
 
-void
-lisnd_source_set_position (LISndSource*       self,
-                           const LIMatVector* value);
+LIAPICALL (void, lisnd_source_set_position, (
+	LISndSource*       self,
+	const LIMatVector* value));
 
-void
-lisnd_source_set_velocity (LISndSource*       self,
-                           const LIMatVector* value);
+LIAPICALL (void, lisnd_source_set_velocity, (
+	LISndSource*       self,
+	const LIMatVector* value));
 
-void
-lisnd_source_set_volume (LISndSource* self,
-                         float        value);
+LIAPICALL (void, lisnd_source_set_volume, (
+	LISndSource* self,
+	float        value));
 
 #endif
 

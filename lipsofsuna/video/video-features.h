@@ -25,6 +25,8 @@
 #ifndef __VIDEO_FEATURES_H__
 #define __VIDEO_FEATURES_H__
 
+#include <lipsofsuna/system.h>
+
 typedef struct _LIVidFeatures LIVidFeatures;
 struct _LIVidFeatures
 {
@@ -35,11 +37,9 @@ struct _LIVidFeatures
 
 extern LIVidFeatures livid_features;
 
-void
-livid_features_init ();
+LIAPICALL (void, livid_features_init, ());
 
-int
-livid_features_get_max_samples ();
+LIAPICALL (int, livid_features_get_max_samples, ());
 
 #endif
 

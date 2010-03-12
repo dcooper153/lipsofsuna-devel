@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "ext-module.h"
 #include "ext-resources.h"
 
 LIExtResources*
@@ -116,7 +115,7 @@ liext_resources_insert_directory (LIExtResources* self,
 	directory = lisys_dir_open (src);
 	if (directory == NULL)
 		return 0;
-	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
+	lisys_dir_set_sorter (directory, lisys_dir_sorter_alpha);
 	if (!lisys_dir_scan (directory))
 	{
 		lisys_dir_free (directory);

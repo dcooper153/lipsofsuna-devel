@@ -28,7 +28,8 @@
 #define __EXT_MODULE_H__
 
 #include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/font.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_SPEECH "Speech"
 
@@ -70,7 +71,7 @@ liext_object_free (LIExtObject* self);
 
 void
 liext_script_speech (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 

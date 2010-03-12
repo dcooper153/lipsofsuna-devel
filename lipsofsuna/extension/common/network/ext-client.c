@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/system.h>
 #include "ext-module.h"
 #include "ext-client.h"
 

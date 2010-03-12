@@ -298,7 +298,7 @@ lisys_dir_set_sorter (LISysDir*      self,
  * \brief Lets everything except directories through.
  */
 int
-LISYS_DIR_FILTER_FILES (const char* dir,
+lisys_dir_filter_files (const char* dir,
                         const char* name,
                         void*       data)
 {
@@ -327,7 +327,7 @@ LISYS_DIR_FILTER_FILES (const char* dir,
  * \brief Only lets directories through.
  */
 int
-LISYS_DIR_FILTER_DIRS (const char* dir,
+lisys_dir_filter_dirs (const char* dir,
                        const char* name,
                        void*       data)
 {
@@ -356,7 +356,7 @@ LISYS_DIR_FILTER_DIRS (const char* dir,
  * \brief Only lets hidden files through.
  */
 int
-LISYS_DIR_FILTER_HIDDEN (const char* dir,
+lisys_dir_filter_hidden (const char* dir,
                          const char* name,
                          void*       data)
 {
@@ -369,7 +369,7 @@ LISYS_DIR_FILTER_HIDDEN (const char* dir,
  * \brief Only lets non-hidden files through.
  */
 int
-LISYS_DIR_FILTER_VISIBLE (const char* dir,
+lisys_dir_filter_visible (const char* dir,
                           const char* name,
                           void*       data)
 {
@@ -382,7 +382,7 @@ LISYS_DIR_FILTER_VISIBLE (const char* dir,
  * \brief Sorts entries alphabetically.
  */
 int
-LISYS_DIR_SORTER_ALPHA (const char** name0,
+lisys_dir_sorter_alpha (const char** name0,
                         const char** name1)
 {
 	return strcmp (*name0, *name1);

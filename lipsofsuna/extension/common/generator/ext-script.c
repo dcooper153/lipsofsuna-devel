@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/server.h>
 #include "ext-module.h"
 
 /* @luadoc

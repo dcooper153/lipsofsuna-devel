@@ -77,58 +77,58 @@ struct _LIRenRender
 #endif
 };
 
-LIRenRender*
-liren_render_new (const char* dir);
+LIAPICALL (LIRenRender*, liren_render_new, (
+	const char* dir));
 
-void
-liren_render_free (LIRenRender* self);
+LIAPICALL (void, liren_render_free, (
+	LIRenRender* self));
 
-LIRenShader*
-liren_render_find_shader (LIRenRender* self,
-                          const char*  name);
+LIAPICALL (LIRenShader*, liren_render_find_shader, (
+	LIRenRender* self,
+	const char*  name));
 
-LIRenImage*
-liren_render_find_image (LIRenRender* self,
-                         const char*  name);
+LIAPICALL (LIRenImage*, liren_render_find_image, (
+	LIRenRender* self,
+	const char*  name));
 
-LIRenModel*
-liren_render_find_model (LIRenRender* self,
-                         const char*  name);
+LIAPICALL (LIRenModel*, liren_render_find_model, (
+	LIRenRender* self,
+	const char*  name));
 
-int
-liren_render_load_image (LIRenRender* self,
-                         const char*  name);
+LIAPICALL (int, liren_render_load_image, (
+	LIRenRender* self,
+	const char*  name));
 
-int
-liren_render_load_model (LIRenRender* self,
-                         const char*  name,
-                         LIMdlModel*  model);
+LIAPICALL (int, liren_render_load_model, (
+	LIRenRender* self,
+	const char*  name,
+	LIMdlModel*  model));
 
-void
-liren_render_update (LIRenRender* self,
-                     float        secs);
+LIAPICALL (void, liren_render_update, (
+	LIRenRender* self,
+	float        secs));
 
-void
-liren_render_set_global_shadows (LIRenRender* self,
-                                 int          value);
+LIAPICALL (void, liren_render_set_global_shadows, (
+	LIRenRender* self,
+	int          value));
 
-int
-liren_render_get_light_count (const LIRenRender* self);
+LIAPICALL (int, liren_render_get_light_count, (
+	const LIRenRender* self));
 
-void
-liren_render_set_light_count (LIRenRender* self,
-                              int          count);
+LIAPICALL (void, liren_render_set_light_count, (
+	LIRenRender* self,
+	int          count));
 
-void
-liren_render_set_local_shadows (LIRenRender* self,
-                                int          value);
+LIAPICALL (void, liren_render_set_local_shadows, (
+	LIRenRender* self,
+	int          value));
 
-int
-liren_render_get_shaders_enabled (const LIRenRender* self);
+LIAPICALL (int, liren_render_get_shaders_enabled, (
+	const LIRenRender* self));
 
-void
-liren_render_set_shaders_enabled (LIRenRender* self,
-                                  int          value);
+LIAPICALL (void, liren_render_set_shaders_enabled, (
+	LIRenRender* self,
+	int          value));
 
 #ifndef NDEBUG
 void

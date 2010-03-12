@@ -22,14 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/render.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/thread.h>
-#include <lipsofsuna/widget.h>
+#include "ext-module.h"
 #include "ext-packager.h"
 #include "ext-resources.h"
 

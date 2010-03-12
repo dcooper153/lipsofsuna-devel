@@ -25,21 +25,23 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__
 
+#include <lipsofsuna/system.h>
+
 typedef struct _LIThrThread LIThrThread;
 typedef void (*LIThrThreadFunc)(LIThrThread*, void*);
 
-LIThrThread*
-lithr_thread_new (LIThrThreadFunc func,
-                  void*           data);
+LIAPICALL (LIThrThread*, lithr_thread_new, (
+	LIThrThreadFunc func,
+	void*           data));
 
-void
-lithr_thread_free (LIThrThread* self);
+LIAPICALL (void, lithr_thread_free, (
+	LIThrThread* self));
 
-void
-lithr_thread_join (LIThrThread* self);
+LIAPICALL (void, lithr_thread_join, (
+	LIThrThread* self));
 
-int
-lithr_thread_get_done (LIThrThread* self);
+LIAPICALL (int, lithr_thread_get_done, (
+	LIThrThread* self));
 
 #endif
 

@@ -27,7 +27,7 @@
 #ifndef __EXT_OPTIONS_H__
 #define __EXT_OPTIONS_H__
 
-#include <lipsofsuna/widget.h>
+#include "ext-module.h"
 
 #define LIEXT_WIDGET_OPTIONS(o) ((LIExtOptions*)(o))
 
@@ -42,6 +42,9 @@ struct _LIExtOptions
 	LIWdgWidget* check_local_shadows;
 	LIWdgWidget* check_shaders;
 };
+
+const LIWdgClass*
+liext_widget_options ();
 
 LIWdgWidget*
 liext_options_new (LICliClient* client);

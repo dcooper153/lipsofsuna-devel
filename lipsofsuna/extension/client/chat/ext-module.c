@@ -24,9 +24,8 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
-#include "ext-history.h"
 #include "ext-module.h"
+#include "ext-history.h"
 
 LIMaiExtensionInfo liext_info =
 {

@@ -45,7 +45,7 @@ private_filter_servers (const char* dir,
 
 const LIWdgClass licli_widget_login =
 {
-	LIWDG_BASE_DYNAMIC, private_base, "Login", sizeof (LIWdgLogin),
+	private_base, "Login", sizeof (LIWdgLogin),
 	(LIWdgWidgetInitFunc) private_init,
 	(LIWdgWidgetFreeFunc) private_free,
 	(LIWdgWidgetEventFunc) private_event
@@ -84,7 +84,7 @@ liwdg_login_read_server_list (LIWdgLogin* self)
 	if (servers0 != NULL)
 	{
 		lisys_dir_set_filter (servers0, private_filter_servers);
-		lisys_dir_set_sorter (servers0, LISYS_DIR_SORTER_ALPHA);
+		lisys_dir_set_sorter (servers0, lisys_dir_sorter_alpha);
 		lisys_dir_scan (servers0);
 		count1 = lisys_dir_get_count (servers0);
 	}
@@ -98,7 +98,7 @@ liwdg_login_read_server_list (LIWdgLogin* self)
 	if (servers1 != NULL)
 	{
 		lisys_dir_set_filter (servers1, private_filter_servers);
-		lisys_dir_set_sorter (servers1, LISYS_DIR_SORTER_ALPHA);
+		lisys_dir_set_sorter (servers1, lisys_dir_sorter_alpha);
 		lisys_dir_scan (servers1);
 		count1 = lisys_dir_get_count (servers1);
 	}
@@ -295,7 +295,7 @@ static int
 private_event (LIWdgLogin* self,
                LIWdgEvent* event)
 {
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void
@@ -320,6 +320,6 @@ private_filter_servers (const char* dir,
                         const char* name,
                         void*       data)
 {
-	return LISYS_DIR_FILTER_VISIBLE (dir, name, NULL) &&
-	       LISYS_DIR_FILTER_DIRS (dir, name, NULL);
+	return lisys_dir_filter_visible (dir, name, NULL) &&
+	       lisys_dir_filter_dirs (dir, name, NULL);
 }

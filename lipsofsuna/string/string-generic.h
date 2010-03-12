@@ -29,35 +29,35 @@
 #include <wchar.h>
 #include <lipsofsuna/system.h>
 
-char*
-listr_dup (const char* self);
+LIAPICALL (char*, listr_dup, (
+	const char* self));
 
-char*
-listr_concat (const char* self,
-              const char* string);
+LIAPICALL (char*, listr_concat, (
+	const char* self,
+	const char* string));
 
-char*
-listr_format (const char* format,
-                          ...) LISYS_ATTR_FORMAT(1, 2);
+LIAPICALL (char*, listr_format, (
+	const char* format,
+	            ...)) LISYS_ATTR_FORMAT(1, 2);
 
-int
-listr_utf8_get_char (const char* self,
-                     wchar_t*    result);
+LIAPICALL (int, listr_utf8_get_char, (
+	const char* self,
+	wchar_t*    result));
 
-int
-listr_utf8_get_length (const char* self);
+LIAPICALL (int, listr_utf8_get_length, (
+	const char* self));
 
-char*
-listr_utf8_get_next (const char* self);
+LIAPICALL (char*, listr_utf8_get_next, (
+	const char* self));
 
-int
-listr_utf8_get_valid (const char* self);
+LIAPICALL (int, listr_utf8_get_valid, (
+	const char* self));
 
-wchar_t*
-listr_utf8_to_wchar (const char* self);
+LIAPICALL (wchar_t*, listr_utf8_to_wchar, (
+	const char* self));
 
-char*
-listr_wchar_to_utf8 (wchar_t self);
+LIAPICALL (char*, listr_wchar_to_utf8, (
+	wchar_t self));
 
 #endif
 

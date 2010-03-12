@@ -26,6 +26,7 @@
 #define __WIDGET_LABEL_H__
 
 #include <lipsofsuna/font.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_LABEL(o) ((LIWdgLabel*)(o))
@@ -42,49 +43,49 @@ struct _LIWdgLabel
 	char* string;
 };
 
-extern const LIWdgClass liwdg_widget_label;
+LIAPICALL (const LIWdgClass*, liwdg_widget_label, ());
 
-LIWdgWidget*
-liwdg_label_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_label_new, (
+	LIWdgManager* manager));
 
-LIWdgWidget*
-liwdg_label_new_with_text (LIWdgManager* manager,
-                           const char*   text);
+LIAPICALL (LIWdgWidget*, liwdg_label_new_with_text, (
+	LIWdgManager* manager,
+	const char*   text));
 
-LIFntFont*
-liwdg_label_get_font (LIWdgLabel* self);
+LIAPICALL (LIFntFont*, liwdg_label_get_font, (
+	LIWdgLabel* self));
 
-void
-liwdg_label_set_font (LIWdgLabel* self,
-                      LIFntFont*  font);
+LIAPICALL (void, liwdg_label_set_font, (
+	LIWdgLabel* self,
+	LIFntFont*  font));
 
-float
-liwdg_label_get_halign (const LIWdgLabel* self);
+LIAPICALL (float, liwdg_label_get_halign, (
+	const LIWdgLabel* self));
 
-void
-liwdg_label_set_halign (LIWdgLabel* self,
-                        float       value);
+LIAPICALL (void, liwdg_label_set_halign, (
+	LIWdgLabel* self,
+	float       value));
 
-int
-liwdg_label_get_highlight (const LIWdgLabel* self);
+LIAPICALL (int, liwdg_label_get_highlight, (
+	const LIWdgLabel* self));
 
-void
-liwdg_label_set_highlight (LIWdgLabel* self,
-                           int         value);
+LIAPICALL (void, liwdg_label_set_highlight, (
+	LIWdgLabel* self,
+	int         value));
 
-int
-liwdg_label_set_text (LIWdgLabel* self,
-                      const char* text);
+LIAPICALL (int, liwdg_label_set_text, (
+	LIWdgLabel* self,
+	const char* text));
 
-const char*
-liwdg_label_get_text (LIWdgLabel* self);
+LIAPICALL (const char*, liwdg_label_get_text, (
+	LIWdgLabel* self));
 
-float
-liwdg_label_get_valign (const LIWdgLabel* self);
+LIAPICALL (float, liwdg_label_get_valign, (
+	const LIWdgLabel* self));
 
-void
-liwdg_label_set_valign (LIWdgLabel* self,
-                        float       value);
+LIAPICALL (void, liwdg_label_set_valign, (
+	LIWdgLabel* self,
+	float       value));
 
 #endif
 

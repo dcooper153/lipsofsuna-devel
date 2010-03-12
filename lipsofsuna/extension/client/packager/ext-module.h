@@ -27,12 +27,24 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
+#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/archive.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/render.h>
 #include <lipsofsuna/script.h>
-#include "ext-packager.h"
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/thread.h>
+#include <lipsofsuna/widget.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_PACKAGER "Packager"
 
 typedef struct _LIExtModule LIExtModule;
+typedef struct _LIExtPackager LIExtPackager;
+typedef struct _LIExtPackagerData LIExtPackagerData;
+
 struct _LIExtModule
 {
 	LIExtPackager* packager;
@@ -49,7 +61,7 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_packager (LIScrClass* self,
-                     void*       data);
+                       void*       data);
 
 #endif
 

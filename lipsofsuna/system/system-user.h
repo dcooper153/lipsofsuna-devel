@@ -25,15 +25,17 @@
 #ifndef __SYSTEM_USER_H__
 #define __SYSTEM_USER_H__
 
+#include "system-compiler.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-char*
-lisys_user_get_name (int uid);
+LIAPICALL (char*, lisys_user_get_name, (
+	int uid));
 
-char*
-lisys_group_get_name (int gid);
+LIAPICALL (char*, lisys_group_get_name, (
+	int gid));
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,6 @@
 #ifndef __ALGORITHM_ARRAY_H__
 #define __ALGORITHM_ARRAY_H__
 
-#include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
 
 typedef struct _LIAlgArray LIAlgArray;
@@ -65,144 +64,41 @@ struct _LIAlgArray
 #define lialg_array_zero(self, index, count) \
 	lialg_array_zero_full((self), sizeof (*((self)->array)), index, count)
 
-static inline int
-lialg_array_append_full (void*  self,
-                         size_t size,
-                         void*  data,
-                         int    count)
-{
-	int num;
-	void* tmp;
-	LIAlgArray* array = (LIAlgArray*) self;
+LIAPICALL (int, lialg_array_append_full, (
+	void*  self,
+	size_t size,
+	void*  data,
+	int    count));
 
-	assert (count >= 0);
-	assert (size > 0);
+LIAPICALL (int, lialg_array_insert_full, (
+	void*  self,
+	size_t size,
+	int    index,
+	void*  data,
+	int    count));
 
-	num = array->count + count;
-	if (num > array->count)
-	{
-		tmp = lisys_realloc (array->array, num * size);
-		if (tmp == NULL)
-			return 0;
-		array->array = tmp;
-	}
-	memcpy ((char*) array->array + array->count * size, data, count * size);
-	array->count += count;
-	return 1;
-}
+LIAPICALL (int, lialg_array_prepend_full, (
+	void*  self,
+	size_t size,
+	void*  data,
+	int    count));
 
-static inline int
-lialg_array_insert_full (void*  self,
-                         size_t size,
-                         int    index,
-                         void*  data,
-                         int    count)
-{
-	int num;
-	void* tmp;
-	LIAlgArray* array = (LIAlgArray*) self;
+LIAPICALL (void, lialg_array_remove_full, (
+	void*  self,
+	size_t size,
+	int    index,
+	int    count));
 
-	assert (count >= 0);
-	assert (size > 0);
+LIAPICALL (int, lialg_array_resize_full, (
+	void*  self,
+	size_t size,
+	int    count));
 
-	num = array->count + count;
-	if (num > array->count)
-	{
-		tmp = lisys_realloc (array->array, num * size);
-		if (tmp == NULL)
-			return 0;
-		array->array = tmp;
-	}
-	memmove ((char*) array->array + (index + count) * size,
-	         (char*) array->array + index * size,
-	         (array->count - index) * size);
-	memcpy ((char*) array->array + index * size, data, count * size);
-	array->count += count;
-	return 1;
-}
-
-static inline int
-lialg_array_prepend_full (void*  self,
-                          size_t size,
-                          void*  data,
-                          int    count)
-{
-	int num;
-	void* tmp;
-	LIAlgArray* array = (LIAlgArray*) self;
-
-	assert (count >= 0);
-	assert (size > 0);
-
-	num = array->count + count;
-	if (num > array->count)
-	{
-		tmp = lisys_realloc (array->array, num * size);
-		if (tmp == NULL)
-			return 0;
-		array->array = tmp;
-	}
-	memmove ((char*) array->array + count * size,
-	         (char*) array->array,
-	         array->count * size);
-	memcpy ((char*) array->array, data, count * size);
-	array->count += count;
-	return 1;
-}
-
-static inline void
-lialg_array_remove_full (void*  self,
-                         size_t size,
-                         int    index,
-                         int    count)
-{
-	LIAlgArray* array = (LIAlgArray*) self;
-
-	assert (size > 0);
-	assert (index >= 0);
-	assert (count <= array->count);
-	assert (index + count <= array->count);
-
-	memmove ((char*) array->array + index * size,
-	         (char*) array->array + (index + count) * size,
-	         (array->count - index - count) * size);
-	array->count -= count;
-}
-
-static inline int
-lialg_array_resize_full (void*  self,
-                         size_t size,
-                         int    count)
-{
-	void* tmp;
-	LIAlgArray* array = (LIAlgArray*) self;
-
-	assert (size > 0);
-	assert (count >= 0);
-
-	tmp = lisys_realloc (array->array, size * count);
-	if (tmp == NULL)
-		return 0;
-	array->count = count;
-	array->array = tmp;
-	return 1;
-}
-
-static inline void
-lialg_array_zero_full (void*  self,
-                       size_t size,
-                       int    index,
-                       int    count)
-{
-	LIAlgArray* array = (LIAlgArray*) self;
-
-	assert (size > 0);
-	assert (index >= 0);
-	assert (count <= array->count);
-	assert (index + count <= array->count);
-
-	memset ((char*) array->array + index * size, 0, count * size);
-}
+LIAPICALL (void, lialg_array_zero_full, (
+	void*  self,
+	size_t size,
+	int    index,
+	int    count));
 
 #endif
 

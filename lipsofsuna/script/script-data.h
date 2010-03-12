@@ -25,42 +25,43 @@
 #ifndef __SCRIPT_DATA_H__
 #define __SCRIPT_DATA_H__
 
+#include <lipsofsuna/system.h>
 #include "script-types.h"
 
-LIScrData*
-liscr_data_new (LIScrScript* script,
-                void*        data,
-                const char*  meta,
-                liscrGCFunc  free);
+LIAPICALL (LIScrData*, liscr_data_new, (
+	LIScrScript* script,
+	void*        data,
+	const char*  meta,
+	liscrGCFunc  free));
 
-LIScrData*
-liscr_data_new_alloc (LIScrScript* script,
-                      size_t       size,
-                      const char*  meta);
+LIAPICALL (LIScrData*, liscr_data_new_alloc, (
+	LIScrScript* script,
+	size_t       size,
+	const char*  meta));
 
-void
-liscr_data_free (LIScrData* object);
+LIAPICALL (void, liscr_data_free, (
+	LIScrData* object));
 
-void
-liscr_data_ref (LIScrData* object,
-                LIScrData* referencer);
+LIAPICALL (void, liscr_data_ref, (
+	LIScrData* object,
+	LIScrData* referencer));
 
-void
-liscr_data_unref (LIScrData* object,
-                  LIScrData* referencer);
+LIAPICALL (void, liscr_data_unref, (
+	LIScrData* object,
+	LIScrData* referencer));
 
-LIScrClass*
-liscr_data_get_class (LIScrData* self);
+LIAPICALL (LIScrClass*, liscr_data_get_class, (
+	LIScrData* self));
 
-int
-liscr_data_set_class (LIScrData*  self,
-                      LIScrClass* clss);
+LIAPICALL (int, liscr_data_set_class, (
+	LIScrData*  self,
+	LIScrClass* clss));
 
-LIScrScript*
-liscr_data_get_script (LIScrData* self);
+LIAPICALL (LIScrScript*, liscr_data_get_script, (
+	LIScrData* self));
 
-int
-liscr_data_get_valid (LIScrData* self);
+LIAPICALL (int, liscr_data_get_valid, (
+	LIScrData* self));
 
 #endif
 

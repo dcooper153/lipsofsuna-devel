@@ -27,66 +27,66 @@
 
 #include "script-types.h"
 
-LIScrClass*
-liscr_isanyclass (lua_State*  lua,
-                  int         arg);
+LIAPICALL (LIScrClass*, liscr_isanyclass, (
+	lua_State*  lua,
+	int         arg));
 
-LIScrData*
-liscr_isanydata (lua_State* lua,
-                 int        arg);
+LIAPICALL (LIScrData*, liscr_isanydata, (
+	lua_State* lua,
+	int        arg));
 
-LIScrClass*
-liscr_isclass (lua_State*  lua,
-               int         arg,
-               const char* meta);
+LIAPICALL (LIScrClass*, liscr_isclass, (
+	lua_State*  lua,
+	int         arg,
+	const char* meta));
 
-LIScrData*
-liscr_isdata (lua_State*  lua,
-              int         arg,
-              const char* meta);
+LIAPICALL (LIScrData*, liscr_isdata, (
+	lua_State*  lua,
+	int         arg,
+	const char* meta));
 
-LIScrClass*
-liscr_checkanyclass (lua_State* lua,
-                     int        arg);
+LIAPICALL (LIScrClass*, liscr_checkanyclass, (
+	lua_State* lua,
+	int        arg));
 
-LIScrData*
-liscr_checkanydata (lua_State* lua,
-                    int        arg);
+LIAPICALL (LIScrData*, liscr_checkanydata, (
+	lua_State* lua,
+	int        arg));
 
-LIScrClass*
-liscr_checkclass (lua_State*  lua,
-                  int         arg,
-                  const char* meta);
+LIAPICALL (LIScrClass*, liscr_checkclass, (
+	lua_State*  lua,
+	int         arg,
+	const char* meta));
 
-void*
-liscr_checkclassdata (lua_State*  lua,
-                      int         arg,
-                      const char* meta);
+LIAPICALL (void*, liscr_checkclassdata, (
+	lua_State*  lua,
+	int         arg,
+	const char* meta));
 
-LIScrData*
-liscr_checkdata (lua_State*  lua,
-                 int         arg,
-                 const char* meta);
+LIAPICALL (LIScrData*, liscr_checkdata, (
+	lua_State*  lua,
+	int         arg,
+	const char* meta));
 
-int
-liscr_copyargs (lua_State* lua,
-                LIScrData* data,
-                int        arg);
+LIAPICALL (int, liscr_copyargs, (
+	lua_State* lua,
+	LIScrData* data,
+	int        arg));
 
-void
-liscr_pushclass (lua_State*  lua,
-                 LIScrClass* clss);
+LIAPICALL (void, liscr_pushclass, (
+	lua_State*  lua,
+	LIScrClass* clss));
 
-void
-liscr_pushdata (lua_State* lua,
-                LIScrData* object);
+LIAPICALL (void, liscr_pushdata, (
+	lua_State* lua,
+	LIScrData* object));
 
-void
-liscr_pushpriv (lua_State* lua,
-                LIScrData* object);
+LIAPICALL (void, liscr_pushpriv, (
+	lua_State* lua,
+	LIScrData* object));
 
-LIScrScript*
-liscr_script (lua_State* lua);
+LIAPICALL (LIScrScript*, liscr_script, (
+	lua_State* lua));
 
 #endif
 

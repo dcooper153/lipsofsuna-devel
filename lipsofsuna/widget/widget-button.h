@@ -26,6 +26,7 @@
 #define __WIDGET_BUTTON_H__
 
 #include <lipsofsuna/font.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_BUTTON(o) ((LIWdgButton*)(o))
@@ -42,24 +43,24 @@ struct _LIWdgButton
 	char* string;
 };
 
-extern const LIWdgClass liwdg_widget_button;
+LIAPICALL (const LIWdgClass*, liwdg_widget_button, ());
 
-LIWdgWidget*
-liwdg_button_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_button_new, (
+	LIWdgManager* manager));
 
-LIFntFont*
-liwdg_button_get_font (LIWdgButton*  self);
+LIAPICALL (LIFntFont*, liwdg_button_get_font, (
+	LIWdgButton*  self));
 
-void
-liwdg_button_set_font (LIWdgButton* self,
-                       LIFntFont*   font);
+LIAPICALL (void, liwdg_button_set_font, (
+	LIWdgButton* self,
+	LIFntFont*   font));
 
-int
-liwdg_button_set_text (LIWdgButton* self,
-                       const char*  text);
+LIAPICALL (int, liwdg_button_set_text, (
+	LIWdgButton* self,
+	const char*  text));
 
-const char*
-liwdg_button_get_text (LIWdgButton* self);
+LIAPICALL (const char*, liwdg_button_get_text, (
+	LIWdgButton* self));
 
 #endif
 

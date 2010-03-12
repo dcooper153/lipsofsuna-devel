@@ -39,20 +39,25 @@ private_event (LIWdgScroll* self,
 static void
 private_rebuild (LIWdgScroll* self);
 
-const LIWdgClass liwdg_widget_scroll =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Scroll", sizeof (LIWdgScroll),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_scroll ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Scroll", sizeof (LIWdgScroll),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_scroll_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_scroll);
+	return liwdg_widget_new (manager, liwdg_widget_scroll ());
 }
 
 LIFntFont*
@@ -165,7 +170,7 @@ private_event (LIWdgScroll*  self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

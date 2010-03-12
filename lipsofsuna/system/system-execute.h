@@ -26,56 +26,57 @@
 #define __SYSTEM_EXECUTE_H__
 
 #include <stdio.h>
+#include "system-compiler.h"
 
 typedef void (*lisysExecFilter)(void*, FILE*);
 
-int
-lisys_execvl (const char* prog,
-                          ...);
+LIAPICALL (int, lisys_execvl, (
+	const char* prog,
+	            ...));
 
-int
-lisys_execvl_detach (const char* prog,
-                                 ...);
+LIAPICALL (int, lisys_execvl_detach, (
+	const char* prog,
+	            ...));
 
-int
-lisys_execvl_redir_call (lisysExecFilter call,
-                         void*           data,
-                         const char*     prog,
-                                         ...);
+LIAPICALL (int, lisys_execvl_redir_call, (
+	lisysExecFilter call,
+	void*           data,
+	const char*     prog,
+	                ...));
 
-int
-lisys_execvl_redir_file (FILE*       file,
-                         const char* prog,
-                                     ...);
+LIAPICALL (int, lisys_execvl_redir_file, (
+	FILE*       file,
+	const char* prog,
+	            ...));
 
-int
-lisys_execvl_redir_path (const char* path,
-                         const char* prog,
-                                     ...);
+LIAPICALL (int, lisys_execvl_redir_path, (
+	const char* path,
+	const char* prog,
+	            ...));
 
-int
-lisys_execvp (const char*        prog,
-              const char* const* args);
+LIAPICALL (int, lisys_execvp, (
+	const char*        prog,
+	const char* const* args));
 
-int
-lisys_execvp_detach (const char*        prog,
-                     const char* const* args);
+LIAPICALL (int, lisys_execvp_detach, (
+	const char*        prog,
+	const char* const* args));
 
-int
-lisys_execvp_redir_call (lisysExecFilter    call,
-                         void*              data,
-                         const char*        prog,
-                         const char* const* args);
+LIAPICALL (int, lisys_execvp_redir_call, (
+	lisysExecFilter    call,
+	void*              data,
+	const char*        prog,
+	const char* const* args));
 
-int
-lisys_execvp_redir_file (FILE*              file,
-                         const char*        prog,
-                         const char* const* args);
+LIAPICALL (int, lisys_execvp_redir_file, (
+	FILE*              file,
+	const char*        prog,
+	const char* const* args));
 
-int
-lisys_execvp_redir_path (const char*        path,
-                         const char*        prog,
-                         const char* const* args);
+LIAPICALL (int, lisys_execvp_redir_path, (
+	const char*        path,
+	const char*        prog,
+	const char* const* args));
 
 #endif
 

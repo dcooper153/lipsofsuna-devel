@@ -37,7 +37,6 @@ typedef void* (*LIWdgWidgetExtendFunc)(LIWdgWidget*, LIWdgClass* clss);
 
 struct _LIWdgClass
 {
-	int basetype;
 	const void* base;
 	const char* type;
 	int size;
@@ -60,16 +59,9 @@ liwdg_class_get_base (const LIWdgClass* self)
 
 	if (self->base == NULL)
 		return NULL;
-	if (self->basetype == LIWDG_BASE_DYNAMIC)
-	{
-		func = self->base;
-		return func ();
-	}
-	else
-	{
-		assert (self->basetype == LIWDG_BASE_STATIC);
-		return self->base;
-	}
+	func = self->base;
+
+	return func ();
 }
 
 #endif

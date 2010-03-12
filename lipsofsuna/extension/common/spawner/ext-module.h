@@ -25,8 +25,7 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/main.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_SPAWNER "Spawner"
 

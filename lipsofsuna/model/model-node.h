@@ -28,6 +28,7 @@
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "model-bone.h"
 #include "model-light.h"
 #include "model-types.h"
@@ -60,64 +61,64 @@ struct _LIMdlNode
 extern "C" {
 #endif
 
-LIMdlNode*
-limdl_node_new (LIMdlModel* model);
+LIAPICALL (LIMdlNode*, limdl_node_new, (
+	LIMdlModel* model));
 
-LIMdlNode*
-limdl_node_copy (const LIMdlNode* node);
+LIAPICALL (LIMdlNode*, limdl_node_copy, (
+	const LIMdlNode* node));
 
-void
-limdl_node_free (LIMdlNode* self);
+LIAPICALL (void, limdl_node_free, (
+	LIMdlNode* self));
 
-LIMdlNode*
-limdl_node_find_node (const LIMdlNode* self,
-                      const char*      name);
+LIAPICALL (LIMdlNode*, limdl_node_find_node, (
+	const LIMdlNode* self,
+	const char*      name));
 
-int
-limdl_node_read (LIMdlNode*   self,
-                 LIArcReader* reader);
+LIAPICALL (int, limdl_node_read, (
+	LIMdlNode*   self,
+	LIArcReader* reader));
 
-void
-limdl_node_rebuild (LIMdlNode* self,
-                    int        recursive);
+LIAPICALL (void, limdl_node_rebuild, (
+	LIMdlNode* self,
+	int        recursive));
 
-int
-limdl_node_write (const LIMdlNode* self,
-                  LIArcWriter*     writer);
+LIAPICALL (int, limdl_node_write, (
+	const LIMdlNode* self,
+	LIArcWriter*     writer));
 
-LIMdlNode*
-limdl_node_get_child (const LIMdlNode* self,
-                      int              index);
+LIAPICALL (LIMdlNode*, limdl_node_get_child, (
+	const LIMdlNode* self,
+	int              index));
 
-int
-limdl_node_get_child_count (const LIMdlNode* self);
+LIAPICALL (int, limdl_node_get_child_count, (
+	const LIMdlNode* self));
 
-int
-limdl_node_get_child_total (const LIMdlNode* self);
+LIAPICALL (int, limdl_node_get_child_total, (
+	const LIMdlNode* self));
 
-const char*
-limdl_node_get_name (const LIMdlNode* self);
+LIAPICALL (const char*, limdl_node_get_name, (
+	const LIMdlNode* self));
 
-void
-limdl_node_get_pose_axes (const LIMdlNode* self,
-                          LIMatVector*     x,
-                          LIMatVector*     y,
-                          LIMatVector*     z);
+LIAPICALL (void, limdl_node_get_pose_axes, (
+	const LIMdlNode* self,
+	LIMatVector*     x,
+	LIMatVector*     y,
+	LIMatVector*     z));
 
-void
-limdl_node_set_local_transform (LIMdlNode*            self,
-                                const LIMatTransform* value);
+LIAPICALL (void, limdl_node_set_local_transform, (
+	LIMdlNode*            self,
+	const LIMatTransform* value));
 
-void
-limdl_node_get_rest_transform (const LIMdlNode* self,
-                               LIMatTransform*  value);
+LIAPICALL (void, limdl_node_get_rest_transform, (
+	const LIMdlNode* self,
+	LIMatTransform*  value));
 
-void
-limdl_node_get_world_transform (const LIMdlNode* self,
-                                LIMatTransform*  value);
+LIAPICALL (void, limdl_node_get_world_transform, (
+	const LIMdlNode* self,
+	LIMatTransform*  value));
 
-LIMdlNodeType
-limdl_node_get_type (const LIMdlNode* self);
+LIAPICALL (LIMdlNodeType, limdl_node_get_type, (
+	const LIMdlNode* self));
 
 #ifdef __cplusplus
 }

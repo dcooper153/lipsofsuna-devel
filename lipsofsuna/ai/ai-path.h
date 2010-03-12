@@ -26,6 +26,7 @@
 #define __AI_PATH_H__
 
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LIAiPath LIAiPath;
 struct _LIAiPath
@@ -38,30 +39,29 @@ struct _LIAiPath
 	} points;
 };
 
-LIAiPath*
-liai_path_new ();
+LIAPICALL (LIAiPath*, liai_path_new, ());
 
-void
-liai_path_free (LIAiPath* self);
+LIAPICALL (void, liai_path_free, (
+	LIAiPath* self));
 
-int
-liai_path_append_point (LIAiPath*          self,
-                        const LIMatVector* point);
+LIAPICALL (int, liai_path_append_point, (
+	LIAiPath*          self,
+	const LIMatVector* point));
 
-void
-liai_path_get_point (const LIAiPath* self,
-                     int             index,
-                     LIMatVector*    value);
+LIAPICALL (void, liai_path_get_point, (
+	const LIAiPath* self,
+	int             index,
+	LIMatVector*    value));
 
-int
-liai_path_get_length (const LIAiPath* self);
+LIAPICALL (int, liai_path_get_length, (
+	const LIAiPath* self));
 
-int
-liai_path_get_position (const LIAiPath* self);
+LIAPICALL (int, liai_path_get_position, (
+	const LIAiPath* self));
 
-void
-liai_path_set_position (LIAiPath* self,
-                        int       index);
+LIAPICALL (void, liai_path_set_position, (
+	LIAiPath* self,
+	int       index));
 
 #endif
 

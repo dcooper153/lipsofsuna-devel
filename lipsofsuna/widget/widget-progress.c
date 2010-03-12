@@ -39,20 +39,25 @@ private_event (LIWdgProgress* self,
 static void
 private_rebuild (LIWdgProgress* self);
 
-const LIWdgClass liwdg_widget_progress =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Progress", sizeof (LIWdgProgress),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_progress ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Progress", sizeof (LIWdgProgress),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_progress_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_progress);
+	return liwdg_widget_new (manager, liwdg_widget_progress ());
 }
 
 LIFntFont*
@@ -166,7 +171,7 @@ private_event (LIWdgProgress* self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

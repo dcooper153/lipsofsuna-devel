@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LIMdlShape LIMdlShape;
 struct _LIMdlShape
@@ -39,13 +40,13 @@ struct _LIMdlShape
 	} vertices;
 };
 
-int
-limdl_shape_read (LIMdlShape*  self,
-                  LIArcReader* reader);
+LIAPICALL (int, limdl_shape_read, (
+	LIMdlShape*  self,
+	LIArcReader* reader));
 
-int
-limdl_shape_write (const LIMdlShape* self,
-                   LIArcWriter*      writer);
+LIAPICALL (int, limdl_shape_write, (
+	const LIMdlShape* self,
+	LIArcWriter*      writer));
 
 #endif
 

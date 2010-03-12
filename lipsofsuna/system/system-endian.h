@@ -25,14 +25,14 @@
 #ifndef __SYSTEM_ENDIAN_H__
 #define __SYSTEM_ENDIAN_H__
 
+#include "system-compiler.h"
+
 #define LISYS_ENDIAN_BIG 0x1234
 #define LISYS_ENDIAN_LITTLE 0x3412
 
-int
-lisys_endian_big ();
+LIAPICALL (int, lisys_endian_big, ());
 
-int
-lisys_endian_get ();
+LIAPICALL (int, lisys_endian_get, ());
 
 #endif
 

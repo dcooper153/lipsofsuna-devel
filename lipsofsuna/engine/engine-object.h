@@ -60,185 +60,185 @@ struct _LIEngObject
 	} smoothing;
 };
 
-LIEngObject*
-lieng_object_new (LIEngEngine*     engine,
-                  LIEngModel*      model,
-                  LIPhyControlMode control,
-                  uint32_t         id);
+LIAPICALL (LIEngObject*, lieng_object_new, (
+	LIEngEngine*     engine,
+	LIEngModel*      model,
+	LIPhyControlMode control,
+	uint32_t         id));
 
-void
-lieng_object_free (LIEngObject* self);
+LIAPICALL (void, lieng_object_free, (
+	LIEngObject* self));
 
-void
-lieng_object_ref (LIEngObject* self,
-                  int          count);
+LIAPICALL (void, lieng_object_ref, (
+	LIEngObject* self,
+	int          count));
 
-int
-lieng_object_animate (LIEngObject* self,
-                      int          channel,
-                      const char*  animation,
-                      int          permanent,
-                      float        priority,
-                      float        time);
+LIAPICALL (int, lieng_object_animate, (
+	LIEngObject* self,
+	int          channel,
+	const char*  animation,
+	int          permanent,
+	float        priority,
+	float        time));
 
-int
-lieng_object_approach (LIEngObject*       self,
-                       const LIMatVector* target,
-                       float              speed,
-                       float              dist);
+LIAPICALL (int, lieng_object_approach, (
+	LIEngObject*       self,
+	const LIMatVector* target,
+	float              speed,
+	float              dist));
 
-LIMdlNode*
-lieng_object_find_node (LIEngObject* self,
-                        const char*  name);
+LIAPICALL (LIMdlNode*, lieng_object_find_node, (
+	LIEngObject* self,
+	const char*  name));
 
-void
-lieng_object_impulse (LIEngObject*       self,
-                      const LIMatVector* point,
-                      const LIMatVector* impulse);
+LIAPICALL (void, lieng_object_impulse, (
+	LIEngObject*       self,
+	const LIMatVector* point,
+	const LIMatVector* impulse));
 
-void
-lieng_object_jump (LIEngObject*       self,
-                   const LIMatVector* impulse);
+LIAPICALL (void, lieng_object_jump, (
+	LIEngObject*       self,
+	const LIMatVector* impulse));
 
-int
-lieng_object_moved (LIEngObject* self);
+LIAPICALL (int, lieng_object_moved, (
+	LIEngObject* self));
 
-void
-lieng_object_refresh (LIEngObject* self,
-                      float        radius);
+LIAPICALL (void, lieng_object_refresh, (
+	LIEngObject* self,
+	float        radius));
 
-void
-lieng_object_update (LIEngObject* self,
-                     float        secs);
+LIAPICALL (void, lieng_object_update, (
+	LIEngObject* self,
+	float        secs));
 
-void
-lieng_object_get_angular (const LIEngObject* self,
-                          LIMatVector*       value);
+LIAPICALL (void, lieng_object_get_angular, (
+	const LIEngObject* self,
+	LIMatVector*       value));
 
-void
-lieng_object_set_angular (LIEngObject*       self,
-                          const LIMatVector* value);
+LIAPICALL (void, lieng_object_set_angular, (
+	LIEngObject*       self,
+	const LIMatVector* value));
 
-void
-lieng_object_get_bounds (const LIEngObject* self,
-                         LIMatAabb*         bounds);
+LIAPICALL (void, lieng_object_get_bounds, (
+	const LIEngObject* self,
+	LIMatAabb*         bounds));
 
-void
-lieng_object_get_bounds_transform (const LIEngObject* self,
-                                   LIMatAabb*         bounds);
+LIAPICALL (void, lieng_object_get_bounds_transform, (
+	const LIEngObject* self,
+	LIMatAabb*         bounds));
 
-int
-lieng_object_get_collision_group (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_collision_group, (
+	const LIEngObject* self));
 
-void
-lieng_object_set_collision_group (LIEngObject* self,
-                                  int          mask);
+LIAPICALL (void, lieng_object_set_collision_group, (
+	LIEngObject* self,
+	int          mask));
 
-int
-lieng_object_get_collision_mask (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_collision_mask, (
+	const LIEngObject* self));
 
-void
-lieng_object_set_collision_mask (LIEngObject* self,
-                                 int          mask);
+LIAPICALL (void, lieng_object_set_collision_mask, (
+	LIEngObject* self,
+	int          mask));
 
-int
-lieng_object_get_dirty (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_dirty, (
+	const LIEngObject* self));
 
-void
-lieng_object_set_dirty (LIEngObject* self,
-                        int          value);
+LIAPICALL (void, lieng_object_set_dirty, (
+	LIEngObject* self,
+	int          value));
 
-float
-lieng_object_get_distance (const LIEngObject* self,
-                           const LIEngObject* object);
+LIAPICALL (float, lieng_object_get_distance, (
+	const LIEngObject* self,
+	const LIEngObject* object));
 
-int
-lieng_object_get_flags (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_flags, (
+	const LIEngObject* self));
 
-void
-lieng_object_set_flags (LIEngObject* self,
-                        int          flags);
+LIAPICALL (void, lieng_object_set_flags, (
+	LIEngObject* self,
+	int          flags));
 
-int
-lieng_object_get_ground (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_ground, (
+	const LIEngObject* self));
 
-float
-lieng_object_get_mass (const LIEngObject* self);
+LIAPICALL (float, lieng_object_get_mass, (
+	const LIEngObject* self));
 
-void
-lieng_object_set_mass (LIEngObject* self,
-                       float        value);
+LIAPICALL (void, lieng_object_set_mass, (
+	LIEngObject* self,
+	float        value));
 
-int
-lieng_object_set_model (LIEngObject* self,
-                        LIEngModel*  model);
+LIAPICALL (int, lieng_object_set_model, (
+	LIEngObject* self,
+	LIEngModel*  model));
 
-const char*
-lieng_object_get_model_name (const LIEngObject* self);
+LIAPICALL (const char*, lieng_object_get_model_name, (
+	const LIEngObject* self));
 
-int
-lieng_object_set_model_name (LIEngObject* self,
-                             const char*  value);
+LIAPICALL (int, lieng_object_set_model_name, (
+	LIEngObject* self,
+	const char*  value));
 
-int
-lieng_object_get_realized (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_realized, (
+	const LIEngObject* self));
 
-int
-lieng_object_set_realized (LIEngObject* self,
-                           int          value);
+LIAPICALL (int, lieng_object_set_realized, (
+	LIEngObject* self,
+	int          value));
 
-LIEngSector*
-lieng_object_get_sector (LIEngObject* self);
+LIAPICALL (LIEngSector*, lieng_object_get_sector, (
+	LIEngObject* self));
 
-int
-lieng_object_get_selected (const LIEngObject* self);
+LIAPICALL (int, lieng_object_get_selected, (
+	const LIEngObject* self));
 
-int
-lieng_object_set_selected (LIEngObject* self,
-                           int          select);
+LIAPICALL (int, lieng_object_set_selected, (
+	LIEngObject* self,
+	int          select));
 
-void
-lieng_object_set_shape (LIEngObject* self,
-                        LIPhyShape*  shape);
+LIAPICALL (void, lieng_object_set_shape, (
+	LIEngObject* self,
+	LIPhyShape*  shape));
 
-void
-lieng_object_set_smoothing (LIEngObject* self,
-                            float        pos,
-                            float        rot);
+LIAPICALL (void, lieng_object_set_smoothing, (
+	LIEngObject* self,
+	float        pos,
+	float        rot));
 
-float
-lieng_object_get_speed (const LIEngObject* self);
+LIAPICALL (float, lieng_object_get_speed, (
+	const LIEngObject* self));
 
-void
-lieng_object_set_speed (LIEngObject* self,
-                        float        value);
+LIAPICALL (void, lieng_object_set_speed, (
+	LIEngObject* self,
+	float        value));
 
-void
-lieng_object_get_target (const LIEngObject* self,
-                         LIMatTransform*    value);
+LIAPICALL (void, lieng_object_get_target, (
+	const LIEngObject* self,
+	LIMatTransform*    value));
 
-void
-lieng_object_get_transform (const LIEngObject* self,
-                            LIMatTransform*    value);
+LIAPICALL (void, lieng_object_get_transform, (
+	const LIEngObject* self,
+	LIMatTransform*    value));
 
-int
-lieng_object_set_transform (LIEngObject*          self,
-                            const LIMatTransform* value);
+LIAPICALL (int, lieng_object_set_transform, (
+	LIEngObject*          self,
+	const LIMatTransform* value));
 
-void*
-lieng_object_get_userdata (LIEngObject* self);
+LIAPICALL (void*, lieng_object_get_userdata, (
+	LIEngObject* self));
 
-void
-lieng_object_set_userdata (LIEngObject* self,
-                           void*        data);
+LIAPICALL (void, lieng_object_set_userdata, (
+	LIEngObject* self,
+	void*        data));
 
-void
-lieng_object_get_velocity (const LIEngObject* self,
-                           LIMatVector*       velocity);
+LIAPICALL (void, lieng_object_get_velocity, (
+	const LIEngObject* self,
+	LIMatVector*       velocity));
 
-int
-lieng_object_set_velocity (LIEngObject*       self,
-                           const LIMatVector* velocity);
+LIAPICALL (int, lieng_object_set_velocity, (
+	LIEngObject*       self,
+	const LIMatVector* velocity));
 
 #endif
 

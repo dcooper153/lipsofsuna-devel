@@ -26,6 +26,7 @@
 #define __GENERATOR_BRUSH_H__
 
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/voxel.h>
 #include "generator-rule.h"
 #include "generator-types.h"
@@ -66,64 +67,64 @@ struct _LIGenBrush
 	} objects;
 };
 
-LIGenBrush*
-ligen_brush_new (LIGenGenerator* generator,
-                 int             width,
-                 int             height,
-                 int             depth);
+LIAPICALL (LIGenBrush*, ligen_brush_new, (
+	LIGenGenerator* generator,
+	int             width,
+	int             height,
+	int             depth));
 
-void
-ligen_brush_free (LIGenBrush* self);
+LIAPICALL (void, ligen_brush_free, (
+	LIGenBrush* self));
 
-int
-ligen_brush_insert_object (LIGenBrush*           self,
-                           int                   flags,
-                           float                 prob,
-                           const char*           type,
-                           const char*           model,
-                           const char*           extra,
-                           const LIMatTransform* transform);
+LIAPICALL (int, ligen_brush_insert_object, (
+	LIGenBrush*           self,
+	int                   flags,
+	float                 prob,
+	const char*           type,
+	const char*           model,
+	const char*           extra,
+	const LIMatTransform* transform));
 
-int
-ligen_brush_insert_rule (LIGenBrush* self,
-                         LIGenRule*  rule);
+LIAPICALL (int, ligen_brush_insert_rule, (
+	LIGenBrush* self,
+	LIGenRule*  rule));
 
-int
-ligen_brush_read_rules (LIGenBrush* self,
-                        LIArcSql*   sql);
+LIAPICALL (int, ligen_brush_read_rules, (
+	LIGenBrush* self,
+	LIArcSql*   sql));
 
-void
-ligen_brush_remove_object (LIGenBrush* self,
-                           int         index);
+LIAPICALL (void, ligen_brush_remove_object, (
+	LIGenBrush* self,
+	int         index));
 
-void
-ligen_brush_remove_rule (LIGenBrush* self,
-                         int         index);
+LIAPICALL (void, ligen_brush_remove_rule, (
+	LIGenBrush* self,
+	int         index));
 
-void
-ligen_brush_remove_strokes (LIGenBrush* self,
-                            int         brush);
+LIAPICALL (void, ligen_brush_remove_strokes, (
+	LIGenBrush* self,
+	int         brush));
 
-int
-ligen_brush_write (LIGenBrush* self,
-                   LIArcSql*   sql);
+LIAPICALL (int, ligen_brush_write, (
+	LIGenBrush* self,
+	LIArcSql*   sql));
 
-int
-ligen_brush_set_name (LIGenBrush* self,
-                      const char* value);
+LIAPICALL (int, ligen_brush_set_name, (
+	LIGenBrush* self,
+	const char* value));
 
-int
-ligen_brush_set_size (LIGenBrush* self,
-                      int         x,
-                      int         y,
-                      int         z);
+LIAPICALL (int, ligen_brush_set_size, (
+	LIGenBrush* self,
+	int         x,
+	int         y,
+	int         z));
 
-void
-ligen_brush_set_voxel (LIGenBrush* self,
-                       int         x,
-                       int         y,
-                       int         z,
-                       LIVoxVoxel  voxel);
+LIAPICALL (void, ligen_brush_set_voxel, (
+	LIGenBrush* self,
+	int         x,
+	int         y,
+	int         z,
+	LIVoxVoxel  voxel));
 
 #endif
 

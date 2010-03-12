@@ -24,13 +24,10 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
+#include "ext-module.h"
 #include "ext-history.h"
 
 #define LIEXT_CHAT_HISTORY_DEFAULT_LINES 10
-
-static const void*
-private_base ();
 
 static int
 private_init (LIExtChatHistory* self,
@@ -48,13 +45,19 @@ private_rebuild (LIExtChatHistory* self);
 
 /****************************************************************************/
 
-const LIWdgClass LIExtChatHistoryType =
+const LIWdgClass*
+liext_widget_log ()
 {
-	LIWDG_BASE_DYNAMIC, private_base, "ChatHistory", sizeof (LIExtChatHistory),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static LIWdgClass clss =
+	{
+		NULL, "ChatHistory", sizeof (LIExtChatHistory),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	clss.base = liwdg_widget_label;
+	return &clss;
+}
 
 /**
  * \brief Creates a new chat history widget.
@@ -70,7 +73,7 @@ liext_chat_history_new (LIWdgManager* manager,
 	LIWdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &LIExtChatHistoryType);
+	self = liwdg_widget_new (manager, liext_widget_log ());
 	if (self == NULL)
 		return NULL;
 	LIEXT_WIDGET_CHAT_HISTORY (self)->client = client;
@@ -110,12 +113,6 @@ liext_chat_history_append (LIExtChatHistory* self,
 
 /****************************************************************************/
 
-static const void*
-private_base ()
-{
-	return &liwdg_widget_label;
-}
-
 static int
 private_init (LIExtChatHistory* self,
               LIWdgManager*     manager)
@@ -150,7 +147,7 @@ static int
 private_event (LIExtChatHistory* self,
                LIWdgEvent*       event)
 {
-	return liwdg_widget_label.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_label ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

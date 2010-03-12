@@ -20,6 +20,7 @@
 
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/script.h>
+#include <lipsofsuna/system.h>
 
 #define LISCR_SCRIPT_CLASS "Class"
 #define LISCR_SCRIPT_DATA "Data"
@@ -31,51 +32,51 @@
 #define LISCR_SCRIPT_QUATERNION "Quaternion"
 #define LISCR_SCRIPT_VECTOR "Vector"
 
-void
-liscr_script_class (LIScrClass* clss,
-                    void*       data);
+LIAPICALL (void, liscr_script_class, (
+	LIScrClass* clss,
+	void*       data));
 
-void
-liscr_script_data (LIScrClass* clss,
-                   void*       data);
+LIAPICALL (void, liscr_script_data, (
+	LIScrClass* clss,
+	void*       data));
 
-void
-liscr_script_event (LIScrClass* clss,
-                    void*       data);
+LIAPICALL (void, liscr_script_event, (
+	LIScrClass* clss,
+	void*       data));
 
-void
-liscr_script_object (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, liscr_script_object, (
+	LIScrClass* self,
+	void*       data));
 
-void
-liscr_script_packet (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, liscr_script_packet, (
+	LIScrClass* self,
+	void*       data));
 
-void
-liscr_script_path (LIScrClass* self,
-                   void*       data);
+LIAPICALL (void, liscr_script_path, (
+	LIScrClass* self,
+	void*       data));
 
-void
-liscr_script_program (LIScrClass* self,
-                      void*       data);
+LIAPICALL (void, liscr_script_program, (
+	LIScrClass* self,
+	void*       data));
 
-void
-liscr_script_quaternion (LIScrClass* self,
-                         void*       data);
+LIAPICALL (void, liscr_script_quaternion, (
+	LIScrClass* self,
+	void*       data));
 
-void
-liscr_script_vector (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, liscr_script_vector, (
+	LIScrClass* self,
+	void*       data));
 
 /*****************************************************************************/
 
-LIScrData*
-liscr_quaternion_new (LIScrScript*           script,
-                      const LIMatQuaternion* quat);
+LIAPICALL (LIScrData*, liscr_quaternion_new, (
+	LIScrScript*           script,
+	const LIMatQuaternion* quat));
 
-LIScrData*
-liscr_vector_new (LIScrScript*       script,
-                  const LIMatVector* vector);
+LIAPICALL (LIScrData*, liscr_vector_new, (
+	LIScrScript*       script,
+	const LIMatVector* vector));
 
 /*****************************************************************************/
 

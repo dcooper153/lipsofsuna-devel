@@ -18,33 +18,25 @@
 #ifndef __SYSTEM_MEMORY_H__
 #define __SYSTEM_MEMORY_H__
 
+#include "system-compiler.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define lisys_calloc lisys_calloc_func
-#define lisys_malloc lisys_malloc_func
-#define lisys_realloc lisys_realloc_func
-#define lisys_free lisys_free_func
-void* lisys_calloc_func (size_t num, size_t size);
-void* lisys_malloc_func (size_t size);
-void* lisys_realloc_func (void*, size_t size);
-void lisys_free_func (void* mem);
+LIAPICALL (void*, lisys_calloc, (
+	size_t num,
+	size_t size));
 
-#ifdef LI_MALLOC_DEBUG
-#undef lisys_calloc
-#undef lisys_malloc
-#undef lisys_realloc
-#undef lisys_free
-#define lisys_calloc(n,s) lisys_calloc_log ((n), (s), "calloc %d %s %d\n", (n) * (s), __FILE__, __LINE__)
-#define lisys_malloc(s) lisys_malloc_log ((s), "malloc %d %s %d\n", (s), __FILE__, __LINE__)
-#define lisys_realloc(m,s) lisys_realloc_log ((m), (s), "realloc %d %s %d\n", (s), __FILE__, __LINE__)
-#define lisys_free(m) lisys_free_log ((m), "free %s %d\n", __FILE__, __LINE__)
-void* lisys_calloc_log (size_t num, size_t size, const char* fmt, ...);
-void* lisys_malloc_log (size_t size, const char* fmt, ...);
-void* lisys_realloc_log (void* mem, size_t size, const char* fmt, ...);
-void lisys_free_log (void* mem, const char* fmt, ...);
-#endif
+LIAPICALL (void*, lisys_malloc, (
+	size_t size));
+
+LIAPICALL (void*, lisys_realloc, (
+	void*  mem,
+	size_t size));
+
+LIAPICALL (void, lisys_free, (
+	void* mem));
 
 #ifdef __cplusplus
 }

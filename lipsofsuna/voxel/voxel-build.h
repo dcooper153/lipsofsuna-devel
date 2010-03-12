@@ -28,34 +28,35 @@
 #include <lipsofsuna/engine.h>
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/physics.h>
+#include <lipsofsuna/system.h>
 #include "voxel-manager.h"
 
-int
-livox_build_area (LIVoxManager* manager,
-                  LIEngEngine*  engine,
-                  int           xstart,
-                  int           ystart,
-                  int           zstart,
-                  int           xsize,
-                  int           ysize,
-                  int           zsize,
-                  LIMdlModel**  result_model,
-                  LIPhyObject** result_physics);
+LIAPICALL (int, livox_build_area, (
+	LIVoxManager* manager,
+	LIEngEngine*  engine,
+	int           xstart,
+	int           ystart,
+	int           zstart,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIMdlModel**  result_model,
+	LIPhyObject** result_physics));
 
-int
-livox_build_block (LIVoxManager*         manager,
-                   LIEngEngine*          engine,
-                   const LIVoxBlockAddr* addr,
-                   LIMdlModel**          result_model,
-                   LIPhyObject**         result_physics);
+LIAPICALL (int, livox_build_block, (
+	LIVoxManager*         manager,
+	LIEngEngine*          engine,
+	const LIVoxBlockAddr* addr,
+	LIMdlModel**          result_model,
+	LIPhyObject**         result_physics));
 
-int
-livox_build_occlusion (LIVoxManager* manager,
-                       int           xsize,
-                       int           ysize,
-                       int           zsize,
-                       LIVoxVoxel*   voxels,
-                       char*         result);
+LIAPICALL (int, livox_build_occlusion, (
+	LIVoxManager* manager,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   voxels,
+	char*         result));
 
 #endif
 

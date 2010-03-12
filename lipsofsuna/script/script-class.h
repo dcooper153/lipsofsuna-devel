@@ -25,77 +25,78 @@
 #ifndef __SCRIPT_CLASS_H__
 #define __SCRIPT_CLASS_H__
 
+#include <lipsofsuna/system.h>
 #include "script-types.h"
 
-LIScrClass*
-liscr_class_new (LIScrScript* script,
-                 const char*  name);
+LIAPICALL (LIScrClass*, liscr_class_new, (
+	LIScrScript* script,
+	const char*  name));
 
-LIScrClass*
-liscr_class_new_full (LIScrScript* script,
-                      LIScrClass*  base,
-                      const char*  name,
-                      int          global);
+LIAPICALL (LIScrClass*, liscr_class_new_full, (
+	LIScrScript* script,
+	LIScrClass*  base,
+	const char*  name,
+	int          global));
 
-void
-liscr_class_free (LIScrClass* self);
+LIAPICALL (void, liscr_class_free, (
+	LIScrClass* self));
 
-void
-liscr_class_inherit (LIScrClass*    self,
-                     LIScrClassInit init,
-                     void*          data);
+LIAPICALL (void, liscr_class_inherit, (
+	LIScrClass*    self,
+	LIScrClassInit init,
+	void*          data));
 
-int
-liscr_class_insert_cfunc (LIScrClass*   self,
-                          const char*   name,
-                          LIScrArgsFunc func);
+LIAPICALL (int, liscr_class_insert_cfunc, (
+	LIScrClass*   self,
+	const char*   name,
+	LIScrArgsFunc func));
 
-int
-liscr_class_insert_cvar (LIScrClass*   self,
-                         const char*   name,
-                         LIScrArgsFunc getter,
-                         LIScrArgsFunc setter);
+LIAPICALL (int, liscr_class_insert_cvar, (
+	LIScrClass*   self,
+	const char*   name,
+	LIScrArgsFunc getter,
+	LIScrArgsFunc setter));
 
-void
-liscr_class_insert_enum (LIScrClass* self,
-                         const char* name,
-                         int         value);
+LIAPICALL (void, liscr_class_insert_enum, (
+	LIScrClass* self,
+	const char* name,
+	int         value));
 
-void
-liscr_class_insert_func (LIScrClass*  self,
-                         const char*  name,
-                         liscrMarshal value);
+LIAPICALL (void, liscr_class_insert_func, (
+	LIScrClass*  self,
+	const char*  name,
+	liscrMarshal value));
 
-int
-liscr_class_insert_interface (LIScrClass* self,
-                              const char* name);
+LIAPICALL (int, liscr_class_insert_interface, (
+	LIScrClass* self,
+	const char* name));
 
-int
-liscr_class_insert_mfunc (LIScrClass*   self,
-                          const char*   name,
-                          LIScrArgsFunc func);
+LIAPICALL (int, liscr_class_insert_mfunc, (
+	LIScrClass*   self,
+	const char*   name,
+	LIScrArgsFunc func));
 
-int
-liscr_class_insert_mvar (LIScrClass*   self,
-                         const char*   name,
-                         LIScrArgsFunc getter,
-                         LIScrArgsFunc setter);
+LIAPICALL (int, liscr_class_insert_mvar, (
+	LIScrClass*   self,
+	const char*   name,
+	LIScrArgsFunc getter,
+	LIScrArgsFunc setter));
 
-int
-liscr_class_get_interface (const LIScrClass* self,
-                           const char*       name);
+LIAPICALL (int, liscr_class_get_interface, (
+	const LIScrClass* self,
+	const char*       name));
 
-const char*
-liscr_class_get_name (const LIScrClass* self);
+LIAPICALL (const char*, liscr_class_get_name, (
+	const LIScrClass* self));
 
-void*
-liscr_class_get_userdata (LIScrClass* self,
-                          const char* key);
+LIAPICALL (void*, liscr_class_get_userdata, (
+	LIScrClass* self,
+	const char* key));
 
-void
-liscr_class_set_userdata (LIScrClass* self,
-                          const char* key,
-                          void*       value);
+LIAPICALL (void, liscr_class_set_userdata, (
+	LIScrClass* self,
+	const char* key,
+	void*       value));
 
 /*****************************************************************************/
 /* Lua specific. */

@@ -363,7 +363,7 @@ private_convert_models (LIThrAsyncCall* call,
 	if (directory == NULL)
 		return 0;
 	lisys_dir_set_filter (directory, private_filter_blend_modified, (void*) dstdir);
-	lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
+	lisys_dir_set_sorter (directory, lisys_dir_sorter_alpha);
 	if (!lisys_dir_scan (directory))
 	{
 		lisys_dir_free (directory);
@@ -430,7 +430,7 @@ private_convert_textures (LIThrAsyncCall* call,
 		if (directory == NULL)
 			return 0;
 		lisys_dir_set_filter (directory, converters[j].filter, (void*) dstdir);
-		lisys_dir_set_sorter (directory, LISYS_DIR_SORTER_ALPHA);
+		lisys_dir_set_sorter (directory, lisys_dir_sorter_alpha);
 		if (!lisys_dir_scan (directory))
 		{
 			lisys_dir_free (directory);

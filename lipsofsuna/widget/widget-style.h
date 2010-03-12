@@ -26,6 +26,7 @@
 #define __WIDGET_STYLE_H__
 
 #include <lipsofsuna/image.h>
+#include <lipsofsuna/system.h>
 #include "widget-types.h"
 
 struct _LIWdgStyle
@@ -49,12 +50,12 @@ struct _LIWdgStyles
 	LIAlgStrdic* subimgs;
 };
 
-LIWdgStyles*
-liwdg_styles_new (LIWdgManager* manager,
-                  const char*   root);
+LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
+	LIWdgManager* manager,
+	const char*   root));
 
-void
-liwdg_styles_free (LIWdgStyles* self);
+LIAPICALL (void, liwdg_styles_free, (
+	LIWdgStyles* self));
 
 #endif
 

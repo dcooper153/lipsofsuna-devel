@@ -25,6 +25,7 @@
 #ifndef __WIDGET_WINDOW_H__
 #define __WIDGET_WINDOW_H__
 
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-group.h"
 
@@ -39,19 +40,19 @@ struct _LIWdgWindow
 	char* title;
 };
 
-extern const LIWdgClass liwdg_widget_window;
+LIAPICALL (const LIWdgClass*, liwdg_widget_window, ());
 
-LIWdgWidget*
-liwdg_window_new (LIWdgManager* manager,
-                  int           width,
-                  int           height);
+LIAPICALL (LIWdgWidget*, liwdg_window_new, (
+	LIWdgManager* manager,
+	int           width,
+	int           height));
 
-const char*
-liwdg_window_get_title (const LIWdgWindow* self);
+LIAPICALL (const char*, liwdg_window_get_title, (
+	const LIWdgWindow* self));
 
-int
-liwdg_window_set_title (LIWdgWindow* self,
-                        const char*  title);
+LIAPICALL (int, liwdg_window_set_title, (
+	LIWdgWindow* self,
+	const char*  title));
 
 #endif
 

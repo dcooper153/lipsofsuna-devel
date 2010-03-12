@@ -26,6 +26,7 @@
 #define __WIDGET_PROGRESS_H__
 
 #include <lipsofsuna/font.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_PROGRESS(o) ((LIWdgProgress*)(o))
@@ -40,31 +41,31 @@ struct _LIWdgProgress
 	float value;
 };
 
-extern const LIWdgClass liwdg_widget_progress;
+LIAPICALL (const LIWdgClass*, liwdg_widget_progress, ());
 
-LIWdgWidget*
-liwdg_progress_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_progress_new, (
+	LIWdgManager* manager));
 
-LIFntFont*
-liwdg_progress_get_font (LIWdgProgress* self);
+LIAPICALL (LIFntFont*, liwdg_progress_get_font, (
+	LIWdgProgress* self));
 
-void
-liwdg_progress_set_font (LIWdgProgress* self,
-                         LIFntFont*     font);
+LIAPICALL (void, liwdg_progress_set_font, (
+	LIWdgProgress* self,
+	LIFntFont*     font));
 
-int
-liwdg_progress_set_text (LIWdgProgress* self,
-                         const char*    text);
+LIAPICALL (int, liwdg_progress_set_text, (
+	LIWdgProgress* self,
+	const char*    text));
 
-const char*
-liwdg_progress_get_text (LIWdgProgress* self);
+LIAPICALL (const char*, liwdg_progress_get_text, (
+	LIWdgProgress* self));
 
-float
-liwdg_progress_get_value (LIWdgProgress* self);
+LIAPICALL (float, liwdg_progress_get_value, (
+	LIWdgProgress* self));
 
-void
-liwdg_progress_set_value (LIWdgProgress* self,
-                          float          value);
+LIAPICALL (void, liwdg_progress_set_value, (
+	LIWdgProgress* self,
+	float          value));
 
 #endif
 

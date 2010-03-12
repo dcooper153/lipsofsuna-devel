@@ -39,15 +39,20 @@ static int
 private_event (LIWdgWindow* self,
                LIWdgEvent*  event);
 
-const LIWdgClass liwdg_widget_window =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_group, "Window", sizeof (LIWdgWindow),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /*****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_window ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_group, "Window", sizeof (LIWdgWindow),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_window_new (LIWdgManager* manager,
@@ -56,7 +61,7 @@ liwdg_window_new (LIWdgManager* manager,
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_window);
+	self = liwdg_widget_new (manager, liwdg_widget_window ());
 	if (self == NULL)
 		return NULL;
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), width, height))
@@ -145,7 +150,7 @@ private_event (LIWdgWindow* self,
 	}
 
 	/* Call base class. */
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

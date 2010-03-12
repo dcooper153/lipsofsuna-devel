@@ -46,15 +46,20 @@ private_event (LIWdgWidget* self,
 static void
 private_rebuild_style (LIWdgWidget* self);
 
-const LIWdgClass liwdg_widget_widget =
-{
-	LIWDG_BASE_STATIC, NULL, "Widget", sizeof (LIWdgWidget),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /*****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_widget ()
+{
+	static const LIWdgClass clss =
+	{
+		NULL, "Widget", sizeof (LIWdgWidget),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_widget_new (LIWdgManager*     manager,
@@ -115,7 +120,7 @@ liwdg_widget_detach (LIWdgWidget* self)
 		case LIWDG_WIDGET_STATE_DETACHED:
 			if (self->parent != NULL)
 			{
-				assert (liwdg_widget_typeis (self->parent, &liwdg_widget_container));
+				assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
 				liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
 				changed = 1;
 			}
@@ -369,7 +374,7 @@ liwdg_widget_translate_coords (LIWdgWidget* self,
 	*widgety = screeny;
 	if (self->parent != NULL)
 		liwdg_widget_translate_coords (self->parent, screenx, screeny, widgetx, widgety);
-	if (liwdg_widget_typeis (self, &liwdg_widget_container))
+	if (liwdg_widget_typeis (self, liwdg_widget_container ()))
 		liwdg_container_translate_coords (LIWDG_CONTAINER (self), screenx, screeny, widgetx, widgety);
 }
 
@@ -723,7 +728,7 @@ private_new (LIWdgWidget*      self,
 	}
 	else
 	{
-		assert (clss == &liwdg_widget_widget);
+		assert (clss == liwdg_widget_widget ());
 	}
 	if (clss->init == NULL)
 		return 1;
@@ -734,7 +739,7 @@ private_new (LIWdgWidget*      self,
 	if (base != NULL)
 		self->type = base;
 	else
-		self->type = &liwdg_widget_widget;
+		self->type = liwdg_widget_widget ();
 	liwdg_widget_free (self);
 
 	return 0;

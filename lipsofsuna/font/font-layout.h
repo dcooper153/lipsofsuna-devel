@@ -25,6 +25,7 @@
 #ifndef __FONT_LAYOUT_H__
 #define __FONT_LAYOUT_H__
 
+#include <lipsofsuna/system.h>
 #include "font.h"
 
 typedef struct _LIFntLayoutGlyph LIFntLayoutGlyph;
@@ -50,37 +51,36 @@ struct _LIFntLayout
 	LIFntLayoutGlyph* glyphs;
 };
 
-LIFntLayout*
-lifnt_layout_new  ();
+LIAPICALL (LIFntLayout*, lifnt_layout_new, ());
 
-void
-lifnt_layout_free (LIFntLayout* self);
+LIAPICALL (void, lifnt_layout_free, (
+	LIFntLayout* self));
 
-void
-lifnt_layout_render (LIFntLayout* self,
-                     int          x,
-                     int          y);
+LIAPICALL (void, lifnt_layout_render, (
+	LIFntLayout* self,
+	int          x,
+	int          y));
 
-int
-lifnt_layout_append_string (LIFntLayout* self,
-                            LIFntFont*   font,
-                            const char*  string);
+LIAPICALL (int, lifnt_layout_append_string, (
+	LIFntLayout* self,
+	LIFntFont*   font,
+	const char*  string));
 
-void
-lifnt_layout_clear (LIFntLayout* self);
+LIAPICALL (void, lifnt_layout_clear, (
+	LIFntLayout* self));
 
-int
-lifnt_layout_get_height (LIFntLayout* self);
+LIAPICALL (int, lifnt_layout_get_height, (
+	LIFntLayout* self));
 
-int
-lifnt_layout_get_width (LIFntLayout* self);
+LIAPICALL (int, lifnt_layout_get_width, (
+	LIFntLayout* self));
 
-int
-lifnt_layout_get_width_limit (const LIFntLayout* self);
+LIAPICALL (int, lifnt_layout_get_width_limit, (
+	const LIFntLayout* self));
 
-void
-lifnt_layout_set_width_limit (LIFntLayout* self,
-                              int          width);
+LIAPICALL (void, lifnt_layout_set_width_limit, (
+	LIFntLayout* self,
+	int          width));
 
 #endif
 

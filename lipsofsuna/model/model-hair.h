@@ -28,6 +28,7 @@
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "model-types.h"
 
 struct _LIMdlHairNode
@@ -46,13 +47,13 @@ struct _LIMdlHair
 extern "C" {
 #endif
 
-int
-limdl_hair_read (LIMdlHair*   self,
-                 LIArcReader* reader);
+LIAPICALL (int, limdl_hair_read, (
+	LIMdlHair*   self,
+	LIArcReader* reader));
 
-int
-limdl_hair_write (LIMdlHair*   self,
-                  LIArcWriter* writer);
+LIAPICALL (int, limdl_hair_write, (
+	LIMdlHair*   self,
+	LIArcWriter* writer));
 
 #ifdef __cplusplus
 }
@@ -69,16 +70,16 @@ struct _LIMdlHairs
 extern "C" {
 #endif
 
-void
-limdl_hairs_free (LIMdlHairs* self);
+LIAPICALL (void, limdl_hairs_free, (
+	LIMdlHairs* self));
 
-int
-limdl_hairs_read (LIMdlHairs*  self,
-                  LIArcReader* reader);
+LIAPICALL (int, limdl_hairs_read, (
+	LIMdlHairs*  self,
+	LIArcReader* reader));
 
-int
-limdl_hairs_write (LIMdlHairs*  self,
-                   LIArcWriter* writer);
+LIAPICALL (int, limdl_hairs_write, (
+	LIMdlHairs*  self,
+	LIArcWriter* writer));
 
 #ifdef __cplusplus
 }

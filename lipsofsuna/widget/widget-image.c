@@ -39,20 +39,25 @@ private_event (LIWdgImage* self,
 static void
 private_rebuild (LIWdgImage* self);
 
-const LIWdgClass liwdg_widget_image =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Image", sizeof (LIWdgImage),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_image ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Image", sizeof (LIWdgImage),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_image_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_image);
+	return liwdg_widget_new (manager, liwdg_widget_image ());
 }
 
 const char*
@@ -115,7 +120,7 @@ private_event (LIWdgImage* self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

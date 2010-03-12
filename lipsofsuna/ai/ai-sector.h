@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/voxel.h>
 #include "ai-waypoint.h"
 #include "ai-types.h"
@@ -38,31 +39,31 @@ struct _LIAiSector
 	LIAlgSector* sector;
 };
 
-LIAiSector*
-liai_sector_new (LIAlgSector* sector);
+LIAPICALL (LIAiSector*, liai_sector_new, (
+	LIAlgSector* sector));
 
-void
-liai_sector_free (LIAiSector* self);
+LIAPICALL (void, liai_sector_free, (
+	LIAiSector* self));
 
-void
-liai_sector_build (LIAiSector*  self,
-                   LIVoxSector* voxels);
+LIAPICALL (void, liai_sector_build, (
+	LIAiSector*  self,
+	LIVoxSector* voxels));
 
-void
-liai_sector_build_area (LIAiSector*  self,
-                        LIVoxSector* voxels,
-                        int          x,
-                        int          y,
-                        int          z,
-                        int          xs,
-                        int          ys,
-                        int          zs);
+LIAPICALL (void, liai_sector_build_area, (
+	LIAiSector*  self,
+	LIVoxSector* voxels,
+	int          x,
+	int          y,
+	int          z,
+	int          xs,
+	int          ys,
+	int          zs));
 
-LIAiWaypoint*
-liai_sector_get_waypoint (LIAiSector* self,
-                          int         x,
-                          int         y,
-                          int         z);
+LIAPICALL (LIAiWaypoint*, liai_sector_get_waypoint, (
+	LIAiSector* self,
+	int         x,
+	int         y,
+	int         z));
 
 #endif
 

@@ -39,20 +39,25 @@ private_event (LIWdgCheck* self,
 static void
 private_rebuild (LIWdgCheck* self);
 
-const LIWdgClass liwdg_widget_check =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Check", sizeof (LIWdgCheck),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_check ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Check", sizeof (LIWdgCheck),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_check_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_check);
+	return liwdg_widget_new (manager, liwdg_widget_check ());
 }
 
 int
@@ -167,7 +172,7 @@ private_event (LIWdgCheck* self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/voxel.h>
 #include "ai-path.h"
 #include "ai-types.h"
@@ -40,28 +41,28 @@ struct _LIAiManager
 	LIVoxManager* voxels;
 };
 
-LIAiManager*
-liai_manager_new (LICalCallbacks* callbacks,
-                  LIAlgSectors*   sectors,
-                  LIVoxManager*   voxels);
+LIAPICALL (LIAiManager*, liai_manager_new, (
+	LICalCallbacks* callbacks,
+	LIAlgSectors*   sectors,
+	LIVoxManager*   voxels));
 
-void
-liai_manager_free (LIAiManager* self);
+LIAPICALL (void, liai_manager_free, (
+	LIAiManager* self));
 
-LIAiWaypoint*
-liai_manager_find_waypoint (LIAiManager*       self,
-                            const LIMatVector* point);
+LIAPICALL (LIAiWaypoint*, liai_manager_find_waypoint, (
+	LIAiManager*       self,
+	const LIMatVector* point));
 
-int
-liai_manager_load_sector (LIAiManager* self,
-                          int          sx,
-                          int          sy,
-                          int          sz);
+LIAPICALL (int, liai_manager_load_sector, (
+	LIAiManager* self,
+	int          sx,
+	int          sy,
+	int          sz));
 
-LIAiPath*
-liai_manager_solve_path (LIAiManager*       self,
-                         const LIMatVector* start,
-                         const LIMatVector* end);
+LIAPICALL (LIAiPath*, liai_manager_solve_path, (
+	LIAiManager*       self,
+	const LIMatVector* start,
+	const LIMatVector* end));
 
 #endif
 

@@ -93,15 +93,20 @@ static void
 private_rebuild (LIWdgGroup* self,
                  int         flags);
 
-const LIWdgClass liwdg_widget_group =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_container, "Group", sizeof (LIWdgGroup),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_group ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_container, "Group", sizeof (LIWdgGroup),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 /**
  * \brief Creates a new group widget.
@@ -114,7 +119,7 @@ liwdg_group_new (LIWdgManager* manager)
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_group);
+	self = liwdg_widget_new (manager, liwdg_widget_group ());
 	if (self == NULL)
 		return NULL;
 	private_rebuild (LIWDG_GROUP (self), PRIVATE_REBUILD_REQUEST);
@@ -137,7 +142,7 @@ liwdg_group_new_with_size (LIWdgManager* manager,
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_group);
+	self = liwdg_widget_new (manager, liwdg_widget_group ());
 	if (self == NULL)
 		return NULL;
 	if (!liwdg_group_set_size (LIWDG_GROUP (self), cols, rows))
@@ -807,7 +812,7 @@ private_event (LIWdgGroup* self,
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdg_widget_container)
+	    event->probe.clss == liwdg_widget_container ())
 	{
 		static LIWdgContainerIface iface =
 		{
@@ -846,7 +851,7 @@ private_event (LIWdgGroup* self,
 			return 1;
 	}
 
-	return liwdg_widget_container.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_container ()->event (LIWDG_WIDGET (self), event);
 }
 
 static LIWdgWidget*
@@ -978,7 +983,7 @@ private_cycle_focus (LIWdgGroup*  self,
 				child = self->cells[x + y * self->width].child;
 				if (child == NULL)
 					continue;
-				if (liwdg_widget_typeis (child, &liwdg_widget_container))
+				if (liwdg_widget_typeis (child, liwdg_widget_container ()))
 				{
 					tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, 1);
 					if (tmp != NULL)
@@ -1012,7 +1017,7 @@ private_cycle_focus (LIWdgGroup*  self,
 				child = self->cells[x + y * self->width].child;
 				if (child == NULL)
 					continue;
-				if (liwdg_widget_typeis (child, &liwdg_widget_container))
+				if (liwdg_widget_typeis (child, liwdg_widget_container ()))
 				{
 					tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, 0);
 					if (tmp != NULL)

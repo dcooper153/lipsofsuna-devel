@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <lipsofsuna/main.h>
 #include "ext-module.h"
 #include "ext-npc.h"
 

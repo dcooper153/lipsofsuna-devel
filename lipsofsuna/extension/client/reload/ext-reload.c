@@ -25,10 +25,7 @@
  */
 
 #include <sys/stat.h>
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/voxel.h>
+#include "ext-module.h"
 #include "ext-reload.h"
 
 static int

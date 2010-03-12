@@ -25,6 +25,7 @@
 #ifndef __SOUND_SAMPLE_H__
 #define __SOUND_SAMPLE_H__
 
+#include <lipsofsuna/system.h>
 #include "sound-system.h"
 
 typedef struct _LISndSample LISndSample;
@@ -33,12 +34,12 @@ struct _LISndSample
 	ALuint buffer;
 };
 
-LISndSample*
-lisnd_sample_new (LISndSystem* system,
-                  const char*  file);
+LIAPICALL (LISndSample*, lisnd_sample_new, (
+	LISndSystem* system,
+	const char*  file));
 
-void
-lisnd_sample_free (LISndSample* self);
+LIAPICALL (void, lisnd_sample_free, (
+	LISndSample* self));
 
 #endif
 

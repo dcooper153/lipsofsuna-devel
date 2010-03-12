@@ -26,6 +26,7 @@
 #define __MODEL_ANIMATION_H__
 
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LIMdlFrame LIMdlFrame;
 struct _LIMdlFrame
@@ -52,25 +53,25 @@ struct _LIMdlAnimation
 	} channels;
 };
 
-int
-limdl_animation_get_channel (LIMdlAnimation* self,
-                             const char*     name);
+LIAPICALL (int, limdl_animation_get_channel, (
+	LIMdlAnimation* self,
+	const char*     name));
 
-float
-limdl_animation_get_duration (const LIMdlAnimation* self);
+LIAPICALL (float, limdl_animation_get_duration, (
+	const LIMdlAnimation* self));
 
-int
-limdl_animation_get_transform (LIMdlAnimation* self,
-                               const char*     name,
-                               float           secs,
-                               LIMatTransform* value);
+LIAPICALL (int, limdl_animation_get_transform, (
+	LIMdlAnimation* self,
+	const char*     name,
+	float           secs,
+	LIMatTransform* value));
 
-float
-limdl_animation_get_weight (const LIMdlAnimation* self,
-                            float                 time,
-                            float                 sweight,
-                            float                 mweight,
-                            float                 eweight);
+LIAPICALL (float, limdl_animation_get_weight, (
+	const LIMdlAnimation* self,
+	float                 time,
+	float                 sweight,
+	float                 mweight,
+	float                 eweight));
 
 #endif
 

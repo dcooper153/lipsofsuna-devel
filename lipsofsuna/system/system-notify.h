@@ -25,6 +25,8 @@
 #ifndef __SYSTEM_NOTIFY_H__
 #define __SYSTEM_NOTIFY_H__
 
+#include "system-compiler.h"
+
 typedef int LISysNotifyFlags;
 enum _LISysNotifyFlags
 {
@@ -48,26 +50,25 @@ struct _LISysNotifyEvent
 
 typedef struct _LISysNotify LISysNotify;
 
-LISysNotify*
-lisys_notify_new ();
+LIAPICALL (LISysNotify*, lisys_notify_new, ());
 
-void
-lisys_notify_free (LISysNotify* self);
+LIAPICALL (void, lisys_notify_free, (
+	LISysNotify* self));
 
-int
-lisys_notify_add (LISysNotify*     self,
-                  const char*      path,
-                  LISysNotifyFlags flags);
+LIAPICALL (int, lisys_notify_add, (
+	LISysNotify*     self,
+	const char*      path,
+	LISysNotifyFlags flags));
 
-void
-lisys_notify_remove (LISysNotify* self,
-                     const char*  path);
+LIAPICALL (void, lisys_notify_remove, (
+	LISysNotify* self,
+	const char*  path));
 
-LISysNotifyEvent*
-lisys_notify_poll (LISysNotify* self);
+LIAPICALL (LISysNotifyEvent*, lisys_notify_poll, (
+	LISysNotify* self));
 
-LISysNotifyEvent*
-lisys_notify_wait (LISysNotify* self);
+LIAPICALL (LISysNotifyEvent*, lisys_notify_wait, (
+	LISysNotify* self));
 
 #endif
 

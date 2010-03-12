@@ -24,7 +24,6 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
 #include "ext-module.h"
 
 static int

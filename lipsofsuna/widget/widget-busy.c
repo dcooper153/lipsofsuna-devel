@@ -37,20 +37,25 @@ static void
 private_event (LIWdgBusy*  self,
                LIWdgEvent* event);
 
-const LIWdgClass liwdg_widget_busy =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_window, "Busy", sizeof (LIWdgBusy),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event,
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_busy ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_window, "Busy", sizeof (LIWdgBusy),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event,
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_busy_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_busy);
+	return liwdg_widget_new (manager, liwdg_widget_busy ());
 }
 
 void
@@ -149,7 +154,7 @@ private_event (LIWdgBusy*  self,
 	}
 
 	/* Call base class. */
-	liwdg_widget_window.event (LIWDG_WIDGET (self), event);
+	liwdg_widget_window ()->event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

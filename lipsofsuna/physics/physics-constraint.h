@@ -34,17 +34,17 @@
 extern "C" {
 #endif
 
-LIPhyConstraint*
-liphy_constraint_new_hinge (LIPhyPhysics*      physics,
-                            LIPhyObject*       object,
-                            const LIMatVector* point,
-                            const LIMatVector* axis,
-                            int                limit,
-                            float              limit_min,
-                            float              limit_max);
+LIAPICALL (LIPhyConstraint*, liphy_constraint_new_hinge, (
+	LIPhyPhysics*      physics,
+	LIPhyObject*       object,
+	const LIMatVector* point,
+	const LIMatVector* axis,
+	int                limit,
+	float              limit_min,
+	float              limit_max));
 
-void
-liphy_constraint_free (LIPhyConstraint* self);
+LIAPICALL (void, liphy_constraint_free, (
+	LIPhyConstraint* self));
 
 #ifdef __cplusplus
 }

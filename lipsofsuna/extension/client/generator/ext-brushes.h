@@ -27,12 +27,8 @@
 #ifndef __EXT_BRUSHES_H__
 #define __EXT_BRUSHES_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/generator.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/widget.h>
-#include "ext-materials.h"
 #include "ext-module.h"
+#include "ext-materials.h"
 
 #define LIEXT_BRUSHES(o) ((LIExtBrushes*)(o))
 
@@ -79,7 +75,8 @@ struct _LIExtBrushes
 	} widgets;
 };
 
-extern const LIWdgClass liext_widget_brushes;
+const LIWdgClass*
+liext_widget_brushes ();
 
 LIWdgWidget*
 liext_brushes_new (LIWdgManager* manager,

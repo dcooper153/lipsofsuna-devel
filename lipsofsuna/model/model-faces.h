@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "model-types.h"
 
 typedef struct _LIMdlFaces LIMdlFaces;
@@ -41,16 +42,16 @@ struct _LIMdlFaces
 	} indices;
 };
 
-void
-limdl_faces_free (LIMdlFaces* self);
+LIAPICALL (void, limdl_faces_free, (
+	LIMdlFaces* self));
 
-int
-limdl_faces_read (LIMdlFaces*  self,
-                  LIArcReader* reader);
+LIAPICALL (int, limdl_faces_read, (
+	LIMdlFaces*  self,
+	LIArcReader* reader));
 
-int
-limdl_faces_write (LIMdlFaces*  self,
-                   LIArcWriter* writer);
+LIAPICALL (int, limdl_faces_write, (
+	LIMdlFaces*  self,
+	LIArcWriter* writer));
 
 #endif
 

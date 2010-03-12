@@ -25,8 +25,6 @@
 #ifndef __EXT_SPAWNER_H__
 #define __EXT_SPAWNER_H__
 
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
 /**

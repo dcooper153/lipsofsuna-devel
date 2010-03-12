@@ -24,14 +24,11 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "ext-module.h"
 #include "ext-brushes.h"
 #include "ext-dialog.h"
 #include "ext-materials.h"
 #include "ext-preview.h"
-
-static const void*
-private_base ();
 
 static int
 private_init (LIExtEditor*    self,
@@ -46,13 +43,19 @@ private_event (LIExtEditor* self,
 
 /****************************************************************************/
 
-const LIWdgClass liext_widget_editor =
+const LIWdgClass*
+liext_widget_editor ()
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorDialog", sizeof (LIExtEditor),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static LIWdgClass clss =
+	{
+		NULL, "GeneratorDialog", sizeof (LIExtEditor),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	clss.base = liwdg_widget_group;
+	return &clss;
+}
 
 LIWdgWidget*
 liext_editor_new (LIWdgManager* manager,
@@ -62,7 +65,7 @@ liext_editor_new (LIWdgManager* manager,
 	LIWdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &liext_widget_editor);
+	self = liwdg_widget_new (manager, liext_widget_editor ());
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_EDITOR (self);
@@ -107,12 +110,6 @@ liext_editor_reset (LIExtEditor* self,
 
 /****************************************************************************/
 
-static const void*
-private_base ()
-{
-	return &liwdg_widget_group;
-}
-
 static int
 private_init (LIExtEditor*  self,
               LIWdgManager* manager)
@@ -136,7 +133,7 @@ static int
 private_event (LIExtEditor* self,
                LIWdgEvent*  event)
 {
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

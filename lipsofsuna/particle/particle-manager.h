@@ -25,6 +25,7 @@
 #ifndef __PARTICLE_MANAGER_H__
 #define __PARTICLE_MANAGER_H__
 
+#include <lipsofsuna/system.h>
 #include "particle-line.h"
 #include "particle-point.h"
 
@@ -51,36 +52,36 @@ struct _LIParManager
 	} points;
 };
 
-LIParManager*
-lipar_manager_new (int points,
-                   int lines);
+LIAPICALL (LIParManager*, lipar_manager_new, (
+	int points,
+	int lines));
 
-void
-lipar_manager_free (LIParManager* self);
+LIAPICALL (void, lipar_manager_free, (
+	LIParManager* self));
 
-LIParLine*
-lipar_manager_insert_line (LIParManager*      self,
-                           const LIMatVector* position0,
-                           const LIMatVector* position1,
-                           const LIMatVector* velocity0,
-                           const LIMatVector* velocity1);
+LIAPICALL (LIParLine*, lipar_manager_insert_line, (
+	LIParManager*      self,
+	const LIMatVector* position0,
+	const LIMatVector* position1,
+	const LIMatVector* velocity0,
+	const LIMatVector* velocity1));
 
-LIParPoint*
-lipar_manager_insert_point (LIParManager*      self,
-                            const LIMatVector* position,
-                            const LIMatVector* velocity);
+LIAPICALL (LIParPoint*, lipar_manager_insert_point, (
+	LIParManager*      self,
+	const LIMatVector* position,
+	const LIMatVector* velocity));
 
-void
-lipar_manager_remove_line (LIParManager* self,
-                           LIParLine*    line);
+LIAPICALL (void, lipar_manager_remove_line, (
+	LIParManager* self,
+	LIParLine*    line));
 
-void
-lipar_manager_remove_point (LIParManager* self,
-                            LIParPoint*   point);
+LIAPICALL (void, lipar_manager_remove_point, (
+	LIParManager* self,
+	LIParPoint*   point));
 
-void
-lipar_manager_update (LIParManager* self,
-                      float         secs);
+LIAPICALL (void, lipar_manager_update, (
+	LIParManager* self,
+	float         secs));
 
 #endif
 

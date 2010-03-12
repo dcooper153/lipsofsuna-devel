@@ -25,6 +25,7 @@
 #ifndef __WIDGET_BUSY_H__
 #define __WIDGET_BUSY_H__
 
+#include <lipsofsuna/system.h>
 #include "widget-window.h"
 
 #define LIWDG_BUSY(o) ((LIWdgBusy*)(o))
@@ -39,28 +40,28 @@ struct _LIWdgBusy
 	void* update_data;
 };
 
-extern const LIWdgClass liwdg_widget_busy;
+LIAPICALL (const LIWdgClass*, liwdg_widget_busy, ());
 
-LIWdgWidget*
-liwdg_busy_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_busy_new, (
+	LIWdgManager* manager));
 
-void
-liwdg_busy_set_cancel (LIWdgBusy*   self,
-                       liwdgHandler handler,
-                       void*        data);
+LIAPICALL (void, liwdg_busy_set_cancel, (
+	LIWdgBusy*   self,
+	liwdgHandler handler,
+	void*        data));
 
-void
-liwdg_busy_set_progress (LIWdgBusy* self,
-                         float      value);
+LIAPICALL (void, liwdg_busy_set_progress, (
+	LIWdgBusy* self,
+	float      value));
 
-void
-liwdg_busy_set_text (LIWdgBusy*  self,
-                     const char* value);
+LIAPICALL (void, liwdg_busy_set_text, (
+	LIWdgBusy*  self,
+	const char* value));
 
-void
-liwdg_busy_set_update (LIWdgBusy*   self,
-                       liwdgHandler handler,
-                       void*        data);
+LIAPICALL (void, liwdg_busy_set_update, (
+	LIWdgBusy*   self,
+	liwdgHandler handler,
+	void*        data));
 
 #endif
 

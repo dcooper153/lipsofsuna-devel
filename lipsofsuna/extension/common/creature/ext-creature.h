@@ -25,8 +25,6 @@
 #ifndef __EXT_CREATURE_H__
 #define __EXT_CREATURE_H__
 
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
 typedef struct _LIExtCreature LIExtCreature;

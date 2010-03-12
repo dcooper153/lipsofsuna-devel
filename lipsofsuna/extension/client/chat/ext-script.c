@@ -24,10 +24,8 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
-#include "ext-history.h"
 #include "ext-module.h"
+#include "ext-history.h"
 
 /* @luadoc
  * ---

@@ -26,26 +26,27 @@
 #define __VOXEL_H__
 
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 #include "voxel-types.h"
 
-void
-livox_voxel_init (LIVoxVoxel* self,
-                  int         type);
+LIAPICALL (void, livox_voxel_init, (
+	LIVoxVoxel* self,
+	int         type));
 
-void
-livox_voxel_rotate (LIVoxVoxel* self,
-                    int         axis,
-                    int         step);
+LIAPICALL (void, livox_voxel_rotate, (
+	LIVoxVoxel* self,
+	int         axis,
+	int         step));
 
-float
-livox_voxel_get_height (const LIVoxVoxel* self);
+LIAPICALL (float, livox_voxel_get_height, (
+	const LIVoxVoxel* self));
 
-int
-livox_voxel_get_type (const LIVoxVoxel* self);
+LIAPICALL (int, livox_voxel_get_type, (
+	const LIVoxVoxel* self));
 
-void
-livox_voxel_get_quaternion (const LIVoxVoxel* self,
-                            LIMatQuaternion*  value);
+LIAPICALL (void, livox_voxel_get_quaternion, (
+	const LIVoxVoxel* self,
+	LIMatQuaternion*  value));
 
 #endif
 

@@ -26,9 +26,8 @@
 #define __EXT_MODULE_H__
 
 #include <lipsofsuna/ai.h>
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/main.h>
 #include <lipsofsuna/voxel.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_NPC "Npc"
 

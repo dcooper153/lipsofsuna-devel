@@ -26,6 +26,7 @@
 #define __CAL_MARSHAL_H__
 
 #include <stdarg.h>
+#include <lipsofsuna/system.h>
 
 typedef int (*licalMarshal)(void*, void*, va_list);
 
@@ -33,16 +34,16 @@ typedef int (*licalMarshal)(void*, void*, va_list);
 extern "C" {
 #endif
 
-int lical_marshal_DATA (void* call, void* data, va_list args);
-int lical_marshal_DATA_FLT (void* call, void* data, va_list args);
-int lical_marshal_DATA_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_INT_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_INT_PTR (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_PTR (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_PTR_INT (void* call, void* data, va_list args);
-int lical_marshal_DATA_PTR_PTR_PTR (void* call, void* data, va_list args);
+LIAPICALL (int, lical_marshal_DATA, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_FLT, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_INT, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_INT_INT, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_INT_PTR, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_PTR, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_PTR_INT, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_PTR_PTR, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_PTR_PTR_INT, (void* call, void* data, va_list args));
+LIAPICALL (int, lical_marshal_DATA_PTR_PTR_PTR, (void* call, void* data, va_list args));
 
 #ifdef __cplusplus
 }

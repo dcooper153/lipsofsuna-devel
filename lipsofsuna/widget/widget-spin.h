@@ -26,6 +26,7 @@
 #define __WIDGET_SPIN_H__
 
 #include <lipsofsuna/font.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_SPIN(o) ((LIWdgSpin*)(o))
@@ -39,24 +40,24 @@ struct _LIWdgSpin
 	float value;
 };
 
-extern const LIWdgClass liwdg_widget_spin;
+LIAPICALL (const LIWdgClass*, liwdg_widget_spin, ());
 
-LIWdgWidget*
-liwdg_spin_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_spin_new, (
+	LIWdgManager* manager));
 
-LIFntFont*
-liwdg_spin_get_font (LIWdgSpin* self);
+LIAPICALL (LIFntFont*, liwdg_spin_get_font, (
+	LIWdgSpin* self));
 
-void
-liwdg_spin_set_font (LIWdgSpin* self,
-                     LIFntFont* font);
+LIAPICALL (void, liwdg_spin_set_font, (
+	LIWdgSpin* self,
+	LIFntFont* font));
 
-float
-liwdg_spin_get_value (LIWdgSpin* self);
+LIAPICALL (float, liwdg_spin_get_value, (
+	LIWdgSpin* self));
 
-void
-liwdg_spin_set_value (LIWdgSpin* self,
-                      float      value);
+LIAPICALL (void, liwdg_spin_set_value, (
+	LIWdgSpin* self,
+	float      value));
 
 #endif
 

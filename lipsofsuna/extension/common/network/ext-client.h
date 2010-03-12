@@ -25,11 +25,7 @@
 #ifndef __EXT_CLIENT_H__
 #define __EXT_CLIENT_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/script.h>
 #include "ext-module.h"
-#include "ext-client.h"
 
 struct _LIExtClient
 {

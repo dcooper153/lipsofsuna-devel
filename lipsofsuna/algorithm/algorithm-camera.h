@@ -64,113 +64,112 @@ struct _LIAlgCamera
 	} view;
 };
 
-LIAlgCamera*
-lialg_camera_new ();
+LIAPICALL (LIAlgCamera*, lialg_camera_new, ());
 
-void
-lialg_camera_free (LIAlgCamera* self);
+LIAPICALL (void, lialg_camera_free, (
+	LIAlgCamera* self));
 
-void
-lialg_camera_clip (LIAlgCamera* self,
-                   float        dist);
+LIAPICALL (void, lialg_camera_clip, (
+	LIAlgCamera* self,
+	float        dist));
 
-void
-lialg_camera_move (LIAlgCamera* self,
-                   float        value);
+LIAPICALL (void, lialg_camera_move, (
+	LIAlgCamera* self,
+	float        value));
 
-int
-lialg_camera_project (LIAlgCamera*       self,
-                      const LIMatVector* object,
-                      LIMatVector*       window);
+LIAPICALL (int, lialg_camera_project, (
+	LIAlgCamera*       self,
+	const LIMatVector* object,
+	LIMatVector*       window));
 
-void
-lialg_camera_tilt (LIAlgCamera* self,
-                   float        value);
+LIAPICALL (void, lialg_camera_tilt, (
+	LIAlgCamera* self,
+	float        value));
 
-void
-lialg_camera_turn (LIAlgCamera* self,
-                   float        value);
+LIAPICALL (void, lialg_camera_turn, (
+	LIAlgCamera* self,
+	float        value));
 
-int
-lialg_camera_unproject (LIAlgCamera*       self,
-                        const LIMatVector* window,
-                        LIMatVector*       object);
+LIAPICALL (int, lialg_camera_unproject, (
+	LIAlgCamera*       self,
+	const LIMatVector* window,
+	LIMatVector*       object));
 
-void
-lialg_camera_update (LIAlgCamera* self,
-                     float        secs);
+LIAPICALL (void, lialg_camera_update, (
+	LIAlgCamera* self,
+	float        secs));
 
-void
-lialg_camera_warp (LIAlgCamera* self);
+LIAPICALL (void, lialg_camera_warp, (
+	LIAlgCamera* self));
 
-void
-lialg_camera_zoom (LIAlgCamera* self,
-                   float        value);
+LIAPICALL (void, lialg_camera_zoom, (
+	LIAlgCamera* self,
+	float        value));
 
-void
-lialg_camera_get_bounds (const LIAlgCamera* self,
-                         LIMatAabb*         aabb);
+LIAPICALL (void, lialg_camera_get_bounds, (
+	const LIAlgCamera* self,
+	LIMatAabb*         aabb));
 
-void
-lialg_camera_get_center (LIAlgCamera*    self,
-                         LIMatTransform* result);
+LIAPICALL (void, lialg_camera_get_center, (
+	LIAlgCamera*    self,
+	LIMatTransform* result));
 
-void
-lialg_camera_set_center (LIAlgCamera*          self,
-                         const LIMatTransform* value);
+LIAPICALL (void, lialg_camera_set_center, (
+	LIAlgCamera*          self,
+	const LIMatTransform* value));
 
-LIAlgCameraDriver
-lialg_camera_get_driver (LIAlgCamera* self);
+LIAPICALL (LIAlgCameraDriver, lialg_camera_get_driver, (
+	LIAlgCamera* self));
 
-void
-lialg_camera_set_driver (LIAlgCamera*      self,
-                         LIAlgCameraDriver value);
+LIAPICALL (void, lialg_camera_set_driver, (
+	LIAlgCamera*      self,
+	LIAlgCameraDriver value));
 
-void
-lialg_camera_set_far (LIAlgCamera* self,
-                      float        value);
+LIAPICALL (void, lialg_camera_set_far, (
+	LIAlgCamera* self,
+	float        value));
 
-void
-lialg_camera_get_frustum (const LIAlgCamera* self,
-                          LIMatFrustum*      result);
+LIAPICALL (void, lialg_camera_get_frustum, (
+	const LIAlgCamera* self,
+	LIMatFrustum*      result));
 
-void
-lialg_camera_get_modelview (const LIAlgCamera* self,
-                            LIMatMatrix*       value);
+LIAPICALL (void, lialg_camera_get_modelview, (
+	const LIAlgCamera* self,
+	LIMatMatrix*       value));
 
-void
-lialg_camera_set_near (LIAlgCamera* self,
-                       float        value);
+LIAPICALL (void, lialg_camera_set_near, (
+	LIAlgCamera* self,
+	float        value));
 
-void
-lialg_camera_get_projection (const LIAlgCamera* self,
-                             LIMatMatrix*       value);
+LIAPICALL (void, lialg_camera_get_projection, (
+	const LIAlgCamera* self,
+	LIMatMatrix*       value));
 
-void
-lialg_camera_set_projection (LIAlgCamera* self,
-                             float        fov,
-                             float        aspect,
-                             float        nearplane,
-                             float        farplane);
+LIAPICALL (void, lialg_camera_set_projection, (
+	LIAlgCamera* self,
+	float        fov,
+	float        aspect,
+	float        nearplane,
+	float        farplane));
 
-void
-lialg_camera_get_transform (const LIAlgCamera* self,
-                            LIMatTransform*    value);
+LIAPICALL (void, lialg_camera_get_transform, (
+	const LIAlgCamera* self,
+	LIMatTransform*    value));
 
-void
-lialg_camera_set_transform (LIAlgCamera*          self,
-                            const LIMatTransform* value);
+LIAPICALL (void, lialg_camera_set_transform, (
+	LIAlgCamera*          self,
+	const LIMatTransform* value));
 
-void
-lialg_camera_get_up (const LIAlgCamera* self,
-                     LIMatVector*       result);
+LIAPICALL (void, lialg_camera_get_up, (
+	const LIAlgCamera* self,
+	LIMatVector*       result));
 
-void
-lialg_camera_set_viewport (LIAlgCamera* self,
-                           int          x,
-                           int          y,
-                           int          width,
-                           int          height);
+LIAPICALL (void, lialg_camera_set_viewport, (
+	LIAlgCamera* self,
+	int          x,
+	int          y,
+	int          width,
+	int          height));
 
 #endif
 

@@ -24,6 +24,7 @@
  * @{
  */
 
+#include "ext-module.h"
 #include "ext-slot.h"
 
 /**

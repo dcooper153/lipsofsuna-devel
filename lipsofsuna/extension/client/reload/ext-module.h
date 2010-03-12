@@ -27,11 +27,18 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include "ext-reload.h"
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/reload.h>
+#include <lipsofsuna/thread.h>
+#include <lipsofsuna/voxel.h>
+#include <lipsofsuna/widget.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_RELOAD "Reload"
 
 typedef struct _LIExtModule LIExtModule;
+typedef struct _LIExtReload LIExtReload;
+
 struct _LIExtModule
 {
 	LICalHandle calls[1];
@@ -49,7 +56,7 @@ liext_module_free (LIExtModule* self);
 
 void
 liext_script_reload (LIScrClass* self,
-                   void*       data);
+                     void*       data);
 
 #endif
 

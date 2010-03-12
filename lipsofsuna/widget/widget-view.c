@@ -78,20 +78,25 @@ private_translate_coords (LIWdgView* self,
 
 /*****************************************************************************/
 
-const LIWdgClass liwdg_widget_view =
+const LIWdgClass*
+liwdg_widget_view ()
 {
-	LIWDG_BASE_STATIC, &liwdg_widget_container, "View", sizeof (LIWdgView),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event,
-};
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_container, "View", sizeof (LIWdgView),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event,
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_view_new (LIWdgManager* manager)
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_view);
+	self = liwdg_widget_new (manager, liwdg_widget_view ());
 	if (self == NULL)
 		return NULL;
 	private_rebuild (LIWDG_VIEW (self));
@@ -185,7 +190,7 @@ private_event (LIWdgView*  self,
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdg_widget_container)
+	    event->probe.clss == liwdg_widget_container ())
 	{
 		static LIWdgContainerIface iface =
 		{
@@ -241,7 +246,7 @@ private_event (LIWdgView*  self,
 			return 1;
 	}
 
-	return liwdg_widget_container.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_container ()->event (LIWDG_WIDGET (self), event);
 }
 
 static LIWdgWidget*
@@ -270,7 +275,7 @@ private_cycle_focus (LIWdgView*   self,
 	LIWdgWidget* tmp;
 
 	/* Cycle focus. */
-	if (liwdg_widget_typeis (self->child, &liwdg_widget_container))
+	if (liwdg_widget_typeis (self->child, liwdg_widget_container ()))
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (self->child), NULL, next);
 		if (tmp != NULL)

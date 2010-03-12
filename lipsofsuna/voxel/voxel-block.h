@@ -39,52 +39,52 @@ struct _LIVoxBlockAddr
 	uint8_t block[3];
 };
 
-void
-livox_block_free (LIVoxBlock*   self,
-                  LIVoxManager* manager);
+LIAPICALL (void, livox_block_free, (
+	LIVoxBlock*   self,
+	LIVoxManager* manager));
 
-void
-livox_block_fill (LIVoxBlock*   self,
-                  LIVoxManager* manager,
-                  LIVoxVoxel*   terrain);
+LIAPICALL (void, livox_block_fill, (
+	LIVoxBlock*   self,
+	LIVoxManager* manager,
+	LIVoxVoxel*   terrain));
 
-void
-livox_block_optimize (LIVoxBlock* self);
+LIAPICALL (void, livox_block_optimize, (
+	LIVoxBlock* self));
 
-int
-livox_block_read (LIVoxBlock*   self,
-                  LIVoxManager* manager,
-                  LIArcReader*  reader);
+LIAPICALL (int, livox_block_read, (
+	LIVoxBlock*   self,
+	LIVoxManager* manager,
+	LIArcReader*  reader));
 
-int
-livox_block_write (LIVoxBlock*  self,
-                   LIArcWriter* writer);
+LIAPICALL (int, livox_block_write, (
+	LIVoxBlock*  self,
+	LIArcWriter* writer));
 
-int
-livox_block_get_dirty (const LIVoxBlock* self);
+LIAPICALL (int, livox_block_get_dirty, (
+	const LIVoxBlock* self));
 
-void
-livox_block_set_dirty (LIVoxBlock* self,
-                       int         value);
+LIAPICALL (void, livox_block_set_dirty, (
+	LIVoxBlock* self,
+	int         value));
 
-int
-livox_block_get_empty (const LIVoxBlock* self);
+LIAPICALL (int, livox_block_get_empty, (
+	const LIVoxBlock* self));
 
-int
-livox_block_get_stamp (const LIVoxBlock* self);
+LIAPICALL (int, livox_block_get_stamp, (
+	const LIVoxBlock* self));
 
-LIVoxVoxel*
-livox_block_get_voxel (LIVoxBlock* self,
-                       uint8_t     x,
-                       uint8_t     y,
-                       uint8_t     z);
+LIAPICALL (LIVoxVoxel*, livox_block_get_voxel, (
+	LIVoxBlock* self,
+	uint8_t     x,
+	uint8_t     y,
+	uint8_t     z));
 
-int
-livox_block_set_voxel (LIVoxBlock* self,
-                       uint8_t     x,
-                       uint8_t     y,
-                       uint8_t     z,
-                       LIVoxVoxel* voxel);
+LIAPICALL (int, livox_block_set_voxel, (
+	LIVoxBlock* self,
+	uint8_t     x,
+	uint8_t     y,
+	uint8_t     z,
+	LIVoxVoxel* voxel));
 
 #endif
 

@@ -67,20 +67,25 @@ private_rebuild (LIWdgTabs* self);
 
 /*****************************************************************************/
 
-const LIWdgClass liwdg_widget_tabs =
+const LIWdgClass*
+liwdg_widget_tabs ()
 {
-	LIWDG_BASE_STATIC, &liwdg_widget_container, "Tabs", sizeof (LIWdgTabs),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event,
-};
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_container, "Tabs", sizeof (LIWdgTabs),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event,
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_tabs_new (LIWdgManager* manager)
 {
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liwdg_widget_tabs);
+	self = liwdg_widget_new (manager, liwdg_widget_tabs ());
 	if (self == NULL)
 		return NULL;
 	private_rebuild (LIWDG_TABS (self));
@@ -172,7 +177,7 @@ private_event (LIWdgTabs*  self,
 
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
-	    event->probe.clss == &liwdg_widget_container)
+	    event->probe.clss == liwdg_widget_container ())
 	{
 		static LIWdgContainerIface iface =
 		{
@@ -244,7 +249,7 @@ private_event (LIWdgTabs*  self,
 			return 1;
 	}
 
-	return liwdg_widget_container.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_container ()->event (LIWDG_WIDGET (self), event);
 }
 
 static LIWdgWidget*
@@ -290,7 +295,7 @@ private_cycle_focus (LIWdgTabs*   self,
 		return NULL;
 
 	/* Cycle focus. */
-	if (liwdg_widget_typeis (child, &liwdg_widget_container))
+	if (liwdg_widget_typeis (child, liwdg_widget_container ()))
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (child), NULL, next);
 		if (tmp != NULL)

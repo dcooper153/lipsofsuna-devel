@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <lipsofsuna/archive.h>
+#include <lipsofsuna/system.h>
 #include "model-texture.h"
 
 typedef struct _LIMdlMaterial LIMdlMaterial;
@@ -52,51 +53,51 @@ struct _LIMdlMaterial
 extern "C" {
 #endif
 
-int
-limdl_material_init (LIMdlMaterial* self);
+LIAPICALL (int, limdl_material_init, (
+	LIMdlMaterial* self));
 
-int
-limdl_material_init_copy (LIMdlMaterial*       self,
-                          const LIMdlMaterial* src);
+LIAPICALL (int, limdl_material_init_copy, (
+	LIMdlMaterial*       self,
+	const LIMdlMaterial* src));
 
-void
-limdl_material_free (LIMdlMaterial* self);
+LIAPICALL (void, limdl_material_free, (
+	LIMdlMaterial* self));
 
-int
-limdl_material_append_texture (LIMdlMaterial* self,
-                               int            type,
-                               int            flags,
-                               const char*    name);
+LIAPICALL (int, limdl_material_append_texture, (
+	LIMdlMaterial* self,
+	int            type,
+	int            flags,
+	const char*    name));
 
-void
-limdl_material_clear_textures (LIMdlMaterial* self);
+LIAPICALL (void, limdl_material_clear_textures, (
+	LIMdlMaterial* self));
 
-int
-limdl_material_compare (const LIMdlMaterial* self,
-                        const LIMdlMaterial* material);
+LIAPICALL (int, limdl_material_compare, (
+	const LIMdlMaterial* self,
+	const LIMdlMaterial* material));
 
-int
-limdl_material_read (LIMdlMaterial* self,
-                     LIArcReader*   reader);
+LIAPICALL (int, limdl_material_read, (
+	LIMdlMaterial* self,
+	LIArcReader*   reader));
 
-int
-limdl_material_realloc_textures (LIMdlMaterial* self,
-                                 int            count);
+LIAPICALL (int, limdl_material_realloc_textures, (
+	LIMdlMaterial* self,
+	int            count));
 
-int
-limdl_material_write (LIMdlMaterial* self,
-                      LIArcWriter*   writer);
+LIAPICALL (int, limdl_material_write, (
+	LIMdlMaterial* self,
+	LIArcWriter*   writer));
 
-int
-limdl_material_set_shader (LIMdlMaterial* self,
-                           const char*    value);
+LIAPICALL (int, limdl_material_set_shader, (
+	LIMdlMaterial* self,
+	const char*    value));
 
-int
-limdl_material_set_texture (LIMdlMaterial* self,
-                            int            unit,
-                            int            type,
-                            int            flags,
-                            const char*    name);
+LIAPICALL (int, limdl_material_set_texture, (
+	LIMdlMaterial* self,
+	int            unit,
+	int            type,
+	int            flags,
+	const char*    name));
 
 #ifdef __cplusplus
 }

@@ -27,8 +27,7 @@
 #ifndef __EXT_HISTORY_H__
 #define __EXT_HISTORY_H__
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/widget.h>
+#include "ext-module.h"
 
 #define LIEXT_WIDGET_CHAT_HISTORY(o) ((LIExtChatHistory*)(o))
 
@@ -43,6 +42,9 @@ struct _LIExtChatHistory
 		char** array;
 	} lines;
 };
+
+const LIWdgClass*
+liext_widget_log ();
 
 LIWdgWidget*
 liext_chat_history_new (LIWdgManager* manager,

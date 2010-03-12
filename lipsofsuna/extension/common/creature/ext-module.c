@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <lipsofsuna/main.h>
-#include "ext-creature.h"
 #include "ext-module.h"
+#include "ext-creature.h"
 
 LIMaiExtensionInfo liext_info =
 {

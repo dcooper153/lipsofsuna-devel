@@ -69,122 +69,122 @@ struct _LIAlgSectors
 extern "C" {
 #endif
 
-LIAlgSectors*
-lialg_sectors_new (int   count,
-                   float width);
+LIAPICALL (LIAlgSectors*, lialg_sectors_new, (
+	int   count,
+	float width));
 
-void
-lialg_sectors_free (LIAlgSectors* self);
+LIAPICALL (void, lialg_sectors_free, (
+	LIAlgSectors* self));
 
-void
-lialg_sectors_clear (LIAlgSectors* self);
+LIAPICALL (void, lialg_sectors_clear, (
+	LIAlgSectors* self));
 
-void*
-lialg_sectors_data_index (LIAlgSectors* self,
-                          const char*   name,
-                          int           index,
-                          int           create);
+LIAPICALL (void*, lialg_sectors_data_index, (
+	LIAlgSectors* self,
+	const char*   name,
+	int           index,
+	int           create));
 
-void*
-lialg_sectors_data_offset (LIAlgSectors* self,
-                           const char*   name,
-                           int           x,
-                           int           y,
-                           int           z,
-                           int           create);
+LIAPICALL (void*, lialg_sectors_data_offset, (
+	LIAlgSectors* self,
+	const char*   name,
+	int           x,
+	int           y,
+	int           z,
+	int           create));
 
-void*
-lialg_sectors_data_point (LIAlgSectors*      self,
-                          const char*        name,
-                          const LIMatVector* point,
-                          int                create);
+LIAPICALL (void*, lialg_sectors_data_point, (
+	LIAlgSectors*      self,
+	const char*        name,
+	const LIMatVector* point,
+	int                create));
 
-LIAlgSector*
-lialg_sectors_sector_index (LIAlgSectors* self,
-                            int           index,
-                            int           create);
+LIAPICALL (LIAlgSector*, lialg_sectors_sector_index, (
+	LIAlgSectors* self,
+	int           index,
+	int           create));
 
-LIAlgSector*
-lialg_sectors_sector_offset (LIAlgSectors* self,
-                             int           x,
-                             int           y,
-                             int           z,
-                             int           create);
+LIAPICALL (LIAlgSector*, lialg_sectors_sector_offset, (
+	LIAlgSectors* self,
+	int           x,
+	int           y,
+	int           z,
+	int           create));
 
-LIAlgSector*
-lialg_sectors_sector_point (LIAlgSectors*      self,
-                            const LIMatVector* point,
-                            int                create);
+LIAPICALL (LIAlgSector*, lialg_sectors_sector_point, (
+	LIAlgSectors*      self,
+	const LIMatVector* point,
+	int                create));
 
-void
-lialg_sectors_index_to_offset (LIAlgSectors* self,
-                               int           index,
-                               int*          x,
-                               int*          y,
-                               int*          z);
+LIAPICALL (void, lialg_sectors_index_to_offset, (
+	LIAlgSectors* self,
+	int           index,
+	int*          x,
+	int*          y,
+	int*          z));
 
-void
-lialg_sectors_index_to_offset_static (int  count,
-                                      int  index,
-                                      int* x,
-                                      int* y,
-                                      int* z);
+LIAPICALL (void, lialg_sectors_index_to_offset_static, (
+	int  count,
+	int  index,
+	int* x,
+	int* y,
+	int* z));
 
-int
-lialg_sectors_insert_content (LIAlgSectors*       self,
-                              const char*         name,
-                              void*               data,
-                              LIAlgSectorFreeFunc free,
-                              LIAlgSectorLoadFunc load);
+LIAPICALL (int, lialg_sectors_insert_content, (
+	LIAlgSectors*       self,
+	const char*         name,
+	void*               data,
+	LIAlgSectorFreeFunc free,
+	LIAlgSectorLoadFunc load));
 
-int
-lialg_sectors_offset_to_index (LIAlgSectors* self,
-                               int           x,
-                               int           y,
-                               int           z);
+LIAPICALL (int, lialg_sectors_offset_to_index, (
+	LIAlgSectors* self,
+	int           x,
+	int           y,
+	int           z));
 
-int
-lialg_sectors_offset_to_index_static (int count,
-                                      int x,
-                                      int y,
-                                      int z);
+LIAPICALL (int, lialg_sectors_offset_to_index_static, (
+	int count,
+	int x,
+	int y,
+	int z));
 
-int
-lialg_sectors_point_to_index (LIAlgSectors*      self,
-                              const LIMatVector* point);
+LIAPICALL (int, lialg_sectors_point_to_index, (
+	LIAlgSectors*      self,
+	const LIMatVector* point));
 
-int
-lialg_sectors_point_to_index_static (int                count,
-                                     float              width,
-                                     const LIMatVector* point);
+LIAPICALL (int, lialg_sectors_point_to_index_static, (
+	int                count,
+	float              width,
+	const LIMatVector* point));
 
-void
-lialg_sectors_refresh_point (LIAlgSectors*      self,
-                             const LIMatVector* point,
-                             float              radius);
+LIAPICALL (void, lialg_sectors_refresh_point, (
+	LIAlgSectors*      self,
+	const LIMatVector* point,
+	float              radius));
 
-void
-lialg_sectors_remove (LIAlgSectors* self,
-                      int           index);
+LIAPICALL (void, lialg_sectors_remove, (
+	LIAlgSectors* self,
+	int           index));
 
-void
-lialg_sectors_remove_content (LIAlgSectors* self,
-                              const char*   name);
+LIAPICALL (void, lialg_sectors_remove_content, (
+	LIAlgSectors* self,
+	const char*   name));
 
-void
-lialg_sectors_update (LIAlgSectors* self,
-                      float         secs);
+LIAPICALL (void, lialg_sectors_update, (
+	LIAlgSectors* self,
+	float         secs));
 
-float
-lialg_sectors_get_unload (const LIAlgSectors* self);
+LIAPICALL (float, lialg_sectors_get_unload, (
+	const LIAlgSectors* self));
 
-void
-lialg_sectors_set_unload (LIAlgSectors* self,
-                          float         value);
+LIAPICALL (void, lialg_sectors_set_unload, (
+	LIAlgSectors* self,
+	float         value));
 
-void*
-lialg_sectors_get_userdata (LIAlgSectors* self,
-                            const char*   name);
+LIAPICALL (void*, lialg_sectors_get_userdata, (
+	LIAlgSectors* self,
+	const char*   name));
 
 #ifdef __cplusplus
 }

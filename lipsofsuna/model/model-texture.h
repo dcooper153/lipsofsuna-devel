@@ -25,9 +25,9 @@
 #ifndef __MODEL_TEXTURE_H__
 #define __MODEL_TEXTURE_H__
 
-#include <string.h>
 #include <lipsofsuna/archive.h>
-#include "model-texture.h"
+#include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 
 typedef int LIMdlTextureFlags;
 typedef int LIMdlTextureType;
@@ -61,13 +61,13 @@ struct _LIMdlTexture
 extern "C" {
 #endif
 
-int
-limdl_texture_compare (const LIMdlTexture* self,
-                       const LIMdlTexture* texture);
+LIAPICALL (int, limdl_texture_compare, (
+	const LIMdlTexture* self,
+	const LIMdlTexture* texture));
 
-int
-limdl_texture_set_string (LIMdlTexture* self,
-                          const char*   value);
+LIAPICALL (int, limdl_texture_set_string, (
+	LIMdlTexture* self,
+	const char*   value));
 
 #ifdef __cplusplus
 }

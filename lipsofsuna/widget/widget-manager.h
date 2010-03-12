@@ -29,6 +29,7 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/font.h>
 #include <lipsofsuna/image.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-style.h"
 #include "widget-types.h"
@@ -66,102 +67,102 @@ struct _LIWdgManager
 	} widgets;
 };
 
-LIWdgManager*
-liwdg_manager_new (LIVidCalls*     video,
-                   LICalCallbacks* callbacks,
-                   const char*     path);
+LIAPICALL (LIWdgManager*, liwdg_manager_new, (
+	LIVidCalls*     video,
+	LICalCallbacks* callbacks,
+	const char*     path));
 
-void
-liwdg_manager_free (LIWdgManager* self);
+LIAPICALL (void, liwdg_manager_free, (
+	LIWdgManager* self));
 
-int
-liwdg_manager_alloc_widgets (LIWdgManager* self,
-                                           ...);
+LIAPICALL (int, liwdg_manager_alloc_widgets, (
+	LIWdgManager* self,
+	              ...));
 
-void
-liwdg_manager_cycle_focus (LIWdgManager* self,
-                           int           next);
+LIAPICALL (void, liwdg_manager_cycle_focus, (
+	LIWdgManager* self,
+	int           next));
 
-void
-liwdg_manager_cycle_window_focus (LIWdgManager* self,
-                                  int           next);
+LIAPICALL (void, liwdg_manager_cycle_window_focus, (
+	LIWdgManager* self,
+	int           next));
 
-int
-liwdg_manager_event (LIWdgManager* self,
-                     LIWdgEvent*   event);
+LIAPICALL (int, liwdg_manager_event, (
+	LIWdgManager* self,
+	LIWdgEvent*   event));
 
-int
-liwdg_manager_event_sdl (LIWdgManager* manager,
-                         SDL_Event*    event);
+LIAPICALL (int, liwdg_manager_event_sdl, (
+	LIWdgManager* manager,
+	SDL_Event*    event));
 
-LIFntFont*
-liwdg_manager_find_font (LIWdgManager* self,
-                         const char*   name);
+LIAPICALL (LIFntFont*, liwdg_manager_find_font, (
+	LIWdgManager* self,
+	const char*   name));
 
-LIWdgStyle*
-liwdg_manager_find_style (LIWdgManager* self,
-                          const char*   name);
+LIAPICALL (LIWdgStyle*, liwdg_manager_find_style, (
+	LIWdgManager* self,
+	const char*   name));
 
-LIWdgWidget*
-liwdg_manager_find_widget_by_point (LIWdgManager* self,
-                                    int           x,
-                                    int           y);
+LIAPICALL (LIWdgWidget*, liwdg_manager_find_widget_by_point, (
+	LIWdgManager* self,
+	int           x,
+	int           y));
 
-LIWdgWidget*
-liwdg_manager_find_window_by_point (LIWdgManager* self,
-                                    int           x,
-                                    int           y);
+LIAPICALL (LIWdgWidget*, liwdg_manager_find_window_by_point, (
+	LIWdgManager* self,
+	int           x,
+	int           y));
 
-int
-liwdg_manager_insert_popup (LIWdgManager* self,
-                            LIWdgWidget*  widget);
+LIAPICALL (int, liwdg_manager_insert_popup, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
 
-int
-liwdg_manager_insert_window (LIWdgManager* self,
-                             LIWdgWidget*  widget);
+LIAPICALL (int, liwdg_manager_insert_window, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
 
-int
-liwdg_manager_remove_popup (LIWdgManager* self,
-                            LIWdgWidget*  widget);
+LIAPICALL (int, liwdg_manager_remove_popup, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
 
-int
-liwdg_manager_remove_window (LIWdgManager* self,
-                             LIWdgWidget*  widget);
+LIAPICALL (int, liwdg_manager_remove_window, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
 
-void
-liwdg_manager_render (LIWdgManager* self);
+LIAPICALL (void, liwdg_manager_render, (
+	LIWdgManager* self));
 
-void
-liwdg_manager_update (LIWdgManager* self,
-                      float         secs);
+LIAPICALL (void, liwdg_manager_update, (
+	LIWdgManager* self,
+	float         secs));
 
-LIWdgWidget*
-liwdg_manager_get_focus (LIWdgManager* self);
+LIAPICALL (LIWdgWidget*, liwdg_manager_get_focus, (
+	LIWdgManager* self));
 
-void
-liwdg_manager_set_focus (LIWdgManager* self,
-                         LIWdgWidget*  widget);
+LIAPICALL (void, liwdg_manager_set_focus, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
 
-void
-liwdg_manager_get_projection (LIWdgManager* self,
-                              LIMatMatrix*  matrix);
+LIAPICALL (void, liwdg_manager_get_projection, (
+	LIWdgManager* self,
+	LIMatMatrix*  matrix));
 
-LIWdgWidget*
-liwdg_manager_get_root (LIWdgManager* self);
+LIAPICALL (LIWdgWidget*, liwdg_manager_get_root, (
+	LIWdgManager* self));
 
-void
-liwdg_manager_set_root (LIWdgManager* self,
-                        LIWdgWidget*  widget);
+LIAPICALL (void, liwdg_manager_set_root, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
 
-void
-liwdg_manager_get_size (LIWdgManager* self,
-                        int*          x,
-                        int*          y);
+LIAPICALL (void, liwdg_manager_get_size, (
+	LIWdgManager* self,
+	int*          x,
+	int*          y));
 
-void
-liwdg_manager_set_size (LIWdgManager* self,
-                        int           width,
-                        int           height);
+LIAPICALL (void, liwdg_manager_set_size, (
+	LIWdgManager* self,
+	int           width,
+	int           height));
 
 #endif
 

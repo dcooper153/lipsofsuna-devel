@@ -64,39 +64,38 @@ struct _LIAlgMemdicIter
 extern "C" {
 #endif
 
-LIAlgMemdic*
-lialg_memdic_new ();
+LIAPICALL (LIAlgMemdic*, lialg_memdic_new, ());
 
-void
-lialg_memdic_free (LIAlgMemdic* self);
+LIAPICALL (void, lialg_memdic_free, (
+	LIAlgMemdic* self));
 
-void
-lialg_memdic_clear (LIAlgMemdic* self);
+LIAPICALL (void, lialg_memdic_clear, (
+	LIAlgMemdic* self));
 
-void*
-lialg_memdic_find (LIAlgMemdic* self,
-                   const void*  key,
-                   int          keysize);
+LIAPICALL (void*, lialg_memdic_find, (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize));
 
-LIAlgMemdicNode*
-lialg_memdic_find_node (LIAlgMemdic* self,
-                        const void*  key,
-                        int          keysize);
+LIAPICALL (LIAlgMemdicNode*, lialg_memdic_find_node, (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize));
 
-LIAlgMemdicNode*
-lialg_memdic_insert (LIAlgMemdic* self,
-                     const void*  key,
-                     int          keysize,
-                     void*        value);
+LIAPICALL (LIAlgMemdicNode*, lialg_memdic_insert, (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize,
+	void*        value));
 
-int
-lialg_memdic_remove (LIAlgMemdic* self,
-                     const void*  key,
-                     int          keysize);
+LIAPICALL (int, lialg_memdic_remove, (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize));
 
-void
-lialg_memdic_remove_node (LIAlgMemdic*     self,
-                          LIAlgMemdicNode* node);
+LIAPICALL (void, lialg_memdic_remove_node, (
+	LIAlgMemdic*     self,
+	LIAlgMemdicNode* node));
 
 #ifdef __cplusplus
 }

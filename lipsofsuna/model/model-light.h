@@ -28,6 +28,7 @@
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "model-types.h"
 
 struct _LIMdlLight
@@ -52,21 +53,21 @@ struct _LIMdlLight
 extern "C" {
 #endif
 
-int
-limdl_light_read (LIMdlNode*   self,
-                  LIArcReader* reader);
+LIAPICALL (int, limdl_light_read, (
+	LIMdlNode*   self,
+	LIArcReader* reader));
 
-int
-limdl_light_write (const LIMdlNode* self,
-                   LIArcWriter*     writer);
+LIAPICALL (int, limdl_light_write, (
+	const LIMdlNode* self,
+	LIArcWriter*     writer));
 
-void
-limdl_light_get_modelview (const LIMdlNode* self,
-                           LIMatMatrix*     value);
+LIAPICALL (void, limdl_light_get_modelview, (
+	const LIMdlNode* self,
+	LIMatMatrix*     value));
 
-void
-limdl_light_get_projection (const LIMdlNode* self,
-                            LIMatMatrix*     value);
+LIAPICALL (void, limdl_light_get_projection, (
+	const LIMdlNode* self,
+	LIMatMatrix*     value));
 
 #ifdef __cplusplus
 }

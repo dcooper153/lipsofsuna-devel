@@ -24,10 +24,9 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "ext-module.h"
 #include "ext-brushes.h"
 #include "ext-dialog.h"
-#include "ext-module.h"
 #include "ext-preview.h"
 
 enum
@@ -50,9 +49,6 @@ struct _LIExtBrushesTreerow
 	int object;
 	int type;
 };
-
-static const void*
-private_base ();
 
 static int
 private_init (LIExtBrushes* self,
@@ -152,13 +148,19 @@ private_get_active (LIExtBrushes* self);
 
 /****************************************************************************/
 
-const LIWdgClass liext_widget_brushes =
+const LIWdgClass*
+liext_widget_brushes ()
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorBrushes", sizeof (LIExtBrushes),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static LIWdgClass clss =
+	{
+		NULL, "GeneratorBrushes", sizeof (LIExtBrushes),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	clss.base = liwdg_widget_group;
+	return &clss;
+}
 
 LIWdgWidget*
 liext_brushes_new (LIWdgManager* manager,
@@ -167,7 +169,7 @@ liext_brushes_new (LIWdgManager* manager,
 	LIExtBrushes* data;
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liext_widget_brushes);
+	self = liwdg_widget_new (manager, liext_widget_brushes ());
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_BRUSHES (self);
@@ -224,12 +226,6 @@ liext_brushes_reset (LIExtBrushes* self,
 }
 
 /****************************************************************************/
-
-static const void*
-private_base ()
-{
-	return &liwdg_widget_group;
-}
 
 static int
 private_init (LIExtBrushes* self,
@@ -362,7 +358,7 @@ static int
 private_event (LIExtBrushes* self,
                LIWdgEvent*   event)
 {
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 static int

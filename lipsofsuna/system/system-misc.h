@@ -26,19 +26,19 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
+#include "system-compiler.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-float
-lisys_randf ();
+LIAPICALL (float, lisys_randf, ());
 
-int
-lisys_randi (int max);
+LIAPICALL (int, lisys_randi, (
+	int max));
 
-void
-lisys_usleep (int usecs);
+LIAPICALL (void, lisys_usleep, (
+	int usecs));
 
 #ifdef __cplusplus
 }

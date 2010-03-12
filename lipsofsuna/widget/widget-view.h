@@ -25,6 +25,7 @@
 #ifndef __WIDGET_VIEW_H__
 #define __WIDGET_VIEW_H__
 
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-container.h"
 #include "widget-types.h"
@@ -42,31 +43,31 @@ struct _LIWdgView
 	int vscrollpos;
 };
 
-extern const LIWdgClass liwdg_widget_view;
+LIAPICALL (const LIWdgClass*, liwdg_widget_view, ());
 
-LIWdgWidget*
-liwdg_view_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_view_new, (
+	LIWdgManager* manager));
 
-LIWdgWidget*
-liwdg_view_get_child (LIWdgView* self);
+LIAPICALL (LIWdgWidget*, liwdg_view_get_child, (
+	LIWdgView* self));
 
-void
-liwdg_view_set_child (LIWdgView*   self,
-                      LIWdgWidget* widget);
+LIAPICALL (void, liwdg_view_set_child, (
+	LIWdgView*   self,
+	LIWdgWidget* widget));
 
-int
-liwdg_view_get_hscroll (LIWdgView* self);
+LIAPICALL (int, liwdg_view_get_hscroll, (
+	LIWdgView* self));
 
-void
-liwdg_view_set_hscroll (LIWdgView* self,
-                        int        value);
+LIAPICALL (void, liwdg_view_set_hscroll, (
+	LIWdgView* self,
+	int        value));
 
-int
-liwdg_view_get_vscroll (LIWdgView* self);
+LIAPICALL (int, liwdg_view_get_vscroll, (
+	LIWdgView* self));
 
-void
-liwdg_view_set_vscroll (LIWdgView* self,
-                        int        value);
+LIAPICALL (void, liwdg_view_set_vscroll, (
+	LIWdgView* self,
+	int        value));
 
 #endif
 

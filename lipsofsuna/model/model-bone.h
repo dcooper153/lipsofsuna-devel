@@ -28,6 +28,7 @@
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/string.h>
+#include <lipsofsuna/system.h>
 #include "model-types.h"
 
 struct _LIMdlBone
@@ -36,21 +37,21 @@ struct _LIMdlBone
 	LIMatVector tail;
 };
 
-int
-limdl_bone_read (LIMdlNode*   self,
-                 LIArcReader* reader);
+LIAPICALL (int, limdl_bone_read, (
+	LIMdlNode*   self,
+	LIArcReader* reader));
 
-int
-limdl_bone_write (const LIMdlNode* self,
-                  LIArcWriter*     writer);
+LIAPICALL (int, limdl_bone_write, (
+	const LIMdlNode* self,
+	LIArcWriter*     writer));
 
-void
-limdl_bone_get_pose_head (const LIMdlNode* self,
-                          LIMatVector*     head);
+LIAPICALL (void, limdl_bone_get_pose_head, (
+	const LIMdlNode* self,
+	LIMatVector*     head));
 
-void
-limdl_bone_get_pose_tail (const LIMdlNode* self,
-                          LIMatVector*     tail);
+LIAPICALL (void, limdl_bone_get_pose_tail, (
+	const LIMdlNode* self,
+	LIMatVector*     tail));
 
 #endif
 

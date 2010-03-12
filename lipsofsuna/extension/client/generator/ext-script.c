@@ -24,10 +24,8 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
-#include "ext-dialog.h"
 #include "ext-module.h"
+#include "ext-dialog.h"
 
 /* @luadoc
  * module "Extension.Client.Generator"

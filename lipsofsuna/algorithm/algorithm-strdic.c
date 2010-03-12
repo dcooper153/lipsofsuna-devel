@@ -50,7 +50,7 @@ lialg_strdic_new ()
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc_func, lisys_free_func);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc, lisys_free);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -81,7 +81,7 @@ lialg_strdic_free (LIAlgStrdic* self)
 void
 lialg_strdic_clear (LIAlgStrdic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free_func);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_node_free);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;

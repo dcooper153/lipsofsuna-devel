@@ -25,12 +25,9 @@
 #ifndef __EXT_PACKAGER_H__
 #define __EXT_PACKAGER_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/thread.h>
+#include "ext-module.h"
 #include "ext-resources.h"
 
-typedef struct _LIExtPackager LIExtPackager;
 struct _LIExtPackager
 {
 	int verbose;
@@ -39,7 +36,6 @@ struct _LIExtPackager
 	LIWdgWidget* progress;
 };
 
-typedef struct _LIExtPackagerData LIExtPackagerData;
 struct _LIExtPackagerData
 {
 	char* target;

@@ -26,6 +26,7 @@
 #define __RENDER_BUFFER_H__
 
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
 #include "render-material.h"
 #include "render-types.h"
@@ -42,27 +43,27 @@ struct _LIRenBuffer
 	} elements;
 };
 
-int
-liren_buffer_init_index (LIRenBuffer* self,
-                         const void*  data,
-                         int          count);
+LIAPICALL (int, liren_buffer_init_index, (
+	LIRenBuffer* self,
+	const void*  data,
+	int          count));
 
-int
-liren_buffer_init_vertex (LIRenBuffer*       self,
-                          const LIRenFormat* format,
-                          const void*        data,
-                          int                count);
+LIAPICALL (int, liren_buffer_init_vertex, (
+	LIRenBuffer*       self,
+	const LIRenFormat* format,
+	const void*        data,
+	int                count));
 
-void
-liren_buffer_free (LIRenBuffer* self);
+LIAPICALL (void, liren_buffer_free, (
+	LIRenBuffer* self));
 
-void*
-liren_buffer_lock (LIRenBuffer* self,
-                   int          write);
+LIAPICALL (void*, liren_buffer_lock, (
+	LIRenBuffer* self,
+	int          write));
 
-void
-liren_buffer_unlock (LIRenBuffer* self,
-                     void*        data);
+LIAPICALL (void, liren_buffer_unlock, (
+	LIRenBuffer* self,
+	void*        data));
 
 #endif
 

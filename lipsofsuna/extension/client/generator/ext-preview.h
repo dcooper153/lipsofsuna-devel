@@ -27,10 +27,7 @@
 #ifndef __EXT_PREVIEW_H__
 #define __EXT_PREVIEW_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/generator.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/widget.h>
+#include "ext-module.h"
 
 #define LIEXT_PREVIEW(o) ((LIExtPreview*)(o))
 
@@ -46,7 +43,6 @@ enum
 	LIEXT_PREVIEW_MAX
 };
 
-typedef struct _LIExtPreview LIExtPreview;
 struct _LIExtPreview
 {
 	LIWdgRender base;
@@ -68,7 +64,8 @@ struct _LIExtPreview
 	int mode;
 };
 
-extern const LIWdgClass liext_widget_preview;
+const LIWdgClass*
+liext_widget_preview ();
 
 LIWdgWidget*
 liext_preview_new (LIWdgManager* manager,

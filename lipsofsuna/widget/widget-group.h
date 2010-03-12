@@ -26,6 +26,7 @@
 #define __WIDGET_GROUP_H__
 
 #include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-container.h"
 
@@ -78,121 +79,121 @@ struct _LIWdgGroup
 	LIWdgGroupCell* cells;
 };
 
-extern const LIWdgClass liwdg_widget_group;
+LIAPICALL (const LIWdgClass*, liwdg_widget_group, ());
 
-LIWdgWidget*
-liwdg_group_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_group_new, (
+	LIWdgManager* manager));
 
-LIWdgWidget*
-liwdg_group_new_with_size (LIWdgManager* manager,
-                           int           cols,
-                           int           rows);
+LIAPICALL (LIWdgWidget*, liwdg_group_new_with_size, (
+	LIWdgManager* manager,
+	int           cols,
+	int           rows));
 
-int
-liwdg_group_append_col (LIWdgGroup* self);
+LIAPICALL (int, liwdg_group_append_col, (
+	LIWdgGroup* self));
 
-int
-liwdg_group_append_row (LIWdgGroup* self);
+LIAPICALL (int, liwdg_group_append_row, (
+	LIWdgGroup* self));
 
-int
-liwdg_group_insert_col (LIWdgGroup* self,
-                        int         index);
+LIAPICALL (int, liwdg_group_insert_col, (
+	LIWdgGroup* self,
+	int         index));
 
-int
-liwdg_group_insert_row (LIWdgGroup* self,
-                        int         index);
+LIAPICALL (int, liwdg_group_insert_row, (
+	LIWdgGroup* self,
+	int         index));
 
-void
-liwdg_group_remove_col (LIWdgGroup* self,
-                        int         index);
+LIAPICALL (void, liwdg_group_remove_col, (
+	LIWdgGroup* self,
+	int         index));
 
-void
-liwdg_group_remove_row (LIWdgGroup* self,
-                        int         index);
+LIAPICALL (void, liwdg_group_remove_row, (
+	LIWdgGroup* self,
+	int         index));
 
-void
-liwdg_group_get_cell_rect (LIWdgGroup* self,
-                           int         x,
-                           int         y,
-                           LIWdgRect*  rect);
+LIAPICALL (void, liwdg_group_get_cell_rect, (
+	LIWdgGroup* self,
+	int         x,
+	int         y,
+	LIWdgRect*  rect));
 
-LIWdgWidget*
-liwdg_group_get_child (LIWdgGroup* self,
-                       int         x,
-                       int         y);
+LIAPICALL (LIWdgWidget*, liwdg_group_get_child, (
+	LIWdgGroup* self,
+	int         x,
+	int         y));
 
-void
-liwdg_group_set_child (LIWdgGroup*  self,
-                       int          x,
-                       int          y,
-                       LIWdgWidget* child);
+LIAPICALL (void, liwdg_group_set_child, (
+	LIWdgGroup*  self,
+	int          x,
+	int          y,
+	LIWdgWidget* child));
 
-int
-liwdg_group_get_col_expand (LIWdgGroup* self,
-                            int         x);
+LIAPICALL (int, liwdg_group_get_col_expand, (
+	LIWdgGroup* self,
+	int         x));
 
-void
-liwdg_group_set_col_expand (LIWdgGroup* self,
-                            int         x,
-                            int         expand); 
+LIAPICALL (void, liwdg_group_set_col_expand, (
+	LIWdgGroup* self,
+	int         x,
+	int         expand));
 
-int
-liwdg_group_get_col_size (LIWdgGroup* self,
-                          int         x);
+LIAPICALL (int, liwdg_group_get_col_size, (
+	LIWdgGroup* self,
+	int         x));
 
-int
-liwdg_group_get_homogeneous (const LIWdgGroup* self);
+LIAPICALL (int, liwdg_group_get_homogeneous, (
+	const LIWdgGroup* self));
 
-void
-liwdg_group_set_homogeneous (LIWdgGroup* self,
-                             int         value);
+LIAPICALL (void, liwdg_group_set_homogeneous, (
+	LIWdgGroup* self,
+	int         value));
 
-void
-liwdg_group_get_margins (LIWdgGroup* self,
-                         int*        left,
-                         int*        right,
-                         int*        top,
-                         int*        bottom);
+LIAPICALL (void, liwdg_group_get_margins, (
+	LIWdgGroup* self,
+	int*        left,
+	int*        right,
+	int*        top,
+	int*        bottom));
 
-void
-liwdg_group_set_margins (LIWdgGroup* self,
-                         int         left,
-                         int         right,
-                         int         top,
-                         int         bottom);
+LIAPICALL (void, liwdg_group_set_margins, (
+	LIWdgGroup* self,
+	int         left,
+	int         right,
+	int         top,
+	int         bottom));
 
-int
-liwdg_group_get_row_expand (LIWdgGroup* self,
-                            int         y);
+LIAPICALL (int, liwdg_group_get_row_expand, (
+	LIWdgGroup* self,
+	int         y));
 
-void
-liwdg_group_set_row_expand (LIWdgGroup* self,
-                            int         y,
-                            int         expand);
+LIAPICALL (void, liwdg_group_set_row_expand, (
+	LIWdgGroup* self,
+	int         y,
+	int         expand));
 
-int
-liwdg_group_get_row_size (LIWdgGroup* self,
-                          int         y);
+LIAPICALL (int, liwdg_group_get_row_size, (
+	LIWdgGroup* self,
+	int         y));
 
-void
-liwdg_group_get_size (LIWdgGroup* self,
-                      int*        cols,
-                      int*        rows);
+LIAPICALL (void, liwdg_group_get_size, (
+	LIWdgGroup* self,
+	int*        cols,
+	int*        rows));
 
-int
-liwdg_group_set_size (LIWdgGroup* self,
-                      int         cols,
-                      int         rows);
+LIAPICALL (int, liwdg_group_set_size, (
+	LIWdgGroup* self,
+	int         cols,
+	int         rows));
 
-void
-liwdg_group_get_spacings (LIWdgGroup* self,
-                          int*        column,
-                          int*        row);
+LIAPICALL (void, liwdg_group_get_spacings, (
+	LIWdgGroup* self,
+	int*        column,
+	int*        row));
 
-void
-liwdg_group_set_spacings (LIWdgGroup* self,
-                          int         column,
-                          int         row);
+LIAPICALL (void, liwdg_group_set_spacings, (
+	LIWdgGroup* self,
+	int         column,
+	int         row));
 
 #endif
 

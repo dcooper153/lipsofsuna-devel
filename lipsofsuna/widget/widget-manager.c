@@ -264,7 +264,7 @@ liwdg_manager_find_widget_by_point (LIWdgManager* self,
 		return NULL;
 
 	/* Find widget. */
-	while (liwdg_widget_typeis (widget, &liwdg_widget_container))
+	while (liwdg_widget_typeis (widget, liwdg_widget_container ()))
 	{
 		child = liwdg_container_child_at (LIWDG_CONTAINER (widget), x, y);
 		if (child == NULL)
@@ -929,7 +929,7 @@ private_focus_root (LIWdgManager* self)
 		return 0;
 	if (!liwdg_widget_get_visible (widget))
 		return 0;
-	if (liwdg_widget_typeis (widget, &liwdg_widget_container))
+	if (liwdg_widget_typeis (widget, liwdg_widget_container ()))
 	{
 		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, 1);
 		if (tmp != NULL)
@@ -991,7 +991,7 @@ private_focus_window (LIWdgManager* self,
 		/* Check if this one is it. */
 		if (liwdg_widget_get_visible (widget))
 		{
-			if (liwdg_widget_typeis (widget, &liwdg_widget_container))
+			if (liwdg_widget_typeis (widget, liwdg_widget_container ()))
 			{
 				tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
 				if (tmp != NULL)

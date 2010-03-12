@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
 #include "ext-module.h"
 #include "ext-packager.h"
 

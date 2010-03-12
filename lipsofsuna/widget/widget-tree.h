@@ -25,6 +25,7 @@
 #ifndef __WIDGET_TREE_H__
 #define __WIDGET_TREE_H__
 
+#include <lipsofsuna/system.h>
 #include "widget-manager.h"
 
 #define LIWDG_TREE(o) ((LIWdgTree*)(o))
@@ -32,73 +33,73 @@
 typedef struct _LIWdgTree LIWdgTree;
 typedef struct _LIWdgTreerow LIWdgTreerow;
 
-extern const LIWdgClass liwdg_widget_tree;
+LIAPICALL (const LIWdgClass*, liwdg_widget_tree, ());
 
-LIWdgWidget*
-liwdg_tree_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_tree_new, (
+	LIWdgManager* manager));
 
-void
-liwdg_tree_clear (LIWdgTree* self);
+LIAPICALL (void, liwdg_tree_clear, (
+	LIWdgTree* self));
 
-void
-liwdg_tree_foreach (LIWdgTree* self,
-                    void     (*call)());
+LIAPICALL (void, liwdg_tree_foreach, (
+	LIWdgTree* self,
+	void     (*call)()));
 
-LIWdgTreerow*
-liwdg_tree_get_active (LIWdgTree* self);
+LIAPICALL (LIWdgTreerow*, liwdg_tree_get_active, (
+	LIWdgTree* self));
 
-LIWdgTreerow*
-liwdg_tree_get_root (LIWdgTree* self);
+LIAPICALL (LIWdgTreerow*, liwdg_tree_get_root, (
+	LIWdgTree* self));
 
-LIWdgTreerow*
-liwdg_treerow_append_row (LIWdgTreerow* self,
-                          const char*   text,
-                          void*         data);
+LIAPICALL (LIWdgTreerow*, liwdg_treerow_append_row, (
+	LIWdgTreerow* self,
+	const char*   text,
+	void*         data));
 
-void
-liwdg_treerow_remove_row (LIWdgTreerow* self,
-                          int           index);
+LIAPICALL (void, liwdg_treerow_remove_row, (
+	LIWdgTreerow* self,
+	int           index));
 
-void*
-liwdg_treerow_get_data (LIWdgTreerow* self);
+LIAPICALL (void*, liwdg_treerow_get_data, (
+	LIWdgTreerow* self));
 
-void
-liwdg_treerow_set_data (LIWdgTreerow* self,
-                        void*         value);
+LIAPICALL (void, liwdg_treerow_set_data, (
+	LIWdgTreerow* self,
+	void*         value));
 
-int
-liwdg_treerow_get_expanded (LIWdgTreerow* self);
+LIAPICALL (int, liwdg_treerow_get_expanded, (
+	LIWdgTreerow* self));
 
-void
-liwdg_treerow_set_expanded (LIWdgTreerow* self,
-                            int           value);
+LIAPICALL (void, liwdg_treerow_set_expanded, (
+	LIWdgTreerow* self,
+	int           value));
 
-int
-liwdg_treerow_get_highlighted (LIWdgTreerow* self);
+LIAPICALL (int, liwdg_treerow_get_highlighted, (
+	LIWdgTreerow* self));
 
-void
-liwdg_treerow_set_highlighted (LIWdgTreerow* self,
-                               int           value);
+LIAPICALL (void, liwdg_treerow_set_highlighted, (
+	LIWdgTreerow* self,
+	int           value));
 
-int
-liwdg_treerow_get_index (LIWdgTreerow* self);
+LIAPICALL (int, liwdg_treerow_get_index, (
+	LIWdgTreerow* self));
 
-LIWdgTreerow*
-liwdg_treerow_get_parent (LIWdgTreerow* self);
+LIAPICALL (LIWdgTreerow*, liwdg_treerow_get_parent, (
+	LIWdgTreerow* self));
 
-LIWdgTreerow*
-liwdg_treerow_get_row (LIWdgTreerow* self,
-                       int           index);
+LIAPICALL (LIWdgTreerow*, liwdg_treerow_get_row, (
+	LIWdgTreerow* self,
+	int           index));
 
-int
-liwdg_treerow_get_row_count (LIWdgTreerow* self);
+LIAPICALL (int, liwdg_treerow_get_row_count, (
+	LIWdgTreerow* self));
 
-const char*
-liwdg_treerow_get_text (LIWdgTreerow* self);
+LIAPICALL (const char*, liwdg_treerow_get_text, (
+	LIWdgTreerow* self));
 
-int
-liwdg_treerow_set_text (LIWdgTreerow* self,
-                        const char*   value);
+LIAPICALL (int, liwdg_treerow_set_text, (
+	LIWdgTreerow* self,
+	const char*   value));
 
 #endif
 

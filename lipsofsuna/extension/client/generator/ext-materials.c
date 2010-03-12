@@ -24,13 +24,10 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "ext-module.h"
 #include "ext-material.h"
 #include "ext-materials.h"
 #include "ext-preview.h"
-
-static const void*
-private_base ();
 
 static int
 private_init (LIExtMaterials* self,
@@ -70,13 +67,19 @@ private_get_active (LIExtMaterials* self);
 
 /****************************************************************************/
 
-const LIWdgClass liext_widget_materials =
+const LIWdgClass*
+liext_widget_materials ()
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorMaterials", sizeof (LIExtMaterials),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static LIWdgClass clss =
+	{
+		NULL, "GeneratorMaterials", sizeof (LIExtMaterials),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	clss.base = liwdg_widget_group;
+	return &clss;
+}
 
 LIWdgWidget*
 liext_materials_new (LIWdgManager* manager,
@@ -85,7 +88,7 @@ liext_materials_new (LIWdgManager* manager,
 	LIExtMaterials* data;
 	LIWdgWidget* self;
 
-	self = liwdg_widget_new (manager, &liext_widget_materials);
+	self = liwdg_widget_new (manager, liext_widget_materials ());
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_MATERIALS (self);
@@ -144,12 +147,6 @@ liext_materials_get_active (LIExtMaterials* self)
 }
 
 /****************************************************************************/
-
-static const void*
-private_base ()
-{
-	return &liwdg_widget_group;
-}
 
 static int
 private_init (LIExtMaterials* self,
@@ -212,7 +209,7 @@ private_event (LIExtMaterials* self,
 	{
 	}
 
-	return liwdg_widget_group.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 static int

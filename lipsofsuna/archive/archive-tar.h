@@ -64,29 +64,29 @@ struct _LIArcTar
 	LIArcWriter* writer;
 };
 
-LIArcTar*
-liarc_tar_new (LIArcWriter* writer);
+LIAPICALL (LIArcTar*, liarc_tar_new, (
+	LIArcWriter* writer));
 
-void
-liarc_tar_free (LIArcTar* self);
+LIAPICALL (void, liarc_tar_free, (
+	LIArcTar* self));
 
-int
-liarc_tar_write_data (LIArcTar*   self,
-                      const char* name,
-                      const void* data,
-                      int         length);
+LIAPICALL (int, liarc_tar_write_data, (
+	LIArcTar*   self,
+	const char* name,
+	const void* data,
+	int         length));
 
-int
-liarc_tar_write_directory (LIArcTar*   self,
-                           const char* name);
+LIAPICALL (int, liarc_tar_write_directory, (
+	LIArcTar*   self,
+	const char* name));
 
-int
-liarc_tar_write_end (LIArcTar* self);
+LIAPICALL (int, liarc_tar_write_end, (
+	LIArcTar* self));
 
-int
-liarc_tar_write_file (LIArcTar*   self,
-                      const char* src,
-                      const char* dst);
+LIAPICALL (int, liarc_tar_write_file, (
+	LIArcTar*   self,
+	const char* src,
+	const char* dst));
 
 #endif
 

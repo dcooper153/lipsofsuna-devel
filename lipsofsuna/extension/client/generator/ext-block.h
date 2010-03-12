@@ -27,9 +27,7 @@
 #ifndef __EXT_BLOCK_H__
 #define __EXT_BLOCK_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/voxel.h>
+#include "ext-module.h"
 #include "ext-preview.h"
 
 typedef struct _LIExtBlock LIExtBlock;

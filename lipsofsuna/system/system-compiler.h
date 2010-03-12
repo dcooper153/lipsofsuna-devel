@@ -26,8 +26,8 @@
 #define __SYSTEM_COMPILER_H__
 
 #ifdef WIN32
-#define LIAPIEXPORT(ret, name, args) __declspec(dllexport) ret name args; typedef ret (*name##_pfn) args
-#define LIAPIIMPORT(ret, name, args) __declspec(dllimport) ret name args; typedef ret (*name##_pfn) args
+#define LIAPIEXPORT(ret, name, args) typedef ret (*name##_pfn) args; __declspec(dllexport) ret name args
+#define LIAPIIMPORT(ret, name, args) typedef ret (*name##_pfn) args; __declspec(dllimport) ret name args
 #else
 #define LIAPIEXPORT(ret, name, args) ret name args
 #define LIAPIIMPORT(ret, name, args) ret name args

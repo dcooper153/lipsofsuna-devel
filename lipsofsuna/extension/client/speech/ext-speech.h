@@ -27,8 +27,7 @@
 #ifndef __EXT_SPEECH_H__
 #define __EXT_SPEECH_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/font.h>
+#include "ext-module.h"
 
 #define LIEXT_SPEECH_TIMEOUT 10.0f
 

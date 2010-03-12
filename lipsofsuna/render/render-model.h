@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-buffer.h"
 #include "render-material.h"
@@ -52,27 +53,27 @@ struct _LIRenModel
 	} materials;
 };
 
-LIRenModel*
-liren_model_new (LIRenRender* render,
-                 LIMdlModel*  model,
-                 const char*  name);
+LIAPICALL (LIRenModel*, liren_model_new, (
+	LIRenRender* render,
+	LIMdlModel*  model,
+	const char*  name));
 
-LIRenModel*
-liren_model_new_instance (LIRenModel* model);
+LIAPICALL (LIRenModel*, liren_model_new_instance, (
+	LIRenModel* model));
 
-void
-liren_model_free (LIRenModel*  self);
+LIAPICALL (void, liren_model_free, (
+	LIRenModel*  self));
 
-void
-liren_model_replace_image (LIRenModel* self,
-                           LIRenImage* image);
+LIAPICALL (void, liren_model_replace_image, (
+	LIRenModel* self,
+	LIRenImage* image));
 
-void
-liren_model_get_bounds (LIRenModel* self,
-                        LIMatAabb*  aabb);
+LIAPICALL (void, liren_model_get_bounds, (
+	LIRenModel* self,
+	LIMatAabb*  aabb));
 
-int
-liren_model_get_static (LIRenModel* self);
+LIAPICALL (int, liren_model_get_static, (
+	LIRenModel* self));
 
 #endif
 

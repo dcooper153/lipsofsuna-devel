@@ -62,35 +62,34 @@ struct _LIAlgStrdicIter
 extern "C" {
 #endif
 
-LIAlgStrdic*
-lialg_strdic_new ();
+LIAPICALL (LIAlgStrdic*, lialg_strdic_new, ());
 
-void
-lialg_strdic_free (LIAlgStrdic* self);
+LIAPICALL (void, lialg_strdic_free, (
+	LIAlgStrdic* self));
 
-void
-lialg_strdic_clear (LIAlgStrdic* self);
+LIAPICALL (void, lialg_strdic_clear, (
+	LIAlgStrdic* self));
 
-void*
-lialg_strdic_find (LIAlgStrdic* self,
-                   const char*  key);
+LIAPICALL (void*, lialg_strdic_find, (
+	LIAlgStrdic* self,
+	const char*  key));
 
-LIAlgStrdicNode*
-lialg_strdic_find_node (LIAlgStrdic* self,
-                        const char*  key);
+LIAPICALL (LIAlgStrdicNode*, lialg_strdic_find_node, (
+	LIAlgStrdic* self,
+	const char*  key));
 
-LIAlgStrdicNode*
-lialg_strdic_insert (LIAlgStrdic* self,
-                     const char*  key,
-                     void*        value);
+LIAPICALL (LIAlgStrdicNode*, lialg_strdic_insert, (
+	LIAlgStrdic* self,
+	const char*  key,
+	void*        value));
 
-int
-lialg_strdic_remove (LIAlgStrdic* self,
-                     const char*  key);
+LIAPICALL (int, lialg_strdic_remove, (
+	LIAlgStrdic* self,
+	const char*  key));
 
-void
-lialg_strdic_remove_node (LIAlgStrdic*     self,
-                          LIAlgStrdicNode* node);
+LIAPICALL (void, lialg_strdic_remove_node, (
+	LIAlgStrdic*     self,
+	LIAlgStrdicNode* node));
 
 #ifdef __cplusplus
 }

@@ -63,15 +63,20 @@ private_item_find (LIWdgMenu* self,
 static void
 private_rebuild (LIWdgMenu* self);
 
-const LIWdgClass liwdg_widget_menu =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Menu", sizeof (LIWdgMenu),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_menu ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Menu", sizeof (LIWdgMenu),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 /**
  * \brief Creates a new menu widget.
@@ -82,7 +87,7 @@ const LIWdgClass liwdg_widget_menu =
 LIWdgWidget*
 liwdg_menu_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_menu);
+	return liwdg_widget_new (manager, liwdg_widget_menu ());
 }
 
 /**
@@ -261,7 +266,7 @@ private_event (LIWdgMenu*  self,
 			break;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

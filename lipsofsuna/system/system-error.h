@@ -43,26 +43,22 @@ enum
 extern "C" {
 #endif
 
-void
-lisys_error_append (const char* format,
-                                ...);
+LIAPICALL (void, lisys_error_append, (
+	const char* format,
+	            ...));
 
-int
-lisys_error_peek ();
+LIAPICALL (int, lisys_error_peek, ());
 
-void
-lisys_error_report ();
+LIAPICALL (void, lisys_error_report, ());
 
-int
-lisys_error_get (const char** text);
+LIAPICALL (int, lisys_error_get, (const char** text));
 
-const char*
-lisys_error_get_string ();
+LIAPICALL (const char*, lisys_error_get_string, ());
 
-void
-lisys_error_set (int         type,
-                 const char* format,
-                             ...);
+LIAPICALL (void, lisys_error_set, (
+	int         type,
+	const char* format,
+	            ...));
 
 #ifdef __cplusplus
 }

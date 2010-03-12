@@ -26,6 +26,7 @@
 #define __SYSTEM_FILE_H__
 
 #include <stdio.h>
+#include "system-compiler.h"
 
 enum
 {
@@ -61,32 +62,32 @@ struct _LISysStat
 extern "C" {
 #endif
 
-int
-lisys_access (const char* path,
-              int         mode);
+LIAPICALL (int, lisys_access, (
+	const char* path,
+	int         mode));
 
-LISysMmap*
-lisys_mmap_open (const char* path);
+LIAPICALL (LISysMmap*, lisys_mmap_open, (
+	const char* path));
 
-void
-lisys_mmap_free (LISysMmap* self);
+LIAPICALL (void, lisys_mmap_free, (
+	LISysMmap* self));
 
-void*
-lisys_mmap_get_buffer (LISysMmap* self);
+LIAPICALL (void*, lisys_mmap_get_buffer, (
+	LISysMmap* self));
 
-int
-lisys_mmap_get_size (LISysMmap* self);
+LIAPICALL (int, lisys_mmap_get_size, (
+	LISysMmap* self));
 
-char*
-lisys_readlink (const char* path);
+LIAPICALL (char*, lisys_readlink, (
+	const char* path));
 
-int
-lisys_stat (const char* path,
-            LISysStat*  result);
+LIAPICALL (int, lisys_stat, (
+	const char* path,
+	LISysStat*  result));
 
-int
-lisys_lstat (const char* path,
-             LISysStat*  result);
+LIAPICALL (int, lisys_lstat, (
+	const char* path,
+	LISysStat*  result));
 
 #ifdef __cplusplus
 }

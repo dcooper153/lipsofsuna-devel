@@ -27,6 +27,7 @@
 
 #include <wchar.h>
 #include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
 
 #define LIFNT_CACHE_WIDTH 512
@@ -66,26 +67,26 @@ struct _LIFntFont
 	TTF_Font* font;
 };
 
-LIFntFont*
-lifnt_font_new (LIVidCalls* video,
-                const char* path,
-                int         size);
+LIAPICALL (LIFntFont*, lifnt_font_new, (
+	LIVidCalls* video,
+	const char* path,
+	int         size));
 
-void
-lifnt_font_free (LIFntFont* self);
+LIAPICALL (void, lifnt_font_free, (
+	LIFntFont* self));
 
-void
-lifnt_font_render (LIFntFont* self,
-                   int        x,
-                   int        y,
-                   wchar_t    glyph);
+LIAPICALL (void, lifnt_font_render, (
+	LIFntFont* self,
+	int        x,
+	int        y,
+	wchar_t    glyph));
 
-int
-lifnt_font_get_advance (LIFntFont* self,
-                        wchar_t    glyph);
+LIAPICALL (int, lifnt_font_get_advance, (
+	LIFntFont* self,
+	wchar_t    glyph));
 
-int
-lifnt_font_get_height (const LIFntFont* self);
+LIAPICALL (int, lifnt_font_get_height, (
+	const LIFntFont* self));
 
 #endif
 

@@ -26,6 +26,7 @@
 #define __CAL_CALLBACKS_H__
 
 #include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/system.h>
 #include "cal-handle.h"
 #include "cal-marshal.h"
 
@@ -49,37 +50,36 @@ struct _LICalCallbacks
 extern "C" {
 #endif
 
-LICalCallbacks*
-lical_callbacks_new ();
+LIAPICALL (LICalCallbacks*, lical_callbacks_new, ());
 
-void
-lical_callbacks_free (LICalCallbacks* self);
+LIAPICALL (void, lical_callbacks_free, (
+	LICalCallbacks* self));
 
-int
-lical_callbacks_call (LICalCallbacks* self,
-                      void*           object,
-                      const char*     type,
-                      licalMarshal    marshal,
-                                      ...);
+LIAPICALL (int, lical_callbacks_call, (
+	LICalCallbacks* self,
+	void*           object,
+	const char*     type,
+	licalMarshal    marshal,
+	                ...));
 
-int
-lical_callbacks_callva (LICalCallbacks* self,
-                        void*           object,
-                        const char*     type,
-                        licalMarshal    marshal,
-                        va_list         args);
+LIAPICALL (int, lical_callbacks_callva, (
+	LICalCallbacks* self,
+	void*           object,
+	const char*     type,
+	licalMarshal    marshal,
+	va_list         args));
 
-int
-lical_callbacks_insert (LICalCallbacks* self,
-                        void*           object,
-                        const char*     type,
-                        int             priority,
-                        void*           call,
-                        void*           data,
-                        LICalHandle*    result);
+LIAPICALL (int, lical_callbacks_insert, (
+	LICalCallbacks* self,
+	void*           object,
+	const char*     type,
+	int             priority,
+	void*           call,
+	void*           data,
+	LICalHandle*    result));
 
-void
-lical_callbacks_update (LICalCallbacks* self);
+LIAPICALL (void, lical_callbacks_update, (
+	LICalCallbacks* self));
 
 #ifdef __cplusplus
 }

@@ -128,6 +128,7 @@ lisys_module_new (const char* path,
 	if (self->handle == 0)
 	{
 		lisys_error_set (EIO, "error code %d", GetLastError ());
+		lisys_error_append ("cannot load module `%s'", path);
 		free (self);
 		return NULL;
 	}

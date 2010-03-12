@@ -42,46 +42,46 @@ struct _LIRelReload
 	void* reload_model_data;
 };
 
-LIRelReload*
-lirel_reload_new (LIPthPaths* paths);
+LIAPICALL (LIRelReload*, lirel_reload_new, (
+	LIPthPaths* paths));
 
-void
-lirel_reload_free (LIRelReload* self);
+LIAPICALL (void, lirel_reload_free, (
+	LIRelReload* self));
 
-void
-lirel_reload_cancel (LIRelReload* self);
+LIAPICALL (void, lirel_reload_cancel, (
+	LIRelReload* self));
 
-int
-lirel_reload_main (LIRelReload* self);
+LIAPICALL (int, lirel_reload_main, (
+	LIRelReload* self));
 
-int
-lirel_reload_run (LIRelReload* self);
+LIAPICALL (int, lirel_reload_run, (
+	LIRelReload* self));
 
-int
-lirel_reload_update (LIRelReload* self);
+LIAPICALL (int, lirel_reload_update, (
+	LIRelReload* self));
 
-int
-lirel_reload_get_done (const LIRelReload* self);
+LIAPICALL (int, lirel_reload_get_done, (
+	const LIRelReload* self));
 
-int
-lirel_reload_get_enabled (const LIRelReload* self);
+LIAPICALL (int, lirel_reload_get_enabled, (
+	const LIRelReload* self));
 
-int
-lirel_reload_set_enabled (LIRelReload* self,
-                          int          value);
+LIAPICALL (int, lirel_reload_set_enabled, (
+	LIRelReload* self,
+	int          value));
 
-void
-lirel_reload_set_image_callback (LIRelReload* self,
-                                 void       (*call)(),
-                                 void*        data);
+LIAPICALL (void, lirel_reload_set_image_callback, (
+	LIRelReload* self,
+	void       (*call)(),
+	void*        data));
 
-void
-lirel_reload_set_model_callback (LIRelReload* self,
-                                 void       (*call)(),
-                                 void*        data);
+LIAPICALL (void, lirel_reload_set_model_callback, (
+	LIRelReload* self,
+	void       (*call)(),
+	void*        data));
 
-float
-lirel_reload_get_progress (const LIRelReload* self);
+LIAPICALL (float, lirel_reload_get_progress, (
+	const LIRelReload* self));
 
 /**
  * @}
@@ -89,10 +89,10 @@ lirel_reload_get_progress (const LIRelReload* self);
  * @{
  */
 
-int
-lirel_reload_blender (LIRelReload* self,
-                      const char*  src,
-                      const char*  dst);
+LIAPICALL (int, lirel_reload_blender, (
+	LIRelReload* self,
+	const char*  src,
+	const char*  dst));
 
 /**
  * @}
@@ -100,10 +100,10 @@ lirel_reload_blender (LIRelReload* self,
  * @{
  */
 
-int
-lirel_reload_image (LIRelReload* self,
-                    const char*  src,
-                    const char*  dst);
+LIAPICALL (int, lirel_reload_image, (
+	LIRelReload* self,
+	const char*  src,
+	const char*  dst));
 
 /**
  * @}
@@ -111,10 +111,10 @@ lirel_reload_image (LIRelReload* self,
  * @{
  */
 
-int
-lirel_reload_gimp (LIRelReload* self,
-                   const char*  src,
-                   const char*  dst);
+LIAPICALL (int, lirel_reload_gimp, (
+	LIRelReload* self,
+	const char*  src,
+	const char*  dst));
 
 #endif
 

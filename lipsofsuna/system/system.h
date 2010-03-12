@@ -31,6 +31,7 @@
 #ifdef HAVE_TIME_H
 #include <time.h>
 #endif
+#include "system-compiler.h"
 
 #ifdef _WIN32
 #define LISYS_EXTENSION_DLL "dll"
@@ -40,11 +41,11 @@
 #define LISYS_EXTENSION_EXE ""
 #endif
 
-time_t lisys_time (time_t* t);
-char* lisys_system_get_path_home ();
-char* lisys_system_get_path_data_home ();
-char* lisys_system_get_path_config_home ();
-char* lisys_system_get_path_cache_home ();
+LIAPICALL (time_t, lisys_time, (time_t* t));
+LIAPICALL (char*, lisys_system_get_path_home, ());
+LIAPICALL (char*, lisys_system_get_path_data_home, ());
+LIAPICALL (char*, lisys_system_get_path_config_home, ());
+LIAPICALL (char*, lisys_system_get_path_cache_home, ());
 
 #endif
 

@@ -58,7 +58,8 @@ def configure(ctx):
 			pkgpaths.append(os.environ['PKG_CONFIG_PATH'])
 		os.environ['PKG_CONFIG_PATH'] = string.join(pkgpaths, ':')
 	ctx.env.CPPPATH_EXTENSION = ctx.env.CPPPATH_CORE
-	ctx.env.CPPFLAGS_EXTENSION = ctx.env.CPPFLAGS_CORE
+	ctx.env.CPPFLAGS_EXTENSION = list(ctx.env.CPPFLAGS_CORE)
+	ctx.env.CPPFLAGS_EXTENSION.append('-DDLL_EXPORT')
 	ctx.env.LIBPATH_EXTENSION = ctx.env.LIBPATH_CORE
 	ctx.env.LINKFLAGS_EXTENSION = ['-g']
 	ctx.env.CPPPATH_TEST = []
@@ -93,6 +94,10 @@ def configure(ctx):
 	ctx.check_cc(lib='dl', uselib_store='CORE')
 	ctx.check_cc(lib='m', uselib_store='CORE')
 	ctx.check_cc(lib='pthread', uselib_store='THREAD')
+	if ctx.is_defined('HAVE_WINDOWS_H'):
+		ctx.env.EXEEXT = '.exe'
+	else:
+		ctx.env.EXEEXT = ''
 	if True:
 		# zlib
 		ctx.check_cc(lib='z', mandatory=True, uselib_store='ZLIB')
@@ -133,7 +138,8 @@ def configure(ctx):
 		ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
 		# GL
 		ctx.check_cc(header_name='GL/gl.h', mandatory=True, uselib='CORE TEST', uselib_store='GL')
-		ctx.check_cc(lib='GL', mandatory=True, uselib='CORE TEST', uselib_store='GL')
+		if not ctx.check_cc(lib='GL', uselib='CORE TEST', uselib_store='GL'):
+			ctx.check_cc(lib='opengl32', mandatory=True, uselib='CORE TEST', uselib_store='GL')
 		# GLEW
 		ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
 		ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST GL', uselib_store='GLEW')
@@ -384,8 +390,8 @@ def build(ctx):
 		add_objects = 'sys_objs',
 		uselib = 'CORE THREAD')
 	ctx.set_group("install")
-	instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna')
-	ctx.install_as(instpath, 'lipsofsuna-bin', chmod = 0777)
+	instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna' + ctx.env.EXEEXT)
+	ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
 	ctx.set_group("build")
 	if ctx.env.SERVER:
 		ctx.new_task_gen(

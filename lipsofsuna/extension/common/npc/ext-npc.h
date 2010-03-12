@@ -25,8 +25,6 @@
 #ifndef __EXT_NPC_H__
 #define __EXT_NPC_H__
 
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/system.h>
 #include "ext-module.h"
 
 struct _LIExtNpc

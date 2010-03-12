@@ -39,20 +39,25 @@ private_event (LIWdgLabel* self,
 static void
 private_rebuild (LIWdgLabel* self);
 
-const LIWdgClass liwdg_widget_label =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Label", sizeof (LIWdgLabel),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_label ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Label", sizeof (LIWdgLabel),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_label_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_label);
+	return liwdg_widget_new (manager, liwdg_widget_label ());
 }
 
 LIWdgWidget*
@@ -212,7 +217,7 @@ private_event (LIWdgLabel* self,
 			return 1;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

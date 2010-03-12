@@ -24,8 +24,6 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/script.h>
 #include "ext-module.h"
 
 /* @luadoc
@@ -292,7 +290,7 @@ static void Effect_system (LIScrArgs* args)
 
 void
 liext_script_effect (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EFFECT, data);
 	liscr_class_insert_cfunc (self, "particle", Effect_particle);

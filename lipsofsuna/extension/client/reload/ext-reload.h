@@ -27,13 +27,8 @@
 #ifndef __EXT_RELOAD_H__
 #define __EXT_RELOAD_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/reload.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/thread.h>
-#include <lipsofsuna/widget.h>
+#include "ext-module.h"
 
-typedef struct _LIExtReload LIExtReload;
 struct _LIExtReload
 {
 	int queued;

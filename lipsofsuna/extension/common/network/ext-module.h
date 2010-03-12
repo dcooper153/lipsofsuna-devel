@@ -27,8 +27,8 @@
 
 #include <pthread.h>
 #include <grapple/grapple.h>
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/server.h>
+#include <lipsofsuna/network.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_NETWORK "Network"
 

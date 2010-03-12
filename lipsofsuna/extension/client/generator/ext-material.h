@@ -27,12 +27,7 @@
 #ifndef __EXT_MATERIAL_H__
 #define __EXT_MATERIAL_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/generator.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/widget.h>
 #include "ext-module.h"
-#include "ext-preview.h"
 
 #define LIEXT_MATERIAL(o) ((LIExtMaterial*)(o))
 
@@ -66,7 +61,8 @@ struct _LIExtMaterial
 	} widgets;
 };
 
-extern const LIWdgClass liext_widget_material;
+const LIWdgClass*
+liext_widget_material ();
 
 LIWdgWidget*
 liext_material_new (LIWdgManager* manager,

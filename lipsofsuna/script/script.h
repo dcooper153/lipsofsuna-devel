@@ -31,44 +31,43 @@
 #include <lipsofsuna/system.h>
 #include "script-types.h"
 
-LIScrScript*
-liscr_script_new ();
+LIAPICALL (LIScrScript*, liscr_script_new, ());
 
-int
-liscr_script_load (LIScrScript* self,
-                   const char*  path);
+LIAPICALL (int, liscr_script_load, (
+	LIScrScript* self,
+	const char*  path));
 
-void
-liscr_script_free (LIScrScript* self);
+LIAPICALL (void, liscr_script_free, (
+	LIScrScript* self));
 
-LIScrClass*
-liscr_script_create_class (LIScrScript*   self,
-                           const char*    name,
-                           LIScrClassInit init,
-                           void*          data);
+LIAPICALL (LIScrClass*, liscr_script_create_class, (
+	LIScrScript*   self,
+	const char*    name,
+	LIScrClassInit init,
+	void*          data));
 
-LIScrClass*
-liscr_script_find_class (LIScrScript* self,
-                         const char*  name);
+LIAPICALL (LIScrClass*, liscr_script_find_class, (
+	LIScrScript* self,
+	const char*  name));
 
-int
-liscr_script_insert_class (LIScrScript* self,
-                           LIScrClass*  clss);
+LIAPICALL (int, liscr_script_insert_class, (
+	LIScrScript* self,
+	LIScrClass*  clss));
 
-void
-liscr_script_update (LIScrScript* self,
-                     float        secs);
+LIAPICALL (void, liscr_script_update, (
+	LIScrScript* self,
+	float        secs));
 
-void
-liscr_script_set_gc (LIScrScript* self,
-                     int          value);
+LIAPICALL (void, liscr_script_set_gc, (
+	LIScrScript* self,
+	int          value));
 
-void*
-liscr_script_get_userdata (LIScrScript* self);
+LIAPICALL (void*, liscr_script_get_userdata, (
+	LIScrScript* self));
 
-void
-liscr_script_set_userdata (LIScrScript* self,
-                           void*        data);
+LIAPICALL (void, liscr_script_set_userdata, (
+	LIScrScript* self,
+	void*        data));
 
 #endif
 

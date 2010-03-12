@@ -24,6 +24,7 @@
  * @{
  */
 
+#include "ext-module.h"
 #include "ext-preview.h"
 #include "ext-block.h"
 
@@ -42,9 +43,6 @@ enum
 	LIEXT_PREVIEW_MODE_TRANSLATEY,
 	LIEXT_PREVIEW_MODE_TRANSLATEZ
 };
-
-static const void*
-private_base ();
 
 static int
 private_init (LIExtPreview* self,
@@ -75,13 +73,19 @@ private_render_preview (LIWdgWidget*  widget,
 
 /****************************************************************************/
 
-const LIWdgClass liext_widget_preview =
+const LIWdgClass*
+liext_widget_preview ()
 {
-	LIWDG_BASE_DYNAMIC, private_base, "GeneratorPreview", sizeof (LIExtPreview),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event
-};
+	static LIWdgClass clss =
+	{
+		NULL, "GeneratorPreview", sizeof (LIExtPreview),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event
+	};
+	clss.base = liwdg_widget_render;
+	return &clss;
+}
 
 LIWdgWidget*
 liext_preview_new (LIWdgManager* manager,
@@ -94,7 +98,7 @@ liext_preview_new (LIWdgManager* manager,
 	LIWdgWidget* self;
 
 	/* Allocate self. */
-	self = liwdg_widget_new (manager, &liext_widget_preview);
+	self = liwdg_widget_new (manager, liext_widget_preview ());
 	if (self == NULL)
 		return NULL;
 	data = LIEXT_PREVIEW (self);
@@ -600,12 +604,6 @@ liext_preview_get_transform (LIExtPreview*   self,
 
 /****************************************************************************/
 
-static const void*
-private_base ()
-{
-	return &liwdg_widget_render;
-}
-
 static int
 private_init (LIExtPreview* self,
               LIWdgManager* manager)
@@ -783,7 +781,7 @@ private_event (LIExtPreview* self,
 		liren_light_set_transform (self->light1, &transform);
 	}
 
-	return liwdg_widget_render.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_render ()->event (LIWDG_WIDGET (self), event);
 }
 
 static int

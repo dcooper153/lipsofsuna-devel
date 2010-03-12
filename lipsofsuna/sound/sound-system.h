@@ -28,6 +28,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LISndSystem LISndSystem;
 struct _LISndSystem
@@ -36,18 +37,16 @@ struct _LISndSystem
 	ALCcontext* context;
 };
 
-LISndSystem*
-lisnd_system_new ();
+LIAPICALL (LISndSystem*, lisnd_system_new, ());
 
-void
-lisnd_system_free (LISndSystem* self);
+LIAPICALL (void, lisnd_system_free, (LISndSystem* self));
 
-void
-lisnd_system_set_listener (LISndSystem*       self,
-                           const LIMatVector* pos,
-                           const LIMatVector* vel,
-                           const LIMatVector* dir,
-                           const LIMatVector* up);
+LIAPICALL (void, lisnd_system_set_listener, (
+	LISndSystem*       self,
+	const LIMatVector* pos,
+	const LIMatVector* vel,
+	const LIMatVector* dir,
+	const LIMatVector* up));
 
 #endif
 

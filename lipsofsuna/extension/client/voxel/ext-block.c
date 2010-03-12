@@ -25,6 +25,7 @@
  */
 
 #include "ext-module.h"
+#include "ext-block.h"
 
 LIExtBlock*
 liext_block_new (LIExtModule* module)

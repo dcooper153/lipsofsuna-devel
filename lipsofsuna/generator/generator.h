@@ -57,64 +57,64 @@ struct _LIGenGenerator
 	} strokes;
 };
 
-LIGenGenerator*
-ligen_generator_new (LIPthPaths*     paths,
-                     LICalCallbacks* callbacks,
-                     LIAlgSectors*   sectors);
+LIAPICALL (LIGenGenerator*, ligen_generator_new, (
+	LIPthPaths*     paths,
+	LICalCallbacks* callbacks,
+	LIAlgSectors*   sectors));
 
-void
-ligen_generator_free (LIGenGenerator* self);
+LIAPICALL (void, ligen_generator_free, (
+	LIGenGenerator* self));
 
-void
-ligen_generator_clear_scene (LIGenGenerator* self);
+LIAPICALL (void, ligen_generator_clear_scene, (
+	LIGenGenerator* self));
 
-LIGenBrush*
-ligen_generator_find_brush (LIGenGenerator* self,
-                            int             id);
+LIAPICALL (LIGenBrush*, ligen_generator_find_brush, (
+	LIGenGenerator* self,
+	int             id));
 
-LIGenBrush*
-ligen_generator_find_brush_by_name (LIGenGenerator* self,
-                                    const char*     name);
+LIAPICALL (LIGenBrush*, ligen_generator_find_brush_by_name, (
+	LIGenGenerator* self,
+	const char*     name));
 
-int
-ligen_generator_insert_brush (LIGenGenerator* self,
-                              LIGenBrush*     brush);
+LIAPICALL (int, ligen_generator_insert_brush, (
+	LIGenGenerator* self,
+	LIGenBrush*     brush));
 
-int
-ligen_generator_insert_stroke (LIGenGenerator* self,
-                               int             brush,
-                               int             x,
-                               int             y,
-                               int             z);
+LIAPICALL (int, ligen_generator_insert_stroke, (
+	LIGenGenerator* self,
+	int             brush,
+	int             x,
+	int             y,
+	int             z));
 
-int
-ligen_generator_load_materials (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_load_materials, (
+	LIGenGenerator* self));
 
-int
-ligen_generator_main (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_main, (
+	LIGenGenerator* self));
 
-int
-ligen_generator_rebuild_scene (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_rebuild_scene, (
+	LIGenGenerator* self));
 
-void
-ligen_generator_remove_brush (LIGenGenerator* self,
-                              int             id);
+LIAPICALL (void, ligen_generator_remove_brush, (
+	LIGenGenerator* self,
+	int             id));
 
-int
-ligen_generator_step (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_step, (
+	LIGenGenerator* self));
 
-int
-ligen_generator_write (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_write, (
+	LIGenGenerator* self));
 
-int
-ligen_generator_write_brushes (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_write_brushes, (
+	LIGenGenerator* self));
 
-int
-ligen_generator_write_materials (LIGenGenerator* self);
+LIAPICALL (int, ligen_generator_write_materials, (
+	LIGenGenerator* self));
 
-void
-ligen_generator_set_fill (LIGenGenerator* self,
-                          int             fill);
+LIAPICALL (void, ligen_generator_set_fill, (
+	LIGenGenerator* self,
+	int             fill));
 
 #endif
 

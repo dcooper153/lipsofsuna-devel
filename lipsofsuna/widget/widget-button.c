@@ -39,20 +39,25 @@ private_event (LIWdgButton* self,
 static void
 private_rebuild (LIWdgButton* self);
 
-const LIWdgClass liwdg_widget_button =
-{
-	LIWDG_BASE_STATIC, &liwdg_widget_widget, "Button", sizeof (LIWdgButton),
-	(LIWdgWidgetInitFunc) private_init,
-	(LIWdgWidgetFreeFunc) private_free,
-	(LIWdgWidgetEventFunc) private_event,
-};
-
 /****************************************************************************/
+
+const LIWdgClass*
+liwdg_widget_button ()
+{
+	static const LIWdgClass clss =
+	{
+		liwdg_widget_widget, "Button", sizeof (LIWdgButton),
+		(LIWdgWidgetInitFunc) private_init,
+		(LIWdgWidgetFreeFunc) private_free,
+		(LIWdgWidgetEventFunc) private_event,
+	};
+	return &clss;
+}
 
 LIWdgWidget*
 liwdg_button_new (LIWdgManager* manager)
 {
-	return liwdg_widget_new (manager, &liwdg_widget_button);
+	return liwdg_widget_new (manager, liwdg_widget_button ());
 }
 
 LIFntFont*
@@ -87,6 +92,7 @@ liwdg_button_set_text (LIWdgButton* self,
 	lisys_free (self->string);
 	self->string = tmp;
 	private_rebuild (self);
+
 	return 1;
 }
 
@@ -162,7 +168,7 @@ private_event (LIWdgButton* self,
 			break;
 	}
 
-	return liwdg_widget_widget.event (LIWDG_WIDGET (self), event);
+	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
 static void

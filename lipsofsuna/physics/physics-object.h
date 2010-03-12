@@ -35,167 +35,167 @@
 extern "C" {
 #endif
 
-LIPhyObject*
-liphy_object_new (LIPhyPhysics*    physics,
-                  uint32_t         id,
-                  LIPhyShape*      shape,
-                  LIPhyControlMode control_mode);
+LIAPICALL (LIPhyObject*, liphy_object_new, (
+	LIPhyPhysics*    physics,
+	uint32_t         id,
+	LIPhyShape*      shape,
+	LIPhyControlMode control_mode));
 
-void
-liphy_object_free (LIPhyObject* self);
+LIAPICALL (void, liphy_object_free, (
+	LIPhyObject* self));
 
-void
-liphy_object_clear_shape (LIPhyObject* self);
+LIAPICALL (void, liphy_object_clear_shape, (
+	LIPhyObject* self));
 
-void
-liphy_object_impulse (LIPhyObject*       self,
-                      const LIMatVector* point,
-                      const LIMatVector* impulse);
+LIAPICALL (void, liphy_object_impulse, (
+	LIPhyObject*       self,
+	const LIMatVector* point,
+	const LIMatVector* impulse));
 
-int
-liphy_object_insert_shape (LIPhyObject*          self,
-                           LIPhyShape*           shape,
-                           const LIMatTransform* transform);
+LIAPICALL (int, liphy_object_insert_shape, (
+	LIPhyObject*          self,
+	LIPhyShape*           shape,
+	const LIMatTransform* transform));
 
-void
-liphy_object_jump (LIPhyObject*       self,
-                   const LIMatVector* impulse);
+LIAPICALL (void, liphy_object_jump, (
+	LIPhyObject*       self,
+	const LIMatVector* impulse));
 
-LIPhyObject*
-liphy_object_scan_sphere (LIPhyObject*       self,
-                          const LIMatVector* relctr,
-                          float              radius);
+LIAPICALL (LIPhyObject*, liphy_object_scan_sphere, (
+	LIPhyObject*       self,
+	const LIMatVector* relctr,
+	float              radius));
 
-float
-liphy_object_sweep (const LIPhyObject* self,
-                    const LIMatVector* sweep);
+LIAPICALL (float, liphy_object_sweep, (
+	const LIPhyObject* self,
+	const LIMatVector* sweep));
 
-int
-liphy_object_sweep_sphere (LIPhyObject*       self,
-                           const LIMatVector* relsrc,
-                           const LIMatVector* reldst,
-                           float              radius,
-                           LIPhyCollision*    result);
+LIAPICALL (int, liphy_object_sweep_sphere, (
+	LIPhyObject*       self,
+	const LIMatVector* relsrc,
+	const LIMatVector* reldst,
+	float              radius,
+	LIPhyCollision*    result));
 
-void
-liphy_object_get_angular (const LIPhyObject* self,
-                          LIMatVector*       value);
+LIAPICALL (void, liphy_object_get_angular, (
+	const LIPhyObject* self,
+	LIMatVector*       value));
 
-void
-liphy_object_set_angular (LIPhyObject*       self,
-                          const LIMatVector* value);
+LIAPICALL (void, liphy_object_set_angular, (
+	LIPhyObject*       self,
+	const LIMatVector* value));
 
-int
-liphy_object_get_collision_group (const LIPhyObject* self);
+LIAPICALL (int, liphy_object_get_collision_group, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_collision_group (LIPhyObject* self,
-                                  int          mask);
+LIAPICALL (void, liphy_object_set_collision_group, (
+	LIPhyObject* self,
+	int          mask));
 
-int
-liphy_object_get_collision_mask (const LIPhyObject* self);
+LIAPICALL (int, liphy_object_get_collision_mask, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_collision_mask (LIPhyObject* self,
-                                 int          mask);
+LIAPICALL (void, liphy_object_set_collision_mask, (
+	LIPhyObject* self,
+	int          mask));
 
-void
-liphy_object_set_contact_call (LIPhyObject*     self,
-                               LIPhyContactCall value);
+LIAPICALL (void, liphy_object_set_contact_call, (
+	LIPhyObject*     self,
+	LIPhyContactCall value));
 
-LIPhyControlMode
-liphy_object_get_control_mode (const LIPhyObject* self);
+LIAPICALL (LIPhyControlMode, liphy_object_get_control_mode, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_control_mode (LIPhyObject*     self,
-                               LIPhyControlMode value);
+LIAPICALL (void, liphy_object_set_control_mode, (
+	LIPhyObject*     self,
+	LIPhyControlMode value));
 
-LIPhyPhysics*
-liphy_object_get_engine (LIPhyObject* self);
+LIAPICALL (LIPhyPhysics*, liphy_object_get_engine, (
+	LIPhyObject* self));
 
-void
-liphy_object_get_gravity (const LIPhyObject* self,
-                          LIMatVector*       value);
+LIAPICALL (void, liphy_object_get_gravity, (
+	const LIPhyObject* self,
+	LIMatVector*       value));
 
-void
-liphy_object_set_gravity (const LIPhyObject* self,
-                          const LIMatVector* value);
+LIAPICALL (void, liphy_object_set_gravity, (
+	const LIPhyObject* self,
+	const LIMatVector* value));
 
-int
-liphy_object_get_ground (const LIPhyObject* self);
+LIAPICALL (int, liphy_object_get_ground, (
+	const LIPhyObject* self));
 
-void
-liphy_object_get_inertia (LIPhyObject* self,
-                          LIMatVector* result);
+LIAPICALL (void, liphy_object_get_inertia, (
+	LIPhyObject* self,
+	LIMatVector* result));
 
-float
-liphy_object_get_mass (const LIPhyObject* self);
+LIAPICALL (float, liphy_object_get_mass, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_mass (LIPhyObject* self,
-                       float        value);
+LIAPICALL (void, liphy_object_set_mass, (
+	LIPhyObject* self,
+	float        value));
 
-float
-liphy_object_get_movement (const LIPhyObject* self);
+LIAPICALL (float, liphy_object_get_movement, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_movement (LIPhyObject* self,
-                           float        value);
+LIAPICALL (void, liphy_object_set_movement, (
+	LIPhyObject* self,
+	float        value));
 
-int
-liphy_object_get_realized (const LIPhyObject* self);
+LIAPICALL (int, liphy_object_get_realized, (
+	const LIPhyObject* self));
 
-int
-liphy_object_set_realized (LIPhyObject* self,
-                           int          value);
+LIAPICALL (int, liphy_object_set_realized, (
+	LIPhyObject* self,
+	int          value));
 
-void
-liphy_object_set_rotating (LIPhyObject* self,
-                           float        value);
+LIAPICALL (void, liphy_object_set_rotating, (
+	LIPhyObject* self,
+	float        value));
 
-float
-liphy_object_get_strafing (const LIPhyObject* self);
+LIAPICALL (float, liphy_object_get_strafing, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_strafing (LIPhyObject* self,
-                           float        value);
+LIAPICALL (void, liphy_object_set_strafing, (
+	LIPhyObject* self,
+	float        value));
 
-float
-liphy_object_get_speed (const LIPhyObject* self);
+LIAPICALL (float, liphy_object_get_speed, (
+	const LIPhyObject* self));
 
-void
-liphy_object_set_speed (LIPhyObject* self,
-                        float        value);
+LIAPICALL (void, liphy_object_set_speed, (
+	LIPhyObject* self,
+	float        value));
 
-void
-liphy_object_get_transform (const LIPhyObject* self,
-                            LIMatTransform*    value);
+LIAPICALL (void, liphy_object_get_transform, (
+	const LIPhyObject* self,
+	LIMatTransform*    value));
 
-void
-liphy_object_set_transform (LIPhyObject*          self,
-                            const LIMatTransform* value);
+LIAPICALL (void, liphy_object_set_transform, (
+	LIPhyObject*          self,
+	const LIMatTransform* value));
 
-liphyCallback
-liphy_object_get_usercall (LIPhyObject* self);
+LIAPICALL (liphyCallback, liphy_object_get_usercall, (
+	LIPhyObject* self));
 
-void
-liphy_object_set_usercall (LIPhyObject*  self,
-                           liphyCallback value);
+LIAPICALL (void, liphy_object_set_usercall, (
+	LIPhyObject*  self,
+	liphyCallback value));
 
-void*
-liphy_object_get_userdata (LIPhyObject* self);
+LIAPICALL (void*, liphy_object_get_userdata, (
+	LIPhyObject* self));
 
-void
-liphy_object_set_userdata (LIPhyObject* self,
-                           void*        value);
+LIAPICALL (void, liphy_object_set_userdata, (
+	LIPhyObject* self,
+	void*        value));
 
-void
-liphy_object_get_velocity (LIPhyObject* self,
-                           LIMatVector* value);
+LIAPICALL (void, liphy_object_get_velocity, (
+	LIPhyObject* self,
+	LIMatVector* value));
 
-void
-liphy_object_set_velocity (LIPhyObject*       self,
-                           const LIMatVector* value);
+LIAPICALL (void, liphy_object_set_velocity, (
+	LIPhyObject*       self,
+	const LIMatVector* value));
 
 #ifdef __cplusplus
 }

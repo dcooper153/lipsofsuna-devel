@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-object.h"
 #include "render-types.h"
@@ -53,39 +54,39 @@ struct _LIRenGroup
 	} lights;
 };
 
-LIRenGroup*
-liren_group_new (LIRenScene* scene);
+LIAPICALL (LIRenGroup*, liren_group_new, (
+	LIRenScene* scene));
 
-void
-liren_group_free (LIRenGroup* self);
+LIAPICALL (void, liren_group_free, (
+	LIRenGroup* self));
 
-void
-liren_group_clear (LIRenGroup* self);
+LIAPICALL (void, liren_group_clear, (
+	LIRenGroup* self));
 
-int
-liren_group_insert_model (LIRenGroup*     self,
-                          LIRenModel*     model,
-                          LIMatTransform* transform);
+LIAPICALL (int, liren_group_insert_model, (
+	LIRenGroup*     self,
+	LIRenModel*     model,
+	LIMatTransform* transform));
 
-void
-liren_group_reload_model (LIRenGroup* self,
-                          LIRenModel* model_old,
-                          LIRenModel* model_new);
+LIAPICALL (void, liren_group_reload_model, (
+	LIRenGroup* self,
+	LIRenModel* model_old,
+	LIRenModel* model_new));
 
-void
-liren_group_update (LIRenGroup* self,
-                    float       secs);
+LIAPICALL (void, liren_group_update, (
+	LIRenGroup* self,
+	float       secs));
 
-void
-liren_group_get_bounds (const LIRenGroup* self,
-                        LIMatAabb*        result);
+LIAPICALL (void, liren_group_get_bounds, (
+	const LIRenGroup* self,
+	LIMatAabb*        result));
 
-int
-liren_group_get_realized (const LIRenGroup* self);
+LIAPICALL (int, liren_group_get_realized, (
+	const LIRenGroup* self));
 
-int
-liren_group_set_realized (LIRenGroup* self,
-                          int         value);
+LIAPICALL (int, liren_group_set_realized, (
+	LIRenGroup* self,
+	int         value));
 
 #endif
 

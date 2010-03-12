@@ -28,6 +28,9 @@
 #define __EXT_MODULE_H__
 
 #include <lipsofsuna/client.h>
+#include <lipsofsuna/generator.h>
+#include <lipsofsuna/widget.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_GENERATOR "Generator"
 
@@ -36,6 +39,7 @@ typedef struct _LIExtEditor LIExtEditor;
 typedef struct _LIExtMaterial LIExtMaterial;
 typedef struct _LIExtMaterials LIExtMaterials;
 typedef struct _LIExtModule LIExtModule;
+typedef struct _LIExtPreview LIExtPreview;
 
 struct _LIExtModule
 {
@@ -57,7 +61,7 @@ liext_module_save (LIExtModule* self);
 
 void
 liext_script_generator (LIScrClass* self,
-                      void*       data);
+                        void*       data);
 
 #endif
 

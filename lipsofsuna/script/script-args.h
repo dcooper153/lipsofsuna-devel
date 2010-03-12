@@ -25,6 +25,7 @@
 #ifndef __SCRIPT_ARGS_H__
 #define __SCRIPT_ARGS_H__
 
+#include <lipsofsuna/system.h>
 #include "script-types.h"
 
 enum
@@ -56,220 +57,220 @@ struct _LIScrArgs
 	int output_table;
 };
 
-void
-liscr_args_init_func (LIScrArgs*  self,
-                      lua_State*  lua,
-                      LIScrClass* clss,
-                      LIScrData*  data);
+LIAPICALL (void, liscr_args_init_func, (
+	LIScrArgs*  self,
+	lua_State*  lua,
+	LIScrClass* clss,
+	LIScrData*  data));
 
-void
-liscr_args_init_getter (LIScrArgs*  self,
-                        lua_State*  lua,
-                        LIScrClass* clss,
-                        LIScrData*  data);
+LIAPICALL (void, liscr_args_init_getter, (
+	LIScrArgs*  self,
+	lua_State*  lua,
+	LIScrClass* clss,
+	LIScrData*  data));
 
-void
-liscr_args_init_setter (LIScrArgs*  self,
-                        lua_State*  lua,
-                        LIScrClass* clss,
-                        LIScrData*  data);
+LIAPICALL (void, liscr_args_init_setter, (
+	LIScrArgs*  self,
+	lua_State*  lua,
+	LIScrClass* clss,
+	LIScrData*  data));
 
-void
-liscr_args_call_setters (LIScrArgs* self,
-                         LIScrData* data);
+LIAPICALL (void, liscr_args_call_setters, (
+	LIScrArgs* self,
+	LIScrData* data));
 
-void
-liscr_args_call_setters_except (LIScrArgs*  self,
-                                LIScrData*  data,
-                                const char* except);
+LIAPICALL (void, liscr_args_call_setters_except, (
+	LIScrArgs*  self,
+	LIScrData*  data,
+	const char* except));
 
-int
-liscr_args_geti_bool (LIScrArgs*  self,
-                      int         index,
-                      int*        result);
+LIAPICALL (int, liscr_args_geti_bool, (
+	LIScrArgs*  self,
+	int         index,
+	int*        result));
 
-int
-liscr_args_geti_class (LIScrArgs*   self,
-                       int          index,
-                       const char*  type,
-                       LIScrClass** result);
+LIAPICALL (int, liscr_args_geti_class, (
+	LIScrArgs*   self,
+	int          index,
+	const char*  type,
+	LIScrClass** result));
 
-int
-liscr_args_geti_data (LIScrArgs*  self,
-                      int         index,
-                      const char* type,
-                      LIScrData** result);
+LIAPICALL (int, liscr_args_geti_data, (
+	LIScrArgs*  self,
+	int         index,
+	const char* type,
+	LIScrData** result));
 
-int
-liscr_args_geti_float (LIScrArgs*  self,
-                       int         index,
-                       float*      result);
+LIAPICALL (int, liscr_args_geti_float, (
+	LIScrArgs*  self,
+	int         index,
+	float*      result));
 
-int
-liscr_args_geti_int (LIScrArgs*  self,
-                     int         index,
-                     int*        result);
+LIAPICALL (int, liscr_args_geti_int, (
+	LIScrArgs*  self,
+	int         index,
+	int*        result));
 
-int
-liscr_args_geti_quaternion (LIScrArgs*       self,
-                            int              index,
-                            LIMatQuaternion* result);
+LIAPICALL (int, liscr_args_geti_quaternion, (
+	LIScrArgs*       self,
+	int              index,
+	LIMatQuaternion* result));
 
-int
-liscr_args_geti_string (LIScrArgs*   self,
-                        int          index,
-                        const char** result);
+LIAPICALL (int, liscr_args_geti_string, (
+	LIScrArgs*   self,
+	int          index,
+	const char** result));
 
-int
-liscr_args_geti_vector (LIScrArgs*   self,
-                        int          index,
-                        LIMatVector* result);
+LIAPICALL (int, liscr_args_geti_vector, (
+	LIScrArgs*   self,
+	int          index,
+	LIMatVector* result));
 
-int
-liscr_args_gets_bool (LIScrArgs*  self,
-                      const char* name,
-                      int*        result);
+LIAPICALL (int, liscr_args_gets_bool, (
+	LIScrArgs*  self,
+	const char* name,
+	int*        result));
 
-int
-liscr_args_gets_class (LIScrArgs*   self,
-                       const char*  name,
-                       const char*  type,
-                       LIScrClass** result);
+LIAPICALL (int, liscr_args_gets_class, (
+	LIScrArgs*   self,
+	const char*  name,
+	const char*  type,
+	LIScrClass** result));
 
-int
-liscr_args_gets_data (LIScrArgs*  self,
-                      const char* name,
-                      const char* type,
-                      LIScrData** result);
+LIAPICALL (int, liscr_args_gets_data, (
+	LIScrArgs*  self,
+	const char* name,
+	const char* type,
+	LIScrData** result));
 
-int
-liscr_args_gets_float (LIScrArgs*  self,
-                       const char* name,
-                       float*      result);
+LIAPICALL (int, liscr_args_gets_float, (
+	LIScrArgs*  self,
+	const char* name,
+	float*      result));
 
-int
-liscr_args_gets_floatv (LIScrArgs*  self,
-                        const char* name,
-                        int         count,
-                        float*      result);
+LIAPICALL (int, liscr_args_gets_floatv, (
+	LIScrArgs*  self,
+	const char* name,
+	int         count,
+	float*      result));
 
-int
-liscr_args_gets_int (LIScrArgs*  self,
-                     const char* name,
-                     int*        result);
+LIAPICALL (int, liscr_args_gets_int, (
+	LIScrArgs*  self,
+	const char* name,
+	int*        result));
 
-int
-liscr_args_gets_quaternion (LIScrArgs*       self,
-                            const char*      name,
-                            LIMatQuaternion* result);
+LIAPICALL (int, liscr_args_gets_quaternion, (
+	LIScrArgs*       self,
+	const char*      name,
+	LIMatQuaternion* result));
 
-int
-liscr_args_gets_string (LIScrArgs*   self,
-                        const char*  name,
-                        const char** result);
+LIAPICALL (int, liscr_args_gets_string, (
+	LIScrArgs*   self,
+	const char*  name,
+	const char** result));
 
-int
-liscr_args_gets_vector (LIScrArgs*   self,
-                        const char*  name,
-                        LIMatVector* result);
+LIAPICALL (int, liscr_args_gets_vector, (
+	LIScrArgs*   self,
+	const char*  name,
+	LIMatVector* result));
 
-void
-liscr_args_set_output (LIScrArgs* self,
-                       int        value);
+LIAPICALL (void, liscr_args_set_output, (
+	LIScrArgs* self,
+	int        value));
 
-void
-liscr_args_setf_data (LIScrArgs* self,
-                      double     name,
-                      LIScrData* value);
+LIAPICALL (void, liscr_args_setf_data, (
+	LIScrArgs* self,
+	double     name,
+	LIScrData* value));
 
-void
-liscr_args_setf_float (LIScrArgs* self,
-                       double     name,
-                       double     value);
+LIAPICALL (void, liscr_args_setf_float, (
+	LIScrArgs* self,
+	double     name,
+	double     value));
 
-void
-liscr_args_setf_string (LIScrArgs*  self,
-                        double      name,
-                        const char* value);
+LIAPICALL (void, liscr_args_setf_string, (
+	LIScrArgs*  self,
+	double      name,
+	const char* value));
 
-void
-liscr_args_seti_bool (LIScrArgs* self,
-                      int        value);
+LIAPICALL (void, liscr_args_seti_bool, (
+	LIScrArgs* self,
+	int        value));
 
-void
-liscr_args_seti_class (LIScrArgs*  self,
-                       LIScrClass* value);
+LIAPICALL (void, liscr_args_seti_class, (
+	LIScrArgs*  self,
+	LIScrClass* value));
 
-void
-liscr_args_seti_data (LIScrArgs* self,
-                      LIScrData* value);
+LIAPICALL (void, liscr_args_seti_data, (
+	LIScrArgs* self,
+	LIScrData* value));
 
-void
-liscr_args_seti_float (LIScrArgs* self,
-                       float      value);
+LIAPICALL (void, liscr_args_seti_float, (
+	LIScrArgs* self,
+	float      value));
 
-void
-liscr_args_seti_int (LIScrArgs* self,
-                     int        value);
+LIAPICALL (void, liscr_args_seti_int, (
+	LIScrArgs* self,
+	int        value));
 
-void
-liscr_args_seti_quaternion (LIScrArgs*             self,
-                            const LIMatQuaternion* value);
+LIAPICALL (void, liscr_args_seti_quaternion, (
+	LIScrArgs*             self,
+	const LIMatQuaternion* value));
 
-void
-liscr_args_seti_stack (LIScrArgs* self);
+LIAPICALL (void, liscr_args_seti_stack, (
+	LIScrArgs* self));
 
-void
-liscr_args_seti_string (LIScrArgs*  self,
-                        const char* value);
+LIAPICALL (void, liscr_args_seti_string, (
+	LIScrArgs*  self,
+	const char* value));
 
-void
-liscr_args_seti_vector (LIScrArgs*         self,
-                        const LIMatVector* value);
+LIAPICALL (void, liscr_args_seti_vector, (
+	LIScrArgs*         self,
+	const LIMatVector* value));
 
-void
-liscr_args_sets_bool (LIScrArgs*  self,
-                      const char* name,
-                      int         value);
+LIAPICALL (void, liscr_args_sets_bool, (
+	LIScrArgs*  self,
+	const char* name,
+	int         value));
 
-void
-liscr_args_sets_class (LIScrArgs*  self,
-                       const char* name,
-                       LIScrClass* value);
+LIAPICALL (void, liscr_args_sets_class, (
+	LIScrArgs*  self,
+	const char* name,
+	LIScrClass* value));
 
-void
-liscr_args_sets_data (LIScrArgs*  self,
-                      const char* name,
-                      LIScrData*  value);
+LIAPICALL (void, liscr_args_sets_data, (
+	LIScrArgs*  self,
+	const char* name,
+	LIScrData*  value));
 
-void
-liscr_args_sets_float (LIScrArgs*  self,
-                       const char* name,
-                       float       value);
+LIAPICALL (void, liscr_args_sets_float, (
+	LIScrArgs*  self,
+	const char* name,
+	float       value));
 
-void
-liscr_args_sets_int (LIScrArgs*  self,
-                     const char* name,
-                     int         value);
+LIAPICALL (void, liscr_args_sets_int, (
+	LIScrArgs*  self,
+	const char* name,
+	int         value));
 
-void
-liscr_args_sets_quaternion (LIScrArgs*             self,
-                            const char*            name,
-                            const LIMatQuaternion* value);
+LIAPICALL (void, liscr_args_sets_quaternion, (
+	LIScrArgs*             self,
+	const char*            name,
+	const LIMatQuaternion* value));
 
-void
-liscr_args_sets_stack (LIScrArgs*  self,
-                       const char* name);
+LIAPICALL (void, liscr_args_sets_stack, (
+	LIScrArgs*  self,
+	const char* name));
 
-void
-liscr_args_sets_string (LIScrArgs*  self,
-                        const char* name,
-                        const char* value);
+LIAPICALL (void, liscr_args_sets_string, (
+	LIScrArgs*  self,
+	const char* name,
+	const char* value));
 
-void
-liscr_args_sets_vector (LIScrArgs*         self,
-                        const char*        name,
-                        const LIMatVector* value);
+LIAPICALL (void, liscr_args_sets_vector, (
+	LIScrArgs*         self,
+	const char*        name,
+	const LIMatVector* value));
 
 /*****************************************************************************/
 

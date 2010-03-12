@@ -27,7 +27,9 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/widget.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_BUTTON "Button"
 #define LIEXT_SCRIPT_ENTRY "Entry"

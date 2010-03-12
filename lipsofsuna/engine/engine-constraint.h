@@ -26,6 +26,7 @@
 #define __ENGINE_CONSTRAINT_H__
 
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "engine-types.h"
 
 struct _LIEngConstraint
@@ -37,27 +38,27 @@ struct _LIEngConstraint
 	LIMdlNode* nodes[2];
 };
 
-LIEngConstraint*
-lieng_constraint_new (LIEngObject* first_object,
-                      const char*  first_anchor,
-                      LIEngObject* second_object,
-                      const char*  second_anchor);
+LIAPICALL (LIEngConstraint*, lieng_constraint_new, (
+	LIEngObject* first_object,
+	const char*  first_anchor,
+	LIEngObject* second_object,
+	const char*  second_anchor));
 
-void
-lieng_constraint_free (LIEngConstraint* self);
+LIAPICALL (void, lieng_constraint_free, (
+	LIEngConstraint* self));
 
-void
-lieng_constraint_update (LIEngConstraint* self,
-                         float            secs);
+LIAPICALL (void, lieng_constraint_update, (
+	LIEngConstraint* self,
+	float            secs));
 
-void
-lieng_constraint_rebuild (LIEngConstraint* self);
+LIAPICALL (void, lieng_constraint_rebuild, (
+	LIEngConstraint* self));
 
-void
-lieng_constraint_get_transform (LIEngConstraint* self,
-                                int              index,
-                                LIEngMatrix      type,
-                                LIMatTransform*  value);
+LIAPICALL (void, lieng_constraint_get_transform, (
+	LIEngConstraint* self,
+	int              index,
+	LIEngMatrix      type,
+	LIMatTransform*  value));
 
 /** @} */
 /** @} */

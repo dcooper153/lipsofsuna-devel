@@ -37,12 +37,13 @@
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
+#include "system-compiler.h"
 
-uint16_t
-lisys_htons (uint16_t value);
+LIAPICALL (uint16_t, lisys_htons, (
+	uint16_t value));
 
-uint32_t
-lisys_htonl (uint32_t value);
+LIAPICALL (uint32_t, lisys_htonl, (
+	uint32_t value));
 
 #endif
 

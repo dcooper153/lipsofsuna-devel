@@ -26,6 +26,7 @@
 #define __CLIENT_SCRIPT_H__
 
 #include <lipsofsuna/script.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/widget.h>
 
 #define LICLI_SCRIPT_ACTION "Action"
@@ -38,45 +39,45 @@
 #define LICLI_SCRIPT_WIDGET "Widget"
 #define LICLI_SCRIPT_WINDOW "Window"
 
-void
-licli_script_action (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, licli_script_action, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_binding (LIScrClass* self,
-                      void*       data);
+LIAPICALL (void, licli_script_binding, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_client (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, licli_script_client, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_extension (LIScrClass* self,
-                        void*       data);
+LIAPICALL (void, licli_script_extension, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_group (LIScrClass* self,
-                    void*       data);
+LIAPICALL (void, licli_script_group, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_light (LIScrClass* self,
-                    void*       data);
+LIAPICALL (void, licli_script_light, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_object (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, licli_script_object, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_scene (LIScrClass* self,
-                    void*       data);
+LIAPICALL (void, licli_script_scene, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_widget (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, licli_script_widget, (
+	LIScrClass* self,
+	void*       data));
 
-void
-licli_script_window (LIScrClass* self,
-                     void*       data);
+LIAPICALL (void, licli_script_window, (
+	LIScrClass* self,
+	void*       data));
 
 #endif
 

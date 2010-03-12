@@ -27,12 +27,8 @@
 #ifndef __EXT_EDITOR_H__
 #define __EXT_EDITOR_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/generator.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/widget.h>
-#include "ext-materials.h"
 #include "ext-module.h"
+#include "ext-materials.h"
 
 #define LIEXT_EDITOR(o) ((LIExtEditor*)(o))
 
@@ -53,7 +49,8 @@ struct _LIExtEditor
 	LIWdgWidget* materials;
 };
 
-extern const LIWdgClass liext_widget_editor;
+const LIWdgClass*
+liext_widget_editor ();
 
 LIWdgWidget*
 liext_editor_new (LIWdgManager* manager,

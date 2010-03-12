@@ -25,15 +25,12 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/main.h>
+#include <lipsofsuna/server.h>
 #include <lipsofsuna/voxel.h>
+#include <lipsofsuna/extension.h>
 
 typedef struct _LIExtBlock LIExtBlock;
 typedef struct _LIExtModule LIExtModule;
-
-#include "ext-block.h"
 
 #define LIEXT_SCRIPT_MATERIAL "Material"
 #define LIEXT_SCRIPT_TILE "Tile"

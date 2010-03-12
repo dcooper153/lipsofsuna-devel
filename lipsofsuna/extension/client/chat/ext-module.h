@@ -27,7 +27,8 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/script.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_CHAT_HISTORY "ChatHistory"
 

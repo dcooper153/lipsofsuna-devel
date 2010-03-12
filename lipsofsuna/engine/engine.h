@@ -66,68 +66,68 @@ struct _LIEngEngine
 	} range;
 };
 
-LIEngEngine*
-lieng_engine_new (LICalCallbacks* calls,
-                  LIAlgSectors*   sectors,
-                  const char*     path);
+LIAPICALL (LIEngEngine*, lieng_engine_new, (
+	LICalCallbacks* calls,
+	LIAlgSectors*   sectors,
+	const char*     path));
 
-void
-lieng_engine_free (LIEngEngine* self);
+LIAPICALL (void, lieng_engine_free, (
+	LIEngEngine* self));
 
-int
-lieng_engine_check_unique (LIEngEngine* self,
-                           uint32_t     id);
+LIAPICALL (int, lieng_engine_check_unique, (
+	LIEngEngine* self,
+	uint32_t     id));
 
-void
-lieng_engine_clear_selection (LIEngEngine* self);
+LIAPICALL (void, lieng_engine_clear_selection, (
+	LIEngEngine* self));
 
-LIEngModel*
-lieng_engine_find_model_by_name (LIEngEngine* self,
-                                 const char*  name);
+LIAPICALL (LIEngModel*, lieng_engine_find_model_by_name, (
+	LIEngEngine* self,
+	const char*  name));
 
-LIEngObject*
-lieng_engine_find_object (LIEngEngine* self,
-                          uint32_t     id);
+LIAPICALL (LIEngObject*, lieng_engine_find_object, (
+	LIEngEngine* self,
+	uint32_t     id));
 
-void
-lieng_engine_insert_constraint (LIEngEngine*     self,
-                                LIEngConstraint* constraint);
+LIAPICALL (void, lieng_engine_insert_constraint, (
+	LIEngEngine*     self,
+	LIEngConstraint* constraint));
 
-int
-lieng_engine_load_model (LIEngEngine* self,
-                         const char*  name);
+LIAPICALL (int, lieng_engine_load_model, (
+	LIEngEngine* self,
+	const char*  name));
 
-void
-lieng_engine_remove_constraint (LIEngEngine*     self,
-                                LIEngConstraint* constraint);
+LIAPICALL (void, lieng_engine_remove_constraint, (
+	LIEngEngine*     self,
+	LIEngConstraint* constraint));
 
-void
-lieng_engine_update (LIEngEngine* self,
-                     float        secs);
+LIAPICALL (void, lieng_engine_update, (
+	LIEngEngine* self,
+	float        secs));
 
-int
-lieng_engine_get_flags (const LIEngEngine* self);
+LIAPICALL (int, lieng_engine_get_flags, (
+	const LIEngEngine* self));
 
-void
-lieng_engine_set_flags (LIEngEngine* self,
-                        int          flags);
+LIAPICALL (void, lieng_engine_set_flags, (
+	LIEngEngine* self,
+	int          flags));
 
-void
-lieng_engine_set_local_range (LIEngEngine* self,
-                              uint32_t     start,
-                              uint32_t     end);
+LIAPICALL (void, lieng_engine_set_local_range, (
+	LIEngEngine* self,
+	uint32_t     start,
+	uint32_t     end));
 
-void
-lieng_engine_set_unique_object_call (LIEngEngine* self,
-                                     void*        call,
-                                     void*        data);
+LIAPICALL (void, lieng_engine_set_unique_object_call, (
+	LIEngEngine* self,
+	void*        call,
+	void*        data));
 
-void*
-lieng_engine_get_userdata (LIEngEngine* self);
+LIAPICALL (void*, lieng_engine_get_userdata, (
+	LIEngEngine* self));
 
-void
-lieng_engine_set_userdata (LIEngEngine* self,
-                           void*        value);
+LIAPICALL (void, lieng_engine_set_userdata, (
+	LIEngEngine* self,
+	void*        value));
 
 #endif
 

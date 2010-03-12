@@ -35,29 +35,29 @@
 extern "C" {
 #endif
 
-LIPhyShape*
-liphy_shape_new (LIPhyPhysics*     physics,
-                 const LIMdlModel* model);
+LIAPICALL (LIPhyShape*, liphy_shape_new, (
+	LIPhyPhysics*     physics,
+	const LIMdlModel* model));
 
-LIPhyShape*
-liphy_shape_new_aabb (LIPhyPhysics*    physics,
-                      const LIMatAabb* aabb);
+LIAPICALL (LIPhyShape*, liphy_shape_new_aabb, (
+	LIPhyPhysics*    physics,
+	const LIMatAabb* aabb));
 
-LIPhyShape*
-liphy_shape_new_convex (LIPhyPhysics*      physics,
-                        const LIMatVector* vertices,
-                        int                count);
+LIAPICALL (LIPhyShape*, liphy_shape_new_convex, (
+	LIPhyPhysics*      physics,
+	const LIMatVector* vertices,
+	int                count));
 
-void
-liphy_shape_free (LIPhyShape* self);
+LIAPICALL (void, liphy_shape_free, (
+	LIPhyShape* self));
 
-void
-liphy_shape_ref (LIPhyShape* self);
+LIAPICALL (void, liphy_shape_ref, (
+	LIPhyShape* self));
 
-void
-liphy_shape_get_inertia (const LIPhyShape* self,
-                         float             mass,
-                         LIMatVector*      result);
+LIAPICALL (void, liphy_shape_get_inertia, (
+	const LIPhyShape* self,
+	float             mass,
+	LIMatVector*      result));
 
 #ifdef __cplusplus
 }

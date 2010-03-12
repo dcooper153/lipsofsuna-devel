@@ -25,6 +25,8 @@
 #ifndef __GENERATOR_RULE_H__
 #define __GENERATOR_RULE_H__
 
+#include <lipsofsuna/system.h>
+
 enum
 {
 	LIGEN_RULE_GENERATE = 0x00,
@@ -52,30 +54,29 @@ struct _LIGenRule
 	} strokes;
 };
 
-LIGenRule*
-ligen_rule_new ();
+LIAPICALL (LIGenRule*, ligen_rule_new, ());
 
-LIGenRule*
-ligen_rule_new_copy (LIGenRule* rule);
+LIAPICALL (LIGenRule*, ligen_rule_new_copy, (
+	LIGenRule* rule));
 
-void
-ligen_rule_free (LIGenRule* self);
+LIAPICALL (void, ligen_rule_free, (
+	LIGenRule* self));
 
-int
-ligen_rule_insert_stroke (LIGenRule* self,
-                          int        x,
-                          int        y,
-                          int        z,
-                          int        flags,
-                          int        brush);
+LIAPICALL (int, ligen_rule_insert_stroke, (
+	LIGenRule* self,
+	int        x,
+	int        y,
+	int        z,
+	int        flags,
+	int        brush));
 
-void
-ligen_rule_remove_stroke (LIGenRule* self,
-                          int        index);
+LIAPICALL (void, ligen_rule_remove_stroke, (
+	LIGenRule* self,
+	int        index));
 
-int
-ligen_rule_set_name (LIGenRule*  self,
-                     const char* value);
+LIAPICALL (int, ligen_rule_set_name, (
+	LIGenRule*  self,
+	const char* value));
 
 #endif
 

@@ -187,17 +187,24 @@ limai_program_insert_extension (LIMaiProgram* self,
 	if (module != NULL)
 		return 1;
 
-	/* Construct full path. */
+	/* Open module file. */
 	path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,
 		"lib", name, ".", LISYS_EXTENSION_DLL, NULL);
 	if (path == NULL)
 		return 0;
-
-	/* Open module file. */
 	module = lisys_module_new (path, 0);
 	lisys_free (path);
 	if (module == NULL)
-		goto error;
+	{
+		path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,
+			name, ".", LISYS_EXTENSION_DLL, NULL);
+		if (path == NULL)
+			return 0;
+		module = lisys_module_new (path, 0);
+		lisys_free (path);
+		if (module == NULL)
+			goto error;
+	}
 
 	/* Find module info. */
 	info = lisys_module_symbol (module, "liext_info");

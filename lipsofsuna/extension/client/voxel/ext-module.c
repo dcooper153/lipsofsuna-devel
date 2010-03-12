@@ -24,8 +24,8 @@
  * @{
  */
 
-#include <lipsofsuna/client.h>
 #include "ext-module.h"
+#include "ext-block.h"
 
 static int
 private_block_free (LIExtModule*      self,

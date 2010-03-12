@@ -25,8 +25,7 @@
 #ifndef __EXT_RESOURCES_H__
 #define __EXT_RESOURCES_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/model.h>
+#include "ext-module.h"
 
 typedef struct _LIExtFile LIExtFile;
 struct _LIExtFile

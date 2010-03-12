@@ -26,6 +26,7 @@
 #define __PARTICLE_POINT_H__
 
 #include <lipsofsuna/math.h>
+#include <lipsofsuna/system.h>
 
 typedef struct _LIParPoint LIParPoint;
 struct _LIParPoint
@@ -41,14 +42,14 @@ struct _LIParPoint
 	LIParPoint* next;
 };
 
-void
-lipar_point_init (LIParPoint*        self,
-                  const LIMatVector* position,
-                  const LIMatVector* velocity);
+LIAPICALL (void, lipar_point_init, (
+	LIParPoint*        self,
+	const LIMatVector* position,
+	const LIMatVector* velocity));
 
-void
-lipar_point_get_color (const LIParPoint* self,
-                       float*            color);
+LIAPICALL (void, lipar_point_get_color, (
+	const LIParPoint* self,
+	float*            color));
 
 #endif
 

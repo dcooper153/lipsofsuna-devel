@@ -68,7 +68,7 @@ static void Speech_add (LIScrArgs* args)
 
 void
 liext_script_speech (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);
 	liscr_class_insert_cfunc (self, "add", Speech_add);

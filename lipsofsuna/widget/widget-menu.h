@@ -25,6 +25,7 @@
 #ifndef __WIDGET_MENU_H__
 #define __WIDGET_MENU_H__
 
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_MENU(o) ((LIWdgMenu*)(o))
@@ -32,43 +33,43 @@
 typedef struct _LIWdgMenu LIWdgMenu;
 typedef struct _LIWdgMenuItem LIWdgMenuItem;
 
-extern const LIWdgClass liwdg_widget_menu;
+LIAPICALL (const LIWdgClass*, liwdg_widget_menu, ());
 
-LIWdgWidget*
-liwdg_menu_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_menu_new, (
+	LIWdgManager* manager));
 
-int
-liwdg_menu_insert_item (LIWdgMenu*   self,
-                        const char*  label,
-                        const char*  icon,
-                        liwdgHandler call,
-                        void*        data);
+LIAPICALL (int, liwdg_menu_insert_item, (
+	LIWdgMenu*   self,
+	const char*  label,
+	const char*  icon,
+	liwdgHandler call,
+	void*        data));
 
-int
-liwdg_menu_get_autohide (const LIWdgMenu* self);
+LIAPICALL (int, liwdg_menu_get_autohide, (
+	const LIWdgMenu* self));
 
-void
-liwdg_menu_set_autohide (LIWdgMenu* self,
-                         int        value);
+LIAPICALL (void, liwdg_menu_set_autohide, (
+	LIWdgMenu* self,
+	int        value));
 
-LIWdgMenuItem*
-liwdg_menu_get_item (const LIWdgMenu* self,
-                     int              index);
+LIAPICALL (LIWdgMenuItem*, liwdg_menu_get_item, (
+	const LIWdgMenu* self,
+	int              index));
 
-int
-liwdg_menu_get_item_count (const LIWdgMenu* self);
+LIAPICALL (int, liwdg_menu_get_item_count, (
+	const LIWdgMenu* self));
 
-int
-liwdg_menu_get_item_rect (const LIWdgMenu* self,
-                          const char*      name,
-                          LIWdgRect*       value);
+LIAPICALL (int, liwdg_menu_get_item_rect, (
+	const LIWdgMenu* self,
+	const char*      name,
+	LIWdgRect*       value));
 
-int
-liwdg_menu_get_vertical (const LIWdgMenu* self);
+LIAPICALL (int, liwdg_menu_get_vertical, (
+	const LIWdgMenu* self));
 
-void
-liwdg_menu_set_vertical (LIWdgMenu* self,
-                         int        value);
+LIAPICALL (void, liwdg_menu_set_vertical, (
+	LIWdgMenu* self,
+	int        value));
 
 #endif
 

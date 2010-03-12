@@ -25,15 +25,15 @@
 #ifndef __SYSTEM_RELATIVE_H__
 #define __SYSTEM_RELATIVE_H__
 
+#include "system-compiler.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-char*
-lisys_relative_exename ();
+LIAPICALL (char*, lisys_relative_exename, ());
 
-char*
-lisys_relative_exedir ();
+LIAPICALL (char*, lisys_relative_exedir, ());
 
 #ifdef __cplusplus
 }

@@ -22,6 +22,8 @@
  * @{
  */
 
+#include "system-compiler.h"
+
 enum
 {
 	LISYS_MODULE_FLAG_GLOBAL  = 0x01,
@@ -30,20 +32,20 @@ enum
 
 typedef struct _LISysModule LISysModule;
 
-LISysModule*
-lisys_module_new (const char* path,
-                  int         flags);
+LIAPICALL (LISysModule*, lisys_module_new, (
+	const char* path,
+	int         flags));
 
-void
-lisys_module_free (LISysModule* self);
+LIAPICALL (void, lisys_module_free, (
+	LISysModule* self));
 
-void*
-lisys_module_symbol (LISysModule* self,
-                     const char*  name);
+LIAPICALL (void*, lisys_module_symbol, (
+	LISysModule* self,
+	const char*  name));
 
-void*
-lisys_module_global_symbol (const char* module,
-                            const char* name);
+LIAPICALL (void*, lisys_module_global_symbol, (
+	const char* module,
+	const char* name));
 
 /** @} */
 /** @} */

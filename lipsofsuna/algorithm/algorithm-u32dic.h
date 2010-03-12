@@ -61,38 +61,37 @@ struct _LIAlgU32dicIter
 extern "C" {
 #endif
 
-LIAlgU32dic*
-lialg_u32dic_new ();
+LIAPICALL (LIAlgU32dic*, lialg_u32dic_new, ());
 
-void
-lialg_u32dic_free (LIAlgU32dic* self);
+LIAPICALL (void, lialg_u32dic_free, (
+	LIAlgU32dic* self));
 
-void
-lialg_u32dic_clear (LIAlgU32dic* self);
+LIAPICALL (void, lialg_u32dic_clear, (
+	LIAlgU32dic* self));
 
-void*
-lialg_u32dic_find (LIAlgU32dic* self,
-                   uint32_t     key);
+LIAPICALL (void*, lialg_u32dic_find, (
+	LIAlgU32dic* self,
+	uint32_t     key));
 
-LIAlgU32dicNode*
-lialg_u32dic_find_node (LIAlgU32dic* self,
-                        uint32_t     key);
+LIAPICALL (LIAlgU32dicNode*, lialg_u32dic_find_node, (
+	LIAlgU32dic* self,
+	uint32_t     key));
 
-LIAlgU32dicNode*
-lialg_u32dic_insert (LIAlgU32dic* self,
-                     uint32_t     key,
-                     void*        value);
+LIAPICALL (LIAlgU32dicNode*, lialg_u32dic_insert, (
+	LIAlgU32dic* self,
+	uint32_t     key,
+	void*        value));
 
-int
-lialg_u32dic_remove (LIAlgU32dic* self,
-                     uint32_t     key);
+LIAPICALL (int, lialg_u32dic_remove, (
+	LIAlgU32dic* self,
+	uint32_t     key));
 
-void
-lialg_u32dic_remove_node (LIAlgU32dic*     self,
-                          LIAlgU32dicNode* node);
+LIAPICALL (void, lialg_u32dic_remove_node, (
+	LIAlgU32dic*     self,
+	LIAlgU32dicNode* node));
 
-uint32_t
-lialg_u32dic_unique_key (const LIAlgU32dic* self);
+LIAPICALL (uint32_t, lialg_u32dic_unique_key, (
+	const LIAlgU32dic* self));
 
 #ifdef __cplusplus
 }

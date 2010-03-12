@@ -26,6 +26,7 @@
 #define __RENDER_LIGHTING_H__
 
 #include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
 #include "render.h"
 #include "render-light.h"
@@ -37,22 +38,22 @@ struct _LIRenLighting
 	LIRenRender* render;
 };
 
-LIRenLighting*
-liren_lighting_new (LIRenRender* render);
+LIAPICALL (LIRenLighting*, liren_lighting_new, (
+	LIRenRender* render));
 
-void
-liren_lighting_free (LIRenLighting* self);
+LIAPICALL (void, liren_lighting_free, (
+	LIRenLighting* self));
 
-int
-liren_lighting_insert_light (LIRenLighting* self,
-                             LIRenLight*    light);
+LIAPICALL (int, liren_lighting_insert_light, (
+	LIRenLighting* self,
+	LIRenLight*    light));
 
-void
-liren_lighting_remove_light (LIRenLighting* self,
-                             LIRenLight*    light);
+LIAPICALL (void, liren_lighting_remove_light, (
+	LIRenLighting* self,
+	LIRenLight*    light));
 
-void
-liren_lighting_update (LIRenLighting* self);
+LIAPICALL (void, liren_lighting_update, (
+	LIRenLighting* self));
 
 #endif
 

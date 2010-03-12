@@ -26,6 +26,7 @@
 #define __WIDGET_SCROLL_H__
 
 #include <lipsofsuna/font.h>
+#include <lipsofsuna/system.h>
 #include "widget.h"
 
 #define LIWDG_SCROLL(o) ((LIWdgScroll*)(o))
@@ -41,29 +42,29 @@ struct _LIWdgScroll
 	float value;
 };
 
-extern const LIWdgClass liwdg_widget_scroll;
+LIAPICALL (const LIWdgClass*, liwdg_widget_scroll, ());
 
-LIWdgWidget*
-liwdg_scroll_new (LIWdgManager* manager);
+LIAPICALL (LIWdgWidget*, liwdg_scroll_new, (
+	LIWdgManager* manager));
 
-LIFntFont*
-liwdg_scroll_get_font (LIWdgScroll* self);
+LIAPICALL (LIFntFont*, liwdg_scroll_get_font, (
+	LIWdgScroll* self));
 
-void
-liwdg_scroll_set_font (LIWdgScroll* self,
-                       LIFntFont*   font);
+LIAPICALL (void, liwdg_scroll_set_font, (
+	LIWdgScroll* self,
+	LIFntFont*   font));
 
-void
-liwdg_scroll_set_range (LIWdgScroll* self,
-                        float        min,
-                        float        max);
+LIAPICALL (void, liwdg_scroll_set_range, (
+	LIWdgScroll* self,
+	float        min,
+	float        max));
 
-float
-liwdg_scroll_get_value (LIWdgScroll* self);
+LIAPICALL (float, liwdg_scroll_get_value, (
+	LIWdgScroll* self));
 
-void
-liwdg_scroll_set_value (LIWdgScroll* self,
-                        float        value);
+LIAPICALL (void, liwdg_scroll_set_value, (
+	LIWdgScroll* self,
+	float        value));
 
 #endif
 

@@ -26,6 +26,7 @@
 #define __WIDGET_H__
 
 #include <SDL.h>
+#include <lipsofsuna/system.h>
 #include "widget-class.h"
 #include "widget-event.h"
 #include "widget-manager.h"
@@ -53,146 +54,146 @@ struct _LIWdgWidget
 	unsigned int visible : 1;
 };
 
-extern const LIWdgClass liwdg_widget_widget;
+LIAPICALL (const LIWdgClass*, liwdg_widget_widget, ());
 
-LIWdgWidget*
-liwdg_widget_new (LIWdgManager*     manager,
-                  const LIWdgClass* clss);
+LIAPICALL (LIWdgWidget*, liwdg_widget_new, (
+	LIWdgManager*     manager,
+	const LIWdgClass* clss));
 
-void
-liwdg_widget_free (LIWdgWidget* self);
+LIAPICALL (void, liwdg_widget_free, (
+	LIWdgWidget* self));
 
-int
-liwdg_widget_connect (LIWdgWidget* self,
-                      const char*  type,
-                      void*        func,
-                      void*        data,
-                      LICalHandle* handle);
+LIAPICALL (int, liwdg_widget_connect, (
+	LIWdgWidget* self,
+	const char*  type,
+	void*        func,
+	void*        data,
+	LICalHandle* handle));
 
-int
-liwdg_widget_detach (LIWdgWidget* self);
+LIAPICALL (int, liwdg_widget_detach, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_draw (LIWdgWidget* self);
+LIAPICALL (void, liwdg_widget_draw, (
+	LIWdgWidget* self));
 
-int
-liwdg_widget_event (LIWdgWidget* self,
-                    LIWdgEvent*  event);
+LIAPICALL (int, liwdg_widget_event, (
+	LIWdgWidget* self,
+	LIWdgEvent*  event));
 
-int
-liwdg_widget_insert_callback (LIWdgWidget* self,
-                              const char*  type,
-                              void*        func,
-                              void*        data);
+LIAPICALL (int, liwdg_widget_insert_callback, (
+	LIWdgWidget* self,
+	const char*  type,
+	void*        func,
+	void*        data));
 
-int
-liwdg_widget_insert_callback_full (LIWdgWidget* self,
-                                   const char*  type,
-                                   int          priority,
-                                   void*        func,
-                                   void*        data,
-                                   LICalHandle* handle);
+LIAPICALL (int, liwdg_widget_insert_callback_full, (
+	LIWdgWidget* self,
+	const char*  type,
+	int          priority,
+	void*        func,
+	void*        data,
+	LICalHandle* handle));
 
-void
-liwdg_widget_move (LIWdgWidget* self,
-                   int          x,
-                   int          y);
+LIAPICALL (void, liwdg_widget_move, (
+	LIWdgWidget* self,
+	int          x,
+	int          y));
 
-void
-liwdg_widget_paint (LIWdgWidget* self,
-                    LIWdgRect*   rect);
+LIAPICALL (void, liwdg_widget_paint, (
+	LIWdgWidget* self,
+	LIWdgRect*   rect));
 
-void
-liwdg_widget_translate_coords (LIWdgWidget* self,
-                               int          screenx,
-                               int          screeny,
-                               int*         widgetx,
-                               int*         widgety);
+LIAPICALL (void, liwdg_widget_translate_coords, (
+	LIWdgWidget* self,
+	int          screenx,
+	int          screeny,
+	int*         widgetx,
+	int*         widgety));
 
-int
-liwdg_widget_typeis (const LIWdgWidget* self,
-                     const LIWdgClass*  clss);
+LIAPICALL (int, liwdg_widget_typeis, (
+	const LIWdgWidget* self,
+	const LIWdgClass*  clss));
 
-void
-liwdg_widget_update (LIWdgWidget* self,
-                     float        secs);
+LIAPICALL (void, liwdg_widget_update, (
+	LIWdgWidget* self,
+	float        secs));
 
-void
-liwdg_widget_get_allocation (LIWdgWidget* self,
-                             LIWdgRect*   allocation);
+LIAPICALL (void, liwdg_widget_get_allocation, (
+	LIWdgWidget* self,
+	LIWdgRect*   allocation));
 
-void
-liwdg_widget_set_allocation (LIWdgWidget* self,
-                             int          x,
-                             int          y,
-                             int          w,
-                             int          h);
+LIAPICALL (void, liwdg_widget_set_allocation, (
+	LIWdgWidget* self,
+	int          x,
+	int          y,
+	int          w,
+	int          h));
 
-void
-liwdg_widget_get_content (LIWdgWidget* self,
-                          LIWdgRect*   allocation);
+LIAPICALL (void, liwdg_widget_get_content, (
+	LIWdgWidget* self,
+	LIWdgRect*   allocation));
 
-int
-liwdg_widget_get_grab (const LIWdgWidget* self);
+LIAPICALL (int, liwdg_widget_get_grab, (
+	const LIWdgWidget* self));
 
-void
-liwdg_widget_set_grab (LIWdgWidget* self,
-                       int          value);
+LIAPICALL (void, liwdg_widget_set_grab, (
+	LIWdgWidget* self,
+	int          value));
 
-int
-liwdg_widget_get_focusable (LIWdgWidget* self);
+LIAPICALL (int, liwdg_widget_get_focusable, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_set_focusable (LIWdgWidget* self,
-                            int          value);
+LIAPICALL (void, liwdg_widget_set_focusable, (
+	LIWdgWidget* self,
+	int          value));
 
-int
-liwdg_widget_get_focused (LIWdgWidget* self);
+LIAPICALL (int, liwdg_widget_get_focused, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_set_focused (LIWdgWidget* self);
+LIAPICALL (void, liwdg_widget_set_focused, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_get_request (LIWdgWidget* self,
-                          LIWdgSize*   request);
+LIAPICALL (void, liwdg_widget_get_request, (
+	LIWdgWidget* self,
+	LIWdgSize*   request));
 
-void
-liwdg_widget_set_request (LIWdgWidget* self,
-                          int          w,
-                          int          h);
+LIAPICALL (void, liwdg_widget_set_request, (
+	LIWdgWidget* self,
+	int          w,
+	int          h));
 
-void
-liwdg_widget_set_request_internal (LIWdgWidget* self,
-                                   int          w,
-                                   int          h);
+LIAPICALL (void, liwdg_widget_set_request_internal, (
+	LIWdgWidget* self,
+	int          w,
+	int          h));
 
-LIWdgWidget*
-liwdg_widget_get_root (LIWdgWidget* self);
+LIAPICALL (LIWdgWidget*, liwdg_widget_get_root, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_set_state (LIWdgWidget* self,
-                        const char*  state);
+LIAPICALL (void, liwdg_widget_set_state, (
+	LIWdgWidget* self,
+	const char*  state));
 
-LIWdgStyle*
-liwdg_widget_get_style (LIWdgWidget* self);
+LIAPICALL (LIWdgStyle*, liwdg_widget_get_style, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_set_style (LIWdgWidget* self,
-                        const char*  style);
+LIAPICALL (void, liwdg_widget_set_style, (
+	LIWdgWidget* self,
+	const char*  style));
 
-void*
-liwdg_widget_get_userdata (LIWdgWidget* self);
+LIAPICALL (void*, liwdg_widget_get_userdata, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_set_userdata (LIWdgWidget* self,
-                           void*        value);
+LIAPICALL (void, liwdg_widget_set_userdata, (
+	LIWdgWidget* self,
+	void*        value));
 
-int
-liwdg_widget_get_visible (LIWdgWidget* self);
+LIAPICALL (int, liwdg_widget_get_visible, (
+	LIWdgWidget* self));
 
-void
-liwdg_widget_set_visible (LIWdgWidget* self,
-                          int          visible);
+LIAPICALL (void, liwdg_widget_set_visible, (
+	LIWdgWidget* self,
+	int          visible));
 
 #endif
 
