@@ -436,12 +436,14 @@ def build(ctx):
 	def buildext(ctx, pth, suf, use):
 		dirs = ctx.path.ant_glob(pth + '*', excl=[pth + '.*'], dir=True, src=False, bld=False)
 		for ext in dirs.replace(pth, '').split(' '):
-			ctx.new_task_gen(
-				features = 'cc cshlib',
-				source = ctx.path.ant_glob(os.path.join(pth, ext, '*.c')),
-				target = ext + suf,
-				install_path = ctx.env.EXTSDIR,
-				uselib = use)
+			srcs = ctx.path.ant_glob(os.path.join(pth, ext, '*.c'))
+			if srcs:
+				ctx.new_task_gen(
+					features = 'cc cshlib',
+					source = srcs,
+					target = ext + suf,
+					install_path = ctx.env.EXTSDIR,
+					uselib = use)
 	if ctx.env.CLIENT or ctx.env.SERVER:
 		buildext(ctx, 'lipsofsuna/extension/common/', '', 'EXTENSION LUA SQLITE GRAPPLE ZLIB THREAD')
 	if ctx.env.CLIENT:
