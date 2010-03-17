@@ -154,6 +154,19 @@ lisnd_source_set_looping (LISndSource* self,
 }
 
 /**
+ * \brief Sets the pitch multiplier of the source.
+ *
+ * \param self Sound source.
+ * \param value Pitch multiplier.
+ */
+void
+lisnd_source_set_pitch (LISndSource* self,
+                        float        value)
+{
+	alSourcef (self->source, AL_PITCH, value);
+}
+
+/**
  * \brief Checks if the source is in playing state.
  *
  * \param self Sound source.

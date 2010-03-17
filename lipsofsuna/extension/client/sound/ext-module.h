@@ -59,7 +59,7 @@ LISndSample*
 liext_module_find_sample (LIExtModule* self,
                           const char*  name);
 
-int
+LISndSource*
 liext_module_set_effect (LIExtModule* self,
                          uint32_t     object,
                          const char*  effect,

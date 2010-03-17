@@ -58,6 +58,10 @@ LIAPICALL (void, lisnd_source_set_looping, (
 	LISndSource* self,
 	int          looping));
 
+LIAPICALL (void, lisnd_source_set_pitch, (
+	LISndSource* self,
+	float        value));
+
 LIAPICALL (int, lisnd_source_get_playing, (
 	LISndSource* self));
 

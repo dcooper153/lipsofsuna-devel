@@ -160,7 +160,7 @@ liext_module_find_sample (LIExtModule* self,
 	return 0;
 }
 
-int
+LISndSource*
 liext_module_set_effect (LIExtModule* self,
                          uint32_t     object,
                          const char*  effect,
@@ -176,16 +176,19 @@ liext_module_set_effect (LIExtModule* self,
 
 	/* Find sample. */
 	if (self->sound == NULL)
-		return 1;
+	{
+		lisys_error_set (ENOTSUP, "no sound support");
+		return NULL;
+	}
 	sample = liext_module_find_sample (self, effect);
 	if (sample == NULL)
-		return 0;
+		return NULL;
 
 	/* Find engine object. */
 	create = 0;
 	engobj = lieng_engine_find_object (self->client->engine, object);
 	if (engobj == NULL)
-		return 0;
+		return NULL;
 
 	/* Find or create sound object. */
 	extobj = lialg_u32dic_find (self->objects, object);
@@ -194,11 +197,11 @@ liext_module_set_effect (LIExtModule* self,
 		create = 1;
 		extobj = liext_object_new ();
 		if (extobj == NULL)
-			return 0;
+			return NULL;
 		if (!lialg_u32dic_insert (self->objects, object, extobj))
 		{
 			liext_object_free (extobj);
-			return 0;
+			return NULL;
 		}
 	}
 
@@ -211,7 +214,7 @@ liext_module_set_effect (LIExtModule* self,
 			lialg_u32dic_remove (self->objects, object);
 			liext_object_free (extobj);
 		}
-		return 0;
+		return NULL;
 	}
 	if (!lialg_list_prepend (&extobj->sounds, source))
 	{
@@ -221,7 +224,7 @@ liext_module_set_effect (LIExtModule* self,
 			liext_object_free (extobj);
 		}
 		lisnd_source_free (source);
-		return 0;
+		return NULL;
 	}
 
 	/* Set properties. */
@@ -233,7 +236,7 @@ liext_module_set_effect (LIExtModule* self,
 		lisnd_source_set_looping (source, 1);
 	lisnd_source_set_playing (source, 1);
 
-	return 1;
+	return source;
 }
 
 int

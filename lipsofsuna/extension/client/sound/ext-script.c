@@ -41,6 +41,8 @@
  * -- Arguments.
  * -- effect: Sample string. (required)
  * -- object: Object. (required)
+ * -- pitch: Pitch shift multiplier.
+ * -- volume: Volume multiplier.
  * --
  * -- @param self Sound class.
  * -- @param args Arguments.
@@ -49,17 +51,27 @@ static void Sound_effect (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
 	int flags = 0;
+	float pitch;
+	float volume;
 	const char* effect;
 	LIEngObject* object;
 	LIExtModule* module;
 	LIScrData* data;
+	LISndSource* source;
 
 	if (liscr_args_gets_string (args, "effect", &effect) &&
 	    liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
 		object = data->data;
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
-		liext_module_set_effect (module, object->id, effect, flags);
+		source = liext_module_set_effect (module, object->id, effect, flags);
+		if (source != NULL)
+		{
+			if (liscr_args_gets_float (args, "pitch", &pitch))
+				lisnd_source_set_pitch (source, pitch);
+			if (liscr_args_gets_float (args, "volume", &volume))
+				lisnd_source_set_volume (source, volume);
+		}
 	}
 #endif
 }
