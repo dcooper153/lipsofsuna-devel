@@ -290,8 +290,8 @@ private_init_model (LIRenModel* self)
 	for (i = 0 ; i < self->buffers.count ; i++)
 	{
 		group = self->model->facegroups.array + i;
-		assert (group->material >= 0);
-		assert (group->material < self->materials.count);
+		lisys_assert (group->material >= 0);
+		lisys_assert (group->material < self->materials.count);
 		if (!liren_buffer_init_index (self->buffers.array + i,
 		     group->indices.array, group->indices.count))
 			return 0;

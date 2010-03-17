@@ -293,6 +293,7 @@ limdl_pose_transform (LIMdlPose*   self,
 	int i;
 	int j;
 	int count;
+	float total;
 	LIMatQuaternion quat0;
 	LIMatQuaternion quat1;
 	LIMatVector tmp;
@@ -313,6 +314,7 @@ limdl_pose_transform (LIMdlPose*   self,
 	for (i = 0 ; i < model->vertices.count ; i++)
 	{
 		count = 0;
+		total = 0.0f;
 		weights = model->weights.array + i;
 
 		/* Get the rest pose state. */
@@ -322,47 +324,65 @@ limdl_pose_transform (LIMdlPose*   self,
 		pose_vertex = limat_vector_init (0.0f, 0.0f, 0.0f);
 		pose_normal = limat_vector_init (0.0f, 0.0f, 0.0f);
 
-		/* Transform by each weight group. */
+		/* Calculate total weight. */
 		for (j = 0 ; j < weights->count ; j++)
 		{
-			/* Get transformation weight. */
 			weight = weights->weights + j;
-			if (weight->weight == 0.0f)
-				continue;
-
-			/* Get transformed bone. */
-			restbone = model->weightgroups.array[weight->group].node;
-			posebone = self->groups.array[weight->group].node;
-			if (restbone == NULL || posebone == NULL)
-				continue;
-			count++;
-
-#warning Possible to use transforms here?
-			/* Get the rotations. */
-			quat0 = restbone->transform.global.rotation;
-			quat1 = posebone->transform.global.rotation;
-			quat0 = limat_quaternion_conjugate (quat0);
-
-			/* Transform the vertex. */
-			tmp = limat_vector_subtract (rest_vertex, restbone->transform.global.position);
-			tmp = limat_quaternion_transform (quat0, tmp);
-			tmp = limat_quaternion_transform (quat1, tmp);
-			tmp = limat_vector_add (tmp, posebone->transform.global.position);
-			pose_vertex = limat_vector_add (pose_vertex,
-				limat_vector_multiply (tmp, weight->weight));
-
-			/* Transform the normal. */
-			tmp = limat_vector_subtract (rest_normal, restbone->transform.global.position);
-			tmp = limat_quaternion_transform (quat0, tmp);
-			tmp = limat_quaternion_transform (quat1, tmp);
-			tmp = limat_vector_add (tmp, posebone->transform.global.position);
-			pose_normal = limat_vector_add (pose_normal,
-				limat_vector_multiply (tmp, weight->weight));
+			if (weight->weight != 0.0f)
+			{
+				restbone = model->weightgroups.array[weight->group].node;
+				posebone = self->groups.array[weight->group].node;
+				if (restbone != NULL && posebone != NULL)
+				{
+					total += weight->weight;
+					count++;
+				}
+			}
 		}
 
-		/* Default to the rest pose. */
-		if (!count)
+		/* Transform by each weight group. */
+		if (count && total != 0.0f)
 		{
+			for (j = 0 ; j < weights->count ; j++)
+			{
+				/* Get transformation weight. */
+				weight = weights->weights + j;
+				if (weight->weight == 0.0f)
+					continue;
+
+				/* Get transformed bone. */
+				restbone = model->weightgroups.array[weight->group].node;
+				posebone = self->groups.array[weight->group].node;
+				if (restbone == NULL || posebone == NULL)
+					continue;
+				count++;
+
+#warning Possible to use transforms here?
+				/* Get the rotations. */
+				quat0 = restbone->transform.global.rotation;
+				quat1 = posebone->transform.global.rotation;
+				quat0 = limat_quaternion_conjugate (quat0);
+
+				/* Transform the vertex. */
+				tmp = limat_vector_subtract (rest_vertex, restbone->transform.global.position);
+				tmp = limat_quaternion_transform (quat0, tmp);
+				tmp = limat_quaternion_transform (quat1, tmp);
+				tmp = limat_vector_add (tmp, posebone->transform.global.position);
+				pose_vertex = limat_vector_add (pose_vertex,
+					limat_vector_multiply (tmp, weight->weight / total));
+
+				/* Transform the normal. */
+				tmp = limat_vector_subtract (rest_normal, restbone->transform.global.position);
+				tmp = limat_quaternion_transform (quat0, tmp);
+				tmp = limat_quaternion_transform (quat1, tmp);
+				tmp = limat_vector_add (tmp, posebone->transform.global.position);
+				pose_normal = limat_vector_add (pose_normal,
+					limat_vector_multiply (tmp, weight->weight / total));
+			}
+		}
+		else
+		{
+			/* Default to the rest pose. */
 			pose_vertex = rest_vertex;
 			pose_normal = rest_normal;
 		}
@@ -546,7 +566,7 @@ limdl_pose_set_channel_state (LIMdlPose*            self,
 			chan->state = value;
 			break;
 		default:
-			assert (0);
+			lisys_assert (0);
 			break;
 	}
 }

@@ -561,7 +561,7 @@ liarc_writer_clear (LIArcWriter* self)
 {
 	char* tmp;
 
-	assert (self->write == private_memory_write);
+	lisys_assert (self->write == private_memory_write);
 
 	/* Resize the buffer. */
 	if (self->memory.capacity > CLEAR_BUFFER_SIZE)
@@ -596,7 +596,7 @@ int
 liarc_writer_erase (LIArcWriter* self,
                     int          size)
 {
-	assert (self->write == private_memory_write);
+	lisys_assert (self->write == private_memory_write);
 
 	if (size < self->memory.length)
 	{
@@ -623,7 +623,7 @@ liarc_writer_erase (LIArcWriter* self,
 const char*
 liarc_writer_get_buffer (const LIArcWriter* self)
 {
-	assert (self->write == private_memory_write);
+	lisys_assert (self->write == private_memory_write);
 
 	return self->memory.buffer;
 }
@@ -639,7 +639,7 @@ liarc_writer_get_buffer (const LIArcWriter* self)
 int
 liarc_writer_get_length (const LIArcWriter* self)
 {
-	assert (self->write == private_memory_write);
+	lisys_assert (self->write == private_memory_write);
 
 	return self->memory.length;
 }

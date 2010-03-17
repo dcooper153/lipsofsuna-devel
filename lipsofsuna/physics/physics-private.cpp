@@ -49,9 +49,9 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 	float len0;
 	float len1;
 
-	assert (!isnan (transform.getOrigin ()[0]));
-	assert (!isnan (transform.getOrigin ()[1]));
-	assert (!isnan (transform.getOrigin ()[2]));
+	lisys_assert (!isnan (transform.getOrigin ()[0]));
+	lisys_assert (!isnan (transform.getOrigin ()[1]));
+	lisys_assert (!isnan (transform.getOrigin ()[2]));
 
 	this->current = transform;
 	len0 = (this->current.getOrigin () - this->previous.getOrigin ()).length ();

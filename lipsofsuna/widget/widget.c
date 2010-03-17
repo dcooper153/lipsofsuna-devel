@@ -120,7 +120,7 @@ liwdg_widget_detach (LIWdgWidget* self)
 		case LIWDG_WIDGET_STATE_DETACHED:
 			if (self->parent != NULL)
 			{
-				assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
+				lisys_assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
 				liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
 				changed = 1;
 			}
@@ -134,7 +134,7 @@ liwdg_widget_detach (LIWdgWidget* self)
 
 		/* Remove from manager root. */
 		case LIWDG_WIDGET_STATE_ROOT:
-			assert (liwdg_manager_get_root (self->manager) == self);
+			lisys_assert (liwdg_manager_get_root (self->manager) == self);
 			liwdg_manager_set_root (self->manager, NULL);
 			changed = 1;
 			break;
@@ -728,7 +728,7 @@ private_new (LIWdgWidget*      self,
 	}
 	else
 	{
-		assert (clss == liwdg_widget_widget ());
+		lisys_assert (clss == liwdg_widget_widget ());
 	}
 	if (clss->init == NULL)
 		return 1;
@@ -770,7 +770,7 @@ private_event (LIWdgWidget* self,
 {
 	if (event->type == LIWDG_EVENT_TYPE_CLOSE)
 	{
-		assert (self->state == LIWDG_WIDGET_STATE_POPUP);
+		lisys_assert (self->state == LIWDG_WIDGET_STATE_POPUP);
 		liwdg_manager_remove_popup (self->manager, self);
 		return 1;
 	}

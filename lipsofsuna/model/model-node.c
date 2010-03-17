@@ -81,7 +81,7 @@ limdl_node_copy (const LIMdlNode* node)
 			self->light = node->light;
 			break;
 		default:
-			assert (0);
+			lisys_assert (0);
 			break;
 	}
 
@@ -281,7 +281,7 @@ limdl_node_write (const LIMdlNode* self,
 				return 0;
 			break;
 		default:
-			assert (0 && "invalid node type");
+			lisys_assert (0 && "invalid node type");
 			break;
 	}
 

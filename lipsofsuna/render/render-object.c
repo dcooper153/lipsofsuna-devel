@@ -79,7 +79,7 @@ liren_object_new (LIRenScene* scene,
 			id = 0;
 	}
 	self->id = id;
-	assert (!liren_scene_find_object (scene, id));
+	lisys_assert (!liren_scene_find_object (scene, id));
 
 	/* Add to renderer. */
 	if (!lialg_u32dic_insert (scene->objects, id, self))

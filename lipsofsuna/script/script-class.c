@@ -534,7 +534,7 @@ liscr_class_default___index (lua_State* lua)
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
 		luaL_getmetatable (lua, ptr->meta);
-		assert (!lua_isnil (lua, -1));
+		lisys_assert (!lua_isnil (lua, -1));
 		lua_pushvalue (lua, 2);
 		lua_rawget (lua, -2);
 		lua_remove (lua, -2);
@@ -618,7 +618,7 @@ liscr_class_default___newindex (lua_State* lua)
 
 	/* Custom class variables. */
 	luaL_getmetatable (lua, clss->meta);
-	assert (!lua_isnil (lua, -1));
+	lisys_assert (!lua_isnil (lua, -1));
 	lua_pushvalue (lua, 2);
 	lua_pushvalue (lua, 3);
 	lua_rawset (lua, -3);

@@ -141,7 +141,7 @@ liimg_image_load (LIImgImage* self,
 	height = png_get_image_height (png, info);
 	rows = png_get_rows (png, info);
 	depth = png_get_rowbytes (png, info);
-	assert (depth == 3 * width || depth == 4 * width);
+	lisys_assert (depth == 3 * width || depth == 4 * width);
 	depth /= width;
 	fclose (file);
 

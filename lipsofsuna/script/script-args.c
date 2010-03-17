@@ -105,7 +105,7 @@ liscr_args_call_setters_except (LIScrArgs*  self,
 		if (lua_type (self->lua, -1) != LUA_TFUNCTION)
 		{
 			lua_pop (self->lua, 2);
-			assert (0);
+			lisys_assert (0);
 			return;
 		}
 
@@ -600,7 +600,7 @@ void
 liscr_args_set_output (LIScrArgs* self,
                        int        value)
 {
-	assert (self->ret == 0);
+	lisys_assert (self->ret == 0);
 	self->output_mode = value;
 
 	if (value == LISCR_ARGS_OUTPUT_TABLE_FORCE)

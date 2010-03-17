@@ -91,7 +91,7 @@ liphy_object_new (LIPhyPhysics*    physics,
 	/* Add to dictionary. */
 	if (self->id)
 	{
-		assert (!lialg_u32dic_find (physics->objects, id));
+		lisys_assert (!lialg_u32dic_find (physics->objects, id));
 		if (!lialg_u32dic_insert (physics->objects, id, self))
 		{
 			liphy_object_free (self);
@@ -989,7 +989,7 @@ private_update_state (LIPhyObject* self)
 				self->control = new liphyVehicleControl (self, shape);
 				break;
 			default:
-				assert (0);
+				lisys_assert (0);
 				break;
 		}
 		if (self->control != NULL)

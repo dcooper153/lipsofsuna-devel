@@ -294,7 +294,7 @@ static void
 private_detach_child (LIWdgView*   self,
                       LIWdgWidget* child)
 {
-	assert (self->child == child);
+	lisys_assert (self->child == child);
 
 	self->child = NULL;
 	child->parent = NULL;

@@ -376,7 +376,7 @@ private_add (LIExtBrushes* self,
 	if (row == NULL)
 		return 0;
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
+	lisys_assert (data != NULL);
 
 	/* Add context specific data. */
 	switch (data->type)
@@ -402,8 +402,8 @@ private_add (LIExtBrushes* self,
 		case LIEXT_BRUSHES_ROWTYPE_OBJECT:
 			row = liwdg_treerow_get_parent (row);
 			data = liwdg_treerow_get_data (row);
-			assert (data != NULL);
-			assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
+			lisys_assert (data != NULL);
+			lisys_assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
 			/* Fall through. */
 		case LIEXT_BRUSHES_ROWTYPE_OBJECTS:
 			liext_preview_get_camera_transform (LIEXT_PREVIEW (self->widgets.preview), &transform);
@@ -431,8 +431,8 @@ private_add (LIExtBrushes* self,
 		case LIEXT_BRUSHES_ROWTYPE_STROKE:
 			row = liwdg_treerow_get_parent (row);
 			data = liwdg_treerow_get_data (row);
-			assert (data != NULL);
-			assert (data->type == LIEXT_BRUSHES_ROWTYPE_RULE);
+			lisys_assert (data != NULL);
+			lisys_assert (data->type == LIEXT_BRUSHES_ROWTYPE_RULE);
 			/* Fall through. */
 		case LIEXT_BRUSHES_ROWTYPE_RULE:
 			if (!ligen_rule_insert_stroke (data->rule, 0, 0, 0, 0, 0))
@@ -458,7 +458,7 @@ private_copy (LIExtBrushes* self,
 	if (row == NULL)
 		return 0;
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
+	lisys_assert (data != NULL);
 
 	/* Add context specific data. */
 	switch (data->type)
@@ -507,8 +507,8 @@ private_object_info (LIExtBrushes* self)
 	if (row == NULL)
 		return 0;
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
-	assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECT);
+	lisys_assert (data != NULL);
+	lisys_assert (data->type == LIEXT_BRUSHES_ROWTYPE_OBJECT);
 	object = data->brush->objects.array[data->object];
 
 	/* Update object info. */
@@ -567,7 +567,7 @@ private_paint_terrain (LIExtBrushes* self,
 	if (row == NULL)
 		return 0;
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
+	lisys_assert (data != NULL);
 	if (data->type != LIEXT_BRUSHES_ROWTYPE_BRUSH)
 		return 0;
 
@@ -692,7 +692,7 @@ private_remove (LIExtBrushes* self,
 	if (row == NULL)
 		return 0;
 	data[0] = liwdg_treerow_get_data (row);
-	assert (data[0] != NULL);
+	lisys_assert (data[0] != NULL);
 
 	/* Remove context specific data. */
 	switch (data[0]->type)
@@ -768,7 +768,7 @@ private_rename (LIExtBrushes* self,
 	if (row == NULL)
 		return 0;
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
+	lisys_assert (data != NULL);
 
 	switch (data->type)
 	{
@@ -848,8 +848,8 @@ private_stroke_flags (LIExtBrushes* self)
 	if (row == NULL)
 		return 0;
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
-	assert (data->type == LIEXT_BRUSHES_ROWTYPE_STROKE);
+	lisys_assert (data != NULL);
+	lisys_assert (data->type == LIEXT_BRUSHES_ROWTYPE_STROKE);
 	stroke = data->rule->strokes.array + data->stroke;
 
 	/* Update stroke flags. */
@@ -875,12 +875,12 @@ private_append_brush (LIExtBrushes* self,
 	rows[0] = liwdg_tree_get_root (LIWDG_TREE (self->widgets.tree));
 	rows[0] = liwdg_treerow_get_row (rows[0], 0);
 	data[0] = liwdg_treerow_get_data (rows[0]);
-	assert (data[0] != NULL);
-	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_ROOT);
-	assert (data[0]->brush == NULL);
-	assert (data[0]->rule == NULL);
-	assert (data[0]->object < 0);
-	assert (data[0]->stroke < 0);
+	lisys_assert (data[0] != NULL);
+	lisys_assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_ROOT);
+	lisys_assert (data[0]->brush == NULL);
+	lisys_assert (data[0]->rule == NULL);
+	lisys_assert (data[0]->object < 0);
+	lisys_assert (data[0]->stroke < 0);
 
 	/* Add brush row. */
 	data[1] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
@@ -994,17 +994,17 @@ private_append_object (LIExtBrushes* self,
 
 	/* Get row info. */
 	data[0] = liwdg_treerow_get_data (row);
-	assert (data[0] != NULL);
-	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
-	assert (data[0]->brush != NULL);
-	assert (data[0]->rule == NULL);
-	assert (data[0]->object < 0);
-	assert (data[0]->stroke < 0);
+	lisys_assert (data[0] != NULL);
+	lisys_assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_OBJECTS);
+	lisys_assert (data[0]->brush != NULL);
+	lisys_assert (data[0]->rule == NULL);
+	lisys_assert (data[0]->object < 0);
+	lisys_assert (data[0]->stroke < 0);
 	rows[0] = row;
 
 	/* Get object info. */
-	assert (index >= 0);
-	assert (index < data[0]->brush->objects.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < data[0]->brush->objects.count);
 	object = data[0]->brush->objects.array[index];
 
 	/* Add object row. */
@@ -1045,12 +1045,12 @@ private_append_rule (LIExtBrushes* self,
 
 	/* Get row info. */
 	data[0] = liwdg_treerow_get_data (row);
-	assert (data[0] != NULL);
-	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_RULES);
-	assert (data[0]->brush != NULL);
-	assert (data[0]->rule == NULL);
-	assert (data[0]->object < 0);
-	assert (data[0]->stroke < 0);
+	lisys_assert (data[0] != NULL);
+	lisys_assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_RULES);
+	lisys_assert (data[0]->brush != NULL);
+	lisys_assert (data[0]->rule == NULL);
+	lisys_assert (data[0]->object < 0);
+	lisys_assert (data[0]->stroke < 0);
 	rows[0] = row;
 
 	/* Add rule row. */
@@ -1111,20 +1111,20 @@ private_append_stroke (LIExtBrushes* self,
 
 	/* Get row info. */
 	data[0] = liwdg_treerow_get_data (row);
-	assert (data[0] != NULL);
-	assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_RULE);
-	assert (data[0]->brush != NULL);
-	assert (data[0]->rule != NULL);
-	assert (data[0]->object < 0);
-	assert (data[0]->stroke < 0);
+	lisys_assert (data[0] != NULL);
+	lisys_assert (data[0]->type == LIEXT_BRUSHES_ROWTYPE_RULE);
+	lisys_assert (data[0]->brush != NULL);
+	lisys_assert (data[0]->rule != NULL);
+	lisys_assert (data[0]->object < 0);
+	lisys_assert (data[0]->stroke < 0);
 	rows[0] = row;
 
 	/* Get stroke info. */
-	assert (index >= 0);
-	assert (index < data[0]->rule->strokes.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < data[0]->rule->strokes.count);
 	stroke = data[0]->rule->strokes.array + index;
 	brush = ligen_generator_find_brush (self->generator, stroke->brush);
-	assert (brush != NULL);
+	lisys_assert (brush != NULL);
 
 	/* Add stroke row. */
 	data[1] = lisys_calloc (1, sizeof (LIExtBrushesTreerow));
@@ -1293,10 +1293,10 @@ private_resize_brush (LIExtBrushes* self)
 
 	/* Find the brush. */
 	row = liwdg_tree_get_active (LIWDG_TREE (self->widgets.tree));
-	assert (row != NULL);
+	lisys_assert (row != NULL);
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
-	assert (data->brush != NULL); 
+	lisys_assert (data != NULL);
+	lisys_assert (data->brush != NULL); 
 
 	/* Resize the brush. */
 	x = (int) liwdg_spin_get_value (LIWDG_SPIN (self->widgets.spin_sizex));
@@ -1365,7 +1365,7 @@ private_rebuild_selection (LIExtBrushes* self)
 		return;
 	}
 	data = liwdg_treerow_get_data (row);
-	assert (data != NULL);
+	lisys_assert (data != NULL);
 
 	/* Set info. */
 	if (data->brush == NULL)

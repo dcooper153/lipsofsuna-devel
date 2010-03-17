@@ -25,7 +25,6 @@
 #ifndef __MATH_MATRIX_H__
 #define __MATH_MATRIX_H__
 
-#include <assert.h>
 #include <math.h>
 #include "math-vector.h"
 

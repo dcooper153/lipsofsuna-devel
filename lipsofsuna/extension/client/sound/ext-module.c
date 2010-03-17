@@ -135,20 +135,29 @@ liext_module_find_sample (LIExtModule* self,
 	if (sample != NULL)
 		return sample;
 
-	/* Format path. */
+	/* Try to load OGG. */
 	path = lisys_path_format (self->client->paths->module_data,
 		LISYS_PATH_SEPARATOR, "sounds",
 		LISYS_PATH_SEPARATOR, name, ".ogg", NULL);
 	if (path == NULL)
 		return NULL;
-
-	/* Load new sample. */
 	ret = lisnd_manager_set_sample (self->sound, name, path);
 	lisys_free (path);
-	if (!ret)
-		return NULL;
+	if (ret)
+		return lisnd_manager_get_sample (self->sound, name);
 
-	return lisnd_manager_get_sample (self->sound, name);
+	/* Try to load FLAC. */
+	path = lisys_path_format (self->client->paths->module_data,
+		LISYS_PATH_SEPARATOR, "sounds",
+		LISYS_PATH_SEPARATOR, name, ".flac", NULL);
+	if (path == NULL)
+		return NULL;
+	ret = lisnd_manager_set_sample (self->sound, name, path);
+	lisys_free (path);
+	if (ret)
+		return lisnd_manager_get_sample (self->sound, name);
+
+	return 0;
 }
 
 int

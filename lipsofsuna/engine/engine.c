@@ -461,7 +461,7 @@ private_sector_free (void*        self,
 
 	/* Invoke callbacks. */
 	sector_ = lialg_strdic_find (sector->content, "engine");
-	assert (sector_ != NULL);
+	lisys_assert (sector_ != NULL);
 	lical_callbacks_call (engine->callbacks, self, "sector-free", lical_marshal_DATA_PTR, sector_);
 }
 
@@ -474,7 +474,7 @@ private_sector_load (void*        self,
 
 	/* Invoke callbacks. */
 	sector_ = lialg_strdic_find (sector->content, "engine");
-	assert (sector_ != NULL);
+	lisys_assert (sector_ != NULL);
 	lical_callbacks_call (engine->callbacks, self, "sector-load", lical_marshal_DATA_PTR, sector_);
 }
 

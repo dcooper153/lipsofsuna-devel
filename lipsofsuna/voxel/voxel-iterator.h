@@ -190,7 +190,6 @@ livox_voxel_iter_first (LIVoxVoxelIter* self,
 
 	/* Find first voxel. */
 	ret = lialg_range_iter_first (&self->rangei1, &self->range1);
-	assert (ret != 0);
 	self->voxel[0] = self->rangei1.x;
 	self->voxel[1] = self->rangei1.y;
 	self->voxel[2] = self->rangei1.z;
@@ -248,7 +247,6 @@ livox_voxel_iter_next (LIVoxVoxelIter* self)
 
 	/* Find first voxel. */
 	ret = lialg_range_iter_first (&self->rangei1, &self->range1);
-	assert (ret != 0);
 	self->voxel[0] = self->rangei1.x;
 	self->voxel[1] = self->rangei1.y;
 	self->voxel[2] = self->rangei1.z;

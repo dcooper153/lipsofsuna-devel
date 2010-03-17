@@ -27,7 +27,6 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
@@ -43,6 +42,7 @@
 #ifdef HAVE_WINDOWS_H
 #include <windows.h>
 #endif
+#include "system.h"
 #include "system-error.h"
 #include "system-file.h"
 
@@ -326,7 +326,7 @@ lisys_stat (const char* path,
 #ifdef HAVE_LSTAT
 	else if (S_ISLNK (st.st_mode)) result->type = LISYS_STAT_LINK;
 #endif
-	else { assert (0); }
+	else { lisys_assert (0); }
 	result->uid = st.st_uid;
 	result->gid = st.st_gid;
 	result->mode = st.st_mode & 0777;
@@ -366,7 +366,7 @@ lisys_lstat (const char* path,
 #ifdef HAVE_LSTAT
 	else if (S_ISLNK (st.st_mode)) result->type = LISYS_STAT_LINK;
 #endif
-	else { assert (0); }
+	else { lisys_assert (0); }
 	result->uid = st.st_uid;
 	result->gid = st.st_gid;
 	result->mode = st.st_mode & 0777;

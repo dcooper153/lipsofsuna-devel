@@ -121,7 +121,7 @@ liext_material_set_material (LIExtMaterial* self,
 	/* Populate widgets. */
 	if (material != NULL)
 	{
-		assert (treerow != NULL);
+		lisys_assert (treerow != NULL);
 		private_rebuild_type (self);
 		liwdg_check_set_active (LIWDG_CHECK (self->widgets.check_occlude), material->flags & LIVOX_MATERIAL_FLAG_OCCLUDER);
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_name), material->name);
@@ -140,7 +140,7 @@ liext_material_set_material (LIExtMaterial* self,
 	}
 	else
 	{
-		assert (treerow == NULL);
+		lisys_assert (treerow == NULL);
 		liwdg_widget_set_visible (LIWDG_WIDGET (self), 0);
 	}
 
@@ -243,7 +243,7 @@ private_pressed_occlude (LIExtMaterial* self,
 {
 	int value;
 
-	assert (self->material != NULL);
+	lisys_assert (self->material != NULL);
 
 	value = liwdg_check_get_active (LIWDG_CHECK (self->widgets.check_occlude));
 	if (!value)
@@ -260,7 +260,7 @@ static int
 private_pressed_type (LIExtMaterial* self,
                       LIWdgWidget*   widget)
 {
-	assert (self->material != NULL);
+	lisys_assert (self->material != NULL);
 
 	self->material->type = (self->material->type + 1) % LIVOX_MATERIAL_TYPE_MAX;
 	private_rebuild_type (self);
@@ -273,7 +273,7 @@ static int
 private_changed_friction (LIExtMaterial* self,
                           LIWdgWidget*   widget)
 {
-	assert (self->material != NULL);
+	lisys_assert (self->material != NULL);
 
 	self->material->friction = liwdg_scroll_get_value (LIWDG_SCROLL (widget));
 
@@ -286,7 +286,7 @@ private_changed_model (LIExtMaterial* self,
 {
 	const char* model;
 
-	assert (self->material != NULL);
+	lisys_assert (self->material != NULL);
 
 	model = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_model));
 	livox_material_set_model (self->material, model);
@@ -301,8 +301,8 @@ private_changed_name (LIExtMaterial* self,
 {
 	const char* name;
 
-	assert (self->material != NULL);
-	assert (self->treerow != NULL);
+	lisys_assert (self->material != NULL);
+	lisys_assert (self->treerow != NULL);
 
 	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_name));
 	livox_material_set_name (self->material, name);
@@ -317,7 +317,7 @@ private_changed_shader (LIExtMaterial* self,
 {
 	const char* name;
 
-	assert (self->material != NULL);
+	lisys_assert (self->material != NULL);
 
 	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_shader1));
 	limdl_material_set_shader (&self->material->mat_top, name);
@@ -335,7 +335,7 @@ private_changed_texture (LIExtMaterial* self,
 	int flags;
 	const char* name;
 
-	assert (self->material != NULL);
+	lisys_assert (self->material != NULL);
 
 	/* TODO: Multiple texture support. */
 	flags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;

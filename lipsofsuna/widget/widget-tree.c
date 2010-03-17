@@ -206,8 +206,8 @@ void
 liwdg_treerow_remove_row (LIWdgTreerow* self,
                           int           index)
 {
-	assert (index >= 0);
-	assert (index < self->rows.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->rows.count);
 
 	private_treerow_free (self->rows.array[index]);
 	lialg_array_remove (&self->rows, index);
@@ -259,13 +259,13 @@ liwdg_treerow_get_index (LIWdgTreerow* self)
 {
 	int i;
 
-	assert (self->parent != NULL);
+	lisys_assert (self->parent != NULL);
 	for (i = 0 ; i < self->parent->rows.count ; i++)
 	{
 		if (self->parent->rows.array[i] == self)
 			return i;
 	}
-	assert (0);
+	lisys_assert (0);
 
 	return 0;
 }
@@ -280,8 +280,8 @@ LIWdgTreerow*
 liwdg_treerow_get_row (LIWdgTreerow* self,
                        int           index)
 {
-	assert (index >= 0);
-	assert (index < self->rows.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->rows.count);
 
 	return self->rows.array[index];
 }
@@ -305,7 +305,7 @@ liwdg_treerow_set_text (LIWdgTreerow* self,
 	int h;
 	char* tmp;
 
-	assert (self->text != NULL);
+	lisys_assert (self->text != NULL);
 
 	/* Set new text. */
 	tmp = listr_dup (value);

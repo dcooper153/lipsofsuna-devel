@@ -36,8 +36,8 @@ lialg_array_append_full (void*  self,
 	void* tmp;
 	LIAlgArray* array = (LIAlgArray*) self;
 
-	assert (count >= 0);
-	assert (size > 0);
+	lisys_assert (count >= 0);
+	lisys_assert (size > 0);
 
 	num = array->count + count;
 	if (num > array->count)
@@ -63,8 +63,8 @@ lialg_array_insert_full (void*  self,
 	void* tmp;
 	LIAlgArray* array = (LIAlgArray*) self;
 
-	assert (count >= 0);
-	assert (size > 0);
+	lisys_assert (count >= 0);
+	lisys_assert (size > 0);
 
 	num = array->count + count;
 	if (num > array->count)
@@ -92,8 +92,8 @@ lialg_array_prepend_full (void*  self,
 	void* tmp;
 	LIAlgArray* array = (LIAlgArray*) self;
 
-	assert (count >= 0);
-	assert (size > 0);
+	lisys_assert (count >= 0);
+	lisys_assert (size > 0);
 
 	num = array->count + count;
 	if (num > array->count)
@@ -119,10 +119,10 @@ lialg_array_remove_full (void*  self,
 {
 	LIAlgArray* array = (LIAlgArray*) self;
 
-	assert (size > 0);
-	assert (index >= 0);
-	assert (count <= array->count);
-	assert (index + count <= array->count);
+	lisys_assert (size > 0);
+	lisys_assert (index >= 0);
+	lisys_assert (count <= array->count);
+	lisys_assert (index + count <= array->count);
 
 	memmove ((char*) array->array + index * size,
 	         (char*) array->array + (index + count) * size,
@@ -138,8 +138,8 @@ lialg_array_resize_full (void*  self,
 	void* tmp;
 	LIAlgArray* array = (LIAlgArray*) self;
 
-	assert (size > 0);
-	assert (count >= 0);
+	lisys_assert (size > 0);
+	lisys_assert (count >= 0);
 
 	tmp = lisys_realloc (array->array, size * count);
 	if (tmp == NULL)
@@ -157,10 +157,10 @@ lialg_array_zero_full (void*  self,
 {
 	LIAlgArray* array = (LIAlgArray*) self;
 
-	assert (size > 0);
-	assert (index >= 0);
-	assert (count <= array->count);
-	assert (index + count <= array->count);
+	lisys_assert (size > 0);
+	lisys_assert (index >= 0);
+	lisys_assert (count <= array->count);
+	lisys_assert (index + count <= array->count);
 
 	memset ((char*) array->array + index * size, 0, count * size);
 }

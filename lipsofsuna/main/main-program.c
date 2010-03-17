@@ -93,7 +93,7 @@ limai_program_free (LIMaiProgram* self)
 	/* Free components. */
 	if (self->components != NULL)
 	{
-		assert (self->components->size == 0);
+		lisys_assert (self->components->size == 0);
 		lialg_strdic_free (self->components);
 	}
 

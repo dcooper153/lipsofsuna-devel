@@ -225,8 +225,8 @@ liren_draw_hair (LIRenContext* context,
 	for (i = 0 ; i < object->model->model->hairs.count ; i++)
 	{
 		hairs = object->model->model->hairs.array + i;
-		assert (hairs->material >= 0);
-		assert (hairs->material < model->materials.count);
+		lisys_assert (hairs->material >= 0);
+		lisys_assert (hairs->material < model->materials.count);
 
 		/* Bind hair group material. */
 		material = model->materials.array[hairs->material];

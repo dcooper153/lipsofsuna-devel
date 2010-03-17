@@ -98,7 +98,7 @@ lialg_priority_queue_find_highest (LIAlgPriorityQueue* self)
 	while (tnode->right != NULL)
 		tnode = tnode->right;
 	pnode = (LIAlgPriorityQueueNode*) tnode->data;
-	assert (&pnode->node == tnode);
+	lisys_assert (&pnode->node == tnode);
 	return pnode->value;
 }
 
@@ -120,7 +120,7 @@ lialg_priority_queue_find_highest_node (LIAlgPriorityQueue* self)
 	while (tnode->left != NULL)
 		tnode = tnode->left;
 	pnode = (LIAlgPriorityQueueNode*) tnode->data;
-	assert (&pnode->node == tnode);
+	lisys_assert (&pnode->node == tnode);
 	return pnode;
 }
 
@@ -142,7 +142,7 @@ lialg_priority_queue_find_lowest (LIAlgPriorityQueue* self)
 	while (tnode->left != NULL)
 		tnode = tnode->left;
 	pnode = (LIAlgPriorityQueueNode*) tnode->data;
-	assert (&pnode->node == tnode);
+	lisys_assert (&pnode->node == tnode);
 	return pnode->value;
 }
 
@@ -164,7 +164,7 @@ lialg_priority_queue_find_lowest_node (LIAlgPriorityQueue* self)
 	while (tnode->left != NULL)
 		tnode = tnode->left;
 	pnode = (LIAlgPriorityQueueNode*) tnode->data;
-	assert (&pnode->node == tnode);
+	lisys_assert (&pnode->node == tnode);
 	return pnode;
 }
 
@@ -216,7 +216,7 @@ lialg_priority_queue_pop_highest (LIAlgPriorityQueue* self)
 		tnode = tnode->right;
 	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	value = pnode->value;
-	assert (&pnode->node == tnode);
+	lisys_assert (&pnode->node == tnode);
 	lialg_bst_unlink (self->tree, tnode);
 	lisys_free (pnode);
 	return value;
@@ -242,7 +242,7 @@ lialg_priority_queue_pop_lowest (LIAlgPriorityQueue* self)
 		tnode = tnode->left;
 	pnode = (LIAlgPriorityQueueNode*) tnode->data;
 	value = pnode->value;
-	assert (&pnode->node == tnode);
+	lisys_assert (&pnode->node == tnode);
 	lialg_bst_unlink (self->tree, tnode);
 	lisys_free (pnode);
 	return value;

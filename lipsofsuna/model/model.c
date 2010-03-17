@@ -521,8 +521,8 @@ limdl_model_insert_facegroup (LIMdlModel* self,
 	int count;
 	LIMdlFaces* tmp;
 
-	assert (material >= 0);
-	assert (material < self->materials.count);
+	lisys_assert (material >= 0);
+	lisys_assert (material < self->materials.count);
 
 	/* Resize buffer. */
 	count = self->facegroups.count + 1;
@@ -685,7 +685,7 @@ limdl_model_insert_vertex (LIMdlModel*         self,
 		self->weights.capacity = i;
 	}
 	count = self->vertices.count;
-	assert (self->vertices.count == self->weights.count);
+	lisys_assert (self->vertices.count == self->weights.count);
 
 	/* Append weights. */
 	if (weights != NULL && weights->count)

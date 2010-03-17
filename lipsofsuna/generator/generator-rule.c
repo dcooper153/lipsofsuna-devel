@@ -148,8 +148,8 @@ void
 ligen_rule_remove_stroke (LIGenRule* self,
                           int        index)
 {
-	assert (index >= 0);
-	assert (index < self->strokes.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->strokes.count);
 
 	lialg_array_remove (&self->strokes, index);
 }

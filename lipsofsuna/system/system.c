@@ -32,6 +32,15 @@
 #include "system-error.h"
 #include "system-path.h"
 
+void
+lisys_assert_fail (const char* asrt,
+                   const char* file,
+                   int         line,
+                   const char* func)
+{
+	fprintf (stderr, "%s:%d: %s: Assertion `%s' failed.", file, line, func, asrt);
+}
+
 /**
  * \brief Gets the current time.
  *

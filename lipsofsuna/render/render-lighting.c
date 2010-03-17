@@ -66,7 +66,7 @@ liren_lighting_free (LIRenLighting* self)
 {
 	if (self->lights != NULL)
 	{
-		assert (self->lights->size == 0);
+		lisys_assert (self->lights->size == 0);
 		lialg_ptrdic_free (self->lights);
 	}
 	lisys_free (self);

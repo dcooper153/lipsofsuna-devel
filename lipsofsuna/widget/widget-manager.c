@@ -115,9 +115,9 @@ liwdg_manager_new (LIVidCalls*     video,
 void
 liwdg_manager_free (LIWdgManager* self)
 {
-	assert (self->dialogs.bottom == NULL);
-	assert (self->dialogs.top == NULL);
-	assert (self->widgets.root == NULL);
+	lisys_assert (self->dialogs.bottom == NULL);
+	lisys_assert (self->dialogs.top == NULL);
+	lisys_assert (self->widgets.root == NULL);
 
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
@@ -179,7 +179,7 @@ liwdg_manager_alloc_widgets (LIWdgManager* self,
 		if (pptr == NULL)
 			break;
 		ptr = va_arg (args, LIWdgWidget*);
-		assert (ptr != NULL);
+		lisys_assert (ptr != NULL);
 		*pptr = ptr;
 	}
 	va_end (args);
@@ -408,7 +408,7 @@ liwdg_manager_event (LIWdgManager* self,
 		default:
 			widget = NULL;
 			match = LIWDG_MATCH_INSIDE;
-			assert (0);
+			lisys_assert (0);
 			break;
 	}
 	if (widget == NULL)
@@ -499,7 +499,7 @@ int
 liwdg_manager_insert_popup (LIWdgManager* self,
                             LIWdgWidget*  widget)
 {
-	assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
+	lisys_assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
 
 	widget->prev = NULL;
 	widget->next = self->widgets.popups;
@@ -517,7 +517,7 @@ liwdg_manager_insert_window (LIWdgManager* self,
 {
 	LIWdgSize size;
 
-	assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
+	lisys_assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
 
 	widget->state = LIWDG_WIDGET_STATE_WINDOW;
 	private_attach_window (self, widget);
@@ -538,8 +538,8 @@ int
 liwdg_manager_remove_popup (LIWdgManager* self,
                             LIWdgWidget*  widget)
 {
-	assert (widget->prev != NULL || widget == self->widgets.popups);
-	assert (widget->state == LIWDG_WIDGET_STATE_POPUP);
+	lisys_assert (widget->prev != NULL || widget == self->widgets.popups);
+	lisys_assert (widget->state == LIWDG_WIDGET_STATE_POPUP);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
@@ -561,9 +561,9 @@ int
 liwdg_manager_remove_window (LIWdgManager* self,
                              LIWdgWidget*  widget)
 {
-	assert (widget->state == LIWDG_WIDGET_STATE_WINDOW);
-	assert (widget->prev != NULL || widget == self->dialogs.top);
-	assert (widget->next != NULL || widget == self->dialogs.bottom);
+	lisys_assert (widget->state == LIWDG_WIDGET_STATE_WINDOW);
+	lisys_assert (widget->prev != NULL || widget == self->dialogs.top);
+	lisys_assert (widget->next != NULL || widget == self->dialogs.bottom);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
@@ -739,14 +739,14 @@ liwdg_manager_set_root (LIWdgManager* self,
 	/* Replace old root. */
 	if (self->widgets.root != NULL)
 	{
-		assert (self->widgets.root->state == LIWDG_WIDGET_STATE_ROOT);
+		lisys_assert (self->widgets.root->state == LIWDG_WIDGET_STATE_ROOT);
 		self->widgets.root->transparent = 0;
 		self->widgets.root->state = LIWDG_WIDGET_STATE_DETACHED;
 	}
 	self->widgets.root = widget;
 	if (self->widgets.root != NULL)
 	{
-		assert (self->widgets.root->state == LIWDG_WIDGET_STATE_DETACHED);
+		lisys_assert (self->widgets.root->state == LIWDG_WIDGET_STATE_DETACHED);
 		self->widgets.root->transparent = 1;
 		self->widgets.root->state = LIWDG_WIDGET_STATE_ROOT;
 	}

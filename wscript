@@ -170,6 +170,10 @@ def configure(ctx):
 			ctx.check_cc(header_name='vorbisfile.h', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
 			ctx.check_cc(lib='vorbis', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
 			ctx.check_cc(lib='vorbisfile', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
+		# FLAC
+		if not ctx.check_cfg(package='flac', atleast_version='1.2.0', args='--cflags --libs'):
+			ctx.check_cc(header_name='stream_decoder.h', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
+			ctx.check_cc(lib='FLAC', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
 	# Defines
 	ctx.define('LI_ENABLE_ERROR', 1)
 	if not ctx.env.SOUND:
@@ -346,7 +350,7 @@ def build(ctx):
 		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/sound/*.c'),
 		target = 'snd_objs',
-		uselib = 'CORE AL VORBIS OGG')
+		uselib = 'CORE AL VORBIS OGG FLAC')
 	ctx.new_task_gen(
 		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/string/*.c'),
@@ -408,7 +412,7 @@ def build(ctx):
 			target = 'lipsofsuna-client',
 			install_path = ctx.env.PROGDIR,
 			add_objects = 'ai_objs alg_objs arc_objs bnd_objs cal_objs cli_objs eng_objs fnt_objs gen_objs img_objs imgcxx_objs mai_objs mat_objs mdl_objs net_objs par_objs phy_objs pth_objs rel_objs ren_objs scr_objs ser_objs snd_objs str_objs sys_objs thr_objs vid_objs vox_objs wdg_objs',
-			uselib = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG SQUISH THREAD AL VORBIS OGG')
+			uselib = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG SQUISH THREAD AL VORBIS OGG FLAC')
 	if ctx.env.GENERATOR:
 		ctx.new_task_gen(
 			features = 'cc cxx cprogram',
@@ -447,7 +451,7 @@ def build(ctx):
 	if ctx.env.CLIENT or ctx.env.SERVER:
 		buildext(ctx, 'lipsofsuna/extension/common/', '', 'EXTENSION LUA SQLITE GRAPPLE ZLIB THREAD')
 	if ctx.env.CLIENT:
-		buildext(ctx, 'lipsofsuna/extension/client/', '-cli', 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG THREAD AL VORBIS OGG')
+		buildext(ctx, 'lipsofsuna/extension/client/', '-cli', 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG THREAD AL VORBIS OGG FLAC')
 	if ctx.env.SERVER:
 		buildext(ctx, 'lipsofsuna/extension/server/', '-ser', 'EXTENSION LUA SQLITE GRAPPLE ZLIB THREAD')
 	ctx.set_group("install")

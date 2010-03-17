@@ -57,7 +57,7 @@ Events_insert (lua_State* lua)
 	if (!lua_istable (lua, -1))
 	{
 		lua_pop (lua, 1);
-		assert (0);
+		lisys_assert (0);
 		return 0;
 	}
 
@@ -105,7 +105,7 @@ Events_remove (lua_State* lua)
 	if (!lua_istable (lua, -1))
 	{
 		lua_pop (lua, 1);
-		assert (0);
+		lisys_assert (0);
 		return 0;
 	}
 

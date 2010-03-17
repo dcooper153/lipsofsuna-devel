@@ -215,7 +215,7 @@ ligen_generator_insert_brush (LIGenGenerator* self,
 		i = brush->id;
 		if (lialg_u32dic_find (self->brushes, i) != NULL)
 		{
-			assert (0);
+			lisys_assert (0);
 			return 0;
 		}
 	}
@@ -253,7 +253,7 @@ ligen_generator_insert_stroke (LIGenGenerator* self,
 	LIGenStroke stroke;
 
 	brush_ = lialg_u32dic_find (self->brushes, brush);
-	assert (brush_ != NULL);
+	lisys_assert (brush_ != NULL);
 	stroke.pos[0] = x;
 	stroke.pos[1] = y;
 	stroke.pos[2] = z;
@@ -415,7 +415,7 @@ ligen_generator_step (LIGenGenerator* self)
 		 * so we need to create a copy of the stroke here. */
 		stroke = self->strokes.array[i];
 		brush = lialg_u32dic_find (self->brushes, stroke.brush);
-		assert (brush != NULL);
+		lisys_assert (brush != NULL);
 		if (!brush->rules.count)
 			continue;
 
@@ -525,7 +525,7 @@ ligen_generator_write (LIGenGenerator* self)
 	{
 		stroke = self->strokes.array + i;
 		brush = lialg_u32dic_find (self->brushes, stroke->brush);
-		assert (brush != NULL);
+		lisys_assert (brush != NULL);
 		for (j = 0 ; j < brush->objects.count ; j++)
 		{
 			object = brush->objects.array[j];
@@ -870,7 +870,7 @@ private_brush_disabled (LIGenGenerator*  self,
 	LIGenBrush* brush;
 
 	brush = lialg_u32dic_find (self->brushes, rstroke->brush);
-	assert (brush != NULL);
+	lisys_assert (brush != NULL);
 
 	return brush->disabled;
 }
@@ -919,7 +919,7 @@ private_brush_intersects (LIGenGenerator*  self,
 
 	/* Calculate world position. */
 	brush = lialg_u32dic_find (self->brushes, rstroke->brush);
-	assert (brush != NULL);
+	lisys_assert (brush != NULL);
 	min0[0] = stroke->pos[0] + rstroke->pos[0];
 	min0[1] = stroke->pos[1] + rstroke->pos[1];
 	min0[2] = stroke->pos[2] + rstroke->pos[2];
@@ -967,7 +967,7 @@ private_rule_apply (LIGenGenerator* self,
 	{
 		rstroke = rule->strokes.array + i;
 		brush1 = lialg_u32dic_find (self->brushes, rstroke->brush);
-		assert (brush1 != NULL);
+		lisys_assert (brush1 != NULL);
 		printf (" * CREATE %s\n", brush1->name);
 		stroke1.pos[0] = stroke->pos[0] + rstroke->pos[0];
 		stroke1.pos[1] = stroke->pos[1] + rstroke->pos[1];
@@ -1029,7 +1029,7 @@ private_stroke_paint (LIGenGenerator* self,
 
 	/* Determine affected sectors. */
 	brush = lialg_u32dic_find (self->brushes, stroke->brush);
-	assert (brush != NULL);
+	lisys_assert (brush != NULL);
 	min[0] = (stroke->pos[0]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	min[1] = (stroke->pos[1]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 	min[2] = (stroke->pos[2]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);

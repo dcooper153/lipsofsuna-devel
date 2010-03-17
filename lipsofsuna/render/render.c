@@ -133,7 +133,7 @@ liren_render_free (LIRenRender* self)
 	/* Free scenes. */
 	if (self->scenes != NULL)
 	{
-		assert (self->scenes->size == 0);
+		lisys_assert (self->scenes->size == 0);
 		lialg_ptrdic_free (self->scenes);
 	}
 
@@ -438,7 +438,7 @@ liren_check_errors ()
 			fprintf (stderr, "ERROR: Unknown GL error\n");
 			break;
 	}
-	/* assert (0); */
+	/* lisys_assert (0); */
 }
 #endif
 

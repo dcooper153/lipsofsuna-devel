@@ -511,7 +511,6 @@ limat_polygon_get_coord (const LIMatPolygon* self,
 {
 	const LIMatVtxops* ops = self->ops;
 
-	assert (index >= 0 && index < self->vertices.count);
 	self->ops->getcoord ((char*) self->vertices.vertices + index * ops->size, coord);
 }
 
@@ -528,7 +527,6 @@ limat_polygon_get_vertex (const LIMatPolygon* self,
 {
 	const LIMatVtxops* ops = self->ops;
 
-	assert (index >= 0 && index < self->vertices.count);
 	return (char*) self->vertices.vertices + index * ops->size;
 }
 

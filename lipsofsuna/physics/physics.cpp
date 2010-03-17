@@ -130,9 +130,9 @@ liphy_physics_new (LICalCallbacks* callbacks)
 void
 liphy_physics_free (LIPhyPhysics* self)
 {
-	assert (self->contacts == NULL);
-	assert (self->constraints == NULL);
-	assert (self->objects->size == 0);
+	lisys_assert (self->contacts == NULL);
+	lisys_assert (self->constraints == NULL);
+	lisys_assert (self->objects->size == 0);
 
 	delete self->dynamics;
 	delete self->solver;

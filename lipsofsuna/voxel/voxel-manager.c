@@ -496,7 +496,7 @@ livox_manager_load_materials (LIVoxManager* self)
 			sqlite3_finalize (statement);
 			return 0;
 		}
-		assert (lialg_u32dic_find (self->materials, material->id) == NULL);
+		lisys_assert (lialg_u32dic_find (self->materials, material->id) == NULL);
 
 		/* Add to material list. */
 		if (!lialg_u32dic_insert (self->materials, material->id, material))

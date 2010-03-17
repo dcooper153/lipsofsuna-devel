@@ -78,7 +78,7 @@ lialg_sectors_new (int   count,
 void
 lialg_sectors_free (LIAlgSectors* self)
 {
-	assert (self->content->size == 0);
+	lisys_assert (self->content->size == 0);
 
 	lialg_sectors_clear (self);
 	lialg_strdic_free (self->content);
@@ -261,7 +261,7 @@ lialg_sectors_insert_content (LIAlgSectors*       self,
 	LIAlgSectorsContent* content;
 	LIAlgU32dicIter iter;
 
-	assert (!lialg_strdic_find (self->content, name));
+	lisys_assert (!lialg_strdic_find (self->content, name));
 
 	/* Allocate content. */
 	content = lisys_calloc (1, sizeof (LIAlgSectorsContent));

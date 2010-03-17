@@ -281,7 +281,7 @@ private_backspace (LIWdgEntry* self)
 	if (wstr == NULL)
 		return;
 	len1 = wcslen (wstr);
-	assert (len1);
+	lisys_assert (len1);
 
 	/* Get length of the last character. */
 	str = listr_wchar_to_utf8 (wstr[len1 - 1]);

@@ -108,7 +108,7 @@ lialg_strdic_find (LIAlgStrdic* self,
 	if (tnode == NULL)
 		return NULL;
 	anode = (LIAlgStrdicNode*)tnode->data;
-	assert (&anode->node == tnode);
+	lisys_assert (&anode->node == tnode);
 	return anode->value;
 }
 
@@ -130,7 +130,7 @@ lialg_strdic_find_node (LIAlgStrdic* self,
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	assert (&((LIAlgStrdicNode*) tnode->data)->node == tnode);
+	lisys_assert (&((LIAlgStrdicNode*) tnode->data)->node == tnode);
 	return (LIAlgStrdicNode*)tnode->data;
 }
 
@@ -196,7 +196,7 @@ lialg_strdic_remove (LIAlgStrdic* self,
 	if (tnode == NULL)
 		return 0;
 	anode = (LIAlgStrdicNode*) tnode->data;
-	assert (&anode->node == tnode);
+	lisys_assert (&anode->node == tnode);
 
 	/* Unlink from tree. */
 	lialg_bst_unlink (self->tree, tnode);

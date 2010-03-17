@@ -435,7 +435,6 @@ limat_quaternion_get_basis (LIMatQuaternion self,
 			result.x = 0.0f;
 			result.y = 0.0f;
 			result.z = 0.0f;
-			assert (0);
 			break;
 	}
 

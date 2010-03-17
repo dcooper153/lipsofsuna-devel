@@ -338,8 +338,8 @@ LIVoxBlock*
 livox_sector_get_block (LIVoxSector* self,
                         int          index)
 {
-	assert (index >= 0);
-	assert (index < LIVOX_BLOCKS_PER_SECTOR);
+	lisys_assert (index >= 0);
+	lisys_assert (index < LIVOX_BLOCKS_PER_SECTOR);
 
 	return self->blocks + index;
 }
@@ -465,10 +465,10 @@ livox_sector_get_voxel (LIVoxSector* self,
 	int ty = y % LIVOX_TILES_PER_LINE;
 	int tz = z % LIVOX_TILES_PER_LINE;
 
-	assert (x >= 0 && y >= 0 && z >= 0);
-	assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	lisys_assert (x >= 0 && y >= 0 && z >= 0);
+	lisys_assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	lisys_assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	lisys_assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
 	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 
 	return livox_block_get_voxel (block, tx, ty, tz);
@@ -500,10 +500,10 @@ livox_sector_set_voxel (LIVoxSector* self,
 	int tz = z % LIVOX_TILES_PER_LINE;
 	LIVoxBlock* block;
 
-	assert (x >= 0 && y >= 0 && z >= 0);
-	assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	lisys_assert (x >= 0 && y >= 0 && z >= 0);
+	lisys_assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	lisys_assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
+	lisys_assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
 	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
 	ret = livox_block_set_voxel (block, tx, ty, tz, &terrain);
 	if (ret)

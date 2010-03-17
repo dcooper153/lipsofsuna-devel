@@ -403,8 +403,8 @@ limdl_material_set_texture (LIMdlMaterial* self,
 {
 	char* dup;
 
-	assert (unit >= 0);
-	assert (unit < self->textures.count);
+	lisys_assert (unit >= 0);
+	lisys_assert (unit < self->textures.count);
 
 	dup = listr_dup (name);
 	if (dup == NULL)

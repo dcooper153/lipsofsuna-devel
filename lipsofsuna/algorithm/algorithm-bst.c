@@ -275,7 +275,7 @@ lialg_bst_link (LIAlgBst*     self,
 		return;
 	}
 
-	//assert (0);
+	//lisys_assert (0);
 }
 
 /**

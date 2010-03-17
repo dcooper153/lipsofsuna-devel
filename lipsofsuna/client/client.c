@@ -26,7 +26,6 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
-#include <assert.h>
 #include <lipsofsuna/network.h>
 #include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
@@ -151,10 +150,10 @@ licli_client_host (LICliClient* self)
 	/* Kill old thread. */
 	if (self->server_thread != NULL)
 	{
-		assert (self->server != NULL);
+		lisys_assert (self->server != NULL);
 		limai_program_shutdown (self->server->program);
 		lithr_thread_free (self->server_thread);
-		assert (self->server == NULL);
+		lisys_assert (self->server == NULL);
 	}
 
 	/* Create new server. */
@@ -272,7 +271,7 @@ private_free_module (LICliClient* self)
 		lithr_thread_free (self->server_thread);
 		self->server_thread = NULL;
 	}
-	assert (self->server == NULL);
+	lisys_assert (self->server == NULL);
 	if (self->paths != NULL)
 	{
 		lipth_paths_free (self->paths);

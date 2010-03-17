@@ -190,7 +190,7 @@ lieng_object_ref (LIEngObject* self,
 	}
 #endif
 	self->refs += count;
-	assert (self->refs >= 0);
+	lisys_assert (self->refs >= 0);
 	if (self->refs <= 0)
 		lieng_object_free (self);
 }

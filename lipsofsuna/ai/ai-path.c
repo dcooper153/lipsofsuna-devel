@@ -88,8 +88,8 @@ liai_path_get_point (const LIAiPath* self,
                      int             index,
                      LIMatVector*    value)
 {
-	assert (index >= 0);
-	assert (index < self->points.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->points.count);
 
 	*value = self->points.points[index];
 }
@@ -128,8 +128,8 @@ void
 liai_path_set_position (LIAiPath* self,
                         int       index)
 {
-	assert (index >= 0);
-	assert (index <= self->points.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index <= self->points.count);
 
 	self->position = index;
 }

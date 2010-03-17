@@ -72,7 +72,7 @@ liwdg_container_child_at (LIWdgContainer* self,
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
-	assert (iface != NULL);
+	lisys_assert (iface != NULL);
 	if (iface == NULL)
 		return NULL;
 
@@ -102,7 +102,7 @@ liwdg_container_child_request (LIWdgContainer* self,
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
-	assert (iface != NULL);
+	lisys_assert (iface != NULL);
 	if (iface == NULL)
 		return;
 
@@ -125,7 +125,7 @@ liwdg_container_cycle_focus (LIWdgContainer* self,
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
-	assert (iface != NULL);
+	lisys_assert (iface != NULL);
 	if (iface == NULL)
 		return NULL;
 
@@ -155,7 +155,7 @@ liwdg_container_detach_child (LIWdgContainer* self,
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
-	assert (iface != NULL);
+	lisys_assert (iface != NULL);
 	if (iface == NULL)
 		return;
 
@@ -185,7 +185,7 @@ liwdg_container_foreach_child (LIWdgContainer* self,
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
-	assert (iface != NULL);
+	lisys_assert (iface != NULL);
 	if (iface == NULL)
 		return;
 
@@ -221,7 +221,7 @@ liwdg_container_translate_coords (LIWdgContainer* self,
 	event.probe.result = NULL;
 	liwdg_widget_event (LIWDG_WIDGET (self), &event);
 	iface = event.probe.result;
-	assert (iface != NULL);
+	lisys_assert (iface != NULL);
 	if (iface == NULL)
 		return;
 

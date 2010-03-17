@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <assert.h>
 #include "script.h"
 #include "script-class.h"
 #include "script-data.h"
@@ -203,7 +202,7 @@ liscr_checkclassdata (lua_State*  lua,
 
 	clss = liscr_checkclass (lua, arg, meta);
 	data = liscr_class_get_userdata (clss, meta);
-	assert (data != NULL);
+	lisys_assert (data != NULL);
 
 	return data;
 }
@@ -261,7 +260,7 @@ liscr_copyargs (lua_State* lua,
 	if (lua_type (lua, -1) != LUA_TFUNCTION)
 	{
 		lua_pop (lua, 2);
-		assert (0);
+		lisys_assert (0);
 		return 0;
 	}
 
@@ -300,7 +299,7 @@ liscr_pushclass (lua_State*  lua,
                  LIScrClass* clss)
 {
 	lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
-	assert (lua_type (lua, -1) == LUA_TTABLE);
+	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
 }
 
 /**
@@ -318,11 +317,11 @@ liscr_pushdata (lua_State* lua,
 {
 	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP);
 	lua_gettable (lua, LUA_REGISTRYINDEX);
-	assert (lua_type (lua, -1) == LUA_TTABLE);
+	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (lua, object);
 	lua_gettable (lua, -2);
 	lua_remove (lua, -2);
-	assert (lua_isuserdata (lua, -1));
+	lisys_assert (lua_isuserdata (lua, -1));
 }
 
 /**
@@ -341,7 +340,7 @@ liscr_pushpriv (lua_State* lua,
 	liscr_pushdata (lua, object);
 	lua_getfenv (lua, -1);
 	lua_remove (lua, -2);
-	assert (lua_istable (lua, -1));
+	lisys_assert (lua_istable (lua, -1));
 }
 
 /**

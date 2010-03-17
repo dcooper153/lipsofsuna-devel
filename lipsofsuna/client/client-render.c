@@ -41,7 +41,7 @@ private_model_reload (LICliClient* self,
                       const char*  name,
                       LIEngModel*  model)
 {
-	assert (model != NULL);
+	lisys_assert (model != NULL);
 
 	liren_render_load_model (self->render, name, model->model);
 

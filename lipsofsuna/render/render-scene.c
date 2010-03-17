@@ -112,12 +112,12 @@ liren_scene_free (LIRenScene* self)
 	/* Free objects. */
 	if (self->groups != NULL)
 	{
-		assert (self->groups->size == 0);
+		lisys_assert (self->groups->size == 0);
 		lialg_ptrdic_free (self->groups);
 	}
 	if (self->objects != NULL)
 	{
-		assert (self->objects->size == 0);
+		lisys_assert (self->objects->size == 0);
 		lialg_u32dic_free (self->objects);
 	}
 
@@ -256,9 +256,9 @@ liren_scene_render (LIRenScene*    self,
 	LIRenContext context;
 	GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	assert (modelview != NULL);
-	assert (projection != NULL);
-	assert (frustum != NULL);
+	lisys_assert (modelview != NULL);
+	lisys_assert (projection != NULL);
+	lisys_assert (frustum != NULL);
 
 	liren_check_errors ();
 	liren_context_init (&context, self);

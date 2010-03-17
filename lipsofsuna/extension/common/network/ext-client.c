@@ -128,7 +128,7 @@ int
 liext_client_set_object (LIExtClient* self,
                          LIEngObject* value)
 {
-	assert (value != NULL);
+	lisys_assert (value != NULL);
 
 	if (self->object == value)
 		return 1;

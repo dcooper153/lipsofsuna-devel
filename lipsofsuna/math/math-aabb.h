@@ -25,7 +25,6 @@
 #ifndef __MATH_AABB_H__
 #define __MATH_AABB_H__
 
-#include <assert.h>
 #include <string.h>
 #include "math-matrix.h"
 #include "math-triangle.h"
@@ -198,7 +197,6 @@ limat_aabb_clip_triangle (const LIMatAabb*     self,
 		prevbuf = tmpbuf;
 		prevlen = currlen;
 	}
-	assert (prevlen <= 9);
 	memcpy (result, prevbuf, prevlen * sizeof (LIMatVector));
 	return prevlen;
 }

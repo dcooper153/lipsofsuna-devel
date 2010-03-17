@@ -104,7 +104,7 @@ lialg_u32dic_find (LIAlgU32dic* self,
 	if (tnode == NULL)
 		return NULL;
 	anode = (LIAlgU32dicNode*) tnode->data;
-	assert (&anode->node == tnode);
+	lisys_assert (&anode->node == tnode);
 	return anode->value;
 }
 
@@ -126,7 +126,7 @@ lialg_u32dic_find_node (LIAlgU32dic* self,
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	assert (&((LIAlgU32dicNode*) tnode->data)->node == tnode);
+	lisys_assert (&((LIAlgU32dicNode*) tnode->data)->node == tnode);
 	return (LIAlgU32dicNode*) tnode->data;
 }
 
@@ -187,7 +187,7 @@ lialg_u32dic_remove (LIAlgU32dic* self,
 	if (tnode == NULL)
 		return 1;
 	anode = (LIAlgU32dicNode*) tnode->data;
-	assert (&anode->node == tnode);
+	lisys_assert (&anode->node == tnode);
 
 	/* Unlink from tree. */
 	lialg_bst_unlink (self->tree, tnode);

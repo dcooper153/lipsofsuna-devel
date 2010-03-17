@@ -253,7 +253,7 @@ private_build_path (LIAlgAstar*     self,
 	count = 0;
 	for (ptr = last ; ptr != NULL ; ptr = ptr->prev)
 	{
-		assert (ptr->node != NULL);
+		lisys_assert (ptr->node != NULL);
 		count++;
 	}
 
@@ -336,7 +336,7 @@ private_node_opened (LIAlgAstar*     self,
 	successor = lialg_ptrdic_find (self->open, node);
 	if (successor == NULL)
 		return 0;
-	assert (successor->node == node);
+	lisys_assert (successor->node == node);
 
 	/* Check if the previously evaluated path is shorter. */
 	cost = prev->cost + self->calls.cost (self->world, self->object, prev->node, node);
@@ -384,7 +384,7 @@ private_node_closed (LIAlgAstar*     self,
 	successor = lialg_ptrdic_find (self->closed, node);
 	if (successor == NULL)
 		return 0;
-	assert (successor->node == node);
+	lisys_assert (successor->node == node);
 
 	/* Check if the previously evaluated path is shorter. */
 	cost = prev->cost + self->calls.cost (self->world, self->object, prev->node, node);

@@ -336,7 +336,7 @@ liext_module_send (LIExtModule* self,
 
 	if (self->client_socket)
 	{
-		assert (object == NULL);
+		lisys_assert (object == NULL);
 		grapple_client_send (self->client_socket, GRAPPLE_SERVER, flags,
 			liarc_writer_get_buffer (writer),
 			liarc_writer_get_length (writer));
@@ -344,7 +344,7 @@ liext_module_send (LIExtModule* self,
 	}
 	if (self->server_socket)
 	{
-		assert (object != NULL);
+		lisys_assert (object != NULL);
 		client = liext_module_find_client_by_object (self, object->id);
 		if (client == NULL)
 			return 0;
@@ -365,7 +365,7 @@ liext_module_shutdown (LIExtModule* self)
 	LIALG_U32DIC_FOREACH (iter0, self->clients)
 		liext_client_free (iter0.value);
 	lialg_u32dic_clear (self->clients);
-	assert (self->objects->size == 0);
+	lisys_assert (self->objects->size == 0);
 
 	/* Clear pending authorization requests. */
 	LIALG_STRDIC_FOREACH (iter1, self->passwords)
@@ -560,7 +560,7 @@ private_disconnect (LIExtModule*     self,
 	client = liext_module_find_client (self, message->USER_DISCONNECTED.id);
 	if (client == NULL)
 		return 0;
-	assert (client->object != NULL);
+	lisys_assert (client->object != NULL);
 	liext_client_free (client);
 
 	return 1;

@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <assert.h>
 #include "script.h"
 #include "script-class.h"
 #include "script-data.h"
@@ -57,7 +56,7 @@ liscr_data_new (LIScrScript* script,
 	if (clss == NULL)
 	{
 		lisys_error_set (EINVAL, "invalid class `%s'", meta);
-		assert (0);
+		lisys_assert (0);
 		return NULL;
 	}
 
@@ -79,7 +78,7 @@ liscr_data_new (LIScrScript* script,
 	/* Add to lookup table. */
 	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);
 	lua_gettable (script->lua, LUA_REGISTRYINDEX);
-	assert (lua_type (script->lua, -1) == LUA_TTABLE);
+	lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (script->lua, object);
 	lua_pushvalue (script->lua, -3);
 	lua_settable (script->lua, -3);
@@ -150,7 +149,7 @@ liscr_data_free (LIScrData* object)
 	/* Remove from lookup table. */
 	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);
 	lua_gettable (script->lua, LUA_REGISTRYINDEX);
-	assert (lua_type (script->lua, -1) == LUA_TTABLE);
+	lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (script->lua, object);
 	lua_pushnil (script->lua);
 	lua_settable (script->lua, -3);
@@ -197,7 +196,7 @@ liscr_data_ref (LIScrData* object,
 		liscr_pushpriv (script->lua, referencer);
 		lua_pushlightuserdata (script->lua, object + 1);
 		lua_gettable (script->lua, -2);
-		assert (lua_isnumber (script->lua, -1) || lua_isnil (script->lua, -1));
+		lisys_assert (lua_isnumber (script->lua, -1) || lua_isnil (script->lua, -1));
 		count = lua_tointeger (script->lua, -1);
 		lua_pop (script->lua, 1);
 
@@ -232,7 +231,7 @@ liscr_data_unref (LIScrData* object,
 
 	if (referencer == NULL)
 	{
-		assert (object->refcount > 0);
+		lisys_assert (object->refcount > 0);
 		if (!--object->refcount)
 		{
 			/* Clear protection reference. */
@@ -247,7 +246,7 @@ liscr_data_unref (LIScrData* object,
 		liscr_pushpriv (script->lua, referencer);
 		lua_pushlightuserdata (script->lua, object + 1);
 		lua_gettable (script->lua, -2);
-		assert (lua_isnumber (script->lua, -1));
+		lisys_assert (lua_isnumber (script->lua, -1));
 		count = lua_tointeger (script->lua, -1);
 		lua_pop (script->lua, 1);
 
@@ -343,7 +342,7 @@ liscr_data_get_valid (LIScrData* self)
 
 	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP);
 	lua_gettable (self->script->lua, LUA_REGISTRYINDEX);
-	assert (lua_type (self->script->lua, -1) == LUA_TTABLE);
+	lisys_assert (lua_type (self->script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (self->script->lua, self);
 	lua_gettable (self->script->lua, -2);
 	ret = lua_isuserdata (self->script->lua, -1);

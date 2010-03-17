@@ -51,7 +51,7 @@ libnd_binding_new (LIBndManager* manager,
 	uint32_t mask;
 	LIBndBinding* self;
 
-	assert (action != NULL);
+	lisys_assert (action != NULL);
 
 	self = lisys_calloc (1, sizeof (LIBndBinding));
 	if (self == NULL)

@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <assert.h>
 #include <lipsofsuna/math.h>
 #include "widget-group.h"
 #include "widget-window.h"
@@ -192,8 +191,8 @@ liwdg_group_insert_col (LIWdgGroup* self,
 	int x;
 	int y;
 
-	assert (index >= 0);
-	assert (index <= self->width);
+	lisys_assert (index >= 0);
+	lisys_assert (index <= self->width);
 
 	/* Resize. */
 	if (!liwdg_group_set_size (self, self->width + 1, self->height))
@@ -232,8 +231,8 @@ liwdg_group_insert_row (LIWdgGroup* self,
 	int x;
 	int y;
 
-	assert (index >= 0);
-	assert (index <= self->height);
+	lisys_assert (index >= 0);
+	lisys_assert (index <= self->height);
 
 	/* Resize. */
 	if (!liwdg_group_set_size (self, self->width, self->height + 1))
@@ -271,8 +270,8 @@ liwdg_group_remove_col (LIWdgGroup* self,
 	int x;
 	int y;
 
-	assert (index >= 0);
-	assert (index < self->width);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->width);
 
 	/* Delete widgets. */
 	for (y = 0 ; y < self->height ; y++)
@@ -310,8 +309,8 @@ liwdg_group_remove_row (LIWdgGroup* self,
 	int x;
 	int y;
 
-	assert (index >= 0);
-	assert (index < self->height);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->height);
 
 	/* Delete widgets. */
 	for (x = 0 ; x < self->width ; x++)
@@ -370,8 +369,8 @@ liwdg_group_get_child (LIWdgGroup* self,
                        int         x,
                        int         y)
 {
-	assert (x < self->width);
-	assert (y < self->height);
+	lisys_assert (x < self->width);
+	lisys_assert (y < self->height);
 	return self->cells[x + y * self->width].child;
 }
 
@@ -392,8 +391,8 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	LIWdgGroupCell* cell;
 	LIWdgManager* manager;
 
-	assert (x < self->width);
-	assert (y < self->height);
+	lisys_assert (x < self->width);
+	lisys_assert (y < self->height);
 
 	/* Check for same widget. */
 	cell = self->cells + x + y * self->width;
@@ -403,8 +402,8 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	/* Detach the old child. */
 	if (cell->child != NULL)
 	{
-		assert (cell->child->state == LIWDG_WIDGET_STATE_DETACHED);
-		assert (cell->child->parent == LIWDG_WIDGET (self));
+		lisys_assert (cell->child->state == LIWDG_WIDGET_STATE_DETACHED);
+		lisys_assert (cell->child->parent == LIWDG_WIDGET (self));
 		private_call_detach (self, x, y);
 	}
 
@@ -412,8 +411,8 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	cell->child = child;
 	if (child != NULL)
 	{
-		assert (child->parent == NULL);
-		assert (child->state == LIWDG_WIDGET_STATE_DETACHED);
+		lisys_assert (child->parent == NULL);
+		lisys_assert (child->state == LIWDG_WIDGET_STATE_DETACHED);
 		manager = LIWDG_WIDGET (self)->manager;
 		child->parent = LIWDG_WIDGET (self);
 		lical_callbacks_call (manager->callbacks, manager, "widget-attach", lical_marshal_DATA_PTR_PTR, child, self);
@@ -920,7 +919,7 @@ private_child_request (LIWdgGroup*  self,
 			}
 		}
 	}
-	assert (0 && "Invalid child request");
+	lisys_assert (0 && "Invalid child request");
 }
 
 /**
@@ -961,7 +960,7 @@ private_cycle_focus (LIWdgGroup*  self,
 			if (found)
 				break;
 		}
-		assert (found);
+		lisys_assert (found);
 	}
 
 	/* Find new focused widget. */
@@ -1138,8 +1137,8 @@ private_cell_changed (LIWdgGroup* self,
 	else if (child != NULL && child->visible)
 	{
 		/* Only set allocation of the widget. */
-		assert (self->cols[x].allocation >= size.width);
-		assert (self->rows[y].allocation >= size.height);
+		lisys_assert (self->cols[x].allocation >= size.width);
+		lisys_assert (self->rows[y].allocation >= size.height);
 		liwdg_widget_set_allocation (child,
 			LIWDG_WIDGET (self)->allocation.x + self->cols[x].start,
 			LIWDG_WIDGET (self)->allocation.y + self->rows[y].start,
@@ -1269,7 +1268,7 @@ private_rebuild (LIWdgGroup* self,
 			if (self->col_expand > 0)
 			{
 				expand = rect.width - wreq;
-				assert (expand >= 0);
+				lisys_assert (expand >= 0);
 				expand /= self->width;
 			}
 			else
@@ -1293,7 +1292,7 @@ private_rebuild (LIWdgGroup* self,
 			if (self->row_expand > 0)
 			{
 				expand = rect.height - hreq;
-				assert (expand >= 0);
+				lisys_assert (expand >= 0);
 				expand /= self->height;
 			}
 			else
@@ -1356,7 +1355,7 @@ private_rebuild (LIWdgGroup* self,
 			if (self->col_expand > 0)
 			{
 				expand = rect.width - self->margin_left - self->margin_right;
-				assert (expand >= 0);
+				lisys_assert (expand >= 0);
 				for (x = 0 ; x < self->width ; x++)
 				{
 					if (self->cols[x].request)
@@ -1366,7 +1365,7 @@ private_rebuild (LIWdgGroup* self,
 							expand -= self->col_spacing;
 					}
 				}
-				assert (expand >= 0);
+				lisys_assert (expand >= 0);
 				expand /= self->col_expand;
 			}
 			else
@@ -1392,7 +1391,7 @@ private_rebuild (LIWdgGroup* self,
 			if (self->row_expand > 0)
 			{
 				expand = rect.height - self->margin_top - self->margin_bottom;
-				assert (expand >= 0);
+				lisys_assert (expand >= 0);
 				for (y = 0 ; y < self->height ; y++)
 				{
 					if (self->rows[y].request)
@@ -1402,7 +1401,7 @@ private_rebuild (LIWdgGroup* self,
 							expand -= self->row_spacing;
 					}
 				}
-				assert (expand >= 0);
+				lisys_assert (expand >= 0);
 				expand /= self->row_expand;
 			}
 			else

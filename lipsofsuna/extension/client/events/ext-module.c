@@ -130,7 +130,6 @@ liext_module_event (LIExtModule* self,
 	if (!lua_istable (script->lua, -1))
 	{
 		lua_pop (script->lua, 1);
-		assert (0);
 		return;
 	}
 
@@ -141,7 +140,6 @@ liext_module_event (LIExtModule* self,
 	if (!lua_istable (script->lua, -1))
 	{
 		lua_pop (script->lua, 1);
-		assert (0);
 		return;
 	}
 

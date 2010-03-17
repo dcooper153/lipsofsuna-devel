@@ -90,7 +90,7 @@ int
 lieng_sector_insert_object (LIEngSector* self,
                             LIEngObject* object)
 {
-	assert (!lialg_u32dic_find (self->objects, object->id));
+	lisys_assert (!lialg_u32dic_find (self->objects, object->id));
 
 	if (lialg_u32dic_insert (self->objects, object->id, object) == NULL)
 		return 0;
@@ -107,7 +107,7 @@ void
 lieng_sector_remove_object (LIEngSector* self,
                             LIEngObject* object)
 {
-	assert (lialg_u32dic_find (self->objects, object->id));
+	lisys_assert (lialg_u32dic_find (self->objects, object->id));
 
 	lialg_u32dic_remove (self->objects, object->id);
 }

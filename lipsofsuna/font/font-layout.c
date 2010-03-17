@@ -217,7 +217,7 @@ private_layout (LIFntLayout* self)
 	{
 		x = 0;
 		w = private_get_line_width (self, start, &end);
-		assert (end < self->n_glyphs);
+		lisys_assert (end < self->n_glyphs);
 		y += private_get_line_height (self, start, end);
 		for (i = start ; i <= end ; i++)
 		{
@@ -262,7 +262,7 @@ private_get_line_ascent (LIFntLayout* self,
 	int asctmp;
 	int ascmax = 0;
 
-	assert (end < self->n_glyphs);
+	lisys_assert (end < self->n_glyphs);
 	for (i = start ; i <= end ; i++)
 	{
 		asctmp = self->glyphs[i].font->font_ascent;
@@ -281,7 +281,7 @@ private_get_line_height (LIFntLayout* self,
 	int htmp;
 	int hmax = 0;
 
-	assert (end < self->n_glyphs);
+	lisys_assert (end < self->n_glyphs);
 	for (i = start ; i <= end ; i++)
 	{
 		htmp = lifnt_font_get_height (self->glyphs[i].font);
@@ -350,7 +350,7 @@ private_get_line_width (LIFntLayout* self,
 		}
 		x += glyph->advance;
 	}
-	assert (i < self->n_glyphs);
+	lisys_assert (i < self->n_glyphs);
 	*end = i;
 
 	return x;

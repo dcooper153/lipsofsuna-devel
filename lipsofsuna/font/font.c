@@ -232,7 +232,7 @@ private_cache_glyph (LIFntFont* self,
 			if (self->table[index] == NULL)
 				break;
 		}
-		assert (index < self->table_length);
+		lisys_assert (index < self->table_length);
 		self->table[index] = cached;
 	}
 	else

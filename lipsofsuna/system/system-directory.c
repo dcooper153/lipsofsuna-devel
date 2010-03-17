@@ -22,7 +22,6 @@
  * @{
  */
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +29,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
+#include "system.h"
 #include "system-directory.h"
 
 #ifdef LI_ENABLE_ERROR
@@ -240,8 +240,8 @@ const char*
 lisys_dir_get_name (const LISysDir* self,
                     int             i)
 {
-	assert (i >= 0);
-	assert (i < self->names.count);
+	lisys_assert (i >= 0);
+	lisys_assert (i < self->names.count);
 
 	return self->names.array[i];
 }
@@ -257,8 +257,8 @@ char*
 lisys_dir_get_path (const LISysDir* self,
                     int             i)
 {
-	assert (i >= 0);
-	assert (i < self->names.count);
+	lisys_assert (i >= 0);
+	lisys_assert (i < self->names.count);
 
 	return private_concat_paths (self->path, self->names.array[i]);
 }

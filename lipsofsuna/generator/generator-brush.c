@@ -219,8 +219,8 @@ ligen_brush_remove_object (LIGenBrush* self,
 	int i;
 	LIGenBrushobject* object;
 
-	assert (index >= 0);
-	assert (index < self->objects.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->objects.count);
 
 	object = self->objects.array[index];
 	lisys_free (object->model);
@@ -251,8 +251,8 @@ ligen_brush_remove_rule (LIGenBrush* self,
 	int i;
 	LIGenRule* rule;
 
-	assert (index >= 0);
-	assert (index < self->rules.count);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->rules.count);
 
 	ligen_rule_free (self->rules.array[index]);
 	lialg_array_remove (&self->rules, index);
@@ -380,9 +380,9 @@ ligen_brush_set_size (LIGenBrush* self,
 	int k;
 	LIVoxVoxel* tmp;
 
-	assert (x > 0);
-	assert (y > 0);
-	assert (z > 0);
+	lisys_assert (x > 0);
+	lisys_assert (y > 0);
+	lisys_assert (z > 0);
 
 	tmp = lisys_calloc (x * y * z, sizeof (LIVoxVoxel));
 	if (tmp == NULL)
@@ -413,12 +413,12 @@ ligen_brush_set_voxel (LIGenBrush* self,
 {
 	int i;
 
-	assert (x >= 0);
-	assert (y >= 0);
-	assert (z >= 0);
-	assert (x < self->size[0]);
-	assert (y < self->size[1]);
-	assert (z < self->size[2]);
+	lisys_assert (x >= 0);
+	lisys_assert (y >= 0);
+	lisys_assert (z >= 0);
+	lisys_assert (x < self->size[0]);
+	lisys_assert (y < self->size[1]);
+	lisys_assert (z < self->size[2]);
 
 	i = x + y * self->size[0] + z * self->size[1] * self->size[2];
 	self->voxels.array[i] = voxel;

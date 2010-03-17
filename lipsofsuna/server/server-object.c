@@ -311,7 +311,7 @@ liser_object_serialize (LIEngObject* self,
 		}
 		if (type != NULL)
 		{
-			assert (script != NULL);
+			lisys_assert (script != NULL);
 			ret = (sqlite3_bind_text (statement, col++, type, -1, SQLITE_TRANSIENT) != SQLITE_OK);
 			lua_pop (script->lua, 1);
 		}
@@ -319,7 +319,7 @@ liser_object_serialize (LIEngObject* self,
 			ret = (sqlite3_bind_null (statement, col++) != SQLITE_OK);
 		if (extra != NULL)
 		{
-			assert (script != NULL);
+			lisys_assert (script != NULL);
 			ret = (ret || sqlite3_bind_text (statement, col++, extra, -1, SQLITE_TRANSIENT) != SQLITE_OK);
 			lua_pop (script->lua, 1);
 		}

@@ -111,7 +111,7 @@ lialg_memdic_find (LIAlgMemdic* self,
 	if (tnode == NULL)
 		return NULL;
 	anode = (LIAlgMemdicNode*) tnode->data;
-	assert (&anode->node == tnode);
+	lisys_assert (&anode->node == tnode);
 	return anode->value;
 }
 
@@ -136,7 +136,7 @@ lialg_memdic_find_node (LIAlgMemdic* self,
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	assert (&((LIAlgMemdicNode*) tnode->data)->node == tnode);
+	lisys_assert (&((LIAlgMemdicNode*) tnode->data)->node == tnode);
 	return (LIAlgMemdicNode*) tnode->data;
 }
 
@@ -209,7 +209,7 @@ lialg_memdic_remove (LIAlgMemdic* self,
 	if (tnode == NULL)
 		return 1;
 	anode = (LIAlgMemdicNode*) tnode->data;
-	assert (&anode->node == tnode);
+	lisys_assert (&anode->node == tnode);
 
 	/* Unlink from tree. */
 	lialg_bst_unlink (self->tree, tnode);

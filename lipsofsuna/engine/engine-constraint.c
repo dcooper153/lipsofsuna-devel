@@ -49,8 +49,8 @@ lieng_constraint_new (LIEngObject* first_object,
 void
 lieng_constraint_free (LIEngConstraint* self)
 {
-	assert (self->next == NULL);
-	assert (self->prev == NULL);
+	lisys_assert (self->next == NULL);
+	lisys_assert (self->prev == NULL);
 	lisys_free (self->node_names[0]);
 	lisys_free (self->node_names[1]);
 	lisys_free (self);
@@ -114,8 +114,8 @@ lieng_constraint_get_transform (LIEngConstraint* self,
 	LIMatTransform t0;
 	LIMatTransform t1;
 
-	assert (index >= 0);
-	assert (index < 2);
+	lisys_assert (index >= 0);
+	lisys_assert (index < 2);
 
 	if (type == LIENG_MATRIX_WORLD)
 	{
