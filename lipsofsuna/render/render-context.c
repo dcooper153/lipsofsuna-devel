@@ -189,7 +189,6 @@ liren_context_render_vbo_array (LIRenContext*      self,
                                 int                vertex0,
                                 int                vertex1)
 {
-	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -223,7 +222,6 @@ liren_context_render_vtx_array (LIRenContext*      self,
                                 int                vertex0,
                                 int                vertex1)
 {
-	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -258,7 +256,6 @@ liren_context_render_vbo_indexed (LIRenContext*      self,
                                   int                index0,
                                   int                index1)
 {
-	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -296,7 +293,6 @@ liren_context_render_vtx_indexed (LIRenContext*      self,
                                   int                index0,
                                   int                index1)
 {
-	glColor3f (1.0f, 1.0f, 1.0f);
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -329,6 +325,19 @@ liren_context_unbind (LIRenContext* self)
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_LIGHTING);
 	glColor3f (1.0f, 1.0f, 1.0f);
+}
+
+int
+liren_context_get_deferred (LIRenContext* self)
+{
+	return self->deferred;
+}
+
+void
+liren_context_set_deferred (LIRenContext* self,
+                            int           value)
+{
+	self->deferred = value;
 }
 
 void
@@ -366,6 +375,16 @@ liren_context_set_material (LIRenContext*        self,
 	memcpy (self->material.parameters, value->parameters, 4 * sizeof (float));
 	memcpy (self->material.diffuse, value->diffuse, 4 * sizeof (float));
 	memcpy (self->material.specular, value->specular, 4 * sizeof (float));
+}
+
+void
+liren_context_set_material_shader (LIRenContext*        self,
+                                   const LIRenMaterial* value)
+{
+	if (self->deferred)
+		liren_context_set_shader (self, value->shader_deferred);
+	else
+		liren_context_set_shader (self, value->shader_forward);
 }
 
 void
@@ -445,16 +464,13 @@ private_bind_material (LIRenContext* self)
 		glEnable (GL_CULL_FACE);
 	else
 		glDisable (GL_CULL_FACE);
-#warning We should support proper transparency.
-#if 0
-	if (self->material.flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
+	if (!self->deferred && (self->material.flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
 	{
 		glEnable (GL_BLEND);
 		glDepthMask (GL_FALSE);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else
-#endif
 	{
 		glDisable (GL_BLEND);
 		glDepthMask (GL_TRUE);

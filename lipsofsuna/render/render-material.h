@@ -47,7 +47,8 @@ struct _LIRenMaterial
 	float strand_start;
 	float strand_end;
 	float strand_shape;
-	LIRenShader* shader;
+	LIRenShader* shader_deferred;
+	LIRenShader* shader_forward;
 	struct
 	{
 		int count;
@@ -71,7 +72,8 @@ liren_material_set_flags (LIRenMaterial* self,
 
 int
 liren_material_set_shader (LIRenMaterial* self,
-                           LIRenShader*   shader);
+                           LIRenShader*   deferred,
+                           LIRenShader*   forward);
 
 void
 liren_material_set_texture (LIRenMaterial* self,

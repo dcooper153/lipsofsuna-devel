@@ -30,11 +30,45 @@
 #define LIREN_LIGHT_MAXIMUM_RATING 100.0f
 #define LIREN_PARTICLE_MAXIMUM_COUNT 1000
 
-static int
-private_init_lights (LIRenScene* self);
+static void
+private_deferred_render_opaque (LIRenScene*    self,
+                                LIRenDeferred* framebuffer,
+                                LIRenContext*  context,
+                                LIRenObject*   objects,
+                                int            count,
+                                int            transparent,
+                                float          threshold);
+
+static void
+private_forward_render_begin (LIRenScene*    self,
+                              LIRenDeferred* framebuffer,
+                              LIRenContext*  context);
+
+static void
+private_forward_render_end (LIRenScene*    self,
+                            LIRenDeferred* framebuffer,
+                            LIRenContext*  context);
+
+static void
+private_forward_render_opaque (LIRenScene*   self,
+                               LIRenContext* context,
+                               LIRenObject*  objects,
+                               int           count,
+                               int           transparent,
+                               float         threshold);
+
+static void
+private_forward_render_particles (LIRenScene*   self,
+                                  LIRenContext* context);
+
+static void
+private_forward_render_transparent (LIRenScene*   self,
+                                    LIRenContext* context,
+                                    LIRenObject*  objects,
+                                    int           count);
 
 static int
-private_init_particles (LIRenScene* self);
+private_init (LIRenScene* self);
 
 static int
 private_light_bounds (LIRenScene*   self,
@@ -56,6 +90,16 @@ private_render (LIRenScene*   self,
                 LIRenContext* context,
                 lirenCallback call,
                 void*         data);
+
+static int
+private_sort_objects (const void* first,
+                      const void* second);
+
+static int
+private_sort_scene (LIRenScene*   self,
+                    LIRenContext* context,
+                    LIRenObject** result_list,
+                    int*          result_count);
 
 /*****************************************************************************/
 
@@ -83,8 +127,7 @@ liren_scene_new (LIRenRender* render)
 		goto error;
 
 	/* Initialize subsystems. */
-	if (!private_init_lights (self) ||
-	    !private_init_particles (self))
+	if (!private_init (self))
 		goto error;
 
 	return self;
@@ -255,7 +298,9 @@ liren_scene_render (LIRenScene*    self,
                     LIMatFrustum*  frustum)
 {
 	int i;
+	int count = 0;
 	LIRenContext context;
+	LIRenObject* objects = NULL;
 	GLfloat none[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	lisys_assert (modelview != NULL);
@@ -268,16 +313,9 @@ liren_scene_render (LIRenScene*    self,
 	liren_context_set_projection (&context, projection);
 	liren_context_set_frustum (&context, frustum);
 
-	/* Bind framebuffer. */
-	if (!self->render->shader.enabled)
-		framebuffer = NULL;
-	if (framebuffer != NULL)
-	{
-		glPushAttrib (GL_VIEWPORT_BIT);
-		glViewport (0, 0, framebuffer->width, framebuffer->height);
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->deferred_fbo);
-		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+	/* Depth sort scene. */
+	if (!private_sort_scene (self, &context, &objects, &count))
+		return;
 
 	/* Set default rendering mode. */
 	glEnable (GL_LIGHTING);
@@ -296,11 +334,6 @@ liren_scene_render (LIRenScene*    self,
 	glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, none);
 	glLightModelfv (GL_LIGHT_MODEL_AMBIENT, none);
 
-#warning We should support proper transparency.
-	glEnable (GL_ALPHA_TEST);
-	glDisable (GL_BLEND);
-	glAlphaFunc (GL_GEQUAL, 0.9f);
-
 	/* Render scene. */
 #ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.objects = 0;
@@ -308,76 +341,18 @@ liren_scene_render (LIRenScene*    self,
 	self->render->profiling.faces = 0;
 	self->render->profiling.vertices = 0;
 #endif
-	private_render (self, &context, liren_draw_opaque, NULL);
-	private_render (self, &context, liren_draw_hair, NULL);
-	private_render (self, &context, liren_draw_transparent, NULL);
-	liren_check_errors ();
+	private_deferred_render_opaque (self, framebuffer, &context, objects, count, 0, 0.9f);
+	private_forward_render_begin (self, framebuffer, &context);
+	private_forward_render_transparent (self, &context, objects, count);
+	private_forward_render_particles (self, &context);
+	private_forward_render_end (self, framebuffer, &context);
 #ifdef LIREN_ENABLE_PROFILING
 	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",
 		self->render->profiling.objects, self->render->profiling.materials,
 		self->render->profiling.faces, self->render->profiling.vertices);
 #endif
 
-#warning We should support proper transparency.
-	glDisable (GL_ALPHA_TEST);
-
-	/* Deferred lighting. */
-	if (framebuffer != NULL)
-	{
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
-		glClear (GL_COLOR_BUFFER_BIT);
-		glPushAttrib (GL_SCISSOR_BIT);
-		private_lighting_render (self, &context, framebuffer);
-		glPopAttrib ();
-	}
-	liren_check_errors ();
-
-	/* Render particles. */
-	glDisable (GL_COLOR_MATERIAL);
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_BLEND);
-	glEnable (GL_DEPTH_TEST);
-	glDepthMask (GL_FALSE);
-	private_particle_render (self);
-	private_render (self, &context, liren_draw_debug, NULL);
-	liren_check_errors ();
-	glDepthMask (GL_TRUE);
-
-	/* Copy scene to screen. */
-	if (framebuffer != NULL)
-	{
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-		glUseProgramObjectARB (0);
-		glClear (GL_COLOR_BUFFER_BIT);
-		glDisable (GL_BLEND);
-		glDisable (GL_LIGHTING);
-		glDisable (GL_CULL_FACE);
-		glDisable (GL_DEPTH_TEST);
-		glColor3f (1.0f, 1.0f, 1.0f);
-		glEnable (GL_TEXTURE_2D);
-		glBindTexture (GL_TEXTURE_2D, framebuffer->target_texture);
-		glMatrixMode (GL_MODELVIEW);
-		glLoadIdentity ();
-		glPushMatrix ();
-		glMatrixMode (GL_PROJECTION);
-		glLoadIdentity ();
-		glPushMatrix ();
-		glBegin (GL_QUADS);
-		glTexCoord2i (0, 0);
-		glVertex2i (-1, -1);
-		glTexCoord2i (0, 1);
-		glVertex2i (-1, 1);
-		glTexCoord2i (1, 1);
-		glVertex2i (1, 1);
-		glTexCoord2i (1, 0);
-		glVertex2i (1, -1);
-		glEnd ();
-		glPopMatrix ();
-		glMatrixMode (GL_MODELVIEW);
-		glPopMatrix ();
-		glPopAttrib ();
-	}
-	liren_check_errors ();
+	/* Free scene object list. */
 
 	/* Restore state. */
 	if (self->render->shader.enabled)
@@ -455,18 +430,223 @@ liren_scene_set_sky (LIRenScene* self,
 
 /*****************************************************************************/
 
+static void
+private_deferred_render_opaque (LIRenScene*    self,
+                                LIRenDeferred* framebuffer,
+                                LIRenContext*  context,
+                                LIRenObject*   objects,
+                                int            count,
+                                int            transparent,
+                                float          threshold)
+{
+	int i;
+
+	/* Check for G-buffer. */
+	if (!self->render->shader.enabled)
+		framebuffer = NULL;
+	if (framebuffer == NULL)
+		return;
+	liren_context_set_deferred (context, 1);
+
+	/* Bind G-buffer. */
+	glPushAttrib (GL_VIEWPORT_BIT);
+	glViewport (0, 0, framebuffer->width, framebuffer->height);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->deferred_fbo);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	/* Render opaque faces to G-buffer. */
+	glEnable (GL_ALPHA_TEST);
+	glDisable (GL_BLEND);
+	glAlphaFunc (GL_GEQUAL, threshold);
+	if (transparent)
+	{
+		for (i = 0 ; i < count ; i++)
+			liren_draw_all (context, objects + i, NULL);
+	}
+	else
+	{
+		for (i = 0 ; i < count ; i++)
+			liren_draw_opaque (context, objects + i, NULL);
+	}
+	glDisable (GL_ALPHA_TEST);
+	liren_check_errors ();
+
+	/* Render lit areas to intermediate framebuffer. */
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
+	glClear (GL_COLOR_BUFFER_BIT);
+	glPushAttrib (GL_SCISSOR_BIT);
+	private_lighting_render (self, context, framebuffer);
+	glPopAttrib ();
+	liren_check_errors ();
+	liren_context_set_deferred (context, 0);
+}
+
+static void
+private_forward_render_begin (LIRenScene*    self,
+                              LIRenDeferred* framebuffer,
+                              LIRenContext*  context)
+{
+	/* Check for intermediate framebuffer. */
+	if (!self->render->shader.enabled)
+		framebuffer = NULL;
+	if (framebuffer == NULL)
+		return;
+
+	/* Bind intermediate framebuffer. */
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
+	glUseProgramObjectARB (0);
+}
+
+static void
+private_forward_render_end (LIRenScene*    self,
+                            LIRenDeferred* framebuffer,
+                            LIRenContext*  context)
+{
+	/* Check for intermediate framebuffer. */
+	if (!self->render->shader.enabled)
+		framebuffer = NULL;
+	if (framebuffer == NULL)
+		return;
+
+	/* Render intermediate framebuffer to screen. */
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+	glUseProgramObjectARB (0);
+	glClear (GL_COLOR_BUFFER_BIT);
+	glDisable (GL_BLEND);
+	glDisable (GL_LIGHTING);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_DEPTH_TEST);
+	glColor3f (1.0f, 1.0f, 1.0f);
+	glEnable (GL_TEXTURE_2D);
+	glBindTexture (GL_TEXTURE_2D, framebuffer->target_texture);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+	glPushMatrix ();
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	glPushMatrix ();
+	glBegin (GL_QUADS);
+	glTexCoord2i (0, 0);
+	glVertex2i (-1, -1);
+	glTexCoord2i (0, 1);
+	glVertex2i (-1, 1);
+	glTexCoord2i (1, 1);
+	glVertex2i (1, 1);
+	glTexCoord2i (1, 0);
+	glVertex2i (1, -1);
+	glEnd ();
+	glPopMatrix ();
+	glMatrixMode (GL_MODELVIEW);
+	glPopMatrix ();
+	glPopAttrib ();
+	liren_check_errors ();
+}
+
+static void
+private_forward_render_opaque (LIRenScene*   self,
+                               LIRenContext* context,
+                               LIRenObject*  objects,
+                               int           count,
+                               int           transparent,
+                               float         threshold)
+{
+	int i;
+	LIAlgPtrdicIter iter;
+	LIMatAabb aabb0;
+	LIMatAabb aabb1;
+	LIRenLight* light;
+
+	/* Render opaque faces to framebuffer. */
+	glEnable (GL_ALPHA_TEST);
+	glDisable (GL_BLEND);
+	glAlphaFunc (GL_GEQUAL, threshold);
+	for (i = 0 ; i < count ; i++)
+	{
+		liren_object_get_bounds (objects + i, &aabb1);
+		/* FIXME: Looping through all lights and objects is slow. */
+		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
+		{
+			light = iter.value;
+			if (light->enabled)
+			{
+				liren_light_get_bounds (light, &aabb0);
+				if (limat_aabb_intersects_aabb (&aabb0, &aabb1))
+				{
+					liren_context_set_lights (context, &light, 1);
+					if (transparent)
+						liren_draw_all (context, objects + i, NULL);
+					else
+						liren_draw_opaque (context, objects + i, NULL);
+				}
+			}
+		}
+	}
+	glDisable (GL_ALPHA_TEST);
+	liren_check_errors ();
+}
+
+static void
+private_forward_render_particles (LIRenScene*   self,
+                                  LIRenContext* context)
+{
+	/* Render particles. */
+	glDisable (GL_COLOR_MATERIAL);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_BLEND);
+	glEnable (GL_DEPTH_TEST);
+	glDepthMask (GL_FALSE);
+	private_particle_render (self);
+	liren_check_errors ();
+	glDepthMask (GL_TRUE);
+}
+
+static void
+private_forward_render_transparent (LIRenScene*   self,
+                                    LIRenContext* context,
+                                    LIRenObject*  objects,
+                                    int           count)
+{
+	int i;
+	LIAlgPtrdicIter iter;
+	LIMatAabb aabb0;
+	LIMatAabb aabb1;
+	LIRenLight* light;
+
+	glEnable (GL_COLOR_MATERIAL);
+	glEnable (GL_BLEND);
+	glEnable (GL_CULL_FACE);
+	glEnable (GL_DEPTH_TEST);
+	glDepthMask (GL_FALSE);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (i = count - 1 ; i >= 0 ; i--)
+	{
+		liren_object_get_bounds (objects + i, &aabb1);
+		/* FIXME: Looping through all lights and objects is slow. */
+		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
+		{
+			light = iter.value;
+			if (light->enabled)
+			{
+				liren_light_get_bounds (light, &aabb0);
+				if (limat_aabb_intersects_aabb (&aabb0, &aabb1))
+				{
+					liren_context_set_lights (context, &light, 1);
+					liren_draw_transparent (context, objects + i, NULL);
+				}
+			}
+		}
+	}
+	liren_context_set_lights (context, NULL, 0);
+	liren_check_errors ();
+	glDepthMask (GL_TRUE);
+}
+
 static int
-private_init_lights (LIRenScene* self)
+private_init (LIRenScene* self)
 {
 	self->lighting = liren_lighting_new (self->render);
 	if (self->lighting == NULL)
 		return 0;
-	return 1;
-}
-
-static int
-private_init_particles (LIRenScene* self)
-{
 	self->particles = lipar_manager_new (LIREN_PARTICLE_MAXIMUM_COUNT);
 	if (self->particles == NULL)
 		return 0;
@@ -605,6 +785,7 @@ private_lighting_render (LIRenScene*    self,
 		glEnd ();
 	}
 
+	liren_context_set_lights (context, NULL, 0);
 	liren_context_unbind (context);
 	glDisable (GL_SCISSOR_TEST);
 
@@ -750,6 +931,122 @@ private_render (LIRenScene*   self,
 			call (context, &tmpobj, data);
 		}
 	}
+}
+
+static int
+private_sort_objects (const void* first,
+                      const void* second)
+{
+	const LIRenObject* a = first;
+	const LIRenObject* b = second;
+
+	if (a->sort < b->sort) return -1;
+	if (a->sort > b->sort) return 1;
+	return 0;
+}
+
+static int
+private_sort_scene (LIRenScene*   self,
+                    LIRenContext* context,
+                    LIRenObject** result_list,
+                    int*          result_count)
+{
+	int i;
+	int capacity;
+	int count;
+	LIAlgU32dicIter iter0;
+	LIAlgPtrdicIter iter1;
+	LIMatAabb aabb;
+	LIMatVector center0;
+	LIMatVector center1;
+	LIRenGroup* group;
+	LIRenGroupObject* grpobj;
+	LIRenObject* tmp;
+	LIRenObject* objects;
+	LIRenObject* rndobj;
+
+	count = 0;
+	capacity = 256;
+	objects = lisys_calloc (capacity, sizeof (LIRenObject));
+	if (objects == NULL)
+		return 0;
+
+	/* Collect scene objects. */
+	LIALG_U32DIC_FOREACH (iter0, self->objects)
+	{
+		rndobj = iter0.value;
+		if (!liren_object_get_realized (rndobj))
+			continue;
+		liren_object_get_bounds (rndobj, &aabb);
+		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
+			continue;
+		if (count == capacity)
+		{
+			capacity <<= 1;
+			tmp = lisys_realloc (objects, capacity * sizeof (LIRenObject));
+			if (tmp == NULL)
+			{
+				lisys_free (objects);
+				return 0;
+			}
+			objects = tmp;
+		}
+		tmp = objects + count;
+		*tmp = *rndobj;
+		count++;
+	}
+
+	/* Collect group objects. */
+	LIALG_PTRDIC_FOREACH (iter1, self->groups)
+	{
+		group = iter1.value;
+		if (!liren_group_get_realized (group))
+			continue;
+		liren_group_get_bounds (group, &aabb);
+		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
+			continue;
+		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
+		{
+			if (count == capacity)
+			{
+				capacity <<= 1;
+				tmp = lisys_realloc (objects, capacity * sizeof (LIRenObject));
+				if (tmp == NULL)
+				{
+					lisys_free (objects);
+					return 0;
+				}
+				objects = tmp;
+			}
+			tmp = objects + count;
+			memset (tmp, 0, sizeof (LIRenObject));
+			tmp->transform = grpobj->transform;
+			tmp->scene = self;
+			tmp->model = grpobj->model;
+			tmp->orientation.center = grpobj->transform.position;
+			tmp->orientation.matrix = limat_convert_transform_to_matrix (grpobj->transform);
+			count++;
+		}
+	}
+
+	/* Calculate distances to camera. */
+	liren_context_bind (context);
+	center0 = limat_matrix_transform (context->modelviewinverse, limat_vector_init (0.0f, 0.0f, 0.0f));
+	for (i = 0 ; i < count ; i++)
+	{
+		rndobj = objects + i;
+		liren_object_get_center (rndobj, &center1);
+		rndobj->sort = limat_vector_get_length (limat_vector_subtract (center0, center1));
+	}
+
+	/* Sort the list. */
+	qsort (objects, count, sizeof (LIRenObject), private_sort_objects);
+
+	/* Return the list. */
+	*result_list = objects;
+	*result_count = count;
+
+	return 1;
 }
 
 /** @} */

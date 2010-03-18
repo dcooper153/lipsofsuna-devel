@@ -40,7 +40,7 @@ def configure(ctx):
 	ctx.env.VIEWER = Options.options.viewer != "false"
 	# Directories
 	ctx.env.CPPPATH_CORE = ['.']
-	ctx.env.CPPFLAGS_CORE = ['-g', '-Wall', '-O2', '-DHAVE_CONFIG_H']
+	ctx.env.CPPFLAGS_CORE = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
 	ctx.env.LIBPATH_CORE = []
 	ctx.env.LINKFLAGS_CORE = ['-g', '-export-dynamic']
 	if Options.options.adddeps:

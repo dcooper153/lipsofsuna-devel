@@ -30,6 +30,11 @@
 #include "render-types.h"
 
 void
+liren_draw_all (LIRenContext* context,
+                LIRenObject*  object,
+                void*         data);
+
+void
 liren_draw_bounds (LIRenContext* context,
                    LIRenObject*  object,
                    void*         data);

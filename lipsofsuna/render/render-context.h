@@ -37,6 +37,7 @@
 struct _LIRenContext
 {
 	int compiled;
+	int deferred;
 	int fixed;
 	int shadows;
 	LIRenRender* render;
@@ -120,6 +121,13 @@ liren_context_render_vtx_indexed (LIRenContext*      self,
 void
 liren_context_unbind (LIRenContext* self);
 
+int
+liren_context_get_deferred (LIRenContext* self);
+
+void
+liren_context_set_deferred (LIRenContext* self,
+                            int           value);
+
 void
 liren_context_set_flags (LIRenContext* self,
                          int           value);
@@ -136,6 +144,10 @@ liren_context_set_lights (LIRenContext* self,
 void
 liren_context_set_material (LIRenContext*        self,
                             const LIRenMaterial* value);
+
+void
+liren_context_set_material_shader (LIRenContext*        self,
+                                   const LIRenMaterial* value);
 
 void
 liren_context_set_matrix (LIRenContext*      self,

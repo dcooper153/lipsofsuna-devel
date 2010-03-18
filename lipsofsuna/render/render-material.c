@@ -48,10 +48,10 @@ liren_material_new_from_model (LIRenRender*         render,
                                const LIMdlMaterial* material)
 {
 	int j;
+	char* name;
 	LIMdlTexture* texture;
 	LIRenImage* image;
 	LIRenMaterial* self;
-	LIRenShader* shader;
 
 	self = lisys_calloc (1, sizeof (LIRenMaterial));
 	if (self == NULL)
@@ -75,9 +75,28 @@ liren_material_new_from_model (LIRenRender*         render,
 	self->strand_start = material->strand_start;
 	self->strand_end = material->strand_end;
 	self->strand_shape = material->strand_shape;
-	shader = liren_render_find_shader (render, material->shader);
-	if (shader != NULL)
-		liren_material_set_shader (self, shader);
+
+	/* Find deferred shader. */
+	name = listr_concat ("deferred-", material->shader);
+	if (name == NULL)
+	{
+		liren_material_free (self);
+		return 0;
+	}
+	self->shader_deferred = liren_render_find_shader (render, name);
+	lisys_free (name);
+
+	/* Find forward shader. */
+	name = listr_concat ("forward-", material->shader);
+	if (name == NULL)
+	{
+		liren_material_free (self);
+		return 0;
+	}
+	self->shader_forward = liren_render_find_shader (render, name);
+	lisys_free (name);
+
+	/* Set textures. */
 	if (!liren_material_set_texture_count (self, material->textures.count))
 	{
 		liren_material_free (self);
@@ -143,13 +162,16 @@ liren_material_set_flags (LIRenMaterial* self,
  * cannot be changed after the first call.
  *
  * \param self Material.
- * \param shader Shader.
+ * \param deferred Shader for deferred rendering.
+ * \param forward Shader for forward rendering.
  */
 int
 liren_material_set_shader (LIRenMaterial* self,
-                           LIRenShader*   shader)
+                           LIRenShader*   deferred,
+                           LIRenShader*   forward)
 {
-	self->shader = shader;
+	self->shader_deferred = deferred;
+	self->shader_forward = forward;
 
 	return 1;
 }

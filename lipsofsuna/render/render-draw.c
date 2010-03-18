@@ -60,6 +60,51 @@ private_draw_node (LIMdlNode* node)
 /*****************************************************************************/
 
 void
+liren_draw_all (LIRenContext* context,
+                LIRenObject*  object,
+                void*         data)
+{
+	int i;
+	int flags;
+	LIMatMatrix matrix;
+	LIRenMaterial* material;
+	LIRenModel* model;
+
+	if (object->instance != NULL)
+		model = object->instance;
+	else
+		model = object->model;
+
+	/* Rendering mode. */
+	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags |= LIREN_FLAG_LIGHTING;
+	flags |= LIREN_FLAG_TEXTURING;
+	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
+	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
+
+	/* Render the mesh. */
+	matrix = object->orientation.matrix;
+	for (i = 0 ; i < model->buffers.count ; i++)
+	{
+		material = model->materials.array[i];
+		if ((!context->deferred || material->shader_deferred != NULL))
+		{
+			liren_context_set_flags (context, flags);
+			liren_context_set_material (context, material);
+			liren_context_set_material_shader (context, material);
+			liren_context_set_matrix (context, &matrix);
+			liren_context_set_textures (context, material->textures.array, material->textures.count);
+			liren_context_bind (context);
+			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		}
+	}
+
+#ifdef LIREN_ENABLE_PROFILING
+	context->render->profiling.objects++;
+#endif
+}
+
+void
 liren_draw_bounds (LIRenContext* context,
                    LIRenObject*  object,
                    void*         data)
@@ -155,9 +200,9 @@ liren_draw_exclude (LIRenContext* context,
 	{
 		material = model->materials.array[i];
 		liren_context_set_flags (context, flags);
-		liren_context_set_matrix (context, &matrix);
 		liren_context_set_material (context, material);
-		liren_context_set_shader (context, material->shader);
+		liren_context_set_material_shader (context, material);
+		liren_context_set_matrix (context, &matrix);
 		liren_context_set_textures (context, material->textures.array, material->textures.count);
 		liren_context_bind (context);
 		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
@@ -231,7 +276,7 @@ liren_draw_hair (LIRenContext* context,
 		/* Bind hair group material. */
 		material = model->materials.array[hairs->material];
 		liren_context_set_material (context, material);
-		liren_context_set_shader (context, material->shader);
+		liren_context_set_material_shader (context, material);
 		liren_context_set_textures (context, material->textures.array, material->textures.count);
 		liren_context_bind (context);
 
@@ -313,12 +358,13 @@ liren_draw_opaque (LIRenContext* context,
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		if (!(material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
+		if ((!context->deferred || material->shader_deferred != NULL) &&
+		    !(material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			liren_context_set_flags (context, flags);
 			liren_context_set_material (context, material);
+			liren_context_set_material_shader (context, material);
 			liren_context_set_matrix (context, &matrix);
-			liren_context_set_shader (context, material->shader);
 			liren_context_set_textures (context, material->textures.array, material->textures.count);
 			liren_context_bind (context);
 			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
@@ -389,8 +435,8 @@ liren_draw_shadeless (LIRenContext* context,
 		material = model->materials.array[i];
 		liren_context_set_flags (context, flags);
 		liren_context_set_material (context, material);
+		liren_context_set_material_shader (context, material);
 		liren_context_set_matrix (context, &matrix);
-		liren_context_set_shader (context, material->shader);
 		liren_context_set_textures (context, material->textures.array, material->textures.count);
 		liren_context_bind (context);
 		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
@@ -459,12 +505,13 @@ liren_draw_transparent (LIRenContext* context,
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		if (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
+		if ((!context->deferred || material->shader_deferred != NULL) &&
+		    (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			liren_context_set_flags (context, flags);
-			liren_context_set_matrix (context, &matrix);
 			liren_context_set_material (context, material);
-			liren_context_set_shader (context, material->shader);
+			liren_context_set_material_shader (context, material);
+			liren_context_set_matrix (context, &matrix);
 			liren_context_set_textures (context, material->textures.array, material->textures.count);
 			liren_context_bind (context);
 			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);

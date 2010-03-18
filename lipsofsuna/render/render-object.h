@@ -39,6 +39,7 @@ struct _LIRenObject
 {
 	int id;
 	int realized;
+	float sort;
 	void* userdata;
 	LIMatAabb aabb;
 	LIMatTransform transform;
