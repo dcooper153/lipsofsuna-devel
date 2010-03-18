@@ -41,7 +41,7 @@
  * -- @return True on success.
  * function Program.load_extension(clss, args)
  */
-static int Program_load_extension (LIScrArgs* args)
+static void Program_load_extension (LIScrArgs* args)
 {
 	int ret;
 	const char* name;

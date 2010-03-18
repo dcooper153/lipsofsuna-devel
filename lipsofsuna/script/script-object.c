@@ -241,6 +241,29 @@ static void Object_impulse (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Creates a hinge constraint.
+ * --
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>position: Position vector.</li>
+ * --   <li>axis: Axis of rotation.</li></ul>
+ * function Object.insert_hinge_constraint(self, args)
+ */
+static void Object_insert_hinge_constraint (LIScrArgs* args)
+{
+	LIEngObject* self;
+	LIMatVector pos;
+	LIMatVector axis = { 0.0f, 1.0f, 0.0f };
+
+	if (liscr_args_gets_vector (args, "position", &pos))
+	{
+		liscr_args_gets_vector (args, "axis", &axis);
+		self = args->self;
+		liphy_constraint_new_hinge (self->engine->physics, self->physics, &pos, &axis, 0, 0.0f, 0.0f);
+	}
+}
+
+/* @luadoc
  * --- Causes the object to jump.
  * --
  * -- @param self Object.
@@ -254,6 +277,46 @@ static void Object_jump (LIScrArgs* args)
 
 	if (liscr_args_gets_vector (args, "impulse", &impulse))
 		lieng_object_jump (args->self, &impulse);
+}
+
+/* @luadoc
+ * --- Sweeps a sphere relative to the object.
+ * --
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>src: Start point vector. (required)</li>
+ * --   <li>dst: End point vector. (required)</li>
+ * --   <li>radius: Sphere radius.</li></ul>
+ * -- @return Table with point, normal, and object. Nil if no collision occurred.
+ * function Object.sweep_sphere(self, args)
+ */
+static void Object_sweep_sphere (LIScrArgs* args)
+{
+	float radius = 0.5f;
+	LIEngObject* object;
+	LIMatVector start;
+	LIMatVector end;
+	LIPhyCollision result;
+
+	if (!liscr_args_gets_vector (args, "src", &start) ||
+	    !liscr_args_gets_vector (args, "dst", &end))
+		return;
+	liscr_args_gets_float (args, "radius", &radius);
+	object = args->self;
+
+	if (liphy_object_sweep_sphere (object->physics, &start, &end, radius, &result))
+	{
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+		liscr_args_sets_float (args, "fraction", result.fraction);
+		liscr_args_sets_vector (args, "point", &result.point);
+		liscr_args_sets_vector (args, "normal", &result.normal);
+		if (result.object != NULL)
+		{
+			object = liphy_object_get_userdata (result.object);
+			if (object != NULL && object->script != NULL)
+				liscr_args_sets_data (args, "object", object->script);
+		}
+	}
 }
 
 /* @luadoc
@@ -371,6 +434,15 @@ static void Object_setter_collision_mask (LIScrArgs* args)
 	if (liscr_args_geti_int (args, 0, &value))
 		lieng_object_set_collision_mask (args->self, value);
 }
+
+/* @luadoc
+ * --- Custom collision response callback.
+ * --
+ * -- Function to be called every time the object collides with something.
+ * --
+ * -- @name Object.contact_cb
+ * -- @class table
+ */
 
 /* @luadoc
  * --- Gravity vector.
@@ -717,7 +789,9 @@ liscr_script_object (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);
 	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
 	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
+	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
 	liscr_class_insert_mfunc (self, "jump", Object_jump);
+	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_mvar (self, "angular", Object_getter_angular, Object_setter_angular);
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 	liscr_class_insert_mvar (self, "class", Object_getter_class, Object_setter_class);

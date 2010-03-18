@@ -32,7 +32,6 @@
 #define LICLI_SCRIPT_ACTION "Action"
 #define LICLI_SCRIPT_BINDING "Binding"
 #define LICLI_SCRIPT_CLIENT "Client"
-#define LICLI_SCRIPT_EXTENSION "Extension"
 #define LICLI_SCRIPT_GROUP "Group"
 #define LICLI_SCRIPT_LIGHT "Light"
 #define LICLI_SCRIPT_SCENE "Scene"
@@ -48,10 +47,6 @@ LIAPICALL (void, licli_script_binding, (
 	void*       data));
 
 LIAPICALL (void, licli_script_client, (
-	LIScrClass* self,
-	void*       data));
-
-LIAPICALL (void, licli_script_extension, (
 	LIScrClass* self,
 	void*       data));
 

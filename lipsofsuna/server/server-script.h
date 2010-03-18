@@ -27,12 +27,7 @@
 
 #include <lipsofsuna/script.h>
 
-#define LISER_SCRIPT_EXTENSION "Extension"
 #define LISER_SCRIPT_SERVER "Server"
-
-void
-liser_script_extension (LIScrClass* self,
-                        void*       data);
 
 void
 liser_script_object (LIScrClass* self,
