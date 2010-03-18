@@ -28,20 +28,18 @@
 
 /* @luadoc
  * module "Core.Client.Light"
- * ---
- * -- Create and manipulate light sources.
+ * --- Create and manipulate light sources.
  * -- @name Light
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new light source.
+ * --- Creates a new light source.
  * --
- * -- @param self Light class.
+ * -- @param clss Light class.
  * -- @param args Arguments.
  * -- @return New light source.
- * function Light.new(self, table)
+ * function Light.new(clss, args)
  */
 static void Light_new (LIScrArgs* args)
 {
@@ -70,8 +68,7 @@ static void Light_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- The ambient color of the light source.
+ * --- The ambient color of the light source.
  * -- @name Light.ambient
  * -- @class table
  */
@@ -99,8 +96,7 @@ static void Light_setter_ambient (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- The diffuse color of the light source.
+ * --- The diffuse color of the light source.
  * -- @name Light.color
  * -- @class table
  */
@@ -128,8 +124,7 @@ static void Light_setter_color (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Enables or disables the light.
+ * --- Enables or disables the light.
  * --
  * -- @name Light.enabled
  * -- @class table
@@ -154,8 +149,7 @@ static void Light_setter_enabled (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- The attenuation equation of the light source.
+ * --- The attenuation equation of the light source.
  * -- @name Light.equation
  * -- @class table
  */
@@ -182,8 +176,7 @@ static void Light_setter_equation (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets or sets the position of the light.
+ * --- Gets or sets the position of the light.
  * --
  * -- @name Light.position
  * -- @class table
@@ -212,7 +205,7 @@ static void Light_setter_position (LIScrArgs* args)
 
 void
 licli_script_light (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
 	liscr_class_insert_cfunc (self, "new", Light_new);

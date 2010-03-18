@@ -29,21 +29,17 @@
 
 /* @luadoc
  * module "Extension.Client.Slots"
- * ---
- * -- Visualize equipped items.
+ * --- Visualize equipped items.
  * -- @name Slots
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Clears slots of an object.
- * --
- * -- Arguments:
- * -- owner: Object whose slots to modify. (required);
+ * --- Clears slots of an object.
  * --
  * -- @param self Slots class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>owner: Object whose slots to modify. (required)</li></ul>
  * function Slots.clear(self, args)
  */
 static void Slots_clear (LIScrArgs* args)
@@ -63,16 +59,13 @@ static void Slots_clear (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Attachs a model to a slot.
- * --
- * -- Arguments:
- * -- owner: Object whose slots to modify. (required);
- * -- node: Node name.
- * -- model: Model name.
+ * --- Attachs a model to a slot.
  * --
  * -- @param self Slots class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>owner: Object whose slots to modify. (required)</li>
+ * --   <li>node: Node name.</li>
+ * --   <li>model: Model name.</li></ul>
  * function Slots.set_object(self, args)
  */
 static void Slots_set_object (LIScrArgs* args)

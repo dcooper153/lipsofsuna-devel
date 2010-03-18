@@ -26,24 +26,20 @@
 #include "ext-spawner.h"
 
 /* @luadoc
- * module "Extension.Server.Spawner"
- * ---
- * -- Spawn objects periodically.
+ * module "Extension.Common.Spawner"
+ * --- Spawn objects periodically.
  * -- @name Spawner
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- @brief Finds the spawner logic for an object.
+ * --- Finds the spawner logic for an object.
  * --
- * -- Arguments:
- * -- object: Object.
- * --
- * -- @param self Spawner class.
- * -- @param args Arguments.
+ * -- @param clss Spawner class.
+ * -- @param args Arguments.<ul>
+ * --   <li>object: Object.</li></ul>
  * -- @return Spawner or nil.
- * function Spawner.find(self, args)
+ * function Spawner.find(clss, args)
  */
 static void Spawner_find (LIScrArgs* args)
 {
@@ -61,13 +57,12 @@ static void Spawner_find (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new spawner logic.
+ * --- Creates a new spawner logic.
  * --
- * -- @param self Spawner class.
+ * -- @param clss Spawner class.
  * -- @param args Arguments.
  * -- @return New spawner.
- * function Spawner.new(self, args)
+ * function Spawner.new(clss, args)
  */
 static void Spawner_new (LIScrArgs* args)
 {
@@ -95,8 +90,7 @@ static void Spawner_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Spawn delay.
+ * --- Spawn delay.
  * -- @name Spawner.delay
  * -- @class table
  */
@@ -113,8 +107,7 @@ static void Spawner_setter_delay (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Maximum number of spawned objects.
+ * --- Maximum number of spawned objects.
  * --
  * -- If the current number of spawned objects is higher than the limit,
  * -- the spawner will disown objects until the count is equal to the limit.
@@ -136,8 +129,7 @@ static void Spawner_setter_limit (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Controlled object.
+ * --- Controlled object.
  * -- @name Spawner.object
  * -- @class table
  */
@@ -157,8 +149,7 @@ static void Spawner_setter_owner (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Spawn function.
+ * --- Spawn function.
  * --
  * -- The object controlled by the spawner is passed to the function as an
  * -- argument whenever there's a need to spawn an object. The function is
@@ -172,7 +163,7 @@ static void Spawner_setter_owner (LIScrArgs* args)
 
 void
 liext_script_spawner (LIScrClass* self,
-                    void*       data)
+                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPAWNER, data);
 	liscr_class_insert_cfunc (self, "find", Spawner_find);

@@ -35,17 +35,15 @@
  */
 
 /* @luadoc
- * ---
- * -- Plays a sound effect.
+ * --- Plays a sound effect.
  * --
- * -- Arguments.
- * -- effect: Sample string. (required)
- * -- object: Object. (required)
- * -- pitch: Pitch shift multiplier.
- * -- volume: Volume multiplier.
- * --
- * -- @param self Sound class.
- * -- @param args Arguments.
+ * -- @param clss Sound class.
+ * -- @param args Arguments.<ul>
+ * --   <li>effect: Sample string. (required)</li>
+ * --   <li>object: Object. (required)</li>
+ * --   <li>pitch: Pitch shift multiplier.</li>
+ * --   <li>volume: Volume multiplier.</li></ul>
+ * function Sound.effect(clss, args)
  */
 static void Sound_effect (LIScrArgs* args)
 {
@@ -77,8 +75,7 @@ static void Sound_effect (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Music track name.
+ * --- Music track name.
  * -- @name Sound.music
  * -- @class table
  */
@@ -97,8 +94,7 @@ static void Sound_setter_music (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Music volume.
+ * --- Music volume.
  * -- @name Sound.music_volume
  * -- @class table
  */
@@ -120,7 +116,7 @@ static void Sound_setter_music_volume (LIScrArgs* args)
 
 void
 liext_script_sound (LIScrClass* self,
-                  void*       data)
+                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
 	liscr_class_insert_cfunc (self, "effect", Sound_effect);

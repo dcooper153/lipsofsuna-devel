@@ -26,15 +26,13 @@
 
 /* @luadoc
  * module "Extension.Server.Skeleton"
- * ---
- * -- FIXME
+ * --- Example extension.
  * -- @name Skeleton
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- FIXME
+ * --- Example function.
  * --
  * -- @param self Skeleton class.
  * Skeleton.test(self)

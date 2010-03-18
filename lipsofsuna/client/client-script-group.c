@@ -28,15 +28,13 @@
 
 /* @luadoc
  * module "Core.Client.Group"
- * ---
- * -- Pack widgets in a grid.
+ * --- Pack widgets in a grid.
  * -- @name Group
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Appends a column to the widget.
+ * --- Appends a column to the widget.
  * --
  * -- @param self Group.
  * -- @param args List of widgets.
@@ -63,8 +61,7 @@ static void Group_append_col (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Appends a row to the widget.
+ * --- Appends a row to the widget.
  * --
  * -- @param self Group.
  * -- @param args List of widgets.
@@ -91,8 +88,7 @@ static void Group_append_row (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Inserts a column to the widget.
+ * --- Inserts a column to the widget.
  * --
  * -- @param self Group.
  * -- @param col Column index.
@@ -142,8 +138,7 @@ Group_insert_col (lua_State* lua)
 }
 
 /* @luadoc
- * ---
- * -- Inserts a row to the widget.
+ * --- Inserts a row to the widget.
  * --
  * -- @param self Group.
  * -- @param row Row index.
@@ -193,13 +188,12 @@ Group_insert_row (lua_State* lua)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new group.
+ * --- Creates a new group.
  * --
- * -- @param self Group class.
+ * -- @param clss Group class.
  * -- @param args Arguments.
  * -- @return New group.
- * function Group.new(self, args)
+ * function Group.new(clss, args)
  */
 static void Group_new (LIScrArgs* args)
 {
@@ -226,15 +220,12 @@ static void Group_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Removes a row or a column from the widget.
- * --
- * -- Arguments:
- * -- col: Column index.
- * -- row: Row index.
+ * --- Removes a row or a column from the widget.
  * --
  * -- @param self Group.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>col: Column index.</li>
+ * --   <li>row: Row index.</li></ul>
  * function Group.remove(self, args)
  */
 static void Group_remove (LIScrArgs* args)
@@ -252,14 +243,12 @@ static void Group_remove (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets a child widget.
- * --
- * -- Arguments:
- * -- row: Row number.
- * -- col: Column number.
+ * --- Gets a child widget.
  * --
  * -- @param self Group.
+ * -- @param args Arguments.<ul>
+ * --   <li>row: Row number.</li>
+ * --   <li>col: Column number.</li></ul>
  * -- @return Widget or nil.
  * function Group.get_child(self, args)
  */
@@ -282,16 +271,13 @@ static void Group_get_child (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Places a widget inside the group.
- * --
- * -- Arguments:
- * -- col: Column number. (required)
- * -- row: Row number. (required)
- * -- widget: Widget.
+ * --- Places a widget inside the group.
  * --
  * -- @param self Group.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>col: Column number. (required)</li>
+ * --   <li>row: Row number. (required)</li>
+ * --   <li>widget: Widget.</li></ul>
  * function Group.set_child(self, args)
  */
 static void Group_set_child (LIScrArgs* args)
@@ -322,16 +308,13 @@ static void Group_set_child (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Enables or disables row or column expansion.
- * --
- * -- Arguments:
- * -- row: Row number.
- * -- col: Column number.
- * -- expand: Boolean.
+ * --- Enables or disables row or column expansion.
  * --
  * -- @param self Group.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>row: Row number.</li>
+ * --   <li>col: Column number.</li>
+ * --   <li>expand: Boolean.</li></ul>
  * function Group.set_expand(self, args)
  */
 static void Group_set_expand (LIScrArgs* args)
@@ -350,8 +333,7 @@ static void Group_set_expand (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Number of rows in the group.
+ * --- Number of columns in the group.
  * -- @name Group.cols
  * -- @class table
  */
@@ -375,8 +357,7 @@ static void Group_setter_cols (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Number of rows in the group.
+ * --- Number of rows in the group.
  * -- @name Group.rows
  * -- @class table
  */

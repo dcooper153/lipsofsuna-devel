@@ -26,18 +26,16 @@
 
 /* @luadoc
  * module "Core.Common.Vector"
- * ---
- * -- Do maths in three dimensions.
+ * --- Do maths in three dimensions.
  * -- @name Vector
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Calculates the sum of two vectors.
+ * --- Calculates the sum of two vectors.
  * --
  * -- @param self Vector.
- * -- @param quat Vector.
+ * -- @param vector Vector.
  * -- @return New vector.
  * function Vector.__add(self, vector)
  */
@@ -66,8 +64,7 @@ Vector___add (lua_State* lua)
 }
 
 /* @luadoc
- * ---
- * -- Multiplies the vector with a scalar.
+ * --- Multiplies the vector with a scalar.
  * --
  * -- @param self Vector.
  * -- @param scalar Scalar.
@@ -99,8 +96,7 @@ Vector___mul (lua_State* lua)
 }
 
 /* @luadoc
- * ---
- * -- Subtracts a vector from another.
+ * --- Subtracts a vector from another.
  * --
  * -- @param self Vector.
  * -- @param vector Vector.
@@ -132,18 +128,15 @@ Vector___sub (lua_State* lua)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new vector.
+ * --- Creates a new vector.
  * --
- * -- Arguments:
- * -- 1,x: X coordinate.
- * -- 2,y: Y coordinate.
- * -- 3,z: Z coordinate.
- * --
- * -- @param self Vector class.
- * -- @param args Arguments.
+ * -- @param clss Vector class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,x: X coordinate.</li>
+ * --   <li>2,y: Y coordinate.</li>
+ * --   <li>3,z: Z coordinate.</li></ul>
  * -- @return New vector.
- * function Vector.new(self, args)
+ * function Vector.new(clss, args)
  */
 static void Vector_new (LIScrArgs* args)
 {
@@ -159,8 +152,7 @@ static void Vector_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Calculates the cross product of two vectors.
+ * --- Calculates the cross product of two vectors.
  * --
  * -- @param self Vector.
  * -- @param vector Vector.
@@ -180,8 +172,7 @@ static void Vector_cross (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Length.
+ * --- Length.
  * -- @name Vector.length
  * -- @class table
  */
@@ -191,8 +182,7 @@ static void Vector_getter_length (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- X value.
+ * --- X value.
  * -- @name Vector.x
  * -- @class table
  */
@@ -206,8 +196,7 @@ static void Vector_setter_x (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Y value.
+ * --- Y value.
  * -- @name Vector.y
  * -- @class table
  */
@@ -221,8 +210,7 @@ static void Vector_setter_y (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Z value.
+ * --- Z value.
  * -- @name Vector.z
  * -- @class table
  */
@@ -239,7 +227,7 @@ static void Vector_setter_z (LIScrArgs* args)
 
 void
 liscr_script_vector (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_insert_func (self, "__add", Vector___add);
 	liscr_class_insert_func (self, "__mul", Vector___mul);

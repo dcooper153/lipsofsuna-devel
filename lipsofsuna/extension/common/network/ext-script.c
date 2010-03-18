@@ -27,22 +27,18 @@
 
 /* @luadoc
  * module "Extension.Common.Network"
- * ---
- * -- Networking support.
+ * --- Networking support.
  * -- @name Network
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Disconnects any client associated to the specified object.
+ * --- Disconnects any client associated to the specified object.
  * --
- * -- Arguements:
- * -- object: Object. (required)
- * --
- * -- @param self Network class.
- * -- @param args Arguments.
- * function Network.disconnect(self)
+ * -- @param clss Network class.
+ * -- @param args Arguments.<ul>
+ * --   <li>object: Object. (required)</li></ul>
+ * function Network.disconnect(clss)
  */
 static void Network_disconnect (LIScrArgs* args)
 {
@@ -61,14 +57,11 @@ static void Network_disconnect (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Checks if the specified object has a client attached to it.
+ * --- Checks if the specified object has a client attached to it.
  * --
- * -- Arguments:
- * -- object: Object. (require)
- * --
- * -- @param self Network class.
- * -- @param args Arguments.
+ * -- @param clss Network class.
+ * -- @param args Arguments.<ul>
+ * --   <li>object: Object. (require)</li></ul>
  * function Network.shutdown(self)
  */
 static void Network_has_client (LIScrArgs* args)
@@ -88,17 +81,14 @@ static void Network_has_client (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Begins listening for clients.
+ * --- Begins listening for clients.
  * --
- * -- Arguments:
- * -- port: Port to listen to.
- * -- udp: True for UDP.
- * --
- * -- @param self Network class.
- * -- @param args Arguments.
+ * -- @param clss Network class.
+ * -- @param args Arguments.<ul>
+ * --   <li>port: Port to listen to.</li>
+ * --   <li>udp: True for UDP.</li></ul>
  * -- @return True on success.
- * function Network.host(self, args)
+ * function Network.host(clss, args)
  */
 static void Network_host (LIScrArgs* args)
 {
@@ -116,20 +106,17 @@ static void Network_host (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Connects to a server.
+ * --- Connects to a server.
  * --
- * -- Arguments:
- * -- host: Server address.
- * -- login: Login name.
- * -- password: password.
- * -- port: Port to listen to.
- * -- udp: True for UDP.
- * --
- * -- @param self Network class.
- * -- @param args Arguments.
+ * -- @param clss Network class.
+ * -- @param args Arguments.<ul>
+ * --   <li>host: Server address.</li>
+ * --   <li>login: Login name.</li>
+ * --   <li>password: password.</li>
+ * --   <li>port: Port to listen to.</li>
+ * --   <li>udp: True for UDP.</li></ul>
  * -- @return True on success.
- * function Network.join(self, args)
+ * function Network.join(clss, args)
  */
 static void Network_join (LIScrArgs* args)
 {
@@ -153,17 +140,14 @@ static void Network_join (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sends a network packet to the client controlling the object.
+ * --- Sends a network packet to the client controlling the object.
  * --
- * -- Arguments:
- * -- object: Object. (required if hosting)
- * -- packet: Packet. (required)
- * -- reliable: Boolean.
- * --
- * -- @param self Network class.
- * -- @param args Arguments.
- * function Object.send(self, args)
+ * -- @param clss Network class.
+ * -- @param args Arguments.<ul>
+ * --   <li>object: Object. (required if hosting)</li>
+ * --   <li>packet: Packet. (required)</li>
+ * --   <li>reliable: Boolean.</li></ul>
+ * function Network.send(clss, args)
  */
 static void Network_send (LIScrArgs* args)
 {
@@ -200,11 +184,10 @@ static void Network_send (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Disconnects all client and closes the network connection.
+ * --- Disconnects all client and closes the network connection.
  * --
- * -- @param self Network class.
- * function Network.shutdown(self)
+ * -- @param clss Network class.
+ * function Network.shutdown(clss)
  */
 static void Network_shutdown (LIScrArgs* args)
 {
@@ -215,20 +198,17 @@ static void Network_shutdown (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Swaps the clients of the objects.
+ * --- Swaps the clients of the objects.
  * --
  * -- Switches the clients of the passed objects so that the client of the first
  * -- object controls the second object and vice versa. This is typically used when
  * -- you need to destroy the object of a player without disconnecting the client.
  * --
- * -- Argumens:
- * -- object: Object. (required)
- * -- other: Object. (required)
- * --
- * -- @param self Network class.
- * -- @param args Arguments.
- * function Object.swap_clients(self, args)
+ * -- @param clss Network class.
+ * -- @param args Arguments.<ul>
+ * --   <li>object: Object. (required)</li>
+ * --   <li>other: Object. (required)</li></ul>
+ * function Network.swap_clients(clss, args)
  */
 static void Network_swap_clients (LIScrArgs* args)
 {
@@ -255,8 +235,7 @@ static void Network_swap_clients (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets the list of connected clients.
+ * --- Gets the list of connected clients.
  * --
  * -- @name Network.clients
  * -- @class table
@@ -278,8 +257,7 @@ static void Network_getter_clients (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Controls whether clients can connect to the server.
+ * --- Controls whether clients can connect to the server.
  * --
  * -- @name Network.closed
  * -- @class table
@@ -302,8 +280,7 @@ static void Network_setter_closed (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets whether the game connected to network.
+ * --- Gets whether the game connected to network.
  * --
  * -- @name Network.connected
  * -- @class table

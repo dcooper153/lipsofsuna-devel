@@ -26,24 +26,20 @@
 #include "ext-npc.h"
 
 /* @luadoc
- * module "Extension.Server.Npc"
- * ---
- * -- Create intelligent non-player characters.
+ * module "Extension.Common.Npc"
+ * --- Create intelligent non-player characters.
  * -- @name Npc
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- @brief Finds the NPC logic for an object.
+ * --- Finds the NPC logic for an object.
  * --
- * -- Arguments:
- * -- object: Object.
- * --
- * -- @param self Npc class.
- * -- @param args Arguments.
+ * -- @param clss Npc class.
+ * -- @param args Arguments.<ul>
+ * --   <li>object: Object.</li></ul>
  * -- @return Npc or nil.
- * function Npc.find(self, args)
+ * function Npc.find(clss, args)
  */
 static void Npc_find (LIScrArgs* args)
 {
@@ -61,13 +57,12 @@ static void Npc_find (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new non-player character logic.
+ * --- Creates a new non-player character logic.
  * --
- * -- @param self Npc class.
+ * -- @param clss Npc class.
  * -- @param args Arguments.
  * -- @return New NPC.
- * function Npc.new(self, args)
+ * function Npc.new(clss, args)
  */
 static void Npc_new (LIScrArgs* args)
 {
@@ -95,14 +90,11 @@ static void Npc_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Solves the path to a point for the NPC logic.
- * --
- * -- Arguments:
- * -- point: Point vector. (required)
+ * --- Solves the path to a point for the NPC logic.
  * --
  * -- @paran self Npc.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Point vector. (required)</li></ul>
  * -- @return Path or nil.
  * function Npc.solve_path(self, args)
  */
@@ -135,8 +127,7 @@ static void Npc_solve_path (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Alertness flag.
+ * --- Alertness flag.
  * -- @name Npc.alert
  * -- @class table
  */
@@ -153,8 +144,7 @@ static void Npc_setter_alert (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Called when the controlled object is near the target.
+ * --- Called when the controlled object is near the target.
  * --
  * -- Arguments passed to the callback: npc, object, target.
  * --
@@ -163,8 +153,7 @@ static void Npc_setter_alert (LIScrArgs* args)
  */
 
 /* @luadoc
- * ---
- * -- Controlled object.
+ * --- Controlled object.
  * -- @name Npc.owner
  * -- @class table
  */
@@ -184,8 +173,7 @@ static void Npc_setter_owner (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- The path for the object to traverse.
+ * --- The path for the object to traverse.
  * -- @name Npc.path
  * -- @class table
  */
@@ -205,8 +193,7 @@ static void Npc_setter_path (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Target scanning radius.
+ * --- Target scanning radius.
  * -- @name Npc.radius
  * -- @class table
  */
@@ -223,8 +210,7 @@ static void Npc_setter_radius (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Refresh delay.
+ * --- Refresh delay.
  * -- @name Npc.refresh
  * -- @class table
  */
@@ -241,8 +227,7 @@ static void Npc_setter_refresh (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Called when the logic needs to scan for a target.
+ * --- Called when the logic needs to scan for a target.
  * --
  * -- Arguments passed to the callback: npc, object.
  * -- Returns: An object or nil.

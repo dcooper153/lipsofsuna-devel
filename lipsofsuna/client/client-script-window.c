@@ -26,20 +26,18 @@
 
 /* @luadoc
  * module "Core.Client.Window"
- * ---
- * -- Pack widgets in dialogs.
+ * --- Pack widgets in dialogs.
  * -- @name Window
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new window.
+ * --- Creates a new window.
  * --
- * -- @param self Window class.
+ * -- @param clss Window class.
  * -- @param args Arguments.
  * -- @return New window.
- * function Window.new(self)
+ * function Window.new(clss)
  */
 static void Window_new (LIScrArgs* args)
 {
@@ -71,8 +69,7 @@ static void Window_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Title string.
+ * --- Title string.
  * -- @name Window.title
  * -- @class table
  */
@@ -89,8 +86,7 @@ static void Window_setter_title (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Visibility flag.
+ * --- Visibility flag.
  * --
  * -- Gets or sets the visibility of the window. Visible windows are
  * -- protected from garbage collection.

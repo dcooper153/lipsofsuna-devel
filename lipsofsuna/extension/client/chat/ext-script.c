@@ -28,15 +28,14 @@
 #include "ext-history.h"
 
 /* @luadoc
- * ---
- * -- Display chat messages.
+ * module "Extension.Client.Chat"
+ * --- Display chat messages.
  * -- @name ChatHistory
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new chat history widget.
+ * --- Creates a new chat history widget.
  * --
  * -- @param self Chat history class.
  * -- @param args Arguments.
@@ -69,14 +68,11 @@ static void ChatHistory_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Appends a message to the chat history widget.
- * --
- * -- Arguments:
- * -- text: String.
+ * --- Appends a message to the chat history widget.
  * --
  * -- @param self Chat history widget.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>text: String.</li></ul>
  * function ChatHistory.append(self, args)
  */
 static void ChatHistory_append (LIScrArgs* args)

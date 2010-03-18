@@ -26,25 +26,21 @@
 
 /* @luadoc
  * module "Core.Client.Widget"
- * ---
- * -- Manipulate widgets.
+ * --- Manipulate widgets.
  * -- @name Widget
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Pops up the widget.
- * --
- * -- Arguments:
- * -- x: X coordinate.
- * -- y: Y coordinate.
- * -- width: Width allocation.
- * -- height: Height allocation.
- * -- dir: Popup direction. ("left"/"right"/"up"/"down")
+ * --- Pops up the widget.
  * --
  * -- @param self Widget.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>x: X coordinate.</li>
+ * --   <li>y: Y coordinate.</li>
+ * --   <li>width: Width allocation.</li>
+ * --   <li>height: Height allocation.</li>
+ * --   <li>dir: Popup direction. ("left"/"right"/"up"/"down")</li></ul>
  * function Widget.popup(self, args)
  */
 static void Widget_popup (LIScrArgs* args)
@@ -86,15 +82,12 @@ static void Widget_popup (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the user size request of widget.
- * --
- * -- Arguments:
- * -- width: Width request.
- * -- height: Height request.
+ * --- Sets the user size request of widget.
  * --
  * -- @param self Widget.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>width: Width request.</li>
+ * --   <li>height: Height request.</li></ul>
  * function Widget.set_request(self, args)
  */
 static void Widget_set_request (LIScrArgs* args)
@@ -107,8 +100,7 @@ static void Widget_set_request (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Style name of the widget.
+ * --- Style name of the widget.
  * -- @name Widget.style
  * -- @class table
  */
@@ -127,8 +119,7 @@ static void Widget_setter_style (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Visibility flag.
+ * --- Visibility flag.
  * -- @name Widget.visible
  * -- @class table
  */
@@ -149,8 +140,7 @@ static void Widget_setter_visible (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Left edge position.
+ * --- Left edge position.
  * -- @name Widget.x
  * -- @class table
  */
@@ -163,8 +153,7 @@ static void Widget_getter_x (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Bottom edge position.
+ * --- Top edge position.
  * -- @name Widget.y
  * -- @class table
  */

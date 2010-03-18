@@ -30,22 +30,18 @@
 
 /* @luadoc
  * module "Core.Server.Object"
- * ---
- * -- Create and manipulate server side objects.
+ * --- Create and manipulate server side objects.
  * -- @name Object
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a hinge constraint.
- * --
- * -- Arguments:
- * -- position: Position vector.
- * -- axis: Axis of rotation.
+ * --- Creates a hinge constraint.
  * --
  * -- @param self Object.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>position: Position vector.</li>
+ * --   <li>axis: Axis of rotation.</li></ul>
  * function Object.insert_hinge_constraint(self, args)
  */
 static void Object_insert_hinge_constraint (LIScrArgs* args)
@@ -66,14 +62,12 @@ static void Object_insert_hinge_constraint (LIScrArgs* args)
  * ---
  * -- Creates a new object.
  * --
- * -- Arguments:
- * -- id: Load the object with this ID from the database.
- * -- purge: Remove from the database after loading.
- * --
- * -- @param self Object class.
- * -- @param args Arguments.
+ * -- @param clss Object class.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Load the object with this ID from the database.</li>
+ * --   <li>purge: Remove from the database after loading.</li></ul>
  * -- @return New object.
- * function Object.new(self, args)
+ * function Object.new(clss, args)
  */
 static void Object_new (LIScrArgs* args)
 {
@@ -123,8 +117,7 @@ static void Object_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Purges the object from the database.
+ * --- Purges the object from the database.
  * --
  * -- @param self Object.
  * function Object.purge(self)
@@ -140,16 +133,13 @@ static void Object_purge (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sweeps a sphere relative to the object.
- * --
- * -- Arguments:
- * -- src: Start point vector. (required)
- * -- dst: End point vector. (required)
- * -- radius: Sphere radius.
+ * --- Sweeps a sphere relative to the object.
  * --
  * -- @param self Object.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>src: Start point vector. (required)</li>
+ * --   <li>dst: End point vector. (required)</li>
+ * --   <li>radius: Sphere radius.</li></ul>
  * -- @return Table with point, normal, and object. Nil if not found.
  * function Object.sweep_sphere(self, args)
  */
@@ -183,8 +173,7 @@ static void Object_sweep_sphere (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Writes the object to the database.
+ * --- Writes the object to the database.
  * --
  * -- @param self Object.
  * function Object.write(self)
@@ -201,8 +190,7 @@ static void Object_write (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Custom collision response callback.
+ * --- Custom collision response callback.
  * --
  * -- Function to be called every time the object collides with something.
  * --
@@ -211,8 +199,7 @@ static void Object_write (LIScrArgs* args)
  */
 
 /* @luadoc
- * ---
- * -- Custom deserialization function.
+ * --- Custom deserialization function.
  * --
  * -- If the function exists, the server calls it when any object is loaded.
  * -- The function is given three arguments: the object, a type string, and a
@@ -223,8 +210,7 @@ static void Object_write (LIScrArgs* args)
  */
 
 /* @luadoc
- * ---
- * -- Custom serialization function.
+ * --- Custom serialization function.
  * --
  * -- If the function exists, the server calls it when any object is saved.
  * -- The function is given one argument: the object. The function must return

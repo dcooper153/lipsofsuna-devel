@@ -26,24 +26,20 @@
 
 /* @luadoc
  * module "Core.Common.Class"
- * ---
- * -- Inherit classes.
+ * --- Inherit classes.
  * -- @name Class
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Checks if an object is an instance of a class.
+ * --- Checks if an object is an instance of a class.
  * --
- * -- Arguments:
- * -- data: Userdata.
- * -- name: Class name.
- * --
- * -- @param self Class class.
- * -- @param args Arguments.
+ * -- @param clss Class class.
+ * -- @param args Arguments.<ul>
+ * --   <li>data: Userdata.</li>
+ * --   <li>name: Class name.</li></ul>
  * -- @return Boolean.
- * function Class.check(self, args)
+ * function Class.check(clss, args)
  */
 static void Class_check (LIScrArgs* args)
 {
@@ -56,17 +52,14 @@ static void Class_check (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Inherits a class from another.
+ * --- Inherits a class from another.
  * --
- * -- Arguments:
- * -- 1,name: Class name. (required)
- * -- 2,base: Base class.
- * --
- * -- @param self Class class.
- * -- @param args Arguments.
+ * -- @param clss Class class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,name: Class name. (required)</li>
+ * --   <li>2,base: Base class.</li></ul>
  * -- @return New class.
- * function Class.new(self, base, name)
+ * function Class.new(clss, args)
  */
 static void Class_new (LIScrArgs* args)
 {
@@ -108,20 +101,18 @@ static void Class_new (LIScrArgs* args)
 
 /* @luadoc
  * module "Core.Common.Data"
- * ---
- * -- Default base class.
+ * --- Default base class.
  * -- @name Data
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates an instance of the default base class.
+ * --- Creates an instance of the default base class.
  * --
- * -- @param self Data class.
+ * -- @param clss Data class.
  * -- @param args Arguments.
  * -- @return New data.
- * function Class.new(self, args)
+ * function Data.new(clss, args)
  */
 static void Data_new (LIScrArgs* args)
 {
@@ -144,8 +135,7 @@ static void Data_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Class of the type.
+ * --- Class of the type.
  * --
  * -- @name Data.class
  * -- @class table
@@ -156,8 +146,7 @@ static void Data_getter_class (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Class name of the type.
+ * --- Class name of the type.
  * --
  * -- @name Data.class_name
  * -- @class table

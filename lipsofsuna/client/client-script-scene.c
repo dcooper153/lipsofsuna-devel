@@ -112,7 +112,7 @@ private_update (LIWdgRender* self,
  * -- Creates a new scene widget.
  * --
  * -- @param self Scene class.
- * -- @param args Optional arguments.
+ * -- @param args Arguments.
  * -- @return New scene widget.
  * function Scene.new(self, args)
  */
@@ -146,15 +146,12 @@ static void Scene_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Pick an object from the scene.
- * --
- * -- Arguments:
- * -- x: X coordinate.
- * -- y: Y coordinate.
- * --
+ * --- Pick an object from the scene.
+ * -- 
  * -- @param self Scene.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>x: X coordinate.</li>
+ * --   <li>y: Y coordinate.</li></ul>
  * -- @return Vector and object, or vector and nil when hit terrain.
  * function Scene.pick(self, args)
  */

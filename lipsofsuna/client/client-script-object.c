@@ -35,8 +35,7 @@
  */
 
 /* @luadoc
- * ---
- * -- FIXME
+ * --- FIXME
  * --
  * -- @param self Object.
  * function Object.emit_particles(self)
@@ -55,14 +54,11 @@ static void Object_emit_particles (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new object.
- * --
- * -- Arguments:
- * -- id: Create with an explicit ID.
+ * --- Creates a new object.
  * --
  * -- @param self Object class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Create with an explicit ID.</li></ul>
  * -- @return New object.
  * function Object.new(self, args)
  */

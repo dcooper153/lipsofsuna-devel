@@ -275,10 +275,11 @@ livox_build_block (LIVoxManager*         manager,
 /**
  * \brief Solves occlusion masks for a volume of voxels.
  *
- * \param self Voxel manager.
+ * \param manager Voxel manager.
  * \param xsize Number of voxels.
  * \param ysize Number of voxels.
  * \param zsize Number of voxels.
+ * \param voxels Array of voxels in the volume.
  * \param result Buffer with room for xsize*ysize*zsize integers.
  * \return Number of completely occluded voxels.
  */

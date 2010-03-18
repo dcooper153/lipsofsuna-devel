@@ -28,30 +28,26 @@
 
 /* @luadoc
  * module "Core.Client.Binding"
- * ---
- * -- Bind controls to actions.
+ * --- Bind controls to actions.
  * -- @name Binding
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- @brief Creates a new binding.
+ * --- Creates a new binding.
  * --
- * -- Arguments:
- * -- action: Action or valid action name. (required)
- * -- joystickaxis: Joystick axis number.
- * -- joystickbutton: Joystick button number.
- * -- key: Key code.
- * -- mods: Key modifier mask.
- * -- mouseaxis: Mouse axis number.
- * -- mousebutton: Mouse button number.
- * -- mousedelta: Mouse axis number.
- * -- mult: Value multiplier.
- * -- params: Free form string passed to the action handler.
- * -- 
  * -- @param self Binding class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>action: Action or valid action name. (required)</li>
+ * --   <li>joystickaxis: Joystick axis number.</li>
+ * --   <li>joystickbutton: Joystick button number.</li>
+ * --   <li>key: Key code.</li>
+ * --   <li>mods: Key modifier mask.</li>
+ * --   <li>mouseaxis: Mouse axis number.</li>
+ * --   <li>mousebutton: Mouse button number.</li>
+ * --   <li>mousedelta: Mouse axis number.</li>
+ * --   <li>mult: Value multiplier.</li>
+ * --   <li>params: Free form string passed to the action handler.</li></ul>
  * -- @return New Binding.
  * function Binding.new(self, args)
  */
@@ -107,8 +103,7 @@ static void Binding_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Removes the binding.
+ * --- Removes the binding.
  * --
  * -- @param self Binding.
  * function Binding.free(self)

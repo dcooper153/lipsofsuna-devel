@@ -35,18 +35,15 @@
  */
 
 /* @luadoc
- * ---
- * -- Sets or clears an animation.
- * --
- * -- Arguments:
- * -- animation: Animation name.
- * -- channel: Channel number.
- * -- weight: Blending weight.
- * -- time: Starting time.
- * -- permanent: True if should keep repeating.
+ * --- Sets or clears an animation.
  * --
  * -- @param self Object.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>animation: Animation name.</li>
+ * --   <li>channel: Channel number.</li>
+ * --   <li>weight: Blending weight.</li>
+ * --   <li>time: Starting time.</li>
+ * --   <li>permanent: True if should keep repeating.</li></ul>
  * -- @return True if started a new animation.
  * function Object.animate(self, args)
  */
@@ -71,16 +68,13 @@ static void Object_animate (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Instructs the object to approach a point.
- * --
- * -- Arguments:
- * -- dist: Distance how close to target to get.
- * -- point: Point vector in world space. (required)
- * -- speed: Movement speed multiplier.
+ * --- Makes the object approach a point.
  * --
  * -- @param self Object.
  * -- @param args Arguments.
+ * --   <li>dist: Distance how close to target to get.</li>
+ * --   <li>point: Point vector in world space. (required)</li>
+ * --   <li>speed: Movement speed multiplier.</li></ul>
  * function Object.approach(self, args)
  */
 static void Object_approach (LIScrArgs* args)
@@ -98,18 +92,15 @@ static void Object_approach (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Finds an object by ID.
+ * --- Finds an object by ID.
  * --
- * -- Arguments:
- * -- id: Object ID. (required)
- * -- point: Center point for radius check.
- * -- radius: Maximum distance from center point.
- * --
- * -- @param self Object class.
- * -- @param args Arguments.
+ * -- @param clss Object class.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Object ID. (required)</li>
+ * --   <li>point: Center point for radius check.</li>
+ * --   <li>radius: Maximum distance from center point.</li></ul>
  * -- @return Object or nil.
- * function Object.find(self, args)
+ * function Object.find(clss, args)
  */
 static void Object_find (LIScrArgs* args)
 {
@@ -146,14 +137,11 @@ static void Object_find (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Finds a bone or an anchor by name.
- * --
- * -- Arguments:
- * -- name: Node name. (required)
+ * --- Finds a bone or an anchor by name.
  * --
  * -- @param self Object.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>name: Node name. (required)</li></ul>
  * -- @return Position and rotation, or nil if not found.
  * function Object.find_node(self, args)
  */
@@ -174,17 +162,14 @@ static void Object_find_node (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Finds all objects inside a sphere.
+ * --- Finds all objects inside a sphere.
  * --
- * -- Arguments:
- * -- point: Center point. (required)
- * -- radius: Search radius.
- * --
- * -- @param self Server class.
- * -- @param args Arguments.
+ * -- @param clss Object class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Center point. (required)</li>
+ * --   <li>radius: Search radius.</li></ul>
  * -- @return Table of matching objects and their IDs.
- * function Object.find_objects(self, args)
+ * function Object.find_objects(clss, args)
  */
 static void Object_find_objects (LIScrArgs* args)
 {
@@ -206,17 +191,14 @@ static void Object_find_objects (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets animation information for the given animation channel.
+ * --- Gets animation information for the given animation channel.
  * --
  * -- If an animation is looping in the channel, a table containing the fields
  * -- animation, time, and weight is returned.
  * --
- * -- Arguments:
- * -- channel: Channel number. (required)
- * --
  * -- @param self Server class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>channel: Channel number. (required)</li></ul>
  * -- @return Animation info table or nil.
  * function Object.get_animation(self, args)
  */
@@ -240,15 +222,12 @@ static void Object_get_animation (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Lets an impulse force affect the object.
- * --
- * -- Arguments:
- * -- point: Point of impulse. (required)
- * -- impulse: Force of impulse. (required)
+ * --- Lets an impulse force affect the object.
  * --
  * -- @param self Object.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Point of impulse. (required)</li>
+ * --   <li>impulse: Force of impulse. (required)</li></ul>
  * function Object.impulse(self, args)
  */
 static void Object_impulse (LIScrArgs* args)
@@ -262,14 +241,11 @@ static void Object_impulse (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Causes the object to jump.
- * --
- * -- Arguments:
- * -- impulse: Force of impulse. (required)
+ * --- Causes the object to jump.
  * --
  * -- @param self Object.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>impulse: Force of impulse. (required)</li></ul>
  * function Object.jump(self, impulse)
  */
 static void Object_jump (LIScrArgs* args)
@@ -281,17 +257,16 @@ static void Object_jump (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Angular velocity.
- * --
+ * --- Angular velocity.
+ * -- <br/>
  * -- Angular velocity specifies how the object rotates. The direction of the
  * -- vector points towards the axis of rotation and the length of the vector
  * -- specifies how fast the object rotates around its center point.
- * --
+ * -- <br/>
  * -- Only supported by rigid bodies. Other kind of objects always return
  * -- a zero vector.
  * --
- * -- @name Object.angular_momentum
+ * -- @name Object.angular
  * -- @class table
  */
 static void Object_getter_angular (LIScrArgs* args)
@@ -310,9 +285,8 @@ static void Object_setter_angular (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Table of channel numbers and animation names.
- * --
+ * --- Table of channel numbers and animation names.
+ * -- <br/>
  * -- A list of permanent animations the object is playing back.
  * --
  * -- @name Object.animations
@@ -334,8 +308,7 @@ static void Object_getter_animations (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Class type.
+ * --- Class type.
  * --
  * -- @name Object.class
  * -- @class table
@@ -353,8 +326,7 @@ static void Object_setter_class (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Class name of the object.
+ * --- Class name of the object.
  * --
  * -- @name Object.class_name
  * -- @class table
@@ -365,8 +337,7 @@ static void Object_getter_class_name (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Collision group bitmask.
+ * --- Collision group bitmask.
  * --
  * -- @name Object.collision_group
  * -- @class table
@@ -384,8 +355,7 @@ static void Object_setter_collision_group (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Collision bitmask.
+ * --- Collision bitmask.
  * --
  * -- @name Object.collision_mask
  * -- @class table
@@ -403,8 +373,7 @@ static void Object_setter_collision_mask (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gravity vector.
+ * --- Gravity vector.
  * --
  * -- @name Object.gravity
  * -- @class table
@@ -425,9 +394,8 @@ static void Object_setter_gravity (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Ground contact flag.
- * --
+ * --- Ground contact flag.
+ * -- <br/>
  * -- Only supported for creatures. Other kind of objects always return false.
  * --
  * -- @name Object.ground
@@ -439,8 +407,7 @@ static void Object_getter_ground (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Identification number.
+ * --- Unique identification number.
  * --
  * -- @name Object.id
  * -- @class table
@@ -451,8 +418,7 @@ static void Object_getter_id (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Mass.
+ * --- Mass.
  * --
  * -- @name Object.mass
  * -- @class table
@@ -470,8 +436,7 @@ static void Object_setter_mass (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Model string.
+ * --- Model string.
  * -- @name Object.model
  * -- @class table
  */
@@ -491,8 +456,7 @@ static void Object_setter_model (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Position.
+ * --- Position.
  * --
  * -- @name Object.position
  * -- @class table
@@ -518,8 +482,7 @@ static void Object_setter_position (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Visibility status.
+ * --- Visibility status.
  * --
  * -- @name Object.realized
  * -- @class table
@@ -537,8 +500,7 @@ static void Object_setter_realized (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Rotational orientation.
+ * --- Rotational orientation.
  * --
  * -- @name Object.rotation
  * -- @class table
@@ -564,8 +526,7 @@ static void Object_setter_rotation (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Save enabled flag.
+ * --- Save enabled flag.
  * --
  * -- @name Object.save
  * -- @class table
@@ -594,8 +555,7 @@ static void Object_setter_save (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Selection status flag.
+ * --- Selection status flag.
  * --
  * -- @name Object.selected
  * -- @class table
@@ -613,9 +573,9 @@ static void Object_setter_selected (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- List of selected objects.
- * --
+ * --- List of selected objects.
+ * -- <br/>
+ * -- Class variable.
  * -- @name Object.selected_objects
  * -- @class table
  */
@@ -654,8 +614,7 @@ static void Object_setter_selected_objects (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Movement speed.
+ * --- Movement speed.
  * --
  * -- Only used by creature objects.
  * --
@@ -675,9 +634,8 @@ static void Object_setter_speed (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Strafing direction.
- * --
+ * --- Strafing direction.
+ * -- <br/>
  * -- Only used by creature objects. The value of -1 means that the creature is
  * -- strafing to the left at walking speed. The value of 1 means right, and the
  * -- value of 0 means no strafing.
@@ -698,8 +656,7 @@ static void Object_setter_strafing (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- True if the object is static, false if it is a dynamic rigid body.
+ * --- True if the object is static, false if it is a dynamic rigid body.
  * --
  * -- @name Object.static
  * -- @class table
@@ -726,8 +683,7 @@ static void Object_setter_static (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Linear velocity.
+ * --- Linear velocity.
  * --
  * -- @name Object.velocity
  * -- @class table

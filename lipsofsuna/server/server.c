@@ -122,10 +122,11 @@ liser_server_free (LISerServer* self)
 }
 
 /**
- * \brief Returns a unique object ID.
+ * \brief Checks if the object ID is unique.
  *
  * \param self Server.
- * \return Unique object ID or zero on error.
+ * \param id ID to check.
+ * \return Nonzero if unique.
  */
 int
 liser_server_check_unique_object (const LISerServer* self,

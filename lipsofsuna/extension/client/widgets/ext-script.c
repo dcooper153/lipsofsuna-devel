@@ -139,20 +139,18 @@ private_callback_pressed_tree (LIScrData*    data,
 
 /* @luadoc
  * module "Extension.Client.Widgets"
- * ---
- * -- Create buttons.
+ * --- Create buttons.
  * -- @name Button
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new button widget.
+ * --- Creates a new button widget.
  * --
- * -- @param self Button class.
+ * -- @param clss Button class.
  * -- @param args Arguments.
  * -- @return New button widget.
- * function Button.new(self, table)
+ * function Button.new(clss, args)
  */
 static void Button_new (LIScrArgs* args)
 {
@@ -181,8 +179,7 @@ static void Button_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Displayed text.
+ * --- Displayed text.
  * -- @name Button.text
  * -- @class table
  */
@@ -199,20 +196,18 @@ static void Button_setter_text (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Edit text.
+ * --- Edit text.
  * -- @name Entry
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new text entry widget.
+ * --- Creates a new text entry widget.
  * --
- * -- @param self Entry class.
+ * -- @param clss Entry class.
  * -- @param args Arguments.
  * -- @return New entry widget.
- * function Entry.new(self, table)
+ * function Entry.new(clss, args)
  */
 static void Entry_new (LIScrArgs* args)
 {
@@ -241,8 +236,7 @@ static void Entry_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Clears the entry.
+ * --- Clears the entry.
  * --
  * -- @param self Entry.
  * function Entry.clear(self)
@@ -253,9 +247,8 @@ static void Entry_clear (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Displayed text.
- * -- @name Label.text
+ * --- Displayed text.
+ * -- @name Entry.text
  * -- @class table
  */
 static void Entry_getter_text (LIScrArgs* args)
@@ -271,20 +264,18 @@ static void Entry_setter_text (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Show images.
+ * --- Show images.
  * -- @name Image
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new image widget.
+ * --- Creates a new image widget.
  * --
- * -- @param self Image class.
+ * -- @param clss Image class.
  * -- @param args Arguments.
  * -- @return New image widget.
- * function Image.new(self, table)
+ * function Image.new(clss, args)
  */
 static void Image_new (LIScrArgs* args)
 {
@@ -313,8 +304,7 @@ static void Image_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Displayed image.
+ * --- Displayed image.
  * -- @name Image.image
  * -- @class table
  */
@@ -331,20 +321,18 @@ static void Image_setter_image (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Show text labels.
+ * --- Show text labels.
  * -- @name Label
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new label widget.
+ * --- Creates a new label widget.
  * --
- * -- @param self Label class.
+ * -- @param clss Label class.
  * -- @param args Arguments.
  * -- @return New label widget.
- * function Label.new(self, table)
+ * function Label.new(clss, args)
  */
 static void Label_new (LIScrArgs* args)
 {
@@ -373,8 +361,7 @@ static void Label_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Displayed text.
+ * --- Displayed text.
  * -- @name Label.text
  * -- @class table
  */
@@ -391,20 +378,18 @@ static void Label_setter_text (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Show menus.
+ * --- Show menus.
  * -- @name Menu
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new menu widget.
+ * --- Creates a new menu widget.
  * --
- * -- @param self Menu class.
+ * -- @param clss Menu class.
  * -- @param args Arguments.
  * -- @return New menu widget.
- * function Menu.new(self, table)
+ * function Menu.new(clss, args)
  */
 static void Menu_new (LIScrArgs* args)
 {
@@ -432,14 +417,11 @@ static void Menu_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets the allocation rectangle of a menu item.
- * --
- * -- Arguments:
- * -- label: Item text.
+ * --- Gets the allocation rectangle of a menu item.
  * --
  * -- @param self Menu.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>label: Item text.</li></ul>
  * -- @return Rectangle or nil.
  * function Menu.get_item_rect(self, args)
  */
@@ -460,16 +442,13 @@ static void Menu_get_item_rect (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Inserts a menu item to the menu.
- * --
- * -- Arguments:
- * -- label: Item label.
- * -- icon: Icon name.
- * -- pressed: Pressed callback.
+ * --- Inserts a menu item to the menu.
  * --
  * -- @param self Menu.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>label: Item label.</li>
+ * --   <li>icon: Icon name.</li>
+ * --   <li>pressed: Pressed callback.</li></ul>
  * function Menu.insert(self, args)
  */
 static void Menu_insert (LIScrArgs* args)
@@ -497,8 +476,7 @@ static void Menu_insert (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- When set to true, the menu is hidden automatically after clicked.
+ * --- When set to true, the menu is hidden automatically after clicked.
  * -- @name Menu.autohide
  * -- @class table
  */
@@ -515,8 +493,7 @@ static void Menu_setter_autohide (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Displayed orientation, either "horz" or "vert".
+ * --- Displayed orientation, either "horz" or "vert".
  * -- @name Menu.orientation
  * -- @class table
  */
@@ -538,20 +515,18 @@ static void Menu_setter_orientation (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Scroll bar widget.
+ * --- Scroll bar widget.
  * -- @name Scroll
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new scroll bar widget.
+ * --- Creates a new scroll bar widget.
  * --
  * -- @param self Scroll class.
  * -- @param args Arguments.
  * -- @return New scroll widget.
- * function Scroll.new(self, table)
+ * function Scroll.new(clss, args)
  */
 static void Scroll_new (LIScrArgs* args)
 {
@@ -580,15 +555,12 @@ static void Scroll_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the scroll range.
- * --
- * -- Arguments:
- * -- min: Minimum value.
- * -- max: Maximum value.
+ * --- Sets the scroll range.
  * --
  * -- @param self Scroll widget.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>min: Minimum value.</li>
+ * --   <li>max: Maximum value.</li></ul>
  * function Scroll.set_range(self, agrs)
  */
 static void Scroll_set_range (LIScrArgs* args)
@@ -604,8 +576,7 @@ static void Scroll_set_range (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Current value.
+ * --- Current value.
  * -- @name Scroll.value
  * -- @class table
  */
@@ -622,20 +593,18 @@ static void Scroll_setter_value (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Display and edit numeric values.
+ * --- Display and edit numeric values.
  * -- @name Spin
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new spin widget.
+ * --- Creates a new spin widget.
  * --
- * -- @param self Spin class.
+ * -- @param clss Spin class.
  * -- @param args Arguments.
  * -- @return New spin widget.
- * function Spin.new(self, table)
+ * function Spin.new(clss, args)
  */
 static void Spin_new (LIScrArgs* args)
 {
@@ -664,8 +633,7 @@ static void Spin_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Current value.
+ * --- Current value.
  * -- @name Spin.value
  * -- @class table
  */
@@ -682,21 +650,17 @@ static void Spin_setter_value (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Display a list of items.
+ * --- Display a list of items.
  * -- @name Tree
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Appends an item to the tree.
- * --
- * -- Arguments:
- * -- text: Text.
+ * --- Appends an item to the tree.
  * --
  * -- @param self Tree.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>text: Text.</li></ul>
  * function Tree.append(self, args)
  */
 static void Tree_append (LIScrArgs* args)
@@ -710,14 +674,11 @@ static void Tree_append (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets a row from the tree.
- * --
- * -- Arguments:
- * -- row: Row index.
+ * --- Gets a row from the tree.
  * --
  * -- @param self Tree.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>row: Row index.</li></ul>
  * -- @return String or nil.
  * function Tree.get_row(self, args)
  */
@@ -739,13 +700,12 @@ static void Tree_get_row (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new tree widget.
+ * --- Creates a new tree widget.
  * --
- * -- @param self Tree class.
+ * -- @param clss Tree class.
  * -- @param args Arguments.
  * -- @return New tree widget.
- * function Tree.new(self, table)
+ * function Tree.new(clss, args)
  */
 static void Tree_new (LIScrArgs* args)
 {
@@ -774,14 +734,11 @@ static void Tree_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Removes a row from the tree.
- * --
- * -- Arguments:
- * -- row: Row index.
+ * --- Removes a row from the tree.
  * --
  * -- @param self Tree.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>row: Row index.</li></ul>
  * function Tree.remove(self, args)
  */
 static void
@@ -799,15 +756,12 @@ Tree_remove (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets a row of the tree.
- * --
- * -- Arguments:
- * -- row: Row index.
- * -- text: String.
+ * --- Sets a row of the tree.
  * --
  * -- @param self Tree.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>row: Row index.</li>
+ * --   <li>text: String.</li></ul>
  * -- @return String or nil.
  * function Tree.get_row(self, args)
  */
@@ -831,8 +785,7 @@ static void Tree_set_row (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Index of the selected item or nil for no selection.
+ * --- Index of the selected item or nil for no selection.
  * -- @name Tree.size
  * -- @class table
  */
@@ -879,8 +832,7 @@ static void Tree_setter_selection (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Number of root level items in the tree.
+ * --- Number of root level items in the tree.
  * -- @name Tree.size
  * -- @class table
  */
@@ -916,20 +868,18 @@ static void Tree_setter_size (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Create a scrollable viewport.
+ * --- Create a scrollable viewport.
  * -- @name View
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new view widget.
+ * --- Creates a new view widget.
  * --
- * -- @param self View class.
+ * -- @param clss View class.
  * -- @param args Arguments.
  * -- @return New view widget.
- * function View.new(self, table)
+ * function View.new(clss, args)
  */
 static void
 View_new (LIScrArgs* args)
@@ -958,8 +908,7 @@ View_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Child widget.
+ * --- Child widget.
  * -- @name View.child
  * -- @class table
  */
@@ -987,8 +936,7 @@ static void View_setter_child (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Horizontal scrolling flag of the widget.
+ * --- Horizontal scrolling flag of the widget.
  * -- @name View.hscroll
  * -- @class table
  */
@@ -1005,8 +953,7 @@ static void View_setter_hscroll (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Vertical scrolling flag of the widget.
+ * --- Vertical scrolling flag of the widget.
  * -- @name View.vscroll
  * -- @class table
  */

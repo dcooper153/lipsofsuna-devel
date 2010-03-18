@@ -27,24 +27,20 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Server.Voxel"
- * ---
- * -- FIXME
+ * module "Extension.Client.Voxel"
+ * --- Display voxel terrain.
  * -- @name Voxel
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Sets the contents of a voxel block.
- * --
- * -- Arguments:
- * -- packet: Packet reader.
+ * --- Sets the contents of a voxel block.
  * --
  * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>packet: Packet reader.</li></ul>
  * -- @return True on success.
- * Voxel.set_block(self, args)
+ * function Voxel.set_block(self, args)
  */
 static void Voxel_set_block (LIScrArgs* args)
 {
@@ -102,16 +98,13 @@ static void Voxel_set_block (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the materials used by the voxel system.
- * --
- * -- Arguments:
- * -- packet: Packet reader.
+ * --- Sets the materials used by the voxel system.
  * --
  * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>packet: Packet reader.</li></ul>
  * -- @return True on success.
- * Voxel.set_materials(self, args)
+ * function Voxel.set_materials(self, args)
  */
 static void Voxel_set_materials (LIScrArgs* args)
 {

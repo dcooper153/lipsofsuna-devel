@@ -28,27 +28,23 @@
 
 /* @luadoc
  * module "Extension.Client.Effect"
- * ---
- * -- Create special effects.
+ * --- Create special effects.
  * -- @name Effect
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Creates a new particle.
- * --
- * -- Arguments:
- * -- accel: Acceleration vector.
- * -- color: Particle color.
- * -- fade: Fade start time in seconds.
- * -- life: Particle lifetime in seconds.
- * -- position: Position vector. (required)
- * -- texture: Texture name.
- * -- velocity: Average particle velocity.
+ * --- Creates a new particle.
  * --
  * -- @param self Effect class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>accel: Acceleration vector.</li>
+ * --   <li>color: Particle color.</li>
+ * --   <li>fade: Fade start time in seconds.</li>
+ * --   <li>life: Particle lifetime in seconds.</li>
+ * --   <li>position: Position vector. (required)</li>
+ * --   <li>texture: Texture name.</li>
+ * --   <li>velocity: Average particle velocity.</li></ul>
  * function Effect.particle(self, args)
  */
 static void Effect_particle (LIScrArgs* args)
@@ -91,27 +87,22 @@ static void Effect_particle (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates random particles.
- * --
- * -- The following values are recognized in the argument table:
- * --
- * -- Arguments:
- * -- accel: Acceleration vector.
- * -- angle: Maximum cone angle in degrees.
- * -- axis: Axis of rotation.
- * -- color: Particle color.
- * -- count: Number of particles.
- * -- fade: Fade start time in seconds.
- * -- life: Particle lifetime in seconds.
- * -- position: Position vector. (required)
- * -- radius: Maximum variation of position.
- * -- random: Velocity error value.
- * -- spread: Maximum particle distance from the center.
- * -- velocity: Average particle velocity.
+ * --- Creates random particles.
  * --
  * -- @param self Effect class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>accel: Acceleration vector.</li>
+ * --   <li>angle: Maximum cone angle in degrees.</li>
+ * --   <li>axis: Axis of rotation.</li>
+ * --   <li>color: Particle color.</li>
+ * --   <li>count: Number of particles.</li>
+ * --   <li>fade: Fade start time in seconds.</li>
+ * --   <li>life: Particle lifetime in seconds.</li>
+ * --   <li>position: Position vector. (required)</li>
+ * --   <li>radius: Maximum variation of position.</li>
+ * --   <li>random: Velocity error value.</li>
+ * --   <li>spread: Maximum particle distance from the center.</li>
+ * --   <li>velocity: Average particle velocity.</li></ul>
  * function Effect.random(self, args)
  */
 static void Effect_random (LIScrArgs* args)
@@ -211,16 +202,14 @@ static void Effect_random (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new ray effect.
- * --
- * -- dst: Destination position vector. (required)
- * -- fade: Fade start time in seconds.
- * -- life: Particle lifetime in seconds.
- * -- src: Source position vector. (required)
+ * --- Creates a new ray effect.
  * --
  * -- @param self Effect class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>dst: Destination position vector. (required)</li>
+ * --   <li>fade: Fade start time in seconds.</li>
+ * --   <li>life: Particle lifetime in seconds.</li>
+ * --   <li>src: Source position vector. (required)</li></ul>
  * function Effect.ray(self, args)
  */
 static void Effect_ray (LIScrArgs* args)
@@ -252,14 +241,11 @@ static void Effect_ray (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a particle system.
- * --
- * -- Arguments:
- * -- position: Position vector.
+ * --- Creates a particle system.
  * --
  * -- @param self Effect class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>position: Position vector.</li></ul>
  * function Effect.system(self, args)
  */
 static void Effect_system (LIScrArgs* args)

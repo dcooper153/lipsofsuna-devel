@@ -28,23 +28,19 @@
 
 /* @luadoc
  * module "Extension.Client.Speech"
- * ---
- * -- Display speech above objects.
+ * --- Display speech above objects.
  * -- @name Sound
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Displays a message above the object.
- * --
- * -- Arguments:
- * -- id: Object id.
- * -- object: Object.
- * -- message: Speech string. (required)
+ * --- Displays a message above the object.
  * --
  * -- @param self Speech class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Object id.</li>
+ * --   <li>object: Object.</li>
+ * --   <li>message: Speech string. (required)</li></ul>
  * function Speech.add(self, args)
  */
 static void Speech_add (LIScrArgs* args)

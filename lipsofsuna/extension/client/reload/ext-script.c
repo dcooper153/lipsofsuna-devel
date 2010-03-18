@@ -29,18 +29,16 @@
 
 /* @luadoc
  * module "Extension.Client.Reload"
- * ---
- * -- Reload modified data files without restarting.
+ * --- Reload modified data files without restarting.
  * -- @name Reload
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Cancels any ongoing reload.
+ * --- Cancels any ongoing reload.
  * --
- * -- @param self Reload class.
- * function Reload.cancel(self)
+ * -- @param clss Reload class.
+ * function Reload.cancel(clss)
  */
 static void Reload_cancel (LIScrArgs* args)
 {
@@ -51,15 +49,12 @@ static void Reload_cancel (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Reloads all modified data files.
+ * --- Reloads all modified data files.
  * --
- * -- Arguments:
- * -- block: If true, lock up the game until done.
- * --
- * -- @param self Reload class.
- * -- @param args Arguments.
- * function Reload.reload(self, args)
+ * -- @param clss Reload class.
+ * -- @param args Arguments.<ul>
+ * --   <li>block: If true, lock up the game until done.</li></ul>
+ * function Reload.reload(clss, args)
  */
 static void Reload_reload (LIScrArgs* args)
 {
@@ -78,8 +73,7 @@ static void Reload_reload (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- True if the reloader is currently idle.
+ * --- True if the reloader is currently idle.
  * --
  * -- @name Reload.done
  * -- @class table
@@ -93,10 +87,9 @@ static void Reload_getter_done (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Automatic reload flag.
+ * --- Automatic reload flag.
  * --
- * -- Automatic reloading is disabled by default.
+ * -- False by default.
  * --
  * -- @name Reload.enabled
  * -- @class table

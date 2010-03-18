@@ -34,7 +34,7 @@ private_tick (LIExtCreature* self,
 /**
  * \brief Creates a new creature logic.
  *
- * \param server Server.
+ * \param module Module.
  * \return Creature logic or NULL.
  */
 LIExtCreature*

@@ -28,22 +28,18 @@
 
 /* @luadoc
  * module "Core.Client.Client"
- * ---
- * -- Access and manipulate the state of the client.
+ * --- Access and manipulate the state of the client.
  * -- @name Client
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Cycles widget focus.
+ * --- Cycles widget focus.
  * --
- * -- Arguments:
- * -- @param backward: True if should cycle backward.
- * --
- * -- @param self Client class.
- * -- @param args Arguments.
- * function Client.cycle_focus(self, args)
+ * -- @param clss Client class.
+ * -- @param args Arguments.<ul>
+ * --   <li>backward: True if should cycle backward.</li></ul>
+ * function Client.cycle_focus(clss, args)
  */
 static void Client_cycle_focus (LIScrArgs* args)
 {
@@ -56,15 +52,12 @@ static void Client_cycle_focus (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Cycles window focus.
+ * --- Cycles window focus.
  * --
- * -- Arguments:
- * -- @param backward: True if should cycle backward.
- * --
- * -- @param self Client class.
- * -- @param args Arguments.
- * function Client.cycle_focus(self, args)
+ * -- @param clss Client class.
+ * -- @param args Arguments.<ul>
+ * --   <li>backward: True if should cycle backward.</li></ul>
+ * function Client.cycle_focus(clss, args)
  */
 static void Client_cycle_window_focus (LIScrArgs* args)
 {
@@ -77,15 +70,12 @@ static void Client_cycle_window_focus (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- @brief Launches a server.
+ * --- Launches a server.
  * --
- * -- Call Client.join to join the server.
- * --
- * -- @param self Client class.
+ * -- @param clss Client class.
  * -- @param args Arguments.
  * -- @return True on success.
- * function Client.host(self, args)
+ * function Client.host(clss, args)
  */
 static void Client_host (LIScrArgs* args)
 {
@@ -101,8 +91,7 @@ static void Client_host (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets the current cursor position.
+ * --- Gets the current cursor position.
  * -- @name Client.cursor_pos
  * -- @class table
  */
@@ -120,8 +109,7 @@ static void Client_getter_cursor_pos (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Short term average frames per second.
+ * --- Short term average frames per second.
  * --
  * -- @name Client.tick
  * -- @class table
@@ -135,8 +123,7 @@ static void Client_getter_fps (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Movement mode flag.
+ * --- Movement mode flag.
  * -- @name Client.moving
  * -- @class table
  */
@@ -160,8 +147,7 @@ static void Client_setter_moving (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Root widget.
+ * --- Root widget.
  * -- @name Client.root
  * -- @class table
  */
@@ -193,8 +179,7 @@ static void Client_setter_root (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Main window title.
+ * --- Main window title.
  * -- @name Client.title
  * -- @class table
  */

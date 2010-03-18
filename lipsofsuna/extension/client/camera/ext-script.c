@@ -28,22 +28,18 @@
 
 /* @luadoc
  * module "Extension.Client.Camera"
- * ---
- * -- Advanced camera control.
+ * --- Advanced camera control.
  * -- @name Camera
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Moves the camera forward or backward.
- * --
- * -- Arguments:
- * -- rate: Movement rate.
- * -- keep: True if should keep moving.
+ * --- Moves the camera forward or backward.
  * --
  * -- @param self Camera class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>rate: Movement rate.</li>
+ * --   <li>keep: True if should keep moving.</li></ul>
  * function Camera.move(self, args)
  */
 static void Camera_move (LIScrArgs* args)
@@ -82,15 +78,12 @@ static void Camera_reset (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the tilting rate of the camera.
- * --
- * -- Arguments:
- * -- rate: Tilting rate.
- * -- keep: True if should keep tilting.
+ * --- Sets the tilting rate of the camera.
  * --
  * -- @param self Camera class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>rate: Tilting rate.</li>
+ * --   <li>keep: True if should keep tilting.</li></ul>
  * function Camera.tilt(self, args)
  */
 static void Camera_tilt (LIScrArgs* args)
@@ -111,15 +104,12 @@ static void Camera_tilt (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the turning rate of the camera.
- * --
- * -- Arguments:
- * -- rate: Turning rate.
- * -- keep: True if should keep turning.
+ * --- Sets the turning rate of the camera.
  * --
  * -- @param self Camera class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>rate: Turning rate.</li>
+ * --   <li>keep: True if should keep turning.</li></ul>
  * function Camera.turn(self, args)
  */
 static void Camera_turn (LIScrArgs* args)
@@ -140,15 +130,12 @@ static void Camera_turn (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Adjusts the zoom of the camera.
- * --
- * -- Arguments:
- * -- rate: Zooming rate.
- * -- keep: True if should keep zooming.
+ * --- Adjusts the zoom of the camera.
  * --
  * -- @param self Camera class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>rate: Zooming rate.</li>
+ * --   <li>keep: True if should keep zooming.</li></ul>
  * function Camera.zoom(self, args)
  */
 static void Camera_zoom (LIScrArgs* args)
@@ -169,8 +156,7 @@ static void Camera_zoom (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Far plane of the camera.
+ * --- Far plane of the camera.
  * -- @name Camera.far
  * -- @class table
  */
@@ -187,8 +173,7 @@ static void Camera_setter_far (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Camera mode.
+ * --- Camera mode.
  * --
  * -- Recognized values: "first-person"/"manual"/"third-person".
  * --
@@ -231,8 +216,7 @@ static void Camera_setter_mode (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Near plane of the camera.
+ * --- Near plane of the camera.
  * -- @name Camera.far
  * -- @class table
  */
@@ -249,8 +233,7 @@ static void Camera_setter_near (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Camera position.
+ * --- Camera position.
  * -- @name Camera.position
  * -- @class table
  */
@@ -265,8 +248,7 @@ static void Camera_getter_position (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Camera rotation.
+ * --- Camera rotation.
  * -- @name Camera.rotation
  * -- @class table
  */
@@ -281,8 +263,7 @@ static void Camera_getter_rotation (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- The position of the target of third person camera.
+ * --- The position of the target of third person camera.
  * -- @name Camera.center
  * -- @class table
  */
@@ -308,8 +289,7 @@ static void Camera_getter_target_position (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- The rotation of the target of third person camera.
+ * --- The rotation of the target of third person camera.
  * -- @name Camera.center
  * -- @class table
  */

@@ -27,15 +27,13 @@
 
 /* @luadoc
  * module "Extension.Server.Voxel"
- * ---
- * -- Use dynamic voxel terrain.
+ * --- Use dynamic voxel terrain.
  * -- @name Voxel
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Material friction.
+ * --- Material friction.
  * --
  * -- @name Material.friction
  * -- @class table
@@ -46,8 +44,7 @@ static void Material_getter_friction (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Material model.
+ * --- Material model.
  * --
  * -- @name Material.model
  * -- @class table
@@ -58,8 +55,7 @@ static void Material_getter_model (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Material name.
+ * --- Material name.
  * --
  * -- @name Material.name
  * -- @class table
@@ -72,13 +68,12 @@ static void Material_getter_name (LIScrArgs* args)
 /*****************************************************************************/
 
 /* @luadoc
- * ---
- * -- Creates a new tile.
+ * --- Creates a new tile.
  * --
- * -- @param self Tile class.
+ * -- @param clss Tile class.
  * -- @param args Arguments.
  * -- @return New tile.
- * function Tile.new(self, args)
+ * function Tile.new(clss, args)
  */
 static void Tile_new (LIScrArgs* args)
 {
@@ -94,8 +89,7 @@ static void Tile_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Damage counter of the tile.
+ * --- Damage counter of the tile.
  * --
  * -- @name Tile.damage
  * -- @class table
@@ -117,8 +111,7 @@ static void Tile_setter_damage (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Rotation of the tile.
+ * --- Rotation of the tile.
  * --
  * -- @name Tile.rotation
  * -- @class table
@@ -140,8 +133,7 @@ static void Tile_setter_rotation (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Terrain type of the tile.
+ * --- Terrain type of the tile.
  * --
  * -- @name Tile.terrain
  * -- @class table
@@ -165,16 +157,13 @@ static void Tile_setter_terrain (LIScrArgs* args)
 /*****************************************************************************/
 
 /* @luadoc
- * ---
- * -- Erases a voxel near the given point.
+ * --- Erases a voxel near the given point.
  * --
- * -- Arguments:
- * -- point: Position vector. (required)
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Position vector. (required)</li></ul>
  * -- @return True if terrain was erased.
- * function Voxel.erase(self, args)
+ * function Voxel.erase(clss, args)
  */
 static void Voxel_erase (LIScrArgs* args)
 {
@@ -189,17 +178,14 @@ static void Voxel_erase (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Finds all blocks near the given point.
+ * --- Finds all blocks near the given point.
  * --
- * -- Arguments:
- * -- point: Position vector. (required)
- * -- radius: Radius.
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Position vector. (required)</li>
+ * --   <li>radius: Radius.</li></ul>
  * -- @return Table of block indices and modification stamps.
- * function Voxel.find_blocks(self, args)
+ * function Voxel.find_blocks(clss, args)
  */
 static void Voxel_find_blocks (LIScrArgs* args)
 {
@@ -274,14 +260,11 @@ static void Voxel_find_blocks (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Finds information on a material.
+ * --- Finds information on a material.
  * --
- * -- Arguments:
- * -- id: Material ID.
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Material ID.</li></ul>
  * -- @return Material or nil.
  */
 static void Voxel_find_material (LIScrArgs* args)
@@ -312,17 +295,14 @@ static void Voxel_find_material (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Finds the voxel nearest to the given point.
+ * --- Finds the voxel nearest to the given point.
  * --
- * -- Arguments:
- * -- match: Tiles to search for. ("all"/"empty"/"full")
- * -- point: Position vector. (required)
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>match: Tiles to search for. ("all"/"empty"/"full")</li>
+ * --   <li>point: Position vector. (required)</li></ul>
  * -- @return Tile and vector, or nil.
- * function Voxel.find_voxel(self, args)
+ * function Voxel.find_voxel(clss, args)
  */
 static void Voxel_find_voxel (LIScrArgs* args)
 {
@@ -362,18 +342,15 @@ static void Voxel_find_voxel (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets the data of a voxel block.
+ * --- Gets the data of a voxel block.
  * --
- * -- Arguments:
- * -- index: Block index. (required)
- * -- packet: Packet writer.
- * -- type: Packet type.
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>index: Block index. (required)</li>
+ * --   <li>packet: Packet writer.</li>
+ * --   <li>type: Packet type.</li></ul>
  * -- @return Packet writer or nil.
- * function Voxel.get_block(self, args)
+ * function Voxel.get_block(clss, args)
  */
 static void Voxel_get_block (LIScrArgs* args)
 {
@@ -438,16 +415,13 @@ static void Voxel_get_block (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Gets the material configuration of the voxel system.
+ * --- Gets the material configuration of the voxel system.
  * --
- * -- Arguments:
- * -- type: Packet type.
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>type: Packet type.</li></ul>
  * -- @return Packet writer.
- * function Voxel.get_materials(self, args)
+ * function Voxel.get_materials(clss, args)
  */
 static void Voxel_get_materials (LIScrArgs* args)
 {
@@ -487,17 +461,14 @@ static void Voxel_get_materials (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Inserts a voxel near the given point.
+ * --- Inserts a voxel near the given point.
  * --
- * -- Arguments:
- * -- point: Position vector. (required)
- * -- tile: Tile. (required)
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Position vector. (required)</li>
+ * --   <li>tile: Tile. (required)</li></ul>
  * -- @return True if terrain was filled.
- * function Voxel.insert(self, args)
+ * function Voxel.insert(clss, args)
  */
 static void Voxel_insert (LIScrArgs* args)
 {
@@ -514,17 +485,14 @@ static void Voxel_insert (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Replaces the voxel near the given point.
+ * --- Replaces the voxel near the given point.
  * --
- * -- Arguments:
- * -- point: Position vector. (required)
- * -- tile: Tile. (required)
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Position vector. (required)</li>
+ * --   <li>tile: Tile. (required)</li></ul>
  * -- @return True if terrain was replaced.
- * function Voxel.replace(self, args)
+ * function Voxel.replace(clss, args)
  */
 static void Voxel_replace (LIScrArgs* args)
 {
@@ -542,18 +510,15 @@ static void Voxel_replace (LIScrArgs* args)
 
 
 /* @luadoc
- * ---
- * -- Rotates a voxel near the given point.
+ * --- Rotates a voxel near the given point.
  * --
- * -- Arguments:
- * -- axis: Axis of rotation ("x"/"y"/"z" or 1/2/3)
- * -- point: Position vector. (required)
- * -- step: Number of steps to rotate.
- * --
- * -- @param self Voxel class.
- * -- @param args Argumennts.
+ * -- @param clss Voxel class.
+ * -- @param args Argumennts.<ul>
+ * --   <li>axis: Axis of rotation ("x"/"y"/"z" or 1/2/3)</li>
+ * --   <li>point: Position vector. (required)</li>
+ * --   <li>step: Number of steps to rotate.</li></ul>
  * -- @return True if a voxel was rotated.
- * function Voxel.rotate(self, args)
+ * function Voxel.rotate(clss, args)
  */
 static void Voxel_rotate (LIScrArgs* args)
 {
@@ -583,10 +548,9 @@ static void Voxel_rotate (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Saves the terrain of the currently loaded sectors.
+ * --- Saves the terrain of the currently loaded sectors.
  * --
- * -- @param self Voxel class.
+ * -- @param clss Voxel class.
  * function Voxel.save(self)
  */
 static void Voxel_save (LIScrArgs* args)
@@ -604,16 +568,13 @@ static void Voxel_save (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the contents of a voxel block.
+ * --- Sets the contents of a voxel block.
  * --
- * -- Arguments:
- * -- packet: Packet reader.
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>packet: Packet reader.</li></ul>
  * -- @return True on success.
- * Voxel.set_block(self, args)
+ * Voxel.set_block(clss, args)
  */
 static void Voxel_set_block (LIScrArgs* args)
 {
@@ -671,16 +632,13 @@ static void Voxel_set_block (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Sets the materials used by the voxel system.
+ * --- Sets the materials used by the voxel system.
  * --
- * -- Arguments:
- * -- packet: Packet reader.
- * --
- * -- @param self Voxel class.
- * -- @param args Arguments.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>packet: Packet reader.</li></li>
  * -- @return True on success.
- * Voxel.set_materials(self, args)
+ * Voxel.set_materials(clss, args)
  */
 static void Voxel_set_materials (LIScrArgs* args)
 {
@@ -720,8 +678,7 @@ static void Voxel_set_materials (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Fill type for empty sectors.
+ * --- Fill type for empty sectors.
  * -- @name Server.time
  * -- @class table
  */

@@ -27,18 +27,16 @@
 
 /* @luadoc
  * module "Extension.Client.Packager"
- * ---
- * -- Automatize data package creation.
- * -- @name Options
+ * --- Automatize data package creation.
+ * -- @name Packager
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- Cancels any ongoing packaging process.
+ * --- Cancels any ongoing packaging process.
  * --
- * -- @param self Packager class.
- * function Packager.cancel(self)
+ * -- @param clss Packager class.
+ * function Packager.cancel(clss)
  */
 static void Packager_cancel (LIScrArgs* args)
 {
@@ -49,17 +47,14 @@ static void Packager_cancel (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates data package.
+ * --- Creates a data package.
  * --
- * -- Arguments:
- * -- dir: Directory name.
- * -- file: File name.
- * --
- * -- @param self Packager class.
- * -- @param args Arguments.
+ * -- @param clss Packager class.
+ * -- @param args Arguments.<ul>
+ * --   <li>dir: Directory name.</li>
+ * --   <li>file: File name.</li></ul>
  * -- @return True on success.
- * function Packager.save(self, args)
+ * function Packager.save(self, clss)
  */
 static void Packager_save (LIScrArgs* args)
 {
@@ -74,8 +69,7 @@ static void Packager_save (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Boolean switch for verbose debug messages.
+ * --- Boolean switch for verbose debug messages.
  * -- @name Packager.verbose
  * -- @class table
  */

@@ -27,22 +27,46 @@
 
 /* @luadoc
  * module "Core.Common.Program"
- * ---
- * -- Manipulate program state.
- * -- @name Path
+ * --- Manipulate program state.
+ * -- @name Program
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- @brief Unloads the world map.
+ * --- Loads an extension.
  * --
+ * -- @param clss Program class.
+ * -- @param args Arguments.<ul>
+ * --  <li>1,name: Extension name.</li></ul>
+ * -- @return True on success.
+ * function Program.load_extension(clss, args)
+ */
+static int Program_load_extension (LIScrArgs* args)
+{
+	int ret;
+	const char* name;
+	LIMaiProgram* program;
+
+	if (liscr_args_gets_string (args, "name", &name) ||
+	    liscr_args_geti_string (args, 0, &name))
+	{
+		program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+		ret = limai_program_insert_extension (program, name);
+		if (!ret)
+			lisys_error_report ();
+		liscr_args_seti_bool (args, ret);
+	}
+}
+
+/* @luadoc
+ * --- Unloads the world map.
+ * -- <br/>
  * -- Unrealizes all objects and destroys all sectors of the world map.
  * -- You usually want to do this when you're about to create a new map with
  * -- the map generator to avoid parts of the old map being left in the game.
  * --
- * -- @param self Program class.
- * function Program.unload_world(self)
+ * -- @param clss Program class.
+ * function Program.unload_world(clss)
  */
 static void Program_unload_world (LIScrArgs* args)
 {
@@ -53,11 +77,10 @@ static void Program_unload_world (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Request program shutdown.
+ * --- Request program shutdown.
  * --
- * -- @param self Program class.
- * function Program.shutdown(self)
+ * -- @param clss Program class.
+ * function Program.shutdown(clss)
  */
 static void Program_shutdown (LIScrArgs* args)
 {
@@ -68,9 +91,7 @@ static void Program_shutdown (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Short term average tick length in seconds.
- * --
+ * --- Short term average tick length in seconds.
  * -- @name Program.tick
  * -- @class table
  */
@@ -83,8 +104,7 @@ static void Program_getter_tick (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Number of seconds the program has been running.
+ * --- Number of seconds the program has been running.
  * -- @name Program.time
  * -- @class table
  */
@@ -103,6 +123,7 @@ liscr_script_program (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_PROGRAM, data);
+	liscr_class_insert_cfunc (self, "load_extension", Program_load_extension);
 	liscr_class_insert_cfunc (self, "unload_world", Program_unload_world);
 	liscr_class_insert_cfunc (self, "shutdown", Program_shutdown);
 	liscr_class_insert_cvar (self, "tick", Program_getter_tick, NULL);

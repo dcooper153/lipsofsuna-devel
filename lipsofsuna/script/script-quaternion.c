@@ -210,7 +210,7 @@ static void Quaternion_new (LIScrArgs* args)
  * -- @param self Quaternion class.
  * -- @param euler Euler angles.
  * -- @return New quaternion.
- * function Quaternion.new(self, euler)
+ * function Quaternion.new_euler(self, euler)
  */
 static void Quaternion_new_euler (LIScrArgs* args)
 {

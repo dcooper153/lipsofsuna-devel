@@ -82,8 +82,7 @@ private_action_callback (LIBndAction*  action,
  */
 
 /* @luadoc
- * ---
- * -- Removes the action.
+ * --- Removes the action.
  * --
  * -- @param self Action.
  * function Action.free(self)
@@ -95,17 +94,14 @@ static void Action_free (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates a new action.
- * --
- * -- Arguments:
- * -- id Identifier string to be used internally.
- * -- name Human readable short name.
- * -- desc Human readable long description.
- * -- func Callback function.
+ * --- Creates a new action.
  * --
  * -- @param self Action class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Identifier string to be used internally.</li>
+ * --   <li>name: Human readable short name.</li>
+ * --   <li>desc: Human readable long description.</li>
+ * --   <li>func: Callback function.</li></ul>
  * -- @return New action.
  * function Action.new(self, args)
  */
@@ -143,8 +139,7 @@ static void Action_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Enables or disables the action.
+ * --- Enables or disables the action.
  * --
  * -- @name Action.enabled
  * -- @class table

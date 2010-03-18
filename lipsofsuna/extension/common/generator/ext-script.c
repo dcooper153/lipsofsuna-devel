@@ -26,26 +26,22 @@
 
 /* @luadoc
  * module "Extension.Common.Generator"
- * ---
- * -- Generate random dungeons.
+ * --- Generate random dungeons.
  * -- @name Generator
  * -- @class table
  */
 
 /* @luadoc
- * ---
- * -- @brief Disables a brush type.
+ * --- Disables a brush type.
  * --
  * -- You can use this function to temporarily disable certain brush types so
  * -- that they'll never appear in the map. This is typically used to control
  * -- where special rooms should appear in the map.
  * --
- * -- Arguments:
- * -- name: Brush name.
- * --
- * -- @param self generator class.
- * -- @param args Arguments.
- * Generator.disable_brush(self, args)
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>name: Brush name.</li></ul>
+ * function Generator.disable_brush(clss, args)
  */
 static void Generator_disable_brush (LIScrArgs* args)
 {
@@ -64,17 +60,14 @@ static void Generator_disable_brush (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- @brief Enables a brush type.
+ * --- Enables a brush type.
  * --
  * -- Enables a previously disabled brush type.
  * --
- * -- Arguments:
- * -- name: Brush name.
- * --
- * -- @param self generator class.
- * -- @param args Arguments.
- * Generator.enable_brush(self, args)
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>name: Brush name.</li></ul>
+ * function Generator.enable_brush(clss, args)
  */
 static void Generator_enable_brush (LIScrArgs* args)
 {
@@ -93,17 +86,14 @@ static void Generator_enable_brush (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Creates the root node of the map.
+ * --- Creates the root node of the map.
  * --
- * -- Arguments:
- * -- center: Center point of root node.
- * -- root: Root node name.
- * --
- * -- @param self Generator class.
- * -- @param args Arguments.
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>center: Center point of root node.</li>
+ * --   <li>root: Root node name.</li></ul>
  * -- @return True if could create root node.
- * Generator.format(self, args)
+ * function Generator.format(clss, args)
  */
 static void Generator_format (LIScrArgs* args)
 {
@@ -139,16 +129,13 @@ static void Generator_format (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Expands the map.
+ * --- Expands the map.
  * --
- * -- Arguments:
- * -- count: Number of nodes to create.
- * --
- * -- @param self Generator class.
- * -- @param args Arguments.
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>count: Number of nodes to create.</li></ul>
  * -- @return True on success.
- * Generator.expand(self, args)
+ * function Generator.expand(clss, args)
  */
 static void Generator_expand (LIScrArgs* args)
 {
@@ -168,11 +155,10 @@ static void Generator_expand (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Saves the current world map.
+ * --- Saves the current world map.
  * --
- * -- @param self Generator class.
- * Generator.save(self)
+ * -- @param clss Generator class.
+ * function Generator.save(clss)
  */
 static void Generator_save (LIScrArgs* args)
 {
@@ -184,8 +170,7 @@ static void Generator_save (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- List of brush names.
+ * --- List of brush names.
  * -- @name Generator.brushes
  * -- @class table
  */

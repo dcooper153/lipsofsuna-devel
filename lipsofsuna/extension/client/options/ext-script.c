@@ -42,7 +42,7 @@
  * -- @param self Options class.
  * -- @param args Arguments.
  * -- @return New options widget.
- * function Options.new(self, table)
+ * function Options.new(self, args)
  */
 static void Options_new (LIScrArgs* args)
 {
