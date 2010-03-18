@@ -44,6 +44,7 @@
  * -- fade: Fade start time in seconds.
  * -- life: Particle lifetime in seconds.
  * -- position: Position vector. (required)
+ * -- texture: Texture name.
  * -- velocity: Average particle velocity.
  * --
  * -- @param self Effect class.
@@ -55,6 +56,7 @@ static void Effect_particle (LIScrArgs* args)
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	float fade = 0.5f;
 	float life = 1.0f;
+	const char* texture = "particle-000";
 	LIExtModule* module;
 	LIMatVector position;
 	LIMatVector accel = { 0.0f, -9.8f, 0.0f };
@@ -73,9 +75,10 @@ static void Effect_particle (LIScrArgs* args)
 	if (liscr_args_gets_float (args, "life", &life))
 		fade = 0.5f * life;
 	liscr_args_gets_float (args, "fade", &fade);
+	liscr_args_gets_string (args, "texture", &texture);
 
 	/* Create particle. */
-	particle = liren_scene_insert_particle (module->client->scene, &position, &velocity);
+	particle = liren_scene_insert_particle (module->client->scene, texture, &position, &velocity);
 	if (particle != NULL)
 	{
 		particle->color[0] = color[0];
@@ -123,6 +126,7 @@ static void Effect_random (LIScrArgs* args)
 	float random;
 	float spread;
 	float velocity;
+	const char* texture;
 	LIExtModule* module;
 	LIMatQuaternion rot0;
 	LIMatQuaternion rot1;
@@ -154,6 +158,7 @@ static void Effect_random (LIScrArgs* args)
 	random = 0.0f;
 	radius = 0.0f;
 	spread = 0.0f;
+	texture = "particle-000";
 	velocity = 10.0f;
 
 	/* Optional arguments. */
@@ -169,6 +174,7 @@ static void Effect_random (LIScrArgs* args)
 	liscr_args_gets_float (args, "fade", &fade);
 	liscr_args_gets_float (args, "random", &random);
 	liscr_args_gets_float (args, "random", &radius);
+	liscr_args_gets_string (args, "texture", &texture);
 	liscr_args_gets_float (args, "velocity", &velocity);
 
 	/* Create particles. */
@@ -191,7 +197,7 @@ static void Effect_random (LIScrArgs* args)
 		partpos = limat_vector_add (partpos, position);
 		partvel = limat_vector_multiply (tmp, velocity + velocity * random *
 			(2.0f * rand () / RAND_MAX - 1.0f));
-		particle = liren_scene_insert_particle (module->client->scene, &partpos, &partvel);
+		particle = liren_scene_insert_particle (module->client->scene, texture, &partpos, &partvel);
 		if (particle != NULL)
 		{
 			particle->color[0] = color[0];
@@ -276,7 +282,7 @@ static void Effect_system (LIScrArgs* args)
 			0.1*(rand()/(0.5*RAND_MAX)-1.0),
 			0.1*(rand()/(3.0*RAND_MAX)+3.0),
 			0.1*(rand()/(0.5*RAND_MAX)-1.0));
-		particle = liren_scene_insert_particle (module->client->scene, &position, &velocity);
+		particle = liren_scene_insert_particle (module->client->scene, "particle-000", &position, &velocity);
 		if (particle != NULL)
 		{
 			particle->time_life = 2.0f;

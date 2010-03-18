@@ -138,16 +138,18 @@ liren_scene_find_object (LIRenScene* self,
  * \brief Creates a new particle.
  *
  * \param self Scene.
+ * \param texture Texture of the particle.
  * \param position Position of the particle.
  * \param velocity Velocity of the particle.
  * \return Particle owned by the scene or NULL.
  */
 LIParPoint*
 liren_scene_insert_particle (LIRenScene*        self,
+                             const char*        texture,
                              const LIMatVector* position,
                              const LIMatVector* velocity)
 {
-	return lipar_manager_insert_point (self->particles, position, velocity);
+	return lipar_manager_insert_point (self->particles, texture, position, velocity);
 }
 
 /**
@@ -465,7 +467,7 @@ private_init_lights (LIRenScene* self)
 static int
 private_init_particles (LIRenScene* self)
 {
-	self->particles = lipar_manager_new (LIREN_PARTICLE_MAXIMUM_COUNT, LIREN_PARTICLE_MAXIMUM_COUNT);
+	self->particles = lipar_manager_new (LIREN_PARTICLE_MAXIMUM_COUNT);
 	if (self->particles == NULL)
 		return 0;
 	return 1;
@@ -637,21 +639,18 @@ private_particle_render (LIRenScene* self)
 {
 	float color0[4];
 	float color1[4];
-	float attenuation[] = { 1.0f, 0.0f, 0.02f };
-	LIRenImage* image;
+	float attenuation[] = { 1.0f, 1.0f, 0.0f };
+	LIAlgStrdicIter iter;
+	LIParGroup* group;
 	LIParLine* line;
 	LIParPoint* particle;
+	LIRenImage* image;
 
-	/* Set particle graphics. */
-	image = liren_render_find_image (self->render, "particle-000");
-	if (image != NULL)
-		glBindTexture (GL_TEXTURE_2D, image->texture->texture);
+	/* Set point particle rendering mode. */
 	if (livid_features.shader_model >= 3)
 		glUseProgramObjectARB (0);
 	glColor3f (1.0f, 1.0f, 1.0f);
 	glEnable (GL_BLEND);
-
-	/* Set point particle rendering mode. */
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 	glDisable (GL_LIGHTING);
 	if (GLEW_ARB_point_sprite)
@@ -659,20 +658,34 @@ private_particle_render (LIRenScene* self)
 		glEnable (GL_POINT_SPRITE_ARB);
 		glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
 		glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation);
-		glPointSize (15.0f);
+		glPointSize (64.0f);
 	}
 	else
 		glPointSize (4.0f);
 
 	/* Render point particles. */
-	glBegin (GL_POINTS);
-	for (particle = self->particles->points.used ; particle != NULL ; particle = particle->next)
+	LIALG_STRDIC_FOREACH (iter, self->particles->groups)
 	{
-		lipar_point_get_color (particle, color0);
-		glColor4fv (color0);
-		glVertex3f (particle->position.x, particle->position.y, particle->position.z);
+		group = iter.value;
+		image = liren_render_find_image (self->render, group->texture);
+		if (image == NULL)
+		{
+			liren_render_load_image (self->render, group->texture);
+			image = liren_render_find_image (self->render, group->texture);
+		}
+		if (image != NULL)
+		{
+			glBindTexture (GL_TEXTURE_2D, image->texture->texture);
+			glBegin (GL_POINTS);
+			for (particle = group->points.used ; particle != NULL ; particle = particle->next)
+			{
+				lipar_point_get_color (particle, color0);
+				glColor4fv (color0);
+				glVertex3f (particle->position.x, particle->position.y, particle->position.z);
+			}
+			glEnd ();
+		}
 	}
-	glEnd ();
 	if (GLEW_ARB_point_sprite)
 		glDisable (GL_POINT_SPRITE_ARB);
 

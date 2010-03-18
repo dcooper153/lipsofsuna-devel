@@ -18,60 +18,46 @@
 /**
  * \addtogroup lipar Particle
  * @{
- * \addtogroup LIParManager Manager
+ * \addtogroup LIParGroup Group
  * @{
  */
 
-#ifndef __PARTICLE_MANAGER_H__
-#define __PARTICLE_MANAGER_H__
+#ifndef __PARTICLE_GROUP_H__
+#define __PARTICLE_GROUP_H__
 
-#include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/math.h>
 #include <lipsofsuna/system.h>
-#include "particle-group.h"
-#include "particle-line.h"
 #include "particle-point.h"
 
-typedef struct _LIParManager LIParManager;
-struct _LIParManager
+typedef struct _LIParGroup LIParGroup;
+struct _LIParGroup
 {
-	LIAlgStrdic* groups;
+	char* texture;
 	struct
 	{
 		int count;
 		int count_used;
 		int count_free;
-		LIParLine* all;
-		LIParLine* used;
-		LIParLine* free;
-	} lines;
+		LIParPoint* all;
+		LIParPoint* used;
+		LIParPoint* free;
+	} points;
 };
 
-LIAPICALL (LIParManager*, lipar_manager_new, (
-	int lines));
+LIAPICALL (LIParGroup*, lipar_group_new, (
+	const char* texture));
 
-LIAPICALL (void, lipar_manager_free, (
-	LIParManager* self));
+LIAPICALL (void, lipar_group_free, (
+	LIParGroup* self));
 
-LIAPICALL (LIParLine*, lipar_manager_insert_line, (
-	LIParManager*      self,
-	const LIMatVector* position0,
-	const LIMatVector* position1,
-	const LIMatVector* velocity0,
-	const LIMatVector* velocity1));
-
-LIAPICALL (LIParPoint*, lipar_manager_insert_point, (
-	LIParManager*      self,
-	const char*        texture,
+LIAPICALL (LIParPoint*, lipar_group_insert_point, (
+	LIParGroup*        self,
 	const LIMatVector* position,
 	const LIMatVector* velocity));
 
-LIAPICALL (void, lipar_manager_remove_line, (
-	LIParManager* self,
-	LIParLine*    line));
-
-LIAPICALL (void, lipar_manager_update, (
-	LIParManager* self,
-	float         secs));
+LIAPICALL (void, lipar_group_update, (
+	LIParGroup* self,
+	float       secs));
 
 #endif
 

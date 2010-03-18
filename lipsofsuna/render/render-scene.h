@@ -59,6 +59,7 @@ LIAPICALL (LIRenObject*, liren_scene_find_object, (
 
 LIAPICALL (LIParPoint*, liren_scene_insert_particle, (
 	LIRenScene*        self,
+	const char*        texture,
 	const LIMatVector* position,
 	const LIMatVector* velocity));
 

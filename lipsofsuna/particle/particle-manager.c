@@ -26,8 +26,7 @@
 #include "particle-manager.h"
 
 LIParManager*
-lipar_manager_new (int points,
-                   int lines)
+lipar_manager_new (int lines)
 {
 	int i;
 	LIParManager* self;
@@ -38,8 +37,8 @@ lipar_manager_new (int points,
 		return NULL;
 
 	/* Allocate particles. */
-	self->points.all = lisys_calloc (points, sizeof (LIParPoint));
-	if (self->points.all == NULL)
+	self->groups = lialg_strdic_new ();
+	if (self->groups == NULL)
 	{
 		lipar_manager_free (self);
 		return NULL;
@@ -50,17 +49,6 @@ lipar_manager_new (int points,
 		lipar_manager_free (self);
 		return NULL;
 	}
-
-	/* Add points to free list. */
-	self->points.count_free = points;
-	self->points.free = self->points.all;
-	for (i = 0 ; i < points ; i++)
-	{
-		self->points.all[i].prev = self->points.all + i - 1;
-		self->points.all[i].next = self->points.all + i + 1;
-	}
-	self->points.all[0].prev = NULL;
-	self->points.all[points - 1].next = NULL;
 
 	/* Add lines to free list. */
 	self->lines.count_free = lines;
@@ -79,8 +67,15 @@ lipar_manager_new (int points,
 void
 lipar_manager_free (LIParManager* self)
 {
+	LIAlgStrdicIter iter;
+
+	if (self->groups != NULL)
+	{
+		LIALG_STRDIC_FOREACH (iter, self->groups)
+			lipar_group_free (iter.value);
+		lialg_strdic_free (self->groups);
+	}
 	lisys_free (self->lines.all);
-	lisys_free (self->points.all);
 	lisys_free (self);
 }
 
@@ -116,30 +111,28 @@ lipar_manager_insert_line (LIParManager*      self,
 
 LIParPoint*
 lipar_manager_insert_point (LIParManager*      self,
+                            const char*        texture,
                             const LIMatVector* position,
                             const LIMatVector* velocity)
 {
-	LIParPoint* point;
+	LIParGroup* group;
 
-	/* Get free point. */
-	point = self->points.free;
-	if (point == NULL)
-		return NULL;
-	lipar_point_init (point, position, velocity);
+	/* Find or create group. */
+	group = lialg_strdic_find (self->groups, texture);
+	if (group == NULL)
+	{
+		group = lipar_group_new (texture);
+		if (group == NULL)
+			return NULL;
+		if (!lialg_strdic_insert (self->groups, texture, group))
+		{
+			lipar_group_free (group);
+			return NULL;
+		}
+	}
 
-	/* Remove from free list. */
-	self->points.free = point->next;
-	if (point->next != NULL)
-		point->next->prev = NULL;
-
-	/* Add to used list. */
-	if (self->points.used != NULL)
-		self->points.used->prev = point;
-	point->next = self->points.used;
-	point->prev = NULL;
-	self->points.used = point;
-
-	return point;
+	/* Insert point to group. */
+	return lipar_group_insert_point (group, position, velocity);
 }
 
 void
@@ -163,47 +156,25 @@ lipar_manager_remove_line (LIParManager* self,
 }
 
 void
-lipar_manager_remove_point (LIParManager* self,
-                            LIParPoint*   point)
-{
-	/* Remove from used list. */
-	if (point->prev != NULL)
-		point->prev->next = point->next;
-	else
-		self->points.used = point->next;
-	if (point->next != NULL)
-		point->next->prev = point->prev;
-
-	/* Add to free list. */
-	if (self->points.free != NULL)
-		self->points.free->prev = point;
-	point->next = self->points.free;
-	point->prev = NULL;
-	self->points.free = point;
-}
-
-void
 lipar_manager_update (LIParManager* self,
                       float         secs)
 {
 	int i;
+	LIAlgStrdicIter iter;
+	LIParGroup* group;
 	LIParLine* line;
 	LIParLine* line_next;
-	LIParPoint* point;
-	LIParPoint* point_next;
 
-	/* Update points. */
-	for (point = self->points.used ; point != NULL ; point = point_next)
+	/* Update groups. */
+	LIALG_STRDIC_FOREACH (iter, self->groups)
 	{
-		/* FIXME: Inaccurate. */
-		point->velocity = limat_vector_add (point->velocity,
-			limat_vector_multiply (point->acceleration, secs * secs));
-		point->position = limat_vector_add (point->position,
-			limat_vector_multiply (point->velocity, secs));
-		point->time += secs;
-		point_next = point->next;
-		if (point->time > point->time_life)
-			lipar_manager_remove_point (self, point);
+		group = iter.value;
+		lipar_group_update (group, secs);
+		if (!group->points.count_used)
+		{
+			lialg_strdic_remove (self->groups, iter.key);
+			lipar_group_free (group);
+		}
 	}
 
 	/* Update lines. */
