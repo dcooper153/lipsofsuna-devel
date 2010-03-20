@@ -40,9 +40,9 @@ liren_buffer_init_index (LIRenBuffer* self,
 {
 	static const LIRenFormat format =
 	{
-		sizeof (uint32_t), 0,
-		{ GL_FLOAT, GL_FLOAT, GL_FLOAT },
-		{ 0, 0, 0 }, 
+		sizeof (uint32_t),
+		GL_FLOAT, 0,
+		GL_FLOAT, 0,
 		GL_FLOAT, 0,
 		GL_FLOAT, 0
 	};

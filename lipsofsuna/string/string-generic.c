@@ -61,6 +61,30 @@ listr_dup (const char* self)
 }
 
 /**
+ * \brief Creates a duplicate of the string.
+ *
+ * \param self String.
+ * \param count Number of characters to duplicate at most.
+ * \return New string or NULL.
+ */
+char*
+listr_dupn (const char* self,
+            int         count)
+{
+	int i;
+	char* dup;
+
+	for (i = 0 ; self[i] != '\0' && i < count ; i++)
+		;
+	dup = lisys_malloc (i + 1);
+	if (dup != NULL)
+		memcpy (dup, self, i);
+	dup[i] = '\0';
+
+	return dup;
+}
+
+/**
  * \brief Concatenates two strings.
  *
  * \param self String.
@@ -134,6 +158,81 @@ listr_format (const char* format,
 		buf = tmp;
 
 	return buf;
+}
+
+/**
+ * \brief Splits the string into substrings.
+ *
+ * \param self String.
+ * \param separator Separator character.
+ * \param result Return location for the substring array.
+ * \param resultn Return location for the substring count.
+ * \return Nonzero on success.
+ */
+int
+listr_split (const char* self,
+             char        separator,
+             char***     result,
+             int*        resultn)
+{
+	int i;
+	int count;
+	int failed;
+	char** slices;
+	const char* end;
+	const char* pos;
+
+	/* Count slices. */
+	count = 1;
+	for (pos = self ; ; pos = end + 1)
+	{
+		end = strchr (pos, separator);
+		if (end == NULL)
+			break;
+		count++;
+	}
+
+	/* Allocate array. */
+	slices = lisys_calloc (count, sizeof (char**));
+	if (slices == NULL)
+		return 0;
+
+	/* Create slices. */
+	i = 0;
+	failed = 0;
+	for (pos = self ; ; pos = end + 1)
+	{
+		end = strchr (pos, separator);
+		if (end == NULL)
+		{
+			slices[i] = listr_dup (pos);
+			if (slices[i] == NULL)
+				failed = 1;
+			break;
+		}
+		slices[i] = listr_dupn (pos, end - pos);
+		if (slices[i] == NULL)
+		{
+			failed = 1;
+			break;
+		}
+		i++;
+	}
+
+	/* Handle errors. */
+	if (failed)
+	{
+		for (i-- ; i >= 0 ; i--)
+			lisys_free (slices[i]);
+		lisys_free (slices);
+		return 0;
+	}
+
+	/* Set result. */
+	*result = slices;
+	*resultn = count;
+
+	return 1;
 }
 
 /**

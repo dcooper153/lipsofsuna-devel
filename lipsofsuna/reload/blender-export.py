@@ -35,7 +35,7 @@ class LipsEnumTexTypes:
 		self.IMAGE = 2
 Lips = LipsEnum()
 
-lips_format_version = 0xFFFFFFF6
+lips_format_version = 0xFFFFFFF5
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
 lips_mirror_snap = 0.01
@@ -302,7 +302,7 @@ def VertexNormal(object, mesh, face, index, conn):
 	no.normalize()
 	return no
 
-def VertexTexcoords(object, mesh, face, index):
+def VertexTexcoords(object, mesh, face, index, tangents):
 	number = 0
 	values = [0, 0, 0, 0, 0, 0]
 	# TODO: Support sticky coordinates.
@@ -313,9 +313,11 @@ def VertexTexcoords(object, mesh, face, index):
 		mesh.activeUVLayer = layer
 		values[number + 0] = face.uv[index][0]
 		values[number + 1] = 1.0 - face.uv[index][1]
-		number = number + 2
-		if number == 6:
-			break
+		values[number + 2] = tangents[face.index][index][0]
+		values[number + 3] = tangents[face.index][index][1]
+		values[number + 4] = tangents[face.index][index][2]
+		number = number + 5
+		break
 	return values
 
 def VertexWeights(object, mesh, face, index, bones):
@@ -902,7 +904,6 @@ class LipsVertex:
 		writer.WriteFloat(self.te[2])
 		writer.WriteFloat(self.te[3])
 		writer.WriteFloat(self.te[4])
-		writer.WriteFloat(self.te[5])
 		writer.WriteFloat(self.no.x)
 		writer.WriteFloat(self.no.y)
 		writer.WriteFloat(self.no.z)
@@ -1289,6 +1290,7 @@ class LipsFile:
 		bmesh = bobj.getData(0, 1)
 		if MeshVisible(bobj, bmesh):
 			conn = LipsConnectivity(bobj, bmesh)
+			tangents = bmesh.getTangents()
 
 			# Check for mirror modifiers.
 			mirror = None
@@ -1314,7 +1316,7 @@ class LipsFile:
 				for i in range(len(bface.v)):
 					co = VertexCoord(bobj, bmesh, bface, i)
 					no = VertexNormal(bobj, bmesh, bface, i, conn)
-					te = VertexTexcoords(bobj, bmesh, bface, i)
+					te = VertexTexcoords(bobj, bmesh, bface, i, tangents)
 					we = VertexWeights(bobj, bmesh, bface, i, self.weightnames)
 					v.append(LipsVertex(self, co, no, te, we))
 

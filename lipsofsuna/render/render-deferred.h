@@ -33,12 +33,12 @@ struct _LIRenDeferred
 	int width;
 	int height;
 	GLuint deferred_fbo;
-	GLuint target_fbo;
+	GLuint postproc_fbo[2];
 	GLuint depth_texture;
 	GLuint diffuse_texture;
 	GLuint specular_texture;
 	GLuint normal_texture;
-	GLuint target_texture;
+	GLuint postproc_texture[2];
 	LIRenRender* render;
 };
 

@@ -37,6 +37,9 @@ private_check_link (LIRenShader* self,
                     GLint        program);
 
 static void
+private_init_attributes (LIRenShader* self);
+
+static void
 private_init_uniforms (LIRenShader* self);
 
 static int
@@ -56,6 +59,10 @@ private_read_config (LIRenShader* self,
 static int
 private_read_source (LIRenShader* self,
                      LIArcReader* reader);
+
+static int
+private_attribute_value (LIRenShader* self,
+                         const char*  value);
 
 static int
 private_uniform_value (LIRenShader* self,
@@ -111,6 +118,7 @@ liren_shader_new_from_data (LIRenRender* render,
 
 	/* Initialize uniforms. */
 	private_init_uniforms (self);
+	glUseProgramObjectARB (0);
 
 	return self;
 }
@@ -149,6 +157,7 @@ liren_shader_new_from_file (LIRenRender* render,
 
 	/* Initialize uniforms. */
 	private_init_uniforms (self);
+	glUseProgramObjectARB (0);
 
 	return self;
 }
@@ -169,8 +178,11 @@ liren_shader_free (LIRenShader* self)
 		glDeleteObjectARB (self->fragment);
 	if (self->program)
 		glDeleteObjectARB (self->program);
+	for (i = 0 ; i < self->attributes.count ; i++)
+		lisys_free (self->attributes.array[i].name);
 	for (i = 0 ; i < self->uniforms.count ; i++)
 		lisys_free (self->uniforms.array[i].name);
+	lisys_free (self->attributes.array);
 	lisys_free (self->uniforms.array);
 	lisys_free (self->name);
 	lisys_free (self);
@@ -261,6 +273,23 @@ private_check_link (LIRenShader* self,
 }
 
 static void
+private_init_attributes (LIRenShader* self)
+{
+	int i;
+	LIRenAttribute* attribute;
+
+	if (livid_features.shader_model >= 3)
+	{
+		for (i = 0 ; i < self->attributes.count ; i++)
+		{
+			attribute = self->attributes.array + i;
+			attribute->binding = i + 1;
+			glBindAttribLocationARB (self->program, attribute->binding, attribute->name);
+		}
+	}
+}
+
+static void
 private_init_uniforms (LIRenShader* self)
 {
 	int i;
@@ -279,7 +308,6 @@ private_init_uniforms (LIRenShader* self)
 				glUniform1iARB (uniform->binding, uniform->sampler);
 			}
 		}
-		glUseProgramObjectARB (0);
 	}
 }
 
@@ -330,6 +358,7 @@ private_read_stream (LIRenShader* self,
 		self->program = glCreateProgramObjectARB ();
 		glAttachObjectARB (self->program, self->vertex);
 		glAttachObjectARB (self->program, self->fragment);
+		private_init_attributes (self);
 		glLinkProgramARB (self->program);
 		if (!private_check_link (self, name, self->program))
 			return 0;
@@ -353,6 +382,7 @@ private_read_config (LIRenShader* self,
 	char* name;
 	char* ptr;
 	char* value;
+	LIRenAttribute* attribute;
 	LIRenUniform* uniform;
 
 	/* Find start. */
@@ -391,6 +421,46 @@ private_read_config (LIRenShader* self,
 			    self->lights.count >= 8)
 				return 0;
 		}
+		else if (!strncmp (line, "attribute ", 10))
+		{
+			/* Separate fields. */
+			for (name = line + 10 ; *name != '\0' && isspace (*name) ; name++) {}
+			for (ptr = name ; *ptr != '\0' && !isspace (*ptr) ; ptr++) {}
+			if (*ptr != '\0')
+			{
+				*ptr = '\0';
+				ptr++;
+			}
+			for (value = ptr ; *value != '\0' && isspace (*value) ; value++) {}
+			for (ptr = value ; *ptr != '\0' && !isspace (*ptr) ; ptr++) {}
+			if (*ptr != '\0')
+			{
+				*ptr = '\0';
+				ptr++;
+			}
+
+			/* Resize array. */
+			attribute = lisys_realloc (self->attributes.array, (self->attributes.count + 1) * sizeof (LIRenAttribute));
+			if (attribute == NULL)
+			{
+				lisys_free (line);
+				return 0;
+			}
+			self->attributes.array = attribute;
+			attribute += self->attributes.count;
+
+			/* Initialize attribute. */
+			attribute->binding = 0;
+			attribute->value = private_attribute_value (self, value);
+			attribute->name = listr_dup (name);
+			if (attribute->name == NULL)
+			{
+				lisys_free (line);
+				return 0;
+			}
+			self->attributes.count++;
+			lisys_free (line);
+		}
 		else if (!strncmp (line, "uniform ", 8))
 		{
 			/* Separate fields. */
@@ -410,7 +480,7 @@ private_read_config (LIRenShader* self,
 			}
 
 			/* Resize array. */
-			uniform = realloc (self->uniforms.array, (self->uniforms.count + 1) * sizeof (LIRenUniform));
+			uniform = lisys_realloc (self->uniforms.array, (self->uniforms.count + 1) * sizeof (LIRenUniform));
 			if (uniform == NULL)
 			{
 				lisys_free (line);
@@ -486,6 +556,24 @@ private_read_source (LIRenShader* self,
 }
 
 static int
+private_attribute_value (LIRenShader* self,
+                         const char*  value)
+{
+	if (!strcmp (value, "NONE"))
+		return LIREN_ATTRIBUTE_NONE;
+	if (!strcmp (value, "COORD"))
+		return LIREN_ATTRIBUTE_COORD;
+	if (!strcmp (value, "NORMAL"))
+		return LIREN_ATTRIBUTE_NORMAL;
+	if (!strcmp (value, "TANGENT"))
+		return LIREN_ATTRIBUTE_TANGENT;
+	if (!strcmp (value, "TEXCOORD"))
+		return LIREN_ATTRIBUTE_TEXCOORD;
+
+	return LIREN_ATTRIBUTE_NONE;
+}
+
+static int
 private_uniform_value (LIRenShader* self,
                        const char*  value)
 {
@@ -528,6 +616,12 @@ private_uniform_value (LIRenShader* self,
 			return LIREN_UNIFORM_NONE;
 		return LIREN_UNIFORM_LIGHTPOSITION0 + index;
 	}
+	if (!strcmp (value, "MATERIALDIFFUSE"))
+		return LIREN_UNIFORM_MATERIALDIFFUSE;
+	if (!strcmp (value, "MATERIALSHININESS"))
+		return LIREN_UNIFORM_MATERIALSHININESS;
+	if (!strcmp (value, "MATERIALSPECULAR"))
+		return LIREN_UNIFORM_MATERIALSPECULAR;
 	if (!strcmp (value, "MODELMATRIX"))
 		return LIREN_UNIFORM_MODELMATRIX;
 	if (!strcmp (value, "MODELVIEWINVERSE"))

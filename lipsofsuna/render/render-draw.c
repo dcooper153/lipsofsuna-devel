@@ -358,7 +358,8 @@ liren_draw_opaque (LIRenContext* context,
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		if ((!context->deferred || material->shader_deferred != NULL) &&
+		if (((context->deferred && material->shader_deferred != NULL) ||
+		    (!context->deferred && material->shader_forward != NULL)) &&
 		    !(material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			liren_context_set_flags (context, flags);
@@ -505,7 +506,8 @@ liren_draw_transparent (LIRenContext* context,
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
 		material = model->materials.array[i];
-		if ((!context->deferred || material->shader_deferred != NULL) &&
+		if (((context->deferred && material->shader_deferred != NULL) ||
+		    (!context->deferred && material->shader_forward != NULL)) &&
 		    (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
 		{
 			liren_context_set_flags (context, flags);

@@ -341,11 +341,19 @@ liren_scene_render (LIRenScene*    self,
 	self->render->profiling.faces = 0;
 	self->render->profiling.vertices = 0;
 #endif
+	if (framebuffer != NULL)
+	{
+		glPushAttrib (GL_VIEWPORT_BIT);
+		glViewport (0, 0, framebuffer->width, framebuffer->height);
+	}
 	private_deferred_render_opaque (self, framebuffer, &context, objects, count, 0, 0.9f);
 	private_forward_render_begin (self, framebuffer, &context);
+	private_forward_render_opaque (self, &context, objects, count, 0, 0.9f);
 	private_forward_render_transparent (self, &context, objects, count);
 	private_forward_render_particles (self, &context);
 	private_forward_render_end (self, framebuffer, &context);
+	if (framebuffer != NULL)
+		glPopAttrib ();
 #ifdef LIREN_ENABLE_PROFILING
 	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",
 		self->render->profiling.objects, self->render->profiling.materials,
@@ -449,8 +457,6 @@ private_deferred_render_opaque (LIRenScene*    self,
 	liren_context_set_deferred (context, 1);
 
 	/* Bind G-buffer. */
-	glPushAttrib (GL_VIEWPORT_BIT);
-	glViewport (0, 0, framebuffer->width, framebuffer->height);
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->deferred_fbo);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -472,7 +478,7 @@ private_deferred_render_opaque (LIRenScene*    self,
 	liren_check_errors ();
 
 	/* Render lit areas to intermediate framebuffer. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->postproc_fbo[0]);
 	glClear (GL_COLOR_BUFFER_BIT);
 	glPushAttrib (GL_SCISSOR_BIT);
 	private_lighting_render (self, context, framebuffer);
@@ -493,7 +499,7 @@ private_forward_render_begin (LIRenScene*    self,
 		return;
 
 	/* Bind intermediate framebuffer. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->target_fbo);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->postproc_fbo[0]);
 	glUseProgramObjectARB (0);
 }
 
@@ -502,29 +508,64 @@ private_forward_render_end (LIRenScene*    self,
                             LIRenDeferred* framebuffer,
                             LIRenContext*  context)
 {
+	int i;
+	int src;
+	char name[32];
+	LIRenShader* shader;
+
 	/* Check for intermediate framebuffer. */
 	if (!self->render->shader.enabled)
 		framebuffer = NULL;
 	if (framebuffer == NULL)
 		return;
 
-	/* Render intermediate framebuffer to screen. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-	glUseProgramObjectARB (0);
-	glClear (GL_COLOR_BUFFER_BIT);
+	/* Set post-processing mode. */
 	glDisable (GL_BLEND);
 	glDisable (GL_LIGHTING);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_DEPTH_TEST);
-	glColor3f (1.0f, 1.0f, 1.0f);
 	glEnable (GL_TEXTURE_2D);
-	glBindTexture (GL_TEXTURE_2D, framebuffer->target_texture);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 	glPushMatrix ();
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity ();
 	glPushMatrix ();
+	glColor3f (1.0f, 1.0f, 1.0f);
+
+	/* Call post-processing shaders. */
+	for (i = src = 0 ; i < 1024 ; i++, src = !src)
+	{
+		/* Bind post-processing shader. */
+		snprintf (name, 32, "postprocess%d", i);
+		shader = liren_render_find_shader (self->render, name);
+		if (shader == NULL)
+		{
+			src = !src;
+			break;
+		}
+
+		/* Render intermediate framebuffer to screen. */
+		glUseProgramObjectARB (shader->program);
+		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->postproc_fbo[!src]);
+		glBindTexture (GL_TEXTURE_2D, framebuffer->postproc_texture[src]);
+		glBegin (GL_QUADS);
+		glTexCoord2i (0, 0);
+		glVertex2i (-1, -1);
+		glTexCoord2i (0, 1);
+		glVertex2i (-1, 1);
+		glTexCoord2i (1, 1);
+		glVertex2i (1, 1);
+		glTexCoord2i (1, 0);
+		glVertex2i (1, -1);
+		glEnd ();
+		liren_check_errors ();
+	}
+
+	/* Copy to screen. */
+	glUseProgramObjectARB (0);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+	glBindTexture (GL_TEXTURE_2D, framebuffer->postproc_texture[!src]);
 	glBegin (GL_QUADS);
 	glTexCoord2i (0, 0);
 	glVertex2i (-1, -1);
@@ -535,10 +576,11 @@ private_forward_render_end (LIRenScene*    self,
 	glTexCoord2i (1, 0);
 	glVertex2i (1, -1);
 	glEnd ();
+
+	/* Restore render mode. */
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 	glPopMatrix ();
-	glPopAttrib ();
 	liren_check_errors ();
 }
 
@@ -557,6 +599,7 @@ private_forward_render_opaque (LIRenScene*   self,
 	LIRenLight* light;
 
 	/* Render opaque faces to framebuffer. */
+	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_ALPHA_TEST);
 	glDisable (GL_BLEND);
 	glAlphaFunc (GL_GEQUAL, threshold);

@@ -70,6 +70,7 @@ liren_context_init (LIRenContext* self,
 	self->compiled = 1;
 	self->scene = scene;
 	self->render = scene->render;
+	self->material.shininess = 1.0f;
 	self->material.diffuse[0] = 1.0f;
 	self->material.diffuse[1] = 1.0f;
 	self->material.diffuse[2] = 1.0f;
@@ -456,6 +457,8 @@ private_bind_lights_shader (LIRenContext* self)
 static void
 private_bind_material (LIRenContext* self)
 {
+	lisys_assert (self->material.shininess >= 0.0f);
+	lisys_assert (self->material.shininess <= 127.0f);
 	glMaterialf (GL_FRONT, GL_SHININESS, self->material.shininess);
 	glMaterialfv (GL_FRONT, GL_SPECULAR, self->material.specular);
 	glColor4fv (self->material.diffuse);
@@ -667,6 +670,16 @@ private_bind_uniform (LIRenContext* self,
 			else
 				glUniform3fARB (uniform->binding, 0.0f, 0.0f, 0.0f);
 			break;
+		case LIREN_UNIFORM_MATERIALDIFFUSE:
+			glUniform4fvARB (uniform->binding, 1, self->material.diffuse);
+			break;
+		case LIREN_UNIFORM_MATERIALSHININESS:
+			glUniform1fARB (uniform->binding,
+				LIMAT_CLAMP (self->material.shininess, 1.0f, 127.0f));
+			break;
+		case LIREN_UNIFORM_MATERIALSPECULAR:
+			glUniform4fvARB (uniform->binding, 1, self->material.specular);
+			break;
 		case LIREN_UNIFORM_MODELMATRIX:
 			glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, self->matrix.m);
 			break;
@@ -717,19 +730,49 @@ private_bind_vertices (LIRenContext*      self,
                        const void*        base)
 {
 	int i;
+	LIRenAttribute* attr;
 
-	for (i = 0 ; i < format->tex_count ; i++)
+	if (self->shader != NULL)
 	{
-		glClientActiveTextureARB (GL_TEXTURE0 + i);
-		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer (2, format->tex_formats[i], format->size, base + format->tex_offsets[i]);
+		for (i = 0 ; i < self->shader->attributes.count ; i++)
+		{
+			attr = self->shader->attributes.array + i;
+			switch (attr->value)
+			{
+				case LIREN_ATTRIBUTE_COORD:
+					glEnableVertexAttribArrayARB (attr->binding);
+					glVertexAttribPointerARB (attr->binding, 3, format->vtx_format,
+						GL_FALSE, format->size, base + format->vtx_offset);
+					break;
+				case LIREN_ATTRIBUTE_NORMAL:
+					glEnableVertexAttribArrayARB (attr->binding);
+					glVertexAttribPointerARB (attr->binding, 3, format->nml_format,
+						GL_FALSE, format->size, base + format->nml_offset);
+					break;
+				case LIREN_ATTRIBUTE_TANGENT:
+					glEnableVertexAttribArrayARB (attr->binding);
+					glVertexAttribPointerARB (attr->binding, 3, format->tan_format,
+						GL_FALSE, format->size, base + format->tan_offset);
+					break;
+				case LIREN_ATTRIBUTE_TEXCOORD:
+					glEnableVertexAttribArrayARB (attr->binding);
+					glVertexAttribPointerARB (attr->binding, 2, format->tex_format,
+						GL_FALSE, format->size, base + format->tex_offset);
+					break;
+			}
+		}
+		glEnableClientState (GL_VERTEX_ARRAY);
+		glVertexPointerEXT (3, format->vtx_format, format->size, 0, base + format->vtx_offset);
 	}
-	if (format->tex_count)
-		glClientActiveTextureARB (GL_TEXTURE0);
-	glEnableClientState (GL_NORMAL_ARRAY);
-	glNormalPointerEXT (format->nml_format, format->size, 0, base + format->nml_offset);
-	glEnableClientState (GL_VERTEX_ARRAY);
-	glVertexPointerEXT (3, format->vtx_format, format->size, 0, base + format->vtx_offset);
+	else
+	{
+		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer (2, format->tex_format, format->size, base + format->tex_offset);
+		glEnableClientState (GL_NORMAL_ARRAY);
+		glNormalPointerEXT (format->nml_format, format->size, 0, base + format->nml_offset);
+		glEnableClientState (GL_VERTEX_ARRAY);
+		glVertexPointerEXT (3, format->vtx_format, format->size, 0, base + format->vtx_offset);
+	}
 }
 
 static void
@@ -781,16 +824,31 @@ private_unbind_vertices (LIRenContext*      self,
                          const LIRenFormat* format)
 {
 	int i;
+	LIRenAttribute* attr;
 
-	for (i = 0 ; i < format->tex_count ; i++)
+	if (self->shader != NULL)
 	{
-		glClientActiveTextureARB (GL_TEXTURE0 + i);
-		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+		for (i = 0 ; i < self->shader->attributes.count ; i++)
+		{
+			attr = self->shader->attributes.array + i;
+			switch (attr->value)
+			{
+				case LIREN_ATTRIBUTE_COORD:
+				case LIREN_ATTRIBUTE_NORMAL:
+				case LIREN_ATTRIBUTE_TANGENT:
+				case LIREN_ATTRIBUTE_TEXCOORD:
+					glDisableVertexAttribArrayARB (attr->binding);
+					break;
+			}
+		}
+		glDisableClientState (GL_VERTEX_ARRAY);
 	}
-	if (format->tex_count)
-		glClientActiveTextureARB (GL_TEXTURE0);
-	glDisableClientState (GL_NORMAL_ARRAY);
-	glDisableClientState (GL_VERTEX_ARRAY);
+	else
+	{
+		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState (GL_NORMAL_ARRAY);
+		glDisableClientState (GL_VERTEX_ARRAY);
+	}
 }
 
 /** @} */

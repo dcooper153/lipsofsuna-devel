@@ -18,56 +18,32 @@
 /**
  * \addtogroup liren Render
  * @{
- * \addtogroup LIRenShader Shader
+ * \addtogroup LIRenUniform Uniform
  * @{
  */
 
-#ifndef __RENDER_SHADER_H__
-#define __RENDER_SHADER_H__
+#ifndef __RENDER_ATTRIBUTE_H__
+#define __RENDER_ATTRIBUTE_H__
 
-#include <lipsofsuna/image.h>
-#include <lipsofsuna/model.h>
-#include "render-attribute.h"
-#include "render-light.h"
+#include <lipsofsuna/video.h>
 #include "render-types.h"
-#include "render-uniform.h"
 
-struct _LIRenShader
+enum
 {
-	char* name;
-	GLint program;
-	GLint vertex;
-	GLint fragment;
-	LIRenRender* render;
-	struct
-	{
-		int count;
-		LIRenAttribute* array;
-	} attributes;
-	struct
-	{
-		int count;
-	} lights;
-	struct
-	{
-		int count;
-		LIRenUniform* array;
-	} uniforms;
+	LIREN_ATTRIBUTE_NONE,
+	LIREN_ATTRIBUTE_COORD,
+	LIREN_ATTRIBUTE_NORMAL,
+	LIREN_ATTRIBUTE_TANGENT,
+	LIREN_ATTRIBUTE_TEXCOORD
 };
 
-LIRenShader*
-liren_shader_new (LIRenRender* render);
-
-LIRenShader*
-liren_shader_new_from_data (LIRenRender* render,
-                            LIArcReader* reader);
-
-LIRenShader*
-liren_shader_new_from_file (LIRenRender* render,
-                            const char*  path);
-
-void
-liren_shader_free (LIRenShader* self);
+typedef struct _LIRenAttribute LIRenAttribute;
+struct _LIRenAttribute
+{
+	char* name;
+	GLint binding;
+	int value;
+};
 
 #endif
 

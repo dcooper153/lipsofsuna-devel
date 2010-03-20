@@ -263,11 +263,11 @@ private_init_model (LIRenModel* self)
 	LIMdlFaces* group;
 	LIRenFormat format =
 	{
-		12 * sizeof (float), 3,
-		{ GL_FLOAT, GL_FLOAT, GL_FLOAT },
-		{ 0 * sizeof (float), 2 * sizeof (float), 4 * sizeof (float) },
-		GL_FLOAT, 6 * sizeof (float),
-		GL_FLOAT, 9 * sizeof (float)
+		11 * sizeof (float),
+		GL_FLOAT, 0 * sizeof (float),
+		GL_FLOAT, 2 * sizeof (float),
+		GL_FLOAT, 5 * sizeof (float),
+		GL_FLOAT, 8 * sizeof (float)
 	};
 
 	/* Allocate vertex buffer. */

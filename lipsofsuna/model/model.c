@@ -1109,10 +1109,9 @@ private_read_vertices (LIMdlModel*  self,
 			vertex = self->vertices.array + i;
 			if (!liarc_reader_get_float (reader, vertex->texcoord + 0) ||
 				!liarc_reader_get_float (reader, vertex->texcoord + 1) ||
-				!liarc_reader_get_float (reader, vertex->texcoord + 2) ||
-				!liarc_reader_get_float (reader, vertex->texcoord + 3) ||
-				!liarc_reader_get_float (reader, vertex->texcoord + 4) ||
-				!liarc_reader_get_float (reader, vertex->texcoord + 5) ||
+				!liarc_reader_get_float (reader, &vertex->tangent.x) ||
+				!liarc_reader_get_float (reader, &vertex->tangent.y) ||
+				!liarc_reader_get_float (reader, &vertex->tangent.z) ||
 				!liarc_reader_get_float (reader, &vertex->normal.x) ||
 				!liarc_reader_get_float (reader, &vertex->normal.y) ||
 				!liarc_reader_get_float (reader, &vertex->normal.z) ||
@@ -1471,10 +1470,9 @@ private_write_vertices (const LIMdlModel* self,
 		vertex = self->vertices.array + i;
 		if (!liarc_writer_append_float (writer, vertex->texcoord[0]) ||
 		    !liarc_writer_append_float (writer, vertex->texcoord[1]) ||
-		    !liarc_writer_append_float (writer, vertex->texcoord[2]) ||
-		    !liarc_writer_append_float (writer, vertex->texcoord[3]) ||
-		    !liarc_writer_append_float (writer, vertex->texcoord[4]) ||
-		    !liarc_writer_append_float (writer, vertex->texcoord[5]) ||
+		    !liarc_writer_append_float (writer, vertex->tangent.x) ||
+		    !liarc_writer_append_float (writer, vertex->tangent.y) ||
+		    !liarc_writer_append_float (writer, vertex->tangent.z) ||
 		    !liarc_writer_append_float (writer, vertex->normal.x) ||
 		    !liarc_writer_append_float (writer, vertex->normal.y) ||
 		    !liarc_writer_append_float (writer, vertex->normal.z) ||

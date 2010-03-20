@@ -73,6 +73,10 @@ private_rebuild_preview (LIExtMaterial* self);
 static void
 private_rebuild_type (LIExtMaterial* self);
 
+static char*
+private_texture_string (LIExtMaterial* self,
+                        LIMdlMaterial* material);
+
 /****************************************************************************/
 
 const LIWdgClass*
@@ -112,7 +116,7 @@ liext_material_set_material (LIExtMaterial* self,
                              LIVoxMaterial* material,
                              LIWdgTreerow*  treerow)
 {
-	const char* name;
+	char* name;
 
 	/* Store values. */
 	self->material = material;
@@ -129,11 +133,19 @@ liext_material_set_material (LIExtMaterial* self,
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_shader1), material->mat_top.shader);
 		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_shader2), material->mat_side.shader);
 
-		/* TODO: Multiple texture support. */
-		name = (material->mat_top.textures.count && material->mat_top.textures.array[0].type == LIMDL_TEXTURE_TYPE_IMAGE)? material->mat_top.textures.array[0].string : "";
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_texture1), name);
-		name = (material->mat_side.textures.count && material->mat_side.textures.array[0].type == LIMDL_TEXTURE_TYPE_IMAGE)? material->mat_side.textures.array[0].string : "";
-		liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_texture2), name);
+		/* Set texture strings. */
+		name = private_texture_string (self, &material->mat_top);
+		if (name != NULL)
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_texture1), name);
+		else
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_texture1), "");
+		lisys_free (name);
+		name = private_texture_string (self, &material->mat_side);
+		if (name != NULL)
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_texture2), name);
+		else
+			liwdg_entry_set_text (LIWDG_ENTRY (self->widgets.entry_texture2), "");
+		lisys_free (name);
 
 		liwdg_scroll_set_value (LIWDG_SCROLL (self->widgets.scroll_friction), material->friction);
 		liwdg_widget_set_visible (LIWDG_WIDGET (self), 1);
@@ -332,19 +344,42 @@ static int
 private_changed_texture (LIExtMaterial* self,
                          LIWdgWidget*   widget)
 {
+	int i;
+	int count;
 	int flags;
+	char** names;
 	const char* name;
 
 	lisys_assert (self->material != NULL);
 
-	/* TODO: Multiple texture support. */
 	flags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
-	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_texture1));
+
+	/* Set top textures. */
 	limdl_material_clear_textures (&self->material->mat_top);
-	limdl_material_append_texture (&self->material->mat_top, LIMDL_TEXTURE_TYPE_IMAGE, flags, name);
-	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_texture2));
+	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_texture1));
+	if (listr_split (name, ' ', &names, &count))
+	{
+		for (i = 0 ; i < count ; i++)
+		{
+			limdl_material_append_texture (&self->material->mat_top, LIMDL_TEXTURE_TYPE_IMAGE, flags, names[i]);
+			lisys_free (names[i]);
+		}
+		lisys_free (names);
+	}
+
+	/* Set side textures. */
 	limdl_material_clear_textures (&self->material->mat_side);
-	limdl_material_append_texture (&self->material->mat_side, LIMDL_TEXTURE_TYPE_IMAGE, flags, name);
+	name = liwdg_entry_get_text (LIWDG_ENTRY (self->widgets.entry_texture2));
+	if (listr_split (name, ' ', &names, &count))
+	{
+		for (i = 0 ; i < count ; i++)
+		{
+			limdl_material_append_texture (&self->material->mat_side, LIMDL_TEXTURE_TYPE_IMAGE, flags, names[i]);
+			lisys_free (names[i]);
+		}
+		lisys_free (names);
+	}
+
 	private_rebuild_preview (self);
 
 	return 0;
@@ -390,6 +425,47 @@ private_rebuild_type (LIExtMaterial* self)
 			liwdg_button_set_text (LIWDG_BUTTON (self->widgets.button_type), "Tile");
 			break;
 	}
+}
+
+static char*
+private_texture_string (LIExtMaterial* self,
+                        LIMdlMaterial* material)
+{
+	int i;
+	int len;
+	int len1;
+	char* tmp;
+	char* name;
+	const char* texture;
+
+	len = 0;
+	name = NULL;
+	for (i = 0 ; i < material->textures.count ; i++)
+	{
+		if (material->textures.array[i].type == LIMDL_TEXTURE_TYPE_IMAGE)
+		{
+			texture = material->textures.array[i].string;
+			len1 = strlen (texture);
+			if (name != NULL)
+			{
+				tmp = lisys_realloc (name, len + len1 + 2);
+				if (tmp != NULL)
+				{
+					name = tmp;
+					name[len] = ' ';
+					strcpy (name + len + 1, texture);
+					len += len1 + 1;
+				}
+			}
+			else
+			{
+				name = listr_dup (texture);
+				len = len1;
+			}
+		}
+	}
+
+	return name;
 }
 
 /** @} */

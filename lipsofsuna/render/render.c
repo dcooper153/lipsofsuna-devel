@@ -148,7 +148,7 @@ liren_render_free (LIRenRender* self)
  *
  * \param self Renderer.
  * \param name Name of the shader.
- * \return Shader.
+ * \return Shader or NULL.
  */
 LIRenShader*
 liren_render_find_shader (LIRenRender* self,
@@ -167,27 +167,23 @@ liren_render_find_shader (LIRenRender* self,
 		LISYS_PATH_SEPARATOR, "shaders",
 		LISYS_PATH_SEPARATOR, name, NULL);
 	if (path == NULL)
-		return self->shader.fixed;
+		return NULL;
 	shader = liren_shader_new_from_file (self, path);
 	lisys_free (path);
-
-	/* Try fallback. */
 	if (shader == NULL)
-		shader = liren_shader_new (self);
-	if (shader == NULL)
-		return self->shader.fixed;
+		return NULL;
 
 	/* Insert to dictionary. */
 	shader->name = listr_dup (name);
 	if (shader->name == NULL)
 	{
 		liren_shader_free (shader);
-		return self->shader.fixed;
+		return NULL;
 	}
 	if (!lialg_strdic_insert (self->shaders, name, shader))
 	{
 		liren_shader_free (shader);
-		return self->shader.fixed;
+		return NULL;
 	}
 
 	return shader;

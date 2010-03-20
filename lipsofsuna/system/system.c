@@ -38,7 +38,8 @@ lisys_assert_fail (const char* asrt,
                    int         line,
                    const char* func)
 {
-	fprintf (stderr, "%s:%d: %s: Assertion `%s' failed.", file, line, func, asrt);
+	fprintf (stderr, "%s:%d: %s: Assertion `%s' failed.\n", file, line, func, asrt);
+	abort ();
 }
 
 /**
