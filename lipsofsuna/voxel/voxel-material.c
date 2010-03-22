@@ -218,7 +218,7 @@ livox_material_read (LIVoxMaterial* self,
 	limdl_material_free (&self->mat_side);
 	limdl_material_free (&self->mat_top);
 	self->id = id;
-	self->flags = flags;
+	self->flags = flags | LIMDL_MATERIAL_FLAG_CULLFACE;
 	self->type = type;
 	self->friction = friction;
 	self->model = model;

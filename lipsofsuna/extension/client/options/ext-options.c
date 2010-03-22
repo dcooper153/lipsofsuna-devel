@@ -41,15 +41,6 @@ private_event (LIExtOptions* self,
 static void
 private_fsaa (LIExtOptions* self);
 
-static void
-private_global_shadows (LIExtOptions* self);
-
-static void
-private_local_shadows (LIExtOptions* self);
-
-static void
-private_shaders (LIExtOptions* self);
-
 /****************************************************************************/
 
 const LIWdgClass*
@@ -117,9 +108,6 @@ private_init (LIExtOptions* self,
 	liwdg_check_set_text (LIWDG_CHECK (self->check_global_shadows), "Shadows for sunlight.");
 	liwdg_check_set_text (LIWDG_CHECK (self->check_local_shadows), "Shadows for lamps.");
 	liwdg_widget_insert_callback (self->check_fsaa, "pressed", private_fsaa, self);
-	liwdg_widget_insert_callback (self->check_shaders, "pressed", private_shaders, self);
-	liwdg_widget_insert_callback (self->check_global_shadows, "pressed", private_global_shadows, self);
-	liwdg_widget_insert_callback (self->check_local_shadows, "pressed", private_local_shadows, self);
 	liwdg_group_set_child (LIWDG_GROUP (self->group), 0, 0, self->check_fsaa);
 	liwdg_group_set_child (LIWDG_GROUP (self->group), 0, 1, self->check_shaders);
 	liwdg_group_set_child (LIWDG_GROUP (self->group), 0, 2, self->check_local_shadows);
@@ -154,29 +142,6 @@ private_fsaa (LIExtOptions* self)
 {
 	licli_window_set_fsaa (self->client->window, livid_features_get_max_samples () *
 		liwdg_check_get_active (LIWDG_CHECK (self->check_fsaa)));
-}
-
-static void
-private_global_shadows (LIExtOptions* self)
-{
-	liren_render_set_global_shadows (self->client->render,
-		liwdg_check_get_active (LIWDG_CHECK (self->check_global_shadows)));
-}
-
-static void
-private_local_shadows (LIExtOptions* self)
-{
-	liren_render_set_local_shadows (self->client->render,
-		liwdg_check_get_active (LIWDG_CHECK (self->check_local_shadows)));
-}
-
-static void
-private_shaders (LIExtOptions* self)
-{
-	liren_render_set_shaders_enabled (self->client->render,
-		liwdg_check_get_active (LIWDG_CHECK (self->check_shaders)));
-	liwdg_check_set_active (LIWDG_CHECK (self->check_shaders),
-		liren_render_get_shaders_enabled (self->client->render));
 }
 
 /** @} */

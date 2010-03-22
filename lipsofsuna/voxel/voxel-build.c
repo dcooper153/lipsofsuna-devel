@@ -221,6 +221,7 @@ livox_build_area (LIVoxManager* manager,
 		/* Occlusion check. */
 		if (!(self.occlud[i] & LIVOX_OCCLUDE_OCCLUDED))
 			count++;
+		self.voxelsb[i].mask = self.occlud[i];
 	}
 
 	/* Build mesh and/or physics. */
@@ -317,13 +318,13 @@ livox_build_occlusion (LIVoxManager* manager,
 			result[i] |= LIVOX_OCCLUDE_XNEG;
 		if (result[i + 1] & LIVOX_OCCLUDE_OCCLUDER)
 			result[i] |= LIVOX_OCCLUDE_XPOS;
-		if (result[i - ysize] & LIVOX_OCCLUDE_OCCLUDER)
+		if (result[i - xsize] & LIVOX_OCCLUDE_OCCLUDER)
 			result[i] |= LIVOX_OCCLUDE_YNEG;
-		if (result[i + ysize] & LIVOX_OCCLUDE_OCCLUDER)
+		if (result[i + xsize] & LIVOX_OCCLUDE_OCCLUDER)
 			result[i] |= LIVOX_OCCLUDE_YPOS;
-		if (result[i - ysize * zsize] & LIVOX_OCCLUDE_OCCLUDER)
+		if (result[i - xsize * ysize] & LIVOX_OCCLUDE_OCCLUDER)
 			result[i] |= LIVOX_OCCLUDE_ZNEG;
-		if (result[i + ysize * zsize] & LIVOX_OCCLUDE_OCCLUDER)
+		if (result[i + xsize * ysize] & LIVOX_OCCLUDE_OCCLUDER)
 			result[i] |= LIVOX_OCCLUDE_ZPOS;
 		if ((result[i] & LIVOX_OCCLUDE_ALL) == LIVOX_OCCLUDE_ALL)
 		{
@@ -438,7 +439,12 @@ private_merge_height_model (LIVoxBuilder* self,
 	LIMdlVertex verts[3];
 	static const int quadidx[2][12] =
 	{
-		{ 0, 0, 1, 0, 0, 1,   1, 1, 1, 0, 0, 1 },
+		{ 1, 0, 0, 0, 0, 1,   1, 1, 1, 0, 0, 1 },
+		{ 1, 0, 0, 0, 1, 1,   1, 1, 0, 0, 0, 1 }
+	};
+	static const int quadidxrev[2][12] =
+	{
+		{ 0, 0, 1, 0, 0, 1,   1, 0, 1, 1, 0, 1 },
 		{ 0, 0, 1, 0, 1, 1,   0, 0, 1, 1, 0, 1 }
 	};
 
@@ -562,7 +568,7 @@ private_merge_height_model (LIVoxBuilder* self,
 
 		/* Bottom surface. */
 		for (k = 0 ; k < 3 ; k++)
-			verts[k] = bot[x + quadidx[z == x][2*k + 6*i]][z + quadidx[z == x][2*k + 6*i + 1]];
+			verts[k] = bot[x + quadidxrev[z == x][2*k + 6*i]][z + quadidxrev[z == x][2*k + 6*i + 1]];
 		if (!private_occlude_face (self, voxel, verts))
 		{
 			for (k = 0 ; k < 3 ; k++)
@@ -582,7 +588,12 @@ private_merge_height_model (LIVoxBuilder* self,
 	for (i = 0 ; i < 2 ; i++)
 	{
 		for (k = 0 ; k < 3 ; k++)
-			verts[k] = side[3 * z + x + quadidx[0][2*k + 6*i]][quadidx[0][2*k + 6*i + 1]];
+		{
+			if (z == 2 || z == 3)
+				verts[k] = side[3 * z + x + quadidxrev[0][2*k + 6*i]][quadidxrev[0][2*k + 6*i + 1]];
+			else
+				verts[k] = side[3 * z + x + quadidx[0][2*k + 6*i]][quadidx[0][2*k + 6*i + 1]];
+		}
 		if (!private_occlude_face (self, voxel, verts))
 		{
 			for (k = 0 ; k < 3 ; k++)
@@ -784,32 +795,32 @@ private_occlude_face (LIVoxBuilder* self,
 		coords[i] = limat_quaternion_transform (voxel->transform.rotation, verts[i].coord);
 
 	/* Occlusion check. */
-	if ((voxel->mask & 0x01) &&
+	if ((voxel->mask & LIVOX_OCCLUDE_XNEG) &&
 		LIMAT_ABS (coords[0].x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[1].x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[2].x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 		return 1;
-	if ((voxel->mask & 0x02) &&
+	if ((voxel->mask & LIVOX_OCCLUDE_XPOS) &&
 		LIMAT_ABS (coords[0].x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[1].x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[2].x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 		return 1;
-	if ((voxel->mask & 0x04) &&
+	if ((voxel->mask & LIVOX_OCCLUDE_YNEG) &&
 		LIMAT_ABS (coords[0].y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[1].y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[2].y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 		return 1;
-	if ((voxel->mask & 0x08) &&
+	if ((voxel->mask & LIVOX_OCCLUDE_YPOS) &&
 		LIMAT_ABS (coords[0].y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[1].y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[2].y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 		return 1;
-	if ((voxel->mask & 0x10) &&
+	if ((voxel->mask & LIVOX_OCCLUDE_ZNEG) &&
 		LIMAT_ABS (coords[0].z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[1].z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[2].z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
 		return 1;
-	if ((voxel->mask & 0x20) &&
+	if ((voxel->mask & LIVOX_OCCLUDE_ZPOS) &&
 		LIMAT_ABS (coords[0].z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[1].z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
 		LIMAT_ABS (coords[2].z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)

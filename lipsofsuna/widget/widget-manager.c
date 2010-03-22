@@ -594,7 +594,6 @@ liwdg_manager_render (LIWdgManager* self)
 	glEnable (GL_TEXTURE_2D);
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_CULL_FACE);
-	glDisable (GL_LIGHTING);
 	glDepthMask (GL_FALSE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

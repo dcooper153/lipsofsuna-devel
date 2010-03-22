@@ -625,7 +625,7 @@ private_update_envmap (LIRenObject* self)
 	LIMatVector ctr;
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
-	LIRenContext context;
+	LIRenContext* context;
 	const LIMatVector dir[6] =
 	{
 		{ 1.0f, 0.0f, 0.0f }, /* Back. */
@@ -645,7 +645,7 @@ private_update_envmap (LIRenObject* self)
 		{ 0.0f, -1.0f, 0.0f } /* Right. */
 	};
 
-	if (!self->cubemap.map || !self->scene->render->shader.enabled)
+	if (!self->cubemap.map)
 		return;
 	modelview = self->orientation.matrix;
 	projection = limat_matrix_perspective (0.5 * M_PI, 1.0f, 1.0f, 100.0f);
@@ -670,12 +670,13 @@ private_update_envmap (LIRenObject* self)
 		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->cubemap.fbo[i]);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		limat_frustum_init (&frustum, &modelview, &projection);
-		liren_context_init (&context, self->scene);
-		liren_context_set_modelview (&context, &modelview);
-		liren_context_set_projection (&context, &projection);
-		liren_context_set_frustum (&context, &frustum);
+		context = liren_render_get_context (self->scene->render);
+		liren_context_set_scene (context, self->scene);
+		liren_context_set_modelview (context, &modelview);
+		liren_context_set_projection (context, &projection);
+		liren_context_set_frustum (context, &frustum);
 		LIALG_U32DIC_FOREACH (iter, self->scene->objects)
-			liren_draw_exclude (&context, iter.value, self);
+			liren_draw_exclude (context, iter.value, self);
 	}
 
 	/* Disable cube map rendering mode. */

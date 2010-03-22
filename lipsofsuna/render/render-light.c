@@ -215,11 +215,7 @@ void
 liren_light_update (LIRenLight* self)
 {
 	if (self->shadow.map)
-	{
-		if ((self->directional && self->scene->render->config.global_shadows) ||
-		    (!self->directional && self->scene->render->config.local_shadows))
-			private_update_shadow (self);
-	}
+		private_update_shadow (self);
 }
 
 void
@@ -450,7 +446,13 @@ private_update_shadow (LIRenLight* self)
 {
 	LIAlgU32dicIter iter;
 	LIMatFrustum frustum;
-	LIRenContext context;
+	LIRenContext* context;
+	LIRenShader* shader;
+
+	/* Find shader. */
+	shader = liren_render_find_shader (self->scene->render, "shadowmap");
+	if (shader == NULL)
+		return;
 
 	/* Enable depth rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
@@ -465,12 +467,14 @@ private_update_shadow (LIRenLight* self)
 
 	/* Render to depth texture. */
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	liren_context_init (&context, self->scene);
-	liren_context_set_modelview (&context, &self->modelview);
-	liren_context_set_projection (&context, &self->projection);
-	liren_context_set_frustum (&context, &frustum);
+	context = liren_render_get_context (self->scene->render);
+	liren_context_set_scene (context, self->scene);
+	liren_context_set_modelview (context, &self->modelview);
+	liren_context_set_projection (context, &self->projection);
+	liren_context_set_frustum (context, &frustum);
+	liren_context_set_shader (context, shader);
 	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
-		liren_draw_shadowmap (&context, iter.value, self);
+		liren_draw_shadowmap (context, iter.value, self);
 
 	/* Disable depth rendering mode. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);

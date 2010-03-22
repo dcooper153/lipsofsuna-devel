@@ -39,6 +39,7 @@ struct _LIVieViewer
 	LIAlgCamera* camera;
 	LIPthPaths* paths;
 	LIRelReload* reload;
+	LIRenDeferred* deferred;
 	LIRenModel* model;
 	LIRenObject* object;
 	LIRenRender* render;

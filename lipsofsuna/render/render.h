@@ -28,6 +28,7 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/system.h>
+#include "render-context.h"
 #include "render-image.h"
 #include "render-light.h"
 #include "render-lighting.h"
@@ -40,18 +41,13 @@
 
 struct _LIRenRender
 {
+	char* datadir;
 	LIAlgPtrdic* scenes;
 	LIAlgStrdic* shaders;
 	LIAlgStrdic* images;
 	LIAlgStrdic* models;
 	LIAlgPtrdic* models_inst;
-	struct
-	{
-		char* dir;
-		int global_shadows;
-		int local_shadows;
-		int light_count;
-	} config;
+	LIRenContext* context;
 	struct
 	{
 		float time;
@@ -59,13 +55,6 @@ struct _LIRenRender
 		GLuint depth_texture_max;
 		LIRenImage* empty_image;
 	} helpers;
-	struct
-	{
-		int enabled;
-		LIRenShader* shader;
-		LIRenShader* shadowmap;
-		LIRenShader* fixed;
-	} shader;
 #ifdef LIREN_ENABLE_PROFILING
 	struct
 	{
@@ -108,27 +97,8 @@ LIAPICALL (void, liren_render_update, (
 	LIRenRender* self,
 	float        secs));
 
-LIAPICALL (void, liren_render_set_global_shadows, (
-	LIRenRender* self,
-	int          value));
-
-LIAPICALL (int, liren_render_get_light_count, (
-	const LIRenRender* self));
-
-LIAPICALL (void, liren_render_set_light_count, (
-	LIRenRender* self,
-	int          count));
-
-LIAPICALL (void, liren_render_set_local_shadows, (
-	LIRenRender* self,
-	int          value));
-
-LIAPICALL (int, liren_render_get_shaders_enabled, (
-	const LIRenRender* self));
-
-LIAPICALL (void, liren_render_set_shaders_enabled, (
-	LIRenRender* self,
-	int          value));
+LIAPICALL (LIRenContext*, liren_render_get_context, (
+	LIRenRender* self));
 
 #ifndef NDEBUG
 void

@@ -31,9 +31,6 @@ static int
 private_init_resources (LIRenRender* self,
                         const char*  dir);
 
-static int
-private_init_shaders (LIRenRender* self);
-
 /*****************************************************************************/
 
 LIRenRender*
@@ -41,11 +38,16 @@ liren_render_new (const char* dir)
 {
 	LIRenRender* self;
 
+	if (livid_features.shader_model < 3)
+	{
+		lisys_error_set (ENOTSUP, "OpenGL 2.0 compatible video hardware is required");
+		return NULL;
+	}
+
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenRender));
 	if (self == NULL)
 		return NULL;
-	self->shader.enabled = (livid_features.shader_model >= 3);
 
 	/* Allocate scene list. */
 	self->scenes = lialg_ptrdic_new ();
@@ -53,11 +55,10 @@ liren_render_new (const char* dir)
 		goto error;
 
 	/* Load data. */
-	self->config.dir = listr_dup (dir);
-	if (self->config.dir == NULL)
+	self->datadir = listr_dup (dir);
+	if (self->datadir == NULL)
 		goto error;
-	if (!private_init_shaders (self) ||
-	    !private_init_resources (self, dir))
+	if (!private_init_resources (self, dir))
 		goto error;
 
 	return self;
@@ -92,12 +93,6 @@ liren_render_free (LIRenRender* self)
 		}
 		lialg_strdic_free (self->shaders);
 	}
-
-	/* Free internal shaders. */
-	if (self->shader.fixed != NULL)
-		liren_shader_free (self->shader.fixed);
-	if (self->shader.shadowmap != NULL)
-		liren_shader_free (self->shader.shadowmap);
 
 	/* Free models. */
 	if (self->models_inst != NULL)
@@ -137,7 +132,8 @@ liren_render_free (LIRenRender* self)
 		lialg_ptrdic_free (self->scenes);
 	}
 
-	lisys_free (self->config.dir);
+	lisys_free (self->datadir);
+	lisys_free (self->context);
 	lisys_free (self);
 }
 
@@ -163,7 +159,7 @@ liren_render_find_shader (LIRenRender* self,
 		return shader;
 
 	/* Try loading. */
-	path = lisys_path_format (self->config.dir,
+	path = lisys_path_format (self->datadir,
 		LISYS_PATH_SEPARATOR, "shaders",
 		LISYS_PATH_SEPARATOR, name, NULL);
 	if (path == NULL)
@@ -359,47 +355,10 @@ liren_render_update (LIRenRender* self,
 	self->helpers.time += secs;
 }
 
-void
-liren_render_set_global_shadows (LIRenRender* self,
-                                 int          value)
+LIRenContext*
+liren_render_get_context (LIRenRender* self)
 {
-	self->config.global_shadows = value;
-}
-
-int
-liren_render_get_light_count (const LIRenRender* self)
-{
-	return self->config.light_count;
-}
-
-void
-liren_render_set_light_count (LIRenRender* self,
-                              int          count)
-{
-	self->config.light_count = LIMAT_MIN (8, count);
-}
-
-void
-liren_render_set_local_shadows (LIRenRender* self,
-                                int          value)
-{
-	self->config.local_shadows = value;
-}
-
-int
-liren_render_get_shaders_enabled (const LIRenRender* self)
-{
-	return self->shader.enabled;
-}
-
-void
-liren_render_set_shaders_enabled (LIRenRender* self,
-                                  int          value)
-{
-	if (livid_features.shader_model >= 3)
-		self->shader.enabled = value;
-	else
-		self->shader.enabled = 0;
+	return self->context;
 }
 
 /*****************************************************************************/
@@ -434,7 +393,7 @@ liren_check_errors ()
 			fprintf (stderr, "ERROR: Unknown GL error\n");
 			break;
 	}
-	/* lisys_assert (0); */
+	lisys_assert (0);
 }
 #endif
 
@@ -473,6 +432,23 @@ private_init_resources (LIRenRender* self,
 		214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,
 		236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
+
+	/* Initialize context manager. */
+	self->context = lisys_calloc (1, sizeof (LIRenContext));
+	if (self->context == NULL)
+		return 0;
+	self->context->compiled = 1;
+	self->context->scene = NULL;
+	self->context->render = self;
+	self->context->material.shininess = 1.0f;
+	self->context->material.diffuse[0] = 1.0f;
+	self->context->material.diffuse[1] = 1.0f;
+	self->context->material.diffuse[2] = 1.0f;
+	self->context->material.diffuse[3] = 1.0f;
+	self->context->matrix = limat_matrix_identity ();
+	self->context->modelview = limat_matrix_identity ();
+	self->context->modelviewinverse = limat_matrix_identity ();
+	self->context->projection = limat_matrix_identity ();
 
 	/* Initialize image dictionary. */
 	self->images = lialg_strdic_new ();
@@ -532,33 +508,6 @@ private_init_resources (LIRenRender* self,
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	lisys_free (pixels);
-
-	return 1;
-}
-
-static int
-private_init_shaders (LIRenRender* self)
-{
-	char* path;
-	LIArcReader* reader;
-
-	self->shader.fixed = liren_shader_new (self);
-	if (self->shader.fixed == NULL)
-		return 0;
-	if (livid_features.shader_model >= 3)
-	{
-		path = lisys_path_concat (self->config.dir, "shaders", "shadowmap", NULL);
-		if (path == NULL)
-			return 0;
-		reader = liarc_reader_new_from_file (path);
-		lisys_free (path);
-		if (reader == NULL)
-			return 0;
-		self->shader.shadowmap = liren_shader_new_from_data (self, reader);
-		liarc_reader_free (reader);
-		if (self->shader.shadowmap == NULL)
-			return 0;
-	}
 
 	return 1;
 }

@@ -38,7 +38,7 @@ struct _LIRenContext
 {
 	int compiled;
 	int deferred;
-	int fixed;
+	int incomplete;
 	int shadows;
 	LIRenRender* render;
 	LIRenScene* scene;
@@ -48,6 +48,10 @@ struct _LIRenContext
 	LIMatMatrix modelview;
 	LIMatMatrix modelviewinverse;
 	LIMatMatrix projection;
+	struct
+	{
+		unsigned int shader : 1;
+	} changed;
 	struct
 	{
 		int count;
@@ -67,10 +71,6 @@ struct _LIRenContext
 		LIRenTexture* array;
 	} textures;
 };
-
-void
-liren_context_init (LIRenContext* self,
-                    LIRenScene*   scene);
 
 void
 liren_context_bind (LIRenContext* self);
@@ -160,6 +160,10 @@ liren_context_set_modelview (LIRenContext*      self,
 void
 liren_context_set_projection (LIRenContext*      self,
                               const LIMatMatrix* value);
+
+void
+liren_context_set_scene (LIRenContext* self,
+                         LIRenScene*   scene);
 
 void
 liren_context_set_shader (LIRenContext* self,

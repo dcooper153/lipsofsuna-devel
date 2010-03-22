@@ -43,6 +43,14 @@ struct _LIRenScene
 	LIRenLighting* lighting;
 	struct
 	{
+		int rendering;
+		int objectn;
+		LIRenContext* context;
+		LIRenDeferred* framebuffer;
+		LIRenObject* objects;
+	} state;
+	struct
+	{
 		LIRenObject* model;
 	} sky;
 };
@@ -74,12 +82,31 @@ LIAPICALL (int, liren_scene_pick, (
 	int             size,
 	LIRenSelection* result));
 
-LIAPICALL (void, liren_scene_render, (
+LIAPICALL (int, liren_scene_render_begin, (
 	LIRenScene*    self,
 	LIRenDeferred* framebuffer,
 	LIMatMatrix*   modelview,
 	LIMatMatrix*   projection,
 	LIMatFrustum*  frustum));
+
+LIAPICALL (void, liren_scene_render_end, (
+	LIRenScene* self));
+
+LIAPICALL (void, liren_scene_render_deferred_opaque, (
+	LIRenScene* self,
+	int         alpha,
+	float       threshold));
+
+LIAPICALL (void, liren_scene_render_forward_opaque, (
+	LIRenScene* self,
+	int         alpha,
+	float       threshold));
+
+LIAPICALL (void, liren_scene_render_forward_transparent, (
+	LIRenScene* self));
+
+LIAPICALL (void, liren_scene_render_postproc, (
+	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_update, (
 	LIRenScene* self,

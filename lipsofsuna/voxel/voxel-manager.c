@@ -123,7 +123,7 @@ livox_manager_check_occluder (const LIVoxManager* self,
 	if (material->type == LIVOX_MATERIAL_TYPE_HEIGHT)
 	{
 #warning Occlusion probably does not work correctly for heightmap tiles.
-		if (voxel->damage != 255)
+		if (voxel->damage)
 			return 0;
 	}
 

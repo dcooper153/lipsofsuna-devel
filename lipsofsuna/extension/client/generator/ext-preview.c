@@ -927,7 +927,6 @@ private_render_preview (LIWdgWidget*  widget,
 
 	/* Render stroke bounds. */
 	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_LIGHTING);
 	glDisable (GL_TEXTURE_2D);
 	glBegin (GL_LINES);
 	for (i = 0 ; i < self->generator->strokes.count ; i++)

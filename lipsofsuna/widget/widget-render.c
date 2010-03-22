@@ -70,7 +70,10 @@ liwdg_render_new (LIWdgManager* manager,
 	LIWDG_RENDER (self)->scene = scene;
 	LIWDG_RENDER (self)->deferred = liren_deferred_new (scene->render, 32, 32);
 	if (LIWDG_RENDER (self)->deferred == NULL)
-		lisys_error_report ();
+	{
+		liwdg_widget_free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -158,6 +161,8 @@ private_init (LIWdgRender*  self,
 static void
 private_free (LIWdgRender* self)
 {
+	if (self->deferred != NULL)
+		liren_deferred_free (self->deferred);
 }
 
 static int
@@ -207,7 +212,11 @@ private_event (LIWdgRender* self,
 			if (self->scene != NULL)
 			{
 				limat_frustum_init (&frustum, &self->modelview, &self->projection);
-				liren_scene_render (self->scene, self->deferred, &self->modelview, &self->projection, &frustum);
+				liren_scene_render_begin (self->scene, self->deferred, &self->modelview, &self->projection, &frustum);
+				liren_scene_render_deferred_opaque (self->scene, 0, 0.0f);
+				liren_scene_render_forward_transparent (self->scene);
+				liren_scene_render_postproc (self->scene);
+				liren_scene_render_end (self->scene);
 			}
 			if (self->custom_render_func != NULL)
 			{
@@ -227,7 +236,6 @@ private_event (LIWdgRender* self,
 			glEnable (GL_TEXTURE_2D);
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glDisable (GL_CULL_FACE);
-			glDisable (GL_LIGHTING);
 			glDisable (GL_DEPTH_TEST);
 			glDepthMask (GL_FALSE);
 			/* Draw children. */

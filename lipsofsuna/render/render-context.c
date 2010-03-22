@@ -32,17 +32,6 @@ static void
 private_bind_material (LIRenContext* self);
 
 static void
-private_bind_shader (LIRenContext* self);
-
-static void
-private_bind_texture (LIRenContext* self,
-                      int           i,
-                      LIRenTexture* texture);
-
-static void
-private_bind_textures_fixed (LIRenContext* self);
-
-static void
 private_bind_uniform (LIRenContext* self,
                       LIRenUniform* uniform);
 
@@ -63,25 +52,6 @@ private_unbind_vertices (LIRenContext*      self,
 /*****************************************************************************/
 
 void
-liren_context_init (LIRenContext* self,
-                    LIRenScene*   scene)
-{
-	memset (self, 0, sizeof (LIRenContext));
-	self->compiled = 1;
-	self->scene = scene;
-	self->render = scene->render;
-	self->material.shininess = 1.0f;
-	self->material.diffuse[0] = 1.0f;
-	self->material.diffuse[1] = 1.0f;
-	self->material.diffuse[2] = 1.0f;
-	self->material.diffuse[3] = 1.0f;
-	self->matrix = limat_matrix_identity ();
-	self->modelview = limat_matrix_identity ();
-	self->modelviewinverse = limat_matrix_identity ();
-	self->projection = limat_matrix_identity ();
-}
-
-void
 liren_context_bind (LIRenContext* self)
 {
 	int i;
@@ -92,22 +62,19 @@ liren_context_bind (LIRenContext* self)
 		self->modelviewinverse = limat_matrix_invert (self->modelview);
 		self->compiled = 1;
 	}
-	if (!self->render->shader.enabled)
-		self->fixed = 1;
+	if (self->shader == NULL)
+	{
+		self->incomplete = 1;
+		return;
+	}
+	self->incomplete = 0;
 
-	/* Bind materials. */
-	if (self->fixed || self->shader == NULL)
-	{
-		private_bind_material (self);
-		if (livid_features.shader_model >= 3)
-			glUseProgramObjectARB (0);
-		private_bind_textures_fixed (self);
-	}
-	else
-	{
-		private_bind_material (self);
-		private_bind_shader (self);
-	}
+	/* Bind shader. */
+	/*if (self->changed.shader)*/
+		glUseProgramObjectARB (self->shader->program);
+
+	/* Bind material. */
+	private_bind_material (self);
 
 	/* Bind matrices. */
 	glMatrixMode (GL_PROJECTION);
@@ -116,16 +83,14 @@ liren_context_bind (LIRenContext* self)
 	glLoadMatrixf (self->modelview.m);
 
 	/* Bind lights. */
-	if (!self->fixed && self->shader != NULL)
-	{
-		private_bind_lights_shader (self);
-		for (i = 0 ; i < self->shader->uniforms.count ; i++)
-			private_bind_uniform (self, self->shader->uniforms.array + i);
-	}
-	else
-		glDisable (GL_LIGHTING);
-	glActiveTextureARB (GL_TEXTURE0);
+	private_bind_lights_shader (self);
+
+	/* Bind uniforms. */
+	for (i = 0 ; i < self->shader->uniforms.count ; i++)
+		private_bind_uniform (self, self->shader->uniforms.array + i);
 	liren_check_errors ();
+
+	self->changed.shader = 0;
 }
 
 /**
@@ -190,6 +155,9 @@ liren_context_render_vbo_array (LIRenContext*      self,
                                 int                vertex0,
                                 int                vertex1)
 {
+	if (self->incomplete)
+		return;
+
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -223,6 +191,9 @@ liren_context_render_vtx_array (LIRenContext*      self,
                                 int                vertex0,
                                 int                vertex1)
 {
+	if (self->incomplete)
+		return;
+
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -257,6 +228,9 @@ liren_context_render_vbo_indexed (LIRenContext*      self,
                                   int                index0,
                                   int                index1)
 {
+	if (self->incomplete)
+		return;
+
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -294,6 +268,9 @@ liren_context_render_vtx_indexed (LIRenContext*      self,
                                   int                index0,
                                   int                index1)
 {
+	if (self->incomplete)
+		return;
+
 	glPushMatrix ();
 	glMultMatrixf (self->matrix.m);
 
@@ -318,13 +295,11 @@ liren_context_render_vtx_indexed (LIRenContext*      self,
 void
 liren_context_unbind (LIRenContext* self)
 {
-	if (livid_features.shader_model >= 3)
-		glUseProgramObjectARB (0);
+	glUseProgramObjectARB (0);
 	glEnable (GL_TEXTURE_2D);
 	glEnable (GL_BLEND);
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_CULL_FACE);
-	glDisable (GL_LIGHTING);
 	glColor3f (1.0f, 1.0f, 1.0f);
 }
 
@@ -345,7 +320,6 @@ void
 liren_context_set_flags (LIRenContext* self,
                          int           value)
 {
-	self->fixed = ((value & LIREN_FLAG_FIXED) != 0);
 /*	self->lighting = ((value & LIREN_FLAG_LIGHTING) != 0);
 	self->texturing = ((value & LIREN_FLAG_TEXTURING) != 0);*/
 	self->shadows = ((value & LIREN_FLAG_SHADOW1) != 0);
@@ -411,10 +385,24 @@ liren_context_set_projection (LIRenContext*      self,
 }
 
 void
+liren_context_set_scene (LIRenContext* self,
+                         LIRenScene*   scene)
+{
+	self->scene = scene;
+	/* FIXME */
+	self->textures.count = 0;
+	self->lights.count = 0;
+}
+
+void
 liren_context_set_shader (LIRenContext* self,
                           LIRenShader*  value)
 {
-	self->shader = value;
+	if (value != self->shader)
+	{
+		self->shader = value;
+		self->changed.shader = 1;
+	}
 }
 
 void
@@ -457,11 +445,6 @@ private_bind_lights_shader (LIRenContext* self)
 static void
 private_bind_material (LIRenContext* self)
 {
-	lisys_assert (self->material.shininess >= 0.0f);
-	lisys_assert (self->material.shininess <= 127.0f);
-	glMaterialf (GL_FRONT, GL_SHININESS, self->material.shininess);
-	glMaterialfv (GL_FRONT, GL_SPECULAR, self->material.specular);
-	glColor4fv (self->material.diffuse);
 	/* TODO: Billboard support. */
 	if (self->material.flags & LIREN_MATERIAL_FLAG_CULLFACE)
 		glEnable (GL_CULL_FACE);
@@ -481,50 +464,10 @@ private_bind_material (LIRenContext* self)
 }
 
 static void
-private_bind_shader (LIRenContext* self)
-{
-	if (livid_features.shader_model >= 3)
-	{
-		if (!self->fixed && self->shader != NULL)
-			glUseProgramObjectARB (self->shader->program);
-		else
-			glUseProgramObjectARB (0);
-	}
-}
-
-static void
-private_bind_texture (LIRenContext* self,
-                      int           i,
-                      LIRenTexture* texture)
-{
-	glActiveTextureARB (GL_TEXTURE0 + i);
-	glBindTexture (GL_TEXTURE_2D, texture->texture);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->params.magfilter);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->params.minfilter);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->params.wraps);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->params.wrapt);
-}
-
-static void
-private_bind_textures_fixed (LIRenContext* self)
-{
-	int i;
-
-	for (i = 0 ; i < self->textures.count ; i++)
-		private_bind_texture (self, i, self->textures.array + i);
-	for ( ; i < livid_features.max_texture_units ; i++)
-	{
-		glActiveTextureARB (GL_TEXTURE0 + i);
-		glBindTexture (GL_TEXTURE_2D, 0);
-	}
-}
-
-static void
 private_bind_uniform (LIRenContext* self,
                       LIRenUniform* uniform)
 {
 	int index;
-	int shadow[2];
 	GLint map;
 	LIRenLight* light;
 	LIRenTexture* texture;
@@ -536,11 +479,6 @@ private_bind_uniform (LIRenContext* self,
 		0.0f, 0.0f, 0.5f, 0.0f,
 		0.5f, 0.5f, 0.5f, 1.0f
 	}};
-
-	/* Shader settings. */
-	/* FIXME */
-	shadow[0] = 0;//((flags & LIREN_FLAG_SHADOW0) != 0);
-	shadow[1] = self->shadows;
 
 	switch (uniform->value)
 	{
@@ -599,6 +537,7 @@ private_bind_uniform (LIRenContext* self,
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 				glBindTexture (GL_TEXTURE_2D, self->render->helpers.empty_image->texture->texture);
 			}
+			glActiveTextureARB (GL_TEXTURE0);
 			break;
 		case LIREN_UNIFORM_LIGHTTYPE0:
 		case LIREN_UNIFORM_LIGHTTYPE1:
@@ -618,7 +557,7 @@ private_bind_uniform (LIRenContext* self,
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DIRECTIONAL);
 				else if (LIMAT_ABS (light->cutoff - M_PI) < 0.001)
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_POINT);
-				else if (light->shadow.map && shadow[1])
+				else if (light->shadow.map)
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOTSHADOW);
 				else
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOT);
@@ -712,7 +651,7 @@ private_bind_uniform (LIRenContext* self,
 			if (index < self->lights.count)
 			{
 				light = self->lights.array[index];
-				if (light->shadow.map && shadow[index != 0])
+				if (light->shadow.map)
 					map = light->shadow.map;
 			}
 			glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
@@ -806,7 +745,6 @@ private_enable_light (LIRenContext* self,
 	}
 
 	/* Set standard parameters. */
-	glEnable (GL_LIGHT0 + i);
 	glLightfv (GL_LIGHT0 + i, GL_POSITION, position);
 	glLightfv (GL_LIGHT0 + i, GL_SPOT_DIRECTION, direction);
 	glLightf (GL_LIGHT0 + i, GL_SPOT_CUTOFF, light->cutoff / M_PI * 180.0f);

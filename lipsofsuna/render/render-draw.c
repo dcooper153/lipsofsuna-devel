@@ -76,11 +76,9 @@ liren_draw_all (LIRenContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags = 0;
 	flags |= LIREN_FLAG_LIGHTING;
 	flags |= LIREN_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -154,7 +152,6 @@ liren_draw_debug (LIRenContext* context,
 		return;
 
 	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_LIGHTING);
 
 	/* Render armature. */
 	glPushMatrix ();
@@ -188,11 +185,9 @@ liren_draw_exclude (LIRenContext* context,
 		return;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags = 0;
 	flags |= LIREN_FLAG_LIGHTING;
 	flags |= LIREN_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -250,11 +245,9 @@ liren_draw_hair (LIRenContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
+	flags = 0;
 	flags |= LIREN_FLAG_LIGHTING;
 	flags |= LIREN_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
 	matrix = object->orientation.matrix;
 	liren_context_set_flags (context, flags);
 	liren_context_set_matrix (context, &matrix);
@@ -347,11 +340,7 @@ liren_draw_opaque (LIRenContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
-	flags |= LIREN_FLAG_LIGHTING;
-	flags |= LIREN_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
+	flags =  LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -426,8 +415,7 @@ liren_draw_shadeless (LIRenContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
-	flags |= LIREN_FLAG_TEXTURING;
+	flags = LIREN_FLAG_TEXTURING;
 
 	/* Render the mesh. */
 	matrix = limat_matrix_identity ();
@@ -466,9 +454,7 @@ liren_draw_shadowmap (LIRenContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		liren_context_set_flags (context, LIREN_FLAG_FIXED);
 		liren_context_set_matrix (context, &matrix);
-		liren_context_set_shader (context, context->render->shader.shadowmap);
 		liren_context_bind (context);
 		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
 	}
@@ -495,11 +481,7 @@ liren_draw_transparent (LIRenContext* context,
 		model = object->model;
 
 	/* Rendering mode. */
-	flags = !context->render->shader.enabled? LIREN_FLAG_FIXED : 0;
-	flags |= LIREN_FLAG_LIGHTING;
-	flags |= LIREN_FLAG_TEXTURING;
-	flags |= context->render->config.global_shadows? LIREN_FLAG_SHADOW0 : 0;
-	flags |= context->render->config.local_shadows? LIREN_FLAG_SHADOW1 : 0;
+	flags = LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;

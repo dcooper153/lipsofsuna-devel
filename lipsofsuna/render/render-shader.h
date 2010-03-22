@@ -27,6 +27,7 @@
 
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
 #include "render-attribute.h"
 #include "render-light.h"
 #include "render-types.h"
@@ -55,19 +56,19 @@ struct _LIRenShader
 	} uniforms;
 };
 
-LIRenShader*
-liren_shader_new (LIRenRender* render);
+LIAPICALL (LIRenShader*, liren_shader_new, (
+	LIRenRender* render));
 
-LIRenShader*
-liren_shader_new_from_data (LIRenRender* render,
-                            LIArcReader* reader);
+LIAPICALL (LIRenShader*, liren_shader_new_from_data, (
+	LIRenRender* render,
+	LIArcReader* reader));
 
-LIRenShader*
-liren_shader_new_from_file (LIRenRender* render,
-                            const char*  path);
+LIAPICALL (LIRenShader*, liren_shader_new_from_file, (
+	LIRenRender* render,
+	const char*  path));
 
-void
-liren_shader_free (LIRenShader* self);
+LIAPICALL (void, liren_shader_free, (
+	LIRenShader* self));
 
 #endif
 

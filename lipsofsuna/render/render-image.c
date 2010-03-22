@@ -138,7 +138,7 @@ private_init (LIRenImage* self,
 		return 0;
 
 	/* Allocate path. */
-	self->path = lisys_path_format (self->render->config.dir,
+	self->path = lisys_path_format (self->render->datadir,
 		LISYS_PATH_SEPARATOR, "graphics",
 		LISYS_PATH_SEPARATOR, name, ".dds", NULL);
 	if (self->path == NULL)

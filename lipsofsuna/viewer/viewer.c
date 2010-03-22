@@ -154,13 +154,6 @@ livie_viewer_main (LIVieViewer* self)
 			{
 				case SDL_QUIT:
 					return 1;
-				case SDL_KEYDOWN:
-					if (event.key.keysym.sym == SDLK_s)
-					{
-						liren_render_set_shaders_enabled (self->render,
-							!liren_render_get_shaders_enabled (self->render));
-					}
-					break;
 				case SDL_MOUSEBUTTONDOWN:
 					if (event.button.button == 4)
 						lialg_camera_zoom (self->camera, -ZOOM_SPEED);
@@ -178,6 +171,7 @@ livie_viewer_main (LIVieViewer* self)
 					private_resize (self, event.resize.w, event.resize.h, self->mode.fsaa);
 					lialg_camera_set_viewport (self->camera, 0, 0, event.resize.w, event.resize.h);
 					glViewport (0, 0, event.resize.w, event.resize.h);
+					liren_deferred_resize (self->deferred, event.resize.w, event.resize.h);
 					break;
 			}
 		}
@@ -208,7 +202,11 @@ livie_viewer_main (LIVieViewer* self)
 		lialg_camera_get_frustum (self->camera, &frustum);
 		lialg_camera_get_modelview (self->camera, &modelview);
 		lialg_camera_get_projection (self->camera, &projection);
-		liren_scene_render (self->scene, NULL, &modelview, &projection, &frustum);
+		liren_scene_render_begin (self->scene, self->deferred, &modelview, &projection, &frustum);
+		liren_scene_render_deferred_opaque (self->scene, 0, 0.0f);
+		liren_scene_render_forward_transparent (self->scene);
+		liren_scene_render_postproc (self->scene);
+		liren_scene_render_end (self->scene);
 		self->video.SDL_GL_SwapBuffers ();
 		self->video.SDL_Delay (100);
 	}
@@ -246,6 +244,11 @@ private_init (LIVieViewer* self)
 		return 0;
 	self->scene = liren_scene_new (self->render);
 	if (self->scene == NULL)
+		return 0;
+
+	/* Allocate framebuffers. */
+	self->deferred = liren_deferred_new (self->scene->render, 32, 32);
+	if (self->deferred == NULL)
 		return 0;
 
 	/* Allocate lights. */

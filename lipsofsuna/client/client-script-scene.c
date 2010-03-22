@@ -34,7 +34,7 @@ private_render (LIWdgRender* self,
 	LIMatFrustum frustum;
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
-	LIRenContext context;
+	LIRenContext* context;
 	LIRenObject* object;
 	LIWdgRect rect;
 
@@ -45,13 +45,13 @@ private_render (LIWdgRender* self,
 	lialg_camera_get_frustum (client->camera, &frustum);
 	lialg_camera_get_modelview (client->camera, &modelview);
 	lialg_camera_get_projection (client->camera, &projection);
-	liren_context_init (&context, client->scene);
-	liren_context_set_modelview (&context, &modelview);
-	liren_context_set_projection (&context, &projection);
-	liren_context_set_frustum (&context, &frustum);
+	context = liren_render_get_context (client->render);
+	liren_context_set_scene (context, client->scene);
+	liren_context_set_modelview (context, &modelview);
+	liren_context_set_projection (context, &projection);
+	liren_context_set_frustum (context, &frustum);
 
 	/* Draw selection. */
-	glDisable (GL_LIGHTING);
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_TEXTURE_2D);
@@ -63,10 +63,10 @@ private_render (LIWdgRender* self,
 		{
 			object = liren_scene_find_object (client->scene, iter.object->id);
 			if (object != NULL)
-				liren_draw_bounds (&context, object, NULL);
+				liren_draw_bounds (context, object, NULL);
 		}
 	}
-	liren_context_unbind (&context);
+	liren_context_unbind (context);
 
 	/* Render custom 3D scene. */
 	lical_callbacks_call (client->callbacks, client->engine, "render-3d", lical_marshal_DATA_PTR, self);
