@@ -41,7 +41,8 @@ liscr_args_init_func (LIScrArgs*  self,
 		self->self = data->data;
 	self->args_start = 2;
 	self->args_count = lua_gettop (lua) - 1;
-	if (lua_type (self->lua, self->args_start) == LUA_TTABLE)
+	if (!liscr_isanyclass (lua, self->args_start) &&
+	    lua_type (self->lua, self->args_start) == LUA_TTABLE)
 	{
 		self->input_mode = LISCR_ARGS_INPUT_TABLE;
 		self->input_table = self->args_start;
@@ -80,6 +81,12 @@ liscr_args_init_setter (LIScrArgs*  self,
 		self->self = data->data;
 	self->args_start = 3;
 	self->args_count = lua_gettop (lua) - 2;
+	if (!liscr_isanyclass (lua, self->args_start) &&
+	    lua_type (self->lua, self->args_start) == LUA_TTABLE)
+	{
+		self->input_mode = LISCR_ARGS_INPUT_TABLE;
+		self->input_table = self->args_start;
+	}
 }
 
 void
