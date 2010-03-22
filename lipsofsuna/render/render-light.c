@@ -59,9 +59,10 @@ liren_light_new (LIRenScene*  scene,
 	if (self == NULL)
 		return NULL;
 	self->scene = scene;
-	self->ambient[0] = 0.0f;
-	self->ambient[1] = 0.0f;
-	self->ambient[2] = 0.0f;
+#warning Hardcoded light ambient because model format does not support it
+	self->ambient[0] = 0.2f * color[0];
+	self->ambient[1] = 0.2f * color[1];
+	self->ambient[2] = 0.2f * color[2];
 	self->ambient[3] = 1.0f;
 	self->diffuse[0] = color[0];
 	self->diffuse[1] = color[1];
