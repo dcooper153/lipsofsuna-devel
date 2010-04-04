@@ -40,6 +40,32 @@ livox_voxel_init (LIVoxVoxel* self,
 }
 
 /**
+ * \brief Writes the voxel to a stream.
+ *
+ * \param self Voxel.
+ * \param writer Stream writer.
+ * \return Nonzero on success.
+ */
+int
+livox_voxel_read (LIVoxVoxel*  self,
+                  LIArcReader* reader)
+{
+	uint16_t terrain;
+	uint8_t damage;
+	uint8_t rotation;
+
+	if (!liarc_reader_get_uint16 (reader, &terrain) ||
+		!liarc_reader_get_uint8 (reader, &damage) ||
+		!liarc_reader_get_uint8 (reader, &rotation))
+		return 0;
+	self->type = terrain;
+	self->damage = damage;
+	self->rotation = rotation;
+
+	return 1;
+}
+
+/**
  * \brief Rotates the voxel.
  *
  * \param self Voxel.
@@ -67,6 +93,22 @@ livox_voxel_rotate (LIVoxVoxel* self,
 		case 2: zr = (zr + step) % 4; break;
 	}
 	self->rotation = xr + 4 * yr + 4 * 4 * zr;
+}
+
+/**
+ * \brief Writes the voxel to a stream.
+ *
+ * \param self Voxel.
+ * \param writer Stream writer.
+ * \return Nonzero on success.
+ */
+int
+livox_voxel_write (LIVoxVoxel*  self,
+                   LIArcWriter* writer)
+{
+	return liarc_writer_append_uint16 (writer, self->type) &&
+	       liarc_writer_append_uint8 (writer, self->damage) &&
+	       liarc_writer_append_uint8 (writer, self->rotation);
 }
 
 /**

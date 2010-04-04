@@ -155,6 +155,92 @@ static void Generator_expand (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Copies voxel data from a packet to a brush.
+ * --
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>brush: Brush ID. (required)</li>
+ * --   <li>point: Position vector.</li>
+ * --   <li>packet: Packet. (required)</li></ul>
+ * -- @return True on success.
+ * function Generator.paste_voxels(clss, args)
+ */
+static void Generator_paste_voxels (LIScrArgs* args)
+{
+	int id;
+	int pos[3];
+	uint32_t size[3];
+	int x;
+	int y;
+	int z;
+	LIArcReader* reader;
+	LIExtModule* module;
+	LIGenBrush* brush;
+	LIMatVector point;
+	LIScrData* data;
+	LIScrPacket* packet;
+	LIVoxVoxel voxel;
+
+	if (liscr_args_gets_int (args, "brush", &id) &&
+	    liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+		point = limat_vector_init (0.0f, 0.0f, 0.0f);
+		liscr_args_gets_vector (args, "point", &point);
+		pos[0] = (int) point.x / LIVOX_TILE_WIDTH;
+		pos[1] = (int) point.y / LIVOX_TILE_WIDTH;
+		pos[2] = (int) point.z / LIVOX_TILE_WIDTH;
+
+		/* Find brush. */
+		brush = ligen_generator_find_brush (module->generator, id);
+		if (brush == NULL)
+			return;
+
+		/* Get packet data. */
+		packet = data->data;
+		if (packet->writer != NULL)
+		{
+			reader = liarc_reader_new (
+				liarc_writer_get_buffer (packet->writer),
+				liarc_writer_get_length (packet->writer));
+		}
+		else
+			reader = packet->reader;
+
+		/* Read size. */
+		if (!liarc_reader_get_uint32 (reader, size + 0) ||
+		    !liarc_reader_get_uint32 (reader, size + 1) ||
+		    !liarc_reader_get_uint32 (reader, size + 2))
+		{
+			if (packet->writer != NULL)
+				liarc_reader_free (reader);
+			return;
+		}
+
+		/* Copy voxels. */
+		for (z = 0 ; z < size[2] ; z++)
+		for (y = 0 ; y < size[1] ; y++)
+		for (x = 0 ; x < size[0] ; x++)
+		{
+			if (!livox_voxel_read (&voxel, reader))
+			{
+				if (packet->writer != NULL)
+					liarc_reader_free (reader);
+				return;
+			}
+			if (0 <= x + pos[0] && x + pos[0] < brush->size[0] &&
+			    0 <= y + pos[1] && y + pos[1] < brush->size[1] &&
+			    0 <= z + pos[2] && z + pos[2] < brush->size[2])
+				ligen_brush_set_voxel (brush, x + pos[0], y + pos[1], z + pos[2], voxel);
+		}
+
+		if (packet->writer != NULL)
+			liarc_reader_free (reader);
+		liscr_args_seti_bool (args, 1);
+	}
+}
+
+/* @luadoc
  * --- Saves the current world map.
  * --
  * -- @param clss Generator class.
@@ -200,6 +286,7 @@ liext_script_generator (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "enable_brush", Generator_enable_brush);
 	liscr_class_insert_cfunc (self, "expand", Generator_expand);
 	liscr_class_insert_cfunc (self, "format", Generator_format);
+	liscr_class_insert_cfunc (self, "paste_voxels", Generator_paste_voxels);
 	liscr_class_insert_cfunc (self, "save", Generator_save);
 	liscr_class_insert_cvar (self, "brushes", Generator_getter_brushes, NULL);
 }

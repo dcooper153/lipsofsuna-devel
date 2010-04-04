@@ -25,6 +25,7 @@
 #ifndef __VOXEL_H__
 #define __VOXEL_H__
 
+#include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/system.h>
 #include "voxel-types.h"
@@ -33,10 +34,18 @@ LIAPICALL (void, livox_voxel_init, (
 	LIVoxVoxel* self,
 	int         type));
 
+LIAPICALL (int, livox_voxel_read, (
+	LIVoxVoxel*  self,
+	LIArcReader* reader));
+
 LIAPICALL (void, livox_voxel_rotate, (
 	LIVoxVoxel* self,
 	int         axis,
 	int         step));
+
+LIAPICALL (int, livox_voxel_write, (
+	LIVoxVoxel*  self,
+	LIArcWriter* writer));
 
 LIAPICALL (float, livox_voxel_get_height, (
 	const LIVoxVoxel* self));

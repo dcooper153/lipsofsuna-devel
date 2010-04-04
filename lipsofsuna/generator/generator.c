@@ -466,18 +466,23 @@ ligen_generator_write (LIGenGenerator* self)
 {
 	int i;
 	int j;
+	int len;
 	int ret;
 	int flags;
-	char* path;
 	double rnd;
+	char* path;
+	const void* buf;
 	uint32_t id;
 	uint32_t sector;
 	const char* query;
 	LIArcSql* server;
+	LIArcWriter* writer;
 	LIGenBrush* brush;
 	LIGenBrushobject* object;
 	LIGenStroke* stroke;
 	LIMatTransform transform;
+	LIMatVector position;
+	LIMatVector size;
 	sqlite3_stmt* statement;
 
 	/* Format path. */
@@ -498,6 +503,7 @@ ligen_generator_write (LIGenGenerator* self)
 
 	/* Drop old tables. */
 	liarc_sql_drop (server, "objects");
+	liarc_sql_drop (server, "regions");
 	liarc_sql_drop (server, "voxel_sectors");
 	liarc_sql_drop (server, "voxel_materials");
 
@@ -506,6 +512,57 @@ ligen_generator_write (LIGenGenerator* self)
 	if (!livox_manager_write (self->voxels))
 		lisys_error_report ();
 	livox_manager_set_sql (self->voxels, self->sql);
+
+	/* Create region table. */
+	query = "CREATE TABLE IF NOT EXISTS regions "
+		"(id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data BLOB);";
+	if (!liarc_sql_query (server, query))
+	{
+		sqlite3_close (server);
+		return 0;
+	}
+
+	/* Write strokes as regions. */
+	for (i = 0 ; i < self->strokes.count ; i++)
+	{
+		stroke = self->strokes.array + i;
+		writer = liarc_writer_new ();
+		if (writer == NULL)
+			return 0;
+		position.x = LIVOX_TILE_WIDTH * stroke->pos[0];
+		position.y = LIVOX_TILE_WIDTH * stroke->pos[1];
+		position.z = LIVOX_TILE_WIDTH * stroke->pos[2];
+		size.x = LIVOX_TILE_WIDTH * stroke->size[0];
+		size.y = LIVOX_TILE_WIDTH * stroke->size[1];
+		size.z = LIVOX_TILE_WIDTH * stroke->size[2];
+		sector = lialg_sectors_point_to_index (self->sectors, &position);
+		if (!liarc_writer_append_uint32 (writer, i) || /* id */
+		    !liarc_writer_append_uint32 (writer, 0) || /* type */
+		    !liarc_writer_append_uint32 (writer, 0) || /* flags */
+		    !liarc_writer_append_uint32 (writer, stroke->brush) ||
+		    !liarc_writer_append_float (writer, position.x) ||
+		    !liarc_writer_append_float (writer, position.y) ||
+		    !liarc_writer_append_float (writer, position.z) ||
+		    !liarc_writer_append_float (writer, size.x) ||
+		    !liarc_writer_append_float (writer, size.y) ||
+		    !liarc_writer_append_float (writer, size.z))
+		{
+			liarc_writer_free (writer);
+			return 0;
+		}
+		len = liarc_writer_get_length (writer);
+		buf = liarc_writer_get_buffer (writer);
+		if (!liarc_sql_replace (server, "regions",
+			"id", LIARC_SQL_INT, i,
+			"sector", LIARC_SQL_INT, sector,
+			"data", LIARC_SQL_BLOB, buf, len, NULL))
+		{
+			liarc_writer_free (writer);
+			sqlite3_close (server);
+			return 0;
+		}
+		liarc_writer_free (writer);
+	}
 
 	/* Create object table. */
 	query = "CREATE TABLE IF NOT EXISTS objects "
@@ -659,6 +716,12 @@ ligen_generator_write_materials (LIGenGenerator* self)
 	return livox_manager_write_materials (self->voxels);
 }
 
+/**
+ * \brief Sets the material used for filling empty sectors.
+ *
+ * \param self Generator.
+ * \param fill Material number.
+ */
 void
 ligen_generator_set_fill (LIGenGenerator* self,
                           int             fill)

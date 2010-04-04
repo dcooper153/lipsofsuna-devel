@@ -148,9 +148,6 @@ livox_sector_read (LIVoxSector* self,
 	int z;
 	int id;
 	int size;
-	uint16_t terrain;
-	uint8_t damage;
-	uint8_t rotation;
 	const char* query;
 	const void* bytes;
 	LIArcReader* reader;
@@ -195,21 +192,14 @@ livox_sector_read (LIVoxSector* self,
 	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; y++)
 	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; x++)
 	{
-		if (!liarc_reader_get_uint16 (reader, &terrain) ||
-		    !liarc_reader_get_uint8 (reader, &damage) ||
-		    !liarc_reader_get_uint8 (reader, &rotation))
+		if (!livox_voxel_read (&tmp, reader))
 		{
 			sqlite3_finalize (statement);
 			liarc_reader_free (reader);
 			return 0;
 		}
-		if (terrain || damage)
-		{
-			livox_voxel_init (&tmp, terrain);
-			tmp.damage = damage;
-			tmp.rotation = rotation;
+		if (tmp.type)
 			livox_sector_set_voxel (self, x, y, z, tmp);
-		}
 	}
 	sqlite3_finalize (statement);
 
@@ -289,9 +279,7 @@ livox_sector_write (LIVoxSector* self,
 	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; x++)
 	{
 		tmp = livox_sector_get_voxel (self, x, y, z);
-		if (!liarc_writer_append_uint16 (writer, tmp->type) ||
-		    !liarc_writer_append_uint8 (writer, tmp->damage) ||
-		    !liarc_writer_append_uint8 (writer, tmp->rotation))
+		if (!livox_voxel_write (tmp, writer))
 			return 0;
 	}
 

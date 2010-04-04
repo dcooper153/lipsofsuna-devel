@@ -157,6 +157,86 @@ static void Tile_setter_terrain (LIScrArgs* args)
 /*****************************************************************************/
 
 /* @luadoc
+ * --- Copies a terrain region into a packet.
+ * --
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Position vector. (required)</li>
+ * --   <li>size: Size vector. (required)</li></ul>
+ * -- @return Packet writer.
+ * function Voxel.copy_region(clss, args)
+ */
+static void Voxel_copy_region (LIScrArgs* args)
+{
+	int i;
+	int length;
+	LIArcWriter* writer;
+	LIExtModule* module;
+	LIMatVector point;
+	LIMatVector size;
+	LIScrData* packet;
+	LIVoxVoxel* result;
+
+	if (liscr_args_gets_vector (args, "point", &point) &&
+	    liscr_args_gets_vector (args, "size", &size))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+		length = ((int) size.x / LIVOX_TILE_WIDTH) *
+		         ((int) size.y / LIVOX_TILE_WIDTH) *
+		         ((int) size.z / LIVOX_TILE_WIDTH);
+
+		/* Read voxel data. */
+		if (length)
+		{
+			result = lisys_calloc (length, sizeof (LIVoxVoxel));
+			if (result == NULL)
+				return;
+			livox_manager_copy_voxels (module->voxels,
+				(int) point.x / LIVOX_TILE_WIDTH,
+				(int) point.y / LIVOX_TILE_WIDTH,
+				(int) point.z / LIVOX_TILE_WIDTH,
+				(int) size.x / LIVOX_TILE_WIDTH,
+				(int) size.y / LIVOX_TILE_WIDTH,
+				(int) size.z / LIVOX_TILE_WIDTH, result);
+		}
+
+		/* Create packet writer. */
+		packet = liscr_packet_new_writable (args->script, 0);
+		if (packet == NULL)
+		{
+			lisys_free (result);
+			return;
+		}
+		writer = ((LIScrPacket*) packet->data)->writer;
+
+		/* Write dimensions. */
+		if (!liarc_writer_append_uint32 (writer, (int) size.x / LIVOX_TILE_WIDTH) ||
+			!liarc_writer_append_uint32 (writer, (int) size.y / LIVOX_TILE_WIDTH) ||
+			!liarc_writer_append_uint32 (writer, (int) size.z / LIVOX_TILE_WIDTH))
+		{
+			lisys_free (result);
+			return;
+		}
+
+		/* Write voxel data. */
+		for (i = 0 ; i < length ; i++)
+		{
+			if (!liarc_writer_append_uint16 (writer, result[i].type) ||
+				!liarc_writer_append_uint8 (writer, result[i].damage) ||
+				!liarc_writer_append_uint8 (writer, result[i].rotation))
+			{
+				lisys_free (result);
+				return;
+			}
+		}
+
+		/* Return data. */
+		liscr_args_seti_data (args, packet);
+		lisys_free (result);
+	}
+}
+
+/* @luadoc
  * --- Erases a voxel near the given point.
  * --
  * -- @param clss Voxel class.
@@ -739,6 +819,7 @@ liext_script_voxel (LIScrClass* self,
                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_insert_cfunc (self, "copy_region", Voxel_copy_region);
 	liscr_class_insert_cfunc (self, "erase", Voxel_erase);
 	liscr_class_insert_cfunc (self, "find_blocks", Voxel_find_blocks);
 	liscr_class_insert_cfunc (self, "find_material", Voxel_find_material);
