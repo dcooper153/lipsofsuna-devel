@@ -27,6 +27,12 @@
 #include <lipsofsuna/system.h>
 #include "sound-source.h"
 
+static int
+private_init_source (LISndSource* self,
+                     ALuint*      result);
+
+/*****************************************************************************/
+
 /**
  * \brief Creates an empty sound source.
  *
@@ -42,16 +48,15 @@ lisnd_source_new (LISndSystem* system)
 	self = lisys_calloc (1, sizeof (LISndSource));
 	if (self == NULL)
 		return NULL;
+	self->volume = 1.0f;
+	self->fade_value = 1.0;
 
 	/* Allocate a source. */
-	alGenSources (1, &self->source);
-	if (alGetError() != AL_NO_ERROR)
+	if (!private_init_source (self, &self->source))
 	{
 		lisys_free (self);
 		return NULL;
 	}
-	alSourcef (self->source, AL_REFERENCE_DISTANCE, 5.0f);
-	alSourcef (self->source, AL_MAX_DISTANCE, 100.0f);
 
 	return self;
 }
@@ -73,19 +78,19 @@ lisnd_source_new_with_sample (LISndSystem* system,
 	self = lisys_calloc (1, sizeof (LISndSource));
 	if (self == NULL)
 		return NULL;
+	self->volume = 1.0f;
+	self->fade_value = 1.0f;
 
 	/* Allocate a source. */
-	alGenSources (1, &self->source);
-	if (alGetError() != AL_NO_ERROR)
+	if (!private_init_source (self, &self->source))
 	{
 		lisys_free (self);
 		return NULL;
 	}
-	alSourcef (self->source, AL_REFERENCE_DISTANCE, 5.0f);
-	alSourcef (self->source, AL_MAX_DISTANCE, 100.0f);
 
 	/* Queue the sample. */
 	lisnd_source_queue_sample (self, sample);
+
 	return self;
 }
 
@@ -111,18 +116,41 @@ lisnd_source_free (LISndSource* self)
  * lived, you can omit calling this.
  *
  * \param self Sound source.
+ * \param secs Seconds since last update.
  * \return The number of samples in the queue.
  */
 int
-lisnd_source_update (LISndSource* self)
+lisnd_source_update (LISndSource* self,
+                     float        secs)
 {
 	ALint num;
 	ALuint buffer;
 
+	/* Update fading. */
+	if (self->fade_factor != 0.0f)
+	{
+		self->fade_value += secs * self->fade_factor;
+		if (self->fade_value > 1.0f)
+		{
+			self->fade_value = 1.0f;
+			self->fade_factor = 0.0f;
+		}
+		else if (self->fade_value < 0.0f)
+		{
+			self->fade_value = 0.0f;
+			self->fade_factor = 0.0f;
+		}
+		alSourcef (self->source, AL_GAIN, self->volume * self->fade_value);
+	}
+	if (self->fade_value == 0.0f && self->fade_factor <= 0.0f)
+		return 0;
+
+	/* Unqueue finished buffers. */
 	alGetSourcei (self->source, AL_BUFFERS_PROCESSED, &num);
 	self->queued -= num;
 	while (num--)
 		alSourceUnqueueBuffers (self->source, 1, &buffer);
+
 	return self->queued;
 }
 
@@ -138,6 +166,23 @@ lisnd_source_queue_sample (LISndSource* self,
 {
 	alSourceQueueBuffers (self->source, 1, &sample->buffer);
 	self->queued++;
+}
+
+/**
+ * \brief Sets the fading speed of the source.
+ *
+ * \param self Sound source.
+ * \param start Initial volume multiplier.
+ * \param speed Fading amound per second.
+ */
+void
+lisnd_source_set_fading (LISndSource* self,
+                         float        start,
+                         float        speed)
+{
+	self->fade_value = start;
+	self->fade_factor = speed;
+	alSourcef (self->source, AL_GAIN, self->fade_value * self->volume);
 }
 
 /**
@@ -232,7 +277,23 @@ void
 lisnd_source_set_volume (LISndSource* self,
                          float        value)
 {
-	alSourcef (self->source, AL_GAIN, value);
+	self->volume = value;
+	alSourcef (self->source, AL_GAIN, self->fade_value * self->volume);
+}
+
+/*****************************************************************************/
+
+static int
+private_init_source (LISndSource* self,
+                     ALuint*      result)
+{
+	alGenSources (1, result);
+	if (alGetError() != AL_NO_ERROR)
+		return 0;
+	alSourcef (self->source, AL_REFERENCE_DISTANCE, 5.0f);
+	alSourcef (self->source, AL_MAX_DISTANCE, 100.0f);
+
+	return 1;
 }
 
 #endif

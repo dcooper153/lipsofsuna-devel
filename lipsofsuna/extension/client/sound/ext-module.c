@@ -51,6 +51,8 @@ liext_module_new (LIMaiProgram* program)
 	if (self == NULL)
 		return NULL;
 	self->client = limai_program_find_component (program, "client");
+	self->music_volume = 1.0f;
+	self->music_fading = 1.0f;
 
 #ifndef LI_DISABLE_SOUND
 	/* Allocate objects. */
@@ -102,9 +104,13 @@ liext_module_free (LIExtModule* self)
 		lialg_u32dic_free (self->objects);
 	}
 
-	/* Disable sound. */
+	/* Free music. */
 	if (self->music != NULL)
 		lisnd_source_free (self->music);
+	if (self->music_fade != NULL)
+		lisnd_source_free (self->music_fade);
+
+	/* Disable sound. */
 	if (self->sound != NULL)
 		lisnd_manager_free (self->sound);
 	if (self->sound != NULL)
@@ -243,6 +249,7 @@ int
 liext_module_set_music (LIExtModule* self,
                         const char*  value)
 {
+	LISndSource* music;
 	LISndSample* sample;
 
 	/* Find sample. */
@@ -252,13 +259,31 @@ liext_module_set_music (LIExtModule* self,
 	if (sample == NULL)
 		return 0;
 
-	/* Set music track. */
-	/* FIXME: Doesn't work if already playing. */
-	lisnd_source_queue_sample (self->music, sample);
-	lisnd_source_set_looping (self->music, 1);
-	lisnd_source_set_playing (self->music, 1);
+	/* Fade in a new music track. */
+	music = lisnd_source_new (self->system);
+	if (music == NULL)
+		return 0;
+	lisnd_source_queue_sample (music, sample);
+	lisnd_source_set_fading (music, 0.0f, 1.0f / self->music_fading);
+	lisnd_source_set_volume (music, self->music_volume);
+	lisnd_source_set_looping (music, 1);
+	lisnd_source_set_playing (music, 1);
+
+	/* Fade out the old music track. */
+	if (self->music_fade != NULL)
+		lisnd_source_free (self->music_fade);
+	lisnd_source_set_fading (self->music, 1.0f, -1.0f / self->music_fading);
+	self->music_fade = self->music;
+	self->music = music;
 
 	return 1;
+}
+
+void
+liext_module_set_music_fading (LIExtModule* self,
+                               float        value)
+{
+	self->music_fading = value;
 }
 
 void
@@ -271,8 +296,12 @@ liext_module_set_music_volume (LIExtModule* self,
 		value = 0.0f;
 	if (value > 1.0f)
 		value = 1.0f;
+	self->music_volume = value;
 
-	lisnd_source_set_volume (self->music, value);
+	if (self->music != NULL)
+		lisnd_source_set_volume (self->music, value);
+	if (self->music_fade != NULL)
+		lisnd_source_set_volume (self->music_fade, value);
 }
 #endif
 
@@ -324,6 +353,18 @@ private_tick (LIExtModule* self,
 	up = limat_quaternion_get_basis (transform.rotation, 1);
 	lisnd_system_set_listener (self->system, &transform.position, &velocity, &direction, &up);
 
+	/* Update music. */
+	if (self->music_fade != NULL)
+	{
+		if (!lisnd_source_update (self->music_fade, secs))
+		{
+			lisnd_source_free (self->music_fade);
+			self->music_fade = NULL;
+		}
+	}
+	if (self->music != NULL)
+		lisnd_source_update (self->music, secs);
+
 	/* Update sound effects. */
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
@@ -339,7 +380,7 @@ private_tick (LIExtModule* self,
 				lieng_object_get_velocity (engobj, &vector);
 				lisnd_source_set_position (source, &transform.position);
 				lisnd_source_set_velocity (source, &vector);
-				if (!lisnd_source_update (source))
+				if (!lisnd_source_update (source, secs))
 				{
 					lisnd_source_free (source);
 					lialg_list_remove (&extobj->sounds, ptr);

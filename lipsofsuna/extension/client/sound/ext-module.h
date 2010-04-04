@@ -38,6 +38,8 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
+	float music_fading;
+	float music_volume;
 	LICliClient* client;
 #ifndef LI_DISABLE_SOUND
 	LIAlgU32dic* objects;
@@ -45,6 +47,7 @@ struct _LIExtModule
 	LISndSystem* system;
 	LISndManager* sound;
 	LISndSource* music;
+	LISndSource* music_fade;
 #endif
 };
 
@@ -68,6 +71,10 @@ liext_module_set_effect (LIExtModule* self,
 int
 liext_module_set_music (LIExtModule* self,
                         const char*  value);
+
+void
+liext_module_set_music_fading (LIExtModule* self,
+                               float        value);
 
 void
 liext_module_set_music_volume (LIExtModule* self,

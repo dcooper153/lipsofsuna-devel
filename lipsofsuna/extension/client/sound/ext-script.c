@@ -94,6 +94,26 @@ static void Sound_setter_music (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Music fading time.
+ * -- @name Sound.music_fading
+ * -- @class table
+ */
+static void Sound_setter_music_fading (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	float value;
+	LIExtModule* module;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		value = LIMAT_MAX (0.0f, value);
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		liext_module_set_music_fading (module, value);
+	}
+#endif
+}
+
+/* @luadoc
  * --- Music volume.
  * -- @name Sound.music_volume
  * -- @class table
@@ -121,6 +141,7 @@ liext_script_sound (LIScrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
 	liscr_class_insert_cfunc (self, "effect", Sound_effect);
 	liscr_class_insert_cvar (self, "music", NULL, Sound_setter_music);
+	liscr_class_insert_cvar (self, "music_fading", NULL, Sound_setter_music_fading);
 	liscr_class_insert_cvar (self, "music_volume", NULL, Sound_setter_music_volume);
 }
 

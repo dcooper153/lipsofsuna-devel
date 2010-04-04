@@ -33,6 +33,9 @@
 typedef struct _LISndSource LISndSource;
 struct _LISndSource
 {
+	float volume;
+	float fade_factor;
+	float fade_value;
 	ALuint source;
 	ALint queued;
 };
@@ -52,7 +55,13 @@ LIAPICALL (void, lisnd_source_queue_sample, (
 	LISndSample* sample));
 
 LIAPICALL (int, lisnd_source_update, (
-	LISndSource* self));
+	LISndSource* self,
+	float        secs));
+
+LIAPICALL (void, lisnd_source_set_fading, (
+	LISndSource* self,
+	float        start,
+	float        speed));
 
 LIAPICALL (void, lisnd_source_set_looping, (
 	LISndSource* self,
