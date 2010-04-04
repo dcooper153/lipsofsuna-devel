@@ -32,10 +32,13 @@
 struct _LIWdgStyle
 {
 	LIImgTexture* texture;
-	int x, y;
+	int x;
+	int y;
 	int w[3];
 	int h[3];
 	int pad[4];
+	int scale;
+	char font[32];
 	float color[4];
 	float hover[4];
 	float selection[4];

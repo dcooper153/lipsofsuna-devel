@@ -110,6 +110,7 @@ liwdg_styles_new (LIWdgManager* manager,
 	self->fallback.selection[1] = 0.5f;
 	self->fallback.selection[2] = 0.5f;
 	self->fallback.selection[3] = 1.0f;
+	strcpy (self->fallback.font, "default");
 
 	/* Allocate resource lists. */
 	self->fonts = lialg_strdic_new ();
@@ -494,6 +495,17 @@ private_read_widget_attr (LIWdgStyles* self,
 	else if (!strcmp (key, "text-color"))
 	{
 		sscanf (value, "%f %f %f %f", widget->color + 0, widget->color + 1, widget->color + 2, widget->color + 3);
+	}
+	else if (!strcmp (key, "font"))
+	{
+		sscanf (value, "%32s", widget->font);
+	}
+	else if (!strcmp (key, "fill-mode"))
+	{
+		if (!strcmp (value, "resize"))
+			widget->scale = 1;
+		else
+			widget->scale = 0;
 	}
 	else
 	{

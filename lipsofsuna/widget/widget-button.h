@@ -38,7 +38,6 @@ typedef struct _LIWdgButton LIWdgButton;
 struct _LIWdgButton
 {
 	LIWdgWidget base;
-	LIFntFont* font;
 	LIFntLayout* text;
 	char* string;
 };
@@ -47,13 +46,6 @@ LIAPICALL (const LIWdgClass*, liwdg_widget_button, ());
 
 LIAPICALL (LIWdgWidget*, liwdg_button_new, (
 	LIWdgManager* manager));
-
-LIAPICALL (LIFntFont*, liwdg_button_get_font, (
-	LIWdgButton*  self));
-
-LIAPICALL (void, liwdg_button_set_font, (
-	LIWdgButton* self,
-	LIFntFont*   font));
 
 LIAPICALL (int, liwdg_button_set_text, (
 	LIWdgButton* self,

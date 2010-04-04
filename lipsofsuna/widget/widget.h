@@ -133,6 +133,9 @@ LIAPICALL (void, liwdg_widget_get_content, (
 	LIWdgWidget* self,
 	LIWdgRect*   allocation));
 
+LIAPICALL (LIFntFont*, liwdg_widget_get_font, (
+	const LIWdgWidget* self));
+
 LIAPICALL (int, liwdg_widget_get_grab, (
 	const LIWdgWidget* self));
 

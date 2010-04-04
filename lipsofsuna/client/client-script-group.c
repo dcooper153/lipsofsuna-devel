@@ -357,6 +357,38 @@ static void Group_setter_cols (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Margin widths.
+ * -- @name Group.margins
+ * -- @class table
+ */
+static void Group_getter_margins (LIScrArgs* args)
+{
+	int v[4];
+
+	liwdg_group_get_margins (args->self, v + 0, v + 1, v + 2, v + 3);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_float (args, "left", v[0]);
+	liscr_args_sets_float (args, "right", v[1]);
+	liscr_args_sets_float (args, "top", v[2]);
+	liscr_args_sets_float (args, "bottom", v[3]);
+}
+static void Group_setter_margins (LIScrArgs* args)
+{
+	int v[4];
+
+	liwdg_group_get_margins (args->self, v + 0, v + 1, v + 2, v + 3);
+	liscr_args_geti_int (args, 0, v + 0);
+	liscr_args_geti_int (args, 1, v + 1);
+	liscr_args_geti_int (args, 2, v + 2);
+	liscr_args_geti_int (args, 3, v + 3);
+	liscr_args_gets_int (args, "left", v + 0);
+	liscr_args_gets_int (args, "right", v + 1);
+	liscr_args_gets_int (args, "top", v + 2);
+	liscr_args_gets_int (args, "bottom", v + 3);
+	liwdg_group_set_margins (args->self, v[0], v[1], v[2], v[3]);
+}
+
+/* @luadoc
  * --- Number of rows in the group.
  * -- @name Group.rows
  * -- @class table
@@ -380,6 +412,32 @@ static void Group_setter_rows (LIScrArgs* args)
 		liwdg_group_set_size (args->self, w, rows);
 }
 
+/* @luadoc
+ * --- Margin widths.
+ * -- @name Group.margins
+ * -- @class table
+ */
+static void Group_getter_spacings (LIScrArgs* args)
+{
+	int v[2];
+
+	liwdg_group_get_spacings (args->self, v + 0, v + 1);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_int (args, "horz", v[0]);
+	liscr_args_sets_int (args, "vert", v[1]);
+}
+static void Group_setter_spacings (LIScrArgs* args)
+{
+	int v[4];
+
+	liwdg_group_get_spacings (args->self, v + 0, v + 1);
+	liscr_args_geti_int (args, 0, v + 0);
+	liscr_args_geti_int (args, 1, v + 1);
+	liscr_args_gets_int (args, "horz", v + 0);
+	liscr_args_gets_int (args, "vert", v + 1);
+	liwdg_group_set_spacings (args->self, v[0], v[1]);
+}
+
 /*****************************************************************************/
 
 void
@@ -399,7 +457,9 @@ licli_script_group (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "set_child", Group_set_child);
 	liscr_class_insert_mfunc (self, "set_expand", Group_set_expand);
 	liscr_class_insert_mvar (self, "cols", Group_getter_cols, Group_setter_cols);
+	liscr_class_insert_mvar (self, "margins", Group_getter_margins, Group_setter_margins);
 	liscr_class_insert_mvar (self, "rows", Group_getter_rows, Group_setter_rows);
+	liscr_class_insert_mvar (self, "spacings", Group_getter_spacings, Group_setter_spacings);
 }
 
 /** @} */

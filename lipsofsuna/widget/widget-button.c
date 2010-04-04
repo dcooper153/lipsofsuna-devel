@@ -60,20 +60,6 @@ liwdg_button_new (LIWdgManager* manager)
 	return liwdg_widget_new (manager, liwdg_widget_button ());
 }
 
-LIFntFont*
-liwdg_button_get_font (LIWdgButton* self)
-{
-	return self->font;
-}
-
-void
-liwdg_button_set_font (LIWdgButton* self,
-                       LIFntFont*   font)
-{
-	self->font = font;
-	private_rebuild (self);
-}
-
 const char*
 liwdg_button_get_text (LIWdgButton* self)
 {
@@ -106,7 +92,6 @@ private_init (LIWdgButton*  self,
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
 		return 0;
-	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 	{
@@ -149,6 +134,9 @@ private_event (LIWdgButton* self,
 			return lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
 			return 0;
+		case LIWDG_EVENT_TYPE_STYLE:
+			private_rebuild (self);
+			break;
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
@@ -175,12 +163,14 @@ static void
 private_rebuild (LIWdgButton* self)
 {
 	int h = 0;
+	LIFntFont* font;
 
 	lifnt_layout_clear (self->text);
-	if (self->font != NULL)
+	font = liwdg_widget_get_font (LIWDG_WIDGET (self));
+	if (font != NULL)
 	{
-		h = lifnt_font_get_height (self->font);
-		lifnt_layout_append_string (self->text, self->font, self->string);
+		h = lifnt_font_get_height (font);
+		lifnt_layout_append_string (self->text, font, self->string);
 	}
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LIMAT_MAX (
