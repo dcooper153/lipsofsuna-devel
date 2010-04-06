@@ -58,11 +58,6 @@ static void Window_new (LIScrArgs* args)
 		liwdg_widget_free (self);
 		return;
 	}
-	if (!liwdg_manager_insert_window (client->widgets, self))
-	{
-		liscr_data_unref (data, NULL);
-		return;
-	}
 	liwdg_widget_set_userdata (self, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
@@ -128,7 +123,7 @@ static void Window_setter_visible (LIScrArgs* args)
 
 void
 licli_script_window (LIScrClass* self,
-                   void*       data)
+                     void*       data)
 {
 	liscr_class_inherit (self, licli_script_group, data);
 	liscr_class_set_userdata (self, LICLI_SCRIPT_WINDOW, data);

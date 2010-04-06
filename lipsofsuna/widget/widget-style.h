@@ -53,6 +53,10 @@ struct _LIWdgStyles
 	LIAlgStrdic* subimgs;
 };
 
+LIAPICALL (void, liwdg_style_paint, (
+	LIWdgStyle* self,
+	LIWdgRect*  rect));
+
 LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
 	LIWdgManager* manager,
 	const char*   root));

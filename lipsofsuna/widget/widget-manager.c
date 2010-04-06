@@ -236,9 +236,37 @@ liwdg_manager_find_font (LIWdgManager* self,
 
 LIWdgStyle*
 liwdg_manager_find_style (LIWdgManager* self,
-                          const char*   name)
+                          const char*   style,
+                          const char*   state)
 {
-	return lialg_strdic_find (self->styles->subimgs, name);
+	int len0;
+	int len1;
+	char* full;
+	LIWdgStyle* style_ = NULL;
+
+	if (style != NULL)
+	{
+		if (state != NULL)
+		{
+			len0 = strlen (style);
+			len1 = strlen (state);
+			full = lisys_calloc (len0 + len1 + 2, sizeof (char));
+			if (full != NULL)
+			{
+				strcpy (full, style);
+				strcpy (full + len0 + 1, state);
+				full[len0] = ':';
+				style_ = lialg_strdic_find (self->styles->subimgs, full);
+				lisys_free (full);
+			}
+			if (style_ == NULL)
+				style_ = lialg_strdic_find (self->styles->subimgs, style);
+		}
+		else
+			style_ = lialg_strdic_find (self->styles->subimgs, style);
+	}
+
+	return style_;
 }
 
 /**
@@ -522,14 +550,10 @@ liwdg_manager_insert_window (LIWdgManager* self,
 	widget->state = LIWDG_WIDGET_STATE_WINDOW;
 	private_attach_window (self, widget);
 
-	static int x=32;// FIXME
-	static int y=32;
 	liwdg_widget_get_request (widget, &size);
-	size.width = LIMAT_MAX (1, self->width - size.width);
-	size.height = LIMAT_MAX (1, self->height - size.height);
-	liwdg_widget_move (widget, x % size.width, y % size.height);
-	x += 64;
-	y += 32;
+	size.width = (self->width - size.width) / 2;
+	size.height = (self->height - size.height) / 2;
+	liwdg_widget_move (widget, size.width, size.height);
 
 	return 1;
 }

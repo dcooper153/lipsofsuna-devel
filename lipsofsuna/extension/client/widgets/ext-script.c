@@ -576,6 +576,23 @@ static void Scroll_set_range (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Reference value.
+ * -- @name Scroll.reference
+ * -- @class table
+ */
+static void Scroll_getter_reference (LIScrArgs* args)
+{
+	liscr_args_seti_float (args, liwdg_scroll_get_reference (args->self));
+}
+static void Scroll_setter_reference (LIScrArgs* args)
+{
+	float value;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		liwdg_scroll_set_reference (args->self, value);
+}
+
+/* @luadoc
  * --- Current value.
  * -- @name Scroll.value
  * -- @class table
@@ -1045,6 +1062,7 @@ liext_script_scroll (LIScrClass* self,
 	liscr_class_inherit (self, licli_script_widget, module->client);
 	liscr_class_insert_cfunc (self, "new", Scroll_new);
 	liscr_class_insert_mfunc (self, "set_range", Scroll_set_range);
+	liscr_class_insert_mvar (self, "reference", Scroll_getter_reference, Scroll_setter_reference);
 	liscr_class_insert_mvar (self, "value", Scroll_getter_value, Scroll_setter_value);
 }
 

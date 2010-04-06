@@ -60,20 +60,6 @@ liwdg_progress_new (LIWdgManager* manager)
 	return liwdg_widget_new (manager, liwdg_widget_progress ());
 }
 
-LIFntFont*
-liwdg_progress_get_font (LIWdgProgress* self)
-{
-	return self->font;
-}
-
-void
-liwdg_progress_set_font (LIWdgProgress* self,
-                         LIFntFont*     font)
-{
-	self->font = font;
-	private_rebuild (self);
-}
-
 const char*
 liwdg_progress_get_text (LIWdgProgress* self)
 {
@@ -92,6 +78,7 @@ liwdg_progress_set_text (LIWdgProgress* self,
 	lisys_free (self->string);
 	self->string = tmp;
 	private_rebuild (self);
+
 	return 1;
 }
 
@@ -117,7 +104,6 @@ private_init (LIWdgProgress* self,
 	self->string = lisys_calloc (1, 1);
 	if (self->string == NULL)
 		return 0;
-	self->font = liwdg_manager_find_font (manager, "default");
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 	{
@@ -126,6 +112,7 @@ private_init (LIWdgProgress* self,
 	}
 	liwdg_widget_set_style (LIWDG_WIDGET (self), "progress");
 	private_rebuild (self);
+
 	return 1;
 }
 
@@ -142,33 +129,51 @@ private_event (LIWdgProgress* self,
 {
 	int w;
 	int h;
+	LIWdgRect alloc;
 	LIWdgRect rect;
-	LIWdgStyle* style;
+	LIWdgStyle* style0;
+	LIWdgStyle* style1;
 
 	switch (event->type)
 	{
 		case LIWDG_EVENT_TYPE_RENDER:
 			w = lifnt_layout_get_width (self->text);
 			h = lifnt_layout_get_height (self->text);
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
-			/* Draw base. */
+			style0 = liwdg_widget_get_style (LIWDG_WIDGET (self));
+			style1 = liwdg_manager_find_style (LIWDG_WIDGET (self)->manager, LIWDG_WIDGET (self)->style_name, "max");
+			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &alloc);
 			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
+			/* Draw base. */
 			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			/* Draw progress. */
-			glBindTexture (GL_TEXTURE_2D, 0);
-			glColor4fv (style->selection);
-			glBegin (GL_QUADS);
-			glVertex2f (rect.x, rect.y);
-			glVertex2f (rect.x + self->value * rect.width, rect.y);
-			glVertex2f (rect.x + self->value * rect.width, rect.y + rect.height);
-			glVertex2f (rect.x, rect.y + rect.height);
-			glEnd ();
+			if (style1 != NULL && style0 != style1)
+			{
+				glPushAttrib (GL_SCISSOR_BIT);
+				glEnable (GL_SCISSOR_TEST);
+				glScissor (alloc.x, alloc.y, (int)(self->value * alloc.width), alloc.height);
+				liwdg_style_paint (style1, &rect);
+				glPopAttrib ();
+			}
+			else
+			{
+				glBindTexture (GL_TEXTURE_2D, 0);
+				glColor4fv (style0->selection);
+				glBegin (GL_QUADS);
+				glVertex2f (rect.x, rect.y);
+				glVertex2f (rect.x + self->value * rect.width, rect.y);
+				glVertex2f (rect.x + self->value * rect.width, rect.y + rect.height);
+				glVertex2f (rect.x, rect.y + rect.height);
+				glEnd ();
+			}
 			/* Draw label. */
-			glColor4fv (style->color);
+			glColor4fv (style0->color);
 			lifnt_layout_render (self->text,
 				rect.x + (rect.width - w) / 2,
 				rect.y + (rect.height - h) / 2);
 			return 1;
+		case LIWDG_EVENT_TYPE_STYLE:
+			private_rebuild (self);
+			break;
 	}
 
 	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
@@ -178,12 +183,14 @@ static void
 private_rebuild (LIWdgProgress* self)
 {
 	int h = 0;
+	LIFntFont* font;
 
 	lifnt_layout_clear (self->text);
-	if (self->font != NULL)
+	font = liwdg_widget_get_font (LIWDG_WIDGET (self));
+	if (font != NULL)
 	{
-		h = lifnt_font_get_height (self->font);
-		lifnt_layout_append_string (self->text, self->font, self->string);
+		h = lifnt_font_get_height (font);
+		lifnt_layout_append_string (self->text, font, self->string);
 	}
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LIMAT_MAX (

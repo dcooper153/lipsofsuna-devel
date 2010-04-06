@@ -40,19 +40,13 @@ struct _LIWdgScroll
 	float min;
 	float max;
 	float value;
+	float reference;
 };
 
 LIAPICALL (const LIWdgClass*, liwdg_widget_scroll, ());
 
 LIAPICALL (LIWdgWidget*, liwdg_scroll_new, (
 	LIWdgManager* manager));
-
-LIAPICALL (LIFntFont*, liwdg_scroll_get_font, (
-	LIWdgScroll* self));
-
-LIAPICALL (void, liwdg_scroll_set_font, (
-	LIWdgScroll* self,
-	LIFntFont*   font));
 
 LIAPICALL (void, liwdg_scroll_set_range, (
 	LIWdgScroll* self,
@@ -63,6 +57,13 @@ LIAPICALL (float, liwdg_scroll_get_value, (
 	LIWdgScroll* self));
 
 LIAPICALL (void, liwdg_scroll_set_value, (
+	LIWdgScroll* self,
+	float        value));
+
+LIAPICALL (float, liwdg_scroll_get_reference, (
+	LIWdgScroll* self));
+
+LIAPICALL (void, liwdg_scroll_set_reference, (
 	LIWdgScroll* self,
 	float        value));
 

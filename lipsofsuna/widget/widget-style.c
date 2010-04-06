@@ -27,494 +27,225 @@
 #include "widget-manager.h"
 #include "widget-style.h"
 
-typedef struct _PrivateFont PrivateFont;
-struct _PrivateFont
-{
-	int size;
-	char* file;
-};
+static void
+private_paint_scaled (LIWdgStyle* self,
+                      LIWdgRect*  rect);
 
-static LIFntFont*
-private_load_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   const char*  file,
-                   int          size);
-
-static int
-private_load_texture (LIWdgStyles*   self,
-                      LIImgTexture** texture,
-                      const char*    root,
-                      const char*    name);
-
-static int
-private_read (LIWdgStyles* self,
-              const char*  root,
-              const char*  path);
-
-static int
-private_read_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   LIArcReader* reader);
-
-static int
-private_read_font_attr (LIWdgStyles* self,
-                        const char*  root,
-                        const char*  name,
-                        PrivateFont* font,
-                        const char*  key,
-                        const char*  value);
-
-static int
-private_read_widget (LIWdgStyles* self,
-                     const char*  root,
-                     const char*  name,
-                     LIArcReader* reader);
-
-static int
-private_read_widget_attr (LIWdgStyles* self,
-                          const char*  root,
-                          const char*  name,
-                          LIWdgStyle*  widget,
-                          const char*  key,
-                          const char*  value);
+static void
+private_paint_tiled (LIWdgStyle* self,
+                     LIWdgRect*  rect);
 
 /*****************************************************************************/
 
-LIWdgStyles*
-liwdg_styles_new (LIWdgManager* manager,
-                  const char*   root)
-{
-	char* path;
-	LIWdgStyles* self;
-	unsigned char tmp[16];
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIWdgStyles));
-	if (self == NULL)
-		return NULL;
-	self->manager = manager;
-
-	/* Initialize defaults. */
-	memset (tmp, 0, sizeof (tmp));
-	self->fallback.color[0] = 0.0f;
-	self->fallback.color[1] = 0.0f;
-	self->fallback.color[2] = 0.0f;
-	self->fallback.color[3] = 1.0f;
-	self->fallback.hover[0] = 0.0f;
-	self->fallback.hover[1] = 0.0f;
-	self->fallback.hover[2] = 0.0f;
-	self->fallback.hover[3] = 0.0f;
-	self->fallback.selection[0] = 0.5f;
-	self->fallback.selection[1] = 0.5f;
-	self->fallback.selection[2] = 0.5f;
-	self->fallback.selection[3] = 1.0f;
-	strcpy (self->fallback.font, "default");
-
-	/* Allocate resource lists. */
-	self->fonts = lialg_strdic_new ();
-	self->images = lialg_strdic_new ();
-	self->subimgs = lialg_strdic_new ();
-	if (self->fonts == NULL ||
-	    self->images == NULL ||
-	    self->subimgs == NULL)
-	{
-		liwdg_styles_free (self);
-		return NULL;
-	}
-
-	/* Load theme. */
-	path = lisys_path_concat (root, "config", "widgets.cfg", NULL);
-	if (path == NULL)
-	{
-		liwdg_styles_free (self);
-		return NULL;
-	}
-	if (!private_read (self, root, path))
-	{
-		liwdg_styles_free (self);
-		lisys_free (path);
-		return NULL;
-	}
-	lisys_free (path);
-
-	return self;
-}
-
+/**
+ * \brief Paints widget graphics.
+ *
+ * \param self Style.
+ * \param rect Rectangle.
+ */
 void
-liwdg_styles_free (LIWdgStyles* self)
+liwdg_style_paint (LIWdgStyle* self,
+                   LIWdgRect*  rect)
 {
-	LIAlgStrdicIter iter;
-
-	if (self->fonts != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter, self->fonts)
-			lifnt_font_free (iter.value);
-		lialg_strdic_free (self->fonts);
-	}
-	if (self->images != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter, self->images)
-			liimg_texture_free (iter.value);
-		lialg_strdic_free (self->images);
-	}
-	if (self->subimgs != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter, self->subimgs)
-			lisys_free (iter.value);
-		lialg_strdic_free (self->subimgs);
-	}
-	if (self->fallback.texture != NULL)
-		liimg_texture_free (self->fallback.texture);
-	lisys_free (self);
+	if (self->texture == NULL)
+		return;
+	if (self->scale)
+		private_paint_scaled (self, rect);
+	else
+		private_paint_tiled (self, rect);
 }
 
 /*****************************************************************************/
 
-static LIFntFont*
-private_load_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   const char*  file,
-                   int          size)
+static void
+private_paint_scaled (LIWdgStyle* self,
+                      LIWdgRect*  rect)
 {
-	char* path;
-	LIFntFont* font;
+	int px;
+	int py;
+	int pw;
+	int ph;
+	float center;
+	float size;
+	float xs;
+	float ys;
+	float tx[2];
+	float ty[2];
 
-	/* Check for duplicates. */
-	if (lialg_strdic_find (self->fonts, name))
+	/* Calculate texture coordinates. */
+	tx[0] = (float)(self->x) / self->texture->width;
+	tx[1] = (float)(self->x + self->w[1]) / self->texture->width;
+	ty[0] = (float)(self->y) / self->texture->height;
+	ty[1] = (float)(self->y + self->h[1]) / self->texture->height;
+
+	/* Calculate pixels per texture unit. */
+	xs = tx[1] - tx[0];
+	ys = ty[1] - ty[0];
+	if (xs < LIMAT_EPSILON || ys < LIMAT_EPSILON)
+		return;
+	xs = rect->width / xs;
+	ys = rect->height / ys;
+
+	/* Scale and translate to fill widget area. */
+	if (ty[1] - ty[0] >= rect->height / xs)
 	{
-		lisys_error_set (EINVAL, "duplicate font `%s'", name);
-		return NULL;
-	}
-
-	/* Load font. */
-	path = lisys_path_concat (root, "fonts", file, NULL);
-	if (path == NULL)
-		return NULL;
-	font = lifnt_font_new (&self->manager->video, path, size);
-	lisys_free (path);
-
-	/* Add to list. */
-	if (!lialg_strdic_insert (self->fonts, name, font))
-	{
-		lifnt_font_free (font);
-		return 0;
-	}
-
-	return font;
-}
-
-static int
-private_load_texture (LIWdgStyles*   self,
-                      LIImgTexture** texture,
-                      const char*    root,
-                      const char*    name)
-{
-	char* path;
-
-	path = lisys_path_concat (root, "graphics", name, NULL);
-	if (path == NULL)
-		return 0;
-	*texture = liimg_texture_new_from_file (path);
-	lisys_free (path);
-	if (*texture == NULL)
-		return 0;
-
-	return 1;
-}
-
-static int
-private_read (LIWdgStyles* self,
-              const char*  root,
-              const char*  path)
-{
-	char* name;
-	char* type;
-	LIArcReader* reader;
-
-	/* Open the file. */
-	reader = liarc_reader_new_from_file (path);
-	if (reader == NULL)
-	{
-		if (lisys_error_get (NULL) != EIO)
-			return 0;
-		return 1;
-	}
-
-	/* Read blocks. */
-	for (liarc_reader_skip_chars (reader, " \t\n") ;
-	    !liarc_reader_check_end (reader) ;
-	     liarc_reader_skip_chars (reader, " \t\n"))
-	{
-		/* Read block type. */
-		if (!liarc_reader_get_text (reader, " ", &type))
-			goto error;
-
-		/* Read block name. */
-		liarc_reader_skip_chars (reader, " \t");
-		if (!liarc_reader_get_text (reader, " \t", &name))
-		{
-			lisys_free (type);
-			goto error;
-		}
-
-		/* Read opening brace. */
-		liarc_reader_skip_chars (reader, " \t");
-		if (!liarc_reader_check_text (reader, "{", " \t\n"))
-		{
-			lisys_error_set (EINVAL, "expected '{' after `%s %s'", type, name);
-			lisys_free (type);
-			lisys_free (name);
-			goto error;
-		}
-
-		/* Read type specific data. */
-		if (!strcmp (type, "widget"))
-		{
-			lisys_free (type);
-			if (!private_read_widget (self, root, name, reader))
-			{
-				lisys_free (name);
-				goto error;
-			}
-			lisys_free (name);
-		}
-		else if (!strcmp (type, "font"))
-		{
-			lisys_free (type);
-			if (!private_read_font (self, root, name, reader))
-			{
-				lisys_free (name);
-				goto error;
-			}
-		}
-		else
-		{
-			lisys_error_set (EINVAL, "unknown block type `%s'", type);
-			lisys_free (type);
-			goto error;
-		}
-	}
-	liarc_reader_free (reader);
-
-	return 1;
-
-error:
-	liarc_reader_free (reader);
-	return 0;
-}
-
-static int
-private_read_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   LIArcReader* reader)
-{
-	char* line;
-	char* value;
-	PrivateFont font = { 12, NULL };
-
-	while (1)
-	{
-		/* Read line. */
-		liarc_reader_skip_chars (reader, " \t\n");
-		if (!liarc_reader_get_text (reader, ";\n", &line))
-		{
-			line = NULL;
-			goto error;
-		}
-		if (!strcmp (line, "}"))
-			break;
-
-		/* Get key and value. */
-		value = strchr (line, ':');
-		if (value == NULL)
-		{
-			lisys_error_set (EINVAL, "syntax error in font `%s'", name);
-			goto error;
-		}
-		*value = '\0';
-		value++;
-		while (isspace (*value))
-			value++;
-
-		/* Process key and value. */
-		if (!private_read_font_attr (self, root, name, &font, line, value))
-			goto error;
-	}
-
-	/* Load font. */
-	if (!private_load_font (self, root, name, font.file? font.file : "default.ttf", font.size))
-	{
-		lisys_free (font.file);
-		return 0;
-	}
-	lisys_free (font.file);
-
-	return 1;
-
-error:
-	lisys_free (line);
-	return 0;
-}
-
-static int
-private_read_font_attr (LIWdgStyles* self,
-                        const char*  root,
-                        const char*  name,
-                        PrivateFont* font,
-                        const char*  key,
-                        const char*  value)
-{
-	if (!strcmp (key, "file"))
-	{
-		lisys_free (font->file);
-		font->file = listr_dup (value);
-	}
-	else if (!strcmp (key, "size"))
-	{
-		sscanf (value, "%d", &font->size);
-	}
-
-	return 1;
-}
-
-static int
-private_read_widget (LIWdgStyles* self,
-                     const char*  root,
-                     const char*  name,
-                     LIArcReader* reader)
-{
-	char* line;
-	char* value;
-	LIWdgStyle* widget;
-
-	/* Allocate info. */
-	widget = lisys_calloc (1, sizeof (LIWdgStyle));
-	if (widget == NULL)
-		return 0;
-	*widget = self->fallback;
-
-	/* Read attributes. */
-	while (1)
-	{
-		/* Read line. */
-		liarc_reader_skip_chars (reader, " \t\n");
-		if (!liarc_reader_get_text (reader, ";\n", &line))
-		{
-			line = NULL;
-			goto error;
-		}
-		if (!strcmp (line, "}"))
-			break;
-
-		/* Get key and value. */
-		value = strchr (line, ':');
-		if (value == NULL)
-		{
-			lisys_error_set (EINVAL, "syntax error in widget `%s'", name);
-			goto error;
-		}
-		*value = '\0';
-		value++;
-		while (isspace (*value))
-			value++;
-
-		/* Process key and value. */
-		if (!private_read_widget_attr (self, root, name, widget, line, value))
-			goto error;
-	}
-
-	/* Add to list. */
-	if (!lialg_strdic_insert (self->subimgs, name, widget))
-	{
-		lisys_free (widget);
-		return 0;
-	}
-
-	return 1;
-
-error:
-	lisys_free (widget);
-	lisys_free (line);
-	return 0;
-}
-
-static int
-private_read_widget_attr (LIWdgStyles* self,
-                          const char*  root,
-                          const char*  name,
-                          LIWdgStyle*  widget,
-                          const char*  key,
-                          const char*  value)
-{
-	LIImgTexture* image;
-
-	if (!strcmp (key, "file"))
-	{
-		image = lialg_strdic_find (self->images, value);
-		if (image == NULL)
-		{
-			if (!private_load_texture (self, &image, root, value))
-				lisys_error_report ();
-			else if (!lialg_strdic_insert (self->images, value, image))
-			{
-				liimg_texture_free (image);
-				return 0;
-			}
-		}
-		if (image != NULL)
-			widget->texture = image;
-	}
-	else if (!strcmp (key, "source"))
-	{
-		sscanf (value, "%d %d", &widget->x, &widget->y);
-	}
-	else if (!strcmp (key, "width"))
-	{
-		sscanf (value, "%d %d %d", widget->w + 0, widget->w + 1, widget->w + 2);
-	}
-	else if (!strcmp (key, "height"))
-	{
-		sscanf (value, "%d %d %d", widget->h + 0, widget->h + 1, widget->h + 2);
-	}
-	else if (!strcmp (key, "padding"))
-	{
-		sscanf (value, "%d %d %d %d", widget->pad + 0, widget->pad + 1, widget->pad + 2, widget->pad + 3);
-	}
-	else if (!strcmp (key, "hover-color"))
-	{
-		sscanf (value, "%f %f %f %f", widget->hover + 0, widget->hover + 1, widget->hover + 2, widget->hover + 3);
-	}
-	else if (!strcmp (key, "selection-color"))
-	{
-		sscanf (value, "%f %f %f %f", widget->selection + 0, widget->selection + 1, widget->selection + 2, widget->selection + 3);
-	}
-	else if (!strcmp (key, "text-color"))
-	{
-		sscanf (value, "%f %f %f %f", widget->color + 0, widget->color + 1, widget->color + 2, widget->color + 3);
-	}
-	else if (!strcmp (key, "font"))
-	{
-		sscanf (value, "%32s", widget->font);
-	}
-	else if (!strcmp (key, "fill-mode"))
-	{
-		if (!strcmp (value, "resize"))
-			widget->scale = 1;
-		else
-			widget->scale = 0;
+		center = 0.5f * (ty[0] + ty[1]);
+		size = ty[1] - ty[0];
+		ty[0] = center - 0.5f * rect->height / xs;
+		ty[1] = center + 0.5f * rect->height / xs;
 	}
 	else
 	{
-		lisys_error_set (EINVAL, "unknown attribute `%s' in widget `%s'", key, name);
-		return 0;
+		center = 0.5f * (tx[0] + tx[1]);
+		size = tx[1] - tx[0];
+		tx[0] = center - 0.5f * rect->width / ys;
+		tx[1] = center + 0.5f * rect->width / ys;
 	}
 
-	return 1;
+	/* Bind texture. */
+	glBindTexture (GL_TEXTURE_2D, self->texture->texture);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glColor3f (1.0f, 1.0f, 1.0f);
+
+	/* Paint fill. */
+	px = rect->x;
+	py = rect->y;
+	pw = rect->width;
+	ph = rect->height;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[0], ty[0]); glVertex2f (px     , py);
+	glTexCoord2f (tx[1], ty[0]); glVertex2f (px + pw, py);
+	glTexCoord2f (tx[0], ty[1]); glVertex2f (px     , py + ph);
+	glTexCoord2f (tx[1], ty[1]); glVertex2f (px + pw, py + ph);
+	glEnd ();
 }
 
-/** @} */
-/** @} */
+static void
+private_paint_tiled (LIWdgStyle* self,
+                     LIWdgRect*  rect)
+{
+	int px;
+	int py;
+	float fw;
+	float fh;
+	float fu;
+	float fv;
+	float w[3];
+	float h[3];
+	float tx[4];
+	float ty[4];
+
+	/* Calculate repeat counts. */
+	w[0] = self->w[0];
+	w[1] = LIMAT_MAX (1, self->w[1]);
+	w[2] = self->w[2];
+	h[0] = self->h[0];
+	h[1] = LIMAT_MAX (1, self->h[1]);
+	h[2] = self->h[2];
+
+	/* Calculate texture coordinates. */
+	tx[0] = (float)(self->x) / self->texture->width;
+	tx[1] = (float)(self->x + self->w[0]) / self->texture->width;
+	tx[2] = (float)(self->x + self->w[0] + self->w[1]) / self->texture->width;
+	tx[3] = (float)(self->x + self->w[0] + self->w[1] + self->w[2]) / self->texture->width;
+	ty[0] = (float)(self->y) / self->texture->height;
+	ty[1] = (float)(self->y + self->h[0]) / self->texture->height;
+	ty[2] = (float)(self->y + self->h[0] + self->h[1]) / self->texture->height;
+	ty[3] = (float)(self->y + self->h[0] + self->h[1] + self->h[2]) / self->texture->height;
+
+	/* Bind texture. */
+	glBindTexture (GL_TEXTURE_2D, self->texture->texture);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glColor3f (1.0f, 1.0f, 1.0f);
+
+	/* Paint corners. */
+	px = rect->x;
+	py = rect->y;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[0], ty[0]); glVertex2f (px       , py);
+	glTexCoord2f (tx[1], ty[0]); glVertex2f (px + w[0], py);
+	glTexCoord2f (tx[0], ty[1]); glVertex2f (px       , py + h[0]);
+	glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py + h[0]);
+	glEnd ();
+	px = rect->x + rect->width - w[2] - 1;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[2], ty[0]); glVertex2f (px       , py);
+	glTexCoord2f (tx[3], ty[0]); glVertex2f (px + w[2], py);
+	glTexCoord2f (tx[2], ty[1]); glVertex2f (px       , py + h[0]);
+	glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py + h[0]);
+	glEnd ();
+	py = rect->y + rect->height - h[2] - 1;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[2], ty[2]); glVertex2f (px       , py);
+	glTexCoord2f (tx[3], ty[2]); glVertex2f (px + w[2], py);
+	glTexCoord2f (tx[2], ty[3]); glVertex2f (px       , py + h[2]);
+	glTexCoord2f (tx[3], ty[3]); glVertex2f (px + w[2], py + h[2]);
+	glEnd ();
+	px = rect->x;
+	glBegin (GL_TRIANGLE_STRIP);
+	glTexCoord2f (tx[0], ty[2]); glVertex2f (px       , py);
+	glTexCoord2f (tx[1], ty[2]); glVertex2f (px + w[0], py);
+	glTexCoord2f (tx[0], ty[3]); glVertex2f (px       , py + h[2]);
+	glTexCoord2f (tx[1], ty[3]); glVertex2f (px + w[0], py + h[2]);
+	glEnd ();
+
+	/* Paint horizontal borders. */
+	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
+	{
+		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
+		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
+		py = rect->y;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[1], ty[0]); glVertex2f (px     , py);
+		glTexCoord2f (fu   , ty[0]); glVertex2f (px + fw, py);
+		glTexCoord2f (tx[1], ty[1]); glVertex2f (px     , py + h[0]);
+		glTexCoord2f (fu   , ty[1]); glVertex2f (px + fw, py + h[0]);
+		glEnd ();
+		py = rect->y + rect->height - h[2] - 1;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[1], ty[2]); glVertex2f (px     , py);
+		glTexCoord2f (fu   , ty[2]); glVertex2f (px + fw, py);
+		glTexCoord2f (tx[1], ty[3]); glVertex2f (px     , py + h[2]);
+		glTexCoord2f (fu   , ty[3]); glVertex2f (px + fw, py + h[2]);
+		glEnd ();
+	}
+
+	/* Paint vertical borders. */
+	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
+	{
+		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
+		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
+		px = rect->x;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[0], ty[1]); glVertex2f (px       , py);
+		glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py);
+		glTexCoord2f (tx[0], fv   ); glVertex2f (px       , py + fh);
+		glTexCoord2f (tx[1], fv   ); glVertex2f (px + w[0], py + fh);
+		glEnd ();
+		px = rect->x + rect->width - w[2] - 1;
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[2], ty[1]); glVertex2f (px       , py);
+		glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py);
+		glTexCoord2f (tx[2], fv   ); glVertex2f (px       , py + fh);
+		glTexCoord2f (tx[3], fv   ); glVertex2f (px + w[2], py + fh);
+		glEnd ();
+	}
+
+	/* Paint fill. */
+	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
+	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
+	{
+		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
+		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
+		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
+		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
+		glBegin (GL_TRIANGLE_STRIP);
+		glTexCoord2f (tx[1], ty[1]); glVertex2f (px     , py);
+		glTexCoord2f (fu   , ty[1]); glVertex2f (px + fw, py);
+		glTexCoord2f (tx[1], fv   ); glVertex2f (px     , py + fh);
+		glTexCoord2f (fu   , fv   ); glVertex2f (px + fw, py + fh);
+		glEnd ();
+	}
+}

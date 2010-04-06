@@ -35,7 +35,6 @@ typedef struct _LIWdgProgress LIWdgProgress;
 struct _LIWdgProgress
 {
 	LIWdgWidget base;
-	LIFntFont* font;
 	LIFntLayout* text;
 	char* string;
 	float value;
@@ -45,13 +44,6 @@ LIAPICALL (const LIWdgClass*, liwdg_widget_progress, ());
 
 LIAPICALL (LIWdgWidget*, liwdg_progress_new, (
 	LIWdgManager* manager));
-
-LIAPICALL (LIFntFont*, liwdg_progress_get_font, (
-	LIWdgProgress* self));
-
-LIAPICALL (void, liwdg_progress_set_font, (
-	LIWdgProgress* self,
-	LIFntFont*     font));
 
 LIAPICALL (int, liwdg_progress_set_text, (
 	LIWdgProgress* self,

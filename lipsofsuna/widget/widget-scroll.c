@@ -60,20 +60,6 @@ liwdg_scroll_new (LIWdgManager* manager)
 	return liwdg_widget_new (manager, liwdg_widget_scroll ());
 }
 
-LIFntFont*
-liwdg_scroll_get_font (LIWdgScroll* self)
-{
-	return self->font;
-}
-
-void
-liwdg_scroll_set_font (LIWdgScroll* self,
-                       LIFntFont* font)
-{
-	self->font = font;
-	private_rebuild (self);
-}
-
 void
 liwdg_scroll_set_range (LIWdgScroll* self,
                         float        min,
@@ -86,6 +72,12 @@ liwdg_scroll_set_range (LIWdgScroll* self,
 	private_rebuild (self);
 }
 
+/**
+ * \brief Gets the value of the scroll widget.
+ *
+ * \param self Scroll widget.
+ * \return Float.
+ */
 float
 liwdg_scroll_get_value (LIWdgScroll* self)
 {
@@ -98,6 +90,25 @@ liwdg_scroll_set_value (LIWdgScroll* self,
 {
 	self->value = value;
 	private_rebuild (self);
+}
+
+/**
+ * \brief Gets the reference value of the scroll widget.
+ *
+ * \param self Scroll widget.
+ * \return Float.
+ */
+float
+liwdg_scroll_get_reference (LIWdgScroll* self)
+{
+	return self->reference;
+}
+
+void
+liwdg_scroll_set_reference (LIWdgScroll* self,
+                            float      value)
+{
+	self->reference = value;
 }
 
 /****************************************************************************/
@@ -129,9 +140,16 @@ private_event (LIWdgScroll*  self,
 {
 	int w;
 	int h;
+	int bar;
+	int ref;
 	float v;
+	float r;
+	LIWdgManager* manager;
+	LIWdgRect alloc;
 	LIWdgRect rect;
-	LIWdgStyle* style;
+	LIWdgStyle* style0;
+	LIWdgStyle* style1;
+	LIWdgStyle* style2;
 
 	switch (event->type)
 	{
@@ -142,32 +160,56 @@ private_event (LIWdgScroll*  self,
 			lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
-			w = lifnt_layout_get_width (self->text);
-			h = lifnt_layout_get_height (self->text);
 			v = self->max - self->min;
 			if (v >= LIMAT_EPSILON)
+			{
+				r = (self->reference - self->min) / v;
 				v = (self->value - self->min) / v;
+				r = LIMAT_MAX (r, v);
+			}
 			else
+			{
+				r = 0.0f;
 				v = 0.0f;
-			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
-			/* Draw base. */
+			}
+			w = lifnt_layout_get_width (self->text);
+			h = lifnt_layout_get_height (self->text);
+			manager = LIWDG_WIDGET (self)->manager;
+			style0 = liwdg_widget_get_style (LIWDG_WIDGET (self));
+			style1 = liwdg_manager_find_style (manager, LIWDG_WIDGET (self)->style_name, "ref");
+			style2 = liwdg_manager_find_style (manager, LIWDG_WIDGET (self)->style_name, "max");
+			liwdg_widget_get_allocation (LIWDG_WIDGET (self), &alloc);
 			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
-			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
-			/* Draw bar. */
-			glBindTexture (GL_TEXTURE_2D, 0);
-			glColor4fv (style->selection);
-			glBegin (GL_QUADS);
-			glVertex2f (rect.x, rect.y);
-			glVertex2f (rect.x + v * rect.width, rect.y);
-			glVertex2f (rect.x + v * rect.width, rect.y + rect.height);
-			glVertex2f (rect.x, rect.y + rect.height);
-			glEnd ();
+			/* Draw base. */
+			bar = (int)(v * alloc.width);
+			ref = (int)(r * alloc.width);
+			glPushAttrib (GL_SCISSOR_BIT);
+			glEnable (GL_SCISSOR_TEST);
+			if (style2 != NULL && bar > 0)
+			{
+				glScissor (alloc.x, manager->height - alloc.y - alloc.height, bar, alloc.height);
+				liwdg_style_paint (style2, &alloc);
+			}
+			if (style1 != NULL && ref > bar)
+			{
+				glScissor (alloc.x + bar, manager->height - alloc.y - alloc.height, ref - bar, alloc.height);
+				liwdg_style_paint (style1, &alloc);
+			}
+			if (style0 != NULL && ref < alloc.width)
+			{
+				glScissor (alloc.x + ref, manager->height - alloc.y - alloc.height, alloc.width - ref, alloc.height);
+				liwdg_style_paint (style0, &alloc);
+			}
+			glPopAttrib ();
 			/* Draw label. */
-			glColor4fv (style->color);
+			glColor4fv (style0->color);
 			lifnt_layout_render (self->text,
 				rect.x + (rect.width - w) / 2,
 				rect.y + (rect.height - h) / 2);
 			return 1;
+		case LIWDG_EVENT_TYPE_STYLE:
+			private_rebuild (self);
+			break;
 	}
 
 	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
@@ -178,13 +220,15 @@ private_rebuild (LIWdgScroll* self)
 {
 	int h = 0;
 	char buf[256];
+	LIFntFont* font;
 
 	lifnt_layout_clear (self->text);
-	if (self->font != NULL)
+	font = liwdg_widget_get_font (LIWDG_WIDGET (self));
+	if (font != NULL)
 	{
-		h = lifnt_font_get_height (self->font);
+		h = lifnt_font_get_height (font);
 		snprintf (buf, 256, "%.2f", self->value);
-		lifnt_layout_append_string (self->text, self->font, buf);
+		lifnt_layout_append_string (self->text, font, buf);
 	}
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LIMAT_MAX (

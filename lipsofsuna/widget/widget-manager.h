@@ -101,7 +101,8 @@ LIAPICALL (LIFntFont*, liwdg_manager_find_font, (
 
 LIAPICALL (LIWdgStyle*, liwdg_manager_find_style, (
 	LIWdgManager* self,
-	const char*   name));
+	const char*   name,
+	const char*   state));
 
 LIAPICALL (LIWdgWidget*, liwdg_manager_find_widget_by_point, (
 	LIWdgManager* self,
