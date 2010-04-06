@@ -31,18 +31,6 @@
 
 #define LIEXT_PREVIEW(o) ((LIExtPreview*)(o))
 
-enum
-{
-	LIEXT_PREVIEW_COPY_VOXEL,
-	LIEXT_PREVIEW_PASTE_VOXEL,
-	LIEXT_PREVIEW_DAMAGE_VOXEL,
-	LIEXT_PREVIEW_ERASE_VOXEL,
-	LIEXT_PREVIEW_INSERT_VOXEL,
-	LIEXT_PREVIEW_REPLACE_VOXEL,
-	LIEXT_PREVIEW_ROTATE_VOXEL,
-	LIEXT_PREVIEW_MAX
-};
-
 struct _LIExtPreview
 {
 	LIWdgRender base;
@@ -61,7 +49,6 @@ struct _LIExtPreview
 	LIRenGroup* group;
 	LIRenRender* render;
 	LIRenScene* scene;
-	int mode;
 };
 
 const LIWdgClass*
