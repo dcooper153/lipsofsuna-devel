@@ -100,6 +100,19 @@ static void Widget_set_request (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Height of the widget.
+ * -- @name Widget.height
+ * -- @class table
+ */
+static void Widget_getter_height (LIScrArgs* args)
+{
+	LIWdgRect rect;
+
+	liwdg_widget_get_allocation (args->self, &rect);
+	liscr_args_seti_float (args, rect.height);
+}
+
+/* @luadoc
  * --- Style name of the widget.
  * -- @name Widget.style
  * -- @class table
@@ -140,6 +153,19 @@ static void Widget_setter_visible (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Width of the widget
+ * -- @name Widget.width
+ * -- @class table
+ */
+static void Widget_getter_width (LIScrArgs* args)
+{
+	LIWdgRect rect;
+
+	liwdg_widget_get_allocation (args->self, &rect);
+	liscr_args_seti_float (args, rect.width);
+}
+
+/* @luadoc
  * --- Left edge position.
  * -- @name Widget.x
  * -- @class table
@@ -175,8 +201,10 @@ licli_script_widget (LIScrClass* self,
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
 	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);
+	liscr_class_insert_mvar (self, "height", Widget_getter_height, NULL);
 	liscr_class_insert_mvar (self, "style", Widget_getter_style, Widget_setter_style);
 	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
+	liscr_class_insert_mvar (self, "width", Widget_getter_width, NULL);
 	liscr_class_insert_mvar (self, "x", Widget_getter_x, NULL);
 	liscr_class_insert_mvar (self, "y", Widget_getter_y, NULL);
 }

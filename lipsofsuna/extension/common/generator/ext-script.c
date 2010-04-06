@@ -32,6 +32,85 @@
  */
 
 /* @luadoc
+ * --- Creates a brush object.
+ * --
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>brush: Brush ID. (required)</li>
+ * --   <li>extra: User defined extra string.</li>
+ * --   <li>flags: Creation flags.</li>
+ * --   <li>model: Model string.</li>
+ * --   <li>position: Position vector relative to brush origin.</li>
+ * --   <li>prob: Creation probability.</li>
+ * --   <li>type: User defined type string.</li>
+ * --   <li>rotation: Rotation quaternion.</li></ul>
+ * function Generator.create_objects(clss, args)
+ */
+static void Generator_create_object (LIScrArgs* args)
+{
+	int id;
+	int flags = 0;
+	float prob = 1.0f;
+	const char* type = "";
+	const char* model = "";
+	const char* extra = "";
+	LIMatTransform transform = limat_transform_identity ();
+	LIExtModule* module;
+	LIGenBrush* brush;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_int (args, "brush", &id))
+	{
+		brush = ligen_generator_find_brush (module->generator, id);
+		if (brush == NULL)
+			return;
+		liscr_args_gets_int (args, "flags", &flags);
+		liscr_args_gets_float (args, "prob", &prob);
+		liscr_args_gets_string (args, "type", &type);
+		liscr_args_gets_string (args, "model", &model);
+		liscr_args_gets_string (args, "extra", &extra);
+		liscr_args_gets_vector (args, "position", &transform.position);
+		liscr_args_gets_quaternion (args, "rotation", &transform.rotation);
+		ligen_brush_insert_object (brush, flags, prob, type, model, extra, &transform);
+	}
+}
+
+/* @luadoc
+ * --- Deletes objects from a brush.
+ * --
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>brush: Brush ID.</li>
+ * --   <li>object: Object index.</li></ul>
+ * function Generator.delete_objects(clss, args)
+ */
+static void Generator_delete_objects (LIScrArgs* args)
+{
+	int i;
+	int id;
+	LIExtModule* module;
+	LIGenBrush* brush;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_int (args, "brush", &id))
+	{
+		brush = ligen_generator_find_brush (module->generator, id);
+		if (brush == NULL)
+			return;
+		if (liscr_args_gets_int (args, "object", &i))
+		{
+			if (i >= 0 && i < brush->objects.count)
+				ligen_brush_remove_object (brush, i);
+		}
+		else
+		{
+			for (i = brush->objects.count - 1 ; i >= 0 ; i--)
+				ligen_brush_remove_object (brush, i);
+		}
+	}
+}
+
+/* @luadoc
  * --- Disables a brush type.
  * --
  * -- You can use this function to temporarily disable certain brush types so
@@ -129,6 +208,65 @@ static void Generator_format (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Gets the objects of a brush.
+ * --
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>brush: Brush ID. (required)</li></ul>
+ * -- @return Table of brush objects.
+ * function Generator.get_objects(clss, args)
+ */
+static void Generator_get_objects (LIScrArgs* args)
+{
+	int i;
+	int id;
+	LIExtModule* module;
+	LIGenBrush* brush;
+	LIGenBrushobject* object;
+	LIScrData* data;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_int (args, "brush", &id))
+	{
+		brush = ligen_generator_find_brush (module->generator, id);
+		if (brush == NULL)
+			return;
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+		for (i = 0 ; i < brush->objects.count ; i++)
+		{
+			object = brush->objects.array[i];
+			lua_pushnumber (args->lua, i + 1);
+			lua_newtable (args->lua);
+			lua_pushnumber (args->lua, object->id);
+			lua_setfield (args->lua, -2, "id");
+			lua_pushnumber (args->lua, object->flags);
+			lua_setfield (args->lua, -2, "flags");
+			lua_pushnumber (args->lua, object->probability);
+			lua_setfield (args->lua, -2, "prob");
+			lua_pushstring (args->lua, object->type);
+			lua_setfield (args->lua, -2, "type");
+			lua_pushstring (args->lua, object->model);
+			lua_setfield (args->lua, -2, "model");
+			lua_pushstring (args->lua, object->extra);
+			lua_setfield (args->lua, -2, "extra");
+			data = liscr_vector_new (args->script, &object->transform.position);
+			if (data != NULL)
+			{
+				liscr_pushdata (args->lua, data);
+				lua_setfield (args->lua, -2, "position");
+			}
+			data = liscr_quaternion_new (args->script, &object->transform.rotation);
+			if (data != NULL)
+			{
+				liscr_pushdata (args->lua, data);
+				lua_setfield (args->lua, -2, "rotation");
+			}
+			lua_settable (args->lua, args->output_table);
+		}
+	}
+}
+
+/* @luadoc
  * --- Expands the map.
  * --
  * -- @param clss Generator class.
@@ -169,6 +307,7 @@ static void Generator_paste_voxels (LIScrArgs* args)
 {
 	int id;
 	int pos[3];
+	uint8_t dummy;
 	uint32_t size[3];
 	int x;
 	int y;
@@ -208,7 +347,8 @@ static void Generator_paste_voxels (LIScrArgs* args)
 			reader = packet->reader;
 
 		/* Read size. */
-		if (!liarc_reader_get_uint32 (reader, size + 0) ||
+		if (!liarc_reader_get_uint8 (reader, &dummy) ||
+		    !liarc_reader_get_uint32 (reader, size + 0) ||
 		    !liarc_reader_get_uint32 (reader, size + 1) ||
 		    !liarc_reader_get_uint32 (reader, size + 2))
 		{
@@ -256,6 +396,30 @@ static void Generator_save (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Saves a brush.
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>brush: Brush ID.</li></ul>
+ * function Generator.save(clss)
+ */
+static void Generator_save_brush (LIScrArgs* args)
+{
+	int id;
+	LIExtModule* module;
+
+	if (liscr_args_gets_int (args, "brush", &id))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+		ligen_generator_write_brush (module->generator, id);
+	}
+	else
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+		ligen_generator_write_brushes (module->generator);
+	}
+}
+
+/* @luadoc
  * --- List of brush names.
  * -- @name Generator.brushes
  * -- @class table
@@ -282,12 +446,16 @@ liext_script_generator (LIScrClass* self,
                         void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
+	liscr_class_insert_cfunc (self, "create_object", Generator_create_object);
+	liscr_class_insert_cfunc (self, "delete_objects", Generator_delete_objects);
 	liscr_class_insert_cfunc (self, "disable_brush", Generator_disable_brush);
 	liscr_class_insert_cfunc (self, "enable_brush", Generator_enable_brush);
 	liscr_class_insert_cfunc (self, "expand", Generator_expand);
 	liscr_class_insert_cfunc (self, "format", Generator_format);
+	liscr_class_insert_cfunc (self, "get_objects", Generator_get_objects);
 	liscr_class_insert_cfunc (self, "paste_voxels", Generator_paste_voxels);
 	liscr_class_insert_cfunc (self, "save", Generator_save);
+	liscr_class_insert_cfunc (self, "save_brush", Generator_save_brush);
 	liscr_class_insert_cvar (self, "brushes", Generator_getter_brushes, NULL);
 }
 

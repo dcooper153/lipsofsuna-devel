@@ -106,6 +106,10 @@ LIAPICALL (int, ligen_generator_step, (
 LIAPICALL (int, ligen_generator_write, (
 	LIGenGenerator* self));
 
+LIAPICALL (int, ligen_generator_write_brush, (
+	LIGenGenerator* self,
+	int             id));
+
 LIAPICALL (int, ligen_generator_write_brushes, (
 	LIGenGenerator* self));
 

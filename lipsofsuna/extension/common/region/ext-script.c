@@ -83,7 +83,7 @@ static void Region_find (LIScrArgs* args)
 				if (data1 != NULL)
 				{
 					liscr_pushdata (args->lua, data1);
-					lua_setfield (args->lua, -2, "point");
+					lua_setfield (args->lua, -2, "position");
 				}
 				data1 = liscr_vector_new (args->script, &region->size);
 				if (data1 != NULL)

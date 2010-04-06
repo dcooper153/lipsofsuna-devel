@@ -677,6 +677,28 @@ ligen_generator_write (LIGenGenerator* self)
 }
 
 /**
+ * \brief Saves a brushe to the generator database.
+ *
+ * \param self Generator.
+ * \param brush Brush ID.
+ * \return Nonzero on success.
+ */
+int
+ligen_generator_write_brush (LIGenGenerator* self,
+                             int             brush)
+{
+	LIGenBrush* brush_;
+
+	brush_ = lialg_u32dic_find (self->brushes, brush);
+	if (brush_ == NULL)
+		return 0;
+	if (!ligen_brush_write (brush_, self->sql))
+		return 0;
+
+	return 1;
+}
+
+/**
  * \brief Saves brushes to the generator database.
  *
  * \param self Generator.
