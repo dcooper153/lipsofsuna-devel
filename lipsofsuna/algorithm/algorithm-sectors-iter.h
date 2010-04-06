@@ -102,6 +102,7 @@ lialg_sectors_iter_next_range (LIAlgSectorsIter* self)
 		if (self->sector != NULL)
 			return 1;
 	}
+	self->sector = NULL;
 
 	return 0;
 }
