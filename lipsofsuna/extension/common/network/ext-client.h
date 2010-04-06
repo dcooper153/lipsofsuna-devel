@@ -51,7 +51,9 @@ liext_client_send (LIExtClient* self,
 
 void
 liext_client_swap (LIExtClient* self,
-                   LIExtClient* client);
+                   LIExtClient* client,
+                   LIEngObject* object0,
+                   LIEngObject* object1);
 
 int
 liext_client_set_object (LIExtClient* self,

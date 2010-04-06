@@ -105,16 +105,18 @@ liext_client_send (LIExtClient* self,
  *
  * \param self Client.
  * \param client Client.
+ * \param object0 Object.
+ * \param object1 Object.
  */
 void
 liext_client_swap (LIExtClient* self,
-                   LIExtClient* client)
+                   LIExtClient* client,
+                   LIEngObject* object0,
+                   LIEngObject* object1)
 {
-	LIEngObject* tmp;
-
-	tmp = self->object;
-	liext_client_set_object (self, client->object);
-	liext_client_set_object (client, tmp);
+	liext_client_set_object (self, object1);
+	if (client != NULL)
+		liext_client_set_object (client, object0);
 }
 
 /**

@@ -212,7 +212,8 @@ static void Network_shutdown (LIScrArgs* args)
  */
 static void Network_swap_clients (LIScrArgs* args)
 {
-	LIEngObject* object;
+	LIEngObject* object0;
+	LIEngObject* object1;
 	LIExtClient* client0;
 	LIExtClient* client1;
 	LIExtModule* module;
@@ -223,14 +224,14 @@ static void Network_swap_clients (LIScrArgs* args)
 	    liscr_args_gets_data (args, "other", LISCR_SCRIPT_OBJECT, &data1))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
-		object = LIENG_OBJECT (data0->data);
-		client0 = liext_module_find_client_by_object (module, object->id);
-		object = LIENG_OBJECT (data1->data);
-		client1 = liext_module_find_client_by_object (module, object->id);
+		object0 = LIENG_OBJECT (data0->data);
+		client0 = liext_module_find_client_by_object (module, object0->id);
+		object1 = LIENG_OBJECT (data1->data);
+		client1 = liext_module_find_client_by_object (module, object1->id);
 		if (client0 != NULL)
-			liext_client_swap (client0, client1);
+			liext_client_swap (client0, client1, object0, object1);
 		else if (client1 != NULL)
-			liext_client_swap (client1, client0);
+			liext_client_swap (client1, client0, object1, object0);
 	}
 }
 
