@@ -254,8 +254,7 @@ private_event (LIWdgMenu*  self,
 			}
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
-			if (!LIWDG_WIDGET (self)->transparent)
-				liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
 			if (self->font != NULL)
 			{
 				if (self->vertical)

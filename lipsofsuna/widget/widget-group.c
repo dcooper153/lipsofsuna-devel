@@ -24,7 +24,6 @@
 
 #include <lipsofsuna/math.h>
 #include "widget-group.h"
-#include "widget-window.h"
 
 #define LIWDG_GROUP_DEFAULT_SPACING 5
 
@@ -402,7 +401,7 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	/* Detach the old child. */
 	if (cell->child != NULL)
 	{
-		lisys_assert (cell->child->state == LIWDG_WIDGET_STATE_DETACHED);
+		lisys_assert (!cell->child->floating);
 		lisys_assert (cell->child->parent == LIWDG_WIDGET (self));
 		private_call_detach (self, x, y);
 	}
@@ -411,8 +410,8 @@ liwdg_group_set_child (LIWdgGroup*  self,
 	cell->child = child;
 	if (child != NULL)
 	{
+		lisys_assert (!child->floating);
 		lisys_assert (child->parent == NULL);
-		lisys_assert (child->state == LIWDG_WIDGET_STATE_DETACHED);
 		manager = LIWDG_WIDGET (self)->manager;
 		child->parent = LIWDG_WIDGET (self);
 		lical_callbacks_call (manager->callbacks, manager, "widget-attach", lical_marshal_DATA_PTR_PTR, child, self);

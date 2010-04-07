@@ -45,12 +45,14 @@ struct _LIWdgWidget
 	LIWdgSize hardrequest;
 	LIWdgSize userrequest;
 	LIWdgStyle* style;
-	LIWdgWidgetState state;
 	void* userdata;
 	char* state_name;
 	char* style_name;
+	unsigned int behind : 1;
+	unsigned int floating : 1;
 	unsigned int focusable : 1;
-	unsigned int transparent : 1;
+	unsigned int fullscreen : 1;
+	unsigned int temporary : 1;
 	unsigned int visible : 1;
 };
 
@@ -129,17 +131,21 @@ LIAPICALL (void, liwdg_widget_set_allocation, (
 	int          w,
 	int          h));
 
+LIAPICALL (int, liwdg_widget_get_behind, (
+	LIWdgWidget* self));
+
+LIAPICALL (void, liwdg_widget_set_behind, (
+	LIWdgWidget* self,
+	int          value));
+
 LIAPICALL (void, liwdg_widget_get_content, (
 	LIWdgWidget* self,
 	LIWdgRect*   allocation));
 
-LIAPICALL (LIFntFont*, liwdg_widget_get_font, (
-	const LIWdgWidget* self));
+LIAPICALL (int, liwdg_widget_get_floating, (
+	LIWdgWidget* self));
 
-LIAPICALL (int, liwdg_widget_get_grab, (
-	const LIWdgWidget* self));
-
-LIAPICALL (void, liwdg_widget_set_grab, (
+LIAPICALL (void, liwdg_widget_set_floating, (
 	LIWdgWidget* self,
 	int          value));
 
@@ -155,6 +161,23 @@ LIAPICALL (int, liwdg_widget_get_focused, (
 
 LIAPICALL (void, liwdg_widget_set_focused, (
 	LIWdgWidget* self));
+
+LIAPICALL (LIFntFont*, liwdg_widget_get_font, (
+	const LIWdgWidget* self));
+
+LIAPICALL (int, liwdg_widget_get_fullscreen, (
+	LIWdgWidget* self));
+
+LIAPICALL (void, liwdg_widget_set_fullscreen, (
+	LIWdgWidget* self,
+	int          value));
+
+LIAPICALL (int, liwdg_widget_get_grab, (
+	const LIWdgWidget* self));
+
+LIAPICALL (void, liwdg_widget_set_grab, (
+	LIWdgWidget* self,
+	int          value));
 
 LIAPICALL (void, liwdg_widget_get_request, (
 	LIWdgWidget* self,
@@ -183,6 +206,13 @@ LIAPICALL (LIWdgStyle*, liwdg_widget_get_style, (
 LIAPICALL (void, liwdg_widget_set_style, (
 	LIWdgWidget* self,
 	const char*  style));
+
+LIAPICALL (int, liwdg_widget_get_temporary, (
+	LIWdgWidget* self));
+
+LIAPICALL (void, liwdg_widget_set_temporary, (
+	LIWdgWidget* self,
+	int          value));
 
 LIAPICALL (void*, liwdg_widget_get_userdata, (
 	LIWdgWidget* self));

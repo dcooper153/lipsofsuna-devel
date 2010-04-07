@@ -26,14 +26,14 @@
 #define __WIDGET_BUSY_H__
 
 #include <lipsofsuna/system.h>
-#include "widget-window.h"
+#include "widget-group.h"
 
 #define LIWDG_BUSY(o) ((LIWdgBusy*)(o))
 
 typedef struct _LIWdgBusy LIWdgBusy;
 struct _LIWdgBusy
 {
-	LIWdgWindow base;
+	LIWdgGroup base;
 	LIWdgWidget* progress;
 	LIWdgWidget* button;
 	liwdgHandler update_func;

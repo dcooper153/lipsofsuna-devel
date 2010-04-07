@@ -20,14 +20,6 @@
 
 #define LIWDG_HANDLER(c) ((liwdgHandler)(c))
 
-enum
-{
-	LIWDG_WIDGET_STATE_DETACHED,
-	LIWDG_WIDGET_STATE_POPUP,
-	LIWDG_WIDGET_STATE_ROOT,
-	LIWDG_WIDGET_STATE_WINDOW
-};
-
 typedef int (*liwdgHandler)();
 typedef int LIWdgWidgetState;
 typedef struct _LIWdgClass LIWdgClass;

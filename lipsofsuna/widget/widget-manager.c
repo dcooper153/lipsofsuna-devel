@@ -59,12 +59,17 @@ private_find_window (LIWdgManager* self,
                      int           y,
                      int*          match);
 
-static int
-private_focus_root (LIWdgManager* self);
+static void
+private_focus_window (LIWdgManager* self,
+                      LIWdgWidget*  window);
 
 static int
-private_focus_window (LIWdgManager* self,
+private_cycle_window (LIWdgManager* self,
                       int           next);
+
+static void
+private_resize_window (LIWdgManager* self,
+                       LIWdgWidget*  window);
 
 static int
 private_load_config (LIWdgManager* self,
@@ -117,7 +122,6 @@ liwdg_manager_free (LIWdgManager* self)
 {
 	lisys_assert (self->dialogs.bottom == NULL);
 	lisys_assert (self->dialogs.top == NULL);
-	lisys_assert (self->widgets.root == NULL);
 
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
@@ -224,7 +228,7 @@ void
 liwdg_manager_cycle_window_focus (LIWdgManager* self,
                                   int           next)
 {
-	private_focus_window (self, next);
+	private_cycle_window (self, next);
 }
 
 LIFntFont*
@@ -338,8 +342,8 @@ liwdg_manager_event (LIWdgManager* self,
 	int x;
 	int y;
 	int match;
-	LIWdgEvent popup;
 	LIWdgRect rect;
+	LIWdgWidget* dialog;
 	LIWdgWidget* widget;
 
 	/* Maintain pointer position. */
@@ -367,25 +371,6 @@ liwdg_manager_event (LIWdgManager* self,
 		}
 		if (event->type == LIWDG_EVENT_TYPE_MOTION)
 			return 1;
-		liwdg_widget_event (widget, event);
-		return 1;
-	}
-
-	/* Handle popups. */
-	if (self->widgets.popups != NULL)
-	{
-		for (widget = self->widgets.popups ; widget->next != NULL ; widget = widget->next) {}
-		if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
-		{
-			liwdg_widget_get_allocation (widget, &rect);
-			if (event->button.x < rect.x || rect.x + rect.width <= event->button.x ||
-				event->button.y < rect.y || rect.y + rect.height <= event->button.y)
-			{
-				popup.type = LIWDG_EVENT_TYPE_CLOSE;
-				liwdg_widget_event (widget, &popup);
-				return 1;
-			}
-		}
 		liwdg_widget_event (widget, event);
 		return 1;
 	}
@@ -418,6 +403,23 @@ liwdg_manager_event (LIWdgManager* self,
 		return 1;
 	}
 
+	/* Hide temporary widgets that were missed. */
+	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
+	{
+		x = event->button.x;
+		y = event->button.y;
+		for (dialog = self->dialogs.top ; dialog != NULL ; dialog = dialog->next)
+		{
+			if (dialog->temporary)
+			{
+				liwdg_widget_get_allocation (dialog, &rect);
+				if (rect.x > x || x >= rect.x + rect.width ||
+				    rect.y > y || y >= rect.y + rect.height)
+					liwdg_widget_set_floating (dialog, 0);
+			}
+		}
+	}
+
 	/* Get target widget. */
 	switch (event->type)
 	{
@@ -443,27 +445,17 @@ liwdg_manager_event (LIWdgManager* self,
 		return 0;
 
 	/* Window events. */
-	if (match == LIWDG_MATCH_INSIDE)
-	{
-		if (!liwdg_widget_event (widget, event))
-			return 1;
-	}
+	if (!liwdg_widget_event (widget, event))
+		return 1;
 
-	/* Manager events. */
-	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS)
+	/* Window dragging. */
+	if (event->type == LIWDG_EVENT_TYPE_BUTTON_PRESS && !widget->fullscreen)
 	{
-		/* TODO: Shading windows. */
-
-		/* Moving windows. */
-		if (match == LIWDG_MATCH_TITLEBAR && event->button.button == 1)
-		{
-			self->drag.active = 1;
-			self->drag.startx = event->button.x - widget->allocation.x;
-			self->drag.starty = event->button.y - widget->allocation.y;
-			private_detach_window (self, widget);
-			private_attach_window (self, widget);
-			return 1;
-		}
+		self->drag.active = 1;
+		self->drag.startx = event->button.x - widget->allocation.x;
+		self->drag.starty = event->button.y - widget->allocation.y;
+		private_focus_window (self, widget);
+		return 1;
 	}
 
 	return 0;
@@ -524,59 +516,20 @@ liwdg_manager_event_sdl (LIWdgManager* self,
 }
 
 int
-liwdg_manager_insert_popup (LIWdgManager* self,
-                            LIWdgWidget*  widget)
-{
-	lisys_assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
-
-	widget->prev = NULL;
-	widget->next = self->widgets.popups;
-	if (self->widgets.popups != NULL)
-		self->widgets.popups->prev = widget;
-	self->widgets.popups = widget;
-	widget->state = LIWDG_WIDGET_STATE_POPUP;
-
-	return 1;
-}
-
-int
 liwdg_manager_insert_window (LIWdgManager* self,
                              LIWdgWidget*  widget)
 {
 	LIWdgSize size;
 
-	lisys_assert (widget->state == LIWDG_WIDGET_STATE_DETACHED);
-
-	widget->state = LIWDG_WIDGET_STATE_WINDOW;
+	liwdg_widget_detach (widget);
+	widget->floating = 1;
 	private_attach_window (self, widget);
 
 	liwdg_widget_get_request (widget, &size);
 	size.width = (self->width - size.width) / 2;
 	size.height = (self->height - size.height) / 2;
 	liwdg_widget_move (widget, size.width, size.height);
-
-	return 1;
-}
-
-int
-liwdg_manager_remove_popup (LIWdgManager* self,
-                            LIWdgWidget*  widget)
-{
-	lisys_assert (widget->prev != NULL || widget == self->widgets.popups);
-	lisys_assert (widget->state == LIWDG_WIDGET_STATE_POPUP);
-
-	/* Make sure that the update loop doesn't break. */
-	if (self->widgets.iter == widget)
-		self->widgets.iter = widget->next;
-
-	/* Remove from stack. */
-	if (widget->next != NULL)
-		widget->next->prev = widget->prev;
-	if (widget->prev != NULL)
-		widget->prev->next = widget->next;
-	else
-		self->widgets.popups = widget->next;
-	widget->state = LIWDG_WIDGET_STATE_DETACHED;
+	private_resize_window (self, widget);
 
 	return 1;
 }
@@ -585,7 +538,7 @@ int
 liwdg_manager_remove_window (LIWdgManager* self,
                              LIWdgWidget*  widget)
 {
-	lisys_assert (widget->state == LIWDG_WIDGET_STATE_WINDOW);
+	lisys_assert (widget->floating);
 	lisys_assert (widget->prev != NULL || widget == self->dialogs.top);
 	lisys_assert (widget->next != NULL || widget == self->dialogs.bottom);
 
@@ -595,7 +548,7 @@ liwdg_manager_remove_window (LIWdgManager* self,
 
 	/* Remove from stack. */
 	private_detach_window (self, widget);
-	widget->state = LIWDG_WIDGET_STATE_DETACHED;
+	widget->floating = 0;
 
 	return 1;
 }
@@ -624,17 +577,7 @@ liwdg_manager_render (LIWdgManager* self)
 	/* Render widgets. */
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT);
-	if (self->widgets.root != NULL)
-	{
-		if (liwdg_widget_get_visible (self->widgets.root))
-			liwdg_widget_draw (self->widgets.root);
-	}
 	for (widget = self->dialogs.bottom ; widget != NULL ; widget = widget->prev)
-	{
-		if (liwdg_widget_get_visible (widget))
-			liwdg_widget_draw (widget);
-	}
-	for (widget = self->widgets.popups ; widget != NULL ; widget = widget->next)
 	{
 		if (liwdg_widget_get_visible (widget))
 			liwdg_widget_draw (widget);
@@ -651,8 +594,6 @@ liwdg_manager_update (LIWdgManager* self,
 	int cy;
 	int buttons;
 	LIWdgEvent event;
-	LIWdgRect rect;
-	LIWdgSize size;
 	LIWdgWidget* widget;
 
 	if (self->widgets.grab != NULL)
@@ -675,24 +616,10 @@ liwdg_manager_update (LIWdgManager* self,
 			liwdg_widget_event (self->widgets.grab, &event);
 		}
 	}
-	if (self->widgets.root != NULL)
-		liwdg_widget_update (self->widgets.root, secs);
 	for (widget = self->dialogs.top ; widget != NULL ; widget = self->widgets.iter)
 	{
 		self->widgets.iter = widget->next;
-		liwdg_widget_get_allocation (widget, &rect);
-		liwdg_widget_get_request (widget, &size);
-		if (rect.width != size.width || rect.height != size.height)
-			liwdg_widget_set_allocation (widget, rect.x, rect.y, size.width, size.height);
-		liwdg_widget_update (widget, secs);
-	}
-	for (widget = self->widgets.popups ; widget != NULL ; widget = self->widgets.iter)
-	{
-		self->widgets.iter = widget->next;
-		liwdg_widget_get_allocation (widget, &rect);
-		liwdg_widget_get_request (widget, &size);
-		if (rect.width != size.width || rect.height != size.height)
-			liwdg_widget_set_allocation (widget, rect.x, rect.y, size.width, size.height);
+		private_resize_window (self, widget);
 		liwdg_widget_update (widget, secs);
 	}
 }
@@ -735,51 +662,6 @@ liwdg_manager_get_projection (LIWdgManager* self,
 }
 
 /**
- * \brief Gets the root widget.
- *
- * \param self Widget manager.
- * \return Widget owned by the widget manager or NULL.
- */
-LIWdgWidget*
-liwdg_manager_get_root (LIWdgManager* self)
-{
-	return self->widgets.root;
-}
-
-/**
- * \brief Sets the root widget.
- *
- * \param self Widget manager.
- * \param widget Widget or NULL.
- */
-void
-liwdg_manager_set_root (LIWdgManager* self,
-                        LIWdgWidget*  widget)
-{
-	if (self->widgets.root == widget)
-		return;
-
-	/* Replace old root. */
-	if (self->widgets.root != NULL)
-	{
-		lisys_assert (self->widgets.root->state == LIWDG_WIDGET_STATE_ROOT);
-		self->widgets.root->transparent = 0;
-		self->widgets.root->state = LIWDG_WIDGET_STATE_DETACHED;
-	}
-	self->widgets.root = widget;
-	if (self->widgets.root != NULL)
-	{
-		lisys_assert (self->widgets.root->state == LIWDG_WIDGET_STATE_DETACHED);
-		self->widgets.root->transparent = 1;
-		self->widgets.root->state = LIWDG_WIDGET_STATE_ROOT;
-	}
-
-	/* Set the allocation. */
-	if (self->widgets.root != NULL)
-		liwdg_widget_set_allocation (self->widgets.root, 0, 0, self->width, self->height);
-}
-
-/**
  * \brief Gets the screen size.
  *
  * \param self Widget manager.
@@ -809,11 +691,10 @@ liwdg_manager_set_size (LIWdgManager* self,
                         int           width,
                         int           height)
 {
+	/* Update projection matrix. */
 	self->width = width;
 	self->height = height;
 	self->projection = limat_matrix_ortho (0.0f, width, height, 0.0f, -100.0f, 100.0f);
-	if (self->widgets.root != NULL)
-		liwdg_widget_set_allocation (self->widgets.root, 0, 0, width, height);
 }
 
 /*****************************************************************************/
@@ -854,124 +735,35 @@ private_find_window (LIWdgManager* self,
 	LIWdgRect rect;
 	LIWdgWidget* widget;
 
-	if (self->dialogs.top != NULL)
+	for (widget = self->dialogs.top ; widget != NULL ; widget = widget->next)
 	{
-		for (widget = self->dialogs.top ; widget != NULL ; widget = widget->next)
-		{
-			if (!liwdg_widget_get_visible (widget))
-				continue;
+		lisys_assert (liwdg_widget_get_visible (widget));
+		liwdg_widget_get_allocation (widget, &rect);
 
-			/* Check if inside content frame. */
-			liwdg_widget_get_content (widget, &rect);
-			if (rect.x <= x && x < rect.x + rect.width &&
-				rect.y <= y && y < rect.y + rect.height)
-			{
-				*match = LIWDG_MATCH_INSIDE;
-				return widget;
-			}
-
-			/* Check if inside at all. */
-			liwdg_widget_get_allocation (widget, &rect);
-			if (x < rect.x || rect.x + rect.width <= x ||
-				y < rect.y || rect.y + rect.height <= y)
-				continue;
-
-			/* Check if inside titlebar. */
-			if (rect.x + BORDERW <= x && x < rect.x + rect.width - BORDERW &&
-				rect.y + BORDERH <= y && y < rect.y + BORDERH + TITLEBARH)
-			{
-				*match = LIWDG_MATCH_TITLEBAR;
-				return widget;
-			}
-
-			/* Check if on corners. */
-			if (x < rect.x + BORDERW && y < rect.y + BORDERH)
-			{
-				*match = LIWDG_MATCH_TOPLEFT;
-				return widget;
-			}
-			if (x >= rect.x + rect.width - BORDERW && y < rect.y + BORDERH)
-			{
-				*match = LIWDG_MATCH_TOPRIGHT;
-				return widget;
-			}
-			if (x < rect.x + BORDERW && y >= rect.y + rect.height - BORDERH)
-			{
-				*match = LIWDG_MATCH_BOTTOMLEFT;
-				return widget;
-			}
-			if (x >= rect.x + rect.width - BORDERW && y >= rect.y + rect.height - BORDERH)
-			{
-				*match = LIWDG_MATCH_BOTTOMRIGHT;
-				return widget;
-			}
-
-			/* Check if on borders. */
-			if (y < rect.y + BORDERH)
-			{
-				*match = LIWDG_MATCH_TOP;
-				return widget;
-			}
-			if (y >= rect.y + rect.height - BORDERH)
-			{
-				*match = LIWDG_MATCH_BOTTOM;
-				return widget;
-			}
-			if (x < rect.x + BORDERW)
-			{
-				*match = LIWDG_MATCH_LEFT;
-				return widget;
-			}
-			if (x >= rect.x + rect.width - BORDERW)
-			{
-				*match = LIWDG_MATCH_RIGHT;
-				return widget;
-			}
-		}
-	}
-	if (self->widgets.root != NULL)
-	{
-		if (liwdg_widget_get_visible (self->widgets.root))
+		if (rect.x <= x && x < rect.x + rect.width &&
+			rect.y <= y && y < rect.y + rect.height)
 		{
 			*match = LIWDG_MATCH_INSIDE;
-			return self->widgets.root;
+			return widget;
 		}
 	}
 
 	return NULL;
 }
 
-static int
-private_focus_root (LIWdgManager* self)
+static void
+private_focus_window (LIWdgManager* self,
+                      LIWdgWidget*  window)
 {
-	LIWdgWidget* tmp;
-	LIWdgWidget* widget;
-
-	widget = self->widgets.root;
-	if (widget == NULL)
-		return 0;
-	if (!liwdg_widget_get_visible (widget))
-		return 0;
-	if (liwdg_widget_typeis (widget, liwdg_widget_container ()))
+	if (!window->behind)
 	{
-		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, 1);
-		if (tmp != NULL)
-		{
-			liwdg_manager_set_focus (self, tmp);
-			return 1;
-		}
+		private_detach_window (self, window);
+		private_attach_window (self, window);
 	}
-	else if (liwdg_widget_get_focusable (widget))
-	{
-		liwdg_manager_set_focus (self, widget);
-		return 1;
-	}
-
-	return 0;
 }
 
 static int
-private_focus_window (LIWdgManager* self,
+private_cycle_window (LIWdgManager* self,
                       int           next)
 {
 	LIWdgWidget* tmp;
@@ -987,13 +779,13 @@ private_focus_window (LIWdgManager* self,
 	}
 
 	/* Find first window to try. */
-	if (widget != NULL && widget != self->widgets.root)
+	if (widget != NULL)
 	{
 		if (next)
 			start = widget->next;
 		else
 			start = widget->prev;
-		if (start == NULL && private_focus_root (self))
+		if (start == NULL)
 			return 1;
 	}
 	else
@@ -1019,16 +811,14 @@ private_focus_window (LIWdgManager* self,
 				tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
 				if (tmp != NULL)
 				{
-					private_detach_window (self, widget);
-					private_attach_window (self, widget);
+					private_focus_window (self, widget);
 					liwdg_manager_set_focus (self, tmp);
 					return 1;
 				}
 			}
 			else if (liwdg_widget_get_focusable (widget))
 			{
-				private_detach_window (self, widget);
-				private_attach_window (self, widget);
+				private_focus_window (self, widget);
 				liwdg_manager_set_focus (self, widget);
 				return 1;
 			}
@@ -1041,8 +831,6 @@ private_focus_window (LIWdgManager* self,
 			widget = widget->prev;
 		if (widget == NULL)
 		{
-			if (private_focus_root (self))
-				return 1;
 			if (next)
 				widget = self->dialogs.top;
 			else
@@ -1052,6 +840,30 @@ private_focus_window (LIWdgManager* self,
 		/* Give up if search wrapped. */
 		if (widget == start)
 			return 0;
+	}
+}
+
+static void
+private_resize_window (LIWdgManager* self,
+                       LIWdgWidget*  window)
+{
+	LIWdgRect rect;
+	LIWdgSize size;
+
+	if (window->fullscreen)
+	{
+		size.width = self->width;
+		size.height = self->height;
+		liwdg_widget_get_allocation (window, &rect);
+		if (rect.x != 0 || rect.y != 0 || rect.width != size.width || rect.height != size.height)
+			liwdg_widget_set_allocation (window, 0, 0, size.width, size.height);
+	}
+	else
+	{
+		liwdg_widget_get_request (window, &size);
+		liwdg_widget_get_allocation (window, &rect);
+		if (rect.width != size.width || rect.height != size.height)
+			liwdg_widget_set_allocation (window, rect.x, rect.y, size.width, size.height);
 	}
 }
 

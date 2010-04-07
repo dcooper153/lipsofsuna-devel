@@ -44,7 +44,7 @@ liwdg_widget_busy ()
 {
 	static const LIWdgClass clss =
 	{
-		liwdg_widget_window, "Busy", sizeof (LIWdgBusy),
+		liwdg_widget_group, "Busy", sizeof (LIWdgBusy),
 		(LIWdgWidgetInitFunc) private_init,
 		(LIWdgWidgetFreeFunc) private_free,
 		(LIWdgWidgetEventFunc) private_event,
@@ -120,7 +120,6 @@ private_init (LIWdgBusy*   self,
 	liwdg_button_set_text (LIWDG_BUTTON (self->button), "Cancel");
 	liwdg_widget_set_request (self->progress, 100, -1);
 	liwdg_widget_set_visible (self->button, 0);
-	liwdg_window_set_title (LIWDG_WINDOW (self), "Busy...");
 	liwdg_group_set_margins (LIWDG_GROUP (self), 5, 5, 5, 5);
 	liwdg_group_set_spacings (LIWDG_GROUP (self), 5, 5);
 	liwdg_group_set_child (LIWDG_GROUP (self), 0, 0, self->progress);
@@ -154,7 +153,7 @@ private_event (LIWdgBusy*  self,
 	}
 
 	/* Call base class. */
-	liwdg_widget_window ()->event (LIWDG_WIDGET (self), event);
+	liwdg_widget_group ()->event (LIWDG_WIDGET (self), event);
 }
 
 /** @} */

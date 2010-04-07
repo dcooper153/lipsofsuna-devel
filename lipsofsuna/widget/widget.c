@@ -25,7 +25,6 @@
 #include <lipsofsuna/system.h>
 #include "widget.h"
 #include "widget-group.h"
-#include "widget-window.h"
 
 static int
 private_new (LIWdgWidget*      self,
@@ -114,38 +113,18 @@ liwdg_widget_detach (LIWdgWidget* self)
 {
 	int changed = 0;
 
-	switch (self->state)
+	if (self->floating)
 	{
-		/* Remove from parent container. */
-		case LIWDG_WIDGET_STATE_DETACHED:
-			if (self->parent != NULL)
-			{
-				lisys_assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
-				liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
-				changed = 1;
-			}
-			break;
-
-		/* Remove from popup stack. */
-		case LIWDG_WIDGET_STATE_POPUP:
-			liwdg_manager_remove_popup (self->manager, self);
-			changed = 1;
-			break;
-
-		/* Remove from manager root. */
-		case LIWDG_WIDGET_STATE_ROOT:
-			lisys_assert (liwdg_manager_get_root (self->manager) == self);
-			liwdg_manager_set_root (self->manager, NULL);
-			changed = 1;
-			break;
-
-		/* Remove from window stack. */
-		case LIWDG_WIDGET_STATE_WINDOW:
-			liwdg_manager_remove_window (self->manager, self);
-			changed = 1;
-			break;
+		liwdg_manager_remove_window (self->manager, self);
+		self->floating = 0;
+		changed = 1;
 	}
-	self->state = LIWDG_WIDGET_STATE_DETACHED;
+	else if (self->parent != NULL)
+	{
+		lisys_assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
+		liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
+		changed = 1;
+	}
 
 	return changed;
 }
@@ -321,18 +300,47 @@ liwdg_widget_set_allocation (LIWdgWidget* self,
 	}
 }
 
-/**
- * \brief Gets the font provided by the style of the widget.
- *
- * \param self Widget.
- * \return Font or NULL.
- */
-LIFntFont*
-liwdg_widget_get_font (const LIWdgWidget* self)
+int
+liwdg_widget_get_behind (LIWdgWidget* self)
 {
-	if (self->style == NULL)
-		return NULL;
-	return liwdg_manager_find_font (self->manager, self->style->font);
+	return self->behind;
+}
+
+void
+liwdg_widget_set_behind (LIWdgWidget* self,
+                         int          value)
+{
+	self->behind = value;
+	if (self->floating)
+	{
+		if (value)
+		{
+			/* Move to bottom. */
+			if (self != self->manager->dialogs.bottom)
+			{
+				if (self->next != NULL)
+					self->next->prev = self->prev;
+				if (self->prev != NULL)
+					self->prev->next = self->next;
+				self->prev = self->manager->dialogs.bottom;
+				if (self->prev != NULL)
+					self->prev->next = self;
+				self->manager->dialogs.bottom = self;
+			}
+		}
+		else
+		{
+			/* Move out of bottom. */
+			if (self == self->manager->dialogs.bottom && self->prev != NULL)
+			{
+				self->prev->next = NULL;
+				self->manager->dialogs.bottom = self->prev;
+				self->next = self->manager->dialogs.bottom;
+				self->prev = self->manager->dialogs.bottom->prev;
+				self->manager->dialogs.bottom->prev = self;
+			}
+		}
+	}
 }
 
 /**
@@ -351,6 +359,32 @@ liwdg_widget_get_content (LIWdgWidget* self,
 	allocation->y = self->allocation.y + self->style->pad[0];
 	allocation->width = self->allocation.width - self->style->pad[1] - self->style->pad[2];
 	allocation->height = self->allocation.height - self->style->pad[0] - self->style->pad[3];
+}
+
+int
+liwdg_widget_get_floating (LIWdgWidget* self)
+{
+	return self->floating;
+}
+
+void
+liwdg_widget_set_floating (LIWdgWidget* self,
+                           int          value)
+{
+	liwdg_widget_detach (self);
+	if (value)
+	{
+		if (liwdg_manager_insert_window (self->manager, self))
+		{
+			self->floating = 1;
+			self->visible = 1;
+		}
+	}
+	else
+	{
+		self->floating = 0;
+		self->visible = 0;
+	}
 }
 
 int
@@ -389,6 +423,33 @@ liwdg_widget_set_focused (LIWdgWidget* self)
 	if (liwdg_manager_get_focus (self->manager) != self &&
 	    liwdg_widget_get_visible (self))
 		liwdg_manager_set_focus (self->manager, self);
+}
+
+/**
+ * \brief Gets the font provided by the style of the widget.
+ *
+ * \param self Widget.
+ * \return Font or NULL.
+ */
+LIFntFont*
+liwdg_widget_get_font (const LIWdgWidget* self)
+{
+	if (self->style == NULL)
+		return NULL;
+	return liwdg_manager_find_font (self->manager, self->style->font);
+}
+
+int
+liwdg_widget_get_fullscreen (LIWdgWidget* self)
+{
+	return self->fullscreen;
+}
+
+void
+liwdg_widget_set_fullscreen (LIWdgWidget* self,
+                            int           value)
+{
+	self->fullscreen = value;
 }
 
 int
@@ -568,6 +629,19 @@ liwdg_widget_set_style (LIWdgWidget* self,
 	private_rebuild_style (self);
 }
 
+int
+liwdg_widget_get_temporary (LIWdgWidget* self)
+{
+	return self->temporary;
+}
+
+void
+liwdg_widget_set_temporary (LIWdgWidget* self,
+                            int          value)
+{
+	self->temporary = value;
+}
+
 void*
 liwdg_widget_get_userdata (LIWdgWidget* self)
 {
@@ -594,8 +668,8 @@ liwdg_widget_set_visible (LIWdgWidget* self,
 	self->visible = (visible != 0);
 	if (self->parent != NULL)
 		liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
-	if (self->state == LIWDG_WIDGET_STATE_POPUP)
-		liwdg_manager_remove_popup (self->manager, self);
+	if (self->floating)
+		liwdg_manager_remove_window (self->manager, self);
 }
 
 /*****************************************************************************/
@@ -656,13 +730,6 @@ static int
 private_event (LIWdgWidget* self,
                LIWdgEvent*  event)
 {
-	if (event->type == LIWDG_EVENT_TYPE_CLOSE)
-	{
-		lisys_assert (self->state == LIWDG_WIDGET_STATE_POPUP);
-		liwdg_manager_remove_popup (self->manager, self);
-		return 1;
-	}
-
 	return 1;
 }
 

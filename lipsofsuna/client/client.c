@@ -434,8 +434,7 @@ private_init_script (LICliClient* self)
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
 	    !liscr_script_create_class (self->script, "Scene", licli_script_scene, self) ||
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
-	    !liscr_script_create_class (self->script, "Widget", licli_script_widget, self) ||
-	    !liscr_script_create_class (self->script, "Window", licli_script_window, self))
+	    !liscr_script_create_class (self->script, "Widget", licli_script_widget, self))
 		return 0;
 
 	return 1;

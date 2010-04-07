@@ -147,38 +147,6 @@ static void Client_setter_moving (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Root widget.
- * -- @name Client.root
- * -- @class table
- */
-static void Client_setter_root (LIScrArgs* args)
-{
-	LICliClient* client;
-	LIScrData* data;
-	LIWdgWidget* window;
-
-	/* Detach old root widget. */
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	window = liwdg_manager_get_root (client->widgets);
-	if (window != NULL)
-	{
-		liscr_data_unref (liwdg_widget_get_userdata (window), NULL);
-		liwdg_widget_set_visible (window, 0);
-	}
-	liwdg_manager_set_root (client->widgets, NULL);
-
-	/* Set new root window. */
-	if (liscr_args_geti_data (args, 0, LICLI_SCRIPT_WIDGET, &data))
-	{
-		window = data->data;
-		if (window->parent != NULL || window->state != LIWDG_WIDGET_STATE_DETACHED)
-			return;
-		liwdg_manager_set_root (client->widgets, data->data);
-		liscr_data_ref (data, NULL);
-	}
-}
-
-/* @luadoc
  * --- Main window title.
  * -- @name Client.title
  * -- @class table
@@ -208,7 +176,6 @@ licli_script_client (LIScrClass* self,
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
 	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
 	liscr_class_insert_cvar (self, "moving", Client_getter_moving, Client_setter_moving);
-	liscr_class_insert_cvar (self, "root", NULL, Client_setter_root);
 	liscr_class_insert_cvar (self, "title", NULL, Client_setter_title);
 }
 

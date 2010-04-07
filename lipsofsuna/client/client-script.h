@@ -36,7 +36,6 @@
 #define LICLI_SCRIPT_LIGHT "Light"
 #define LICLI_SCRIPT_SCENE "Scene"
 #define LICLI_SCRIPT_WIDGET "Widget"
-#define LICLI_SCRIPT_WINDOW "Window"
 
 LIAPICALL (void, licli_script_action, (
 	LIScrClass* self,
@@ -67,10 +66,6 @@ LIAPICALL (void, licli_script_scene, (
 	void*       data));
 
 LIAPICALL (void, licli_script_widget, (
-	LIScrClass* self,
-	void*       data));
-
-LIAPICALL (void, licli_script_window, (
 	LIScrClass* self,
 	void*       data));
 

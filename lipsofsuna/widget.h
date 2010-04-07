@@ -40,6 +40,5 @@
 #include "widget/widget-tree.h"
 #include "widget/widget-types.h"
 #include "widget/widget-view.h"
-#include "widget/widget-window.h"
 
 #endif

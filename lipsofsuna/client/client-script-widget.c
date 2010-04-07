@@ -52,8 +52,7 @@ static void Widget_popup (LIScrArgs* args)
 	LIWdgWidget* widget;
 
 	widget = args->self;
-	if (widget->state != LIWDG_WIDGET_STATE_DETACHED || widget->parent != NULL)
-		return;
+	liwdg_widget_detach (widget);
 
 	/* Calculate position. */
 	liwdg_manager_get_size (widget->manager, &screen.width, &screen.height);
@@ -76,7 +75,7 @@ static void Widget_popup (LIScrArgs* args)
 
 	/* Popup the widget. */
 	liwdg_widget_set_visible (widget, 1);
-	liwdg_manager_insert_popup (widget->manager, widget);
+	liwdg_manager_insert_window (widget->manager, widget);
 	liwdg_widget_set_allocation (widget, rect.x, rect.y, rect.width, rect.height);
 	liscr_data_ref (args->data, NULL);
 }
@@ -97,6 +96,57 @@ static void Widget_set_request (LIScrArgs* args)
 	liscr_args_gets_int (args, "width", &size.width);
 	liscr_args_gets_int (args, "height", &size.height);
 	liwdg_widget_set_request (args->self, size.width, size.height);
+}
+
+/* @luadoc
+ * --- Behind flag.
+ * -- @name Widget.behind
+ * -- @class table
+ */
+static void Widget_getter_behind (LIScrArgs* args)
+{
+	liscr_args_seti_bool (args, liwdg_widget_get_behind (args->self));
+}
+static void Widget_setter_behind (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_widget_set_behind (args->self, value);
+}
+
+/* @luadoc
+ * --- Floating flag.
+ * -- @name Widget.floating
+ * -- @class table
+ */
+static void Widget_getter_floating (LIScrArgs* args)
+{
+	liscr_args_seti_bool (args, liwdg_widget_get_floating (args->self));
+}
+static void Widget_setter_floating (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_widget_set_floating (args->self, value);
+}
+
+/* @luadoc
+ * --- Fullscreen flag.
+ * -- @name Widget.fullscreen
+ * -- @class table
+ */
+static void Widget_getter_fullscreen (LIScrArgs* args)
+{
+	liscr_args_seti_bool (args, liwdg_widget_get_fullscreen (args->self));
+}
+static void Widget_setter_fullscreen (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_widget_set_fullscreen (args->self, value);
 }
 
 /* @luadoc
@@ -132,6 +182,23 @@ static void Widget_setter_style (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- True if the widget should be hidden if a click misses it.
+ * -- @name Widget.visible
+ * -- @class table
+ */
+static void Widget_getter_temporary (LIScrArgs* args)
+{
+	liscr_args_seti_bool (args, liwdg_widget_get_temporary (args->self));
+}
+static void Widget_setter_temporary (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_widget_set_temporary (args->self, value);
+}
+
+/* @luadoc
  * --- Visibility flag.
  * -- @name Widget.visible
  * -- @class table
@@ -145,11 +212,7 @@ static void Widget_setter_visible (LIScrArgs* args)
 	int value;
 
 	if (liscr_args_geti_bool (args, 0, &value))
-	{
-		if (LIWDG_WIDGET (args->self)->state == LIWDG_WIDGET_STATE_POPUP)
-			liscr_data_unref (args->data, NULL);
 		liwdg_widget_set_visible (args->self, value);
-	}
 }
 
 /* @luadoc
@@ -201,8 +264,12 @@ licli_script_widget (LIScrClass* self,
 	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
 	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);
+	liscr_class_insert_mvar (self, "behind", Widget_getter_behind, Widget_setter_behind);
+	liscr_class_insert_mvar (self, "floating", Widget_getter_floating, Widget_setter_floating);
+	liscr_class_insert_mvar (self, "fullscreen", Widget_getter_fullscreen, Widget_setter_fullscreen);
 	liscr_class_insert_mvar (self, "height", Widget_getter_height, NULL);
 	liscr_class_insert_mvar (self, "style", Widget_getter_style, Widget_setter_style);
+	liscr_class_insert_mvar (self, "temporary", Widget_getter_temporary, Widget_setter_temporary);
 	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
 	liscr_class_insert_mvar (self, "width", Widget_getter_width, NULL);
 	liscr_class_insert_mvar (self, "x", Widget_getter_x, NULL);

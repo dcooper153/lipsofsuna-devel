@@ -61,9 +61,7 @@ struct _LIWdgManager
 	struct
 	{
 		LIWdgWidget* iter;
-		LIWdgWidget* root;
 		LIWdgWidget* grab;
-		LIWdgWidget* popups;
 	} widgets;
 };
 
@@ -114,15 +112,7 @@ LIAPICALL (LIWdgWidget*, liwdg_manager_find_window_by_point, (
 	int           x,
 	int           y));
 
-LIAPICALL (int, liwdg_manager_insert_popup, (
-	LIWdgManager* self,
-	LIWdgWidget*  widget));
-
 LIAPICALL (int, liwdg_manager_insert_window, (
-	LIWdgManager* self,
-	LIWdgWidget*  widget));
-
-LIAPICALL (int, liwdg_manager_remove_popup, (
 	LIWdgManager* self,
 	LIWdgWidget*  widget));
 
