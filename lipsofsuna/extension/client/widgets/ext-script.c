@@ -802,8 +802,14 @@ static void Tree_set_row (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Customizable callback for row selection events.
+ * -- @param self Tree widget.
+ * function Tree.pressed(self)
+ */
+
+/* @luadoc
  * --- Index of the selected item or nil for no selection.
- * -- @name Tree.size
+ * -- @name Tree.selection
  * -- @class table
  */
 static void Tree_getter_selection (LIScrArgs* args)
