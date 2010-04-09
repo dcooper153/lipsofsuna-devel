@@ -26,8 +26,6 @@
 #include "client-callbacks.h"
 #include "client-window.h"
 
-#define MOUSE_DELTA_REFRESH 0.05f
-
 /*****************************************************************************/
 /* Bindings. */
 
@@ -35,6 +33,9 @@ static int
 private_binding_event (LICliClient* client,
                        SDL_Event*   event)
 {
+	int cx;
+	int cy;
+
 	switch (event->type)
 	{
 		case SDL_JOYAXISMOTION:
@@ -69,16 +70,37 @@ private_binding_event (LICliClient* client,
 				client->video.SDL_GetModState (),
 				event->button.state == SDL_PRESSED);
 		case SDL_MOUSEMOTION:
-			libnd_manager_event (
-				client->bindings,
-				LIBND_TYPE_MOUSE_AXIS, 0,
-				client->video.SDL_GetModState (),
-				-1.0 + 2.0f * event->motion.x / (float) client->window->mode.width);
-			libnd_manager_event (
-				client->bindings,
-				LIBND_TYPE_MOUSE_AXIS, 1,
-				client->video.SDL_GetModState (),
-				-1.0 + 2.0f * event->motion.y / (float) client->window->mode.height);
+			if (client->moving)
+			{
+				cx = client->window->mode.width / 2;
+				cy = client->window->mode.height / 2;
+				if (event->motion.x != cx || event->motion.y != cy)
+				{
+					if (event->motion.x != cx)
+					{
+						libnd_manager_event (client->bindings, LIBND_TYPE_MOUSE_DELTA,
+							0, client->video.SDL_GetModState (), event->motion.x - cx);
+					}
+					if (event->motion.y != cy)
+					{
+						libnd_manager_event (client->bindings, LIBND_TYPE_MOUSE_DELTA,
+							1, client->video.SDL_GetModState (), event->motion.y - cy);
+					}
+				}
+			}
+			else
+			{
+				libnd_manager_event (
+					client->bindings,
+					LIBND_TYPE_MOUSE_AXIS, 0,
+					client->video.SDL_GetModState (),
+					-1.0 + 2.0f * event->motion.x / (float) client->window->mode.width);
+				libnd_manager_event (
+					client->bindings,
+					LIBND_TYPE_MOUSE_AXIS, 1,
+					client->video.SDL_GetModState (),
+					-1.0 + 2.0f * event->motion.y / (float) client->window->mode.height);
+			}
 			break;
 	}
 
@@ -93,36 +115,19 @@ private_binding_tick (LICliClient* client,
 	int y;
 	int cx;
 	int cy;
-	static float accum = 0.0f;
 
 	if (!client->moving)
-	{
-		accum = 0.0f;
 		return 1;
-	}
-	accum += secs;
-	if (accum < MOUSE_DELTA_REFRESH)
-		return 1;
-	while (accum > MOUSE_DELTA_REFRESH)
-		accum -= MOUSE_DELTA_REFRESH;
 
-	/* Pointer state. */
+	/* Pointer warping in movement mode. */
 	cx = client->window->mode.width / 2;
 	cy = client->window->mode.height / 2;
 	client->video.SDL_GetMouseState (&x, &y);
 	if (x != cx || y != cy)
+	{
+		client->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 		client->video.SDL_WarpMouse (cx, cy);
-
-	/* Cursor delta events. */
-	if (x != cx)
-	{
-		libnd_manager_event (client->bindings, LIBND_TYPE_MOUSE_DELTA,
-			0, client->video.SDL_GetModState (), x - cx);
-	}
-	if (y != cy)
-	{
-		libnd_manager_event (client->bindings, LIBND_TYPE_MOUSE_DELTA,
-			1, client->video.SDL_GetModState (), y - cy);
+		client->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
 	}
 
 	return 1;

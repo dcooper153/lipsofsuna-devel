@@ -602,7 +602,11 @@ liwdg_manager_update (LIWdgManager* self,
 		cy = self->height / 2;
 		buttons = self->video.SDL_GetMouseState (&x, &y);
 		if (x != cx || y != cy)
+		{
+			self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 			self->video.SDL_WarpMouse (cx, cy);
+			self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+		}
 
 		/* Cursor delta events. */
 		if (x != cx || y != cy)

@@ -37,9 +37,11 @@ struct _LIVidCalls
 	void (*SDL_Delay)(Uint32 ms);
 	int (*SDL_EnableKeyRepeat)(int delay, int interval);
 	int (*SDL_EnableUNICODE)(int enable);
+	Uint8 (*SDL_EventState)(Uint8 type, int state);
 	void (*SDL_FreeSurface)(SDL_Surface *surface);
 	SDLMod (*SDL_GetModState)(void);
 	Uint8 (*SDL_GetMouseState)(int *x, int *y);
+	Uint8 (*SDL_GetRelativeMouseState)(int *x, int *y);
 	Uint32 (*SDL_GetTicks)();
 	SDL_Surface* (*SDL_GetVideoSurface)();
 	int (*SDL_GL_SetAttribute)(SDL_GLattr attr, int value);

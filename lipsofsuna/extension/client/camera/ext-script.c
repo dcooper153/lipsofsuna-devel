@@ -94,6 +94,7 @@ static void Camera_tilt (LIScrArgs* args)
 
 	if (liscr_args_gets_float (args, "rate", &value))
 	{
+		value *= M_PI / 180.0f;
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 		liscr_args_gets_bool (args, "keep", &keep);
 		if (keep)
@@ -120,6 +121,7 @@ static void Camera_turn (LIScrArgs* args)
 
 	if (liscr_args_gets_float (args, "rate", &value))
 	{
+		value *= M_PI / 180.0f;
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
 		liscr_args_gets_bool (args, "keep", &keep);
 		if (keep)

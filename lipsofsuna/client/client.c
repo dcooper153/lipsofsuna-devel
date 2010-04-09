@@ -212,8 +212,10 @@ licli_client_set_moving (LICliClient* self,
 		cx = self->window->mode.width / 2;
 		cy = self->window->mode.height / 2;
 		self->video.SDL_ShowCursor (SDL_DISABLE);
+		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 		self->video.SDL_WarpMouse (cx, cy);
-		self->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
+		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+		self->video.SDL_WM_GrabInput (SDL_GRAB_ON);
 	}
 	else
 	{

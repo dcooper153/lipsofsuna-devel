@@ -34,9 +34,11 @@ livid_calls_init (LIVidCalls* self)
 	CALL (SDL_Delay);
 	CALL (SDL_EnableKeyRepeat);
 	CALL (SDL_EnableUNICODE);
+	CALL (SDL_EventState);
 	CALL (SDL_FreeSurface);
 	CALL (SDL_GetModState);
 	CALL (SDL_GetMouseState);
+	CALL (SDL_GetRelativeMouseState);
 	CALL (SDL_GetTicks);
 	CALL (SDL_GetVideoSurface);
 	CALL (SDL_GL_SetAttribute);
