@@ -264,12 +264,15 @@ private_cache_glyph (LIFntFont* self,
 	cached->bearing_y = bearing_y - self->font_descent + 1;
 
 	/* Upload to the tile. */
-	glBindTexture (GL_TEXTURE_2D, self->texture);
-	glTexSubImage2D (GL_TEXTURE_2D, 0,
-		self->table_glyph_width * cached->table_x,
-		self->table_glyph_height * cached->table_y,
-		image->w, image->h,
-		GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+	if (image->w > 0 && image->h > 0)
+	{
+		glBindTexture (GL_TEXTURE_2D, self->texture);
+		glTexSubImage2D (GL_TEXTURE_2D, 0,
+			self->table_glyph_width * cached->table_x,
+			self->table_glyph_height * cached->table_y,
+			image->w, image->h,
+			GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+	}
 	self->video.SDL_FreeSurface (image);
 
 	return cached;

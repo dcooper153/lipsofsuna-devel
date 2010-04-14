@@ -126,7 +126,10 @@ static void Scene_new (LIScrArgs* args)
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_SCENE);
 	self = liwdg_render_new (client->widgets, client->scene);
 	if (self == NULL)
+	{
+		lisys_error_report ();
 		return;
+	}
 	LIWDG_RENDER (self)->custom_update_func = private_update;
 	LIWDG_RENDER (self)->custom_update_data = client;
 	LIWDG_RENDER (self)->custom_render_func = private_render;
@@ -137,6 +140,7 @@ static void Scene_new (LIScrArgs* args)
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
+		lisys_error_report ();
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);

@@ -216,6 +216,8 @@ private_rebuild (LIRenDeferred* self,
                  int            height)
 {
 	int i;
+	GLenum fmt1;
+	GLenum fmt2;
 	GLuint deferred_fbo;
 	GLuint postproc_fbo[2];
 	GLuint depth_texture;
@@ -230,6 +232,18 @@ private_rebuild (LIRenDeferred* self,
 		GL_COLOR_ATTACHMENT2_EXT
 	};
 
+	/* Choose pixel formats. */
+	if (GLEW_ARB_texture_float)
+	{
+		fmt1 = 4;
+		fmt2 = GL_RGBA32F_ARB;
+	}
+	else
+	{
+		fmt1 = 4;
+		fmt2 = 4;
+	}
+
 	/* Create depth texture. */
 	glGenTextures (1, &depth_texture);
 	glBindTexture (GL_TEXTURE_2D, depth_texture);
@@ -243,7 +257,7 @@ private_rebuild (LIRenDeferred* self,
 	/* Create normal texture. */
 	glGenTextures (1, &normal_texture);
 	glBindTexture (GL_TEXTURE_2D, normal_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D (GL_TEXTURE_2D, 0, fmt1, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -252,7 +266,7 @@ private_rebuild (LIRenDeferred* self,
 	/* Create diffuse texture. */
 	glGenTextures (1, &diffuse_texture);
 	glBindTexture (GL_TEXTURE_2D, diffuse_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D (GL_TEXTURE_2D, 0, fmt1, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -261,7 +275,7 @@ private_rebuild (LIRenDeferred* self,
 	/* Create specular texture. */
 	glGenTextures (1, &specular_texture);
 	glBindTexture (GL_TEXTURE_2D, specular_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D (GL_TEXTURE_2D, 0, fmt1, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -272,7 +286,7 @@ private_rebuild (LIRenDeferred* self,
 	for (i = 0 ; i < 2 ; i++)
 	{
 		glBindTexture (GL_TEXTURE_2D, postproc_texture[i]);
-		glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D (GL_TEXTURE_2D, 0, fmt2, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);

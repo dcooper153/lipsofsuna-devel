@@ -54,7 +54,12 @@ livid_features_init ()
 	}
 	if (GLEW_ARB_shading_language_100)
 	{
-		if (GLEW_NV_vertex_program3 || GLEW_ATI_shader_texture_lod)
+		if (glewIsSupported ("GL_AMD_vertex_shader_tessellator"))
+			livid_features.shader_model = 5;
+		else if (glewIsSupported ("GL_ARB_geometry_shader4"))
+			livid_features.shader_model = 4;
+		else if (GLEW_NV_vertex_program3 || GLEW_ATI_shader_texture_lod ||
+		         glewIsSupported ("GL_ARB_shader_texture_lod"))
 			livid_features.shader_model = 3;
 		else if (GLEW_ARB_fragment_shader)
 			livid_features.shader_model = 2;
