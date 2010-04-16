@@ -158,6 +158,10 @@ lieng_object_free (LIEngObject* self)
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
 
+	/* Free model instance. */
+	if (self->flags & LIENG_OBJECT_FLAG_INSTANCE_MODEL)
+		lieng_model_free (self->model);
+
 	/* Free all memory. */
 	liphy_object_free (self->physics);
 	lisys_free (self);
@@ -358,6 +362,51 @@ lieng_object_jump (LIEngObject*       self,
                    const LIMatVector* impulse)
 {
 	liphy_object_jump (self->physics, impulse);
+}
+
+/**
+ * \brief Merges a model to the object.
+ *
+ * \param self Object.
+ * \param name Model name.
+ * \return Nonzero on success.
+ */
+int lieng_object_merge_model (
+	LIEngObject* self,
+	const char*  name)
+{
+	LIEngModel* model0;
+	LIEngModel* model1;
+
+	/* Just set if no existing model. */
+	if (self->model == NULL)
+		return lieng_object_set_model_name (self, name);
+
+	/* Find merged model. */
+	model1 = lieng_engine_find_model_by_name (self->engine, name);
+	if (model1 == NULL)
+		return 0;
+
+	/* Instance existing model. */
+	model0 = lieng_model_new_copy (self->model);
+	if (model0 == NULL)
+		return 0;
+
+	/* Merge requested model. */
+	if (!limdl_model_merge (model0->model, model1->model))
+	{
+		lieng_model_free (model0);
+		return 0;
+	}
+
+	/* Clear name so that we know this is an instance model. */
+	free (model0->name);
+	model0->name = NULL;
+
+	/* Use the new instance model. */
+	lieng_object_set_model (self, model0);
+
+	return 1;
 }
 
 /**
@@ -722,6 +771,11 @@ lieng_object_set_model (LIEngObject* self,
 	{
 		limdl_pose_set_model (self->pose, NULL);
 		liphy_object_clear_shape (self->physics);
+	}
+	if (self->flags & LIENG_OBJECT_FLAG_INSTANCE_MODEL)
+	{
+		lieng_model_free (self->model);
+		self->flags &= ~LIENG_OBJECT_FLAG_INSTANCE_MODEL;
 	}
 	self->model = model;
 

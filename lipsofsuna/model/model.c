@@ -130,6 +130,37 @@ limdl_model_new ()
 	return self;
 }
 
+LIMdlModel*
+limdl_model_new_copy (LIMdlModel* model)
+{
+	LIMdlModel* self;
+	LIArcReader* reader;
+	LIArcWriter* writer;
+
+	/* FIXME: This is lousy. */
+	writer = liarc_writer_new ();
+	if (writer == NULL)
+		return NULL;
+	if (!limdl_model_write (model, writer))
+	{
+		liarc_writer_free (writer);
+		return NULL;
+	}
+	reader = liarc_reader_new (
+		liarc_writer_get_buffer (writer),
+		liarc_writer_get_length (writer));
+	if (reader == NULL)
+	{
+		liarc_writer_free (writer);
+		return NULL;
+	}
+	self = limdl_model_new_from_data (reader);
+	liarc_reader_free (reader);
+	liarc_writer_free (writer);
+
+	return self;
+}
+
 /**
  * \brief Loads a model from uncompressed data.
  *
@@ -433,15 +464,94 @@ limdl_model_find_node (const LIMdlModel* self,
  * \param vertex Vertex.
  * \return Index in vertex array or -1 if not found.
  */
-int
-limdl_model_find_vertex (LIMdlModel*        self,
-                         const LIMdlVertex* vertex)
+int limdl_model_find_vertex (
+	LIMdlModel*        self,
+	const LIMdlVertex* vertex)
 {
 	int i;
 
 	for (i = 0 ; i < self->vertices.count ; i++)
 	{
 		if (limdl_vertex_compare (self->vertices.array + i, vertex) == 0)
+			return i;
+	}
+
+	return -1;
+}
+
+/**
+ * \brief Finds the index of a matching vertex.
+ *
+ * \param self Model.
+ * \param vertex Vertex.
+ * \param weights Weight group influences.
+ * \param mapping Maps group indices of the weights array.
+ * \return Index in vertex array or -1 if not found.
+ */
+int limdl_model_find_vertex_weighted (
+	LIMdlModel*         self,
+	const LIMdlVertex*  vertex,
+	const LIMdlWeights* weights,
+	const int*          mapping)
+{
+	int i;
+	int j;
+	int k;
+	LIMdlWeights* weights1;
+
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		/* Match vertex. */
+		if (limdl_vertex_compare (self->vertices.array + i, vertex) != 0)
+			continue;
+
+		/* Match weight counts. */
+		weights1 = self->weights.array + i;
+		if (weights1 == NULL && weights == NULL)
+			return 1;
+		if (weights1->count != weights->count)
+			continue;
+
+		/* Match weight influences. */
+		for (j = 0 ; j < weights1->count ; j++)
+		{
+			for (k = 0 ; k < weights->count ; k++)
+			{
+				if (weights1->weights[j].group == weights->weights[mapping[k]].group &&
+				    weights1->weights[j].weight == weights->weights[mapping[k]].weight)
+					break;
+			}
+			if (k == weights->count)
+				break;
+		}
+		if (j == weights->count)
+			return i;
+	}
+
+	return -1;
+}
+
+/**
+ * \brief Finds a matching weight group.
+ *
+ * \param self Model.
+ * \param name Group name.
+ * \param bone Bone name.
+ * \return Index in weight group array or -1 if not found.
+ */
+int limdl_model_find_weightgroup (
+	LIMdlModel* self,
+	const char* name,
+	const char* bone)
+{
+	int i;
+	LIMdlWeightGroup* group;
+
+	for (i = 0 ; i < self->weightgroups.count ; i++)
+	{
+		group = self->weightgroups.array + i;
+		if (!strcmp (group->name, name) &&
+		    !strcmp (group->bone, bone))
 			return i;
 	}
 
@@ -709,6 +819,242 @@ limdl_model_insert_vertex (LIMdlModel*         self,
 	self->weights.count++;
 
 	return 1;
+}
+
+/**
+ * \brief Inserts a vertex to the model.
+ *
+ * \param self Model.
+ * \param vertex Vertex.
+ * \param weights Vertex weights or NULL.
+ * \param mapping Maps group indices of the weights array. NULL if no mapping is needed.
+ * \return Nonzero on success.
+ */
+int limdl_model_insert_vertex_weighted (
+	LIMdlModel*         self,
+	const LIMdlVertex*  vertex,
+	const LIMdlWeights* weights,
+	const int*          mapping)
+{
+	int i;
+	int count;
+	void* tmp;
+	LIMdlWeights* w;
+
+	/* Resize buffers. */
+	if (self->vertices.capacity < self->vertices.count + 1)
+	{
+		if (self->vertices.capacity)
+			i = self->vertices.capacity << 1;
+		else
+			i = 32;
+		tmp = lisys_realloc (self->vertices.array, i * sizeof (LIMdlVertex));
+		if (tmp == NULL)
+			return 0;
+		self->vertices.array = tmp;
+		self->vertices.capacity = i;
+	}
+	if (self->weights.capacity < self->weights.count + 1)
+	{
+		if (self->weights.capacity)
+			i = self->weights.capacity << 1;
+		else
+			i = 32;
+		tmp = lisys_realloc (self->weights.array, i * sizeof (LIMdlWeights));
+		if (tmp == NULL)
+			return 0;
+		self->weights.array = tmp;
+		self->weights.capacity = i;
+	}
+	count = self->vertices.count;
+	lisys_assert (self->vertices.count == self->weights.count);
+
+	/* Append weights. */
+	if (weights != NULL && weights->count)
+	{
+		/* Clone weights. */
+		w = self->weights.array + count;
+		w->weights = lisys_malloc (weights->count * sizeof (LIMdlWeight));
+		if (w->weights == NULL)
+			return 0;
+		memcpy (w->weights, weights->weights, weights->count * sizeof (LIMdlWeight));
+		w->count = weights->count;
+
+		/* Remap weight group indices. */
+		if (mapping != NULL)
+		{
+			for (i = 0 ; i < w->count ; i++)
+				w->weights[i].group = mapping[w->weights[i].group];
+		}
+	}
+	else
+	{
+		w = self->weights.array + count;
+		memset (w, 0, sizeof (LIMdlWeights));
+	}
+
+	/* Append vertex. */
+	self->vertices.array[count] = *vertex;
+	self->vertices.count++;
+	self->weights.count++;
+
+	return 1;
+}
+
+/**
+ * \brief Inserts a weight group to the model.
+ *
+ * \param self Model.
+ * \param name Group name.
+ * \param bone Bone name.
+ * \return Nonzero on success.
+ */
+int limdl_model_insert_weightgroup (
+	LIMdlModel* self,
+	const char* name,
+	const char* bone)
+{
+	int count;
+	LIMdlWeightGroup* tmp;
+
+	/* Resize buffer. */
+	count = self->weightgroups.count + 1;
+	tmp = lisys_realloc (self->weightgroups.array, count * sizeof (LIMdlWeightGroup));
+	if (tmp == NULL)
+		return 0;
+	self->weightgroups.array = tmp;
+	tmp += self->weightgroups.count;
+
+	/* Copy weight group. */
+	tmp->name = listr_dup (name);
+	tmp->bone = listr_dup (bone);
+	if (tmp->name == NULL || tmp->bone == NULL)
+	{
+		lisys_free (tmp->name);
+		lisys_free (tmp->bone);
+		return 0;
+	}
+	self->weightgroups.count++;
+
+	/* Map node. */
+	tmp->node = limdl_model_find_node (self, tmp->bone);
+
+	return 1;
+}
+
+int
+limdl_model_merge (LIMdlModel* self,
+                   LIMdlModel* model)
+{
+	int i;
+	int j;
+	int count;
+	int group;
+	int material;
+	int vertex;
+	int* vertices = NULL;
+	int* wgroups = NULL;
+	uint32_t index;
+	uint32_t* indices;
+	LIMdlFaces* dstfaces;
+	LIMdlFaces* srcfaces;
+
+	/* Map weight groups. */
+	if (model->weightgroups.count)
+	{
+		wgroups = lisys_calloc (model->weightgroups.count, sizeof (int));
+		for (i = 0 ; i < model->weightgroups.count ; i++)
+		{
+			group = limdl_model_find_weightgroup (self,
+				model->weightgroups.array[i].name,
+				model->weightgroups.array[i].bone);
+			if (group == -1)
+			{
+				group = model->weightgroups.count;
+				if (!limdl_model_insert_weightgroup (self, 
+				    model->weightgroups.array[i].name,
+				    model->weightgroups.array[i].bone))
+					goto error;
+			}
+			wgroups[i] = group;
+		}
+	}
+
+	/* Map vertices. */
+	if (model->vertices.count)
+	{
+		vertices = lisys_calloc (model->vertices.count, sizeof (int));
+		for (i = 0 ; i < model->vertices.count ; i++)
+		{
+			/* FIXME: Too slow with the lousy search algorithm. */
+/*			vertex = limdl_model_find_vertex_weighted (self, model->vertices.array + i,
+				model->weights.array + i, wgroups);
+			if (vertex == -1)*/
+			{
+				vertex = self->vertices.count;
+				if (!limdl_model_insert_vertex_weighted (self, model->vertices.array + i,
+				    model->weights.array + i, wgroups))
+					goto error;
+			}
+			vertices[i] = vertex;
+		}
+	}
+
+	/* Merge each face group. */
+	for (i = 0 ; i < model->facegroups.count ; i++)
+	{
+		srcfaces = model->facegroups.array + i;
+
+		/* Find or create material. */
+		material = limdl_model_find_material (self, model->materials.array + srcfaces->material);
+		if (material == -1)
+		{
+			material = self->materials.count;
+			if (!limdl_model_insert_material (self, model->materials.array + srcfaces->material))
+				goto error;
+		}
+
+		/* Find or create face group. */
+		group = limdl_model_find_facegroup (self, material);
+		if (group == -1)
+		{
+			group = self->facegroups.count;
+			if (!limdl_model_insert_facegroup (self, material))
+				goto error;
+		}
+
+		/* Destination group for cloned faces. */
+		dstfaces = self->facegroups.array + group;
+
+		/* Allocate space for indices. */
+		count = dstfaces->indices.count + srcfaces->indices.count;
+		if (dstfaces->indices.capacity < count)
+		{
+			indices = lisys_realloc (dstfaces->indices.array, count * sizeof (uint32_t));
+			if (indices == NULL)
+				goto error;
+			dstfaces->indices.array = indices;
+			dstfaces->indices.capacity = count;
+		}
+
+		/* Insert indices. */
+		for (j = 0 ; j < srcfaces->indices.count ; j++)
+		{
+			index = vertices[srcfaces->indices.array[j]];
+			dstfaces->indices.array[dstfaces->indices.count] = index;
+			dstfaces->indices.count++;
+		}
+	}
+
+	lisys_free (wgroups);
+	lisys_free (vertices);
+
+	return 1;
+
+error:
+	lisys_free (wgroups);
+	lisys_free (vertices);
+	return 0;
 }
 
 int

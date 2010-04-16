@@ -49,11 +49,74 @@ lieng_model_new (LIEngEngine* engine,
 	if (self->path == NULL)
 		goto error;
 
+	/* Load data. */
+	if (!lieng_model_load (self))
+		goto error;
+
 	return self;
 
 error:
 	lieng_model_free (self);
 	return NULL;
+}
+
+LIEngModel*
+lieng_model_new_copy (LIEngModel* model)
+{
+	LIEngModel* self;
+	LIMdlModel* tmpmdl;
+	LIPhyShape* tmpphy;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIEngModel));
+	if (self == NULL)
+		return NULL;
+	self->engine = model->engine;
+
+	/* Allocate info. */
+	if (model->name != NULL)
+	{
+		self->name = listr_dup (model->name);
+		if (self->name == NULL)
+		{
+			lieng_model_free (self);
+			return NULL;
+		}
+	}
+	if (model->path != NULL)
+	{
+		self->path = listr_dup (model->path);
+		if (self->path == NULL)
+		{
+			lieng_model_free (self);
+			return NULL;
+		}
+	}
+
+	/* Load model geometry. */
+	tmpmdl = limdl_model_new_copy (model->model);
+	if (tmpmdl == NULL)
+	{
+		lieng_model_free (self);
+		return 0;
+	}
+
+	/* Create collision shape. */
+	tmpphy = liphy_shape_new (self->engine->physics, tmpmdl);
+	if (tmpphy == NULL)
+	{
+		limdl_model_free (tmpmdl);
+		lieng_model_free (self);
+		return 0;
+	}
+	liphy_shape_ref (tmpphy);
+
+	/* Set model and shape. */
+	self->bounds = tmpmdl->bounds;
+	self->model = tmpmdl;
+	self->physics = tmpphy;
+
+	return self;
 }
 
 void

@@ -26,12 +26,6 @@
 #include <lipsofsuna/system.h>
 #include "engine-resources.h"
 
-static LIEngModel*
-private_load_model (LIEngResources* self,
-                    const char*     name);
-
-/*****************************************************************************/
-
 /**
  * \brief Creates a new resource manager.
  *
@@ -98,7 +92,7 @@ lieng_resources_clear (LIEngResources* self)
 }
 
 /**
- * \brief Finds a model by name.
+ * \brief Finds or loads a model by name.
  *
  * \param self Resources.
  * \param name Name.
@@ -115,28 +109,10 @@ lieng_resources_find_model (LIEngResources* self,
 	if (model != NULL)
 		return model;
 
-	return private_load_model (self, name);
-}
-
-/*****************************************************************************/
-
-static LIEngModel*
-private_load_model (LIEngResources* self,
-                    const char*     name)
-{
-	LIEngModel* model;
-
 	/* Create engine model. */
 	model = lieng_model_new (self->engine, self->engine->config.dir, name);
 	if (model == NULL)
 		return NULL;
-
-	/* Load model data. */
-	if (!lieng_model_load (model))
-	{
-		lieng_model_free (model);
-		return NULL;
-	}
 
 	/* Add to dictionary. */
 	if (!lialg_strdic_insert (self->models, name, model))

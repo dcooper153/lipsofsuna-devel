@@ -100,6 +100,10 @@ LIAPICALL (void, lieng_object_jump, (
 	LIEngObject*       self,
 	const LIMatVector* impulse));
 
+LIAPICALL (int, lieng_object_merge_model, (
+	LIEngObject* self,
+	const char*  name));
+
 LIAPICALL (int, lieng_object_moved, (
 	LIEngObject* self));
 

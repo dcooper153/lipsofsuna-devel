@@ -64,9 +64,9 @@ liren_model_new (LIRenRender* render,
 		return NULL;
 	self->render = render;
 	self->model = model;
+	self->aabb = model->bounds;
 
 	/* Set name. */
-	self->aabb = model->bounds;
 	if (name != NULL)
 	{
 		self->name = strdup (name);

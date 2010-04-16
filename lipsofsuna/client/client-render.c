@@ -83,12 +83,17 @@ private_object_model (LICliClient* self,
 	{
 		if (model != NULL)
 		{
-			model_ = liren_render_find_model (self->render, model->name);
-			if (model_ == NULL)
+			if (model->name != NULL)
 			{
-				liren_render_load_model (self->render, model->name, model->model);
 				model_ = liren_render_find_model (self->render, model->name);
+				if (model_ == NULL)
+				{
+					liren_render_load_model (self->render, model->name, model->model);
+					model_ = liren_render_find_model (self->render, model->name);
+				}
 			}
+			else
+				model_ = liren_model_new (self->render, model->model, NULL);
 			if (model_ != NULL)
 			{
 				liren_object_set_pose (object_, object->pose);

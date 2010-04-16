@@ -187,8 +187,6 @@ lieng_engine_find_model_by_name (LIEngEngine* self,
 	model = lieng_resources_find_model (self->resources, name);
 	if (model == NULL)
 		return NULL;
-	if (!lieng_model_load (model))
-		lisys_error_report ();
 
 	return model;
 }

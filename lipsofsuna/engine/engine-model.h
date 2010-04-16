@@ -45,11 +45,18 @@ lieng_model_new (LIEngEngine* engine,
                  const char*  dir,
                  const char*  name);
 
+LIEngModel*
+lieng_model_new_copy (LIEngModel* model);
+
 void
 lieng_model_free (LIEngModel* self);
 
 int
 lieng_model_load (LIEngModel* self);
+
+int
+lieng_model_merge (LIEngModel* self,
+                   LIEngModel* model);
 
 void
 lieng_model_unload (LIEngModel* self);

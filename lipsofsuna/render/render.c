@@ -299,7 +299,10 @@ liren_render_load_model (LIRenRender* self,
 	LIAlgPtrdicIter iter2;
 
 	/* Create new model. */
-	model0 = lialg_strdic_find (self->models, name);
+	if (name != NULL)
+		model0 = lialg_strdic_find (self->models, name);
+	else
+		model0 = NULL;
 	model1 = liren_model_new (self, model, name);
 	if (model1 == NULL)
 		return 0;

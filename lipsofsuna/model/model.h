@@ -96,6 +96,9 @@ extern "C" {
 
 LIAPICALL (LIMdlModel*, limdl_model_new, ());
 
+LIAPICALL (LIMdlModel*, limdl_model_new_copy, (
+	LIMdlModel* model));
+
 LIAPICALL (LIMdlModel*, limdl_model_new_from_data, (
 	LIArcReader* reader));
 
@@ -128,6 +131,17 @@ LIAPICALL (int, limdl_model_find_vertex, (
 	LIMdlModel*        self,
 	const LIMdlVertex* vertex));
 
+LIAPICALL (int, limdl_model_find_vertex_weighted, (
+	LIMdlModel*         self,
+	const LIMdlVertex*  vertex,
+	const LIMdlWeights* weights,
+	const int*          mapping));
+
+LIAPICALL (int, limdl_model_find_weightgroup, (
+	LIMdlModel* self,
+	const char* name,
+	const char* bone));
+
 LIAPICALL (int, limdl_model_insert_face, (
 	LIMdlModel*         self,
 	int                 group,
@@ -156,6 +170,21 @@ LIAPICALL (int, limdl_model_insert_vertex, (
 	LIMdlModel*         self,
 	const LIMdlVertex*  vertex,
 	const LIMdlWeights* weights));
+
+LIAPICALL (int, limdl_model_insert_vertex_weighted, (
+	LIMdlModel*         self,
+	const LIMdlVertex*  vertex,
+	const LIMdlWeights* weights,
+	const int*          mapping));
+
+LIAPICALL (int, limdl_model_insert_weightgroup, (
+	LIMdlModel* self,
+	const char* name,
+	const char* bone));
+
+LIAPICALL (int, limdl_model_merge, (
+	LIMdlModel* self,
+	LIMdlModel* model));
 
 LIAPICALL (int, limdl_model_write, (
 	const LIMdlModel* self,

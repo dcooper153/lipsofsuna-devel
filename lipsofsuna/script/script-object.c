@@ -35,6 +35,21 @@
  */
 
 /* @luadoc
+ * --- Adds an additional model mesh to the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>model: Model name. (required)</li></ul>
+ * function Object.add_model(self, args)
+ */
+static void Object_add_model (LIScrArgs* args)
+{
+	const char* model;
+
+	if (liscr_args_gets_string (args, "model", &model))
+		lieng_object_merge_model (args->self, model);
+}
+
+/* @luadoc
  * --- Sets or clears an animation.
  * --
  * -- @param self Object.
@@ -269,7 +284,7 @@ static void Object_insert_hinge_constraint (LIScrArgs* args)
  * -- @param self Object.
  * -- @param args Arguments.<ul>
  * --   <li>impulse: Force of impulse. (required)</li></ul>
- * function Object.jump(self, impulse)
+ * function Object.jump(self, args)
  */
 static void Object_jump (LIScrArgs* args)
 {
@@ -782,6 +797,7 @@ liscr_script_object (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
+	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "approach", Object_approach);
 	liscr_class_insert_cfunc (self, "find", Object_find);
