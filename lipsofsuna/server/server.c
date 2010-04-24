@@ -84,8 +84,7 @@ liser_server_new (LIPthPaths* paths)
 	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self->program) ||
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
 	    !liscr_script_create_class (self->script, "Server", liser_script_server, self) ||
-	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
-	    !limai_program_execute_script (self->program, "server/main.lua"))
+	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
 	{
 		liser_server_free (self);
 		return NULL;
@@ -165,7 +164,7 @@ liser_server_check_unique_object (const LISerServer* self,
 }
 
 /**
- * \brief Runs the server in a loop until it exits.
+ * \brief Runs the server script.
  *
  * \param self Server.
  * \return Nonzero on success.
@@ -173,7 +172,7 @@ liser_server_check_unique_object (const LISerServer* self,
 int
 liser_server_main (LISerServer* self)
 {
-	return limai_program_main (self->program);
+	return limai_program_execute_script (self->program, "server/main.lua");
 }
 
 /**

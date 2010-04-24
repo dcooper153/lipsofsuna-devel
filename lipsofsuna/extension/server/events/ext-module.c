@@ -124,63 +124,19 @@ liext_module_event (LIExtModule* self,
                                  ...)
 {
 	va_list args;
-	LIScrData* event = NULL;
-	LIScrScript* script = self->program->script;
+	LIScrData* event;
 
-	/* Get event table. */
-	lua_pushlightuserdata (script->lua, self);
-	lua_gettable (script->lua, LUA_REGISTRYINDEX);
-	if (!lua_istable (script->lua, -1))
-	{
-		lua_pop (script->lua, 1);
-		lisys_assert (0);
-		return;
-	}
-
-	/* Get handler table. */
-	lua_pushnumber (script->lua, type);
-	lua_gettable (script->lua, -2);
-	lua_remove (script->lua, -2);
-	if (!lua_istable (script->lua, -1))
-	{
-		lua_pop (script->lua, 1);
-		lisys_assert (0);
-		return;
-	}
-
-	/* Loop through all handlers. */
-	lua_pushnil (script->lua);
-	while (lua_next (script->lua, -2) != 0)
-	{
-		/* Create event. */
-		if (event == NULL)
-		{
-			va_start (args, type);
-			event = liscr_event_newv (script, args);
-			va_end (args);
-			if (event == NULL)
-				break;
-			liscr_event_set_type (event, type);
-		}
-
-		/* Call handler. */
-		lua_pushvalue (script->lua, -1);
-		liscr_pushdata (script->lua, event);
-		if (lua_pcall (script->lua, 1, 0, 0) != 0)
-		{
-			lisys_error_set (EINVAL, "Event handler %d: %s", type, lua_tostring (script->lua, -1));
-			lisys_error_report ();
-			lua_pop (script->lua, 1);
-		}
-
-		/* Next handler. */
-		lua_pop (script->lua, 1);
-	}
-
-	lua_pop (script->lua, 1);
-	if (event != NULL)
-		liscr_data_unref (event, NULL);
+	/* Allocate event. */
+	va_start (args, type);
+	event = liscr_event_newv (self->program->script, args);
 	va_end (args);
+	if (event == NULL)
+		return;
+	liscr_event_set_type (event, type);
+
+	/* Push to event queue. */
+	limai_program_push_event (self->program, event);
+	liscr_data_unref (event, NULL);
 }
 
 /*****************************************************************************/

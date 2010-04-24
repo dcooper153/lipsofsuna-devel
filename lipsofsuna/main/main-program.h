@@ -33,14 +33,22 @@
 #include <lipsofsuna/script.h>
 #include "main-extension.h"
 
+#define LIMAI_PROGRAM_FPS_TICKS 32
+
 typedef struct _LIMaiProgram LIMaiProgram;
 struct _LIMaiProgram
 {
 	int sleep;
+	int ticki;
 	int quit;
 	float fps;
 	float tick;
+	float ticks[LIMAI_PROGRAM_FPS_TICKS];
 	struct timeval start;
+	struct timeval curr_tick;
+	struct timeval prev_tick;
+	LIAlgList* event_first;
+	LIAlgList* event_last;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;
 	LIAlgStrdic* extensions;
@@ -77,8 +85,12 @@ LIAPICALL (int, limai_program_insert_extension, (
 	LIMaiProgram* self,
 	const char*   name));
 
-LIAPICALL (int, limai_program_main, (
+LIAPICALL (LIScrData*, limai_program_pop_event, (
 	LIMaiProgram* self));
+
+LIAPICALL (int, limai_program_push_event, (
+	LIMaiProgram* self,
+	LIScrData*    event));
 
 LIAPICALL (void, limai_program_remove_component, (
 	LIMaiProgram* self,
@@ -88,8 +100,7 @@ LIAPICALL (void, limai_program_shutdown, (
 	LIMaiProgram* self));
 
 LIAPICALL (int, limai_program_update, (
-	LIMaiProgram* self,
-	float         secs));
+	LIMaiProgram* self));
 
 LIAPICALL (double, limai_program_get_time, (
 	const LIMaiProgram* self));

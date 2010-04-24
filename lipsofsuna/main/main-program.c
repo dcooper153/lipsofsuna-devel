@@ -24,8 +24,6 @@
 
 #include "main-program.h"
 
-#define FPS_TICKS 32
-
 static int
 private_init (LIMaiProgram* self);
 
@@ -76,6 +74,11 @@ limai_program_free (LIMaiProgram* self)
 	/* Free script. */
 	if (self->script != NULL)
 		liscr_script_free (self->script);
+
+	/* Free event queue. */
+	lialg_list_free (self->event_first);
+	self->event_first = NULL;
+	self->event_last = NULL;
 
 	/* Free extensions. */
 	if (self->extensions != NULL)
@@ -279,49 +282,50 @@ limai_program_insert_component (LIMaiProgram* self,
 }
 
 /**
- * \brief Runs the server in a loop until it exits.
+ * \brief Pops an event from the event queue.
+ *
+ * The returned event has one extra reference that is considered the
+ * property of the caller from now on.
+ *
+ * \param self Program.
+ * \return Event or nil.
+ */
+LIScrData* limai_program_pop_event (
+	LIMaiProgram* self)
+{
+	LIAlgList* ptr;
+	LIScrData* event;
+
+	/* Get oldest event. */
+	if (self->event_last == NULL)
+		return NULL;
+	event = self->event_last->data;
+
+	/* Remove from queue. */
+	ptr = self->event_last->prev;
+	lialg_list_remove (&self->event_first, self->event_last);
+	self->event_last = ptr;
+
+	return event;
+}
+
+/**
+ * \brief Pushes an event to the event queue.
+ *
+ * The event will be referenced once upon success.
  *
  * \param self Program.
  * \return Nonzero on success.
  */
-int
-limai_program_main (LIMaiProgram* self)
+int limai_program_push_event (
+	LIMaiProgram* self,
+	LIScrData*    event)
 {
-	int i;
-	int ticki = 0;
-	float secs;
-	float ticks[FPS_TICKS];
-	struct timeval curr_tick;
-	struct timeval prev_tick;
-
-	/* Main loop. */
-	gettimeofday (&prev_tick, NULL);
-	while (1)
-	{
-		/* Timing. */
-		gettimeofday (&curr_tick, NULL);
-		secs = curr_tick.tv_sec - prev_tick.tv_sec +
-		      (curr_tick.tv_usec - prev_tick.tv_usec) * 0.000001f;
-		prev_tick = curr_tick;
-
-		/* Frames per second. */
-		ticks[ticki++] = secs;
-		if (ticki == FPS_TICKS)
-			ticki = 0;
-		self->tick = 0.0f;
-		for (i = 0 ; i < FPS_TICKS ; i++)
-			self->tick += ticks[i];
-		self->fps = FPS_TICKS / self->tick;
-		self->tick = self->tick / FPS_TICKS;
-
-		/* Update. */
-		if (!limai_program_update (self, secs))
-			break;
-
-		/* Sleep until end of frame. */
-		if (self->sleep > (int)(1000000 * secs))
-			lisys_usleep (self->sleep - (int)(1000000 * secs));
-	}
+	if (!lialg_list_prepend (&self->event_first, event))
+		return 0;
+	if (self->event_last == NULL)
+		self->event_last = self->event_first;
+	liscr_data_ref (event, NULL);
 
 	return 1;
 }
@@ -355,20 +359,42 @@ limai_program_shutdown (LIMaiProgram* self)
  * \brief Updates the program state.
  *
  * \param self Program.
- * \param secs Duration of the tick in seconds.
  * \return Nonzero if the program is still running.
  */
 int
-limai_program_update (LIMaiProgram* self,
-                      float         secs)
+limai_program_update (LIMaiProgram* self)
 {
+	int i;
+	float secs;
+
 	if (self->quit)
 		return 0;
 
+	/* Calculate time delta. */
+	gettimeofday (&self->curr_tick, NULL);
+	secs = self->curr_tick.tv_sec - self->prev_tick.tv_sec +
+	      (self->curr_tick.tv_usec - self->prev_tick.tv_usec) * 0.000001f;
+	self->prev_tick = self->curr_tick;
+
+	/* Frames per second. */
+	self->ticks[self->ticki++] = secs;
+	if (self->ticki == LIMAI_PROGRAM_FPS_TICKS)
+		self->ticki = 0;
+	self->tick = 0.0f;
+	for (i = 0 ; i < LIMAI_PROGRAM_FPS_TICKS ; i++)
+		self->tick += self->ticks[i];
+	self->fps = LIMAI_PROGRAM_FPS_TICKS / self->tick;
+	self->tick = self->tick / LIMAI_PROGRAM_FPS_TICKS;
+
+	/* Update subsystems. */
 	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
 	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
+
+	/* Sleep until end of frame. */
+	if (self->sleep > (int)(1000000 * secs))
+		lisys_usleep (self->sleep - (int)(1000000 * secs));
 
 	return !self->quit;
 }
@@ -434,6 +460,8 @@ private_init (LIMaiProgram* self)
 
 	/* Initialize timer. */
 	gettimeofday (&self->start, NULL);
+	self->prev_tick = self->start;
+	self->curr_tick = self->start;
 
 	return 1;
 }
