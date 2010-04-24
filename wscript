@@ -263,34 +263,14 @@ def build(ctx):
 		uselib = 'CORE')
 	ctx.new_task_gen(
 		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/client/*.c', excl=['lipsofsuna/client/client-main.c']),
-		target = 'cli_objs',
-		uselib = 'CORE LUA GRAPPLE SDL SDL_TTF GL GLEW')
-	ctx.new_task_gen(
-		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/engine/*.c'),
 		target = 'eng_objs',
 		uselib = 'CORE')
 	ctx.new_task_gen(
 		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/font/*.c'),
-		target = 'fnt_objs',
-		uselib = 'CORE SDL SDL_TTF')
-	ctx.new_task_gen(
-		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/generator/*.c', excl=['lipsofsuna/generator/generator-main.c']),
 		target = 'gen_objs',
 		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/image/*.c'),
-		target = 'img_objs',
-		uselib = 'CORE SDL GL PNG')
-	ctx.new_task_gen(
-		features = 'cxx',
-		source = ctx.path.ant_glob('lipsofsuna/image/*.cpp'),
-		target = 'imgcxx_objs',
-		uselib = 'CORE SDL GL SQUISH')
 	ctx.new_task_gen(
 		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/main/*.c', excl=['lipsofsuna/main/main.c']),
@@ -313,11 +293,6 @@ def build(ctx):
 		uselib = 'CORE GRAPPLE')
 	ctx.new_task_gen(
 		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/particle/*.c'),
-		target = 'par_objs',
-		uselib = 'CORE GL GLEW SDL')
-	ctx.new_task_gen(
-		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/paths/*.c'),
 		target = 'pth_objs',
 		uselib = 'CORE')
@@ -328,16 +303,6 @@ def build(ctx):
 		uselib = 'CORE BULLET')
 	ctx.new_task_gen(
 		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/reload/*.c', excl=['lipsofsuna/reload/reload-main.c']),
-		target = 'rel_objs',
-		uselib = 'CORE SDL PNG SQUISH')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/render/*.c'),
-		target = 'ren_objs',
-		uselib = 'CORE SDL GLEW GL')
-	ctx.new_task_gen(
-		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/script/*.c'),
 		target = 'scr_objs',
 		uselib = 'CORE LUA')
@@ -346,11 +311,6 @@ def build(ctx):
 		source = ctx.path.ant_glob('lipsofsuna/server/*.c', excl=['lipsofsuna/server/server-main.c']),
 		target = 'ser_objs',
 		uselib = 'CORE LUA GRAPPLE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/sound/*.c'),
-		target = 'snd_objs',
-		uselib = 'CORE AL VORBIS OGG FLAC')
 	ctx.new_task_gen(
 		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/string/*.c'),
@@ -368,24 +328,67 @@ def build(ctx):
 		uselib = 'CORE THREAD')
 	ctx.new_task_gen(
 		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/video/*.c'),
-		target = 'vid_objs',
-		uselib = 'CORE SDL GLEW GL')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/viewer/*.c', excl=['lipsofsuna/viewer/viewer-main.c']),
-		target = 'vie_objs',
-		uselib = 'CORE SDL GLEW GL')
-	ctx.new_task_gen(
-		features = 'cc',
 		source = ctx.path.ant_glob('lipsofsuna/voxel/*.c'),
 		target = 'vox_objs',
 		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/widget/*.c'),
-		target = 'wdg_objs',
-		uselib = 'CORE SDL GLEW GL')
+	if ctx.env.CLIENT:
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/client/*.c', excl=['lipsofsuna/client/client-main.c']),
+			target = 'cli_objs',
+			uselib = 'CORE LUA GRAPPLE SDL SDL_TTF GL GLEW')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/sound/*.c'),
+			target = 'snd_objs',
+			uselib = 'CORE AL VORBIS OGG FLAC')
+	if ctx.env.CLIENT or ctx.env.VIEWER:
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/font/*.c'),
+			target = 'fnt_objs',
+			uselib = 'CORE SDL SDL_TTF')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/image/*.c'),
+			target = 'img_objs',
+			uselib = 'CORE SDL GL PNG')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/particle/*.c'),
+			target = 'par_objs',
+			uselib = 'CORE GL GLEW SDL')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/video/*.c'),
+			target = 'vid_objs',
+			uselib = 'CORE SDL GLEW GL')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/viewer/*.c', excl=['lipsofsuna/viewer/viewer-main.c']),
+			target = 'vie_objs',
+			uselib = 'CORE SDL GLEW GL')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/widget/*.c'),
+			target = 'wdg_objs',
+			uselib = 'CORE SDL GLEW GL')
+	if ctx.env.CLIENT or ctx.env.VIEWER or ctx.env.IMPORT:
+		ctx.new_task_gen(
+			features = 'cxx',
+			source = ctx.path.ant_glob('lipsofsuna/image/*.cpp'),
+			target = 'imgcxx_objs',
+			uselib = 'CORE SDL GL SQUISH')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/reload/*.c', excl=['lipsofsuna/reload/reload-main.c']),
+			target = 'rel_objs',
+			uselib = 'CORE SDL PNG SQUISH')
+		ctx.new_task_gen(
+			features = 'cc',
+			source = ctx.path.ant_glob('lipsofsuna/render/*.c'),
+			target = 'ren_objs',
+			uselib = 'CORE SDL GLEW GL')
 	ctx.new_task_gen(
 		features = 'cc cprogram',
 		source = 'lipsofsuna/main/main.c',
