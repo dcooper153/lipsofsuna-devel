@@ -204,27 +204,22 @@ private_check_compile (LIRenShader* self,
 
 	type = (shader == self->vertex)? "vertex" : "fragment";
 	glGetObjectParameterivARB (shader, GL_COMPILE_STATUS, &status);
-	glGetInfoLogARB (shader, sizeof (log), &length, log);
-	if (length)
-	{
-		reader = liarc_reader_new (log, length);
-		if (reader != NULL)
-		{
-			while (liarc_reader_get_text (reader, "\n", &text))
-			{
-				printf ("WARNING: %s:%s%s\n", name, type, text);
-				lisys_free (text);
-			}
-			liarc_reader_free (reader);
-		}
-		if (strstr (log, "software"))
-		{
-			lisys_error_set (ENOTSUP, "unsupported %s shader `%s'", type, name);
-			return 0;
-		}
-	}
 	if (status == GL_FALSE)
 	{
+		glGetInfoLogARB (shader, sizeof (log), &length, log);
+		if (length)
+		{
+			reader = liarc_reader_new (log, length);
+			if (reader != NULL)
+			{
+				while (liarc_reader_get_text (reader, "\n", &text))
+				{
+					printf ("WARNING: %s:%s%s\n", name, type, text);
+					lisys_free (text);
+				}
+				liarc_reader_free (reader);
+			}
+		}
 		lisys_error_set (EINVAL, "cannot compile %s shader `%s'", type, name);
 		return 0;
 	}
@@ -245,7 +240,7 @@ private_check_link (LIRenShader* self,
 
 	glGetObjectParameterivARB (program, GL_LINK_STATUS, &status);
 	glGetInfoLogARB (program, sizeof (log), &length, log);
-	if (length)
+	if (status == GL_FALSE)
 	{
 		reader = liarc_reader_new (log, length);
 		if (reader != NULL)
@@ -257,14 +252,6 @@ private_check_link (LIRenShader* self,
 			}
 			liarc_reader_free (reader);
 		}
-		if (strstr (log, "software"))
-		{
-			lisys_error_set (ENOTSUP, "unsupported program `%s'", name);
-			return 0;
-		}
-	}
-	if (status == GL_FALSE)
-	{
 		lisys_error_set (EINVAL, "cannot link program `%s'", name);
 		return 0;
 	}

@@ -77,7 +77,7 @@ lisys_module_new (const char* path,
 	}
 
 	/* Get flags. */
-	dlflags = RTLD_LAZY;
+	dlflags = RTLD_NOW;
 	if (flags & LISYS_MODULE_FLAG_GLOBAL)
 		dlflags |= RTLD_GLOBAL;
 	else

@@ -54,6 +54,7 @@ liext_module_new (LIMaiProgram* program)
 	if (self == NULL)
 		return NULL;
 	self->client = limai_program_find_component (program, "client");
+	self->video = &self->client->video;
 
 	/* Allocate objects. */
 	self->objects = lialg_u32dic_new ();
@@ -191,10 +192,10 @@ private_render_2d (LIExtModule* self,
 	LIExtSpeech* speech;
 	LIMatVector win;
 
-	glEnable (GL_TEXTURE_2D);
-	glEnable (GL_BLEND);
-	glDisable (GL_CULL_FACE);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	self->video->glEnable (GL_TEXTURE_2D);
+	self->video->glEnable (GL_BLEND);
+	self->video->glDisable (GL_CULL_FACE);
+	self->video->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
@@ -212,14 +213,14 @@ private_render_2d (LIExtModule* self,
 			speech = ptr->data;
 			win.y += lifnt_layout_get_height (speech->text);
 			width = lifnt_layout_get_width (speech->text) / 2;
-			glPushMatrix ();
-			glTranslatef (win.x - width, win.y, 0.0f);
-			glScalef (1.0f, -1.0f, 1.0f);
-			glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
+			self->video->glPushMatrix ();
+			self->video->glTranslatef (win.x - width, win.y, 0.0f);
+			self->video->glScalef (1.0f, -1.0f, 1.0f);
+			self->video->glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
 			lifnt_layout_render (speech->text, 1, -1);
-			glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
+			self->video->glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
 			lifnt_layout_render (speech->text, 0, 0);
-			glPopMatrix ();
+			self->video->glPopMatrix ();
 		}
 	}
 

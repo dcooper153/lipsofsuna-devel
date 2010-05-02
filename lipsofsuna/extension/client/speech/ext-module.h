@@ -39,6 +39,7 @@ struct _LIExtModule
 	LICliClient* client;
 	LIAlgU32dic* objects;
 	LICalHandle calls[2];
+	LIVidCalls* video;
 };
 
 LIExtModule*
