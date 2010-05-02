@@ -64,6 +64,16 @@ LIAPICALL (LIMaiProgram*, limai_program_new, (
 LIAPICALL (void, limai_program_free, (
 	LIMaiProgram* self));
 
+LIAPICALL (void, limai_program_event, (
+	LIMaiProgram* self,
+	const char*   type,
+	              ...)) LISYS_ATTR_SENTINEL;
+
+LIAPICALL (void, limai_program_eventva, (
+	LIMaiProgram* self,
+	const char*   type,
+	va_list       args));
+
 LIAPICALL (int, limai_program_execute_script, (
 	LIMaiProgram* self,
 	const char*   file));

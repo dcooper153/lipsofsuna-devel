@@ -48,12 +48,12 @@ LIAPICALL (void, liscr_event_setv, (
 	LIScrData* self,
 	va_list    args));
 
-LIAPICALL (int, liscr_event_get_type, (
+LIAPICALL (const char*, liscr_event_get_type, (
 	const LIScrData* self));
 
 LIAPICALL (void, liscr_event_set_type, (
-	LIScrData* self,
-	int        type));
+	LIScrData*  self,
+	const char* type));
 
 #endif
 

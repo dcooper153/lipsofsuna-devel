@@ -116,6 +116,52 @@ limai_program_free (LIMaiProgram* self)
 }
 
 /**
+ * \brief Emits an event.
+ *
+ * \param self Program.
+ * \param type Event type.
+ * \param ... List of name,type,value triplets terminated by NULL.
+ */
+void limai_program_event (
+	LIMaiProgram* self,
+	const char*   type,
+	              ...)
+{
+	va_list args;
+
+	va_start (args, type);
+	limai_program_eventva (self, type, args);
+	va_end (args);
+}
+
+/**
+ * \brief Emits an event.
+ *
+ * \param self Program.
+ * \param type Event type.
+ * \param args Variable argument list.
+ */
+void limai_program_eventva (
+	LIMaiProgram* self,
+	const char*   type,
+	va_list       args)
+{
+	LIScrData* event;
+
+	/* TODO: Blocking events by type as an optimization. */
+
+	/* Create event. */
+	event = liscr_event_newv (self->script, args);
+	if (event == NULL)
+		return;
+	liscr_event_set_type (event, type);
+
+	/* Push to event list. */
+	limai_program_push_event (self, event);
+	liscr_data_unref (event, NULL);
+}
+
+/**
  * \brief Executes a script file.
  *
  * \param self Program.
@@ -366,9 +412,6 @@ limai_program_update (LIMaiProgram* self)
 {
 	int i;
 	float secs;
-
-	if (self->quit)
-		return 0;
 
 	/* Calculate time delta. */
 	gettimeofday (&self->curr_tick, NULL);

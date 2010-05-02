@@ -175,7 +175,7 @@ licli_client_host (LICliClient* self)
 int
 licli_client_main (LICliClient* self)
 {
-	return limai_program_main (self->program);
+	return limai_program_execute_script (self->program, "client/main.lua");
 }
 
 /**
@@ -354,8 +354,7 @@ private_load_module (LICliClient* self,
 	    !licli_render_init (self) ||
 	    !licli_client_init_callbacks_binding (self) ||
 	    !licli_client_init_callbacks_misc (self) ||
-	    !licli_client_init_callbacks_widget (self) ||
-	    !limai_program_execute_script (self->program, "client/main.lua"))
+	    !licli_client_init_callbacks_widget (self))
 	{
 		private_free_module (self);
 		return 0;
@@ -426,6 +425,7 @@ private_init_script (LICliClient* self)
 	    !liscr_script_create_class (self->script, "Binding", licli_script_binding, self) ||
 	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
 	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
+	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
 	    !liscr_script_create_class (self->script, "Group", licli_script_group, self) ||
 	    !liscr_script_create_class (self->script, "Light", licli_script_light, self) ||

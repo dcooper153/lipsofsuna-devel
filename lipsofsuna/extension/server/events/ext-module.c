@@ -64,17 +64,13 @@ LIMaiExtensionInfo liext_info =
 LIExtModule*
 liext_module_new (LIMaiProgram* program)
 {
-	int i;
 	LIExtModule* self;
-	LIScrScript* script = program->script;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
-	liscr_script_create_class (script, "Event", liscr_script_event, self);
-	liscr_script_create_class (script, "Events", liext_script_events, self);
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "client-login", 0, private_login, self, self->calls + 2) ||
@@ -88,19 +84,6 @@ liext_module_new (LIMaiProgram* program)
 		return NULL;
 	}
 
-	/* Register events. */
-	lua_newtable (script->lua);
-	lua_pushlightuserdata (script->lua, self);
-	lua_pushvalue (script->lua, -2);
-	lua_settable (script->lua, LUA_REGISTRYINDEX);
-	for (i = 0 ; i < LIEXT_EVENT_MAX ; i++)
-	{
-		lua_pushnumber (script->lua, i);
-		lua_newtable (script->lua);
-		lua_settable (script->lua, -3);
-	}
-	lua_pop (script->lua, 1);
-
 	return self;
 }
 
@@ -111,34 +94,6 @@ liext_module_free (LIExtModule* self)
 	lisys_free (self);
 }
 
-/**
- * \brief Emits an event.
- *
- * \param self Module.
- * \param type Event type.
- * \param ... Event arguments.
- */
-void
-liext_module_event (LIExtModule* self,
-                    int          type,
-                                 ...)
-{
-	va_list args;
-	LIScrData* event;
-
-	/* Allocate event. */
-	va_start (args, type);
-	event = liscr_event_newv (self->program->script, args);
-	va_end (args);
-	if (event == NULL)
-		return;
-	liscr_event_set_type (event, type);
-
-	/* Push to event queue. */
-	limai_program_push_event (self->program, event);
-	liscr_data_unref (event, NULL);
-}
-
 /*****************************************************************************/
 
 static int
@@ -147,7 +102,7 @@ private_login (LIExtModule* self,
                const char*  name,
                const char*  pass)
 {
-	liext_module_event (self, LIEXT_EVENT_LOGIN,
+	limai_program_event (self->program, "login",
 		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
@@ -156,7 +111,7 @@ static int
 private_logout (LIExtModule* self,
                 LIEngObject* object)
 {
-	liext_module_event (self, LIEXT_EVENT_LOGOUT,
+	limai_program_event (self->program, "logout",
 		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
@@ -165,7 +120,7 @@ static int
 private_motion (LIExtModule* self,
                 LIEngObject* object)
 {
-	liext_module_event (self, LIEXT_EVENT_SIMULATE,
+	limai_program_event (self->program, "object-motion",
 		"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	return 1;
 }
@@ -180,7 +135,7 @@ private_packet (LIExtModule* self,
 
 	type = ((uint8_t*) packet->buffer)[0];
 	data0 = liscr_packet_new_readable (self->program->script, packet);
-	liext_module_event (self, LIEXT_EVENT_PACKET,
+	limai_program_event (self->program, "packet",
 		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"message", LISCR_TYPE_INT, type,
 		"packet", LISCR_SCRIPT_PACKET, data0, NULL);
@@ -194,7 +149,7 @@ static int
 private_tick (LIExtModule* self,
               float        secs)
 {
-	liext_module_event (self, LIEXT_EVENT_TICK,
+	limai_program_event (self->program, "tick",
 		"secs", LISCR_TYPE_FLOAT, secs, NULL);
 	return 1;
 }
@@ -204,7 +159,7 @@ private_visibility (LIExtModule* self,
                     LIEngObject* object,
                     int          visible)
 {
-	liext_module_event (self, LIEXT_EVENT_VISIBILITY,
+	limai_program_event (self->program, "object-visibility",
 		"object", LISCR_SCRIPT_OBJECT, object->script,
 		"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
 	return 1;

@@ -140,6 +140,28 @@ static void Program_update (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Boolean indicating whether the game needs to exit.
+ * -- @name Program.quit
+ * -- @class table
+ */
+static void Program_getter_quit (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+	liscr_args_seti_bool (args, program->quit);
+}
+static void Program_setter_quit (LIScrArgs* args)
+{
+	int value;
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+	if (liscr_args_geti_bool (args, 0, &value) && value)
+		program->quit = value;
+}
+
+/* @luadoc
  * --- Short term average tick length in seconds.
  * -- @name Program.tick
  * -- @class table
@@ -178,6 +200,7 @@ liscr_script_program (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "unload_world", Program_unload_world);
 	liscr_class_insert_cfunc (self, "shutdown", Program_shutdown);
 	liscr_class_insert_cfunc (self, "update", Program_update);
+	liscr_class_insert_cvar (self, "quit", Program_getter_quit, Program_setter_quit);
 	liscr_class_insert_cvar (self, "tick", Program_getter_tick, NULL);
 	liscr_class_insert_cvar (self, "time", Program_getter_time, NULL);
 }

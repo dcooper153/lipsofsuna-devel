@@ -55,7 +55,7 @@ private_action_callback (LIBndAction*  action,
 		lua_pop (script->lua, 1);
 		return 1;
 	}
-	liscr_event_set_type (event, LICLI_EVENT_TYPE_ACTION);
+	liscr_event_set_type (event, "action");
 
 	/* Call callback. */
 	liscr_pushdata (script->lua, event);

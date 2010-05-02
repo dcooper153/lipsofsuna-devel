@@ -46,8 +46,6 @@
 #define LICLI_SELECT_MAXIMUM_COUNT 128
 #define LICLI_SELECT_RECTANGLE_SIZE 1
 
-#define LICLI_EVENT_TYPE_ACTION 0
-
 struct _LICliClient
 {
 	/* Persistent. */

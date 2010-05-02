@@ -151,7 +151,7 @@ private_miscellaneous_event (LICliClient* client,
 	switch (event->type)
 	{
 		case SDL_QUIT:
-			limai_program_shutdown (client->program);
+			limai_program_event (client->program, "quit", NULL);
 			break;
 		case SDL_ACTIVEEVENT:
 			if (event->active.state & SDL_APPINPUTFOCUS)

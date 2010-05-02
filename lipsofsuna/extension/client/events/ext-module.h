@@ -32,17 +32,6 @@
 
 #define LIEXT_SCRIPT_EVENTS "Events"
 
-enum
-{
-	LIEXT_EVENT_ACTION = LICLI_EVENT_TYPE_ACTION,
-	LIEXT_EVENT_PACKET,
-	LIEXT_EVENT_OBJECT_MODEL,
-	LIEXT_EVENT_OBJECT_NEW,
-	LIEXT_EVENT_SELECT,
-	LIEXT_EVENT_TICK,
-	LIEXT_EVENT_MAX
-};
-
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
@@ -50,22 +39,17 @@ struct _LIExtModule
 	LICliClient* client;
 };
 
-LIExtModule*
-liext_module_new (LIMaiProgram* program);
+LIExtModule* liext_module_new (
+	LIMaiProgram* program);
 
-void
-liext_module_free (LIExtModule* self);
-
-void
-liext_module_event (LIExtModule* self,
-                    int          type,
-                                 ...) LISYS_ATTR_SENTINEL;
+void liext_module_free (
+	LIExtModule* self);
 
 /*****************************************************************************/
 
-void
-liext_script_events (LIScrClass* self,
-                   void*       data);
+void liext_script_events (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 
