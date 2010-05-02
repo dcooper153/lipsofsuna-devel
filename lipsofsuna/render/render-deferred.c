@@ -51,7 +51,6 @@ liren_deferred_new (LIRenRender* render,
 	LIRenDeferred* self;
 
 	/* Check for capabilities. */
-	/* TODO: Check for NPOT */
 	if (!GLEW_EXT_framebuffer_object)
 	{
 		lisys_error_set (ENOTSUP, "EXT_framebuffer_object not supported");
@@ -60,6 +59,11 @@ liren_deferred_new (LIRenRender* render,
 	if (!GLEW_ARB_depth_buffer_float)
 	{
 		lisys_error_set (ENOTSUP, "ARB_depth_buffer_float not supported");
+		return NULL;
+	}
+	if (!GLEW_ARB_texture_non_power_of_two)
+	{
+		lisys_error_set (ENOTSUP, "ARB_texture_non_power_of_two not supported");
 		return NULL;
 	}
 
