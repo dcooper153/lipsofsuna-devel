@@ -82,11 +82,7 @@ liext_module_new (LIMaiProgram* program)
 	if (server != NULL)
 	{
 		livox_manager_set_sql (self->voxels, server->sql);
-		if (!livox_manager_load_materials (self->voxels))
-		{
-			liext_module_free (self);
-			return NULL;
-		}
+		livox_manager_load_materials (self->voxels);
 	}
 
 	/* Create assign packet. */
