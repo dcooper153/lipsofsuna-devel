@@ -34,16 +34,6 @@
 #include "client-script.h"
 #include "client-window.h"
 
-static void
-private_free_module (LICliClient* self);
-
-static int
-private_load_module (LICliClient* self,
-                     const char*  path,
-                     const char*  name,
-                     const char*  login,
-                     const char*  password);
-
 static int
 private_init_bindings (LICliClient* self);
 
@@ -78,16 +68,12 @@ static int private_update (
 
 /*****************************************************************************/
 
-
-LICliClient*
-licli_client_new (LIVidCalls* video,
-                  const char* path,
-                  const char* name)
+LICliClient* licli_client_new (
+	LIVidCalls* video,
+	const char* path,
+	const char* name)
 {
 	LICliClient* self;
-	/* FIXME: Login name and password not supported. */
-	const char* login = "none";
-	const char* password = "none";
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LICliClient));
@@ -121,20 +107,13 @@ licli_client_new (LIVidCalls* video,
 		return NULL;
 	}
 
-	/* Load module. */
-	if (!private_load_module (self, path, name, login, password))
-	{
-		licli_client_free (self);
-		return NULL;
-	}
-
 	return self;
 }
 
-void
-licli_client_free (LICliClient* self)
+void licli_client_free (
+	LICliClient* self)
 {
-	private_free_module (self);
+	licli_client_free_module (self);
 	if (self->window != NULL)
 		licli_window_free (self->window);
 	self->video.SDL_Quit ();
@@ -143,100 +122,12 @@ licli_client_free (LICliClient* self)
 }
 
 /**
- * \brief Starts an embedded server.
- *
- * \param self Client.
- * \return Nonzero on success.
- */
-int
-licli_client_host (LICliClient* self)
-{
-	/* Kill old thread. */
-	if (self->server_thread != NULL)
-	{
-		lisys_assert (self->server != NULL);
-		limai_program_shutdown (self->server->program);
-		lithr_thread_free (self->server_thread);
-		lisys_assert (self->server == NULL);
-	}
-
-	/* Create new server. */
-	self->server = liser_server_new (self->paths);
-	if (self->server == NULL)
-		return 0;
-
-	/* Create server thread. */
-	self->server_thread = lithr_thread_new (private_server_main, self);
-	if (self->server_thread == NULL)
-	{
-		liser_server_free (self->server);
-		self->server = NULL;
-	}
-
-	return 1;
-}
-
-int
-licli_client_main (LICliClient* self)
-{
-	return limai_program_execute_script (self->program, "client/main.lua");
-}
-
-/**
- * \brief Returns nonzero if movement mode is active.
- *
- * \param self Client.
- * \return Boolean.
- */
-int
-licli_client_get_moving (LICliClient* self)
-{
-	return self->moving;
-}
-
-/**
- * \brief Enables or disables movement mode.
- *
- * When the movement mode is enabled, all mouse events are passed directly to
- * the scripts. Otherwise, the events are first passed to the user interface.
- *
- * \param self Client.
- * \param value Nonzero for movement mode, zero for user interface mode
- */
-void
-licli_client_set_moving (LICliClient* self,
-                         int          value)
-{
-	int cx;
-	int cy;
-
-	self->moving = value;
-	if (value)
-	{
-		cx = self->window->mode.width / 2;
-		cy = self->window->mode.height / 2;
-		self->video.SDL_ShowCursor (SDL_DISABLE);
-		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
-		self->video.SDL_WarpMouse (cx, cy);
-		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-		self->video.SDL_WM_GrabInput (SDL_GRAB_ON);
-	}
-	else
-	{
-		self->video.SDL_ShowCursor (SDL_ENABLE);
-		self->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
-	}
-}
-
-/*****************************************************************************/
-
-/**
- * \brief Frees the module.
+ * \brief Frees the currently loaded module.
  *
  * \param self Client.
  */
-static void
-private_free_module (LICliClient* self)
+void licli_client_free_module (
+	LICliClient* self)
 {
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
@@ -284,15 +175,47 @@ private_free_module (LICliClient* self)
 		self->paths = NULL;
 	}
 	lisys_free (self->camera_node);
-	lisys_free (self->login);
-	lisys_free (self->password);
 	lisys_free (self->path);
 	lisys_free (self->name);
 	self->camera_node = NULL;
-	self->login = NULL;
-	self->password = NULL;
 	self->path = NULL;
 	self->name = NULL;
+}
+
+/**
+ * \brief Starts an embedded server.
+ *
+ * \param self Client.
+ * \param args Arguments to pass to the server.
+ * \return Nonzero on success.
+ */
+int licli_client_host (
+	LICliClient* self,
+	const char*  args)
+{
+	/* Kill old thread. */
+	if (self->server_thread != NULL)
+	{
+		lisys_assert (self->server != NULL);
+		limai_program_shutdown (self->server->program);
+		lithr_thread_free (self->server_thread);
+		lisys_assert (self->server == NULL);
+	}
+
+	/* Create new server. */
+	self->server = liser_server_new (self->paths, args);
+	if (self->server == NULL)
+		return 0;
+
+	/* Create server thread. */
+	self->server_thread = lithr_thread_new (private_server_main, self);
+	if (self->server_thread == NULL)
+	{
+		liser_server_free (self->server);
+		self->server = NULL;
+	}
+
+	return 1;
 }
 
 /**
@@ -301,23 +224,18 @@ private_free_module (LICliClient* self)
  * \param client Client.
  * \param path Package root directory.
  * \param name Module name.
- * \param login Login name.
- * \param password Login password.
- * \return Nonzero on success.
  */
-static int
-private_load_module (LICliClient* self,
-                     const char*  path,
-                     const char*  name,
-                     const char*  login,
-                     const char*  password)
+int licli_client_load_module (
+	LICliClient* self,
+	const char*  name,
+	const char*  args)
 {
 	/* Initialize paths. */
-	if (!private_init_paths (self, path, name))
+	if (!private_init_paths (self, self->root, name))
 		return 0;
 
 	/* Create program. */
-	self->program = limai_program_new (self->paths);
+	self->program = limai_program_new (self->paths, args);
 	if (self->program == NULL)
 	{
 		lipth_paths_free (self->paths);
@@ -335,20 +253,16 @@ private_load_module (LICliClient* self,
 
 	/* Store credentials. */
 	self->name = listr_dup (name);
-	self->login = listr_dup (login);
-	self->password = listr_dup (password);
-	if (self->name == NULL ||
-	    self->login == NULL ||
-	    self->password == NULL)
+	if (self->name == NULL)
 	{
-		private_free_module (self);
+		licli_client_free_module (self);
 		return 0;
 	}
 
 	/* Initialize client component. */
 	if (!limai_program_insert_component (self->program, "client", self))
 	{
-		private_free_module (self);
+		licli_client_free_module (self);
 		return 0;
 	}
 	if (!private_init_bindings (self) ||
@@ -361,12 +275,66 @@ private_load_module (LICliClient* self,
 	    !licli_client_init_callbacks_misc (self) ||
 	    !licli_client_init_callbacks_widget (self))
 	{
-		private_free_module (self);
+		licli_client_free_module (self);
 		return 0;
 	}
 
 	return 1;
 }
+
+int licli_client_main (
+	LICliClient* self)
+{
+	return limai_program_execute_script (self->program, "client/main.lua");
+}
+
+/**
+ * \brief Returns nonzero if movement mode is active.
+ *
+ * \param self Client.
+ * \return Boolean.
+ */
+int licli_client_get_moving (
+	LICliClient* self)
+{
+	return self->moving;
+}
+
+/**
+ * \brief Enables or disables movement mode.
+ *
+ * When the movement mode is enabled, all mouse events are passed directly to
+ * the scripts. Otherwise, the events are first passed to the user interface.
+ *
+ * \param self Client.
+ * \param value Nonzero for movement mode, zero for user interface mode
+ */
+void licli_client_set_moving (
+	LICliClient* self,
+	int          value)
+{
+	int cx;
+	int cy;
+
+	self->moving = value;
+	if (value)
+	{
+		cx = self->window->mode.width / 2;
+		cy = self->window->mode.height / 2;
+		self->video.SDL_ShowCursor (SDL_DISABLE);
+		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
+		self->video.SDL_WarpMouse (cx, cy);
+		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+		self->video.SDL_WM_GrabInput (SDL_GRAB_ON);
+	}
+	else
+	{
+		self->video.SDL_ShowCursor (SDL_ENABLE);
+		self->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
+	}
+}
+
+/*****************************************************************************/
 
 static int
 private_init_bindings (LICliClient* self)

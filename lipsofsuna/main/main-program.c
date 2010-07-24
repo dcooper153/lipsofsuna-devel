@@ -58,7 +58,8 @@ static int private_tick (
  * \return New program or NULL.
  */
 LIMaiProgram* limai_program_new (
-	LIPthPaths* paths)
+	LIPthPaths* paths,
+	const char* args)
 {
 	LIMaiProgram* self;
 
@@ -67,6 +68,12 @@ LIMaiProgram* limai_program_new (
 	if (self == NULL)
 		return NULL;
 	self->paths = paths;
+	self->args = listr_dup ((args != NULL)? args : "");
+	if (self->args == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 
 	/* Initialize subsystems. */
 	if (!private_init (self))
@@ -138,6 +145,9 @@ void limai_program_free (
 		lical_callbacks_free (self->callbacks);
 	}
 
+	lisys_free (self->launch_args);
+	lisys_free (self->launch_name);
+	lisys_free (self->args);
 	lisys_free (self);
 }
 
@@ -173,8 +183,6 @@ void limai_program_eventva (
 	va_list       args)
 {
 	LIScrData* event;
-
-	/* TODO: Blocking events by type as an optimization. */
 
 	/* Create event. */
 	event = liscr_event_newv (self->script, args);

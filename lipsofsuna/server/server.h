@@ -44,21 +44,22 @@ struct _LISerServer
 	LIScrScript* script;
 };
 
-LISerServer*
-liser_server_new (LIPthPaths* paths);
+LIAPICALL (LISerServer*, liser_server_new, (
+	LIPthPaths* paths,
+	const char* args));
 
-void
-liser_server_free (LISerServer* self);
+LIAPICALL (void, liser_server_free, (
+	LISerServer* self));
 
-int
-liser_server_check_unique_object (const LISerServer* self,
-                                  uint32_t           id);
+LIAPICALL (int, liser_server_check_unique_object, (
+	const LISerServer* self,
+	uint32_t           id));
 
-int
-liser_server_main (LISerServer* self);
+LIAPICALL (int, liser_server_main, (
+	LISerServer* self));
 
-int
-liser_server_save (LISerServer* self);
+LIAPICALL (int, liser_server_save, (
+	LISerServer* self));
 
 #endif
 

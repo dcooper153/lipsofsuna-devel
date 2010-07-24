@@ -64,8 +64,6 @@ struct _LICliClient
 	int moving;
 	char* name;
 	char* path;
-	char* login;
-	char* password;
 	char* camera_node;
 	LIAlgCamera* camera;
 	LIBndManager* bindings;
@@ -77,29 +75,38 @@ struct _LICliClient
 	LIWdgManager* widgets;
 };
 
-LICliClient*
-licli_client_new (LIVidCalls* video,
-                  const char* path,
-                  const char* name);
+LIAPICALL (LICliClient*, licli_client_new, (
+	LIVidCalls* video,
+	const char* path,
+	const char* name));
 
-void
-licli_client_free (LICliClient* self);
+LIAPICALL (void, licli_client_free, (
+	LICliClient* self));
 
-int
-licli_client_host (LICliClient* self);
+LIAPICALL (void, licli_client_free_module, (
+	LICliClient* self));
 
-int
-licli_client_main (LICliClient* self);
+LIAPICALL (int, licli_client_host, (
+	LICliClient* self,
+	const char*  args));
 
-void
-licli_client_render (LICliClient* self);
+LIAPICALL (int, licli_client_load_module, (
+	LICliClient* self,
+	const char*  name,
+	const char*  args));
 
-int
-licli_client_get_moving (LICliClient* self);
+LIAPICALL (int, licli_client_main, (
+	LICliClient* self));
 
-void
-licli_client_set_moving (LICliClient* self,
-                         int          value);
+LIAPICALL (void, licli_client_render, (
+	LICliClient* self));
+
+LIAPICALL (int, licli_client_get_moving, (
+	LICliClient* self));
+
+LIAPICALL (void, licli_client_set_moving, (
+	LICliClient* self,
+	int          value));
 
 #endif
 

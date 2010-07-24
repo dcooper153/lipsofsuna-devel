@@ -30,27 +30,52 @@ main (int argc, char** argv)
 {
 	LIPthPaths* paths;
 	LISerServer* self;
+	char* launch_name;
+	char* launch_args;
 
-	/* Resolve game directory. */
-	paths = lipth_paths_new (NULL, argc > 1? argv[1] : "data");
-	if (paths == NULL)
+	/* Choose the first mod. */
+	launch_name = listr_dup ((argc > 1)? argv[1] : "data");
+	launch_args = listr_dup ((argc > 2)? argv[2] : "");
+	if (launch_name == NULL || launch_args == NULL)
 	{
 		lisys_error_report ();
+		lisys_free (launch_name);
+		lisys_free (launch_args);
 		return 1;
 	}
 
-	/* Execute program. */
-	self = liser_server_new (paths);
-	if (self == NULL)
+	/* Execute mods until one exits without starting a new one. */
+	while (1)
 	{
-		lisys_error_report ();
+		/* Resolve game directory. */
+		paths = lipth_paths_new (NULL, launch_name);
+		if (paths == NULL)
+		{
+			lisys_error_report ();
+			return 1;
+		}
+
+		/* Load and execute the mod. */
+		self = liser_server_new (paths, launch_args);
+		if (self == NULL)
+		{
+			lisys_error_report ();
+			lipth_paths_free (paths);
+			return 1;
+		}
+		if (!liser_server_main (self))
+			lisys_error_report ();
+
+		/* Check if there's another mod to launch. */
+		launch_name = self->program->launch_name;
+		launch_args = self->program->launch_args;
+		self->program->launch_name = NULL;
+		self->program->launch_args = NULL;
+
+		/* Close the old mod. */
+		liser_server_free (self);
 		lipth_paths_free (paths);
-		return 1;
 	}
-	if (!liser_server_main (self))
-		lisys_error_report ();
-	liser_server_free (self);
-	lipth_paths_free (paths);
 
 	return 0;
 }

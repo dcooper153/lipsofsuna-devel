@@ -73,16 +73,21 @@ static void Client_cycle_window_focus (LIScrArgs* args)
  * --- Launches a server.
  * --
  * -- @param clss Client class.
- * -- @param args Arguments.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,args: String to pass to the server.</li></ul>
  * -- @return True on success.
  * function Client.host(clss, args)
  */
 static void Client_host (LIScrArgs* args)
 {
+	const char* str = NULL;
 	LICliClient* client;
 
+	if (!liscr_args_gets_string (args, "args", &str))
+	    liscr_args_geti_string (args, 0, &str);
+
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	if (!licli_client_host (client))
+	if (!licli_client_host (client, str))
 	{
 		lisys_error_report ();
 		return;

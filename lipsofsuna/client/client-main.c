@@ -30,6 +30,8 @@ int
 main (int argc, char** argv)
 {
 	char* path;
+	char* launch_name;
+	char* launch_args;
 	LICliClient* self;
 	LIVidCalls video;
 
@@ -55,8 +57,47 @@ main (int argc, char** argv)
 		lisys_free (path);
 		return 1;
 	}
-	if (!licli_client_main (self))
-		lisys_error_report ();
+
+	/* Load the first mod. */
+	if (argc > 1)
+	{
+		/* FIXME: Should concatenate the arguments. */
+		if (!licli_client_load_module (self, argv[1], (argc > 2)? argv[2] : NULL))
+			lisys_error_report ();
+	}
+	else
+	{
+		if (!licli_client_load_module (self, "data", NULL))
+			lisys_error_report ();
+	}
+
+	/* Execute mods until one exits without starting a new one. */
+	while (self->program != NULL)
+	{
+		/* Execute the module until the script exits. */
+		if (!licli_client_main (self))
+		{
+			lisys_error_report ();
+			break;
+		}
+
+		/* Check if the module started another one. */
+		launch_name = self->program->launch_name;
+		launch_args = self->program->launch_args;
+		if (launch_name == NULL)
+			break;
+		self->program->launch_name = NULL;
+		self->program->launch_args = NULL;
+
+		/* Unload the old module and load a new one. */
+		licli_client_free_module (self);
+		if (!licli_client_load_module (self, launch_name, launch_args))
+			lisys_error_report ();
+		lisys_free (launch_name);
+		lisys_free (launch_args);
+	}
+
+	/* Free all resources. */
 	licli_client_free (self);
 	lisys_free (path);
 

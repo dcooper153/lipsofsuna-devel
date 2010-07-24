@@ -39,10 +39,12 @@ private_init_sql (LISerServer* self);
  * \brief Creates a new server instance.
  *
  * \param paths Path information.
+ * \param args Arguments passed to the program.
  * \return New server or NULL.
  */
-LISerServer*
-liser_server_new (LIPthPaths* paths)
+LISerServer* liser_server_new (
+	LIPthPaths* paths,
+	const char* args)
 {
 	LISerServer* self;
 
@@ -52,7 +54,7 @@ liser_server_new (LIPthPaths* paths)
 		return NULL;
 
 	/* Create program. */
-	self->program = limai_program_new (paths);
+	self->program = limai_program_new (paths, args);
 	if (self->program == NULL)
 	{
 		lisys_free (self);

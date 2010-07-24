@@ -33,6 +33,39 @@
  */
 
 /* @luadoc
+ * --- Sets the name of the mod to be executed after this one quits.
+ * -- @param clss Program class.
+ * -- @param args Arguments.<ul>
+ * --  <li>1,name: Module name.</li></ul>
+ * --  <li>1,args: Argument string to pass to the module.</li></ul>
+ * function Program.launch_mod(clss, args)
+ */
+static void Program_launch_mod (LIScrArgs* args)
+{
+	const char* name;
+	LIMaiProgram* program;
+
+	/* Clear the old module name. */
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+	lisys_free (program->launch_name);
+	lisys_free (program->launch_args);
+	program->launch_name = NULL;
+	program->launch_args = NULL;
+
+	/* Set the new module name, if any given. */
+	if (liscr_args_gets_string (args, "name", &name) ||
+	    liscr_args_geti_string (args, 0, &name))
+	{
+		program->launch_name = listr_dup (name);
+		if (liscr_args_gets_string (args, "args", &name) ||
+		    liscr_args_geti_string (args, 1, &name))
+		{
+			program->launch_args = listr_dup (name);
+		}
+	}
+}
+
+/* @luadoc
  * --- Loads an extension.
  * -- @param clss Program class.
  * -- @param args Arguments.<ul>
@@ -140,6 +173,19 @@ static void Program_update (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The argument string passed to the program at startup time.
+ * -- @name Program.args
+ * -- @class table
+ */
+static void Program_getter_args (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+	liscr_args_seti_string (args, program->args);
+}
+
+/* @luadoc
  * --- Boolean indicating whether the game needs to exit.
  * -- @name Program.quit
  * -- @class table
@@ -194,12 +240,14 @@ liscr_script_program (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_PROGRAM, data);
+	liscr_class_insert_cfunc (self, "launch_mod", Program_launch_mod);
 	liscr_class_insert_cfunc (self, "load_extension", Program_load_extension);
 	liscr_class_insert_cfunc (self, "pop_event", Program_pop_event);
 	liscr_class_insert_cfunc (self, "push_event", Program_push_event);
 	liscr_class_insert_cfunc (self, "unload_world", Program_unload_world);
 	liscr_class_insert_cfunc (self, "shutdown", Program_shutdown);
 	liscr_class_insert_cfunc (self, "update", Program_update);
+	liscr_class_insert_cvar (self, "args", Program_getter_args, NULL);
 	liscr_class_insert_cvar (self, "quit", Program_getter_quit, Program_setter_quit);
 	liscr_class_insert_cvar (self, "tick", Program_getter_tick, NULL);
 	liscr_class_insert_cvar (self, "time", Program_getter_time, NULL);

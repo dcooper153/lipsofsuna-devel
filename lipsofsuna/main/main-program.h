@@ -44,6 +44,9 @@ struct _LIMaiProgram
 	float fps;
 	float tick;
 	float ticks[LIMAI_PROGRAM_FPS_TICKS];
+	char* args;
+	char* launch_name;
+	char* launch_args;
 	struct timeval start;
 	struct timeval curr_tick;
 	struct timeval prev_tick;
@@ -60,7 +63,8 @@ struct _LIMaiProgram
 };
 
 LIAPICALL (LIMaiProgram*, limai_program_new, (
-	LIPthPaths* paths));
+	LIPthPaths* paths,
+	const char* args));
 
 LIAPICALL (void, limai_program_free, (
 	LIMaiProgram* self));
