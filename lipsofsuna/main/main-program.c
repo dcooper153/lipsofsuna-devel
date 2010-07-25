@@ -24,8 +24,30 @@
 
 #include "main-program.h"
 
-static int
-private_init (LIMaiProgram* self);
+static int private_init (
+	LIMaiProgram* self);
+
+static int private_object_model (
+	LIMaiProgram* self,
+	LIEngObject*  object,
+	LIEngModel*   model);
+
+static int private_object_motion (
+	LIMaiProgram* self,
+	LIEngObject*  object);
+
+static int private_object_new (
+	LIMaiProgram* self,
+	LIEngObject*  object);
+
+static int private_object_visibility (
+	LIMaiProgram* self,
+	LIEngObject*  object,
+	int           visible);
+
+static int private_tick (
+	LIMaiProgram* self,
+	float         secs);
 
 /****************************************************************************/
 
@@ -35,8 +57,8 @@ private_init (LIMaiProgram* self);
  * \param paths Path information.
  * \return New program or NULL.
  */
-LIMaiProgram*
-limai_program_new (LIPthPaths* paths)
+LIMaiProgram* limai_program_new (
+	LIPthPaths* paths)
 {
 	LIMaiProgram* self;
 
@@ -61,8 +83,8 @@ limai_program_new (LIPthPaths* paths)
  *
  * \param self Program.
  */
-void
-limai_program_free (LIMaiProgram* self)
+void limai_program_free (
+	LIMaiProgram* self)
 {
 	LIAlgStrdicIter iter;
 	LIMaiExtension* extension;
@@ -87,7 +109,8 @@ limai_program_free (LIMaiProgram* self)
 		{
 			extension = iter.value;
 			((void (*)(void*)) extension->info->free) (extension->object);
-			lisys_module_free (extension->module);
+			if (extension->module != NULL)
+				lisys_module_free (extension->module);
 			lisys_free (extension);
 		}
 		lialg_strdic_free (self->extensions);
@@ -110,7 +133,10 @@ limai_program_free (LIMaiProgram* self)
 
 	/* Free callbacks. */
 	if (self->callbacks != NULL)
+	{
+		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 		lical_callbacks_free (self->callbacks);
+	}
 
 	lisys_free (self);
 }
@@ -168,9 +194,9 @@ void limai_program_eventva (
  * \param file Filename.
  * \return Nonzero on success.
  */
-int
-limai_program_execute_script (LIMaiProgram* self,
-                              const char*   file)
+int limai_program_execute_script (
+	LIMaiProgram* self,
+	const char*   file)
 {
 	int ret;
 	char* path;
@@ -194,9 +220,9 @@ limai_program_execute_script (LIMaiProgram* self,
  * \param name Component name.
  * \return Component or NULL.
  */
-void*
-limai_program_find_component (LIMaiProgram* self,
-                              const char*   name)
+void* limai_program_find_component (
+	LIMaiProgram* self,
+	const char*   name)
 {
 	return lialg_strdic_find (self->components, name);
 }
@@ -208,9 +234,9 @@ limai_program_find_component (LIMaiProgram* self,
  * \param name Extension name.
  * \return Extension or NULL.
  */
-LIMaiExtension*
-limai_program_find_extension (LIMaiProgram* self,
-                              const char*   name)
+LIMaiExtension* limai_program_find_extension (
+	LIMaiProgram* self,
+	const char*   name)
 {
 	return lialg_strdic_find (self->extensions, name);
 }
@@ -222,11 +248,13 @@ limai_program_find_extension (LIMaiProgram* self,
  * \param name Extensions name.
  * \return Nonzero on success.
  */
-int
-limai_program_insert_extension (LIMaiProgram* self,
-                                const char*   name)
+int limai_program_insert_extension (
+	LIMaiProgram* self,
+	const char*   name)
 {
+	char* ptr;
 	char* path;
+	char* ident;
 	LISysModule* module;
 	LIMaiExtension* extension;
 	LIMaiExtensionInfo* info;
@@ -236,43 +264,65 @@ limai_program_insert_extension (LIMaiProgram* self,
 	if (module != NULL)
 		return 1;
 
-	/* Open module file. */
-	path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,
-		"lib", name, ".", LISYS_EXTENSION_DLL, NULL);
-	if (path == NULL)
+	/* Determine extension info struct name. We restrict the
+	 * name of the extension to [a-z_] for security reasons. */
+	ident = listr_format ("liext_%s_info", name);
+	if (ident == NULL)
 		return 0;
-	module = lisys_module_new (path, 0);
-	lisys_free (path);
-	if (module == NULL)
+	for (ptr = ident ; *ptr != '\0' ; ptr++)
+	{
+		if (*ptr < 'a' || *ptr > 'z')
+			*ptr = '_';
+	}
+
+	/* Open an external library if the extension isn't built-in. */
+	info = lisys_module_global_symbol (NULL, ident);
+	if (info == NULL)
 	{
 		path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,
-			name, ".", LISYS_EXTENSION_DLL, NULL);
+			"lib", name, ".", LISYS_EXTENSION_DLL, NULL);
 		if (path == NULL)
+		{
+			lisys_free (ident);
 			return 0;
+		}
 		module = lisys_module_new (path, 0);
 		lisys_free (path);
 		if (module == NULL)
-			goto error;
+		{
+			path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,
+				name, ".", LISYS_EXTENSION_DLL, NULL);
+			if (path == NULL)
+			{
+				lisys_free (ident);
+				return 0;
+			}
+			module = lisys_module_new (path, 0);
+			lisys_free (path);
+			if (module == NULL)
+			{
+				lisys_free (ident);
+				goto error;
+			}
+		}
+		info = lisys_module_symbol (module, ident);
 	}
+	lisys_free (ident);
 
-	/* Find module info. */
-	info = lisys_module_symbol (module, "liext_info");
+	/* Check for valid module info. */
 	if (info == NULL)
 	{
 		lisys_error_set (EINVAL, "no module info");
-		lisys_module_free (module);
 		goto error;
 	}
 	if (info->version != LIMAI_EXTENSION_VERSION)
 	{
 		lisys_error_set (EINVAL, "invalid module version");
-		lisys_module_free (module);
 		goto error;
 	}
 	if (info->name == NULL || info->init == NULL || info->free == NULL)
 	{
 		lisys_error_set (EINVAL, "invalid module format");
-		lisys_module_free (module);
 		goto error;
 	}
 
@@ -283,13 +333,9 @@ limai_program_insert_extension (LIMaiProgram* self,
 	extension->info = info;
 	extension->module = module;
 	if (extension == NULL)
-	{
-		lisys_module_free (module);
 		goto error;
-	}
 	if (!lialg_strdic_insert (self->extensions, name, extension))
 	{
-		lisys_module_free (module);
 		lisys_free (extension);
 		goto error;
 	}
@@ -299,7 +345,6 @@ limai_program_insert_extension (LIMaiProgram* self,
 	if (extension->object == NULL)
 	{
 		lialg_strdic_remove (self->extensions, name);
-		lisys_module_free (module);
 		lisys_free (extension);
 		goto error;
 	}
@@ -308,6 +353,8 @@ limai_program_insert_extension (LIMaiProgram* self,
 
 error:
 	lisys_error_append ("cannot initialize module `%s'", name);
+	if (module != NULL)
+		lisys_module_free (module);
 	return 0;
 }
 
@@ -319,10 +366,10 @@ error:
  * \param value Component.
  * \return Nonzero on success.
  */
-int
-limai_program_insert_component (LIMaiProgram* self,
-                                const char*   name,
-                                void*         value)
+int limai_program_insert_component (
+	LIMaiProgram* self,
+	const char*   name,
+	void*         value)
 {
 	return lialg_strdic_insert (self->components, name, value) != NULL;
 }
@@ -382,9 +429,9 @@ int limai_program_push_event (
  * \param self Program.
  * \param name Component name.
  */
-void
-limai_program_remove_component (LIMaiProgram* self,
-                                const char*   name)
+void limai_program_remove_component (
+	LIMaiProgram* self,
+	const char*   name)
 {
 	lialg_strdic_remove (self->components, name);
 }
@@ -395,8 +442,8 @@ limai_program_remove_component (LIMaiProgram* self,
  * \note Thread safe.
  * \param self Program.
  */
-void
-limai_program_shutdown (LIMaiProgram* self)
+void limai_program_shutdown (
+	LIMaiProgram* self)
 {
 	self->quit = 1;
 }
@@ -407,8 +454,8 @@ limai_program_shutdown (LIMaiProgram* self)
  * \param self Program.
  * \return Nonzero if the program is still running.
  */
-int
-limai_program_update (LIMaiProgram* self)
+int limai_program_update (
+	LIMaiProgram* self)
 {
 	int i;
 	float secs;
@@ -448,8 +495,8 @@ limai_program_update (LIMaiProgram* self)
  * \param self Program.
  * \return Time in seconds.
  */
-double
-limai_program_get_time (const LIMaiProgram* self)
+double limai_program_get_time (
+	const LIMaiProgram* self)
 {
 	struct timeval t;
 
@@ -467,8 +514,8 @@ limai_program_get_time (const LIMaiProgram* self)
 
 /****************************************************************************/
 
-static int
-private_init (LIMaiProgram* self)
+static int private_init (
+	LIMaiProgram* self)
 {
 	/* Initialize dictionaries. */
 	self->components = lialg_strdic_new ();
@@ -505,6 +552,79 @@ private_init (LIMaiProgram* self)
 	gettimeofday (&self->start, NULL);
 	self->prev_tick = self->start;
 	self->curr_tick = self->start;
+
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (self->callbacks, self->engine, "object-model", 65535, private_object_model, self, self->calls + 0) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "object-motion", 63353, private_object_motion, self, self->calls + 1) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "object-new", 65535, private_object_new, self, self->calls + 2) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "object-visibility", 65535, private_object_visibility, self, self->calls + 3) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 4))
+		return 0;
+
+	return 1;
+}
+
+static int private_object_model (
+	LIMaiProgram* self,
+	LIEngObject*  object,
+	LIEngModel*   model)
+{
+	if (object->script != NULL && model != NULL)
+	{
+		limai_program_event (self, "object-model",
+			"object", LISCR_SCRIPT_OBJECT, object->script,
+			"model", LISCR_TYPE_STRING, model->name, NULL);
+	}
+
+	return 1;
+}
+
+static int private_object_motion (
+	LIMaiProgram* self,
+	LIEngObject*  object)
+{
+	if (object->script != NULL)
+	{
+		limai_program_event (self, "object-motion",
+			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
+	}
+
+	return 1;
+}
+
+static int private_object_new (
+	LIMaiProgram* self,
+	LIEngObject*  object)
+{
+	if (object->script != NULL)
+	{
+		limai_program_event (self, "object-new",
+			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
+	}
+
+	return 1;
+}
+
+static int private_object_visibility (
+	LIMaiProgram* self,
+	LIEngObject*  object,
+	int           visible)
+{
+	if (object->script != NULL)
+	{
+		limai_program_event (self, "object-visibility",
+			"object", LISCR_SCRIPT_OBJECT, object->script,
+			"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
+	}
+
+	return 1;
+}
+
+static int private_tick (
+	LIMaiProgram* self,
+	float        secs)
+{
+	limai_program_event (self, "tick", "secs", LISCR_TYPE_FLOAT, secs, NULL);
 
 	return 1;
 }

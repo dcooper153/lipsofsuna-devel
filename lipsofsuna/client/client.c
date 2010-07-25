@@ -68,9 +68,13 @@ static void
 private_server_main (LIThrThread* thread,
                      void*        data);
 
-static int
-private_update (LICliClient* self,
-                float        secs);
+static int private_select (
+	LICliClient*    self,
+	LIRenSelection* selection);
+
+static int private_update (
+	LICliClient* self,
+	float        secs);
 
 /*****************************************************************************/
 
@@ -327,6 +331,7 @@ private_load_module (LICliClient* self,
 	self->script = self->program->script;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
 	lical_callbacks_insert (self->callbacks, self->engine, "tick", -1000, private_update, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "select", 32768, private_select, self, NULL);
 
 	/* Store credentials. */
 	self->name = listr_dup (name);
@@ -465,9 +470,29 @@ private_server_main (LIThrThread* thread,
 	self->server = NULL;
 }
 
-static int
-private_update (LICliClient* self,
-                float        secs)
+static int private_select (
+	LICliClient*    self,
+	LIRenSelection* selection)
+{
+	LIEngObject* object;
+
+	if (selection != NULL)
+	{
+		object = lieng_engine_find_object (self->engine, selection->object);
+		if (object != NULL && object->script != NULL)
+		{
+			limai_program_event (self->program, "select",
+				"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
+			return 1;
+		}
+	}
+
+	return 1;
+}
+
+static int private_update (
+	LICliClient* self,
+	float        secs)
 {
 	int w;
 	int h;

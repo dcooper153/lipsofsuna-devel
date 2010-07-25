@@ -165,7 +165,7 @@ lisys_module_free (LISysModule* self)
 /**
  * \brief Gets a symbol from the module.
  *
- * \param self Module.
+ * \param self Module. If this is NULL, the main executable is used as the module.
  * \param name Symbol name.
  * \return Symbol or NULL.
  */
@@ -173,6 +173,8 @@ void*
 lisys_module_symbol (LISysModule* self,
                      const char*  name)
 {
+	if (self == NULL)
+		return lisys_module_global_symbol (NULL, name);
 #ifdef HAVE_DLFCN_H
 	return dlsym (self->handle, name);
 #elif defined HAVE_WINDOWS_H

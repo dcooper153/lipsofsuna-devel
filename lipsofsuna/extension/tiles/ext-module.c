@@ -1,0 +1,163 @@
+/* Lips of Suna
+ * Copyright© 2007-2010 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtVoxel Voxel
+ * @{
+ */
+
+#include "ext-module.h"
+
+static int private_tick (
+	LIExtModule* self,
+	float        secs);
+
+/*****************************************************************************/
+
+LIMaiExtensionInfo liext_tiles_info =
+{
+	LIMAI_EXTENSION_VERSION, "tiles",
+	liext_tiles_new,
+	liext_tiles_free
+};
+
+LIExtModule* liext_tiles_new (
+	LIMaiProgram* program)
+{
+	LIAlgU32dicIter iter;
+	LIExtModule* self;
+	LISerServer* server;
+	LIVoxMaterial* material;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIExtModule));
+	if (self == NULL)
+		return NULL;
+	self->program = program;
+
+	/* Create voxel manager. */
+	self->voxels = livox_manager_new (program->callbacks, program->sectors);
+	if (self->voxels == NULL)
+	{
+		liext_tiles_free (self);
+		return NULL;
+	}
+
+	/* Register component. */
+	if (!limai_program_insert_component (program, "voxels", self->voxels))
+	{
+		liext_tiles_free (self);
+		return NULL;
+	}
+
+	/* Load materials if server. */
+	/* FIXME: This shouldn't be hardcoded either. */
+	server = limai_program_find_component (program, "server");
+	if (server != NULL)
+	{
+		livox_manager_set_sql (self->voxels, server->sql);
+		livox_manager_load_materials (self->voxels);
+	}
+
+	/* Create assign packet. */
+	self->assign_packet = liarc_writer_new_packet (1);
+	if (self->assign_packet == NULL)
+	{
+		liext_tiles_free (self);
+		return NULL;
+	}
+	LIALG_U32DIC_FOREACH (iter, self->voxels->materials)
+	{
+		material = iter.value;
+		if (!livox_material_write (material, self->assign_packet))
+		{
+			liext_tiles_free (self);
+			return NULL;
+		}
+	}
+
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 0))
+	{
+		liext_tiles_free (self);
+		return NULL;
+	}
+
+	/* Register classes. */
+	liscr_script_create_class (program->script, "Material", liext_script_material, self);
+	liscr_script_create_class (program->script, "Tile", liext_script_tile, self);
+	liscr_script_create_class (program->script, "Voxel", liext_script_voxel, self);
+
+	return self;
+}
+
+void liext_tiles_free (
+	LIExtModule* self)
+{
+	/* Unregister component. */
+	if (self->voxels != NULL)
+		limai_program_remove_component (self->program, "voxels");
+
+	/* Free resources. */
+	if (self->voxels != NULL)
+		livox_manager_free (self->voxels);
+	if (self->assign_packet != NULL)
+		liarc_writer_free (self->assign_packet);
+
+	lisys_free (self);
+}
+
+int liext_tiles_write (
+	LIExtModule* self,
+	LIArcSql*    sql)
+{
+	return livox_manager_write (self->voxels);
+}
+
+/**
+ * \brief Gets the voxel manager of the module.
+ *
+ * This function is used by other modules, such as the NPC module, to interact
+ * with the voxel terrain.
+ *
+ * \warning Accessing the terrain from a different thread isn't safe.
+ *
+ * \param self Module.
+ * \return Voxel manager.
+ */
+LIVoxManager* liext_tiles_get_voxels (
+	LIExtModule* self)
+{
+	return self->voxels;
+}
+
+/*****************************************************************************/
+
+static int private_tick (
+	LIExtModule* self,
+	float        secs)
+{
+	livox_manager_mark_updates (self->voxels);
+	livox_manager_update_marked (self->voxels);
+
+	return 1;
+}
+
+/** @} */
+/** @} */

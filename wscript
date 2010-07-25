@@ -9,6 +9,10 @@ VERSION='0.0.3'
 srcdir = '.'
 blddir = 'build'
 
+CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video viewer voxel widget'
+EXTS_DIRS = 'camera chat creature effect generator network npc packager region reload skeleton slots sound spawner speech tiles tiles-physics tiles-render widgets'
+CORE_EXCL = 'lipsofsuna/math/unittest.c lipsofsuna/server/server-main.c lipsofsuna/generator/generator-main.c lipsofsuna/viewer/viewer-main.c lipsofsuna/main/main.c lipsofsuna/reload/reload-main.c'
+
 def set_options(ctx):
 	ctx.tool_options('compiler_cc')
 	ctx.tool_options('compiler_cxx')
@@ -236,227 +240,61 @@ def build(ctx):
 		ctx.env.PROGDIR = os.path.join(ctx.env.PREFIX, 'bin')
 		ctx.env.TOOLDIR = os.path.join(ctx.env.PREFIX, 'tool')
 		ctx.env.SAVEDIR = os.path.join(ctx.env.PREFIX, 'save')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/ai/*.c'),
-		target = 'ai_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/algorithm/*.c'),
-		target = 'alg_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/archive/*.c'),
-		target = 'arc_objs',
-		uselib = 'CORE ZLIB')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/binding/*.c'),
-		target = 'bnd_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/callback/*.c'),
-		target = 'cal_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/engine/*.c'),
-		target = 'eng_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/generator/*.c', excl=['lipsofsuna/generator/generator-main.c']),
-		target = 'gen_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/main/*.c', excl=['lipsofsuna/main/main.c']),
-		target = 'mai_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/math/*.c', excl=['lipsofsuna/math/unittest.c']),
-		target = 'mat_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/model/*.c'),
-		target = 'mdl_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/network/*.c'),
-		target = 'net_objs',
-		uselib = 'CORE GRAPPLE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/paths/*.c'),
-		target = 'pth_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cxx',
-		source = ctx.path.ant_glob('lipsofsuna/physics/*.cpp'),
-		target = 'phy_objs',
-		uselib = 'CORE BULLET')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/script/*.c'),
-		target = 'scr_objs',
-		uselib = 'CORE LUA')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/server/*.c', excl=['lipsofsuna/server/server-main.c']),
-		target = 'ser_objs',
-		uselib = 'CORE LUA GRAPPLE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/string/*.c'),
-		target = 'str_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/system/*.c'),
-		target = 'sys_objs',
-		uselib = 'CORE')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/thread/*.c'),
-		target = 'thr_objs',
-		uselib = 'CORE THREAD')
-	ctx.new_task_gen(
-		features = 'cc',
-		source = ctx.path.ant_glob('lipsofsuna/voxel/*.c'),
-		target = 'vox_objs',
-		uselib = 'CORE')
-	if ctx.env.CLIENT:
+	objs = ''
+	libs = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG SQUISH THREAD AL VORBIS OGG FLAC'
+
+	# Core objects.
+	for dir in CORE_DIRS.split(' '):
+		path = os.path.join('lipsofsuna', dir, '*.c')
+		srcs = ctx.path.ant_glob(path, excl = CORE_EXCL.split(' '))
+		if srcs:
+			objs += dir + '_objs '
+			ctx.new_task_gen(
+				features = 'cc',
+				source = srcs,
+				target = dir + '_objs',
+				uselib = libs)
+		path = os.path.join('lipsofsuna', dir, '*.cpp')
+		srcs = ctx.path.ant_glob(path, excl = CORE_EXCL.split(' '))
+		if srcs:
+			objs += dir + '_cxx_objs '
+			ctx.new_task_gen(
+				features = 'cxx',
+				source = srcs,
+				target = dir + '_cxx_objs',
+				uselib = libs)
+
+	# Extension objects.
+	for dir in EXTS_DIRS.split(' '):
+		path = os.path.join('lipsofsuna', 'extension', dir, '*.c')
+		objs += dir + '_ext_objs '
 		ctx.new_task_gen(
 			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/client/*.c', excl=['lipsofsuna/client/client-main.c']),
-			target = 'cli_objs',
-			uselib = 'CORE LUA GRAPPLE SDL SDL_TTF GL GLEW')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/sound/*.c'),
-			target = 'snd_objs',
-			uselib = 'CORE AL VORBIS OGG FLAC')
-	if ctx.env.CLIENT or ctx.env.VIEWER:
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/font/*.c'),
-			target = 'fnt_objs',
-			uselib = 'CORE SDL SDL_TTF')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/image/*.c'),
-			target = 'img_objs',
-			uselib = 'CORE SDL GL PNG')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/particle/*.c'),
-			target = 'par_objs',
-			uselib = 'CORE GL GLEW SDL')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/video/*.c'),
-			target = 'vid_objs',
-			uselib = 'CORE SDL GLEW GL')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/viewer/*.c', excl=['lipsofsuna/viewer/viewer-main.c']),
-			target = 'vie_objs',
-			uselib = 'CORE SDL GLEW GL')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/widget/*.c'),
-			target = 'wdg_objs',
-			uselib = 'CORE SDL GLEW GL')
-	if ctx.env.CLIENT or ctx.env.VIEWER or ctx.env.IMPORT:
-		ctx.new_task_gen(
-			features = 'cxx',
-			source = ctx.path.ant_glob('lipsofsuna/image/*.cpp'),
-			target = 'imgcxx_objs',
-			uselib = 'CORE SDL GL SQUISH')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/reload/*.c', excl=['lipsofsuna/reload/reload-main.c']),
-			target = 'rel_objs',
-			uselib = 'CORE SDL PNG SQUISH')
-		ctx.new_task_gen(
-			features = 'cc',
-			source = ctx.path.ant_glob('lipsofsuna/render/*.c'),
-			target = 'ren_objs',
-			uselib = 'CORE SDL GLEW GL')
+			source = ctx.path.ant_glob(path),
+			target = dir + '_ext_objs',
+			uselib = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG THREAD AL VORBIS OGG FLAC')
+
+	# Target executable.
 	ctx.new_task_gen(
-		features = 'cc cprogram',
-		source = 'lipsofsuna/main/main.c',
-		target = 'lipsofsuna-bin',
-		install_path = None,
-		add_objects = 'sys_objs',
-		uselib = 'CORE THREAD')
-	ctx.set_group("install")
-	instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna' + ctx.env.EXEEXT)
-	ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
-	ctx.set_group("build")
-	if ctx.env.SERVER:
-		ctx.new_task_gen(
-			features = 'cc cxx cprogram',
-			source = 'lipsofsuna/server/server-main.c',
-			target = 'lipsofsuna-server',
-			install_path = ctx.env.PROGDIR,
-			add_objects = 'ai_objs alg_objs arc_objs cal_objs eng_objs gen_objs mai_objs mat_objs mdl_objs net_objs phy_objs pth_objs scr_objs ser_objs str_objs sys_objs thr_objs vox_objs',
-			uselib = 'CORE LUA SQLITE BULLET GRAPPLE ZLIB THREAD')
-	if ctx.env.CLIENT:
-		ctx.new_task_gen(
-			features = 'cc cxx cprogram',
-			source = 'lipsofsuna/client/client-main.c',
-			target = 'lipsofsuna-client',
-			install_path = ctx.env.PROGDIR,
-			add_objects = 'ai_objs alg_objs arc_objs bnd_objs cal_objs cli_objs eng_objs fnt_objs gen_objs img_objs imgcxx_objs mai_objs mat_objs mdl_objs net_objs par_objs phy_objs pth_objs rel_objs ren_objs scr_objs ser_objs snd_objs str_objs sys_objs thr_objs vid_objs vox_objs wdg_objs',
-			uselib = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG SQUISH THREAD AL VORBIS OGG FLAC')
-	if ctx.env.GENERATOR:
-		ctx.new_task_gen(
-			features = 'cc cxx cprogram',
-			source = 'lipsofsuna/generator/generator-main.c',
-			target = 'lipsofsuna-generator',
-			install_path = ctx.env.PROGDIR,
-			add_objects = 'ai_objs alg_objs arc_objs cal_objs eng_objs gen_objs mai_objs mat_objs mdl_objs net_objs phy_objs pth_objs scr_objs ser_objs str_objs sys_objs thr_objs vox_objs',
-			uselib = 'CORE LUA SQLITE BULLET GRAPPLE ZLIB THREAD')
-	if ctx.env.IMPORT:
-		ctx.new_task_gen(
-			features = 'cc cxx cprogram',
-			source = 'lipsofsuna/reload/reload-main.c',
-			target = 'lipsofsuna-import',
-			install_path = ctx.env.PROGDIR,
-			add_objects = 'alg_objs arc_objs img_objs imgcxx_objs mat_objs mdl_objs pth_objs rel_objs str_objs sys_objs thr_objs',
-			uselib = 'CORE SQLITE ZLIB PNG SDL GL GLEW SQUISH THREAD')
-	if ctx.env.VIEWER:
-		ctx.new_task_gen(
-			features = 'cc cxx cprogram',
-			source = 'lipsofsuna/viewer/viewer-main.c',
-			target = 'lipsofsuna-viewer',
-			install_path = ctx.env.PROGDIR,
-			add_objects = 'ai_objs alg_objs arc_objs cal_objs eng_objs img_objs imgcxx_objs mai_objs mat_objs mdl_objs par_objs phy_objs pth_objs rel_objs ren_objs scr_objs str_objs sys_objs thr_objs vid_objs vie_objs vox_objs',
-			uselib = 'CORE LUA SQLITE BULLET SDL SDL_TTF ZLIB GLEW GL PNG SQUISH THREAD')
-	def buildext(ctx, pth, suf, use):
-		dirs = ctx.path.ant_glob(pth + '*', excl=[pth + '.*'], dir=True, src=False, bld=False)
-		for ext in dirs.replace(pth, '').split(' '):
-			srcs = ctx.path.ant_glob(os.path.join(pth, ext, '*.c'))
-			if srcs:
-				ctx.new_task_gen(
-					features = 'cc cshlib',
-					source = srcs,
-					target = ext + suf,
-					install_path = ctx.env.EXTSDIR,
-					uselib = use)
-	if ctx.env.CLIENT or ctx.env.SERVER:
-		buildext(ctx, 'lipsofsuna/extension/common/', '', 'EXTENSION LUA SQLITE GRAPPLE ZLIB THREAD')
-	if ctx.env.CLIENT:
-		buildext(ctx, 'lipsofsuna/extension/client/', '-cli', 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG THREAD AL VORBIS OGG FLAC')
-	if ctx.env.SERVER:
-		buildext(ctx, 'lipsofsuna/extension/server/', '-ser', 'EXTENSION LUA SQLITE GRAPPLE ZLIB THREAD')
+		features = 'cc cxx cprogram',
+		target = 'lipsofsuna-client',
+		install_path = ctx.env.PROGDIR,
+		add_objects = objs,
+		uselib = libs)
+
+	# FIXME: Launcher.
+	#ctx.new_task_gen(
+	#	features = 'cc cprogram',
+	#	source = 'lipsofsuna/main/main.c',
+	#	target = 'lipsofsuna-bin',
+	#	install_path = None,
+	#	add_objects = 'sys_objs',
+	#	uselib = 'CORE THREAD')
+	#ctx.set_group("install")
+	#instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna' + ctx.env.EXEEXT)
+	#ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
+	#ctx.set_group("build")
+
 	ctx.set_group("install")
 	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export.py'])
 
