@@ -9,9 +9,9 @@ VERSION='0.0.3'
 srcdir = '.'
 blddir = 'build'
 
-CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video viewer voxel widget'
+CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video voxel widget'
 EXTS_DIRS = 'camera chat creature effect generator network npc packager region reload skeleton slots sound spawner speech tiles tiles-physics tiles-render widgets'
-CORE_EXCL = 'lipsofsuna/math/unittest.c lipsofsuna/server/server-main.c lipsofsuna/generator/generator-main.c lipsofsuna/viewer/viewer-main.c lipsofsuna/main/main.c lipsofsuna/reload/reload-main.c'
+CORE_EXCL = 'lipsofsuna/math/unittest.c lipsofsuna/server/server-main.c lipsofsuna/main/main.c'
 
 def set_options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -22,26 +22,18 @@ def set_options(ctx):
 	ctx.add_option('--datadir', action='store', default=None, help='override data directory [default: PREFIX/share]')
 	ctx.add_option('--savedir', action='store', default=None, help='override save directory [default: PREFIX/var]')
 	ctx.add_option('--adddeps', action='store', default=None, help='extra path to dependencies')
-	ctx.add_option('--client', action='store', default=True, help='compile client [default: true]')
-	ctx.add_option('--generator', action='store', default=True, help='compile generator [default: true]')
-	ctx.add_option('--importer', action='store', default=True, help='compile importer [default: true]')
-	ctx.add_option('--server', action='store', default=True, help='compile server [default: true]')
 	ctx.add_option('--sound', action='store', default=True, help='compile with sound support [default: true]')
-	ctx.add_option('--viewer', action='store', default=True, help='compile viewer [default: true]')
 
 def configure(ctx):
+
 	# Options
 	if Options.options.relpath != "false" and (Options.options.bindir or Options.options.libdir or Options.options.datadir or Options.options.savedir):
 		print("\nThe directory overrides are not used by a relative path build")
 		print("To enable a traditional build, configure with --relpath=false\n")
 		exit(1)
-	ctx.env.CLIENT = Options.options.client != "false"
-	ctx.env.GENERATOR = Options.options.generator != "false"
-	ctx.env.IMPORT = Options.options.importer != "false"
 	ctx.env.RELPATH = Options.options.relpath != "false"
-	ctx.env.SERVER = Options.options.server != "false"
 	ctx.env.SOUND = Options.options.sound != "false"
-	ctx.env.VIEWER = Options.options.viewer != "false"
+
 	# Directories
 	ctx.env.CPPPATH_CORE = ['.']
 	ctx.env.CPPFLAGS_CORE = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
@@ -68,9 +60,11 @@ def configure(ctx):
 	ctx.env.LINKFLAGS_EXTENSION = ['-g']
 	ctx.env.CPPPATH_TEST = []
 	ctx.env.LIBPATH_TEST = []
+
 	# Tools
 	ctx.check_tool('compiler_cc')
 	ctx.check_tool('compiler_cxx')
+
 	# Dependencies
 	ctx.check(header_name='arpa/inet.h', define_name='HAVE_ARPA_INET_H')
 	ctx.check(header_name='dlfcn.h', define_name='HAVE_DLFCN_H')
@@ -102,63 +96,72 @@ def configure(ctx):
 		ctx.env.EXEEXT = '.exe'
 	else:
 		ctx.env.EXEEXT = ''
-	if True:
-		# zlib
-		ctx.check_cc(lib='z', mandatory=True, uselib_store='ZLIB')
-		ctx.check_cc(header_name='zlib.h', mandatory=True, uselib_store='ZLIB')
-		# SQLite
-		if not ctx.check_cfg(package='sqlite', atleast_version='3.6.0', args='--cflags --libs'):
-			ctx.check_cc(header_name='sqlite3.h', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
-			ctx.check_cc(lib='sqlite3', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
-	if ctx.env.CLIENT or ctx.env.SERVER or ctx.env.GENERATOR:
-		# Bullet
-		if not ctx.check_cfg(package='bullet', atleast_version='2.74', args='--cflags --libs'):
-			ctx.check_cxx(header_name='btBulletCollisionCommon.h', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-			if not ctx.check_cxx(lib='linearmath', uselib='CORE TEST', uselib_store='BULLET'):
-				ctx.check_cxx(lib='LinearMath', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-			if not ctx.check_cxx(lib='bulletcollision', uselib='CORE TEST', uselib_store='BULLET'):
-				ctx.check_cxx(lib='BulletCollision', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-			if not ctx.check_cxx(lib='bulletdynamics', uselib='CORE TEST', uselib_store='BULLET'):
-				ctx.check_cxx(lib='BulletDynamics', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-		# Grapple
-		if not ctx.check_cfg(package='grapple', atleast_version='0.9', args='--cflags --libs'):
-			ctx.check_cc(header_name='grapple/grapple_client.h', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
-			#ctx.check_cc(header_name='grapple/grapple_server.h', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
-			ctx.check_cc(lib='grapple', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
-		# Lua
-		if not ctx.check_cfg(package='lua5.1', atleast_version='5.1', args='--cflags --libs', uselib_store='LUA'):
-			if not ctx.check_cfg(package='lua', atleast_version='5.1', args='--cflags --libs'):
-				ctx.check_cc(header_name='lua.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
-				ctx.check_cc(header_name='lauxlib.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
-				if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA'):
-					ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
-	if ctx.env.CLIENT or ctx.env.VIEWER or ctx.env.IMPORT:
-		# SDL
-		if not ctx.check_cfg(package='sdl', atleast_version='1.2.0', args='--cflags --libs'):
-			ctx.check_cxx(header_name='SDL.h', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
-			ctx.check_cxx(lib='SDL', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
-		# SDL_ttf
-		ctx.check_cc(lib='SDL_ttf', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
-		ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
-		# GL
-		ctx.check_cc(header_name='GL/gl.h', mandatory=True, uselib='CORE TEST', uselib_store='GL')
-		if not ctx.check_cc(lib='GL', uselib='CORE TEST', uselib_store='GL'):
-			ctx.check_cc(lib='opengl32', mandatory=True, uselib='CORE TEST', uselib_store='GL')
-		# GLEW
-		ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-		ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST GL', uselib_store='GLEW')
-		# PNG
-		if not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG") and \
-		   not ctx.check_cfg(package='libpng14', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG") and \
-		   not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG"):
-			ctx.check_cxx(header_name='png.h', mandatory=True, uselib='CORE TEST', uselib_store='PNG')
-			if not ctx.check_cxx(lib='png12', mandatory=True, uselib='CORE TEST', uselib_store='PNG') and \
-			   not ctx.check_cxx(lib='png15', mandatory=True, uselib='CORE TEST', uselib_store='PNG'):
-				ctx.check_cxx(lib='png', mandatory=True, uselib='CORE TEST', uselib_store='PNG')
-		# squish
-		ctx.check_cxx(header_name='squish.h', mandatory=True, uselib='CORE TEST', uselib_store='SQUISH')
-		ctx.check_cxx(lib='squish', mandatory=True, uselib='CORE TEST', uselib_store='SQUISH')
-	if ctx.env.CLIENT and ctx.env.SOUND:
+
+	# zlib
+	ctx.check_cc(lib='z', mandatory=True, uselib_store='ZLIB')
+	ctx.check_cc(header_name='zlib.h', mandatory=True, uselib_store='ZLIB')
+
+	# SQLite
+	if not ctx.check_cfg(package='sqlite', atleast_version='3.6.0', args='--cflags --libs'):
+		ctx.check_cc(header_name='sqlite3.h', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
+		ctx.check_cc(lib='sqlite3', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
+
+	# Bullet
+	if not ctx.check_cfg(package='bullet', atleast_version='2.74', args='--cflags --libs'):
+		ctx.check_cxx(header_name='btBulletCollisionCommon.h', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
+		if not ctx.check_cxx(lib='linearmath', uselib='CORE TEST', uselib_store='BULLET'):
+			ctx.check_cxx(lib='LinearMath', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
+		if not ctx.check_cxx(lib='bulletcollision', uselib='CORE TEST', uselib_store='BULLET'):
+			ctx.check_cxx(lib='BulletCollision', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
+		if not ctx.check_cxx(lib='bulletdynamics', uselib='CORE TEST', uselib_store='BULLET'):
+			ctx.check_cxx(lib='BulletDynamics', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
+
+	# Grapple
+	if not ctx.check_cfg(package='grapple', atleast_version='0.9', args='--cflags --libs'):
+		ctx.check_cc(header_name='grapple/grapple_client.h', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
+		#ctx.check_cc(header_name='grapple/grapple_server.h', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
+		ctx.check_cc(lib='grapple', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
+
+	# Lua
+	if not ctx.check_cfg(package='lua5.1', atleast_version='5.1', args='--cflags --libs', uselib_store='LUA'):
+		if not ctx.check_cfg(package='lua', atleast_version='5.1', args='--cflags --libs'):
+			ctx.check_cc(header_name='lua.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
+			ctx.check_cc(header_name='lauxlib.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
+			if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA'):
+				ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
+
+	# SDL
+	if not ctx.check_cfg(package='sdl', atleast_version='1.2.0', args='--cflags --libs'):
+		ctx.check_cxx(header_name='SDL.h', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
+		ctx.check_cxx(lib='SDL', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
+
+	# SDL_ttf
+	ctx.check_cc(lib='SDL_ttf', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
+	ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
+
+	# GL
+	ctx.check_cc(header_name='GL/gl.h', mandatory=True, uselib='CORE TEST', uselib_store='GL')
+	if not ctx.check_cc(lib='GL', uselib='CORE TEST', uselib_store='GL'):
+		ctx.check_cc(lib='opengl32', mandatory=True, uselib='CORE TEST', uselib_store='GL')
+
+	# GLEW
+	ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
+	ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST GL', uselib_store='GLEW')
+
+	# PNG
+	if not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG") and \
+	   not ctx.check_cfg(package='libpng14', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG") and \
+	   not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG"):
+		ctx.check_cxx(header_name='png.h', mandatory=True, uselib='CORE TEST', uselib_store='PNG')
+		if not ctx.check_cxx(lib='png12', mandatory=True, uselib='CORE TEST', uselib_store='PNG') and \
+		   not ctx.check_cxx(lib='png15', mandatory=True, uselib='CORE TEST', uselib_store='PNG'):
+			ctx.check_cxx(lib='png', mandatory=True, uselib='CORE TEST', uselib_store='PNG')
+
+	# squish
+	ctx.check_cxx(header_name='squish.h', mandatory=True, uselib='CORE TEST', uselib_store='SQUISH')
+	ctx.check_cxx(lib='squish', mandatory=True, uselib='CORE TEST', uselib_store='SQUISH')
+
+	if ctx.env.SOUND:
 		# AL
 		if not ctx.check_cfg(package='openal', atleast_version='0.0.8', args='--cflags --libs', uselib_store="AL"):
 			ctx.check_cc(header_name='AL/al.h', mandatory=True, uselib='CORE TEST', uselib_store='AL')
@@ -178,13 +181,14 @@ def configure(ctx):
 		if not ctx.check_cfg(package='flac', atleast_version='1.2.0', args='--cflags --libs'):
 			ctx.check_cc(header_name='stream_decoder.h', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
 			ctx.check_cc(lib='FLAC', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
+
 	# Defines
 	ctx.define('LI_ENABLE_ERROR', 1)
 	if not ctx.env.SOUND:
 		ctx.define('LI_DISABLE_SOUND', 1)
 	if ctx.env.RELPATH:
 		ctx.define('LI_RELATIVE_PATHS', 1)
-		ctx.env.RPATH_CORE = ['$ORIGIN/../lib']
+		ctx.env.RPATH_CORE = ['$ORIGIN/lib']
 	else:
 		bindir = Options.options.bindir
 		if not bindir:
@@ -212,10 +216,10 @@ def configure(ctx):
 		ctx.define('LITOOLDIR', ctx.env.TOOLDIR)
 		ctx.define('LISAVEDIR', ctx.env.SAVEDIR)
 	ctx.write_config_header('config.h')
+
 	# Messages
 	if ctx.env.RELPATH:
 		ctx.define('LI_RELATIVE_PATHS', 1)
-		ctx.env.RPATH_CORE = ['$ORIGIN/../lib']
 		print("\nConfigured with:")
 		print("\trelative paths\n")
 	else:
@@ -277,25 +281,15 @@ def build(ctx):
 	# Target executable.
 	ctx.new_task_gen(
 		features = 'cc cxx cprogram',
-		target = 'lipsofsuna-client',
-		install_path = ctx.env.PROGDIR,
+		target = 'lipsofsuna-bin',
+		install_path = None,
 		add_objects = objs,
 		uselib = libs)
 
-	# FIXME: Launcher.
-	#ctx.new_task_gen(
-	#	features = 'cc cprogram',
-	#	source = 'lipsofsuna/main/main.c',
-	#	target = 'lipsofsuna-bin',
-	#	install_path = None,
-	#	add_objects = 'sys_objs',
-	#	uselib = 'CORE THREAD')
-	#ctx.set_group("install")
-	#instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna' + ctx.env.EXEEXT)
-	#ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
-	#ctx.set_group("build")
-
+	# Installation.
 	ctx.set_group("install")
+	instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna' + ctx.env.EXEEXT)
+	ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
 	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export.py'])
 
 def html(ctx):

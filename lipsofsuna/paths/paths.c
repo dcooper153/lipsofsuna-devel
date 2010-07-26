@@ -33,9 +33,9 @@
  * \param name Module name.
  * \return Paths or NULL.
  */
-LIPthPaths*
-lipth_paths_new (const char* path,
-                 const char* name)
+LIPthPaths* lipth_paths_new (
+	const char* path,
+	const char* name)
 {
 	LIPthPaths* self;
 	LISysStat stat;
@@ -135,8 +135,8 @@ error:
  *
  * \param self Paths object.
  */
-void
-lipth_paths_free (LIPthPaths* self)
+void lipth_paths_free (
+	LIPthPaths* self)
 {
 #ifdef LI_RELATIVE_PATHS
 	lisys_free (self->global_exts);
@@ -157,9 +157,9 @@ lipth_paths_free (LIPthPaths* self)
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_data (const LIPthPaths* self,
-                      const char*       name)
+char* lipth_paths_get_data (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_data, name, NULL);
 }
@@ -171,9 +171,9 @@ lipth_paths_get_data (const LIPthPaths* self,
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_font (const LIPthPaths* self,
-                      const char*       name)
+char* lipth_paths_get_font (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_data, "fonts", name, NULL);
 }
@@ -185,9 +185,9 @@ lipth_paths_get_font (const LIPthPaths* self,
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_graphics (const LIPthPaths* self,
-                          const char*       name)
+char* lipth_paths_get_graphics (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_data, "graphics", name, NULL);
 }
@@ -199,9 +199,9 @@ lipth_paths_get_graphics (const LIPthPaths* self,
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_script (const LIPthPaths* self,
-                        const char*       name)
+char* lipth_paths_get_script (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_data, "scripts", name, NULL);
 }
@@ -213,9 +213,9 @@ lipth_paths_get_script (const LIPthPaths* self,
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_shader (const LIPthPaths* self,
-                        const char*       name)
+char* lipth_paths_get_shader (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_data, "shaders", name, NULL);
 }
@@ -227,9 +227,9 @@ lipth_paths_get_shader (const LIPthPaths* self,
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_sound (const LIPthPaths* self,
-                       const char*       name)
+char* lipth_paths_get_sound (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_data, "sounds", name, NULL);
 }
@@ -241,9 +241,9 @@ lipth_paths_get_sound (const LIPthPaths* self,
  * \param name File name.
  * \return Full path or NULL.
  */
-char*
-lipth_paths_get_sql (const LIPthPaths* self,
-                     const char*       name)
+char* lipth_paths_get_sql (
+	const LIPthPaths* self,
+	const char*       name)
 {
 	return lisys_path_concat (self->module_state, name, NULL);
 }
@@ -253,21 +253,10 @@ lipth_paths_get_sql (const LIPthPaths* self,
  *
  * \return Path or NULL.
  */
-char*
-lipth_paths_get_root ()
+char* lipth_paths_get_root ()
 {
 #ifdef LI_RELATIVE_PATHS
-	char* tmp;
-	char* path;
-
-	/* Resolve game directory. */
-	tmp = lisys_relative_exedir ();
-	if (tmp == NULL)
-		return NULL;
-	path = lisys_path_format (tmp, LISYS_PATH_STRIPLAST, NULL);
-	lisys_free (tmp);
-
-	return path;
+	return lisys_relative_exedir ();
 #else
 	return listr_dup (LIDATADIR);
 #endif
