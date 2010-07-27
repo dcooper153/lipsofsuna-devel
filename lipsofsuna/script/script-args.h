@@ -121,6 +121,10 @@ LIAPICALL (int, liscr_args_geti_string, (
 	int          index,
 	const char** result));
 
+LIAPICALL (int, liscr_args_geti_table, (
+	LIScrArgs* self,
+	int        index));
+
 LIAPICALL (int, liscr_args_geti_vector, (
 	LIScrArgs*   self,
 	int          index,
@@ -169,6 +173,10 @@ LIAPICALL (int, liscr_args_gets_string, (
 	const char*  name,
 	const char** result));
 
+LIAPICALL (int, liscr_args_gets_table, (
+	LIScrArgs*  self,
+	const char* name));
+
 LIAPICALL (int, liscr_args_gets_vector, (
 	LIScrArgs*   self,
 	const char*  name,
@@ -212,6 +220,9 @@ LIAPICALL (void, liscr_args_seti_float, (
 LIAPICALL (void, liscr_args_seti_int, (
 	LIScrArgs* self,
 	int        value));
+
+LIAPICALL (void, liscr_args_seti_nil, (
+	LIScrArgs* self));
 
 LIAPICALL (void, liscr_args_seti_quaternion, (
 	LIScrArgs*             self,

@@ -364,13 +364,44 @@ liscr_args_geti_string (LIScrArgs*   self,
 		if (index < 0 || index >= self->args_count)
 			return 0;
 		index += self->args_start;
-		if (lua_type (self->lua, -1) == LUA_TSTRING)
+		if (lua_type (self->lua, index) == LUA_TSTRING)
 			tmp = lua_tostring (self->lua, index);
 		if (tmp != NULL)
 			*result = tmp;
 	}
 
 	return tmp != NULL;
+}
+
+/**
+ * \brief Gets a table by index and pushes it to the stack.
+ * \param self Arguments.
+ * \param index Argument index.
+ * \return Nonzero on success.
+ */
+int liscr_args_geti_table (
+	LIScrArgs* self,
+	int        index)
+{
+	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
+	{
+		lua_pushnumber (self->lua, index + 1);
+		lua_gettable (self->lua, self->input_table);
+		if (lua_type (self->lua, -1) == LUA_TTABLE)
+			return 1;
+		lua_pop (self->lua, 1);
+	}
+	else
+	{
+		if (index < 0 || index >= self->args_count)
+			return 0;
+		index += self->args_start;
+		if (lua_type (self->lua, index) == LUA_TTABLE)
+			return 1;
+		lua_pushvalue (self->lua, index);
+	}
+
+	return 0;
 }
 
 int
@@ -584,6 +615,27 @@ liscr_args_gets_string (LIScrArgs*   self,
 	return tmp != NULL;
 }
 
+/**
+ * \brief Gets a table by name and pushes it to the stack.
+ * \param self Arguments.
+ * \param name Argument name.
+ * \return Nonzero on success.
+ */
+int liscr_args_gets_table (
+	LIScrArgs*  self,
+	const char* name)
+{
+	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
+	{
+		lua_getfield (self->lua, self->input_table, name);
+		if (lua_type (self->lua, -1) == LUA_TTABLE)
+			return 1;
+		lua_pop (self->lua, 1);
+	}
+
+	return 0;
+}
+
 int
 liscr_args_gets_vector (LIScrArgs*   self,
                         const char*  name,
@@ -791,6 +843,18 @@ liscr_args_seti_int (LIScrArgs* self,
 		lua_pushnumber (self->lua, value);
 		lua_settable (self->lua, self->output_table);
 	}
+}
+
+void liscr_args_seti_nil (
+	LIScrArgs* self)
+{
+	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
+	{
+		lua_pushnil (self->lua);
+		self->ret++;
+	}
+	else
+		self->ret++;
 }
 
 void
