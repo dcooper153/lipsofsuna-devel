@@ -205,6 +205,11 @@ LIAPICALL (void, lieng_object_set_shape, (
 	LIEngObject* self,
 	LIPhyShape*  shape));
 
+LIAPICALL (void, lieng_object_get_smoothing, (
+	LIEngObject* self,
+	float*       pos,
+	float*       rot));
+
 LIAPICALL (void, lieng_object_set_smoothing, (
 	LIEngObject* self,
 	float        pos,

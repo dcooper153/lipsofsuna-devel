@@ -988,6 +988,22 @@ lieng_object_set_shape (LIEngObject* self,
 }
 
 /**
+ * \brief Gets positional and rotation smoothing.
+ *
+ * \param self Object.
+ * \param pos Return location for positional smoothing.
+ * \param rot Return location for rotational smoothing.
+ */
+void lieng_object_get_smoothing (
+	LIEngObject* self,
+	float*       pos,
+	float*       rot)
+{
+	*pos = self->smoothing.pos;
+	*rot = self->smoothing.rot;
+}
+
+/**
  * \brief Sets positional and rotation smoothing.
  *
  * By setting either of the smoothing values to non-zero, the engine object is
@@ -999,10 +1015,10 @@ lieng_object_set_shape (LIEngObject* self,
  * \param pos Positional smoothing.
  * \param rot Rotational smoothing.
  */
-void
-lieng_object_set_smoothing (LIEngObject* self,
-                            float        pos,
-                            float        rot)
+void lieng_object_set_smoothing (
+	LIEngObject* self,
+	float        pos,
+	float        rot)
 {
 	self->smoothing.pos = pos;
 	self->smoothing.rot = rot;

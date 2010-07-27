@@ -58,7 +58,6 @@ private_miscellaneous_object_new (LICliClient* client,
                                   LIEngObject* object)
 {
 	/* Set object mode. */
-	lieng_object_set_smoothing (object, LICLI_OBJECT_POSITION_SMOOTHING, LICLI_OBJECT_ROTATION_SMOOTHING);
 	lieng_object_set_userdata (object, client);
 
 	/* Allocate script data. */

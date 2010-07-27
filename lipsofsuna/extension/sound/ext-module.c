@@ -24,6 +24,7 @@
  * @{
  */
 
+#include <lipsofsuna/network.h>
 #include "ext-module.h"
 
 #ifndef LI_DISABLE_SOUND

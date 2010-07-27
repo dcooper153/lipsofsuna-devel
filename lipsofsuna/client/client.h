@@ -38,7 +38,6 @@
 #include <lipsofsuna/video.h>
 #include <lipsofsuna/widget.h>
 #include "client-callbacks.h"
-#include "client-object.h"
 #include "client-types.h"
 #include "client-window.h"
 
