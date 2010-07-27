@@ -16,18 +16,18 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup LIExtBinding Binding
  * @{
  */
 
-#include <lipsofsuna/client.h>
+#include "ext-module.h"
 
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Client.Binding"
+ * module "Extension.Binding"
  * --- Bind controls to actions.
  * -- @name Binding
  * -- @class table
@@ -61,18 +61,18 @@ static void Binding_new (LIScrArgs* args)
 	const char* params = "";
 	LIBndAction* action;
 	LIBndBinding* self;
-	LICliClient* client;
+	LIExtModule* module;
 	LIScrData* data;
 
 	/* Arguments. */
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_BINDING);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_BINDING);
 	if (liscr_args_gets_string (args, "action", &name))
 	{
-		action = libnd_manager_find_action (client->bindings, name);
+		action = libnd_manager_find_action (module->bindings, name);
 		if (action == NULL)
 			return;
 	}
-	else if (liscr_args_gets_data (args, "action", LICLI_SCRIPT_ACTION, &data)) 
+	else if (liscr_args_gets_data (args, "action", LIEXT_SCRIPT_ACTION, &data)) 
 		action = data->data;
 	else
 		return;
@@ -89,10 +89,10 @@ static void Binding_new (LIScrArgs* args)
 	liscr_args_gets_string (args, "params", &params);
 
 	/* Allocate userdata. */
-	self = libnd_binding_new (client->bindings, type, action, params, code, mods, mult);
+	self = libnd_binding_new (module->bindings, type, action, params, code, mods, mult);
 	if (self == NULL)
 		return;
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_BINDING, libnd_binding_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_BINDING, libnd_binding_free);
 	if (data == NULL)
 	{
 		libnd_binding_free (self);
@@ -116,11 +116,11 @@ static void Binding_free (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-licli_script_binding (LIScrClass* self,
-                      void*       data)
+void liext_script_binding (
+	LIScrClass* self,
+	void*       data)
 {
-	liscr_class_set_userdata (self, LICLI_SCRIPT_BINDING, data);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_BINDING, data);
 	liscr_class_insert_cfunc (self, "new", Binding_new);
 	liscr_class_insert_mfunc (self, "free", Binding_free);
 }

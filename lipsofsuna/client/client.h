@@ -66,7 +66,6 @@ struct _LICliClient
 	char* path;
 	char* camera_node;
 	LIAlgCamera* camera;
-	LIBndManager* bindings;
 	LIPthPaths* paths;
 	LIRenRender* render;
 	LIRenScene* scene;

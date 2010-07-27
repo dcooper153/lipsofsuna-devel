@@ -16,13 +16,13 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup LIExtBinding Binding
  * @{
  */
 
-#include <lipsofsuna/client.h>
+#include "ext-module.h"
 
 static int
 private_action_callback (LIBndAction*  action,
@@ -45,8 +45,8 @@ private_action_callback (LIBndAction*  action,
 
 	/* Create event. */
 	event = liscr_event_newva (script,
-		"binding", LICLI_SCRIPT_BINDING, libnd_binding_get_userdata (binding),
-		"action", LICLI_SCRIPT_ACTION, libnd_action_get_userdata (action),
+		"binding", LIEXT_SCRIPT_BINDING, libnd_binding_get_userdata (binding),
+		"action", LIEXT_SCRIPT_ACTION, libnd_action_get_userdata (action),
 		"active", LISCR_TYPE_BOOLEAN, value != 0.0f,
 		"value", LISCR_TYPE_FLOAT, value,
 		"params", LISCR_TYPE_STRING, binding->params, NULL);
@@ -61,7 +61,8 @@ private_action_callback (LIBndAction*  action,
 	liscr_pushdata (script->lua, event);
 	if (lua_pcall (script->lua, 1, 0, 0))
 	{
-		printf ("ERROR: %s.\n", lua_tostring (script->lua, -1));
+		lisys_error_set (EINVAL, lua_tostring (script->lua, -1));
+		lisys_error_report ();
 		lua_pop (script->lua, 1);
 	}
 
@@ -74,7 +75,7 @@ private_action_callback (LIBndAction*  action,
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Client.Action"
+ * module "Extension.Binding"
  * ---
  * -- Specify the actions and controls of players.
  * -- @name Action
@@ -111,7 +112,7 @@ static void Action_new (LIScrArgs* args)
 	const char* name = "";
 	const char* desc = "";
 	LIBndAction* self;
-	LICliClient* client;
+	LIExtModule* module;
 	LIScrData* data;
 
 	/* Check arguments. */
@@ -121,13 +122,13 @@ static void Action_new (LIScrArgs* args)
 	liscr_args_gets_string (args, "desc", &desc);
 
 	/* Allocate self. */
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_ACTION);
-	self = libnd_action_new (client->bindings, id, name, desc, private_action_callback, NULL);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_ACTION);
+	self = libnd_action_new (module->bindings, id, name, desc, private_action_callback, NULL);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_ACTION, libnd_action_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_ACTION, libnd_action_free);
 	if (data == NULL)
 	{
 		libnd_action_free (self);
@@ -158,11 +159,11 @@ static void Action_setter_enabled (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-licli_script_action (LIScrClass* self,
-                   void*       data)
+void liext_script_action (
+	LIScrClass* self,
+	void*       data)
 {
-	liscr_class_set_userdata (self, LICLI_SCRIPT_ACTION, data);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_ACTION, data);
 	liscr_class_insert_cfunc (self, "new", Action_new);
 	liscr_class_insert_mfunc (self, "free", Action_free);
 	liscr_class_insert_mvar (self, "enabled", Action_getter_enabled, Action_setter_enabled);

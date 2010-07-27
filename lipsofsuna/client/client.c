@@ -35,9 +35,6 @@
 #include "client-window.h"
 
 static int
-private_init_bindings (LICliClient* self);
-
-static int
 private_init_camera (LICliClient* self);
 
 static int
@@ -152,11 +149,6 @@ void licli_client_free_module (
 		self->script = NULL;
 	}
 
-	if (self->bindings != NULL)
-	{
-		libnd_manager_free (self->bindings);
-		self->bindings = NULL;
-	}
 	if (self->widgets != NULL)
 	{
 		liwdg_manager_free (self->widgets);
@@ -265,13 +257,11 @@ int licli_client_load_module (
 		licli_client_free_module (self);
 		return 0;
 	}
-	if (!private_init_bindings (self) ||
-	    !private_init_render (self) ||
+	if (!private_init_render (self) ||
 	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_script (self) ||
 	    !licli_render_init (self) ||
-	    !licli_client_init_callbacks_binding (self) ||
 	    !licli_client_init_callbacks_misc (self) ||
 	    !licli_client_init_callbacks_widget (self))
 	{
@@ -337,15 +327,6 @@ void licli_client_set_moving (
 /*****************************************************************************/
 
 static int
-private_init_bindings (LICliClient* self)
-{
-	self->bindings = libnd_manager_new ();
-	if (self->bindings == NULL)
-		return 0;
-	return 1;
-}
-
-static int
 private_init_camera (LICliClient* self)
 {
 	GLint viewport[4];
@@ -394,9 +375,7 @@ private_init_render (LICliClient* self)
 static int
 private_init_script (LICliClient* self)
 {
-	if (!liscr_script_create_class (self->script, "Action", licli_script_action, self) ||
-	    !liscr_script_create_class (self->script, "Binding", licli_script_binding, self) ||
-	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
+	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
 	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
 	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||

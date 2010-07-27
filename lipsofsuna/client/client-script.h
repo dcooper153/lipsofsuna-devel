@@ -29,21 +29,11 @@
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/widget.h>
 
-#define LICLI_SCRIPT_ACTION "Action"
-#define LICLI_SCRIPT_BINDING "Binding"
 #define LICLI_SCRIPT_CLIENT "Client"
 #define LICLI_SCRIPT_GROUP "Group"
 #define LICLI_SCRIPT_LIGHT "Light"
 #define LICLI_SCRIPT_SCENE "Scene"
 #define LICLI_SCRIPT_WIDGET "Widget"
-
-LIAPICALL (void, licli_script_action, (
-	LIScrClass* self,
-	void*       data));
-
-LIAPICALL (void, licli_script_binding, (
-	LIScrClass* self,
-	void*       data));
 
 LIAPICALL (void, licli_script_client, (
 	LIScrClass* self,

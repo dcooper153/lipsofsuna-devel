@@ -16,24 +16,48 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup licliCallbacks Callbacks
+ * \addtogroup LIExtBinding Binding
  * @{
  */
 
-#ifndef __CLIENT_CALLBACKS_H__
-#define __CLIENT_CALLBACKS_H__
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
-#include <lipsofsuna/render.h>
-#include "client-types.h"
+#include <lipsofsuna/binding.h>
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/extension.h>
 
-int licli_client_init_callbacks_misc (LICliClient* self);
-int licli_client_init_callbacks_widget (LICliClient* self);
-int licli_render_init (LICliClient* self);
+#define LIEXT_SCRIPT_ACTION "Action"
+#define LIEXT_SCRIPT_BINDING "Binding"
+
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
+{
+	LIBndManager* bindings;
+	LICalHandle calls[2];
+	LICliClient* client;
+	LIMaiProgram* program;
+};
+
+LIExtModule* liext_bindings_new (
+	LIMaiProgram* program);
+
+void liext_bindings_free (
+	LIExtModule* self);
+
+/*****************************************************************************/
+
+void liext_script_action (
+	LIScrClass* self,
+	void*       data);
+
+void liext_script_binding (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 
 /** @} */
 /** @} */
-
