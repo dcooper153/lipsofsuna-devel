@@ -27,7 +27,6 @@
 
 #include <lipsofsuna/engine.h>
 #include "server.h"
-#include "server-object.h"
 #include "server-types.h"
 
 int liser_server_init_callbacks_client (LISerServer* server);

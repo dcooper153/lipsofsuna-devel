@@ -27,7 +27,6 @@
 
 #include <lipsofsuna/archive.h>
 #include <lipsofsuna/main.h>
-#include "server-object.h"
 #include "server-types.h"
 
 struct _LISerServer
@@ -51,14 +50,7 @@ LIAPICALL (LISerServer*, liser_server_new, (
 LIAPICALL (void, liser_server_free, (
 	LISerServer* self));
 
-LIAPICALL (int, liser_server_check_unique_object, (
-	const LISerServer* self,
-	uint32_t           id));
-
 LIAPICALL (int, liser_server_main, (
-	LISerServer* self));
-
-LIAPICALL (int, liser_server_save, (
 	LISerServer* self));
 
 #endif

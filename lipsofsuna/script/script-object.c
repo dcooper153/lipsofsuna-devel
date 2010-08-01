@@ -182,27 +182,47 @@ static void Object_find_node (LIScrArgs* args)
  * -- @param clss Object class.
  * -- @param args Arguments.<ul>
  * --   <li>point: Center point. (required)</li>
- * --   <li>radius: Search radius.</li></ul>
+ * --   <li>radius: Search radius.</li>
+ * --   <li>sector: Return all object in this sector.</li></ul>
  * -- @return Table of matching objects and their IDs.
  * function Object.find_objects(clss, args)
  */
 static void Object_find_objects (LIScrArgs* args)
 {
+	int id;
 	float radius = 32.0f;
+	LIAlgU32dicIter iter1;
 	LIEngObjectIter iter;
+	LIEngObject* object;
+	LIEngSector* sector;
 	LIMatVector center;
 	LIMaiProgram* program;
 
-	/* Check arguments. */
-	if (!liscr_args_gets_vector (args, "point", &center))
-		return;
-	liscr_args_gets_float (args, "radius", &radius);
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
 
-	/* Find objects. */
-	LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
-		liscr_args_setf_data (args, iter.object->id, iter.object->script);
+	/* Radial find mode. */
+	if (liscr_args_gets_vector (args, "point", &center))
+	{
+		liscr_args_gets_float (args, "radius", &radius);
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+		LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
+			liscr_args_setf_data (args, iter.object->id, iter.object->script);
+	}
+
+	/* Sector find mode. */
+	else if (liscr_args_gets_int (args, "sector", &id))
+	{
+		sector = lialg_sectors_data_index (program->sectors, "engine", id, 0);
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+		if (sector != NULL)
+		{
+			LIALG_U32DIC_FOREACH (iter1, sector->objects)
+			{
+				object = iter1.value;
+				liscr_args_setf_data (args, object->id, object->script);
+			}
+		}
+	}
 }
 
 /* @luadoc
@@ -295,6 +315,63 @@ static void Object_jump (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Creates a new object.
+ * --
+ * -- @param clss Object class.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: Unique ID of the object. (required)</li></ul>
+ * -- @return New object.
+ * function Object.new(clss, args)
+ */
+static void Object_new (LIScrArgs* args)
+{
+	int id;
+	int realize = 0;
+	LIEngObject* self;
+	LIMaiProgram* program;
+	LIScrClass* clss;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	if (!liscr_args_gets_int (args, "id", &id) || id <= 0)
+		return;
+
+	/* Check for an existing object. */
+	self = lieng_engine_find_object (program->engine, id);
+	if (self != NULL)
+	{
+		/* TODO: Should we reset the object somehow? */
+		if (self->script != NULL)
+			liscr_args_seti_data (args, self->script);
+		return;
+	}
+
+	/* Get real class. */
+	clss = liscr_isanyclass (args->lua, 1);
+	if (clss == NULL)
+		return;
+
+	/* Allocate object. */
+	self = lieng_object_new (program->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
+	if (self == NULL)
+		return;
+
+	/* Allocate userdata. */
+	self->script = liscr_data_new (args->script, self, clss->meta, lieng_object_free);
+	if (self->script == NULL)
+	{
+		lieng_object_free (self);
+		return;
+	}
+
+	/* Initialize userdata. */
+	liscr_args_call_setters_except (args, self->script, "realized");
+	liscr_args_gets_bool (args, "realized", &realize);
+	liscr_args_seti_data (args, self->script);
+	liscr_data_unref (self->script, NULL);
+	lieng_object_set_realized (self, realize);
+}
+
+/* @luadoc
  * --- Sweeps a sphere relative to the object.
  * --
  * -- @param self Object.
@@ -383,35 +460,6 @@ static void Object_getter_animations (LIScrArgs* args)
 		if (channel->repeats == -1)
 			liscr_args_setf_string (args, iter.key, channel->animation_name);
 	}
-}
-
-/* @luadoc
- * --- Class type.
- * --
- * -- @name Object.class
- * -- @class table
- */
-static void Object_getter_class (LIScrArgs* args)
-{
-	liscr_args_seti_class (args, args->data->clss);
-}
-static void Object_setter_class (LIScrArgs* args)
-{
-	LIScrClass* clss;
-
-	if (liscr_args_geti_class (args, 0, NULL, &clss))
-		liscr_data_set_class (args->data, clss);
-}
-
-/* @luadoc
- * --- Class name of the object.
- * --
- * -- @name Object.class_name
- * -- @class table
- */
-static void Object_getter_class_name (LIScrArgs* args)
-{
-	liscr_args_seti_string (args, liscr_class_get_name (args->clss));
 }
 
 /* @luadoc
@@ -690,6 +738,20 @@ static void Object_setter_save (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The sector index of the object, or nil if the object isn't on the map.
+ * --
+ * -- @name Object.sector
+ * -- @class table
+ */
+static void Object_getter_sector (LIScrArgs* args)
+{
+	LIEngObject* self = args->self;
+
+	if (self->sector != NULL)
+		liscr_args_seti_int (args, self->sector->sector->index);
+}
+
+/* @luadoc
  * --- Selection status flag.
  * --
  * -- @name Object.selected
@@ -840,11 +902,11 @@ static void Object_setter_velocity (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liscr_script_object (LIScrClass* self,
-                     void*       data)
+void liscr_script_object (LIScrClass* self,
+                          void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
+	liscr_class_inherit (self, liscr_script_data, data);
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "approach", Object_approach);
@@ -855,11 +917,10 @@ liscr_script_object (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
 	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
 	liscr_class_insert_mfunc (self, "jump", Object_jump);
+	liscr_class_insert_cfunc (self, "new", Object_new);
 	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
 	liscr_class_insert_mvar (self, "angular", Object_getter_angular, Object_setter_angular);
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
-	liscr_class_insert_mvar (self, "class", Object_getter_class, Object_setter_class);
-	liscr_class_insert_cvar (self, "class_name", Object_getter_class_name, NULL);
 	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);
 	liscr_class_insert_mvar (self, "collision_mask", Object_getter_collision_mask, Object_setter_collision_mask);
 	liscr_class_insert_mvar (self, "gravity", Object_getter_gravity, Object_setter_gravity);
@@ -873,6 +934,7 @@ liscr_script_object (LIScrClass* self,
 	liscr_class_insert_mvar (self, "rotation", Object_getter_rotation, Object_setter_rotation);
 	liscr_class_insert_mvar (self, "rotation_smoothing", Object_getter_rotation_smoothing, Object_setter_rotation_smoothing);
 	liscr_class_insert_mvar (self, "save", Object_getter_save, Object_setter_save);
+	liscr_class_insert_mvar (self, "sector", Object_getter_sector, NULL);
 	liscr_class_insert_mvar (self, "selected", Object_getter_selected, Object_setter_selected);
 	liscr_class_insert_cvar (self, "selected_objects", Object_getter_selected_objects, Object_setter_selected_objects);
 	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);

@@ -47,10 +47,6 @@ LIAPICALL (void, licli_script_light, (
 	LIScrClass* self,
 	void*       data));
 
-LIAPICALL (void, licli_script_object, (
-	LIScrClass* self,
-	void*       data));
-
 LIAPICALL (void, licli_script_scene, (
 	LIScrClass* self,
 	void*       data));

@@ -67,7 +67,6 @@ LISerServer* liser_server_new (
 	self->paths = self->program->paths;
 	self->script = self->program->script;
 	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
-	lieng_engine_set_unique_object_call (self->engine, liser_server_check_unique_object, self);
 	lialg_sectors_set_unload (self->sectors, 20.0f);
 
 	/* Initialize server component. */
@@ -81,12 +80,11 @@ LISerServer* liser_server_new (
 	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
 	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
 	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
-	    !liscr_script_create_class (self->script, "Object", liser_script_object, self->program) ||
+	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
 	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
 	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self->program) ||
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
-	    !liscr_script_create_class (self->script, "Server", liser_script_server, self) ||
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
 	{
 		liser_server_free (self);
@@ -123,50 +121,6 @@ liser_server_free (LISerServer* self)
 }
 
 /**
- * \brief Checks if the object ID is unique.
- *
- * \param self Server.
- * \param id ID to check.
- * \return Nonzero if unique.
- */
-int
-liser_server_check_unique_object (const LISerServer* self,
-                                  uint32_t           id)
-{
-	int ret;
-	const char* query;
-	sqlite3_stmt* statement;
-
-	/* Query the ID from database. */
-	query = "SELECT id FROM objects WHERE id=?;";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (self->sql));
-		sqlite3_finalize (statement);
-		return 0;
-	}
-
-	/* Reject if found. */
-	ret = sqlite3_step (statement);
-	if (ret != SQLITE_DONE)
-	{
-		if (ret != SQLITE_ROW)
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->sql));
-		ret = 0;
-	}
-	else
-		ret = 1;
-	sqlite3_finalize (statement);
-
-	return ret;
-}
-
-/**
  * \brief Runs the server script.
  *
  * \param self Server.
@@ -176,33 +130,6 @@ int
 liser_server_main (LISerServer* self)
 {
 	return limai_program_execute_script (self->program, "server/main.lua");
-}
-
-/**
- * \brief Saves currently loaded objects.
- *
- * \param self Server.
- * \return Nonzero on success.
- */
-int
-liser_server_save (LISerServer* self)
-{
-	int ret;
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-
-	ret = 1;
-	LIALG_U32DIC_FOREACH (iter, self->engine->objects)
-	{
-		object = iter.value;
-		if (object->flags & LIENG_OBJECT_FLAG_SAVE)
-		{
-			if (!liser_object_serialize (object, self, 1))
-				ret = 0;
-		}
-	}
-
-	return ret;
 }
 
 /****************************************************************************/

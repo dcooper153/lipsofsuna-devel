@@ -53,26 +53,10 @@ private_miscellaneous_event (LICliClient* client,
 	return 1;
 }
 
-static int
-private_miscellaneous_object_new (LICliClient* client,
-                                  LIEngObject* object)
-{
-	/* Set object mode. */
-	lieng_object_set_userdata (object, client);
-
-	/* Allocate script data. */
-	object->script = liscr_data_new (client->script, object, LISCR_SCRIPT_OBJECT, lieng_object_free);
-	if (object->script == NULL)
-		return 0;
-
-	return 1;
-}
-
 int
 licli_client_init_callbacks_misc (LICliClient* self)
 {
 	lical_callbacks_insert (self->callbacks, self->engine, "event", -5, private_miscellaneous_event, self, NULL);
-	lical_callbacks_insert (self->callbacks, self->engine, "object-new", -65535, private_miscellaneous_object_new, self, NULL);
 	return 1;
 }
 
