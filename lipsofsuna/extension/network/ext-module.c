@@ -27,49 +27,48 @@
 
 #define CLIENT_REFRESH_RADIUS 10.0f
 
-static int
-private_init (LIExtModule* self);
+static int private_init (
+	LIExtModule* self);
 
-static int
-private_accept (grapple_user user,
-                LIExtModule* self);
+static int private_accept (
+	grapple_user user,
+	LIExtModule* self);
 
-static int
-private_login (const char*  login,
-               const char*  password,
-               LIExtModule* self);
+static int private_login (
+	const char*  login,
+	const char*  password,
+	LIExtModule* self);
 
-static int
-private_connect (LIExtModule*     self,
-                 grapple_message* message);
+static int private_connect (
+	LIExtModule*     self,
+	grapple_message* message);
 
-static int
-private_disconnect (LIExtModule*     self,
-                    grapple_message* message);
+static int private_disconnect (
+	LIExtModule*     self,
+	grapple_message* message);
 
-static int
-private_message_client (LIExtModule*     self,
-                        grapple_message* message);
+static int private_message_client (
+	LIExtModule*     self,
+	grapple_message* message);
 
-static int
-private_message_server (LIExtModule*     self,
-                        grapple_message* message);
+static int private_message_server (
+	LIExtModule*     self,
+	grapple_message* message);
 
-static int
-private_refused (LIExtModule*     self,
-                 grapple_message* message);
+static int private_refused (
+	LIExtModule*     self,
+	grapple_message* message);
 
-static int
-private_rename (LIExtModule*     self,
-                grapple_message* message);
+static int private_rename (
+	LIExtModule*     self,
+	grapple_message* message);
 
-static int
-private_object_free (LIExtModule* self,
-                     LIEngObject* object);
+static int private_update (
+	LIExtModule* self,
+	float        secs);
 
-static int
-private_update (LIExtModule* self,
-                float        secs);
+static int private_shutdown (
+	LIExtModule* self);
 
 /*****************************************************************************/
 
@@ -80,8 +79,8 @@ LIMaiExtensionInfo liext_network_info =
 	liext_network_free
 };
 
-LIExtModule*
-liext_network_new (LIMaiProgram* program)
+LIExtModule* liext_network_new (
+	LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -92,7 +91,7 @@ liext_network_new (LIMaiProgram* program)
 	self->program = program;
 
 	/* Connect callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "object-free", 0, private_object_free, self, self->calls + 0) ||
+	if (!lical_callbacks_insert (program->callbacks, program, "program-shutdown", 0, private_shutdown, self, self->calls + 0) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_update, self, self->calls + 1))
 	{
 		liext_network_free (self);
@@ -109,20 +108,19 @@ liext_network_new (LIMaiProgram* program)
 	return self;
 }
 
-void
-liext_network_free (LIExtModule* self)
+void liext_network_free (
+	LIExtModule* self)
 {
 	LIAlgU32dicIter iter0;
 	LIAlgStrdicIter iter1;
 
 	if (self->clients != NULL)
 	{
+		lisys_assert (self->clients->size == 0);
 		LIALG_U32DIC_FOREACH (iter0, self->clients)
 			liext_client_free (iter0.value);
 		lialg_u32dic_free (self->clients);
 	}
-	if (self->objects != NULL)
-		lialg_u32dic_free (self->objects);
 	if (self->passwords != NULL)
 	{
 		LIALG_STRDIC_FOREACH (iter1, self->passwords)
@@ -138,10 +136,10 @@ liext_network_free (LIExtModule* self)
 	lisys_free (self);
 }
 
-int
-liext_network_host (LIExtModule* self,
-                   int          udp,
-                   int          port)
+int liext_network_host (
+	LIExtModule* self,
+	int          udp,
+	int          port)
 {
 	grapple_error error;
 
@@ -177,13 +175,13 @@ liext_network_host (LIExtModule* self,
 	return 1;
 }
 
-int
-liext_network_join (LIExtModule* self,
-                   int          udp,
-                   int          port,
-                   const char*  addr,
-                   const char*  name,
-                   const char*  pass)
+int liext_network_join (
+	LIExtModule* self,
+	int          udp,
+	int          port,
+	const char*  addr,
+	const char*  name,
+	const char*  pass)
 {
 	grapple_error error;
 
@@ -217,13 +215,11 @@ liext_network_join (LIExtModule* self,
 	return 1;
 }
 
-void
-liext_network_update (LIExtModule* self,
-                     float        secs)
+void liext_network_update (
+	LIExtModule* self,
+	float        secs)
 {
 	int ret;
-	LIAlgU32dicIter iter;
-	LIExtClient* client;
 	grapple_message* message;
 
 	/* Handle client socket. */
@@ -287,14 +283,6 @@ liext_network_update (LIExtModule* self,
 			}
 			grapple_message_dispose (message);
 		}
-
-		/* Prevent sectors from unloading. */
-		LIALG_U32DIC_FOREACH (iter, self->clients)
-		{
-			client = iter.value;
-			if (client->object != NULL)
-				lieng_object_refresh (client->object, CLIENT_REFRESH_RADIUS);
-		}
 	}
 }
 
@@ -305,38 +293,23 @@ liext_network_update (LIExtModule* self,
  * \param user Network user.
  * \return Client or NULL.
  */
-LIExtClient*
-liext_network_find_client (LIExtModule* self,
-                          grapple_user user)
+LIExtClient* liext_network_find_client (
+	LIExtModule* self,
+	grapple_user user)
 {
 	return lialg_u32dic_find (self->clients, user);
 }
 
-/**
- * \brief Find a client by object ID.
- *
- * \param self Network.
- * \param id Object ID.
- * \return Client or NULL.
- */
-LIExtClient*
-liext_network_find_client_by_object (LIExtModule* self,
-                                    uint32_t     id)
-{
-	return lialg_u32dic_find (self->objects, id);
-}
-
-int
-liext_network_send (LIExtModule* self,
-                   LIEngObject* object,
-                   LIArcWriter* writer,
-                   int          flags)
+int liext_network_send (
+	LIExtModule* self,
+	grapple_user user,
+	LIArcWriter* writer,
+	int          flags)
 {
 	LIExtClient* client;
 
 	if (self->client_socket)
 	{
-		lisys_assert (object == NULL);
 		grapple_client_send (self->client_socket, GRAPPLE_SERVER, flags,
 			liarc_writer_get_buffer (writer),
 			liarc_writer_get_length (writer));
@@ -344,8 +317,7 @@ liext_network_send (LIExtModule* self,
 	}
 	if (self->server_socket)
 	{
-		lisys_assert (object != NULL);
-		client = liext_network_find_client_by_object (self, object->id);
+		client = liext_network_find_client (self, user);
 		if (client == NULL)
 			return 0;
 		liext_client_send (client, writer, flags);
@@ -355,8 +327,8 @@ liext_network_send (LIExtModule* self,
 	return 0;
 }
 
-void
-liext_network_shutdown (LIExtModule* self)
+void liext_network_shutdown (
+	LIExtModule* self)
 {
 	LIAlgU32dicIter iter0;
 	LIAlgStrdicIter iter1;
@@ -365,7 +337,6 @@ liext_network_shutdown (LIExtModule* self)
 	LIALG_U32DIC_FOREACH (iter0, self->clients)
 		liext_client_free (iter0.value);
 	lialg_u32dic_clear (self->clients);
-	lisys_assert (self->objects->size == 0);
 
 	/* Clear pending authorization requests. */
 	LIALG_STRDIC_FOREACH (iter1, self->passwords)
@@ -385,41 +356,38 @@ liext_network_shutdown (LIExtModule* self)
 	}
 }
 
-int
-liext_network_get_closed (LIExtModule* self)
+int liext_network_get_closed (
+	LIExtModule* self)
 {
 	if (self->server_socket)
 		return grapple_server_closed_get (self->server_socket);
 	return 1;
 }
 
-void
-liext_network_set_closed (LIExtModule* self,
-                         int          value)
+void liext_network_set_closed (
+	LIExtModule* self,
+	int          value)
 {
 	if (self->server_socket)
 		grapple_server_closed_set (self->server_socket, value);
 }
 
-int
-liext_network_get_connected (LIExtModule* self)
+int liext_network_get_connected (
+	LIExtModule* self)
 {
 	return self->client_socket != 0 || self->server_socket != 0;
 }
 
 /*****************************************************************************/
 
-static int
-private_init (LIExtModule* self)
+static int private_init (
+	LIExtModule* self)
 {
 	pthread_mutex_init (&self->mutex, NULL);
 
 	/* Allocate client list. */
 	self->clients = lialg_u32dic_new ();
 	if (self->clients == NULL)
-		return 0;
-	self->objects = lialg_u32dic_new ();
-	if (self->objects == NULL)
 		return 0;
 	self->passwords = lialg_strdic_new ();
 	if (self->passwords == NULL)
@@ -442,9 +410,9 @@ private_init (LIExtModule* self)
  * \param self Network.
  * \return Nonzero if the user is allowed to enter.
  */
-static int
-private_accept (grapple_user user,
-                LIExtModule* self)
+static int private_accept (
+	grapple_user user,
+	LIExtModule* self)
 {
 	int ret = 1;
 	char* address;
@@ -471,10 +439,10 @@ private_accept (grapple_user user,
  * \param self Network.
  * \return Nonzero if the user is allowed to enter.
  */
-static int
-private_login (const char*   login,
-               const char*   password,
-               LIExtModule* self)
+static int private_login (
+	const char*   login,
+	const char*   password,
+	LIExtModule* self)
 {
 	int ret = 1;
 
@@ -487,13 +455,11 @@ private_login (const char*   login,
 	return ret;
 }
 
-static int
-private_connect (LIExtModule*     self,
-                 grapple_message* message)
+static int private_connect (
+	LIExtModule*     self,
+	grapple_message* message)
 {
-	int flags;
 	char* pass;
-	LIEngObject* object;
 	LIExtClient* client;
 
 	/* Get temporarily stored password. */
@@ -503,21 +469,8 @@ private_connect (LIExtModule*     self,
 		lialg_strdic_remove (self->passwords, message->NEW_USER.name);
 	pthread_mutex_unlock (&self->mutex);
 
-	/* Create object. */
-	liscr_script_set_gc (self->program->script, 0);
-	object = lieng_object_new (self->program->engine, NULL, LIPHY_CONTROL_MODE_RIGID, 0);
-	if (object == NULL)
-	{
-		liscr_script_set_gc (self->program->script, 1);
-		lisys_free (pass);
-		return 0;
-	}
-	flags = lieng_object_get_flags (object);
-	flags &= ~LIENG_OBJECT_FLAG_SAVE;
-	lieng_object_set_flags (object, flags);
-
 	/* Create client. */
-	client = liext_client_new (self, object, message->NEW_USER.id);
+	client = liext_client_new (self, message->NEW_USER.id);
 	if (client == NULL)
 	{
 		grapple_server_disconnect_client (self->server_socket, message->NEW_USER.id);
@@ -533,18 +486,9 @@ private_connect (LIExtModule*     self,
 		return 0;
 	}
 
-	/* Assign client to the object. */
-	if (!liext_client_set_object (client, object))
-	{
-		liext_client_free (client);
-		liscr_script_set_gc (self->program->script, 1);
-		lisys_free (pass);
-		return 0;
-	}
-
 	/* Emit a login event. */
 	limai_program_event (self->program, "login",
-		"object", LISCR_SCRIPT_OBJECT, object->script,
+		"client", LISCR_TYPE_INT, client->net,
 		"login", LISCR_TYPE_STRING, message->NEW_USER.name,
 		"password", LISCR_TYPE_STRING, pass, NULL);
 	lisys_free (pass);
@@ -553,9 +497,9 @@ private_connect (LIExtModule*     self,
 	return 1;
 }
 
-static int
-private_disconnect (LIExtModule*     self,
-                    grapple_message* message)
+static int private_disconnect (
+	LIExtModule*     self,
+	grapple_message* message)
 {
 	LIExtClient* client;
 
@@ -563,15 +507,14 @@ private_disconnect (LIExtModule*     self,
 	client = liext_network_find_client (self, message->USER_DISCONNECTED.id);
 	if (client == NULL)
 		return 0;
-	lisys_assert (client->object != NULL);
 	liext_client_free (client);
 
 	return 1;
 }
 
-static int
-private_message_client (LIExtModule*     self,
-                        grapple_message* message)
+static int private_message_client (
+	LIExtModule*     self,
+	grapple_message* message)
 {
 	int len;
 	const uint8_t* data;
@@ -607,9 +550,9 @@ private_message_client (LIExtModule*     self,
 	return 1;
 }
 
-static int
-private_message_server (LIExtModule*     self,
-                        grapple_message* message)
+static int private_message_server (
+	LIExtModule*     self,
+	grapple_message* message)
 {
 	LIArcReader* reader;
 	LIExtClient* client;
@@ -634,7 +577,7 @@ private_message_server (LIExtModule*     self,
 	{
 		limai_program_event (self->program, "packet",
 			"message", LISCR_TYPE_INT, ((uint8_t*) message->USER_MSG.data)[0],
-			"object", LISCR_SCRIPT_OBJECT, client->object->script,
+			"client", LISCR_TYPE_INT, (int) client->net,
 			"packet", LISCR_SCRIPT_PACKET, packet, NULL);
 		liscr_data_unref (packet, NULL);
 	}
@@ -643,9 +586,9 @@ private_message_server (LIExtModule*     self,
 	return 1;
 }
 
-static int
-private_refused (LIExtModule*     self,
-                 grapple_message* message)
+static int private_refused (
+	LIExtModule*     self,
+	grapple_message* message)
 {
 	switch (message->CONNECTION_REFUSED.reason)
 	{
@@ -671,9 +614,9 @@ private_refused (LIExtModule*     self,
 	return 0;
 }
 
-static int
-private_rename (LIExtModule*     self,
-                grapple_message* message)
+static int private_rename (
+	LIExtModule*     self,
+	grapple_message* message)
 {
 	LIExtClient* client;
 
@@ -686,35 +629,22 @@ private_rename (LIExtModule*     self,
 	return 0;
 }
 
-static int
-private_object_free (LIExtModule* self,
-                     LIEngObject* object)
-{
-	LIExtClient* client;
-
-	/* Get the client. */
-	client = liext_network_find_client_by_object (self, object->id);
-	if (client == NULL)
-		return 0;
-
-	/* Avoid freeing the object again. */
-	if (client->object != NULL)
-	{
-		lialg_u32dic_remove (self->objects, client->object->id);
-		client->object = NULL;
-	}
-
-	/* Free client info. */
-	liext_client_free (client);
-
-	return 0;
-}
-
-static int
-private_update (LIExtModule* self,
-                float        secs)
+static int private_update (
+	LIExtModule* self,
+	float        secs)
 {
 	liext_network_update (self, secs);
+
+	return 1;
+}
+
+static int private_shutdown (
+	LIExtModule* self)
+{
+	/* The program is shutting down so we need to disconnect the clients before
+	   the script gets deleted. Since client logouts emit events, there must not
+	   be any clients left after this callback. */
+	liext_network_shutdown (self);
 
 	return 1;
 }

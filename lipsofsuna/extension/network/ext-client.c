@@ -33,10 +33,9 @@
  * \param user Network user.
  * \return New client or NULL.
  */
-LIExtClient*
-liext_client_new (LIExtModule* module,
-                  LIEngObject* object,
-                  grapple_user user)
+LIExtClient* liext_client_new (
+	LIExtModule* module,
+	grapple_user user)
 {
 	LIExtClient* self;
 
@@ -47,13 +46,6 @@ liext_client_new (LIExtModule* module,
 	self->module = module;
 	self->net = user;
 
-	/* Assign object. */
-	if (!liext_client_set_object (self, object))
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
 	return self;
 }
 
@@ -62,17 +54,12 @@ liext_client_new (LIExtModule* module,
  *
  * \param self Client.
  */
-void
-liext_client_free (LIExtClient* self)
+void liext_client_free (
+	LIExtClient* self)
 {
 	/* Signal logout. */
-	if (self->object != NULL)
-	{
-		limai_program_event (self->module->program, "logout",
-			"object", LISCR_SCRIPT_OBJECT, self->object->script, NULL);
-		lialg_u32dic_remove (self->module->objects, self->object->id);
-		lieng_object_ref (self->object, -1);
-	}
+	limai_program_event (self->module->program, "logout",
+		"client", LISCR_TYPE_INT, (int) self->net, NULL);
 
 	/* Remove from the client list. */
 	if (self->net != 0)
@@ -91,66 +78,14 @@ liext_client_free (LIExtClient* self)
  * \param writer Packet.
  * \param flags Grapple send flags.
  */
-void
-liext_client_send (LIExtClient* self,
-                   LIArcWriter* writer,
-                   int          flags)
+void liext_client_send (
+	LIExtClient* self,
+	LIArcWriter* writer,
+	int          flags)
 {
 	grapple_server_send (self->module->server_socket, self->net, flags,
 		liarc_writer_get_buffer (writer),
 		liarc_writer_get_length (writer));
-}
-
-/**
- * \brief Swaps the objects of the clients.
- *
- * \param self Client.
- * \param client Client.
- * \param object0 Object.
- * \param object1 Object.
- */
-void
-liext_client_swap (LIExtClient* self,
-                   LIExtClient* client,
-                   LIEngObject* object0,
-                   LIEngObject* object1)
-{
-	liext_client_set_object (self, object1);
-	if (client != NULL)
-		liext_client_set_object (client, object0);
-}
-
-/**
- * \brief Sets the object controlled by the client.
- *
- * \param self Client.
- * \param value Object.
- * \return Nonzero on success.
- */
-int
-liext_client_set_object (LIExtClient* self,
-                         LIEngObject* value)
-{
-	lisys_assert (value != NULL);
-
-	if (self->object == value)
-		return 1;
-
-	/* Clear old object. */
-	if (self->object != NULL)
-	{
-		lialg_u32dic_remove (self->module->objects, self->object->id);
-		lieng_object_ref (self->object, -1);
-	}
-
-	/* Set the new object. */
-	self->object = value;
-	lieng_object_ref (value, 1);
-	lical_callbacks_call (self->module->program->engine->callbacks, self->module->program->engine, "object-client", lical_marshal_DATA_PTR, value);
-	if (!lialg_u32dic_insert (self->module->objects, self->object->id, self))
-		return 0;
-
-	return 1;
 }
 
 /** @} */

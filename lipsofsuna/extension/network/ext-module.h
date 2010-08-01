@@ -41,67 +41,62 @@ struct _LIExtModule
 	grapple_client client_socket;
 	grapple_server server_socket;
 	LIAlgU32dic* clients;
-	LIAlgU32dic* objects;
 	LIAlgStrdic* passwords;
 	LICalHandle calls[2];
 	LIMaiProgram* program;
 };
 
-LIExtModule*
-liext_network_new (LIMaiProgram* program);
+LIExtModule* liext_network_new (
+	LIMaiProgram* program);
 
-void
-liext_network_free (LIExtModule* self);
+void liext_network_free (
+	LIExtModule* self);
 
-int
-liext_network_host (LIExtModule* self,
-                   int          udp,
-                   int          port);
+int liext_network_host (
+	LIExtModule* self,
+	int          udp,
+	int          port);
 
-int
-liext_network_join (LIExtModule* self,
-                   int          udp,
-                   int          port,
-                   const char*  addr,
-                   const char*  name,
-                   const char*  pass);
+int liext_network_join (
+	LIExtModule* self,
+	int          udp,
+	int          port,
+	const char*  addr,
+	const char*  name,
+	const char*  pass);
 
-void
-liext_network_update (LIExtModule* self,
-                     float        secs);
+void liext_network_update (
+	LIExtModule* self,
+	float        secs);
 
-LIExtClient*
-liext_network_find_client (LIExtModule* self,
-                          grapple_user user);
+LIExtClient* liext_network_find_client (
+	LIExtModule* self,
+	grapple_user user);
 
-LIExtClient*
-liext_network_find_client_by_object (LIExtModule* self,
-                                    uint32_t      id);
+int liext_network_send (
+	LIExtModule* self,
+	grapple_user user,
+	LIArcWriter* writer,
+	int          flags);
 
-int
-liext_network_send (LIExtModule* self,
-                   LIEngObject* object,
-                   LIArcWriter* writer,
-                   int          flags);
+void liext_network_shutdown (
+	LIExtModule* self);
 
-void
-liext_network_shutdown (LIExtModule* self);
+int liext_network_get_closed (
+	LIExtModule* self);
 
-int
-liext_network_get_closed (LIExtModule* self);
+void liext_network_set_closed (
+	LIExtModule* self,
+	int          value);
 
-void
-liext_network_set_closed (LIExtModule* self,
-                         int          value);
-
-int
-liext_network_get_connected (LIExtModule* self);
+int liext_network_get_connected (
+	LIExtModule* self);
 
 /*****************************************************************************/
 
-void
-liext_script_network (LIScrClass* self,
-                      void*       data);
+void liext_script_network (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 

@@ -33,51 +33,26 @@
  */
 
 /* @luadoc
- * --- Disconnects any client associated to the specified object.
+ * --- Disconnects a client.
  * --
  * -- @param clss Network class.
  * -- @param args Arguments.<ul>
- * --   <li>object: Object. (required)</li></ul>
+ * --   <li>1,client: Client number. (required)</li></ul>
  * function Network.disconnect(clss)
  */
 static void Network_disconnect (LIScrArgs* args)
 {
-	LIEngObject* object;
+	int id;
 	LIExtClient* client;
 	LIExtModule* module;
-	LIScrData* data;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
-	if (!liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
+	if (!liscr_args_geti_int (args, 0, &id) &&
+	    !liscr_args_gets_int (args, "client", &id))
 		return;
-	object = data->data;
-	client = liext_network_find_client_by_object (module, object->id);
+	client = liext_network_find_client (module, id);
 	if (client != NULL)
 		liext_client_free (client);
-}
-
-/* @luadoc
- * --- Checks if the specified object has a client attached to it.
- * --
- * -- @param clss Network class.
- * -- @param args Arguments.<ul>
- * --   <li>object: Object. (require)</li></ul>
- * function Network.shutdown(self)
- */
-static void Network_has_client (LIScrArgs* args)
-{
-	LIExtClient* client;
-	LIExtModule* module;
-	LIEngObject* object;
-	LIScrData* data;
-
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
-		object = LIENG_OBJECT (data->data);
-		client = liext_network_find_client_by_object (module, object->id);
-		liscr_args_seti_bool (args, client != NULL);
-	}
 }
 
 /* @luadoc
@@ -144,32 +119,30 @@ static void Network_join (LIScrArgs* args)
  * --
  * -- @param clss Network class.
  * -- @param args Arguments.<ul>
- * --   <li>object: Object. (required if hosting)</li>
+ * --   <li>client: Client ID. (required if hosting)</li>
  * --   <li>packet: Packet. (required)</li>
  * --   <li>reliable: Boolean.</li></ul>
  * function Network.send(clss, args)
  */
 static void Network_send (LIScrArgs* args)
 {
+	int id = 0;
 	int reliable = 1;
-	LIEngObject* object = NULL;
 	LIExtModule* module;
-	LIScrData* data0;
-	LIScrData* data1;
+	LIScrData* data;
 	LIScrPacket* packet;
 
 	/* Get packet. */
-	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data0))
+	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 		return;
-	packet = data0->data;
+	packet = data->data;
 
 	/* Get object if hosting. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
 	if (module->server_socket)
 	{
-		if (!liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data1))
+		if (!liscr_args_gets_int (args, "client", &id))
 			return;
-		object = data1->data;
 	}
 
 	/* Send packet. */
@@ -177,9 +150,9 @@ static void Network_send (LIScrArgs* args)
 	if (packet->writer != NULL)
 	{
 		if (reliable)
-			liext_network_send (module, object, packet->writer, GRAPPLE_RELIABLE);
+			liext_network_send (module, id, packet->writer, GRAPPLE_RELIABLE);
 		else
-			liext_network_send (module, object, packet->writer, 0);
+			liext_network_send (module, id, packet->writer, 0);
 	}
 }
 
@@ -195,44 +168,6 @@ static void Network_shutdown (LIScrArgs* args)
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
 	liext_network_shutdown (module);
-}
-
-/* @luadoc
- * --- Swaps the clients of the objects.
- * --
- * -- Switches the clients of the passed objects so that the client of the first
- * -- object controls the second object and vice versa. This is typically used when
- * -- you need to destroy the object of a player without disconnecting the client.
- * --
- * -- @param clss Network class.
- * -- @param args Arguments.<ul>
- * --   <li>object: Object. (required)</li>
- * --   <li>other: Object. (required)</li></ul>
- * function Network.swap_clients(clss, args)
- */
-static void Network_swap_clients (LIScrArgs* args)
-{
-	LIEngObject* object0;
-	LIEngObject* object1;
-	LIExtClient* client0;
-	LIExtClient* client1;
-	LIExtModule* module;
-	LIScrData* data0;
-	LIScrData* data1;
-
-	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data0) &&
-	    liscr_args_gets_data (args, "other", LISCR_SCRIPT_OBJECT, &data1))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
-		object0 = LIENG_OBJECT (data0->data);
-		client0 = liext_network_find_client_by_object (module, object0->id);
-		object1 = LIENG_OBJECT (data1->data);
-		client1 = liext_network_find_client_by_object (module, object1->id);
-		if (client0 != NULL)
-			liext_client_swap (client0, client1, object0, object1);
-		else if (client1 != NULL)
-			liext_client_swap (client1, client0, object1, object0);
-	}
 }
 
 /* @luadoc
@@ -252,8 +187,7 @@ static void Network_getter_clients (LIScrArgs* args)
 	LIALG_U32DIC_FOREACH (iter, module->clients)
 	{
 		client = iter.value;
-		if (client->object != NULL)
-			liscr_args_seti_data (args, client->object->script);
+		liscr_args_seti_int (args, client->net);
 	}
 }
 
@@ -300,12 +234,10 @@ liext_script_network (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NETWORK, data);
 	liscr_class_insert_cfunc (self, "disconnect", Network_disconnect);
-	liscr_class_insert_cfunc (self, "has_client", Network_has_client);
 	liscr_class_insert_cfunc (self, "host", Network_host);
 	liscr_class_insert_cfunc (self, "join", Network_join);
 	liscr_class_insert_cfunc (self, "send", Network_send);
 	liscr_class_insert_cfunc (self, "shutdown", Network_shutdown);
-	liscr_class_insert_cfunc (self, "swap_clients", Network_swap_clients);
 	liscr_class_insert_cvar (self, "clients", Network_getter_clients, NULL);
 	liscr_class_insert_cvar (self, "closed", Network_getter_closed, Network_setter_closed);
 	liscr_class_insert_cvar (self, "connected", Network_getter_connected, NULL);

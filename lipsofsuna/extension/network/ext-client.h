@@ -30,34 +30,22 @@
 struct _LIExtClient
 {
 	grapple_user net;
-	LIEngObject* object;
 	LIExtClient* next;
 	LIExtClient* prev;
 	LIExtModule* module;
 };
 
-LIExtClient*
-liext_client_new (LIExtModule* module,
-                  LIEngObject* object,
-                  grapple_user user);
+LIExtClient* liext_client_new (
+	LIExtModule* module,
+	grapple_user user);
 
-void
-liext_client_free (LIExtClient* self);
+void liext_client_free (
+	LIExtClient* self);
 
-void
-liext_client_send (LIExtClient* self,
-                   LIArcWriter* writer,
-                   int          flags);
-
-void
-liext_client_swap (LIExtClient* self,
-                   LIExtClient* client,
-                   LIEngObject* object0,
-                   LIEngObject* object1);
-
-int
-liext_client_set_object (LIExtClient* self,
-                         LIEngObject* value);
+void liext_client_send (
+	LIExtClient* self,
+	LIArcWriter* writer,
+	int          flags);
 
 #endif
 
