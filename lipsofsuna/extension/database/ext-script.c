@@ -245,7 +245,7 @@ static void Database_query (LIScrArgs* args)
 			return;
 		}
 		if (!row)
-			liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+			liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 
 		/* Create a row table. */
 		lua_newtable (args->lua);
@@ -302,6 +302,8 @@ static void Database_query (LIScrArgs* args)
 		/* Add the row to the return values. */
 		liscr_args_seti_stack (args);
 	}
+	if (!row)
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	sqlite3_finalize (statement);
 }
 
