@@ -77,6 +77,9 @@ liscr_script_new ()
     lua_pushcfunction (self->lua, luaopen_math);
     lua_pushstring (self->lua, LUA_MATHLIBNAME);
     lua_call (self->lua, 1, 0);
+    lua_pushcfunction (self->lua, luaopen_debug);
+    lua_pushstring (self->lua, LUA_DBLIBNAME);
+    lua_call (self->lua, 1, 0);
 
 	/* Create shortcut to self. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_SELF);

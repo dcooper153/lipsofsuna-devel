@@ -88,6 +88,9 @@ LIAPICALL (void, liscr_pushpriv, (
 LIAPICALL (LIScrScript*, liscr_script, (
 	lua_State* lua));
 
+LIAPICALL (void, liscr_traceback, (
+	lua_State* lua));
+
 #endif
 
 /** @} */

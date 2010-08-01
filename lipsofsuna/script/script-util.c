@@ -362,5 +362,51 @@ liscr_script (lua_State* lua)
 	return script;
 }
 
+/**
+ * \brief Prints the traceback to the terminal.
+ *
+ * This function is intended to be used for debugging. It helps with locating
+ * crashes and other problems that involve Lua calling the C functions.
+ *
+ * \param lua Lua state.
+ */
+void liscr_traceback (
+	lua_State* lua)
+{
+	/* Get debug table. */
+	lua_getfield (lua, LUA_GLOBALSINDEX, "debug");
+	if (lua_type (lua, -1) != LUA_TTABLE)
+	{
+		lisys_error_set (EINVAL, "invalid debug table");
+		lua_pop (lua, 1);
+		return;
+	}
+
+	/* Get traceback function. */
+	lua_getfield (lua, -1, "traceback");
+	lua_remove (lua, -2);
+	if (lua_type (lua, -1) != LUA_TFUNCTION)
+	{
+		lisys_error_set (EINVAL, "invalid traceback function");
+		lua_pop (lua, 1);
+		return;
+	}
+
+	/* Call traceback excluding itself from the trace. */
+	lua_pushstring (lua, "");
+	lua_pushinteger (lua, 1);
+	if (lua_pcall (lua, 2, 1, 0) != 0)
+	{
+		lisys_error_set (EINVAL, lua_tostring (lua, -1));
+		lisys_error_report ();
+		lua_pop (lua, 1);
+		return;
+	}
+
+	/* Print the traceback to the terminal. */
+	printf ("\nLua traceback:\n%s\n\n", lua_tostring (lua, -1));
+	lua_pop (lua, 1);
+}
+
 /** @} */
 /** @} */
