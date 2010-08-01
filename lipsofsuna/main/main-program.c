@@ -45,6 +45,14 @@ static int private_object_visibility (
 	LIEngObject*  object,
 	int           visible);
 
+static int private_sector_free (
+	LIMaiProgram* self,
+	LIEngSector*  sector);
+
+static int private_sector_load (
+	LIMaiProgram* self,
+	LIEngSector*  sector);
+
 static int private_tick (
 	LIMaiProgram* self,
 	float         secs);
@@ -566,7 +574,9 @@ static int private_init (
 	    !lical_callbacks_insert (self->callbacks, self->engine, "object-motion", 63353, private_object_motion, self, self->calls + 1) ||
 	    !lical_callbacks_insert (self->callbacks, self->engine, "object-new", 65535, private_object_new, self, self->calls + 2) ||
 	    !lical_callbacks_insert (self->callbacks, self->engine, "object-visibility", 65535, private_object_visibility, self, self->calls + 3) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 4))
+	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-free", 65535, private_sector_free, self, self->calls + 4) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-load", 65535, private_sector_load, self, self->calls + 5) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 6))
 		return 0;
 
 	return 1;
@@ -624,6 +634,24 @@ static int private_object_visibility (
 			"object", LISCR_SCRIPT_OBJECT, object->script,
 			"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
 	}
+
+	return 1;
+}
+
+static int private_sector_free (
+	LIMaiProgram* self,
+	LIEngSector*  sector)
+{
+	limai_program_event (self, "sector-free", "sector", LISCR_TYPE_INT, sector->sector->index, NULL);
+
+	return 1;
+}
+
+static int private_sector_load (
+	LIMaiProgram* self,
+	LIEngSector*  sector)
+{
+	limai_program_event (self, "sector-load", "sector", LISCR_TYPE_INT, sector->sector->index, NULL);
 
 	return 1;
 }
