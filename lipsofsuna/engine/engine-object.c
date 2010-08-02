@@ -61,6 +61,8 @@ lieng_object_new (LIEngEngine*     engine,
 	self->id = id;
 	self->engine = engine;
 	self->flags = LIENG_OBJECT_FLAG_SAVE;
+	self->transform = limat_transform_identity ();
+	self->smoothing.target = limat_transform_identity ();
 
 	/* Choose object number. */
 	while (!self->id)
