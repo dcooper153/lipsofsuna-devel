@@ -386,7 +386,15 @@ void*
 liscr_class_get_userdata (LIScrClass* self,
                           const char* key)
 {
-	return lialg_strdic_find (self->userdata, key);
+	void* value;
+
+	value = lialg_strdic_find (self->userdata, key);
+	if (value != NULL)
+		return value;
+	if (self->base != NULL)
+		return liscr_class_get_userdata (self->base, key);
+
+	return NULL;
 }
 
 /**
