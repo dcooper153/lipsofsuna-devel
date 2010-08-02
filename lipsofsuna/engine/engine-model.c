@@ -65,7 +65,6 @@ lieng_model_new_copy (LIEngModel* model)
 {
 	LIEngModel* self;
 	LIMdlModel* tmpmdl;
-	LIPhyShape* tmpphy;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIEngModel));
@@ -101,20 +100,12 @@ lieng_model_new_copy (LIEngModel* model)
 		return 0;
 	}
 
-	/* Create collision shape. */
-	tmpphy = liphy_shape_new (self->engine->physics, tmpmdl);
-	if (tmpphy == NULL)
-	{
-		limdl_model_free (tmpmdl);
-		lieng_model_free (self);
-		return 0;
-	}
-	liphy_shape_ref (tmpphy);
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-copy", lical_marshal_DATA_PTR_PTR, self, model);
 
 	/* Set model and shape. */
 	self->bounds = tmpmdl->bounds;
 	self->model = tmpmdl;
-	self->physics = tmpphy;
 
 	return self;
 }
@@ -144,7 +135,6 @@ int
 lieng_model_load (LIEngModel* self)
 {
 	LIMdlModel* tmpmdl;
-	LIPhyShape* tmpphy;
 
 	if (self->model != NULL)
 		return 1;
@@ -154,20 +144,10 @@ lieng_model_load (LIEngModel* self)
 	if (tmpmdl == NULL)
 		return 0;
 
-	/* Create collision shape. */
-	tmpphy = liphy_shape_new (self->engine->physics, tmpmdl);
-	if (tmpphy == NULL)
-	{
-		limdl_model_free (tmpmdl);
-		return 0;
-	}
-	liphy_shape_ref (tmpphy);
-
 	/* Invoke callbacks. */
 	lieng_model_unload (self);
 	self->bounds = tmpmdl->bounds;
 	self->model = tmpmdl;
-	self->physics = tmpphy;
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
 
 	return 1;
@@ -180,11 +160,6 @@ lieng_model_unload (LIEngModel* self)
 	if (self->model != NULL && self->physics != NULL)
 		lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
-	if (self->physics != NULL)
-	{
-		liphy_shape_free (self->physics);
-		self->physics = NULL;
-	}
 	if (self->model != NULL)
 	{
 		limdl_model_free (self->model);

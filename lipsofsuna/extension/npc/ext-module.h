@@ -39,6 +39,7 @@ struct _LIExtModule
 	LIAiManager* ai;
 	LIAlgPtrdic* dictionary;
 	LIMaiProgram* program;
+	LIPhyPhysics* physics;
 	LIVoxManager* voxels;
 };
 

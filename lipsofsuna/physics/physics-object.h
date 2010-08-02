@@ -44,6 +44,12 @@ LIAPICALL (LIPhyObject*, liphy_object_new, (
 LIAPICALL (void, liphy_object_free, (
 	LIPhyObject* self));
 
+LIAPICALL (int, liphy_object_approach, (
+	LIPhyObject*       self,
+	const LIMatVector* target,
+	float              speed,
+	float              dist));
+
 LIAPICALL (void, liphy_object_clear_shape, (
 	LIPhyObject* self));
 

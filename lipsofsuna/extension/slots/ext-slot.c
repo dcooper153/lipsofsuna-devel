@@ -61,7 +61,6 @@ liext_slot_new (LICliClient* client,
 	}
 	lieng_object_set_smoothing (self->object, 0.0f, 0.0f);
 	lieng_object_set_model (self->object, model);
-	liphy_object_set_collision_group (self->object->physics, LICLI_PHYSICS_GROUP_OBJECTS);
 
 	/* Allocate constraint. */
 	self->constraint = lieng_constraint_new (object, node0, self->object, node1);

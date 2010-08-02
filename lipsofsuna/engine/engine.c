@@ -32,10 +32,6 @@ static int
 private_init (LIEngEngine* self);
 
 static void
-private_physics_transform (LIEngEngine* self,
-                           LIPhyObject* object);
-
-static void
 private_sector_free (void*        self,
                      LIAlgSector* sector);
 
@@ -131,10 +127,6 @@ lieng_engine_free (LIEngEngine* self)
 	/* Clear sectors. */
 	if (self->sectors != NULL)
 		lialg_sectors_remove_content (self->sectors, "engine");
-
-	/* Free subsystems. */
-	if (self->physics != NULL)
-		liphy_physics_free (self->physics);
 
 	if (self->resources != NULL)
 		lieng_resources_free (self->resources);
@@ -325,9 +317,6 @@ lieng_engine_update (LIEngEngine* self,
 		lieng_object_update (object, secs);
 	}
 
-	/* Update physics. */
-	liphy_physics_update (self->physics, secs);
-
 	/* Maintain callbacks. */
 	lical_callbacks_update (self->callbacks);
 
@@ -418,12 +407,6 @@ private_init (LIEngEngine* self)
 	if (self->selection == NULL)
 		return 0;
 
-	/* Physics. */
-	self->physics = liphy_physics_new (self->callbacks);
-	if (self->physics == NULL)
-		return 0;
-	lical_callbacks_insert (self->callbacks, self->physics, "object-transform", 0, private_physics_transform, self, self->calls + 0);
-
 	/* Resources. */
 	self->resources = lieng_resources_new (self);
 	if (self->resources == NULL)
@@ -436,18 +419,6 @@ private_init (LIEngEngine* self)
 		return 0;
 
 	return 1;
-}
-
-static void
-private_physics_transform (LIEngEngine* self,
-                           LIPhyObject* object)
-{
-	LIEngObject* obj;
-
-	obj = liphy_object_get_userdata (object);
-	if (obj == NULL || obj->sector == NULL)
-		return;
-	lieng_object_moved (obj);
 }
 
 static void

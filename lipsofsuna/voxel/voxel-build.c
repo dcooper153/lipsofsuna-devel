@@ -53,6 +53,7 @@ struct _LIVoxBuilder
 	LIEngEngine* engine;
 	LIMdlModel* model;
 	LIPhyObject* physics;
+	LIPhyPhysics* physics_manager;
 	LIVoxManager* manager;
 	LIVoxVoxel* voxels;
 	LIVoxVoxelB* voxelsb;
@@ -117,17 +118,18 @@ private_solve_height_4 (LIVoxBuilder* self,
 
 /*****************************************************************************/
 
-int
-livox_build_area (LIVoxManager* manager,
-                  LIEngEngine*  engine,
-                  int           xstart,
-                  int           ystart,
-                  int           zstart,
-                  int           xsize,
-                  int           ysize,
-                  int           zsize,
-                  LIMdlModel**  result_model,
-                  LIPhyObject** result_physics)
+int livox_build_area (
+	LIVoxManager* manager,
+	LIEngEngine*  engine,
+	LIPhyPhysics* physics,
+	int           xstart,
+	int           ystart,
+	int           zstart,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIMdlModel**  result_model,
+	LIPhyObject** result_physics)
 {
 	int i;
 	int x;
@@ -147,6 +149,7 @@ livox_build_area (LIVoxManager* manager,
 	memset (&self, 0, sizeof (LIVoxBuilder));
 	self.manager = manager;
 	self.engine = engine;
+	self.physics_manager = physics;
 	self.xsize = xsize + 2;
 	self.ysize = ysize + 2;
 	self.zsize = zsize + 2;
@@ -258,14 +261,15 @@ livox_build_area (LIVoxManager* manager,
 	return ret;
 }
 
-int
-livox_build_block (LIVoxManager*         manager,
-                   LIEngEngine*          engine,
-                   const LIVoxBlockAddr* addr,
-                   LIMdlModel**          result_model,
-                   LIPhyObject**         result_physics)
+int livox_build_block (
+	LIVoxManager*         manager,
+	LIEngEngine*          engine,
+	LIPhyPhysics*         physics,
+	const LIVoxBlockAddr* addr,
+	LIMdlModel**          result_model,
+	LIPhyObject**         result_physics)
 {
-	return livox_build_area (manager, engine,
+	return livox_build_area (manager, engine, physics,
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[0] + addr->block[0]),
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[1] + addr->block[1]),
 		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[2] + addr->block[2]),
@@ -284,13 +288,13 @@ livox_build_block (LIVoxManager*         manager,
  * \param result Buffer with room for xsize*ysize*zsize integers.
  * \return Number of completely occluded voxels.
  */
-int
-livox_build_occlusion (LIVoxManager* manager,
-                       int           xsize,
-                       int           ysize,
-                       int           zsize,
-                       LIVoxVoxel*   voxels,
-                       char*         result)
+int livox_build_occlusion (
+	LIVoxManager* manager,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   voxels,
+	char*         result)
 {
 	int i;
 	int x;
@@ -375,9 +379,9 @@ private_build (LIVoxBuilder* self,
 			if (self->model == NULL)
 				ret = 0;
 		}
-		if (physics && self->physics == NULL)
+		if (physics && self->physics == NULL && self->physics_manager != NULL)
 		{
-			self->physics = liphy_object_new (self->engine->physics, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
+			self->physics = liphy_object_new (self->physics_manager, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
 			if (self->physics == NULL)
 				ret = 0;
 		}
@@ -629,7 +633,7 @@ private_merge_height_physics (LIVoxBuilder* self,
 	}
 
 	/* Insert convex shape. */
-	shape = liphy_shape_new_convex (self->engine->physics, verts, 18);
+	shape = liphy_shape_new_convex (self->physics_manager, verts, 18);
 	if (shape != NULL)
 	{
 		liphy_object_insert_shape (self->physics, shape, &voxel->transform);

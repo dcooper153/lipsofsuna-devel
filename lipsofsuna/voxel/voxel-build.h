@@ -34,6 +34,7 @@
 LIAPICALL (int, livox_build_area, (
 	LIVoxManager* manager,
 	LIEngEngine*  engine,
+	LIPhyPhysics* physics,
 	int           xstart,
 	int           ystart,
 	int           zstart,
@@ -46,6 +47,7 @@ LIAPICALL (int, livox_build_area, (
 LIAPICALL (int, livox_build_block, (
 	LIVoxManager*         manager,
 	LIEngEngine*          engine,
+	LIPhyPhysics*         physics,
 	const LIVoxBlockAddr* addr,
 	LIMdlModel**          result_model,
 	LIPhyObject**         result_physics));

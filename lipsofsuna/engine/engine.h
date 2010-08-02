@@ -50,7 +50,6 @@ struct _LIEngEngine
 	LICalHandle calls[1];
 	LIEngConstraint* constraints;
 	LIEngResources* resources;
-	LIPhyPhysics* physics;
 	struct
 	{
 		int flags;

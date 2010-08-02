@@ -82,14 +82,6 @@ lieng_object_new (LIEngEngine*     engine,
 		return 0;
 	}
 
-	/* Initialize physics. */
-	if (model != NULL)
-		self->physics = liphy_object_new (engine->physics, self->id, model->physics, control);
-	else
-		self->physics = liphy_object_new (engine->physics, self->id, NULL, control);
-	if (self->physics == NULL)
-		goto error;
-
 	/* Allocate pose buffer. */
 	self->pose = limdl_pose_new ();
 	if (self->pose == NULL)
@@ -110,8 +102,6 @@ lieng_object_new (LIEngEngine*     engine,
 error:
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
-	if (self->physics != NULL)
-		liphy_object_free (self->physics);
 	lialg_u32dic_remove (engine->objects, self->id);
 	lisys_free (self);
 	return NULL;
@@ -165,7 +155,6 @@ lieng_object_free (LIEngObject* self)
 		lieng_model_free (self->model);
 
 	/* Free all memory. */
-	liphy_object_free (self->physics);
 	lisys_free (self);
 }
 
@@ -259,57 +248,6 @@ lieng_object_animate (LIEngObject* self,
 }
 
 /**
- * \brief Configures the object to move towards the given target.
- *
- * Configures the physics state of the object so that it heads directly
- * towards the specified target point.
- *
- * \param self Object.
- * \param target Target position vector.
- * \param speed Movement speed.
- * \param dist Tolerance in position for the goal check.
- * \return Nonzero if reached the goal.
- */
-int
-lieng_object_approach (LIEngObject*       self,
-                       const LIMatVector* target,
-                       float              speed,
-                       float              dist)
-{
-	float len;
-	LIMatVector tmp;
-	LIMatQuaternion dir;
-	LIMatTransform transform;
-
-	if (!lieng_object_get_realized (self))
-		return 1;
-
-	/* Get direction to target. */
-	lieng_object_get_transform (self, &transform);
-	tmp = limat_vector_subtract (*target, transform.position);
-	tmp.y = 0.0f;
-	len = limat_vector_get_length (tmp);
-
-	/* Set look direction. */
-	if (len > 0.1f)
-	{
-		dir = limat_quaternion_look (tmp, limat_vector_init (0.0f, 1.0f, 0.0f));
-		transform.rotation = limat_quaternion_conjugate (dir);
-		lieng_object_set_transform (self, &transform);
-	}
-
-	/* Move towards target. */
-	if (len > dist)
-	{
-		liphy_object_set_movement (self->physics, speed);
-		return 0;
-	}
-	liphy_object_set_movement (self->physics, 0.0f);
-
-	return 1;
-}
-
-/**
  * \brief Finds a node by name.
  *
  * Searches for a pose node if the object has a pose associated to it and a
@@ -328,42 +266,6 @@ lieng_object_find_node (LIEngObject* self,
 		return limdl_model_find_node (self->model->model, name);
 
 	return NULL;
-}
-
-/**
- * \brief Modifies the velocity of the object with an impulse.
- *
- * \param self Object.
- * \param point Impulse point relative to the body.
- * \param impulse Impulse force.
- */
-void
-lieng_object_impulse (LIEngObject*       self,
-                      const LIMatVector* point,
-                      const LIMatVector* impulse)
-{
-	liphy_object_impulse (self->physics, point, impulse);
-}
-
-/**
- * \brief Causes the object to jump.
- *
- * Adds the walking velocity vector of the character to its rigid body
- * velocity and then does the same as #liphy_object_impulse. This causes
- * the character to automatically jump to its walking direction.
- *
- * If the object is not a character, the character specific operations are
- * skipped and the function behaves the same way as #liphy_object_impulse
- * with point of impulse set to origin in body space.
- *
- * \param self Object.
- * \param impulse Jump force.
- */
-void
-lieng_object_jump (LIEngObject*       self,
-                   const LIMatVector* impulse)
-{
-	liphy_object_jump (self->physics, impulse);
 }
 
 /**
@@ -497,7 +399,7 @@ lieng_object_update (LIEngObject* self,
 		if (lieng_object_get_realized (self))
 		{
 			/* Calculate new position. */
-			liphy_object_get_transform (self->physics, &transform0);
+			transform0 = self->transform;
 			transform1 = self->smoothing.target;
 			transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
 			transform.position = limat_vector_lerp (
@@ -508,39 +410,13 @@ lieng_object_update (LIEngObject* self,
 				0.5f * self->smoothing.rot);
 
 			/* Set new position. */
-			liphy_object_set_transform (self->physics, &transform);
+			self->transform = transform;
 			private_warp (self, &transform.position);
 
 			/* Invoke callbacks. */
 			lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, &transform);
 		}
 	}
-}
-
-/**
- * \brief Gets the angular velocity of the object.
- *
- * \param self Object.
- * \param value Return location for a vector.
- */
-void
-lieng_object_get_angular (const LIEngObject* self,
-                          LIMatVector*       value)
-{
-	liphy_object_get_angular (self->physics, value);
-}
-
-/**
- * \brief Sets the angular velocity of the object.
- *
- * \param self Object.
- * \param value Angular velocity vector.
- */
-void
-lieng_object_set_angular (LIEngObject*       self,
-                          const LIMatVector* value)
-{
-	liphy_object_set_angular (self->physics, value);
 }
 
 /**
@@ -578,64 +454,6 @@ lieng_object_get_bounds_transform (const LIEngObject* self,
 	}
 	else
 		limat_aabb_init (bounds);
-}
-
-/**
- * \brief Gets the collision group of the object.
- *
- * \param self Object.
- * \return Collision group mask.
- */
-int
-lieng_object_get_collision_group (const LIEngObject* self)
-{
-	return liphy_object_get_collision_group (self->physics);
-}
-
-/**
- * \brief Sets the collision group of the object.
- *
- * Two objects can collide with each other if the mask of the first object has
- * common bits with the group of the second object and the mask of the second
- * object has common bits with the group of the first object.
- *
- * \param self Object.
- * \param mask Collision group mask.
- */
-void
-lieng_object_set_collision_group (LIEngObject* self,
-                                  int          mask)
-{
-	liphy_object_set_collision_group (self->physics, mask);
-}
-
-/**
- * \brief Gets the collision mask of the object.
- *
- * \param self Object.
- * \return Collision mask.
- */
-int
-lieng_object_get_collision_mask (const LIEngObject* self)
-{
-	return liphy_object_get_collision_mask (self->physics);
-}
-
-/**
- * \brief Sets the collision mask of the object.
- *
- * Two objects can collide with each other if the mask of the first object has
- * common bits with the group of the second object and the mask of the second
- * object has common bits with the group of the first object.
- *
- * \param self Object.
- * \param mask Collision mask.
- */
-void
-lieng_object_set_collision_mask (LIEngObject* self,
-                                 int          mask)
-{
-	liphy_object_set_collision_mask (self->physics, mask);
 }
 
 /**
@@ -693,20 +511,6 @@ lieng_object_get_distance (const LIEngObject* self,
 	return limat_vector_get_length (limat_vector_subtract (t0.position, t1.position));
 }
 
-/**
- * \brief Returns nonzero if the object is standing on ground.
- *
- * This only works for character objects. Other types always return zero.
- *
- * \param self Object.
- * \return Nonzero if standing on ground.
- */
-int
-lieng_object_get_ground (const LIEngObject* self)
-{
-	return liphy_object_get_ground (self->physics);
-}
-
 int
 lieng_object_get_flags (const LIEngObject* self)
 {
@@ -718,31 +522,6 @@ lieng_object_set_flags (LIEngObject* self,
                         int          flags)
 {
 	self->flags = flags;
-}
-
-/**
- * \brief Gets the mass of the object.
- *
- * \param self Object.
- * \return Mass.
- */
-float
-lieng_object_get_mass (const LIEngObject* self)
-{
-	return liphy_object_get_mass (self->physics);
-}
-
-/**
- * \brief Sets the mass of the object.
- *
- * \param self Object.
- * \param value Mass.
- */
-void
-lieng_object_set_mass (LIEngObject* self,
-                       float        value)
-{
-	liphy_object_set_mass (self->physics, value);
 }
 
 /**
@@ -764,16 +543,9 @@ lieng_object_set_model (LIEngObject* self,
 
 	/* Switch model. */
 	if (model != NULL)
-	{
 		limdl_pose_set_model (self->pose, model->model);
-		liphy_object_clear_shape (self->physics);
-		liphy_object_insert_shape (self->physics, model->physics, NULL);
-	}
 	else
-	{
 		limdl_pose_set_model (self->pose, NULL);
-		liphy_object_clear_shape (self->physics);
-	}
 	if (self->flags & LIENG_OBJECT_FLAG_INSTANCE_MODEL)
 	{
 		lieng_model_free (self->model);
@@ -866,17 +638,10 @@ lieng_object_set_realized (LIEngObject* self,
 		return 1;
 	if (value)
 	{
-		/* Activate physics. */
-		if (!liphy_object_set_realized (self->physics, 1))
-			return 0;
-
 		/* Link to map. */
 		lieng_object_get_transform (self, &transform);
 		if (!private_warp (self, &transform.position))
-		{
-			liphy_object_set_realized (self->physics, 0);
 			return 0;
-		}
 
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
@@ -888,9 +653,6 @@ lieng_object_set_realized (LIEngObject* self,
 	{
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
-
-		/* Deactivate physics. */
-		liphy_object_set_realized (self->physics, 0);
 
 		/* Remove from map. */
 		lieng_sector_remove_object (self->sector, self);
@@ -967,29 +729,6 @@ lieng_object_set_selected (LIEngObject* self,
 }
 
 /**
- * \brief Replaces the shape of the object.
- *
- * The camera uses this for creating a ghost object for itself by setting
- * its model to NULL and then assigning a privately managed shape to its
- * engine object.
- *
- * \warning Assigning a shape from another model without incrementing the
- * reference count of the model manually will likely lead to the model being
- * unloaded while still in use and the game crashing.
- *
- * \param self Object.
- * \param shape Collision shape or NULL.
- */
-void
-lieng_object_set_shape (LIEngObject* self,
-                        LIPhyShape*  shape)
-{
-	liphy_object_clear_shape (self->physics);
-	if (shape != NULL)
-		liphy_object_insert_shape (self->physics, shape, NULL);
-}
-
-/**
  * \brief Gets positional and rotation smoothing.
  *
  * \param self Object.
@@ -1027,31 +766,6 @@ void lieng_object_set_smoothing (
 }
 
 /**
- * \brief Gets the movement speed of the object.
- *
- * \param self Object.
- * \return Movement speed.
- */
-float
-lieng_object_get_speed (const LIEngObject* self)
-{
-	return liphy_object_get_speed (self->physics);
-}
-
-/**
- * \brief Sets the movement speed of the object.
- *
- * \param self Object.
- * \param value Movement speed.
- */
-void
-lieng_object_set_speed (LIEngObject* self,
-                        float        value)
-{
-	liphy_object_set_speed (self->physics, value);
-}
-
-/**
  * \brief Gets the smoothing target transformation of the object.
  *
  * Works exactly like #lieng_object_get_transform when smoothing is disabled.
@@ -1069,7 +783,7 @@ lieng_object_get_target (const LIEngObject* self,
 
 	realized = lieng_object_get_realized (self);
 	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
-		liphy_object_get_transform (self->physics, value);
+		*value = self->transform;
 	else
 		*value = self->smoothing.target;
 }
@@ -1080,11 +794,11 @@ lieng_object_get_target (const LIEngObject* self,
  * \param self Object.
  * \param value Return location for the transformation.
  */
-void
-lieng_object_get_transform (const LIEngObject* self,
-                            LIMatTransform*    value)
+void lieng_object_get_transform (
+	const LIEngObject* self,
+	LIMatTransform*    value)
 {
-	liphy_object_get_transform (self->physics, value);
+	*value = self->transform;
 }
 
 /**
@@ -1104,9 +818,12 @@ lieng_object_set_transform (LIEngObject*          self,
 	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
 	{
 		/* Transform immediately. */
-		liphy_object_set_transform (self->physics, value);
 		if (realized)
-			private_warp (self, &value->position);
+		{
+			if (!private_warp (self, &value->position))
+				return 0;
+		}
+		self->transform = *value;
 
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
@@ -1127,34 +844,6 @@ lieng_object_set_userdata (LIEngObject* self,
                            void*        data)
 {
 	self->userdata = data;
-}
-
-/**
- * \brief Get the velocity vector of the object.
- *
- * \param self object
- * \param value Return location for the vector.
- */
-void
-lieng_object_get_velocity (const LIEngObject* self,
-                           LIMatVector*       value)
-{
-	liphy_object_get_velocity (self->physics, value);
-}
-
-/**
- * \brief Set the velocity vector of the object.
- *
- * \param self object
- * \param value Vector.
- * \return Nonzero on success.
- */
-int
-lieng_object_set_velocity (LIEngObject*       self,
-                           const LIMatVector* value)
-{
-	liphy_object_set_velocity (self->physics, value);
-	return 1;
 }
 
 /*****************************************************************************/

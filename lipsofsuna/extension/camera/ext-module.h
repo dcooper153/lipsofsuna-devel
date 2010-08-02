@@ -41,6 +41,7 @@ struct _LIExtModule
 	float zoom;
 	LICalHandle calls[1];
 	LICliClient* client;
+	LIMaiProgram* program;
 };
 
 LIExtModule*

@@ -37,6 +37,9 @@ static int private_tick (
 	LIExtModule* self,
 	float        secs);
 
+static int private_shutdown (
+	LIExtModule* self);
+
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_tiles_physics_info =
@@ -65,16 +68,18 @@ LIExtModule* liext_tiles_physics_new (
 		return NULL;
 	}
 
-	/* Make sure the tiles extension is loaded. */
-	if (!limai_program_insert_extension (program, "tiles"))
+	/* Make sure the physics and tiles extensions are loaded. */
+	if (!limai_program_insert_extension (program, "physics") ||
+	    !limai_program_insert_extension (program, "tiles"))
 	{
 		liext_tiles_physics_free (self);
 		return NULL;
 	}
 
-	/* Find the voxel manager. */
+	/* Find the physics and voxel managers. */
+	self->physics = limai_program_find_component (program, "physics");
 	self->voxels = limai_program_find_component (program, "voxels");
-	if (self->voxels == NULL)
+	if (self->physics == NULL || self->voxels == NULL)
 	{
 		liext_tiles_physics_free (self);
 		return NULL;
@@ -83,7 +88,8 @@ LIExtModule* liext_tiles_physics_new (
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 0) ||
 	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-free", 0, private_block_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 0, private_block_load, self, self->calls + 2))
+	    !lical_callbacks_insert (self->voxels->callbacks, self->voxels, "block-load", 0, private_block_load, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, program, "program-shutdown", 0, private_shutdown, self, self->calls + 3))
 	{
 		liext_tiles_physics_free (self);
 		return NULL;
@@ -95,16 +101,14 @@ LIExtModule* liext_tiles_physics_new (
 void liext_tiles_physics_free (
 	LIExtModule* self)
 {
-	LIAlgMemdicIter iter;
-
 	/* Free callbacks. */
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
-	/* Free physics blocks. */
+	/* Free physics block storage. The blocks have already been freed by the shutdown
+	   callback since the physics manager might have already been deleted. */
 	if (self->blocks != NULL)
 	{
-		LIALG_MEMDIC_FOREACH (iter, self->blocks)
-			liext_tiles_physics_block_free (iter.value);
+		lisys_assert (self->blocks->size == 0);
 		lialg_memdic_free (self->blocks);
 	}
 
@@ -142,6 +146,16 @@ int liext_tiles_physics_build_block (
 	return 1;
 }
 
+void liext_tiles_physics_clear (
+	LIExtModule* self)
+{
+	LIAlgMemdicIter iter;
+
+	LIALG_MEMDIC_FOREACH (iter, self->blocks)
+		liext_tiles_physics_block_free (iter.value);
+	lialg_memdic_clear (self->blocks);
+}
+
 /*****************************************************************************/
 
 static int private_block_free (
@@ -174,6 +188,14 @@ static int private_tick (
 {
 	livox_manager_mark_updates (self->voxels);
 	livox_manager_update_marked (self->voxels);
+
+	return 1;
+}
+
+static int private_shutdown (
+	LIExtModule* self)
+{
+	liext_tiles_physics_clear (self);
 
 	return 1;
 }

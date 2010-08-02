@@ -236,9 +236,10 @@ LISndSource* liext_sound_set_effect (
 
 	/* Set properties. */
 	lieng_object_get_transform (engobj, &transform);
-	lieng_object_get_velocity (engobj, &vector);
 	lisnd_source_set_position (source, &transform.position);
-	lisnd_source_set_velocity (source, &vector);
+	// TODO: Use the physics component to get the velocity.
+	//lieng_object_get_velocity (engobj, &vector);
+	//lisnd_source_set_velocity (source, &vector);
 	if (flags & LINET_EFFECT_REPEAT)
 		lisnd_source_set_looping (source, 1);
 	lisnd_source_set_playing (source, 1);
@@ -377,9 +378,10 @@ static int private_tick (
 				next = ptr->next;
 				source = ptr->data;
 				lieng_object_get_transform (engobj, &transform);
-				lieng_object_get_velocity (engobj, &vector);
 				lisnd_source_set_position (source, &transform.position);
-				lisnd_source_set_velocity (source, &vector);
+				// TODO: Use the physics component to get the velocity.
+				//lieng_object_get_velocity (engobj, &vector);
+				//lisnd_source_set_velocity (source, &vector);
 				if (!lisnd_source_update (source, secs))
 				{
 					lisnd_source_free (source);

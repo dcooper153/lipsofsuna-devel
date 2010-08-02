@@ -35,8 +35,9 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LIAlgMemdic* blocks;
-	LICalHandle calls[3];
+	LICalHandle calls[4];
 	LIMaiProgram* program;
+	LIPhyPhysics* physics;
 	LIVoxManager* voxels;
 };
 
@@ -49,6 +50,9 @@ void liext_tiles_physics_free (
 int liext_tiles_physics_build_block (
 	LIExtModule*    self,
 	LIVoxBlockAddr* addr);
+
+void liext_tiles_physics_clear (
+	LIExtModule* self);
 
 #endif
 

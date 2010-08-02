@@ -33,7 +33,6 @@ struct _LIExtBlock
 {
 	LIExtModule* module;
 	LIMdlModel* mmodel;
-	LIPhyObject* physics;
 	LIRenModel* rmodel;
 	LIRenGroup* group;
 };

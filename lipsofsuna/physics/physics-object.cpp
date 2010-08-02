@@ -132,6 +132,57 @@ liphy_object_free (LIPhyObject* self)
 }
 
 /**
+ * \brief Configures the object to move towards the given target.
+ *
+ * Configures the physics state of the object so that it heads directly
+ * towards the specified target point.
+ *
+ * \param self Object.
+ * \param target Target position vector.
+ * \param speed Movement speed.
+ * \param dist Tolerance in position for the goal check.
+ * \return Nonzero if reached the goal.
+ */
+int liphy_object_approach (
+	LIPhyObject*       self,
+	const LIMatVector* target,
+	float              speed,
+	float              dist)
+{
+	float len;
+	LIMatVector tmp;
+	LIMatQuaternion dir;
+	LIMatTransform transform;
+
+	if (!liphy_object_get_realized (self))
+		return 1;
+
+	/* Get direction to target. */
+	liphy_object_get_transform (self, &transform);
+	tmp = limat_vector_subtract (*target, transform.position);
+	tmp.y = 0.0f;
+	len = limat_vector_get_length (tmp);
+
+	/* Set look direction. */
+	if (len > 0.1f)
+	{
+		dir = limat_quaternion_look (tmp, limat_vector_init (0.0f, 1.0f, 0.0f));
+		transform.rotation = limat_quaternion_conjugate (dir);
+		liphy_object_set_transform (self, &transform);
+	}
+
+	/* Move towards target. */
+	if (len > dist)
+	{
+		liphy_object_set_movement (self, speed);
+		return 0;
+	}
+	liphy_object_set_movement (self, 0.0f);
+
+	return 1;
+}
+
+/**
  * \brief Clears the current shape of the object.
  *
  * \param self Object.

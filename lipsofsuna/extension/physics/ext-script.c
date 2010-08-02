@@ -16,32 +16,40 @@
  */
 
 /**
- * \addtogroup liser Server
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liserCallbacks Callbacks
+ * \addtogroup LIExtPhysics Physics
  * @{
  */
 
-#include <lipsofsuna/network.h>
-#include "server-callbacks.h"
-#include "server-observer.h"
-#include "server-script.h"
+#include "ext-module.h"
 
-static int
-private_object_free (LISerServer* server,
-                     LIEngObject* object)
+/* @luadoc
+ * module "Extension.Physics"
+ * --- Example extension.
+ * -- @name Physics
+ * -- @class table
+ */
+
+/* @luadoc
+ * --- Example function.
+ * --
+ * -- @param self Physics class.
+ * Physics.test(self)
+ */
+static void Physics_test (LIScrArgs* args)
 {
-	/* Unrealize before server data is freed. */
-	lieng_object_set_realized (object, 0);
-
-	return 1;
+	printf ("Physics.test\n");
 }
 
-int
-liser_server_init_callbacks_client (LISerServer* server)
+/*****************************************************************************/
+
+void liext_script_physics (
+	LIScrClass* self,
+	void*       data)
 {
-	lical_callbacks_insert (server->callbacks, server->engine, "object-free", 65535, private_object_free, server, NULL);
-	return 1;
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_PHYSICS, data);
+	liscr_class_insert_cfunc (self, "test", Physics_test);
 }
 
 /** @} */

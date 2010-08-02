@@ -51,6 +51,7 @@ liext_cameras_new (LIMaiProgram* program)
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
+	self->program = program;
 	self->client = limai_program_find_component (program, "client");
 
 	/* Register callbacks. */
@@ -101,12 +102,18 @@ private_camera_clip (LIExtModule* self)
 	LIMatTransform end;
 	LIMatVector diff;
 	LIPhyCollision tmp;
+	LIPhyPhysics* physics;
 	LIPhyShape* shape;
+
+	/* Find the physics manager. */
+	physics = limai_program_find_component (self->program, "physics");
+	if (physics == NULL)
+		return;
 
 	/* Create sweep shape. */
 	/* FIXME: Could use a more accurate shape. */
 	lialg_camera_get_bounds (self->client->camera, &aabb);
-	shape = liphy_shape_new_aabb (self->client->engine->physics, &aabb);
+	shape = liphy_shape_new_aabb (physics, &aabb);
 	if (shape == NULL)
 		return;
 
@@ -114,7 +121,7 @@ private_camera_clip (LIExtModule* self)
 	lialg_camera_get_center (self->client->camera, &start);
 	lialg_camera_get_transform (self->client->camera, &end);
 	diff = limat_vector_subtract (end.position, start.position);
-	hit = liphy_physics_cast_shape (self->client->engine->physics, &start, &end, shape,
+	hit = liphy_physics_cast_shape (physics, &start, &end, shape,
 		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
 	liphy_shape_free (shape);
 

@@ -27,7 +27,7 @@
 #include <lipsofsuna/script.h>
 
 /* @luadoc
- * module "Core.Common.Object"
+ * module "Core.Object"
  * ---
  * -- Manipulate objects.
  * -- @name Object
@@ -80,30 +80,6 @@ static void Object_animate (LIScrArgs* args)
 		channel = -1;
 	ret = lieng_object_animate (args->self, channel, animation, repeat, weight, time);
 	liscr_args_seti_bool (args, ret);
-}
-
-/* @luadoc
- * --- Makes the object approach a point.
- * --
- * -- @param self Object.
- * -- @param args Arguments.
- * --   <li>dist: Distance how close to target to get.</li>
- * --   <li>point: Point vector in world space. (required)</li>
- * --   <li>speed: Movement speed multiplier.</li></ul>
- * function Object.approach(self, args)
- */
-static void Object_approach (LIScrArgs* args)
-{
-	float dist = 0.0f;
-	float speed = 1.0f;
-	LIMatVector vector;
-
-	if (liscr_args_gets_vector (args, "point", &vector))
-	{
-		liscr_args_gets_float (args, "dist", &dist);
-		liscr_args_gets_float (args, "speed", &speed);
-		lieng_object_approach (args->self, &vector, speed, dist);
-	}
 }
 
 /* @luadoc
@@ -257,64 +233,6 @@ static void Object_get_animation (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Lets an impulse force affect the object.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>point: Point of impulse. (required)</li>
- * --   <li>impulse: Force of impulse. (required)</li></ul>
- * function Object.impulse(self, args)
- */
-static void Object_impulse (LIScrArgs* args)
-{
-	LIMatVector impulse;
-	LIMatVector point;
-
-	if (liscr_args_gets_vector (args, "impulse", &impulse) &&
-	    liscr_args_gets_vector (args, "point", &point))
-		lieng_object_impulse (args->self, &point, &impulse);
-}
-
-/* @luadoc
- * --- Creates a hinge constraint.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>position: Position vector.</li>
- * --   <li>axis: Axis of rotation.</li></ul>
- * function Object.insert_hinge_constraint(self, args)
- */
-static void Object_insert_hinge_constraint (LIScrArgs* args)
-{
-	LIEngObject* self;
-	LIMatVector pos;
-	LIMatVector axis = { 0.0f, 1.0f, 0.0f };
-
-	if (liscr_args_gets_vector (args, "position", &pos))
-	{
-		liscr_args_gets_vector (args, "axis", &axis);
-		self = args->self;
-		liphy_constraint_new_hinge (self->engine->physics, self->physics, &pos, &axis, 0, 0.0f, 0.0f);
-	}
-}
-
-/* @luadoc
- * --- Causes the object to jump.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>impulse: Force of impulse. (required)</li></ul>
- * function Object.jump(self, args)
- */
-static void Object_jump (LIScrArgs* args)
-{
-	LIMatVector impulse;
-
-	if (liscr_args_gets_vector (args, "impulse", &impulse))
-		lieng_object_jump (args->self, &impulse);
-}
-
-/* @luadoc
  * --- Creates a new object.
  * --
  * -- @param clss Object class.
@@ -372,74 +290,6 @@ static void Object_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Sweeps a sphere relative to the object.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>src: Start point vector. (required)</li>
- * --   <li>dst: End point vector. (required)</li>
- * --   <li>radius: Sphere radius.</li></ul>
- * -- @return Table with point, normal, and object. Nil if no collision occurred.
- * function Object.sweep_sphere(self, args)
- */
-static void Object_sweep_sphere (LIScrArgs* args)
-{
-	float radius = 0.5f;
-	LIEngObject* object;
-	LIMatVector start;
-	LIMatVector end;
-	LIPhyCollision result;
-
-	if (!liscr_args_gets_vector (args, "src", &start) ||
-	    !liscr_args_gets_vector (args, "dst", &end))
-		return;
-	liscr_args_gets_float (args, "radius", &radius);
-	object = args->self;
-
-	if (liphy_object_sweep_sphere (object->physics, &start, &end, radius, &result))
-	{
-		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-		liscr_args_sets_float (args, "fraction", result.fraction);
-		liscr_args_sets_vector (args, "point", &result.point);
-		liscr_args_sets_vector (args, "normal", &result.normal);
-		if (result.object != NULL)
-		{
-			object = liphy_object_get_userdata (result.object);
-			if (object != NULL && object->script != NULL)
-				liscr_args_sets_data (args, "object", object->script);
-		}
-	}
-}
-
-/* @luadoc
- * --- Angular velocity.
- * -- <br/>
- * -- Angular velocity specifies how the object rotates. The direction of the
- * -- vector points towards the axis of rotation and the length of the vector
- * -- specifies how fast the object rotates around its center point.
- * -- <br/>
- * -- Only supported by rigid bodies. Other kind of objects always return
- * -- a zero vector.
- * --
- * -- @name Object.angular
- * -- @class table
- */
-static void Object_getter_angular (LIScrArgs* args)
-{
-	LIMatVector tmp;
-
-	lieng_object_get_angular (args->self, &tmp);
-	liscr_args_seti_vector (args, &tmp);
-}
-static void Object_setter_angular (LIScrArgs* args)
-{
-	LIMatVector vector;
-
-	if (liscr_args_geti_vector (args, 0, &vector))
-		lieng_object_set_angular (args->self, &vector);
-}
-
-/* @luadoc
  * --- Table of channel numbers and animation names.
  * -- <br/>
  * -- A list of permanent animations the object is playing back.
@@ -463,42 +313,6 @@ static void Object_getter_animations (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Collision group bitmask.
- * --
- * -- @name Object.collision_group
- * -- @class table
- */
-static void Object_getter_collision_group (LIScrArgs* args)
-{
-	liscr_args_seti_int (args, lieng_object_get_collision_group (args->self));
-}
-static void Object_setter_collision_group (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_int (args, 0, &value))
-		lieng_object_set_collision_group (args->self, value);
-}
-
-/* @luadoc
- * --- Collision bitmask.
- * --
- * -- @name Object.collision_mask
- * -- @class table
- */
-static void Object_getter_collision_mask (LIScrArgs* args)
-{
-	liscr_args_seti_int (args, lieng_object_get_collision_mask (args->self));
-}
-static void Object_setter_collision_mask (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_int (args, 0, &value))
-		lieng_object_set_collision_mask (args->self, value);
-}
-
-/* @luadoc
  * --- Custom collision response callback.
  * --
  * -- Function to be called every time the object collides with something.
@@ -506,40 +320,6 @@ static void Object_setter_collision_mask (LIScrArgs* args)
  * -- @name Object.contact_cb
  * -- @class table
  */
-
-/* @luadoc
- * --- Gravity vector.
- * --
- * -- @name Object.gravity
- * -- @class table
- */
-static void Object_getter_gravity (LIScrArgs* args)
-{
-	LIMatVector tmp;
-
-	liphy_object_get_gravity (LIENG_OBJECT (args->self)->physics, &tmp);
-	liscr_args_seti_vector (args, &tmp);
-}
-static void Object_setter_gravity (LIScrArgs* args)
-{
-	LIMatVector vector;
-
-	if (liscr_args_geti_vector (args, 0, &vector))
-		liphy_object_set_gravity (LIENG_OBJECT (args->self)->physics, &vector);
-}
-
-/* @luadoc
- * --- Ground contact flag.
- * -- <br/>
- * -- Only supported for creatures. Other kind of objects always return false.
- * --
- * -- @name Object.ground
- * -- @class table
- */
-static void Object_getter_ground (LIScrArgs* args)
-{
-	liscr_args_seti_bool (args, lieng_object_get_ground (args->self));
-}
 
 /* @luadoc
  * --- Unique identification number.
@@ -550,24 +330,6 @@ static void Object_getter_ground (LIScrArgs* args)
 static void Object_getter_id (LIScrArgs* args)
 {
 	liscr_args_seti_int (args, LIENG_OBJECT (args->self)->id);
-}
-
-/* @luadoc
- * --- Mass.
- * --
- * -- @name Object.mass
- * -- @class table
- */
-static void Object_getter_mass (LIScrArgs* args)
-{
-	liscr_args_seti_float (args, lieng_object_get_mass (args->self));
-}
-static void Object_setter_mass (LIScrArgs* args)
-{
-	float value;
-
-	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
-		lieng_object_set_mass (args->self, value);
 }
 
 /* @luadoc
@@ -810,123 +572,23 @@ static void Object_setter_selected_objects (LIScrArgs* args)
 		lieng_object_set_selected (data->data, 1);
 }
 
-/* @luadoc
- * --- Movement speed.
- * --
- * -- Only used by creature objects.
- * --
- * -- @name Object.speed
- * -- @class table
- */
-static void Object_getter_speed (LIScrArgs* args)
-{
-	liscr_args_seti_float (args, lieng_object_get_speed (args->self));
-}
-static void Object_setter_speed (LIScrArgs* args)
-{
-	float value;
-
-	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
-		lieng_object_set_speed (args->self, value);
-}
-
-/* @luadoc
- * --- Strafing direction.
- * -- <br/>
- * -- Only used by creature objects. The value of -1 means that the creature is
- * -- strafing to the left at walking speed. The value of 1 means right, and the
- * -- value of 0 means no strafing.
- * --
- * -- @name Object.strafing
- * -- @class table
- */
-static void Object_getter_strafing (LIScrArgs* args)
-{
-	liscr_args_seti_float (args, liphy_object_get_strafing (LIENG_OBJECT (args->self)->physics));
-}
-static void Object_setter_strafing (LIScrArgs* args)
-{
-	float value;
-
-	if (liscr_args_geti_float (args, 0, &value))
-		liphy_object_set_strafing (LIENG_OBJECT (args->self)->physics, value);
-}
-
-/* @luadoc
- * --- True if the object is static, false if it is a dynamic rigid body.
- * --
- * -- @name Object.static
- * -- @class table
- */
-static void Object_getter_static (LIScrArgs* args)
-{
-	int value;
-
-	value = liphy_object_get_control_mode (LIENG_OBJECT (args->self)->physics);
-	liscr_args_seti_bool (args, value == LIPHY_CONTROL_MODE_STATIC);
-}
-static void Object_setter_static (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_bool (args, 0, &value))
-	{
-		if (value)
-			value = LIPHY_CONTROL_MODE_STATIC;
-		else
-			value = LIPHY_CONTROL_MODE_RIGID;
-		liphy_object_set_control_mode (LIENG_OBJECT (args->self)->physics, value);
-	}
-}
-
-/* @luadoc
- * --- Linear velocity.
- * --
- * -- @name Object.velocity
- * -- @class table
- */
-static void Object_getter_velocity (LIScrArgs* args)
-{
-	LIMatVector tmp;
-
-	lieng_object_get_velocity (args->self, &tmp);
-	liscr_args_seti_vector (args, &tmp);
-}
-static void Object_setter_velocity (LIScrArgs* args)
-{
-	LIMatVector vector;
-
-	if (liscr_args_geti_vector (args, 0, &vector))
-		lieng_object_set_velocity (args->self, &vector);
-}
-
 /*****************************************************************************/
 
-void liscr_script_object (LIScrClass* self,
-                          void*       data)
+void liscr_script_object (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
 	liscr_class_inherit (self, liscr_script_data, data);
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
-	liscr_class_insert_mfunc (self, "approach", Object_approach);
 	liscr_class_insert_cfunc (self, "find", Object_find);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
 	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);
 	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
-	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
-	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
-	liscr_class_insert_mfunc (self, "jump", Object_jump);
 	liscr_class_insert_cfunc (self, "new", Object_new);
-	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
-	liscr_class_insert_mvar (self, "angular", Object_getter_angular, Object_setter_angular);
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
-	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);
-	liscr_class_insert_mvar (self, "collision_mask", Object_getter_collision_mask, Object_setter_collision_mask);
-	liscr_class_insert_mvar (self, "gravity", Object_getter_gravity, Object_setter_gravity);
-	liscr_class_insert_mvar (self, "ground", Object_getter_ground, NULL);
 	liscr_class_insert_mvar (self, "id", Object_getter_id, NULL);
-	liscr_class_insert_mvar (self, "mass", Object_getter_mass, Object_setter_mass);
 	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);
 	liscr_class_insert_mvar (self, "position", Object_getter_position, Object_setter_position);
 	liscr_class_insert_mvar (self, "position_smoothing", Object_getter_position_smoothing, Object_setter_position_smoothing);
@@ -937,10 +599,6 @@ void liscr_script_object (LIScrClass* self,
 	liscr_class_insert_mvar (self, "sector", Object_getter_sector, NULL);
 	liscr_class_insert_mvar (self, "selected", Object_getter_selected, Object_setter_selected);
 	liscr_class_insert_cvar (self, "selected_objects", Object_getter_selected_objects, Object_setter_selected_objects);
-	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);
-	liscr_class_insert_mvar (self, "static", Object_getter_static, Object_setter_static);
-	liscr_class_insert_mvar (self, "strafing", Object_getter_strafing, Object_setter_strafing);
-	liscr_class_insert_mvar (self, "velocity", Object_getter_velocity, Object_setter_velocity);
 }
 
 /** @} */

@@ -50,8 +50,6 @@ void liext_tiles_render_block_free (
 		liren_model_free (self->rmodel);
 	if (self->mmodel != NULL)
 		limdl_model_free (self->mmodel);
-	if (self->physics != NULL)
-		liphy_object_free (self->physics);
 	lisys_free (self);
 }
 
@@ -73,11 +71,6 @@ void liext_tiles_render_block_clear (
 		limdl_model_free (self->mmodel);
 		self->mmodel = NULL;
 	}
-	if (self->physics != NULL)
-	{
-		liphy_object_free (self->physics);
-		self->physics = NULL;
-	}
 }
 
 int liext_tiles_render_block_build (
@@ -90,7 +83,7 @@ int liext_tiles_render_block_build (
 	liext_tiles_render_block_clear (self);
 
 	/* Build new objects. */
-	if (!livox_build_block (self->module->voxels, self->module->client->engine, addr, &self->mmodel, &self->physics))
+	if (!livox_build_block (self->module->voxels, self->module->client->engine, NULL, addr, &self->mmodel, NULL))
 		return 0;
 
 	/* Create render model if not empty. */
@@ -111,8 +104,6 @@ int liext_tiles_render_block_build (
 	/* Realize if not empty. */
 	if (self->group != NULL)
 		liren_group_set_realized (self->group, 1);
-	if (self->physics != NULL)
-		liphy_object_set_realized (self->physics, 1);
 
 	return 1;
 }

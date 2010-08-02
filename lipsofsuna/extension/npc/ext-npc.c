@@ -25,15 +25,15 @@
 #include "ext-module.h"
 #include "ext-npc.h"
 
-static int
-private_tick (LIExtNpc* self,
-              float     secs);
+static int private_tick (
+	LIExtNpc* self,
+	float     secs);
 
-static void
-private_attack (LIExtNpc* self);
+static void private_attack (
+	LIExtNpc* self);
 
-static int
-private_rescan (LIExtNpc* self);
+static int private_rescan (
+	LIExtNpc* self);
 
 /*****************************************************************************/
 
@@ -108,7 +108,6 @@ int
 liext_npc_set_owner (LIExtNpc*    self,
                      LIEngObject* value)
 {
-	int flags;
 	LIExtNpc* old;
 
 	/* Discard old target. */
@@ -121,9 +120,6 @@ liext_npc_set_owner (LIExtNpc*    self,
 		if (old != NULL)
 		{
 			liext_npc_set_target (old, NULL);
-			flags = lieng_object_get_flags (old->owner);
-			liphy_object_set_control_mode (old->owner->physics, LIPHY_CONTROL_MODE_RIGID);
-			lieng_object_set_flags (old->owner, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
 			liscr_data_unref (old->owner->script, self->script);
 			liscr_data_unref (self->script, old->owner->script);
 			old->owner = NULL;
@@ -133,18 +129,12 @@ liext_npc_set_owner (LIExtNpc*    self,
 	/* Set new owner. */
 	if (self->owner != NULL)
 	{
-		flags = lieng_object_get_flags (self->owner);
-		liphy_object_set_control_mode (self->owner->physics, LIPHY_CONTROL_MODE_RIGID);
-		lieng_object_set_flags (self->owner, flags & ~LIENG_OBJECT_FLAG_DYNAMIC);
 		liscr_data_unref (self->owner->script, self->script);
 		liscr_data_unref (self->script, self->owner->script);
 		lialg_ptrdic_remove (self->module->dictionary, self->owner);
 	}
 	if (value != NULL)
 	{
-		flags = lieng_object_get_flags (value);
-		liphy_object_set_control_mode (value->physics, LIPHY_CONTROL_MODE_CHARACTER);
-		lieng_object_set_flags (value, flags | LIENG_OBJECT_FLAG_DYNAMIC);
 		liscr_data_ref (value->script, self->script);
 		liscr_data_ref (self->script, value->script);
 		lialg_ptrdic_insert (self->module->dictionary, value, self);
@@ -194,9 +184,9 @@ liext_npc_set_target (LIExtNpc*    self,
 
 /*****************************************************************************/
 
-static int
-private_tick (LIExtNpc* self,
-              float     secs)
+static int private_tick (
+	LIExtNpc* self,
+	float     secs)
 {
 	LIAiPath* path;
 	LIEngObject* object;
@@ -210,11 +200,21 @@ private_tick (LIExtNpc* self,
 	LIScrData* tmp;
 	LIPhyObject* physics;
 
+	/* Find the physics manager. */
+	if (self->module->physics == NULL)
+	{
+		self->module->physics = limai_program_find_component (self->module->program, "physics");
+		if (self->module->physics == NULL)
+			return 1;
+	}
+
 	/* Get object data. */
 	object = self->owner;
 	if (object == NULL)
 		return 1;
-	physics = object->physics;
+	physics = liphy_physics_find_object (self->module->physics, object->id);
+	if (physics == NULL)
+		return 1;
 
 	/* Check if active. */
 	if (!self->alert || object->sector == NULL)
@@ -299,12 +299,12 @@ private_tick (LIExtNpc* self,
 				if (diff.y > 0.5f)
 				{
 					impulse = limat_vector_init (0.0f, 100.0f, 0.0f);
-					lieng_object_jump (object, &impulse);
+					liphy_object_jump (physics, &impulse);
 				}
 			}
 
 			/* Move towards waypoint. */
-			lieng_object_approach (object, &vector, 1.0f, 0.0f);
+			liphy_object_approach (physics, &vector, 1.0f, 0.0f);
 			return 1;
 		}
 		else
@@ -333,14 +333,14 @@ private_tick (LIExtNpc* self,
 	/* Move towards target. */
 	/* FIXME: Speed not supported. */
 	lieng_object_get_transform (self->target, &transform);
-	if (lieng_object_approach (object, &transform.position, 1.0f, dist.z))
+	if (liphy_object_approach (physics, &transform.position, 1.0f, dist.z))
 		private_attack (self);
 
 	return 1;
 }
 
-static void
-private_attack (LIExtNpc* self)
+static void private_attack (
+	LIExtNpc* self)
 {
 	LIScrScript* script = self->module->program->script;
 
@@ -366,8 +366,8 @@ private_attack (LIExtNpc* self)
 	}
 }
 
-static int
-private_rescan (LIExtNpc* self)
+static int private_rescan (
+	LIExtNpc* self)
 {
 	LIScrData* object;
 	LIScrScript* script = self->module->program->script;
