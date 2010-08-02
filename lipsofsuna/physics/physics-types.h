@@ -43,7 +43,7 @@ enum _LIPhyControlMode
 typedef struct _LIPhyContact LIPhyContact;
 typedef enum _LIPhyControlMode LIPhyControlMode;
 typedef struct _LIPhyObject LIPhyObject;
-typedef void (*liphyCallback)(LIPhyObject* self, float secs);
+typedef void (*LIPhyCallback)(LIPhyObject* self, float secs);
 typedef void (*LIPhyContactCall)(LIPhyObject* self, LIPhyContact* contact);
 
 /** @} */

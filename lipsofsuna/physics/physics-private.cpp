@@ -29,22 +29,23 @@
 #define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
 #define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
 
-liphyMotionState::liphyMotionState (LIPhyObject*       object,
-                                    const btTransform& transform)
+liphyMotionState::liphyMotionState (
+	LIPhyObject*       object,
+	const btTransform& transform)
 {
 	this->object = object;
 	this->current = transform;
 	this->previous = transform;
 }
 
-void
-liphyMotionState::getWorldTransform (btTransform& transform) const
+void liphyMotionState::getWorldTransform (
+	btTransform& transform) const
 {
 	transform = this->current;
 }
 
-void
-liphyMotionState::setWorldTransform (const btTransform& transform)
+void liphyMotionState::setWorldTransform (
+	const btTransform& transform)
 {
 	float len0;
 	float len1;
@@ -52,6 +53,10 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 	lisys_assert (!isnan (transform.getOrigin ()[0]));
 	lisys_assert (!isnan (transform.getOrigin ()[1]));
 	lisys_assert (!isnan (transform.getOrigin ()[2]));
+	lisys_assert (!isnan (transform.getRotation ()[0]));
+	lisys_assert (!isnan (transform.getRotation ()[1]));
+	lisys_assert (!isnan (transform.getRotation ()[2]));
+	lisys_assert (!isnan (transform.getRotation ()[3]));
 
 	this->current = transform;
 	len0 = (this->current.getOrigin () - this->previous.getOrigin ()).length ();
@@ -67,13 +72,15 @@ liphyMotionState::setWorldTransform (const btTransform& transform)
 
 /*****************************************************************************/
 
-liphyCharacterController::liphyCharacterController (LIPhyObject* object)
+liphyCharacterController::liphyCharacterController (
+	LIPhyObject* object)
 {
 	this->object = object;
 	this->ground = 0;
 }
 
-void liphyCharacterController::updateAction (btCollisionWorld* world, btScalar delta)
+void liphyCharacterController::updateAction (
+	btCollisionWorld* world, btScalar delta)
 {
 	int ground;
 	float damp0;
@@ -128,7 +135,8 @@ void liphyCharacterController::updateAction (btCollisionWorld* world, btScalar d
 	((btRigidBody*) object)->setLinearVelocity (velx + vely + velz);
 }
 
-void liphyCharacterController::debugDraw (btIDebugDraw* debug)
+void liphyCharacterController::debugDraw (
+	btIDebugDraw* debug)
 {
 }
 

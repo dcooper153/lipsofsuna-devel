@@ -181,12 +181,12 @@ LIAPICALL (void, liphy_object_set_transform, (
 	LIPhyObject*          self,
 	const LIMatTransform* value));
 
-LIAPICALL (liphyCallback, liphy_object_get_usercall, (
+LIAPICALL (LIPhyCallback, liphy_object_get_usercall, (
 	LIPhyObject* self));
 
 LIAPICALL (void, liphy_object_set_usercall, (
 	LIPhyObject*  self,
-	liphyCallback value));
+	LIPhyCallback value));
 
 LIAPICALL (void*, liphy_object_get_userdata, (
 	LIPhyObject* self));

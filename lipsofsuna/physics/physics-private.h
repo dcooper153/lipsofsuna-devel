@@ -85,7 +85,7 @@ struct _LIPhyObject
 		void* userdata;
 		LIMatVector angular;
 		LIMatVector velocity;
-		liphyCallback custom_call;
+		LIPhyCallback custom_call;
 		LIPhyContactCall contact_call;
 	} config;
 };

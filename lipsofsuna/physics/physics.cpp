@@ -130,9 +130,13 @@ liphy_physics_new (LICalCallbacks* callbacks)
 void
 liphy_physics_free (LIPhyPhysics* self)
 {
+	LIAlgU32dicIter iter;
+
 	lisys_assert (self->contacts == NULL);
 	lisys_assert (self->constraints == NULL);
-	lisys_assert (self->objects->size == 0);
+
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+		liphy_object_free ((LIPhyObject*) iter.value);
 
 	delete self->dynamics;
 	delete self->solver;
@@ -380,6 +384,19 @@ liphy_physics_clear_contacts (LIPhyPhysics* self,
 			lisys_free (record);
 		}
 	}
+}
+
+/**
+ * \brief Finds a physics object by ID.
+ * \param self Physics simulation.
+ * \param id Object ID.
+ * \return Object or NULL.
+ */
+LIPhyObject* liphy_physics_find_object (
+	LIPhyPhysics* self,
+	uint32_t      id)
+{
+	return (LIPhyObject*) lialg_u32dic_find (self->objects, id);
 }
 
 /**
