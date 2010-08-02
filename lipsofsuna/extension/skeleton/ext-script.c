@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Server.Skeleton"
+ * module "Extension.Skeleton"
  * --- Example extension.
  * -- @name Skeleton
  * -- @class table
@@ -44,9 +44,9 @@ static void Skeleton_test (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liext_script_skeleton (LIScrClass* self,
-                       void*       data)
+void liext_script_skeleton (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);
 	liscr_class_insert_cfunc (self, "test", Skeleton_test);

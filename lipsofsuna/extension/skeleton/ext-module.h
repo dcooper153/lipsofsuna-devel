@@ -35,17 +35,17 @@ struct _LIExtModule
 	LIMaiProgram* program;
 };
 
-LIExtModule*
-liext_module_new (LIMaiProgram* program);
+LIExtModule* liext_skeleton_new (
+	LIMaiProgram* program);
 
-void
-liext_module_free (LIExtModule* self);
+void liext_skeleton_free (
+	LIExtModule* self);
 
 /*****************************************************************************/
 
-void
-liext_script_skeleton (LIScrClass* self,
-                       void*       data);
+void liext_script_skeleton (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 

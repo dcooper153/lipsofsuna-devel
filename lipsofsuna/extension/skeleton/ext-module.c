@@ -27,27 +27,29 @@
 LIMaiExtensionInfo liext_skeleton_info =
 {
 	LIMAI_EXTENSION_VERSION, "Skeleton",
-	liext_module_new,
-	liext_module_free
+	liext_skeleton_new,
+	liext_skeleton_free
 };
 
-LIExtModule*
-liext_module_new (LIMaiProgram* program)
+LIExtModule* liext_skeleton_new (
+	LIMaiProgram* program)
 {
 	LIExtModule* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
 
+	/* Register classes. */
 	liscr_script_create_class (program->script, "Skeleton", liext_script_skeleton, self);
 
 	return self;
 }
 
-void
-liext_module_free (LIExtModule* self)
+void liext_skeleton_free (
+	LIExtModule* self)
 {
 	lisys_free (self);
 }
