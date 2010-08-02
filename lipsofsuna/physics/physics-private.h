@@ -83,7 +83,6 @@ struct _LIPhyObject
 		float strafing;
 		float character_step;
 		void* userdata;
-		LIMatTransform transform;
 		LIMatVector angular;
 		LIMatVector velocity;
 		liphyCallback custom_call;
