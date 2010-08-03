@@ -315,12 +315,16 @@ void licli_client_set_moving (
 		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 		self->video.SDL_WarpMouse (cx, cy);
 		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+#ifdef ENABLE_GRABS
 		self->video.SDL_WM_GrabInput (SDL_GRAB_ON);
+#endif
 	}
 	else
 	{
 		self->video.SDL_ShowCursor (SDL_ENABLE);
+#ifdef ENABLE_GRABS
 		self->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
+#endif
 	}
 }
 
