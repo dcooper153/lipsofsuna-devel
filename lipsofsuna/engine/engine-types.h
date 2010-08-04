@@ -36,7 +36,6 @@ enum
 	LIENG_OBJECT_FLAG_RELOAD = 0x8000
 };
 
-typedef struct _LIEngConstraint LIEngConstraint;
 typedef struct _LIEngEngine LIEngEngine;
 typedef enum _LIEngMatrix LIEngMatrix;
 typedef struct _LIEngModel LIEngModel;

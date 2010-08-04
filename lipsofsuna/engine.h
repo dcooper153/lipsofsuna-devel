@@ -19,7 +19,6 @@
 #define __LIPS_ENGINE_H__
 
 #include "engine/engine.h"
-#include "engine/engine-constraint.h"
 #include "engine/engine-iterator.h"
 #include "engine/engine-model.h"
 #include "engine/engine-object.h"

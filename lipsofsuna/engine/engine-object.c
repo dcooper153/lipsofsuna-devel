@@ -23,7 +23,6 @@
  */
 
 #include <lipsofsuna/network.h>
-#include "engine-constraint.h"
 #include "engine-object.h"
 #include "engine-selection.h"
 
@@ -115,33 +114,12 @@ error:
 void
 lieng_object_free (LIEngObject* self)
 {
-	LIEngConstraint* constraint;
-	LIEngConstraint* constraint_next;
-
 	/* Unrealize. */
 	lieng_object_set_realized (self, 0);
 	lieng_object_set_selected (self, 0);
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-free", lical_marshal_DATA_PTR, self);
-
-	/* Free constraints. */
-	/* FIXME: Would be better to have objects remember their own constraints. */
-	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint_next)
-	{
-		constraint_next = constraint->next;
-		if (constraint->objects[0] == self ||
-		    constraint->objects[1] == self)
-		{
-			if (constraint->prev != NULL)
-				constraint->prev->next = constraint->next;
-			else
-				self->engine->constraints = constraint->next;
-			if (constraint->next != NULL)
-				constraint->next->prev = constraint->prev;
-			lisys_free (constraint);
-		}
-	}
 
 	/* Remove from engine. */
 	lialg_u32dic_remove (self->engine->objects, self->id);
@@ -539,8 +517,6 @@ int
 lieng_object_set_model (LIEngObject* self,
                         LIEngModel*  model)
 {
-	LIEngConstraint* constraint;
-
 	/* Switch model. */
 	if (model != NULL)
 		limdl_pose_set_model (self->pose, model->model);
@@ -552,15 +528,6 @@ lieng_object_set_model (LIEngObject* self,
 		self->flags &= ~LIENG_OBJECT_FLAG_INSTANCE_MODEL;
 	}
 	self->model = model;
-
-	/* Rebuild constraints. */
-	/* TODO: Looping through all constraints in the engine is wasteful. */
-	for (constraint = self->engine->constraints ; constraint != NULL ; constraint = constraint->next)
-	{
-		if (constraint->objects[0] == self ||
-		    constraint->objects[1] == self)
-			lieng_constraint_rebuild (constraint);
-	}
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, model);

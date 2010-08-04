@@ -48,7 +48,6 @@ struct _LIEngEngine
 	LIAlgU32dic* objects;
 	LICalCallbacks* callbacks;
 	LICalHandle calls[1];
-	LIEngConstraint* constraints;
 	LIEngResources* resources;
 	struct
 	{
@@ -88,17 +87,9 @@ LIAPICALL (LIEngObject*, lieng_engine_find_object, (
 	LIEngEngine* self,
 	uint32_t     id));
 
-LIAPICALL (void, lieng_engine_insert_constraint, (
-	LIEngEngine*     self,
-	LIEngConstraint* constraint));
-
 LIAPICALL (int, lieng_engine_load_model, (
 	LIEngEngine* self,
 	const char*  name));
-
-LIAPICALL (void, lieng_engine_remove_constraint, (
-	LIEngEngine*     self,
-	LIEngConstraint* constraint));
 
 LIAPICALL (void, lieng_engine_update, (
 	LIEngEngine* self,

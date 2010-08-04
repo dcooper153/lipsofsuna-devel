@@ -24,7 +24,6 @@
 
 #include <stdarg.h>
 #include "engine.h"
-#include "engine-constraint.h"
 #include "engine-iterator.h"
 #include "engine-selection.h"
 
@@ -86,17 +85,7 @@ void
 lieng_engine_free (LIEngEngine* self)
 {
 	LIAlgU32dicIter iter;
-	LIEngConstraint* constraint;
-	LIEngConstraint* constraint_next;
 	LIEngObject* object;
-
-	/* Clear constraints. */
-	for (constraint = self->constraints ; constraint != NULL ; constraint = constraint_next)
-	{
-		constraint_next = constraint->next;
-		lieng_constraint_free (constraint);
-	}
-	self->constraints = NULL;
 
 	/* Clear objects. */
 	if (self->objects != NULL)
@@ -198,22 +187,6 @@ lieng_engine_find_object (LIEngEngine* self,
 }
 
 /**
- * \brief Register a constraint.
- *
- * \param self Engine.
- * \param constraint Constraint.
- */
-void
-lieng_engine_insert_constraint (LIEngEngine*     self,
-                                LIEngConstraint* constraint)
-{
-	if (self->constraints != NULL)
-		self->constraints->prev = constraint;
-	constraint->next = self->constraints;
-	self->constraints = constraint;
-}
-
-/**
  * \brief Forces the engine to reload a model.
  *
  * Reloads the requested model and updates any objects that reference
@@ -267,26 +240,6 @@ lieng_engine_load_model (LIEngEngine* self,
 }
 
 /**
- * \brief Unregister a constraint.
- *
- * \param self Engine.
- * \param constraint Constraint.
- */
-void
-lieng_engine_remove_constraint (LIEngEngine*     self,
-                                LIEngConstraint* constraint)
-{
-	if (constraint->next != NULL)
-		constraint->next->prev = constraint->prev;
-	if (constraint->prev != NULL)
-		constraint->prev->next = constraint->next;
-	else
-		self->constraints = constraint->next;
-	constraint->next = NULL;
-	constraint->prev = NULL;
-}
-
-/**
  * \brief Updates the scene.
  *
  * \param self Engine.
@@ -298,7 +251,6 @@ lieng_engine_update (LIEngEngine* self,
 {
 	LIAlgSectorsIter siter;
 	LIAlgU32dicIter iter;
-	LIEngConstraint* constraint;
 	LIEngObject* object;
 	LIEngSector* sector;
 
@@ -319,14 +271,6 @@ lieng_engine_update (LIEngEngine* self,
 
 	/* Maintain callbacks. */
 	lical_callbacks_update (self->callbacks);
-
-	/* Update constraints. */
-	for (constraint = self->constraints ;
-	     constraint != NULL ;
-	     constraint = constraint->next)
-	{
-		lieng_constraint_update (constraint, secs);
-	}
 }
 
 /**
