@@ -261,7 +261,6 @@ int licli_client_load_module (
 	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_script (self) ||
-	    !licli_render_init (self) ||
 	    !licli_client_init_callbacks_misc (self) ||
 	    !licli_client_init_callbacks_widget (self))
 	{

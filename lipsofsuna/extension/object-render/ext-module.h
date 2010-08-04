@@ -16,23 +16,35 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup licliCallbacks Callbacks
+ * \addtogroup LIExtObjectRender ObjectRender
  * @{
  */
 
-#ifndef __CLIENT_CALLBACKS_H__
-#define __CLIENT_CALLBACKS_H__
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
-#include <lipsofsuna/render.h>
-#include "client-types.h"
+#include <lipsofsuna/extension.h>
+#include <lipsofsuna/client.h>
 
-int licli_client_init_callbacks_misc (LICliClient* self);
-int licli_client_init_callbacks_widget (LICliClient* self);
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
+{
+	LICalHandle calls[8];
+	LICliClient* client;
+	LIMaiProgram* program;
+	LIRenRender* render;
+	LIRenScene* scene;
+};
+
+LIExtModule* liext_object_render_new (
+	LIMaiProgram* program);
+
+void liext_object_render_free (
+	LIExtModule* self);
 
 #endif
 
 /** @} */
 /** @} */
-
