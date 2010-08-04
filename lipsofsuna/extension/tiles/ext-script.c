@@ -180,9 +180,9 @@ static void Voxel_copy_region (LIScrArgs* args)
 	    liscr_args_gets_vector (args, "size", &size))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		length = ((int) size.x / LIVOX_TILE_WIDTH) *
-		         ((int) size.y / LIVOX_TILE_WIDTH) *
-		         ((int) size.z / LIVOX_TILE_WIDTH);
+		length = ((int) size.x / module->voxels->tile_width) *
+		         ((int) size.y / module->voxels->tile_width) *
+		         ((int) size.z / module->voxels->tile_width);
 
 		/* Read voxel data. */
 		if (length)
@@ -191,12 +191,12 @@ static void Voxel_copy_region (LIScrArgs* args)
 			if (result == NULL)
 				return;
 			livox_manager_copy_voxels (module->voxels,
-				(int) point.x / LIVOX_TILE_WIDTH,
-				(int) point.y / LIVOX_TILE_WIDTH,
-				(int) point.z / LIVOX_TILE_WIDTH,
-				(int) size.x / LIVOX_TILE_WIDTH,
-				(int) size.y / LIVOX_TILE_WIDTH,
-				(int) size.z / LIVOX_TILE_WIDTH, result);
+				(int) point.x / module->voxels->tile_width,
+				(int) point.y / module->voxels->tile_width,
+				(int) point.z / module->voxels->tile_width,
+				(int) size.x / module->voxels->tile_width,
+				(int) size.y / module->voxels->tile_width,
+				(int) size.z / module->voxels->tile_width, result);
 		}
 
 		/* Create packet writer. */
@@ -209,9 +209,9 @@ static void Voxel_copy_region (LIScrArgs* args)
 		writer = ((LIScrPacket*) packet->data)->writer;
 
 		/* Write dimensions. */
-		if (!liarc_writer_append_uint32 (writer, (int) size.x / LIVOX_TILE_WIDTH) ||
-			!liarc_writer_append_uint32 (writer, (int) size.y / LIVOX_TILE_WIDTH) ||
-			!liarc_writer_append_uint32 (writer, (int) size.z / LIVOX_TILE_WIDTH))
+		if (!liarc_writer_append_uint32 (writer, (int) size.x / module->voxels->tile_width) ||
+			!liarc_writer_append_uint32 (writer, (int) size.y / module->voxels->tile_width) ||
+			!liarc_writer_append_uint32 (writer, (int) size.z / module->voxels->tile_width))
 		{
 			lisys_free (result);
 			return;
@@ -294,7 +294,7 @@ static void Voxel_find_blocks (LIScrArgs* args)
 	liscr_args_gets_float (args, "radius", &radius);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	line = LIVOX_BLOCKS_PER_LINE * module->voxels->sectors->count;
+	line = module->voxels->blocks_per_line * module->voxels->sectors->count;
 
 	/* Calculate sight volume. */
 	size = limat_vector_init (radius, radius, radius);
@@ -302,8 +302,8 @@ static void Voxel_find_blocks (LIScrArgs* args)
 	max = limat_vector_add (point, size);
 	sectors = lialg_range_new_from_aabb (&min, &max, module->voxels->sectors->width);
 	sectors = lialg_range_clamp (sectors, 0, module->voxels->sectors->count - 1);
-	blocks = lialg_range_new_from_aabb (&min, &max, module->voxels->sectors->width / LIVOX_BLOCKS_PER_LINE);
-	blocks = lialg_range_clamp (blocks, 0, LIVOX_BLOCKS_PER_LINE * module->voxels->sectors->count - 1);
+	blocks = lialg_range_new_from_aabb (&min, &max, module->voxels->sectors->width / module->voxels->blocks_per_line);
+	blocks = lialg_range_clamp (blocks, 0, module->voxels->blocks_per_line * module->voxels->sectors->count - 1);
 
 	/* Loop through visible sectors. */
 	LIALG_RANGE_FOREACH (iter0, sectors)
@@ -315,22 +315,22 @@ static void Voxel_find_blocks (LIScrArgs* args)
 
 		/* Calculate visible block range. */
 		livox_sector_get_offset (sector, &sx, &sy, &sz);
-		sx *= LIVOX_BLOCKS_PER_LINE;
-		sy *= LIVOX_BLOCKS_PER_LINE;
-		sz *= LIVOX_BLOCKS_PER_LINE;
+		sx *= module->voxels->blocks_per_line;
+		sy *= module->voxels->blocks_per_line;
+		sz *= module->voxels->blocks_per_line;
 		range.min = 0;
-		range.max = LIVOX_BLOCKS_PER_LINE;
+		range.max = module->voxels->blocks_per_line;
 		range.minx = LIMAT_MAX (blocks.minx - sx, 0);
 		range.miny = LIMAT_MAX (blocks.miny - sy, 0);
 		range.minz = LIMAT_MAX (blocks.minz - sz, 0);
-		range.maxx = LIMAT_MIN (blocks.maxx - sx, LIVOX_BLOCKS_PER_LINE - 1);
-		range.maxy = LIMAT_MIN (blocks.maxy - sy, LIVOX_BLOCKS_PER_LINE - 1);
-		range.maxz = LIMAT_MIN (blocks.maxz - sz, LIVOX_BLOCKS_PER_LINE - 1);
+		range.maxx = LIMAT_MIN (blocks.maxx - sx, module->voxels->blocks_per_line - 1);
+		range.maxy = LIMAT_MIN (blocks.maxy - sy, module->voxels->blocks_per_line - 1);
+		range.maxz = LIMAT_MIN (blocks.maxz - sz, module->voxels->blocks_per_line - 1);
 
 		/* Loop through visible blocks. */
 		LIALG_RANGE_FOREACH (iter1, range)
 		{
-			block = livox_sector_get_block (sector, iter1.index);
+			block = livox_sector_get_block (sector, iter1.x, iter1.y, iter1.z);
 			stamp = livox_block_get_stamp (block);
 			index = (sx + iter1.x) + (sy + iter1.y) * line + (sz + iter1.z) * line * line;
 			liscr_args_setf_float (args, index, stamp);
@@ -433,13 +433,12 @@ static void Voxel_find_voxel (LIScrArgs* args)
  */
 static void Voxel_get_block (LIScrArgs* args)
 {
-	int index;
 	int tmp;
+	int index;
 	int type = 1;
 	LIExtModule* module;
 	LIScrData* data = NULL;
 	LIScrPacket* packet;
-	LIVoxBlock* block;
 	LIVoxSector* sector;
 	LIVoxBlockAddr addr;
 
@@ -448,22 +447,20 @@ static void Voxel_get_block (LIScrArgs* args)
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	tmp = index;
-	addr.block[0] = tmp % LIVOX_BLOCKS_PER_LINE;
-	addr.sector[0] = tmp / LIVOX_BLOCKS_PER_LINE % module->voxels->sectors->count;
-	tmp /= LIVOX_BLOCKS_PER_LINE * module->voxels->sectors->count;
-	addr.block[1] = tmp % LIVOX_BLOCKS_PER_LINE;
-	addr.sector[1] = tmp / LIVOX_BLOCKS_PER_LINE % module->voxels->sectors->count;
-	tmp /= LIVOX_BLOCKS_PER_LINE * module->voxels->sectors->count;
-	addr.block[2] = tmp % LIVOX_BLOCKS_PER_LINE;
-	addr.sector[2] = tmp / LIVOX_BLOCKS_PER_LINE % module->voxels->sectors->count;
+	addr.block[0] = tmp % module->voxels->blocks_per_line;
+	addr.sector[0] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
+	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
+	addr.block[1] = tmp % module->voxels->blocks_per_line;
+	addr.sector[1] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
+	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
+	addr.block[2] = tmp % module->voxels->blocks_per_line;
+	addr.sector[2] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
 
 	/* Get block. */
 	sector = lialg_sectors_data_offset (module->program->sectors, "voxel",
 		addr.sector[0], addr.sector[1], addr.sector[2], 0);
 	if (sector == NULL)
 		return;
-	tmp = LIVOX_BLOCK_INDEX (addr.block[0], addr.block[1], addr.block[2]);
-	block = livox_sector_get_block (sector, tmp);
 
 	/* Get or create packet. */
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
@@ -484,7 +481,7 @@ static void Voxel_get_block (LIScrArgs* args)
 
 	/* Build packet. */
 	if (!liarc_writer_append_uint32 (packet->writer, index) ||
-		!livox_block_write (block, packet->writer))
+		!livox_sector_write_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->writer))
 	{
 		liscr_data_unref (data, NULL);
 		return;
@@ -661,7 +658,6 @@ static void Voxel_set_block (LIScrArgs* args)
 	uint32_t index;
 	uint32_t tmp;
 	LIExtModule* module;
-	LIVoxBlock* block;
 	LIVoxBlockAddr addr;
 	LIVoxSector* sector;
 	LIScrData* data;
@@ -683,14 +679,14 @@ static void Voxel_set_block (LIScrArgs* args)
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	tmp = index;
-	addr.block[0] = tmp % LIVOX_BLOCKS_PER_LINE;
-	addr.sector[0] = tmp / LIVOX_BLOCKS_PER_LINE % module->voxels->sectors->count;
-	tmp /= LIVOX_BLOCKS_PER_LINE * module->voxels->sectors->count;
-	addr.block[1] = tmp % LIVOX_BLOCKS_PER_LINE;
-	addr.sector[1] = tmp / LIVOX_BLOCKS_PER_LINE % module->voxels->sectors->count;
-	tmp /= LIVOX_BLOCKS_PER_LINE * module->voxels->sectors->count;
-	addr.block[2] = tmp % LIVOX_BLOCKS_PER_LINE;
-	addr.sector[2] = tmp / LIVOX_BLOCKS_PER_LINE % module->voxels->sectors->count;
+	addr.block[0] = tmp % module->voxels->blocks_per_line;
+	addr.sector[0] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
+	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
+	addr.block[1] = tmp % module->voxels->blocks_per_line;
+	addr.sector[1] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
+	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
+	addr.block[2] = tmp % module->voxels->blocks_per_line;
+	addr.sector[2] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
 
 	/* Find or create sector. */
 	sector = lialg_sectors_data_offset (module->voxels->sectors, "voxel",
@@ -699,12 +695,8 @@ static void Voxel_set_block (LIScrArgs* args)
 		return;
 
 	/* Read block data. */
-	index = LIVOX_BLOCK_INDEX (addr.block[0], addr.block[1], addr.block[2]);
-	block = livox_sector_get_block (sector, index);
-	if (!livox_block_read (block, module->voxels, packet->reader))
+	if (!livox_sector_read_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->reader))
 		return;
-	if (livox_block_get_dirty (block))
-		livox_sector_set_dirty (sector, 1);
 
 	/* Indicate success. */
 	liscr_args_seti_bool (args, 1);

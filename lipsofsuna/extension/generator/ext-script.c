@@ -198,9 +198,9 @@ static void Generator_format (LIScrArgs* args)
 	ligen_generator_clear_scene (module->generator);
 
 	/* Create root stroke. */
-	pos[0] = LIMAT_MAX (0, (int)(center.x / LIVOX_TILE_WIDTH) - brush->size[0] / 2);
-	pos[1] = LIMAT_MAX (0, (int)(center.y / LIVOX_TILE_WIDTH) - brush->size[1] / 2);
-	pos[2] = LIMAT_MAX (0, (int)(center.z / LIVOX_TILE_WIDTH) - brush->size[2] / 2);
+	pos[0] = LIMAT_MAX (0, (int)(center.x / module->generator->voxels->tile_width) - brush->size[0] / 2);
+	pos[1] = LIMAT_MAX (0, (int)(center.y / module->generator->voxels->tile_width) - brush->size[1] / 2);
+	pos[2] = LIMAT_MAX (0, (int)(center.z / module->generator->voxels->tile_width) - brush->size[2] / 2);
 	if (!ligen_generator_insert_stroke (module->generator, brush->id, pos[0], pos[1], pos[2]))
 		return;
 
@@ -326,9 +326,9 @@ static void Generator_paste_voxels (LIScrArgs* args)
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
 		point = limat_vector_init (0.0f, 0.0f, 0.0f);
 		liscr_args_gets_vector (args, "point", &point);
-		pos[0] = (int) point.x / LIVOX_TILE_WIDTH;
-		pos[1] = (int) point.y / LIVOX_TILE_WIDTH;
-		pos[2] = (int) point.z / LIVOX_TILE_WIDTH;
+		pos[0] = (int) point.x / module->generator->voxels->tile_width;
+		pos[1] = (int) point.y / module->generator->voxels->tile_width;
+		pos[2] = (int) point.z / module->generator->voxels->tile_width;
 
 		/* Find brush. */
 		brush = ligen_generator_find_brush (module->generator, id);

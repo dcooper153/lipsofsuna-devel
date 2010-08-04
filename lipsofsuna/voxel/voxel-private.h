@@ -29,15 +29,15 @@ struct _LIVoxBlock
 {
 	uint8_t dirty;
 	uint16_t stamp;
-	LIVoxVoxel tiles[LIVOX_TILES_PER_BLOCK];
 };
 
 struct _LIVoxSector
 {
 	uint8_t dirty;
 	LIAlgSector* sector;
-	LIVoxBlock blocks[LIVOX_BLOCKS_PER_SECTOR];
+	LIVoxBlock* blocks;
 	LIVoxManager* manager;
+	LIVoxVoxel* tiles;
 };
 
 #endif

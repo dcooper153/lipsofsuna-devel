@@ -52,6 +52,13 @@ LIAPICALL (int, livox_sector_read, (
 	LIVoxSector* self,
 	LIArcSql*    sql));
 
+LIAPICALL (int, livox_sector_read_block, (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z,
+	LIArcReader* reader));
+
 LIAPICALL (void, livox_sector_update, (
 	LIVoxSector* self,
 	float        secs));
@@ -60,9 +67,18 @@ LIAPICALL (int, livox_sector_write, (
 	LIVoxSector* self,
 	LIArcSql*    sql));
 
+LIAPICALL (int, livox_sector_write_block, (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z,
+	LIArcWriter* writer));
+
 LIAPICALL (LIVoxBlock*, livox_sector_get_block, (
 	LIVoxSector* self,
-	int          index));
+	int          x,
+	int          y,
+	int          z));
 
 LIAPICALL (void, livox_sector_get_bounds, (
 	const LIVoxSector* self,

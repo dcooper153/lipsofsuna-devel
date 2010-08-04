@@ -38,6 +38,7 @@ struct _LIVoxBlockIter
 	int blocks;
 	LIAlgSectorsIter sectors;
 	LIVoxBlock* block;
+	LIVoxManager* voxels;
 	int (*filter)(LIVoxBlock*);
 };
 
@@ -57,6 +58,9 @@ struct _LIVoxBlockIter
 static inline int
 livox_block_iter_next (LIVoxBlockIter* self)
 {
+	int x;
+	int y;
+	int z;
 	LIAlgSector* sector;
 	LIVoxBlock* block;
 	LIVoxSector* voxsec;
@@ -65,11 +69,14 @@ livox_block_iter_next (LIVoxBlockIter* self)
 	for (sector = self->sectors.sector ; sector != NULL ; sector = self->sectors.sector)
 	{
 		voxsec = lialg_strdic_find (sector->content, "voxel");
-		if (voxsec != NULL && self->blocks < LIVOX_BLOCKS_PER_SECTOR)
+		if (voxsec != NULL && self->blocks < self->voxels->blocks_per_sector)
 		{
-			while (++self->blocks < LIVOX_BLOCKS_PER_SECTOR)
+			while (++self->blocks < self->voxels->blocks_per_sector)
 			{
-				block = livox_sector_get_block (voxsec, self->blocks);
+				x = self->blocks % self->voxels->blocks_per_line;
+				y = self->blocks / self->voxels->blocks_per_line % self->voxels->blocks_per_line;
+				z = self->blocks / self->voxels->blocks_per_line / self->voxels->blocks_per_line;
+				block = livox_sector_get_block (voxsec, x, y, z);
 				if (self->filter == NULL || self->filter (block))
 				{
 					self->block = block;
@@ -92,6 +99,7 @@ livox_block_iter_first (LIVoxBlockIter* self,
                         LIVoxManager*   manager,
                         void*           filter)
 {
+	self->voxels = manager;
 	self->filter = filter;
 	self->blocks = -1;
 
@@ -154,12 +162,12 @@ livox_voxel_iter_first (LIVoxVoxelIter* self,
 
 	/* Initialize sector range. */
 	self->range0 = lialg_range_new (
-		tiles->minx / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		tiles->miny / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		tiles->minz / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		tiles->maxx / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		tiles->maxy / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		tiles->maxz / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
+		tiles->minx / self->voxels->tiles_per_line,
+		tiles->miny / self->voxels->tiles_per_line,
+		tiles->minz / self->voxels->tiles_per_line,
+		tiles->maxx / self->voxels->tiles_per_line,
+		tiles->maxy / self->voxels->tiles_per_line,
+		tiles->maxz / self->voxels->tiles_per_line);
 	self->range0 = lialg_range_clamp (self->range0, 0, voxels->sectors->count - 1);
 
 	/* Find first valid sector. */
@@ -180,13 +188,13 @@ livox_voxel_iter_first (LIVoxVoxelIter* self,
 	/* Initialize voxel range. */
 	livox_sector_get_offset (self->sector, offset + 0, offset + 1, offset + 2);
 	self->range1 = lialg_range_new (
-		self->tiles.minx - offset[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.miny - offset[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.minz - offset[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.maxx - offset[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.maxy - offset[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.maxz - offset[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
-	self->range1 = lialg_range_clamp (self->range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
+		self->tiles.minx - offset[0] * self->voxels->tiles_per_line,
+		self->tiles.miny - offset[1] * self->voxels->tiles_per_line,
+		self->tiles.minz - offset[2] * self->voxels->tiles_per_line,
+		self->tiles.maxx - offset[0] * self->voxels->tiles_per_line,
+		self->tiles.maxy - offset[1] * self->voxels->tiles_per_line,
+		self->tiles.maxz - offset[2] * self->voxels->tiles_per_line);
+	self->range1 = lialg_range_clamp (self->range1, 0, self->voxels->tiles_per_line - 1);
 
 	/* Find first voxel. */
 	ret = lialg_range_iter_first (&self->rangei1, &self->range1);
@@ -237,13 +245,13 @@ livox_voxel_iter_next (LIVoxVoxelIter* self)
 	/* Initialize voxel range. */
 	livox_sector_get_offset (self->sector, offset + 0, offset + 1, offset + 2);
 	self->range1 = lialg_range_new (
-		self->tiles.minx - offset[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.miny - offset[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.minz - offset[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.maxx - offset[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.maxy - offset[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-		self->tiles.maxz - offset[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE));
-	self->range1 = lialg_range_clamp (self->range1, 0, LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE - 1);
+		self->tiles.minx - offset[0] * self->voxels->tiles_per_line,
+		self->tiles.miny - offset[1] * self->voxels->tiles_per_line,
+		self->tiles.minz - offset[2] * self->voxels->tiles_per_line,
+		self->tiles.maxx - offset[0] * self->voxels->tiles_per_line,
+		self->tiles.maxy - offset[1] * self->voxels->tiles_per_line,
+		self->tiles.maxz - offset[2] * self->voxels->tiles_per_line);
+	self->range1 = lialg_range_clamp (self->range1, 0, self->voxels->tiles_per_line - 1);
 
 	/* Find first voxel. */
 	ret = lialg_range_iter_first (&self->rangei1, &self->range1);

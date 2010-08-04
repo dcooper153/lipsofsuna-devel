@@ -182,7 +182,7 @@ int livox_build_area (
 
 	/* Calculate area offset. */
 	offset = limat_vector_init (xstart - 1, ystart - 1, zstart - 1);
-	offset = limat_vector_multiply (offset, LIVOX_TILE_WIDTH);
+	offset = limat_vector_multiply (offset, manager->tile_width);
 
 	/* Precalculate useful information on voxels. */
 	for (z = 0 ; z < self.zsize ; z++)
@@ -217,7 +217,7 @@ int livox_build_area (
 
 		/* Cache transformation. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
-		vector = limat_vector_multiply (vector, LIVOX_TILE_WIDTH);
+		vector = limat_vector_multiply (vector, manager->tile_width);
 		self.voxelsb[i].transform.position = limat_vector_add (vector, offset);
 		livox_voxel_get_quaternion (voxel, &self.voxelsb[i].transform.rotation);
 
@@ -269,12 +269,13 @@ int livox_build_block (
 	LIMdlModel**          result_model,
 	LIPhyObject**         result_physics)
 {
+	int blockw = manager->tiles_per_line / manager->blocks_per_line;
+
 	return livox_build_area (manager, engine, physics,
-		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[0] + addr->block[0]),
-		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[1] + addr->block[1]),
-		LIVOX_TILES_PER_LINE * (LIVOX_BLOCKS_PER_LINE * addr->sector[2] + addr->block[2]),
-		LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE,
-		result_model, result_physics);
+		manager->tiles_per_line * addr->sector[0] + blockw * addr->block[0],
+		manager->tiles_per_line * addr->sector[1] + blockw * addr->block[1],
+		manager->tiles_per_line * addr->sector[2] + blockw * addr->block[2],
+		blockw, blockw, blockw, result_model, result_physics);
 }
 
 /**
@@ -800,34 +801,34 @@ private_occlude_face (LIVoxBuilder* self,
 
 	/* Occlusion check. */
 	if ((voxel->mask & LIVOX_OCCLUDE_XNEG) &&
-		LIMAT_ABS (coords[0].x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].x + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].x + self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].x + self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].x + self->manager->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_XPOS) &&
-		LIMAT_ABS (coords[0].x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].x - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].x - self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].x - self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].x - self->manager->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_YNEG) &&
-		LIMAT_ABS (coords[0].y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].y + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].y + self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].y + self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].y + self->manager->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_YPOS) &&
-		LIMAT_ABS (coords[0].y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].y - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].y - self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].y - self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].y - self->manager->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_ZNEG) &&
-		LIMAT_ABS (coords[0].z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].z + LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].z + self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].z + self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].z + self->manager->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_ZPOS) &&
-		LIMAT_ABS (coords[0].z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].z - LIVOX_TILE_WIDTH / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].z - self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].z - self->manager->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].z - self->manager->tile_width / 2) < CULL_EPSILON)
 		return 1;
 
 	return 0;
@@ -843,7 +844,7 @@ private_solve_coords (LIVoxBuilder* self,
 	int y;
 	int z;
 	float h[3][3][3];
-	float size = 0.5f * LIVOX_TILE_WIDTH;
+	float size = 0.5f * self->manager->tile_width;
 
 	/* Cache tile heights. */
 	for (z = -1 ; z <= 1 ; z++)
@@ -857,13 +858,13 @@ private_solve_coords (LIVoxBuilder* self,
 	{
 		/* Top. */
 		top[x][z] = limat_vector_init (
-			(-0.5f + x / 2.0f) * LIVOX_TILE_WIDTH, 0.5f * LIVOX_TILE_WIDTH,
-			(-0.5f + z / 2.0f) * LIVOX_TILE_WIDTH);
+			(-0.5f + x / 2.0f) * self->manager->tile_width, 0.5f * self->manager->tile_width,
+			(-0.5f + z / 2.0f) * self->manager->tile_width);
 
 		/* Bottom. */
 		bot[x][z] = limat_vector_init (
-			(-0.5f + x / 2.0f) * LIVOX_TILE_WIDTH, -0.5f * LIVOX_TILE_WIDTH,
-			(-0.5f + z / 2.0f) * LIVOX_TILE_WIDTH);
+			(-0.5f + x / 2.0f) * self->manager->tile_width, -0.5f * self->manager->tile_width,
+			(-0.5f + z / 2.0f) * self->manager->tile_width);
 	}
 
 	/* Construct Y coordinate. */

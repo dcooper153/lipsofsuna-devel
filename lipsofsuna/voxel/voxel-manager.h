@@ -51,6 +51,11 @@ struct _LIVoxManager
 {
 	int fill;
 	int load;
+	int blocks_per_line;
+	int blocks_per_sector;
+	int tiles_per_line;
+	int tiles_per_sector;
+	float tile_width;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* materials;
 	LIArcSql* sql;
@@ -110,7 +115,7 @@ LIAPICALL (int, livox_manager_load_materials, (
 LIAPICALL (void, livox_manager_mark_updates, (
 	LIVoxManager* self));
 
-LIAPICALL (void, livox_manager_paste_voxels, (
+LIAPICALL (int, livox_manager_paste_voxels, (
 	LIVoxManager* self,
 	int           xstart,
 	int           ystart,

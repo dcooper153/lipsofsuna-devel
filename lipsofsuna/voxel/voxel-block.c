@@ -29,111 +29,6 @@
 #include "voxel-private.h"
 
 /**
- * \brief Frees the contents of the block but not the block itself.
- *
- * \param self Block.
- * \param manager Voxel manager.
- */
-void
-livox_block_free (LIVoxBlock*   self,
-                  LIVoxManager* manager)
-{
-}
-
-/**
- * \brief Fills the block with the given terrain type.
- *
- * \param self Block.
- * \param manager Voxel manager.
- * \param terrain Terrain type.
- */
-void
-livox_block_fill (LIVoxBlock*   self,
-                  LIVoxManager* manager,
-                  LIVoxVoxel*   terrain)
-{
-	int i;
-
-	for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
-		self->tiles[i] = *terrain;
-	self->dirty = 0xFF;
-	self->stamp++;
-}
-
-/**
- * \brief Optimizes the block.
- *
- * \param self Block.
- */
-void
-livox_block_optimize (LIVoxBlock* self)
-{
-	/* TODO? */
-}
-
-/**
- * \brief Reads block data from a stream.
- *
- * \param self Block.
- * \param manager Voxel manager.
- * \param reader Reader.
- * \return Nonzero on success.
- */
-int
-livox_block_read (LIVoxBlock*   self,
-                  LIVoxManager* manager,
-                  LIArcReader*  reader)
-{
-	int x;
-	int y;
-	int z;
-	uint8_t damage;
-	uint8_t rotation;
-	uint16_t terrain;
-	LIVoxVoxel tmp;
-
-	for (z = 0 ; z < LIVOX_TILES_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_TILES_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_TILES_PER_LINE ; x++)
-	{
-		if (!liarc_reader_get_uint16 (reader, &terrain) ||
-		    !liarc_reader_get_uint8 (reader, &damage) ||
-		    !liarc_reader_get_uint8 (reader, &rotation))
-			return 0;
-		livox_voxel_init (&tmp, terrain);
-		tmp.damage = damage;
-		tmp.rotation = rotation;
-		livox_block_set_voxel (self, x, y, z, &tmp);
-	}
-
-	return 1;
-}
-
-/**
- * \brief Writes block data to a stream.
- *
- * \param self Block.
- * \param writer Writer.
- * \return Nonzero on success.
- */
-int
-livox_block_write (LIVoxBlock*  self,
-                   LIArcWriter* writer)
-{
-	int i;
-
-	for (i = 0 ; i < LIVOX_TILES_PER_BLOCK ; i++)
-	{
-		if (!liarc_writer_append_uint16 (writer, self->tiles[i].type) ||
-		    !liarc_writer_append_uint8 (writer, self->tiles[i].damage) ||
-		    !liarc_writer_append_uint8 (writer, self->tiles[i].rotation))
-			return 0;
-	}
-
-	return 1;
-}
-
-/**
  * \brief Returns nonzero if the block is dirty.
  *
  * \param self Block.
@@ -159,19 +54,6 @@ livox_block_set_dirty (LIVoxBlock* self,
 }
 
 /**
- * \brief Checks if the block is empty.
- *
- * \param self Block.
- * \return Boolean.
- */
-int
-livox_block_get_empty (const LIVoxBlock* self)
-{
-#warning livox_block_get_empty not implemented.
-	return 0;//self->objects.count == 0;
-}
-
-/**
  * \brief Gets the modification stamp of the block.
  *
  * \param self Block.
@@ -181,71 +63,6 @@ int
 livox_block_get_stamp (const LIVoxBlock* self)
 {
 	return self->stamp;
-}
-
-/**
- * \brief Gets the terrain type of a voxel.
- *
- * \param self Block.
- * \param x Offset of the voxel within the block.
- * \param y Offset of the voxel within the block.
- * \param z Offset of the voxel within the block.
- * \return Terrain type or zero.
- */
-LIVoxVoxel*
-livox_block_get_voxel (LIVoxBlock* self,
-                       uint8_t     x,
-                       uint8_t     y,
-                       uint8_t     z)
-{
-	return self->tiles + LIVOX_TILE_INDEX (x, y, z);
-}
-
-/**
- * \brief Sets the terrain type of a voxel.
- *
- * If the voxel data is changed, the dirty flag of the block is updated.
- *
- * \param self Block.
- * \param x Offset of the voxel within the block.
- * \param y Offset of the voxel within the block.
- * \param z Offset of the voxel within the block.
- * \param voxel Voxel data.
- * \return Nonzero if a voxel was modified.
- */
-int
-livox_block_set_voxel (LIVoxBlock* self,
-                       uint8_t     x,
-                       uint8_t     y,
-                       uint8_t     z,
-                       LIVoxVoxel* voxel)
-{
-	int i;
-
-	/* Modify terrain. */
-	i = LIVOX_TILE_INDEX (x, y, z);
-	if (self->tiles[i].type == voxel->type &&
-	    self->tiles[i].damage == voxel->damage &&
-	    self->tiles[i].rotation == voxel->rotation)
-		return 0;
-	self->tiles[i] = *voxel;
-
-	/* Mark faces dirty. */
-	if (x == 0)
-		self->dirty |= 0x01;
-	if (x == LIVOX_TILES_PER_LINE - 1)
-		self->dirty |= 0x02;
-	if (y == 0)
-		self->dirty |= 0x04;
-	if (y == LIVOX_TILES_PER_LINE - 1)
-		self->dirty |= 0x08;
-	if (z == 0)
-		self->dirty |= 0x10;
-	if (z == LIVOX_TILES_PER_LINE - 1)
-		self->dirty |= 0x20;
-	self->dirty |= 0x80;
-
-	return 1;
 }
 
 /** @} */

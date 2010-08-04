@@ -331,7 +331,7 @@ private_block_load (LIAiManager*      self,
 
 	/* Build waypoints. */
 	liai_sector_build_area (ai, voxel, event->block[0], event->block[1], event->block[2],
-		LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE, LIVOX_TILES_PER_LINE);
+		LIAI_WAYPOINTS_PER_LINE, LIAI_WAYPOINTS_PER_LINE, LIAI_WAYPOINTS_PER_LINE);
 
 	return 1;
 }

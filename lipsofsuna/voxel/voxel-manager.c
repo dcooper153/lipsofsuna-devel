@@ -61,6 +61,11 @@ livox_manager_new (LICalCallbacks* callbacks,
 	self->load = 1;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
+	self->blocks_per_line = 4;
+	self->blocks_per_sector = self->blocks_per_line * self->blocks_per_line * self->blocks_per_line;
+	self->tiles_per_line = 16;
+	self->tiles_per_sector = self->tiles_per_line * self->tiles_per_line * self->tiles_per_line;
+	self->tile_width = self->sectors->width / self->tiles_per_line;
 
 	/* Allocate materials. */
 	self->materials = lialg_u32dic_new ();
@@ -180,12 +185,12 @@ livox_manager_copy_voxels (LIVoxManager* self,
 	for (y = ystart ; y < ystart + ysize ; y++)
 	for (x = xstart ; x < xstart + xsize ; x++, i++)
 	{
-		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		tx = x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		ty = y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		tz = z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+		sx = x / self->tiles_per_line;
+		sy = y / self->tiles_per_line;
+		sz = z / self->tiles_per_line;
+		tx = x - sx * self->tiles_per_line;
+		ty = y - sy * self->tiles_per_line;
+		tz = z - sz * self->tiles_per_line;
 		if (sx < 0 || sx >= self->sectors->count || tx < 0 ||
 		    sy < 0 || sy >= self->sectors->count || ty < 0 ||
 		    sz < 0 || sz >= self->sectors->count || tz < 0)
@@ -222,7 +227,7 @@ livox_manager_erase_voxel (LIVoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+	range = lialg_range_new_from_sphere (point, self->tile_width, self->tile_width);
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
 		livox_sector_get_origin (iter.sector, &origin);
@@ -230,9 +235,9 @@ livox_manager_erase_voxel (LIVoxManager*      self,
 		if (voxel.type)
 		{
 			diff = limat_vector_subtract (*point, limat_vector_init (
-				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
-				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
-				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f)));
+				origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
+				origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
+				origin.z + self->tile_width * (iter.voxel[2] + 0.5f)));
 			d = limat_vector_dot (diff, diff);
 			if (best.sector == NULL || d < best.dist)
 			{
@@ -297,7 +302,7 @@ livox_manager_find_voxel (LIVoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, { 0.0f, 0.0f, 0.0f }, NULL };
 
 	/* Loop through affected sectors. */
-	range = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+	range = lialg_range_new_from_sphere (point, self->tile_width, self->tile_width);
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
 		livox_sector_get_origin (iter.sector, &origin);
@@ -306,9 +311,9 @@ livox_manager_find_voxel (LIVoxManager*      self,
 			( voxel.type && (flags & LIVOX_FIND_FULL)))
 		{
 			tmp = limat_vector_init (
-				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
-				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
-				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f));
+				origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
+				origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
+				origin.z + self->tile_width * (iter.voxel[2] + 0.5f));
 			diff = limat_vector_subtract (*point, tmp);
 			d = limat_vector_dot (diff, diff);
 			if (best.sector == NULL || d < best.dist)
@@ -384,7 +389,7 @@ livox_manager_insert_voxel (LIVoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+	range = lialg_range_new_from_sphere (point, self->tile_width, self->tile_width);
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
 		livox_sector_get_origin (iter.sector, &origin);
@@ -392,9 +397,9 @@ livox_manager_insert_voxel (LIVoxManager*      self,
 		if (!voxel->type)
 		{
 			diff = limat_vector_subtract (*point, limat_vector_init (
-				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
-				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
-				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f)));
+				origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
+				origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
+				origin.z + self->tile_width * (iter.voxel[2] + 0.5f)));
 			d = limat_vector_dot (diff, diff);
 			if (best.sector == NULL || d < best.dist)
 			{
@@ -564,9 +569,9 @@ livox_manager_mark_updates (LIVoxManager* self)
 		sector = lialg_strdic_find (iter.sector->content, "voxel");
 		if (sector == NULL || !sector->dirty)
 			continue;
-		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
+		for (i = z = 0 ; z < self->blocks_per_line ; z++)
+		for (y = 0 ; y < self->blocks_per_line ; y++)
+		for (x = 0 ; x < self->blocks_per_line ; x++, i++)
 		{
 			for (j = 0 ; j < 26 ; j++)
 			{
@@ -592,43 +597,63 @@ livox_manager_mark_updates (LIVoxManager* self)
  * \param ysize Number of voxels to paste.
  * \param zsize Number of voxels to paste.
  * \param voxels Buffer containing xsize*ysize*zsize voxels.
+ * \return Nonzero on success.
  */
-void
-livox_manager_paste_voxels (LIVoxManager* self,
-                            int           xstart,
-                            int           ystart,
-                            int           zstart,
-                            int           xsize,
-                            int           ysize,
-                            int           zsize,
-                            LIVoxVoxel*   voxels)
+int livox_manager_paste_voxels (
+	LIVoxManager* self,
+	int           xstart,
+	int           ystart,
+	int           zstart,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   voxels)
 {
 	int i;
-	int x;
-	int y;
-	int z;
-	int sx;
-	int sy;
-	int sz;
-	LIVoxSector* sec;
+	int min[3];
+	int max[3];
+	int off[3];
+	int sec[3];
+	int src[3];
+	int dst[3];
+	LIVoxSector* sector;
 
-	/* FIXME: Avoid excessive sector lookups. */
-	for (i = 0, z = zstart ; z < zstart + zsize ; z++)
-	for (y = ystart ; y < ystart + ysize ; y++)
-	for (x = xstart ; x < xstart + xsize ; x++, i++)
+	/* Determine affected sectors. */
+	min[0] = xstart / self->tiles_per_line;
+	min[1] = ystart / self->tiles_per_line;
+	min[2] = zstart / self->tiles_per_line;
+	max[0] = (xstart + xsize) / self->tiles_per_line;
+	max[1] = (ystart + ysize) / self->tiles_per_line;
+	max[2] = (zstart + zsize) / self->tiles_per_line;
+
+	/* Loop through affected sectors. */
+	for (sec[2] = min[2] ; sec[2] <= max[2] ; sec[2]++)
+	for (sec[1] = min[1] ; sec[1] <= max[1] ; sec[1]++)
+	for (sec[0] = min[0] ; sec[0] <= max[0] ; sec[0]++)
 	{
-		sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		sec = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
-		if (sec != NULL)
+		/* Find or create sector. */
+		sector = lialg_sectors_data_offset (self->sectors, "voxel", sec[0], sec[1], sec[2], 1);
+		if (sector == NULL)
+			return 0;
+
+		/* Calculate paint offset. */
+		off[0] = xstart - sec[0] * self->tiles_per_line;
+		off[1] = ystart - sec[1] * self->tiles_per_line;
+		off[2] = zstart - sec[2] * self->tiles_per_line;
+
+		/* Copy brush voxels to sector. */
+		for (src[2] = 0, dst[2] = off[2], i = 0 ; src[2] < zsize ; src[2]++, dst[2]++)
+		for (src[1] = 0, dst[1] = off[1] ; src[1] < ysize ; src[1]++, dst[1]++)
+		for (src[0] = 0, dst[0] = off[0] ; src[0] < xsize ; src[0]++, dst[0]++, i++)
 		{
-			livox_sector_set_voxel (sec,
-				x - sx * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-				y - sy * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE),
-				z - sz * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE), voxels[i]);
+			if (0 <= dst[0] && dst[0] < self->tiles_per_line &&
+				0 <= dst[1] && dst[1] < self->tiles_per_line &&
+				0 <= dst[2] && dst[2] < self->tiles_per_line)
+				livox_sector_set_voxel (sector, dst[0], dst[1], dst[2], voxels[i]);
 		}
 	}
+
+	return 1;
 }
 
 void
@@ -663,9 +688,9 @@ livox_manager_reload_model (LIVoxManager* self,
 		sector = lialg_sectors_data_index (self->sectors, "voxel", iter.key, 0);
 		if (sector == NULL)
 			continue;
-		for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++)
+		for (z = 0 ; z < self->blocks_per_line ; z++)
+		for (y = 0 ; y < self->blocks_per_line ; y++)
+		for (x = 0 ; x < self->blocks_per_line ; x++)
 		{
 			livox_sector_build_block (sector, x, y, z);
 		}
@@ -708,7 +733,7 @@ livox_manager_replace_voxel (LIVoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+	range = lialg_range_new_from_sphere (point, self->tile_width, self->tile_width);
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
 		livox_sector_get_origin (iter.sector, &origin);
@@ -716,9 +741,9 @@ livox_manager_replace_voxel (LIVoxManager*      self,
 		if (voxel.type)
 		{
 			diff = limat_vector_subtract (*point, limat_vector_init (
-				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
-				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
-				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f)));
+				origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
+				origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
+				origin.z + self->tile_width * (iter.voxel[2] + 0.5f)));
 			d = limat_vector_dot (diff, diff);
 			if (best.sector == NULL || d < best.dist)
 			{
@@ -761,7 +786,7 @@ livox_manager_rotate_voxel (LIVoxManager*      self,
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
 	/* Loop through affected sectors. */
-	range = lialg_range_new_from_sphere (point, LIVOX_TILE_WIDTH, LIVOX_TILE_WIDTH);
+	range = lialg_range_new_from_sphere (point, self->tile_width, self->tile_width);
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
 		livox_sector_get_origin (iter.sector, &origin);
@@ -769,9 +794,9 @@ livox_manager_rotate_voxel (LIVoxManager*      self,
 		if (voxel.type)
 		{
 			diff = limat_vector_subtract (*point, limat_vector_init (
-				origin.x + LIVOX_TILE_WIDTH * (iter.voxel[0] + 0.5f),
-				origin.y + LIVOX_TILE_WIDTH * (iter.voxel[1] + 0.5f),
-				origin.z + LIVOX_TILE_WIDTH * (iter.voxel[2] + 0.5f)));
+				origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
+				origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
+				origin.z + self->tile_width * (iter.voxel[2] + 0.5f)));
 			d = limat_vector_dot (diff, diff);
 			if (best.sector == NULL || d < best.dist)
 			{
@@ -819,9 +844,9 @@ livox_manager_update_marked (LIVoxManager* self)
 		sector = lialg_strdic_find (iter.sector->content, "voxel");
 		if (sector == NULL || !sector->dirty)
 			continue;
-		for (i = z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
-		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-		for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++, i++)
+		for (i = z = 0 ; z < self->blocks_per_line ; z++)
+		for (y = 0 ; y < self->blocks_per_line ; y++)
+		for (x = 0 ; x < self->blocks_per_line ; x++, i++)
 		{
 			if (!sector->blocks[i].dirty)
 				continue;
@@ -964,18 +989,18 @@ livox_manager_get_voxel (LIVoxManager* self,
 	int sz;
 	LIVoxSector* sector;
 
-	sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	sx = x / self->tiles_per_line;
+	sy = y / self->tiles_per_line;
+	sz = z / self->tiles_per_line;
 	sector = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
 	if (sector == NULL)
 	{
 		livox_voxel_init (value, 0);
 		return;
 	}
-	sx = x % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sy = y % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sz = z % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	sx = x % self->tiles_per_line;
+	sy = y % self->tiles_per_line;
+	sz = z % self->tiles_per_line;
 	*value = *livox_sector_get_voxel (sector, sx, sy, sz);
 }
 
@@ -991,15 +1016,15 @@ livox_manager_set_voxel (LIVoxManager*     self,
 	int sz;
 	LIVoxSector* sector;
 
-	sx = x / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sy = y / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sz = z / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	sx = x / self->tiles_per_line;
+	sy = y / self->tiles_per_line;
+	sz = z / self->tiles_per_line;
 	sector = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
 	if (sector == NULL)
 		return 0;
-	sx = x % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sy = y % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	sz = z % (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
+	sx = x % self->tiles_per_line;
+	sy = y % self->tiles_per_line;
+	sz = z % self->tiles_per_line;
 
 	return livox_sector_set_voxel (sector, sx, sy, sz, *value);
 }
@@ -1058,6 +1083,7 @@ private_mark_block (LIVoxManager* self,
 	int sx;
 	int sy;
 	int sz;
+	LIVoxBlock* block;
 	LIVoxSector* sector1;
 
 	/* Find affected sector. */
@@ -1066,30 +1092,30 @@ private_mark_block (LIVoxManager* self,
 	sz = sector->sector->z;
 	if (x < 0)
 	{
-		x = LIVOX_BLOCKS_PER_LINE - 1;
+		x = self->blocks_per_line - 1;
 		sx--;
 	}
-	else if (x >= LIVOX_BLOCKS_PER_LINE)
+	else if (x >= self->blocks_per_line)
 	{
 		x = 0;
 		sx++;
 	}
 	if (y < 0)
 	{
-		y = LIVOX_BLOCKS_PER_LINE - 1;
+		y = self->blocks_per_line - 1;
 		sy--;
 	}
-	else if (y >= LIVOX_BLOCKS_PER_LINE)
+	else if (y >= self->blocks_per_line)
 	{
 		y = 0;
 		sy++;
 	}
 	if (z < 0)
 	{
-		z = LIVOX_BLOCKS_PER_LINE - 1;
+		z = self->blocks_per_line - 1;
 		sz--;
 	}
-	else if (z >= LIVOX_BLOCKS_PER_LINE)
+	else if (z >= self->blocks_per_line)
 	{
 		z = 0;
 		sz++;
@@ -1099,7 +1125,8 @@ private_mark_block (LIVoxManager* self,
 	sector1 = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 0);
 	if (sector1 == NULL)
 		return;
-	sector1->blocks[LIVOX_BLOCK_INDEX (x, y, z)].dirty |= 0x80;
+	block = livox_sector_get_block (sector1, x, y, z);
+	block->dirty |= 0x80;
 	sector1->dirty = 1;
 }
 

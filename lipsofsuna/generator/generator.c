@@ -295,7 +295,7 @@ ligen_generator_main (LIGenGenerator* self)
 	}
 
 	/* Create root stroke. */
-	i = LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE * self->sectors->count / 2;
+	i = self->voxels->tiles_per_line * self->sectors->count / 2;
 	stroke.pos[0] = i - brush->size[0] / 2;
 	stroke.pos[1] = i - brush->size[1] / 2;
 	stroke.pos[2] = i - brush->size[2] / 2;
@@ -529,12 +529,12 @@ ligen_generator_write (LIGenGenerator* self)
 		writer = liarc_writer_new ();
 		if (writer == NULL)
 			return 0;
-		position.x = LIVOX_TILE_WIDTH * stroke->pos[0];
-		position.y = LIVOX_TILE_WIDTH * stroke->pos[1];
-		position.z = LIVOX_TILE_WIDTH * stroke->pos[2];
-		size.x = LIVOX_TILE_WIDTH * stroke->size[0];
-		size.y = LIVOX_TILE_WIDTH * stroke->size[1];
-		size.z = LIVOX_TILE_WIDTH * stroke->size[2];
+		position.x = self->voxels->tile_width * stroke->pos[0];
+		position.y = self->voxels->tile_width * stroke->pos[1];
+		position.z = self->voxels->tile_width * stroke->pos[2];
+		size.x = self->voxels->tile_width * stroke->size[0];
+		size.y = self->voxels->tile_width * stroke->size[1];
+		size.z = self->voxels->tile_width * stroke->size[2];
 		sector = lialg_sectors_point_to_index (self->sectors, &position);
 		if (!liarc_writer_append_uint32 (writer, i) || /* id */
 		    !liarc_writer_append_uint32 (writer, 0) || /* type */
@@ -634,9 +634,9 @@ ligen_generator_write (LIGenGenerator* self)
 			/* Collect values. */
 			flags = object->flags;
 			transform = object->transform;
-			transform.position.x += LIVOX_TILE_WIDTH * stroke->pos[0];
-			transform.position.y += LIVOX_TILE_WIDTH * stroke->pos[1];
-			transform.position.z += LIVOX_TILE_WIDTH * stroke->pos[2];
+			transform.position.x += self->voxels->tile_width * stroke->pos[0];
+			transform.position.y += self->voxels->tile_width * stroke->pos[1];
+			transform.position.z += self->voxels->tile_width * stroke->pos[2];
 			sector = lialg_sectors_point_to_index (self->sectors, &transform.position);
 
 			/* Write values. */
@@ -1102,54 +1102,14 @@ static int
 private_stroke_paint (LIGenGenerator* self,
                       LIGenStroke*    stroke)
 {
-	int i;
-	int min[3];
-	int max[3];
-	int off[3];
-	int sec[3];
-	int src[3];
-	int dst[3];
 	LIGenBrush* brush;
-	LIVoxSector* sector;
 
-	/* Determine affected sectors. */
 	brush = lialg_u32dic_find (self->brushes, stroke->brush);
 	lisys_assert (brush != NULL);
-	min[0] = (stroke->pos[0]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	min[1] = (stroke->pos[1]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	min[2] = (stroke->pos[2]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	max[0] = (stroke->pos[0] + stroke->size[0]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	max[1] = (stroke->pos[1] + stroke->size[1]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-	max[2] = (stroke->pos[2] + stroke->size[2]) / (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
 
-	/* Loop through affected sectors. */
-	for (sec[2] = min[2] ; sec[2] <= max[2] ; sec[2]++)
-	for (sec[1] = min[1] ; sec[1] <= max[1] ; sec[1]++)
-	for (sec[0] = min[0] ; sec[0] <= max[0] ; sec[0]++)
-	{
-		/* Find or create sector. */
-		sector = lialg_sectors_data_offset (self->sectors, "voxel", sec[0], sec[1], sec[2], 1);
-		if (sector == NULL)
-			return 0;
-
-		/* Calculate paint offset. */
-		off[0] = stroke->pos[0] - sec[0] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		off[1] = stroke->pos[1] - sec[1] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-		off[2] = stroke->pos[2] - sec[2] * (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE);
-
-		/* Copy brush voxels to sector. */
-		for (src[2] = 0, dst[2] = off[2], i = 0 ; src[2] < brush->size[2] ; src[2]++, dst[2]++)
-		for (src[1] = 0, dst[1] = off[1] ; src[1] < brush->size[1] ; src[1]++, dst[1]++)
-		for (src[0] = 0, dst[0] = off[0] ; src[0] < brush->size[0] ; src[0]++, dst[0]++, i++)
-		{
-			if (0 <= dst[0] && dst[0] < LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE &&
-				0 <= dst[1] && dst[1] < LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE &&
-				0 <= dst[2] && dst[2] < LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE)
-				livox_sector_set_voxel (sector, dst[0], dst[1], dst[2], brush->voxels.array[i]);
-		}
-	}
-
-	return 1;
+	return livox_manager_paste_voxels (self->voxels,
+		stroke->pos[0], stroke->pos[1], stroke->pos[2],
+		stroke->size[0], stroke->size[1], stroke->size[2], brush->voxels.array);
 }
 
 /** @} */

@@ -37,6 +37,13 @@ private_build_block (LIVoxSector* self,
                      int          y,
                      int          z);
 
+static int private_set_voxel (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z,
+	LIVoxVoxel*  voxel);
+
 /*****************************************************************************/
 
 /**
@@ -58,6 +65,21 @@ livox_sector_new (LIAlgSector* sector)
 		return NULL;
 	self->manager = lialg_sectors_get_userdata (sector->manager, "voxel");
 	self->sector = sector;
+
+	/* Allocate tiles. */
+	self->blocks = lisys_calloc (self->manager->blocks_per_sector, sizeof (LIVoxBlock));
+	if (self->blocks == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+	self->tiles = lisys_calloc (self->manager->tiles_per_sector, sizeof (LIVoxVoxel));
+	if (self->tiles == NULL)
+	{
+		lisys_free (self->blocks);
+		lisys_free (self);
+		return NULL;
+	}
 
 	/* Load data. */
 	if (self->manager->load && self->manager->sql != NULL)
@@ -81,16 +103,12 @@ livox_sector_new (LIAlgSector* sector)
 void
 livox_sector_free (LIVoxSector* self)
 {
-	int i;
-
 	/* Save data. */
 	if (self->manager->load && self->manager->sql != NULL)
 		livox_sector_write (self, self->manager->sql);
 
-	/* Free blocks. */
-	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
-		livox_block_free (self->blocks + i, self->manager);
-
+	lisys_free (self->blocks);
+	lisys_free (self->tiles);
 	lisys_free (self);
 }
 
@@ -113,21 +131,14 @@ void
 livox_sector_fill (LIVoxSector* self,
                    LIVoxVoxel*  terrain)
 {
-	int x;
-	int y;
-	int z;
 	int i = 0;
 
-	for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE ; z++)
+	for (i = 0 ; i < self->manager->tiles_per_sector ; i++)
+		self->tiles[i] = *terrain;
+	for (i = 0 ; i < self->manager->blocks_per_sector ; i++)
 	{
-		for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE ; y++)
-		{
-			for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE ; x++)
-			{
-				livox_block_fill (self->blocks + i, self->manager, terrain);
-				i++;
-			}
-		}
+		self->blocks[i].dirty = 0xFF;
+		self->blocks[i].stamp++;
 	}
 	self->dirty = 1;
 }
@@ -147,6 +158,7 @@ livox_sector_read (LIVoxSector* self,
 	int y;
 	int z;
 	int id;
+	int ret;
 	int size;
 	const char* query;
 	const void* bytes;
@@ -170,7 +182,13 @@ livox_sector_read (LIVoxSector* self,
 	}
 
 	/* Execute statement. */
-	if (sqlite3_step (statement) != SQLITE_ROW)
+	ret = sqlite3_step (statement);
+	if (ret == SQLITE_DONE)
+	{
+		sqlite3_finalize (statement);
+		return 0;
+	}
+	if (ret != SQLITE_ROW)
 	{
 		lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
 		sqlite3_finalize (statement);
@@ -188,9 +206,9 @@ livox_sector_read (LIVoxSector* self,
 	}
 
 	/* Deserialize terrain. */
-	for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; x++)
+	for (z = 0 ; z < self->manager->tiles_per_line ; z++)
+	for (y = 0 ; y < self->manager->tiles_per_line ; y++)
+	for (x = 0 ; x < self->manager->tiles_per_line ; x++)
 	{
 		if (!livox_voxel_read (&tmp, reader))
 		{
@@ -206,6 +224,51 @@ livox_sector_read (LIVoxSector* self,
 	/* Force rebuild. */
 	liarc_reader_free (reader);
 	self->dirty = 1;
+
+	return 1;
+}
+
+/**
+ * \brief Reads block data from a stream.
+ *
+ * \param self Sector.
+ * \param x Block offset.
+ * \param y Block offset.
+ * \param z Block offset.
+ * \param reader Reader.
+ * \return Nonzero on success.
+ */
+int livox_sector_read_block (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z,
+	LIArcReader* reader)
+{
+	int c;
+	int tx;
+	int ty;
+	int tz;
+	uint8_t damage;
+	uint8_t rotation;
+	uint16_t terrain;
+	LIVoxVoxel tmp;
+
+	c = self->manager->tiles_per_line / self->manager->blocks_per_line;
+	for (tz = 0 ; tz < c ; tz++)
+	for (ty = 0 ; ty < c ; ty++)
+	for (tx = 0 ; tx < c ; tx++)
+	{
+		if (!liarc_reader_get_uint16 (reader, &terrain) ||
+		    !liarc_reader_get_uint8 (reader, &damage) ||
+		    !liarc_reader_get_uint8 (reader, &rotation))
+			return 0;
+		livox_voxel_init (&tmp, terrain);
+		tmp.damage = damage;
+		tmp.rotation = rotation;
+		if (private_set_voxel (self, tx + x * c, ty + y * c, tz + z * c, &tmp))
+			self->dirty = 1;
+	}
 
 	return 1;
 }
@@ -274,9 +337,9 @@ livox_sector_write (LIVoxSector* self,
 	writer = liarc_writer_new ();
 	if (writer == NULL)
 		return 0;
-	for (z = 0 ; z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; z++)
-	for (y = 0 ; y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; y++)
-	for (x = 0 ; x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE ; x++)
+	for (z = 0 ; z < self->manager->tiles_per_line ; z++)
+	for (y = 0 ; y < self->manager->tiles_per_line ; y++)
+	for (x = 0 ; x < self->manager->tiles_per_line ; x++)
 	{
 		tmp = livox_sector_get_voxel (self, x, y, z);
 		if (!livox_voxel_write (tmp, writer))
@@ -316,20 +379,65 @@ livox_sector_write (LIVoxSector* self,
 }
 
 /**
+ * \brief Writes block data to a stream.
+ *
+ * \param self Sector.
+ * \param x Block offset.
+ * \param y Block offset.
+ * \param z Block offset.
+ * \param writer Writer.
+ * \return Nonzero on success.
+ */
+int livox_sector_write_block (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z,
+	LIArcWriter* writer)
+{
+	int c;
+	int tx;
+	int ty;
+	int tz;
+	LIVoxVoxel* tile;
+
+	c = self->manager->tiles_per_line / self->manager->blocks_per_line;
+	for (tz = 0 ; tz < c ; tz++)
+	for (ty = 0 ; ty < c ; ty++)
+	for (tx = 0 ; tx < c ; tx++)
+	{
+		tile = livox_sector_get_voxel (self, tx + x * c, ty + y * c, tz + z * c);
+		if (!liarc_writer_append_uint16 (writer, tile->type) ||
+		    !liarc_writer_append_uint8 (writer, tile->damage) ||
+		    !liarc_writer_append_uint8 (writer, tile->rotation))
+			return 0;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Gets a voxel block.
  *
  * \param self Sector.
- * \param index Block index.
+ * \param x Block offset.
+ * \param y Block offset.
+ * \param z Block offset.
  * \return Block.
  */
-LIVoxBlock*
-livox_sector_get_block (LIVoxSector* self,
-                        int          index)
+LIVoxBlock* livox_sector_get_block (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z)
 {
-	lisys_assert (index >= 0);
-	lisys_assert (index < LIVOX_BLOCKS_PER_SECTOR);
+	lisys_assert (x >= 0 && y >= 0 && z >= 0);
+	lisys_assert (x < self->manager->blocks_per_line);
+	lisys_assert (y < self->manager->blocks_per_line);
+	lisys_assert (z < self->manager->blocks_per_line);
 
-	return self->blocks + index;
+	return self->blocks + x + y * self->manager->blocks_per_line +
+		z * self->manager->blocks_per_line * self->manager->blocks_per_line;
 }
 
 /**
@@ -389,9 +497,9 @@ livox_sector_get_empty (const LIVoxSector* self)
 {
 	int i;
 
-	for (i = 0 ; i < LIVOX_BLOCKS_PER_SECTOR ; i++)
+	for (i = 0 ; i < self->manager->tiles_per_sector ; i++)
 	{
-		if (!livox_block_get_empty (self->blocks + i))
+		if (self->tiles[i].type != 0)
 			return 0;
 	}
 
@@ -445,21 +553,13 @@ livox_sector_get_voxel (LIVoxSector* self,
                         int          y,
                         int          z)
 {
-	LIVoxBlock* block;
-	int bx = x / LIVOX_TILES_PER_LINE;
-	int by = y / LIVOX_TILES_PER_LINE;
-	int bz = z / LIVOX_TILES_PER_LINE;
-	int tx = x % LIVOX_TILES_PER_LINE;
-	int ty = y % LIVOX_TILES_PER_LINE;
-	int tz = z % LIVOX_TILES_PER_LINE;
-
 	lisys_assert (x >= 0 && y >= 0 && z >= 0);
-	lisys_assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	lisys_assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	lisys_assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
+	lisys_assert (x < self->manager->tiles_per_line);
+	lisys_assert (y < self->manager->tiles_per_line);
+	lisys_assert (z < self->manager->tiles_per_line);
 
-	return livox_block_get_voxel (block, tx, ty, tz);
+	return self->tiles + x + y * self->manager->tiles_per_line +
+		z * self->manager->tiles_per_line * self->manager->tiles_per_line;
 }
 
 /**
@@ -479,28 +579,15 @@ livox_sector_set_voxel (LIVoxSector* self,
                         int          z,
                         LIVoxVoxel   terrain)
 {
-	int ret;
-	int bx = x / LIVOX_TILES_PER_LINE;
-	int by = y / LIVOX_TILES_PER_LINE;
-	int bz = z / LIVOX_TILES_PER_LINE;
-	int tx = x % LIVOX_TILES_PER_LINE;
-	int ty = y % LIVOX_TILES_PER_LINE;
-	int tz = z % LIVOX_TILES_PER_LINE;
-	LIVoxBlock* block;
-
 	lisys_assert (x >= 0 && y >= 0 && z >= 0);
-	lisys_assert (x < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	lisys_assert (y < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	lisys_assert (z < LIVOX_BLOCKS_PER_LINE * LIVOX_TILES_PER_LINE);
-	block = self->blocks + LIVOX_BLOCK_INDEX (bx, by, bz);
-	ret = livox_block_set_voxel (block, tx, ty, tz, &terrain);
-	if (ret)
-	{
-		block->stamp++;
-		self->dirty = 1;
-	}
+	lisys_assert (x < self->manager->tiles_per_line);
+	lisys_assert (y < self->manager->tiles_per_line);
+	lisys_assert (z < self->manager->tiles_per_line);
 
-	return ret;
+	if (private_set_voxel (self, x, y, z, &terrain))
+		self->dirty = 1;
+
+	return 1;
 }
 
 /*****************************************************************************/
@@ -521,6 +608,44 @@ private_build_block (LIVoxSector* self,
 	event.block[1] = y;
 	event.block[2] = z;
 	lical_callbacks_call (self->manager->callbacks, self->manager, "block-load", lical_marshal_DATA_PTR, &event);
+
+	return 1;
+}
+
+static int private_set_voxel (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z,
+	LIVoxVoxel*  voxel)
+{
+	int m;
+	LIVoxVoxel* tile;
+	LIVoxBlock* block;
+
+	/* Modify terrain. */
+	tile = self->tiles + x + y * self->manager->tiles_per_line +
+		z * self->manager->tiles_per_line * self->manager->tiles_per_line;
+	if (tile->type == voxel->type &&
+	    tile->damage == voxel->damage &&
+	    tile->rotation == voxel->rotation)
+		return 0;
+	*tile = *voxel;
+
+	/* Mark block faces dirty. */
+	m = self->manager->tiles_per_line / self->manager->blocks_per_line;
+	block = livox_sector_get_block (self, x / m, y / m, z / m);
+	x %= m;
+	y %= m;
+	z %= m--;
+	if (x == 0) block->dirty |= 0x01;
+	if (x == m) block->dirty |= 0x02;
+	if (y == 0) block->dirty |= 0x04;
+	if (y == m) block->dirty |= 0x08;
+	if (z == 0) block->dirty |= 0x10;
+	if (z == m) block->dirty |= 0x20;
+	block->dirty |= 0x80;
+	block->stamp++;
 
 	return 1;
 }
