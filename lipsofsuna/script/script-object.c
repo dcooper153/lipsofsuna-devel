@@ -132,22 +132,41 @@ static void Object_find (LIScrArgs* args)
  * --
  * -- @param self Object.
  * -- @param args Arguments.<ul>
- * --   <li>name: Node name. (required)</li></ul>
+ * --   <li>name: Node name. (required)</li>
+ * --   <li>space: Coordinate space. ("local"/"world")</li></ul>
  * -- @return Position and rotation, or nil if not found.
  * function Object.find_node(self, args)
  */
 static void Object_find_node (LIScrArgs* args)
 {
 	const char* name;
+	const char* space = "local";
 	LIMatTransform transform;
+	LIMatTransform transform1;
 	LIMdlNode* node;
+	LIEngObject* self;
 
 	if (!liscr_args_gets_string (args, "name", &name))
 		return;
-	node = limdl_pose_find_node (LIENG_OBJECT (args->self)->pose, name);
+	liscr_args_gets_string (args, "space", &space);
+
+	/* Find the node. */
+	self = args->self;
+	node = limdl_pose_find_node (self->pose, name);
 	if (node == NULL)
 		return;
-	limdl_node_get_world_transform (node, &transform);
+
+	/* Get the transformation. */
+	if (!strcmp (space, "world"))
+	{
+		limdl_node_get_world_transform (node, &transform);
+		lieng_object_get_transform (self, &transform1);
+		transform = limat_transform_multiply (transform1, transform);
+	}
+	else
+		limdl_node_get_world_transform (node, &transform);
+
+	/* Return the transformation. */
 	liscr_args_seti_vector (args, &transform.position);
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
