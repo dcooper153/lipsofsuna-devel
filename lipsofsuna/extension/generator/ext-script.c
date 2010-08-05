@@ -169,14 +169,19 @@ static void Generator_enable_brush (LIScrArgs* args)
  * --
  * -- @param clss Generator class.
  * -- @param args Arguments.<ul>
+ * --   <li>blocks_per_line: Number of blocks per sector edge.</li>
  * --   <li>center: Center point of root node.</li>
- * --   <li>root: Root node name.</li></ul>
+ * --   <li>root: Root node name.</li>
+ * --   <li>tiles_per_line: Number of tiles per sector edge.</li></ul>
  * -- @return True if could create root node.
  * function Generator.format(clss, args)
  */
 static void Generator_format (LIScrArgs* args)
 {
 	int pos[3];
+	int tmp;
+	int tiles_per_line;
+	int blocks_per_line;
 	const char* root = "root";
 	LIExtModule* module;
 	LIGenBrush* brush;
@@ -189,6 +194,15 @@ static void Generator_format (LIScrArgs* args)
 	liscr_args_gets_string (args, "root", &root);
 	liscr_args_gets_vector (args, "center", &center);
 
+	/* Configure tile size. */
+	blocks_per_line = module->blocks_per_line;
+	tiles_per_line = module->tiles_per_line;
+	if (liscr_args_gets_int (args, "blocks_per_line", &tmp) && tmp >= 1)
+		blocks_per_line = tmp;
+	if (liscr_args_gets_int (args, "tiles_per_line", &tmp) && tmp >= 1)
+		tiles_per_line = tmp;
+	liext_generator_configure (module, blocks_per_line, tiles_per_line);
+
 	/* Find brush. */
 	brush = ligen_generator_find_brush_by_name (module->generator, root);
 	if (brush == NULL)
@@ -198,9 +212,9 @@ static void Generator_format (LIScrArgs* args)
 	ligen_generator_clear_scene (module->generator);
 
 	/* Create root stroke. */
-	pos[0] = LIMAT_MAX (0, (int)(center.x / module->generator->voxels->tile_width) - brush->size[0] / 2);
-	pos[1] = LIMAT_MAX (0, (int)(center.y / module->generator->voxels->tile_width) - brush->size[1] / 2);
-	pos[2] = LIMAT_MAX (0, (int)(center.z / module->generator->voxels->tile_width) - brush->size[2] / 2);
+	pos[0] = LIMAT_MAX (0, (int)(center.x / module->tile_width) - brush->size[0] / 2);
+	pos[1] = LIMAT_MAX (0, (int)(center.y / module->tile_width) - brush->size[1] / 2);
+	pos[2] = LIMAT_MAX (0, (int)(center.z / module->tile_width) - brush->size[2] / 2);
 	if (!ligen_generator_insert_stroke (module->generator, brush->id, pos[0], pos[1], pos[2]))
 		return;
 
@@ -326,9 +340,9 @@ static void Generator_paste_voxels (LIScrArgs* args)
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
 		point = limat_vector_init (0.0f, 0.0f, 0.0f);
 		liscr_args_gets_vector (args, "point", &point);
-		pos[0] = (int) point.x / module->generator->voxels->tile_width;
-		pos[1] = (int) point.y / module->generator->voxels->tile_width;
-		pos[2] = (int) point.z / module->generator->voxels->tile_width;
+		pos[0] = (int) point.x / module->tile_width;
+		pos[1] = (int) point.y / module->tile_width;
+		pos[2] = (int) point.z / module->tile_width;
 
 		/* Find brush. */
 		brush = ligen_generator_find_brush (module->generator, id);
@@ -391,8 +405,8 @@ static void Generator_save (LIScrArgs* args)
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
-	ligen_generator_rebuild_scene (module->generator);
-	ligen_generator_write (module->generator);
+	if (!ligen_generator_write (module->generator, module->blocks_per_line, module->tiles_per_line))
+		lisys_error_report ();
 }
 
 /* @luadoc

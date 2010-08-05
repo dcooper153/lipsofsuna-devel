@@ -49,7 +49,6 @@ struct _LIGenGenerator
 	LIArcSql* sql;
 	LICalCallbacks* callbacks;
 	LIPthPaths* paths;
-	LIVoxManager* voxels;
 	struct
 	{
 		int count;
@@ -90,12 +89,6 @@ LIAPICALL (int, ligen_generator_insert_stroke, (
 LIAPICALL (int, ligen_generator_load_materials, (
 	LIGenGenerator* self));
 
-LIAPICALL (int, ligen_generator_main, (
-	LIGenGenerator* self));
-
-LIAPICALL (int, ligen_generator_rebuild_scene, (
-	LIGenGenerator* self));
-
 LIAPICALL (void, ligen_generator_remove_brush, (
 	LIGenGenerator* self,
 	int             id));
@@ -104,16 +97,15 @@ LIAPICALL (int, ligen_generator_step, (
 	LIGenGenerator* self));
 
 LIAPICALL (int, ligen_generator_write, (
-	LIGenGenerator* self));
+	LIGenGenerator* self,
+	int             blocks_per_line,
+	int             tiles_per_line));
 
 LIAPICALL (int, ligen_generator_write_brush, (
 	LIGenGenerator* self,
 	int             id));
 
 LIAPICALL (int, ligen_generator_write_brushes, (
-	LIGenGenerator* self));
-
-LIAPICALL (int, ligen_generator_write_materials, (
 	LIGenGenerator* self));
 
 LIAPICALL (void, ligen_generator_set_fill, (

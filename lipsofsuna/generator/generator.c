@@ -62,9 +62,11 @@ private_rule_test (LIGenGenerator* self,
                    LIGenStroke*    stroke,
                    LIGenRule*      rule);
 
-static int
-private_stroke_paint (LIGenGenerator* self,
-                      LIGenStroke*    stroke);
+static int private_save_terrain (
+	LIGenGenerator* self,
+	int             blocks_per_line,
+	int             tiles_per_line,
+	LIArcSql*       sql);
 
 /*****************************************************************************/
 
@@ -86,19 +88,11 @@ ligen_generator_new (LIPthPaths*     paths,
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIGenGenerator));
 	if (self == NULL)
-	{
-		lisys_error_report ();
 		return NULL;
-	}
 	self->paths = paths;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
-
-	/* Allocate terrain structures. */
-	self->voxels = livox_manager_new (callbacks, sectors);
-	if (self->voxels == NULL)
-		goto error;
-	ligen_generator_set_fill (self, 1);
+	self->fill = 1;
 
 	/* Load databases. */
 	if (!private_init_sql (self) ||
@@ -129,8 +123,6 @@ ligen_generator_free (LIGenGenerator* self)
 			ligen_brush_free (iter.value);
 		lialg_u32dic_free (self->brushes);
 	}
-	if (self->voxels != NULL)
-		livox_manager_free (self->voxels);
 	if (self->sql != NULL)
 		sqlite3_close (self->sql);
 	lisys_free (self->strokes.array);
@@ -152,7 +144,6 @@ ligen_generator_clear_scene (LIGenGenerator* self)
 
 	/* Clear scene. */
 	lialg_sectors_clear (self->sectors);
-	livox_manager_update (self->voxels, 1.0f);
 }
 
 /**
@@ -267,89 +258,6 @@ ligen_generator_insert_stroke (LIGenGenerator* self,
 	return 1;
 }
 
-int
-ligen_generator_load_materials (LIGenGenerator* self)
-{
-	return livox_manager_load_materials (self->voxels);
-}
-
-/**
- * \brief Enters the main loop of the generator.
- *
- * \param self Generator.
- * \return Nonzero on success.
- */
-int
-ligen_generator_main (LIGenGenerator* self)
-{
-	int i;
-	LIGenBrush* brush;
-	LIGenStroke stroke;
-
-	/* Find root brush. */
-	brush = ligen_generator_find_brush_by_name (self, "root");
-	if (brush == NULL)
-	{
-		lisys_error_set (EINVAL, "cannot find `root' brush");
-		return 0;
-	}
-
-	/* Create root stroke. */
-	i = self->voxels->tiles_per_line * self->sectors->count / 2;
-	stroke.pos[0] = i - brush->size[0] / 2;
-	stroke.pos[1] = i - brush->size[1] / 2;
-	stroke.pos[2] = i - brush->size[2] / 2;
-	stroke.size[0] = brush->size[0];
-	stroke.size[1] = brush->size[1];
-	stroke.size[2] = brush->size[2];
-	stroke.brush = brush->id;
-	if (!lialg_array_append (&self->strokes, &stroke))
-		return 0;
-
-	/* Generate areas. */
-	/* FIXME */
-	for (i = 0 ; i < 100 ; i++)
-	{
-		if (!ligen_generator_step (self))
-			break;
-	}
-
-	/* Generate geometry. */
-	if (!ligen_generator_rebuild_scene (self) ||
-	    !ligen_generator_write (self))
-		return 0;
-
-	return 1;
-}
-
-/**
- * \brief Rebuilds all the terrain.
- *
- * \param self Generator.
- * \return Nonzero on success.
- */
-int
-ligen_generator_rebuild_scene (LIGenGenerator* self)
-{
-	int i;
-	LIGenStroke* stroke;
-
-	/* Clear sectors. */
-	lialg_sectors_clear (self->sectors);
-
-	/* Paint strokes. */
-	for (i = 0 ; i < self->strokes.count ; i++)
-	{
-		stroke = self->strokes.array + i;
-		private_stroke_paint (self, stroke);
-	}
-
-	/* Rebuild geometry. */
-	livox_manager_update (self->voxels, 1.0f);
-
-	return 1;
-}
-
 /**
  * \brief Removes a brush from the generator.
  *
@@ -459,16 +367,21 @@ ligen_generator_step (LIGenGenerator* self)
  * \brief Saves the generated map to the server database.
  *
  * \param self Generator.
+ * \param blocks_per_line Number of blocks per sector edge.
+ * \param tiles_per_line Number of tiles per sector edge.
  * \return Nonzero on success.
  */
-int
-ligen_generator_write (LIGenGenerator* self)
+int ligen_generator_write (
+	LIGenGenerator* self,
+	int             blocks_per_line,
+	int             tiles_per_line)
 {
 	int i;
 	int j;
 	int len;
 	int ret;
 	int flags;
+	float tile_width;
 	double rnd;
 	char* path;
 	const void* buf;
@@ -508,10 +421,11 @@ ligen_generator_write (LIGenGenerator* self)
 	liarc_sql_drop (server, "voxel_materials");
 
 	/* Save terrain. */
-	livox_manager_set_sql (self->voxels, server);
-	if (!livox_manager_write (self->voxels))
-		lisys_error_report ();
-	livox_manager_set_sql (self->voxels, self->sql);
+	if (!private_save_terrain (self, blocks_per_line, tiles_per_line, server))
+	{
+		sqlite3_close (server);
+		return 0;
+	}
 
 	/* Create region table. */
 	query = "CREATE TABLE IF NOT EXISTS regions "
@@ -523,18 +437,19 @@ ligen_generator_write (LIGenGenerator* self)
 	}
 
 	/* Write strokes as regions. */
+	tile_width = self->sectors->width / tiles_per_line;
 	for (i = 0 ; i < self->strokes.count ; i++)
 	{
 		stroke = self->strokes.array + i;
 		writer = liarc_writer_new ();
 		if (writer == NULL)
 			return 0;
-		position.x = self->voxels->tile_width * stroke->pos[0];
-		position.y = self->voxels->tile_width * stroke->pos[1];
-		position.z = self->voxels->tile_width * stroke->pos[2];
-		size.x = self->voxels->tile_width * stroke->size[0];
-		size.y = self->voxels->tile_width * stroke->size[1];
-		size.z = self->voxels->tile_width * stroke->size[2];
+		position.x = tile_width * stroke->pos[0];
+		position.y = tile_width * stroke->pos[1];
+		position.z = tile_width * stroke->pos[2];
+		size.x = tile_width * stroke->size[0];
+		size.y = tile_width * stroke->size[1];
+		size.z = tile_width * stroke->size[2];
 		sector = lialg_sectors_point_to_index (self->sectors, &position);
 		if (!liarc_writer_append_uint32 (writer, i) || /* id */
 		    !liarc_writer_append_uint32 (writer, 0) || /* type */
@@ -634,9 +549,9 @@ ligen_generator_write (LIGenGenerator* self)
 			/* Collect values. */
 			flags = object->flags;
 			transform = object->transform;
-			transform.position.x += self->voxels->tile_width * stroke->pos[0];
-			transform.position.y += self->voxels->tile_width * stroke->pos[1];
-			transform.position.z += self->voxels->tile_width * stroke->pos[2];
+			transform.position.x += tile_width * stroke->pos[0];
+			transform.position.y += tile_width * stroke->pos[1];
+			transform.position.z += tile_width * stroke->pos[2];
 			sector = lialg_sectors_point_to_index (self->sectors, &transform.position);
 
 			/* Write values. */
@@ -727,18 +642,6 @@ ligen_generator_write_brushes (LIGenGenerator* self)
 }
 
 /**
- * \brief Saves materials to the generator database.
- *
- * \param self Generator.
- * \return Nonzero on success.
- */
-int
-ligen_generator_write_materials (LIGenGenerator* self)
-{
-	return livox_manager_write_materials (self->voxels);
-}
-
-/**
  * \brief Sets the material used for filling empty sectors.
  *
  * \param self Generator.
@@ -752,7 +655,6 @@ ligen_generator_set_fill (LIGenGenerator* self,
 		self->fill = 0;
 	else
 		self->fill = fill;
-	livox_manager_set_fill (self->voxels, self->fill);
 }
 
 /*****************************************************************************/
@@ -895,11 +797,6 @@ private_init_sql (LIGenGenerator* self)
 		return 0;
 	}
 	lisys_free (path);
-
-	/* Load materials from it. */
-	livox_manager_set_sql (self->voxels, self->sql);
-	livox_manager_set_load (self->voxels, 0);
-	livox_manager_load_materials (self->voxels);
 
 	return 1;
 }
@@ -1098,18 +995,55 @@ private_rule_test (LIGenGenerator* self,
 	return 1;
 }
 
-static int
-private_stroke_paint (LIGenGenerator* self,
-                      LIGenStroke*    stroke)
+static int private_save_terrain (
+	LIGenGenerator* self,
+	int             blocks_per_line,
+	int             tiles_per_line,
+	LIArcSql*       sql)
 {
+	int i;
 	LIGenBrush* brush;
+	LIGenStroke* stroke;
+	LIVoxManager* voxels;
 
-	brush = lialg_u32dic_find (self->brushes, stroke->brush);
-	lisys_assert (brush != NULL);
+	/* Initialize voxel manager. */
+	voxels = livox_manager_new (self->callbacks, self->sectors);
+	if (voxels == NULL)
+		return 0;
+	livox_manager_set_fill (voxels, self->fill);
+	livox_manager_set_load (voxels, 0);
+	livox_manager_configure (voxels, blocks_per_line, tiles_per_line);
+	livox_manager_set_sql (voxels, self->sql);
+	livox_manager_load_materials (voxels); // FIXME: Scripts should set these somehow.
+	livox_manager_set_sql (voxels, sql);
 
-	return livox_manager_paste_voxels (self->voxels,
-		stroke->pos[0], stroke->pos[1], stroke->pos[2],
-		stroke->size[0], stroke->size[1], stroke->size[2], brush->voxels.array);
+	/* Paint strokes. */
+	lialg_sectors_clear (self->sectors);
+	for (i = 0 ; i < self->strokes.count ; i++)
+	{
+		stroke = self->strokes.array + i;
+		brush = lialg_u32dic_find (self->brushes, stroke->brush);
+		lisys_assert (brush != NULL);
+		livox_manager_paste_voxels (voxels,
+			stroke->pos[0], stroke->pos[1], stroke->pos[2],
+			stroke->size[0], stroke->size[1], stroke->size[2], brush->voxels.array);
+	}
+	livox_manager_update (voxels, 1.0f);
+
+	/* Write to the database. */
+	if (!livox_manager_write (voxels))
+	{
+		lialg_sectors_clear (self->sectors);
+		livox_manager_free (voxels);
+		return 0;
+	}
+
+	/* Free voxel manager. */
+	lialg_sectors_clear (self->sectors);
+	livox_manager_set_sql (voxels, self->sql);
+	livox_manager_free (voxels);
+
+	return 1;
 }
 
 /** @} */

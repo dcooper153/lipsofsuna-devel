@@ -33,6 +33,9 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
+	int blocks_per_line;
+	int tiles_per_line;
+	float tile_width;
 	LIAlgSectors* sectors;
 	LICalCallbacks* callbacks;
 	LIGenGenerator* generator;
@@ -41,6 +44,11 @@ struct _LIExtModule
 
 LIExtModule* liext_generator_new (
 	LIMaiProgram* program);
+
+void liext_generator_configure (
+	LIExtModule* self,
+	int          blocks_per_line,
+	int          tiles_per_line);
 
 void liext_generator_free (
 	LIExtModule* self);
