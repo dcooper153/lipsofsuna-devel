@@ -749,8 +749,33 @@ static void Voxel_set_materials (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Number of blocks per sector edge.
+ * -- @name Voxel.blocks_per_line
+ * -- @class table
+ */
+static void Voxel_getter_blocks_per_line (LIScrArgs* args)
+{
+	LIExtModule* self;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	liscr_args_seti_int (args, self->voxels->blocks_per_line);
+}
+static void Voxel_setter_blocks_per_line (LIScrArgs* args)
+{
+	int count;
+	LIExtModule* self;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (liscr_args_geti_int (args, 0, &count))
+	{
+		if (!livox_manager_configure (self->voxels, count, self->voxels->tiles_per_line))
+			lisys_error_report ();
+	}
+}
+
+/* @luadoc
  * --- Fill type for empty sectors.
- * -- @name Server.time
+ * -- @name Voxel.fill
  * -- @class table
  */
 static void Voxel_getter_fill (LIScrArgs* args)
@@ -780,6 +805,31 @@ static void Voxel_setter_fill (LIScrArgs* args)
 		livox_manager_set_fill (self->voxels, ((LIVoxVoxel*) voxel->data)->type);
 	else
 		livox_manager_set_fill (self->voxels, 0);
+}
+
+/* @luadoc
+ * --- Number of tiles per sector edge.
+ * -- @name Voxel.tiles_per_line
+ * -- @class table
+ */
+static void Voxel_getter_tiles_per_line (LIScrArgs* args)
+{
+	LIExtModule* self;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	liscr_args_seti_int (args, self->voxels->tiles_per_line);
+}
+static void Voxel_setter_tiles_per_line (LIScrArgs* args)
+{
+	int count;
+	LIExtModule* self;
+
+	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (liscr_args_geti_int (args, 0, &count))
+	{
+		if (!livox_manager_configure (self->voxels, self->voxels->blocks_per_line, count))
+			lisys_error_report ();
+	}
 }
 
 /*****************************************************************************/
@@ -823,7 +873,9 @@ liext_script_voxel (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "save", Voxel_save);
 	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
 	liscr_class_insert_cfunc (self, "set_materials", Voxel_set_materials);
+	liscr_class_insert_cvar (self, "blocks_per_line", Voxel_getter_blocks_per_line, Voxel_setter_blocks_per_line);
 	liscr_class_insert_cvar (self, "fill", Voxel_getter_fill, Voxel_setter_fill);
+	liscr_class_insert_cvar (self, "tiles_per_line", Voxel_getter_tiles_per_line, Voxel_setter_tiles_per_line);
 }
 
 /** @} */

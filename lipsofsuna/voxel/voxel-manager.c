@@ -61,11 +61,7 @@ livox_manager_new (LICalCallbacks* callbacks,
 	self->load = 1;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
-	self->blocks_per_line = 4;
-	self->blocks_per_sector = self->blocks_per_line * self->blocks_per_line * self->blocks_per_line;
-	self->tiles_per_line = 16;
-	self->tiles_per_sector = self->tiles_per_line * self->tiles_per_line * self->tiles_per_line;
-	self->tile_width = self->sectors->width / self->tiles_per_line;
+	livox_manager_configure (self, 4, 16);
 
 	/* Allocate materials. */
 	self->materials = lialg_u32dic_new ();
@@ -144,6 +140,33 @@ void
 livox_manager_clear_materials (LIVoxManager* self)
 {
 	private_clear_materials (self);
+}
+
+/**
+ * \brief Reconfigures the block and tile counts of the map.
+ *
+ * \param self Voxel manager.
+ * \param blocks_per_line Number of blocks per sector edge.
+ * \param tiles_per_line Number of tiles per sector edge.
+ * \return Nonzero on success.
+ */
+int livox_manager_configure (
+	LIVoxManager* self,
+	int           blocks_per_line,
+	int           tiles_per_line)
+{
+	if (self->sectors->sectors->size)
+	{
+		lisys_error_set (EINVAL, "cannot change grid settings when the map is populated");
+		return 0;
+	}
+	self->blocks_per_line = blocks_per_line;
+	self->blocks_per_sector = self->blocks_per_line * self->blocks_per_line * self->blocks_per_line;
+	self->tiles_per_line = tiles_per_line;
+	self->tiles_per_sector = self->tiles_per_line * self->tiles_per_line * self->tiles_per_line;
+	self->tile_width = self->sectors->width / self->tiles_per_line;
+
+	return 1;
 }
 
 /**

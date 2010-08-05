@@ -76,6 +76,11 @@ LIAPICALL (int, livox_manager_check_occluder, (
 LIAPICALL (void, livox_manager_clear_materials, (
 	LIVoxManager* self));
 
+LIAPICALL (int, livox_manager_configure, (
+	LIVoxManager* self,
+	int           blocks_per_line,
+	int           tiles_per_line));
+
 LIAPICALL (void, livox_manager_copy_voxels, (
 	LIVoxManager* self,
 	int           xstart,
