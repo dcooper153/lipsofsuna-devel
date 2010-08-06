@@ -26,94 +26,114 @@
 #include <lipsofsuna/system.h>
 #include "model.h"
 
-static void
-private_build (LIMdlModel* self);
+typedef int (*LIMdlWriteFunc)(const LIMdlModel*, LIArcWriter*);
 
-static void
-private_free_animation (LIMdlModel*     self,
-                        LIMdlAnimation* animation);
+static void private_build (
+	LIMdlModel* self);
 
-static int
-private_read (LIMdlModel*  self,
-              LIArcReader* reader);
+static void private_free_animation (
+	LIMdlModel*     self,
+	LIMdlAnimation* animation);
 
-static int
-private_read_animations (LIMdlModel*  self,
-                         LIArcReader* reader);
+static int private_read (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_faces (LIMdlModel*  self,
-                    LIArcReader* reader);
+static int private_read_animations (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_hairs (LIMdlModel*  self,
-                    LIArcReader* reader);
+static int private_read_bounds (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_materials (LIMdlModel*  self,
-                        LIArcReader* reader);
+static int private_read_faces (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_nodes (LIMdlModel*  self,
-                    LIArcReader* reader);
+static int private_read_hairs (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_shapes (LIMdlModel*  self,
-                     LIArcReader* reader);
+static int private_read_materials (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_vertices (LIMdlModel*  self,
-                       LIArcReader* reader);
+static int private_read_nodes (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_weights (LIMdlModel*  self,
-                      LIArcReader* reader);
+static int private_read_shapes (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_animation (LIMdlModel*     self,
-                        LIMdlAnimation* animation,
-                        LIArcReader*    reader);
+static int private_read_vertices (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_read_vertex_weights (LIMdlModel*   self,
-                             LIMdlWeights* weights,
-                             LIArcReader*  reader);
+static int private_read_weights (
+	LIMdlModel*  self,
+	LIArcReader* reader);
 
-static int
-private_write (const LIMdlModel* self,
-               LIArcWriter*      writer);
+static int private_read_animation (
+	LIMdlModel*     self,
+	LIMdlAnimation* animation,
+	LIArcReader*    reader);
 
-static int
-private_write_animations (const LIMdlModel* self,
-                          LIArcWriter*      writer);
+static int private_read_vertex_weights (
+	LIMdlModel*   self,
+	LIMdlWeights* weights,
+	LIArcReader*  reader);
 
-static int
-private_write_faces (const LIMdlModel* self,
-                     LIArcWriter*      writer);
+static int private_write (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
 
-static int
-private_write_hairs (const LIMdlModel* self,
-                     LIArcWriter*      writer);
+static int private_write_block (
+	const LIMdlModel* self,
+	const char*       name,
+	LIMdlWriteFunc    func,
+	LIArcWriter*      writer);
 
-static int
-private_write_materials (const LIMdlModel* self,
-                         LIArcWriter*      writer);
+static int private_write_animations (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
 
-static int
-private_write_nodes (const LIMdlModel* self,
-                     LIArcWriter*      writer);
+static int private_write_bounds (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
 
-static int
-private_write_shapes (const LIMdlModel* self,
-                      LIArcWriter*      writer);
+static int private_write_faces (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
 
-static int
-private_write_vertices (const LIMdlModel* self,
-                        LIArcWriter*      writer);
+static int private_write_hairs (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
 
-static int
-private_write_weights (const LIMdlModel* self,
-                       LIArcWriter*      writer);
+static int private_write_header (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_materials (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_nodes (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_shapes (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_vertices (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_weights (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
 
 /*****************************************************************************/
 
@@ -1061,10 +1081,6 @@ int
 limdl_model_write (const LIMdlModel* self,
                    LIArcWriter*      writer)
 {
-	liarc_writer_append_string (writer, "lips/mdl");
-	liarc_writer_append_nul (writer);
-	if (writer->error)
-		return 0;
 	return private_write (self, writer);
 }
 
@@ -1149,16 +1165,26 @@ private_read (LIMdlModel*  self,
 {
 	int i;
 	int j;
+	int ret;
+	char* id;
 	uint32_t tmp;
+	uint32_t size;
 	uint32_t version;
-	LIMatVector min;
-	LIMatVector max;
 	LIMdlFaces* group;
 
 	/* Read magic. */
 	if (!liarc_reader_check_text (reader, "lips/mdl", ""))
 	{
 		lisys_error_set (EINVAL, "wrong file format");
+		return 0;
+	}
+
+	/* Read header chunk size. */
+	if (!liarc_reader_get_uint32 (reader, &size))
+		return 0;
+	if (size != 8)
+	{
+		lisys_error_set (LISYS_ERROR_VERSION, "invalid header block");
 		return 0;
 	}
 
@@ -1171,28 +1197,58 @@ private_read (LIMdlModel*  self,
 		return 0;
 	}
 
-	/* Read header. */
-	if (!liarc_reader_get_uint32 (reader, &tmp) ||
-	    !liarc_reader_get_float (reader, &min.x) ||
-	    !liarc_reader_get_float (reader, &min.y) ||
-	    !liarc_reader_get_float (reader, &min.z) ||
-	    !liarc_reader_get_float (reader, &max.x) ||
-	    !liarc_reader_get_float (reader, &max.y) ||
-	    !liarc_reader_get_float (reader, &max.z))
+	/* Read flags. */
+	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->flags = tmp;
-	limat_aabb_init_from_points (&self->bounds, &min, &max);
 
 	/* Read chunks. */
-	if (!private_read_materials (self, reader) ||
-	    !private_read_vertices (self, reader) ||
-	    !private_read_faces (self, reader) ||
-	    !private_read_weights (self, reader) ||
-	    !private_read_nodes (self, reader) ||
-	    !private_read_animations (self, reader) ||
-	    !private_read_hairs (self, reader) ||
-	    !private_read_shapes (self, reader))
-		return 0;
+	while (!liarc_reader_check_end (reader))
+	{
+		id = NULL;
+		if (!liarc_reader_get_text (reader, "", &id) ||
+		    !liarc_reader_get_uint32 (reader, &size))
+		{
+			lisys_error_append ("reading chunk failed");
+			lisys_free (id);
+			return 0;
+		}
+		if (!strcmp (id, "bou"))
+			ret = private_read_bounds (self, reader);
+		else if (!strcmp (id, "mat"))
+			ret = private_read_materials (self, reader);
+		else if (!strcmp (id, "ver"))
+			ret = private_read_vertices (self, reader);
+		else if (!strcmp (id, "fac"))
+			ret = private_read_faces (self, reader);
+		else if (!strcmp (id, "wei"))
+			ret = private_read_weights (self, reader);
+		else if (!strcmp (id, "nod"))
+			ret = private_read_nodes (self, reader);
+		else if (!strcmp (id, "ani"))
+			ret = private_read_animations (self, reader);
+		else if (!strcmp (id, "hai"))
+			ret = private_read_hairs (self, reader);
+		else if (!strcmp (id, "sha"))
+			ret = private_read_shapes (self, reader);
+		else
+		{
+			if (!liarc_reader_skip_bytes (reader, size))
+			{
+				lisys_error_append ("failed to skip block `%s'", id);
+				lisys_free (id);
+				return 0;
+			}
+			ret = 1;
+		}
+		if (!ret)
+		{
+			lisys_error_append ("failed to read block `%s'", id);
+			lisys_free (id);
+			return 0;
+		}
+		lisys_free (id);
+	}
 
 	/* Sanity checks. */
 	for (i = 0 ; i < self->facegroups.count ; i++)
@@ -1228,11 +1284,6 @@ private_read_animations (LIMdlModel*  self,
 	LIMdlAnimation* animation;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "ani", ""))
-	{
-		lisys_error_set (EINVAL, "invalid animation block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->animations.count = tmp;
@@ -1254,6 +1305,25 @@ private_read_animations (LIMdlModel*  self,
 	return 1;
 }
 
+static int private_read_bounds (
+	LIMdlModel*  self,
+	LIArcReader* reader)
+{
+	LIMatVector min;
+	LIMatVector max;
+
+	if (!liarc_reader_get_float (reader, &min.x) ||
+	    !liarc_reader_get_float (reader, &min.y) ||
+	    !liarc_reader_get_float (reader, &min.z) ||
+	    !liarc_reader_get_float (reader, &max.x) ||
+	    !liarc_reader_get_float (reader, &max.y) ||
+	    !liarc_reader_get_float (reader, &max.z))
+		return 0;
+	limat_aabb_init_from_points (&self->bounds, &min, &max);
+
+	return 1;
+}
+
 static int
 private_read_faces (LIMdlModel*  self,
                     LIArcReader* reader)
@@ -1263,11 +1333,6 @@ private_read_faces (LIMdlModel*  self,
 	LIMdlFaces* group;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "fac", ""))
-	{
-		lisys_error_set (EINVAL, "invalid face block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->facegroups.count = tmp;
@@ -1297,11 +1362,6 @@ private_read_hairs (LIMdlModel*  self,
 	uint32_t count;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "hai", ""))
-	{
-		lisys_error_set (EINVAL, "invalid hair block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &count))
 		return 0;
 	self->hairs.count = count;
@@ -1330,11 +1390,6 @@ private_read_materials (LIMdlModel*  self,
 	uint32_t tmp;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "mat", ""))
-	{
-		lisys_error_set (EINVAL, "invalid material block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->materials.count = tmp;
@@ -1363,11 +1418,6 @@ private_read_nodes (LIMdlModel*  self,
 	uint32_t tmp;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "nod", ""))
-	{
-		lisys_error_set (EINVAL, "invalid node block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->nodes.count = tmp;
@@ -1399,11 +1449,6 @@ private_read_shapes (LIMdlModel*  self,
 	uint32_t tmp;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "sha", ""))
-	{
-		lisys_error_set (EINVAL, "invalid shape block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->shapes.count = tmp;
@@ -1433,11 +1478,6 @@ private_read_vertices (LIMdlModel*  self,
 	LIMdlVertex* vertex;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "ver", ""))
-	{
-		lisys_error_set (EINVAL, "invalid vertex block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->vertices.count = tmp;
@@ -1480,11 +1520,6 @@ private_read_weights (LIMdlModel*  self,
 	LIMdlWeightGroup* group;
 
 	/* Read header. */
-	if (!liarc_reader_check_text (reader, "wei", ""))
-	{
-		lisys_error_set (EINVAL, "invalid weight block header");
-		return 0;
-	}
 	if (!liarc_reader_get_uint32 (reader, tmp + 0))
 		return 0;
 
@@ -1621,34 +1656,61 @@ private_read_vertex_weights (LIMdlModel*   self,
 	return 1;
 }
 
-static int
-private_write (const LIMdlModel* self,
-               LIArcWriter*      writer)
+static int private_write (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
-	if (!liarc_writer_append_uint32 (writer, LIMDL_FORMAT_VERSION) ||
-	    !liarc_writer_append_uint32 (writer, self->flags) ||
-	    !liarc_writer_append_float (writer, self->bounds.min.x) ||
-	    !liarc_writer_append_float (writer, self->bounds.min.y) ||
-	    !liarc_writer_append_float (writer, self->bounds.min.z) ||
-	    !liarc_writer_append_float (writer, self->bounds.max.x) ||
-	    !liarc_writer_append_float (writer, self->bounds.max.y) ||
-	    !liarc_writer_append_float (writer, self->bounds.max.z))
-		return 0;
-	if (!private_write_materials (self, writer) ||
-	    !private_write_vertices (self, writer) ||
-	    !private_write_faces (self, writer) ||
-	    !private_write_weights (self, writer) ||
-	    !private_write_nodes (self, writer) ||
-	    !private_write_animations (self, writer) ||
-	    !private_write_hairs (self, writer) ||
-	    !private_write_shapes (self, writer))
+	if (!private_write_block (self, "lips/mdl", private_write_header, writer) ||
+	    !private_write_block (self, "bou", private_write_bounds, writer) ||
+	    !private_write_block (self, "mat", private_write_materials, writer) ||
+	    !private_write_block (self, "ver", private_write_vertices, writer) ||
+	    !private_write_block (self, "fac", private_write_faces, writer) ||
+	    !private_write_block (self, "wei", private_write_weights, writer) ||
+	    !private_write_block (self, "nod", private_write_nodes, writer) ||
+	    !private_write_block (self, "ani", private_write_animations, writer) ||
+	    !private_write_block (self, "hai", private_write_hairs, writer) ||
+	    !private_write_block (self, "sha", private_write_shapes, writer))
 		return 0;
 	return 1;
 }
 
-static int
-private_write_animations (const LIMdlModel* self,
-                          LIArcWriter*      writer)
+static int private_write_block (
+	const LIMdlModel* self,
+	const char*       name,
+	LIMdlWriteFunc    func,
+	LIArcWriter*      writer)
+{
+	int len;
+	LIArcWriter* data;
+
+	/* Write the block to a temporary buffer. */
+	data = liarc_writer_new ();
+	if (data == NULL)
+		return 0;
+	if (!func (self, data))
+	{
+		liarc_writer_free (data);
+		return 0;
+	}
+	len = liarc_writer_get_length (data);
+
+	/* Write the temporary to the main writer as a block. */
+	if (!liarc_writer_append_string (writer, name) ||
+	    !liarc_writer_append_nul (writer) ||
+	    !liarc_writer_append_uint32 (writer, len) ||
+	    !liarc_writer_append_raw (writer, liarc_writer_get_buffer (data), len))
+	{
+		liarc_writer_free (data);
+		return 0;
+	}
+	liarc_writer_free (data);
+
+	return 1;
+}
+
+static int private_write_animations (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	int j;
@@ -1656,9 +1718,7 @@ private_write_animations (const LIMdlModel* self,
 	LIMatTransform* transform;
 
 	/* Write animations. */
-	if (!liarc_writer_append_string (writer, "ani") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->animations.count))
+	if (!liarc_writer_append_uint32 (writer, self->animations.count))
 		return 0;
 	for (i = 0 ; i < self->animations.count ; i++)
 	{
@@ -1691,15 +1751,27 @@ private_write_animations (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_faces (const LIMdlModel* self,
-                     LIArcWriter*      writer)
+static int private_write_bounds (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
+{
+	if (!liarc_writer_append_float (writer, self->bounds.min.x) ||
+	    !liarc_writer_append_float (writer, self->bounds.min.y) ||
+	    !liarc_writer_append_float (writer, self->bounds.min.z) ||
+	    !liarc_writer_append_float (writer, self->bounds.max.x) ||
+	    !liarc_writer_append_float (writer, self->bounds.max.y) ||
+	    !liarc_writer_append_float (writer, self->bounds.max.z))
+		return 0;
+	return 1;
+}
+
+static int private_write_faces (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 
-	if (!liarc_writer_append_string (writer, "fac") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->facegroups.count))
+	if (!liarc_writer_append_uint32 (writer, self->facegroups.count))
 		return 0;
 	for (i = 0 ; i < self->facegroups.count ; i++)
 	{
@@ -1710,17 +1782,15 @@ private_write_faces (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_hairs (const LIMdlModel* self,
-                     LIArcWriter*      writer)
+static int private_write_hairs (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	LIMdlHairs* hairs;
 
 	/* Write animations. */
-	if (!liarc_writer_append_string (writer, "hai") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->hairs.count))
+	if (!liarc_writer_append_uint32 (writer, self->hairs.count))
 		return 0;
 	for (i = 0 ; i < self->hairs.count ; i++)
 	{
@@ -1732,16 +1802,24 @@ private_write_hairs (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_materials (const LIMdlModel* self,
-                         LIArcWriter*      writer)
+static int private_write_header (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
+{
+	if (!liarc_writer_append_uint32 (writer, LIMDL_FORMAT_VERSION) ||
+	    !liarc_writer_append_uint32 (writer, self->flags))
+		return 0;
+	return 1;
+}
+
+static int private_write_materials (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	LIMdlMaterial* material;
 
-	if (!liarc_writer_append_string (writer, "mat") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->materials.count))
+	if (!liarc_writer_append_uint32 (writer, self->materials.count))
 		return 0;
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
@@ -1753,17 +1831,15 @@ private_write_materials (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_nodes (const LIMdlModel* self,
-                     LIArcWriter*      writer)
+static int private_write_nodes (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	LIMdlNode* node;
 
 	/* Write nodes. */
-	if (!liarc_writer_append_string (writer, "nod") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->nodes.count))
+	if (!liarc_writer_append_uint32 (writer, self->nodes.count))
 		return 0;
 	for (i = 0 ; i < self->nodes.count ; i++)
 	{
@@ -1775,17 +1851,15 @@ private_write_nodes (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_shapes (const LIMdlModel* self,
-                      LIArcWriter*      writer)
+static int private_write_shapes (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	LIMdlShape* shape;
 
 	/* Write nodes. */
-	if (!liarc_writer_append_string (writer, "sha") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->shapes.count))
+	if (!liarc_writer_append_uint32 (writer, self->shapes.count))
 		return 0;
 	for (i = 0 ; i < self->shapes.count ; i++)
 	{
@@ -1797,17 +1871,15 @@ private_write_shapes (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_vertices (const LIMdlModel* self,
-                        LIArcWriter*      writer)
+static int private_write_vertices (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	LIMdlVertex* vertex;
 
 	/* Write header. */
-	if (!liarc_writer_append_string (writer, "ver") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->vertices.count))
+	if (!liarc_writer_append_uint32 (writer, self->vertices.count))
 		return 0;
 
 	/* Write vertices. */
@@ -1831,9 +1903,9 @@ private_write_vertices (const LIMdlModel* self,
 	return 1;
 }
 
-static int
-private_write_weights (const LIMdlModel* self,
-                       LIArcWriter*      writer)
+static int private_write_weights (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	int i;
 	int j;
@@ -1841,9 +1913,7 @@ private_write_weights (const LIMdlModel* self,
 	LIMdlWeights* weights;
 
 	/* Write header. */
-	if (!liarc_writer_append_string (writer, "wei") ||
-	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->weightgroups.count))
+	if (!liarc_writer_append_uint32 (writer, self->weightgroups.count))
 		return 0;
 
 	/* Write weight groups. */

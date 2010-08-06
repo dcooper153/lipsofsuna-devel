@@ -35,7 +35,7 @@ class LipsEnumTexTypes:
 		self.IMAGE = 2
 Lips = LipsEnum()
 
-lips_format_version = 0xFFFFFFF5
+lips_format_version = 0xFFFFFFF4
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
 lips_mirror_snap = 0.01
@@ -1337,49 +1337,62 @@ class LipsFile:
 	# \param self Storage.
 	# \param writer Writer.
 	def Write(self, writer):
+		data = LipsStringWriter()
+		# Header.
+		data.WriteInt(lips_format_version)
+		data.WriteInt(0)
+		writer.WriteBlock("lips/mdl", data)
+		# Bounds.
+		data.Clear()
 		bounds = self.faces.GetBounds();
-		writer.WriteString("lips/mdl")
-		writer.WriteInt(lips_format_version)
-		writer.WriteInt(0)
-		writer.WriteFloat(bounds[0])
-		writer.WriteFloat(bounds[1])
-		writer.WriteFloat(bounds[2])
-		writer.WriteFloat(bounds[3])
-		writer.WriteFloat(bounds[4])
-		writer.WriteFloat(bounds[5])
+		data.WriteFloat(bounds[0])
+		data.WriteFloat(bounds[1])
+		data.WriteFloat(bounds[2])
+		data.WriteFloat(bounds[3])
+		data.WriteFloat(bounds[4])
+		data.WriteFloat(bounds[5])
+		writer.WriteBlock("bou", data)
 		# Materials.
+		data.Clear()
 		materials = self.materials.values()
 		materials.sort(lambda x,y: x.index - y.index)
-		writer.WriteString("mat")
-		writer.WriteInt(len(materials))
+		data.WriteInt(len(materials))
 		for material in materials:
-			material.Write(writer)
+			material.Write(data)
+		writer.WriteBlock("mat", data)
 		# Vertices.
-		writer.WriteString("ver")
-		self.faces.WriteVertices(writer)
+		data.Clear()
+		self.faces.WriteVertices(data)
+		writer.WriteBlock("ver", data)
 		# Face groups.
-		writer.WriteString("fac")
-		self.faces.WriteIndices(writer)
+		data.Clear()
+		self.faces.WriteIndices(data)
+		writer.WriteBlock("fac", data)
 		# Weights.
-		writer.WriteString("wei")
-		writer.WriteInt(len(self.weightnames))
+		data.Clear()
+		data.WriteInt(len(self.weightnames))
 		for name in self.weightnames:
-			writer.WriteString(name)
-			writer.WriteString(name)
-		self.faces.WriteWeights(writer)
+			data.WriteString(name)
+			data.WriteString(name)
+		self.faces.WriteWeights(data)
+		writer.WriteBlock("wei", data)
 		# Nodes.
-		writer.WriteString("nod")
-		writer.WriteInt(1)
-		self.node.Write(writer)
+		data.Clear()
+		data.WriteInt(1)
+		self.node.Write(data)
+		writer.WriteBlock("nod", data)
 		# Animations.
-		writer.WriteString("ani")
-		self.animations.Write(writer)
+		data.Clear()
+		self.animations.Write(data)
+		writer.WriteBlock("ani", data)
 		# Hairs.
-		writer.WriteString("hai")
-		self.hairs.Write(writer)
+		data.Clear()
+		self.hairs.Write(data)
+		writer.WriteBlock("hai", data)
 		# Shapes
-		writer.WriteString("sha")
-		self.shapes.Write(writer)
+		data.Clear()
+		self.shapes.Write(data)
+		writer.WriteBlock("sha", data)
 
 class LipsStorage:
 
@@ -1399,6 +1412,33 @@ class LipsStorage:
 #############################################################################
 # Writer.
 
+class LipsStringWriter:
+
+	def __init__(self):
+		self.data = ""
+		self.pos = 0
+
+	def Clear(self):
+		self.data = ""
+		self.pos = 0
+
+	# Appends an integer.
+	def WriteInt(self, value):
+		self.data += struct.pack("!I", value)
+		self.pos += 4
+
+	# Appends a floating point number.
+	def WriteFloat(self, value):
+		self.data += struct.pack("!f", value)
+		self.pos += 4
+
+	# Appends a string.
+	def WriteString(self, value):
+		self.data += value
+		self.data += struct.pack('c', '\0')
+		self.pos += len(value) + 1
+
+
 class LipsWriter:
 
 	# Initializes a new data writer.
@@ -1408,6 +1448,13 @@ class LipsWriter:
 
 	def Close(self):
 		self.file.close()
+
+	# Writes a named data block.
+	def WriteBlock(self, name, data):
+		self.WriteString(name)
+		self.WriteInt(data.pos)
+		self.file.write(data.data)
+		self.pos += data.pos
 
 	# Appends an integer.
 	def WriteInt(self, value):
