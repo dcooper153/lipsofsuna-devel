@@ -124,7 +124,7 @@ LIAPICALL (void, liphy_object_get_gravity, (
 	LIMatVector*       value));
 
 LIAPICALL (void, liphy_object_set_gravity, (
-	const LIPhyObject* self,
+	LIPhyObject*       self,
 	const LIMatVector* value));
 
 LIAPICALL (int, liphy_object_get_ground, (

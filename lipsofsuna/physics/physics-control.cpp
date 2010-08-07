@@ -149,10 +149,9 @@ liphyRigidControl::liphyRigidControl (LIPhyObject* object, btCollisionShape* sha
 {
 	LIMatVector v;
 	btVector3 angular (object->config.angular.x, object->config.angular.y, object->config.angular.z);
+	btVector3 gravity (object->config.gravity.x, object->config.gravity.y, object->config.gravity.z);
 	btVector3 velocity (object->config.velocity.x, object->config.velocity.y, object->config.velocity.z);
 
-	liphy_object_get_inertia (object, &v);
-	this->body.setMassProps (object->config.mass, btVector3 (v.x, v.y, v.z));
 	this->body.setUserPointer (object);
 	this->body.setLinearVelocity (velocity);
 	this->body.setAngularVelocity (angular);
@@ -160,6 +159,9 @@ liphyRigidControl::liphyRigidControl (LIPhyObject* object, btCollisionShape* sha
 	this->object->physics->dynamics->addRigidBody (&this->body,
 		this->object->config.collision_group,
 		this->object->config.collision_mask);
+	liphy_object_get_inertia (object, &v);
+	this->body.setMassProps (object->config.mass, btVector3 (v.x, v.y, v.z));
+	this->body.setGravity (gravity);
 }
 
 liphyRigidControl::~liphyRigidControl ()
@@ -170,7 +172,7 @@ liphyRigidControl::~liphyRigidControl ()
 void
 liphyRigidControl::apply_impulse (const btVector3& pos, const btVector3& imp)
 {
-	this->body.applyImpulse (pos, imp);
+	this->body.applyImpulse (imp, pos);
 }
 
 void

@@ -414,7 +414,7 @@ liphy_physics_update (LIPhyPhysics* self,
 	LIPhyContactRecord* record;
 
 	/* Step simulation. */
-	self->dynamics->stepSimulation (secs, 10);
+	self->dynamics->stepSimulation (secs, 20);
 
 	/* Process contacts. */
 	for (ptr = self->contacts ; ptr != NULL ; ptr = self->contacts_iter)

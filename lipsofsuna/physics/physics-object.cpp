@@ -70,6 +70,7 @@ liphy_object_new (LIPhyPhysics*    physics,
 	self->physics = physics;
 	self->id = id;
 	self->control_mode = control_mode;
+	self->config.gravity = limat_vector_init (0.0f, -10.0f, 0.0f);
 	self->config.mass = 10.0f;
 	self->config.speed = LIPHY_DEFAULT_SPEED;
 	self->config.character_step = 0.35;
@@ -302,7 +303,7 @@ liphy_object_jump (LIPhyObject*       self,
 {
 	LIMatVector o = { 0.0f, 0.0f, 0.0f };
 
-	liphy_object_impulse (self, &o, impulse);
+	liphy_object_impulse (self, impulse, &o);
 }
 
 /**
@@ -548,15 +549,7 @@ void
 liphy_object_get_gravity (const LIPhyObject* self,
                           LIMatVector*       value)
 {
-	btVector3 gravity;
-
-	if (self->control != NULL)
-	{
-		self->control->get_gravity (&gravity);
-		*value = limat_vector_init (gravity[0], gravity[1], gravity[2]);
-	}
-	else
-		*value = limat_vector_init (0.0f, 0.0f, 0.0f);
+	*value = self->config.gravity;
 }
 
 /**
@@ -566,9 +559,10 @@ liphy_object_get_gravity (const LIPhyObject* self,
  * \param value Gravity vector.
  */
 void
-liphy_object_set_gravity (const LIPhyObject* self,
+liphy_object_set_gravity (LIPhyObject*       self,
                           const LIMatVector* value)
 {
+	self->config.gravity = *value;
 	if (self->control != NULL)
 		self->control->set_gravity (btVector3 (value->x, value->y, value->z));
 }

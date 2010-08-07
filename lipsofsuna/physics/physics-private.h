@@ -84,6 +84,7 @@ struct _LIPhyObject
 		float character_step;
 		void* userdata;
 		LIMatVector angular;
+		LIMatVector gravity;
 		LIMatVector velocity;
 		LIPhyCallback custom_call;
 		LIPhyContactCall contact_call;
