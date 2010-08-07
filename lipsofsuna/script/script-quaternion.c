@@ -181,25 +181,39 @@ Quaternion___sub (lua_State* lua)
  * -- Creates a new quaternion.
  * --
  * -- @param self Quaternion class.
- * -- @param x Optional X value, default is 0.
- * -- @param y Optional Y value, default is 0.
- * -- @param z Optional Z value, default is 0.
- * -- @param w Optional W value, default is 1.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,x Optional X value, default is 0.</li>
+ * --   <li>2,y Optional Y value, default is 0.</li>
+ * --   <li>3,z Optional Z value, default is 0.</li>
+ * --   <li>4,w Optional W value, default is 1.</li>
+ * --   <li>dir Look direction vector.</li>
+ * --   <li>up Up direction vector.</li></ul>
  * -- @return New quaternion.
  * function Quaternion.new(self, x, y, z, w)
  */
 static void Quaternion_new (LIScrArgs* args)
 {
+	LIMatVector dir;
+	LIMatVector up;
 	LIMatQuaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	if (!liscr_args_gets_float (args, "x", &quat.x))
-		liscr_args_geti_float (args, 0, &quat.x);
-	if (!liscr_args_gets_float (args, "y", &quat.y))
-		liscr_args_geti_float (args, 1, &quat.y);
-	if (!liscr_args_gets_float (args, "z", &quat.z))
-		liscr_args_geti_float (args, 2, &quat.z);
-	if (!liscr_args_gets_float (args, "w", &quat.w))
-		liscr_args_geti_float (args, 3, &quat.w);
+	if (liscr_args_gets_vector (args, "dir", &dir) &&
+	    liscr_args_gets_vector (args, "up", &up))
+	{
+		quat = limat_quaternion_look (dir, up);
+		quat = limat_quaternion_conjugate (quat);
+	}
+	else
+	{
+		if (!liscr_args_gets_float (args, "x", &quat.x))
+			liscr_args_geti_float (args, 0, &quat.x);
+		if (!liscr_args_gets_float (args, "y", &quat.y))
+			liscr_args_geti_float (args, 1, &quat.y);
+		if (!liscr_args_gets_float (args, "z", &quat.z))
+			liscr_args_geti_float (args, 2, &quat.z);
+		if (!liscr_args_gets_float (args, "w", &quat.w))
+			liscr_args_geti_float (args, 3, &quat.w);
+	}
 	liscr_args_seti_quaternion (args, &quat);
 }
 
@@ -237,14 +251,16 @@ static void Quaternion_new_euler (LIScrArgs* args)
 static void Quaternion_nlerp (LIScrArgs* args)
 {
 	float val;
-	LIMatQuaternion tmp;
-	LIScrData* data;
+	LIMatQuaternion q1;
+	LIMatQuaternion q2;
 
-	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &data) &&
+	if (liscr_args_geti_quaternion(args, 0, &q2) &&
 	    liscr_args_geti_float (args, 1, &val))
 	{
-		tmp = limat_quaternion_nlerp (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) data->data), val);
-		liscr_args_seti_quaternion (args, &tmp);
+		q1 = *((LIMatQuaternion*) args->self);
+		q2 = limat_quaternion_get_nearest (q2, q1);
+		q2 = limat_quaternion_nlerp (q1, q2, val);
+		liscr_args_seti_quaternion (args, &q2);
 	}
 }
 

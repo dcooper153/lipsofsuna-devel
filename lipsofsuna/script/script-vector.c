@@ -172,6 +172,41 @@ static void Vector_cross (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Calculates the dot product of two vectors.
+ * --
+ * -- @param self Vector.
+ * -- @param vector Vector.
+ * -- @return Scalar.
+ * function Vector.dot(self, vector)
+ */
+static void Vector_dot (LIScrArgs* args)
+{
+	float tmp;
+	LIScrData* data;
+
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
+	{
+		tmp = limat_vector_dot (*((LIMatVector*) args->self), *((LIMatVector*) data->data));
+		liscr_args_seti_float (args, tmp);
+	}
+}
+
+/* @luadoc
+ * --- Normalizes the vector and returns it.
+ * --
+ * -- @param self Vector.
+ * -- @return Vector.
+ * function Vector.normalize(self)
+ */
+static void Vector_normalize (LIScrArgs* args)
+{
+	LIMatVector tmp;
+
+	tmp = limat_vector_normalize (*((LIMatVector*) args->self));
+	liscr_args_seti_vector (args, &tmp);
+}
+
+/* @luadoc
  * --- Length.
  * -- @name Vector.length
  * -- @class table
@@ -233,7 +268,9 @@ liscr_script_vector (LIScrClass* self,
 	liscr_class_insert_func (self, "__mul", Vector___mul);
 	liscr_class_insert_func (self, "__sub", Vector___sub);
 	liscr_class_insert_mfunc (self, "cross", Vector_cross);
+	liscr_class_insert_mfunc (self, "dot", Vector_dot);
 	liscr_class_insert_cfunc (self, "new", Vector_new);
+	liscr_class_insert_mfunc (self, "normalize", Vector_normalize);
 	liscr_class_insert_mvar (self, "length", Vector_getter_length, NULL);
 	liscr_class_insert_mvar (self, "x", Vector_getter_x, Vector_setter_x);
 	liscr_class_insert_mvar (self, "y", Vector_getter_y, Vector_setter_y);
