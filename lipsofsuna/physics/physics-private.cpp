@@ -47,9 +47,6 @@ void liphyMotionState::getWorldTransform (
 void liphyMotionState::setWorldTransform (
 	const btTransform& transform)
 {
-	float len0;
-	float len1;
-
 	lisys_assert (!isnan (transform.getOrigin ()[0]));
 	lisys_assert (!isnan (transform.getOrigin ()[1]));
 	lisys_assert (!isnan (transform.getOrigin ()[2]));
@@ -59,13 +56,10 @@ void liphyMotionState::setWorldTransform (
 	lisys_assert (!isnan (transform.getRotation ()[3]));
 
 	this->current = transform;
-	len0 = (this->current.getOrigin () - this->previous.getOrigin ()).length ();
-	len1 = (this->current.getRotation () - this->previous.getRotation ()).length ();
-	if (len0 > LIPHY_MOTION_TOLERANCE || len1 > LIPHY_ROTATION_TOLERANCE)
+	if (this->object->control != NULL)
 	{
 		this->previous = this->current;
-		if (this->object->control != NULL)
-			this->object->control->update ();
+		this->object->control->update ();
 		lical_callbacks_call (this->object->physics->callbacks, this->object->physics, "object-transform", lical_marshal_DATA_PTR, this->object);
 	}
 }

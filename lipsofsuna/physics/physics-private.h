@@ -26,8 +26,6 @@
 #include <lipsofsuna/model.h>
 #include "physics-types.h"
 
-#define LIPHY_MOTION_TOLERANCE 0.25f
-#define LIPHY_ROTATION_TOLERANCE 0.1f
 #define LIPHY_BROADPHASE_DBVT
 
 class liphyControl;

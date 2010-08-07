@@ -818,9 +818,11 @@ liphy_object_set_transform (LIPhyObject*          self,
 	btQuaternion rotation (value->rotation.x, value->rotation.y, value->rotation.z, value->rotation.w);
 	btTransform transform (rotation, origin);
 
-	self->motion->setWorldTransform (transform);
+	/* Update the transformation of the body. */
 	if (self->control != NULL)
 		self->control->transform (transform);
+	else
+		self->motion->setWorldTransform (transform);
 }
 
 /**
