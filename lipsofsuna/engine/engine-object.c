@@ -354,6 +354,27 @@ lieng_object_refresh (LIEngObject* self,
 }
 
 /**
+ * \brief Attempts to reset the object.
+ *
+ * \param self Object.
+ * \return Nonzero on success.
+ */
+int lieng_object_reset (
+	LIEngObject* self)
+{
+	/* Reset fields specific to the engine. */
+	lieng_object_set_realized (self, 0);
+	self->transform = limat_transform_identity ();
+	self->smoothing.target = limat_transform_identity ();
+	lieng_object_set_model (self, NULL);
+
+	/* Invoke callbacks to reset anything else. */
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-reset", lical_marshal_DATA_PTR, self);
+
+	return 1;
+}
+
+/**
  * \brief Updates the state of the object.
  * 
  * \param self Object.

@@ -96,6 +96,9 @@ LIAPICALL (void, lieng_object_refresh, (
 	LIEngObject* self,
 	float        radius));
 
+LIAPICALL (int, lieng_object_reset, (
+	LIEngObject* self));
+
 LIAPICALL (void, lieng_object_update, (
 	LIEngObject* self,
 	float        secs));

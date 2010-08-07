@@ -56,7 +56,7 @@ struct _LIMaiProgram
 	LIAlgStrdic* components;
 	LIAlgStrdic* extensions;
 	LICalCallbacks* callbacks;
-	LICalHandle calls[7];
+	LICalHandle calls[8];
 	LIEngEngine* engine;
 	LIPthPaths* paths;
 	LIScrScript* script;

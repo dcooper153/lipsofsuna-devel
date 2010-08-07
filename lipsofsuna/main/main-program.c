@@ -40,6 +40,10 @@ static int private_object_new (
 	LIMaiProgram* self,
 	LIEngObject*  object);
 
+static int private_object_reset (
+	LIMaiProgram* self,
+	LIEngObject*  object);
+
 static int private_object_visibility (
 	LIMaiProgram* self,
 	LIEngObject*  object,
@@ -573,10 +577,11 @@ static int private_init (
 	if (!lical_callbacks_insert (self->callbacks, self->engine, "object-model", 65535, private_object_model, self, self->calls + 0) ||
 	    !lical_callbacks_insert (self->callbacks, self->engine, "object-motion", 63353, private_object_motion, self, self->calls + 1) ||
 	    !lical_callbacks_insert (self->callbacks, self->engine, "object-new", 65535, private_object_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "object-visibility", 65535, private_object_visibility, self, self->calls + 3) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-free", 65535, private_sector_free, self, self->calls + 4) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-load", 65535, private_sector_load, self, self->calls + 5) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 6))
+	    !lical_callbacks_insert (self->callbacks, self->engine, "object-reset", 65535, private_object_reset, self, self->calls + 3) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "object-visibility", 65535, private_object_visibility, self, self->calls + 4) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-free", 65535, private_sector_free, self, self->calls + 5) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-load", 65535, private_sector_load, self, self->calls + 6) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 7))
 		return 0;
 
 	return 1;
@@ -618,6 +623,36 @@ static int private_object_new (
 	{
 		limai_program_event (self, "object-new",
 			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
+	}
+
+	return 1;
+}
+
+static int private_object_reset (
+	LIMaiProgram* self,
+	LIEngObject*  object)
+{
+	if (object->script != NULL)
+	{
+		/* Emit an event. */
+		limai_program_event (self, "object-reset",
+			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
+
+		/* Call the reset function provided by scripts. */
+		liscr_pushdata (self->script->lua, object->script);
+		lua_getfield (self->script->lua, -1, "reset");
+		if (lua_type (self->script->lua, -1) == LUA_TFUNCTION)
+		{
+			liscr_pushdata (self->script->lua, object->script);
+			if (lua_pcall (self->script->lua, 1, 0, 0) != 0)
+			{
+				lisys_error_set (EINVAL, lua_tostring (self->script->lua, -1));
+				lua_pop (self->script->lua, 1);
+			}
+			lua_pop (self->script->lua, 1);
+		}
+		else
+			lua_pop (self->script->lua, 2);
 	}
 
 	return 1;

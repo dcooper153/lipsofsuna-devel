@@ -272,13 +272,20 @@ static void Object_new (LIScrArgs* args)
 	if (!liscr_args_gets_int (args, "id", &id) || id <= 0)
 		return;
 
-	/* Check for an existing object. */
+	/* Check for an existing object. Reusing an existing object with the same
+	   ID is a valid use case because the scripts have no way to know if the
+	   object has been garbage collected by clients in networked scenarios. */
 	self = lieng_engine_find_object (program->engine, id);
 	if (self != NULL)
 	{
-		/* TODO: Should we reset the object somehow? */
 		if (self->script != NULL)
+		{
+			lieng_object_reset (self);
+			liscr_args_call_setters_except (args, self->script, "realized");
+			liscr_args_gets_bool (args, "realized", &realize);
 			liscr_args_seti_data (args, self->script);
+			lieng_object_set_realized (self, realize);
+		}
 		return;
 	}
 
