@@ -291,6 +291,7 @@ def build(ctx):
 	instpath = os.path.join(ctx.env.BINDIR, 'lipsofsuna' + ctx.env.EXEEXT)
 	ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
 	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export.py'])
+	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export-25.py'])
 	for src in ctx.path.ant_glob('data/**/*.*').split(' '):
 		dst = os.path.join(ctx.env.DATADIR, os.path.dirname(src).replace('data/', ''))
 		ctx.install_files(dst, [src])
