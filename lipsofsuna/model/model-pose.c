@@ -315,7 +315,6 @@ limdl_pose_transform (LIMdlPose*   self,
 	{
 		count = 0;
 		total = 0.0f;
-		weights = model->weights.array + i;
 
 		/* Get the rest pose state. */
 		rest_vertex = model->vertices.array[i].coord;
@@ -324,18 +323,23 @@ limdl_pose_transform (LIMdlPose*   self,
 		pose_vertex = limat_vector_init (0.0f, 0.0f, 0.0f);
 		pose_normal = limat_vector_init (0.0f, 0.0f, 0.0f);
 
-		/* Calculate total weight. */
-		for (j = 0 ; j < weights->count ; j++)
+		/* Calculate total weight. The model file might not have weights
+		   so we might have to skip and use the original vertex. */
+		if (i < model->weights.count)
 		{
-			weight = weights->weights + j;
-			if (weight->weight != 0.0f)
+			weights = model->weights.array + i;
+			for (j = 0 ; j < weights->count ; j++)
 			{
-				restbone = model->weightgroups.array[weight->group].node;
-				posebone = self->groups.array[weight->group].node;
-				if (restbone != NULL && posebone != NULL)
+				weight = weights->weights + j;
+				if (weight->weight != 0.0f)
 				{
-					total += weight->weight;
-					count++;
+					restbone = model->weightgroups.array[weight->group].node;
+					posebone = self->groups.array[weight->group].node;
+					if (restbone != NULL && posebone != NULL)
+					{
+						total += weight->weight;
+						count++;
+					}
 				}
 			}
 		}
@@ -343,6 +347,7 @@ limdl_pose_transform (LIMdlPose*   self,
 		/* Transform by each weight group. */
 		if (count && total != 0.0f)
 		{
+			weights = model->weights.array + i;
 			for (j = 0 ; j < weights->count ; j++)
 			{
 				/* Get transformation weight. */

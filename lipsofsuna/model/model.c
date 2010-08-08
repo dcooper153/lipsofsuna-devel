@@ -978,6 +978,7 @@ limdl_model_merge (LIMdlModel* self,
 	uint32_t* indices;
 	LIMdlFaces* dstfaces;
 	LIMdlFaces* srcfaces;
+	LIMdlWeights* weights;
 
 	/* Map weight groups. */
 	if (model->weightgroups.count)
@@ -1012,8 +1013,11 @@ limdl_model_merge (LIMdlModel* self,
 			if (vertex == -1)*/
 			{
 				vertex = self->vertices.count;
-				if (!limdl_model_insert_vertex_weighted (self, model->vertices.array + i,
-				    model->weights.array + i, wgroups))
+				if (model->weights.count)
+					weights = model->weights.array + i;
+				else
+					weights = NULL;
+				if (!limdl_model_insert_vertex_weighted (self, model->vertices.array + i, weights, wgroups))
 					goto error;
 			}
 			vertices[i] = vertex;
