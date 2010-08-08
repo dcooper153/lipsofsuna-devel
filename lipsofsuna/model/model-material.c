@@ -237,6 +237,7 @@ limdl_material_read (LIMdlMaterial* self,
 		tmpmat.textures.array = lisys_calloc (tmpmat.textures.count, sizeof (LIMdlTexture));
 		if (tmpmat.textures.array == NULL)
 		{
+			tmpmat.textures.count = 0;
 			limdl_material_free (&tmpmat);
 			return 0;
 		}
