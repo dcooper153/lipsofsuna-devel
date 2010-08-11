@@ -1,7 +1,7 @@
 Startup = Class{name = "Startup"}
 
 -- Modify these to join a server of your choice.
-Startup.host = "h.lipsofsuna.org"
+Startup.addr = "h.lipsofsuna.org"
 Startup.port = 10101
 
 --- Initializes the startup screen.
@@ -44,7 +44,7 @@ end
 --- Joins a server.
 -- @param clss Startup class.
 Startup.join = function(clss)
-	Program:launch_mod{name = "lipsofsuna", args = "--join " .. clss.host .. " " .. clss.port}
+	Program:launch_mod{name = "lipsofsuna", args = "--join " .. clss.addr .. " " .. clss.port}
 	Program.quit = true
 end
 
