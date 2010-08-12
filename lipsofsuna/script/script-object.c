@@ -46,7 +46,10 @@ static void Object_add_model (LIScrArgs* args)
 	const char* model;
 
 	if (liscr_args_gets_string (args, "model", &model))
-		lieng_object_merge_model (args->self, model);
+	{
+		if (!lieng_object_merge_model (args->self, model))
+			lisys_error_report ();
+	}
 }
 
 /* @luadoc

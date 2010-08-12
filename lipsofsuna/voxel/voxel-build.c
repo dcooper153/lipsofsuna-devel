@@ -773,7 +773,7 @@ private_merge_vertex (LIVoxBuilder* self,
 	{
 		/* Add to model. */
 		index = self->model->vertices.count;
-		if (!limdl_model_insert_vertex (self->model, &vert, NULL))
+		if (!limdl_model_insert_vertex (self->model, &vert))
 			return -1;
 
 		/* Add to lookup. */

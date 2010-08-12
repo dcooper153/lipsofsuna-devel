@@ -625,8 +625,13 @@ limdl_model_insert_face (LIMdlModel*         self,
 		if (index == -1)
 		{
 			index = self->vertices.count;
-			if (!limdl_model_insert_vertex (self, vertices + i, (weights != NULL)? weights + i : NULL))
+			if (!limdl_model_insert_vertex (self, vertices + i))
 				return 0;
+			if (!limdl_model_insert_vertex_weights (self, weights, NULL))
+			{
+				self->vertices.count--;
+				return 0;
+			}
 		}
 
 		/* Insert index. */
@@ -776,67 +781,105 @@ limdl_model_insert_node (LIMdlModel*      self,
  *
  * \param self Model.
  * \param vertex Vertex.
- * \param weights Vertex weights or NULL.
  * \return Nonzero on success.
  */
-int
-limdl_model_insert_vertex (LIMdlModel*         self,
-                           const LIMdlVertex*  vertex,
-                           const LIMdlWeights* weights)
+int limdl_model_insert_vertex (
+	LIMdlModel*         self,
+	const LIMdlVertex*  vertex)
 {
-	int i;
 	int count;
+	int capacity;
 	void* tmp;
-	LIMdlWeights* w;
 
-	/* Resize buffers. */
+	/* Allocate space for the vertex. */
 	if (self->vertices.capacity < self->vertices.count + 1)
 	{
 		if (self->vertices.capacity)
-			i = self->vertices.capacity << 1;
+			capacity = self->vertices.capacity << 1;
 		else
-			i = 32;
-		tmp = lisys_realloc (self->vertices.array, i * sizeof (LIMdlVertex));
+			capacity = 32;
+		tmp = lisys_realloc (self->vertices.array, capacity * sizeof (LIMdlVertex));
 		if (tmp == NULL)
 			return 0;
 		self->vertices.array = tmp;
-		self->vertices.capacity = i;
-	}
-	if (self->weights.capacity < self->weights.count + 1)
-	{
-		if (self->weights.capacity)
-			i = self->weights.capacity << 1;
-		else
-			i = 32;
-		tmp = lisys_realloc (self->weights.array, i * sizeof (LIMdlWeights));
-		if (tmp == NULL)
-			return 0;
-		self->weights.array = tmp;
-		self->weights.capacity = i;
+		self->vertices.capacity = capacity;
 	}
 	count = self->vertices.count;
-	lisys_assert (self->vertices.count == self->weights.count);
-
-	/* Append weights. */
-	if (weights != NULL && weights->count)
-	{
-		w = self->weights.array + count;
-		w->weights = lisys_malloc (weights->count * sizeof (LIMdlWeight));
-		if (w->weights == NULL)
-			return 0;
-		memcpy (w->weights, weights->weights, weights->count * sizeof (LIMdlWeight));
-		w->count = weights->count;
-	}
-	else
-	{
-		w = self->weights.array + count;
-		memset (w, 0, sizeof (LIMdlWeights));
-	}
 
 	/* Append vertex. */
 	self->vertices.array[count] = *vertex;
 	self->vertices.count++;
-	self->weights.count++;
+
+	return 1;
+}
+
+/**
+ * \brief Inserts vertex weights to the model.
+ *
+ * \param self Model.
+ * \param weights Vertex weights or NULL.
+ * \param mapping Maps group indices of the weights array. NULL if no mapping is needed.
+ * \return Nonzero on success.
+ */
+int limdl_model_insert_vertex_weights (
+	LIMdlModel*         self,
+	const LIMdlWeights* weights,
+	const int*          mapping)
+{
+	int i;
+	int group;
+	int count;
+	int capacity;
+	LIMdlWeights* tmp;
+	LIMdlWeights* dstwei;
+
+	/* Don't create weights when none are needed. */
+	if (!self->weights.count && (weights == NULL || !weights->count))
+		return 1;
+	lisys_assert (self->weights.count < self->vertices.count);
+	count = self->weights.count;
+
+	/* Allocate space for weights. */
+	if (self->weights.capacity < self->vertices.count)
+	{
+		if (self->weights.capacity)
+			capacity = self->weights.capacity;
+		else
+			capacity = 32;
+		while (capacity < self->vertices.count) 
+			capacity = capacity << 1;
+		tmp = lisys_realloc (self->weights.array, capacity * sizeof (LIMdlWeights));
+		if (tmp == NULL)
+			return 0;
+		self->weights.array = tmp;
+		self->weights.capacity = capacity;
+	}
+
+	/* Initialize the new weights and any missing weights. */
+	memset (self->weights.array + count, 0, (self->vertices.count - count) * sizeof (LIMdlWeights));
+	dstwei = self->weights.array + self->vertices.count - 1;
+
+	/* Copy weights. */
+	if (weights != NULL && weights->count)
+	{
+		dstwei->weights = lisys_malloc (weights->count * sizeof (LIMdlWeight));
+		if (dstwei->weights == NULL)
+			return 0;
+		memcpy (dstwei->weights, weights->weights, weights->count * sizeof (LIMdlWeight));
+		dstwei->count = weights->count;
+	}
+	self->weights.count = self->vertices.count;
+
+	/* Remap weight group indices. */
+	if (mapping != NULL)
+	{
+		for (i = 0 ; i < dstwei->count ; i++)
+		{
+			group = mapping[dstwei->weights[i].group];
+			lisys_assert (group < self->weightgroups.count);
+			dstwei->weights[i].group = group;
+		}
+	}
 
 	return 1;
 }
@@ -856,67 +899,13 @@ int limdl_model_insert_vertex_weighted (
 	const LIMdlWeights* weights,
 	const int*          mapping)
 {
-	int i;
-	int count;
-	void* tmp;
-	LIMdlWeights* w;
-
-	/* Resize buffers. */
-	if (self->vertices.capacity < self->vertices.count + 1)
+	if (!limdl_model_insert_vertex (self, vertex))
+		return 0;
+	if (!limdl_model_insert_vertex_weights (self, weights, mapping))
 	{
-		if (self->vertices.capacity)
-			i = self->vertices.capacity << 1;
-		else
-			i = 32;
-		tmp = lisys_realloc (self->vertices.array, i * sizeof (LIMdlVertex));
-		if (tmp == NULL)
-			return 0;
-		self->vertices.array = tmp;
-		self->vertices.capacity = i;
+		self->vertices.count--;
+		return 0;
 	}
-	if (self->weights.capacity < self->weights.count + 1)
-	{
-		if (self->weights.capacity)
-			i = self->weights.capacity << 1;
-		else
-			i = 32;
-		tmp = lisys_realloc (self->weights.array, i * sizeof (LIMdlWeights));
-		if (tmp == NULL)
-			return 0;
-		self->weights.array = tmp;
-		self->weights.capacity = i;
-	}
-	count = self->vertices.count;
-	lisys_assert (self->vertices.count == self->weights.count);
-
-	/* Append weights. */
-	if (weights != NULL && weights->count)
-	{
-		/* Clone weights. */
-		w = self->weights.array + count;
-		w->weights = lisys_malloc (weights->count * sizeof (LIMdlWeight));
-		if (w->weights == NULL)
-			return 0;
-		memcpy (w->weights, weights->weights, weights->count * sizeof (LIMdlWeight));
-		w->count = weights->count;
-
-		/* Remap weight group indices. */
-		if (mapping != NULL)
-		{
-			for (i = 0 ; i < w->count ; i++)
-				w->weights[i].group = mapping[w->weights[i].group];
-		}
-	}
-	else
-	{
-		w = self->weights.array + count;
-		memset (w, 0, sizeof (LIMdlWeights));
-	}
-
-	/* Append vertex. */
-	self->vertices.array[count] = *vertex;
-	self->vertices.count++;
-	self->weights.count++;
 
 	return 1;
 }
@@ -984,6 +973,8 @@ limdl_model_merge (LIMdlModel* self,
 	if (model->weightgroups.count)
 	{
 		wgroups = lisys_calloc (model->weightgroups.count, sizeof (int));
+		if (wgroups == NULL)
+			return 0;
 		for (i = 0 ; i < model->weightgroups.count ; i++)
 		{
 			group = limdl_model_find_weightgroup (self,
@@ -991,12 +982,13 @@ limdl_model_merge (LIMdlModel* self,
 				model->weightgroups.array[i].bone);
 			if (group == -1)
 			{
-				group = model->weightgroups.count;
+				group = self->weightgroups.count;
 				if (!limdl_model_insert_weightgroup (self, 
 				    model->weightgroups.array[i].name,
 				    model->weightgroups.array[i].bone))
 					goto error;
 			}
+			lisys_assert (group < self->weightgroups.count);
 			wgroups[i] = group;
 		}
 	}
@@ -1634,6 +1626,7 @@ private_read_vertex_weights (LIMdlModel*   self,
                              LIMdlWeights* weights,
                              LIArcReader*  reader)
 {
+	float weight;
 	uint32_t i;
 	uint32_t count;
 	uint32_t group;
@@ -1652,9 +1645,15 @@ private_read_vertex_weights (LIMdlModel*   self,
 	for (i = 0 ; i < count ; i++)
 	{
 		if (!liarc_reader_get_uint32 (reader, &group) ||
-		    !liarc_reader_get_float (reader, &weights->weights[i].weight))
+		    !liarc_reader_get_float (reader, &weight))
 			return 0;
+		if (group >= self->weightgroups.count)
+		{
+			lisys_error_set (EINVAL, "weight group index out of bounds");
+			return 0;
+		}
 		weights->weights[i].group = group;
+		weights->weights[i].weight = weight;
 	}
 
 	return 1;
@@ -1697,6 +1696,8 @@ static int private_write_block (
 		return 0;
 	}
 	len = liarc_writer_get_length (data);
+	if (!len)
+		return 1;
 
 	/* Write the temporary to the main writer as a block. */
 	if (!liarc_writer_append_string (writer, name) ||
@@ -1720,6 +1721,10 @@ static int private_write_animations (
 	int j;
 	LIMdlAnimation* animation;
 	LIMatTransform* transform;
+
+	/* Check if writing is needed. */
+	if (!self->animations.count)
+		return 1;
 
 	/* Write animations. */
 	if (!liarc_writer_append_uint32 (writer, self->animations.count))
@@ -1775,6 +1780,10 @@ static int private_write_faces (
 {
 	int i;
 
+	/* Check if writing is needed. */
+	if (!self->facegroups.count)
+		return 1;
+
 	if (!liarc_writer_append_uint32 (writer, self->facegroups.count))
 		return 0;
 	for (i = 0 ; i < self->facegroups.count ; i++)
@@ -1792,6 +1801,10 @@ static int private_write_hairs (
 {
 	int i;
 	LIMdlHairs* hairs;
+
+	/* Check if writing is needed. */
+	if (!self->hairs.count)
+		return 1;
 
 	/* Write animations. */
 	if (!liarc_writer_append_uint32 (writer, self->hairs.count))
@@ -1823,6 +1836,10 @@ static int private_write_materials (
 	int i;
 	LIMdlMaterial* material;
 
+	/* Check if writing is needed. */
+	if (!self->materials.count)
+		return 1;
+
 	if (!liarc_writer_append_uint32 (writer, self->materials.count))
 		return 0;
 	for (i = 0 ; i < self->materials.count ; i++)
@@ -1841,6 +1858,10 @@ static int private_write_nodes (
 {
 	int i;
 	LIMdlNode* node;
+
+	/* Check if writing is needed. */
+	if (!self->nodes.count)
+		return 1;
 
 	/* Write nodes. */
 	if (!liarc_writer_append_uint32 (writer, self->nodes.count))
@@ -1862,6 +1883,10 @@ static int private_write_shapes (
 	int i;
 	LIMdlShape* shape;
 
+	/* Check if writing is needed. */
+	if (!self->shapes.count)
+		return 1;
+
 	/* Write nodes. */
 	if (!liarc_writer_append_uint32 (writer, self->shapes.count))
 		return 0;
@@ -1881,6 +1906,10 @@ static int private_write_vertices (
 {
 	int i;
 	LIMdlVertex* vertex;
+
+	/* Check if writing is needed. */
+	if (!self->vertices.count)
+		return 1;
 
 	/* Write header. */
 	if (!liarc_writer_append_uint32 (writer, self->vertices.count))
@@ -1915,6 +1944,10 @@ static int private_write_weights (
 	int j;
 	LIMdlWeightGroup* group;
 	LIMdlWeights* weights;
+
+	/* Check if writing is needed. */
+	if (!self->weightgroups.count)
+		return 1;
 
 	/* Write header. */
 	if (!liarc_writer_append_uint32 (writer, self->weightgroups.count))

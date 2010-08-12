@@ -168,12 +168,16 @@ LIAPICALL (int, limdl_model_insert_node, (
 
 LIAPICALL (int, limdl_model_insert_vertex, (
 	LIMdlModel*         self,
-	const LIMdlVertex*  vertex,
-	const LIMdlWeights* weights));
+	const LIMdlVertex*  vertex));
 
 LIAPICALL (int, limdl_model_insert_vertex_weighted, (
 	LIMdlModel*         self,
 	const LIMdlVertex*  vertex,
+	const LIMdlWeights* weights,
+	const int*          mapping));
+
+LIAPICALL (int, limdl_model_insert_vertex_weights, (
+	LIMdlModel*         self,
 	const LIMdlWeights* weights,
 	const int*          mapping));
 
