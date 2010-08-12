@@ -858,7 +858,6 @@ class LIFile:
 			if self.mesh.write_weights(data):
 				self.write_block("wei", data)
 			# TODO: Hairs.
-			# TODO: Shapes
 		if self.hier:
 			# Nodes.
 			data.clear("nod")
@@ -925,34 +924,57 @@ class LIWriter:
 
 ##############################################################################
 
-# Adjust state.
-alllayers = [True for x in range(0, 20)]
-origlayers = [x for x in bpy.context.scene.layers]
-origframe = bpy.context.scene.frame_current
-bpy.context.scene.layers = alllayers
-if bpy.context.scene.objects.active:
-	bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+class LIExporter(bpy.types.Operator):
+	'''Export to Lips of Suna (.lmdl)'''
 
-# Find target files.
-files = []
-for obj in bpy.data.objects:
-	for file in object_files(obj):
-		if file not in files:
-			files.append(file)
+	bl_idname = "export.lipsofsuna"
+	bl_label = 'Export to Lips of Suna (.lmdl)'
 
-# If no target file was specified by any object, assume that the
-# user wanted to export all the objects to the default file.
-if not len(files):
-	path,name = os.path.split(bpy.data.filepath)
-	path = os.path.join(os.path.split(path)[0], "graphics")
-	files = [os.path.join(path, name)]
-	LIFormat.files = files
+	def execute(self, context):
+		# Adjust state.
+		alllayers = [True for x in range(0, 20)]
+		origlayers = [x for x in bpy.context.scene.layers]
+		origframe = bpy.context.scene.frame_current
+		bpy.context.scene.layers = alllayers
+		if bpy.context.scene.objects.active:
+			bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+		# Find target files.
+		files = []
+		for obj in bpy.data.objects:
+			for file in object_files(obj):
+				if file not in files:
+					files.append(file)
+		# If no target file was specified by any object, assume that the
+		# user wanted to export all the objects to the default file.
+		if not len(files):
+			path,name = os.path.split(bpy.data.filepath)
+			path = os.path.join(os.path.split(path)[0], "graphics")
+			files = [os.path.join(path, name)]
+			LIFormat.files = files
+		# Export each file.
+		for file in files:
+			f = LIFile(file)
+			f.write()
+		# Restore state.
+		bpy.context.scene.layers = origlayers
+		bpy.context.scene.set_frame(origframe)
+		return {'FINISHED'}
 
-# Export each file.
-for file in files:
-	f = LIFile(file)
-	f.write()
+	def invoke(self, context, event):
+		return self.execute(context)
 
-# Restore state.
-bpy.context.scene.layers = origlayers
-bpy.context.scene.set_frame(origframe)
+##############################################################################
+
+def menu_func(self, context):
+	self.layout.operator(LIExporter.bl_idname, text="Lips of Suna (.lmdl)")
+
+def register():
+	bpy.types.register(LIExporter)
+	bpy.types.INFO_MT_file_export.append(menu_func)
+
+def unregister():
+	bpy.types.unregister(LIExporter)
+	bpy.types.INFO_MT_file_export.remove(menu_func)
+
+if __name__ == "__main__":
+	register()
