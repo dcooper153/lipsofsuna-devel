@@ -86,6 +86,19 @@ static void Object_animate (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Recalculates the bounding box of the model of the object.
+ * -- @param self Object.
+ * function Object.calculate_bounds(self)
+ */
+static void Object_calculate_bounds (LIScrArgs* args)
+{
+	LIEngObject* self = args->self;
+
+	if (self->model != NULL)
+		lieng_model_calculate_bounds (self->model);
+}
+
+/* @luadoc
  * --- Finds an object by ID.
  * --
  * -- @param clss Object class.
@@ -611,6 +624,7 @@ void liscr_script_object (
 	liscr_class_inherit (self, liscr_script_data, data);
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
+	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
 	liscr_class_insert_cfunc (self, "find", Object_find);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
 	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);

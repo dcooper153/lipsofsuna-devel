@@ -68,7 +68,6 @@ liren_object_new (LIRenScene* scene,
 	self->scene = scene;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
-	limat_aabb_init (&self->aabb);
 
 	/* Choose unique ID. */
 	while (!id)
@@ -206,7 +205,13 @@ void
 liren_object_get_bounds (const LIRenObject* self,
                          LIMatAabb*         result)
 {
-	*result = limat_aabb_transform (self->aabb, &self->orientation.matrix);
+	LIMatAabb tmp;
+
+	if (self->model != NULL)
+		liren_model_get_bounds (self->model, &tmp);
+	else
+		limat_aabb_init (&tmp);
+	*result = limat_aabb_transform (tmp, &self->orientation.matrix);
 }
 
 /**
@@ -248,12 +253,6 @@ liren_object_set_model (LIRenObject* self,
 		self->instance = liren_model_new_instance (model);
 	else
 		self->instance = NULL;
-
-	/* Update bounds. */
-	if (model != NULL)
-		self->aabb = model->aabb;
-	else
-		limat_aabb_init (&self->aabb);
 
 	/* Replace lights and environment map. */
 	private_clear_lights (self);

@@ -103,8 +103,7 @@ lieng_model_new_copy (LIEngModel* model)
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-copy", lical_marshal_DATA_PTR_PTR, self, model);
 
-	/* Set model and shape. */
-	self->bounds = tmpmdl->bounds;
+	/* Set new model. */
 	self->model = tmpmdl;
 
 	return self;
@@ -131,6 +130,16 @@ lieng_model_free (LIEngModel* self)
 	lisys_free (self);
 }
 
+void lieng_model_calculate_bounds (
+	LIEngModel* self)
+{
+	if (self->model != NULL)
+	{
+		limdl_model_calculate_bounds (self->model);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "model-bounds", lical_marshal_DATA_PTR, self);
+	}
+}
+
 int
 lieng_model_load (LIEngModel* self)
 {
@@ -146,7 +155,6 @@ lieng_model_load (LIEngModel* self)
 
 	/* Invoke callbacks. */
 	lieng_model_unload (self);
-	self->bounds = tmpmdl->bounds;
 	self->model = tmpmdl;
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
 
@@ -177,7 +185,10 @@ void
 lieng_model_get_bounds (const LIEngModel* self,
                         LIMatAabb*        result)
 {
-	*result = self->bounds;
+	if (self->model != NULL)
+		*result = self->model->bounds;
+	else
+		limat_aabb_init (result);
 }
 
 /**
@@ -196,18 +207,20 @@ lieng_model_get_bounds_transform (const LIEngModel*     self,
 	LIMatVector v[7];
 	LIMatVector min;
 	LIMatVector max;
+	LIMatAabb bounds;
 
 	/* Initialize vertices. */
-	v[0] = limat_vector_init (self->bounds.min.x, self->bounds.min.y, self->bounds.max.z);
-	v[1] = limat_vector_init (self->bounds.min.x, self->bounds.max.y, self->bounds.min.z);
-	v[2] = limat_vector_init (self->bounds.min.x, self->bounds.max.y, self->bounds.max.z);
-	v[3] = limat_vector_init (self->bounds.max.x, self->bounds.min.y, self->bounds.min.z);
-	v[4] = limat_vector_init (self->bounds.max.x, self->bounds.min.y, self->bounds.max.z);
-	v[5] = limat_vector_init (self->bounds.max.x, self->bounds.max.y, self->bounds.min.z);
-	v[6] = limat_vector_init (self->bounds.max.x, self->bounds.max.y, self->bounds.max.z);
+	lieng_model_get_bounds (self, &bounds);
+	v[0] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.max.z);
+	v[1] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.min.z);
+	v[2] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.max.z);
+	v[3] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.min.z);
+	v[4] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.max.z);
+	v[5] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.min.z);
+	v[6] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.max.z);
 
 	/* Find minimum and maximum points. */
-	min = max = limat_transform_transform (*transform, self->bounds.min);
+	min = max = limat_transform_transform (*transform, bounds.min);
 	for (i = 0 ; i < 7 ; i++)
 	{
 		v[i] = limat_transform_transform (*transform, v[i]);

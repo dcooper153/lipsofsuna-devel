@@ -357,8 +357,8 @@ limdl_model_calculate_bounds (LIMdlModel* self)
 	int j;
 	LIMatVector v;
 
-	self->bounds.min = limat_vector_init (-2.0E10, -2.0E10, -2.0E10);
-	self->bounds.max = limat_vector_init (2.0E10, 2.0E10, 2.0E10);
+	self->bounds.min = limat_vector_init (2.0E10, 2.0E10, 2.0E10);
+	self->bounds.max = limat_vector_init (-2.0E10, -2.0E10, -2.0E10);
 	for (j = 0 ; j < self->vertices.count ; j++)
 	{
 		v = self->vertices.array[j].coord;

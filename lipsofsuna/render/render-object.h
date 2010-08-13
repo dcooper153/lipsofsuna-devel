@@ -41,7 +41,6 @@ struct _LIRenObject
 	int realized;
 	float sort;
 	void* userdata;
-	LIMatAabb aabb;
 	LIMatTransform transform;
 	LIMdlPose* pose;
 	LIRenScene* scene;

@@ -34,41 +34,43 @@ struct _LIEngModel
 {
 	char* name;
 	char* path;
-	LIMatAabb bounds;
 	LIEngEngine* engine;
 	LIMdlModel* model;
 	LIPhyShape* physics;
 };
 
-LIEngModel*
-lieng_model_new (LIEngEngine* engine,
-                 const char*  dir,
-                 const char*  name);
+LIAPICALL (LIEngModel*, lieng_model_new, (
+	LIEngEngine* engine,
+	const char*  dir,
+	const char*  name));
 
-LIEngModel*
-lieng_model_new_copy (LIEngModel* model);
+LIAPICALL (LIEngModel*, lieng_model_new_copy, (
+	LIEngModel* model));
 
-void
-lieng_model_free (LIEngModel* self);
+LIAPICALL (void, lieng_model_free, (
+	LIEngModel* self));
 
-int
-lieng_model_load (LIEngModel* self);
+LIAPICALL (void, lieng_model_calculate_bounds, (
+	LIEngModel* self));
 
-int
-lieng_model_merge (LIEngModel* self,
-                   LIEngModel* model);
+LIAPICALL (int, lieng_model_load, (
+	LIEngModel* self));
 
-void
-lieng_model_unload (LIEngModel* self);
+LIAPICALL (int, lieng_model_merge, (
+	LIEngModel* self,
+	LIEngModel* model));
 
-void
-lieng_model_get_bounds (const LIEngModel* self,
-                        LIMatAabb*        result);
+LIAPICALL (void, lieng_model_unload, (
+	LIEngModel* self));
 
-void
-lieng_model_get_bounds_transform (const LIEngModel*     self,
-                                  const LIMatTransform* transform,
-                                  LIMatAabb*            result);
+LIAPICALL (void, lieng_model_get_bounds, (
+	const LIEngModel* self,
+	LIMatAabb*        result));
+
+LIAPICALL (void, lieng_model_get_bounds_transform, (
+	const LIEngModel*     self,
+	const LIMatTransform* transform,
+	LIMatAabb*            result));
 
 #endif
 

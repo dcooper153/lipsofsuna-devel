@@ -37,7 +37,6 @@ struct _LIRenModel
 {
 	int added;
 	char* name;
-	LIMatAabb aabb;
 	LIMdlModel* model;
 	LIRenBuffer* vertices;
 	LIRenRender* render;

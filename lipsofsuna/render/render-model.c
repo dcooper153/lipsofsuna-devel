@@ -64,7 +64,6 @@ liren_model_new (LIRenRender* render,
 		return NULL;
 	self->render = render;
 	self->model = model;
-	self->aabb = model->bounds;
 
 	/* Set name. */
 	if (name != NULL)
@@ -177,7 +176,10 @@ void
 liren_model_get_bounds (LIRenModel* self,
                         LIMatAabb*  aabb)
 {
-	*aabb = self->aabb;
+	if (self->model != NULL)
+		*aabb = self->model->bounds;
+	else
+		limat_aabb_init (aabb);
 }
 
 /**
