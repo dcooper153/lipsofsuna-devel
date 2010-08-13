@@ -114,9 +114,6 @@ LIAPICALL (int, livox_manager_insert_voxel, (
 	const LIMatVector* point,
 	const LIVoxVoxel*  terrain));
 
-LIAPICALL (int, livox_manager_load_materials, (
-	LIVoxManager* self));
-
 LIAPICALL (void, livox_manager_mark_updates, (
 	LIVoxManager* self));
 
@@ -129,6 +126,10 @@ LIAPICALL (int, livox_manager_paste_voxels, (
 	int           ysize,
 	int           zsize,
 	LIVoxVoxel*   voxels));
+
+LIAPICALL (int, livox_manager_read_materials, (
+	LIVoxManager* self,
+	LIArcReader*  reader));
 
 LIAPICALL (void, livox_manager_reload_model, (
 	LIVoxManager* self,
@@ -168,7 +169,8 @@ LIAPICALL (int, livox_manager_write, (
 	LIVoxManager* self));
 
 LIAPICALL (int, livox_manager_write_materials, (
-	LIVoxManager* self));
+	LIVoxManager* self,
+	LIArcWriter*  writer));
 
 LIAPICALL (void, livox_manager_set_fill, (
 	LIVoxManager* self,

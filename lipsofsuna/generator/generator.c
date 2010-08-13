@@ -30,6 +30,9 @@
 static int
 private_init_brushes (LIGenGenerator* self);
 
+static int private_init_data (
+	LIGenGenerator* self);
+
 static int
 private_init_sql (LIGenGenerator* self);
 
@@ -95,7 +98,8 @@ ligen_generator_new (LIPthPaths*     paths,
 	self->fill = 1;
 
 	/* Load databases. */
-	if (!private_init_sql (self) ||
+	if (!private_init_data (self) ||
+	    !private_init_sql (self) ||
 	    !private_init_tables (self) ||
 	    !private_init_brushes (self))
 		goto error;
@@ -117,12 +121,22 @@ ligen_generator_free (LIGenGenerator* self)
 {
 	LIAlgU32dicIter iter;
 
+	/* Free brushes. */
 	if (self->brushes != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter, self->brushes)
 			ligen_brush_free (iter.value);
 		lialg_u32dic_free (self->brushes);
 	}
+
+	/* Free materials. */
+	if (self->brushes != NULL)
+	{
+		LIALG_U32DIC_FOREACH (iter, self->materials)
+			livox_material_free (iter.value);
+		lialg_u32dic_free (self->materials);
+	}
+
 	if (self->sql != NULL)
 		sqlite3_close (self->sql);
 	lisys_free (self->strokes.array);
@@ -224,6 +238,33 @@ ligen_generator_insert_brush (LIGenGenerator* self,
 }
 
 /**
+ * \brief Inserts or replaces a material.
+ *
+ * The ownership of the material is transfered to the generator upon success.
+ *
+ * \param self Generator.
+ * \param material Material.
+ * \return Nonzero on success.
+ */
+int ligen_generator_insert_material (
+	LIGenGenerator* self,
+	LIVoxMaterial*  material)
+{
+	LIVoxMaterial* tmp;
+
+	tmp = lialg_u32dic_find (self->materials, material->id);
+	if (tmp != NULL)
+	{
+		lialg_u32dic_remove (self->materials, material->id);
+		livox_material_free (tmp);
+	}
+	if (!lialg_u32dic_insert (self->materials, material->id, material))
+		return 0;
+
+	return 1;
+}
+
+/**
  * \brief Inserts a stroke to the generator.
  *
  * \param self Generator.
@@ -285,6 +326,26 @@ ligen_generator_remove_brush (LIGenGenerator* self,
 	/* Free brush. */
 	lialg_u32dic_remove (self->brushes, id);
 	ligen_brush_free (brush);
+}
+
+/**
+ * \brief Removes a material.
+ *
+ * \param self Generator.
+ * \param id Material ID.
+ */
+void ligen_generator_remove_material (
+	LIGenGenerator* self,
+	int             id)
+{
+	LIVoxMaterial* tmp;
+
+	tmp = lialg_u32dic_find (self->materials, id);
+	if (tmp != NULL)
+	{
+		lialg_u32dic_remove (self->materials, id);
+		livox_material_free (tmp);
+	}
 }
 
 /**
@@ -642,6 +703,30 @@ ligen_generator_write_brushes (LIGenGenerator* self)
 }
 
 /**
+ * \brief Writes the materials to a stream writer.
+ *
+ * \param self Generator.
+ * \param writer Stream writer.
+ * \return Nonzero on success.
+ */
+int ligen_generator_write_materials (
+	LIGenGenerator* self,
+	LIArcWriter*    writer)
+{
+	LIAlgU32dicIter iter;
+	LIVoxMaterial* material;
+
+	LIALG_U32DIC_FOREACH (iter, self->materials)
+	{
+		material = iter.value;
+		if (!livox_material_write (material, writer))
+			return 0;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Sets the material used for filling empty sectors.
  *
  * \param self Generator.
@@ -658,6 +743,18 @@ ligen_generator_set_fill (LIGenGenerator* self,
 }
 
 /*****************************************************************************/
+
+static int private_init_data (
+	LIGenGenerator* self)
+{
+	self->brushes = lialg_u32dic_new ();
+	if (self->brushes == NULL)
+		return 0;
+	self->materials = lialg_u32dic_new ();
+	if (self->materials == NULL)
+		return 0;
+	return 1;
+}
 
 static int
 private_init_brushes (LIGenGenerator* self)
@@ -679,11 +776,6 @@ private_init_brushes (LIGenGenerator* self)
 	sqlite3_stmt* statement;
 
 	sql = self->sql;
-
-	/* Allocate dictionary. */
-	self->brushes = lialg_u32dic_new ();
-	if (self->brushes == NULL)
-		return 0;
 
 	/* Prepare statement. */
 	query = "SELECT id,sizx,sizy,sizz,name,voxels FROM generator_brushes;";
@@ -1002,9 +1094,11 @@ static int private_save_terrain (
 	LIArcSql*       sql)
 {
 	int i;
+	LIAlgU32dicIter iter;
 	LIGenBrush* brush;
 	LIGenStroke* stroke;
 	LIVoxManager* voxels;
+	LIVoxMaterial* material;
 
 	/* Initialize voxel manager. */
 	voxels = livox_manager_new (self->callbacks, self->sectors);
@@ -1013,9 +1107,24 @@ static int private_save_terrain (
 	livox_manager_set_fill (voxels, self->fill);
 	livox_manager_set_load (voxels, 0);
 	livox_manager_configure (voxels, blocks_per_line, tiles_per_line);
-	livox_manager_set_sql (voxels, self->sql);
-	livox_manager_load_materials (voxels); // FIXME: Scripts should set these somehow.
 	livox_manager_set_sql (voxels, sql);
+
+	/* Set materials. */
+	LIALG_U32DIC_FOREACH (iter, self->materials)
+	{
+		material = livox_material_new_copy (iter.value);
+		if (material == NULL)
+		{
+			livox_manager_free (voxels);
+			return 0;
+		}
+		if (!livox_manager_insert_material (voxels, material))
+		{
+			livox_material_free (material);
+			livox_manager_free (voxels);
+			return 0;
+		}
+	}
 
 	/* Paint strokes. */
 	lialg_sectors_clear (self->sectors);

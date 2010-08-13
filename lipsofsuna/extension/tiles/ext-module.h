@@ -38,7 +38,6 @@ typedef struct _LIExtModule LIExtModule;
 
 struct _LIExtModule
 {
-	LIArcWriter* assign_packet;
 	LICalHandle calls[1];
 	LIMaiProgram* program;
 	LIVoxManager* voxels;
@@ -57,6 +56,10 @@ int liext_tiles_build_block (
 int liext_tiles_write (
 	LIExtModule* self,
 	LIArcSql*    sql);
+
+int liext_tiles_set_materials (
+	LIExtModule* self,
+	LIArcReader* reader);
 
 LIVoxManager* liext_tiles_get_voxels (
 	LIExtModule* self);

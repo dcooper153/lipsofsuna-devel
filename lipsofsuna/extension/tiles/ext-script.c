@@ -503,35 +503,19 @@ static void Voxel_get_materials (LIScrArgs* args)
 {
 	int type = 1;
 	LIExtModule* module;
-	LIScrData* data = NULL;
+	LIScrData* data;
 	LIScrPacket* packet;
 
-	/* Get or create packet. */
-	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
-	{
-		liscr_args_gets_int (args, "type", &type);
-		data = liscr_packet_new_writable (args->script, type);
-		if (data == NULL)
-			return;
-		packet = data->data;
-	}
-	else
-	{
-		packet = data->data;
-		if (packet->writer == NULL)
-			return;
-		liscr_data_ref (data, NULL);
-	}
+	/* Create packet. */
+	liscr_args_gets_int (args, "type", &type);
+	data = liscr_packet_new_writable (args->script, type);
+	if (data == NULL)
+		return;
+	packet = data->data;
 
 	/* Build packet. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	if (!liarc_writer_append_raw (packet->writer,
-	     liarc_writer_get_buffer (module->assign_packet) + 1,
-	     liarc_writer_get_length (module->assign_packet) - 1))
-	{
-		liscr_data_unref (data, NULL);
-		return;
-	}
+	livox_manager_write_materials (module->voxels, packet->writer);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data, NULL);
 }
@@ -707,45 +691,40 @@ static void Voxel_set_block (LIScrArgs* args)
  * --
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>packet: Packet reader.</li></li>
+ * --   <li>1,packet: Packet reader.</li></li>
  * -- @return True on success.
  * Voxel.set_materials(clss, args)
  */
 static void Voxel_set_materials (LIScrArgs* args)
 {
-	uint8_t skip;
+	LIArcReader* reader;
 	LIExtModule* module;
-	LIVoxMaterial* material;
 	LIScrData* data;
 	LIScrPacket* packet;
 
 	/* Get packet. */
-	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_PACKET, &data) &&
+	    !liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 		return;
 	packet = data->data;
-	if (!packet->reader)
-		return;
 
-	/* Skip type. */
-	if (!packet->reader->pos && !liarc_reader_get_uint8 (packet->reader, &skip))
-		return;
-
-	/* Clear old materials. */
+	/* Get reader. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	livox_manager_clear_materials (module->voxels);
+	if (packet->writer)
+	{
+		reader = liarc_reader_new (
+			liarc_writer_get_buffer (packet->writer),
+			liarc_writer_get_length (packet->writer));
+		if (reader == NULL)
+			return;
+	}
+	else
+		reader = packet->reader;
 
 	/* Read materials. */
-	while (!liarc_reader_check_end (packet->reader))
-	{
-		material = livox_material_new_from_stream (packet->reader);
-		if (material == NULL)
-			return;
-		if (!livox_manager_insert_material (module->voxels, material))
-			livox_material_free (material);
-	}
-
-	/* Indicate success. */
-	liscr_args_seti_bool (args, 1);
+	liscr_args_seti_bool (args, liext_tiles_set_materials (module, reader));
+	if (packet->writer)
+		liarc_reader_free (reader);
 }
 
 /* @luadoc

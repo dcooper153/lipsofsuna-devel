@@ -32,6 +32,140 @@
  */
 
 /* @luadoc
+ * --- Adds or replaces a material definition.
+ * --
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>flags: Flags.</li>
+ * --   <li>friction: Friction coefficient.</li>
+ * --   <li>diffuse0: Top surface diffuse color.</li>
+ * --   <li>diffuse1: Side surface diffuse color.</li>
+ * --   <li>id: ID number. (required)</li>
+ * --   <li>name: Name string.</li>
+ * --   <li>model: Model string.</li>
+ * --   <li>shader0: Top surface shader.</li>
+ * --   <li>shader1: Side surface shader.</li>
+ * --   <li>shininess0: Top surface shininess.</li>
+ * --   <li>shininess1: Side surface shininess.</li>
+ * --   <li>specular0: Top surface specular color.</li>
+ * --   <li>specular1: Side surface specular color.</li>
+ * --   <li>texture0: Table of top surface texture names.</li>
+ * --   <li>texture1: Table of side surface texture names.</li>
+ * --   <li>type: Material type ("height"/"tile")</li></ul>
+ * function Generator.add_material(clss, args)
+ */
+static void Generator_add_material (LIScrArgs* args)
+{
+	int i;
+	int id;
+	int flags = LIMDL_MATERIAL_FLAG_COLLISION | LIMDL_MATERIAL_FLAG_CULLFACE;
+	int texflags0 = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
+	int texflags1 = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
+	float friction = 1.0f;
+	float shininess0 = 1.0f;
+	float shininess1 = 1.0f;
+	float diffuse0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float diffuse1[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float specular0[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float specular1[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const char* type = "tile";
+	const char* name = "";
+	const char* model = NULL;
+	const char* shader0 = "default";
+	const char* shader1 = "default";
+	LIExtModule* module;
+	LIVoxMaterial* material;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_int (args, "id", &id) && id > 0)
+	{
+		liscr_args_gets_int (args, "flags", &flags);
+		liscr_args_gets_float (args, "friction", &friction);
+		liscr_args_gets_float (args, "shininess0", &shininess0);
+		liscr_args_gets_float (args, "shininess1", &shininess1);
+		liscr_args_gets_string (args, "type", &type);
+		liscr_args_gets_string (args, "name", &name);
+		liscr_args_gets_string (args, "model", &model);
+		liscr_args_gets_string (args, "shader0", &shader0);
+		liscr_args_gets_string (args, "shader1", &shader1);
+		liscr_args_gets_floatv (args, "diffuse0", 4, diffuse0);
+		liscr_args_gets_floatv (args, "diffuse1", 4, diffuse1);
+		liscr_args_gets_floatv (args, "specular0", 4, specular0);
+		liscr_args_gets_floatv (args, "specular1", 4, specular1);
+
+		/* Create the material. */
+		material = livox_material_new ();
+		if (material == NULL)
+			return;
+		material->id = id;
+		material->flags = flags;
+		material->friction = friction;
+		livox_material_set_name (material, name);
+		if (model != NULL)
+			livox_material_set_model (material, model);
+		if (!strcmp (type, "height"))
+			material->type = LIVOX_MATERIAL_TYPE_HEIGHT;
+		else
+			material->type = LIVOX_MATERIAL_TYPE_TILE;
+		material->mat_top.shininess = shininess0;
+		material->mat_side.shininess = shininess1;
+		memcpy (material->mat_top.diffuse, diffuse0, 4 * sizeof (float));
+		memcpy (material->mat_side.diffuse, diffuse1, 4 * sizeof (float));
+		memcpy (material->mat_top.specular, specular0, 4 * sizeof (float));
+		memcpy (material->mat_side.specular, specular1, 4 * sizeof (float));
+		limdl_material_set_shader (&material->mat_top, shader0);
+		limdl_material_set_shader (&material->mat_side, shader1);
+
+		/* Append top surface textures. */
+		if (liscr_args_gets_table (args, "texture0"))
+		{
+			for (i = 1 ; i > 0 ; i++)
+			{
+				lua_pushnumber (args->lua, i);
+				lua_gettable (args->lua, -2);
+				if (lua_type (args->lua, -1) == LUA_TSTRING)
+				{
+					limdl_material_append_texture (&material->mat_top,
+						LIMDL_TEXTURE_TYPE_IMAGE, texflags0, lua_tostring (args->lua, -1));
+				}
+				else
+					i = -1;
+				lua_pop (args->lua, 1);
+			}
+			lua_pop (args->lua, 1);
+		}
+
+		/* Append side surface textures. */
+		if (liscr_args_gets_table (args, "texture1"))
+		{
+			for (i = 1 ; i > 0 ; i++)
+			{
+				lua_pushnumber (args->lua, i);
+				lua_gettable (args->lua, -2);
+				if (lua_type (args->lua, -1) == LUA_TSTRING)
+				{
+					limdl_material_append_texture (&material->mat_side,
+						LIMDL_TEXTURE_TYPE_IMAGE, texflags1, lua_tostring (args->lua, -1));
+				}
+				else
+					i = -1;
+				lua_pop (args->lua, 1);
+			}
+			lua_pop (args->lua, 1);
+		}
+
+		/* Insert to the generator. */
+		ligen_generator_remove_material (module->generator, id);
+		if (!ligen_generator_insert_material (module->generator, material))
+		{
+			livox_material_free (material);
+			return;
+		}
+		liscr_args_seti_bool (args, 1);
+	}
+}
+
+/* @luadoc
  * --- Creates a brush object.
  * --
  * -- @param clss Generator class.
@@ -281,6 +415,36 @@ static void Generator_get_objects (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Gets the material configuration of the voxel system.
+ * --
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>type: Packet type.</li></ul>
+ * -- @return Packet writer.
+ * function Generator.get_materials(clss, args)
+ */
+static void Generator_get_materials (LIScrArgs* args)
+{
+	int type = 1;
+	LIExtModule* module;
+	LIScrData* data;
+	LIScrPacket* packet;
+
+	/* Create packet. */
+	liscr_args_gets_int (args, "type", &type);
+	data = liscr_packet_new_writable (args->script, type);
+	if (data == NULL)
+		return;
+	packet = data->data;
+
+	/* Build packet. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	ligen_generator_write_materials (module->generator, packet->writer);
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
+}
+
+/* @luadoc
  * --- Expands the map.
  * --
  * -- @param clss Generator class.
@@ -395,6 +559,24 @@ static void Generator_paste_voxels (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Removes a material definition.
+ * --
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>id: ID number. (required)</li></ul>
+ * function Generator.remove_material(clss, args)
+ */
+static void Generator_remove_material (LIScrArgs* args)
+{
+	int id;
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_int (args, "id", &id))
+		ligen_generator_remove_material (module->generator, id);
+}
+
+/* @luadoc
  * --- Saves the current world map.
  * --
  * -- @param clss Generator class.
@@ -453,6 +635,26 @@ static void Generator_getter_brushes (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * --- List of brush IDs.
+ * -- @name Generator.materials
+ * -- @class table
+ */
+static void Generator_getter_materials (LIScrArgs* args)
+{
+	LIAlgU32dicIter iter;
+	LIExtModule* module;
+	LIVoxMaterial* material;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	LIALG_U32DIC_FOREACH (iter, module->generator->materials)
+	{
+		material = iter.value;
+		liscr_args_seti_int (args, material->id);
+	}
+}
+
 /*****************************************************************************/
 
 void
@@ -460,17 +662,21 @@ liext_script_generator (LIScrClass* self,
                         void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
+	liscr_class_insert_cfunc (self, "add_material", Generator_add_material);
 	liscr_class_insert_cfunc (self, "create_object", Generator_create_object);
 	liscr_class_insert_cfunc (self, "delete_objects", Generator_delete_objects);
 	liscr_class_insert_cfunc (self, "disable_brush", Generator_disable_brush);
 	liscr_class_insert_cfunc (self, "enable_brush", Generator_enable_brush);
 	liscr_class_insert_cfunc (self, "expand", Generator_expand);
 	liscr_class_insert_cfunc (self, "format", Generator_format);
+	liscr_class_insert_cfunc (self, "get_materials", Generator_get_materials);
 	liscr_class_insert_cfunc (self, "get_objects", Generator_get_objects);
 	liscr_class_insert_cfunc (self, "paste_voxels", Generator_paste_voxels);
+	liscr_class_insert_cfunc (self, "remove_material", Generator_remove_material);
 	liscr_class_insert_cfunc (self, "save", Generator_save);
 	liscr_class_insert_cfunc (self, "save_brush", Generator_save_brush);
 	liscr_class_insert_cvar (self, "brushes", Generator_getter_brushes, NULL);
+	liscr_class_insert_cvar (self, "materials", Generator_getter_materials, NULL);
 }
 
 /** @} */

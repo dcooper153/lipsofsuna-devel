@@ -40,10 +40,8 @@ LIMaiExtensionInfo liext_tiles_info =
 LIExtModule* liext_tiles_new (
 	LIMaiProgram* program)
 {
-	LIAlgU32dicIter iter;
 	LIExtModule* self;
 	LISerServer* server;
-	LIVoxMaterial* material;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -66,31 +64,11 @@ LIExtModule* liext_tiles_new (
 		return NULL;
 	}
 
-	/* Load materials if server. */
-	/* FIXME: This shouldn't be hardcoded either. */
+	/* Set database for sector I/O if server. */
+	/* FIXME: Scripts should take care of loading and saving sectors. */
 	server = limai_program_find_component (program, "server");
 	if (server != NULL)
-	{
 		livox_manager_set_sql (self->voxels, server->sql);
-		livox_manager_load_materials (self->voxels);
-	}
-
-	/* Create assign packet. */
-	self->assign_packet = liarc_writer_new_packet (1);
-	if (self->assign_packet == NULL)
-	{
-		liext_tiles_free (self);
-		return NULL;
-	}
-	LIALG_U32DIC_FOREACH (iter, self->voxels->materials)
-	{
-		material = iter.value;
-		if (!livox_material_write (material, self->assign_packet))
-		{
-			liext_tiles_free (self);
-			return NULL;
-		}
-	}
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 0))
@@ -117,8 +95,6 @@ void liext_tiles_free (
 	/* Free resources. */
 	if (self->voxels != NULL)
 		livox_manager_free (self->voxels);
-	if (self->assign_packet != NULL)
-		liarc_writer_free (self->assign_packet);
 
 	lisys_free (self);
 }
@@ -145,6 +121,23 @@ LIVoxManager* liext_tiles_get_voxels (
 	LIExtModule* self)
 {
 	return self->voxels;
+}
+
+int liext_tiles_set_materials (
+	LIExtModule* self,
+	LIArcReader* reader)
+{
+	uint8_t skip;
+
+	/* Skip type. */
+	if (!reader->pos && !liarc_reader_get_uint8 (reader, &skip))
+		return 0;
+
+	/* Read materials. */
+	if (!livox_manager_read_materials (self->voxels, reader))
+		return 0;
+
+	return 1;
 }
 
 /*****************************************************************************/

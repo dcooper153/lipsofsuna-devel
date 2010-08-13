@@ -34,9 +34,6 @@ static void
 private_clear_materials (LIVoxManager* self);
 
 static int
-private_ensure_materials (LIVoxManager* self);
-
-static int
 private_ensure_sectors (LIVoxManager* self);
 
 static void
@@ -442,103 +439,6 @@ livox_manager_insert_voxel (LIVoxManager*      self,
 	return 0;
 }
 
-/**
- * \brief Loads materials from an SQL database.
- *
- * \brief Voxel manager.
- * \return Nonzero on success.
- */
-int
-livox_manager_load_materials (LIVoxManager* self)
-{
-	int id;
-	int col;
-	int fmt;
-	int ret;
-	int size;
-	const char* query;
-	const void* bytes;
-	LIArcReader* reader;
-	LIVoxMaterial* material;
-	sqlite3_stmt* statement;
-
-	if (self->sql == NULL)
-	{
-		lisys_error_set (EINVAL, "no database");
-		return 0;
-	}
-
-	/* Prepare statement. */
-	query = "SELECT id,fmt,data FROM voxel_materials;";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-
-	/* Read materials. */
-	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
-	{
-		/* Check for errors. */
-		if (ret != SQLITE_ROW)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (self->sql));
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Read id and format. */
-		col = 0;
-		id = sqlite3_column_int (statement, col++);
-		fmt = sqlite3_column_int (statement, col++);
-		if (fmt != LIVOX_MATERIAL_FORMAT)
-		{
-			lisys_error_set (EINVAL, "invalid voxel material format %d", fmt);
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Read binary blob. */
-		bytes = sqlite3_column_blob (statement, col);
-		size = sqlite3_column_bytes (statement, col);
-		reader = liarc_reader_new (bytes, size);
-		if (reader == NULL)
-		{
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Deserialize material. */
-		material = livox_material_new_from_stream (reader);
-		liarc_reader_free (reader);
-		if (material == NULL)
-		{
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Sanity checks. */
-		if (id != material->id)
-		{
-			lisys_error_set (EINVAL, "voxel material id mismatch");
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		lisys_assert (lialg_u32dic_find (self->materials, material->id) == NULL);
-
-		/* Add to material list. */
-		if (!lialg_u32dic_insert (self->materials, material->id, material))
-		{
-			livox_material_free (material);
-			sqlite3_finalize (statement);
-			return 0;
-		}
-	}
-	sqlite3_finalize (statement);
-
-	return 1;
-}
-
 void
 livox_manager_mark_updates (LIVoxManager* self)
 {
@@ -674,6 +574,35 @@ int livox_manager_paste_voxels (
 				0 <= dst[2] && dst[2] < self->tiles_per_line)
 				livox_sector_set_voxel (sector, dst[0], dst[1], dst[2], voxels[i]);
 		}
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Reads materials from a stream reader.
+ *
+ * \param self Voxel manager.
+ * \param reader Stream reader.
+ * \return Nonzero on success.
+ */
+int livox_manager_read_materials (
+	LIVoxManager* self,
+	LIArcReader*  reader)
+{
+	LIVoxMaterial* material;
+
+	/* Clear old materials. */
+	livox_manager_clear_materials (self);
+
+	/* Read materials. */
+	while (!liarc_reader_check_end (reader))
+	{
+		material = livox_material_new_from_stream (reader);
+		if (material == NULL)
+			return 0;
+		if (!livox_manager_insert_material (self, material))
+			livox_material_free (material);
 	}
 
 	return 1;
@@ -911,57 +840,28 @@ livox_manager_write (LIVoxManager* self)
 			return 0;
 	}
 
-	return livox_manager_write_materials (self);
+	return 1;
 }
 
 /**
- * \brief Writes the materials to the database.
+ * \brief Writes the materials to a stream writer.
  *
  * \param self Voxel manager.
+ * \param writer Stream writer.
  * \return Nonzero on success.
  */
-int
-livox_manager_write_materials (LIVoxManager* self)
+int livox_manager_write_materials (
+	LIVoxManager* self,
+	LIArcWriter*  writer)
 {
 	LIAlgU32dicIter iter;
-	LIArcWriter* writer;
 	LIVoxMaterial* material;
 
-	if (self->sql == NULL)
-	{
-		lisys_error_set (EINVAL, "no database");
-		return 0;
-	}
-
-	/* Remove old materials. */
-	if (!liarc_sql_drop (self->sql, "voxel_materials") ||
-	    !private_ensure_materials (self))
-		return 0;
-
-	/* Save materials. */
 	LIALG_U32DIC_FOREACH (iter, self->materials)
 	{
-		/* Serialize material. */
 		material = iter.value;
-		writer = liarc_writer_new ();
-		if (writer == NULL)
+		if (!livox_material_write (material, writer))
 			return 0;
-		if (!livox_material_write (iter.value, writer))
-		{
-			liarc_writer_free (writer);
-			return 0;
-		}
-
-		/* Write to database. */
-		if (!liarc_sql_insert (self->sql, "voxel_materials",
-			"id", LIARC_SQL_INT, material->id,
-			"fmt", LIARC_SQL_INT, LIVOX_MATERIAL_FORMAT,
-			"data", LIARC_SQL_BLOB, liarc_writer_get_buffer (writer), liarc_writer_get_length (writer), NULL))
-		{
-			liarc_writer_free (writer);
-			return 0;
-		}
-		liarc_writer_free (writer);
 	}
 
 	return 1;
@@ -1066,20 +966,6 @@ private_clear_materials (LIVoxManager* self)
 		livox_material_free (material);
 	}
 	lialg_u32dic_clear (self->materials);
-}
-
-static int
-private_ensure_materials (LIVoxManager* self)
-{
-	const char* query;
-
-	/* Create material table. */
-	query = "CREATE TABLE IF NOT EXISTS voxel_materials "
-		"(id INTEGER PRIMARY KEY,fmt INTEGER,data BLOB);";
-	if (!liarc_sql_query (self->sql, query))
-		return 0;
-
-	return 1;
 }
 
 static int
