@@ -10,7 +10,7 @@ srcdir = '.'
 blddir = 'build'
 
 CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video voxel widget'
-EXTS_DIRS = 'binding camera chat database effect generator network npc object-physics object-render physics packager region reload skeleton sound speech tiles tiles-physics tiles-render widgets'
+EXTS_DIRS = 'binding camera database effect generator network npc object-physics object-render physics packager region reload skeleton sound speech tiles tiles-physics tiles-render widgets'
 CORE_EXCL = 'lipsofsuna/math/unittest.c lipsofsuna/server/server-main.c lipsofsuna/main/main.c'
 
 def set_options(ctx):
