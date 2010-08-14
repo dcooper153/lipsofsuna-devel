@@ -53,7 +53,15 @@ LIExtModule* liext_speeches_new (
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
+
+	/* Make sure the widgets extension is loaded. */
+	if (!limai_program_insert_extension (program, "widgets"))
+	{
+		lisys_free (self);
+		return NULL;
+	}
 	self->client = limai_program_find_component (program, "client");
+	self->widgets = limai_program_find_component (program, "widgets");
 	self->video = &self->client->video;
 
 	/* Allocate objects. */
@@ -136,7 +144,7 @@ int liext_speeches_set_speech (
 	}
 
 	/* Allocate new speech. */
-	speech = liext_speech_new (self->client, message);
+	speech = liext_speech_new (self, message);
 	if (speech == NULL)
 	{
 		if (create)

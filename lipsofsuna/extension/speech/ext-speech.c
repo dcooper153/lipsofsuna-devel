@@ -27,9 +27,9 @@
 #include "ext-module.h"
 #include "ext-speech.h"
 
-LIExtSpeech*
-liext_speech_new (LICliClient* client,
-                  const char*  text)
+LIExtSpeech* liext_speech_new (
+	LIExtModule* module,
+	const char*  text)
 {
 	LIExtSpeech* self;
 	LIFntFont* font;
@@ -46,7 +46,7 @@ liext_speech_new (LICliClient* client,
 		return NULL;
 	}
 	lifnt_layout_set_width_limit (self->text, 150);
-	font = liwdg_manager_find_font (client->widgets, "default");
+	font = liwdg_manager_find_font (module->widgets, "default");
 	if (font != NULL)
 		lifnt_layout_append_string (self->text, font, text);
 

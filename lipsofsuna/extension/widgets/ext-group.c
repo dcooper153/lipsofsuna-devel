@@ -16,18 +16,18 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup LIExtWidgets Widgets
  * @{
  */
 
-#include <lipsofsuna/client.h>
+#include "ext-module.h"
 
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Client.Group"
+ * module "Extension.Widgets"
  * --- Pack widgets in a grid.
  * -- @name Group
  * -- @class table
@@ -53,7 +53,7 @@ static void Group_append_col (LIScrArgs* args)
 		return;
 
 	/* Append rows. */
-	for (i = 0 ; i < h && liscr_args_geti_data (args, i, LICLI_SCRIPT_WIDGET, &data) ; i++)
+	for (i = 0 ; i < h && liscr_args_geti_data (args, i, LIEXT_SCRIPT_WIDGET, &data) ; i++)
 	{
 		liwdg_widget_detach (data->data);
 		liwdg_group_set_child (args->self, w, i, data->data);
@@ -80,7 +80,7 @@ static void Group_append_row (LIScrArgs* args)
 		return;
 
 	/* Append columns. */
-	for (i = 0 ; i < w && liscr_args_geti_data (args, i, LICLI_SCRIPT_WIDGET, &data) ; i++)
+	for (i = 0 ; i < w && liscr_args_geti_data (args, i, LIEXT_SCRIPT_WIDGET, &data) ; i++)
 	{
 		liwdg_widget_detach (data->data);
 		liwdg_group_set_child (args->self, i, h, data->data);
@@ -104,10 +104,10 @@ Group_insert_col (lua_State* lua)
 	LIScrData* self;
 	LIScrData* widget;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_GROUP);
 	col = luaL_checkint (lua, 2) - 1;
 	if (!lua_isnoneornil (lua, 3))
-		widget = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
+		widget = liscr_checkdata (lua, 3, LIEXT_SCRIPT_WIDGET);
 	else
 		widget = NULL;
 	liwdg_group_get_size (self->data, &w, &h);
@@ -154,10 +154,10 @@ Group_insert_row (lua_State* lua)
 	LIScrData* self;
 	LIScrData* widget;
 
-	self = liscr_checkdata (lua, 1, LICLI_SCRIPT_GROUP);
+	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_GROUP);
 	row = luaL_checkint (lua, 2) - 1;
 	if (!lua_isnoneornil (lua, 3))
-		widget = liscr_checkdata (lua, 3, LICLI_SCRIPT_WIDGET);
+		widget = liscr_checkdata (lua, 3, LIEXT_SCRIPT_WIDGET);
 	else
 		widget = NULL;
 	liwdg_group_get_size (self->data, &w, &h);
@@ -197,24 +197,25 @@ Group_insert_row (lua_State* lua)
  */
 static void Group_new (LIScrArgs* args)
 {
-	LICliClient* client;
+	LIExtModule* module;
 	LIScrData* data;
 	LIWdgWidget* self;
 
 	/* Allocate userdata. */
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_GROUP);
-	self = liwdg_group_new (client->widgets);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GROUP);
+	self = liwdg_group_new (module->widgets);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_GROUP, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_GROUP, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
 		return;
 	}
 	liwdg_widget_set_userdata (self, data);
+	liwdg_widget_insert_callback (self, "paint", liext_widgets_callback_paint, data);
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 }
@@ -292,7 +293,7 @@ static void Group_set_child (LIScrArgs* args)
 	if (!liscr_args_gets_int (args, "col", &x) ||
 	    !liscr_args_gets_int (args, "row", &y))
 		return;
-	liscr_args_gets_data (args, "widget", LICLI_SCRIPT_WIDGET, &data);
+	liscr_args_gets_data (args, "widget", LIEXT_SCRIPT_WIDGET, &data);
 	liwdg_group_get_size (args->self, &w, &h);
 	if (x < 1 || x > w || y < 1 || y > h)
 		return;
@@ -440,13 +441,13 @@ static void Group_setter_spacings (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-licli_script_group (LIScrClass* self,
-                    void*       data)
+void liext_script_group (
+	LIScrClass* self,
+	void*       data)
 {
-	liscr_class_inherit (self, licli_script_widget, data);
-	liscr_class_set_userdata (self, LICLI_SCRIPT_GROUP, data);
-	liscr_class_insert_interface (self, LICLI_SCRIPT_GROUP);
+	liscr_class_inherit (self, liext_script_widget, data);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_GROUP, data);
+	liscr_class_insert_interface (self, LIEXT_SCRIPT_GROUP);
 	liscr_class_insert_mfunc (self, "append_col", Group_append_col);
 	liscr_class_insert_mfunc (self, "append_row", Group_append_row);
 	liscr_class_insert_func (self, "insert_col", Group_insert_col);

@@ -34,42 +34,6 @@
  */
 
 /* @luadoc
- * --- Cycles widget focus.
- * --
- * -- @param clss Client class.
- * -- @param args Arguments.<ul>
- * --   <li>backward: True if should cycle backward.</li></ul>
- * function Client.cycle_focus(clss, args)
- */
-static void Client_cycle_focus (LIScrArgs* args)
-{
-	int prev = 0;
-	LICliClient* client;
-
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	liscr_args_gets_bool (args, "backward", &prev);
-	liwdg_manager_cycle_focus (client->widgets, !prev);
-}
-
-/* @luadoc
- * --- Cycles window focus.
- * --
- * -- @param clss Client class.
- * -- @param args Arguments.<ul>
- * --   <li>backward: True if should cycle backward.</li></ul>
- * function Client.cycle_focus(clss, args)
- */
-static void Client_cycle_window_focus (LIScrArgs* args)
-{
-	int prev = 0;
-	LICliClient* client;
-
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	liscr_args_gets_bool (args, "backward", &prev);
-	liwdg_manager_cycle_window_focus (client->widgets, !prev);
-}
-
-/* @luadoc
  * --- Launches a server.
  * --
  * -- @param clss Client class.
@@ -109,7 +73,7 @@ static void Client_getter_cursor_pos (LIScrArgs* args)
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	client->video.SDL_GetMouseState (&x, &y);
-	tmp = limat_vector_init (x, client->widgets->height - y - 1, 0.0f);
+	tmp = limat_vector_init (x, client->window->mode.height - y - 1, 0.0f);
 	liscr_args_seti_vector (args, &tmp);
 }
 
@@ -175,8 +139,6 @@ licli_script_client (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
-	liscr_class_insert_cfunc (self, "cycle_focus", Client_cycle_focus);
-	liscr_class_insert_cfunc (self, "cycle_window_focus", Client_cycle_window_focus);
 	liscr_class_insert_cfunc (self, "host", Client_host);
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
 	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);

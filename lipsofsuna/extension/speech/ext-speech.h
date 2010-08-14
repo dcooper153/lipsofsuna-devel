@@ -39,12 +39,12 @@ struct _LIExtSpeech
 	LIFntLayout* text;
 };
 
-LIExtSpeech*
-liext_speech_new (LICliClient* client,
-                  const char*  text);
+LIExtSpeech* liext_speech_new (
+	LIExtModule* module,
+	const char*  text);
 
-void
-liext_speech_free (LIExtSpeech* self);
+void liext_speech_free (
+	LIExtSpeech* self);
 
 #endif
 

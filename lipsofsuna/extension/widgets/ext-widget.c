@@ -16,16 +16,16 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup LIExtWidgets Widgets
  * @{
  */
 
-#include <lipsofsuna/client.h>
+#include "ext-module.h"
 
 /* @luadoc
- * module "Core.Client.Widget"
+ * module "Extension.Widgets"
  * --- Manipulate widgets.
  * -- @name Widget
  * -- @class table
@@ -256,12 +256,12 @@ static void Widget_getter_y (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-licli_script_widget (LIScrClass* self,
-                     void*       data)
+void liext_script_widget (
+	LIScrClass* self,
+	void*       data)
 {
-	liscr_class_set_userdata (self, LICLI_SCRIPT_WIDGET, data);
-	liscr_class_insert_interface (self, LICLI_SCRIPT_WIDGET);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGET, data);
+	liscr_class_insert_interface (self, LIEXT_SCRIPT_WIDGET);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
 	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);
 	liscr_class_insert_mvar (self, "behind", Widget_getter_behind, Widget_setter_behind);

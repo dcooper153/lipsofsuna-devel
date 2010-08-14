@@ -80,6 +80,9 @@ LIAPICALL (void, liwdg_container_foreach_child, (
 	void          (*call)(),
 	void*           data));
 
+LIAPICALL (void, liwdg_container_paint_children, (
+	LIWdgContainer* self));
+
 LIAPICALL (void, liwdg_container_translate_coords, (
 	LIWdgContainer* self,
 	int             containerx,

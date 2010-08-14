@@ -105,6 +105,9 @@ LIAPICALL (void, liwdg_widget_paint, (
 	LIWdgWidget* self,
 	LIWdgRect*   rect));
 
+LIAPICALL (void, liwdg_widget_paint_custom, (
+	LIWdgWidget* self));
+
 LIAPICALL (void, liwdg_widget_translate_coords, (
 	LIWdgWidget* self,
 	int          screenx,

@@ -203,6 +203,16 @@ liwdg_widget_paint (LIWdgWidget* self,
 }
 
 /**
+ * \brief Calls the custom paint method of the widget.
+ * \param self Widget.
+ */
+void liwdg_widget_paint_custom (
+	LIWdgWidget* self)
+{
+	lical_callbacks_call (self->manager->callbacks, self, "paint", lical_marshal_DATA_PTR, self);
+}
+
+/**
  * \brief Translates coordinates from screen space to widget space.
  *
  * Coordinate translation is needed when widgets are inside a scrollable viewport.

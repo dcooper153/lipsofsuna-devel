@@ -70,7 +70,6 @@ struct _LICliClient
 	LIRenScene* scene;
 	LISerServer* server;
 	LIThrThread* server_thread;
-	LIWdgManager* widgets;
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (

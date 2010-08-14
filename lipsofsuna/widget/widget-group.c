@@ -805,9 +805,6 @@ static int
 private_event (LIWdgGroup* self,
                LIWdgEvent* event)
 {
-	int i;
-	LIWdgWidget* child;
-
 	/* Container interface. */
 	if (event->type == LIWDG_EVENT_TYPE_PROBE &&
 	    event->probe.clss == liwdg_widget_container ())
@@ -830,23 +827,6 @@ private_event (LIWdgGroup* self,
 		case LIWDG_EVENT_TYPE_ALLOCATION:
 			private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 			return 0;
-		case LIWDG_EVENT_TYPE_RENDER:
-			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
-			for (i = 0 ; i < self->width * self->height ; i++)
-			{
-				child = self->cells[i].child;
-				if (child != NULL)
-					liwdg_widget_draw (child);
-			}
-			return 1;
-		case LIWDG_EVENT_TYPE_UPDATE:
-			for (i = 0 ; i < self->width * self->height ; i++)
-			{
-				child = self->cells[i].child;
-				if (child != NULL)
-					liwdg_widget_update (child, event->update.secs);
-			}
-			return 1;
 	}
 
 	return liwdg_widget_container ()->event (LIWDG_WIDGET (self), event);

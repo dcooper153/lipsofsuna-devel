@@ -48,9 +48,6 @@ private_init_render (LICliClient* self);
 static int
 private_init_script (LICliClient* self);
 
-static int
-private_init_widgets (LICliClient* self);
-
 static void
 private_server_main (LIThrThread* thread,
                      void*        data);
@@ -149,11 +146,6 @@ void licli_client_free_module (
 		self->script = NULL;
 	}
 
-	if (self->widgets != NULL)
-	{
-		liwdg_manager_free (self->widgets);
-		self->widgets = NULL;
-	}
 	if (self->server_thread != NULL)
 	{
 		limai_program_shutdown (self->server->program);
@@ -258,11 +250,9 @@ int licli_client_load_module (
 		return 0;
 	}
 	if (!private_init_render (self) ||
-	    !private_init_widgets (self) ||
 	    !private_init_camera (self) ||
 	    !private_init_script (self) ||
-	    !licli_client_init_callbacks_misc (self) ||
-	    !licli_client_init_callbacks_widget (self))
+	    !licli_client_init_callbacks_misc (self))
 	{
 		licli_client_free_module (self);
 		return 0;
@@ -382,28 +372,14 @@ private_init_script (LICliClient* self)
 	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
 	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
-	    !liscr_script_create_class (self->script, "Group", licli_script_group, self) ||
 	    !liscr_script_create_class (self->script, "Light", licli_script_light, self) ||
 	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
 	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
 	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self->program) ||
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
-	    !liscr_script_create_class (self->script, "Scene", licli_script_scene, self) ||
-	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script) ||
-	    !liscr_script_create_class (self->script, "Widget", licli_script_widget, self))
+	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
 		return 0;
-
-	return 1;
-}
-
-static int
-private_init_widgets (LICliClient* self)
-{
-	self->widgets = liwdg_manager_new (&self->video, self->callbacks, self->path);
-	if (self->widgets == NULL)
-		return 0;
-	liwdg_manager_set_size (self->widgets, self->window->mode.width, self->window->mode.height);
 
 	return 1;
 }
@@ -444,20 +420,11 @@ static int private_update (
 	LICliClient* self,
 	float        secs)
 {
-	int w;
-	int h;
 	SDL_Event event;
 
 	/* Invoke input callbacks. */
 	while (self->video.SDL_PollEvent (&event))
 		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
-
-	/* Render widgets. */
-	licli_window_get_size (self->window, &w, &h);
-	liwdg_manager_set_size (self->widgets, w, h);
-	lialg_camera_set_viewport (self->camera, 0, 0, w, h);
-	liwdg_manager_render (self->widgets);
-	self->video.SDL_GL_SwapBuffers ();
 
 	return 1;
 }

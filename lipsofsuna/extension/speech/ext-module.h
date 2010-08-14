@@ -36,10 +36,11 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LICliClient* client;
 	LIAlgU32dic* objects;
 	LICalHandle calls[2];
+	LICliClient* client;
 	LIVidCalls* video;
+	LIWdgManager* widgets;
 };
 
 LIExtModule* liext_speeches_new (

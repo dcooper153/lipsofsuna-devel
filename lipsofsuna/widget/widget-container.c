@@ -35,6 +35,14 @@ static int
 private_event (LIWdgContainer* self,
                LIWdgEvent*     event);
 
+static void private_paint_child (
+	LIWdgEvent*  event,
+	LIWdgWidget* child);
+
+static void private_update_child (
+	LIWdgEvent*  event,
+	LIWdgWidget* child);
+
 /*****************************************************************************/
 
 const LIWdgClass*
@@ -195,6 +203,20 @@ liwdg_container_foreach_child (LIWdgContainer* self,
 }
 
 /**
+ * \brief Draws the children of the widget.
+ * \param self Widget.
+ */
+void liwdg_container_paint_children (
+	LIWdgContainer* self)
+{
+	LIWdgEvent event;
+
+	memset (&event, 0, sizeof (LIWdgEvent));
+	event.type = LIWDG_EVENT_TYPE_RENDER;
+	liwdg_container_foreach_child (self, private_paint_child, &event);
+}
+
+/**
  * \brief Translates coordinates from container widget space to child widget space.
  *
  * Coordinate translation is needed when widgets are inside a scrollable viewport.
@@ -285,6 +307,14 @@ private_event (LIWdgContainer* self,
 			x = event->motion.x;
 			y = event->motion.y;
 			break;
+		case LIWDG_EVENT_TYPE_RENDER:
+			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
+			liwdg_widget_paint_custom (LIWDG_WIDGET (self));
+			liwdg_container_paint_children (LIWDG_CONTAINER (self));
+			return 1;
+		case LIWDG_EVENT_TYPE_UPDATE:
+			liwdg_container_foreach_child (self, private_update_child, event);
+			return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 		default:
 			return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 	}
@@ -317,6 +347,21 @@ private_event (LIWdgContainer* self,
 	}
 
 	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
+}
+
+static void private_paint_child (
+	LIWdgEvent*  event,
+	LIWdgWidget* child)
+{
+	if (child->visible)
+		liwdg_widget_event (child, event);
+}
+
+static void private_update_child (
+	LIWdgEvent*  event,
+	LIWdgWidget* child)
+{
+	liwdg_widget_event (child, event);
 }
 
 /** @} */

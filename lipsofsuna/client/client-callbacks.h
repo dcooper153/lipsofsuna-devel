@@ -29,7 +29,6 @@
 #include "client-types.h"
 
 int licli_client_init_callbacks_misc (LICliClient* self);
-int licli_client_init_callbacks_widget (LICliClient* self);
 
 #endif
 

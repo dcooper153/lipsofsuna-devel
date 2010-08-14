@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliWidgets Widgets 
+ * \addtogroup LIExtWidgets Widgets
  * @{
  */
 
@@ -33,25 +31,35 @@
 
 #define LIEXT_SCRIPT_BUTTON "Button"
 #define LIEXT_SCRIPT_ENTRY "Entry"
+#define LIEXT_SCRIPT_GROUP "Group"
 #define LIEXT_SCRIPT_IMAGE "Image"
 #define LIEXT_SCRIPT_LABEL "Label"
 #define LIEXT_SCRIPT_MENU "Menu"
+#define LIEXT_SCRIPT_SCENE "Scene"
 #define LIEXT_SCRIPT_SCROLL "Scroll"
 #define LIEXT_SCRIPT_SPIN "Spin"
 #define LIEXT_SCRIPT_TREE "Tree"
 #define LIEXT_SCRIPT_VIEW "View"
+#define LIEXT_SCRIPT_WIDGET "Widget"
+#define LIEXT_SCRIPT_WIDGETS "Widgets"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
+	LICalHandle calls[5];
 	LICliClient* client;
+	LIMaiProgram* program;
+	LIWdgManager* widgets;
 };
 
-LIExtModule*
-liext_widgets_new (LIMaiProgram* program);
+LIExtModule* liext_widgets_new (
+	LIMaiProgram* program);
 
-void
-liext_widgets_free (LIExtModule* self);
+void liext_widgets_free (
+	LIExtModule* self);
+
+void liext_widgets_callback_paint (
+	LIScrData* data);
 
 /*****************************************************************************/
 
@@ -62,6 +70,10 @@ liext_script_button (LIScrClass* self,
 void
 liext_script_entry (LIScrClass* self,
                   void*       data);
+
+void liext_script_group (
+	LIScrClass* self,
+	void*       data);
 
 void
 liext_script_image (LIScrClass* self,
@@ -74,6 +86,10 @@ liext_script_label (LIScrClass* self,
 void
 liext_script_menu (LIScrClass* self,
                  void*       data);
+
+void liext_script_scene (
+	LIScrClass* self,
+	void*       data);
 
 void
 liext_script_scroll (LIScrClass* self,
@@ -91,8 +107,15 @@ void
 liext_script_view (LIScrClass* self,
                  void*       data);
 
+void liext_script_widget (
+	LIScrClass* self,
+	void*       data);
+
+void liext_script_widgets (
+	LIScrClass* self,
+	void*       data);
+
 #endif
 
-/** @} */
 /** @} */
 /** @} */
