@@ -36,7 +36,6 @@ struct _LIExtReload
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIRelReload* reload;
-	LIWdgWidget* progress;
 };
 
 LIExtReload* liext_reload_new (
