@@ -27,10 +27,6 @@
 #include "ext-module.h"
 #include "ext-speech.h"
 
-static int private_render_2d (
-	LIExtModule* self,
-	LIWdgRender* widget);
-
 static int private_tick (
 	LIExtModule* self,
 	float        secs);
@@ -73,8 +69,7 @@ LIExtModule* liext_speeches_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "render-2d", 1, private_render_2d, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 0))
 	{
 		liext_speeches_free (self);
 		return NULL;
@@ -103,6 +98,66 @@ void liext_speeches_free (
 	}
 
 	lisys_free (self);
+}
+
+void liext_speeches_render (
+	LIExtModule* self)
+{
+	int width;
+	GLint viewport[4];
+	LIAlgU32dicIter iter;
+	LIAlgList* ptr;
+	LIExtObject* object;
+	LIExtSpeech* speech;
+	LIMatVector win;
+
+	/* Set 2D mode. */
+	glGetIntegerv (GL_VIEWPORT, viewport);
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix ();
+	glLoadIdentity();
+	glOrtho (0, viewport[2], 0, viewport[3], -100.0f, 100.0f);
+	glMatrixMode (GL_MODELVIEW);
+	glPushMatrix ();
+	glLoadIdentity ();
+
+	self->video->glEnable (GL_TEXTURE_2D);
+	self->video->glEnable (GL_BLEND);
+	self->video->glDisable (GL_CULL_FACE);
+	self->video->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+	{
+		object = iter.value;
+
+		/* Project start offset. */
+		if (!lialg_camera_project (self->client->camera, &object->position, &win))
+			continue;
+		if (win.z < 0.0f)
+			continue;
+		win.y -= 5;
+
+		/* Render all messages. */
+		for (ptr = object->speech ; ptr != NULL ; ptr = ptr->next)
+		{
+			speech = ptr->data;
+			win.y += lifnt_layout_get_height (speech->text);
+			width = lifnt_layout_get_width (speech->text) / 2;
+			self->video->glPushMatrix ();
+			self->video->glTranslatef (win.x - width, win.y, 0.0f);
+			self->video->glScalef (1.0f, -1.0f, 1.0f);
+			self->video->glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
+			lifnt_layout_render (speech->text, 1, -1);
+			self->video->glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
+			lifnt_layout_render (speech->text, 0, 0);
+			self->video->glPopMatrix ();
+		}
+	}
+
+	 /* Reset mode. */
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix ();
+	glMatrixMode (GL_MODELVIEW);
+	glPopMatrix ();
 }
 
 /**
@@ -187,52 +242,6 @@ void liext_speech_object_free (
 }
 
 /*****************************************************************************/
-
-static int private_render_2d (
-	LIExtModule* self,
-	LIWdgRender* widget)
-{
-	int width;
-	LIAlgU32dicIter iter;
-	LIAlgList* ptr;
-	LIExtObject* object;
-	LIExtSpeech* speech;
-	LIMatVector win;
-
-	self->video->glEnable (GL_TEXTURE_2D);
-	self->video->glEnable (GL_BLEND);
-	self->video->glDisable (GL_CULL_FACE);
-	self->video->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-
-		/* Project start offset. */
-		if (!lialg_camera_project (self->client->camera, &object->position, &win))
-			continue;
-		if (win.z < 0.0f)
-			continue;
-		win.y -= 5;
-
-		/* Render all messages. */
-		for (ptr = object->speech ; ptr != NULL ; ptr = ptr->next)
-		{
-			speech = ptr->data;
-			win.y += lifnt_layout_get_height (speech->text);
-			width = lifnt_layout_get_width (speech->text) / 2;
-			self->video->glPushMatrix ();
-			self->video->glTranslatef (win.x - width, win.y, 0.0f);
-			self->video->glScalef (1.0f, -1.0f, 1.0f);
-			self->video->glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
-			lifnt_layout_render (speech->text, 1, -1);
-			self->video->glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
-			lifnt_layout_render (speech->text, 0, 0);
-			self->video->glPopMatrix ();
-		}
-	}
-
-	return 1;
-}
 
 static int private_tick (
 	LIExtModule* self,

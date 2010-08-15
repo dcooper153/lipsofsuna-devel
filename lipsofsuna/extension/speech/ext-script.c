@@ -60,6 +60,20 @@ static void Speech_add (LIScrArgs* args)
 	liext_speeches_set_speech (module, id, msg);
 }
 
+/* @luadoc
+ * --- Draws the speech texts to the framebuffer.
+ * --
+ * -- @param self Speech class.
+ * function Speech.draw(self)
+ */
+static void Speech_draw (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
+	liext_speeches_render (module);
+}
+
 /*****************************************************************************/
 
 void
@@ -68,6 +82,7 @@ liext_script_speech (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);
 	liscr_class_insert_cfunc (self, "add", Speech_add);
+	liscr_class_insert_cfunc (self, "draw", Speech_draw);
 }
 
 /** @} */

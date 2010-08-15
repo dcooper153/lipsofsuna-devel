@@ -37,7 +37,7 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LIAlgU32dic* objects;
-	LICalHandle calls[2];
+	LICalHandle calls[1];
 	LICliClient* client;
 	LIVidCalls* video;
 	LIWdgManager* widgets;
@@ -47,6 +47,9 @@ LIExtModule* liext_speeches_new (
 	LIMaiProgram* program);
 
 void liext_speeches_free (
+	LIExtModule* self);
+
+void liext_speeches_render (
 	LIExtModule* self);
 
 int liext_speeches_set_speech (

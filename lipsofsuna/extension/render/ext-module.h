@@ -15,29 +15,42 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_WIDGET_H__
-#define __LIPS_WIDGET_H__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtRender Render
+ * @{
+ */
 
-#include "widget/widget.h"
-#include "widget/widget-button.h"
-#include "widget/widget-busy.h"
-#include "widget/widget-check.h"
-#include "widget/widget-class.h"
-#include "widget/widget-container.h"
-#include "widget/widget-entry.h"
-#include "widget/widget-event.h"
-#include "widget/widget-group.h"
-#include "widget/widget-image.h"
-#include "widget/widget-label.h"
-#include "widget/widget-manager.h"
-#include "widget/widget-menu.h"
-#include "widget/widget-progress.h"
-#include "widget/widget-scroll.h"
-#include "widget/widget-spin.h"
-#include "widget/widget-style.h"
-#include "widget/widget-tabs.h"
-#include "widget/widget-tree.h"
-#include "widget/widget-types.h"
-#include "widget/widget-view.h"
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
+
+#include <lipsofsuna/client.h>
+#include <lipsofsuna/extension.h>
+
+#define LIEXT_SCRIPT_SCENE "Scene"
+
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
+{
+	LICliClient* client;
+	LIMaiProgram* program;
+	LIRenDeferred* deferred;
+};
+
+LIExtModule* liext_render_new (
+	LIMaiProgram* program);
+
+void liext_render_free (
+	LIExtModule* self);
+
+/*****************************************************************************/
+
+void liext_script_scene (
+	LIScrClass* self,
+	void*       data);
 
 #endif
+
+/** @} */
+/** @} */

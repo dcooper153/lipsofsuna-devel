@@ -163,6 +163,12 @@ LIAPICALL (int, liscr_args_gets_int, (
 	const char* name,
 	int*        result));
 
+LIAPICALL (int, liscr_args_gets_intv, (
+	LIScrArgs*  self,
+	const char* name,
+	int         count,
+	int*        result));
+
 LIAPICALL (int, liscr_args_gets_quaternion, (
 	LIScrArgs*       self,
 	const char*      name,

@@ -34,7 +34,6 @@ struct _LIExtPackager
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIThrAsyncCall* worker;
-	LIWdgWidget* progress;
 };
 
 struct _LIExtPackagerData

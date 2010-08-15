@@ -500,10 +500,10 @@ liscr_args_gets_data (LIScrArgs*  self,
 	return tmp != NULL;
 }
 
-int
-liscr_args_gets_float (LIScrArgs*  self,
-                       const char* name,
-                       float*      result)
+int liscr_args_gets_float (
+	LIScrArgs*  self,
+	const char* name,
+	float*      result)
 {
 	int ret = 0;
 
@@ -521,11 +521,11 @@ liscr_args_gets_float (LIScrArgs*  self,
 	return ret;
 }
 
-int
-liscr_args_gets_floatv (LIScrArgs*  self,
-                        const char* name,
-                        int         count,
-                        float*      result)
+int liscr_args_gets_floatv (
+	LIScrArgs*  self,
+	const char* name,
+	int         count,
+	float*      result)
 {
 	int i;
 	int ret = 0;
@@ -537,9 +537,9 @@ liscr_args_gets_floatv (LIScrArgs*  self,
 		{
 			for (i = 0 ; i < count ; i++)
 			{
-	                        lua_pushnumber (self->lua, i + 1);
-	                        lua_gettable (self->lua, -2);
-        	                if (!lua_isnumber (self->lua, -1))
+				lua_pushnumber (self->lua, i + 1);
+				lua_gettable (self->lua, -2);
+				if (!lua_isnumber (self->lua, -1))
 				{
 					lua_pop (self->lua, 1);
 					break;
@@ -555,10 +555,10 @@ liscr_args_gets_floatv (LIScrArgs*  self,
 	return ret;
 }
 
-int
-liscr_args_gets_int (LIScrArgs*  self,
-                     const char* name,
-                     int*        result)
+int liscr_args_gets_int (
+	LIScrArgs*  self,
+	const char* name,
+	int*        result)
 {
 	int ret = 0;
 
@@ -569,6 +569,40 @@ liscr_args_gets_int (LIScrArgs*  self,
 		{
 			*result = (int) lua_tonumber (self->lua, -1);
 			ret = 1;
+		}
+		lua_pop (self->lua, 1);
+	}
+
+	return ret;
+}
+
+int liscr_args_gets_intv (
+	LIScrArgs*  self,
+	const char* name,
+	int         count,
+	int*        result)
+{
+	int i;
+	int ret = 0;
+
+	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
+	{
+		lua_getfield (self->lua, self->input_table, name);
+		if (lua_type (self->lua, -1) == LUA_TTABLE)
+		{
+			for (i = 0 ; i < count ; i++)
+			{
+				lua_pushnumber (self->lua, i + 1);
+				lua_gettable (self->lua, -2);
+				if (!lua_isnumber (self->lua, -1))
+				{
+					lua_pop (self->lua, 1);
+					break;
+				}
+				result[i] = lua_tonumber (self->lua, -1);
+				lua_pop (self->lua, 1);
+			}
+			ret = i;
 		}
 		lua_pop (self->lua, 1);
 	}

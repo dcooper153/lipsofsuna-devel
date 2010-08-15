@@ -41,9 +41,6 @@ private_ignore (LIExtPackagerData* self,
                 const char*        name);
 
 static void
-private_progress_cancel (LIExtPackager* self);
-
-static void
 private_progress_update (LIExtPackager* self);
 
 /*****************************************************************************/
@@ -141,22 +138,6 @@ liext_packager_save (LIExtPackager* self,
 		lisys_free (data);
 		return 0;
 	}
-
-	/* Create progress dialog. */
-	self->progress = liwdg_busy_new (self->client->widgets);
-	if (self->progress == NULL)
-	{
-		lithr_async_call_stop (self->worker);
-		lithr_async_call_join (self->worker);
-		lithr_async_call_free (self->worker);
-		self->worker = NULL;
-		return 0;
-	}
-	liwdg_busy_set_cancel (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_cancel), self);
-	liwdg_busy_set_update (LIWDG_BUSY (self->progress), LIWDG_HANDLER (private_progress_update), self);
-	liwdg_busy_set_text (LIWDG_BUSY (self->progress), "Packaging...");
-	liwdg_widget_set_visible (LIWDG_WIDGET (self->progress), 1);
-	liwdg_manager_insert_window (self->client->widgets, LIWDG_WIDGET (self->progress));
 
 	return 1;
 }
@@ -309,24 +290,7 @@ private_ignore (LIExtPackagerData* self,
 }
 
 /**
- * \brief Called when the cancel button is pressed in the progress dialog.
- *
- * Sends a signal to the worker thread to stop working.
- *
- * \param self Module.
- */
-static void
-private_progress_cancel (LIExtPackager* self)
-{
-	lithr_async_call_stop (self->worker);
-}
-
-/**
  * \brief Called every tick to update packager status.
- *
- * If packaging is still in process, updates the progress dialog status.
- * If packaging has ended, frees the progress dialog and the worker thread.
- *
  * \param self Module.
  */
 static void
@@ -336,13 +300,9 @@ private_progress_update (LIExtPackager* self)
 		return;
 	if (lithr_async_call_get_done (self->worker))
 	{
-		liwdg_manager_remove_window (self->client->widgets, self->progress);
 		lithr_async_call_free (self->worker);
-		self->progress = NULL;
 		self->worker = NULL;
 	}
-	else
-		liwdg_busy_set_progress (LIWDG_BUSY (self->progress), lithr_async_call_get_progress (self->worker));
 }
 
 /** @} */
