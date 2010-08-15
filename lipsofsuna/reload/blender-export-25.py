@@ -245,7 +245,7 @@ class LIMaterial:
 		self.indices = []
 		self.diffuse = [1, 1, 1, 1]
 		self.emission = 0
-		self.flags = LIFormat.MATRFLAG_DEFAULT # TODO
+		self.flags = LIFormat.MATRFLAG_DEFAULT
 		self.name = 'default'
 		self.shader = 'default'
 		self.shininess = 0
@@ -259,6 +259,8 @@ class LIMaterial:
 				self.shader = mat["shader"]
 			except:
 				pass
+			if mat.transparency:
+				self.flags |= LIFormat.MATRFLAG_ALPHA
 			self.diffuse[0] = mat.diffuse_color[0]
 			self.diffuse[1] = mat.diffuse_color[1]
 			self.diffuse[2] = mat.diffuse_color[2]
@@ -268,7 +270,7 @@ class LIMaterial:
 			self.specular[0] = mat.specular_color[0]
 			self.specular[1] = mat.specular_color[1]
 			self.specular[2] = mat.specular_color[2]
-			self.specular[3] = mat.specular_alpha
+			self.specular[3] = mat.specular_intensity
 			self.strands[0] = mat.strand.root_size
 			self.strands[1] = mat.strand.tip_size
 			self.strands[2] = mat.strand.shape
@@ -588,7 +590,7 @@ class LINodeBone(LINode):
 
 	# \brief Gets the armature space rest matrix of the bone tail.
 	def get_tail_rest_matrix(self):
-		return self.get_head_rest_matrix() * mathutils.TranslationMatrix(self.len)
+		return self.get_head_rest_matrix() * mathutils.Matrix.Translation(self.len)
 
 	# \brief Gets the armature space pose transformation of the bone head.
 	def get_head_pose_matrix(self):
@@ -596,7 +598,7 @@ class LINodeBone(LINode):
 
 	# \brief Gets the armature space pose transformation of the bone tail.
 	def get_tail_pose_matrix(self):
-		return self.get_head_pose_matrix() * mathutils.TranslationMatrix(self.len)
+		return self.get_head_pose_matrix() * mathutils.Matrix.Translation(self.len)
 
 	def write_special(self, writer):
 		writer.write_float(self.len.x)
@@ -721,7 +723,7 @@ class LIVertex:
 
 	def write(self, writer):
 		writer.write_float(self.uv[0])
-		writer.write_float(self.uv[1])
+		writer.write_float(1.0 - self.uv[1])
 		writer.write_float(0) # TODO: Tangent
 		writer.write_float(0) # TODO: Tangent
 		writer.write_float(0) # TODO: Tangent
@@ -969,11 +971,9 @@ def menu_func(self, context):
 	self.layout.operator(LIExporter.bl_idname, text="Lips of Suna (.lmdl)")
 
 def register():
-	bpy.types.register(LIExporter)
 	bpy.types.INFO_MT_file_export.append(menu_func)
 
 def unregister():
-	bpy.types.unregister(LIExporter)
 	bpy.types.INFO_MT_file_export.remove(menu_func)
 
 if __name__ == "__main__":
