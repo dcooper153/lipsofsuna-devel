@@ -43,6 +43,7 @@ struct _LIRenScene
 	LIRenLighting* lighting;
 	struct
 	{
+		int alphatest;
 		int rendering;
 		int objectn;
 		LIRenContext* context;
@@ -92,14 +93,20 @@ LIAPICALL (int, liren_scene_render_begin, (
 LIAPICALL (void, liren_scene_render_end, (
 	LIRenScene* self));
 
-LIAPICALL (void, liren_scene_render_deferred_opaque, (
+LIAPICALL (void, liren_scene_render_deferred_begin, (
 	LIRenScene* self,
 	int         alpha,
 	float       threshold));
 
+LIAPICALL (void, liren_scene_render_deferred_end, (
+	LIRenScene* self));
+
+LIAPICALL (void, liren_scene_render_deferred_opaque, (
+	LIRenScene* self));
+
 LIAPICALL (void, liren_scene_render_forward_opaque, (
 	LIRenScene* self,
-	int         alpha,
+	int         alphatest,
 	float       threshold));
 
 LIAPICALL (void, liren_scene_render_forward_transparent, (

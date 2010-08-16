@@ -392,21 +392,17 @@ liren_scene_render_end (LIRenScene* self)
 }
 
 /**
- * \brief Renders opaque objects to the post-processing buffer.
- *
- * Draws the visible opaque objects, and optionally transparent objects
- * using alpha test, to the G-buffer. After that, renders lit fragments
- * using deferred lighting to the post-processing input buffer.
+ * \brief Begins deferred rendering.
  *
  * \param self Scene.
+ * \param alphatest Nonzero for drawing transparent faces using alpha test.
+ * \param threshold Alpha test threshold.
  */
-void
-liren_scene_render_deferred_opaque (LIRenScene* self,
-                                    int         alpha,
-                                    float       threshold)
+void liren_scene_render_deferred_begin (
+	LIRenScene* self,
+	int         alphatest,
+	float       threshold)
 {
-	int i;
-
 	/* Validate state. */
 	if (!self->state.rendering)
 		return;
@@ -418,18 +414,23 @@ liren_scene_render_deferred_opaque (LIRenScene* self,
 	glEnable (GL_ALPHA_TEST);
 	glDisable (GL_BLEND);
 	glAlphaFunc (GL_GEQUAL, threshold);
+	self->state.alphatest = alphatest;
+}
 
-	/* Render opaque faces to G-buffer. */
-	if (alpha)
-	{
-		for (i = 0 ; i < self->state.objectn ; i++)
-			liren_draw_all (self->state.context, self->state.objects + i, NULL);
-	}
-	else
-	{
-		for (i = 0 ; i < self->state.objectn ; i++)
-			liren_draw_opaque (self->state.context, self->state.objects + i, NULL);
-	}
+/**
+ * \brief Renders lit fragments to the post-processing buffer.
+ *
+ * Using the data in the G-buffer and the lights of the scene, renders lit
+ * fragments to the post-processing buffer.
+ *
+ * \param self Scene.
+ */
+void liren_scene_render_deferred_end (
+	LIRenScene* self)
+{
+	/* Validate state. */
+	if (!self->state.rendering)
+		return;
 
 	/* Change render state. */
 	liren_check_errors ();
@@ -440,11 +441,43 @@ liren_scene_render_deferred_opaque (LIRenScene* self,
 
 	/* Render lit fragments to post-processing buffer. */
 	private_lighting_render (self, self->state.context, self->state.framebuffer);
+	liren_check_errors ();
 
 	/* Change render state. */
 	glPopAttrib ();
-	liren_check_errors ();
 	liren_context_set_deferred (self->state.context, 0);
+}
+
+/**
+ * \brief Renders opaque objects to the post-processing buffer.
+ *
+ * Draws the visible opaque objects, and optionally transparent objects
+ * using alpha test, to the G-buffer.
+ *
+ * \param self Scene.
+ */
+void liren_scene_render_deferred_opaque (
+	LIRenScene* self)
+{
+	int i;
+
+	/* Validate state. */
+	if (!self->state.rendering)
+		return;
+
+	/* Render opaque faces to G-buffer. */
+	if (self->state.alphatest)
+	{
+		for (i = 0 ; i < self->state.objectn ; i++)
+			liren_draw_all (self->state.context, self->state.objects + i, NULL);
+		liren_check_errors ();
+	}
+	else
+	{
+		for (i = 0 ; i < self->state.objectn ; i++)
+			liren_draw_opaque (self->state.context, self->state.objects + i, NULL);
+		liren_check_errors ();
+	}
 }
 
 /**

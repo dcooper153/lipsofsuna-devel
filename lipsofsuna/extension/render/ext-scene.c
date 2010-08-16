@@ -44,7 +44,7 @@
  * --   <li>viewport: Viewport array.</li></ul>
  * function Scene.draw_begin(self, args)
  */
-void Scene_draw_begin (LIScrArgs* args)
+static void Scene_draw_begin (LIScrArgs* args)
 {
 	GLint viewport[4];
 	LIExtModule* module;
@@ -81,19 +81,63 @@ void Scene_draw_begin (LIScrArgs* args)
 
 /* @luadoc
  * ---
- * -- Draws the opaque faces of the scene to the post-processing buffer.
+ * -- Begins the deferred rendering pass.
  * --
  * -- @param self Scene class.
- * function Scene.draw_deferred_opaque(self)
+ * -- @param args Arguments.<ul>
+ * --   <li>alphatest: True to draw transparent faces using alpha test.</li>
+ * --   <li>threshold: Alpha test threshold.</li></ul>
+ * function Scene.draw_deferred_begin(self, args)
  */
-void Scene_draw_deferred_opaque (LIScrArgs* args)
+static void Scene_draw_deferred_begin (LIScrArgs* args)
+{
+	int alphatest = 0;
+	float threshold = 0.5f;
+	LIExtModule* module;
+	LIRenScene* scene;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	scene = module->client->scene;
+	liscr_args_gets_int (args, "alphatest", &alphatest);
+	liscr_args_gets_float (args, "threshold", &threshold);
+	liren_scene_render_deferred_begin (scene, alphatest, threshold);
+}
+
+/* @luadoc
+ * ---
+ * -- Ends the deferred rendering pass.<br/>
+ * -- Draws lit fragments to the post-processing buffer using the lights of the
+ * -- scene and the data in the deferred rendering G-buffer.
+ * -- @param self Scene class.
+ * -- @param args Arguments.<ul>
+ * --   <li>alphatest: True to draw transparent faces using alpha test.</li>
+ * --   <li>threshold: Alpha test threshold.</li></ul>
+ * function Scene.draw_deferred_begin(self, args)
+ */
+static void Scene_draw_deferred_end (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIRenScene* scene;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liren_scene_render_deferred_opaque (scene, 0, 0.0f);
+	liren_scene_render_deferred_end (scene);
+}
+
+/* @luadoc
+ * ---
+ * -- Draws opaque faces to the deferred rendering G-buffer.
+ * -- @param self Scene class.
+ * function Scene.draw_deferred_opaque(self)
+ */
+static void Scene_draw_deferred_opaque (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIRenScene* scene;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	scene = module->client->scene;
+	liren_scene_render_deferred_opaque (scene);
 }
 
 /* @luadoc
@@ -103,7 +147,7 @@ void Scene_draw_deferred_opaque (LIScrArgs* args)
  * -- @param self Scene class.
  * function Scene.draw_begin(self)
  */
-void Scene_draw_end (LIScrArgs* args)
+static void Scene_draw_end (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIRenScene* scene;
@@ -126,7 +170,7 @@ void Scene_draw_end (LIScrArgs* args)
  * -- @param self Scene class.
  * function Scene.draw_forward_transparent(self)
  */
-void Scene_draw_forward_transparent (LIScrArgs* args)
+static void Scene_draw_forward_transparent (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIRenScene* scene;
@@ -143,7 +187,7 @@ void Scene_draw_forward_transparent (LIScrArgs* args)
  * -- @param self Scene class.
  * function Scene.draw_post_process(self)
  */
-void Scene_draw_post_process (LIScrArgs* args)
+static void Scene_draw_post_process (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIRenScene* scene;
@@ -219,6 +263,8 @@ void liext_script_scene (
 	liscr_class_inherit (self, liscr_script_data, data);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SCENE, data);
 	liscr_class_insert_cfunc (self, "draw_begin", Scene_draw_begin);
+	liscr_class_insert_cfunc (self, "draw_deferred_begin", Scene_draw_deferred_begin);
+	liscr_class_insert_cfunc (self, "draw_deferred_end", Scene_draw_deferred_end);
 	liscr_class_insert_cfunc (self, "draw_deferred_opaque", Scene_draw_deferred_opaque);
 	liscr_class_insert_cfunc (self, "draw_end", Scene_draw_end);
 	liscr_class_insert_cfunc (self, "draw_forward_transparent", Scene_draw_forward_transparent);
