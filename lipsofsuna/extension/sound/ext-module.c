@@ -54,6 +54,7 @@ LIExtModule* liext_sound_new (
 	self->client = limai_program_find_component (program, "client");
 	self->music_volume = 1.0f;
 	self->music_fading = 1.0f;
+	self->listener_rotation = limat_quaternion_identity ();
 
 #ifndef LI_DISABLE_SOUND
 	/* Allocate objects. */
@@ -343,16 +344,13 @@ static int private_tick (
 	LIMatVector direction;
 	LIMatVector velocity;
 	LIMatVector up;
-	LIMatVector vector;
 	LISndSource* source;
 
 	/* Update listener position. */
-	lialg_camera_get_transform (self->client->camera, &transform);
-#warning Camera velocity is needed by doppler effects
-	velocity = limat_vector_init (0.0f, 0.0f, 0.0f);
-	direction = limat_quaternion_get_basis (transform.rotation, 2);
-	up = limat_quaternion_get_basis (transform.rotation, 1);
-	lisnd_system_set_listener (self->system, &transform.position, &velocity, &direction, &up);
+	velocity = self->listener_velocity;
+	direction = limat_quaternion_get_basis (self->listener_rotation, 2);
+	up = limat_quaternion_get_basis (self->listener_rotation, 1);
+	lisnd_system_set_listener (self->system, &self->listener_position, &velocity, &direction, &up);
 
 	/* Update music. */
 	if (self->music_fade != NULL)

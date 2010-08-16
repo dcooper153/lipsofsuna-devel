@@ -41,6 +41,9 @@ struct _LIExtModule
 	float music_fading;
 	float music_volume;
 	LICliClient* client;
+	LIMatVector listener_position;
+	LIMatVector listener_velocity;
+	LIMatQuaternion listener_rotation;
 #ifndef LI_DISABLE_SOUND
 	LIAlgU32dic* objects;
 	LICalHandle calls[1];

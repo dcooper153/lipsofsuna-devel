@@ -75,6 +75,78 @@ static void Sound_effect (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Position of the listener.
+ * -- @name Sound.listener_position
+ * -- @class table
+ */
+static void Sound_getter_listener_position (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+	liscr_args_seti_vector (args, &module->listener_position);
+}
+static void Sound_setter_listener_position (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatVector value;
+
+	if (liscr_args_geti_vector (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		module->listener_position = value;
+	}
+}
+
+/* @luadoc
+ * --- Rotation of the listener.
+ * -- @name Sound.listener_rotation
+ * -- @class table
+ */
+static void Sound_getter_listener_rotation (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+	liscr_args_seti_quaternion (args, &module->listener_rotation);
+}
+static void Sound_setter_listener_rotation (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatQuaternion value;
+
+	if (liscr_args_geti_quaternion (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		module->listener_rotation = value;
+	}
+}
+
+/* @luadoc
+ * --- Velocity of the listener.
+ * -- @name Sound.listener_velocity
+ * -- @class table
+ */
+static void Sound_getter_listener_velocity (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+	liscr_args_seti_vector (args, &module->listener_velocity);
+}
+static void Sound_setter_listener_velocity (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatVector value;
+
+	if (liscr_args_geti_vector (args, 0, &value))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
+		module->listener_velocity = value;
+	}
+}
+
+/* @luadoc
  * --- Music track name.
  * -- @name Sound.music
  * -- @class table
@@ -134,12 +206,15 @@ static void Sound_setter_music_volume (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liext_script_sound (LIScrClass* self,
-                    void*       data)
+void liext_script_sound (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
 	liscr_class_insert_cfunc (self, "effect", Sound_effect);
+	liscr_class_insert_cvar (self, "listener_position", Sound_getter_listener_position, Sound_setter_listener_position);
+	liscr_class_insert_cvar (self, "listener_rotation", Sound_getter_listener_rotation, Sound_setter_listener_rotation);
+	liscr_class_insert_cvar (self, "listener_velocity", Sound_getter_listener_velocity, Sound_setter_listener_velocity);
 	liscr_class_insert_cvar (self, "music", NULL, Sound_setter_music);
 	liscr_class_insert_cvar (self, "music_fading", NULL, Sound_setter_music_fading);
 	liscr_class_insert_cvar (self, "music_volume", NULL, Sound_setter_music_volume);
