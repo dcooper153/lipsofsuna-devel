@@ -225,7 +225,6 @@ static int private_widget_tick (
 	/* Render widgets. */
 	licli_window_get_size (module->client->window, &w, &h);
 	liwdg_manager_set_size (module->widgets, w, h);
-	lialg_camera_set_viewport (module->client->camera, 0, 0, w, h);
 	liwdg_manager_render (module->widgets);
 	module->client->video.SDL_GL_SwapBuffers ();
 
