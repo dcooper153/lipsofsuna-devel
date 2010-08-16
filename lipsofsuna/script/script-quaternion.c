@@ -177,6 +177,23 @@ Quaternion___sub (lua_State* lua)
 }
 
 /* @luadoc
+ * --- Converts the quaternion to a string.
+ * --
+ * -- @param self Quaternion.
+ * -- @return String.
+ * function Quaternion.__tostring(self)
+ */
+static void Quaternion___tostring (LIScrArgs* args)
+{
+	char buffer[256];
+	LIMatQuaternion* self;
+
+	self = args->self;
+	snprintf (buffer, 256, "Quaternion(%f,%f,%f,%f)", self->x, self->y, self->z, self->w);
+	liscr_args_seti_string (args, buffer);
+}
+
+/* @luadoc
  * ---
  * -- Creates a new quaternion.
  * --
@@ -379,6 +396,7 @@ liscr_script_quaternion (LIScrClass* self,
 	liscr_class_insert_func (self, "__add", Quaternion___add);
 	liscr_class_insert_func (self, "__mul", Quaternion___mul);
 	liscr_class_insert_func (self, "__sub", Quaternion___sub);
+	liscr_class_insert_mfunc (self, "__tostring", Quaternion___tostring);
 	liscr_class_insert_cfunc (self, "new", Quaternion_new);
 	liscr_class_insert_cfunc (self, "new_euler", Quaternion_new_euler);
 	liscr_class_insert_mfunc (self, "nlerp", Quaternion_nlerp);

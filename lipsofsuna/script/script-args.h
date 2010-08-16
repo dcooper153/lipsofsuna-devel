@@ -111,6 +111,12 @@ LIAPICALL (int, liscr_args_geti_int, (
 	int         index,
 	int*        result));
 
+LIAPICALL (int, liscr_args_geti_intv, (
+	LIScrArgs* self,
+	int        index,
+	int        count,
+	int*       result));
+
 LIAPICALL (int, liscr_args_geti_quaternion, (
 	LIScrArgs*       self,
 	int              index,

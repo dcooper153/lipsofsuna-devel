@@ -313,6 +313,63 @@ liscr_args_geti_int (LIScrArgs*  self,
 	return ret;
 }
 
+int liscr_args_geti_intv (
+	LIScrArgs* self,
+	int        index,
+	int        count,
+	int*       result)
+{
+	int i;
+	int ret = 0;
+
+	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
+	{
+		lua_pushnumber (self->lua, index);
+		lua_gettable (self->lua, self->input_table);
+		if (lua_type (self->lua, -1) == LUA_TTABLE)
+		{
+			for (i = 0 ; i < count ; i++)
+			{
+				lua_pushnumber (self->lua, i + 1);
+				lua_gettable (self->lua, -2);
+				if (!lua_isnumber (self->lua, -1))
+				{
+					lua_pop (self->lua, 1);
+					break;
+				}
+				result[i] = lua_tonumber (self->lua, -1);
+				lua_pop (self->lua, 1);
+			}
+			ret = i;
+		}
+		lua_pop (self->lua, 1);
+	}
+	else
+	{
+		if (index < 0 || index >= self->args_count)
+			return 0;
+		index += self->args_start;
+		if (lua_type (self->lua, index) == LUA_TTABLE)
+		{
+			for (i = 0 ; i < count ; i++)
+			{
+				lua_pushnumber (self->lua, i + 1);
+				lua_gettable (self->lua, index);
+				if (!lua_isnumber (self->lua, -1))
+				{
+					lua_pop (self->lua, 1);
+					break;
+				}
+				result[i] = lua_tonumber (self->lua, -1);
+				lua_pop (self->lua, 1);
+			}
+			ret = i;
+		}
+	}
+
+	return ret;
+}
+
 int
 liscr_args_geti_quaternion (LIScrArgs*       self,
                             int              index,

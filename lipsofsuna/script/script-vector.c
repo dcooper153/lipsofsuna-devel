@@ -128,6 +128,23 @@ Vector___sub (lua_State* lua)
 }
 
 /* @luadoc
+ * --- Converts the vector to a string.
+ * --
+ * -- @param self Vector.
+ * -- @return String.
+ * function Vector.__tostring(self)
+ */
+static void Vector___tostring (LIScrArgs* args)
+{
+	char buffer[256];
+	LIMatVector* self;
+
+	self = args->self;
+	snprintf (buffer, 256, "Vector(%f,%f,%f)", self->x, self->y, self->z);
+	liscr_args_seti_string (args, buffer);
+}
+
+/* @luadoc
  * --- Creates a new vector.
  * --
  * -- @param clss Vector class.
@@ -267,6 +284,7 @@ liscr_script_vector (LIScrClass* self,
 	liscr_class_insert_func (self, "__add", Vector___add);
 	liscr_class_insert_func (self, "__mul", Vector___mul);
 	liscr_class_insert_func (self, "__sub", Vector___sub);
+	liscr_class_insert_mfunc (self, "__tostring", Vector___tostring);
 	liscr_class_insert_mfunc (self, "cross", Vector_cross);
 	liscr_class_insert_mfunc (self, "dot", Vector_dot);
 	liscr_class_insert_cfunc (self, "new", Vector_new);
