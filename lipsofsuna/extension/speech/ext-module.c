@@ -101,10 +101,12 @@ void liext_speeches_free (
 }
 
 void liext_speeches_render (
-	LIExtModule* self)
+	LIExtModule*       self,
+	const LIMatMatrix* projection,
+	const LIMatMatrix* modelview,
+	const int*         viewport)
 {
 	int width;
-	GLint viewport[4];
 	LIAlgU32dicIter iter;
 	LIAlgList* ptr;
 	LIExtObject* object;
@@ -112,7 +114,6 @@ void liext_speeches_render (
 	LIMatVector win;
 
 	/* Set 2D mode. */
-	glGetIntegerv (GL_VIEWPORT, viewport);
 	glMatrixMode (GL_PROJECTION);
 	glPushMatrix ();
 	glLoadIdentity();
@@ -130,7 +131,7 @@ void liext_speeches_render (
 		object = iter.value;
 
 		/* Project start offset. */
-		if (!lialg_camera_project (self->client->camera, &object->position, &win))
+		if (!limat_matrix_project (*projection, *modelview, viewport, &object->position, &win))
 			continue;
 		if (win.z < 0.0f)
 			continue;

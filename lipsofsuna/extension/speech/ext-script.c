@@ -64,14 +64,39 @@ static void Speech_add (LIScrArgs* args)
  * --- Draws the speech texts to the framebuffer.
  * --
  * -- @param self Speech class.
+ * -- @param args Arguments.<ul>
+ * --   <li>modelview: Modelview matrix.</li>
+ * --   <li>projection: Projection matrix.</li>
+ * --   <li>viewport: Viewport array.</li></ul>
  * function Speech.draw(self)
  */
 static void Speech_draw (LIScrArgs* args)
 {
+	GLint viewport[4];
 	LIExtModule* module;
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
-	liext_speeches_render (module);
+
+	/* Get arguments. */
+	modelview = limat_matrix_identity ();
+	projection = limat_matrix_identity ();
+	liscr_args_gets_floatv (args, "modelview", 16, modelview.m);
+	liscr_args_gets_floatv (args, "projection", 16, projection.m);
+	viewport[0] = 0;
+	viewport[1] = 0;
+	viewport[2] = module->client->window->mode.width;
+	viewport[3] = module->client->window->mode.height;
+	liscr_args_gets_intv (args, "viewport", 4, viewport);
+	viewport[0] = LIMAT_MAX (0, viewport[0]);
+	viewport[1] = LIMAT_MAX (0, viewport[1]);
+	viewport[1] = module->client->window->mode.height - viewport[1] - viewport[3];
+	viewport[2] = LIMAT_MAX (2, viewport[2]);
+	viewport[3] = LIMAT_MAX (2, viewport[3]);
+
+	/* Render all speech. */
+	liext_speeches_render (module, &projection, &modelview, viewport);
 }
 
 /*****************************************************************************/

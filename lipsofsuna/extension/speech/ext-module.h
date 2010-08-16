@@ -50,7 +50,10 @@ void liext_speeches_free (
 	LIExtModule* self);
 
 void liext_speeches_render (
-	LIExtModule* self);
+	LIExtModule*       self,
+	const LIMatMatrix* projection,
+	const LIMatMatrix* modelview,
+	const int*         viewport);
 
 int liext_speeches_set_speech (
 	LIExtModule* self,
