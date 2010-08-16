@@ -45,7 +45,7 @@ LIExtModule* liext_render_new (
 	if (self->client == NULL)
 	{
 		lisys_error_set (EINVAL, "extension `render' can only be used by the client");
-		liext_widgets_free (self);
+		liext_render_free (self);
 		return NULL;
 	}
 

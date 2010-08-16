@@ -35,26 +35,26 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	float move;
-	float tilt;
-	float turn;
-	float zoom;
-	LICalHandle calls[1];
 	LICliClient* client;
 	LIMaiProgram* program;
 };
 
-LIExtModule*
-liext_cameras_new (LIMaiProgram* program);
+LIExtModule* liext_cameras_new (
+	LIMaiProgram* program);
 
-void
-liext_cameras_free (LIExtModule* self);
+void liext_cameras_free (
+	LIExtModule* self);
+
+void liext_cameras_update (
+	LIExtModule* self,
+	LIAlgCamera* camera,
+	float        secs);
 
 /*****************************************************************************/
 
-void
-liext_script_camera (LIScrClass* self,
-                     void*       data);
+void liext_script_camera (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 

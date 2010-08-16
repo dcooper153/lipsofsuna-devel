@@ -46,6 +46,13 @@ struct _LIAlgCamera
 	} config;
 	struct
 	{
+		float move_rate;
+		float tilt_rate;
+		float turn_rate;
+		float zoom_rate;
+	} controls;
+	struct
+	{
 		LIMatTransform center;
 		LIMatTransform current;
 		LIMatTransform local;

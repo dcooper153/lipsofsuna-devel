@@ -26,12 +26,9 @@
 
 #include "ext-module.h"
 
-static int
-private_tick (LIExtModule* self,
-              float        secs);
-
-static void
-private_camera_clip (LIExtModule* self);
+static void private_camera_clip (
+	LIExtModule* self,
+	LIAlgCamera* camera);
 
 /*****************************************************************************/
 
@@ -42,8 +39,8 @@ LIMaiExtensionInfo liext_camera_info =
 	liext_cameras_free
 };
 
-LIExtModule*
-liext_cameras_new (LIMaiProgram* program)
+LIExtModule* liext_cameras_new (
+	LIMaiProgram* program)
 {
 	LIExtModule* self;
 
@@ -54,46 +51,33 @@ liext_cameras_new (LIMaiProgram* program)
 	self->program = program;
 	self->client = limai_program_find_component (program, "client");
 
-	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 0))
-	{
-		liext_cameras_free (self);
-		return NULL;
-	}
-
 	/* Register classes. */
 	liscr_script_create_class (program->script, "Camera", liext_script_camera, self);
 
 	return self;
 }
 
-void
-liext_cameras_free (LIExtModule* self)
+void liext_cameras_free (
+	LIExtModule* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
+}
+
+void liext_cameras_update (
+	LIExtModule* self,
+	LIAlgCamera* camera,
+	float        secs)
+{
+	lialg_camera_update (camera, secs);
+	if (lialg_camera_get_driver (camera) != LIALG_CAMERA_FIRSTPERSON)
+		private_camera_clip (self, camera);
 }
 
 /*****************************************************************************/
 
-static int
-private_tick (LIExtModule* self,
-              float        secs)
-{
-	lialg_camera_move (self->client->camera, secs * self->move);
-	lialg_camera_tilt (self->client->camera, secs * self->tilt);
-	lialg_camera_turn (self->client->camera, secs * self->turn);
-	lialg_camera_zoom (self->client->camera, secs * self->zoom);
-
-	lialg_camera_update (self->client->camera, secs);
-	if (lialg_camera_get_driver (self->client->camera) != LIALG_CAMERA_FIRSTPERSON)
-		private_camera_clip (self);
-
-	return 1;
-}
-
-static void
-private_camera_clip (LIExtModule* self)
+static void private_camera_clip (
+	LIExtModule* self,
+	LIAlgCamera* camera)
 {
 	int hit;
 	float frac;
@@ -112,14 +96,14 @@ private_camera_clip (LIExtModule* self)
 
 	/* Create sweep shape. */
 	/* FIXME: Could use a more accurate shape. */
-	lialg_camera_get_bounds (self->client->camera, &aabb);
+	lialg_camera_get_bounds (camera, &aabb);
 	shape = liphy_shape_new_aabb (physics, &aabb);
 	if (shape == NULL)
 		return;
 
 	/* Sweep the shape. */
-	lialg_camera_get_center (self->client->camera, &start);
-	lialg_camera_get_transform (self->client->camera, &end);
+	lialg_camera_get_center (camera, &start);
+	lialg_camera_get_transform (camera, &end);
 	diff = limat_vector_subtract (end.position, start.position);
 	hit = liphy_physics_cast_shape (physics, &start, &end, shape,
 		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
@@ -129,7 +113,7 @@ private_camera_clip (LIExtModule* self)
 	if (hit)
 	{
 		frac = tmp.fraction * limat_vector_get_length (diff);
-		lialg_camera_clip (self->client->camera, frac);
+		lialg_camera_clip (camera, frac);
 	}
 }
 

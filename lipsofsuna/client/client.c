@@ -35,9 +35,6 @@
 #include "client-window.h"
 
 static int
-private_init_camera (LICliClient* self);
-
-static int
 private_init_paths (LICliClient* self,
                     const char*  path,
                     const char*  name);
@@ -127,13 +124,6 @@ void licli_client_free_module (
 	if (self->callbacks != NULL)
 		lical_callbacks_call (self->callbacks, self, "client-free", lical_marshal_DATA);
 
-	/* Free camera. */
-	if (self->camera != NULL)
-	{
-		lialg_camera_free (self->camera);
-		self->camera = NULL;
-	}
-
 	/* Free program. */
 	if (self->program != NULL)
 	{
@@ -158,10 +148,8 @@ void licli_client_free_module (
 		lipth_paths_free (self->paths);
 		self->paths = NULL;
 	}
-	lisys_free (self->camera_node);
 	lisys_free (self->path);
 	lisys_free (self->name);
-	self->camera_node = NULL;
 	self->path = NULL;
 	self->name = NULL;
 }
@@ -250,7 +238,6 @@ int licli_client_load_module (
 		return 0;
 	}
 	if (!private_init_render (self) ||
-	    !private_init_camera (self) ||
 	    !private_init_script (self) ||
 	    !licli_client_init_callbacks_misc (self))
 	{
@@ -318,24 +305,6 @@ void licli_client_set_moving (
 }
 
 /*****************************************************************************/
-
-static int
-private_init_camera (LICliClient* self)
-{
-	GLint viewport[4];
-
-	self->camera_node = strdup ("#camera");
-	if (self->camera_node == NULL)
-		return 0;
-	self->camera = lialg_camera_new ();
-	if (self->camera == NULL)
-		return 0;
-	glGetIntegerv (GL_VIEWPORT, viewport);
-	lialg_camera_set_driver (self->camera, LIALG_CAMERA_THIRDPERSON);
-	lialg_camera_set_viewport (self->camera, viewport[0], viewport[1], viewport[2], viewport[3]);
-
-	return 1;
-}
 
 static int
 private_init_paths (LICliClient* self,

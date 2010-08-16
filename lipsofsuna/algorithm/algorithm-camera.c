@@ -269,6 +269,10 @@ void
 lialg_camera_update (LIAlgCamera* self,
                      float        secs)
 {
+	lialg_camera_move (self, secs * self->controls.move_rate);
+	lialg_camera_tilt (self, secs * self->controls.tilt_rate);
+	lialg_camera_turn (self, secs * self->controls.turn_rate);
+	lialg_camera_zoom (self, secs * self->controls.zoom_rate);
 	switch (self->config.driver)
 	{
 		case LIALG_CAMERA_FIRSTPERSON:

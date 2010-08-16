@@ -63,8 +63,6 @@ struct _LICliClient
 	int moving;
 	char* name;
 	char* path;
-	char* camera_node;
-	LIAlgCamera* camera;
 	LIPthPaths* paths;
 	LIRenRender* render;
 	LIRenScene* scene;
