@@ -297,8 +297,6 @@ liren_scene_render_begin (LIRenScene*    self,
 	glEnable (GL_NORMALIZE);
 	glEnable (GL_COLOR_MATERIAL);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glPushAttrib (GL_VIEWPORT_BIT);
-	glViewport (0, 0, framebuffer->width, framebuffer->height);
 
 	/* Reset profiling. */
 #ifdef LIREN_ENABLE_PROFILING
@@ -314,6 +312,14 @@ liren_scene_render_begin (LIRenScene*    self,
 	self->state.framebuffer = framebuffer;
 	self->state.objects = objects;
 	self->state.objectn = count;
+
+	/* Enable backbuffer viewport. */
+	glPushAttrib (GL_VIEWPORT_BIT);
+	glViewport (0, 0, framebuffer->width, framebuffer->height);
+
+	/* Clear the post-processing buffer. */
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer->postproc_fbo[0]);
+	glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	return 1;
 }
@@ -335,16 +341,19 @@ liren_scene_render_end (LIRenScene* self)
 	if (!self->state.rendering)
 		return;
 
-	/* Change render state. */
+	/* Disable backbuffer viewport. */
+	glPopAttrib ();
+
+	/* Setup copy to screen. */
+	glMatrixMode (GL_MODELVIEW);
+	glPushMatrix ();
+	glLoadIdentity ();
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix ();
+	glLoadIdentity ();
 	glUseProgramObjectARB (0);
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 	glBindTexture (GL_TEXTURE_2D, self->state.framebuffer->postproc_texture[0]);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-	glPushMatrix ();
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	glPushMatrix ();
 	glColor3f (1.0f, 1.0f, 1.0f);
 
 	/* Copy results to screen. */
@@ -359,7 +368,7 @@ liren_scene_render_end (LIRenScene* self)
 	glVertex2i (1, -1);
 	glEnd ();
 
-	/* Change render state. */
+	/* Disable copy to screen. */
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 	glPopMatrix ();
@@ -380,7 +389,6 @@ liren_scene_render_end (LIRenScene* self)
 	}
 	glMatrixMode (GL_MODELVIEW);
 	liren_check_errors ();
-	glPopAttrib ();
 	self->state.rendering = 0;
 
 	/* Profiling report. */
@@ -436,7 +444,6 @@ void liren_scene_render_deferred_end (
 	liren_check_errors ();
 	glDisable (GL_ALPHA_TEST);
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
-	glClear (GL_COLOR_BUFFER_BIT);
 	glPushAttrib (GL_SCISSOR_BIT);
 
 	/* Render lit fragments to post-processing buffer. */
@@ -630,11 +637,11 @@ liren_scene_render_postproc (LIRenScene* self)
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_DEPTH_TEST);
 	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
 	glPushMatrix ();
+	glLoadIdentity ();
 	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
 	glPushMatrix ();
+	glLoadIdentity ();
 
 	/* Call post-processing shaders. */
 	for (i = src = 0 ; i < 1024 ; i++, src = !src)

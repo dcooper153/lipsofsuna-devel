@@ -116,6 +116,8 @@ liren_deferred_resize (LIRenDeferred* self,
                        int            width,
                        int            height)
 {
+	if (self->width == width && self->height == height)
+		return 1;
 	if (private_rebuild (self, width, height))
 	{
 		self->width = width;

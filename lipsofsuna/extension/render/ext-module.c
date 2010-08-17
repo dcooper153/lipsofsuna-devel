@@ -49,14 +49,6 @@ LIExtModule* liext_render_new (
 		return NULL;
 	}
 
-	/* Allocate deferred rendering buffer. */
-	self->deferred = liren_deferred_new (self->client->render, 32, 32);
-	if (self->deferred == NULL)
-	{
-		liext_render_free (self);
-		return NULL;
-	}
-
 	/* Register classes. */
 	liscr_script_create_class (program->script, "Scene", liext_script_scene, self);
 
@@ -66,10 +58,6 @@ LIExtModule* liext_render_new (
 void liext_render_free (
 	LIExtModule* self)
 {
-	/* Free deferred rendering buffer. */
-	if (self->deferred != NULL)
-		liren_deferred_free (self->deferred);
-
 	lisys_free (self);
 }
 

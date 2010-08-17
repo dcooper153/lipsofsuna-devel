@@ -35,7 +35,6 @@ struct _LIExtModule
 {
 	LICliClient* client;
 	LIMaiProgram* program;
-	LIRenDeferred* deferred;
 };
 
 LIExtModule* liext_render_new (
