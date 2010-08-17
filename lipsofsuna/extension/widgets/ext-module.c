@@ -222,11 +222,9 @@ static int private_widget_tick (
 	/* Update widgets. */
 	liwdg_manager_update (module->widgets, secs);
 
-	/* Render widgets. */
+	/* Update dimensions. */
 	licli_window_get_size (module->client->window, &w, &h);
 	liwdg_manager_set_size (module->widgets, w, h);
-	liwdg_manager_render (module->widgets);
-	module->client->video.SDL_GL_SwapBuffers ();
 
 	return 1;
 }

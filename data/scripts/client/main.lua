@@ -28,4 +28,7 @@ while not Program.quit do
 		Eventhandler:event(event)
 		event = Program:pop_event()
 	end
+	-- Render the scene.
+	Widgets:draw()
+	Client:swap_buffers()
 end

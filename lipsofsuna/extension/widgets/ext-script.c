@@ -1037,6 +1037,19 @@ static void Widgets_cycle_window_focus (LIScrArgs* args)
 	liwdg_manager_cycle_window_focus (module->widgets, !prev);
 }
 
+/* @luadoc
+ * --- Draws the user interface.
+ * -- @param clss Widgets class.
+ * function Widgets.draw(clss)
+ */
+static void Widgets_draw (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	liwdg_manager_render (module->widgets);
+}
+
 /*****************************************************************************/
 
 void
@@ -1167,6 +1180,7 @@ void liext_script_widgets (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGETS, data);
 	liscr_class_insert_cfunc (self, "cycle_focus", Widgets_cycle_focus);
 	liscr_class_insert_cfunc (self, "cycle_window_focus", Widgets_cycle_window_focus);
+	liscr_class_insert_cfunc (self, "draw", Widgets_draw);
 }
 
 /** @} */

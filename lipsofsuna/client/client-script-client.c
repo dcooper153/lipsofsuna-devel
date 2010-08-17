@@ -60,6 +60,21 @@ static void Client_host (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Copies the rendered scene to the screen.
+ * -- @param clss Client class.
+ * function Client.swap_buffers(clss)
+ */
+static void Client_swap_buffers (LIScrArgs* args)
+{
+	LICliClient* client;
+
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client->video.SDL_GL_SwapBuffers ();
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+/* @luadoc
  * --- Gets the current cursor position.
  * -- @name Client.cursor_pos
  * -- @class table
@@ -140,6 +155,7 @@ licli_script_client (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
 	liscr_class_insert_cfunc (self, "host", Client_host);
+	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
 	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
 	liscr_class_insert_cvar (self, "moving", Client_getter_moving, Client_setter_moving);
