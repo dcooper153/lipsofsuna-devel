@@ -43,6 +43,9 @@ private_init_convex (LIPhyShape*        self,
                      const LIMatVector* vertices,
                      int                count);
 
+static inline int private_init_empty (
+	LIPhyShape* self);
+
 static inline int
 private_init_model (LIPhyShape*       self,
                     const LIMdlModel* model);
@@ -287,6 +290,18 @@ private_init_convex (LIPhyShape*        self,
 	return 1;
 }
 
+static inline int private_init_empty (
+	LIPhyShape* self)
+{
+	const float w = 0.1f;
+	const LIMatVector v[8] =
+	{
+		{ -w, -w, -w }, { -w, -w, w }, { -w, w, -w }, { -w, w, w },
+		{ w, -w, -w }, { w, -w, w }, { w, w, -w }, { w, w, w }
+	};
+	return private_init_convex (self, v, 8);
+}
+
 static inline int
 private_init_model (LIPhyShape*       self,
                     const LIMdlModel* model)
@@ -301,6 +316,8 @@ private_init_model (LIPhyShape*       self,
 	if (model->shapes.count)
 	{
 		/* Create predefined shape. */
+		if (!model->shapes.array[0].vertices.count)
+			return private_init_empty (self);
 		ret = private_init_convex (self,
 			model->shapes.array[0].vertices.array,
 			model->shapes.array[0].vertices.count);
@@ -310,7 +327,7 @@ private_init_model (LIPhyShape*       self,
 		/* Count vertices. */
 		count = model->vertices.count;
 		if (!count)
-			return 1;
+			return private_init_empty (self);
 
 		/* Allocate vertices. */
 		vertices = (LIMatVector*) lisys_calloc (count, sizeof (LIMatVector));
