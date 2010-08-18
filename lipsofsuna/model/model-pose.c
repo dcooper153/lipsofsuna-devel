@@ -587,6 +587,50 @@ void limdl_pose_set_channel_state (
 }
 
 /**
+ * \brief Sets the transformation of a node for the given frame.
+ * \param self Pose.
+ * \param channel Channel number.
+ * \param frame Frame number.
+ * \param node Node name.
+ * \param transform Node transformation.
+ * \return Nonzero on success.
+ */
+int limdl_pose_set_channel_transform (
+	LIMdlPose*            self,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform)
+{
+	LIMdlNode* node_;
+	LIMdlPoseChannel* chan;
+
+	/* Find the node. */
+	node_ = limdl_pose_find_node (self, node);
+	if (node_ == NULL)
+		return 0;
+
+	/* Find the channel. */
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0;
+
+	/* Make sure the channel and the frame exist. */
+	if (!limdl_animation_insert_channel (chan->animation, node))
+		return 0;
+	if (chan->animation->length <= frame)
+	{
+		if (!limdl_animation_set_length (chan->animation, frame + 1))
+			return 0;
+	}
+
+	/* Set the node transformation of the frame. */
+	limdl_animation_set_transform (chan->animation, node, frame, transform);
+
+	return 1;
+}
+
+/**
  * \brief Sets the posed model.
  *
  * \param self Model pose.

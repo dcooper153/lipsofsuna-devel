@@ -101,6 +101,46 @@ static void Object_calculate_bounds (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Edits the pose of a node.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>channel: Channel number.</li>
+ * --   <li>frame: Frame number.</li>
+ * --   <li>node: Node name. (required)</li>
+ * --   <li>position: Position change relative to rest pose.</li>
+ * --   <li>rotation: Rotation change relative to rest pose.</li></ul>
+ * function Object.edit_pose(self, args)
+ */
+static void Object_edit_pose (LIScrArgs* args)
+{
+	int frame = 0;
+	int channel = 0;
+	const char* node = NULL;
+	LIMatTransform transform = limat_transform_identity ();
+	LIEngObject* self = args->self;
+
+	if (!liscr_args_gets_string (args, "node", &node))
+		return;
+	if (liscr_args_gets_int (args, "channel", &channel))
+	{
+		channel--;
+		if (channel < 0) channel = 0;
+		if (channel > 254) channel = 254;
+	}
+	if (liscr_args_gets_int (args, "frame", &frame))
+	{
+		frame--;
+		if (frame < 0)
+			return;
+	}
+	liscr_args_gets_quaternion (args, "rotation", &transform.rotation);
+	liscr_args_gets_vector (args, "position", &transform.position);
+	transform.rotation = limat_quaternion_normalize (transform.rotation);
+
+	limdl_pose_set_channel_transform (self->pose, channel, frame, node, &transform);
+}
+
+/* @luadoc
  * --- Finds an object by ID.
  * --
  * -- @param clss Object class.
@@ -626,6 +666,7 @@ void liscr_script_object (
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
+	liscr_class_insert_mfunc (self, "edit_pose", Object_edit_pose);
 	liscr_class_insert_cfunc (self, "find", Object_find);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
 	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);

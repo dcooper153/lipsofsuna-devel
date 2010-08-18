@@ -105,6 +105,77 @@ void limdl_animation_free (
 }
 
 /**
+ * \brief Adds a channel to the animation.
+ *
+ * If the channel exists already, nothing is done.
+ *
+ * \param self Animation.
+ * \param name Node name.
+ * \return Nonzero on success.
+ */
+int limdl_animation_insert_channel (
+	LIMdlAnimation* self,
+	const char*     name)
+{
+	int chan;
+	int frame;
+	char* str;
+	char** tmp;
+	LIMdlFrame* buffer;
+
+	/* Check for existence. */
+	if (limdl_animation_get_channel (self, name) != -1)
+		return 1;
+
+	/* Duplicate the name. */
+	str = listr_dup (name);
+	if (str == NULL)
+		return 0;
+
+	/* Rebuild the transformation buffer. */
+	if (self->length)
+	{
+		buffer = lisys_calloc ((self->channels.count + 1) * self->length, sizeof (LIMdlFrame));
+		if (buffer == NULL)
+		{
+			lisys_free (str);
+			return 0;
+		}
+		for (frame = 0 ; frame < self->length ; frame++)
+		{
+			for (chan = 0 ; chan < self->channels.count ; chan++)
+			{
+				buffer[(self->channels.count + 1) * frame + chan].transform =
+					self->buffer.array[self->channels.count * frame + chan].transform;
+			}
+			buffer[(self->channels.count + 1) * frame + chan].transform = limat_transform_identity ();
+		}
+	}
+
+	/* Allocate a new channel. */
+	tmp = lisys_realloc (self->channels.array, (self->channels.count + 1) * sizeof (char*));
+	if (tmp == NULL)
+	{
+		lisys_free (buffer);
+		lisys_free (str);
+		return 0;
+	}
+	self->channels.array = tmp;
+	self->channels.array[self->channels.count] = str;
+	self->channels.count++;
+
+	/* Use the new transformation buffer. */
+	if (self->length)
+	{
+		lisys_free (self->buffer.array);
+		self->buffer.array = buffer;
+		self->buffer.count = self->channels.count * self->length;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Clears the name and channels of the animation.
  * \param self Animation.
  */
@@ -219,6 +290,83 @@ float limdl_animation_get_duration (
 	const LIMdlAnimation* self)
 {
 	return (self->length - 1) * TIMESCALE;
+}
+
+/**
+ * \brief Sets the number of frames in the animation.
+ * \param self Animation.
+ * \param value Frame count.
+ * \return Nonzero on success.
+ */
+int limdl_animation_set_length (
+	LIMdlAnimation* self,
+	int             value)
+{
+	int i;
+	LIMdlFrame* tmp;
+
+	if (value == self->length)
+		return 1;
+	if (!self->channels.count)
+	{
+		self->length = value;
+		return 1;
+	}
+	if (!value)
+	{
+		/* Set to empty. */
+		lisys_free (self->buffer.array);
+		self->buffer.array = NULL;
+	}
+	else if (value < self->length)
+	{
+		/* Shrink. */
+		tmp = lisys_realloc (self->buffer.array, self->channels.count * value * sizeof (LIMdlFrame));
+		if (tmp != NULL)
+			self->buffer.array = tmp;
+	}
+	else
+	{
+		/* Expand. */
+		tmp = lisys_realloc (self->buffer.array, self->channels.count * value * sizeof (LIMdlFrame));
+		if (tmp == NULL)
+			return 0;
+		self->buffer.array = tmp;
+		for (i = self->channels.count * self->length ; i < self->channels.count * value ; i++)
+			self->buffer.array[i].transform = limat_transform_identity ();
+	}
+	self->length = value;
+	self->buffer.count = self->channels.count * self->length;
+
+	return 1;
+}
+
+/**
+ * \brief Sets the node transformation.
+ *
+ * \param self Animation.
+ * \param name Channel name.
+ * \param frame Frame number.
+ * \param value Node transformation.
+ * \return Nonzero on success.
+ */
+int limdl_animation_set_transform (
+	LIMdlAnimation*       self,
+	const char*           name,
+	int                   frame,
+	const LIMatTransform* value)
+{
+	int chan;
+
+	lisys_assert (frame >= 0);
+	lisys_assert (frame < self->length);
+
+	chan = limdl_animation_get_channel (self, name);
+	if (chan == -1)
+		return 0;
+	self->buffer.array[self->channels.count * frame + chan].transform = *value;
+
+	return 1;
 }
 
 /**

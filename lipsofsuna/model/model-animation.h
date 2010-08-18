@@ -60,6 +60,10 @@ LIAPICALL (LIMdlAnimation*, limdl_animation_new_copy, (
 LIAPICALL (void, limdl_animation_free, (
 	LIMdlAnimation* self));
 
+LIAPICALL (int, limdl_animation_insert_channel, (
+	LIMdlAnimation* self,
+	const char*     name));
+
 LIAPICALL (void, limdl_animation_clear, (
 	LIMdlAnimation* self));
 
@@ -73,6 +77,16 @@ LIAPICALL (int, limdl_animation_get_channel, (
 
 LIAPICALL (float, limdl_animation_get_duration, (
 	const LIMdlAnimation* self));
+
+LIAPICALL (int, limdl_animation_set_length, (
+	LIMdlAnimation* self,
+	int             value));
+
+LIAPICALL (int, limdl_animation_set_transform, (
+	LIMdlAnimation*       self,
+	const char*           name,
+	int                   frame,
+	const LIMatTransform* value));
 
 LIAPICALL (int, limdl_animation_get_transform, (
 	LIMdlAnimation* self,

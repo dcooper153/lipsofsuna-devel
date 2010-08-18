@@ -157,6 +157,13 @@ LIAPICALL (void, limdl_pose_set_channel_state, (
 	int                   channel,
 	LIMdlPoseChannelState value));
 
+LIAPICALL (int, limdl_pose_set_channel_transform, (
+	LIMdlPose*            self,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform));
+
 LIAPICALL (int, limdl_pose_set_model, (
 	LIMdlPose*  self,
 	LIMdlModel* model));
