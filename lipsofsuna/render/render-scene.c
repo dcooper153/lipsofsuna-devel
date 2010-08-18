@@ -277,6 +277,12 @@ liren_scene_render_begin (LIRenScene*    self,
 		return 0;
 	liren_check_errors ();
 
+	/* Save matrices. */
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix ();
+	glMatrixMode (GL_MODELVIEW);
+	glPushMatrix ();
+
 	/* Initialize context. */
 	context = liren_render_get_context (self->render);
 	liren_context_set_scene (context, self);
@@ -286,7 +292,13 @@ liren_scene_render_begin (LIRenScene*    self,
 
 	/* Depth sort scene. */
 	if (!private_sort_scene (self, context, &objects, &count))
+	{
+		glMatrixMode (GL_PROJECTION);
+		glPopMatrix ();
+		glMatrixMode (GL_MODELVIEW);
+		glPopMatrix ();
 		return 0;
+	}
 
 	/* Change render state. */
 	glEnable (GL_DEPTH_TEST);
@@ -387,9 +399,24 @@ liren_scene_render_end (LIRenScene* self)
 		glBindTexture (GL_TEXTURE_2D, 0);
 		glDisable (GL_TEXTURE_2D);
 	}
-	glMatrixMode (GL_MODELVIEW);
+	glEnable (GL_BLEND);
+	glEnable (GL_TEXTURE_2D);
+	glDisable (GL_ALPHA_TEST);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_NORMALIZE);
+	glDisable (GL_COLOR_MATERIAL);
+	glDepthMask (GL_FALSE);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor3f (1.0f, 1.0f, 1.0f);
 	liren_check_errors ();
 	self->state.rendering = 0;
+
+	/* Restore matrices. */
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix ();
+	glMatrixMode (GL_MODELVIEW);
+	glPopMatrix ();
 
 	/* Profiling report. */
 #ifdef LIREN_ENABLE_PROFILING
