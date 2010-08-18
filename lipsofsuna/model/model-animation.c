@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
+#include <lipsofsuna/string.h>
 #include "model-animation.h"
 
 #define TIMESCALE 0.02f
@@ -35,15 +35,168 @@ private_frame_transform (LIMdlAnimation* self,
 /*****************************************************************************/
 
 /**
+ * \brief Creates a soft copy of the animation.
+ * \param anim Animation.
+ * \return New animation or NULL.
+ */
+LIMdlAnimation* limdl_animation_new_copy (
+	LIMdlAnimation* anim)
+{
+	int i;
+	LIMdlAnimation* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIMdlAnimation));
+	if (self == NULL)
+		return NULL;
+	self->length = anim->length;
+	self->blendin = anim->blendin;
+	self->blendout = anim->blendout;
+	if (anim->name != NULL)
+		self->name = listr_dup (anim->name);
+
+	/* Copy channels. */
+	if (anim->channels.count)
+	{
+		self->channels.array = lisys_calloc (anim->channels.count, sizeof (char*));
+		if (self->channels.array == NULL)
+		{
+			limdl_animation_free (self);
+			return NULL;
+		}
+		self->channels.count = anim->channels.count;
+		for (i = 0 ; i < self->channels.count ; i++)
+		{
+			self->channels.array[i] = listr_dup (anim->channels.array[i]);
+			if (self->channels.array[i] == NULL)
+			{
+				limdl_animation_free (self);
+				return NULL;
+			}
+		}
+	}
+
+	/* Copy frames. */
+	if (anim->buffer.count)
+	{
+		self->buffer.array = lisys_calloc (anim->buffer.count, sizeof (LIMdlFrame));
+		if (self->buffer.array == NULL)
+		{
+			limdl_animation_free (self);
+			return NULL;
+		}
+		self->buffer.count = anim->buffer.count;
+		memcpy (self->buffer.array, anim->buffer.array,
+			self->buffer.count * sizeof (LIMdlFrame));
+	}
+
+	return self;
+}
+
+/**
+ * \brief Frees the animation.
+ * \param self Animation.
+ */
+void limdl_animation_free (
+	LIMdlAnimation* self)
+{
+	limdl_animation_clear (self);
+	lisys_free (self);
+}
+
+/**
+ * \brief Clears the name and channels of the animation.
+ * \param self Animation.
+ */
+void limdl_animation_clear (
+	LIMdlAnimation* self)
+{
+	int i;
+
+	if (self->channels.array != NULL)
+	{
+		for (i = 0 ; i < self->channels.count ; i++)
+			lisys_free (self->channels.array[i]);
+		lisys_free (self->channels.array);
+	}
+	lisys_free (self->buffer.array);
+	lisys_free (self->name);
+}
+
+/**
+ * \brief Reads the animation from a stream.
+ * \param self Animation.
+ * \param reader Stream reader.
+ * \return Nonzero on success.
+ */
+int limdl_animation_read (
+	LIMdlAnimation* self,
+	LIArcReader*    reader)
+{
+	int i;
+	uint32_t count0;
+	uint32_t count1;
+	LIMatTransform* transform;
+
+	/* Read the header. */
+	if (!liarc_reader_get_text (reader, "", &self->name) ||
+	    !liarc_reader_get_uint32 (reader, &count0) ||
+	    !liarc_reader_get_uint32 (reader, &count1))
+		return 0;
+
+	/* Allocate channels. */
+	self->channels.count = count0;
+	if (count0)
+	{
+		self->channels.array = lisys_calloc (count0, sizeof (char*));
+		if (self->channels.array == NULL)
+			return 0;
+	}
+
+	/* Read channels. */
+	for (i = 0 ; i < self->channels.count ; i++)
+	{
+		if (!liarc_reader_get_text (reader, "", self->channels.array + i))
+			return 0;
+	}
+
+	/* Allocate frames. */
+	self->length = count1;
+	self->buffer.count = count0 * count1;
+	if (self->buffer.count)
+	{
+		self->buffer.array = lisys_calloc (self->buffer.count, sizeof (LIMdlFrame));
+		if (self->buffer.array == NULL)
+			return 0;
+	}
+
+	/* Read frames. */
+	for (i = 0 ; i < self->buffer.count ; i++)
+	{
+		transform = &self->buffer.array[i].transform;
+		if (!liarc_reader_get_float (reader, &transform->position.x) ||
+			!liarc_reader_get_float (reader, &transform->position.y) ||
+			!liarc_reader_get_float (reader, &transform->position.z) ||
+			!liarc_reader_get_float (reader, &transform->rotation.x) ||
+			!liarc_reader_get_float (reader, &transform->rotation.y) ||
+			!liarc_reader_get_float (reader, &transform->rotation.z) ||
+			!liarc_reader_get_float (reader, &transform->rotation.w))
+			return 0;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Gets the index of a channel.
  *
  * \param self Animation.
  * \param name Channel name.
  * \return Channel index or -1.
  */
-int
-limdl_animation_get_channel (LIMdlAnimation* self,
-                             const char*     name)
+int limdl_animation_get_channel (
+	LIMdlAnimation* self,
+	const char*     name)
 {
 	int i;
 
@@ -62,8 +215,8 @@ limdl_animation_get_channel (LIMdlAnimation* self,
  * \param self Animation.
  * \return Duration in seconds.
  */
-float
-limdl_animation_get_duration (const LIMdlAnimation* self)
+float limdl_animation_get_duration (
+	const LIMdlAnimation* self)
 {
 	return (self->length - 1) * TIMESCALE;
 }
@@ -77,11 +230,11 @@ limdl_animation_get_duration (const LIMdlAnimation* self)
  * \param value Return location for the transformation.
  * \return Nonzero on success.
  */
-int
-limdl_animation_get_transform (LIMdlAnimation* self,
-                               const char*     name,
-                               float           secs,
-                               LIMatTransform* value)
+int limdl_animation_get_transform (
+	LIMdlAnimation* self,
+	const char*     name,
+	float           secs,
+	LIMatTransform* value)
 {
 	int chan;
 	int frame;
@@ -130,12 +283,12 @@ limdl_animation_get_transform (LIMdlAnimation* self,
  * \param eweight Ending weight.
  * \return Value within range from 0.0 to 1.0.
  */
-float
-limdl_animation_get_weight (const LIMdlAnimation* self,
-                            float                 time,
-                            float                 sweight,
-                            float                 mweight,
-                            float                 eweight)
+float limdl_animation_get_weight (
+	const LIMdlAnimation* self,
+	float                 time,
+	float                 sweight,
+	float                 mweight,
+	float                 eweight)
 {
 #warning No animation weights
 #if 0

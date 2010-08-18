@@ -31,10 +31,6 @@ typedef int (*LIMdlWriteFunc)(const LIMdlModel*, LIArcWriter*);
 static void private_build (
 	LIMdlModel* self);
 
-static void private_free_animation (
-	LIMdlModel*     self,
-	LIMdlAnimation* animation);
-
 static int private_read (
 	LIMdlModel*  self,
 	LIArcReader* reader);
@@ -74,11 +70,6 @@ static int private_read_vertices (
 static int private_read_weights (
 	LIMdlModel*  self,
 	LIArcReader* reader);
-
-static int private_read_animation (
-	LIMdlModel*     self,
-	LIMdlAnimation* animation,
-	LIArcReader*    reader);
 
 static int private_read_vertex_weights (
 	LIMdlModel*   self,
@@ -317,7 +308,7 @@ limdl_model_free (LIMdlModel* self)
 	if (self->animations.array != NULL)
 	{
 		for (i = 0 ; i < self->animations.count ; i++)
-			private_free_animation (self, self->animations.array + i);
+			limdl_animation_clear (self->animations.array + i);
 		lisys_free (self->animations.array);
 	}
 
@@ -1139,22 +1130,6 @@ private_build (LIMdlModel* self)
 	}
 }
 
-static void
-private_free_animation (LIMdlModel*     self,
-                        LIMdlAnimation* animation)
-{
-	int i;
-
-	if (animation->channels.array != NULL)
-	{
-		for (i = 0 ; i < animation->channels.count ; i++)
-			lisys_free (animation->channels.array[i]);
-		lisys_free (animation->channels.array);
-	}
-	lisys_free (animation->buffer.array);
-	lisys_free (animation->name);
-}
-
 static int
 private_read (LIMdlModel*  self,
               LIArcReader* reader)
@@ -1293,7 +1268,7 @@ private_read_animations (LIMdlModel*  self,
 		for (i = 0 ; i < self->animations.count ; i++)
 		{
 			animation = self->animations.array + i;
-			if (!private_read_animation (self, animation, reader))
+			if (!limdl_animation_read (animation, reader))
 				return 0;
 		}
 	}
@@ -1557,65 +1532,6 @@ private_read_weights (LIMdlModel*  self,
 			if (!private_read_vertex_weights (self, self->weights.array + i, reader))
 				return 0;
 		}
-	}
-
-	return 1;
-}
-
-static int
-private_read_animation (LIMdlModel*     self,
-                        LIMdlAnimation* animation,
-                        LIArcReader*    reader)
-{
-	int i;
-	uint32_t count0;
-	uint32_t count1;
-	LIMatTransform* transform;
-
-	/* Read the header. */
-	if (!liarc_reader_get_text (reader, "", &animation->name) ||
-	    !liarc_reader_get_uint32 (reader, &count0) ||
-	    !liarc_reader_get_uint32 (reader, &count1))
-		return 0;
-
-	/* Allocate channels. */
-	animation->channels.count = count0;
-	if (count0)
-	{
-		animation->channels.array = lisys_calloc (count0, sizeof (char*));
-		if (animation->channels.array == NULL)
-			return 0;
-	}
-
-	/* Read channels. */
-	for (i = 0 ; i < animation->channels.count ; i++)
-	{
-		if (!liarc_reader_get_text (reader, "", animation->channels.array + i))
-			return 0;
-	}
-
-	/* Allocate frames. */
-	animation->length = count1;
-	animation->buffer.count = count0 * count1;
-	if (animation->buffer.count)
-	{
-		animation->buffer.array = lisys_calloc (animation->buffer.count, sizeof (LIMdlFrame));
-		if (animation->buffer.array == NULL)
-			return 0;
-	}
-
-	/* Read frames. */
-	for (i = 0 ; i < animation->buffer.count ; i++)
-	{
-		transform = &animation->buffer.array[i].transform;
-		if (!liarc_reader_get_float (reader, &transform->position.x) ||
-			!liarc_reader_get_float (reader, &transform->position.y) ||
-			!liarc_reader_get_float (reader, &transform->position.z) ||
-			!liarc_reader_get_float (reader, &transform->rotation.x) ||
-			!liarc_reader_get_float (reader, &transform->rotation.y) ||
-			!liarc_reader_get_float (reader, &transform->rotation.z) ||
-			!liarc_reader_get_float (reader, &transform->rotation.w))
-			return 0;
 	}
 
 	return 1;

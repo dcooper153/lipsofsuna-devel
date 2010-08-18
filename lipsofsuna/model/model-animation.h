@@ -25,6 +25,7 @@
 #ifndef __MODEL_ANIMATION_H__
 #define __MODEL_ANIMATION_H__
 
+#include <lipsofsuna/archive.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/system.h>
 
@@ -52,6 +53,19 @@ struct _LIMdlAnimation
 		char** array;
 	} channels;
 };
+
+LIAPICALL (LIMdlAnimation*, limdl_animation_new_copy, (
+	LIMdlAnimation* anim));
+
+LIAPICALL (void, limdl_animation_free, (
+	LIMdlAnimation* self));
+
+LIAPICALL (void, limdl_animation_clear, (
+	LIMdlAnimation* self));
+
+LIAPICALL (int, limdl_animation_read, (
+	LIMdlAnimation* self,
+	LIArcReader*    reader));
 
 LIAPICALL (int, limdl_animation_get_channel, (
 	LIMdlAnimation* self,
