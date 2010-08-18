@@ -666,7 +666,7 @@ class LIShape:
 		self.vertices = []
 
 	def add_mesh(self, obj):
-		matrix = obj.matrix_world.rotation_part() * LIFormat.matrix.copy().to_3x3()
+		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.rotation_part()
 		for v in obj.data.verts:
 			self.vertices.append(v.co * matrix)
 
