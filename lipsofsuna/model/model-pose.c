@@ -25,51 +25,50 @@
 #include <lipsofsuna/system.h>
 #include "model-pose.h"
 
-static void
-private_channel_free (LIMdlPoseChannel* chan);
+static void private_channel_free (
+	LIMdlPoseChannel* chan);
 
-static void
-private_clear_node (LIMdlPose*       self,
-                    LIMdlNode*       node,
-                    const LIMdlNode* rest);
+static void private_clear_node (
+	LIMdlPose*       self,
+	LIMdlNode*       node,
+	const LIMdlNode* rest);
 
-static void
-private_clear_pose (LIMdlPose* self);
+static void private_clear_pose (
+	LIMdlPose* self);
 
-static LIMdlPoseChannel*
-private_create_channel (LIMdlPose* self,
-                        int        channel);
+static LIMdlPoseChannel* private_create_channel (
+	LIMdlPose* self,
+	int        channel);
 
-static void
-private_fade_free (LIMdlPoseFade* fade);
+static void private_fade_free (
+	LIMdlPoseFade* fade);
 
-static void
-private_fade_remove (LIMdlPose*     self,
-                     LIMdlPoseFade* fade);
+static void private_fade_remove (
+	LIMdlPose*     self,
+	LIMdlPoseFade* fade);
 
-static LIMdlPoseChannel*
-private_find_channel (const LIMdlPose* self,
-                      int              channel);
+static LIMdlPoseChannel* private_find_channel (
+	const LIMdlPose* self,
+	int              channel);
 
-static int
-private_init_pose (LIMdlPose*  self,
-                   LIMdlModel* model);
+static int private_init_pose (
+	LIMdlPose*  self,
+	LIMdlModel* model);
 
-static int
-private_play_channel (const LIMdlPose*  self,
-                      LIMdlPoseChannel* channel,
-                      float             secs);
+static int private_play_channel (
+	const LIMdlPose*  self,
+	LIMdlPoseChannel* channel,
+	float             secs);
 
-static void
-private_transform_node (LIMdlPose* self,
-                        LIMdlNode* node);
+static void private_transform_node (
+	LIMdlPose* self,
+	LIMdlNode* node);
 
-static float
-private_get_channel_weight (const LIMdlPose*        self,
-                            const LIMdlPoseChannel* channel);
+static float private_get_channel_weight (
+	const LIMdlPose*        self,
+	const LIMdlPoseChannel* channel);
 
-static LIMdlAnimation
-private_empty_anim =
+static LIMdlAnimation private_empty_anim =
 {
 	0, "empty", 0.0f, 0.0f, { 0, NULL }, { 0, NULL }
 };
@@ -78,12 +77,11 @@ private_empty_anim =
 
 /**
  * \brief Creates a new model pose.
- *
  * \param model The model this pose is for.
  * \return New model pose or NULL.
  */
-LIMdlPose*
-limdl_pose_new (LIMdlModel* model)
+LIMdlPose* limdl_pose_new (
+	LIMdlModel* model)
 {
 	LIMdlPose* self;
 
@@ -95,22 +93,20 @@ limdl_pose_new (LIMdlModel* model)
 	/* Allocate channel tree. */
 	self->channels = lialg_u32dic_new ();
 	if (self->channels == NULL)
-		goto error;
+	{
+		limdl_pose_free (self);
+		return NULL;
+	}
 
 	return self;
-
-error:
-	limdl_pose_free (self);
-	return NULL;
 }
 
 /**
  * \brief Frees the model pose.
- *
  * \param self A model pose.
  */
-void
-limdl_pose_free (LIMdlPose* self)
+void limdl_pose_free (
+	LIMdlPose* self)
 {
 	private_clear_pose (self);
 	if (self->channels != NULL)
@@ -127,9 +123,9 @@ limdl_pose_free (LIMdlPose* self)
  * \param self Model pose.
  * \param channel Channel number.
  */
-void
-limdl_pose_destroy_channel (LIMdlPose* self,
-                            int        channel)
+void limdl_pose_destroy_channel (
+	LIMdlPose* self,
+	int        channel)
 {
 	LIMdlPoseChannel* chan;
 
@@ -154,10 +150,10 @@ limdl_pose_destroy_channel (LIMdlPose* self,
  * \param channel Channel number.
  * \param rate Amount of fade out per second or LIMDL_POSE_FADE_AUTOMATIC.
  */
-void
-limdl_pose_fade_channel (LIMdlPose* self,
-                         int        channel,
-                         float      rate)
+void limdl_pose_fade_channel (
+	LIMdlPose* self,
+	int        channel,
+	float      rate)
 {
 	LIMdlPoseFade* fade;
 	LIMdlPoseChannel* chan;
@@ -180,7 +176,13 @@ limdl_pose_fade_channel (LIMdlPose* self,
 	fade->rate = rate;
 	fade->time = chan->time;
 	fade->weight = chan->priority * private_get_channel_weight (self, chan);
-	fade->animation = chan->animation;
+	fade->animation = limdl_animation_new_copy (chan->animation);
+	if (fade->animation == NULL)
+	{
+		limdl_pose_destroy_channel (self, channel);
+		lisys_free (fade);
+		return;
+	}
 
 	/* Link to fade list. */
 	fade->prev = NULL;
@@ -200,9 +202,9 @@ limdl_pose_fade_channel (LIMdlPose* self,
  * \param name Name of the node to find.
  * \return Node or NULL.
  */
-LIMdlNode*
-limdl_pose_find_node (const LIMdlPose* self,
-                      const char*      name)
+LIMdlNode* limdl_pose_find_node (
+	const LIMdlPose* self,
+	const char*      name)
 {
 	int i;
 	LIMdlNode* node;
@@ -227,9 +229,9 @@ limdl_pose_find_node (const LIMdlPose* self,
  * \param self Model pose.
  * \param secs Number of seconds to progress.
  */
-void
-limdl_pose_update (LIMdlPose* self,
-                   float      secs)
+void limdl_pose_update (
+	LIMdlPose* self,
+	float      secs)
 {
 	int i;
 	LIAlgU32dicIter iter;
@@ -286,9 +288,9 @@ limdl_pose_update (LIMdlPose* self,
 	}
 }
 
-void
-limdl_pose_transform (LIMdlPose*   self,
-                      LIMdlVertex* vertices)
+void limdl_pose_transform (
+	LIMdlPose*   self,
+	LIMdlVertex* vertices)
 {
 	int i;
 	int j;
@@ -400,9 +402,9 @@ limdl_pose_transform (LIMdlPose*   self,
 	}
 }
 
-LIMdlAnimation*
-limdl_pose_get_channel_animation (const LIMdlPose* self,
-                                  int              channel)
+LIMdlAnimation* limdl_pose_get_channel_animation (
+	const LIMdlPose* self,
+	int              channel)
 {
 	LIMdlPoseChannel* chan;
 
@@ -412,46 +414,54 @@ limdl_pose_get_channel_animation (const LIMdlPose* self,
 	return chan->animation;
 }
 
-void
-limdl_pose_set_channel_animation (LIMdlPose*  self,
-                                  int         channel,
-                                  const char* animation)
+void limdl_pose_set_channel_animation (
+	LIMdlPose*  self,
+	int         channel,
+	const char* animation)
 {
 	LIMdlAnimation* anim;
 	LIMdlPoseChannel* chan;
 
 	if (self->model == NULL)
 		return;
+
+	/* Create an animation. */
 	anim = limdl_model_find_animation (self->model, animation);
 	if (anim == NULL)
 	{
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
+	anim = limdl_animation_new_copy (anim);
+	if (anim == NULL)
+		return;
+
+	/* Create a channel. */
 	chan = private_create_channel (self, channel);
 	if (chan == NULL)
+	{
+		limdl_animation_free (anim);
 		return;
+	}
 	chan->time = 0.0f;
 	chan->animation = anim;
-	lisys_free (chan->animation_name);
-	chan->animation_name = strdup (animation);
 }
 
-const char*
-limdl_pose_get_channel_name (const LIMdlPose* self,
-                             int              channel)
+const char* limdl_pose_get_channel_name (
+	const LIMdlPose* self,
+	int              channel)
 {
 	LIMdlPoseChannel* chan;
 
 	chan = private_find_channel (self, channel);
-	if (chan == NULL || chan->animation == NULL)
+	if (chan == NULL)
 		return "";
 	return chan->animation->name;
 }
 
-float
-limdl_pose_get_channel_position (const LIMdlPose* self,
-                                 int              channel)
+float limdl_pose_get_channel_position (
+	const LIMdlPose* self,
+	int              channel)
 {
 	LIMdlPoseChannel* chan;
 
@@ -461,10 +471,10 @@ limdl_pose_get_channel_position (const LIMdlPose* self,
 	return chan->time;
 }
 
-void
-limdl_pose_set_channel_position (LIMdlPose* self,
-                                 int        channel,
-                                 float      value)
+void limdl_pose_set_channel_position (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
 {
 	LIMdlPoseChannel* chan;
 
@@ -476,9 +486,9 @@ limdl_pose_set_channel_position (LIMdlPose* self,
 		chan->time = limdl_animation_get_duration (chan->animation);
 }
 
-float
-limdl_pose_get_channel_priority (const LIMdlPose* self,
-                                 int              channel)
+float limdl_pose_get_channel_priority (
+	const LIMdlPose* self,
+	int              channel)
 {
 	LIMdlPoseChannel* chan;
 
@@ -488,10 +498,10 @@ limdl_pose_get_channel_priority (const LIMdlPose* self,
 	return chan->priority;
 }
 
-void
-limdl_pose_set_channel_priority (LIMdlPose* self,
-                                 int        channel,
-                                 float      value)
+void limdl_pose_set_channel_priority (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
 {
 	LIMdlPoseChannel* chan;
 
@@ -501,9 +511,9 @@ limdl_pose_set_channel_priority (LIMdlPose* self,
 	chan->priority = value;
 }
 
-int
-limdl_pose_get_channel_repeats (const LIMdlPose* self,
-                                int              channel)
+int limdl_pose_get_channel_repeats (
+	const LIMdlPose* self,
+	int              channel)
 {
 	LIMdlPoseChannel* chan;
 
@@ -513,10 +523,10 @@ limdl_pose_get_channel_repeats (const LIMdlPose* self,
 	return chan->repeats;
 }
 
-void
-limdl_pose_set_channel_repeats (LIMdlPose* self,
-                                int        channel,
-                                int        value)
+void limdl_pose_set_channel_repeats (
+	LIMdlPose* self,
+	int        channel,
+	int        value)
 {
 	LIMdlPoseChannel* chan;
 
@@ -533,9 +543,9 @@ limdl_pose_set_channel_repeats (LIMdlPose* self,
  * \param channel Channel number.
  * \return Current state.
  */
-LIMdlPoseChannelState
-limdl_pose_get_channel_state (const LIMdlPose* self,
-                              int              channel)
+LIMdlPoseChannelState limdl_pose_get_channel_state (
+	const LIMdlPose* self,
+	int              channel)
 {
 	LIMdlPoseChannel* chan;
 
@@ -552,10 +562,10 @@ limdl_pose_get_channel_state (const LIMdlPose* self,
  * \param channel Channel number.
  * \param value New state.
  */
-void
-limdl_pose_set_channel_state (LIMdlPose*            self,
-                              int                   channel,
-                              LIMdlPoseChannelState value)
+void limdl_pose_set_channel_state (
+	LIMdlPose*            self,
+	int                   channel,
+	LIMdlPoseChannelState value)
 {
 	LIMdlPoseChannel* chan;
 
@@ -583,9 +593,9 @@ limdl_pose_set_channel_state (LIMdlPose*            self,
  * \param model Model to pose.
  * \return Nonzero on success.
  */
-int
-limdl_pose_set_model (LIMdlPose*  self,
-                      LIMdlModel* model)
+int limdl_pose_set_model (
+	LIMdlPose*  self,
+	LIMdlModel* model)
 {
 	LIAlgU32dicIter iter;
 	LIMdlAnimation* anim;
@@ -621,17 +631,24 @@ limdl_pose_set_model (LIMdlPose*  self,
 	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
-		if (model != NULL && chan->animation_name != NULL)
-			anim = limdl_model_find_animation (model, chan->animation_name);
+		if (model != NULL)
+		{
+			anim = limdl_model_find_animation (model, chan->animation->name);
+			if (anim != NULL)
+				anim = limdl_animation_new_copy (anim);
+		}
 		else
 			anim = NULL;
-		if (anim == NULL)
+		if (anim != NULL)
+		{
+			limdl_animation_free (chan->animation);
+			chan->animation = anim;
+		}
+		else
 		{
 			lialg_u32dic_remove (self->channels, iter.key);
 			private_channel_free (chan);
 		}
-		else
-			chan->animation = anim;
 	}
 
 	/* Clear invalid fades. */
@@ -640,8 +657,8 @@ limdl_pose_set_model (LIMdlPose*  self,
 	for (fade = self->fades ; fade != NULL ; fade = fade_next)
 	{
 		fade_next = fade->next;
-		if (model != NULL && fade->animation_name != NULL)
-			anim = limdl_model_find_animation (model, fade->animation_name);
+		if (model != NULL)
+			anim = limdl_model_find_animation (model, fade->animation->name);
 		else
 			anim = NULL;
 		if (anim == NULL)
@@ -659,17 +676,17 @@ limdl_pose_set_model (LIMdlPose*  self,
 
 /*****************************************************************************/
 
-static void
-private_channel_free (LIMdlPoseChannel* chan)
+static void private_channel_free (
+	LIMdlPoseChannel* chan)
 {
-	lisys_free (chan->animation_name);
+	limdl_animation_free (chan->animation);
 	lisys_free (chan);
 }
 
-static void
-private_clear_node (LIMdlPose*       self,
-                    LIMdlNode*       node,
-                    const LIMdlNode* rest)
+static void private_clear_node (
+	LIMdlPose*       self,
+	LIMdlNode*       node,
+	const LIMdlNode* rest)
 {
 	int i;
 	LIMdlNode* node0;
@@ -684,8 +701,8 @@ private_clear_node (LIMdlPose*       self,
 	}
 }
 
-static void
-private_clear_pose (LIMdlPose* self)
+static void private_clear_pose (
+	LIMdlPose* self)
 {
 	int i;
 	LIAlgU32dicIter iter;
@@ -731,40 +748,54 @@ private_clear_pose (LIMdlPose* self)
 	}
 }
 
-static LIMdlPoseChannel*
-private_create_channel (LIMdlPose* self,
-                        int        channel)
+static LIMdlPoseChannel* private_create_channel (
+	LIMdlPose* self,
+	int        channel)
 {
+	LIMdlAnimation* anim;
 	LIMdlPoseChannel* chan;
 
+	/* Check for an existing channel. */
 	chan = private_find_channel (self, channel);
 	if (chan != NULL)
 		return chan;
+
+	/* Create an empty animation. */
+	anim = limdl_animation_new_copy (&private_empty_anim);
+	if (anim == NULL)
+		return 0;
+
+	/* Create a new channel. */
 	chan = lisys_calloc (1, sizeof (LIMdlPoseChannel));
 	if (chan == NULL)
-		return 0;
-	if (!lialg_u32dic_insert (self->channels, channel, chan))
 	{
-		lisys_free (chan);
+		limdl_animation_free (anim);
 		return 0;
 	}
 	chan->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
-	chan->animation = &private_empty_anim;
-	chan->animation_name = strdup ("idle");
+	chan->animation = anim;
+
+	/* Register the channel. */
+	if (!lialg_u32dic_insert (self->channels, channel, chan))
+	{
+		limdl_animation_free (chan->animation);
+		lisys_free (chan);
+		return 0;
+	}
 
 	return chan;
 }
 
-static void
-private_fade_free (LIMdlPoseFade* fade)
+static void private_fade_free (
+	LIMdlPoseFade* fade)
 {
-	lisys_free (fade->animation_name);
+	limdl_animation_free (fade->animation);
 	lisys_free (fade);
 }
 
-static void
-private_fade_remove (LIMdlPose*     self,
-                     LIMdlPoseFade* fade)
+static void private_fade_remove (
+	LIMdlPose*     self,
+	LIMdlPoseFade* fade)
 {
 	if (fade->next != NULL)
 		fade->next->prev = fade->prev;
@@ -774,16 +805,16 @@ private_fade_remove (LIMdlPose*     self,
 		self->fades = fade->next;
 }
 
-static LIMdlPoseChannel*
-private_find_channel (const LIMdlPose* self,
-                      int              channel)
+static LIMdlPoseChannel* private_find_channel (
+	const LIMdlPose* self,
+	int              channel)
 {
 	return lialg_u32dic_find (self->channels, channel);
 }
 
-static int
-private_init_pose (LIMdlPose*  self,
-                   LIMdlModel* model)
+static int private_init_pose (
+	LIMdlPose*  self,
+	LIMdlModel* model)
 {
 	int i;
 
@@ -826,10 +857,10 @@ private_init_pose (LIMdlPose*  self,
 	return 1;
 }
 
-static int
-private_play_channel (const LIMdlPose*  self,
-                      LIMdlPoseChannel* channel,
-                      float             secs)
+static int private_play_channel (
+	const LIMdlPose*  self,
+	LIMdlPoseChannel* channel,
+	float             secs)
 {
 	int cycles;
 	float duration;
@@ -860,9 +891,9 @@ private_play_channel (const LIMdlPose*  self,
 	return 1;
 }
 
-static void
-private_transform_node (LIMdlPose* self,
-                        LIMdlNode* node)
+static void private_transform_node (
+	LIMdlPose* self,
+	LIMdlNode* node)
 {
 	int i;
 	int channels;
@@ -945,9 +976,9 @@ private_transform_node (LIMdlPose* self,
 		private_transform_node (self, node->nodes.array[i]);
 }
 
-static float
-private_get_channel_weight (const LIMdlPose*        self,
-                            const LIMdlPoseChannel* channel)
+static float private_get_channel_weight (
+	const LIMdlPose*        self,
+	const LIMdlPoseChannel* channel)
 {
 	return limdl_animation_get_weight (channel->animation, channel->time,
 		channel->repeat == 0 && channel->repeats != -1? 0.0f : 1.0f, 1.0f,

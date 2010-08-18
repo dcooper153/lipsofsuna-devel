@@ -48,7 +48,6 @@ struct _LIMdlPoseChannel
 	int repeats;
 	float time;
 	float priority;
-	char* animation_name;
 	LIMdlAnimation* animation;
 };
 
@@ -57,7 +56,6 @@ struct _LIMdlPoseFade
 	float rate;
 	float time;
 	float weight;
-	char* animation_name;
 	LIMdlPoseFade* prev;
 	LIMdlPoseFade* next;
 	LIMdlAnimation* animation;
@@ -84,85 +82,84 @@ struct _LIMdlPose
 extern "C" {
 #endif
 
-LIMdlPose*
-limdl_pose_new ();
+LIAPICALL (LIMdlPose*, limdl_pose_new, ());
 
-void
-limdl_pose_free (LIMdlPose* self);
+LIAPICALL (void, limdl_pose_free, (
+	LIMdlPose* self));
 
-void
-limdl_pose_destroy_channel (LIMdlPose* self,
-                            int        channel);
+LIAPICALL (void, limdl_pose_destroy_channel, (
+	LIMdlPose* self,
+	int        channel));
 
-void
-limdl_pose_fade_channel (LIMdlPose* self,
-                         int        channel,
-                         float      rate);
+LIAPICALL (void, limdl_pose_fade_channel, (
+	LIMdlPose* self,
+	int        channel,
+	float      rate));
 
-LIMdlNode*
-limdl_pose_find_node (const LIMdlPose* self,
-                      const char*      name);
+LIAPICALL (LIMdlNode*, limdl_pose_find_node, (
+	const LIMdlPose* self,
+	const char*      name));
 
-void
-limdl_pose_update (LIMdlPose* self,
-                   float      secs);
+LIAPICALL (void, limdl_pose_update, (
+	LIMdlPose* self,
+	float      secs));
 
-void
-limdl_pose_transform (LIMdlPose*   self,
-                      LIMdlVertex* vertices);
+LIAPICALL (void, limdl_pose_transform, (
+	LIMdlPose*   self,
+	LIMdlVertex* vertices));
 
-LIMdlAnimation*
-limdl_pose_get_channel_animation (const LIMdlPose* self,
-                                  int              channel);
+LIAPICALL (LIMdlAnimation*, limdl_pose_get_channel_animation, (
+	const LIMdlPose* self,
+	int              channel));
 
-void
-limdl_pose_set_channel_animation (LIMdlPose*  self,
-                                  int         channel,
-                                  const char* animation);
+LIAPICALL (void, limdl_pose_set_channel_animation, (
+	LIMdlPose*  self,
+	int         channel,
+	const char* animation));
 
-const char*
-limdl_pose_get_channel_name (const LIMdlPose* self,
-                             int              channel);
+LIAPICALL (const char*, limdl_pose_get_channel_name, (
+	const LIMdlPose* self,
+	int              channel));
 
-float
-limdl_pose_get_channel_position (const LIMdlPose* self,
-                                 int              channel);
+LIAPICALL (float, limdl_pose_get_channel_position, (
+	const LIMdlPose* self,
+	int              channel));
 
-void
-limdl_pose_set_channel_position (LIMdlPose* self,
-                                 int        channel,
-                                 float      value);
+LIAPICALL (void, limdl_pose_set_channel_position, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
 
-float
-limdl_pose_get_channel_priority (const LIMdlPose* self,
-                                 int              channel);
+LIAPICALL (float, limdl_pose_get_channel_priority, (
+	const LIMdlPose* self,
+	int              channel));
 
-void
-limdl_pose_set_channel_priority (LIMdlPose* self,
-                                 int        channel,
-                                 float      value);
+LIAPICALL (void, limdl_pose_set_channel_priority, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
 
-int
-limdl_pose_get_channel_repeats (const LIMdlPose* self,
-                                int              channel);
+LIAPICALL (int, limdl_pose_get_channel_repeats, (
+	const LIMdlPose* self,
+	int              channel));
 
-void
-limdl_pose_set_channel_repeats (LIMdlPose* self,
-                                int        channel,
-                                int        value);
+LIAPICALL (void, limdl_pose_set_channel_repeats, (
+	LIMdlPose* self,
+	int        channel,
+	int        value));
 
-LIMdlPoseChannelState
-limdl_pose_get_channel_state (const LIMdlPose* self,
-                              int              channel);
+LIAPICALL (LIMdlPoseChannelState, limdl_pose_get_channel_state, (
+	const LIMdlPose* self,
+	int              channel));
 
-void
-limdl_pose_set_channel_state (LIMdlPose*            self,
-                              int                   channel,
-                              LIMdlPoseChannelState value);
+LIAPICALL (void, limdl_pose_set_channel_state, (
+	LIMdlPose*            self,
+	int                   channel,
+	LIMdlPoseChannelState value));
 
-int
-limdl_pose_set_model (LIMdlPose*  self,
-                      LIMdlModel* model);
+LIAPICALL (int, limdl_pose_set_model, (
+	LIMdlPose*  self,
+	LIMdlModel* model));
 
 #ifdef __cplusplus
 }
