@@ -113,7 +113,8 @@ LIAPICALL (void, liren_scene_render_forward_transparent, (
 	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_postproc, (
-	LIRenScene* self));
+	LIRenScene* self,
+	const char* name));
 
 LIAPICALL (void, liren_scene_update, (
 	LIRenScene* self,

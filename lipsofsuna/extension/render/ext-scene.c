@@ -220,16 +220,21 @@ static void Scene_draw_forward_transparent (LIScrArgs* args)
  * -- Applies post-processing shaders to the output buffer.
  * --
  * -- @param self Scene.
- * function Scene.draw_post_process(self)
+ * -- @param args Arguments.<ul>
+ * --   <li>shader: Post-processing shader name.</li></ul>
+ * function Scene.draw_post_process(self, args)
  */
 static void Scene_draw_post_process (LIScrArgs* args)
 {
+	const char* shader = "postprocess0";
 	LIExtModule* module;
 	LIRenScene* scene;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liren_scene_render_postproc (scene);
+	liscr_args_gets_string (args, "shader", &shader);
+
+	liren_scene_render_postproc (scene, shader);
 }
 
 /* @luadoc

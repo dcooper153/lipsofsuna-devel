@@ -645,18 +645,22 @@ liren_scene_render_forward_transparent (LIRenScene* self)
  * the input of the next operation.
  *
  * \param self Scene.
+ * \param name Shader name.
  */
-void
-liren_scene_render_postproc (LIRenScene* self)
+void liren_scene_render_postproc (
+	LIRenScene* self,
+	const char* name)
 {
-	int i;
-	int src;
-	char name[32];
 	GLuint tmp;
 	LIRenShader* shader;
 
 	/* Validate state. */
 	if (!self->state.rendering)
+		return;
+
+	/* Find post-processing shader. */
+	shader = liren_render_find_shader (self->render, name);
+	if (shader == NULL)
 		return;
 
 	/* Change render state. */
@@ -669,45 +673,30 @@ liren_scene_render_postproc (LIRenScene* self)
 	glMatrixMode (GL_PROJECTION);
 	glPushMatrix ();
 	glLoadIdentity ();
+	glUseProgramObjectARB (shader->program);
+	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
+	glBindTexture (GL_TEXTURE_2D, self->state.framebuffer->postproc_texture[0]);
 
-	/* Call post-processing shaders. */
-	for (i = src = 0 ; i < 1024 ; i++, src = !src)
-	{
-		/* Bind post-processing shader. */
-		snprintf (name, 32, "postprocess%d", i);
-		shader = liren_render_find_shader (self->render, name);
-		if (shader == NULL)
-		{
-			src = !src;
-			break;
-		}
+	/* Render from buffer to another. */
+	glBegin (GL_QUADS);
+	glTexCoord2i (0, 0);
+	glVertex2i (-1, -1);
+	glTexCoord2i (0, 1);
+	glVertex2i (-1, 1);
+	glTexCoord2i (1, 1);
+	glVertex2i (1, 1);
+	glTexCoord2i (1, 0);
+	glVertex2i (1, -1);
+	glEnd ();
+	liren_check_errors ();
 
-		/* Change render state. */
-		glUseProgramObjectARB (shader->program);
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
-		glBindTexture (GL_TEXTURE_2D, self->state.framebuffer->postproc_texture[0]);
-
-		/* Render intermediate framebuffer to screen. */
-		glBegin (GL_QUADS);
-		glTexCoord2i (0, 0);
-		glVertex2i (-1, -1);
-		glTexCoord2i (0, 1);
-		glVertex2i (-1, 1);
-		glTexCoord2i (1, 1);
-		glVertex2i (1, 1);
-		glTexCoord2i (1, 0);
-		glVertex2i (1, -1);
-		glEnd ();
-		liren_check_errors ();
-
-		/* Swap input and output. */
-		tmp = self->state.framebuffer->postproc_fbo[0];
-		self->state.framebuffer->postproc_fbo[0] = self->state.framebuffer->postproc_fbo[1];
-		self->state.framebuffer->postproc_fbo[1] = tmp;
-		tmp = self->state.framebuffer->postproc_texture[0];
-		self->state.framebuffer->postproc_texture[0] = self->state.framebuffer->postproc_texture[1];
-		self->state.framebuffer->postproc_texture[1] = tmp;
-	}
+	/* Swap input and output buffers. */
+	tmp = self->state.framebuffer->postproc_fbo[0];
+	self->state.framebuffer->postproc_fbo[0] = self->state.framebuffer->postproc_fbo[1];
+	self->state.framebuffer->postproc_fbo[1] = tmp;
+	tmp = self->state.framebuffer->postproc_texture[0];
+	self->state.framebuffer->postproc_texture[0] = self->state.framebuffer->postproc_texture[1];
+	self->state.framebuffer->postproc_texture[1] = tmp;
 
 	/* Change render state. */
 	glPopMatrix ();
