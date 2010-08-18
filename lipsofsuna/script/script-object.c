@@ -79,8 +79,10 @@ static void Object_animate (LIScrArgs* args)
 	liscr_args_gets_float (args, "weight", &weight);
 	liscr_args_gets_float (args, "time", &time);
 	liscr_args_gets_bool (args, "permanent", &repeat);
-	if (channel < 0 || channel > 254)
+	if (channel < 1 || channel > 255)
 		channel = -1;
+	else
+		channel--;
 	ret = lieng_object_animate (args->self, channel, animation, repeat, weight, time);
 	liscr_args_seti_bool (args, ret);
 }
@@ -257,6 +259,7 @@ static void Object_get_animation (LIScrArgs* args)
 	/* Check arguments. */
 	if (!liscr_args_gets_int (args, "channel", &chan))
 		return;
+	chan--;
 	object = args->self;
 	anim = limdl_pose_get_channel_animation (object->pose, chan);
 	if (anim == NULL)
@@ -332,10 +335,8 @@ static void Object_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Table of channel numbers and animation names.
- * -- <br/>
+ * --- Table of channel numbers and animation names.<br/>
  * -- A list of permanent animations the object is playing back.
- * --
  * -- @name Object.animations
  */
 static void Object_getter_animations (LIScrArgs* args)
@@ -350,7 +351,7 @@ static void Object_getter_animations (LIScrArgs* args)
 	{
 		channel = iter.value;
 		if (channel->repeats == -1)
-			liscr_args_setf_string (args, iter.key, channel->animation_name);
+			liscr_args_setf_string (args, iter.key + 1, channel->animation->name);
 	}
 }
 
