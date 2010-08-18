@@ -29,6 +29,7 @@
 #include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_SCENE "Scene"
+#define LIEXT_SCRIPT_SHADER "Shader"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
@@ -46,6 +47,10 @@ void liext_render_free (
 /*****************************************************************************/
 
 void liext_script_scene (
+	LIScrClass* self,
+	void*       data);
+
+void liext_script_shader (
 	LIScrClass* self,
 	void*       data);
 

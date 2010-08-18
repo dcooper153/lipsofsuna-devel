@@ -57,15 +57,11 @@ struct _LIRenShader
 };
 
 LIAPICALL (LIRenShader*, liren_shader_new, (
-	LIRenRender* render));
-
-LIAPICALL (LIRenShader*, liren_shader_new_from_data, (
 	LIRenRender* render,
-	LIArcReader* reader));
-
-LIAPICALL (LIRenShader*, liren_shader_new_from_file, (
-	LIRenRender* render,
-	const char*  path));
+	const char*  name,
+	const char*  config,
+	const char*  vertex,
+	const char*  fragment));
 
 LIAPICALL (void, liren_shader_free, (
 	LIRenShader* self));

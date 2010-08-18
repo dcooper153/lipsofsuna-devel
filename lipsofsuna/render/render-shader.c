@@ -26,47 +26,33 @@
 #include <lipsofsuna/system.h>
 #include "render-shader.h"
 
-static int
-private_check_compile (LIRenShader* self,
-                       const char*  name,
-                       GLint        shader);
+static int private_check_compile (
+	LIRenShader* self,
+	const char*  name,
+	GLint        shader);
 
-static int
-private_check_link (LIRenShader* self,
-                    const char*  name,
-                    GLint        program);
+static int private_check_link (
+	LIRenShader* self,
+	const char*  name,
+	GLint        program);
 
-static void
-private_init_attributes (LIRenShader* self);
+static void private_init_attributes (
+	LIRenShader* self);
 
-static void
-private_init_uniforms (LIRenShader* self);
+static void private_init_uniforms (
+	LIRenShader* self);
 
-static int
-private_read_file (LIRenShader* self,
-                   const char*  path,
-                   const char*  name);
+static int private_read_config (
+	LIRenShader* self,
+	LIArcReader* reader);
 
-static int
-private_read_stream (LIRenShader* self,
-                     const char*  name,
-                     LIArcReader* reader);
+static int private_attribute_value (
+	LIRenShader* self,
+	const char*  value);
 
-static int
-private_read_config (LIRenShader* self,
-                     LIArcReader* reader);
-
-static int
-private_read_source (LIRenShader* self,
-                     LIArcReader* reader);
-
-static int
-private_attribute_value (LIRenShader* self,
-                         const char*  value);
-
-static int
-private_uniform_value (LIRenShader* self,
-                       const char*  value);
+static int private_uniform_value (
+	LIRenShader* self,
+	const char*  value);
 
 /****************************************************************************/
 
@@ -76,9 +62,16 @@ private_uniform_value (LIRenShader* self,
  * \param render Renderer.
  * \return New shader or NULL.
  */
-LIRenShader*
-liren_shader_new (LIRenRender* render)
+LIRenShader* liren_shader_new (
+	LIRenRender* render,
+	const char*  name,
+	const char*  config,
+	const char*  vertex,
+	const char*  fragment)
 {
+	GLint length;
+	const GLchar* ptr;
+	LIArcReader* reader;
 	LIRenShader* self;
 
 	/* Allocate self. */
@@ -86,74 +79,68 @@ liren_shader_new (LIRenRender* render)
 	if (self == NULL)
 		return NULL;
 	self->render = render;
-
-	return self;
-}
-
-/**
- * \brief Loads a shader program from a stream.
- *
- * \param render Renderer.
- * \param reader Stream reader.
- * \return New shader or NULL.
- */
-LIRenShader*
-liren_shader_new_from_data (LIRenRender* render,
-                            LIArcReader* reader)
-{
-	LIRenShader* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenShader));
-	if (self == NULL)
-		return NULL;
-	self->render = render;
-
-	/* Load the shader. */
-	if (!private_read_stream (self, "<stream>", reader))
+	self->name = listr_dup (name);
+	if (self->name == NULL)
 	{
 		liren_shader_free (self);
 		return NULL;
 	}
 
-	/* Initialize uniforms. */
-	private_init_uniforms (self);
-	glUseProgramObjectARB (0);
-
-	return self;
-}
-
-/**
- * \brief Loads a shader program from a file.
- *
- * \param render Renderer.
- * \param path Path to the shader file or NULL.
- * \return New shader or NULL.
- */
-LIRenShader*
-liren_shader_new_from_file (LIRenRender* render,
-                            const char*  path)
-{
-	const char* name;
-	LIRenShader* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenShader));
-	if (self == NULL)
-		return NULL;
-	self->render = render;
-
-	/* Load the shader. */
-	name = strrchr (path, '/');
-	if (name != NULL)
-		name++;
-	else
-		name = path;
-	if (!private_read_file (self, path, name))
+	/* Parse configuration. */
+	reader = liarc_reader_new (config, strlen (config));
+	if (reader == NULL)
 	{
 		liren_shader_free (self);
 		return NULL;
 	}
+	if (!private_read_config (self, reader))
+	{
+		liarc_reader_free (reader);
+		liren_shader_free (self);
+		return NULL;
+	}
+	liarc_reader_free (reader);
+
+	/* Create shader objects. */
+	self->vertex = glCreateShaderObjectARB (GL_VERTEX_SHADER);
+	self->fragment = glCreateShaderObjectARB (GL_FRAGMENT_SHADER);
+
+	/* Upload shader source. */
+	length = strlen (vertex);
+	ptr = vertex;
+	glShaderSourceARB (self->vertex, 1, &ptr, &length);
+	length = strlen (fragment);
+	ptr = fragment;
+	glShaderSourceARB (self->fragment, 1, &ptr, &length);
+
+	/* Compile the vertex shader. */
+	glCompileShaderARB (self->vertex);
+	if (!private_check_compile (self, name, self->vertex))
+	{
+		liren_shader_free (self);
+		return NULL;
+	}
+
+	/* Compile the fragment shader. */
+	glCompileShaderARB (self->fragment);
+	if (!private_check_compile (self, name, self->fragment))
+	{
+		liren_shader_free (self);
+		return NULL;
+	}
+
+	/* Link the shader program. */
+	self->program = glCreateProgramObjectARB ();
+	glAttachObjectARB (self->program, self->vertex);
+	glAttachObjectARB (self->program, self->fragment);
+	private_init_attributes (self);
+	glLinkProgramARB (self->program);
+	if (!private_check_link (self, name, self->program))
+	{
+		liren_shader_free (self);
+		return NULL;
+	}
+	glUseProgramObjectARB (self->program);
 
 	/* Initialize uniforms. */
 	private_init_uniforms (self);
@@ -167,8 +154,8 @@ liren_shader_new_from_file (LIRenRender* render,
  *
  * \param self Shader.
  */
-void
-liren_shader_free (LIRenShader* self)
+void liren_shader_free (
+	LIRenShader* self)
 {
 	int i;
 
@@ -190,10 +177,10 @@ liren_shader_free (LIRenShader* self)
 
 /****************************************************************************/
 
-static int
-private_check_compile (LIRenShader* self,
-                       const char*  name,
-                       GLint        shader)
+static int private_check_compile (
+	LIRenShader* self,
+	const char*  name,
+	GLint        shader)
 {
 	char* text;
 	const char* type;
@@ -227,10 +214,10 @@ private_check_compile (LIRenShader* self,
 	return 1;
 }
 
-static int
-private_check_link (LIRenShader* self,
-                    const char*  name,
-                    GLint        program)
+static int private_check_link (
+	LIRenShader* self,
+	const char*  name,
+	GLint        program)
 {
 	char* text;
 	GLint status;
@@ -259,8 +246,8 @@ private_check_link (LIRenShader* self,
 	return 1;
 }
 
-static void
-private_init_attributes (LIRenShader* self)
+static void private_init_attributes (
+	LIRenShader* self)
 {
 	int i;
 	LIRenAttribute* attribute;
@@ -276,8 +263,8 @@ private_init_attributes (LIRenShader* self)
 	}
 }
 
-static void
-private_init_uniforms (LIRenShader* self)
+static void private_init_uniforms (
+	LIRenShader* self)
 {
 	int i;
 	int sampler = 0;
@@ -298,72 +285,9 @@ private_init_uniforms (LIRenShader* self)
 	}
 }
 
-static int
-private_read_file (LIRenShader* self,
-                   const char*  path,
-                   const char*  name)
-{
-	int ret;
-	LIArcReader* reader;
-
-	/* Open the file. */
-	reader = liarc_reader_new_from_file (path);
-	if (reader == NULL)
-		return 0;
-
-	/* Read from stream. */
-	ret = private_read_stream (self, name, reader);
-	liarc_reader_free (reader);
-	return ret;
-}
-
-static int
-private_read_stream (LIRenShader* self,
-                     const char*  name,
-                     LIArcReader* reader)
-{
-	if (livid_features.shader_model >= 3)
-	{
-		/* Read the shaders. */
-		self->vertex = glCreateShaderObjectARB (GL_VERTEX_SHADER);
-		self->fragment = glCreateShaderObjectARB (GL_FRAGMENT_SHADER);
-		if (!private_read_config (self, reader) ||
-			!private_read_source (self, reader))
-			return 0;
-
-		/* Compile the vertex shader. */
-		glCompileShaderARB (self->vertex);
-		if (!private_check_compile (self, name, self->vertex))
-			return 0;
-
-		/* Compile the fragment shader. */
-		glCompileShaderARB (self->fragment);
-		if (!private_check_compile (self, name, self->fragment))
-			return 0;
-
-		/* Link the shader program. */
-		self->program = glCreateProgramObjectARB ();
-		glAttachObjectARB (self->program, self->vertex);
-		glAttachObjectARB (self->program, self->fragment);
-		private_init_attributes (self);
-		glLinkProgramARB (self->program);
-		if (!private_check_link (self, name, self->program))
-			return 0;
-		glUseProgramObjectARB (self->program);
-	}
-	else
-	{
-		/* Only read configuration. */
-		if (!private_read_config (self, reader))
-			return 0;
-	}
-
-	return 1;
-}
-
-static int
-private_read_config (LIRenShader* self,
-                     LIArcReader* reader)
+static int private_read_config (
+	LIRenShader* self,
+	LIArcReader* reader)
 {
 	char* line;
 	char* name;
@@ -372,35 +296,17 @@ private_read_config (LIRenShader* self,
 	LIRenAttribute* attribute;
 	LIRenUniform* uniform;
 
-	/* Find start. */
-	while (1)
-	{
-		if (!liarc_reader_get_text (reader, "\n", &line))
-			return 0;
-		if (!strcmp (line, "[configuration]"))
-		{
-			lisys_free (line);
-			break;
-		}
-		lisys_free (line);
-	}
-
 	/* Parse options. */
 	while (1)
 	{
 		if (!liarc_reader_get_text (reader, "\n", &line))
-			return 0;
+			break;
 		if (!strlen (line))
 		{
 			lisys_free (line);
 			continue;
 		}
-		if (!strcmp (line, "[vertex shader]"))
-		{
-			lisys_free (line);
-			break;
-		}
-		else if (!strncmp (line, "light-count ", 12))
+		if (!strncmp (line, "light-count ", 12))
 		{
 			self->lights.count = atoi (line + 12);
 			lisys_free (line);
@@ -499,52 +405,9 @@ private_read_config (LIRenShader* self,
 	return 1;
 }
 
-static int
-private_read_source (LIRenShader* self,
-                     LIArcReader* reader)
-{
-	GLint length;
-	GLint vert_start;
-	GLint vert_end;
-	GLint frag_start;
-	GLint frag_end;
-	char* line;
-	const GLchar* ptr;
-
-	/* Split into parts. */
-	vert_start = reader->pos;
-	while (1)
-	{
-		vert_end = reader->pos;
-		if (!liarc_reader_get_text (reader, "\n", &line))
-		{
-			liarc_reader_free (reader);
-			return 0;
-		}
-		if (!strcmp (line, "[fragment shader]"))
-		{
-			frag_start = reader->pos;
-			frag_end = reader->length;
-			lisys_free (line);
-			break;
-		}
-		lisys_free (line);
-	}
-
-	/* Upload shader source. */
-	length = vert_end - vert_start;
-	ptr = reader->buffer + vert_start;
-	glShaderSourceARB (self->vertex, 1, &ptr, &length);
-	length = frag_end - frag_start;
-	ptr = reader->buffer + frag_start;
-	glShaderSourceARB (self->fragment, 1, &ptr, &length);
-
-	return 1;
-}
-
-static int
-private_attribute_value (LIRenShader* self,
-                         const char*  value)
+static int private_attribute_value (
+	LIRenShader* self,
+	const char*  value)
 {
 	if (!strcmp (value, "NONE"))
 		return LIREN_ATTRIBUTE_NONE;
@@ -560,9 +423,9 @@ private_attribute_value (LIRenShader* self,
 	return LIREN_ATTRIBUTE_NONE;
 }
 
-static int
-private_uniform_value (LIRenShader* self,
-                       const char*  value)
+static int private_uniform_value (
+	LIRenShader* self,
+	const char*  value)
 {
 	int index;
 

@@ -139,50 +139,15 @@ liren_render_free (LIRenRender* self)
 
 /**
  * \brief Finds a shader by name.
- *
- * If no matching shader is found, a fixed function fallback is returned.
- *
  * \param self Renderer.
  * \param name Name of the shader.
  * \return Shader or NULL.
  */
-LIRenShader*
-liren_render_find_shader (LIRenRender* self,
-                          const char*  name)
+LIRenShader* liren_render_find_shader (
+	LIRenRender* self,
+	const char*  name)
 {
-	char* path;
-	LIRenShader* shader;
-
-	/* Try existing. */
-	shader = lialg_strdic_find (self->shaders, name);
-	if (shader != NULL)
-		return shader;
-
-	/* Try loading. */
-	path = lisys_path_format (self->datadir,
-		LISYS_PATH_SEPARATOR, "shaders",
-		LISYS_PATH_SEPARATOR, name, NULL);
-	if (path == NULL)
-		return NULL;
-	shader = liren_shader_new_from_file (self, path);
-	lisys_free (path);
-	if (shader == NULL)
-		return NULL;
-
-	/* Insert to dictionary. */
-	shader->name = listr_dup (name);
-	if (shader->name == NULL)
-	{
-		liren_shader_free (shader);
-		return NULL;
-	}
-	if (!lialg_strdic_insert (self->shaders, name, shader))
-	{
-		liren_shader_free (shader);
-		return NULL;
-	}
-
-	return shader;
+	return lialg_strdic_find (self->shaders, name);
 }
 
 /**
