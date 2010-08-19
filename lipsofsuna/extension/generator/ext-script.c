@@ -662,6 +662,7 @@ liext_script_generator (LIScrClass* self,
                         void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "add_material", Generator_add_material);
 	liscr_class_insert_cfunc (self, "create_object", Generator_create_object);
 	liscr_class_insert_cfunc (self, "delete_objects", Generator_delete_objects);

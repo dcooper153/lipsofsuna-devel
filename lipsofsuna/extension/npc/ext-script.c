@@ -264,6 +264,7 @@ liext_script_npc (LIScrClass* self,
                   void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NPC, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "find", Npc_find);
 	liscr_class_insert_cfunc (self, "new", Npc_new);
 	liscr_class_insert_mfunc (self, "solve_path", Npc_solve_path);

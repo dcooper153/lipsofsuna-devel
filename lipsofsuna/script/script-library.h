@@ -23,7 +23,6 @@
 #include <lipsofsuna/system.h>
 
 #define LISCR_SCRIPT_CLASS "Class"
-#define LISCR_SCRIPT_DATA "Data"
 #define LISCR_SCRIPT_EVENT "Event"
 #define LISCR_SCRIPT_OBJECT "Object"
 #define LISCR_SCRIPT_PACKET "Packet"
@@ -33,10 +32,6 @@
 #define LISCR_SCRIPT_VECTOR "Vector"
 
 LIAPICALL (void, liscr_script_class, (
-	LIScrClass* clss,
-	void*       data));
-
-LIAPICALL (void, liscr_script_data, (
 	LIScrClass* clss,
 	void*       data));
 

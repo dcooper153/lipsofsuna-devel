@@ -285,6 +285,7 @@ liext_script_effect (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_EFFECT, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "particle", Effect_particle);
 	liscr_class_insert_cfunc (self, "random", Effect_random);
 	liscr_class_insert_cfunc (self, "ray", Effect_ray);

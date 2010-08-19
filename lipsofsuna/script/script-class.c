@@ -29,10 +29,6 @@
 #include "script-private.h"
 #include "script-util.h"
 
-static LIScrClassMemb*
-private_find_var (LIScrClass* self,
-                  const char* name);
-
 static int
 private_insert_func (LIScrClass*   self,
                      int           member,
@@ -45,10 +41,6 @@ private_insert_var (LIScrClass*   self,
                     const char*   name,
                     LIScrArgsFunc args,
                     LIScrArgsFunc setter);
-
-static int
-private_member_compare (const void* a,
-                        const void* b);
 
 static int
 private_string_compare (const void* a,
@@ -469,15 +461,12 @@ liscr_class_default___gc (lua_State* lua)
  * \param lua Lua state.
  * \return One.
  */
-int
-liscr_class_default___index (lua_State* lua)
+int liscr_class_default___index (
+	lua_State* lua)
 {
 	LIScrClass* ptr;
 	LIScrClass* clss;
-	LIScrClass* clss1;
-	LIScrClassMemb* func;
 	LIScrData* self;
-	LIScrArgs args;
 	LIScrScript* script;
 
 	/* Get class data. */
@@ -494,64 +483,31 @@ liscr_class_default___index (lua_State* lua)
 		self = NULL;
 	luaL_checkany (lua, 2);
 
-	/* Check for class. */
-	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
-	if (!liscr_class_get_interface (clss, clss1->meta))
-		return 0;
-
-	/* Getters. */
-	if (lua_isstring (lua, 2))
-	{
-		func = private_find_var (clss, lua_tostring (lua, 2));
-		if (func != NULL)
-		{
-			if (func->getter == NULL)
-				return 0;
-			if (func->member && self == NULL)
-				return 0;
-			if (!func->member && self != NULL)
-			{
-				liscr_pushclass (lua, clss);
-				lua_replace (lua, 1);
-				self = NULL;
-			}
-			liscr_args_init_getter (&args, lua, clss, self);
-			func->getter (&args);
-			if (!args.output_table)
-				return args.ret;
-			else
-				return 1;
-		}
-	}
-
-	/* Custom instance variables. */
-	if (self != NULL)
-	{
-		liscr_pushpriv (lua, self);
-		lua_pushvalue (lua, 2);
-		lua_gettable (lua, -2);
-		if (!lua_isnil (lua, -1))
-		{
-			lua_remove (lua, -2);
-			return 1;
-		}
-		lua_pop (lua, 2);
-	}
-
-	/* Custom class variables. */
+	/* Custom getter. */
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
 		luaL_getmetatable (lua, ptr->meta);
 		lisys_assert (!lua_isnil (lua, -1));
-		lua_pushvalue (lua, 2);
+		lua_pushstring (lua, "getter");
 		lua_rawget (lua, -2);
+		if (lua_type (lua, -1) != LUA_TFUNCTION)
+		{
+			lua_pop (lua, 2);
+			continue;
+		}
 		lua_remove (lua, -2);
-		if (!lua_isnil (lua, -1))
-			return 1;
-		lua_pop (lua, 1);
+		lua_pushvalue (lua, 1);
+		lua_pushvalue (lua, 2);
+		if (lua_pcall (lua, 2, 1, 0) != 0)
+		{
+			lisys_error_set (EINVAL, lua_tostring (lua, -1));
+			lisys_error_report ();
+			lua_pop (lua, 1);
+			break;
+		}
+		return 1;
 	}
 
-	/* None found. */
 	return 0;
 }
 
@@ -561,14 +517,12 @@ liscr_class_default___index (lua_State* lua)
  * \param lua Lua state.
  * \return Zero.
  */
-int
-liscr_class_default___newindex (lua_State* lua)
+int liscr_class_default___newindex (
+	lua_State* lua)
 {
+	LIScrClass* ptr;
 	LIScrClass* clss;
-	LIScrClass* clss1;
-	LIScrClassMemb* func;
 	LIScrData* self;
-	LIScrArgs args;
 	LIScrScript* script;
 
 	/* Get class data. */
@@ -586,82 +540,35 @@ liscr_class_default___newindex (lua_State* lua)
 	luaL_checkany (lua, 2);
 	luaL_checkany (lua, 3);
 
-	/* Check for class. */
-	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
-	if (!liscr_class_get_interface (clss, clss1->meta))
-		return 0;
-
-	/* Setters. */
-	if (lua_isstring (lua, 2))
+	/* Custom setter. */
+	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
-		func = private_find_var (clss, lua_tostring (lua, 2));
-		if (func != NULL)
+		luaL_getmetatable (lua, ptr->meta);
+		lisys_assert (!lua_isnil (lua, -1));
+		lua_pushstring (lua, "setter");
+		lua_rawget (lua, -2);
+		if (lua_type (lua, -1) != LUA_TFUNCTION)
 		{
-			if (func->setter == NULL)
-				return 0;
-			if (func->member && self == NULL)
-				return 0;
-			if (!func->member && self != NULL)
-			{
-				liscr_pushclass (lua, clss);
-				lua_replace (lua, 1);
-				self = NULL;
-			}
-			liscr_args_init_setter (&args, lua, clss, self);
-			func->setter (&args);
-			return 0;
+			lua_pop (lua, 2);
+			continue;
 		}
-	}
-
-	/* Custom instance variables. */
-	if (self != NULL)
-	{
-		liscr_pushpriv (lua, self);
+		lua_remove (lua, -2);
+		lua_pushvalue (lua, 1);
 		lua_pushvalue (lua, 2);
 		lua_pushvalue (lua, 3);
-		lua_settable (lua, -3);
-		lua_pop (lua, 1);
-		return 0;
+		if (lua_pcall (lua, 3, 0, 0) != 0)
+		{
+			lisys_error_set (EINVAL, lua_tostring (self->script->lua, -1));
+			lisys_error_report ();
+			lua_pop (self->script->lua, 1);
+		}
+		break;
 	}
-
-	/* Custom class variables. */
-	luaL_getmetatable (lua, clss->meta);
-	lisys_assert (!lua_isnil (lua, -1));
-	lua_pushvalue (lua, 2);
-	lua_pushvalue (lua, 3);
-	lua_rawset (lua, -3);
-	lua_pop (lua, 1);
 
 	return 0;
 }
 
 /*****************************************************************************/
-
-static LIScrClassMemb*
-private_find_var (LIScrClass* self,
-                  const char* name)
-{
-	LIScrClass* ptr;
-	LIScrClassMemb tmp;
-	LIScrClassMemb* func;
-
-	tmp.name = (char*) name;
-	for (ptr = self ; ptr != NULL ; ptr = ptr->base)
-	{
-		if (ptr->flags & LISCR_CLASS_FLAG_SORT_VARS)
-		{
-			ptr->flags &= ~LISCR_CLASS_FLAG_SORT_VARS;
-			qsort (ptr->vars.array, ptr->vars.count,
-				sizeof (LIScrClassMemb), private_member_compare);
-		}
-		func = bsearch (&tmp, ptr->vars.array, ptr->vars.count,
-			sizeof (LIScrClassMemb), private_member_compare);
-		if (func != NULL)
-			return func;
-	}
-
-	return NULL;
-}
 
 static int
 private_insert_func (LIScrClass*   self,
@@ -722,16 +629,6 @@ private_insert_var (LIScrClass*   self,
 	self->flags |= LISCR_CLASS_FLAG_SORT_VARS;
 
 	return 1;
-}
-
-static int
-private_member_compare (const void* a,
-                        const void* b)
-{
-	const LIScrClassMemb* aa = a;
-	const LIScrClassMemb* bb = b;
-
-	return strcmp (aa->name, bb->name);
 }
 
 static int

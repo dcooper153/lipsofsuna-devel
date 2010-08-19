@@ -445,6 +445,7 @@ void liext_script_camera (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_CAMERA, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "new", Camera_new);
 	liscr_class_insert_mfunc (self, "move", Camera_move);
 	liscr_class_insert_mfunc (self, "reset", Camera_reset);

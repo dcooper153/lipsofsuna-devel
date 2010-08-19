@@ -1178,6 +1178,7 @@ void liext_script_widgets (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGETS, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "cycle_focus", Widgets_cycle_focus);
 	liscr_class_insert_cfunc (self, "cycle_window_focus", Widgets_cycle_window_focus);
 	liscr_class_insert_cfunc (self, "draw", Widgets_draw);

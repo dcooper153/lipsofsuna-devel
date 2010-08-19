@@ -261,6 +261,7 @@ void liext_script_widget (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGET, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_interface (self, LIEXT_SCRIPT_WIDGET);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
 	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);

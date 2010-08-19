@@ -285,6 +285,7 @@ void
 liscr_script_packet (LIScrClass* self,
                    void*       data)
 {
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_enum (self, "CUSTOM", LINET_SERVER_PACKET_CUSTOM);
 	liscr_class_insert_func (self, "new", Packet_new);
 	liscr_class_insert_func (self, "read", Packet_read);

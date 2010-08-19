@@ -208,6 +208,7 @@ licli_script_light (LIScrClass* self,
                     void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "new", Light_new);
 	liscr_class_insert_mvar (self, "ambient", Light_getter_ambient, Light_setter_ambient);
 	liscr_class_insert_mvar (self, "color", Light_getter_color, Light_setter_color);

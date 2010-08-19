@@ -49,6 +49,7 @@ void liext_script_physics (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PHYSICS, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "test", Physics_test);
 }
 

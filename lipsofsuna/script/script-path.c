@@ -74,6 +74,7 @@ void
 liscr_script_path (LIScrClass* self,
                  void*       data)
 {
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_mfunc (self, "pop", Path_pop);
 	liscr_class_insert_mvar (self, "length", Path_getter_length, NULL);
 }

@@ -94,11 +94,12 @@ static void Packager_setter_verbose (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liext_script_packager (LIScrClass* self,
-                     void*       data)
+void liext_script_packager (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PACKAGER, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "cancel", Packager_cancel);
 	liscr_class_insert_cfunc (self, "save", Packager_save);
 	liscr_class_insert_cvar (self, "verbose", Packager_getter_verbose, Packager_setter_verbose);

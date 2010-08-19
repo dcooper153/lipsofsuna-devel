@@ -818,6 +818,7 @@ liext_script_material (LIScrClass* self,
                        void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_mvar (self, "friction", Material_getter_friction, NULL);
 	liscr_class_insert_mvar (self, "name", Material_getter_name, NULL);
 	liscr_class_insert_mvar (self, "model", Material_getter_model, NULL);
@@ -828,6 +829,7 @@ liext_script_tile (LIScrClass* self,
                    void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "new", Tile_new);
 	liscr_class_insert_mvar (self, "damage", Tile_getter_damage, Tile_setter_damage);
 	liscr_class_insert_mvar (self, "rotation", Tile_getter_rotation, Tile_setter_rotation);
@@ -839,6 +841,7 @@ liext_script_voxel (LIScrClass* self,
                     void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
+	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "copy_region", Voxel_copy_region);
 	liscr_class_insert_cfunc (self, "erase", Voxel_erase);
 	liscr_class_insert_cfunc (self, "find_blocks", Voxel_find_blocks);

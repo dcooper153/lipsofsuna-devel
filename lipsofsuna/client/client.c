@@ -338,7 +338,6 @@ static int
 private_init_script (LICliClient* self)
 {
 	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
-	    !liscr_script_create_class (self->script, "Data", liscr_script_data, self->script) ||
 	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
 	    !liscr_script_create_class (self->script, "Light", licli_script_light, self) ||
