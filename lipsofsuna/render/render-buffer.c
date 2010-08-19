@@ -24,19 +24,21 @@
 
 #include "render-buffer.h"
 
-static int
-private_init (LIRenBuffer*       self,
-              GLenum             target,
-              const LIRenFormat* format,
-              const void*        data,
-              int                count);
+static int private_init (
+	LIRenBuffer*       self,
+	GLenum             target,
+	const LIRenFormat* format,
+	const void*        data,
+	int                count,
+	int                type);
 
 /*****************************************************************************/
 
-int
-liren_buffer_init_index (LIRenBuffer* self,
-                         const void*  data,
-                         int          count)
+int liren_buffer_init_index (
+	LIRenBuffer* self,
+	const void*  data,
+	int          count,
+	int          type)
 {
 	static const LIRenFormat format =
 	{
@@ -47,29 +49,30 @@ liren_buffer_init_index (LIRenBuffer* self,
 		GL_FLOAT, 0
 	};
 
-	return private_init (self, GL_ELEMENT_ARRAY_BUFFER_ARB, &format, data, count);
+	return private_init (self, GL_ELEMENT_ARRAY_BUFFER_ARB, &format, data, count, type);
 }
 
-int
-liren_buffer_init_vertex (LIRenBuffer*       self,
-                          const LIRenFormat* format,
-                          const void*        data,
-                          int                count)
+int liren_buffer_init_vertex (
+	LIRenBuffer*       self,
+	const LIRenFormat* format,
+	const void*        data,
+	int                count,
+	int                type)
 {
-	return private_init (self, GL_ARRAY_BUFFER_ARB, format, data, count);
+	return private_init (self, GL_ARRAY_BUFFER_ARB, format, data, count, type);
 }
 
-void
-liren_buffer_free (LIRenBuffer* self)
+void liren_buffer_free (
+	LIRenBuffer* self)
 {
 	if (GLEW_ARB_vertex_buffer_object)
 		glDeleteBuffersARB (1, &self->buffer);
 	lisys_free (self->elements.array);
 }
 
-void*
-liren_buffer_lock (LIRenBuffer* self,
-                   int          write)
+void* liren_buffer_lock (
+	LIRenBuffer* self,
+	int          write)
 {
 	int size;
 	void* ret;
@@ -89,9 +92,9 @@ liren_buffer_lock (LIRenBuffer* self,
 		return self->elements.array;
 }
 
-void
-liren_buffer_unlock (LIRenBuffer* self,
-                     void*        data)
+void liren_buffer_unlock (
+	LIRenBuffer* self,
+	void*        data)
 {
 	if (self->buffer != 0)
 	{
@@ -103,12 +106,13 @@ liren_buffer_unlock (LIRenBuffer* self,
 
 /*****************************************************************************/
 
-static int
-private_init (LIRenBuffer*       self,
-              GLenum             target,
-              const LIRenFormat* format,
-              const void*        data,
-              int                count)
+static int private_init (
+	LIRenBuffer*       self,
+	GLenum             target,
+	const LIRenFormat* format,
+	const void*        data,
+	int                count,
+	int                type)
 {
 	int size;
 
@@ -117,7 +121,7 @@ private_init (LIRenBuffer*       self,
 	if (count)
 	{
 		size = count * format->size;
-		if (GLEW_ARB_vertex_buffer_object)
+		if (GLEW_ARB_vertex_buffer_object && type == LIREN_BUFFER_TYPE_GPU)
 		{
 			glGenBuffersARB (1, &self->buffer);
 			glBindBufferARB (target, self->buffer);

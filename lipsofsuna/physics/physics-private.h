@@ -57,9 +57,8 @@ struct _LIPhyPhysics
 
 struct _LIPhyShape
 {
-	int refs;
 	LIPhyPhysics* physics;
-	btConvexShape* shape;
+	btCompoundShape* shape;
 };
 
 struct _LIPhyObject
@@ -70,7 +69,7 @@ struct _LIPhyObject
 	liphyControl* control;
 	liphyMotionState* motion;
 	LIPhyPhysics* physics;
-	btCompoundShape* shape;
+	LIPhyShape* shape;
 	struct
 	{
 		int collision_group;

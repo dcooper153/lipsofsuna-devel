@@ -30,7 +30,8 @@
 struct _LIExtBlock
 {
 	LIExtModule* module;
-	LIPhyObject* physics;
+	LIPhyShape* shape;
+	LIPhyObject* object;
 };
 
 LIExtBlock* liext_tiles_physics_block_new (

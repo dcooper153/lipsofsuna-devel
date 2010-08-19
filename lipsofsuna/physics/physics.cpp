@@ -228,6 +228,7 @@ liphy_physics_cast_shape (const LIPhyPhysics*   self,
                           int                   ignore_count,
                           LIPhyCollision*       result)
 {
+	int i;
 	float best;
 	btCollisionWorld* collision;
 	btConvexShape* btshape;
@@ -248,10 +249,9 @@ liphy_physics_cast_shape (const LIPhyPhysics*   self,
 
 	/* Sweep the shape. */
 	/* TODO: Compound shape support when the shape class supports them. */
-/*	for (i = 0 ; i < shape->shape->getNumChildShapes () ; i++)
+	for (i = 0 ; i < shape->shape->getNumChildShapes () ; i++)
 	{
-		btshape = (btConvexShape*) shape->shape->getChildShape (i); */
-		btshape = shape->shape;
+		btshape = (btConvexShape*) shape->shape->getChildShape (i);
 		collision->convexSweepTest (btshape, btstart, btend, test);
 		if (test.m_closestHitFraction <= best)
 		{
@@ -268,7 +268,7 @@ liphy_physics_cast_shape (const LIPhyPhysics*   self,
 			else
 				result->object = NULL;
 		}
-/*	}*/
+	}
 
 	return result->fraction < 1.0f;
 }

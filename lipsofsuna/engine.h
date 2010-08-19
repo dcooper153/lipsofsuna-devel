@@ -22,7 +22,6 @@
 #include "engine/engine-iterator.h"
 #include "engine/engine-model.h"
 #include "engine/engine-object.h"
-#include "engine/engine-resources.h"
 #include "engine/engine-sector.h"
 #include "engine/engine-selection.h"
 #include "engine/engine-types.h"

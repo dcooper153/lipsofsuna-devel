@@ -25,17 +25,18 @@
 #include <lipsofsuna/system.h>
 #include "render-model.h"
 
-static void
-private_clear_materials (LIRenModel* self);
+static void private_clear_materials (
+	LIRenModel* self);
 
-static void
-private_clear_model (LIRenModel* self);
+static void private_clear_model (
+	LIRenModel* self);
 
-static int
-private_init_materials (LIRenModel* self);
+static int private_init_materials (
+	LIRenModel* self);
 
-static int
-private_init_model (LIRenModel* self);
+static int private_init_model (
+	LIRenModel* self,
+	int         type);
 
 /*****************************************************************************/
 
@@ -47,15 +48,14 @@ private_init_model (LIRenModel* self);
  *
  * \param render Renderer.
  * \param model Model description.
- * \param name Unique model name or NULL.
+ * \param id Unique model ID.
  * \return New model or NULL.
  */
-LIRenModel*
-liren_model_new (LIRenRender* render,
-                 LIMdlModel*  model,
-                 const char*  name)
+LIRenModel* liren_model_new (
+	LIRenRender* render,
+	LIMdlModel*  model,
+	int          id)
 {
-	LIAlgStrdicNode* node;
 	LIRenModel* self;
 
 	/* Allocate self. */
@@ -64,67 +64,26 @@ liren_model_new (LIRenRender* render,
 		return NULL;
 	self->render = render;
 	self->model = model;
+	self->id = id;
+	self->type = LIREN_BUFFER_TYPE_GPU;
 
-	/* Set name. */
-	if (name != NULL)
+	/* Create model data. */
+	if (!liren_model_set_model (self, model))
 	{
-		self->name = strdup (name);
-		if (self->name == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
-
-	/* Initialize static mesh. */
-	if (!private_init_materials (self) ||
-	    !private_init_model (self))
-	{
-		lisys_free (self->name);
 		lisys_free (self);
 		return NULL;
 	}
 
 	/* Add to dictionary. */
-	if (name != NULL)
+	if (!lialg_u32dic_insert (render->models, id, self))
 	{
-		node = lialg_strdic_find_node (render->models, name);
-		if (node == NULL)
-		{
-			if (!lialg_strdic_insert (render->models, name, self))
-			{
-				private_clear_materials (self);
-				private_clear_model (self);
-				lisys_free (self->name);
-				lisys_free (self);
-				return NULL;
-			}
-		}
-		else
-		{
-			((LIRenModel*) node->value)->added = 0;
-			node->value = self;
-		}
+		private_clear_materials (self);
+		private_clear_model (self);
+		lisys_free (self);
+		return NULL;
 	}
-	else
-	{
-		if (!lialg_ptrdic_insert (render->models_inst, self, self))
-		{
-			private_clear_materials (self);
-			private_clear_model (self);
-			lisys_free (self);
-			return NULL;
-		}
-	}
-	self->added = 1;
 
 	return self;
-}
-
-LIRenModel*
-liren_model_new_instance (LIRenModel* model)
-{
-	return liren_model_new (model->render, model->model, NULL);
 }
 
 /**
@@ -136,18 +95,11 @@ void
 liren_model_free (LIRenModel* self)
 {
 	/* Remove from dictionary. */
-	if (self->added)
-	{
-		if (self->name != NULL)
-			lialg_strdic_remove (self->render->models, self->name);
-		else
-			lialg_ptrdic_remove (self->render->models_inst, self);
-	}
+	lialg_u32dic_remove (self->render->models, self->id);
 
 	/* Free self. */
 	private_clear_materials (self);
 	private_clear_model (self);
-	lisys_free (self->name);
 	lisys_free (self);
 }
 
@@ -182,6 +134,46 @@ liren_model_get_bounds (LIRenModel* self,
 		limat_aabb_init (aabb);
 }
 
+int liren_model_set_model (
+	LIRenModel* self,
+	LIMdlModel* model)
+{
+	LIAlgPtrdicIter iter0;
+	LIAlgU32dicIter iter1;
+	LIRenModel backup;
+	LIRenObject* object;
+	LIRenScene* scene;
+
+	/* Create new model data and erase the old data. */
+	backup = *self;
+	self->model = model;
+	if (!private_init_materials (self) ||
+	    !private_init_model (self, self->type))
+	{
+		private_clear_materials (self);
+		private_clear_model (self);
+		*self = backup;
+		return 0;
+	}
+	private_clear_materials (&backup);
+	private_clear_model (&backup);
+
+	/* We need to refresh any objects using the model since lights reference
+	   the nodes of the model directly and those might have changed. */
+	LIALG_PTRDIC_FOREACH (iter0, self->render->scenes)
+	{
+		scene = iter0.value;
+		LIALG_U32DIC_FOREACH (iter1, scene->objects)
+		{
+			object = iter1.value;
+			if (object->model == self)
+				liren_object_set_model (object, self);
+		}
+	}
+
+	return 1;
+}
+
 /**
  * \brief Checks if the model is static.
  *
@@ -194,10 +186,34 @@ liren_model_get_static (LIRenModel* self)
 	return !self->model->animations.count;
 }
 
+int liren_model_get_type (
+	const LIRenModel* self)
+{
+	return self->type;
+}
+
+int liren_model_set_type (
+	LIRenModel* self,
+	int         value)
+{
+	LIRenModel backup;
+
+	backup = *self;
+	self->type = value;
+	if (!private_init_model (self, self->type))
+	{
+		*self = backup;
+		return 0;
+	}
+	private_clear_model (&backup);
+
+	return 1;
+}
+
 /*****************************************************************************/
 
-static void
-private_clear_materials (LIRenModel* self)
+static void private_clear_materials (
+	LIRenModel* self)
 {
 	int i;
 
@@ -211,8 +227,8 @@ private_clear_materials (LIRenModel* self)
 	self->materials.count = 0;
 }
 
-static void
-private_clear_model (LIRenModel* self)
+static void private_clear_model (
+	LIRenModel* self)
 {
 	int i;
 
@@ -229,8 +245,8 @@ private_clear_model (LIRenModel* self)
 	self->buffers.count = 0;
 }
 
-static int
-private_init_materials (LIRenModel* self)
+static int private_init_materials (
+	LIRenModel* self)
 {
 	uint32_t i;
 	LIMdlMaterial* src;
@@ -258,8 +274,9 @@ private_init_materials (LIRenModel* self)
 	return 1;
 }
 
-static int
-private_init_model (LIRenModel* self)
+static int private_init_model (
+	LIRenModel* self,
+	int         type)
 {
 	int i;
 	LIMdlFaces* group;
@@ -279,7 +296,7 @@ private_init_model (LIRenModel* self)
 
 	/* Allocate vertex buffer data. */
 	if (!liren_buffer_init_vertex (self->vertices, &format,
-	     self->model->vertices.array, self->model->vertices.count))
+	     self->model->vertices.array, self->model->vertices.count, type))
 		return 0;
 
 	/* Allocate index buffer list. */
@@ -295,7 +312,7 @@ private_init_model (LIRenModel* self)
 		lisys_assert (group->material >= 0);
 		lisys_assert (group->material < self->materials.count);
 		if (!liren_buffer_init_index (self->buffers.array + i,
-		     group->indices.array, group->indices.count))
+		     group->indices.array, group->indices.count, type))
 			return 0;
 	}
 

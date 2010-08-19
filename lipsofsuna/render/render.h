@@ -45,8 +45,7 @@ struct _LIRenRender
 	LIAlgPtrdic* scenes;
 	LIAlgStrdic* shaders;
 	LIAlgStrdic* images;
-	LIAlgStrdic* models;
-	LIAlgPtrdic* models_inst;
+	LIAlgU32dic* models;
 	LIRenContext* context;
 	struct
 	{
@@ -82,16 +81,11 @@ LIAPICALL (LIRenImage*, liren_render_find_image, (
 
 LIAPICALL (LIRenModel*, liren_render_find_model, (
 	LIRenRender* self,
-	const char*  name));
+	int          id));
 
 LIAPICALL (int, liren_render_load_image, (
 	LIRenRender* self,
 	const char*  name));
-
-LIAPICALL (int, liren_render_load_model, (
-	LIRenRender* self,
-	const char*  name,
-	LIMdlModel*  model));
 
 LIAPICALL (void, liren_render_update, (
 	LIRenRender* self,

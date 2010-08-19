@@ -27,24 +27,24 @@
 #include "render-draw.h"
 #include "render-object.h"
 
-static void
-private_clear_envmap (LIRenObject* self);
+static void private_envmap_clear (
+	LIRenObject* self);
 
-static void
-private_clear_lights (LIRenObject* self);
+static int private_envmap_create (
+	LIRenObject* self);
 
-static int
-private_init_envmap (LIRenObject* self);
+static void private_envmap_update (
+	LIRenObject* self);
 
-static int
-private_init_lights (LIRenObject* self,
-                     LIMdlPose*   pose);
+static void private_lights_clear (
+	LIRenObject* self);
 
-static void
-private_update_envmap (LIRenObject* self);
+static int private_lights_create (
+	LIRenObject* self,
+	LIMdlPose*   pose);
 
-static void
-private_update_lights (LIRenObject* self);
+static void private_lights_update (
+	LIRenObject* self);
 
 /*****************************************************************************/
 
@@ -97,14 +97,12 @@ liren_object_new (LIRenScene* scene,
  *
  * \param self Object.
  */
-void
-liren_object_free (LIRenObject* self)
+void liren_object_free (
+	LIRenObject* self)
 {
 	lialg_u32dic_remove (self->scene->objects, self->id);
-	private_clear_envmap (self);
-	private_clear_lights (self);
-	if (self->instance != NULL)
-		liren_model_free (self->instance);
+	private_envmap_clear (self);
+	private_lights_clear (self);
 	lisys_free (self);
 }
 
@@ -119,62 +117,18 @@ liren_object_deform (LIRenObject* self)
 	void* vertices;
 	LIRenBuffer* buffer;
 
-	if (self->instance == NULL)
+	if (!liren_object_get_realized (self))
 		return;
-	buffer = self->instance->vertices;
+
+	/* Modify the vertex buffer. */
+	buffer = self->model->vertices;
 	vertices = liren_buffer_lock (buffer, 1);
 	if (vertices != NULL)
 	{
 		limdl_pose_transform (self->pose, vertices);
 		liren_buffer_unlock (buffer, vertices);
 	}
-	private_update_lights (self);
-}
-
-void
-liren_object_emit_particles (LIRenObject* self)
-{
-#warning FIXME: Emitting particles is disabled
-#if 0
-	int i;
-	LIMatMatrix vtxmat;
-	LIMatMatrix nmlmat;
-	LIMatVector position;
-	LIMatVector velocity;
-	LIMdlVertex* vertex;
-	LIMdlVertex* vertices;
-	lirenParticle* particle;
-
-	if (self->model == NULL)
-		return;
-
-	vtxmat = self->orientation.matrix;
-	nmlmat = limat_matrix_get_rotation (vtxmat);
-	if (self->vertices != NULL)
-		vertices = self->vertices;
-	else
-		vertices = self->model->model->vertex.vertices;
-
-	for (i = 0 ; i < self->model->model->vertex.count ; i++)
-	{
-		vertex = vertices + i;
-		position = limat_matrix_transform (vtxmat, vertex->coord);
-		velocity = limat_matrix_transform (nmlmat, vertex->normal);
-		velocity = limat_vector_multiply (velocity, 3.0f/*0.2f*/);
-		/*
-			random()/(0.5*RAND_MAX)-1.0,
-			random()/(3.0*RAND_MAX)+3.0f,
-			random()/(0.5*RAND_MAX)-1.0
-		*/
-		particle = liren_scene_insert_particle (self->scene, &position, &velocity);
-		if (particle != NULL)
-		{
-			particle->time_life = 2.0f;
-			particle->time_fade = 1.0f;
-			particle->acceleration = limat_vector_init (0.0, -100.0, 5.0);
-		}
-	}
-#endif
+	private_lights_update (self);
 }
 
 /**
@@ -187,12 +141,7 @@ void
 liren_object_update (LIRenObject* self,
                      float        secs)
 {
-	if (self->instance != NULL && self->instance->buffers.count)
-	{
-		private_update_envmap (self);
-		if (self->pose != NULL)
-			liren_object_deform (self);
-	}
+	private_envmap_update (self);
 }
 
 /**
@@ -239,26 +188,21 @@ liren_object_get_center (const LIRenObject* self,
  * \param model Model.
  * \return Nonzero on success.
  */
-int
-liren_object_set_model (LIRenObject* self,
-                        LIRenModel*  model)
+int liren_object_set_model (
+	LIRenObject* self,
+	LIRenModel*  model)
 {
 	/* Replace model. */
 	self->model = model;
 
-	/* Replace instance. */
-	if (self->instance != NULL)
-		liren_model_free (self->instance);
-	if (model != NULL && self->pose != NULL)
-		self->instance = liren_model_new_instance (model);
-	else
-		self->instance = NULL;
-
 	/* Replace lights and environment map. */
-	private_clear_lights (self);
-	private_clear_envmap (self);
-	private_init_lights (self, self->pose);
-	private_init_envmap (self);
+	private_lights_clear (self);
+	private_envmap_clear (self);
+	if (liren_object_get_realized (self))
+	{
+		private_lights_create (self, self->pose);
+		private_envmap_create (self);
+	}
 
 	return 1;
 }
@@ -295,7 +239,7 @@ liren_object_set_pose (LIRenObject* self,
 int
 liren_object_get_realized (const LIRenObject* self)
 {
-	return self->realized && (self->model != NULL || self->instance != NULL);
+	return self->realized && self->model != NULL;
 }
 
 /**
@@ -313,30 +257,19 @@ liren_object_get_realized (const LIRenObject* self)
  * \param value Flag value.
  * \return Nonzero if succeeded.
  */
-int
-liren_object_set_realized (LIRenObject* self,
-                           int          value)
+int liren_object_set_realized (
+	LIRenObject* self,
+	int          value)
 {
-	int i;
-
 	if (self->realized == value)
 		return 1;
 	self->realized = value;
-	if (value && self->model != NULL)
+	private_lights_clear (self);
+	private_envmap_clear (self);
+	if (liren_object_get_realized (self))
 	{
-		for (i = 0 ; i < self->lights.count ; i++)
-		{
-			if (self->lights.array[i] != NULL)
-				liren_lighting_insert_light (self->scene->lighting, self->lights.array[i]);
-		}
-	}
-	else
-	{
-		for (i = 0 ; i < self->lights.count ; i++)
-		{
-			if (self->lights.array[i] != NULL)
-				liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
-		}
+		private_lights_create (self, self->pose);
+		private_envmap_create (self);
 	}
 
 	return 1;
@@ -384,6 +317,9 @@ liren_object_set_transform (LIRenObject*          self,
 	}
 	else
 		self->orientation.center = value->position;
+
+	/* Transform our light sources. */
+	private_lights_update (self);
 }
 
 void*
@@ -401,54 +337,22 @@ liren_object_set_userdata (LIRenObject* self,
 
 /*****************************************************************************/
 
-static void
-private_clear_envmap (LIRenObject* self)
+static void private_envmap_clear (
+	LIRenObject* self)
 {
-	int i;
-	int j;
-	LIRenMaterial* material;
-	LIRenTexture* texture;
-
-	if (self->instance == NULL)
-		return;
-	glDeleteFramebuffersEXT (6, self->cubemap.fbo);
-	glDeleteTextures (1, &self->cubemap.depth);
-	glDeleteTextures (1, &self->cubemap.map);
-	memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
-	self->cubemap.depth = 0;
-	self->cubemap.map = 0;
-	for (i = 0 ; i < self->instance->materials.count ; i++)
+	if (self->cubemap.map)
 	{
-		material = self->instance->materials.array[i];
-		for (j = 0 ; j < material->textures.count ; j++)
-		{
-			texture = material->textures.array + j;
-			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
-				texture->texture = 0;
-		}
+		glDeleteFramebuffersEXT (6, self->cubemap.fbo);
+		glDeleteTextures (1, &self->cubemap.depth);
+		glDeleteTextures (1, &self->cubemap.map);
+		memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
+		self->cubemap.depth = 0;
+		self->cubemap.map = 0;
 	}
 }
 
-static void
-private_clear_lights (LIRenObject* self)
-{
-	int i;
-
-	for (i = 0 ; i < self->lights.count ; i++)
-	{
-		if (self->lights.array[i] != NULL)
-		{
-			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
-			liren_light_free (self->lights.array[i]);
-		}
-	}
-	lisys_free (self->lights.array);
-	self->lights.array = NULL;
-	self->lights.count = 0;
-}
-
-static int
-private_init_envmap (LIRenObject* self)
+static int private_envmap_create (
+	LIRenObject* self)
 {
 	int i;
 	int j;
@@ -464,11 +368,11 @@ private_init_envmap (LIRenObject* self)
 		return 1;
 
 	/* Check if needed by textures. */
-	if (self->instance == NULL)
+	if (self->model == NULL)
 		return 1;
-	for (i = 0 ; i < self->instance->materials.count ; i++)
+	for (i = 0 ; i < self->model->materials.count ; i++)
 	{
-		material = self->instance->materials.array[i];
+		material = self->model->materials.array[i];
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;
@@ -541,9 +445,9 @@ private_init_envmap (LIRenObject* self)
 	self->cubemap.height = height;
 
 	/* Bind it to environment map textures. */
-	for (i = 0 ; i < self->instance->materials.count ; i++)
+	for (i = 0 ; i < self->model->materials.count ; i++)
 	{
-		material = self->instance->materials.array[i];
+		material = self->model->materials.array[i];
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;
@@ -563,60 +467,12 @@ error:
 	memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
 	self->cubemap.depth = 0;
 	self->cubemap.map = 0;
-	return 1;
-}
-
-int
-private_init_lights (LIRenObject* self,
-                     LIMdlPose*   pose)
-{
-	int i;
-	LIMdlNode* node;
-	LIMdlNodeIter iter;
-	LIRenLight* light;
-
-	/* Create light sources. */
-	if (pose != NULL)
-	{
-		LIMDL_FOREACH_NODE (iter, &pose->nodes)
-		{
-			node = iter.value;
-			if (node->type != LIMDL_NODE_LIGHT)
-				continue;
-			light = liren_light_new_from_model (self->scene, node);
-			if (light == NULL)
-				return 0;
-			if (!lialg_array_append (&self->lights, &light))
-			{
-				liren_light_free (light);
-				return 0;
-			}
-		}
-	}
-
-	/* Register light sources. */
-	if (self->realized)
-	{
-		for (i = 0 ; i < self->lights.count ; i++)
-		{
-			light = self->lights.array[i];
-			if (!liren_lighting_insert_light (self->scene->lighting, light))
-			{
-				while (i--)
-				{
-					light = self->lights.array[i];
-					liren_lighting_remove_light (self->scene->lighting, light);
-				}
-				return 0;
-			}
-		}
-	}
 
 	return 1;
 }
 
-static void
-private_update_envmap (LIRenObject* self)
+static void private_envmap_update (
+	LIRenObject* self)
 {
 	int i;
 	LIAlgU32dicIter iter;
@@ -683,8 +539,72 @@ private_update_envmap (LIRenObject* self)
 	glPopAttrib ();
 }
 
-static void
-private_update_lights (LIRenObject* self)
+static void private_lights_clear (
+	LIRenObject* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		if (self->lights.array[i] != NULL)
+		{
+			liren_lighting_remove_light (self->scene->lighting, self->lights.array[i]);
+			liren_light_free (self->lights.array[i]);
+		}
+	}
+	lisys_free (self->lights.array);
+	self->lights.array = NULL;
+	self->lights.count = 0;
+}
+
+static int private_lights_create (
+	LIRenObject* self,
+	LIMdlPose*   pose)
+{
+	int i;
+	LIMdlNode* node;
+	LIMdlNodeIter iter;
+	LIRenLight* light;
+
+	/* Create light sources. */
+	if (pose != NULL)
+	{
+		LIMDL_FOREACH_NODE (iter, &pose->nodes)
+		{
+			node = iter.value;
+			if (node->type != LIMDL_NODE_LIGHT)
+				continue;
+			light = liren_light_new_from_model (self->scene, node);
+			if (light == NULL)
+				return 0;
+			if (!lialg_array_append (&self->lights, &light))
+			{
+				liren_light_free (light);
+				return 0;
+			}
+		}
+	}
+
+	/* Register light sources. */
+	for (i = 0 ; i < self->lights.count ; i++)
+	{
+		light = self->lights.array[i];
+		if (!liren_lighting_insert_light (self->scene->lighting, light))
+		{
+			while (i--)
+			{
+				light = self->lights.array[i];
+				liren_lighting_remove_light (self->scene->lighting, light);
+			}
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+static void private_lights_update (
+	LIRenObject* self)
 {
 	int i;
 	LIMatTransform transform;

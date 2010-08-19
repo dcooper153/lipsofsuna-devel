@@ -69,6 +69,7 @@ liphy_object_new (LIPhyPhysics*    physics,
 		return NULL;
 	self->physics = physics;
 	self->id = id;
+	self->shape = shape;
 	self->control_mode = control_mode;
 	self->config.gravity = limat_vector_init (0.0f, -10.0f, 0.0f);
 	self->config.mass = 10.0f;
@@ -78,7 +79,6 @@ liphy_object_new (LIPhyPhysics*    physics,
 	self->config.collision_mask = LIPHY_DEFAULT_COLLISION_MASK;
 	try
 	{
-		self->shape = new btCompoundShape ();
 		self->motion = new liphyMotionState (self, btTransform (orientation, position));
 	}
 	catch (...)
@@ -86,8 +86,6 @@ liphy_object_new (LIPhyPhysics*    physics,
 		liphy_object_free (self);
 		return NULL;
 	}
-	if (shape != NULL)
-		liphy_object_insert_shape (self, shape, NULL);
 
 	/* Add to dictionary. */
 	if (self->id)
@@ -121,11 +119,6 @@ liphy_object_free (LIPhyObject* self)
 	/* Unrealize. */
 	self->flags &= ~PRIVATE_REALIZED;
 	private_update_state (self);
-
-	/* Free shape. */
-	if (self->shape != NULL)
-		liphy_object_clear_shape (self);
-	delete self->shape;
 
 	/* Free self. */
 	delete self->motion;
@@ -184,24 +177,6 @@ int liphy_object_approach (
 }
 
 /**
- * \brief Clears the current shape of the object.
- *
- * \param self Object.
- */
-void
-liphy_object_clear_shape (LIPhyObject* self)
-{
-	LIPhyShape* shape;
-
-	while (self->shape->getNumChildShapes ())
-	{
-		shape = (LIPhyShape*) self->shape->getChildShape (0)->getUserPointer ();
-		self->shape->removeChildShapeByIndex (0);
-		liphy_shape_free (shape);
-	}
-}
-
-/**
  * \brief Modifies the velocity of the object with an impulse.
  *
  * \param self Object.
@@ -218,39 +193,6 @@ liphy_object_impulse (LIPhyObject*       self,
 
 	if (self->control != NULL)
 		self->control->apply_impulse (v0, v1);
-}
-
-/**
- * \brief Adds a collision shape to the object.
- *
- * The reference count of the collision shape is increased by one when calling
- * this so the caller should free the shape if it doesn't need it.
- *
- * \param self Object.
- * \param shape Collision shape.
- * \param transform Shape transformation or NULL for identity.
- */
-int
-liphy_object_insert_shape (LIPhyObject*          self,
-                           LIPhyShape*           shape,
-                           const LIMatTransform* transform)
-{
-	liphy_shape_ref (shape);
-	if (transform != NULL)
-	{
-		btTransform btransform(
-			btQuaternion (transform->rotation.x, transform->rotation.y,
-			              transform->rotation.z, transform->rotation.w),
-			btVector3 (transform->position.x, transform->position.y, transform->position.z));
-		self->shape->addChildShape (btransform, shape->shape);
-	}
-	else
-	{
-		btTransform btransform (btQuaternion (0.0f, 0.0f, 0.0f, 1.0f));
-		self->shape->addChildShape (btransform, shape->shape);
-	}
-
-	return 1;
 }
 
 /**
@@ -590,16 +532,14 @@ liphy_object_get_ground (const LIPhyObject* self)
  * \param self Object.
  * \param result Return location for the inertia vector.
  */
-void
-liphy_object_get_inertia (LIPhyObject* self,
-                          LIMatVector* result)
+void liphy_object_get_inertia (
+	LIPhyObject* self,
+	LIMatVector* result)
 {
-	btVector3 inertia;
-
-	self->shape->calculateLocalInertia (self->config.mass, inertia);
-	result->x = inertia[0];
-	result->y = inertia[1];
-	result->z = inertia[2];
+	if (self->shape != NULL)
+		liphy_shape_get_inertia (self->shape, self->config.mass, result);
+	else
+		*result = limat_vector_init (0.0f, 0.0f, 0.0f);
 }
 
 /**
@@ -726,6 +666,23 @@ liphy_object_set_rotating (LIPhyObject* self,
 			self->body->setAngularFactor (value);
 	}
 #endif
+}
+
+LIPhyShape* liphy_object_get_shape (
+	LIPhyObject* self)
+{
+	return self->shape;
+}
+
+void liphy_object_set_shape (
+	LIPhyObject* self,
+	LIPhyShape*  shape)
+{
+	if (shape != self->shape)
+	{
+		self->shape = shape;
+		private_update_state (self);
+	}
 }
 
 /**
@@ -970,7 +927,7 @@ private_sweep_shape (const LIPhyObject* self,
 	object = self->control->get_object ();
 	if (object == NULL)
 		return 1.0f;
-	if (self->shape->getNumChildShapes () == 0)
+	if (self->shape->shape->getNumChildShapes () == 0)
 		return 1.0f;
 
 	/* Initialize sweep. */
@@ -981,10 +938,10 @@ private_sweep_shape (const LIPhyObject* self,
 	test.m_collisionFilterMask = self->config.collision_mask;
 
 	/* Sweep the shape. */
-	for (i = 0 ; i < self->shape->getNumChildShapes () ; i++)
+	for (i = 0 ; i < self->shape->shape->getNumChildShapes () ; i++)
 	{
 		collision = self->physics->dynamics->getCollisionWorld ();
-		shape = (btConvexShape*) self->shape->getChildShape (i);
+		shape = (btConvexShape*) self->shape->shape->getChildShape (i);
 		src = start;
 		dst = src;
 		dst.setOrigin (dst.getOrigin () + sweep);
@@ -1018,7 +975,9 @@ private_update_state (LIPhyObject* self)
 	/* Create new controller. */
 	if (self->flags & PRIVATE_REALIZED)
 	{
-		shape = self->shape;
+		if (self->shape == NULL)
+			return;
+		shape = self->shape->shape;
 		switch (self->control_mode)
 		{
 			case LIPHY_CONTROL_MODE_NONE:

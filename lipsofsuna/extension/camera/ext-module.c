@@ -97,9 +97,10 @@ static void private_camera_clip (
 	/* Create sweep shape. */
 	/* FIXME: Could use a more accurate shape. */
 	lialg_camera_get_bounds (camera, &aabb);
-	shape = liphy_shape_new_aabb (physics, &aabb);
+	shape = liphy_shape_new (physics);
 	if (shape == NULL)
 		return;
+	liphy_shape_add_aabb (shape, &aabb, NULL);
 
 	/* Sweep the shape. */
 	lialg_camera_get_center (camera, &start);

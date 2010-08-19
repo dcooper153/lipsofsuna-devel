@@ -52,7 +52,7 @@ struct _LIVoxBuilder
 	LIAlgMemdic* accel;
 	LIEngEngine* engine;
 	LIMdlModel* model;
-	LIPhyObject* physics;
+	LIPhyShape* physics;
 	LIPhyPhysics* physics_manager;
 	LIVoxManager* manager;
 	LIVoxVoxel* voxels;
@@ -129,7 +129,7 @@ int livox_build_area (
 	int           ysize,
 	int           zsize,
 	LIMdlModel**  result_model,
-	LIPhyObject** result_physics)
+	LIPhyShape**  result_physics)
 {
 	int i;
 	int x;
@@ -206,7 +206,9 @@ int livox_build_area (
 		/* Cache model. */
 		if (material->type == LIVOX_MATERIAL_TYPE_TILE)
 		{
-			model = lieng_engine_find_model_by_name (engine, material->model);
+#warning Support for tile models is temporarily disabled
+			model = NULL;
+//			model = lieng_engine_find_model_by_name (engine, material->model);
 			self.voxelsb[i].model = model;
 			self.voxelsb[i].height = 1.0f;
 		}
@@ -232,11 +234,6 @@ int livox_build_area (
 	if (count)
 	{
 		ret = private_build (&self, result_model != NULL, result_physics != NULL);
-		if (self.physics != NULL)
-		{
-			liphy_object_set_collision_group (self.physics, LIPHY_GROUP_TILES);
-			liphy_object_set_collision_mask (self.physics, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
-		}
 		if (ret)
 		{
 			if (result_physics != NULL)
@@ -247,7 +244,7 @@ int livox_build_area (
 		else
 		{
 			if (self.physics != NULL)
-				liphy_object_free (self.physics);
+				liphy_shape_free (self.physics);
 			if (self.model != NULL)
 				limdl_model_free (self.model);
 		}
@@ -267,7 +264,7 @@ int livox_build_block (
 	LIPhyPhysics*         physics,
 	const LIVoxBlockAddr* addr,
 	LIMdlModel**          result_model,
-	LIPhyObject**         result_physics)
+	LIPhyShape**          result_physics)
 {
 	int blockw = manager->tiles_per_line / manager->blocks_per_line;
 
@@ -382,7 +379,7 @@ private_build (LIVoxBuilder* self,
 		}
 		if (physics && self->physics == NULL && self->physics_manager != NULL)
 		{
-			self->physics = liphy_object_new (self->physics_manager, 0, NULL, LIPHY_CONTROL_MODE_STATIC);
+			self->physics = liphy_shape_new (self->physics_manager);
 			if (self->physics == NULL)
 				ret = 0;
 		}
@@ -623,7 +620,6 @@ private_merge_height_physics (LIVoxBuilder* self,
 	int x;
 	int z;
 	LIMatVector verts[18];
-	LIPhyShape* shape;
 
 	/* Collect vertices. */
 	for (i = z = 0 ; z < 3 ; z++)
@@ -634,12 +630,7 @@ private_merge_height_physics (LIVoxBuilder* self,
 	}
 
 	/* Insert convex shape. */
-	shape = liphy_shape_new_convex (self->physics_manager, verts, 18);
-	if (shape != NULL)
-	{
-		liphy_object_insert_shape (self->physics, shape, &voxel->transform);
-		liphy_shape_free (shape);
-	}
+	liphy_shape_add_convex (self->physics, verts, 18, &voxel->transform);
 }
 
 static int
@@ -724,7 +715,7 @@ static int
 private_merge_tile_physics (LIVoxBuilder* self,
                             LIVoxVoxelB*  voxel)
 {
-	return liphy_object_insert_shape (self->physics, voxel->model->physics, &voxel->transform);
+	return liphy_shape_add_shape (self->physics, voxel->model->physics, &voxel->transform);
 }
 
 static int

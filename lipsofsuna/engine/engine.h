@@ -34,7 +34,6 @@
 #include <lipsofsuna/system.h>
 #include "engine-model.h"
 #include "engine-object.h"
-#include "engine-resources.h"
 #include "engine-sector.h"
 #include "engine-types.h"
 
@@ -45,10 +44,10 @@ struct _LIEngEngine
 	void* userdata;
 	LIAlgPtrdic* selection;
 	LIAlgSectors* sectors;
+	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
 	LICalCallbacks* callbacks;
 	LICalHandle calls[1];
-	LIEngResources* resources;
 	struct
 	{
 		int flags;
@@ -78,10 +77,6 @@ LIAPICALL (int, lieng_engine_check_unique, (
 
 LIAPICALL (void, lieng_engine_clear_selection, (
 	LIEngEngine* self));
-
-LIAPICALL (LIEngModel*, lieng_engine_find_model_by_name, (
-	LIEngEngine* self,
-	const char*  name));
 
 LIAPICALL (LIEngObject*, lieng_engine_find_object, (
 	LIEngEngine* self,

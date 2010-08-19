@@ -22,37 +22,45 @@
  * @{
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#include "ext-module.h"
 
-#include <lipsofsuna/extension.h>
-#include <lipsofsuna/client.h>
+/* @luadoc
+ * module "Extension.ObjectRender"
+ * ---
+ * -- Control rendering of objects.
+ * -- @name Object
+ * -- @class table
+ */
 
-#define LISCR_SCRIPT_RENDER_OBJECT "RenderObject"
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+/* @luadoc
+ * --- Deforms the mesh of the object according to its animation pose.
+ * --
+ * -- @param self Object.
+ * function Object.deform_mesh(self)
+ */
+static void Object_deform_mesh (LIScrArgs* args)
 {
-	LICalHandle calls[10];
-	LICliClient* client;
-	LIMaiProgram* program;
-	LIRenRender* render;
-	LIRenScene* scene;
-};
+	LIExtModule* module;
+	LIEngObject* engobj;
+	LIRenObject* object;
 
-LIExtModule* liext_object_render_new (
-	LIMaiProgram* program);
+	/* Get render object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	engobj = args->self;
+	object = liren_scene_find_object (module->scene, engobj->id);
+	if (object == NULL)
+		return;
 
-void liext_object_render_free (
-	LIExtModule* self);
+	/* Deform the mesh. */
+	liren_object_deform (object);
+}
 
 /*****************************************************************************/
 
 void liext_script_render_object (
 	LIScrClass* self,
-	void*       data);
-
-#endif
-
-/** @} */
-/** @} */
+	void*       data)
+{
+	liscr_class_set_userdata (self, LISCR_SCRIPT_RENDER_OBJECT, data);
+	liscr_class_insert_mfunc (self, "deform_mesh", Object_deform_mesh);
+}

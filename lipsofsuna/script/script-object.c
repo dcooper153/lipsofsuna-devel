@@ -38,16 +38,16 @@
  * --- Adds an additional model mesh to the object.
  * -- @param self Object.
  * -- @param args Arguments.<ul>
- * --   <li>model: Model name. (required)</li></ul>
+ * --   <li>model: Model. (required)</li></ul>
  * function Object.add_model(self, args)
  */
 static void Object_add_model (LIScrArgs* args)
 {
-	const char* model;
+	LIScrData* model;
 
-	if (liscr_args_gets_string (args, "model", &model))
+	if (liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &model))
 	{
-		if (!lieng_object_merge_model (args->self, model))
+		if (!lieng_object_merge_model (args->self, model->data))
 			lisys_error_report ();
 	}
 }
@@ -375,6 +375,24 @@ static void Object_new (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Updates the animations of the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>secs: Tick length.</li></ul>
+ * function Object.update_animations(self, args)
+ */
+static void Object_update_animations (LIScrArgs* args)
+{
+	float secs = 1.0f;
+	LIEngObject* self;
+
+	self = args->self;
+	liscr_args_gets_float (args, "secs", &secs);
+	if (self->pose != NULL)
+		limdl_pose_update (self->pose, secs);
+}
+
+/* @luadoc
  * --- Table of channel numbers and animation names.<br/>
  * -- A list of permanent animations the object is playing back.
  * -- @name Object.animations
@@ -425,14 +443,14 @@ static void Object_getter_model (LIScrArgs* args)
 	LIEngObject* self = args->self;
 
 	if (self->model != NULL)
-		liscr_args_seti_string (args, self->model->name);
+		liscr_args_seti_data (args, self->model->script);
 }
 static void Object_setter_model (LIScrArgs* args)
 {
-	const char* value;
+	LIScrData* value;
 
-	if (liscr_args_geti_string (args, 0, &value))
-		lieng_object_set_model_name (args->self, value);
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
+		lieng_object_set_model (args->self, value->data);
 }
 
 /* @luadoc
@@ -672,6 +690,7 @@ void liscr_script_object (
 	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);
 	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
 	liscr_class_insert_cfunc (self, "new", Object_new);
+	liscr_class_insert_mfunc (self, "update_animations", Object_update_animations);
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 	liscr_class_insert_mvar (self, "id", Object_getter_id, NULL);
 	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);

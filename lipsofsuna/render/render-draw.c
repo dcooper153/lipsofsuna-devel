@@ -70,10 +70,7 @@ liren_draw_all (LIRenContext* context,
 	LIRenMaterial* material;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Rendering mode. */
 	flags = 0;
@@ -175,10 +172,7 @@ liren_draw_exclude (LIRenContext* context,
 	LIRenMaterial* material;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Exlude object. */
 	if ((LIRenObject*) data == object)
@@ -239,10 +233,7 @@ liren_draw_hair (LIRenContext* context,
 	/* Check if renderable. */
 	if (object->model == NULL)
 		return;
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Rendering mode. */
 	flags = 0;
@@ -334,10 +325,7 @@ liren_draw_opaque (LIRenContext* context,
 	LIRenMaterial* material;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Rendering mode. */
 	flags =  LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING;
@@ -377,10 +365,7 @@ liren_draw_picking (LIRenContext* context,
 	LIRenMaterial* material;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Rendering mode. */
 	flags = LIREN_FLAG_FIXED;
@@ -409,10 +394,7 @@ liren_draw_shadeless (LIRenContext* context,
 	LIRenMaterial* material;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Rendering mode. */
 	flags = LIREN_FLAG_TEXTURING;
@@ -445,10 +427,7 @@ liren_draw_shadowmap (LIRenContext* context,
 	LIMatMatrix matrix;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Render the mesh. */
 	matrix = object->orientation.matrix;
@@ -475,10 +454,7 @@ liren_draw_transparent (LIRenContext* context,
 	LIRenMaterial* material;
 	LIRenModel* model;
 
-	if (object->instance != NULL)
-		model = object->instance;
-	else
-		model = object->model;
+	model = object->model;
 
 	/* Rendering mode. */
 	flags = LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING;

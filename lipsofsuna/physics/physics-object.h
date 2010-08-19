@@ -50,18 +50,10 @@ LIAPICALL (int, liphy_object_approach, (
 	float              speed,
 	float              dist));
 
-LIAPICALL (void, liphy_object_clear_shape, (
-	LIPhyObject* self));
-
 LIAPICALL (void, liphy_object_impulse, (
 	LIPhyObject*       self,
 	const LIMatVector* point,
 	const LIMatVector* impulse));
-
-LIAPICALL (int, liphy_object_insert_shape, (
-	LIPhyObject*          self,
-	LIPhyShape*           shape,
-	const LIMatTransform* transform));
 
 LIAPICALL (void, liphy_object_jump, (
 	LIPhyObject*       self,
@@ -158,6 +150,13 @@ LIAPICALL (int, liphy_object_set_realized, (
 LIAPICALL (void, liphy_object_set_rotating, (
 	LIPhyObject* self,
 	float        value));
+
+LIAPICALL (float, liphy_object_get_shape, (
+	const LIPhyObject* self));
+
+LIAPICALL (void, liphy_object_set_shape, (
+	LIPhyObject* self,
+	LIPhyShape*  shape));
 
 LIAPICALL (float, liphy_object_get_strafing, (
 	const LIPhyObject* self));

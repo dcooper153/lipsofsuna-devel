@@ -128,10 +128,6 @@ lieng_object_free (LIEngObject* self)
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
 
-	/* Free model instance. */
-	if (self->flags & LIENG_OBJECT_FLAG_INSTANCE_MODEL)
-		lieng_model_free (self->model);
-
 	/* Free all memory. */
 	lisys_free (self);
 }
@@ -250,43 +246,28 @@ lieng_object_find_node (LIEngObject* self,
  * \brief Merges a model to the object.
  *
  * \param self Object.
- * \param name Model name.
+ * \param name Model.
  * \return Nonzero on success.
  */
 int lieng_object_merge_model (
 	LIEngObject* self,
-	const char*  name)
+	LIEngModel*  model)
 {
-	LIEngModel* model0;
-	LIEngModel* model1;
+	LIEngModel* tmp;
 
-	/* Just set if no existing model. */
 	if (self->model == NULL)
-		return lieng_object_set_model_name (self, name);
-
-	/* Find merged model. */
-	model1 = lieng_engine_find_model_by_name (self->engine, name);
-	if (model1 == NULL)
-		return 0;
-
-	/* Instance existing model. */
-	model0 = lieng_model_new_copy (self->model);
-	if (model0 == NULL)
-		return 0;
-
-	/* Merge requested model. */
-	if (!limdl_model_merge (model0->model, model1->model))
 	{
-		lieng_model_free (model0);
-		return 0;
+		tmp = lieng_model_new_copy (model);
+		if (tmp == NULL)
+			return 0;
+		lieng_object_set_model (self, tmp);
 	}
-
-	/* Clear name so that we know this is an instance model. */
-	free (model0->name);
-	model0->name = NULL;
-
-	/* Use the new instance model. */
-	lieng_object_set_model (self, model0);
+	else
+	{
+		if (!limdl_model_merge (self->model->model, model->model))
+			return 0;
+		lieng_object_set_model (self, self->model);
+	}
 
 	return 1;
 }
@@ -380,17 +361,13 @@ int lieng_object_reset (
  * \param self Object.
  * \param secs Number of seconds since last tick.
  */
-void
-lieng_object_update (LIEngObject* self,
-                     float        secs)
+void lieng_object_update (
+	LIEngObject* self,
+	float        secs)
 {
 	LIMatTransform transform;
 	LIMatTransform transform0;
 	LIMatTransform transform1;
-
-	/* Animations. */
-	if (self->pose != NULL)
-		limdl_pose_update (self->pose, secs);
 
 	/* Smoothing. */
 	if (self->smoothing.rot != 0.0f || self->smoothing.pos != 0.0f)
@@ -540,47 +517,18 @@ lieng_object_set_model (LIEngObject* self,
 {
 	/* Switch model. */
 	if (model != NULL)
+	{
 		limdl_pose_set_model (self->pose, model->model);
+		liscr_data_ref (model->script, self->script);
+	}
 	else
 		limdl_pose_set_model (self->pose, NULL);
-	if (self->flags & LIENG_OBJECT_FLAG_INSTANCE_MODEL)
-	{
-		lieng_model_free (self->model);
-		self->flags &= ~LIENG_OBJECT_FLAG_INSTANCE_MODEL;
-	}
+	if (self->model != NULL)
+		liscr_data_unref (self->model->script, self->script);
 	self->model = model;
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
-
-	return 1;
-}
-
-const char*
-lieng_object_get_model_name (const LIEngObject* self)
-{
-	if (self->model != NULL)
-		return self->model->name;
-	return "";
-}
-
-/**
- * \brief Replaces the current model of the object.
- *
- * \param self Object.
- * \param value Model string.
- * \return Nonzero on success.
- */
-int
-lieng_object_set_model_name (LIEngObject* self,
-                             const char*  value)
-{
-	LIEngModel* model;
-
-	model = lieng_engine_find_model_by_name (self->engine, value);
-	if (model == NULL)
-		return 0;
-	lieng_object_set_model (self, model);
 
 	return 1;
 }

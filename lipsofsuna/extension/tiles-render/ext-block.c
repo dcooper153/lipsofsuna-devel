@@ -89,7 +89,7 @@ int liext_tiles_render_block_build (
 	/* Create render model if not empty. */
 	if (self->mmodel != NULL)
 	{
-		self->rmodel = liren_model_new (self->module->client->render, self->mmodel, NULL);
+		self->rmodel = liren_model_new (self->module->client->render, self->mmodel, 0);
 		if (self->rmodel != NULL)
 		{
 			self->group = liren_group_new (self->module->client->scene);

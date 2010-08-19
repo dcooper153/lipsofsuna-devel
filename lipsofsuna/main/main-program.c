@@ -596,7 +596,7 @@ static int private_object_model (
 	{
 		limai_program_event (self, "object-model",
 			"object", LISCR_SCRIPT_OBJECT, object->script,
-			"model", LISCR_TYPE_STRING, model->name, NULL);
+			"model", LISCR_SCRIPT_MODEL, model->script, NULL);
 	}
 
 	return 1;

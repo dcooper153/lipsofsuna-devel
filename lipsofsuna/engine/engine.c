@@ -106,10 +106,6 @@ lieng_engine_free (LIEngEngine* self)
 	if (self->selection != NULL)
 		lieng_engine_clear_selection (self);
 
-	/* Clear resources. */
-	if (self->resources != NULL)
-		lieng_resources_clear (self->resources);
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->callbacks, self, "free", lical_marshal_DATA_PTR, self);
 
@@ -117,10 +113,10 @@ lieng_engine_free (LIEngEngine* self)
 	if (self->sectors != NULL)
 		lialg_sectors_remove_content (self->sectors, "engine");
 
-	if (self->resources != NULL)
-		lieng_resources_free (self->resources);
 	if (self->objects != NULL)
 		lialg_u32dic_free (self->objects);
+	if (self->models != NULL)
+		lialg_u32dic_free (self->models);
 	if (self->selection != NULL)
 		lialg_ptrdic_free (self->selection);
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
@@ -159,19 +155,6 @@ lieng_engine_clear_selection (LIEngEngine* self)
 	lialg_ptrdic_clear (self->selection);
 }
 
-LIEngModel*
-lieng_engine_find_model_by_name (LIEngEngine* self,
-                                 const char*  name)
-{
-	LIEngModel* model;
-
-	model = lieng_resources_find_model (self->resources, name);
-	if (model == NULL)
-		return NULL;
-
-	return model;
-}
-
 /**
  * \brief Find an object by id.
  *
@@ -184,59 +167,6 @@ lieng_engine_find_object (LIEngEngine* self,
                           uint32_t     id)
 {
 	return lialg_u32dic_find (self->objects, id);
-}
-
-/**
- * \brief Forces the engine to reload a model.
- *
- * Reloads the requested model and updates any objects that reference
- * it to reflect the new model. Any other references to the model become
- * invalid and need to be manually replaced.
- *
- * \param self Engine.
- * \param name Model name.
- * \return Nonzero on success.
- */
-int
-lieng_engine_load_model (LIEngEngine* self,
-                         const char*  name)
-{
-	LIAlgU32dicIter iter;
-	LIEngModel* model;
-	LIEngObject* object;
-
-	/* Find model. */
-	model = lieng_resources_find_model (self->resources, name);
-	if (model == NULL)
-		return 0;
-
-	/* Mark affected objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		if (object->model == model)
-			object->flags |= LIENG_OBJECT_FLAG_RELOAD;
-	}
-
-	/* Reload model. */
-	lieng_model_unload (model);
-	lieng_model_load (model);
-	lical_callbacks_call (self->callbacks, self, "model-reload", lical_marshal_DATA_PTR_PTR, name, model);
-
-	/* Rebuild affected objects. */
-	/* TODO: Constraints are currently rebuild by lieng_object_set_model so
-	         this loop can result to a lot of unnecessary rebuilds. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		if (object->flags & LIENG_OBJECT_FLAG_RELOAD)
-		{
-			object->flags &= ~LIENG_OBJECT_FLAG_RELOAD;
-			lieng_object_set_model (object, model);
-		}
-	}
-
-	return 1;
 }
 
 /**
@@ -346,14 +276,14 @@ private_init (LIEngEngine* self)
 	if (self->objects == NULL)
 		return 0;
 
+	/* Models. */
+	self->models = lialg_u32dic_new ();
+	if (self->models == NULL)
+		return 0;
+
 	/* Selection. */
 	self->selection = lialg_ptrdic_new ();
 	if (self->selection == NULL)
-		return 0;
-
-	/* Resources. */
-	self->resources = lieng_resources_new (self);
-	if (self->resources == NULL)
 		return 0;
 
 	/* Sectors. */

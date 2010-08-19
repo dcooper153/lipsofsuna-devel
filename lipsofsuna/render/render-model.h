@@ -35,8 +35,8 @@
 
 struct _LIRenModel
 {
-	int added;
-	char* name;
+	int id;
+	int type;
 	LIMdlModel* model;
 	LIRenBuffer* vertices;
 	LIRenRender* render;
@@ -55,10 +55,7 @@ struct _LIRenModel
 LIAPICALL (LIRenModel*, liren_model_new, (
 	LIRenRender* render,
 	LIMdlModel*  model,
-	const char*  name));
-
-LIAPICALL (LIRenModel*, liren_model_new_instance, (
-	LIRenModel* model));
+	int          id));
 
 LIAPICALL (void, liren_model_free, (
 	LIRenModel*  self));
@@ -71,8 +68,19 @@ LIAPICALL (void, liren_model_get_bounds, (
 	LIRenModel* self,
 	LIMatAabb*  aabb));
 
+LIAPICALL (int, liren_model_set_model, (
+	LIRenModel* self,
+	LIMdlModel* model));
+
 LIAPICALL (int, liren_model_get_static, (
 	LIRenModel* self));
+
+LIAPICALL (int, liren_model_get_type, (
+	const LIRenModel* self));
+
+LIAPICALL (int, liren_model_set_type, (
+	LIRenModel* self,
+	int         value));
 
 #endif
 

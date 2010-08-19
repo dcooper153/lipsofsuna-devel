@@ -31,6 +31,12 @@
 #include "render-material.h"
 #include "render-types.h"
 
+enum
+{
+	LIREN_BUFFER_TYPE_CPU,
+	LIREN_BUFFER_TYPE_GPU
+};
+
 struct _LIRenBuffer
 {
 	GLuint buffer;
@@ -46,13 +52,15 @@ struct _LIRenBuffer
 LIAPICALL (int, liren_buffer_init_index, (
 	LIRenBuffer* self,
 	const void*  data,
-	int          count));
+	int          count,
+	int          type));
 
 LIAPICALL (int, liren_buffer_init_vertex, (
 	LIRenBuffer*       self,
 	const LIRenFormat* format,
 	const void*        data,
-	int                count));
+	int                count,
+	int                type));
 
 LIAPICALL (void, liren_buffer_free, (
 	LIRenBuffer* self));

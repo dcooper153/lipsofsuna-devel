@@ -32,9 +32,6 @@ static int private_callback_tick (
 	LIExtReload* self,
 	float        secs);
 
-static void private_progress_cancel (
-	LIExtReload* self);
-
 static void private_reload_image (
 	LIExtReload* self,
 	const char*  name);
@@ -165,40 +162,21 @@ static int private_callback_tick (
 	return 1;
 }
 
-/**
- * \brief Called when the cancel button is pressed in the progress dialog.
- *
- * Sends a signal to the worker thread to stop working.
- *
- * \param self Reload.
- */
-static void private_progress_cancel (
-	LIExtReload* self)
-{
-	lirel_reload_cancel (self->reload);
-}
-
 static void private_reload_image (
 	LIExtReload* self,
 	const char*  name)
 {
-	printf ("Reloading texture `%s'\n", name);
 	liren_render_load_image (self->client->render, name);
+	limai_program_event (self->program, "reload-image",
+		"file", LISCR_TYPE_STRING, name, NULL);
 }
 
 static void private_reload_model (
 	LIExtReload* self,
 	const char*  name)
 {
-	LIVoxManager* voxels;
-
-	printf ("Reloading model `%s'\n", name);
-	lieng_engine_load_model (self->program->engine, name);
-
-	/* Rebuild voxel terrain. */
-	voxels = limai_program_find_component (self->program, "voxel");
-	if (voxels != NULL)
-		livox_manager_reload_model (voxels, name);
+	limai_program_event (self->program, "reload-model",
+		"file", LISCR_TYPE_STRING, name, NULL);
 }
 
 /** @} */

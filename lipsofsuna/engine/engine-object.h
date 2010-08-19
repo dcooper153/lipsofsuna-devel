@@ -87,7 +87,7 @@ LIAPICALL (LIMdlNode*, lieng_object_find_node, (
 
 LIAPICALL (int, lieng_object_merge_model, (
 	LIEngObject* self,
-	const char*  name));
+	LIEngModel*  model));
 
 LIAPICALL (int, lieng_object_moved, (
 	LIEngObject* self));
@@ -132,13 +132,6 @@ LIAPICALL (void, lieng_object_set_flags, (
 LIAPICALL (int, lieng_object_set_model, (
 	LIEngObject* self,
 	LIEngModel*  model));
-
-LIAPICALL (const char*, lieng_object_get_model_name, (
-	const LIEngObject* self));
-
-LIAPICALL (int, lieng_object_set_model_name, (
-	LIEngObject* self,
-	const char*  value));
 
 LIAPICALL (int, lieng_object_get_realized, (
 	const LIEngObject* self));

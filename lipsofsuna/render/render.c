@@ -71,8 +71,8 @@ error:
 void
 liren_render_free (LIRenRender* self)
 {
-	LIAlgPtrdicIter iter0;
 	LIAlgStrdicIter iter1;
+	LIAlgU32dicIter iter2;
 	LIRenImage* image;
 	LIRenModel* model;
 	LIRenShader* shader;
@@ -95,23 +95,14 @@ liren_render_free (LIRenRender* self)
 	}
 
 	/* Free models. */
-	if (self->models_inst != NULL)
-	{
-		LIALG_PTRDIC_FOREACH (iter0, self->models_inst)
-		{
-			model = iter0.value;
-			liren_model_free (model);
-		}
-		lialg_ptrdic_free (self->models_inst);
-	}
 	if (self->models != NULL)
 	{
-		LIALG_STRDIC_FOREACH (iter1, self->models)
+		LIALG_U32DIC_FOREACH (iter2, self->models)
 		{
-			model = iter1.value;
+			model = iter2.value;
 			liren_model_free (model);
 		}
-		lialg_strdic_free (self->models);
+		lialg_u32dic_free (self->models);
 	}
 
 	/* Free images. */
@@ -168,17 +159,17 @@ liren_render_find_image (LIRenRender* self,
 }
 
 /**
- * \brief Finds a model by name.
+ * \brief Finds a model by ID.
  *
  * \param self Renderer.
- * \param name Model name.
+ * \param id Model ID.
  * \return Model.
  */
-LIRenModel*
-liren_render_find_model (LIRenRender* self,
-                         const char*  name)
+LIRenModel* liren_render_find_model (
+	LIRenRender* self,
+	int          id)
 {
-	return lialg_strdic_find (self->models, name);
+	return lialg_u32dic_find (self->models, id);
 }
 
 /**
@@ -196,8 +187,7 @@ int
 liren_render_load_image (LIRenRender* self,
                          const char*  name)
 {
-	LIAlgPtrdicIter iter0;
-	LIAlgStrdicIter iter1;
+	LIAlgU32dicIter iter;
 	LIRenImage* image;
 	LIRenModel* model;
 
@@ -220,91 +210,12 @@ liren_render_load_image (LIRenRender* self,
 	if (!liren_image_load (image))
 		return 0;
 
-	/* Replace in all named models. */
-	LIALG_STRDIC_FOREACH (iter1, self->models)
+	/* Replace in all models. */
+	LIALG_U32DIC_FOREACH (iter, self->models)
 	{
-		model = iter1.value;
+		model = iter.value;
 		liren_model_replace_image (model, image);
 	}
-
-	/* Replace in all instance models. */
-	LIALG_PTRDIC_FOREACH (iter0, self->models_inst)
-	{
-		model = iter0.value;
-		liren_model_replace_image (model, image);
-	}
-
-	return 1;
-}
-
-/**
- * \brief Forces the renderer to load or reload a model.
- *
- * Reloads the requested model and updates any objects or groups that reference
- * it to point to the new model. Any other references to the model become
- * invalid and need to be manually replaced.
- *
- * \param self Renderer.
- * \param name Model name.
- * \param model Model data.
- * \return Nonzero on success.
- */
-int
-liren_render_load_model (LIRenRender* self,
-                         const char*  name,
-                         LIMdlModel*  model)
-{
-	LIRenGroup* group;
-	LIRenModel* model0;
-	LIRenModel* model1;
-	LIRenObject* object;
-	LIRenScene* scene;
-	LIAlgPtrdicIter iter0;
-	LIAlgU32dicIter iter1;
-	LIAlgPtrdicIter iter2;
-
-	/* Create new model. */
-	if (name != NULL)
-		model0 = lialg_strdic_find (self->models, name);
-	else
-		model0 = NULL;
-	model1 = liren_model_new (self, model, name);
-	if (model1 == NULL)
-		return 0;
-
-	/* Early exit if not reloading. */
-	if (model0 == NULL)
-		return 1;
-
-	/* Replace in all instances. */
-	LIALG_PTRDIC_FOREACH (iter0, self->scenes)
-	{
-		scene = iter0.value;
-
-		/* Replace in all objects. */
-		LIALG_U32DIC_FOREACH (iter1, scene->objects)
-		{
-			object = iter1.value;
-			if (object->model == model0)
-			{
-				if (!liren_object_set_model (object, model1))
-				{
-					liren_object_set_model (object, NULL);
-					liren_object_set_pose (object, NULL);
-				}
-			}
-		}
-
-		/* Replace in all groups. */
-		LIALG_PTRDIC_FOREACH (iter2, scene->groups)
-		{
-			group = iter2.value;
-			liren_group_reload_model (group, model0, model1);
-		}
-	}
-
-	/* Free old model. */
-	liren_model_free (model0);
 
 	return 1;
 }
@@ -429,11 +340,8 @@ private_init_resources (LIRenRender* self,
 		return 0;
 
 	/* Initialize model dicrionaries. */
-	self->models = lialg_strdic_new ();
+	self->models = lialg_u32dic_new ();
 	if (self->models == NULL)
-		return 0;
-	self->models_inst = lialg_ptrdic_new ();
-	if (self->models_inst == NULL)
 		return 0;
 
 	/* Initialize shader dictionary. */

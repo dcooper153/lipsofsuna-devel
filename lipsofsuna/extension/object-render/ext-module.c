@@ -28,9 +28,16 @@ static int private_engine_free (
 	LIExtModule* self,
 	LIEngEngine* engine);
 
-static int private_model_reload (
+static int private_model_changed (
 	LIExtModule* self,
-	const char*  name,
+	LIEngModel*  model);
+
+static int private_model_free (
+	LIExtModule* self,
+	LIEngModel*  model);
+
+static int private_model_new (
+	LIExtModule* self,
 	LIEngModel*  model);
 
 static int private_object_new (
@@ -73,6 +80,7 @@ LIExtModule* liext_object_render_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
+	LIScrClass* clss;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -92,17 +100,24 @@ LIExtModule* liext_object_render_new (
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "engine-free", 1, private_engine_free, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "model-reload", 1, private_model_reload, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_engine_tick, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", 1, private_object_new, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-free", 1, private_object_free, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", 1, private_object_model, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 1, private_object_realize, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", 1, private_object_transform, self, self->calls + 7))
+	    !lical_callbacks_insert (program->callbacks, program->engine, "model-changed", 1, private_model_changed, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", 1, private_model_free, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", 1, private_model_new, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_engine_tick, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", 1, private_object_new, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-free", 1, private_object_free, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", 1, private_object_model, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", 1, private_object_realize, self, self->calls + 8) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", 1, private_object_transform, self, self->calls + 9))
 	{
 		liext_object_render_free (self);
 		return NULL;
 	}
+
+	/* Extend the object class. */
+	clss = liscr_script_find_class (program->script, "Object");
+	if (clss != NULL)
+		liext_script_render_object (clss, self);
 
 	return self;
 }
@@ -128,14 +143,47 @@ static int private_engine_free (
 	return 1;
 }
 
-static int private_model_reload (
+static int private_model_changed (
 	LIExtModule* self,
-	const char*  name,
 	LIEngModel*  model)
 {
+	LIRenModel* model_;
+
 	lisys_assert (model != NULL);
 
-	liren_render_load_model (self->render, name, model->model);
+	model_ = liren_render_find_model (self->render, model->id);
+	if (model_ != NULL)
+		liren_model_set_model (model_, model->model);
+
+	return 1;
+}
+
+static int private_model_free (
+	LIExtModule* self,
+	LIEngModel*  model)
+{
+	LIRenModel* model_;
+
+	lisys_assert (model != NULL);
+
+	model_ = liren_render_find_model (self->render, model->id);
+	if (model_ != NULL)
+		liren_model_free (model_);
+
+	return 1;
+}
+
+static int private_model_new (
+	LIExtModule* self,
+	LIEngModel*  model)
+{
+	LIRenModel* model_;
+
+	lisys_assert (model != NULL);
+
+	model_ = liren_render_find_model (self->render, model->id);
+	if (model_ == NULL)
+		liren_model_new (self->render, model->model, model->id);
 
 	return 1;
 }
@@ -175,17 +223,7 @@ static int private_object_model (
 	{
 		if (model != NULL)
 		{
-			if (model->name != NULL)
-			{
-				model_ = liren_render_find_model (self->render, model->name);
-				if (model_ == NULL)
-				{
-					liren_render_load_model (self->render, model->name, model->model);
-					model_ = liren_render_find_model (self->render, model->name);
-				}
-			}
-			else
-				model_ = liren_model_new (self->render, model->model, NULL);
+			model_ = liren_render_find_model (self->render, model->id);
 			if (model_ != NULL)
 			{
 				liren_object_set_pose (object_, object->pose);

@@ -45,7 +45,6 @@ struct _LIRenObject
 	LIMdlPose* pose;
 	LIRenScene* scene;
 	LIRenModel* model;
-	LIRenModel* instance;
 	struct
 	{
 		int width;
@@ -74,9 +73,6 @@ LIAPICALL (void, liren_object_free, (
 	LIRenObject* self));
 
 LIAPICALL (void, liren_object_deform, (
-	LIRenObject* self));
-
-LIAPICALL (void, liren_object_emit_particles, (
 	LIRenObject* self));
 
 LIAPICALL (void, liren_object_update, (

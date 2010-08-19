@@ -27,22 +27,21 @@
 
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/physics.h>
+#include <lipsofsuna/script.h>
 #include "engine.h"
 #include "engine-types.h"
 
 struct _LIEngModel
 {
-	char* name;
-	char* path;
+	int id;
 	LIEngEngine* engine;
 	LIMdlModel* model;
 	LIPhyShape* physics;
+	LIScrData* script;
 };
 
 LIAPICALL (LIEngModel*, lieng_model_new, (
-	LIEngEngine* engine,
-	const char*  dir,
-	const char*  name));
+	LIEngEngine* engine));
 
 LIAPICALL (LIEngModel*, lieng_model_new_copy, (
 	LIEngModel* model));
@@ -54,14 +53,12 @@ LIAPICALL (void, lieng_model_calculate_bounds, (
 	LIEngModel* self));
 
 LIAPICALL (int, lieng_model_load, (
-	LIEngModel* self));
+	LIEngModel* self,
+	const char* name));
 
 LIAPICALL (int, lieng_model_merge, (
 	LIEngModel* self,
 	LIEngModel* model));
-
-LIAPICALL (void, lieng_model_unload, (
-	LIEngModel* self));
 
 LIAPICALL (void, lieng_model_get_bounds, (
 	const LIEngModel* self,

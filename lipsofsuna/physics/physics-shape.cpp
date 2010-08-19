@@ -29,48 +29,41 @@
 
 #define VERTEX_WELD_EPSILON 0.05
 
-static btConvexHullShape*
-private_create_convex (LIPhyShape* self,
-                       btScalar*   vertices,
-                       int         count);
+static int private_add_shape (
+	LIPhyShape*           self,
+	btConvexShape*        shape,
+	const LIMatTransform* transform);
 
-static inline int
-private_init_box (LIPhyShape*      self,
-                  const LIMatAabb* aabb);
+static btConvexHullShape* private_create_convex (
+	LIPhyShape* self,
+	btScalar*   vertices,
+	int         count);
 
-static inline int
-private_init_convex (LIPhyShape*        self,
-                     const LIMatVector* vertices,
-                     int                count);
+static btConvexHullShape* private_create_from_box (
+	LIPhyShape*      self,
+	const LIMatAabb* aabb);
 
-static inline int private_init_empty (
+static btConvexHullShape* private_create_from_empty (
 	LIPhyShape* self);
 
-static inline int
-private_init_model (LIPhyShape*       self,
-                    const LIMdlModel* model);
+static btConvexHullShape* private_create_from_model (
+	LIPhyShape*       self,
+	const LIMdlModel* model);
 
-static btScalar*
-private_weld_vertices (LIPhyShape*        self,
-                       const LIMatVector* vertices,
-                       int                count_in,
-                       int*               count_out);
+static btConvexHullShape* private_create_from_vertices (
+	LIPhyShape*        self,
+	const LIMatVector* vertices,
+	int                count);
 
 /*****************************************************************************/
 
 /**
- * \brief Creates a collision shape from a model.
- *
- * The model is stored to the shape as a reference and must not be freed
- * before the shape.
- *
+ * \brief Creates an empty collision shape.
  * \param physics Physics engine.
- * \param model Referenced model.
  * \return New collision shape or NULL.
  */
-LIPhyShape*
-liphy_shape_new (LIPhyPhysics*     physics,
-                 const LIMdlModel* model)
+LIPhyShape* liphy_shape_new (
+	LIPhyPhysics* physics)
 {
 	LIPhyShape* self;
 
@@ -80,11 +73,8 @@ liphy_shape_new (LIPhyPhysics*     physics,
 	try
 	{
 		self->physics = physics;
-		if (!private_init_model (self, model))
-		{
-			liphy_shape_free (self);
-			return NULL;
-		}
+		self->shape = new btCompoundShape ();
+		self->shape->setUserPointer (self);
 	}
 	catch (...)
 	{
@@ -92,81 +82,6 @@ liphy_shape_new (LIPhyPhysics*     physics,
 		liphy_shape_free (self);
 		return NULL;
 	}
-	self->shape->setUserPointer (self);
-
-	return self;
-}
-
-/**
- * \brief Creates a collision shape from a bounding box.
- *
- * \param physics Physics engine.
- * \param aabb Axis-aligned bounding box.
- * \return New collision shape or NULL.
- */
-LIPhyShape*
-liphy_shape_new_aabb (LIPhyPhysics*    physics,
-                      const LIMatAabb* aabb)
-{
-	LIPhyShape* self;
-
-	self = (LIPhyShape*) lisys_calloc (1, sizeof (LIPhyShape));
-	if (self == NULL)
-		return NULL;
-	try
-	{
-		self->physics = physics;
-		if (!private_init_box (self, aabb))
-		{
-			liphy_shape_free (self);
-			return NULL;
-		}
-	}
-	catch (...)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		liphy_shape_free (self);
-		return NULL;
-	}
-	self->shape->setUserPointer (self);
-
-	return self;
-}
-
-/**
- * \brief Creates a convex collision shape from a triangle list.
- *
- * \param physics Physics engine.
- * \param vertices Vertex array.
- * \param count Number of vertices.
- * \return New collision shape or NULL.
- */
-LIPhyShape*
-liphy_shape_new_convex (LIPhyPhysics*      physics,
-                        const LIMatVector* vertices,
-                        int                count)
-{
-	LIPhyShape* self;
-
-	self = (LIPhyShape*) lisys_calloc (1, sizeof (LIPhyShape));
-	if (self == NULL)
-		return NULL;
-	try
-	{
-		self->physics = physics;
-		if (!private_init_convex (self, vertices, count))
-		{
-			liphy_shape_free (self);
-			return NULL;
-		}
-	}
-	catch (...)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		liphy_shape_free (self);
-		return NULL;
-	}
-	self->shape->setUserPointer (self);
 
 	return self;
 }
@@ -176,28 +91,101 @@ liphy_shape_new_convex (LIPhyPhysics*      physics,
  *
  * \param self Collision shape.
  */
-void
-liphy_shape_free (LIPhyShape* self)
+void liphy_shape_free (
+	LIPhyShape* self)
 {
-	if (!self->refs)
+	delete self->shape;
+	lisys_free (self);
+}
+
+int liphy_shape_add_aabb (
+	LIPhyShape*           self,
+	const LIMatAabb*      aabb,
+	const LIMatTransform* transform)
+{
+	btConvexShape* shape;
+
+	shape = private_create_from_box (self, aabb);
+	if (shape == NULL)
 	{
-		if (self->shape != NULL)
-			delete self->shape;
-		lisys_free (self);
+		liphy_shape_free (self);
+		return 0;
 	}
-	else
-		self->refs--;
+	private_add_shape (self, shape, transform);
+
+	return 1;
+}
+
+int liphy_shape_add_convex (
+	LIPhyShape*           self,
+	const LIMatVector*    vertices,
+	int                   count,
+	const LIMatTransform* transform)
+{
+	btConvexShape* shape;
+
+	shape = private_create_from_vertices (self, vertices, count);
+	if (shape == NULL)
+	{
+		liphy_shape_free (self);
+		return 0;
+	}
+	private_add_shape (self, shape, transform);
+
+	return 1;
+}
+
+int liphy_shape_add_model (
+	LIPhyShape*           self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform)
+{
+	btConvexShape* shape;
+
+	shape = private_create_from_model (self, model);
+	if (shape == NULL)
+	{
+		liphy_shape_free (self);
+		return 0;
+	}
+	private_add_shape (self, shape, transform);
+
+	return 1;
 }
 
 /**
- * \brief Increments the reference count of the shape.
- *
- * \param self Collision shape.
+ * \brief Merges a collision shape to this one.
+ * \param self Object.
+ * \param shape Collision shape.
+ * \param transform Shape transformation or NULL for identity.
  */
-void
-liphy_shape_ref (LIPhyShape* self)
+int liphy_shape_add_shape (
+	LIPhyShape*           self,
+	LIPhyShape*           shape,
+	const LIMatTransform* transform)
 {
-	self->refs++;
+	btConvexHullShape* child;
+
+	while (shape->shape->getNumChildShapes ())
+	{
+		child = (btConvexHullShape*) shape->shape->getChildShape (0);
+		child = new btConvexHullShape (*child);
+		// FIXME: Take child transformation into account.
+		private_add_shape (self, child, transform);
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Clears the shape.
+ * \param self Shape.
+ */
+void liphy_shape_clear (
+	LIPhyShape* self)
+{
+	while (self->shape->getNumChildShapes ())
+		self->shape->removeChildShapeByIndex (0);
 }
 
 /**
@@ -221,12 +209,47 @@ liphy_shape_get_inertia (const LIPhyShape* self,
 	result->z = inertia[2];
 }
 
+int liphy_shape_set_model (
+	LIPhyShape*       self,
+	const LIMdlModel* model)
+{
+	btConvexShape* shape;
+
+	shape = private_create_from_model (self, model);
+	if (shape == NULL)
+		return 0;
+	liphy_shape_clear (self);
+	private_add_shape (self, shape, NULL);
+
+	return 1;
+}
+
 /*****************************************************************************/
 
-static btConvexHullShape*
-private_create_convex (LIPhyShape* self,
-                       btScalar*   vertices,
-                       int         count)
+static int private_add_shape (
+	LIPhyShape*           self,
+	btConvexShape*        shape,
+	const LIMatTransform* transform)
+{
+	btVector3 p(0.0f, 0.0f, 0.0f);
+	btQuaternion r(0.0f, 0.0f, 0.0f, 1.0f);
+
+	if (transform != NULL)
+	{
+		p = btVector3 (transform->position.x, transform->position.y,
+		               transform->position.z);
+		r = btQuaternion(transform->rotation.x, transform->rotation.y,
+		                 transform->rotation.z, transform->rotation.w);
+	}
+	self->shape->addChildShape (btTransform (r, p), shape);
+
+	return 1;
+}
+
+static btConvexHullShape* private_create_convex (
+	LIPhyShape* self,
+	btScalar*   vertices,
+	int         count)
 {
 	btShapeHull* hull;
 	btConvexHullShape* shape;
@@ -252,9 +275,9 @@ private_create_convex (LIPhyShape* self,
 	return shape1;
 }
 
-static inline int
-private_init_box (LIPhyShape*      self,
-                  const LIMatAabb* aabb)
+static btConvexHullShape* private_create_from_box (
+	LIPhyShape*      self,
+	const LIMatAabb* aabb)
 {
 	btScalar tmp[32] =
 	{
@@ -268,116 +291,110 @@ private_init_box (LIPhyShape*      self,
 		aabb->max.x, aabb->max.y, aabb->max.z, 0.0
 	};
 
-	self->shape = new btConvexHullShape (tmp, 8, 4 * sizeof (btScalar));
-
-	return 1;
+	return new btConvexHullShape (tmp, 8, 4 * sizeof (btScalar));
 }
 
-static inline int
-private_init_convex (LIPhyShape*        self,
-                     const LIMatVector* vertices,
-                     int                count)
-{
-	int num;
-	btScalar* tmp;
-
-	tmp = private_weld_vertices (self, vertices, count, &num);
-	if (tmp == NULL)
-		return 0;
-	self->shape = private_create_convex (self, tmp, num);
-	lisys_free (tmp);
-
-	return 1;
-}
-
-static inline int private_init_empty (
+static btConvexHullShape* private_create_from_empty (
 	LIPhyShape* self)
 {
 	const float w = 0.1f;
-	const LIMatVector v[8] =
+	const btScalar tmp[32] =
 	{
-		{ -w, -w, -w }, { -w, -w, w }, { -w, w, -w }, { -w, w, w },
-		{ w, -w, -w }, { w, -w, w }, { w, w, -w }, { w, w, w }
+		-w, -w, -w, 0.0,
+		-w, -w, w, 0.0,
+		-w, w, -w, 0.0,
+		-w, w, w, 0.0,
+		w, -w, -w, 0.0,
+		w, -w, w, 0.0,
+		w, w, -w, 0.0,
+		w, w, w, 0.0
 	};
-	return private_init_convex (self, v, 8);
+
+	return new btConvexHullShape (tmp, 8, 4 * sizeof (btScalar));
 }
 
-static inline int
-private_init_model (LIPhyShape*       self,
-                    const LIMdlModel* model)
+static btConvexHullShape* private_create_from_model (
+	LIPhyShape*       self,
+	const LIMdlModel* model)
 {
 	int i;
-	int ret;
-	int count;
-	LIMatVector* vertices;
+	btConvexHullShape* ret;
+	LIMatVector* tmp;
 
+	/* Use precalculated convex shapes when possible. */
 	/* FIXME: One model can have multiple shapes. */
-	/* FIXME: All shapes should be precalculated. */
 	if (model->shapes.count)
 	{
-		/* Create predefined shape. */
 		if (!model->shapes.array[0].vertices.count)
-			return private_init_empty (self);
-		ret = private_init_convex (self,
+			return private_create_from_empty (self);
+		return private_create_from_vertices (self,
 			model->shapes.array[0].vertices.array,
 			model->shapes.array[0].vertices.count);
 	}
-	else
+
+	/* Extract coordinates from vertices. */
+	if (model->vertices.count)
 	{
-		/* Count vertices. */
-		count = model->vertices.count;
-		if (!count)
-			return private_init_empty (self);
-
-		/* Allocate vertices. */
-		vertices = (LIMatVector*) lisys_calloc (count, sizeof (LIMatVector));
-		if (vertices == NULL)
-			return 0;
+		tmp = (LIMatVector*) lisys_calloc (model->vertices.count, sizeof (LIMatVector));
+		if (tmp == NULL)
+			return NULL;
 		for (i = 0 ; i < model->vertices.count ; i++)
-			vertices[i] = model->vertices.array[i].coord;
-
-		/* Create shape. */
-		ret = private_init_convex (self, vertices, count);
-		lisys_free (vertices);
+			tmp[i] = model->vertices.array[i].coord;
 	}
+	else
+		tmp = NULL;
+
+	/* Create the shape from the vertex coordinates. */
+	ret = private_create_from_vertices (self, tmp, model->vertices.count);
+	lisys_free (tmp);
 
 	return ret;
 }
 
-static btScalar*
-private_weld_vertices (LIPhyShape*        self,
-                       const LIMatVector* vertices,
-                       int                count_in,
-                       int*               count_out)
+static btConvexHullShape* private_create_from_vertices (
+	LIPhyShape*        self,
+	const LIMatVector* vertices,
+	int                count)
 {
 	int i;
 	int j;
 	int num;
-	btScalar* ret;
+	btConvexHullShape* ret;
+	btScalar* tmp;
+	LIMatVector vertex;
 
+	/* Use a default empty model if there are no vertices. */
+	if (!count)
+		return private_create_from_empty (self);
+
+	/* Remove duplicate vertices from the model. */
 	num = 0;
-	ret = (btScalar*) lisys_calloc (4 * count_in, sizeof (btScalar));
-	if (ret == NULL)
+	tmp = (btScalar*) lisys_calloc (4 * count, sizeof (btScalar));
+	if (tmp == NULL)
 		return NULL;
-	for (i = 0 ; i < count_in ; i++)
+	for (i = 0 ; i < count ; i++)
 	{
+		vertex = vertices[i];
 		for (j = 0 ; j < num ; j++)
 		{
-			if (LIMAT_ABS (vertices[i].x - ret[4 * j + 0]) < VERTEX_WELD_EPSILON &&
-			    LIMAT_ABS (vertices[i].y - ret[4 * j + 1]) < VERTEX_WELD_EPSILON &&
-			    LIMAT_ABS (vertices[i].z - ret[4 * j + 2]) < VERTEX_WELD_EPSILON)
+			if (LIMAT_ABS (vertex.x - tmp[4 * j + 0]) < VERTEX_WELD_EPSILON &&
+			    LIMAT_ABS (vertex.y - tmp[4 * j + 1]) < VERTEX_WELD_EPSILON &&
+			    LIMAT_ABS (vertex.z - tmp[4 * j + 2]) < VERTEX_WELD_EPSILON)
 				break;
 		}
 		if (j == num)
 		{
-			ret[4 * num + 0] = vertices[i].x;
-			ret[4 * num + 1] = vertices[i].y;
-			ret[4 * num + 2] = vertices[i].z;
-			ret[4 * num + 3] = 0.0;
+			tmp[4 * num + 0] = vertex.x;
+			tmp[4 * num + 1] = vertex.y;
+			tmp[4 * num + 2] = vertex.z;
+			tmp[4 * num + 3] = 0.0;
 			num++;
 		}
 	}
-	*count_out = num;
+
+	/* Create a convex shape. */
+	ret = private_create_convex (self, tmp, num);
+	lisys_free (tmp);
 
 	return ret;
 }

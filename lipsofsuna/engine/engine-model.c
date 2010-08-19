@@ -24,11 +24,15 @@
 
 #include "engine-model.h"
 
-LIEngModel*
-lieng_model_new (LIEngEngine* engine,
-                 const char*  dir,
-                 const char*  name)
+static void private_changed (
+	LIEngModel* self);
+
+/*****************************************************************************/
+
+LIEngModel* lieng_model_new (
+	LIEngEngine* engine)
 {
+	float rnd;
 	LIEngModel* self;
 
 	/* Allocate self. */
@@ -37,34 +41,36 @@ lieng_model_new (LIEngEngine* engine,
 		return NULL;
 	self->engine = engine;
 
-	/* Allocate name. */
-	self->name = listr_dup (name);
-	if (self->name == NULL)
-		goto error;
+	/* Create an empty model. */
+	self->model = limdl_model_new ();
+	if (self->model == NULL)
+	{
+		lieng_model_free (self);
+		return NULL;
+	}
 
-	/* Allocate path. */
-	self->path = lisys_path_format (engine->config.dir,
-		LISYS_PATH_SEPARATOR, "graphics",
-		LISYS_PATH_SEPARATOR, name, ".lmdl", NULL);
-	if (self->path == NULL)
-		goto error;
+	/* Choose model number. */
+	while (!self->id)
+	{
+		rnd = lisys_randf ();
+		self->id = (int)(0x7FFFFFFF * rnd);
+		if (!self->id)
+			continue;
+		if (lialg_u32dic_find (engine->models, self->id) != NULL)
+			self->id = 0;
+	}
 
-	/* Load data. */
-	if (!lieng_model_load (self))
-		goto error;
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
 
 	return self;
-
-error:
-	lieng_model_free (self);
-	return NULL;
 }
 
-LIEngModel*
-lieng_model_new_copy (LIEngModel* model)
+LIEngModel* lieng_model_new_copy (
+	LIEngModel* model)
 {
+	float rnd;
 	LIEngModel* self;
-	LIMdlModel* tmpmdl;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIEngModel));
@@ -72,45 +78,33 @@ lieng_model_new_copy (LIEngModel* model)
 		return NULL;
 	self->engine = model->engine;
 
-	/* Allocate info. */
-	if (model->name != NULL)
-	{
-		self->name = listr_dup (model->name);
-		if (self->name == NULL)
-		{
-			lieng_model_free (self);
-			return NULL;
-		}
-	}
-	if (model->path != NULL)
-	{
-		self->path = listr_dup (model->path);
-		if (self->path == NULL)
-		{
-			lieng_model_free (self);
-			return NULL;
-		}
-	}
-
-	/* Load model geometry. */
-	tmpmdl = limdl_model_new_copy (model->model);
-	if (tmpmdl == NULL)
+	/* Copy model geometry. */
+	self->model = limdl_model_new_copy (model->model);
+	if (self->model == NULL)
 	{
 		lieng_model_free (self);
 		return 0;
 	}
 
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-copy", lical_marshal_DATA_PTR_PTR, self, model);
+	/* Choose model number. */
+	while (!self->id)
+	{
+		rnd = lisys_randf ();
+		self->id = (int)(0x7FFFFFFF * rnd);
+		if (!self->id)
+			continue;
+		if (lialg_u32dic_find (model->engine->models, self->id) != NULL)
+			self->id = 0;
+	}
 
-	/* Set new model. */
-	self->model = tmpmdl;
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR_PTR, self, model);
 
 	return self;
 }
 
-void
-lieng_model_free (LIEngModel* self)
+void lieng_model_free (
+	LIEngModel* self)
 {
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
@@ -125,8 +119,6 @@ lieng_model_free (LIEngModel* self)
 	/* Free data. */
 	if (self->model != NULL)
 		limdl_model_free (self->model);
-	lisys_free (self->path);
-	lisys_free (self->name);
 	lisys_free (self);
 }
 
@@ -136,43 +128,48 @@ void lieng_model_calculate_bounds (
 	if (self->model != NULL)
 	{
 		limdl_model_calculate_bounds (self->model);
-		lical_callbacks_call (self->engine->callbacks, self->engine, "model-bounds", lical_marshal_DATA_PTR, self);
+		lical_callbacks_call (self->engine->callbacks, self->engine, "model-changed", lical_marshal_DATA_PTR, self);
 	}
 }
 
-int
-lieng_model_load (LIEngModel* self)
+int lieng_model_load (
+	LIEngModel* self,
+	const char* name)
 {
+	char* path;
 	LIMdlModel* tmpmdl;
 
-	if (self->model != NULL)
-		return 1;
+	/* Allocate path. */
+	path = lisys_path_format (self->engine->config.dir,
+		LISYS_PATH_SEPARATOR, "graphics",
+		LISYS_PATH_SEPARATOR, name, ".lmdl", NULL);
+	if (path == NULL)
+		return 0;
 
 	/* Load model geometry. */
-	tmpmdl = limdl_model_new_from_file (self->path);
+	tmpmdl = limdl_model_new_from_file (path);
+	lisys_free (path);
 	if (tmpmdl == NULL)
 		return 0;
 
-	/* Invoke callbacks. */
-	lieng_model_unload (self);
+	/* Replace model data. */
+	limdl_model_free (self->model);
 	self->model = tmpmdl;
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
+	private_changed (self);
 
 	return 1;
 }
 
-void
-lieng_model_unload (LIEngModel* self)
+int lieng_model_merge (
+	LIEngModel* self,
+	LIEngModel* model)
 {
-	/* Invoke callbacks. */
-	if (self->model != NULL && self->physics != NULL)
-		lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
+	int ret;
 
-	if (self->model != NULL)
-	{
-		limdl_model_free (self->model);
-		self->model = NULL;
-	}
+	ret = limdl_model_merge (self->model, model->model);
+	private_changed (self);
+
+	return ret;
 }
 
 /**
@@ -181,9 +178,9 @@ lieng_model_unload (LIEngModel* self)
  * \param self Module.
  * \param result Return location for the bounds.
  */
-void
-lieng_model_get_bounds (const LIEngModel* self,
-                        LIMatAabb*        result)
+void lieng_model_get_bounds (
+	const LIEngModel* self,
+	LIMatAabb*        result)
 {
 	if (self->model != NULL)
 		*result = self->model->bounds;
@@ -198,10 +195,10 @@ lieng_model_get_bounds (const LIEngModel* self,
  * \param transform Transformation.
  * \param result Return location for the bounds.
  */
-void
-lieng_model_get_bounds_transform (const LIEngModel*     self,
-                                  const LIMatTransform* transform,
-                                  LIMatAabb*            result)
+void lieng_model_get_bounds_transform (
+	const LIEngModel*     self,
+	const LIMatTransform* transform,
+	LIMatAabb*            result)
 {
 	int i;
 	LIMatVector v[7];
@@ -238,6 +235,27 @@ lieng_model_get_bounds_transform (const LIEngModel*     self,
 			max.z = v[i].z;
 	}
 	limat_aabb_init_from_points (result, &min, &max);
+}
+
+/*****************************************************************************/
+
+static void private_changed (
+	LIEngModel* self)
+{
+	LIAlgU32dicIter iter;
+	LIEngObject* object;
+
+	/* We need to refresh any objects using the model since poses reference
+	   the nodes of the model directly and those might have changed. */
+	LIALG_U32DIC_FOREACH (iter, self->engine->objects)
+	{
+		object = iter.value;
+		if (object->model == self)
+			limdl_pose_set_model (object->pose, self->model);
+	}
+
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->engine->callbacks, self->engine, "model-changed", lical_marshal_DATA_PTR, self);
 }
 
 /** @} */

@@ -32,6 +32,7 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
+	int silence;
 	LICalHandle calls[9];
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;

@@ -28,7 +28,7 @@ static void private_contact_callback (
 	LIPhyObject*  object,
 	LIPhyContact* contact);
 
-static int private_model_copy (
+static int private_model_changed (
 	LIExtModule* self,
 	LIEngModel*  model);
 
@@ -103,7 +103,7 @@ LIExtModule* liext_object_physics_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-copy", -65535, private_model_copy, self, self->calls + 0) ||
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", -65535, private_model_changed, self, self->calls + 0) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", -65535, private_model_free, self, self->calls + 1) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", -65535, private_model_new, self, self->calls + 2) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", -65535, private_object_model, self, self->calls + 3) ||
@@ -207,18 +207,12 @@ static void private_contact_callback (
 	}
 }
 
-static int private_model_copy (
+static int private_model_changed (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIPhyShape* shape;
-
-	/* Create collision shape. */
-	shape = liphy_shape_new (self->physics, model->model);
-	if (shape != NULL)
-		return 1;
-	liphy_shape_ref (shape);
-	model->physics = shape;
+	if (model->physics != NULL)
+		liphy_shape_set_model (model->physics, model->model);
 
 	return 1;
 }
@@ -243,10 +237,10 @@ static int private_model_new (
 	LIPhyShape* shape;
 
 	/* Create collision shape. */
-	shape = liphy_shape_new (self->physics, model->model);
+	shape = liphy_shape_new (self->physics);
 	if (shape == NULL)
 		return 1;
-	liphy_shape_ref (shape);
+	liphy_shape_add_model (shape, model->model, NULL);
 	model->physics = shape;
 
 	return 1;
@@ -265,9 +259,7 @@ static int private_object_model (
 		return 1;
 
 	/* Set its collision shape. */
-	liphy_object_clear_shape (phyobj);
-	if (model != NULL)
-		liphy_object_insert_shape (phyobj, model->physics, NULL);
+	liphy_object_set_shape (phyobj, model->physics);
 
 	return 1;
 }
@@ -302,8 +294,11 @@ static int private_object_transform (
 		return 1;
 
 	/* Set its transformation. */
-	lieng_object_get_transform (object, &transform);
-	liphy_object_set_transform (phyobj, &transform);
+	if (!self->silence)
+	{
+		lieng_object_get_transform (object, &transform);
+		liphy_object_set_transform (phyobj, &transform);
+	}
 
 	return 1;
 }
@@ -315,12 +310,19 @@ static void private_physics_transform (
 	LIEngObject* obj;
 	LIMatTransform transform;
 
+	/* Find physics object. */
 	obj = liphy_object_get_userdata (object);
 	if (obj == NULL || obj->sector == NULL)
 		return;
+
+	/* Copy the transformation to the engine object. We set the silence
+	   variable here to prevent the object-transform event by the engine
+	   object from causing a feedback loop. */
+	self->silence++;
 	liphy_object_get_transform (object, &transform);
 	lieng_object_set_transform (obj, &transform);
 	lieng_object_moved (obj);
+	self->silence--;
 }
 
 static int private_object_visibility (

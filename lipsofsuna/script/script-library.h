@@ -24,6 +24,7 @@
 
 #define LISCR_SCRIPT_CLASS "Class"
 #define LISCR_SCRIPT_EVENT "Event"
+#define LISCR_SCRIPT_MODEL "Model"
 #define LISCR_SCRIPT_OBJECT "Object"
 #define LISCR_SCRIPT_PACKET "Packet"
 #define LISCR_SCRIPT_PATH "Path"
@@ -37,6 +38,10 @@ LIAPICALL (void, liscr_script_class, (
 
 LIAPICALL (void, liscr_script_event, (
 	LIScrClass* clss,
+	void*       data));
+
+LIAPICALL (void, liscr_script_model, (
+	LIScrClass* self,
 	void*       data));
 
 LIAPICALL (void, liscr_script_object, (

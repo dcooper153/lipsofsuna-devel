@@ -42,7 +42,7 @@ LIAPICALL (int, livox_build_area, (
 	int           ysize,
 	int           zsize,
 	LIMdlModel**  result_model,
-	LIPhyObject** result_physics));
+	LIPhyShape**  result_physics));
 
 LIAPICALL (int, livox_build_block, (
 	LIVoxManager*         manager,
@@ -50,7 +50,7 @@ LIAPICALL (int, livox_build_block, (
 	LIPhyPhysics*         physics,
 	const LIVoxBlockAddr* addr,
 	LIMdlModel**          result_model,
-	LIPhyObject**         result_physics));
+	LIPhyShape**          result_physics));
 
 LIAPICALL (int, livox_build_occlusion, (
 	LIVoxManager* manager,

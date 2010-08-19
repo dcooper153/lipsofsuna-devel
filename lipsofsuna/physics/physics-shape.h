@@ -36,28 +36,43 @@ extern "C" {
 #endif
 
 LIAPICALL (LIPhyShape*, liphy_shape_new, (
-	LIPhyPhysics*     physics,
-	const LIMdlModel* model));
-
-LIAPICALL (LIPhyShape*, liphy_shape_new_aabb, (
-	LIPhyPhysics*    physics,
-	const LIMatAabb* aabb));
-
-LIAPICALL (LIPhyShape*, liphy_shape_new_convex, (
-	LIPhyPhysics*      physics,
-	const LIMatVector* vertices,
-	int                count));
+	LIPhyPhysics* physics));
 
 LIAPICALL (void, liphy_shape_free, (
 	LIPhyShape* self));
 
-LIAPICALL (void, liphy_shape_ref, (
+LIAPICALL (void, liphy_object_clear, (
 	LIPhyShape* self));
+
+LIAPICALL (int, liphy_shape_add_aabb, (
+	LIPhyShape*           self,
+	const LIMatAabb*      aabb,
+	const LIMatTransform* transform));
+
+LIAPICALL (int, liphy_shape_add_convex, (
+	LIPhyShape*           self,
+	const LIMatVector*    vertices,
+	int                   count,
+	const LIMatTransform* transform));
+
+LIAPICALL (int, liphy_shape_add_model, (
+	LIPhyShape*           self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform));
+
+LIAPICALL (int, liphy_shape_add_shape, (
+	LIPhyShape*           self,
+	LIPhyShape*           shape,
+	const LIMatTransform* transform));
 
 LIAPICALL (void, liphy_shape_get_inertia, (
 	const LIPhyShape* self,
 	float             mass,
 	LIMatVector*      result));
+
+LIAPICALL (int, liphy_shape_set_model, (
+	LIPhyShape*       self,
+	const LIMdlModel* model));
 
 #ifdef __cplusplus
 }
