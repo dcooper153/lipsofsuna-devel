@@ -491,9 +491,9 @@ class LINode:
 	def get_rest_transform(self):
 		matrix = self.object.matrix_local.copy()
 		if self.object.parent_bone:
-			# We assume here that only bones are animated.
 			parentbone = self.object.parent.pose.bones[self.object.parent_bone]
-			matrix = parentbone.matrix.copy().invert() * matrix
+			parentmatr = parentbone.matrix * mathutils.Matrix.Translation(self.parent.len)
+			matrix = parentmatr.invert() * matrix
 		loc = matrix.translation_part()
 		rot = matrix.rotation_part().to_quat().normalize()
 		return (loc, rot)
