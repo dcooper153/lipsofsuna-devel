@@ -375,6 +375,21 @@ static void Object_new (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Prevents map sectors around the object from being unloaded.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>radius: Refresh radius.</li></ul>
+ * function Object.refresh(self, args)
+ */
+static void Object_refresh (LIScrArgs* args)
+{
+	float radius = 32.0f;
+
+	liscr_args_gets_float (args, "radius", &radius);
+	lieng_object_refresh (args->self, radius);
+}
+
+/* @luadoc
  * --- Updates the animations of the object.
  * -- @param self Object.
  * -- @param args Arguments.<ul>
@@ -690,6 +705,7 @@ void liscr_script_object (
 	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);
 	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
 	liscr_class_insert_cfunc (self, "new", Object_new);
+	liscr_class_insert_mfunc (self, "refresh", Object_refresh);
 	liscr_class_insert_mfunc (self, "update_animations", Object_update_animations);
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 	liscr_class_insert_mvar (self, "id", Object_getter_id, NULL);
