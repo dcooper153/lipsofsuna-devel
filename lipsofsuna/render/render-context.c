@@ -103,16 +103,25 @@ void
 liren_context_render_array (LIRenContext* self,
                             LIRenBuffer*  vertex)
 {
+	if (self->incomplete)
+		return;
+
+	glPushMatrix ();
+	glMultMatrixf (self->matrix.m);
 	if (vertex->buffer)
-	{
-		liren_context_render_vbo_array (self, &vertex->format,
-			vertex->buffer, 0, vertex->elements.count);
-	}
-	else
-	{
-		liren_context_render_vtx_array (self, &vertex->format,
-			vertex->elements.array, 0, vertex->elements.count);
-	}
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertex->buffer);
+	private_bind_vertices (self, &vertex->format, vertex->elements.array);
+	glDrawArraysEXT (GL_TRIANGLES, 0, vertex->elements.count);
+	private_unbind_vertices (self, &vertex->format);
+	if (vertex->buffer)
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+	glPopMatrix ();
+
+#ifdef LIREN_ENABLE_PROFILING
+	self->render->profiling.materials++;
+	self->render->profiling.faces += vertex->elements.count / 3;
+	self->render->profiling.vertices += vertex->elements.count;
+#endif
 }
 
 /**
@@ -127,163 +136,29 @@ liren_context_render_indexed (LIRenContext* self,
                               LIRenBuffer*  vertex,
                               LIRenBuffer*  index)
 {
+	if (self->incomplete)
+		return;
+
+	glPushMatrix ();
+	glMultMatrixf (self->matrix.m);
+	if (index->buffer)
+		glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, index->buffer);
 	if (vertex->buffer)
-	{
-		liren_context_render_vbo_indexed (self, &vertex->format,
-			vertex->buffer, index->buffer, 0, index->elements.count);
-	}
-	else
-	{
-		liren_context_render_vtx_indexed (self, &vertex->format,
-			vertex->elements.array, index->elements.array, 0, index->elements.count);
-	}
-}
-
-/**
- * \brief Renders triangles.
- *
- * \param self Rendering context.
- * \param format Vertex format.
- * \param vertices Vertex array.
- * \param vertex0 Vertex from which to begin rendering.
- * \param vertex1 Vertex to which to end rendering.
- */
-void
-liren_context_render_vbo_array (LIRenContext*      self,
-                                const LIRenFormat* format,
-                                GLuint             vertices,
-                                int                vertex0,
-                                int                vertex1)
-{
-	if (self->incomplete)
-		return;
-
-	glPushMatrix ();
-	glMultMatrixf (self->matrix.m);
-
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertices);
-	private_bind_vertices (self, format, NULL);
-	glDrawArraysEXT (GL_TRIANGLES, vertex0, vertex1 - vertex0);
-	private_unbind_vertices (self, format);
-
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertex->buffer);
+	private_bind_vertices (self, &vertex->format, vertex->elements.array);
+	glDrawRangeElements (GL_TRIANGLES, 0, vertex->elements.count,
+		index->elements.count, GL_UNSIGNED_INT, index->elements.array);
+	private_unbind_vertices (self, &vertex->format);
+	if (vertex->buffer)
+		glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+	if (index->buffer)
+		glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	glPopMatrix ();
 
 #ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
-	self->render->profiling.faces += count;
-	self->render->profiling.vertices += 3 * count;
-#endif
-}
-
-/**
- * \brief Renders triangles.
- *
- * \param self Rendering context.
- * \param format Vertex format.
- * \param vertices Vertex array.
- * \param vertex0 Vertex from which to begin rendering.
- * \param vertex1 Vertex to which to end rendering.
- */
-void
-liren_context_render_vtx_array (LIRenContext*      self,
-                                const LIRenFormat* format,
-                                const void*        vertices,
-                                int                vertex0,
-                                int                vertex1)
-{
-	if (self->incomplete)
-		return;
-
-	glPushMatrix ();
-	glMultMatrixf (self->matrix.m);
-
-	private_bind_vertices (self, format, vertices);
-	glDrawArraysEXT (GL_TRIANGLES, vertex0, vertex1 - vertex0);
-	private_unbind_vertices (self, format);
-
-	glPopMatrix ();
-
-#ifdef LIREN_ENABLE_PROFILING
-	self->render->profiling.materials++;
-	self->render->profiling.faces += vertex1 - vertex0;
-	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
-#endif
-}
-
-/**
- * \brief Renders indexed triangles.
- *
- * \param self Rendering context.
- * \param format Vertex format.
- * \param vertices Vertex buffer.
- * \param indices Index buffer.
- * \param index0 Index from which to begin rendering.
- * \param index1 Index to which to end rendering.
- */
-void
-liren_context_render_vbo_indexed (LIRenContext*      self,
-                                  const LIRenFormat* format,
-                                  GLuint             vertices,
-                                  GLuint             indices,
-                                  int                index0,
-                                  int                index1)
-{
-	if (self->incomplete)
-		return;
-
-	glPushMatrix ();
-	glMultMatrixf (self->matrix.m);
-
-	glBindBufferARB (GL_ARRAY_BUFFER_ARB, vertices);
-	glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, indices);
-	private_bind_vertices (self, format, NULL);
-	glDrawElements (GL_TRIANGLES, index1 - index0, GL_UNSIGNED_INT, NULL + 4 * index0);
-	private_unbind_vertices (self, format);
-	glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-
-	glPopMatrix ();
-
-#ifdef LIREN_ENABLE_PROFILING
-	self->render->profiling.materials++;
-	self->render->profiling.faces += vertex1 - vertex0;
-	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
-#endif
-}
-
-/**
- * \brief Renders indexed triangles.
- *
- * \param self Rendering context.
- * \param format Vertex format.
- * \param vertices Vertex array.
- * \param indices Index array.
- * \param index0 Index from which to begin rendering.
- * \param index1 Index to which to end rendering.
- */
-void
-liren_context_render_vtx_indexed (LIRenContext*      self,
-                                  const LIRenFormat* format,
-                                  const void*        vertices,
-                                  const void*        indices,
-                                  int                index0,
-                                  int                index1)
-{
-	if (self->incomplete)
-		return;
-
-	glPushMatrix ();
-	glMultMatrixf (self->matrix.m);
-
-	private_bind_vertices (self, format, vertices);
-	glDrawElements (GL_TRIANGLES, index1 - index0, GL_UNSIGNED_INT, indices + 4 * index0);
-	private_unbind_vertices (self, format);
-
-	glPopMatrix ();
-
-#ifdef LIREN_ENABLE_PROFILING
-	self->render->profiling.materials++;
-	self->render->profiling.faces += vertex1 - vertex0;
-	self->render->profiling.vertices += 3 * (vertex1 - vertex0);
+	self->render->profiling.faces += index->elements.count / 3;
+	self->render->profiling.vertices += index->elements.count;
 #endif
 }
 

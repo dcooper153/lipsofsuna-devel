@@ -114,7 +114,10 @@ LIExtModule* liext_object_render_new (
 		return NULL;
 	}
 
-	/* Extend the object class. */
+	/* Extend classes. */
+	clss = liscr_script_find_class (program->script, "Model");
+	if (clss != NULL)
+		liext_script_render_model (clss, self);
 	clss = liscr_script_find_class (program->script, "Object");
 	if (clss != NULL)
 		liext_script_render_object (clss, self);

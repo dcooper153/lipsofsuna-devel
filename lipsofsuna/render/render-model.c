@@ -65,7 +65,7 @@ LIRenModel* liren_model_new (
 	self->render = render;
 	self->model = model;
 	self->id = id;
-	self->type = LIREN_BUFFER_TYPE_GPU;
+	self->type = LIREN_BUFFER_TYPE_STATIC;
 
 	/* Create model data. */
 	if (!liren_model_set_model (self, model))
@@ -196,18 +196,8 @@ int liren_model_set_type (
 	LIRenModel* self,
 	int         value)
 {
-	LIRenModel backup;
-
-	backup = *self;
 	self->type = value;
-	if (!private_init_model (self, self->type))
-	{
-		*self = backup;
-		return 0;
-	}
-	private_clear_model (&backup);
-
-	return 1;
+	return liren_model_set_model (self, self->model);
 }
 
 /*****************************************************************************/
@@ -300,10 +290,13 @@ static int private_init_model (
 		return 0;
 
 	/* Allocate index buffer list. */
-	self->buffers.array = lisys_calloc (self->model->facegroups.count, sizeof (LIRenBuffer));
-	if (self->buffers.array == NULL)
-		return 0;
-	self->buffers.count = self->model->facegroups.count;
+	if (self->model->facegroups.count)
+	{
+		self->buffers.array = lisys_calloc (self->model->facegroups.count, sizeof (LIRenBuffer));
+		if (self->buffers.array == NULL)
+			return 0;
+		self->buffers.count = self->model->facegroups.count;
+	}
 
 	/* Allocate index buffer data. */
 	for (i = 0 ; i < self->buffers.count ; i++)

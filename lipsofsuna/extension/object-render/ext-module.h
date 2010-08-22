@@ -28,6 +28,7 @@
 #include <lipsofsuna/extension.h>
 #include <lipsofsuna/client.h>
 
+#define LISCR_SCRIPT_RENDER_MODEL "RenderModel"
 #define LISCR_SCRIPT_RENDER_OBJECT "RenderObject"
 
 typedef struct _LIExtModule LIExtModule;
@@ -47,6 +48,10 @@ void liext_object_render_free (
 	LIExtModule* self);
 
 /*****************************************************************************/
+
+void liext_script_render_model (
+	LIScrClass* self,
+	void*       data);
 
 void liext_script_render_object (
 	LIScrClass* self,

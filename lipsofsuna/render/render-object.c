@@ -114,6 +114,7 @@ void liren_object_free (
 void
 liren_object_deform (LIRenObject* self)
 {
+	int size;
 	void* vertices;
 	LIRenBuffer* buffer;
 
@@ -122,12 +123,18 @@ liren_object_deform (LIRenObject* self)
 
 	/* Modify the vertex buffer. */
 	buffer = self->model->vertices;
-	vertices = liren_buffer_lock (buffer, 1);
-	if (vertices != NULL)
+	size = liren_buffer_get_size (buffer);
+	if (size)
 	{
+		vertices = lisys_malloc (size);
+		if (vertices == NULL)
+			return;
+		memcpy (vertices, self->model->model->vertices.array, size);
 		limdl_pose_transform (self->pose, vertices);
-		liren_buffer_unlock (buffer, vertices);
+		liren_buffer_replace_data (buffer, vertices);
+		lisys_free (vertices);
 	}
+
 	private_lights_update (self);
 }
 

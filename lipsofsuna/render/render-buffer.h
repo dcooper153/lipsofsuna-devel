@@ -33,12 +33,15 @@
 
 enum
 {
-	LIREN_BUFFER_TYPE_CPU,
-	LIREN_BUFFER_TYPE_GPU
+	LIREN_BUFFER_TYPE_DYNAMIC,
+	LIREN_BUFFER_TYPE_MEMORY,
+	LIREN_BUFFER_TYPE_STATIC,
+	LIREN_BUFFER_TYPE_STREAM
 };
 
 struct _LIRenBuffer
 {
+	int type;
 	GLuint buffer;
 	GLenum target;
 	LIRenFormat format;
@@ -69,9 +72,16 @@ LIAPICALL (void*, liren_buffer_lock, (
 	LIRenBuffer* self,
 	int          write));
 
+LIAPICALL (void, liren_buffer_replace_data, (
+	LIRenBuffer* self,
+	void*        data));
+
 LIAPICALL (void, liren_buffer_unlock, (
 	LIRenBuffer* self,
 	void*        data));
+
+LIAPICALL (int, liren_buffer_get_size, (
+	LIRenBuffer* self));
 
 #endif
 

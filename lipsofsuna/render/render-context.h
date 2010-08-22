@@ -85,40 +85,6 @@ liren_context_render_indexed (LIRenContext* self,
                               LIRenBuffer*  index);
 
 void
-liren_context_render (LIRenContext* self,
-                      LIRenBuffer*  buffer);
-
-void
-liren_context_render_vbo_array (LIRenContext*      self,
-                                const LIRenFormat* format,
-                                GLuint             vertices,
-                                int                vertex0,
-                                int                vertex1);
-
-void
-liren_context_render_vtx_array (LIRenContext*      self,
-                                const LIRenFormat* format,
-                                const void*        vertices,
-                                int                vertex0,
-                                int                vertex1);
-
-void
-liren_context_render_vbo_indexed (LIRenContext*      self,
-                                  const LIRenFormat* format,
-                                  GLuint             vertices,
-                                  GLuint             indices,
-                                  int                index0,
-                                  int                index1);
-
-void
-liren_context_render_vtx_indexed (LIRenContext*      self,
-                                  const LIRenFormat* format,
-                                  const void*        vertices,
-                                  const void*        indices,
-                                  int                index0,
-                                  int                index1);
-
-void
 liren_context_unbind (LIRenContext* self);
 
 int
