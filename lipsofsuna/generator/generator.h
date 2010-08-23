@@ -43,11 +43,7 @@ struct _LIGenStroke
 
 struct _LIGenGenerator
 {
-	int fill;
-	LIAlgSectors* sectors;
 	LIAlgU32dic* brushes;
-	LIAlgU32dic* materials;
-	LIArcSql* sql;
 	LICalCallbacks* callbacks;
 	LIPthPaths* paths;
 	struct
@@ -59,13 +55,12 @@ struct _LIGenGenerator
 
 LIAPICALL (LIGenGenerator*, ligen_generator_new, (
 	LIPthPaths*     paths,
-	LICalCallbacks* callbacks,
-	LIAlgSectors*   sectors));
+	LICalCallbacks* callbacks));
 
 LIAPICALL (void, ligen_generator_free, (
 	LIGenGenerator* self));
 
-LIAPICALL (void, ligen_generator_clear_scene, (
+LIAPICALL (void, ligen_generator_clear, (
 	LIGenGenerator* self));
 
 LIAPICALL (LIGenBrush*, ligen_generator_find_brush, (
@@ -80,10 +75,6 @@ LIAPICALL (int, ligen_generator_insert_brush, (
 	LIGenGenerator* self,
 	LIGenBrush*     brush));
 
-LIAPICALL (int, ligen_generator_insert_material, (
-	LIGenGenerator* self,
-	LIVoxMaterial*  material));
-
 LIAPICALL (int, ligen_generator_insert_stroke, (
 	LIGenGenerator* self,
 	int             brush,
@@ -95,32 +86,8 @@ LIAPICALL (void, ligen_generator_remove_brush, (
 	LIGenGenerator* self,
 	int             id));
 
-LIAPICALL (void, ligen_generator_remove_material, (
-	LIGenGenerator* self,
-	int             id));
-
 LIAPICALL (int, ligen_generator_step, (
 	LIGenGenerator* self));
-
-LIAPICALL (int, ligen_generator_write, (
-	LIGenGenerator* self,
-	int             blocks_per_line,
-	int             tiles_per_line));
-
-LIAPICALL (int, ligen_generator_write_brush, (
-	LIGenGenerator* self,
-	int             id));
-
-LIAPICALL (int, ligen_generator_write_brushes, (
-	LIGenGenerator* self));
-
-LIAPICALL (int, ligen_generator_write_materials, (
-	LIGenGenerator* self,
-	LIArcWriter*    writer));
-
-LIAPICALL (void, ligen_generator_set_fill, (
-	LIGenGenerator* self,
-	int             fill));
 
 #endif
 

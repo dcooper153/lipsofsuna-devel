@@ -53,14 +53,6 @@ int liext_tiles_build_block (
 	LIExtModule*    self,
 	LIVoxBlockAddr* addr);
 
-int liext_tiles_write (
-	LIExtModule* self,
-	LIArcSql*    sql);
-
-int liext_tiles_set_materials (
-	LIExtModule* self,
-	LIArcReader* reader);
-
 LIVoxManager* liext_tiles_get_voxels (
 	LIExtModule* self);
 

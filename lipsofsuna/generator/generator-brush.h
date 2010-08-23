@@ -53,18 +53,8 @@ struct _LIGenBrush
 	struct
 	{
 		int count;
-		LIVoxVoxel* array;
-	} voxels;
-	struct
-	{
-		int count;
 		LIGenRule** array;
 	} rules;
-	struct
-	{
-		int count;
-		LIGenBrushobject** array;
-	} objects;
 };
 
 LIAPICALL (LIGenBrush*, ligen_brush_new, (
@@ -76,38 +66,13 @@ LIAPICALL (LIGenBrush*, ligen_brush_new, (
 LIAPICALL (void, ligen_brush_free, (
 	LIGenBrush* self));
 
-LIAPICALL (int, ligen_brush_insert_object, (
-	LIGenBrush*           self,
-	int                   flags,
-	float                 prob,
-	const char*           type,
-	const char*           model,
-	const char*           extra,
-	const LIMatTransform* transform));
-
 LIAPICALL (int, ligen_brush_insert_rule, (
 	LIGenBrush* self,
 	LIGenRule*  rule));
 
-LIAPICALL (int, ligen_brush_read_rules, (
-	LIGenBrush* self,
-	LIArcSql*   sql));
-
-LIAPICALL (void, ligen_brush_remove_object, (
-	LIGenBrush* self,
-	int         index));
-
 LIAPICALL (void, ligen_brush_remove_rule, (
 	LIGenBrush* self,
 	int         index));
-
-LIAPICALL (void, ligen_brush_remove_strokes, (
-	LIGenBrush* self,
-	int         brush));
-
-LIAPICALL (int, ligen_brush_write, (
-	LIGenBrush* self,
-	LIArcSql*   sql));
 
 LIAPICALL (int, ligen_brush_set_name, (
 	LIGenBrush* self,
@@ -118,13 +83,6 @@ LIAPICALL (int, ligen_brush_set_size, (
 	int         x,
 	int         y,
 	int         z));
-
-LIAPICALL (void, ligen_brush_set_voxel, (
-	LIGenBrush* self,
-	int         x,
-	int         y,
-	int         z,
-	LIVoxVoxel  voxel));
 
 #endif
 

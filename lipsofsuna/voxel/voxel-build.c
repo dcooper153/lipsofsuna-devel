@@ -49,6 +49,7 @@ struct _LIVoxBuilder
 	int ystep;
 	int zstep;
 	char* occlud;
+	float vertex_scale;
 	LIAlgMemdic* accel;
 	LIEngEngine* engine;
 	LIMdlModel* model;
@@ -137,7 +138,6 @@ int livox_build_area (
 	int z;
 	int count;
 	int ret;
-	LIEngModel* model;
 	LIMatVector offset;
 	LIMatVector vector;
 	LIVoxMaterial* material;
@@ -150,6 +150,7 @@ int livox_build_area (
 	self.manager = manager;
 	self.engine = engine;
 	self.physics_manager = physics;
+	self.vertex_scale = manager->tile_width * 0.5f;
 	self.xsize = xsize + 2;
 	self.ysize = ysize + 2;
 	self.zsize = zsize + 2;
@@ -206,10 +207,7 @@ int livox_build_area (
 		/* Cache model. */
 		if (material->type == LIVOX_MATERIAL_TYPE_TILE)
 		{
-#warning Support for tile models is temporarily disabled
-			model = NULL;
-//			model = lieng_engine_find_model_by_name (engine, material->model);
-			self.voxelsb[i].model = model;
+			self.voxelsb[i].model = material->model;
 			self.voxelsb[i].height = 1.0f;
 		}
 
@@ -697,6 +695,7 @@ private_merge_tile_model (LIVoxBuilder* self,
 			/* Insert vertices to model. */
 			for (k = 0 ; k < 3 ; k++)
 			{
+				verts[k].coord = limat_vector_multiply (verts[k].coord, self->vertex_scale);
 				indices[k] = private_merge_vertex (self, voxel, verts + k);
 				if (indices[k] == -1)
 					break;
@@ -715,7 +714,8 @@ static int
 private_merge_tile_physics (LIVoxBuilder* self,
                             LIVoxVoxelB*  voxel)
 {
-	return liphy_shape_add_shape (self->physics, voxel->model->physics, &voxel->transform);
+	return liphy_shape_add_model (self->physics, voxel->model->model,
+		&voxel->transform, self->vertex_scale);
 }
 
 static int

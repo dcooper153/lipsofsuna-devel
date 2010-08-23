@@ -55,7 +55,6 @@ static int private_set_voxel (
 LIVoxSector*
 livox_sector_new (LIAlgSector* sector)
 {
-	int empty;
 	LIVoxSector* self;
 	LIVoxVoxel tmp;
 
@@ -81,12 +80,8 @@ livox_sector_new (LIAlgSector* sector)
 		return NULL;
 	}
 
-	/* Load data. */
-	if (self->manager->load && self->manager->sql != NULL)
-		empty = !livox_sector_read (self, self->manager->sql);
-	else
-		empty = 1;
-	if (empty && self->manager->fill)
+	/* Fill sector. */
+	if (self->manager->fill)
 	{
 		livox_voxel_init (&tmp, self->manager->fill);
 		livox_sector_fill (self, &tmp);
@@ -103,10 +98,6 @@ livox_sector_new (LIAlgSector* sector)
 void
 livox_sector_free (LIVoxSector* self)
 {
-	/* Save data. */
-	if (self->manager->load && self->manager->sql != NULL)
-		livox_sector_write (self, self->manager->sql);
-
 	lisys_free (self->blocks);
 	lisys_free (self->tiles);
 	lisys_free (self);

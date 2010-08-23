@@ -26,6 +26,7 @@
 #define __VOXEL_MATERIAL_H__
 
 #include <lipsofsuna/archive.h>
+#include <lipsofsuna/engine.h>
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/system.h>
 #include "voxel-types.h"
@@ -51,8 +52,8 @@ struct _LIVoxMaterial
 	int flags;
 	int type;
 	char* name;
-	char* model;
 	float friction;
+	LIEngModel* model;
 	LIMdlMaterial mat_side;
 	LIMdlMaterial mat_top;
 };
@@ -62,19 +63,8 @@ LIAPICALL (LIVoxMaterial*, livox_material_new, ());
 LIAPICALL (LIVoxMaterial*, livox_material_new_copy, (
 	const LIVoxMaterial* src));
 
-LIAPICALL (LIVoxMaterial*, livox_material_new_from_stream, (
-	LIArcReader* reader));
-
 LIAPICALL (void, livox_material_free, (
 	LIVoxMaterial* self));
-
-LIAPICALL (int, livox_material_read, (
-	LIVoxMaterial* self,
-	LIArcReader*   reader));
-
-LIAPICALL (int, livox_material_write, (
-	LIVoxMaterial* self,
-	LIArcWriter*   writer));
 
 LIAPICALL (int, livox_material_set_name, (
 	LIVoxMaterial* self,
@@ -82,7 +72,7 @@ LIAPICALL (int, livox_material_set_name, (
 
 LIAPICALL (int, livox_material_set_model, (
 	LIVoxMaterial* self,
-	const char*    value));
+	LIEngModel*    model));
 
 #endif
 

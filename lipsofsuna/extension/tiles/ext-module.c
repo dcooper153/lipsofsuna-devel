@@ -41,7 +41,6 @@ LIExtModule* liext_tiles_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
-	LISerServer* server;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -63,12 +62,6 @@ LIExtModule* liext_tiles_new (
 		liext_tiles_free (self);
 		return NULL;
 	}
-
-	/* Set database for sector I/O if server. */
-	/* FIXME: Scripts should take care of loading and saving sectors. */
-	server = limai_program_find_component (program, "server");
-	if (server != NULL)
-		livox_manager_set_sql (self->voxels, server->sql);
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 0))
@@ -99,13 +92,6 @@ void liext_tiles_free (
 	lisys_free (self);
 }
 
-int liext_tiles_write (
-	LIExtModule* self,
-	LIArcSql*    sql)
-{
-	return livox_manager_write (self->voxels);
-}
-
 /**
  * \brief Gets the voxel manager of the module.
  *
@@ -121,23 +107,6 @@ LIVoxManager* liext_tiles_get_voxels (
 	LIExtModule* self)
 {
 	return self->voxels;
-}
-
-int liext_tiles_set_materials (
-	LIExtModule* self,
-	LIArcReader* reader)
-{
-	uint8_t skip;
-
-	/* Skip type. */
-	if (!reader->pos && !liarc_reader_get_uint8 (reader, &skip))
-		return 0;
-
-	/* Read materials. */
-	if (!livox_manager_read_materials (self->voxels, reader))
-		return 0;
-
-	return 1;
 }
 
 /*****************************************************************************/

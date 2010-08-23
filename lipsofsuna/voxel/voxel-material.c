@@ -50,14 +50,6 @@ livox_material_new ()
 		return NULL;
 	}
 
-	/* Allocate model. */
-	self->model = listr_dup ("");
-	if (self->model == NULL)
-	{
-		livox_material_free (self);
-		return NULL;
-	}
-
 	/* Allocate materials. */
 	flags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
 	if (!limdl_material_init (&self->mat_side) ||
@@ -107,42 +99,11 @@ livox_material_new_copy (const LIVoxMaterial* src)
 	}
 
 	/* Copy model. */
-	self->model = listr_dup (src->model);
-	if (self->model == NULL)
-	{
-		livox_material_free (self);
-		return NULL;
-	}
+	self->model = src->model;
 
 	/* Copy materials. */
 	if (!limdl_material_init_copy (&self->mat_side, &src->mat_side) ||
 	    !limdl_material_init_copy (&self->mat_top, &src->mat_top))
-	{
-		livox_material_free (self);
-		return NULL;
-	}
-
-	return self;
-}
-
-/**
- * \brief Deserializes a material from a stream.
- *
- * \param reader Stream reader.
- * \return New material or NULL.
- */
-LIVoxMaterial*
-livox_material_new_from_stream (LIArcReader* reader)
-{
-	LIVoxMaterial* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIVoxMaterial));
-	if (self == NULL)
-		return NULL;
-
-	/* Read from stream. */
-	if (!livox_material_read (self, reader))
 	{
 		livox_material_free (self);
 		return NULL;
@@ -161,95 +122,8 @@ livox_material_free (LIVoxMaterial* self)
 {
 	limdl_material_free (&self->mat_side);
 	limdl_material_free (&self->mat_top);
-	lisys_free (self->model);
 	lisys_free (self->name);
 	lisys_free (self);
-}
-
-/**
- * \brief Deserializes the material from a stream.
- *
- * The contents of the material are replaced with data read from the stream.
- * If the read fails, the function returns without modifying the material.
- *
- * \param self Material.
- * \param reader Stream reader.
- * \return Nonzero on success.
- */
-int
-livox_material_read (LIVoxMaterial* self,
-                     LIArcReader*   reader)
-{
-	float friction;
-	char* model;
-	char* name;
-	uint32_t id;
-	uint32_t flags;
-	uint32_t type;
-	LIMdlMaterial tmpmat[2];
-
-	/* Initialize temporaries. */
-	model = NULL;
-	name = NULL;
-	memset (tmpmat + 0, 0, sizeof (LIMdlMaterial));
-	memset (tmpmat + 1, 0, sizeof (LIMdlMaterial));
-
-	/* Read into temporaries. */
-	if (!liarc_reader_get_uint32 (reader, &id) ||
-	    !liarc_reader_get_uint32 (reader, &flags) ||
-	    !liarc_reader_get_uint32 (reader, &type) ||
-	    !liarc_reader_get_float (reader, &friction) ||
-	    !liarc_reader_get_text (reader, "", &model) ||
-	    !liarc_reader_get_text (reader, "", &name) ||
-	    !limdl_material_read (tmpmat + 0, reader) ||
-	    !limdl_material_read (tmpmat + 1, reader))
-	{
-		limdl_material_free (tmpmat + 0);
-		limdl_material_free (tmpmat + 1);
-		lisys_free (model);
-		lisys_free (name);
-		livox_material_free (self);
-		return 0;
-	}
-
-	/* Succeeded so free old data and copy over. */
-	lisys_free (self->model);
-	lisys_free (self->name);
-	limdl_material_free (&self->mat_side);
-	limdl_material_free (&self->mat_top);
-	self->id = id;
-	self->flags = flags | LIMDL_MATERIAL_FLAG_CULLFACE;
-	self->type = type;
-	self->friction = friction;
-	self->model = model;
-	self->name = name;
-	self->mat_side = tmpmat[0];
-	self->mat_top = tmpmat[1];
-
-	return 1;
-}
-
-/**
- * \brief Serializes the material to a stream.
- *
- * \param self Material.
- * \param writer Stream writer.
- * \return Nonzero on success.
- */
-int
-livox_material_write (LIVoxMaterial* self,
-                      LIArcWriter*   writer)
-{
-	return liarc_writer_append_uint32 (writer, self->id) &&
-	       liarc_writer_append_uint32 (writer, self->flags) &&
-	       liarc_writer_append_uint32 (writer, self->type) &&
-	       liarc_writer_append_float (writer, self->friction) &&
-	       liarc_writer_append_string (writer, self->model) &&
-	       liarc_writer_append_nul (writer) &&
-	       liarc_writer_append_string (writer, self->name) &&
-	       liarc_writer_append_nul (writer) &&
-	       limdl_material_write (&self->mat_side, writer) &&
-	       limdl_material_write (&self->mat_top, writer);
 }
 
 int
@@ -267,17 +141,22 @@ livox_material_set_name (LIVoxMaterial* self,
 	return 1;
 }
 
-int
-livox_material_set_model (LIVoxMaterial* self,
-                          const char*    value)
+/**
+ * \brief Sets the tile model of the material.
+ *
+ * The caller retains the ownership of the model and needs to ensure that the
+ * model isn't freed until either the model of the material is changed or the
+ * material is deleted.
+ *
+ * \param self Material.
+ * \param model Model.
+ * \return Nonzero on success.
+ */
+int livox_material_set_model (
+	LIVoxMaterial* self,
+	LIEngModel*    model)
 {
-	char* tmp;
-
-	tmp = listr_dup (value);
-	if (tmp == NULL)
-		return 0;
-	lisys_free (self->model);
-	self->model = tmp;
+	self->model = model;
 
 	return 1;
 }

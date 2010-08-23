@@ -33,9 +33,6 @@
 static void
 private_clear_materials (LIVoxManager* self);
 
-static int
-private_ensure_sectors (LIVoxManager* self);
-
 static void
 private_mark_block (LIVoxManager* self,
                     LIVoxSector*  sector,
@@ -55,7 +52,6 @@ livox_manager_new (LICalCallbacks* callbacks,
 	self = lisys_calloc (1, sizeof (LIVoxManager));
 	if (self == NULL)
 		return NULL;
-	self->load = 1;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
 	livox_manager_configure (self, 4, 16);
@@ -579,76 +575,6 @@ int livox_manager_paste_voxels (
 	return 1;
 }
 
-/**
- * \brief Reads materials from a stream reader.
- *
- * \param self Voxel manager.
- * \param reader Stream reader.
- * \return Nonzero on success.
- */
-int livox_manager_read_materials (
-	LIVoxManager* self,
-	LIArcReader*  reader)
-{
-	LIVoxMaterial* material;
-
-	/* Clear old materials. */
-	livox_manager_clear_materials (self);
-
-	/* Read materials. */
-	while (!liarc_reader_check_end (reader))
-	{
-		material = livox_material_new_from_stream (reader);
-		if (material == NULL)
-			return 0;
-		if (!livox_manager_insert_material (self, material))
-			livox_material_free (material);
-	}
-
-	return 1;
-}
-
-void
-livox_manager_reload_model (LIVoxManager* self,
-                            const char*   name)
-{
-	int x;
-	int y;
-	int z;
-	int found = 0;
-	LIAlgU32dicIter iter;
-	LIVoxSector* sector;
-	LIVoxMaterial* material;
-
-	/* Check if any materials were affected. */
-	LIALG_U32DIC_FOREACH (iter, self->materials)
-	{
-		material = iter.value;
-		if (!strcmp (material->model, name))
-		{
-			found = 1;
-			break;
-		}
-	}
-	if (!found)
-		return;
-
-	/* Rebuild affected sectors. */
-	/* FIXME: Just rebuilds everything. */
-	LIALG_U32DIC_FOREACH (iter, self->sectors->sectors)
-	{
-		sector = lialg_sectors_data_index (self->sectors, "voxel", iter.key, 0);
-		if (sector == NULL)
-			continue;
-		for (z = 0 ; z < self->blocks_per_line ; z++)
-		for (y = 0 ; y < self->blocks_per_line ; y++)
-		for (x = 0 ; x < self->blocks_per_line ; x++)
-		{
-			livox_sector_build_block (sector, x, y, z);
-		}
-	}
-}
-
 void
 livox_manager_remove_material (LIVoxManager* self,
                                int           id)
@@ -810,64 +736,6 @@ livox_manager_update_marked (LIVoxManager* self)
 }
 
 /**
- * \brief Writes all the sectors to the database.
- *
- * \param self Voxel manager.
- * \return Nonzero on success.
- */
-int
-livox_manager_write (LIVoxManager* self)
-{
-	LIAlgSectorsIter iter;
-	LIVoxSector* sector;
-
-	if (self->sql == NULL)
-	{
-		lisys_error_set (EINVAL, "no database");
-		return 0;
-	}
-
-	if (!private_ensure_sectors (self))
-		return 0;
-
-	/* Save terrain. */
-	LIALG_SECTORS_FOREACH (iter, self->sectors)
-	{
-		sector = lialg_strdic_find (iter.sector->content, "voxel");
-		if (sector == NULL)
-			continue;
-		if (!livox_sector_write (sector, self->sql))
-			return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Writes the materials to a stream writer.
- *
- * \param self Voxel manager.
- * \param writer Stream writer.
- * \return Nonzero on success.
- */
-int livox_manager_write_materials (
-	LIVoxManager* self,
-	LIArcWriter*  writer)
-{
-	LIAlgU32dicIter iter;
-	LIVoxMaterial* material;
-
-	LIALG_U32DIC_FOREACH (iter, self->materials)
-	{
-		material = iter.value;
-		if (!livox_material_write (material, writer))
-			return 0;
-	}
-
-	return 1;
-}
-
-/**
  * \brief Sets the default fill tile type for empty sectors.
  *
  * \param self Voxel manager.
@@ -878,26 +746,6 @@ livox_manager_set_fill (LIVoxManager* self,
                         int           type)
 {
 	self->fill = type;
-}
-
-/**
- * \brief Enables or disables loading of sector data from the database.
- *
- * \param self Voxel manager.
- * \param value Nonzero for loading, zero for no loading.
- */
-void
-livox_manager_set_load (LIVoxManager* self,
-                        int           value)
-{
-	self->load = value;
-}
-
-void
-livox_manager_set_sql (LIVoxManager* self,
-                       LIArcSql*     sql)
-{
-	self->sql = sql;
 }
 
 void
@@ -966,20 +814,6 @@ private_clear_materials (LIVoxManager* self)
 		livox_material_free (material);
 	}
 	lialg_u32dic_clear (self->materials);
-}
-
-static int
-private_ensure_sectors (LIVoxManager* self)
-{
-	const char* query;
-
-	/* Create sector table. */
-	query = "CREATE TABLE IF NOT EXISTS voxel_sectors "
-		"(id INTEGER PRIMARY KEY,data BLOB);";
-	if (!liarc_sql_query (self->sql, query))
-		return 0;
-
-	return 1;
 }
 
 static void

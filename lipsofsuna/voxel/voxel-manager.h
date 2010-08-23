@@ -50,7 +50,6 @@ struct _LIVoxUpdateEvent
 struct _LIVoxManager
 {
 	int fill;
-	int load;
 	int blocks_per_line;
 	int blocks_per_sector;
 	int tiles_per_line;
@@ -58,7 +57,6 @@ struct _LIVoxManager
 	float tile_width;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* materials;
-	LIArcSql* sql;
 	LICalCallbacks* callbacks;
 };
 
@@ -127,14 +125,6 @@ LIAPICALL (int, livox_manager_paste_voxels, (
 	int           zsize,
 	LIVoxVoxel*   voxels));
 
-LIAPICALL (int, livox_manager_read_materials, (
-	LIVoxManager* self,
-	LIArcReader*  reader));
-
-LIAPICALL (void, livox_manager_reload_model, (
-	LIVoxManager* self,
-	const char*   name));
-
 LIAPICALL (void, livox_manager_remove_material, (
 	LIVoxManager* self,
 	int           id));
@@ -165,13 +155,6 @@ LIAPICALL (void, livox_manager_update, (
 LIAPICALL (void, livox_manager_update_marked, (
 	LIVoxManager* self));
 
-LIAPICALL (int, livox_manager_write, (
-	LIVoxManager* self));
-
-LIAPICALL (int, livox_manager_write_materials, (
-	LIVoxManager* self,
-	LIArcWriter*  writer));
-
 LIAPICALL (void, livox_manager_set_fill, (
 	LIVoxManager* self,
 	int           fill));
@@ -179,10 +162,6 @@ LIAPICALL (void, livox_manager_set_fill, (
 LIAPICALL (void, livox_manager_set_load, (
 	LIVoxManager* self,
 	int           value));
-
-LIAPICALL (void, livox_manager_set_sql, (
-	LIVoxManager* self,
-	LIArcSql*     sql));
 
 LIAPICALL (void, livox_manager_get_voxel, (
 	LIVoxManager* self,

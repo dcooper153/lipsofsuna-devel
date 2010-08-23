@@ -42,35 +42,17 @@ liext_generator_new (LIMaiProgram* program)
 		return NULL;
 	self->program = program;
 
-	/* Allocate callbacks. */
-	self->callbacks = lical_callbacks_new ();
-	if (self->callbacks == NULL)
-	{
-		liext_generator_free (self);
-		return NULL;
-	}
-
-	/* Allocate sectors. */
-	self->sectors = lialg_sectors_new (self->program->sectors->count, self->program->sectors->width);
-	if (self->sectors == NULL)
-	{
-		liext_generator_free (self);
-		return NULL;
-	}
-
 	/* Allocate generator. */
-	self->generator = ligen_generator_new (program->paths, self->callbacks, self->sectors);
+	self->generator = ligen_generator_new (program->paths, program->callbacks);
 	if (self->generator == NULL)
 	{
 		liext_generator_free (self);
 		return NULL;
 	}
 
-	/* Initialize tile size. */
-	liext_generator_configure (self, 4, 4);
-
 	/* Register classes. */
 	liscr_script_create_class (program->script, "Generator", liext_script_generator, self);
+	liscr_script_create_class (program->script, "GeneratorRegion", liext_script_generator_region, self);
 
 	return self;
 }
@@ -80,21 +62,7 @@ liext_generator_free (LIExtModule* self)
 {
 	if (self->generator != NULL)
 		ligen_generator_free (self->generator);
-	if (self->sectors != NULL)
-		lialg_sectors_free (self->sectors);
-	if (self->callbacks != NULL)
-		lical_callbacks_free (self->callbacks);
 	lisys_free (self);
-}
-
-void liext_generator_configure (
-	LIExtModule* self,
-	int          blocks_per_line,
-	int          tiles_per_line)
-{
-	self->blocks_per_line = blocks_per_line;
-	self->tiles_per_line = tiles_per_line;
-	self->tile_width = self->sectors->width / self->tiles_per_line;
 }
 
 /** @} */

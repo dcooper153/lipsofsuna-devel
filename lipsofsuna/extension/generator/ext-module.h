@@ -29,15 +29,11 @@
 #include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_GENERATOR "Generator"
+#define LIEXT_SCRIPT_REGION "GeneratorRegion"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	int blocks_per_line;
-	int tiles_per_line;
-	float tile_width;
-	LIAlgSectors* sectors;
-	LICalCallbacks* callbacks;
 	LIGenGenerator* generator;
 	LIMaiProgram* program;
 };
@@ -45,19 +41,18 @@ struct _LIExtModule
 LIExtModule* liext_generator_new (
 	LIMaiProgram* program);
 
-void liext_generator_configure (
-	LIExtModule* self,
-	int          blocks_per_line,
-	int          tiles_per_line);
-
 void liext_generator_free (
 	LIExtModule* self);
 
 /*****************************************************************************/
 
-void
-liext_script_generator (LIScrClass* self,
-                        void*       data);
+void liext_script_generator (
+	LIScrClass* self,
+	void*       data);
+
+void liext_script_generator_region (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 

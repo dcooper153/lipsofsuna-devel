@@ -27,17 +27,8 @@
 #include <lipsofsuna/system.h>
 #include "generator.h"
 
-static int
-private_init_brushes (LIGenGenerator* self);
-
-static int private_init_data (
+static int private_init (
 	LIGenGenerator* self);
-
-static int
-private_init_sql (LIGenGenerator* self);
-
-static int
-private_init_tables (LIGenGenerator* self);
 
 static int
 private_brush_disabled (LIGenGenerator*  self,
@@ -65,12 +56,6 @@ private_rule_test (LIGenGenerator* self,
                    LIGenStroke*    stroke,
                    LIGenRule*      rule);
 
-static int private_save_terrain (
-	LIGenGenerator* self,
-	int             blocks_per_line,
-	int             tiles_per_line,
-	LIArcSql*       sql);
-
 /*****************************************************************************/
 
 /**
@@ -83,8 +68,7 @@ static int private_save_terrain (
  */
 LIGenGenerator*
 ligen_generator_new (LIPthPaths*     paths,
-                     LICalCallbacks* callbacks,
-                     LIAlgSectors*   sectors)
+                     LICalCallbacks* callbacks)
 {
 	LIGenGenerator* self;
 
@@ -94,14 +78,9 @@ ligen_generator_new (LIPthPaths*     paths,
 		return NULL;
 	self->paths = paths;
 	self->callbacks = callbacks;
-	self->sectors = sectors;
-	self->fill = 1;
 
 	/* Load databases. */
-	if (!private_init_data (self) ||
-	    !private_init_sql (self) ||
-	    !private_init_tables (self) ||
-	    !private_init_brushes (self))
+	if (!private_init (self))
 		goto error;
 
 	return self;
@@ -129,35 +108,20 @@ ligen_generator_free (LIGenGenerator* self)
 		lialg_u32dic_free (self->brushes);
 	}
 
-	/* Free materials. */
-	if (self->brushes != NULL)
-	{
-		LIALG_U32DIC_FOREACH (iter, self->materials)
-			livox_material_free (iter.value);
-		lialg_u32dic_free (self->materials);
-	}
-
-	if (self->sql != NULL)
-		sqlite3_close (self->sql);
 	lisys_free (self->strokes.array);
 	lisys_free (self);
 }
 
 /**
- * \brief Removes all the created map paint operations.
- *
+ * \brief Removes all created regions.
  * \param self Generator.
  */
 void
-ligen_generator_clear_scene (LIGenGenerator* self)
+ligen_generator_clear (LIGenGenerator* self)
 {
-	/* Free strokes. */
 	lisys_free (self->strokes.array);
 	self->strokes.array = NULL;
 	self->strokes.count = 0;
-
-	/* Clear scene. */
-	lialg_sectors_clear (self->sectors);
 }
 
 /**
@@ -213,52 +177,12 @@ int
 ligen_generator_insert_brush (LIGenGenerator* self,
                               LIGenBrush*     brush)
 {
-	int i;
-
-	if (brush->id >= 0)
+	if (lialg_u32dic_find (self->brushes, brush->id) != NULL)
 	{
-		i = brush->id;
-		if (lialg_u32dic_find (self->brushes, i) != NULL)
-		{
-			lisys_assert (0);
-			return 0;
-		}
-	}
-	else
-	{
-		for (i = 0 ; lialg_u32dic_find (self->brushes, i) != NULL ; i++)
-		{
-		}
-	}
-	if (!lialg_u32dic_insert (self->brushes, i, brush))
+		lisys_assert (0);
 		return 0;
-	brush->id = i;
-
-	return 1;
-}
-
-/**
- * \brief Inserts or replaces a material.
- *
- * The ownership of the material is transfered to the generator upon success.
- *
- * \param self Generator.
- * \param material Material.
- * \return Nonzero on success.
- */
-int ligen_generator_insert_material (
-	LIGenGenerator* self,
-	LIVoxMaterial*  material)
-{
-	LIVoxMaterial* tmp;
-
-	tmp = lialg_u32dic_find (self->materials, material->id);
-	if (tmp != NULL)
-	{
-		lialg_u32dic_remove (self->materials, material->id);
-		livox_material_free (tmp);
 	}
-	if (!lialg_u32dic_insert (self->materials, material->id, material))
+	if (!lialg_u32dic_insert (self->brushes, brush->id, brush))
 		return 0;
 
 	return 1;
@@ -311,7 +235,6 @@ void
 ligen_generator_remove_brush (LIGenGenerator* self,
                               int             id)
 {
-	LIAlgU32dicIter iter;
 	LIGenBrush* brush;
 
 	/* Find brush. */
@@ -319,33 +242,9 @@ ligen_generator_remove_brush (LIGenGenerator* self,
 	if (brush == NULL)
 		return;
 
-	/* Clear references. */
-	LIALG_U32DIC_FOREACH (iter, self->brushes)
-		ligen_brush_remove_strokes (iter.value, id);
-
 	/* Free brush. */
 	lialg_u32dic_remove (self->brushes, id);
 	ligen_brush_free (brush);
-}
-
-/**
- * \brief Removes a material.
- *
- * \param self Generator.
- * \param id Material ID.
- */
-void ligen_generator_remove_material (
-	LIGenGenerator* self,
-	int             id)
-{
-	LIVoxMaterial* tmp;
-
-	tmp = lialg_u32dic_find (self->materials, id);
-	if (tmp != NULL)
-	{
-		lialg_u32dic_remove (self->materials, id);
-		livox_material_free (tmp);
-	}
 }
 
 /**
@@ -424,515 +323,14 @@ ligen_generator_step (LIGenGenerator* self)
 	return 0;
 }
 
-/**
- * \brief Saves the generated map to the server database.
- *
- * \param self Generator.
- * \param blocks_per_line Number of blocks per sector edge.
- * \param tiles_per_line Number of tiles per sector edge.
- * \return Nonzero on success.
- */
-int ligen_generator_write (
-	LIGenGenerator* self,
-	int             blocks_per_line,
-	int             tiles_per_line)
-{
-	int i;
-	int j;
-	int len;
-	int ret;
-	int flags;
-	float tile_width;
-	double rnd;
-	char* path;
-	const void* buf;
-	uint32_t id;
-	uint32_t sector;
-	const char* query;
-	LIArcSql* server;
-	LIArcWriter* writer;
-	LIGenBrush* brush;
-	LIGenBrushobject* object;
-	LIGenStroke* stroke;
-	LIMatTransform transform;
-	LIMatVector position;
-	LIMatVector size;
-	sqlite3_stmt* statement;
-
-	/* Format path. */
-	path = lipth_paths_get_sql (self->paths, "server.db");
-	if (path == NULL)
-		return 0;
-
-	/* Open server database. */
-	flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
-	if (sqlite3_open_v2 (path, &server, flags, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (server));
-		sqlite3_close (server);
-		lisys_free (path);
-		return 0;
-	}
-	lisys_free (path);
-
-	/* Drop old tables. */
-	liarc_sql_drop (server, "objects");
-	liarc_sql_drop (server, "regions");
-	liarc_sql_drop (server, "voxel_sectors");
-	liarc_sql_drop (server, "voxel_materials");
-
-	/* Save terrain. */
-	if (!private_save_terrain (self, blocks_per_line, tiles_per_line, server))
-	{
-		sqlite3_close (server);
-		return 0;
-	}
-
-	/* Create region table. */
-	query = "CREATE TABLE IF NOT EXISTS regions "
-		"(id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data BLOB);";
-	if (!liarc_sql_query (server, query))
-	{
-		sqlite3_close (server);
-		return 0;
-	}
-
-	/* Write strokes as regions. */
-	tile_width = self->sectors->width / tiles_per_line;
-	for (i = 0 ; i < self->strokes.count ; i++)
-	{
-		stroke = self->strokes.array + i;
-		writer = liarc_writer_new ();
-		if (writer == NULL)
-			return 0;
-		position.x = tile_width * stroke->pos[0];
-		position.y = tile_width * stroke->pos[1];
-		position.z = tile_width * stroke->pos[2];
-		size.x = tile_width * stroke->size[0];
-		size.y = tile_width * stroke->size[1];
-		size.z = tile_width * stroke->size[2];
-		sector = lialg_sectors_point_to_index (self->sectors, &position);
-		if (!liarc_writer_append_uint32 (writer, i) || /* id */
-		    !liarc_writer_append_uint32 (writer, 0) || /* type */
-		    !liarc_writer_append_uint32 (writer, 0) || /* flags */
-		    !liarc_writer_append_uint32 (writer, stroke->brush) ||
-		    !liarc_writer_append_float (writer, position.x) ||
-		    !liarc_writer_append_float (writer, position.y) ||
-		    !liarc_writer_append_float (writer, position.z) ||
-		    !liarc_writer_append_float (writer, size.x) ||
-		    !liarc_writer_append_float (writer, size.y) ||
-		    !liarc_writer_append_float (writer, size.z))
-		{
-			liarc_writer_free (writer);
-			return 0;
-		}
-		len = liarc_writer_get_length (writer);
-		buf = liarc_writer_get_buffer (writer);
-		if (!liarc_sql_replace (server, "regions",
-			"id", LIARC_SQL_INT, i,
-			"sector", LIARC_SQL_INT, sector,
-			"data", LIARC_SQL_BLOB, buf, len, NULL))
-		{
-			liarc_writer_free (writer);
-			sqlite3_close (server);
-			return 0;
-		}
-		liarc_writer_free (writer);
-	}
-
-	/* Create object table. */
-	query = "CREATE TABLE IF NOT EXISTS objects "
-		"(id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,model TEXT,"
-		"flags UNSIGNED INTEGER,angx REAL,angy REAL,angz REAL,posx REAL,"
-		"posy REAL,posz REAL,rotx REAL,roty REAL,rotz REAL,rotw REAL,"
-		"mass REAL,move REAL,speed REAL,step REAL,colgrp UNSIGNED INTEGER,"
-		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,type TEXT,extra TEXT);";
-	if (!liarc_sql_query (server, query))
-	{
-		sqlite3_close (server);
-		return 0;
-	}
-
-	/* Save new objects. */
-	for (i = 0 ; i < self->strokes.count ; i++)
-	{
-		stroke = self->strokes.array + i;
-		brush = lialg_u32dic_find (self->brushes, stroke->brush);
-		lisys_assert (brush != NULL);
-		for (j = 0 ; j < brush->objects.count ; j++)
-		{
-			object = brush->objects.array[j];
-
-			/* Creation probability. */
-			rnd = rand () / (double) RAND_MAX;
-			if (rnd <= 1.0 - object->probability)
-				continue;
-
-			/* Choose unique object number. */
-			for (id = 0 ; !id ; )
-			{
-				/* Choose random number. */
-				rnd = rand () / (double) RAND_MAX;
-				id = LINET_RANGE_SERVER_START + (uint32_t)((LINET_RANGE_SERVER_END - LINET_RANGE_SERVER_START) * rnd);
-				if (!id)
-					continue;
-
-				/* Reject numbers of database objects. */
-				query = "SELECT id FROM objects WHERE id=?;";
-				if (sqlite3_prepare_v2 (server, query, -1, &statement, NULL) != SQLITE_OK)
-				{
-					lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (server));
-					sqlite3_close (server);
-					return 0;
-				}
-				if (sqlite3_bind_int (statement, 1, id) != SQLITE_OK)
-				{
-					lisys_error_set (EINVAL, "SQL bind: %s", sqlite3_errmsg (server));
-					sqlite3_finalize (statement);
-					sqlite3_close (server);
-					return 0;
-				}
-				ret = sqlite3_step (statement);
-				if (ret != SQLITE_DONE)
-				{
-					if (ret != SQLITE_ROW)
-					{
-						lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (server));
-						sqlite3_finalize (statement);
-						sqlite3_close (server);
-						return 0;
-					}
-					id = 0;
-				}
-				sqlite3_finalize (statement);
-			}
-
-			/* Collect values. */
-			flags = object->flags;
-			transform = object->transform;
-			transform.position.x += tile_width * stroke->pos[0];
-			transform.position.y += tile_width * stroke->pos[1];
-			transform.position.z += tile_width * stroke->pos[2];
-			sector = lialg_sectors_point_to_index (self->sectors, &transform.position);
-
-			/* Write values. */
-			if (!liarc_sql_replace (server, "objects",
-				"id", LIARC_SQL_INT, id,
-				"sector", LIARC_SQL_INT, sector,
-				"flags", LIARC_SQL_INT, flags,
-				"angx", LIARC_SQL_FLOAT, 0.0f,
-				"angy", LIARC_SQL_FLOAT, 0.0f,
-				"angz", LIARC_SQL_FLOAT, 0.0f,
-				"posx", LIARC_SQL_FLOAT, transform.position.x,
-				"posy", LIARC_SQL_FLOAT, transform.position.y,
-				"posz", LIARC_SQL_FLOAT, transform.position.z,
-				"rotx", LIARC_SQL_FLOAT, transform.rotation.x,
-				"roty", LIARC_SQL_FLOAT, transform.rotation.y,
-				"rotz", LIARC_SQL_FLOAT, transform.rotation.z,
-				"rotw", LIARC_SQL_FLOAT, transform.rotation.w,
-				"mass", LIARC_SQL_FLOAT, 0.0f,
-				"move", LIARC_SQL_FLOAT, 0.0f,
-				"speed", LIARC_SQL_FLOAT, 5.0f,
-				"step", LIARC_SQL_FLOAT, 0.0f,
-				"colgrp", LIARC_SQL_INT, LIPHY_DEFAULT_COLLISION_GROUP,
-				"colmsk", LIARC_SQL_INT, LIPHY_DEFAULT_COLLISION_MASK,
-				"control", LIARC_SQL_INT, LIPHY_CONTROL_MODE_NONE,
-				"model", LIARC_SQL_TEXT, object->model,
-				"type", LIARC_SQL_TEXT, object->type,
-				"extra", LIARC_SQL_TEXT, object->extra, NULL))
-			{
-				sqlite3_close (server);
-				return 0;
-			}
-		}
-	}
-
-	sqlite3_close (server);
-
-	return 1;
-}
-
-/**
- * \brief Saves a brushe to the generator database.
- *
- * \param self Generator.
- * \param brush Brush ID.
- * \return Nonzero on success.
- */
-int
-ligen_generator_write_brush (LIGenGenerator* self,
-                             int             brush)
-{
-	LIGenBrush* brush_;
-
-	brush_ = lialg_u32dic_find (self->brushes, brush);
-	if (brush_ == NULL)
-		return 0;
-	if (!ligen_brush_write (brush_, self->sql))
-		return 0;
-
-	return 1;
-}
-
-/**
- * \brief Saves brushes to the generator database.
- *
- * \param self Generator.
- * \return Nonzero on success.
- */
-int
-ligen_generator_write_brushes (LIGenGenerator* self)
-{
-	LIAlgU32dicIter iter;
-
-	/* Remove old brushes. */
-	if (!liarc_sql_delete (self->sql, "generator_brushes") ||
-	    !liarc_sql_delete (self->sql, "generator_rules") ||
-	    !liarc_sql_delete (self->sql, "generator_strokes") ||
-	    !liarc_sql_delete (self->sql, "generator_objects"))
-		return 0;
-
-	/* Save brushes. */
-	LIALG_U32DIC_FOREACH (iter, self->brushes)
-	{
-		if (!ligen_brush_write (iter.value, self->sql))
-			return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Writes the materials to a stream writer.
- *
- * \param self Generator.
- * \param writer Stream writer.
- * \return Nonzero on success.
- */
-int ligen_generator_write_materials (
-	LIGenGenerator* self,
-	LIArcWriter*    writer)
-{
-	LIAlgU32dicIter iter;
-	LIVoxMaterial* material;
-
-	LIALG_U32DIC_FOREACH (iter, self->materials)
-	{
-		material = iter.value;
-		if (!livox_material_write (material, writer))
-			return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Sets the material used for filling empty sectors.
- *
- * \param self Generator.
- * \param fill Material number.
- */
-void
-ligen_generator_set_fill (LIGenGenerator* self,
-                          int             fill)
-{
-	if (fill < 0)
-		self->fill = 0;
-	else
-		self->fill = fill;
-}
-
 /*****************************************************************************/
 
-static int private_init_data (
+static int private_init (
 	LIGenGenerator* self)
 {
 	self->brushes = lialg_u32dic_new ();
 	if (self->brushes == NULL)
 		return 0;
-	self->materials = lialg_u32dic_new ();
-	if (self->materials == NULL)
-		return 0;
-	return 1;
-}
-
-static int
-private_init_brushes (LIGenGenerator* self)
-{
-	int i;
-	int id;
-	int col;
-	int ret;
-	int size0;
-	int size1;
-	int size[3];
-	char* name;
-	const char* query;
-	const void* bytes;
-	LIAlgU32dicIter iter;
-	LIArcReader* reader;
-	LIArcSql* sql;
-	LIGenBrush* brush;
-	sqlite3_stmt* statement;
-
-	sql = self->sql;
-
-	/* Prepare statement. */
-	query = "SELECT id,sizx,sizy,sizz,name,voxels FROM generator_brushes;";
-	if (sqlite3_prepare_v2 (sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "SQL prepare: %s", sqlite3_errmsg (sql));
-		return 0;
-	}
-
-	/* Read brushes. */
-	for (ret = sqlite3_step (statement) ; ret != SQLITE_DONE ; ret = sqlite3_step (statement))
-	{
-		/* Check for errors. */
-		if (ret != SQLITE_ROW)
-		{
-			lisys_error_set (EINVAL, "SQL step: %s", sqlite3_errmsg (sql));
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Read id and size. */
-		col = 0;
-		id = sqlite3_column_int (statement, col++);
-		size[0] = sqlite3_column_int (statement, col++);
-		size[1] = sqlite3_column_int (statement, col++);
-		size[2] = sqlite3_column_int (statement, col++);
-		size[0] = LIMAT_MAX (1, size[0]);
-		size[1] = LIMAT_MAX (1, size[1]);
-		size[2] = LIMAT_MAX (1, size[2]);
-
-		/* Create new brush. */
-		brush = ligen_brush_new (self, size[0], size[1], size[2]);
-		if (brush == NULL)
-		{
-			sqlite3_finalize (statement);
-			return 0;
-		}
-		brush->id = id;
-		if (!ligen_generator_insert_brush (self, brush))
-		{
-			ligen_brush_free (brush);
-			sqlite3_finalize (statement);
-			return 0;
-		}
-
-		/* Read name column. */
-		name = (char*) sqlite3_column_text (statement, col);
-		size0 = sqlite3_column_bytes (statement, col++);
-		if (size0 > 0 && name != NULL)
-		{
-			lisys_free (brush->name);
-			brush->name = listr_dup (name);
-			if (brush->name == NULL)
-			{
-				sqlite3_finalize (statement);
-				return 0;
-			}
-		}
-
-		/* Read voxels column. */
-		bytes = sqlite3_column_blob (statement, col);
-		size0 = sqlite3_column_bytes (statement, col);
-		size1 = size[0] * size[1] * size[2] * 4;
-		if (size0 == size1)
-		{
-			reader = liarc_reader_new (bytes, size0);
-			if (reader != NULL)
-			{
-				for (i = 0 ; i < size[0] * size[1] * size[2] ; i++)
-				{
-					liarc_reader_get_uint16 (reader, &brush->voxels.array[i].type);
-					liarc_reader_get_uint8 (reader, &brush->voxels.array[i].damage);
-					liarc_reader_get_uint8 (reader, &brush->voxels.array[i].rotation);
-				}
-				liarc_reader_free (reader);
-			}
-		}
-	}
-	sqlite3_finalize (statement);
-
-	/* Read rules. */
-	LIALG_U32DIC_FOREACH (iter, self->brushes)
-	{
-		if (!ligen_brush_read_rules (iter.value, sql))
-		{
-			sqlite3_finalize (statement);
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-static int
-private_init_sql (LIGenGenerator* self)
-{
-	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
-	char* path;
-
-	/* Format path. */
-	path = lipth_paths_get_sql (self->paths, "generator.db");
-	if (path == NULL)
-		return 0;
-
-	/* Open database. */
-	if (sqlite3_open_v2 (path, &self->sql, flags, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
-		sqlite3_close (self->sql);
-		lisys_free (path);
-		return 0;
-	}
-	lisys_free (path);
-
-	return 1;
-}
-
-static int
-private_init_tables (LIGenGenerator* self)
-{
-	const char* query;
-
-	/* Create brush table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_brushes "
-		"(id INTEGER PRIMARY KEY,name TEXT,sizx UNSIGNED INTEGER,"
-		"sizy UNSIGNED INTEGER,sizz UNSIGNED INTEGER,voxels BLOB);";
-	if (!liarc_sql_query (self->sql, query))
-		return 0;
-
-	/* Create object table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_objects "
-		"(id INTEGER,"
-		"brush INTEGER REFERENCES generator_brushes(id),"
-		"flags UNSIGNED INTEGER,prob REAL,posx REAL,posy REAL,posz REAL,"
-		"rotx REAL,roty REAL,rotz REAL,rotw REAL,type TEXT,model TEXT,extra TEXT);";
-	if (!liarc_sql_query (self->sql, query))
-		return 0;
-
-	/* Create rule table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_rules "
-		"(id INTEGER,"
-		"brush INTEGER REFERENCES generator_brushes(id),"
-		"name TEXT,flags UNSIGNED INTEGER);";
-	if (!liarc_sql_query (self->sql, query))
-		return 0;
-
-	/* Create stroke table. */
-	query = "CREATE TABLE IF NOT EXISTS generator_strokes "
-		"(id INTEGER,"
-		"brush INTEGER REFERENCES generator_brushes(id),"
-		"rule INTEGER,"
-		"paint INTEGER REFERENCES generator_brushes(id),"
-		"x UNSIGNED INTEGER,y UNSIGNED INTEGER,z UNSIGNED INTEGER,"
-		"flags UNSIGNED INTEGER);";
-	if (!liarc_sql_query (self->sql, query))
-		return 0;
-
 	return 1;
 }
 
@@ -1083,74 +481,6 @@ private_rule_test (LIGenGenerator* self,
 				return 0;
 		}
 	}
-
-	return 1;
-}
-
-static int private_save_terrain (
-	LIGenGenerator* self,
-	int             blocks_per_line,
-	int             tiles_per_line,
-	LIArcSql*       sql)
-{
-	int i;
-	LIAlgU32dicIter iter;
-	LIGenBrush* brush;
-	LIGenStroke* stroke;
-	LIVoxManager* voxels;
-	LIVoxMaterial* material;
-
-	/* Initialize voxel manager. */
-	voxels = livox_manager_new (self->callbacks, self->sectors);
-	if (voxels == NULL)
-		return 0;
-	livox_manager_set_fill (voxels, self->fill);
-	livox_manager_set_load (voxels, 0);
-	livox_manager_configure (voxels, blocks_per_line, tiles_per_line);
-	livox_manager_set_sql (voxels, sql);
-
-	/* Set materials. */
-	LIALG_U32DIC_FOREACH (iter, self->materials)
-	{
-		material = livox_material_new_copy (iter.value);
-		if (material == NULL)
-		{
-			livox_manager_free (voxels);
-			return 0;
-		}
-		if (!livox_manager_insert_material (voxels, material))
-		{
-			livox_material_free (material);
-			livox_manager_free (voxels);
-			return 0;
-		}
-	}
-
-	/* Paint strokes. */
-	lialg_sectors_clear (self->sectors);
-	for (i = 0 ; i < self->strokes.count ; i++)
-	{
-		stroke = self->strokes.array + i;
-		brush = lialg_u32dic_find (self->brushes, stroke->brush);
-		lisys_assert (brush != NULL);
-		livox_manager_paste_voxels (voxels,
-			stroke->pos[0], stroke->pos[1], stroke->pos[2],
-			stroke->size[0], stroke->size[1], stroke->size[2], brush->voxels.array);
-	}
-	livox_manager_update (voxels, 1.0f);
-
-	/* Write to the database. */
-	if (!livox_manager_write (voxels))
-	{
-		lialg_sectors_clear (self->sectors);
-		livox_manager_free (voxels);
-		return 0;
-	}
-
-	/* Free voxel manager. */
-	lialg_sectors_clear (self->sectors);
-	livox_manager_set_sql (voxels, self->sql);
-	livox_manager_free (voxels);
 
 	return 1;
 }
