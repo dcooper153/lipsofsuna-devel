@@ -199,23 +199,32 @@ static void Quaternion___tostring (LIScrArgs* args)
  * --
  * -- @param self Quaternion class.
  * -- @param args Arguments.<ul>
- * --   <li>1,x Optional X value, default is 0.</li>
- * --   <li>2,y Optional Y value, default is 0.</li>
- * --   <li>3,z Optional Z value, default is 0.</li>
- * --   <li>4,w Optional W value, default is 1.</li>
- * --   <li>dir Look direction vector.</li>
- * --   <li>up Up direction vector.</li></ul>
+ * --   <li>1,x: Optional X value, default is 0.</li>
+ * --   <li>2,y: Optional Y value, default is 0.</li>
+ * --   <li>3,z: Optional Z value, default is 0.</li>
+ * --   <li>4,w: Optional W value, default is 1.</li>
+ * --   <li>angle: Angle of rotation in radians.</li>
+ * --   <li>axis: Axis of rotation.</li>
+ * --   <li>dir: Look direction vector.</li>
+ * --   <li>up: Up direction vector.</li></ul>
  * -- @return New quaternion.
- * function Quaternion.new(self, x, y, z, w)
+ * function Quaternion.new(self, args)
  */
 static void Quaternion_new (LIScrArgs* args)
 {
+	float angle;
+	LIMatVector axis;
 	LIMatVector dir;
 	LIMatVector up;
 	LIMatQuaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	if (liscr_args_gets_vector (args, "dir", &dir) &&
-	    liscr_args_gets_vector (args, "up", &up))
+	if (liscr_args_gets_vector (args, "axis", &axis) &&
+	    liscr_args_gets_float (args, "angle", &angle))
+	{
+		quat = limat_quaternion_rotation (angle, axis);
+	}
+	else if (liscr_args_gets_vector (args, "dir", &dir) &&
+	         liscr_args_gets_vector (args, "up", &up))
 	{
 		quat = limat_quaternion_look (dir, up);
 		quat = limat_quaternion_conjugate (quat);
