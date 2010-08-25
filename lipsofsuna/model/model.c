@@ -324,10 +324,7 @@ limdl_model_free (LIMdlModel* self)
 	if (self->shapes.array != NULL)
 	{
 		for (i = 0 ; i < self->shapes.count ; i++)
-		{
-			lisys_free (self->shapes.array[i].name);
-			lisys_free (self->shapes.array[i].vertices.array);
-		}
+			limdl_shape_clear (self->shapes.array + i);
 		lisys_free (self->shapes.array);
 	}
 

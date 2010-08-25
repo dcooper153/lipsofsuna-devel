@@ -25,55 +25,99 @@
 #include <lipsofsuna/system.h>
 #include "model-shape.h"
 
-int
-limdl_shape_read (LIMdlShape*  self,
-                  LIArcReader* reader)
+void limdl_shape_clear (
+	LIMdlShape*  self)
 {
 	int i;
+
+	for (i = 0 ; i < self->parts.count ; i++)
+	{
+		lisys_free (self->parts.array[i].vertices.array);
+	}
+	lisys_free (self->parts.array);
+	lisys_free (self->name);
+}
+
+int limdl_shape_read (
+	LIMdlShape*  self,
+	LIArcReader* reader)
+{
+	int i;
+	int j;
 	uint32_t tmp;
+	LIMdlShapePart* part;
 
 	/* Read header. */
 	if (!liarc_reader_get_text (reader, "", &self->name) ||
 	    !liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 
-	/* Allocate vertices. */
+	/* Allocate parts. */
 	if (tmp)
 	{
-		self->vertices.count = tmp;
-		self->vertices.array = lisys_calloc (3 * tmp, sizeof (LIMatVector));
-		if (self->vertices.array == NULL)
+		self->parts.array = lisys_calloc (tmp, sizeof (LIMdlShapePart));
+		if (self->parts.array == NULL)
 			return 0;
+		self->parts.count = tmp;
 	}
 
-	/* Read vertices. */
-	for (i = 0 ; i < tmp ; i++)
+	/* Read parts. */
+	for (i = 0 ; i < self->parts.count ; i++)
 	{
-		if (!liarc_reader_get_float (reader, &self->vertices.array[i].x) ||
-		    !liarc_reader_get_float (reader, &self->vertices.array[i].y) ||
-		    !liarc_reader_get_float (reader, &self->vertices.array[i].z))
+		/* Read part header. */
+		part = self->parts.array + i;
+		if (!liarc_reader_get_uint32 (reader, &tmp))
 			return 0;
+
+		/* Allocate vertices. */
+		if (tmp)
+		{
+			part->vertices.count = tmp;
+			part->vertices.array = lisys_calloc (3 * tmp, sizeof (LIMatVector));
+			if (part->vertices.array == NULL)
+				return 0;
+		}
+
+		/* Read vertices. */
+		for (j = 0 ; j < tmp ; j++)
+		{
+			if (!liarc_reader_get_float (reader, &part->vertices.array[j].x) ||
+				!liarc_reader_get_float (reader, &part->vertices.array[j].y) ||
+				!liarc_reader_get_float (reader, &part->vertices.array[j].z))
+				return 0;
+		}
 	}
 
 	return 1;
 }
 
-int
-limdl_shape_write (const LIMdlShape* self,
-                   LIArcWriter*      writer)
+int limdl_shape_write (
+	const LIMdlShape* self,
+	LIArcWriter*      writer)
 {
 	int i;
+	int j;
+	LIMdlShapePart* part;
 
+	/* Write shape header. */
 	if (!liarc_writer_append_string (writer, self->name) ||
 	    !liarc_writer_append_nul (writer) ||
-	    !liarc_writer_append_uint32 (writer, self->vertices.count))
+	    !liarc_writer_append_uint32 (writer, self->parts.count))
 		return 0;
-	for (i = 0 ; i < self->vertices.count ; i++)
+
+	/* Write shape parts. */
+	for (i = 0 ; i < self->parts.count ; i++)
 	{
-		if (!liarc_writer_append_float (writer, self->vertices.array[i].x) ||
-		    !liarc_writer_append_float (writer, self->vertices.array[i].y) ||
-		    !liarc_writer_append_float (writer, self->vertices.array[i].z))
+		part = self->parts.array + i;
+		if (!liarc_writer_append_uint32 (writer, part->vertices.count))
 			return 0;
+		for (j = 0 ; j < part->vertices.count ; j++)
+		{
+			if (!liarc_writer_append_float (writer, part->vertices.array[i].x) ||
+				!liarc_writer_append_float (writer, part->vertices.array[i].y) ||
+				!liarc_writer_append_float (writer, part->vertices.array[i].z))
+				return 0;
+		}
 	}
 
 	return 1;

@@ -1219,6 +1219,7 @@ class LipsShape:
 
 	def Write(self, writer):
 		writer.WriteString(self.name)
+		writer.WriteInt(1)
 		writer.WriteInt(len(self.vertices))
 		for v in self.vertices:
 			writer.WriteFloat(v.x)

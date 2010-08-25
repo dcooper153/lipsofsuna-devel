@@ -240,7 +240,7 @@ static int private_model_new (
 	shape = liphy_shape_new (self->physics);
 	if (shape == NULL)
 		return 1;
-	liphy_shape_add_model (shape, model->model, NULL);
+	liphy_shape_add_model (shape, model->model, NULL, 1.0f);
 	model->physics = shape;
 
 	return 1;

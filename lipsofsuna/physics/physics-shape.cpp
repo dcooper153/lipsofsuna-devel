@@ -29,6 +29,12 @@
 
 #define VERTEX_WELD_EPSILON 0.05
 
+static int private_add_model (
+	LIPhyShape*           self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform,
+	float                 scale);
+
 static int private_add_shape (
 	LIPhyShape*           self,
 	btConvexShape*        shape,
@@ -45,11 +51,6 @@ static btConvexHullShape* private_create_from_box (
 
 static btConvexHullShape* private_create_from_empty (
 	LIPhyShape* self);
-
-static btConvexHullShape* private_create_from_model (
-	LIPhyShape*       self,
-	const LIMdlModel* model,
-	float             scale);
 
 static btConvexHullShape* private_create_from_vertices (
 	LIPhyShape*        self,
@@ -143,17 +144,7 @@ int liphy_shape_add_model (
 	const LIMatTransform* transform,
 	float                 scale)
 {
-	btConvexShape* shape;
-
-	shape = private_create_from_model (self, model, scale);
-	if (shape == NULL)
-	{
-		liphy_shape_free (self);
-		return 0;
-	}
-	private_add_shape (self, shape, transform);
-
-	return 1;
+	return private_add_model (self, model, transform, scale);
 }
 
 /**
@@ -217,18 +208,73 @@ int liphy_shape_set_model (
 	LIPhyShape*       self,
 	const LIMdlModel* model)
 {
-	btConvexShape* shape;
-
-	shape = private_create_from_model (self, model, 1.0f);
-	if (shape == NULL)
-		return 0;
 	liphy_shape_clear (self);
-	private_add_shape (self, shape, NULL);
-
-	return 1;
+	return private_add_model (self, model, NULL, 1.0f);
 }
 
 /*****************************************************************************/
+
+static int private_add_model (
+	LIPhyShape*           self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform,
+	float                 scale)
+{
+	int i;
+	int empty;
+	btConvexHullShape* ret;
+	LIMatVector* tmp;
+	LIMdlShape* shape;
+
+	/* Use precalculated convex shapes when possible. */
+	/* FIXME: One model can have multiple shapes. */
+	if (model->shapes.count)
+	{
+		empty = 1;
+		shape = model->shapes.array + 0;
+		for (i = 0 ; i < shape->parts.count ; i++)
+		{
+			if (!shape->parts.array[i].vertices.count)
+				continue;
+			ret = private_create_from_vertices (self,
+				shape->parts.array[i].vertices.array,
+				shape->parts.array[i].vertices.count, scale);
+			if (ret == NULL)
+				return 0;
+			private_add_shape (self, ret, transform);
+			empty = 0;
+		}
+		if (empty)
+		{
+			ret = private_create_from_empty (self);
+			if (ret == NULL)
+				return 0;
+			private_add_shape (self, ret, transform);
+		}
+		return 1;
+	}
+
+	/* Extract coordinates from vertices. */
+	if (model->vertices.count)
+	{
+		tmp = (LIMatVector*) lisys_calloc (model->vertices.count, sizeof (LIMatVector));
+		if (tmp == NULL)
+			return 0;
+		for (i = 0 ; i < model->vertices.count ; i++)
+			tmp[i] = model->vertices.array[i].coord;
+	}
+	else
+		tmp = NULL;
+
+	/* Create the shape from the vertex coordinates. */
+	ret = private_create_from_vertices (self, tmp, model->vertices.count, scale);
+	if (ret == NULL)
+		return 0;
+	private_add_shape (self, ret, transform);
+	lisys_free (tmp);
+
+	return 1;
+}
 
 static int private_add_shape (
 	LIPhyShape*           self,
@@ -315,45 +361,6 @@ static btConvexHullShape* private_create_from_empty (
 	};
 
 	return new btConvexHullShape (tmp, 8, 4 * sizeof (btScalar));
-}
-
-static btConvexHullShape* private_create_from_model (
-	LIPhyShape*       self,
-	const LIMdlModel* model,
-	float             scale)
-{
-	int i;
-	btConvexHullShape* ret;
-	LIMatVector* tmp;
-
-	/* Use precalculated convex shapes when possible. */
-	/* FIXME: One model can have multiple shapes. */
-	if (model->shapes.count)
-	{
-		if (!model->shapes.array[0].vertices.count)
-			return private_create_from_empty (self);
-		return private_create_from_vertices (self,
-			model->shapes.array[0].vertices.array,
-			model->shapes.array[0].vertices.count, scale);
-	}
-
-	/* Extract coordinates from vertices. */
-	if (model->vertices.count)
-	{
-		tmp = (LIMatVector*) lisys_calloc (model->vertices.count, sizeof (LIMatVector));
-		if (tmp == NULL)
-			return NULL;
-		for (i = 0 ; i < model->vertices.count ; i++)
-			tmp[i] = model->vertices.array[i].coord;
-	}
-	else
-		tmp = NULL;
-
-	/* Create the shape from the vertex coordinates. */
-	ret = private_create_from_vertices (self, tmp, model->vertices.count, scale);
-	lisys_free (tmp);
-
-	return ret;
 }
 
 static btConvexHullShape* private_create_from_vertices (

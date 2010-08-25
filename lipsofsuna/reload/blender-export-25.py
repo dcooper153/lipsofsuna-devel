@@ -663,15 +663,27 @@ class LIShape:
 
 	def __init__(self, name):
 		self.name = name
-		self.vertices = []
+		self.parts = []
 
 	def add_mesh(self, obj):
-		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.rotation_part()
-		for v in obj.data.verts:
-			self.vertices.append(v.co * matrix)
+		self.parts.append(LIShapePart(obj))
 
 	def write(self, writer):
 		writer.write_string(self.name)
+		writer.write_int(len(self.parts))
+		writer.write_marker()
+		for p in self.parts:
+			p.write(writer)
+
+class LIShapePart:
+
+	def __init__(self, obj):
+		self.vertices = []
+		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.rotation_part()
+		for v in obj.data.verts:
+			self.vertices.append(matrix * v.co)
+
+	def write(self, writer):
 		writer.write_int(len(self.vertices))
 		writer.write_marker()
 		for v in self.vertices:

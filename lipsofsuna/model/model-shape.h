@@ -29,6 +29,16 @@
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/system.h>
 
+typedef struct _LIMdlShapePart LIMdlShapePart;
+struct _LIMdlShapePart
+{
+	struct
+	{
+		int count;
+		LIMatVector* array;
+	} vertices;
+};
+
 typedef struct _LIMdlShape LIMdlShape;
 struct _LIMdlShape
 {
@@ -36,9 +46,12 @@ struct _LIMdlShape
 	struct
 	{
 		int count;
-		LIMatVector* array;
-	} vertices;
+		LIMdlShapePart* array;
+	} parts;
 };
+
+LIAPICALL (void, limdl_shape_clear, (
+	LIMdlShape*  self));
 
 LIAPICALL (int, limdl_shape_read, (
 	LIMdlShape*  self,
