@@ -9,9 +9,9 @@ class LIEnum:
 		self.LIGHTFLAG_NOSHADOW = 1
 		self.MATRFLAG_BILLBOARD = 1
 		self.MATRFLAG_COLLISION = 2
-		self.MATRFLAG_TWOSIDE = 4
+		self.MATRFLAG_CULLFACE = 4
 		self.MATRFLAG_ALPHA = 8
-		self.MATRFLAG_DEFAULT = self.MATRFLAG_COLLISION
+		self.MATRFLAG_DEFAULT = self.MATRFLAG_COLLISION | self.MATRFLAG_CULLFACE
 		self.NODETYPE_BONE = 0
 		self.NODETYPE_EMPTY = 1
 		self.NODETYPE_LIGHT = 2
@@ -281,7 +281,7 @@ class LIMaterial:
 				if slot and slot.texture and slot.texture.type == 'IMAGE':
 					tex = slot.texture
 					while len(self.textures) < index:
-						self.textures.append(LITexture(count, None, None))
+						self.textures.append(LITexture(len(self.textures), None, None))
 					self.textures.append(LITexture(index, tex, tex.image))
 				index = index + 1
 		# Face texture.
