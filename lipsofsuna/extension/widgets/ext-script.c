@@ -1002,6 +1002,72 @@ static void View_setter_vscroll (LIScrArgs* args)
 /*****************************************************************************/
 
 /* @luadoc
+ * --- Adds a font style.
+ * -- @param clss Widgets class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,name: Name of the style.</li>
+ * --   <li>2,string: Style string.</li></ul>
+ * function Widgets.add_font_style(clss, args)
+ */
+static void Widgets_add_font_style (LIScrArgs* args)
+{
+	const char* name;
+	const char* string;
+	LIArcReader* reader;
+	LIExtModule* module;
+
+	/* Arguments. */
+	if (!liscr_args_geti_string (args, 0, &name) &&
+	    !liscr_args_gets_string (args, "name", &name))
+		return;
+	if (!liscr_args_geti_string (args, 1, &string) &&
+	    !liscr_args_gets_string (args, "string", &string))
+		return;
+
+	/* Parse the string. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	reader = liarc_reader_new (string, strlen (string));
+	if (reader == NULL)
+		return;
+	if (!liwdg_styles_add_font (module->widgets->styles, name, reader))
+		lisys_error_report ();
+	liarc_reader_free (reader);
+}
+
+/* @luadoc
+ * --- Adds a font style.
+ * -- @param clss Widgets class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,name: Name of the style.</li>
+ * --   <li>2,string: Style string.</li></ul>
+ * function Widgets.add_font_style(clss, args)
+ */
+static void Widgets_add_widget_style (LIScrArgs* args)
+{
+	const char* name;
+	const char* string;
+	LIArcReader* reader;
+	LIExtModule* module;
+
+	/* Arguments. */
+	if (!liscr_args_geti_string (args, 0, &name) &&
+	    !liscr_args_gets_string (args, "name", &name))
+		return;
+	if (!liscr_args_geti_string (args, 1, &string) &&
+	    !liscr_args_gets_string (args, "string", &string))
+		return;
+
+	/* Parse the string. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	reader = liarc_reader_new (string, strlen (string));
+	if (reader == NULL)
+		return;
+	if (!liwdg_styles_add_widget (module->widgets->styles, name, reader))
+		lisys_error_report ();
+	liarc_reader_free (reader);
+}
+
+/* @luadoc
  * --- Cycles widget focus.
  * --
  * -- @param clss Widgets class.
@@ -1179,6 +1245,8 @@ void liext_script_widgets (
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGETS, data);
 	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_insert_cfunc (self, "add_font_style", Widgets_add_font_style);
+	liscr_class_insert_cfunc (self, "add_widget_style", Widgets_add_widget_style);
 	liscr_class_insert_cfunc (self, "cycle_focus", Widgets_cycle_focus);
 	liscr_class_insert_cfunc (self, "cycle_window_focus", Widgets_cycle_window_focus);
 	liscr_class_insert_cfunc (self, "draw", Widgets_draw);

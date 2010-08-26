@@ -12,6 +12,7 @@ require "core/sound"
 require "core/widgets"
 require "core/reload"
 require "common/eventhandler"
+require "client/theme"
 require "client/startup"
 
 Eventhandler{type = "quit", func = function(self, args)

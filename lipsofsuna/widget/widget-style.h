@@ -46,6 +46,7 @@ struct _LIWdgStyle
 
 struct _LIWdgStyles
 {
+	char* root;
 	LIWdgManager* manager;
 	LIWdgStyle fallback;
 	LIAlgStrdic* fonts;
@@ -63,6 +64,16 @@ LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
 
 LIAPICALL (void, liwdg_styles_free, (
 	LIWdgStyles* self));
+
+LIAPICALL (int, liwdg_styles_add_font, (
+	LIWdgStyles* self,
+	const char*  name,
+	LIArcReader* reader));
+
+LIAPICALL (int, liwdg_styles_add_widget, (
+	LIWdgStyles* self,
+	const char*  name,
+	LIArcReader* reader));
 
 #endif
 

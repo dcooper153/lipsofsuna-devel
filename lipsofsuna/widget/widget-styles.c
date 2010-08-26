@@ -34,59 +34,41 @@ struct _PrivateFont
 	char* file;
 };
 
-static LIFntFont*
-private_load_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   const char*  file,
-                   int          size);
+static LIFntFont* private_load_font (
+	LIWdgStyles* self,
+	const char*  root,
+	const char*  name,
+	const char*  file,
+	int          size);
 
-static int
-private_load_texture (LIWdgStyles*   self,
-                      LIImgTexture** texture,
-                      const char*    root,
-                      const char*    name);
+static int private_load_texture (
+	LIWdgStyles*   self,
+	LIImgTexture** texture,
+	const char*    root,
+	const char*    name);
 
-static int
-private_read (LIWdgStyles* self,
-              const char*  root,
-              const char*  path);
+static int private_read_font_attr (
+	LIWdgStyles* self,
+	const char*  root,
+	const char*  name,
+	PrivateFont* font,
+	const char*  key,
+	const char*  value);
 
-static int
-private_read_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   LIArcReader* reader);
-
-static int
-private_read_font_attr (LIWdgStyles* self,
-                        const char*  root,
-                        const char*  name,
-                        PrivateFont* font,
-                        const char*  key,
-                        const char*  value);
-
-static int
-private_read_widget (LIWdgStyles* self,
-                     const char*  root,
-                     const char*  name,
-                     LIArcReader* reader);
-
-static int
-private_read_widget_attr (LIWdgStyles* self,
-                          const char*  root,
-                          const char*  name,
-                          LIWdgStyle*  widget,
-                          const char*  key,
-                          const char*  value);
+static int private_read_widget_attr (
+	LIWdgStyles* self,
+	const char*  root,
+	const char*  name,
+	LIWdgStyle*  widget,
+	const char*  key,
+	const char*  value);
 
 /*****************************************************************************/
 
-LIWdgStyles*
-liwdg_styles_new (LIWdgManager* manager,
-                  const char*   root)
+LIWdgStyles* liwdg_styles_new (
+	LIWdgManager* manager,
+	const char*   root)
 {
-	char* path;
 	LIWdgStyles* self;
 	unsigned char tmp[16];
 
@@ -95,6 +77,12 @@ liwdg_styles_new (LIWdgManager* manager,
 	if (self == NULL)
 		return NULL;
 	self->manager = manager;
+	self->root = listr_dup (root);
+	if (root == NULL)
+	{
+		liwdg_styles_free (self);
+		return NULL;
+	}
 
 	/* Initialize defaults. */
 	memset (tmp, 0, sizeof (tmp));
@@ -124,26 +112,11 @@ liwdg_styles_new (LIWdgManager* manager,
 		return NULL;
 	}
 
-	/* Load theme. */
-	path = lisys_path_concat (root, "config", "widgets.cfg", NULL);
-	if (path == NULL)
-	{
-		liwdg_styles_free (self);
-		return NULL;
-	}
-	if (!private_read (self, root, path))
-	{
-		liwdg_styles_free (self);
-		lisys_free (path);
-		return NULL;
-	}
-	lisys_free (path);
-
 	return self;
 }
 
-void
-liwdg_styles_free (LIWdgStyles* self)
+void liwdg_styles_free (
+	LIWdgStyles* self)
 {
 	LIAlgStrdicIter iter;
 
@@ -167,17 +140,131 @@ liwdg_styles_free (LIWdgStyles* self)
 	}
 	if (self->fallback.texture != NULL)
 		liimg_texture_free (self->fallback.texture);
+	lisys_free (self->root);
 	lisys_free (self);
+}
+
+int liwdg_styles_add_font (
+	LIWdgStyles* self,
+	const char*  name,
+	LIArcReader* reader)
+{
+	char* line;
+	char* value;
+	PrivateFont font = { 12, NULL };
+
+	while (1)
+	{
+		/* Read line. */
+		liarc_reader_skip_chars (reader, " \t\n");
+		if (liarc_reader_check_end (reader))
+			break;
+		if (!liarc_reader_get_text (reader, ";\n", &line))
+		{
+			line = NULL;
+			goto error;
+		}
+
+		/* Get key and value. */
+		value = strchr (line, ':');
+		if (value == NULL)
+		{
+			lisys_error_set (EINVAL, "syntax error in font `%s'", name);
+			goto error;
+		}
+		*value = '\0';
+		value++;
+		while (isspace (*value))
+			value++;
+
+		/* Process key and value. */
+		if (!private_read_font_attr (self, self->root, name, &font, line, value))
+			goto error;
+	}
+
+	/* Load font. */
+	if (!private_load_font (self, self->root, name, font.file? font.file : "default.ttf", font.size))
+	{
+		lisys_free (font.file);
+		return 0;
+	}
+	lisys_free (font.file);
+
+	return 1;
+
+error:
+	lisys_free (line);
+	return 0;
+}
+
+int liwdg_styles_add_widget (
+	LIWdgStyles* self,
+	const char*  name,
+	LIArcReader* reader)
+{
+	char* line;
+	char* value;
+	LIWdgStyle* widget;
+
+	/* Allocate info. */
+	widget = lisys_calloc (1, sizeof (LIWdgStyle));
+	if (widget == NULL)
+		return 0;
+	*widget = self->fallback;
+
+	/* Read attributes. */
+	while (1)
+	{
+		/* Read line. */
+		liarc_reader_skip_chars (reader, " \t\n");
+		if (liarc_reader_check_end (reader))
+			break;
+		if (!liarc_reader_get_text (reader, ";\n", &line))
+		{
+			line = NULL;
+			goto error;
+		}
+
+		/* Get key and value. */
+		value = strchr (line, ':');
+		if (value == NULL)
+		{
+			lisys_error_set (EINVAL, "syntax error in widget `%s'", name);
+			goto error;
+		}
+		*value = '\0';
+		value++;
+		while (isspace (*value))
+			value++;
+
+		/* Process key and value. */
+		if (!private_read_widget_attr (self, self->root, name, widget, line, value))
+			goto error;
+	}
+
+	/* Add to list. */
+	if (!lialg_strdic_insert (self->subimgs, name, widget))
+	{
+		lisys_free (widget);
+		return 0;
+	}
+
+	return 1;
+
+error:
+	lisys_free (widget);
+	lisys_free (line);
+	return 0;
 }
 
 /*****************************************************************************/
 
-static LIFntFont*
-private_load_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   const char*  file,
-                   int          size)
+static LIFntFont* private_load_font (
+	LIWdgStyles* self,
+	const char*  root,
+	const char*  name,
+	const char*  file,
+	int          size)
 {
 	char* path;
 	LIFntFont* font;
@@ -206,11 +293,11 @@ private_load_font (LIWdgStyles* self,
 	return font;
 }
 
-static int
-private_load_texture (LIWdgStyles*   self,
-                      LIImgTexture** texture,
-                      const char*    root,
-                      const char*    name)
+static int private_load_texture (
+	LIWdgStyles*   self,
+	LIImgTexture** texture,
+	const char*    root,
+	const char*    name)
 {
 	char* path;
 
@@ -225,148 +312,13 @@ private_load_texture (LIWdgStyles*   self,
 	return 1;
 }
 
-static int
-private_read (LIWdgStyles* self,
-              const char*  root,
-              const char*  path)
-{
-	char* name;
-	char* type;
-	LIArcReader* reader;
-
-	/* Open the file. */
-	reader = liarc_reader_new_from_file (path);
-	if (reader == NULL)
-	{
-		if (lisys_error_get (NULL) != EIO)
-			return 0;
-		return 1;
-	}
-
-	/* Read blocks. */
-	for (liarc_reader_skip_chars (reader, " \t\n") ;
-	    !liarc_reader_check_end (reader) ;
-	     liarc_reader_skip_chars (reader, " \t\n"))
-	{
-		/* Read block type. */
-		if (!liarc_reader_get_text (reader, " ", &type))
-			goto error;
-
-		/* Read block name. */
-		liarc_reader_skip_chars (reader, " \t");
-		if (!liarc_reader_get_text (reader, " \t", &name))
-		{
-			lisys_free (type);
-			goto error;
-		}
-
-		/* Read opening brace. */
-		liarc_reader_skip_chars (reader, " \t");
-		if (!liarc_reader_check_text (reader, "{", " \t\n"))
-		{
-			lisys_error_set (EINVAL, "expected '{' after `%s %s'", type, name);
-			lisys_free (type);
-			lisys_free (name);
-			goto error;
-		}
-
-		/* Read type specific data. */
-		if (!strcmp (type, "widget"))
-		{
-			lisys_free (type);
-			if (!private_read_widget (self, root, name, reader))
-			{
-				lisys_free (name);
-				goto error;
-			}
-			lisys_free (name);
-		}
-		else if (!strcmp (type, "font"))
-		{
-			lisys_free (type);
-			if (!private_read_font (self, root, name, reader))
-			{
-				lisys_free (name);
-				goto error;
-			}
-		}
-		else
-		{
-			lisys_error_set (EINVAL, "unknown block type `%s'", type);
-			lisys_free (type);
-			goto error;
-		}
-	}
-	liarc_reader_free (reader);
-
-	return 1;
-
-error:
-	liarc_reader_free (reader);
-	return 0;
-}
-
-static int
-private_read_font (LIWdgStyles* self,
-                   const char*  root,
-                   const char*  name,
-                   LIArcReader* reader)
-{
-	char* line;
-	char* value;
-	PrivateFont font = { 12, NULL };
-
-	while (1)
-	{
-		/* Read line. */
-		liarc_reader_skip_chars (reader, " \t\n");
-		if (!liarc_reader_get_text (reader, ";\n", &line))
-		{
-			line = NULL;
-			goto error;
-		}
-		if (!strcmp (line, "}"))
-			break;
-
-		/* Get key and value. */
-		value = strchr (line, ':');
-		if (value == NULL)
-		{
-			lisys_error_set (EINVAL, "syntax error in font `%s'", name);
-			goto error;
-		}
-		*value = '\0';
-		value++;
-		while (isspace (*value))
-			value++;
-
-		/* Process key and value. */
-		if (!private_read_font_attr (self, root, name, &font, line, value))
-			goto error;
-	}
-
-	/* Load font. */
-	if (!private_load_font (self, root, name, font.file? font.file : "default.ttf", font.size))
-	{
-		lisys_free (font.file);
-		return 0;
-	}
-	lisys_free (font.file);
-
-	return 1;
-
-error:
-	lisys_free (line);
-	return 0;
-}
-
-static int
-private_read_font_attr (LIWdgStyles* self,
-                        const char*  root,
-                        const char*  name,
-                        PrivateFont* font,
-                        const char*  key,
-                        const char*  value)
+static int private_read_font_attr (
+	LIWdgStyles* self,
+	const char*  root,
+	const char*  name,
+	PrivateFont* font,
+	const char*  key,
+	const char*  value)
 {
 	if (!strcmp (key, "file"))
 	{
@@ -381,74 +333,13 @@ private_read_font_attr (LIWdgStyles* self,
 	return 1;
 }
 
-static int
-private_read_widget (LIWdgStyles* self,
-                     const char*  root,
-                     const char*  name,
-                     LIArcReader* reader)
-{
-	char* line;
-	char* value;
-	LIWdgStyle* widget;
-
-	/* Allocate info. */
-	widget = lisys_calloc (1, sizeof (LIWdgStyle));
-	if (widget == NULL)
-		return 0;
-	*widget = self->fallback;
-
-	/* Read attributes. */
-	while (1)
-	{
-		/* Read line. */
-		liarc_reader_skip_chars (reader, " \t\n");
-		if (!liarc_reader_get_text (reader, ";\n", &line))
-		{
-			line = NULL;
-			goto error;
-		}
-		if (!strcmp (line, "}"))
-			break;
-
-		/* Get key and value. */
-		value = strchr (line, ':');
-		if (value == NULL)
-		{
-			lisys_error_set (EINVAL, "syntax error in widget `%s'", name);
-			goto error;
-		}
-		*value = '\0';
-		value++;
-		while (isspace (*value))
-			value++;
-
-		/* Process key and value. */
-		if (!private_read_widget_attr (self, root, name, widget, line, value))
-			goto error;
-	}
-
-	/* Add to list. */
-	if (!lialg_strdic_insert (self->subimgs, name, widget))
-	{
-		lisys_free (widget);
-		return 0;
-	}
-
-	return 1;
-
-error:
-	lisys_free (widget);
-	lisys_free (line);
-	return 0;
-}
-
-static int
-private_read_widget_attr (LIWdgStyles* self,
-                          const char*  root,
-                          const char*  name,
-                          LIWdgStyle*  widget,
-                          const char*  key,
-                          const char*  value)
+static int private_read_widget_attr (
+	LIWdgStyles* self,
+	const char*  root,
+	const char*  name,
+	LIWdgStyle*  widget,
+	const char*  key,
+	const char*  value)
 {
 	LIImgTexture* image;
 
