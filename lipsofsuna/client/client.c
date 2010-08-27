@@ -49,6 +49,9 @@ static void
 private_server_main (LIThrThread* thread,
                      void*        data);
 
+static void private_server_shutdown (
+	LICliClient* self);
+
 static int private_select (
 	LICliClient*    self,
 	LIRenSelection* selection);
@@ -136,13 +139,9 @@ void licli_client_free_module (
 		self->script = NULL;
 	}
 
-	if (self->server_thread != NULL)
-	{
-		limai_program_shutdown (self->server->program);
-		lithr_thread_free (self->server_thread);
-		self->server_thread = NULL;
-	}
-	lisys_assert (self->server == NULL);
+	/* Free the server. */
+	private_server_shutdown (self);
+
 	if (self->paths != NULL)
 	{
 		lipth_paths_free (self->paths);
@@ -166,13 +165,7 @@ int licli_client_host (
 	const char*  args)
 {
 	/* Kill old thread. */
-	if (self->server_thread != NULL)
-	{
-		lisys_assert (self->server != NULL);
-		limai_program_shutdown (self->server->program);
-		lithr_thread_free (self->server_thread);
-		lisys_assert (self->server == NULL);
-	}
+	private_server_shutdown (self);
 
 	/* Create new server. */
 	self->server = liser_server_new (self->paths, args);
@@ -363,6 +356,26 @@ private_server_main (LIThrThread* thread,
 		lisys_error_report ();
 	liser_server_free (self->server);
 	self->server = NULL;
+}
+
+static void private_server_shutdown (
+	LICliClient* self)
+{
+	/* Terminate the server if it's running. If the server closed on its own,
+	   for example due to an error its scripts, the server program has already
+	   been freed by the server thread but the thread still exists. */
+	if (self->server != NULL)
+		limai_program_shutdown (self->server->program);
+
+	/* Free the server thread. The server program is guaranteed to be freed
+	   by the server thread so all we need to do is to wait for the thread to
+	   exit. This doesn't take long since we asked the server to quit already. */
+	if (self->server_thread != NULL)
+	{
+		lithr_thread_free (self->server_thread);
+		self->server_thread = NULL;
+		lisys_assert (self->server == NULL);
+	}
 }
 
 static int private_select (
