@@ -45,7 +45,7 @@ struct _LIEngObjectIter
  * \param iter Object iterator.
  * \param engine Engine.
  * \param point Search center in world coordinates.
- * \param radius Search radius in world units.
+ * \param radius Search radius hint in world units.
  */
 #define LIENG_FOREACH_OBJECT(iter, engine, point, radius) \
 	for (lieng_object_iter_first (&iter, engine, point, radius) ; iter.object != NULL ; \

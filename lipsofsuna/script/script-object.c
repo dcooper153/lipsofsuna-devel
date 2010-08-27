@@ -249,6 +249,7 @@ static void Object_find_objects (LIScrArgs* args)
 	LIEngObject* object;
 	LIEngSector* sector;
 	LIMatVector center;
+	LIMatVector diff;
 	LIMaiProgram* program;
 
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
@@ -259,7 +260,11 @@ static void Object_find_objects (LIScrArgs* args)
 		liscr_args_gets_float (args, "radius", &radius);
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 		LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
-			liscr_args_setf_data (args, iter.object->id, iter.object->script);
+		{
+			diff = limat_vector_subtract (center, iter.object->transform.position);
+			if (limat_vector_get_length (diff) < radius)
+				liscr_args_setf_data (args, iter.object->id, iter.object->script);
+		}
 	}
 
 	/* Sector find mode. */
