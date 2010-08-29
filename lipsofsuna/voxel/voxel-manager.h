@@ -89,10 +89,6 @@ LIAPICALL (void, livox_manager_copy_voxels, (
 	int           zsize,
 	LIVoxVoxel*   result));
 
-LIAPICALL (int, livox_manager_erase_voxel, (
-	LIVoxManager*      self,
-	const LIMatVector* point));
-
 LIAPICALL (LIVoxMaterial*, livox_manager_find_material, (
 	LIVoxManager* self,
 	uint32_t      id));
@@ -101,16 +97,11 @@ LIAPICALL (LIVoxVoxel*, livox_manager_find_voxel, (
 	LIVoxManager*      self,
 	int                flags,
 	const LIMatVector* point,
-	LIMatVector*       center));
+	int*               index));
 
 LIAPICALL (int, livox_manager_insert_material, (
 	LIVoxManager*  self,
 	LIVoxMaterial* material));
-
-LIAPICALL (int, livox_manager_insert_voxel, (
-	LIVoxManager*      self,
-	const LIMatVector* point,
-	const LIVoxVoxel*  terrain));
 
 LIAPICALL (void, livox_manager_mark_updates, (
 	LIVoxManager* self));
@@ -128,17 +119,6 @@ LIAPICALL (int, livox_manager_paste_voxels, (
 LIAPICALL (void, livox_manager_remove_material, (
 	LIVoxManager* self,
 	int           id));
-
-LIAPICALL (int, livox_manager_replace_voxel, (
-	LIVoxManager*      self,
-	const LIMatVector* point,
-	const LIVoxVoxel*  terrain));
-
-LIAPICALL (int, livox_manager_rotate_voxel, (
-	LIVoxManager*      self,
-	const LIMatVector* point,
-	int                axis,
-	int                step));
 
 LIAPICALL (int, livox_manager_solve_occlusion, (
 	LIVoxManager* self,

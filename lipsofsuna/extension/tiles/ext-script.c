@@ -53,6 +53,35 @@ static void Tile_new (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Rotates the tile.
+ * -- @param self Tile.
+ * -- @param args Arguments.<ul>
+ * --   <li>axis: Axis of rotation ("x"/"y"/"z" or 1/2/3)</li>
+ * --   <li>step: Number of steps to rotate.</li></ul>
+ * function Tile.rotate(self, args)
+ */
+static void Tile_rotate (LIScrArgs* args)
+{
+	int step = 1;
+	int axis = 0;
+	const char* tmp;
+
+	if (liscr_args_gets_int (args, "step", &step))
+		step %= 4;
+	if (liscr_args_gets_string (args, "axis", &tmp))
+	{
+		if (!strcmp (tmp, "x")) axis = 0;
+		else if (!strcmp (tmp, "y")) axis = 1;
+		else if (!strcmp (tmp, "z")) axis = 2;
+	}
+	else if (liscr_args_gets_int (args, "axis", &axis))
+	{
+		axis = LIMAT_CLAMP (axis - 1, 0, 2);
+	}
+	livox_voxel_rotate (args->self, axis, step);
+}
+
+/* @luadoc
  * --- Damage counter of the tile.
  * --
  * -- @name Tile.damage
@@ -125,8 +154,8 @@ static void Tile_setter_terrain (LIScrArgs* args)
  * --
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Position vector. (required)</li>
- * --   <li>size: Size vector. (required)</li></ul>
+ * --   <li>point: Tile index vector. (required)</li>
+ * --   <li>size: Region size, in tiles. (required)</li></ul>
  * -- @return Packet writer.
  * function Voxel.copy_region(clss, args)
  */
@@ -145,9 +174,7 @@ static void Voxel_copy_region (LIScrArgs* args)
 	    liscr_args_gets_vector (args, "size", &size))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		length = ((int) size.x / module->voxels->tile_width) *
-		         ((int) size.y / module->voxels->tile_width) *
-		         ((int) size.z / module->voxels->tile_width);
+		length = (int) size.x * (int) size.y * (int) size.z;
 
 		/* Read voxel data. */
 		if (length)
@@ -156,12 +183,8 @@ static void Voxel_copy_region (LIScrArgs* args)
 			if (result == NULL)
 				return;
 			livox_manager_copy_voxels (module->voxels,
-				(int) point.x / module->voxels->tile_width,
-				(int) point.y / module->voxels->tile_width,
-				(int) point.z / module->voxels->tile_width,
-				(int) size.x / module->voxels->tile_width,
-				(int) size.y / module->voxels->tile_width,
-				(int) size.z / module->voxels->tile_width, result);
+				(int) point.x, (int) point.y, (int) point.z,
+				(int) size.x, (int) size.y, (int) size.z, result);
 		}
 
 		/* Create packet writer. */
@@ -174,9 +197,9 @@ static void Voxel_copy_region (LIScrArgs* args)
 		writer = ((LIScrPacket*) packet->data)->writer;
 
 		/* Write dimensions. */
-		if (!liarc_writer_append_uint32 (writer, (int) size.x / module->voxels->tile_width) ||
-			!liarc_writer_append_uint32 (writer, (int) size.y / module->voxels->tile_width) ||
-			!liarc_writer_append_uint32 (writer, (int) size.z / module->voxels->tile_width))
+		if (!liarc_writer_append_uint32 (writer, (int) size.x) ||
+			!liarc_writer_append_uint32 (writer, (int) size.y) ||
+			!liarc_writer_append_uint32 (writer, (int) size.z))
 		{
 			lisys_free (result);
 			return;
@@ -201,31 +224,10 @@ static void Voxel_copy_region (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Erases a voxel near the given point.
- * --
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Position vector. (required)</li></ul>
- * -- @return True if terrain was erased.
- * function Voxel.erase(clss, args)
- */
-static void Voxel_erase (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIMatVector point;
-
-	if (liscr_args_gets_vector (args, "point", &point))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		liscr_args_seti_bool (args, livox_manager_erase_voxel (module->voxels, &point));
-	}
-}
-
-/* @luadoc
  * --- Fills a terrain region.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Position vector. (required)</li>
+ * --   <li>point: Tile index vector. (required)</li>
  * --   <li>size: Size vector. (required)</li>
  * --   <li>tile: Tile data.</ul>
  * function Voxel.fill_region(clss, args)
@@ -386,17 +388,17 @@ static void Voxel_find_material (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Finds the voxel nearest to the given point.
- * --
+ * --- Finds the tile nearest to the given point.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
  * --   <li>match: Tiles to search for. ("all"/"empty"/"full")</li>
- * --   <li>point: Position vector. (required)</li></ul>
- * -- @return Tile and vector, or nil.
- * function Voxel.find_voxel(clss, args)
+ * --   <li>point: Position vector in world space. (required)</li></ul>
+ * -- @return Tile and voxel index vector, or nil.
+ * function Voxel.find_tile(clss, args)
  */
-static void Voxel_find_voxel (LIScrArgs* args)
+static void Voxel_find_tile (LIScrArgs* args)
 {
+	int index[3];
 	int flags = LIVOX_FIND_ALL;
 	const char* tmp;
 	LIExtModule* module;
@@ -417,7 +419,7 @@ static void Voxel_find_voxel (LIScrArgs* args)
 		}
 
 		/* Find voxel. */
-		voxel = livox_manager_find_voxel (module->voxels, flags, &point, &result);
+		voxel = livox_manager_find_voxel (module->voxels, flags, &point, index);
 		if (voxel == NULL)
 			return;
 
@@ -427,6 +429,7 @@ static void Voxel_find_voxel (LIScrArgs* args)
 			return;
 		*((LIVoxVoxel*) data->data) = *voxel;
 		liscr_args_seti_data (args, data);
+		result = limat_vector_init (index[0], index[1], index[2]);
 		liscr_args_seti_vector (args, &result);
 		liscr_data_unref (data, NULL);
 	}
@@ -434,7 +437,6 @@ static void Voxel_find_voxel (LIScrArgs* args)
 
 /* @luadoc
  * --- Gets the data of a voxel block.
- * --
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
  * --   <li>index: Block index. (required)</li>
@@ -503,107 +505,33 @@ static void Voxel_get_block (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Inserts a voxel near the given point.
- * --
+ * --- Gets the contents of a tile.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Position vector. (required)</li>
- * --   <li>tile: Tile. (required)</li></ul>
- * -- @return True if terrain was filled.
- * function Voxel.insert(clss, args)
+ * --   <li>point: Tile index vector. (required)</li></ul>
+ * -- @return Tile.
+ * function Voxel.get_tile(clss, args)
  */
-static void Voxel_insert (LIScrArgs* args)
+static void Voxel_get_tile (LIScrArgs* args)
 {
+	int lim;
 	LIExtModule* module;
 	LIMatVector point;
-	LIScrData* voxel;
-
-	if (liscr_args_gets_vector (args, "point", &point) &&
-	    liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &voxel))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		liscr_args_seti_bool (args, livox_manager_insert_voxel (module->voxels, &point, voxel->data));
-	}
-}
-
-/* @luadoc
- * --- Removes a material definition.
- * --
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>id: ID number. (required)</li></ul>
- * function Voxel.remove_material(clss, args)
- */
-static void Voxel_remove_material (LIScrArgs* args)
-{
-	int id;
-	LIExtModule* module;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	if (liscr_args_gets_int (args, "id", &id))
-		livox_manager_remove_material (module->voxels, id);
-}
-
-/* @luadoc
- * --- Replaces the voxel near the given point.
- * --
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Position vector. (required)</li>
- * --   <li>tile: Tile. (required)</li></ul>
- * -- @return True if terrain was replaced.
- * function Voxel.replace(clss, args)
- */
-static void Voxel_replace (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIMatVector point;
-	LIScrData* voxel;
-
-	if (liscr_args_gets_vector (args, "point", &point) &&
-	    liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &voxel))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		liscr_args_seti_bool (args, livox_manager_replace_voxel (module->voxels, &point, voxel->data));
-	}
-}
-
-
-/* @luadoc
- * --- Rotates a voxel near the given point.
- * --
- * -- @param clss Voxel class.
- * -- @param args Argumennts.<ul>
- * --   <li>axis: Axis of rotation ("x"/"y"/"z" or 1/2/3)</li>
- * --   <li>point: Position vector. (required)</li>
- * --   <li>step: Number of steps to rotate.</li></ul>
- * -- @return True if a voxel was rotated.
- * function Voxel.rotate(clss, args)
- */
-static void Voxel_rotate (LIScrArgs* args)
-{
-	int step = 1;
-	int axis = 0;
-	const char* tmp;
-	LIExtModule* module;
-	LIMatVector point;
+	LIScrData* data;
 
 	if (liscr_args_gets_vector (args, "point", &point))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		if (liscr_args_gets_int (args, "step", &step))
-			step %= 4;
-		if (liscr_args_gets_string (args, "axis", &tmp))
-		{
-			if (!strcmp (tmp, "x")) axis = 0;
-			else if (!strcmp (tmp, "y")) axis = 1;
-			else if (!strcmp (tmp, "z")) axis = 2;
-		}
-		else if (liscr_args_gets_int (args, "axis", &axis))
-		{
-			axis = LIMAT_CLAMP (axis - 1, 0, 2);
-		}
-		liscr_args_seti_bool (args, livox_manager_rotate_voxel (module->voxels, &point, axis, step));
+		lim = module->voxels->tiles_per_line * module->program->sectors->count;
+		if (point.x < 0.0f || point.x >= lim ||
+		    point.y < 0.0f || point.y >= lim ||
+		    point.z < 0.0f || point.z >= lim)
+			return;
+		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
+		if (data == NULL)
+			return;
+		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, data->data);
+		liscr_args_seti_data (args, data);
 	}
 }
 
@@ -664,6 +592,34 @@ static void Voxel_set_block (LIScrArgs* args)
 
 	/* Indicate success. */
 	liscr_args_seti_bool (args, 1);
+}
+
+/* @luadoc
+ * --- Sets the contents of a tile.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>point: Tile index vector. (required)</li>
+ * --   <li>tile: Tile. (required)</li></ul>
+ * function Voxel.set_tile(clss, args)
+ */
+static void Voxel_set_tile (LIScrArgs* args)
+{
+	int lim;
+	LIExtModule* module;
+	LIMatVector point;
+	LIScrData* voxel;
+
+	if (liscr_args_gets_vector (args, "point", &point) &&
+	    liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &voxel))
+	{
+		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+		lim = module->voxels->tiles_per_line * module->program->sectors->count;
+		if (point.x < 0.0f || point.x >= lim ||
+		    point.y < 0.0f || point.y >= lim ||
+		    point.z < 0.0f || point.z >= lim)
+			return;
+		livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, voxel->data);
+	}
 }
 
 /* @luadoc
@@ -772,36 +728,34 @@ static void Voxel_setter_tiles_per_line (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liext_script_tile (LIScrClass* self,
-                   void*       data)
+void liext_script_tile (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
 	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "new", Tile_new);
+	liscr_class_insert_mfunc (self, "rotate", Tile_rotate);
 	liscr_class_insert_mvar (self, "damage", Tile_getter_damage, Tile_setter_damage);
 	liscr_class_insert_mvar (self, "rotation", Tile_getter_rotation, Tile_setter_rotation);
 	liscr_class_insert_mvar (self, "terrain", Tile_getter_terrain, Tile_setter_terrain);
 }
 
-void
-liext_script_voxel (LIScrClass* self,
-                    void*       data)
+void liext_script_voxel (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
 	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "copy_region", Voxel_copy_region);
-	liscr_class_insert_cfunc (self, "erase", Voxel_erase);
 	liscr_class_insert_cfunc (self, "fill_region", Voxel_fill_region);
 	liscr_class_insert_cfunc (self, "find_blocks", Voxel_find_blocks);
 	liscr_class_insert_cfunc (self, "find_material", Voxel_find_material);
-	liscr_class_insert_cfunc (self, "find_voxel", Voxel_find_voxel);
+	liscr_class_insert_cfunc (self, "find_tile", Voxel_find_tile);
 	liscr_class_insert_cfunc (self, "get_block", Voxel_get_block);
-	liscr_class_insert_cfunc (self, "insert", Voxel_insert);
-	liscr_class_insert_cfunc (self, "remove_material", Voxel_remove_material);
-	liscr_class_insert_cfunc (self, "replace", Voxel_replace);
-	liscr_class_insert_cfunc (self, "rotate", Voxel_rotate);
+	liscr_class_insert_cfunc (self, "get_tile", Voxel_get_tile);
 	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
+	liscr_class_insert_cfunc (self, "set_tile", Voxel_set_tile);
 	liscr_class_insert_cvar (self, "blocks_per_line", Voxel_getter_blocks_per_line, Voxel_setter_blocks_per_line);
 	liscr_class_insert_cvar (self, "fill", Voxel_getter_fill, Voxel_setter_fill);
 	liscr_class_insert_cvar (self, "materials", Voxel_getter_materials, NULL);
