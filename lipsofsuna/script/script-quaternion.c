@@ -189,7 +189,7 @@ static void Quaternion___tostring (LIScrArgs* args)
 	LIMatQuaternion* self;
 
 	self = args->self;
-	snprintf (buffer, 256, "Quaternion(%f,%f,%f,%f)", self->x, self->y, self->z, self->w);
+	snprintf (buffer, 256, "Quaternion(%g,%g,%g,%g)", self->x, self->y, self->z, self->w);
 	liscr_args_seti_string (args, buffer);
 }
 

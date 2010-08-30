@@ -140,7 +140,7 @@ static void Vector___tostring (LIScrArgs* args)
 	LIMatVector* self;
 
 	self = args->self;
-	snprintf (buffer, 256, "Vector(%f,%f,%f)", self->x, self->y, self->z);
+	snprintf (buffer, 256, "Vector(%g,%g,%g)", self->x, self->y, self->z);
 	liscr_args_seti_string (args, buffer);
 }
 
