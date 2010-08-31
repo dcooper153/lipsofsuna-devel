@@ -151,11 +151,11 @@ static void Tile_setter_terrain (LIScrArgs* args)
 
 /* @luadoc
  * --- Copies a terrain region into a packet.
- * --
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Tile index vector. (required)</li>
- * --   <li>size: Region size, in tiles. (required)</li></ul>
+ * --   <li>point: Tile index vector.</li>
+ * --   <li>sector: Sector index.</li>
+ * --   <li>size: Region size, in tiles.</li></ul>
  * -- @return Packet writer.
  * function Voxel.copy_region(clss, args)
  */
@@ -163,6 +163,8 @@ static void Voxel_copy_region (LIScrArgs* args)
 {
 	int i;
 	int length;
+	int sector;
+	int offset[3];
 	LIArcWriter* writer;
 	LIExtModule* module;
 	LIMatVector point;
@@ -170,57 +172,67 @@ static void Voxel_copy_region (LIScrArgs* args)
 	LIScrData* packet;
 	LIVoxVoxel* result;
 
-	if (liscr_args_gets_vector (args, "point", &point) &&
-	    liscr_args_gets_vector (args, "size", &size))
+	/* Get region offset and size. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (liscr_args_gets_int (args, "sector", &sector))
 	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		length = (int) size.x * (int) size.y * (int) size.z;
-
-		/* Read voxel data. */
-		if (length)
-		{
-			result = lisys_calloc (length, sizeof (LIVoxVoxel));
-			if (result == NULL)
-				return;
-			livox_manager_copy_voxels (module->voxels,
-				(int) point.x, (int) point.y, (int) point.z,
-				(int) size.x, (int) size.y, (int) size.z, result);
-		}
-
-		/* Create packet writer. */
-		packet = liscr_packet_new_writable (args->script, 0);
-		if (packet == NULL)
-		{
-			lisys_free (result);
-			return;
-		}
-		writer = ((LIScrPacket*) packet->data)->writer;
-
-		/* Write dimensions. */
-		if (!liarc_writer_append_uint32 (writer, (int) size.x) ||
-			!liarc_writer_append_uint32 (writer, (int) size.y) ||
-			!liarc_writer_append_uint32 (writer, (int) size.z))
-		{
-			lisys_free (result);
-			return;
-		}
-
-		/* Write voxel data. */
-		for (i = 0 ; i < length ; i++)
-		{
-			if (!liarc_writer_append_uint16 (writer, result[i].type) ||
-				!liarc_writer_append_uint8 (writer, result[i].damage) ||
-				!liarc_writer_append_uint8 (writer, result[i].rotation))
-			{
-				lisys_free (result);
-				return;
-			}
-		}
-
-		/* Return data. */
-		liscr_args_seti_data (args, packet);
-		lisys_free (result);
+		lialg_sectors_index_to_offset (module->program->sectors, sector,
+			offset + 0, offset + 1, offset + 2);
+		point = limat_vector_init (offset[0], offset[1], offset[2]);
+		point = limat_vector_multiply (point, module->voxels->tiles_per_line);
+		size.x = size.y = size.z = module->voxels->tiles_per_line;
+		length = module->voxels->tiles_per_sector;
 	}
+	else if (liscr_args_gets_vector (args, "point", &point) &&
+	         liscr_args_gets_vector (args, "size", &size))
+	{
+		if (point.x < 0.0f || point.y < 0.0f || point.z < 0.0f ||
+		    size.x < 1.0f || size.y < 1.0f || size.z < 1.0f)
+			return;
+		length = (int) size.x * (int) size.y * (int) size.z;
+	}
+	else
+		return;
+
+	/* Read voxel data. */
+	result = lisys_calloc (length, sizeof (LIVoxVoxel));
+	if (result == NULL)
+		return;
+	livox_manager_copy_voxels (module->voxels,
+		(int) point.x, (int) point.y, (int) point.z,
+		(int) size.x, (int) size.y, (int) size.z, result);
+
+	/* Create packet writer. */
+	packet = liscr_packet_new_writable (args->script, 0);
+	if (packet == NULL)
+	{
+		lisys_free (result);
+		return;
+	}
+	writer = ((LIScrPacket*) packet->data)->writer;
+
+	/* Write dimensions. */
+	if (!liarc_writer_append_uint32 (writer, (int) size.x) ||
+		!liarc_writer_append_uint32 (writer, (int) size.y) ||
+		!liarc_writer_append_uint32 (writer, (int) size.z))
+	{
+		lisys_free (result);
+		return;
+	}
+
+	/* Write voxel data. */
+	for (i = 0 ; i < length ; i++)
+	{
+		if (!livox_voxel_write (result + i, writer))
+		{
+			lisys_free (result);
+			return;
+		}
+	}
+
+	/* Return data. */
+	liscr_args_seti_data (args, packet);
+	lisys_free (result);
 }
 
 /* @luadoc
@@ -247,7 +259,7 @@ static void Voxel_fill_region (LIScrArgs* args)
 	if (!liscr_args_gets_vector (args, "point", &pos) ||
 	    !liscr_args_gets_vector (args, "size", &size))
 		return;
-	if (size.x <= 0.0f || size.y <= 0.0f || size.z <= 0.0f)
+	if (size.x < 1.0f || size.y < 1.0f || size.z < 1.0f)
 		return;
 	if (liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &data))
 		tile = *((LIVoxVoxel*) data->data);
@@ -536,6 +548,110 @@ static void Voxel_get_tile (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Pastes a terrain region from a packet to the map.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>packet: Data packet.</li>
+ * --   <li>point: Tile index vector.</li>
+ * --   <li>sector: Sector index.</li></ul>
+ * function Voxel.paste_region(clss, args)
+ */
+static void Voxel_paste_region (LIScrArgs* args)
+{
+	int i;
+	int length;
+	int sector;
+	int offset[3];
+	uint8_t tmp;
+	uint32_t size[3];
+	LIArcReader* reader;
+	LIExtModule* module;
+	LIMatVector point;
+	LIScrData* data;
+	LIScrPacket* packet;
+	LIVoxVoxel* voxels;
+
+	/* Get region offset. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (liscr_args_gets_int (args, "sector", &sector))
+	{
+		lialg_sectors_index_to_offset (module->program->sectors, sector,
+			offset + 0, offset + 1, offset + 2);
+		point = limat_vector_init (offset[0], offset[1], offset[2]);
+		point = limat_vector_multiply (point, module->voxels->tiles_per_line);
+	}
+	else if (liscr_args_gets_vector (args, "point", &point))
+	{
+		if (point.x < 0.0f || point.y < 0.0f || point.z < 0.0f)
+			return;
+	}
+	else
+		return;
+
+	/* Get terrain data. */
+	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
+		return;
+	packet = data->data;
+	if (packet->reader == NULL)
+	{
+		reader = liarc_reader_new (
+			liarc_writer_get_buffer (packet->writer),
+			liarc_writer_get_length (packet->writer));
+		if (reader == NULL)
+			return;
+	}
+	else
+		reader = packet->reader;
+
+	/* Read dimensions. */
+	if (!liarc_reader_get_uint8 (reader, &tmp) ||
+	    !liarc_reader_get_uint32 (reader, size + 0) ||
+	    !liarc_reader_get_uint32 (reader, size + 1) ||
+	    !liarc_reader_get_uint32 (reader, size + 2))
+	{
+		if (packet->reader == NULL)
+			liarc_reader_free (reader);
+		return;
+	}
+	length = size[0] * size[1] * size[2];
+	if (!length)
+	{
+		if (packet->reader == NULL)
+			liarc_reader_free (reader);
+		return;
+	}
+
+	/* Allocate space for voxel data. */
+	voxels = lisys_calloc (length, sizeof (LIVoxVoxel));
+	if (voxels == NULL)
+	{
+		if (packet->reader == NULL)
+			liarc_reader_free (reader);
+		return;
+	}
+
+	/* Read voxel data. */
+	for (i = 0 ; i < length ; i++)
+	{
+		if (!livox_voxel_read (voxels + i, reader))
+		{
+			if (packet->reader == NULL)
+				liarc_reader_free (reader);
+			lisys_free (voxels);
+			return;
+		}
+	}
+
+	/* Paste voxel data to the map. */
+	livox_manager_paste_voxels (module->voxels,
+		(int) point.x, (int) point.y, (int) point.z,
+		size[0], size[1], size[2], voxels);
+	if (packet->reader == NULL)
+		liarc_reader_free (reader);
+	lisys_free (voxels);
+}
+
+/* @luadoc
  * --- Sets the contents of a voxel block.
  * --
  * -- @param clss Voxel class.
@@ -754,6 +870,7 @@ void liext_script_voxel (
 	liscr_class_insert_cfunc (self, "find_tile", Voxel_find_tile);
 	liscr_class_insert_cfunc (self, "get_block", Voxel_get_block);
 	liscr_class_insert_cfunc (self, "get_tile", Voxel_get_tile);
+	liscr_class_insert_cfunc (self, "paste_region", Voxel_paste_region);
 	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
 	liscr_class_insert_cfunc (self, "set_tile", Voxel_set_tile);
 	liscr_class_insert_cvar (self, "blocks_per_line", Voxel_getter_blocks_per_line, Voxel_setter_blocks_per_line);

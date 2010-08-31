@@ -58,7 +58,6 @@ struct _LIAlgSectors
 	int count;
 	int loading;
 	float width;
-	float unload;
 	LIAlgU32dic* sectors;
 	LIAlgStrdic* content;
 	LIAlgSectorsCallback sector_free_callback;
@@ -174,13 +173,6 @@ LIAPICALL (void, lialg_sectors_remove_content, (
 LIAPICALL (void, lialg_sectors_update, (
 	LIAlgSectors* self,
 	float         secs));
-
-LIAPICALL (float, lialg_sectors_get_unload, (
-	const LIAlgSectors* self));
-
-LIAPICALL (void, lialg_sectors_set_unload, (
-	LIAlgSectors* self,
-	float         value));
 
 LIAPICALL (void*, lialg_sectors_get_userdata, (
 	LIAlgSectors* self,

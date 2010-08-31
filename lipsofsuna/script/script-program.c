@@ -131,6 +131,25 @@ static void Program_push_event (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Unloads a sector.<br/>
+ * -- Unrealizes all objects in the sector and clears the terrain in the sector.
+ * -- The sector is then removed from the sector list.
+ * -- @param clss Program class.
+ * -- @param args Arguments.<ul>
+ * --   <li>sector: Sector index.</li></ul>
+ * function Program.unload_sector(clss, args)
+ */
+static void Program_unload_sector (LIScrArgs* args)
+{
+	int sector;
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+	if (liscr_args_gets_int (args, "sector", &sector))
+		lialg_sectors_remove (program->sectors, sector);
+}
+
+/* @luadoc
  * --- Unloads the world map.<br/>
  * -- Unrealizes all objects and destroys all sectors of the world map.
  * -- You usually want to do this when you're about to create a new map with
@@ -208,6 +227,28 @@ static void Program_setter_quit (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Dictionary of indices of active sectors.
+ * -- @name Program.sectors
+ * -- @class table
+ */
+static void Program_getter_sectors (LIScrArgs* args)
+{
+	int idle;
+	LIAlgSector* sector;
+	LIAlgU32dicIter iter;
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	LIALG_U32DIC_FOREACH (iter, program->sectors->sectors)
+	{
+		sector = iter.value;
+		idle = (int) time (NULL) - sector->stamp;
+		liscr_args_setf_float (args, iter.key, idle);
+	}
+}
+
+/* @luadoc
  * --- Short term average tick length in seconds.
  * -- @name Program.tick
  * -- @class table
@@ -245,11 +286,13 @@ liscr_script_program (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "load_extension", Program_load_extension);
 	liscr_class_insert_cfunc (self, "pop_event", Program_pop_event);
 	liscr_class_insert_cfunc (self, "push_event", Program_push_event);
+	liscr_class_insert_cfunc (self, "unload_sector", Program_unload_sector);
 	liscr_class_insert_cfunc (self, "unload_world", Program_unload_world);
 	liscr_class_insert_cfunc (self, "shutdown", Program_shutdown);
 	liscr_class_insert_cfunc (self, "update", Program_update);
 	liscr_class_insert_cvar (self, "args", Program_getter_args, NULL);
 	liscr_class_insert_cvar (self, "quit", Program_getter_quit, Program_setter_quit);
+	liscr_class_insert_cvar (self, "sectors", Program_getter_sectors, NULL);
 	liscr_class_insert_cvar (self, "tick", Program_getter_tick, NULL);
 	liscr_class_insert_cvar (self, "time", Program_getter_time, NULL);
 }

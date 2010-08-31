@@ -259,7 +259,10 @@ static int private_object_model (
 		return 1;
 
 	/* Set its collision shape. */
-	liphy_object_set_shape (phyobj, model->physics);
+	if (model != NULL)
+		liphy_object_set_shape (phyobj, model->physics);
+	else
+		liphy_object_set_shape (phyobj, NULL);
 
 	return 1;
 }
