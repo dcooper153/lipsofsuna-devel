@@ -659,6 +659,120 @@ class LINodeRoot(LINode):
 		self.rot = LIFormat.quat
 		self.loc = mathutils.Vector((0, 0, 0))
 
+class LIParticle:
+
+	def __init__(self):
+		self.frame_start = 0
+		self.frame_end = 0
+		self.frames = []
+
+	def add_frame(self, frame):
+		self.frames.append(frame)
+		self.frame_end += 1
+
+	# \brief Saves the particle.
+	# \param self Particle.
+	# \param writer Writer.
+	def write(self, writer):
+		# FIXME: The first frame is broken for some reason.
+		if len(self.frames):
+			del self.frames[0]
+		writer.write_int(self.frame_start)
+		writer.write_int(len(self.frames))
+		for f in self.frames:
+			writer.write_float(f.x)
+			writer.write_float(f.y)
+			writer.write_float(f.z)
+		writer.write_marker()
+
+class LIParticles:
+
+	def __init__(self, file):
+		# Create particle systems.
+		self.file = file
+		self.particlesystems = []
+		obj = bpy.context.scene.objects.active
+		for object in bpy.context.scene.objects:
+			if self.file in object_files(object):
+				for sys in object.particle_systems:
+					self.particlesystems.append(LIParticleSystem(object, sys))
+		# Calculate total animation length.
+		self.frame_start = 0
+		self.frame_end = 0
+		self.frame_end_emit = 0
+		for sys in self.particlesystems:
+			if self.frame_end_emit < sys.frame_end:
+				self.frame_end_emit = sys.frame_end
+			if self.frame_end < sys.frame_end + sys.lifetime:
+				self.frame_end = sys.frame_end + sys.lifetime
+		# Animate particle systems.
+		if len(self.particlesystems):
+			for frame in range(self.frame_start, self.frame_end):
+				# Switch frame.
+				bpy.context.scene.set_frame(frame)
+				# Add particle frame.
+				for sys in self.particlesystems:
+					sys.add_frame()
+
+	# \brief Saves all particle systems.
+	# \param self Particle manager.
+	# \param writer Writer.
+	def write(self, writer):
+		if not len(self.particlesystems):
+			return False
+		writer.write_int(len(self.particlesystems))
+		writer.write_marker()
+		for sys in self.particlesystems:
+			sys.write(writer)
+		return True
+
+class LIParticleSystem:
+
+	def __init__(self, object, system):
+		self.object = object
+		self.system = system
+		self.particles = []
+		self.frame_start = 0
+		self.frame_end = int(self.system.settings.frame_end)
+		self.lifetime = int(self.system.settings.lifetime)
+		self.particle_size = self.system.settings.particle_size
+		# Set material texture.
+		self.texture = "particle1"
+		mat = self.system.settings.material - 1
+		if mat < len(self.object.material_slots):
+			mat = self.object.material_slots[mat]
+			tex = mat.material.texture_slots[0]
+			if tex and tex.texture and tex.texture.type == "IMAGE":
+				img = tex.texture.image
+				self.texture = os.path.splitext(os.path.basename(img.filepath))[0]
+		# Create particles.
+		for sys in self.system.particles:
+			self.particles.append(LIParticle())
+
+	def add_frame(self):
+		i = 0
+		for bpar in self.system.particles:
+			lpar = self.particles[i]
+			if bpar.alive_state == 'UNBORN':
+				lpar.frame_start += 1
+			elif bpar.alive_state == 'ALIVE':
+				lpar.add_frame(LIFormat.matrix * (bpar.location - self.object.location))
+			i += 1
+
+	# \brief Saves the particle system.
+	# \param self Particle system.
+	# \param writer Writer.
+	def write(self, writer):
+		writer.write_int(self.frame_start)
+		writer.write_int(self.frame_end)
+		writer.write_int(self.frame_end + self.lifetime)
+		writer.write_float(self.particle_size)
+		writer.write_string(self.texture)
+		writer.write_int(len(self.particles))
+		writer.write_marker()
+		for par in self.particles:
+			par.write(writer)
+
 class LIShape:
 
 	def __init__(self, name):
@@ -834,6 +948,8 @@ class LIFile:
 			bpy.ops.object.delete()
 		# Build the node hierarchy.
 		self.hier = LIHierarchy(file)
+		# Build particle animations.
+		self.particles = LIParticles(file)
 
 	def write(self):
 		if not self.mesh and not self.hier:
@@ -885,6 +1001,10 @@ class LIFile:
 		data.clear("sha")
 		if self.coll.write(data):
 			self.write_block("sha", data)
+		# Particles.
+		data.clear("par")
+		if self.particles.write(data):
+			self.write_block("par", data)
 		# Done.
 		self.file.close()
 		if debug:
@@ -963,6 +1083,7 @@ class LIExporter(bpy.types.Operator):
 		if not len(files):
 			path,name = os.path.split(bpy.data.filepath)
 			path = os.path.join(os.path.split(path)[0], "graphics")
+			name = os.path.splitext(name)[0] + ".lmdl"
 			files = [os.path.join(path, name)]
 			LIFormat.files = files
 		# Export each file.

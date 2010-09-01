@@ -918,14 +918,104 @@ private_lighting_render (LIRenScene*    self,
 static void
 private_particle_render (LIRenScene* self)
 {
+	int i;
+	int j;
+	float fade;
 	float color0[4];
 	float color1[4];
 	float attenuation[] = { 1.0f, 1.0f, 0.0f };
 	LIAlgStrdicIter iter;
+	LIAlgU32dicIter iter1;
+	LIMatMatrix matrix;
+	LIMatVector v[4];
+	LIMatVector bbp;
+	LIMatVector bbx;
+	LIMatVector bby;
+	LIMatVector bbsx;
+	LIMatVector bbsy;
+	LIMatVector position;
+	LIMdlModel* model;
+	LIMdlParticle* part;
+	LIMdlParticleSystem* system;
 	LIParGroup* group;
 	LIParLine* line;
 	LIParPoint* particle;
 	LIRenImage* image;
+	LIRenObject* object;
+
+	/* Set billboard rendering mode. */
+	if (livid_features.shader_model >= 3)
+		glUseProgramObjectARB (0);
+	glColor3f (1.0f, 1.0f, 1.0f);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+
+	/* Get billboard axis. */
+	matrix = self->state.context->modelviewinverse;
+	bbp = limat_matrix_transform (matrix, limat_vector_init (0.0f, 0.0f, 0.0f));
+	bbx = limat_matrix_transform (matrix, limat_vector_init (1.0f, 0.0f, 0.0f));
+	bby = limat_matrix_transform (matrix, limat_vector_init (0.0f, 1.0f, 0.0f));
+	bbx = limat_vector_subtract (bbx, bbp);
+	bby = limat_vector_subtract (bby, bbp);
+
+	/* Render particle systems of objects as billboards. */
+	LIALG_U32DIC_FOREACH (iter1, self->objects)
+	{
+		/* Get the model of the object. */
+		object = iter1.value;
+		if (!liren_object_get_realized (object))
+			continue;
+		model = object->model->model;
+
+		/* Render all particle systems of the model. */
+		for (i = 0 ; i < model->particlesystems.count ; i++)
+		{
+			/* Find texture image of the system. */
+			system = model->particlesystems.array + i;
+			image = liren_render_find_image (self->render, system->texture);
+			if (image == NULL)
+			{
+				liren_render_load_image (self->render, system->texture);
+				image = liren_render_find_image (self->render, system->texture);
+				if (image == NULL)
+					continue;
+			}
+
+			/* Calculate billboard size. */
+			bbsx = limat_vector_multiply (bbx, system->particle_size);
+			bbsy = limat_vector_multiply (bby, system->particle_size);
+
+			/* Render each alive particle. */
+			glBindTexture (GL_TEXTURE_2D, image->texture->texture);
+			glBegin (GL_QUADS);
+			for (j = 0 ; j < system->particles.count ; j++)
+			{
+				part = system->particles.array + j;
+				if (limdl_particle_get_state (part, object->particle.time, object->particle.loop, &position, &fade))
+				{
+					position = limat_transform_transform (object->transform, position);
+					v[0] = limat_vector_subtract (position, bbsx);
+					v[0] = limat_vector_subtract (v[0], bbsy);
+					v[1] = limat_vector_add (position, bbsx);
+					v[1] = limat_vector_subtract (v[1], bbsy);
+					v[2] = limat_vector_add (position, bbsx);
+					v[2] = limat_vector_add (v[2], bbsy);
+					v[3] = limat_vector_subtract (position, bbsx);
+					v[3] = limat_vector_add (v[3], bbsy);
+					glColor4f (1.0f, 1.0f, 1.0f, fade);
+					glTexCoord2i (0, 0);
+					glVertex3f (v[0].x, v[0].y, v[0].z);
+					glTexCoord2i (1, 0);
+					glVertex3f (v[1].x, v[1].y, v[1].z);
+					glTexCoord2i (1, 1);
+					glVertex3f (v[2].x, v[2].y, v[2].z);
+					glTexCoord2i (0, 1);
+					glVertex3f (v[3].x, v[3].y, v[3].z);
+				}
+			}
+			glEnd ();
+		}
+	}
 
 	/* Set point particle rendering mode. */
 	if (livid_features.shader_model >= 3)

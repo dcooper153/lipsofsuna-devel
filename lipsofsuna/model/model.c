@@ -59,6 +59,10 @@ static int private_read_nodes (
 	LIMdlModel*  self,
 	LIArcReader* reader);
 
+static int private_read_particles (
+	LIMdlModel*  self,
+	LIArcReader* reader);
+
 static int private_read_shapes (
 	LIMdlModel*  self,
 	LIArcReader* reader);
@@ -111,6 +115,10 @@ static int private_write_materials (
 	LIArcWriter*      writer);
 
 static int private_write_nodes (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_particles (
 	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
@@ -313,6 +321,12 @@ limdl_model_free (LIMdlModel* self)
 	}
 
 	/* Free particles. */
+	if (self->particlesystems.array != NULL)
+	{
+		for (i = 0 ; i < self->particlesystems.count ; i++)
+			limdl_particle_system_clear (self->particlesystems.array + i);
+		lisys_free (self->particlesystems.array);
+	}
 	if (self->hairs.array != NULL)
 	{
 		for (i = 0 ; i < self->hairs.count ; i++)
@@ -1181,6 +1195,12 @@ private_read (LIMdlModel*  self,
 			lisys_free (id);
 			return 0;
 		}
+		if (size > reader->length - reader->pos)
+		{
+			lisys_error_append ("invalid chunk size for `%s'", id);
+			lisys_free (id);
+			return 0;
+		}
 		if (!strcmp (id, "bou"))
 			ret = private_read_bounds (self, reader);
 		else if (!strcmp (id, "mat"))
@@ -1197,6 +1217,8 @@ private_read (LIMdlModel*  self,
 			ret = private_read_animations (self, reader);
 		else if (!strcmp (id, "hai"))
 			ret = private_read_hairs (self, reader);
+		else if (!strcmp (id, "par"))
+			ret = private_read_particles (self, reader);
 		else if (!strcmp (id, "sha"))
 			ret = private_read_shapes (self, reader);
 		else
@@ -1409,6 +1431,36 @@ private_read_nodes (LIMdlModel*  self,
 	return 1;
 }
 
+static int private_read_particles (
+	LIMdlModel*  self,
+	LIArcReader* reader)
+{
+	int i;
+	uint32_t tmp[1];
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, tmp + 0))
+		return 0;
+
+	/* Allocate particle systems. */
+	if (tmp[0])
+	{
+		self->particlesystems.array = lisys_calloc (tmp[0], sizeof (LIMdlParticleSystem));
+		if (self->particlesystems.array == NULL)
+			return 0;
+		self->particlesystems.count = tmp[0];
+	}
+
+	/* Read particle systems. */
+	for (i = 0 ; i < self->particlesystems.count ; i++)
+	{
+		if (!limdl_particle_system_read (self->particlesystems.array + i, reader))
+			return 0;
+	}
+
+	return 1;
+}
+
 static int
 private_read_shapes (LIMdlModel*  self,
                      LIArcReader* reader)
@@ -1585,6 +1637,7 @@ static int private_write (
 	    !private_write_block (self, "nod", private_write_nodes, writer) ||
 	    !private_write_block (self, "ani", private_write_animations, writer) ||
 	    !private_write_block (self, "hai", private_write_hairs, writer) ||
+	    !private_write_block (self, "par", private_write_particles, writer) ||
 	    !private_write_block (self, "sha", private_write_shapes, writer))
 		return 0;
 	return 1;
@@ -1783,6 +1836,30 @@ static int private_write_nodes (
 	{
 		node = self->nodes.array[i];
 		if (!limdl_node_write (node, writer))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int private_write_particles (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
+{
+	int i;
+
+	/* Check if writing is needed. */
+	if (!self->particlesystems.count)
+		return 1;
+
+	/* Write header. */
+	if (!liarc_writer_append_uint32 (writer, self->particlesystems.count))
+		return 0;
+
+	/* Write particle systems. */
+	for (i = 0 ; i < self->particlesystems.count ; i++)
+	{
+		if (!limdl_particle_system_write (self->particlesystems.array + i, writer))
 			return 0;
 	}
 

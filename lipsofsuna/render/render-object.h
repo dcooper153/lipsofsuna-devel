@@ -63,6 +63,11 @@ struct _LIRenObject
 		LIMatVector center;
 		LIMatMatrix matrix;
 	} orientation;
+	struct
+	{
+		int loop;
+		float time;
+	} particle;
 };
 
 LIAPICALL (LIRenObject*, liren_object_new, (
@@ -74,6 +79,11 @@ LIAPICALL (void, liren_object_free, (
 
 LIAPICALL (void, liren_object_deform, (
 	LIRenObject* self));
+
+LIAPICALL (void, liren_object_particle_animation, (
+	LIRenObject* self,
+	float        start,
+	int          loop));
 
 LIAPICALL (void, liren_object_update, (
 	LIRenObject* self,

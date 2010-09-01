@@ -35,6 +35,7 @@
 #include "model-hair.h"
 #include "model-light.h"
 #include "model-material.h"
+#include "model-particle.h"
 #include "model-node.h"
 #include "model-shape.h"
 #include "model-types.h"
@@ -84,6 +85,7 @@ struct _LIMdlModel
 	struct { int count; LIMdlFaces* array; } facegroups;
 	struct { int count; LIMdlMaterial* array; } materials;
 	struct { int count; LIMdlNode** array; } nodes;
+	struct { int count; LIMdlParticleSystem* array; } particlesystems;
 	struct { int count; LIMdlShape* array; } shapes;
 	struct { int count; LIMdlVertex* array; int capacity; } vertices;
 	struct { int count; LIMdlWeightGroup* array; } weightgroups;

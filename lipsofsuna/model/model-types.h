@@ -70,6 +70,16 @@ typedef void (*LIMdlNodeTransformFunc)(void*, LIMdlNode*, LIMatTransform*);
 
 /**
  * @}
+ * \addtogroup LIMdlParticle Particle
+ * @{
+ */
+
+typedef struct _LIMdlParticle LIMdlParticle;
+typedef struct _LIMdlParticleFrame LIMdlParticleFrame;
+typedef struct _LIMdlParticleSystem LIMdlParticleSystem;
+
+/**
+ * @}
  * \addtogroup LIMdlPose Pose
  * @{
  */

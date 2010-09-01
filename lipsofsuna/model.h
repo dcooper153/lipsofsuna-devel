@@ -25,6 +25,7 @@
 #include "model/model-material.h"
 #include "model/model-node.h"
 #include "model/model-light.h"
+#include "model/model-particle.h"
 #include "model/model-pose.h"
 #include "model/model-shape.h"
 #include "model/model-texture.h"

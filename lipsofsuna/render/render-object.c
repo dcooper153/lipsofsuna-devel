@@ -139,6 +139,21 @@ liren_object_deform (LIRenObject* self)
 }
 
 /**
+ * \brief Sets the particle animation state of the object.
+ * \param self Object.
+ * \param start Animation offset in seconds.
+ * \param loop Nonzero to enable looping.
+ */
+void liren_object_particle_animation (
+	LIRenObject* self,
+	float        start,
+	int          loop)
+{
+	self->particle.time = start;
+	self->particle.loop = loop;
+}
+
+/**
  * \brief Advances the timer of the object and deforms its mesh.
  *
  * \param self Object.
@@ -148,6 +163,7 @@ void
 liren_object_update (LIRenObject* self,
                      float        secs)
 {
+	self->particle.time += secs;
 	private_envmap_update (self);
 }
 
